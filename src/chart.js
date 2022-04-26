@@ -22,12 +22,17 @@ const CLASS_OFFCHART  = "tradeXoffChart"
 
 
 
-export default class Chart {
+export default class TradeXchart {
+
+
+  static #cnt = 0
+  static #instances = {}
 
   #el = undefined
   #inCnt = null
   #userClasses = ""
 
+  
 
   constructor (container, options={}, inCnt) {
     
@@ -46,6 +51,19 @@ export default class Chart {
   }
 
   get inCnt() { return this.#inCnt }
+
+  static create(container, options={}) {
+    const cnt = ++TradeXchart.#cnt
+    TradeXchart.#instances[cnt] = new TradeXchart(container, options, cnt)
+    return TradeXchart.#instances[cnt]
+  }
+
+  static destroy(chart) {
+    if (chart.constructor.name === "TradeXchart") {
+      const inCnt = chart.inCnt
+      delete TradeXchart.#instances[inCnt]
+    }
+  }
 
   init(options, inCnt) {
     this.#inCnt = inCnt
@@ -86,15 +104,31 @@ export default class Chart {
               <div class="${CLASS_ROW} ${CLASS_CHART}">
                 <div class="${CLASS_WIDGETS}"></div>
                 <canvas/>
-                <div class="${CLASS_SCALE}"></div>
+                <div class="${CLASS_SCALE}">
+                  <canvas/>
+                </div>
               </div>
             </div>
-            <div class="${CLASS_TIME}"></div>
+            <div class="${CLASS_TIME}">
+              <canvas/>
+            </div>
           </div>
         </div>
       </div>
     `
     return node
+  }
+
+  insertRow() {
+    const node = `
+      <div class="${CLASS_ROW} ${CLASS_OFFCHART}">
+        <div class="${CLASS_WIDGETS}"></div>
+        <canvas/>
+        <div class="${CLASS_SCALE}">
+          <canvas/>
+        </div>
+      </div>
+    `
   }
 
   setClasses(classes) {
