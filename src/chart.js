@@ -1,7 +1,7 @@
 // chart.js
 
 import DOM from './utils/DOM'
-import { isObject, isString } from './utils/typeChecks'
+import { isArray, isNumber, isObject, isString } from './utils/typeChecks'
 
 const NAME = "TradeX-Chart"
 
@@ -20,8 +20,6 @@ const CLASS_WIDGETS   = "tradeXwidgets"
 const CLASS_ONCHART   = "tradeXonChart"
 const CLASS_OFFCHART  = "tradeXoffChart"
 
-
-
 export default class TradeXchart {
 
 
@@ -30,8 +28,20 @@ export default class TradeXchart {
 
   #el = undefined
   #inCnt = null
-  #userClasses = ""
+  #userClasses = []
 
+  chartW
+  chartH
+  chartWMax = "100%"
+  chartWMin
+  chartHMax = "100%"
+  chartHMin
+  chartW_Reactive = true
+  chartH_Reactive = true
+
+  logs = false
+  warnings = false
+  errors = false
   
 
   constructor (container, options={}, inCnt) {
@@ -47,10 +57,18 @@ export default class TradeXchart {
       this.#el = container
       this.init(options, inCnt)
     }
-    else console.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`)
+    else this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`)
   }
 
+  log(l) { if (this.logs) console.log(l) }
+  warning(w) { if (this.warnings) console.warn(l) }
+  error(e) { if (this.errors) console.error(e) }
+
   get inCnt() { return this.#inCnt }
+  get width() { return this.chartW }
+  set width(w) { this.setWidth(w) } 
+  get height() { return this.chartH }
+  set height(h) { this.setHeight(h) }
 
   static create(container, options={}) {
     const cnt = ++TradeXchart.#cnt
@@ -68,15 +86,18 @@ export default class TradeXchart {
   init(options, inCnt) {
     this.#inCnt = inCnt
 
-    if (this.#el !== undefined) {
-      if (isObject(options) 
-      && ("userClasses" in options) 
-      && isString(options?.userClasses))
-        this.#userClasses = options.userClasses
+    this.mount()
+
+    if (isObject(options)) {
+      for (const option in options) {
+        if (option in props) {
+          this[option](options[option])
+        }
+      }
     }
 
-    this.mount()
   }
+
 
   mount() {
     this.#el.innerHTML = this.defaultNode()
@@ -89,6 +110,47 @@ export default class TradeXchart {
   cleanup() {
     // remove all event listeners
     // destroy all objects
+  }
+
+  props() {
+    return {
+      userClasses: (classes) => this.setUserClasses(classes),
+      width: (width) => this.setWidth(width),
+      height: (height) => this.setHeight(height),
+    }
+  }
+
+  setWidth(w) {
+    if (isNumber(w))
+      this.chartW = w
+    else 
+      this.chartW = this.#el.parentElement.width
+    this.#el.width = this.chartW
+  }
+
+  setHeight(h) {
+    if (isNumber(h))
+      this.chartH = h
+    else 
+      this.chartH = this.#el.parentElement.height
+    this.#el.height = this.chartH
+  }
+
+  setUserClasses(c) {
+    if (isString(c)) {
+      let uc = c.split(" ")
+      this.#userClasses = uc
+    }
+    else if (isArray(c)) {
+      this.#userClasses = c
+    }
+    else {
+      this.warn(`Supplied user classes not valid. Expecting type String or Array`)
+    }
+
+    for (let cl of this.#userClasses) {
+      classes.add(cl)
+    }
   }
 
   defaultNode() {
