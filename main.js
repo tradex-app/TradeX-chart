@@ -1,4 +1,4 @@
-import { create, DOM } from './src/'
+import { Chart, DOM } from './src/'
 
 import './style.css'
 
@@ -8,5 +8,6 @@ DOM.findBySelector('#app').innerHTML = `
   <div id="test"></div>
 `
 const mount = DOM.findByID('test')
-create(mount)
+// create(mount)
+const chart = Chart.create(mount)
 

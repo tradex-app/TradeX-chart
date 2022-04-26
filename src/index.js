@@ -1,4 +1,5 @@
-import create from './core'
+// import create from './core'
+import Chart from './chart'
 import DOM from './utils/DOM'
 
-export { create, DOM }
+export { Chart, DOM }
