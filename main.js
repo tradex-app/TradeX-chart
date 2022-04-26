@@ -8,6 +8,10 @@ DOM.findBySelector('#app').innerHTML = `
   <div id="test"></div>
 `
 const mount = DOM.findByID('test')
-// create(mount)
+const props = {
+  logs: true,
+  warnings: true,
+  errors: true,
+}
 const chart = Chart.create(mount)
 

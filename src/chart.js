@@ -1,7 +1,7 @@
 // chart.js
 
 import DOM from './utils/DOM'
-import { isArray, isNumber, isObject, isString } from './utils/typeChecks'
+import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeChecks'
 
 const NAME = "TradeX-Chart"
 
@@ -117,6 +117,9 @@ export default class TradeXchart {
       userClasses: (classes) => this.setUserClasses(classes),
       width: (width) => this.setWidth(width),
       height: (height) => this.setHeight(height),
+      logs: (logs) => this.logs = (isBoolean(logs)) ? logs : false,
+      warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
+      errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
     }
   }
 
