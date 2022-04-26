@@ -27,6 +27,19 @@ export default class TradeXchart {
   static #instances = {}
 
   #el = undefined
+  #elTXChart
+  #elUtils
+  #elBody
+  #elTools
+  #elMain
+  #elWidgetsG
+  #elRows
+  #elChart
+  #elChartWidgets
+  #elChartCanvas
+  #elChartScale
+  #elTime
+
   #inCnt = null
   #userClasses = []
 
@@ -38,6 +51,11 @@ export default class TradeXchart {
   chartHMin
   chartW_Reactive = true
   chartH_Reactive = true
+
+  utilsH = 20
+  toolsW = 45
+  timeH  = 30
+  scaleW = 60
 
   logs = false
   warnings = false
@@ -88,6 +106,7 @@ export default class TradeXchart {
 
     this.mount()
 
+
     if (isObject(options)) {
       for (const option in options) {
         if (option in props) {
@@ -101,6 +120,18 @@ export default class TradeXchart {
 
   mount() {
     this.#el.innerHTML = this.defaultNode()
+    this.#elTXChart = this.#el.children[0]
+    this.#elUtils = this.#elTXChart.children[0]
+    this.#elBody  = this.#elTXChart.children[1]
+    this.#elTools = this.#elBody.children[0]
+    this.#elMain  = this.#elBody.children[1]
+    this.#elWidgetsG = this.#elMain.children[0]
+    this.#elRows  = this.#elMain.children[1]
+    this.#elChart = this.#elRows.children[0]
+    this.#elChartWidgets = this.#elChart.children[0]
+    this.#elChartCanvas = this.#elChart.children[1]
+    this.#elChartScale = this.#elChart.children[2]
+    this.#elTime = this.#elMain.children[2]
   }
 
   unmount() {
