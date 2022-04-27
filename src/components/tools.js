@@ -4,15 +4,27 @@
 
 export default class ToolsBar {
 
+  #name = "Toolbar"
+  #shortname = "tools"
+  #core
   #elTools
 
   constructor (core) {
 
+    this.#core = core
     this.#elTools = core.elTools
-    this.insertTools(this.#elTools)
+    this.init()
   }
 
-  insertTools(el) {
+  log(l) { if (this.#core.logs) console.log(l) }
+  warning(w) { if (this.#core.warnings) console.warn(l) }
+  error(e) { if (this.#core.errors) console.error(e) }
+
+  init() {
+    this.mount(this.#elTools)
+  }
+
+  mount(el) {
     el.innerHTML = this.defaultNode()
   }
 

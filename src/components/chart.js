@@ -22,9 +22,15 @@ import {
   CLASS_ONCHART,
   CLASS_OFFCHART,
 } from '../definitions/core'
+
+const STYLE_CHART = "border: 1px solid"
+const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid"
 export default class Chart {
 
+  #name = "chart"
+  #shortname = "chart"
   #core
+  #target
   #elChart
   #elWidgets
   #elCanvas
@@ -32,10 +38,11 @@ export default class Chart {
 
   #Scale
 
-  constructor (core) {
+  constructor (core, target) {
 
     this.#core = core
-    this.#elChart = core.elChart
+    this.#target = target
+    this.#elChart = target
     this.init()
   }
 
@@ -61,11 +68,13 @@ export default class Chart {
   }
 
   defaultNode() {
+    const styleScale = STYLE_SCALE + ``
+
     const node = `
       <p>Chart</p>
       <div class="${CLASS_WIDGETS}"></div>
-      <canvas></canvas>
-      <div class="${CLASS_SCALE}"></div>
+      <canvas id="" width="" height="" style="${STYLE_CHART}"></canvas>
+      <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
     return node
   }
