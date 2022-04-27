@@ -4,8 +4,8 @@ import DOM from './utils/DOM'
 import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeChecks'
 import UtilsBar from './components/utils'
 import ToolsBar from './components/tools'
-import Timeline from './components/timeLine'
-import Chart from './components/chart'
+import MainPane from './components/main'
+// import Chart from './components/chart'
 import {
   NAME,
   ID,
@@ -25,6 +25,11 @@ import {
   CLASS_OFFCHART,
 } from './definitions/core'
 
+const STYLE_UTILS = "border-bottom: 1px solid;"
+const STYLE_BODY  = "position: relative;"
+const STYLE_TOOLS = "position: absolute; top: 0; left: 0; border-right: 1px solid;"
+const STYLE_MAIN  = "position: absolute; top: 0;"
+
 
 export default class TradeXchart {
 
@@ -39,10 +44,6 @@ export default class TradeXchart {
   #elBody
   #elTools
   #elMain
-  #elWidgetsG
-  #elRows
-  #elChart
-  #elTime
 
   #inCnt = null
   #userClasses = []
@@ -64,8 +65,14 @@ export default class TradeXchart {
   UtilsBar
   ToolsBar
   Timeline
-  Chart
-  ScaleBar
+  MainPane
+  // Chart
+
+  panes = {
+    utils: UtilsBar,
+    tools: ToolsBar,
+    main: MainPane,
+  }
 
   logs = false
   warnings = false
@@ -100,8 +107,9 @@ export default class TradeXchart {
   set height(h) { this.setHeight(h) }
   get elUtils() { return this.#elUtils }
   get elTools() { return this.#elTools }
-  get elTime() { return this.#elTime }
-  get elChart() { return this.#elChart }
+  // get elTime() { return this.#elTime }
+  get elMain() { return this.#elMain }
+  // get elChart() { return this.#elChart }
 
 
   static create(container, options={}) {
@@ -136,8 +144,8 @@ export default class TradeXchart {
 
     this.UtilsBar = new UtilsBar(this)
     this.ToolsBar = new ToolsBar(this)
-    this.Timeline = new Timeline(this)
-    this.Chart = new Chart(this)
+    // this.Timeline = new Timeline(this)
+    this.MainPane = new MainPane(this)
 
   }
 
@@ -152,10 +160,10 @@ export default class TradeXchart {
     this.#elBody = DOM.findBySelector(`#${this.id} .${CLASS_BODY}`)
     this.#elTools = DOM.findBySelector(`#${this.id} .${CLASS_TOOLS}`)
     this.#elMain  = DOM.findBySelector(`#${this.id} .${CLASS_MAIN}`)
-    this.#elWidgetsG = DOM.findBySelector(`#${this.id} .${CLASS_WIDGETSG}`)
-    this.#elRows  = DOM.findBySelector(`#${this.id} .${CLASS_ROWS}`)
-    this.#elChart = DOM.findBySelector(`#${this.id} .${CLASS_CHART}`)
-    this.#elTime = DOM.findBySelector(`#${this.id} .${CLASS_TIME}`)
+    // this.#elWidgetsG = DOM.findBySelector(`#${this.id} .${CLASS_WIDGETSG}`)
+    // this.#elRows  = DOM.findBySelector(`#${this.id} .${CLASS_ROWS}`)
+    // this.#elChart = DOM.findBySelector(`#${this.id} .${CLASS_CHART}`)
+    // this.#elTime = DOM.findBySelector(`#${this.id} .${CLASS_TIME}`)
   }
 
   unmount() {
@@ -220,43 +228,21 @@ export default class TradeXchart {
   }
 
   defaultNode() {
+
+    const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px;`
+    const styleMain = STYLE_MAIN + ` left: ${this.toolsW}px; width: calc(100% - ${this.toolsW}px);`
     
     const node = `
       <div id="${this.id}" class="${CLASS_DEFAULT} ${this.#userClasses}">
-        <div class="${CLASS_UTILS}"></div>
-        <div class="${CLASS_BODY}">
-          <div class="${CLASS_TOOLS}"></div>
-          <div class="${CLASS_MAIN}">
-            <div class="${CLASS_WIDGETSG}"></div>
-            <div class="${CLASS_ROWS}">
-              <div class="${CLASS_ROW} ${CLASS_CHART}">
-                <div class="${CLASS_WIDGETS}"></div>
-                <canvas></canvas>
-                <div class="${CLASS_SCALE}">
-                  <canvas><canvas/>
-                </div>
-              </div>
-            </div>
-            <div class="${CLASS_TIME}">
-              <canvas><canvas/>
-            </div>
+        <div class="${CLASS_UTILS}" style="${STYLE_UTILS}"></div>
+        <div class="${CLASS_BODY}" style="${STYLE_BODY}">
+          <div class="${CLASS_TOOLS}" style="${styleTools}"></div>
+          <div class="${CLASS_MAIN}" style="${styleMain}">
           </div>
         </div>
       </div>
     `
     return node
-  }
-
-  insertRow() {
-    const node = `
-      <div class="${CLASS_ROW} ${CLASS_OFFCHART}">
-        <div class="${CLASS_WIDGETS}"></div>
-        <canvas/>
-        <div class="${CLASS_SCALE}">
-          <canvas/>
-        </div>
-      </div>
-    `
   }
 
   setClasses(classes) {

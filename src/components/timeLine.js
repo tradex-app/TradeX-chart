@@ -2,24 +2,39 @@
 // Time bar that lives at the top of the chart
 // Providing: chart drawing Time
 
+
 export default class Timeline {
 
+  #name = "Timeline"
+  #shortName = "time"
+  #core
+  #target
   #elTime
 
-  constructor (core) {
+  constructor (core, target) {
 
-    this.#elTime = core.elTime
-    this.insertTime(this.#elTime)
+    this.#core = core
+    this.#target = target
+    this.#elTime = target
+    this.init()
+  }
+  
+  log(l) { if (this.#core.logs) console.log(l) }
+  warning(w) { if (this.#core.warnings) console.warn(l) }
+  error(e) { if (this.#core.errors) console.error(e) }
+
+  init() {
+    this.mount(this.#elTime)
   }
 
-  insertTime(el) {
+  mount(el) {
     el.innerHTML = this.defaultNode()
   }
 
   defaultNode() {
     const node = `
       <p>Timeline</p>
-      <canvas></canvas>
+      <canvas width="" height="${this.#core.timeH}"></canvas>
     `
     return node
   }
