@@ -2,23 +2,29 @@
 
 import DOM from './utils/DOM'
 import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeChecks'
+import UtilsBar from './components/utils'
+import ToolsBar from './components/tools'
+import Timeline from './components/timeLine'
+import Chart from './components/chart'
+import {
+  NAME,
+  ID,
+  CLASS_DEFAULT,
+  CLASS_UTILS ,
+  CLASS_BODY,
+  CLASS_WIDGETSG,
+  CLASS_TOOLS,
+  CLASS_MAIN,
+  CLASS_TIME,
+  CLASS_ROWS,
+  CLASS_ROW,
+  CLASS_CHART,
+  CLASS_SCALE,
+  CLASS_WIDGETS,
+  CLASS_ONCHART,
+  CLASS_OFFCHART,
+} from './definitions/core'
 
-const NAME = "TradeX-Chart"
-
-const CLASS_DEFAULT   = "tradeXchart"
-const CLASS_UTILS     = "tradeXutils"
-const CLASS_BODY      = "tradeXbody"
-const CLASS_WIDGETSG  = "tradeXwidgetsG"
-const CLASS_TOOLS     = "tradeXtools"
-const CLASS_MAIN      = "tradeXmain"
-const CLASS_TIME      = "tradeXtime"
-const CLASS_ROWS      = "tradeXrow"
-const CLASS_ROW       = "tradeXrow"
-const CLASS_CHART     = "tradeXchart"
-const CLASS_SCALE     = "tradeXscale"
-const CLASS_WIDGETS   = "tradeXwidgets"
-const CLASS_ONCHART   = "tradeXonChart"
-const CLASS_OFFCHART  = "tradeXoffChart"
 
 export default class TradeXchart {
 
@@ -26,6 +32,7 @@ export default class TradeXchart {
   static #cnt = 0
   static #instances = {}
 
+  #id
   #el = undefined
   #elTXChart
   #elUtils
@@ -35,9 +42,6 @@ export default class TradeXchart {
   #elWidgetsG
   #elRows
   #elChart
-  #elChartWidgets
-  #elChartCanvas
-  #elChartScale
   #elTime
 
   #inCnt = null
@@ -56,6 +60,12 @@ export default class TradeXchart {
   toolsW = 45
   timeH  = 30
   scaleW = 60
+
+  UtilsBar
+  ToolsBar
+  Timeline
+  Chart
+  ScaleBar
 
   logs = false
   warnings = false
@@ -82,11 +92,17 @@ export default class TradeXchart {
   warning(w) { if (this.warnings) console.warn(l) }
   error(e) { if (this.errors) console.error(e) }
 
+  get id() { return this.#id }
   get inCnt() { return this.#inCnt }
   get width() { return this.chartW }
   set width(w) { this.setWidth(w) } 
   get height() { return this.chartH }
   set height(h) { this.setHeight(h) }
+  get elUtils() { return this.#elUtils }
+  get elTools() { return this.#elTools }
+  get elTime() { return this.#elTime }
+  get elChart() { return this.#elChart }
+
 
   static create(container, options={}) {
     const cnt = ++TradeXchart.#cnt
@@ -104,9 +120,12 @@ export default class TradeXchart {
   init(options, inCnt) {
     this.#inCnt = inCnt
 
+    const id = (isObject(options) && isString(options.id)) ? options.id : null
+    this.setID(id)
+
     this.mount()
 
-
+    // process options
     if (isObject(options)) {
       for (const option in options) {
         if (option in props) {
@@ -115,23 +134,28 @@ export default class TradeXchart {
       }
     }
 
+    this.UtilsBar = new UtilsBar(this)
+    this.ToolsBar = new ToolsBar(this)
+    this.Timeline = new Timeline(this)
+    this.Chart = new Chart(this)
+
   }
 
 
   mount() {
+    // mount the framework
     this.#el.innerHTML = this.defaultNode()
-    this.#elTXChart = this.#el.children[0]
-    this.#elUtils = this.#elTXChart.children[0]
-    this.#elBody  = this.#elTXChart.children[1]
-    this.#elTools = this.#elBody.children[0]
-    this.#elMain  = this.#elBody.children[1]
-    this.#elWidgetsG = this.#elMain.children[0]
-    this.#elRows  = this.#elMain.children[1]
-    this.#elChart = this.#elRows.children[0]
-    this.#elChartWidgets = this.#elChart.children[0]
-    this.#elChartCanvas = this.#elChart.children[1]
-    this.#elChartScale = this.#elChart.children[2]
-    this.#elTime = this.#elMain.children[2]
+
+    // define the elements for the components to mount onto
+    this.#elTXChart = DOM.findBySelector(`#${this.id}`)
+    this.#elUtils = DOM.findBySelector(`#${this.id} .${CLASS_UTILS}`)
+    this.#elBody = DOM.findBySelector(`#${this.id} .${CLASS_BODY}`)
+    this.#elTools = DOM.findBySelector(`#${this.id} .${CLASS_TOOLS}`)
+    this.#elMain  = DOM.findBySelector(`#${this.id} .${CLASS_MAIN}`)
+    this.#elWidgetsG = DOM.findBySelector(`#${this.id} .${CLASS_WIDGETSG}`)
+    this.#elRows  = DOM.findBySelector(`#${this.id} .${CLASS_ROWS}`)
+    this.#elChart = DOM.findBySelector(`#${this.id} .${CLASS_CHART}`)
+    this.#elTime = DOM.findBySelector(`#${this.id} .${CLASS_TIME}`)
   }
 
   unmount() {
@@ -145,6 +169,7 @@ export default class TradeXchart {
 
   props() {
     return {
+      // id: (id) => this.setID(id),
       userClasses: (classes) => this.setUserClasses(classes),
       width: (width) => this.setWidth(width),
       height: (height) => this.setHeight(height),
@@ -152,6 +177,13 @@ export default class TradeXchart {
       warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
     }
+  }
+
+  setID(id) {
+    if (isString(id)) 
+      this.#id = id
+    else 
+      this.#id = ID + this.#inCnt
   }
 
   setWidth(w) {
@@ -190,7 +222,7 @@ export default class TradeXchart {
   defaultNode() {
     
     const node = `
-      <div class="${CLASS_DEFAULT} ${this.#userClasses}">
+      <div id="${this.id}" class="${CLASS_DEFAULT} ${this.#userClasses}">
         <div class="${CLASS_UTILS}"></div>
         <div class="${CLASS_BODY}">
           <div class="${CLASS_TOOLS}"></div>
@@ -199,14 +231,14 @@ export default class TradeXchart {
             <div class="${CLASS_ROWS}">
               <div class="${CLASS_ROW} ${CLASS_CHART}">
                 <div class="${CLASS_WIDGETS}"></div>
-                <canvas/>
+                <canvas></canvas>
                 <div class="${CLASS_SCALE}">
-                  <canvas/>
+                  <canvas><canvas/>
                 </div>
               </div>
             </div>
             <div class="${CLASS_TIME}">
-              <canvas/>
+              <canvas><canvas/>
             </div>
           </div>
         </div>
