@@ -2,6 +2,7 @@
 // State management for the entire chart component library thing
 
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
+import Store from './store'
 import Dataset from '../units/dataset'
 
 export default class State {
@@ -46,37 +47,39 @@ export default class State {
 
   validateState(state) {
 
-    if (!('chart' in this.#data)) {
-      this.#data.chart = {
+    if (!('chart' in state)) {
+      state.chart = {
           type: 'Candles',
-          data: this.#data.ohlcv || []
+          data: state.ohlcv || []
       }
     }
 
-    if (!('onchart' in this.#data)) {
-        this.#data.onchart = []
+    if (!('onchart' in state)) {
+        state.onchart = []
     }
 
-    if (!('offchart' in this.#data)) {
-        this.#data.offchart = []
+    if (!('offchart' in state)) {
+        state.offchart = []
     }
 
-    if (!this.#data.chart.settings) {
-        this.#data.chart.settings = {}
+    if (!state.chart.settings) {
+        state.chart.settings = {}
     }
 
     // Remove ohlcv we have Data v1.1^
-    delete this.#data.ohlcv
+    delete state.ohlcv
 
-    if (!('datasets' in this.#data)) {
-        this.#data.datasets = []
+    if (!('datasets' in state)) {
+        state.datasets = []
     }
 
     // Init dataset proxies
-    for (var ds of this.#data.datasets) {
+    for (var ds of state.datasets) {
       if (!this.#dss) this.#dss = {}
       this.dss[ds.id] = new Dataset(this, ds)
     }
+
+    this.#data = state
   }
 
   defaultState() {
