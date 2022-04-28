@@ -16,7 +16,7 @@ import { getGlobalObject, isNode } from '../utils/browser-or-node'
 import { _get, _set } from '../utils/utilities';
 import customEvent from '../events/custom'
 
-module.exports = class Store extends events {
+module.exports = class Store {
 
   globalStore = {}
   persistent = false
