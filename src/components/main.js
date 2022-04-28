@@ -25,8 +25,9 @@ import {
   CLASS_OFFCHART,
 } from '../definitions/core'
 
-const STYLE_TIME = "border-top: 1px solid;"
-
+const STYLE_ROWS = "width:100%; min-width:100%;"
+const STYLE_TIME = "border-top: 1px solid; width:100%; min-width:100%;"
+const STYLE_SCALE = "border-left: 1px solid;"
 
 
 export default class MainPane {
@@ -83,10 +84,13 @@ export default class MainPane {
   }
 
   defaultNode() {
+    const styleRows = STYLE_ROWS + `height: calc(100% - ${this.#core.timeH}px)`
+    const styleTime = STYLE_TIME + ` height: ${this.#core.timeH}px; border-color: ${this.#core.chartBorderColour};`
+
     const node = `
     <div class="${CLASS_WIDGETSG}"></div>
-    <div class="${CLASS_ROWS}"></div>
-    <div class="${CLASS_TIME}" style="${STYLE_TIME}">
+    <div class="${CLASS_ROWS}" style="${styleRows}"></div>
+    <div class="${CLASS_TIME}" style="${styleTime}">
       <canvas id=""><canvas/>
     </div>
     `
@@ -94,11 +98,13 @@ export default class MainPane {
   }
 
   rowNode(type) {
+    const styleScale = STYLE_SCALE + ` border-color: ${this.#core.chartBorderColour};`
+
     const node = `
       <div class="${CLASS_ROW} ${type}">
         <div class="${CLASS_WIDGETS}"></div>
         <canvas><canvas/>
-        <div class="${CLASS_SCALE}">
+        <div class="${styleScale}">
           <canvas id=""><canvas/>
         </div>
       </div>

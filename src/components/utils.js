@@ -31,7 +31,7 @@ export default class UtilsBar {
 
   defaultNode() {
     const node = `
-      <p>Utils Bar</p>
+
     `
     return node
   }
