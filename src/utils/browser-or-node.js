@@ -17,7 +17,7 @@ export const isJsDom = () => (typeof window !== 'undefined' && window.name === '
   || navigator.userAgent.includes('Node.js')
   || navigator.userAgent.includes('jsdom');
 
-  export const getGlobalObject = () => {
+export const getGlobalObject = () => {
   if (typeof globalThis !== 'undefined') { return globalThis; }
   if (typeof self !== 'undefined') { return self; }
   if (typeof window !== 'undefined') { return window; }
