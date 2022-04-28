@@ -23,8 +23,8 @@ import {
   CLASS_OFFCHART,
 } from '../definitions/core'
 
-const STYLE_CHART = "border: 1px solid"
-const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid"
+const STYLE_CHART = "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
+const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
 export default class Chart {
 
   #name = "chart"
@@ -68,12 +68,17 @@ export default class Chart {
   }
 
   defaultNode() {
-    const styleScale = STYLE_SCALE + ``
+    const styleChart = STYLE_CHART + ` border-color: ${this.#core.chartBorderColour};`
+    const styleScale = STYLE_SCALE + ` width: ${this.#core.scaleW - 1}px; border-color: ${this.#core.chartBorderColour};`
+    
+    const rowsH = DOM.findBySelector(`#${this.#core.id} .${CLASS_ROWS}`).clientHeight
+    const rowsW = DOM.findBySelector(`#${this.#core.id} .${CLASS_ROWS}`).clientWidth - 1
+    const chartH = rowsH - 1
+    const chartW = rowsW - this.#core.scaleW
 
     const node = `
-      <p>Chart</p>
       <div class="${CLASS_WIDGETS}"></div>
-      <canvas id="" width="" height="" style="${STYLE_CHART}"></canvas>
+      <canvas id="" width="${chartW}" height="${chartH}" style="${styleChart}"></canvas>
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
     return node

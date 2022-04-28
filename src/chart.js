@@ -25,10 +25,11 @@ import {
   CLASS_OFFCHART,
 } from './definitions/core'
 
+const STYLE_TXCHART = "overflow: hidden;"
 const STYLE_UTILS = "border-bottom: 1px solid;"
 const STYLE_BODY  = "position: relative;"
-const STYLE_TOOLS = "position: absolute; top: 0; left: 0; border-right: 1px solid;"
-const STYLE_MAIN  = "position: absolute; top: 0;"
+const STYLE_TOOLS = "position: absolute; top: 0; left: 0; height: 100%; min-height: 100%; border-right: 1px solid;"
+const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;"
 
 
 export default class TradeXchart {
@@ -48,16 +49,17 @@ export default class TradeXchart {
   #inCnt = null
   #userClasses = []
 
-  chartW
-  chartH
-  chartWMax = "100%"
-  chartWMin
-  chartHMax = "100%"
-  chartHMin
+  chartW = 500
+  chartH = 400
+  chartWMin = 500
+  chartHMin = 400
   chartW_Reactive = true
   chartH_Reactive = true
+  chartBGColour = "#444"
+  chartTxtColour = "#CCC"
+  chartBorderColour = "#666"
 
-  utilsH = 20
+  utilsH = 30
   toolsW = 45
   timeH  = 30
   scaleW = 60
@@ -160,10 +162,6 @@ export default class TradeXchart {
     this.#elBody = DOM.findBySelector(`#${this.id} .${CLASS_BODY}`)
     this.#elTools = DOM.findBySelector(`#${this.id} .${CLASS_TOOLS}`)
     this.#elMain  = DOM.findBySelector(`#${this.id} .${CLASS_MAIN}`)
-    // this.#elWidgetsG = DOM.findBySelector(`#${this.id} .${CLASS_WIDGETSG}`)
-    // this.#elRows  = DOM.findBySelector(`#${this.id} .${CLASS_ROWS}`)
-    // this.#elChart = DOM.findBySelector(`#${this.id} .${CLASS_CHART}`)
-    // this.#elTime = DOM.findBySelector(`#${this.id} .${CLASS_TIME}`)
   }
 
   unmount() {
@@ -229,13 +227,17 @@ export default class TradeXchart {
 
   defaultNode() {
 
-    const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px;`
+    const classesTXChart = CLASS_DEFAULT+" "+this.#userClasses 
+    const styleTXChart = STYLE_TXCHART + ` height: ${this.chartH}px; width: ${this.chartW}px; background: ${this.chartBGColour}; color: ${this.chartTxtColour};`
+    const styleUtils = STYLE_UTILS + ` height: ${this.utilsH}px; width: ${this.chartW}px; border-color: ${this.chartBorderColour};`
+    const styleBody = STYLE_BODY + ` height: calc(100% - ${this.utilsH}px); width: ${this.chartW}px;`
+    const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour};`
     const styleMain = STYLE_MAIN + ` left: ${this.toolsW}px; width: calc(100% - ${this.toolsW}px);`
     
     const node = `
-      <div id="${this.id}" class="${CLASS_DEFAULT} ${this.#userClasses}">
-        <div class="${CLASS_UTILS}" style="${STYLE_UTILS}"></div>
-        <div class="${CLASS_BODY}" style="${STYLE_BODY}">
+      <div id="${this.id}" class="${classesTXChart}" style="${styleTXChart}">
+        <div class="${CLASS_UTILS}" style="${styleUtils}"></div>
+        <div class="${CLASS_BODY}" style="${styleBody}">
           <div class="${CLASS_TOOLS}" style="${styleTools}"></div>
           <div class="${CLASS_MAIN}" style="${styleMain}">
           </div>

@@ -33,7 +33,6 @@ export default class Timeline {
 
   defaultNode() {
     const node = `
-      <p>Timeline</p>
       <canvas width="" height="${this.#core.timeH}"></canvas>
     `
     return node
