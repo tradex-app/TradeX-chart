@@ -79,6 +79,22 @@ export default class TradeXchart {
   logs = false
   warnings = false
   errors = false
+
+  state = {
+    chart: {
+      type: "candles",
+      indexed: false,
+      data: [],
+      settings: {},
+      row: {},
+      tf: ""
+    },
+    onchart: [],
+    offchart: [],
+    datasets: [],
+    tools: [],
+    ohlcv: []
+  }
   
 
   constructor (container, options={}, inCnt) {
