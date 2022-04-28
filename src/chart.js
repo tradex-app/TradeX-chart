@@ -5,7 +5,8 @@ import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeCh
 import UtilsBar from './components/utils'
 import ToolsBar from './components/tools'
 import MainPane from './components/main'
-// import Chart from './components/chart'
+import State from './state'
+
 import {
   NAME,
   ID,
@@ -80,24 +81,10 @@ export default class TradeXchart {
   warnings = false
   errors = false
 
-  state = {
-    chart: {
-      type: "candles",
-      indexed: false,
-      data: [],
-      settings: {},
-      row: {},
-      tf: ""
-    },
-    onchart: [],
-    offchart: [],
-    datasets: [],
-    tools: [],
-    ohlcv: []
-  }
+  state = {}
   
 
-  constructor (container, options={}, inCnt) {
+  constructor (container, options={}, state, inCnt) {
     
     if (isString(container)) {
       if (container[0] === '#')
@@ -108,7 +95,7 @@ export default class TradeXchart {
 
     if (DOM.isElement(container)) {
       this.#el = container
-      this.init(options, inCnt)
+      this.init(options, state, inCnt)
     }
     else this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`)
   }
@@ -130,7 +117,7 @@ export default class TradeXchart {
   // get elChart() { return this.#elChart }
 
 
-  static create(container, options={}) {
+  static create(container, options={}, state) {
     const cnt = ++TradeXchart.#cnt
     TradeXchart.#instances[cnt] = new TradeXchart(container, options, cnt)
     return TradeXchart.#instances[cnt]
@@ -143,7 +130,7 @@ export default class TradeXchart {
     }
   }
 
-  init(options, inCnt) {
+  init(options, state, inCnt) {
     this.#inCnt = inCnt
 
     const id = (isObject(options) && isString(options.id)) ? options.id : null
@@ -162,8 +149,9 @@ export default class TradeXchart {
 
     this.UtilsBar = new UtilsBar(this)
     this.ToolsBar = new ToolsBar(this)
-    // this.Timeline = new Timeline(this)
     this.MainPane = new MainPane(this)
+    this.State    = new State(state)
+
 
   }
 
