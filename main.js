@@ -9,7 +9,7 @@ DOM.findBySelector('#app').innerHTML = `
   -->
   <div id="test" style=""></div>
 `
-const mount = DOM.findByID('test')
+const mount = DOM.findBySelector('#test')
 const props = {
   logs: true,
   warnings: true,
