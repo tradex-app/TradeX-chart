@@ -1,8 +1,9 @@
 // state.js
-// State management for the entire chart component library thing
+// State management for the entire chart component library thingy
 
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import Store from './store'
+import customEvent from '../events/custom'
 import Dataset from '../units/dataset'
 
 export default class State {
@@ -29,9 +30,12 @@ export default class State {
   #currentState = ""
   #nextState
   #states = {}
+  #store
   #dss = {}
 
   constructor(state) {
+    this.#store = new Store()
+
     // validate state
     if (isObject(state)) this.validateState(state)
     else this.defaultState()
