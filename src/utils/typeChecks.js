@@ -56,3 +56,25 @@ export function isBoolean (value) {
 export function isString (value) {
   return typeof value === 'string'
 }
+
+/**
+ * @param {string} type
+ * @param value
+ * @param {string} name 
+ * @return {boolean}
+ */
+export function checkType(type, value, name) {
+  // if (typeof value !== type) {
+  //   return "" + name + " has to be a " + type;
+  // }
+  switch(type) {
+    case 'array': isArray(value); break;
+    case 'function': isFunction(value); break;
+    case 'object': isObject(value); break;
+    case 'number': isNumber(value); break;
+    case 'valid': isValid(value); break;
+    case 'boolean': isBoolean(value); break;
+    case 'string': isString(value); break;
+    default: throw new Error(`No known test for type: ${type}`)
+  }
+};

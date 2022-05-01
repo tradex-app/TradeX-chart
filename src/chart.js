@@ -5,7 +5,7 @@ import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeCh
 import UtilsBar from './components/utils'
 import ToolsBar from './components/tools'
 import MainPane from './components/main'
-import State from './state'
+// import State from './state'
 
 import {
   NAME,
@@ -150,7 +150,7 @@ export default class TradeXchart {
     this.UtilsBar = new UtilsBar(this)
     this.ToolsBar = new ToolsBar(this)
     this.MainPane = new MainPane(this)
-    this.State    = new State(state)
+    // this.State    = new State(state)
 
 
   }

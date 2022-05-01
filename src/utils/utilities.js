@@ -1,4 +1,4 @@
-import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeChecks'
+import { isArray, isBoolean, isNumber, isObject, isString } from './typeChecks'
 
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 

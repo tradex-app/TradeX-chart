@@ -25,7 +25,7 @@ module.exports = class Store {
 
   constructor ( persistent = false ) {
 
-    super()
+    // super()
 
       this.persistent = persistent
       this.getVal = this.get

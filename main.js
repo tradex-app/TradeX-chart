@@ -1,4 +1,5 @@
 import { Chart, DOM } from './src/'
+import test from './tests/inheiritance'
 
 import './style.css'
 
@@ -16,4 +17,6 @@ const props = {
   errors: true,
 }
 const chart = Chart.create(mount)
+
+test()
 
