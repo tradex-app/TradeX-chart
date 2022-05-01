@@ -1,5 +1,5 @@
 import { Chart, DOM } from './src/'
-import test from './tests/inheiritance'
+// import test from './tests/inheiritance'
 
 import './style.css'
 
@@ -18,5 +18,5 @@ const props = {
 }
 const chart = Chart.create(mount)
 
-test()
+// test()
 

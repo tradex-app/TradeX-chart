@@ -1,11 +1,12 @@
 class mediator {
 
   valid
+  #core
 
-  constructor() {
+  constructor(core) {
 
     // Check that module has required methods
-    const required = ['constructor', 'start', 'notify', 'end']
+    const required = ['constructor', 'start', 'end']
     const target = Object.getOwnPropertyNames(this.constructor.prototype)
     const intersection = required.filter(x => target.includes(x));
 
@@ -27,7 +28,7 @@ class mediator {
   * @param {Object}  context   - The context the function(s) belongs to
   */
   on(topic, cb, context) {
-
+    this.#core.subscribe(topic, cb, context)
   }
 
   /* ## Unsubscribe from a topic
@@ -39,7 +40,7 @@ class mediator {
   *                         publishes to the specified topic
   */
   off(topic, cb) {
-
+    this.#core.unsubscribe(topic, cb)
   }
 
   /* ## Publish an event
@@ -50,17 +51,17 @@ class mediator {
   * @param {Function} cb  - callback method
   */
   emit(topic, data, cb) {
-
+    this.#core.publish(topic, data, cb)
   }
 
-  /* ## Send a task
+  /* ## Execute a task
   *
   * Parameters:
   * @param {String} channel - The topic name
   * @param {Object} data    - The data that gets published
   * @param {Function} cb    - callback method
   */
-  send(channel, data, cb) {
+  execute(channel, data, cb) {
 
   }
 
@@ -77,10 +78,6 @@ class module_New extends mediator {
   start() {
 
       console.log(this.constructor.name+": It lives!!!")
-  }
-
-  notify() {
-
   }
 
   end() {
