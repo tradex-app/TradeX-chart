@@ -1,13 +1,14 @@
 import { checkType } from '../utils/typeChecks'
-import { Mediator } from './mediator'
+import Mediator from './mediator'
+import aspect from './aspect'
 
-class Core {
+export default class Core {
 
-  #modules
-  #plugins
+  #modules = {}
+  #plugins = {}
   #instances
   #sandboxes
-  #running
+  #running = {}
   #mediator
 
   log = {
@@ -38,10 +39,12 @@ class Core {
 
   register(id, newModule, options) {
     let instance = new Mediator(this, newModule, options)
-    if (instance.constructor.name !== "Mediator") {
+    if (instance.constructor.name === "Mediator") {
       throw new Error("module failed")
     }
+    aspect.before(instance, "start").add(this, "beforeModStart")
     this.#modules[id] = instance
+    return instance
   }
 
   extend(superclass, construct) {
@@ -54,6 +57,36 @@ class Core {
             construct(_super, ...args);
         }
     };
+  }
+
+  beforeModStart(id) {
+    this.#running[id] = this.#modules[id]
+    console.log(`module ${id} is running`)
+  }
+
+  hookMountsAdd(targetObject, targetMethod) {
+
+  }
+
+  hookMount() {
+    // hooks = () => {
+      // for (const hook of hooks.prototype.hooks) {
+      //   hook(...arguments)
+      // }
+    // }
+    this.hookMount.prototype = {
+      hooks: [],
+      get:function() {
+        return this.hooks
+      },
+      add:function(hook) {
+        this.hooks.push(hook)
+      },
+      remove:function(hook) {
+    
+      }
+    }
+    return hooks
   }
 
 }

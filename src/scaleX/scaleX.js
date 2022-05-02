@@ -1,6 +1,6 @@
 
-import { core } from './core'
-import { mediator } from './mediator'
+import Core from './core'
+import Mediator from './mediator'
 
 
-export { core, mediator }
+export default { Core, Mediator }

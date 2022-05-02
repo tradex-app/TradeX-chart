@@ -1,6 +1,6 @@
-import { core } from "./scaleX";
+// import { core } from "./scaleX";
 
-export class mediator {
+export default class Mediator {
 
   valid
   #core
@@ -14,13 +14,16 @@ export class mediator {
     const target = Object.getOwnPropertyNames(modClass.prototype)
     const intersection = required.filter(x => target.includes(x));
 
-    // check that module conforms to the naming convention
-    const name = modClass.prototype.constructor.name.match(/^module_\s*([$A-Z_][0-9A-Z_$]*)/i)
+    let name = modClass.prototype.constructor.name
+    // check that module is in the permitted list
+    if (!options.permittedClassNames.includes(name))
+      // or heck that module conforms to the naming convention
+      name = name.match(/^module_\s*([$A-Z_][0-9A-Z_$]*)/i)
 
     this.valid = (required.length === intersection.length)
                 && (name !== null)
 
-    console.log('Is module',this.constructor.name,'valid:',this.valid)
+    console.log('Is module',name,'valid:',this.valid)
 
     const instance = (this.valid) ? new modClass(this, options) : null
 
