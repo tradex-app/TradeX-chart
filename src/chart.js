@@ -2,6 +2,7 @@
 
 import DOM from './utils/DOM'
 import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeChecks'
+import SX from './scaleX/scaleX'
 import UtilsBar from './components/utils'
 import ToolsBar from './components/tools'
 import MainPane from './components/main'
@@ -41,6 +42,7 @@ export default class TradeXchart {
 
   #id
   #el = undefined
+  #core
   #elTXChart
   #elUtils
   #elBody
@@ -48,6 +50,7 @@ export default class TradeXchart {
   #elMain
 
   #inCnt = null
+  #state = {}
   #userClasses = []
 
   chartW = 500
@@ -81,10 +84,19 @@ export default class TradeXchart {
   warnings = false
   errors = false
 
-  state = {}
   
+/**
+ * Creates an instance of TradeXchart.
+ * @param {String|DOM element} container
+ * @param {Object} [options={}] - configuration options
+ * @param {Object} state - initial or previously exported state
+ * @param {Number} inCnt
+ * @memberof TradeXchart
+ */
+// , container, state, inCnt
+constructor (core, options={}) {
 
-  constructor (container, options={}, state, inCnt) {
+    let container = options?.container
     
     if (isString(container)) {
       if (container[0] === '#')
@@ -95,7 +107,8 @@ export default class TradeXchart {
 
     if (DOM.isElement(container)) {
       this.#el = container
-      this.init(options, state, inCnt)
+      this.#core = core
+      this.init(options)
     }
     else this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`)
   }
@@ -119,8 +132,14 @@ export default class TradeXchart {
 
   static create(container, options={}, state) {
     const cnt = ++TradeXchart.#cnt
-    TradeXchart.#instances[cnt] = new TradeXchart(container, options, cnt)
-    return TradeXchart.#instances[cnt]
+    options.cnt = cnt
+    options.state = state
+    options.container = container
+    options.permittedClassNames = ["TradeXchart"]
+    const core = new SX.Core()
+    const instance = core.register("TradeXchart", TradeXchart, options)
+    TradeXchart.#instances[cnt] = core
+    return instance
   }
 
   static destroy(chart) {
@@ -130,8 +149,13 @@ export default class TradeXchart {
     }
   }
 
-  init(options, state, inCnt) {
-    this.#inCnt = inCnt
+  /**
+   * Target element has been validated as a mount point
+   * let's start building
+   */
+  init(options) {
+    this.#inCnt = options.cnt
+    this.#state = options.state
 
     const id = (isObject(options) && isString(options.id)) ? options.id : null
     this.setID(id)
@@ -155,6 +179,12 @@ export default class TradeXchart {
 
   }
 
+  start() {
+    console.log("...processing and setting state")
+  }
+  end() {
+    console.log("...cleanup the mess")
+  }
 
   mount() {
     // mount the framework

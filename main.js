@@ -17,6 +17,7 @@ const props = {
   errors: true,
 }
 const chart = Chart.create(mount)
+chart.start()
 
 // test()
 
