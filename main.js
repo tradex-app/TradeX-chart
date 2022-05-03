@@ -13,11 +13,12 @@ DOM.findBySelector('#app').innerHTML = `
 const mount = DOM.findBySelector('#test')
 const props = {
   logs: true,
+  infos: true,
   warnings: true,
   errors: true,
 }
-const chart = Chart.create(mount)
-chart.start()
+const chart = Chart.create(mount, props)
+chart.start(chart.getModID())
 
 // test()
 

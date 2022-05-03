@@ -4,10 +4,13 @@ export default class Mediator {
 
   valid
   #core
+  #api
+  #subModules = {}
 
-  constructor(core, modClass, options) {
+  constructor(core, api, modClass, options) {
 
     this.#core = core
+    this.#api = api
 
     // Check that module has required methods
     const required = ['constructor', 'start', 'end']
@@ -15,20 +18,50 @@ export default class Mediator {
     const intersection = required.filter(x => target.includes(x));
 
     let name = modClass.prototype.constructor.name
-    // check that module is in the permitted list
+    // check that module is in the (fundamental) permitted list
+    // for modules that are fixed features of the project
     if (!options.permittedClassNames.includes(name))
-      // or heck that module conforms to the naming convention
+      // or check that module conforms to the naming convention
+      // for modules that are 3rd party 
+      // or dynamically added in the project lifecycle
       name = name.match(/^module_\s*([$A-Z_][0-9A-Z_$]*)/i)
 
+    // does the name validate?
     this.valid = (required.length === intersection.length)
                 && (name !== null)
 
-    console.log('Is module',name,'valid:',this.valid)
+    this.log('Is module',name,'valid:',this.valid)
 
-    const instance = (this.valid) ? new modClass(this, options) : null
+    const instance = (this.valid) ? new modClass(this, options) : this
 
     return instance
   
+  }
+
+  get api() { return this.#api }
+
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warning(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
+
+  /**
+   * Provision for modules to spawn other modules
+   *
+   * @param {String} id
+   * @param {Class} newModule
+   * @param {Object} options - initial provided configuration
+   * @param {Object} api - functions / methods, calculated properties
+   * @return {Instance}  
+   * @memberof Mediator
+   */
+  register(id, newModule, options, api) {
+
+    const instance = this.#core.register(id, newModule, options, api)
+
+    // track child modules instantiated by this module
+    this.#subModules[instance.modID] = instance
+    return instance
   }
 
   /* ## Subscribe to a topic
