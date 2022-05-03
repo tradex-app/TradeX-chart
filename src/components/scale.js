@@ -5,21 +5,35 @@
 export default class ScaleBar {
 
   #name = "Y Scale Axis"
-  #shortname = "scale"
+  #shortName = "scale"
+  #mediator
+  #options
   #core
   #target
   #elScale
 
-  constructor (core, target) {
+  constructor (mediator, options) {
 
-    this.#core = core
-    this.#target = target
-    this.#elScale = target.elScale
+    this.#mediator = mediator
+    this.#options = options
+    this.#elScale = mediator.api.elements.elScale
     this.init()
   }
 
+  log(l) { this.#mediator.log(l) }
+  info(i) { this.#mediator.info(i) }
+  warning(w) { this.#mediator.warn(w) }
+  error(e) { this.#mediator.error(e) }
+
+  get name() {return this.#name}
+  get shortName() {return this.#shortName}
+  get mediator() {return this.#mediator}
+  get options() {return this.#options}
+
   init() {
     this.mount(this.#elScale)
+
+    this.log(`${this.#name} instantiated`)
   }
 
 
@@ -31,18 +45,16 @@ export default class ScaleBar {
     
   }
 
-  log(l) { if (this.#core.logs) console.log(l) }
-  warning(w) { if (this.#core.warnings) console.warn(l) }
-  error(e) { if (this.#core.errors) console.error(e) }
-
   mount(el) {
     el.innerHTML = this.defaultNode()
   }
 
   defaultNode() {
+    const api = this.#mediator.api
+
     const node = `
       <p>Scale Bar</p>
-      <canvas id="" width="${this.#core.scaleW}" height=""></canvas>
+      <canvas id="" width="${api.scaleW}" height=""></canvas>
     `
     return node
   }

@@ -28,8 +28,9 @@ const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px soli
 export default class Chart {
 
   #name = "chart"
-  #shortname = "chart"
+  #shortName = "chart"
   #mediator
+  #options
   #elChart
   #elWidgets
   #elCanvas
@@ -41,7 +42,7 @@ export default class Chart {
 
     this.#mediator = mediator
     this.#elChart = mediator.api.elements.elChart
-    this.init()
+    this.init(options)
   }
 
   log(l) { this.#mediator.log(l) }
@@ -49,13 +50,30 @@ export default class Chart {
   warning(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
+  get name() {return this.#name}
+  get shortName() {return this.#shortName}
+  get mediator() {return this.#mediator}
+  get options() {return this.#options}
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
 
-  init() {
+  init(options) {
     this.mount(this.#elChart)
 
-    this.Scale = new ScaleBar(api, this)
+    // api - functions / methods, calculated properties provided by this module
+    const api = this.#mediator.api
+    api.elements = 
+    {...api.elements, 
+      ...{
+        elWidgets: this.#elWidgets,
+        elCanvas: this.#elCanvas,
+        elScale: this.#elScale
+      }
+    }
+
+    this.#Scale = this.#mediator.register("ScaleBar", ScaleBar, options, api)
+
+    this.log(`${this.#name} instantiated`)
   }
 
 

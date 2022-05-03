@@ -13,22 +13,31 @@ export default class Mediator {
     this.#api = api
 
     // Check that module has required methods
-    const required = ['constructor', 'start', 'end']
+    const required = ['constructor','start','end',"name","shortName","mediator","options"]
     const target = Object.getOwnPropertyNames(modClass.prototype)
     const intersection = required.filter(x => target.includes(x));
+
+    // // Check that module has required properties
+    // const propertiesToTest = ["name","shortName","mediator","options"];
+    // const hasProperties = (propertiesToTest.every(function(x) { return x in modClass })) 
 
     let name = modClass.prototype.constructor.name
     // check that module is in the (fundamental) permitted list
     // for modules that are fixed features of the project
-    if (!options.permittedClassNames.includes(name))
+    if ("permittedClassNames" in api && !api?.permittedClassNames.includes(name))
       // or check that module conforms to the naming convention
       // for modules that are 3rd party 
       // or dynamically added in the project lifecycle
       name = name.match(/^module_\s*([$A-Z_][0-9A-Z_$]*)/i)
 
-    // does the name validate?
-    this.valid = (required.length === intersection.length)
-                && (name !== null)
+    // does the module class validate?
+    this.valid = 
+      // has required methods?
+      (required.length === intersection.length)
+      // // has required properties?
+      // && hasProperties 
+      // has a valid class name?
+      && (name !== null)
 
     this.log('Is module',name,'valid:',this.valid)
 

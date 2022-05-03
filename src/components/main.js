@@ -3,7 +3,7 @@
 // Providing: chart, off chart indicators
 
 import DOM from "../utils/DOM"
-import Timeline from './timeLine'
+import Timeline from './timeline'
 import Chart from "./chart"
 
 
@@ -34,7 +34,7 @@ const STYLE_SCALE = "border-left: 1px solid;"
 export default class MainPane {
 
   #name = "Utilities"
-  #shortname = "Main"
+  #shortName = "Main"
   #mediator
   #options
   #elMain
@@ -53,7 +53,7 @@ export default class MainPane {
     this.#mediator = mediator
     this.#options = options
     this.#elMain = mediator.api.elements.elMain
-    this.init()
+    this.init(options)
   }
 
   log(l) { this.#mediator.log(l) }
@@ -61,14 +61,32 @@ export default class MainPane {
   warning(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
-  init() {
+  get name() {return this.#name}
+  get shortName() {return this.#shortName}
+  get mediator() {return this.#mediator}
+  get options() {return this.#options}
+
+  init(options) {
     this.mount(this.#elMain)
     this.mountRow(this.#elRows, CLASS_CHART)
 
-    this.#elChart = DOM.findBySelector(`#${this.#options.id} .${CLASS_CHART}`)
+    const api = this.#mediator.api
+    this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
+    this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
 
-    this.#Time = new Timeline(this.#mediator, this.#elTime)
-    this.#Chart = new Chart(this.#mediator, this.#elChart)
+    // api - functions / methods, calculated properties provided by this module
+    api.elements = 
+      {...api.elements, 
+        ...{
+          elChart: this.#elChart,
+          elTime: this.#elTime
+        }
+      }
+
+    this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
+    this.#Chart = this.#mediator.register("Chart", Chart, options, api)
+
+    this.log(`${this.#name} instantiated`)
   }
 
   start() {

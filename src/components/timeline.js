@@ -1,24 +1,24 @@
-// utils.js
-// Utils bar that lives at the top of the chart
-// Providing: timeframes, indicators, config, refresh, save, load
+// timeLine.js
+// Time bar that lives at the top of the chart
+// Providing: chart drawing Time
 
 
-export default class UtilsBar {
+export default class Timeline {
 
-  #name = "Utilities"
-  #shortName = "utils"
+  #name = "Timeline"
+  #shortName = "time"
   #mediator
   #options
-  #elUtils
+  #elTime
 
   constructor (mediator, options) {
 
     this.#mediator = mediator
     this.#options = options
-    this.#elUtils = mediator.api.elements.elUtils
+    this.#elTime = mediator.api.elements.elTime
     this.init()
   }
-
+  
   log(l) { this.#mediator.log(l) }
   info(i) { this.#mediator.info(i) }
   warning(w) { this.#mediator.warn(w) }
@@ -30,20 +30,9 @@ export default class UtilsBar {
   get options() {return this.#options}
 
   init() {
-    this.mount(this.#elUtils)
+    this.mount(this.#elTime)
 
     this.log(`${this.#name} instantiated`)
-  }
-
-  start() {
-    // Start the module's activities.
-    // Play time!
-  }
-
-  end() {
-    // Stop and clean up the module to prevent memory leaks.
-    // It should remove: event listeners, timers, ect.
-    // Put your toys away or it will end in tears.
   }
 
   mount(el) {
@@ -52,9 +41,18 @@ export default class UtilsBar {
 
   defaultNode() {
     const node = `
-
+      <canvas width="" height="${this.mediator.api.timeH}"></canvas>
     `
     return node
+  }
+
+
+  start() {
+
+  }
+
+  end() {
+    
   }
 
 }

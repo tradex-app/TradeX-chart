@@ -41,9 +41,12 @@ export default class TradeXchart {
   static #instances = {}
 
   #id
+  #name = NAME
+  #shortName = NAME
   #el = undefined
   #core
   #mediator
+  #options
   #elements
   #elTXChart
   #elUtils
@@ -70,6 +73,10 @@ export default class TradeXchart {
   toolsW = 45
   timeH  = 30
   scaleW = 60
+
+  static permittedClassNames = 
+      ["TradeXchart","MainPane","ToolsBar","UtilsBar",
+      "Chart","MainPane","ScaleBar","Timeline","ToolsBar"]
 
   UtilsBar
   ToolsBar
@@ -123,6 +130,10 @@ constructor (mediator, options={}) {
   error(e) { this.#mediator.error(e) }
 
   get id() { return this.#id }
+  get name() {return this.#name}
+  get shortName() {return this.#shortName}
+  get mediator() {return this.#mediator}
+  get options() {return this.#options}
   get inCnt() { return this.#inCnt }
   get width() { return this.chartW }
   set width(w) { this.setWidth(w) } 
@@ -135,19 +146,32 @@ constructor (mediator, options={}) {
   // get elChart() { return this.#elChart }
 
 
+  /**
+   * Create a new TradeXchart instance
+   *
+   * @static
+   * @param {DOM element} container
+   * @param {Object} [options={}]
+   * @param {Object} state
+   * @return {Instance}  
+   * @memberof TradeXchart
+   */
   static create(container, options={}, state) {
     const cnt = ++TradeXchart.#cnt
 
-    options.cnt = cnt
+    // options.cnt = cnt
     options.state = state
     options.modID = `${ID}_${cnt}`
     options.container = container
-    options.permittedClassNames = ["TradeXchart","MainPane","ToolsBar","UtilsBar"]
 
     const core = new SX.Core(options)
 
+    const api = {
+      permittedClassNames:TradeXchart.permittedClassNames,
+    }
+
     // register the parent module which will build and control everything
-    const instance = core.register(options.modID, TradeXchart, options)
+    const instance = core.register(options.modID, TradeXchart, options, api)
     TradeXchart.#instances[cnt] = core
     return instance
   }
@@ -183,7 +207,8 @@ constructor (mediator, options={}) {
     }
 
     // api - functions / methods, calculated properties provided by this module
-    const api = {
+    let api = {
+      ...{
       id: this.id,
       inCnt: this.inCnt,
       width: this.width,
@@ -200,12 +225,14 @@ constructor (mediator, options={}) {
       scaleW: this.scaleW,
     
       elements: this.#elements,
-    }
+    }, ...this.#mediator.api}
+
 
     this.UtilsBar = this.#mediator.register("UtilsBar", UtilsBar, options, api)
     this.ToolsBar = this.#mediator.register("ToolsBar", ToolsBar, options, api)
     this.MainPane = this.#mediator.register("MainPane", MainPane, options, api)
 
+    this.log(`${this.#name} instantiated`)
   }
 
   start() {
