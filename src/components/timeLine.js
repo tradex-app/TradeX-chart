@@ -38,4 +38,13 @@ export default class Timeline {
     return node
   }
 
+
+  start() {
+
+  }
+
+  end() {
+    
+  }
+
 }

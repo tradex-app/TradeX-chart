@@ -6,6 +6,7 @@ import DOM from "../utils/DOM"
 import Timeline from './timeLine'
 import Chart from "./chart"
 
+
 import {
   NAME,
   ID,
@@ -34,7 +35,8 @@ export default class MainPane {
 
   #name = "Utilities"
   #shortname = "Main"
-  #core
+  #mediator
+  #options
   #elMain
   #elWidgetsG
   #elRows
@@ -46,33 +48,44 @@ export default class MainPane {
   #Time
 
 
-  constructor (core) {
+  constructor (mediator, options) {
 
-    this.#core = core
-    this.#elMain = core.elMain
+    this.#mediator = mediator
+    this.#options = options
+    this.#elMain = mediator.api.elements.elMain
     this.init()
   }
 
-  log(l) { if (this.#core.logs) console.log(l) }
-  warning(w) { if (this.#core.warnings) console.warn(l) }
-  error(e) { if (this.#core.errors) console.error(e) }
+  log(l) { this.#mediator.log(l) }
+  info(i) { this.#mediator.info(i) }
+  warning(w) { this.#mediator.warn(w) }
+  error(e) { this.#mediator.error(e) }
 
   init() {
     this.mount(this.#elMain)
     this.mountRow(this.#elRows, CLASS_CHART)
 
-    this.#elChart = DOM.findBySelector(`#${this.#core.id} .${CLASS_CHART}`)
+    this.#elChart = DOM.findBySelector(`#${this.#options.id} .${CLASS_CHART}`)
 
-    this.#Time = new Timeline(this.#core, this.#elTime)
-    this.#Chart = new Chart(this.#core, this.#elChart)
+    this.#Time = new Timeline(this.#mediator, this.#elTime)
+    this.#Chart = new Chart(this.#mediator, this.#elChart)
+  }
+
+  start() {
+
+  }
+
+  end() {
+    
   }
 
   mount(el) {
     el.innerHTML = this.defaultNode()
 
-    this.#elWidgetsG = DOM.findBySelector(`#${this.#core.id} .${CLASS_WIDGETSG}`)
-    this.#elRows = DOM.findBySelector(`#${this.#core.id} .${CLASS_ROWS}`)
-    this.#elTime = DOM.findBySelector(`#${this.#core.id} .${CLASS_TIME}`)
+    const api = this.#mediator.api
+    this.#elWidgetsG = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETSG}`)
+    this.#elRows = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`)
+    this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
   }
 
   mountRow(el, type) {
@@ -84,8 +97,9 @@ export default class MainPane {
   }
 
   defaultNode() {
-    const styleRows = STYLE_ROWS + `height: calc(100% - ${this.#core.timeH}px)`
-    const styleTime = STYLE_TIME + ` height: ${this.#core.timeH}px; border-color: ${this.#core.chartBorderColour};`
+    const api = this.#mediator.api
+    const styleRows = STYLE_ROWS + `height: calc(100% - ${api.timeH}px)`
+    const styleTime = STYLE_TIME + ` height: ${api.timeH}px; border-color: ${api.chartBorderColour};`
 
     const node = `
     <div class="${CLASS_WIDGETSG}"></div>
@@ -98,7 +112,8 @@ export default class MainPane {
   }
 
   rowNode(type) {
-    const styleScale = STYLE_SCALE + ` border-color: ${this.#core.chartBorderColour};`
+    const api = this.#mediator.api
+    const styleScale = STYLE_SCALE + ` border-color: ${api.chartBorderColour};`
 
     const node = `
       <div class="${CLASS_ROW} ${type}">

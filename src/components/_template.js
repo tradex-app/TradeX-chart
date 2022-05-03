@@ -15,7 +15,7 @@ export default class UtilsBar {
 
     this.#mediator = mediator
     this.#options = options
-    this.#elUtils = mediator.api.elements.elUtils
+    this.#elUtils = options.elements.elUtils
     this.init()
   }
 

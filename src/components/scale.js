@@ -22,6 +22,15 @@ export default class ScaleBar {
     this.mount(this.#elScale)
   }
 
+
+  start() {
+
+  }
+
+  end() {
+    
+  }
+
   log(l) { if (this.#core.logs) console.log(l) }
   warning(w) { if (this.#core.warnings) console.warn(l) }
   error(e) { if (this.#core.errors) console.error(e) }

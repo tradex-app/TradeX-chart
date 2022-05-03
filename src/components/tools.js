@@ -6,22 +6,34 @@ export default class ToolsBar {
 
   #name = "Toolbar"
   #shortname = "tools"
-  #core
+  #mediator
+  #options
   #elTools
 
-  constructor (core) {
+  constructor (mediator, options) {
 
-    this.#core = core
-    this.#elTools = core.elTools
+    this.#mediator = mediator
+    this.#options = options
+    this.#elTools = mediator.api.elements.elTools
     this.init()
   }
 
-  log(l) { if (this.#core.logs) console.log(l) }
-  warning(w) { if (this.#core.warnings) console.warn(l) }
-  error(e) { if (this.#core.errors) console.error(e) }
+  log(l) { this.#mediator.log(l) }
+  info(i) { this.#mediator.info(i) }
+  warning(w) { this.#mediator.warn(w) }
+  error(e) { this.#mediator.error(e) }
 
   init() {
     this.mount(this.#elTools)
+  }
+
+
+  start() {
+
+  }
+
+  end() {
+    
   }
 
   mount(el) {

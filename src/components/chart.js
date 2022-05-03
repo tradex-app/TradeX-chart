@@ -29,8 +29,7 @@ export default class Chart {
 
   #name = "chart"
   #shortname = "chart"
-  #core
-  #target
+  #mediator
   #elChart
   #elWidgets
   #elCanvas
@@ -38,17 +37,17 @@ export default class Chart {
 
   #Scale
 
-  constructor (core, target) {
+  constructor (mediator, options) {
 
-    this.#core = core
-    this.#target = target
-    this.#elChart = target
+    this.#mediator = mediator
+    this.#elChart = mediator.api.elements.elChart
     this.init()
   }
 
-  log(l) { if (this.#core.logs) console.log(l) }
-  warning(w) { if (this.#core.warnings) console.warn(l) }
-  error(e) { if (this.#core.errors) console.error(e) }
+  log(l) { this.#mediator.log(l) }
+  info(i) { this.#mediator.info(i) }
+  warning(w) { this.#mediator.warn(w) }
+  error(e) { this.#mediator.error(e) }
 
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
@@ -56,25 +55,36 @@ export default class Chart {
   init() {
     this.mount(this.#elChart)
 
-    this.Scale = new ScaleBar(this.#core, this)
+    this.Scale = new ScaleBar(api, this)
+  }
+
+
+  start() {
+
+  }
+
+  end() {
+    
   }
 
   mount(el) {
     el.innerHTML = this.defaultNode()
 
-    this.#elWidgets = DOM.findBySelector(`#${this.#core.id} .${CLASS_WIDGETS}`)
-    this.#elCanvas = DOM.findBySelector(`#${this.#core.id} .${CLASS_CHART} canvas`)
-    this.#elScale = DOM.findBySelector(`#${this.#core.id} .${CLASS_CHART} .${CLASS_SCALE}`)
+    const api = this.#mediator.api
+    this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
+    this.#elCanvas = DOM.findBySelector(`#${api.id} .${CLASS_CHART} canvas`)
+    this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`)
   }
 
   defaultNode() {
-    const styleChart = STYLE_CHART + ` border-color: ${this.#core.chartBorderColour};`
-    const styleScale = STYLE_SCALE + ` width: ${this.#core.scaleW - 1}px; border-color: ${this.#core.chartBorderColour};`
+    const api = this.#mediator.api
+    const styleChart = STYLE_CHART + ` border-color: ${api.chartBorderColour};`
+    const styleScale = STYLE_SCALE + ` width: ${api.scaleW - 1}px; border-color: ${api.chartBorderColour};`
     
-    const rowsH = DOM.findBySelector(`#${this.#core.id} .${CLASS_ROWS}`).clientHeight
-    const rowsW = DOM.findBySelector(`#${this.#core.id} .${CLASS_ROWS}`).clientWidth - 1
+    const rowsH = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`).clientHeight
+    const rowsW = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`).clientWidth - 1
     const chartH = rowsH - 1
-    const chartW = rowsW - this.#core.scaleW
+    const chartW = rowsW - api.scaleW
 
     const node = `
       <div class="${CLASS_WIDGETS}"></div>

@@ -45,26 +45,29 @@ decoupled, event-driven architecture
 
 The features of the architecture are decoupled, allowing for flexible and extensible applications. The application is broken down into the following parts:
 
-* Modules
-* Sandbox
-* Application Core
-* Base Libraries
+* Modules (sandboxed)
+* Mediator (API)
+* Application Core (Plugins, Base Libraries)
 
 ![Scalable Javascript Applicaton Architecture](./assets/architecture.png)
 
 #### Module
 
-Modules are single-purpose parts of a larger system that are interchangeable.
+Modules are single-purpose parts of a larger system that are interchangeable. They are classes which will be instantiated with a Mediator which will sand box them.
 
 References: [1]
 
 #### Sandbox
 
-A Sandbox is an object which is an instance of the Core, creating a siloed API for the Module. None of the modules can directly mutate each other or the Core.
+A Sandbox is a module instance created with the Mediator, which presents a siloed API of the Core for the Module. None of the modules can directly mutate each other or the Core.
 
-The Sandbox uses a Facade [2] and Mediator [3] pattern.
+The Sandbox uses a [Facade](#facade) [2] and [Mediator](#mediator<a id="application-core"></a>) [3] pattern.
 
-Modules can interact with the Core and each other via the Mediator which has inheirited a specific methods and properties (Facade) from the Core.
+Modules can interact with the Core and each other via the Mediator which has inheirited a specific methods and properties ([Facade](#facade)) from the Core.
+
+#### Mediator
+
+The Mediator can be thought of as a customized API for the Core (Facade).
 
 #### <a id="application-core"></a>Core
 
@@ -76,7 +79,7 @@ Plugins extend or mofify the functionality of the Core.
 
 ### Design Patterns
 
-#### Facade
+#### <a id="facade"></a>Facade
 
 The Facace is a unifying (simplified) API for the [Application Core](#application-core).
 
@@ -86,7 +89,7 @@ In that way you can hide the features provided by the core and only show a well 
 
 References: [2]
 
-#### Mediator
+#### <a id="mediator"></a>Mediator
 
 A mediator **encapsulates** how disparate modules **interact**
 with each other by acting as an intermediary. The pattern also promotes
@@ -97,6 +100,58 @@ inter-dependency issues.
 It provides the Facade to Module, by extending the Module class.
 
 Refrences: [3]
+
+# Modules
+
+## Module Template
+
+```javascript
+export default class UtilsBar {
+
+  #modID                 // required - set by the Core
+  #name = "Utilities"    // required
+  #shortname = "utils"   // required
+  #mediator              // required
+  #options               // required
+
+  // user defined properties follow...
+
+  // required - can be empty
+  constructor (mediator, options) {
+
+    this.#mediator = mediator
+    this.#options = options
+    this.init()
+  }
+
+  // suggested
+  log(l) { this.#mediator.log(l) }
+  info(i) { this.#mediator.info(i) }
+  warning(w) { this.#mediator.warn(w) }
+  error(e) { this.#mediator.error(e) }
+
+
+  init() {
+    this.mount(this.#elUtils)
+  }
+
+  // required
+  start() {
+    // Start the module's activities.
+    // Play time!
+  }
+
+  // required
+  end() {
+    // Stop and clean up the module to prevent memory leaks.
+    // It should remove: event listeners, timers, ect.
+    // Put your toys away or it will end in tears.
+  }
+
+
+}
+
+```
 
 # References
 

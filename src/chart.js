@@ -43,6 +43,8 @@ export default class TradeXchart {
   #id
   #el = undefined
   #core
+  #mediator
+  #elements
   #elTXChart
   #elUtils
   #elBody
@@ -50,6 +52,7 @@ export default class TradeXchart {
   #elMain
 
   #inCnt = null
+  #modID
   #state = {}
   #userClasses = []
 
@@ -81,6 +84,7 @@ export default class TradeXchart {
   }
 
   logs = false
+  info = false
   warnings = false
   errors = false
 
@@ -94,7 +98,7 @@ export default class TradeXchart {
  * @memberof TradeXchart
  */
 // , container, state, inCnt
-constructor (core, options={}) {
+constructor (mediator, options={}) {
 
     let container = options?.container
     
@@ -107,15 +111,16 @@ constructor (core, options={}) {
 
     if (DOM.isElement(container)) {
       this.#el = container
-      this.#core = core
+      this.#mediator = mediator
       this.init(options)
     }
     else this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`)
   }
 
-  log(l) { if (this.logs) console.log(l) }
-  warning(w) { if (this.warnings) console.warn(l) }
-  error(e) { if (this.errors) console.error(e) }
+  log(l) { this.#mediator.log(l) }
+  info(i) { this.#mediator.info(i) }
+  warning(w) { this.#mediator.warn(w) }
+  error(e) { this.#mediator.error(e) }
 
   get id() { return this.#id }
   get inCnt() { return this.#inCnt }
@@ -132,12 +137,17 @@ constructor (core, options={}) {
 
   static create(container, options={}, state) {
     const cnt = ++TradeXchart.#cnt
+
     options.cnt = cnt
     options.state = state
+    options.modID = `${ID}_${cnt}`
     options.container = container
-    options.permittedClassNames = ["TradeXchart"]
-    const core = new SX.Core()
-    const instance = core.register("TradeXchart", TradeXchart, options)
+    options.permittedClassNames = ["TradeXchart","MainPane","ToolsBar","UtilsBar"]
+
+    const core = new SX.Core(options)
+
+    // register the parent module which will build and control everything
+    const instance = core.register(options.modID, TradeXchart, options)
     TradeXchart.#instances[cnt] = core
     return instance
   }
@@ -156,6 +166,7 @@ constructor (core, options={}) {
   init(options) {
     this.#inCnt = options.cnt
     this.#state = options.state
+    this.#modID = options.modID
 
     const id = (isObject(options) && isString(options.id)) ? options.id : null
     this.setID(id)
@@ -171,19 +182,42 @@ constructor (core, options={}) {
       }
     }
 
-    this.UtilsBar = new UtilsBar(this)
-    this.ToolsBar = new ToolsBar(this)
-    this.MainPane = new MainPane(this)
-    // this.State    = new State(state)
+    // api - functions / methods, calculated properties provided by this module
+    const api = {
+      id: this.id,
+      inCnt: this.inCnt,
+      width: this.width,
+      width: this.width,
+      height: this.height,
 
+      chartBGColour: this.chartBGColour,
+      chartTxtColour: this.chartTxtColour,
+      chartBorderColour: this.chartBorderColour,
+    
+      utilsH: this.utilsH,
+      toolsW: this.toolsW,
+      timeH: this.timeH,
+      scaleW: this.scaleW,
+    
+      elements: this.#elements,
+    }
+
+    this.UtilsBar = this.#mediator.register("UtilsBar", UtilsBar, options, api)
+    this.ToolsBar = this.#mediator.register("ToolsBar", ToolsBar, options, api)
+    this.MainPane = this.#mediator.register("MainPane", MainPane, options, api)
 
   }
 
   start() {
-    console.log("...processing and setting state")
+    this.log("...processing and setting state")
+
+    this.UtilsBar.start()
+    this.ToolsBar.start()
+    this.MainPane.start()
+
   }
   end() {
-    console.log("...cleanup the mess")
+    this.log("...cleanup the mess")
   }
 
   mount() {
@@ -196,6 +230,14 @@ constructor (core, options={}) {
     this.#elBody = DOM.findBySelector(`#${this.id} .${CLASS_BODY}`)
     this.#elTools = DOM.findBySelector(`#${this.id} .${CLASS_TOOLS}`)
     this.#elMain  = DOM.findBySelector(`#${this.id} .${CLASS_MAIN}`)
+
+    this.#elements = {
+      elTXChart: this.#elTXChart,
+      elUtils: this.#elUtils,
+      elBody: this.#elBody,
+      elTools: this.#elTools,
+      elMain: this.#elMain
+    }
   }
 
   unmount() {
@@ -219,12 +261,20 @@ constructor (core, options={}) {
     }
   }
 
+  getInCnt() {
+    return this.#inCnt
+  }
+
   setID(id) {
     if (isString(id)) 
-      this.#id = id
+      this.#id = id + this.#inCnt
     else 
       this.#id = ID + this.#inCnt
   }
+  getID() { return this.#id }
+
+  getModID() { return this.#modID }
+
 
   setWidth(w) {
     if (isNumber(w))
