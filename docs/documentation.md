@@ -1,5 +1,10 @@
 # TradeXChart
 
+
+### v0.0.0
+
+TradeXChart follows [breaking].[feature].[fix] versioning
+
 **Hook Observer Pattern**
 An extensible API like WordPress
 making it easy for third party programmers to write extensions to the core
@@ -110,7 +115,7 @@ export default class UtilsBar {
 
   #modID                 // required - set by the Core
   #name = "Utilities"    // required
-  #shortname = "utils"   // required
+  #shortName = "utils"   // required
   #mediator              // required
   #options               // required
 
@@ -148,7 +153,14 @@ export default class UtilsBar {
     // Put your toys away or it will end in tears.
   }
 
-
+  // required
+  get name() {return this.#name}
+  // required
+  get shortName() {return this.#shortName}
+  // required
+  get mediator() {return this.#mediator}
+  // required
+  get options() {return this.#options}
 }
 
 ```

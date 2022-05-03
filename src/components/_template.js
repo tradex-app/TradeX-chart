@@ -6,7 +6,7 @@
 export default class UtilsBar {
 
   #name = "Utilities"
-  #shortname = "utils"
+  #shortName = "utils"
   #mediator
   #options
   #elUtils

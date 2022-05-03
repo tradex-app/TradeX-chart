@@ -5,7 +5,7 @@
 export default class ToolsBar {
 
   #name = "Toolbar"
-  #shortname = "tools"
+  #shortName = "tools"
   #mediator
   #options
   #elTools
@@ -23,8 +23,15 @@ export default class ToolsBar {
   warning(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
+  get name() {return this.#name}
+  get shortName() {return this.#shortName}
+  get mediator() {return this.#mediator}
+  get options() {return this.#options}
+
   init() {
     this.mount(this.#elTools)
+
+    this.log(`${this.#name} instantiated`)
   }
 
 
