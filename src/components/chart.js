@@ -27,7 +27,7 @@ const STYLE_CHART = "position: absolute; top: 0; left: 0; border: 1px solid; bor
 const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
 export default class Chart {
 
-  #name = "chart"
+  #name = "Chart"
   #shortName = "chart"
   #mediator
   #options
