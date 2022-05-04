@@ -20,9 +20,9 @@ export function isFunction (value) {
  */
 export function isObject (value) {
   return (
-  typeof yourVariable === 'object' &&
-  !Array.isArray(yourVariable) &&
-  yourVariable !== null)
+  typeof value === 'object' &&
+  !Array.isArray(value) &&
+  value !== null)
 }
 
 /**

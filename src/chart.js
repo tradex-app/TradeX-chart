@@ -2,7 +2,7 @@
 
 import DOM from './utils/DOM'
 import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeChecks'
-import SX from './scaleX/scaleX'
+import SX from './scaleX/scale'
 import UtilsBar from './components/utils'
 import ToolsBar from './components/tools'
 import MainPane from './components/main'
@@ -200,8 +200,8 @@ constructor (mediator, options={}) {
     // process options
     if (isObject(options)) {
       for (const option in options) {
-        if (option in props) {
-          this[option](options[option])
+        if (option in this.props()) {
+          this.props()[option](options[option])
         }
       }
     }
