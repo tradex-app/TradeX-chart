@@ -13,7 +13,7 @@ export default class Core {
   #mediator
 
   logs = false
-  info = false
+  infos = false
   warnings = false
   errors = false
 
@@ -22,8 +22,8 @@ export default class Core {
     // process options
     if (isObject(options)) {
       for (const option in options) {
-        if (option in props) {
-          this[option](options[option])
+        if (option in this.props()) {
+          this.props()[option](options[option])
         }
       }
     }
@@ -41,7 +41,7 @@ export default class Core {
   }
 
   log(l) { if (this.logs) console.log(l) }
-  info(i) { if (this.info) console.info(i) }
+  info(i) { if (this.infos) console.info(i) }
   warning(w) { if (this.warnings) console.warn(w) }
   error(e) { if (this.errors) console.error(e) }
 
@@ -99,7 +99,7 @@ export default class Core {
 
   beforeModStart(id) {
     this.#running[id] = this.#modules[id]
-    console.log(`module ${id} is running`)
+    this.log(`module ${id} is running`)
   }
 
   hookMountsAdd(targetObject, targetMethod) {
