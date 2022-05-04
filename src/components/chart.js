@@ -72,6 +72,8 @@ export default class Chart {
     }
 
     this.#Scale = this.#mediator.register("ScaleBar", ScaleBar, options, api)
+    this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
+    this.#Scale.start("Thanks for the update!")
 
     this.log(`${this.#name} instantiated`)
   }
@@ -83,6 +85,18 @@ export default class Chart {
 
   end() {
     
+  }
+
+  on(topic, handler, context) {
+    this.#mediator.on(topic, handler, context)
+  }
+
+  off(topic, handler) {
+    this.#mediator.off(topic, handler)
+  }
+
+  emit(topic, data) {
+    this.#mediator.emit(topic, data)
   }
 
   mount(el) {

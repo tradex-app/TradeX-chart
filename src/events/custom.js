@@ -23,6 +23,31 @@
 })(typeof self !== 'undefined' ? self : this);
 
 /**
+ * https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener
+ * 
+ * options: {
+ *  capture: false
+ *  once: false
+ *  passive: false
+ *  signal: undefined
+ * }
+ *
+ */
+ export const on = function(type, cb, params) {
+  const target = params?.target || window.document
+  return target.addEventListener(type, cb)
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener
+export const off = function(type, listener, options, params) {
+  const target = params?.target || window.document
+  target.removeEventListener(type, listener, options)
+}
+
+/**
+ * https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
+ * https://developer.mozilla.org/en-US/docs/Web/Events/Creating_and_triggering_events
+ * 
  * options: {
  *   detail: {},
  *   bubbles: true,
@@ -30,15 +55,6 @@
  *   composed: false,
  * }
  */
-
-// https://github.com/lucaszadok/isomorphic-events/blob/master/src/events-browser.js
-export var on = function(evt, params, options) {
-  var target = options && options.target ? options.target : window.document;
-  return target.addEventListener(evt, params);
-};
-
-export var emit = function(evt, params, options) {
-  var target = options && options.target ? options.target : window.document;
-  return target.dispatchEvent(new window.CustomEvent(evt, params));
-};
-
+export const emit = function(type, options, params) {
+  const target = params?.target || window.document
+  return target.dispatchEvent(new CustomEvent(type, options))

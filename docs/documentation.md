@@ -161,6 +161,21 @@ export default class UtilsBar {
   get mediator() {return this.#mediator}
   // required
   get options() {return this.#options}
+
+  // recommended
+  on(topic, handler, context) {
+    this.#mediator.on(topic, handler, context)
+  }
+
+  // recommended
+  off(topic, handler) {
+    this.#mediator.off(topic, handler)
+  }
+
+  // recommended
+  emit(topic, data) {
+    this.#mediator.emit(topic, data)
+  }
 }
 
 ```
