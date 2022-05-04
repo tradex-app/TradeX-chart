@@ -39,7 +39,7 @@ export default class Mediator {
       // has a valid class name?
       && (name !== null)
 
-    this.log('Is module',name,'valid:',this.valid)
+    this.log(`Is Module ${name} valid: ${this.valid}`)
 
     const instance = (this.valid) ? new modClass(this, options) : this
 
