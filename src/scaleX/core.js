@@ -74,7 +74,7 @@ export default class Core {
     if (instance.constructor.name === "Mediator") {
       throw new Error("module failed")
     }
-    aspect.before(instance, "start").add(this, "beforeModStart")
+    aspect.before(instance, "start").add(this, "beforeModStart", false, id)
     
     // ensure module IDs are unique
     const modID = (isString(id)) ? `${id}_${this.#modCnt}` : `${this.#modCnt}`
@@ -97,9 +97,9 @@ export default class Core {
   //   };
   // }
 
-  beforeModStart(id) {
-    this.#running[id] = this.#modules[id]
-    this.log(`module ${id} is running`)
+  beforeModStart(args) {
+    this.#running[args] = this.#modules[args]
+    this.log(`module ${args} is running`)
   }
 
   hookMountsAdd(targetObject, targetMethod) {
