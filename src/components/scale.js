@@ -37,12 +37,24 @@ export default class ScaleBar {
   }
 
 
-  start() {
-
+  start(data) {
+    this.emit("started",data)
   }
 
   end() {
     
+  }
+
+  on(topic, handler, context) {
+    this.#mediator.on(topic, handler, context)
+  }
+
+  off(topic, handler) {
+    this.#mediator.off(topic, handler)
+  }
+
+  emit(topic, data) {
+    this.#mediator.emit(topic, data)
   }
 
   mount(el) {

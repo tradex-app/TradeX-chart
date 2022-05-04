@@ -5,6 +5,7 @@ export default class Mediator {
   valid
   #core
   #api
+  #hub = {}
   #subModules = {}
 
   constructor(core, api, modClass, options) {
@@ -76,12 +77,13 @@ export default class Mediator {
   /* ## Subscribe to a topic
   *
   * @param {String} topic      - The topic name
-  * @param {Function} callback - The function that gets called if an other module
+  * @param {Function} callback - The function that iss called if an other module
   *                              publishes to the specified topic
   * @param {Object}  context   - The context the function(s) belongs to
   */
-  on(topic, cb, context) {
-    this.#core.subscribe(topic, cb, context)
+  on(topic, handler, context) {
+    if (!this.#hub[topic]) this.#hub[topic] = [];
+    this.#hub[topic].push({handler, context});
   }
 
   /* ## Unsubscribe from a topic
@@ -89,22 +91,25 @@ export default class Mediator {
   * Parameters:
   *
   * @param {String} topic - The topic name
-  * @param {Function} cb  - The function that gets called if an other module
+  * @param {Function} cb  - The function that iss called if an other module
   *                         publishes to the specified topic
   */
-  off(topic, cb) {
-    this.#core.unsubscribe(topic, cb)
+  off(topic, handler) {
+    const i = (this.#hub[topic] || []).findIndex(h => h === handler);
+    if (i > -1) this.#hub[topic].splice(i, 1);
+    if (this.#hub[topic].length === 0) delete this.#hub[topic];
   }
 
-  /* ## Publish an event
+  /* ## Publish an topic
   *
   * Parameters:
   * @param {String} topic - The topic name
-  * @param {Object}  data - The data that gets published
-  * @param {Function} cb  - callback method
+  * @param {Object}  data - The data to publish
   */
-  emit(topic, data, cb) {
-    this.#core.publish(topic, data, cb)
+  emit(topic, data) {
+    (this.#hub[topic] || []).forEach(cb => cb.handler.call(cb.context, data));
+
+    // (this.#hub[topic] || []).forEach(cb => cb.handler(data));
   }
 
   /* ## Execute a task
