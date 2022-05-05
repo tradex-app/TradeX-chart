@@ -43,6 +43,18 @@ export default class ToolsBar {
     
   }
 
+  on(topic, handler, context) {
+    this.#mediator.on(topic, handler, context)
+  }
+
+  off(topic, handler) {
+    this.#mediator.off(topic, handler)
+  }
+
+  emit(topic, data) {
+    this.#mediator.emit(topic, data)
+  }
+
   mount(el) {
     el.innerHTML = this.defaultNode()
   }
