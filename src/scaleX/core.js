@@ -97,9 +97,10 @@ export default class Core {
   //   };
   // }
 
-  beforeModStart(args) {
-    this.#running[args] = this.#modules[args]
-    this.log(`module ${args} is running`)
+  beforeModStart() {
+    const id = arguments[arguments.length - 1]
+    this.#running[id] = this.#modules[id]
+    this.log(`module ${id} is running`)
   }
 
   hookMountsAdd(targetObject, targetMethod) {

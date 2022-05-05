@@ -12,40 +12,55 @@ function isObject (value) {
   value !== null)
 }
 
-function ref(v) {
-  let x = v
-  // const subs = []
+function makeRef(v, k) {
+  let x = v[k]
+  v.__subs__ = {}
+  v.__observer__ = function (cb) { v.__subs__[k](cb) }
 
-  const makeRef = (v) => {
-    v = {
-      set value(v) { 
-        if (x !== v) {
-          for (let sub of this.__subs__) {
-            sub(v, x)
-          }
+
+
+
+
+  v = {
+    __last__: v,
+    __subs__: [],
+    __observer__(cb) { this.__subs__.push(cb) },
+
+    set value(v) { 
+      if (this.__last__ !== v) {
+        for (let sub of this.__subs__) {
+          sub(v, this.__last__)
         }
-        x = v
-      },
-      get value() { return x },
-
-      __subs__: [],
-      __observer__(cb) { this.__subs__.push(cb) }
-    }
-    return v
+      }
+      this.__last__ = v
+    },
+    get value() { return x }
   }
+  return v
+}
 
+function reactive(v) {
   if (isObject(v)) {
     if ("__observer__" in v) return new Error ("ref() target is already reactive")
     else {
-      // iterate over properties and add getters and setters
-      for (p in v) {
-        let _ref = ref(p)
-        _ref.__subs__ = []
-        _ref.__observer__ = (cb) => { subs.push(cb) }
-        watch(_ref, (newVal, oldVal) => {
+      // iterate over properties to add getters and setters
+      for (k in v) {
+        if (isObject(v[k])) {
+          makeRef(v, k)
+        }
 
+
+
+        v[k] = makeRef(v,k)
+        watch(v[k], (newVal, oldVal) => {
+          for (let sub of v.__subs__) {
+            sub(newVal, oldVal)
+          }
         })
       }
+      v.__subs__ = []
+      v.__observer__ = function (cb) { v.__subs__.push(cb) }
+
       return v
     }
   }
@@ -54,6 +69,42 @@ function ref(v) {
   }
   else {
     return makeRef(v)
+  }
+}
+
+
+/**
+ * @param {*} v
+ * @return {Object}  
+ */
+function ref(v) {
+
+  if (isObject(v)) {
+    if ("__observer__" in v) return new Error ("ref() target is already reactive")
+    else {
+      return reactive(v)
+    }
+  }
+  else if (isArray(v)) {
+
+  }
+  else {
+    v = {
+      __last__: v,
+      __subs__: [],
+      __observer__(cb) { this.__subs__.push(cb) },
+  
+      set value(v) { 
+        if (this.__last__ !== v) {
+          for (let sub of this.__subs__) {
+            sub(v, this.__last__)
+          }
+        }
+        this.__last__ = v
+      },
+      get value() { return x }
+    }
+    return v
   }
 }
 
@@ -79,11 +130,13 @@ watch(z, (newVal, oldVal) => {
 })
 z.value = "hij"
 
-let o = {
-  a: "123",
-  b: "456"
-}
-watch (0, (newVal, oldVal) => {
-  console.log(`z - newVal: ${newVal}, oldVal: ${oldVal}`)
+let o = ref (
+  {
+    a: "123",
+    b: "456"
+  }
+)
+watch (o, (newVal, oldVal) => {
+  console.log(`o - newVal: ${newVal}, oldVal: ${oldVal}`)
 })
 o.a = "abc"
