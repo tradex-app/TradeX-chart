@@ -15,7 +15,10 @@ const props = {
   logs: true,
   infos: true,
   warnings: true,
+  warnings: true,
   errors: true,
+  width: 1000,
+  height: 800
 }
 const chart = Chart.create(mount, props)
 chart.start(chart.getModID())
