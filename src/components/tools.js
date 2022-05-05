@@ -2,6 +2,13 @@
 // Tools bar that lives at the top of the chart
 // Providing: chart drawing tools
 
+import cursor from "../assets/svg/cursor.svg"
+import line from "../assets/svg/line.svg"
+import range from "../assets/svg/range.svg"
+import text from "../assets/svg/text.svg"
+import measure from "../assets/svg/measure.svg"
+import del from "../assets/svg/delete.svg"
+
 export default class ToolsBar {
 
   #name = "Toolbar"
@@ -60,10 +67,52 @@ export default class ToolsBar {
   }
 
   defaultNode() {
-    const node = `
-      <p>Tools Bar</p>
+
+    let toolbar = ""
+    const tools = this.tools()
+    for (const tool in tools) {
+      toolbar += this.toolNode(tools[tool].icon)
+    }
+
+    return toolbar
+  }
+
+  toolNode(icon) {
+    return  `
+    <div class="icon-wrapper"><img src="${icon}" \></div>\n
     `
-    return node
+  }
+
+  tools() {
+    return {
+      cursor: {
+        name: "Cursor",
+        icon: cursor
+      },
+      line: {
+        name: "Line",
+        icon: line,
+        sub: {}
+      },
+      range: {
+        name: "Range",
+        icon: range,
+        sub: {}
+      },
+      text: {
+        name: "Text",
+        icon: text,
+        sub: {}
+      },
+      measure: {
+        name: "measure",
+        icon: measure
+      },
+      delete: {
+        name: "delete",
+        icon: del
+      }
+    }
   }
 
 }
