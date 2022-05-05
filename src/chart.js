@@ -44,7 +44,6 @@ export default class TradeXchart {
   #name = NAME
   #shortName = NAME
   #el = undefined
-  #core
   #mediator
   #options
   #elements
@@ -210,6 +209,7 @@ constructor (mediator, options={}) {
     let api = {
       ...{
       id: this.id,
+      parent: this.#mediator,
       inCnt: this.inCnt,
       width: this.width,
       width: this.width,
@@ -243,8 +243,21 @@ constructor (mediator, options={}) {
     this.MainPane.start()
 
   }
+
   end() {
     this.log("...cleanup the mess")
+  }
+
+  on(topic, handler, context) {
+    this.#mediator.on(topic, handler, context)
+  }
+
+  off(topic, handler) {
+    this.#mediator.off(topic, handler)
+  }
+
+  emit(topic, data) {
+    this.#mediator.emit(topic, data)
   }
 
   mount() {
@@ -309,7 +322,11 @@ constructor (mediator, options={}) {
       this.chartW = w
     else 
       this.chartW = this.#el.parentElement.width
-    this.#el.width = this.chartW
+    this.#elTXChart.style.width = this.chartW+"px"
+    this.#elUtils.style.width = `${this.chartW}px`
+    this.#elBody.style.width = `${this.chartW}px`
+    this.#elBody.style.height = `calc(100% - ${this.utilsH}px`
+    this.#elMain.style.width = `calc(100% - ${this.toolsW}px`
   }
 
   setHeight(h) {
@@ -317,7 +334,7 @@ constructor (mediator, options={}) {
       this.chartH = h
     else 
       this.chartH = this.#el.parentElement.height
-    this.#el.height = this.chartH
+    this.#elTXChart.style.height = this.chartH+"px"
   }
 
   setUserClasses(c) {

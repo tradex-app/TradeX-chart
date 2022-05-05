@@ -86,6 +86,8 @@ export default class MainPane {
     this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
     this.#Chart = this.#mediator.register("Chart", Chart, options, api)
 
+    this.#mediator.api.parent.on("resize", this.onResize())
+
     this.log(`${this.#name} instantiated`)
   }
 
@@ -107,6 +109,10 @@ export default class MainPane {
 
   emit(topic, data) {
     this.#mediator.emit(topic, data)
+  }
+
+  onResize(w, h) {
+
   }
 
   mount(el) {
