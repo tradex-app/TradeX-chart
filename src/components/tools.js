@@ -4,6 +4,7 @@
 
 import cursor from "../assets/svg/cursor.svg"
 import line from "../assets/svg/line.svg"
+import fibonacci from "../assets/svg/fibonacci.svg"
 import range from "../assets/svg/range.svg"
 import text from "../assets/svg/text.svg"
 import measure from "../assets/svg/measure.svg"
@@ -92,6 +93,11 @@ export default class ToolsBar {
       line: {
         name: "Line",
         icon: line,
+        sub: {}
+      },
+      fibonacci: {
+        name: "Fibonacci",
+        icon: fibonacci,
         sub: {}
       },
       range: {
