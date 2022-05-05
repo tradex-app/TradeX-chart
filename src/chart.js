@@ -283,6 +283,7 @@ constructor (mediator, options={}) {
       width: (width) => this.setWidth(width),
       height: (height) => this.setHeight(height),
       logs: (logs) => this.logs = (isBoolean(logs)) ? logs : false,
+      infos: (infos) => this.infos = (isBoolean(infos)) ? infos : false,
       warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
     }
