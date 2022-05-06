@@ -7,6 +7,7 @@ export default class OffChart {
   #shortName = "offChart"
   #mediator
   #options
+  #parent
   #elOffChart
 
   #width
@@ -17,6 +18,7 @@ export default class OffChart {
     this.#mediator = mediator
     this.#options = options
     this.#elOffChart = options.elements.elOffChart
+    this.#parent = this.#mediator.api.parent
     this.init()
   }
 
@@ -30,11 +32,11 @@ export default class OffChart {
 
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api
-    api.parent = this.#mediator.parent
+    api.parent = this
     api.elements = {}
 
     // listen/subscribe/watch for parent notifications
-    api.parent.on("resize", (dimensions) => this.onResize(dimensions))
+    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   start() {
@@ -72,7 +74,7 @@ export default class OffChart {
     this.#width = w
   }
 
-  setHeight(w) {
+  setHeight(h) {
     this.#height = h
   }
 

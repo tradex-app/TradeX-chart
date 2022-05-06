@@ -31,6 +31,7 @@ export default class Chart {
   #shortName = "chart"
   #mediator
   #options
+  #parent
   #elChart
   #elWidgets
   #elCanvas
@@ -45,6 +46,7 @@ export default class Chart {
 
     this.#mediator = mediator
     this.#elChart = mediator.api.elements.elChart
+    this.#parent = this.#mediator.api.parent
     this.init(options)
   }
 
@@ -59,7 +61,9 @@ export default class Chart {
   get options() { return this.#options }
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
+  set width(w) { this.setWidth(w) }
   get width() { return this.#width }
+  set height(h) { this.setHeight(h) }
   get height() { return this.#height }
 
   init(options) {
@@ -67,7 +71,7 @@ export default class Chart {
 
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api
-    api.parent = this.#mediator
+    api.parent = this
     api.elements = 
     {...api.elements, 
       ...{
@@ -81,7 +85,10 @@ export default class Chart {
     this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
     this.#Scale.start("Thanks for the update!")
 
-    this.#mediator.api.parent.on("resize", (dimensions) => this.onResize(dimensions))
+    let dimensions = {wdith: this.#width, height: this.#height}
+    this.emit("resizeChart", dimensions)
+
+    this.#parent.on("resizeChart", (dimensions) => this.onResize(dimensions))
 
     this.log(`${this.#name} instantiated`)
   }
@@ -124,13 +131,16 @@ export default class Chart {
     this.#width = w
   }
 
-  setHeight(w) {
+  setHeight(h) {
     this.#height = h
+    this.parent
   }
 
   setDimensions(dimensions) {
     this.setWidth(dimensions.mainW)
     this.setHeight(dimensions.mainH)
+
+    this.emit("resize", dimensions)
   }
 
   defaultNode() {
@@ -140,12 +150,12 @@ export default class Chart {
     
     const rowsH = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`).clientHeight
     const rowsW = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`).clientWidth - 1
-    const chartH = rowsH - 1
-    const chartW = rowsW - api.scaleW
+    this.width = rowsW - api.scaleW
+    this.height = rowsH - 1
 
     const node = `
       <div class="${CLASS_WIDGETS}"></div>
-      <canvas id="" width="${chartW}" height="${chartH}" style="${styleChart}"></canvas>
+      <canvas id="" width="${this.width}" height="${this.height}" style="${styleChart}"></canvas>
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
     return node

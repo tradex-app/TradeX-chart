@@ -38,6 +38,7 @@ export default class MainPane {
   #shortName = "Main"
   #mediator
   #options
+  #parent
   #elMain
   #elWidgetsG
   #elRows
@@ -62,6 +63,7 @@ export default class MainPane {
     this.#mediator = mediator
     this.#options = options
     this.#elMain = mediator.api.elements.elMain
+    this.#parent = this.#mediator.api.parent
     this.init(options)
   }
 
@@ -74,6 +76,8 @@ export default class MainPane {
   get shortName() {return this.#shortName}
   get mediator() {return this.#mediator}
   get options() {return this.#options}
+  get chartW() { return this.#chartW }
+  get chartH() { return this.#chartH }
 
   init(options) {
     this.mount(this.#elMain)
@@ -95,12 +99,12 @@ export default class MainPane {
           elTime: this.#elTime
         }
       }
-    api.parent = this.#mediator
+    api.parent = this
 
     this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
     this.#Chart = this.#mediator.register("Chart", Chart, options, api)
 
-    this.#mediator.api.parent.on("resize", (dimensions) => this.onResize(dimensions))
+    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
 
     this.log(`${this.#name} instantiated`)
   }
