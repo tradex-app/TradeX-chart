@@ -58,8 +58,8 @@ export default class TradeXchart {
   #state = {}
   #userClasses = []
 
-  chartW = 500
-  chartH = 400
+  #chartW = 500
+  #chartH = 400
   chartWMin = 500
   chartHMin = 400
   chartW_Reactive = true
@@ -134,9 +134,9 @@ constructor (mediator, options={}) {
   get mediator() {return this.#mediator}
   get options() {return this.#options}
   get inCnt() { return this.#inCnt }
-  get width() { return this.chartW }
+  get width() { return this.#chartW }
   set width(w) { this.setWidth(w) } 
-  get height() { return this.chartH }
+  get height() { return this.#chartH }
   set height(h) { this.setHeight(h) }
   get elUtils() { return this.#elUtils }
   get elTools() { return this.#elTools }
@@ -319,22 +319,37 @@ constructor (mediator, options={}) {
 
   setWidth(w) {
     if (isNumber(w))
-      this.chartW = w
+      this.#chartW = w
     else 
-      this.chartW = this.#el.parentElement.width
-    this.#elTXChart.style.width = this.chartW+"px"
-    this.#elUtils.style.width = `${this.chartW}px`
-    this.#elBody.style.width = `${this.chartW}px`
-    this.#elBody.style.height = `calc(100% - ${this.utilsH}px`
-    this.#elMain.style.width = `calc(100% - ${this.toolsW}px`
+      this.#chartW = this.#el.parentElement.width
+
+    this.#elTXChart.style.width = this.#chartW+"px"
+    this.#elUtils.style.width = `${this.#chartW}px`
+    this.#elBody.style.width = `${this.#chartW}px`
+    this.#elMain.style.width = `${this.#chartW - this.toolsW}px`
   }
 
   setHeight(h) {
     if (isNumber(h))
-      this.chartH = h
+      this.#chartH = h
     else 
-      this.chartH = this.#el.parentElement.height
-    this.#elTXChart.style.height = this.chartH+"px"
+      this.#chartH = this.#el.parentElement.height
+      
+    this.#elTXChart.style.height = this.#chartH+"px"
+    this.#elBody.style.height = `${this.#chartH - this.utilsH}px`
+    this.#elMain.style.height= `${this.#chartH - this.utilsH}px`
+  }
+
+  setDimensions(w, h) {
+    this.setWidth(w)
+    this.setHeight(h)
+
+    this.emit("resize", {
+      chartW: this.width,
+      chartH: this.height,
+      mainW: this.#chartW - this.toolsW,
+      mainH: this.#chartH - this.utilsH,
+    })
   }
 
   setUserClasses(c) {
@@ -357,9 +372,9 @@ constructor (mediator, options={}) {
   defaultNode() {
 
     const classesTXChart = CLASS_DEFAULT+" "+this.#userClasses 
-    const styleTXChart = STYLE_TXCHART + ` height: ${this.chartH}px; width: ${this.chartW}px; background: ${this.chartBGColour}; color: ${this.chartTxtColour};`
-    const styleUtils = STYLE_UTILS + ` height: ${this.utilsH}px; width: ${this.chartW}px; border-color: ${this.chartBorderColour};`
-    const styleBody = STYLE_BODY + ` height: calc(100% - ${this.utilsH}px); width: ${this.chartW}px;`
+    const styleTXChart = STYLE_TXCHART + ` height: ${this.#chartH}px; width: ${this.#chartW}px; background: ${this.chartBGColour}; color: ${this.chartTxtColour};`
+    const styleUtils = STYLE_UTILS + ` height: ${this.utilsH}px; width: ${this.#chartW}px; border-color: ${this.chartBorderColour};`
+    const styleBody = STYLE_BODY + ` height: calc(100% - ${this.utilsH}px); width: ${this.#chartW}px;`
     const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour};`
     const styleMain = STYLE_MAIN + ` left: ${this.toolsW}px; width: calc(100% - ${this.toolsW}px);`
     

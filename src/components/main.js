@@ -5,6 +5,7 @@
 import DOM from "../utils/DOM"
 import Timeline from './timeline'
 import Chart from "./chart"
+import OffChart from "./offChart"
 
 
 import {
@@ -43,9 +44,17 @@ export default class MainPane {
   #elTime
   #elChart
 
-  #Rows = []
+  #OffChart = []
   #Chart
   #Time
+
+  #chartW
+  #chartH
+  #rowsW
+  #rowsH
+  #offChartDefaultH = 0.3
+  #offChartDefaultWpx = 120
+  
 
 
   constructor (mediator, options) {
@@ -74,6 +83,10 @@ export default class MainPane {
     this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
     this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
 
+    // set the chart default dimensions
+    this.#chartW = this.#elChart.width 
+    this.#chartH = this.#elChart.height
+
     // api - functions / methods, calculated properties provided by this module
     api.elements = 
       {...api.elements, 
@@ -82,11 +95,12 @@ export default class MainPane {
           elTime: this.#elTime
         }
       }
+    api.parent = this.#mediator
 
     this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
     this.#Chart = this.#mediator.register("Chart", Chart, options, api)
 
-    this.#mediator.api.parent.on("resize", this.onResize())
+    this.#mediator.api.parent.on("resize", (dimensions) => this.onResize(dimensions))
 
     this.log(`${this.#name} instantiated`)
   }
@@ -111,8 +125,8 @@ export default class MainPane {
     this.#mediator.emit(topic, data)
   }
 
-  onResize(w, h) {
-
+  onResize(dimensions) {
+    this.setDimensions(dimensions)
   }
 
   mount(el) {
@@ -129,6 +143,51 @@ export default class MainPane {
   }
 
   unmountRow() {
+
+  }
+
+  setWidth(w) {
+    this.#rowsW = w
+  }
+
+  setHeight(h) {
+    this.#rowsH = api.timeH - h
+    this.#elRows.style.height = this.#rowsH
+  }
+
+  setDimensions(dimensions) {
+
+
+    for (row of rows) {
+
+    }
+
+    this.setWidth(dimensions.mainW)
+    this.setHeight(dimensions.mainH)
+
+    dimensions.rowsW = this.#rowsW
+    dimensions.rowsH = this.#rowsH
+
+    this.emit("rowsResize", dimensions)
+  }
+
+  addOffChart(type, options, api) {
+
+    if (this.#rowsH === this.#chartH && !this.#OffChart.length) {
+      // adjust chart size for first offChart
+    }
+    else {
+      // adjust chart size for subsequent offCharts
+    }
+
+    this.#elChart.insertAdjacentHTML(this.rowNode(type))
+
+    let offChart = this.#mediator.register("OffChart", OffChart, options, api)
+    this.#OffChart.push(offChart)
+    offChart.start(this.#OffChart.length + 1)
+
+    this.emit("addOffChart", offchart)
+
 
   }
 

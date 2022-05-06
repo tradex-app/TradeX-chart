@@ -1,21 +1,22 @@
-// utils.js
-// Utils bar that lives at the top of the chart
-// Providing: timeframes, indicators, config, refresh, save, load
+// _template.js
+// A template file for Chart components
 
+export default class _template {
 
-export default class UtilsBar {
-
-  #name = "Utilities"
-  #shortName = "utils"
+  #name = "Template"
+  #shortName = "template"
   #mediator
   #options
-  #elUtils
+  #elTemplate
+
+  #width
+  #height
 
   constructor (mediator, options) {
 
     this.#mediator = mediator
     this.#options = options
-    this.#elUtils = options.elements.elUtils
+    this.#elTemplate = options.elements.elTemplate
     this.init()
   }
 
@@ -25,7 +26,15 @@ export default class UtilsBar {
   error(e) { this.#mediator.error(e) }
 
   init() {
-    this.mount(this.#elUtils)
+    this.mount(this.#elTemplate)
+
+    // api - functions / methods, calculated properties provided by this module
+    const api = this.#mediator.api
+    api.parent = this.#mediator.parent
+    api.elements = {}
+
+    // listen/subscribe/watch for parent notifications
+    api.parent.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   start() {
@@ -39,8 +48,37 @@ export default class UtilsBar {
     // Put your toys away or it will end in tears.
   }
 
+  on(topic, handler, context) {
+    this.#mediator.on(topic, handler, context)
+  }
+
+  off(topic, handler) {
+    this.#mediator.off(topic, handler)
+  }
+
+  emit(topic, data) {
+    this.#mediator.emit(topic, data)
+  }
+
+  onResize(dimensions) {
+    this.setDimensions(dimensions)
+  }
+
   mount(el) {
     el.innerHTML = this.defaultNode()
+  }
+
+  setWidth(w) {
+    this.#width = w
+  }
+
+  setHeight(w) {
+    this.#height = h
+  }
+
+  setDimensions(dimensions) {
+    this.setWidth(dimensions.mainW)
+    this.setHeight(dimensions.mainH)
   }
 
   defaultNode() {
