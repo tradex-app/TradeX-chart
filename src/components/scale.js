@@ -1,6 +1,25 @@
 // scale.js
-// Scale bar that lives at the top of the chart
-// Providing: timeframes, indicators, config, refresh, save, load
+// Scale bar that lives on the side of the chart
+
+import DOM from "../utils/DOM"
+import {
+  NAME,
+  ID,
+  CLASS_DEFAULT,
+  CLASS_UTILS ,
+  CLASS_BODY,
+  CLASS_WIDGETSG,
+  CLASS_TOOLS,
+  CLASS_MAIN,
+  CLASS_TIME,
+  CLASS_ROWS,
+  CLASS_ROW,
+  CLASS_CHART,
+  CLASS_SCALE,
+  CLASS_WIDGETS,
+  CLASS_ONCHART,
+  CLASS_OFFCHART,
+} from '../definitions/core'
 
 export default class ScaleBar {
 
@@ -8,15 +27,21 @@ export default class ScaleBar {
   #shortName = "scale"
   #mediator
   #options
+  #parent
   #core
   #target
   #elScale
+  #elScaleCanvas
+
+  #width
+  #height
 
   constructor (mediator, options) {
 
     this.#mediator = mediator
     this.#options = options
     this.#elScale = mediator.api.elements.elScale
+    this.#parent = mediator.api.parent
     this.init()
   }
 
@@ -32,6 +57,8 @@ export default class ScaleBar {
 
   init() {
     this.mount(this.#elScale)
+
+    this.#parent.on("resizeChart", (dimensions) => this.onResize(dimensions))
 
     this.log(`${this.#name} instantiated`)
   }
@@ -57,15 +84,30 @@ export default class ScaleBar {
     this.#mediator.emit(topic, data)
   }
 
+  onResize(dimensions) {
+    this.setDimensions(dimensions)
+  }
+
   mount(el) {
     el.innerHTML = this.defaultNode()
+
+    const api = this.#mediator.api
+    this.#elScaleCanvas = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE} canvas`)
+    this.#elScaleCanvas.height = this.#parent.height
+  }
+
+  setHeight(h) {
+    this.#height = h
+  }
+
+  setDimensions(dimensions) {
+    this.setHeight(dimensions.mainH)
   }
 
   defaultNode() {
     const api = this.#mediator.api
 
     const node = `
-      <p>Scale Bar</p>
       <canvas id="" width="${api.scaleW}" height=""></canvas>
     `
     return node

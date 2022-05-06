@@ -7,6 +7,7 @@ export default class _template {
   #shortName = "template"
   #mediator
   #options
+  #parent
   #elTemplate
 
   #width
@@ -17,6 +18,7 @@ export default class _template {
     this.#mediator = mediator
     this.#options = options
     this.#elTemplate = options.elements.elTemplate
+    this.#parent = this.#mediator.api.parent
     this.init()
   }
 
@@ -30,11 +32,11 @@ export default class _template {
 
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api
-    api.parent = this.#mediator.parent
+    api.parent = this.#mediator
     api.elements = {}
 
     // listen/subscribe/watch for parent notifications
-    api.parent.on("resize", (dimensions) => this.onResize(dimensions))
+    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   start() {
@@ -72,7 +74,7 @@ export default class _template {
     this.#width = w
   }
 
-  setHeight(w) {
+  setHeight(h) {
     this.#height = h
   }
 
