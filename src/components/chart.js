@@ -38,6 +38,9 @@ export default class Chart {
 
   #Scale
 
+  #width
+  #height
+
   constructor (mediator, options) {
 
     this.#mediator = mediator
@@ -51,17 +54,20 @@ export default class Chart {
   error(e) { this.#mediator.error(e) }
 
   get name() {return this.#name}
-  get shortName() {return this.#shortName}
-  get mediator() {return this.#mediator}
-  get options() {return this.#options}
+  get shortName() { return this.#shortName }
+  get mediator() { return this.#mediator }
+  get options() { return this.#options }
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
+  get width() { return this.#width }
+  get height() { return this.#height }
 
   init(options) {
     this.mount(this.#elChart)
 
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api
+    api.parent = this.#mediator
     api.elements = 
     {...api.elements, 
       ...{
@@ -74,6 +80,8 @@ export default class Chart {
     this.#Scale = this.#mediator.register("ScaleBar", ScaleBar, options, api)
     this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
     this.#Scale.start("Thanks for the update!")
+
+    this.#mediator.api.parent.on("resize", (dimensions) => this.onResize(dimensions))
 
     this.log(`${this.#name} instantiated`)
   }
@@ -99,6 +107,10 @@ export default class Chart {
     this.#mediator.emit(topic, data)
   }
 
+  onResize(dimensions) {
+    this.setDimensions(dimensions)
+  }
+
   mount(el) {
     el.innerHTML = this.defaultNode()
 
@@ -106,6 +118,19 @@ export default class Chart {
     this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elCanvas = DOM.findBySelector(`#${api.id} .${CLASS_CHART} canvas`)
     this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`)
+  }
+
+  setWidth(w) {
+    this.#width = w
+  }
+
+  setHeight(w) {
+    this.#height = h
+  }
+
+  setDimensions(dimensions) {
+    this.setWidth(dimensions.mainW)
+    this.setHeight(dimensions.mainH)
   }
 
   defaultNode() {
