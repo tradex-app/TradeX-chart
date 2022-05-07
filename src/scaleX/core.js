@@ -44,6 +44,9 @@ export default class Core {
   info(i) { if (this.infos) console.info(i) }
   warning(w) { if (this.warnings) console.warn(w) }
   error(e) { if (this.errors) console.error(e) }
+  time(n) { if(this.timer) console.time(n) }
+  timeLog(n) { if(this.timer) console.timeLog(n) }
+  timeEnd(n) { if(this.timer) console.timeEnd(n) }
 
   subscribe(topic, cb, context) {
 
