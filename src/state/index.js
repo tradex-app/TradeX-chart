@@ -2,30 +2,32 @@
 // State management for the entire chart component library thingy
 
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
-import Store from './store'
-import customEvent from '../events/custom'
-import Dataset from '../units/dataset'
+// import Store from './store'
+// import customEvent from '../events/custom'
+import Dataset from '../helpers/dataset'
+import { validateDeep, validateShallow } from '../helpers/validateData'
 
+const DEFAULT_STATE = {
+  chart: {
+    type: "candles",
+    indexed: false,
+    data: [],
+    settings: {},
+    row: {},
+    tf: ""
+  },
+  onchart: [],
+  offchart: [],
+  datasets: [],
+  tools: [],
+  ohlcv: []
+}
 export default class State {
 
   static #stateList = []
   
   #id = ""
-  #data = {
-    chart: {
-      type: "candles",
-      indexed: false,
-      data: [],
-      settings: {},
-      row: {},
-      tf: ""
-    },
-    onchart: [],
-    offchart: [],
-    datasets: [],
-    tools: [],
-    ohlcv: []
-  }
+  #data = {}
   #initialState = ""
   #currentState = ""
   #nextState
@@ -33,11 +35,11 @@ export default class State {
   #store
   #dss = {}
 
-  constructor(state) {
-    this.#store = new Store()
+  constructor(state, deepValidate=false) {
+    // this.#store = new Store()
 
     // validate state
-    if (isObject(state)) this.validateState(state)
+    if (isObject(state)) this.#data = this.validateState(state)
     else this.defaultState()
   }
 
@@ -49,7 +51,7 @@ export default class State {
 
   }
 
-  validateState(state) {
+  validateState(state, deepValidate=false) {
 
     if (!('chart' in state)) {
       state.chart = {
@@ -57,6 +59,11 @@ export default class State {
           data: state.ohlcv || []
       }
     }
+
+    if (deepValidate) 
+      state.chart.data = validateDeep(state.chart.data) ? state.chart.data : []
+    else 
+      state.chart.data = validateShallow(state.chart.data) ? state.chart.data : []
 
     if (!('onchart' in state)) {
         state.onchart = []
@@ -83,11 +90,11 @@ export default class State {
       this.dss[ds.id] = new Dataset(this, ds)
     }
 
-    this.#data = state
+    return state
   }
 
   defaultState() {
-
+    this.#data = DEFAULT_STATE
   }
 
   /**

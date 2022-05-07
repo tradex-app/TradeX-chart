@@ -161,4 +161,19 @@ export default class Chart {
     return node
   }
 
+
+// -----------------------
+
+  setTimezone(timezone) {}
+  getTimezone(timezone) {}
+  setChartStyle(chartStyle) {}
+  getChartStyle(chartStyle) {}
+  setChartTheme(chartTheme) {}
+  getChartTheme(chartTheme) {}
+
+  loadData(data) {}
+  updateData(data) {}
+
+
+
 }
