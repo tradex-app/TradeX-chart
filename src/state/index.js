@@ -10,6 +10,7 @@ import { validateDeep, validateShallow } from '../helpers/validateData'
 const DEFAULT_STATE = {
   chart: {
     type: "candles",
+    candleType: "CANDLE_SOLID",
     indexed: false,
     data: [],
     settings: {},
@@ -34,13 +35,20 @@ export default class State {
   #states = {}
   #store
   #dss = {}
+  #status = false
 
   constructor(state, deepValidate=false) {
     // this.#store = new Store()
 
     // validate state
-    if (isObject(state)) this.#data = this.validateState(state)
-    else this.defaultState()
+    if (isObject(state)) {
+      this.#data = this.validateState(state)
+      this.#status = "valid"
+    }
+    else {
+      this.defaultState()
+      this.#status = "default"
+    }
   }
 
   static create(state) {
@@ -51,11 +59,14 @@ export default class State {
 
   }
 
+  getStatus() { return this.#status }
+
   validateState(state, deepValidate=false) {
 
     if (!('chart' in state)) {
       state.chart = {
           type: 'Candles',
+          candleType: "CANDLE_SOLID",
           data: state.ohlcv || []
       }
     }

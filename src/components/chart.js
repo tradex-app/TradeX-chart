@@ -65,6 +65,7 @@ export default class Chart {
   get width() { return this.#width }
   set height(h) { this.setHeight(h) }
   get height() { return this.#height }
+  set state(s) { this.setState(s) }
 
   init(options) {
     this.mount(this.#elChart)
@@ -134,6 +135,10 @@ export default class Chart {
   setHeight(h) {
     this.#height = h
     this.parent
+  }
+
+  setState(s) {
+    
   }
 
   setDimensions(dimensions) {

@@ -1,7 +1,7 @@
 import { Chart, DOM } from './src/'
-// import test from './tests/inheiritance'
-
 import './style.css'
+
+import state from './data/data.json'
 
 DOM.findBySelector('#app').innerHTML = `
   <!-- 
@@ -20,7 +20,7 @@ const props = {
   width: 1000,
   height: 800
 }
-const chart = Chart.create(mount, props)
+const chart = Chart.create(mount, props, state )
 chart.start(chart.getModID())
 
 // test()
