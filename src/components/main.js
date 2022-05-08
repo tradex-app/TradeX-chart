@@ -75,6 +75,7 @@ export default class MainPane {
   get name() {return this.#name}
   get shortName() {return this.#shortName}
   get mediator() {return this.#mediator}
+  get chart() {return this.#Chart}
   get options() {return this.#options}
   get chartW() { return this.#chartW }
   get chartH() { return this.#chartH }
