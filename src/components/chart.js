@@ -84,7 +84,7 @@ export default class Chart {
 
     this.#Scale = this.#mediator.register("ScaleBar", ScaleBar, options, api)
     this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
-    this.#Scale.start("Thanks for the update!")
+    this.#Scale.start(`Chart says to Scale, "Thanks for the update!"`)
 
     let dimensions = {wdith: this.#width, height: this.#height}
     this.emit("resizeChart", dimensions)
@@ -138,7 +138,7 @@ export default class Chart {
   }
 
   setState(s) {
-    
+
   }
 
   setDimensions(dimensions) {

@@ -51,8 +51,10 @@ export default class State {
     }
   }
 
-  static create(state) {
-    State.#stateList.push(new State(id, state))
+  static create(state, deepValidate=false) {
+    const instance = new State(state, deepValidate=false)
+    State.#stateList.push(instance)
+    return instance
   }
 
   static delete(state) {
