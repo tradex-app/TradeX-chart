@@ -7,7 +7,7 @@ export function getRandom() {
 
 // Getting a random number between two values
 // inclusive of the minimum, exclusive of the maximum
-export function getRandom(min, max) {
+export function getRandomInt(min, max) {
   return Math.random() * (max - min) + min;
 }
 

@@ -6,7 +6,8 @@ import SX from './scaleX/scale'
 import UtilsBar from './components/utils'
 import ToolsBar from './components/tools'
 import MainPane from './components/main'
-// import State from './state'
+
+import State from './state'
 
 import {
   NAME,
@@ -121,6 +122,9 @@ constructor (mediator, options={}) {
       this.init(options)
     }
     else this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`)
+
+    this.#state = new State(options.state)
+    this.log(`Chart ${this.#id} started with a ${this.#state.getStatus()} state`)
   }
 
   log(l) { this.#mediator.log(l) }
