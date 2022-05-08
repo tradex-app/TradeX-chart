@@ -18,6 +18,12 @@ export function validateShallow(data) {
   if (!isValidCandle(data[0])) return false
   if (!isValidCandle(data[rnd])) return false
   if (!isValidCandle(data[data.length - 1])) return false
+
+  // is ascending order?
+  let t1 = data[0][0]
+  let t2 = data[1][0]
+  let t3 = data[2][0]
+  if (t1 > t2 && t2 > t3) return false
   
   // is (likely) valid - use validateDeep() to validate entire dataset
   return true
@@ -26,8 +32,14 @@ export function validateShallow(data) {
 export function validateDeep(data) {
   if (!isArray(data)) return false
 
-  for (candle of data) {
+  let i = 0
+  let prev = 0
+  while (i < data.length) {
     if (!isValidCandle(candle)) return false
+    // is ascending order?
+    if (data[i][0] < prev) return false
+    prev = data[i][0]
+    i++
   }
 
   // is valid!
