@@ -31,6 +31,7 @@ export default class Chart {
   #shortName = "chart"
   #mediator
   #options
+  #core
   #parent
   #elChart
   #elWidgets
@@ -41,12 +42,16 @@ export default class Chart {
 
   #width
   #height
+  #chartXPadding = 5
+  #chartYPadding = 2.5
+
 
   constructor (mediator, options) {
 
     this.#mediator = mediator
     this.#elChart = mediator.api.elements.elChart
     this.#parent = this.#mediator.api.parent
+    this.#core = this.#mediator.api.core
     this.init(options)
   }
 
@@ -179,6 +184,21 @@ export default class Chart {
   loadData(data) {}
   updateData(data) {}
 
+  draw(range) {
 
+  }
+
+  time2XPos(time, range) {
+    const unit = this.#width / range.len 
+
+    let r = 0
+    while(r < l) {
+      
+    }
+  }
+
+  scale2YPos(scale, range) {
+
+  }
 
 }

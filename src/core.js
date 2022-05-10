@@ -247,6 +247,7 @@ constructor (mediator, options={}) {
     this.UtilsBar.start()
     this.ToolsBar.start()
     this.MainPane.start()
+    this.Chart.start()
 
   }
 
