@@ -92,6 +92,43 @@ export default class Chart {
     // add layers
     viewport.addLayer(grid).addLayer(volume).addLayer(candles);
 
+// -------------- quick and dirty test
+
+    const config = {
+      x: 100,
+      y: 100,
+      color: 'red',
+      hovered: false,
+      selected: true,
+    }
+
+    const scene = grid.scene,
+          ctx = scene.context;
+
+    scene.clear();
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(config.x, config.y, 60, 0, Math.PI*2, false);
+    ctx.fillStyle = config.color;
+    ctx.fill();
+
+    if (config.selected) {
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 6;
+      ctx.stroke();
+    }
+
+    if (config.hovered) {
+      ctx.strokeStyle = 'green';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    viewport.render();
+
+// -------------- end quick and dirty test
+
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api
     api.parent = this
