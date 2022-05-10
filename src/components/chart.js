@@ -5,6 +5,9 @@
 import DOM from "../utils/DOM"
 import ScaleBar from "./scale"
 import CEL from "../components/primitives/canvas"
+import chartGrid from "./overlays/chart-grid"
+import chartVolume from "./overlays/chart-volume"
+import chartCandles from "./overlays/chart-candles"
 import {
   NAME,
   ID,
@@ -94,36 +97,32 @@ export default class Chart {
 
 // -------------- quick and dirty test
 
-    const config = {
+    const gridConfig = {
       x: 100,
       y: 100,
       color: 'red',
       hovered: false,
+      selected: false,
+    }
+    const volumeConfig = {
+      x: 150,
+      y: 150,
+      color: 'yellow',
+      hovered: false,
+      selected: true,
+    }
+    const candlesConfig = {
+      x: 150,
+      y: 100,
+      color: 'green',
+      hovered: false,
       selected: true,
     }
 
-    const scene = grid.scene,
-          ctx = scene.context;
+    chartGrid.draw(grid, gridConfig)
+    chartVolume.draw(volume, volumeConfig)
+    chartCandles.draw(candles, candlesConfig)
 
-    scene.clear();
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(config.x, config.y, 60, 0, Math.PI*2, false);
-    ctx.fillStyle = config.color;
-    ctx.fill();
-
-    if (config.selected) {
-      ctx.strokeStyle = 'black';
-      ctx.lineWidth = 6;
-      ctx.stroke();
-    }
-
-    if (config.hovered) {
-      ctx.strokeStyle = 'green';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-    ctx.restore();
 
     viewport.render();
 
