@@ -283,7 +283,7 @@ class Scene {
 
     this.canvas = document.createElement("canvas");
     this.canvas.className = "scene-canvas";
-    this.canvas.style.display = "inline-block";
+    this.canvas.style.display = "block";
     this.context = this.canvas.getContext(this.contextType);
 
     if (cfg.width && cfg.height) {
@@ -537,3 +537,5 @@ const CEL = {
   Scene: Scene,
   Hit: Hit,
 };
+
+export default CEL

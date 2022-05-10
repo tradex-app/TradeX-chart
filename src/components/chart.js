@@ -4,6 +4,7 @@
 
 import DOM from "../utils/DOM"
 import ScaleBar from "./scale"
+import CEL from "../components/primitives/canvas"
 import {
   NAME,
   ID,
@@ -36,6 +37,7 @@ export default class Chart {
   #elChart
   #elWidgets
   #elCanvas
+  #elViewport
   #elScale
 
   #Scale
@@ -74,6 +76,21 @@ export default class Chart {
 
   init(options) {
     this.mount(this.#elChart)
+
+    // create viewport
+    var viewport = new CEL.Viewport({
+      width: this.#width,
+      height: this.#height,
+      container: this.#elViewport
+    });
+
+    // create layers - grid, volume, candles
+    var grid = new CEL.Layer();
+    var volume = new CEL.Layer();
+    var candles = new CEL.Layer();
+
+    // add layers
+    viewport.addLayer(grid).addLayer(volume).addLayer(candles);
 
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api
@@ -129,7 +146,7 @@ export default class Chart {
 
     const api = this.#mediator.api
     this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
-    this.#elCanvas = DOM.findBySelector(`#${api.id} .${CLASS_CHART} canvas`)
+    this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .viewport`)
     this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`)
   }
 
@@ -165,7 +182,7 @@ export default class Chart {
 
     const node = `
       <div class="${CLASS_WIDGETS}"></div>
-      <canvas id="" width="${this.width}" height="${this.height}" style="${styleChart}"></canvas>
+      <div class="viewport"></div>
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
     return node
