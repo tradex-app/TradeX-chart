@@ -85,6 +85,9 @@ export default class MainPane {
     this.mountRow(this.#elRows, CLASS_CHART)
 
     const api = this.#mediator.api
+    api.core = this.#mediator.api
+    api.parent = this
+
     this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
     this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
 
@@ -100,11 +103,12 @@ export default class MainPane {
           elTime: this.#elTime
         }
       }
-    api.parent = this
 
+    // register child modules
     this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
     this.#Chart = this.#mediator.register("Chart", Chart, options, api)
 
+    // events / messages
     this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
 
     this.log(`${this.#name} instantiated`)

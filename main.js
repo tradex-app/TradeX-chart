@@ -18,7 +18,8 @@ const props = {
   warnings: true,
   errors: true,
   width: 1000,
-  height: 800
+  height: 800,
+  rangeLimit: 500,
 }
 const chart = Chart.create(mount, props, state )
 chart.start(chart.getModID())
