@@ -6,6 +6,7 @@ import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeC
 // import customEvent from '../events/custom'
 import Dataset from '../helpers/dataset'
 import { validateDeep, validateShallow } from '../helpers/validateData'
+import { mergeDeep } from '../utils/utilities'
 
 const DEFAULT_STATE = {
   chart: {
@@ -110,31 +111,8 @@ export default class State {
     this.#data = DEFAULT_STATE
   }
 
-  /**
-   * Deep Merge
-   * https://gist.github.com/ahtcx/0cd94e62691f539160b32ecda18af3d6?permalink_comment_id=2930530#gistcomment-2930530
-   */
-  merge(target, source) {
-    const isObject = (obj) => obj && typeof obj === 'object';
-  
-    if (!isObject(target) || !isObject(source)) {
-      return source;
-    }
-  
-    Object.keys(source).forEach(key => {
-      const targetValue = target[key];
-      const sourceValue = source[key];
-  
-      if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
-        target[key] = targetValue.concat(sourceValue);
-      } else if (isObject(targetValue) && isObject(sourceValue)) {
-        target[key] = mergeDeep(Object.assign({}, targetValue), sourceValue);
-      } else {
-        target[key] = sourceValue;
-      }
-    });
-  
-    return target;
+  deepMerge(target, source) {
+    return mergeDeep(target, source)
   }
 
 }

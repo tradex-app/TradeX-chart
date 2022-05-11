@@ -10,3 +10,19 @@ export const CandleType = {
   AREA: 'area'
   }
 
+/**
+* y-axis position
+*/
+export const YAxisPosition = {
+  LEFT: 'left',
+  RIGHT: 'right'
+  }
+  
+  /**
+  *y-axis type
+  */
+  export const YAxisType = {
+  NORMAL: 'normal',
+  PERCENTAGE: 'percentage',
+  LOG: 'log'
+  }

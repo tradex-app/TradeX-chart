@@ -26,6 +26,7 @@ import {
   CLASS_WIDGETS,
   CLASS_ONCHART,
   CLASS_OFFCHART,
+  RANGELIMIT,
 } from './definitions/core'
 
 const STYLE_TXCHART = "overflow: hidden;"
@@ -95,6 +96,7 @@ export default class TradeXchart {
   warnings = false
   errors = false
 
+  #rangeLimit
   
 /**
  * Creates an instance of TradeXchart.
@@ -133,21 +135,25 @@ constructor (mediator, options={}) {
   error(e) { this.#mediator.error(e) }
 
   get id() { return this.#id }
-  get name() {return this.#name}
-  get shortName() {return this.#shortName}
-  get mediator() {return this.#mediator}
-  get options() {return this.#options}
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get mediator() { return this.#mediator }
+  get options() { return this.#options }
   get inCnt() { return this.#inCnt }
+
   get width() { return this.#chartW }
   set width(w) { this.setWidth(w) } 
   get height() { return this.#chartH }
   set height(h) { this.setHeight(h) }
+
   get elUtils() { return this.#elUtils }
   get elTools() { return this.#elTools }
   // get elTime() { return this.#elTime }
   get elMain() { return this.#elMain }
   // get elChart() { return this.#elChart }
 
+  get chartData() { return this.#state.chart.data }
+  get rangeLimit() { return this.#rangeLimit }
 
   /**
    * Create a new TradeXchart instance
@@ -192,7 +198,6 @@ constructor (mediator, options={}) {
    */
   init(options) {
     this.#inCnt = options.cnt
-    this.#state = options.state
     this.#modID = options.modID
 
     const id = (isObject(options) && isString(options.id)) ? options.id : null
@@ -306,6 +311,7 @@ constructor (mediator, options={}) {
       infos: (infos) => this.infos = (isBoolean(infos)) ? infos : false,
       warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
+      rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
     }
   }
 
