@@ -8,6 +8,9 @@ import CEL from "../components/primitives/canvas"
 import chartGrid from "./overlays/chart-grid"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
+
+import { getRange } from "../helpers/range"
+
 import {
   NAME,
   ID,
@@ -43,12 +46,18 @@ export default class Chart {
   #elViewport
   #elScale
 
+  #data
+  #range
+  #rangeLimit
   #Scale
 
   #width
   #height
   #chartXPadding = 5
   #chartYPadding = 2.5
+
+  #pricePrecision
+  #volumePrecision
 
 
   constructor (mediator, options) {
@@ -57,6 +66,11 @@ export default class Chart {
     this.#elChart = mediator.api.elements.elChart
     this.#parent = this.#mediator.api.parent
     this.#core = this.#mediator.api.core
+    // this.#data = this.#core.chartData
+    // this.#rangeLimit = this.#core.rangeLimit
+    // const end = this.#data.length - 1
+    // const start = end - this.#rangeLimit
+    // this.#range = getRange(this.#data, start, end)
     this.init(options)
   }
 
@@ -252,6 +266,30 @@ export default class Chart {
 
   scale2YPos(scale, range) {
 
+  }
+
+  /**
+   * Set the price accuracy
+   * @param pricePrecision - Price accuracy
+   */
+    setPriceVolumePrecision (pricePrecision) {
+      if (!isNumber(pricePrecision) || pricePrecision < 0) {
+        this.warning('setPriceVolumePrecision', 'pricePrecision', 'pricePrecision must be a number and greater than zero!!!')
+        return
+      }
+      this.#pricePrecision = pricePrecision
+    }
+
+  /**
+   * Set the volume accuracy
+   * @param volumePrecision - Volume accuracy
+   */
+  setPriceVolumePrecision (volumePrecision) {
+    if (!isNumber(volumePrecision) || volumePrecision < 0) {
+      logWarn('setPriceVolumePrecision', 'volumePrecision', 'volumePrecision must be a number and greater than zero!!!')
+      return
+    }
+    this.#volumePrecision = volumePrecision
   }
 
 }

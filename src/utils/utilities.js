@@ -38,24 +38,29 @@ export function _set(obj, path, value) {
 
 /**
  * Deep merge two objects.
- * https://stackoverflow.com/a/34749873
- * @param target
- * @param ...sources
+ * https://gist.github.com/ahtcx/0cd94e62691f539160b32ecda18af3d6?permalink_comment_id=2930530#gistcomment-2930530
+ * @param {object} target
+ * @param {object} source
+ * @returns {object}
  */
- export function mergeDeep(target, ...sources) {
-  if (!sources.length) return target;
-  const source = sources.shift();
-
-  if (isObject(target) && isObject(source)) {
-    for (const key in source) {
-      if (isObject(source[key])) {
-        if (!target[key]) Object.assign(target, { [key]: {} });
-        mergeDeep(target[key], source[key]);
-      } else {
-        Object.assign(target, { [key]: source[key] });
-      }
-    }
+ export function mergeDeep(target, source) {
+  
+  if (!isObject(target) || !isObject(source)) {
+    return source;
   }
 
-  return mergeDeep(target, ...sources);
+  Object.keys(source).forEach(key => {
+    const targetValue = target[key];
+    const sourceValue = source[key];
+
+    if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
+      target[key] = targetValue.concat(sourceValue);
+    } else if (isObject(targetValue) && isObject(sourceValue)) {
+      target[key] = mergeDeep(Object.assign({}, targetValue), sourceValue);
+    } else {
+      target[key] = sourceValue;
+    }
+  });
+
+  return target;
 }

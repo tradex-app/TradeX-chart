@@ -2,6 +2,17 @@
 
 const chartGrid = {
 
+  TimeDivision: {
+    "5m": ["30m", "90m"],
+    "30m": ["12h", "1d"],
+    "1h": "1d",
+    "4h": "1d",
+    "1d": ["14d", "1M"],
+    "5d": "1M",
+    "1w": "1M",
+    "3M": "1y",
+  },
+
   draw(target, config) {
     const scene = target.scene,
     ctx = scene.context;
