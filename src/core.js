@@ -96,7 +96,7 @@ export default class TradeXchart {
   warnings = false
   errors = false
 
-  #rangeLimit
+  #rangeLimit = RANGELIMIT
   
 /**
  * Creates an instance of TradeXchart.
@@ -106,7 +106,6 @@ export default class TradeXchart {
  * @param {Number} inCnt
  * @memberof TradeXchart
  */
-// , container, state, inCnt
 constructor (mediator, options={}) {
 
     let container = options?.container
@@ -121,12 +120,13 @@ constructor (mediator, options={}) {
     if (DOM.isElement(container)) {
       this.#el = container
       this.#mediator = mediator
+      this.#state = State.create(options.state)
+      this.log(`Chart ${this.#id} created with a ${this.#state.status} state`)
+      delete(options.state)
+
       this.init(options)
     }
     else this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`)
-
-    this.#state = State.create(options.state)
-    this.log(`Chart ${this.#id} created with a ${this.#state.getStatus()} state`)
   }
 
   log(l) { this.#mediator.log(l) }
@@ -152,8 +152,8 @@ constructor (mediator, options={}) {
   get elMain() { return this.#elMain }
   // get elChart() { return this.#elChart }
 
-  get chartData() { return this.#state.chart.data }
-  get rangeLimit() { return this.#rangeLimit }
+  get chartData() { return this.#state.data.chart.data }
+  get rangeLimit() { return (isNumber(this.#rangeLimit)) ? this.#rangeLimit : RANGELIMIT }
 
   /**
    * Create a new TradeXchart instance
@@ -169,7 +169,7 @@ constructor (mediator, options={}) {
     const cnt = ++TradeXchart.#cnt
 
     // options.cnt = cnt
-    options.state = state
+    // options.state = state
     options.modID = `${ID}_${cnt}`
     options.container = container
 
@@ -178,6 +178,8 @@ constructor (mediator, options={}) {
     const api = {
       permittedClassNames:TradeXchart.permittedClassNames,
     }
+
+    options.state = state
 
     // register the parent module which will build and control everything
     const instance = core.register(options.modID, TradeXchart, options, api)
@@ -215,27 +217,32 @@ constructor (mediator, options={}) {
     }
 
     // api - functions / methods, calculated properties provided by this module
-    let api = {
+    const api = {
+      ...this.#mediator.api,
       ...{
-      id: this.id,
-      parent: this.#mediator,
-      core: this.#mediator,
-      inCnt: this.inCnt,
-      width: this.width,
-      width: this.width,
-      height: this.height,
+        id: this.id,
+        parent: this.#mediator,
+        core: this.#mediator,
+        inCnt: this.inCnt,
+        width: this.width,
+        width: this.width,
+        height: this.height,
 
-      chartBGColour: this.chartBGColour,
-      chartTxtColour: this.chartTxtColour,
-      chartBorderColour: this.chartBorderColour,
-    
-      utilsH: this.utilsH,
-      toolsW: this.toolsW,
-      timeH: this.timeH,
-      scaleW: this.scaleW,
-    
-      elements: this.#elements,
-    }, ...this.#mediator.api}
+        chartBGColour: this.chartBGColour,
+        chartTxtColour: this.chartTxtColour,
+        chartBorderColour: this.chartBorderColour,
+      
+        utilsH: this.utilsH,
+        toolsW: this.toolsW,
+        timeH: this.timeH,
+        scaleW: this.scaleW,
+      
+        elements: this.#elements,
+
+        chartData: this.chartData,
+        rangeLimit: this.rangeLimit,
+      }
+    }
 
 
     this.UtilsBar = this.#mediator.register("UtilsBar", UtilsBar, options, api)
@@ -253,7 +260,6 @@ constructor (mediator, options={}) {
     this.ToolsBar.start()
     this.MainPane.start()
     this.Chart.start()
-
   }
 
   end() {

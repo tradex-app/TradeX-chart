@@ -66,11 +66,11 @@ export default class Chart {
     this.#elChart = mediator.api.elements.elChart
     this.#parent = this.#mediator.api.parent
     this.#core = this.#mediator.api.core
-    // this.#data = this.#core.chartData
-    // this.#rangeLimit = this.#core.rangeLimit
-    // const end = this.#data.length - 1
-    // const start = end - this.#rangeLimit
-    // this.#range = getRange(this.#data, start, end)
+    this.#data = this.#core.chartData
+    this.#rangeLimit = this.#core.rangeLimit
+    const end = this.#data.length - 1
+    const start = end - this.#rangeLimit
+    this.#range = getRange(this.#data, start, end)
     this.init(options)
   }
 

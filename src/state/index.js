@@ -62,7 +62,8 @@ export default class State {
 
   }
 
-  getStatus() { return this.#status }
+  get status() { return this.#status }
+  get data() { return this.#data }
 
   validateState(state, deepValidate=false) {
 
