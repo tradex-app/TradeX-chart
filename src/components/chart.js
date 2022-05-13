@@ -90,6 +90,7 @@ export default class Chart {
   set height(h) { this.setHeight(h) }
   get height() { return this.#height }
   set state(s) { this.setState(s) }
+  get range() { this.#range }
 
   init(options) {
     this.mount(this.#elChart)
