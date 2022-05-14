@@ -125,6 +125,39 @@ export function nice (value) {
 }
 
 /**
+ * count digits
+ * bitwise operations in JavaScript only work with 32-bit values (so a max of 2,147,483,647)
+ * @export
+ * @param {Number} value
+ * @return {Number}  
+ */
+export function numDigits(value) {
+  return (Math.log10((value ^ (value >> 31)) - (value >> 31)) | 0) + 1;
+}
+
+/**
+ * slightly slower
+ *
+ * @export
+ * @param {*} x
+ * @return {*}  
+ */
+export function numDigits2(x) {
+  return Math.max(Math.floor(Math.log10(Math.abs(x))), 0) + 1;
+}
+
+/**
+ * truncate floating point, works for positives as well as negatives
+ * @export
+ * @param {Number} value
+ * @return {Number}  
+ */
+export function float2Int(value) {
+  return value | 0
+}
+
+
+/**
  * round to precision
  * @param value
  * @param precision
@@ -141,7 +174,25 @@ export function round (value, precision) {
 
 /**
  * Get the number of decimal places
- * @param value
+ * fastest method
+ * @export
+ * @param {number} value
+ * @return {number}  
+ */
+export function precision(value) {
+  if (typeof value !== "number") a = parseFloat(value); 
+  if (isNaN(value)) return 0;
+  if (!isFinite(value)) return 0;
+  var e = 1, p = 0;
+  while (Math.round(value * e) / e !== value) { e *= 10; p++; }
+  return p;
+}
+
+/**
+ * Get the number of decimal places
+ * converting to string and splitting by . is only a solution for up to 7 decimals
+ * slowest
+ * @param {number} - value
  * @return {number}
  */
 export function getPrecision (value) {
@@ -154,6 +205,26 @@ export function getPrecision (value) {
     const dotIndex = str.indexOf('.')
     return dotIndex < 0 ? 0 : str.length - 1 - dotIndex
   }
+}
+
+/**
+ * Get the number of decimal places
+ * method is limited to maximum 10 guaranteed decimals
+ * close second for speed
+ * @export
+ * @param {*} n
+ * @return {*}  
+ */
+export function decimalPlaces(n) {
+  function hasFraction(n) {
+    return Math.abs(Math.round(n) - n) > 1e-10;
+  }
+
+  let count = 0;
+  // multiply by increasing powers of 10 until the fractional part is ~ 0
+  while (hasFraction(n * (10 ** count)) && isFinite(10 ** count))
+    count++;
+  return count;
 }
 
 /**

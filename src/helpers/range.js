@@ -4,20 +4,21 @@ import { ms2Interval } from "../utils/time"
 
 export function getRange( data, start=0, end=data.length-1 ) {
   let r = {}
-  r.dataLen = data.length
-  r.dataTimeS = data[0][0]
-  r.dataTimeE = data[r.dataLen - 1][0]
-  r.indexS = start
-  r.indexE = end
-  r.len = end - start
-  r.timeS = data[r.indexS][0]
-  r.timeE = data[r.indexE][0]
-  r.interval = data[r.indexS+1][0] - data[r.indexS][0]
+  if (start > end) [start, end] = [end, start]
+  r.dataLength = (end > (data.length - 1)) ? data.length - 1 : end
+  r.indexStart = (start < 0) ? 0 : start
+  r.indexEnd = (end > (data.length - 1)) ? data.length - 1 : end
+  r.Length = r.indexEnd - r.indexStart
+  r.timeStart = data[0][0]
+  r.timeFinish = data[r.dataLength - 1][0]
+  r.timeMin = data[r.indexStart][0]
+  r.timeMax = data[r.indexEnd][0]
+  r.interval = data[r.indexStart+1][0] - data[r.indexStart][0]
   r.intervalStr = ms2Interval(r.interval)
-  r.minTime = data[r.indexS][0]
-  r.maxTime = data[r.indexE-1][0]
   r = {...r, ...maxMinPriceVol(data, start, end)}
-  r.scale = (r.dataLen - 1) / (r.len)
+  r.height = r.priceMax - r.priceMin
+  r.volumeHeight = r.volumeMax - r.volumeMin
+  r.scale = (r.dataLength - 1) / (r.Length)
   return r
 }
 
@@ -31,26 +32,25 @@ export function getRange( data, start=0, end=data.length-1 ) {
  * @return {object}  
  */
 export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
-  if (start > end) [start, end] = [end, start]
-  const l = (end > (data.length - 1)) ? data.length - 1 : end
-  let i = (start < 0) ? 0 : start
-  let minPrice  = data[0][3]
-  let maxPrice  = data[0][2]
-  let minVolume = data[0][5]
-  let maxVolume = data[0][5]
+  let i = start,
+      l = end;
+  let priceMin  = data[0][3]
+  let priceMax  = data[0][2]
+  let volumeMin = data[0][5]
+  let volumeMax = data[0][5]
 
   while(i < l) {
-    minPrice  = (data[i][3] < minPrice) ? data[i][3] : minPrice
-    maxPrice  = (data[i][2] > maxPrice) ? data[i][2] : maxPrice
-    minVolume = (data[i][5] < minVolume) ? data[i][5] : minVolume
-    maxVolume = (data[i][5] > maxVolume) ? data[i][5] : maxVolume
+    priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin
+    priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax
+    volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin
+    volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
     i++
   }
 
   return {
-    minPrice: minPrice,
-    maxPrice: maxPrice,
-    minVolume: minVolume,
-    maxVolume: maxVolume
+    priceMin: priceMin,
+    priceMax: priceMax,
+    volumeMin: volumeMin,
+    volumeMax: volumeMax
   }
 }

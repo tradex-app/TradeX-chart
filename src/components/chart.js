@@ -3,6 +3,7 @@
 // Providing: the playground for price movements, indicators and drawing tools
 
 import DOM from "../utils/DOM"
+import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import ScaleBar from "./scale"
 import CEL from "../components/primitives/canvas"
 import chartGrid from "./overlays/chart-grid"
@@ -10,6 +11,7 @@ import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 
 import { getRange } from "../helpers/range"
+
 
 import {
   NAME,
@@ -29,6 +31,10 @@ import {
   CLASS_ONCHART,
   CLASS_OFFCHART,
 } from '../definitions/core'
+
+import {
+  PRICEDIGITS,
+} from "../definitions/chart"
 
 const STYLE_CHART = "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
 const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
@@ -56,7 +62,9 @@ export default class Chart {
   #chartXPadding = 5
   #chartYPadding = 2.5
 
+  #yAxisDigits
   #pricePrecision
+
   #volumePrecision
 
 
@@ -90,10 +98,23 @@ export default class Chart {
   set height(h) { this.setHeight(h) }
   get height() { return this.#height }
   set state(s) { this.setState(s) }
-  get range() { this.#range }
+  get state() { return this.getState() }
+  get data() { return this.#data }
+  get range() { return this.#range }
+  set priceDigits(digits) { this.setYAxisDigits(digits) }
+  get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
 
   init(options) {
     this.mount(this.#elChart)
+
+    // process options
+    if (isObject(options)) {
+      for (const option in options) {
+        if (option in this.props()) {
+          this.props()[option](options[option])
+        }
+      }
+    }
 
     // create viewport
     var viewport = new CEL.Viewport({
@@ -201,6 +222,13 @@ export default class Chart {
     this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`)
   }
 
+  props() {
+    return {
+      // id: (id) => this.setID(id),
+      yAxisDigits: (digits) => this.setYAxisDigits(digits),
+    }
+  }
+
   setWidth(w) {
     this.#width = w
   }
@@ -214,11 +242,22 @@ export default class Chart {
 
   }
 
+  getState() {
+    return null
+  }
+
   setDimensions(dimensions) {
     this.setWidth(dimensions.mainW)
     this.setHeight(dimensions.mainH)
 
     this.emit("resize", dimensions)
+  }
+
+  setYAxisDigits(digits) {
+    this.#yAxisDigits = (isNumber(digits) && digits >= 3) ? parseInt(digits) : PRICEDIGITS
+  }
+  getPriceDigits() {
+    return this.#yAxisDigits
   }
 
   defaultNode() {
