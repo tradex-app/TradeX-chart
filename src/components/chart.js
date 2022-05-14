@@ -56,6 +56,7 @@ export default class Chart {
   #range
   #rangeLimit
   #Scale
+  #Time
 
   #width
   #height
@@ -180,6 +181,8 @@ export default class Chart {
     this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
     this.#Scale.start(`Chart says to Scale, "Thanks for the update!"`)
 
+    this.#Time = this.#parent.time
+
     let dimensions = {wdith: this.#width, height: this.#height}
     this.emit("resizeChart", dimensions)
 
@@ -295,17 +298,12 @@ export default class Chart {
 
   }
 
-  time2XPos(time, range) {
-    const unit = this.#width / range.len 
-
-    let r = 0
-    while(r < l) {
-      
-    }
+  time2XPos(time) {
+    return this.#Time.xPos(time)
   }
 
-  scale2YPos(scale, range) {
-
+  price2YPos(price) {
+    return this.#Scale.yPos(price)
   }
 
   /**

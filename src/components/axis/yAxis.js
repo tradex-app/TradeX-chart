@@ -15,39 +15,42 @@ export default class yAxis extends Axis {
   yAxisPadding = 1.04
   yAxisPrecision
 
-    constructor(chart, isLog=false) {
-      super(chart)
-      this.data = super.data
-      this.range = super.range
-      this.height = super.height
+  constructor(chart, isLog=false) {
+    super(chart)
+    this.data = super.data
+    this.range = super.range
+    this.height = super.height
 
-      // console.log(super)
-      console.log(this)
+    this.isLog = isLog
+    if (isLog) this.yAxisLog()
+    else this.yAxisRangeBounds()
+  }
 
-      this.isLog = isLog
-      if (isLog) this.yAxisLog()
-      else this.yAxisRangeBounds()
-    }
+  yAxisRangeBounds() {
+    this.rangeH = this.range.height * this.yAxisPadding
+    this.yAxisRatio = this.height / this.range.height
+    this.yAxisPrecision = this.yAxisCalcPrecision
+  }
 
-    yAxisRangeBounds() {
-      this.rangeH = this.range.height * this.yAxisPadding
-      this.yAxisRatio = this.height / this.range.height
-      this.yAxisPrecision = this.yAxisCalcPrecision
-    }
+  yAxisLog() {
+    
+  }
 
-    yAxisLog() {
-      
-    }
+  yAxisCalcPrecision() {
+    let integerCnt = super.numDigits(this.range.priceMax)
+    // let decimalCnt = super.precision(this.range.priceMax)
+    return super.yDigits - integerCnt
+  }
 
-    yAxisCalcPrecision() {
-      let integerCnt = super.numDigits(this.range.priceMax)
-      // let decimalCnt = super.precision(this.range.priceMax)
-      return super.yDigits - integerCnt
-    }
-
-    yPos(price) {
-      let height = this.range.priceMax - price
-      let yPos = height * this.yAxisRatio
-      return yPos
-    }
+  /**
+   * return canvas y co-ordinate
+   * @param {number} dataY - chart price or offchart indicator y data
+   * @return {number}  
+   * @memberof yAxis
+   */
+  yPos(dataY) {
+    let height = this.range.priceMax - dataY
+    let yPos = height * this.yAxisRatio
+    return yPos
+  }
 }

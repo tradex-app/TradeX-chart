@@ -1,7 +1,8 @@
 // timeLine.js
-// Time bar that lives at the top of the chart
+// Time bar that lives at the bottom of the chart
 // Providing: chart drawing Time
 
+import xAxis from "./axis/xAxis"
 
 export default class Timeline {
 
@@ -10,12 +11,18 @@ export default class Timeline {
   #mediator
   #options
   #elTime
+  #parent
+  #chart
+  #xAxis
 
   constructor (mediator, options) {
 
     this.#mediator = mediator
     this.#options = options
     this.#elTime = mediator.api.elements.elTime
+    this.#parent = mediator.api.parent
+    this.#chart = this.#parent
+    this.#xAxis = new xAxis(this.#chart)
     this.init()
   }
   
@@ -65,6 +72,10 @@ export default class Timeline {
 
   emit(topic, data) {
     this.#mediator.emit(topic, data)
+  }
+
+  xPos(time) {
+    return this.#xAxis.xPos(time)
   }
 
 }

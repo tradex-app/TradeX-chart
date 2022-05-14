@@ -72,11 +72,12 @@ export default class MainPane {
   warning(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
-  get name() {return this.#name}
-  get shortName() {return this.#shortName}
-  get mediator() {return this.#mediator}
-  get chart() {return this.#Chart}
-  get options() {return this.#options}
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get mediator() { return this.#mediator }
+  get chart() { return this.#Chart }
+  get time() { return this.#Time }
+  get options() { return this.#options }
   get chartW() { return this.#chartW }
   get chartH() { return this.#chartH }
 
@@ -105,8 +106,8 @@ export default class MainPane {
       }
 
     // register child modules
-    this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
     this.#Chart = this.#mediator.register("Chart", Chart, options, api)
+    this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
 
     // events / messages
     this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
