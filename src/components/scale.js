@@ -2,6 +2,8 @@
 // Scale bar that lives on the side of the chart
 
 import DOM from "../utils/DOM"
+import yAxis from "./axis/yAxis"
+
 import {
   NAME,
   ID,
@@ -30,6 +32,7 @@ export default class ScaleBar {
   #parent
   #core
   #target
+  #yAxis
   #elScale
   #elScaleCanvas
 
@@ -42,6 +45,7 @@ export default class ScaleBar {
     this.#options = options
     this.#elScale = mediator.api.elements.elScale
     this.#parent = mediator.api.parent
+    this.#yAxis = new yAxis(this.#parent)
     this.init()
   }
 
