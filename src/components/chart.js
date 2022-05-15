@@ -110,7 +110,6 @@ export default class Chart {
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
 
   init(options) {
-    this.mount(this.#elChart)
 
     // process options
     if (isObject(options)) {
@@ -121,56 +120,8 @@ export default class Chart {
       }
     }
 
-    // create viewport
-    this.#viewport = new CEL.Viewport({
-      width: this.#width,
-      height: this.#height,
-      container: this.#elViewport
-    });
-
-    // create layers - grid, volume, candles
-    this.#layerGrid = new CEL.Layer();
-    this.#layerVolume = new CEL.Layer();
-    this.#layerCandles = new CEL.Layer();
-
-    // add layers
-    this.#viewport
-          .addLayer(this.#layerGrid)
-          .addLayer(this.#layerVolume)
-          .addLayer(this.#layerCandles);
-
-// -------------- quick and dirty test
-
-    const gridConfig = {
-      x: 100,
-      y: 100,
-      color: 'red',
-      hovered: false,
-      selected: false,
-    }
-    const volumeConfig = {
-      x: 150,
-      y: 150,
-      color: 'yellow',
-      hovered: false,
-      selected: true,
-    }
-    const candlesConfig = {
-      x: 150,
-      y: 100,
-      color: 'green',
-      hovered: false,
-      selected: true,
-    }
-
-    chartGrid.draw(this.#layerGrid, gridConfig)
-    chartVolume.draw(this.#layerVolume, volumeConfig)
-    chartCandles.draw(this.#layerCandles, candlesConfig)
-
-
-    this.#viewport.render();
-
-// -------------- end quick and dirty test
+    // mount chart on DOM
+    this.mount(this.#elChart)
 
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api
@@ -184,12 +135,21 @@ export default class Chart {
       }
     }
 
+    // X Axis - Timeline
+    this.#Time = this.#parent.time
+
+    // Y Axis - Price Scale
     this.#Scale = this.#mediator.register("ScaleBar", ScaleBar, options, api)
     this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
     this.#Scale.start(`Chart says to Scale, "Thanks for the update!"`)
 
-    this.#Time = this.#parent.time
+    // prepare layered canvas
+    this.createViewport()
 
+    // draw the chart - grid, candles, volume
+    this.draw(this.range)
+
+    // set up layout responsiveness
     let dimensions = {wdith: this.#width, height: this.#height}
     this.emit("resizeChart", dimensions)
 
@@ -301,8 +261,59 @@ export default class Chart {
   loadData(data) {}
   updateData(data) {}
 
-  draw(range) {
+  createViewport() {
+    // create viewport
+    this.#viewport = new CEL.Viewport({
+      width: this.#width,
+      height: this.#height,
+      container: this.#elViewport
+    });
 
+    // create layers - grid, volume, candles
+    this.#layerGrid = new CEL.Layer();
+    this.#layerVolume = new CEL.Layer();
+    this.#layerCandles = new CEL.Layer();
+
+    // add layers
+    this.#viewport
+          .addLayer(this.#layerGrid)
+          .addLayer(this.#layerVolume)
+          .addLayer(this.#layerCandles);
+  }
+
+  draw(range) {
+    // -------------- quick and dirty test
+
+    const gridConfig = {
+      x: 100,
+      y: 100,
+      color: 'red',
+      hovered: false,
+      selected: false,
+    }
+    const volumeConfig = {
+      x: 150,
+      y: 150,
+      color: 'yellow',
+      hovered: false,
+      selected: true,
+    }
+    const candlesConfig = {
+      x: 150,
+      y: 100,
+      color: 'green',
+      hovered: false,
+      selected: true,
+    }
+
+    chartGrid.draw(this.#layerGrid, gridConfig)
+    chartVolume.draw(this.#layerVolume, volumeConfig)
+    chartCandles.draw(this.#layerCandles, candlesConfig)
+
+
+    this.#viewport.render();
+
+    // -------------- end quick and dirty test
   }
 
   time2XPos(time) {
