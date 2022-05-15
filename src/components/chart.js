@@ -65,8 +65,12 @@ export default class Chart {
 
   #yAxisDigits
   #pricePrecision
-
   #volumePrecision
+
+  #viewport
+  #layerGrid
+  #layerVolume
+  #layerCandles
 
 
   constructor (mediator, options) {
@@ -118,19 +122,22 @@ export default class Chart {
     }
 
     // create viewport
-    var viewport = new CEL.Viewport({
+    this.#viewport = new CEL.Viewport({
       width: this.#width,
       height: this.#height,
       container: this.#elViewport
     });
 
     // create layers - grid, volume, candles
-    var grid = new CEL.Layer();
-    var volume = new CEL.Layer();
-    var candles = new CEL.Layer();
+    this.#layerGrid = new CEL.Layer();
+    this.#layerVolume = new CEL.Layer();
+    this.#layerCandles = new CEL.Layer();
 
     // add layers
-    viewport.addLayer(grid).addLayer(volume).addLayer(candles);
+    this.#viewport
+          .addLayer(this.#layerGrid)
+          .addLayer(this.#layerVolume)
+          .addLayer(this.#layerCandles);
 
 // -------------- quick and dirty test
 
@@ -156,12 +163,12 @@ export default class Chart {
       selected: true,
     }
 
-    chartGrid.draw(grid, gridConfig)
-    chartVolume.draw(volume, volumeConfig)
-    chartCandles.draw(candles, candlesConfig)
+    chartGrid.draw(this.#layerGrid, gridConfig)
+    chartVolume.draw(this.#layerVolume, volumeConfig)
+    chartCandles.draw(this.#layerCandles, candlesConfig)
 
 
-    viewport.render();
+    this.#viewport.render();
 
 // -------------- end quick and dirty test
 
