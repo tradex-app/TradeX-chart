@@ -71,6 +71,9 @@ export default class Chart {
   #layerGrid
   #layerVolume
   #layerCandles
+  #chartCandles
+
+  #theme
 
 
   constructor (mediator, options) {
@@ -196,6 +199,7 @@ export default class Chart {
     return {
       // id: (id) => this.setID(id),
       yAxisDigits: (digits) => this.setYAxisDigits(digits),
+      theme: (theme) => this.setTheme(theme)
     }
   }
 
@@ -221,6 +225,10 @@ export default class Chart {
     this.setHeight(dimensions.mainH)
 
     this.emit("resize", dimensions)
+  }
+
+  setTheme(theme) {
+    this.#theme = theme
   }
 
   setYAxisDigits(digits) {
@@ -253,10 +261,10 @@ export default class Chart {
 
   setTimezone(timezone) {}
   getTimezone(timezone) {}
-  setChartStyle(chartStyle) {}
-  getChartStyle(chartStyle) {}
-  setChartTheme(chartTheme) {}
-  getChartTheme(chartTheme) {}
+  // setChartStyle(chartStyle) {}
+  // getChartStyle(chartStyle) {}
+  // setChartTheme(chartTheme) {}
+  // getChartTheme(chartTheme) {}
 
   loadData(data) {}
   updateData(data) {}
@@ -279,6 +287,11 @@ export default class Chart {
           .addLayer(this.#layerGrid)
           .addLayer(this.#layerVolume)
           .addLayer(this.#layerCandles);
+
+    // add overlays
+    this.#chartCandles = new chartCandles(this.#layerCandles, this.#theme)
+    // this.#chartGrid =
+    // this.#chartVolume =
   }
 
   draw(range) {
@@ -299,16 +312,20 @@ export default class Chart {
       selected: true,
     }
     const candlesConfig = {
-      x: 150,
-      y: 100,
-      color: 'green',
-      hovered: false,
-      selected: true,
+      ...this.#theme,
+      ...{
+        x: 150,
+        y: 100,
+        color: 'green',
+        hovered: false,
+        selected: true,
+      }
     }
+
 
     chartGrid.draw(this.#layerGrid, gridConfig)
     chartVolume.draw(this.#layerVolume, volumeConfig)
-    chartCandles.draw(this.#layerCandles, candlesConfig)
+    this.#chartCandles.draw(range)
 
 
     this.#viewport.render();

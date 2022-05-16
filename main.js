@@ -20,6 +20,9 @@ const props = {
   width: 1000,
   height: 800,
   rangeLimit: 500,
+  theme: {
+    candleType: "CANDLE_SOLID"
+  }
 }
 const chart = Chart.create(mount, props, state )
 chart.start(chart.getModID())
