@@ -19,7 +19,7 @@ export default class xAxis extends Axis {
     this.width = super.width
 
     this.rangeW = this.range.width
-    this.xAxisRatio = this.width - this.rangeW
+    this.xAxisRatio = this.width / this.range.Length
   }
 
   /**
