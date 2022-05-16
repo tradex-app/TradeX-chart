@@ -9,29 +9,34 @@
 
 export default class Candle{
 
-  constructor(ctx, config) {
-    this.ctx = ctx
+  constructor(scene, config) {
+    this.scene = scene
+    this.ctx = this.scene.context
+    this.width = this.scene.width
     this.cfg = config
+    switch(this.cfg?.candleType) {
+      case "CANDLE_HOLLOW":
+      case "OHLC":
+        this.fill = false
+        break;
+      case "CANDLE_UP_HOLLOW":
+        this.fill = false && hilo
+        break;
+      case "CANDLE_DOWN_HOLLOW":
+        this.fill = false || hilo
+      case "CANDLE_SOLID": 
+      default:
+        this.fill = true
+        break;
+    }
   }
 
   draw(data) {
-    const hilo = data.raw[3] >= data.raw[0]
+    const ctx = this.ctx
+    const hilo = data.raw[5] >= data.raw[1]
     const bodyColour = hilo ? this.cfg.colourCandleUp : this.cfg.colourCandleDn
     const wickColour = hilo ? this.cfg.colourWickUp : this.cfg.colourWickDn
-    switch(this.cfg.type) {
-      case "CANDLE_SOLID": 
-        fill = true
-        break;
-      case "CANDLE_HOLLOW":
-      case "OHLC":
-        fill = false
-        break;
-      case "CANDLE_UP_HOLLOW":
-        fill = false && hilo
-        break;
-      case "CANDLE_DOWN_HOLLOW":
-        fill = false || hilo
-    }
+
 
     let w = Math.max(data.w, 1)
     let hw = Math.max(Math.floor(w * 0.5), 1)
@@ -39,43 +44,44 @@ export default class Candle{
     let max_h = data.c === data.o ? 1 : 2
     let x05 = Math.floor(data.x) - 0.5
 
-    this.ctx.strokeStyle = wick_color
+    ctx.save();
+    ctx.strokeStyle = wickColour
 
-    this.ctx.beginPath()
-    this.ctx.moveTo(x05, Math.floor(data.h))
+    ctx.beginPath()
+    ctx.moveTo(x05, Math.floor(data.h))
 
     // Wicks
     if (this.cfg.type === "CANDLE_SOLID" || this.cfg.type === "OHLC") {
-      this.ctx.lineTo(x05, Math.floor(data.l))
+      ctx.lineTo(x05, Math.floor(data.l))
     }
     else {
       if (hilo) {
-        this.ctx.lineTo(x05, Math.floor(data.c))
-        this.ctx.moveTo(x05, Math.floor(data.o))
+        ctx.lineTo(x05, Math.floor(data.c))
+        ctx.moveTo(x05, Math.floor(data.o))
       }
       else {
-        this.ctx.lineTo(x05, Math.floor(data.o))
-        this.ctx.moveTo(x05, Math.floor(data.c))
+        ctx.lineTo(x05, Math.floor(data.o))
+        ctx.moveTo(x05, Math.floor(data.c))
       }
     }
-    this.ctx.lineTo(x05, Math.floor(data.l))
-    this.ctx.stroke()
+    ctx.lineTo(x05, Math.floor(data.l))
+    ctx.stroke()
 
     // Body
-    if (data.w > 1.5 && fill) {
+    if (data.w > 1.5 && this.fill) {
 
-      this.ctx.fillStyle = bodyColour
+      ctx.fillStyle = bodyColour
 
       let s = hilo ? 1 : -1
-      this.ctx.fillRect(
+      ctx.fillRect(
           Math.floor(data.x - hw -1),
           data.c,
           Math.floor(hw * 2 + 1),
           s * Math.max(h, max_h),
       )
     } 
-    else if (data.w <= 1.5 && !fill && this.cfg.type !== "OHLC") {
-      this.ctx.rect(
+    else if (data.w <= 1.5 && !this.fill && this.cfg.type !== "OHLC") {
+      ctx.rect(
         Math.floor(data.x - hw -1),
         data.c,
         Math.floor(hw * 2 + 1),
@@ -83,31 +89,32 @@ export default class Candle{
       )
     } 
     else if (this.cfg.type === "OHLC") {
-      // this.ctx.strokeStyle = wickColour
-      this.ctx.beginPath()
-      this.ctx.moveTo(x05 - hw, data.o)
-      this.ctx.lineTo(x05, data.o)
+      // ctx.strokeStyle = wickColour
+      ctx.beginPath()
+      ctx.moveTo(x05 - hw, data.o)
+      ctx.lineTo(x05, data.o)
 
-      this.ctx.moveTo(x05, data.c)
-      this.ctx.lineTo(x05 + hw, data.c)
-      this.ctx.stroke()
+      ctx.moveTo(x05, data.c)
+      ctx.lineTo(x05 + hw, data.c)
+      ctx.stroke()
     }
     else {
 
-        this.ctx.strokeStyle = bodyColour
+        ctx.strokeStyle = bodyColour
 
-        this.ctx.beginPath()
-        this.ctx.moveTo(
+        ctx.beginPath()
+        ctx.moveTo(
             x05,
             Math.floor(Math.min(data.o, data.c)),
         )
-        this.ctx.lineTo(
+        ctx.lineTo(
             x05,
             Math.floor(Math.max(data.o, data.c)) +
                 (data.o === data.c ? 1 : 0)
         )
-        this.ctx.stroke()
+        ctx.stroke()
     }
+    ctx.restore();
   }
 
 
