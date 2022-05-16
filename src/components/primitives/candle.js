@@ -9,10 +9,9 @@
 
 export default class Candle{
 
-  constructor(ctx, data, config) {
+  constructor(ctx, config) {
     this.ctx = ctx
     this.cfg = config
-    this.draw(data)
   }
 
   draw(data) {
