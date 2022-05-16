@@ -6,6 +6,7 @@
 // CANDLE_DOWN_HOLLOW: 'candle_down_hollow',
 // OHLC: 'ohlc',
 
+import { CandleStyple } from "../../definitions/style"
 
 export default class Candle{
 
@@ -14,6 +15,11 @@ export default class Candle{
     this.ctx = this.scene.context
     this.width = this.scene.width
     this.cfg = config
+    this.cfg.colourCandleUp = this.cfg?.colourCandleUp || CandleStyple.COLOUR_CANDLE_UP
+    this.cfg.colourCandleDn = this.cfg?.colourCandleDn || CandleStyple.COLOUR_CANDLE_DN
+    this.cfg.colourWickUp = this.cfg?.colourWickUp || CandleStyple.COLOUR_WICK_UP
+    this.cfg.colourWickDn = this.cfg?.colourWickDn || CandleStyple.COLOUR_WICK_DN
+    
     switch(this.cfg?.candleType) {
       case "CANDLE_HOLLOW":
       case "OHLC":
@@ -33,7 +39,7 @@ export default class Candle{
 
   draw(data) {
     const ctx = this.ctx
-    const hilo = data.raw[5] >= data.raw[1]
+    const hilo = data.raw[4] >= data.raw[1]
     const bodyColour = hilo ? this.cfg.colourCandleUp : this.cfg.colourCandleDn
     const wickColour = hilo ? this.cfg.colourWickUp : this.cfg.colourWickDn
 

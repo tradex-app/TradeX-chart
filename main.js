@@ -19,7 +19,7 @@ const props = {
   errors: true,
   width: 1000,
   height: 800,
-  rangeLimit: 500,
+  rangeLimit: 50,
   theme: {
     candleType: "CANDLE_SOLID"
   }
