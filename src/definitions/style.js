@@ -8,7 +8,15 @@ export const CandleType = {
   CANDLE_DOWN_HOLLOW: 'candle_down_hollow',
   OHLC: 'ohlc',
   AREA: 'area'
-  }
+}
+
+export const CandleStyple = {
+  COLOUR_CANDLE_UP: "#00F040CC",
+  COLOUR_CANDLE_DN: "#F00040CC",
+  COLOUR_WICK_UP: "#0F4",
+  COLOUR_WICK_DN: "#F04",
+
+}
 
 /**
 * y-axis position
@@ -16,13 +24,13 @@ export const CandleType = {
 export const YAxisPosition = {
   LEFT: 'left',
   RIGHT: 'right'
-  }
+}
   
   /**
   *y-axis type
   */
   export const YAxisType = {
-  NORMAL: 'normal',
-  PERCENTAGE: 'percentage',
-  LOG: 'log'
+    NORMAL: 'normal',
+    PERCENTAGE: 'percentage',
+    LOG: 'log'
   }
