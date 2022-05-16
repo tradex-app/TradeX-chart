@@ -5,6 +5,7 @@ import { ms2Interval } from "../utils/time"
 export function getRange( data, start=0, end=data.length-1 ) {
   let r = {}
   if (start > end) [start, end] = [end, start]
+  r.data = data
   r.dataLength = (end > (data.length - 1)) ? data.length - 1 : end
   r.indexStart = (start < 0) ? 0 : start
   r.indexEnd = (end > (data.length - 1)) ? data.length - 1 : end

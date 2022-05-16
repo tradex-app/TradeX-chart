@@ -138,19 +138,8 @@ export default class Chart {
       }
     }
 
-    // X Axis - Timeline
-    this.#Time = this.#parent.time
-
     // Y Axis - Price Scale
     this.#Scale = this.#mediator.register("ScaleBar", ScaleBar, options, api)
-    this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
-    this.#Scale.start(`Chart says to Scale, "Thanks for the update!"`)
-
-    // prepare layered canvas
-    this.createViewport()
-
-    // draw the chart - grid, candles, volume
-    this.draw(this.range)
 
     // set up layout responsiveness
     let dimensions = {wdith: this.#width, height: this.#height}
@@ -164,6 +153,18 @@ export default class Chart {
 
   start() {
 
+    // X Axis - Timeline
+    this.#Time = this.#parent.time
+
+    // Y Axis - Price Scale
+    this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
+    this.#Scale.start(`Chart says to Scale, "Thanks for the update!"`)
+
+    // prepare layered canvas
+    this.createViewport()
+
+    // draw the chart - grid, candles, volume
+    this.draw(this.range)
   }
 
   end() {
@@ -289,7 +290,12 @@ export default class Chart {
           .addLayer(this.#layerCandles);
 
     // add overlays
-    this.#chartCandles = new chartCandles(this.#layerCandles, this.#theme)
+    this.#chartCandles = 
+      new chartCandles(
+        this.#layerCandles, 
+        this.#Time, 
+        this.#Scale, 
+        this.#theme)
     // this.#chartGrid =
     // this.#chartVolume =
   }
@@ -326,7 +332,6 @@ export default class Chart {
     chartGrid.draw(this.#layerGrid, gridConfig)
     chartVolume.draw(this.#layerVolume, volumeConfig)
     this.#chartCandles.draw(range)
-
 
     this.#viewport.render();
 

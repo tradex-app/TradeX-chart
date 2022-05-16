@@ -31,10 +31,12 @@ export default class Timeline {
   warning(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
-  get name() {return this.#name}
-  get shortName() {return this.#shortName}
-  get mediator() {return this.#mediator}
-  get options() {return this.#options}
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get mediator() { return this.#mediator }
+  get options() { return this.#options }
+  get xAxisWidth() { return this.#xAxis.width }
+  get xAxisRatio() { return this.#xAxis.xAxisRatio }
 
   init() {
     this.mount(this.#elTime)

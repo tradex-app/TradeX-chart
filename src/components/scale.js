@@ -58,6 +58,8 @@ export default class ScaleBar {
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
   get options() { return this.#options }
+  get yAxisHeight() { return this.#yAxis.height }
+  get yAxisRatio() { return this.#yAxis.yAxisRatio }
 
   init() {
     this.mount(this.#elScale)
@@ -102,6 +104,7 @@ export default class ScaleBar {
 
   setHeight(h) {
     this.#height = h
+    // TODO: modify yAxis Height
   }
 
   setDimensions(dimensions) {

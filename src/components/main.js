@@ -116,7 +116,8 @@ export default class MainPane {
   }
 
   start() {
-
+    this.#Chart.start()
+    this.#Time.start()
   }
 
   end() {
