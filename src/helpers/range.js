@@ -19,7 +19,7 @@ export function getRange( data, start=0, end=data.length-1 ) {
   r = {...r, ...maxMinPriceVol(data, start, end)}
   r.height = r.priceMax - r.priceMin
   r.volumeHeight = r.volumeMax - r.volumeMin
-  r.scale = (r.dataLength - 1) / (r.Length)
+  r.scale = (r.Length) / (r.dataLength - 1)
   return r
 }
 
@@ -35,10 +35,10 @@ export function getRange( data, start=0, end=data.length-1 ) {
 export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
   let i = start,
       l = end;
-  let priceMin  = data[0][3]
-  let priceMax  = data[0][2]
-  let volumeMin = data[0][5]
-  let volumeMax = data[0][5]
+  let priceMin  = data[i][3]
+  let priceMax  = data[i][2]
+  let volumeMin = data[i][5]
+  let volumeMax = data[i][5]
 
   while(i < l) {
     priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin

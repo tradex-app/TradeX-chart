@@ -14,12 +14,11 @@ export default class yAxis extends Axis {
     super(chart)
     this.#data = super.data
     this.#range = super.range
-
     this.#isLog = isLog
-    if (isLog) this.yAxisLog()
-    else this.yAxisRangeBounds()
   }
 
+  set isLog(l) { this.#isLog = l }
+  get isLog() { return this.#isLog }
   get data() { return this.#data }
   get range() { return this.#range }
   get height() { return super.height }
@@ -50,8 +49,13 @@ export default class yAxis extends Axis {
    * @memberof yAxis
    */
   yPos(dataY) {
-    let height = this.range.priceMax - dataY
-    let yPos = height * this.yAxisRatio
-    return yPos
+    if (this.#isLog) {
+
+    }
+    else {
+      let height = dataY - this.range.priceMin
+      let yPos = height * this.yAxisRatio
+      return yPos
+    }
   }
 }
