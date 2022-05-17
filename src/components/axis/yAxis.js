@@ -5,31 +5,32 @@ import { precision, round } from "../../utils/number";
 
 export default class yAxis extends Axis {
 
-  isLog = false
-  data
-  height
-  range
-  rangeH
-  yAxisH
-  yAxisRatio
-  yAxisPadding = 1.04
-  yAxisPrecision
+  #isLog = false
+  #data
+  #range
+  #yAxisPadding = 1.04
 
   constructor(chart, isLog=false) {
     super(chart)
-    this.data = super.data
-    this.range = super.range
-    this.height = super.height
+    this.#data = super.data
+    this.#range = super.range
 
-    this.isLog = isLog
+    this.#isLog = isLog
     if (isLog) this.yAxisLog()
     else this.yAxisRangeBounds()
   }
 
+  get data() { return this.#data }
+  get range() { return this.#range }
+  get height() { return super.height }
+  get rangeH() { return this.range.height * this.yAxisPadding }
+  get yAxisRatio() { return this.height / this.range.height }
+  get yAxisPrecision() { return this.yAxisCalcPrecision }
+  set yAxisPadding(p) { this.#yAxisPadding = p }
+  get yAxisPadding() { return this.#yAxisPadding }
+
   yAxisRangeBounds() {
-    this.rangeH = this.range.height * this.yAxisPadding
-    this.yAxisRatio = this.height / this.range.height
-    this.yAxisPrecision = this.yAxisCalcPrecision
+
   }
 
   yAxisLog() {
