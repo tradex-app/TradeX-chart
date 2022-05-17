@@ -27,8 +27,8 @@ export default class Candle{
   draw(data) {
     const ctx = this.ctx
     const hilo = data.raw[4] >= data.raw[1]
-    const bodyColour = hilo ? this.cfg.colourCandleUp : this.cfg.colourCandleDn
-    const wickColour = hilo ? this.cfg.colourWickUp : this.cfg.colourWickDn
+    const bodyColour = hilo ? this.cfg.colourCandleDn : this.cfg.colourCandleUp
+    const wickColour = hilo ? this.cfg.colourWickDn : this.cfg.colourWickUp
 
     switch(this.cfg?.candleType) {
       case "CANDLE_SOLID": 
@@ -62,7 +62,7 @@ export default class Candle{
     ctx.moveTo(x05, Math.floor(data.h))
 
     // Wicks
-    if (this.cfg.candleType === "CANDLE_SOLID" || this.cfg.candleType === "OHLC") {
+    if (this.cfg.candleType === "OHLC") {
       ctx.lineTo(x05, Math.floor(data.l))
     }
     else {
@@ -83,16 +83,18 @@ export default class Candle{
 
       ctx.fillStyle = bodyColour
 
-      let s = hilo ? 1 : -1
-      ctx.fillRect(
+      let s = hilo ? -1 : 1
+      ctx.rect(
         Math.floor(data.x - hw -1),
         data.c,
         Math.floor(hw * 2 + 1),
         s * Math.max(h, max_h),
       )
+      ctx.fill()
+      ctx.stroke()
     } 
     else if (data.w > 1.5 && !this.fill && this.cfg.candleType !== "OHLC") {
-      let s = hilo ? 1 : -1
+      let s = hilo ? -1 : 1
       ctx.rect(
         Math.floor(data.x - hw -1),
         data.c,
@@ -130,7 +132,9 @@ export default class Candle{
     ctx.restore();
   }
 
+  body(fill) {
 
+  }
 }
 
 

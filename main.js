@@ -21,7 +21,7 @@ const props = {
   height: 800,
   rangeLimit: 50,
   theme: {
-    candleType: "OHLC"
+    candleType: "CANDLE_SOLID"
   }
 }
 const chart = Chart.create(mount, props, state )

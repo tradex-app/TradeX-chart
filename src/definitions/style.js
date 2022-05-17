@@ -11,8 +11,8 @@ export const CandleType = {
 }
 
 export const CandleStyple = {
-  COLOUR_CANDLE_UP: "#00F040CC",
-  COLOUR_CANDLE_DN: "#F00040CC",
+  COLOUR_CANDLE_UP: "#00F04088",
+  COLOUR_CANDLE_DN: "#F0004088",
   COLOUR_WICK_UP: "#0F4",
   COLOUR_WICK_DN: "#F04",
 
