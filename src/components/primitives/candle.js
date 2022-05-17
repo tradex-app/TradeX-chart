@@ -39,7 +39,7 @@ export default class Candle{
         this.fill = false
         break;
       case "CANDLE_UP_HOLLOW":
-        this.fill = false && hilo
+        this.fill = false || !hilo
         break;
       case "CANDLE_DOWN_HOLLOW":
         this.fill = false || hilo
