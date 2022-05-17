@@ -44,38 +44,5 @@ export default class chartCandles extends Candle {
     }
   }
 
-  draw2(range) {
-
-    this.#config = {
-      x: 150,
-      y: 100,
-      color: 'green',
-      hovered: false,
-      selected: true,
-    }
-
-
-    const ctx = this.#scene.context;
-  
-    this.#scene.clear();
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(this.#config.x, this.#config.y, 60, 0, Math.PI*2, false);
-    ctx.fillStyle = this.#config.color;
-    ctx.fill();
-  
-    if (this.#config.selected) {
-    ctx.strokeStyle = 'black';
-    ctx.lineWidth = 6;
-    ctx.stroke();
-    }
-  
-    if (this.#config.hovered) {
-    ctx.strokeStyle = 'green';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    }
-    ctx.restore();
-  }
 }
 
