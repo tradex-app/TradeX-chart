@@ -20,6 +20,15 @@ export default class Candle{
     this.cfg.colourWickUp = this.cfg?.colourWickUp || CandleStyple.COLOUR_WICK_UP
     this.cfg.colourWickDn = this.cfg?.colourWickDn || CandleStyple.COLOUR_WICK_DN
     
+
+  }
+
+  draw(data) {
+    const ctx = this.ctx
+    const hilo = data.raw[4] >= data.raw[1]
+    const bodyColour = hilo ? this.cfg.colourCandleUp : this.cfg.colourCandleDn
+    const wickColour = hilo ? this.cfg.colourWickUp : this.cfg.colourWickDn
+
     switch(this.cfg?.candleType) {
       case "CANDLE_HOLLOW":
       case "OHLC":
@@ -33,21 +42,15 @@ export default class Candle{
       case "CANDLE_SOLID": 
       default:
         this.fill = true
+        this.cfg.candleType = "CANDLE_SOLID"
         break;
     }
-  }
-
-  draw(data) {
-    const ctx = this.ctx
-    const hilo = data.raw[4] >= data.raw[1]
-    const bodyColour = hilo ? this.cfg.colourCandleUp : this.cfg.colourCandleDn
-    const wickColour = hilo ? this.cfg.colourWickUp : this.cfg.colourWickDn
-
-
+    
     let w = Math.max(data.w, 1)
     let hw = Math.max(Math.floor(w * 0.5), 1)
     let h = Math.abs(data.o - data.c)
     let max_h = data.c === data.o ? 1 : 2
+    data.x = data.x + hw
     let x05 = Math.floor(data.x) - 0.5
 
     ctx.save();
@@ -57,7 +60,7 @@ export default class Candle{
     ctx.moveTo(x05, Math.floor(data.h))
 
     // Wicks
-    if (this.cfg.type === "CANDLE_SOLID" || this.cfg.type === "OHLC") {
+    if (this.cfg.candleType === "CANDLE_SOLID" || this.cfg.candleType === "OHLC") {
       ctx.lineTo(x05, Math.floor(data.l))
     }
     else {
@@ -80,21 +83,23 @@ export default class Candle{
 
       let s = hilo ? 1 : -1
       ctx.fillRect(
-          Math.floor(data.x - hw -1),
-          data.c,
-          Math.floor(hw * 2 + 1),
-          s * Math.max(h, max_h),
-      )
-    } 
-    else if (data.w <= 1.5 && !this.fill && this.cfg.type !== "OHLC") {
-      ctx.rect(
         Math.floor(data.x - hw -1),
         data.c,
         Math.floor(hw * 2 + 1),
         s * Math.max(h, max_h),
       )
     } 
-    else if (this.cfg.type === "OHLC") {
+    else if (data.w > 1.5 && !this.fill && this.cfg.candleType !== "OHLC") {
+      let s = hilo ? 1 : -1
+      ctx.rect(
+        Math.floor(data.x - hw -1),
+        data.c,
+        Math.floor(hw * 2 + 1),
+        s * Math.max(h, max_h),
+      )
+      ctx.stroke()
+    } 
+    else if (this.cfg.candleType === "OHLC") {
       // ctx.strokeStyle = wickColour
       ctx.beginPath()
       ctx.moveTo(x05 - hw, data.o)
