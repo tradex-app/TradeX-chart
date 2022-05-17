@@ -15,6 +15,7 @@ export default class Candle{
     this.ctx = this.scene.context
     this.width = this.scene.width
     this.cfg = config
+    this.cfg.candleType = this.cfg?.candleType || "CANDLE_SOLID"
     this.cfg.colourCandleUp = this.cfg?.colourCandleUp || CandleStyple.COLOUR_CANDLE_UP
     this.cfg.colourCandleDn = this.cfg?.colourCandleDn || CandleStyple.COLOUR_CANDLE_DN
     this.cfg.colourWickUp = this.cfg?.colourWickUp || CandleStyple.COLOUR_WICK_UP
@@ -30,6 +31,9 @@ export default class Candle{
     const wickColour = hilo ? this.cfg.colourWickUp : this.cfg.colourWickDn
 
     switch(this.cfg?.candleType) {
+      case "CANDLE_SOLID": 
+      this.fill = true
+      break;
       case "CANDLE_HOLLOW":
       case "OHLC":
         this.fill = false
@@ -39,13 +43,11 @@ export default class Candle{
         break;
       case "CANDLE_DOWN_HOLLOW":
         this.fill = false || hilo
-      case "CANDLE_SOLID": 
-      default:
-        this.fill = true
-        this.cfg.candleType = "CANDLE_SOLID"
-        break;
+      // default:
+      //   this.fill = true
+      //   break;
     }
-    
+
     let w = Math.max(data.w, 1)
     let hw = Math.max(Math.floor(w * 0.5), 1)
     let h = Math.abs(data.o - data.c)
