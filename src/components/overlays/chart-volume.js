@@ -1,31 +1,51 @@
 // chart-volume.js
 
-const chartVolume = {
+import VolumeBar from "../primitives/volume";
 
-  draw(target, config) {
-    const scene = target.scene,
-    ctx = scene.context;
-  
-    scene.clear();
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(config.x, config.y, 60, 0, Math.PI*2, false);
-    ctx.fillStyle = config.color;
-    ctx.fill();
-  
-    if (config.selected) {
-    ctx.strokeStyle = 'black';
-    ctx.lineWidth = 6;
-    ctx.stroke();
-    }
-  
-    if (config.hovered) {
-    ctx.strokeStyle = 'green';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    }
-    ctx.restore();
+export default class chartVolume extends VolumeBar {
+
+  #target
+  #scene
+  #config
+  #xAxis
+  #yAxis
+
+  constructor(target, xAxis, yAxis, config) {
+
+    super(target.scene, config)
+
+    this.#target = target
+    this.#scene = target.scene
+    this.#config = config
+    this.#xAxis = xAxis
+    this.#config.maxVolumeH = config?.maxVolumeH || 100
   }
+
+  draw(range) {
+    const data = range.data
+    const zeroPos = this.scene.height
+    const volume = {
+      x: 0,
+      w: this.#xAxis.xAxisRatio,
+      z: zeroPos
+    }
+
+    const volH = Math.floor(zeroPos * this.#config.maxVolumeH / 100)
+    const maxVol = range.volumeMax
+
+    let v = range.indexStart
+    let i = range.Length
+
+    while(i) {
+      volume.h = (maxVol - data[v][5]) * volH / maxVol
+      volume.raw = data[v]
+
+      super.draw(volume)
+      v++
+      i--
+      volume.x = volume.x + volume.w
+    }
+  }
+
 }
 
-export default chartVolume

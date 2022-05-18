@@ -11,6 +11,7 @@ import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 
 import { getRange } from "../helpers/range"
+import { VolumeStyle } from "../definitions/style"
 
 
 import {
@@ -71,6 +72,9 @@ export default class Chart {
   #layerGrid
   #layerVolume
   #layerCandles
+  
+  #chartGrid
+  #chartVolume
   #chartCandles
 
   #theme
@@ -296,8 +300,16 @@ export default class Chart {
         this.#Time, 
         this.#Scale, 
         this.#theme)
+
+    this.#theme.maxVolumeH = this.#theme?.onchartVolumeH || VolumeStyle.ONCHART_VOLUME_HEIGHT
+    this.#chartVolume =
+      new chartVolume(
+        this.#layerVolume, 
+        this.#Time, 
+        this.#Scale, 
+        this.#theme)
+
     // this.#chartGrid =
-    // this.#chartVolume =
   }
 
   draw(range) {
@@ -330,7 +342,7 @@ export default class Chart {
 
 
     chartGrid.draw(this.#layerGrid, gridConfig)
-    chartVolume.draw(this.#layerVolume, volumeConfig)
+    this.#chartVolume.draw(range)
     this.#chartCandles.draw(range)
 
     this.#viewport.render();

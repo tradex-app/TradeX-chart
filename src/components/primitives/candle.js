@@ -6,9 +6,9 @@
 // CANDLE_DOWN_HOLLOW: 'candle_down_hollow',
 // OHLC: 'ohlc',
 
-import { CandleStyple } from "../../definitions/style"
+import { CandleStyle } from "../../definitions/style"
 
-export default class Candle{
+export default class Candle {
 
   constructor(scene, config) {
     this.scene = scene
@@ -16,10 +16,10 @@ export default class Candle{
     this.width = this.scene.width
     this.cfg = config
     this.cfg.candleType = this.cfg?.candleType || "CANDLE_SOLID"
-    this.cfg.colourCandleUp = this.cfg?.colourCandleUp || CandleStyple.COLOUR_CANDLE_UP
-    this.cfg.colourCandleDn = this.cfg?.colourCandleDn || CandleStyple.COLOUR_CANDLE_DN
-    this.cfg.colourWickUp = this.cfg?.colourWickUp || CandleStyple.COLOUR_WICK_UP
-    this.cfg.colourWickDn = this.cfg?.colourWickDn || CandleStyple.COLOUR_WICK_DN
+    this.cfg.colourCandleUp = this.cfg?.colourCandleUp || CandleStyle.COLOUR_CANDLE_UP
+    this.cfg.colourCandleDn = this.cfg?.colourCandleDn || CandleStyle.COLOUR_CANDLE_DN
+    this.cfg.colourWickUp = this.cfg?.colourWickUp || CandleStyle.COLOUR_WICK_UP
+    this.cfg.colourWickDn = this.cfg?.colourWickDn || CandleStyle.COLOUR_WICK_DN
     
 
   }
@@ -39,10 +39,10 @@ export default class Candle{
         this.fill = false
         break;
       case "CANDLE_UP_HOLLOW":
-        this.fill = false || !hilo
+        this.fill = false || hilo
         break;
       case "CANDLE_DOWN_HOLLOW":
-        this.fill = false || hilo
+        this.fill = false || !hilo
       // default:
       //   this.fill = true
       //   break;
@@ -114,7 +114,7 @@ export default class Candle{
       ctx.stroke()
     }
     else {
-
+        // candle to thin for fill, just draw paths
         ctx.strokeStyle = bodyColour
 
         ctx.beginPath()
