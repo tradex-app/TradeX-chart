@@ -48,12 +48,12 @@ export default class Candle {
       //   break;
     }
 
-    let w = Math.max(data.w, 1)
+    let w = Math.max(data.w - 2, 1)
     let hw = Math.max(Math.floor(w * 0.5), 1)
     let h = Math.abs(data.o - data.c)
     let max_h = data.c === data.o ? 1 : 2
-    data.x = data.x + hw
-    let x05 = Math.floor(data.x) - 0.5
+    let x = data.x + hw
+    let x05 = Math.floor(x) - 0.5
 
     ctx.save();
     ctx.strokeStyle = wickColour
@@ -85,7 +85,7 @@ export default class Candle {
 
       let s = hilo ? -1 : 1
       ctx.rect(
-        Math.floor(data.x - hw -1),
+        Math.floor(x - hw -1),
         data.c,
         Math.floor(hw * 2 + 1),
         s * Math.max(h, max_h),
@@ -96,7 +96,7 @@ export default class Candle {
     else if (data.w > 1.5 && !this.fill && this.cfg.candleType !== "OHLC") {
       let s = hilo ? -1 : 1
       ctx.rect(
-        Math.floor(data.x - hw -1),
+        Math.floor(x - hw -1),
         data.c,
         Math.floor(hw * 2 + 1),
         s * Math.max(h, max_h),
