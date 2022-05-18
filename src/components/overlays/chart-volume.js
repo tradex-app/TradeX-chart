@@ -39,7 +39,6 @@ export default class chartVolume extends VolumeBar {
     while(i) {
       volume.h = (maxVol - data[v][5]) * volH / maxVol
       volume.raw = data[v]
-
       super.draw(volume)
       v++
       i--

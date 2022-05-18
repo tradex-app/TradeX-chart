@@ -5,20 +5,17 @@ import { precision, round } from "../../utils/number";
 
 export default class yAxis extends Axis {
 
-  #isLog = false
   #data
   #range
+  #yAxisType = "default"  // default, log, percent
   #yAxisPadding = 1.04
 
-  constructor(chart, isLog=false) {
+  constructor(chart, yAxisType="default") {
     super(chart)
     this.#data = super.data
     this.#range = super.range
-    this.#isLog = isLog
   }
 
-  set isLog(l) { this.#isLog = l }
-  get isLog() { return this.#isLog }
   get data() { return this.#data }
   get range() { return this.#range }
   get height() { return super.height }
@@ -27,6 +24,8 @@ export default class yAxis extends Axis {
   get yAxisPrecision() { return this.yAxisCalcPrecision }
   set yAxisPadding(p) { this.#yAxisPadding = p }
   get yAxisPadding() { return this.#yAxisPadding }
+  set yAxisType(t) { this.#yAxisType = t }
+  get yAxisType() { return this.#yAxisType }
 
   yAxisRangeBounds() {
 
@@ -49,10 +48,12 @@ export default class yAxis extends Axis {
    * @memberof yAxis
    */
   yPos(dataY) {
-    if (this.#isLog) {
-
-    }
-    else {
+    switch(this.yAxisType) {
+      case "percentage" :
+        break;
+      case "log" :
+        break;
+      default :
       let height = dataY - this.range.priceMin
       let yPos = height * this.yAxisRatio
       return yPos

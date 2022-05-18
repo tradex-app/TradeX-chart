@@ -19,8 +19,6 @@ export default class VolumeBar {
     const ctx = this.ctx;
     const hilo = data.raw[4] >= data.raw[1];
     const barColour = hilo ? this.cfg.colourVolumeDn : this.cfg.colourVolumeUp;
-    const zeroPos = data.z;
-    const maxPos = Math.floor((zeroPos * this.cfg.onchartVolumeH) / 100);
 
     ctx.save();
     ctx.strokeStyle = barColour;
