@@ -19,9 +19,10 @@ const props = {
   errors: true,
   width: 1000,
   height: 800,
-  rangeLimit: 50,
+  rangeLimit: 100,
   theme: {
-    candleType: "CANDLE_SOLID"
+    candleType: "CANDLE_SOLID",
+    onchartVolumeH: 15,
   }
 }
 const chart = Chart.create(mount, props, state )
