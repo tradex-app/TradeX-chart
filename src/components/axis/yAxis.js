@@ -9,6 +9,7 @@ import {
   YAXIS_STEP,
   YAXIS_TYPES
 } from "../../definitions/chart";
+import { YAxisStyle } from "../../definitions/style";
 
 export default class yAxis extends Axis {
 
@@ -100,30 +101,30 @@ export default class yAxis extends Axis {
     // const yAxisMid = this.height * 0.5
     const grad = Math.floor(this.height / this.#yAxisStep)
 
-    const rangeMid = this.range.height * 0.5
+    const rangeMid = (this.range.priceMax + this.range.priceMin) * 0.5
       let digits = this.countDigits(rangeMid)
     const scaleMid = this.niceValue(digits)
     const step = (this.#range.priceMax - scaleMid) / grad
 
     const scaleGrads = [[scaleMid, this.$2Pixel(scaleMid), digits]]
 
-    let top = scaleMid + step,
+    let upper = scaleMid + step,
         nice, 
         entry;
-    while (top < this.#range.priceMax) {
-      digits = this.countDigits(top)
+    while (upper < this.#range.priceMax) {
+      digits = this.countDigits(upper)
       nice = this.niceValue(digits)
       entry = [nice, this.$2Pixel(nice), digits]
       scaleGrads.unshift(entry)
-      top += step
+      upper += step
     }
-    let bot = scaleMid - step
-    while (bot > this.#range.priceMin) {
-      digits = this.countDigits(bot)
+    let lower = scaleMid - step
+    while (lower > this.#range.priceMin) {
+      digits = this.countDigits(lower)
       nice = this.niceValue(digits)
       entry = [nice, this.$2Pixel(nice), digits]
       scaleGrads.push(entry)
-      top -= step
+      lower -= step
     }
     return scaleGrads
   }
@@ -155,7 +156,8 @@ export default class yAxis extends Axis {
     const ctx = this.#parent.layerTicks.scene.context
     if (this.yAxisTicks) {
       ctx.save();
-      for (tick of grads) {
+      ctx.strokeStyle = YAxisStyle.COLOUR_TICK
+      for (let tick of grads) {
         ctx.beginPath()
         ctx.moveTo(0, tick[1])
         ctx.lineTo(this.yAxisTicks, tick[1])

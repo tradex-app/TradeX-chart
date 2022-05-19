@@ -32,11 +32,16 @@ export const YAxisPosition = {
   RIGHT: 'right'
 }
   
-  /**
-  *y-axis type
-  */
-  export const YAxisType = {
-    NORMAL: 'normal',
-    PERCENTAGE: 'percentage',
-    LOG: 'log'
-  }
+/**
+*y-axis type
+*/
+export const YAxisType = {
+  NORMAL: 'normal',
+  PERCENTAGE: 'percentage',
+  LOG: 'log'
+}
+
+export const YAxisStyle = {
+  COLOUR_TICK: "#666",
+  COLOUR_LABEL: "666"
+}

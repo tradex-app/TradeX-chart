@@ -21,5 +21,5 @@ const $SCALES = [0.05, 0.1, 0.2, 0.25, 0.5, 0.8, 1, 2, 5];
 
 export const PRICEDIGITS = 8
 
-export const YAXIS_STEP = 50
+export const YAXIS_STEP = 100
 export const YAXIS_TYPES = ["default", "percent", "log"]

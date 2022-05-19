@@ -130,6 +130,7 @@ export function countDigits(value) {
   digits.sign = (!value) ? false : true
   digits.integers = numDigits(value)
   digits.decimals = precision(value)
+  return digits
 }
 
 /**
