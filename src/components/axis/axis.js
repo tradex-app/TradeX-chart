@@ -1,7 +1,7 @@
 // axis.js
 
 // import pixel aspect ratio
-import { float2Int, numDigits, precision, nice, round } from '../../utils/number.js'
+import { float2Int, countDigits, numDigits, precision, nice, round } from '../../utils/number.js'
 
 export default class Axis {
 
@@ -19,6 +19,7 @@ export default class Axis {
 
   float2Int(value) { return float2Int(value) }
   numDigits(value) { return numDigits(value) }
+  countDigits(value) { return countDigits(value) }
   precision(value) { return precision(value) }
 
 }

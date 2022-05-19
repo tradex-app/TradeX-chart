@@ -277,8 +277,8 @@ export default class Chart {
   createViewport() {
     // create viewport
     this.#viewport = new CEL.Viewport({
-      width: this.#width,
-      height: this.#height,
+      width: this.width,
+      height: this.height,
       container: this.#elViewport
     });
 
