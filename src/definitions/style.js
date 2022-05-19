@@ -43,5 +43,10 @@ export const YAxisType = {
 
 export const YAxisStyle = {
   COLOUR_TICK: "#666",
-  COLOUR_LABEL: "666"
+  COLOUR_LABEL: "666",
+  FONT_LABEL: "12px Arial"
+}
+
+export const GridStyle = {
+  COLOUR_GRID: "#666"
 }

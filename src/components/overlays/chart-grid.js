@@ -1,42 +1,35 @@
 // chart-grid.js
 
-const chartGrid = {
+import { GridStyle } from "../../definitions/style"
+export default class chartGrid {
 
-  TimeDivision: {
-    "5m": ["30m", "90m"],
-    "30m": ["12h", "1d"],
-    "1h": "1d",
-    "4h": "1d",
-    "1d": ["14d", "1M"],
-    "5d": "1M",
-    "1w": "1M",
-    "3M": "1y",
-  },
+  #target
+  #scene
+  #config
+  #xAxis
+  #yAxis
 
-  draw(target, config) {
-    const scene = target.scene,
-    ctx = scene.context;
-  
-    scene.clear();
+  constructor(target, xAxis, yAxis, config) {
+
+    this.#target = target
+    this.#scene = target.scene
+    this.#config = config
+    this.#xAxis = xAxis
+    this.#yAxis = yAxis
+  }
+
+  draw() {
+    const grads = this.#yAxis.yAxisGrads
+    const ctx = this.#scene.context
     ctx.save();
-    ctx.beginPath();
-    ctx.arc(config.x, config.y, 60, 0, Math.PI*2, false);
-    ctx.fillStyle = config.color;
-    ctx.fill();
-  
-    if (config.selected) {
-    ctx.strokeStyle = 'black';
-    ctx.lineWidth = 6;
-    ctx.stroke();
-    }
-  
-    if (config.hovered) {
-    ctx.strokeStyle = 'green';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    ctx.strokeStyle = GridStyle.COLOUR_GRID
+    for (let tick of grads) {
+      ctx.beginPath()
+      ctx.moveTo(0, tick[1])
+      ctx.lineTo(this.#scene.width, tick[1])
+      ctx.stroke()
     }
     ctx.restore();
   }
 }
 
-export default chartGrid

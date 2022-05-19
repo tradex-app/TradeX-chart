@@ -73,6 +73,7 @@ export default class ScaleBar {
   get layerTicks() { return this.#layerTicks }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
+  get yAxisGrads() { return this.#yAxis.yAxisGrads }
 
   init() {
     this.mount(this.#elScale)

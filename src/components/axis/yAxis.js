@@ -22,6 +22,7 @@ export default class yAxis extends Axis {
   #yAxisDigits = PRICEDIGITS
   #yAxisRound = 3
   #yAxisTicks = 2
+  #yAxisGrads
 
   constructor(parent, chart, yAxisType=YAXIS_TYPES[0]) {
     super(chart)
@@ -44,6 +45,7 @@ export default class yAxis extends Axis {
   get yAxisStep() { return this.#yAxisStep }
   set yAxisTicks(t) { this.yAxisTicks = isNumber(t) ? t : 0 }
   get yAxisTicks() { return this.#yAxisTicks }
+  get yAxisGrads() { return this.#yAxisGrads }
 
   yAxisRangeBounds() {
 
@@ -111,7 +113,7 @@ export default class yAxis extends Axis {
     let upper = scaleMid + step,
         nice, 
         entry;
-    while (upper < this.#range.priceMax) {
+    while (upper <= this.#range.priceMax) {
       digits = this.countDigits(upper)
       nice = this.niceValue(digits)
       entry = [nice, this.$2Pixel(nice), digits]
@@ -119,7 +121,7 @@ export default class yAxis extends Axis {
       upper += step
     }
     let lower = scaleMid - step
-    while (lower > this.#range.priceMin) {
+    while (lower >= this.#range.priceMin) {
       digits = this.countDigits(lower)
       nice = this.niceValue(digits)
       entry = [nice, this.$2Pixel(nice), digits]
@@ -146,18 +148,23 @@ export default class yAxis extends Axis {
   }
 
   draw() {
-    const grads = this.calcGradations()
-    this.drawTicks(grads)
-    this.drawLabels(grads)
+    this.#yAxisGrads = this.calcGradations()
+    this.drawTicks()
+    this.drawLabels()
     this.drawOverlays()
   }
 
-  drawTicks(grads) {
+  drawTicks() {
+    const grads = this.#yAxisGrads
     const ctx = this.#parent.layerTicks.scene.context
     if (this.yAxisTicks) {
       ctx.save();
       ctx.strokeStyle = YAxisStyle.COLOUR_TICK
+      ctx.fillStyle = YAxisStyle.COLOUR_TICK
+      ctx.font = YAxisStyle.FONT_LABEL
       for (let tick of grads) {
+        ctx.fillText(tick[0], this.yAxisTicks * 2, tick[1])
+
         ctx.beginPath()
         ctx.moveTo(0, tick[1])
         ctx.lineTo(this.yAxisTicks, tick[1])
@@ -168,10 +175,12 @@ export default class yAxis extends Axis {
   }
 
   drawLabels() {
+    const grads = this.#yAxisGrads
 
   }
 
   drawOverlays() {
+    const grads = this.#yAxisGrads
 
   }
 
