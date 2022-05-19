@@ -67,7 +67,7 @@ export default class ScaleBar {
   get options() { return this.#options }
   set height(h) { this.setHeight(h) }
   get height() { return this.#yAxis.height }
-  get width() { return this.#elScale.width }
+  get width() { return this.#elScale.clientWidth }
   get yAxisHeight() { return this.#yAxis.height }
   get yAxisRatio() { return this.#yAxis.yAxisRatio }
   get layerTicks() { return this.#layerTicks }
