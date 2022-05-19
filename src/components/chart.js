@@ -309,45 +309,20 @@ export default class Chart {
         this.#Scale, 
         this.#theme)
 
-    // this.#chartGrid =
+    this.#chartGrid =
+      new chartGrid(
+        this.#layerGrid, 
+        this.#Time, 
+        this.#Scale, 
+        this.#theme)
   }
 
   draw(range) {
-    // -------------- quick and dirty test
-
-    const gridConfig = {
-      x: 100,
-      y: 100,
-      color: 'red',
-      hovered: false,
-      selected: false,
-    }
-    const volumeConfig = {
-      x: 150,
-      y: 150,
-      color: 'yellow',
-      hovered: false,
-      selected: true,
-    }
-    const candlesConfig = {
-      ...this.#theme,
-      ...{
-        x: 150,
-        y: 100,
-        color: 'green',
-        hovered: false,
-        selected: true,
-      }
-    }
-
-
-    chartGrid.draw(this.#layerGrid, gridConfig)
+    this.#chartGrid.draw()
     this.#chartVolume.draw(range)
     this.#chartCandles.draw(range)
 
     this.#viewport.render();
-
-    // -------------- end quick and dirty test
   }
 
   time2XPos(time) {
