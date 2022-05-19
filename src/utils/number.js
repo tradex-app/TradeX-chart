@@ -124,8 +124,16 @@ export function nice (value) {
   return exponent >= -20 ? +value.toFixed(exponent < 0 ? -exponent : 0) : value
 }
 
+export function countDigits(value) {
+  const digits = {}
+  digits.value = value
+  digits.sign = (!value) ? false : true
+  digits.integers = numDigits(value)
+  digits.decimals = precision(value)
+}
+
 /**
- * count digits
+ * count integer digits
  * bitwise operations in JavaScript only work with 32-bit values (so a max of 2,147,483,647)
  * @export
  * @param {Number} value
@@ -188,6 +196,27 @@ export function precision(value) {
   return p;
 }
 
+
+/**
+ * Get the number of decimal places
+ * method is limited to maximum 10 guaranteed decimals
+ * close second for speed
+ * @export
+ * @param {*} n
+ * @return {*}  
+ */
+ export function decimalPlaces(n) {
+  function hasFraction(n) {
+    return Math.abs(Math.round(n) - n) > 1e-10;
+  }
+
+  let count = 0;
+  // multiply by increasing powers of 10 until the fractional part is ~ 0
+  while (hasFraction(n * (10 ** count)) && isFinite(10 ** count))
+    count++;
+  return count;
+}
+
 /**
  * Get the number of decimal places
  * converting to string and splitting by . is only a solution for up to 7 decimals
@@ -205,26 +234,6 @@ export function getPrecision (value) {
     const dotIndex = str.indexOf('.')
     return dotIndex < 0 ? 0 : str.length - 1 - dotIndex
   }
-}
-
-/**
- * Get the number of decimal places
- * method is limited to maximum 10 guaranteed decimals
- * close second for speed
- * @export
- * @param {*} n
- * @return {*}  
- */
-export function decimalPlaces(n) {
-  function hasFraction(n) {
-    return Math.abs(Math.round(n) - n) > 1e-10;
-  }
-
-  let count = 0;
-  // multiply by increasing powers of 10 until the fractional part is ~ 0
-  while (hasFraction(n * (10 ** count)) && isFinite(10 ** count))
-    count++;
-  return count;
 }
 
 /**
