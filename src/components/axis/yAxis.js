@@ -21,7 +21,7 @@ export default class yAxis extends Axis {
   #yAxisStep = YAXIS_STEP
   #yAxisDigits = PRICEDIGITS
   #yAxisRound = 3
-  #yAxisTicks = 2
+  #yAxisTicks = 3
   #yAxisGrads
 
   constructor(parent, chart, yAxisType=YAXIS_TYPES[0]) {
@@ -163,7 +163,7 @@ export default class yAxis extends Axis {
       ctx.fillStyle = YAxisStyle.COLOUR_TICK
       ctx.font = YAxisStyle.FONT_LABEL
       for (let tick of grads) {
-        ctx.fillText(tick[0], this.yAxisTicks * 2, tick[1])
+        ctx.fillText(tick[0], this.yAxisTicks + 5, tick[1] + 4)
 
         ctx.beginPath()
         ctx.moveTo(0, tick[1])
