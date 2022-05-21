@@ -12,6 +12,7 @@ export function getRange( data, start=0, end=data.length-1 ) {
   r.Length = r.indexEnd - r.indexStart
   r.timeStart = data[0][0]
   r.timeFinish = data[r.dataLength - 1][0]
+  r.timeDuration = r.timeFinish - r.timeStart
   r.timeMin = data[r.indexStart][0]
   r.timeMax = data[r.indexEnd][0]
   r.interval = data[r.indexStart+1][0] - data[r.indexStart][0]

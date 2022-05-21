@@ -43,7 +43,7 @@ export default class yAxis extends Axis {
   get yAxisType() { return this.#yAxisType }
   set yAxisStep(s) { this.#yAxisStep = isNumber(s) ? s : YAXIS_STEP }
   get yAxisStep() { return this.#yAxisStep }
-  set yAxisTicks(t) { this.yAxisTicks = isNumber(t) ? t : 0 }
+  set yAxisTicks(t) { this.#yAxisTicks = isNumber(t) ? t : 0 }
   get yAxisTicks() { return this.#yAxisTicks }
   get yAxisGrads() { return this.#yAxisGrads }
 
