@@ -35,7 +35,7 @@ export function validateDeep(data) {
   let i = 0
   let prev = 0
   while (i < data.length) {
-    if (!isValidCandle(candle)) return false
+    if (!isValidCandle(data[i])) return false
     // is ascending order?
     if (data[i][0] < prev) return false
     prev = data[i][0]
