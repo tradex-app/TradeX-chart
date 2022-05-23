@@ -15,9 +15,9 @@ export function validateShallow(data, isCrypto=false) {
   if (!isArray(data)) return false
 
   let rnd = getRandomIntBetween(0, data.length)
-  if (!isValidCandle(data[0]), isCrypto) return false
-  if (!isValidCandle(data[rnd]), isCrypto) return false
-  if (!isValidCandle(data[data.length - 1]), isCrypto) return false
+  if (!isValidCandle(data[0], isCrypto)) return false
+  if (!isValidCandle(data[rnd], isCrypto)) return false
+  if (!isValidCandle(data[data.length - 1], isCrypto)) return false
 
   // is ascending order?
   let t1 = data[0][0]
@@ -35,7 +35,7 @@ export function validateDeep(data, isCrypto=false) {
   let i = 0
   let prev = 0
   while (i < data.length) {
-    if (!isValidCandle(data[i]), isCrypto) return false
+    if (!isValidCandle(data[i], isCrypto)) return false
     // is ascending order?
     if (data[i][0] < prev) return false
     prev = data[i][0]

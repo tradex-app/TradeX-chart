@@ -43,7 +43,7 @@ export default class State {
 
     // validate state
     if (isObject(state)) {
-      this.#data = this.validateState(state, isCrypto)
+      this.#data = this.validateState(state, deepValidate, isCrypto)
       this.#status = "valid"
     }
     else {
