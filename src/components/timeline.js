@@ -22,7 +22,7 @@ export default class Timeline {
     this.#elTime = mediator.api.elements.elTime
     this.#parent = mediator.api.parent
     this.#chart = this.#parent
-    this.#xAxis = new xAxis(this.#chart)
+    this.#xAxis = new xAxis(this, this.#chart)
     this.init()
   }
   

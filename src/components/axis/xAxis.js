@@ -1,6 +1,8 @@
 // xAxis.js
 
 import Axis from "./axis";
+import { TIMEUNITS, TIMESCALES, MONTHMAP } from "../../definitions/chart";
+import { ms2Interval } from "../../utils/time";
 
 export default class xAxis extends Axis {
 
@@ -30,7 +32,7 @@ export default class xAxis extends Axis {
   get timeMax() { return this.#range.timeMax }
   get timeMin() { return this.#range.timeMin }
   get xAxisRatio() { return this.width / this.#range.Length }
-  get xAxisStep() {  }
+  get xAxisStep() { return this.calcXAxisStep() }
   set xAxisTicks(t) {  }
   get xAxisTicks() {  }
 
@@ -45,4 +47,53 @@ export default class xAxis extends Axis {
     let xPos = width * this.xAxisRatio
     return xPos
   }
+
+  calcXAxisStep() {
+    const intervalStr = this.#range.intervalStr
+
+    let i = TIMESCALES.length -1,
+        major = minor = 1000
+    while (this.rangeDuration >= TIMESCALES[i]) {
+      minor = TIMESCALES[i++]
+    }
+    major = TIMESCALES[i]
+
+  }
+
+  get_day(t) {
+    return t ? new Date(t).getDate() : null
+  }
+  
+  // Start of the day (zero millisecond)
+  day_start(t) {
+    let start = new Date(t)
+    return start.setUTCHours(0,0,0,0)
+  }
+
+  get_month(t) {
+    if (!t) return undefined
+    return new Date(t).getUTCMonth()
+  }
+  
+  // Start of the month
+  month_start(t) {
+    let date = new Date(t)
+    return Date.UTC(
+        date.getFullYear(),
+        date.getMonth(), 1
+    )
+  }
+
+  get_year(t) {
+    if (!t) return undefined
+    return new Date(t).getUTCFullYear()
+  }
+
+  // Start of the year
+  year_start(t) {
+    return Date.UTC(new Date(t).getFullYear())
+  }
+
+
+
 }
