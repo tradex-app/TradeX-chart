@@ -14,7 +14,7 @@ export function isValidTimeInRange( time, start=BTCGENESIS,end=Date.now() ) {
 }
 
 function ms2TimeUnits( milliseconds ) {
-  var weeks, days, hours, minutes, seconds;
+  let years, months, _weeks, weeks, days, hours, minutes, seconds;
   seconds = Math.floor(milliseconds / 1000);
   minutes = Math.floor(seconds / 60);
   seconds = seconds % 60;

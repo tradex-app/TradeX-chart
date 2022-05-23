@@ -42,7 +42,6 @@ export default class ScaleBar {
   #height
 
   #viewport
-  #layerTicks
   #layerLabels
   #layerOverlays
 
@@ -70,7 +69,6 @@ export default class ScaleBar {
   get width() { return this.#elScale.clientWidth }
   get yAxisHeight() { return this.#yAxis.height }
   get yAxisRatio() { return this.#yAxis.yAxisRatio }
-  get layerTicks() { return this.#layerTicks }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
   get yAxisGrads() { return this.#yAxis.yAxisGrads }
@@ -156,15 +154,13 @@ export default class ScaleBar {
       container: this.#elViewport
     });
 
-    // create layers - ticks, labels, overlays
-    this.#layerTicks = new CEL.Layer();
+    // create layers - labels, overlays
     this.#layerLabels = new CEL.Layer();
     this.#layerOverlays = new CEL.Layer();
 
 
     // add layers
     this.#viewport
-          .addLayer(this.#layerTicks)
           .addLayer(this.#layerLabels)
           .addLayer(this.#layerOverlays);
   }

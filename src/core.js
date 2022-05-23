@@ -108,7 +108,10 @@ export default class TradeXchart {
  */
 constructor (mediator, options={}) {
 
-    let container = options?.container
+    let container = options?.container,
+        state = options?.state, 
+        deepValidate = options?.deepValidate || false, 
+        isCrypto = options?.isCrypto || false
     
     if (isString(container)) {
       if (container[0] === '#')
@@ -120,7 +123,7 @@ constructor (mediator, options={}) {
     if (DOM.isElement(container)) {
       this.#el = container
       this.#mediator = mediator
-      this.#state = State.create(options.state)
+      this.#state = State.create(state, deepValidate, isCrypto)
       this.log(`Chart ${this.#id} created with a ${this.#state.status} state`)
       delete(options.state)
 

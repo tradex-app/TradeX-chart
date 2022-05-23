@@ -23,7 +23,8 @@ const props = {
   theme: {
     candleType: "CANDLE_SOLID",
     onchartVolumeH: 15,
-  }
+  },
+  isCrypto: true
 }
 const chart = Chart.create(mount, props, state )
 chart.start(chart.getModID())

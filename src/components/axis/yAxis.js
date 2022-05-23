@@ -149,14 +149,13 @@ export default class yAxis extends Axis {
 
   draw() {
     this.#yAxisGrads = this.calcGradations()
-    this.drawTicks()
     this.drawLabels()
     this.drawOverlays()
   }
 
-  drawTicks() {
+  drawLabels() {
     const grads = this.#yAxisGrads
-    const ctx = this.#parent.layerTicks.scene.context
+    const ctx = this.#parent.layerLabels.scene.context
     if (this.yAxisTicks) {
       ctx.save();
       ctx.strokeStyle = YAxisStyle.COLOUR_TICK
@@ -172,11 +171,6 @@ export default class yAxis extends Axis {
       }
       ctx.restore();
     }
-  }
-
-  drawLabels() {
-    const grads = this.#yAxisGrads
-
   }
 
   drawOverlays() {
