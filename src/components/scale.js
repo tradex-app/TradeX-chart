@@ -116,8 +116,6 @@ export default class ScaleBar {
     el.innerHTML = this.defaultNode()
 
     const api = this.#mediator.api
-    // this.#elScaleCanvas = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE} canvas`)
-    // this.#elScaleCanvas.height = this.#parent.height
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE} .viewport`)
 
   }
