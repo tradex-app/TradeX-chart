@@ -2,7 +2,11 @@
 // Time bar that lives at the bottom of the chart
 // Providing: chart drawing Time
 
+import DOM from "../utils/DOM"
 import xAxis from "./axis/xAxis"
+import CEL from "./primitives/canvas"
+
+import { CLASS_TIME } from "../definitions/core"
 
 export default class Timeline {
 
@@ -14,6 +18,15 @@ export default class Timeline {
   #parent
   #chart
   #xAxis
+
+  #elViewport
+
+  #width
+  #height
+
+  #viewport
+  #layerLabels
+  #layerOverlays
 
   constructor (mediator, options) {
 
@@ -35,6 +48,9 @@ export default class Timeline {
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
   get options() { return this.#options }
+  get height() { return this.#elTime.clientHeight }
+  set width(w) { this.setWidth(w) }
+  get width() { return this.#xAxis.width }
   get xAxisWidth() { return this.#xAxis.width }
   get xAxisRatio() { return this.#xAxis.xAxisRatio }
 
@@ -46,18 +62,38 @@ export default class Timeline {
 
   mount(el) {
     el.innerHTML = this.defaultNode()
+
+    const api = this.#mediator.api
+    this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .viewport`)
+
   }
 
   defaultNode() {
+    // const node = `
+    //   <canvas width="" height="${this.mediator.api.timeH}"></canvas>
+    // `
     const node = `
-      <canvas width="" height="${this.mediator.api.timeH}"></canvas>
-    `
+    <div class="viewport"></div>
+  `
     return node
   }
 
+  setWidth(w) {
+    this.#width = w
+  }
+
+  setDimensions(dimensions) {
+    this.setWidth(dimensions.mainW)
+  }
 
   start() {
+    this.emit("started")
 
+    // prepare layered canvas
+    this.createViewport()
+
+    // draw the Timeline
+    this.draw()
   }
 
   end() {
@@ -76,8 +112,34 @@ export default class Timeline {
     this.#mediator.emit(topic, data)
   }
 
+  // -----------------------
+
   xPos(time) {
     return this.#xAxis.xPos(time)
+  }
+
+  createViewport() {
+    // create viewport
+    this.#viewport = new CEL.Viewport({
+      width: this.width,
+      height: this.height,
+      container: this.#elViewport
+    });
+
+    // create layers - labels, overlays
+    this.#layerLabels = new CEL.Layer();
+    this.#layerOverlays = new CEL.Layer();
+
+
+    // add layers
+    this.#viewport
+          .addLayer(this.#layerLabels)
+          .addLayer(this.#layerOverlays);
+  }
+
+  draw() {
+    this.#xAxis.draw()
+    this.#viewport.render()
   }
 
 }

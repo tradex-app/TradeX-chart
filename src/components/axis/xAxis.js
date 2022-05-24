@@ -1,8 +1,10 @@
 // xAxis.js
+// Timeline that lurks down below
 
 import Axis from "./axis";
-import { TIMEUNITS, TIMESCALES, MONTHMAP } from "../../definitions/chart";
+import { TIMEUNITS, TIMEINCS, MONTHMAP } from "../../definitions/chart";
 import { ms2Interval } from "../../utils/time";
+
 
 export default class xAxis extends Axis {
 
@@ -10,7 +12,8 @@ export default class xAxis extends Axis {
   #range
   #parent
 
-  xAxisOffset
+  #xAxisGrads
+  #xAxisOffset
 
   constructor(parent, chart) {
     super(chart)
@@ -49,33 +52,129 @@ export default class xAxis extends Axis {
   }
 
   calcXAxisStep() {
-    const intervalStr = this.#range.intervalStr
-
-    let i = TIMESCALES.length -1,
-        major = minor = 1000
-    while (this.rangeDuration >= TIMESCALES[i]) {
-      minor = TIMESCALES[i++]
+    let interval = Object.keys(TIMEINCS),
+        i = interval.length - 1
+        // major = minor = 1000
+    while (this.rangeDuration >= interval[i]) {
+      // minor = interval[i--]
+      if (--i === 0) break
     }
-    major = TIMESCALES[i]
+    // major = interval[i]
 
+    return {...{int: interval[i]}, ...TIMEINCS[interval[i]]}
   }
 
+  calcXAxisGrads() {
+    const step = this.calcXAxisStep()
+    const rangeEnd = this.range.timeFinish
+    const intervals = ms2Interval(rangeEnd)
+
+    // // max
+    // let max
+    // switch(step.max[1]) {
+    //   case "y":
+    //     max = this.year_start(rangeEnd)
+    //     break;
+    //   case "M":
+    //     max = this.month_start(rangeEnd)
+    //     break;
+    //   case "d":
+    //     max = this.day_start(rangeEnd)
+    // }
+
+    const hourStart = this.get_hour(rangeEnd)
+    const dayStart = this.day_start(rangeEnd)
+    const monthStart = this.month_start(rangeEnd)
+    const yearStart = this.year_start(rangeEnd)
+
+    let rangeAnchor,
+        time
+
+    if (this.inRange(yearStart)) {
+      rangeAnchor = yearStart
+      time = this.get_year(rangeEnd)
+    }
+    else if (this.inRange(monthStart)) {
+      rangeAnchor = monthStart
+      time = this.get_month(rangeEnd)
+    }
+    else if (this.inRange(dayStart)) {
+      rangeAnchor = dayStart
+      time = this.get_day(rangeEnd)
+    }
+    else if (this.inRange(hourStart)) {
+      rangeAnchor = hourStart
+      time = this.get_hour(rangeEnd)
+    }
+    else {
+      rangeAnchor = rangeEnd
+      time = tis.get_minute(rangeEnd)
+    }
+
+    // const timeGrads = [[rangeAnchor, t2Pixel(rangeAnchor)], time]
+  }
+
+  inRange(t) {
+    if (t >= this.range.timeStart && t <= this.range.timeFinish)
+      return true
+    else return false
+  }
+
+  get_minute(t) {
+    return t ? new Date(t).getMinutes() : null
+  }
+
+  get_hour(t) {
+    return t ? new Date(t).getHours() : null
+  }
+
+  hourStart(t) {
+    let start = new Date(t)
+    return start.setUTCMinutes(0,0,0)
+  }
+
+  /**
+   * day number of the month
+   *
+   * @param {timestamp} t - timestamp ms
+   * @return {number} - day number of the month
+   * @memberof xAxis
+   */
   get_day(t) {
     return t ? new Date(t).getDate() : null
   }
   
-  // Start of the day (zero millisecond)
+  /**
+   * Start of the day (zero millisecond)
+   *
+   * @param {timestamp} t - timestamp ms
+   * @return {timestamp} - timestamp ms
+   * @memberof xAxis
+   */
   day_start(t) {
     let start = new Date(t)
     return start.setUTCHours(0,0,0,0)
   }
 
+  /**
+   * month number of the year
+   *
+   * @param {timestamp} t - timestamp ms
+   * @return {number} - month number of the year
+   * @memberof xAxis
+   */
   get_month(t) {
     if (!t) return undefined
     return new Date(t).getUTCMonth()
   }
   
-  // Start of the month
+  /**
+   * Start of the month (zero millisecond)
+   *
+   * @param {timestamp} t - timestamp ms
+   * @return {timestamp} - timestamp ms
+   * @memberof xAxis
+   */
   month_start(t) {
     let date = new Date(t)
     return Date.UTC(
@@ -84,16 +183,43 @@ export default class xAxis extends Axis {
     )
   }
 
+  /**
+   * the year
+   *
+   * @param {timestamp} t - timestamp ms
+   * @return {number} - the year
+   * @memberof xAxis
+   */
   get_year(t) {
     if (!t) return undefined
     return new Date(t).getUTCFullYear()
   }
 
-  // Start of the year
+  /**
+   * Start of the year (zero millisecond)
+   *
+   * @param {timestamp} t - timestamp ms
+   * @return {timestamp} - timestamp ms
+   * @memberof xAxis
+   */
   year_start(t) {
     return Date.UTC(new Date(t).getFullYear())
   }
 
 
+
+  draw() {
+    this.#xAxisGrads = this.calcXAxisGrads()
+    this.drawLabels()
+    this.drawOverlays()
+  }
+
+  drawLabels() {
+
+  }
+
+  drawOverlays() {
+
+  }
 
 }
