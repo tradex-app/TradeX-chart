@@ -23,6 +23,10 @@ const DOM = {
     return document.querySelector(sel)
   },
 
+  findBySelectorAll(sel) {
+    return document.querySelectorAll(sel)
+  },
+
   //Returns true if it is a DOM node
   isNode(o){
     return (

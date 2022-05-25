@@ -7,9 +7,12 @@ export const GlobalStyle = {
   COLOUR_TXT: "#CCC",
 }
 
+export const ToolsStyle = {
+  COLOUR_ICON: "#CCC"
+}
 
 /**
-* Candlestick style
+* Candlesticks
 */
 export const CandleType = {
   CANDLE_SOLID: 'candle_solid',
