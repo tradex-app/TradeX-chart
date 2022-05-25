@@ -3,8 +3,9 @@
 
 import Axis from "./axis";
 import { TIMEUNITS, TIMEINCS, MONTHMAP } from "../../definitions/chart";
+import { isNumber } from "../../utils/typeChecks";
 import { ms2Interval } from "../../utils/time";
-
+import { XAxisStyle } from "../../definitions/style";
 
 export default class xAxis extends Axis {
 
@@ -12,6 +13,7 @@ export default class xAxis extends Axis {
   #range
   #parent
 
+  #xAxisTicks = 4
   #xAxisGrads
   #xAxisOffset
 
@@ -34,10 +36,11 @@ export default class xAxis extends Axis {
   get indexEnd() { return this.#range.indexEnd }
   get timeMax() { return this.#range.timeMax }
   get timeMin() { return this.#range.timeMin }
-  get xAxisRatio() { return this.width / this.#range.Length }
+  get xAxisRatio() { return this.width / this.#range.timeDuration }
   get xAxisStep() { return this.calcXAxisStep() }
-  set xAxisTicks(t) {  }
-  get xAxisTicks() {  }
+  set xAxisTicks(t) { this.#xAxisTicks = isNumber(t) ? t : 0 }
+  get xAxisTicks() { return this.#xAxisTicks }
+  get xAxisGrads() { return this.#xAxisGrads }
 
   /**
  * return canvas x co-ordinate
@@ -47,6 +50,12 @@ export default class xAxis extends Axis {
  */
   xPos(time) {
     let width = this.range.timeMax - time
+    let xPos = width * this.xAxisRatio
+    return xPos
+  }
+
+  t2Pixel(dataX) {
+    let width = dataX - this.range.timeStart
     let xPos = width * this.xAxisRatio
     return xPos
   }
@@ -111,7 +120,11 @@ export default class xAxis extends Axis {
       time = tis.get_minute(rangeEnd)
     }
 
-    // const timeGrads = [[rangeAnchor, t2Pixel(rangeAnchor)], time]
+    const timeGrads = [[time, this.t2Pixel(rangeAnchor), rangeAnchor]]
+
+    // figure out the rest of the timeline
+
+    return timeGrads
   }
 
   inRange(t) {
@@ -215,10 +228,26 @@ export default class xAxis extends Axis {
   }
 
   drawLabels() {
+    const grads = this.#xAxisGrads
+    const ctx = this.#parent.layerLabels.scene.context
+    const mid = this.width / this.range.Length * 0.5
+    ctx.save();
+    ctx.strokeStyle = XAxisStyle.COLOUR_TICK
+    ctx.fillStyle = XAxisStyle.COLOUR_TICK
+    ctx.font = XAxisStyle.FONT_LABEL
+    for (let tick of grads) { 
+      ctx.fillText(tick[0], tick[1], this.xAxisTicks + 12)
 
+      ctx.beginPath()
+      ctx.moveTo(tick[1], 0)
+      ctx.lineTo(tick[1], this.xAxisTicks)
+      ctx.stroke()
+    }
+      ctx.restore();
   }
 
   drawOverlays() {
+    const grads = this.#xAxisGrads
 
   }
 

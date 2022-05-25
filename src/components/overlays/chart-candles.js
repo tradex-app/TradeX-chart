@@ -25,7 +25,7 @@ export default class chartCandles extends Candle {
     const data = range.data
     const candle = {
       x: 0,
-      w: this.#xAxis.xAxisRatio,
+      w: this.#xAxis.width / range.Length,
     }
 
     let c = range.indexStart
