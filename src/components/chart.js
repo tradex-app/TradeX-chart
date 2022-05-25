@@ -9,6 +9,7 @@ import CEL from "../components/primitives/canvas"
 import chartGrid from "./overlays/chart-grid"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
+import chartCursor from "./overlays/chart-cursor"
 
 import { getRange } from "../helpers/range"
 import { VolumeStyle } from "../definitions/style"
@@ -51,6 +52,7 @@ export default class Chart {
   #elWidgets
   #elCanvas
   #elViewport
+  #elEditport
   #elScale
 
   #data
@@ -69,13 +71,16 @@ export default class Chart {
   #volumePrecision
 
   #viewport
+  #editport
   #layerGrid
   #layerVolume
   #layerCandles
+  #layerCursor
   
   #chartGrid
   #chartVolume
   #chartCandles
+  #chartCursor
 
   #theme
 
@@ -169,10 +174,25 @@ export default class Chart {
 
     // draw the chart - grid, candles, volume
     this.draw(this.range)
+
+    // prepare the canvas where cursor or tool edits happen
+    // this.createEditport()
+
+    // set up event listeners
+    this.eventsListen()
+
+    // TEST
+    // this.on("mousemove_chart", (e) => {console.log(e)})
   }
 
   end() {
     
+  }
+
+
+  eventsListen() {
+    let canvas = this.#viewport.scene.canvas
+    canvas.addEventListener("mousemove", (e) => this.onMouseMove(e))
   }
 
   on(topic, handler, context) {
@@ -191,12 +211,17 @@ export default class Chart {
     this.setDimensions(dimensions)
   }
 
+  onMouseMove(e) {
+    this.emit("mousemove_chart", [e.layerX, e.layerY])
+  }
+
   mount(el) {
     el.innerHTML = this.defaultNode()
 
     const api = this.#mediator.api
     this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .viewport`)
+    this.#elEditport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .editport`)
     this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`)
   }
 
@@ -247,6 +272,7 @@ export default class Chart {
     const api = this.#mediator.api
     const styleChart = STYLE_CHART + ` border-color: ${api.chartBorderColour};`
     const styleScale = STYLE_SCALE + ` width: ${api.scaleW - 1}px; border-color: ${api.chartBorderColour};`
+    const styleEdit = `position: absolute; top: 0; left: 0; z-index:100;`
     
     const rowsH = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`).clientHeight
     const rowsW = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`).clientWidth - 1
@@ -256,6 +282,7 @@ export default class Chart {
     const node = `
       <div class="${CLASS_WIDGETS}"></div>
       <div class="viewport"></div>
+      <div class="editport" style="${styleEdit}"></div>
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
     return node
@@ -286,14 +313,24 @@ export default class Chart {
     this.#layerGrid = new CEL.Layer();
     this.#layerVolume = new CEL.Layer();
     this.#layerCandles = new CEL.Layer();
+    this.#layerCursor = new CEL.Layer();
 
     // add layers
     this.#viewport
           .addLayer(this.#layerGrid)
           .addLayer(this.#layerVolume)
-          .addLayer(this.#layerCandles);
+          .addLayer(this.#layerCandles)
+          .addLayer(this.#layerCursor)
 
     // add overlays
+    this.#chartCursor = 
+    new chartCursor(
+      this.#layerCursor, 
+      this,
+      this.#Time, 
+      this.#Scale, 
+      this.#theme)
+
     this.#chartCandles = 
       new chartCandles(
         this.#layerCandles, 
@@ -315,6 +352,29 @@ export default class Chart {
         this.#Time, 
         this.#Scale, 
         this.#theme)
+  }
+
+  createEditport() {
+    // create editport
+    this.#editport = new CEL.Viewport({
+      width: this.width,
+      height: this.height,
+      container: this.#elEditport
+    });
+
+    this.#layerCursor = new CEL.Layer();
+
+    // add layers
+    this.#viewport
+        .addLayer(this.#layerCursor);
+
+    this.#chartCursor = 
+    new chartCursor(
+      this.#layerCursor,
+      this,
+      this.#Time, 
+      this.#Scale, 
+      this.#theme)
   }
 
   draw(range) {
