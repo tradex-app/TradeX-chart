@@ -26,7 +26,7 @@ export default class chartVolume extends VolumeBar {
     const zeroPos = this.scene.height
     const volume = {
       x: 0,
-      w: this.#xAxis.xAxisRatio,
+      w: this.#xAxis.width / range.Length,
       z: zeroPos
     }
 

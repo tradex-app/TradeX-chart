@@ -53,6 +53,9 @@ export default class Timeline {
   get width() { return this.#xAxis.width }
   get xAxisWidth() { return this.#xAxis.width }
   get xAxisRatio() { return this.#xAxis.xAxisRatio }
+  get layerLabels() { return this.#layerLabels }
+  get layerOverlays() { return this.#layerOverlays }
+  get xAxisGrads() { return this.#xAxis.xAxisGrads }
 
   init() {
     this.mount(this.#elTime)

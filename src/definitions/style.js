@@ -1,4 +1,14 @@
 /**
+ * Global
+ */
+export const GlobalStyle = {
+  COLOUR_BG: "#141414",
+  COLOUR_BORDER: "#666",
+  COLOUR_TXT: "#CCC",
+}
+
+
+/**
 * Candlestick style
 */
 export const CandleType = {
@@ -42,6 +52,12 @@ export const YAxisType = {
 }
 
 export const YAxisStyle = {
+  COLOUR_TICK: "#666",
+  COLOUR_LABEL: "666",
+  FONT_LABEL: "12px Arial"
+}
+
+export const XAxisStyle = {
   COLOUR_TICK: "#666",
   COLOUR_LABEL: "666",
   FONT_LABEL: "12px Arial"
