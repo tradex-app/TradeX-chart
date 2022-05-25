@@ -27,8 +27,8 @@ export default class Candle {
   draw(data) {
     const ctx = this.ctx
     const hilo = data.raw[4] >= data.raw[1]
-    const bodyColour = hilo ? this.cfg.colourCandleDn : this.cfg.colourCandleUp
-    const wickColour = hilo ? this.cfg.colourWickDn : this.cfg.colourWickUp
+    const bodyColour = hilo ? this.cfg.colourCandleUp : this.cfg.colourCandleDn
+    const wickColour = hilo ? this.cfg.colourWickUp : this.cfg.colourWickDn
 
     switch(this.cfg?.candleType) {
       case "CANDLE_SOLID": 
@@ -39,16 +39,16 @@ export default class Candle {
         this.fill = false
         break;
       case "CANDLE_UP_HOLLOW":
-        this.fill = false || hilo
+        this.fill = false || !hilo
         break;
       case "CANDLE_DOWN_HOLLOW":
-        this.fill = false || !hilo
+        this.fill = false || hilo
       // default:
       //   this.fill = true
       //   break;
     }
 
-    let w = Math.max(data.w - 2, 1)
+    let w = Math.max(data.w -1, 1)
     let hw = Math.max(Math.floor(w * 0.5), 1)
     let h = Math.abs(data.o - data.c)
     let max_h = data.c === data.o ? 1 : 2
@@ -83,7 +83,7 @@ export default class Candle {
 
       ctx.fillStyle = bodyColour
 
-      let s = hilo ? -1 : 1
+      let s = hilo ? 1 : -1
       ctx.rect(
         Math.floor(x - hw -1),
         data.c,
@@ -94,7 +94,7 @@ export default class Candle {
       ctx.stroke()
     } 
     else if (data.w > 1.5 && !this.fill && this.cfg.candleType !== "OHLC") {
-      let s = hilo ? -1 : 1
+      let s = hilo ? 1 : -1
       ctx.rect(
         Math.floor(x - hw -1),
         data.c,

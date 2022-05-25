@@ -1,5 +1,18 @@
 /**
-* Candlestick style
+ * Global
+ */
+export const GlobalStyle = {
+  COLOUR_BG: "#141414",
+  COLOUR_BORDER: "#666",
+  COLOUR_TXT: "#CCC",
+}
+
+export const ToolsStyle = {
+  COLOUR_ICON: "#888"
+}
+
+/**
+* Candlesticks
 */
 export const CandleType = {
   CANDLE_SOLID: 'candle_solid',
@@ -42,11 +55,17 @@ export const YAxisType = {
 }
 
 export const YAxisStyle = {
-  COLOUR_TICK: "#666",
-  COLOUR_LABEL: "666",
+  COLOUR_TICK: "#888",
+  COLOUR_LABEL: "888",
+  FONT_LABEL: "12px Arial"
+}
+
+export const XAxisStyle = {
+  COLOUR_TICK: "#888",
+  COLOUR_LABEL: "888",
   FONT_LABEL: "12px Arial"
 }
 
 export const GridStyle = {
-  COLOUR_GRID: "#666"
+  COLOUR_GRID: "#333"
 }

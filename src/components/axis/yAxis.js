@@ -43,7 +43,7 @@ export default class yAxis extends Axis {
   get yAxisType() { return this.#yAxisType }
   set yAxisStep(s) { this.#yAxisStep = isNumber(s) ? s : YAXIS_STEP }
   get yAxisStep() { return this.#yAxisStep }
-  set yAxisTicks(t) { this.yAxisTicks = isNumber(t) ? t : 0 }
+  set yAxisTicks(t) { this.#yAxisTicks = isNumber(t) ? t : 0 }
   get yAxisTicks() { return this.#yAxisTicks }
   get yAxisGrads() { return this.#yAxisGrads }
 
@@ -89,7 +89,7 @@ export default class yAxis extends Axis {
 
   $2Pixel(dataY) {
     let height = dataY - this.range.priceMin
-    let yPos = height * this.yAxisRatio
+    let yPos = this.height - (height * this.yAxisRatio)
     return yPos
   }
 
@@ -149,15 +149,14 @@ export default class yAxis extends Axis {
 
   draw() {
     this.#yAxisGrads = this.calcGradations()
-    this.drawTicks()
     this.drawLabels()
     this.drawOverlays()
   }
 
-  drawTicks() {
+  drawLabels() {
     const grads = this.#yAxisGrads
-    const ctx = this.#parent.layerTicks.scene.context
-    if (this.yAxisTicks) {
+    const ctx = this.#parent.layerLabels.scene.context
+    // if (this.yAxisTicks) {
       ctx.save();
       ctx.strokeStyle = YAxisStyle.COLOUR_TICK
       ctx.fillStyle = YAxisStyle.COLOUR_TICK
@@ -171,12 +170,7 @@ export default class yAxis extends Axis {
         ctx.stroke()
       }
       ctx.restore();
-    }
-  }
-
-  drawLabels() {
-    const grads = this.#yAxisGrads
-
+    // }
   }
 
   drawOverlays() {

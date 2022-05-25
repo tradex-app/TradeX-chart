@@ -38,12 +38,12 @@ export default class State {
   #dss = {}
   #status = false
 
-  constructor(state, deepValidate=false) {
+  constructor(state, deepValidate=false, isCrypto=false) {
     // this.#store = new Store()
 
     // validate state
     if (isObject(state)) {
-      this.#data = this.validateState(state)
+      this.#data = this.validateState(state, deepValidate, isCrypto)
       this.#status = "valid"
     }
     else {
@@ -52,8 +52,8 @@ export default class State {
     }
   }
 
-  static create(state, deepValidate=false) {
-    const instance = new State(state, deepValidate=false)
+  static create(state, deepValidate=false, isCrypto=false) {
+    const instance = new State(state, deepValidate, isCrypto)
     State.#stateList.push(instance)
     return instance
   }
@@ -65,7 +65,7 @@ export default class State {
   get status() { return this.#status }
   get data() { return this.#data }
 
-  validateState(state, deepValidate=false) {
+  validateState(state, deepValidate=false, isCrypto=false) {
 
     if (!('chart' in state)) {
       state.chart = {
@@ -76,9 +76,9 @@ export default class State {
     }
 
     if (deepValidate) 
-      state.chart.data = validateDeep(state.chart.data) ? state.chart.data : []
+      state.chart.data = validateDeep(state.chart.data, isCrypto) ? state.chart.data : []
     else 
-      state.chart.data = validateShallow(state.chart.data) ? state.chart.data : []
+      state.chart.data = validateShallow(state.chart.data, isCrypto) ? state.chart.data : []
 
     if (!('onchart' in state)) {
         state.onchart = []

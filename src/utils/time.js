@@ -13,8 +13,8 @@ export function isValidTimeInRange( time, start=BTCGENESIS,end=Date.now() ) {
   return (time > start && time < end) ? true : false
 }
 
-export function ms2TimeUnits( milliseconds ) {
-  var weeks, days, hours, minutes, seconds;
+function ms2TimeUnits( milliseconds ) {
+  let years, months, _weeks, weeks, days, hours, minutes, seconds;
   seconds = Math.floor(milliseconds / 1000);
   minutes = Math.floor(seconds / 60);
   seconds = seconds % 60;
@@ -22,14 +22,27 @@ export function ms2TimeUnits( milliseconds ) {
   minutes = minutes % 60;
   days = Math.floor(hours / 24);
   hours = hours % 24;
-  weeks = Math.floor(days / 7);
+  _weeks = Math.floor(days / 7);
+  days = days % 7
+  months = Math.floor(_weeks / 4)
+  years = Math.floor(_weeks / 52)
+  weeks = _weeks % 4
+  // accumulative extra days of months (28 days) 
+  // in 1 year (365 days) = 29 days
+  // thus...
+  months = months % 13
+
   return {
+    y: years,
+    M: months,
     w: weeks,
     d: days,
     h: hours,
     m: minutes,
     s: seconds,
     
+    years: years,
+    months: months,
     weeks: weeks,
     days: days,
     hours: hours,

@@ -29,6 +29,8 @@ import {
   RANGELIMIT,
 } from './definitions/core'
 
+import { GlobalStyle } from './definitions/style'
+
 const STYLE_TXCHART = "overflow: hidden;"
 const STYLE_UTILS = "border-bottom: 1px solid;"
 const STYLE_BODY  = "position: relative;"
@@ -66,13 +68,13 @@ export default class TradeXchart {
   chartHMin = 400
   chartW_Reactive = true
   chartH_Reactive = true
-  chartBGColour = "#444"
-  chartTxtColour = "#CCC"
-  chartBorderColour = "#666"
+  chartBGColour = GlobalStyle.COLOUR_BG
+  chartTxtColour = GlobalStyle.COLOUR_TXT
+  chartBorderColour = GlobalStyle.COLOUR_BORDER
 
   utilsH = 30
   toolsW = 45
-  timeH  = 30
+  timeH  = 25
   scaleW = 60
 
   static permittedClassNames = 
@@ -108,7 +110,10 @@ export default class TradeXchart {
  */
 constructor (mediator, options={}) {
 
-    let container = options?.container
+    let container = options?.container,
+        state = options?.state, 
+        deepValidate = options?.deepValidate || false, 
+        isCrypto = options?.isCrypto || false
     
     if (isString(container)) {
       if (container[0] === '#')
@@ -120,7 +125,7 @@ constructor (mediator, options={}) {
     if (DOM.isElement(container)) {
       this.#el = container
       this.#mediator = mediator
-      this.#state = State.create(options.state)
+      this.#state = State.create(state, deepValidate, isCrypto)
       this.log(`Chart ${this.#id} created with a ${this.#state.status} state`)
       delete(options.state)
 

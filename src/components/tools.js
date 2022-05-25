@@ -2,6 +2,8 @@
 // Tools bar that lives at the top of the chart
 // Providing: chart drawing tools
 
+import DOM from "../utils/DOM"
+
 import cursor from "../assets/svg/cursor.svg"
 import line from "../assets/svg/line.svg"
 import fibonacci from "../assets/svg/fibonacci.svg"
@@ -9,6 +11,8 @@ import range from "../assets/svg/range.svg"
 import text from "../assets/svg/text.svg"
 import measure from "../assets/svg/measure.svg"
 import del from "../assets/svg/delete.svg"
+import { ToolsStyle } from "../definitions/style"
+import { CLASS_TOOLS } from "../definitions/core"
 
 export default class ToolsBar {
 
@@ -44,7 +48,7 @@ export default class ToolsBar {
 
 
   start() {
-
+    this.initAllTools()
   }
 
   end() {
@@ -67,6 +71,19 @@ export default class ToolsBar {
     el.innerHTML = this.defaultNode()
   }
 
+  initAllTools() {
+    const api = this.#mediator.api
+    const toolObjects = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .tool`)
+    for (let obj of toolObjects) {
+
+      obj.addEventListener("load", () => {
+        let svgObj = obj.contentDocument
+        let svg = svgObj.querySelector(`svg`)
+        svg.style.fill = ToolsStyle.COLOUR_ICON
+      })
+    }
+  }
+
   defaultNode() {
 
     let toolbar = ""
@@ -79,8 +96,9 @@ export default class ToolsBar {
   }
 
   toolNode(icon) {
+    const iconStyle = `color: ${ToolsStyle.COLOUR_ICON};`
     return  `
-    <div class="icon-wrapper"><img src="${icon}" \></div>\n
+    <div class="icon-wrapper"><object data="${icon}" type="image/svg+xml" class="tool"></object></div>\n
     `
   }
 

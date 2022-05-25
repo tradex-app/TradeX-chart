@@ -7,19 +7,32 @@ function ms2TimeUnits( milliseconds ) {
   minutes = minutes % 60;
   days = Math.floor(hours / 24);
   hours = hours % 24;
-  weeks = Math.floor(days / 7);
+  _weeks = Math.floor(days / 7);
+  days = days % 7
+  months = Math.floor(_weeks / 4)
+  years = Math.floor(_weeks / 52)
+  weeks = _weeks % 4
+  // accumulative extra days of months (28 days) 
+  // in 1 year (365 days) = 29 days
+  // thus...
+  months = months % 13
+
   return {
-      w: weeks,
-      d: days,
-      h: hours,
-      m: minutes,
-      s: seconds,
-      
-			weeks: weeks,
-      days: days,
-      hours: hours,
-      minutes: minutes,
-      seconds: seconds,
+    y: years,
+    M: months,
+    w: weeks,
+    d: days,
+    h: hours,
+    m: minutes,
+    s: seconds,
+    
+    years: years,
+    months: months,
+    weeks: weeks,
+    days: days,
+    hours: hours,
+    minutes: minutes,
+    seconds: seconds,
   };
 }
 
@@ -30,7 +43,7 @@ function ms2Interval( milliseconds ) {
   }
 }
 
-let ms = 1000 * 60 * 60 * 24 * 8
+let ms = 1000 * 60 * 60 * 24 * 365
 
 console.log(ms2TimeUnits(ms))
 

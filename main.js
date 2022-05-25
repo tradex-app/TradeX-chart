@@ -19,11 +19,12 @@ const props = {
   errors: true,
   width: 1000,
   height: 800,
-  rangeLimit: 100,
+  rangeLimit: 50,
   theme: {
     candleType: "CANDLE_SOLID",
     onchartVolumeH: 15,
-  }
+  },
+  isCrypto: true
 }
 const chart = Chart.create(mount, props, state )
 chart.start(chart.getModID())
