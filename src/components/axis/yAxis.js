@@ -89,7 +89,7 @@ export default class yAxis extends Axis {
 
   $2Pixel(dataY) {
     let height = dataY - this.range.priceMin
-    let yPos = height * this.yAxisRatio
+    let yPos = this.height - (height * this.yAxisRatio)
     return yPos
   }
 
