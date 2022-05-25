@@ -179,7 +179,8 @@ export default class xAxis extends Axis {
    */
   get_month(t) {
     if (!t) return undefined
-    return new Date(t).getUTCMonth()
+    let m = new Date(t).getUTCMonth()
+    return MONTHMAP[m]
   }
   
   /**
@@ -237,7 +238,8 @@ export default class xAxis extends Axis {
     ctx.fillStyle = XAxisStyle.COLOUR_TICK
     ctx.font = XAxisStyle.FONT_LABEL
     for (let tick of grads) { 
-      ctx.fillText(tick[0], tick[1], this.xAxisTicks + 12)
+      let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5)
+      ctx.fillText(tick[0], tick[1] - w, this.xAxisTicks + 12)
 
       ctx.beginPath()
       ctx.moveTo(tick[1], 0)
