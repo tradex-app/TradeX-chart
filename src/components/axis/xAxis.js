@@ -36,6 +36,7 @@ export default class xAxis extends Axis {
   get indexEnd() { return this.#range.indexEnd }
   get timeMax() { return this.#range.timeMax }
   get timeMin() { return this.#range.timeMin }
+  get candleW() { return this.width / this.range.Length }
   get xAxisRatio() { return this.width / this.#range.timeDuration }
   get xAxisStep() { return this.calcXAxisStep() }
   set xAxisTicks(t) { this.#xAxisTicks = isNumber(t) ? t : 0 }
@@ -50,13 +51,13 @@ export default class xAxis extends Axis {
  */
   xPos(time) {
     let width = this.range.timeMax - time
-    let xPos = width * this.xAxisRatio
+    let xPos = (width * this.xAxisRatio) + (this.candleW * 0.5)
     return xPos
   }
 
   t2Pixel(dataX) {
     let width = dataX - this.range.timeStart
-    let xPos = width * this.xAxisRatio
+    let xPos = (width * this.xAxisRatio) + (this.candleW * 0.5)
     return xPos
   }
 
@@ -120,7 +121,7 @@ export default class xAxis extends Axis {
       time = tis.get_minute(rangeEnd)
     }
 
-    const timeGrads = [[time, this.t2Pixel(rangeAnchor), rangeAnchor]]
+    const timeGrads = [[time, this.t2Pixel(rangeAnchor) -1, rangeAnchor]]
 
     // figure out the rest of the timeline
 

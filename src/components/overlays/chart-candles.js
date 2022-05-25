@@ -24,7 +24,7 @@ export default class chartCandles extends Candle {
   draw(range) {
     const data = range.data
     const candle = {
-      x: 0,
+      x: 2,
       w: this.#xAxis.width / range.Length,
     }
 
