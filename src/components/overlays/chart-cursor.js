@@ -32,10 +32,13 @@ export default class chartCursor {
   draw(e) {
 
     let [x, y] = e
+        x = this.#xAxis.xPosSnap2CandlePos(x)
 
     this.#scene.clear()
     const ctx = this.#scene.context
     ctx.save();
+
+    ctx.setLineDash([5, 5])
 
     ctx.strokeStyle = "#666"
     ctx.beginPath()

@@ -121,6 +121,10 @@ export default class Timeline {
     return this.#xAxis.xPos(time)
   }
 
+  xPosSnap2CandlePos(x) {
+    return this.#xAxis.xPosSnap2CandlePos(x)
+  }
+
   createViewport() {
     // create viewport
     this.#viewport = new CEL.Viewport({
