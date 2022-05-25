@@ -55,10 +55,19 @@ export default class xAxis extends Axis {
     return xPos
   }
 
-  t2Pixel(dataX) {
-    let width = dataX - this.range.timeStart
+  t2Pixel(x) {
+    let width = x - this.range.timeStart
     let xPos = (width * this.xAxisRatio) + (this.candleW * 0.5)
     return xPos
+  }
+
+  pixel2T(x) {
+
+  }
+
+  xPosSnap2CandlePos(x) {
+    let c = Math.floor((x / this.candleW))
+    return  (c * this.candleW) + (this.candleW / 2)
   }
 
   calcXAxisStep() {
