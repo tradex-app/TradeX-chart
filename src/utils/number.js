@@ -124,12 +124,20 @@ export function nice (value) {
   return exponent >= -20 ? +value.toFixed(exponent < 0 ? -exponent : 0) : value
 }
 
+/**
+ *
+ *
+ * @export
+ * @param {number} value
+ * @return {*}  
+ */
 export function countDigits(value) {
   const digits = {}
   digits.value = value
   digits.sign = (!value) ? false : true
   digits.integers = numDigits(value)
   digits.decimals = precision(value)
+  digits.total = digits.integers + digits.decimals
   return digits
 }
 

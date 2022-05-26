@@ -184,14 +184,14 @@ export default class ScaleBar {
     let [x, y] = e,
         price =  this.yPos2Price(y),
         digits = this.#yAxis.countDigits(price),
-        nice = this.#yAxis.niceValue(digits);
+        nice = this.#yAxis.limitPrecision(digits)
 
     this.#layerCursor.scene.clear()
     const ctx = this.#layerCursor.scene.context
     ctx.save()
 
     const options = {
-      fontSize: YAxisStyle.FONTSIZE,
+      fontSize: YAxisStyle.FONTSIZE * 1.05,
       fontWeight: YAxisStyle.FONTWEIGHT,
       fontFamily: YAxisStyle.FONTFAMILY,
       txtCol: YAxisStyle.COLOUR_CURSOR,

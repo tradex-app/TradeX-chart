@@ -105,9 +105,12 @@ export default class yAxis extends Axis {
   }
 
   pixel2$(y) {
-    let ratio = this.height / y
+
+
+
+    let ratio = (this.height - y) / this.height
     let adjust = this.#range.height * ratio
-    return this.#range.priceMax - adjust
+    return this.#range.priceMin + adjust
   }
 
   calcGradations() {
@@ -156,6 +159,18 @@ export default class yAxis extends Axis {
     else {
 
     }
+  }
+
+  limitPrecision(digits) {
+    let value = digits.value
+    if (digits.total > this.#yAxisDigits) {
+      let cnt = this.#yAxisDigits - digits.total
+      if (cnt < 1) {
+        let decimals = digits.decimals + cnt
+        value = value.toFixed(decimals)
+      }
+    }
+    return value
   }
 
   draw() {

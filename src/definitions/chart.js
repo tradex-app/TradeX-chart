@@ -75,7 +75,7 @@ export const TIMEINCS = {
 export const TIMEUNITS = ['s','m','h','d','w','M','y']
 
 
-export const PRICEDIGITS = 8
+export const PRICEDIGITS = 6
 
 export const YAXIS_STEP = 100
 export const YAXIS_TYPES = ["default", "percent", "log"]
