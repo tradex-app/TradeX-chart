@@ -1,19 +1,15 @@
-/**
- * KLineChart by Lii Huu
- * https://github.com/liihuu/KLineChart
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
-
- * http://www.apache.org/licenses/LICENSE-2.0
-
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+export const defaultOptions = {
+  fontSize: 12,
+  fontWeight: "normal",
+  fontFamily: 'Helvetica Neue',
+  paddingLeft: 3,
+  paddingRight: 3,
+  paddingTop: 2,
+  paddingBottom: 2,
+  borderSize: 0,
+  txtCol: "#000",
+  bakCol: "#CCC"
+}
 
 /**
  * Get screen ratio
@@ -41,7 +37,11 @@ export function calcTextWidth (ctx, text) {
  * @param fontWeight
  * @returns {string}
  */
-export function createFont (fontSize = 12, fontWeight = 'normal', fontFamily = 'Helvetica Neue') {
+export function createFont (
+  fontSize = defaultOptions.fontSize, 
+  fontWeight = defaultOptions.fontWeight, 
+  fontFamily = defaultOptions.fontFamily
+  ) {
   return `${fontWeight} ${fontSize}px ${fontFamily}`
 }
 
@@ -53,9 +53,12 @@ export function createFont (fontSize = 12, fontWeight = 'normal', fontFamily = '
  * @returns {number}
  */
 export function getTextRectWidth (ctx, text, options) {
-  ctx.font = createFont(options.size, options.weight, options.family)
+  ctx.font = createFont(options.fontSize, options.fontWeight, options.fontFamily)
   const textWidth = calcTextWidth(ctx, text)
-  return options.paddingLeft + options.paddingRight + textWidth + (options.borderSize || 0) * 2
+  const paddingLeft = options.paddingLeft || 0
+  const paddingRight = options.paddingRight || 0
+  const borderSize = options.borderSize || 0
+  return paddingLeft + paddingRight + textWidth + (borderSize * 2)
 }
 
 /**
@@ -64,5 +67,47 @@ export function getTextRectWidth (ctx, text, options) {
  * @returns {number}
  */
 export function getTextRectHeight (options) {
-  return options.paddingTop + options.paddingBottom + options.size + (options.borderSize || 0) * 2
+  const paddingTop = options.paddingTop || 0
+  const paddingBottom = options.paddingBottom || 0
+  const borderSize = options.borderSize || 0
+  const fontSize = options.fontSize || 0
+  return paddingTop + paddingBottom + fontSize + (borderSize * 2)
+}
+
+/**
+ * draw text with background
+ * @export
+ * @param {canvas} ctx
+ * @param {string} txt
+ * @param {number} x
+ * @param {number} y
+ * @param {object} options - styling options
+ */
+export function drawTextBG(ctx, txt, x, y, options) {
+
+  /// lets save current state as we make a lot of changes        
+  ctx.save();
+
+  ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily)
+  /// draw text from top - makes life easier at the moment
+  ctx.textBaseline = 'top';
+
+  /// color for background
+  ctx.fillStyle = options.bakCol || defaultOptions.bakCol;
+  
+  /// get width of text
+  let width = getTextRectWidth(ctx, txt, options)
+  let height = getTextRectHeight(options)
+
+  /// draw background rect
+  ctx.fillRect(x, y, width, height);
+
+  // draw text on top
+  ctx.fillStyle = options.txtCol || defaultOptions.txtCol;
+  x = x + options?.paddingLeft
+  y = y + options?.paddingTop
+  ctx.fillText(txt, x, y);
+  
+  /// restore original state
+  ctx.restore();
 }

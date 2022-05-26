@@ -180,9 +180,6 @@ export default class Chart {
 
     // set up event listeners
     this.eventsListen()
-
-    // TEST
-    // this.on("mousemove_chart", (e) => {console.log(e)})
   }
 
   end() {
@@ -397,13 +394,13 @@ export default class Chart {
    * Set the price accuracy
    * @param pricePrecision - Price accuracy
    */
-    setPriceVolumePrecision (pricePrecision) {
-      if (!isNumber(pricePrecision) || pricePrecision < 0) {
-        this.warning('setPriceVolumePrecision', 'pricePrecision', 'pricePrecision must be a number and greater than zero!!!')
-        return
-      }
-      this.#pricePrecision = pricePrecision
+  setPriceVolumePrecision (pricePrecision) {
+    if (!isNumber(pricePrecision) || pricePrecision < 0) {
+      this.warning('setPriceVolumePrecision', 'pricePrecision', 'pricePrecision must be a number and greater than zero!!!')
+      return
     }
+    this.#pricePrecision = pricePrecision
+  }
 
   /**
    * Set the volume accuracy

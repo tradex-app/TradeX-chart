@@ -54,10 +54,19 @@ export const YAxisType = {
   LOG: 'log'
 }
 
+const YAxisStyle_FONTWEIGHT = "normal"
+const YAxisStyle_FONTSIZE = 12
+const YAxisStyle_FONTFAMILY = "Arial"
+
 export const YAxisStyle = {
   COLOUR_TICK: "#888",
   COLOUR_LABEL: "888",
-  FONT_LABEL: "12px Arial"
+  COLOUR_CURSOR: "#000",
+  COLOUR_CURSOR_BG: "#CCC",
+  FONTFAMILY: "Arial",
+  FONTSIZE: 12,
+  FONTWEIGHT: "normal",
+  FONT_LABEL: `${YAxisStyle_FONTWEIGHT} ${YAxisStyle_FONTSIZE}px ${YAxisStyle_FONTFAMILY}`
 }
 
 export const XAxisStyle = {

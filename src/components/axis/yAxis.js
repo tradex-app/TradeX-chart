@@ -71,24 +71,35 @@ export default class yAxis extends Axis {
 
   /**
    * return canvas y co-ordinate
-   * @param {number} dataY - chart price or offchart indicator y data
+   * handles Y Axis modes: default, log, percentate
+   * @param {number} yData - chart price or offchart indicator y data
    * @return {number}  
    * @memberof yAxis
    */
-  yPos(dataY) {
+  yPos(yData) {
     switch(this.yAxisType) {
       case "percentage" :
         break;
       case "log" :
-        return this.$2Pixel(log10(dataY))
+        return this.$2Pixel(log10(yData))
         break;
       default :
-        return this.$2Pixel(dataY)
+        return this.$2Pixel(yData)
     }
   }
 
-  $2Pixel(dataY) {
-    let height = dataY - this.range.priceMin
+  /**
+   * return chart price
+   * handles Y Axis modes: default, log, percentate
+   * @param {*} y
+   * @memberof yAxis
+   */
+  yPos2Price(y) {
+    return this.pixel2$(y)
+  }
+
+  $2Pixel(yData) {
+    let height = yData - this.range.priceMin
     let yPos = this.height - (height * this.yAxisRatio)
     return yPos
   }
@@ -156,26 +167,29 @@ export default class yAxis extends Axis {
   drawLabels() {
     const grads = this.#yAxisGrads
     const ctx = this.#parent.layerLabels.scene.context
-    // if (this.yAxisTicks) {
-      ctx.save();
-      ctx.strokeStyle = YAxisStyle.COLOUR_TICK
-      ctx.fillStyle = YAxisStyle.COLOUR_TICK
-      ctx.font = YAxisStyle.FONT_LABEL
-      for (let tick of grads) {
-        ctx.fillText(tick[0], this.yAxisTicks + 5, tick[1] + 4)
+    ctx.save();
+    ctx.strokeStyle = YAxisStyle.COLOUR_TICK
+    ctx.fillStyle = YAxisStyle.COLOUR_TICK
+    ctx.font = YAxisStyle.FONT_LABEL
+    for (let tick of grads) {
+      ctx.fillText(tick[0], this.yAxisTicks + 5, tick[1] + 4)
 
-        ctx.beginPath()
-        ctx.moveTo(0, tick[1])
-        ctx.lineTo(this.yAxisTicks, tick[1])
-        ctx.stroke()
-      }
-      ctx.restore();
-    // }
+      ctx.beginPath()
+      ctx.moveTo(0, tick[1])
+      ctx.lineTo(this.yAxisTicks, tick[1])
+      ctx.stroke()
+    }
+    ctx.restore();
   }
 
   drawOverlays() {
     const grads = this.#yAxisGrads
+    const ctx = this.#parent.layerOverlays.scene.context
+    ctx.save();
 
+// draw overlays
+
+    ctx.restore();
   }
 
 
