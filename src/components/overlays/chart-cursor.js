@@ -19,15 +19,11 @@ export default class chartCursor {
     this.#yAxis = yAxis
 
     this.#chart.on("mousemove_chart", (e) => { this.draw(e) })
-    // this.#target.viewport.render();
-
-    // let canvas = this.#target.scene.canvas
-    // canvas.addEventListener("mousemove", (e) => this.onMouseMove(e))
   }
 
-  onMouseMove(e) {
-    this.#chart.emit("mousemove_chart", [e.layerX, e.layerY])
-  }
+  // onMouseMove(e) {
+  //   this.#chart.emit("mousemove_chart", [e.layerX, e.layerY])
+  // }
 
   draw(e) {
 

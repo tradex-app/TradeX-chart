@@ -4,6 +4,7 @@
 import DOM from "../utils/DOM"
 import yAxis from "./axis/yAxis"
 import CEL from "./primitives/canvas"
+import { drawTextBG } from "../utils/canvas"
 
 import {
   NAME,
@@ -23,6 +24,7 @@ import {
   CLASS_ONCHART,
   CLASS_OFFCHART,
 } from '../definitions/core'
+import { YAxisStyle } from "../definitions/style";
 
 export default class ScaleBar {
 
@@ -44,6 +46,7 @@ export default class ScaleBar {
   #viewport
   #layerLabels
   #layerOverlays
+  #layerCursor
 
   constructor (mediator, options) {
 
@@ -90,10 +93,17 @@ export default class ScaleBar {
 
     // draw the scale
     this.draw()
+
+    // set up event listeners
+    this.eventsListen()
   }
 
   end() {
     
+  }
+
+  eventsListen() {
+    this.#parent.on("mousemove_chart", (e) => { this.drawCursorPrice(e) })
   }
 
   on(topic, handler, context) {
@@ -130,10 +140,6 @@ export default class ScaleBar {
 
   defaultNode() {
     const api = this.#mediator.api
-
-    // const node = `
-    //   <canvas id="" width="${api.scaleW}" height=""></canvas>
-    // `
     const node = `
       <div class="viewport"></div>
     `
@@ -142,8 +148,13 @@ export default class ScaleBar {
 
   // -----------------------
 
-  yPos(dataY) { return this.#yAxis.yPos(dataY) }
+  // convert chart price or offchart indicator y data to pixel pos
+  yPos(yData) { return this.#yAxis.yPos(yData) }
 
+  // convert pixel pos to chart price
+  yPos2Price(y) { return this.#yAxis.yPos2Price(y) }
+
+  // create canvas layers with handling methods
   createViewport() {
     // create viewport
     this.#viewport = new CEL.Viewport({
@@ -155,16 +166,50 @@ export default class ScaleBar {
     // create layers - labels, overlays
     this.#layerLabels = new CEL.Layer();
     this.#layerOverlays = new CEL.Layer();
-
+    this.#layerCursor = new CEL.Layer();
 
     // add layers
     this.#viewport
           .addLayer(this.#layerLabels)
-          .addLayer(this.#layerOverlays);
+          .addLayer(this.#layerOverlays)
+          .addLayer(this.#layerCursor);
   }
 
   draw() {
     this.#yAxis.draw()
+    this.#viewport.render()
+  }
+
+  drawCursorPrice(e) {
+    let [x, y] = e,
+        price =  this.yPos2Price(y),
+        digits = this.#yAxis.countDigits(price),
+        nice = this.#yAxis.niceValue(digits);
+
+    this.#layerCursor.scene.clear()
+    const ctx = this.#layerCursor.scene.context
+    ctx.save()
+
+    const options = {
+      fontSize: YAxisStyle.FONTSIZE,
+      fontWeight: YAxisStyle.FONTWEIGHT,
+      fontFamily: YAxisStyle.FONTFAMILY,
+      txtCol: YAxisStyle.COLOUR_CURSOR,
+      bakCol: YAxisStyle.COLOUR_CURSOR_BG,
+      paddingTop: 2,
+      paddingBottom: 2,
+      paddingLeft: 3,
+      paddingRight: 3
+    }
+    let height = options.fontSize + options.paddingTop + options.paddingBottom
+    let yPos = y - (height * 0.5)
+
+    ctx.fillStyle = options.bakCol
+    ctx.fillRect(1, yPos, this.width, height)
+
+    drawTextBG(ctx, `${nice}`, 1, yPos , options)
+
+    ctx.restore()
     this.#viewport.render()
   }
 
