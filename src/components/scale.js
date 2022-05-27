@@ -163,7 +163,7 @@ export default class ScaleBar {
       container: this.#elViewport
     });
 
-    // create layers - labels, overlays
+    // create layers - labels, overlays, cursor
     this.#layerLabels = new CEL.Layer();
     this.#layerOverlays = new CEL.Layer();
     this.#layerCursor = new CEL.Layer();
@@ -184,25 +184,26 @@ export default class ScaleBar {
     let [x, y] = e,
         price =  this.yPos2Price(y),
         digits = this.#yAxis.countDigits(price),
-        nice = this.#yAxis.limitPrecision(digits)
+        nice = this.#yAxis.limitPrecision(digits),
+
+        options = {
+          fontSize: YAxisStyle.FONTSIZE * 1.05,
+          fontWeight: YAxisStyle.FONTWEIGHT,
+          fontFamily: YAxisStyle.FONTFAMILY,
+          txtCol: YAxisStyle.COLOUR_CURSOR,
+          bakCol: YAxisStyle.COLOUR_CURSOR_BG,
+          paddingTop: 2,
+          paddingBottom: 2,
+          paddingLeft: 3,
+          paddingRight: 3
+        },
+        
+        height = options.fontSize + options.paddingTop + options.paddingBottom,
+        yPos = y - (height * 0.5);
 
     this.#layerCursor.scene.clear()
     const ctx = this.#layerCursor.scene.context
     ctx.save()
-
-    const options = {
-      fontSize: YAxisStyle.FONTSIZE * 1.05,
-      fontWeight: YAxisStyle.FONTWEIGHT,
-      fontFamily: YAxisStyle.FONTFAMILY,
-      txtCol: YAxisStyle.COLOUR_CURSOR,
-      bakCol: YAxisStyle.COLOUR_CURSOR_BG,
-      paddingTop: 2,
-      paddingBottom: 2,
-      paddingLeft: 3,
-      paddingRight: 3
-    }
-    let height = options.fontSize + options.paddingTop + options.paddingBottom
-    let yPos = y - (height * 0.5)
 
     ctx.fillStyle = options.bakCol
     ctx.fillRect(1, yPos, this.width, height)

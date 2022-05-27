@@ -5,8 +5,10 @@
 import DOM from "../utils/DOM"
 import xAxis from "./axis/xAxis"
 import CEL from "./primitives/canvas"
-
+import { getTextRectWidth } from "../utils/canvas"
 import { CLASS_TIME } from "../definitions/core"
+import { XAxisStyle } from "../definitions/style"
+import { drawTextBG } from "../utils/canvas"
 
 export default class Timeline {
 
@@ -27,6 +29,7 @@ export default class Timeline {
   #viewport
   #layerLabels
   #layerOverlays
+  #layerCursor
 
   constructor (mediator, options) {
 
@@ -97,10 +100,17 @@ export default class Timeline {
 
     // draw the Timeline
     this.draw()
+
+    // set up event listeners
+    this.eventsListen()
   }
 
   end() {
     
+  }
+
+  eventsListen() {
+    this.#chart.on("mousemove_chart", (e) => { this.drawCursorTime(e) })
   }
 
   on(topic, handler, context) {
@@ -117,13 +127,11 @@ export default class Timeline {
 
   // -----------------------
 
-  xPos(time) {
-    return this.#xAxis.xPos(time)
-  }
+  xPos(time) { return this.#xAxis.xPos(time) }
 
-  xPosSnap2CandlePos(x) {
-    return this.#xAxis.xPosSnap2CandlePos(x)
-  }
+  xPosSnap2CandlePos(x) { return this.#xAxis.xPosSnap2CandlePos(x) }
+
+  xPos2Time(x) { return this.#xAxis.xPos2Time(x) }
 
   createViewport() {
     // create viewport
@@ -133,19 +141,53 @@ export default class Timeline {
       container: this.#elViewport
     });
 
-    // create layers - labels, overlays
+    // create layers - labels, overlays, cursor
     this.#layerLabels = new CEL.Layer();
     this.#layerOverlays = new CEL.Layer();
-
+    this.#layerCursor = new CEL.Layer();
 
     // add layers
     this.#viewport
           .addLayer(this.#layerLabels)
-          .addLayer(this.#layerOverlays);
+          .addLayer(this.#layerOverlays)
+          .addLayer(this.#layerCursor);
   }
 
   draw() {
     this.#xAxis.draw()
+    this.#viewport.render()
+  }
+
+  drawCursorTime(e) {
+    const ctx = this.#layerCursor.scene.context
+    let [x, y] = e,
+        timestamp = this.xPos2Time(x),
+        date = new Date(timestamp),
+        opts = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
+        dateTimeStr = date.toLocaleDateString('en-GB', opts),
+
+        options = {
+          fontSize: XAxisStyle.FONTSIZE * 1.05,
+          fontWeight: XAxisStyle.FONTWEIGHT,
+          fontFamily: XAxisStyle.FONTFAMILY,
+          txtCol: XAxisStyle.COLOUR_CURSOR,
+          bakCol: XAxisStyle.COLOUR_CURSOR_BG,
+          paddingTop: 5,
+          paddingBottom: 3,
+          paddingLeft: 4,
+          paddingRight: 4
+        },
+
+        height = options.fontSize + options.paddingTop + options.paddingBottom,
+        txtW = getTextRectWidth(ctx, dateTimeStr, options),
+        xPos = this.#xAxis.xPosSnap2CandlePos(x) - (txtW * 0.5)
+
+    this.#layerCursor.scene.clear()
+    ctx.save()
+
+    drawTextBG(ctx, dateTimeStr, xPos, 1 , options)
+
+    ctx.restore()
     this.#viewport.render()
   }
 
