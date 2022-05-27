@@ -91,7 +91,7 @@ export default class yAxis extends Axis {
   /**
    * return chart price
    * handles Y Axis modes: default, log, percentate
-   * @param {*} y
+   * @param {number} y
    * @memberof yAxis
    */
   yPos2Price(y) {
@@ -105,9 +105,6 @@ export default class yAxis extends Axis {
   }
 
   pixel2$(y) {
-
-
-
     let ratio = (this.height - y) / this.height
     let adjust = this.#range.height * ratio
     return this.#range.priceMin + adjust

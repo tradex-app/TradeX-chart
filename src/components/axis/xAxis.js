@@ -45,6 +45,7 @@ export default class xAxis extends Axis {
 
   /**
  * return canvas x co-ordinate
+ * handles X Axis modes: default, indexed
  * @param {number} dataX - chart time
  * @return {number}  
  * @memberof xAxis
@@ -62,12 +63,24 @@ export default class xAxis extends Axis {
   }
 
   pixel2T(x) {
-
+    let c = Math.floor(x / this.candleW )
+    return this.#range.data[c][0]
   }
 
   xPosSnap2CandlePos(x) {
     let c = Math.floor((x / this.candleW))
     return  (c * this.candleW) + (this.candleW / 2)
+  }
+
+  /**
+   * return chart time
+   * handles X Axis modes: default, indexed
+   * @param {number} x
+   * @returns {timestamp}
+   * @memberof xAxis
+   */
+  xPos2Time(x) {
+    return this.pixel2T(x)
   }
 
   calcXAxisStep() {

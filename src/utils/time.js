@@ -57,3 +57,20 @@ export function ms2Interval( milliseconds ) {
     if (intervals[unit]) return `${intervals[unit]}${unit}`
   }
 }
+
+export function ms2DateTime( milliseconds, locale="en-GB" ) {
+  const date = new Date(milliseconds)
+  const year = date.getFullYear()
+  const month = date.getMonth()
+  const monthName = date.toLocaleDateString(locale, {month: 'short'})
+  const monthNameLong = date.toLocaleDateString(locale, {month: 'long'})
+  const day = date.getDate()
+  const dayName = date.toLocaleDateString(locale, {day: 'short'})
+  const dayNameLong = date.toLocaleDateString(locale, {month: 'long'})
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  const timeStamp = milliseconds
+  return {
+    year, month, monthName, monthNameLong, day, dayName, dayNameLong, hours, minutes, timeStamp
+  }
+}

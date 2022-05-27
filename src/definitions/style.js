@@ -63,16 +63,23 @@ export const YAxisStyle = {
   COLOUR_LABEL: "888",
   COLOUR_CURSOR: "#000",
   COLOUR_CURSOR_BG: "#CCC",
-  FONTFAMILY: "Arial",
-  FONTSIZE: 12,
-  FONTWEIGHT: "normal",
+  FONTFAMILY: YAxisStyle_FONTFAMILY,
+  FONTSIZE: YAxisStyle_FONTSIZE,
+  FONTWEIGHT: YAxisStyle_FONTWEIGHT,
   FONT_LABEL: `${YAxisStyle_FONTWEIGHT} ${YAxisStyle_FONTSIZE}px ${YAxisStyle_FONTFAMILY}`
 }
+
+const XAxisStyle_FONTWEIGHT = "normal"
+const XAxisStyle_FONTSIZE = 12
+const XAxisStyle_FONTFAMILY = "Arial"
 
 export const XAxisStyle = {
   COLOUR_TICK: "#888",
   COLOUR_LABEL: "888",
-  FONT_LABEL: "12px Arial"
+  FONTFAMILY: XAxisStyle_FONTFAMILY,
+  FONTSIZE: XAxisStyle_FONTSIZE,
+  FONTWEIGHT: XAxisStyle_FONTWEIGHT,
+  FONT_LABEL: `${XAxisStyle_FONTWEIGHT} ${XAxisStyle_FONTSIZE}px ${XAxisStyle_FONTFAMILY}`
 }
 
 export const GridStyle = {
