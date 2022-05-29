@@ -55,13 +55,13 @@ export default class xAxis extends Axis {
  * @memberof xAxis
  */
   xPos(time) {
-    let width = this.range.timeMax - time
+    let width = time - this.range.timeMin
     let xPos = (width * this.xAxisRatio) + (this.candleW * 0.5)
     return xPos
   }
 
-  t2Pixel(x) {
-    let width = this.range.timeMax - x
+  t2Pixel(t) {
+    let width = t - this.range.timeMin
     let xPos = (width * this.xAxisRatio) + (this.candleW * 0.5)
     return xPos
   }
@@ -148,17 +148,18 @@ export default class xAxis extends Axis {
     diff.days = timestampDiff.inDays(rangeStart, rangeEnd)
     let day = rangeStart
     for (let i = diff.days; i > 0; i--) {
-      let monthValue = get_month(month)
+      let monthValue = get_month(day)
       let dayStart = day_start(day)
       let dayValue = get_day(day)
-      let dayCnt = dayValue
+
+      if (dayStart < rangeStart) dayStart += 1000*60*60*24
 
       if (monthValue == 0 && dayValue == 1) dayValue = get_year(day)
       else if (dayValue == 1) dayValue = get_monthName(day)
  
       grads.days.push([dayValue, this.t2Pixel(dayStart)])
 
-      day += 1000*60*60*24
+      day = dayStart + 1000*60*60*24
     }
 
 
