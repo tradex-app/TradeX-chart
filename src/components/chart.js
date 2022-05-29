@@ -269,7 +269,7 @@ export default class Chart {
     const api = this.#mediator.api
     const styleChart = STYLE_CHART + ` border-color: ${api.chartBorderColour};`
     const styleScale = STYLE_SCALE + ` width: ${api.scaleW - 1}px; border-color: ${api.chartBorderColour};`
-    const styleEdit = `position: absolute; top: 0; left: 0; z-index:100;`
+    const styleLegend = `position: absolute; top: 0; left: 0; z-index:100;`
     
     const rowsH = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`).clientHeight
     const rowsW = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`).clientWidth - 1
@@ -279,7 +279,7 @@ export default class Chart {
     const node = `
       <div class="${CLASS_WIDGETS}"></div>
       <div class="viewport"></div>
-      <div class="editport" style="${styleEdit}"></div>
+      <div class="legends" style="${styleLegend}"></div>
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
     return node
