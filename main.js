@@ -12,11 +12,8 @@ DOM.findBySelector('#app').innerHTML = `
 `
 const mount = DOM.findBySelector('#test')
 const props = {
-  logs: true,
-  infos: true,
-  warnings: true,
-  warnings: true,
-  errors: true,
+  id: "TradeX_test",
+  title: "BTC/USDT",
   width: 1000,
   height: 800,
   rangeLimit: 50,
@@ -24,7 +21,12 @@ const props = {
     candleType: "CANDLE_SOLID",
     onchartVolumeH: 15,
   },
-  isCrypto: true
+  isCrypto: true,
+  logs: true,
+  infos: true,
+  warnings: true,
+  warnings: true,
+  errors: true,
 }
 const chart = Chart.create(mount, props, state )
 chart.start(chart.getModID())

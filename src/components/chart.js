@@ -6,6 +6,7 @@ import DOM from "../utils/DOM"
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import ScaleBar from "./scale"
 import CEL from "../components/primitives/canvas"
+import Legends from "./primitives/legend"
 import chartGrid from "./overlays/chart-grid"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
@@ -52,7 +53,7 @@ export default class Chart {
   #elWidgets
   #elCanvas
   #elViewport
-  #elEditport
+  #elLegends
   #elScale
 
   #data
@@ -60,6 +61,7 @@ export default class Chart {
   #rangeLimit
   #Scale
   #Time
+  #Legends
 
   #width
   #height
@@ -82,6 +84,9 @@ export default class Chart {
   #chartCandles
   #chartCursor
 
+  #cursorPos = [0, 0]
+  #chartCandle
+  #title
   #theme
 
 
@@ -120,6 +125,7 @@ export default class Chart {
   get range() { return this.#range }
   set priceDigits(digits) { this.setYAxisDigits(digits) }
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
+  get cursorPos() { return this.#cursorPos }
 
   init(options) {
 
@@ -162,6 +168,15 @@ export default class Chart {
 
   start() {
 
+    // Legends - to display overlay Title, inputs and options
+    let options = {
+      id: "chart",
+      title: this.#title,
+      type: "chart"
+    }
+    this.#Legends = new Legends(this.#elLegends)
+    this.#Legends.add(options)
+
     // X Axis - Timeline
     this.#Time = this.#parent.time
 
@@ -174,9 +189,6 @@ export default class Chart {
 
     // draw the chart - grid, candles, volume
     this.draw(this.range)
-
-    // prepare the canvas where cursor or tool edits happen
-    // this.createEditport()
 
     // set up event listeners
     this.eventsListen()
@@ -209,7 +221,11 @@ export default class Chart {
   }
 
   onMouseMove(e) {
-    this.emit("mousemove_chart", [e.layerX, e.layerY])
+    this.#cursorPos = [e.layerX, e.layerY]
+
+    this.emit("mousemove_chart", this.#cursorPos)
+
+    this.updateLegends()
   }
 
   mount(el) {
@@ -218,15 +234,17 @@ export default class Chart {
     const api = this.#mediator.api
     this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .viewport`)
-    this.#elEditport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .editport`)
+    this.#elLegends = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .legends`)
     this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`)
   }
 
   props() {
     return {
       // id: (id) => this.setID(id),
+      title: (title) => this.#title = title,
       yAxisDigits: (digits) => this.setYAxisDigits(digits),
       theme: (theme) => this.setTheme(theme)
+
     }
   }
 
@@ -351,29 +369,6 @@ export default class Chart {
         this.#theme)
   }
 
-  createEditport() {
-    // create editport
-    this.#editport = new CEL.Viewport({
-      width: this.width,
-      height: this.height,
-      container: this.#elEditport
-    });
-
-    this.#layerCursor = new CEL.Layer();
-
-    // add layers
-    this.#viewport
-        .addLayer(this.#layerCursor);
-
-    this.#chartCursor = 
-    new chartCursor(
-      this.#layerCursor,
-      this,
-      this.#Time, 
-      this.#Scale, 
-      this.#theme)
-  }
-
   draw(range) {
     this.#chartGrid.draw()
     this.#chartVolume.draw(range)
@@ -412,6 +407,14 @@ export default class Chart {
       return
     }
     this.#volumePrecision = volumePrecision
+  }
+
+  updateLegends() {
+    const legends = this.#Legends.list 
+
+    for (const legend in legends) {
+      this.#Legends.update(legend, {inputs: {pos: this.#cursorPos}})
+    }
   }
 
 }
