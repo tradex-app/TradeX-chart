@@ -133,6 +133,8 @@ export default class Timeline {
 
   xPos2Time(x) { return this.#xAxis.xPos2Time(x) }
 
+  xPosOHLCV(x) { return this.#xAxis.xPosOHLCV(x) }
+
   createViewport() {
     // create viewport
     this.#viewport = new CEL.Viewport({

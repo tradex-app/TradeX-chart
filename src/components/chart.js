@@ -410,11 +410,21 @@ export default class Chart {
   }
 
   updateLegends() {
-    const legends = this.#Legends.list 
+    const legends = this.#Legends.list
+    const ohlcv = this.#Time.xPosOHLCV(this.#cursorPos[0])
+    const inputs = {
+      O: this.#Scale.nicePrice(ohlcv[1]),
+      H: this.#Scale.nicePrice(ohlcv[2]),
+      L: this.#Scale.nicePrice(ohlcv[3]),
+      C: this.#Scale.nicePrice(ohlcv[4]),
+      V: this.#Scale.nicePrice(ohlcv[5]),
+    }
 
     for (const legend in legends) {
-      this.#Legends.update(legend, {inputs: {pos: this.#cursorPos}})
+      this.#Legends.update(legend, {inputs: inputs})
     }
   }
+
+
 
 }
