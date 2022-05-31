@@ -159,14 +159,19 @@ export default class yAxis extends Axis {
   }
 
   limitPrecision(digits) {
-    let value = digits.value
-    if (digits.total > this.#yAxisDigits) {
-      let cnt = this.#yAxisDigits - digits.total
-      if (cnt < 1) {
-        let decimals = digits.decimals + cnt
-        value = value.toFixed(decimals)
-      }
+    let value = digits.value,
+        cnt = this.#yAxisDigits - digits.total,
+        cnt2 = 4 - digits.integers
+
+    if (cnt < 1) {
+      let decimals = digits.decimals + cnt
+      value = Number.parseFloat(value).toFixed(decimals)
     }
+    else if (cnt2 < 1) {
+      let decimals = 2 - cnt2
+      value = Number.parseFloat(value).toFixed(decimals)
+    }
+
     return value
   }
 
