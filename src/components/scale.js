@@ -154,6 +154,11 @@ export default class ScaleBar {
   // convert pixel pos to chart price
   yPos2Price(y) { return this.#yAxis.yPos2Price(y) }
 
+  nicePrice($) {
+    let digits = this.#yAxis.countDigits($)
+    return this.#yAxis.limitPrecision(digits)
+  }
+
   // create canvas layers with handling methods
   createViewport() {
     // create viewport
@@ -183,8 +188,7 @@ export default class ScaleBar {
   drawCursorPrice(e) {
     let [x, y] = e,
         price =  this.yPos2Price(y),
-        digits = this.#yAxis.countDigits(price),
-        nice = this.#yAxis.limitPrecision(digits),
+        nice = this.nicePrice(price),
 
         options = {
           fontSize: YAxisStyle.FONTSIZE * 1.05,

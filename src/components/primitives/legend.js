@@ -30,7 +30,7 @@ export default class Legends {
   buildLegend(o) {
     const styleLegend = "margin: .5em 0 1em 1em; font-size: 12px;"
       let styleLegendTitle = "margin-right: 1em;"
-    const styleInputs = "display: inline;"
+    const styleInputs = "display: inline; margin-left: -1em;"
 
     if (o?.type === "chart") styleLegendTitle +=
       "font-size: 1.5em;"
@@ -46,10 +46,13 @@ export default class Legends {
 
   buildInputs(o) {
     let inp = "",
-        input;
+        input,
+        styleDT = "display: inline; margin-left: 1em;",
+        styleDD = "display: inline; margin-left: .25em;";
     for (input in o.inputs) {
       inp +=
-      `<dt>${input}</dt><dd>${o.inputs[input]}<dd>`
+      `<dt style="${styleDT}">${input}:</dt>
+      <dd style="${styleDD}">${o.inputs[input]}</dd>`
     }
     return inp
   }
