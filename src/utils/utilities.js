@@ -69,3 +69,11 @@ export function uid(tag="id") {
   if (!isString(tag)) tag = "id"
   return `${tag}_${Date.now().toString(36)}_${Math.random().toString(36).substring(2,5)}`
 }
+
+export function isArrayEqual(a1, a2) {
+  let i = a1.length;
+  while (i--) {
+      if (a1[i] !== a2[i]) return false;
+  }
+  return true
+}
