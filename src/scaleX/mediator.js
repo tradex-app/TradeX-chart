@@ -1,4 +1,7 @@
+// mediator.js
+
 // import { core } from "./scaleX";
+import StateMachine from "./stateMachne"
 
 export default class Mediator {
 
@@ -7,6 +10,7 @@ export default class Mediator {
   #api
   #hub = {}
   #subModules = {}
+  #stateMachine
 
   constructor(core, api, modClass, options) {
 
@@ -42,13 +46,14 @@ export default class Mediator {
 
     this.log(`Is Module ${name} valid: ${this.valid}`)
 
-    const instance = (this.valid) ? new modClass(this, options) : this
-
-    return instance
-  
+    if (this.valid) return new modClass(this, options)
   }
 
   get api() { return this.#api }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config) }
+  get stateMachine() { return this.#stateMachine }
+  
+  isStateMachineConfigValid(config) { StateMachine.validateConfig(config) }
 
   log(l) { this.#core.log(l) }
   info(i) { this.#core.info(i) }
