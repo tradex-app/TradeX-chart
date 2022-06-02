@@ -11,6 +11,7 @@ export default class Core {
   #sandboxes
   #running = {}
   #mediator
+  #hub = {}
 
   logs = false
   infos = false
@@ -39,6 +40,8 @@ export default class Core {
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
     }
   }
+
+  get hub() { return this.#hub }
 
   log(l) { if (this.logs) console.log(l) }
   info(i) { if (this.infos) console.info(i) }
