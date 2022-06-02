@@ -1,10 +1,14 @@
-// stateMachine.js
-// a simple Finite State Machine
 
-import { isFunction, isObject, isString } from "../utils/typeChecks"
-import { isArrayEqual } from "../utils/utilities"
 
-export default class StateMachine {
+function isFunction (value) {
+  return value && typeof value === 'function'
+}
+
+function isString (value) {
+  return typeof value === 'string'
+}
+
+class StateMachine {
 
   #state
   #statePrev
@@ -86,3 +90,55 @@ export default class StateMachine {
 
 }
 
+
+const config2 = {
+  id: 'test',
+  initial: 'off',
+  context: {},
+  states: {
+    off: {
+      onEnter() {
+        console.log('off: onEnter')
+      },
+      onExit() {
+        console.log('off: onExit')
+      },
+      on: {
+        switch: {
+          target: 'on',
+          action: () => {
+            console.log('transition action for "switch" in "off" state')
+          },
+        },
+      },
+    },
+    on: {
+      onEnter() {
+        console.log('on: onEnter')
+      },
+      onExit() {
+        console.log('on: onExit')
+      },
+      on: {
+        switch: {
+          target: 'off',
+          action: () => {
+            console.log('transition action for "switch" in "on" state')
+          },
+        },
+      },
+    },
+  }
+}
+
+
+const machine2 = new StateMachine(config2)
+console.log(`status: ${machine2.status}`)
+machine2.start()
+console.log(`status: ${machine2.status}`)
+let state = machine2.state
+console.log(`current state: ${state}`)
+state = machine2.notify('switch')
+console.log(`current state: ${state}`)
+state = machine2.notify('switch')
+console.log(`current state: ${state}`)
