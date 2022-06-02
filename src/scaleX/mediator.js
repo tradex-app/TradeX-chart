@@ -36,11 +36,6 @@ export default class Mediator {
       // or dynamically added in the project lifecycle
       name = name.match(/^module_\s*([$A-Z_][0-9A-Z_$]*)/i)
 
-    let validConfig = true
-    if ("stateMachineConfig" in api) {
-      validConfig = this.isStateMachineConfigValid(api.stateMachineConfig)
-    }
-
     // does the module class validate?
     this.valid = 
       // has required methods?
@@ -49,22 +44,14 @@ export default class Mediator {
       // && hasProperties 
       // has a valid class name?
       && (name !== null)
-      // if a state machine config is provided
-      && validConfig
 
     this.log(`Is Module ${name} valid: ${this.valid}`)
 
-    if (this.valid) {
-
-      if ("stateMachineConfig" in api) 
-        this.#stateMachine = new StateMachine(api.stateMachineConfig)
-
-      return new modClass(this, options)
-    }
+    if (this.valid)  return new modClass(this, options)
   }
 
   get api() { return this.#api }
-  set stateMachine(config) { this.#stateMachine = new StateMachine(config) }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
   
   isStateMachineConfigValid(config) { StateMachine.validateConfig(config) }
