@@ -10,14 +10,20 @@ export default class StateMachine {
   #statePrev
   #context
   #config
+  #mediator
   #status = "stopped"
   #event
   #statuses = ["await", "idle", "running", "stopped"]
 
-  constructor(config) {
+  constructor(config, mediator) {
     this.#config = config
     this.#state = config.initial
     this.#context = config.context
+    this.#mediator = mediator
+
+    if (!StateMachine.validateConfig) return false
+
+    this.#subscribe()
   }
 
   get state() { return this.#state }
@@ -26,7 +32,7 @@ export default class StateMachine {
   get status() { return this.#status }
   get event() { return this.#event }
 
-  notify(event) {
+  notify(event, data) {
     this.#event = event
     const currStateConfig = this.#config.states[this.#state]
     const destTransition = currStateConfig.on[event]
@@ -38,9 +44,9 @@ export default class StateMachine {
     const destState = destTransition.target
     const destStateConfig = this.#config.states[destState]
 
-    destTransition.action(this)
-    currStateConfig?.onExit(this)
-    destStateConfig?.onEnter(this)
+    destTransition.action(this, data)
+    currStateConfig?.onExit(this, data)
+    destStateConfig?.onEnter(this, data)
 
     this.#statePrev = this.#state
     this.#state = destState
@@ -56,8 +62,18 @@ export default class StateMachine {
   start() { this.#status = "running" }
   stop() { this.#status = "stopped" }
 
-  subscribe(cb) {
+  #subscribe() {
+    const events = new Set()
 
+    for (let state in this.#config.states) {
+      for (let event in state.on) {
+        events.add(event)
+      }
+    }
+
+    for (let event of events) {
+      this.#mediator.on(event, (data) => {this.notify(event, data)})
+    }
   }
 
   static validateConfig(c) {
