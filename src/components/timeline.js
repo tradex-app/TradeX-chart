@@ -110,7 +110,7 @@ export default class Timeline {
   }
 
   eventsListen() {
-    this.#chart.on("mousemove_chart", (e) => { this.drawCursorTime(e) })
+    this.#chart.on("chart_mousemove", (e) => { this.drawCursorTime(e) })
   }
 
   on(topic, handler, context) {

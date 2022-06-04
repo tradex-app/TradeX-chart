@@ -66,7 +66,7 @@ export default class StateMachine {
     const events = new Set()
 
     for (let state in this.#config.states) {
-      for (let event in state.on) {
+      for (let event in this.#config.states[state].on) {
         events.add(event)
       }
     }

@@ -11,7 +11,8 @@ import chartGrid from "./overlays/chart-grid"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartCursor from "./overlays/chart-cursor"
-
+import stateMachineConfig from "../state/state-chart"
+import { InputController, EventDispatcher } from '@jingwood/input-control'
 import { getRange } from "../helpers/range"
 import { VolumeStyle } from "../definitions/style"
 
@@ -186,12 +187,14 @@ export default class Chart {
 
     // prepare layered canvas
     this.createViewport()
-
     // draw the chart - grid, candles, volume
     this.draw(this.range)
 
     // set up event listeners
     this.eventsListen()
+
+    this.#mediator.stateMachine = stateMachineConfig
+    this.#mediator.stateMachine.start()
   }
 
   end() {
@@ -201,7 +204,16 @@ export default class Chart {
 
   eventsListen() {
     let canvas = this.#viewport.scene.canvas
-    canvas.addEventListener("mousemove", (e) => this.onMouseMove(e))
+    // canvas.addEventListener("mousemove", (e) => this.onMouseMove(e))
+
+    // create controller and use 'on' method to receive input events 
+    const controller = new InputController(canvas);
+    // move event
+    controller.on("mousemove", e => { this.onMouseMove(e) });
+    // drag event
+    controller.on("drag", e => { this.onChartDrag(e) });
+    // drag event complete
+    controller.on("enddrag", e => { this.onChartDragDone(e) });
   }
 
   on(topic, handler, context) {
@@ -221,11 +233,26 @@ export default class Chart {
   }
 
   onMouseMove(e) {
-    this.#cursorPos = [e.layerX, e.layerY]
+    // this.#cursorPos = [e.layerX, e.layerY]
+    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
 
-    this.emit("mousemove_chart", this.#cursorPos)
+    this.emit("chart_mousemove", this.#cursorPos)
 
     this.updateLegends()
+  }
+
+  onChartDrag(e) {
+    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y), e.movement.x, e.movement.y]
+
+    this.emit("chart_pan", this.#cursorPos)
+
+    console.log("mouse dragging " + e.movement.x + ", " + e.movement.y);
+  }
+
+  onChartDragDone(e) {
+    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y), e.movement.x, e.movement.y]
+
+    this.emit("chart_panDone", this.#cursorPos)
   }
 
   mount(el) {

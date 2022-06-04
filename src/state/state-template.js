@@ -1,6 +1,6 @@
 // state-chart.js
 
-export const config = {
+const config = {
   id: "template",
   initial: "idle",
   context: {},
@@ -23,3 +23,5 @@ export const config = {
     }
   }
 }
+
+export default config
