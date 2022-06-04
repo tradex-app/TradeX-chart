@@ -6,16 +6,16 @@ const config = {
   context: {},
   states: {
     idle: {
-      onEnter(stateMachine) {
+      onEnter(stateMachine, data) {
         console.log('idle: onEnter')
       },
-      onExit(stateMachine) {
+      onExit(stateMachine, data) {
         console.log('idle: onExit')
       },
       on: {
         someEvent: {
           target: '',
-          action: (stateMachine) => {
+          action: (stateMachine, data) => {
             console.log('transition action for event in "idle" state')
           },
         },

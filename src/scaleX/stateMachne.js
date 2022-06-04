@@ -29,6 +29,7 @@ export default class StateMachine {
   get state() { return this.#state }
   get previousSate() { return this.#statePrev }
   get context() { return this.#context }
+  get mediator() { return this.#mediator }
   get status() { return this.#status }
   get event() { return this.#event }
 

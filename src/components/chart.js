@@ -193,6 +193,7 @@ export default class Chart {
     // set up event listeners
     this.eventsListen()
 
+    stateMachineConfig.context.origin = this
     this.#mediator.stateMachine = stateMachineConfig
     this.#mediator.stateMachine.start()
   }
@@ -242,17 +243,33 @@ export default class Chart {
   }
 
   onChartDrag(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y), e.movement.x, e.movement.y]
-
+    this.#cursorPos = [
+      Math.floor(e.position.x), Math.floor(e.position.y), 
+      e.dragstart.x, e.dragstart.y,
+      e.movement.x, e.movement.y
+    ]
     this.emit("chart_pan", this.#cursorPos)
 
+    console.log("mouse drag start:", e.dragstart.x, e.dragstart.y)
+    e.dragend.x = Math.floor(e.position.x)
+    e.dragend.y = Math.floor(e.position.y)
+    console.log("mouse drag end:", e.dragend.x, e.dragend.y)
     console.log("mouse dragging " + e.movement.x + ", " + e.movement.y);
+
   }
 
   onChartDragDone(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y), e.movement.x, e.movement.y]
-
+    this.#cursorPos = [
+      Math.floor(e.position.x), Math.floor(e.position.y), 
+      e.dragstart.x, e.dragstart.y,
+      e.movement.x, e.movement.y
+    ]
     this.emit("chart_panDone", this.#cursorPos)
+
+    console.log("mouse drag start:", e.dragstart.x, e.dragstart.y)
+    e.dragend.x = Math.floor(e.position.x)
+    e.dragend.y = Math.floor(e.position.y)
+    console.log("mouse drag end:", e.dragend.x, e.dragend.y)
   }
 
   mount(el) {
@@ -451,6 +468,21 @@ export default class Chart {
     }
   }
 
+  updateRange(pos) {
 
+    // pan horizontal check
+    const dist = Math.floor(pos[0] - pos[2])
+
+    if (Math.abs(dist) < this.#Time.candleW) return
+
+    const offset = Math.floor(dist / this.#Time.candleW)
+    let start = this.range.indexStart + offset,
+        end = this.range.indexEnd + offset;
+
+    this.#range = getRange(this.#data, start, end)
+
+    // draw the chart - grid, candles, volume
+    this.draw(this.range)
+  }
 
 }
