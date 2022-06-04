@@ -59,6 +59,7 @@ export default class Timeline {
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
   get xAxisGrads() { return this.#xAxis.xAxisGrads }
+  get candleW() { return this.#xAxis.candleW }
 
   init() {
     this.mount(this.#elTime)

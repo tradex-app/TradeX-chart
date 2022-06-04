@@ -6,56 +6,56 @@ const config = {
   context: {},
   states: {
     idle: {
-      onEnter(stateMachine) {
+      onEnter(stateMachine, data) {
         console.log('idle: onEnter')
       },
-      onExit(stateMachine) {
+      onExit(stateMachine, data) {
         console.log('idle: onExit')
       },
       on: {
         resize: {
           target: 'resize',
-          action: (stateMachine) => {
+          action: (stateMachine, data) => {
             console.log('transition action for "resize" in "idle" state')
           },
         },
         yAxis_scale: {
           target: 'scale',
-          action: (stateMachine) => {
+          action: (stateMachine, data) => {
             console.log('transition action for "yAxis_scale" in "idle" state')
           },
         },
         yAxis_inc: {
           target: 'incremental',
-          action: (stateMachine) => {
+          action: (stateMachine, data) => {
             console.log('transition action for "yAxis_inc" in "idle" state')
           },
         },
         yAxis_log: {
           target: 'logarithmic',
-          action: (stateMachine) => {
+          action: (stateMachine, data) => {
             console.log('transition action for "yAxis_log" in "idle" state')
           },
         },
         yAxis_100: {
           target: 'percentual',
-          action: (stateMachine) => {
+          action: (stateMachine, data) => {
             console.log('transition action for "yAxis_100" in "idle" state')
           },
         },
       }
     },
     resize: {
-      onEnter(stateMachine) {
+      onEnter(stateMachine, data) {
         console.log('resize: onEnter')
       },
-      onExit(stateMachine) {
+      onExit(stateMachine, data) {
         console.log('reize: onExit')
       },
       on: {
         someEvent: {
           target: '',
-          action: (stateMachine) => {
+          action: (stateMachine, data) => {
             console.log('transition action for event in "idle" state')
           },
         },
