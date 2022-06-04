@@ -13,21 +13,27 @@ export const config = {
         console.log('ilde: onExit')
       },
       on: {
-        Scroll: {
-          target: 'scroll',
+        chart_pan: {
+          target: 'chart_pan',
           action: (stateMachine) => {
             console.log('transition action for "onScroll" in "idle" state')
           },
         },
-        XScale: {
-          target: 'XScale',
+        chart_tool: {
+          target: 'chart_tool',
           action: (stateMachine) => {
-            console.log('transition action for "onXScale" in "idle" state')
+            console.log('transition action for "chart_tool" in "idle" state')
+          },
+        },
+        xAxis_scale: {
+          target: 'xAxis_scale',
+          action: (stateMachine) => {
+            console.log('transition action for "xAxis_scale" in "idle" state')
           },
         },
       }
     },
-    scroll: {
+    chart_pan: {
       onEnter(stateMachine) {
         console.log('scroll: onEnter')
       },
@@ -43,7 +49,7 @@ export const config = {
         },
       }
     },
-    XScale: {
+    xAxis_scale: {
       onEnter(stateMachine) {
         console.log('XScale: onEnter')
       },
