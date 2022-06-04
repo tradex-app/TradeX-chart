@@ -9,6 +9,8 @@
   },
   "devDependencies": {
     "vite": "^2.9.5"
+  },
+  "dependencies": {
+    "@jingwood/input-control": "^1.0.11"
   }
 }
-

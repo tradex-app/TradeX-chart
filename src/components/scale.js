@@ -103,7 +103,7 @@ export default class ScaleBar {
   }
 
   eventsListen() {
-    this.#mediator.on("mousemove_chart", (e) => { this.drawCursorPrice(e) })
+    this.#mediator.on("chart_mousemove", (e) => { this.drawCursorPrice(e) })
   }
 
   on(topic, handler, context) {

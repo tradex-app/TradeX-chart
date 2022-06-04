@@ -1,6 +1,6 @@
 // state-chart.js
 
-export const config = {
+const config = {
   id: "chart",
   initial: "idle",
   context: {},
@@ -16,7 +16,7 @@ export const config = {
         chart_pan: {
           target: 'chart_pan',
           action: (stateMachine) => {
-            console.log('transition action for "onScroll" in "idle" state')
+            console.log('transition action for "chart_pan" in "idle" state')
           },
         },
         chart_tool: {
@@ -35,16 +35,16 @@ export const config = {
     },
     chart_pan: {
       onEnter(stateMachine) {
-        console.log('scroll: onEnter')
+        console.log('chart_pan: onEnter')
       },
       onExit(stateMachine) {
-        console.log('scroll: onExit')
+        console.log('chart_pan: onExit')
       },
       on: {
-        Idle: {
+        chart_panDone: {
           target: 'idle',
           action: (stateMachine) => {
-            console.log('transition action for "onIdle" in "scroll" state')
+            console.log('transition action for "chart_panDone" in "chart_pan" state')
           },
         },
       }
@@ -67,3 +67,5 @@ export const config = {
     },
   }
 }
+
+export default config
