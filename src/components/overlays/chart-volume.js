@@ -22,6 +22,8 @@ export default class chartVolume extends VolumeBar {
   }
 
   draw(range) {
+    this.#scene.clear()
+
     const data = range.data
     const zeroPos = this.scene.height
     const volume = {

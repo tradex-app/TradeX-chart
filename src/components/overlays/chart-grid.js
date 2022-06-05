@@ -19,6 +19,8 @@ export default class chartGrid {
   }
 
   draw() {
+    this.#scene.clear()
+    
     const xGrads = this.#xAxis.xAxisGrads
     const ctx = this.#scene.context
     ctx.save();
