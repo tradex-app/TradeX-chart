@@ -22,6 +22,8 @@ export default class chartCandles extends Candle {
   }
 
   draw(range) {
+    this.#scene.clear()
+
     const data = range.data
     const candle = {
       x: 2,
