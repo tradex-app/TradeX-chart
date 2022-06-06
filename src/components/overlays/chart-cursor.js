@@ -18,7 +18,9 @@ export default class chartCursor {
     this.#xAxis = xAxis
     this.#yAxis = yAxis
 
-    this.#chart.on("mousemove_chart", (e) => { this.draw(e) })
+    this.#chart.on("chart_mousemove", (e) => { this.draw(e) })
+    this.#chart.on("chart_pan", (e) => { this.draw(e) })
+    this.#chart.on("chart_panDone", (e) => { this.draw(e) })
   }
 
   // onMouseMove(e) {

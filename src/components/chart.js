@@ -12,7 +12,7 @@ import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartCursor from "./overlays/chart-cursor"
 import stateMachineConfig from "../state/state-chart"
-import { InputController, EventDispatcher } from '@jingwood/input-control'
+import { InputController, EventDispatcher, Keys } from '@jingwood/input-control'
 import { getRange } from "../helpers/range"
 import { VolumeStyle } from "../definitions/style"
 
@@ -214,6 +214,9 @@ export default class Chart {
     controller.on("drag", e => { this.onChartDrag(e) });
     // drag event complete
     controller.on("enddrag", e => { this.onChartDragDone(e) });
+    // keyboard input
+    controller.on("keydown", e => { this.onChartKeyDown(e) })
+    controller.on("keyup", e => { this.onChartKeyDown(e) })
   }
 
   on(topic, handler, context) {
@@ -248,13 +251,6 @@ export default class Chart {
       e.movement.x, e.movement.y
     ]
     this.emit("chart_pan", this.#cursorPos)
-
-    // console.log("mouse drag start:", e.dragstart.x, e.dragstart.y)
-    e.dragend.x = Math.floor(e.position.x)
-    e.dragend.y = Math.floor(e.position.y)
-    // console.log("mouse drag end:", e.dragend.x, e.dragend.y)
-    // console.log("mouse dragging " + e.movement.x + ", " + e.movement.y);
-
   }
 
   onChartDragDone(e) {
@@ -264,11 +260,30 @@ export default class Chart {
       e.movement.x, e.movement.y
     ]
     this.emit("chart_panDone", this.#cursorPos)
+  }
 
-    // console.log("mouse drag start:", e.dragstart.x, e.dragstart.y)
-    e.dragend.x = Math.floor(e.position.x)
-    e.dragend.y = Math.floor(e.position.y)
-    // console.log("mouse drag end:", e.dragend.x, e.dragend.y)
+  onChartKeyDown(e) {
+    console.log(e)
+    switch (e.keyCode) {
+      case Keys.Left:
+        console.log("keydown: cursor Left")
+        break;
+      case Keys.Right:
+        console.log("keydown: cursor Right")
+        break;
+    }
+  }
+
+  onChartKeyUp(e) {
+    console.log(e)
+    switch (e.keyCode) {
+      case Keys.Left:
+        console.log("keyup: cursor Left")
+        break;
+      case Keys.Right:
+        console.log("keyup: cursor Right")
+        break;
+    }
   }
 
   mount(el) {
