@@ -193,6 +193,7 @@ export default class Chart {
     // set up event listeners
     this.eventsListen()
 
+    // start State Machine 
     stateMachineConfig.context.origin = this
     this.#mediator.stateMachine = stateMachineConfig
     this.#mediator.stateMachine.start()
@@ -205,8 +206,6 @@ export default class Chart {
 
   eventsListen() {
     let canvas = this.#viewport.scene.canvas
-    // canvas.addEventListener("mousemove", (e) => this.onMouseMove(e))
-
     // create controller and use 'on' method to receive input events 
     const controller = new InputController(canvas);
     // move event
@@ -250,11 +249,11 @@ export default class Chart {
     ]
     this.emit("chart_pan", this.#cursorPos)
 
-    console.log("mouse drag start:", e.dragstart.x, e.dragstart.y)
+    // console.log("mouse drag start:", e.dragstart.x, e.dragstart.y)
     e.dragend.x = Math.floor(e.position.x)
     e.dragend.y = Math.floor(e.position.y)
-    console.log("mouse drag end:", e.dragend.x, e.dragend.y)
-    console.log("mouse dragging " + e.movement.x + ", " + e.movement.y);
+    // console.log("mouse drag end:", e.dragend.x, e.dragend.y)
+    // console.log("mouse dragging " + e.movement.x + ", " + e.movement.y);
 
   }
 
@@ -266,10 +265,10 @@ export default class Chart {
     ]
     this.emit("chart_panDone", this.#cursorPos)
 
-    console.log("mouse drag start:", e.dragstart.x, e.dragstart.y)
+    // console.log("mouse drag start:", e.dragstart.x, e.dragstart.y)
     e.dragend.x = Math.floor(e.position.x)
     e.dragend.y = Math.floor(e.position.y)
-    console.log("mouse drag end:", e.dragend.x, e.dragend.y)
+    // console.log("mouse drag end:", e.dragend.x, e.dragend.y)
   }
 
   mount(el) {
@@ -476,8 +475,8 @@ export default class Chart {
     if (Math.abs(dist) < this.#Time.candleW) return
 
     const offset = Math.floor(dist / this.#Time.candleW)
-    let start = this.range.indexStart + offset,
-        end = this.range.indexEnd + offset;
+    let start = this.range.indexStart - offset,
+        end = this.range.indexEnd - offset;
 
     this.#range = getRange(this.#data, start, end)
 

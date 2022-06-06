@@ -36,7 +36,6 @@ const config = {
     chart_pan: {
       onEnter(stateMachine, data) {
         console.log('chart_pan: onEnter')
-        stateMachine.context.origin.updateRange(data) 
       },
       onExit(stateMachine, data) {
         console.log('chart_pan: onExit')

@@ -78,15 +78,15 @@ const config = {
         chart_pan: {
           target: 'chart_pan',
           action: (stateMachine, data) => {
-            console.log('Scale: transition action for "chart_panDone" in "chart_pan" state')
-            stateMachine.context.origin.draw()
+            console.log('transition action for "chart_panDone" in "chart_pan" state')
+            stateMachine.context.origin.updateRange(data) 
           },
         },
         chart_panDone: {
           target: 'idle',
           action: (stateMachine, data) => {
-            console.log('Scale: transition action for "chart_panDone" in "chart_pan" state')
-            stateMachine.context.origin.draw() 
+            console.log('transition action for "chart_panDone" in "chart_pan" state')
+            stateMachine.context.origin.updateRange(data) 
           },
         },
       }

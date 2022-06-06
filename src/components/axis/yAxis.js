@@ -13,8 +13,6 @@ import { YAxisStyle } from "../../definitions/style";
 
 export default class yAxis extends Axis {
 
-  #data
-  #range
   #parent
   #yAxisType = YAXIS_TYPES[0]  // default, log, percent
   #yAxisPadding = 1.04
@@ -25,15 +23,14 @@ export default class yAxis extends Axis {
   #yAxisGrads
 
   constructor(parent, chart, yAxisType=YAXIS_TYPES[0]) {
-    super(chart)
-    this.#data = super.data
-    this.#range = super.range
+    super()
+    this.chart = chart
     this.#parent = parent 
   }
 
-  get data() { return this.#data }
-  get range() { return this.#range }
-  get height() { return super.height }
+  get data() { return this.chart.data }
+  get range() { return this.chart.range }
+  get height() { return this.chart.height }
   get rangeH() { return this.range.height * this.yAxisPadding }
   get yAxisRatio() { return this.height / this.range.height }
   get yAxisPrecision() { return this.yAxisCalcPrecision }
@@ -56,13 +53,13 @@ export default class yAxis extends Axis {
   }
 
   yAxisCntDigits(value) {
-    return super.countDigits(value)
+    return this.countDigits(value)
   }
 
   yAxisCalcPrecision() {
-    let integerCnt = super.numDigits(this.range.priceMax)
-    // let decimalCnt = super.precision(this.range.priceMax)
-    return super.yDigits - integerCnt
+    let integerCnt = this.numDigits(this.range.priceMax)
+    // let decimalCnt = this.precision(this.range.priceMax)
+    return this.yDigits - integerCnt
   }
 
   yAxisCursor() {
@@ -106,25 +103,27 @@ export default class yAxis extends Axis {
 
   pixel2$(y) {
     let ratio = (this.height - y) / this.height
-    let adjust = this.#range.height * ratio
-    return this.#range.priceMin + adjust
+    let adjust = this.range.height * ratio
+    return this.range.priceMin + adjust
   }
 
   calcGradations() {
-    // const yAxisMid = this.height * 0.5
+
+    console.log(`yAxis: priceMax: ${this.range.priceMax} priceMin: ${this.range.priceMin}`)
+
     const grad = Math.floor(this.height / this.#yAxisStep)
 
     const rangeMid = (this.range.priceMax + this.range.priceMin) * 0.5
       let digits = this.countDigits(rangeMid)
     const scaleMid = this.niceValue(digits)
-    const step = (this.#range.priceMax - scaleMid) / grad
+    const step = (this.range.priceMax - scaleMid) / grad
 
     const scaleGrads = [[scaleMid, this.$2Pixel(scaleMid), digits]]
 
     let upper = scaleMid + step,
         nice, 
         entry;
-    while (upper <= this.#range.priceMax) {
+    while (upper <= this.range.priceMax) {
       digits = this.countDigits(upper)
       nice = this.niceValue(digits)
       entry = [nice, this.$2Pixel(nice), digits]
@@ -132,7 +131,7 @@ export default class yAxis extends Axis {
       upper += step
     }
     let lower = scaleMid - step
-    while (lower >= this.#range.priceMin) {
+    while (lower >= this.range.priceMin) {
       digits = this.countDigits(lower)
       nice = this.niceValue(digits)
       entry = [nice, this.$2Pixel(nice), digits]
@@ -182,6 +181,8 @@ export default class yAxis extends Axis {
   }
 
   drawLabels() {
+    this.#parent.layerLabels.scene.clear()
+
     const grads = this.#yAxisGrads
     const ctx = this.#parent.layerLabels.scene.context
     ctx.save();
@@ -200,6 +201,8 @@ export default class yAxis extends Axis {
   }
 
   drawOverlays() {
+    this.#parent.layerOverlays.scene.clear()
+
     const grads = this.#yAxisGrads
     const ctx = this.#parent.layerOverlays.scene.context
     ctx.save();
