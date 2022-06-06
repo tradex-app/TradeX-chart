@@ -109,8 +109,8 @@ export default class Timeline {
 
     // start State Machine 
     stateMachineConfig.context.origin = this
-    // this.#mediator.stateMachine = stateMachineConfig
-    // this.#mediator.stateMachine.start()
+    this.#mediator.stateMachine = stateMachineConfig
+    this.#mediator.stateMachine.start()
   }
 
   end() {
@@ -123,10 +123,7 @@ export default class Timeline {
     let canvas = this.#viewport.scene.canvas
     // create controller and use 'on' method to receive input events 
     const controller = new InputController(canvas);
-    // drag event
-    controller.on("drag", e => { this.onTimeDrag(e) });
-    // drag event complete
-    controller.on("enddrag", e => { this.onTimeDragDone(e) });
+
   }
 
   on(topic, handler, context) {

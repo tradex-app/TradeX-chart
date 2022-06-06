@@ -4,6 +4,7 @@ import { ms2Interval } from "../utils/time"
 
 export function getRange( data, start=0, end=data.length-1 ) {
   let r = {}
+  // check and correct start and end argument order
   if (start > end) [start, end] = [end, start]
   r.data = data
   r.dataLength = (end > (data.length - 1)) ? data.length - 1 : end
@@ -53,9 +54,6 @@ export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
     volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
     i++
   }
-
-  console.log(`priceMax: ${priceMax} priceMin: ${priceMin}`)
-
 
   return {
     priceMin: priceMin,

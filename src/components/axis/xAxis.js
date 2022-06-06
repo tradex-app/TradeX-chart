@@ -264,6 +264,8 @@ export default class xAxis extends Axis {
   }
 
   drawLabels() {
+    this.#parent.layerLabels.scene.clear()
+
     const grads = this.#xAxisGrads
     const ctx = this.#parent.layerLabels.scene.context
     const mid = this.width / this.range.Length * 0.5
@@ -284,6 +286,8 @@ export default class xAxis extends Axis {
   }
 
   drawOverlays() {
+    this.#parent.layerOverlays.scene.clear()
+
     const grads = this.#xAxisGrads
 
   }
