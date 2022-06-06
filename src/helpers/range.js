@@ -56,8 +56,8 @@ export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
   }
 
   return {
-    priceMin: priceMin,
-    priceMax: priceMax,
+    priceMin: priceMin * 0.995,
+    priceMax: priceMax * 1.005,
     volumeMin: volumeMin,
     volumeMax: volumeMax
   }
