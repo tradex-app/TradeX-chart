@@ -5,6 +5,8 @@ import DOM from "../utils/DOM"
 import yAxis from "./axis/yAxis"
 import CEL from "./primitives/canvas"
 import { drawTextBG } from "../utils/canvas"
+import stateMachineConfig from "../state/state-scale"
+import { InputController, EventDispatcher } from '@jingwood/input-control'
 
 import {
   NAME,
@@ -75,6 +77,7 @@ export default class ScaleBar {
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
   get yAxisGrads() { return this.#yAxis.yAxisGrads }
+  get viewport() { return this.#viewport }
 
   init() {
     this.mount(this.#elScale)
@@ -90,12 +93,16 @@ export default class ScaleBar {
 
     // prepare layered canvas
     this.createViewport()
-
     // draw the scale
     this.draw()
 
     // set up event listeners
     this.eventsListen()
+
+    // start State Machine 
+    stateMachineConfig.context.origin = this
+    this.#mediator.stateMachine = stateMachineConfig
+    this.#mediator.stateMachine.start()
   }
 
   end() {
@@ -103,6 +110,10 @@ export default class ScaleBar {
   }
 
   eventsListen() {
+    let canvas = this.#viewport.scene.canvas
+    // create controller and use 'on' method to receive input events 
+    const controller = new InputController(canvas);
+
     this.#mediator.on("chart_mousemove", (e) => { this.drawCursorPrice(e) })
   }
 

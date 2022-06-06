@@ -35,6 +35,10 @@ export function getRange( data, start=0, end=data.length-1 ) {
  * @return {object}  
  */
 export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
+
+  console.log(`start: ${start} end: ${end}`)
+
+
   let i = start,
       l = end;
   let priceMin  = data[i][3]
@@ -49,6 +53,9 @@ export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
     volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
     i++
   }
+
+  console.log(`priceMax: ${priceMax} priceMin: ${priceMin}`)
+
 
   return {
     priceMin: priceMin,

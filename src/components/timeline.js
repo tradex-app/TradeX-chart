@@ -9,6 +9,8 @@ import { getTextRectWidth } from "../utils/canvas"
 import { CLASS_TIME } from "../definitions/core"
 import { XAxisStyle } from "../definitions/style"
 import { drawTextBG } from "../utils/canvas"
+import { InputController, EventDispatcher } from '@jingwood/input-control'
+import stateMachineConfig from "../state/state-time"
 
 export default class Timeline {
 
@@ -60,6 +62,7 @@ export default class Timeline {
   get layerOverlays() { return this.#layerOverlays }
   get xAxisGrads() { return this.#xAxis.xAxisGrads }
   get candleW() { return this.#xAxis.candleW }
+  get viewport() { return this.#viewport }
 
   init() {
     this.mount(this.#elTime)
@@ -98,12 +101,16 @@ export default class Timeline {
 
     // prepare layered canvas
     this.createViewport()
-
     // draw the Timeline
     this.draw()
 
     // set up event listeners
     this.eventsListen()
+
+    // start State Machine 
+    stateMachineConfig.context.origin = this
+    // this.#mediator.stateMachine = stateMachineConfig
+    // this.#mediator.stateMachine.start()
   }
 
   end() {
@@ -112,6 +119,14 @@ export default class Timeline {
 
   eventsListen() {
     this.#chart.on("chart_mousemove", (e) => { this.drawCursorTime(e) })
+
+    let canvas = this.#viewport.scene.canvas
+    // create controller and use 'on' method to receive input events 
+    const controller = new InputController(canvas);
+    // drag event
+    controller.on("drag", e => { this.onTimeDrag(e) });
+    // drag event complete
+    controller.on("enddrag", e => { this.onTimeDragDone(e) });
   }
 
   on(topic, handler, context) {

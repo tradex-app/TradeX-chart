@@ -13,8 +13,6 @@ import { XAxisStyle } from "../../definitions/style";
 
 export default class xAxis extends Axis {
 
-  #data
-  #range
   #parent
 
   #xAxisTicks = 4
@@ -22,26 +20,25 @@ export default class xAxis extends Axis {
   #xAxisOffset
 
   constructor(parent, chart) {
-    super(chart)
-    this.#data = super.data
-    this.#range = super.range
+    super()
+    this.chart = chart
     this.#parent = parent 
   }
 
-  get data() { return this.#data }
-  get range() { return this.#range }
-  get width() { return super.width }
-  get interval() { return this.#range.interval }
-  get intervalStr() { return this.#range.intervalStr }
-  get timeStart() { return this.#range.timeStart }
-  get timeFinish() { return this.#range.timeFinish }
-  get rangeDuration() { return this.#range.rangeDuration }
-  get indexStart() { return this.#range.indexStart }
-  get indexEnd() { return this.#range.indexEnd }
-  get timeMax() { return this.#range.timeMax }
-  get timeMin() { return this.#range.timeMin }
+  get data() { return this.chart.data }
+  get range() { return this.chart.range }
+  get width() { return this.chart.width }
+  get interval() { return this.range.interval }
+  get intervalStr() { return this.range.intervalStr }
+  get timeStart() { return this.range.timeStart }
+  get timeFinish() { return this.range.timeFinish }
+  get rangeDuration() { return this.range.rangeDuration }
+  get indexStart() { return this.range.indexStart }
+  get indexEnd() { return this.range.indexEnd }
+  get timeMax() { return this.range.timeMax }
+  get timeMin() { return this.range.timeMin }
   get candleW() { return this.width / this.range.Length }
-  get xAxisRatio() { return this.width / this.#range.rangeDuration }
+  get xAxisRatio() { return this.width / this.range.rangeDuration }
   get xAxisStep() { return this.calcXAxisStep() }
   set xAxisTicks(t) { this.#xAxisTicks = isNumber(t) ? t : 0 }
   get xAxisTicks() { return this.#xAxisTicks }
@@ -68,12 +65,12 @@ export default class xAxis extends Axis {
 
   pixel2T(x) {
     let c = Math.floor(x / this.candleW ) + this.range.indexStart
-    return this.#range.data[c][0]
+    return this.range.data[c][0]
   }
 
   pixelOHLCV(x) {
     let c = Math.floor(x / this.candleW ) + this.range.indexStart
-    return this.#range.data[c]
+    return this.range.data[c]
   }
 
   xPosSnap2CandlePos(x) {
