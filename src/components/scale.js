@@ -115,6 +115,8 @@ export default class ScaleBar {
     const controller = new InputController(canvas);
 
     this.#mediator.on("chart_mousemove", (e) => { this.drawCursorPrice(e) })
+    this.#mediator.on("chart_pan", (e) => { this.drawCursorPrice(e) })
+    this.#mediator.on("chart_panDone", (e) => { this.drawCursorPrice(e) })
   }
 
   on(topic, handler, context) {
