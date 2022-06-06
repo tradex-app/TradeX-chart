@@ -109,8 +109,6 @@ export default class yAxis extends Axis {
 
   calcGradations() {
 
-    console.log(`yAxis: priceMax: ${this.range.priceMax} priceMin: ${this.range.priceMin}`)
-
     const grad = Math.floor(this.height / this.#yAxisStep)
 
     const rangeMid = (this.range.priceMax + this.range.priceMin) * 0.5
