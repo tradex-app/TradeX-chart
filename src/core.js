@@ -72,7 +72,7 @@ export default class TradeXchart {
   chartTxtColour = GlobalStyle.COLOUR_TXT
   chartBorderColour = GlobalStyle.COLOUR_BORDER
 
-  utilsH = 30
+  utilsH = 40
   toolsW = 45
   timeH  = 25
   scaleW = 60
