@@ -11,6 +11,10 @@ export const ToolsStyle = {
   COLOUR_ICON: "#888"
 }
 
+export const UtilsStyle = {
+  COLOUR_ICON: "#888"
+}
+
 /**
 * Candlesticks
 */

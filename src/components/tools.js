@@ -3,16 +3,9 @@
 // Providing: chart drawing tools
 
 import DOM from "../utils/DOM"
-
-import cursor from "../assets/svg/cursor.svg"
-import line from "../assets/svg/line.svg"
-import fibonacci from "../assets/svg/fibonacci.svg"
-import range from "../assets/svg/range.svg"
-import text from "../assets/svg/text.svg"
-import measure from "../assets/svg/measure.svg"
-import del from "../assets/svg/delete.svg"
 import { ToolsStyle } from "../definitions/style"
 import { CLASS_TOOLS } from "../definitions/core"
+import tools from "../definitions/tools"
 
 export default class ToolsBar {
 
@@ -21,12 +14,14 @@ export default class ToolsBar {
   #mediator
   #options
   #elTools
+  #tools
 
   constructor (mediator, options) {
 
     this.#mediator = mediator
     this.#options = options
     this.#elTools = mediator.api.elements.elTools
+    this.#tools = tools || options.tools
     this.init()
   }
 
@@ -85,58 +80,18 @@ export default class ToolsBar {
   }
 
   defaultNode() {
-
     let toolbar = ""
-    const tools = this.tools()
-    for (const tool in tools) {
-      toolbar += this.toolNode(tools[tool].icon)
+    for (const tool of this.#tools) {
+      toolbar += this.toolNode(tool.icon)
     }
 
     return toolbar
   }
 
   toolNode(icon) {
-    const iconStyle = `color: ${ToolsStyle.COLOUR_ICON};`
     return  `
     <div class="icon-wrapper"><object data="${icon}" type="image/svg+xml" class="tool"></object></div>\n
     `
-  }
-
-  tools() {
-    return {
-      cursor: {
-        name: "Cursor",
-        icon: cursor
-      },
-      line: {
-        name: "Line",
-        icon: line,
-        sub: {}
-      },
-      fibonacci: {
-        name: "Fibonacci",
-        icon: fibonacci,
-        sub: {}
-      },
-      range: {
-        name: "Range",
-        icon: range,
-        sub: {}
-      },
-      text: {
-        name: "Text",
-        icon: text,
-        sub: {}
-      },
-      measure: {
-        name: "measure",
-        icon: measure
-      },
-      delete: {
-        name: "delete",
-        icon: del
-      }
-    }
   }
 
 }
