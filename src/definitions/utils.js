@@ -1,10 +1,6 @@
 // utils.js
 
-import chart from "../assets/svg/chart.svg"
-import clock from "../assets/svg/clock.svg"
-import config from "../assets/svg/config.svg"
-import camera from "../assets/svg/camera.svg"
-
+import { camera, chart, clock, config } from "./icons"
 
 export default [
   {

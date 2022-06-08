@@ -68,40 +68,37 @@ export default class ToolsBar {
 
   initAllTools() {
     const api = this.#mediator.api
-    const toolObjects = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .tool`)
-    for (let obj of toolObjects) {
+    const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`)
+    for (let tool of tools) {
 
-      let id = obj.id.replace('TX_', '');
+      let id = tool.id.replace('TX_', ''),
+          svg = tool.querySelector('svg');
+          svg.style.fill = ToolsStyle.COLOUR_ICON
+          svg.style.width = "90%"
 
-      obj.addEventListener("load", () => {
-        let svgObj = obj.contentDocument,
-            svg = svgObj.querySelector(`svg`);
-            svg.style.fill = ToolsStyle.COLOUR_ICON
 
-        for (let t of this.#tools) {
-          if (t.id === id)
-            svg.addEventListener("click", (e) => {
-              t.action(e, this)
-            })
-        }
-      })
+      for (let u of this.#tools) {
+        if (u.id === id)
+          svg.addEventListener("click", (e) => {
+            u.action(e, this)
+          })
+      }
     }
   }
 
   defaultNode() {
     let toolbar = ""
     for (const tool of this.#tools) {
-      toolbar += this.toolNode(tool)
+      toolbar += this.iconNode(tool)
     }
 
     return toolbar
   }
 
-  toolNode(tool) {
-    // const iconStyle = "display: inline;"
-    const objectStyle = "height: 90%; padding-top: 2px;"
+  iconNode(icon) {
+    const iconStyle = `display: inline-block; height: ${this.#elTools.clientWidth}px; padding-right: 2px`
     return  `
-    <div class="icon-wrapper"><object id="TX_${tool.id}" data="${tool.icon}" type="image/svg+xml" class="tool"></object></div>\n
+      <div id="TX_${icon.id}" class="icon-wrapper" style="${iconStyle}">${icon.icon}</div>\n
     `
   }
 

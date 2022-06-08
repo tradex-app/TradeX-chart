@@ -1,12 +1,6 @@
 // tools.js
 
-import cursor from "../assets/svg/cursor.svg"
-import line from "../assets/svg/line.svg"
-import fibonacci from "../assets/svg/fibonacci.svg"
-import range from "../assets/svg/range.svg"
-import text from "../assets/svg/text.svg"
-import measure from "../assets/svg/measure.svg"
-import del from "../assets/svg/delete.svg"
+import { cursor, line, fibonacci, range, text, measure, del } from "./icons"
 
 export default [
   {
