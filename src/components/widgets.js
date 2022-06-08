@@ -165,7 +165,10 @@ export default class Widgets {
   }
 
   insertMenu(e, content) {
-    let pos
+    let wPos = this.#elWidgetsG.getBoundingClientRect()
+    let iPos = e.target.getBoundingClientRect()
+
+    let pos = [iPos.left - wPos.left, iPos.bottom - wPos.top]
     let config = { pos, content }
     return menu(this, config)
   }
