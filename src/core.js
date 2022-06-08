@@ -409,6 +409,7 @@ constructor (mediator, options={}) {
     const styleBody = STYLE_BODY + ` height: calc(100% - ${this.utilsH}px); width: ${this.#chartW}px;`
     const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour};`
     const styleMain = STYLE_MAIN + ` left: ${this.toolsW}px; width: calc(100% - ${this.toolsW}px);`
+    const styleWidgets = ` position: relative;`
     
     const node = `
       <div id="${this.id}" class="${classesTXChart}" style="${styleTXChart}">
@@ -418,7 +419,7 @@ constructor (mediator, options={}) {
           <div class="${CLASS_MAIN}" style="${styleMain}">
           </div>
         </div>
-        <div class="${CLASS_WIDGETSG}"></div>
+        <div class="${CLASS_WIDGETSG}" style="${styleWidgets}"></div>
       </div>
     `
     return node
