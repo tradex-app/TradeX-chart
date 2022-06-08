@@ -71,10 +71,19 @@ export default class ToolsBar {
     const toolObjects = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .tool`)
     for (let obj of toolObjects) {
 
+      let id = obj.id.replace('TX_', '');
+
       obj.addEventListener("load", () => {
-        let svgObj = obj.contentDocument
-        let svg = svgObj.querySelector(`svg`)
-        svg.style.fill = ToolsStyle.COLOUR_ICON
+        let svgObj = obj.contentDocument,
+            svg = svgObj.querySelector(`svg`);
+            svg.style.fill = ToolsStyle.COLOUR_ICON
+
+        for (let t of this.#tools) {
+          if (t.id === id)
+            svg.addEventListener("click", () => {
+              t.action()
+            })
+        }
       })
     }
   }
@@ -82,15 +91,17 @@ export default class ToolsBar {
   defaultNode() {
     let toolbar = ""
     for (const tool of this.#tools) {
-      toolbar += this.toolNode(tool.icon)
+      toolbar += this.toolNode(tool)
     }
 
     return toolbar
   }
 
-  toolNode(icon) {
+  toolNode(tool) {
+    // const iconStyle = "display: inline;"
+    const objectStyle = "height: 90%; padding-top: 2px;"
     return  `
-    <div class="icon-wrapper"><object data="${icon}" type="image/svg+xml" class="tool"></object></div>\n
+    <div class="icon-wrapper"><object id="TX_${tool.id}" data="${tool.icon}" type="image/svg+xml" class="tool"></object></div>\n
     `
   }
 

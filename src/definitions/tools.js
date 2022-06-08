@@ -10,42 +10,63 @@ import del from "../assets/svg/delete.svg"
 
 export default [
   {
+    id: "cursor",
     name: "Cursor",
     icon: cursor,
-    action: () => {},
+    action: () => {
+      console.log("Cursor Selected")
+    },
   },
   {
+    id: "line",
     name: "Line",
     icon: line,
-    action: () => {},
+    action: () => {
+      console.log("Line tool")
+    },
     sub: {}
   },
   {
+    id: "fibonacci",
     name: "Fibonacci",
     icon: fibonacci,
-    action: () => {},
+    action: () => {
+      console.log("Fibonacci tool")
+    },
     sub: {}
   },
   {
+    id: "range",
     name: "Range",
     icon: range,
-    action: () => {},
+    action: () => {
+      console.log("Range tool")
+    },
     sub: {}
   },
   {
+    id: "text",
     name: "Text",
     icon: text,
-    action: () => {},
+    action: () => {
+      console.log("Text tool")
+    },
     sub: {}
   },
   {
-    name: "measure",
+    id: "measure",
+    name: "Measure",
     icon: measure,
-    action: () => {},
+    action: () => {
+      console.log("Measure tool")
+    },
   },
   {
-    name: "delete",
+    id: "delete",
+    name: "Delete",
     icon: del,
-    action: () => {},
+    action: () => {
+      console.log("Delete tool")
+    },
   }
 ]
