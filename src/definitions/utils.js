@@ -19,19 +19,25 @@ export default [
     id: "timezone",
     name: "Timezone", 
     icon: clock, 
-    action: () => {}
+    action: () => {
+      console.log("Set timezone")
+    }
   },
   {
     id: "style",
     name: "Style", 
     icon: config, 
-    action: () => {}
+    action: () => {
+      console.log("Modify chart theme")
+    }
   },
   {
     id: "screenshot",
     name: "Screenshot", 
     icon: camera, 
-    action: () => {}
+    action: () => {
+      console.log("Save chart screenshot")
+    }
   },
   // {name: "Save", icon: "./assets/svg/", action: () => {}},
   // {name: "Load", icon: "./assets/svg/", action: () => {}},
