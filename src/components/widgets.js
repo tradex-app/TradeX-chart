@@ -1,6 +1,12 @@
 // widgets.js
 // A template file for Chart components
 
+import DOM from "../utils/DOM"
+import { CLASS_MENU, CLASS_WINDOW } from "../definitions/core"
+import { MenuStyle, WindowStyle } from "../definitions/style"
+import menu from "./widgets/menu"
+import dialogue from "./widgets/dialogue"
+
 // import stateMachineConfig from "../state/state-widgets"
 
 export default class Widgets {
@@ -10,7 +16,9 @@ export default class Widgets {
   #mediator
   #options
   #parent
+  #elements
   #elWidgetsG
+  #elMenu
 
   #width
   #height
@@ -34,10 +42,11 @@ export default class Widgets {
   warning(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
-  get name() {return this.#name}
-  get shortName() {return this.#shortName}
-  get mediator() {return this.#mediator}
-  get options() {return this.#options}
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get mediator() { return this.#mediator }
+  get options() { return this.#options }
+  get elements() { return this.#elements }
 
   init() {
     this.mount(this.#elWidgetsG)
@@ -45,7 +54,14 @@ export default class Widgets {
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api
     api.parent = this.#mediator
-    api.elements = {}
+    api.elements = this.#elements
+    
+    this.#elMenu = DOM.findBySelector(`#${api.id} .${CLASS_MENU}`)
+
+    this.#elements = {
+      elWidgetsG: this.#elWidgetsG,
+      elMenu: this.#elMenu
+    }
 
     // listen/subscribe/watch for parent notifications
     this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
@@ -93,6 +109,20 @@ export default class Widgets {
   }
 
   onIndicators(e) {
+
+    const insidcators = [
+      {id: "ADX", name: "Average Direction", action: ()=>{console.log("ADX")}},
+      {id: "BB", name: "Bollinger Bands", action: ()=>{console.log("BB")}},
+      {id: "DMI", name: "Directional Movement", action: ()=>{console.log("DMI")}}
+    ]
+
+    let content = "<ul>"
+    for (let i of insidcators) {
+      content += `<li><span>${i.id}</span><span>${i.name}</span></li>`
+    }
+    content += "</ul>"
+
+    this.insertMenu(e, content)
     console.log("Indicators Menu")
   }
 
@@ -126,10 +156,22 @@ export default class Widgets {
   }
 
   defaultNode() {
-    const node = `
+    const menuStyle = `display: none; border: 1px solid ${MenuStyle.COLOUR_BORDER}; background: ${MenuStyle.COLOUR_BG}; color: ${MenuStyle.COLOUR_TXT}; position: absolute;`
 
+    const node = `
+      <div class="${CLASS_MENU}" style="${menuStyle}"></div>
     `
     return node
+  }
+
+  insertMenu(e, content) {
+    let pos
+    let config = { pos, content }
+    return menu(this, config)
+  }
+
+  removeMenu() {
+
   }
 
 // -----------------------
