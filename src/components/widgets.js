@@ -1,7 +1,7 @@
 // widgets.js
 // A template file for Chart components
 
-import stateMachineConfig from "../state/state-chart"
+// import stateMachineConfig from "../state/state-widgets"
 
 export default class Widgets {
 
@@ -57,9 +57,9 @@ export default class Widgets {
     this.eventsListen()
 
     // start State Machine 
-    stateMachineConfig.context.origin = this
-    this.#mediator.stateMachine = stateMachineConfig
-    this.#mediator.stateMachine.start()
+    // stateMachineConfig.context.origin = this
+    // this.#mediator.stateMachine = stateMachineConfig
+    // this.#mediator.stateMachine.start()
   }
 
   end() {
