@@ -69,41 +69,38 @@ export default class UtilsBar {
 
   initAllUtils() {
     const api = this.#mediator.api
-    const utilsObjects = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .util`)
+    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
 
-    for (let obj of utilsObjects) {
+    for (let util of utils) {
 
-      let id = obj.id.replace('TX_', '');
+      let id = util.id.replace('TX_', ''),
+          svg = util.querySelector('svg');
+          svg.style.fill = UtilsStyle.COLOUR_ICON
+          svg.style.height = "90%"
 
-      obj.addEventListener("load", () => {
-        let svgObj = obj.contentDocument,
-            svg = svgObj.querySelector(`svg`);
-            svg.style.fill = UtilsStyle.COLOUR_ICON
 
-        for (let u of this.#utils) {
-          if (u.id === id)
-            obj.parentElement.addEventListener("click", (e) => {
-              u.action(e, this)
-            })
-        }
-      })
+      for (let u of this.#utils) {
+        if (u.id === id)
+          svg.addEventListener("click", (e) => {
+            u.action(e, this)
+          })
+      }
     }
   }
 
   defaultNode() {
     let utilsBar = ""
     for (const util of this.#utils) {
-      utilsBar += this.utilNode(util)
+      utilsBar += this.iconNode(util)
     }
 
     return utilsBar
   }
 
-  utilNode(util) {
-    const iconStyle = `display: inline-block; height: ${this.#elUtils.clientHeight}px;`
-    const objectStyle = "height: 90%; padding-top: 2px;"
+  iconNode(icon) {
+    const iconStyle = `display: inline-block; height: ${this.#elUtils.clientHeight}px; padding-top: 2px`
     return  `
-    <div class="icon-wrapper" style="${iconStyle}"><object id="TX_${util.id}" style="${objectStyle}" data="${util.icon}" type="image/svg+xml" class="util"></object></div>\n
+      <div id="TX_${icon.id}" class="icon-wrapper" style="${iconStyle}">${icon.icon}</div>\n
     `
   }
 
