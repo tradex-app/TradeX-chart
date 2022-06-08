@@ -82,8 +82,8 @@ export default class UtilsBar {
 
         for (let u of this.#utils) {
           if (u.id === id)
-            svg.addEventListener("click", () => {
-              u.action()
+            svg.addEventListener("click", (e) => {
+              u.action(e, this)
             })
         }
       })

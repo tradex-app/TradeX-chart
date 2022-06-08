@@ -80,8 +80,8 @@ export default class ToolsBar {
 
         for (let t of this.#tools) {
           if (t.id === id)
-            svg.addEventListener("click", () => {
-              t.action()
+            svg.addEventListener("click", (e) => {
+              t.action(e, this)
             })
         }
       })
