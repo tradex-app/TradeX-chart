@@ -13,7 +13,7 @@ export default [
     id: "cursor",
     name: "Cursor",
     icon: cursor,
-    action: () => {
+    action: (e, mediator) => {
       console.log("Cursor Selected")
     },
   },
@@ -21,7 +21,7 @@ export default [
     id: "line",
     name: "Line",
     icon: line,
-    action: () => {
+    action: (e, mediator) => {
       console.log("Line tool")
     },
     sub: {}
@@ -30,7 +30,7 @@ export default [
     id: "fibonacci",
     name: "Fibonacci",
     icon: fibonacci,
-    action: () => {
+    action: (e, mediator) => {
       console.log("Fibonacci tool")
     },
     sub: {}
@@ -39,7 +39,7 @@ export default [
     id: "range",
     name: "Range",
     icon: range,
-    action: () => {
+    action: (e, mediator) => {
       console.log("Range tool")
     },
     sub: {}
@@ -48,7 +48,7 @@ export default [
     id: "text",
     name: "Text",
     icon: text,
-    action: () => {
+    action: (e, mediator) => {
       console.log("Text tool")
     },
     sub: {}
@@ -57,7 +57,7 @@ export default [
     id: "measure",
     name: "Measure",
     icon: measure,
-    action: () => {
+    action: (e, mediator) => {
       console.log("Measure tool")
     },
   },
@@ -65,7 +65,7 @@ export default [
     id: "delete",
     name: "Delete",
     icon: del,
-    action: () => {
+    action: (e, mediator) => {
       console.log("Delete tool")
     },
   }

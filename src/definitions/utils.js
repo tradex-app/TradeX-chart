@@ -11,32 +11,32 @@ export default [
     id: "indicators",
     name: "Indicators", 
     icon: chart, 
-    action: () => {
-      console.log("Indicators Menu")
+    action: (e, mediator) => {
+      mediator.emit("utils_indicators", e)
     }
   },
   {
     id: "timezone",
     name: "Timezone", 
     icon: clock, 
-    action: () => {
-      console.log("Set timezone")
+    action: (e, mediator) => {
+      mediator.emit("utils_timezone", e)
     }
   },
   {
-    id: "style",
-    name: "Style", 
+    id: "settings",
+    name: "Settings", 
     icon: config, 
-    action: () => {
-      console.log("Modify chart theme")
+    action: (e, mediator) => {
+      mediator.emit("utils_settings", e)
     }
   },
   {
     id: "screenshot",
     name: "Screenshot", 
     icon: camera, 
-    action: () => {
-      console.log("Save chart screenshot")
+    action: (e, mediator) => {
+      mediator.emit("utils_screenshot", e)
     }
   },
   // {name: "Save", icon: "./assets/svg/", action: () => {}},

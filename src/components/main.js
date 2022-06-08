@@ -208,7 +208,6 @@ export default class MainPane {
     const styleTime = STYLE_TIME + ` height: ${api.timeH}px; border-color: ${api.chartBorderColour};`
 
     const node = `
-    <div class="${CLASS_WIDGETSG}"></div>
     <div class="${CLASS_ROWS}" style="${styleRows}"></div>
     <div class="${CLASS_TIME}" style="${styleTime}">
       <canvas id=""><canvas/>
@@ -223,7 +222,6 @@ export default class MainPane {
 
     const node = `
       <div class="${CLASS_ROW} ${type}">
-        <div class="${CLASS_WIDGETS}"></div>
         <canvas><canvas/>
         <div class="${styleScale}">
           <canvas id=""><canvas/>
