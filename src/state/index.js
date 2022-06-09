@@ -92,7 +92,7 @@ export default class State {
         state.chart.settings = {}
     }
 
-    // Remove ohlcv we have Data v1.1^
+    // Remove ohlcv we have Data
     delete state.ohlcv
 
     if (!('datasets' in state)) {

@@ -66,8 +66,10 @@ export function _set(obj, path, value) {
 }
 
 export function uid(tag="id") {
-  if (!isString(tag)) tag = "id"
-  return `${tag}_${Date.now().toString(36)}_${Math.random().toString(36).substring(2,5)}`
+  if (!isString(tag)) tag = "ID"
+  const dateString = Date.now().toString(36);
+  const randomness = Math.random().toString(36).substring(2,5);
+  return `${tag}_${dateString}_${randomness}`
 }
 
 export function isArrayEqual(a1, a2) {

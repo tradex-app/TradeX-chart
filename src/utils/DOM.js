@@ -27,7 +27,7 @@ const DOM = {
     return document.querySelectorAll(sel)
   },
 
-  //Returns true if it is a DOM node
+  // returns true if it is a DOM node
   isNode(o){
     return (
       typeof Node === "object" ? o instanceof Node : 
@@ -35,12 +35,18 @@ const DOM = {
     );
   },
 
-  //Returns true if it is a DOM element    
+  // returns true if it is a DOM element    
   isElement(o){
     return (
       typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
       o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
     );
+  },
+
+  // returns true if DOM element is visible
+  // source (2018-03-11): https://github.com/jquery/jquery/blob/master/src/css/hiddenVisibleSelectors.js 
+  isVisible(o) {
+    return !!o && !!( o.offsetWidth || o.offsetHeight || o.getClientRects().length )
   },
 
   /**
@@ -80,11 +86,6 @@ const DOM = {
     }
 
     document.addEventListener('click', outsideClickListener);
-  },
-
-  // source (2018-03-11): https://github.com/jquery/jquery/blob/master/src/css/hiddenVisibleSelectors.js 
-  isVisible(elem) {
-    return !!elem && !!( elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length )
   },
 
 }

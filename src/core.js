@@ -80,8 +80,8 @@ export default class TradeXchart {
   scaleW = 60
 
   static permittedClassNames = 
-      ["TradeXchart","Chart","MainPane","ScaleBar",
-      "Timeline","ToolsBar","UtilsBar","Widgets"]
+      ["TradeXchart","Chart","MainPane","OffChart","OnChart",
+      "ScaleBar","Timeline","ToolsBar","UtilsBar","Widgets"]
 
   UtilsBar
   ToolsBar
@@ -162,7 +162,14 @@ constructor (mediator, options={}) {
   get elWidgetsG() { return this.#elWidgetsG }
 
   get chartData() { return this.#state.data.chart.data }
+  get offChart() { return this.#state.data.offchart }
+  get onChart() { return this.#state.data.onchart }
+  get datasets() { return this.#state.data.datasets }
+
   get rangeLimit() { return (isNumber(this.#rangeLimit)) ? this.#rangeLimit : RANGELIMIT }
+
+  get settings() { return this.#state.data.chart.settings }
+
 
   /**
    * Create a new TradeXchart instance
@@ -249,7 +256,12 @@ constructor (mediator, options={}) {
         elements: this.#elements,
 
         chartData: this.chartData,
+        offChart: this.offChart,
+        onChart: this.onChart,
+        datasets: this.datasets,
         rangeLimit: this.rangeLimit,
+
+        settings: this.settings,
       }
     }
 
@@ -270,7 +282,6 @@ constructor (mediator, options={}) {
     this.ToolsBar.start()
     this.MainPane.start()
     this.WidgetsG.start()
-    // this.Chart.start()
   }
 
   end() {

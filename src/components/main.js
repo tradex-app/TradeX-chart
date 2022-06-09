@@ -6,6 +6,7 @@ import DOM from "../utils/DOM"
 import Timeline from './timeline'
 import Chart from "./chart"
 import OffChart from "./offChart"
+import OnChart from "./onChart"
 
 
 import {
@@ -46,6 +47,7 @@ export default class MainPane {
   #elChart
 
   #OffChart = []
+  #OnChart = []
   #Chart
   #Time
 
@@ -88,6 +90,10 @@ export default class MainPane {
     const api = this.#mediator.api
     api.core = this.#mediator.api
     api.parent = this
+    api.chartData = this.mediator.api.chartData
+    api.onChart = this.#mediator.api.onChart
+    api.rangeLimit = this.#mediator.api.rangeLimit
+    api.settings = this.#mediator.api.settings
 
     this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
     this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
@@ -198,8 +204,6 @@ export default class MainPane {
     offChart.start(this.#OffChart.length + 1)
 
     this.emit("addOffChart", offchart)
-
-
   }
 
   defaultNode() {
