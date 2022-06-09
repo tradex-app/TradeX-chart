@@ -2,6 +2,10 @@
 // Utils bar that lives at the top of the chart
 // Providing: timeframes, indicators, config, refresh, save, load
 
+import DOM from "../utils/DOM"
+import { UtilsStyle } from "../definitions/style"
+import { CLASS_UTILS } from "../definitions/core"
+import utilsList from "../definitions/utils"
 
 export default class UtilsBar {
 
@@ -10,12 +14,14 @@ export default class UtilsBar {
   #mediator
   #options
   #elUtils
+  #utils
 
   constructor (mediator, options) {
 
     this.#mediator = mediator
     this.#options = options
     this.#elUtils = mediator.api.elements.elUtils
+    this.#utils = utilsList || options.utilsBar
     this.init()
   }
 
@@ -36,8 +42,7 @@ export default class UtilsBar {
   }
 
   start() {
-    // Start the module's activities.
-    // Play time!
+    this.initAllUtils()
   }
 
   end() {
@@ -62,11 +67,41 @@ export default class UtilsBar {
     el.innerHTML = this.defaultNode()
   }
 
-  defaultNode() {
-    const node = `
+  initAllUtils() {
+    const api = this.#mediator.api
+    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
 
+    for (let util of utils) {
+
+      let id = util.id.replace('TX_', ''),
+          svg = util.querySelector('svg');
+          svg.style.fill = UtilsStyle.COLOUR_ICON
+          svg.style.height = "90%"
+
+
+      for (let u of this.#utils) {
+        if (u.id === id)
+          svg.addEventListener("click", (e) => {
+            u.action(e, this)
+          })
+      }
+    }
+  }
+
+  defaultNode() {
+    let utilsBar = ""
+    for (const util of this.#utils) {
+      utilsBar += this.iconNode(util)
+    }
+
+    return utilsBar
+  }
+
+  iconNode(icon) {
+    const iconStyle = `display: inline-block; height: ${this.#elUtils.clientHeight}px; padding-top: 2px`
+    return  `
+      <div id="TX_${icon.id}" class="icon-wrapper" style="${iconStyle}">${icon.icon}</div>\n
     `
-    return node
   }
 
 }

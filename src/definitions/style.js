@@ -11,6 +11,22 @@ export const ToolsStyle = {
   COLOUR_ICON: "#888"
 }
 
+export const UtilsStyle = {
+  COLOUR_ICON: "#888"
+}
+
+export const MenuStyle = {
+  COLOUR_BG: "#141414",
+  COLOUR_BORDER: "#666",
+  COLOUR_TXT: "#CCC",
+}
+
+export const WindowStyle = {
+  COLOUR_BG: "#141414",
+  COLOUR_BORDER: "#666",
+  COLOUR_TXT: "#CCC",
+}
+
 /**
 * Candlesticks
 */

@@ -1,6 +1,8 @@
 // _template.js
 // A template file for Chart components
 
+import stateMachineConfig from "../state/state-chart"
+
 export default class _template {
 
   #name = "Template"
@@ -27,6 +29,11 @@ export default class _template {
   warning(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
+  get name() {return this.#name}
+  get shortName() {return this.#shortName}
+  get mediator() {return this.#mediator}
+  get options() {return this.#options}
+
   init() {
     this.mount(this.#elTemplate)
 
@@ -42,12 +49,24 @@ export default class _template {
   start() {
     // Start the module's activities.
     // Play time!
+
+    // set up event listeners
+    this.eventsListen()
+
+    // start State Machine 
+    // stateMachineConfig.context.origin = this
+    // this.#mediator.stateMachine = stateMachineConfig
+    // this.#mediator.stateMachine.start()
   }
 
   end() {
     // Stop and clean up the module to prevent memory leaks.
     // It should remove: event listeners, timers, ect.
     // Put your toys away or it will end in tears.
+  }
+
+
+  eventsListen() {
   }
 
   on(topic, handler, context) {

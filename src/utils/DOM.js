@@ -62,7 +62,30 @@ const DOM = {
     var template = document.createElement('template');
     template.innerHTML = html;
     return template.content.childNodes;
-  }
+  },
+
+  //  https://stackoverflow.com/a/3028037/15109215
+  hideOnClickOutside(element) {
+    const outsideClickListener = event => {
+        if (!element.contains(event.target) && this.isVisible(element)) { 
+        // or use: event.target.closest(selector) === null
+        // if (event.target.closest(selector) === null) {
+          element.style.display = 'none';
+          removeClickListener();
+        }
+    }
+
+    const removeClickListener = () => {
+        document.removeEventListener('click', outsideClickListener);
+    }
+
+    document.addEventListener('click', outsideClickListener);
+  },
+
+  // source (2018-03-11): https://github.com/jquery/jquery/blob/master/src/css/hiddenVisibleSelectors.js 
+  isVisible(elem) {
+    return !!elem && !!( elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length )
+  },
 
 }
 

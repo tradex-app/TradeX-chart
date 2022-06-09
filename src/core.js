@@ -6,6 +6,7 @@ import SX from './scaleX/scale'
 import UtilsBar from './components/utils'
 import ToolsBar from './components/tools'
 import MainPane from './components/main'
+import WidgetsG from './components/widgets'
 
 import State from './state'
 
@@ -56,6 +57,7 @@ export default class TradeXchart {
   #elBody
   #elTools
   #elMain
+  #elWidgetsG
 
   #inCnt = null
   #modID
@@ -72,19 +74,20 @@ export default class TradeXchart {
   chartTxtColour = GlobalStyle.COLOUR_TXT
   chartBorderColour = GlobalStyle.COLOUR_BORDER
 
-  utilsH = 30
+  utilsH = 40
   toolsW = 45
   timeH  = 25
   scaleW = 60
 
   static permittedClassNames = 
-      ["TradeXchart","MainPane","ToolsBar","UtilsBar",
-      "Chart","MainPane","ScaleBar","Timeline","ToolsBar"]
+      ["TradeXchart","Chart","MainPane","ScaleBar",
+      "Timeline","ToolsBar","UtilsBar","Widgets"]
 
   UtilsBar
   ToolsBar
   Timeline
   MainPane
+  WidgetsG
   // Chart
 
   panes = {
@@ -156,6 +159,7 @@ constructor (mediator, options={}) {
   // get elTime() { return this.#elTime }
   get elMain() { return this.#elMain }
   // get elChart() { return this.#elChart }
+  get elWidgetsG() { return this.#elWidgetsG }
 
   get chartData() { return this.#state.data.chart.data }
   get rangeLimit() { return (isNumber(this.#rangeLimit)) ? this.#rangeLimit : RANGELIMIT }
@@ -253,6 +257,7 @@ constructor (mediator, options={}) {
     this.UtilsBar = this.#mediator.register("UtilsBar", UtilsBar, options, api)
     this.ToolsBar = this.#mediator.register("ToolsBar", ToolsBar, options, api)
     this.MainPane = this.#mediator.register("MainPane", MainPane, options, api)
+    this.WidgetsG = this.#mediator.register("WidgetsG", WidgetsG, options, api)
     this.Chart = this.MainPane.chart
 
     this.log(`${this.#name} instantiated`)
@@ -264,6 +269,7 @@ constructor (mediator, options={}) {
     this.UtilsBar.start()
     this.ToolsBar.start()
     this.MainPane.start()
+    this.WidgetsG.start()
     // this.Chart.start()
   }
 
@@ -293,13 +299,15 @@ constructor (mediator, options={}) {
     this.#elBody = DOM.findBySelector(`#${this.id} .${CLASS_BODY}`)
     this.#elTools = DOM.findBySelector(`#${this.id} .${CLASS_TOOLS}`)
     this.#elMain  = DOM.findBySelector(`#${this.id} .${CLASS_MAIN}`)
+    this.#elWidgetsG = DOM.findBySelector(`#${this.id} .${CLASS_WIDGETSG}`)
 
     this.#elements = {
       elTXChart: this.#elTXChart,
       elUtils: this.#elUtils,
       elBody: this.#elBody,
       elTools: this.#elTools,
-      elMain: this.#elMain
+      elMain: this.#elMain,
+      elWidgetsG: this.#elWidgetsG
     }
   }
 
@@ -401,6 +409,7 @@ constructor (mediator, options={}) {
     const styleBody = STYLE_BODY + ` height: calc(100% - ${this.utilsH}px); width: ${this.#chartW}px;`
     const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour};`
     const styleMain = STYLE_MAIN + ` left: ${this.toolsW}px; width: calc(100% - ${this.toolsW}px);`
+    const styleWidgets = ` position: relative;`
     
     const node = `
       <div id="${this.id}" class="${classesTXChart}" style="${styleTXChart}">
@@ -410,6 +419,7 @@ constructor (mediator, options={}) {
           <div class="${CLASS_MAIN}" style="${styleMain}">
           </div>
         </div>
+        <div class="${CLASS_WIDGETSG}" style="${styleWidgets}"></div>
       </div>
     `
     return node

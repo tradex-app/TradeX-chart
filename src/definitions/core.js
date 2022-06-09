@@ -15,5 +15,9 @@ export const CLASS_SCALE     = "tradeXscale"
 export const CLASS_WIDGETS   = "tradeXwidgets"
 export const CLASS_ONCHART   = "tradeXonChart"
 export const CLASS_OFFCHART  = "tradeXoffChart"
+export const CLASS_MENU      = "tradeXmenu"
+export const CLASS_WINDOW    = "tradeXwindow"
+export const CLASS_PROGRESS  = "tradeXprogress"
+
 
 export const RANGELIMIT = 500
