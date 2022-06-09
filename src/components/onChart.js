@@ -1,16 +1,16 @@
-// offChart.js
-// A base class for offChart components to extend upon
+// onChart.js
+// A base class for onChart components to extend upon
 
 import stateMachineConfig from "../state/state-chart"
 
-export default class OffChart {
+export default class OnChart {
 
-  #name = "OffChart"
-  #shortName = "offChart"
+  #name = "OnChart"
+  #shortName = "onChart"
   #mediator
   #options
   #parent
-  #elOffChart
+  #elOnChart
 
   #width
   #height
@@ -19,7 +19,7 @@ export default class OffChart {
 
     this.#mediator = mediator
     this.#options = options
-    this.#elOffChart = options.elements.elOffChart
+    this.#elOnChart = this.#mediator.api.elOnChart
     this.#parent = this.#mediator.api.parent
     this.init()
   }
@@ -35,7 +35,7 @@ export default class OffChart {
   get options() {return this.#options}
 
   init() {
-    this.mount(this.#elOffChart)
+    this.mount(this.#elOnChart)
 
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api

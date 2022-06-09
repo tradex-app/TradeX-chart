@@ -11,6 +11,8 @@ import chartGrid from "./overlays/chart-grid"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartCursor from "./overlays/chart-cursor"
+import indicator from "./overlays/inidcator"
+import OnChart from "./onChart"
 import stateMachineConfig from "../state/state-chart"
 import { InputController, EventDispatcher, Keys } from '@jingwood/input-control'
 import { getRange } from "../helpers/range"
@@ -51,7 +53,7 @@ export default class Chart {
   #core
   #parent
   #elChart
-  #elWidgets
+  // #elWidgets
   #elCanvas
   #elViewport
   #elLegends
@@ -63,6 +65,7 @@ export default class Chart {
   #Scale
   #Time
   #Legends
+  #onChart
 
   #width
   #height
@@ -79,13 +82,17 @@ export default class Chart {
   #layerVolume
   #layerCandles
   #layerCursor
+  #layersOnChart
   
   #chartGrid
   #chartVolume
+  #chartIndicators
   #chartCandles
   #chartCursor
 
   #cursorPos = [0, 0]
+
+  #settings
   #chartCandle
   #title
   #theme
@@ -97,11 +104,13 @@ export default class Chart {
     this.#elChart = mediator.api.elements.elChart
     this.#parent = this.#mediator.api.parent
     this.#core = this.#mediator.api.core
-    this.#data = this.#core.chartData
-    this.#rangeLimit = this.#core.rangeLimit
+    this.#data = this.#mediator.api.chartData
+    this.#onChart = this.#mediator.api.onChart
+    this.#rangeLimit = this.#mediator.api.rangeLimit
     const end = this.#data.length - 1
     const start = end - this.#rangeLimit
     this.#range = getRange(this.#data, start, end)
+    this.#settings = this.#mediator.api.settings
     this.init(options)
   }
 
@@ -124,6 +133,7 @@ export default class Chart {
   get state() { return this.getState() }
   get data() { return this.#data }
   get range() { return this.#range }
+  get onChart() { return this.#onChart }
   set priceDigits(digits) { this.setYAxisDigits(digits) }
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
   get cursorPos() { return this.#cursorPos }
@@ -142,20 +152,35 @@ export default class Chart {
     // mount chart on DOM
     this.mount(this.#elChart)
 
+    // Legends - to display indicator overlay Title, inputs and options
+    let chartLegend = {
+      id: "chart",
+      title: this.#title,
+      type: "chart"
+    }
+    this.#Legends = new Legends(this.#elLegends)
+    this.#Legends.add(chartLegend)
+
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api
     api.parent = this
     api.elements = 
     {...api.elements, 
       ...{
-        elWidgets: this.#elWidgets,
+        // elWidgets: this.#elWidgets,
         elCanvas: this.#elCanvas,
         elScale: this.#elScale
       }
     }
+    api.onChart = this.#mediator.api.onChart
+    api.legends = this.#Legends
 
     // Y Axis - Price Scale
     this.#Scale = this.#mediator.register("ScaleBar", ScaleBar, options, api)
+
+    // onChart indicators
+    // this.#onChart = this.#mediator.register("OnChart", OnChart, options, api)
+
 
     // set up layout responsiveness
     let dimensions = {wdith: this.#width, height: this.#height}
@@ -168,15 +193,6 @@ export default class Chart {
 
 
   start() {
-
-    // Legends - to display overlay Title, inputs and options
-    let options = {
-      id: "chart",
-      title: this.#title,
-      type: "chart"
-    }
-    this.#Legends = new Legends(this.#elLegends)
-    this.#Legends.add(options)
 
     // X Axis - Timeline
     this.#Time = this.#parent.time
@@ -290,7 +306,7 @@ export default class Chart {
     el.innerHTML = this.defaultNode()
 
     const api = this.#mediator.api
-    this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
+    // this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .viewport`)
     this.#elLegends = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .legends`)
     this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`)
@@ -385,6 +401,7 @@ export default class Chart {
     // create layers - grid, volume, candles
     this.#layerGrid = new CEL.Layer();
     this.#layerVolume = new CEL.Layer();
+    this.#layersOnChart = this.layersOnChart()
     this.#layerCandles = new CEL.Layer();
     this.#layerCursor = new CEL.Layer();
 
@@ -392,6 +409,10 @@ export default class Chart {
     this.#viewport
           .addLayer(this.#layerGrid)
           .addLayer(this.#layerVolume)
+
+    this.addLayersOnChart()
+
+    this.#viewport
           .addLayer(this.#layerCandles)
           .addLayer(this.#layerCursor)
 
@@ -411,6 +432,8 @@ export default class Chart {
         this.#Scale, 
         this.#theme)
 
+    this.#chartIndicators = this.chartIndicators()
+
     this.#theme.maxVolumeH = this.#theme?.onchartVolumeH || VolumeStyle.ONCHART_VOLUME_HEIGHT
     this.#chartVolume =
       new chartVolume(
@@ -425,6 +448,34 @@ export default class Chart {
         this.#Time, 
         this.#Scale, 
         this.#theme)
+  }
+
+  layersOnChart() {
+    let l = []
+
+    for (let i = 0; i < this.#onChart.length; i++) {
+      l[i] = new CEL.Layer()
+    }
+    return l
+  }
+
+  addLayersOnChart() {
+    for (let i = 0; i < this.#layersOnChart.length; i++) {
+      this.#viewport.addLayer(this.#layersOnChart[i])
+    }
+  }
+
+  chartIndicators() {
+    const indicators = []
+    for (let i = 0; i < this.#layersOnChart.length; i++) {
+      indicators[i] = 
+        new indicator(
+          this.#layersOnChart[i], 
+          this.#Time,
+          this.#Scale,
+          this.config)
+    } 
+    return indicators
   }
 
   draw(range) {
