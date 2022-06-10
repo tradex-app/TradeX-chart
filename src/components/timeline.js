@@ -25,9 +25,6 @@ export default class Timeline {
 
   #elViewport
 
-  #width
-  #height
-
   #viewport
   #layerLabels
   #layerOverlays
@@ -89,7 +86,7 @@ export default class Timeline {
   }
 
   setWidth(w) {
-    this.#width = w
+    this.#elTime.style.width = w
   }
 
   setDimensions(dimensions) {
@@ -152,8 +149,8 @@ export default class Timeline {
   createViewport() {
     // create viewport
     this.#viewport = new CEL.Viewport({
-      width: this.width,
-      height: this.height,
+      width: this.#elTime.clientWidth,
+      height: this.#elTime.clientHeight,
       container: this.#elViewport
     });
 
