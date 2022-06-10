@@ -52,7 +52,7 @@ export default class Timeline {
   get options() { return this.#options }
   get height() { return this.#elTime.clientHeight }
   set width(w) { this.setWidth(w) }
-  get width() { return this.#xAxis.width }
+  get width() { return this.#elTime.clientWidth }
   get xAxisWidth() { return this.#xAxis.width }
   get xAxisRatio() { return this.#xAxis.xAxisRatio }
   get layerLabels() { return this.#layerLabels }
@@ -89,8 +89,9 @@ export default class Timeline {
     this.#elTime.style.width = w
   }
 
-  setDimensions(dimensions) {
-    this.setWidth(dimensions.mainW)
+  setDimensions(dim) {
+    this.#viewport.setSize(dim.w, this.height)
+    this.setWidth(dim.w)
   }
 
   start() {

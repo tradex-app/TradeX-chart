@@ -186,7 +186,6 @@ export default class Chart {
     // let dimensions = {wdith: this.#width, height: this.#height}
     // this.emit("resizeChart", dimensions)
 
-    this.on("resizeChart", (dimensions) => this.onResize(dimensions))
 
     this.log(`${this.#name} instantiated`)
   }
@@ -233,6 +232,9 @@ export default class Chart {
     // keyboard input
     controller.on("keydown", e => { this.onChartKeyDown(e) })
     controller.on("keyup", e => { this.onChartKeyDown(e) })
+
+    this.on("resizeChart", e => { this.onResize(e) })
+
   }
 
   on(topic, handler, context) {
@@ -324,11 +326,19 @@ export default class Chart {
 
   setWidth(w) {
     this.#elChart.style.width = w
+    this.#elViewport.style.width = w - this.#elScale.clientWidth
   }
 
   setHeight(h) {
     this.#elChart.style.height = h
     this.#elScale.style.height = h
+    this.#Scale.setDimensions({w: null, h: h})
+  }
+
+  setDimensions(dim) {
+    this.#viewport.setSize(dim.w - this.#elScale.clientWidth, dim.h)
+    this.setWidth(dim.w)
+    this.setHeight(dim.h)
   }
 
   setState(s) {
@@ -339,12 +349,6 @@ export default class Chart {
     return null
   }
 
-  setDimensions(dimensions) {
-    this.setWidth(dimensions.mainW)
-    this.setHeight(dimensions.mainH)
-
-    this.emit("resize", dimensions)
-  }
 
   setTheme(theme) {
     this.#theme = theme
