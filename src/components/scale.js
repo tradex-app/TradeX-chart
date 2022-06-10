@@ -82,7 +82,7 @@ export default class ScaleBar {
   init() {
     this.mount(this.#elScale)
 
-    this.on("resizeChart", (dimensions) => this.onResize(dimensions))
+    // this.on("resizeChart", (dimensions) => this.onResize(dimensions))
 
     this.log(`${this.#name} instantiated`)
   }
@@ -145,8 +145,9 @@ export default class ScaleBar {
     this.#elScale.style.height = h
   }
 
-  setDimensions(dimensions) {
-    this.setHeight(dimensions.mainH)
+  setDimensions(dim) {
+    this.#viewport.setSize(this.width, dim.h)
+    this.setHeight(dim.h)
   }
 
   defaultNode() {

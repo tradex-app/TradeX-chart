@@ -50,7 +50,7 @@ export default class MainPane {
   #Chart
   #Time
 
-  #offChartDefaultH = 0.3
+  #offChartDefaultH = 30 // %
   #offChartDefaultWpx = 120
   
 
@@ -111,7 +111,7 @@ export default class MainPane {
     this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
 
     // register offChart
-    // this.registerOffCharts(options, api)
+    this.registerOffCharts(options, api)
 
     // events / messages
     this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
@@ -189,33 +189,43 @@ export default class MainPane {
   }
 
   registerOffCharts(options, api) {
-    for (o of this.#mediator.api.offChart) {
+    
+    let a = this.#offChartDefaultH * this.#mediator.api.offChart.length,
+        offChartsH = Math.round( a / Math.log10( a * 2 ) ) / 100,
+        rowsH = this.rowsH * offChartsH;
+
+    if (this.#mediator.api.offChart.length === 1) {
+      // adjust chart size for first offChart
+      options.rowH = this.rowsH * this.#offChartDefaultH / 100
+      options.chartH = this.chartH - options.rowH
+
+    }
+    else {
+      // adjust chart size for subsequent offCharts
+      options.rowH = rowsH / this.#OffCharts.length
+      options.chartH = this.rowsH - rowsH
+    }
+
+    for (let o of this.#mediator.api.offChart) {
       this.addOffChart(o.type, options, api)
     }
+    this.emit("resizeChart", {w: this.rowsW, h: options.chartH})
   }
 
   addOffChart(type, options, api) {
 
-    if (this.rowsH === this.chartH && this.#OffCharts.length < 1) {
-      // adjust chart size for first offChart
-      let rowH = this.rowsH * this.#offChartDefaultH
-      let chartH = this.chartH - rowH
+    this.#elRows.lastElementChild.insertAdjacentHTML("afterend", this.rowNode(type))
+    this.#elOffCharts.push(this.#elRows.lastElementChild)
+    this.#elRows.lastElementChild.style.height = options.rowH
 
-      this.emit("resizeChart")
-    }
-    else {
-      // adjust chart size for subsequent offCharts
-    }
-
-    this.#elChart.insertAdjacentHTML("afterend", this.rowNode(type))
-    this.#elOffCharts.unshift(this.#elChart.nextElementSibling)
+    api.elements.elOffChart = this.#elRows.lastElementChild
 
     let offChart = this.#mediator.register("OffChart", OffChart, options, api)
     
-    this.#OffCharts.unshift(offChart)
-    offChart.start(this.#OffCharts.length + 1)
+    this.#OffCharts.push(offChart)
+    offChart.start(this.#OffCharts.length - 1)
 
-    this.emit("addOffChart", offchart)
+    this.emit("addOffChart", offChart)
   }
 
   defaultNode() {
