@@ -82,8 +82,6 @@ export default class ScaleBar {
   init() {
     this.mount(this.#elScale)
 
-    // this.on("resizeChart", (dimensions) => this.onResize(dimensions))
-
     this.log(`${this.#name} instantiated`)
   }
 
@@ -114,9 +112,10 @@ export default class ScaleBar {
     // create controller and use 'on' method to receive input events 
     const controller = new InputController(canvas);
 
-    this.#mediator.on("chart_mousemove", (e) => { this.drawCursorPrice(e) })
-    this.#mediator.on("chart_pan", (e) => { this.drawCursorPrice(e) })
-    this.#mediator.on("chart_panDone", (e) => { this.drawCursorPrice(e) })
+    this.on("chart_mousemove", (e) => { this.drawCursorPrice(e) })
+    this.on("chart_pan", (e) => { this.drawCursorPrice(e) })
+    this.on("chart_panDone", (e) => { this.drawCursorPrice(e) })
+    // this.on("resizeChart", (dimensions) => this.onResize(dimensions))
   }
 
   on(topic, handler, context) {

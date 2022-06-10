@@ -122,6 +122,10 @@ export default class MainPane {
   start() {
     this.#Time.start()
     this.#Chart.start()
+
+    for (let i = 0; i < this.#OffCharts.length; i++) {
+      this.#OffCharts[i].start(i)
+    }
   }
 
   end() {
@@ -209,21 +213,21 @@ export default class MainPane {
     for (let o of this.#mediator.api.offChart) {
       this.addOffChart(o.type, options, api)
     }
-    this.emit("resizeChart", {w: this.rowsW, h: options.chartH})
+    // this.emit("resizeChart", {w: this.rowsW, h: options.chartH})
+    // this.#Chart.setDimensions({w: this.rowsW, h: options.chartH})
   }
 
   addOffChart(type, options, api) {
 
     this.#elRows.lastElementChild.insertAdjacentHTML("afterend", this.rowNode(type))
     this.#elOffCharts.push(this.#elRows.lastElementChild)
-    this.#elRows.lastElementChild.style.height = options.rowH
 
     api.elements.elOffChart = this.#elRows.lastElementChild
 
     let offChart = this.#mediator.register("OffChart", OffChart, options, api)
     
     this.#OffCharts.push(offChart)
-    offChart.start(this.#OffCharts.length - 1)
+    // offChart.start(this.#OffCharts.length - 1)
 
     this.emit("addOffChart", offChart)
   }

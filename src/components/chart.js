@@ -53,7 +53,6 @@ export default class Chart {
   #core
   #parent
   #elChart
-  // #elWidgets
   #elCanvas
   #elViewport
   #elLegends
@@ -233,7 +232,7 @@ export default class Chart {
     controller.on("keydown", e => { this.onChartKeyDown(e) })
     controller.on("keyup", e => { this.onChartKeyDown(e) })
 
-    this.on("resizeChart", e => { this.onResize(e) })
+    this.on("resizeChart", e => { console.log("resizing !!!");this.onResize(e) })
 
   }
 
