@@ -62,9 +62,6 @@ export default class Widgets {
       elWidgetsG: this.#elWidgetsG,
       elMenu: this.#elMenu
     }
-
-    // listen/subscribe/watch for parent notifications
-    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   start() {
@@ -84,12 +81,13 @@ export default class Widgets {
     // Put your toys away or it will end in tears.
   }
 
-
+  // listen/subscribe/watch for parent notifications
   eventsListen() {
-    this.#mediator.on("utils_indicators", (e) => { this.onIndicators(e) })
-    this.#mediator.on("utils_timezone", (e) => { this.onTimezone(e) })
-    this.#mediator.on("utils_settings", (e) => { this.onSettings(e) })
-    this.#mediator.on("utils_screenshot", (e) => { this.onScreenshot(e) })
+    this.on("utils_indicators", (e) => { this.onIndicators(e) })
+    this.on("utils_timezone", (e) => { this.onTimezone(e) })
+    this.on("utils_settings", (e) => { this.onSettings(e) })
+    this.on("utils_screenshot", (e) => { this.onScreenshot(e) })
+    this.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   on(topic, handler, context) {

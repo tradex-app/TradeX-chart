@@ -120,9 +120,9 @@ export default class Timeline {
     // create controller and use 'on' method to receive input events 
     const controller = new InputController(canvas);
 
-    this.#chart.on("chart_mousemove", (e) => { this.drawCursorTime(e) })
-    this.#chart.on("chart_pan", (e) => { this.drawCursorTime(e) })
-    this.#chart.on("chart_panDone", (e) => { this.drawCursorTime(e) })
+    this.on("chart_mousemove", (e) => { this.drawCursorTime(e) })
+    this.on("chart_pan", (e) => { this.drawCursorTime(e) })
+    this.on("chart_panDone", (e) => { this.drawCursorTime(e) })
   }
 
   on(topic, handler, context) {
