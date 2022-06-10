@@ -1,5 +1,5 @@
 /**
- * EMA 指数移动平均
+ * EMA
  */
  export default {
   name: 'EMA',

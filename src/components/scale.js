@@ -70,7 +70,7 @@ export default class ScaleBar {
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   set height(h) { this.setHeight(h) }
-  get height() { return this.#yAxis.height }
+  get height() { return this.#elScale.clientHeight }
   get width() { return this.#elScale.clientWidth }
   get yAxisHeight() { return this.#yAxis.height }
   get yAxisRatio() { return this.#yAxis.yAxisRatio }
@@ -82,7 +82,7 @@ export default class ScaleBar {
   init() {
     this.mount(this.#elScale)
 
-    this.#parent.on("resizeChart", (dimensions) => this.onResize(dimensions))
+    this.on("resizeChart", (dimensions) => this.onResize(dimensions))
 
     this.log(`${this.#name} instantiated`)
   }
@@ -138,13 +138,11 @@ export default class ScaleBar {
   mount(el) {
     el.innerHTML = this.defaultNode()
 
-    const api = this.#mediator.api
-    this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE} .viewport`)
-
+    this.#elViewport = el.querySelector(`.viewport`)
   }
 
   setHeight(h) {
-    this.#height = h
+    this.#elScale.style.height = h
   }
 
   setDimensions(dimensions) {
@@ -176,8 +174,8 @@ export default class ScaleBar {
   createViewport() {
     // create viewport
     this.#viewport = new CEL.Viewport({
-      width: this.width,
-      height: this.height,
+      width: this.#elScale.clientWidth,
+      height: this.#elScale.clientHeight,
       container: this.#elViewport
     });
 

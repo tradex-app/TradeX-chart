@@ -12,7 +12,7 @@ import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartCursor from "./overlays/chart-cursor"
 import indicator from "./overlays/inidcator"
-import OnChart from "./onChart"
+import OnChart from "./overlays"
 import stateMachineConfig from "../state/state-chart"
 import { InputController, EventDispatcher, Keys } from '@jingwood/input-control'
 import { getRange } from "../helpers/range"
@@ -42,7 +42,7 @@ import {
   PRICEDIGITS,
 } from "../definitions/chart"
 
-const STYLE_CHART = "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
+const STYLE_CHART = "" // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
 const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
 export default class Chart {
 
@@ -126,9 +126,9 @@ export default class Chart {
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
   set width(w) { this.setWidth(w) }
-  get width() { return this.#width }
+  get width() { return this.#elChart.clientWidth }
   set height(h) { this.setHeight(h) }
-  get height() { return this.#height }
+  get height() { return this.#elChart.clientHeight }
   set state(s) { this.setState(s) }
   get state() { return this.getState() }
   get data() { return this.#data }
@@ -183,10 +183,10 @@ export default class Chart {
 
 
     // set up layout responsiveness
-    let dimensions = {wdith: this.#width, height: this.#height}
-    this.emit("resizeChart", dimensions)
+    // let dimensions = {wdith: this.#width, height: this.#height}
+    // this.emit("resizeChart", dimensions)
 
-    this.#parent.on("resizeChart", (dimensions) => this.onResize(dimensions))
+    this.on("resizeChart", (dimensions) => this.onResize(dimensions))
 
     this.log(`${this.#name} instantiated`)
   }
@@ -323,12 +323,12 @@ export default class Chart {
   }
 
   setWidth(w) {
-    this.#width = w
+    this.#elChart.style.width = w
   }
 
   setHeight(h) {
-    this.#height = h
-    this.parent
+    this.#elChart.style.height = h
+    this.#elScale.style.height = h
   }
 
   setState(s) {
@@ -359,18 +359,15 @@ export default class Chart {
 
   defaultNode() {
     const api = this.#mediator.api
-    const styleChart = STYLE_CHART + ` border-color: ${api.chartBorderColour};`
-    const styleScale = STYLE_SCALE + ` width: ${api.scaleW - 1}px; border-color: ${api.chartBorderColour};`
+    const width = api.parent.rowsW - api.scaleW
+    const height = api.parent.rowsH - 1
+
+    const styleChart = STYLE_CHART + ` width: ${width}px; height: ${height}px`
+    const styleScale = STYLE_SCALE + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`
     const styleLegend = `position: absolute; top: 0; left: 0; z-index:100;`
-    
-    const rowsH = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`).clientHeight
-    const rowsW = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`).clientWidth - 1
-    this.width = rowsW - api.scaleW
-    this.height = rowsH - 1
 
     const node = `
-      <div class="${CLASS_WIDGETS}"></div>
-      <div class="viewport"></div>
+      <div class="viewport" style="${styleChart}"></div>
       <div class="legends" style="${styleLegend}"></div>
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
@@ -393,8 +390,8 @@ export default class Chart {
   createViewport() {
     // create viewport
     this.#viewport = new CEL.Viewport({
-      width: this.width,
-      height: this.height,
+      width: this.#elViewport.clientWidth,
+      height: this.#elViewport.clientHeight,
       container: this.#elViewport
     });
 
