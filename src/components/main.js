@@ -29,6 +29,7 @@ import {
 } from '../definitions/core'
 
 const STYLE_ROWS = "width:100%; min-width:100%;"
+const STYLE_ROW = "position: relative;"
 const STYLE_TIME = "border-top: 1px solid; width:100%; min-width:100%;"
 const STYLE_SCALE = "border-left: 1px solid;"
 
@@ -216,25 +217,25 @@ export default class MainPane {
     }
 
     for (let o of this.#mediator.api.offChart) {
-      this.addOffChart(o.type, options, api)
+      this.addOffChart(o, options, api)
     }
     // this.emit("resizeChart", {w: this.rowsW, h: options.chartH})
     // this.#Chart.setDimensions({w: this.rowsW, h: options.chartH})
   }
 
-  addOffChart(type, options, api) {
+  addOffChart(offChart, options, api) {
 
-    this.#elRows.lastElementChild.insertAdjacentHTML("afterend", this.rowNode(type))
+    this.#elRows.lastElementChild.insertAdjacentHTML("afterend", this.rowNode(offChart.type))
     this.#elOffCharts.push(this.#elRows.lastElementChild)
 
     api.elements.elOffChart = this.#elRows.lastElementChild
+    options.offChart = offChart
 
-    let offChart = this.#mediator.register("OffChart", OffChart, options, api)
+    let o = this.#mediator.register("OffChart", OffChart, options, api)
     
-    this.#OffCharts.push(offChart)
-    // offChart.start(this.#OffCharts.length - 1)
+    this.#OffCharts.push(o)
 
-    this.emit("addOffChart", offChart)
+    this.emit("addOffChart", o)
   }
 
   defaultNode() {
@@ -253,10 +254,11 @@ export default class MainPane {
 
   rowNode(type) {
     const api = this.#mediator.api
+    const styleRow = STYLE_ROW + ` border-top: 1px solid ${api.chartBorderColour};`
     const styleScale = STYLE_SCALE + ` border-color: ${api.chartBorderColour};`
 
     const node = `
-      <div class="${CLASS_ROW} ${type}">
+      <div class="${CLASS_ROW} ${type}" style="${styleRow}">
         <canvas><canvas/>
         <div class="${styleScale}">
           <canvas id=""><canvas/>

@@ -1,7 +1,14 @@
 // offChart.js
 // A base class for offChart components to extend upon
 
+import DOM from "../utils/DOM"
+import ScaleBar from "./scale"
+import CEL from "../components/primitives/canvas"
+import Legends from "./primitives/legend"
+import chartGrid from "./overlays/chart-grid"
+import chartVolume from "./overlays/chart-volume"
 import stateMachineConfig from "../state/state-chart"
+import { uid } from "../utils/utilities"
 
 import {
   NAME,
@@ -27,6 +34,7 @@ const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px soli
 
 export default class OffChart {
 
+  #ID
   #name = "OffChart"
   #shortName = "offChart"
   #mediator
@@ -53,7 +61,8 @@ export default class OffChart {
     this.#options = options
     this.#elOffChart = mediator.api.elements.elOffChart
     this.#parent = this.#mediator.api.parent
-    this.init()
+    this.#ID = this.#options.offChartID || uid("TX_OC_")
+    this.init(options)
   }
 
   log(l) { this.#mediator.log(l) }
@@ -61,27 +70,48 @@ export default class OffChart {
   warning(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
+  get ID() { return this.#offChartID }
   get name() {return this.#name}
   get shortName() {return this.#shortName}
   get mediator() {return this.#mediator}
   get options() {return this.#options}
 
-  init() {
+  init(options) {
     this.mount(this.#elOffChart)
+
+    // Legends - to display indicator overlay Title, inputs and options
+    let offChartLegend = {
+      id: options.offChart.type,
+      title: options.offChart.name,
+      type: options.offChart.type
+    }
+    this.#Legends = new Legends(this.#elLegends)
+    this.#Legends.add(offChartLegend)
 
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api
     api.parent = this
     // api.elements = {}
 
-    // listen/subscribe/watch for parent notifications
-    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
+    // Y Axis - Price Scale
+    // this.#Scale = this.#mediator.register("ScaleBar", ScaleBar, options, api)
+
   }
 
   start(index) {
     
     this.#offChartID = index
 
+    // X Axis - Timeline
+    this.#Time = this.mediator.api.Timeline
+
+    // this.#Scale.start()
+
+    // prepare layered canvas
+    this.createViewport()
+    // draw the chart - grid, candles, volume
+    this.draw(this.range)
+  
     // set up event listeners
     this.eventsListen()
 
@@ -99,6 +129,8 @@ export default class OffChart {
 
 
   eventsListen() {
+    // listen/subscribe/watch for parent notifications
+    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   on(topic, handler, context) {
@@ -118,7 +150,14 @@ export default class OffChart {
   }
 
   mount(el) {
+    el.id = this.#ID
     el.innerHTML = this.defaultNode()
+
+    const api = this.#mediator.api
+    // this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
+    this.#elViewport = DOM.findBySelector(`#${this.#ID} .viewport`)
+    this.#elLegends = DOM.findBySelector(`#${this.#ID} .legends`)
+    this.#elScale = DOM.findBySelector(`#${this.#ID} .${CLASS_SCALE}`)
   }
 
   setWidth(w) {
@@ -153,6 +192,16 @@ export default class OffChart {
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
     return node
+  }
+
+// -----------------------
+
+  createViewport() {
+
+  }
+
+  draw() {
+
   }
 
 }
