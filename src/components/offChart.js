@@ -140,7 +140,7 @@ export default class OffChart {
 
   defaultNode() {
     const api = this.#mediator.api
-    const width = api.parent.rowsW - api.scaleW
+    const width = api.width - api.toolsW - api.scaleW
     const height = this.#options.rowH
 
     const styleOffChart = STYLE_OFFCHART + ` width: ${width}px; height: ${height}px`

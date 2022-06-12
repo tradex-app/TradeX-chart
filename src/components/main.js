@@ -60,7 +60,7 @@ export default class MainPane {
     this.#mediator = mediator
     this.#options = options
     this.#elMain = mediator.api.elements.elMain
-    this.#parent = this.#mediator.api.parent
+    this.#parent = {...this.#mediator.api.parent}
     this.init(options)
   }
 
@@ -82,9 +82,17 @@ export default class MainPane {
 
   init(options) {
     this.mount(this.#elMain)
-    this.mountRow(this.#elRows, CLASS_CHART)
 
     const api = this.#mediator.api
+
+    this.#elRows = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`)
+    this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
+
+    this.mountRow(this.#elRows, CLASS_CHART)
+
+    this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
+
+
     api.core = this.#mediator.api
     api.parent = this
     api.chartData = this.mediator.api.chartData
@@ -93,28 +101,22 @@ export default class MainPane {
     api.rangeLimit = this.#mediator.api.rangeLimit
     api.settings = this.#mediator.api.settings
 
-    this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
-    this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
-
     // api - functions / methods, calculated properties provided by this module
     api.elements = 
       {...api.elements, 
         ...{
           elChart: this.#elChart,
           elTime: this.#elTime,
+          elRows: this.#elRows,
           elOffCharts: this.#elOffCharts
         }
       }
 
-    // register child modules
-    this.#Chart = this.#mediator.register("Chart", Chart, options, api)
-    this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
-
     // register offChart
     this.registerOffCharts(options, api)
-
-    // events / messages
-    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
+        // register child modules
+    this.#Chart = this.#mediator.register("Chart", Chart, options, api)
+    this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
 
     this.log(`${this.#name} instantiated`)
   }
@@ -126,10 +128,18 @@ export default class MainPane {
     for (let i = 0; i < this.#OffCharts.length; i++) {
       this.#OffCharts[i].start(i)
     }
+    // set up event listeners
+    this.eventsListen()
   }
 
   end() {
     
+  }
+
+
+  eventsListen() {
+    // listen/subscribe/watch for parent notifications
+    this.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   on(topic, handler, context) {
@@ -150,10 +160,6 @@ export default class MainPane {
 
   mount(el) {
     el.innerHTML = this.defaultNode()
-
-    const api = this.#mediator.api
-    this.#elRows = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`)
-    this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
   }
 
   mountRow(el, type) {
@@ -201,7 +207,7 @@ export default class MainPane {
     if (this.#mediator.api.offChart.length === 1) {
       // adjust chart size for first offChart
       options.rowH = this.rowsH * this.#offChartDefaultH / 100
-      options.chartH = this.chartH - options.rowH
+      options.chartH = this.rowsH - options.rowH
 
     }
     else {

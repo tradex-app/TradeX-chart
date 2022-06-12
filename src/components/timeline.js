@@ -35,8 +35,8 @@ export default class Timeline {
     this.#mediator = mediator
     this.#options = options
     this.#elTime = mediator.api.elements.elTime
-    this.#parent = mediator.api.parent
-    this.#chart = this.#parent
+    this.#parent = mediator.api.MainPane
+    this.#chart = mediator.api.Chart
     this.#xAxis = new xAxis(this, this.#chart)
     this.init()
   }
@@ -60,6 +60,7 @@ export default class Timeline {
   get xAxisGrads() { return this.#xAxis.xAxisGrads }
   get candleW() { return this.#xAxis.candleW }
   get viewport() { return this.#viewport }
+  get range() { return this.mediator.api.range }
 
   init() {
     this.mount(this.#elTime)

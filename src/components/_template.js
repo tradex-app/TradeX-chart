@@ -20,7 +20,7 @@ export default class _template {
     this.#mediator = mediator
     this.#options = options
     this.#elTemplate = options.elements.elTemplate
-    this.#parent = this.#mediator.api.parent
+    this.#parent = {...this.#mediator.api.parent}
     this.init()
   }
 
@@ -41,9 +41,6 @@ export default class _template {
     const api = this.#mediator.api
     api.parent = this.#mediator
     api.elements = {}
-
-    // listen/subscribe/watch for parent notifications
-    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   start() {
@@ -67,6 +64,8 @@ export default class _template {
 
 
   eventsListen() {
+    // listen/subscribe/watch for parent notifications
+    this.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   on(topic, handler, context) {
