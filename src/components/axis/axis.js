@@ -5,10 +5,10 @@ import { float2Int, countDigits, numDigits, precision, nice, round } from '../..
 
 export default class Axis {
 
-  chart
+  // chart
 
   constructor(chart) {
-    this.chart = chart
+    // this.chart = chart
   }
 
   get width() { return this.chart.width }

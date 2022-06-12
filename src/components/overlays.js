@@ -1,16 +1,17 @@
-// onChart.js
-// A base class for onChart components to extend upon
+// overlays.js
+// A base class for overlays components to extend upon
 
 import stateMachineConfig from "../state/state-chart"
 
-export default class OnChart {
+export default class Overlays {
 
-  #name = "OnChart"
-  #shortName = "onChart"
+  #name = "Overlays"
+  #shortName = "overlays"
   #mediator
   #options
   #parent
-  #elOnChart
+
+  #elOverlays
 
   #width
   #height
@@ -19,7 +20,7 @@ export default class OnChart {
 
     this.#mediator = mediator
     this.#options = options
-    this.#elOnChart = this.#mediator.api.elOnChart
+    this.#elOverlays = this.#mediator.api.elOverlays
     this.#parent = this.#mediator.api.parent
     this.init()
   }
@@ -35,7 +36,7 @@ export default class OnChart {
   get options() {return this.#options}
 
   init() {
-    this.mount(this.#elOnChart)
+    this.mount(this.#elOverlays)
 
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api

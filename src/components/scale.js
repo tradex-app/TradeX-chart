@@ -55,8 +55,7 @@ export default class ScaleBar {
     this.#mediator = mediator
     this.#options = options
     this.#elScale = mediator.api.elements.elScale
-    this.#parent = mediator.api.parent
-    this.#yAxis = new yAxis(this, this.#parent)
+    this.#parent = {...mediator.api.parent}
     this.init()
   }
 
@@ -89,6 +88,8 @@ export default class ScaleBar {
   start(data) {
     this.emit("started",data)
 
+    this.#yAxis = new yAxis(this, this.mediator.api.Chart)
+
     // prepare layered canvas
     this.createViewport()
     // draw the scale
@@ -99,8 +100,8 @@ export default class ScaleBar {
 
     // start State Machine 
     stateMachineConfig.context.origin = this
-    this.#mediator.stateMachine = stateMachineConfig
-    this.#mediator.stateMachine.start()
+    this.mediator.stateMachine = stateMachineConfig
+    this.mediator.stateMachine.start()
   }
 
   end() {
@@ -119,15 +120,15 @@ export default class ScaleBar {
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.mediator.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.mediator.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.mediator.emit(topic, data)
   }
 
   onResize(dimensions) {
@@ -150,7 +151,7 @@ export default class ScaleBar {
   }
 
   defaultNode() {
-    const api = this.#mediator.api
+    const api = this.mediator.api
     const node = `
       <div class="viewport"></div>
     `

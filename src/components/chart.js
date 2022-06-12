@@ -15,7 +15,6 @@ import indicator from "./overlays/inidcator"
 import OnChart from "./overlays"
 import stateMachineConfig from "../state/state-chart"
 import { InputController, EventDispatcher, Keys } from '@jingwood/input-control'
-import { getRange } from "../helpers/range"
 import { VolumeStyle } from "../definitions/style"
 
 
@@ -58,16 +57,11 @@ export default class Chart {
   #elLegends
   #elScale
 
-  #data
-  #range
-  #rangeLimit
   #Scale
   #Time
   #Legends
   #onChart
 
-  #width
-  #height
   #chartXPadding = 5
   #chartYPadding = 2.5
 
@@ -101,15 +95,12 @@ export default class Chart {
 
     this.#mediator = mediator
     this.#elChart = mediator.api.elements.elChart
-    this.#parent = this.#mediator.api.parent
+    this.#parent = {...this.#mediator.api.parent}
     this.#core = this.#mediator.api.core
-    this.#data = this.#mediator.api.chartData
     this.#onChart = this.#mediator.api.onChart
-    this.#rangeLimit = this.#mediator.api.rangeLimit
-    const end = this.#data.length - 1
-    const start = end - this.#rangeLimit
-    this.#range = getRange(this.#data, start, end)
+
     this.#settings = this.#mediator.api.settings
+    this.#options = options
     this.init(options)
   }
 
@@ -128,10 +119,10 @@ export default class Chart {
   get width() { return this.#elChart.clientWidth }
   set height(h) { this.setHeight(h) }
   get height() { return this.#elChart.clientHeight }
-  set state(s) { this.setState(s) }
-  get state() { return this.getState() }
-  get data() { return this.#data }
-  get range() { return this.#range }
+  set state(s) { this.#core.setState(s) }
+  get state() { return this.#core.getState() }
+  get data() { return this.mediator.api.chartData }
+  get range() { return this.mediator.api.range }
   get onChart() { return this.#onChart }
   set priceDigits(digits) { this.setYAxisDigits(digits) }
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
@@ -193,7 +184,7 @@ export default class Chart {
   start() {
 
     // X Axis - Timeline
-    this.#Time = this.#parent.time
+    this.#Time = this.mediator.api.Timeline
 
     // Y Axis - Price Scale
     this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
@@ -318,8 +309,7 @@ export default class Chart {
       // id: (id) => this.setID(id),
       title: (title) => this.#title = title,
       yAxisDigits: (digits) => this.setYAxisDigits(digits),
-      theme: (theme) => this.setTheme(theme)
-
+      theme: (theme) => this.setTheme(theme),
     }
   }
 
@@ -340,14 +330,6 @@ export default class Chart {
     this.setHeight(dim.h)
   }
 
-  setState(s) {
-
-  }
-
-  getState() {
-    return null
-  }
-
 
   setTheme(theme) {
     this.#theme = theme
@@ -362,8 +344,9 @@ export default class Chart {
 
   defaultNode() {
     const api = this.#mediator.api
-    const width = api.parent.rowsW - api.scaleW
-    const height = api.parent.rowsH - 1
+    const rowsH = api.height - api.utilsW - api.timeH // api.elements.elRows.clientHeight
+    const width = api.width - api.toolsW - api.scaleW
+    const height = this.#options.chartH || rowsH - 1
 
     const styleChart = STYLE_CHART + ` width: ${width}px; height: ${height}px`
     const styleScale = STYLE_SCALE + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`
@@ -394,7 +377,7 @@ export default class Chart {
     // create viewport
     this.#viewport = new CEL.Viewport({
       width: this.#elViewport.clientWidth,
-      height: this.#elViewport.clientHeight,
+      height: this.#options.chartH || this.#parent.rowsH - 1,
       container: this.#elViewport
     });
 
@@ -535,16 +518,7 @@ export default class Chart {
 
   updateRange(pos) {
 
-    // pan horizontal check
-    const dist = Math.floor(pos[0] - pos[2])
-
-    if (Math.abs(dist) < this.#Time.candleW) return
-
-    const offset = Math.floor(dist / this.#Time.candleW)
-    let start = this.range.indexStart - offset,
-        end = this.range.indexEnd - offset;
-
-    this.#range = getRange(this.#data, start, end)
+    this.#core.updateRange(pos)
 
     // draw the chart - grid, candles, volume
     this.draw(this.range)

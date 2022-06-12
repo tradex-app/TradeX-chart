@@ -14,6 +14,8 @@ import { YAxisStyle } from "../../definitions/style";
 export default class yAxis extends Axis {
 
   #parent
+  #chart
+
   #yAxisType = YAXIS_TYPES[0]  // default, log, percent
   #yAxisPadding = 1.04
   #yAxisStep = YAXIS_STEP
@@ -24,12 +26,14 @@ export default class yAxis extends Axis {
 
   constructor(parent, chart, yAxisType=YAXIS_TYPES[0]) {
     super()
-    this.chart = chart
+    this.#chart = chart
     this.#parent = parent 
+    this.yAxisType = yAxisType
   }
 
+  get chart() { return this.#chart }
   get data() { return this.chart.data }
-  get range() { return this.chart.range }
+  get range() { return this.#parent.mediator.api.core.range }
   get height() { return this.chart.height }
   get rangeH() { return this.range.height * this.yAxisPadding }
   get yAxisRatio() { return this.height / this.range.height }
@@ -43,6 +47,11 @@ export default class yAxis extends Axis {
   set yAxisTicks(t) { this.#yAxisTicks = isNumber(t) ? t : 0 }
   get yAxisTicks() { return this.#yAxisTicks }
   get yAxisGrads() { return this.#yAxisGrads }
+
+  calcHeight() {
+    let api = this.#parent.mediator.api
+    return api.height - api.utilsW - api.scaleW
+  }
 
   yAxisRangeBounds() {
 
