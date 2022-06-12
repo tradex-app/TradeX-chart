@@ -51,6 +51,7 @@ export default class Mediator {
   }
 
   get api() { return this.#api }
+  get core() { return this.#core }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
   

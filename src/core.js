@@ -255,7 +255,7 @@ constructor (mediator, options={}) {
       ...{
         id: this.id,
         parent: this.#mediator,
-        core: this.#mediator,
+        core: this,
         inCnt: this.inCnt,
         width: this.width,
         width: this.width,
