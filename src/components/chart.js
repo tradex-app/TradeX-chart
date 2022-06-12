@@ -121,8 +121,8 @@ export default class Chart {
   get height() { return this.#elChart.clientHeight }
   set state(s) { this.#core.setState(s) }
   get state() { return this.#core.getState() }
-  get data() { return this.mediator.api.chartData }
-  get range() { return this.mediator.api.range }
+  get data() { return this.#core.chartData }
+  get range() { return this.#core.range }
   get onChart() { return this.#onChart }
   set priceDigits(digits) { this.setYAxisDigits(digits) }
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }

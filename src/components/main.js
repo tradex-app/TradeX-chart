@@ -93,7 +93,6 @@ export default class MainPane {
     this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
 
 
-    api.core = this.#mediator.api
     api.parent = this
     api.chartData = this.mediator.api.chartData
     api.onChart = this.#mediator.api.onChart
