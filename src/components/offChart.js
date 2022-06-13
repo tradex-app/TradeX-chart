@@ -2,11 +2,12 @@
 // A base class for offChart components to extend upon
 
 import DOM from "../utils/DOM"
+import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import ScaleBar from "./scale"
 import CEL from "../components/primitives/canvas"
 import Legends from "./primitives/legend"
 import chartGrid from "./overlays/chart-grid"
-import chartVolume from "./overlays/chart-volume"
+import chartCursor from "./overlays/chart-cursor"
 import stateMachineConfig from "../state/state-chart"
 import { uid } from "../utils/utilities"
 
@@ -39,6 +40,7 @@ export default class OffChart {
   #shortName = "offChart"
   #mediator
   #options
+  #core
   #parent
   #elOffChart
   #elCanvas
@@ -52,15 +54,38 @@ export default class OffChart {
   #Scale
   #Time
   #Legends
-  #onChart
+  #onRow
   #offChartID
+
+  #viewport
+  #editport
+  #layerGrid
+  #layerCursor
+  #layersOnRow
+
+  #chartGrid
+  #chartVolume
+  #chartIndicators
+  #chartCandles
+  #chartCursor
+
+  #cursorPos = [0, 0]
+
+  #settings
+  #chartCandle
+  #title
+  #theme
+
 
   constructor (mediator, options) {
 
     this.#mediator = mediator
-    this.#options = options
     this.#elOffChart = mediator.api.elements.elOffChart
-    this.#parent = this.#mediator.api.parent
+    this.#parent = {...this.#mediator.api.parent}
+    this.#core = this.#mediator.api.core
+    this.#onRow = options.offChart
+
+    this.#options = options
     this.#ID = this.#options.offChartID || uid("TX_OC_")
     this.init(options)
   }
@@ -77,6 +102,16 @@ export default class OffChart {
   get options() {return this.#options}
 
   init(options) {
+
+    // process options
+    if (isObject(options)) {
+      for (const option in options) {
+        if (option in this.props()) {
+          this.props()[option](options[option])
+        }
+      }
+    }
+    
     this.mount(this.#elOffChart)
 
     // Legends - to display indicator overlay Title, inputs and options
@@ -130,7 +165,7 @@ export default class OffChart {
 
   eventsListen() {
     // listen/subscribe/watch for parent notifications
-    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
+    this.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   on(topic, handler, context) {
@@ -160,6 +195,15 @@ export default class OffChart {
     this.#elScale = DOM.findBySelector(`#${this.#ID} .${CLASS_SCALE}`)
   }
 
+  props() {
+    return {
+      // id: (id) => this.setID(id),
+      title: (title) => this.#title = title,
+      yAxisDigits: (digits) => this.setYAxisDigits(digits),
+      theme: (theme) => this.setTheme(theme),
+    }
+  }
+
   setWidth(w) {
     this.#elOffChart.style.width = w
     this.#elViewport.style.width = w - this.#elScale.clientWidth
@@ -175,6 +219,10 @@ export default class OffChart {
     // this.#viewport.setSize(dim.w - this.#elScale.clientWidth, dim.h)
     this.setWidth(dim.w)
     this.setHeight(dim.h)
+  }
+
+  setTheme(theme) {
+    this.#theme = theme
   }
 
   defaultNode() {
@@ -197,7 +245,65 @@ export default class OffChart {
 // -----------------------
 
   createViewport() {
+    // create viewport
+    this.#viewport = new CEL.Viewport({
+      width: this.#elViewport.clientWidth,
+      height: this.#options.rowH || this.#parent.rowsH - 1,
+      container: this.#elViewport
+    });
 
+    // create layers - grid, volume, candles
+    this.#layerGrid = new CEL.Layer();
+    this.#layersOnRow = this.layersOnRow()
+    this.#layerCursor = new CEL.Layer();
+
+    // add layers
+    this.#viewport
+    .addLayer(this.#layerGrid)
+    .addLayer(this.#layersOnRow)
+    .addLayer(this.#layerCursor)
+
+    // add overlays
+    this.#chartCursor = 
+    new chartCursor(
+      this.#layerCursor, 
+      this,
+      this.#Time, 
+      this.#Scale, 
+      this.#theme)
+
+    // this.#chartGrid =
+    // new chartGrid(
+    //   this.#layersOnRow, 
+    //   this.#Time, 
+    //   this.#Scale, 
+    //   this.#theme)
+
+    this.#chartGrid =
+    new chartGrid(
+      this.#layerGrid, 
+      this.#Time, 
+      this.#Scale, 
+      this.#theme)
+  }
+
+
+
+  layersOnRow() {
+    // let l = []
+
+    // for (let i = 0; i < this.#onRow.length; i++) {
+    //   l[i] = new CEL.Layer()
+    // }
+    // return l
+    return new CEL.Layer()
+  }
+
+  addLayersOnChart() {
+    // for (let i = 0; i < this.#layersOnRow.length; i++) {
+    //   this.#viewport.addLayer(this.#layersOnRow[i])
+    // }
+    this.#viewport.addLayer(this.#layersOnRow)
   }
 
   draw() {
