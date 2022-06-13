@@ -7,6 +7,8 @@
 //   line,
 // }
 
+import { renderLine } from "../../renderer/line"
+
 export default class indicator {
 
   #target
@@ -14,6 +16,8 @@ export default class indicator {
   #config
   #xAxis
   #yAxis
+  #indicator
+  #type
 
   constructor(target, xAxis, yAxis, config) {
 
@@ -22,30 +26,25 @@ export default class indicator {
     this.#config = config
     this.#xAxis = xAxis
     this.#yAxis = yAxis
+    this.#indicator = config.indicator
+    this.#type = config.type
   }
 
-  draw(range) {
-    this.#scene.clear()
+  get target() { return this.#target }
+  get scene() { return this.#scene }
+  get xAxis() { return this.#xAxis }
+  get yAxis() { return this.#yAxis }
 
-    const data = range.data
-    const candle = {
-      x: 2,
-      w: this.#xAxis.width / range.Length,
+
+  draw(plots, type, style) {
+
+    const ctx = this.#scene.context
+    ctx.save();
+
+    switch(type) {
+      case "renderLine": renderLine(ctx, plots, style);
     }
 
-    let c = range.indexStart
-    let i = range.Length
-
-    while(i) {
-      candle.o = this.#yAxis.yPos(data[c][1])
-      candle.h = this.#yAxis.yPos(data[c][2])
-      candle.l = this.#yAxis.yPos(data[c][3])
-      candle.c = this.#yAxis.yPos(data[c][4])
-      candle.raw = data[c]
-      super.draw(candle)
-      c++
-      i--
-      candle.x = candle.x + candle.w
-    }
+    ctx.restore();
   }
 }
