@@ -112,11 +112,12 @@ export default class MainPane {
         }
       }
 
+    // register timeline - xAxis
+    this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
     // register offChart
     this.registerOffCharts(options, api)
-        // register child modules
+    // register chart
     this.#Chart = this.#mediator.register("Chart", Chart, options, api)
-    this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
 
     this.log(`${this.#name} instantiated`)
   }

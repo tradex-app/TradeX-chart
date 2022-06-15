@@ -26,6 +26,9 @@ import {
   CLASS_ONCHART,
   CLASS_OFFCHART,
 } from '../definitions/core'
+import { 
+  YAXIS_TYPES
+} from "../definitions/chart";
 import { YAxisStyle } from "../definitions/style";
 
 export default class ScaleBar {
@@ -36,14 +39,14 @@ export default class ScaleBar {
   #options
   #parent
   #core
+  #chart
   #target
   #yAxis
   #elScale
   #elScaleCanvas
   #elViewport
 
-  #width
-  #height
+  #yAxisType = YAXIS_TYPES[0]  // default, log, percent
 
   #viewport
   #layerLabels
@@ -55,7 +58,8 @@ export default class ScaleBar {
     this.#mediator = mediator
     this.#options = options
     this.#elScale = mediator.api.elements.elScale
-    this.#parent = {...mediator.api.parent}
+    this.#chart = mediator.api.chart
+    this.#parent = mediator.api.parent
     this.init()
   }
 
@@ -75,11 +79,15 @@ export default class ScaleBar {
   get yAxisRatio() { return this.#yAxis.yAxisRatio }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
+  set yAxisType(t) { this.#yAxisType = YAXIS_TYPES.includes(t) ? t : YAXIS_TYPES[0] }
+  get yAxisType() { return this.#yAxisType }
   get yAxisGrads() { return this.#yAxis.yAxisGrads }
   get viewport() { return this.#viewport }
 
   init() {
     this.mount(this.#elScale)
+
+    this.yAxisType = this.options.yAxisType
 
     this.log(`${this.#name} instantiated`)
   }
@@ -88,7 +96,7 @@ export default class ScaleBar {
   start(data) {
     this.emit("started",data)
 
-    this.#yAxis = new yAxis(this, this.mediator.api.Chart)
+    this.#yAxis = new yAxis(this, this, this.yAxisType)
 
     // prepare layered canvas
     this.createViewport()
