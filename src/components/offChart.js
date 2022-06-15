@@ -6,9 +6,9 @@ import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeC
 import ScaleBar from "./scale"
 import CEL from "../components/primitives/canvas"
 import Legends from "./primitives/legend"
-import chartGrid from "./overlays/chart-grid"
-import chartCursor from "./overlays/chart-cursor"
-import stateMachineConfig from "../state/state-chart"
+import overlayGrid from "./overlays/chart-grid"
+import overlayCursor from "./overlays/chart-cursor"
+import stateMachineConfig from "../state/state-offChart"
 import { uid } from "../utils/utilities"
 
 import {
@@ -54,20 +54,19 @@ export default class OffChart {
   #Scale
   #Time
   #Legends
-  #onRow
+  #Indicator
+  #overlay
   #offChartID
 
   #viewport
   #editport
   #layerGrid
   #layerCursor
-  #layersOnRow
+  #layersIndicator
 
-  #chartGrid
-  #chartVolume
-  #chartIndicators
-  #chartCandles
-  #chartCursor
+  #overlayGrid
+  #overlayIndicator
+  #overlayCursor
 
   #cursorPos = [0, 0]
 
@@ -81,25 +80,26 @@ export default class OffChart {
 
     this.#mediator = mediator
     this.#elOffChart = mediator.api.elements.elOffChart
-    this.#parent = {...this.#mediator.api.parent}
-    this.#core = this.#mediator.api.core
-    this.#onRow = options.offChart
+    this.#parent = {...this.mediator.api.parent}
+    this.#core = this.mediator.api.core
+    this.#overlay = options.offChart
 
     this.#options = options
     this.#ID = this.#options.offChartID || uid("TX_OC_")
     this.init(options)
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.mediator.log(l) }
+  info(i) { this.mediator.info(i) }
+  warning(w) { this.mediator.warn(w) }
+  error(e) { this.mediator.error(e) }
 
   get ID() { return this.#offChartID }
   get name() {return this.#name}
   get shortName() {return this.#shortName}
   get mediator() {return this.#mediator}
   get options() {return this.#options}
+  get range() { return this.#core.range }
 
   init(options) {
 
@@ -124,12 +124,14 @@ export default class OffChart {
     this.#Legends.add(offChartLegend)
 
     // api - functions / methods, calculated properties provided by this module
-    const api = this.#mediator.api
+    const api = this.mediator.api
     api.parent = this
-    // api.elements = {}
+    api.elements.elScale = this.#elScale
 
     // Y Axis - Price Scale
-    // this.#Scale = this.#mediator.register("ScaleBar", ScaleBar, options, api)
+    this.#Indicator = this.#mediator.api.indicators[this.#overlay.type]
+    options.yAxisType = this.#Indicator.scale
+    this.#Scale = this.mediator.register("ScaleBar", ScaleBar, options, api)
 
   }
 
@@ -140,7 +142,7 @@ export default class OffChart {
     // X Axis - Timeline
     this.#Time = this.mediator.api.Timeline
 
-    // this.#Scale.start()
+    this.#Scale.start()
 
     // prepare layered canvas
     this.createViewport()
@@ -151,9 +153,9 @@ export default class OffChart {
     this.eventsListen()
 
     // start State Machine 
-    // stateMachineConfig.context.origin = this
-    // this.#mediator.stateMachine = stateMachineConfig
-    // this.#mediator.stateMachine.start()
+    stateMachineConfig.context.origin = this
+    this.mediator.stateMachine = stateMachineConfig
+    this.mediator.stateMachine.start()
   }
 
   end() {
@@ -169,15 +171,15 @@ export default class OffChart {
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.mediator.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.mediator.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.mediator.emit(topic, data)
   }
 
   onResize(dimensions) {
@@ -188,7 +190,7 @@ export default class OffChart {
     el.id = this.#ID
     el.innerHTML = this.defaultNode()
 
-    const api = this.#mediator.api
+    const api = this.mediator.api
     // this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elViewport = DOM.findBySelector(`#${this.#ID} .viewport`)
     this.#elLegends = DOM.findBySelector(`#${this.#ID} .legends`)
@@ -226,7 +228,7 @@ export default class OffChart {
   }
 
   defaultNode() {
-    const api = this.#mediator.api
+    const api = this.mediator.api
     const width = api.width - api.toolsW - api.scaleW
     const height = this.#options.rowH
 
@@ -254,33 +256,34 @@ export default class OffChart {
 
     // create layers - grid, volume, candles
     this.#layerGrid = new CEL.Layer();
-    this.#layersOnRow = this.layersOnRow()
+    this.#layersIndicator = this.layersOnRow()
     this.#layerCursor = new CEL.Layer();
 
     // add layers
     this.#viewport
     .addLayer(this.#layerGrid)
-    .addLayer(this.#layersOnRow)
+    .addLayer(this.#layersIndicator)
     .addLayer(this.#layerCursor)
 
     // add overlays
-    this.#chartCursor = 
-    new chartCursor(
+    this.#overlayCursor = 
+    new overlayCursor(
       this.#layerCursor, 
       this,
       this.#Time, 
       this.#Scale, 
       this.#theme)
 
-    // this.#chartGrid =
-    // new chartGrid(
-    //   this.#layersOnRow, 
-    //   this.#Time, 
-    //   this.#Scale, 
-    //   this.#theme)
+    this.#overlayIndicator =
+    new this.#Indicator(
+      this.#layersIndicator,
+      this.#overlay,
+      this.#Time, 
+      this.#Scale, 
+      this.#theme)
 
-    this.#chartGrid =
-    new chartGrid(
+    this.#overlayGrid =
+    new overlayGrid(
       this.#layerGrid, 
       this.#Time, 
       this.#Scale, 
@@ -292,7 +295,7 @@ export default class OffChart {
   layersOnRow() {
     // let l = []
 
-    // for (let i = 0; i < this.#onRow.length; i++) {
+    // for (let i = 0; i < this.#overlay.length; i++) {
     //   l[i] = new CEL.Layer()
     // }
     // return l
@@ -300,14 +303,26 @@ export default class OffChart {
   }
 
   addLayersOnChart() {
-    // for (let i = 0; i < this.#layersOnRow.length; i++) {
-    //   this.#viewport.addLayer(this.#layersOnRow[i])
+    // for (let i = 0; i < this.#layersIndicator.length; i++) {
+    //   this.#viewport.addLayer(this.#layersIndicator[i])
     // }
-    this.#viewport.addLayer(this.#layersOnRow)
+    this.#viewport.addLayer(this.#layersIndicator)
   }
 
-  draw() {
+  draw(range) {
+    this.#overlayGrid.draw()
+    this.#overlayIndicator.draw(range)
 
+    this.#viewport.render();
+  }
+
+  updateRange(pos) {
+
+    // only updateRange when drag / pan event is generated by this component
+    // this.#core.updateRange(pos)
+
+    // draw the chart - grid, candles, volume
+    this.draw(this.range)
   }
 
 }

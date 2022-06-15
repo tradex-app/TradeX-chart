@@ -11,7 +11,7 @@ export function renderPath (ctx, coordinates, style, strokeFill) {
   if (ctx.lineWidth % 2) {
     ctx.translate(0.5, 0.5)
   }
-  ctx.strokeStyle = style.strokeFill
+  ctx.strokeStyle = style.strokeStyle
   ctx.beginPath()
   let move = true
   coordinates.forEach(coordinate => {

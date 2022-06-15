@@ -34,9 +34,11 @@ export default class indicator {
   get scene() { return this.#scene }
   get xAxis() { return this.#xAxis }
   get yAxis() { return this.#yAxis }
+  get type() { return this.#type }
+  get indicator() { return this.#indicator }
 
 
-  draw(plots, type, style) {
+  plot(plots, type, style) {
 
     const ctx = this.#scene.context
     ctx.save();

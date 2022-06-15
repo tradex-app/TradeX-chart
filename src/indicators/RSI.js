@@ -4,12 +4,15 @@
  * RSI = SUM(MAX(CLOSE - REF(CLOSE,1),0),N) / SUM(ABS(CLOSE - REF(CLOSE,1)),N) × 100
  */
 import indicator from "../components/overlays/inidcator"
+import { 
+  YAXIS_TYPES
+} from "../definitions/chart";
 
 export default class RSI extends indicator {
   name = 'Relative Strength Index'
   shortName = 'RSI'
   calcParams = [6, 12, 24]
-  shouldCheckParamCount = false
+  checkParamCount = false
   plots = [
     { key: 'rsi1', title: 'RSI1: ', type: 'line' },
     { key: 'rsi2', title: 'RSI2: ', type: 'line' },
@@ -19,11 +22,16 @@ export default class RSI extends indicator {
     strokeStyle: "#C80",
     lineWidth: '1'
   }
-  style 
+  style = {}
+  overly
+  // YAXIS_TYPES - percent
+  static scale = YAXIS_TYPES[1]
 
-  constructor(target, xAxis, yAxis, config) {
+
+  constructor(target, overlay, xAxis, yAxis, config) {
     super(target, xAxis, yAxis, config)
 
+    this.overlay = overlay
     this.style = config.style || this.defaultStyle
   }
 
@@ -67,29 +75,36 @@ export default class RSI extends indicator {
     })
   }
 
-  plot(range) {
+  draw(range) {
     this.scene.clear()
 
-    const data = range.data
-    plots = []
+
+    const data = this.overlay.data
+    const plots = []
     const plot = {
       x: 2,
       w: this.xAxis.width / range.Length,
     }
 
-    let c = range.indexStart
+    // account for "missing" entries because of indicator calculation
+    let o = range.dataLength - this.overlay.data.length
+    let c = range.indexStart - o
     let i = range.Length
 
     while(i) {
-      plot.y = this.yAxis.yPos100(data[c][1])
-      plots[i - 1] = plot
-
+      if (!c) {
+        plots[range.Length - i] = {x: null, y: null}
+      }
+      else {
+        plot.y = this.yAxis.yPos(data[c][1])
+        plots[range.Length - i] = {...plot}
+      }
       c++
       i--
       plot.x = plot.x + plot.w
     }
 
-    this.draw(plots, "renderLine", this.style)
+    this.plot(plots, "renderLine", this.style)
 
     this.target.viewport.render();
   }

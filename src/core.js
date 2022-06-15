@@ -10,6 +10,7 @@ import WidgetsG from './components/widgets'
 
 import State from './state'
 import { getRange } from "./helpers/range"
+import Indicators from './definitions/indicators'
 
 
 import {
@@ -70,6 +71,7 @@ export default class TradeXchart {
   #data
   #range
   #rangeLimit = RANGELIMIT
+  #indicators = Indicators
 
 
   #chartW = 500
@@ -93,7 +95,10 @@ export default class TradeXchart {
 
   #UtilsBar
   #ToolsBar
-  #MainPane
+  #MainPane = {
+    chart: {},
+    time: {}
+  }
   #WidgetsG
 
   panes = {
@@ -181,6 +186,7 @@ constructor (mediator, options={}) {
   get range() { return this.#range }
 
   get settings() { return this.#state.data.chart.settings }
+  get indicators() { return this.#indicators }
 
   getTimeline() {}
 
@@ -247,7 +253,13 @@ constructor (mediator, options={}) {
 
     const end = this.chartData.length - 1
     const start = end - this.#rangeLimit
-    this.#range = getRange(this.chartData, start, end)
+    const allData = {
+      data: this.chartData,
+      onChart: this.onChart,
+      offChart: this.offChart,
+      datasets: this.datasets
+    }
+    this.#range = getRange(allData, start, end)
 
     // api - functions / methods, calculated properties provided by this module
     const api = {
@@ -276,6 +288,7 @@ constructor (mediator, options={}) {
         ToolsBar: this.ToolsBar,
         MainPane: this.MainPane,
         WidgetsG: this.WidgetsG,
+        Chart: this.Chart,
 
         chartData: this.chartData,
         offChart: this.offChart,
@@ -284,6 +297,7 @@ constructor (mediator, options={}) {
         rangeLimit: this.rangeLimit,
         range: this.#range,
         updateRange: (pos) => this.updateRange(pos),
+        indicators: this.indicators,
 
         settings: this.settings,
       }
@@ -372,6 +386,7 @@ constructor (mediator, options={}) {
       warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
       rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
+      indicators: (indicators) => this.#indicators = {...Indicators, ...indicators }
     }
   }
 
@@ -481,6 +496,12 @@ constructor (mediator, options={}) {
     let start = this.range.indexStart - offset,
         end = this.range.indexEnd - offset;
 
-    this.#range = getRange(this.chartData, start, end)
+    const allData = {
+      data: this.chartData,
+      onChart: this.onChart,
+      offChart: this.offChart,
+      datasets: this.datasets
+    }
+    this.#range = getRange(allData, start, end)
   }
 }

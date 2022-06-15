@@ -84,7 +84,8 @@ export default class yAxis extends Axis {
    */
   yPos(yData) {
     switch(this.yAxisType) {
-      case "percentage" :
+      case "percent" :
+        return this.p100toPixel(yData)
         break;
       case "log" :
         return this.$2Pixel(log10(yData))
@@ -116,12 +117,27 @@ export default class yAxis extends Axis {
     return this.range.priceMin + adjust
   }
 
+  p100toPixel(yData) {
+    return this.height * yData / 100
+  }
+
   calcGradations() {
 
+    switch (this.yAxisType) {
+      case "percent":
+        return this.percentGradations()
+        break;
+      default:
+        return this.defaultGradations()
+        break;
+    }
+  }
+
+  defaultGradations() {
     const grad = Math.floor(this.height / this.#yAxisStep)
 
     const rangeMid = (this.range.priceMax + this.range.priceMin) * 0.5
-      let digits = this.countDigits(rangeMid)
+    let digits = this.countDigits(rangeMid)
     const scaleMid = this.niceValue(digits)
     const step = (this.range.priceMax - scaleMid) / grad
 
@@ -142,6 +158,34 @@ export default class yAxis extends Axis {
       digits = this.countDigits(lower)
       nice = this.niceValue(digits)
       entry = [nice, this.$2Pixel(nice), digits]
+      scaleGrads.push(entry)
+      lower -= step
+    }
+    return scaleGrads
+  }
+
+  percentGradations() {
+    let digits = this.countDigits(50)
+    const scaleMid = 50
+    const step = 10
+
+    const scaleGrads = [[50, this.p100toPixel(50), digits]]
+
+    let upper = scaleMid + step,
+        nice, 
+        entry;
+    while (upper <= 100) {
+      digits = this.countDigits(upper)
+      nice = this.niceValue(digits)
+      entry = [upper, this.p100toPixel(upper), digits]
+      scaleGrads.unshift(entry)
+      upper += step
+    }
+    let lower = scaleMid - step
+    while (lower >= 0) {
+      digits = this.countDigits(lower)
+      nice = this.niceValue(digits)
+      entry = [lower, this.p100toPixel(nice), digits]
       scaleGrads.push(entry)
       lower -= step
     }

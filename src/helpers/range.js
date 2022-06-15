@@ -2,24 +2,23 @@
 
 import { ms2Interval } from "../utils/time"
 
-export function getRange( data, start=0, end=data.length-1 ) {
-  let r = {}
+export function getRange( allData, start=0, end=allData.chart.length-1 ) {
+  let r = allData
   // check and correct start and end argument order
   if (start > end) [start, end] = [end, start]
-  r.data = data
-  r.dataLength = (end > (data.length - 1)) ? data.length - 1 : end
+  r.dataLength = (end > (r.datalength - 1)) ? r.datalength - 1 : end
   r.indexStart = (start < 0) ? 0 : start
-  r.indexEnd = (end > (data.length - 1)) ? data.length - 1 : end
+  r.indexEnd = (end > (r.datalength - 1)) ? r.datalength - 1 : end
   r.Length = r.indexEnd - r.indexStart
-  r.timeStart = data[0][0]
-  r.timeFinish = data[r.dataLength - 1][0]
+  r.timeStart = r.data[0][0]
+  r.timeFinish = r.data[r.dataLength - 1][0]
   r.timeDuration = r.timeFinish - r.timeStart
-  r.timeMin = data[r.indexStart][0]
-  r.timeMax = data[r.indexEnd][0]
+  r.timeMin = r.data[r.indexStart][0]
+  r.timeMax = r.data[r.indexEnd][0]
   r.rangeDuration = r.timeMax - r.timeMin
-  r.interval = data[r.indexStart+1][0] - data[r.indexStart][0]
+  r.interval = r.data[r.indexStart+1][0] - r.data[r.indexStart][0]
   r.intervalStr = ms2Interval(r.interval)
-  r = {...r, ...maxMinPriceVol(data, start, end)}
+  r = {...r, ...maxMinPriceVol(r.data, start, end)}
   r.height = r.priceMax - r.priceMin
   r.volumeHeight = r.volumeMax - r.volumeMin
   r.scale = (r.Length) / (r.dataLength - 1)
