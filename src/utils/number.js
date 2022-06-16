@@ -180,10 +180,15 @@ export function float2Int(value) {
  * @param precision
  * @return {number}
  */
-export function round (value, precision) {
-  if (precision == null) {
-    precision = 10
-  }
+ export function round (n, p) {
+	p = p || 100
+  const d = Math.pow(10, p);
+  return Math.round((n + Number.EPSILON) * d) / d;
+}
+
+// 3.5 times slower than round()
+export function roundT (value, precision) {
+  precision = precision || 10
   precision = Math.min(Math.max(0, precision), 20)
   value = (+value).toFixed(precision)
   return +value
@@ -263,5 +268,7 @@ export function index10 (value) {
   return Math.pow(10, value)
 }
 
-
+export function power (base, exponent) {
+  return Math.pow(base, exponent)
+}
 
