@@ -175,7 +175,7 @@ export function float2Int(value) {
 
 
 /**
- * round to precision
+ * round to precision - fastest
  * @param value
  * @param precision
  * @return {number}
