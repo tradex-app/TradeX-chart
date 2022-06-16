@@ -1,7 +1,7 @@
 // yAxis.js
 
 import Axis from "./axis";
-import { log10, precision, round } from "../../utils/number";
+import { log10, power, precision, round } from "../../utils/number";
 import { isNumber } from "../../utils/typeChecks";
 
 import { 
@@ -125,86 +125,67 @@ export default class yAxis extends Axis {
 
     switch (this.yAxisType) {
       case "percent":
-        return this.percentGradations()
+        return this.gradations(100, 0, false)
         break;
       default:
-        return this.defaultGradations()
+        return this.gradations(this.range.priceMax, this.range.priceMin)
         break;
     }
   }
 
-  defaultGradations() {
-    const grad = Math.floor(this.height / this.#yAxisStep)
-
-    const rangeMid = (this.range.priceMax + this.range.priceMin) * 0.5
+  gradations(max, min, decimals=true) {
+    const rangeMid = (max + min) * 0.5
+    const midH = this.height * 0.5
     let digits = this.countDigits(rangeMid)
-    const scaleMid = this.niceValue(digits)
-    const step = (this.range.priceMax - scaleMid) / grad
+    const scaleMid = this.niceValue(digits, decimals)
 
-    const scaleGrads = [[scaleMid, this.$2Pixel(scaleMid), digits]]
+    const scaleGrads = [[scaleMid, round(midH), digits]]
 
-    let upper = scaleMid + step,
+    let grad = round(power(log10(midH), 2) - 1),
+        step$ = (max - scaleMid) / grad,
+        stepP = midH / grad,
+        upper = scaleMid + step$,
+        pos = midH - stepP,
         nice, 
         entry;
-    while (upper <= this.range.priceMax) {
+    while (upper <= max) {
       digits = this.countDigits(upper)
-      nice = this.niceValue(digits)
-      entry = [nice, this.$2Pixel(nice), digits]
+      nice = this.niceValue(digits, decimals)
+      entry = [nice, round(pos), digits]
       scaleGrads.unshift(entry)
-      upper += step
+      upper += step$
+      pos -= stepP
     }
-    let lower = scaleMid - step
-    while (lower >= this.range.priceMin) {
+    let lower = scaleMid - step$
+        pos = midH + stepP
+    while (lower >= min) {
       digits = this.countDigits(lower)
-      nice = this.niceValue(digits)
-      entry = [nice, this.$2Pixel(nice), digits]
+      nice = this.niceValue(digits, decimals)
+      entry = [nice, round(pos), digits]
       scaleGrads.push(entry)
-      lower -= step
+      lower -= step$
+      pos += stepP
     }
     return scaleGrads
   }
 
-  percentGradations() {
-    let digits = this.countDigits(50)
-    const scaleMid = 50
-    const step = 10
-
-    const scaleGrads = [[50, this.p100toPixel(50), digits]]
-
-    let upper = scaleMid + step,
-        nice, 
-        entry;
-    while (upper <= 100) {
-      digits = this.countDigits(upper)
-      nice = this.niceValue(digits)
-      entry = [upper, this.p100toPixel(upper), digits]
-      scaleGrads.unshift(entry)
-      upper += step
-    }
-    let lower = scaleMid - step
-    while (lower >= 0) {
-      digits = this.countDigits(lower)
-      nice = this.niceValue(digits)
-      entry = [lower, this.p100toPixel(nice), digits]
-      scaleGrads.push(entry)
-      lower -= step
-    }
-    return scaleGrads
-  }
-
-  niceValue(digits) {
+  niceValue(digits, decimals=true) {
     if (digits.integers) {
       let x = digits.integers - this.#yAxisRound
       if (x > 0) {
-        let factor = Math.pow(10, x)
+        let factor = power(10, x)
         return Math.floor(digits.value / factor) * factor
       }
       else {
-
+        if (!decimals) return Math.floor(digits.value)
+        x = (x -1) * -1
+        return round(digits.value, x)
       }
     }
     else {
-
+      let y = digits.decimals - this.#yAxisRound
+      y = (y -1) * -1
+      return round(digits.value, y)
     }
   }
 
