@@ -73,7 +73,7 @@ export default class StateMachine {
     }
 
     for (let event of events) {
-      this.#mediator.on(event, (data) => {this.notify(event, data)})
+      this.#mediator.on(event, (data) => {this.notify(event, data)}, this.context)
     }
   }
 

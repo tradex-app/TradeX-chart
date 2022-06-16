@@ -60,7 +60,7 @@ export default class Timeline {
   get xAxisGrads() { return this.#xAxis.xAxisGrads }
   get candleW() { return this.#xAxis.candleW }
   get viewport() { return this.#viewport }
-  get range() { return this.mediator.api.range }
+  get range() { return this.mediator.api.core.range }
 
   init() {
     this.mount(this.#elTime)

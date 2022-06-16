@@ -46,7 +46,7 @@ const config = {
         chart_pan: {
           target: 'chart_pan',
           action: (stateMachine, data) => {
-            console.log('transition action for "chart_pan" in Scale "idle" state')
+            console.log('Scale: from "idle" to "chart_pan" state')
           },
         },
       }
