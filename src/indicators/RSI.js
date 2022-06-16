@@ -87,7 +87,7 @@ export default class RSI extends indicator {
     }
 
     // account for "missing" entries because of indicator calculation
-    let o = range.dataLength - this.overlay.data.length
+    let o = range.data.length - this.overlay.data.length
     let c = range.indexStart - o
     let i = range.Length
 
@@ -96,7 +96,7 @@ export default class RSI extends indicator {
         plots[range.Length - i] = {x: null, y: null}
       }
       else {
-        plot.y = this.yAxis.yPos(data[c][1])
+        plot.y = this.yAxis.yPos(100 - data[c][1])
         plots[range.Length - i] = {...plot}
       }
       c++

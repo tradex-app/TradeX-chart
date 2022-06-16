@@ -6,9 +6,9 @@ export function getRange( allData, start=0, end=allData.chart.length-1 ) {
   let r = allData
   // check and correct start and end argument order
   if (start > end) [start, end] = [end, start]
-  r.dataLength = (end > (r.datalength - 1)) ? r.datalength - 1 : end
+  r.dataLength = (end > (r.data.length - 1)) ? r.data.length - 1 : end
   r.indexStart = (start < 0) ? 0 : start
-  r.indexEnd = (end > (r.datalength - 1)) ? r.datalength - 1 : end
+  r.indexEnd = (end > (r.data.length - 1)) ? r.data.length - 1 : end
   r.Length = r.indexEnd - r.indexStart
   r.timeStart = r.data[0][0]
   r.timeFinish = r.data[r.dataLength - 1][0]
