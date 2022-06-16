@@ -29,11 +29,10 @@ export default class Legends {
 
   buildLegend(o) {
     const styleLegend = "margin: .5em 0 1em 1em; font-size: 12px;"
-      let styleLegendTitle = "margin-right: 1em;"
+      let styleLegendTitle = "margin-right: 1em; white-space: nowrap;"
     const styleInputs = "display: inline; margin-left: -1em;"
 
-    if (o?.type === "chart") styleLegendTitle +=
-      "font-size: 1.5em;"
+    styleLegendTitle += (o?.type === "chart")? "font-size: 1.5em;" : "font-size: 1.2em;"
 
     const node = `
       <div id="${o.id}" class="legend" style="${styleLegend}">
