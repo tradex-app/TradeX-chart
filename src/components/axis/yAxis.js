@@ -33,7 +33,7 @@ export default class yAxis extends Axis {
 
   get chart() { return this.#chart }
   get data() { return this.chart.data }
-  get range() { return this.#parent.mediator.api.core.range }
+  get range() { return this.#chart.mediator.api.core.range }
   get height() { return this.chart.height }
   get rangeH() { return this.range.height * this.yAxisPadding }
   get yAxisRatio() { return this.height / this.range.height }
