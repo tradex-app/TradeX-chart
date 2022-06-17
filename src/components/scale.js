@@ -58,7 +58,7 @@ export default class ScaleBar {
     this.#mediator = mediator
     this.#options = options
     this.#elScale = mediator.api.elements.elScale
-    this.#chart = mediator.api.chart
+    this.#chart = mediator.api.core.Chart
     this.#parent = mediator.api.parent
     this.init()
   }
