@@ -31,9 +31,9 @@ export default class yAxis extends Axis {
     this.yAxisType = yAxisType
   }
 
-  get chart() { return this.#chart }
+  get chart() { return this.#chart } //this.#parent.mediator.api.core.Chart }
   get data() { return this.chart.data }
-  get range() { return this.#chart.mediator.api.core.range }
+  get range() { return this.#parent.mediator.api.core.range }
   get height() { return this.chart.height }
   get rangeH() { return this.range.height * this.yAxisPadding }
   get yAxisRatio() { return this.height / this.range.height }
@@ -49,7 +49,7 @@ export default class yAxis extends Axis {
   get yAxisGrads() { return this.#yAxisGrads }
 
   calcHeight() {
-    let api = this.#parent.mediator.api
+    let api = this.#chart.mediator.api
     return api.height - api.utilsW - api.scaleW
   }
 
@@ -128,6 +128,7 @@ export default class yAxis extends Axis {
         return this.gradations(100, 0, false)
         break;
       default:
+        console.log("yAxis:", this.range.priceMax, this.range.priceMin)
         return this.gradations(this.range.priceMax, this.range.priceMin)
         break;
     }
