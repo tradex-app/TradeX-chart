@@ -95,10 +95,11 @@ export default class OffChart {
   error(e) { this.mediator.error(e) }
 
   get ID() { return this.#offChartID }
-  get name() {return this.#name}
-  get shortName() {return this.#shortName}
-  get mediator() {return this.#mediator}
-  get options() {return this.#options}
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get mediator() { return this.#mediator }
+  get options() { return this.#options }
+  get core() { return this.#core }
   get range() { return this.#core.range }
 
   init(options) {
@@ -132,6 +133,8 @@ export default class OffChart {
     this.#Indicator = this.#mediator.api.indicators[this.#overlay.type]
     options.yAxisType = this.#Indicator.scale
     this.#Scale = this.mediator.register("ScaleBar", ScaleBar, options, api)
+
+    this.#Time = this.core.Timeline
 
   }
 
@@ -168,6 +171,7 @@ export default class OffChart {
   eventsListen() {
     // listen/subscribe/watch for parent notifications
     this.on("resize", (dimensions) => this.onResize(dimensions))
+    this.on("chart_mousemove", (pos) => this.updateLegends(pos))
   }
 
   on(topic, handler, context) {
@@ -314,6 +318,25 @@ export default class OffChart {
     this.#overlayIndicator.draw(range)
 
     this.#viewport.render();
+  }
+
+  updateLegends(pos=this.#cursorPos[0]) {
+    const legends = this.#Legends.list
+    const index = this.#Time.xPos2Index(pos[0])
+    const offset = this.range.data.length - this.#overlayIndicator.overlay.data.length
+    const entry = this.#overlayIndicator.overlay.data[index - offset]
+    const inputs = {}
+
+    for (let i = 0; i < this.#overlayIndicator.plots.length; i++) {
+      let plot = this.#overlayIndicator.plots[i]
+      // first entry value is expected to be timestamp, so skip it
+      inputs[plot.key] = this.#Scale.nicePrice(entry[i + 1])
+    }
+
+    for (const legend in legends) {
+      this.#Legends.update(legend, {inputs: inputs})
+    }
+
   }
 
   updateRange(pos) {

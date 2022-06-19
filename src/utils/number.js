@@ -202,7 +202,7 @@ export function roundT (value, precision) {
  * @return {number}  
  */
 export function precision(value) {
-  if (typeof value !== "number") a = parseFloat(value); 
+  if (typeof value !== "number") value = parseFloat(value); 
   if (isNaN(value)) return 0;
   if (!isFinite(value)) return 0;
   var e = 1, p = 0;

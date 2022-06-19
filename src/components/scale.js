@@ -201,6 +201,7 @@ export default class ScaleBar {
   }
 
   draw() {
+    console.log("Scale.draw()")
     this.#yAxis.draw()
     this.#viewport.render()
   }
