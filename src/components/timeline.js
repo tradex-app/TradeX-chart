@@ -148,6 +148,8 @@ export default class Timeline {
 
   xPos2Time(x) { return this.#xAxis.xPos2Time(x) }
 
+  xPos2Index(x) { return this.#xAxis.xPos2Index(x) }
+
   xPosOHLCV(x) { return this.#xAxis.xPosOHLCV(x) }
 
   createViewport() {

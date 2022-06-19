@@ -208,7 +208,10 @@ export default class yAxis extends Axis {
   }
 
   draw() {
+    console.log("yAxis.draw()")
+    // calculate Y Axis gradations for labels and overlays
     this.#yAxisGrads = this.calcGradations()
+    
     this.drawLabels()
     this.drawOverlays()
   }

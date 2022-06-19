@@ -503,9 +503,9 @@ export default class Chart {
     this.#volumePrecision = volumePrecision
   }
 
-  updateLegends() {
+  updateLegends(pos=this.#cursorPos[0]) {
     const legends = this.#Legends.list
-    const ohlcv = this.#Time.xPosOHLCV(this.#cursorPos[0])
+    const ohlcv = this.#Time.xPosOHLCV(pos)
     const inputs = {}
           inputs.O = this.#Scale.nicePrice(ohlcv[1])
           inputs.H = this.#Scale.nicePrice(ohlcv[2])

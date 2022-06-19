@@ -11,12 +11,10 @@ import {
 export default class RSI extends indicator {
   name = 'Relative Strength Index'
   shortName = 'RSI'
-  calcParams = [6, 12, 24]
+  calcParams = [20]
   checkParamCount = false
   plots = [
-    { key: 'rsi1', title: 'RSI1: ', type: 'line' },
-    { key: 'rsi2', title: 'RSI2: ', type: 'line' },
-    { key: 'rsi3', title: 'RSI3: ', type: 'line' }
+    { key: 'rsi1', title: ' ', type: 'line' },
   ]
   defaultStyle = {
     strokeStyle: "#C80",
