@@ -14,7 +14,7 @@ export default class RSI extends indicator {
   calcParams = [20]
   checkParamCount = false
   plots = [
-    { key: 'rsi1', title: ' ', type: 'line' },
+    { key: 'RSI_1', title: ' ', type: 'line' },
   ]
   defaultStyle = {
     strokeStyle: "#C80",

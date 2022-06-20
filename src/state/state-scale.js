@@ -1,6 +1,7 @@
 // state-chart.js
 
-const config = {
+export default 
+{
   id: "scale",
   initial: "idle",
   context: {},
@@ -94,4 +95,3 @@ const config = {
   }
 }
 
-export default config

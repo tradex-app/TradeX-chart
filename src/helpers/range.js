@@ -36,9 +36,6 @@ export function getRange( allData, start=0, end=allData.chart.length-1 ) {
  */
 export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
 
-  console.log(`start: ${start} end: ${end}`)
-
-
   let i = start,
       l = end;
   let priceMin  = data[i][3]

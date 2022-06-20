@@ -7,6 +7,7 @@ import CEL from "./primitives/canvas"
 import { drawTextBG } from "../utils/canvas"
 import stateMachineConfig from "../state/state-scale"
 import { InputController, EventDispatcher } from '@jingwood/input-control'
+import { copyDeep } from '../utils/utilities'
 
 import {
   NAME,
@@ -107,8 +108,9 @@ export default class ScaleBar {
     this.eventsListen()
 
     // start State Machine 
-    stateMachineConfig.context.origin = this
-    this.mediator.stateMachine = stateMachineConfig
+    const newConfig = copyDeep(stateMachineConfig)
+    newConfig.context.origin = this
+    this.mediator.stateMachine = newConfig
     this.mediator.stateMachine.start()
   }
 
@@ -201,7 +203,6 @@ export default class ScaleBar {
   }
 
   draw() {
-    console.log("Scale.draw()")
     this.#yAxis.draw()
     this.#viewport.render()
   }
