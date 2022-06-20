@@ -125,11 +125,10 @@ export default class yAxis extends Axis {
 
     switch (this.yAxisType) {
       case "percent":
-        return this.gradations(100, 0, false)
+        this.#yAxisGrads = this.gradations(100, 0, false)
         break;
       default:
-        console.log("yAxis:", this.range.priceMax, this.range.priceMin)
-        return this.gradations(this.range.priceMax, this.range.priceMin)
+        this.#yAxisGrads = this.gradations(this.range.priceMax, this.range.priceMin)
         break;
     }
   }
@@ -208,10 +207,8 @@ export default class yAxis extends Axis {
   }
 
   draw() {
-    console.log("yAxis.draw()")
     // calculate Y Axis gradations for labels and overlays
-    this.#yAxisGrads = this.calcGradations()
-    
+    this.calcGradations()
     this.drawLabels()
     this.drawOverlays()
   }

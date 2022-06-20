@@ -152,7 +152,7 @@ export default class Chart {
     this.#Legends.add(chartLegend)
 
     // api - functions / methods, calculated properties provided by this module
-    const api = this.#mediator.api
+    const api = {...this.#mediator.api}
     api.parent = this
     api.chart = this
     api.elements = 
@@ -168,8 +168,10 @@ export default class Chart {
 
     // Y Axis - Price Scale
     options.yAxisType = "default"
-    this.#Scale = this.#mediator.register("ScaleBar", ScaleBar, options, api)
+    this.#Scale = this.#mediator.register("Chart_ScaleBar", ScaleBar, options, api)
 
+
+    window.tradex_chart_scale = this.#Scale
     // onChart indicators
     // this.#onChart = this.#mediator.register("OnChart", OnChart, options, api)
 

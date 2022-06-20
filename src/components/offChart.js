@@ -125,14 +125,18 @@ export default class OffChart {
     this.#Legends.add(offChartLegend)
 
     // api - functions / methods, calculated properties provided by this module
-    const api = this.mediator.api
+    const api = {...this.mediator.api}
     api.parent = this
     api.elements.elScale = this.#elScale
 
     // Y Axis - Price Scale
     this.#Indicator = this.#mediator.api.indicators[this.#overlay.type]
     options.yAxisType = this.#Indicator.scale
-    this.#Scale = this.mediator.register("ScaleBar", ScaleBar, options, api)
+    const id = options.offChart.type + "_ScaleBar"
+    this.#Scale = this.mediator.register(id, ScaleBar, options, api)
+
+    window.tradex_offChart_scale = this.#Scale
+
 
     this.#Time = this.core.Timeline
 
@@ -145,7 +149,9 @@ export default class OffChart {
     // X Axis - Timeline
     this.#Time = this.mediator.api.Timeline
 
-    this.#Scale.start()
+    // Y Axis - Price Scale
+    this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
+    this.#Scale.start("OffChart",this.name,"yAxis Scale started")
 
     // prepare layered canvas
     this.createViewport()
