@@ -81,7 +81,7 @@ export default class Mediator {
     return instance
   }
 
-  /* ## Subscribe to a topic
+  /** Subscribe to a topic
   *
   * @param {String} topic      - The topic name
   * @param {Function} callback - The function that is called if another module
@@ -93,12 +93,10 @@ export default class Mediator {
     this.#hub[topic].push({handler, context});
   }
 
-  /* ## Unsubscribe from a topic
-  *
-  * Parameters:
+  /** Unsubscribe from a topic
   *
   * @param {String} topic - The topic name
-  * @param {Function} cb  - The function that iss called if an other module
+  * @param {Function} cb  - The function that is called if an other module
   *                         publishes to the specified topic
   */
   off(topic, handler) {
@@ -107,9 +105,8 @@ export default class Mediator {
     if (this.#hub[topic].length === 0) delete this.#hub[topic];
   }
 
-  /* ## Publish an topic
+  /** Publish an topic
   *
-  * Parameters:
   * @param {String} topic - The topic name
   * @param {Object}  data - The data to publish
   */
@@ -119,9 +116,8 @@ export default class Mediator {
     // (this.#hub[topic] || []).forEach(cb => cb.handler(data));
   }
 
-  /* ## Execute a task
+  /** Execute a task
   *
-  * Parameters:
   * @param {String} channel - The topic name
   * @param {Object} data    - The data that gets published
   * @param {Function} cb    - callback method
