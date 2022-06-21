@@ -43,14 +43,10 @@ export default class OffChart {
   #core
   #parent
   #elOffChart
-  #elCanvas
   #elViewport
   #elLegends
   #elScale
 
-  #data
-  #range
-  #rangeLimit
   #Scale
   #Time
   #Legends
@@ -101,6 +97,7 @@ export default class OffChart {
   get options() { return this.#options }
   get core() { return this.#core }
   get range() { return this.#core.range }
+  get pos() { return this.getPos() }
 
   init(options) {
 
@@ -231,6 +228,10 @@ export default class OffChart {
     // this.#viewport.setSize(dim.w - this.#elScale.clientWidth, dim.h)
     this.setWidth(dim.w)
     this.setHeight(dim.h)
+  }
+
+  getPos() {
+    return DOM.elementDimPos(this.#elOffChart)
   }
 
   setTheme(theme) {

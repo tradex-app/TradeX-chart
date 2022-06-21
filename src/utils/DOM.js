@@ -49,6 +49,38 @@ const DOM = {
     return !!o && !!( o.offsetWidth || o.offsetHeight || o.getClientRects().length )
   },
 
+
+  elementDimPos(el) {
+    if (!this.isElement(el)) return false
+
+    let _x = 0;
+    let _y = 0;
+    while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
+        _x += el.offsetLeft - el.scrollLeft;
+        _y += el.offsetTop - el.scrollTop;
+        el = el.offsetParent;
+    }
+    const dim = el.getBoundingClientRect()
+    let _w = dim.right - dim.left
+    let _h = dim.bottom - dim.top
+    return { top: _y, left: _x, width: _w, height: _h };
+  },
+
+  elementsDistance(el1, el2) {
+    el1Location = this.elementDimPos(el1)
+    el2Location = this.elementDimPos(el2)
+
+    // fail if either are not elements
+    if (!el1Location || !el2Location) return false
+
+    return {
+      x: el1Location.top - el2Location.top,
+      y: el1Location.left . el2Location.left,
+      el1Location: el1Location,
+      el2Location: el2Location,
+    }
+  },
+
   /**
  * @param {String} HTML representing a single element
  * @return {Element}

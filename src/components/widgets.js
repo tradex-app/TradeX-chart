@@ -4,8 +4,9 @@
 import DOM from "../utils/DOM"
 import { CLASS_MENU, CLASS_WINDOW } from "../definitions/core"
 import { MenuStyle, WindowStyle } from "../definitions/style"
-import menu from "./widgets/menu"
-import dialogue from "./widgets/dialogue"
+import Menu from "./widgets/menu"
+import Dialogue from "./widgets/dialogue"
+import Divider from "./widgets/divider"
 
 // import stateMachineConfig from "../state/state-widgets"
 
@@ -168,10 +169,18 @@ export default class Widgets {
 
     let pos = [iPos.left - wPos.left, iPos.bottom - wPos.top]
     let config = { pos, content }
-    return menu(this, config)
+    return Menu(this, config)
   }
 
   removeMenu() {
+
+  }
+
+  insertDivider(offChart) {
+
+  }
+
+  removeDivider() {
 
   }
 
