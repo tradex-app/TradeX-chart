@@ -89,6 +89,7 @@ export default class Chart {
   #chartCandle
   #title
   #theme
+  #controller
 
 
   constructor (mediator, options) {
@@ -209,23 +210,30 @@ export default class Chart {
   }
 
   end() {
-    
+    this.#controller.removeEventListener("mousemove", this.onMouseMove);
+    this.#controller.removeEventListener("drag", this.onChartDrag);
+    this.#controller.removeEventListener("enddrag", this.onChartDragDone);
+    this.#controller.removeEventListener("keydown", this.onChartKeyDown)
+    this.#controller.removeEventListener("keyup", this.onChartKeyDown)
+
+    // this.off("resizeChart", this.onResize)
+
   }
 
 
   eventsListen() {
     let canvas = this.#viewport.scene.canvas
     // create controller and use 'on' method to receive input events 
-    const controller = new InputController(canvas);
+    this.#controller = new InputController(canvas);
     // move event
-    controller.on("mousemove", e => { this.onMouseMove(e) });
+    this.#controller.on("mousemove", this.onMouseMove.bind(this));
     // drag event
-    controller.on("drag", e => { this.onChartDrag(e) });
+    this.#controller.on("drag", this.onChartDrag.bind(this));
     // drag event complete
-    controller.on("enddrag", e => { this.onChartDragDone(e) });
+    this.#controller.on("enddrag", this.onChartDragDone.bind(this));
     // keyboard input
-    controller.on("keydown", e => { this.onChartKeyDown(e) })
-    controller.on("keyup", e => { this.onChartKeyDown(e) })
+    this.#controller.on("keydown", this.onChartKeyDown.bind(this))
+    this.#controller.on("keyup", this.onChartKeyDown.bind(this))
 
     this.on("resizeChart", e => { console.log("resizing !!!");this.onResize(e) })
 

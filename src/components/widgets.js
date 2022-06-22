@@ -2,7 +2,7 @@
 // A template file for Chart components
 
 import DOM from "../utils/DOM"
-import { CLASS_MENU, CLASS_WINDOW } from "../definitions/core"
+import { CLASS_MENU, CLASS_DIVIDERS, CLASS_WINDOW } from "../definitions/core"
 import { MenuStyle, WindowStyle } from "../definitions/style"
 import Menu from "./widgets/menu"
 import Dialogue from "./widgets/dialogue"
@@ -20,6 +20,7 @@ export default class Widgets {
   #elements
   #elWidgetsG
   #elMenu
+  #elDividers
 
   #width
   #height
@@ -58,10 +59,12 @@ export default class Widgets {
     api.elements = this.#elements
     
     this.#elMenu = DOM.findBySelector(`#${api.id} .${CLASS_MENU}`)
+    this.#elDividers = DOM.findBySelector(`#${api.id} .${CLASS_DIVIDERS}`)
 
     this.#elements = {
       elWidgetsG: this.#elWidgetsG,
-      elMenu: this.#elMenu
+      elMenu: this.#elMenu,
+      elDividers: this.#elDividers,
     }
   }
 
@@ -156,9 +159,11 @@ export default class Widgets {
 
   defaultNode() {
     const menuStyle = `display: none; border: 1px solid ${MenuStyle.COLOUR_BORDER}; background: ${MenuStyle.COLOUR_BG}; color: ${MenuStyle.COLOUR_TXT}; position: absolute;`
+    const dividersStyle = `position: absolute;`
 
     const node = `
       <div class="${CLASS_MENU}" style="${menuStyle}"></div>
+      <div class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
     `
     return node
   }
