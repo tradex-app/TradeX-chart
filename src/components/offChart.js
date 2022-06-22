@@ -98,6 +98,7 @@ export default class OffChart {
   get core() { return this.#core }
   get range() { return this.#core.range }
   get pos() { return this.getPos() }
+  get elOffChart() { return this.#elOffChart }
 
   init(options) {
 
