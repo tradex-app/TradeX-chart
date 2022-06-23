@@ -43,11 +43,7 @@ export default class Divider{
   }
 
   static destroyDivider(id) {
-    // remove event listners
-    Divider.dividerList[id].offChart.off(topic, handler)
-
-    // remove element
-    Divider.dividerList[id].el.remove()
+    Divider.dividerList[id].end
 
     // remove entry
     delete Divider.dividerList[id]
@@ -68,8 +64,12 @@ export default class Divider{
   }
 
   end() {
+    // remove event listners
     this.#controller.removeEventListener("drag", this.onDividerDrag);
     this.#controller.removeEventListener("enddrag", this.onDividerDragDone);
+
+    // remove element
+    this.el.remove()
   }
 
   eventsListen() {
