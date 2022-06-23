@@ -182,7 +182,11 @@ export default class Widgets {
   }
 
   insertDivider(offChart) {
-
+    const config = {
+      offChart: offChart,
+      mediator: this.#mediator,
+    }
+    return Divider.createDivider(this, config)
   }
 
   removeDivider() {
