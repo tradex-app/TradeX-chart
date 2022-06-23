@@ -160,7 +160,7 @@ export default class Chart {
     {...api.elements, 
       ...{
         // elWidgets: this.#elWidgets,
-        elCanvas: this.#elCanvas,
+        // elCanvas: this.#elCanvas,
         elScale: this.#elScale
       }
     }
@@ -222,9 +222,12 @@ export default class Chart {
 
 
   eventsListen() {
-    let canvas = this.#viewport.scene.canvas
+    // Give canvas focus so it can receive keyboard input
+    this.#elCanvas.tabIndex = 0
+    this.#elCanvas.focus()
+
     // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(canvas);
+    this.#controller = new InputController(this.#elCanvas);
     // move event
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
     // drag event
@@ -392,6 +395,7 @@ export default class Chart {
       height: this.#options.chartH || this.#parent.rowsH - 1,
       container: this.#elViewport
     });
+    this.#elCanvas = this.#viewport.scene.canvas
 
     // create layers - grid, volume, candles
     this.#layerGrid = new CEL.Layer();
