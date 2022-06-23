@@ -236,7 +236,7 @@ export default class Chart {
     this.#controller.on("enddrag", this.onChartDragDone.bind(this));
     // keyboard input
     this.#controller.on("keydown", this.onChartKeyDown.bind(this))
-    this.#controller.on("keyup", this.onChartKeyDown.bind(this))
+    this.#controller.on("keyup", this.onChartKeyUp.bind(this))
 
     this.on("resizeChart", e => { console.log("resizing !!!");this.onResize(e) })
 
@@ -286,25 +286,37 @@ export default class Chart {
   }
 
   onChartKeyDown(e) {
-    console.log(e)
+    let step = Math.ceil(this.#core.Timeline.candleW) || 1
+
     switch (e.keyCode) {
       case Keys.Left:
         console.log("keydown: cursor Left")
+        // this.updateRange([0,null,step])
+        this.emit("chart_pan", [0,null,step,null,step * -1])
+
         break;
       case Keys.Right:
         console.log("keydown: cursor Right")
+        // this.updateRange([step,null,0])
+        this.emit("chart_pan", [step,null,0,step])
+
         break;
     }
   }
 
   onChartKeyUp(e) {
-    console.log(e)
+    let step = Math.ceil(this.#core.Timeline.candleW) || 1
+
     switch (e.keyCode) {
       case Keys.Left:
         console.log("keyup: cursor Left")
+        
+        this.emit("chart_panDone", [0,null,step,null,step * -1])
         break;
       case Keys.Right:
         console.log("keyup: cursor Right")
+
+        this.emit("chart_panDone", [step,null,0,step])
         break;
     }
   }

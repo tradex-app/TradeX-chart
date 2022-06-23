@@ -42,9 +42,6 @@ export default class Overlays {
     const api = this.#mediator.api
     api.parent = this
     api.elements = {}
-
-    // listen/subscribe/watch for parent notifications
-    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   start() {
@@ -68,6 +65,8 @@ export default class Overlays {
 
 
   eventsListen() {
+    // listen/subscribe/watch for parent notifications
+    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   on(topic, handler, context) {
