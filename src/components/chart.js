@@ -291,15 +291,13 @@ export default class Chart {
     switch (e.keyCode) {
       case Keys.Left:
         console.log("keydown: cursor Left")
-        // this.updateRange([0,null,step])
-        this.emit("chart_pan", [0,null,step,null,step * -1])
 
+        this.emit("chart_pan", [0,null,step,null,step * -1])
         break;
       case Keys.Right:
         console.log("keydown: cursor Right")
-        // this.updateRange([step,null,0])
-        this.emit("chart_pan", [step,null,0,step])
 
+        this.emit("chart_pan", [step,null,0,step])
         break;
     }
   }

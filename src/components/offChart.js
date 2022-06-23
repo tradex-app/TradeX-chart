@@ -42,6 +42,7 @@ export default class OffChart {
   #options
   #core
   #parent
+
   #elOffChart
   #elViewport
   #elLegends
@@ -53,6 +54,7 @@ export default class OffChart {
   #Indicator
   #overlay
   #offChartID
+  #Divider
 
   #viewport
   #editport
@@ -77,8 +79,8 @@ export default class OffChart {
     this.#mediator = mediator
     this.#elOffChart = mediator.api.elements.elOffChart
     this.#parent = {...this.mediator.api.parent}
-    this.#core = this.mediator.api.core
     this.#overlay = options.offChart
+    this.#core = this.mediator.api.core
 
     this.#options = options
     this.#ID = this.#options.offChartID || uid("TX_OC_")
@@ -99,6 +101,7 @@ export default class OffChart {
   get range() { return this.#core.range }
   get pos() { return this.getPos() }
   get elOffChart() { return this.#elOffChart }
+  get widgets() { return this.#core.WidgetsG }
 
   init(options) {
 
@@ -150,6 +153,10 @@ export default class OffChart {
     // Y Axis - Price Scale
     this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
     this.#Scale.start("OffChart",this.name,"yAxis Scale started")
+
+    // add divider to allow manual resize of the offChart indicator
+    this.#Divider = this.widgets.insertDivider(this)
+    this.#Divider.start()
 
     // prepare layered canvas
     this.createViewport()
