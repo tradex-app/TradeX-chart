@@ -10,6 +10,13 @@ import Divider from "./widgets/divider"
 
 // import stateMachineConfig from "../state/state-widgets"
 
+const indicators = [
+  {id: "ADX", name: "Average Direction", action: ()=>{console.log("ADX")}},
+  {id: "BB", name: "Bollinger Bands", action: ()=>{console.log("BB")}},
+  {id: "DMI", name: "Directional Movement", action: ()=>{console.log("DMI")}}
+]
+const indicatorActions = {}
+
 export default class Widgets {
 
   #name = "Widgets"
@@ -112,22 +119,35 @@ export default class Widgets {
 
   onIndicators(e) {
 
-    const insidcators = [
-      {id: "ADX", name: "Average Direction", action: ()=>{console.log("ADX")}},
-      {id: "BB", name: "Bollinger Bands", action: ()=>{console.log("BB")}},
-      {id: "DMI", name: "Directional Movement", action: ()=>{console.log("DMI")}}
-    ]
-
-    const listStyle = "text-align: left;"
+    const api = this.#mediator.api
+    const listStyle = "list-style: none; text-align: left; margin:1em 1em 1em -2.5em;"
+    const itemStyle = "padding: .25em 1em .25em 1em;"
+    const shortStyle = "display: inline-block; width: 4em;"
+    const cPointer = "cursor: pointer;"
+    const over = `onmouseover="this.style.background ='#222'"`
+    const out = `onmouseout="this.style.background ='none'"`
 
     let content = `<ul style="${listStyle}">`
-    for (let i of insidcators) {
-      content += `<li><span>${i.id}</span><span>${i.name}</span></li>`
+    for (let i of indicators) {
+      indicatorActions[i.id] = i.action
+      content += `<li id="${i.id}" style="${itemStyle} ${cPointer}" ${over} ${out}><a style="${cPointer}"><span style="${shortStyle}">${i.id}</span><span>${i.name}</span></li></a>`
     }
     content += "</ul>"
 
     this.insertMenu(e, content)
+
+    const menuItems = DOM.findBySelectorAll(`#${api.id} .${CLASS_MENU} li`)
+    menuItems.forEach((item) => {
+      item.addEventListener('click', (e) => this.onIndicatorSelect(e))
+    })
+
     console.log("Indicators Menu")
+  }
+
+  onIndicatorSelect(e) {
+    let id = e.currentTarget.id
+    // indicatorActions[id]()
+    this.emit("addIndicator", id)
   }
 
   onTimezone(e) {

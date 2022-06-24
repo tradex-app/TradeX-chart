@@ -142,6 +142,8 @@ export default class MainPane {
   eventsListen() {
     // listen/subscribe/watch for parent notifications
     this.on("resize", (dimensions) => this.onResize(dimensions))
+
+    this.on("addIndicator", (ind) => console.log(`Add the ${ind} indicator`))
   }
 
   on(topic, handler, context) {
