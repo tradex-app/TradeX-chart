@@ -118,7 +118,9 @@ export default class Widgets {
       {id: "DMI", name: "Directional Movement", action: ()=>{console.log("DMI")}}
     ]
 
-    let content = "<ul>"
+    const listStyle = "text-align: left;"
+
+    let content = `<ul style="${listStyle}">`
     for (let i of insidcators) {
       content += `<li><span>${i.id}</span><span>${i.name}</span></li>`
     }
@@ -158,7 +160,7 @@ export default class Widgets {
   }
 
   defaultNode() {
-    const menuStyle = `display: none; border: 1px solid ${MenuStyle.COLOUR_BORDER}; background: ${MenuStyle.COLOUR_BG}; color: ${MenuStyle.COLOUR_TXT}; position: absolute;`
+    const menuStyle = `position: absolute; z-index: 1000; display: none; border: 1px solid ${MenuStyle.COLOUR_BORDER}; background: ${MenuStyle.COLOUR_BG}; color: ${MenuStyle.COLOUR_TXT};`
     const dividersStyle = `position: absolute;`
 
     const node = `
@@ -183,6 +185,7 @@ export default class Widgets {
 
   insertDivider(offChart) {
     const config = {
+      
       offChart: offChart,
       mediator: this.#mediator,
     }
