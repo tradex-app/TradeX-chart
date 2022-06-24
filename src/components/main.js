@@ -7,6 +7,8 @@ import Timeline from './timeline'
 import Chart from "./chart"
 import OffChart from "./offChart"
 import Overlays from "./overlays"
+import stateMachineConfig from "../state/state-mainPane"
+
 
 
 import {
@@ -132,6 +134,11 @@ export default class MainPane {
     }
     // set up event listeners
     this.eventsListen()
+
+    // start State Machine 
+    stateMachineConfig.context.origin = this
+    this.#mediator.stateMachine = stateMachineConfig
+    this.#mediator.stateMachine.start()
   }
 
   end() {
@@ -143,7 +150,7 @@ export default class MainPane {
     // listen/subscribe/watch for parent notifications
     this.on("resize", (dimensions) => this.onResize(dimensions))
 
-    this.on("addIndicator", (ind) => console.log(`Add the ${ind} indicator`))
+    // this.on("addIndicator", (ind) => console.log(`Add the ${ind} indicator`))
   }
 
   on(topic, handler, context) {
@@ -244,6 +251,15 @@ export default class MainPane {
     this.#OffCharts.push(o)
 
     this.emit("addOffChart", o)
+  }
+
+  addIndicator(ind) {
+    console.log(`Add the ${ind} indicator`)
+
+    // final inidicator object
+    const indicator = ind
+
+    this.emit("addIndicatorDone", indicator)
   }
 
   defaultNode() {
