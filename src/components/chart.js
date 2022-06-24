@@ -367,6 +367,10 @@ export default class Chart {
     return this.#yAxisDigits
   }
 
+  setCursor(cursor) {
+    this.#elChart.style.cursor = cursor
+  }
+
   defaultNode() {
     const api = this.#mediator.api
     const rowsH = api.height - api.utilsW - api.timeH // api.elements.elRows.clientHeight
