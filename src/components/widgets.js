@@ -7,8 +7,7 @@ import { MenuStyle, WindowStyle } from "../definitions/style"
 import Menu from "./widgets/menu"
 import Dialogue from "./widgets/dialogue"
 import Divider from "./widgets/divider"
-
-// import stateMachineConfig from "../state/state-widgets"
+import stateMachineConfig from "../state/state-widgets"
 
 const indicators = [
   {id: "ADX", name: "Average Direction", action: ()=>{console.log("ADX")}},
@@ -81,9 +80,9 @@ export default class Widgets {
     this.eventsListen()
 
     // start State Machine 
-    // stateMachineConfig.context.origin = this
-    // this.#mediator.stateMachine = stateMachineConfig
-    // this.#mediator.stateMachine.start()
+    stateMachineConfig.context.origin = this
+    this.#mediator.stateMachine = stateMachineConfig
+    this.#mediator.stateMachine.start()
   }
 
   end() {
@@ -190,6 +189,7 @@ export default class Widgets {
     return node
   }
 
+  // --- Menus -----------
   insertMenu(e, content) {
     let wPos = this.#elWidgetsG.getBoundingClientRect()
     let iPos = e.target.getBoundingClientRect()
@@ -203,6 +203,11 @@ export default class Widgets {
 
   }
 
+  closeMenu(menu) {
+    console.log(`menu ${menu} closed`)
+  }
+
+  // --- Dividers ---------
   insertDivider(offChart) {
     const config = {
       
