@@ -169,8 +169,8 @@ export default class Widgets {
   }
 
   remove(type, id) {
-    this.#widgets[type].destroy(id)
     delete(this.#widgetsInstances[id])
+    this.#widgets[type].destroy(id)
   }
 
 }

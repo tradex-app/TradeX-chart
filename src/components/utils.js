@@ -7,6 +7,12 @@ import { UtilsStyle } from "../definitions/style"
 import { CLASS_UTILS } from "../definitions/core"
 import utilsList from "../definitions/utils"
 
+const indicators = [
+  {id: "ADX", name: "Average Direction", event: "addIndicator"},
+  {id: "BB", name: "Bollinger Bands", event: "addIndicator"},
+  {id: "DMI", name: "Directional Movement", event: "addIndicator"}
+]
+
 export default class UtilsBar {
 
   #name = "Utilities"
@@ -16,6 +22,7 @@ export default class UtilsBar {
   #elUtils
   #utils
   #widgets
+  #indicators
 
   constructor (mediator, options) {
 
@@ -24,6 +31,7 @@ export default class UtilsBar {
     this.#elUtils = mediator.api.elements.elUtils
     this.#utils = utilsList || options.utilsBar
     this.#widgets = this.#mediator.api.core.WidgetsG
+    this.#indicators = this.options.indicators || indicators
     this.init()
   }
 
@@ -101,10 +109,19 @@ export default class UtilsBar {
 
 
       for (let u of this.#utils) {
-        if (u.id === id)
+        if (u.id === id) {
           util.addEventListener("click", this.onIconClick.bind(this))
-          let config = {}
-          this.#widgets.insert("Menu", config)
+
+          if (u.id === "indicators") u.sub = this.#indicators
+
+          if (u?.sub) {
+            let config = {
+              content: u.sub,
+              primary: util
+            }
+            this.#widgets.insert("Menu", config)
+          }
+        }
       }
     }
   }

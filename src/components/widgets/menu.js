@@ -78,6 +78,8 @@ export default class Menu {
   }
 
   start() {
+    // position menus next to primary (icon)
+    this.position(this.#elMenu)
     // set up event listeners
     Menu.eventsListen()
   }
@@ -101,7 +103,7 @@ export default class Menu {
     // this.#controller.on("mouseout", this.onMouseOut.bind(this))
 
     const api = this.#mediator.api
-    const menuItems = DOM.findBySelectorAll(`#${api.id} .${CLASS_MENU} li`)
+    const menuItems = DOM.findBySelectorAll(`#${api.id} #${this.#config.id} li`)
     menuItems.forEach((item) => {
       item.addEventListener('click', this.onMenuSelect)
     })
@@ -127,13 +129,14 @@ export default class Menu {
 
 
   mount(el) {
+    const api = this.#mediator.api
+
     if (el.lastElementChild == null) 
       el.innerHTML = this.menuNode()
     else
       el.lastElementChild.insertAdjacentHTML("afterend", this.menuNode())
 
-
-    // el.innerHTML = this.menuNode()
+    this.#elMenu = DOM.findBySelector(`#${api.id} #${this.#config.id}`)
   }
 
   static defaultNode() {
@@ -176,13 +179,12 @@ export default class Menu {
     return content
   }
 
-  insertMenu(target, content) {
+  position(target) {
     let wPos = this.#elWidgetsG.getBoundingClientRect()
     let iPos = target.getBoundingClientRect()
 
-    let pos = [iPos.left - wPos.left, iPos.bottom - wPos.top]
-    let config = { pos, content }
-    let menu = Menu.create(this, config)
+    target.style.left = iPos.left - wPos.left + "px"
+    target.style.top = wPos.left, iPos.bottom - wPos.top + "px"
   }
 
   remove() {
