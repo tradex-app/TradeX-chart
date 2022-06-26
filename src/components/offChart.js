@@ -155,7 +155,8 @@ export default class OffChart {
     this.#Scale.start("OffChart",this.name,"yAxis Scale started")
 
     // add divider to allow manual resize of the offChart indicator
-    this.#Divider = this.widgets.insertDivider(this)
+    const config = { offChart: this }
+    this.#Divider = this.widgets.insert("Divider", config)
     this.#Divider.start()
 
     // prepare layered canvas

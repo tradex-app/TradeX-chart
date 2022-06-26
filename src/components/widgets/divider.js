@@ -2,6 +2,7 @@
 // dragable divider to resize off chart indicators
 
 import DOM from "../../utils/DOM"
+import { CLASS_DIVIDERS } from "../../definitions/core"
 import { InputController, EventDispatcher, Keys } from '@jingwood/input-control'
 
 
@@ -22,6 +23,8 @@ export default class Divider{
 
   static dividerList = {}
   static divideCnt = 0
+  static class = CLASS_DIVIDERS
+  static name = "Dividers"
 
   constructor(widgets, config) {
     this.#widgets = widgets
@@ -34,19 +37,19 @@ export default class Divider{
     this.init()
   }
 
-  static createDivider(widgets, config) {
+  static create(widgets, config) {
 
     const id = `divider${++Divider.divideCnt}`
     config.id = id
 
     // add entry
-    Divider[id] = new Divider(widgets, config)
+    Divider.dividerList[id] = new Divider(widgets, config)
 
-    return Divider[id]
+    return Divider.dividerList[id]
   }
 
-  static destroyDivider(id) {
-    Divider.dividerList[id].end
+  static destroy(id) {
+    Divider.dividerList[id].end()
 
     // remove entry
     delete Divider.dividerList[id]
@@ -138,15 +141,23 @@ export default class Divider{
 
   mount() {
     if (this.#elDividers.lastElementChild == null) 
-      this.#elDividers.innerHTML = this.defaultNode()
+      this.#elDividers.innerHTML = this.dividerNode()
     else
       this.#elDividers.lastElementChild.insertAdjacentHTML("afterend", this.defaultNode())
 
     this.#elDivider = DOM.findBySelector(`#${this.#id}`)
   }
 
+  static defaultNode() {
+    const dividersStyle = `position: absolute;`
 
-  defaultNode() {
+    const node = `
+      <div class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
+    `
+    return node
+  }
+
+  dividerNode() {
     let top =  this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top,
         width = this.#core.MainPane.rowsW,
         left = this.#core.toolsW; 
