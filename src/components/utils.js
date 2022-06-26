@@ -15,6 +15,7 @@ export default class UtilsBar {
   #options
   #elUtils
   #utils
+  #widgets
 
   constructor (mediator, options) {
 
@@ -22,6 +23,7 @@ export default class UtilsBar {
     this.#options = options
     this.#elUtils = mediator.api.elements.elUtils
     this.#utils = utilsList || options.utilsBar
+    this.#widgets = this.#mediator.api.core.WidgetsG
     this.init()
   }
 
@@ -46,9 +48,16 @@ export default class UtilsBar {
   }
 
   end() {
-    // Stop and clean up the module to prevent memory leaks.
-    // It should remove: event listeners, timers, ect.
-    // Put your toys away or it will end in tears.
+    // remove event listeners
+    const api = this.#mediator.api
+    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
+
+    for (let util of utils) {
+      for (let u of this.#utils) {
+        if (u.id === id)
+          util.removeEventListener("click", this.onIconClick)
+      }
+    }
   }
   
   on(topic, handler, context) {
@@ -61,6 +70,18 @@ export default class UtilsBar {
 
   emit(topic, data) {
     this.#mediator.emit(topic, data)
+  }
+
+  onIconClick(e) {
+    let id = e.currentTarget.id,
+        evt = e.currentTarget.dataset.event,
+        menu = e.currentTarget.dataset.menu || false
+    this.emit(evt, id)
+    
+    if (menu) this.emit("openMenu", {id, evt})
+
+    // TODO: remove
+    console.log(`Tools: ${evt} ${id}`)
   }
 
   mount(el) {
@@ -81,9 +102,9 @@ export default class UtilsBar {
 
       for (let u of this.#utils) {
         if (u.id === id)
-          svg.addEventListener("click", (e) => {
-            u.action(e, this)
-          })
+          util.addEventListener("click", this.onIconClick.bind(this))
+          let config = {}
+          this.#widgets.insert("Menu", config)
       }
     }
   }
@@ -97,10 +118,11 @@ export default class UtilsBar {
     return utilsBar
   }
 
-  iconNode(icon) {
+  iconNode(util) {
     const iconStyle = `display: inline-block; height: ${this.#elUtils.clientHeight}px; padding-top: 2px`
+    const menu = ("sub" in util) ? `data-menu="true"` : ""
     return  `
-      <div id="TX_${icon.id}" class="icon-wrapper" style="${iconStyle}">${icon.icon}</div>\n
+      <div id="TX_${util.id}" data-event="${util.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${util.icon}</div>\n
     `
   }
 

@@ -54,7 +54,7 @@ export default class TradeXchart {
   #el = undefined
   #mediator
   #options
-  #elements
+  #elements = {}
   #elTXChart
   #elUtils
   #elBody
@@ -304,10 +304,10 @@ constructor (mediator, options={}) {
     }
 
 
+    this.#WidgetsG = this.#mediator.register("WidgetsG", WidgetsG, options, api)
     this.#UtilsBar = this.#mediator.register("UtilsBar", UtilsBar, options, api)
     this.#ToolsBar = this.#mediator.register("ToolsBar", ToolsBar, options, api)
     this.#MainPane = this.#mediator.register("MainPane", MainPane, options, api)
-    this.#WidgetsG = this.#mediator.register("WidgetsG", WidgetsG, options, api)
 
     api.Timeline = this.Timeline
     api.Chart = this.Chart
