@@ -23,6 +23,7 @@ export default class UtilsBar {
   #utils
   #widgets
   #indicators
+  #menus = {}
 
   constructor (mediator, options) {
 
@@ -86,7 +87,7 @@ export default class UtilsBar {
         menu = e.currentTarget.dataset.menu || false
     this.emit(evt, id)
     
-    if (menu) this.emit("openMenu", {id, evt})
+    if (menu) this.emit("openMenu", {id, evt, menu})
 
     // TODO: remove
     console.log(`Tools: ${evt} ${id}`)
@@ -119,7 +120,9 @@ export default class UtilsBar {
               content: u.sub,
               primary: util
             }
-            this.#widgets.insert("Menu", config)
+            let menu = this.#widgets.insert("Menu", config)
+            util.dataset.menu = menu.id
+            menu.start()
           }
         }
       }

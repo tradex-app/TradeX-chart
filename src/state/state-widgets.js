@@ -27,7 +27,7 @@ export default
         console.log('addIndicator: onEnter')
         console.log("close indicator menu")
 
-        stateMachine.context.origin.closeMenu(data) 
+        stateMachine.context.origin.instances[data.menu].close()
       },
       onExit(stateMachine, data) {
         console.log('addIndicator: onExit')
