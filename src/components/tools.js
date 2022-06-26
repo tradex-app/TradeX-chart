@@ -101,11 +101,16 @@ export default class ToolsBar {
 
 
       for (let t of this.#tools) {
-        if (t.id === id)
+        if (t.id === id) {
           tool.addEventListener("click", this.onIconClick.bind(this))
-          let config = {}
-          if (t?.sub) config.content = t.sub
-          this.#widgets.insert("Menu", config)
+          if (t?.sub) {
+            let config = {
+              content: t.sub,
+              primary: tool
+            }
+            this.#widgets.insert("Menu", config)
+          }
+        }
       }
     }
   }
