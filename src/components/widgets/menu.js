@@ -47,7 +47,7 @@ export default class Menu {
     this.#config = config
     this.#id = config.id
     this.#elMenus = widgets.elements.elMenus
-    this.#elWidgetsG = widgets.elements.elWidgetsG
+    this.#elWidgetsG = this.#core.elWidgetsG
     this.init()
   }
 
@@ -79,9 +79,9 @@ export default class Menu {
 
   start() {
     // position menus next to primary (icon)
-    this.position(this.#elMenu)
+    this.position(this.#config.primary)
     // set up event listeners
-    Menu.eventsListen()
+    this.eventsListen()
   }
 
   end() {
@@ -105,7 +105,7 @@ export default class Menu {
     const api = this.#mediator.api
     const menuItems = DOM.findBySelectorAll(`#${api.id} #${this.#config.id} li`)
     menuItems.forEach((item) => {
-      item.addEventListener('click', this.onMenuSelect)
+      item.addEventListener('click', this.onMenuSelect.bind(this))
     })
   }
 
@@ -122,9 +122,9 @@ export default class Menu {
   }
 
   onMenuSelect(e) {
-    let id = e.currentTarget.id
-        evt = e.currentTarget.dataset.event
-    this.emit(evt, id)
+    let ids = {target: e.currentTarget.id, menu: this.#id},
+        evt = e.currentTarget.dataset.event;
+    this.emit(evt, ids)
   }
 
 
@@ -183,15 +183,21 @@ export default class Menu {
     let wPos = this.#elWidgetsG.getBoundingClientRect()
     let iPos = target.getBoundingClientRect()
 
-    target.style.left = iPos.left - wPos.left + "px"
-    target.style.top = wPos.left, iPos.bottom - wPos.top + "px"
+    this.#elMenu.style.left = Math.round(iPos.left - wPos.left) + "px"
+    this.#elMenu.style.top = Math.round(iPos.bottom - wPos.top) + "px"
   }
 
   remove() {
 
   }
 
-  close(menu) {
-    console.log(`menu ${menu} closed`)
+  // display the menu
+  open() {
+    this.#elMenu.style.display = "block"
+  }
+  // hide the menu
+  close() {
+    this.#elMenu.style.display = "none"
+    this.emit("menuClosed", this.id)
   }
 }

@@ -9,13 +9,6 @@ import Menu from "./widgets/menu"
 import Divider from "./widgets/divider"
 import stateMachineConfig from "../state/state-widgets"
 
-// TODO: remove indicators.action - obsolete
-const indicators = [
-  {id: "ADX", name: "Average Direction", event: "addIndicator", action: ()=>{console.log("ADX")}},
-  {id: "BB", name: "Bollinger Bands", event: "addIndicator", action: ()=>{console.log("BB")}},
-  {id: "DMI", name: "Directional Movement", event: "addIndicator", action: ()=>{console.log("DMI")}}
-]
-
 export default class Widgets {
 
   #name = "Widgets"
@@ -40,7 +33,7 @@ export default class Widgets {
     this.#mediator = mediator
     this.#options = options
     this.#widgets = options.widgets || this.#widgetsList
-    this.#elWidgetsG = this.#mediator.api.elements.elWidgetsG
+    this.#elWidgetsG = this.#mediator.api.core.elWidgetsG
     this.#parent = this.#mediator.api.parent
     this.init()
   }
@@ -55,6 +48,7 @@ export default class Widgets {
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   get elements() { return this.#elements }
+  get instances() { return this.#widgetsInstances }
 
   init() {
     this.mount(this.#elWidgetsG)
@@ -83,9 +77,6 @@ export default class Widgets {
   }
 
   start() {
-
-
-
     // set up event listeners
     this.eventsListen()
 
@@ -129,8 +120,11 @@ export default class Widgets {
     this.setDimensions(dimensions)
   }
 
-  onOpenMenu(menu) {
-    console.log("onOpenMenu:", menu)
+  onOpenMenu(data) {
+    console.log("onOpenMenu:", data)
+
+    this.#widgetsInstances[data.menu].open()
+
   }
 
   mount(el) {

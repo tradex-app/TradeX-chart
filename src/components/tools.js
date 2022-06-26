@@ -79,7 +79,7 @@ export default class ToolsBar {
         menu = e.currentTarget.dataset.menu || false
     this.emit(evt, id)
 
-    if (menu) this.emit("openMenu", {id, evt})
+    if (menu) this.emit("openMenu", {id, evt, menu})
 
     // TODO: remove
     console.log(`Tools: ${evt} ${id}`)
@@ -108,7 +108,9 @@ export default class ToolsBar {
               content: t.sub,
               primary: tool
             }
-            this.#widgets.insert("Menu", config)
+            let menu = this.#widgets.insert("Menu", config)
+            tool.dataset.menu = menu.id
+            menu.start()
           }
         }
       }
