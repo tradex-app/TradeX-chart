@@ -39,6 +39,7 @@ export default class Menu {
   static menuCnt = 0
   static class = CLASS_MENUS
   static name = "Menus"
+  static currentActive
 
   constructor(widgets, config) {
     this.#widgets = widgets
@@ -71,6 +72,8 @@ export default class Menu {
 
   get el() { return this.#elMenu }
   get id() { return this.#id }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elMenu) }
 
   init() {
     // insert element
@@ -98,7 +101,7 @@ export default class Menu {
 
   eventsListen() {
     // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(this.#elMenu);
+    // this.#controller = new InputController(this.#elMenu);
     // this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
     // this.#controller.on("mouseout", this.onMouseOut.bind(this))
 
@@ -193,6 +196,7 @@ export default class Menu {
 
   // display the menu
   open() {
+    Menu.currentActive = this
     this.#elMenu.style.display = "block"
   }
   // hide the menu

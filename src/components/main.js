@@ -82,7 +82,8 @@ export default class MainPane {
   get chartH() { return this.#elChart.clientHeight }
   get rowsW() { return this.#elRows.clientWidth }
   get rowsH() { return this.#elRows.clientHeight }
-  get pos() { return this.getPos() }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elMain) }
 
   init(options) {
     this.mount(this.#elMain)
@@ -207,10 +208,6 @@ export default class MainPane {
     dimensions.rowsH = this.rowsH
 
     this.emit("rowsResize", dimensions)
-  }
-
-  getPos() {
-    return DOM.elementDimPos(this.#elMain)
   }
 
   registerOffCharts(options, api) {

@@ -14,30 +14,31 @@ export default
         console.log('idle: onExit')
       },
       on: {
-        openMenu: {
-          target: 'openMenu',
+        addIndicator: {
+          target: 'addIndicator',
           action: (stateMachine, data) => {
-            console.log('Widgets: transition from "idle" to "openMenu"')
+            console.log('transition action for event in "idle" state')
+            console.log("close indicator menu")
+
+            stateMachine.context.origin.instances[data.menu].close()
+            stateMachine.notify("menuClosed", data)
           },
         },
       }
     },
-    openMenu: {
+    addIndicator: {
       onEnter(stateMachine, data) {
-        console.log('Widgets: state: "openMenu" - onEnter')
+        console.log('addIndicator: onEnter')
 
-        stateMachine.context.origin.instances[data.menu].open()
       },
       onExit(stateMachine, data) {
         console.log('addIndicator: onExit')
-
-        stateMachine.context.origin.instances[data.menu].close()
       },
       on: {
-        closeMenu: {
+        menuClosed: {
           target: "idle",
           action: (stateMachine, data) => {
-            console.log('Widgets: transition from "openMenu" to "idle" on "closeMenu"')
+            console.log(`${data} menuClosed: transition to "idle" state`)
           },
         }
       }

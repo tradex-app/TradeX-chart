@@ -63,6 +63,8 @@ export default class Timeline {
   get candleW() { return this.#xAxis.candleW }
   get viewport() { return this.#viewport }
   get range() { return this.#core.range }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elTime) }
 
   init() {
     this.mount(this.#elTime)

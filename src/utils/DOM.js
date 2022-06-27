@@ -49,6 +49,42 @@ const DOM = {
     return !!o && !!( o.offsetWidth || o.offsetHeight || o.getClientRects().length )
   },
 
+  // https://www.javascripttutorial.net/dom/css/check-if-an-element-is-visible-in-the-viewport/
+  isInViewport(el) {
+    const rect = el.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+  },
+
+  // https://stackoverflow.com/a/41698614/15109215
+  isVisibleToUser(el) {
+    if (!(el instanceof Element)) throw Error('DomUtil: el is not an element.');
+    const style = getComputedStyle(elem);
+    if (style.display === 'none') return false;
+    if (style.visibility !== 'visible') return false;
+    if (style.opacity < 0.1) return false;
+    if (el.offsetWidth + el.offsetHeight + el.getBoundingClientRect().height +
+        el.getBoundingClientRect().width === 0) {
+        return false;
+    }
+    const elCenter   = {
+        x: el.getBoundingClientRect().left + el.offsetWidth / 2,
+        y: el.getBoundingClientRect().top + el.offsetHeight / 2
+    };
+    if (elCenter.x < 0) return false;
+    if (elCenter.x > (document.documentElement.clientWidth || window.innerWidth)) return false;
+    if (elCenter.y < 0) return false;
+    if (elCenter.y > (document.documentElement.clientHeight || window.innerHeight)) return false;
+    let pointContainer = document.elementFromPoint(elCenter.x, elCenter.y);
+    do {
+        if (pointContainer === elem) return true;
+    } while (pointContainer = pointContainer.parentNode);
+    return false;
+  },
 
   elementDimPos(el) {
     if (!this.isElement(el)) return false
@@ -64,7 +100,9 @@ const DOM = {
     const dim = el.getBoundingClientRect()
     let _w = dim.right - dim.left
     let _h = dim.bottom - dim.top
-    return { top: _y, left: _x, width: _w, height: _h };
+    let _v = this.isVisible(el)
+    let _vp = this.isInViewport(el)
+    return { top: _y, left: _x, width: _w, height: _h, visible: _v, viewport: _vp };
   },
 
   elementsDistance(el1, el2) {
