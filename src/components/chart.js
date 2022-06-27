@@ -128,6 +128,8 @@ export default class Chart {
   set priceDigits(digits) { this.setYAxisDigits(digits) }
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
   get cursorPos() { return this.#cursorPos }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elChart) }
 
   init(options) {
 

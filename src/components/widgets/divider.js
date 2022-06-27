@@ -58,6 +58,8 @@ export default class Divider{
   get el() { return this.#elDivider }
   get id() { return this.#id }
   get offChart() { return this.#offChart }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elDivider) }
 
   init() {
     // insert element

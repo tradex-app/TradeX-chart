@@ -99,7 +99,8 @@ export default class OffChart {
   get options() { return this.#options }
   get core() { return this.#core }
   get range() { return this.#core.range }
-  get pos() { return this.getPos() }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elOffChart) }
   get elOffChart() { return this.#elOffChart }
   get widgets() { return this.#core.WidgetsG }
 
@@ -237,10 +238,6 @@ export default class OffChart {
     // this.#viewport.setSize(dim.w - this.#elScale.clientWidth, dim.h)
     this.setWidth(dim.w)
     this.setHeight(dim.h)
-  }
-
-  getPos() {
-    return DOM.elementDimPos(this.#elOffChart)
   }
 
   setTheme(theme) {

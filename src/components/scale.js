@@ -84,6 +84,8 @@ export default class ScaleBar {
   get yAxisType() { return this.#yAxisType }
   get yAxisGrads() { return this.#yAxis.yAxisGrads }
   get viewport() { return this.#viewport }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elScale) }
 
   init() {
     this.mount(this.#elScale)

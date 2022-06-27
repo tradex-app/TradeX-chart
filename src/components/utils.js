@@ -45,6 +45,8 @@ export default class UtilsBar {
   get shortName() {return this.#shortName}
   get mediator() {return this.#mediator}
   get options() {return this.#options}
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elUtils) }
 
   init() {
     this.mount(this.#elUtils)

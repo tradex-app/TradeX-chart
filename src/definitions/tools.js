@@ -32,7 +32,7 @@ export default [
       },
       {
         id: "hRay",
-        name: "HRay",
+        name: "Horizontal Ray",
         icon: line,
         event: "tools_horizonalRay",
         action: (e, mediator) => {
@@ -41,7 +41,7 @@ export default [
       },
       {
         id: "vRay",
-        name: "VRay",
+        name: "Vertical Ray",
         icon: line,
         event: "tools_verticalRay",
         action: (e, mediator) => {
