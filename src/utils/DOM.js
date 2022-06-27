@@ -142,12 +142,12 @@ const DOM = {
   },
 
   //  https://stackoverflow.com/a/3028037/15109215
-  hideOnClickOutside(element) {
+  hideOnClickOutside(el) {
     const outsideClickListener = event => {
-        if (!element.contains(event.target) && this.isVisible(element)) { 
+        if (!el.contains(event.target) && this.isVisible(el)) { 
         // or use: event.target.closest(selector) === null
         // if (event.target.closest(selector) === null) {
-          element.style.display = 'none';
+          el.style.display = 'none';
           removeClickListener();
         }
     }
@@ -158,6 +158,23 @@ const DOM = {
 
     document.addEventListener('click', outsideClickListener);
   },
+
+  onClickOutside(el, cb) {
+    const outsideClickListener = event => {
+        if (!el.contains(event.target) && DOM.isVisible(el)) { 
+        // or use: event.target.closest(selector) === null
+        // if (event.target.closest(selector) === null) {
+          cb();
+          removeClickListener();
+        }
+    }
+
+    const removeClickListener = () => {
+        document.removeEventListener('click', outsideClickListener);
+    }
+
+    document.addEventListener('click', outsideClickListener);
+  }
 
 }
 
