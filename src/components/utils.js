@@ -90,9 +90,6 @@ export default class UtilsBar {
     this.emit(evt, id)
     
     if (menu) this.emit("openMenu", {id, evt, menu})
-
-    // TODO: remove
-    console.log(`Tools: ${evt} ${id}`)
   }
 
   mount(el) {

@@ -125,9 +125,16 @@ export default class Menu {
   }
 
   onMenuSelect(e) {
-    let ids = {target: e.currentTarget.id, menu: this.#id},
-        evt = e.currentTarget.dataset.event;
-    this.emit(evt, ids)
+    let evt = e.currentTarget.dataset.event,
+        data = {
+          target: e.currentTarget.id, 
+          menu: this.#id,
+          evt: evt
+        };
+        
+    this.emit(evt, data)
+    this.emit("menuItemSelected", data)
+    this.emit("closeMenu", data)
   }
 
 
@@ -196,11 +203,23 @@ export default class Menu {
 
   // display the menu
   open() {
+    let id = Menu.currentActive?.id || false
+    if (id) this.emit("closeMenu", {menu: id})
+
     Menu.currentActive = this
     this.#elMenu.style.display = "block"
+
+    const callback = function() {
+      this.emit("closeMenu", { menu: this.#id })
+    }
+
+    setTimeout( () => {
+      // DOM.onClickOutside(this.#elMenu, callback.bind(this))
+    }, 500)
   }
   // hide the menu
   close() {
+    Menu.currentActive = null
     this.#elMenu.style.display = "none"
     this.emit("menuClosed", this.id)
   }
