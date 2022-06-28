@@ -21,16 +21,28 @@ export default class RSI extends indicator {
     lineWidth: '1'
   }
   style = {}
-  overly
+  overlay
+  TALib
+
   // YAXIS_TYPES - percent
   static scale = YAXIS_TYPES[1]
 
 
+  /**
+   * Creates an instance of RSI.
+   * @param {object} target - canvas scene
+   * @param {object} overlay - data for the overlay
+   * @param {instance} xAxis - timeline axis
+   * @param {instance} yAxis - scale axis
+   * @param {object} config - theme / styling
+   * @memberof RSI
+   */
   constructor(target, overlay, xAxis, yAxis, config) {
     super(target, xAxis, yAxis, config)
 
     this.overlay = overlay
     this.style = config.style || this.defaultStyle
+    this.TALib = xAxis.mediator.api.core.TALib
   }
 
   regeneratePlots (params) {

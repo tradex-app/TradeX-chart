@@ -210,7 +210,7 @@ export default class Menu {
     this.#elMenu.style.display = "block"
 
     const callback = function() {
-      this.emit("closeMenu", { menu: this.#id })
+      this.#core.emit("closeMenu", { menu: this.#id })
     }
 
     setTimeout( () => {
