@@ -10,7 +10,9 @@ import utilsList from "../definitions/utils"
 const indicators = [
   {id: "ADX", name: "Average Direction", event: "addIndicator"},
   {id: "BB", name: "Bollinger Bands", event: "addIndicator"},
-  {id: "DMI", name: "Directional Movement", event: "addIndicator"}
+  {id: "EMA", name: "Exponential Moving Average ", event: "addIndicator"},
+  {id: "DMI", name: "Directional Movement", event: "addIndicator"},
+  {id: "RSI", name: "Relative Strength Index", event: "addIndicator"},
 ]
 
 export default class UtilsBar {

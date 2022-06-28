@@ -1,25 +1,61 @@
 /**
  * EMA
  */
- export default {
-  name: 'EMA',
-  shortName: 'EMA',
-  series: 'price',
-  calcParams: [6, 12, 20],
-  precision: 2,
-  shouldCheckParamCount: false,
-  shouldOhlc: true,
-  plots: [
+ import indicator from "../components/overlays/inidcator"
+ import { 
+   YAXIS_TYPES
+ } from "../definitions/chart";
+ 
+ export default class RSI extends indicator {
+  name ='Exponential Moving Average'
+  shortName = 'EMA'
+  series = 'price'
+  calcParams = [6, 12, 20]
+  precision = 2
+  shouldCheckParamCount = false
+  shouldOhlc = true
+  plots = [
     { key: 'ema6', title: 'EMA6: ', type: 'line' },
     { key: 'ema12', title: 'EMA12: ', type: 'line' },
     { key: 'ema20', title: 'EMA20: ', type: 'line' }
-  ],
-  regeneratePlots: (params) => {
+  ]
+  defaultStyle = {
+    strokeStyle: "#C80",
+    lineWidth: '1'
+  }
+  style = {}
+  overlay
+  TALib
+
+  // YAXIS_TYPES - percent
+  static scale = YAXIS_TYPES[1]
+
+
+  /**
+   * Creates an instance of RSI.
+   * @param {object} target - canvas scene
+   * @param {object} overlay - data for the overlay
+   * @param {instance} xAxis - timeline axis
+   * @param {instance} yAxis - scale axis
+   * @param {object} config - theme / styling
+   * @memberof RSI
+   */
+  constructor(target, overlay, xAxis, yAxis, config) {
+    super(target, xAxis, yAxis, config)
+
+    this.overlay = overlay
+    this.style = config.style || this.defaultStyle
+    this.TALib = xAxis.mediator.api.core.TALib
+  }
+
+  
+  regeneratePlots (params) {
     return params.map(p => {
       return { key: `ema${p}`, title: `EMA${p}: `, type: 'line' }
     })
-  },
-  calcTechnicalIndicator: (dataList, { params, plots }) => {
+  }
+
+  calcTechnicalIndicator (dataList, { params, plots }) {
     let closeSum = 0
     const emaValues = []
     return dataList.map((kLineData, i) => {
@@ -38,6 +74,40 @@
       })
       return ema
     })
+  }
+
+  draw(range) {
+    this.scene.clear()
+
+
+    const data = this.overlay.data
+    const plots = []
+    const plot = {
+      x: 2,
+      w: this.xAxis.width / range.Length,
+    }
+
+    // account for "missing" entries because of indicator calculation
+    let o = range.data.length - this.overlay.data.length
+    let c = range.indexStart - o
+    let i = range.Length
+
+    while(i) {
+      if (!c) {
+        plots[range.Length - i] = {x: null, y: null}
+      }
+      else {
+        plot.y = this.yAxis.yPos(100 - data[c][1])
+        plots[range.Length - i] = {...plot}
+      }
+      c++
+      i--
+      plot.x = plot.x + plot.w
+    }
+
+    this.plot(plots, "renderLine", this.style)
+
+    this.target.viewport.render();
   }
 }
 

@@ -1,5 +1,6 @@
 // core.js
 
+import * as talib from "talib-web"
 import DOM from './utils/DOM'
 import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeChecks'
 import SX from './scaleX/scale'
@@ -39,9 +40,12 @@ const STYLE_TXCHART = "overflow: hidden;"
 const STYLE_UTILS = "border-bottom: 1px solid;"
 const STYLE_BODY  = "position: relative;"
 const STYLE_TOOLS = "position: absolute; top: 0; left: 0; height: 100%; min-height: 100%; border-right: 1px solid;"
-const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;"
+const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;";
 
-
+// wait for talib wasm to initialize 
+(async () => {
+  await talib.init("node_modules/talib-web/lib/talib.wasm")
+})();
 export default class TradeXchart {
 
 
@@ -72,6 +76,7 @@ export default class TradeXchart {
   #range
   #rangeLimit = RANGELIMIT
   #indicators = Indicators
+  #TALib = talib
 
 
   #chartW = 500
@@ -112,6 +117,7 @@ export default class TradeXchart {
   warnings = false
   errors = false
   
+
 /**
  * Creates an instance of TradeXchart.
  * @param {String|DOM element} container
@@ -187,8 +193,8 @@ constructor (mediator, options={}) {
 
   get settings() { return this.#state.data.chart.settings }
   get indicators() { return this.#indicators }
+  get TALib() { return this.#TALib }
 
-  getTimeline() {}
 
   /**
    * Create a new TradeXchart instance
