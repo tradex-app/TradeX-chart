@@ -11,6 +11,7 @@ import {
 export default class RSI extends indicator {
   name = 'Relative Strength Index'
   shortName = 'RSI'
+  onChart = false
   calcParams = [20]
   checkParamCount = false
   plots = [
@@ -44,6 +45,13 @@ export default class RSI extends indicator {
     this.style = config.style || this.defaultStyle
     this.TALib = xAxis.mediator.api.core.TALib
   }
+
+  calcIndicator(input) {
+    this.overlay.data = this.TALib.EMA(input)
+  }
+
+
+
 
   regeneratePlots (params) {
     return params.map((_, index) => {

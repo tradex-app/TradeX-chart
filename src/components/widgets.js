@@ -101,6 +101,9 @@ export default class Widgets {
     // this.on("resize", (dimensions) => this.onResize(dimensions))
 
     this.on("openMenu", this.onOpenMenu.bind(this))
+    this.on("closeMenu", this.onCloseMenu.bind(this))
+    this.on("offMenu", this.onCloseMenu.bind(this))
+
 
   }
 
@@ -124,7 +127,11 @@ export default class Widgets {
     console.log("onOpenMenu:", data)
 
     this.#widgetsInstances[data.menu].open()
+  }
+  onCloseMenu(data) {
+    console.log("onCloseMenu:", data)
 
+    this.#widgetsInstances[data.menu].close()
   }
 
   mount(el) {

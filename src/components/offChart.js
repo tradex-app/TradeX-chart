@@ -132,7 +132,7 @@ export default class OffChart {
     api.elements.elScale = this.#elScale
 
     // Y Axis - Price Scale
-    this.#Indicator = this.#mediator.api.indicators[this.#overlay.type]
+    this.#Indicator = this.#mediator.api.indicators[this.#overlay.type].ind
     options.yAxisType = this.#Indicator.scale
     const id = options.offChart.type + "_ScaleBar"
     this.#Scale = this.mediator.register(id, ScaleBar, options, api)

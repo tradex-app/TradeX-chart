@@ -9,6 +9,7 @@
  export default class RSI extends indicator {
   name ='Exponential Moving Average'
   shortName = 'EMA'
+  onChart = true
   series = 'price'
   calcParams = [6, 12, 20]
   precision = 2
@@ -27,8 +28,8 @@
   overlay
   TALib
 
-  // YAXIS_TYPES - percent
-  static scale = YAXIS_TYPES[1]
+  // YAXIS_TYPES - default
+  static scale = YAXIS_TYPES[0]
 
 
   /**
@@ -48,7 +49,15 @@
     this.TALib = xAxis.mediator.api.core.TALib
   }
 
-  
+  calcIndicator(input) {
+    this.overlay.data = this.TALib.EMA(input)
+  }
+
+
+
+
+
+
   regeneratePlots (params) {
     return params.map(p => {
       return { key: `ema${p}`, title: `EMA${p}: `, type: 'line' }

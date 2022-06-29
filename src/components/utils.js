@@ -6,14 +6,15 @@ import DOM from "../utils/DOM"
 import { UtilsStyle } from "../definitions/style"
 import { CLASS_UTILS } from "../definitions/core"
 import utilsList from "../definitions/utils"
+import indicators from "../definitions/indicators"
 
-const indicators = [
-  {id: "ADX", name: "Average Direction", event: "addIndicator"},
-  {id: "BB", name: "Bollinger Bands", event: "addIndicator"},
-  {id: "EMA", name: "Exponential Moving Average ", event: "addIndicator"},
-  {id: "DMI", name: "Directional Movement", event: "addIndicator"},
-  {id: "RSI", name: "Relative Strength Index", event: "addIndicator"},
-]
+// const indicators = [
+//   {id: "ADX", name: "Average Direction", event: "addIndicator"},
+//   {id: "BB", name: "Bollinger Bands", event: "addIndicator"},
+//   {id: "EMA", name: "Exponential Moving Average ", event: "addIndicator"},
+//   {id: "DMI", name: "Directional Movement", event: "addIndicator"},
+//   {id: "RSI", name: "Relative Strength Index", event: "addIndicator"},
+// ]
 
 export default class UtilsBar {
 
@@ -114,7 +115,7 @@ export default class UtilsBar {
         if (u.id === id) {
           util.addEventListener("click", this.onIconClick.bind(this))
 
-          if (u.id === "indicators") u.sub = this.#indicators
+          if (u.id === "indicators") u.sub = Object.values(this.#indicators)
 
           if (u?.sub) {
             let config = {

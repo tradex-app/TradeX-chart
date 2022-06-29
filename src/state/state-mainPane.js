@@ -8,34 +8,35 @@ export default
   states: {
     idle: {
       onEnter(stateMachine, data) {
-        console.log('idle: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('idle: onExit')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         addIndicator: {
           target: 'addIndicator',
           action: (stateMachine, data) => {
-            console.log('transition action for event in "idle" state')
+            console.log('offChart: transition from "idle" to "addIndicator" state')
           },
         },
       }
     },
     addIndicator: {
       onEnter(stateMachine, data) {
-        console.log('addIndicator: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
 
         stateMachine.context.origin.addIndicator(data) 
       },
       onExit(stateMachine, data) {
-        console.log('addIndicator: onExit')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         addIndicatorDone: {
           target: "idle",
           action: (stateMachine, data) => {
-            console.log(`${data} addIndicatorDone: transition to "idle" state`)
+            console.log('transition action for "onIdle" in "addIndicator" state')
+
           },
         }
       }

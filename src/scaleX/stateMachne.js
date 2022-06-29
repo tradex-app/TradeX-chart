@@ -6,6 +6,7 @@ import { isArrayEqual } from "../utils/utilities"
 
 export default class StateMachine {
 
+  #id
   #state
   #statePrev
   #context
@@ -16,6 +17,7 @@ export default class StateMachine {
   #statuses = ["await", "idle", "running", "stopped"]
 
   constructor(config, mediator) {
+    this.#id = config.id
     this.#config = config
     this.#state = config.initial
     this.#context = config.context
@@ -26,6 +28,7 @@ export default class StateMachine {
     this.#subscribe()
   }
 
+  get id() { return this.#id }
   get state() { return this.#state }
   get previousSate() { return this.#statePrev }
   get context() { return this.#context }
@@ -45,12 +48,13 @@ export default class StateMachine {
     const destState = destTransition.target
     const destStateConfig = this.#config.states[destState]
 
-    destTransition.action(this, data)
     currStateConfig?.onExit(this, data)
-    destStateConfig?.onEnter(this, data)
+    destTransition.action(this, data)
 
     this.#statePrev = this.#state
     this.#state = destState
+
+    destStateConfig?.onEnter(this, data)
 
     return this.#state
   }

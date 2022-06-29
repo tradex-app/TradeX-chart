@@ -43,6 +43,7 @@ export default class MainPane {
   #mediator
   #options
   #parent
+  #core
   #elMain
   #elRows
   #elTime
@@ -56,6 +57,7 @@ export default class MainPane {
   #offChartDefaultH = 30 // %
   #offChartDefaultWpx = 120
   
+  #indicators
 
 
   constructor (mediator, options) {
@@ -64,6 +66,7 @@ export default class MainPane {
     this.#options = options
     this.#elMain = mediator.api.elements.elMain
     this.#parent = {...this.#mediator.api.parent}
+    this.#core = this.#mediator.api.core
     this.init(options)
   }
 
@@ -87,6 +90,8 @@ export default class MainPane {
 
   init(options) {
     this.mount(this.#elMain)
+
+    this.#indicators = this.#core.indicators
 
     const api = this.#mediator.api
 
@@ -150,8 +155,6 @@ export default class MainPane {
   eventsListen() {
     // listen/subscribe/watch for parent notifications
     this.on("resize", (dimensions) => this.onResize(dimensions))
-
-    // this.on("addIndicator", (ind) => console.log(`Add the ${ind} indicator`))
   }
 
   on(topic, handler, context) {
@@ -251,10 +254,10 @@ export default class MainPane {
   }
 
   addIndicator(ind) {
-    console.log(`Add the ${ind} indicator`)
+    console.log(`Add the ${ind.target} indicator`)
 
-    // final inidicator object
-    const indicator = ind
+    // final indicator object
+    const indicator = this.#indicators[ind.target].ind
 
     this.emit("addIndicatorDone", indicator)
   }
