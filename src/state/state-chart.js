@@ -10,10 +10,10 @@ export default
       onEnter(stateMachine, data) {
         stateMachine.context.origin.setCursor("crosshair")
 
-        console.log('idle: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('ilde: onExit')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         chart_pan: {
@@ -21,42 +21,42 @@ export default
           action: (stateMachine, data) => {
             stateMachine.context.origin.setCursor("grab")
 
-            console.log('transition action for "chart_pan" in "idle" state')
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to  "chart_pan"`)
           },
         },
         chart_tool: {
           target: 'chart_tool',
           action: (stateMachine, data) => {
-            console.log('transition action for "chart_tool" in "idle" state')
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_tool"`)
           },
         },
         xAxis_scale: {
           target: 'xAxis_scale',
           action: (stateMachine, data) => {
-            console.log('transition action for "xAxis_scale" in "idle" state')
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to  "xAxis_scale"`)
           },
         },
       }
     },
     chart_pan: {
       onEnter(stateMachine, data) {
-        console.log('chart_pan: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('chart_pan: onExit')
+        console.log(`${stateMachine.id}: state: - onExit (${stateMachine.event})`)
       },
       on: {
         chart_pan: {
           target: 'chart_pan',
           action: (stateMachine, data) => {
-            console.log('transition action for "chart_panDone" in "chart_pan" state')
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_pan"`)
             stateMachine.context.origin.updateRange(data) 
           },
         },
         chart_panDone: {
           target: 'idle',
           action: (stateMachine, data) => {
-            console.log('transition action for "chart_panDone" in "chart_pan" state')
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_panDone"`)
             stateMachine.context.origin.updateRange(data) 
           },
         },
@@ -64,16 +64,16 @@ export default
     },
     xAxis_scale: {
       onEnter(stateMachine, data) {
-        console.log('XScale: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('XScale: onExit')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         Idle: {
           target: 'idle',
           action: (stateMachine, data) => {
-            console.log('transition action for "onIdle" in "XScale" state')
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "onIdle"`)
           },
         },
       }

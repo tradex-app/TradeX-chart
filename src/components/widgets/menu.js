@@ -95,6 +95,7 @@ export default class Menu {
       item.removeEventListener('click', this.onMenuSelect)
     })
 
+    document.removeEventListener('click', this.onOutsideClickListener)
     // remove element
     // this.el.remove()
   }
@@ -110,6 +111,9 @@ export default class Menu {
     menuItems.forEach((item) => {
       item.addEventListener('click', this.onMenuSelect.bind(this))
     })
+
+    // click event outside of menu
+    document.addEventListener('click', this.onOutsideClickListener.bind(this))
   }
 
   on(topic, handler, context) {
@@ -137,6 +141,17 @@ export default class Menu {
     this.emit("closeMenu", data)
   }
 
+  onOutsideClickListener(e) {
+    if (!this.#elMenu.contains(e.target) 
+    && (!this.#config.primary.contains(e.target)) 
+    && DOM.isVisible(this.#elMenu)) {
+      let data = {
+        target: e.currentTarget.id, 
+        menu: this.#id,
+      };
+      this.emit("closeMenu", data)
+    }
+  }
 
   mount(el) {
     const api = this.#mediator.api
@@ -208,7 +223,9 @@ export default class Menu {
 
     Menu.currentActive = this
     this.#elMenu.style.display = "block"
+  }
 
+  offMenu() {
     const callback = function() {
       this.#core.emit("closeMenu", { menu: this.#id })
     }
@@ -217,6 +234,7 @@ export default class Menu {
       // DOM.onClickOutside(this.#elMenu, callback.bind(this))
     }, 500)
   }
+
   // hide the menu
   close() {
     Menu.currentActive = null
