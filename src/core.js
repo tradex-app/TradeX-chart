@@ -1,5 +1,6 @@
 // core.js
 
+import * as talib from "talib-web"
 import DOM from './utils/DOM'
 import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeChecks'
 import SX from './scaleX/scale'
@@ -9,6 +10,9 @@ import MainPane from './components/main'
 import WidgetsG from './components/widgets'
 
 import State from './state'
+import { getRange } from "./helpers/range"
+import Indicators from './definitions/indicators'
+
 
 import {
   NAME,
@@ -36,9 +40,12 @@ const STYLE_TXCHART = "overflow: hidden;"
 const STYLE_UTILS = "border-bottom: 1px solid;"
 const STYLE_BODY  = "position: relative;"
 const STYLE_TOOLS = "position: absolute; top: 0; left: 0; height: 100%; min-height: 100%; border-right: 1px solid;"
-const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;"
+const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;";
 
-
+// wait for talib wasm to initialize 
+(async () => {
+  await talib.init("node_modules/talib-web/lib/talib.wasm")
+})();
 export default class TradeXchart {
 
 
@@ -51,18 +58,26 @@ export default class TradeXchart {
   #el = undefined
   #mediator
   #options
-  #elements
+  #elements = {}
   #elTXChart
   #elUtils
   #elBody
   #elTools
   #elMain
+  #elRows
+  #elTime
   #elWidgetsG
 
   #inCnt = null
   #modID
   #state = {}
   #userClasses = []
+  #data
+  #range
+  #rangeLimit = RANGELIMIT
+  #indicators = Indicators
+  #TALib = talib
+
 
   #chartW = 500
   #chartH = 400
@@ -80,29 +95,29 @@ export default class TradeXchart {
   scaleW = 60
 
   static permittedClassNames = 
-      ["TradeXchart","Chart","MainPane","ScaleBar",
-      "Timeline","ToolsBar","UtilsBar","Widgets"]
+      ["TradeXchart","Chart","MainPane","OffChart","OnChart",
+      "ScaleBar","Timeline","ToolsBar","UtilsBar","Widgets"]
 
-  UtilsBar
-  ToolsBar
-  Timeline
-  MainPane
-  WidgetsG
-  // Chart
+  #UtilsBar
+  #ToolsBar
+  #MainPane = {
+    chart: {},
+    time: {}
+  }
+  #WidgetsG
 
   panes = {
-    utils: UtilsBar,
-    tools: ToolsBar,
-    main: MainPane,
+    utils: this.#UtilsBar,
+    tools: this.#ToolsBar,
+    main: this.#MainPane,
   }
 
   logs = false
   info = false
   warnings = false
   errors = false
-
-  #rangeLimit = RANGELIMIT
   
+
 /**
  * Creates an instance of TradeXchart.
  * @param {String|DOM element} container
@@ -161,8 +176,25 @@ constructor (mediator, options={}) {
   // get elChart() { return this.#elChart }
   get elWidgetsG() { return this.#elWidgetsG }
 
+  get UtilsBar() { return this.#UtilsBar }
+  get ToolsBar() { return this.#ToolsBar }
+  get MainPane() { return this.#MainPane }
+  get Timeline() { return this.#MainPane.time }
+  get WidgetsG() { return this.#WidgetsG }
+  get Chart() { return this.#MainPane.chart }
+
   get chartData() { return this.#state.data.chart.data }
+  get offChart() { return this.#state.data.offchart }
+  get onChart() { return this.#state.data.onchart }
+  get datasets() { return this.#state.data.datasets }
+
   get rangeLimit() { return (isNumber(this.#rangeLimit)) ? this.#rangeLimit : RANGELIMIT }
+  get range() { return this.#range }
+
+  get settings() { return this.#state.data.chart.settings }
+  get indicators() { return this.#indicators }
+  get TALib() { return this.#TALib }
+
 
   /**
    * Create a new TradeXchart instance
@@ -225,13 +257,23 @@ constructor (mediator, options={}) {
       }
     }
 
+    const end = this.chartData.length - 1
+    const start = end - this.#rangeLimit
+    const allData = {
+      data: this.chartData,
+      onChart: this.onChart,
+      offChart: this.offChart,
+      datasets: this.datasets
+    }
+    this.#range = getRange(allData, start, end)
+
     // api - functions / methods, calculated properties provided by this module
     const api = {
       ...this.#mediator.api,
       ...{
         id: this.id,
         parent: this.#mediator,
-        core: this.#mediator,
+        core: this,
         inCnt: this.inCnt,
         width: this.width,
         width: this.width,
@@ -248,17 +290,33 @@ constructor (mediator, options={}) {
       
         elements: this.#elements,
 
+        UtilsBar: this.UtilsBar,
+        ToolsBar: this.ToolsBar,
+        MainPane: this.MainPane,
+        WidgetsG: this.WidgetsG,
+        Chart: this.Chart,
+
         chartData: this.chartData,
+        offChart: this.offChart,
+        onChart: this.onChart,
+        datasets: this.datasets,
         rangeLimit: this.rangeLimit,
+        range: this.#range,
+        updateRange: (pos) => this.updateRange(pos),
+        indicators: this.indicators,
+
+        settings: this.settings,
       }
     }
 
 
-    this.UtilsBar = this.#mediator.register("UtilsBar", UtilsBar, options, api)
-    this.ToolsBar = this.#mediator.register("ToolsBar", ToolsBar, options, api)
-    this.MainPane = this.#mediator.register("MainPane", MainPane, options, api)
-    this.WidgetsG = this.#mediator.register("WidgetsG", WidgetsG, options, api)
-    this.Chart = this.MainPane.chart
+    this.#WidgetsG = this.#mediator.register("WidgetsG", WidgetsG, options, api)
+    this.#UtilsBar = this.#mediator.register("UtilsBar", UtilsBar, options, api)
+    this.#ToolsBar = this.#mediator.register("ToolsBar", ToolsBar, options, api)
+    this.#MainPane = this.#mediator.register("MainPane", MainPane, options, api)
+
+    api.Timeline = this.Timeline
+    api.Chart = this.Chart
 
     this.log(`${this.#name} instantiated`)
   }
@@ -270,7 +328,6 @@ constructor (mediator, options={}) {
     this.ToolsBar.start()
     this.MainPane.start()
     this.WidgetsG.start()
-    // this.Chart.start()
   }
 
   end() {
@@ -299,6 +356,8 @@ constructor (mediator, options={}) {
     this.#elBody = DOM.findBySelector(`#${this.id} .${CLASS_BODY}`)
     this.#elTools = DOM.findBySelector(`#${this.id} .${CLASS_TOOLS}`)
     this.#elMain  = DOM.findBySelector(`#${this.id} .${CLASS_MAIN}`)
+    this.#elRows  = DOM.findBySelector(`#${this.id} .${CLASS_ROWS}`)
+    this.#elTime  = DOM.findBySelector(`#${this.id} .${CLASS_TIME}`)
     this.#elWidgetsG = DOM.findBySelector(`#${this.id} .${CLASS_WIDGETSG}`)
 
     this.#elements = {
@@ -307,6 +366,8 @@ constructor (mediator, options={}) {
       elBody: this.#elBody,
       elTools: this.#elTools,
       elMain: this.#elMain,
+      elRows: this.#elRows,
+      elTime: this.#elTime,
       elWidgetsG: this.#elWidgetsG
     }
   }
@@ -331,6 +392,7 @@ constructor (mediator, options={}) {
       warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
       rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
+      indicators: (indicators) => this.#indicators = {...Indicators, ...indicators }
     }
   }
 
@@ -365,7 +427,7 @@ constructor (mediator, options={}) {
     if (isNumber(h))
       this.#chartH = h
     else 
-      this.#chartH = this.#el.parentElement.height
+      this.#chartH = this.#el.parentElement.clientHeight
       
     this.#elTXChart.style.height = this.#chartH+"px"
     this.#elBody.style.height = `${this.#chartH - this.utilsH}px`
@@ -377,8 +439,8 @@ constructor (mediator, options={}) {
     this.setHeight(h)
 
     this.emit("resize", {
-      chartW: this.width,
-      chartH: this.height,
+      width: this.width,
+      height: this.height,
       mainW: this.#chartW - this.toolsW,
       mainH: this.#chartH - this.utilsH,
     })
@@ -404,7 +466,7 @@ constructor (mediator, options={}) {
   defaultNode() {
 
     const classesTXChart = CLASS_DEFAULT+" "+this.#userClasses 
-    const styleTXChart = STYLE_TXCHART + ` height: ${this.#chartH}px; width: ${this.#chartW}px; background: ${this.chartBGColour}; color: ${this.chartTxtColour};`
+    const styleTXChart = STYLE_TXCHART + ` height: ${this.height}px; width: ${this.#chartW}px; background: ${this.chartBGColour}; color: ${this.chartTxtColour};`
     const styleUtils = STYLE_UTILS + ` height: ${this.utilsH}px; width: ${this.#chartW}px; border-color: ${this.chartBorderColour};`
     const styleBody = STYLE_BODY + ` height: calc(100% - ${this.utilsH}px); width: ${this.#chartW}px;`
     const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour};`
@@ -427,5 +489,25 @@ constructor (mediator, options={}) {
 
   setClasses(classes) {
 
+  }
+
+  updateRange(pos) {
+
+    // pan horizontal check
+    const dist = Math.floor(pos[0] - pos[2])
+
+    if (Math.abs(dist) < this.Timeline.candleW) return
+
+    const offset = Math.floor(dist / this.Timeline.candleW)
+    let start = this.range.indexStart - offset,
+        end = this.range.indexEnd - offset;
+
+    const allData = {
+      data: this.chartData,
+      onChart: this.onChart,
+      offChart: this.offChart,
+      datasets: this.datasets
+    }
+    this.#range = getRange(allData, start, end)
   }
 }

@@ -1,21 +1,8 @@
-/**
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
-
- * http://www.apache.org/licenses/LICENSE-2.0
-
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 
 import { renderPath } from './path'
 
 /**
- * 绘制水平直线
+ * Draw a horizontal straight line
  * @param ctx
  * @param y
  * @param left
@@ -31,7 +18,7 @@ export function renderHorizontalLine (ctx, y, left, right) {
 }
 
 /**
- * 绘制垂直直线
+ * Draw a vertical straight line
  * @param ctx
  * @param x
  * @param top
@@ -47,12 +34,12 @@ export function renderVerticalLine (ctx, x, top, bottom) {
 }
 
 /**
- * 绘制线
+ * Render line - open path
  * @param ctx
  * @param coordinates
  */
-export function renderLine (ctx, coordinates) {
-  renderPath(ctx, coordinates, () => {
+export function renderLine (ctx, coordinates, style) {
+  renderPath(ctx, coordinates, style, () => {
     ctx.stroke()
     ctx.closePath()
   })

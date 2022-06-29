@@ -6,6 +6,15 @@ import DOM from "../utils/DOM"
 import { UtilsStyle } from "../definitions/style"
 import { CLASS_UTILS } from "../definitions/core"
 import utilsList from "../definitions/utils"
+import indicators from "../definitions/indicators"
+
+// const indicators = [
+//   {id: "ADX", name: "Average Direction", event: "addIndicator"},
+//   {id: "BB", name: "Bollinger Bands", event: "addIndicator"},
+//   {id: "EMA", name: "Exponential Moving Average ", event: "addIndicator"},
+//   {id: "DMI", name: "Directional Movement", event: "addIndicator"},
+//   {id: "RSI", name: "Relative Strength Index", event: "addIndicator"},
+// ]
 
 export default class UtilsBar {
 
@@ -15,6 +24,9 @@ export default class UtilsBar {
   #options
   #elUtils
   #utils
+  #widgets
+  #indicators
+  #menus = {}
 
   constructor (mediator, options) {
 
@@ -22,6 +34,8 @@ export default class UtilsBar {
     this.#options = options
     this.#elUtils = mediator.api.elements.elUtils
     this.#utils = utilsList || options.utilsBar
+    this.#widgets = this.#mediator.api.core.WidgetsG
+    this.#indicators = this.options.indicators || indicators
     this.init()
   }
 
@@ -34,6 +48,8 @@ export default class UtilsBar {
   get shortName() {return this.#shortName}
   get mediator() {return this.#mediator}
   get options() {return this.#options}
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elUtils) }
 
   init() {
     this.mount(this.#elUtils)
@@ -46,9 +62,16 @@ export default class UtilsBar {
   }
 
   end() {
-    // Stop and clean up the module to prevent memory leaks.
-    // It should remove: event listeners, timers, ect.
-    // Put your toys away or it will end in tears.
+    // remove event listeners
+    const api = this.#mediator.api
+    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
+
+    for (let util of utils) {
+      for (let u of this.#utils) {
+        if (u.id === id)
+          util.removeEventListener("click", this.onIconClick)
+      }
+    }
   }
   
   on(topic, handler, context) {
@@ -61,6 +84,15 @@ export default class UtilsBar {
 
   emit(topic, data) {
     this.#mediator.emit(topic, data)
+  }
+
+  onIconClick(e) {
+    let id = e.currentTarget.id,
+        evt = e.currentTarget.dataset.event,
+        menu = e.currentTarget.dataset.menu || false
+    this.emit(evt, id)
+    
+    if (menu) this.emit("openMenu", {id, evt, menu})
   }
 
   mount(el) {
@@ -80,10 +112,21 @@ export default class UtilsBar {
 
 
       for (let u of this.#utils) {
-        if (u.id === id)
-          svg.addEventListener("click", (e) => {
-            u.action(e, this)
-          })
+        if (u.id === id) {
+          util.addEventListener("click", this.onIconClick.bind(this))
+
+          if (u.id === "indicators") u.sub = Object.values(this.#indicators)
+
+          if (u?.sub) {
+            let config = {
+              content: u.sub,
+              primary: util
+            }
+            let menu = this.#widgets.insert("Menu", config)
+            util.dataset.menu = menu.id
+            menu.start()
+          }
+        }
       }
     }
   }
@@ -97,10 +140,11 @@ export default class UtilsBar {
     return utilsBar
   }
 
-  iconNode(icon) {
+  iconNode(util) {
     const iconStyle = `display: inline-block; height: ${this.#elUtils.clientHeight}px; padding-top: 2px`
+    const menu = ("sub" in util) ? `data-menu="true"` : ""
     return  `
-      <div id="TX_${icon.id}" class="icon-wrapper" style="${iconStyle}">${icon.icon}</div>\n
+      <div id="TX_${util.id}" data-event="${util.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${util.icon}</div>\n
     `
   }
 

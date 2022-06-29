@@ -1,16 +1,17 @@
-// _template.js
-// A template file for Chart components
+// overlays.js
+// A base class for overlays components to extend upon
 
 import stateMachineConfig from "../state/state-chart"
 
-export default class _template {
+export default class Overlays {
 
-  #name = "Template"
-  #shortName = "template"
+  #name = "Overlays"
+  #shortName = "overlays"
   #mediator
   #options
   #parent
-  #elTemplate
+
+  #elOverlays
 
   #width
   #height
@@ -19,8 +20,8 @@ export default class _template {
 
     this.#mediator = mediator
     this.#options = options
-    this.#elTemplate = options.elements.elTemplate
-    this.#parent = {...this.#mediator.api.parent}
+    this.#elOverlays = this.#mediator.api.elOverlays
+    this.#parent = this.#mediator.api.parent
     this.init()
   }
 
@@ -35,11 +36,11 @@ export default class _template {
   get options() {return this.#options}
 
   init() {
-    this.mount(this.#elTemplate)
+    this.mount(this.#elOverlays)
 
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api
-    api.parent = this.#mediator
+    api.parent = this
     api.elements = {}
   }
 
@@ -65,7 +66,7 @@ export default class _template {
 
   eventsListen() {
     // listen/subscribe/watch for parent notifications
-    this.on("resize", (dimensions) => this.onResize(dimensions))
+    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   on(topic, handler, context) {

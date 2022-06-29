@@ -65,9 +65,38 @@ export function _set(obj, path, value) {
   return target;
 }
 
+/**
+ * Deep copy an object - no shared object references
+ * https://stackoverflow.com/a/122190/15109215
+ *
+ * @export
+ * @param {object} obj
+ * @return {object}  
+ */
+export function copyDeep(obj) {
+  if (obj === null || typeof (obj) !== 'object' || 'isActiveClone' in obj)
+      return obj;
+
+  if (obj instanceof Date)
+      var temp = new obj.constructor(); //or new Date(obj);
+  else
+      var temp = obj.constructor();
+
+  for (var key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          obj['isActiveClone'] = null;
+          temp[key] = copyDeep(obj[key]);
+          delete obj['isActiveClone'];
+      }
+  }
+  return temp;
+}
+
 export function uid(tag="id") {
-  if (!isString(tag)) tag = "id"
-  return `${tag}_${Date.now().toString(36)}_${Math.random().toString(36).substring(2,5)}`
+  if (!isString(tag)) tag = "ID"
+  const dateString = Date.now().toString(36);
+  const randomness = Math.random().toString(36).substring(2,5);
+  return `${tag}_${dateString}_${randomness}`
 }
 
 export function isArrayEqual(a1, a2) {

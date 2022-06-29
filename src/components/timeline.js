@@ -19,14 +19,12 @@ export default class Timeline {
   #mediator
   #options
   #elTime
+  #core
   #parent
   #chart
   #xAxis
 
   #elViewport
-
-  #width
-  #height
 
   #viewport
   #layerLabels
@@ -38,8 +36,9 @@ export default class Timeline {
     this.#mediator = mediator
     this.#options = options
     this.#elTime = mediator.api.elements.elTime
-    this.#parent = mediator.api.parent
-    this.#chart = this.#parent
+    this.#parent = mediator.api.MainPane
+    this.#chart = mediator.api.Chart
+    this.#core = mediator.api.core
     this.#xAxis = new xAxis(this, this.#chart)
     this.init()
   }
@@ -55,7 +54,7 @@ export default class Timeline {
   get options() { return this.#options }
   get height() { return this.#elTime.clientHeight }
   set width(w) { this.setWidth(w) }
-  get width() { return this.#xAxis.width }
+  get width() { return this.#elTime.clientWidth }
   get xAxisWidth() { return this.#xAxis.width }
   get xAxisRatio() { return this.#xAxis.xAxisRatio }
   get layerLabels() { return this.#layerLabels }
@@ -63,6 +62,9 @@ export default class Timeline {
   get xAxisGrads() { return this.#xAxis.xAxisGrads }
   get candleW() { return this.#xAxis.candleW }
   get viewport() { return this.#viewport }
+  get range() { return this.#core.range }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elTime) }
 
   init() {
     this.mount(this.#elTime)
@@ -89,11 +91,12 @@ export default class Timeline {
   }
 
   setWidth(w) {
-    this.#width = w
+    this.#elTime.style.width = w
   }
 
-  setDimensions(dimensions) {
-    this.setWidth(dimensions.mainW)
+  setDimensions(dim) {
+    this.#viewport.setSize(dim.w, this.height)
+    this.setWidth(dim.w)
   }
 
   start() {
@@ -122,9 +125,9 @@ export default class Timeline {
     // create controller and use 'on' method to receive input events 
     const controller = new InputController(canvas);
 
-    this.#chart.on("chart_mousemove", (e) => { this.drawCursorTime(e) })
-    this.#chart.on("chart_pan", (e) => { this.drawCursorTime(e) })
-    this.#chart.on("chart_panDone", (e) => { this.drawCursorTime(e) })
+    this.on("chart_mousemove", (e) => { this.drawCursorTime(e) })
+    this.on("chart_pan", (e) => { this.drawCursorTime(e) })
+    this.on("chart_panDone", (e) => { this.drawCursorTime(e) })
   }
 
   on(topic, handler, context) {
@@ -147,13 +150,15 @@ export default class Timeline {
 
   xPos2Time(x) { return this.#xAxis.xPos2Time(x) }
 
+  xPos2Index(x) { return this.#xAxis.xPos2Index(x) }
+
   xPosOHLCV(x) { return this.#xAxis.xPosOHLCV(x) }
 
   createViewport() {
     // create viewport
     this.#viewport = new CEL.Viewport({
-      width: this.width,
-      height: this.height,
+      width: this.#elTime.clientWidth,
+      height: this.#elTime.clientHeight,
       container: this.#elViewport
     });
 

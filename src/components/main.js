@@ -6,6 +6,9 @@ import DOM from "../utils/DOM"
 import Timeline from './timeline'
 import Chart from "./chart"
 import OffChart from "./offChart"
+import Overlays from "./overlays"
+import stateMachineConfig from "../state/state-mainPane"
+
 
 
 import {
@@ -28,6 +31,7 @@ import {
 } from '../definitions/core'
 
 const STYLE_ROWS = "width:100%; min-width:100%;"
+const STYLE_ROW = "position: relative;"
 const STYLE_TIME = "border-top: 1px solid; width:100%; min-width:100%;"
 const STYLE_SCALE = "border-left: 1px solid;"
 
@@ -39,23 +43,21 @@ export default class MainPane {
   #mediator
   #options
   #parent
+  #core
   #elMain
-  #elWidgetsG
   #elRows
   #elTime
   #elChart
+  #elOffCharts = []
 
-  #OffChart = []
+  #OffCharts = []
   #Chart
   #Time
 
-  #chartW
-  #chartH
-  #rowsW
-  #rowsH
-  #offChartDefaultH = 0.3
+  #offChartDefaultH = 30 // %
   #offChartDefaultWpx = 120
   
+  #indicators
 
 
   constructor (mediator, options) {
@@ -63,7 +65,8 @@ export default class MainPane {
     this.#mediator = mediator
     this.#options = options
     this.#elMain = mediator.api.elements.elMain
-    this.#parent = this.#mediator.api.parent
+    this.#parent = {...this.#mediator.api.parent}
+    this.#core = this.#mediator.api.core
     this.init(options)
   }
 
@@ -78,39 +81,52 @@ export default class MainPane {
   get chart() { return this.#Chart }
   get time() { return this.#Time }
   get options() { return this.#options }
-  get chartW() { return this.#chartW }
-  get chartH() { return this.#chartH }
+  get chartW() { return this.#elChart.clientWidth }
+  get chartH() { return this.#elChart.clientHeight }
+  get rowsW() { return this.#elRows.clientWidth }
+  get rowsH() { return this.#elRows.clientHeight }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elMain) }
 
   init(options) {
     this.mount(this.#elMain)
-    this.mountRow(this.#elRows, CLASS_CHART)
+
+    this.#indicators = this.#core.indicators
 
     const api = this.#mediator.api
-    api.core = this.#mediator.api
-    api.parent = this
 
-    this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
+    this.#elRows = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`)
     this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
 
-    // set the chart default dimensions
-    this.#chartW = this.#elChart.width 
-    this.#chartH = this.#elChart.height
+    this.mountRow(this.#elRows, CLASS_CHART)
+
+    this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
+
+
+    api.parent = this
+    api.chartData = this.mediator.api.chartData
+    api.onChart = this.#mediator.api.onChart
+    api.offChart = this.#mediator.api.offChart
+    api.rangeLimit = this.#mediator.api.rangeLimit
+    api.settings = this.#mediator.api.settings
 
     // api - functions / methods, calculated properties provided by this module
     api.elements = 
       {...api.elements, 
         ...{
           elChart: this.#elChart,
-          elTime: this.#elTime
+          elTime: this.#elTime,
+          elRows: this.#elRows,
+          elOffCharts: this.#elOffCharts
         }
       }
 
-    // register child modules
-    this.#Chart = this.#mediator.register("Chart", Chart, options, api)
+    // register timeline - xAxis
     this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
-
-    // events / messages
-    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
+    // register offChart
+    this.registerOffCharts(options, api)
+    // register chart
+    this.#Chart = this.#mediator.register("Chart", Chart, options, api)
 
     this.log(`${this.#name} instantiated`)
   }
@@ -118,10 +134,27 @@ export default class MainPane {
   start() {
     this.#Time.start()
     this.#Chart.start()
+
+    for (let i = 0; i < this.#OffCharts.length; i++) {
+      this.#OffCharts[i].start(i)
+    }
+    // set up event listeners
+    this.eventsListen()
+
+    // start State Machine 
+    stateMachineConfig.context.origin = this
+    this.#mediator.stateMachine = stateMachineConfig
+    this.#mediator.stateMachine.start()
   }
 
   end() {
     
+  }
+
+
+  eventsListen() {
+    // listen/subscribe/watch for parent notifications
+    this.on("resize", (dimensions) => this.onResize(dimensions))
   }
 
   on(topic, handler, context) {
@@ -142,11 +175,6 @@ export default class MainPane {
 
   mount(el) {
     el.innerHTML = this.defaultNode()
-
-    const api = this.#mediator.api
-    this.#elWidgetsG = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETSG}`)
-    this.#elRows = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`)
-    this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
   }
 
   mountRow(el, type) {
@@ -158,48 +186,80 @@ export default class MainPane {
   }
 
   setWidth(w) {
-    this.#rowsW = w
+    const resize = this.rowsW / w
+    const rows = this.#elRows.children
+    for (let row of rows) {
+      row.style.width = row.style.width * resize
+    }
+    this.#elRows.style.width = w
   }
 
   setHeight(h) {
-    this.#rowsH = api.timeH - h
-    this.#elRows.style.height = this.#rowsH
+    const resize = this.rowsH / (h - api.timeH)
+    const rows = this.#elRows.children
+    for (let row of rows) {
+      row.style.height = row.style.height * resize
+    }
+    this.#elRows.style.height = this.#elRows.style.height * resize
   }
 
   setDimensions(dimensions) {
-
-
-    for (row of rows) {
-
-    }
-
     this.setWidth(dimensions.mainW)
     this.setHeight(dimensions.mainH)
 
-    dimensions.rowsW = this.#rowsW
-    dimensions.rowsH = this.#rowsH
+    dimensions.rowsW = this.rowsW
+    dimensions.rowsH = this.rowsH
 
     this.emit("rowsResize", dimensions)
   }
 
-  addOffChart(type, options, api) {
+  registerOffCharts(options, api) {
+    
+    let a = this.#offChartDefaultH * this.#mediator.api.offChart.length,
+        offChartsH = Math.round( a / Math.log10( a * 2 ) ) / 100,
+        rowsH = this.rowsH * offChartsH;
 
-    if (this.#rowsH === this.#chartH && !this.#OffChart.length) {
+    if (this.#mediator.api.offChart.length === 1) {
       // adjust chart size for first offChart
+      options.rowH = this.rowsH * this.#offChartDefaultH / 100
+      options.chartH = this.rowsH - options.rowH
+
     }
     else {
       // adjust chart size for subsequent offCharts
+      options.rowH = rowsH / this.#OffCharts.length
+      options.chartH = this.rowsH - rowsH
     }
 
-    this.#elChart.insertAdjacentHTML(this.rowNode(type))
+    for (let o of this.#mediator.api.offChart) {
+      this.addOffChart(o, options, api)
+    }
+    // this.emit("resizeChart", {w: this.rowsW, h: options.chartH})
+    // this.#Chart.setDimensions({w: this.rowsW, h: options.chartH})
+  }
 
-    let offChart = this.#mediator.register("OffChart", OffChart, options, api)
-    this.#OffChart.push(offChart)
-    offChart.start(this.#OffChart.length + 1)
+  addOffChart(offChart, options, api) {
 
-    this.emit("addOffChart", offchart)
+    this.#elRows.lastElementChild.insertAdjacentHTML("afterend", this.rowNode(offChart.type))
+    this.#elOffCharts.push(this.#elRows.lastElementChild)
 
+    api.elements.elOffChart = this.#elRows.lastElementChild
+    options.offChart = offChart
 
+    let o = this.#mediator.register("OffChart", OffChart, options, api)
+    
+    this.#OffCharts.push(o)
+
+    this.emit("addOffChart", o)
+  }
+
+  addIndicator(ind) {
+    console.log(`Add the ${ind.target} indicator`)
+
+    // final indicator object
+    const indicator = this.#indicators[ind.target].ind
+
+    this.emit("addIndicatorDone", indicator)
   }
 
   defaultNode() {
@@ -218,10 +278,11 @@ export default class MainPane {
 
   rowNode(type) {
     const api = this.#mediator.api
+    const styleRow = STYLE_ROW + ` border-top: 1px solid ${api.chartBorderColour};`
     const styleScale = STYLE_SCALE + ` border-color: ${api.chartBorderColour};`
 
     const node = `
-      <div class="${CLASS_ROW} ${type}">
+      <div class="${CLASS_ROW} ${type}" style="${styleRow}">
         <canvas><canvas/>
         <div class="${styleScale}">
           <canvas id=""><canvas/>

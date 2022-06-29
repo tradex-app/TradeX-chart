@@ -11,9 +11,10 @@ import chartGrid from "./overlays/chart-grid"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartCursor from "./overlays/chart-cursor"
+import indicator from "./overlays/inidcator"
+import OnChart from "./overlays"
 import stateMachineConfig from "../state/state-chart"
 import { InputController, EventDispatcher, Keys } from '@jingwood/input-control'
-import { getRange } from "../helpers/range"
 import { VolumeStyle } from "../definitions/style"
 
 
@@ -40,7 +41,7 @@ import {
   PRICEDIGITS,
 } from "../definitions/chart"
 
-const STYLE_CHART = "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
+const STYLE_CHART = "" // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
 const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
 export default class Chart {
 
@@ -51,21 +52,16 @@ export default class Chart {
   #core
   #parent
   #elChart
-  #elWidgets
   #elCanvas
   #elViewport
   #elLegends
   #elScale
 
-  #data
-  #range
-  #rangeLimit
   #Scale
   #Time
   #Legends
+  #onChart
 
-  #width
-  #height
   #chartXPadding = 5
   #chartYPadding = 2.5
 
@@ -79,29 +75,33 @@ export default class Chart {
   #layerVolume
   #layerCandles
   #layerCursor
+  #layersOnChart
   
   #chartGrid
   #chartVolume
+  #chartIndicators
   #chartCandles
   #chartCursor
 
   #cursorPos = [0, 0]
+
+  #settings
   #chartCandle
   #title
   #theme
+  #controller
 
 
   constructor (mediator, options) {
 
     this.#mediator = mediator
     this.#elChart = mediator.api.elements.elChart
-    this.#parent = this.#mediator.api.parent
+    this.#parent = {...this.#mediator.api.parent}
     this.#core = this.#mediator.api.core
-    this.#data = this.#core.chartData
-    this.#rangeLimit = this.#core.rangeLimit
-    const end = this.#data.length - 1
-    const start = end - this.#rangeLimit
-    this.#range = getRange(this.#data, start, end)
+    this.#onChart = this.#mediator.api.onChart
+
+    this.#settings = this.#mediator.api.settings
+    this.#options = options
     this.init(options)
   }
 
@@ -117,16 +117,19 @@ export default class Chart {
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
   set width(w) { this.setWidth(w) }
-  get width() { return this.#width }
+  get width() { return this.#elChart.clientWidth }
   set height(h) { this.setHeight(h) }
-  get height() { return this.#height }
-  set state(s) { this.setState(s) }
-  get state() { return this.getState() }
-  get data() { return this.#data }
-  get range() { return this.#range }
+  get height() { return this.#elChart.clientHeight }
+  set state(s) { this.#core.setState(s) }
+  get state() { return this.#core.getState() }
+  get data() { return this.#core.chartData }
+  get range() { return this.#core.range }
+  get onChart() { return this.#onChart }
   set priceDigits(digits) { this.setYAxisDigits(digits) }
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
   get cursorPos() { return this.#cursorPos }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elChart) }
 
   init(options) {
 
@@ -142,26 +145,44 @@ export default class Chart {
     // mount chart on DOM
     this.mount(this.#elChart)
 
+    // Legends - to display indicator overlay Title, inputs and options
+    let chartLegend = {
+      id: "chart",
+      title: this.#title,
+      type: "chart"
+    }
+    this.#Legends = new Legends(this.#elLegends)
+    this.#Legends.add(chartLegend)
+
     // api - functions / methods, calculated properties provided by this module
-    const api = this.#mediator.api
+    const api = {...this.#mediator.api}
     api.parent = this
+    api.chart = this
     api.elements = 
     {...api.elements, 
       ...{
-        elWidgets: this.#elWidgets,
-        elCanvas: this.#elCanvas,
+        // elWidgets: this.#elWidgets,
+        // elCanvas: this.#elCanvas,
         elScale: this.#elScale
       }
     }
+    api.onChart = this.#mediator.api.onChart
+    api.legends = this.#Legends
 
     // Y Axis - Price Scale
-    this.#Scale = this.#mediator.register("ScaleBar", ScaleBar, options, api)
+    options.yAxisType = "default"
+    this.#Scale = this.#mediator.register("Chart_ScaleBar", ScaleBar, options, api)
+
+
+    window.tradex_chart_scale = this.#Scale
+    // onChart indicators
+    // this.#onChart = this.#mediator.register("OnChart", OnChart, options, api)
+
 
     // set up layout responsiveness
-    let dimensions = {wdith: this.#width, height: this.#height}
-    this.emit("resizeChart", dimensions)
+    // let dimensions = {wdith: this.#width, height: this.#height}
+    // this.emit("resizeChart", dimensions)
 
-    this.#parent.on("resizeChart", (dimensions) => this.onResize(dimensions))
 
     this.log(`${this.#name} instantiated`)
   }
@@ -169,17 +190,8 @@ export default class Chart {
 
   start() {
 
-    // Legends - to display overlay Title, inputs and options
-    let options = {
-      id: "chart",
-      title: this.#title,
-      type: "chart"
-    }
-    this.#Legends = new Legends(this.#elLegends)
-    this.#Legends.add(options)
-
     // X Axis - Timeline
-    this.#Time = this.#parent.time
+    this.#Time = this.mediator.api.Timeline
 
     // Y Axis - Price Scale
     this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
@@ -200,23 +212,36 @@ export default class Chart {
   }
 
   end() {
-    
+    this.#controller.removeEventListener("mousemove", this.onMouseMove);
+    this.#controller.removeEventListener("drag", this.onChartDrag);
+    this.#controller.removeEventListener("enddrag", this.onChartDragDone);
+    this.#controller.removeEventListener("keydown", this.onChartKeyDown)
+    this.#controller.removeEventListener("keyup", this.onChartKeyDown)
+
+    // this.off("resizeChart", this.onResize)
+
   }
 
 
   eventsListen() {
-    let canvas = this.#viewport.scene.canvas
+    // Give canvas focus so it can receive keyboard input
+    this.#elCanvas.tabIndex = 0
+    this.#elCanvas.focus()
+
     // create controller and use 'on' method to receive input events 
-    const controller = new InputController(canvas);
+    this.#controller = new InputController(this.#elCanvas);
     // move event
-    controller.on("mousemove", e => { this.onMouseMove(e) });
+    this.#controller.on("mousemove", this.onMouseMove.bind(this));
     // drag event
-    controller.on("drag", e => { this.onChartDrag(e) });
+    this.#controller.on("drag", this.onChartDrag.bind(this));
     // drag event complete
-    controller.on("enddrag", e => { this.onChartDragDone(e) });
+    this.#controller.on("enddrag", this.onChartDragDone.bind(this));
     // keyboard input
-    controller.on("keydown", e => { this.onChartKeyDown(e) })
-    controller.on("keyup", e => { this.onChartKeyDown(e) })
+    this.#controller.on("keydown", this.onChartKeyDown.bind(this))
+    this.#controller.on("keyup", this.onChartKeyUp.bind(this))
+
+    this.on("resizeChart", e => { console.log("resizing !!!");this.onResize(e) })
+
   }
 
   on(topic, handler, context) {
@@ -263,25 +288,35 @@ export default class Chart {
   }
 
   onChartKeyDown(e) {
-    console.log(e)
+    let step = Math.ceil(this.#core.Timeline.candleW) || 1
+
     switch (e.keyCode) {
       case Keys.Left:
         console.log("keydown: cursor Left")
+
+        this.emit("chart_pan", [0,null,step,null,step * -1])
         break;
       case Keys.Right:
         console.log("keydown: cursor Right")
+
+        this.emit("chart_pan", [step,null,0,step])
         break;
     }
   }
 
   onChartKeyUp(e) {
-    console.log(e)
+    let step = Math.ceil(this.#core.Timeline.candleW) || 1
+
     switch (e.keyCode) {
       case Keys.Left:
         console.log("keyup: cursor Left")
+        
+        this.emit("chart_panDone", [0,null,step,null,step * -1])
         break;
       case Keys.Right:
         console.log("keyup: cursor Right")
+
+        this.emit("chart_panDone", [step,null,0,step])
         break;
     }
   }
@@ -290,7 +325,7 @@ export default class Chart {
     el.innerHTML = this.defaultNode()
 
     const api = this.#mediator.api
-    this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
+    // this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .viewport`)
     this.#elLegends = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .legends`)
     this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`)
@@ -301,34 +336,27 @@ export default class Chart {
       // id: (id) => this.setID(id),
       title: (title) => this.#title = title,
       yAxisDigits: (digits) => this.setYAxisDigits(digits),
-      theme: (theme) => this.setTheme(theme)
-
+      theme: (theme) => this.setTheme(theme),
     }
   }
 
   setWidth(w) {
-    this.#width = w
+    this.#elChart.style.width = w
+    this.#elViewport.style.width = w - this.#elScale.clientWidth
   }
 
   setHeight(h) {
-    this.#height = h
-    this.parent
+    this.#elChart.style.height = h
+    this.#elScale.style.height = h
+    this.#Scale.setDimensions({w: null, h: h})
   }
 
-  setState(s) {
-
+  setDimensions(dim) {
+    this.#viewport.setSize(dim.w - this.#elScale.clientWidth, dim.h)
+    this.setWidth(dim.w)
+    this.setHeight(dim.h)
   }
 
-  getState() {
-    return null
-  }
-
-  setDimensions(dimensions) {
-    this.setWidth(dimensions.mainW)
-    this.setHeight(dimensions.mainH)
-
-    this.emit("resize", dimensions)
-  }
 
   setTheme(theme) {
     this.#theme = theme
@@ -341,20 +369,22 @@ export default class Chart {
     return this.#yAxisDigits
   }
 
+  setCursor(cursor) {
+    this.#elChart.style.cursor = cursor
+  }
+
   defaultNode() {
     const api = this.#mediator.api
-    const styleChart = STYLE_CHART + ` border-color: ${api.chartBorderColour};`
-    const styleScale = STYLE_SCALE + ` width: ${api.scaleW - 1}px; border-color: ${api.chartBorderColour};`
+    const rowsH = api.height - api.utilsW - api.timeH // api.elements.elRows.clientHeight
+    const width = api.width - api.toolsW - api.scaleW
+    const height = this.#options.chartH || rowsH - 1
+
+    const styleChart = STYLE_CHART + ` width: ${width}px; height: ${height}px`
+    const styleScale = STYLE_SCALE + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`
     const styleLegend = `position: absolute; top: 0; left: 0; z-index:100;`
-    
-    const rowsH = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`).clientHeight
-    const rowsW = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`).clientWidth - 1
-    this.width = rowsW - api.scaleW
-    this.height = rowsH - 1
 
     const node = `
-      <div class="${CLASS_WIDGETS}"></div>
-      <div class="viewport"></div>
+      <div class="viewport" style="${styleChart}"></div>
       <div class="legends" style="${styleLegend}"></div>
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
@@ -377,14 +407,16 @@ export default class Chart {
   createViewport() {
     // create viewport
     this.#viewport = new CEL.Viewport({
-      width: this.width,
-      height: this.height,
+      width: this.#elViewport.clientWidth,
+      height: this.#options.chartH || this.#parent.rowsH - 1,
       container: this.#elViewport
     });
+    this.#elCanvas = this.#viewport.scene.canvas
 
     // create layers - grid, volume, candles
     this.#layerGrid = new CEL.Layer();
     this.#layerVolume = new CEL.Layer();
+    this.#layersOnChart = this.layersOnChart()
     this.#layerCandles = new CEL.Layer();
     this.#layerCursor = new CEL.Layer();
 
@@ -392,6 +424,10 @@ export default class Chart {
     this.#viewport
           .addLayer(this.#layerGrid)
           .addLayer(this.#layerVolume)
+
+    this.addLayersOnChart()
+
+    this.#viewport
           .addLayer(this.#layerCandles)
           .addLayer(this.#layerCursor)
 
@@ -411,6 +447,8 @@ export default class Chart {
         this.#Scale, 
         this.#theme)
 
+    // this.#chartIndicators = this.chartIndicators()
+
     this.#theme.maxVolumeH = this.#theme?.onchartVolumeH || VolumeStyle.ONCHART_VOLUME_HEIGHT
     this.#chartVolume =
       new chartVolume(
@@ -425,6 +463,34 @@ export default class Chart {
         this.#Time, 
         this.#Scale, 
         this.#theme)
+  }
+
+  layersOnChart() {
+    let l = []
+
+    for (let i = 0; i < this.#onChart.length; i++) {
+      l[i] = new CEL.Layer()
+    }
+    return l
+  }
+
+  addLayersOnChart() {
+    for (let i = 0; i < this.#layersOnChart.length; i++) {
+      this.#viewport.addLayer(this.#layersOnChart[i])
+    }
+  }
+
+  chartIndicators() {
+    const indicators = []
+    for (let i = 0; i < this.#layersOnChart.length; i++) {
+      indicators[i] = 
+        new indicator(
+          this.#layersOnChart[i], 
+          this.#Time,
+          this.#Scale,
+          this.config)
+    } 
+    return indicators
   }
 
   draw(range) {
@@ -467,9 +533,9 @@ export default class Chart {
     this.#volumePrecision = volumePrecision
   }
 
-  updateLegends() {
+  updateLegends(pos=this.#cursorPos[0]) {
     const legends = this.#Legends.list
-    const ohlcv = this.#Time.xPosOHLCV(this.#cursorPos[0])
+    const ohlcv = this.#Time.xPosOHLCV(pos)
     const inputs = {}
           inputs.O = this.#Scale.nicePrice(ohlcv[1])
           inputs.H = this.#Scale.nicePrice(ohlcv[2])
@@ -484,16 +550,8 @@ export default class Chart {
 
   updateRange(pos) {
 
-    // pan horizontal check
-    const dist = Math.floor(pos[0] - pos[2])
-
-    if (Math.abs(dist) < this.#Time.candleW) return
-
-    const offset = Math.floor(dist / this.#Time.candleW)
-    let start = this.range.indexStart - offset,
-        end = this.range.indexEnd - offset;
-
-    this.#range = getRange(this.#data, start, end)
+    // only updateRange when drag / pan event is generated by this component
+    this.#core.updateRange(pos)
 
     // draw the chart - grid, candles, volume
     this.draw(this.range)

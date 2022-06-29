@@ -14,6 +14,7 @@ import { XAxisStyle } from "../../definitions/style";
 export default class xAxis extends Axis {
 
   #parent
+  #chart
 
   #xAxisTicks = 4
   #xAxisGrads
@@ -21,13 +22,14 @@ export default class xAxis extends Axis {
 
   constructor(parent, chart) {
     super()
-    this.chart = chart
+    this.#chart = chart
     this.#parent = parent 
   }
 
+  get chart() { return this.#parent.mediator.api.Chart }
   get data() { return this.chart.data }
-  get range() { return this.chart.range }
-  get width() { return this.chart.width }
+  get range() { return this.#parent.range }
+  get width() { return this.calcWidth() }
   get interval() { return this.range.interval }
   get intervalStr() { return this.range.intervalStr }
   get timeStart() { return this.range.timeStart }
@@ -43,6 +45,11 @@ export default class xAxis extends Axis {
   set xAxisTicks(t) { this.#xAxisTicks = isNumber(t) ? t : 0 }
   get xAxisTicks() { return this.#xAxisTicks }
   get xAxisGrads() { return this.#xAxisGrads }
+
+  calcWidth() {
+    let api = this.#parent.mediator.api
+    return api.width - api.toolsW - api.scaleW
+  }
 
   /**
  * return canvas x co-ordinate
@@ -64,8 +71,12 @@ export default class xAxis extends Axis {
   }
 
   pixel2T(x) {
-    let c = Math.floor(x / this.candleW ) + this.range.indexStart
+    let c = this.pixel2Index(x)
     return this.range.data[c][0]
+  }
+
+  pixel2Index(x) {
+    return Math.floor(x / this.candleW ) + this.range.indexStart
   }
 
   pixelOHLCV(x) {
@@ -87,6 +98,10 @@ export default class xAxis extends Axis {
    */
   xPos2Time(x) {
     return this.pixel2T(x)
+  }
+
+  xPos2Index(x) {
+    return this.pixel2Index(x)
   }
 
   xPosOHLCV(x) {

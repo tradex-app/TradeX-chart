@@ -2,12 +2,12 @@
 // A template file for Chart components
 
 import DOM from "../utils/DOM"
-import { CLASS_MENU, CLASS_WINDOW } from "../definitions/core"
+import { CLASS_MENUS, CLASS_MENU, CLASS_DIVIDERS, CLASS_WINDOW } from "../definitions/core"
 import { MenuStyle, WindowStyle } from "../definitions/style"
-import menu from "./widgets/menu"
-import dialogue from "./widgets/dialogue"
-
-// import stateMachineConfig from "../state/state-widgets"
+import Menu from "./widgets/menu"
+// import Dialogue from "./widgets/dialogue"
+import Divider from "./widgets/divider"
+import stateMachineConfig from "../state/state-widgets"
 
 export default class Widgets {
 
@@ -16,23 +16,24 @@ export default class Widgets {
   #mediator
   #options
   #parent
-  #elements
+  #widgets
+  #widgetsList = { Divider, Menu }
+  #widgetsInstances = {}
+  #elements = {}
   #elWidgetsG
-  #elMenu
+  #elMenus
+  #elDividers
 
   #width
   #height
-
-  #widgetSettings
-  #widgetTimezone
-  #widgetIndicators
 
 
   constructor (mediator, options) {
 
     this.#mediator = mediator
     this.#options = options
-    this.#elWidgetsG = this.#mediator.api.elements.elWidgetsG
+    this.#widgets = options.widgets || this.#widgetsList
+    this.#elWidgetsG = this.#mediator.api.core.elWidgetsG
     this.#parent = this.#mediator.api.parent
     this.init()
   }
@@ -47,6 +48,7 @@ export default class Widgets {
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   get elements() { return this.#elements }
+  get instances() { return this.#widgetsInstances }
 
   init() {
     this.mount(this.#elWidgetsG)
@@ -54,28 +56,34 @@ export default class Widgets {
     // api - functions / methods, calculated properties provided by this module
     const api = this.#mediator.api
     api.parent = this.#mediator
-    api.elements = this.#elements
-    
-    this.#elMenu = DOM.findBySelector(`#${api.id} .${CLASS_MENU}`)
+    // api.elements = this.#elements
 
-    this.#elements = {
-      elWidgetsG: this.#elWidgetsG,
-      elMenu: this.#elMenu
+    // this.#elements = {
+    //   elWidgetsG: this.#elWidgetsG,
+    // }
+
+    api.elements = 
+    {...api.elements, 
+      ...{
+        elWidgetsG: this.#elWidgetsG
+      }
     }
 
-    // listen/subscribe/watch for parent notifications
-    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
+    for (let i in this.#widgets) {
+      let widget = this.#widgets[i]
+      let entry = `el${widget.name}`
+      this.#elements[entry] = DOM.findBySelector(`#${api.id} .${widget.class}`)
+    }
   }
 
   start() {
-
     // set up event listeners
     this.eventsListen()
 
     // start State Machine 
-    // stateMachineConfig.context.origin = this
-    // this.#mediator.stateMachine = stateMachineConfig
-    // this.#mediator.stateMachine.start()
+    stateMachineConfig.context.origin = this
+    this.#mediator.stateMachine = stateMachineConfig
+    this.#mediator.stateMachine.start()
   }
 
   end() {
@@ -84,12 +92,19 @@ export default class Widgets {
     // Put your toys away or it will end in tears.
   }
 
-
+  // listen/subscribe/watch for parent notifications
   eventsListen() {
-    this.#mediator.on("utils_indicators", (e) => { this.onIndicators(e) })
-    this.#mediator.on("utils_timezone", (e) => { this.onTimezone(e) })
-    this.#mediator.on("utils_settings", (e) => { this.onSettings(e) })
-    this.#mediator.on("utils_screenshot", (e) => { this.onScreenshot(e) })
+    // this.on("utils_indicators", (e) => { this.onIndicators(e) })
+    // this.on("utils_timezone", (e) => { this.onTimezone(e) })
+    // this.on("utils_settings", (e) => { this.onSettings(e) })
+    // this.on("utils_screenshot", (e) => { this.onScreenshot(e) })
+    // this.on("resize", (dimensions) => this.onResize(dimensions))
+
+    this.on("openMenu", this.onOpenMenu.bind(this))
+    this.on("closeMenu", this.onCloseMenu.bind(this))
+    this.on("offMenu", this.onCloseMenu.bind(this))
+
+
   }
 
   on(topic, handler, context) {
@@ -108,34 +123,15 @@ export default class Widgets {
     this.setDimensions(dimensions)
   }
 
-  onIndicators(e) {
+  onOpenMenu(data) {
+    console.log("onOpenMenu:", data)
 
-    const insidcators = [
-      {id: "ADX", name: "Average Direction", action: ()=>{console.log("ADX")}},
-      {id: "BB", name: "Bollinger Bands", action: ()=>{console.log("BB")}},
-      {id: "DMI", name: "Directional Movement", action: ()=>{console.log("DMI")}}
-    ]
-
-    let content = "<ul>"
-    for (let i of insidcators) {
-      content += `<li><span>${i.id}</span><span>${i.name}</span></li>`
-    }
-    content += "</ul>"
-
-    this.insertMenu(e, content)
-    console.log("Indicators Menu")
+    this.#widgetsInstances[data.menu].open()
   }
+  onCloseMenu(data) {
+    console.log("onCloseMenu:", data)
 
-  onTimezone(e) {
-    console.log("Set timezone")
-  }
-
-  onSettings(e) {
-    console.log("Modify chart settings")
-  }
-
-  onScreenshot(e) {
-    console.log("Save chart screenshot")
+    this.#widgetsInstances[data.menu].close()
   }
 
   mount(el) {
@@ -156,27 +152,26 @@ export default class Widgets {
   }
 
   defaultNode() {
-    const menuStyle = `display: none; border: 1px solid ${MenuStyle.COLOUR_BORDER}; background: ${MenuStyle.COLOUR_BG}; color: ${MenuStyle.COLOUR_TXT}; position: absolute;`
 
-    const node = `
-      <div class="${CLASS_MENU}" style="${menuStyle}"></div>
-    `
-    return node
+    let nodes = ``
+    for (let i in this.#widgets) {
+      let widget = this.#widgets[i]
+      nodes += widget.defaultNode()
+    }
+
+    return nodes
   }
 
-  insertMenu(e, content) {
-    let wPos = this.#elWidgetsG.getBoundingClientRect()
-    let iPos = e.target.getBoundingClientRect()
-
-    let pos = [iPos.left - wPos.left, iPos.bottom - wPos.top]
-    let config = { pos, content }
-    return menu(this, config)
+  insert(type, config) {
+    config.mediator = this.mediator
+    const widget = this.#widgets[type].create(this, config)
+    this.#widgetsInstances[widget.id] = widget
+    return widget
   }
 
-  removeMenu() {
-
+  remove(type, id) {
+    delete(this.#widgetsInstances[id])
+    this.#widgets[type].destroy(id)
   }
-
-// -----------------------
 
 }

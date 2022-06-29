@@ -1,7 +1,7 @@
 // yAxis.js
 
 import Axis from "./axis";
-import { log10, precision, round } from "../../utils/number";
+import { log10, power, precision, round } from "../../utils/number";
 import { isNumber } from "../../utils/typeChecks";
 
 import { 
@@ -14,6 +14,8 @@ import { YAxisStyle } from "../../definitions/style";
 export default class yAxis extends Axis {
 
   #parent
+  #chart
+
   #yAxisType = YAXIS_TYPES[0]  // default, log, percent
   #yAxisPadding = 1.04
   #yAxisStep = YAXIS_STEP
@@ -24,12 +26,14 @@ export default class yAxis extends Axis {
 
   constructor(parent, chart, yAxisType=YAXIS_TYPES[0]) {
     super()
-    this.chart = chart
+    this.#chart = chart
     this.#parent = parent 
+    this.yAxisType = yAxisType
   }
 
+  get chart() { return this.#chart } //this.#parent.mediator.api.core.Chart }
   get data() { return this.chart.data }
-  get range() { return this.chart.range }
+  get range() { return this.#parent.mediator.api.core.range }
   get height() { return this.chart.height }
   get rangeH() { return this.range.height * this.yAxisPadding }
   get yAxisRatio() { return this.height / this.range.height }
@@ -43,6 +47,11 @@ export default class yAxis extends Axis {
   set yAxisTicks(t) { this.#yAxisTicks = isNumber(t) ? t : 0 }
   get yAxisTicks() { return this.#yAxisTicks }
   get yAxisGrads() { return this.#yAxisGrads }
+
+  calcHeight() {
+    let api = this.#chart.mediator.api
+    return api.height - api.utilsW - api.scaleW
+  }
 
   yAxisRangeBounds() {
 
@@ -75,7 +84,8 @@ export default class yAxis extends Axis {
    */
   yPos(yData) {
     switch(this.yAxisType) {
-      case "percentage" :
+      case "percent" :
+        return this.p100toPixel(yData)
         break;
       case "log" :
         return this.$2Pixel(log10(yData))
@@ -107,51 +117,75 @@ export default class yAxis extends Axis {
     return this.range.priceMin + adjust
   }
 
+  p100toPixel(yData) {
+    return this.height * yData / 100
+  }
+
   calcGradations() {
 
-    const grad = Math.floor(this.height / this.#yAxisStep)
+    switch (this.yAxisType) {
+      case "percent":
+        this.#yAxisGrads = this.gradations(100, 0, false)
+        break;
+      default:
+        this.#yAxisGrads = this.gradations(this.range.priceMax, this.range.priceMin)
+        break;
+    }
+  }
 
-    const rangeMid = (this.range.priceMax + this.range.priceMin) * 0.5
-      let digits = this.countDigits(rangeMid)
-    const scaleMid = this.niceValue(digits)
-    const step = (this.range.priceMax - scaleMid) / grad
+  gradations(max, min, decimals=true) {
+    const rangeMid = (max + min) * 0.5
+    const midH = this.height * 0.5
+    let digits = this.countDigits(rangeMid)
+    const scaleMid = this.niceValue(digits, decimals)
 
-    const scaleGrads = [[scaleMid, this.$2Pixel(scaleMid), digits]]
+    const scaleGrads = [[scaleMid, round(midH), digits]]
 
-    let upper = scaleMid + step,
+    let grad = round(power(log10(midH), 2) - 1),
+        step$ = (max - scaleMid) / grad,
+        stepP = midH / grad,
+        upper = scaleMid + step$,
+        pos = midH - stepP,
         nice, 
         entry;
-    while (upper <= this.range.priceMax) {
+    while (upper <= max) {
       digits = this.countDigits(upper)
-      nice = this.niceValue(digits)
-      entry = [nice, this.$2Pixel(nice), digits]
+      nice = this.niceValue(digits, decimals)
+      entry = [nice, round(pos), digits]
       scaleGrads.unshift(entry)
-      upper += step
+      upper += step$
+      pos -= stepP
     }
-    let lower = scaleMid - step
-    while (lower >= this.range.priceMin) {
+    let lower = scaleMid - step$
+        pos = midH + stepP
+    while (lower >= min) {
       digits = this.countDigits(lower)
-      nice = this.niceValue(digits)
-      entry = [nice, this.$2Pixel(nice), digits]
+      nice = this.niceValue(digits, decimals)
+      entry = [nice, round(pos), digits]
       scaleGrads.push(entry)
-      lower -= step
+      lower -= step$
+      pos += stepP
     }
     return scaleGrads
   }
 
-  niceValue(digits) {
+  niceValue(digits, decimals=true) {
     if (digits.integers) {
       let x = digits.integers - this.#yAxisRound
       if (x > 0) {
-        let factor = Math.pow(10, x)
+        let factor = power(10, x)
         return Math.floor(digits.value / factor) * factor
       }
       else {
-
+        if (!decimals) return Math.floor(digits.value)
+        x = (x -1) * -1
+        return round(digits.value, x)
       }
     }
     else {
-
+      let y = digits.decimals - this.#yAxisRound
+      y = (y -1) * -1
+      return round(digits.value, y)
     }
   }
 
@@ -173,7 +207,8 @@ export default class yAxis extends Axis {
   }
 
   draw() {
-    this.#yAxisGrads = this.calcGradations()
+    // calculate Y Axis gradations for labels and overlays
+    this.calcGradations()
     this.drawLabels()
     this.drawOverlays()
   }

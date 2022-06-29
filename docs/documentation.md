@@ -1,9 +1,31 @@
 # TradeXChart
 
-
 ### v0.0.0
 
 TradeXChart follows [breaking].[feature].[fix] versioning
+
+# Configuration
+
+`const chart = Chart.create(mount, config, state )`
+
+@param {DOM element} mount
+@param {object} config
+@param {object} state
+
+A DOM element is requried to mount the chart. Any contents of the element will be replaced by the chart
+
+TradeXChart can be configured through two options.
+
+1. config
+2. state
+
+Config describes the basics of the chart, size, ect. and requires the following minimum properties to be valid.
+
+...
+
+State is a snapshot of the entirety of the chart state, including chart price data, indicators, drawing tools, datasets and theme. Where properties of Config and State.settings intersect, Config properties take priority.
+
+# Architecture
 
 **Hook Observer Pattern**
 An extensible API like WordPress
@@ -111,6 +133,9 @@ Refrences: [3]
 ## Module Template
 
 ```javascript
+// optional State Machine
+// import stateMachineConfig from "../state/state-chart"
+
 export default class UtilsBar {
 
   #modID                 // required - set by the Core
@@ -135,6 +160,14 @@ export default class UtilsBar {
   warning(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
+  // required
+  get name() {return this.#name}
+  // required
+  get shortName() {return this.#shortName}
+  // required
+  get mediator() {return this.#mediator}
+  // required
+  get options() {return this.#options}
 
   init() {
     this.mount(this.#elUtils)
@@ -144,6 +177,14 @@ export default class UtilsBar {
   start() {
     // Start the module's activities.
     // Play time!
+
+    // set up event listeners
+    this.eventsListen()
+
+    // start State Machine 
+    // stateMachineConfig.context.origin = this
+    // this.#mediator.stateMachine = stateMachineConfig
+    // this.#mediator.stateMachine.start()
   }
 
   // required
@@ -153,14 +194,7 @@ export default class UtilsBar {
     // Put your toys away or it will end in tears.
   }
 
-  // required
-  get name() {return this.#name}
-  // required
-  get shortName() {return this.#shortName}
-  // required
-  get mediator() {return this.#mediator}
-  // required
-  get options() {return this.#options}
+
 
   // recommended
   on(topic, handler, context) {

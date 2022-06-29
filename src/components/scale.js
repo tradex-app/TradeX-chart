@@ -7,6 +7,7 @@ import CEL from "./primitives/canvas"
 import { drawTextBG } from "../utils/canvas"
 import stateMachineConfig from "../state/state-scale"
 import { InputController, EventDispatcher } from '@jingwood/input-control'
+import { copyDeep } from '../utils/utilities'
 
 import {
   NAME,
@@ -26,6 +27,9 @@ import {
   CLASS_ONCHART,
   CLASS_OFFCHART,
 } from '../definitions/core'
+import { 
+  YAXIS_TYPES
+} from "../definitions/chart";
 import { YAxisStyle } from "../definitions/style";
 
 export default class ScaleBar {
@@ -36,14 +40,14 @@ export default class ScaleBar {
   #options
   #parent
   #core
+  #chart
   #target
   #yAxis
   #elScale
   #elScaleCanvas
   #elViewport
 
-  #width
-  #height
+  #yAxisType = YAXIS_TYPES[0]  // default, log, percent
 
   #viewport
   #layerLabels
@@ -55,8 +59,8 @@ export default class ScaleBar {
     this.#mediator = mediator
     this.#options = options
     this.#elScale = mediator.api.elements.elScale
+    this.#chart = mediator.api.core.Chart
     this.#parent = mediator.api.parent
-    this.#yAxis = new yAxis(this, this.#parent)
     this.init()
   }
 
@@ -70,19 +74,23 @@ export default class ScaleBar {
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   set height(h) { this.setHeight(h) }
-  get height() { return this.#yAxis.height }
+  get height() { return this.#elScale.clientHeight }
   get width() { return this.#elScale.clientWidth }
   get yAxisHeight() { return this.#yAxis.height }
   get yAxisRatio() { return this.#yAxis.yAxisRatio }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
+  set yAxisType(t) { this.#yAxisType = YAXIS_TYPES.includes(t) ? t : YAXIS_TYPES[0] }
+  get yAxisType() { return this.#yAxisType }
   get yAxisGrads() { return this.#yAxis.yAxisGrads }
   get viewport() { return this.#viewport }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elScale) }
 
   init() {
     this.mount(this.#elScale)
 
-    this.#parent.on("resizeChart", (dimensions) => this.onResize(dimensions))
+    this.yAxisType = this.options.yAxisType
 
     this.log(`${this.#name} instantiated`)
   }
@@ -90,6 +98,8 @@ export default class ScaleBar {
 
   start(data) {
     this.emit("started",data)
+
+    this.#yAxis = new yAxis(this, this, this.yAxisType)
 
     // prepare layered canvas
     this.createViewport()
@@ -100,9 +110,10 @@ export default class ScaleBar {
     this.eventsListen()
 
     // start State Machine 
-    stateMachineConfig.context.origin = this
-    this.#mediator.stateMachine = stateMachineConfig
-    this.#mediator.stateMachine.start()
+    const newConfig = copyDeep(stateMachineConfig)
+    newConfig.context.origin = this
+    this.mediator.stateMachine = newConfig
+    this.mediator.stateMachine.start()
   }
 
   end() {
@@ -114,21 +125,22 @@ export default class ScaleBar {
     // create controller and use 'on' method to receive input events 
     const controller = new InputController(canvas);
 
-    this.#mediator.on("chart_mousemove", (e) => { this.drawCursorPrice(e) })
-    this.#mediator.on("chart_pan", (e) => { this.drawCursorPrice(e) })
-    this.#mediator.on("chart_panDone", (e) => { this.drawCursorPrice(e) })
+    this.on("chart_mousemove", (e) => { this.drawCursorPrice(e) })
+    this.on("chart_pan", (e) => { this.drawCursorPrice(e) })
+    this.on("chart_panDone", (e) => { this.drawCursorPrice(e) })
+    // this.on("resizeChart", (dimensions) => this.onResize(dimensions))
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.mediator.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.mediator.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.mediator.emit(topic, data)
   }
 
   onResize(dimensions) {
@@ -138,21 +150,20 @@ export default class ScaleBar {
   mount(el) {
     el.innerHTML = this.defaultNode()
 
-    const api = this.#mediator.api
-    this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE} .viewport`)
-
+    this.#elViewport = el.querySelector(`.viewport`)
   }
 
   setHeight(h) {
-    this.#height = h
+    this.#elScale.style.height = h
   }
 
-  setDimensions(dimensions) {
-    this.setHeight(dimensions.mainH)
+  setDimensions(dim) {
+    this.#viewport.setSize(this.width, dim.h)
+    this.setHeight(dim.h)
   }
 
   defaultNode() {
-    const api = this.#mediator.api
+    const api = this.mediator.api
     const node = `
       <div class="viewport"></div>
     `
@@ -176,8 +187,8 @@ export default class ScaleBar {
   createViewport() {
     // create viewport
     this.#viewport = new CEL.Viewport({
-      width: this.width,
-      height: this.height,
+      width: this.#elScale.clientWidth,
+      height: this.#elScale.clientHeight,
       container: this.#elViewport
     });
 

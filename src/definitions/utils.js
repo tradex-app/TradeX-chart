@@ -7,35 +7,40 @@ export default [
     id: "indicators",
     name: "Indicators", 
     icon: chart, 
-    action: (e, mediator) => {
-      mediator.emit("utils_indicators", e)
-    }
+    event: "utils_indicators",
+    sub: [],
+    // action: (e, mediator) => {
+    //   mediator.emit("utils_indicators", e)
+    // }
   },
   {
     id: "timezone",
     name: "Timezone", 
     icon: clock, 
-    action: (e, mediator) => {
-      mediator.emit("utils_timezone", e)
-    }
+    event: "utils_timezone",
+    // action: (e, mediator) => {
+    //   mediator.emit("utils_timezone", e)
+    // }
   },
   {
     id: "settings",
     name: "Settings", 
     icon: config, 
-    action: (e, mediator) => {
-      mediator.emit("utils_settings", e)
-    }
+    event: "utils_settings",
+    // action: (e, mediator) => {
+    //   mediator.emit("utils_settings", e)
+    // }
   },
   {
     id: "screenshot",
     name: "Screenshot", 
     icon: camera, 
-    action: (e, mediator) => {
-      mediator.emit("utils_screenshot", e)
-    }
+    event: "utils_screenshot",
+    // action: (e, mediator) => {
+    //   mediator.emit("utils_screenshot", e)
+    // }
   },
-  // {name: "Save", icon: "./assets/svg/", action: () => {}},
+  // {name: "Save", icon: "./assets/svg/", event: "utils_save", action: () => {}},
   // {name: "Load", icon: "./assets/svg/", action: () => {}},
   // {name: "Refresh", icon: "./assets/svg/", action: () => {}},
 ]

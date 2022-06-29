@@ -15,6 +15,8 @@ export default class ToolsBar {
   #options
   #elTools
   #tools
+  #widgets
+
 
   constructor (mediator, options) {
 
@@ -22,6 +24,7 @@ export default class ToolsBar {
     this.#options = options
     this.#elTools = mediator.api.elements.elTools
     this.#tools = tools || options.tools
+    this.#widgets = this.#mediator.api.core.WidgetsG
     this.init()
   }
 
@@ -34,6 +37,8 @@ export default class ToolsBar {
   get shortName() {return this.#shortName}
   get mediator() {return this.#mediator}
   get options() {return this.#options}
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elTools) }
 
   init() {
     this.mount(this.#elTools)
@@ -47,7 +52,15 @@ export default class ToolsBar {
   }
 
   end() {
-    
+    // remove event listeners
+    const api = this.#mediator.api
+    const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`)
+    for (let tool of tools) {
+      for (let t of this.#tools) {
+        if (t.id === id)
+          tool.removeEventListener("click", this.onIconClick)
+      }
+    }
   }
 
   on(topic, handler, context) {
@@ -60,6 +73,15 @@ export default class ToolsBar {
 
   emit(topic, data) {
     this.#mediator.emit(topic, data)
+  }
+
+  onIconClick(e) {
+    let id = e.currentTarget.id,
+        evt = e.currentTarget.dataset.event,
+        menu = e.currentTarget.dataset.menu || false
+    this.emit(evt, id)
+
+    if (menu) this.emit("openMenu", {id, evt, menu})
   }
 
   mount(el) {
@@ -77,11 +99,19 @@ export default class ToolsBar {
           svg.style.width = "90%"
 
 
-      for (let u of this.#tools) {
-        if (u.id === id)
-          svg.addEventListener("click", (e) => {
-            u.action(e, this)
-          })
+      for (let t of this.#tools) {
+        if (t.id === id) {
+          tool.addEventListener("click", this.onIconClick.bind(this))
+          if (t?.sub) {
+            let config = {
+              content: t.sub,
+              primary: tool
+            }
+            let menu = this.#widgets.insert("Menu", config)
+            tool.dataset.menu = menu.id
+            menu.start()
+          }
+        }
       }
     }
   }
@@ -95,10 +125,11 @@ export default class ToolsBar {
     return toolbar
   }
 
-  iconNode(icon) {
+  iconNode(tool) {
     const iconStyle = `display: inline-block; height: ${this.#elTools.clientWidth}px; padding-right: 2px`
+    const menu = ("sub" in tool) ? `data-menu="true"` : ""
     return  `
-      <div id="TX_${icon.id}" class="icon-wrapper" style="${iconStyle}">${icon.icon}</div>\n
+      <div id="TX_${tool.id}" data-event="${tool.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${tool.icon}</div>\n
     `
   }
 
