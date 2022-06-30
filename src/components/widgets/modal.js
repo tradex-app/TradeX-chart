@@ -1,8 +1,9 @@
-// dialogue.js
+// modal.js
+// modal window blocks the entire chart
 
 import Window from "./window";
 
-export default class Dialogue extends Window {
+export default class Modal extends Window {
 
 
     constructor(widgets, config) {

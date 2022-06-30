@@ -76,13 +76,23 @@ export default class ToolsBar {
   }
 
   onIconClick(e) {
-    let id = e.currentTarget.id,
-        evt = e.currentTarget.dataset.event,
-        menu = e.currentTarget.dataset.menu || false
-    this.emit(evt, id)
+    let evt = e.currentTarget.dataset.event,
+        menu = e.currentTarget.dataset.menu || false,
+        data = {
+          target: e.currentTarget.id,
+          menu: menu,
+          evt: e.currentTarget.dataset.event
+        };
+        
+    this.emit(evt, data)
 
-    if (menu) this.emit("openMenu", {id, evt, menu})
+    if (menu) this.emit("openMenu", data)
+    else {
+      this.emit("menuItemSelected", data)
+      this.emit("toolSelected", data)
+    }
   }
+
 
   mount(el) {
     el.innerHTML = this.defaultNode()
