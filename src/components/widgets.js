@@ -2,11 +2,9 @@
 // A template file for Chart components
 
 import DOM from "../utils/DOM"
-import { CLASS_MENUS, CLASS_MENU, CLASS_DIVIDERS, CLASS_WINDOW } from "../definitions/core"
-import { MenuStyle, WindowStyle } from "../definitions/style"
 import Menu from "./widgets/menu"
-// import Dialogue from "./widgets/dialogue"
 import Divider from "./widgets/divider"
+import Window from "./widgets/window"
 import stateMachineConfig from "../state/state-widgets"
 
 export default class Widgets {
@@ -17,7 +15,7 @@ export default class Widgets {
   #options
   #parent
   #widgets
-  #widgetsList = { Divider, Menu }
+  #widgetsList = { Divider, Menu, Window }
   #widgetsInstances = {}
   #elements = {}
   #elWidgetsG
