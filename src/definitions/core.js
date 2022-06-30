@@ -18,6 +18,7 @@ export const CLASS_OFFCHART  = "tradeXoffChart"
 export const CLASS_MENUS     = "tradeXmenus"
 export const CLASS_MENU      = "tradeXmenu"
 export const CLASS_DIVIDERS  = "tradeXdividers"
+export const CLASS_WINDOWS   = "tradeXwindows"
 export const CLASS_WINDOW    = "tradeXwindow"
 export const CLASS_PROGRESS  = "tradeXprogress"
 
