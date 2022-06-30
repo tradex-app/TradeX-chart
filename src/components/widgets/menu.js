@@ -23,6 +23,7 @@ export default class Menu {
   static menuCnt = 0
   static class = CLASS_MENUS
   static name = "Menus"
+  static type = "menu"
   static currentActive
 
   constructor(widgets, config) {

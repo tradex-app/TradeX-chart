@@ -27,6 +27,7 @@ export default class Window {
   static windowCnt = 0
   static class = CLASS_WINDOWS
   static name = "Windows"
+  static type = "window"
   static currentActive
 
   constructor(widgets, config) {
@@ -153,13 +154,18 @@ export default class Window {
 
   windowNode() {
     const window = this.#config
-    const windowStyle = `position: absolute; z-index: 1000; display: none; border: 1px solid ${WindowStyle.COLOUR_BORDER}; background: ${WindowStyle.COLOUR_BG}; color: ${WindowStyle.COLOUR_TXT};`
+    const windowStyle = `position: absolute; z-index: 1000; display: block; border: 1px solid ${WindowStyle.COLOUR_BORDER}; background: ${WindowStyle.COLOUR_BG}; color: ${WindowStyle.COLOUR_TXT};`
+
+    // if x,y position not provided calculate default
+    let x = this.#config.x || 100
+    let y = this.#config.y || -100
+    let p = `top: ${y}px; left: ${x}px;`
 
     let dragBar = this.dragBar(window)
     let content = this.content(window)
     let closeIcon = this.closeIcon(window)
     let node = `
-      <div id="${window.id}" class="${CLASS_WINDOW}" style="${windowStyle}">
+      <div id="${window.id}" class="${CLASS_WINDOW}" style="${windowStyle} ${p}">
           ${dragBar}
           ${closeIcon}
           ${content}
@@ -170,9 +176,11 @@ export default class Window {
   }
 
   content(window) {
+    const contentStyle = "padding: 2em;"
+
     let content = (window?.content)? window.content : ''
     let node = `
-      <div class="content">
+      <div class="content" style="${contentStyle}">
         ${content}
       </div>
     `

@@ -172,7 +172,12 @@ export default class UtilsBar {
 
   onTimezone(data) {
     console.log(`Timezone:`,data)
-    let config = {}
+    let x = 100
+    let y = -100;
+    let content = `
+      This feature is not implemented yet.
+    `;
+    let config = { x, y, content }
     this.#widgets.insert("Dialogue", config)
   }
 

@@ -146,10 +146,17 @@ export default class Widgets {
 
   defaultNode() {
 
-    let nodes = ``
+    let nodes = ``,
+        types = [];
     for (let i in this.#widgets) {
       let widget = this.#widgets[i]
-      nodes += widget.defaultNode()
+
+      // only add one of each widget type
+      // some widgets are extensions of a parent
+      if (types.indexOf(widget.type) === -1) {
+        nodes += widget.defaultNode()
+        types.push(widget.type)
+      }
     }
 
     return nodes

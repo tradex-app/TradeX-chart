@@ -5,13 +5,14 @@ import Window from "./window";
 
 export default class Modal extends Window {
 
+  static type = "window"
 
-    constructor(widgets, config) {
-      super()
+  constructor(widgets, config) {
+    super()
 
-      config.dragbar = true
-      config.close = tue
-      this.config = config
-    }
+    config.dragbar = true
+    config.close = tue
+    this.config = config
+  }
   
 }

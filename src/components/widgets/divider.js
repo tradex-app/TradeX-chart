@@ -25,6 +25,8 @@ export default class Divider{
   static divideCnt = 0
   static class = CLASS_DIVIDERS
   static name = "Dividers"
+  static type = "divider"
+
 
   constructor(widgets, config) {
     this.#widgets = widgets
