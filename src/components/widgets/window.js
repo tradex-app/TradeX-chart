@@ -61,6 +61,8 @@ export default class Window {
   get el() { return this.#elWindow }
   get id() { return this.#id }
   get pos() { return this.dimensions }
+  get config() { return this.#config }
+  set config(c) { this.#config = c }
   get dimensions() { return DOM.elementDimPos(this.#elWindow) }
 
   init() {
@@ -153,27 +155,62 @@ export default class Window {
     const window = this.#config
     const windowStyle = `position: absolute; z-index: 1000; display: none; border: 1px solid ${WindowStyle.COLOUR_BORDER}; background: ${WindowStyle.COLOUR_BG}; color: ${WindowStyle.COLOUR_TXT};`
 
+    let dragBar = this.dragBar(window)
     let content = this.content(window)
+    let closeIcon = this.closeIcon(window)
     let node = `
       <div id="${window.id}" class="${CLASS_WINDOW}" style="${windowStyle}">
-        ${content}
+          ${dragBar}
+          ${closeIcon}
+          ${content}
+        </div>
       </div>
     `
     return node
   }
 
   content(window) {
+    let content = (window?.content)? window.content : ''
+    let node = `
+      <div class="content">
+        ${content}
+      </div>
+    `
+    return node
+  }
+
+  // get your drag on
+  dragBar(window) {
+    const api = this.#mediator.api
+    const cPointer = "cursor: grab;"
+    const over = `onmouseover="this.style.background ='#222'"`
+    const out = `onmouseout="this.style.background ='none'"`
+    const dragBarStyle = `${cPointer}`
+
+    let node = ``
+    if (window.dragBar) node +=
+    `
+      <div class="dragBar" ${dragBarStyle} ${over} ${out}>
+      </div>
+    `
+    return node
+  }
+
+  closeIcon(window) {
     const api = this.#mediator.api
     const cPointer = "cursor: pointer;"
     const over = `onmouseover="this.style.background ='#222'"`
     const out = `onmouseout="this.style.background ='none'"`
+    const closeIconStyle = `${cPointer}`
 
-    let content = `<ul style="${listStyle}">`
-    if (window?.content) {
-      content += window.content
-    }
-    content += "</ul>"
-    return content
+    let node = ``
+    if (window.closeIcon) node +=
+    `
+      <div class="closeIcon" ${closeIconStyle} ${over} ${out}>
+        <span>X</span>
+      </div>
+    `
+    return node
   }
 
   position(target) {

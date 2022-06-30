@@ -3,6 +3,7 @@
 
 import DOM from "../utils/DOM"
 import Menu from "./widgets/menu"
+import Dialogue from "./widgets/dialogue"
 import Divider from "./widgets/divider"
 import Window from "./widgets/window"
 import stateMachineConfig from "../state/state-widgets"
@@ -15,7 +16,7 @@ export default class Widgets {
   #options
   #parent
   #widgets
-  #widgetsList = { Divider, Menu, Window }
+  #widgetsList = { Dialogue, Divider, Menu, Window }
   #widgetsInstances = {}
   #elements = {}
   #elWidgetsG
@@ -92,17 +93,11 @@ export default class Widgets {
 
   // listen/subscribe/watch for parent notifications
   eventsListen() {
-    // this.on("utils_indicators", (e) => { this.onIndicators(e) })
-    // this.on("utils_timezone", (e) => { this.onTimezone(e) })
-    // this.on("utils_settings", (e) => { this.onSettings(e) })
-    // this.on("utils_screenshot", (e) => { this.onScreenshot(e) })
     // this.on("resize", (dimensions) => this.onResize(dimensions))
 
     this.on("openMenu", this.onOpenMenu.bind(this))
     this.on("closeMenu", this.onCloseMenu.bind(this))
     this.on("offMenu", this.onCloseMenu.bind(this))
-
-
   }
 
   on(topic, handler, context) {
