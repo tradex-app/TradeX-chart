@@ -24,6 +24,7 @@ export default class UtilsBar {
   #options
   #elUtils
   #utils
+  #core
   #widgets
   #indicators
   #menus = {}
@@ -34,6 +35,7 @@ export default class UtilsBar {
     this.#options = options
     this.#elUtils = mediator.api.elements.elUtils
     this.#utils = utilsList || options.utilsBar
+    this.#core = this.#mediator.api.core
     this.#widgets = this.#mediator.api.core.WidgetsG
     this.#indicators = this.options.indicators || indicators
     this.init()
@@ -170,15 +172,22 @@ export default class UtilsBar {
   }
 
 
+  onIndicators(data) {
+    console.log(`Indicator:`,data)
+  }
+
   onTimezone(data) {
     console.log(`Timezone:`,data)
-    let x = 100
-    let y = -100;
-    let content = `
-      This feature is not implemented yet.
-    `;
-    let config = { x, y, content }
-    this.#widgets.insert("Dialogue", config)
+    this.#core.notImplemented()
   }
+
+  onSettings(data) {
+    console.log(`Settings:`,data)
+  }
+
+  onScreenshot(data) {
+    console.log(`Screenshot:`,data)
+  }
+
 
 }

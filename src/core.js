@@ -510,4 +510,16 @@ constructor (mediator, options={}) {
     }
     this.#range = getRange(allData, start, end)
   }
+
+  notImplemented() {
+    if (!this.implemented) {
+      let content = `
+        This feature is not implemented yet.
+      `;
+      let config = { content }
+      this.implemented = this.#WidgetsG.insert("Dialogue", config)
+      this.implemented.start()
+    }
+    else this.implemented.open()
+  }
 }
