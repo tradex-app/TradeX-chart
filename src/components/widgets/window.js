@@ -7,6 +7,7 @@
 import DOM from "../../utils/DOM"
 import { CLASS_WINDOWS, CLASS_WINDOW } from "../../definitions/core"
 import { WindowStyle } from "../../definitions/style"
+import { decimalPlaces } from "../../utils/number"
 
 export default class Window {
 
@@ -28,7 +29,7 @@ export default class Window {
   static class = CLASS_WINDOWS
   static name = "Windows"
   static type = "window"
-  static currentActive
+  static currentActive = null
 
   constructor(widgets, config) {
     this.#widgets = widgets
@@ -72,8 +73,6 @@ export default class Window {
   }
 
   start() {
-    // position windows next to primary (icon)
-    this.position(this.#config.primary)
     // set up event listeners
     this.eventsListen()
   }
@@ -87,13 +86,15 @@ export default class Window {
 
   eventsListen() {
     const api = this.#mediator.api
-    const windowItems = DOM.findBySelectorAll(`#${api.id} #${this.#config.id} li`)
-    windowItems.forEach((item) => {
-      item.addEventListener('click', this.onWindowSelect.bind(this))
-    })
+    // add event listener to dragbar
+    // const windowItems = DOM.findBySelectorAll(`#${api.id} #${this.#config.id} li`)
+    // windowItems.forEach((item) => {
+    //   item.addEventListener('click', this.onWindowSelect.bind(this))
+    // })
 
-    // click event outside of window
-    document.addEventListener('click', this.onOutsideClickListener.bind(this))
+    this.on("closeWindow", (e) => { 
+      if (e.window === this.#id) this.close()
+     })
   }
 
   on(topic, handler, context) {
@@ -123,7 +124,7 @@ export default class Window {
 
   onOutsideClickListener(e) {
     if (!this.#elWindow.contains(e.target) 
-    && (!this.#config.primary.contains(e.target)) 
+    // && (!this.#config.primary.contains(e.target)) 
     && DOM.isVisible(this.#elWindow)) {
       let data = {
         target: e.currentTarget.id, 
@@ -142,6 +143,21 @@ export default class Window {
       el.lastElementChild.insertAdjacentHTML("afterend", this.windowNode())
 
     this.#elWindow = DOM.findBySelector(`#${api.id} #${this.#config.id}`)
+    
+    let x, y;
+    if (this.#config.x && this.#config.y) {
+      x = this.#config.x
+      y = this.#config.y
+    }
+    // if x,y position not provided calculate default
+    else {
+      let dims = DOM.elementDimPos(this.#elWindow)
+      x = (this.#core.width - dims.width) / 2
+      y = (this.#core.height - dims.height) / 2
+    }
+  
+    this.#elWindow.style.bottom = `${y}px`
+    this.#elWindow.style.left = `${x}px`
   }
 
   static defaultNode() {
@@ -156,16 +172,11 @@ export default class Window {
     const window = this.#config
     const windowStyle = `position: absolute; z-index: 1000; display: block; border: 1px solid ${WindowStyle.COLOUR_BORDER}; background: ${WindowStyle.COLOUR_BG}; color: ${WindowStyle.COLOUR_TXT};`
 
-    // if x,y position not provided calculate default
-    let x = this.#config.x || 100
-    let y = this.#config.y || -100
-    let p = `top: ${y}px; left: ${x}px;`
-
     let dragBar = this.dragBar(window)
     let content = this.content(window)
     let closeIcon = this.closeIcon(window)
     let node = `
-      <div id="${window.id}" class="${CLASS_WINDOW}" style="${windowStyle} ${p}">
+      <div id="${window.id}" class="${CLASS_WINDOW}" style="${windowStyle}">
           ${dragBar}
           ${closeIcon}
           ${content}
@@ -235,11 +246,17 @@ export default class Window {
 
   // display the window
   open() {
-    let id = Window.currentActive?.id || false
-    if (id) this.emit("closeWindow", {window: id})
+    // let id = Window.currentActive?.id || false
+    // if (id !== this.#id) this.emit("closeWindow", {window: id})
 
     Window.currentActive = this
     this.#elWindow.style.display = "block"
+    this.emit("windowOpened", this.id)
+
+    setTimeout(() => {
+      // click event outside of window
+      document.addEventListener('click', this.onOutsideClickListener.bind(this))
+    }, 500)
   }
 
   // hide the window
@@ -247,5 +264,7 @@ export default class Window {
     Window.currentActive = null
     this.#elWindow.style.display = "none"
     this.emit("windowClosed", this.id)
+
+    document.removeEventListener('click', this.onOutsideClickListener)
   }
 }
