@@ -75,6 +75,7 @@ export default class Window {
   start() {
     // set up event listeners
     this.eventsListen()
+    this.open()
   }
 
   end() {
@@ -256,7 +257,7 @@ export default class Window {
     setTimeout(() => {
       // click event outside of window
       document.addEventListener('click', this.onOutsideClickListener.bind(this))
-    }, 500)
+    }, 1000)
   }
 
   // hide the window
