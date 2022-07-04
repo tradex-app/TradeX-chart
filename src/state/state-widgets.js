@@ -44,5 +44,27 @@ export default
         },
       }
     },
+    openWindow: {
+      onEnter(stateMachine, data) {
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+
+        // stateMachine.context.origin.instances[data.menu].open()
+        // stateMachine.context.origin.instances[data.menu].offMenu()
+
+      },
+      onExit(stateMachine, data) {
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+
+        // stateMachine.context.origin.instances[data.menu].close()
+      },
+      on: {
+        closeWindow: {
+          target: "idle",
+          action: (stateMachine, data) => {
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "idle" on "${stateMachine.event}"`)
+          },
+        },
+      }
+    },
   }
 }
