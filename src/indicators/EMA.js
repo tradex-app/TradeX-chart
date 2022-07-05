@@ -6,7 +6,7 @@
    YAXIS_TYPES
  } from "../definitions/chart";
  
- export default class RSI extends indicator {
+ export default class EMA extends indicator {
   name ='Exponential Moving Average'
   shortName = 'EMA'
   onChart = true

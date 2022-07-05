@@ -25,6 +25,58 @@ Config describes the basics of the chart, size, ect. and requires the following 
 
 State is a snapshot of the entirety of the chart state, including chart price data, indicators, drawing tools, datasets and theme. Where properties of Config and State.settings intersect, Config properties take priority.
 
+
+# API
+
+## mediator
+
+class
+
+Provides:
+
+* api
+* core
+* register
+* stateMachine
+* isStateMachineConfigValid
+* emit
+* on
+* off
+* execute
+* log
+* info
+* warning
+* error
+
+## OffChart
+
+class (mediator, options)
+
+mediator: module core interface
+
+options:
+
+* offCharID {string} - unique id
+* offChart {array} - indicator data
+  * type
+  * name
+  * data
+  * settings
+* yAxisType -
+* rowH {nubmer}
+
+## registerOffCharts
+
+method (options, api)
+
+api:
+
+* elChart - chart HTML element
+* elTime - timeline HTML element
+* elRows - rows HTML element (contains main chart and off charts)
+* elOffCharts - off chart HTML element
+* offChart {array} - list of offChart instances
+
 # Architecture
 
 **Hook Observer Pattern**
