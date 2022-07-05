@@ -49,6 +49,9 @@ export default class ToolsBar {
 
   start() {
     this.initAllTools()
+
+    // set up event listeners
+    this.eventsListen()
   }
 
   end() {
@@ -61,6 +64,15 @@ export default class ToolsBar {
           tool.removeEventListener("click", this.onIconClick)
       }
     }
+  }
+
+  eventsListen() {
+    // this.on("utils_indicators", (e) => { this.onIndicators(e) })
+    // this.on("utils_timezone", (e) => { this.onTimezone(e) })
+    // this.on("utils_settings", (e) => { this.onSettings(e) })
+    // this.on("utils_screenshot", (e) => { this.onScreenshot(e) })
+    // this.on("resize", (dimensions) => this.onResize(dimensions))
+
   }
 
   on(topic, handler, context) {
