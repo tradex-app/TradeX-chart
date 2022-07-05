@@ -136,12 +136,7 @@ export default class OffChart {
     options.yAxisType = this.#Indicator.scale
     const id = options.offChart.type + "_ScaleBar"
     this.#Scale = this.mediator.register(id, ScaleBar, options, api)
-
-    window.tradex_offChart_scale = this.#Scale
-
-
     this.#Time = this.core.Timeline
-
   }
 
   start(index) {

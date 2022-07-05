@@ -49,6 +49,9 @@ export default class ToolsBar {
 
   start() {
     this.initAllTools()
+
+    // set up event listeners
+    this.eventsListen()
   }
 
   end() {
@@ -61,6 +64,15 @@ export default class ToolsBar {
           tool.removeEventListener("click", this.onIconClick)
       }
     }
+  }
+
+  eventsListen() {
+    // this.on("utils_indicators", (e) => { this.onIndicators(e) })
+    // this.on("utils_timezone", (e) => { this.onTimezone(e) })
+    // this.on("utils_settings", (e) => { this.onSettings(e) })
+    // this.on("utils_screenshot", (e) => { this.onScreenshot(e) })
+    // this.on("resize", (dimensions) => this.onResize(dimensions))
+
   }
 
   on(topic, handler, context) {
@@ -76,13 +88,23 @@ export default class ToolsBar {
   }
 
   onIconClick(e) {
-    let id = e.currentTarget.id,
-        evt = e.currentTarget.dataset.event,
-        menu = e.currentTarget.dataset.menu || false
-    this.emit(evt, id)
+    let evt = e.currentTarget.dataset.event,
+        menu = e.currentTarget.dataset.menu || false,
+        data = {
+          target: e.currentTarget.id,
+          menu: menu,
+          evt: e.currentTarget.dataset.event
+        };
+        
+    this.emit(evt, data)
 
-    if (menu) this.emit("openMenu", {id, evt, menu})
+    if (menu) this.emit("openMenu", data)
+    else {
+      this.emit("menuItemSelected", data)
+      this.emit("toolSelected", data)
+    }
   }
+
 
   mount(el) {
     el.innerHTML = this.defaultNode()

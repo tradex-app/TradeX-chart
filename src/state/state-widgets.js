@@ -42,19 +42,15 @@ export default
             console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "idle" on "${stateMachine.event}"`)
           },
         },
-        offMenu: {
-          target: "offMenu",
-          action: (stateMachine, data) => {
-            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "offMenu" on "${stateMachine.event}"`)
-          },
-        }
       }
     },
-    offMenu: {
+    openWindow: {
       onEnter(stateMachine, data) {
         console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
 
         // stateMachine.context.origin.instances[data.menu].open()
+        // stateMachine.context.origin.instances[data.menu].offMenu()
+
       },
       onExit(stateMachine, data) {
         console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
@@ -62,13 +58,13 @@ export default
         // stateMachine.context.origin.instances[data.menu].close()
       },
       on: {
-        closeMenu: {
+        closeWindow: {
           target: "idle",
           action: (stateMachine, data) => {
             console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "idle" on "${stateMachine.event}"`)
           },
         },
       }
-    }
+    },
   }
 }

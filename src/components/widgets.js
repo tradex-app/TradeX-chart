@@ -2,11 +2,10 @@
 // A template file for Chart components
 
 import DOM from "../utils/DOM"
-import { CLASS_MENUS, CLASS_MENU, CLASS_DIVIDERS, CLASS_WINDOW } from "../definitions/core"
-import { MenuStyle, WindowStyle } from "../definitions/style"
 import Menu from "./widgets/menu"
-// import Dialogue from "./widgets/dialogue"
+import Dialogue from "./widgets/dialogue"
 import Divider from "./widgets/divider"
+import Window from "./widgets/window"
 import stateMachineConfig from "../state/state-widgets"
 
 export default class Widgets {
@@ -17,7 +16,7 @@ export default class Widgets {
   #options
   #parent
   #widgets
-  #widgetsList = { Divider, Menu }
+  #widgetsList = { Dialogue, Divider, Menu, Window }
   #widgetsInstances = {}
   #elements = {}
   #elWidgetsG
@@ -94,17 +93,11 @@ export default class Widgets {
 
   // listen/subscribe/watch for parent notifications
   eventsListen() {
-    // this.on("utils_indicators", (e) => { this.onIndicators(e) })
-    // this.on("utils_timezone", (e) => { this.onTimezone(e) })
-    // this.on("utils_settings", (e) => { this.onSettings(e) })
-    // this.on("utils_screenshot", (e) => { this.onScreenshot(e) })
     // this.on("resize", (dimensions) => this.onResize(dimensions))
 
     this.on("openMenu", this.onOpenMenu.bind(this))
     this.on("closeMenu", this.onCloseMenu.bind(this))
     this.on("offMenu", this.onCloseMenu.bind(this))
-
-
   }
 
   on(topic, handler, context) {
@@ -153,10 +146,17 @@ export default class Widgets {
 
   defaultNode() {
 
-    let nodes = ``
+    let nodes = ``,
+        types = [];
     for (let i in this.#widgets) {
       let widget = this.#widgets[i]
-      nodes += widget.defaultNode()
+
+      // only add one of each widget type
+      // some widgets are extensions of a parent
+      if (types.indexOf(widget.type) === -1) {
+        nodes += widget.defaultNode()
+        types.push(widget.type)
+      }
     }
 
     return nodes

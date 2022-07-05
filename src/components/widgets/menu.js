@@ -3,22 +3,6 @@
 import DOM from "../../utils/DOM"
 import { CLASS_MENUS, CLASS_MENU } from "../../definitions/core"
 import { MenuStyle } from "../../definitions/style"
-import { InputController, EventDispatcher, Keys } from '@jingwood/input-control'
-
-
-// export default function (widgets, config) {
-  
-//   const elMenu = widgets.elements.elMenu
-
-//   // elMenu.innerHTML = config.content
-//   elMenu.style.top = `${config.pos[1]}px`
-//   elMenu.style.left = `${config.pos[0]}px`
-//   elMenu.style.display = "block"
-
-//   // setTimeout(() => DOM.hideOnClickOutside(elMenu), 1000)
-// }
-
-
 
 export default class Menu {
 
@@ -39,6 +23,7 @@ export default class Menu {
   static menuCnt = 0
   static class = CLASS_MENUS
   static name = "Menus"
+  static type = "menu"
   static currentActive
 
   constructor(widgets, config) {
@@ -101,11 +86,6 @@ export default class Menu {
   }
 
   eventsListen() {
-    // create controller and use 'on' method to receive input events 
-    // this.#controller = new InputController(this.#elMenu);
-    // this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
-    // this.#controller.on("mouseout", this.onMouseOut.bind(this))
-
     const api = this.#mediator.api
     const menuItems = DOM.findBySelectorAll(`#${api.id} #${this.#config.id} li`)
     menuItems.forEach((item) => {
@@ -223,16 +203,6 @@ export default class Menu {
 
     Menu.currentActive = this
     this.#elMenu.style.display = "block"
-  }
-
-  offMenu() {
-    const callback = function() {
-      this.#core.emit("closeMenu", { menu: this.#id })
-    }
-
-    setTimeout( () => {
-      // DOM.onClickOutside(this.#elMenu, callback.bind(this))
-    }, 500)
   }
 
   // hide the menu

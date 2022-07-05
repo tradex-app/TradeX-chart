@@ -154,7 +154,7 @@ export default class MainPane {
 
   eventsListen() {
     // listen/subscribe/watch for parent notifications
-    this.on("resize", (dimensions) => this.onResize(dimensions))
+    this.on("resize", (dimensions) => this.onResize(dimensions).bind(this))
   }
 
   on(topic, handler, context) {
@@ -238,6 +238,12 @@ export default class MainPane {
     // this.#Chart.setDimensions({w: this.rowsW, h: options.chartH})
   }
 
+  /**
+   * add off chart indicator below chart and any other off charts
+   * @param {object} offChart - data for the indicator
+   * @param {object} options 
+   * @param {object} api 
+   */
   addOffChart(offChart, options, api) {
 
     this.#elRows.lastElementChild.insertAdjacentHTML("afterend", this.rowNode(offChart.type))
@@ -258,6 +264,13 @@ export default class MainPane {
 
     // final indicator object
     const indicator = this.#indicators[ind.target].ind
+    console.log("indicator:",indicator)
+    // check if we already have indicator data in the chart state
+    // generate indicator data
+    // let instance = new indicator(target, overlay, xAxis, yAxis, config)
+    // instance.calcIndicator(...)
+    // this.addOffChart(instance.overlay.data, options, api)
+    // 
 
     this.emit("addIndicatorDone", indicator)
   }
