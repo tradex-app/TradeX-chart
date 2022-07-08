@@ -13,17 +13,22 @@ module.exports = defineConfig({
       fileName: (format) => `${id}.${format}.js`
     },
     emptyOutDir: true,
+    target: "esnext",
     rollupOptions: {
-      // make sure to externalize deps that shouldn't be bundled
-      // into your library
-      external: ['talib-web','@jingwood/input-control'],
+      // make sure to externalize deps that shouldn't be bundled into your library
+      external: [
+        'talib-web',
+        '@jingwood/input-control'
+      ],
       output: {
-        // Provide global variables to use in the UMD build
-        // for externalized deps
+        // Provide global variables to use in the UMD build for externalized deps
         globals: {
           // vue: 'Vue'
         }
       }
     }
+  },
+  server: {
+    open: '/demo.html'
   }
 })

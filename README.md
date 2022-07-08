@@ -23,11 +23,19 @@ TradeX-chart was created to give you the developer the freedom to choose your fr
 
 Secondly after talking to other developers, top on their wishlist for a trading chart was more direct control over it, so they could create their own custom plots. The extensive API will give you power over your chart data like you never had before. Subscribe to the internal events messaging to trigger events in your own application.
 
-## Demo
-
-TODO...
-
 ## Getting Started
+
+### Requirements
+
+TradeX-chart targets browsers that support ECMAScript 2022.
+
+### Demo
+
+```
+npm install
+npm run build
+npm run serve
+```
 
 ### Development
 
@@ -38,11 +46,14 @@ npm run dev
 
 ### Build
 
-Currently no distribution build, but coming soon to a repo near you...
+```
+npm install
+npm run build
+```
 
 ### Production
 
-How to use the chart in production.
+How to use the chart in production... coming soon to a repo near you, once it is added to [npmjs.com](https://npmjs.com).
 
 ## Features
 

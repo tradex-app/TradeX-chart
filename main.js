@@ -25,7 +25,6 @@ const props = {
   logs: true,
   infos: true,
   warnings: true,
-  warnings: true,
   errors: true,
 }
 const chart = Chart.create(mount, props, state )
