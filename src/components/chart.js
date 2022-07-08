@@ -14,7 +14,7 @@ import chartCursor from "./overlays/chart-cursor"
 import indicator from "./overlays/inidcator"
 import OnChart from "./overlays"
 import stateMachineConfig from "../state/state-chart"
-import { InputController, EventDispatcher, Keys } from '@jingwood/input-control'
+import { InputController, Keys } from '@jingwood/input-control'
 import { VolumeStyle } from "../definitions/style"
 
 

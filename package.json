@@ -1,7 +1,17 @@
 {
   "name": "TradeX-chart",
+  "files": ["dist"],
+  "main": "./dist/tradex-chart.umd.js",
+  "module": "./dist/tradex-chart.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/tradex-chart.es.js",
+      "require": "./dist/tradex-chart.umd.js"
+    }
+  },
   "private": true,
   "version": "0.123.0",
+  "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

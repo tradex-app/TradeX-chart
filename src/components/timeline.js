@@ -9,7 +9,7 @@ import { getTextRectWidth } from "../utils/canvas"
 import { CLASS_TIME } from "../definitions/core"
 import { XAxisStyle } from "../definitions/style"
 import { drawTextBG } from "../utils/canvas"
-import { InputController, EventDispatcher } from '@jingwood/input-control'
+import { InputController, } from '@jingwood/input-control'
 import stateMachineConfig from "../state/state-time"
 
 export default class Timeline {

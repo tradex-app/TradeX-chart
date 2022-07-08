@@ -6,7 +6,7 @@ import yAxis from "./axis/yAxis"
 import CEL from "./primitives/canvas"
 import { drawTextBG } from "../utils/canvas"
 import stateMachineConfig from "../state/state-scale"
-import { InputController, EventDispatcher } from '@jingwood/input-control'
+import { InputController, } from '@jingwood/input-control'
 import { copyDeep } from '../utils/utilities'
 
 import {
