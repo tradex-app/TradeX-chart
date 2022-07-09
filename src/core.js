@@ -118,12 +118,11 @@ export default class TradeXchart {
   errors = false
   
 
+
 /**
  * Creates an instance of TradeXchart.
- * @param {String|DOM element} container
- * @param {Object} [options={}] - configuration options
- * @param {Object} state - initial or previously exported state
- * @param {Number} inCnt
+ * @param {instance} mediator
+ * @param {object} [options={}]
  * @memberof TradeXchart
  */
 constructor (mediator, options={}) {
@@ -491,6 +490,11 @@ constructor (mediator, options={}) {
 
   }
 
+  /**
+   * Calculate new range index / position 
+   * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
+   * @returns 
+   */
   updateRange(pos) {
 
     // pan horizontal check
