@@ -1,6 +1,6 @@
 # TradeXChart
 
-### v0.123.0
+### v0.97.0
 
 TradeXChart follows [breaking].[feature].[fix] versioning
 

@@ -11,11 +11,11 @@ It provides a two way API to give you complete control over the chart.
 ## Table of Contents
 
 * [Why](#why)
-* Demo
-* Getting Started
-* Documentation
-* Features
-* License
+* [Demo](#demo)
+* [Getting Started](#getting-started)
+* [Documentation](/docs/README.md)
+* [Features](#features)
+* [License](/LICENSE)
 
 ## Why
 
@@ -27,7 +27,7 @@ Secondly after talking to other developers, top on their wishlist for a trading 
 
 ### Requirements
 
-TradeX-chart targets browsers that support ECMAScript 2022.
+TradeX-chart targets browsers that support [ECMAScript 2022](https://www.ecma-international.org/wp-content/uploads/ECMA-262_13th_edition_june_2022.pdfhttps:/).
 
 ### Demo
 
@@ -54,6 +54,10 @@ npm run build
 ### Production
 
 How to use the chart in production... coming soon to a repo near you, once it is added to [npmjs.com](https://npmjs.com).
+
+## Documentation
+
+Full documentation including API can be found under [docs](/docs/README.md).
 
 ## Features
 
