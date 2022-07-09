@@ -75,7 +75,7 @@ api:
 * elTime - timeline HTML element
 * elRows - rows HTML element (contains main chart and off charts)
 * elOffCharts - off chart HTML element
-* offChart {array} - list of offChart instances
+* offChart {array} - list of state offChart entries
 
 # Architecture
 
