@@ -13,7 +13,7 @@ It provides a two way API to give you complete control over the chart.
 * [Why](#why)
 * [Demo](#demo)
 * [Getting Started](#getting-started)
-* [Documentation](/docs/README.md)
+* [Documentation](/docs/documentation.md)
 * [Features](#features)
 * [License](/LICENSE)
 
@@ -57,7 +57,7 @@ How to use the chart in production... coming soon to a repo near you, once it is
 
 ## Documentation
 
-Full documentation including API can be found under [docs](/docs/README.md).
+Full documentation including API can be found under [docs](/docs/documentation.md).
 
 ## Features
 
