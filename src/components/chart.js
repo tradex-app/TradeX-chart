@@ -265,6 +265,18 @@ export default class Chart {
 
   onMouseWheel(e) {
     console.log("onMouseWheel:",e)
+
+    const direction = Math.sign(e.wheeldelta)
+    const range = this.range
+    const newStart = range.indexStart - direction
+    const newEnd = range.indexEnd + direction
+    const oldStart = range.indexStart
+    const oldEnd = range.indexEnd
+    const inOut = (range)? "out" : "in"
+
+    this.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
+    this.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd])
+    this.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
   }
   
   onMouseMove(e) {

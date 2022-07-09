@@ -258,13 +258,7 @@ constructor (mediator, options={}) {
 
     const end = this.chartData.length - 1
     const start = end - this.#rangeLimit
-    const allData = {
-      data: this.chartData,
-      onChart: this.onChart,
-      offChart: this.offChart,
-      datasets: this.datasets
-    }
-    this.#range = getRange(allData, start, end)
+    this.setRange(start, end)
 
     // api - functions / methods, calculated properties provided by this module
     const api = {
@@ -491,7 +485,8 @@ constructor (mediator, options={}) {
   }
 
   /**
-   * Calculate new range index / position 
+   * Calculate new range index / position from position difference
+   * typically mouse drag or cursor keys
    * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
    * @returns 
    */
@@ -506,6 +501,15 @@ constructor (mediator, options={}) {
     let start = this.range.indexStart - offset,
         end = this.range.indexEnd - offset;
 
+    this.setRange(start, end)
+  }
+
+  /**
+   * set start and end of range
+   * @param {number} start - index
+   * @param {number} end - index
+   */
+  setRange(start, end) {
     const allData = {
       data: this.chartData,
       onChart: this.onChart,
