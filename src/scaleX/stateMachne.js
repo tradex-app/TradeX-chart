@@ -1,7 +1,7 @@
 // stateMachine.js
 // a simple Finite State Machine
 
-import { isFunction, isObject, isString } from "../utils/typeChecks"
+import { isArray, isFunction, isObject, isString } from "../utils/typeChecks"
 import { isArrayEqual } from "../utils/utilities"
 
 export default class StateMachine {
@@ -39,7 +39,7 @@ export default class StateMachine {
   notify(event, data) {
     this.#event = event
     const currStateConfig = this.#config.states[this.#state]
-    const destTransition = currStateConfig.on[event]
+      let destTransition = currStateConfig.on[event]
     if ( !destTransition 
       || !isFunction(destTransition.action)
       || this.#status !== "running") {
@@ -55,6 +55,34 @@ export default class StateMachine {
     this.#state = destState
 
     destStateConfig?.onEnter(this, data)
+
+    // null event - immediately transition (transient transition)
+    if ( this.#config.states[destState]?.on
+      && (this.#config.states[destState].on[''] 
+      || this.#config.states[destState].on?.always) ) {
+
+        const transient
+          = this.#config.states[destState].on[''] 
+          || this.#config.states[destState].on.always
+
+        if (isArray(transient)) {
+          for (let transition of transient) {
+            let cond = this.#config.guards[transition?.cond](this.#context, null)
+            if (cond && isString(transition.target)) {
+              this.#statePrev = this.#state
+              this.#state = transition?.target
+              this.notify(null, null)
+            }
+          }
+        } else if (isObject(transient) && isString(transient.target)) {
+          let cond = this.#config.guards[transient?.cond](this.#context, null)
+          if (cond && isString(transient.target)) {
+            this.#statePrev = this.#state
+            this.#state = transient.target
+            this.notify(null, null)
+          }
+        }
+    }
 
     return this.#state
   }

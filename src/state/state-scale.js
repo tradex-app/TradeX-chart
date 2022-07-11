@@ -50,6 +50,12 @@ export default
             console.log('Scale: from "idle" to "chart_pan" state')
           },
         },
+        chart_zoom: {
+          target: 'chart_zoom',
+          action: (stateMachine, data) => {
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to  "chart_zoom"`)
+          },
+        },
       }
     },
     resize: {
@@ -88,6 +94,30 @@ export default
           action: (stateMachine, data) => {
             console.log('Scale: transition action for "chart_panDone" in "chart_pan" state')
             stateMachine.context.origin.draw() 
+          },
+        },
+      }
+    },
+    chart_zoom: {
+      onEnter(stateMachine, data) {
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      },
+      onExit(stateMachine, data) {
+        console.log(`${stateMachine.id}: state: - onExit (${stateMachine.event})`)
+      },
+      on: {
+        chart_zoom: {
+          target: 'chart_zoom',
+          action: (stateMachine, data) => {
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_zoom"`)
+            stateMachine.context.origin.draw()
+          },
+        },
+        chart_zoomDone: {
+          target: 'idle',
+          action: (stateMachine, data) => {
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_zoomDone"`)
+            stateMachine.context.origin.draw()
           },
         },
       }

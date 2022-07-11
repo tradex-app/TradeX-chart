@@ -2,7 +2,7 @@
 
 export default
 {
-  id: "chart",
+  id: "offChart",
   initial: "idle",
   context: {},
   states: {
@@ -18,6 +18,12 @@ export default
           target: 'chart_pan',
           action: (stateMachine, data) => {
             console.log('transition action for "chart_pan" in "idle" state')
+          },
+        },
+        chart_zoom: {
+          target: 'chart_zoom',
+          action: (stateMachine, data) => {
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to  "chart_zoom"`)
           },
         },
         chart_tool: {
@@ -54,6 +60,32 @@ export default
           action: (stateMachine, data) => {
             console.log('offChart action for "chart_panDone" in "chart_pan" state')
             stateMachine.context.origin.updateRange(data) 
+          },
+        },
+      }
+    },
+    chart_zoom: {
+      onEnter(stateMachine, data) {
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      },
+      onExit(stateMachine, data) {
+        console.log(`${stateMachine.id}: state: - onExit (${stateMachine.event})`)
+      },
+      on: {
+        chart_zoom: {
+          target: 'chart_zoom',
+          action: (stateMachine, data) => {
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_zoom"`)
+            const range = stateMachine.context.origin.range
+            stateMachine.context.origin.draw(range)
+          },
+        },
+        chart_zoomDone: {
+          target: 'idle',
+          action: (stateMachine, data) => {
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_zoomDone"`)
+            const range = stateMachine.context.origin.range
+            stateMachine.context.origin.draw(range)
           },
         },
       }

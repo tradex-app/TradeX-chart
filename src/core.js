@@ -504,6 +504,15 @@ constructor (mediator, options={}) {
     this.setRange(start, end)
   }
 
+  // /**
+  //  * Set the 
+  //  * @param {array} data - [newStart, newEnd, oldStart, oldEnd, inOut]
+  //  */
+  // zoomRange(data) {
+
+  //   this.setRange(start, end)
+  // }
+
   /**
    * set start and end of range
    * @param {number} start - index
