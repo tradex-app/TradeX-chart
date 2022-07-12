@@ -65,18 +65,29 @@ export default class StateMachine {
           = this.#config.states[destState].on[''] 
           || this.#config.states[destState].on.always
 
+        // Do we have an array of conditions to check?
         if (isArray(transient)) {
           for (let transition of transient) {
-            let cond = this.#config.guards[transition?.cond](this.#context, null)
-            if (cond && isString(transition.target)) {
+            let cond = transition?.condition.type || transition?.condition || false
+            if (
+                this.condition(cond, null, {cond}) 
+                && isString(transition.target)
+              ) {
+              transition?.action(this, data)
               this.#statePrev = this.#state
               this.#state = transition?.target
               this.notify(null, null)
             }
           }
-        } else if (isObject(transient) && isString(transient.target)) {
-          let cond = this.#config.guards[transient?.cond](this.#context, null)
-          if (cond && isString(transient.target)) {
+        }
+        // otherwise if only one condition
+        else if (isObject(transient) && isString(transient.target)) {
+          let cond = transient?.condition.type || transient?.condition || false
+          if (
+              this.condition(cond, null, {cond}) 
+              && isString(transient.target)
+            ) {
+            transient?.action(this, data)
             this.#statePrev = this.#state
             this.#state = transient.target
             this.notify(null, null)
@@ -85,6 +96,10 @@ export default class StateMachine {
     }
 
     return this.#state
+  }
+
+  condition(cond, event=null, params={}) {
+    return (cond)? this.#config.guards[cond](this.#context, event, params) : false
   }
 
   canTransition(event) {

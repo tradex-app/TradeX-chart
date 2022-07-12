@@ -8,10 +8,10 @@ export default
   states: {
     idle: {
       onEnter(stateMachine, data) {
-        console.log('idle: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('idle: onExit')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         resize: {
@@ -60,10 +60,10 @@ export default
     },
     resize: {
       onEnter(stateMachine, data) {
-        console.log('resize: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('reize: onExit')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         someEvent: {
@@ -76,10 +76,10 @@ export default
     },
     chart_pan: {
       onEnter(stateMachine, data) {
-        console.log('Time: chart_pan: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('Time: chart_pan: onExit')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         chart_pan: {
@@ -100,27 +100,24 @@ export default
     },
     chart_zoom: {
       onEnter(stateMachine, data) {
-        console.log('Time: chart_pan: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('Time: chart_pan: onExit')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
-        chart_zoom: {
-          target: 'chart_zoom',
+        always: {
+          target: 'idle',
+          condition: 'zoomDone',
           action: (stateMachine, data) => {
             console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_pan"`)
             stateMachine.context.origin.draw()
           },
         },
-        chart_panDone: {
-          target: 'idle',
-          action: (stateMachine, data) => {
-            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_panDone"`)
-            stateMachine.context.origin.draw()
-          },
-        },
       }
     },
+  },
+  guards: {
+    zoomDone: (context, event, { cond }) => { return true }
   }
 }

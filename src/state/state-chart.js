@@ -49,7 +49,7 @@ export default
         console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: - onExit (${stateMachine.event})`)
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         chart_pan: {
@@ -73,20 +73,15 @@ export default
         console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: - onExit (${stateMachine.event})`)
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
-        chart_zoom: {
-          target: 'chart_zoom',
-          action: (stateMachine, data) => {
-            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_zoom"`)
-            stateMachine.context.origin.zoomRange(data) 
-          },
-        },
-        chart_zoomDone: {
+        always: {
           target: 'idle',
+          condition: 'zoomDone',
           action: (stateMachine, data) => {
-            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_zoomDone"`)
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "idle"`)
+            stateMachine.context.origin.zoomRange(data) 
           },
         },
       }
@@ -107,5 +102,8 @@ export default
         },
       }
     },
+  },
+  guards: {
+    zoomDone: (context, event, { cond }) => { return true }
   }
 }
