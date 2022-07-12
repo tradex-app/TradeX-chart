@@ -39,6 +39,7 @@ import {
 
 import {
   PRICEDIGITS,
+  XAXIS_ZOOM,
 } from "../definitions/chart"
 
 const STYLE_CHART = "" // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
@@ -266,8 +267,8 @@ export default class Chart {
   onMouseWheel(e) {
     const direction = Math.sign(e.wheeldelta)
     const range = this.range
-    const newStart = range.indexStart - direction
-    const newEnd = range.indexEnd + direction
+    const newStart = range.indexStart - (direction * XAXIS_ZOOM)
+    const newEnd = range.indexEnd + (direction * XAXIS_ZOOM)
     const oldStart = range.indexStart
     const oldEnd = range.indexEnd
     const inOut = (range)? "out" : "in"
