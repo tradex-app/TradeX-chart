@@ -77,7 +77,12 @@ export const TIMEUNITS = ['s','m','h','d','w','M','y']
 
 export const PRICEDIGITS = 6
 
-export const XAXIS_ZOOM = 10
+export const XAXIS_ZOOM = 0.05
 
 export const YAXIS_STEP = 100
 export const YAXIS_TYPES = ["default", "percent", "log"]
+
+export const LIMITFUTURE = 100
+export const LIMITPAST = 100
+export const MINCANDLES = 10
+export const MAXCANDLES = 4096

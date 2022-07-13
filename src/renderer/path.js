@@ -15,7 +15,7 @@ export function renderPath (ctx, coordinates, style, strokeFill) {
   ctx.beginPath()
   let move = true
   coordinates.forEach(coordinate => {
-    if (coordinate) {
+    if (coordinate && coordinate.x !== null) {
       if (move) {
         ctx.moveTo(coordinate.x, coordinate.y)
         move = false

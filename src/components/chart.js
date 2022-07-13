@@ -267,8 +267,8 @@ export default class Chart {
   onMouseWheel(e) {
     const direction = Math.sign(e.wheeldelta)
     const range = this.range
-    const newStart = range.indexStart - (direction * XAXIS_ZOOM)
-    const newEnd = range.indexEnd + (direction * XAXIS_ZOOM)
+    const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length)
+    const newEnd = range.indexEnd + Math.floor(direction * XAXIS_ZOOM * range.Length)
     const oldStart = range.indexStart
     const oldEnd = range.indexEnd
     const inOut = (range)? "out" : "in"

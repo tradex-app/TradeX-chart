@@ -36,15 +36,19 @@ export default class chartCandles extends Candle {
 
     let c = range.indexStart
     let i = range.Length
+    let x
 
     while(i) {
-      candle.o = this.#yAxis.yPos(data[c][1])
-      candle.h = this.#yAxis.yPos(data[c][2])
-      candle.l = this.#yAxis.yPos(data[c][3])
-      candle.c = this.#yAxis.yPos(data[c][4])
-      candle.raw = data[c]
-      // super.draw(candle)
-      render(candle)
+      x = range.value( c )
+      if (x[4] !== null) {
+        candle.o = this.#yAxis.yPos(x[1])
+        candle.h = this.#yAxis.yPos(x[2])
+        candle.l = this.#yAxis.yPos(x[3])
+        candle.c = this.#yAxis.yPos(x[4])
+        candle.raw = x
+        // super.draw(candle)
+        render(candle)
+      }
       c++
       i--
       candle.x = candle.x + candle.w

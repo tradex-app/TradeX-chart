@@ -110,7 +110,7 @@ export default class RSI extends indicator {
     let i = range.Length
 
     while(i) {
-      if (!c) {
+      if (c < 0 || c >= this.overlay.data.length) {
         plots[range.Length - i] = {x: null, y: null}
       }
       else {
