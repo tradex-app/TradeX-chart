@@ -10,6 +10,8 @@ import { CandleStyle } from "../../definitions/style"
 
 export default class Candle {
 
+  areaCoordinates
+
   constructor(scene, config) {
     this.scene = scene
     this.ctx = this.scene.context
@@ -20,8 +22,6 @@ export default class Candle {
     this.cfg.colourCandleDn = this.cfg?.colourCandleDn || CandleStyle.COLOUR_CANDLE_DN
     this.cfg.colourWickUp = this.cfg?.colourWickUp || CandleStyle.COLOUR_WICK_UP
     this.cfg.colourWickDn = this.cfg?.colourWickDn || CandleStyle.COLOUR_WICK_DN
-    
-
   }
 
   draw(data) {
@@ -134,6 +134,24 @@ export default class Candle {
 
   body(fill) {
 
+  }
+
+  area(data) {
+    this.areaCoordinates.push(data)
+  }
+
+  areaRender() {
+    ctx.save();
+    ctx.beginPath()
+
+    let coords = this.areaCoordinates
+    for (let i = 0; i < coords.length; i++) {
+      const ctx = this.ctx
+      const hilo = coords[i].raw[4] >= data[i+1].raw[4]
+
+      
+    }
+    ctx.restore();
   }
 }
 

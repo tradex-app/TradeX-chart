@@ -37,11 +37,15 @@ export default class chartVolume extends VolumeBar {
 
     let v = range.indexStart
     let i = range.Length
+    let x
 
     while(i) {
-      volume.h = volH - ((maxVol - data[v][5]) * volH / maxVol)
-      volume.raw = data[v]
-      super.draw(volume)
+      x = range.value( v )
+      if (x[4] !== null) {
+        volume.h = volH - ((maxVol - x[5]) * volH / maxVol)
+        volume.raw = data[v]
+        super.draw(volume)
+      }
       v++
       i--
       volume.x = volume.x + volume.w

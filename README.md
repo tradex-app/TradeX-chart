@@ -31,10 +31,11 @@ TradeX-chart targets browsers that support [ECMAScript 2022](https://www.ecma-in
 
 ### Demo
 
+Run the demo locally:
+
 ```
 npm install
-npm run build
-npm run serve
+npm run demo
 ```
 
 ### Development
