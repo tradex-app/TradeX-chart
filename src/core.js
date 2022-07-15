@@ -91,7 +91,7 @@ export default class TradeXchart {
 
   utilsH = 40
   toolsW = 45
-  timeH  = 25
+  timeH  = 50
   scaleW = 60
 
   static permittedClassNames = 
@@ -110,6 +110,15 @@ export default class TradeXchart {
     utils: this.#UtilsBar,
     tools: this.#ToolsBar,
     main: this.#MainPane,
+  }
+
+  #time = {
+    rangeTotal: true,
+    range: {},
+    total: {},
+    timeFrame: '',
+    timeZone: '',
+    indexed: false
   }
 
   logs = false
@@ -189,6 +198,7 @@ constructor (mediator, options={}) {
 
   get rangeLimit() { return (isNumber(this.#rangeLimit)) ? this.#rangeLimit : RANGELIMIT }
   get range() { return this.#range }
+  get time() { return this.#time }
 
   get settings() { return this.#state.data.chart.settings }
   get indicators() { return this.#indicators }
@@ -297,6 +307,7 @@ constructor (mediator, options={}) {
         range: this.#range,
         updateRange: (pos) => this.updateRange(pos),
         indicators: this.indicators,
+        time: this.time,
 
         settings: this.settings,
       }

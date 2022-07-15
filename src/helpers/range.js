@@ -10,21 +10,15 @@ export function getRange( allData, start=0, end=allData.chart.length-1 ) {
 
   // check and correct start and end argument order
   if (start > end) [start, end] = [end, start]
+
+  // minimum range constraint
+  if ((end - start) < MINCANDLES) end = start + MINCANDLES + 1
+
+  // set out of history bounds limits
   start = (start < LIMITPAST * -1) ? LIMITPAST * -1 : start
-  start = (start >= r.dataLength + LIMITFUTURE) ? r.dataLength + LIMITFUTURE - MINCANDLES : start
-  end = (end < LIMITPAST * -1) ? (LIMITPAST * -1) + MINCANDLES : end
-  end = (end >= r.dataLength + LIMITFUTURE) ? r.dataLength + LIMITFUTURE : end
-  // r.dataLength = (end > (r.data.length - 1)) ? r.data.length - 1 : end
-  // r.indexStart = (start < 0) ? 0 : start
-  // r.indexEnd = (end > (r.data.length - 1)) ? r.data.length - 1 : end
-  // r.Length = r.indexEnd - r.indexStart
-  // r.timeStart = r.data[0][0]
-  // r.timeFinish = r.data[r.dataLength - 1][0]
-  // r.timeDuration = r.timeFinish - r.timeStart
-  // r.timeMin = r.data[r.indexStart][0]
-  // r.timeMax = r.data[r.indexEnd][0]
-  // r.rangeDuration = r.timeMax - r.timeMin
-  // r.interval = r.data[r.indexStart+1][0] - r.data[r.indexStart][0]
+  end = (end < (LIMITPAST * -1) + MINCANDLES) ? (LIMITPAST * -1) + MINCANDLES + 1 : end
+  start = (start > r.dataLength + LIMITFUTURE - MINCANDLES) ? r.dataLength + LIMITFUTURE - MINCANDLES - 1: start
+  end = (end > r.dataLength + LIMITFUTURE) ? r.dataLength + LIMITFUTURE : end
   
   r.value = (index) =>{ return rangeValue(r, index)}
   r.interval = r.data[1][0] - r.data[0][0]
@@ -56,7 +50,7 @@ export function rangeValue( range, index ) {
       return v
     }
     else if (index > len) {
-      v[0] = range.data[len][0] + (range.interval * index)
+      v[0] = range.data[len][0] + (range.interval * (index - len))
       return v
     }
     else return null

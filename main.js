@@ -30,5 +30,8 @@ const props = {
 const chart = Chart.create(mount, props, state )
 chart.start(chart.getModID())
 
+console.log("API: id:", chart.id)
+console.log("API: name:", chart.name)
+console.log("API: height:", chart.height)
 // test()
 

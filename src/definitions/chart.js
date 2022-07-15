@@ -82,7 +82,7 @@ export const XAXIS_ZOOM = 0.05
 export const YAXIS_STEP = 100
 export const YAXIS_TYPES = ["default", "percent", "log"]
 
-export const LIMITFUTURE = 100
-export const LIMITPAST = 100
-export const MINCANDLES = 10
+export const LIMITFUTURE = 200
+export const LIMITPAST = 200
+export const MINCANDLES = 20
 export const MAXCANDLES = 4096
