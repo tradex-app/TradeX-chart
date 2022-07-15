@@ -1,6 +1,6 @@
 # TradeXChart
 
-### v0.0.0
+### v0.97.1
 
 TradeXChart follows [breaking].[feature].[fix] versioning
 
@@ -24,7 +24,6 @@ Config describes the basics of the chart, size, ect. and requires the following 
 ...
 
 State is a snapshot of the entirety of the chart state, including chart price data, indicators, drawing tools, datasets and theme. Where properties of Config and State.settings intersect, Config properties take priority.
-
 
 # API
 

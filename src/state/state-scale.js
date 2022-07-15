@@ -8,10 +8,10 @@ export default
   states: {
     idle: {
       onEnter(stateMachine, data) {
-        console.log('idle: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('idle: onExit')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         resize: {
@@ -50,14 +50,20 @@ export default
             console.log('Scale: from "idle" to "chart_pan" state')
           },
         },
+        chart_zoom: {
+          target: 'chart_zoom',
+          action: (stateMachine, data) => {
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to  "chart_zoom"`)
+          },
+        },
       }
     },
     resize: {
       onEnter(stateMachine, data) {
-        console.log('resize: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('reize: onExit')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         someEvent: {
@@ -92,6 +98,27 @@ export default
         },
       }
     },
+    chart_zoom: {
+      onEnter(stateMachine, data) {
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      },
+      onExit(stateMachine, data) {
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      },
+      on: {
+        always: {
+          target: 'idle',
+          condition: 'zoomDone',
+          action: (stateMachine, data) => {
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_zoom"`)
+            stateMachine.context.origin.draw()
+          },
+        },
+      }
+    },
+  },
+  guards: {
+    zoomDone: (context, event, { cond }) => { return true }
   }
 }
 

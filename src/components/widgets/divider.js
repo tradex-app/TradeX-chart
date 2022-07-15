@@ -3,7 +3,7 @@
 
 import DOM from "../../utils/DOM"
 import { CLASS_DIVIDERS } from "../../definitions/core"
-import { InputController, EventDispatcher, Keys } from '@jingwood/input-control'
+import { InputController, Keys } from "../../input/controller"
 
 
 export default class Divider{

@@ -272,3 +272,25 @@ export function power (base, exponent) {
   return Math.pow(base, exponent)
 }
 
+/**
+ * Function to calculate average of
+ * an array using efficient method
+ * @param {array} arr
+ * @param {number} N
+ * @return {number}  
+ */
+function mean(arr, N)
+{
+    // Store the average of the array
+    var avg = 0;
+ 
+    // Traverse the array arr[]
+    for(var i = 0; i < N; i++) {
+ 
+        // Update avg
+        avg += parseFloat((arr[i] - avg) / (i + 1));
+    }
+ 
+    // Return avg
+    return avg;
+}

@@ -72,7 +72,7 @@ export default class xAxis extends Axis {
 
   pixel2T(x) {
     let c = this.pixel2Index(x)
-    return this.range.data[c][0]
+    return this.range.value(c)[0]
   }
 
   pixel2Index(x) {
@@ -81,7 +81,7 @@ export default class xAxis extends Axis {
 
   pixelOHLCV(x) {
     let c = Math.floor(x / this.candleW ) + this.range.indexStart
-    return this.range.data[c]
+    return this.range.value(c)
   }
 
   xPosSnap2CandlePos(x) {

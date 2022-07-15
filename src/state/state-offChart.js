@@ -2,22 +2,28 @@
 
 export default
 {
-  id: "chart",
+  id: "offChart",
   initial: "idle",
   context: {},
   states: {
     idle: {
       onEnter(stateMachine, data) {
-        console.log('idle: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('ilde: onExit')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         chart_pan: {
           target: 'chart_pan',
           action: (stateMachine, data) => {
             console.log('transition action for "chart_pan" in "idle" state')
+          },
+        },
+        chart_zoom: {
+          target: 'chart_zoom',
+          action: (stateMachine, data) => {
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to  "chart_zoom"`)
           },
         },
         chart_tool: {
@@ -36,10 +42,10 @@ export default
     },
     chart_pan: {
       onEnter(stateMachine, data) {
-        console.log('chart_pan: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('chart_pan: onExit')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         chart_pan: {
@@ -58,12 +64,31 @@ export default
         },
       }
     },
-    xAxis_scale: {
+    chart_zoom: {
       onEnter(stateMachine, data) {
-        console.log('XScale: onEnter')
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
-        console.log('XScale: onExit')
+        console.log(`${stateMachine.id}: state: - onExit (${stateMachine.event})`)
+      },
+      on: {
+        always: {
+          target: 'idle',
+          condition: 'zoomDone',
+          action: (stateMachine, data) => {
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_zoom"`)
+            const range = stateMachine.context.origin.range
+            stateMachine.context.origin.draw(range)
+          },
+        },
+      }
+    },
+    xAxis_scale: {
+      onEnter(stateMachine, data) {
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      },
+      onExit(stateMachine, data) {
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         Idle: {
@@ -74,5 +99,8 @@ export default
         },
       }
     },
+  },
+  guards: {
+    zoomDone: (context, event, { cond }) => { return true }
   }
 }

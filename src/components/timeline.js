@@ -9,7 +9,7 @@ import { getTextRectWidth } from "../utils/canvas"
 import { CLASS_TIME } from "../definitions/core"
 import { XAxisStyle } from "../definitions/style"
 import { drawTextBG } from "../utils/canvas"
-import { InputController, EventDispatcher } from '@jingwood/input-control'
+import { InputController, } from "../input/controller"
 import stateMachineConfig from "../state/state-time"
 
 export default class Timeline {
@@ -25,8 +25,10 @@ export default class Timeline {
   #xAxis
 
   #elViewport
+  #elViewTotal
 
   #viewport
+  #viewTotal
   #layerLabels
   #layerOverlays
   #layerCursor
@@ -62,6 +64,7 @@ export default class Timeline {
   get xAxisGrads() { return this.#xAxis.xAxisGrads }
   get candleW() { return this.#xAxis.candleW }
   get viewport() { return this.#viewport }
+  get viewTotal() { return this.#viewTotal }
   get range() { return this.#core.range }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elTime) }
@@ -77,7 +80,7 @@ export default class Timeline {
 
     const api = this.#mediator.api
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .viewport`)
-
+    this.#elViewTotal = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .viewTotal`)
   }
 
   defaultNode() {
@@ -86,6 +89,7 @@ export default class Timeline {
     // `
     const node = `
     <div class="viewport"></div>
+    <div class="viewTotal"></div>
   `
     return node
   }

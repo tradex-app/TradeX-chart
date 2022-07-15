@@ -1,7 +1,7 @@
 // stateMachine.js
 // a simple Finite State Machine
 
-import { isFunction, isObject, isString } from "../utils/typeChecks"
+import { isArray, isFunction, isObject, isString } from "../utils/typeChecks"
 import { isArrayEqual } from "../utils/utilities"
 
 export default class StateMachine {
@@ -39,7 +39,7 @@ export default class StateMachine {
   notify(event, data) {
     this.#event = event
     const currStateConfig = this.#config.states[this.#state]
-    const destTransition = currStateConfig.on[event]
+      let destTransition = currStateConfig.on[event]
     if ( !destTransition 
       || !isFunction(destTransition.action)
       || this.#status !== "running") {
@@ -56,7 +56,50 @@ export default class StateMachine {
 
     destStateConfig?.onEnter(this, data)
 
+    // null event - immediately transition (transient transition)
+    if ( this.#config.states[destState]?.on
+      && (this.#config.states[destState].on[''] 
+      || this.#config.states[destState].on?.always) ) {
+
+        const transient
+          = this.#config.states[destState].on[''] 
+          || this.#config.states[destState].on.always
+
+        // Do we have an array of conditions to check?
+        if (isArray(transient)) {
+          for (let transition of transient) {
+            let cond = transition?.condition.type || transition?.condition || false
+            if (
+                this.condition(cond, null, {cond}) 
+                && isString(transition.target)
+              ) {
+              transition?.action(this, data)
+              this.#statePrev = this.#state
+              this.#state = transition?.target
+              this.notify(null, null)
+            }
+          }
+        }
+        // otherwise if only one condition
+        else if (isObject(transient) && isString(transient.target)) {
+          let cond = transient?.condition.type || transient?.condition || false
+          if (
+              this.condition(cond, null, {cond}) 
+              && isString(transient.target)
+            ) {
+            transient?.action(this, data)
+            this.#statePrev = this.#state
+            this.#state = transient.target
+            this.notify(null, null)
+          }
+        }
+    }
+
     return this.#state
+  }
+
+  condition(cond, event=null, params={}) {
+    return (cond)? this.#config.guards[cond](this.#context, event, params) : false
   }
 
   canTransition(event) {

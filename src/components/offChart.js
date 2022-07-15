@@ -333,18 +333,20 @@ export default class OffChart {
     const index = this.#Time.xPos2Index(pos[0])
     const offset = this.range.data.length - this.#overlayIndicator.overlay.data.length
     const entry = this.#overlayIndicator.overlay.data[index - offset]
-    const inputs = {}
 
-    for (let i = 0; i < this.#overlayIndicator.plots.length; i++) {
-      let plot = this.#overlayIndicator.plots[i]
-      // first entry value is expected to be timestamp, so skip it
-      inputs[plot.key] = this.#Scale.nicePrice(entry[i + 1])
+    if (entry !== undefined) {
+      const inputs = {}
+
+      for (let i = 0; i < this.#overlayIndicator.plots.length; i++) {
+        let plot = this.#overlayIndicator.plots[i]
+        // first entry value is expected to be timestamp, so skip it
+        inputs[plot.key] = this.#Scale.nicePrice(entry[i + 1])
+      }
+  
+      for (const legend in legends) {
+        this.#Legends.update(legend, {inputs: inputs})
+      }
     }
-
-    for (const legend in legends) {
-      this.#Legends.update(legend, {inputs: inputs})
-    }
-
   }
 
   updateRange(pos) {
