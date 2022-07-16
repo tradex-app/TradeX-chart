@@ -157,11 +157,16 @@ export function get_minute(t) {
   return t ? new Date(t).getMinutes() : null
 }
 
+export function minute_start(t) {
+  let start = new Date(t)
+  return start.setUTCSeconds(0,0)
+}
+
 export function get_hour(t) {
   return t ? new Date(t).getHours() : null
 }
 
-export function hourStart(t) {
+export function hour_start(t) {
   let start = new Date(t)
   return start.setUTCMinutes(0,0,0)
 }
@@ -171,7 +176,6 @@ export function hourStart(t) {
  *
  * @param {timestamp} t - timestamp ms
  * @return {number} - day number of the month
- * @memberof xAxis
  */
  export function get_day(t) {
   return t ? new Date(t).getDate() : null
@@ -186,7 +190,6 @@ export function get_dayName(t, locale="en-GB", len="short") {
  *
  * @param {timestamp} t - timestamp ms
  * @return {timestamp} - timestamp ms
- * @memberof xAxis
  */
  export function day_start(t) {
   return new Date(t).setUTCHours(0,0,0,0)
@@ -197,7 +200,6 @@ export function get_dayName(t, locale="en-GB", len="short") {
  *
  * @param {timestamp} t - timestamp ms
  * @return {number} - month number of the year
- * @memberof xAxis
  */
  export function get_month(t) {
   if (!t) return undefined
@@ -213,7 +215,6 @@ export function get_monthName(t, locale="en-GB", len="short") {
  *
  * @param {timestamp} t - timestamp ms
  * @return {timestamp} - timestamp ms
- * @memberof xAxis
  */
  export function month_start(t) {
   let date = new Date(t)
@@ -228,7 +229,6 @@ export function get_monthName(t, locale="en-GB", len="short") {
  *
  * @param {timestamp} t - timestamp ms
  * @return {number} - the year
- * @memberof xAxis
  */
  export function get_year(t) {
   if (!t) return undefined
@@ -240,7 +240,6 @@ export function get_monthName(t, locale="en-GB", len="short") {
  *
  * @param {timestamp} t - timestamp ms
  * @return {timestamp} - timestamp ms
- * @memberof xAxis
  */
  export function year_start(t) {
   return Date.UTC(new Date(t).getFullYear())

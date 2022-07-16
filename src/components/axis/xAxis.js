@@ -8,7 +8,10 @@ import {
   monthDayCnt, timestampDiff, 
   isLeapYear, year_start, get_year, 
   month_start, get_month, get_monthName, 
-  get_day, day_start } from "../../utils/time";
+  get_day, day_start, 
+  get_hour, hour_start,
+  get_minute, minute_start
+ } from "../../utils/time";
 import { XAxisStyle } from "../../definitions/style";
 
 export default class xAxis extends Axis {
@@ -124,66 +127,122 @@ export default class xAxis extends Axis {
   calcXAxisGrads() {
     const rangeStart = this.range.timeMin
     const rangeEnd = this.range.timeMax
+    const interval = this.range.intervalStr
     let d1 = new Date(rangeStart)
     let d2 = new Date(rangeEnd)
     const diff = {}
     const units = {}
     const grads = {}
-
+    const unit = interval.charAt(interval.length - 1)
 
     // let d1Y = d1.getFullYear
     // let d2Y = d2.getFullYear
 
-    // year boundary
-    grads.years = []
-    diff.years = timestampDiff.inYears(rangeStart, rangeEnd)
-    let year = rangeStart
-    for (let i = diff.years; i > 0; i--) {
-      let yearStart = year_start(year)
-      let yearValue = get_year(year)
+    switch(unit) {
+      case "y":
+        // year boundary
+        grads.years = []
+        diff.years = timestampDiff.inYears(rangeStart, rangeEnd)
+        let year = rangeStart
+        for (let i = diff.years; i > 0; i--) {
+          let yearStart = year_start(year)
+          let yearValue = get_year(year)
 
-      grads.years.push([yearStart, yearValue])
+          grads.years.push([yearStart, this.t2Pixel(yearValue)])
 
-      year += 1000*60*60*24*365
-      if (isLeapYear(year)) year += 1
+          year += 1000*60*60*24*365
+          if (isLeapYear(year)) year += 1
+        }
+        grads.current = grads.years
+        break;
+      
+      case "M":
+        // month boundary
+        grads.months = []
+        diff.months = timestampDiff.inMonths(rangeStart, rangeEnd)
+        let month = rangeStart
+        for (let i = diff.months; i > 0; i--) {
+          let monthStart = month_start(month)
+          let monthValue = get_month(month)
+          let dayCnt = monthDayCnt[monthValue]
+
+          monthValue = (monthValue == 0) ? get_year(month) : get_monthName(month)
+
+          grads.months.push([monthStart, this.t2Pixel(monthValue)])
+
+          if (isLeapYear(month) && monthValue == 1) ++dayCnt
+          month += 1000*60*60*24*dayCnt
+        }
+        grads.current = grads.months
+        break;
+
+      case "d":
+        // day boundary
+        grads.days = []
+        diff.days = timestampDiff.inDays(rangeStart, rangeEnd)
+        let day = rangeStart
+        for (let i = diff.days; i > 0; i--) {
+          let monthValue = get_month(day)
+          let dayStart = day_start(day)
+          let dayValue = get_day(day)
+
+          if (monthValue == 0 && dayValue == 1) dayValue = get_year(day)
+          else if (dayValue == 1) dayValue = get_monthName(day)
+    
+          grads.days.push([dayValue, this.t2Pixel(dayStart)])
+
+          day = dayStart + 1000*60*60*24
+        }
+        grads.current = grads.days
+        break;
+
+      case "h":
+        // hour boundary
+        grads.hours = []
+        diff.hours = timestampDiff.inHours(rangeStart, rangeEnd)
+        let hour = rangeStart
+        for (let i = diff.hours; i > 0; i--) {
+          let monthValue = get_month(hour)
+          let dayValue = get_day(hour)
+          let hourValue = get_hour(hour)
+          let hourStart = hour_start(hour)
+
+          if (monthValue == 0 && dayValue == 1 && hourValue == 0) hourValue = get_year(hour)
+          else if (dayValue == 1 && hourValue == 0) hourValue = get_monthName(hour)
+          else if (hourValue == 0) hourValue = get_day(hour)
+          else hourValue = hourValue + ":00"
+
+          grads.hours.push([hourValue, this.t2Pixel(hourStart)])
+
+          hour = hourStart + 1000*60*60
+        }
+        grads.current = grads.hours
+        break;
+
+      case "m":
+        // minute boundary
+        grads.minutes = []
+        diff.minutes = timestampDiff.inMinutes(rangeStart, rangeEnd)
+        let minute = rangeStart
+        for (let i = diff.minutes; i > 0; i--) {
+          let monthValue = get_month(hour)
+          let dayValue = get_day(hour)
+          let hourValue = get_hour(hour)
+          let minuteValue = get_minute(hour)
+          let minuteStart = minute_start(hour)
+
+          if (monthValue == 0 && dayValue == 1 && hourValue == 0 && minuteValue == 0) minuteValue = get_year(minute)
+          else if (dayValue == 1 && hourValue == 0 && minuteValue == 0) minuteValue = get_monthName(minute)
+          else if (hourValue == 0 && minuteValue == 0) minuteValue = get_day(minute)
+          else minuteValue = get_hour(minute) + ":" + minuteValue
+
+          grads.minutes.push([minuteValue, "00:" + this.t2Pixel(minuteStart)])
+
+          minute = minuteStart + 1000*60
+        }
+        grads.current = grads.minutes
+        break;
     }
-
-    // month boundary
-    grads.months = []
-    diff.months = timestampDiff.inMonths(rangeStart, rangeEnd)
-    let month = rangeStart
-    for (let i = diff.months; i > 0; i--) {
-      let monthStart = month_start(month)
-      let monthValue = get_month(month)
-      let dayCnt = monthDayCnt[monthValue]
-
-      monthValue = (monthValue == 0) ? get_year(month) : get_monthName(month)
-      grads.months.push([monthStart, monthValue])
-
-      if (isLeapYear(month) && monthValue == 1) ++dayCnt
-      month += 1000*60*60*24*dayCnt
-    }
-
-    // day boundary
-    grads.days = []
-    diff.days = timestampDiff.inDays(rangeStart, rangeEnd)
-    let day = rangeStart
-    for (let i = diff.days; i > 0; i--) {
-      let monthValue = get_month(day)
-      let dayStart = day_start(day)
-      let dayValue = get_day(day)
-
-      if (dayStart < rangeStart) dayStart += 1000*60*60*24
-
-      if (monthValue == 0 && dayValue == 1) dayValue = get_year(day)
-      else if (dayValue == 1) dayValue = get_monthName(day)
- 
-      grads.days.push([dayValue, this.t2Pixel(dayStart)])
-
-      day = dayStart + 1000*60*60*24
-    }
-
-
 
 
     // diff.months = timestampDiff.inMonths(rangeStart, rangeEnd)
@@ -261,7 +320,7 @@ export default class xAxis extends Axis {
     // figure out the rest of the timeline
 
     // return timeGrads
-    return grads.days
+    return grads.current
   }
 
   inRange(t) {
