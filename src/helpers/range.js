@@ -94,12 +94,11 @@ export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
   let volumeMin = data[i][5]
   let volumeMax = data[i][5]
 
-  while(i < c) {
+  while(i++ < c) {
     priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin
     priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax
     volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin
     volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
-    i++
   }
 
   return {
