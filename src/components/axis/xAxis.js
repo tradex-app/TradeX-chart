@@ -390,8 +390,11 @@ export default class xAxis extends Axis {
 
           while (d1 < d2) {
             d1 += tick
-            grads.current.push([get_hour(d1) + ":00", this.t2Pixel(d1), d1])
-            --gradCnt
+            let hr = get_hour(d1)
+            if (hr != 0) {
+              grads.current.push([hr + ":00", this.t2Pixel(d1), d1])
+              --gradCnt
+            }
           }
         }
 

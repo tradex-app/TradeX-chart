@@ -96,12 +96,12 @@ export default class RSI extends indicator {
   draw(range) {
     this.scene.clear()
 
-
     const data = this.overlay.data
+    const width = Math.round(this.scene.width / range.Length)
     const plots = []
     const plot = {
-      x: 2,
-      w: this.xAxis.width / range.Length,
+      x: (width * 0.5) + 2,
+      w: width,
     }
 
     // account for "missing" entries because of indicator calculation
