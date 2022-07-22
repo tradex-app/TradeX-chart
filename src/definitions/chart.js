@@ -86,3 +86,4 @@ export const LIMITFUTURE = 200
 export const LIMITPAST = 200
 export const MINCANDLES = 20
 export const MAXCANDLES = 4096
+export const MAXGRADSPER = 100

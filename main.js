@@ -16,7 +16,7 @@ const props = {
   title: "BTC/USDT",
   width: 1000,
   height: 800,
-  rangeLimit: 100,
+  rangeLimit: 30,
   theme: {
     candleType: "CANDLE_SOLID",
     onchartVolumeH: 15,

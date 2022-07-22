@@ -2,7 +2,7 @@
 // Timeline that lurks down below
 
 import Axis from "./axis";
-import { TIMEUNITS, TIMEINCS } from "../../definitions/chart";
+import { MAXGRADSPER, TIMEUNITS, TIMEINCS } from "../../definitions/chart";
 import { isNumber } from "../../utils/typeChecks";
 import { 
   monthDayCnt, timestampDiff, 
@@ -10,7 +10,9 @@ import {
   month_start, get_month, get_monthName, 
   get_day, day_start, 
   get_hour, hour_start,
-  get_minute, minute_start
+  get_minute, minute_start,
+
+  MINUTE_MS, HOUR_MS, DAY_MS, YEAR_MS
  } from "../../utils/time";
 import { XAxisStyle } from "../../definitions/style";
 
@@ -125,14 +127,16 @@ export default class xAxis extends Axis {
   }
 
   calcXAxisGrads() {
-    const rangeStart = this.range.timeMin
-    const rangeEnd = this.range.timeMax
-    const intervalStr = this.range.intervalStr
+    const rangeStart = this.timeMin
+    const rangeEnd = this.timeMax
+    const intervalStr = this.intervalStr
     const diff = {}
-    const grads = {}
+    const grads = {years: [], months: [], days: [], hours: [], minutes: [], current: []}
+      let gradsPer = Math.trunc(this.width / MAXGRADSPER)
     const unit = intervalStr.charAt(intervalStr.length - 1)
     const numUnits = parseInt(intervalStr, 10)
-      let unitCnt = 0
+      let unitCnt = numUnits
+      let gradCnt = gradsPer
       let push = false
       let i
 
@@ -141,28 +145,28 @@ export default class xAxis extends Axis {
 
       // year boundary
       case "y":
-        grads.years = []
         diff.years = timestampDiff.inYears(rangeStart, rangeEnd)
         let year = rangeStart
-        i = diff.years / numUnits
+            i = diff.years / numUnits
 
         do {
           let yearStart = year_start(year)
           let yearValue = get_year(year)
 
-          grads.years.push([yearStart, this.t2Pixel(yearValue)])
+          grads.years.push([yearValue, this.t2Pixel(yearStart), yearStart])
 
-          year += 1000*60*60*24*366 * numUnits
-          if (!isLeapYear(year)) year -= 1000*60*60*24
+          // adjust for leap year
+          for (let i = numUnits; i > 0; i--) {
+            year += YEAR_MS + DAY_MS
+            if (!isLeapYear(year)) year -= DAY_MS
+          }
         } 
         while (--i > 0)
 
-        grads.current = grads.years
         break;
 
       // month boundary
       case "M":
-        grads.months = []
         diff.months = timestampDiff.inMonths(rangeStart, rangeEnd)
         let month = rangeStart
             i = diff.months / numUnits
@@ -173,23 +177,21 @@ export default class xAxis extends Axis {
 
           monthValue = (monthValue == 0) ? get_year(month) : get_monthName(month)
 
-          grads.months.push([monthStart, this.t2Pixel(monthValue)])
+          grads.months.push([monthValue, this.t2Pixel(monthStart), monthStart])
 
           while (unitCnt++ < numUnits) {
             let dayCnt = monthDayCnt[monthValue]
             if (isLeapYear(month) && monthValue == 1) ++dayCnt
-            month += 1000*60*60*24*dayCnt
+            month += DAY_MS*dayCnt
           }
           unitCnt = 0
         }
         while (--i > 0)
 
-        grads.current = grads.months
         break;
 
       // day boundary
       case "d":
-        grads.days = []
         diff.days = timestampDiff.inDays(rangeStart, rangeEnd)
         let day = rangeStart
             i = diff.days
@@ -214,24 +216,22 @@ export default class xAxis extends Axis {
             // remove last grad if current grad is a new year or month
             // and unit count is not finished
             if (unitCnt > 0) grads.days.pop()
-            grads.days.push([dayValue, this.t2Pixel(dayStart)])
+            grads.days.push([dayValue, this.t2Pixel(dayStart), dayStart])
           }
           if (++unitCnt == numUnits) unitCnt = 0
 
-          day = dayStart + 1000*60*60*24
+          day = dayStart + DAY_MS
           push = false
         }
         while (--i > 0)
 
-        grads.current = grads.days
         break;
 
       case "h":
         // hour boundary
-        grads.hours = []
         diff.hours = timestampDiff.inHours(rangeStart, rangeEnd)
         let hour = rangeStart
-            i = diff.hours
+            i = diff.hours / unitCnt
 
         do {
           let monthValue = get_month(hour)
@@ -239,135 +239,230 @@ export default class xAxis extends Axis {
           let hourValue = get_hour(hour)
           let hourStart = hour_start(hour)
 
-          if (monthValue == 0 && dayValue == 1 && hourValue == 0) hourValue = get_year(hour)
-          else if (dayValue == 1 && hourValue == 0) hourValue = get_monthName(hour)
-          else if (hourValue == 0) hourValue = get_day(hour)
-          else hourValue = hourValue + ":00"
+          if (monthValue == 0 && dayValue == 1 && hourValue == 0) {
+            hourValue = get_year(hour)
+            grads.years.push([hourValue, this.t2Pixel(hourStart), hourStart])
+            grads.hours.push([hourValue, this.t2Pixel(hourStart), hourStart])
+
+            push = true
+          }
+          else if (dayValue == 1 && hourValue == 0) {
+            hourValue = get_monthName(hour)
+            grads.months.push([hourValue, this.t2Pixel(hourStart), hourStart])
+            grads.hours.push([hourValue, this.t2Pixel(hourStart), hourStart])
+
+            push = true
+          }
+          else if (hourValue == 0) {
+            hourValue = get_day(hour) // +" "+ get_monthName(hour)
+            grads.days.push([hourValue, this.t2Pixel(hourStart), hourStart])
+            grads.hours.push([hourValue, this.t2Pixel(hourStart), hourStart])
+
+            push = true
+          }
+          else {
+            // if (--unitCnt == 0) {
+              hourValue = hourValue + ":00"
+              grads.hours.push([hourValue, this.t2Pixel(hourStart), hourStart])
+              unitCnt = numUnits
+            // }
+          }
 
           // add grad to list if start of time unit count or 
           // start of a year or month
-          if (unitCnt == 0 || push === true) {
-            // remove last grad if current grad is a new year or month
-            // and unit count is not finished
-            if (unitCnt > 0) grads.days.pop()
-            grads.hours.push([hourValue, this.t2Pixel(hourStart)])
-          }
-          if (++unitCnt == numUnits) unitCnt = 0
+          // if (unitCnt == 0 || push === true) {
+          //   // if (gradCnt == 0 || push === true) {
+          //     // remove last grad if current grad is a new year or month
+          //     // and unit count is not finished
+          //     if (unitCnt > 0) grads.days.pop()
+          //     grads.hours.push([hourValue, this.t2Pixel(hourStart)])
+          //   // }
+          // }
+          // if (++unitCnt == numUnits) unitCnt = 0
+          // if (++gradCnt >= gradsPer) gradCnt = 0
 
-          hour = hourStart + 1000*60*60
+          hour = hourStart + this.interval
           push = false
         }
         while (--i > 0)
 
-        grads.current = grads.hours
         break;
 
       case "m":
         // minute boundary
-        grads.minutes = []
         diff.minutes = timestampDiff.inMinutes(rangeStart, rangeEnd)
         let minute = rangeStart
             i = diff.days
 
         do {
-          let monthValue = get_month(hour)
-          let dayValue = get_day(hour)
-          let hourValue = get_hour(hour)
-          let minuteValue = get_minute(hour)
-          let minuteStart = minute_start(hour)
+          let monthValue = get_month(minute)
+          let dayValue = get_day(minute)
+          let hourValue = get_hour(minute)
+          let minuteValue = get_minute(minute)
+          let minuteStart = minute_start(minute)
 
           if (monthValue == 0 && dayValue == 1 && hourValue == 0 && minuteValue == 0) minuteValue = get_year(minute)
           else if (dayValue == 1 && hourValue == 0 && minuteValue == 0) minuteValue = get_monthName(minute)
           else if (hourValue == 0 && minuteValue == 0) minuteValue = get_day(minute)
           else minuteValue = get_hour(minute) + ":" + minuteValue
 
-          grads.minutes.push([minuteValue, "00:" + this.t2Pixel(minuteStart)])
+          grads.minutes.push([minuteValue, "00:" + this.t2Pixel(minuteStart), minuteStart])
 
-          minute = minuteStart + 1000*60
+          minute = minuteStart + MINUTE_MS
         }
         while (--i > 0)
 
-        grads.current = grads.minutes
         break;
     }
 
 
-    // diff.months = timestampDiff.inMonths(rangeStart, rangeEnd)
-    // diff.days = timestampDiff.inDays(rangeStart, rangeEnd)
-    // diff.hours = timestampDiff.inHours(rangeStart, rangeEnd)
-    // diff.minutes = timestampDiff.inMinutes(rangeStart, rangeEnd)
-
-    // if (diff.years > 1) {
-    //   units.max = ['y', diff.years]
-    //   units.min = ['M', diff.months]
-    // }
-    // else if (diff.months > 1) {
-    //   units.max = ['M', diff.months]
-    //   units.min = ['d', diff.days]
-    // }
-    // else if (diff.days > 1) {
-    //   units.max = ['d', diff.days]
-    //   units.min = ['h', diff.hours]
-    // }
-    // else if (diff.hours > 1) {
-    //   units.max = ['h', diff.hours]
-    //   units.min = ['m', diff.minutes]
-    // }
-    // else {
-    //   units.max = ['h', diff.hours]
-    //   units.min = ['m', diff.minutes]
-    // }
 
 
+    let years = grads.years.length
+    let months = grads.months.length
+    let days = grads.days.length
+    let hours = grads.hours.length
+    let minutes = grads.minutes.length
+    // let gradCnt = 
+    let x, y
+    
+    // years
+    do {
+      if (years > 0) {
+        x = Math.ceil(years / gradCnt)
+        y = 0
+        while (y < years) {
+          grads.current.push(grads.years[y])
+          gradCnt--
+          y += x
+        }
+        break
+      }
+      break
+    }
+    while (gradsPer > 0)
 
-    // // // max
-    // // let max
-    // // switch(step.max[1]) {
-    // //   case "y":
-    // //     max = this.year_start(rangeEnd)
-    // //     break;
-    // //   case "M":
-    // //     max = this.month_start(rangeEnd)
-    // //     break;
-    // //   case "d":
-    // //     max = this.day_start(rangeEnd)
-    // // }
+    // months
+    do {
+      if (months > 0) {
+        x = Math.ceil(months / gradCnt)
+        y = 0
+        while (y < months) {
+          grads.current.push(grads.months[y])
+          gradCnt--
+          
+          y += x
+        }
+        break
+      }
+      break
+    }
+    while (gradsPer > 0)
 
-    // const hourStart = this.get_hour(rangeEnd)
-    // const dayStart = this.day_start(rangeEnd)
-    // const monthStart = this.month_start(rangeEnd)
-    // const yearStart = this.year_start(rangeEnd)
+    // days
+    do {
+      if (days > 0) {
+        x = Math.ceil(days / gradCnt)
+        y = 0
+        while (y < days) {
+          grads.current.push(grads.days[y])
+          gradCnt--
+          
+          y += x
+        }
+        break
+      }
+      break
+    }
+    while (gradsPer > 0)
 
-    // let rangeAnchor,
-    //     time
+    // hours
+    do {
+      if (hours > 0) {
+        let d1 = day_start(grads.hours[0][2])
+        let hLen = grads.hours.length
+        let d2 = day_start(grads.hours[hLen-1][2]) + DAY_MS
+        let dDiff = timestampDiff.inDays(d1, d2)
+        let dGrad = Math.ceil(gradCnt / dDiff)
 
-    // if (this.inRange(yearStart)) {
-    //   rangeAnchor = yearStart
-    //   time = this.get_year(rangeEnd)
-    // }
-    // else if (this.inRange(monthStart)) {
-    //   rangeAnchor = monthStart
-    //   time = this.get_month(rangeEnd)
-    // }
-    // else if (this.inRange(dayStart)) {
-    //   rangeAnchor = dayStart
-    //   time = this.get_day(rangeEnd)
-    // }
-    // else if (this.inRange(hourStart)) {
-    //   rangeAnchor = hourStart
-    //   time = this.get_hour(rangeEnd)
-    // }
-    // else {
-    //   rangeAnchor = rangeEnd
-    //   time = tis.get_minute(rangeEnd)
-    // }
+        if (gradCnt > 0) {
+          let tick = Math.ceil(DAY_MS / (dGrad))
 
-    // const timeGrads = [[time, this.t2Pixel(rangeAnchor) -1, rangeAnchor]]
+          while (d1 < d2) {
+            d1 += tick
+            grads.current.push([get_hour(d1) + ":00", this.t2Pixel(d1), d1])
+            --gradCnt
+          }
+        }
 
-    // figure out the rest of the timeline
 
-    // return timeGrads
+
+
+        // const grad_MS = Math.ceil(DAY_MS / dGrad)
+
+        // // const grad_MS = Math.ceil(this.rangeDuration / gradCnt)
+        // while (d1 < grads.hours[0][2]) { d1 += grad_MS }
+        //       i = Math.floor((d1 - grads.hours[0][2]) / this.interval)
+
+        // while (i++ < hours-1 && gradCnt > 0) {
+        //   // if (grads.hours[i][2] == day_start(grads.hours[i][2])) {
+        //   //   grads.current.push(grads.hours[i])
+        //   //   gradCnt--
+        //   //   y = x
+        //   // }
+        //   // else if (y == 0) {
+        //   //   grads.current.push(grads.hours[i])
+        //   //   gradCnt--
+        //   //   y = x
+        //   // }
+
+        //   if (y == 0) {
+        //     grads.current.push(grads.hours[i])
+        //     gradCnt--
+        //     y = x
+        //   }
+        //   --y
+        // }
+
+
+        // let dayCnt = grads.days.length
+        // if (dayCnt > 0) {
+        //   let step = gradCnt / dayCnt
+        //   while (day-- > 0 ) {
+  
+        //   }
+        // }
+        // else {
+        //   while (y < hours) {
+        //     grads.current.push(grads.hours[y])
+        //     gradCnt--
+        //     y += x
+        //   }
+        // }
+      }
+      break
+    }
+    while (gradsCnt > 0)
+
+    // minutes
+    do {
+      if (minutes > 0) {
+        x = Math.ceil(minutes / gradCnt)
+        y = 0
+        while (y < minutes) {
+          grads.current.push(grads.minutes[y])
+          gradCnt--
+          
+          y += x
+        }
+        break
+      }
+      break
+    }
+    while (gradsPer > 0)
+
     return grads.current
+
   }
 
   inRange(t) {

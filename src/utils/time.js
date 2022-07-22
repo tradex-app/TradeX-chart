@@ -1,11 +1,19 @@
 import { isArray, isBoolean, isNumber, isObject, isString, checkType } from '../utils/typeChecks'
 
-// BTC Genesis Block: 03/01/2009, 19:15:05
-const BTCGENESIS = 1231006505000
-
 export const dayCntInc = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
 export const dayCntLeapInc = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
 export const monthDayCnt = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
+
+// BTC Genesis Block: 03/01/2009, 19:15:05
+export const BTCGENESIS = 1231006505000
+export const SECOND_MS = 1000
+export const MINUTE_MS = SECOND_MS*60
+export const HOUR_MS = MINUTE_MS*60
+export const DAY_MS = HOUR_MS*24
+export const WEEK_MS = DAY_MS*7
+export const MONTHR_MS = DAY_MS*30
+export function MONTH_MS(m) { return monthDayCnt[m] * DAY_MS }
+export const YEAR_MS = DAY_MS*365
 
 export function isValidTimestamp( _timestamp ) {
   const newTimestamp = new Date(_timestamp).getTime();
@@ -65,19 +73,19 @@ export function ms2Interval( milliseconds ) {
 export function timestampDifference(date1,date2) {
   let difference = date1.getTime() - date2.getTime();
 
-  let weeksDifference = Math.floor(difference/1000/60/60/24/7);
-  difference -= weeksDifference*1000*60*60*24*7
+  let weeksDifference = Math.floor(difference / WEEK_MS);
+  difference -= weeksDifference * WEEK_MS
 
-  let daysDifference = Math.floor(difference/1000/60/60/24);
-  difference -= daysDifference*1000*60*60*24
+  let daysDifference = Math.floor(difference / HOUR_MS);
+  difference -= daysDifference * DAY_MS
 
-  let hoursDifference = Math.floor(difference/1000/60/60);
-  difference -= hoursDifference*1000*60*60
+  let hoursDifference = Math.floor(difference / HOUR_MS);
+  difference -= hoursDifference * HOUR_MS
 
-  let minutesDifference = Math.floor(difference/1000/60);
-  difference -= minutesDifference*1000*60
+  let minutesDifference = Math.floor(difference / MINUTE_MS);
+  difference -= minutesDifference * MINUTE_MS
 
-  let secondsDifference = Math.floor(difference/1000);
+  let secondsDifference = Math.floor(difference / SECOND_MS);
 
   return {
     weeks: weeksDifference,
@@ -96,7 +104,7 @@ export const timestampDiff = {
     var t2 = d2.getTime();
     var t1 = d1.getTime();
 
-    return parseInt((t2-t1)/1000);
+    return parseInt((t2-t1)/SECOND_MS);
   },
   inMinutes: function(d1, d2) {
         d1 = new Date(d1)
@@ -104,7 +112,7 @@ export const timestampDiff = {
     let t2 = d2.getTime();
     let t1 = d1.getTime();
 
-    return parseInt((t2-t1)/(60*1000));
+    return parseInt((t2-t1)/MINUTE_MS);
   },
 
   inHours: function(d1, d2) {
@@ -113,7 +121,7 @@ export const timestampDiff = {
     let t2 = d2.getTime();
     let t1 = d1.getTime();
 
-    return parseInt((t2-t1)/(3600*1000));
+    return parseInt((t2-t1)/HOUR_MS);
   },
 
   inDays: function(d1, d2) {
@@ -122,7 +130,7 @@ export const timestampDiff = {
     let t2 = d2.getTime();
     let t1 = d1.getTime();
 
-    return parseInt((t2-t1)/(24*3600*1000));
+    return parseInt((t2-t1)/DAY_MS);
   },
 
   inWeeks: function(d1, d2) {
@@ -131,16 +139,16 @@ export const timestampDiff = {
     let t2 = d2.getTime();
     let t1 = d1.getTime();
 
-    return parseInt((t2-t1)/(24*3600*1000*7));
+    return parseInt((t2-t1)/WEEK_MS);
   },
 
   inMonths: function(d1, d2) {
          d1 = new Date(d1)
          d2 = new Date(d2)
-    let d1Y = d1.getFullYear();
-    let d2Y = d2.getFullYear();
-    let d1M = d1.getMonth();
-    let d2M = d2.getMonth();
+    let d1Y = d1.getUTCFullYear();
+    let d2Y = d2.getUTCFullYear();
+    let d1M = d1.getUTCMonth();
+    let d2M = d2.getUTCMonth();
 
     return (d2M+12*d2Y)-(d1M+12*d1Y);
   },
@@ -148,13 +156,13 @@ export const timestampDiff = {
   inYears: function(d1, d2) {
     let d1Y = new Date(d1)
     let d2Y = new Date(d2)
-    return d2Y.getFullYear()-d1Y.getFullYear();
+    return d2Y.getUTCFullYear()-d1Y.getUTCFullYear();
   }
   
 }
 
 export function get_minute(t) {
-  return t ? new Date(t).getMinutes() : null
+  return t ? new Date(t).getUTCMinutes() : null
 }
 
 export function minute_start(t) {
@@ -163,7 +171,7 @@ export function minute_start(t) {
 }
 
 export function get_hour(t) {
-  return t ? new Date(t).getHours() : null
+  return t ? new Date(t).getUTCHours() : null
 }
 
 export function hour_start(t) {
@@ -178,7 +186,7 @@ export function hour_start(t) {
  * @return {number} - day number of the month
  */
  export function get_day(t) {
-  return t ? new Date(t).getDate() : null
+  return t ? new Date(t).getUTCDate() : null
 }
 
 export function get_dayName(t, locale="en-GB", len="short") {
@@ -219,8 +227,8 @@ export function get_monthName(t, locale="en-GB", len="short") {
  export function month_start(t) {
   let date = new Date(t)
   return Date.UTC(
-      date.getFullYear(),
-      date.getMonth(), 1
+      date.getUTCFullYear(),
+      date.getUTCMonth(), 1
   )
 }
 
@@ -242,20 +250,20 @@ export function get_monthName(t, locale="en-GB", len="short") {
  * @return {timestamp} - timestamp ms
  */
  export function year_start(t) {
-  return Date.UTC(new Date(t).getFullYear())
+  return Date.UTC(new Date(t).getUTCFullYear())
 }
 
 export function isLeapYear(t) {
   let date = new Date(t)
-  let year = date.getFullYear();
+  let year = date.getUTCFullYear();
   if((year & 3) != 0) return false;
   return ((year % 100) != 0 || (year % 400) == 0);
 }
 
 export function dayOfYear(t) {
   let date = new Date(t)
-  let mn = date.getMonth();
-  let dn = date.getDate();
+  let mn = date.getUTCMonth();
+  let dn = date.getUTCDate();
   let dayOfYear = dayCount[mn] + dn;
   if(mn > 1 && isLeapYear()) dayOfYear++;
   return dayOfYear;

@@ -22,6 +22,7 @@ export function getRange( allData, start=0, end=allData.chart.length-1 ) {
   
   r.value = (index) =>{ return rangeValue(r, index)}
   r.interval = r.data[1][0] - r.data[0][0]
+  r.intervalStr = ms2Interval(r.interval)
   r.indexStart = start
   r.indexEnd = end
   r.Length = r.indexEnd - r.indexStart
@@ -31,7 +32,6 @@ export function getRange( allData, start=0, end=allData.chart.length-1 ) {
   r.timeMin = r.value(r.indexStart)[0]
   r.timeMax = r.value(r.indexEnd)[0]
   r.rangeDuration = r.timeMax - r.timeMin
-  r.intervalStr = ms2Interval(r.interval)
   r = {...r, ...maxMinPriceVol(r.data, r.indexStart, r.indexEnd)}
   r.height = r.priceMax - r.priceMin
   r.volumeHeight = r.volumeMax - r.volumeMin

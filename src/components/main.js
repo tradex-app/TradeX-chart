@@ -8,7 +8,7 @@ import Chart from "./chart"
 import OffChart from "./offChart"
 import Overlays from "./overlays"
 import stateMachineConfig from "../state/state-mainPane"
-
+import { InputController, Keys } from "../input/controller"
 
 
 import {
@@ -56,8 +56,11 @@ export default class MainPane {
 
   #offChartDefaultH = 30 // %
   #offChartDefaultWpx = 120
+
+  #cursorPos = [0, 0]
   
   #indicators
+  #controller
 
 
   constructor (mediator, options) {
@@ -153,6 +156,24 @@ export default class MainPane {
 
 
   eventsListen() {
+    // // Give canvas focus so it can receive keyboard input
+    // this.#elMain.tabIndex = 0
+    // this.#elMain.focus()
+
+    // // create controller and use 'on' method to receive input events 
+    // this.#controller = new InputController(this.#elMain);
+    // // mouse wheel event
+    // this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
+    // // move event
+    // this.#controller.on("mousemove", this.onMouseMove.bind(this));
+    // // drag event
+    // this.#controller.on("drag", this.onChartDrag.bind(this));
+    // // drag event complete
+    // this.#controller.on("enddrag", this.onChartDragDone.bind(this));
+    // // keyboard events
+    // this.#controller.on("keydown", this.onChartKeyDown.bind(this))
+    // this.#controller.on("keyup", this.onChartKeyUp.bind(this))
+
     // listen/subscribe/watch for parent notifications
     this.on("resize", (dimensions) => this.onResize(dimensions).bind(this))
   }
@@ -172,6 +193,83 @@ export default class MainPane {
   onResize(dimensions) {
     this.setDimensions(dimensions)
   }
+
+  onMouseWheel(e) {
+    const direction = Math.sign(e.wheeldelta)
+    const range = this.range
+    const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length)
+    const newEnd = range.indexEnd + Math.floor(direction * XAXIS_ZOOM * range.Length)
+    const oldStart = range.indexStart
+    const oldEnd = range.indexEnd
+    const inOut = (range)? "out" : "in"
+
+    this.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
+    this.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
+    this.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
+  }
+  
+  onMouseMove(e) {
+    // this.#cursorPos = [e.layerX, e.layerY]
+    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+
+    this.emit("chart_mousemove", this.#cursorPos)
+
+    this.updateLegends()
+  }
+
+  onChartDrag(e) {
+    this.#cursorPos = [
+      Math.floor(e.position.x), Math.floor(e.position.y), 
+      e.dragstart.x, e.dragstart.y,
+      e.movement.x, e.movement.y
+    ]
+    this.emit("chart_pan", this.#cursorPos)
+  }
+
+  onChartDragDone(e) {
+    this.#cursorPos = [
+      Math.floor(e.position.x), Math.floor(e.position.y), 
+      e.dragstart.x, e.dragstart.y,
+      e.movement.x, e.movement.y
+    ]
+    this.emit("chart_panDone", this.#cursorPos)
+  }
+
+  onChartKeyDown(e) {
+    let step = Math.ceil(this.#core.Timeline.candleW) || 1
+
+    switch (e.keyCode) {
+      case Keys.Left:
+        console.log("keydown: cursor Left")
+
+        this.emit("chart_pan", [0,null,step,null,step * -1])
+        break;
+      case Keys.Right:
+        console.log("keydown: cursor Right")
+
+        this.emit("chart_pan", [step,null,0,step])
+        break;
+    }
+  }
+
+  onChartKeyUp(e) {
+    let step = Math.ceil(this.#core.Timeline.candleW) || 1
+
+    switch (e.keyCode) {
+      case Keys.Left:
+        console.log("keyup: cursor Left")
+        
+        this.emit("chart_panDone", [0,null,step,null,step * -1])
+        break;
+      case Keys.Right:
+        console.log("keyup: cursor Right")
+
+        this.emit("chart_panDone", [step,null,0,step])
+        break;
+    }
+  }
+
+
 
   mount(el) {
     el.innerHTML = this.defaultNode()
