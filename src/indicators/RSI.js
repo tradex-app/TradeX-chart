@@ -24,8 +24,8 @@ export default class RSI extends indicator {
     defaultLow: 25,
     highLowLineWidth: 1,
     highLowStyle: "dashed",
-    highStrokeStyle: "#404",
-    lowStrokeStyle: "#404"
+    highStrokeStyle: "#848",
+    lowStrokeStyle: "#848"
   }
   style = {}
   overlay
@@ -106,7 +106,8 @@ export default class RSI extends indicator {
     plots[1] = {x: this.scene.width, y: this.yAxis.yPos(100 - this.style.defaultHigh)}
     let style = {
       lineWidth: this.style.highLowLineWidth,
-      strokeStyle: this.style.highStrokeStyle
+      strokeStyle: this.style.highStrokeStyle,
+      dash: [5, 5]
     }
     this.plot(plots, "renderLine", style)
 
@@ -115,11 +116,12 @@ export default class RSI extends indicator {
     plots[1] = {x: this.scene.width, y: this.yAxis.yPos(100 - this.style.defaultLow)}
     style = {
       lineWidth: this.style.highLowLineWidth,
-      strokeStyle: this.style.highStrokeStyle
+      strokeStyle: this.style.highStrokeStyle,
+      dash: [5, 5]
     }
     this.plot(plots, "renderLine", style)
 
-    
+
     plots.length = 0
     const plot = {
       x: (width * 0.5) + 2,

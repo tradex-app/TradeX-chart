@@ -7,11 +7,14 @@
  */
 export function renderPath (ctx, coordinates, style, strokeFill) {
   ctx.save()
-  ctx.lineWidth = style.lineWidth
+  ctx.lineWidth = style.lineWidth || 1
   if (ctx.lineWidth % 2) {
     ctx.translate(0.5, 0.5)
   }
   ctx.strokeStyle = style.strokeStyle
+
+  if ("dash" in style) ctx.setLineDash(style.dash)
+  
   ctx.beginPath()
   let move = true
   coordinates.forEach(coordinate => {
