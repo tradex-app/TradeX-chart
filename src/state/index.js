@@ -7,6 +7,8 @@ import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeC
 import Dataset from '../helpers/dataset'
 import { validateDeep, validateShallow } from '../helpers/validateData'
 import { mergeDeep } from '../utils/utilities'
+import { detectInterval } from '../helpers/range'
+import { ms2Interval } from '../utils/time'
 
 const DEFAULT_STATE = {
   chart: {
@@ -16,7 +18,8 @@ const DEFAULT_STATE = {
     data: [],
     settings: {},
     row: {},
-    tf: ""
+    tf: "",
+    tfms: 0
   },
   onchart: [],
   offchart: [],
@@ -79,6 +82,12 @@ export default class State {
       state.chart.data = validateDeep(state.chart.data, isCrypto) ? state.chart.data : []
     else 
       state.chart.data = validateShallow(state.chart.data, isCrypto) ? state.chart.data : []
+
+    if (typeof state.chart?.tf !== "number" || deepValidate)
+      state.chart.tfms = detectInterval(state.chart.data)
+    
+    if (typeof state.chart?.tfms !== "string" || deepValidate)
+      state.chart.tf = ms2Interval(state.chart.tfms)
 
     if (!('onchart' in state)) {
         state.onchart = []

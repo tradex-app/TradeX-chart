@@ -21,7 +21,7 @@ export default class chartGrid {
   draw() {
     this.#scene.clear()
     
-    const xGrads = this.#xAxis.xAxisGrads
+    const xGrads = this.#xAxis.xAxisGrads.values
     const ctx = this.#scene.context
     ctx.save();
     ctx.strokeStyle = GridStyle.COLOUR_GRID

@@ -1,5 +1,7 @@
 import { isArray, isBoolean, isNumber, isObject, isString, checkType } from '../utils/typeChecks'
 
+export const TIMEUNITS = ['y','M','d','h','m','s','ms']
+export const TIMEUNITSLONG = ['years','months','days','hours','minutes','seconds','milliseconds']
 export const dayCntInc = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
 export const dayCntLeapInc = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
 export const monthDayCnt = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
@@ -12,8 +14,46 @@ export const HOUR_MS = MINUTE_MS*60
 export const DAY_MS = HOUR_MS*24
 export const WEEK_MS = DAY_MS*7
 export const MONTHR_MS = DAY_MS*30
-export function MONTH_MS(m) { return monthDayCnt[m] * DAY_MS }
+export function MONTH_MS(m=3, l=false) { 
+  let ms = monthDayCnt[m % 12] * DAY_MS
+  if (l && m > 0) ms += DAY_MS
+  return ms
+}
 export const YEAR_MS = DAY_MS*365
+export const TIMEUNITSVALUESSHORT = {
+  y: YEAR_MS, 
+  M: MONTHR_MS,
+  w: WEEK_MS,
+  d: DAY_MS,
+  h: HOUR_MS,
+  m: MINUTE_MS,
+  s: SECOND_MS,
+}
+export const TIMEUNITSVALUESLONG = {
+  years: YEAR_MS,
+  months: MONTHR_MS,
+  weeks: WEEK_MS,
+  days: DAY_MS,
+  hours: HOUR_MS,
+  minutes: MINUTE_MS,
+  seconds: SECOND_MS,
+}
+export const TIMEUNITSVALUES = { ...TIMEUNITSVALUESSHORT, ...TIMEUNITSVALUESLONG }
+
+export function buildSubGrads() {
+  const grads = {}
+  for (let unit in TIMEUNITSVALUESSHORT) {
+    let i = 0
+    grads[unit] = []
+    do {
+      grads[unit].push(Math.round(TIMEUNITSVALUESSHORT[unit] * i))
+      i += 0.125
+    }
+    while(i < 1)
+  }
+  return grads
+}
+
 
 export function isValidTimestamp( _timestamp ) {
   const newTimestamp = new Date(_timestamp).getTime();
@@ -23,77 +63,6 @@ export function isValidTimestamp( _timestamp ) {
 export function isValidTimeInRange( time, start=BTCGENESIS,end=Date.now() ) {
   if (!isValidTimestamp(time)) return false
   return (time > start && time < end) ? true : false
-}
-
-function ms2TimeUnits( milliseconds ) {
-  let years, months, _weeks, weeks, days, hours, minutes, seconds;
-  seconds = Math.floor(milliseconds / 1000);
-  minutes = Math.floor(seconds / 60);
-  seconds = seconds % 60;
-  hours = Math.floor(minutes / 60);
-  minutes = minutes % 60;
-  days = Math.floor(hours / 24);
-  hours = hours % 24;
-  _weeks = Math.floor(days / 7);
-  days = days % 7
-  months = Math.floor(_weeks / 4)
-  years = Math.floor(_weeks / 52)
-  weeks = _weeks % 4
-  // accumulative extra days of months (28 days) 
-  // in 1 year (365 days) = 29 days
-  // thus...
-  months = months % 13
-
-  return {
-    y: years,
-    M: months,
-    w: weeks,
-    d: days,
-    h: hours,
-    m: minutes,
-    s: seconds,
-    
-    years: years,
-    months: months,
-    weeks: weeks,
-    days: days,
-    hours: hours,
-    minutes: minutes,
-    seconds: seconds,
-  };
-}
-
-export function ms2Interval( milliseconds ) {
-  const intervals = ms2TimeUnits(milliseconds)
-  for (const unit in intervals) {
-    if (intervals[unit]) return `${intervals[unit]}${unit}`
-  }
-}
-
-export function timestampDifference(date1,date2) {
-  let difference = date1.getTime() - date2.getTime();
-
-  let weeksDifference = Math.floor(difference / WEEK_MS);
-  difference -= weeksDifference * WEEK_MS
-
-  let daysDifference = Math.floor(difference / HOUR_MS);
-  difference -= daysDifference * DAY_MS
-
-  let hoursDifference = Math.floor(difference / HOUR_MS);
-  difference -= hoursDifference * HOUR_MS
-
-  let minutesDifference = Math.floor(difference / MINUTE_MS);
-  difference -= minutesDifference * MINUTE_MS
-
-  let secondsDifference = Math.floor(difference / SECOND_MS);
-
-  return {
-    weeks: weeksDifference,
-    days: daysDifference,
-    hours: hoursDifference,
-    minutes: minutesDifference,
-    seconds: secondsDifference
-  }
 }
 
 export const timestampDiff = {
@@ -161,6 +130,97 @@ export const timestampDiff = {
   
 }
 
+/**
+ * Timestamp difference in multiple units
+ *
+ * @param {timestamp} date1 - milliseconds
+ * @param {timestamp} date2 - milliseconds
+ * @return {object}  
+ */
+export function timestampDifference(date1,date2) {
+  let years = timestampDiff.inYears(date1,date2)
+  let months = timestampDiff.inMonths(date1,date2)
+  let weeks = timestampDiff.inWeeks(date1,date2)
+  let days = timestampDiff.inDays(date1,date2)
+  let hours = timestampDiff.inHours(date1,date2)
+  let minutes = timestampDiff.inMinutes(date1,date2)
+  let seconds = timestampDiff.inSeconds(date1,date2)
+  let milliseconds = new Date(date2).getTime() - new Date(date1).getTime();
+
+  return {
+    y: years,
+    M: months,
+    w:weeks,
+    d:days,
+    h:hours,
+    m:minutes,
+    s:seconds,
+    ms:milliseconds,
+    
+    years: years,
+    months: months,
+    weeks:weeks,
+    days:days,
+    hours:hours,
+    minutes:minutes,
+    seconds:seconds,
+    milliseconds:milliseconds
+  }
+}
+
+
+/**
+ * Milliseconds broken down into major unit and remainders
+ *
+ * @export
+ * @param {number} milliseconds
+ * @return {object}  
+ */
+export function ms2TimeUnits( milliseconds ) {
+  // let years, months, _weeks, weeks, days, hours, minutes, seconds;
+  let seconds = Math.floor(milliseconds / 1000);
+  let minutes = Math.floor(seconds / 60);
+      seconds = seconds % 60;
+  let hours = Math.floor(minutes / 60);
+      minutes = minutes % 60;
+  let days = Math.floor(hours / 24);
+      hours = hours % 24;
+  let _weeks = Math.floor(days / 7);
+      days = days % 7
+  let months = Math.floor(_weeks / 4)
+  let years = Math.floor(_weeks / 52)
+  let weeks = _weeks % 4
+  // accumulative extra days of months (28 days) 
+  // in 1 year (365 days) = 29 days
+  // thus...
+  months = months % 13
+
+  return {
+    y: years,
+    M: months,
+    w: weeks,
+    d: days,
+    h: hours,
+    m: minutes,
+    s: seconds,
+    
+    years: years,
+    months: months,
+    weeks: weeks,
+    days: days,
+    hours: hours,
+    minutes: minutes,
+    seconds: seconds,
+  };
+}
+
+export function ms2Interval( milliseconds ) {
+  const intervals = ms2TimeUnits(milliseconds)
+  for (const unit in intervals) {
+    if (intervals[unit]) return `${intervals[unit]}${unit}`
+  }
+}
+
 export function get_minute(t) {
   return t ? new Date(t).getUTCMinutes() : null
 }
@@ -190,7 +250,7 @@ export function hour_start(t) {
 }
 
 export function get_dayName(t, locale="en-GB", len="short") {
-  return new Date(t).toLocaleDateString(locale, {day: len})
+  return new Date(t).toLocaleDateString(locale, {weekday: len})
 }
 
 /**
@@ -232,6 +292,12 @@ export function get_monthName(t, locale="en-GB", len="short") {
   )
 }
 
+export function nextMonth(t) {
+  let m = (get_month(t) + 1) % 12
+  t += MONTH_MS(m, isLeapYear(t))
+  return t
+}
+
 /**
  * the year
  *
@@ -251,6 +317,12 @@ export function get_monthName(t, locale="en-GB", len="short") {
  */
  export function year_start(t) {
   return Date.UTC(new Date(t).getUTCFullYear())
+}
+
+export function nextYear(t) {
+  t = t + YEAR_MS + DAY_MS
+  if (!isLeapYear(t)) t - DAY_MS
+  return t
 }
 
 export function isLeapYear(t) {

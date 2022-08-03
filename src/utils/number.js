@@ -186,13 +186,6 @@ export function float2Int(value) {
   return Math.round((n + Number.EPSILON) * d) / d;
 }
 
-// 3.5 times slower than round()
-export function roundT (value, precision) {
-  precision = precision || 10
-  precision = Math.min(Math.max(0, precision), 20)
-  value = (+value).toFixed(precision)
-  return +value
-}
 
 /**
  * Get the number of decimal places

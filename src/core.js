@@ -12,6 +12,7 @@ import WidgetsG from './components/widgets'
 import State from './state'
 import { getRange } from "./helpers/range"
 import Indicators from './definitions/indicators'
+import * as Time from './utils/time'
 
 
 import {
@@ -116,6 +117,7 @@ export default class TradeXchart {
     rangeTotal: true,
     range: {},
     total: {},
+    timeFrameMS: 0,
     timeFrame: '',
     timeZone: '',
     indexed: false
@@ -154,6 +156,9 @@ constructor (mediator, options={}) {
       this.#state = State.create(state, deepValidate, isCrypto)
       this.log(`Chart ${this.#id} created with a ${this.#state.status} state`)
       delete(options.state)
+
+      this.#time.timeFrame = this.#state.data.chart.tf 
+      this.#time.timeFrameMS = this.#state.data.chart.tfms
 
       this.init(options)
     }
@@ -199,6 +204,7 @@ constructor (mediator, options={}) {
   get rangeLimit() { return (isNumber(this.#rangeLimit)) ? this.#rangeLimit : RANGELIMIT }
   get range() { return this.#range }
   get time() { return this.#time }
+  get TimeUtils() { return Time }
 
   get settings() { return this.#state.data.chart.settings }
   get indicators() { return this.#indicators }
@@ -537,6 +543,9 @@ constructor (mediator, options={}) {
       datasets: this.datasets
     }
     this.#range = getRange(allData, start, end)
+    this.#range.interval = this.#time.timeFrameMS
+    this.#range.intervalStr = this.#time.timeFrame
+    this.#time.range = this.#range
   }
 
   notImplemented() {

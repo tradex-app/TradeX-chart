@@ -8,7 +8,8 @@ DOM.findBySelector('#app').innerHTML = `
   <h1>Hello Vite!</h1>
   <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
   -->
-  <div id="test" style=""></div>
+  <div id="test" style="float:left;"></div>
+  <div id="info" style="float:left;"></div>
 `
 const mount = DOM.findBySelector('#test')
 const props = {
@@ -33,5 +34,34 @@ chart.start(chart.getModID())
 console.log("API: id:", chart.id)
 console.log("API: name:", chart.name)
 console.log("API: height:", chart.height)
+
+function internals() {
+  const data = {}
+  const tx = chart.Timeline.xAxis
+
+  data.rangeLength = [`range.length:`,`${tx.range.Length}`]
+  data.rangeIntervalStr = [`range.intervalStr:`,`${tx.range.intervalStr}`]
+  data.rangeStart = ["range.indexStart: ", new Date(tx.range.value(tx.indexStart)[0])]
+  data.rangeEnd = ["range.indexEnd: ", new Date(tx.range.value(tx.indexEnd)[0])]
+  data.gradsTimeSpan = ["grads.timeSpan: ", tx.xAxisGrads.timeSpan]
+  data.gradsUnits = ["grads.units: ", JSON.stringify(tx.xAxisGrads.units)]
+  data.gradsInc = ["grads.inc: ", tx.xAxisGrads.inc]
+
+  return data
+}
+
+const infoBox = {}
+      infoBox.el = DOM.findBySelector('#info')
+      infoBox.out = function (info) {
+        let inf = `<ul style="color:#FFF; text-align:left;">`
+        for (let i in info) {
+          inf += `<li>${info[i][0]} <span>${info[i][1]}</span></li>`
+        }
+        inf += "</ul>"
+        infoBox.el.innerHTML = inf
+      }
+
+chart.on("chart_zoom", (e) => { infoBox.out(internals()) })
+chart.on("chart_pan", (e) => { infoBox.out(internals()) })
 // test()
 

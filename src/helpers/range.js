@@ -1,7 +1,7 @@
 // range.js
 
 import indicators from "../definitions/indicators"
-import { ms2Interval } from "../utils/time"
+import { DAY_MS, ms2Interval, WEEK_MS } from "../utils/time"
 import { LIMITFUTURE, LIMITPAST, MINCANDLES } from "../definitions/chart"
 
 export function getRange( allData, start=0, end=allData.chart.length-1 ) {
@@ -108,3 +108,21 @@ export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
     volumeMax: volumeMax
   }
 }
+
+
+// Detects candles interval
+export function detectInterval(ohlcv) {
+
+  let len = Math.min(ohlcv.length - 1, 99)
+  let min = Infinity
+  ohlcv.slice(0, len).forEach((x, i) => {
+      let d = ohlcv[i+1][0] - x[0]
+      if (d === d && d < min) min = d
+  })
+  // This saves monthly chart from being awkward
+  // if (min >= WEEK_MS * 4 && min <= DAY_MS * 30) {
+  //     return DAY_MS * 31
+  // }
+  return min
+}
+

@@ -106,3 +106,28 @@ export function isArrayEqual(a1, a2) {
   }
   return true
 }
+
+/**
+ *Find nearest number value in Array
+ *
+ * @param {number} x
+ * @param {array} array
+ * @return {array} - index, value
+ */
+export function nearestArrayValue(x, array) {
+  let dist = Infinity
+  let val = null
+  let index = -1
+  let i = 0
+
+  while(i++ < array.length) {
+    let xi = array[i]
+    let diff = Math.abs(xi - x)
+    if (diff < dist) {
+      dist = diff
+      val = xi
+      index = i
+    }
+  }
+  return [index, val]
+}

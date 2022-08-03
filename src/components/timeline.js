@@ -57,6 +57,7 @@ export default class Timeline {
   get height() { return this.#elTime.clientHeight }
   set width(w) { this.setWidth(w) }
   get width() { return this.#elTime.clientWidth }
+  get xAxis() { return this.#xAxis }
   get xAxisWidth() { return this.#xAxis.width }
   get xAxisRatio() { return this.#xAxis.xAxisRatio }
   get layerLabels() { return this.#layerLabels }
@@ -161,7 +162,7 @@ export default class Timeline {
   createViewport() {
     // create viewport
     this.#viewport = new CEL.Viewport({
-      width: this.#elTime.clientWidth,
+      width: this.xAxisWidth,
       height: this.#elTime.clientHeight,
       container: this.#elViewport
     });
