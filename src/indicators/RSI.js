@@ -19,7 +19,13 @@ export default class RSI extends indicator {
   ]
   defaultStyle = {
     strokeStyle: "#C80",
-    lineWidth: '1'
+    lineWidth: '1',
+    defaultHigh: 75,
+    defaultLow: 25,
+    highLowLineWidth: 1,
+    highLowStyle: "dashed",
+    highStrokeStyle: "#404",
+    lowStrokeStyle: "#404"
   }
   style = {}
   overlay
@@ -42,16 +48,13 @@ export default class RSI extends indicator {
     super(target, xAxis, yAxis, config)
 
     this.overlay = overlay
-    this.style = config.style || this.defaultStyle
+    this.style = {...this.defaultStyle, ...config.style}
     this.TALib = xAxis.mediator.api.core.TALib
   }
 
   calcIndicator(input) {
     this.overlay.data = this.TALib.EMA(input)
   }
-
-
-
 
   regeneratePlots (params) {
     return params.map((_, index) => {
@@ -99,6 +102,25 @@ export default class RSI extends indicator {
     const data = this.overlay.data
     const width = Math.round(this.scene.width / range.Length)
     const plots = []
+    plots[0] = {x: 0, y: this.yAxis.yPos(100 - this.style.defaultHigh)}
+    plots[1] = {x: this.scene.width, y: this.yAxis.yPos(100 - this.style.defaultHigh)}
+    let style = {
+      lineWidth: this.style.highLowLineWidth,
+      strokeStyle: this.style.highStrokeStyle
+    }
+    this.plot(plots, "renderLine", style)
+
+    plots.length = 0
+    plots[0] = {x: 0, y: this.yAxis.yPos(100 - this.style.defaultLow)}
+    plots[1] = {x: this.scene.width, y: this.yAxis.yPos(100 - this.style.defaultLow)}
+    style = {
+      lineWidth: this.style.highLowLineWidth,
+      strokeStyle: this.style.highStrokeStyle
+    }
+    this.plot(plots, "renderLine", style)
+
+    
+    plots.length = 0
     const plot = {
       x: (width * 0.5) + 2,
       w: width,
