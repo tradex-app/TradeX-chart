@@ -7,6 +7,7 @@ import indicator from "../components/overlays/inidcator"
 import { 
   YAXIS_TYPES
 } from "../definitions/chart";
+import { round } from "../utils/number";
 
 export default class RSI extends indicator {
   name = 'Relative Strength Index'
@@ -100,7 +101,7 @@ export default class RSI extends indicator {
     this.scene.clear()
 
     const data = this.overlay.data
-    const width = Math.round(this.scene.width / range.Length)
+    const width = round(this.scene.width / range.Length, 1)
     const plots = []
     plots[0] = {x: 0, y: this.yAxis.yPos(100 - this.style.defaultHigh)}
     plots[1] = {x: this.scene.width, y: this.yAxis.yPos(100 - this.style.defaultHigh)}

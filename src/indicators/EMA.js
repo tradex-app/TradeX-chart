@@ -5,6 +5,7 @@
  import { 
    YAXIS_TYPES
  } from "../definitions/chart";
+import { round } from "../utils/number";
  
  export default class EMA extends indicator {
   name ='Exponential Moving Average'
@@ -89,7 +90,7 @@
     this.scene.clear()
 
     const data = this.overlay.data
-    const width = Math.round(this.scene.width / range.Length)
+    const width = round(this.scene.width / range.Length, 1)
     const plots = []
     const plot = {
       x: (width * 0.5) + 2,

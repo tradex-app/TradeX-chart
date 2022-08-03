@@ -2,6 +2,7 @@
 
 import Candle from "../primitives/candle";
 import { CandleStyle } from "../../definitions/style"
+import { round } from "../../utils/number";
 
 export default class chartCandles extends Candle {
 
@@ -31,7 +32,7 @@ export default class chartCandles extends Candle {
     const data = range.data
     const candle = {
       x: 2,
-      w: Math.round(this.#scene.width / range.Length),
+      w: round(this.#scene.width / range.Length, 1),
     }
 
     let c = range.indexStart

@@ -50,7 +50,7 @@ export default class xAxis extends Axis {
   get indexEnd() { return this.range.indexEnd }
   get timeMax() { return this.range.timeMax }
   get timeMin() { return this.range.timeMin }
-  get candleW() { return Math.floor(this.width / this.range.Length) }
+  get candleW() { return round(this.width / this.range.Length, 1) }
   get gradsMax() { return Math.trunc(this.width / MAXGRADSPER) }
       gradsYear(t) { return get_year(t) }
       gradsMonthName(t) { return get_monthName(t) }

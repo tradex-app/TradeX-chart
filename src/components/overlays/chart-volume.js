@@ -1,6 +1,7 @@
 // chart-volume.js
 
 import VolumeBar from "../primitives/volume";
+import { round } from "../../utils/number";
 
 export default class chartVolume extends VolumeBar {
 
@@ -28,7 +29,7 @@ export default class chartVolume extends VolumeBar {
     const zeroPos = this.scene.height
     const volume = {
       x: 0,
-      w: Math.round(this.#scene.width / range.Length),
+      w: round(this.#scene.width / range.Length, 1),
       z: zeroPos
     }
 
