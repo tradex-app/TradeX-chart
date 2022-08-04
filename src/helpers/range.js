@@ -39,6 +39,12 @@ export function getRange( allData, start=0, end=allData.chart.length-1 ) {
   return r
 }
 
+export function inRange(t, range) {
+  if (t >= range.timeStart && t <= range.timeFinish)
+    return true
+  else return false
+}
+
 export function rangeValue( range, index ) {
   let v = range.data[index]
   if (v !== undefined) return v
@@ -56,8 +62,6 @@ export function rangeValue( range, index ) {
     else return null
   }
 }
-
-
 
 export function rangeOnchartValue( range, indicator, index ) {
   const len = range.onchart[indicator].length - 1

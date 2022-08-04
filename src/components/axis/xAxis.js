@@ -19,6 +19,7 @@ import {
   TIMEUNITSVALUES
  } from "../../utils/time";
 import { XAxisStyle } from "../../definitions/style";
+import { inRange } from "../../helpers/range";
 
 export default class xAxis extends Axis {
 
@@ -186,6 +187,7 @@ export default class xAxis extends Axis {
       
     // Months
     else if (units.months > 0) {
+      let months = units.months
       grads.unit = ["M", "month"]
       grads.timeSpan = `${units.months} months`
       
@@ -193,9 +195,9 @@ export default class xAxis extends Axis {
       t2 = month_start(rangeEnd) + MONTH_MS(get_month(rangeEnd)) + YEAR_MS
         
       units = timestampDifference(t1, t2)
-      major = units.months
+      major = months
       majorTick = Math.ceil(1 / (this.gradsMax / major))
-      minorTick = (units.months >= this.gradsMax - 1) ? 0 : Math.floor(this.gradsMax / major)
+      minorTick = (months >= this.gradsMax - 1) ? 0 : Math.floor(this.gradsMax / major)
 
       console.log("minorTick:",minorTick)
       console.log("majorTick:",majorTick)
@@ -210,7 +212,7 @@ export default class xAxis extends Axis {
       }
       
       t = t1
-      inc = Math.round((MONTHR_MS + DAY_MS) / (minorTick + 1))
+      inc = Math.round((DAY_MS * 28) / (minorTick + 1))
       grads.major = []
       grads.minor = []
 
@@ -226,6 +228,7 @@ export default class xAxis extends Axis {
             console.log(`t: ${t}, next: ${next}, inc: ${inc}`)
 
             t = day_start(t + inc)
+            if (get_day(t) > 27) break 
             grads.minor.push(t)
           }
         }
@@ -376,12 +379,12 @@ export default class xAxis extends Axis {
     let i = -1
     while (++i < grads.major.length) {
       t = grads.major[i]
-      grads.values.push([majorValue(t), this.t2Pixel(t), t])
+      grads.values.push([majorValue(t), this.t2Pixel(t), t, "major"])
     }
     i = -1
     while (++i < grads.minor.length) {
       t = grads.minor[i]
-      grads.values.push([minorValue(t), this.t2Pixel(t), t])
+      grads.values.push([minorValue(t), this.t2Pixel(t), t, "minor"])
     }
 
     return grads
@@ -399,12 +402,6 @@ export default class xAxis extends Axis {
     }
     while (t < t2)
     return ticks
-  }
-
-  inRange(t) {
-    if (t >= this.range.timeStart && t <= this.range.timeFinish)
-      return true
-    else return false
   }
 
   draw() {
