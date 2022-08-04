@@ -45,7 +45,10 @@ function internals() {
   data.rangeEnd = ["range.indexEnd: ", new Date(tx.range.value(tx.indexEnd)[0])]
   data.gradsTimeSpan = ["grads.timeSpan: ", tx.xAxisGrads.timeSpan]
   data.gradsUnits = ["grads.units: ", JSON.stringify(tx.xAxisGrads.units)]
+  data.gradsMajor = ["grads.major: ", tx.xAxisGrads.majorTick]
+  data.gradsMinor = ["grads.minor: ", tx.xAxisGrads.minorTick]
   data.gradsInc = ["grads.inc: ", tx.xAxisGrads.inc]
+  // data.gradsValues = ["grads.values: ", JSON.stringify(tx.xAxisGrads.values)]
 
   return data
 }

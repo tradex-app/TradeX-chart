@@ -2,24 +2,21 @@
 // Timeline that lurks down below
 
 import Axis from "./axis";
-import { MAXGRADSPER, TIMEUNITS, TIMEINCS } from "../../definitions/chart";
+import { MAXGRADSPER } from "../../definitions/chart";
 import { isNumber } from "../../utils/typeChecks";
 import { round } from "../../utils/number"
-import { nearestArrayValue } from "../../utils/utilities";
 import { 
-  ms2TimeUnits, ms2Interval, monthDayCnt, timestampDiff, timestampDifference,
+  ms2TimeUnits, timestampDifference,
   isLeapYear, year_start, get_year, nextYear,
-  month_start, get_month, get_monthName, nextMonth,
+  month_start, get_month, get_monthName,
   get_day, day_start, get_dayName,
   get_hour, hour_start,
   get_minute, minute_start,
   buildSubGrads,
 
   MINUTE_MS, HOUR_MS, DAY_MS, MONTH_MS, MONTHR_MS, YEAR_MS,
-  TIMEUNITSVALUES
  } from "../../utils/time";
 import { XAxisStyle } from "../../definitions/style";
-import { inRange } from "../../helpers/range";
 
 export default class xAxis extends Axis {
 
@@ -136,7 +133,7 @@ export default class xAxis extends Axis {
     const unit = intervalStr.charAt(intervalStr.length - 1)
     const numUnits = parseInt(intervalStr, 10)
     
-      let days, cnt, inc, next, t, t1, t2, units, 
+      let d, m, days, cnt, inc, month, next, t, t1, t2, units, 
           major, majorValue, minorValue, minorTick, majorTick;
     
       units = ms2TimeUnits(this.rangeDuration)
@@ -169,6 +166,7 @@ export default class xAxis extends Axis {
       grads.minor = []
 
       while (t < t2) {
+        t = year_start(t)
         grads.major.push(t)
         next = t
         for (let i = majorTick; i > -1; --i) {
@@ -199,8 +197,8 @@ export default class xAxis extends Axis {
       majorTick = Math.ceil(1 / (this.gradsMax / major))
       minorTick = (months >= this.gradsMax - 1) ? 0 : Math.floor(this.gradsMax / major)
 
-      console.log("minorTick:",minorTick)
-      console.log("majorTick:",majorTick)
+      grads.majorTick = majorTick
+      grads.minorTick = minorTick
       
       majorValue = (t) => { 
         if (get_month(t) == 0) return get_year(t)
@@ -213,23 +211,25 @@ export default class xAxis extends Axis {
       
       t = t1
       inc = Math.round((DAY_MS * 28) / (minorTick + 1))
+      grads.inc = inc
       grads.major = []
       grads.minor = []
 
       while (t < t2) {
+        t = month_start(t)
         grads.major.push(t)
         next = t
-        for (let i = majorTick; i > -1; --i) {
-          next = nextMonth(t)
+        for (let i = majorTick; i > 0; i--) {
+          next = month_start(next + (DAY_MS * 31))
         }
 
         if (minorTick > 0 && this.interval < DAY_MS * 28) {
-          while (t < next) {
-            console.log(`t: ${t}, next: ${next}, inc: ${inc}`)
-
+          month = month_start(t + (DAY_MS * 31))
+          while (t < month) {
             t = day_start(t + inc)
-            if (get_day(t) > 27) break 
-            grads.minor.push(t)
+            if (t >= month) break
+            else if (month - t < inc * 0.75) break
+            else grads.minor.push(t)
           }
         }
         t = next
@@ -250,9 +250,6 @@ export default class xAxis extends Axis {
       major = days
       majorTick = Math.ceil(1 / (this.gradsMax / major))
       minorTick = (days >= this.gradsMax - 1) ? 0 : Math.floor(this.gradsMax / major)
-
-      console.log("minorTick:",minorTick)
-      console.log("majorTick:",majorTick)
       
       majorValue = (t) => { 
         if (get_month(t) == 0 && get_day(t) == 1) return get_year(t)
@@ -272,9 +269,10 @@ export default class xAxis extends Axis {
       grads.minor = []
 
       while (t < t2) {
+        t = day_start(t)
         grads.major.push(t)
         next = t
-        for (let i = majorTick; i > -1; --i) {
+        for (let i = majorTick; i > 0; i--) {
           next = next + DAY_MS
         }
 
@@ -300,9 +298,6 @@ export default class xAxis extends Axis {
       major = units.hours
       majorTick = Math.ceil(1 / (this.gradsMax / major))
       minorTick = (units.hours >= this.gradsMax - 1) ? 0 : Math.floor(this.gradsMax / major)
-
-      console.log("minorTick:",minorTick)
-      console.log("majorTick:",majorTick)
       
       majorValue = (t) => { 
         if (get_hour(t) == 0) return this.gradsDayName(t)
@@ -320,6 +315,7 @@ export default class xAxis extends Axis {
       grads.minor = []
 
       while (t < t2) {
+        t = hour_start(t)
         grads.major.push(t)
         next = t
         for (let i = majorTick; i > -1; --i) {
