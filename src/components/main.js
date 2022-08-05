@@ -30,6 +30,11 @@ import {
   CLASS_OFFCHART,
 } from '../definitions/core'
 
+import {
+  PRICEDIGITS,
+  XAXIS_ZOOM,
+} from "../definitions/chart"
+
 const STYLE_ROWS = "width:100%; min-width:100%;"
 const STYLE_ROW = "position: relative;"
 const STYLE_TIME = "border-top: 1px solid; width:100%; min-width:100%;"
@@ -90,6 +95,9 @@ export default class MainPane {
   get rowsH() { return this.#elRows.clientHeight }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elMain) }
+  get range() { return this.#core.range }
+  get cursorPos() { return this.#cursorPos }
+
 
   init(options) {
     this.mount(this.#elMain)
@@ -151,28 +159,35 @@ export default class MainPane {
   }
 
   end() {
-    
+    this.#controller.removeEventListener("mousewheel", this.onMouseWheel);
+    this.#controller.removeEventListener("mousemove", this.onMouseMove);
+    this.#controller.removeEventListener("drag", this.onChartDrag);
+    this.#controller.removeEventListener("enddrag", this.onChartDragDone);
+    this.#controller.removeEventListener("keydown", this.onChartKeyDown)
+    this.#controller.removeEventListener("keyup", this.onChartKeyDown)
+
+    this.off("resizeChart", this.onResize)
   }
 
 
   eventsListen() {
-    // // Give canvas focus so it can receive keyboard input
-    // this.#elMain.tabIndex = 0
-    // this.#elMain.focus()
+    // // Give Main focus so it can receive keyboard input
+    this.#elMain.tabIndex = 0
+    this.#elMain.focus()
 
-    // // create controller and use 'on' method to receive input events 
-    // this.#controller = new InputController(this.#elMain);
-    // // mouse wheel event
-    // this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
-    // // move event
-    // this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    // // drag event
-    // this.#controller.on("drag", this.onChartDrag.bind(this));
-    // // drag event complete
-    // this.#controller.on("enddrag", this.onChartDragDone.bind(this));
-    // // keyboard events
-    // this.#controller.on("keydown", this.onChartKeyDown.bind(this))
-    // this.#controller.on("keyup", this.onChartKeyUp.bind(this))
+    // create controller and use 'on' method to receive input events 
+    this.#controller = new InputController(this.#elMain);
+    // mouse wheel event
+    this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
+    // move event
+    this.#controller.on("mousemove", this.onMouseMove.bind(this));
+    // drag event
+    this.#controller.on("drag", this.onChartDrag.bind(this));
+    // drag event complete
+    this.#controller.on("enddrag", this.onChartDragDone.bind(this));
+    // keyboard events
+    this.#controller.on("keydown", this.onChartKeyDown.bind(this))
+    this.#controller.on("keyup", this.onChartKeyUp.bind(this))
 
     // listen/subscribe/watch for parent notifications
     this.on("resize", (dimensions) => this.onResize(dimensions).bind(this))
@@ -214,7 +229,7 @@ export default class MainPane {
 
     this.emit("chart_mousemove", this.#cursorPos)
 
-    this.updateLegends()
+    // this.updateLegends()
   }
 
   onChartDrag(e) {

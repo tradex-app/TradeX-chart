@@ -213,38 +213,39 @@ export default class Chart {
   }
 
   end() {
-    this.#controller.removeEventListener("mousewheel", this.onMouseWheel);
-    this.#controller.removeEventListener("mousemove", this.onMouseMove);
-    this.#controller.removeEventListener("drag", this.onChartDrag);
-    this.#controller.removeEventListener("enddrag", this.onChartDragDone);
-    this.#controller.removeEventListener("keydown", this.onChartKeyDown)
-    this.#controller.removeEventListener("keyup", this.onChartKeyDown)
+    // this.#controller.removeEventListener("mousewheel", this.onMouseWheel);
+    // this.#controller.removeEventListener("mousemove", this.onMouseMove);
+    // this.#controller.removeEventListener("drag", this.onChartDrag);
+    // this.#controller.removeEventListener("enddrag", this.onChartDragDone);
+    // this.#controller.removeEventListener("keydown", this.onChartKeyDown)
+    // this.#controller.removeEventListener("keyup", this.onChartKeyDown)
 
-    // this.off("resizeChart", this.onResize)
+    this.off("resizeChart", this.onResize)
 
   }
 
 
   eventsListen() {
-    // Give canvas focus so it can receive keyboard input
-    this.#elCanvas.tabIndex = 0
-    this.#elCanvas.focus()
+    // // Give canvas focus so it can receive keyboard input
+    // this.#elCanvas.tabIndex = 0
+    // this.#elCanvas.focus()
 
-    // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(this.#elCanvas);
-    // mouse wheel event
-    this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
-    // move event
-    this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    // drag event
-    this.#controller.on("drag", this.onChartDrag.bind(this));
-    // drag event complete
-    this.#controller.on("enddrag", this.onChartDragDone.bind(this));
-    // keyboard events
-    this.#controller.on("keydown", this.onChartKeyDown.bind(this))
-    this.#controller.on("keyup", this.onChartKeyUp.bind(this))
+    // // create controller and use 'on' method to receive input events 
+    // this.#controller = new InputController(this.#elCanvas);
+    // // mouse wheel event
+    // this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
+    // // move event
+    // this.#controller.on("mousemove", this.onMouseMove.bind(this));
+    // // drag event
+    // this.#controller.on("drag", this.onChartDrag.bind(this));
+    // // drag event complete
+    // this.#controller.on("enddrag", this.onChartDragDone.bind(this));
+    // // keyboard events
+    // this.#controller.on("keydown", this.onChartKeyDown.bind(this))
+    // this.#controller.on("keyup", this.onChartKeyUp.bind(this))
 
-    this.on("resizeChart", e => { console.log("resizing !!!");this.onResize(e) })
+    // listen/subscribe/watch for parent notifications
+    this.on("resize", (dimensions) => this.onResize(dimensions).bind(this))
 
   }
 
