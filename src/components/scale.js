@@ -7,7 +7,7 @@ import CEL from "./primitives/canvas"
 import { drawTextBG } from "../utils/canvas"
 import stateMachineConfig from "../state/state-scale"
 import { InputController, } from "../input/controller"
-import { copyDeep } from '../utils/utilities'
+import { copyDeep, uid } from '../utils/utilities'
 
 import {
   NAME,
@@ -31,9 +31,11 @@ import {
   YAXIS_TYPES
 } from "../definitions/chart";
 import { YAxisStyle } from "../definitions/style";
+import { isArray } from "../utils/typeChecks"
 
 export default class ScaleBar {
 
+  #ID
   #name = "Y Scale Axis"
   #shortName = "scale"
   #mediator
@@ -54,6 +56,9 @@ export default class ScaleBar {
   #layerOverlays
   #layerCursor
 
+  #cursorPos
+
+
   constructor (mediator, options) {
 
     this.#mediator = mediator
@@ -61,6 +66,9 @@ export default class ScaleBar {
     this.#elScale = mediator.api.elements.elScale
     this.#chart = mediator.api.core.Chart
     this.#parent = mediator.api.parent
+
+    this.#options = options
+    this.#ID = this.#options.offChartID || uid("TX_scale_")
     this.init()
   }
 
@@ -69,6 +77,7 @@ export default class ScaleBar {
   warning(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
+  get ID() { return this.#ID }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
@@ -117,7 +126,10 @@ export default class ScaleBar {
   }
 
   end() {
-    
+    // this.off(`${this.#parent.ID}_mousemove`, (e) => { this.offMouseMove(e) })
+    // this.off(`${this.#parent.ID}_mouseout`, (e) => { this.offMouseMove(e) })
+    // this.off("chart_pan", (e) => { this.drawCursorPrice() })
+    // this.off("chart_panDone", (e) => { this.eraseCursorPrice() })
   }
 
   eventsListen() {
@@ -125,9 +137,10 @@ export default class ScaleBar {
     // create controller and use 'on' method to receive input events 
     const controller = new InputController(canvas);
 
-    this.on("chart_mousemove", (e) => { this.drawCursorPrice(e) })
-    this.on("chart_pan", (e) => { this.drawCursorPrice(e) })
-    this.on("chart_panDone", (e) => { this.drawCursorPrice(e) })
+    this.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMove(e) })
+    this.on(`${this.#parent.ID}_mouseout`, (e) => { this.eraseCursorPrice() })
+    // this.on("chart_pan", (e) => { this.drawCursorPrice() })
+    // this.on("chart_panDone", (e) => { this.drawCursorPrice() })
     // this.on("resizeChart", (dimensions) => this.onResize(dimensions))
   }
 
@@ -145,6 +158,11 @@ export default class ScaleBar {
 
   onResize(dimensions) {
     this.setDimensions(dimensions)
+  }
+
+  onMouseMove(e) {
+    this.#cursorPos = (isArray(e)) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.drawCursorPrice()
   }
 
   mount(el) {
@@ -209,8 +227,8 @@ export default class ScaleBar {
     this.#viewport.render()
   }
 
-  drawCursorPrice(e) {
-    let [x, y] = e,
+  drawCursorPrice() {
+    let [x, y] = this.#cursorPos,
         price =  this.yPos2Price(y),
         nice = this.nicePrice(price),
 
@@ -240,6 +258,12 @@ export default class ScaleBar {
 
     ctx.restore()
     this.#viewport.render()
+  }
+
+  eraseCursorPrice() {
+    this.#layerCursor.scene.clear()
+    this.#viewport.render()
+    return
   }
 
 }

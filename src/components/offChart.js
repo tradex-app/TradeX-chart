@@ -10,6 +10,7 @@ import overlayGrid from "./overlays/chart-grid"
 import overlayCursor from "./overlays/chart-cursor"
 import stateMachineConfig from "../state/state-offChart"
 import { uid } from "../utils/utilities"
+import { InputController, Keys } from "../input/controller"
 
 import {
   NAME,
@@ -67,11 +68,13 @@ export default class OffChart {
   #overlayCursor
 
   #cursorPos = [0, 0]
+  #cursorActive = false
 
   #settings
   #chartCandle
   #title
   #theme
+  #controller
 
 
   constructor (mediator, options) {
@@ -92,7 +95,7 @@ export default class OffChart {
   warning(w) { this.mediator.warn(w) }
   error(e) { this.mediator.error(e) }
 
-  get ID() { return this.#offChartID }
+  get ID() { return this.#ID }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
@@ -103,6 +106,9 @@ export default class OffChart {
   get dimensions() { return DOM.elementDimPos(this.#elOffChart) }
   get elOffChart() { return this.#elOffChart }
   get widgets() { return this.#core.WidgetsG }
+  get offChartID() { return this.#offChartID }
+  get cursorPos() { return this.#cursorPos }
+  get cursorActive() { return this.#cursorActive }
 
   init(options) {
 
@@ -147,7 +153,7 @@ export default class OffChart {
     this.#Time = this.mediator.api.Timeline
 
     // Y Axis - Price Scale
-    this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
+    this.#Scale.on("started",(data)=>{this.log(`OffChart scale started: ${data}`)})
     this.#Scale.start("OffChart",this.name,"yAxis Scale started")
 
     // add divider to allow manual resize of the offChart indicator
@@ -170,16 +176,28 @@ export default class OffChart {
   }
 
   end() {
-    // Stop and clean up the module to prevent memory leaks.
-    // It should remove: event listeners, timers, ect.
-    // Put your toys away or it will end in tears.
+    this.#controller.removeEventListener("mousemove", this.onMouseMove);
+    this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
+    this.#controller.removeEventListener("mouseout", this.onMouseOut);
+
+    this.off("resizeChart", this.onResize)
+    this.off("main_mousemove", this.onResize)
   }
 
 
   eventsListen() {
+    // // create controller and use 'on' method to receive input events 
+    this.#controller = new InputController(this.#elOffChart);
+    // // move event
+    this.#controller.on("mousemove", this.onMouseMove.bind(this));
+    // // enter event
+    this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
+    // // out event
+    this.#controller.on("mouseout", this.onMouseOut.bind(this));
+
     // listen/subscribe/watch for parent notifications
     this.on("resize", (dimensions) => this.onResize(dimensions))
-    this.on("chart_mousemove", (pos) => this.updateLegends(pos))
+    this.on("main_mousemove", (pos) => this.updateLegends(pos))
   }
 
   on(topic, handler, context) {
@@ -196,6 +214,25 @@ export default class OffChart {
 
   onResize(dimensions) {
     this.setDimensions(dimensions)
+  }
+
+  onMouseMove(e) {
+    // this.#cursorPos = [e.layerX, e.layerY]
+    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.emit(`${this.#ID}_mousemove`, this.#cursorPos)
+    this.updateLegends()
+  }
+
+  onMouseEnter(e) {
+    this.#cursorActive = true
+    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.emit(`${this.ID}_mouseenter`, this.#cursorPos)
+  }
+
+  onMouseOut(e) {
+    this.#cursorActive = false
+    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.emit(`${this.ID}_mouseout`, this.#cursorPos)
   }
 
   mount(el) {
@@ -328,7 +365,7 @@ export default class OffChart {
     this.#viewport.render();
   }
 
-  updateLegends(pos=this.#cursorPos[0]) {
+  updateLegends(pos=this.#cursorPos) {
     const legends = this.#Legends.list
     const index = this.#Time.xPos2Index(pos[0])
     const offset = this.range.data.length - this.#overlayIndicator.overlay.data.length

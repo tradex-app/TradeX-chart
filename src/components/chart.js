@@ -85,6 +85,7 @@ export default class Chart {
   #chartCursor
 
   #cursorPos = [0, 0]
+  #cursorActive = false
 
   #settings
   #chartCandle
@@ -111,6 +112,7 @@ export default class Chart {
   warning(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
+  get ID() { return "chart" }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
@@ -129,6 +131,7 @@ export default class Chart {
   set priceDigits(digits) { this.setYAxisDigits(digits) }
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
   get cursorPos() { return this.#cursorPos }
+  get cursorActive() { return this.#cursorActive }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elChart) }
 
@@ -213,40 +216,28 @@ export default class Chart {
   }
 
   end() {
-    // this.#controller.removeEventListener("mousewheel", this.onMouseWheel);
-    // this.#controller.removeEventListener("mousemove", this.onMouseMove);
-    // this.#controller.removeEventListener("drag", this.onChartDrag);
-    // this.#controller.removeEventListener("enddrag", this.onChartDragDone);
-    // this.#controller.removeEventListener("keydown", this.onChartKeyDown)
-    // this.#controller.removeEventListener("keyup", this.onChartKeyDown)
+    this.#controller.removeEventListener("mousemove", this.onMouseMove);
+    this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
+    this.#controller.removeEventListener("mouseout", this.onMouseOut);
 
     this.off("resizeChart", this.onResize)
-
+    this.off("main_mousemove", this.onResize)
   }
 
 
   eventsListen() {
-    // // Give canvas focus so it can receive keyboard input
-    // this.#elCanvas.tabIndex = 0
-    // this.#elCanvas.focus()
-
     // // create controller and use 'on' method to receive input events 
-    // this.#controller = new InputController(this.#elCanvas);
-    // // mouse wheel event
-    // this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
+    this.#controller = new InputController(this.#elCanvas);
     // // move event
-    // this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    // // drag event
-    // this.#controller.on("drag", this.onChartDrag.bind(this));
-    // // drag event complete
-    // this.#controller.on("enddrag", this.onChartDragDone.bind(this));
-    // // keyboard events
-    // this.#controller.on("keydown", this.onChartKeyDown.bind(this))
-    // this.#controller.on("keyup", this.onChartKeyUp.bind(this))
+    this.#controller.on("mousemove", this.onMouseMove.bind(this));
+    // // enter event
+    this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
+    // // out event
+    this.#controller.on("mouseout", this.onMouseOut.bind(this));
 
     // listen/subscribe/watch for parent notifications
     this.on("resize", (dimensions) => this.onResize(dimensions).bind(this))
-
+    this.on("main_mousemove", (pos) => this.updateLegends(pos))
   }
 
   on(topic, handler, context) {
@@ -288,56 +279,16 @@ export default class Chart {
     this.updateLegends()
   }
 
-  onChartDrag(e) {
-    this.#cursorPos = [
-      Math.floor(e.position.x), Math.floor(e.position.y), 
-      e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
-    ]
-    this.emit("chart_pan", this.#cursorPos)
+  onMouseEnter(e) {
+    this.#cursorActive = true
+    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.emit(`${this.ID}_mouseenter`, this.#cursorPos)
   }
 
-  onChartDragDone(e) {
-    this.#cursorPos = [
-      Math.floor(e.position.x), Math.floor(e.position.y), 
-      e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
-    ]
-    this.emit("chart_panDone", this.#cursorPos)
-  }
-
-  onChartKeyDown(e) {
-    let step = Math.ceil(this.#core.Timeline.candleW) || 1
-
-    switch (e.keyCode) {
-      case Keys.Left:
-        console.log("keydown: cursor Left")
-
-        this.emit("chart_pan", [0,null,step,null,step * -1])
-        break;
-      case Keys.Right:
-        console.log("keydown: cursor Right")
-
-        this.emit("chart_pan", [step,null,0,step])
-        break;
-    }
-  }
-
-  onChartKeyUp(e) {
-    let step = Math.ceil(this.#core.Timeline.candleW) || 1
-
-    switch (e.keyCode) {
-      case Keys.Left:
-        console.log("keyup: cursor Left")
-        
-        this.emit("chart_panDone", [0,null,step,null,step * -1])
-        break;
-      case Keys.Right:
-        console.log("keyup: cursor Right")
-
-        this.emit("chart_panDone", [step,null,0,step])
-        break;
-    }
+  onMouseOut(e) {
+    this.#cursorActive = false
+    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.emit(`${this.ID}_mouseout`, this.#cursorPos)
   }
 
   mount(el) {
@@ -552,9 +503,9 @@ export default class Chart {
     this.#volumePrecision = volumePrecision
   }
 
-  updateLegends(pos=this.#cursorPos[0]) {
+  updateLegends(pos=this.#cursorPos) {
     const legends = this.#Legends.list
-    const ohlcv = this.#Time.xPosOHLCV(pos)
+    const ohlcv = this.#Time.xPosOHLCV(pos[0])
     const inputs = {}
           inputs.O = this.#Scale.nicePrice(ohlcv[1])
           inputs.H = this.#Scale.nicePrice(ohlcv[2])

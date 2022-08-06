@@ -227,9 +227,7 @@ export default class MainPane {
     // this.#cursorPos = [e.layerX, e.layerY]
     this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
 
-    this.emit("chart_mousemove", this.#cursorPos)
-
-    // this.updateLegends()
+    this.emit("main_mousemove", this.#cursorPos)
   }
 
   onChartDrag(e) {
