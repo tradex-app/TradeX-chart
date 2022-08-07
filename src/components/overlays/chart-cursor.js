@@ -47,10 +47,12 @@ export default class chartCursor {
     ctx.setLineDash([5, 5])
 
     // X
+    const offset = this.#xAxis.smoothScrollOffset || 0
+
     ctx.strokeStyle = "#666"
     ctx.beginPath()
-    ctx.moveTo(x, 0)
-    ctx.lineTo(x, this.#scene.height)
+    ctx.moveTo(x + offset, 0)
+    ctx.lineTo(x + offset, this.#scene.height)
     ctx.stroke()
     // Y
     if (this.#chart.cursorActive) {

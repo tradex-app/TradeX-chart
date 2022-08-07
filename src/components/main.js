@@ -67,7 +67,6 @@ export default class MainPane {
   #indicators
   #controller
 
-
   constructor (mediator, options) {
 
     this.#mediator = mediator
@@ -97,6 +96,7 @@ export default class MainPane {
   get dimensions() { return DOM.elementDimPos(this.#elMain) }
   get range() { return this.#core.range }
   get cursorPos() { return this.#cursorPos }
+  get candleW() { return this.#Time.candleW }
 
 
   init(options) {
@@ -249,7 +249,7 @@ export default class MainPane {
   }
 
   onChartKeyDown(e) {
-    let step = Math.ceil(this.#core.Timeline.candleW) || 1
+    let step = Math.ceil(this.candleW) || 1
 
     switch (e.keyCode) {
       case Keys.Left:
@@ -266,7 +266,7 @@ export default class MainPane {
   }
 
   onChartKeyUp(e) {
-    let step = Math.ceil(this.#core.Timeline.candleW) || 1
+    let step = Math.ceil(this.candleW) || 1
 
     switch (e.keyCode) {
       case Keys.Left:

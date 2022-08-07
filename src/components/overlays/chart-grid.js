@@ -27,10 +27,12 @@ export default class chartGrid {
     ctx.strokeStyle = GridStyle.COLOUR_GRID
 
     // X Axis
+    const offset = this.#xAxis.smoothScrollOffset || 0
+
     for (let tick of xGrads) {
       ctx.beginPath()
-      ctx.moveTo(tick[1], 0)
-      ctx.lineTo(tick[1], this.#scene.height)
+      ctx.moveTo(tick[1] + offset, 0)
+      ctx.lineTo(tick[1] + offset, this.#scene.height)
       ctx.stroke()
     }
 

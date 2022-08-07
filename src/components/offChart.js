@@ -109,6 +109,7 @@ export default class OffChart {
   get offChartID() { return this.#offChartID }
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
+  get candleW() { return this.#core.Timeline.candleW }
 
   init(options) {
 

@@ -123,6 +123,8 @@ export default class Chart {
   get width() { return this.#elChart.clientWidth }
   set height(h) { this.setHeight(h) }
   get height() { return this.#elChart.clientHeight }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elChart) }
   set state(s) { this.#core.setState(s) }
   get state() { return this.#core.getState() }
   get data() { return this.#core.chartData }
@@ -132,8 +134,7 @@ export default class Chart {
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
-  get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elChart) }
+  get candleW() { return this.#core.Timeline.candleW }
 
   init(options) {
 

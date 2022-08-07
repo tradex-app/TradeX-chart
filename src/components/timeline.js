@@ -69,6 +69,7 @@ export default class Timeline {
   get range() { return this.#core.range }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elTime) }
+  get smoothScrollOffset() { return this.#core.smoothScrollOffset }
 
   init() {
     this.mount(this.#elTime)
@@ -211,7 +212,7 @@ export default class Timeline {
     this.#layerCursor.scene.clear()
     ctx.save()
 
-    drawTextBG(ctx, dateTimeStr, xPos, 1 , options)
+    drawTextBG(ctx, dateTimeStr, xPos + this.smoothScrollOffset, 1 , options)
 
     ctx.restore()
     this.#viewport.render()

@@ -124,8 +124,9 @@ export default class RSI extends indicator {
 
 
     plots.length = 0
+    const offset = this.xAxis.smoothScrollOffset || 0
     const plot = {
-      x: (width * 0.5) + 2,
+      x: (width * 0.5) + 2 + offset,
       w: width,
     }
 

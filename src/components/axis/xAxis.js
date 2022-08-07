@@ -412,17 +412,19 @@ export default class xAxis extends Axis {
     const grads = this.#xAxisGrads.values
     const ctx = this.#parent.layerLabels.scene.context
     const mid = this.width / this.range.Length * 0.5
+    const offset = this.#parent.smoothScrollOffset || 0
+
     ctx.save();
     ctx.strokeStyle = XAxisStyle.COLOUR_TICK
     ctx.fillStyle = XAxisStyle.COLOUR_TICK
     ctx.font = XAxisStyle.FONT_LABEL
     for (let tick of grads) { 
       let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5)
-      ctx.fillText(tick[0], tick[1] - w, this.xAxisTicks + 12)
+      ctx.fillText(tick[0], tick[1] - w + offset, this.xAxisTicks + 12)
 
       ctx.beginPath()
-      ctx.moveTo(tick[1], 0)
-      ctx.lineTo(tick[1], this.xAxisTicks)
+      ctx.moveTo(tick[1] + offset, 0)
+      ctx.lineTo(tick[1] + offset, this.xAxisTicks)
       ctx.stroke()
     }
       ctx.restore();

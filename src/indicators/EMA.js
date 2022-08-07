@@ -92,8 +92,9 @@ import { round } from "../utils/number";
     const data = this.overlay.data
     const width = round(this.scene.width / range.Length, 1)
     const plots = []
+    const offset = this.xAxis.smoothScrollOffset || 0
     const plot = {
-      x: (width * 0.5) + 2,
+      x: (width * 0.5) + 2 + offset,
       w: width,
     }
 

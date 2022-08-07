@@ -128,6 +128,8 @@ export default class TradeXchart {
   warnings = false
   errors = false
   
+  #smoothScrollOffset = 0
+  #panBeginPos = [null, null, null, null]
 
 
 /**
@@ -210,6 +212,8 @@ constructor (mediator, options={}) {
   get indicators() { return this.#indicators }
   get TALib() { return this.#TALib }
 
+  get candleW() { return this.Timeline.candleW }
+  get smoothScrollOffset() { return this.#smoothScrollOffset }
 
   /**
    * Create a new TradeXchart instance
@@ -509,26 +513,41 @@ constructor (mediator, options={}) {
    */
   updateRange(pos) {
 
-    // pan horizontal check
-    const dist = Math.floor(pos[0] - pos[2])
+    let dist, offset
 
-    if (Math.abs(dist) < this.Timeline.candleW) return
+    if (pos[2] != this.#panBeginPos[2]) {
+      this.#panBeginPos = pos
+      dist = Math.floor(pos[0] - pos[2])
+    }
+    else {
+      dist = Math.floor(pos[0] - this.#panBeginPos[0])
+      this.#panBeginPos = pos
+    }
 
-    const offset = Math.floor(dist / this.Timeline.candleW)
+    const sign = Math.sign(dist)
+    this.#smoothScrollOffset += Math.round(dist % this.candleW) //* sign
+    offset = Math.floor(dist / this.candleW)
+
+    if (this.#smoothScrollOffset < 0) {
+      this.#smoothScrollOffset = Math.round(this.candleW - 1)
+      offset = -1
+    }
+    else if (this.#smoothScrollOffset > this.candleW - 1) {
+      this.#smoothScrollOffset = 0
+      offset = 1
+    }
+    else {
+      this.emit("smoothscroll", this.#smoothScrollOffset)
+      return
+    }
+    this.emit("smoothscroll", this.#smoothScrollOffset)
+
+    // const offset = Math.floor(dist / this.candleW)
     let start = this.range.indexStart - offset,
         end = this.range.indexEnd - offset;
 
     this.setRange(start, end)
   }
-
-  // /**
-  //  * Set the 
-  //  * @param {array} data - [newStart, newEnd, oldStart, oldEnd, inOut]
-  //  */
-  // zoomRange(data) {
-
-  //   this.setRange(start, end)
-  // }
 
   /**
    * set start and end of range

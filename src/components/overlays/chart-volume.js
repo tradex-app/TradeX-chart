@@ -27,8 +27,9 @@ export default class chartVolume extends VolumeBar {
 
     const data = range.data
     const zeroPos = this.scene.height
+    const offset = this.#xAxis.smoothScrollOffset || 0
     const volume = {
-      x: 0,
+      x: 0 + offset,
       w: round(this.#scene.width / range.Length, 1),
       z: zeroPos
     }
