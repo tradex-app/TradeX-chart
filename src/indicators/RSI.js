@@ -103,6 +103,8 @@ export default class RSI extends indicator {
     const data = this.overlay.data
     const width = this.xAxis.candleW
     const plots = []
+
+    // High RSI Range marker
     plots[0] = {x: 0, y: this.yAxis.yPos(100 - this.style.defaultHigh)}
     plots[1] = {x: this.scene.width, y: this.yAxis.yPos(100 - this.style.defaultHigh)}
     let style = {
@@ -112,6 +114,7 @@ export default class RSI extends indicator {
     }
     this.plot(plots, "renderLine", style)
 
+    // Low RSI Range marker
     plots.length = 0
     plots[0] = {x: 0, y: this.yAxis.yPos(100 - this.style.defaultLow)}
     plots[1] = {x: this.scene.width, y: this.yAxis.yPos(100 - this.style.defaultLow)}
@@ -122,26 +125,26 @@ export default class RSI extends indicator {
     }
     this.plot(plots, "renderLine", style)
 
-
+    // RSI plot
     plots.length = 0
     const offset = this.xAxis.smoothScrollOffset || 0
     const plot = {
-      x: (width * 0.5) + 2 + offset - width,
+      x: (width * 0.5) + 2 + offset - (width * 2),
       w: width,
     }
 
     // account for "missing" entries because of indicator calculation
-    let o = (range.indexStart - 1 < 0) ? 0 : 1
+    let o = (range.indexStart - 1 < 0) ? 0 : 2
     let c = range.indexStart - (range.data.length - this.overlay.data.length) - o
-    let i = range.Length + o
+    let i = range.Length + o + 1
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
-        plots[range.Length - i] = {x: null, y: null}
+        plots[range.Length + o + 1 - i] = {x: null, y: null}
       }
       else {
         plot.y = this.yAxis.yPos(100 - data[c][1])
-        plots[range.Length - i] = {...plot}
+        plots[range.Length + o + 1 - i] = {...plot}
       }
       c++
       i--

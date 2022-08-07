@@ -94,22 +94,22 @@ import { round } from "../utils/number";
     const plots = []
     const offset = this.xAxis.smoothScrollOffset || 0
     const plot = {
-      x: (width * 0.5) + 2 + offset,
+      x: (width * 0.5) + 2 + offset - (width * 2),
       w: width,
     }
 
     // account for "missing" entries because of indicator calculation
-    let o = range.data.length - this.overlay.data.length
-    let c = range.indexStart - o
-    let i = range.Length
+    let o = (range.indexStart - 1 < 0) ? 0 : 2
+    let c = range.indexStart - (range.data.length - this.overlay.data.length) - o
+    let i = range.Length + o + 1
 
     while(i) {
-      if (!c) {
-        plots[range.Length - i] = {x: null, y: null}
+      if (c < 0 || c >= this.overlay.data.length) {
+        plots[range.Length + o + 1 - i] = {x: null, y: null}
       }
       else {
         plot.y = this.yAxis.yPos(100 - data[c][1])
-        plots[range.Length - i] = {...plot}
+        plots[range.Length + o + 1 - i] = {...plot}
       }
       c++
       i--
