@@ -101,7 +101,7 @@ export default class RSI extends indicator {
     this.scene.clear()
 
     const data = this.overlay.data
-    const width = round(this.scene.width / range.Length, 1)
+    const width = this.xAxis.candleW
     const plots = []
     plots[0] = {x: 0, y: this.yAxis.yPos(100 - this.style.defaultHigh)}
     plots[1] = {x: this.scene.width, y: this.yAxis.yPos(100 - this.style.defaultHigh)}
@@ -126,14 +126,14 @@ export default class RSI extends indicator {
     plots.length = 0
     const offset = this.xAxis.smoothScrollOffset || 0
     const plot = {
-      x: (width * 0.5) + 2 + offset,
+      x: (width * 0.5) + 2 + offset - width,
       w: width,
     }
 
     // account for "missing" entries because of indicator calculation
-    let o = range.data.length - this.overlay.data.length
-    let c = range.indexStart - o
-    let i = range.Length
+    let o = (range.indexStart - 1 < 0) ? 0 : 1
+    let c = range.indexStart - (range.data.length - this.overlay.data.length) - o
+    let i = range.Length + o
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {

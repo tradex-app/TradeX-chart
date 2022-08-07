@@ -29,16 +29,17 @@ export default class chartVolume extends VolumeBar {
     const zeroPos = this.scene.height
     const offset = this.#xAxis.smoothScrollOffset || 0
     const volume = {
-      x: 0 + offset,
-      w: round(this.#scene.width / range.Length, 1),
+      x: 0 + offset - this.#xAxis.candleW,
+      w: this.#xAxis.candleW,
       z: zeroPos
     }
 
     const volH = Math.floor(zeroPos * this.#config.maxVolumeH / 100)
     const maxVol = range.volumeMax
 
-    let v = range.indexStart
-    let i = range.Length
+    let o = (range.indexStart - 1 < 0) ? 0 : 1
+    let v = range.indexStart - o
+    let i = range.Length + o
     let x
 
     while(i) {

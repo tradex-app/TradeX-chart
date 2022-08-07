@@ -31,12 +31,13 @@ export default class chartCandles extends Candle {
       (candle) => {super.draw(candle)}
     const offset = this.#xAxis.smoothScrollOffset || 0
     const candle = {
-      x: 2 + offset,
-      w: round(this.#scene.width / range.Length, 1),
+      x: 2 + offset - this.#xAxis.candleW,
+      w: this.#xAxis.candleW
     }
 
-    let c = range.indexStart
-    let i = range.Length
+    let o = (range.indexStart - 1 < 0) ? 0 : 1
+    let c = range.indexStart - o
+    let i = range.Length + o
     let x
 
     while(i) {
