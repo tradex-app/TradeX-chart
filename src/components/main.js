@@ -249,7 +249,7 @@ export default class MainPane {
   }
 
   onChartKeyDown(e) {
-    let step = Math.ceil(this.candleW) || 1
+    let step = this.candleW || 1
 
     switch (e.keyCode) {
       case Keys.Left:
@@ -260,13 +260,13 @@ export default class MainPane {
       case Keys.Right:
         console.log("keydown: cursor Right")
 
-        this.emit("chart_pan", [step,null,0,step])
+        this.emit("chart_pan", [step,null,0,null,step])
         break;
     }
   }
 
   onChartKeyUp(e) {
-    let step = Math.ceil(this.candleW) || 1
+    let step = this.candleW || 1
 
     switch (e.keyCode) {
       case Keys.Left:
@@ -277,7 +277,7 @@ export default class MainPane {
       case Keys.Right:
         console.log("keyup: cursor Right")
 
-        this.emit("chart_panDone", [step,null,0,step])
+        this.emit("chart_panDone", [step,null,0,null,step])
         break;
     }
   }

@@ -515,14 +515,18 @@ constructor (mediator, options={}) {
 
     let dist, offset
 
-    if (pos[2] != this.#panBeginPos[2]) {
-      this.#panBeginPos = pos
-      dist = Math.floor(pos[0] - pos[2])
-    }
-    else {
-      dist = Math.floor(pos[0] - this.#panBeginPos[0])
-      this.#panBeginPos = pos
-    }
+console.log("pos:",JSON.stringify(pos))
+
+    // if (pos[2] != this.#panBeginPos[2]) {
+    //   this.#panBeginPos = pos
+    //   dist = Math.floor(pos[0] - pos[2])
+    // }
+    // else {
+    //   dist = Math.floor(pos[0] - this.#panBeginPos[0])
+    //   this.#panBeginPos = pos
+    // }
+
+    dist = pos[4]
 
     offset = Math.floor(dist / this.candleW)
 
@@ -530,9 +534,13 @@ constructor (mediator, options={}) {
       this.#smoothScrollOffset = 0
       offset = Math.sign(dist) * 6
     }
-    if (this.candleW < 6) {
+    else if (this.candleW < 6) {
       this.#smoothScrollOffset = 0
       offset = Math.sign(dist) * 2
+    }
+    else if (this.candleW == Math.abs(dist)) {
+      this.#smoothScrollOffset = 0
+      offset = Math.sign(dist)
     }
     else {
       this.#smoothScrollOffset += Math.round(dist % this.candleW) //* sign
