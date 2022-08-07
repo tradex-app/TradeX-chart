@@ -524,23 +524,32 @@ constructor (mediator, options={}) {
       this.#panBeginPos = pos
     }
 
-    const sign = Math.sign(dist)
-    this.#smoothScrollOffset += Math.round(dist % this.candleW) //* sign
     offset = Math.floor(dist / this.candleW)
 
-    if (this.#smoothScrollOffset < 0) {
-      this.#smoothScrollOffset = Math.round(this.candleW - 1)
-      offset = -1
-    }
-    else if (this.#smoothScrollOffset > this.candleW - 1) {
+    if (this.candleW < 3) {
       this.#smoothScrollOffset = 0
-      offset = 1
+      offset = Math.sign(dist) * 6
+    }
+    if (this.candleW < 6) {
+      this.#smoothScrollOffset = 0
+      offset = Math.sign(dist) * 2
     }
     else {
-      this.emit("smoothscroll", this.#smoothScrollOffset)
-      return
+      this.#smoothScrollOffset += Math.round(dist % this.candleW) //* sign
+  
+      if (this.#smoothScrollOffset < 0) {
+        this.#smoothScrollOffset = Math.round(this.candleW - 1)
+        offset = -1
+      }
+      else if (this.#smoothScrollOffset > this.candleW - 1) {
+        this.#smoothScrollOffset = 0
+        offset = 1
+      }
+      else {
+        this.emit("smoothscroll", this.#smoothScrollOffset)
+        return
+      }
     }
-    this.emit("smoothscroll", this.#smoothScrollOffset)
 
     // const offset = Math.floor(dist / this.candleW)
     let start = this.range.indexStart - offset,
