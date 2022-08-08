@@ -237,7 +237,7 @@ export default class Chart {
     this.#controller.on("mouseout", this.onMouseOut.bind(this));
 
     // listen/subscribe/watch for parent notifications
-    this.on("resize", (dimensions) => this.onResize(dimensions).bind(this))
+    this.on("resize", (dimensions) => this.onResize.bind(this))
     this.on("main_mousemove", (pos) => this.updateLegends(pos))
   }
 
@@ -327,7 +327,6 @@ export default class Chart {
     this.setWidth(dim.w)
     this.setHeight(dim.h)
   }
-
 
   setTheme(theme) {
     this.#theme = theme
@@ -465,7 +464,7 @@ export default class Chart {
   }
 
   draw(range) {
-    this.#chartGrid.draw()
+    this.#chartGrid.draw("y")
     this.#chartVolume.draw(range)
     this.#chartCandles.draw(range)
 

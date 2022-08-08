@@ -141,7 +141,7 @@ export default class ScaleBar {
     this.on(`${this.#parent.ID}_mouseout`, (e) => { this.eraseCursorPrice() })
     // this.on("chart_pan", (e) => { this.drawCursorPrice() })
     // this.on("chart_panDone", (e) => { this.drawCursorPrice() })
-    // this.on("resizeChart", (dimensions) => this.onResize(dimensions))
+    // this.on("resizeChart", (dimensions) => this.onResize.bind(this))
   }
 
   on(topic, handler, context) {

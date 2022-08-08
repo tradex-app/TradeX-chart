@@ -71,7 +71,7 @@ export default class ToolsBar {
     // this.on("utils_timezone", (e) => { this.onTimezone(e) })
     // this.on("utils_settings", (e) => { this.onSettings(e) })
     // this.on("utils_screenshot", (e) => { this.onScreenshot(e) })
-    // this.on("resize", (dimensions) => this.onResize(dimensions))
+    // this.on("resize", (dimensions) => this.onResize.bind(this))
 
   }
 

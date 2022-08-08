@@ -79,7 +79,7 @@ export default class TradeXchart {
   #indicators = Indicators
   #TALib = talib
 
-
+  #theme
   #chartW = 500
   #chartH = 400
   chartWMin = 500
@@ -208,6 +208,7 @@ constructor (mediator, options={}) {
   get time() { return this.#time }
   get TimeUtils() { return Time }
 
+  get theme() { return this.#theme }
   get settings() { return this.#state.data.chart.settings }
   get indicators() { return this.#indicators }
   get TALib() { return this.#TALib }
@@ -406,7 +407,8 @@ constructor (mediator, options={}) {
       warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
       rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
-      indicators: (indicators) => this.#indicators = {...Indicators, ...indicators }
+      indicators: (indicators) => this.#indicators = {...Indicators, ...indicators },
+      theme: (theme) => this.setTheme(theme),
     }
   }
 
@@ -458,6 +460,10 @@ constructor (mediator, options={}) {
       mainW: this.#chartW - this.toolsW,
       mainH: this.#chartH - this.utilsH,
     })
+  }
+
+  setTheme(theme) {
+    this.#theme = theme
   }
 
   setUserClasses(c) {

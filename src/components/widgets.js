@@ -93,7 +93,7 @@ export default class Widgets {
 
   // listen/subscribe/watch for parent notifications
   eventsListen() {
-    // this.on("resize", (dimensions) => this.onResize(dimensions))
+    // this.on("resize", (dimensions) => this.onResize.bind(this))
 
     this.on("openMenu", this.onOpenMenu.bind(this))
     this.on("closeMenu", this.onCloseMenu.bind(this))

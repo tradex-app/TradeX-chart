@@ -197,7 +197,7 @@ export default class OffChart {
     this.#controller.on("mouseout", this.onMouseOut.bind(this));
 
     // listen/subscribe/watch for parent notifications
-    this.on("resize", (dimensions) => this.onResize(dimensions))
+    this.on("resize", (dimensions) => this.onResize.bind(this))
     this.on("main_mousemove", (pos) => this.updateLegends(pos))
   }
 
@@ -360,7 +360,7 @@ export default class OffChart {
   }
 
   draw(range) {
-    this.#overlayGrid.draw()
+    this.#overlayGrid.draw("y")
     this.#overlayIndicator.draw(range)
 
     this.#viewport.render();

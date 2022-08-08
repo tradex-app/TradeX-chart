@@ -8,6 +8,7 @@ import CEL from "../components/primitives/canvas"
 import Chart from "./chart"
 import OffChart from "./offChart"
 import Overlays from "./overlays"
+import chartGrid from "./overlays/chart-grid"
 import stateMachineConfig from "../state/state-mainPane"
 import { InputController, Keys } from "../input/controller"
 
@@ -52,6 +53,7 @@ export default class MainPane {
   #OffCharts = []
   #Chart
   #Time
+  #chartGrid
 
   #offChartDefaultH = 30 // %
   #offChartDefaultWpx = 120
@@ -91,6 +93,7 @@ export default class MainPane {
   get range() { return this.#core.range }
   get cursorPos() { return this.#cursorPos }
   get candleW() { return this.#Time.candleW }
+  get theme() { return this.#core.theme }
 
 
   init(options) {
@@ -144,7 +147,7 @@ export default class MainPane {
     // prepare layered canvas
     this.createViewport()
     // draw the chart - grid, candles, volume
-    // this.draw(this.range)
+    this.draw(this.range)
 
     // set up event listeners
     this.eventsListen()
@@ -187,7 +190,10 @@ export default class MainPane {
     this.#controller.on("keyup", this.onChartKeyUp.bind(this))
 
     // listen/subscribe/watch for parent notifications
-    this.on("resize", (dimensions) => this.onResize(dimensions).bind(this))
+    this.on("resize", (dimensions) => this.onResize.bind(this))
+    // this.on("chart_zoom", () => this.zoomRange.bind(this))
+    // this.on("chart_pan", () => this.updateRange.bind(this))
+    // this.on("chart_panDone", () => this.updateRange.bind(this))
   }
 
   on(topic, handler, context) {
@@ -218,6 +224,8 @@ export default class MainPane {
     this.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
     this.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
     this.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
+
+    this.draw()
   }
   
   onMouseMove(e) {
@@ -234,6 +242,7 @@ export default class MainPane {
       e.movement.x, e.movement.y
     ]
     this.emit("chart_pan", this.#cursorPos)
+    this.draw()
   }
 
   onChartDragDone(e) {
@@ -243,6 +252,7 @@ export default class MainPane {
       e.movement.x, e.movement.y
     ]
     this.emit("chart_panDone", this.#cursorPos)
+    this.draw()
   }
 
   onChartKeyDown(e) {
@@ -260,6 +270,7 @@ export default class MainPane {
         this.emit("chart_pan", [step,null,0,null,step])
         break;
     }
+    this.draw()
   }
 
   onChartKeyUp(e) {
@@ -277,6 +288,7 @@ export default class MainPane {
         this.emit("chart_panDone", [step,null,0,null,step])
         break;
     }
+    this.draw()
   }
 
 
@@ -438,14 +450,27 @@ export default class MainPane {
     this.#viewport
           .addLayer(this.#layerGrid)
 
-    // this.#chartGrid =
-    //   new chartGrid(
-    //     this.#layerGrid, 
-    //     this.#Time, 
-    //     this.#Scale, 
-    //     this.#theme)
+    const config = {...this.theme, ...{ axes: "x" }}
+    this.#chartGrid =
+      new chartGrid(
+        this.#layerGrid, 
+        this.#Time, 
+        null, 
+        config)
   }
 
+  draw(range) {
+    this.#chartGrid.draw("x")
+    this.#viewport.render();
+  }
 
+  updateRange() {
+    // draw the grid
+    this.draw(this.range)
+  }
 
+  zoomRange() {
+    // draw the gird
+    this.draw(this.range)
+  }
 }

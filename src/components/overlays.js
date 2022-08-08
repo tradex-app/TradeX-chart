@@ -66,7 +66,7 @@ export default class Overlays {
 
   eventsListen() {
     // listen/subscribe/watch for parent notifications
-    this.#parent.on("resize", (dimensions) => this.onResize(dimensions))
+    this.#parent.on("resize", (dimensions) => this.onResize.bind(this))
   }
 
   on(topic, handler, context) {

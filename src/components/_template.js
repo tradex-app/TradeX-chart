@@ -65,7 +65,7 @@ export default class _template {
 
   eventsListen() {
     // listen/subscribe/watch for parent notifications
-    this.on("resize", (dimensions) => this.onResize(dimensions))
+    this.on("resize", (dimensions) => this.onResize.bind(this))
   }
 
   on(topic, handler, context) {
