@@ -4,6 +4,7 @@
 
 import DOM from "../utils/DOM"
 import Timeline from './timeline'
+import CEL from "../components/primitives/canvas"
 import Chart from "./chart"
 import OffChart from "./offChart"
 import Overlays from "./overlays"
@@ -12,22 +13,11 @@ import { InputController, Keys } from "../input/controller"
 
 
 import {
-  NAME,
-  ID,
-  CLASS_DEFAULT,
-  CLASS_UTILS ,
-  CLASS_BODY,
-  CLASS_WIDGETSG,
-  CLASS_TOOLS,
-  CLASS_MAIN,
   CLASS_TIME,
   CLASS_ROWS,
   CLASS_ROW,
+  CLASS_GRID,
   CLASS_CHART,
-  CLASS_SCALE,
-  CLASS_WIDGETS,
-  CLASS_ONCHART,
-  CLASS_OFFCHART,
 } from '../definitions/core'
 
 import {
@@ -54,7 +44,11 @@ export default class MainPane {
   #elTime
   #elChart
   #elOffCharts = []
+  #elCanvas
+  #elViewport
 
+  #viewport
+  #layerGrid
   #OffCharts = []
   #Chart
   #Time
@@ -108,11 +102,8 @@ export default class MainPane {
 
     this.#elRows = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`)
     this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
-
-    this.mountRow(this.#elRows, CLASS_CHART)
-
     this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
-
+    this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_GRID} .viewport`)
 
     api.parent = this
     api.chartData = this.mediator.api.chartData
@@ -149,6 +140,12 @@ export default class MainPane {
     for (let i = 0; i < this.#OffCharts.length; i++) {
       this.#OffCharts[i].start(i)
     }
+
+    // prepare layered canvas
+    this.createViewport()
+    // draw the chart - grid, candles, volume
+    // this.draw(this.range)
+
     // set up event listeners
     this.eventsListen()
 
@@ -288,14 +285,6 @@ export default class MainPane {
     el.innerHTML = this.defaultNode()
   }
 
-  mountRow(el, type) {
-    el.innerHTML = this.rowNode(type)
-  }
-
-  unmountRow() {
-
-  }
-
   setWidth(w) {
     const resize = this.rowsW / w
     const rows = this.#elRows.children
@@ -390,13 +379,28 @@ export default class MainPane {
     const api = this.#mediator.api
     const styleRows = STYLE_ROWS + `height: calc(100% - ${api.timeH}px)`
     const styleTime = STYLE_TIME + ` height: ${api.timeH}px; border-color: ${api.chartBorderColour};`
+    const defaultRow = this.defaultRowNode()
 
     const node = `
-    <div class="${CLASS_ROWS}" style="${styleRows}"></div>
+    <div class="${CLASS_ROWS}" style="${styleRows}">
+      ${defaultRow}
+    </div>
     <div class="${CLASS_TIME}" style="${styleTime}">
       <canvas id=""><canvas/>
     </div>
     `
+    return node
+  }
+
+  defaultRowNode() {
+    const api = this.#mediator.api
+    const width = api.width - api.toolsW - api.scaleW
+    const height = api.height - api.utilsH - api.timeH
+    const styleGrid = ` width: ${width}px; height: ${height}px`
+      let node = `<div class="${CLASS_GRID}" style="position: absolute;">
+                        <div class="viewport" style="${styleGrid}"></div>
+                    </div>`
+          node += this.rowNode(CLASS_CHART)
     return node
   }
 
@@ -415,4 +419,33 @@ export default class MainPane {
     `
     return node
   }
+
+  createViewport() {
+    const api = this.#mediator.api
+    const width = api.width - api.toolsW - api.scaleW
+    const height = api.height - api.utilsW - api.timeH
+
+    // create viewport
+    this.#viewport = new CEL.Viewport({
+      width: width,
+      height: this.rowsH,
+      container: this.#elViewport
+    });
+    this.#elCanvas = this.#viewport.scene.canvas
+
+    this.#layerGrid = new CEL.Layer();
+    // add layers
+    this.#viewport
+          .addLayer(this.#layerGrid)
+
+    // this.#chartGrid =
+    //   new chartGrid(
+    //     this.#layerGrid, 
+    //     this.#Time, 
+    //     this.#Scale, 
+    //     this.#theme)
+  }
+
+
+
 }

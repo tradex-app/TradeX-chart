@@ -16,6 +16,8 @@ export default class chartGrid {
     this.#config = config
     this.#xAxis = xAxis
     this.#yAxis = yAxis
+
+    this.#config.axes = config.axes || "both"
   }
 
   draw() {
@@ -27,23 +29,28 @@ export default class chartGrid {
     ctx.strokeStyle = GridStyle.COLOUR_GRID
 
     // X Axis
-    const offset = this.#xAxis.smoothScrollOffset || 0
+    if (this.#config.axes != "y") {
+      const offset = this.#xAxis.smoothScrollOffset || 0
 
-    for (let tick of xGrads) {
-      ctx.beginPath()
-      ctx.moveTo(tick[1] + offset, 0)
-      ctx.lineTo(tick[1] + offset, this.#scene.height)
-      ctx.stroke()
+      for (let tick of xGrads) {
+        ctx.beginPath()
+        ctx.moveTo(tick[1] + offset, 0)
+        ctx.lineTo(tick[1] + offset, this.#scene.height)
+        ctx.stroke()
+      }
     }
 
     // Y Axis
-    const yGrads = this.#yAxis.yAxisGrads
-    for (let tick of yGrads) {
-      ctx.beginPath()
-      ctx.moveTo(0, tick[1])
-      ctx.lineTo(this.#scene.width, tick[1])
-      ctx.stroke()
+    if (this.#config.axes != "x") {
+      const yGrads = this.#yAxis.yAxisGrads
+      for (let tick of yGrads) {
+        ctx.beginPath()
+        ctx.moveTo(0, tick[1])
+        ctx.lineTo(this.#scene.width, tick[1])
+        ctx.stroke()
+      }
     }
+
     ctx.restore();
   }
 }

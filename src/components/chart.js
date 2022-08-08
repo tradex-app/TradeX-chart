@@ -346,7 +346,7 @@ export default class Chart {
 
   defaultNode() {
     const api = this.#mediator.api
-    const rowsH = api.height - api.utilsW - api.timeH // api.elements.elRows.clientHeight
+    const rowsH = api.height - api.utilsW - api.timeH
     const width = api.width - api.toolsW - api.scaleW
     const height = this.#options.chartH || rowsH - 1
 
