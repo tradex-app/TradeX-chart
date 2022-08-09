@@ -12,7 +12,7 @@ DOM.findBySelector('#app').innerHTML = `
   <div id="info" style="float:left;"></div>
 `
 const mount = DOM.findBySelector('#test')
-const props = {
+const config = {
   id: "TradeX_test",
   title: "BTC/USDT",
   width: 1000,
@@ -28,7 +28,7 @@ const props = {
   warnings: true,
   errors: true,
 }
-const chart = Chart.create(mount, props, state )
+const chart = Chart.create(mount, config, state )
 chart.start(chart.getModID())
 
 console.log("API: id:", chart.id)

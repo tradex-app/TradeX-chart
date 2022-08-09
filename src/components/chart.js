@@ -38,8 +38,7 @@ import {
 } from '../definitions/core'
 
 import {
-  PRICEDIGITS,
-  XAXIS_ZOOM,
+  BUFFERSIZE,
 } from "../definitions/chart"
 
 const STYLE_CHART = "" // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
@@ -135,6 +134,8 @@ export default class Chart {
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
   get candleW() { return this.#core.Timeline.candleW }
+  get theme() { return this.#core.theme }
+  get config() { return this.#core.config }
 
   init(options) {
 
@@ -375,19 +376,28 @@ export default class Chart {
   updateData(data) {}
 
   createViewport() {
+
+    const buffer = this.config.buffer || BUFFERSIZE
+    const width = this.#elViewport.clientWidth
+    const height = this.#options.chartH || this.#parent.rowsH - 1
+    const layerConfig = { 
+      width: width * ((100 + buffer) * 0.01), 
+      height: height
+    }
+
     // create viewport
     this.#viewport = new CEL.Viewport({
-      width: this.#elViewport.clientWidth,
-      height: this.#options.chartH || this.#parent.rowsH - 1,
+      width: width,
+      height: height,
       container: this.#elViewport
     });
     this.#elCanvas = this.#viewport.scene.canvas
 
     // create layers - grid, volume, candles
-    this.#layerGrid = new CEL.Layer();
-    this.#layerVolume = new CEL.Layer();
-    this.#layersOnChart = this.layersOnChart()
-    this.#layerCandles = new CEL.Layer();
+    this.#layerGrid = new CEL.Layer(layerConfig);
+    this.#layerVolume = new CEL.Layer(layerConfig);
+    this.#layersOnChart = this.layersOnChart(layerConfig)
+    this.#layerCandles = new CEL.Layer(layerConfig);
     this.#layerCursor = new CEL.Layer();
 
     // add layers

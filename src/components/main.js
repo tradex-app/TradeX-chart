@@ -24,10 +24,11 @@ import {
 import {
   PRICEDIGITS,
   XAXIS_ZOOM,
+  BUFFERSIZE,
 } from "../definitions/chart"
 
 const STYLE_ROWS = "width:100%; min-width:100%;"
-const STYLE_ROW = "position: relative;"
+const STYLE_ROW = "position: relative; overflow: hidden;"
 const STYLE_TIME = "border-top: 1px solid; width:100%; min-width:100%;"
 const STYLE_SCALE = "border-left: 1px solid;"
 
@@ -94,6 +95,7 @@ export default class MainPane {
   get cursorPos() { return this.#cursorPos }
   get candleW() { return this.#Time.candleW }
   get theme() { return this.#core.theme }
+  get config() { return this.#core.config }
 
 
   init(options) {
@@ -191,9 +193,6 @@ export default class MainPane {
 
     // listen/subscribe/watch for parent notifications
     this.on("resize", (dimensions) => this.onResize.bind(this))
-    // this.on("chart_zoom", () => this.zoomRange.bind(this))
-    // this.on("chart_pan", () => this.updateRange.bind(this))
-    // this.on("chart_panDone", () => this.updateRange.bind(this))
   }
 
   on(topic, handler, context) {
@@ -408,10 +407,10 @@ export default class MainPane {
     const api = this.#mediator.api
     const width = api.width - api.toolsW - api.scaleW
     const height = api.height - api.utilsH - api.timeH
-    const styleGrid = ` width: ${width}px; height: ${height}px`
+    const styleGrid = ` width: ${width}px; height: ${height}px; overflow: hidden`
       let node = `<div class="${CLASS_GRID}" style="position: absolute;">
-                        <div class="viewport" style="${styleGrid}"></div>
-                    </div>`
+                      <div class="viewport" style="${styleGrid}"></div>
+                  </div>`
           node += this.rowNode(CLASS_CHART)
     return node
   }
@@ -434,18 +433,23 @@ export default class MainPane {
 
   createViewport() {
     const api = this.#mediator.api
-    const width = api.width - api.toolsW - api.scaleW
-    const height = api.height - api.utilsW - api.timeH
+    const buffer = this.config.buffer || BUFFERSIZE
+    const width = (api.width - api.toolsW - api.scaleW)
+    const height = this.rowsH
+    const layerConfig = { 
+      width: width * ((100 + buffer) * 0.01), 
+      height: height
+    }
 
     // create viewport
     this.#viewport = new CEL.Viewport({
       width: width,
-      height: this.rowsH,
+      height: height,
       container: this.#elViewport
     });
     this.#elCanvas = this.#viewport.scene.canvas
 
-    this.#layerGrid = new CEL.Layer();
+    this.#layerGrid = new CEL.Layer(layerConfig);
     // add layers
     this.#viewport
           .addLayer(this.#layerGrid)

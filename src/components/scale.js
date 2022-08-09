@@ -27,9 +27,12 @@ import {
   CLASS_ONCHART,
   CLASS_OFFCHART,
 } from '../definitions/core'
+
 import { 
-  YAXIS_TYPES
+  YAXIS_TYPES,
+  BUFFERSIZE
 } from "../definitions/chart";
+
 import { YAxisStyle } from "../definitions/style";
 import { isArray } from "../utils/typeChecks"
 
@@ -66,6 +69,7 @@ export default class ScaleBar {
     this.#elScale = mediator.api.elements.elScale
     this.#chart = mediator.api.core.Chart
     this.#parent = mediator.api.parent
+    this.#core = this.#mediator.api.core
 
     this.#options = options
     this.#ID = this.#options.offChartID || uid("TX_scale_")
@@ -95,6 +99,8 @@ export default class ScaleBar {
   get viewport() { return this.#viewport }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elScale) }
+  get theme() { return this.#core.theme }
+  get config() { return this.#core.config }
 
   init() {
     this.mount(this.#elScale)
@@ -203,6 +209,14 @@ export default class ScaleBar {
 
   // create canvas layers with handling methods
   createViewport() {
+
+    const width = this.#elScale.clientWidth
+    const height = this.#elScale.clientHeight
+    const layerConfig = { 
+      width: width, 
+      height: height
+    }
+
     // create viewport
     this.#viewport = new CEL.Viewport({
       width: this.#elScale.clientWidth,
@@ -211,8 +225,8 @@ export default class ScaleBar {
     });
 
     // create layers - labels, overlays, cursor
-    this.#layerLabels = new CEL.Layer();
-    this.#layerOverlays = new CEL.Layer();
+    this.#layerLabels = new CEL.Layer(layerConfig);
+    this.#layerOverlays = new CEL.Layer(layerConfig);
     this.#layerCursor = new CEL.Layer();
 
     // add layers

@@ -31,6 +31,10 @@ import {
   CLASS_OFFCHART,
 } from '../definitions/core'
 
+import {
+  BUFFERSIZE,
+} from "../definitions/chart"
+
 const STYLE_OFFCHART = "" // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
 const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
 
@@ -110,6 +114,8 @@ export default class OffChart {
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
   get candleW() { return this.#core.Timeline.candleW }
+  get theme() { return this.#core.theme }
+  get config() { return this.#core.config }
 
   init(options) {
 
@@ -297,16 +303,25 @@ export default class OffChart {
 // -----------------------
 
   createViewport() {
+
+    const buffer = this.config.buffer || BUFFERSIZE
+    const width = this.#elViewport.clientWidth
+    const height = this.#options.rowH || this.#parent.rowsH - 1
+    const layerConfig = { 
+      width: width * ((100 + buffer) * 0.01), 
+      height: height
+    }
+
     // create viewport
     this.#viewport = new CEL.Viewport({
-      width: this.#elViewport.clientWidth,
-      height: this.#options.rowH || this.#parent.rowsH - 1,
+      width: width,
+      height: height,
       container: this.#elViewport
     });
 
     // create layers - grid, volume, candles
-    this.#layerGrid = new CEL.Layer();
-    this.#layersIndicator = this.layersOnRow()
+    this.#layerGrid = new CEL.Layer(layerConfig);
+    this.#layersIndicator = this.layersOnRow(layerConfig)
     this.#layerCursor = new CEL.Layer();
 
     // add layers

@@ -58,6 +58,7 @@ export default class TradeXchart {
   #shortName = NAME
   #el = undefined
   #mediator
+  #config
   #options
   #elements = {}
   #elTXChart
@@ -177,6 +178,7 @@ constructor (mediator, options={}) {
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
   get options() { return this.#options }
+  get config() { return this.#config }
   get inCnt() { return this.#inCnt }
 
   get width() { return this.#chartW }
@@ -221,29 +223,29 @@ constructor (mediator, options={}) {
    *
    * @static
    * @param {DOM element} container
-   * @param {Object} [options={}]
+   * @param {Object} [config={}]
    * @param {Object} state
    * @return {Instance}  
    * @memberof TradeXchart
    */
-  static create(container, options={}, state) {
+  static create(container, config={}, state) {
     const cnt = ++TradeXchart.#cnt
 
-    // options.cnt = cnt
-    // options.state = state
-    options.modID = `${ID}_${cnt}`
-    options.container = container
+    // config.cnt = cnt
+    // config.state = state
+    config.modID = `${ID}_${cnt}`
+    config.container = container
 
-    const core = new SX.Core(options)
+    const core = new SX.Core(config)
 
     const api = {
       permittedClassNames:TradeXchart.permittedClassNames,
     }
 
-    options.state = state
+    config.state = state
 
     // register the parent module which will build and control everything
-    const instance = core.register(options.modID, TradeXchart, options, api)
+    const instance = core.register(config.modID, TradeXchart, config, api)
     TradeXchart.#instances[cnt] = core
     return instance
   }
@@ -259,20 +261,21 @@ constructor (mediator, options={}) {
    * Target element has been validated as a mount point
    * let's start building
    */
-  init(options) {
-    this.#inCnt = options.cnt
-    this.#modID = options.modID
+  init(config) {
+    this.#config = config
+    this.#inCnt = config.cnt
+    this.#modID = config.modID
 
-    const id = (isObject(options) && isString(options.id)) ? options.id : null
+    const id = (isObject(config) && isString(config.id)) ? config.id : null
     this.setID(id)
 
     this.mount()
 
-    // process options
-    if (isObject(options)) {
-      for (const option in options) {
+    // process config
+    if (isObject(config)) {
+      for (const option in config) {
         if (option in this.props()) {
-          this.props()[option](options[option])
+          this.props()[option](config[option])
         }
       }
     }
@@ -325,10 +328,10 @@ constructor (mediator, options={}) {
     }
 
 
-    this.#WidgetsG = this.#mediator.register("WidgetsG", WidgetsG, options, api)
-    this.#UtilsBar = this.#mediator.register("UtilsBar", UtilsBar, options, api)
-    this.#ToolsBar = this.#mediator.register("ToolsBar", ToolsBar, options, api)
-    this.#MainPane = this.#mediator.register("MainPane", MainPane, options, api)
+    this.#WidgetsG = this.#mediator.register("WidgetsG", WidgetsG, config, api)
+    this.#UtilsBar = this.#mediator.register("UtilsBar", UtilsBar, config, api)
+    this.#ToolsBar = this.#mediator.register("ToolsBar", ToolsBar, config, api)
+    this.#MainPane = this.#mediator.register("MainPane", MainPane, config, api)
 
     api.Timeline = this.Timeline
     api.Chart = this.Chart

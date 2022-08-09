@@ -12,6 +12,10 @@ import { drawTextBG } from "../utils/canvas"
 import { InputController, } from "../input/controller"
 import stateMachineConfig from "../state/state-time"
 
+import {
+  BUFFERSIZE,
+} from "../definitions/chart"
+
 export default class Timeline {
 
   #name = "Timeline"
@@ -64,6 +68,8 @@ export default class Timeline {
   get layerOverlays() { return this.#layerOverlays }
   get xAxisGrads() { return this.#xAxis.xAxisGrads }
   get candleW() { return this.#xAxis.candleW }
+  get theme() { return this.#core.theme }
+  get config() { return this.#core.config }
   get viewport() { return this.#viewport }
   get viewTotal() { return this.#viewTotal }
   get range() { return this.#core.range }
@@ -161,16 +167,25 @@ export default class Timeline {
   xPosOHLCV(x) { return this.#xAxis.xPosOHLCV(x) }
 
   createViewport() {
+
+    const buffer = this.config.buffer || BUFFERSIZE
+    const width = this.xAxisWidth
+    const height = this.#elTime.clientHeight
+    const layerConfig = { 
+      width: width * ((100 + buffer) * 0.01), 
+      height: height
+    }
+
     // create viewport
     this.#viewport = new CEL.Viewport({
-      width: this.xAxisWidth,
-      height: this.#elTime.clientHeight,
+      width: width,
+      height: height,
       container: this.#elViewport
     });
 
     // create layers - labels, overlays, cursor
-    this.#layerLabels = new CEL.Layer();
-    this.#layerOverlays = new CEL.Layer();
+    this.#layerLabels = new CEL.Layer(layerConfig);
+    this.#layerOverlays = new CEL.Layer(layerConfig);
     this.#layerCursor = new CEL.Layer();
 
     // add layers
