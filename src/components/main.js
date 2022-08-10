@@ -60,6 +60,7 @@ export default class MainPane {
   #offChartDefaultWpx = 120
 
   #cursorPos = [0, 0]
+  #buffer
   
   #indicators
   #controller
@@ -85,6 +86,8 @@ export default class MainPane {
   get chart() { return this.#Chart }
   get time() { return this.#Time }
   get options() { return this.#options }
+  get width() { return this.#elMain.clientWidth }
+  get height() { return this.#elMain.clientHeight }
   get chartW() { return this.#elChart.clientWidth }
   get chartH() { return this.#elChart.clientHeight }
   get rowsW() { return this.#elRows.clientWidth }
@@ -96,6 +99,8 @@ export default class MainPane {
   get candleW() { return this.#Time.candleW }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
+  get buffer() { return this.#buffer }
+  get bufferPx() { return Math.round(this.width * buffer / 100) }
 
 
   init(options) {
@@ -134,6 +139,8 @@ export default class MainPane {
     this.registerOffCharts(options, api)
     // register chart
     this.#Chart = this.#mediator.register("Chart", Chart, options, api)
+
+    this.#buffer = this.config.buffer || BUFFERSIZE
 
     this.log(`${this.#name} instantiated`)
   }
@@ -432,12 +439,11 @@ export default class MainPane {
   }
 
   createViewport() {
-    const api = this.#mediator.api
-    const buffer = this.config.buffer || BUFFERSIZE
-    const width = (api.width - api.toolsW - api.scaleW)
+    const buffer = this.buffer
+    const width = this.width
     const height = this.rowsH
     const layerConfig = { 
-      width: width * ((100 + buffer) * 0.01), 
+      width: Math.round(width * ((100 + buffer) * 0.01)), 
       height: height
     }
 

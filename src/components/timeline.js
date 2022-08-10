@@ -172,7 +172,7 @@ export default class Timeline {
     const width = this.xAxisWidth
     const height = this.#elTime.clientHeight
     const layerConfig = { 
-      width: width * ((100 + buffer) * 0.01), 
+      width: Math.round(width * ((100 + buffer) * 0.01)), 
       height: height
     }
 

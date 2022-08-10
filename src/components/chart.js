@@ -381,7 +381,7 @@ export default class Chart {
     const width = this.#elViewport.clientWidth
     const height = this.#options.chartH || this.#parent.rowsH - 1
     const layerConfig = { 
-      width: width * ((100 + buffer) * 0.01), 
+      width: Math.round(width * ((100 + buffer) * 0.01)), 
       height: height
     }
 

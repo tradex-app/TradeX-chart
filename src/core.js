@@ -129,6 +129,7 @@ export default class TradeXchart {
   warnings = false
   errors = false
   
+  #scrollPos
   #smoothScrollOffset = 0
   #panBeginPos = [null, null, null, null]
 
@@ -216,7 +217,11 @@ constructor (mediator, options={}) {
   get TALib() { return this.#TALib }
 
   get candleW() { return this.Timeline.candleW }
-  get smoothScrollOffset() { return this.#smoothScrollOffset }
+  get buffer() { return this.MainPane.buffer }
+  get bufferPx() { return this.MainPane.bufferPx }
+  set scrollPos(pos) { this.setScrollPos() }
+  get scrollPos() { return this.#scrollPos }
+  get smoothScrollOffset() { return 0 } //{ return this.#smoothScrollOffset }
 
   /**
    * Create a new TradeXchart instance
@@ -466,7 +471,15 @@ constructor (mediator, options={}) {
   }
 
   setTheme(theme) {
+    // TODO: validation
     this.#theme = theme
+  }
+
+  setScrollPos(pos) {
+    if (isNumber(pos) && pos && pos < this.bufferPx) this.#scrollPos = pos
+    else {
+      this.emit("Error", `setScrollPos: not a valid value`)
+    }
   }
 
   setUserClasses(c) {
@@ -524,16 +537,9 @@ constructor (mediator, options={}) {
 
     let dist, offset
 
-console.log("pos:",JSON.stringify(pos))
+    // dist = pos[4]
+    // this.#scrollPos += Math.round(dist % this.candleW)
 
-    // if (pos[2] != this.#panBeginPos[2]) {
-    //   this.#panBeginPos = pos
-    //   dist = Math.floor(pos[0] - pos[2])
-    // }
-    // else {
-    //   dist = Math.floor(pos[0] - this.#panBeginPos[0])
-    //   this.#panBeginPos = pos
-    // }
 
     dist = pos[4]
 
@@ -552,7 +558,7 @@ console.log("pos:",JSON.stringify(pos))
       offset = Math.sign(dist)
     }
     else {
-      this.#smoothScrollOffset += Math.round(dist % this.candleW) //* sign
+      this.#smoothScrollOffset += Math.round(dist % this.candleW)
   
       if (this.#smoothScrollOffset < 0) {
         this.#smoothScrollOffset = Math.round(this.candleW - 1)
