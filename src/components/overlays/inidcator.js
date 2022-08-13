@@ -7,6 +7,7 @@
 //   line,
 // }
 
+import { renderFillRect } from "../../renderer/rect"
 import { renderLine } from "../../renderer/line"
 
 export default class indicator {
@@ -45,6 +46,7 @@ export default class indicator {
 
     switch(type) {
       case "renderLine": renderLine(ctx, plots, style);
+      case "renderFillRect": renderFillRect(ctx, plots[0], plots[1], plots[2], plots[3], style)
     }
 
     ctx.restore();

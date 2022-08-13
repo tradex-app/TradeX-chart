@@ -26,7 +26,8 @@ export default class RSI extends indicator {
     highLowLineWidth: 1,
     highLowStyle: "dashed",
     highStrokeStyle: "#848",
-    lowStrokeStyle: "#848"
+    lowStrokeStyle: "#848",
+    highLowRangeStyle: "#22002220"
   }
   style = {}
   overlay
@@ -102,15 +103,20 @@ export default class RSI extends indicator {
 
     const data = this.overlay.data
     const width = this.xAxis.candleW
-    const plots = []
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2)
     const y1 = this.yAxis.yPos(100 - this.style.defaultHigh)
     const y2 = this.yAxis.yPos(100 - this.style.defaultLow)
 
+    // Fill the range between high and low
+    const plots = [0, y1, this.scene.width, y2 - y1]
+    let style = this.style.highLowRangeStyle
+    this.plot(plots, "renderFillRect", style)
+
     // High RSI Range marker
+    plots.length = 0
     plots[0] = {x: 0, y: y1}
     plots[1] = {x: x2, y: y1}
-    let style = {
+    style = {
       lineWidth: this.style.highLowLineWidth,
       strokeStyle: this.style.highStrokeStyle,
       dash: [5, 5]
