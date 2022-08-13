@@ -75,8 +75,10 @@ export default class Timeline {
   get range() { return this.#core.range }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elTime) }
+  get bufferPx() { return this.#core.bufferPx }
   get smoothScrollOffset() { return this.#core.smoothScrollOffset }
-
+  get rangeScrollOffset() { return this.#core.rangeScrollOffset }
+ 
   init() {
     this.mount(this.#elTime)
 
@@ -196,6 +198,9 @@ export default class Timeline {
   }
 
   draw() {
+    this.#layerCursor.setPosition(this.#core.scrollPos, 0)
+    this.#layerLabels.setPosition(this.#core.scrollPos, 0)
+    this.#layerOverlays.setPosition(this.#core.scrollPos, 0)
     this.#xAxis.draw()
     this.#viewport.render()
   }

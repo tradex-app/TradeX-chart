@@ -474,8 +474,13 @@ export default class Chart {
   }
 
   draw(range) {
+    this.#layerGrid.setPosition(this.#core.scrollPos, 0)
     this.#chartGrid.draw("y")
+
+    this.#layerVolume.setPosition(this.#core.scrollPos, 0)
     this.#chartVolume.draw(range)
+
+    this.#layerCandles.setPosition(this.#core.scrollPos, 0)
     this.#chartCandles.draw(range)
 
     this.#viewport.render();

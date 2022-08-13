@@ -119,8 +119,8 @@ class Viewport {
       if (layer.visible)
         scene.context.drawImage(
           layer.scene.canvas,
-          0,
-          0,
+          layer.x,
+          layer.y,
           layer.width,
           layer.height
         );

@@ -37,9 +37,9 @@ export default class chartVolume extends VolumeBar {
     const volH = Math.floor(zeroPos * this.#config.maxVolumeH / 100)
     const maxVol = range.volumeMax
 
-    let o = (range.indexStart - 1 < 0) ? 0 : 1
+    let o = this.#xAxis.rangeScrollOffset
     let v = range.indexStart - o
-    let i = range.Length + o
+    let i = range.Length + o + 1
     let x
 
     while(i) {

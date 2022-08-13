@@ -3,6 +3,7 @@
 import Candle from "../primitives/candle";
 import { CandleStyle } from "../../definitions/style"
 import { round } from "../../utils/number";
+import { getTextRectWidth } from "../../utils/canvas";
 
 export default class chartCandles extends Candle {
 
@@ -23,6 +24,8 @@ export default class chartCandles extends Candle {
     this.#yAxis = yAxis
   }
 
+  get target() { return this.#target }
+
   draw(range) {
     this.#scene.clear()
 
@@ -35,9 +38,9 @@ export default class chartCandles extends Candle {
       w: this.#xAxis.candleW
     }
 
-    let o = (range.indexStart - 1 < 0) ? 0 : 1
+    let o = this.#xAxis.rangeScrollOffset;
     let c = range.indexStart - o
-    let i = range.Length + o
+    let i = range.Length + o + 1
     let x
 
     while(i) {

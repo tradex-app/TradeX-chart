@@ -129,7 +129,7 @@ export default class TradeXchart {
   warnings = false
   errors = false
   
-  #scrollPos
+  #scrollPos = 0
   #smoothScrollOffset = 0
   #panBeginPos = [null, null, null, null]
 
@@ -222,6 +222,7 @@ constructor (mediator, options={}) {
   set scrollPos(pos) { this.setScrollPos() }
   get scrollPos() { return this.#scrollPos }
   get smoothScrollOffset() { return 0 } //{ return this.#smoothScrollOffset }
+  get rangeScrollOffset() { return Math.floor(this.bufferPx / this.candleW) }
 
   /**
    * Create a new TradeXchart instance
@@ -346,6 +347,8 @@ constructor (mediator, options={}) {
 
   start() {
     this.log("...processing state")
+
+    this.#scrollPos = this.bufferPx * -1
 
     this.UtilsBar.start()
     this.ToolsBar.start()
@@ -535,44 +538,54 @@ constructor (mediator, options={}) {
    */
   updateRange(pos) {
 
-    let dist, offset
+    let dist, offset, scrollPos
+    offset = 0
+    dist = pos[4]
+    scrollPos = this.#scrollPos + dist
+
+    if (scrollPos < this.bufferPx * -1) {
+      scrollPos = 0
+      offset = this.rangeScrollOffset * -1
+    }
+    else if (scrollPos > 0) {
+      scrollPos = this.bufferPx * -1
+      offset = this.rangeScrollOffset
+    }
+
+    this.#scrollPos = scrollPos
 
     // dist = pos[4]
-    // this.#scrollPos += Math.round(dist % this.candleW)
 
+    // offset = Math.floor(dist / this.candleW)
 
-    dist = pos[4]
-
-    offset = Math.floor(dist / this.candleW)
-
-    if (this.candleW < 3) {
-      this.#smoothScrollOffset = 0
-      offset = Math.sign(dist) * 6
-    }
-    else if (this.candleW < 6) {
-      this.#smoothScrollOffset = 0
-      offset = Math.sign(dist) * 2
-    }
-    else if (this.candleW == Math.abs(dist)) {
-      this.#smoothScrollOffset = 0
-      offset = Math.sign(dist)
-    }
-    else {
-      this.#smoothScrollOffset += Math.round(dist % this.candleW)
+    // if (this.candleW < 3) {
+    //   this.#smoothScrollOffset = 0
+    //   offset = Math.sign(dist) * 6
+    // }
+    // else if (this.candleW < 6) {
+    //   this.#smoothScrollOffset = 0
+    //   offset = Math.sign(dist) * 2
+    // }
+    // else if (this.candleW == Math.abs(dist)) {
+    //   this.#smoothScrollOffset = 0
+    //   offset = Math.sign(dist)
+    // }
+    // else {
+    //   this.#smoothScrollOffset += Math.round(dist % this.candleW)
   
-      if (this.#smoothScrollOffset < 0) {
-        this.#smoothScrollOffset = Math.round(this.candleW - 1)
-        offset = -1
-      }
-      else if (this.#smoothScrollOffset > this.candleW - 1) {
-        this.#smoothScrollOffset = 0
-        offset = 1
-      }
-      else {
-        this.emit("smoothscroll", this.#smoothScrollOffset)
-        return
-      }
-    }
+    //   if (this.#smoothScrollOffset < 0) {
+    //     this.#smoothScrollOffset = Math.round(this.candleW - 1)
+    //     offset = -1
+    //   }
+    //   else if (this.#smoothScrollOffset > this.candleW - 1) {
+    //     this.#smoothScrollOffset = 0
+    //     offset = 1
+    //   }
+    //   else {
+    //     this.emit("smoothscroll", this.#smoothScrollOffset)
+    //     return
+    //   }
+    // }
 
     // const offset = Math.floor(dist / this.candleW)
     let start = this.range.indexStart - offset,

@@ -357,14 +357,14 @@ export default class OffChart {
 
 
 
-  layersOnRow() {
+  layersOnRow(layerConfig) {
     // let l = []
 
     // for (let i = 0; i < this.#overlay.length; i++) {
     //   l[i] = new CEL.Layer()
     // }
     // return l
-    return new CEL.Layer()
+    return new CEL.Layer(layerConfig)
   }
 
   addLayersOnChart() {
@@ -375,7 +375,10 @@ export default class OffChart {
   }
 
   draw(range) {
+    this.#layerGrid.setPosition(this.#core.scrollPos, 0)
     this.#overlayGrid.draw("y")
+
+    this.#layersIndicator.setPosition(this.#core.scrollPos, 0)
     this.#overlayIndicator.draw(range)
 
     this.#viewport.render();

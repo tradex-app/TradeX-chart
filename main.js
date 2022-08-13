@@ -23,7 +23,7 @@ const config = {
     onchartVolumeH: 15,
   },
   isCrypto: true,
-  logs: true,
+  logs: false,
   infos: true,
   warnings: true,
   errors: true,
@@ -43,6 +43,7 @@ function internals() {
   data.rangeIntervalStr = [`range.intervalStr:`,`${tx.range.intervalStr}`]
   data.rangeStart = ["range.indexStart: ", new Date(tx.range.value(tx.indexStart)[0])]
   data.rangeEnd = ["range.indexEnd: ", new Date(tx.range.value(tx.indexEnd)[0])]
+  data.scrollPos = ["scrollPos:", chart.scrollPos]
   data.gradsTimeSpan = ["grads.timeSpan: ", tx.xAxisGrads.timeSpan]
   data.gradsUnits = ["grads.units: ", JSON.stringify(tx.xAxisGrads.units)]
   data.gradsMajor = ["grads.major: ", tx.xAxisGrads.majorTick]

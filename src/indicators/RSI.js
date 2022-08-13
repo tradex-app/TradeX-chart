@@ -103,10 +103,13 @@ export default class RSI extends indicator {
     const data = this.overlay.data
     const width = this.xAxis.candleW
     const plots = []
+    const x2 = this.scene.width + (this.xAxis.bufferPx * 2)
+    const y1 = this.yAxis.yPos(100 - this.style.defaultHigh)
+    const y2 = this.yAxis.yPos(100 - this.style.defaultLow)
 
     // High RSI Range marker
-    plots[0] = {x: 0, y: this.yAxis.yPos(100 - this.style.defaultHigh)}
-    plots[1] = {x: this.scene.width, y: this.yAxis.yPos(100 - this.style.defaultHigh)}
+    plots[0] = {x: 0, y: y1}
+    plots[1] = {x: x2, y: y1}
     let style = {
       lineWidth: this.style.highLowLineWidth,
       strokeStyle: this.style.highStrokeStyle,
@@ -116,11 +119,11 @@ export default class RSI extends indicator {
 
     // Low RSI Range marker
     plots.length = 0
-    plots[0] = {x: 0, y: this.yAxis.yPos(100 - this.style.defaultLow)}
-    plots[1] = {x: this.scene.width, y: this.yAxis.yPos(100 - this.style.defaultLow)}
+    plots[0] = {x: 0, y: y2}
+    plots[1] = {x: x2, y: y2}
     style = {
       lineWidth: this.style.highLowLineWidth,
-      strokeStyle: this.style.highStrokeStyle,
+      strokeStyle: this.style.lowStrokeStyle,
       dash: [5, 5]
     }
     this.plot(plots, "renderLine", style)
@@ -134,9 +137,9 @@ export default class RSI extends indicator {
     }
 
     // account for "missing" entries because of indicator calculation
-    let o = (range.indexStart - 1 < 0) ? 0 : 2
-    let c = range.indexStart - (range.data.length - this.overlay.data.length) - o
-    let i = range.Length + o + 1
+    let o = this.xAxis.rangeScrollOffset;
+    let c = range.indexStart - (range.data.length - this.overlay.data.length) - o - 1
+    let i = range.Length + o + 2
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {

@@ -51,6 +51,7 @@ export default class MainPane {
 
   #viewport
   #layerGrid
+  #layerLabels
   #OffCharts = []
   #Chart
   #Time
@@ -100,7 +101,7 @@ export default class MainPane {
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
   get buffer() { return this.#buffer }
-  get bufferPx() { return Math.round(this.width * buffer / 100) }
+  get bufferPx() { return this.getBufferPx() }
 
 
   init(options) {
@@ -331,6 +332,12 @@ export default class MainPane {
     this.emit("rowsResize", dimensions)
   }
 
+  getBufferPx() { 
+    let w = Math.round(this.width * this.buffer / 100) 
+    let r = w % this.candleW
+    return w - Math.round(r)
+  }
+
   registerOffCharts(options, api) {
     
     let a = this.#offChartDefaultH * this.#mediator.api.offChart.length,
@@ -455,9 +462,11 @@ export default class MainPane {
     });
     this.#elCanvas = this.#viewport.scene.canvas
 
+    this.#layerLabels = new CEL.Layer(layerConfig);
     this.#layerGrid = new CEL.Layer(layerConfig);
     // add layers
     this.#viewport
+          .addLayer(this.#layerLabels)
           .addLayer(this.#layerGrid)
 
     const config = {...this.theme, ...{ axes: "x" }}
@@ -470,6 +479,7 @@ export default class MainPane {
   }
 
   draw(range) {
+    this.#layerGrid.setPosition(this.#core.scrollPos, 0)
     this.#chartGrid.draw("x")
     this.#viewport.render();
   }
