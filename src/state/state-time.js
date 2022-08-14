@@ -86,14 +86,14 @@ export default
           target: 'chart_pan',
           action: (stateMachine, data) => {
             // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_pan"`)
-            stateMachine.context.origin.draw()
+            // stateMachine.context.origin.draw()
           },
         },
         chart_panDone: {
           target: 'idle',
           action: (stateMachine, data) => {
             // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_panDone"`)
-            stateMachine.context.origin.draw()
+            // stateMachine.context.origin.draw()
           },
         },
       }
@@ -111,7 +111,7 @@ export default
           condition: 'zoomDone',
           action: (stateMachine, data) => {
             // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_pan"`)
-            stateMachine.context.origin.draw()
+            // stateMachine.context.origin.draw()
           },
         },
       }

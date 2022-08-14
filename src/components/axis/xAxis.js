@@ -20,6 +20,7 @@ import { XAxisStyle } from "../../definitions/style";
 
 export default class xAxis extends Axis {
 
+  #core
   #parent
   #chart
 
@@ -31,7 +32,8 @@ export default class xAxis extends Axis {
   constructor(parent, chart) {
     super()
     this.#chart = chart
-    this.#parent = parent 
+    this.#parent = parent
+    this.#core = this.#parent.mediator.api.core
     this.#xAxisSubGrads = buildSubGrads()
   }
 
@@ -412,7 +414,7 @@ export default class xAxis extends Axis {
     const grads = this.#xAxisGrads.values
     const ctx = this.#parent.layerLabels.scene.context
     const mid = this.width / this.range.Length * 0.5
-    const offset = this.#parent.smoothScrollOffset || 0
+    const offset = 0
 
     ctx.save();
     ctx.strokeStyle = XAxisStyle.COLOUR_TICK

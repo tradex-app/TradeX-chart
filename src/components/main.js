@@ -482,6 +482,7 @@ export default class MainPane {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
     this.#chartGrid.draw("x")
     this.#viewport.render();
+    this.#Time.draw()
   }
 
   updateRange() {

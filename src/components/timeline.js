@@ -188,7 +188,7 @@ export default class Timeline {
     // create layers - labels, overlays, cursor
     this.#layerLabels = new CEL.Layer(layerConfig);
     this.#layerOverlays = new CEL.Layer(layerConfig);
-    this.#layerCursor = new CEL.Layer();
+    this.#layerCursor = new CEL.Layer(layerConfig);
 
     // add layers
     this.#viewport
@@ -232,7 +232,7 @@ export default class Timeline {
     this.#layerCursor.scene.clear()
     ctx.save()
 
-    drawTextBG(ctx, dateTimeStr, xPos + this.smoothScrollOffset, 1 , options)
+    drawTextBG(ctx, dateTimeStr, xPos + this.#core.bufferPx, 1 , options)
 
     ctx.restore()
     this.#viewport.render()
