@@ -136,6 +136,8 @@ export default class Chart {
   get candleW() { return this.#core.Timeline.candleW }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
+  get scrollPos() { this.#core.scrollPos }
+  get bufferPx() { this.#core.bufferPx }
 
   init(options) {
 
@@ -475,13 +477,13 @@ export default class Chart {
 
   draw(range) {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
-    this.#chartGrid.draw("y")
+    if (this.scrollPos == this.bufferPx) this.#chartGrid.draw("y")
 
     this.#layerVolume.setPosition(this.#core.scrollPos, 0)
-    this.#chartVolume.draw(range)
+    if (this.scrollPos == this.bufferPx) this.#chartVolume.draw(range)
 
     this.#layerCandles.setPosition(this.#core.scrollPos, 0)
-    this.#chartCandles.draw(range)
+    if (this.scrollPos == this.bufferPx) this.#chartCandles.draw(range)
 
     this.#viewport.render();
   }

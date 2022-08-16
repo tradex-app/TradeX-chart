@@ -102,6 +102,7 @@ export default class MainPane {
   get config() { return this.#core.config }
   get buffer() { return this.#buffer }
   get bufferPx() { return this.getBufferPx() }
+  get scrollPos() { this.#core.scrollPos }
 
 
   init(options) {

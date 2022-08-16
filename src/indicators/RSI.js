@@ -145,7 +145,7 @@ export default class RSI extends indicator {
     // account for "missing" entries because of indicator calculation
     let o = this.xAxis.rangeScrollOffset;
     let c = range.indexStart - (range.data.length - this.overlay.data.length) - o - 1
-    let i = range.Length + o + 2
+    let i = range.Length + o + 3
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {

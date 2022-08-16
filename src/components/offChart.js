@@ -116,6 +116,8 @@ export default class OffChart {
   get candleW() { return this.#core.Timeline.candleW }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
+  get scrollPos() { this.#core.scrollPos }
+  get bufferPx() { this.#core.bufferPx }
 
   init(options) {
 
@@ -376,10 +378,10 @@ export default class OffChart {
 
   draw(range) {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
-    this.#overlayGrid.draw("y")
+    if (this.scrollPos == this.bufferPx) this.#overlayGrid.draw("y")
 
     this.#layersIndicator.setPosition(this.#core.scrollPos, 0)
-    this.#overlayIndicator.draw(range)
+    if (this.scrollPos == this.bufferPx) this.#overlayIndicator.draw(range)
 
     this.#viewport.render();
   }

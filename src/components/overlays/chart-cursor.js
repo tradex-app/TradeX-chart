@@ -19,12 +19,16 @@ export default class chartCursor {
     this.#xAxis = xAxis
     this.#yAxis = yAxis
 
-    this.#chart.on("chart_pan", (e) => { this.onMouseMoveX(e) })
-    this.#chart.on("chart_panDone", (e) => { this.onMouseMoveX(e) })
+    this.#chart.on("chart_pan", (e) => { this.onMouseDragX(e) })
+    this.#chart.on("chart_panDone", (e) => { this.onMouseDragX(e) })
     this.#chart.on("main_mousemove", (e) => { this.onMouseMoveX(e) })
     this.#chart.on(`${this.#chart.ID}_mousemove`, (e) => { this.onMouseMoveY(e) })
   }
 
+  onMouseDragX(e) {
+    this.#cursorPos[0] = e[0]
+    this.draw(true)
+  }
   onMouseMoveX(e) {
     this.#cursorPos[0] = e[0]
     this.draw()
@@ -34,10 +38,10 @@ export default class chartCursor {
     this.draw()
   }
 
-  draw() {
+  draw(drag = false) {
 
     let x = this.#cursorPos[0]
-        x = this.#xAxis.xPosSnap2CandlePos(x)
+        if (!drag) x = this.#xAxis.xPosSnap2CandlePos(x) + this.#xAxis.scrollOffsetPx
     let y = this.#cursorPos[1]
 
     this.#scene.clear()

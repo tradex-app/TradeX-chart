@@ -76,6 +76,8 @@ export default class Timeline {
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elTime) }
   get bufferPx() { return this.#core.bufferPx }
+  get scrollPos() { return this.#core.scrollPos }
+  get scrollOffsetPx() { return this.#core.scrollPos % this.candleW }
   get smoothScrollOffset() { return this.#core.smoothScrollOffset }
   get rangeScrollOffset() { return this.#core.rangeScrollOffset }
  
@@ -119,6 +121,7 @@ export default class Timeline {
     // prepare layered canvas
     this.createViewport()
     // draw the Timeline
+    this.#xAxis.initXAxisGrads()
     this.draw()
 
     // set up event listeners
@@ -140,8 +143,8 @@ export default class Timeline {
     const controller = new InputController(canvas);
 
     this.on("main_mousemove", (e) => { this.drawCursorTime(e) })
-    this.on("chart_pan", (e) => { this.drawCursorTime(e) })
-    this.on("chart_panDone", (e) => { this.drawCursorTime(e) })
+    this.on("chart_pan", (e) => { this.drawCursorTime(e, true) })
+    this.on("chart_panDone", (e) => { this.drawCursorTime(e, true) })
   }
 
   on(topic, handler, context) {
@@ -205,7 +208,7 @@ export default class Timeline {
     this.#viewport.render()
   }
 
-  drawCursorTime(e) {
+  drawCursorTime(e, drag = false) {
     const ctx = this.#layerCursor.scene.context
     let [x, y] = e,
         timestamp = this.xPos2Time(x),
@@ -224,15 +227,26 @@ export default class Timeline {
           paddingLeft: 4,
           paddingRight: 4
         },
-
-        height = options.fontSize + options.paddingTop + options.paddingBottom,
         txtW = getTextRectWidth(ctx, dateTimeStr, options),
-        xPos = this.#xAxis.xPosSnap2CandlePos(x) - (txtW * 0.5)
+        xPos = x + this.bufferPx, //+ this.#xAxis.scrollOffsetPx;
+        o = this.scrollPos % this.candleW;
+
+        // height = options.fontSize + options.paddingTop + options.paddingBottom,
+
+    if (!drag){
+      xPos = this.#xAxis.xPosSnap2CandlePos(xPos)
+      xPos = xPos - Math.round(txtW * 0.5) - this.scrollPos - this.bufferPx
+    }
+    else {
+      xPos = xPos - Math.round(txtW * 0.5) - this.scrollPos - this.bufferPx
+      if (this.scrollPos == (this.bufferPx - 1) * -1) this.#xAxis.xPosSnap2CandlePos(xPos) //xPos += this.bufferPx
+      // else if (this.scrollPos == this.bufferPx * -1) xPos -= this.bufferPx
+    }
 
     this.#layerCursor.scene.clear()
     ctx.save()
 
-    drawTextBG(ctx, dateTimeStr, xPos + this.#core.bufferPx, 1 , options)
+    drawTextBG(ctx, dateTimeStr, xPos, 1 , options)
 
     ctx.restore()
     this.#viewport.render()

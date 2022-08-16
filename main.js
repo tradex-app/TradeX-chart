@@ -67,5 +67,6 @@ const infoBox = {}
 
 chart.on("chart_zoom", (e) => { infoBox.out(internals()) })
 chart.on("chart_pan", (e) => { infoBox.out(internals()) })
+infoBox.out(internals())
 // test()
 

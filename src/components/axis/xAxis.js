@@ -62,6 +62,8 @@ export default class xAxis extends Axis {
   get xAxisTicks() { return this.#xAxisTicks }
   get xAxisGrads() { return this.#xAxisGrads }
   get xAxisSubGrads() { return this.#xAxisSubGrads }
+  get scrollOffsetPx() { return this.#core.scrollPos % this.candleW }
+  get bufferPx() { return this.#core.bufferPx }
 
   calcWidth() {
     let api = this.#parent.mediator.api
@@ -104,7 +106,7 @@ export default class xAxis extends Axis {
   }
 
   xPosSnap2CandlePos(x) {
-    let c = Math.floor((x / this.candleW))
+    let c = Math.round((x / this.candleW))
     return  (c * this.candleW) + (this.candleW / 2)
   }
 
@@ -125,6 +127,10 @@ export default class xAxis extends Axis {
 
   xPosOHLCV(x) {
     return this.pixelOHLCV(x)
+  }
+
+  initXAxisGrads() {
+    this.#xAxisGrads = this.calcXAxisGrads()
   }
 
   calcXAxisGrads() {
@@ -415,6 +421,7 @@ export default class xAxis extends Axis {
     const ctx = this.#parent.layerLabels.scene.context
     const mid = this.width / this.range.Length * 0.5
     const offset = 0
+
 
     ctx.save();
     ctx.strokeStyle = XAxisStyle.COLOUR_TICK

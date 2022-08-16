@@ -40,7 +40,7 @@ export default class chartCandles extends Candle {
 
     let o = this.#xAxis.rangeScrollOffset;
     let c = range.indexStart - o
-    let i = range.Length + o + 1
+    let i = range.Length + o + 2
     let x
 
     while(i) {
