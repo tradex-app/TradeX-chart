@@ -129,6 +129,7 @@ export default class TradeXchart {
   warnings = false
   errors = false
   
+  #mousePos = {x:0, y:0}
   #scrollPos = 0
   #smoothScrollOffset = 0
   #panBeginPos = [null, null, null, null]
@@ -223,6 +224,7 @@ constructor (mediator, options={}) {
   get scrollPos() { return this.#scrollPos }
   get smoothScrollOffset() { return 0 } //{ return this.#smoothScrollOffset }
   get rangeScrollOffset() { return Math.floor(this.bufferPx / this.candleW) }
+  get mousePos() { return this.#mousePos }
 
   /**
    * Create a new TradeXchart instance
@@ -350,6 +352,8 @@ constructor (mediator, options={}) {
 
     this.#scrollPos = this.bufferPx * -1
 
+    this.eventsListen()
+
     this.UtilsBar.start()
     this.ToolsBar.start()
     this.MainPane.start()
@@ -358,6 +362,11 @@ constructor (mediator, options={}) {
 
   end() {
     this.log("...cleanup the mess")
+    removeEventListener('mousemove', this.onMouseMove)
+  }
+
+  eventsListen() {
+    this.#elTXChart.addEventListener('mousemove', this.onMouseMove.bind(this))
   }
 
   on(topic, handler, context) {
@@ -370,6 +379,11 @@ constructor (mediator, options={}) {
 
   emit(topic, data) {
     this.#mediator.emit(topic, data)
+  }
+
+  onMouseMove(e) {
+    this.#mousePos.x = e.clientX
+    this.#mousePos.y = e.clientY
   }
 
   mount() {

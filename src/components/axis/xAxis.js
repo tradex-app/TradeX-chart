@@ -410,11 +410,11 @@ export default class xAxis extends Axis {
 
   draw() {
     this.#xAxisGrads = this.calcXAxisGrads()
-    this.drawLabels()
+    this.drawGrads()
     this.drawOverlays()
   }
 
-  drawLabels() {
+  drawGrads() {
     this.#parent.layerLabels.scene.clear()
 
     const grads = this.#xAxisGrads.values

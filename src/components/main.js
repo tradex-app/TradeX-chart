@@ -158,7 +158,7 @@ export default class MainPane {
     // prepare layered canvas
     this.createViewport()
     // draw the chart - grid, candles, volume
-    this.draw(this.range)
+    this.initXGrid()
 
     // set up event listeners
     this.eventsListen()
@@ -479,20 +479,30 @@ export default class MainPane {
         config)
   }
 
-  draw(range) {
+  initXGrid() {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
     this.#chartGrid.draw("x")
     this.#viewport.render();
     this.#Time.draw()
   }
 
+  draw() {
+    this.#layerGrid.setPosition(this.#core.scrollPos, 0)
+    if (this.scrollPos == this.bufferPx) {
+      this.#chartGrid.draw("x")
+      console.log(`this.#chartGrid.draw("x")`)
+    }
+    this.#viewport.render();
+    this.#Time.draw()
+  }
+
   updateRange() {
     // draw the grid
-    this.draw(this.range)
+    this.draw()
   }
 
   zoomRange() {
     // draw the gird
-    this.draw(this.range)
+    this.draw()
   }
 }
