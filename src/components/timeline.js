@@ -143,8 +143,8 @@ export default class Timeline {
     const controller = new InputController(canvas);
 
     this.on("main_mousemove", (e) => { this.drawCursorTime(e) })
-    this.on("chart_pan", (e) => { this.drawCursorTime(e, true) })
-    this.on("chart_panDone", (e) => { this.drawCursorTime(e, true) })
+    // this.on("chart_pan", (e) => { this.drawCursorTime(e, true) })
+    // this.on("chart_panDone", (e) => { this.drawCursorTime(e, true) })
   }
 
   on(topic, handler, context) {
@@ -205,13 +205,18 @@ export default class Timeline {
     this.#layerLabels.setPosition(this.#core.scrollPos, 0)
     this.#layerOverlays.setPosition(this.#core.scrollPos, 0)
     this.#xAxis.draw()
+    // if (this.scrollPos == this.bufferPx) {
+    //   this.#xAxis.draw()
+    //   this.drawCursorTime()
+    // }
     this.#viewport.render()
   }
 
   drawCursorTime(e, drag = false) {
     const ctx = this.#layerCursor.scene.context
-    let [x, y] = e,
-        timestamp = this.xPos2Time(x),
+    const rect = this.#elViewport.getBoundingClientRect()
+    const x = this.#core.mousePos.x - rect.left
+    let timestamp = this.xPos2Time(x),
         date = new Date(timestamp),
         opts = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
         dateTimeStr = date.toLocaleDateString('en-GB', opts),
@@ -233,15 +238,15 @@ export default class Timeline {
 
         // height = options.fontSize + options.paddingTop + options.paddingBottom,
 
-    if (!drag){
+    // if (!drag){
       xPos = this.#xAxis.xPosSnap2CandlePos(xPos)
       xPos = xPos - Math.round(txtW * 0.5) - this.scrollPos - this.bufferPx
-    }
-    else {
-      xPos = xPos - Math.round(txtW * 0.5) - this.scrollPos - this.bufferPx
-      if (this.scrollPos == (this.bufferPx - 1) * -1) this.#xAxis.xPosSnap2CandlePos(xPos) //xPos += this.bufferPx
-      // else if (this.scrollPos == this.bufferPx * -1) xPos -= this.bufferPx
-    }
+    // }
+    // else {
+    //   xPos = xPos - Math.round(txtW * 0.5) - this.scrollPos - this.bufferPx
+    //   if (this.scrollPos == (this.bufferPx - 1) * -1) this.#xAxis.xPosSnap2CandlePos(xPos) //xPos += this.bufferPx
+    //   // else if (this.scrollPos == this.bufferPx * -1) xPos -= this.bufferPx
+    // }
 
     this.#layerCursor.scene.clear()
     ctx.save()
