@@ -205,6 +205,7 @@ export default class Timeline {
     this.#layerLabels.setPosition(this.#core.scrollPos, 0)
     this.#layerOverlays.setPosition(this.#core.scrollPos, 0)
     this.#xAxis.draw()
+    this.drawCursorTime()
     // if (this.scrollPos == this.bufferPx) {
     //   this.#xAxis.draw()
     //   this.drawCursorTime()
