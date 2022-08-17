@@ -488,10 +488,7 @@ export default class MainPane {
 
   draw() {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
-    if (this.scrollPos == this.bufferPx) {
-      this.#chartGrid.draw("x")
-      console.log(`this.#chartGrid.draw("x")`)
-    }
+    this.#chartGrid.draw("x")
     this.#viewport.render();
     this.#Time.draw()
   }

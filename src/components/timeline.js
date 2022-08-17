@@ -143,11 +143,8 @@ export default class Timeline {
     const controller = new InputController(canvas);
 
     this.on("main_mousemove", (e) => { this.drawCursorTime(e) })
-<<<<<<< HEAD
-=======
     // this.on("chart_pan", (e) => { this.drawCursorTime(e, true) })
     // this.on("chart_panDone", (e) => { this.drawCursorTime(e, true) })
->>>>>>> renderFix3
   }
 
   on(topic, handler, context) {
@@ -207,18 +204,8 @@ export default class Timeline {
     this.#layerCursor.setPosition(this.#core.scrollPos, 0)
     this.#layerLabels.setPosition(this.#core.scrollPos, 0)
     this.#layerOverlays.setPosition(this.#core.scrollPos, 0)
-<<<<<<< HEAD
-    // if (this.scrollPos == this.bufferPx * -1) {
-      this.#xAxis.draw()
-      this.drawCursorTime()
-=======
     this.#xAxis.draw()
     this.drawCursorTime()
-    // if (this.scrollPos == this.bufferPx) {
-    //   this.#xAxis.draw()
-    //   this.drawCursorTime()
->>>>>>> renderFix3
-    // }
     this.#viewport.render()
   }
 
@@ -226,18 +213,11 @@ export default class Timeline {
     const ctx = this.#layerCursor.scene.context
     const rect = this.#elViewport.getBoundingClientRect()
     const x = this.#core.mousePos.x - rect.left
-<<<<<<< HEAD
-=======
     let timestamp = this.xPos2Time(x),
         date = new Date(timestamp),
         opts = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
         dateTimeStr = date.toLocaleDateString('en-GB', opts),
->>>>>>> renderFix3
 
-    let timestamp = this.xPos2Time(x),
-    date = new Date(timestamp),
-    opts = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
-    dateTimeStr = date.toLocaleDateString('en-GB', opts),
 
     options = {
       fontSize: XAxisStyle.FONTSIZE * 1.05,
@@ -254,10 +234,6 @@ export default class Timeline {
     xPos = x + this.bufferPx, //+ this.#xAxis.scrollOffsetPx;
     o = this.scrollPos % this.candleW;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> renderFix3
     // if (!drag){
       xPos = this.#xAxis.xPosSnap2CandlePos(xPos)
       xPos = xPos - Math.round(txtW * 0.5) - this.scrollPos - this.bufferPx
