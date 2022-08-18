@@ -560,48 +560,18 @@ constructor (mediator, options={}) {
     if (scrollPos < this.bufferPx * -1) {
       scrollPos = 0
       offset = this.rangeScrollOffset * -1
+      this.offsetRange(offset)
     }
     else if (scrollPos > 0) {
       scrollPos = this.bufferPx * -1
       offset = this.rangeScrollOffset
+      this.offsetRange(offset)
     }
 
     this.#scrollPos = scrollPos
+  }
 
-    // dist = pos[4]
-
-    // offset = Math.floor(dist / this.candleW)
-
-    // if (this.candleW < 3) {
-    //   this.#smoothScrollOffset = 0
-    //   offset = Math.sign(dist) * 6
-    // }
-    // else if (this.candleW < 6) {
-    //   this.#smoothScrollOffset = 0
-    //   offset = Math.sign(dist) * 2
-    // }
-    // else if (this.candleW == Math.abs(dist)) {
-    //   this.#smoothScrollOffset = 0
-    //   offset = Math.sign(dist)
-    // }
-    // else {
-    //   this.#smoothScrollOffset += Math.round(dist % this.candleW)
-  
-    //   if (this.#smoothScrollOffset < 0) {
-    //     this.#smoothScrollOffset = Math.round(this.candleW - 1)
-    //     offset = -1
-    //   }
-    //   else if (this.#smoothScrollOffset > this.candleW - 1) {
-    //     this.#smoothScrollOffset = 0
-    //     offset = 1
-    //   }
-    //   else {
-    //     this.emit("smoothscroll", this.#smoothScrollOffset)
-    //     return
-    //   }
-    // }
-
-    // const offset = Math.floor(dist / this.candleW)
+  offsetRange(offset) {
     let start = this.range.indexStart - offset,
         end = this.range.indexEnd - offset;
 

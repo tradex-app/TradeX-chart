@@ -201,9 +201,9 @@ export default class Timeline {
   }
 
   draw() {
-    this.#layerCursor.setPosition(this.#core.scrollPos, 0)
-    this.#layerLabels.setPosition(this.#core.scrollPos, 0)
-    this.#layerOverlays.setPosition(this.#core.scrollPos, 0)
+    this.#layerCursor.setPosition(this.scrollPos, 0)
+    this.#layerLabels.setPosition(this.scrollPos, 0)
+    this.#layerOverlays.setPosition(this.scrollPos, 0)
     this.#xAxis.draw()
     this.drawCursorTime()
     this.#viewport.render()

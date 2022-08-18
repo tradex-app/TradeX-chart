@@ -38,6 +38,18 @@ export default
             // console.log('transition action for "xAxis_scale" in "idle" state')
           },
         },
+        offChart_mouseDown: {
+          target: 'offChart_mouseDown',
+          action: (stateMachine, data) => {
+            // console.log('transition action for "xAxis_scale" in "idle" state')
+          },
+        },
+        offChart_mouseUp: {
+          target: 'offChart_mouseUp',
+          action: (stateMachine, data) => {
+            // console.log('transition action for "xAxis_scale" in "idle" state')
+          },
+        },
       }
     },
     chart_pan: {
@@ -78,12 +90,44 @@ export default
           action: (stateMachine, data) => {
             // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_zoom"`)
             const range = stateMachine.context.origin.range
-            stateMachine.context.origin.draw(range)
+            stateMachine.context.origin.zoomRange()
           },
         },
       }
     },
     xAxis_scale: {
+      onEnter(stateMachine, data) {
+        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      },
+      onExit(stateMachine, data) {
+        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      },
+      on: {
+        Idle: {
+          target: 'idle',
+          action: (stateMachine, data) => {
+            // console.log('transition action for "onIdle" in "XScale" state')
+          },
+        },
+      }
+    },
+    offChart_mouseDown: {
+      onEnter(stateMachine, data) {
+        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      },
+      onExit(stateMachine, data) {
+        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      },
+      on: {
+        Idle: {
+          target: 'idle',
+          action: (stateMachine, data) => {
+            // console.log('transition action for "onIdle" in "XScale" state')
+          },
+        },
+      }
+    },
+    offChart_mouseUp: {
       onEnter(stateMachine, data) {
         // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },

@@ -44,6 +44,7 @@ function internals() {
   data.rangeStart = ["range.indexStart: ", new Date(tx.range.value(tx.indexStart)[0])]
   data.rangeEnd = ["range.indexEnd: ", new Date(tx.range.value(tx.indexEnd)[0])]
   data.scrollPos = ["scrollPos:", chart.scrollPos]
+  data.bufferPx = ["bufferPx:", chart.bufferPx]
   data.gradsTimeSpan = ["grads.timeSpan: ", tx.xAxisGrads.timeSpan]
   data.gradsUnits = ["grads.units: ", JSON.stringify(tx.xAxisGrads.units)]
   data.gradsMajor = ["grads.major: ", tx.xAxisGrads.majorTick]

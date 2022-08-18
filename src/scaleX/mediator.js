@@ -23,7 +23,7 @@ export default class Mediator {
     const target = Object.getOwnPropertyNames(modClass.prototype)
     const intersection = required.filter(x => target.includes(x));
 
-    // // Check that module has required properties
+    // Check that module has required properties
     // const propertiesToTest = ["name","shortName","mediator","options"];
     // const hasProperties = (propertiesToTest.every(function(x) { return x in modClass })) 
 
@@ -40,7 +40,7 @@ export default class Mediator {
     this.valid = 
       // has required methods?
       (required.length === intersection.length)
-      // // has required properties?
+      // has required properties?
       // && hasProperties 
       // has a valid class name?
       && (name !== null)

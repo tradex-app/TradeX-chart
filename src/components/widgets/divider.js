@@ -93,6 +93,10 @@ export default class Divider{
     this.#controller.on("drag", this.onDividerDrag.bind(this));
     // drag event complete
     this.#controller.on("enddrag", this.onDividerDragDone.bind(this));
+    // down event / click
+    this.#controller.on("mousedown", this.onMouseDown.bind(this));
+    // out event / click
+    this.#controller.on("mouseup", this.onMouseUp.bind(this));
   }
 
   on(topic, handler, context) {
@@ -141,6 +145,18 @@ export default class Divider{
     }
     this.emit("divider_dragDone", dragEvent)
     console.log("Divider drag done")
+  }
+
+  onMouseDown(e) {
+    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.emit(`${this.ID}_mousedown`, this.#cursorPos)
+    this.emit(`divider_mousedown`,{id: this.id, e: e, pos: this.#cursorPos})
+  }
+
+  onMouseUp(e) {
+    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.emit(`${this.ID}_mouseup`, this.#cursorPos)
+    this.emit(`divider_mouseup`,{id: this.id, e: e, pos: this.#cursorPos})
   }
 
   mount() {

@@ -102,7 +102,7 @@ export default class MainPane {
   get config() { return this.#core.config }
   get buffer() { return this.#buffer }
   get bufferPx() { return this.getBufferPx() }
-  get scrollPos() { this.#core.scrollPos }
+  get scrollPos() { return this.#core.scrollPos }
 
 
   init(options) {
@@ -182,7 +182,7 @@ export default class MainPane {
 
 
   eventsListen() {
-    // // Give Main focus so it can receive keyboard input
+    // Give Main focus so it can receive keyboard input
     this.#elMain.tabIndex = 0
     this.#elMain.focus()
 
@@ -222,7 +222,7 @@ export default class MainPane {
 
   onMouseWheel(e) {
     e.domEvent.preventDefault()
-    
+
     const direction = Math.sign(e.wheeldelta)
     const range = this.range
     const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length)
@@ -482,14 +482,14 @@ export default class MainPane {
   }
 
   initXGrid() {
-    this.#layerGrid.setPosition(this.#core.scrollPos, 0)
+    this.#layerGrid.setPosition(this.scrollPos, 0)
     this.#chartGrid.draw("x")
     this.#viewport.render();
     this.#Time.draw()
   }
 
   draw() {
-    this.#layerGrid.setPosition(this.#core.scrollPos, 0)
+    this.#layerGrid.setPosition(this.scrollPos, 0)
     this.#chartGrid.draw("x")
     this.#viewport.render();
     this.#Time.draw()
