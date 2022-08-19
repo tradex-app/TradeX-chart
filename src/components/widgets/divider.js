@@ -58,7 +58,7 @@ export default class Divider{
   }
 
   get el() { return this.#elDivider }
-  get id() { return this.#id }
+  get ID() { return this.#id }
   get offChart() { return this.#offChart }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elDivider) }
@@ -89,13 +89,9 @@ export default class Divider{
     this.#controller = new InputController(this.#elDivider);
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
     this.#controller.on("mouseout", this.onMouseOut.bind(this))
-    // drag event
     this.#controller.on("drag", this.onDividerDrag.bind(this));
-    // drag event complete
     this.#controller.on("enddrag", this.onDividerDragDone.bind(this));
-    // down event / click
     this.#controller.on("mousedown", this.onMouseDown.bind(this));
-    // out event / click
     this.#controller.on("mouseup", this.onMouseUp.bind(this));
   }
 
@@ -150,13 +146,13 @@ export default class Divider{
   onMouseDown(e) {
     this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
     this.emit(`${this.ID}_mousedown`, this.#cursorPos)
-    this.emit(`divider_mousedown`,{id: this.id, e: e, pos: this.#cursorPos})
+    this.emit(`divider_mousedown`,{id: this.ID, e: e, pos: this.#cursorPos, ofChart: this.offChart})
   }
 
   onMouseUp(e) {
     this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
     this.emit(`${this.ID}_mouseup`, this.#cursorPos)
-    this.emit(`divider_mouseup`,{id: this.id, e: e, pos: this.#cursorPos})
+    this.emit(`divider_mouseup`,{id: this.ID, e: e, pos: this.#cursorPos, ofChart: this.offChart})
   }
 
   mount() {

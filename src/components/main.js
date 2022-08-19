@@ -188,20 +188,17 @@ export default class MainPane {
 
     // create controller and use 'on' method to receive input events 
     this.#controller = new InputController(this.#elMain);
-    // mouse wheel event
     this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
-    // move event
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    // drag event
     this.#controller.on("drag", this.onChartDrag.bind(this));
-    // drag event complete
     this.#controller.on("enddrag", this.onChartDragDone.bind(this));
-    // keyboard events
     this.#controller.on("keydown", this.onChartKeyDown.bind(this))
     this.#controller.on("keyup", this.onChartKeyUp.bind(this))
 
     // listen/subscribe/watch for parent notifications
     this.on("resize", (dimensions) => this.onResize.bind(this))
+    this.on("divider_mousedown", this.onDividerMousedown.bind(this))
+
   }
 
   on(topic, handler, context) {
@@ -301,6 +298,9 @@ export default class MainPane {
     this.draw()
   }
 
+  onDividerMousedown(e) {
+    console.log(e)
+  }
 
 
   mount(el) {

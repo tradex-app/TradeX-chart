@@ -198,20 +198,13 @@ export default class OffChart {
   eventsListen() {
     // create controller and use 'on' method to receive input events 
     this.#controller = new InputController(this.#elOffChart);
-    // move event
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    // enter event
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
-    // out event
     this.#controller.on("mouseout", this.onMouseOut.bind(this));
-    // down event / click
-    this.#controller.on("mousedown", this.onMouseDown.bind(this));
-    // out event / click
-    this.#controller.on("mouseup", this.onMouseUp.bind(this));
 
     // listen/subscribe/watch for parent notifications
-    this.on("resize", (dimensions) => this.onResize.bind(this))
-    this.on("main_mousemove", (pos) => this.updateLegends(pos))
+    this.on("resize", this.onResize.bind(this))
+    this.on("main_mousemove", this.updateLegends.bind(this))
   }
 
   on(topic, handler, context) {
@@ -250,13 +243,15 @@ export default class OffChart {
   }
 // do we need these?
   onMouseDown(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
-    this.emit(`${this.ID}_mousedown`, this.#cursorPos)
+    // this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    // this.emit(`${this.ID}_mousedown`, this.#cursorPos)
+    console.log(`${this.ID}_mousedown`)
   }
 // do we need these?
   onMouseUp(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
-    this.emit(`${this.ID}_mouseup`, this.#cursorPos)
+    // this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    // this.emit(`${this.ID}_mouseup`, this.#cursorPos)
+    console.log(`${this.ID}_mouseup`)
   }
 
   mount(el) {

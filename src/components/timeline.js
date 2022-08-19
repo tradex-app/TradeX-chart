@@ -217,32 +217,21 @@ export default class Timeline {
         date = new Date(timestamp),
         opts = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
         dateTimeStr = date.toLocaleDateString('en-GB', opts),
-
-
-    options = {
-      fontSize: XAxisStyle.FONTSIZE * 1.05,
-      fontWeight: XAxisStyle.FONTWEIGHT,
-      fontFamily: XAxisStyle.FONTFAMILY,
-      txtCol: XAxisStyle.COLOUR_CURSOR,
-      bakCol: XAxisStyle.COLOUR_CURSOR_BG,
-      paddingTop: 5,
-      paddingBottom: 3,
-      paddingLeft: 4,
-      paddingRight: 4
-    },
-    txtW = getTextRectWidth(ctx, dateTimeStr, options),
-    xPos = x + this.bufferPx, //+ this.#xAxis.scrollOffsetPx;
-    o = this.scrollPos % this.candleW;
-
-    // if (!drag){
-      xPos = this.#xAxis.xPosSnap2CandlePos(xPos)
-      xPos = xPos - Math.round(txtW * 0.5) - this.scrollPos - this.bufferPx
-    // }
-    // else {
-    //   xPos = xPos - Math.round(txtW * 0.5) - this.scrollPos - this.bufferPx
-    //   if (this.scrollPos == (this.bufferPx - 1) * -1) this.#xAxis.xPosSnap2CandlePos(xPos) //xPos += this.bufferPx
-    //   // else if (this.scrollPos == this.bufferPx * -1) xPos -= this.bufferPx
-    // }
+        options = {
+          fontSize: XAxisStyle.FONTSIZE * 1.05,
+          fontWeight: XAxisStyle.FONTWEIGHT,
+          fontFamily: XAxisStyle.FONTFAMILY,
+          txtCol: XAxisStyle.COLOUR_CURSOR,
+          bakCol: XAxisStyle.COLOUR_CURSOR_BG,
+          paddingTop: 5,
+          paddingBottom: 3,
+          paddingLeft: 4,
+          paddingRight: 4
+        },
+        txtW = getTextRectWidth(ctx, dateTimeStr, options),
+        xPos = x + this.bufferPx;
+        xPos = this.#xAxis.xPosSnap2CandlePos(xPos)
+        xPos = xPos - Math.round(txtW * 0.5) - this.scrollPos - this.bufferPx
 
     this.#layerCursor.scene.clear()
     ctx.save()
