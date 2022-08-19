@@ -69,6 +69,9 @@ export default class Divider{
   }
 
   start() {
+    // set mouse pointer
+    this.setCursor("n-resize")
+
     // set up event listeners
     this.eventsListen()
   }
@@ -162,6 +165,10 @@ export default class Divider{
       this.#elDividers.lastElementChild.insertAdjacentHTML("afterend", this.defaultNode())
 
     this.#elDivider = DOM.findBySelector(`#${this.#id}`)
+  }
+
+  setCursor(cursor) {
+    this.#elDivider.style.cursor = cursor
   }
 
   static defaultNode() {

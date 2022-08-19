@@ -175,6 +175,9 @@ export default class OffChart {
     this.createViewport()
     // draw the chart - grid, candles, volume
     this.draw(this.range)
+
+    // set mouse pointer
+    this.setCursor("crosshair")
   
     // set up event listeners
     this.eventsListen()
@@ -293,6 +296,10 @@ export default class OffChart {
 
   setTheme(theme) {
     this.#theme = theme
+  }
+
+  setCursor(cursor) {
+    this.#elOffChart.style.cursor = cursor
   }
 
   defaultNode() {

@@ -8,6 +8,8 @@ export default
   states: {
     idle: {
       onEnter(stateMachine, data) {
+        stateMachine.context.origin.setCursor("crosshair")
+
         // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
       },
       onExit(stateMachine, data) {
@@ -17,6 +19,8 @@ export default
         chart_pan: {
           target: 'chart_pan',
           action: (stateMachine, data) => {
+            stateMachine.context.origin.setCursor("grab")
+
             // console.log('transition action for "chart_pan" in "idle" state')
           },
         },

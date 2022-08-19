@@ -195,10 +195,12 @@ export default class MainPane {
     this.#controller.on("keydown", this.onChartKeyDown.bind(this))
     this.#controller.on("keyup", this.onChartKeyUp.bind(this))
 
+    this.#controller.on("mouseup", this.onMouseUp.bind(this))
+
     // listen/subscribe/watch for parent notifications
     this.on("resize", (dimensions) => this.onResize.bind(this))
-    this.on("divider_mousedown", this.onDividerMousedown.bind(this))
-
+    this.on("divider_mousedown", this.onDividerMouseDown.bind(this))
+    this.on("divider_mouseup", this.onDividerMouseUp.bind(this))
   }
 
   on(topic, handler, context) {
@@ -250,6 +252,7 @@ export default class MainPane {
     ]
     this.emit("chart_pan", this.#cursorPos)
     this.draw()
+    console.log("what a drag!")
   }
 
   onChartDragDone(e) {
@@ -260,6 +263,7 @@ export default class MainPane {
     ]
     this.emit("chart_panDone", this.#cursorPos)
     this.draw()
+    console.log("drag done")
   }
 
   onChartKeyDown(e) {
@@ -298,10 +302,17 @@ export default class MainPane {
     this.draw()
   }
 
-  onDividerMousedown(e) {
+  onMouseUp(e) {
+    console.log("Main Pane: mouse up")
+  }
+
+  onDividerMouseDown(e) {
     console.log(e)
   }
 
+  onDividerMouseUp(e) {
+    console.log(e)
+  }
 
   mount(el) {
     el.innerHTML = this.defaultNode()

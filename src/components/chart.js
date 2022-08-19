@@ -210,6 +210,9 @@ export default class Chart {
     // draw the chart - grid, candles, volume
     this.draw(this.range)
 
+    // set mouse pointer
+    this.setCursor("crosshair")
+
     // set up event listeners
     this.eventsListen()
 
