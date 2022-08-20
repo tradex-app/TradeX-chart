@@ -2,18 +2,23 @@
 // dragable divider to resize off chart indicators
 
 import DOM from "../../utils/DOM"
-import { CLASS_DIVIDERS } from "../../definitions/core"
-import { InputController, Keys } from "../../input/controller"
+import {
+  CLASS_DIVIDERS
+} from "../../definitions/core"
+import {
+  InputController,
+  Keys
+} from "../../input/controller"
 
 
-export default class Divider{
+export default class Divider {
 
   #id
   #widgets
   #offChart
   #mediator
   #core
-  
+
   #elDividers
   #elDivider
   #elOffChart
@@ -88,7 +93,7 @@ export default class Divider{
   }
 
   eventsListen() {
-    // create controller and use 'on' method to receive input events 
+    // create controller and use 'on' method to receive input events
     this.#controller = new InputController(this.#elDivider);
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
     this.#controller.on("mouseout", this.onMouseOut.bind(this))
@@ -121,7 +126,7 @@ export default class Divider{
 
   onDividerDrag(e) {
     this.#cursorPos = [
-      Math.floor(e.position.x), Math.floor(e.position.y), 
+      Math.floor(e.position.x), Math.floor(e.position.y),
       e.dragstart.x, e.dragstart.y,
       e.movement.x, e.movement.y
     ]
@@ -130,11 +135,14 @@ export default class Divider{
       cursorPos: this.#cursorPos
     }
     this.emit("divider_drag", dragEvent)
+    this.updateDividerPos(this.#cursorPos)
+
+    console.log("Divider drag")
   }
 
   onDividerDragDone(e) {
     this.#cursorPos = [
-      Math.floor(e.position.x), Math.floor(e.position.y), 
+      Math.floor(e.position.x), Math.floor(e.position.y),
       e.dragstart.x, e.dragstart.y,
       e.movement.x, e.movement.y
     ]
@@ -143,23 +151,34 @@ export default class Divider{
       cursorPos: this.#cursorPos
     }
     this.emit("divider_dragDone", dragEvent)
+
     console.log("Divider drag done")
   }
 
   onMouseDown(e) {
     this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
     this.emit(`${this.ID}_mousedown`, this.#cursorPos)
-    this.emit(`divider_mousedown`,{id: this.ID, e: e, pos: this.#cursorPos, ofChart: this.offChart})
+    this.emit(`divider_mousedown`, {
+      id: this.ID,
+      e: e,
+      pos: this.#cursorPos,
+      ofChart: this.offChart
+    })
   }
 
   onMouseUp(e) {
     this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
     this.emit(`${this.ID}_mouseup`, this.#cursorPos)
-    this.emit(`divider_mouseup`,{id: this.ID, e: e, pos: this.#cursorPos, ofChart: this.offChart})
+    this.emit(`divider_mouseup`, {
+      id: this.ID,
+      e: e,
+      pos: this.#cursorPos,
+      ofChart: this.offChart
+    })
   }
 
   mount() {
-    if (this.#elDividers.lastElementChild == null) 
+    if (this.#elDividers.lastElementChild == null)
       this.#elDividers.innerHTML = this.dividerNode()
     else
       this.#elDividers.lastElementChild.insertAdjacentHTML("afterend", this.defaultNode())
@@ -175,21 +194,26 @@ export default class Divider{
     const dividersStyle = `position: absolute;`
 
     const node = `
-      <div class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
-    `
+        <div class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
+        `
     return node
   }
 
   dividerNode() {
-    let top =  this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top,
-        width = this.#core.MainPane.rowsW,
-        left = this.#core.toolsW; 
-    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: 5px; background: #FFFFFF00;`
+    let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top,
+      width = this.#core.MainPane.rowsW,
+      left = this.#core.toolsW;
+    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: 10px; background: #FFFFFF00;`
 
     const node = `
-      <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
-    `
+        <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
+        `
     return node
   }
 
+  updateDividerPos(pos) {
+    // let dividerY = this.#elDivider.getBoundingClientRect().top,
+
+    // this.#elDivider.style.top += Math.sign(pos[5])
+  }
 }
