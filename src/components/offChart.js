@@ -119,6 +119,10 @@ export default class OffChart {
   get scrollPos() { return this.#core.scrollPos }
   get bufferPx() { return this.#core.bufferPx }
   get Divider() { return this.#Divider }
+  get width() { return this.#elOffChart.clientWidth }
+  set width(w) { this.setWidth(w) } 
+  get height() { return this.#elOffChart.clientHeight }
+  set height(h) { this.setHeight(h) }
 
   init(options) {
 
@@ -278,13 +282,17 @@ export default class OffChart {
   }
 
   setWidth(w) {
-    this.#elOffChart.style.width = w
-    this.#elViewport.style.width = w - this.#elScale.clientWidth
+    if (!isNumber(w)) w = this.width || this.#parent.width
+
+    this.#elOffChart.style.width = `${w}px`
+    this.#elViewport.style.width = `${w - this.#elScale.clientWidth}px`
   }
 
   setHeight(h) {
-    this.#elOffChart.style.height = h
-    this.#elScale.style.height = h
+    if (!isNumber(h)) h = this.height || this.#parent.height
+
+    this.#elOffChart.style.height = `${h}px`
+    this.#elScale.style.height = `${h}px`
     this.#Scale.setDimensions({w: null, h: h})
   }
 

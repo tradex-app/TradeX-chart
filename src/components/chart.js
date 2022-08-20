@@ -318,13 +318,17 @@ export default class Chart {
   }
 
   setWidth(w) {
-    this.#elChart.style.width = w
-    this.#elViewport.style.width = w - this.#elScale.clientWidth
+    if (!isNumber(w)) w = this.width || this.#parent.width
+
+    this.#elChart.style.width = `${w}px`
+    this.#elViewport.style.width = `${w - this.#elScale.clientWidth}px`
   }
 
   setHeight(h) {
-    this.#elChart.style.height = h
-    this.#elScale.style.height = h
+    if (!isNumber(h)) h = this.height || this.#parent.height
+
+    this.#elChart.style.height = `${h}px`
+    this.#elScale.style.height = `${h}px`
     this.#Scale.setDimensions({w: null, h: h})
   }
 

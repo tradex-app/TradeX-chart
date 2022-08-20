@@ -551,7 +551,10 @@ export default class MainPane {
     console.log(prev)
     console.log(active)
 
-    // active.draw(undefined, true)
-    // prev.draw(undefined, true)
+    active.height = active.height - pos[5]
+    prev.height = prev.height + pos[5]
+
+    active.draw(undefined, true)
+    prev.draw(undefined, true)
   }
 }
