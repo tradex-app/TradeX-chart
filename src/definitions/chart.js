@@ -87,3 +87,4 @@ export const BUFFERSIZE = 20  // %
 
 export const ROWMINHEIGHT = 50 // px
 export const OFFCHARTDEFAULTHEIGHT = 30 // %
+export const DIVIDERHEIGHT = 8 // px

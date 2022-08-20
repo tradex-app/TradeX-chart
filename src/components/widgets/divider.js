@@ -6,9 +6,13 @@ import {
   CLASS_DIVIDERS
 } from "../../definitions/core"
 import {
+  DIVIDERHEIGHT
+} from "../../definitions/chart"
+import {
   InputController,
   Keys
 } from "../../input/controller"
+import { isNumber } from "../../utils/typeChecks"
 
 
 export default class Divider {
@@ -65,6 +69,7 @@ export default class Divider {
   get el() { return this.#elDivider }
   get ID() { return this.#id }
   get offChart() { return this.#offChart }
+  get config() { return this.#core.config }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elDivider) }
 
@@ -202,8 +207,10 @@ export default class Divider {
   dividerNode() {
     let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top,
       width = this.#core.MainPane.rowsW,
+      height = (isNumber(this.config.dividerHeight)) ? 
+        this.config.dividerHeight : DIVIDERHEIGHT,
       left = this.#core.toolsW;
-    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: 10px; background: #FFFFFF00;`
+    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: #FFFFFF00;`
 
     const node = `
   <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
