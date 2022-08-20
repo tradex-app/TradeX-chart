@@ -478,7 +478,7 @@ export default class Chart {
     return indicators
   }
 
-  draw(range, update=false) {
+  draw(range=this.range, update=false) {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
     this.#layerVolume.setPosition(this.#core.scrollPos, 0)
     this.#layerCandles.setPosition(this.#core.scrollPos, 0)

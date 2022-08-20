@@ -135,7 +135,7 @@ export default class Divider {
       cursorPos: this.#cursorPos
     }
     this.emit("divider_drag", dragEvent)
-    this.updateDividerPos(this.#cursorPos)
+    // this.updateDividerPos(this.#cursorPos)
 
     console.log("Divider drag")
   }
@@ -162,7 +162,7 @@ export default class Divider {
       id: this.ID,
       e: e,
       pos: this.#cursorPos,
-      ofChart: this.offChart
+      offChart: this.offChart
     })
   }
 
@@ -173,7 +173,7 @@ export default class Divider {
       id: this.ID,
       e: e,
       pos: this.#cursorPos,
-      ofChart: this.offChart
+      offChart: this.offChart
     })
   }
 
@@ -194,8 +194,8 @@ export default class Divider {
     const dividersStyle = `position: absolute;`
 
     const node = `
-        <div class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
-        `
+  <div class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
+  `
     return node
   }
 
@@ -206,8 +206,8 @@ export default class Divider {
     const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: 10px; background: #FFFFFF00;`
 
     const node = `
-        <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
-        `
+  <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
+  `
     return node
   }
 

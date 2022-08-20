@@ -393,7 +393,7 @@ export default class OffChart {
     this.#viewport.addLayer(this.#layersIndicator)
   }
 
-  draw(range, update=false) {
+  draw(range=this.range, update=false) {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
     this.#layersIndicator.setPosition(this.#core.scrollPos, 0)
 

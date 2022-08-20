@@ -69,11 +69,7 @@ export const TIMEINCS = {
   // [MINUTE]: {max: [, ], min: [, ]},
 }
 
-
-
-
 export const TIMEUNITS = ['s','m','h','d','w','M','y']
-
 
 export const PRICEDIGITS = 6
 
@@ -88,3 +84,6 @@ export const MINCANDLES = 20
 export const MAXCANDLES = 4096
 export const MAXGRADSPER = 100
 export const BUFFERSIZE = 20  // %
+
+export const ROWMINHEIGHT = 50 // px
+export const OFFCHARTDEFAULTHEIGHT = 30 // %
