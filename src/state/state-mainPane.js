@@ -93,6 +93,12 @@ export default
           action: (stateMachine, data) => {
             console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "ilde"`)
           },
+        },
+        divider_mouseup: {
+          target: "idle",
+          action: (stateMachine, data) => {
+            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "ilde"`)
+          },
         }
       }
     },

@@ -1,6 +1,9 @@
 // chart-grid.js
 
 import { GridStyle } from "../../definitions/style"
+import { BUFFERSIZE } from "../../definitions/chart"
+
+
 export default class chartGrid {
 
   #target
@@ -8,6 +11,7 @@ export default class chartGrid {
   #config
   #xAxis
   #yAxis
+  #core
 
   constructor(target, xAxis, yAxis, config) {
 
@@ -16,6 +20,7 @@ export default class chartGrid {
     this.#config = config
     this.#xAxis = xAxis
     this.#yAxis = yAxis
+    this.#core = xAxis.mediator.api.core
     this.#config.axes = config.axes || "both"
   }
 
@@ -55,6 +60,8 @@ export default class chartGrid {
   }
 
   resize(width=this.#scene.width, height=this.#scene.height) {
+    // const buffer = this.#core.config.buffer || BUFFERSIZE
+    // width = Math.round(width * ((100 + buffer) * 0.01))
     this.#scene.setSize(width, height)
     this.draw()
   }

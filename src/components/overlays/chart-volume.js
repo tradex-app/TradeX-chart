@@ -2,6 +2,7 @@
 
 import VolumeBar from "../primitives/volume";
 import { round } from "../../utils/number";
+import { BUFFERSIZE } from "../../definitions/chart"
 
 export default class chartVolume extends VolumeBar {
 
@@ -58,6 +59,8 @@ export default class chartVolume extends VolumeBar {
   }
 
   resize(width=this.#scene.width, height=this.#scene.height) {
+    // const buffer = this.#core.config.buffer || BUFFERSIZE
+    // width = Math.round(width * ((100 + buffer) * 0.01))
     this.#scene.setSize(width, height)
     this.draw()
   }

@@ -4,6 +4,8 @@ import Candle from "../primitives/candle";
 import { CandleStyle } from "../../definitions/style"
 import { round } from "../../utils/number";
 import { getTextRectWidth } from "../../utils/canvas";
+import { BUFFERSIZE } from "../../definitions/chart"
+
 
 export default class chartCandles extends Candle {
 
@@ -65,6 +67,8 @@ export default class chartCandles extends Candle {
   }
 
   resize(width=this.#scene.width, height=this.#scene.height) {
+    // const buffer = this.#core.config.buffer || BUFFERSIZE
+    // width = Math.round(width * ((100 + buffer) * 0.01))
     this.#scene.setSize(width, height)
     this.draw()
   }

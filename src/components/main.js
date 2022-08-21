@@ -543,6 +543,8 @@ export default class MainPane {
       this.#OffCharts.get(offCharts[i]) :
       this.#Chart;
 
+    divider.offChart.Divider.updateDividerPos(pos)
+
     let activeH = active.height - pos[5]
     active.resize(undefined, activeH)
 

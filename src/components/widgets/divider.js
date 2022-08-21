@@ -219,8 +219,8 @@ export default class Divider {
   }
 
   updateDividerPos(pos) {
-    // let dividerY = this.#elDivider.getBoundingClientRect().top,
-
-    // this.#elDivider.style.top += Math.sign(pos[5])
+    let dividerY = this.#elDivider.offsetTop;
+        dividerY += pos[5]
+    this.#elDivider.style.top = `${dividerY}px`
   }
 }
