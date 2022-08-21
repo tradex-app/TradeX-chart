@@ -297,7 +297,7 @@ export default class OffChart {
   }
 
   setDimensions(dim) {
-    // this.#viewport.setSize(dim.w - this.#elScale.clientWidth, dim.h)
+    this.#viewport.setSize(dim.w - this.#elScale.clientWidth, dim.h)
     this.setWidth(dim.w)
     this.setHeight(dim.h)
   }
@@ -445,6 +445,19 @@ export default class OffChart {
   zoomRange(pos) {
     // draw the chart - grid, candles, volume
     this.draw(this.range, true)
+  }
+
+  resize(width=this.width, height=this.height) {
+    this.setDimensions({w: width, h: height})
+
+    // this.#overlayCursor.resize(width, height)
+    // adjust width for scroll buffer
+    const buffer = this.config.buffer || BUFFERSIZE
+          width = Math.round(width * ((100 + buffer) * 0.01))
+    this.#overlayGrid.resize(width, height)
+    // this.#overlayIndicator.resize(width, height)
+
+    this.draw(undefined, true)
   }
 
 }

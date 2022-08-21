@@ -16,7 +16,6 @@ export default class chartGrid {
     this.#config = config
     this.#xAxis = xAxis
     this.#yAxis = yAxis
-
     this.#config.axes = config.axes || "both"
   }
 
@@ -53,6 +52,11 @@ export default class chartGrid {
     }
 
     ctx.restore();
+  }
+
+  resize(width=this.#scene.width, height=this.#scene.height) {
+    this.#scene.setSize(width, height)
+    this.draw()
   }
 }
 

@@ -10,6 +10,7 @@ export default class chartVolume extends VolumeBar {
   #config
   #xAxis
   #yAxis
+  #core
 
   constructor(target, xAxis, yAxis, config) {
 
@@ -19,10 +20,11 @@ export default class chartVolume extends VolumeBar {
     this.#scene = target.scene
     this.#config = config
     this.#xAxis = xAxis
+    this.#core = xAxis.mediator.api.core
     this.#config.maxVolumeH = config?.maxVolumeH || 100
   }
 
-  draw(range) {
+  draw(range=this.#core.range) {
     this.#scene.clear()
 
     const data = range.data
@@ -53,6 +55,11 @@ export default class chartVolume extends VolumeBar {
       i--
       volume.x = volume.x + volume.w
     }
+  }
+
+  resize(width=this.#scene.width, height=this.#scene.height) {
+    this.#scene.setSize(width, height)
+    this.draw()
   }
 
 }

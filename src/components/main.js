@@ -535,11 +535,6 @@ export default class MainPane {
   }
 
   resizeRowPair(divider, pos) {
-    /**
-    console.log(divider)
-    console.log(pos)
-    console.log(this.#OffCharts)
-*/
     let active = divider.offChart
     let ID = active.ID
     let offCharts = Object.keys(this.#OffCharts)
@@ -548,13 +543,11 @@ export default class MainPane {
       this.#OffCharts.get(offCharts[i]) :
       this.#Chart;
 
-    console.log(prev)
-    console.log(active)
+    let activeH = active.height - pos[5]
+    active.resize(undefined, activeH)
 
-    active.height = active.height - pos[5]
-    prev.height = prev.height + pos[5]
-
-    active.draw(undefined, true)
-    prev.draw(undefined, true)
+    let prevH  = prev.height + pos[5]
+    prev.resize(undefined, prevH)
   }
+
 }

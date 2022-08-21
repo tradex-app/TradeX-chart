@@ -12,6 +12,7 @@ export default class chartCandles extends Candle {
   #config
   #xAxis
   #yAxis
+  #core
 
   constructor(target, xAxis, yAxis, config) {
 
@@ -22,11 +23,12 @@ export default class chartCandles extends Candle {
     this.#config = config
     this.#xAxis = xAxis
     this.#yAxis = yAxis
+    this.#core = xAxis.mediator.api.core
   }
 
   get target() { return this.#target }
 
-  draw(range) {
+  draw(range=this.#core.range) {
     this.#scene.clear()
 
     const render = (this.#config.CandleType === "AREA") ?
@@ -60,6 +62,11 @@ export default class chartCandles extends Candle {
     }
 
     if (this.#config.CandleType === "AREA") super.areaRender()
+  }
+
+  resize(width=this.#scene.width, height=this.#scene.height) {
+    this.#scene.setSize(width, height)
+    this.draw()
   }
 
 }

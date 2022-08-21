@@ -228,7 +228,7 @@ export default class Chart {
     this.#controller.removeEventListener("mouseout", this.onMouseOut);
 
     this.off("resizeChart", this.onResize)
-    this.off("main_mousemove", this.onResize)
+    this.off("main_mousemove", this.onMouseMove)
   }
 
 
@@ -571,5 +571,20 @@ export default class Chart {
     this.draw(this.range, true)
 
     this.emit("chart_zoomDone")
+  }
+
+  resize(width=this.width, height=this.height) {
+    this.setDimensions({w: width, h: height})
+
+    // this.#chartCursor.resize(width, height)
+    // adjust width for scroll buffer
+    const buffer = this.config.buffer || BUFFERSIZE
+          width = Math.round(width * ((100 + buffer) * 0.01))
+    this.#chartGrid.resize(width, height)
+    this.#chartVolume.resize(width, height)
+    this.#chartCandles.resize(width, height)
+    // chartIndicators .resize(width, height)
+
+    this.draw(undefined, true)
   }
 }
