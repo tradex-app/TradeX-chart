@@ -14,6 +14,7 @@ export default class StateMachine {
   #mediator
   #status = "stopped"
   #event
+  #actions
   #statuses = ["await", "idle", "running", "stopped"]
 
   constructor(config, mediator) {
@@ -21,6 +22,7 @@ export default class StateMachine {
     this.#config = config
     this.#state = config.initial
     this.#context = config.context
+    this.#actions = config.actions
     this.#mediator = mediator
 
     if (!StateMachine.validateConfig) return false
@@ -35,6 +37,7 @@ export default class StateMachine {
   get mediator() { return this.#mediator }
   get status() { return this.#status }
   get event() { return this.#event }
+  get actions() { return this.#actions }
 
   notify(event, data) {
     this.#event = event

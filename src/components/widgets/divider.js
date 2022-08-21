@@ -122,7 +122,6 @@ export default class Divider {
 
   onMouseEnter() {
     this.#elDivider.style.background = "#888888C0"
-    console.log("Divider mouse enter")
   }
 
   onMouseOut() {
@@ -140,9 +139,6 @@ export default class Divider {
       cursorPos: this.#cursorPos
     }
     this.emit("divider_drag", dragEvent)
-    // this.updateDividerPos(this.#cursorPos)
-
-    console.log("Divider drag")
   }
 
   onDividerDragDone(e) {
@@ -156,8 +152,6 @@ export default class Divider {
       cursorPos: this.#cursorPos
     }
     this.emit("divider_dragDone", dragEvent)
-
-    console.log("Divider drag done")
   }
 
   onMouseDown(e) {

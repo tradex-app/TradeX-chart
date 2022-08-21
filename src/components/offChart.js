@@ -109,6 +109,7 @@ export default class OffChart {
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elOffChart) }
   get elOffChart() { return this.#elOffChart }
+  get element() { return this.#elOffChart }
   get widgets() { return this.#core.WidgetsG }
   get offChartID() { return this.#offChartID }
   get cursorPos() { return this.#cursorPos }

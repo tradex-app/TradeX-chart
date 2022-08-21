@@ -58,7 +58,7 @@ export default
       },
       on: {
         main_mousemove: {
-          target: "main_mousemove",
+          target: "divider_mousemove",
           action: (stateMachine, data) => {
             console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "ilde"`)
           },
@@ -71,19 +71,19 @@ export default
         }
       }
     },
-    main_mousemove: {
+    divider_mousemove: {
       onEnter(stateMachine, data) {
         console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
 
         let divider = stateMachine.context.divider
-        stateMachine.context.origin.resizeRowPair(divider, data) 
+        stateMachine.context.pair = stateMachine.context.origin.resizeRowPair(divider, data) 
       },
       onExit(stateMachine, data) {
         console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
       },
       on: {
         main_mousemove: {
-          target: "main_mousemove",
+          target: "divider_mousemove",
           action: (stateMachine, data) => {
             console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "ilde"`)
           },
@@ -91,16 +91,31 @@ export default
         main_mouseup: {
           target: "idle",
           action: (stateMachine, data) => {
+            stateMachine.actions.removeProperty(stateMachine)
+
             console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "ilde"`)
           },
         },
         divider_mouseup: {
           target: "idle",
           action: (stateMachine, data) => {
+            stateMachine.actions.removeProperty(stateMachine)
+
             console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "ilde"`)
           },
         }
       }
     },
+  },
+  actions: {
+    removeProperty: (stateMachine) => {
+      let active = stateMachine.context.pair.active,
+      prev = stateMachine.context.pair.prev;
+
+      active.element.style.removeProperty('user-select');
+      // active.element.style.removeProperty('pointer-events');
+      prev.element.style.removeProperty('user-select');
+      // prev.element.style.removeProperty('pointer-events');
+    }
   }
 }

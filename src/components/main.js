@@ -550,6 +550,14 @@ export default class MainPane {
 
     let prevH  = prev.height + pos[5]
     prev.resize(undefined, prevH)
+
+    // TODO: disable drag select and pointer events - https://htmldom.dev/create-resizable-split-views/
+    active.element.style.userSelect = 'none';
+    // active.element.style.pointerEvents = 'none';
+    prev.element.style.userSelect = 'none';
+    // prev.element.style.pointerEvents = 'none';
+
+    return {active, prev}
   }
 
 }

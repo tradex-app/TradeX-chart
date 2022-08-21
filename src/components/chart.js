@@ -116,6 +116,7 @@ export default class Chart {
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
   get options() { return this.#options }
+  get element() { return this.#elChart }
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
   set width(w) { this.setWidth(w) }
