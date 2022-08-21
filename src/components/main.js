@@ -542,16 +542,15 @@ export default class MainPane {
     let prev = (i > 0) ? 
       this.#OffCharts.get(offCharts[i]) :
       this.#Chart;
-
-    divider.offChart.Divider.updateDividerPos(pos)
-
     let activeH = active.height - pos[5]
-    active.resize(undefined, activeH)
-
     let prevH  = prev.height + pos[5]
-    prev.resize(undefined, prevH)
-
-    // TODO: disable drag select and pointer events - https://htmldom.dev/create-resizable-split-views/
+    
+    if ( activeH >= this.#rowMinH
+        && prevH >= this.#rowMinH) {
+          divider.offChart.Divider.updateDividerPos(pos)
+          active.resize(undefined, activeH)
+          prev.resize(undefined, prevH)
+    }
     active.element.style.userSelect = 'none';
     // active.element.style.pointerEvents = 'none';
     prev.element.style.userSelect = 'none';
