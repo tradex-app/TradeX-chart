@@ -59,11 +59,5 @@ export default class chartGrid {
     ctx.restore();
   }
 
-  resize(width=this.#scene.width, height=this.#scene.height) {
-    // const buffer = this.#core.config.buffer || BUFFERSIZE
-    // width = Math.round(width * ((100 + buffer) * 0.01))
-    this.#scene.setSize(width, height)
-    this.draw()
-  }
 }
 

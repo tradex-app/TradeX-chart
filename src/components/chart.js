@@ -574,17 +574,20 @@ export default class Chart {
   }
 
   resize(width=this.width, height=this.height) {
+    // adjust partent element
     this.setDimensions({w: width, h: height})
-
-    // this.#chartCursor.resize(width, height)
+    // adjust layers
+    width -= this.#elScale.clientWidth
+    this.#layerCursor.setSize(width, height)
     // adjust width for scroll buffer
     const buffer = this.config.buffer || BUFFERSIZE
           width = Math.round(width * ((100 + buffer) * 0.01))
-    this.#chartGrid.resize(width, height)
-    this.#chartVolume.resize(width, height)
-    this.#chartCandles.resize(width, height)
-    // chartIndicators .resize(width, height)
-
+    this.#layerGrid.setSize(width, height)
+    this.#layerVolume.setSize(width, height)
+    this.#layerCandles.setSize(width, height)
+    // chartIndicators .setSize(width, height)
+    // render
     this.draw(undefined, true)
+    this.#Scale.resize(width, height)
   }
 }

@@ -66,12 +66,5 @@ export default class chartCandles extends Candle {
     if (this.#config.CandleType === "AREA") super.areaRender()
   }
 
-  resize(width=this.#scene.width, height=this.#scene.height) {
-    // const buffer = this.#core.config.buffer || BUFFERSIZE
-    // width = Math.round(width * ((100 + buffer) * 0.01))
-    this.#scene.setSize(width, height)
-    this.draw()
-  }
-
 }
 

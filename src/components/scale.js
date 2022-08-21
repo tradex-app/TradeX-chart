@@ -280,4 +280,19 @@ export default class ScaleBar {
     return
   }
 
+  resize(width=this.width, height=this.height) {
+    // adjust partent element
+    this.setDimensions({w: width, h: height})
+    // adjust layers
+    width -= this.#elScale.clientWidth
+    this.#layerCursor.setSize(width, height)
+    // adjust width for scroll buffer
+    const buffer = this.config.buffer || BUFFERSIZE
+          width = Math.round(width * ((100 + buffer) * 0.01))
+    this.#layerLabels.setSize(width, height)
+    this.#layerOverlays.setSize(width, height)
+    // render
+    this.draw(undefined, true)
+  }
+
 }
