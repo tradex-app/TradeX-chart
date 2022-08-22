@@ -596,6 +596,13 @@ constructor (mediator, options={}) {
     this.#time.range = this.#range
   }
 
+  resize(width, height) {
+    if (!isNumber(width) && !isNumber(height)) return false
+
+    this.setDimensions(width, height)
+    return true
+  }
+
   notImplemented() {
     if (!this.implemented) {
       let content = `

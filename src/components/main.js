@@ -186,7 +186,7 @@ export default class MainPane {
     this.#controller.removeEventListener("keydown", this.onChartKeyDown)
     this.#controller.removeEventListener("keyup", this.onChartKeyDown)
 
-    this.off("resizeChart", this.onResize)
+    this.off("resize", this.onResize)
   }
 
 
@@ -207,10 +207,6 @@ export default class MainPane {
     this.#controller.on("mouseup", this.onMouseUp.bind(this))
 
     // listen/subscribe/watch for parent notifications
-    this.on("resize", (dimensions) => this.onResize.bind(this))
-    // this.on("divider_mousedown", this.onDividerMouseDown.bind(this))
-    // this.on("divider_mouseup", this.onDividerMouseUp.bind(this))
-    // this.on("divider_drag", this.onDividerDrag.bind(this))
   }
 
   on(topic, handler, context) {
@@ -319,19 +315,7 @@ export default class MainPane {
     }
     this.draw()
   }
-/**
-  onDividerMouseDown(e) {
-    console.log(e)
-  }
 
-  onDividerMouseUp(e) {
-    console.log(e)
-  }
-
-  onDividerDrag(e) {
-    console.log(e)
-  }
-*/
   mount(el) {
     el.innerHTML = this.defaultNode()
   }
@@ -339,24 +323,34 @@ export default class MainPane {
   setWidth(w) {
     const resize = this.rowsW / w
     const rows = this.#elRows.children
+    /*
     for (let row of rows) {
-      row.style.width = row.style.width * resize
+      row.style.width = `${Math.round(row.clientWidth * resize)}px`
     }
-    this.#elRows.style.width = w
+    */
+    this.#elRows.style.width = `${Math.round(w * resize)}px`
   }
 
   setHeight(h) {
+    const api = this.#mediator.api
     const resize = this.rowsH / (h - api.timeH)
     const rows = this.#elRows.children
+    /*
     for (let row of rows) {
-      row.style.height = row.style.height * resize
+      row.style.height = `${Math.round(row.style.height * resize)}px`
     }
-    this.#elRows.style.height = this.#elRows.style.height * resize
+    */
+    this.#elRows.style.height = `${Math.round(this.#elRows.style.height * resize)}px`
   }
 
   setDimensions(dimensions) {
     this.setWidth(dimensions.mainW)
     this.setHeight(dimensions.mainH)
+
+    const api = this.#mediator.api
+    const resize = this.rowsH / (dimensions.mainH - api.timeH)
+    this.#Chart.resize(dimensions.mainW, Math.round(this.#Chart.height * resize))
+    // this.#chartGrid.resize(dimensions.mainW, Math.round(this.#Chart.height * resize))
 
     dimensions.rowsW = this.rowsW
     dimensions.rowsH = this.rowsH

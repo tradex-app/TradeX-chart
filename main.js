@@ -8,6 +8,7 @@ DOM.findBySelector('#app').innerHTML = `
   <h1>Hello Vite!</h1>
   <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
   -->
+  <a href="#" onclick="window.chart.resize(600, 500)">Resize Chart</a>
   <div id="test" style="float:left;"></div>
   <div id="info" style="float:left;"></div>
 `
@@ -29,6 +30,7 @@ const config = {
   errors: true,
 }
 const chart = Chart.create(mount, config, state )
+window.chart = chart
 chart.start(chart.getModID())
 
 console.log("API: id:", chart.id)

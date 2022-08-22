@@ -26,6 +26,12 @@ export default
             // console.log('offChart: transition from "idle" to "addIndicator" state')
           },
         },
+        resize: {
+          target: 'resize',
+          action: (stateMachine, data) => {
+            // console.log('offChart: transition from "idle" to "addIndicator" state')
+          },
+        },
       }
     },
     addIndicator: {
@@ -106,6 +112,27 @@ export default
         }
       }
     },
+    resize: {
+      onEnter(stateMachine, data) {
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+        stateMachine.context.origin.setDimensions(data)
+      },
+      onExit(stateMachine, data) {
+        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      },
+      on: {
+        always: {
+          target: 'idle',
+          condition: 'resizeDone',
+          action: (stateMachine, data) => {
+            // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "idle"`)
+          },
+        },
+      },
+    }
+  },
+  guards: {
+    resizeDone: (context, event, { cond }) => { return true }
   },
   actions: {
     removeProperty: (stateMachine) => {
