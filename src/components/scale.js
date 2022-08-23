@@ -178,7 +178,7 @@ export default class ScaleBar {
   }
 
   setHeight(h) {
-    this.#elScale.style.height = h
+    this.#elScale.style.height = `${h}px`
   }
 
   setDimensions(dim) {

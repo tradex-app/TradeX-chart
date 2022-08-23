@@ -107,7 +107,8 @@ export default class Timeline {
   }
 
   setWidth(w) {
-    this.#elTime.style.width = w
+    this.#elTime.style.width = `${w}px`
+    this.#elViewport.style.width = w
   }
 
   setDimensions(dim) {

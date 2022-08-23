@@ -49,6 +49,7 @@ export default class MainPane {
   #elTime
   #elChart
   #elOffCharts = []
+  #elGrid
   #elCanvas
   #elViewport
 
@@ -121,6 +122,7 @@ export default class MainPane {
     this.#elRows = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`)
     this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
     this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
+    this.#elGrid = DOM.findBySelector(`#${api.id} .${CLASS_GRID}`)
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_GRID} .viewport`)
 
     api.parent = this
@@ -340,16 +342,18 @@ export default class MainPane {
   setDimensions(dimensions) {
     let chartW = dimensions.mainW // this.#Chart.width
     let chartH = Math.round(this.#Chart.height * dimensions.resizeH) - this.time.height
-    let width = this.width - this.#Chart.scale.width
+    let width = chartW - this.#Chart.scale.width
 
     this.setWidth(dimensions.mainW)
     this.setHeight(dimensions.mainH)
 
+    this.#core.scrollPos = 0
 
     this.#Time.setDimensions({w: width})
     this.#Time.draw()
 
-    this.#viewport.setSize(width, this.height)
+    this.#elGrid.style.height = `${chartH}px`
+    this.#viewport.setSize(width, this.height - this.#Chart.scale.width)
 
     const buffer = this.buffer
     width = Math.round(width * ((100 + buffer) * 0.01))

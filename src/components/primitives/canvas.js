@@ -301,9 +301,9 @@ class Scene {
     this.width = width;
     this.height = height;
     this.canvas.width = width * CEL.pixelRatio;
-    this.canvas.style.width = width + "px";
+    this.canvas.style.width = `${width}px`
     this.canvas.height = height * CEL.pixelRatio;
-    this.canvas.style.height = height + "px";
+    this.canvas.style.height = `${height}px`
 
     if (this.contextType === "2d" && CEL.pixelRatio !== 1) {
       this.context.scale(CEL.pixelRatio, CEL.pixelRatio);
@@ -422,9 +422,9 @@ class Hit {
     this.width = width;
     this.height = height;
     this.canvas.width = width * CEL.pixelRatio;
-    this.canvas.style.width = width + "px";
+    this.canvas.style.width = `${width}px`
     this.canvas.height = height * CEL.pixelRatio;
-    this.canvas.style.height = height + "px";
+    this.canvas.style.height = `${height}px`
     return this;
   }
   /**

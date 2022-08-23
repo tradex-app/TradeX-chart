@@ -220,7 +220,7 @@ constructor (mediator, options={}) {
   get candleW() { return this.Timeline.candleW }
   get buffer() { return this.MainPane.buffer }
   get bufferPx() { return this.MainPane.bufferPx }
-  set scrollPos(pos) { this.setScrollPos() }
+  set scrollPos(pos) { this.setScrollPos(pos) }
   get scrollPos() { return this.#scrollPos }
   get smoothScrollOffset() { return 0 } //{ return this.#smoothScrollOffset }
   get rangeScrollOffset() { return Math.floor(this.bufferPx / this.candleW) }
@@ -458,7 +458,7 @@ constructor (mediator, options={}) {
     else 
       this.#chartW = this.#el.parentElement.width
 
-    this.#elTXChart.style.width = this.#chartW+"px"
+    this.#elTXChart.style.width = `${this.#chartW}px`
     this.#elUtils.style.width = `${this.#chartW}px`
     this.#elBody.style.width = `${this.#chartW}px`
     this.#elMain.style.width = `${this.#chartW - this.toolsW}px`
@@ -470,7 +470,7 @@ constructor (mediator, options={}) {
     else 
       this.#chartH = this.#el.parentElement.clientHeight
       
-    this.#elTXChart.style.height = this.#chartH+"px"
+    this.#elTXChart.style.height = `${this.#chartH}px`
     this.#elBody.style.height = `${this.#chartH - this.utilsH}px`
     this.#elMain.style.height= `${this.#chartH - this.utilsH}px`
   }
@@ -499,7 +499,8 @@ constructor (mediator, options={}) {
   }
 
   setScrollPos(pos) {
-    if (isNumber(pos) && pos && pos < this.bufferPx) this.#scrollPos = pos
+    pos = Math.round(pos)
+    if (isNumber(pos) && pos <= 0 && pos >= this.bufferPx * -1) this.#scrollPos = pos
     else {
       this.emit("Error", `setScrollPos: not a valid value`)
     }
