@@ -330,6 +330,7 @@ export default class Chart {
 
     this.#elChart.style.height = `${h}px`
     this.#elScale.style.height = `${h}px`
+    this.#elViewport.style.height = `${h}px`
     this.#Scale.setDimensions({w: null, h: h})
   }
 

@@ -294,6 +294,7 @@ export default class OffChart {
 
     this.#elOffChart.style.height = `${h}px`
     this.#elScale.style.height = `${h}px`
+    this.#elViewport.style.height = `${h}px`
     this.#Scale.setDimensions({w: null, h: h})
   }
 

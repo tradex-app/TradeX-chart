@@ -343,21 +343,22 @@ export default class MainPane {
     let chartW = dimensions.mainW // this.#Chart.width
     let chartH = Math.round(this.#Chart.height * dimensions.resizeH) - this.time.height
     let width = chartW - this.#Chart.scale.width
+    let height = dimensions.mainH - this.#Time.height
 
     this.setWidth(dimensions.mainW)
     this.setHeight(dimensions.mainH)
 
-    this.#core.scrollPos = 0
+    this.#core.scrollPos = -1
 
-    this.#Time.setDimensions({w: width})
+    this.#Time.setDimensions({w: dimensions.mainW})
     this.#Time.draw()
 
-    this.#elGrid.style.height = `${chartH}px`
-    this.#viewport.setSize(width, this.height - this.#Chart.scale.width)
+    this.#elGrid.style.height = `${height}px`
+    this.#viewport.setSize(width, height)
 
     const buffer = this.buffer
     width = Math.round(width * ((100 + buffer) * 0.01))
-    this.#layerGrid.setSize(width, dimensions.mainH - this.time.height)
+    this.#layerGrid.setSize(width, height)
     this.#chartGrid.draw("x")
     this.#viewport.render();
 
