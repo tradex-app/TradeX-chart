@@ -185,8 +185,6 @@ export default class MainPane {
     this.#controller.removeEventListener("enddrag", this.onChartDragDone);
     this.#controller.removeEventListener("keydown", this.onChartKeyDown)
     this.#controller.removeEventListener("keyup", this.onChartKeyDown)
-
-    this.off("resize", this.onResize)
   }
 
 
@@ -219,10 +217,6 @@ export default class MainPane {
 
   emit(topic, data) {
     this.#mediator.emit(topic, data)
-  }
-
-  onResize(dimensions) {
-    this.setDimensions(dimensions)
   }
 
   onMouseWheel(e) {
@@ -344,13 +338,32 @@ export default class MainPane {
   }
 
   setDimensions(dimensions) {
+    let chartW = dimensions.mainW // this.#Chart.width
+    let chartH = Math.round(this.#Chart.height * dimensions.resizeH) - this.time.height
+    let width = this.width - this.#Chart.scale.width
+
     this.setWidth(dimensions.mainW)
     this.setHeight(dimensions.mainH)
 
-    const api = this.#mediator.api
-    const resize = this.rowsH / (dimensions.mainH - api.timeH)
-    this.#Chart.resize(dimensions.mainW, Math.round(this.#Chart.height * resize))
-    // this.#chartGrid.resize(dimensions.mainW, Math.round(this.#Chart.height * resize))
+
+    this.#Time.setDimensions({w: width})
+    this.#Time.draw()
+
+    this.#viewport.setSize(width, this.height)
+
+    const buffer = this.buffer
+    width = Math.round(width * ((100 + buffer) * 0.01))
+    this.#layerGrid.setSize(width, dimensions.mainH - this.time.height)
+    this.#chartGrid.draw("x")
+    this.#viewport.render();
+
+    this.#Chart.resize(chartW, chartH)
+
+    this.#OffCharts.forEach((offChart, key) => {
+      chartH = Math.round(offChart.height * dimensions.resizeH) //- this.time.height
+      offChart.resize(chartW, chartH)
+      offChart.Divider.setDividerPos()
+    })
 
     dimensions.rowsW = this.rowsW
     dimensions.rowsH = this.rowsH

@@ -217,4 +217,9 @@ export default class Divider {
         dividerY += pos[5]
     this.#elDivider.style.top = `${dividerY}px`
   }
+
+  setDividerPos() {
+    let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top;
+    this.#elDivider.style.top = `${top}px`
+  }
 }

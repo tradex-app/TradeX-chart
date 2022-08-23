@@ -476,14 +476,20 @@ constructor (mediator, options={}) {
   }
 
   setDimensions(w, h) {
+    let width = this.width
+    let height = this.height
     this.setWidth(w)
     this.setHeight(h)
 
     this.emit("resize", {
       width: this.width,
       height: this.height,
-      mainW: this.#chartW - this.toolsW,
-      mainH: this.#chartH - this.utilsH,
+      mainW: this.#MainPane.width,
+      mainH: this.#MainPane.height,
+      resizeW: w / width,
+      resizeH: h / height,
+      resizeWDiff: w - width,
+      resizeHDiff: h - height
     })
   }
 
