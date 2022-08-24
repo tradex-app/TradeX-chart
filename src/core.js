@@ -610,6 +610,21 @@ constructor (mediator, options={}) {
     return true
   }
 
+  /**
+   * Merge a block of data into the chart state
+   * used for populating a chart with back history
+   */
+  mergeData() {
+
+  }
+
+  /**
+   * Update current candle with a live stream
+   */
+  streamData() {
+    
+  }
+
   notImplemented() {
     if (!this.implemented) {
       let content = `
