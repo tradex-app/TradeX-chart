@@ -66,8 +66,7 @@ export default class xAxis extends Axis {
   get bufferPx() { return this.#core.bufferPx }
 
   calcWidth() {
-    let api = this.#parent.mediator.api
-    return api.width - api.toolsW - api.scaleW
+    return this.#core.Chart.width - this.#core.Chart.scale.width
   }
 
 

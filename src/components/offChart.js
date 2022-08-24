@@ -198,8 +198,7 @@ export default class OffChart {
     this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
     this.#controller.removeEventListener("mouseout", this.onMouseOut);
 
-    this.off("resizeChart", this.onResize)
-    this.off("main_mousemove", this.onResize)
+    this.off("main_mousemove", this.onMouseMove)
   }
 
 
@@ -211,7 +210,6 @@ export default class OffChart {
     this.#controller.on("mouseout", this.onMouseOut.bind(this));
 
     // listen/subscribe/watch for parent notifications
-    this.on("resize", this.onResize.bind(this))
     this.on("main_mousemove", this.updateLegends.bind(this))
   }
 
@@ -225,10 +223,6 @@ export default class OffChart {
 
   emit(topic, data) {
     this.mediator.emit(topic, data)
-  }
-
-  onResize(dimensions) {
-    this.setDimensions(dimensions)
   }
 
   onMouseMove(e) {
@@ -299,9 +293,21 @@ export default class OffChart {
   }
 
   setDimensions(dim) {
-    this.#viewport.setSize(dim.w - this.#elScale.clientWidth, dim.h)
+    const buffer = this.config.buffer || BUFFERSIZE
+    const width = dim.w - this.#elScale.clientWidth
+    const height = dim.h
+    const layerWidth = Math.round(width * ((100 + buffer) * 0.01))
+
+    this.#viewport.setSize(width, dim.h)
+    this.#layerGrid.setSize(layerWidth, height)
+    this.#layersIndicator.setSize(layerWidth, height)
+    this.#layerCursor.setSize(width, height)
+
     this.setWidth(dim.w)
     this.setHeight(dim.h)
+    this.#Scale.resize(dim.w, dim.h)
+
+    this.draw(undefined, true)
   }
 
   setTheme(theme) {
@@ -452,17 +458,6 @@ export default class OffChart {
   resize(width=this.width, height=this.height) {
     // adjust partent element
     this.setDimensions({w: width, h: height})
-    // adjust layers
-    width -= this.#elScale.clientWidth
-    this.#layerCursor.setSize(width, height)
-    // adjust width for scroll buffer
-    const buffer = this.config.buffer || BUFFERSIZE
-          width = Math.round(width * ((100 + buffer) * 0.01))
-    this.#layerGrid.setSize(width, height)
-    this.#layersIndicator.setSize(width, height)
-    // render
-    this.draw(undefined, true)
-    this.#Scale.resize(width, height)
   }
 
 }

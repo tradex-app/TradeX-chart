@@ -251,7 +251,7 @@ export default class MainPane {
 
   onMouseUp(e) {
     this.emit("main_mouseup", e)
-    console.log("Main Pane: mouse up")
+    // console.log("Main Pane: mouse up")
   }
 
   onChartDrag(e) {
@@ -262,7 +262,7 @@ export default class MainPane {
     ]
     this.emit("chart_pan", this.#cursorPos)
     this.draw()
-    console.log("what a drag!")
+    // console.log("what a drag!")
   }
 
   onChartDragDone(e) {
@@ -273,7 +273,7 @@ export default class MainPane {
     ]
     this.emit("chart_panDone", this.#cursorPos)
     this.draw()
-    console.log("drag done")
+    // console.log("drag done")
   }
 
   onChartKeyDown(e) {
@@ -281,12 +281,12 @@ export default class MainPane {
 
     switch (e.keyCode) {
       case Keys.Left:
-        console.log("keydown: cursor Left")
+        // console.log("keydown: cursor Left")
 
         this.emit("chart_pan", [0,null,step,null,step * -1])
         break;
       case Keys.Right:
-        console.log("keydown: cursor Right")
+        // console.log("keydown: cursor Right")
 
         this.emit("chart_pan", [step,null,0,null,step])
         break;
@@ -299,12 +299,12 @@ export default class MainPane {
 
     switch (e.keyCode) {
       case Keys.Left:
-        console.log("keyup: cursor Left")
+        // console.log("keyup: cursor Left")
         
         this.emit("chart_panDone", [0,null,step,null,step * -1])
         break;
       case Keys.Right:
-        console.log("keyup: cursor Right")
+        // console.log("keyup: cursor Right")
 
         this.emit("chart_panDone", [step,null,0,null,step])
         break;
@@ -340,10 +340,12 @@ export default class MainPane {
   }
 
   setDimensions(dimensions) {
+
+    let height = dimensions.mainH - this.#Time.height
+    let oldHeight = this.height
     let chartW = dimensions.mainW // this.#Chart.width
     let chartH = Math.round(this.#Chart.height * dimensions.resizeH) - this.time.height
     let width = chartW - this.#Chart.scale.width
-    let height = dimensions.mainH - this.#Time.height
 
     this.setWidth(dimensions.mainW)
     this.setHeight(dimensions.mainH)
@@ -354,6 +356,9 @@ export default class MainPane {
     this.#Time.draw()
 
     this.#elGrid.style.height = `${height}px`
+    this.#elGrid.style.width = `${width}px`
+    this.#elViewport.style.height = `${height}px`
+    this.#elViewport.style.width = `${width}px`
     this.#viewport.setSize(width, height)
 
     const buffer = this.buffer
@@ -369,6 +374,8 @@ export default class MainPane {
       offChart.resize(chartW, chartH)
       offChart.Divider.setDividerPos()
     })
+
+    this.#core.range
 
     dimensions.rowsW = this.rowsW
     dimensions.rowsH = this.rowsH

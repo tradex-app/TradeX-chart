@@ -72,6 +72,7 @@ export default class Divider {
   get config() { return this.#core.config }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elDivider) }
+  get height() { return this.#elDivider.clientHeight }
 
   init() {
     // insert element
@@ -204,6 +205,8 @@ export default class Divider {
       height = (isNumber(this.config.dividerHeight)) ? 
         this.config.dividerHeight : DIVIDERHEIGHT,
       left = this.#core.toolsW;
+      top -= height / 2
+
     const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: #FFFFFF00;`
 
     const node = `
@@ -220,6 +223,7 @@ export default class Divider {
 
   setDividerPos() {
     let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top;
+        top = top - (this.height / 2)
     this.#elDivider.style.top = `${top}px`
   }
 }
