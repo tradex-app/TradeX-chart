@@ -120,7 +120,7 @@ export default class Timeline {
     this.#viewport.setSize(width, this.height)
     this.#layerLabels.setSize(layerWidth, height)
     this.#layerOverlays.setSize(layerWidth, height)
-    this.#layerCursor.setSize(width, height)
+    this.#layerCursor.setSize(layerWidth, height)
 
     this.setWidth(dim.w)
     this.draw()
