@@ -4,6 +4,8 @@
 
 TradeXChart follows [breaking].[feature].[fix] versioning
 
+[Semantic Versioning](https://semver.org/)
+
 # Configuration
 
 `const chart = Chart.create(mount, config, state )`
