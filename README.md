@@ -1,5 +1,7 @@
 # README
 
+[![Join the chat at https://gitter.im/TradeX-chart/community](https://badges.gitter.im/TradeX-chart/community.svg)](https://gitter.im/TradeX-chart/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## WIP - under heavy development
 
 TradeX-chart is a trade chart written in plain (vanilla) JavaScript with minimal dependencies; use it with any framework or backend.
