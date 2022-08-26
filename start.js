@@ -1,7 +1,7 @@
 // const { Chart } = require("../dist/tradex-chart.es.js")
 // const state = require ('../data/data.json')
-import { Chart } from "../dist/tradex-chart.es.js"
-import state from '../data/data.json'
+import { Chart } from "dist/tradex-chart.es.js"
+import state from 'data/data.json'
 
 const mount = document.getElementById('test')
 const config = {
