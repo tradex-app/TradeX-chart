@@ -1,37 +1,37 @@
 // definitions/chart.js
 
-const SECOND = 1000;
-const MINUTE = SECOND * 60;
-const MINUTE2 = MINUTE * 2
-const MINUTE3 = MINUTE * 3;
-const MINUTE5 = MINUTE * 5;
-const MINUTE10 = MINUTE * 10
-const MINUTE15 = MINUTE * 15;
-const MINUTE30 = MINUTE * 30;
-const HOUR = MINUTE * 60;
-const HOUR1_5 = HOUR * 1.5
-const HOUR3 = HOUR * 3
-const HOUR4 = HOUR * 4;
-const HOUR6 = HOUR * 6
-const HOUR12 = HOUR * 12;
-const DAY = HOUR * 24;
-const DAY2 = DAY * 2
-const DAY3 = DAY * 3
-const DAY5 = DAY * 5
-const DAY7 = DAY * 7
-const DAY10 = DAY * 10
-const DAY15 = DAY * 15
-const WEEK = DAY * 7;
-const MONTH = WEEK * 4;
-const MONTH2 = MONTH * 2
-const MONTH4 = MONTH * 4
-const MONTH3 = MONTH * 3
-const MONTH6 = MONTH * 6
-const YEAR = DAY * 365;
-const YEAR2 = YEAR * 2
-const YEAR3 = YEAR * 3
-const YEAR5 = YEAR * 5
-const YEAR10 = YEAR * 10
+export const SECOND = 1000;
+export const MINUTE = SECOND * 60;
+export const MINUTE2 = MINUTE * 2
+export const MINUTE3 = MINUTE * 3;
+export const MINUTE5 = MINUTE * 5;
+export const MINUTE10 = MINUTE * 10
+export const MINUTE15 = MINUTE * 15;
+export const MINUTE30 = MINUTE * 30;
+export const HOUR = MINUTE * 60;
+export const HOUR1_5 = HOUR * 1.5
+export const HOUR3 = HOUR * 3
+export const HOUR4 = HOUR * 4;
+export const HOUR6 = HOUR * 6
+export const HOUR12 = HOUR * 12;
+export const DAY = HOUR * 24;
+export const DAY2 = DAY * 2
+export const DAY3 = DAY * 3
+export const DAY5 = DAY * 5
+export const DAY7 = DAY * 7
+export const DAY10 = DAY * 10
+export const DAY15 = DAY * 15
+export const WEEK = DAY * 7;
+export const MONTH = WEEK * 4;
+export const MONTH2 = MONTH * 2
+export const MONTH4 = MONTH * 4
+export const MONTH3 = MONTH * 3
+export const MONTH6 = MONTH * 6
+export const YEAR = DAY * 365;
+export const YEAR2 = YEAR * 2
+export const YEAR3 = YEAR * 3
+export const YEAR5 = YEAR * 5
+export const YEAR10 = YEAR * 10
 
 export const MONTHMAP = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; // Grid time steps
 
@@ -70,6 +70,9 @@ export const TIMEINCS = {
 }
 
 export const TIMEUNITS = ['s','m','h','d','w','M','y']
+
+export const DEFAULT_TIMEFRAME = "1m"
+export const DEFAULT_TIMEFRAMEMS = MINUTE
 
 export const PRICEDIGITS = 6
 

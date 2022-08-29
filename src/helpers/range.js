@@ -3,6 +3,7 @@
 import indicators from "../definitions/indicators"
 import { DAY_MS, ms2Interval, WEEK_MS } from "../utils/time"
 import { LIMITFUTURE, LIMITPAST, MINCANDLES } from "../definitions/chart"
+import { isNumber } from "../utils/typeChecks"
 
 export function getRange( allData, start=0, end=allData.chart.length-1 ) {
   let r = allData
@@ -35,7 +36,7 @@ export function getRange( allData, start=0, end=allData.chart.length-1 ) {
   r = {...r, ...maxMinPriceVol(r.data, r.indexStart, r.indexEnd)}
   r.height = r.priceMax - r.priceMin
   r.volumeHeight = r.volumeMax - r.volumeMin
-  r.scale = (r.Length) / (r.dataLength - 1)
+  r.scale = (r.Length) / (r.dataLength)
   return r
 }
 
@@ -46,6 +47,9 @@ export function inRange(t, range) {
 }
 
 export function rangeValue( range, index ) {
+  // return last value as default
+  if (!isNumber(index)) index = range.data.length - 1
+
   let v = range.data[index]
   if (v !== undefined) return v
   else {

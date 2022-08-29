@@ -3,11 +3,17 @@
 export default class Stream {
 
   #core
+  #data
+  #range
+  #maxUpdate
+  #updateTimer
+
 
   constructor(config) {
     this.#core = config.core
     this.#data = config.core.data
     this.#range = config.core.range
+    this.#maxUpdate = config.core.config.maxCandleUpdate
   }
 
   start() {
@@ -18,6 +24,21 @@ export default class Stream {
   stop() {
 
     this.#core.emit("onStream_Stop")
+  }
+
+  candle() {
+    return this.#range.value()
+  }
+
+  newCandle() {
+    let t = Date.now()
+    // getUTC
+    // calc candle timestamp on the timeframe boundary from current timeframe
+    // this.time.timeFrame
+    // this.time.timeFrameMS
+
+    // create empty / zero entry chart and offChart data
+    this.#range.data[this.#range.data.length] = [t, 0, 0, 0, 0, 0]
   }
 
   set data(d) {

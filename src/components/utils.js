@@ -148,12 +148,14 @@ export default class UtilsBar {
   }
 
   defaultNode() {
-    let utilsBar = ""
+    // let utilsBar = ""
+    let style = `display: inline-block; float: right;`
+    let utilsBar = `<div style="${style}">`
     for (const util of this.#utils) {
       utilsBar += this.iconNode(util)
     }
 
-    return utilsBar
+    return utilsBar + "</div>"
   }
 
   iconNode(util) {

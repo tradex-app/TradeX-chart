@@ -9,6 +9,7 @@ import { validateDeep, validateShallow } from '../helpers/validateData'
 import { mergeDeep } from '../utils/utilities'
 import { detectInterval } from '../helpers/range'
 import { ms2Interval } from '../utils/time'
+import { SECOND, DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS } from '../definitions/chart'
 
 const DEFAULT_STATE = {
   chart: {
@@ -18,8 +19,8 @@ const DEFAULT_STATE = {
     data: [],
     settings: {},
     row: {},
-    tf: "",
-    tfms: 0
+    tf: DEFAULT_TIMEFRAME,
+    tfms: DEFAULT_TIMEFRAMEMS
   },
   onchart: [],
   offchart: [],
@@ -83,10 +84,15 @@ export default class State {
     else 
       state.chart.data = validateShallow(state.chart.data, isCrypto) ? state.chart.data : []
 
-    if (typeof state.chart?.tf !== "number" || deepValidate)
-      state.chart.tfms = detectInterval(state.chart.data)
+    if (!isNumber(state.chart?.tf) || deepValidate) {
+      let tfms = detectInterval(state.chart.data)
+      // this SHOULD never happen, 
+      // but there are limits to fixing broken data sent to chart
+      if (tfms < SECOND) tfms = DEFAULT_TIMEFRAMEMS
+      state.chart.tfms = tfms
+    }
     
-    if (typeof state.chart?.tfms !== "string" || deepValidate)
+    if (!isString(state.chart?.tfms) || deepValidate)
       state.chart.tf = ms2Interval(state.chart.tfms)
 
     if (!('onchart' in state)) {
