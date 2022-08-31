@@ -74,6 +74,7 @@ export default class Chart {
   #layerGrid
   #layerVolume
   #layerCandles
+  #layerStream
   #layerCursor
   #layersOnChart
   
@@ -397,13 +398,7 @@ export default class Chart {
 
   createViewport() {
 
-    const buffer = this.config.buffer || BUFFERSIZE
-    const width = this.#elViewport.clientWidth
-    const height = this.#options.chartH || this.#parent.rowsH - 1
-    const layerConfig = { 
-      width: Math.round(width * ((100 + buffer) * 0.01)), 
-      height: height
-    }
+    const {width, height, layerConfig} = this.viewportConfig()
 
     // create viewport
     this.#viewport = new CEL.Viewport({
@@ -416,8 +411,8 @@ export default class Chart {
     // create layers - grid, volume, candles
     this.#layerGrid = new CEL.Layer(layerConfig);
     this.#layerVolume = new CEL.Layer(layerConfig);
-    this.#layersOnChart = this.layersOnChart(layerConfig)
     this.#layerCandles = new CEL.Layer(layerConfig);
+    this.#layersOnChart = this.layersOnChart(layerConfig)
     this.#layerCursor = new CEL.Layer();
 
     // add layers
@@ -491,6 +486,23 @@ export default class Chart {
           this.config)
     } 
     return indicators
+  }
+
+  viewportConfig() {
+    const buffer = this.config.buffer || BUFFERSIZE
+    const width = this.#elViewport.clientWidth
+    const height = this.#options.chartH || this.#parent.rowsH - 1
+    const layerConfig = { 
+      width: Math.round(width * ((100 + buffer) * 0.01)), 
+      height: height
+    }
+    return {width, height, layerConfig}
+  }
+
+  layerStream() {
+    const {width, height, layerConfig} = this.viewportConfig()
+    this.#layerStream = new CEL.Layer(layerConfig);
+    this.#viewport.addLayer(this.#layerStream)
   }
 
   draw(range=this.range, update=false) {

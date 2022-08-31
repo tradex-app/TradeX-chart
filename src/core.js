@@ -13,6 +13,7 @@ import State from './state'
 import { getRange } from "./helpers/range"
 import Indicators from './definitions/indicators'
 import * as Time from './utils/time'
+import Stream from './helpers/stream'
 
 
 import {
@@ -133,6 +134,8 @@ export default class TradeXchart {
   #scrollPos = 0
   #smoothScrollOffset = 0
   #panBeginPos = [null, null, null, null]
+
+  #stream
 
 
 /**
@@ -358,6 +361,9 @@ constructor (mediator, options={}) {
     this.ToolsBar.start()
     this.MainPane.start()
     this.WidgetsG.start()
+
+    if (isObject(this.#config.stream)) this.#stream = new Stream(this)
+
   }
 
   end() {

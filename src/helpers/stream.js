@@ -9,11 +9,11 @@ export default class Stream {
   #updateTimer
 
 
-  constructor(config) {
-    this.#core = config.core
-    this.#data = config.core.data
-    this.#range = config.core.range
-    this.#maxUpdate = config.core.config.maxCandleUpdate
+  constructor(core) {
+    this.#core = core
+    this.#data = core.data
+    this.#range = core.range
+    this.#maxUpdate = core.config.maxCandleUpdate
   }
 
   start() {

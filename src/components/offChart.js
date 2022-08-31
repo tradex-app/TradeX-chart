@@ -66,6 +66,7 @@ export default class OffChart {
   #layerGrid
   #layerCursor
   #layersIndicator
+  #layerStream
 
   #overlayGrid
   #overlayIndicator
@@ -337,15 +338,14 @@ export default class OffChart {
 
 // -----------------------
 
+  // setOffChartStyle(chartStyle) {}
+  // getOffChartStyle(chartStyle) {}
+  // setOffChartTheme(chartTheme) {}
+  // getOffChartTheme(chartTheme) {}
+
   createViewport() {
 
-    const buffer = this.config.buffer || BUFFERSIZE
-    const width = this.#elViewport.clientWidth
-    const height = this.#options.rowH || this.#parent.rowsH - 1
-    const layerConfig = { 
-      width: Math.round(width * ((100 + buffer) * 0.01)), 
-      height: height
-    }
+    const {width, height, layerConfig} = this.viewportConfig()
 
     // create viewport
     this.#viewport = new CEL.Viewport({
@@ -407,6 +407,23 @@ export default class OffChart {
     //   this.#viewport.addLayer(this.#layersIndicator[i])
     // }
     this.#viewport.addLayer(this.#layersIndicator)
+  }
+
+  viewportConfig() {
+    const buffer = this.config.buffer || BUFFERSIZE
+    const width = this.#elViewport.clientWidth
+    const height = this.#options.chartH || this.#parent.rowsH - 1
+    const layerConfig = { 
+      width: Math.round(width * ((100 + buffer) * 0.01)), 
+      height: height
+    }
+    return {width, height, layerConfig}
+  }
+
+  layerStream() {
+    const {width, height, layerConfig} = this.viewportConfig()
+    this.#layerStream = new CEL.Layer(layerConfig);
+    this.#viewport.addLayer(this.#layerStream)
   }
 
   draw(range=this.range, update=false) {
