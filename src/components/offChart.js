@@ -11,6 +11,14 @@ import overlayCursor from "./overlays/chart-cursor"
 import stateMachineConfig from "../state/state-offChart"
 import { uid } from "../utils/utilities"
 import { InputController, Keys } from "../input/controller"
+import {
+  STREAM_ERROR,
+  STREAM_NONE,
+  STREAM_LISTENING, 
+  STREAM_STOPPED,
+  STREAM_NEWVALUE,
+  STREAM_UPDATE
+} from "../definitions/core"
 
 import {
   NAME,
@@ -60,6 +68,7 @@ export default class OffChart {
   #overlay
   #offChartID
   #Divider
+  #Stream
 
   #viewport
   #editport
@@ -212,6 +221,9 @@ export default class OffChart {
 
     // listen/subscribe/watch for parent notifications
     this.on("main_mousemove", this.updateLegends.bind(this))
+    this.on(STREAM_LISTENING, (stream) => this.onStreamListening(stream))
+    this.on(STREAM_NEWVALUE, (value) => this.onStreamNewValue(value))
+    this.on(STREAM_UPDATE, (value) => this.onStreamUpdate(value))
   }
 
   on(topic, handler, context) {
@@ -248,13 +260,29 @@ export default class OffChart {
   onMouseDown(e) {
     // this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
     // this.emit(`${this.ID}_mousedown`, this.#cursorPos)
-    console.log(`${this.ID}_mousedown`)
+    // console.log(`${this.ID}_mousedown`)
   }
 // do we need these?
   onMouseUp(e) {
     // this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
     // this.emit(`${this.ID}_mouseup`, this.#cursorPos)
-    console.log(`${this.ID}_mouseup`)
+    // console.log(`${this.ID}_mouseup`)
+  }
+
+  onStreamListening(stream) {
+    if (this.#Stream !== stream) {
+      this.#Stream = stream
+      if (this.#layerStream === undefined) this.layerStream()
+    }
+  }
+
+
+  onStreamNewValue(value) {
+
+  }
+
+  onStreamUpdate(value) {
+
   }
 
   mount(el) {

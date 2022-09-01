@@ -34,9 +34,12 @@ import {
   CLASS_ONCHART,
   CLASS_OFFCHART,
   RANGELIMIT,
+  PRICE_PRECISION,
+  VOLUME_PRECISION
 } from './definitions/core'
 
 import { GlobalStyle } from './definitions/style'
+import { precision } from "./utils/number"
 
 const STYLE_TXCHART = "overflow: hidden;"
 const STYLE_UTILS = "border-bottom: 1px solid;"
@@ -136,6 +139,8 @@ export default class TradeXchart {
   #panBeginPos = [null, null, null, null]
 
   #stream
+  #pricePrecision
+  #volumePrecision
 
 
 /**
@@ -228,6 +233,9 @@ constructor (mediator, options={}) {
   get smoothScrollOffset() { return 0 } //{ return this.#smoothScrollOffset }
   get rangeScrollOffset() { return Math.floor(this.bufferPx / this.candleW) }
   get mousePos() { return this.#mousePos }
+
+  get pricePrecision() { return this.#pricePrecision }
+  get volumePrecision() { return this.#volumePrecision }
 
   /**
    * Create a new TradeXchart instance
@@ -440,6 +448,8 @@ constructor (mediator, options={}) {
       rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
       indicators: (indicators) => this.#indicators = {...Indicators, ...indicators },
       theme: (theme) => this.setTheme(theme),
+      pricePrecision: (precision) => this.setPricePrecision(precision),
+      volumePrecision: (precision) => this.setVolumePrecision(precision),
     }
   }
 
@@ -498,6 +508,28 @@ constructor (mediator, options={}) {
       resizeHDiff: h - height
     })
   }
+
+    /**
+   * Set the price accuracy
+   * @param pricePrecision - Price accuracy
+   */
+     setPricePrecision (pricePrecision) {
+      if (!isNumber(pricePrecision) || pricePrecision < 0) {
+        pricePrecision = PRICE_PRECISION
+      }
+      this.#pricePrecision = pricePrecision
+    }
+
+    /**
+     * Set the volume accuracy
+     * @param volumePrecision - Volume accuracy
+     */
+    setVolumePrecision (volumePrecision) {
+      if (!isNumber(volumePrecision) || volumePrecision < 0) {
+        volumePrecision = VOLUME_PRECISION
+      }
+      this.#volumePrecision = volumePrecision
+    }
 
   setTheme(theme) {
     // TODO: validation

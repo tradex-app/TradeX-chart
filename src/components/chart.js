@@ -16,7 +16,14 @@ import OnChart from "./overlays"
 import stateMachineConfig from "../state/state-chart"
 import { InputController, Keys } from "../input/controller"
 import { VolumeStyle } from "../definitions/style"
-
+import {
+  STREAM_ERROR,
+  STREAM_NONE,
+  STREAM_LISTENING,
+  STREAM_STOPPED,
+  STREAM_NEWVALUE,
+  STREAM_UPDATE
+} from "../definitions/core"
 
 import {
   NAME,
@@ -61,13 +68,12 @@ export default class Chart {
   #Time
   #Legends
   #onChart
+  #Stream
 
   #chartXPadding = 5
   #chartYPadding = 2.5
 
   #yAxisDigits
-  #pricePrecision
-  #volumePrecision
 
   #viewport
   #editport
@@ -245,6 +251,9 @@ export default class Chart {
 
     // listen/subscribe/watch for parent notifications
     this.on("main_mousemove", (pos) => this.updateLegends(pos))
+    this.on(STREAM_LISTENING, (stream) => this.onStreamListening(stream))
+    this.on(STREAM_NEWVALUE, (value) => this.onStreamNewValue(value))
+    this.on(STREAM_UPDATE, (value) => this.onStreamUpdate(value))
   }
 
   on(topic, handler, context) {
@@ -292,6 +301,21 @@ export default class Chart {
     this.#cursorActive = false
     this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
     this.emit(`${this.ID}_mouseout`, this.#cursorPos)
+  }
+
+  onStreamListening(stream) {
+    if (this.#Stream !== stream) {
+      this.#Stream = stream
+      if (this.#layerStream === undefined) this.layerStream()
+    }
+  }
+
+  onStreamNewValue(value) {
+
+  }
+
+  onStreamUpdate(value) {
+
   }
 
   mount(el) {
@@ -528,30 +552,6 @@ export default class Chart {
 
   price2YPos(price) {
     return this.#Scale.yPos(price)
-  }
-
-  /**
-   * Set the price accuracy
-   * @param pricePrecision - Price accuracy
-   */
-  setPriceVolumePrecision (pricePrecision) {
-    if (!isNumber(pricePrecision) || pricePrecision < 0) {
-      this.warning('setPriceVolumePrecision', 'pricePrecision', 'pricePrecision must be a number and greater than zero!!!')
-      return
-    }
-    this.#pricePrecision = pricePrecision
-  }
-
-  /**
-   * Set the volume accuracy
-   * @param volumePrecision - Volume accuracy
-   */
-  setPriceVolumePrecision (volumePrecision) {
-    if (!isNumber(volumePrecision) || volumePrecision < 0) {
-      logWarn('setPriceVolumePrecision', 'volumePrecision', 'volumePrecision must be a number and greater than zero!!!')
-      return
-    }
-    this.#volumePrecision = volumePrecision
   }
 
   updateLegends(pos=this.#cursorPos) {
