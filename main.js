@@ -73,3 +73,23 @@ chart.on("chart_pan", (e) => { infoBox.out(internals()) })
 infoBox.out(internals())
 // test()
 
+let tick = chart.range.value()
+let interval = 1000
+
+function getRandomInt(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function stream() {
+  let percent = getRandomInt(0, 100)
+  let sign = getRandomInt(0, 100) % 2
+  if (sign === 0) percent = percent * -1
+  let price = tick[4] + (tick[4] * (percent / 100))
+  let time = tick[0] + interval
+
+}
+
+const streamTimer = setInterval(stream, interval)
+
+
+

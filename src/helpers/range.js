@@ -21,7 +21,7 @@ export function getRange( allData, start=0, end=allData.chart.length-1 ) {
   start = (start > r.dataLength + LIMITFUTURE - MINCANDLES) ? r.dataLength + LIMITFUTURE - MINCANDLES - 1: start
   end = (end > r.dataLength + LIMITFUTURE) ? r.dataLength + LIMITFUTURE : end
   
-  r.value = (index) =>{ return rangeValue(r, index)}
+  r.value = (index) => { return rangeValue(r, index)}
   r.interval = r.data[1][0] - r.data[0][0]
   r.intervalStr = ms2Interval(r.interval)
   r.indexStart = start

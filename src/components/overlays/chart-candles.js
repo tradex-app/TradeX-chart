@@ -2,10 +2,7 @@
 
 import Candle from "../primitives/candle";
 import { CandleStyle } from "../../definitions/style"
-import { round } from "../../utils/number";
-import { getTextRectWidth } from "../../utils/canvas";
 import { BUFFERSIZE } from "../../definitions/chart"
-
 
 export default class chartCandles extends Candle {
 

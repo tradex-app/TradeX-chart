@@ -10,6 +10,7 @@ import Legends from "./primitives/legend"
 import chartGrid from "./overlays/chart-grid"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
+import chartStreamCandle from "./overlays/chart-streamCandle"
 import chartCursor from "./overlays/chart-cursor"
 import indicator from "./overlays/inidcator"
 import OnChart from "./overlays"
@@ -88,6 +89,7 @@ export default class Chart {
   #chartVolume
   #chartIndicators
   #chartCandles
+  #chartStreamCandle
   #chartCursor
 
   #cursorPos = [0, 0]
@@ -439,6 +441,8 @@ export default class Chart {
     this.#layersOnChart = this.layersOnChart(layerConfig)
     this.#layerCursor = new CEL.Layer();
 
+    if (isObject(this.config.stream)) this.layerStream()
+
     // add layers
     this.#viewport
           .addLayer(this.#layerGrid)
@@ -465,6 +469,14 @@ export default class Chart {
         this.#Time, 
         this.#Scale, 
         this.#theme)
+
+    if (isObject(this.config.stream))
+      this.#chartStreamCandle = 
+        new chartStreamCandles(
+          this.#layerStream, 
+          this.#Time, 
+          this.#Scale, 
+          this.#theme);
 
     // this.#chartIndicators = this.chartIndicators()
 
@@ -524,15 +536,28 @@ export default class Chart {
   }
 
   layerStream() {
-    const {width, height, layerConfig} = this.viewportConfig()
-    this.#layerStream = new CEL.Layer(layerConfig);
-    this.#viewport.addLayer(this.#layerStream)
+    // if the layer and instance were no set from chart config, do it now
+
+    if (!this.#layerStream) {
+      const {width, height, layerConfig} = this.viewportConfig()
+      this.#layerStream = new CEL.Layer(layerConfig);
+      this.#viewport.addLayer(this.#layerStream)
+    }
+    if (!this.#chartStreamCandle) {
+      this.#chartStreamCandle = 
+      new chartStreamCandles(
+        this.#layerStream, 
+        this.#Time, 
+        this.#Scale, 
+        this.#theme)
+    }
   }
 
   draw(range=this.range, update=false) {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
     this.#layerVolume.setPosition(this.#core.scrollPos, 0)
     this.#layerCandles.setPosition(this.#core.scrollPos, 0)
+    if (this.#layerStream)this.#layerStream.setPosition(this.#core.scrollPos, 0)
 
     if (this.scrollPos == this.bufferPx * -1 || 
         this.scrollPos == 0 || 
@@ -544,6 +569,10 @@ export default class Chart {
     }
 
     this.#viewport.render();
+  }
+
+  drawStream(candle) {
+
   }
 
   time2XPos(time) {

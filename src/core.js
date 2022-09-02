@@ -35,7 +35,10 @@ import {
   CLASS_OFFCHART,
   RANGELIMIT,
   PRICE_PRECISION,
-  VOLUME_PRECISION
+  VOLUME_PRECISION,
+  STREAM_LISTENING,
+  STREAM_NEWVALUE,
+  STREAM_UPDATE
 } from './definitions/core'
 
 import { GlobalStyle } from './definitions/style'
@@ -371,7 +374,6 @@ constructor (mediator, options={}) {
     this.WidgetsG.start()
 
     if (isObject(this.#config.stream)) this.#stream = new Stream(this)
-
   }
 
   end() {

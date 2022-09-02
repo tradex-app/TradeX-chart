@@ -53,7 +53,7 @@ export default class Stream {
   }
 
   onUpdate() {
-    this.status = {status: STREAM_UPDATE, data: this.#candle}
+    this.status = {status: STREAM_UPDATE, data: this.candle}
   }
 
   get status() { return this.#status }
@@ -73,15 +73,16 @@ export default class Stream {
     let roundedTime = Math.floor(new Date(data.t) / 60000.0) * 60
     data.t = roundedTime
 
-    if (this.candle[T] !== data.t)
+    if (this.candle[T] !== data.t) {
       this.newCandle(data)
+    }
     else {
       this.updateCandle(data)
       this.status = {status: STREAM_LISTENING}
     }
   }
   get candle() {
-    return this.#range.value()
+    return this.#candle
   }
 
   /**
@@ -91,9 +92,10 @@ export default class Stream {
    * @memberof Stream
    */
   newCandle(data) {
-    // add new entry to chart and offChart data
-    let candle = [data.t, data.p, data.p, data.p, 0, data.q]
-    this.#range.data.push(data)
+    // add old stream candle to state data
+    if (isArray(this.#candle)) this.#range.data.push(this.#candle)
+    // create new stream candle
+    this.#candle = [data.t, data.p, data.p, data.p, 0, data.q]
     this.status = {status: STREAM_NEWVALUE, data: data}
   }
 
@@ -114,8 +116,7 @@ export default class Stream {
     candle[V] = parseFloat((candle[V] + data.s).toFixed(this.#core.volumePrecision))
 
     // update the last candle in the state data
-    this.#range.data[this.#range.dataLength] = candle
+    this.#candle = candle
   }
-
 
 }
