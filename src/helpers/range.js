@@ -134,3 +134,40 @@ export function detectInterval(ohlcv) {
   return min
 }
 
+// FIXME: stuck in endless loop
+export function getTimeIndex(allData, dateStamp) {
+  let r = allData
+  let l = r.data.length - 1
+  let i = Math.floor(l / 2)
+  let idx = false
+  let index
+
+  do {
+    index = i
+    if (r.data[index][0] === dateStamp) idx = index
+    else if (r.data[index][0] > dateStamp) i = (Math.floor(i/2))
+    else if (r.data[index][0] < dateStamp) i = i + Math.round((l - i) / 2)
+
+    if (i >= l) idx = l
+    else if (i <= 0) idx = 0
+  }
+  while (!idx)
+  return idx
+}
+
+export function calcTimeIndex(time, dateStamp) {
+  if (!isNumber(dateStamp)) return false
+
+  let index
+  let timeFrameMS = time.timeFrameMS
+  dateStamp = dateStamp - (dateStamp % timeFrameMS)
+
+  if (dateStamp === time.range.data[0][0])
+    index = 0
+  if (dateStamp < time.range.data[0][0]) 
+    index = ((time.range.data[0][0] - dateStamp) / timeFrameMS) * -1
+  else 
+    index = (dateStamp - time.range.data[0][0]) / timeFrameMS
+
+  return index
+}

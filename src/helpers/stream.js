@@ -37,7 +37,7 @@ export default class Stream {
 
   start() {
     this.status = {status: STREAM_LISTENING}
-    this.#updateTimer = setInterval(onUpdate.bind(this), this.#maxUpdate)
+    this.#updateTimer = setInterval(this.onUpdate.bind(this), this.#maxUpdate)
   }
 
   stop() {
@@ -82,7 +82,8 @@ export default class Stream {
     }
   }
   get candle() {
-    return this.#candle
+    // return this.#candle
+    return this.#range.value()
   }
 
   /**

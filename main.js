@@ -18,6 +18,7 @@ const config = {
   title: "BTC/USDT",
   width: 1000,
   height: 800,
+  rangeStartTS: 1558429200000, // 21/05/2019, 11:00:00
   rangeLimit: 30,
   theme: {
     candleType: "CANDLE_SOLID",
@@ -28,6 +29,7 @@ const config = {
   infos: true,
   warnings: true,
   errors: true,
+  stream: {}
 }
 const chart = Chart.create(mount, config, state )
 window.chart = chart
@@ -73,7 +75,6 @@ chart.on("chart_pan", (e) => { infoBox.out(internals()) })
 infoBox.out(internals())
 // test()
 
-let tick = chart.range.value()
 let interval = 1000
 
 function getRandomInt(min, max) {
@@ -81,15 +82,22 @@ function getRandomInt(min, max) {
 }
 
 function stream() {
-  let percent = getRandomInt(0, 100)
-  let sign = getRandomInt(0, 100) % 2
+  let candle = chart.range.value()
+  let percent = getRandomInt(0, 30)
+  let sign = getRandomInt(0, 10) % 2
   if (sign === 0) percent = percent * -1
-  let price = tick[4] + (tick[4] * (percent / 100))
-  let time = tick[0] + interval
-
+  let price = candle[4] + (candle[4] * (percent / 100))
+  let time = candle[0] + interval
+  let quantity = candle[5] + (candle[5] * (sign / 100))
+  let tick = {t: time, p: price, q: quantity}
+  chart.stream.onTick(tick)
 }
 
-const streamTimer = setInterval(stream, interval)
+if (chart.stream) {
+  chart.stream.start()
+  const streamTimer = setInterval(stream, interval)
+}
+
 
 
 

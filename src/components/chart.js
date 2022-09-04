@@ -472,7 +472,7 @@ export default class Chart {
 
     if (isObject(this.config.stream))
       this.#chartStreamCandle = 
-        new chartStreamCandles(
+        new chartStreamCandle(
           this.#layerStream, 
           this.#Time, 
           this.#Scale, 
@@ -545,7 +545,7 @@ export default class Chart {
     }
     if (!this.#chartStreamCandle) {
       this.#chartStreamCandle = 
-      new chartStreamCandles(
+      new chartStreamCandle(
         this.#layerStream, 
         this.#Time, 
         this.#Scale, 

@@ -10,7 +10,7 @@ import MainPane from './components/main'
 import WidgetsG from './components/widgets'
 
 import State from './state'
-import { getRange } from "./helpers/range"
+import { getRange, calcTimeIndex } from "./helpers/range"
 import Indicators from './definitions/indicators'
 import * as Time from './utils/time'
 import Stream from './helpers/stream'
@@ -83,6 +83,7 @@ export default class TradeXchart {
   #userClasses = []
   #data
   #range
+  #rangeStartTS
   #rangeLimit = RANGELIMIT
   #indicators = Indicators
   #TALib = talib
@@ -217,7 +218,14 @@ constructor (mediator, options={}) {
   get offChart() { return this.#state.data.offchart }
   get onChart() { return this.#state.data.onchart }
   get datasets() { return this.#state.data.datasets }
-
+  get allData() {
+    return {
+      data: this.chartData,
+      onChart: this.onChart,
+      offChart: this.offChart,
+      datasets: this.datasets
+    }
+  }
   get rangeLimit() { return (isNumber(this.#rangeLimit)) ? this.#rangeLimit : RANGELIMIT }
   get range() { return this.#range }
   get time() { return this.#time }
@@ -239,6 +247,10 @@ constructor (mediator, options={}) {
 
   get pricePrecision() { return this.#pricePrecision }
   get volumePrecision() { return this.#volumePrecision }
+
+  get stream() { return this.#stream }
+
+
 
   /**
    * Create a new TradeXchart instance
@@ -302,8 +314,15 @@ constructor (mediator, options={}) {
       }
     }
 
-    const end = this.chartData.length - 1
-    const start = end - this.#rangeLimit
+    // set default range
+    this.setRange()
+    // now set user defined (if any) range
+    const rangeStart = calcTimeIndex(this.#time, this.#rangeStartTS)
+    const end = (rangeStart) ? 
+      rangeStart + this.#rangeLimit :
+      this.chartData.length - 1
+    const start = (rangeStart) ? rangeStart : end - this.#rangeLimit
+    this.#rangeLimit = end - start
     this.setRange(start, end)
 
     // api - functions / methods, calculated properties provided by this module
@@ -447,6 +466,7 @@ constructor (mediator, options={}) {
       infos: (infos) => this.infos = (isBoolean(infos)) ? infos : false,
       warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
+      rangeStartTS: (rangeStartTS) => this.#rangeStartTS = (isNumber(rangeStartTS)) ? rangeStartTS : undefined,
       rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
       indicators: (indicators) => this.#indicators = {...Indicators, ...indicators },
       theme: (theme) => this.setTheme(theme),
@@ -630,14 +650,8 @@ constructor (mediator, options={}) {
    * @param {number} start - index
    * @param {number} end - index
    */
-  setRange(start, end) {
-    const allData = {
-      data: this.chartData,
-      onChart: this.onChart,
-      offChart: this.offChart,
-      datasets: this.datasets
-    }
-    this.#range = getRange(allData, start, end)
+  setRange(start=0, end=this.rangeLimit) {
+    this.#range = getRange(this.allData, start, end)
     this.#range.interval = this.#time.timeFrameMS
     this.#range.intervalStr = this.#time.timeFrame
     this.#time.range = this.#range
