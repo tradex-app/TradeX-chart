@@ -13,6 +13,7 @@ import State from './state'
 import { getRange } from "./helpers/range"
 import Indicators from './definitions/indicators'
 import * as Time from './utils/time'
+import Tool from './tools/tool'
 
 
 import {
@@ -134,6 +135,8 @@ export default class TradeXchart {
   #smoothScrollOffset = 0
   #panBeginPos = [null, null, null, null]
 
+  #tools = Tool
+
 
 /**
  * Creates an instance of TradeXchart.
@@ -239,8 +242,7 @@ constructor (mediator, options={}) {
   static create(container, config={}, state) {
     const cnt = ++TradeXchart.#cnt
 
-    // config.cnt = cnt
-    // config.state = state
+    config.cnt = cnt
     config.modID = `${ID}_${cnt}`
     config.container = container
 
