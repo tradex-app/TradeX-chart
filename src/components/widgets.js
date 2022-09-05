@@ -98,6 +98,7 @@ export default class Widgets {
     this.on("openMenu", this.onOpenMenu.bind(this))
     this.on("closeMenu", this.onCloseMenu.bind(this))
     this.on("offMenu", this.onCloseMenu.bind(this))
+    this.on("menuItemSelected", this.onMenuItemSelected.bind(this))
   }
 
   on(topic, handler, context) {
@@ -125,6 +126,12 @@ export default class Widgets {
     console.log("onCloseMenu:", data)
 
     this.#widgetsInstances[data.menu].close()
+  }
+
+  onMenuItemSelected(e) {
+    // console.log("onMenuItemSelected:",e)
+
+    this.emit(e.evt, e.target)
   }
 
   mount(el) {

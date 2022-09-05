@@ -13,49 +13,34 @@ export default [
     id: "cursor",
     name: "Cursor",
     icon: cursor,
-    event: "tools_cursor",
-    action: (e, mediator) => {
-      console.log("Cursor Selected")
-    },
+    event: "tool_activated",
   },
   {
     id: "line",
     name: "Line",
     icon: line,
-    event: "tools_line",
-    action: (e, mediator) => {
-      console.log("Line tool")
-    },
+    event: "tool_activated",
     class: Line,
     sub: [
       {
         id: "ray",
         name: "Ray",
         icon: line,
-        event: "tools_ray",
-        action: (e, mediator) => {
-          console.log("Ray Selected")
-        },
+        event: "tool_activated",
         class: Line,
       },
       {
         id: "hRay",
         name: "Horizontal Ray",
         icon: line,
-        event: "tools_horizonalRay",
-        action: (e, mediator) => {
-          console.log("Horizontal Ray Selected")
-        },
+        event: "tool_activated",
         class: Line,
       },
       {
         id: "vRay",
         name: "Vertical Ray",
         icon: line,
-        event: "tools_verticalRay",
-        action: (e, mediator) => {
-          console.log("Vertical Ray Selected")
-        },
+        event: "tool_activated",
         class: Line,
       },
     ]
@@ -64,10 +49,7 @@ export default [
     id: "fibonacci",
     name: "Fibonacci",
     icon: fibonacci,
-    event: "tools_fibonacci",
-    action: (e, mediator) => {
-      console.log("Fibonacci tool")
-    },
+    event: "tool_activated",
     class: Fibonacci,
     sub: []
   },
@@ -75,10 +57,7 @@ export default [
     id: "range",
     name: "Range",
     icon: range,
-    event: "tools_range",
-    action: (e, mediator) => {
-      console.log("Range tool")
-    },
+    event: "tool_activated",
     class: Range,
     sub: []
   },
@@ -86,10 +65,7 @@ export default [
     id: "text",
     name: "Text",
     icon: text,
-    event: "tools_text",
-    action: (e, mediator) => {
-      console.log("Text tool")
-    },
+    event: "tool_activated",
     class: Text,
     sub: []
   },
@@ -97,20 +73,14 @@ export default [
     id: "measure",
     name: "Measure",
     icon: measure,
-    event: "tools_measure",
-    action: (e, mediator) => {
-      console.log("Measure tool")
-    },
+    event: "tool_activated",
     class: Measure,
   },
   {
     id: "delete",
     name: "Delete",
     icon: del,
-    event: "tools_delete",
-    action: (e, mediator) => {
-      console.log("Delete tool")
-    },
+    event: "tool_activated",
     class: undefined,
   }
 ]
