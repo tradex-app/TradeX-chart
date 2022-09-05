@@ -13,7 +13,6 @@ import State from './state'
 import { getRange } from "./helpers/range"
 import Indicators from './definitions/indicators'
 import * as Time from './utils/time'
-import Tool from './tools/tool'
 
 
 import {
@@ -134,8 +133,6 @@ export default class TradeXchart {
   #scrollPos = 0
   #smoothScrollOffset = 0
   #panBeginPos = [null, null, null, null]
-
-  #tools = Tool
 
 
 /**

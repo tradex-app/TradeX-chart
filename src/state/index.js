@@ -1,5 +1,5 @@
 // state.js
-// State management for the entire chart component library thingy
+// Data state management for the entire chart component library thingy
 
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 // import Store from './store'

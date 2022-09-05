@@ -125,6 +125,7 @@ export default class Chart {
   get height() { return this.#elChart.clientHeight }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elChart) }
+  get stateMachine() { return this.#mediator.stateMachine }
   set state(s) { this.#core.setState(s) }
   get state() { return this.#core.getState() }
   get data() { return this.#core.chartData }

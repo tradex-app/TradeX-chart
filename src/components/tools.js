@@ -6,6 +6,8 @@ import DOM from "../utils/DOM"
 import { ToolsStyle } from "../definitions/style"
 import { CLASS_TOOLS } from "../definitions/core"
 import tools from "../definitions/tools"
+import Tool from '../tools/tool'
+
 
 export default class ToolsBar {
 

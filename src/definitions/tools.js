@@ -2,6 +2,12 @@
 
 import { cursor, line, fibonacci, range, text, measure, del } from "./icons"
 
+import Fibonacci from "../tools/fibonacci"
+import Line from "../tools/line"
+import Measure from "../tools/measure"
+import Range from "../tools/range"
+import Text from "../tools/text"
+
 export default [
   {
     id: "cursor",
@@ -20,6 +26,7 @@ export default [
     action: (e, mediator) => {
       console.log("Line tool")
     },
+    class: Line,
     sub: [
       {
         id: "ray",
@@ -29,6 +36,7 @@ export default [
         action: (e, mediator) => {
           console.log("Ray Selected")
         },
+        class: Line,
       },
       {
         id: "hRay",
@@ -38,6 +46,7 @@ export default [
         action: (e, mediator) => {
           console.log("Horizontal Ray Selected")
         },
+        class: Line,
       },
       {
         id: "vRay",
@@ -47,6 +56,7 @@ export default [
         action: (e, mediator) => {
           console.log("Vertical Ray Selected")
         },
+        class: Line,
       },
     ]
   },
@@ -58,6 +68,7 @@ export default [
     action: (e, mediator) => {
       console.log("Fibonacci tool")
     },
+    class: Fibonacci,
     sub: []
   },
   {
@@ -68,6 +79,7 @@ export default [
     action: (e, mediator) => {
       console.log("Range tool")
     },
+    class: Range,
     sub: []
   },
   {
@@ -78,6 +90,7 @@ export default [
     action: (e, mediator) => {
       console.log("Text tool")
     },
+    class: Text,
     sub: []
   },
   {
@@ -88,6 +101,7 @@ export default [
     action: (e, mediator) => {
       console.log("Measure tool")
     },
+    class: Measure,
   },
   {
     id: "delete",
@@ -97,5 +111,6 @@ export default [
     action: (e, mediator) => {
       console.log("Delete tool")
     },
+    class: undefined,
   }
 ]
