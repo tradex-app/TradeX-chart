@@ -7,46 +7,46 @@ export default
   context: {},
   states: {
     idle: {
-      onEnter(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
-      onExit(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         addIndicator: {
           target: 'addIndicator',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('offChart: transition from "idle" to "addIndicator" state')
           },
         },
         divider_mousedown: {
           target: 'divider_mousedown',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('offChart: transition from "idle" to "addIndicator" state')
           },
         },
         resize: {
           target: 'resize',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('offChart: transition from "idle" to "addIndicator" state')
           },
         },
       }
     },
     addIndicator: {
-      onEnter(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
-        stateMachine.context.origin.addIndicator(data) 
+        this.context.origin.addIndicator(data) 
       },
-      onExit(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         addIndicatorDone: {
           target: "idle",
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "onIdle" in "addIndicator" state')
 
           },
@@ -54,90 +54,90 @@ export default
       }
     },
     divider_mousedown: {
-      onEnter(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
-        stateMachine.context.divider = data
+        this.context.divider = data
       },
-      onExit(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         main_mousemove: {
           target: "divider_mousemove",
-          action: (stateMachine, data) => {
-            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "ilde"`)
+          action (data) {
+            console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         },
         main_mouseup: {
           target: "idle",
-          action: (stateMachine, data) => {
-            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "ilde"`)
+          action (data) {
+            console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         }
       }
     },
     divider_mousemove: {
-      onEnter(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
-        let divider = stateMachine.context.divider
-        stateMachine.context.pair = stateMachine.context.origin.resizeRowPair(divider, data) 
+        let divider = this.context.divider
+        this.context.pair = this.context.origin.resizeRowPair(divider, data) 
       },
-      onExit(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         main_mousemove: {
           target: "divider_mousemove",
-          action: (stateMachine, data) => {
-            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "ilde"`)
+          action (data) {
+            console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         },
         main_mouseup: {
           target: "idle",
-          action: (stateMachine, data) => {
-            stateMachine.actions.removeProperty(stateMachine)
+          action (data) {
+            this.actions.removeProperty.call(this)
 
-            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "ilde"`)
+            console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         },
         divider_mouseup: {
           target: "idle",
-          action: (stateMachine, data) => {
-            stateMachine.actions.removeProperty(stateMachine)
+          action (data) {
+            this.actions.removeProperty.call(this)
 
-            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "ilde"`)
+            console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         }
       }
     },
     resize: {
-      onEnter(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
-        stateMachine.context.origin.setDimensions(data)
+      onEnter(data) {
+        console.log(`${this.id}: state: "${this.state}" - onEnter`)
+        this.context.origin.setDimensions(data)
       },
-      onExit(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         always: {
           target: 'idle',
           condition: 'resizeDone',
-          action: (stateMachine, data) => {
-            // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "idle"`)
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
           },
         },
       },
     }
   },
   guards: {
-    resizeDone: (context, event, { cond }) => { return true }
+    resizeDone (context, event, { cond }) { return true }
   },
   actions: {
-    removeProperty: (stateMachine) => {
-      let active = stateMachine.context.pair.active,
-      prev = stateMachine.context.pair.prev;
+    removeProperty () {
+      let active = this.context.pair.active,
+      prev = this.context.pair.prev;
 
       active.element.style.removeProperty('user-select');
       // active.element.style.removeProperty('pointer-events');

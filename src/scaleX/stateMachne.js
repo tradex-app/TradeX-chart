@@ -56,13 +56,13 @@ export default class StateMachine {
     const destState = destTransition.target
     const destStateConfig = this.#config.states[destState]
 
-    currStateConfig?.onExit(this, data)
-    destTransition.action(this, data)
+    currStateConfig?.onExit.call(this, data)
+    destTransition.action.call(this, data)
 
     this.#statePrev = this.#state
     this.#state = destState
 
-    destStateConfig?.onEnter(this, data)
+    destStateConfig?.onEnter.call(this, data)
 
     // null event - immediately transition (transient transition)
     if ( this.#config.states[destState]?.on
@@ -81,7 +81,7 @@ export default class StateMachine {
                 this.condition(cond, null, {cond}) 
                 && isString(transition.target)
               ) {
-              transition?.action(this, data)
+              transition?.action.call(this, data)
               this.#statePrev = this.#state
               this.#state = transition?.target
               this.notify(null, null)
@@ -92,10 +92,10 @@ export default class StateMachine {
         else if (isObject(transient) && isString(transient.target)) {
           let cond = transient?.condition?.type || transient?.condition || false
           if (
-              this.condition(cond, null, {cond}) 
+              this.condition(cond, null, {cond})
               && isString(transient.target)
             ) {
-            transient?.action(this, data)
+            transient?.action.call(this, data)
             this.#statePrev = this.#state
             this.#state = transient.target
             this.notify(null, null)
@@ -107,7 +107,7 @@ export default class StateMachine {
   }
 
   condition(cond, event=null, params={}) {
-    return (cond)? this.#config.guards[cond](this.#context, event, params) : false
+    return (cond)? this.#config.guards[cond].call(this, this.#context, event, params) : false
   }
 
   canTransition(event) {

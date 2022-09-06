@@ -7,18 +7,18 @@ export default
   context: {},
   states: {
     idle: {
-      onEnter(stateMachine, data) {
+      onEnter(data) {
         console.log('idle: onEnter')
       },
-      onExit(stateMachine, data) {
+      onExit(data) {
         console.log('idle: onExit')
       },
       on: {
         tool_activated: {
           target: 'idle',
-          action: (stateMachine, data) => {
-            // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "idle"`)
-            stateMachine.context.origin.onToolActivated(data)
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+            this.context.origin.onToolActivated(data)
           },
         },
       }

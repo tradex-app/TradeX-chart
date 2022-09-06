@@ -7,118 +7,118 @@ export default
   context: {},
   states: {
     idle: {
-      onEnter(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
-      onExit(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         resize: {
           target: 'resize',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "resize" in "idle" state')
           },
         },
         yAxis_scale: {
           target: 'scale',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "yAxis_scale" in "idle" state')
           },
         },
         yAxis_inc: {
           target: 'incremental',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "yAxis_inc" in "idle" state')
           },
         },
         yAxis_log: {
           target: 'logarithmic',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "yAxis_log" in "idle" state')
           },
         },
         yAxis_100: {
           target: 'percentual',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "yAxis_100" in "idle" state')
           },
         },
         chart_pan: {
           target: 'chart_pan',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('Scale: from "idle" to "chart_pan" state')
           },
         },
         chart_zoom: {
           target: 'chart_zoom',
-          action: (stateMachine, data) => {
-            // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to  "chart_zoom"`)
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
           },
         },
       }
     },
     resize: {
-      onEnter(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
-      onExit(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         someEvent: {
           target: '',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for event in "idle" state')
           },
         },
       }
     },
     chart_pan: {
-      onEnter(stateMachine, data) {
+      onEnter(data) {
         // console.log('Scale: chart_pan: onEnter')
       },
-      onExit(stateMachine, data) {
+      onExit(data) {
         // console.log('Scale: chart_pan: onExit')
       },
       on: {
         chart_pan: {
           target: 'chart_pan',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('Scale: transition action for "chart_panDone" in "chart_pan" state')
-            stateMachine.context.origin.draw()
+            this.context.origin.draw()
           },
         },
         chart_panDone: {
           target: 'idle',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('Scale: transition action for "chart_panDone" in "chart_pan" state')
-            stateMachine.context.origin.draw() 
+            this.context.origin.draw() 
           },
         },
       }
     },
     chart_zoom: {
-      onEnter(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
-      onExit(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         always: {
           target: 'idle',
           condition: 'zoomDone',
-          action: (stateMachine, data) => {
-            // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_zoom"`)
-            stateMachine.context.origin.draw()
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "chart_zoom"`)
+            this.context.origin.draw()
           },
         },
       }
     },
   },
   guards: {
-    zoomDone: (context, event, { cond }) => { return true }
+    zoomDone (context, event, { cond }) { return true }
   }
 }
 
