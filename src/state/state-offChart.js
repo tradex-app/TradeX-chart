@@ -54,6 +54,14 @@ export default
             // console.log('transition action for "xAxis_scale" in "idle" state')
           },
         },
+        tool_activated: {
+          target: 'tool_activated',
+          action: (stateMachine, data) => {
+            stateMachine.context.origin.setCursor("default")
+
+            // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to  "xAxis_scale"`)
+          },
+        },
       }
     },
     chart_pan: {
@@ -143,6 +151,22 @@ export default
           target: 'idle',
           action: (stateMachine, data) => {
             // console.log('transition action for "onIdle" in "XScale" state')
+          },
+        },
+      }
+    },
+    tool_activated: {
+      onEnter(stateMachine, data) {
+        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      },
+      onExit(stateMachine, data) {
+        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      },
+      on: {
+        tool_target: {
+          target: 'idle',
+          action: (stateMachine, data) => {
+            // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "onIdle"`)
           },
         },
       }

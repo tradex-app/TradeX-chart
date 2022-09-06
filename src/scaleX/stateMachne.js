@@ -48,6 +48,11 @@ export default class StateMachine {
       || this.#status !== "running") {
       return false
     }
+    let cond = destTransition?.condition?.type || destTransition?.condition || false
+    if ( cond
+      && !this.condition(cond, event, cond)) {
+      return false
+    }
     const destState = destTransition.target
     const destStateConfig = this.#config.states[destState]
 
@@ -71,7 +76,7 @@ export default class StateMachine {
         // Do we have an array of conditions to check?
         if (isArray(transient)) {
           for (let transition of transient) {
-            let cond = transition?.condition.type || transition?.condition || false
+            let cond = transition?.condition?.type || transition?.condition || false
             if (
                 this.condition(cond, null, {cond}) 
                 && isString(transition.target)
@@ -85,7 +90,7 @@ export default class StateMachine {
         }
         // otherwise if only one condition
         else if (isObject(transient) && isString(transient.target)) {
-          let cond = transient?.condition.type || transient?.condition || false
+          let cond = transient?.condition?.type || transient?.condition || false
           if (
               this.condition(cond, null, {cond}) 
               && isString(transient.target)

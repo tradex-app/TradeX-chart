@@ -242,6 +242,8 @@ export default class Chart {
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
     // out event
     this.#controller.on("mouseout", this.onMouseOut.bind(this));
+    // click event
+    this.#controller.on("mousedown", this.onMouseDown.bind(this));
 
     // listen/subscribe/watch for parent notifications
     this.on("main_mousemove", (pos) => this.updateLegends(pos))
@@ -292,6 +294,12 @@ export default class Chart {
     this.#cursorActive = false
     this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
     this.emit(`${this.ID}_mouseout`, this.#cursorPos)
+  }
+
+  onMouseDown(e) {
+    // console.log("onMouseDown: stateMachine.state:", this.stateMachine.state)
+
+    if (this.stateMachine.state === "tool_activated") this.emit("tool_targetSelected", this)
   }
 
   mount(el) {

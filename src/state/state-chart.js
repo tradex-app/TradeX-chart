@@ -42,6 +42,14 @@ export default
             // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to  "xAxis_scale"`)
           },
         },
+        tool_activated: {
+          target: 'tool_activated',
+          action: (stateMachine, data) => {
+            stateMachine.context.origin.setCursor("default")
+
+            // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to  "xAxis_scale"`)
+          },
+        },
       }
     },
     chart_pan: {
@@ -102,8 +110,31 @@ export default
         },
       }
     },
+    tool_activated: {
+      onEnter(stateMachine, data) {
+        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      },
+      onExit(stateMachine, data) {
+        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      },
+      on: {
+        tool_targetSelected: {
+          target: 'idle',
+          condition: 'toolSelectedThis',
+          action: (stateMachine, data) => {
+            // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "onIdle"`)
+            console.log("tool_targetSelected")
+          },
+        },
+      }
+    },
   },
+
   guards: {
-    zoomDone: (context, event, { cond }) => { return true }
+    zoomDone: (context, event, { cond }) => { return true },
+    toolSelectedThis: (context, event, { cond }) => { 
+      console.log(context, event, cond)
+      return true
+     },
   }
 }
