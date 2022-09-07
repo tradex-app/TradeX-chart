@@ -119,9 +119,9 @@ export default class ToolsBar {
     }
   }
 
-  onToolTargetSelected(target) {
-    console.log("tool_targetSelected", target)
-    this.#toolTarget = target
+  onToolTargetSelected(tool) {
+    console.log("tool_targetSelected", tool.target)
+    this.#toolTarget = tool.target
   }
 
   onToolActivated(tool) {
@@ -201,7 +201,8 @@ export default class ToolsBar {
   addTool(tool=this.#activeTool, target=this.#toolTarget) {
     let config = {
       name: tool,
-      tool: this.#toolClasses[tool]
+      tool: this.#toolClasses[tool],
+      pos: target.cursorClick
     }
     let toolInstance = this.#Tool.create(target, config)
     toolInstance.start()

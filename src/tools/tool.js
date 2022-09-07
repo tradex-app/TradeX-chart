@@ -30,6 +30,7 @@ export default class Tool {
 
   #cursorPos = [0, 0]
   #cursorActive = false
+  #cursorClick
 
   constructor(config) {
     this.#config = config
@@ -44,7 +45,7 @@ export default class Tool {
     this.#target.addTool(this)
     this.#elViewport = this.#layerTool.viewport
     this.#elCanvas = this.#elViewport.scene.canvas
-
+    this.#cursorClick = config.pos
   }
 
   get inCnt() { return this.#inCnt }
@@ -65,6 +66,7 @@ export default class Tool {
 
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
+  get cursorClick() { return this.#cursorClick }
   get candleW() { return this.#core.Timeline.candleW }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }

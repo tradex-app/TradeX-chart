@@ -86,6 +86,7 @@ export default class Chart {
 
   #cursorPos = [0, 0]
   #cursorActive = false
+  #cursorClick
 
   #settings
   #chartCandle
@@ -136,6 +137,7 @@ export default class Chart {
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
+  get cursorClick() { return this.#cursorClick }
   get candleW() { return this.#core.Timeline.candleW }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
@@ -295,7 +297,8 @@ export default class Chart {
   }
 
   onMouseDown(e) {
-    if (this.stateMachine.state === "tool_activated") this.emit("tool_targetSelected", this)
+    this.#cursorClick = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    if (this.stateMachine.state === "tool_activated") this.emit("tool_targetSelected", {target: this, position: e})
   }
 
   mount(el) {

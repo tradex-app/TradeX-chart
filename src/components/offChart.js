@@ -248,7 +248,7 @@ export default class OffChart {
   }
 
   onMouseDown(e) {
-    if (this.stateMachine.state === "tool_activated") this.emit("tool_targetSelected", this)
+    if (this.stateMachine.state === "tool_activated") this.emit("tool_targetSelected", {target: this, position: e})
   }
 
   mount(el) {

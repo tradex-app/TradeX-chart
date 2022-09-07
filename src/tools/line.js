@@ -35,6 +35,8 @@ export default class Line extends Tool {
     // // progress state from idle to active
     // this.#mediator.stateMachine.notify(`tool_${this.#name}_start`, this.ID)
 
+    let [x1, y1] = this.cursorClick
+
     const scene = this.layerTool.scene
     scene.clear()
     const ctx = this.layerTool.scene.context
@@ -45,7 +47,7 @@ export default class Line extends Tool {
     ctx.strokeStyle = this.colour
 
     ctx.beginPath();
-    ctx.moveTo(0, 0);
+    ctx.moveTo(x1, y1);
     ctx.lineTo(300, 150);
     ctx.stroke()
     ctx.closePath()
