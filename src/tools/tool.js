@@ -61,6 +61,7 @@ export default class Tool {
   get target() { return this.#target }
   set layerTool(layer) { this.#layerTool = layer }
   get layerTool() { return this.#layerTool }
+  get elViewport() { return this.#elViewport }
 
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
@@ -94,32 +95,6 @@ export default class Tool {
     }
   }
 
-  start() {
-    this.eventsListen()
-    // // start State Machine 
-    // stateMachineConfig.context.origin = this
-    // this.#mediator.stateMachine = stateMachineConfig
-    // this.#mediator.stateMachine.start()
-    // this.emit(`tool_start`, this.ID)
-    // // progress state from idle to active
-    // this.#mediator.stateMachine.notify(`tool_${this.#name}_start`, this.ID)
-
-    const scene = this.layerTool.scene
-    scene.clear()
-    const ctx = this.layerTool.scene.context
-
-    ctx.save();
-
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(300, 150);
-    ctx.stroke()
-    ctx.closePath()
-
-    ctx.restore()
-
-    this.#elViewport.render()
-  }
 
   end() { this.stop() }
 

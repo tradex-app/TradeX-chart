@@ -84,3 +84,9 @@ export default [
     class: undefined,
   }
 ]
+
+export const lineConfig = {
+  colour: "#8888AACC",
+  lineWidth: 1
+}
+
