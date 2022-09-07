@@ -259,8 +259,8 @@ constructor (mediator, options={}) {
 
   static destroy(chart) {
     if (chart.constructor.name === "TradeXchart") {
-      const inCnt = chart.inCnt
-      delete TradeXchart.#instances[inCnt]
+      const inCnt = chart.inCnt;
+      delete TradeXchart.#instances[inCnt];
     }
   }
 

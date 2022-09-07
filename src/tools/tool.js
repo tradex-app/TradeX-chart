@@ -23,20 +23,21 @@ export default class Tool {
   #elCanvas
   #elViewport
 
-  #onChart
+  #target
 
   #cursorPos = [0, 0]
   #cursorActive = false
 
-  constructor(mediator, config) {
+  constructor(config) {
     this.#config = config
     this.#inCnt = config.cnt
     this.#ID = this.#config.ID || uid("TX_Tool_")
-    this.#name = this.config.name
-    this.#core = config.core
-    this.#mediator = mediator
-    this.#elChart = mediator.api.elements.elChart
+    this.#name = config.name
+    this.#mediator = config.target.mediator
+    this.#core = this.#mediator.api.core
+    this.#elChart = this.#mediator.api.elements.elChart
     this.#parent = {...this.#mediator.api.parent}
+    this.#target = config.target
   }
 
   get inCnt() { return this.#inCnt }
@@ -50,7 +51,7 @@ export default class Tool {
   get state() { return this.#core.getState() }
   get data() { return this.#core.chartData }
   get range() { return this.#core.range }
-  get onChart() { return this.#onChart }
+  get target() { return this.#target }
 
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
@@ -61,13 +62,13 @@ export default class Tool {
   get bufferPx() { return this.#core.bufferPx }
 
 
-  static create(row, config) {
+  static create(target, config) {
     const cnt = ++Tool.#cnt
     
     config.cnt = cnt
     config.modID = `${config.toolID}_${cnt}`
     config.toolID = config.modID
-    config.row = row
+    config.target = target
 
     const tool = new config.tool(config)
 
@@ -89,7 +90,7 @@ export default class Tool {
     // stateMachineConfig.context.origin = this
     // this.#mediator.stateMachine = stateMachineConfig
     // this.#mediator.stateMachine.start()
-    this.emit(`tool_start`, this.ID)
+    // this.emit(`tool_start`, this.ID)
     // // progress state from idle to active
     // this.#mediator.stateMachine.notify(`tool_${this.#name}_start`, this.ID)
 

@@ -18,8 +18,13 @@ export default class ToolsBar {
   #mediator
   #options
   #elTools
-  #tools
   #widgets
+
+  #Tool = Tool
+  #tools
+  #toolClasses = {}
+  #activeTool = undefined
+  #toolTarget
 
 
   constructor (mediator, options) {
@@ -114,8 +119,14 @@ export default class ToolsBar {
     }
   }
 
-  onToolActivated(e) {
-    console.log("Tool activated:", e)
+  onToolTargetSelected(target) {
+    console.log("tool_targetSelected", target)
+    this.#toolTarget = target
+  }
+
+  onToolActivated(tool) {
+    console.log("Tool activated:", tool)
+    this.#activeTool = tool
   }
 
   onToolSelect(e) {
@@ -140,6 +151,7 @@ export default class ToolsBar {
           svg.style.fill = ToolsStyle.COLOUR_ICON
           svg.style.width = "90%"
 
+          console.log(this.#toolClasses)
 
       for (let t of this.#tools) {
         if (t.id === id) {
@@ -152,9 +164,18 @@ export default class ToolsBar {
             let menu = this.#widgets.insert("Menu", config)
             tool.dataset.menu = menu.id
             menu.start()
+
+            for (let s of t.sub) {
+              this.#toolClasses[s.id] = s.class
+            }
           }
+          else {
+            this.#toolClasses[t.id] = t.class
+          }        
         }
       }
+      console.log(this.#toolClasses)
+
     }
   }
 
@@ -181,8 +202,14 @@ export default class ToolsBar {
    * @param {class} tool 
    * @param {object} target
    */
-  addTool(tool, target) {
-    return new tool(target)
+  addTool(tool=this.#activeTool, target=this.#toolTarget) {
+    let config = {
+      name: tool,
+      tool: this.#toolClasses[tool]
+    }
+    let toolInstance = this.#Tool.create(target, config)
+    console.log(toolInstance)
+    return toolInstance
   }
 
   addNewTool(tool, target) {
@@ -190,6 +217,8 @@ export default class ToolsBar {
     this.activeTool = (t)
     this.emit(`tool_active`, t)
     this.emit(`tool_${t.ID}_active`, t)
+
+    // add tool entry to Data State
   }
 
   // add all on and off chart tools

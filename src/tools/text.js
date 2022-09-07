@@ -5,8 +5,8 @@ import Tool from "./tool";
 
 export default class Text extends Tool {
 
-  constructor() {
-    super()
+  constructor(config) {
+    super(config)
   }
 
 }
