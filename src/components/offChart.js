@@ -62,10 +62,10 @@ export default class OffChart {
   #Divider
 
   #viewport
-  #editport
   #layerGrid
   #layerCursor
   #layersIndicator
+  #layersTools
 
   #overlayGrid
   #overlayIndicator
@@ -334,13 +334,7 @@ export default class OffChart {
 
   createViewport() {
 
-    const buffer = this.config.buffer || BUFFERSIZE
-    const width = this.#elViewport.clientWidth
-    const height = this.#options.rowH || this.#parent.rowsH - 1
-    const layerConfig = { 
-      width: Math.round(width * ((100 + buffer) * 0.01)), 
-      height: height
-    }
+    const {width, height, layerConfig} = this.layerConfig()
 
     // create viewport
     this.#viewport = new CEL.Viewport({
@@ -385,7 +379,16 @@ export default class OffChart {
       this.#theme)
   }
 
-
+  layerConfig() {
+    const buffer = this.config.buffer || BUFFERSIZE
+    const width = this.#elViewport.clientWidth
+    const height = this.#options.rowH || this.#parent.rowsH - 1
+    const layerConfig = { 
+      width: Math.round(width * ((100 + buffer) * 0.01)), 
+      height: height
+    }
+    return {width, height, layerConfig}
+  }
 
   layersOnRow(layerConfig) {
     // let l = []

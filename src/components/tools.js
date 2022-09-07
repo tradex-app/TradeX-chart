@@ -204,6 +204,8 @@ export default class ToolsBar {
       tool: this.#toolClasses[tool]
     }
     let toolInstance = this.#Tool.create(target, config)
+    toolInstance.start()
+    
     console.log(toolInstance)
     return toolInstance
   }

@@ -70,17 +70,18 @@ export default class Chart {
   #volumePrecision
 
   #viewport
-  #editport
   #layerGrid
   #layerVolume
   #layerCandles
   #layerCursor
   #layersOnChart
+  #layersTools = new Map()
   
   #chartGrid
   #chartVolume
-  #chartIndicators
+  #chartIndicators = new Map()
   #chartCandles
+  #chartTools = new Map()
   #chartCursor
 
   #cursorPos = [0, 0]
@@ -401,13 +402,7 @@ export default class Chart {
 
   createViewport() {
 
-    const buffer = this.config.buffer || BUFFERSIZE
-    const width = this.#elViewport.clientWidth
-    const height = this.#options.chartH || this.#parent.rowsH - 1
-    const layerConfig = { 
-      width: Math.round(width * ((100 + buffer) * 0.01)), 
-      height: height
-    }
+    const {width, height, layerConfig} = this.layerConfig()
 
     // create viewport
     this.#viewport = new CEL.Viewport({
@@ -469,11 +464,23 @@ export default class Chart {
         this.#theme)
   }
 
+  layerConfig() {
+    const buffer = this.config.buffer || BUFFERSIZE
+    const width = this.#elViewport.clientWidth
+    const height = this.#options.chartH || this.#parent.rowsH - 1
+    const layerConfig = { 
+      width: Math.round(width * ((100 + buffer) * 0.01)), 
+      height: height
+    }
+    return {width, height, layerConfig}
+  }
+
   layersOnChart() {
     let l = []
+    let { layerConfig } = this.layerConfig()
 
     for (let i = 0; i < this.#onChart.length; i++) {
-      l[i] = new CEL.Layer()
+      l[i] = new CEL.Layer(layerConfig)
     }
     return l
   }
@@ -495,6 +502,47 @@ export default class Chart {
           this.config)
     } 
     return indicators
+  }
+
+  layersTools() {
+
+  }
+
+  addTool(tool) {
+    let { layerConfig } = this.layerConfig()
+    let layer = new CEL.Layer(layerConfig)
+    this.#layersTools.set(tool.id, layer)
+    this.#viewport.addLayer(layer)
+
+    tool.layerTool = layer
+    this.#chartTools.set(tool.id, tool)
+  }
+
+  addTools(tools) {
+
+  }
+
+  chartTools() {
+    const tools = []
+    // for (let i = 0; i < this.#layersTools.length; i++) {
+      // tools[i] = 
+        // new indicator(
+        //   this.#layersOnChart[i], 
+        //   this.#Time,
+        //   this.#Scale,
+        //   this.config)
+    // } 
+    // return tools
+  }
+
+  chartToolAdd(tool) {
+    // create new tool layer
+
+    this.#chartTools.set(tool.id, tool)
+  }
+
+  chartToolDelete(tool) {
+    this.#chartTools.delete(tool)
   }
 
   draw(range=this.range, update=false) {

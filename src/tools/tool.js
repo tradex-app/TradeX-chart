@@ -2,6 +2,7 @@
 // base class for chart drawing tools
 
 import { uid } from "../utils/utilities"
+import { InputController } from "../input/controller"
 
 
 export default class Tool {
@@ -23,6 +24,8 @@ export default class Tool {
   #elCanvas
   #elViewport
 
+  #layerTool
+
   #target
 
   #cursorPos = [0, 0]
@@ -38,6 +41,10 @@ export default class Tool {
     this.#elChart = this.#mediator.api.elements.elChart
     this.#parent = {...this.#mediator.api.parent}
     this.#target = config.target
+    this.#target.addTool(this)
+    this.#elViewport = this.#layerTool.viewport
+    this.#elCanvas = this.#elViewport.scene.canvas
+
   }
 
   get inCnt() { return this.#inCnt }
@@ -52,6 +59,8 @@ export default class Tool {
   get data() { return this.#core.chartData }
   get range() { return this.#core.range }
   get target() { return this.#target }
+  set layerTool(layer) { this.#layerTool = layer }
+  get layerTool() { return this.#layerTool }
 
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
@@ -73,6 +82,7 @@ export default class Tool {
     const tool = new config.tool(config)
 
     Tool.#instances[cnt] = tool
+    target.chartToolAdd(tool)
 
     return tool
   }
@@ -94,6 +104,21 @@ export default class Tool {
     // // progress state from idle to active
     // this.#mediator.stateMachine.notify(`tool_${this.#name}_start`, this.ID)
 
+    const scene = this.layerTool.scene
+    scene.clear()
+    const ctx = this.layerTool.scene.context
+
+    ctx.save();
+
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(300, 150);
+    ctx.stroke()
+    ctx.closePath()
+
+    ctx.restore()
+
+    this.#elViewport.render()
   }
 
   end() { this.stop() }
