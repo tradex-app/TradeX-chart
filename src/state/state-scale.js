@@ -118,7 +118,7 @@ export default
     },
   },
   guards: {
-    zoomDone (context, event, { cond }) { return true }
+    zoomDone () { return true },
   }
 }
 

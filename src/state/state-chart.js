@@ -123,7 +123,7 @@ export default
           condition: 'toolSelectedThis',
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to "onIdle"`)
-            console.log("tool_targetSelected")
+            console.log("tool_targetSelected:", data)
           },
         },
       }
@@ -131,10 +131,9 @@ export default
   },
 
   guards: {
-    zoomDone (context, event, { cond }) { return true },
-    toolSelectedThis (context, event, { cond }) { 
-      console.log(context, event, cond)
-      if (context.origin === this.context.origin)
+    zoomDone () { return true },
+    toolSelectedThis (conditionType, condition) { 
+      if (this.eventData === this.context.origin)
         return true
       else
         return false

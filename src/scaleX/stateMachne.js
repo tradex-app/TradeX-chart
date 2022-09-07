@@ -14,6 +14,7 @@ export default class StateMachine {
   #mediator
   #status = "stopped"
   #event
+  #eventData
   #actions
   #statuses = ["await", "idle", "running", "stopped"]
 
@@ -37,10 +38,12 @@ export default class StateMachine {
   get mediator() { return this.#mediator }
   get status() { return this.#status }
   get event() { return this.#event }
+  get eventData() { return this.#eventData }
   get actions() { return this.#actions }
 
   notify(event, data) {
     this.#event = event
+    this.#eventData = data
     const currStateConfig = this.#config.states[this.#state]
       let destTransition = currStateConfig.on[event]
     if ( !destTransition 
@@ -50,7 +53,7 @@ export default class StateMachine {
     }
     let cond = destTransition?.condition?.type || destTransition?.condition || false
     if ( cond
-      && !this.condition(cond, event, cond)) {
+      && !this.condition.call(this, cond, destTransition.condition)) {
       return false
     }
     const destState = destTransition.target
@@ -78,7 +81,7 @@ export default class StateMachine {
           for (let transition of transient) {
             let cond = transition?.condition?.type || transition?.condition || false
             if (
-                this.condition(cond, null, {cond}) 
+                this.condition.call(this, cond, transition.condition) 
                 && isString(transition.target)
               ) {
               transition?.action.call(this, data)
@@ -92,7 +95,7 @@ export default class StateMachine {
         else if (isObject(transient) && isString(transient.target)) {
           let cond = transient?.condition?.type || transient?.condition || false
           if (
-              this.condition(cond, null, {cond})
+              this.condition.call(this, cond, transient.condition)
               && isString(transient.target)
             ) {
             transient?.action.call(this, data)

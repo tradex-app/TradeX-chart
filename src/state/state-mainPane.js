@@ -132,7 +132,7 @@ export default
     }
   },
   guards: {
-    resizeDone (context, event, { cond }) { return true }
+    zoomDone () { return true },
   },
   actions: {
     removeProperty () {

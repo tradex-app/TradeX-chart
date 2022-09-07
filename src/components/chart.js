@@ -228,6 +228,7 @@ export default class Chart {
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
     this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
     this.#controller.removeEventListener("mouseout", this.onMouseOut);
+    this.#controller.removeEventListener("mousedown", this.onMouseDown);
 
     this.off("main_mousemove", this.onMouseMove)
   }
@@ -236,13 +237,9 @@ export default class Chart {
   eventsListen() {
     // create controller and use 'on' method to receive input events 
     this.#controller = new InputController(this.#elCanvas);
-    // move event
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    // enter event
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
-    // out event
     this.#controller.on("mouseout", this.onMouseOut.bind(this));
-    // click event
     this.#controller.on("mousedown", this.onMouseDown.bind(this));
 
     // listen/subscribe/watch for parent notifications
@@ -297,8 +294,6 @@ export default class Chart {
   }
 
   onMouseDown(e) {
-    // console.log("onMouseDown: stateMachine.state:", this.stateMachine.state)
-
     if (this.stateMachine.state === "tool_activated") this.emit("tool_targetSelected", this)
   }
 

@@ -151,8 +151,6 @@ export default class ToolsBar {
           svg.style.fill = ToolsStyle.COLOUR_ICON
           svg.style.width = "90%"
 
-          console.log(this.#toolClasses)
-
       for (let t of this.#tools) {
         if (t.id === id) {
           tool.addEventListener("click", this.onIconClick.bind(this))
@@ -174,8 +172,6 @@ export default class ToolsBar {
           }        
         }
       }
-      console.log(this.#toolClasses)
-
     }
   }
 
