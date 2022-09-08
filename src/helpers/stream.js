@@ -7,7 +7,8 @@ import {
   STREAM_LISTENING,
   STREAM_STOPPED,
   STREAM_NEWVALUE,
-  STREAM_UPDATE
+  STREAM_UPDATE,
+  STREAM_MAXUPDATE
 } from "../definitions/core"
 
 const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
@@ -27,7 +28,7 @@ export default class Stream {
     this.#core = core
     this.#data = core.data
     this.#range = core.range
-    this.#maxUpdate = core.config.maxCandleUpdate
+    this.#maxUpdate = (isNumber(core.config?.maxCandleUpdate)) ? core.config.maxCandleUpdate : STREAM_MAXUPDATE
     this.status = {status: STREAM_NONE}
   }
 
@@ -70,7 +71,7 @@ export default class Stream {
    */
   set candle(data) {
     // round time to nearest current time unit
-    let roundedTime = Math.floor(new Date(data.t) / 60000.0) * 60
+    let roundedTime = Math.floor(new Date(data.t) / 60000.0) * 60000
     data.t = roundedTime
 
     if (this.candle[T] !== data.t) {
@@ -114,7 +115,7 @@ export default class Stream {
     candle[H] = data.p > candle[H] ? data.p : candle[H]
     candle[L] = data.p < candle[L] ? data.p : candle[L]
     candle[C] = data.p
-    candle[V] = parseFloat((candle[V] + data.s).toFixed(this.#core.volumePrecision))
+    candle[V] = parseFloat((candle[V] + data.q).toFixed(this.#core.volumePrecision))
 
     // update the last candle in the state data
     this.#candle = candle

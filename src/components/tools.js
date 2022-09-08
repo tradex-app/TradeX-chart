@@ -6,6 +6,10 @@ import DOM from "../utils/DOM"
 import { ToolsStyle } from "../definitions/style"
 import { CLASS_TOOLS } from "../definitions/core"
 import tools from "../definitions/tools"
+import Tool from '../tools/tool'
+import { timestampDiff } from "../utils/time"
+import stateMachineConfig from "../state/state-tools"
+
 
 export default class ToolsBar {
 
@@ -14,8 +18,13 @@ export default class ToolsBar {
   #mediator
   #options
   #elTools
-  #tools
   #widgets
+
+  #Tool = Tool
+  #tools
+  #toolClasses = {}
+  #activeTool = undefined
+  #toolTarget
 
 
   constructor (mediator, options) {
@@ -48,10 +57,18 @@ export default class ToolsBar {
 
 
   start() {
+    // build toolbar
     this.initAllTools()
+    // add all on and off chart tools
+    this.addAllTools()
 
     // set up event listeners
     this.eventsListen()
+
+    // start State Machine 
+    stateMachineConfig.context.origin = this
+    this.#mediator.stateMachine = stateMachineConfig
+    this.#mediator.stateMachine.start()
   }
 
   end() {
@@ -67,11 +84,8 @@ export default class ToolsBar {
   }
 
   eventsListen() {
-    // this.on("utils_indicators", (e) => { this.onIndicators(e) })
-    // this.on("utils_timezone", (e) => { this.onTimezone(e) })
-    // this.on("utils_settings", (e) => { this.onSettings(e) })
-    // this.on("utils_screenshot", (e) => { this.onScreenshot(e) })
-    // this.on("resize", (dimensions) => this.onResize.bind(this))
+    this.on("tool_selected", (e) => { this.onToolSelect.bind(this) })
+    this.on("tool_deselected", (e) => { this.onToolDeselect.bind(this) })
 
   }
 
@@ -93,18 +107,35 @@ export default class ToolsBar {
         data = {
           target: e.currentTarget.id,
           menu: menu,
-          evt: e.currentTarget.dataset.event
+          evt: e.currentTarget.dataset.event,
+          tool: e.currentTarget.dataset.tool
         };
         
-    this.emit(evt, data)
+    // this.emit(evt, data)
 
     if (menu) this.emit("openMenu", data)
     else {
       this.emit("menuItemSelected", data)
-      this.emit("toolSelected", data)
     }
   }
 
+  onToolTargetSelected(tool) {
+    console.log("tool_targetSelected", tool.target)
+    this.#toolTarget = tool.target
+  }
+
+  onToolActivated(tool) {
+    console.log("Tool activated:", tool)
+    this.#activeTool = tool
+  }
+
+  onToolSelect(e) {
+
+  }
+
+  onToolDeselect(e) {
+
+  }
 
   mount(el) {
     el.innerHTML = this.defaultNode()
@@ -115,11 +146,10 @@ export default class ToolsBar {
     const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`)
     for (let tool of tools) {
 
-      let id = tool.id.replace('TX_', ''),
+      let id = tool.id, //.replace('TX_', ''),
           svg = tool.querySelector('svg');
           svg.style.fill = ToolsStyle.COLOUR_ICON
           svg.style.width = "90%"
-
 
       for (let t of this.#tools) {
         if (t.id === id) {
@@ -132,7 +162,14 @@ export default class ToolsBar {
             let menu = this.#widgets.insert("Menu", config)
             tool.dataset.menu = menu.id
             menu.start()
+
+            for (let s of t.sub) {
+              this.#toolClasses[s.id] = s.class
+            }
           }
+          else {
+            this.#toolClasses[t.id] = t.class
+          }        
         }
       }
     }
@@ -151,8 +188,41 @@ export default class ToolsBar {
     const iconStyle = `display: inline-block; height: ${this.#elTools.clientWidth}px; padding-right: 2px`
     const menu = ("sub" in tool) ? `data-menu="true"` : ""
     return  `
-      <div id="TX_${tool.id}" data-event="${tool.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${tool.icon}</div>\n
+      <div id="${tool.id}" data-event="${tool.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${tool.icon}</div>\n
     `
+  }
+
+  /**
+   * add tool to chart row from data state
+   * or add as new tool from toolbar
+   * @param {class} tool 
+   * @param {object} target
+   */
+  addTool(tool=this.#activeTool, target=this.#toolTarget) {
+    let config = {
+      name: tool,
+      tool: this.#toolClasses[tool],
+      pos: target.cursorClick
+    }
+    let toolInstance = this.#Tool.create(target, config)
+    toolInstance.start()
+    
+    console.log(toolInstance)
+    return toolInstance
+  }
+
+  addNewTool(tool, target) {
+    let t = this.addTool(tool, target)
+    this.activeTool = (t)
+    this.emit(`tool_active`, t)
+    this.emit(`tool_${t.ID}_active`, t)
+
+    // add tool entry to Data State
+  }
+
+  // add all on and off chart tools
+  addAllTools() {
+    // iterate over Data State to add all tools
   }
 
 }

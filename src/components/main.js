@@ -436,10 +436,10 @@ export default class MainPane {
   }
 
   addIndicator(ind) {
-    console.log(`Add the ${ind.target} indicator`)
+    console.log(`Add the ${ind} indicator`)
 
     // final indicator object
-    const indicator = this.#indicators[ind.target].ind
+    const indicator = this.#indicators[ind].ind
     console.log("indicator:",indicator)
     // check if we already have indicator data in the chart state
     // generate indicator data

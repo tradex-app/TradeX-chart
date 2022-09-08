@@ -75,25 +75,29 @@ export default class Chart {
   #chartYPadding = 2.5
 
   #yAxisDigits
+  #pricePrecision
+  #volumePrecision
 
   #viewport
-  #editport
   #layerGrid
   #layerVolume
   #layerCandles
   #layerStream
   #layerCursor
   #layersOnChart
+  #layersTools = new Map()
   
   #chartGrid
   #chartVolume
-  #chartIndicators
+  #chartIndicators = new Map()
   #chartCandles
   #chartStreamCandle
+  #chartTools = new Map()
   #chartCursor
 
   #cursorPos = [0, 0]
   #cursorActive = false
+  #cursorClick
 
   #settings
   #chartCandle
@@ -134,6 +138,7 @@ export default class Chart {
   get height() { return this.#elChart.clientHeight }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elChart) }
+  get stateMachine() { return this.#mediator.stateMachine }
   set state(s) { this.#core.setState(s) }
   get state() { return this.#core.getState() }
   get data() { return this.#core.chartData }
@@ -143,6 +148,7 @@ export default class Chart {
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
+  get cursorClick() { return this.#cursorClick }
   get candleW() { return this.#core.Timeline.candleW }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
@@ -236,6 +242,7 @@ export default class Chart {
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
     this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
     this.#controller.removeEventListener("mouseout", this.onMouseOut);
+    this.#controller.removeEventListener("mousedown", this.onMouseDown);
 
     this.off("main_mousemove", this.onMouseMove)
   }
@@ -244,12 +251,10 @@ export default class Chart {
   eventsListen() {
     // create controller and use 'on' method to receive input events 
     this.#controller = new InputController(this.#elCanvas);
-    // move event
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    // enter event
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
-    // out event
     this.#controller.on("mouseout", this.onMouseOut.bind(this));
+    this.#controller.on("mousedown", this.onMouseDown.bind(this));
 
     // listen/subscribe/watch for parent notifications
     this.on("main_mousemove", (pos) => this.updateLegends(pos))
@@ -305,6 +310,11 @@ export default class Chart {
     this.emit(`${this.ID}_mouseout`, this.#cursorPos)
   }
 
+  onMouseDown(e) {
+    this.#cursorClick = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    if (this.stateMachine.state === "tool_activated") this.emit("tool_targetSelected", {target: this, position: e})
+  }
+
   onStreamListening(stream) {
     if (this.#Stream !== stream) {
       this.#Stream = stream
@@ -316,8 +326,9 @@ export default class Chart {
 
   }
 
-  onStreamUpdate(value) {
-
+  onStreamUpdate(candle) {
+    this.#chartStreamCandle.draw(candle)
+    this.#viewport.render()
   }
 
   mount(el) {
@@ -424,7 +435,7 @@ export default class Chart {
 
   createViewport() {
 
-    const {width, height, layerConfig} = this.viewportConfig()
+    const {width, height, layerConfig} = this.layerConfig()
 
     // create viewport
     this.#viewport = new CEL.Viewport({
@@ -496,11 +507,23 @@ export default class Chart {
         this.#theme)
   }
 
+  layerConfig() {
+    const buffer = this.config.buffer || BUFFERSIZE
+    const width = this.#elViewport.clientWidth
+    const height = this.#options.chartH || this.#parent.rowsH - 1
+    const layerConfig = { 
+      width: Math.round(width * ((100 + buffer) * 0.01)), 
+      height: height
+    }
+    return {width, height, layerConfig}
+  }
+
   layersOnChart() {
     let l = []
+    let { layerConfig } = this.layerConfig()
 
     for (let i = 0; i < this.#onChart.length; i++) {
-      l[i] = new CEL.Layer()
+      l[i] = new CEL.Layer(layerConfig)
     }
     return l
   }
@@ -524,22 +547,52 @@ export default class Chart {
     return indicators
   }
 
-  viewportConfig() {
-    const buffer = this.config.buffer || BUFFERSIZE
-    const width = this.#elViewport.clientWidth
-    const height = this.#options.chartH || this.#parent.rowsH - 1
-    const layerConfig = { 
-      width: Math.round(width * ((100 + buffer) * 0.01)), 
-      height: height
-    }
-    return {width, height, layerConfig}
+  layersTools() {
+
+  }
+
+  addTool(tool) {
+    let { layerConfig } = this.layerConfig()
+    let layer = new CEL.Layer(layerConfig)
+    this.#layersTools.set(tool.id, layer)
+    this.#viewport.addLayer(layer)
+
+    tool.layerTool = layer
+    this.#chartTools.set(tool.id, tool)
+  }
+
+  addTools(tools) {
+
+  }
+
+  chartTools() {
+    const tools = []
+    // for (let i = 0; i < this.#layersTools.length; i++) {
+      // tools[i] = 
+        // new indicator(
+        //   this.#layersOnChart[i], 
+        //   this.#Time,
+        //   this.#Scale,
+        //   this.config)
+    // } 
+    // return tools
+  }
+
+  chartToolAdd(tool) {
+    // create new tool layer
+
+    this.#chartTools.set(tool.id, tool)
+  }
+
+  chartToolDelete(tool) {
+    this.#chartTools.delete(tool)
   }
 
   layerStream() {
     // if the layer and instance were no set from chart config, do it now
 
     if (!this.#layerStream) {
-      const {width, height, layerConfig} = this.viewportConfig()
+      const {width, height, layerConfig} = this.layerConfig()
       this.#layerStream = new CEL.Layer(layerConfig);
       this.#viewport.addLayer(this.#layerStream)
     }
@@ -581,6 +634,30 @@ export default class Chart {
 
   price2YPos(price) {
     return this.#Scale.yPos(price)
+  }
+
+  /**
+   * Set the price accuracy
+   * @param pricePrecision - Price accuracy
+   */
+  setPriceVolumePrecision (pricePrecision) {
+    if (!isNumber(pricePrecision) || pricePrecision < 0) {
+      this.warning('setPriceVolumePrecision', 'pricePrecision', 'pricePrecision must be a number and greater than zero!!!')
+      return
+    }
+    this.#pricePrecision = pricePrecision
+  }
+
+  /**
+   * Set the volume accuracy
+   * @param volumePrecision - Volume accuracy
+   */
+  setPriceVolumePrecision (volumePrecision) {
+    if (!isNumber(volumePrecision) || volumePrecision < 0) {
+      logWarn('setPriceVolumePrecision', 'volumePrecision', 'volumePrecision must be a number and greater than zero!!!')
+      return
+    }
+    this.#volumePrecision = volumePrecision
   }
 
   updateLegends(pos=this.#cursorPos) {

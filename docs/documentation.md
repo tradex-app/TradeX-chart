@@ -4,6 +4,8 @@
 
 TradeXChart follows [breaking].[feature].[fix] versioning
 
+[Semantic Versioning](https://semver.org/)
+
 # Configuration
 
 `const chart = Chart.create(mount, config, state )`
@@ -111,11 +113,12 @@ Code injection
 
 ## State Machine
 
-Logical state management
+Logical finite state management
 
 ![State Machine](./assets/quick_ref_sct_overview.png)
 
-[https://www.itemis.com/en/yakindu/state-machine/documentation/user-guide/quick_ref](https://www.itemis.com/en/yakindu/state-machine/documentation/user-guide/quick_ref)
+[State Machine documentation](state_machine.md)
+
 
 ## Scalable Javascript Applicaton Architecture
 

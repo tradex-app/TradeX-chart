@@ -13,7 +13,7 @@ export function renderPath (ctx, coordinates, style, strokeFill) {
   }
   ctx.strokeStyle = style.strokeStyle
 
-  if ("dash" in style) ctx.setLineDash(style.dash)
+  if ("lineDash" in style) ctx.setLineDash(style.lineDash)
   
   ctx.beginPath()
   let move = true
@@ -31,8 +31,8 @@ export function renderPath (ctx, coordinates, style, strokeFill) {
   ctx.restore()
 }
 
-export function renderCloseStrokePath (ctx, coordinates) {
-  renderPath(ctx, coordinates, () => {
+export function renderCloseStrokePath (ctx, coordinates, style) {
+  renderPath(ctx, coordinates, style, () => {
     ctx.closePath()
     ctx.stroke()
   })
@@ -43,8 +43,8 @@ export function renderCloseStrokePath (ctx, coordinates) {
  * @param ctx
  * @param coordinates
  */
-export function renderCloseFillPath (ctx, coordinates) {
-  renderPath(ctx, coordinates, () => {
+export function renderCloseFillPath (ctx, coordinates, style) {
+  renderPath(ctx, coordinates, style, () => {
     ctx.closePath()
     ctx.fill()
   })

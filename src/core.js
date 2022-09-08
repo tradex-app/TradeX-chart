@@ -265,8 +265,7 @@ constructor (mediator, options={}) {
   static create(container, config={}, state) {
     const cnt = ++TradeXchart.#cnt
 
-    // config.cnt = cnt
-    // config.state = state
+    config.cnt = cnt
     config.modID = `${ID}_${cnt}`
     config.container = container
 
@@ -286,8 +285,8 @@ constructor (mediator, options={}) {
 
   static destroy(chart) {
     if (chart.constructor.name === "TradeXchart") {
-      const inCnt = chart.inCnt
-      delete TradeXchart.#instances[inCnt]
+      const inCnt = chart.inCnt;
+      delete TradeXchart.#instances[inCnt];
     }
   }
 

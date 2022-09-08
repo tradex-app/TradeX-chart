@@ -7,61 +7,61 @@ export default
   context: {},
   states: {
     idle: {
-      onEnter(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
-      onExit(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         openMenu: {
           target: 'openMenu',
-          action: (stateMachine, data) => {
-            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "openMenu" on ${stateMachine.event}`)
+          action (data) {
+            console.log(`${this.id}: transition from "${this.state}" to "openMenu" on ${this.event}`)
           },
         },
       }
     },
     openMenu: {
-      onEnter(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
-        // stateMachine.context.origin.instances[data.menu].open()
-        // stateMachine.context.origin.instances[data.menu].offMenu()
+        // this.context.origin.instances[data.menu].open()
+        // this.context.origin.instances[data.menu].offMenu()
 
       },
-      onExit(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
 
-        // stateMachine.context.origin.instances[data.menu].close()
+        // this.context.origin.instances[data.menu].close()
       },
       on: {
         closeMenu: {
           target: "idle",
-          action: (stateMachine, data) => {
-            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "idle" on "${stateMachine.event}"`)
+          action (data) {
+            console.log(`${this.id}: transition from "${this.state}" to "idle" on "${this.event}"`)
           },
         },
       }
     },
     openWindow: {
-      onEnter(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
-        // stateMachine.context.origin.instances[data.menu].open()
-        // stateMachine.context.origin.instances[data.menu].offMenu()
+        // this.context.origin.instances[data.menu].open()
+        // this.context.origin.instances[data.menu].offMenu()
 
       },
-      onExit(stateMachine, data) {
-        console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
 
-        // stateMachine.context.origin.instances[data.menu].close()
+        // this.context.origin.instances[data.menu].close()
       },
       on: {
         closeWindow: {
           target: "idle",
-          action: (stateMachine, data) => {
-            console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "idle" on "${stateMachine.event}"`)
+          action (data) {
+            console.log(`${this.id}: transition from "${this.state}" to "idle" on "${this.event}"`)
           },
         },
       }

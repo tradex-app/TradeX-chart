@@ -1,4 +1,6 @@
+// line.js
 
+import { line } from '../definitions/icons'
 import { renderPath } from './path'
 
 /**
@@ -8,13 +10,12 @@ import { renderPath } from './path'
  * @param left
  * @param right
  */
-export function renderHorizontalLine (ctx, y, left, right) {
-  ctx.beginPath()
-  const correction = (ctx.lineWidth % 2) ? 0.5 : 0
-  ctx.moveTo(left, y + correction)
-  ctx.lineTo(right, y + correction)
-  ctx.stroke()
-  ctx.closePath()
+export function renderHorizontalLine (ctx, y, left, right, style) {
+  const coordinates = [{x:left, y:y}, {x:right, y:y}]
+  renderPath(ctx, coordinates, style, () => {
+    ctx.stroke()
+    ctx.closePath()
+  })
 }
 
 /**
@@ -24,13 +25,12 @@ export function renderHorizontalLine (ctx, y, left, right) {
  * @param top
  * @param bottom
  */
-export function renderVerticalLine (ctx, x, top, bottom) {
-  ctx.beginPath()
-  const correction = (ctx.lineWidth % 2) ? 0.5 : 0
-  ctx.moveTo(x + correction, top)
-  ctx.lineTo(x + correction, bottom)
-  ctx.stroke()
-  ctx.closePath()
+export function renderVerticalLine (ctx, x, top, bottom, style) {
+  coordinates = [{x:x, y:top}, {x:x, y,bottom}]
+  renderPath(ctx, coordinates, style, () => {
+    ctx.stroke()
+    ctx.closePath()
+  })
 }
 
 /**

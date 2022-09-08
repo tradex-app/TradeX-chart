@@ -7,16 +7,16 @@ export default
   context: {},
   states: {
     idle: {
-      onEnter(stateMachine, data) {
+      onEnter(data) {
         console.log('idle: onEnter')
       },
-      onExit(stateMachine, data) {
+      onExit(data) {
         console.log('idle: onExit')
       },
       on: {
         someEvent: {
           target: '',
-          action: (stateMachine, data) => {
+          action (data) {
             console.log('transition action for event in "idle" state')
           },
         },

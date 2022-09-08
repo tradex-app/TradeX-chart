@@ -7,148 +7,180 @@ export default
   context: {},
   states: {
     idle: {
-      onEnter(stateMachine, data) {
-        stateMachine.context.origin.setCursor("crosshair")
+      onEnter(data) {
+        this.context.origin.setCursor("crosshair")
 
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
-      onExit(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         chart_pan: {
           target: 'chart_pan',
-          action: (stateMachine, data) => {
-            stateMachine.context.origin.setCursor("grab")
+          action (data) {
+            this.context.origin.setCursor("grab")
 
             // console.log('transition action for "chart_pan" in "idle" state')
           },
         },
         chart_zoom: {
           target: 'chart_zoom',
-          action: (stateMachine, data) => {
-            // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to  "chart_zoom"`)
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
           },
         },
         chart_tool: {
           target: 'chart_tool',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "chart_tool" in "idle" state')
           },
         },
         xAxis_scale: {
           target: 'xAxis_scale',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "xAxis_scale" in "idle" state')
           },
         },
         offChart_mouseDown: {
           target: 'offChart_mouseDown',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "xAxis_scale" in "idle" state')
           },
         },
         offChart_mouseUp: {
           target: 'offChart_mouseUp',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "xAxis_scale" in "idle" state')
+          },
+        },
+        tool_activated: {
+          target: 'tool_activated',
+          action (data) {
+            this.context.origin.setCursor("default")
+
+            // console.log(`${this.id}: transition from "${this.state}" to  "xAxis_scale"`)
           },
         },
       }
     },
     chart_pan: {
-      onEnter(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
-      onExit(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         chart_pan: {
           target: 'chart_pan',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('offChart action for "chart_panDone" in "chart_pan" state')
-            stateMachine.context.origin.updateRange(data) 
+            this.context.origin.updateRange(data) 
           },
         },
         chart_panDone: {
           target: 'idle',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('offChart action for "chart_panDone" in "chart_pan" state')
-            stateMachine.context.origin.updateRange(data) 
+            this.context.origin.updateRange(data) 
           },
         },
       }
     },
     chart_zoom: {
-      onEnter(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
-      onExit(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: - onExit (${stateMachine.event})`)
+      onExit(data) {
+        // console.log(`${this.id}: state: - onExit (${this.event})`)
       },
       on: {
         always: {
           target: 'idle',
           condition: 'zoomDone',
-          action: (stateMachine, data) => {
-            // console.log(`${stateMachine.id}: transition from "${stateMachine.state}" to "chart_zoom"`)
-            const range = stateMachine.context.origin.range
-            stateMachine.context.origin.zoomRange()
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "chart_zoom"`)
+            const range = this.context.origin.range
+            this.context.origin.zoomRange()
           },
         },
       }
     },
     xAxis_scale: {
-      onEnter(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
-      onExit(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         Idle: {
           target: 'idle',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "onIdle" in "XScale" state')
           },
         },
       }
     },
     offChart_mouseDown: {
-      onEnter(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
-      onExit(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         Idle: {
           target: 'idle',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "onIdle" in "XScale" state')
           },
         },
       }
     },
     offChart_mouseUp: {
-      onEnter(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onEnter`)
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
-      onExit(stateMachine, data) {
-        // console.log(`${stateMachine.id}: state: "${stateMachine.state}" - onExit (${stateMachine.event})`)
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         Idle: {
           target: 'idle',
-          action: (stateMachine, data) => {
+          action (data) {
             // console.log('transition action for "onIdle" in "XScale" state')
+          },
+        },
+      }
+    },
+    tool_activated: {
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+      },
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+      },
+      on: {
+        tool_targetSelected: {
+          target: 'idle',
+          condition: 'toolSelectedThis',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "onIdle"`)
+            console.log("tool_targetSelected:", data)
           },
         },
       }
     },
   },
   guards: {
-    zoomDone: (context, event, { cond }) => { return true }
+    zoomDone () { return true },
+    toolSelectedThis (conditionType, condition) { 
+      if (this.eventData === this.context.origin)
+        return true
+      else
+        return false
+     },
   }
 }

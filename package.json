@@ -12,7 +12,7 @@
     }
   },
   "private": true,
-  "version": "0.101.0",
+  "version": "0.101.4",
   "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",
@@ -24,6 +24,7 @@
     "vite": "^2.9.13"
   },
   "dependencies": {
-    "talib-web": "^0.1.3"
+    "talib-web": "^0.1.3",
+    "tinycolor": "^0.0.1"
   }
 }

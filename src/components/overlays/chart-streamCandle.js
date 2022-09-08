@@ -1,7 +1,8 @@
 // chart-streamCandle.js
 
 import Candle from "../primitives/candle";
-
+import { renderHorizontalLine } from "../../renderer/line"
+import { CandleStyle, PriceLineStyle } from "../../definitions/style";
 
 export default class chartStreamCandle extends Candle {
 
@@ -22,6 +23,7 @@ export default class chartStreamCandle extends Candle {
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#core = xAxis.mediator.api.core
+    this.#config.priceLineStyle = this.#config?.priceLineStyle || PriceLineStyle
   }
 
   get target() { return this.#target }
@@ -42,10 +44,24 @@ export default class chartStreamCandle extends Candle {
     candle.h = this.#yAxis.yPos(stream[2])
     candle.l = this.#yAxis.yPos(stream[3])
     candle.c = this.#yAxis.yPos(stream[4])
+    candle.raw = stream
 
     render(candle)
 
     if (this.#config.CandleType === "AREA") super.areaRender()
+
+    if (stream[4] >= stream[1]) this.#config.priceLineStyle.strokeStyle = CandleStyle.COLOUR_CANDLE_UP
+    else this.#config.priceLineStyle.strokeStyle = CandleStyle.COLOUR_CANDLE_DN
+
+
+    // draw price line 
+    renderHorizontalLine (
+      this.#scene.context, 
+      candle.c, 
+      0, 
+      this.#scene.width, 
+      this.#config.priceLineStyle
+    )
   }
 
 }

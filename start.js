@@ -1,24 +1,14 @@
-import { Chart, DOM } from './src/'
-import './style.css'
+// const { Chart } = require("../dist/tradex-chart.es.js")
+// const state = require ('../data/data.json')
+import { Chart } from "dist/tradex-chart.es.js"
+import state from 'data/data.json'
 
-import state from './data/data.json'
-
-DOM.findBySelector('#app').innerHTML = `
-  <!-- 
-  <h1>Hello Vite!</h1>
-  <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
-  -->
-  <button type="button" onclick="window.chart.resize(600, 500)">Resize Chart</button>
-  <div id="test" style="float:left;"></div>
-  <div id="info" style="float:left;"></div>
-`
-const mount = DOM.findBySelector('#test')
+const mount = document.getElementById('test')
 const config = {
   id: "TradeX_test",
   title: "BTC/USDT",
   width: 1000,
   height: 800,
-  rangeStartTS: 1558429200000, // 21/05/2019, 11:00:00
   rangeLimit: 30,
   theme: {
     candleType: "CANDLE_SOLID",
@@ -29,7 +19,6 @@ const config = {
   infos: true,
   warnings: true,
   errors: true,
-  stream: {}
 }
 const chart = Chart.create(mount, config, state )
 window.chart = chart
@@ -60,7 +49,7 @@ function internals() {
 }
 
 const infoBox = {}
-      infoBox.el = DOM.findBySelector('#info')
+      infoBox.el = document.getElementById('info')
       infoBox.out = function (info) {
         let inf = `<ul style="color:#FFF; text-align:left;">`
         for (let i in info) {
@@ -74,32 +63,3 @@ chart.on("chart_zoom", (e) => { infoBox.out(internals()) })
 chart.on("chart_pan", (e) => { infoBox.out(internals()) })
 infoBox.out(internals())
 // test()
-
-let time = chart.range.value()[0]
-let interval = 1000
-
-function getRandomInt(min, max) {
-  return Math.random() * (max - min) + min;
-}
-
-function stream() {
-  let candle = chart.range.value()
-  let percent = getRandomInt(0, 1)
-  let factor2 = getRandomInt(0, 10) % 2
-  let sign = (Math.floor(factor2) === 1) ? 1 : -1
-  let price = candle[4] + (candle[4] * (percent / 200 * sign))
-      time += interval
-  let quantity = candle[5] * (factor2 / 100)
-  let tick = {t: time, p: price, q: quantity}
-  console.log(tick)
-  chart.stream.onTick(tick)
-}
-
-if (chart.stream) {
-  chart.stream.start()
-  const streamTimer = setInterval(stream, interval)
-}
-
-
-
-

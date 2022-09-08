@@ -71,10 +71,10 @@ export default class OffChart {
   #Stream
 
   #viewport
-  #editport
   #layerGrid
   #layerCursor
   #layersIndicator
+  #layersTools
   #layerStream
 
   #overlayGrid
@@ -118,6 +118,7 @@ export default class OffChart {
   get range() { return this.#core.range }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elOffChart) }
+  get stateMachine() { return this.#mediator.stateMachine }
   get elOffChart() { return this.#elOffChart }
   get element() { return this.#elOffChart }
   get widgets() { return this.#core.WidgetsG }
@@ -207,6 +208,7 @@ export default class OffChart {
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
     this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
     this.#controller.removeEventListener("mouseout", this.onMouseOut);
+    this.#controller.removeEventListener("mousedown", this.onMouseDown);
 
     this.off("main_mousemove", this.onMouseMove)
   }
@@ -218,6 +220,7 @@ export default class OffChart {
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
     this.#controller.on("mouseout", this.onMouseOut.bind(this));
+    this.#controller.on("mousedown", this.onMouseDown.bind(this));
 
     // listen/subscribe/watch for parent notifications
     this.on("main_mousemove", this.updateLegends.bind(this))
@@ -256,17 +259,9 @@ export default class OffChart {
     this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
     this.emit(`${this.ID}_mouseout`, this.#cursorPos)
   }
-// do we need these?
+
   onMouseDown(e) {
-    // this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
-    // this.emit(`${this.ID}_mousedown`, this.#cursorPos)
-    // console.log(`${this.ID}_mousedown`)
-  }
-// do we need these?
-  onMouseUp(e) {
-    // this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
-    // this.emit(`${this.ID}_mouseup`, this.#cursorPos)
-    // console.log(`${this.ID}_mouseup`)
+    if (this.stateMachine.state === "tool_activated") this.emit("tool_targetSelected", {target: this, position: e})
   }
 
   onStreamListening(stream) {
@@ -373,7 +368,7 @@ export default class OffChart {
 
   createViewport() {
 
-    const {width, height, layerConfig} = this.viewportConfig()
+    const {width, height, layerConfig} = this.layerConfig()
 
     // create viewport
     this.#viewport = new CEL.Viewport({
@@ -418,7 +413,16 @@ export default class OffChart {
       this.#theme)
   }
 
-
+  layerConfig() {
+    const buffer = this.config.buffer || BUFFERSIZE
+    const width = this.#elViewport.clientWidth
+    const height = this.#options.rowH || this.#parent.rowsH - 1
+    const layerConfig = { 
+      width: Math.round(width * ((100 + buffer) * 0.01)), 
+      height: height
+    }
+    return {width, height, layerConfig}
+  }
 
   layersOnRow(layerConfig) {
     // let l = []
@@ -437,19 +441,8 @@ export default class OffChart {
     this.#viewport.addLayer(this.#layersIndicator)
   }
 
-  viewportConfig() {
-    const buffer = this.config.buffer || BUFFERSIZE
-    const width = this.#elViewport.clientWidth
-    const height = this.#options.chartH || this.#parent.rowsH - 1
-    const layerConfig = { 
-      width: Math.round(width * ((100 + buffer) * 0.01)), 
-      height: height
-    }
-    return {width, height, layerConfig}
-  }
-
   layerStream() {
-    const {width, height, layerConfig} = this.viewportConfig()
+    const {width, height, layerConfig} = this.layerConfig()
     this.#layerStream = new CEL.Layer(layerConfig);
     this.#viewport.addLayer(this.#layerStream)
   }

@@ -116,7 +116,6 @@ export default class Menu {
           evt: evt
         };
         
-    this.emit(evt, data)
     this.emit("menuItemSelected", data)
     this.emit("closeMenu", data)
   }

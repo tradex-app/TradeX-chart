@@ -101,3 +101,10 @@ export const XAxisStyle = {
 export const GridStyle = {
   COLOUR_GRID: "#333"
 }
+
+export const PriceLineStyle = {
+  lineWidth: 1,
+  strokeStyle: "#ccc",
+  lineDash: [1,1]
+}
+
