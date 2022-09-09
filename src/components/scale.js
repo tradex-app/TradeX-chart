@@ -91,6 +91,7 @@ export default class ScaleBar {
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
   get options() { return this.#options }
+  get core() { return this.#core }
   set height(h) { this.setHeight(h) }
   get height() { return this.#elScale.clientHeight }
   get width() { return this.#elScale.clientWidth }
@@ -139,7 +140,7 @@ export default class ScaleBar {
   end() {
     this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove)
     this.off(`${this.#parent.ID}_mouseout`, this.eraseCursorPrice)
-    this.off(STREAM_UPDATE, this.onUpdate)
+    this.off(STREAM_UPDATE, this.onStreamUpdate)
     // this.off("chart_pan", (e) => { this.drawCursorPrice() })
     // this.off("chart_panDone", (e) => { this.eraseCursorPrice() })
   }
@@ -151,7 +152,7 @@ export default class ScaleBar {
 
     this.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMove(e) })
     this.on(`${this.#parent.ID}_mouseout`, (e) => { this.eraseCursorPrice() })
-    this.on(STREAM_UPDATE, (e) => { this.onUpdate(e) })
+    this.on(STREAM_UPDATE, (e) => { this.onStreamUpdate(e) })
     // this.on("chart_pan", (e) => { this.drawCursorPrice() })
     // this.on("chart_panDone", (e) => { this.drawCursorPrice() })
     // this.on("resizeChart", (dimensions) => this.onResize.bind(this))
@@ -178,7 +179,7 @@ export default class ScaleBar {
     this.drawCursorPrice()
   }
 
-  onUpdate(e) {
+  onStreamUpdate(e) {
 
   }
 
@@ -272,7 +273,7 @@ export default class ScaleBar {
       this.#priceLine =
       new scalePriceLine(
         this.#layerPriceLine,
-        this.#yAxis,
+        this,
         this.theme
       )
     }
