@@ -590,7 +590,6 @@ export default class Chart {
 
   layerStream() {
     // if the layer and instance were no set from chart config, do it now
-
     if (!this.#layerStream) {
       const {width, height, layerConfig} = this.layerConfig()
       this.#layerStream = new CEL.Layer(layerConfig);

@@ -1,6 +1,7 @@
 // scale.js
 // Scale bar that lives on the side of the chart
 
+import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import DOM from "../utils/DOM"
 import yAxis from "./axis/yAxis"
 import CEL from "./primitives/canvas"
@@ -8,6 +9,8 @@ import { drawTextBG } from "../utils/canvas"
 import stateMachineConfig from "../state/state-scale"
 import { InputController, } from "../input/controller"
 import { copyDeep, uid } from '../utils/utilities'
+import { STREAM_UPDATE } from "../definitions/core"
+import scalePriceLine from './overlays/scale-priceLine'
 
 import {
   NAME,
@@ -34,7 +37,6 @@ import {
 } from "../definitions/chart";
 
 import { YAxisStyle } from "../definitions/style";
-import { isArray } from "../utils/typeChecks"
 
 export default class ScaleBar {
 
@@ -57,7 +59,10 @@ export default class ScaleBar {
   #viewport
   #layerLabels
   #layerOverlays
+  #layerPriceLine
   #layerCursor
+
+  #priceLine
 
   #cursorPos
 
@@ -132,8 +137,9 @@ export default class ScaleBar {
   }
 
   end() {
-    // this.off(`${this.#parent.ID}_mousemove`, (e) => { this.offMouseMove(e) })
-    // this.off(`${this.#parent.ID}_mouseout`, (e) => { this.offMouseMove(e) })
+    this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove)
+    this.off(`${this.#parent.ID}_mouseout`, this.eraseCursorPrice)
+    this.off(STREAM_UPDATE, this.onUpdate)
     // this.off("chart_pan", (e) => { this.drawCursorPrice() })
     // this.off("chart_panDone", (e) => { this.eraseCursorPrice() })
   }
@@ -145,6 +151,7 @@ export default class ScaleBar {
 
     this.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMove(e) })
     this.on(`${this.#parent.ID}_mouseout`, (e) => { this.eraseCursorPrice() })
+    this.on(STREAM_UPDATE, (e) => { this.onUpdate(e) })
     // this.on("chart_pan", (e) => { this.drawCursorPrice() })
     // this.on("chart_panDone", (e) => { this.drawCursorPrice() })
     // this.on("resizeChart", (dimensions) => this.onResize.bind(this))
@@ -169,6 +176,10 @@ export default class ScaleBar {
   onMouseMove(e) {
     this.#cursorPos = (isArray(e)) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)]
     this.drawCursorPrice()
+  }
+
+  onUpdate(e) {
+
   }
 
   mount(el) {
@@ -217,12 +228,7 @@ export default class ScaleBar {
   // create canvas layers with handling methods
   createViewport() {
 
-    const width = this.#elScale.clientWidth
-    const height = this.#elScale.clientHeight
-    const layerConfig = { 
-      width: width, 
-      height: height
-    }
+    const {layerConfig} = this.layerConfig()
 
     // create viewport
     this.#viewport = new CEL.Viewport({
@@ -236,11 +242,40 @@ export default class ScaleBar {
     this.#layerOverlays = new CEL.Layer(layerConfig);
     this.#layerCursor = new CEL.Layer();
 
+    if (isObject(this.config.stream)) this.layerStream()
+
     // add layers
     this.#viewport
           .addLayer(this.#layerLabels)
           .addLayer(this.#layerOverlays)
           .addLayer(this.#layerCursor);
+  }
+
+  layerConfig() {
+    const width = this.#elScale.clientWidth
+    const height = this.#elScale.clientHeight
+    const layerConfig = { 
+      width: width, 
+      height: height
+    }
+    return {width, height, layerConfig}
+  }
+
+  layerStream() {
+    // if the layer and instance were no set, do it now
+    if (!this.#layerPriceLine) {
+      const {layerConfig} = this.layerConfig()
+      this.#layerPriceLine = new CEL.Layer(layerConfig);
+      this.#viewport.addLayer(this.#layerPriceLine)
+    }
+    if (!this.#priceLine) {
+      this.#priceLine =
+      new scalePriceLine(
+        this.#layerPriceLine,
+        this.#yAxis,
+        this.theme
+      )
+    }
   }
 
   draw() {

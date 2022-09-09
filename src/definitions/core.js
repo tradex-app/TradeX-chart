@@ -32,7 +32,7 @@ export const STREAM_STOPPED   = "stream_Stopped"
 export const STREAM_ERROR     = "stream_Error"
 export const STREAM_UPDATE    = "stream_candleUpdate"
 export const STREAM_NEWVALUE  = "stream_candleNew"
-export const STREAM_MAXUPDATE = 1000
+export const STREAM_MAXUPDATE = 500
 
 export const PRICE_PRECISION  = 2
 export const VOLUME_PRECISION = 2
