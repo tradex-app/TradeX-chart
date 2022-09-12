@@ -5,7 +5,7 @@ import { DAY_MS, ms2Interval, WEEK_MS } from "../utils/time"
 import { LIMITFUTURE, LIMITPAST, MINCANDLES } from "../definitions/chart"
 import { isNumber } from "../utils/typeChecks"
 
-export function getRange( allData, start=0, end=allData.chart.length-1 ) {
+export function getRange( allData, start=0, end=allData.data.length-1 ) {
   let r = allData
   r.dataLength = r.data.length - 1
 

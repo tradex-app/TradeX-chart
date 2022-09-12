@@ -656,26 +656,61 @@ constructor (mediator, options={}) {
     this.#time.range = this.#range
   }
 
+  /**
+   * Merge a block of data into the chart state
+   * used for populating a chart with back history
+   * or updating with a live stream
+   */
+  mergeData(merge, newRange=false) {
+    if (!isObject(merge)) return false
+
+    let i, j, p=0, start, end;
+    const data = this.allData.data
+    const mData = merge?.data
+
+    if (isArray(mData) && mData.length > 0) {
+      i = mData.length - 1
+      j = data.length - 1
+
+      if (data.length == 0) data = mData
+      else {
+        const r1 = [data[0][0], data[j][0]]
+        const r2 = [mData[0][0], mData[i][0]]
+        const o = [Math.max(r1[0], r2[0]), Math.min(r1[1], r2[1])]
+        console.log("o:",o)
+
+        // overlap between existing data and merge data
+        if (o[1] >= o[0]) {
+
+        }
+        // no overlap, insert the new data
+        else {
+          data.push(...mData)
+        }
+      }
+    }
+
+    if (newRange) {
+      if (isObject(newRange)) {
+        start = (isNumber(newRange.start)) ? newRange.start : this.range.indexStart
+        end = (isNumber(newRange.end)) ? newRange.end : this.range.indexEnd
+      }
+      else {
+        start = this.range.indexStart + 1
+        end = this.range.indexEnd + 1
+      }
+      this.setRange(start, end)
+    }
+
+  }
+
+
+
   resize(width, height) {
     if (!isNumber(width) && !isNumber(height)) return false
 
     this.setDimensions(width, height)
     return true
-  }
-
-  /**
-   * Merge a block of data into the chart state
-   * used for populating a chart with back history
-   */
-  mergeData() {
-
-  }
-
-  /**
-   * Update current candle with a live stream
-   */
-  streamData() {
-    
   }
 
   notImplemented() {
@@ -689,4 +724,6 @@ constructor (mediator, options={}) {
     }
     else this.implemented.open()
   }
+
+
 }

@@ -78,13 +78,23 @@ infoBox.out(internals())
 
 let time = chart.range.value()[0]
 let interval = 500
+let streamInit = false
 
 function getRandomInt(min, max) {
   return Math.random() * (max - min) + min;
 }
 
 function stream() {
-  let candle = chart.range.value()
+  let candle 
+  if (!streamInit) {
+    // candle = chart.allData.data[chart.range.dataLength - 1]
+    candle = chart.range.value()
+    streamInit = true
+    time = time + chart.time.timeFrameMS - interval
+  }
+  else candle = chart.stream.candle // chart.range.value()
+
+  // let candle = chart.range.value()
   let percent = getRandomInt(0, 1)
   let factor2 = getRandomInt(0, 10) % 2
   let sign = (Math.floor(factor2) === 1) ? 1 : -1

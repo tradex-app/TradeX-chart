@@ -143,6 +143,7 @@ export default class Chart {
   get state() { return this.#core.getState() }
   get data() { return this.#core.chartData }
   get range() { return this.#core.range }
+  get stream() { return this.#Stream }
   get onChart() { return this.#onChart }
   set priceDigits(digits) { this.setYAxisDigits(digits) }
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
@@ -259,8 +260,8 @@ export default class Chart {
     // listen/subscribe/watch for parent notifications
     this.on("main_mousemove", (pos) => this.updateLegends(pos))
     this.on(STREAM_LISTENING, (stream) => this.onStreamListening(stream))
-    this.on(STREAM_NEWVALUE, (value) => this.onStreamNewValue(value))
-    this.on(STREAM_UPDATE, (value) => this.onStreamUpdate(value))
+    this.on(STREAM_NEWVALUE, (candle) => this.onStreamNewValue(candle))
+    this.on(STREAM_UPDATE, (candle) => this.onStreamUpdate(candle))
   }
 
   on(topic, handler, context) {
@@ -322,8 +323,10 @@ export default class Chart {
     }
   }
 
-  onStreamNewValue(value) {
-
+  onStreamNewValue(candle) {
+    // this.#chartStreamCandle.draw(candle)
+    // this.#viewport.render()
+    this.draw(this.range, true)
   }
 
   onStreamUpdate(candle) {
@@ -609,7 +612,7 @@ export default class Chart {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
     this.#layerVolume.setPosition(this.#core.scrollPos, 0)
     this.#layerCandles.setPosition(this.#core.scrollPos, 0)
-    if (this.#layerStream)this.#layerStream.setPosition(this.#core.scrollPos, 0)
+    if (this.#layerStream) this.#layerStream.setPosition(this.#core.scrollPos, 0)
 
     if (this.scrollPos == this.bufferPx * -1 || 
         this.scrollPos == 0 || 

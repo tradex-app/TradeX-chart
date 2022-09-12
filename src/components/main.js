@@ -19,6 +19,7 @@ import {
   CLASS_ROW,
   CLASS_GRID,
   CLASS_CHART,
+  STREAM_NEWVALUE
 } from '../definitions/core'
 
 import {
@@ -187,6 +188,8 @@ export default class MainPane {
     this.#controller.removeEventListener("enddrag", this.onChartDragDone);
     this.#controller.removeEventListener("keydown", this.onChartKeyDown)
     this.#controller.removeEventListener("keyup", this.onChartKeyDown)
+
+    this.off(STREAM_NEWVALUE, this.onNewStreamValue)
   }
 
 
@@ -207,6 +210,7 @@ export default class MainPane {
     this.#controller.on("mouseup", this.onMouseUp.bind(this))
 
     // listen/subscribe/watch for parent notifications
+    this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this))
   }
 
   on(topic, handler, context) {
@@ -309,6 +313,10 @@ export default class MainPane {
         this.emit("chart_panDone", [step,null,0,null,step])
         break;
     }
+    this.draw()
+  }
+
+  onNewStreamValue(value) {
     this.draw()
   }
 

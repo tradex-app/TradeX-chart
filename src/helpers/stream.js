@@ -5,6 +5,7 @@ import {
   STREAM_ERROR,
   STREAM_NONE,
   STREAM_LISTENING,
+  STREAM_STARTED,
   STREAM_STOPPED,
   STREAM_NEWVALUE,
   STREAM_UPDATE,
@@ -12,22 +13,19 @@ import {
 } from "../definitions/core"
 
 const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
+const empty = [0,0,0,0,0]
 
 export default class Stream {
 
   #core
-  #data
-  #range
   #maxUpdate
   #updateTimer
   #status
-  #candle
+  #candle = empty
 
 
   constructor(core) {
     this.#core = core
-    this.#data = core.data
-    this.#range = core.range
     this.#maxUpdate = (isNumber(core.config?.maxCandleUpdate)) ? core.config.maxCandleUpdate : STREAM_MAXUPDATE
     this.status = {status: STREAM_NONE}
   }
@@ -37,7 +35,11 @@ export default class Stream {
   }
 
   start() {
-    this.status = {status: STREAM_LISTENING}
+    // add empty value to range end
+    // this.#core.chartData.push([0,0,0,0,0,0])
+    // iterate over indicators add empty value to end
+
+    this.status = {status: STREAM_STARTED}
     this.#updateTimer = setInterval(this.onUpdate.bind(this), this.#maxUpdate)
   }
 
@@ -50,12 +52,19 @@ export default class Stream {
   }
 
   onTick(tick) {
-    if (isObject(tick)) this.candle = tick
+    if (this.#status == STREAM_STARTED || this.#status == STREAM_LISTENING) {
+      if (isObject(tick)) this.candle = tick
+    }
   }
 
   onUpdate() {
-    this.status = {status: STREAM_UPDATE, data: this.candle}
+    if (this.#candle !== empty) {
+      this.status = {status: STREAM_UPDATE, data: this.candle}
+      this.status = {status: STREAM_LISTENING, data: this.#candle}
+    }
   }
+
+  get range() { return this.#core.range }
 
   get status() { return this.#status }
   set status({status, data}) {
@@ -74,17 +83,16 @@ export default class Stream {
     let roundedTime = Math.floor(new Date(data.t) / 60000.0) * 60000
     data.t = roundedTime
 
-    if (this.candle[T] !== data.t) {
+    if (this.#candle[T] !== data.t) {
       this.newCandle(data)
     }
     else {
       this.updateCandle(data)
-      this.status = {status: STREAM_LISTENING}
     }
+    this.status = {status: STREAM_LISTENING, data: this.#candle}
   }
   get candle() {
-    // return this.#candle
-    return this.#range.value()
+    if (this.#candle !== empty) return this.#candle
   }
 
   /**
@@ -94,11 +102,20 @@ export default class Stream {
    * @memberof Stream
    */
   newCandle(data) {
+    let open = this.range.value()[C] || data.p
     // add old stream candle to state data
-    if (isArray(this.#candle)) this.#range.data.push(this.#candle)
+    if (this.#candle !== empty) {
+      this.#core.mergeData({data: [this.#candle]}, true)
+      open = this.#candle[C]
+    }
+
     // create new stream candle
-    this.#candle = [data.t, data.p, data.p, data.p, 0, data.q]
-    this.status = {status: STREAM_NEWVALUE, data: data}
+    this.#candle = [data.t, open, data.p, data.p, data.p, data.q]
+    this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
+
+    console.log("------------------------------------------------")
+    console.log("dataLenght:", this.range.dataLength)
+    console.log("newCandle:", data)
   }
 
   /**
@@ -111,7 +128,7 @@ export default class Stream {
 
     // https://stackoverflow.com/a/52772191
 
-    let candle = this.candle
+    let candle = this.#candle
     candle[H] = data.p > candle[H] ? data.p : candle[H]
     candle[L] = data.p < candle[L] ? data.p : candle[L]
     candle[C] = data.p
@@ -119,6 +136,8 @@ export default class Stream {
 
     // update the last candle in the state data
     this.#candle = candle
+
+    console.log("updateCandle", candle)
   }
 
 }
