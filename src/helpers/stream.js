@@ -12,6 +12,8 @@ import {
   STREAM_MAXUPDATE
 } from "../definitions/core"
 
+import { YAXIS_BOUNDS } from '../definitions/chart';
+
 const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
 const empty = [0,0,0,0,0]
 
@@ -79,6 +81,9 @@ export default class Stream {
    * @memberof Stream
    */
   set candle(data) {
+    // const r = this.range
+    // if (data.p > r.priceMax || data.p < r.priceMin) {}
+
     // round time to nearest current time unit
     let roundedTime = Math.floor(new Date(data.t) / 60000.0) * 60000
     data.t = roundedTime
@@ -104,18 +109,21 @@ export default class Stream {
   newCandle(data) {
     let open = this.range.value()[C] || data.p
     // add old stream candle to state data
-    if (this.#candle !== empty) {
-      this.#core.mergeData({data: [this.#candle]}, true)
-      open = this.#candle[C]
-    }
+    // if (this.#candle !== empty) {
+    //   // this.#core.mergeData({data: [this.#candle]}, true)
+    //   open = this.#candle[C]
+    // }
 
     // create new stream candle
-    this.#candle = [data.t, open, data.p, data.p, data.p, data.q]
+    this.prevCandle()
+    this.#candle = [data.t, open, data.p, data.p, open, data.q, null, true]
+    this.#core.mergeData({data: [this.#candle]}, true)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
+  }
 
-    console.log("------------------------------------------------")
-    console.log("dataLenght:", this.range.dataLength)
-    console.log("newCandle:", data)
+  prevCandle() {
+    const d = this.#core.allData.data
+    if (d[d.length - 1][7]) d[d.length - 1].pop()
   }
 
   /**
@@ -137,7 +145,8 @@ export default class Stream {
     // update the last candle in the state data
     this.#candle = candle
 
-    console.log("updateCandle", candle)
+    const d = this.#core.allData.data
+    d[d.length - 1] = this.#candle
   }
 
 }

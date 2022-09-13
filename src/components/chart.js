@@ -100,7 +100,7 @@ export default class Chart {
   #cursorClick
 
   #settings
-  #chartCandle
+  #streamCandle
   #title
   #theme
   #controller
@@ -199,7 +199,7 @@ export default class Chart {
     this.#Scale = this.#mediator.register("Chart_ScaleBar", ScaleBar, options, api)
 
 
-    window.tradex_chart_scale = this.#Scale
+    // window.tradex_chart_scale = this.#Scale
     // onChart indicators
     // this.#onChart = this.#mediator.register("OnChart", OnChart, options, api)
 
@@ -262,6 +262,7 @@ export default class Chart {
     this.on(STREAM_LISTENING, (stream) => this.onStreamListening(stream))
     this.on(STREAM_NEWVALUE, (candle) => this.onStreamNewValue(candle))
     this.on(STREAM_UPDATE, (candle) => this.onStreamUpdate(candle))
+    this.on("chart_yAxisRedraw", this.onYAxisRedraw.bind(this))
   }
 
   on(topic, handler, context) {
@@ -330,8 +331,15 @@ export default class Chart {
   }
 
   onStreamUpdate(candle) {
+    this.#streamCandle = candle
+    this.#layerStream.setPosition(this.#core.scrollPos, 0)
     this.#chartStreamCandle.draw(candle)
     this.#viewport.render()
+  }
+
+  onYAxisRedraw() {
+    this.draw(this.range, true)
+    this.#Scale.draw()
   }
 
   mount(el) {
@@ -455,8 +463,6 @@ export default class Chart {
     this.#layersOnChart = this.layersOnChart(layerConfig)
     this.#layerCursor = new CEL.Layer();
 
-    if (isObject(this.config.stream)) this.layerStream()
-
     // add layers
     this.#viewport
           .addLayer(this.#layerGrid)
@@ -466,6 +472,11 @@ export default class Chart {
 
     this.#viewport
           .addLayer(this.#layerCandles)
+
+    if (isObject(this.config.stream)) 
+      this.addLayerStream()
+
+    this.#viewport
           .addLayer(this.#layerCursor)
 
     // add overlays
@@ -477,13 +488,8 @@ export default class Chart {
       this.#Scale, 
       this.#theme)
 
-    this.#chartCandles = 
-      new chartCandles(
-        this.#layerCandles, 
-        this.#Time, 
-        this.#Scale, 
-        this.#theme)
-
+    // this.#chartIndicators = this.chartIndicators()
+    
     if (isObject(this.config.stream))
       this.#chartStreamCandle = 
         new chartStreamCandle(
@@ -492,7 +498,12 @@ export default class Chart {
           this.#Scale, 
           this.#theme);
 
-    // this.#chartIndicators = this.chartIndicators()
+    this.#chartCandles = 
+      new chartCandles(
+        this.#layerCandles, 
+        this.#Time, 
+        this.#Scale, 
+        this.#theme)
 
     this.#theme.maxVolumeH = this.#theme?.onchartVolumeH || VolumeStyle.ONCHART_VOLUME_HEIGHT
     this.#chartVolume =
@@ -593,11 +604,8 @@ export default class Chart {
 
   layerStream() {
     // if the layer and instance were no set from chart config, do it now
-    if (!this.#layerStream) {
-      const {width, height, layerConfig} = this.layerConfig()
-      this.#layerStream = new CEL.Layer(layerConfig);
-      this.#viewport.addLayer(this.#layerStream)
-    }
+    this.addLayerStream()
+
     if (!this.#chartStreamCandle) {
       this.#chartStreamCandle = 
       new chartStreamCandle(
@@ -605,6 +613,14 @@ export default class Chart {
         this.#Time, 
         this.#Scale, 
         this.#theme)
+    }
+  }
+
+  addLayerStream() {
+    if (!this.#layerStream) {
+      const {width, height, layerConfig} = this.layerConfig()
+      this.#layerStream = new CEL.Layer(layerConfig);
+      this.#viewport.addLayer(this.#layerStream)
     }
   }
 
@@ -621,6 +637,7 @@ export default class Chart {
       this.#chartGrid.draw("y")
       this.#chartVolume.draw(range)
       this.#chartCandles.draw(range)
+      // if (this.#layerStream) this.#chartStreamCandle.draw(this.#streamCandle)
     }
 
     this.#viewport.render();
@@ -684,7 +701,7 @@ export default class Chart {
    */
   updateRange(pos) {
 
-    this.#core.updateRange(pos)
+    // this.#core.updateRange(pos)
 
     // draw the chart - grid, candles, volume
     this.draw(this.range)

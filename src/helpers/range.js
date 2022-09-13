@@ -2,7 +2,7 @@
 
 import indicators from "../definitions/indicators"
 import { DAY_MS, ms2Interval, WEEK_MS } from "../utils/time"
-import { LIMITFUTURE, LIMITPAST, MINCANDLES } from "../definitions/chart"
+import { LIMITFUTURE, LIMITPAST, MINCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
 import { isNumber } from "../utils/typeChecks"
 
 export function getRange( allData, start=0, end=allData.data.length-1 ) {
@@ -21,7 +21,9 @@ export function getRange( allData, start=0, end=allData.data.length-1 ) {
   start = (start > r.dataLength + LIMITFUTURE - MINCANDLES) ? r.dataLength + LIMITFUTURE - MINCANDLES - 1: start
   end = (end > r.dataLength + LIMITFUTURE) ? r.dataLength + LIMITFUTURE : end
   
-  r.value = (index) => { return rangeValue(r, index)}
+  r.value = (index) => { return rangeValue(index, r)}
+  r.inRange = (ts) => { return inRange(ts, r) }
+  r.inPriceHistory = (ts) => { return inRange(ts, r) }
   r.interval = r.data[1][0] - r.data[0][0]
   r.intervalStr = ms2Interval(r.interval)
   r.indexStart = start
@@ -40,13 +42,19 @@ export function getRange( allData, start=0, end=allData.data.length-1 ) {
   return r
 }
 
-export function inRange(t, range) {
+export function inPriceHistory(t, range) {
   if (t >= range.timeStart && t <= range.timeFinish)
     return true
   else return false
 }
 
-export function rangeValue( range, index ) {
+export function inRange(t, range) {
+  if (t >= range.timeMin && t <= range.timeMax)
+    return true
+  else return false
+}
+
+export function rangeValue( index, range ) {
   // return last value as default
   if (!isNumber(index)) index = range.data.length - 1
 
@@ -110,8 +118,8 @@ export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
   }
 
   return {
-    priceMin: priceMin * 0.995,
-    priceMax: priceMax * 1.005,
+    priceMin: priceMin * (1 - YAXIS_BOUNDS),
+    priceMax: priceMax * (1 + YAXIS_BOUNDS),
     volumeMin: volumeMin,
     volumeMax: volumeMax
   }

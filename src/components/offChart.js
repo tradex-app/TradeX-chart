@@ -210,7 +210,7 @@ export default class OffChart {
     this.#controller.removeEventListener("mouseout", this.onMouseOut);
     this.#controller.removeEventListener("mousedown", this.onMouseDown);
 
-    this.off("main_mousemove", this.onMouseMove)
+    this.off("main_mousemove", this.updateLegends)
   }
 
 

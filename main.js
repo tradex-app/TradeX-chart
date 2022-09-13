@@ -30,7 +30,7 @@ const config = {
   warnings: true,
   errors: true,
   stream: {},
-  maxCandleUpdate: 500
+  maxCandleUpdate: 250
 }
 const chart = Chart.create(mount, config, state )
 window.chart = chart
@@ -77,7 +77,7 @@ infoBox.out(internals())
 // test()
 
 let time = chart.range.value()[0]
-let interval = 500
+let interval = 250
 let streamInit = false
 
 function getRandomInt(min, max) {
@@ -102,7 +102,7 @@ function stream() {
       time += interval
   let quantity = candle[5] * (factor2 / 400)
   let tick = {t: time, p: price, q: quantity}
-  console.log(tick)
+
   chart.stream.onTick(tick)
 }
 

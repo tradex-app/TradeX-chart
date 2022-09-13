@@ -551,7 +551,8 @@ export default class MainPane {
     this.#Time.draw()
   }
 
-  updateRange() {
+  updateRange(pos) {
+    this.#core.updateRange(pos)
     // draw the grid
     this.draw()
   }

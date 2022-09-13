@@ -14,6 +14,12 @@ export default
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
+        chart_pan: {
+          target: 'chart_pan',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to  "chart_pan"`)
+          },
+        },
         addIndicator: {
           target: 'addIndicator',
           action (data) {
@@ -30,6 +36,30 @@ export default
           target: 'resize',
           action (data) {
             // console.log('offChart: transition from "idle" to "addIndicator" state')
+          },
+        },
+      }
+    },
+    chart_pan: {
+      onEnter (data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+      },
+      onExit (data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+      },
+      on: {
+        chart_pan: {
+          target: 'chart_pan',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "chart_pan"`)
+            this.context.origin.updateRange(data) 
+          },
+        },
+        chart_panDone: {
+          target: 'idle',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "chart_panDone"`)
+            this.context.origin.updateRange(data) 
           },
         },
       }

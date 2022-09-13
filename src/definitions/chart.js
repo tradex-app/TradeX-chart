@@ -80,6 +80,7 @@ export const XAXIS_ZOOM = 0.05
 
 export const YAXIS_STEP = 100
 export const YAXIS_TYPES = ["default", "percent", "log"]
+export const YAXIS_BOUNDS = 0.005
 
 export const LIMITFUTURE = 200
 export const LIMITPAST = 200

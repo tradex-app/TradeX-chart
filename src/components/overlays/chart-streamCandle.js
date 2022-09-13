@@ -35,9 +35,9 @@ export default class chartStreamCandle extends Candle {
       (candle) => {} :
       (candle) => {super.draw(candle)}
     const offset = this.#xAxis.smoothScrollOffset || 0
-    const pos = this.#xAxis.xPos(stream[0])
+    const pos = this.#xAxis.xPos(stream[0]) + this.#core.bufferPx
     const candle = {
-      x: 2 + offset - this.#xAxis.candleW + pos,
+      x: 2 + offset - (this.#xAxis.candleW * 2) + pos,
       w: this.#xAxis.candleW
     }
     candle.o = this.#yAxis.yPos(stream[1])

@@ -41,6 +41,8 @@ import {
   STREAM_UPDATE
 } from './definitions/core'
 
+import { YAXIS_BOUNDS } from "./definitions/chart"
+
 import { GlobalStyle } from './definitions/style'
 import { precision } from "./utils/number"
 
@@ -397,10 +399,14 @@ constructor (mediator, options={}) {
   end() {
     this.log("...cleanup the mess")
     removeEventListener('mousemove', this.onMouseMove)
+
+    this.off(STREAM_UPDATE, this.onStreamUpdate)
   }
 
   eventsListen() {
     this.#elTXChart.addEventListener('mousemove', this.onMouseMove.bind(this))
+
+    this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this))
   }
 
   on(topic, handler, context) {
@@ -418,6 +424,23 @@ constructor (mediator, options={}) {
   onMouseMove(e) {
     this.#mousePos.x = e.clientX
     this.#mousePos.y = e.clientY
+  }
+
+  onStreamUpdate(candle) {
+    const r = this.range
+    // is candle visible?
+    if (r.inRange(candle[0])) {
+      const max = r.priceMax // * (1 - YAXIS_BOUNDS)
+      const min = r.priceMin // * (1 + YAXIS_BOUNDS)
+      // is candle testing display boundaries?
+      if (candle[2] > max || candle[3] < min) {
+        // recalculate range
+        // TODO: instead of recalculate, update Range
+        this.setRange(r.indexStart, r.indexEnd)
+
+        this.emit("chart_yAxisRedraw", this.range)
+      }
+    }
   }
 
   mount() {
@@ -667,17 +690,17 @@ constructor (mediator, options={}) {
     let i, j, p=0, start, end;
     const data = this.allData.data
     const mData = merge?.data
+    const inc = (this.range.inRange(mData[0][0])) ? 1 : 0
 
     if (isArray(mData) && mData.length > 0) {
       i = mData.length - 1
       j = data.length - 1
 
-      if (data.length == 0) data = mData
+      if (data.length == 0) this.allData.data = mData
       else {
         const r1 = [data[0][0], data[j][0]]
         const r2 = [mData[0][0], mData[i][0]]
         const o = [Math.max(r1[0], r2[0]), Math.min(r1[1], r2[1])]
-        console.log("o:",o)
 
         // overlap between existing data and merge data
         if (o[1] >= o[0]) {
@@ -685,7 +708,7 @@ constructor (mediator, options={}) {
         }
         // no overlap, insert the new data
         else {
-          data.push(...mData)
+          this.allData.data.push(...mData)
         }
       }
     }
@@ -696,8 +719,9 @@ constructor (mediator, options={}) {
         end = (isNumber(newRange.end)) ? newRange.end : this.range.indexEnd
       }
       else {
-        start = this.range.indexStart + 1
-        end = this.range.indexEnd + 1
+        if (mData[0][0] )
+        start = this.range.indexStart + inc
+        end = this.range.indexEnd + inc
       }
       this.setRange(start, end)
     }
