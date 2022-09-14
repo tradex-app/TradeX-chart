@@ -3,6 +3,7 @@
 import Candle from "../primitives/candle";
 import { renderHorizontalLine } from "../../renderer/line"
 import { CandleStyle, PriceLineStyle } from "../../definitions/style";
+import { inRange } from "../../helpers/range";
 
 export default class chartStreamCandle extends Candle {
 
@@ -31,13 +32,16 @@ export default class chartStreamCandle extends Candle {
   draw(stream) {
     this.#scene.clear()
 
+    const r = this.#core.range
     const render = (this.#config.CandleType === "AREA") ?
       (candle) => {} :
       (candle) => {super.draw(candle)}
     const offset = this.#xAxis.smoothScrollOffset || 0
-    const pos = this.#xAxis.xPos(stream[0]) + this.#core.bufferPx
+    // const pos = this.#xAxis.xPos(stream[0]) + this.#core.bufferPx
+    // const pos = this.#xAxis.xPos(stream[0]) + this.#core.bufferPx - this.#xAxis.candleW
+    const pos = this.#core.stream.lastXPos
     const candle = {
-      x: 2 + offset - (this.#xAxis.candleW * 2) + pos,
+      x: 2 + offset + pos,
       w: this.#xAxis.candleW
     }
     candle.o = this.#yAxis.yPos(stream[1])
@@ -46,7 +50,7 @@ export default class chartStreamCandle extends Candle {
     candle.c = this.#yAxis.yPos(stream[4])
     candle.raw = stream
 
-    if (this.#core.range.inRange(stream[0])) {
+    if (r.inRange(stream[0])) {
       render(candle)
 
       if (this.#config.CandleType === "AREA") super.areaRender()

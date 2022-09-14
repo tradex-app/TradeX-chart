@@ -46,6 +46,10 @@ export default class chartCandles extends Candle {
 
     while(i) {
       x = range.value( c )
+      if (x?.[7]) {
+        this.#core.stream.lastXPos = candle.x
+        break
+      }
       if (x[4] !== null) {
         candle.o = this.#yAxis.yPos(x[1])
         candle.h = this.#yAxis.yPos(x[2])

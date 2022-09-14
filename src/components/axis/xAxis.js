@@ -74,20 +74,16 @@ export default class xAxis extends Axis {
   /**
  * return canvas x co-ordinate
  * handles X Axis modes: default, indexed
- * @param {number} dataX - chart time
+ * @param {number} ts - chart time stamp
  * @return {number}  
  * @memberof xAxis
  */
-  xPos(time) {
-    let width = time - this.range.timeMin
-    let xPos = (width * this.xAxisRatio) + (this.candleW * 0.5)
-    return xPos
+  xPos(ts) {
+    return (this.range.rangeIndex(ts) * this.candleW) + (this.candleW * 0.5)
   }
 
-  t2Pixel(t) {
-    let width = t - this.range.timeMin
-    let xPos = (width * this.xAxisRatio) + (this.candleW * 0.5)
-    return xPos
+  t2Pixel(ts) {
+    return this.xPos(ts)
   }
 
   pixel2T(x) {

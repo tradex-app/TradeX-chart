@@ -22,8 +22,10 @@ export function getRange( allData, start=0, end=allData.data.length-1 ) {
   end = (end > r.dataLength + LIMITFUTURE) ? r.dataLength + LIMITFUTURE : end
   
   r.value = (index) => { return rangeValue(index, r)}
+  r.index = (ts) => { return getTimeIndex(ts, r) }
   r.inRange = (ts) => { return inRange(ts, r) }
   r.inPriceHistory = (ts) => { return inRange(ts, r) }
+  r.rangeIndex = (ts) => { return getTimeIndex(ts, r) - r.indexStart }
   r.interval = r.data[1][0] - r.data[0][0]
   r.intervalStr = ms2Interval(r.interval)
   r.indexStart = start
@@ -142,25 +144,25 @@ export function detectInterval(ohlcv) {
   return min
 }
 
-// FIXME: stuck in endless loop
-export function getTimeIndex(allData, dateStamp) {
-  let r = allData
-  let l = r.data.length - 1
-  let i = Math.floor(l / 2)
-  let idx = false
-  let index
+export function getTimeIndex(ts, r) {
+  // if (r.inRange(ts)) {
+  //   let i = r.indexStart
+  //   while (i++ <= r.indexEnd) {
+  //     if (ts === r.value(i)[0]) return i
+  //   }
+  //   return false
+  // }
 
-  do {
-    index = i
-    if (r.data[index][0] === dateStamp) idx = index
-    else if (r.data[index][0] > dateStamp) i = (Math.floor(i/2))
-    else if (r.data[index][0] < dateStamp) i = i + Math.round((l - i) / 2)
+  if (!isNumber(ts)) return false
+  ts = ts - (ts % r.interval)
 
-    if (i >= l) idx = l
-    else if (i <= 0) idx = 0
-  }
-  while (!idx)
-  return idx
+  let x = r.data[0][0]
+  if (ts === x) 
+    return 0
+  else if (ts < x)
+    return ((x - ts) / r.interval) * -1
+  else 
+    return (ts - x) / r.interval
 }
 
 export function calcTimeIndex(time, dateStamp) {
@@ -172,7 +174,7 @@ export function calcTimeIndex(time, dateStamp) {
 
   if (dateStamp === time.range.data[0][0])
     index = 0
-  if (dateStamp < time.range.data[0][0]) 
+  else if (dateStamp < time.range.data[0][0]) 
     index = ((time.range.data[0][0] - dateStamp) / timeFrameMS) * -1
   else 
     index = (dateStamp - time.range.data[0][0]) / timeFrameMS
