@@ -46,20 +46,22 @@ export default class chartStreamCandle extends Candle {
     candle.c = this.#yAxis.yPos(stream[4])
     candle.raw = stream
 
-    render(candle)
+    if (this.#core.range.inRange(stream[0])) {
+      render(candle)
 
-    if (this.#config.CandleType === "AREA") super.areaRender()
+      if (this.#config.CandleType === "AREA") super.areaRender()
+    }
+
 
     if (stream[4] >= stream[1]) this.#config.priceLineStyle.strokeStyle = CandleStyle.COLOUR_CANDLE_UP
     else this.#config.priceLineStyle.strokeStyle = CandleStyle.COLOUR_CANDLE_DN
-
 
     // draw price line 
     renderHorizontalLine (
       this.#scene.context, 
       candle.c, 
       0, 
-      this.#scene.width, 
+      this.#target.width, 
       this.#config.priceLineStyle
     )
   }

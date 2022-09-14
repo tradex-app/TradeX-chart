@@ -637,7 +637,8 @@ export default class Chart {
       this.#chartGrid.draw("y")
       this.#chartVolume.draw(range)
       this.#chartCandles.draw(range)
-      // if (this.#layerStream) this.#chartStreamCandle.draw(this.#streamCandle)
+      if (this.#layerStream && this.#streamCandle) 
+        this.#chartStreamCandle.draw(this.#streamCandle)
     }
 
     this.#viewport.render();
