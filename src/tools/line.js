@@ -5,7 +5,7 @@ import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeC
 import Tool from "./tool";
 import { lineConfig } from "../definitions/tools";
 
-import tinycolor from "tinycolor"
+// import tinycolor from 'tinycolor2';
 
 
 export default class Line extends Tool {
@@ -18,8 +18,9 @@ export default class Line extends Tool {
   }
 
   set colour(colour=this.#colour) {
-    const c = tinycolor(colour)
-    this.#colour = (c.isValid()) ? colour : this.#colour
+    // const c = tinycolor(colour)
+    // this.#colour = (c.isValid()) ? colour : this.#colour
+    this.#colour = colour
   }
   get colour() { return this.#colour }
   set lineWidth(width) { this.#lineWidth = (isNumber(width)) ? width : this.#lineWidth }
