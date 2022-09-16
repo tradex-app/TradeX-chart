@@ -16,7 +16,7 @@ import indicator from "./overlays/inidcator"
 import OnChart from "./overlays"
 import stateMachineConfig from "../state/state-chart"
 import { InputController, Keys } from "../input/controller"
-import { VolumeStyle } from "../definitions/style"
+import { CandleStyle, VolumeStyle } from "../definitions/style"
 import {
   STREAM_ERROR,
   STREAM_NONE,
@@ -335,6 +335,8 @@ export default class Chart {
     this.#layerStream.setPosition(this.#core.scrollPos, 0)
     this.#chartStreamCandle.draw(candle)
     this.#viewport.render()
+
+    this.updateLegends(this.#cursorPos, candle)
   }
 
   onYAxisRedraw() {
@@ -681,18 +683,28 @@ export default class Chart {
     this.#volumePrecision = volumePrecision
   }
 
-  updateLegends(pos=this.#cursorPos) {
+  updateLegends(pos=this.#cursorPos, candle=false) {
+
     const legends = this.#Legends.list
-    const ohlcv = this.#Time.xPosOHLCV(pos[0])
     const inputs = {}
-          inputs.O = this.#Scale.nicePrice(ohlcv[1])
-          inputs.H = this.#Scale.nicePrice(ohlcv[2])
-          inputs.L = this.#Scale.nicePrice(ohlcv[3])
-          inputs.C = this.#Scale.nicePrice(ohlcv[4])
-          inputs.V = this.#Scale.nicePrice(ohlcv[5])
+      let ohlcv = this.#Time.xPosOHLCV(pos[0])
+      let colours = []
+
+    if (this.#Stream && ohlcv[4] === null) ohlcv = candle
+    if (!candle) return
+
+    // TODO: get candle colours from config / theme
+    if (ohlcv[4] >= ohlcv[1]) colours = new Array(5).fill(CandleStyle.COLOUR_WICK_UP)
+    else colours = new Array(5).fill(CandleStyle.COLOUR_WICK_DN)
+
+    inputs.O = this.#Scale.nicePrice(ohlcv[1])
+    inputs.H = this.#Scale.nicePrice(ohlcv[2])
+    inputs.L = this.#Scale.nicePrice(ohlcv[3])
+    inputs.C = this.#Scale.nicePrice(ohlcv[4])
+    inputs.V = this.#Scale.nicePrice(ohlcv[5])
 
     for (const legend in legends) {
-      this.#Legends.update(legend, {inputs: inputs})
+      this.#Legends.update(legend, {inputs: inputs, colours: colours})
     }
   }
 

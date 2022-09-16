@@ -76,6 +76,7 @@ export default class scalePriceLine {
     const ctx = this.#scene.context
     ctx.save()
 
+    // TODO: get candle colours from config / theme
     if (candle[4] >= candle[1]) options.bakCol = CandleStyle.COLOUR_CANDLE_UP
     else options.bakCol = CandleStyle.COLOUR_CANDLE_DN
 

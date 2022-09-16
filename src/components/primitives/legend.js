@@ -44,14 +44,18 @@ export default class Legends {
   }
 
   buildInputs(o) {
-    let inp = "",
+    let i = 0,
+        inp = "",
         input,
         styleDT = "display: inline; margin-left: 1em;",
         styleDD = "display: inline; margin-left: .25em;";
     for (input in o.inputs) {
+      let colour = ""
+      if (o.colours?.[i]) colour = ` color: ${o.colours[i]};`
       inp +=
       `<dt style="${styleDT}">${input}:</dt>
-      <dd style="${styleDD}">${o.inputs[input]}</dd>`
+      <dd style="${styleDD}${colour}">${o.inputs[input]}</dd>`;
+      ++i
     }
     return inp
   }
