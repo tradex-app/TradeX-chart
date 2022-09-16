@@ -112,7 +112,8 @@ export default class Tool {
 
   eventsListen() {
     // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(this.#elCanvas);
+    this.#controller = new InputController(this.#elCanvas, {disableContextMenu: false});
+
     // move event
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
     // // enter event

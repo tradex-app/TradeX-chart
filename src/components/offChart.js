@@ -216,7 +216,8 @@ export default class OffChart {
 
   eventsListen() {
     // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(this.#elOffChart);
+    this.#controller = new InputController(this.#elOffChart, {disableContextMenu: false});
+
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
     this.#controller.on("mouseout", this.onMouseOut.bind(this));

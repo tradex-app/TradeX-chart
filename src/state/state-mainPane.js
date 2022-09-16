@@ -85,43 +85,43 @@ export default
     },
     divider_mousedown: {
       onEnter(data) {
-        console.log(`${this.id}: state: "${this.state}" - onEnter`)
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
         this.context.divider = data
       },
       onExit(data) {
-        console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         main_mousemove: {
           target: "divider_mousemove",
           action (data) {
-            console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
+            // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         },
         main_mouseup: {
           target: "idle",
           action (data) {
-            console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
+            // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         }
       }
     },
     divider_mousemove: {
       onEnter(data) {
-        console.log(`${this.id}: state: "${this.state}" - onEnter`)
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
         let divider = this.context.divider
         this.context.pair = this.context.origin.resizeRowPair(divider, data) 
       },
       onExit(data) {
-        console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         main_mousemove: {
           target: "divider_mousemove",
           action (data) {
-            console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
+            // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         },
         main_mouseup: {
@@ -129,7 +129,7 @@ export default
           action (data) {
             this.actions.removeProperty.call(this)
 
-            console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
+            // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         },
         divider_mouseup: {
@@ -137,18 +137,18 @@ export default
           action (data) {
             this.actions.removeProperty.call(this)
 
-            console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
+            // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         }
       }
     },
     resize: {
       onEnter(data) {
-        console.log(`${this.id}: state: "${this.state}" - onEnter`)
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
         this.context.origin.setDimensions(data)
       },
       onExit(data) {
-        console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         always: {

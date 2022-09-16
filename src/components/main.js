@@ -199,7 +199,8 @@ export default class MainPane {
     this.#elMain.focus()
 
     // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(this.#elMain);
+    this.#controller = new InputController(this.#elMain, {disableContextMenu: false});
+
     this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
     this.#controller.on("drag", this.onChartDrag.bind(this));

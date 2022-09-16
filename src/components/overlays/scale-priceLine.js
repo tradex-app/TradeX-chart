@@ -61,7 +61,7 @@ export default class scalePriceLine {
           fontSize: YAxisStyle.FONTSIZE * 1.05,
           fontWeight: YAxisStyle.FONTWEIGHT,
           fontFamily: YAxisStyle.FONTFAMILY,
-          txtCol: YAxisStyle.COLOUR_CURSOR,
+          txtCol: "#FFFFFF", //YAxisStyle.COLOUR_CURSOR,
           bakCol: YAxisStyle.COLOUR_CURSOR_BG,
           paddingTop: 2,
           paddingBottom: 2,

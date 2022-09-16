@@ -251,7 +251,7 @@ export default class Chart {
 
   eventsListen() {
     // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(this.#elCanvas);
+    this.#controller = new InputController(this.#elCanvas, {disableContextMenu: false});
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
     this.#controller.on("mouseout", this.onMouseOut.bind(this));
@@ -389,6 +389,7 @@ export default class Chart {
     // TODO: iterate layersOnChart and setSize()
     // this.#layersOnChart.setSize(layerWidth, height)
     this.#layerCandles.setSize(layerWidth, height)
+    this.#layerStream.setSize(layerWidth, height)
     this.#layerCursor.setSize(width, height)
 
     this.setWidth(dim.w)

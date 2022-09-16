@@ -157,6 +157,8 @@ export default class TradeXchart {
  */
 constructor (mediator, options={}) {
 
+this.oncontextmenu = window.oncontextmenu
+
     let container = options?.container,
         state = options?.state, 
         deepValidate = options?.deepValidate || false, 

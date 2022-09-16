@@ -100,7 +100,8 @@ export default class Divider {
 
   eventsListen() {
     // create controller and use 'on' method to receive input events
-    this.#controller = new InputController(this.#elDivider);
+    this.#controller = new InputController(this.#elDivider, {disableContextMenu: false});
+
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
     this.#controller.on("mouseout", this.onMouseOut.bind(this))
     this.#controller.on("drag", this.onDividerDrag.bind(this));

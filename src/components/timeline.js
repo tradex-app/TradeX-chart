@@ -37,6 +37,8 @@ export default class Timeline {
   #layerOverlays
   #layerCursor
 
+  #controller
+
   constructor (mediator, options) {
 
     this.#mediator = mediator
@@ -151,7 +153,7 @@ export default class Timeline {
   eventsListen() {
     let canvas = this.#viewport.scene.canvas
     // create controller and use 'on' method to receive input events 
-    const controller = new InputController(canvas);
+    this.#controller = new InputController(canvas, {disableContextMenu: false});
 
     this.on("main_mousemove", (e) => { this.drawCursorTime(e) })
     // this.on("chart_pan", (e) => { this.drawCursorTime(e, true) })

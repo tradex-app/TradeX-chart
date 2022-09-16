@@ -39,6 +39,7 @@ class InputController {
     this.currentAgent = null;
     
     if (this.options.disableContextMenu) {
+      console.log("culprit")
       window.oncontextmenu = (e) => {
         e.preventDefault();
         return false;

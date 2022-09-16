@@ -2,6 +2,8 @@
 // const state = require ('../data/1hour.json')
 import { Chart } from "../dist/tradex-chart.es.js"
 import state from '../data/1hour.json'
+// import state from '../data/seconds.json'
+
 
 const mount = document.getElementById('test')
 const config = {
@@ -9,6 +11,8 @@ const config = {
   title: "BTC/USDT",
   width: 1000,
   height: 800,
+  rangeStartTS: 1558429200000, // 21/05/2019, 11:00:00 - 1 hour price
+  // rangeStartTS: 1663059600000, // seconds price
   rangeLimit: 30,
   theme: {
     candleType: "CANDLE_SOLID",

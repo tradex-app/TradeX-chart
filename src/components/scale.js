@@ -62,6 +62,8 @@ export default class ScaleBar {
   #layerPriceLine
   #layerCursor
 
+  #controller
+
   #priceLine
 
   #cursorPos
@@ -148,7 +150,7 @@ export default class ScaleBar {
   eventsListen() {
     let canvas = this.#viewport.scene.canvas
     // create controller and use 'on' method to receive input events 
-    const controller = new InputController(canvas);
+    this.#controller = new InputController(canvas, {disableContextMenu: false});
 
     this.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMove(e) })
     this.on(`${this.#parent.ID}_mouseout`, (e) => { this.eraseCursorPrice() })
@@ -243,11 +245,12 @@ export default class ScaleBar {
     this.#layerOverlays = new CEL.Layer(layerConfig);
     this.#layerCursor = new CEL.Layer();
 
-    if (isObject(this.config.stream)) this.layerStream()
-
     // add layers
     this.#viewport
-          .addLayer(this.#layerLabels)
+          .addLayer(this.#layerLabels);
+    if (isObject(this.config.stream)) 
+          this.layerStream()
+    this.#viewport
           .addLayer(this.#layerOverlays)
           .addLayer(this.#layerCursor);
   }
