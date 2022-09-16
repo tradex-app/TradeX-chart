@@ -221,6 +221,15 @@ export function ms2Interval( milliseconds ) {
   }
 }
 
+export function get_second(t) {
+  return t ? new Date(t).getUTCSeconds() : null
+}
+
+export function second_start(t) {
+  let start = new Date(t)
+  return start.setUTCMilliseconds(0,0)
+}
+
 export function get_minute(t) {
   return t ? new Date(t).getUTCMinutes() : null
 }

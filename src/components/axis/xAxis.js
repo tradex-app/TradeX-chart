@@ -12,9 +12,10 @@ import {
   get_day, day_start, get_dayName,
   get_hour, hour_start,
   get_minute, minute_start,
+  get_second, second_start,
   buildSubGrads,
 
-  MINUTE_MS, HOUR_MS, DAY_MS, MONTH_MS, MONTHR_MS, YEAR_MS,
+  SECOND_MS, MINUTE_MS, HOUR_MS, DAY_MS, MONTH_MS, MONTHR_MS, YEAR_MS,
  } from "../../utils/time";
 import { XAxisStyle } from "../../definitions/style";
 
@@ -294,8 +295,8 @@ export default class xAxis extends Axis {
       grads.unit = ["h", "hour"]
       grads.timeSpan = `${units.hours} hours`
       
-      t1 = day_start(rangeStart)
-      t2 = day_start(rangeEnd) + DAY_MS
+      t1 = hour_start(rangeStart)
+      t2 = hour_start(rangeEnd) + DAY_MS
         
       units = timestampDifference(t1, t2)
       major = units.hours
@@ -340,8 +341,8 @@ export default class xAxis extends Axis {
       grads.unit = ["m", "minute"]
       grads.timeSpan = `${units.minutes} minutes`
       
-      t1 = day_start(rangeStart)
-      t2 = day_start(rangeEnd) + HOUR_MS
+      t1 = minute_start(rangeStart)
+      t2 = minute_start(rangeEnd) + HOUR_MS
         
       units = timestampDifference(t1, t2)
       major = units.minutes
@@ -354,7 +355,7 @@ export default class xAxis extends Axis {
       }
       
       t = t1
-  //       inc = Math.round(HOUR_MS / (minorTick + 1))
+      inc = Math.round(MINUTE_MS / (minorTick + 1))
       grads.major = []
       grads.minor = []
 
@@ -365,6 +366,46 @@ export default class xAxis extends Axis {
           next = next + MINUTE_MS
         }
 
+        if (minorTick > 0) {
+          while (t < next) {
+            t = second_start(t + inc)
+            grads.minor.push(t)
+          }
+        }
+        t = next
+      }
+    }
+
+    // Seconds
+    else if (units.seconds > 0) {
+      grads.unit = ["s", "second"]
+      grads.timeSpan = `${units.seconds} seconds`
+      
+      t1 = second_start(rangeStart)
+      t2 = second_start(rangeEnd) + MINUTE_MS
+        
+      units = timestampDifference(t1, t2)
+      major = units.seconds
+      majorTick = Math.ceil(this.gradsMax / major)
+      minorTick = (units.seconds >= this.gradsMax - 1) ? 0 : Math.floor(this.gradsMax / major)
+      
+      majorValue = (t) => { 
+        if (get_second(t) == 0) return get_minute(t) + ":00"
+        else return "00:" + get_second(t) 
+      }
+      
+      t = t1
+  //       inc = Math.round(HOUR_MS / (minorTick + 1))
+      grads.major = []
+      grads.minor = []
+
+      while (t < t2) {
+        grads.major.push(t)
+        next = t
+        for (let i = majorTick; i > -1; --i) {
+          next = next + SECOND_MS
+        }
+
   //         if (minorTick > 0) {
   //           while (t < next) {
   //             t = second_start(t + inc)
@@ -372,8 +413,7 @@ export default class xAxis extends Axis {
   //           }
           t = next
         }
-      }
-  //       grads.values = [...grads.major, ...grads.minor]  
+    }
 
     let i = -1
     while (++i < grads.major.length) {

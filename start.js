@@ -1,7 +1,7 @@
 // const { Chart } = require("../dist/tradex-chart.es.js")
-// const state = require ('../data/data.json')
+// const state = require ('../data/1hour.json')
 import { Chart } from "dist/tradex-chart.es.js"
-import state from 'data/data.json'
+import state from 'data/1hour.json'
 
 const mount = document.getElementById('test')
 const config = {
@@ -40,9 +40,9 @@ function internals() {
   data.bufferPx = ["bufferPx:", chart.bufferPx]
   data.gradsTimeSpan = ["grads.timeSpan: ", tx.xAxisGrads.timeSpan]
   data.gradsUnits = ["grads.units: ", JSON.stringify(tx.xAxisGrads.units)]
-  data.gradsMajor = ["grads.major: ", tx.xAxisGrads.majorTick]
-  data.gradsMinor = ["grads.minor: ", tx.xAxisGrads.minorTick]
-  data.gradsInc = ["grads.inc: ", tx.xAxisGrads.inc]
+  // data.gradsMajor = ["grads.major: ", tx.xAxisGrads.majorTick]
+  // data.gradsMinor = ["grads.minor: ", tx.xAxisGrads.minorTick]
+  // data.gradsInc = ["grads.inc: ", tx.xAxisGrads.inc]
   // data.gradsValues = ["grads.values: ", JSON.stringify(tx.xAxisGrads.values)]
 
   return data

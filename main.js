@@ -1,7 +1,9 @@
 import { Chart, DOM } from './src/'
 import './style.css'
 
-import state from './data/data.json'
+import state from './data/1hour.json'
+// import state from './data/seconds.json'
+
 
 DOM.findBySelector('#app').innerHTML = `
   <!-- 
@@ -18,7 +20,8 @@ const config = {
   title: "BTC/USDT",
   width: 1000,
   height: 800,
-  rangeStartTS: 1558429200000, // 21/05/2019, 11:00:00
+  rangeStartTS: 1558429200000, // 21/05/2019, 11:00:00 - 1 hour price
+  // rangeStartTS: 1663059600000, // seconds price
   rangeLimit: 30,
   theme: {
     candleType: "CANDLE_SOLID",
@@ -52,9 +55,9 @@ function internals() {
   data.bufferPx = ["bufferPx:", chart.bufferPx]
   data.gradsTimeSpan = ["grads.timeSpan: ", tx.xAxisGrads.timeSpan]
   data.gradsUnits = ["grads.units: ", JSON.stringify(tx.xAxisGrads.units)]
-  data.gradsMajor = ["grads.major: ", tx.xAxisGrads.majorTick]
-  data.gradsMinor = ["grads.minor: ", tx.xAxisGrads.minorTick]
-  data.gradsInc = ["grads.inc: ", tx.xAxisGrads.inc]
+  // data.gradsMajor = ["grads.major: ", tx.xAxisGrads.majorTick]
+  // data.gradsMinor = ["grads.minor: ", tx.xAxisGrads.minorTick]
+  // data.gradsInc = ["grads.inc: ", tx.xAxisGrads.inc]
   // data.gradsValues = ["grads.values: ", JSON.stringify(tx.xAxisGrads.values)]
 
   return data
