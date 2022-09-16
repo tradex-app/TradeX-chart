@@ -85,7 +85,8 @@ export default class Stream {
     // if (data.p > r.priceMax || data.p < r.priceMin) {}
 
     // round time to nearest current time unit
-    let roundedTime = Math.floor(new Date(data.t) / 60000.0) * 60000
+    const tfms = this.#core.time.timeFrameMS
+    let roundedTime = Math.floor(new Date(data.t) / tfms) * tfms
     data.t = roundedTime
 
     if (this.#candle[T] !== data.t) {
@@ -140,7 +141,7 @@ export default class Stream {
     candle[H] = data.p > candle[H] ? data.p : candle[H]
     candle[L] = data.p < candle[L] ? data.p : candle[L]
     candle[C] = data.p
-    candle[V] = parseFloat((candle[V] + data.q).toFixed(this.#core.volumePrecision))
+    candle[V] = parseFloat(candle[V] + data.q)
 
     // update the last candle in the state data
     this.#candle = candle
