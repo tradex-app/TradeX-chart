@@ -9,7 +9,8 @@ import {
   STREAM_STOPPED,
   STREAM_NEWVALUE,
   STREAM_UPDATE,
-  STREAM_MAXUPDATE
+  STREAM_MAXUPDATE,
+  STREAM_PRECISION
 } from "../definitions/core"
 
 import { YAXIS_BOUNDS } from '../definitions/chart';
@@ -24,11 +25,13 @@ export default class Stream {
   #updateTimer
   #status
   #candle = empty
+  #precision
 
 
   constructor(core) {
     this.#core = core
     this.#maxUpdate = (isNumber(core.config?.maxCandleUpdate)) ? core.config.maxCandleUpdate : STREAM_MAXUPDATE
+    this.#precision = (isNumber(core.config?.streamPrecision)) ? core.config.streamPrecision : STREAM_PRECISION
     this.status = {status: STREAM_NONE}
   }
 
@@ -109,11 +112,6 @@ export default class Stream {
    */
   newCandle(data) {
     let open = this.range.value()[C] || data.p
-    // add old stream candle to state data
-    // if (this.#candle !== empty) {
-    //   // this.#core.mergeData({data: [this.#candle]}, true)
-    //   open = this.#candle[C]
-    // }
 
     // create new stream candle
     this.prevCandle()
@@ -135,13 +133,16 @@ export default class Stream {
    */
   updateCandle(data) {
 
+    data.p = parseFloat(data.p)
+    data.q = parseFloat(data.q)
+
     // https://stackoverflow.com/a/52772191
 
     let candle = this.#candle
     candle[H] = data.p > candle[H] ? data.p : candle[H]
     candle[L] = data.p < candle[L] ? data.p : candle[L]
     candle[C] = data.p
-    candle[V] = parseFloat(candle[V] + data.q)
+    candle[V] = parseFloat((candle[V] + data.q).toFixed(this.#precision))
 
     // update the last candle in the state data
     this.#candle = candle

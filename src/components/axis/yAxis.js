@@ -7,6 +7,7 @@ import { isNumber } from "../../utils/typeChecks";
 import { 
   PRICEDIGITS, 
   YAXIS_STEP,
+  YAXIS_GRID,
   YAXIS_TYPES
 } from "../../definitions/chart";
 import { YAxisStyle } from "../../definitions/style";
@@ -19,6 +20,7 @@ export default class yAxis extends Axis {
   #yAxisType = YAXIS_TYPES[0]  // default, log, percent
   #yAxisPadding = 1.04
   #yAxisStep = YAXIS_STEP
+  #yAxisGrid = YAXIS_GRID
   #yAxisDigits = PRICEDIGITS
   #yAxisRound = 3
   #yAxisTicks = 3
@@ -29,6 +31,8 @@ export default class yAxis extends Axis {
     this.#chart = chart
     this.#parent = parent 
     this.yAxisType = yAxisType
+    this.#yAxisGrid = (this.#parent.core.config?.yAxisGrid) ? 
+      this.#parent.core.config?.yAxisGrid : YAXIS_GRID
   }
 
   get chart() { return this.#chart } //this.#parent.mediator.api.core.Chart }
@@ -125,7 +129,7 @@ export default class yAxis extends Axis {
 
     switch (this.yAxisType) {
       case "percent":
-        this.#yAxisGrads = this.gradations(100, 0, false)
+        this.#yAxisGrads = this.gradations(100, 0, false, true)
         break;
       default:
         this.#yAxisGrads = this.gradations(this.range.priceMax, this.range.priceMin)
@@ -133,39 +137,74 @@ export default class yAxis extends Axis {
     }
   }
 
-  gradations(max, min, decimals=true) {
-    const rangeMid = (max + min) * 0.5
-    const midH = this.height * 0.5
-    let digits = this.countDigits(rangeMid)
-    const scaleMid = this.niceValue(digits, decimals)
+  gradations(max, min, decimals=true, fixed=false) {
 
-    const scaleGrads = [[scaleMid, round(midH), digits]]
+      let digits;
+    const scaleGrads = [];
 
-    let grad = round(power(log10(midH), 2) - 1),
-        step$ = (max - scaleMid) / grad,
-        stepP = midH / grad,
-        upper = scaleMid + step$,
-        pos = midH - stepP,
-        nice, 
-        entry;
-    while (upper <= max) {
-      digits = this.countDigits(upper)
-      nice = this.niceValue(digits, decimals)
-      entry = [nice, round(pos), digits]
-      scaleGrads.unshift(entry)
-      upper += step$
-      pos -= stepP
+    if (fixed) {
+      const rangeMid = (max + min) * 0.5
+      const midH = this.height * 0.5
+      digits = this.countDigits(rangeMid)
+      const scaleMid = this.niceValue(digits, decimals)
+  
+      scaleGrads.push([scaleMid, round(midH), digits])
+  
+      let grad = round(power(log10(midH), 2) - 1),
+          step$ = (max - scaleMid) / grad,
+          stepP = midH / grad,
+          upper = scaleMid + step$,
+          pos = midH - stepP,
+          nice, 
+          entry;
+      while (upper <= max) {
+        digits = this.countDigits(upper)
+        nice = this.niceValue(digits, decimals)
+        entry = [nice, round(pos), digits]
+        scaleGrads.unshift(entry)
+        upper += step$
+        pos -= stepP
+      }
+      let lower = scaleMid - step$
+          pos = midH + stepP
+      while (lower >= min) {
+        digits = this.countDigits(lower)
+        nice = this.niceValue(digits, decimals)
+        entry = [nice, round(pos), digits]
+        scaleGrads.push(entry)
+        lower -= step$
+        pos += stepP
+      }
     }
-    let lower = scaleMid - step$
-        pos = midH + stepP
-    while (lower >= min) {
-      digits = this.countDigits(lower)
-      nice = this.niceValue(digits, decimals)
-      entry = [nice, round(pos), digits]
-      scaleGrads.push(entry)
-      lower -= step$
-      pos += stepP
+    else {
+      // roughly divide the yRange into cells
+      let yGridSize = (this.rangeH)/this.#yAxisGrid;
+
+      // try to find a nice number to round to
+      let niceNumber = Math.pow( 10 , Math.ceil( Math.log10( yGridSize ) ) );
+      if ( yGridSize < 0.25 * niceNumber ) niceNumber = 0.25 * niceNumber;
+      else if ( yGridSize < 0.5 * niceNumber ) niceNumber = 0.5 * niceNumber;
+
+      // find next largest nice number above yStart
+      var yStartRoundNumber = Math.ceil( min/niceNumber ) * niceNumber;
+      // find next lowest nice number below yEnd
+      var yEndRoundNumber = Math.floor( max/niceNumber ) * niceNumber;
+
+      let pos = this.height,
+          step$ = (yEndRoundNumber - yStartRoundNumber) / niceNumber,
+          stepP = this.height / step$,
+          nice;
+
+      for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
+      {
+        digits = this.countDigits(y)
+        nice = this.niceValue(digits, decimals)
+        scaleGrads.push([nice, round(pos), digits])
+
+        pos -= stepP
+      }
     }
+
     return scaleGrads
   }
 

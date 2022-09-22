@@ -34,6 +34,7 @@ export const STREAM_ERROR     = "stream_Error"
 export const STREAM_UPDATE    = "stream_candleUpdate"
 export const STREAM_NEWVALUE  = "stream_candleNew"
 export const STREAM_MAXUPDATE = 250
+export const STREAM_PRECISION = 8
 
 export const PRICE_PRECISION  = 2
 export const VOLUME_PRECISION = 2
