@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.103.0] - 2022-09-14
+
+Added
+
+* Live Stream - stream candle
+
+## [0.102.0] - 2022-09-09
+
+Added
+
+* Live Stream - Scale - Price Line indicator
+
 ## [0.101.2] - 2022-08-25
 
 Added

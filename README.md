@@ -6,7 +6,7 @@ TradeX-chart is a trade chart written in plain (vanilla) JavaScript with minimal
 
 It provides a two way API to give you complete control over the chart.
 
-![](assets/20220706_133347_screenshot.png)
+![](assets/20220922_230049_Screenshot_20220922_225048.png)
 
 ## Table of Contents
 
