@@ -20,6 +20,12 @@ export default
             // console.log(`${this.id}: transition from "${this.state}" to  "chart_pan"`)
           },
         },
+        chart_zoom: {
+          target: 'chart_zoom',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
+          },
+        },
         addIndicator: {
           target: 'addIndicator',
           action (data) {
@@ -60,6 +66,24 @@ export default
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to "chart_panDone"`)
             this.context.origin.updateRange(data) 
+          },
+        },
+      }
+    },
+    chart_zoom: {
+      onEnter (data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+      },
+      onExit (data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+      },
+      on: {
+        always: {
+          target: 'idle',
+          condition: 'zoomDone',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+            this.context.origin.zoomRange(data) 
           },
         },
       }

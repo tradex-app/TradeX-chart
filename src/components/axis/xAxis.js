@@ -38,6 +38,7 @@ export default class xAxis extends Axis {
     this.#xAxisSubGrads = buildSubGrads()
   }
 
+  get core() { return this.#core }
   get chart() { return this.#parent.mediator.api.Chart }
   get data() { return this.chart.data }
   get range() { return this.#parent.range }

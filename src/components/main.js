@@ -539,10 +539,7 @@ export default class MainPane {
   }
 
   initXGrid() {
-    this.#layerGrid.setPosition(this.scrollPos, 0)
-    this.#chartGrid.draw("x")
-    this.#viewport.render();
-    this.#Time.draw()
+    this.draw()
   }
 
   draw() {

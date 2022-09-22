@@ -20,7 +20,7 @@ export default class chartGrid {
     this.#config = config
     this.#xAxis = xAxis
     this.#yAxis = yAxis
-    this.#core = xAxis.mediator.api.core
+    this.#core = xAxis.core
     this.#config.axes = config.axes || "both"
   }
 
