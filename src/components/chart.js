@@ -292,11 +292,8 @@ export default class Chart {
   }
   
   onMouseMove(e) {
-    // this.#cursorPos = [e.layerX, e.layerY]
     this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
-
     this.emit("chart_mousemove", this.#cursorPos)
-
     this.updateLegends()
   }
 
@@ -332,7 +329,7 @@ export default class Chart {
 
   onStreamUpdate(candle) {
     this.#streamCandle = candle
-    this.#layerStream.setPosition(this.#core.scrollPos, 0)
+    this.#layerStream.setPosition(this.#core.stream.lastScrollPos, 0)
     this.#chartStreamCandle.draw(candle)
     this.#viewport.render()
 
@@ -631,7 +628,10 @@ export default class Chart {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
     this.#layerVolume.setPosition(this.#core.scrollPos, 0)
     this.#layerCandles.setPosition(this.#core.scrollPos, 0)
-    if (this.#layerStream) this.#layerStream.setPosition(this.#core.scrollPos, 0)
+    if (this.#layerStream) {
+      this.#layerStream.setPosition(this.#core.scrollPos, 0)
+      this.#core.stream.lastScrollPos = this.#core.scrollPos
+    }
 
     if (this.scrollPos == this.bufferPx * -1 || 
         this.scrollPos == 0 || 
@@ -640,9 +640,9 @@ export default class Chart {
       this.#chartGrid.draw("y")
       this.#chartVolume.draw(range)
       this.#chartCandles.draw(range)
-      if (this.#layerStream && this.#streamCandle) 
-        this.#chartStreamCandle.draw(this.#streamCandle)
     }
+    if (this.#layerStream && this.#streamCandle) 
+      this.#chartStreamCandle.draw(this.#streamCandle)
 
     this.#viewport.render();
   }
@@ -714,9 +714,6 @@ export default class Chart {
    * @returns 
    */
   updateRange(pos) {
-
-    // this.#core.updateRange(pos)
-
     // draw the chart - grid, candles, volume
     this.draw(this.range)
   }

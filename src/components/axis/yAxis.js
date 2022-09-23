@@ -1,7 +1,7 @@
 // yAxis.js
 
 import Axis from "./axis";
-import { log10, power, precision, round } from "../../utils/number";
+import { limit, log10, power, precision, round } from "../../utils/number";
 import { isNumber } from "../../utils/typeChecks";
 
 import { 
@@ -234,7 +234,7 @@ export default class yAxis extends Axis {
         cnt2 = 4 - digits.integers
 
     if (cnt < 1) {
-      let decimals = (digits.decimals < cnt) ? 0 : digits.decimals + cnt
+      let decimals = limit(digits.decimals + cnt, 0, 100)
       value = Number.parseFloat(value).toFixed(decimals)
     }
     else if (cnt2 < 1) {

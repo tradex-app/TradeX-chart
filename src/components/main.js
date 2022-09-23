@@ -256,7 +256,6 @@ export default class MainPane {
 
   onMouseUp(e) {
     this.emit("main_mouseup", e)
-    // console.log("Main Pane: mouse up")
   }
 
   onChartDrag(e) {
@@ -267,7 +266,6 @@ export default class MainPane {
     ]
     this.emit("chart_pan", this.#cursorPos)
     this.draw()
-    // console.log("what a drag!")
   }
 
   onChartDragDone(e) {
@@ -278,40 +276,31 @@ export default class MainPane {
     ]
     this.emit("chart_panDone", this.#cursorPos)
     this.draw()
-    // console.log("drag done")
   }
 
   onChartKeyDown(e) {
-    let step = this.candleW || 1
+    let step = (this.candleW > 1) ? this.candleW : 1
 
     switch (e.keyCode) {
       case Keys.Left:
-        // console.log("keydown: cursor Left")
-
-        this.emit("chart_pan", [0,null,step,null,step * -1])
+        this.emit("chart_pan", [0,null,step,null,step * -1,null])
         break;
       case Keys.Right:
-        // console.log("keydown: cursor Right")
-
-        this.emit("chart_pan", [step,null,0,null,step])
+        this.emit("chart_pan", [step,null,0,null,step,null])
         break;
     }
     this.draw()
   }
 
   onChartKeyUp(e) {
-    let step = this.candleW || 1
+    let step = (this.candleW > 1) ? this.candleW : 1
 
     switch (e.keyCode) {
       case Keys.Left:
-        // console.log("keyup: cursor Left")
-        
-        this.emit("chart_panDone", [0,null,step,null,step * -1])
+        this.emit("chart_panDone", [0,null,step,null,step * -1,null])
         break;
       case Keys.Right:
-        // console.log("keyup: cursor Right")
-
-        this.emit("chart_panDone", [step,null,0,null,step])
+        this.emit("chart_panDone", [step,null,0,null,step,null])
         break;
     }
     this.draw()

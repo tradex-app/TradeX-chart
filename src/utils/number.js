@@ -129,7 +129,7 @@ export function nice (value) {
  *
  * @export
  * @param {number} value
- * @return {*}  
+ * @return {number}  
  */
 export function countDigits(value) {
   const digits = {}
@@ -156,8 +156,8 @@ export function numDigits(value) {
  * slightly slower
  *
  * @export
- * @param {*} x
- * @return {*}  
+ * @param {number} x
+ * @return {number}  
  */
 export function numDigits2(x) {
   return Math.max(Math.floor(Math.log10(Math.abs(x))), 0) + 1;
@@ -209,8 +209,8 @@ export function precision(value) {
  * method is limited to maximum 10 guaranteed decimals
  * close second for speed
  * @export
- * @param {*} n
- * @return {*}  
+ * @param {number} n
+ * @return {number}  
  */
  export function decimalPlaces(n) {
   function hasFraction(n) {
@@ -266,24 +266,28 @@ export function power (base, exponent) {
 }
 
 /**
- * Function to calculate average of
- * an array using efficient method
+ * Calculate average of array
  * @param {array} arr
  * @param {number} N
  * @return {number}  
  */
-function mean(arr, N)
-{
-    // Store the average of the array
-    var avg = 0;
+export function mean(arr, N) {
+    let avg = 0;
+    let i = 0
  
-    // Traverse the array arr[]
-    for(var i = 0; i < N; i++) {
- 
-        // Update avg
+    while (i++ < N) {
         avg += parseFloat((arr[i] - avg) / (i + 1));
     }
- 
-    // Return avg
     return avg;
+}
+
+/**
+ * limit number to a range
+ * @param {number} val
+ * @param {number} min
+ * @param {number} max
+ * @return {number}  
+ */
+export function limit(val, min, max) {
+  return Math.min(max, Math.max(min, val));
 }

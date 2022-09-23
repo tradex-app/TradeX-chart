@@ -48,6 +48,7 @@ export default class chartCandles extends Candle {
       x = range.value( c )
       if (x?.[7]) {
         this.#core.stream.lastXPos = candle.x
+        console.log("lastXPos:",candle.x)
         break
       }
       if (x[4] !== null) {

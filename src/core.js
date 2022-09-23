@@ -494,6 +494,7 @@ this.oncontextmenu = window.oncontextmenu
       rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
       indicators: (indicators) => this.#indicators = {...Indicators, ...indicators },
       theme: (theme) => this.setTheme(theme),
+      stream: (stream) => this.#stream = (isObject(stream)) ? stream : {},
       pricePrecision: (precision) => this.setPricePrecision(precision),
       volumePrecision: (precision) => this.setVolumePrecision(precision),
     }
@@ -660,6 +661,7 @@ this.oncontextmenu = window.oncontextmenu
     }
 
     this.#scrollPos = scrollPos
+    console.log("scrollPos:",this.#scrollPos)
   }
 
   offsetRange(offset) {
