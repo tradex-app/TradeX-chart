@@ -340,8 +340,8 @@ export default class Chart {
   }
 
   onYAxisRedraw() {
-    this.draw(this.range, true)
     this.#Scale.draw()
+    this.draw(this.range, true)
   }
 
   mount(el) {
