@@ -234,7 +234,7 @@ export default class yAxis extends Axis {
         cnt2 = 4 - digits.integers
 
     if (cnt < 1) {
-      let decimals = digits.decimals + cnt
+      let decimals = (digits.decimals < cnt) ? 0 : digits.decimals + cnt
       value = Number.parseFloat(value).toFixed(decimals)
     }
     else if (cnt2 < 1) {
