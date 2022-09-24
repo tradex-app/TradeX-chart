@@ -4,6 +4,7 @@ import indicators from "../definitions/indicators"
 import { DAY_MS, ms2Interval, WEEK_MS } from "../utils/time"
 import { LIMITFUTURE, LIMITPAST, MINCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
 import { isNumber } from "../utils/typeChecks"
+import { limit } from "../utils/number"
 
 export function getRange( allData, start=0, end=allData.data.length-1 ) {
   let r = allData
@@ -99,11 +100,13 @@ export function rangeDatasetValue( range, indicator, index ) {
  */
 export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
 
-  let l = data.length-1
-  let i = (start < 0) ? 0 : start
-      i = (start >= data.length) ? l - MINCANDLES : i
-  let c = (end < 0) ? MINCANDLES : end
-      c = (end >= l) ? l : c
+  let l = (data.length-1) ? data.length-1 : 0
+  let i = limit(start, 0, l)
+  // let i = (start < 0) ? 0 : start
+  //     i = (start >= data.length) ? l - MINCANDLES : i
+  let c = limit(end, 0, l)
+  // let c = (end < 0) ? MINCANDLES : end
+  //     c = (end >= l) ? l : c
   
   // let i = start,
   //     c = end;

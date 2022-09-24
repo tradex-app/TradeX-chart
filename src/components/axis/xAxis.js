@@ -95,10 +95,16 @@ export default class xAxis extends Axis {
 
   pixel2Index(x) {
     return Math.floor(x / this.candleW ) + this.range.indexStart
+    // let scrollPos = this.scrollPos
+    // let candleW = this.candle
+    // let indexStart = this.indexStart
+    // let rangeOffset = this.core.rangeScrollOffset
+    // return this.range.indexStart
+    //   + Math.floor((x + this.scrollPos) / this.candleW) 
   }
 
   pixelOHLCV(x) {
-    let c = Math.floor(x / this.candleW ) + this.range.indexStart
+    let c = this.pixel2Index(x)
     return this.range.value(c)
   }
 

@@ -1,5 +1,27 @@
 # Change Log
 
+## [0.103.5] - 2022-09-23
+
+Fixed
+
+* Stream - live candle positioning
+
+## [0.103.3] - 2022-09-22
+
+Added
+
+* Scale - yAxis - dynamic gradation placement option added to the fixed option
+
+Fixed
+
+* FIXED: Chart X Grid on zoom - now updates
+
+## [0.103.0] - 2022-09-14
+
+Fixed
+
+* Stream - new candle creation time - now matches chart time frame
+
 ## [0.103.0] - 2022-09-14
 
 Added
