@@ -102,14 +102,8 @@ export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
 
   let l = (data.length-1) ? data.length-1 : 0
   let i = limit(start, 0, l)
-  // let i = (start < 0) ? 0 : start
-  //     i = (start >= data.length) ? l - MINCANDLES : i
   let c = limit(end, 0, l)
-  // let c = (end < 0) ? MINCANDLES : end
-  //     c = (end >= l) ? l : c
-  
-  // let i = start,
-  //     c = end;
+
   let priceMin  = data[i][3]
   let priceMax  = data[i][2]
   let volumeMin = data[i][5]

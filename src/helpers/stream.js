@@ -111,11 +111,12 @@ export default class Stream {
    * @memberof Stream
    */
   newCandle(data) {
-    let open = this.range.value()[C] || data.p
+    // let open = this.range.value()[C] || data.p
 
     // create new stream candle
     this.prevCandle()
-    this.#candle = [data.t, open, data.p, data.p, open, data.q, null, true]
+    // this.#candle = [data.t, open, data.p, data.p, open, data.q, null, true]
+    this.#candle = [data.t, data.p, data.p, data.p, data.p, data.q, null, true]
     this.#core.mergeData({data: [this.#candle]}, true)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
   }
