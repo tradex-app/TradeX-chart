@@ -691,7 +691,6 @@ export default class Chart {
       let colours = []
 
     if (this.#Stream && ohlcv[4] === null) ohlcv = candle
-    if (!candle) return
 
     // TODO: get candle colours from config / theme
     if (ohlcv[4] >= ohlcv[1]) colours = new Array(5).fill(CandleStyle.COLOUR_WICK_UP)

@@ -32,6 +32,7 @@ const config = {
   infos: true,
   warnings: true,
   errors: true,
+  // stream: {},
   maxCandleUpdate: 250
 }
 const chart = Chart.create(mount, config, state )
