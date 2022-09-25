@@ -29,7 +29,9 @@ Secondly after talking to other developers, top on their wishlist for a trading 
 
 TradeX-chart targets browsers that support [ECMAScript 2022](https://www.ecma-international.org/wp-content/uploads/ECMA-262_13th_edition_june_2022.pdfhttps:/).
 
-### Demo
+## Demo
+
+### [Live Demo](https://tradex-chart.guildmedia.net)
 
 Run the demo locally:
 

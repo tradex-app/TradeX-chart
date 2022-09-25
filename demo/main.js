@@ -1,4 +1,4 @@
-import { Chart, DOM } from './src'
+import { Chart, DOM } from './tradex-chart.es.js'
 // import './style.css'
 
 

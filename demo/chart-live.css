@@ -1,5 +1,3 @@
-html, body {height:100%;}
-
 body {
   margin: 0;
   padding: 0;
@@ -8,6 +6,11 @@ body {
 h1, h2 {
   color: #CCC;
   text-align: left;
+  margin: 0 1em 0 0.5em;
+}
+
+button {
+  margin-left: 1em;
 }
 
 #app {
@@ -18,26 +21,13 @@ h1, h2 {
   color: #2c3e50;
   margin: 0;
   padding: 0;
-  height: 100%;
 }
 
-#container {
-  height: 100%;
-}
-
-#nav {
-  width: 5%;
+#info {
+  width: 400px;
   float: left;
 }
 
-#stage {
-  width: 95%;
-  height: 100%;
-  float: right;
-}
-
-#demo {
-  height: 100%;
-  width: 100%; 
-  border:none;
+#info ul li span {
+  color:#ccc;
 }
