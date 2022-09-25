@@ -81,3 +81,11 @@ Full documentation including API can be found under [docs](/docs/documentation.m
   * OHLC
   * TODO: area
 * Chart pan / scroll via mouse or cursor keys
+
+## Contributing
+
+* Fork the Project
+* Create your Feature Branch (git checkout -b feature/AmazingFeature)
+* Commit your Changes (git commit -m 'Add some AmazingFeature)
+* Push to the Branch (git push origin feature/AmazingFeature)
+* Open a Pull Request
