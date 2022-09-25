@@ -229,7 +229,7 @@ export default class MainPane {
   onMouseWheel(e) {
     e.domEvent.preventDefault()
 
-    const direction = Math.sign(e.wheeldelta)
+    const direction = Math.sign(e.wheeldelta) * -1
     const range = this.range
     const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length)
     const newEnd = range.indexEnd + Math.floor(direction * XAXIS_ZOOM * range.Length)
