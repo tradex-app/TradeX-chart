@@ -3743,13 +3743,10 @@ class xAxis extends Axis {
   }
 
   pixel2Index(x) {
-    return Math.floor(x / this.candleW ) + this.range.indexStart
-    // let scrollPos = this.scrollPos
-    // let candleW = this.candle
-    // let indexStart = this.indexStart
-    // let rangeOffset = this.core.rangeScrollOffset
-    // return this.range.indexStart
-    //   + Math.floor((x + this.scrollPos) / this.candleW) 
+    let o = this.core.rangeScrollOffset;
+    let c = this.range.indexStart - o; 
+    return c + 1
+      + Math.floor((x + (this.#core.scrollPos * -1)) / this.candleW) 
   }
 
   pixelOHLCV(x) {
@@ -3758,8 +3755,13 @@ class xAxis extends Axis {
   }
 
   xPosSnap2CandlePos(x) {
-    let c = Math.round((x / this.candleW));
-    return  (c * this.candleW) + (this.candleW / 2)
+    this.#core.scrollPos % this.candleW;
+    // let o = (x % this.candleW < this.candleW / 2) ? this.candleW : this.candleW * -1
+    let c = Math.floor((x / this.candleW)); // + o
+    return  (c * this.candleW) + (this.candleW / 2) // + o
+
+    // return ((this.pixel2Index(x) - this.range.indexStart) 
+    //         * this.candleW) - (this.candleW / 2)
   }
 
   /**
@@ -7491,7 +7493,6 @@ class Chart {
       let colours = [];
 
     if (this.#Stream && ohlcv[4] === null) ohlcv = candle;
-    if (!candle) return
 
     // TODO: get candle colours from config / theme
     if (ohlcv[4] >= ohlcv[1]) colours = new Array(5).fill(CandleStyle.COLOUR_WICK_UP);
@@ -8587,7 +8588,7 @@ class MainPane {
   onMouseWheel(e) {
     e.domEvent.preventDefault();
 
-    const direction = Math.sign(e.wheeldelta);
+    const direction = Math.sign(e.wheeldelta) * -1;
     const range = this.range;
     const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM$1 * range.Length);
     const newEnd = range.indexEnd + Math.floor(direction * XAXIS_ZOOM$1 * range.Length);

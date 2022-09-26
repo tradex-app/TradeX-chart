@@ -3,6 +3,9 @@
 import DOM from "../../utils/DOM"
 import { CLASS_MENUS, CLASS_MENU } from "../../definitions/core"
 import { MenuStyle } from "../../definitions/style"
+import { limit } from "../../utils/number"
+
+const MENUMINWIDTH = 150
 
 export default class Menu {
 
@@ -166,8 +169,8 @@ export default class Menu {
 
   content(menu) {
     const api = this.#mediator.api
-    const listStyle = "list-style: none; text-align: left; margin:1em 1em 1em -2.5em;"
-    const itemStyle = "padding: .25em 1em .25em 1em;"
+    const listStyle = `list-style: none; text-align: left; margin:1em 1em 1em -2.5em; min-width: ${MENUMINWIDTH}px`
+    const itemStyle = "padding: .25em 1em .25em 1em; white-space: nowrap;"
     const shortStyle = "display: inline-block; width: 4em;"
     const cPointer = "cursor: pointer;"
     const over = `onmouseover="this.style.background ='#222'"`
@@ -202,6 +205,14 @@ export default class Menu {
 
     Menu.currentActive = this
     this.#elMenu.style.display = "block"
+
+    let pos = DOM.elementDimPos(this.#elMenu)
+    let posR = pos.left + pos.width
+    if (posR > this.#elWidgetsG.offsetWidth) {
+      let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width)
+          o = limit(o, 0, this.#elWidgetsG.offsetWidth)
+      this.#elMenu.style.left = `${o}px`
+    }
   }
 
   // hide the menu
