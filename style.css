@@ -26,12 +26,12 @@ h1, h2 {
 }
 
 #nav {
-  width: 10%;
+  width: 5%;
   float: left;
 }
 
 #stage {
-  width: 90%;
+  width: 95%;
   height: 100%;
   float: right;
 }

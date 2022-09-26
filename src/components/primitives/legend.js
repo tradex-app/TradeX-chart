@@ -17,6 +17,7 @@ export default class Legends {
     height: 20,
     fill: "#aaa"
   }
+  #controlsList
 
   constructor(target, parent) {
     this.#targetEl = target
@@ -28,6 +29,10 @@ export default class Legends {
   }
 
   get list() { return this.#list }
+
+  onMouseClick() {
+
+  }
 
   mount(el) {
     // el.innerHTML = this.defaultNode()
@@ -75,22 +80,23 @@ export default class Legends {
 
   buildControls(o) {
     let inp = "";
+    let id = this.#parent.ID
 
     // visibility
     // move up
-    inp += up
+    inp += `<span id="${id}_up" class="control">${up}</span>`
     // move down
-    inp += down
+    inp += `<span id="${id}_down" class="control">${down}</span>`
     // collapse
-    inp += collapse
+    inp += `<span id="${id}_collapse" class="control">${collapse}</span>`
     // maximize
-    inp += maximize
+    inp += `<span id="${id}_maximize" class="control">${maximize}</span>`
     // restore
-    inp += restore
+    inp += `<span id="${id}_restore" class="control">${restore}</span>`
     // remove
-    inp += close
+    inp += `<span id="${id}_remove" class="control">${close}</span>`
     // config
-    inp += config
+    inp += `<span id="${id}_config" class="control">${config}</span>`
 
 
     return inp
@@ -109,12 +115,14 @@ export default class Legends {
     const legendEl = DOM.findByID(options.id)
     this.#list[options.id] = {el: legendEl, type: options.type}
 
-    const controls = DOM.findBySelectorAll(`#${options.id} .controls svg`)
-    for (let c of controls) {
-      c.style.width = `${this.#controls.width}px`
-      c.style.height = `${this.#controls.height}px`
-      c.style.fill = `${this.#controls.fill}`
+    this.#controlsList = DOM.findBySelectorAll(`#${options.id} .controls .control`)
+    for (let c of this.#controlsList) {
+      let svg = c.querySelector('svg');
+      svg.style.width = `${this.#controls.width}px`
+      svg.style.height = `${this.#controls.height}px`
+      svg.style.fill = `${this.#controls.fill}`
 
+      c.addEventListener('click', this.onMouseClick.bind(this))
     }
 
     return options.id
@@ -126,6 +134,11 @@ export default class Legends {
     
     this.#list[id].el.remove()
     delete this.#list[id]
+
+    for (let c of this.#controlsList) {
+      c.removeEventListener('click', this.onMouseClick)
+    }
+    
 
     return true
   }

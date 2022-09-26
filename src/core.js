@@ -400,7 +400,7 @@ this.oncontextmenu = window.oncontextmenu
 
   end() {
     this.log("...cleanup the mess")
-    removeEventListener('mousemove', this.onMouseMove)
+    this.#elTXChart.removeEventListener('mousemove', this.onMouseMove)
 
     this.off(STREAM_UPDATE, this.onStreamUpdate)
   }
