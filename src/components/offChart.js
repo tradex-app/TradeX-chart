@@ -155,7 +155,7 @@ export default class OffChart {
       title: options.offChart.name,
       type: options.offChart.type
     }
-    this.#Legends = new Legends(this.#elLegends)
+    this.#Legends = new Legends(this.#elLegends, this)
     this.#Legends.add(offChartLegend)
 
     // api - functions / methods, calculated properties provided by this module
@@ -350,7 +350,7 @@ export default class OffChart {
 
     const styleOffChart = STYLE_OFFCHART + ` width: ${width}px; height: ${height}px`
     const styleScale = STYLE_SCALE + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`
-    const styleLegend = `position: absolute; top: 0; left: 0; z-index:100;`
+    const styleLegend = `width: 100%; position: absolute; top: 0; left: 0; z-index:100;`
 
     const node = `
       <div class="viewport" style="${styleOffChart}"></div>

@@ -46,11 +46,15 @@ const DOM = {
   // returns true if DOM element is visible
   // source (2018-03-11): https://github.com/jquery/jquery/blob/master/src/css/hiddenVisibleSelectors.js 
   isVisible(o) {
+    if (!this.isElement(o)) return false
+
     return !!o && !!( o.offsetWidth || o.offsetHeight || o.getClientRects().length )
   },
 
   // https://www.javascripttutorial.net/dom/css/check-if-an-element-is-visible-in-the-viewport/
   isInViewport(el) {
+    if (!this.isElement(el)) return false
+
     const rect = el.getBoundingClientRect();
     return (
         rect.top >= 0 &&
@@ -62,7 +66,8 @@ const DOM = {
 
   // https://stackoverflow.com/a/41698614/15109215
   isVisibleToUser(el) {
-    if (!(el instanceof Element)) throw Error('DomUtil: el is not an element.');
+    if (!this.isElement(el)) return false
+
     const style = getComputedStyle(elem);
     if (style.display === 'none') return false;
     if (style.visibility !== 'visible') return false;
@@ -106,11 +111,11 @@ const DOM = {
   },
 
   elementsDistance(el1, el2) {
+    // fail if either are not elements
+    if (!this.isElement(el1) || !this.isElement(el1)) return false
+
     el1Location = this.elementDimPos(el1)
     el2Location = this.elementDimPos(el2)
-
-    // fail if either are not elements
-    if (!el1Location || !el2Location) return false
 
     return {
       x: el1Location.top - el2Location.top,
@@ -143,6 +148,8 @@ const DOM = {
 
   //  https://stackoverflow.com/a/3028037/15109215
   hideOnClickOutside(el) {
+    if (!this.isElement(el)) return false
+
     const outsideClickListener = event => {
       if (!el.contains(event.target) && this.isVisible(el)) { 
       // or use: event.target.closest(selector) === null
@@ -160,6 +167,8 @@ const DOM = {
   },
 
   onClickOutside(el, cb) {
+    if (!this.isElement(el)) return false
+
     const outsideClickListener = event => {
       if (!el.contains(event.target) && DOM.isVisible(el)) { 
       // or use: event.target.closest(selector) === null

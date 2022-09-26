@@ -55,7 +55,7 @@ export default class RSI extends indicator {
   }
 
   calcIndicator(input) {
-    this.overlay.data = this.TALib.EMA(input)
+    this.overlay.data = this.TALib.RSI(input)
   }
 
   regeneratePlots (params) {

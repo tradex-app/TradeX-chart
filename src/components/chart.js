@@ -130,6 +130,7 @@ export default class Chart {
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   get element() { return this.#elChart }
+  get core() { return this.#core }
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
   set width(w) { this.setWidth(w) }
@@ -176,7 +177,7 @@ export default class Chart {
       title: this.#title,
       type: "chart"
     }
-    this.#Legends = new Legends(this.#elLegends)
+    this.#Legends = new Legends(this.#elLegends, this)
     this.#Legends.add(chartLegend)
 
     // api - functions / methods, calculated properties provided by this module
@@ -421,7 +422,7 @@ export default class Chart {
 
     const styleChart = STYLE_CHART + ` width: ${width}px; height: ${height}px`
     const styleScale = STYLE_SCALE + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`
-    const styleLegend = `position: absolute; top: 0; left: 0; z-index:100;`
+    const styleLegend = `width: 100%; position: absolute; top: 0; left: 0; z-index:100;`
 
     const node = `
       <div class="viewport" style="${styleChart}"></div>

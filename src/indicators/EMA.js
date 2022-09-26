@@ -54,11 +54,6 @@ import { round } from "../utils/number";
     this.overlay.data = this.TALib.EMA(input)
   }
 
-
-
-
-
-
   regeneratePlots (params) {
     return params.map(p => {
       return { key: `ema${p}`, title: `EMA${p}: `, type: 'line' }
