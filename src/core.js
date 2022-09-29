@@ -157,7 +157,7 @@ export default class TradeXchart {
  */
 constructor (mediator, options={}) {
 
-this.oncontextmenu = window.oncontextmenu
+    this.oncontextmenu = window.oncontextmenu
 
     let container = options?.container,
         state = options?.state, 
@@ -206,9 +206,7 @@ this.oncontextmenu = window.oncontextmenu
 
   get elUtils() { return this.#elUtils }
   get elTools() { return this.#elTools }
-  // get elTime() { return this.#elTime }
   get elMain() { return this.#elMain }
-  // get elChart() { return this.#elChart }
   get elWidgetsG() { return this.#elWidgetsG }
 
   get UtilsBar() { return this.#UtilsBar }
@@ -302,6 +300,7 @@ this.oncontextmenu = window.oncontextmenu
   /**
    * Target element has been validated as a mount point
    * let's start building
+   * @param {object} config - chart configuration
    */
   init(config) {
     this.#config = config
@@ -492,15 +491,6 @@ this.oncontextmenu = window.oncontextmenu
     }
   }
 
-  unmount() {
-    this.cleanup()
-  }
-
-  cleanup() {
-    // remove all event listeners
-    // destroy all objects
-  }
-
   props() {
     return {
       // id: (id) => this.setID(id),
@@ -535,7 +525,6 @@ this.oncontextmenu = window.oncontextmenu
 
   getModID() { return this.#modID }
 
-
   setWidth(w) {
     if (isNumber(w))
       this.#chartW = w
@@ -559,6 +548,11 @@ this.oncontextmenu = window.oncontextmenu
     this.#elMain.style.height= `${this.#chartH - this.utilsH}px`
   }
 
+  /**
+   * Set chart width and height
+   * @param {number} w - width in pixels
+   * @param {number} h - height in pixels
+   */
   setDimensions(w, h) {
     let width = this.width
     let height = this.height
@@ -577,28 +571,32 @@ this.oncontextmenu = window.oncontextmenu
     })
   }
 
-    /**
-   * Set the price accuracy
-   * @param pricePrecision - Price accuracy
+  /**
+ * Set the price accuracy
+ * @param {number} pricePrecision - Price accuracy
+ */
+    setPricePrecision (pricePrecision) {
+    if (!isNumber(pricePrecision) || pricePrecision < 0) {
+      pricePrecision = PRICE_PRECISION
+    }
+    this.#pricePrecision = pricePrecision
+  }
+
+  /**
+   * Set the volume accuracy
+   * @param {number} volumePrecision - Volume accuracy
    */
-     setPricePrecision (pricePrecision) {
-      if (!isNumber(pricePrecision) || pricePrecision < 0) {
-        pricePrecision = PRICE_PRECISION
-      }
-      this.#pricePrecision = pricePrecision
+  setVolumePrecision (volumePrecision) {
+    if (!isNumber(volumePrecision) || volumePrecision < 0) {
+      volumePrecision = VOLUME_PRECISION
     }
+    this.#volumePrecision = volumePrecision
+  }
 
-    /**
-     * Set the volume accuracy
-     * @param volumePrecision - Volume accuracy
-     */
-    setVolumePrecision (volumePrecision) {
-      if (!isNumber(volumePrecision) || volumePrecision < 0) {
-        volumePrecision = VOLUME_PRECISION
-      }
-      this.#volumePrecision = volumePrecision
-    }
-
+  /**
+   * Set the chart theme
+   * @param {object} volumePrecision - Volume accuracy
+   */
   setTheme(theme) {
     // TODO: validation
     this.#theme = theme
