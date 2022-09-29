@@ -13,6 +13,7 @@ export default class StateMachine {
   #config
   #mediator
   #status = "stopped"
+  #events
   #event
   #eventData
   #actions
@@ -120,18 +121,28 @@ export default class StateMachine {
 
   start() { this.#status = "running" }
   stop() { this.#status = "stopped" }
+  destroy() { 
+    this.#unsubscribe()
+    this.#config = null
+  }
 
   #subscribe() {
-    const events = new Set()
+    this.#events = new Set()
 
     for (let state in this.#config.states) {
       for (let event in this.#config.states[state].on) {
-        events.add(event)
+        this.#events.add(event)
       }
     }
 
-    for (let event of events) {
-      this.#mediator.on(event, (data) => {this.notify(event, data)}, this.context)
+    for (let event of this.#events) {
+      this.#mediator.on(event, this.notify.bind(this, event), this.context)
+    }
+  }
+
+  #unsubscribe() {
+    for (let event of this.#events) {
+      this.#mediator.off(event, this.notify)
     }
   }
 
