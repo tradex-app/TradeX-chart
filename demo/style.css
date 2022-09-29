@@ -8,6 +8,17 @@ body {
 h1, h2 {
   color: #CCC;
   text-align: left;
+  margin: 0 0 .5em 1em;
+}
+
+p {
+  text-align: left;
+  color: #bbb;
+  margin: 0 0 .5em 1em;
+}
+
+a {
+  color: #CCC;
 }
 
 #app {
@@ -26,12 +37,12 @@ h1, h2 {
 }
 
 #nav {
-  width: 10%;
+  width: 5%;
   float: left;
 }
 
 #stage {
-  width: 90%;
+  width: 95%;
   height: 100%;
   float: right;
 }

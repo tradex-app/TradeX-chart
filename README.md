@@ -4,9 +4,9 @@
 
 TradeX-chart is a trade chart written in plain (vanilla) JavaScript with minimal dependencies; use it with any framework or backend.
 
-It provides a two way API to give you complete control over the chart.
+It uses an event driven state managed architecture, providing a two way API to give you complete control over the chart.
 
-![](assets/20220922_230049_Screenshot_20220922_225048.png)
+![](assets/20220927_130009_Screenshot_20220927_125708.png)
 
 ## Table of Contents
 

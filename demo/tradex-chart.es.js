@@ -48,11 +48,15 @@ const DOM = {
   // returns true if DOM element is visible
   // source (2018-03-11): https://github.com/jquery/jquery/blob/master/src/css/hiddenVisibleSelectors.js 
   isVisible(o) {
+    if (!this.isElement(o)) return false
+
     return !!o && !!( o.offsetWidth || o.offsetHeight || o.getClientRects().length )
   },
 
   // https://www.javascripttutorial.net/dom/css/check-if-an-element-is-visible-in-the-viewport/
   isInViewport(el) {
+    if (!this.isElement(el)) return false
+
     const rect = el.getBoundingClientRect();
     return (
         rect.top >= 0 &&
@@ -64,7 +68,8 @@ const DOM = {
 
   // https://stackoverflow.com/a/41698614/15109215
   isVisibleToUser(el) {
-    if (!(el instanceof Element)) throw Error('DomUtil: el is not an element.');
+    if (!this.isElement(el)) return false
+
     const style = getComputedStyle(elem);
     if (style.display === 'none') return false;
     if (style.visibility !== 'visible') return false;
@@ -108,11 +113,11 @@ const DOM = {
   },
 
   elementsDistance(el1, el2) {
+    // fail if either are not elements
+    if (!this.isElement(el1) || !this.isElement(el1)) return false
+
     el1Location = this.elementDimPos(el1);
     el2Location = this.elementDimPos(el2);
-
-    // fail if either are not elements
-    if (!el1Location || !el2Location) return false
 
     return {
       x: el1Location.top - el2Location.top,
@@ -145,6 +150,8 @@ const DOM = {
 
   //  https://stackoverflow.com/a/3028037/15109215
   hideOnClickOutside(el) {
+    if (!this.isElement(el)) return false
+
     const outsideClickListener = event => {
       if (!el.contains(event.target) && this.isVisible(el)) { 
       // or use: event.target.closest(selector) === null
@@ -162,6 +169,8 @@ const DOM = {
   },
 
   onClickOutside(el, cb) {
+    if (!this.isElement(el)) return false
+
     const outsideClickListener = event => {
       if (!el.contains(event.target) && DOM.isVisible(el)) { 
       // or use: event.target.closest(selector) === null
@@ -1004,9 +1013,23 @@ const line =
 const measure = 
   `<svg aria-hidden="true" width="46.08" height="46.08" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"> <path d="M 3.2758709,20.241377 11.758622,28.72413 28.72413,11.758622 20.241377,3.2758709 Z m 2.1206881,0 1.5905161,-1.590515 3.7112049,3.711203 1.060342,-1.060345 -3.7112027,-3.711204 1.0603441,-1.060344 2.1206876,2.12069 1.060346,-1.060346 -2.120689,-2.120688 1.060343,-1.060344 3.711203,3.711203 L 16,17.060346 l -3.711203,-3.711208 1.060341,-1.060341 2.12069,2.120687 1.060344,-1.060346 -2.120688,-2.120687 1.060344,-1.060343 3.711204,3.711205 1.060345,-1.060345 -3.711205,-3.7112046 1.060344,-1.0603441 2.120687,2.1206887 1.060346,-1.0603446 -2.120687,-2.1206883 1.590515,-1.5905161 6.362065,6.362063 -14.84482,14.84482 z" style="stroke-width:0.749776" /></svg>`;
 const range = 
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.5 5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 6.5A2.5 2.5 0 0 1 6.95 6H24v1H6.95A2.5 2.5 0 0 1 2 6.5zM4.5 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 16.5a2.5 2.5 0 0 1 4.95-.5h13.1a2.5 2.5 0 1 1 0 1H6.95A2.5 2.5 0 0 1 2 16.5zM22.5 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-18 6a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 22.5a2.5 2.5 0 0 1 4.95-.5H24v1H6.95A2.5 2.5 0 0 1 2 22.5z"></path><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M22.4 8.94l-1.39.63-.41-.91 1.39-.63.41.91zm-4 1.8l-1.39.63-.41-.91 1.39-.63.41.91zm-4 1.8l-1.4.63-.4-.91 1.39-.63.41.91zm-4 1.8l-1.4.63-.4-.91 1.39-.63.41.91z"></path></svg>`;
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28"><path  clip-rule="evenodd" d="M4.5 5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 6.5A2.5 2.5 0 0 1 6.95 6H24v1H6.95A2.5 2.5 0 0 1 2 6.5zM4.5 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 16.5a2.5 2.5 0 0 1 4.95-.5h13.1a2.5 2.5 0 1 1 0 1H6.95A2.5 2.5 0 0 1 2 16.5zM22.5 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-18 6a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 22.5a2.5 2.5 0 0 1 4.95-.5H24v1H6.95A2.5 2.5 0 0 1 2 22.5z"></path><path fill="currentColor"  clip-rule="evenodd" d="M22.4 8.94l-1.39.63-.41-.91 1.39-.63.41.91zm-4 1.8l-1.39.63-.41-.91 1.39-.63.41.91zm-4 1.8l-1.4.63-.4-.91 1.39-.63.41.91zm-4 1.8l-1.4.63-.4-.91 1.39-.63.41.91z"></path></svg>`;
 const text = 
   `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M231.359 147l-80.921 205h45.155l15.593-39.5h89.628l15.593 39.5h45.155l-80.921-205zm-3.594 123.5L256 198.967l28.235 71.533z"></path><path d="M384 56H128V16H16v112h40v256H16v112h112v-40h256v40h112V384h-40V128h40V16H384zM48 96V48h48v48zm48 368H48v-48h48zm288-40H128v-40H88V128h40V88h256v40h40v256h-40zm80-8v48h-48v-48zM416 48h48v48h-48z"></path></svg>`;
+
+
+  const close =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /> <g id="g718" transform="translate(0,1.2499996)"> <path d="M 7.5010125,7.9560661 5.355012,10.103066 c -0.472,0.472 -1.18,-0.2360003 -0.708,-0.7080003 L 7.6470125,6.3950659 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999998 c 0.472,0.472 -0.236,1.1800003 -0.708,0.7080003 L 8.5010125,7.9560661 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /> <path d="m 7.4989873,5.5439348 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /> </g></svg>`;
+ const up =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /> <path d="m 7.4989873,7.7026182 -2.1460003,2.147 c -0.472,0.4719998 -1.18,-0.236 -0.708,-0.708 l 3.0000003,-3 c 0.1953639,-0.1958581 0.5126361,-0.1958581 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.1799998 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6-3" /></svg>`;
+ const down =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /> <path d="m 7.4989873,8.2973819 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.1958581 0.5126361,0.1958581 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></svg>`;
+ const restore =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /> <g id="g687" transform="translate(15.647255,-0.0288128)"> <path d="m -8.1462425,10.484879 -2.1460005,2.146999 c -0.472,0.472 -1.18,-0.236 -0.708,-0.708 l 3.0000005,-2.9999994 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999994 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1460005,-2.146999 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /> <path d="m -8.1482677,5.5727476 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /> </g></svg>`;
+ const maximize =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /> <g id="g611" transform="translate(0.2050748,-0.8829888)"> <path d="m 7.2959375,11.933818 -2.146,-2.1469999 c -0.472,-0.4719998 -1.18,0.2359999 -0.708,0.7079999 l 3,3 c 0.195364,0.195858 0.512636,0.195858 0.708,0 l 3.0000005,-3 c 0.472,-0.472 -0.236,-1.1799997 -0.708,-0.7079999 L 8.2959375,11.933818 c -0.431103,0.417289 -0.523896,0.423024 -1,0 z" style="" id="path566" /> <path d="m 7.2939123,5.8321596 -2.146,2.147 c -0.4719998,0.472 -1.1799998,-0.236 -0.708,-0.708 l 3,-3 c 0.1953639,-0.195858 0.5126361,-0.195858 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6" /> </g></svg>`;
+ const collapse =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /> <path d="m 11.500447,8.5 c 0.666666,0 0.666666,-1 0,-1 H 4.444275 c -0.1571231,0 -0.224029,0.07336 -0.2978281,0.1459999 -0.1958579,0.195364 -0.1958579,0.5126361 0,0.7080001 0,0 0.113806,0.146 0.320186,0.146 z" style="" id="path887" /></svg>`;
 
 // utils.js
 
@@ -1202,6 +1225,75 @@ const ROWMINHEIGHT = 50; // px
 const OFFCHARTDEFAULTHEIGHT = 30; // %
 const DIVIDERHEIGHT = 8; // px
 
+// DMI.js
+
+class DMI extends indicator {
+  name = 'Directional Movement Index'
+  shortName = 'DMI'
+  onChart = false
+  calcParams = [20]
+  checkParamCount = false
+  plots = [
+    { key: 'DMI_1', title: ' ', type: 'line' },
+  ]
+  defaultStyle = {
+    strokeStyle: "#C80",
+    lineWidth: '1',
+    defaultHigh: 75,
+    defaultLow: 25,
+    highLowLineWidth: 1,
+    highLowStyle: "dashed",
+    highStrokeStyle: "#848",
+    lowStrokeStyle: "#848",
+    highLowRangeStyle: "#22002220"
+  }
+  style = {}
+  overlay
+  TALib
+
+  // YAXIS_TYPES - percent
+  static scale = YAXIS_TYPES[1]
+
+  /**
+ * Creates an instance of DMI.
+ * @param {object} target - canvas scene
+ * @param {object} overlay - data for the overlay
+ * @param {instance} xAxis - timeline axis
+ * @param {instance} yAxis - scale axis
+ * @param {object} config - theme / styling
+ * @memberof DMI
+ */
+  constructor(target, overlay, xAxis, yAxis, config) {
+    super(target, xAxis, yAxis, config);
+
+    this.overlay = overlay;
+    this.style = {...this.defaultStyle, ...config.style};
+    this.TALib = xAxis.mediator.api.core.TALib;
+  }
+
+  calcIndicator(input) {
+    this.overlay.data = this.TALib.DMI(input);
+  }
+
+  regeneratePlots (params) {
+    return params.map((_, index) => {
+      const num = index + 1;
+      return { key: `dmi${num}`, title: `DMI${num}: `, type: 'line' }
+    })
+  }
+
+  draw(range) {
+    this.scene.clear();
+
+    this.overlay.data;
+    this.xAxis.candleW;
+    this.scene.width + (this.xAxis.bufferPx * 2);
+    this.yAxis.yPos(100 - this.style.defaultHigh);
+    this.yAxis.yPos(100 - this.style.defaultLow);
+
+  }
+}
+
 // number.js
 
 // Getting a random integer between two values
@@ -1356,11 +1448,6 @@ function limit(val, min, max) {
     this.overlay.data = this.TALib.EMA(input);
   }
 
-
-
-
-
-
   regeneratePlots (params) {
     return params.map(p => {
       return { key: `ema${p}`, title: `EMA${p}: `, type: 'line' }
@@ -1472,7 +1559,7 @@ class RSI extends indicator {
   }
 
   calcIndicator(input) {
-    this.overlay.data = this.TALib.EMA(input);
+    this.overlay.data = this.TALib.RSI(input);
   }
 
   regeneratePlots (params) {
@@ -1588,8 +1675,8 @@ class RSI extends indicator {
 var Indicators = {
   ADX: {id: "ADX", name: "Average Direction", event: "addIndicator"},
   BB: {id: "BB", name: "Bollinger Bands", event: "addIndicator", ind: ""},
+  DMI: {id: "DMI", name: "Directional Movement", event: "addIndicator", ind: DMI},
   EMA: {id: "EMA", name: "Exponential Moving Average", event: "addIndicator", ind: EMA},
-  DMI: {id: "DMI", name: "Directional Movement", event: "addIndicator", },
   RSI: {id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: RSI},
 };
 
@@ -2923,7 +3010,13 @@ var tools = [
     icon: fibonacci,
     event: "tool_activated",
     class: Fibonacci,
-    sub: []
+    sub: [
+      {
+        id: "fib",
+        name: "Not Implemented Yet",
+        icon: line,
+      }
+    ]
   },
   {
     id: "range",
@@ -2931,7 +3024,13 @@ var tools = [
     icon: range,
     event: "tool_activated",
     class: Range,
-    sub: []
+    sub: [
+      {
+        id: "rng",
+        name: "Not Implemented Yet",
+        icon: line,
+      }
+    ]
   },
   {
     id: "text",
@@ -2939,7 +3038,13 @@ var tools = [
     icon: text,
     event: "tool_activated",
     class: Text,
-    sub: []
+    sub: [
+      {
+        id: "txt",
+        name: "Not Implemented Yet",
+        icon: line,
+      }
+    ]
   },
   {
     id: "measure",
@@ -3001,6 +3106,45 @@ const TIMEUNITSVALUESLONG = {
   seconds: SECOND_MS,
 };
 const TIMEUNITSVALUES = { ...TIMEUNITSVALUESSHORT, ...TIMEUNITSVALUESLONG };
+
+const timezones = {
+  0: 'Europe/London',
+  '-120': 'Europe/Tallinn',
+  '-60': 'Europe/Zurich',
+  180: 'America/Santiago',
+  300: 'America/Toronto',
+  240: 'America/Caracas',
+  360: 'America/Mexico_City',
+  540: 'America/Juneau',
+  480: 'America/Vancouver',
+  420: 'US/Mountain',
+  120: 'America/Sao_Paulo',
+  '-360': 'Asia/Almaty',
+  '-300': 'Asia/Ashkhabad',
+  '-180': 'Europe/Moscow',
+  '-420': 'Asia/Jakarta',
+  '-480': 'Asia/Taipei',
+  '-240': 'Asia/Muscat',
+  '-345': 'Asia/Kathmandu',
+  '-330': 'Asia/Kolkata',
+  '-540': 'Asia/Tokyo',
+  '-210': 'Asia/Tehran',
+  '-660': 'Pacific/Norfolk',
+  '-630': 'Australia/Adelaide',
+  '-600': 'Australia/Brisbane',
+  '-780': 'Pacific/Fakaofo',
+  '-825': 'Pacific/Chatham',
+  600: 'Pacific/Honolulu',
+};
+
+function getTimezone() {
+  const offset = new Date().getTimezoneOffset();
+
+  if (Object.prototype.hasOwnProperty.call(timezones, offset)) {
+    return timezones[offset.toString()];
+  }
+  return 'Etc/UTC';
+}
 
 function buildSubGrads() {
   const grads = {};
@@ -3331,6 +3475,8 @@ var Time = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   TIMEUNITSVALUESSHORT: TIMEUNITSVALUESSHORT,
   TIMEUNITSVALUESLONG: TIMEUNITSVALUESLONG,
   TIMEUNITSVALUES: TIMEUNITSVALUES,
+  timezones: timezones,
+  getTimezone: getTimezone,
   buildSubGrads: buildSubGrads,
   isValidTimestamp: isValidTimestamp,
   isValidTimeInRange: isValidTimeInRange,
@@ -5954,15 +6100,30 @@ class Legends {
 
   #targetEl
   #list
+  #parent
+  #core
 
-  constructor(target) {
+  #controls = {
+    width: 20,
+    height: 20,
+    fill: "#aaa"
+  }
+  #controlsList
+
+  constructor(target, parent) {
     this.#targetEl = target;
     this.#list = {};
+    this.#parent = parent;
+    this.#core = parent.core;
 
     this.mount(target);
   }
 
   get list() { return this.#list }
+
+  onMouseClick() {
+
+  }
 
   mount(el) {
     // el.innerHTML = this.defaultNode()
@@ -5972,9 +6133,10 @@ class Legends {
   }
 
   buildLegend(o) {
-    const styleLegend = "margin: .5em 0 1em 1em; font-size: 12px;";
+    const styleLegend = `width: calc(100% - ${this.#core.scaleW}px - 1em); margin: .5em 0 1em 1em; font-size: 12px; text-align: left;`;
       let styleLegendTitle = "margin-right: 1em; white-space: nowrap;";
     const styleInputs = "display: inline; margin-left: -1em;";
+    const styleControls = "float: right; margin: 0.5em;";
 
     styleLegendTitle += (o?.type === "chart")? "font-size: 1.5em;" : "font-size: 1.2em;";
 
@@ -5982,6 +6144,7 @@ class Legends {
       <div id="${o.id}" class="legend" style="${styleLegend}">
         <span class="title" style="${styleLegendTitle}">${o.title}</span>
         <dl style="${styleInputs}">${this.buildInputs(o)}</dl>
+        <div class="controls" style="${styleControls}">${this.buildControls(o)}</div>
       </div>
     `;
     return node
@@ -6004,6 +6167,30 @@ class Legends {
     return inp
   }
 
+  buildControls(o) {
+    let inp = "";
+    let id = this.#parent.ID;
+
+    // visibility
+    // move up
+    inp += `<span id="${id}_up" class="control">${up}</span>`;
+    // move down
+    inp += `<span id="${id}_down" class="control">${down}</span>`;
+    // collapse
+    inp += `<span id="${id}_collapse" class="control">${collapse}</span>`;
+    // maximize
+    inp += `<span id="${id}_maximize" class="control">${maximize}</span>`;
+    // restore
+    inp += `<span id="${id}_restore" class="control">${restore}</span>`;
+    // remove
+    inp += `<span id="${id}_remove" class="control">${close}</span>`;
+    // config
+    inp += `<span id="${id}_config" class="control">${config}</span>`;
+
+
+    return inp
+  }
+
   add(options) {
     if (!isObject(options) || !("title" in options)) return false
 
@@ -6013,8 +6200,19 @@ class Legends {
     const html = this.buildLegend(options);
     const elem = DOM.htmlToElement(html);
 
-    this.#targetEl.appendChild(elem); 
-    this.#list[options.id] = {el: DOM.findByID(options.id), type: options.type};
+    this.#targetEl.appendChild(elem);
+    const legendEl = DOM.findByID(options.id);
+    this.#list[options.id] = {el: legendEl, type: options.type};
+
+    this.#controlsList = DOM.findBySelectorAll(`#${options.id} .controls .control`);
+    for (let c of this.#controlsList) {
+      let svg = c.querySelector('svg');
+      svg.style.width = `${this.#controls.width}px`;
+      svg.style.height = `${this.#controls.height}px`;
+      svg.style.fill = `${this.#controls.fill}`;
+
+      c.addEventListener('click', this.onMouseClick.bind(this));
+    }
 
     return options.id
   }
@@ -6025,6 +6223,11 @@ class Legends {
     
     this.#list[id].el.remove();
     delete this.#list[id];
+
+    for (let c of this.#controlsList) {
+      c.removeEventListener('click', this.onMouseClick);
+    }
+    
 
     return true
   }
@@ -6933,6 +7136,7 @@ class Chart {
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   get element() { return this.#elChart }
+  get core() { return this.#core }
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
   set width(w) { this.setWidth(w); }
@@ -6979,7 +7183,7 @@ class Chart {
       title: this.#title,
       type: "chart"
     };
-    this.#Legends = new Legends(this.#elLegends);
+    this.#Legends = new Legends(this.#elLegends, this);
     this.#Legends.add(chartLegend);
 
     // api - functions / methods, calculated properties provided by this module
@@ -7224,7 +7428,7 @@ class Chart {
 
     const styleChart = STYLE_CHART + ` width: ${width}px; height: ${height}px`;
     const styleScale = STYLE_SCALE$2 + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`;
-    const styleLegend = `position: absolute; top: 0; left: 0; z-index:100;`;
+    const styleLegend = `width: 100%; position: absolute; top: 0; left: 0; z-index:100;`;
 
     const node = `
       <div class="viewport" style="${styleChart}"></div>
@@ -7839,7 +8043,7 @@ class OffChart {
       title: options.offChart.name,
       type: options.offChart.type
     };
-    this.#Legends = new Legends(this.#elLegends);
+    this.#Legends = new Legends(this.#elLegends, this);
     this.#Legends.add(offChartLegend);
 
     // api - functions / methods, calculated properties provided by this module
@@ -8034,7 +8238,7 @@ class OffChart {
 
     const styleOffChart = STYLE_OFFCHART + ` width: ${width}px; height: ${height}px`;
     const styleScale = STYLE_SCALE$1 + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`;
-    const styleLegend = `position: absolute; top: 0; left: 0; z-index:100;`;
+    const styleLegend = `width: 100%; position: absolute; top: 0; left: 0; z-index:100;`;
 
     const node = `
       <div class="viewport" style="${styleOffChart}"></div>
@@ -8937,6 +9141,8 @@ class MainPane {
 
 // menu.js
 
+const MENUMINWIDTH = 150;
+
 class Menu {
 
   #id
@@ -9099,8 +9305,8 @@ class Menu {
 
   content(menu) {
     this.#mediator.api;
-    const listStyle = "list-style: none; text-align: left; margin:1em 1em 1em -2.5em;";
-    const itemStyle = "padding: .25em 1em .25em 1em;";
+    const listStyle = `list-style: none; text-align: left; margin:1em 1em 1em -2.5em; min-width: ${MENUMINWIDTH}px`;
+    const itemStyle = "padding: .25em 1em .25em 1em; white-space: nowrap;";
     const shortStyle = "display: inline-block; width: 4em;";
     const cPointer = "cursor: pointer;";
     const over = `onmouseover="this.style.background ='#222'"`;
@@ -9135,6 +9341,14 @@ class Menu {
 
     Menu.currentActive = this;
     this.#elMenu.style.display = "block";
+
+    let pos = DOM.elementDimPos(this.#elMenu);
+    let posR = pos.left + pos.width;
+    if (posR > this.#elWidgetsG.offsetWidth) {
+      let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width);
+          o = limit(o, 0, this.#elWidgetsG.offsetWidth);
+      this.#elMenu.style.left = `${o}px`;
+    }
   }
 
   // hide the menu
@@ -10603,7 +10817,7 @@ this.oncontextmenu = window.oncontextmenu;
 
   end() {
     this.log("...cleanup the mess");
-    removeEventListener('mousemove', this.onMouseMove);
+    this.#elTXChart.removeEventListener('mousemove', this.onMouseMove);
 
     this.off(STREAM_UPDATE, this.onStreamUpdate);
   }

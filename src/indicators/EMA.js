@@ -6,28 +6,28 @@
    YAXIS_TYPES
  } from "../definitions/chart";
 import { round } from "../utils/number";
+import { uid } from "../utils/utilities"
  
  export default class EMA extends indicator {
-  name ='Exponential Moving Average'
-  shortName = 'EMA'
-  onChart = true
-  series = 'price'
-  calcParams = [6, 12, 20]
-  precision = 2
-  shouldCheckParamCount = false
-  shouldOhlc = true
-  plots = [
+  #ID
+  #name ='Exponential Moving Average'
+  #shortName = 'EMA'
+  #onChart = true
+  #series = 'price'
+  #precision = 2
+  #calcParams = [6, 12, 20]
+  #checkParamCount = false
+  #scaleOverlay = false
+  #plots = [
     { key: 'ema6', title: 'EMA6: ', type: 'line' },
     { key: 'ema12', title: 'EMA12: ', type: 'line' },
     { key: 'ema20', title: 'EMA20: ', type: 'line' }
   ]
-  defaultStyle = {
+  #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1'
   }
-  style = {}
-  overlay
-  TALib
+  #style = {}
 
   // YAXIS_TYPES - default
   static scale = YAXIS_TYPES[0]
@@ -45,19 +45,29 @@ import { round } from "../utils/number";
   constructor(target, overlay, xAxis, yAxis, config) {
     super(target, xAxis, yAxis, config)
 
-    this.overlay = overlay
-    this.style = config.style || this.defaultStyle
-    this.TALib = xAxis.mediator.api.core.TALib
+    this.#ID = uid(this.#shortName)
+    this.#style = {...this.#defaultStyle, ...config.style}
   }
 
+  get ID() { return this.#ID }
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get onChart() { return this.#onChart }
+  get style() { return this.#style }
+  get plots() { return this.#plots }
+
   calcIndicator(input) {
-    this.overlay.data = this.TALib.EMA(input)
+    this.overlay.data = this.TAlib.Indicators.EMA.ema(input)
   }
 
   regeneratePlots (params) {
     return params.map(p => {
       return { key: `ema${p}`, title: `EMA${p}: `, type: 'line' }
     })
+  }
+
+  updateIndicator (input) {
+
   }
 
   calcTechnicalIndicator (dataList, { params, plots }) {

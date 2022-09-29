@@ -23,19 +23,15 @@
         return _results1;
       }
     };
-    core.uniqueId = function(length) {
-      var id;
-      if (length == null) {
-        length = 8;
-      }
-      id = "";
+    core.uniqueId = function(length=8) {
+      let id = "";
       while (id.length < length) {
-        id += Math.random().toString(36).substr(2);
+        id += Math.random().toString(36).substring(2);
       }
-      return id.substr(0, length);
+      return id.substring(0, length);
     };
     core.clone = function(data) {
-      var copy, k, v;
+      let copy, k, v;
       if (data instanceof Array) {
         copy = (function() {
           var _i, _len, _results;
@@ -56,7 +52,7 @@
       return copy;
     };
     core.countObjectKeys = function(o) {
-      var k, v;
+      let k, v;
       if (typeof o === "object") {
         return ((function() {
           var _results;

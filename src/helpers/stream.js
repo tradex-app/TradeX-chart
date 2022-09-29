@@ -101,7 +101,7 @@ export default class Stream {
     this.status = {status: STREAM_LISTENING, data: this.#candle}
   }
   get candle() {
-    if (this.#candle !== empty) return this.#candle
+    return (this.#candle !== empty) ? this.#candle : null
   }
 
   /**

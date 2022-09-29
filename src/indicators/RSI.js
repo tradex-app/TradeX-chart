@@ -8,17 +8,31 @@ import {
   YAXIS_TYPES
 } from "../definitions/chart";
 import { round } from "../utils/number";
+import { uid } from "../utils/utilities"
 
+const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
+const calcParams = [20]
+
+
+/**
+ * Indicator - Relative Strength Index
+ * @export
+ * @class RSI
+ * @extends {indicator}
+ */
 export default class RSI extends indicator {
-  name = 'Relative Strength Index'
-  shortName = 'RSI'
-  onChart = false
-  calcParams = [20]
-  checkParamCount = false
-  plots = [
+  #ID
+  #name = 'Relative Strength Index'
+  #shortName = 'RSI'
+  #onChart = false
+  #precision = 2
+  #calcParams = calcParams
+  #checkParamCount = false
+  #scaleOverlay = true
+  #plots = [
     { key: 'RSI_1', title: ' ', type: 'line' },
   ]
-  defaultStyle = {
+  #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1',
     defaultHigh: 75,
@@ -29,9 +43,7 @@ export default class RSI extends indicator {
     lowStrokeStyle: "#848",
     highLowRangeStyle: "#22002220"
   }
-  style = {}
-  overlay
-  TALib
+  #style = {}
 
   // YAXIS_TYPES - percent
   static scale = YAXIS_TYPES[1]
@@ -46,16 +58,65 @@ export default class RSI extends indicator {
    * @param {object} config - theme / styling
    * @memberof RSI
    */
-  constructor(target, overlay, xAxis, yAxis, config) {
-    super(target, xAxis, yAxis, config)
+  constructor (target, overlay, xAxis, yAxis, config) {
+    super (target, overlay, xAxis, yAxis, config)
 
-    this.overlay = overlay
-    this.style = {...this.defaultStyle, ...config.style}
-    this.TALib = xAxis.mediator.api.core.TALib
+    this.#ID = overlay?.id || uid(this.#shortName)
+    this.#calcParams = (overlay?.calcParams) ? JSON.parse(overlay.calcParams) : calcParams
+    this.#style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
+    this.setNewValue = (value) => { this.newValue(value) }
+    this.setUpdateValue = (value) => { this.UpdateValue(value) }
   }
 
-  calcIndicator(input) {
-    this.overlay.data = this.TALib.RSI(input)
+  get ID() { return this.#ID }
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get onChart() { return this.#onChart }
+  get style() { return this.#style }
+  get plots() { return this.#plots }
+
+  indicatorStream() {
+    // return indicator stream
+  }
+
+  /**
+   * calculate indicator values for entire chart history
+   * @returns {boolean} - success or failure
+   */
+  calcIndicator () {
+    this.overlay.data = []
+    let step = this.#calcParams[0]
+    // fail if there is not enough data to calculate
+    if (this.range.Length < step) return false
+
+    let data, end, entry, time;
+    let start = 0
+    let input = this.indicatorInput(start, this.range.Length - 1)
+    do {
+      end = start + step
+      data = input.slice(start, end)
+      entry = this.TALib.RSI({ inReal: input, timePeriod: step })
+      time = this.range.value(end - 1)[0]
+      this.overlay.data.push([time, entry])
+      start++
+    } 
+    while (end < this.range.Length)
+    return true
+  }
+
+  /**
+   * 
+   * @param {*} data 
+   * @returns {array} - indicator data entry
+   */
+  calcIndicatorStream (data) {
+    let end = this.range.Length - 1
+    let step = this.#calcParams[0]
+    let start = end - step
+    let input = this.indicatorInput(start, end)
+    let entry = this.TALib.RSI({ inReal: input, timePeriod: step })
+    let time = this.range.value(end)[0]
+    return [time, entry]
   }
 
   regeneratePlots (params) {
@@ -65,6 +126,38 @@ export default class RSI extends indicator {
     })
   }
 
+  /**
+   * process stream and create new indicator data entry
+   * @param {array} value - current stream candle 
+   * @memberof RSI
+   */
+  newValue (value) {
+    let v = this.calcIndicatorStream(value)
+    this.overlay.data.push([v[0], v[1].output])
+    // this.overlay.data
+    console.log(`RSI stream input new value: ${value}`)
+  }
+
+  /**
+   * process stream and update current (last) indicator data entry
+   * @param {array} value - current stream candle 
+   * @memberof RSI
+   */
+  UpdateValue (value) {
+    let l = this.overlay.data.length - 1
+    let v = this.calcIndicatorStream(value)
+    this.overlay.data[l] = [v[0], v[1].output]
+
+    this.draw(this.range)
+
+    console.log(`RSI stream input update: ${value}`)
+
+  }
+
+  updateIndicator (input) {
+
+  }
+ 
   calcTechnicalIndicator (dataList, { params, plots }) {
     const sumCloseAs = []
     const sumCloseBs = []
@@ -98,6 +191,10 @@ export default class RSI extends indicator {
     })
   }
 
+  /**
+   * Draw the current indicator range on its canvas layer and render it.
+   * @param {object} range 
+   */
   draw(range) {
     this.scene.clear()
 

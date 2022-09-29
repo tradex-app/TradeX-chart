@@ -152,7 +152,7 @@ export default class TradeXchart {
 /**
  * Creates an instance of TradeXchart.
  * @param {instance} mediator
- * @param {object} [options={}]
+ * @param {object}[options={}]
  * @memberof TradeXchart
  */
 constructor (mediator, options={}) {
@@ -255,15 +255,14 @@ this.oncontextmenu = window.oncontextmenu
   get stream() { return this.#stream }
 
 
-
   /**
    * Create a new TradeXchart instance
    *
    * @static
-   * @param {DOM element} container
-   * @param {Object} [config={}]
-   * @param {Object} state
-   * @return {Instance}  
+   * @param {DOM_element} container
+   * @param {object}[config={}]
+   * @param {object}state
+   * @return {instance}  
    * @memberof TradeXchart
    */
   static create(container, config={}, state) {
@@ -287,8 +286,14 @@ this.oncontextmenu = window.oncontextmenu
     return instance
   }
 
+  /**
+   * Destroy a chart instance, clean up and remove data
+   * @static
+   * @param {instance} chart 
+   */
   static destroy(chart) {
     if (chart.constructor.name === "TradeXchart") {
+      chart.end()
       const inCnt = chart.inCnt;
       delete TradeXchart.#instances[inCnt];
     }
@@ -383,6 +388,9 @@ this.oncontextmenu = window.oncontextmenu
     this.log(`${this.#name} instantiated`)
   }
 
+  /**
+   * Start the chart processing events and displaying data
+   */
   start() {
     this.log("...processing state")
 
@@ -398,11 +406,24 @@ this.oncontextmenu = window.oncontextmenu
     if (isObject(this.#config.stream)) this.#stream = new Stream(this)
   }
 
+  /**
+   * Stop all chart event processing and remove the chart from DOM.
+   * In other words, destroy the chart.
+   */
   end() {
     this.log("...cleanup the mess")
     this.#elTXChart.removeEventListener('mousemove', this.onMouseMove)
 
     this.off(STREAM_UPDATE, this.onStreamUpdate)
+
+    this.UtilsBar.end()
+    this.ToolsBar.end()
+    this.MainPane.end()
+    this.WidgetsG.end()
+
+    this.#state = null
+
+    DOM.findByID(this.id).remove
   }
 
   eventsListen() {
@@ -640,7 +661,6 @@ this.oncontextmenu = window.oncontextmenu
    * Calculate new range index / position from position difference
    * typically mouse drag or cursor keys
    * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
-   * @returns 
    */
   updateRange(pos) {
 
@@ -684,9 +704,12 @@ this.oncontextmenu = window.oncontextmenu
   }
 
   /**
-   * Merge a block of data into the chart state
-   * used for populating a chart with back history
-   * or updating with a live stream
+   * Merge a block of data into the chart state.
+   * Used for populating a chart with back history.
+   * Merge data must be formatted to a Chart State.
+   * Optionally set a new range upon merge.
+   * @param {object} merge - merge data must be formatted to a Chart State
+   * @param {boolean|object} newRange - false | {start: number, end: number}
    */
   mergeData(merge, newRange=false) {
     if (!isObject(merge)) return false
@@ -732,8 +755,12 @@ this.oncontextmenu = window.oncontextmenu
 
   }
 
-
-
+  /**
+   * Resize the chart
+   * @param {number} width - pixels
+   * @param {number} height - pixels
+   * @returns {boolean} - success or failure
+   */
   resize(width, height) {
     if (!isNumber(width) && !isNumber(height)) return false
 

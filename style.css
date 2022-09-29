@@ -8,6 +8,17 @@ body {
 h1, h2 {
   color: #CCC;
   text-align: left;
+  margin: 0 0 .5em 1em;
+}
+
+p {
+  text-align: left;
+  color: #bbb;
+  margin: 0 0 .5em 1em;
+}
+
+a {
+  color: #CCC;
 }
 
 #app {

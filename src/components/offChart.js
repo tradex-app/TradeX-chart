@@ -72,20 +72,22 @@ export default class OffChart {
 
   #viewport
   #layerGrid
+  #layerStream
   #layerCursor
   #layersIndicator
-  #layersTools
-  #layerStream
+  #layersTools = new Map()
 
   #overlayGrid
   #overlayIndicator
+  #overlayStream
+  #overlayTools = new Map()
   #overlayCursor
 
   #cursorPos = [0, 0]
   #cursorActive = false
 
   #settings
-  #chartCandle
+  #streamCandle
   #title
   #theme
   #controller
@@ -115,7 +117,6 @@ export default class OffChart {
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   get core() { return this.#core }
-  get range() { return this.#core.range }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elOffChart) }
   get stateMachine() { return this.#mediator.stateMachine }
@@ -123,6 +124,9 @@ export default class OffChart {
   get element() { return this.#elOffChart }
   get widgets() { return this.#core.WidgetsG }
   get offChartID() { return this.#offChartID }
+  get data() {}
+  get range() { return this.#core.range }
+  get stream() { return this.#Stream }
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
   get candleW() { return this.#core.Timeline.candleW }
@@ -205,12 +209,22 @@ export default class OffChart {
   }
 
   end() {
+    this.#mediator.stateMachine.destroy()
+    this.#viewport.destroy()
+    this.#Scale.end()
+    this.#Divider.end()
+    this.#Indicator.end()
+
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
     this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
     this.#controller.removeEventListener("mouseout", this.onMouseOut);
     this.#controller.removeEventListener("mousedown", this.onMouseDown);
+    this.#controller = null
 
     this.off("main_mousemove", this.updateLegends)
+    this.off(STREAM_LISTENING, this.onStreamListening)
+    this.off(STREAM_NEWVALUE, this.onStreamNewValue)
+    this.off(STREAM_UPDATE, this.onStreamUpdate)
   }
 
 
@@ -225,9 +239,9 @@ export default class OffChart {
 
     // listen/subscribe/watch for parent notifications
     this.on("main_mousemove", this.updateLegends.bind(this))
-    this.on(STREAM_LISTENING, (stream) => this.onStreamListening(stream))
-    this.on(STREAM_NEWVALUE, (value) => this.onStreamNewValue(value))
-    this.on(STREAM_UPDATE, (value) => this.onStreamUpdate(value))
+    this.on(STREAM_LISTENING, this.onStreamListening.bind(this))
+    this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this))
+    this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this))
   }
 
   on(topic, handler, context) {
@@ -272,13 +286,18 @@ export default class OffChart {
     }
   }
 
-
   onStreamNewValue(value) {
-
+    this.draw(this.range, true)
   }
 
-  onStreamUpdate(value) {
+  onStreamUpdate(candle) {
+    this.#streamCandle = candle
+    // calculate new indicator value
+    this.#layerStream.setPosition(this.#core.stream.lastScrollPos, 0)
+    // this.#chartStreamCandle.draw(candle)
+    this.#viewport.render()
 
+    this.updateLegends()
   }
 
   mount(el) {

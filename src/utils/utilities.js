@@ -92,8 +92,10 @@ export function copyDeep(obj) {
   return temp;
 }
 
-export function uid(tag="id") {
-  if (!isString(tag)) tag = "ID"
+// unique ID
+export function uid(tag="ID") {
+  if (isNumber(tag)) tag = tag.toString()
+  else if (!isString(tag)) tag = "ID"
   const dateString = Date.now().toString(36);
   const randomness = Math.random().toString(36).substring(2,5);
   return `${tag}_${dateString}_${randomness}`

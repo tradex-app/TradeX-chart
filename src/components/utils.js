@@ -60,6 +60,7 @@ export default class UtilsBar {
   }
 
   end() {
+    this.#mediator.stateMachine.destroy()
     // remove event listeners
     const api = this.#mediator.api
     const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
@@ -70,15 +71,19 @@ export default class UtilsBar {
           util.removeEventListener("click", this.onIconClick)
       }
     }
+
+    this.off("utils_indicators", this.onIndicators)
+    this.off("utils_timezone", this.onTimezone)
+    this.off("utils_settings", this.onSettings)
+    this.off("utils_screenshot", this.onScreenshot)
   }
 
   eventsListen() {
-    this.on("utils_indicators", (e) => { this.onIndicators(e) })
-    this.on("utils_timezone", (e) => { this.onTimezone(e) })
-    this.on("utils_settings", (e) => { this.onSettings(e) })
-    this.on("utils_screenshot", (e) => { this.onScreenshot(e) })
+    this.on("utils_indicators", this.onIndicators.bind(this))
+    this.on("utils_timezone", this.onTimezone.bind(this))
+    this.on("utils_settings", this.onSettings.bind(this))
+    this.on("utils_screenshot", this.onScreenshot.bind(this))
     // this.on("resize", (dimensions) => this.onResize.bind(this))
-
   }
   
   on(topic, handler, context) {

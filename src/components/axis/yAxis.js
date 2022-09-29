@@ -14,6 +14,7 @@ import { YAxisStyle } from "../../definitions/style";
 
 export default class yAxis extends Axis {
 
+  #source
   #parent
   #chart
 
@@ -27,15 +28,16 @@ export default class yAxis extends Axis {
   #yAxisGrads
 
   constructor(parent, chart, yAxisType=YAXIS_TYPES[0]) {
-    super()
+    super(parent, chart)
     this.#chart = chart
-    this.#parent = parent 
+    this.#parent = parent
+    this.#source = parent.parent
     this.yAxisType = yAxisType
     this.#yAxisGrid = (this.#parent.core.config?.yAxisGrid) ? 
       this.#parent.core.config?.yAxisGrid : YAXIS_GRID
   }
 
-  get chart() { return this.#chart } //this.#parent.mediator.api.core.Chart }
+  get chart() { return this.#chart }
   get data() { return this.chart.data }
   get range() { return this.#parent.mediator.api.core.range }
   get height() { return this.chart.height }

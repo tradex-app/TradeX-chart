@@ -11,6 +11,11 @@ import { timestampDiff } from "../utils/time"
 import stateMachineConfig from "../state/state-tools"
 
 
+/**
+ * Provides the drawing tools for the chart.
+ * @export
+ * @class ToolsBar
+ */
 export default class ToolsBar {
 
   #name = "Toolbar"
@@ -61,7 +66,6 @@ export default class ToolsBar {
     this.initAllTools()
     // add all on and off chart tools
     this.addAllTools()
-
     // set up event listeners
     this.eventsListen()
 
@@ -72,6 +76,7 @@ export default class ToolsBar {
   }
 
   end() {
+    this.#mediator.stateMachine.destroy()
     // remove event listeners
     const api = this.#mediator.api
     const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`)
@@ -81,12 +86,14 @@ export default class ToolsBar {
           tool.removeEventListener("click", this.onIconClick)
       }
     }
+
+    this.off("tool_selected", this.onToolSelect)
+    this.off("tool_deselected", this.onToolDeselect)
   }
 
   eventsListen() {
     this.on("tool_selected", (e) => { this.onToolSelect.bind(this) })
     this.on("tool_deselected", (e) => { this.onToolDeselect.bind(this) })
-
   }
 
   on(topic, handler, context) {
