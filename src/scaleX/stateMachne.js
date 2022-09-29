@@ -2,8 +2,13 @@
 // a simple Finite State Machine
 
 import { isArray, isFunction, isObject, isString } from "../utils/typeChecks"
-import { isArrayEqual } from "../utils/utilities"
+import { isArrayEqual, uid } from "../utils/utilities"
 
+/**
+ * Finite State Machine
+ * @export
+ * @class StateMachine
+ */
 export default class StateMachine {
 
   #id
@@ -19,7 +24,15 @@ export default class StateMachine {
   #actions
   #statuses = ["await", "idle", "running", "stopped"]
 
+  /**
+   * Instantiate state machine
+   * @param {object} config - state definition
+   * @param {object} mediator - module mediate provides event handling
+   * @returns 
+   */
   constructor(config, mediator) {
+    if (!StateMachine.validateConfig(config)) return false
+
     this.#id = config.id
     this.#config = config
     this.#state = config.initial
@@ -27,11 +40,10 @@ export default class StateMachine {
     this.#actions = config.actions
     this.#mediator = mediator
 
-    if (!StateMachine.validateConfig) return false
-
     this.#subscribe()
   }
 
+  /** @type Return state machine ID */
   get id() { return this.#id }
   get state() { return this.#state }
   get previousSate() { return this.#statePrev }
@@ -119,8 +131,11 @@ export default class StateMachine {
     return event in currStateConfig.on
   }
 
+  /** commence state machine execution */
   start() { this.#status = "running" }
+  /** stop state machine execution */
   stop() { this.#status = "stopped" }
+  /** Expunge state and event listeners, free memory */
   destroy() { 
     this.#unsubscribe()
     this.#config = null
@@ -146,6 +161,11 @@ export default class StateMachine {
     }
   }
 
+  /**
+   * @static
+   * @param {object} c - state definition
+   * @returns {boolean} - valid true or false
+   */
   static validateConfig(c) {
     if (!isObject(c)) return false
 
@@ -156,11 +176,13 @@ export default class StateMachine {
 
     if (!(c.initial in c.states)) return false
 
-    for (state in c.states) {
-      if ("onEnter" in c.states[state] && !isFunction(c.states[state])) return false
-      if ("onExit" in c.states[state] && !isFunction(c.states[state])) return false
+    for (let state in c.states) {
+      if (!isObject(c.states[state])) return false
+      if ("onEnter" in c.states[state] && !isFunction(c.states[state].onEnter)) return false
+      if ("onExit" in c.states[state] && !isFunction(c.states[state].onExit)) return false
       if ("on" in c.states[state]) {
-        for (let event of c.states[state].on) {
+        for (let e in c.states[state].on) {
+          let event = c.states[state].on[e]
           if (!isString(event.target)) return false
           if ("action" in event && !isFunction(event.action)) return false
         }
