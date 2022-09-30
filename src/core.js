@@ -56,6 +56,12 @@ const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;";
 (async () => {
   await talib.init("node_modules/talib-web/lib/talib.wasm")
 })();
+
+/**
+ * The root class for the entire chart
+ * @export
+ * @class TradeXchart
+ */
 export default class TradeXchart {
 
 
@@ -151,8 +157,8 @@ export default class TradeXchart {
 
 /**
  * Creates an instance of TradeXchart.
- * @param {instance} mediator
- * @param {object}[options={}]
+ * @param {instance} mediator - module api
+ * @param {object}[options={}] - chart configuration
  * @memberof TradeXchart
  */
 constructor (mediator, options={}) {
@@ -257,9 +263,9 @@ constructor (mediator, options={}) {
    * Create a new TradeXchart instance
    *
    * @static
-   * @param {DOM_element} container
-   * @param {object}[config={}]
-   * @param {object}state
+   * @param {DOM_element} container - HTML element to mount the chart on
+   * @param {object} [config={}] - chart config
+   * @param {object} state - chart state
    * @return {instance}  
    * @memberof TradeXchart
    */
@@ -288,6 +294,7 @@ constructor (mediator, options={}) {
    * Destroy a chart instance, clean up and remove data
    * @static
    * @param {instance} chart 
+   * @memberof TradeXchart
    */
   static destroy(chart) {
     if (chart.constructor.name === "TradeXchart") {
@@ -298,7 +305,7 @@ constructor (mediator, options={}) {
   }
 
   /**
-   * Target element has been validated as a mount point
+   * Target element has been validated as a mount point, 
    * let's start building
    * @param {object} config - chart configuration
    */
@@ -636,14 +643,15 @@ constructor (mediator, options={}) {
     const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour};`
     const styleMain = STYLE_MAIN + ` left: ${this.toolsW}px; width: calc(100% - ${this.toolsW}px);`
     const styleWidgets = ` position: relative;`
+    const styleEvents = `position: absolute; top: 0; right: 0; width: ${this.scaleW}px; height: 100%;`
     
     const node = `
       <div id="${this.id}" class="${classesTXChart}" style="${styleTXChart}">
         <div class="${CLASS_UTILS}" style="${styleUtils}"></div>
         <div class="${CLASS_BODY}" style="${styleBody}">
           <div class="${CLASS_TOOLS}" style="${styleTools}"></div>
-          <div class="${CLASS_MAIN}" style="${styleMain}">
-          </div>
+          <div class="${CLASS_MAIN}" style="${styleMain}"></div>
+          <div style="${styleEvents}"></div>
         </div>
         <div class="${CLASS_WIDGETSG}" style="${styleWidgets}"></div>
       </div>

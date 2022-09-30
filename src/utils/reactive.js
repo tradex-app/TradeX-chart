@@ -10,7 +10,7 @@ export function ref(v) {
       // iterate over properties and add getters and setters
       for (p in v) {
         let _ref = ref(p)
-        _ref.__observer__ => (cb) { subs.push(cb) }
+        _ref.__observer__ = (cb) => { subs.push(cb) }
         watch(_ref, (newVal, oldVal) => {
 
         })
@@ -33,7 +33,7 @@ export function ref(v) {
       },
       get value() { return x },
 
-      __subs__: []
+      __subs__: [],
       __observer__(cb) { this.subs.push(cb) }
     }
     return v

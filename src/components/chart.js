@@ -714,7 +714,6 @@ export default class Chart {
   /**
    * Calculate new range index / position 
    * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
-   * @returns 
    */
   updateRange(pos) {
     // draw the chart - grid, candles, volume

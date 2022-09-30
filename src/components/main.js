@@ -465,7 +465,8 @@ export default class MainPane {
 
   defaultNode() {
     const api = this.#mediator.api
-    const styleRows = STYLE_ROWS + `height: calc(100% - ${api.timeH}px)`
+    const styleEvents = `height: calc(100% - ${api.timeH}px); width: calc(100% - ${api.scaleW}px); position: absolute; top: -100%`
+    const styleRows = STYLE_ROWS + ` height: calc(100% - ${api.timeH}px)`
     const styleTime = STYLE_TIME + ` height: ${api.timeH}px; border-color: ${api.chartBorderColour};`
     const defaultRow = this.defaultRowNode()
 
