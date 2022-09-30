@@ -37,6 +37,11 @@ const STYLE_TIME = "border-top: 1px solid; width:100%; min-width:100%;"
 const STYLE_SCALE = "border-left: 1px solid;"
 
 
+/**
+ * Provides chart main pane that hosts, chart, off charts (indicators), timeline, widgets
+ * @export
+ * @class MainPane
+ */
 export default class MainPane {
 
   #name = "Utilities"
@@ -159,10 +164,10 @@ export default class MainPane {
   }
 
   start() {
+    let i = 0
+
     this.#Time.start()
     this.#Chart.start()
-
-    let i = 0
     this.#OffCharts.forEach((offChart, key) => {
       offChart.start(i++)
     })
@@ -182,12 +187,21 @@ export default class MainPane {
   }
 
   end() {
+    this.#mediator.stateMachine.destroy()
+    this.#Time.end()
+    this.#Chart.end()
+    this.#OffCharts.forEach((offChart, key) => {
+      offChart.end()
+    })
+    this.#viewport.destroy()
+
     this.#controller.removeEventListener("mousewheel", this.onMouseWheel);
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
     this.#controller.removeEventListener("drag", this.onChartDrag);
     this.#controller.removeEventListener("enddrag", this.onChartDragDone);
     this.#controller.removeEventListener("keydown", this.onChartKeyDown)
     this.#controller.removeEventListener("keyup", this.onChartKeyDown)
+    this.#controller = null
 
     this.off(STREAM_NEWVALUE, this.onNewStreamValue)
   }
@@ -451,7 +465,7 @@ export default class MainPane {
 
   defaultNode() {
     const api = this.#mediator.api
-    const styleRows = STYLE_ROWS + `height: calc(100% - ${api.timeH}px)`
+    const styleRows = STYLE_ROWS + ` height: calc(100% - ${api.timeH}px)`
     const styleTime = STYLE_TIME + ` height: ${api.timeH}px; border-color: ${api.chartBorderColour};`
     const defaultRow = this.defaultRowNode()
 
