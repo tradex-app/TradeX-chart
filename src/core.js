@@ -56,6 +56,12 @@ const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;";
 (async () => {
   await talib.init("node_modules/talib-web/lib/talib.wasm")
 })();
+
+/**
+ * The root class for the entire chart
+ * @export
+ * @class TradeXchart
+ */
 export default class TradeXchart {
 
 
@@ -151,13 +157,13 @@ export default class TradeXchart {
 
 /**
  * Creates an instance of TradeXchart.
- * @param {instance} mediator
- * @param {object} [options={}]
+ * @param {instance} mediator - module api
+ * @param {object}[options={}] - chart configuration
  * @memberof TradeXchart
  */
 constructor (mediator, options={}) {
 
-this.oncontextmenu = window.oncontextmenu
+    this.oncontextmenu = window.oncontextmenu
 
     let container = options?.container,
         state = options?.state, 
@@ -206,9 +212,7 @@ this.oncontextmenu = window.oncontextmenu
 
   get elUtils() { return this.#elUtils }
   get elTools() { return this.#elTools }
-  // get elTime() { return this.#elTime }
   get elMain() { return this.#elMain }
-  // get elChart() { return this.#elChart }
   get elWidgetsG() { return this.#elWidgetsG }
 
   get UtilsBar() { return this.#UtilsBar }
@@ -255,15 +259,14 @@ this.oncontextmenu = window.oncontextmenu
   get stream() { return this.#stream }
 
 
-
   /**
    * Create a new TradeXchart instance
    *
    * @static
-   * @param {DOM element} container
-   * @param {Object} [config={}]
-   * @param {Object} state
-   * @return {Instance}  
+   * @param {DOM_element} container - HTML element to mount the chart on
+   * @param {object} [config={}] - chart config
+   * @param {object} state - chart state
+   * @return {instance}  
    * @memberof TradeXchart
    */
   static create(container, config={}, state) {
@@ -287,16 +290,24 @@ this.oncontextmenu = window.oncontextmenu
     return instance
   }
 
+  /**
+   * Destroy a chart instance, clean up and remove data
+   * @static
+   * @param {instance} chart 
+   * @memberof TradeXchart
+   */
   static destroy(chart) {
     if (chart.constructor.name === "TradeXchart") {
+      chart.end()
       const inCnt = chart.inCnt;
       delete TradeXchart.#instances[inCnt];
     }
   }
 
   /**
-   * Target element has been validated as a mount point
+   * Target element has been validated as a mount point, 
    * let's start building
+   * @param {object} config - chart configuration
    */
   init(config) {
     this.#config = config
@@ -383,6 +394,9 @@ this.oncontextmenu = window.oncontextmenu
     this.log(`${this.#name} instantiated`)
   }
 
+  /**
+   * Start the chart processing events and displaying data
+   */
   start() {
     this.log("...processing state")
 
@@ -398,11 +412,24 @@ this.oncontextmenu = window.oncontextmenu
     if (isObject(this.#config.stream)) this.#stream = new Stream(this)
   }
 
+  /**
+   * Stop all chart event processing and remove the chart from DOM.
+   * In other words, destroy the chart.
+   */
   end() {
     this.log("...cleanup the mess")
     this.#elTXChart.removeEventListener('mousemove', this.onMouseMove)
 
     this.off(STREAM_UPDATE, this.onStreamUpdate)
+
+    this.UtilsBar.end()
+    this.ToolsBar.end()
+    this.MainPane.end()
+    this.WidgetsG.end()
+
+    this.#state = null
+
+    DOM.findByID(this.id).remove
   }
 
   eventsListen() {
@@ -471,15 +498,6 @@ this.oncontextmenu = window.oncontextmenu
     }
   }
 
-  unmount() {
-    this.cleanup()
-  }
-
-  cleanup() {
-    // remove all event listeners
-    // destroy all objects
-  }
-
   props() {
     return {
       // id: (id) => this.setID(id),
@@ -514,7 +532,6 @@ this.oncontextmenu = window.oncontextmenu
 
   getModID() { return this.#modID }
 
-
   setWidth(w) {
     if (isNumber(w))
       this.#chartW = w
@@ -538,6 +555,11 @@ this.oncontextmenu = window.oncontextmenu
     this.#elMain.style.height= `${this.#chartH - this.utilsH}px`
   }
 
+  /**
+   * Set chart width and height
+   * @param {number} w - width in pixels
+   * @param {number} h - height in pixels
+   */
   setDimensions(w, h) {
     let width = this.width
     let height = this.height
@@ -556,28 +578,32 @@ this.oncontextmenu = window.oncontextmenu
     })
   }
 
-    /**
-   * Set the price accuracy
-   * @param pricePrecision - Price accuracy
+  /**
+ * Set the price accuracy
+ * @param {number} pricePrecision - Price accuracy
+ */
+    setPricePrecision (pricePrecision) {
+    if (!isNumber(pricePrecision) || pricePrecision < 0) {
+      pricePrecision = PRICE_PRECISION
+    }
+    this.#pricePrecision = pricePrecision
+  }
+
+  /**
+   * Set the volume accuracy
+   * @param {number} volumePrecision - Volume accuracy
    */
-     setPricePrecision (pricePrecision) {
-      if (!isNumber(pricePrecision) || pricePrecision < 0) {
-        pricePrecision = PRICE_PRECISION
-      }
-      this.#pricePrecision = pricePrecision
+  setVolumePrecision (volumePrecision) {
+    if (!isNumber(volumePrecision) || volumePrecision < 0) {
+      volumePrecision = VOLUME_PRECISION
     }
+    this.#volumePrecision = volumePrecision
+  }
 
-    /**
-     * Set the volume accuracy
-     * @param volumePrecision - Volume accuracy
-     */
-    setVolumePrecision (volumePrecision) {
-      if (!isNumber(volumePrecision) || volumePrecision < 0) {
-        volumePrecision = VOLUME_PRECISION
-      }
-      this.#volumePrecision = volumePrecision
-    }
-
+  /**
+   * Set the chart theme
+   * @param {object} volumePrecision - Volume accuracy
+   */
   setTheme(theme) {
     // TODO: validation
     this.#theme = theme
@@ -617,14 +643,15 @@ this.oncontextmenu = window.oncontextmenu
     const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour};`
     const styleMain = STYLE_MAIN + ` left: ${this.toolsW}px; width: calc(100% - ${this.toolsW}px);`
     const styleWidgets = ` position: relative;`
+    const styleScale = `position: absolute; top: 0; right: 0; width: ${this.scaleW}px; height: 100%;`
     
     const node = `
       <div id="${this.id}" class="${classesTXChart}" style="${styleTXChart}">
         <div class="${CLASS_UTILS}" style="${styleUtils}"></div>
         <div class="${CLASS_BODY}" style="${styleBody}">
           <div class="${CLASS_TOOLS}" style="${styleTools}"></div>
-          <div class="${CLASS_MAIN}" style="${styleMain}">
-          </div>
+          <div class="${CLASS_MAIN}" style="${styleMain}"></div>
+          <div style="${styleScale}"></div>
         </div>
         <div class="${CLASS_WIDGETSG}" style="${styleWidgets}"></div>
       </div>
@@ -640,7 +667,6 @@ this.oncontextmenu = window.oncontextmenu
    * Calculate new range index / position from position difference
    * typically mouse drag or cursor keys
    * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
-   * @returns 
    */
   updateRange(pos) {
 
@@ -684,9 +710,12 @@ this.oncontextmenu = window.oncontextmenu
   }
 
   /**
-   * Merge a block of data into the chart state
-   * used for populating a chart with back history
-   * or updating with a live stream
+   * Merge a block of data into the chart state.
+   * Used for populating a chart with back history.
+   * Merge data must be formatted to a Chart State.
+   * Optionally set a new range upon merge.
+   * @param {object} merge - merge data must be formatted to a Chart State
+   * @param {boolean|object} newRange - false | {start: number, end: number}
    */
   mergeData(merge, newRange=false) {
     if (!isObject(merge)) return false
@@ -732,8 +761,12 @@ this.oncontextmenu = window.oncontextmenu
 
   }
 
-
-
+  /**
+   * Resize the chart
+   * @param {number} width - pixels
+   * @param {number} height - pixels
+   * @returns {boolean} - success or failure
+   */
   resize(width, height) {
     if (!isNumber(width) && !isNumber(height)) return false
 
