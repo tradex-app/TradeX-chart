@@ -107,8 +107,8 @@ export default class TradeXchart {
   chartTxtColour = GlobalStyle.COLOUR_TXT
   chartBorderColour = GlobalStyle.COLOUR_BORDER
 
-  utilsH = 40
-  toolsW = 45
+  utilsH = 35
+  toolsW = 40
   timeH  = 50
   scaleW = 60
 
@@ -643,7 +643,7 @@ constructor (mediator, options={}) {
     const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour};`
     const styleMain = STYLE_MAIN + ` left: ${this.toolsW}px; width: calc(100% - ${this.toolsW}px);`
     const styleWidgets = ` position: relative;`
-    const styleEvents = `position: absolute; top: 0; right: 0; width: ${this.scaleW}px; height: 100%;`
+    const styleScale = `position: absolute; top: 0; right: 0; width: ${this.scaleW}px; height: 100%;`
     
     const node = `
       <div id="${this.id}" class="${classesTXChart}" style="${styleTXChart}">
@@ -651,7 +651,7 @@ constructor (mediator, options={}) {
         <div class="${CLASS_BODY}" style="${styleBody}">
           <div class="${CLASS_TOOLS}" style="${styleTools}"></div>
           <div class="${CLASS_MAIN}" style="${styleMain}"></div>
-          <div style="${styleEvents}"></div>
+          <div style="${styleScale}"></div>
         </div>
         <div class="${CLASS_WIDGETSG}" style="${styleWidgets}"></div>
       </div>

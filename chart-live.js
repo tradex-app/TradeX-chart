@@ -1,8 +1,9 @@
 import { Chart, DOM } from './src'
 // import './chart-live.css'
 
-import state from './data/1hour.json'
+// import state from './data/1hour.json'
 // import state from './data/seconds.json'
+import state from './data/seconds-indicator'
 
 
 DOM.findBySelector('#app').innerHTML = `
@@ -20,8 +21,8 @@ const config = {
   title: "BTC/USDT",
   width: 1000,
   height: 800,
-  rangeStartTS: 1558429200000, // 21/05/2019, 11:00:00 - 1 hour price
-  // rangeStartTS: 1663059600000, // seconds price
+  // rangeStartTS: 1558429200000, // 21/05/2019, 11:00:00 - 1 hour price
+  rangeStartTS: 1663059600000, // seconds price
   rangeLimit: 30,
   theme: {
     candleType: "CANDLE_SOLID",

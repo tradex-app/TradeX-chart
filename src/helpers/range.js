@@ -8,7 +8,7 @@ import { limit } from "../utils/number"
 
 export function getRange( allData, start=0, end=allData.data.length-1 ) {
   let r = allData
-  r.dataLength = r.data.length - 1
+  Object.defineProperty(r, 'dataLength', { get() { return this.data.length - 1 } })
 
   // check and correct start and end argument order
   if (start > end) [start, end] = [end, start]
@@ -32,13 +32,18 @@ export function getRange( allData, start=0, end=allData.data.length-1 ) {
   r.indexStart = start
   r.indexEnd = end
   r.Length = r.indexEnd - r.indexStart
-  r.timeStart = r.value(0)[0]
-  r.timeFinish = r.value(r.dataLength)[0]
+  Object.defineProperty(r, 'timeStart', { get() { return this.value(0)[0] } })
+  Object.defineProperty(r, 'timeFinish', { get() { return this.value(this.dataLength)[0] } })
+
   r.timeDuration = r.timeFinish - r.timeStart
   r.timeMin = r.value(r.indexStart)[0]
   r.timeMax = r.value(r.indexEnd)[0]
   r.rangeDuration = r.timeMax - r.timeMin
-  r = {...r, ...maxMinPriceVol(r.data, r.indexStart, r.indexEnd)}
+  // r = {...r, ...maxMinPriceVol(r.data, r.indexStart, r.indexEnd)}
+  r = Object.defineProperties({}, {
+    ...Object.getOwnPropertyDescriptors(r),
+    ...Object.getOwnPropertyDescriptors(maxMinPriceVol(r.data, r.indexStart, r.indexEnd)),
+  });
   r.height = r.priceMax - r.priceMin
   r.volumeHeight = r.volumeMax - r.volumeMin
   r.scale = (r.Length) / (r.dataLength)

@@ -25,8 +25,6 @@ export default class RSI extends indicator {
   #name = 'Relative Strength Index'
   #shortName = 'RSI'
   #onChart = false
-  #precision = 2
-  #calcParams = calcParams
   #checkParamCount = false
   #scaleOverlay = true
   #plots = [
@@ -43,7 +41,6 @@ export default class RSI extends indicator {
     lowStrokeStyle: "#848",
     highLowRangeStyle: "#22002220"
   }
-  #style = {}
 
   // YAXIS_TYPES - percent
   static scale = YAXIS_TYPES[1]
@@ -62,8 +59,8 @@ export default class RSI extends indicator {
     super (target, overlay, xAxis, yAxis, config)
 
     this.#ID = overlay?.id || uid(this.#shortName)
-    this.#calcParams = (overlay?.calcParams) ? JSON.parse(overlay.calcParams) : calcParams
-    this.#style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
+    this.calcParams = (overlay?.calcParams) ? JSON.parse(overlay.calcParams) : calcParams
+    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
   }
@@ -72,51 +69,10 @@ export default class RSI extends indicator {
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get onChart() { return this.#onChart }
-  get style() { return this.#style }
   get plots() { return this.#plots }
 
   indicatorStream() {
     // return indicator stream
-  }
-
-  /**
-   * calculate indicator values for entire chart history
-   * @returns {boolean} - success or failure
-   */
-  calcIndicator () {
-    this.overlay.data = []
-    let step = this.#calcParams[0]
-    // fail if there is not enough data to calculate
-    if (this.range.Length < step) return false
-
-    let data, end, entry, time;
-    let start = 0
-    let input = this.indicatorInput(start, this.range.Length - 1)
-    do {
-      end = start + step
-      data = input.slice(start, end)
-      entry = this.TALib.RSI({ inReal: input, timePeriod: step })
-      time = this.range.value(end - 1)[0]
-      this.overlay.data.push([time, entry])
-      start++
-    } 
-    while (end < this.range.Length)
-    return true
-  }
-
-  /**
-   * 
-   * @param {*} data 
-   * @returns {array} - indicator data entry
-   */
-  calcIndicatorStream (data) {
-    let end = this.range.Length - 1
-    let step = this.#calcParams[0]
-    let start = end - step
-    let input = this.indicatorInput(start, end)
-    let entry = this.TALib.RSI({ inReal: input, timePeriod: step })
-    let time = this.range.value(end)[0]
-    return [time, entry]
   }
 
   regeneratePlots (params) {
@@ -132,10 +88,16 @@ export default class RSI extends indicator {
    * @memberof RSI
    */
   newValue (value) {
-    let v = this.calcIndicatorStream(value)
-    this.overlay.data.push([v[0], v[1].output])
-    // this.overlay.data
-    console.log(`RSI stream input new value: ${value}`)
+    let p = this.TALibParams()
+    if (!p) return false
+
+    let v = this.calcIndicatorStream(this.#shortName, this.TALibParams())
+    if (!v) return false
+    
+    this.overlay.data.push([v[0], v[1]])
+
+    this.target.setPosition(this.core.scrollPos, 0)
+    this.draw(this.range)
   }
 
   /**
@@ -145,13 +107,29 @@ export default class RSI extends indicator {
    */
   UpdateValue (value) {
     let l = this.overlay.data.length - 1
-    let v = this.calcIndicatorStream(value)
-    this.overlay.data[l] = [v[0], v[1].output]
+    let p = this.TALibParams()
+    if (!p) return false
 
+    let v = this.calcIndicatorStream(this.#shortName, p)
+    if (!v) return false
+
+    this.overlay.data[l] = [v[0], v[1]]
+
+    this.target.setPosition(this.core.scrollPos, 0)
     this.draw(this.range)
 
     console.log(`RSI stream input update: ${value}`)
 
+  }
+
+  TALibParams() {
+    let end = this.range.dataLength
+    let step = this.calcParams[0]
+    let start = end - step
+    let input = this.indicatorInput(start, end)
+    let hasNull = input.find(element => element === null)
+    if (hasNull) return false
+    else return { inReal: input, timePeriod: step }
   }
 
   updateIndicator (input) {
