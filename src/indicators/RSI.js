@@ -71,10 +71,6 @@ export default class RSI extends indicator {
   get onChart() { return this.#onChart }
   get plots() { return this.#plots }
 
-  indicatorStream() {
-    // return indicator stream
-  }
-
   regeneratePlots (params) {
     return params.map((_, index) => {
       const num = index + 1
@@ -93,7 +89,7 @@ export default class RSI extends indicator {
 
     let v = this.calcIndicatorStream(this.#shortName, this.TALibParams())
     if (!v) return false
-    
+
     this.overlay.data.push([v[0], v[1]])
 
     this.target.setPosition(this.core.scrollPos, 0)
@@ -130,10 +126,6 @@ export default class RSI extends indicator {
     let hasNull = input.find(element => element === null)
     if (hasNull) return false
     else return { inReal: input, timePeriod: step }
-  }
-
-  updateIndicator (input) {
-
   }
  
   calcTechnicalIndicator (dataList, { params, plots }) {

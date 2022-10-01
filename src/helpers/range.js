@@ -3,51 +3,128 @@
 import indicators from "../definitions/indicators"
 import { DAY_MS, ms2Interval, WEEK_MS } from "../utils/time"
 import { LIMITFUTURE, LIMITPAST, MINCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
-import { isNumber } from "../utils/typeChecks"
+import { isNumber, isObject } from "../utils/typeChecks"
 import { limit } from "../utils/number"
 
-export function getRange( allData, start=0, end=allData.data.length-1 ) {
-  let r = allData
-  Object.defineProperty(r, 'dataLength', { get() { return this.data.length - 1 } })
+const config = {
+  limitFuture: LIMITFUTURE,
+  limitPast: LIMITPAST,
+  minCandles: MINCANDLES,
+  yAxisBounds: YAXIS_BOUNDS
+}
 
-  // check and correct start and end argument order
-  if (start > end) [start, end] = [end, start]
+export function getRange( allData, start=0, end=allData.data.length-1, config ) {
+  return new Range( allData, start, end, config )
+}
 
-  // minimum range constraint
-  if ((end - start) < MINCANDLES) end = start + MINCANDLES + 1
+export class Range {
 
-  // set out of history bounds limits
-  start = (start < LIMITPAST * -1) ? LIMITPAST * -1 : start
-  end = (end < (LIMITPAST * -1) + MINCANDLES) ? (LIMITPAST * -1) + MINCANDLES + 1 : end
-  start = (start > r.dataLength + LIMITFUTURE - MINCANDLES) ? r.dataLength + LIMITFUTURE - MINCANDLES - 1: start
-  end = (end > r.dataLength + LIMITFUTURE) ? r.dataLength + LIMITFUTURE : end
-  
-  r.value = (index) => { return rangeValue(index, r)}
-  r.index = (ts) => { return getTimeIndex(ts, r) }
-  r.inRange = (ts) => { return inRange(ts, r) }
-  r.inPriceHistory = (ts) => { return inRange(ts, r) }
-  r.rangeIndex = (ts) => { return getTimeIndex(ts, r) - r.indexStart }
-  r.interval = r.data[1][0] - r.data[0][0]
-  r.intervalStr = ms2Interval(r.interval)
-  r.indexStart = start
-  r.indexEnd = end
-  r.Length = r.indexEnd - r.indexStart
-  Object.defineProperty(r, 'timeStart', { get() { return this.value(0)[0] } })
-  Object.defineProperty(r, 'timeFinish', { get() { return this.value(this.dataLength)[0] } })
+  data
+  // dataLength
+  #interval
+  #intervalStr
+  indexStart
+  indexEnd
+  limitFuture = LIMITFUTURE
+  limitPast = LIMITPAST
+  minCandles = MINCANDLES
+  yAxisBounds = YAXIS_BOUNDS
+  config = config
 
-  r.timeDuration = r.timeFinish - r.timeStart
-  r.timeMin = r.value(r.indexStart)[0]
-  r.timeMax = r.value(r.indexEnd)[0]
-  r.rangeDuration = r.timeMax - r.timeMin
-  // r = {...r, ...maxMinPriceVol(r.data, r.indexStart, r.indexEnd)}
-  r = Object.defineProperties({}, {
-    ...Object.getOwnPropertyDescriptors(r),
-    ...Object.getOwnPropertyDescriptors(maxMinPriceVol(r.data, r.indexStart, r.indexEnd)),
-  });
-  r.height = r.priceMax - r.priceMin
-  r.volumeHeight = r.volumeMax - r.volumeMin
-  r.scale = (r.Length) / (r.dataLength)
-  return r
+  constructor( allData, start=0, end=allData.data.length-1, config={}) {
+    if (!isObject(allData) || 
+        !isNumber(start) || 
+        !isNumber(end) || 
+        !isObject(config)) return false
+
+    this.config = {...this.config, ...config}
+
+    for (let data in allData) {
+      this[data] = allData[data]
+    }
+    // this.dataLength = this.data.length - 1
+
+    // check and correct start and end argument order
+    if (start > end) [start, end] = [end, start]
+    // minimum range constraint
+    if ((end - start) < this.minCandles) end = start + this.minCandles + 1
+
+    // set out of history bounds limits
+    start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
+    end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
+    start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
+    end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
+ 
+    this.indexStart = start
+    this.indexEnd = end
+    // this.Length = this.indexEnd - this.indexStart
+    // this.timeDuration = this.timeFinish - this.timeStart
+    // this.timeMin = this.value(this.indexStart)[0]
+    // this.timeMax = this.value(this.indexEnd)[0]
+    // this.rangeDuration = this.timeMax - this.timeMin
+    this.#interval = this.data[1][0] - this.data[0][0]
+    this.#intervalStr = ms2Interval(this.interval)
+
+    let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd)
+    for (let m in maxMin) {
+      this[m] = maxMin[m]
+    }
+    this.height = this.priceMax - this.priceMin
+    this.volumeHeight = this.volumeMax - this.volumeMin
+    this.scale = this.Length / this.dataLength
+  }
+
+  get dataLength () { return this.data.length - 1 }
+  get Length () { return this.indexEnd - this.indexStart }
+  get timeDuration () { return this.timeFinish - this.timeStart }
+  get timeMin () { return this.value(this.indexStart)[0] }
+  get timeMax () { return this.value(this.indexEnd)[0] }
+  get rangeDuration () { return this.timeMax - this.timeMin }
+  get timeStart () { return this.value(0)[0] }
+  get timeFinish () { return this.value(this.dataLength)[0] }
+  set interval (i) { this.#interval = i }
+  get interval () { return this.#interval }
+  set intervalStr (i) { this.#intervalStr = i }
+  get intervalStr () { return this.#intervalStr }
+
+  value (index) { return rangeValue(index, this)}
+  index (ts) { return getTimeIndex(ts, this) }
+  inRange (ts) { return inRange(ts, this) }
+  inPriceHistory (ts) { return inRange(ts, this) }
+  rangeIndex (ts) { return getTimeIndex(ts, this) - this.indexStart }
+
+  /**
+   * Find price maximum and minimum, volume maximum and minimum
+   * @param {array} data
+   * @param {number} [start=0]
+   * @param {number} [end=data.length-1]
+   * @return {object}  
+   */
+  maxMinPriceVol ( data, start=0, end=data.length-1 ) {
+
+    let l = (data.length-1) ? data.length-1 : 0
+    let i = limit(start, 0, l)
+    let c = limit(end, 0, l)
+
+    let priceMin  = data[i][3]
+    let priceMax  = data[i][2]
+    let volumeMin = data[i][5]
+    let volumeMax = data[i][5]
+
+    while(i++ < c) {
+      priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin
+      priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax
+      volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin
+      volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
+    }
+
+    return {
+      priceMin: priceMin * (1 - this.yAxisBounds),
+      priceMax: priceMax * (1 + this.yAxisBounds),
+      volumeMin: volumeMin,
+      volumeMax: volumeMax
+    }
+  }
 }
 
 export function inPriceHistory(t, range) {
@@ -94,42 +171,6 @@ export function rangeOffchartValue( range, indicator, index ) {
 export function rangeDatasetValue( range, indicator, index ) {
 }
 
-/**
- * Find price maximum and minimum, volume maximum and minimum
- *
- * @export
- * @param {array} data
- * @param {number} [start=0]
- * @param {number} [end=data.length-1]
- * @return {object}  
- */
-export function maxMinPriceVol( data, start=0, end=data.length-1 ) {
-
-  let l = (data.length-1) ? data.length-1 : 0
-  let i = limit(start, 0, l)
-  let c = limit(end, 0, l)
-
-  let priceMin  = data[i][3]
-  let priceMax  = data[i][2]
-  let volumeMin = data[i][5]
-  let volumeMax = data[i][5]
-
-  while(i++ < c) {
-    priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin
-    priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax
-    volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin
-    volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
-  }
-
-  return {
-    priceMin: priceMin * (1 - YAXIS_BOUNDS),
-    priceMax: priceMax * (1 + YAXIS_BOUNDS),
-    volumeMin: volumeMin,
-    volumeMax: volumeMax
-  }
-}
-
-
 // Detects candles interval
 export function detectInterval(ohlcv) {
 
@@ -147,14 +188,6 @@ export function detectInterval(ohlcv) {
 }
 
 export function getTimeIndex(ts, r) {
-  // if (r.inRange(ts)) {
-  //   let i = r.indexStart
-  //   while (i++ <= r.indexEnd) {
-  //     if (ts === r.value(i)[0]) return i
-  //   }
-  //   return false
-  // }
-
   if (!isNumber(ts)) return false
   ts = ts - (ts % r.interval)
 
