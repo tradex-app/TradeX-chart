@@ -57,11 +57,6 @@ export class Range {
  
     this.indexStart = start
     this.indexEnd = end
-    // this.Length = this.indexEnd - this.indexStart
-    // this.timeDuration = this.timeFinish - this.timeStart
-    // this.timeMin = this.value(this.indexStart)[0]
-    // this.timeMax = this.value(this.indexEnd)[0]
-    // this.rangeDuration = this.timeMax - this.timeMin
     this.#interval = this.data[1][0] - this.data[0][0]
     this.#intervalStr = ms2Interval(this.interval)
 
@@ -87,11 +82,69 @@ export class Range {
   set intervalStr (i) { this.#intervalStr = i }
   get intervalStr () { return this.#intervalStr }
 
-  value (index) { return rangeValue(index, this)}
-  index (ts) { return getTimeIndex(ts, this) }
-  inRange (ts) { return inRange(ts, this) }
-  inPriceHistory (ts) { return inRange(ts, this) }
-  rangeIndex (ts) { return getTimeIndex(ts, this) - this.indexStart }
+  /**
+   * 
+   * @param {number} index - price history index, out of bounds will return null filled entry
+   * @returns {array}
+   */
+  value ( index ) {
+    // return last value as default
+    if (!isNumber(index)) index = this.data.length - 1
+  
+    let v = this.data[index]
+    if (v !== undefined) return v
+    else {
+      const len = this.data.length - 1
+      v = [null, null, null, null, null, null]
+      if (index < 0) {
+        v[0] = this.data[0][0] + (this.interval * index)
+        return v
+      }
+      else if (index > len) {
+        v[0] = this.data[len][0] + (this.interval * (index - len))
+        return v
+      }
+      else return null
+    }
+  }
+
+  /**
+   * Return time index
+   * @param {number} ts - timestamp
+   * @returns {number}
+   */
+   getTimeIndex (ts) {
+    if (!isNumber(ts)) return false
+    ts = ts - (ts % this.interval)
+  
+    let x = this.data[0][0]
+    if (ts === x) 
+      return 0
+    else if (ts < x)
+      return ((x - ts) / this.interval) * -1
+    else 
+      return (ts - x) / this.interval
+  }
+
+  /**
+   * Is timestamp in current range
+   * @param {number} t - timestamp
+   * @returns {boolean}
+   */
+  inRange(t) {
+    if (t >= this.timeMin && t <= this.timeMax)
+      return true
+    else return false
+  }
+
+  inPriceHistory (ts) { return this.inRange(ts) }
+  
+  /**
+   * Return index offset of timestamp relative to range start
+   * @param {number} ts - timestamp
+   * @returns {number}
+   */
+  rangeIndex (ts) { return this.getTimeIndex(ts) - this.indexStart }
 
   /**
    * Find price maximum and minimum, volume maximum and minimum
@@ -125,40 +178,22 @@ export class Range {
       volumeMax: volumeMax
     }
   }
-}
 
-export function inPriceHistory(t, range) {
-  if (t >= range.timeStart && t <= range.timeFinish)
-    return true
-  else return false
-}
-
-export function inRange(t, range) {
-  if (t >= range.timeMin && t <= range.timeMax)
-    return true
-  else return false
-}
-
-export function rangeValue( index, range ) {
-  // return last value as default
-  if (!isNumber(index)) index = range.data.length - 1
-
-  let v = range.data[index]
-  if (v !== undefined) return v
-  else {
-    const len = range.data.length - 1
-    v = [null, null, null, null, null, null]
-    if (index < 0) {
-      v[0] = range.data[0][0] + (range.interval * index)
-      return v
-    }
-    else if (index > len) {
-      v[0] = range.data[len][0] + (range.interval * (index - len))
-      return v
-    }
-    else return null
+  /**
+   * 
+   * @param {number} t 
+   * @returns {boolean}
+   */
+  inPriceHistory (t) {
+    if (t >= this.timeStart && t <= this.timeFinish)
+      return true
+    else return false
   }
-}
+} // end class
+
+
+
+
 
 export function rangeOnchartValue( range, indicator, index ) {
   const len = range.onchart[indicator].length - 1
@@ -171,7 +206,11 @@ export function rangeOffchartValue( range, indicator, index ) {
 export function rangeDatasetValue( range, indicator, index ) {
 }
 
-// Detects candles interval
+/**
+ * Detects candles interval
+ * @param {array} ohlcv - array of ohlcv values (price history)
+ * @returns {number} - milliseconds
+ */
 export function detectInterval(ohlcv) {
 
   let len = Math.min(ohlcv.length - 1, 99)
@@ -187,19 +226,12 @@ export function detectInterval(ohlcv) {
   return min
 }
 
-export function getTimeIndex(ts, r) {
-  if (!isNumber(ts)) return false
-  ts = ts - (ts % r.interval)
-
-  let x = r.data[0][0]
-  if (ts === x) 
-    return 0
-  else if (ts < x)
-    return ((x - ts) / r.interval) * -1
-  else 
-    return (ts - x) / r.interval
-}
-
+/**
+ * 
+ * @param {object} time - time object provided by core
+ * @param {number} dateStamp 
+ * @returns {number}
+ */
 export function calcTimeIndex(time, dateStamp) {
   if (!isNumber(dateStamp)) return false
 
