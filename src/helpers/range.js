@@ -6,6 +6,17 @@ import { LIMITFUTURE, LIMITPAST, MINCANDLES, YAXIS_BOUNDS } from "../definitions
 import { isNumber, isObject } from "../utils/typeChecks"
 import { limit } from "../utils/number"
 
+const config = {
+  limitFuture: LIMITFUTURE,
+  limitPast: LIMITPAST,
+  minCandles: MINCANDLES,
+  yAxisBounds: YAXIS_BOUNDS
+}
+
+export function getRange( allData, start=0, end=allData.data.length-1, config ) {
+  return new Range( allData, start, end, config )
+}
+
 export class Range {
 
   data
@@ -18,24 +29,44 @@ export class Range {
   limitPast = LIMITPAST
   minCandles = MINCANDLES
   yAxisBounds = YAXIS_BOUNDS
+  config = config
 
   constructor( allData, start=0, end=allData.data.length-1, config={}) {
     if (!isObject(allData) || 
+        !isNumber(start) || 
+        !isNumber(end) || 
         !isObject(config)) return false
 
-    this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE
-    this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST
-    this.minCandles = (isNumber(this.config?.limitCandles)) ? this.config.limitCandles : MINCANDLES
-    this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS
+    this.config = {...this.config, ...config}
 
     for (let data in allData) {
       this[data] = allData[data]
     }
+    // this.dataLength = this.data.length - 1
 
-    if (!this.set(start, end)) return false
+    // check and correct start and end argument order
+    if (start > end) [start, end] = [end, start]
+    // minimum range constraint
+    if ((end - start) < this.minCandles) end = start + this.minCandles + 1
 
-    this.#interval = detectInterval(this.data)
+    // set out of history bounds limits
+    start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
+    end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
+    start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
+    end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
+ 
+    this.indexStart = start
+    this.indexEnd = end
+    this.#interval = this.data[1][0] - this.data[0][0]
     this.#intervalStr = ms2Interval(this.interval)
+
+    let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd)
+    for (let m in maxMin) {
+      this[m] = maxMin[m]
+    }
+    this.height = this.priceMax - this.priceMin
+    this.volumeHeight = this.volumeMax - this.volumeMin
+    this.scale = this.Length / this.dataLength
   }
 
   get dataLength () { return this.data.length - 1 }
@@ -50,35 +81,6 @@ export class Range {
   get interval () { return this.#interval }
   set intervalStr (i) { this.#intervalStr = i }
   get intervalStr () { return this.#intervalStr }
-
-  set (start=0, end=this.dataLength) {
-    if (!isNumber(start) || 
-        !isNumber(end)) return false
-
-    // check and correct start and end argument order
-    if (start > end) [start, end] = [end, start]
-    // minimum range constraint
-    if ((end - start) < this.minCandles) end = start + this.minCandles + 1
-
-    // set out of history bounds limits
-    start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
-    end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
-    start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
-    end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
-  
-    this.indexStart = start
-    this.indexEnd = end
-
-    let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd)
-    for (let m in maxMin) {
-      this[m] = maxMin[m]
-    }
-    this.height = this.priceMax - this.priceMin
-    this.volumeHeight = this.volumeMax - this.volumeMin
-    this.scale = this.Length / this.dataLength
-
-    return true
-  }
 
   /**
    * 
