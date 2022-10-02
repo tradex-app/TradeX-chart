@@ -93,6 +93,7 @@ export default class Divider {
     this.#controller.removeEventListener("mouseout", this.onMouseOut);
     this.#controller.removeEventListener("drag", this.onDividerDrag);
     this.#controller.removeEventListener("enddrag", this.onDividerDragDone);
+    this.#controller = null
 
     // remove element
     this.el.remove()

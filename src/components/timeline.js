@@ -9,7 +9,7 @@ import { getTextRectWidth } from "../utils/canvas"
 import { CLASS_TIME } from "../definitions/core"
 import { XAxisStyle } from "../definitions/style"
 import { drawTextBG } from "../utils/canvas"
-import { InputController, } from "../input/controller"
+import { InputController } from "../input/controller"
 import stateMachineConfig from "../state/state-time"
 
 import {
@@ -60,6 +60,7 @@ export default class Timeline {
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
   get options() { return this.#options }
+  get core() { return this.#core }
   get height() { return this.#elTime.clientHeight }
   set width(w) { this.setWidth(w) }
   get width() { return this.#elTime.clientWidth }
@@ -147,7 +148,10 @@ export default class Timeline {
   }
 
   end() {
-    
+    this.#mediator.stateMachine.destroy()
+    this.#viewport.destroy()
+    this.#controller = null
+    this.off("main_mousemove", this.drawCursorTime)
   }
 
   eventsListen() {
@@ -156,8 +160,6 @@ export default class Timeline {
     this.#controller = new InputController(canvas, {disableContextMenu: false});
 
     this.on("main_mousemove", (e) => { this.drawCursorTime(e) })
-    // this.on("chart_pan", (e) => { this.drawCursorTime(e, true) })
-    // this.on("chart_panDone", (e) => { this.drawCursorTime(e, true) })
   }
 
   on(topic, handler, context) {

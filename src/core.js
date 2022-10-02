@@ -10,7 +10,7 @@ import MainPane from './components/main'
 import WidgetsG from './components/widgets'
 
 import State from './state'
-import { getRange, calcTimeIndex } from "./helpers/range"
+import { Range, calcTimeIndex } from "./helpers/range"
 import Indicators from './definitions/indicators'
 import * as Time from './utils/time'
 import Stream from './helpers/stream'
@@ -107,8 +107,8 @@ export default class TradeXchart {
   chartTxtColour = GlobalStyle.COLOUR_TXT
   chartBorderColour = GlobalStyle.COLOUR_BORDER
 
-  utilsH = 40
-  toolsW = 45
+  utilsH = 35
+  toolsW = 40
   timeH  = 50
   scaleW = 60
 
@@ -329,7 +329,7 @@ constructor (mediator, options={}) {
     }
 
     // set default range
-    this.setRange()
+    this.getRange()
     // now set user defined (if any) range
     const rangeStart = calcTimeIndex(this.#time, this.#rangeStartTS)
     const end = (rangeStart) ? 
@@ -698,15 +698,24 @@ constructor (mediator, options={}) {
   }
 
   /**
+   * initialize range
+   * @param {number} start - index
+   * @param {number} end - index
+   */
+  getRange(start=0, end=this.rangeLimit, config={}) {
+    this.#range = new Range(this.allData, start, end, config)
+    this.#range.interval = this.#time.timeFrameMS
+    this.#range.intervalStr = this.#time.timeFrame
+    this.#time.range = this.#range
+  }
+
+  /**
    * set start and end of range
    * @param {number} start - index
    * @param {number} end - index
    */
   setRange(start=0, end=this.rangeLimit) {
-    this.#range = getRange(this.allData, start, end)
-    this.#range.interval = this.#time.timeFrameMS
-    this.#range.intervalStr = this.#time.timeFrame
-    this.#time.range = this.#range
+    this.#range.set(start, end)
   }
 
   /**

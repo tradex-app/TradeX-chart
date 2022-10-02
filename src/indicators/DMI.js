@@ -4,17 +4,21 @@ import indicator from "../components/overlays/inidcator"
 import { 
   YAXIS_TYPES
 } from "../definitions/chart";
+import { uid } from "../utils/utilities"
 
 export default class DMI extends indicator {
-  name = 'Directional Movement Index'
-  shortName = 'DMI'
-  onChart = false
-  calcParams = [20]
-  checkParamCount = false
-  plots = [
+  #ID
+  #name = 'Directional Movement Index'
+  #shortName = 'DMI'
+  #onChart = false
+  #precision = 2
+  #calcParams = [20]
+  #checkParamCount = false
+  #scaleOverlay = true
+  #plots = [
     { key: 'DMI_1', title: ' ', type: 'line' },
   ]
-  defaultStyle = {
+  #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1',
     defaultHigh: 75,
@@ -25,9 +29,7 @@ export default class DMI extends indicator {
     lowStrokeStyle: "#848",
     highLowRangeStyle: "#22002220"
   }
-  style = {}
-  overlay
-  TALib
+  #style = {}
 
   // YAXIS_TYPES - percent
   static scale = YAXIS_TYPES[1]
@@ -44,9 +46,19 @@ export default class DMI extends indicator {
   constructor(target, overlay, xAxis, yAxis, config) {
     super(target, xAxis, yAxis, config)
 
-    this.overlay = overlay
+    this.#ID = uid(this.#shortName)
     this.style = {...this.defaultStyle, ...config.style}
-    this.TALib = xAxis.mediator.api.core.TALib
+  }
+
+  get ID() { return this.#ID }
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get onChart() { return this.#onChart }
+  get style() { return this.#style }
+  get plots() { return this.#plots }
+
+  indicatorStream() {
+    // return indicator stream
   }
 
   calcIndicator(input) {
@@ -58,6 +70,10 @@ export default class DMI extends indicator {
       const num = index + 1
       return { key: `dmi${num}`, title: `DMI${num}: `, type: 'line' }
     })
+  }
+
+  updateIndicator (input) {
+
   }
 
   draw(range) {

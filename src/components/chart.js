@@ -187,8 +187,6 @@ export default class Chart {
     api.elements = 
     {...api.elements, 
       ...{
-        // elWidgets: this.#elWidgets,
-        // elCanvas: this.#elCanvas,
         elScale: this.#elScale
       }
     }
@@ -199,16 +197,8 @@ export default class Chart {
     options.yAxisType = "default"
     this.#Scale = this.#mediator.register("Chart_ScaleBar", ScaleBar, options, api)
 
-
-    // window.tradex_chart_scale = this.#Scale
     // onChart indicators
     // this.#onChart = this.#mediator.register("OnChart", OnChart, options, api)
-
-
-    // set up layout responsiveness
-    // let dimensions = {wdith: this.#width, height: this.#height}
-    // this.emit("resizeChart", dimensions)
-
 
     this.log(`${this.#name} instantiated`)
   }
@@ -219,8 +209,16 @@ export default class Chart {
     // X Axis - Timeline
     this.#Time = this.mediator.api.Timeline
 
+    // start on chart indicators
+
     // Y Axis - Price Scale
-    this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
+    // this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
+    const data = {inputs: {}}
+    if (isObject(this.Stream)) {
+      data.inputs.chart = {stream: this.Stream}
+      // iterate over on chart indicators and add inputs if any
+    }
+
     this.#Scale.start(`Chart says to Scale, "Thanks for the update!"`)
 
     // prepare layered canvas
@@ -241,10 +239,15 @@ export default class Chart {
   }
 
   end() {
+    this.#mediator.stateMachine.destroy()
+    this.#Scale.end()
+    this.#viewport.destroy()
+
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
     this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
     this.#controller.removeEventListener("mouseout", this.onMouseOut);
     this.#controller.removeEventListener("mousedown", this.onMouseDown);
+    this.#controller = null
 
     this.off("main_mousemove", this.onMouseMove)
   }
@@ -711,7 +714,6 @@ export default class Chart {
   /**
    * Calculate new range index / position 
    * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
-   * @returns 
    */
   updateRange(pos) {
     // draw the chart - grid, candles, volume

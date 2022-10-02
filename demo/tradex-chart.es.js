@@ -48,11 +48,15 @@ const DOM = {
   // returns true if DOM element is visible
   // source (2018-03-11): https://github.com/jquery/jquery/blob/master/src/css/hiddenVisibleSelectors.js 
   isVisible(o) {
+    if (!this.isElement(o)) return false
+
     return !!o && !!( o.offsetWidth || o.offsetHeight || o.getClientRects().length )
   },
 
   // https://www.javascripttutorial.net/dom/css/check-if-an-element-is-visible-in-the-viewport/
   isInViewport(el) {
+    if (!this.isElement(el)) return false
+
     const rect = el.getBoundingClientRect();
     return (
         rect.top >= 0 &&
@@ -64,7 +68,8 @@ const DOM = {
 
   // https://stackoverflow.com/a/41698614/15109215
   isVisibleToUser(el) {
-    if (!(el instanceof Element)) throw Error('DomUtil: el is not an element.');
+    if (!this.isElement(el)) return false
+
     const style = getComputedStyle(elem);
     if (style.display === 'none') return false;
     if (style.visibility !== 'visible') return false;
@@ -108,11 +113,11 @@ const DOM = {
   },
 
   elementsDistance(el1, el2) {
+    // fail if either are not elements
+    if (!this.isElement(el1) || !this.isElement(el1)) return false
+
     el1Location = this.elementDimPos(el1);
     el2Location = this.elementDimPos(el2);
-
-    // fail if either are not elements
-    if (!el1Location || !el2Location) return false
 
     return {
       x: el1Location.top - el2Location.top,
@@ -145,6 +150,8 @@ const DOM = {
 
   //  https://stackoverflow.com/a/3028037/15109215
   hideOnClickOutside(el) {
+    if (!this.isElement(el)) return false
+
     const outsideClickListener = event => {
       if (!el.contains(event.target) && this.isVisible(el)) { 
       // or use: event.target.closest(selector) === null
@@ -162,6 +169,8 @@ const DOM = {
   },
 
   onClickOutside(el, cb) {
+    if (!this.isElement(el)) return false
+
     const outsideClickListener = event => {
       if (!el.contains(event.target) && DOM.isVisible(el)) { 
       // or use: event.target.closest(selector) === null
@@ -287,8 +296,10 @@ function copyDeep(obj) {
   return temp;
 }
 
-function uid(tag="id") {
-  if (!isString(tag)) tag = "ID";
+// unique ID
+function uid(tag="ID") {
+  if (isNumber(tag)) tag = tag.toString();
+  else if (!isString(tag)) tag = "ID";
   const dateString = Date.now().toString(36);
   const randomness = Math.random().toString(36).substring(2,5);
   return `${tag}_${dateString}_${randomness}`
@@ -304,6 +315,11 @@ function isArrayEqual(a1, a2) {
 
 // stateMachine.js
 
+/**
+ * Finite State Machine
+ * @export
+ * @class StateMachine
+ */
 class StateMachine {
 
   #id
@@ -313,12 +329,20 @@ class StateMachine {
   #config
   #mediator
   #status = "stopped"
+  #events
   #event
   #eventData
   #actions
   #statuses = ["await", "idle", "running", "stopped"]
 
+  /**
+   * Instantiate state machine
+   * @param {object} config - state definition
+   * @param {object} mediator - module mediate provides event handling
+   */
   constructor(config, mediator) {
+    if (!StateMachine.validateConfig(config)) return false
+
     this.#id = config.id;
     this.#config = config;
     this.#state = config.initial;
@@ -326,11 +350,10 @@ class StateMachine {
     this.#actions = config.actions;
     this.#mediator = mediator;
 
-    if (!StateMachine.validateConfig) return false
-
     this.#subscribe();
   }
 
+  /** @type {string} */
   get id() { return this.#id }
   get state() { return this.#state }
   get previousSate() { return this.#statePrev }
@@ -418,23 +441,41 @@ class StateMachine {
     return event in currStateConfig.on
   }
 
+  /** commence state machine execution */
   start() { this.#status = "running"; }
+  /** stop state machine execution */
   stop() { this.#status = "stopped"; }
+  /** Expunge state and event listeners, free memory */
+  destroy() { 
+    this.#unsubscribe();
+    this.#config = null;
+  }
 
   #subscribe() {
-    const events = new Set();
+    this.#events = new Set();
 
     for (let state in this.#config.states) {
       for (let event in this.#config.states[state].on) {
-        events.add(event);
+        this.#events.add(event);
       }
     }
 
-    for (let event of events) {
-      this.#mediator.on(event, (data) => {this.notify(event, data);}, this.context);
+    for (let event of this.#events) {
+      this.#mediator.on(event, this.notify.bind(this, event), this.context);
     }
   }
 
+  #unsubscribe() {
+    for (let event of this.#events) {
+      this.#mediator.off(event, this.notify);
+    }
+  }
+
+  /**
+   * @static
+   * @param {object} c - state definition
+   * @returns {boolean} - valid true or false
+   */
   static validateConfig(c) {
     if (!isObject(c)) return false
 
@@ -445,11 +486,13 @@ class StateMachine {
 
     if (!(c.initial in c.states)) return false
 
-    for (state in c.states) {
-      if ("onEnter" in c.states[state] && !isFunction(c.states[state])) return false
-      if ("onExit" in c.states[state] && !isFunction(c.states[state])) return false
+    for (let state in c.states) {
+      if (!isObject(c.states[state])) return false
+      if ("onEnter" in c.states[state] && !isFunction(c.states[state].onEnter)) return false
+      if ("onExit" in c.states[state] && !isFunction(c.states[state].onExit)) return false
       if ("on" in c.states[state]) {
-        for (let event of c.states[state].on) {
+        for (let e in c.states[state].on) {
+          let event = c.states[state].on[e];
           if (!isString(event.target)) return false
           if ("action" in event && !isFunction(event.action)) return false
         }
@@ -1004,9 +1047,23 @@ const line =
 const measure = 
   `<svg aria-hidden="true" width="46.08" height="46.08" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"> <path d="M 3.2758709,20.241377 11.758622,28.72413 28.72413,11.758622 20.241377,3.2758709 Z m 2.1206881,0 1.5905161,-1.590515 3.7112049,3.711203 1.060342,-1.060345 -3.7112027,-3.711204 1.0603441,-1.060344 2.1206876,2.12069 1.060346,-1.060346 -2.120689,-2.120688 1.060343,-1.060344 3.711203,3.711203 L 16,17.060346 l -3.711203,-3.711208 1.060341,-1.060341 2.12069,2.120687 1.060344,-1.060346 -2.120688,-2.120687 1.060344,-1.060343 3.711204,3.711205 1.060345,-1.060345 -3.711205,-3.7112046 1.060344,-1.0603441 2.120687,2.1206887 1.060346,-1.0603446 -2.120687,-2.1206883 1.590515,-1.5905161 6.362065,6.362063 -14.84482,14.84482 z" style="stroke-width:0.749776" /></svg>`;
 const range = 
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.5 5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 6.5A2.5 2.5 0 0 1 6.95 6H24v1H6.95A2.5 2.5 0 0 1 2 6.5zM4.5 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 16.5a2.5 2.5 0 0 1 4.95-.5h13.1a2.5 2.5 0 1 1 0 1H6.95A2.5 2.5 0 0 1 2 16.5zM22.5 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-18 6a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 22.5a2.5 2.5 0 0 1 4.95-.5H24v1H6.95A2.5 2.5 0 0 1 2 22.5z"></path><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M22.4 8.94l-1.39.63-.41-.91 1.39-.63.41.91zm-4 1.8l-1.39.63-.41-.91 1.39-.63.41.91zm-4 1.8l-1.4.63-.4-.91 1.39-.63.41.91zm-4 1.8l-1.4.63-.4-.91 1.39-.63.41.91z"></path></svg>`;
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28"><path  clip-rule="evenodd" d="M4.5 5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 6.5A2.5 2.5 0 0 1 6.95 6H24v1H6.95A2.5 2.5 0 0 1 2 6.5zM4.5 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 16.5a2.5 2.5 0 0 1 4.95-.5h13.1a2.5 2.5 0 1 1 0 1H6.95A2.5 2.5 0 0 1 2 16.5zM22.5 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-18 6a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 22.5a2.5 2.5 0 0 1 4.95-.5H24v1H6.95A2.5 2.5 0 0 1 2 22.5z"></path><path fill="currentColor"  clip-rule="evenodd" d="M22.4 8.94l-1.39.63-.41-.91 1.39-.63.41.91zm-4 1.8l-1.39.63-.41-.91 1.39-.63.41.91zm-4 1.8l-1.4.63-.4-.91 1.39-.63.41.91zm-4 1.8l-1.4.63-.4-.91 1.39-.63.41.91z"></path></svg>`;
 const text = 
   `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M231.359 147l-80.921 205h45.155l15.593-39.5h89.628l15.593 39.5h45.155l-80.921-205zm-3.594 123.5L256 198.967l28.235 71.533z"></path><path d="M384 56H128V16H16v112h40v256H16v112h112v-40h256v40h112V384h-40V128h40V16H384zM48 96V48h48v48zm48 368H48v-48h48zm288-40H128v-40H88V128h40V88h256v40h40v256h-40zm80-8v48h-48v-48zM416 48h48v48h-48z"></path></svg>`;
+
+
+  const close =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /> <g id="g718" transform="translate(0,1.2499996)"> <path d="M 7.5010125,7.9560661 5.355012,10.103066 c -0.472,0.472 -1.18,-0.2360003 -0.708,-0.7080003 L 7.6470125,6.3950659 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999998 c 0.472,0.472 -0.236,1.1800003 -0.708,0.7080003 L 8.5010125,7.9560661 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /> <path d="m 7.4989873,5.5439348 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /> </g></svg>`;
+ const up =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /> <path d="m 7.4989873,7.7026182 -2.1460003,2.147 c -0.472,0.4719998 -1.18,-0.236 -0.708,-0.708 l 3.0000003,-3 c 0.1953639,-0.1958581 0.5126361,-0.1958581 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.1799998 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6-3" /></svg>`;
+ const down =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /> <path d="m 7.4989873,8.2973819 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.1958581 0.5126361,0.1958581 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></svg>`;
+ const restore =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /> <g id="g687" transform="translate(15.647255,-0.0288128)"> <path d="m -8.1462425,10.484879 -2.1460005,2.146999 c -0.472,0.472 -1.18,-0.236 -0.708,-0.708 l 3.0000005,-2.9999994 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999994 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1460005,-2.146999 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /> <path d="m -8.1482677,5.5727476 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /> </g></svg>`;
+ const maximize =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /> <g id="g611" transform="translate(0.2050748,-0.8829888)"> <path d="m 7.2959375,11.933818 -2.146,-2.1469999 c -0.472,-0.4719998 -1.18,0.2359999 -0.708,0.7079999 l 3,3 c 0.195364,0.195858 0.512636,0.195858 0.708,0 l 3.0000005,-3 c 0.472,-0.472 -0.236,-1.1799997 -0.708,-0.7079999 L 8.2959375,11.933818 c -0.431103,0.417289 -0.523896,0.423024 -1,0 z" style="" id="path566" /> <path d="m 7.2939123,5.8321596 -2.146,2.147 c -0.4719998,0.472 -1.1799998,-0.236 -0.708,-0.708 l 3,-3 c 0.1953639,-0.195858 0.5126361,-0.195858 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6" /> </g></svg>`;
+ const collapse =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /> <path d="m 11.500447,8.5 c 0.666666,0 0.666666,-1 0,-1 H 4.444275 c -0.1571231,0 -0.224029,0.07336 -0.2978281,0.1459999 -0.1958579,0.195364 -0.1958579,0.5126361 0,0.7080001 0,0 0.113806,0.146 0.320186,0.146 z" style="" id="path887" /></svg>`;
 
 // utils.js
 
@@ -1132,34 +1189,172 @@ function renderLine (ctx, coordinates, style) {
 
 // indicator.js
 
+const T$1 = 0, C$1 = 4;
+
+/**
+ * Base class for on and off chart indicators
+ * @export
+ * @class indicator
+ */
 class indicator {
 
+  #core
   #target
   #scene
   #config
   #xAxis
   #yAxis
+  #overlay
   #indicator
   #type
+  #TALib
+  #range
+  #value = [0, 0]
+  #newValueCB
+  #updateValueCB
+  #precision = 2
+  #calcParams
+  #style = {}
 
-  constructor(target, xAxis, yAxis, config) {
+  constructor(target, overlay, xAxis, yAxis, config) {
 
+    this.#core = xAxis.core;
+    this.#config = config;
     this.#target = target;
     this.#scene = target.scene;
-    this.#config = config;
     this.#xAxis = xAxis;
     this.#yAxis = yAxis;
-    this.#indicator = config.indicator;
+    this.#overlay = overlay;
     this.#type = config.type;
+    this.#indicator = config.indicator;
+    this.#TALib = xAxis.core.TALib;
+    this.#range = xAxis.range;
+
+    this.eventsListen();
   }
 
+  get core() { return this.#core }
+  get config() { return this.#config }
   get target() { return this.#target }
   get scene() { return this.#scene }
   get xAxis() { return this.#xAxis }
   get yAxis() { return this.#yAxis }
   get type() { return this.#type }
+  get overlay() { return this.#overlay }
   get indicator() { return this.#indicator }
+  get TALib() { return this.#TALib }
+  get range() { return this.#range }
+  set setNewValue(cb) { this.#newValueCB = cb;}
+  set setUpdateValue(cb) { this.#updateValueCB = cb; }
+  set precision(p) { this.#precision = p; }
+  get precision() { return this.#precision }
+  set calcParams(p) { this.#calcParams = p; }
+  get calcParams() { return this.#calcParams }
+  set style(s) { this.#style = s; }
+  get style() { return this.#style }
 
+
+  set value(data) {
+    // round time to nearest current time unit
+    const tfms = this.core.time.timeFrameMS;
+    let roundedTime = Math.floor(new Date(data[T$1]) / tfms) * tfms;
+    data[T$1] = roundedTime;
+
+    if (this.#value[T$1] !== data[T$1]) {
+      this.#value[T$1] = data[T$1];
+      this.#newValueCB(data);
+    }
+    else {
+      this.#updateValueCB(data);
+    }
+  }
+  get value() {
+    return this.#value
+  }
+
+  end() {
+    // this.off(STREAM_NEWVALUE, this.onStreamNewValue)
+    this.off(STREAM_UPDATE, this.onStreamUpdate);
+  }
+
+  eventsListen() {
+    // this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this))
+    this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this));
+  }
+
+  on(topic, handler, context) {
+    this.core.on(topic, handler, context);
+  }
+
+  off(topic, handler) {
+    this.core.off(topic, handler);
+  }
+
+  emit(topic, data) {
+    this.core.emit(topic, data);
+  }
+
+  onStreamNewValue(value) {
+    // this.value = value
+    console.log("onStreamNewValue(value):",value);
+  }
+
+  onStreamUpdate(candle) {
+    // console.log("onStreamUpdate(candle):", candle)
+    this.value = candle;
+  }
+
+  indicatorInput(start, end) {
+    let input = [];
+    do {
+      input.push(this.range.value(start)[C$1]);
+    }
+    while (start++ < end)
+    return input
+  }
+
+    /**
+   * Calculate indicator values for entire chart history
+   * @param {string} indicator - the TALib function to call
+   * @param {object} params - parameters for the TALib function
+   * @returns {boolean} - success or failure
+   */
+     calcIndicator (indicator, params) {
+      this.overlay.data = [];
+      let step = this.calcParams[0];
+      // fail if there is not enough data to calculate
+      if (this.range.Length < step) return false
+  
+      let end, entry, time;
+      let start = 0;
+      let input = this.indicatorInput(start, this.range.Length - 1);
+      let hasNull = input.find(element => element === null);
+      if (hasNull) return false
+      
+      do {
+        end = start + step;
+        input.slice(start, end);
+        entry = this.TALib[indicator](params);
+        time = this.range.value(end - 1)[0];
+        this.overlay.data.push([time, entry]);
+        start++;
+      } 
+      while (end < this.range.Length)
+      return true
+    }
+  
+    /**
+     * Calculate indicator value for current stream candle
+     * @param {string} indicator - the TALib function to call
+     * @param {object} params - parameters for the TALib function
+     * @returns {array} - indicator data entry
+     */
+    calcIndicatorStream (indicator, params) {
+      let entry = this.TALib[indicator](params);
+      let end = this.range.dataLength;
+      let time = this.range.value(end)[0];
+      return [time, entry.output[0]]
+    }
 
   plot(plots, type, style) {
 
@@ -1201,6 +1396,90 @@ const BUFFERSIZE$1 = 20;  // %
 const ROWMINHEIGHT = 50; // px
 const OFFCHARTDEFAULTHEIGHT = 30; // %
 const DIVIDERHEIGHT = 8; // px
+
+// DMI.js
+
+class DMI extends indicator {
+  #ID
+  #name = 'Directional Movement Index'
+  #shortName = 'DMI'
+  #onChart = false
+  #precision = 2
+  #calcParams = [20]
+  #checkParamCount = false
+  #scaleOverlay = true
+  #plots = [
+    { key: 'DMI_1', title: ' ', type: 'line' },
+  ]
+  #defaultStyle = {
+    strokeStyle: "#C80",
+    lineWidth: '1',
+    defaultHigh: 75,
+    defaultLow: 25,
+    highLowLineWidth: 1,
+    highLowStyle: "dashed",
+    highStrokeStyle: "#848",
+    lowStrokeStyle: "#848",
+    highLowRangeStyle: "#22002220"
+  }
+  #style = {}
+
+  // YAXIS_TYPES - percent
+  static scale = YAXIS_TYPES[1]
+
+  /**
+ * Creates an instance of DMI.
+ * @param {object} target - canvas scene
+ * @param {object} overlay - data for the overlay
+ * @param {instance} xAxis - timeline axis
+ * @param {instance} yAxis - scale axis
+ * @param {object} config - theme / styling
+ * @memberof DMI
+ */
+  constructor(target, overlay, xAxis, yAxis, config) {
+    super(target, xAxis, yAxis, config);
+
+    this.#ID = uid(this.#shortName);
+    this.style = {...this.defaultStyle, ...config.style};
+  }
+
+  get ID() { return this.#ID }
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get onChart() { return this.#onChart }
+  get style() { return this.#style }
+  get plots() { return this.#plots }
+
+  indicatorStream() {
+    // return indicator stream
+  }
+
+  calcIndicator(input) {
+    this.overlay.data = this.TALib.DMI(input);
+  }
+
+  regeneratePlots (params) {
+    return params.map((_, index) => {
+      const num = index + 1;
+      return { key: `dmi${num}`, title: `DMI${num}: `, type: 'line' }
+    })
+  }
+
+  updateIndicator (input) {
+
+  }
+
+  draw(range) {
+    this.scene.clear();
+
+    this.overlay.data;
+    this.xAxis.candleW;
+    this.scene.width + (this.xAxis.bufferPx * 2);
+    this.yAxis.yPos(100 - this.style.defaultHigh);
+    this.yAxis.yPos(100 - this.style.defaultLow);
+
+  }
+}
 
 // number.js
 
@@ -1310,26 +1589,25 @@ function limit(val, min, max) {
  */
  
  class EMA extends indicator {
-  name ='Exponential Moving Average'
-  shortName = 'EMA'
-  onChart = true
-  series = 'price'
-  calcParams = [6, 12, 20]
-  precision = 2
-  shouldCheckParamCount = false
-  shouldOhlc = true
-  plots = [
+  #ID
+  #name ='Exponential Moving Average'
+  #shortName = 'EMA'
+  #onChart = true
+  #series = 'price'
+  #precision = 2
+  #calcParams = [6, 12, 20]
+  #checkParamCount = false
+  #scaleOverlay = false
+  #plots = [
     { key: 'ema6', title: 'EMA6: ', type: 'line' },
     { key: 'ema12', title: 'EMA12: ', type: 'line' },
     { key: 'ema20', title: 'EMA20: ', type: 'line' }
   ]
-  defaultStyle = {
+  #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1'
   }
-  style = {}
-  overlay
-  TALib
+  #style = {}
 
   // YAXIS_TYPES - default
   static scale = YAXIS_TYPES[0]
@@ -1347,24 +1625,29 @@ function limit(val, min, max) {
   constructor(target, overlay, xAxis, yAxis, config) {
     super(target, xAxis, yAxis, config);
 
-    this.overlay = overlay;
-    this.style = config.style || this.defaultStyle;
-    this.TALib = xAxis.mediator.api.core.TALib;
+    this.#ID = uid(this.#shortName);
+    this.#style = {...this.#defaultStyle, ...config.style};
   }
+
+  get ID() { return this.#ID }
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get onChart() { return this.#onChart }
+  get style() { return this.#style }
+  get plots() { return this.#plots }
 
   calcIndicator(input) {
-    this.overlay.data = this.TALib.EMA(input);
+    this.overlay.data = this.TAlib.Indicators.EMA.ema(input);
   }
-
-
-
-
-
 
   regeneratePlots (params) {
     return params.map(p => {
       return { key: `ema${p}`, title: `EMA${p}: `, type: 'line' }
     })
+  }
+
+  updateIndicator (input) {
+
   }
 
   calcTechnicalIndicator (dataList, { params, plots }) {
@@ -1425,17 +1708,26 @@ function limit(val, min, max) {
 }
 
 // RSI.js
+const calcParams = [20];
 
+
+/**
+ * Indicator - Relative Strength Index
+ * @export
+ * @class RSI
+ * @extends {indicator}
+ */
 class RSI extends indicator {
-  name = 'Relative Strength Index'
-  shortName = 'RSI'
-  onChart = false
-  calcParams = [20]
-  checkParamCount = false
-  plots = [
+  #ID
+  #name = 'Relative Strength Index'
+  #shortName = 'RSI'
+  #onChart = false
+  #checkParamCount = false
+  #scaleOverlay = true
+  #plots = [
     { key: 'RSI_1', title: ' ', type: 'line' },
   ]
-  defaultStyle = {
+  #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1',
     defaultHigh: 75,
@@ -1446,9 +1738,6 @@ class RSI extends indicator {
     lowStrokeStyle: "#848",
     highLowRangeStyle: "#22002220"
   }
-  style = {}
-  overlay
-  TALib
 
   // YAXIS_TYPES - percent
   static scale = YAXIS_TYPES[1]
@@ -1463,17 +1752,21 @@ class RSI extends indicator {
    * @param {object} config - theme / styling
    * @memberof RSI
    */
-  constructor(target, overlay, xAxis, yAxis, config) {
-    super(target, xAxis, yAxis, config);
+  constructor (target, overlay, xAxis, yAxis, config) {
+    super (target, overlay, xAxis, yAxis, config);
 
-    this.overlay = overlay;
-    this.style = {...this.defaultStyle, ...config.style};
-    this.TALib = xAxis.mediator.api.core.TALib;
+    this.#ID = overlay?.id || uid(this.#shortName);
+    this.calcParams = (overlay?.calcParams) ? JSON.parse(overlay.calcParams) : calcParams;
+    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style};
+    this.setNewValue = (value) => { this.newValue(value); };
+    this.setUpdateValue = (value) => { this.UpdateValue(value); };
   }
 
-  calcIndicator(input) {
-    this.overlay.data = this.TALib.EMA(input);
-  }
+  get ID() { return this.#ID }
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get onChart() { return this.#onChart }
+  get plots() { return this.#plots }
 
   regeneratePlots (params) {
     return params.map((_, index) => {
@@ -1482,6 +1775,56 @@ class RSI extends indicator {
     })
   }
 
+  /**
+   * process stream and create new indicator data entry
+   * @param {array} value - current stream candle 
+   * @memberof RSI
+   */
+  newValue (value) {
+    let p = this.TALibParams();
+    if (!p) return false
+
+    let v = this.calcIndicatorStream(this.#shortName, this.TALibParams());
+    if (!v) return false
+
+    this.overlay.data.push([v[0], v[1]]);
+
+    this.target.setPosition(this.core.scrollPos, 0);
+    this.draw(this.range);
+  }
+
+  /**
+   * process stream and update current (last) indicator data entry
+   * @param {array} value - current stream candle 
+   * @memberof RSI
+   */
+  UpdateValue (value) {
+    let l = this.overlay.data.length - 1;
+    let p = this.TALibParams();
+    if (!p) return false
+
+    let v = this.calcIndicatorStream(this.#shortName, p);
+    if (!v) return false
+
+    this.overlay.data[l] = [v[0], v[1]];
+
+    this.target.setPosition(this.core.scrollPos, 0);
+    this.draw(this.range);
+
+    console.log(`RSI stream input update: ${value}`);
+
+  }
+
+  TALibParams() {
+    let end = this.range.dataLength;
+    let step = this.calcParams[0];
+    let start = end - step;
+    let input = this.indicatorInput(start, end);
+    let hasNull = input.find(element => element === null);
+    if (hasNull) return false
+    else return { inReal: input, timePeriod: step }
+  }
+ 
   calcTechnicalIndicator (dataList, { params, plots }) {
     const sumCloseAs = [];
     const sumCloseBs = [];
@@ -1515,6 +1858,10 @@ class RSI extends indicator {
     })
   }
 
+  /**
+   * Draw the current indicator range on its canvas layer and render it.
+   * @param {object} range 
+   */
   draw(range) {
     this.scene.clear();
 
@@ -1588,8 +1935,8 @@ class RSI extends indicator {
 var Indicators = {
   ADX: {id: "ADX", name: "Average Direction", event: "addIndicator"},
   BB: {id: "BB", name: "Bollinger Bands", event: "addIndicator", ind: ""},
+  DMI: {id: "DMI", name: "Directional Movement", event: "addIndicator", ind: DMI},
   EMA: {id: "EMA", name: "Exponential Moving Average", event: "addIndicator", ind: EMA},
-  DMI: {id: "DMI", name: "Directional Movement", event: "addIndicator", },
   RSI: {id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: RSI},
 };
 
@@ -1647,6 +1994,7 @@ class UtilsBar {
   }
 
   end() {
+    this.#mediator.stateMachine.destroy();
     // remove event listeners
     const api = this.#mediator.api;
     const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`);
@@ -1657,15 +2005,19 @@ class UtilsBar {
           util.removeEventListener("click", this.onIconClick);
       }
     }
+
+    this.off("utils_indicators", this.onIndicators);
+    this.off("utils_timezone", this.onTimezone);
+    this.off("utils_settings", this.onSettings);
+    this.off("utils_screenshot", this.onScreenshot);
   }
 
   eventsListen() {
-    this.on("utils_indicators", (e) => { this.onIndicators(e); });
-    this.on("utils_timezone", (e) => { this.onTimezone(e); });
-    this.on("utils_settings", (e) => { this.onSettings(e); });
-    this.on("utils_screenshot", (e) => { this.onScreenshot(e); });
+    this.on("utils_indicators", this.onIndicators.bind(this));
+    this.on("utils_timezone", this.onTimezone.bind(this));
+    this.on("utils_settings", this.onSettings.bind(this));
+    this.on("utils_screenshot", this.onScreenshot.bind(this));
     // this.on("resize", (dimensions) => this.onResize.bind(this))
-
   }
   
   on(topic, handler, context) {
@@ -2859,7 +3211,7 @@ class Measure extends Tool {
 // range.js
 
 
-class Range extends Tool {
+class Range$1 extends Tool {
 
   constructor(config) {
     super(config);
@@ -2923,15 +3275,27 @@ var tools = [
     icon: fibonacci,
     event: "tool_activated",
     class: Fibonacci,
-    sub: []
+    sub: [
+      {
+        id: "fib",
+        name: "Not Implemented Yet",
+        icon: line,
+      }
+    ]
   },
   {
     id: "range",
     name: "Range",
     icon: range,
     event: "tool_activated",
-    class: Range,
-    sub: []
+    class: Range$1,
+    sub: [
+      {
+        id: "rng",
+        name: "Not Implemented Yet",
+        icon: line,
+      }
+    ]
   },
   {
     id: "text",
@@ -2939,7 +3303,13 @@ var tools = [
     icon: text,
     event: "tool_activated",
     class: Text,
-    sub: []
+    sub: [
+      {
+        id: "txt",
+        name: "Not Implemented Yet",
+        icon: line,
+      }
+    ]
   },
   {
     id: "measure",
@@ -3001,6 +3371,45 @@ const TIMEUNITSVALUESLONG = {
   seconds: SECOND_MS,
 };
 const TIMEUNITSVALUES = { ...TIMEUNITSVALUESSHORT, ...TIMEUNITSVALUESLONG };
+
+const timezones = {
+  0: 'Europe/London',
+  '-120': 'Europe/Tallinn',
+  '-60': 'Europe/Zurich',
+  180: 'America/Santiago',
+  300: 'America/Toronto',
+  240: 'America/Caracas',
+  360: 'America/Mexico_City',
+  540: 'America/Juneau',
+  480: 'America/Vancouver',
+  420: 'US/Mountain',
+  120: 'America/Sao_Paulo',
+  '-360': 'Asia/Almaty',
+  '-300': 'Asia/Ashkhabad',
+  '-180': 'Europe/Moscow',
+  '-420': 'Asia/Jakarta',
+  '-480': 'Asia/Taipei',
+  '-240': 'Asia/Muscat',
+  '-345': 'Asia/Kathmandu',
+  '-330': 'Asia/Kolkata',
+  '-540': 'Asia/Tokyo',
+  '-210': 'Asia/Tehran',
+  '-660': 'Pacific/Norfolk',
+  '-630': 'Australia/Adelaide',
+  '-600': 'Australia/Brisbane',
+  '-780': 'Pacific/Fakaofo',
+  '-825': 'Pacific/Chatham',
+  600: 'Pacific/Honolulu',
+};
+
+function getTimezone() {
+  const offset = new Date().getTimezoneOffset();
+
+  if (Object.prototype.hasOwnProperty.call(timezones, offset)) {
+    return timezones[offset.toString()];
+  }
+  return 'Etc/UTC';
+}
 
 function buildSubGrads() {
   const grads = {};
@@ -3331,6 +3740,8 @@ var Time = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   TIMEUNITSVALUESSHORT: TIMEUNITSVALUESSHORT,
   TIMEUNITSVALUESLONG: TIMEUNITSVALUESLONG,
   TIMEUNITSVALUES: TIMEUNITSVALUES,
+  timezones: timezones,
+  getTimezone: getTimezone,
   buildSubGrads: buildSubGrads,
   isValidTimestamp: isValidTimestamp,
   isValidTimeInRange: isValidTimeInRange,
@@ -3427,6 +3838,11 @@ var stateMachineConfig$6 = {
 // tools.js
 
 
+/**
+ * Provides the drawing tools for the chart.
+ * @export
+ * @class ToolsBar
+ */
 class ToolsBar {
 
   #name = "Toolbar"
@@ -3477,7 +3893,6 @@ class ToolsBar {
     this.initAllTools();
     // add all on and off chart tools
     this.addAllTools();
-
     // set up event listeners
     this.eventsListen();
 
@@ -3488,6 +3903,7 @@ class ToolsBar {
   }
 
   end() {
+    this.#mediator.stateMachine.destroy();
     // remove event listeners
     const api = this.#mediator.api;
     const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`);
@@ -3497,12 +3913,14 @@ class ToolsBar {
           tool.removeEventListener("click", this.onIconClick);
       }
     }
+
+    this.off("tool_selected", this.onToolSelect);
+    this.off("tool_deselected", this.onToolDeselect);
   }
 
   eventsListen() {
     this.on("tool_selected", (e) => { this.onToolSelect.bind(this); });
     this.on("tool_deselected", (e) => { this.onToolDeselect.bind(this); });
-
   }
 
   on(topic, handler, context) {
@@ -3647,17 +4065,24 @@ class ToolsBar {
 
 class Axis {
 
-  // chart
+  #core
+  #parent
+  #chart
 
-  constructor(chart) {
-    // this.chart = chart
+  constructor(parent, chart) {
+    this.#chart = chart;
+    this.#parent = parent;
+    this.#core = this.#parent.core;
   }
 
-  get width() { return this.chart.width }
-  get height() { return this.chart.height }
-  get data() { return this.chart.data }
-  get range() { return this.chart.range }
-  get yDigits() { return this.chart.yAxisDigits }
+  get core() { return this.#chart.core }
+  get chart() { return this.#chart }
+  get parent() { return this.#parent }
+  get width() { return this.#chart.width }
+  get height() { return this.#chart.height }
+  get data() { return this.#chart.data }
+  get range() { return this.#chart.range }
+  get yDigits() { return this.#chart.yAxisDigits }
 
   float2Int(value) { return float2Int(value) }
   numDigits(value) { return numDigits(value) }
@@ -3670,9 +4095,7 @@ class Axis {
 
 class xAxis extends Axis {
 
-  #core
-  #parent
-  #chart
+
 
   #xAxisTicks = 4
   #xAxisGrads
@@ -3680,17 +4103,15 @@ class xAxis extends Axis {
   #xAxisOffset
 
   constructor(parent, chart) {
-    super();
-    this.#chart = chart;
-    this.#parent = parent;
-    this.#core = this.#parent.mediator.api.core;
+    super(parent, chart);
+
     this.#xAxisSubGrads = buildSubGrads();
   }
 
-  get core() { return this.#core }
-  get chart() { return this.#parent.mediator.api.Chart }
+  get chart() { return this.parent.mediator.api.Chart }
+  get core() { return this.chart.core }
   get data() { return this.chart.data }
-  get range() { return this.#parent.range }
+  get range() { return this.parent.range }
   get width() { return this.calcWidth() }
   get interval() { return this.range.interval }
   get intervalStr() { return this.range.intervalStr }
@@ -3713,11 +4134,11 @@ class xAxis extends Axis {
   get xAxisTicks() { return this.#xAxisTicks }
   get xAxisGrads() { return this.#xAxisGrads }
   get xAxisSubGrads() { return this.#xAxisSubGrads }
-  get scrollOffsetPx() { return this.#core.scrollPos % this.candleW }
-  get bufferPx() { return this.#core.bufferPx }
+  get scrollOffsetPx() { return this.core.scrollPos % this.candleW }
+  get bufferPx() { return this.core.bufferPx }
 
   calcWidth() {
-    return this.#core.Chart.width - this.#core.Chart.scale.width
+    return this.core.Chart.width - this.core.Chart.scale.width
   }
 
 
@@ -3746,7 +4167,7 @@ class xAxis extends Axis {
     let o = this.core.rangeScrollOffset;
     let c = this.range.indexStart - o; 
     return c + 1
-      + Math.floor((x + (this.#core.scrollPos * -1)) / this.candleW) 
+      + Math.floor((x + (this.core.scrollPos * -1)) / this.candleW) 
   }
 
   pixelOHLCV(x) {
@@ -3755,7 +4176,7 @@ class xAxis extends Axis {
   }
 
   xPosSnap2CandlePos(x) {
-    this.#core.scrollPos % this.candleW;
+    this.core.scrollPos % this.candleW;
     // let o = (x % this.candleW < this.candleW / 2) ? this.candleW : this.candleW * -1
     let c = Math.floor((x / this.candleW)); // + o
     return  (c * this.candleW) + (this.candleW / 2) // + o
@@ -4107,10 +4528,10 @@ class xAxis extends Axis {
   }
 
   drawGrads() {
-    this.#parent.layerLabels.scene.clear();
+    this.parent.layerLabels.scene.clear();
 
     const grads = this.#xAxisGrads.values;
-    const ctx = this.#parent.layerLabels.scene.context;
+    const ctx = this.parent.layerLabels.scene.context;
     this.width / this.range.Length * 0.5;
     const offset = 0;
 
@@ -4132,7 +4553,7 @@ class xAxis extends Axis {
   }
 
   drawOverlays() {
-    this.#parent.layerOverlays.scene.clear();
+    this.parent.layerOverlays.scene.clear();
 
     this.#xAxisGrads;
 
@@ -4142,11 +4563,16 @@ class xAxis extends Axis {
 
 // canvas.js
 
+
+/**
+ * Create multi-layered canvas
+ * @class Viewport
+ */
+class Viewport {
 /**
  * Viewport constructor
  * @param {Object} cfg - {width, height}
  */
-class Viewport {
   constructor(cfg) {
     if (!cfg) cfg = {};
 
@@ -4645,8 +5071,8 @@ class Hit {
   }
   /**
    * converts rgb array to integer value
-   * @param {Array.<Number} rgb - [r,g,b]
-   * @returns {Integer}
+   * @param {Array} rgb - [r,g,b]
+   * @returns {number}
    */
   rgbToInt(rgb) {
     let r = rgb[0];
@@ -4657,7 +5083,7 @@ class Hit {
   /**
    * converts integer value to rgb array
    * @param {Number} number - positive number between 0 and 256*256*256 = 16,777,216
-   * @returns {Array.<Integer>}
+   * @returns {Array}
    */
   intToRGB(number) {
     let r = (number & 0xff0000) >> 16;
@@ -4953,6 +5379,7 @@ class Timeline {
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
   get options() { return this.#options }
+  get core() { return this.#core }
   get height() { return this.#elTime.clientHeight }
   set width(w) { this.setWidth(w); }
   get width() { return this.#elTime.clientWidth }
@@ -5040,7 +5467,10 @@ class Timeline {
   }
 
   end() {
-    
+    this.#mediator.stateMachine.destroy();
+    this.#viewport.destroy();
+    this.#controller = null;
+    this.off("main_mousemove", this.drawCursorTime);
   }
 
   eventsListen() {
@@ -5049,8 +5479,6 @@ class Timeline {
     this.#controller = new InputController(canvas, {disableContextMenu: false});
 
     this.on("main_mousemove", (e) => { this.drawCursorTime(e); });
-    // this.on("chart_pan", (e) => { this.drawCursorTime(e, true) })
-    // this.on("chart_panDone", (e) => { this.drawCursorTime(e, true) })
   }
 
   on(topic, handler, context) {
@@ -5159,6 +5587,7 @@ class Timeline {
 
 class yAxis extends Axis {
 
+  #source
   #parent
   #chart
 
@@ -5172,15 +5601,16 @@ class yAxis extends Axis {
   #yAxisGrads
 
   constructor(parent, chart, yAxisType=YAXIS_TYPES[0]) {
-    super();
+    super(parent, chart);
     this.#chart = chart;
-    this.#parent = parent; 
+    this.#parent = parent;
+    this.#source = parent.parent;
     this.yAxisType = yAxisType;
     this.#yAxisGrid = (this.#parent.core.config?.yAxisGrid) ? 
       this.#parent.core.config?.yAxisGrid : YAXIS_GRID;
   }
 
-  get chart() { return this.#chart } //this.#parent.mediator.api.core.Chart }
+  get chart() { return this.#chart }
   get data() { return this.chart.data }
   get range() { return this.#parent.mediator.api.core.range }
   get height() { return this.chart.height }
@@ -5643,6 +6073,11 @@ class scalePriceLine {
 
 // scale.js
 
+/**
+ * Provides the chart panes scale / yAxis
+ * @export
+ * @class ScaleBar
+ */
 class ScaleBar {
 
   #ID
@@ -5699,6 +6134,7 @@ class ScaleBar {
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   get core() { return this.#core }
+  get parent() { return this.#parent }
   set height(h) { this.setHeight(h); }
   get height() { return this.#elScale.clientHeight }
   get width() { return this.#elScale.clientWidth }
@@ -5725,7 +6161,6 @@ class ScaleBar {
 
 
   start(data) {
-    this.emit("started",data);
 
     this.#yAxis = new yAxis(this, this, this.yAxisType);
 
@@ -5745,11 +6180,13 @@ class ScaleBar {
   }
 
   end() {
+    this.#mediator.stateMachine.destroy();
+    this.#controller = null;
+    this.#viewport.destroy();
+
     this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove);
     this.off(`${this.#parent.ID}_mouseout`, this.eraseCursorPrice);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
-    // this.off("chart_pan", (e) => { this.drawCursorPrice() })
-    // this.off("chart_panDone", (e) => { this.eraseCursorPrice() })
   }
 
   eventsListen() {
@@ -5954,15 +6391,30 @@ class Legends {
 
   #targetEl
   #list
+  #parent
+  #core
 
-  constructor(target) {
+  #controls = {
+    width: 20,
+    height: 20,
+    fill: "#aaa"
+  }
+  #controlsList
+
+  constructor(target, parent) {
     this.#targetEl = target;
     this.#list = {};
+    this.#parent = parent;
+    this.#core = parent.core;
 
     this.mount(target);
   }
 
   get list() { return this.#list }
+
+  onMouseClick() {
+
+  }
 
   mount(el) {
     // el.innerHTML = this.defaultNode()
@@ -5972,9 +6424,10 @@ class Legends {
   }
 
   buildLegend(o) {
-    const styleLegend = "margin: .5em 0 1em 1em; font-size: 12px;";
+    const styleLegend = `width: calc(100% - ${this.#core.scaleW}px - 1em); margin: .5em 0 1em 1em; font-size: 12px; text-align: left;`;
       let styleLegendTitle = "margin-right: 1em; white-space: nowrap;";
     const styleInputs = "display: inline; margin-left: -1em;";
+    const styleControls = "float: right; margin: 0.5em;";
 
     styleLegendTitle += (o?.type === "chart")? "font-size: 1.5em;" : "font-size: 1.2em;";
 
@@ -5982,6 +6435,7 @@ class Legends {
       <div id="${o.id}" class="legend" style="${styleLegend}">
         <span class="title" style="${styleLegendTitle}">${o.title}</span>
         <dl style="${styleInputs}">${this.buildInputs(o)}</dl>
+        <div class="controls" style="${styleControls}">${this.buildControls(o)}</div>
       </div>
     `;
     return node
@@ -6004,6 +6458,30 @@ class Legends {
     return inp
   }
 
+  buildControls(o) {
+    let inp = "";
+    let id = this.#parent.ID;
+
+    // visibility
+    // move up
+    inp += `<span id="${id}_up" class="control">${up}</span>`;
+    // move down
+    inp += `<span id="${id}_down" class="control">${down}</span>`;
+    // collapse
+    inp += `<span id="${id}_collapse" class="control">${collapse}</span>`;
+    // maximize
+    inp += `<span id="${id}_maximize" class="control">${maximize}</span>`;
+    // restore
+    inp += `<span id="${id}_restore" class="control">${restore}</span>`;
+    // remove
+    inp += `<span id="${id}_remove" class="control">${close}</span>`;
+    // config
+    inp += `<span id="${id}_config" class="control">${config}</span>`;
+
+
+    return inp
+  }
+
   add(options) {
     if (!isObject(options) || !("title" in options)) return false
 
@@ -6013,8 +6491,19 @@ class Legends {
     const html = this.buildLegend(options);
     const elem = DOM.htmlToElement(html);
 
-    this.#targetEl.appendChild(elem); 
-    this.#list[options.id] = {el: DOM.findByID(options.id), type: options.type};
+    this.#targetEl.appendChild(elem);
+    const legendEl = DOM.findByID(options.id);
+    this.#list[options.id] = {el: legendEl, type: options.type};
+
+    this.#controlsList = DOM.findBySelectorAll(`#${options.id} .controls .control`);
+    for (let c of this.#controlsList) {
+      let svg = c.querySelector('svg');
+      svg.style.width = `${this.#controls.width}px`;
+      svg.style.height = `${this.#controls.height}px`;
+      svg.style.fill = `${this.#controls.fill}`;
+
+      c.addEventListener('click', this.onMouseClick.bind(this));
+    }
 
     return options.id
   }
@@ -6025,6 +6514,11 @@ class Legends {
     
     this.#list[id].el.remove();
     delete this.#list[id];
+
+    for (let c of this.#controlsList) {
+      c.removeEventListener('click', this.onMouseClick);
+    }
+    
 
     return true
   }
@@ -6409,164 +6903,6 @@ class chartCandles extends Candle {
 
 }
 
-// range.js
-
-function getRange( allData, start=0, end=allData.data.length-1 ) {
-  let r = allData;
-  r.dataLength = r.data.length - 1;
-
-  // check and correct start and end argument order
-  if (start > end) [start, end] = [end, start];
-
-  // minimum range constraint
-  if ((end - start) < MINCANDLES) end = start + MINCANDLES + 1;
-
-  // set out of history bounds limits
-  start = (start < LIMITPAST * -1) ? LIMITPAST * -1 : start;
-  end = (end < (LIMITPAST * -1) + MINCANDLES) ? (LIMITPAST * -1) + MINCANDLES + 1 : end;
-  start = (start > r.dataLength + LIMITFUTURE - MINCANDLES) ? r.dataLength + LIMITFUTURE - MINCANDLES - 1: start;
-  end = (end > r.dataLength + LIMITFUTURE) ? r.dataLength + LIMITFUTURE : end;
-  
-  r.value = (index) => { return rangeValue(index, r)};
-  r.index = (ts) => { return getTimeIndex(ts, r) };
-  r.inRange = (ts) => { return inRange(ts, r) };
-  r.inPriceHistory = (ts) => { return inRange(ts, r) };
-  r.rangeIndex = (ts) => { return getTimeIndex(ts, r) - r.indexStart };
-  r.interval = r.data[1][0] - r.data[0][0];
-  r.intervalStr = ms2Interval(r.interval);
-  r.indexStart = start;
-  r.indexEnd = end;
-  r.Length = r.indexEnd - r.indexStart;
-  r.timeStart = r.value(0)[0];
-  r.timeFinish = r.value(r.dataLength)[0];
-  r.timeDuration = r.timeFinish - r.timeStart;
-  r.timeMin = r.value(r.indexStart)[0];
-  r.timeMax = r.value(r.indexEnd)[0];
-  r.rangeDuration = r.timeMax - r.timeMin;
-  r = {...r, ...maxMinPriceVol(r.data, r.indexStart, r.indexEnd)};
-  r.height = r.priceMax - r.priceMin;
-  r.volumeHeight = r.volumeMax - r.volumeMin;
-  r.scale = (r.Length) / (r.dataLength);
-  return r
-}
-
-function inRange(t, range) {
-  if (t >= range.timeMin && t <= range.timeMax)
-    return true
-  else return false
-}
-
-function rangeValue( index, range ) {
-  // return last value as default
-  if (!isNumber(index)) index = range.data.length - 1;
-
-  let v = range.data[index];
-  if (v !== undefined) return v
-  else {
-    const len = range.data.length - 1;
-    v = [null, null, null, null, null, null];
-    if (index < 0) {
-      v[0] = range.data[0][0] + (range.interval * index);
-      return v
-    }
-    else if (index > len) {
-      v[0] = range.data[len][0] + (range.interval * (index - len));
-      return v
-    }
-    else return null
-  }
-}
-
-/**
- * Find price maximum and minimum, volume maximum and minimum
- *
- * @export
- * @param {array} data
- * @param {number} [start=0]
- * @param {number} [end=data.length-1]
- * @return {object}  
- */
-function maxMinPriceVol( data, start=0, end=data.length-1 ) {
-
-  let l = (data.length-1) ? data.length-1 : 0;
-  let i = limit(start, 0, l);
-  let c = limit(end, 0, l);
-
-  let priceMin  = data[i][3];
-  let priceMax  = data[i][2];
-  let volumeMin = data[i][5];
-  let volumeMax = data[i][5];
-
-  while(i++ < c) {
-    priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin;
-    priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax;
-    volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin;
-    volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax;
-  }
-
-  return {
-    priceMin: priceMin * (1 - YAXIS_BOUNDS),
-    priceMax: priceMax * (1 + YAXIS_BOUNDS),
-    volumeMin: volumeMin,
-    volumeMax: volumeMax
-  }
-}
-
-
-// Detects candles interval
-function detectInterval(ohlcv) {
-
-  let len = Math.min(ohlcv.length - 1, 99);
-  let min = Infinity;
-  ohlcv.slice(0, len).forEach((x, i) => {
-      let d = ohlcv[i+1][0] - x[0];
-      if (d === d && d < min) min = d;
-  });
-  // This saves monthly chart from being awkward
-  // if (min >= WEEK_MS * 4 && min <= DAY_MS * 30) {
-  //     return DAY_MS * 31
-  // }
-  return min
-}
-
-function getTimeIndex(ts, r) {
-  // if (r.inRange(ts)) {
-  //   let i = r.indexStart
-  //   while (i++ <= r.indexEnd) {
-  //     if (ts === r.value(i)[0]) return i
-  //   }
-  //   return false
-  // }
-
-  if (!isNumber(ts)) return false
-  ts = ts - (ts % r.interval);
-
-  let x = r.data[0][0];
-  if (ts === x) 
-    return 0
-  else if (ts < x)
-    return ((x - ts) / r.interval) * -1
-  else 
-    return (ts - x) / r.interval
-}
-
-function calcTimeIndex(time, dateStamp) {
-  if (!isNumber(dateStamp)) return false
-
-  let index;
-  let timeFrameMS = time.timeFrameMS;
-  dateStamp = dateStamp - (dateStamp % timeFrameMS);
-
-  if (dateStamp === time.range.data[0][0])
-    index = 0;
-  else if (dateStamp < time.range.data[0][0]) 
-    index = ((time.range.data[0][0] - dateStamp) / timeFrameMS) * -1;
-  else 
-    index = (dateStamp - time.range.data[0][0]) / timeFrameMS;
-
-  return index
-}
-
 // chart-streamCandle.js
 
 class chartStreamCandle extends Candle {
@@ -6933,6 +7269,7 @@ class Chart {
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   get element() { return this.#elChart }
+  get core() { return this.#core }
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
   set width(w) { this.setWidth(w); }
@@ -6979,7 +7316,7 @@ class Chart {
       title: this.#title,
       type: "chart"
     };
-    this.#Legends = new Legends(this.#elLegends);
+    this.#Legends = new Legends(this.#elLegends, this);
     this.#Legends.add(chartLegend);
 
     // api - functions / methods, calculated properties provided by this module
@@ -6989,8 +7326,6 @@ class Chart {
     api.elements = 
     {...api.elements, 
       ...{
-        // elWidgets: this.#elWidgets,
-        // elCanvas: this.#elCanvas,
         elScale: this.#elScale
       }
     };
@@ -7001,16 +7336,8 @@ class Chart {
     options.yAxisType = "default";
     this.#Scale = this.#mediator.register("Chart_ScaleBar", ScaleBar, options, api);
 
-
-    // window.tradex_chart_scale = this.#Scale
     // onChart indicators
     // this.#onChart = this.#mediator.register("OnChart", OnChart, options, api)
-
-
-    // set up layout responsiveness
-    // let dimensions = {wdith: this.#width, height: this.#height}
-    // this.emit("resizeChart", dimensions)
-
 
     this.log(`${this.#name} instantiated`);
   }
@@ -7020,9 +7347,11 @@ class Chart {
 
     // X Axis - Timeline
     this.#Time = this.mediator.api.Timeline;
+    if (isObject(this.Stream)) {
+      ({stream: this.Stream});
+      // iterate over on chart indicators and add inputs if any
+    }
 
-    // Y Axis - Price Scale
-    this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`);});
     this.#Scale.start(`Chart says to Scale, "Thanks for the update!"`);
 
     // prepare layered canvas
@@ -7043,10 +7372,15 @@ class Chart {
   }
 
   end() {
+    this.#mediator.stateMachine.destroy();
+    this.#Scale.end();
+    this.#viewport.destroy();
+
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
     this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
     this.#controller.removeEventListener("mouseout", this.onMouseOut);
     this.#controller.removeEventListener("mousedown", this.onMouseDown);
+    this.#controller = null;
 
     this.off("main_mousemove", this.onMouseMove);
   }
@@ -7224,7 +7558,7 @@ class Chart {
 
     const styleChart = STYLE_CHART + ` width: ${width}px; height: ${height}px`;
     const styleScale = STYLE_SCALE$2 + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`;
-    const styleLegend = `position: absolute; top: 0; left: 0; z-index:100;`;
+    const styleLegend = `width: 100%; position: absolute; top: 0; left: 0; z-index:100;`;
 
     const node = `
       <div class="viewport" style="${styleChart}"></div>
@@ -7512,7 +7846,6 @@ class Chart {
   /**
    * Calculate new range index / position 
    * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
-   * @returns 
    */
   updateRange(pos) {
     // draw the chart - grid, candles, volume
@@ -7756,20 +8089,22 @@ class OffChart {
 
   #viewport
   #layerGrid
+  #layerStream
   #layerCursor
   #layersIndicator
-  #layersTools
-  #layerStream
+  #layersTools = new Map()
 
   #overlayGrid
   #overlayIndicator
+  #overlayStream
+  #overlayTools = new Map()
   #overlayCursor
 
   #cursorPos = [0, 0]
   #cursorActive = false
 
   #settings
-  #chartCandle
+  #streamCandle
   #title
   #theme
   #controller
@@ -7799,7 +8134,6 @@ class OffChart {
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   get core() { return this.#core }
-  get range() { return this.#core.range }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elOffChart) }
   get stateMachine() { return this.#mediator.stateMachine }
@@ -7807,6 +8141,9 @@ class OffChart {
   get element() { return this.#elOffChart }
   get widgets() { return this.#core.WidgetsG }
   get offChartID() { return this.#offChartID }
+  get data() {}
+  get range() { return this.#core.range }
+  get stream() { return this.#Stream }
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
   get candleW() { return this.#core.Timeline.candleW }
@@ -7839,7 +8176,7 @@ class OffChart {
       title: options.offChart.name,
       type: options.offChart.type
     };
-    this.#Legends = new Legends(this.#elLegends);
+    this.#Legends = new Legends(this.#elLegends, this);
     this.#Legends.add(offChartLegend);
 
     // api - functions / methods, calculated properties provided by this module
@@ -7889,12 +8226,22 @@ class OffChart {
   }
 
   end() {
+    this.#mediator.stateMachine.destroy();
+    this.#viewport.destroy();
+    this.#Scale.end();
+    this.#Divider.end();
+    this.#Indicator.end();
+
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
     this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
     this.#controller.removeEventListener("mouseout", this.onMouseOut);
     this.#controller.removeEventListener("mousedown", this.onMouseDown);
+    this.#controller = null;
 
     this.off("main_mousemove", this.updateLegends);
+    this.off(STREAM_LISTENING, this.onStreamListening);
+    this.off(STREAM_NEWVALUE, this.onStreamNewValue);
+    this.off(STREAM_UPDATE, this.onStreamUpdate);
   }
 
 
@@ -7909,9 +8256,9 @@ class OffChart {
 
     // listen/subscribe/watch for parent notifications
     this.on("main_mousemove", this.updateLegends.bind(this));
-    this.on(STREAM_LISTENING, (stream) => this.onStreamListening(stream));
-    this.on(STREAM_NEWVALUE, (value) => this.onStreamNewValue(value));
-    this.on(STREAM_UPDATE, (value) => this.onStreamUpdate(value));
+    this.on(STREAM_LISTENING, this.onStreamListening.bind(this));
+    this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this));
+    this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this));
   }
 
   on(topic, handler, context) {
@@ -7956,13 +8303,18 @@ class OffChart {
     }
   }
 
-
   onStreamNewValue(value) {
-
+    this.draw(this.range, true);
   }
 
-  onStreamUpdate(value) {
+  onStreamUpdate(candle) {
+    this.#streamCandle = candle;
+    // calculate new indicator value
+    this.#layerStream.setPosition(this.#core.stream.lastScrollPos, 0);
+    // this.#chartStreamCandle.draw(candle)
+    this.#viewport.render();
 
+    this.updateLegends();
   }
 
   mount(el) {
@@ -8034,7 +8386,7 @@ class OffChart {
 
     const styleOffChart = STYLE_OFFCHART + ` width: ${width}px; height: ${height}px`;
     const styleScale = STYLE_SCALE$1 + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`;
-    const styleLegend = `position: absolute; top: 0; left: 0; z-index:100;`;
+    const styleLegend = `width: 100%; position: absolute; top: 0; left: 0; z-index:100;`;
 
     const node = `
       <div class="viewport" style="${styleOffChart}"></div>
@@ -8396,6 +8748,11 @@ const STYLE_TIME = "border-top: 1px solid; width:100%; min-width:100%;";
 const STYLE_SCALE = "border-left: 1px solid;";
 
 
+/**
+ * Provides chart main pane that hosts, chart, off charts (indicators), timeline, widgets
+ * @export
+ * @class MainPane
+ */
 class MainPane {
 
   #name = "Utilities"
@@ -8518,10 +8875,10 @@ class MainPane {
   }
 
   start() {
+    let i = 0;
+
     this.#Time.start();
     this.#Chart.start();
-
-    let i = 0;
     this.#OffCharts.forEach((offChart, key) => {
       offChart.start(i++);
     });
@@ -8541,12 +8898,21 @@ class MainPane {
   }
 
   end() {
+    this.#mediator.stateMachine.destroy();
+    this.#Time.end();
+    this.#Chart.end();
+    this.#OffCharts.forEach((offChart, key) => {
+      offChart.end();
+    });
+    this.#viewport.destroy();
+
     this.#controller.removeEventListener("mousewheel", this.onMouseWheel);
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
     this.#controller.removeEventListener("drag", this.onChartDrag);
     this.#controller.removeEventListener("enddrag", this.onChartDragDone);
     this.#controller.removeEventListener("keydown", this.onChartKeyDown);
     this.#controller.removeEventListener("keyup", this.onChartKeyDown);
+    this.#controller = null;
 
     this.off(STREAM_NEWVALUE, this.onNewStreamValue);
   }
@@ -8810,7 +9176,7 @@ class MainPane {
 
   defaultNode() {
     const api = this.#mediator.api;
-    const styleRows = STYLE_ROWS + `height: calc(100% - ${api.timeH}px)`;
+    const styleRows = STYLE_ROWS + ` height: calc(100% - ${api.timeH}px)`;
     const styleTime = STYLE_TIME + ` height: ${api.timeH}px; border-color: ${api.chartBorderColour};`;
     const defaultRow = this.defaultRowNode();
 
@@ -8936,6 +9302,8 @@ class MainPane {
 }
 
 // menu.js
+
+const MENUMINWIDTH = 150;
 
 class Menu {
 
@@ -9099,8 +9467,8 @@ class Menu {
 
   content(menu) {
     this.#mediator.api;
-    const listStyle = "list-style: none; text-align: left; margin:1em 1em 1em -2.5em;";
-    const itemStyle = "padding: .25em 1em .25em 1em;";
+    const listStyle = `list-style: none; text-align: left; margin:1em 1em 1em -2.5em; min-width: ${MENUMINWIDTH}px`;
+    const itemStyle = "padding: .25em 1em .25em 1em; white-space: nowrap;";
     const shortStyle = "display: inline-block; width: 4em;";
     const cPointer = "cursor: pointer;";
     const over = `onmouseover="this.style.background ='#222'"`;
@@ -9135,6 +9503,14 @@ class Menu {
 
     Menu.currentActive = this;
     this.#elMenu.style.display = "block";
+
+    let pos = DOM.elementDimPos(this.#elMenu);
+    let posR = pos.left + pos.width;
+    if (posR > this.#elWidgetsG.offsetWidth) {
+      let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width);
+          o = limit(o, 0, this.#elWidgetsG.offsetWidth);
+      this.#elMenu.style.left = `${o}px`;
+    }
   }
 
   // hide the menu
@@ -9506,6 +9882,7 @@ class Divider {
     this.#controller.removeEventListener("mouseout", this.onMouseOut);
     this.#controller.removeEventListener("drag", this.onDividerDrag);
     this.#controller.removeEventListener("enddrag", this.onDividerDragDone);
+    this.#controller = null;
 
     // remove element
     this.el.remove();
@@ -9984,6 +10361,234 @@ function isValidCandle(c, isCrypto=false) {
   return true
 }
 
+// range.js
+
+class Range {
+
+  data
+  // dataLength
+  #interval
+  #intervalStr
+  indexStart
+  indexEnd
+  limitFuture = LIMITFUTURE
+  limitPast = LIMITPAST
+  minCandles = MINCANDLES
+  yAxisBounds = YAXIS_BOUNDS
+
+  constructor( allData, start=0, end=allData.data.length-1, config={}) {
+    if (!isObject(allData) || 
+        !isObject(config)) return false
+
+    this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE;
+    this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST;
+    this.minCandles = (isNumber(this.config?.limitCandles)) ? this.config.limitCandles : MINCANDLES;
+    this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS;
+
+    for (let data in allData) {
+      this[data] = allData[data];
+    }
+
+    if (!this.set(start, end)) return false
+
+    this.#interval = detectInterval(this.data);
+    this.#intervalStr = ms2Interval(this.interval);
+  }
+
+  get dataLength () { return this.data.length - 1 }
+  get Length () { return this.indexEnd - this.indexStart }
+  get timeDuration () { return this.timeFinish - this.timeStart }
+  get timeMin () { return this.value(this.indexStart)[0] }
+  get timeMax () { return this.value(this.indexEnd)[0] }
+  get rangeDuration () { return this.timeMax - this.timeMin }
+  get timeStart () { return this.value(0)[0] }
+  get timeFinish () { return this.value(this.dataLength)[0] }
+  set interval (i) { this.#interval = i; }
+  get interval () { return this.#interval }
+  set intervalStr (i) { this.#intervalStr = i; }
+  get intervalStr () { return this.#intervalStr }
+
+  set (start=0, end=this.dataLength) {
+    if (!isNumber(start) || 
+        !isNumber(end)) return false
+
+    // check and correct start and end argument order
+    if (start > end) [start, end] = [end, start];
+    // minimum range constraint
+    if ((end - start) < this.minCandles) end = start + this.minCandles + 1;
+
+    // set out of history bounds limits
+    start = (start < this.limitPast * -1) ? this.limitPast * -1 : start;
+    end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end;
+    start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start;
+    end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end;
+  
+    this.indexStart = start;
+    this.indexEnd = end;
+
+    let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd);
+    for (let m in maxMin) {
+      this[m] = maxMin[m];
+    }
+    this.height = this.priceMax - this.priceMin;
+    this.volumeHeight = this.volumeMax - this.volumeMin;
+    this.scale = this.Length / this.dataLength;
+
+    return true
+  }
+
+  /**
+   * 
+   * @param {number} index - price history index, out of bounds will return null filled entry
+   * @returns {array}
+   */
+  value ( index ) {
+    // return last value as default
+    if (!isNumber(index)) index = this.data.length - 1;
+  
+    let v = this.data[index];
+    if (v !== undefined) return v
+    else {
+      const len = this.data.length - 1;
+      v = [null, null, null, null, null, null];
+      if (index < 0) {
+        v[0] = this.data[0][0] + (this.interval * index);
+        return v
+      }
+      else if (index > len) {
+        v[0] = this.data[len][0] + (this.interval * (index - len));
+        return v
+      }
+      else return null
+    }
+  }
+
+  /**
+   * Return time index
+   * @param {number} ts - timestamp
+   * @returns {number}
+   */
+   getTimeIndex (ts) {
+    if (!isNumber(ts)) return false
+    ts = ts - (ts % this.interval);
+  
+    let x = this.data[0][0];
+    if (ts === x) 
+      return 0
+    else if (ts < x)
+      return ((x - ts) / this.interval) * -1
+    else 
+      return (ts - x) / this.interval
+  }
+
+  /**
+   * Is timestamp in current range
+   * @param {number} t - timestamp
+   * @returns {boolean}
+   */
+  inRange(t) {
+    if (t >= this.timeMin && t <= this.timeMax)
+      return true
+    else return false
+  }
+
+  inPriceHistory (ts) { return this.inRange(ts) }
+  
+  /**
+   * Return index offset of timestamp relative to range start
+   * @param {number} ts - timestamp
+   * @returns {number}
+   */
+  rangeIndex (ts) { return this.getTimeIndex(ts) - this.indexStart }
+
+  /**
+   * Find price maximum and minimum, volume maximum and minimum
+   * @param {array} data
+   * @param {number} [start=0]
+   * @param {number} [end=data.length-1]
+   * @return {object}  
+   */
+  maxMinPriceVol ( data, start=0, end=data.length-1 ) {
+
+    let l = (data.length-1) ? data.length-1 : 0;
+    let i = limit(start, 0, l);
+    let c = limit(end, 0, l);
+
+    let priceMin  = data[i][3];
+    let priceMax  = data[i][2];
+    let volumeMin = data[i][5];
+    let volumeMax = data[i][5];
+
+    while(i++ < c) {
+      priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin;
+      priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax;
+      volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin;
+      volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax;
+    }
+
+    return {
+      priceMin: priceMin * (1 - this.yAxisBounds),
+      priceMax: priceMax * (1 + this.yAxisBounds),
+      volumeMin: volumeMin,
+      volumeMax: volumeMax
+    }
+  }
+
+  /**
+   * 
+   * @param {number} t 
+   * @returns {boolean}
+   */
+  inPriceHistory (t) {
+    if (t >= this.timeStart && t <= this.timeFinish)
+      return true
+    else return false
+  }
+} // end class
+
+/**
+ * Detects candles interval
+ * @param {array} ohlcv - array of ohlcv values (price history)
+ * @returns {number} - milliseconds
+ */
+function detectInterval(ohlcv) {
+
+  let len = Math.min(ohlcv.length - 1, 99);
+  let min = Infinity;
+  ohlcv.slice(0, len).forEach((x, i) => {
+      let d = ohlcv[i+1][0] - x[0];
+      if (d === d && d < min) min = d;
+  });
+  // This saves monthly chart from being awkward
+  // if (min >= WEEK_MS * 4 && min <= DAY_MS * 30) {
+  //     return DAY_MS * 31
+  // }
+  return min
+}
+
+/**
+ * 
+ * @param {object} time - time object provided by core
+ * @param {number} dateStamp 
+ * @returns {number}
+ */
+function calcTimeIndex(time, dateStamp) {
+  if (!isNumber(dateStamp)) return false
+
+  let index;
+  let timeFrameMS = time.timeFrameMS;
+  dateStamp = dateStamp - (dateStamp % timeFrameMS);
+
+  if (dateStamp === time.range.data[0][0])
+    index = 0;
+  else if (dateStamp < time.range.data[0][0]) 
+    index = ((time.range.data[0][0] - dateStamp) / timeFrameMS) * -1;
+  else 
+    index = (dateStamp - time.range.data[0][0]) / timeFrameMS;
+
+  return index
+}
+
 // state.js
 
 const DEFAULT_STATE = {
@@ -10194,7 +10799,7 @@ class Stream {
     this.status = {status: STREAM_LISTENING, data: this.#candle};
   }
   get candle() {
-    if (this.#candle !== empty) return this.#candle
+    return (this.#candle !== empty) ? this.#candle : null
   }
 
   /**
@@ -10259,6 +10864,12 @@ const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;";
 (async () => {
   await talib.init("node_modules/talib-web/lib/talib.wasm");
 })();
+
+/**
+ * The root class for the entire chart
+ * @export
+ * @class TradeXchart
+ */
 class TradeXchart {
 
 
@@ -10304,8 +10915,8 @@ class TradeXchart {
   chartTxtColour = GlobalStyle.COLOUR_TXT
   chartBorderColour = GlobalStyle.COLOUR_BORDER
 
-  utilsH = 40
-  toolsW = 45
+  utilsH = 35
+  toolsW = 40
   timeH  = 50
   scaleW = 60
 
@@ -10354,13 +10965,13 @@ class TradeXchart {
 
 /**
  * Creates an instance of TradeXchart.
- * @param {instance} mediator
- * @param {object} [options={}]
+ * @param {instance} mediator - module api
+ * @param {object}[options={}] - chart configuration
  * @memberof TradeXchart
  */
 constructor (mediator, options={}) {
 
-this.oncontextmenu = window.oncontextmenu;
+    this.oncontextmenu = window.oncontextmenu;
 
     let container = options?.container,
         state = options?.state, 
@@ -10409,9 +11020,7 @@ this.oncontextmenu = window.oncontextmenu;
 
   get elUtils() { return this.#elUtils }
   get elTools() { return this.#elTools }
-  // get elTime() { return this.#elTime }
   get elMain() { return this.#elMain }
-  // get elChart() { return this.#elChart }
   get elWidgetsG() { return this.#elWidgetsG }
 
   get UtilsBar() { return this.#UtilsBar }
@@ -10458,15 +11067,14 @@ this.oncontextmenu = window.oncontextmenu;
   get stream() { return this.#stream }
 
 
-
   /**
    * Create a new TradeXchart instance
    *
    * @static
-   * @param {DOM element} container
-   * @param {Object} [config={}]
-   * @param {Object} state
-   * @return {Instance}  
+   * @param {DOM_element} container - HTML element to mount the chart on
+   * @param {object} [config={}] - chart config
+   * @param {object} state - chart state
+   * @return {instance}  
    * @memberof TradeXchart
    */
   static create(container, config={}, state) {
@@ -10490,16 +11098,24 @@ this.oncontextmenu = window.oncontextmenu;
     return instance
   }
 
+  /**
+   * Destroy a chart instance, clean up and remove data
+   * @static
+   * @param {instance} chart 
+   * @memberof TradeXchart
+   */
   static destroy(chart) {
     if (chart.constructor.name === "TradeXchart") {
+      chart.end();
       const inCnt = chart.inCnt;
       delete TradeXchart.#instances[inCnt];
     }
   }
 
   /**
-   * Target element has been validated as a mount point
+   * Target element has been validated as a mount point, 
    * let's start building
+   * @param {object} config - chart configuration
    */
   init(config) {
     this.#config = config;
@@ -10521,7 +11137,7 @@ this.oncontextmenu = window.oncontextmenu;
     }
 
     // set default range
-    this.setRange();
+    this.getRange();
     // now set user defined (if any) range
     const rangeStart = calcTimeIndex(this.#time, this.#rangeStartTS);
     const end = (rangeStart) ? 
@@ -10586,6 +11202,9 @@ this.oncontextmenu = window.oncontextmenu;
     this.log(`${this.#name} instantiated`);
   }
 
+  /**
+   * Start the chart processing events and displaying data
+   */
   start() {
     this.log("...processing state");
 
@@ -10601,11 +11220,24 @@ this.oncontextmenu = window.oncontextmenu;
     if (isObject(this.#config.stream)) this.#stream = new Stream(this);
   }
 
+  /**
+   * Stop all chart event processing and remove the chart from DOM.
+   * In other words, destroy the chart.
+   */
   end() {
     this.log("...cleanup the mess");
-    removeEventListener('mousemove', this.onMouseMove);
+    this.#elTXChart.removeEventListener('mousemove', this.onMouseMove);
 
     this.off(STREAM_UPDATE, this.onStreamUpdate);
+
+    this.UtilsBar.end();
+    this.ToolsBar.end();
+    this.MainPane.end();
+    this.WidgetsG.end();
+
+    this.#state = null;
+
+    DOM.findByID(this.id).remove;
   }
 
   eventsListen() {
@@ -10674,15 +11306,6 @@ this.oncontextmenu = window.oncontextmenu;
     };
   }
 
-  unmount() {
-    this.cleanup();
-  }
-
-  cleanup() {
-    // remove all event listeners
-    // destroy all objects
-  }
-
   props() {
     return {
       // id: (id) => this.setID(id),
@@ -10717,7 +11340,6 @@ this.oncontextmenu = window.oncontextmenu;
 
   getModID() { return this.#modID }
 
-
   setWidth(w) {
     if (isNumber(w))
       this.#chartW = w;
@@ -10741,6 +11363,11 @@ this.oncontextmenu = window.oncontextmenu;
     this.#elMain.style.height= `${this.#chartH - this.utilsH}px`;
   }
 
+  /**
+   * Set chart width and height
+   * @param {number} w - width in pixels
+   * @param {number} h - height in pixels
+   */
   setDimensions(w, h) {
     let width = this.width;
     let height = this.height;
@@ -10759,28 +11386,32 @@ this.oncontextmenu = window.oncontextmenu;
     });
   }
 
-    /**
-   * Set the price accuracy
-   * @param pricePrecision - Price accuracy
+  /**
+ * Set the price accuracy
+ * @param {number} pricePrecision - Price accuracy
+ */
+    setPricePrecision (pricePrecision) {
+    if (!isNumber(pricePrecision) || pricePrecision < 0) {
+      pricePrecision = PRICE_PRECISION;
+    }
+    this.#pricePrecision = pricePrecision;
+  }
+
+  /**
+   * Set the volume accuracy
+   * @param {number} volumePrecision - Volume accuracy
    */
-     setPricePrecision (pricePrecision) {
-      if (!isNumber(pricePrecision) || pricePrecision < 0) {
-        pricePrecision = PRICE_PRECISION;
-      }
-      this.#pricePrecision = pricePrecision;
+  setVolumePrecision (volumePrecision) {
+    if (!isNumber(volumePrecision) || volumePrecision < 0) {
+      volumePrecision = VOLUME_PRECISION;
     }
+    this.#volumePrecision = volumePrecision;
+  }
 
-    /**
-     * Set the volume accuracy
-     * @param volumePrecision - Volume accuracy
-     */
-    setVolumePrecision (volumePrecision) {
-      if (!isNumber(volumePrecision) || volumePrecision < 0) {
-        volumePrecision = VOLUME_PRECISION;
-      }
-      this.#volumePrecision = volumePrecision;
-    }
-
+  /**
+   * Set the chart theme
+   * @param {object} volumePrecision - Volume accuracy
+   */
   setTheme(theme) {
     // TODO: validation
     this.#theme = theme;
@@ -10820,14 +11451,15 @@ this.oncontextmenu = window.oncontextmenu;
     const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour};`;
     const styleMain = STYLE_MAIN + ` left: ${this.toolsW}px; width: calc(100% - ${this.toolsW}px);`;
     const styleWidgets = ` position: relative;`;
+    const styleScale = `position: absolute; top: 0; right: 0; width: ${this.scaleW}px; height: 100%;`;
     
     const node = `
       <div id="${this.id}" class="${classesTXChart}" style="${styleTXChart}">
         <div class="${CLASS_UTILS}" style="${styleUtils}"></div>
         <div class="${CLASS_BODY}" style="${styleBody}">
           <div class="${CLASS_TOOLS}" style="${styleTools}"></div>
-          <div class="${CLASS_MAIN}" style="${styleMain}">
-          </div>
+          <div class="${CLASS_MAIN}" style="${styleMain}"></div>
+          <div style="${styleScale}"></div>
         </div>
         <div class="${CLASS_WIDGETSG}" style="${styleWidgets}"></div>
       </div>
@@ -10843,7 +11475,6 @@ this.oncontextmenu = window.oncontextmenu;
    * Calculate new range index / position from position difference
    * typically mouse drag or cursor keys
    * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
-   * @returns 
    */
   updateRange(pos) {
 
@@ -10875,21 +11506,33 @@ this.oncontextmenu = window.oncontextmenu;
   }
 
   /**
-   * set start and end of range
+   * initialize range
    * @param {number} start - index
    * @param {number} end - index
    */
-  setRange(start=0, end=this.rangeLimit) {
-    this.#range = getRange(this.allData, start, end);
+  getRange(start=0, end=this.rangeLimit, config={}) {
+    this.#range = new Range(this.allData, start, end, config);
     this.#range.interval = this.#time.timeFrameMS;
     this.#range.intervalStr = this.#time.timeFrame;
     this.#time.range = this.#range;
   }
 
   /**
-   * Merge a block of data into the chart state
-   * used for populating a chart with back history
-   * or updating with a live stream
+   * set start and end of range
+   * @param {number} start - index
+   * @param {number} end - index
+   */
+  setRange(start=0, end=this.rangeLimit) {
+    this.#range.set(start, end);
+  }
+
+  /**
+   * Merge a block of data into the chart state.
+   * Used for populating a chart with back history.
+   * Merge data must be formatted to a Chart State.
+   * Optionally set a new range upon merge.
+   * @param {object} merge - merge data must be formatted to a Chart State
+   * @param {boolean|object} newRange - false | {start: number, end: number}
    */
   mergeData(merge, newRange=false) {
     if (!isObject(merge)) return false
@@ -10933,8 +11576,12 @@ this.oncontextmenu = window.oncontextmenu;
 
   }
 
-
-
+  /**
+   * Resize the chart
+   * @param {number} width - pixels
+   * @param {number} height - pixels
+   * @returns {boolean} - success or failure
+   */
   resize(width, height) {
     if (!isNumber(width) && !isNumber(height)) return false
 

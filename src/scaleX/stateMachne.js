@@ -28,7 +28,6 @@ export default class StateMachine {
    * Instantiate state machine
    * @param {object} config - state definition
    * @param {object} mediator - module mediate provides event handling
-   * @returns 
    */
   constructor(config, mediator) {
     if (!StateMachine.validateConfig(config)) return false
@@ -43,7 +42,7 @@ export default class StateMachine {
     this.#subscribe()
   }
 
-  /** @type Return state machine ID */
+  /** @type {string} */
   get id() { return this.#id }
   get state() { return this.#state }
   get previousSate() { return this.#statePrev }

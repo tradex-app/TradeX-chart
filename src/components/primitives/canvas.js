@@ -1,10 +1,15 @@
 // canvas.js
 
+
+/**
+ * Create multi-layered canvas
+ * @class Viewport
+ */
+class Viewport {
 /**
  * Viewport constructor
  * @param {Object} cfg - {width, height}
  */
-class Viewport {
   constructor(cfg) {
     if (!cfg) cfg = {};
 
@@ -504,8 +509,8 @@ class Hit {
   }
   /**
    * converts rgb array to integer value
-   * @param {Array.<Number} rgb - [r,g,b]
-   * @returns {Integer}
+   * @param {Array} rgb - [r,g,b]
+   * @returns {number}
    */
   rgbToInt(rgb) {
     let r = rgb[0];
@@ -516,7 +521,7 @@ class Hit {
   /**
    * converts integer value to rgb array
    * @param {Number} number - positive number between 0 and 256*256*256 = 16,777,216
-   * @returns {Array.<Integer>}
+   * @returns {Array}
    */
   intToRGB(number) {
     let r = (number & 0xff0000) >> 16;

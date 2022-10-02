@@ -3,6 +3,7 @@ import { Chart, DOM } from './src'
 
 import state from './data/1hour.json'
 // import state from './data/seconds.json'
+// import state from './data/seconds-indicator'
 
 
 DOM.findBySelector('#app').innerHTML = `

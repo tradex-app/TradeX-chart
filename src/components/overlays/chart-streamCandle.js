@@ -3,7 +3,6 @@
 import Candle from "../primitives/candle";
 import { renderHorizontalLine } from "../../renderer/line"
 import { CandleStyle, PriceLineStyle } from "../../definitions/style";
-import { inRange } from "../../helpers/range";
 
 export default class chartStreamCandle extends Candle {
 

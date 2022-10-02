@@ -8,17 +8,29 @@ import {
   YAXIS_TYPES
 } from "../definitions/chart";
 import { round } from "../utils/number";
+import { uid } from "../utils/utilities"
 
+const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
+const calcParams = [20]
+
+
+/**
+ * Indicator - Relative Strength Index
+ * @export
+ * @class RSI
+ * @extends {indicator}
+ */
 export default class RSI extends indicator {
-  name = 'Relative Strength Index'
-  shortName = 'RSI'
-  onChart = false
-  calcParams = [20]
-  checkParamCount = false
-  plots = [
+  #ID
+  #name = 'Relative Strength Index'
+  #shortName = 'RSI'
+  #onChart = false
+  #checkParamCount = false
+  #scaleOverlay = true
+  #plots = [
     { key: 'RSI_1', title: ' ', type: 'line' },
   ]
-  defaultStyle = {
+  #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1',
     defaultHigh: 75,
@@ -29,9 +41,6 @@ export default class RSI extends indicator {
     lowStrokeStyle: "#848",
     highLowRangeStyle: "#22002220"
   }
-  style = {}
-  overlay
-  TALib
 
   // YAXIS_TYPES - percent
   static scale = YAXIS_TYPES[1]
@@ -46,17 +55,21 @@ export default class RSI extends indicator {
    * @param {object} config - theme / styling
    * @memberof RSI
    */
-  constructor(target, overlay, xAxis, yAxis, config) {
-    super(target, xAxis, yAxis, config)
+  constructor (target, overlay, xAxis, yAxis, config) {
+    super (target, overlay, xAxis, yAxis, config)
 
-    this.overlay = overlay
-    this.style = {...this.defaultStyle, ...config.style}
-    this.TALib = xAxis.mediator.api.core.TALib
+    this.#ID = overlay?.id || uid(this.#shortName)
+    this.calcParams = (overlay?.calcParams) ? JSON.parse(overlay.calcParams) : calcParams
+    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
+    this.setNewValue = (value) => { this.newValue(value) }
+    this.setUpdateValue = (value) => { this.UpdateValue(value) }
   }
 
-  calcIndicator(input) {
-    this.overlay.data = this.TALib.RSI(input)
-  }
+  get ID() { return this.#ID }
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get onChart() { return this.#onChart }
+  get plots() { return this.#plots }
 
   regeneratePlots (params) {
     return params.map((_, index) => {
@@ -65,6 +78,56 @@ export default class RSI extends indicator {
     })
   }
 
+  /**
+   * process stream and create new indicator data entry
+   * @param {array} value - current stream candle 
+   * @memberof RSI
+   */
+  newValue (value) {
+    let p = this.TALibParams()
+    if (!p) return false
+
+    let v = this.calcIndicatorStream(this.#shortName, this.TALibParams())
+    if (!v) return false
+
+    this.overlay.data.push([v[0], v[1]])
+
+    this.target.setPosition(this.core.scrollPos, 0)
+    this.draw(this.range)
+  }
+
+  /**
+   * process stream and update current (last) indicator data entry
+   * @param {array} value - current stream candle 
+   * @memberof RSI
+   */
+  UpdateValue (value) {
+    let l = this.overlay.data.length - 1
+    let p = this.TALibParams()
+    if (!p) return false
+
+    let v = this.calcIndicatorStream(this.#shortName, p)
+    if (!v) return false
+
+    this.overlay.data[l] = [v[0], v[1]]
+
+    this.target.setPosition(this.core.scrollPos, 0)
+    this.draw(this.range)
+
+    console.log(`RSI stream input update: ${value}`)
+
+  }
+
+  TALibParams() {
+    let end = this.range.dataLength
+    let step = this.calcParams[0]
+    let start = end - step
+    let input = this.indicatorInput(start, end)
+    let hasNull = input.find(element => element === null)
+    if (hasNull) return false
+    else return { inReal: input, timePeriod: step }
+  }
+ 
   calcTechnicalIndicator (dataList, { params, plots }) {
     const sumCloseAs = []
     const sumCloseBs = []
@@ -98,6 +161,10 @@ export default class RSI extends indicator {
     })
   }
 
+  /**
+   * Draw the current indicator range on its canvas layer and render it.
+   * @param {object} range 
+   */
   draw(range) {
     this.scene.clear()
 

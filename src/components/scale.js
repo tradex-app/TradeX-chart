@@ -38,6 +38,11 @@ import {
 
 import { YAxisStyle } from "../definitions/style";
 
+/**
+ * Provides the chart panes scale / yAxis
+ * @export
+ * @class ScaleBar
+ */
 export default class ScaleBar {
 
   #ID
@@ -94,6 +99,7 @@ export default class ScaleBar {
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   get core() { return this.#core }
+  get parent() { return this.#parent }
   set height(h) { this.setHeight(h) }
   get height() { return this.#elScale.clientHeight }
   get width() { return this.#elScale.clientWidth }
@@ -120,7 +126,6 @@ export default class ScaleBar {
 
 
   start(data) {
-    this.emit("started",data)
 
     this.#yAxis = new yAxis(this, this, this.yAxisType)
 
@@ -140,11 +145,13 @@ export default class ScaleBar {
   }
 
   end() {
+    this.#mediator.stateMachine.destroy()
+    this.#controller = null
+    this.#viewport.destroy()
+
     this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove)
     this.off(`${this.#parent.ID}_mouseout`, this.eraseCursorPrice)
     this.off(STREAM_UPDATE, this.onStreamUpdate)
-    // this.off("chart_pan", (e) => { this.drawCursorPrice() })
-    // this.off("chart_panDone", (e) => { this.eraseCursorPrice() })
   }
 
   eventsListen() {

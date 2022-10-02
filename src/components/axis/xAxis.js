@@ -21,9 +21,7 @@ import { XAxisStyle } from "../../definitions/style";
 
 export default class xAxis extends Axis {
 
-  #core
-  #parent
-  #chart
+
 
   #xAxisTicks = 4
   #xAxisGrads
@@ -31,17 +29,15 @@ export default class xAxis extends Axis {
   #xAxisOffset
 
   constructor(parent, chart) {
-    super()
-    this.#chart = chart
-    this.#parent = parent
-    this.#core = this.#parent.mediator.api.core
+    super(parent, chart)
+
     this.#xAxisSubGrads = buildSubGrads()
   }
 
-  get core() { return this.#core }
-  get chart() { return this.#parent.mediator.api.Chart }
+  get chart() { return this.parent.mediator.api.Chart }
+  get core() { return this.chart.core }
   get data() { return this.chart.data }
-  get range() { return this.#parent.range }
+  get range() { return this.parent.range }
   get width() { return this.calcWidth() }
   get interval() { return this.range.interval }
   get intervalStr() { return this.range.intervalStr }
@@ -64,11 +60,11 @@ export default class xAxis extends Axis {
   get xAxisTicks() { return this.#xAxisTicks }
   get xAxisGrads() { return this.#xAxisGrads }
   get xAxisSubGrads() { return this.#xAxisSubGrads }
-  get scrollOffsetPx() { return this.#core.scrollPos % this.candleW }
-  get bufferPx() { return this.#core.bufferPx }
+  get scrollOffsetPx() { return this.core.scrollPos % this.candleW }
+  get bufferPx() { return this.core.bufferPx }
 
   calcWidth() {
-    return this.#core.Chart.width - this.#core.Chart.scale.width
+    return this.core.Chart.width - this.core.Chart.scale.width
   }
 
 
@@ -97,7 +93,7 @@ export default class xAxis extends Axis {
     let o = this.core.rangeScrollOffset;
     let c = this.range.indexStart - o 
     return c + 1
-      + Math.floor((x + (this.#core.scrollPos * -1)) / this.candleW) 
+      + Math.floor((x + (this.core.scrollPos * -1)) / this.candleW) 
   }
 
   pixelOHLCV(x) {
@@ -106,7 +102,7 @@ export default class xAxis extends Axis {
   }
 
   xPosSnap2CandlePos(x) {
-    let r = this.#core.scrollPos % this.candleW
+    let r = this.core.scrollPos % this.candleW
     // let o = (x % this.candleW < this.candleW / 2) ? this.candleW : this.candleW * -1
     let c = Math.floor((x / this.candleW)) // + o
     return  (c * this.candleW) + (this.candleW / 2) // + o
@@ -459,10 +455,10 @@ export default class xAxis extends Axis {
   }
 
   drawGrads() {
-    this.#parent.layerLabels.scene.clear()
+    this.parent.layerLabels.scene.clear()
 
     const grads = this.#xAxisGrads.values
-    const ctx = this.#parent.layerLabels.scene.context
+    const ctx = this.parent.layerLabels.scene.context
     const mid = this.width / this.range.Length * 0.5
     const offset = 0
 
@@ -484,7 +480,7 @@ export default class xAxis extends Axis {
   }
 
   drawOverlays() {
-    this.#parent.layerOverlays.scene.clear()
+    this.parent.layerOverlays.scene.clear()
 
     const grads = this.#xAxisGrads
 
