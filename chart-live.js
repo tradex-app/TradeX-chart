@@ -21,6 +21,7 @@ const config = {
   title: "BTC/USDT",
   width: 1000,
   height: 800,
+  timeFrame: "1s",
   rangeStartTS: 1558429200000, // 21/05/2019, 11:00:00 - 1 hour price
   // rangeStartTS: 1663059600000, // seconds price
   rangeLimit: 30,
@@ -36,7 +37,8 @@ const config = {
   stream: {},
   maxCandleUpdate: 250
 }
-const chart = Chart.create(mount, config, state )
+const chart = Chart.create(mount, config, state)
+// const chart = Chart.create(mount, config)
 window.chart = chart
 chart.start(chart.getModID())
 

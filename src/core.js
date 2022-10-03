@@ -14,6 +14,7 @@ import { Range, calcTimeIndex } from "./helpers/range"
 import Indicators from './definitions/indicators'
 import * as Time from './utils/time'
 import Stream from './helpers/stream'
+import { interval2MS ,SECOND_MS } from "./utils/time"
 
 
 import {
@@ -177,19 +178,42 @@ constructor (mediator, options={}) {
         container = DOM.findBySelector(container)
     }
 
-    if (DOM.isElement(container)) {
+    if (!DOM.isElement(container)) 
+      this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`)
+    
+    else {
       this.#el = container
       this.#mediator = mediator
       this.#state = State.create(state, deepValidate, isCrypto)
       this.log(`Chart ${this.#id} created with a ${this.#state.status} state`)
       delete(options.state)
 
-      this.#time.timeFrame = this.#state.data.chart.tf 
-      this.#time.timeFrameMS = this.#state.data.chart.tfms
-
-      this.init(options)
+      // time frame
+      if (!("stream" in options) && this.#state.data.chart.data.length < 2) {
+        this.warning(`${NAME} cannot be initialized. No chart data or streaming is provided.`)
+      }
+      // is the chart streaming with an empty chart?
+      else if (options?.stream && this.#state.data.chart.data.length < 2) {
+        let tf = "1s"
+        let ms = SECOND_MS
+        // has a time frame been provided?
+        if (options?.timeFrame) {
+          let ms = interval2MS(options.timeFrame)
+          if (ms) tf = options.timeFrame
+          else ms = SECOND_MS
+        }
+        this.#time.timeFrame = tf
+        this.#time.timeFrameMS = ms
+        this.init(options)
+      }
+      // chart has back history and optionally streaming
+      else {
+        this.#time.timeFrame = this.#state.data.chart.tf 
+        this.#time.timeFrameMS = this.#state.data.chart.tfms
+  
+        this.init(options)
+      }
     }
-    else this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`)
   }
 
   log(l) { this.#mediator.log(l) }
@@ -330,14 +354,17 @@ constructor (mediator, options={}) {
 
     // set default range
     this.getRange()
-    // now set user defined (if any) range
-    const rangeStart = calcTimeIndex(this.#time, this.#rangeStartTS)
-    const end = (rangeStart) ? 
-      rangeStart + this.#rangeLimit :
-      this.chartData.length - 1
-    const start = (rangeStart) ? rangeStart : end - this.#rangeLimit
-    this.#rangeLimit = end - start
-    this.setRange(start, end)
+
+    if (this.#range.Length > 1) {
+      // now set user defined (if any) range
+      const rangeStart = calcTimeIndex(this.#time, this.#rangeStartTS)
+      const end = (rangeStart) ? 
+        rangeStart + this.#rangeLimit :
+        this.chartData.length - 1
+      const start = (rangeStart) ? rangeStart : end - this.#rangeLimit
+      this.#rangeLimit = end - start
+      this.setRange(start, end)
+    }
 
     // api - functions / methods, calculated properties provided by this module
     const api = {
@@ -702,7 +729,8 @@ constructor (mediator, options={}) {
    * @param {number} start - index
    * @param {number} end - index
    */
-  getRange(start=0, end=this.rangeLimit, config={}) {
+  // TODO: config from where?
+  getRange(start=0, end=0, config={}) {
     this.#range = new Range(this.allData, start, end, config)
     this.#range.interval = this.#time.timeFrameMS
     this.#range.intervalStr = this.#time.timeFrame

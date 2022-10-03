@@ -72,11 +72,9 @@ export default class State {
   validateState(state, deepValidate=false, isCrypto=false) {
 
     if (!('chart' in state)) {
-      state.chart = {
-          type: 'Candles',
-          candleType: "CANDLE_SOLID",
-          data: state.ohlcv || []
-      }
+      state.chart = DEFAULT_STATE.chart
+      state.chart.data = state?.ohlcv || []
+      state.chart.settings = state?.settings || state.chart.settings
     }
 
     if (deepValidate) 
@@ -96,15 +94,15 @@ export default class State {
       state.chart.tf = ms2Interval(state.chart.tfms)
 
     if (!('onchart' in state)) {
-        state.onchart = []
+        state.onchart = DEFAULT_STATE.onchart
     }
 
     if (!('offchart' in state)) {
-        state.offchart = []
+        state.offchart = DEFAULT_STATE.offchart
     }
 
     if (!state.chart.settings) {
-        state.chart.settings = {}
+        state.chart.settings = DEFAULT_STATE.chart.settings
     }
 
     // Remove ohlcv we have Data

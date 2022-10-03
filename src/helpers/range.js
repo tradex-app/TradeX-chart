@@ -2,7 +2,7 @@
 
 import indicators from "../definitions/indicators"
 import { DAY_MS, ms2Interval, WEEK_MS } from "../utils/time"
-import { LIMITFUTURE, LIMITPAST, MINCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
+import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
 import { isNumber, isObject } from "../utils/typeChecks"
 import { limit } from "../utils/number"
 
@@ -14,14 +14,32 @@ export class Range {
   #intervalStr
   indexStart
   indexEnd
+  priceMin = 0
+  priceMax = 0
+  volumeMin = 0
+  volumeMax = 0
   limitFuture = LIMITFUTURE
   limitPast = LIMITPAST
   minCandles = MINCANDLES
   yAxisBounds = YAXIS_BOUNDS
 
   constructor( allData, start=0, end=allData.data.length-1, config={}) {
-    if (!isObject(allData) || 
-        !isObject(config)) return false
+    if (!isObject(allData)) return false
+    if (!isObject(config)) return false
+    if (allData.data.length == 0) {
+      start = 0
+      end = 0
+      this.#interval = DEFAULT_TIMEFRAMEMS
+      this.#intervalStr = ms2Interval(this.interval)
+    }  
+    else if (allData.data.length < 2) {
+      this.#interval = DEFAULT_TIMEFRAMEMS
+      this.#intervalStr = ms2Interval(this.interval)
+    }
+    else if (end == 0 && allData.data.length >= this.rangeLimit)
+      end = this.rangeLimit
+    else if (end == 0)
+      end = allData.data.length
 
     this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE
     this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST
@@ -32,10 +50,14 @@ export class Range {
       this[data] = allData[data]
     }
 
-    if (!this.set(start, end)) return false
 
-    this.#interval = detectInterval(this.data)
-    this.#intervalStr = ms2Interval(this.interval)
+    if (allData.data.length > 2) {
+  
+      if (!this.set(start, end)) return false
+
+      this.#interval = detectInterval(this.data)
+      this.#intervalStr = ms2Interval(this.interval)
+    }
   }
 
   get dataLength () { return this.data.length - 1 }

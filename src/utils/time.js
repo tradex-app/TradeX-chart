@@ -207,6 +207,22 @@ export function timestampDifference(date1,date2) {
   }
 }
 
+/**
+ * convert interval (timeframe) string to milliseconds
+ * @export
+ * @param {string} tf
+ * @return {number}
+ */
+export function interval2MS(tf) {
+  if (!isString(tf)) return false
+
+  const regex = /([0-9]{1,2})([s|m|h|d|w|M|y])/gm;
+  let m
+  if ((m = regex.exec(tf)) !== null) {
+    return TIMEUNITSVALUESSHORT[2] * TIMEUNITSVALUESSHORT[1]
+  }
+  else return false
+}
 
 /**
  * Milliseconds broken down into major unit and remainders

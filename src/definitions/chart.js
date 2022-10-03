@@ -71,8 +71,10 @@ export const TIMEINCS = {
 
 export const TIMEUNITS = ['s','m','h','d','w','M','y']
 
+export const DEFAULT_TIMEVALUE = 1
+export const DEFAULT_TIMEINTERVAL = MINUTE
 export const DEFAULT_TIMEFRAME = "1m"
-export const DEFAULT_TIMEFRAMEMS = MINUTE
+export const DEFAULT_TIMEFRAMEMS = DEFAULT_TIMEINTERVAL
 
 export const PRICEDIGITS = 6
 
