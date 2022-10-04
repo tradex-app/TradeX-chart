@@ -41,6 +41,7 @@ export default class State {
   #store
   #dss = {}
   #status = false
+  #isEmpty = true
 
   constructor(state, deepValidate=false, isCrypto=false) {
     // this.#store = new Store()
@@ -49,10 +50,12 @@ export default class State {
     if (isObject(state)) {
       this.#data = this.validateState(state, deepValidate, isCrypto)
       this.#status = "valid"
+      this.#isEmpty = (this.#data.chart?.isEmpty) ? true : false
     }
     else {
       this.defaultState()
       this.#status = "default"
+      this.#isEmpty = true
     }
   }
 
@@ -68,6 +71,7 @@ export default class State {
 
   get status() { return this.#status }
   get data() { return this.#data }
+  get isEmpty() { return this.#isEmpty }
 
   validateState(state, deepValidate=false, isCrypto=false) {
 
@@ -75,6 +79,7 @@ export default class State {
       state.chart = DEFAULT_STATE.chart
       state.chart.data = state?.ohlcv || []
       state.chart.settings = state?.settings || state.chart.settings
+      state.chart.isEmpty = true
     }
 
     if (deepValidate) 

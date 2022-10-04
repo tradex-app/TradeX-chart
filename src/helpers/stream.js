@@ -16,7 +16,7 @@ import {
 import { YAXIS_BOUNDS } from '../definitions/chart';
 
 const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
-const empty = [0,0,0,0,0]
+const empty = [null, null, null, null, null]
 
 export default class Stream {
 
@@ -123,7 +123,8 @@ export default class Stream {
 
   prevCandle() {
     const d = this.#core.allData.data
-    if (d[d.length - 1][7]) d[d.length - 1].pop()
+    if (d.length > 0 && d[d.length - 1][7]) 
+          d[d.length - 1].pop()
   }
 
   /**
@@ -149,7 +150,8 @@ export default class Stream {
     this.#candle = candle
 
     const d = this.#core.allData.data
-    d[d.length - 1] = this.#candle
+    const l = (d.length > 0) ? d.length -1 : 0
+    d[l] = this.#candle
   }
 
 }

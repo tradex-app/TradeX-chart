@@ -2,7 +2,7 @@
 // Timeline that lurks down below
 
 import Axis from "./axis";
-import { MAXGRADSPER } from "../../definitions/chart";
+import { DEFAULT_RANGELENGTH, MAXGRADSPER } from "../../definitions/chart";
 import { isNumber } from "../../utils/typeChecks";
 import { round } from "../../utils/number"
 import { 
@@ -135,13 +135,24 @@ export default class xAxis extends Axis {
   }
 
   calcXAxisGrads() {
-    const rangeStart = this.timeMin
-    const rangeEnd = this.timeMax
+    let rangeStart
+    let rangeEnd
+    if (this.chart.data.length == 0) {
+      rangeStart = Date.now()
+      rangeEnd = rangeStart + (DEFAULT_RANGELENGTH * this.core.time.timeFrameMS)
+      // TODO: check this.rangeInterval == this.core.time.timeFrameMS
+    }
+    else {
+      rangeStart = this.timeMin
+      rangeEnd = this.timeMax
+    }
     const intervalStr = this.intervalStr
     const grads = {values: []}
     const unit = intervalStr.charAt(intervalStr.length - 1)
     const numUnits = parseInt(intervalStr, 10)
-    
+
+// return grads
+
       let d, m, days, cnt, inc, month, next, t, t1, t2, units, 
           major, majorValue, minorValue, minorTick, majorTick;
     

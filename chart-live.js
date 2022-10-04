@@ -1,10 +1,17 @@
 import { Chart, DOM } from './src'
 // import './chart-live.css'
 
-import state from './data/1hour.json'
+let state = undefined
+// import state from './data/1hour.json'
 // import state from './data/seconds.json'
 // import state from './data/seconds-indicator'
 
+// let rangeStartTS = 1558429200000 // 21/05/2019, 11:00:00 - 1 hour price
+// let rangeStartTS = 1663059600000 // seconds price
+let rangeStartTS = undefined
+let streamVal = {}
+let interval = 250
+let streamInit = false
 
 DOM.findBySelector('#app').innerHTML = `
 <h2>Live Chart</h2>
@@ -22,8 +29,7 @@ const config = {
   width: 1000,
   height: 800,
   timeFrame: "1s",
-  rangeStartTS: 1558429200000, // 21/05/2019, 11:00:00 - 1 hour price
-  // rangeStartTS: 1663059600000, // seconds price
+  rangeStartTS: rangeStartTS,
   rangeLimit: 30,
   theme: {
     candleType: "CANDLE_SOLID",
@@ -34,7 +40,7 @@ const config = {
   infos: true,
   warnings: true,
   errors: true,
-  stream: {},
+  stream: streamVal,
   maxCandleUpdate: 250
 }
 const chart = Chart.create(mount, config, state)
@@ -88,8 +94,6 @@ infoBox.out(internals())
 // test()
 
 let time = chart.range.value()[0]
-let interval = 250
-let streamInit = false
 
 function getRandomInt(min, max) {
   return Math.random() * (max - min) + min;
@@ -104,6 +108,9 @@ function stream() {
     time = time + chart.time.timeFrameMS - interval
   }
   else candle = chart.stream.candle // chart.range.value()
+
+  if (candle[4] === null) candle[4] = 1
+  if (candle[5] === null) candle[5] = 1
 
   // let candle = chart.range.value()
   let percent = getRandomInt(0, 1)

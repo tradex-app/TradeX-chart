@@ -90,6 +90,7 @@ export default class TradeXchart {
   #modID
   #state = {}
   #userClasses = []
+  #chartIsEmpty = true
   #data
   #range
   #rangeStartTS
@@ -189,13 +190,16 @@ constructor (mediator, options={}) {
       delete(options.state)
 
       // time frame
+      let tf = "1s"
+      let ms = SECOND_MS
       if (!("stream" in options) && this.#state.data.chart.data.length < 2) {
         this.warning(`${NAME} cannot be initialized. No chart data or streaming is provided.`)
+        this.#time.timeFrame = tf
+        this.#time.timeFrameMS = ms
+        this.#chartIsEmpty = true
       }
       // is the chart streaming with an empty chart?
       else if (options?.stream && this.#state.data.chart.data.length < 2) {
-        let tf = "1s"
-        let ms = SECOND_MS
         // has a time frame been provided?
         if (options?.timeFrame) {
           let ms = interval2MS(options.timeFrame)
@@ -204,15 +208,15 @@ constructor (mediator, options={}) {
         }
         this.#time.timeFrame = tf
         this.#time.timeFrameMS = ms
-        this.init(options)
+        this.#chartIsEmpty = true
       }
       // chart has back history and optionally streaming
       else {
         this.#time.timeFrame = this.#state.data.chart.tf 
         this.#time.timeFrameMS = this.#state.data.chart.tfms
-  
-        this.init(options)
+        this.#chartIsEmpty = false
       }
+      this.init(options)
     }
   }
 
@@ -281,6 +285,7 @@ constructor (mediator, options={}) {
   get volumePrecision() { return this.#volumePrecision }
 
   get stream() { return this.#stream }
+  get isEmtpy() { return this.#chartIsEmpty }
 
 
   /**

@@ -134,7 +134,9 @@ export default class yAxis extends Axis {
         this.#yAxisGrads = this.gradations(100, 0, false, true)
         break;
       default:
-        this.#yAxisGrads = this.gradations(this.range.priceMax, this.range.priceMin)
+        let max = (this.range.priceMax > 0) ? this.range.priceMax : 1
+        let min = (this.range.priceMin > 0) ? this.range.priceMin : 0
+        this.#yAxisGrads = this.gradations(max, min)
         break;
     }
   }
@@ -180,7 +182,8 @@ export default class yAxis extends Axis {
     }
     else {
       // roughly divide the yRange into cells
-      let yGridSize = (this.rangeH)/this.#yAxisGrid;
+      let rangeH = (this.rangeH > 0) ? this.rangeH : 1
+      let yGridSize = (rangeH)/this.#yAxisGrid;
 
       // try to find a nice number to round to
       let niceNumber = Math.pow( 10 , Math.ceil( Math.log10( yGridSize ) ) );

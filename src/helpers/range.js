@@ -22,15 +22,19 @@ export class Range {
   limitPast = LIMITPAST
   minCandles = MINCANDLES
   yAxisBounds = YAXIS_BOUNDS
+  rangeLimit = LIMITFUTURE
+  anchor
 
   constructor( allData, start=0, end=allData.data.length-1, config={}) {
     if (!isObject(allData)) return false
     if (!isObject(config)) return false
     if (allData.data.length == 0) {
+      let ts = Date.now()
       start = 0
-      end = 0
+      end = this.rangeLimit
       this.#interval = DEFAULT_TIMEFRAMEMS
       this.#intervalStr = ms2Interval(this.interval)
+      this.anchor = ts - (ts % DEFAULT_TIMEFRAMEMS)
     }  
     else if (allData.data.length < 2) {
       this.#interval = DEFAULT_TIMEFRAMEMS
@@ -50,17 +54,15 @@ export class Range {
       this[data] = allData[data]
     }
 
+    if (!this.set(start, end)) return false
 
     if (allData.data.length > 2) {
-  
-      if (!this.set(start, end)) return false
-
       this.#interval = detectInterval(this.data)
       this.#intervalStr = ms2Interval(this.interval)
     }
   }
 
-  get dataLength () { return this.data.length - 1 }
+  get dataLength () { return (this.data.length == 0) ? 0 : this.data.length - 1 }
   get Length () { return this.indexEnd - this.indexStart }
   get timeDuration () { return this.timeFinish - this.timeStart }
   get timeMin () { return this.value(this.indexStart)[0] }
@@ -97,7 +99,7 @@ export class Range {
     }
     this.height = this.priceMax - this.priceMin
     this.volumeHeight = this.volumeMax - this.volumeMin
-    this.scale = this.Length / this.dataLength
+    this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
 
     return true
   }
@@ -116,7 +118,12 @@ export class Range {
     else {
       const len = this.data.length - 1
       v = [null, null, null, null, null, null]
-      if (index < 0) {
+
+      if (this.data.length < 1) {
+        v[0] = Date.now() + (this.interval * index)
+        return v
+      }
+      else if (index < 0) {
         v[0] = this.data[0][0] + (this.interval * index)
         return v
       }
@@ -137,7 +144,7 @@ export class Range {
     if (!isNumber(ts)) return false
     ts = ts - (ts % this.interval)
   
-    let x = this.data[0][0]
+    let x = (this.data.length > 0) ? this.data[0][0] : this.anchor
     if (ts === x) 
       return 0
     else if (ts < x)
@@ -175,7 +182,15 @@ export class Range {
    */
   maxMinPriceVol ( data, start=0, end=data.length-1 ) {
 
-    let l = (data.length-1) ? data.length-1 : 0
+    if (data.length == 0) {
+      return {
+        priceMin: 0,
+        priceMax: 1,
+        volumeMin: 0,
+        volumeMax: 0
+      }
+    }
+    let l = data.length - 1
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
 
