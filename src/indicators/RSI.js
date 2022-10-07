@@ -114,7 +114,7 @@ export default class RSI extends indicator {
     this.target.setPosition(this.core.scrollPos, 0)
     this.draw(this.range)
 
-    console.log(`RSI stream input update: ${value}`)
+    // console.log(`RSI stream input update: ${value}`)
 
   }
 

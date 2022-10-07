@@ -1,8 +1,8 @@
 import { Chart, DOM } from './src'
 // import './chart-live.css'
 
-let state = undefined
-// import state from './data/1hour.json'
+// let state = undefined
+import state from './data/1hour.json'
 // import state from './data/seconds.json'
 // import state from './data/seconds-indicator'
 
@@ -10,7 +10,7 @@ let state = undefined
 // let rangeStartTS = 1663059600000 // seconds price
 let rangeStartTS = undefined
 let streamVal = {}
-let interval = 250
+let interval = 10
 let streamInit = false
 
 DOM.findBySelector('#app').innerHTML = `
@@ -28,7 +28,7 @@ const config = {
   title: "BTC/USDT",
   width: 1000,
   height: 800,
-  timeFrame: "1s",
+  timeFrame: "1m",
   rangeStartTS: rangeStartTS,
   rangeLimit: 30,
   theme: {
@@ -124,7 +124,7 @@ function stream() {
   chart.stream.onTick(tick)
 }
 
-if (chart.stream) {
+if (typeof chart.stream.start === "function") {
   chart.stream.start()
   const streamTimer = setInterval(stream, interval)
 }

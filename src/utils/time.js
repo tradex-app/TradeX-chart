@@ -207,6 +207,19 @@ export function timestampDifference(date1,date2) {
   }
 }
 
+export function isTimeFrame(tf) {
+  let ms = SECOND_MS
+  if (isString(tf)) {
+    ms = interval2MS(tf)
+    if (ms) tf = tf
+    else {
+      ms = SECOND_MS
+      tf = "1s"
+    }
+  }
+  return {tf, ms}
+}
+
 /**
  * convert interval (timeframe) string to milliseconds
  * @export

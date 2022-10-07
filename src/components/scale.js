@@ -12,25 +12,6 @@ import { copyDeep, uid } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
 import scalePriceLine from './overlays/scale-priceLine'
 
-import {
-  NAME,
-  ID,
-  CLASS_DEFAULT,
-  CLASS_UTILS ,
-  CLASS_BODY,
-  CLASS_WIDGETSG,
-  CLASS_TOOLS,
-  CLASS_MAIN,
-  CLASS_TIME,
-  CLASS_ROWS,
-  CLASS_ROW,
-  CLASS_CHART,
-  CLASS_SCALE,
-  CLASS_WIDGETS,
-  CLASS_ONCHART,
-  CLASS_OFFCHART,
-} from '../definitions/core'
-
 import { 
   YAXIS_TYPES,
   BUFFERSIZE

@@ -14,7 +14,7 @@ import { Range, calcTimeIndex } from "./helpers/range"
 import Indicators from './definitions/indicators'
 import * as Time from './utils/time'
 import Stream from './helpers/stream'
-import { interval2MS ,SECOND_MS } from "./utils/time"
+import { interval2MS, isTimeFrame, SECOND_MS } from "./utils/time"
 
 
 import {
@@ -143,7 +143,7 @@ export default class TradeXchart {
   }
 
   logs = false
-  info = false
+  infos = false
   warnings = false
   errors = false
   
@@ -166,6 +166,11 @@ export default class TradeXchart {
 constructor (mediator, options={}) {
 
     this.oncontextmenu = window.oncontextmenu
+
+    this.logs = (options?.logs) ? options.logs : false
+    this.infos = (options?.infos) ? options.infos : false
+    this.warnings = (options?.warnings) ? options.warnings : false
+    this.errors = (options?.errors) ? options.errors : false
 
     let container = options?.container,
         state = options?.state, 
@@ -192,20 +197,23 @@ constructor (mediator, options={}) {
       // time frame
       let tf = "1s"
       let ms = SECOND_MS
-      if (!("stream" in options) && this.#state.data.chart.data.length < 2) {
-        this.warning(`${NAME} cannot be initialized. No chart data or streaming is provided.`)
+      if (!isObject(options?.stream) && this.#state.data.chart.data.length < 2) {
+        this.warning(`${NAME} has no chart data or streaming provided.`)
+        // has a time frame been provided?
+        // if (isString(options?.timeFrame)) {
+        //   let ms = interval2MS(options.timeFrame)
+        //   if (ms) tf = options.timeFrame
+        //   else ms = SECOND_MS
+        // }
+        ;({tf, ms} = isTimeFrame(options?.timeFrame))
         this.#time.timeFrame = tf
         this.#time.timeFrameMS = ms
         this.#chartIsEmpty = true
       }
       // is the chart streaming with an empty chart?
-      else if (options?.stream && this.#state.data.chart.data.length < 2) {
+      else if (isObject(options?.stream) && this.#state.data.chart.data.length < 2) {
         // has a time frame been provided?
-        if (options?.timeFrame) {
-          let ms = interval2MS(options.timeFrame)
-          if (ms) tf = options.timeFrame
-          else ms = SECOND_MS
-        }
+        ({tf, ms} = isTimeFrame(options?.timeFrame))
         this.#time.timeFrame = tf
         this.#time.timeFrameMS = ms
         this.#chartIsEmpty = true
@@ -220,10 +228,10 @@ constructor (mediator, options={}) {
     }
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { if (this.logs) console.log(l) }
+  info(i) { if (this.info) console.info(i) }
+  warning(w) { if (this.warnings) console.warn(w) }
+  error(e) { if (this.errors) console.error(e) }
 
   get id() { return this.#id }
   get name() { return this.#name }
@@ -358,7 +366,7 @@ constructor (mediator, options={}) {
     }
 
     // set default range
-    this.getRange()
+    this.getRange(null, null, {interval: this.#time.timeFrameMS})
 
     if (this.#range.Length > 1) {
       // now set user defined (if any) range

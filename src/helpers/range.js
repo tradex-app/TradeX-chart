@@ -1,7 +1,7 @@
 // range.js
 
 import indicators from "../definitions/indicators"
-import { DAY_MS, ms2Interval, WEEK_MS } from "../utils/time"
+import { DAY_MS, interval2MS, ms2Interval, WEEK_MS } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
 import { isNumber, isObject } from "../utils/typeChecks"
 import { limit } from "../utils/number"
@@ -10,10 +10,10 @@ export class Range {
 
   data
   // dataLength
-  #interval
-  #intervalStr
-  indexStart
-  indexEnd
+  #interval = DEFAULT_TIMEFRAMEMS
+  #intervalStr = "1s"
+  indexStart = 0
+  indexEnd = LIMITFUTURE
   priceMin = 0
   priceMax = 0
   volumeMin = 0
@@ -28,16 +28,24 @@ export class Range {
   constructor( allData, start=0, end=allData.data.length-1, config={}) {
     if (!isObject(allData)) return false
     if (!isObject(config)) return false
+
+    this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE
+    this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST
+    this.minCandles = (isNumber(this.config?.limitCandles)) ? this.config.limitCandles : MINCANDLES
+    this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS
+
+    const tf = config?.interval || DEFAULT_TIMEFRAMEMS
+
     if (allData.data.length == 0) {
       let ts = Date.now()
       start = 0
       end = this.rangeLimit
-      this.#interval = DEFAULT_TIMEFRAMEMS
+      this.#interval = tf
       this.#intervalStr = ms2Interval(this.interval)
-      this.anchor = ts - (ts % DEFAULT_TIMEFRAMEMS)
+      this.anchor = ts - (ts % tf) // - (this.limitPast * this.#interval)
     }  
     else if (allData.data.length < 2) {
-      this.#interval = DEFAULT_TIMEFRAMEMS
+      this.#interval = tf
       this.#intervalStr = ms2Interval(this.interval)
     }
     else if (end == 0 && allData.data.length >= this.rangeLimit)
@@ -45,11 +53,7 @@ export class Range {
     else if (end == 0)
       end = allData.data.length
 
-    this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE
-    this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST
-    this.minCandles = (isNumber(this.config?.limitCandles)) ? this.config.limitCandles : MINCANDLES
-    this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS
-
+    
     for (let data in allData) {
       this[data] = allData[data]
     }
