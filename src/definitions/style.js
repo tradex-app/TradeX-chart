@@ -82,7 +82,8 @@ export const YAxisStyle = {
   FONTFAMILY: YAxisStyle_FONTFAMILY,
   FONTSIZE: YAxisStyle_FONTSIZE,
   FONTWEIGHT: YAxisStyle_FONTWEIGHT,
-  FONT_LABEL: `${YAxisStyle_FONTWEIGHT} ${YAxisStyle_FONTSIZE}px ${YAxisStyle_FONTFAMILY}`
+  FONT_LABEL: `${YAxisStyle_FONTWEIGHT} ${YAxisStyle_FONTSIZE}px ${YAxisStyle_FONTFAMILY}`,
+  FONT_LABEL_BOLD: `bold ${YAxisStyle_FONTSIZE}px ${YAxisStyle_FONTFAMILY}`
 }
 
 const XAxisStyle_FONTWEIGHT = "normal"
@@ -95,7 +96,8 @@ export const XAxisStyle = {
   FONTFAMILY: XAxisStyle_FONTFAMILY,
   FONTSIZE: XAxisStyle_FONTSIZE,
   FONTWEIGHT: XAxisStyle_FONTWEIGHT,
-  FONT_LABEL: `${XAxisStyle_FONTWEIGHT} ${XAxisStyle_FONTSIZE}px ${XAxisStyle_FONTFAMILY}`
+  FONT_LABEL: `${XAxisStyle_FONTWEIGHT} ${XAxisStyle_FONTSIZE}px ${XAxisStyle_FONTFAMILY}`,
+  FONT_LABEL_BOLD: `bold ${YAxisStyle_FONTSIZE}px ${YAxisStyle_FONTFAMILY}`
 }
 
 export const GridStyle = {

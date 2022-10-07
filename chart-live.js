@@ -3,6 +3,7 @@ import { Chart, DOM } from './src'
 
 // let state = undefined
 import state from './data/1hour.json'
+// import state from './data/1minute.json'
 // import state from './data/seconds.json'
 // import state from './data/seconds-indicator'
 
@@ -10,7 +11,7 @@ import state from './data/1hour.json'
 // let rangeStartTS = 1663059600000 // seconds price
 let rangeStartTS = undefined
 let streamVal = {}
-let interval = 10
+let interval = 500
 let streamInit = false
 
 DOM.findBySelector('#app').innerHTML = `
