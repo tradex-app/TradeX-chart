@@ -2,7 +2,7 @@
 // Timeline that lurks down below
 
 import Axis from "./axis";
-import { DEFAULT_RANGELENGTH, MAXGRADSPER } from "../../definitions/chart";
+import { MAXGRADSPER } from "../../definitions/chart";
 import { isNumber } from "../../utils/typeChecks";
 import { round } from "../../utils/number"
 import { 
@@ -18,16 +18,12 @@ import {
   SECOND_MS, MINUTE_MS, HOUR_MS, DAY_MS, WEEK_MS, MONTH_MS, MONTHR_MS, YEAR_MS,
  } from "../../utils/time";
 import { XAxisStyle } from "../../definitions/style";
-import { MA } from "talib-web";
 
 export default class xAxis extends Axis {
-
-
 
   #xAxisTicks = 4
   #xAxisGrads
   #xAxisSubGrads
-  #xAxisOffset
 
   constructor(parent, chart) {
     super(parent, chart)
@@ -68,8 +64,6 @@ export default class xAxis extends Axis {
   calcWidth() {
     return this.core.Chart.width - this.core.Chart.scale.width
   }
-
-
 
   /**
  * return canvas x co-ordinate
@@ -139,7 +133,6 @@ export default class xAxis extends Axis {
   calcXAxisGrads() {
     const rangeStart = this.timeMin
     const rangeEnd = this.timeMax
-    const rangeLength = this.rangeLength
     const intervalStr = this.intervalStr
     const grads = {
       entries: {},
@@ -152,8 +145,8 @@ export default class xAxis extends Axis {
 
 // return grads
 
-      let d, m, days, cnt, inc, grad, month, next, t, t1, t2, units, unitStart, 
-          major, majorGrad, minorGrad, majorValue, minorValue, minorTick, majorTick;
+      let days, t1, t2, units, unitStart, 
+          majorGrad, majorValue, minorValue;
     
       units = ms2TimeUnits(this.rangeDuration)
       grads.units = ms2TimeUnits(this.rangeDuration)
@@ -362,20 +355,6 @@ export default class xAxis extends Axis {
     return `${m}:${s}`
   }
 
-  idealTicks(t1, t2, unit) {
-    let t = t1
-    let ticks = []
-    do {
-      let i = -1
-      while (++i < this.#xAxisSubGrads[unit].length) {
-        t += this.#xAxisSubGrads[unit][i]
-        ticks.push(t)
-      }
-    }
-    while (t < t2)
-    return ticks
-  }
-
   draw() {
     this.#xAxisGrads = this.calcXAxisGrads()
     this.drawGrads()
@@ -412,7 +391,6 @@ export default class xAxis extends Axis {
     this.parent.layerOverlays.scene.clear()
 
     const grads = this.#xAxisGrads
-
   }
 
 }

@@ -74,6 +74,7 @@ export class TouchAgent {
 			}
 		}, { passive: false });
 
+
 		window.addEventListener("touchend", (e) => {
 			if (e.touches) {
 				this.fingers = e.length;

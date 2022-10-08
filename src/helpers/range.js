@@ -1,6 +1,5 @@
 // range.js
 
-import indicators from "../definitions/indicators"
 import { DAY_MS, interval2MS, ms2Interval, WEEK_MS } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
 import { isNumber, isObject } from "../utils/typeChecks"
@@ -266,24 +265,24 @@ export function detectInterval(ohlcv) {
 }
 
 /**
- * 
+ * Calculate the index for a given time stamp
  * @param {object} time - time object provided by core
- * @param {number} dateStamp 
+ * @param {number} timeStamp 
  * @returns {number}
  */
-export function calcTimeIndex(time, dateStamp) {
-  if (!isNumber(dateStamp)) return false
+export function calcTimeIndex(time, timeStamp) {
+  if (!isNumber(timeStamp)) return false
 
   let index
   let timeFrameMS = time.timeFrameMS
-  dateStamp = dateStamp - (dateStamp % timeFrameMS)
+  timeStamp = timeStamp - (timeStamp % timeFrameMS)
 
-  if (dateStamp === time.range.data[0][0])
+  if (timeStamp === time.range.data[0][0])
     index = 0
-  else if (dateStamp < time.range.data[0][0]) 
-    index = ((time.range.data[0][0] - dateStamp) / timeFrameMS) * -1
+  else if (timeStamp < time.range.data[0][0]) 
+    index = ((time.range.data[0][0] - timeStamp) / timeFrameMS) * -1
   else 
-    index = (dateStamp - time.range.data[0][0]) / timeFrameMS
+    index = (timeStamp - time.range.data[0][0]) / timeFrameMS
 
   return index
 }

@@ -115,6 +115,7 @@ class MouseAgent {
       }
     }, { passive: false });
 
+
     element.addEventListener("mouseenter", (e) => {
       controller.raise(this, "mouseenter", this.createEventArgument(e));
     });
