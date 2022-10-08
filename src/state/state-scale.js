@@ -56,6 +56,12 @@ export default
             // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
           },
         },
+        scale_drag: {
+          target: 'scale_drag',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
+          },
+        },
       }
     },
     resize: {
@@ -116,6 +122,31 @@ export default
         },
       }
     },
+    scale_drag: {
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+      },
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+      },
+      on: {
+        scale_drag: {
+          target: 'scale_drag',
+          action (data) {
+            console.log(`${this.id}: transition from "${this.state}" to "chart_pan"`)
+            // this.context.origin.updateRange(data) 
+          },
+        },
+        scale_dragDone: {
+          target: 'idle',
+          action (data) {
+            console.log(`${this.id}: transition from "${this.state}" to "chart_panDone"`)
+            // this.context.origin.updateRange(data) 
+          },
+        },
+      }
+    },
+
   },
   guards: {
     zoomDone () { return true },

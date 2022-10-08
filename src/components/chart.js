@@ -51,6 +51,7 @@ import {
 
 const STYLE_CHART = "" // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
 const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
+const STYLE_SCALE2 = "top: 0; right: 0; border-left: 1px solid;"
 export default class Chart {
 
   #name = "Chart"
@@ -110,6 +111,7 @@ export default class Chart {
 
     this.#mediator = mediator
     this.#elChart = mediator.api.elements.elChart
+    this.#elScale = mediator.api.elements.elChartScale
     this.#parent = {...this.#mediator.api.parent}
     this.#core = this.#mediator.api.core
     this.#onChart = this.#mediator.api.onChart
@@ -352,7 +354,8 @@ export default class Chart {
     // this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .viewport`)
     this.#elLegends = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .legends`)
-    this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`)
+    // this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`)
+    // this.#elScale  = DOM.findBySelector(`#${api.id} .${CLASS_YAXIS} .${CLASS_CHART} .${CLASS_ROW}`)
   }
 
   props() {
@@ -432,6 +435,7 @@ export default class Chart {
       <div class="legends" style="${styleLegend}"></div>
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
+    this.#elScale.style.cssText = STYLE_SCALE2 + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`
     return node
   }
 

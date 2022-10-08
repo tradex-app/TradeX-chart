@@ -45,6 +45,7 @@ import {
 
 const STYLE_OFFCHART = "" // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
 const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
+const STYLE_SCALE2 = "top: 0; right: 0; border-left: 1px solid;"
 
 export default class OffChart {
 
@@ -97,6 +98,7 @@ export default class OffChart {
 
     this.#mediator = mediator
     this.#elOffChart = mediator.api.elements.elOffChart
+    this.#elScale = mediator.api.elements.elScale
     this.#parent = {...this.mediator.api.parent}
     this.#overlay = options.offChart
     this.#core = this.mediator.api.core
@@ -185,7 +187,6 @@ export default class OffChart {
     // Y Axis - Price Scale
     this.#Scale.on("started",(data)=>{this.log(`OffChart scale started: ${data}`)})
     this.#Scale.start("OffChart",this.name,"yAxis Scale started")
-
     // add divider to allow manual resize of the offChart indicator
     const config = { offChart: this }
     this.#Divider = this.widgets.insert("Divider", config)
@@ -308,7 +309,8 @@ export default class OffChart {
     // this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elViewport = DOM.findBySelector(`#${this.#ID} .viewport`)
     this.#elLegends = DOM.findBySelector(`#${this.#ID} .legends`)
-    this.#elScale = DOM.findBySelector(`#${this.#ID} .${CLASS_SCALE}`)
+    // this.#elScale = DOM.findBySelector(`#${this.#ID} .${CLASS_SCALE}`)
+    // this.#elScale2.style.cssText = this.#elScale.style.cssText
   }
 
   props() {
@@ -376,6 +378,7 @@ export default class OffChart {
       <div class="legends" style="${styleLegend}"></div>
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
+    this.#elScale.style.cssText = STYLE_SCALE2 + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`
     return node
   }
 

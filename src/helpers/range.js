@@ -23,6 +23,12 @@ export class Range {
   yAxisBounds = YAXIS_BOUNDS
   rangeLimit = LIMITFUTURE
   anchor
+  #rangeMode = "automatic"
+  #yRangeManual = {
+    max: 1,
+    min: 0,
+    factor: 1
+  }
 
   constructor( allData, start=0, end=allData.data.length-1, config={}) {
     if (!isObject(allData)) return false
@@ -77,6 +83,8 @@ export class Range {
   get interval () { return this.#interval }
   set intervalStr (i) { this.#intervalStr = i }
   get intervalStr () { return this.#intervalStr }
+  set mode (m) { this.setMode(m) }
+  get mode () { return this.#rangeMode }
 
   set (start=0, end=this.dataLength) {
     if (!isNumber(start) || 
@@ -105,6 +113,18 @@ export class Range {
     this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
 
     return true
+  }
+
+  setMode(m) {
+    if (m == "automatic" || m == "manual") this.#rangeMode = m
+    this.#yRangeManual.max = this.maxMin.priceMax
+    this.#yRangeManual.min = this.maxMin.priceMin
+  }
+
+  yFactor(f) {
+    if (!isNumber(f)) return false
+
+    this.#yRangeManual.factor = f
   }
 
   /**

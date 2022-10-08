@@ -31,6 +31,7 @@ import {
   CLASS_ROW,
   CLASS_CHART,
   CLASS_SCALE,
+  CLASS_YAXIS,
   CLASS_WIDGETS,
   CLASS_ONCHART,
   CLASS_OFFCHART,
@@ -84,6 +85,7 @@ export default class TradeXchart {
   #elMain
   #elRows
   #elTime
+  #elYAxis
   #elWidgetsG
 
   #inCnt = null
@@ -249,6 +251,7 @@ constructor (mediator, options={}) {
   get elUtils() { return this.#elUtils }
   get elTools() { return this.#elTools }
   get elMain() { return this.#elMain }
+  get elYAxis() { return this.#elYAxis }
   get elWidgetsG() { return this.#elWidgetsG }
 
   get UtilsBar() { return this.#UtilsBar }
@@ -522,6 +525,7 @@ constructor (mediator, options={}) {
     this.#elBody = DOM.findBySelector(`#${this.id} .${CLASS_BODY}`)
     this.#elTools = DOM.findBySelector(`#${this.id} .${CLASS_TOOLS}`)
     this.#elMain  = DOM.findBySelector(`#${this.id} .${CLASS_MAIN}`)
+    this.#elYAxis  = DOM.findBySelector(`#${this.id} .${CLASS_YAXIS}`)
     this.#elRows  = DOM.findBySelector(`#${this.id} .${CLASS_ROWS}`)
     this.#elTime  = DOM.findBySelector(`#${this.id} .${CLASS_TIME}`)
     this.#elWidgetsG = DOM.findBySelector(`#${this.id} .${CLASS_WIDGETSG}`)
@@ -691,7 +695,7 @@ constructor (mediator, options={}) {
         <div class="${CLASS_BODY}" style="${styleBody}">
           <div class="${CLASS_TOOLS}" style="${styleTools}"></div>
           <div class="${CLASS_MAIN}" style="${styleMain}"></div>
-          <div style="${styleScale}"></div>
+          <div class="${CLASS_YAXIS}" style="${styleScale}"></div>
         </div>
         <div class="${CLASS_WIDGETSG}" style="${styleWidgets}"></div>
       </div>

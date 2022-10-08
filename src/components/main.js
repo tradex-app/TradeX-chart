@@ -19,6 +19,7 @@ import {
   CLASS_ROW,
   CLASS_GRID,
   CLASS_CHART,
+  CLASS_YAXIS,
   STREAM_NEWVALUE
 } from '../definitions/core'
 
@@ -30,6 +31,7 @@ import {
   OFFCHARTDEFAULTHEIGHT,
 } from "../definitions/chart"
 import { isNumber } from "../utils/typeChecks"
+import { timestampDiff } from "../utils/time"
 
 const STYLE_ROWS = "width:100%; min-width:100%;"
 const STYLE_ROW = "position: relative; overflow: hidden;"
@@ -50,11 +52,14 @@ export default class MainPane {
   #options
   #parent
   #core
+  #elYAxis
   #elMain
   #elRows
   #elTime
   #elChart
+  #elChartScale
   #elOffCharts = []
+  #elYAxisScales = []
   #elGrid
   #elCanvas
   #elViewport
@@ -81,9 +86,10 @@ export default class MainPane {
 
     this.#mediator = mediator
     this.#options = options
-    this.#elMain = mediator.api.elements.elMain
     this.#parent = {...this.#mediator.api.parent}
     this.#core = this.#mediator.api.core
+    this.#elMain = this.#core.elMain
+    this.#elYAxis = this.#core.elYAxis
     this.init(options)
   }
 
@@ -130,6 +136,7 @@ export default class MainPane {
     this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
     this.#elGrid = DOM.findBySelector(`#${api.id} .${CLASS_GRID}`)
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_GRID} .viewport`)
+    this.#elChartScale  = DOM.findBySelector(`#${api.id} .${CLASS_YAXIS} .${CLASS_CHART}`)
 
     api.parent = this
     api.chartData = this.mediator.api.chartData
@@ -145,7 +152,8 @@ export default class MainPane {
           elChart: this.#elChart,
           elTime: this.#elTime,
           elRows: this.#elRows,
-          elOffCharts: this.#elOffCharts
+          elOffCharts: this.#elOffCharts,
+          elChartScale: this.#elChartScale
         }
       }
 
@@ -437,7 +445,11 @@ export default class MainPane {
     this.#elRows.lastElementChild.insertAdjacentHTML("afterend", this.rowNode(offChart.type))
     this.#elOffCharts.push(this.#elRows.lastElementChild)
 
+    this.#elYAxis.lastElementChild.insertAdjacentHTML("afterend", this.scaleNode(offChart.type))
+    this.#elYAxisScales.push(this.#elYAxis.lastElementChild)
+
     api.elements.elOffChart = this.#elRows.lastElementChild
+    api.elements.elScale = this.#elYAxis.lastElementChild
     options.offChart = offChart
 
     let o = this.#mediator.register("OffChart", OffChart, options, api)
@@ -489,6 +501,9 @@ export default class MainPane {
                       <div class="viewport" style="${styleGrid}"></div>
                   </div>`
           node += this.rowNode(CLASS_CHART)
+
+    this.#elYAxis.innerHTML = this.scaleNode(CLASS_CHART)
+    
     return node
   }
 
@@ -500,7 +515,22 @@ export default class MainPane {
     const node = `
       <div class="${CLASS_ROW} ${type}" style="${styleRow}">
         <canvas><canvas/>
-        <div class="${styleScale}">
+        <div style="${styleScale}">
+          <canvas id=""><canvas/>
+        </div>
+      </div>
+    `
+    return node
+  }
+
+  scaleNode(type) {
+    const api = this.#mediator.api
+    const styleRow = STYLE_ROW + ` border-top: 1px solid ${api.chartBorderColour};`
+    const styleScale = STYLE_SCALE + ` border-color: ${api.chartBorderColour};`
+
+    const node = `
+      <div class="${CLASS_ROW} ${type}" style="${styleRow}">
+        <div style="${styleScale}">
           <canvas id=""><canvas/>
         </div>
       </div>

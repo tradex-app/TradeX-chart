@@ -49,11 +49,8 @@ export default class ScaleBar {
   #layerCursor
 
   #controller
-
   #priceLine
-
   #cursorPos
-
 
   constructor (mediator, options) {
 
@@ -96,6 +93,9 @@ export default class ScaleBar {
   get dimensions() { return DOM.elementDimPos(this.#elScale) }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
+  set scaleRange(r) { this.setScaleRange(r) }
+  set rangeMode(m) { this.core.range.mode = m }
+  get rangeMode() { return this.core.range.mode }
 
   init() {
     this.mount(this.#elScale)
@@ -107,14 +107,11 @@ export default class ScaleBar {
 
 
   start(data) {
-
     this.#yAxis = new yAxis(this, this, this.yAxisType)
-
     // prepare layered canvas
     this.createViewport()
     // draw the scale
     this.draw()
-
     // set up event listeners
     this.eventsListen()
 
@@ -130,6 +127,9 @@ export default class ScaleBar {
     this.#controller = null
     this.#viewport.destroy()
 
+    this.#controller.removeEventListener("drag", this.onDrag);
+    this.#controller.removeEventListener("enddrag", this.onDragDone);
+
     this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove)
     this.off(`${this.#parent.ID}_mouseout`, this.eraseCursorPrice)
     this.off(STREAM_UPDATE, this.onStreamUpdate)
@@ -139,6 +139,8 @@ export default class ScaleBar {
     let canvas = this.#viewport.scene.canvas
     // create controller and use 'on' method to receive input events 
     this.#controller = new InputController(canvas, {disableContextMenu: false});
+    this.#controller.on("drag", this.onDrag.bind(this));
+    this.#controller.on("enddrag", this.onDragDone.bind(this));
 
     this.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMove(e) })
     this.on(`${this.#parent.ID}_mouseout`, (e) => { this.eraseCursorPrice() })
@@ -169,6 +171,32 @@ export default class ScaleBar {
     this.drawCursorPrice()
   }
 
+  onDrag(e) {
+    this.#cursorPos = [
+      Math.floor(e.position.x), Math.floor(e.position.y),
+      e.dragstart.x, e.dragstart.y,
+      e.movement.x, e.movement.y
+    ]
+    const dragEvent = {
+      divider: this,
+      cursorPos: this.#cursorPos
+    }
+    this.emit("scale_drag", dragEvent)
+  }
+
+  onDragDone(e) {
+    this.#cursorPos = [
+      Math.floor(e.position.x), Math.floor(e.position.y),
+      e.dragstart.x, e.dragstart.y,
+      e.movement.x, e.movement.y
+    ]
+    const dragEvent = {
+      divider: this,
+      cursorPos: this.#cursorPos
+    }
+    this.emit("scale_dragDone", dragEvent)
+  }
+
   onStreamUpdate(e) {
 
   }
@@ -193,6 +221,10 @@ export default class ScaleBar {
 
     this.setHeight(dim.h)
     this.draw(undefined, true)
+  }
+
+  setScaleRange(r) {
+    this.rangeMode = "manual"
   }
 
   defaultNode() {
