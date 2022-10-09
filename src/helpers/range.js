@@ -107,8 +107,8 @@ export class Range {
     let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd)
 
     if (this.#rangeMode = "manual") {
-      maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
-      maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
+      // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
+      // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
     }
 
     for (let m in maxMin) {

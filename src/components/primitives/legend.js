@@ -47,7 +47,9 @@ export default class Legends {
     const styleLegend = `width: calc(100% - ${this.#core.scaleW}px - 1em); margin: .5em 0 1em 1em; font-size: 12px; text-align: left;`
       let styleLegendTitle = "margin-right: 1em; white-space: nowrap;"
     const styleInputs = "display: inline; margin-left: -1em;"
-    const styleControls = "float: right; margin: 0.5em;"
+    const styleControls = "float: right; margin: 0.5em; opacity:0"
+    const mouseOver = "onmouseover='this.style.opacity=1'"
+    const mouseOut = "onmouseout='this.style.opacity=0'"
 
     styleLegendTitle += (o?.type === "chart")? "font-size: 1.5em;" : "font-size: 1.2em;"
 
@@ -55,7 +57,7 @@ export default class Legends {
       <div id="${o.id}" class="legend" style="${styleLegend}">
         <span class="title" style="${styleLegendTitle}">${o.title}</span>
         <dl style="${styleInputs}">${this.buildInputs(o)}</dl>
-        <div class="controls" style="${styleControls}">${this.buildControls(o)}</div>
+        <div class="controls" style="${styleControls}" ${mouseOver} ${mouseOut}>${this.buildControls(o)}</div>
       </div>
     `
     return node
