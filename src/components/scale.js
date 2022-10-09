@@ -96,6 +96,7 @@ export default class ScaleBar {
   set scaleRange(r) { this.setScaleRange(r) }
   set rangeMode(m) { this.core.range.mode = m }
   get rangeMode() { return this.core.range.mode }
+  set rangeYFactor(f) { this.core.range.yFactor = f }
 
   init() {
     this.mount(this.#elScale)
@@ -225,6 +226,7 @@ export default class ScaleBar {
 
   setScaleRange(r) {
     this.rangeMode = "manual"
+    this.rangeYFactor = r * 0.001
   }
 
   defaultNode() {

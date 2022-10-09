@@ -105,6 +105,12 @@ export class Range {
     this.indexEnd = end
 
     let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd)
+
+    if (this.#rangeMode = "manual") {
+      maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
+      maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
+    }
+
     for (let m in maxMin) {
       this[m] = maxMin[m]
     }
@@ -117,14 +123,14 @@ export class Range {
 
   setMode(m) {
     if (m == "automatic" || m == "manual") this.#rangeMode = m
-    this.#yRangeManual.max = this.maxMin.priceMax
-    this.#yRangeManual.min = this.maxMin.priceMin
+    if (m == "manual") this.#yRangeManual.factor = 0
+    this.#yRangeManual.max = this.priceMax
+    this.#yRangeManual.min = this.priceMin
   }
 
   yFactor(f) {
-    if (!isNumber(f)) return false
-
-    this.#yRangeManual.factor = f
+    if (!isNumber(f) || this.#rangeMode !== "manual") return false
+    this.#yRangeManual.factor += f * -1
   }
 
   /**
