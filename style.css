@@ -37,12 +37,17 @@ a {
 }
 
 #nav {
-  width: 5%;
+  width: 10%;
   float: left;
+  text-align: left;
+}
+
+#nav button {
+  margin-left: 1em;
 }
 
 #stage {
-  width: 95%;
+  width: 90%;
   height: 100%;
   float: right;
 }

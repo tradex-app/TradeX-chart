@@ -2,10 +2,45 @@ import { Chart, DOM } from './src'
 // import './chart-live.css'
 
 // let state = undefined
-import state from './data/1hour.json'
+// import state from './data/1hour.json'
 // import state from './data/1minute.json'
-// import state from './data/seconds.json'
+import state from './data/seconds.json'
 // import state from './data/seconds-indicator'
+
+// let state = {
+//   "ohlcv": [
+//       [
+//           1663333201000,
+//           19139.4,
+//           19139.6,
+//           19179.6,
+//           19179.63478779,
+//           441.1
+//       ],
+//       [
+//           1663333202000,
+//           19182.2,
+//           19182.2,
+//           19120.2,
+//           19133.5,
+//           445.2
+//       ],
+//       [
+//           1663333203000,
+//           19182.2,
+//           19182.2,
+//           19120.2,
+//           19133.5,
+//           434.3
+//       ]
+//   ],
+// "offchart": [
+//   {
+//     "name": "RSI, 20",
+//     "type": "RSI",
+//     "data": []
+//   }]
+// }
 
 // let rangeStartTS = 1558429200000 // 21/05/2019, 11:00:00 - 1 hour price
 // let rangeStartTS = 1663059600000 // seconds price
@@ -69,10 +104,7 @@ function internals() {
   data.gradsUnits = ["grads.units: ", JSON.stringify(tx.xAxisGrads.units)]
   data.mouseXPos = ["mouseXPos:", chart.mousePos.x]
   data.mouseRangePos = ["xPos2Index:", chart.Timeline.xPos2Index(chart.mousePos.x)]
-  // data.gradsMajor = ["grads.major: ", tx.xAxisGrads.majorTick]
-  // data.gradsMinor = ["grads.minor: ", tx.xAxisGrads.minorTick]
-  // data.gradsInc = ["grads.inc: ", tx.xAxisGrads.inc]
-  // data.gradsValues = ["grads.values: ", JSON.stringify(tx.xAxisGrads.values)]
+
 
   return data
 }

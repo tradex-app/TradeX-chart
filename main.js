@@ -13,8 +13,9 @@ I'm interested in constructive feedback (testing) or contributions.<br/>
 <div id="container">
   <div id="nav">
     <h2>Demo</h2>
-    <button type="button" onclick="window.demo.src='chart-live.html'">Live Chart</button>
-    <button type="button" onclick="window.demo.src='chart-static.html'">Static Chart</button>
+    <button type="button" onclick="window.demo.src='chart-live.html'">History + Stream</button><br/>
+    <button type="button" onclick="window.demo.src='chart-stream-only.html'">Stream Only</button><br/>
+    <button type="button" onclick="window.demo.src='chart-static.html'">Static Chart</button><br/>
   </div>
   <div id="stage">
     <iframe id="demo" src="chart-live.html" height=""></iframe>

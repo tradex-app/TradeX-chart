@@ -783,7 +783,7 @@ constructor (mediator, options={}) {
       i = mData.length - 1
       j = data.length - 1
 
-      if (data.length == 0) this.allData.data = mData
+      if (data.length == 0) this.allData.data.push(...mData)
       else {
         const r1 = [data[0][0], data[j][0]]
         const r2 = [mData[0][0], mData[i][0]]
@@ -791,7 +791,7 @@ constructor (mediator, options={}) {
 
         // overlap between existing data and merge data
         if (o[1] >= o[0]) {
-
+// TODO: merge with overlap
         }
         // no overlap, insert the new data
         else {
