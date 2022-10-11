@@ -144,7 +144,7 @@ export default class Stream {
     candle[H] = data.p > candle[H] ? data.p : candle[H]
     candle[L] = data.p < candle[L] ? data.p : candle[L]
     candle[C] = data.p
-    candle[V] = parseFloat((candle[V] + data.q).toFixed(this.#precision))
+    candle[V] = parseFloat(candle[V] + data.q).toFixed(this.#precision)
 
     // update the last candle in the state data
     this.#candle = candle

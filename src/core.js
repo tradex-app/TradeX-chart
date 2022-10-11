@@ -202,11 +202,6 @@ constructor (mediator, options={}) {
       if (!isObject(options?.stream) && this.#state.data.chart.data.length < 2) {
         this.warning(`${NAME} has no chart data or streaming provided.`)
         // has a time frame been provided?
-        // if (isString(options?.timeFrame)) {
-        //   let ms = interval2MS(options.timeFrame)
-        //   if (ms) tf = options.timeFrame
-        //   else ms = SECOND_MS
-        // }
         ;({tf, ms} = isTimeFrame(options?.timeFrame))
         this.#time.timeFrame = tf
         this.#time.timeFrameMS = ms
@@ -215,7 +210,9 @@ constructor (mediator, options={}) {
       // is the chart streaming with an empty chart?
       else if (isObject(options?.stream) && this.#state.data.chart.data.length < 2) {
         // has a time frame been provided?
-        ({tf, ms} = isTimeFrame(options?.timeFrame))
+        ;({tf, ms} = isTimeFrame(options?.timeFrame))
+        console.log("tf:",tf,"ms:",ms)
+
         this.#time.timeFrame = tf
         this.#time.timeFrameMS = ms
         this.#chartIsEmpty = true

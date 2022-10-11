@@ -217,6 +217,7 @@ export function isTimeFrame(tf) {
       tf = "1s"
     }
   }
+  else tf = "1s"
   return {tf, ms}
 }
 
@@ -232,7 +233,7 @@ export function interval2MS(tf) {
   const regex = /([0-9]{1,2})([s|m|h|d|w|M|y])/gm;
   let m
   if ((m = regex.exec(tf)) !== null) {
-    return TIMEUNITSVALUESSHORT[2] * TIMEUNITSVALUESSHORT[1]
+    return TIMEUNITSVALUESSHORT[m[2]] * m[1]
   }
   else return false
 }
