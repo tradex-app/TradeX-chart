@@ -682,6 +682,11 @@ constructor (mediator, options={}) {
       return false
     }
     else if (isObject(stream)) {
+      if (this.allData.data.length == 0 && isString(stream.timeFrame)) {
+        ;({tf, ms} = isTimeFrame(stream?.timeFrame))
+        this.#time.timeFrame = tf
+        this.#time.timeFrameMS = ms
+      }
       this.#stream = new Stream(this)
       return this.#stream
     }
