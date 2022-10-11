@@ -292,6 +292,7 @@ constructor (mediator, options={}) {
   get pricePrecision() { return this.#pricePrecision }
   get volumePrecision() { return this.#volumePrecision }
 
+  set stream(stream) { return this.setStream(stream) }
   get stream() { return this.#stream }
   get isEmtpy() { return this.#chartIsEmpty }
 
@@ -449,7 +450,7 @@ constructor (mediator, options={}) {
     this.MainPane.start()
     this.WidgetsG.start()
 
-    if (isObject(this.#config.stream)) this.#stream = new Stream(this)
+    this.stream = this.#config.stream
   }
 
   /**
@@ -675,6 +676,23 @@ constructor (mediator, options={}) {
     }
   }
 
+  setStream(stream) {
+    if (this.stream?.constructor.name == "Stream") {
+      this.error("Error: Invoke stopStream() before starting a new one.")
+      return false
+    }
+    else if (isObject(stream)) {
+      this.#stream = new Stream(this)
+      return this.#stream
+    }
+  }
+
+  stopStream() {
+    if (this.stream.constructor.name == "Stream") {
+      this.stream.stop()
+    }
+  }
+
   defaultNode() {
 
     const classesTXChart = CLASS_DEFAULT+" "+this.#userClasses 
@@ -768,6 +786,8 @@ constructor (mediator, options={}) {
    * @param {object} merge - merge data must be formatted to a Chart State
    * @param {boolean|object} newRange - false | {start: number, end: number}
    */
+  // TODO: merge indicator data?
+  // TODO: merge dataset?
   mergeData(merge, newRange=false) {
     if (!isObject(merge)) return false
 
