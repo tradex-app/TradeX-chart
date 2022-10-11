@@ -3,8 +3,8 @@ import { Chart, DOM } from './src'
 
 // let state = undefined
 // import state from './data/1hour.json'
-// import state from './data/1minute.json'
-import state from './data/seconds.json'
+import state from './data/1minute.json'
+// import state from './data/seconds.json'
 // import state from './data/seconds-indicator'
 
 // let state = {
@@ -50,7 +50,7 @@ let interval = 500
 let streamInit = false
 
 DOM.findBySelector('#app').innerHTML = `
-<h2>Live Chart</h2>
+<h2>Stream with Back History</h2>
 <button type="button" onclick="window.chart.resize(600, 500)">Resize Chart</button>
 <div>
   <div id="test" style="float:left;"></div>
