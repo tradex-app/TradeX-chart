@@ -963,7 +963,8 @@ const YAxisStyle = {
   FONTFAMILY: YAxisStyle_FONTFAMILY,
   FONTSIZE: YAxisStyle_FONTSIZE,
   FONTWEIGHT: YAxisStyle_FONTWEIGHT,
-  FONT_LABEL: `${YAxisStyle_FONTWEIGHT} ${YAxisStyle_FONTSIZE}px ${YAxisStyle_FONTFAMILY}`
+  FONT_LABEL: `${YAxisStyle_FONTWEIGHT} ${YAxisStyle_FONTSIZE}px ${YAxisStyle_FONTFAMILY}`,
+  FONT_LABEL_BOLD: `bold ${YAxisStyle_FONTSIZE}px ${YAxisStyle_FONTFAMILY}`
 };
 
 const XAxisStyle_FONTWEIGHT = "normal";
@@ -976,7 +977,8 @@ const XAxisStyle = {
   FONTFAMILY: XAxisStyle_FONTFAMILY,
   FONTSIZE: XAxisStyle_FONTSIZE,
   FONTWEIGHT: XAxisStyle_FONTWEIGHT,
-  FONT_LABEL: `${XAxisStyle_FONTWEIGHT} ${XAxisStyle_FONTSIZE}px ${XAxisStyle_FONTFAMILY}`
+  FONT_LABEL: `${XAxisStyle_FONTWEIGHT} ${XAxisStyle_FONTSIZE}px ${XAxisStyle_FONTFAMILY}`,
+  FONT_LABEL_BOLD: `bold ${YAxisStyle_FONTSIZE}px ${YAxisStyle_FONTFAMILY}`
 };
 
 const GridStyle = {
@@ -1004,6 +1006,7 @@ const CLASS_ROW       = "tradeXrow";
 const CLASS_GRID      = "tradeXgrid";
 const CLASS_CHART     = "tradeXchart";
 const CLASS_SCALE     = "tradeXscale";
+const CLASS_YAXIS     = "tradeXyAxis";
 const CLASS_MENUS     = "tradeXmenus";
 const CLASS_MENU      = "tradeXmenu";
 const CLASS_DIVIDERS  = "tradeXdividers";
@@ -1374,9 +1377,9 @@ class indicator {
 
 const SECOND = 1000;
 const MINUTE = SECOND * 60;
-
+const DEFAULT_TIMEINTERVAL = MINUTE;
 const DEFAULT_TIMEFRAME = "1m";
-const DEFAULT_TIMEFRAMEMS = MINUTE;
+const DEFAULT_TIMEFRAMEMS = DEFAULT_TIMEINTERVAL;
 
 const PRICEDIGITS$1 = 6;
 
@@ -1390,7 +1393,7 @@ const YAXIS_BOUNDS = 0.005;
 const LIMITFUTURE = 200;
 const LIMITPAST = 200;
 const MINCANDLES = 20;
-const MAXGRADSPER = 100;
+const MAXGRADSPER = 75;
 const BUFFERSIZE$1 = 20;  // %
 
 const ROWMINHEIGHT = 50; // px
@@ -1811,7 +1814,7 @@ class RSI extends indicator {
     this.target.setPosition(this.core.scrollPos, 0);
     this.draw(this.range);
 
-    console.log(`RSI stream input update: ${value}`);
+    // console.log(`RSI stream input update: ${value}`)
 
   }
 
@@ -2272,6 +2275,7 @@ class MouseAgent {
         return false;
       }
     }, { passive: false });
+
 
     element.addEventListener("mouseenter", (e) => {
       controller.raise(this, "mouseenter", this.createEventArgument(e));
@@ -2874,6 +2878,7 @@ class TouchAgent {
 				}
 			}
 		}, { passive: false });
+
 
 		window.addEventListener("touchend", (e) => {
 			if (e.touches) {
@@ -3539,6 +3544,36 @@ function timestampDifference(date1,date2) {
   }
 }
 
+function isTimeFrame(tf) {
+  let ms = SECOND_MS;
+  if (isString(tf)) {
+    ms = interval2MS(tf);
+    if (ms) tf = tf;
+    else {
+      ms = SECOND_MS;
+      tf = "1s";
+    }
+  }
+  else tf = "1s";
+  return {tf, ms}
+}
+
+/**
+ * convert interval (timeframe) string to milliseconds
+ * @export
+ * @param {string} tf
+ * @return {number}
+ */
+function interval2MS(tf) {
+  if (!isString(tf)) return false
+
+  const regex = /([0-9]{1,2})([s|m|h|d|w|M|y])/gm;
+  let m;
+  if ((m = regex.exec(tf)) !== null) {
+    return TIMEUNITSVALUESSHORT[m[2]] * m[1]
+  }
+  else return false
+}
 
 /**
  * Milliseconds broken down into major unit and remainders
@@ -3747,6 +3782,8 @@ var Time = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   isValidTimeInRange: isValidTimeInRange,
   timestampDiff: timestampDiff,
   timestampDifference: timestampDifference,
+  isTimeFrame: isTimeFrame,
+  interval2MS: interval2MS,
   ms2TimeUnits: ms2TimeUnits,
   ms2Interval: ms2Interval,
   get_second: get_second,
@@ -4095,12 +4132,9 @@ class Axis {
 
 class xAxis extends Axis {
 
-
-
   #xAxisTicks = 4
   #xAxisGrads
   #xAxisSubGrads
-  #xAxisOffset
 
   constructor(parent, chart) {
     super(parent, chart);
@@ -4118,6 +4152,7 @@ class xAxis extends Axis {
   get timeStart() { return this.range.timeStart }
   get timeFinish() { return this.range.timeFinish }
   get rangeDuration() { return this.range.rangeDuration }
+  get rangeLength() { return this.range.Length }
   get indexStart() { return this.range.indexStart }
   get indexEnd() { return this.range.indexEnd }
   get timeMax() { return this.range.timeMax }
@@ -4140,8 +4175,6 @@ class xAxis extends Axis {
   calcWidth() {
     return this.core.Chart.width - this.core.Chart.scale.width
   }
-
-
 
   /**
  * return canvas x co-ordinate
@@ -4212,313 +4245,224 @@ class xAxis extends Axis {
     const rangeStart = this.timeMin;
     const rangeEnd = this.timeMax;
     const intervalStr = this.intervalStr;
-    const grads = {values: []};
+    const grads = {
+      entries: {},
+      values: [],
+      major: [],
+      minor: []
+    };
     intervalStr.charAt(intervalStr.length - 1);
-    
-      let days, inc, month, next, t, t1, t2, units, 
-          major, majorValue, minorValue, minorTick, majorTick;
+
+// return grads
+
+      let days, t1, t2, units, unitStart, 
+          majorGrad, majorValue, minorValue;
     
       units = ms2TimeUnits(this.rangeDuration);
       grads.units = ms2TimeUnits(this.rangeDuration);
     
     // Years
     if (units.years > 0) {
-      grads.unit = ["y", "year"];
-      grads.timeSpan = `${units.years} years`;
-      
+            
       t1 = year_start(rangeStart);
       t2 = nextYear(year_start(rangeEnd)) + YEAR_MS;
-        
-      units = timestampDifference(t1, t2);
-      major = units.years;
-      majorTick = Math.ceil(1 / (this.gradsMax / major));
-      minorTick = (units.years >= this.gradsMax - 1) ? 0 : Math.floor(this.gradsMax / major);
-      
-      majorValue = (t) => { 
-        return get_year(t) 
-      };
-      minorValue = (t) => { 
-        if (get_month(t) == 0) return get_year(t)
-        else return get_monthName(t) 
-      };
-      
-      t = t1;
-      inc = Math.round((YEAR_MS + DAY_MS) / (minorTick + 1));
-      grads.major = [];
-      grads.minor = [];
 
-      while (t < t2) {
-        t = year_start(t);
-        grads.major.push(t);
-        next = t;
-        for (let i = majorTick; i > -1; --i) {
-          next = nextYear(next);
-        }
+      grads.unit = ["y", "year"];
+      grads.timeSpan = `${units.years} years`;
 
-        if (minorTick > 0 && this.interval < YEAR_MS) {
-          while (t < next) {
-            t = month_start(t + inc);
-            grads.minor.push(t);
-          }
-        }
-        t = next;
-      }
+      majorGrad = (ts) => { return nextYear(ts) };
+
+      unitStart = (ts) => { return month_start(ts) };
+
+      majorValue = (ts) => { 
+        return get_year(ts) 
+      };
+      minorValue = (ts) => { 
+        if (get_month(ts) == 0 && get_day(ts) == 1 && get_hour(ts) == 0) return get_year(ts)
+        else return get_monthName(ts) 
+      };
+
+      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
     }
       
     // Months
     else if (units.months > 0) {
-      let months = units.months;
+
+      t1 = month_start(rangeStart);
+      t2 = month_start(rangeEnd) + MONTH_MS(get_month(rangeEnd));// + YEAR_MS
+
       grads.unit = ["M", "month"];
       grads.timeSpan = `${units.months} months`;
-      
-      t1 = month_start(rangeStart);
-      t2 = month_start(rangeEnd) + MONTH_MS(get_month(rangeEnd)) + YEAR_MS;
-        
-      units = timestampDifference(t1, t2);
-      major = months;
-      majorTick = Math.ceil(1 / (this.gradsMax / major));
-      minorTick = (months >= this.gradsMax - 1) ? 0 : Math.floor(this.gradsMax / major);
 
-      grads.majorTick = majorTick;
-      grads.minorTick = minorTick;
-      
-      majorValue = (t) => { 
-        if (get_month(t) == 0) return get_year(t)
-        else return get_monthName(t)
+      // TODO: optimize nextMonth() - too slow on large rages
+      // majorGrad = (ts) => { return nextMonth(ts) }
+      majorGrad = (ts) => { return MONTHR_MS };
+
+      unitStart = (ts) => { return day_start(ts) };
+
+      majorValue = (ts) => { 
+        if (get_month(ts) == 0) return get_year(ts)
+        else return get_monthName(ts)
       };
-      minorValue = (t) => { 
-        if (get_day(t) == 1) return get_monthName(t) 
-        else return this.gradsDayName(t) 
+      minorValue = (ts) => {
+        if (get_month(ts) == 0 && get_day(ts) == 1) return get_year(ts)
+        if (get_day(ts) == 1 && get_hour(ts) == 0) return get_monthName(ts)
+        else return this.gradsDayName(ts) 
       };
-      
-      t = t1;
-      inc = Math.round((DAY_MS * 28) / (minorTick + 1));
-      grads.inc = inc;
-      grads.major = [];
-      grads.minor = [];
 
-      while (t < t2) {
-        t = month_start(t);
-        grads.major.push(t);
-        next = t;
-        for (let i = majorTick; i > 0; i--) {
-          next = month_start(next + (DAY_MS * 31));
-        }
-
-        if (minorTick > 0 && this.interval < DAY_MS * 28) {
-          month = month_start(t + (DAY_MS * 31));
-          while (t < month) {
-            t = day_start(t + inc);
-            if (t >= month) break
-            else if (month - t < inc * 0.75) break
-            else grads.minor.push(t);
-          }
-        }
-        t = next;
-      }
+      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
     }
     
     // Days
     else if (units.weeks > 0 || units.days > 0) {
       days = units.weeks * 7 + units.days;
 
+      t1 = day_start(rangeStart);
+      t2 = day_start(rangeEnd) + WEEK_MS;
+
       grads.unit = ["d", "day"];
       grads.timeSpan = `${days} days`;
-      
-      t1 = day_start(rangeStart);
-      t2 = day_start(rangeEnd) + MONTHR_MS;
-        
-      units = timestampDifference(t1, t2);
-      major = days;
-      majorTick = Math.ceil(1 / (this.gradsMax / major));
-      minorTick = (days >= this.gradsMax - 1) ? 0 : Math.floor(this.gradsMax / major);
-      
-      majorValue = (t) => { 
-        if (get_month(t) == 0 && get_day(t) == 1) return get_year(t)
-        else if (get_day(t) == 1) return get_monthName(t)
-        else return this.gradsDayName(t) // null
-        // else if (unit == "h") return get_hour(t) + ":00" 
-      };
-      minorValue = (t) => { 
-        if (get_day(t) == 1) return get_monthName(t)
-        else if (get_hour(t) == 0) return this.gradsDayName(t) // null
-        else return get_hour(t) + ":00" 
-      };
-      
-      t = t1;
-      inc = Math.round(DAY_MS / (minorTick + 1));
-      grads.major = [];
-      grads.minor = [];
 
-      while (t < t2) {
-        t = day_start(t);
-        grads.major.push(t);
-        next = t;
-        for (let i = majorTick; i > 0; i--) {
-          next = next + DAY_MS;
-        }
+      majorGrad = (ts) => { return DAY_MS };
 
-        if (minorTick > 0 && this.interval < DAY_MS) {
-          while (t < next) {
-            t = hour_start(t + inc);
-            grads.minor.push(t);
-          }
-        }
-        t = next;
-      }
+      unitStart = (ts) => { return hour_start(ts) };
+
+      majorValue = (ts) => { 
+        if (get_month(ts) == 0 && get_day(ts) == 1) return get_year(ts)
+        else if (get_day(ts) == 1) return get_monthName(ts)
+        else return this.gradsDayName(ts) // null
+      };
+      minorValue = (ts) => { 
+        if (get_day(ts) == 1 && get_hour(ts) == 0) return get_monthName(ts)
+        else if (get_hour(ts) == 0) return this.gradsDayName(ts)
+        else return get_hour(ts) + ":00" 
+      };
+
+      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
     }
     
     // Hours
     else if (units.hours > 0) {
-      grads.unit = ["h", "hour"];
-      grads.timeSpan = `${units.hours} hours`;
       
       t1 = hour_start(rangeStart);
       t2 = hour_start(rangeEnd) + DAY_MS;
+
+      grads.unit = ["h", "hour"];
+      grads.timeSpan = `${units.hours} hours`;
+
+      majorGrad = (ts) => { return HOUR_MS };
         
-      units = timestampDifference(t1, t2);
-      major = units.hours;
-      majorTick = Math.ceil(1 / (this.gradsMax / major));
-      minorTick = (units.hours >= this.gradsMax - 1) ? 0 : Math.floor(this.gradsMax / major);
-      
-      majorValue = (t) => { 
-        if (get_hour(t) == 0) return this.gradsDayName(t)
-        else if (get_minute(t) == 0) return get_hour(t) + ":00"
-        else return "00:" + get_minute(t)
-      };
-      minorValue = (t) => { 
-          if (get_minute(t) == 0) return get_hour(t) + ":00"
-          else return "00:" + get_minute(t) 
-      };
-      
-      t = t1;
-      inc = Math.round(HOUR_MS / (minorTick + 1));
-      grads.major = [];
-      grads.minor = [];
+      unitStart = (ts) => { return minute_start(ts) };
 
-      while (t < t2) {
-        t = hour_start(t);
-        grads.major.push(t);
-        next = t;
-        for (let i = majorTick; i > -1; --i) {
-          next = next + HOUR_MS;
-        }
+      majorValue = (ts) => {
+        if (get_month(ts) == 0 && get_day(ts) == 1 && get_hour(ts) == 0) return get_year(ts)
+        else if (get_day(ts) == 1 && get_hour(ts) == 0) return get_monthName(ts)
+        else if (get_hour(ts) == 0) return this.gradsDayName(ts)
+        else return this.HM(ts)
+      };
+      minorValue = (ts) => { return this.HM(ts) };
 
-        if (minorTick > 0 && this.interval < HOUR_MS) {
-          while (t < next) {
-            t = minute_start(t + inc);
-            grads.minor.push(t);
-          }
-        }
-        t = next;
-      }
+      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
     }
     
     // Minutes
     else if (units.minutes > 0) {
-      grads.unit = ["m", "minute"];
-      grads.timeSpan = `${units.minutes} minutes`;
       
       t1 = minute_start(rangeStart);
       t2 = minute_start(rangeEnd) + HOUR_MS;
-        
-      units = timestampDifference(t1, t2);
-      major = units.minutes;
-      majorTick = Math.ceil(this.gradsMax / major);
-      minorTick = (units.minutes >= this.gradsMax - 1) ? 0 : Math.floor(this.gradsMax / major);
-      
-      majorValue = (t) => { 
-        if (get_minute(t) == 0) return get_hour(t) + ":00"
-        else return "00:" + get_minute(t) 
+
+      grads.unit = ["m", "minute"];
+      grads.timeSpan = `${units.minutes} minutes`;
+
+      majorGrad = (ts) => { return MINUTE_MS };
+
+      unitStart = (ts) => { return second_start(ts) };
+
+      majorValue = (ts) => {
+        if (get_month(ts) == 0 && get_day(ts) == 1 && get_hour(ts) == 0 && get_minute(ts) == 0) return get_year(ts)
+        else if (get_day(ts) == 1 && get_hour(ts) == 0 && get_minute(ts) == 0) return get_monthName(ts)
+        else if (get_hour(ts) == 0 && get_minute(ts) == 0) return this.gradsDayName(ts)
+        else return this.HM(ts)
       };
-      
-      t = t1;
-      inc = Math.round(MINUTE_MS / (minorTick + 1));
-      grads.major = [];
-      grads.minor = [];
+      minorValue = (ts) => { return this.HMS(ts) };
 
-      while (t < t2) {
-        grads.major.push(t);
-        next = t;
-        for (let i = majorTick; i > -1; --i) {
-          next = next + MINUTE_MS;
-        }
-
-        if (minorTick > 0) {
-          while (t < next) {
-            t = second_start(t + inc);
-            grads.minor.push(t);
-          }
-        }
-        t = next;
-      }
+      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
     }
 
     // Seconds
     else if (units.seconds > 0) {
+      
+      t1 = second_start(rangeStart) - MINUTE_MS;
+      t2 = second_start(rangeEnd) + MINUTE_MS;
+
       grads.unit = ["s", "second"];
       grads.timeSpan = `${units.seconds} seconds`;
-      
-      t1 = second_start(rangeStart);
-      t2 = second_start(rangeEnd) + MINUTE_MS;
+
+      majorGrad = (ts) => { return SECOND_MS };
         
-      units = timestampDifference(t1, t2);
-      major = units.seconds;
-      majorTick = Math.ceil(this.gradsMax / major);
-      minorTick = (units.seconds >= this.gradsMax - 1) ? 0 : Math.floor(this.gradsMax / major);
-      
-      majorValue = (t) => { 
-        if (get_second(t) == 0) return get_minute(t) + ":00"
-        else return "00:" + get_second(t) 
+      unitStart = (ts) => { return second_start(ts) };
+
+      majorValue = (ts) => {
+        if (get_month(ts) == 0 && get_day(ts) == 1 && get_hour(ts) == 0 && get_minute(ts) == 0) return get_year(ts)
+        else if (get_day(ts) == 1 && get_hour(ts) == 0 && get_minute(ts) == 0) return get_monthName(ts)
+        else if (get_hour(ts) == 0 && get_minute(ts) == 0) return this.gradsDayName(ts)
+        else if (get_minute(ts) == 0 && get_second(ts) == 0) return this.HM(ts)
+        else return this.MS(ts)
       };
-      
-      t = t1;
-  //       inc = Math.round(HOUR_MS / (minorTick + 1))
-      grads.major = [];
-      grads.minor = [];
+      minorValue = (ts) => { return this.MS(ts) };
 
-      while (t < t2) {
-        grads.major.push(t);
-        next = t;
-        for (let i = majorTick; i > -1; --i) {
-          next = next + SECOND_MS;
+      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
+    }
+  }
+
+  buildGrads(grads, t1, t2, majorGrad ,majorValue, minorValue, unitStart) {
+    let th, to, min;
+    const minorGrad = Math.floor(this.rangeLength / this.gradsMax) * this.range.interval;
+
+    while (t1 < t2) {
+      to = t1;
+      grads.entries[t1] = [majorValue(t1), this.t2Pixel(t1), t1, "major"];
+
+      th = t1;
+      t1 += majorGrad(t1);
+
+      while ((t1 - to) < minorGrad) {
+        t1 += majorGrad(t1);
+      }
+
+      let x = Math.floor((t1 - to) / minorGrad);
+      if (x > 0 ) {
+        let y = Math.floor((t1 - to) / x);
+        while (th < t1) {
+          th += y;
+          min = unitStart(th);
+          grads.entries[min] = [minorValue(min), this.t2Pixel(min), min, "minor"];
         }
-
-  //         if (minorTick > 0) {
-  //           while (t < next) {
-  //             t = second_start(t + inc)
-  //             grads.minor.push(t)
-  //           }
-          t = next;
-        }
+      }
     }
 
-    let i = -1;
-    while (++i < grads.major.length) {
-      t = grads.major[i];
-      grads.values.push([majorValue(t), this.t2Pixel(t), t, "major"]);
-    }
-    i = -1;
-    while (++i < grads.minor.length) {
-      t = grads.minor[i];
-      grads.values.push([minorValue(t), this.t2Pixel(t), t, "minor"]);
-    }
+    grads.values = Object.values(grads.entries);
 
     return grads
   }
 
-  idealTicks(t1, t2, unit) {
-    let t = t1;
-    let ticks = [];
-    do {
-      let i = -1;
-      while (++i < this.#xAxisSubGrads[unit].length) {
-        t += this.#xAxisSubGrads[unit][i];
-        ticks.push(t);
-      }
-    }
-    while (t < t2)
-    return ticks
+  HM(t) {
+    let h = String(get_hour(t)).padStart(2, '0');
+    let m = String(get_minute(t)).padStart(2, '0');
+    return `${h}:${m}`
+  }
+
+  HMS(t) {
+    let h = String(get_hour(t)).padStart(2, '0');
+    let m = String(get_minute(t)).padStart(2, '0');
+    let s = String(get_second(t)).padStart(2, '0');
+    return `${h}:${m}:${s}`
+  }
+
+  MS(t) {
+    let m = String(get_minute(t)).padStart(2, '0');
+    let s = String(get_second(t)).padStart(2, '0');
+    return `${m}:${s}`
   }
 
   draw() {
@@ -4541,6 +4485,7 @@ class xAxis extends Axis {
     ctx.fillStyle = XAxisStyle.COLOUR_TICK;
     ctx.font = XAxisStyle.FONT_LABEL;
     for (let tick of grads) { 
+      // ctx.font = (tick[3] == "major") ? XAxisStyle.FONT_LABEL_BOLD : XAxisStyle.FONT_LABEL
       let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5);
       ctx.fillText(tick[0], tick[1] - w + offset, this.xAxisTicks + 12);
 
@@ -4556,7 +4501,6 @@ class xAxis extends Axis {
     this.parent.layerOverlays.scene.clear();
 
     this.#xAxisGrads;
-
   }
 
 }
@@ -5705,7 +5649,9 @@ class yAxis extends Axis {
         this.#yAxisGrads = this.gradations(100, 0, false, true);
         break;
       default:
-        this.#yAxisGrads = this.gradations(this.range.priceMax, this.range.priceMin);
+        let max = (this.range.priceMax > 0) ? this.range.priceMax : 1;
+        let min = (this.range.priceMin > 0) ? this.range.priceMin : 0;
+        this.#yAxisGrads = this.gradations(max, min);
         break;
     }
   }
@@ -5751,7 +5697,8 @@ class yAxis extends Axis {
     }
     else {
       // roughly divide the yRange into cells
-      let yGridSize = (this.rangeH)/this.#yAxisGrid;
+      let rangeH = (this.rangeH > 0) ? this.rangeH : 1;
+      let yGridSize = (rangeH)/this.#yAxisGrid;
 
       // try to find a nice number to round to
       let niceNumber = Math.pow( 10 , Math.ceil( Math.log10( yGridSize ) ) );
@@ -5917,6 +5864,12 @@ var stateMachineConfig$4 = {
             // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
           },
         },
+        scale_drag: {
+          target: 'scale_drag',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
+          },
+        },
       }
     },
     resize: {
@@ -5977,6 +5930,31 @@ var stateMachineConfig$4 = {
         },
       }
     },
+    scale_drag: {
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+      },
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+      },
+      on: {
+        scale_drag: {
+          target: 'scale_drag',
+          action (data) {
+            console.log(`${this.id}: transition from "${this.state}" to "chart_pan"`);
+            this.context.origin.setScaleRange(data[5]); 
+          },
+        },
+        scale_dragDone: {
+          target: 'idle',
+          action (data) {
+            console.log(`${this.id}: transition from "${this.state}" to "chart_panDone"`);
+            this.context.origin.setScaleRange(data[5]); 
+          },
+        },
+      }
+    },
+
   },
   guards: {
     zoomDone () { return true },
@@ -6103,11 +6081,8 @@ class ScaleBar {
   #layerCursor
 
   #controller
-
   #priceLine
-
   #cursorPos
-
 
   constructor (mediator, options) {
 
@@ -6150,6 +6125,10 @@ class ScaleBar {
   get dimensions() { return DOM.elementDimPos(this.#elScale) }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
+  set scaleRange(r) { this.setScaleRange(r); }
+  set rangeMode(m) { this.core.range.mode = m; }
+  get rangeMode() { return this.core.range.mode }
+  set rangeYFactor(f) { this.core.range.yFactor = f; }
 
   init() {
     this.mount(this.#elScale);
@@ -6161,14 +6140,11 @@ class ScaleBar {
 
 
   start(data) {
-
     this.#yAxis = new yAxis(this, this, this.yAxisType);
-
     // prepare layered canvas
     this.createViewport();
     // draw the scale
     this.draw();
-
     // set up event listeners
     this.eventsListen();
 
@@ -6184,6 +6160,9 @@ class ScaleBar {
     this.#controller = null;
     this.#viewport.destroy();
 
+    this.#controller.removeEventListener("drag", this.onDrag);
+    this.#controller.removeEventListener("enddrag", this.onDragDone);
+
     this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove);
     this.off(`${this.#parent.ID}_mouseout`, this.eraseCursorPrice);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
@@ -6193,6 +6172,8 @@ class ScaleBar {
     let canvas = this.#viewport.scene.canvas;
     // create controller and use 'on' method to receive input events 
     this.#controller = new InputController(canvas, {disableContextMenu: false});
+    this.#controller.on("drag", this.onDrag.bind(this));
+    this.#controller.on("enddrag", this.onDragDone.bind(this));
 
     this.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMove(e); });
     this.on(`${this.#parent.ID}_mouseout`, (e) => { this.eraseCursorPrice(); });
@@ -6223,6 +6204,32 @@ class ScaleBar {
     this.drawCursorPrice();
   }
 
+  onDrag(e) {
+    this.#cursorPos = [
+      Math.floor(e.position.x), Math.floor(e.position.y),
+      e.dragstart.x, e.dragstart.y,
+      e.movement.x, e.movement.y
+    ];
+    const dragEvent = {
+      divider: this,
+      cursorPos: this.#cursorPos
+    };
+    this.emit("scale_drag", dragEvent);
+  }
+
+  onDragDone(e) {
+    this.#cursorPos = [
+      Math.floor(e.position.x), Math.floor(e.position.y),
+      e.dragstart.x, e.dragstart.y,
+      e.movement.x, e.movement.y
+    ];
+    const dragEvent = {
+      divider: this,
+      cursorPos: this.#cursorPos
+    };
+    this.emit("scale_dragDone", dragEvent);
+  }
+
   onStreamUpdate(e) {
 
   }
@@ -6247,6 +6254,11 @@ class ScaleBar {
 
     this.setHeight(dim.h);
     this.draw(undefined, true);
+  }
+
+  setScaleRange(r) {
+    this.rangeMode = "manual";
+    this.rangeYFactor = r * 0.001;
   }
 
   defaultNode() {
@@ -6427,7 +6439,9 @@ class Legends {
     const styleLegend = `width: calc(100% - ${this.#core.scaleW}px - 1em); margin: .5em 0 1em 1em; font-size: 12px; text-align: left;`;
       let styleLegendTitle = "margin-right: 1em; white-space: nowrap;";
     const styleInputs = "display: inline; margin-left: -1em;";
-    const styleControls = "float: right; margin: 0.5em;";
+    const styleControls = "float: right; margin: 0.5em; opacity:0";
+    const mouseOver = "onmouseover='this.style.opacity=1'";
+    const mouseOut = "onmouseout='this.style.opacity=0'";
 
     styleLegendTitle += (o?.type === "chart")? "font-size: 1.5em;" : "font-size: 1.2em;";
 
@@ -6435,7 +6449,7 @@ class Legends {
       <div id="${o.id}" class="legend" style="${styleLegend}">
         <span class="title" style="${styleLegendTitle}">${o.title}</span>
         <dl style="${styleInputs}">${this.buildInputs(o)}</dl>
-        <div class="controls" style="${styleControls}">${this.buildControls(o)}</div>
+        <div class="controls" style="${styleControls}" ${mouseOver} ${mouseOut}>${this.buildControls(o)}</div>
       </div>
     `;
     return node
@@ -7190,6 +7204,7 @@ var stateMachineConfig$3 = {
 
 const STYLE_CHART = ""; // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
 const STYLE_SCALE$2 = "position: absolute; top: 0; right: 0; border-left: 1px solid;";
+const STYLE_SCALE2$1 = "top: 0; right: 0; border-left: 1px solid;";
 class Chart {
 
   #name = "Chart"
@@ -7249,6 +7264,7 @@ class Chart {
 
     this.#mediator = mediator;
     this.#elChart = mediator.api.elements.elChart;
+    this.#elScale = mediator.api.elements.elChartScale;
     this.#parent = {...this.#mediator.api.parent};
     this.#core = this.#mediator.api.core;
     this.#onChart = this.#mediator.api.onChart;
@@ -7485,7 +7501,8 @@ class Chart {
     // this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .viewport`);
     this.#elLegends = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .legends`);
-    this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`);
+    // this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`)
+    // this.#elScale  = DOM.findBySelector(`#${api.id} .${CLASS_YAXIS} .${CLASS_CHART} .${CLASS_ROW}`)
   }
 
   props() {
@@ -7565,6 +7582,7 @@ class Chart {
       <div class="legends" style="${styleLegend}"></div>
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `;
+    this.#elScale.style.cssText = STYLE_SCALE2$1 + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`;
     return node
   }
 
@@ -7785,6 +7803,11 @@ class Chart {
 
   drawStream(candle) {
 
+  }
+  
+  refresh() {
+    this.#Scale.draw();
+    this.draw(this.range, true);
   }
 
   time2XPos(time) {
@@ -8062,6 +8085,7 @@ var stateMachineConfig$2 = {
 
 const STYLE_OFFCHART = ""; // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
 const STYLE_SCALE$1 = "position: absolute; top: 0; right: 0; border-left: 1px solid;";
+const STYLE_SCALE2 = "top: 0; right: 0; border-left: 1px solid;";
 
 class OffChart {
 
@@ -8114,6 +8138,7 @@ class OffChart {
 
     this.#mediator = mediator;
     this.#elOffChart = mediator.api.elements.elOffChart;
+    this.#elScale = mediator.api.elements.elScale;
     this.#parent = {...this.mediator.api.parent};
     this.#overlay = options.offChart;
     this.#core = this.mediator.api.core;
@@ -8202,7 +8227,6 @@ class OffChart {
     // Y Axis - Price Scale
     this.#Scale.on("started",(data)=>{this.log(`OffChart scale started: ${data}`);});
     this.#Scale.start("OffChart",this.name,"yAxis Scale started");
-
     // add divider to allow manual resize of the offChart indicator
     const config = { offChart: this };
     this.#Divider = this.widgets.insert("Divider", config);
@@ -8325,7 +8349,8 @@ class OffChart {
     // this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elViewport = DOM.findBySelector(`#${this.#ID} .viewport`);
     this.#elLegends = DOM.findBySelector(`#${this.#ID} .legends`);
-    this.#elScale = DOM.findBySelector(`#${this.#ID} .${CLASS_SCALE}`);
+    // this.#elScale = DOM.findBySelector(`#${this.#ID} .${CLASS_SCALE}`)
+    // this.#elScale2.style.cssText = this.#elScale.style.cssText
   }
 
   props() {
@@ -8393,6 +8418,7 @@ class OffChart {
       <div class="legends" style="${styleLegend}"></div>
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `;
+    this.#elScale.style.cssText = STYLE_SCALE2 + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`;
     return node
   }
 
@@ -8499,6 +8525,11 @@ class OffChart {
     this.#viewport.render();
   }
 
+  refresh() {
+    this.draw();
+    this.#Scale.draw();
+  }
+
   updateLegends(pos=this.#cursorPos) {
     const legends = this.#Legends.list;
     const index = this.#Time.xPos2Index(pos[0]);
@@ -8564,6 +8595,12 @@ var stateMachineConfig$1 = {
             // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
           },
         },
+        chart_scrollto: {
+          target: 'chart_scrollto',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
+          },
+        },
         addIndicator: {
           target: 'addIndicator',
           action (data) {
@@ -8622,6 +8659,23 @@ var stateMachineConfig$1 = {
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
             this.context.origin.zoomRange(data); 
+          },
+        },
+      }
+    },
+    chart_scrollto: {
+      onEnter (data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+      },
+      onExit (data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+      },
+      on: {
+        always: {
+          target: 'idle',
+          action (data) {
+            console.log(`${this.id}: transition from "${this.state}" to "idle"`);
+            this.context.origin.updateRange(data); 
           },
         },
       }
@@ -8761,11 +8815,14 @@ class MainPane {
   #options
   #parent
   #core
+  #elYAxis
   #elMain
   #elRows
   #elTime
   #elChart
+  #elChartScale
   #elOffCharts = []
+  #elYAxisScales = []
   #elGrid
   #elCanvas
   #elViewport
@@ -8792,9 +8849,10 @@ class MainPane {
 
     this.#mediator = mediator;
     this.#options = options;
-    this.#elMain = mediator.api.elements.elMain;
     this.#parent = {...this.#mediator.api.parent};
     this.#core = this.#mediator.api.core;
+    this.#elMain = this.#core.elMain;
+    this.#elYAxis = this.#core.elYAxis;
     this.init(options);
   }
 
@@ -8808,6 +8866,7 @@ class MainPane {
   get mediator() { return this.#mediator }
   get chart() { return this.#Chart }
   get time() { return this.#Time }
+  get offCharts() { return this.#OffCharts }
   get options() { return this.#options }
   get width() { return this.#elMain.clientWidth }
   get height() { return this.#elMain.clientHeight }
@@ -8841,6 +8900,7 @@ class MainPane {
     this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`);
     this.#elGrid = DOM.findBySelector(`#${api.id} .${CLASS_GRID}`);
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_GRID} .viewport`);
+    this.#elChartScale  = DOM.findBySelector(`#${api.id} .${CLASS_YAXIS} .${CLASS_CHART}`);
 
     api.parent = this;
     api.chartData = this.mediator.api.chartData;
@@ -8856,7 +8916,8 @@ class MainPane {
           elChart: this.#elChart,
           elTime: this.#elTime,
           elRows: this.#elRows,
-          elOffCharts: this.#elOffCharts
+          elOffCharts: this.#elOffCharts,
+          elChartScale: this.#elChartScale
         }
       };
 
@@ -9148,7 +9209,11 @@ class MainPane {
     this.#elRows.lastElementChild.insertAdjacentHTML("afterend", this.rowNode(offChart.type));
     this.#elOffCharts.push(this.#elRows.lastElementChild);
 
+    this.#elYAxis.lastElementChild.insertAdjacentHTML("afterend", this.scaleNode(offChart.type));
+    this.#elYAxisScales.push(this.#elYAxis.lastElementChild);
+
     api.elements.elOffChart = this.#elRows.lastElementChild;
+    api.elements.elScale = this.#elYAxis.lastElementChild;
     options.offChart = offChart;
 
     let o = this.#mediator.register("OffChart", OffChart, options, api);
@@ -9200,6 +9265,9 @@ class MainPane {
                       <div class="viewport" style="${styleGrid}"></div>
                   </div>`;
           node += this.rowNode(CLASS_CHART);
+
+    this.#elYAxis.innerHTML = this.scaleNode(CLASS_CHART);
+    
     return node
   }
 
@@ -9211,7 +9279,22 @@ class MainPane {
     const node = `
       <div class="${CLASS_ROW} ${type}" style="${styleRow}">
         <canvas><canvas/>
-        <div class="${styleScale}">
+        <div style="${styleScale}">
+          <canvas id=""><canvas/>
+        </div>
+      </div>
+    `;
+    return node
+  }
+
+  scaleNode(type) {
+    const api = this.#mediator.api;
+    const styleRow = STYLE_ROW + ` border-top: 1px solid ${api.chartBorderColour};`;
+    const styleScale = STYLE_SCALE + ` border-color: ${api.chartBorderColour};`;
+
+    const node = `
+      <div class="${CLASS_ROW} ${type}" style="${styleRow}">
+        <div style="${styleScale}">
           <canvas id=""><canvas/>
         </div>
       </div>
@@ -10367,35 +10450,69 @@ class Range {
 
   data
   // dataLength
-  #interval
-  #intervalStr
-  indexStart
-  indexEnd
+  #interval = DEFAULT_TIMEFRAMEMS
+  #intervalStr = "1s"
+  indexStart = 0
+  indexEnd = LIMITFUTURE
+  priceMin = 0
+  priceMax = 0
+  volumeMin = 0
+  volumeMax = 0
   limitFuture = LIMITFUTURE
   limitPast = LIMITPAST
   minCandles = MINCANDLES
   yAxisBounds = YAXIS_BOUNDS
+  rangeLimit = LIMITFUTURE
+  anchor
+  #rangeMode = "automatic"
+  #yRangeManual = {
+    max: 1,
+    min: 0,
+    factor: 1
+  }
 
   constructor( allData, start=0, end=allData.data.length-1, config={}) {
-    if (!isObject(allData) || 
-        !isObject(config)) return false
+    if (!isObject(allData)) return false
+    if (!isObject(config)) return false
 
     this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE;
     this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST;
     this.minCandles = (isNumber(this.config?.limitCandles)) ? this.config.limitCandles : MINCANDLES;
     this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS;
 
+    const tf = config?.interval || DEFAULT_TIMEFRAMEMS;
+
+    if (allData.data.length == 0) {
+      let ts = Date.now();
+      start = 0;
+      end = this.rangeLimit;
+      this.#interval = tf;
+      this.#intervalStr = ms2Interval(this.interval);
+      this.anchor = ts - (ts % tf); // - (this.limitPast * this.#interval)
+    }  
+    else if (allData.data.length < 2) {
+      this.#interval = tf;
+      this.#intervalStr = ms2Interval(this.interval);
+    }
+    else if (end == 0 && allData.data.length >= this.rangeLimit)
+      end = this.rangeLimit;
+    else if (end == 0)
+      end = allData.data.length;
+
+    
     for (let data in allData) {
       this[data] = allData[data];
     }
 
     if (!this.set(start, end)) return false
 
-    this.#interval = detectInterval(this.data);
-    this.#intervalStr = ms2Interval(this.interval);
+    if (allData.data.length > 2) {
+      this.#interval = detectInterval(this.data);
+      this.#intervalStr = ms2Interval(this.interval);
+    }
   }
 
-  get dataLength () { return this.data.length - 1 }
+  get dataLength () { return (this.data.length == 0) ? 0 : this.data.length - 1 }
   get Length () { return this.indexEnd - this.indexStart }
   get timeDuration () { return this.timeFinish - this.timeStart }
   get timeMin () { return this.value(this.indexStart)[0] }
@@ -10407,6 +10524,8 @@ class Range {
   get interval () { return this.#interval }
   set intervalStr (i) { this.#intervalStr = i; }
   get intervalStr () { return this.#intervalStr }
+  set mode (m) { this.setMode(m); }
+  get mode () { return this.#rangeMode }
 
   set (start=0, end=this.dataLength) {
     if (!isNumber(start) || 
@@ -10427,14 +10546,29 @@ class Range {
     this.indexEnd = end;
 
     let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd);
+
+    if (this.#rangeMode = "manual") ;
+
     for (let m in maxMin) {
       this[m] = maxMin[m];
     }
     this.height = this.priceMax - this.priceMin;
     this.volumeHeight = this.volumeMax - this.volumeMin;
-    this.scale = this.Length / this.dataLength;
+    this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1;
 
     return true
+  }
+
+  setMode(m) {
+    if (m == "automatic" || m == "manual") this.#rangeMode = m;
+    if (m == "manual") this.#yRangeManual.factor = 0;
+    this.#yRangeManual.max = this.priceMax;
+    this.#yRangeManual.min = this.priceMin;
+  }
+
+  yFactor(f) {
+    if (!isNumber(f) || this.#rangeMode !== "manual") return false
+    this.#yRangeManual.factor += f * -1;
   }
 
   /**
@@ -10451,7 +10585,12 @@ class Range {
     else {
       const len = this.data.length - 1;
       v = [null, null, null, null, null, null];
-      if (index < 0) {
+
+      if (this.data.length < 1) {
+        v[0] = Date.now() + (this.interval * index);
+        return v
+      }
+      else if (index < 0) {
         v[0] = this.data[0][0] + (this.interval * index);
         return v
       }
@@ -10472,7 +10611,7 @@ class Range {
     if (!isNumber(ts)) return false
     ts = ts - (ts % this.interval);
   
-    let x = this.data[0][0];
+    let x = (this.data.length > 0) ? this.data[0][0] : this.anchor;
     if (ts === x) 
       return 0
     else if (ts < x)
@@ -10510,7 +10649,15 @@ class Range {
    */
   maxMinPriceVol ( data, start=0, end=data.length-1 ) {
 
-    let l = (data.length-1) ? data.length-1 : 0;
+    if (data.length == 0) {
+      return {
+        priceMin: 0,
+        priceMax: 1,
+        volumeMin: 0,
+        volumeMax: 0
+      }
+    }
+    let l = data.length - 1;
     let i = limit(start, 0, l);
     let c = limit(end, 0, l);
 
@@ -10567,24 +10714,24 @@ function detectInterval(ohlcv) {
 }
 
 /**
- * 
+ * Calculate the index for a given time stamp
  * @param {object} time - time object provided by core
- * @param {number} dateStamp 
+ * @param {number} timeStamp 
  * @returns {number}
  */
-function calcTimeIndex(time, dateStamp) {
-  if (!isNumber(dateStamp)) return false
+function calcTimeIndex(time, timeStamp) {
+  if (!isNumber(timeStamp)) return false
 
   let index;
   let timeFrameMS = time.timeFrameMS;
-  dateStamp = dateStamp - (dateStamp % timeFrameMS);
+  timeStamp = timeStamp - (timeStamp % timeFrameMS);
 
-  if (dateStamp === time.range.data[0][0])
+  if (timeStamp === time.range.data[0][0])
     index = 0;
-  else if (dateStamp < time.range.data[0][0]) 
-    index = ((time.range.data[0][0] - dateStamp) / timeFrameMS) * -1;
+  else if (timeStamp < time.range.data[0][0]) 
+    index = ((time.range.data[0][0] - timeStamp) / timeFrameMS) * -1;
   else 
-    index = (dateStamp - time.range.data[0][0]) / timeFrameMS;
+    index = (timeStamp - time.range.data[0][0]) / timeFrameMS;
 
   return index
 }
@@ -10621,6 +10768,7 @@ class State {
   #store
   #dss = {}
   #status = false
+  #isEmpty = true
 
   constructor(state, deepValidate=false, isCrypto=false) {
     // this.#store = new Store()
@@ -10629,10 +10777,12 @@ class State {
     if (isObject(state)) {
       this.#data = this.validateState(state, deepValidate, isCrypto);
       this.#status = "valid";
+      this.#isEmpty = (this.#data.chart?.isEmpty) ? true : false;
     }
     else {
       this.defaultState();
       this.#status = "default";
+      this.#isEmpty = true;
     }
   }
 
@@ -10648,15 +10798,15 @@ class State {
 
   get status() { return this.#status }
   get data() { return this.#data }
+  get isEmpty() { return this.#isEmpty }
 
   validateState(state, deepValidate=false, isCrypto=false) {
 
     if (!('chart' in state)) {
-      state.chart = {
-          type: 'Candles',
-          candleType: "CANDLE_SOLID",
-          data: state.ohlcv || []
-      };
+      state.chart = DEFAULT_STATE.chart;
+      state.chart.data = state?.ohlcv || [];
+      state.chart.settings = state?.settings || state.chart.settings;
+      state.chart.isEmpty = true;
     }
 
     if (deepValidate) 
@@ -10676,15 +10826,15 @@ class State {
       state.chart.tf = ms2Interval(state.chart.tfms);
 
     if (!('onchart' in state)) {
-        state.onchart = [];
+        state.onchart = DEFAULT_STATE.onchart;
     }
 
     if (!('offchart' in state)) {
-        state.offchart = [];
+        state.offchart = DEFAULT_STATE.offchart;
     }
 
     if (!state.chart.settings) {
-        state.chart.settings = {};
+        state.chart.settings = DEFAULT_STATE.chart.settings;
     }
 
     // Remove ohlcv we have Data
@@ -10714,7 +10864,7 @@ class State {
 }
 
 const T = 0, H = 2, L = 3, C = 4, V = 5;
-const empty = [0,0,0,0,0];
+const empty = [null, null, null, null, null];
 
 class Stream {
 
@@ -10821,7 +10971,8 @@ class Stream {
 
   prevCandle() {
     const d = this.#core.allData.data;
-    if (d[d.length - 1][7]) d[d.length - 1].pop();
+    if (d.length > 0 && d[d.length - 1][7]) 
+          d[d.length - 1].pop();
   }
 
   /**
@@ -10841,13 +10992,14 @@ class Stream {
     candle[H] = data.p > candle[H] ? data.p : candle[H];
     candle[L] = data.p < candle[L] ? data.p : candle[L];
     candle[C] = data.p;
-    candle[V] = parseFloat((candle[V] + data.q).toFixed(this.#precision));
+    candle[V] = parseFloat(candle[V] + data.q).toFixed(this.#precision);
 
     // update the last candle in the state data
     this.#candle = candle;
 
     const d = this.#core.allData.data;
-    d[d.length - 1] = this.#candle;
+    const l = (d.length > 0) ? d.length -1 : 0;
+    d[l] = this.#candle;
   }
 
 }
@@ -10891,12 +11043,14 @@ class TradeXchart {
   #elMain
   #elRows
   #elTime
+  #elYAxis
   #elWidgetsG
 
   #inCnt = null
   #modID
   #state = {}
   #userClasses = []
+  #chartIsEmpty = true
   #data
   #range
   #rangeStartTS
@@ -10949,7 +11103,7 @@ class TradeXchart {
   }
 
   logs = false
-  info = false
+  infos = false
   warnings = false
   errors = false
   
@@ -10962,6 +11116,8 @@ class TradeXchart {
   #pricePrecision
   #volumePrecision
 
+  #delayedSetRange = false
+
 
 /**
  * Creates an instance of TradeXchart.
@@ -10972,6 +11128,11 @@ class TradeXchart {
 constructor (mediator, options={}) {
 
     this.oncontextmenu = window.oncontextmenu;
+
+    this.logs = (options?.logs) ? options.logs : false;
+    this.infos = (options?.infos) ? options.infos : false;
+    this.warnings = (options?.warnings) ? options.warnings : false;
+    this.errors = (options?.errors) ? options.errors : false;
 
     let container = options?.container,
         state = options?.state, 
@@ -10985,25 +11146,51 @@ constructor (mediator, options={}) {
         container = DOM.findBySelector(container);
     }
 
-    if (DOM.isElement(container)) {
+    if (!DOM.isElement(container)) 
+      this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`);
+    
+    else {
       this.#el = container;
       this.#mediator = mediator;
       this.#state = State.create(state, deepValidate, isCrypto);
       this.log(`Chart ${this.#id} created with a ${this.#state.status} state`);
       delete(options.state);
 
-      this.#time.timeFrame = this.#state.data.chart.tf; 
-      this.#time.timeFrameMS = this.#state.data.chart.tfms;
+      // time frame
+      let tf = "1s";
+      let ms = SECOND_MS;
+      if (!isObject(options?.stream) && this.#state.data.chart.data.length < 2) {
+        this.warning(`${NAME} has no chart data or streaming provided.`)
+        // has a time frame been provided?
+        ;({tf, ms} = isTimeFrame(options?.timeFrame));
+        this.#time.timeFrame = tf;
+        this.#time.timeFrameMS = ms;
+        this.#chartIsEmpty = true;
+      }
+      // is the chart streaming with an empty chart?
+      else if (isObject(options?.stream) && this.#state.data.chart.data.length < 2) {
+({tf, ms} = isTimeFrame(options?.timeFrame));
+        console.log("tf:",tf,"ms:",ms);
 
+        this.#time.timeFrame = tf;
+        this.#time.timeFrameMS = ms;
+        this.#chartIsEmpty = true;
+        this.#delayedSetRange = true;
+      }
+      // chart has back history and optionally streaming
+      else {
+        this.#time.timeFrame = this.#state.data.chart.tf; 
+        this.#time.timeFrameMS = this.#state.data.chart.tfms;
+        this.#chartIsEmpty = false;
+      }
       this.init(options);
     }
-    else this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`);
   }
 
-  log(l) { this.#mediator.log(l); }
-  info(i) { this.#mediator.info(i); }
-  warning(w) { this.#mediator.warn(w); }
-  error(e) { this.#mediator.error(e); }
+  log(l) { if (this.logs) console.log(l); }
+  info(i) { if (this.info) console.info(i); }
+  warning(w) { if (this.warnings) console.warn(w); }
+  error(e) { if (this.errors) console.error(e); }
 
   get id() { return this.#id }
   get name() { return this.#name }
@@ -11021,6 +11208,7 @@ constructor (mediator, options={}) {
   get elUtils() { return this.#elUtils }
   get elTools() { return this.#elTools }
   get elMain() { return this.#elMain }
+  get elYAxis() { return this.#elYAxis }
   get elWidgetsG() { return this.#elWidgetsG }
 
   get UtilsBar() { return this.#UtilsBar }
@@ -11064,7 +11252,9 @@ constructor (mediator, options={}) {
   get pricePrecision() { return this.#pricePrecision }
   get volumePrecision() { return this.#volumePrecision }
 
+  set stream(stream) { return this.setStream(stream) }
   get stream() { return this.#stream }
+  get isEmtpy() { return this.#chartIsEmpty }
 
 
   /**
@@ -11137,15 +11327,18 @@ constructor (mediator, options={}) {
     }
 
     // set default range
-    this.getRange();
-    // now set user defined (if any) range
-    const rangeStart = calcTimeIndex(this.#time, this.#rangeStartTS);
-    const end = (rangeStart) ? 
-      rangeStart + this.#rangeLimit :
-      this.chartData.length - 1;
-    const start = (rangeStart) ? rangeStart : end - this.#rangeLimit;
-    this.#rangeLimit = end - start;
-    this.setRange(start, end);
+    this.getRange(null, null, {interval: this.#time.timeFrameMS});
+
+    if (this.#range.Length > 1) {
+      // now set user defined (if any) range
+      const rangeStart = calcTimeIndex(this.#time, this.#rangeStartTS);
+      const end = (rangeStart) ? 
+        rangeStart + this.#rangeLimit :
+        this.chartData.length - 1;
+      const start = (rangeStart) ? rangeStart : end - this.#rangeLimit;
+      this.#rangeLimit = end - start;
+      this.setRange(start, end);
+    }
 
     // api - functions / methods, calculated properties provided by this module
     const api = {
@@ -11217,7 +11410,10 @@ constructor (mediator, options={}) {
     this.MainPane.start();
     this.WidgetsG.start();
 
-    if (isObject(this.#config.stream)) this.#stream = new Stream(this);
+    this.stream = this.#config.stream;
+
+    if (this.#delayedSetRange) 
+      this.on(STREAM_UPDATE, this.delayedSetRange.bind(this));
   }
 
   /**
@@ -11290,6 +11486,7 @@ constructor (mediator, options={}) {
     this.#elBody = DOM.findBySelector(`#${this.id} .${CLASS_BODY}`);
     this.#elTools = DOM.findBySelector(`#${this.id} .${CLASS_TOOLS}`);
     this.#elMain  = DOM.findBySelector(`#${this.id} .${CLASS_MAIN}`);
+    this.#elYAxis  = DOM.findBySelector(`#${this.id} .${CLASS_YAXIS}`);
     this.#elRows  = DOM.findBySelector(`#${this.id} .${CLASS_ROWS}`);
     this.#elTime  = DOM.findBySelector(`#${this.id} .${CLASS_TIME}`);
     this.#elWidgetsG = DOM.findBySelector(`#${this.id} .${CLASS_WIDGETSG}`);
@@ -11442,6 +11639,39 @@ constructor (mediator, options={}) {
     }
   }
 
+  setStream(stream) {
+    if (this.stream?.constructor.name == "Stream") {
+      this.error("Error: Invoke stopStream() before starting a new one.");
+      return false
+    }
+    else if (isObject(stream)) {
+      if (this.allData.data.length == 0 && isString(stream.timeFrame)) {
+({tf, ms} = isTimeFrame(stream?.timeFrame));
+        this.#time.timeFrame = tf;
+        this.#time.timeFrameMS = ms;
+      }
+      this.#stream = new Stream(this);
+      return this.#stream
+    }
+  }
+
+  stopStream() {
+    if (this.stream.constructor.name == "Stream") {
+      this.stream.stop();
+    }
+  }
+
+  delayedSetRange() {
+    while (this.#delayedSetRange) {
+      let r = this.range;
+      let l = Math.floor((r.indexEnd - r.indexStart) / 2);
+      this.setRange(l * -1, l);
+      this.off(STREAM_UPDATE, this.delayedSetRange);
+      this.#delayedSetRange = false;
+      this.refresh();
+    }
+  }
+
   defaultNode() {
 
     const classesTXChart = CLASS_DEFAULT+" "+this.#userClasses; 
@@ -11459,7 +11689,7 @@ constructor (mediator, options={}) {
         <div class="${CLASS_BODY}" style="${styleBody}">
           <div class="${CLASS_TOOLS}" style="${styleTools}"></div>
           <div class="${CLASS_MAIN}" style="${styleMain}"></div>
-          <div style="${styleScale}"></div>
+          <div class="${CLASS_YAXIS}" style="${styleScale}"></div>
         </div>
         <div class="${CLASS_WIDGETSG}" style="${styleWidgets}"></div>
       </div>
@@ -11510,7 +11740,8 @@ constructor (mediator, options={}) {
    * @param {number} start - index
    * @param {number} end - index
    */
-  getRange(start=0, end=this.rangeLimit, config={}) {
+  // TODO: config from where?
+  getRange(start=0, end=0, config={}) {
     this.#range = new Range(this.allData, start, end, config);
     this.#range.interval = this.#time.timeFrameMS;
     this.#range.intervalStr = this.#time.timeFrame;
@@ -11534,6 +11765,8 @@ constructor (mediator, options={}) {
    * @param {object} merge - merge data must be formatted to a Chart State
    * @param {boolean|object} newRange - false | {start: number, end: number}
    */
+  // TODO: merge indicator data?
+  // TODO: merge dataset?
   mergeData(merge, newRange=false) {
     if (!isObject(merge)) return false
 
@@ -11546,7 +11779,7 @@ constructor (mediator, options={}) {
       i = mData.length - 1;
       j = data.length - 1;
 
-      if (data.length == 0) this.allData.data = mData;
+      if (data.length == 0) this.allData.data.push(...mData);
       else {
         const r1 = [data[0][0], data[j][0]];
         const r2 = [mData[0][0], mData[i][0]];
@@ -11587,6 +11820,16 @@ constructor (mediator, options={}) {
 
     this.setDimensions(width, height);
     return true
+  }
+
+  refresh() {
+    this.MainPane.draw();
+    this.Chart.refresh();
+    const offCharts = this.MainPane.offCharts;
+    offCharts.forEach((offChart, key) => {
+      offChart.refresh();
+    });
+    // TODO: drawing tools
   }
 
   notImplemented() {

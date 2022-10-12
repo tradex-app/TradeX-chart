@@ -103,6 +103,7 @@ export default class MainPane {
   get mediator() { return this.#mediator }
   get chart() { return this.#Chart }
   get time() { return this.#Time }
+  get offCharts() { return this.#OffCharts }
   get options() { return this.#options }
   get width() { return this.#elMain.clientWidth }
   get height() { return this.#elMain.clientHeight }

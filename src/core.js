@@ -43,7 +43,7 @@ import {
   STREAM_UPDATE
 } from './definitions/core'
 
-import { YAXIS_BOUNDS } from "./definitions/chart"
+import { MINCANDLES, YAXIS_BOUNDS } from "./definitions/chart"
 
 import { GlobalStyle } from './definitions/style'
 import { precision } from "./utils/number"
@@ -158,6 +158,8 @@ export default class TradeXchart {
   #pricePrecision
   #volumePrecision
 
+  #delayedSetRange = false
+
 
 /**
  * Creates an instance of TradeXchart.
@@ -216,6 +218,7 @@ constructor (mediator, options={}) {
         this.#time.timeFrame = tf
         this.#time.timeFrameMS = ms
         this.#chartIsEmpty = true
+        this.#delayedSetRange = true
       }
       // chart has back history and optionally streaming
       else {
@@ -451,6 +454,9 @@ constructor (mediator, options={}) {
     this.WidgetsG.start()
 
     this.stream = this.#config.stream
+
+    if (this.#delayedSetRange) 
+      this.on(STREAM_UPDATE, this.delayedSetRange.bind(this))
   }
 
   /**
@@ -698,6 +704,17 @@ constructor (mediator, options={}) {
     }
   }
 
+  delayedSetRange() {
+    while (this.#delayedSetRange) {
+      let r = this.range
+      let l = Math.floor((r.indexEnd - r.indexStart) / 2)
+      this.setRange(l * -1, l)
+      this.off(STREAM_UPDATE, this.delayedSetRange)
+      this.#delayedSetRange = false
+      this.refresh()
+    }
+  }
+
   defaultNode() {
 
     const classesTXChart = CLASS_DEFAULT+" "+this.#userClasses 
@@ -848,6 +865,16 @@ constructor (mediator, options={}) {
 
     this.setDimensions(width, height)
     return true
+  }
+
+  refresh() {
+    this.MainPane.draw()
+    this.Chart.refresh()
+    const offCharts = this.MainPane.offCharts
+    offCharts.forEach((offChart, key) => {
+      offChart.refresh()
+    })
+    // TODO: drawing tools
   }
 
   notImplemented() {

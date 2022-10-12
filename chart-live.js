@@ -2,8 +2,8 @@ import { Chart, DOM } from './src'
 // import './chart-live.css'
 
 // let state = undefined
-// import state from './data/1hour.json'
-import state from './data/1minute.json'
+import state from './data/1hour.json'
+// import state from './data/1minute.json'
 // import state from './data/seconds.json'
 // import state from './data/seconds-indicator'
 

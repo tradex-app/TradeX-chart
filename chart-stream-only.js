@@ -51,6 +51,7 @@ let streamInit = false
 
 DOM.findBySelector('#app').innerHTML = `
 <h2>Stream Only</h2>
+<p>Start streaming live price data with an empty chart.</p>
 <button type="button" onclick="window.chart.resize(600, 500)">Resize Chart</button>
 <div>
   <div id="test" style="float:left;"></div>

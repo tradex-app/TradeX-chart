@@ -485,6 +485,11 @@ export default class OffChart {
     this.#viewport.render();
   }
 
+  refresh() {
+    this.draw()
+    this.#Scale.draw()
+  }
+
   updateLegends(pos=this.#cursorPos) {
     const legends = this.#Legends.list
     const index = this.#Time.xPos2Index(pos[0])

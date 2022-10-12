@@ -658,6 +658,11 @@ export default class Chart {
   drawStream(candle) {
 
   }
+  
+  refresh() {
+    this.#Scale.draw()
+    this.draw(this.range, true)
+  }
 
   time2XPos(time) {
     return this.#Time.xPos(time)

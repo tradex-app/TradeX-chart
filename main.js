@@ -16,6 +16,7 @@ I'm interested in constructive feedback (testing) or contributions.<br/>
     <button type="button" onclick="window.demo.src='chart-live.html'">History + Stream</button><br/>
     <button type="button" onclick="window.demo.src='chart-stream-only.html'">Stream Only</button><br/>
     <button type="button" onclick="window.demo.src='chart-static.html'">Static Chart</button><br/>
+    <button type="button" onclick="window.demo.src='chart-qq.html'">qq</button><br/>
   </div>
   <div id="stage">
     <iframe id="demo" src="chart-live.html" height=""></iframe>
