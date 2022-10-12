@@ -2,8 +2,8 @@ import { Chart, DOM } from './src'
 // import './chart-live.css'
 
 // let state = undefined
-import state from './data/1hour.json'
-// import state from './data/1minute.json'
+// import state from './data/1hour.json'
+import state from './data/data_btc_1m.js'
 // import state from './data/seconds.json'
 // import state from './data/seconds-indicator'
 
@@ -149,9 +149,9 @@ function stream() {
   let percent = getRandomInt(0, 1)
   let factor2 = getRandomInt(0, 10) % 2
   let sign = (Math.floor(factor2) === 1) ? 1 : -1
-  let price = candle[4] + (candle[4] * (percent / 400 * sign))
+  let price = candle[4] + (candle[4] * (percent / 3000 * sign))
       time += interval
-  let quantity = candle[5] * (factor2 / 400)
+  let quantity = candle[5] * (factor2 / 500)
   let tick = {t: time, p: price, q: quantity}
 
   chart.stream.onTick(tick)

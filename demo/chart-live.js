@@ -2,8 +2,8 @@ import { Chart, DOM } from './tradex-chart.es.js'
 // import './chart-live.css'
 
 // let state = undefined
-import state from './data/1hour.js'
-// import state from './data/1minute.json'
+// import state from './data/1hour.js'
+import state from './data/data_btc_1m.js'
 // import state from './data/seconds.json'
 // import state from './data/seconds-indicator'
 
