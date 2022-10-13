@@ -11,9 +11,10 @@ import WidgetsG from './components/widgets'
 
 import State from './state'
 import { Range, calcTimeIndex } from "./helpers/range"
+import Stream from './helpers/stream'
+import WebWorker from "./helpers/webWorkers"
 import Indicators from './definitions/indicators'
 import * as Time from './utils/time'
-import Stream from './helpers/stream'
 import { interval2MS, isTimeFrame, SECOND_MS } from "./utils/time"
 
 
@@ -154,6 +155,7 @@ export default class TradeXchart {
   #smoothScrollOffset = 0
   #panBeginPos = [null, null, null, null]
 
+  #worker
   #stream
   #pricePrecision
   #volumePrecision
@@ -170,6 +172,7 @@ export default class TradeXchart {
 constructor (mediator, options={}) {
 
     this.oncontextmenu = window.oncontextmenu
+    this.#worker = WebWorker
 
     this.logs = (options?.logs) ? options.logs : false
     this.infos = (options?.infos) ? options.infos : false
@@ -297,6 +300,7 @@ constructor (mediator, options={}) {
 
   set stream(stream) { return this.setStream(stream) }
   get stream() { return this.#stream }
+  get worker() { return this.#worker }
   get isEmtpy() { return this.#chartIsEmpty }
 
 
@@ -370,7 +374,7 @@ constructor (mediator, options={}) {
     }
 
     // set default range
-    this.getRange(null, null, {interval: this.#time.timeFrameMS})
+    this.getRange(null, null, {interval: this.#time.timeFrameMS, core: this})
 
     if (this.#range.Length > 1) {
       // now set user defined (if any) range
@@ -783,7 +787,6 @@ constructor (mediator, options={}) {
    * @param {number} start - index
    * @param {number} end - index
    */
-  // TODO: config from where?
   getRange(start=0, end=0, config={}) {
     this.#range = new Range(this.allData, start, end, config)
     this.#range.interval = this.#time.timeFrameMS
