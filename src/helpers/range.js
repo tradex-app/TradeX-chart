@@ -42,7 +42,7 @@ export class Range {
     this.minCandles = (isNumber(this.config?.limitCandles)) ? this.config.limitCandles : MINCANDLES
     this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS
     this.#core = config.core
-    // this.#worker = this.#core.worker.create("range", MaxMinPriceVol, ()=>{}, this.#core)
+    this.#worker = this.#core.worker.create("range", MaxMinPriceVol, undefined, this.#core)
 
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS
 
@@ -95,19 +95,19 @@ export class Range {
     if (!isNumber(start) || 
         !isNumber(end)) return false
 
-    // check and correct start and end argument order
-    if (start > end) [start, end] = [end, start]
-    // minimum range constraint
-    if ((end - start) < this.minCandles) end = start + this.minCandles + 1
+    // // check and correct start and end argument order
+    // if (start > end) [start, end] = [end, start]
+    // // minimum range constraint
+    // if ((end - start) < this.minCandles) end = start + this.minCandles + 1
 
-    // set out of history bounds limits
-    start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
-    end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
-    start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
-    end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
+    // // set out of history bounds limits
+    // start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
+    // end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
+    // start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
+    // end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
   
-    this.indexStart = start
-    this.indexEnd = end
+    // this.indexStart = start
+    // this.indexEnd = end
 
     // let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd, this)
 
@@ -125,22 +125,24 @@ export class Range {
 
     // return true
 
-    this.#worker = this.#core.worker.create("range", MaxMinPriceVol, (response)=>{
-      console.log("worker response:", response)
-      
-      // // check and correct start and end argument order
-      // if (start > end) [start, end] = [end, start]
-      // // minimum range constraint
-      // if ((end - start) < this.minCandles) end = start + this.minCandles + 1
+    this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
 
-      // // set out of history bounds limits
-      // start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
-      // end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
-      // start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
-      // end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
+    this.#worker = this.#core.worker.create("range", MaxMinPriceVol, (response)=>{
+      // console.log("worker response:", response)
+      
+      // check and correct start and end argument order
+      if (start > end) [start, end] = [end, start]
+      // minimum range constraint
+      if ((end - start) < this.minCandles) end = start + this.minCandles + 1
+
+      // set out of history bounds limits
+      start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
+      end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
+      start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
+      end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
     
-      // this.indexStart = start
-      // this.indexEnd = end
+      this.indexStart = start
+      this.indexEnd = end
 
       // maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd, this)
 
@@ -309,8 +311,8 @@ function MaxMinPriceVol () {
   self.onmessage = (input) => {
     let {data, start, end, that} = {...input.data}
 
-    console.log(input)
-    console.log(data, start, end)
+    // console.log(input)
+    // console.log(data, start, end)
 
     start = (typeof start === "number")? start : 0
     end = (typeof end === "number")? end : data.length-1

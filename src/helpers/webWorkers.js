@@ -14,11 +14,15 @@ export default class WebWorker {
   constructor(ID, worker, cb, core) {
     this.#ID = ID
     this.#worker = new Worker(worker)
-    this.#worker.onmessage = cb
+    this.#worker.onmessage = (m) => {
+      cb(m)
+      this.#worker.terminate()
+    }
     this.#worker.onerror = (e) => {}//core.error(e)
   }
 
   get ID() { return this.#ID }
+  get worker() { return this.#worker }
 
   postMessage(m) { this.#worker.postMessage(m) }
   terminate() { this.#worker.terminate() }
@@ -44,7 +48,8 @@ export default class WebWorker {
   static destroy(ID) {
     if (!isString(ID)) return false
 
-    WebWorker.#workers.get(ID).terminate()
+    // console.log(`deleting: ${ID}`)
+    // WebWorker.#workers.get(ID).terminate()
     WebWorker.#workers.delete(ID)
   }
 
