@@ -4,7 +4,7 @@ import { DAY_MS, interval2MS, ms2Interval, WEEK_MS } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
 import { isNumber, isObject } from "../utils/typeChecks"
 import { limit } from "../utils/number"
-import WebWorker from "./webWorkers"
+import WebWorker from "./webWorkers4"
 
 export class Range {
 
@@ -42,7 +42,8 @@ export class Range {
     this.minCandles = (isNumber(this.config?.limitCandles)) ? this.config.limitCandles : MINCANDLES
     this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS
     this.#core = config.core
-    this.#worker = this.#core.worker.create("range", MaxMinPriceVol, undefined, this.#core)
+    // this.#worker = this.#core.worker.create("range", MaxMinPriceVol, undefined, this.#core)
+    // this.#worker = WebWorker.create("range", MaxMinPriceVol2, undefined, this.#core)
 
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS
 
@@ -95,19 +96,19 @@ export class Range {
     if (!isNumber(start) || 
         !isNumber(end)) return false
 
-    // // check and correct start and end argument order
-    // if (start > end) [start, end] = [end, start]
-    // // minimum range constraint
-    // if ((end - start) < this.minCandles) end = start + this.minCandles + 1
+    // check and correct start and end argument order
+    if (start > end) [start, end] = [end, start]
+    // minimum range constraint
+    if ((end - start) < this.minCandles) end = start + this.minCandles + 1
 
-    // // set out of history bounds limits
-    // start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
-    // end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
-    // start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
-    // end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
+    // set out of history bounds limits
+    start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
+    end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
+    start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
+    end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
   
-    // this.indexStart = start
-    // this.indexEnd = end
+    this.indexStart = start
+    this.indexEnd = end
 
     // let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd, this)
 
@@ -125,24 +126,64 @@ export class Range {
 
     // return true
 
-    this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
+    // WebWorker(MaxMinPriceVol, this.data, this.indexStart, this.indexEnd, this)
+
+
+
+    // this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
+    // .then(maxMin => {
+    //   if (this.#rangeMode = "manual") {
+    //     // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
+    //     // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
+    //   }
+  
+    //   for (let m in maxMin) {
+    //     this[m] = maxMin[m]
+    //   }
+    //   this.height = this.priceMax - this.priceMin
+    //   this.volumeHeight = this.volumeMax - this.volumeMin
+    //   this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
+    // })
+
+    // return
+
+
+    // WebWorker(MaxMinPriceVol2, this.data, this.indexStart, this.indexEnd, this)
+    WebWorker(MaxMinPriceVol2, {data: this.data, start: start, end: end, that: this})
+.then(maxMin => {
+  if (this.#rangeMode = "manual") {
+    // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
+    // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
+  }
+
+  for (let m in maxMin) {
+    this[m] = maxMin[m]
+  }
+  this.height = this.priceMax - this.priceMin
+  this.volumeHeight = this.volumeMax - this.volumeMin
+  this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
+})
+.catch(error => console.error('error', error));
+
+return
+
 
     this.#worker = this.#core.worker.create("range", MaxMinPriceVol, (response)=>{
       // console.log("worker response:", response)
       
-      // check and correct start and end argument order
-      if (start > end) [start, end] = [end, start]
-      // minimum range constraint
-      if ((end - start) < this.minCandles) end = start + this.minCandles + 1
+      // // check and correct start and end argument order
+      // if (start > end) [start, end] = [end, start]
+      // // minimum range constraint
+      // if ((end - start) < this.minCandles) end = start + this.minCandles + 1
 
-      // set out of history bounds limits
-      start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
-      end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
-      start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
-      end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
+      // // set out of history bounds limits
+      // start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
+      // end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
+      // start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
+      // end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
     
-      this.indexStart = start
-      this.indexEnd = end
+      // this.indexStart = start
+      // this.indexEnd = end
 
       // maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd, this)
 
@@ -160,7 +201,7 @@ export class Range {
       this.volumeHeight = this.volumeMax - this.volumeMin
       this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
 
-      WebWorker.destroy(this.#worker.ID)
+      this.#core.worker.destroy(this.#worker.ID)
     }, this.#core)
 
     this.#worker.postMessage({data: this.data, start: this.indexStart, end: this.indexEnd, that: this})
@@ -257,7 +298,7 @@ export class Range {
    * @return {object}  
    */
   maxMinPriceVol ( data, start=0, end=data.length-1, that ) {
-
+console.log("maxMinPriceVol()")
     start = (isNumber(start))? start : 0
     end = (isNumber(end))? end : data.length-1
 
@@ -348,6 +389,52 @@ function MaxMinPriceVol () {
       volumeMax: volumeMax
     })
   }
+
+  function limit(val, min, max) {
+    return Math.min(max, Math.max(min, val));
+  }
+}
+
+function MaxMinPriceVol2 (input) {
+
+    let {data, start, end, that} = {...input}
+
+    // console.log(input)
+    // console.log(data, start, end)
+
+    start = (typeof start === "number")? start : 0
+    end = (typeof end === "number")? end : data.length-1
+  
+    if (data.length == 0) {
+      return {
+        priceMin: 0,
+        priceMax: 1,
+        volumeMin: 0,
+        volumeMax: 0
+      }
+    }
+    let l = data.length - 1
+    let i = limit(start, 0, l)
+    let c = limit(end, 0, l)
+  
+    let priceMin  = data[i][3]
+    let priceMax  = data[i][2]
+    let volumeMin = data[i][5]
+    let volumeMax = data[i][5]
+  
+    while(i++ < c) {
+      priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin
+      priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax
+      volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin
+      volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
+    }
+  
+    return {
+      priceMin: priceMin * (1 - that.yAxisBounds),
+      priceMax: priceMax * (1 + that.yAxisBounds),
+      volumeMin: volumeMin,
+      volumeMax: volumeMax
+    }
 
   function limit(val, min, max) {
     return Math.min(max, Math.max(min, val));

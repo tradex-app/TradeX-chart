@@ -772,7 +772,7 @@ constructor (mediator, options={}) {
     }
 
     this.#scrollPos = scrollPos
-    console.log("scrollPos:",this.#scrollPos)
+    // console.log("scrollPos:",this.#scrollPos)
   }
 
   offsetRange(offset) {
