@@ -17,7 +17,7 @@ export default class WebWorker {
 
     constructor (fn) {
       this.#fn = fn
-      self.onmessage = m => this._onmessage(m)
+      self.onmessage = m => this._onmessage(m.data)
     }
 
     _onmessage (m) {
@@ -55,7 +55,7 @@ export default class WebWorker {
     get req() { return `r_${this.#req}` }
 
     onmessage(m) {
-      return (isFunction(this.#cb))? this.#cb(m.data) : result = m.data
+      return (isFunction(this.#cb))? this.#cb(m) : m
     }
 
     onerror(e) {
@@ -68,10 +68,10 @@ export default class WebWorker {
           let r = this.req
           this.#reqList[r] = {resolve, reject}
 
-          this.#worker.postMessage({r, m})
+          this.#worker.postMessage({r: r, data: m})
 
           this.#worker.onmessage = m => {
-            const {r, result} = m
+            const {r, result} = m.data
             if (r in this.#reqList) {
               const {resolve, reject} = this.#reqList[r]
               delete this.#reqList[r]
@@ -104,7 +104,7 @@ export default class WebWorker {
       // is URL path?
     }
     else { return false }
-    
+
     ID = (isString(ID))? uid(ID) : uid("worker")
     WebWorker.#threads.set(ID, new WebWorker.Thread(ID, worker, cb))
     return WebWorker.#threads.get(ID)
@@ -119,11 +119,13 @@ export default class WebWorker {
 }
 
 
-function doSomething() { 
-  // console.log("Do something...")
-  return "I did something."
-}
+// function doSomething(x) { 
+//   return `I did something. ${x}`
+// }
 
-const test = WebWorker.create("WT", doSomething)
-const result = await test.postMessage("bla")
-console.log(result)
+// const test = WebWorker.create("WT", doSomething)
+// // const result = await test.postMessage("bla")
+// // console.log(result)
+
+// test.postMessage("bla")
+// .then(r => console.log(r))
