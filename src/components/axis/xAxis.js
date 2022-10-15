@@ -336,6 +336,10 @@ export default class xAxis extends Axis {
     return grads
   }
 
+  gradsWorker() {
+    
+  }
+
   HM(t) {
     let h = String(get_hour(t)).padStart(2, '0');
     let m = String(get_minute(t)).padStart(2, '0');

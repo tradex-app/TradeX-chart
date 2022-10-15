@@ -155,7 +155,7 @@ export default class TradeXchart {
   #smoothScrollOffset = 0
   #panBeginPos = [null, null, null, null]
 
-  #worker
+  #workers
   #stream
   #pricePrecision
   #volumePrecision
@@ -172,7 +172,7 @@ export default class TradeXchart {
 constructor (mediator, options={}) {
 
     this.oncontextmenu = window.oncontextmenu
-    this.#worker = WebWorker
+    this.#workers = WebWorker
 
     this.logs = (options?.logs) ? options.logs : false
     this.infos = (options?.infos) ? options.infos : false
@@ -300,7 +300,7 @@ constructor (mediator, options={}) {
 
   set stream(stream) { return this.setStream(stream) }
   get stream() { return this.#stream }
-  get worker() { return this.#worker }
+  get worker() { return this.#workers }
   get isEmtpy() { return this.#chartIsEmpty }
 
 
@@ -478,6 +478,7 @@ constructor (mediator, options={}) {
     this.MainPane.end()
     this.WidgetsG.end()
 
+    this.#workers.end()
     this.#state = null
 
     DOM.findByID(this.id).remove

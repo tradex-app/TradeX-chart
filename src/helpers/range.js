@@ -4,7 +4,7 @@ import { DAY_MS, interval2MS, ms2Interval, WEEK_MS } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
 import { isNumber, isObject } from "../utils/typeChecks"
 import { limit } from "../utils/number"
-import WebWorker from "./webWorkers3"
+// import WebWorker from "./webWorkers"
 // import WebWorker from "./webWorkers4"
 
 export class Range {
@@ -44,7 +44,9 @@ export class Range {
     this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS
     this.#core = config.core
     // this.#worker = this.#core.worker.create("range", MaxMinPriceVol, undefined, this.#core)
-    this.#worker = WebWorker.create("range", MaxMinPriceVol2, undefined, this.#core)
+    // this.#worker = WebWorker.create("range", MaxMinPriceVol2, undefined, this.#core)
+    this.#worker = this.#core.worker.create("range", MaxMinPriceVol2, undefined, this.#core)
+
 
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS
 
@@ -92,6 +94,10 @@ export class Range {
   get intervalStr () { return this.#intervalStr }
   set mode (m) { this.setMode(m) }
   get mode () { return this.#rangeMode }
+
+  end() {
+    WebWorker.destroy(this.#worker.ID)
+  }
 
   set (start=0, end=this.dataLength) {
     if (!isNumber(start) || 
@@ -148,6 +154,38 @@ export class Range {
 
     return
 
+    // ;(async() => {
+    //   const maxMin = await this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
+    //   if (this.#rangeMode = "manual") {
+    //     // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
+    //     // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
+    //   }
+  
+    //   for (let m in maxMin) {
+    //     this[m] = maxMin[m]
+    //   }
+    //   this.height = this.priceMax - this.priceMin
+    //   this.volumeHeight = this.volumeMax - this.volumeMin
+    //   this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
+
+    // })()
+    // return
+
+    // const maxMin = await this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
+
+    // if (this.#rangeMode = "manual") {
+    //   // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
+    //   // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
+    // }
+
+    // for (let m in maxMin) {
+    //   this[m] = maxMin[m]
+    // }
+    // this.height = this.priceMax - this.priceMin
+    // this.volumeHeight = this.volumeMax - this.volumeMin
+    // this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
+
+    // return
 
 
 // webWorker4.js
