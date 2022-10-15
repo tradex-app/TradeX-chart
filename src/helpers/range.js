@@ -32,20 +32,30 @@ export class Range {
   }
   #core
   #worker
+  #init = true
 
   constructor( allData, start=0, end=allData.data.length-1, config={}) {
     if (!isObject(allData)) return false
     if (!isObject(config)) return false
     if (!(config?.core?.constructor.name == "TradeXchart")) return false
 
+    this.#init = true
     this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE
     this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST
     this.minCandles = (isNumber(this.config?.limitCandles)) ? this.config.limitCandles : MINCANDLES
     this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS
     this.#core = config.core
-    // this.#worker = this.#core.worker.create("range", MaxMinPriceVol, undefined, this.#core)
-    // this.#worker = WebWorker.create("range", MaxMinPriceVol2, undefined, this.#core)
-    this.#worker = this.#core.worker.create("range", MaxMinPriceVol2, undefined, this.#core)
+
+    const MaxMinPriceVolStr = `
+      self.onmessage = (input) => {
+        let {data, start, end, that} = {...input}
+        let maxMin = maxMinPriceVol(data, start, end, that)
+        self.postMessage (maxMin)
+      }
+      function ${this.maxMinPriceVol.toString()}
+    `
+
+    this.#worker = this.#core.worker.create("range", MaxMinPriceVolStr, undefined, this.#core)
 
 
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS
@@ -117,136 +127,35 @@ export class Range {
     this.indexStart = start
     this.indexEnd = end
 
-    // let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd, this)
+    if (this.#init) {
+      this.#init = false
+      let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd, this)
+      
+      this.setMaxMin(maxMin)
 
-    // if (this.#rangeMode = "manual") {
-    //   // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
-    //   // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
-    // }
+      return true
+    }
 
-    // for (let m in maxMin) {
-    //   this[m] = maxMin[m]
-    // }
-    // this.height = this.priceMax - this.priceMin
-    // this.volumeHeight = this.volumeMax - this.volumeMin
-    // this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
-
-    // return true
-
-    // WebWorker(MaxMinPriceVol, this.data, this.indexStart, this.indexEnd, this)
-
-
-// webWorker3.js
+    // use web worker after init
     this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
     .then(maxMin => {
-      if (this.#rangeMode = "manual") {
-        // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
-        // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
-      }
-  
-      for (let m in maxMin) {
-        this[m] = maxMin[m]
-      }
-      this.height = this.priceMax - this.priceMin
-      this.volumeHeight = this.volumeMax - this.volumeMin
-      this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
+      this.setMaxMin(maxMin)
     })
 
-    return
-
-    // ;(async() => {
-    //   const maxMin = await this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
-    //   if (this.#rangeMode = "manual") {
-    //     // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
-    //     // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
-    //   }
-  
-    //   for (let m in maxMin) {
-    //     this[m] = maxMin[m]
-    //   }
-    //   this.height = this.priceMax - this.priceMin
-    //   this.volumeHeight = this.volumeMax - this.volumeMin
-    //   this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
-
-    // })()
-    // return
-
-    // const maxMin = await this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
-
-    // if (this.#rangeMode = "manual") {
-    //   // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
-    //   // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
-    // }
-
-    // for (let m in maxMin) {
-    //   this[m] = maxMin[m]
-    // }
-    // this.height = this.priceMax - this.priceMin
-    // this.volumeHeight = this.volumeMax - this.volumeMin
-    // this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
-
-    // return
-
-
-// webWorker4.js
-// WebWorker(MaxMinPriceVol2, {data: this.data, start: start, end: end, that: this})
-// .then(maxMin => {
-//   if (this.#rangeMode = "manual") {
-//     // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
-//     // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
-//   }
-
-//   for (let m in maxMin) {
-//     this[m] = maxMin[m]
-//   }
-//   this.height = this.priceMax - this.priceMin
-//   this.volumeHeight = this.volumeMax - this.volumeMin
-//   this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
-// })
-// .catch(error => console.error('error', error));
-
-// return
-
-// webWorker.js
-    this.#worker = this.#core.worker.create("range", MaxMinPriceVol, (response)=>{
-      // console.log("worker response:", response)
-      
-      // // check and correct start and end argument order
-      // if (start > end) [start, end] = [end, start]
-      // // minimum range constraint
-      // if ((end - start) < this.minCandles) end = start + this.minCandles + 1
-
-      // // set out of history bounds limits
-      // start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
-      // end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
-      // start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
-      // end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
-    
-      // this.indexStart = start
-      // this.indexEnd = end
-
-      // maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd, this)
-
-      let maxMin = response.data
-
-      if (this.#rangeMode = "manual") {
-        // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
-        // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
-      }
-
-      for (let m in maxMin) {
-        this[m] = maxMin[m]
-      }
-      this.height = this.priceMax - this.priceMin
-      this.volumeHeight = this.volumeMax - this.volumeMin
-      this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
-
-      this.#core.worker.destroy(this.#worker.ID)
-    }, this.#core)
-
-    this.#worker.postMessage({data: this.data, start: this.indexStart, end: this.indexEnd, that: this})
-
     return true
+  }
+
+  setMaxMin(maxMin) {
+    if (this.#rangeMode = "manual") {
+      // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
+      // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
+    }
+    for (let m in maxMin) {
+      this[m] = maxMin[m]
+    }
+    this.height = this.priceMax - this.priceMin
+    this.volumeHeight = this.volumeMax - this.volumeMin
+    this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
   }
 
   setMode(m) {
@@ -337,10 +246,9 @@ export class Range {
    * @param {number} [end=data.length-1]
    * @return {object}  
    */
-  maxMinPriceVol ( data, start=0, end=data.length-1, that ) {
-console.log("maxMinPriceVol()")
-    start = (isNumber(start))? start : 0
-    end = (isNumber(end))? end : data.length-1
+  maxMinPriceVol ( data, start, end, that ) {
+    start = (typeof start === "number")? start : 0
+    end = (typeof end == "number")? end : data.length-1
 
     if (data.length == 0) {
       return {
@@ -371,6 +279,10 @@ console.log("maxMinPriceVol()")
       priceMax: priceMax * (1 + that.yAxisBounds),
       volumeMin: volumeMin,
       volumeMax: volumeMax
+    }
+
+    function limit(val, min, max) {
+      return Math.min(max, Math.max(min, val));
     }
   }
 
@@ -385,100 +297,6 @@ console.log("maxMinPriceVol()")
     else return false
   }
 } // end class
-
-
-function MaxMinPriceVol () {
-
-  self.onmessage = (input) => {
-    let {data, start, end, that} = {...input.data}
-
-    // console.log(input)
-    // console.log(data, start, end)
-
-    start = (typeof start === "number")? start : 0
-    end = (typeof end === "number")? end : data.length-1
-  
-    if (data.length == 0) {
-      return {
-        priceMin: 0,
-        priceMax: 1,
-        volumeMin: 0,
-        volumeMax: 0
-      }
-    }
-    let l = data.length - 1
-    let i = limit(start, 0, l)
-    let c = limit(end, 0, l)
-  
-    let priceMin  = data[i][3]
-    let priceMax  = data[i][2]
-    let volumeMin = data[i][5]
-    let volumeMax = data[i][5]
-  
-    while(i++ < c) {
-      priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin
-      priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax
-      volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin
-      volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
-    }
-  
-    self.postMessage ({
-      priceMin: priceMin * (1 - that.yAxisBounds),
-      priceMax: priceMax * (1 + that.yAxisBounds),
-      volumeMin: volumeMin,
-      volumeMax: volumeMax
-    })
-  }
-
-  function limit(val, min, max) {
-    return Math.min(max, Math.max(min, val));
-  }
-}
-
-function MaxMinPriceVol2 (input) {
-
-    let {data, start, end, that} = {...input}
-
-
-
-    start = (typeof start === "number")? start : 0
-    end = (typeof end === "number")? end : data.length-1
-  
-    if (data.length == 0) {
-      return {
-        priceMin: 0,
-        priceMax: 1,
-        volumeMin: 0,
-        volumeMax: 0
-      }
-    }
-    let l = data.length - 1
-    let i = limit(start, 0, l)
-    let c = limit(end, 0, l)
-  
-    let priceMin  = data[i][3]
-    let priceMax  = data[i][2]
-    let volumeMin = data[i][5]
-    let volumeMax = data[i][5]
-  
-    while(i++ < c) {
-      priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin
-      priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax
-      volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin
-      volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
-    }
-  
-    return {
-      priceMin: priceMin * (1 - that.yAxisBounds),
-      priceMax: priceMax * (1 + that.yAxisBounds),
-      volumeMin: volumeMin,
-      volumeMax: volumeMax
-    }
-
-  function limit(val, min, max) {
-    return Math.min(max, Math.max(min, val));
-  }
-}
 
 
 export function rangeOnchartValue( range, indicator, index ) {

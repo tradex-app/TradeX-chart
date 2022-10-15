@@ -461,6 +461,8 @@ constructor (mediator, options={}) {
 
     if (this.#delayedSetRange) 
       this.on(STREAM_UPDATE, this.delayedSetRange.bind(this))
+
+    this.refresh()
   }
 
   /**
