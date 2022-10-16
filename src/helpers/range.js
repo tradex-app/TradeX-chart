@@ -57,7 +57,6 @@ export class Range {
 
     this.#worker = this.#core.worker.create("range", MaxMinPriceVolStr, undefined, this.#core)
 
-
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS
 
     if (allData.data.length == 0) {
@@ -76,7 +75,6 @@ export class Range {
       end = this.rangeLimit
     else if (end == 0)
       end = allData.data.length
-
     
     for (let data in allData) {
       this[data] = allData[data]
