@@ -47,14 +47,11 @@ export class Range {
     this.#core = config.core
 
     const MaxMinPriceVolStr = `
-      self.onmessage = (input) => {
-        let {data, start, end, that} = {...input}
-        let maxMin = maxMinPriceVol(data, start, end, that)
-        self.postMessage (maxMin)
-      }
-      function ${this.maxMinPriceVol.toString()}
-    `
-
+    (input) => {
+      return maxMinPriceVol(input)
+    }
+    function ${this.maxMinPriceVol.toString()}
+  `
     this.#worker = this.#core.worker.create("range", MaxMinPriceVolStr, undefined, this.#core)
 
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS
@@ -127,7 +124,7 @@ export class Range {
 
     if (this.#init) {
       this.#init = false
-      let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd, this)
+      let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this})
       
       this.setMaxMin(maxMin)
 
@@ -244,9 +241,12 @@ export class Range {
    * @param {number} [end=data.length-1]
    * @return {object}  
    */
-  maxMinPriceVol ( data, start, end, that ) {
+   maxMinPriceVol ( input ) {
+
+    let {data, start, end, that} = {...input}
+
     start = (typeof start === "number")? start : 0
-    end = (typeof end == "number")? end : data.length-1
+    end = (typeof end === "number")? end : data?.length-1
 
     if (data.length == 0) {
       return {
