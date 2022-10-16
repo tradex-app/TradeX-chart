@@ -395,7 +395,7 @@ export default class Chart {
     // TODO: iterate layersOnChart and setSize()
     // this.#layersOnChart.setSize(layerWidth, height)
     this.#layerCandles.setSize(layerWidth, height)
-    this.#layerStream.setSize(layerWidth, height)
+    if (this.#Stream) this.#layerStream.setSize(layerWidth, height)
     this.#layerCursor.setSize(width, height)
 
     this.setWidth(dim.w)
