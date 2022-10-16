@@ -45,9 +45,14 @@ export class Range {
     this.minCandles = (isNumber(this.config?.limitCandles)) ? this.config.limitCandles : MINCANDLES
     this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS
     this.#core = config.core
-    // this.#worker = this.#core.worker.create("range", MaxMinPriceVol, undefined, this.#core)
-    // this.#worker = WebWorker.create("range", MaxMinPriceVol2, undefined, this.#core)
-    this.#worker = this.#core.worker.create("range", MaxMinPriceVol2, undefined, this.#core)
+
+    const MaxMinPriceVolStr = `
+    (input) => {
+      return maxMinPriceVol(input)
+    }
+    function ${this.maxMinPriceVol.toString()}
+  `
+    this.#worker = this.#core.worker.create("range", MaxMinPriceVolStr, undefined, this.#core)
 
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS
 
@@ -120,7 +125,7 @@ export class Range {
 
     if (this.#init) {
       this.#init = false
-      let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd, this)
+      let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this})
       
       this.setMaxMin(maxMin)
 
@@ -239,9 +244,12 @@ export class Range {
    * @param {number} [end=data.length-1]
    * @return {object}  
    */
-  maxMinPriceVol ( data, start, end, that ) {
+   maxMinPriceVol ( input ) {
+
+    let {data, start, end, that} = {...input}
+
     start = (typeof start === "number")? start : 0
-    end = (typeof end == "number")? end : data.length-1
+    end = (typeof end === "number")? end : data?.length-1
 
     if (data.length == 0) {
       return {
@@ -290,100 +298,6 @@ export class Range {
     else return false
   }
 } // end class
-
-
-function MaxMinPriceVol () {
-
-  self.onmessage = (input) => {
-    let {data, start, end, that} = {...input.data}
-
-    // console.log(input)
-    // console.log(data, start, end)
-
-    start = (typeof start === "number")? start : 0
-    end = (typeof end === "number")? end : data.length-1
-  
-    if (data.length == 0) {
-      return {
-        priceMin: 0,
-        priceMax: 1,
-        volumeMin: 0,
-        volumeMax: 0
-      }
-    }
-    let l = data.length - 1
-    let i = limit(start, 0, l)
-    let c = limit(end, 0, l)
-  
-    let priceMin  = data[i][3]
-    let priceMax  = data[i][2]
-    let volumeMin = data[i][5]
-    let volumeMax = data[i][5]
-  
-    while(i++ < c) {
-      priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin
-      priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax
-      volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin
-      volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
-    }
-  
-    self.postMessage ({
-      priceMin: priceMin * (1 - that.yAxisBounds),
-      priceMax: priceMax * (1 + that.yAxisBounds),
-      volumeMin: volumeMin,
-      volumeMax: volumeMax
-    })
-  }
-
-  function limit(val, min, max) {
-    return Math.min(max, Math.max(min, val));
-  }
-}
-
-function MaxMinPriceVol2 (input) {
-
-    let {data, start, end, that} = {...input}
-
-
-
-    start = (typeof start === "number")? start : 0
-    end = (typeof end === "number")? end : data.length-1
-  
-    if (data.length == 0) {
-      return {
-        priceMin: 0,
-        priceMax: 1,
-        volumeMin: 0,
-        volumeMax: 0
-      }
-    }
-    let l = data.length - 1
-    let i = limit(start, 0, l)
-    let c = limit(end, 0, l)
-  
-    let priceMin  = data[i][3]
-    let priceMax  = data[i][2]
-    let volumeMin = data[i][5]
-    let volumeMax = data[i][5]
-  
-    while(i++ < c) {
-      priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin
-      priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax
-      volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin
-      volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
-    }
-  
-    return {
-      priceMin: priceMin * (1 - that.yAxisBounds),
-      priceMax: priceMax * (1 + that.yAxisBounds),
-      volumeMin: volumeMin,
-      volumeMax: volumeMax
-    }
-
-  function limit(val, min, max) {
-    return Math.min(max, Math.max(min, val));
-  }
-}
 
 
 export function rangeOnchartValue( range, indicator, index ) {
