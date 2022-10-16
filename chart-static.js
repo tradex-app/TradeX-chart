@@ -20,6 +20,8 @@ const config = {
   title: "BTC/USDT",
   width: 1000,
   height: 800,
+  utils: {none: true},
+  tools: {none: true},
   rangeStartTS: 1558429200000, // 21/05/2019, 11:00:00 - 1 hour price
   // rangeStartTS: 1663059600000, // seconds price
   rangeLimit: 30,

@@ -633,6 +633,16 @@ constructor (mediator, options={}) {
     })
   }
 
+  setUtilsH(h) {
+    this.utilsH = h
+    this.#elUtils.style.height = `${h}px`
+  }
+
+  setToolsW(w) {
+    this.toolsW = w
+    this.#elTools.style.width = `${w}px`
+  }
+
   /**
  * Set the price accuracy
  * @param {number} pricePrecision - Price accuracy
@@ -723,6 +733,9 @@ constructor (mediator, options={}) {
   }
 
   defaultNode() {
+
+    if (this.config?.tools?.none) this.toolsW = 0
+    if (this.config?.utils?.none) this.utilsH = 0
 
     const classesTXChart = CLASS_DEFAULT+" "+this.#userClasses 
     const styleTXChart = STYLE_TXCHART + ` height: ${this.height}px; width: ${this.#chartW}px; background: ${this.chartBGColour}; color: ${this.chartTxtColour};`

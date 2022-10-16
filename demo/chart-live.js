@@ -64,6 +64,8 @@ const config = {
   title: "BTC/USDT",
   width: 1000,
   height: 800,
+  utils: {none: true},
+  tools: {none: true},
   timeFrame: "1m",
   rangeStartTS: rangeStartTS,
   rangeLimit: 30,

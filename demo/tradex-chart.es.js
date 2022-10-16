@@ -4446,6 +4446,10 @@ class xAxis extends Axis {
     return grads
   }
 
+  gradsWorker() {
+    
+  }
+
   HM(t) {
     let h = String(get_hour(t)).padStart(2, '0');
     let m = String(get_minute(t)).padStart(2, '0');
@@ -7542,7 +7546,7 @@ class Chart {
     // TODO: iterate layersOnChart and setSize()
     // this.#layersOnChart.setSize(layerWidth, height)
     this.#layerCandles.setSize(layerWidth, height);
-    this.#layerStream.setSize(layerWidth, height);
+    if (this.#Stream) this.#layerStream.setSize(layerWidth, height);
     this.#layerCursor.setSize(width, height);
 
     this.setWidth(dim.w);
@@ -7784,7 +7788,7 @@ class Chart {
     this.#layerCandles.setPosition(this.#core.scrollPos, 0);
     if (this.#layerStream) {
       this.#layerStream.setPosition(this.#core.scrollPos, 0);
-      this.#core.stream.lastScrollPos = this.#core.scrollPos;
+    this.#core.stream.lastScrollPos = this.#core.scrollPos;
     }
 
     if (this.scrollPos == this.bufferPx * -1 || 
@@ -10445,11 +10449,12 @@ function isValidCandle(c, isCrypto=false) {
 }
 
 // range.js
+// import WebWorker from "./webWorkers"
+// import WebWorker from "./webWorkers4"
 
 class Range {
 
   data
-  // dataLength
   #interval = DEFAULT_TIMEFRAMEMS
   #intervalStr = "1s"
   indexStart = 0
@@ -10470,15 +10475,29 @@ class Range {
     min: 0,
     factor: 1
   }
+  #core
+  #worker
+  #init = true
 
   constructor( allData, start=0, end=allData.data.length-1, config={}) {
     if (!isObject(allData)) return false
     if (!isObject(config)) return false
+    if (!(config?.core?.constructor.name == "TradeXchart")) return false
 
+    this.#init = true;
     this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE;
     this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST;
     this.minCandles = (isNumber(this.config?.limitCandles)) ? this.config.limitCandles : MINCANDLES;
     this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS;
+    this.#core = config.core;
+
+    const MaxMinPriceVolStr = `
+    (input) => {
+      return maxMinPriceVol(input)
+    }
+    function ${this.maxMinPriceVol.toString()}
+  `;
+    this.#worker = this.#core.worker.create("range", MaxMinPriceVolStr, undefined, this.#core);
 
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS;
 
@@ -10498,7 +10517,6 @@ class Range {
       end = this.rangeLimit;
     else if (end == 0)
       end = allData.data.length;
-
     
     for (let data in allData) {
       this[data] = allData[data];
@@ -10527,6 +10545,10 @@ class Range {
   set mode (m) { this.setMode(m); }
   get mode () { return this.#rangeMode }
 
+  end() {
+    WebWorker.destroy(this.#worker.ID);
+  }
+
   set (start=0, end=this.dataLength) {
     if (!isNumber(start) || 
         !isNumber(end)) return false
@@ -10545,18 +10567,32 @@ class Range {
     this.indexStart = start;
     this.indexEnd = end;
 
-    let maxMin = this.maxMinPriceVol(this.data, this.indexStart, this.indexEnd);
+    if (this.#init) {
+      this.#init = false;
+      let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this});
+      
+      this.setMaxMin(maxMin);
 
+      return true
+    }
+
+    // use web worker after init
+    this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
+    .then(maxMin => {
+      this.setMaxMin(maxMin);
+    });
+
+    return true
+  }
+
+  setMaxMin(maxMin) {
     if (this.#rangeMode = "manual") ;
-
     for (let m in maxMin) {
       this[m] = maxMin[m];
     }
     this.height = this.priceMax - this.priceMin;
     this.volumeHeight = this.volumeMax - this.volumeMin;
     this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1;
-
-    return true
   }
 
   setMode(m) {
@@ -10647,7 +10683,12 @@ class Range {
    * @param {number} [end=data.length-1]
    * @return {object}  
    */
-  maxMinPriceVol ( data, start=0, end=data.length-1 ) {
+   maxMinPriceVol ( input ) {
+
+    let {data, start, end, that} = {...input};
+
+    start = (typeof start === "number")? start : 0;
+    end = (typeof end === "number")? end : data?.length-1;
 
     if (data.length == 0) {
       return {
@@ -10674,10 +10715,14 @@ class Range {
     }
 
     return {
-      priceMin: priceMin * (1 - this.yAxisBounds),
-      priceMax: priceMax * (1 + this.yAxisBounds),
+      priceMin: priceMin * (1 - that.yAxisBounds),
+      priceMax: priceMax * (1 + that.yAxisBounds),
       volumeMin: volumeMin,
       volumeMax: volumeMax
+    }
+
+    function limit(val, min, max) {
+      return Math.min(max, Math.max(min, val));
     }
   }
 
@@ -11004,6 +11049,138 @@ class Stream {
 
 }
 
+// webWorkers.js
+
+
+class WebWorker$1 {
+
+  static #threads = new Map()
+
+  static ThreadWorker = class ThreadWorker {
+
+    #fn
+
+    constructor (fn) {
+      this.#fn = fn;
+      self.onmessage = m => this._onmessage(m.data);
+    }
+
+    _onmessage (m) {
+      const {r, data} = m;
+      const result = this.#fn(data);
+      self.postMessage({r, result});
+    }
+  }
+
+  static Thread = class Thread {
+
+    #ID
+    #cb
+    #err
+    #req = 0
+    #reqList = {}
+    #worker
+
+    constructor(ID, fn, cb, err) {
+      this.#ID = ID;
+      this.#cb = cb;
+      this.#err = err;
+      const workerFn = `
+        ${WebWorker$1.ThreadWorker.toString()};
+        const fn = ${fn}
+        const worker = new ThreadWorker(fn)
+      `;
+      const blob = new Blob([`;(() => {${workerFn}})()`], { type: 'text/javascript' });
+      const blobURL = URL.createObjectURL(blob);
+      this.#worker = new Worker(blobURL);
+      URL.revokeObjectURL(blobURL);
+    }
+
+    get ID() { return this.#ID }
+    get req() { return `r_${this.#req}` }
+
+    onmessage(m) {
+      return (isFunction(this.#cb))? this.#cb(m) : m
+    }
+
+    onerror(e) {
+      return (isFunction(this.#err))? this.#err(e) : e
+    }
+
+    postMessage(m) {
+      return new Promise((resolve, reject) => {
+        try {
+          let r = this.req;
+          this.#reqList[r] = {resolve, reject};
+
+          this.#worker.postMessage({r: r, data: m});
+
+          this.#worker.onmessage = m => {
+            const {r, result} = m.data;
+            if (r in this.#reqList) {
+              const {resolve, reject} = this.#reqList[r];
+              delete this.#reqList[r];
+              resolve(this.onmessage(result));
+            }
+          };
+
+          this.#worker.onerror = e => {
+            reject(this.onerror(e));
+          };
+
+        } catch (error) { reject(error); }
+      })
+      
+    }
+
+    terminate() {
+      this.#worker.terminate();
+    }
+  }
+
+
+  static create(ID="worker", worker, cb, core) {
+    if (typeof window.Worker === "undefined") return false
+    if (isFunction(worker)) {
+      worker = worker.toString();
+    }
+    else if (isString(worker)) ;
+    else { return false }
+
+    ID = (isString(ID))? uid(ID) : uid("worker");
+    WebWorker$1.#threads.set(ID, new WebWorker$1.Thread(ID, worker, cb));
+    return WebWorker$1.#threads.get(ID)
+  }
+
+  static destroy(ID) {
+    if (!isString(ID)) return false
+
+    WebWorker$1.#threads.get(ID).terminate();
+    WebWorker$1.#threads.delete(ID);
+  }
+
+  /**
+   * destroy all web workers
+   */
+  static end() {
+    WebWorker$1.#threads.forEach( (value, key, map) => {
+      WebWorker$1.destroy(key);
+    });
+  }
+}
+
+// const doSomethingStr = doSomething.toString()
+// function doSomething(x) { 
+//   return `I did something. ${x}`
+// }
+
+// const test = WebWorker.create("WT", doSomethingStr)
+// // const result = await test.postMessage("bla")
+// // console.log(result)
+
+// test.postMessage("bla")
+// .then(r => console.log(r))
+
 // core.js
 
 const STYLE_TXCHART = "overflow: hidden;";
@@ -11112,6 +11289,7 @@ class TradeXchart {
   #smoothScrollOffset = 0
   #panBeginPos = [null, null, null, null]
 
+  #workers
   #stream
   #pricePrecision
   #volumePrecision
@@ -11128,6 +11306,7 @@ class TradeXchart {
 constructor (mediator, options={}) {
 
     this.oncontextmenu = window.oncontextmenu;
+    this.#workers = WebWorker$1;
 
     this.logs = (options?.logs) ? options.logs : false;
     this.infos = (options?.infos) ? options.infos : false;
@@ -11254,6 +11433,7 @@ constructor (mediator, options={}) {
 
   set stream(stream) { return this.setStream(stream) }
   get stream() { return this.#stream }
+  get worker() { return this.#workers }
   get isEmtpy() { return this.#chartIsEmpty }
 
 
@@ -11327,7 +11507,7 @@ constructor (mediator, options={}) {
     }
 
     // set default range
-    this.getRange(null, null, {interval: this.#time.timeFrameMS});
+    this.getRange(null, null, {interval: this.#time.timeFrameMS, core: this});
 
     if (this.#range.Length > 1) {
       // now set user defined (if any) range
@@ -11414,6 +11594,8 @@ constructor (mediator, options={}) {
 
     if (this.#delayedSetRange) 
       this.on(STREAM_UPDATE, this.delayedSetRange.bind(this));
+
+    this.refresh();
   }
 
   /**
@@ -11431,6 +11613,7 @@ constructor (mediator, options={}) {
     this.MainPane.end();
     this.WidgetsG.end();
 
+    this.#workers.end();
     this.#state = null;
 
     DOM.findByID(this.id).remove;
@@ -11583,6 +11766,16 @@ constructor (mediator, options={}) {
     });
   }
 
+  setUtilsH(h) {
+    this.utilsH = h;
+    this.#elUtils.style.height = `${h}px`;
+  }
+
+  setToolsW(w) {
+    this.toolsW = w;
+    this.#elTools.style.width = `${w}px`;
+  }
+
   /**
  * Set the price accuracy
  * @param {number} pricePrecision - Price accuracy
@@ -11674,6 +11867,9 @@ constructor (mediator, options={}) {
 
   defaultNode() {
 
+    if (this.config?.tools?.none) this.toolsW = 0;
+    if (this.config?.utils?.none) this.utilsH = 0;
+
     const classesTXChart = CLASS_DEFAULT+" "+this.#userClasses; 
     const styleTXChart = STYLE_TXCHART + ` height: ${this.height}px; width: ${this.#chartW}px; background: ${this.chartBGColour}; color: ${this.chartTxtColour};`;
     const styleUtils = STYLE_UTILS + ` height: ${this.utilsH}px; width: ${this.#chartW}px; border-color: ${this.chartBorderColour};`;
@@ -11725,7 +11921,7 @@ constructor (mediator, options={}) {
     }
 
     this.#scrollPos = scrollPos;
-    console.log("scrollPos:",this.#scrollPos);
+    // console.log("scrollPos:",this.#scrollPos)
   }
 
   offsetRange(offset) {
@@ -11740,7 +11936,6 @@ constructor (mediator, options={}) {
    * @param {number} start - index
    * @param {number} end - index
    */
-  // TODO: config from where?
   getRange(start=0, end=0, config={}) {
     this.#range = new Range(this.allData, start, end, config);
     this.#range.interval = this.#time.timeFrameMS;
