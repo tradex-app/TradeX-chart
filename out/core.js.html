@@ -38,10 +38,12 @@ import MainPane from './components/main'
 import WidgetsG from './components/widgets'
 
 import State from './state'
-import { getRange, calcTimeIndex } from "./helpers/range"
+import { Range, calcTimeIndex } from "./helpers/range"
+import Stream from './helpers/stream'
+import WebWorker from "./helpers/webWorkers"
 import Indicators from './definitions/indicators'
 import * as Time from './utils/time'
-import Stream from './helpers/stream'
+import { interval2MS, isTimeFrame, SECOND_MS } from "./utils/time"
 
 
 import {
@@ -58,6 +60,7 @@ import {
   CLASS_ROW,
   CLASS_CHART,
   CLASS_SCALE,
+  CLASS_YAXIS,
   CLASS_WIDGETS,
   CLASS_ONCHART,
   CLASS_OFFCHART,
@@ -69,7 +72,7 @@ import {
   STREAM_UPDATE
 } from './definitions/core'
 
-import { YAXIS_BOUNDS } from "./definitions/chart"
+import { MINCANDLES, YAXIS_BOUNDS } from "./definitions/chart"
 
 import { GlobalStyle } from './definitions/style'
 import { precision } from "./utils/number"
@@ -84,6 +87,12 @@ const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;";
 (async () => {
   await talib.init("node_modules/talib-web/lib/talib.wasm")
 })();
+
+/**
+ * The root class for the entire chart
+ * @export
+ * @class TradeXchart
+ */
 export default class TradeXchart {
 
 
@@ -105,12 +114,14 @@ export default class TradeXchart {
   #elMain
   #elRows
   #elTime
+  #elYAxis
   #elWidgetsG
 
   #inCnt = null
   #modID
   #state = {}
   #userClasses = []
+  #chartIsEmpty = true
   #data
   #range
   #rangeStartTS
@@ -129,8 +140,8 @@ export default class TradeXchart {
   chartTxtColour = GlobalStyle.COLOUR_TXT
   chartBorderColour = GlobalStyle.COLOUR_BORDER
 
-  utilsH = 40
-  toolsW = 45
+  utilsH = 35
+  toolsW = 40
   timeH  = 50
   scaleW = 60
 
@@ -163,7 +174,7 @@ export default class TradeXchart {
   }
 
   logs = false
-  info = false
+  infos = false
   warnings = false
   errors = false
   
@@ -172,20 +183,29 @@ export default class TradeXchart {
   #smoothScrollOffset = 0
   #panBeginPos = [null, null, null, null]
 
+  #workers
   #stream
   #pricePrecision
   #volumePrecision
 
+  #delayedSetRange = false
+
 
 /**
  * Creates an instance of TradeXchart.
- * @param {instance} mediator
- * @param {object}[options={}]
+ * @param {instance} mediator - module api
+ * @param {object}[options={}] - chart configuration
  * @memberof TradeXchart
  */
 constructor (mediator, options={}) {
 
-this.oncontextmenu = window.oncontextmenu
+    this.oncontextmenu = window.oncontextmenu
+    this.#workers = WebWorker
+
+    this.logs = (options?.logs) ? options.logs : false
+    this.infos = (options?.infos) ? options.infos : false
+    this.warnings = (options?.warnings) ? options.warnings : false
+    this.errors = (options?.errors) ? options.errors : false
 
     let container = options?.container,
         state = options?.state, 
@@ -199,25 +219,52 @@ this.oncontextmenu = window.oncontextmenu
         container = DOM.findBySelector(container)
     }
 
-    if (DOM.isElement(container)) {
+    if (!DOM.isElement(container)) 
+      this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`)
+    
+    else {
       this.#el = container
       this.#mediator = mediator
       this.#state = State.create(state, deepValidate, isCrypto)
       this.log(`Chart ${this.#id} created with a ${this.#state.status} state`)
       delete(options.state)
 
-      this.#time.timeFrame = this.#state.data.chart.tf 
-      this.#time.timeFrameMS = this.#state.data.chart.tfms
+      // time frame
+      let tf = "1s"
+      let ms = SECOND_MS
+      if (!isObject(options?.stream) &amp;&amp; this.#state.data.chart.data.length &lt; 2) {
+        this.warning(`${NAME} has no chart data or streaming provided.`)
+        // has a time frame been provided?
+        ;({tf, ms} = isTimeFrame(options?.timeFrame))
+        this.#time.timeFrame = tf
+        this.#time.timeFrameMS = ms
+        this.#chartIsEmpty = true
+      }
+      // is the chart streaming with an empty chart?
+      else if (isObject(options?.stream) &amp;&amp; this.#state.data.chart.data.length &lt; 2) {
+        // has a time frame been provided?
+        ;({tf, ms} = isTimeFrame(options?.timeFrame))
+        console.log("tf:",tf,"ms:",ms)
 
+        this.#time.timeFrame = tf
+        this.#time.timeFrameMS = ms
+        this.#chartIsEmpty = true
+        this.#delayedSetRange = true
+      }
+      // chart has back history and optionally streaming
+      else {
+        this.#time.timeFrame = this.#state.data.chart.tf 
+        this.#time.timeFrameMS = this.#state.data.chart.tfms
+        this.#chartIsEmpty = false
+      }
       this.init(options)
     }
-    else this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`)
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { if (this.logs) console.log(l) }
+  info(i) { if (this.info) console.info(i) }
+  warning(w) { if (this.warnings) console.warn(w) }
+  error(e) { if (this.errors) console.error(e) }
 
   get id() { return this.#id }
   get name() { return this.#name }
@@ -234,9 +281,8 @@ this.oncontextmenu = window.oncontextmenu
 
   get elUtils() { return this.#elUtils }
   get elTools() { return this.#elTools }
-  // get elTime() { return this.#elTime }
   get elMain() { return this.#elMain }
-  // get elChart() { return this.#elChart }
+  get elYAxis() { return this.#elYAxis }
   get elWidgetsG() { return this.#elWidgetsG }
 
   get UtilsBar() { return this.#UtilsBar }
@@ -280,16 +326,19 @@ this.oncontextmenu = window.oncontextmenu
   get pricePrecision() { return this.#pricePrecision }
   get volumePrecision() { return this.#volumePrecision }
 
+  set stream(stream) { return this.setStream(stream) }
   get stream() { return this.#stream }
+  get worker() { return this.#workers }
+  get isEmtpy() { return this.#chartIsEmpty }
 
 
   /**
    * Create a new TradeXchart instance
    *
    * @static
-   * @param {DOM_element} container
-   * @param {object}[config={}]
-   * @param {object}state
+   * @param {DOM_element} container - HTML element to mount the chart on
+   * @param {object} [config={}] - chart config
+   * @param {object} state - chart state
    * @return {instance}  
    * @memberof TradeXchart
    */
@@ -299,6 +348,7 @@ this.oncontextmenu = window.oncontextmenu
     config.cnt = cnt
     config.modID = `${ID}_${cnt}`
     config.container = container
+    config.CPUCores = navigator.hardwareConcurrency
 
     const core = new SX.Core(config)
 
@@ -314,16 +364,24 @@ this.oncontextmenu = window.oncontextmenu
     return instance
   }
 
+  /**
+   * Destroy a chart instance, clean up and remove data
+   * @static
+   * @param {instance} chart 
+   * @memberof TradeXchart
+   */
   static destroy(chart) {
     if (chart.constructor.name === "TradeXchart") {
+      chart.end()
       const inCnt = chart.inCnt;
       delete TradeXchart.#instances[inCnt];
     }
   }
 
   /**
-   * Target element has been validated as a mount point
+   * Target element has been validated as a mount point, 
    * let's start building
+   * @param {object} config - chart configuration
    */
   init(config) {
     this.#config = config
@@ -345,15 +403,18 @@ this.oncontextmenu = window.oncontextmenu
     }
 
     // set default range
-    this.setRange()
-    // now set user defined (if any) range
-    const rangeStart = calcTimeIndex(this.#time, this.#rangeStartTS)
-    const end = (rangeStart) ? 
-      rangeStart + this.#rangeLimit :
-      this.chartData.length - 1
-    const start = (rangeStart) ? rangeStart : end - this.#rangeLimit
-    this.#rangeLimit = end - start
-    this.setRange(start, end)
+    this.getRange(null, null, {interval: this.#time.timeFrameMS, core: this})
+
+    if (this.#range.Length > 1) {
+      // now set user defined (if any) range
+      const rangeStart = calcTimeIndex(this.#time, this.#rangeStartTS)
+      const end = (rangeStart) ? 
+        rangeStart + this.#rangeLimit :
+        this.chartData.length - 1
+      const start = (rangeStart) ? rangeStart : end - this.#rangeLimit
+      this.#rangeLimit = end - start
+      this.setRange(start, end)
+    }
 
     // api - functions / methods, calculated properties provided by this module
     const api = {
@@ -410,6 +471,9 @@ this.oncontextmenu = window.oncontextmenu
     this.log(`${this.#name} instantiated`)
   }
 
+  /**
+   * Start the chart processing events and displaying data
+   */
   start() {
     this.log("...processing state")
 
@@ -422,14 +486,33 @@ this.oncontextmenu = window.oncontextmenu
     this.MainPane.start()
     this.WidgetsG.start()
 
-    if (isObject(this.#config.stream)) this.#stream = new Stream(this)
+    this.stream = this.#config.stream
+
+    if (this.#delayedSetRange) 
+      this.on(STREAM_UPDATE, this.delayedSetRange.bind(this))
+
+    this.refresh()
   }
 
+  /**
+   * Stop all chart event processing and remove the chart from DOM.
+   * In other words, destroy the chart.
+   */
   end() {
     this.log("...cleanup the mess")
     this.#elTXChart.removeEventListener('mousemove', this.onMouseMove)
 
     this.off(STREAM_UPDATE, this.onStreamUpdate)
+
+    this.UtilsBar.end()
+    this.ToolsBar.end()
+    this.MainPane.end()
+    this.WidgetsG.end()
+
+    this.#workers.end()
+    this.#state = null
+
+    DOM.findByID(this.id).remove
   }
 
   eventsListen() {
@@ -482,6 +565,7 @@ this.oncontextmenu = window.oncontextmenu
     this.#elBody = DOM.findBySelector(`#${this.id} .${CLASS_BODY}`)
     this.#elTools = DOM.findBySelector(`#${this.id} .${CLASS_TOOLS}`)
     this.#elMain  = DOM.findBySelector(`#${this.id} .${CLASS_MAIN}`)
+    this.#elYAxis  = DOM.findBySelector(`#${this.id} .${CLASS_YAXIS}`)
     this.#elRows  = DOM.findBySelector(`#${this.id} .${CLASS_ROWS}`)
     this.#elTime  = DOM.findBySelector(`#${this.id} .${CLASS_TIME}`)
     this.#elWidgetsG = DOM.findBySelector(`#${this.id} .${CLASS_WIDGETSG}`)
@@ -496,15 +580,6 @@ this.oncontextmenu = window.oncontextmenu
       elTime: this.#elTime,
       elWidgetsG: this.#elWidgetsG
     }
-  }
-
-  unmount() {
-    this.cleanup()
-  }
-
-  cleanup() {
-    // remove all event listeners
-    // destroy all objects
   }
 
   props() {
@@ -541,7 +616,6 @@ this.oncontextmenu = window.oncontextmenu
 
   getModID() { return this.#modID }
 
-
   setWidth(w) {
     if (isNumber(w))
       this.#chartW = w
@@ -565,6 +639,11 @@ this.oncontextmenu = window.oncontextmenu
     this.#elMain.style.height= `${this.#chartH - this.utilsH}px`
   }
 
+  /**
+   * Set chart width and height
+   * @param {number} w - width in pixels
+   * @param {number} h - height in pixels
+   */
   setDimensions(w, h) {
     let width = this.width
     let height = this.height
@@ -583,28 +662,42 @@ this.oncontextmenu = window.oncontextmenu
     })
   }
 
-    /**
-   * Set the price accuracy
-   * @param pricePrecision - Price accuracy
+  setUtilsH(h) {
+    this.utilsH = h
+    this.#elUtils.style.height = `${h}px`
+  }
+
+  setToolsW(w) {
+    this.toolsW = w
+    this.#elTools.style.width = `${w}px`
+  }
+
+  /**
+ * Set the price accuracy
+ * @param {number} pricePrecision - Price accuracy
+ */
+    setPricePrecision (pricePrecision) {
+    if (!isNumber(pricePrecision) || pricePrecision &lt; 0) {
+      pricePrecision = PRICE_PRECISION
+    }
+    this.#pricePrecision = pricePrecision
+  }
+
+  /**
+   * Set the volume accuracy
+   * @param {number} volumePrecision - Volume accuracy
    */
-     setPricePrecision (pricePrecision) {
-      if (!isNumber(pricePrecision) || pricePrecision &lt; 0) {
-        pricePrecision = PRICE_PRECISION
-      }
-      this.#pricePrecision = pricePrecision
+  setVolumePrecision (volumePrecision) {
+    if (!isNumber(volumePrecision) || volumePrecision &lt; 0) {
+      volumePrecision = VOLUME_PRECISION
     }
+    this.#volumePrecision = volumePrecision
+  }
 
-    /**
-     * Set the volume accuracy
-     * @param volumePrecision - Volume accuracy
-     */
-    setVolumePrecision (volumePrecision) {
-      if (!isNumber(volumePrecision) || volumePrecision &lt; 0) {
-        volumePrecision = VOLUME_PRECISION
-      }
-      this.#volumePrecision = volumePrecision
-    }
-
+  /**
+   * Set the chart theme
+   * @param {object} volumePrecision - Volume accuracy
+   */
   setTheme(theme) {
     // TODO: validation
     this.#theme = theme
@@ -635,7 +728,48 @@ this.oncontextmenu = window.oncontextmenu
     }
   }
 
+  /**
+   * specify a chart stream
+   * @param {object} stream 
+   * @returns {instance}
+   */
+  setStream(stream) {
+    if (this.stream?.constructor.name == "Stream") {
+      this.error("Error: Invoke stopStream() before starting a new one.")
+      return false
+    }
+    else if (isObject(stream)) {
+      if (this.allData.data.length == 0 &amp;&amp; isString(stream.timeFrame)) {
+        ;({tf, ms} = isTimeFrame(stream?.timeFrame))
+        this.#time.timeFrame = tf
+        this.#time.timeFrameMS = ms
+      }
+      this.#stream = new Stream(this)
+      return this.#stream
+    }
+  }
+
+  stopStream() {
+    if (this.stream.constructor.name == "Stream") {
+      this.stream.stop()
+    }
+  }
+
+  delayedSetRange() {
+    while (this.#delayedSetRange) {
+      let r = this.range
+      let l = Math.floor((r.indexEnd - r.indexStart) / 2)
+      this.setRange(l * -1, l)
+      this.off(STREAM_UPDATE, this.delayedSetRange)
+      this.#delayedSetRange = false
+      this.refresh()
+    }
+  }
+
   defaultNode() {
+
+    if (this.config?.tools?.none) this.toolsW = 0
+    if (this.config?.utils?.none) this.utilsH = 0
 
     const classesTXChart = CLASS_DEFAULT+" "+this.#userClasses 
     const styleTXChart = STYLE_TXCHART + ` height: ${this.height}px; width: ${this.#chartW}px; background: ${this.chartBGColour}; color: ${this.chartTxtColour};`
@@ -644,14 +778,15 @@ this.oncontextmenu = window.oncontextmenu
     const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour};`
     const styleMain = STYLE_MAIN + ` left: ${this.toolsW}px; width: calc(100% - ${this.toolsW}px);`
     const styleWidgets = ` position: relative;`
+    const styleScale = `position: absolute; top: 0; right: 0; width: ${this.scaleW}px; height: 100%;`
     
     const node = `
       &lt;div id="${this.id}" class="${classesTXChart}" style="${styleTXChart}">
         &lt;div class="${CLASS_UTILS}" style="${styleUtils}">&lt;/div>
         &lt;div class="${CLASS_BODY}" style="${styleBody}">
           &lt;div class="${CLASS_TOOLS}" style="${styleTools}">&lt;/div>
-          &lt;div class="${CLASS_MAIN}" style="${styleMain}">
-          &lt;/div>
+          &lt;div class="${CLASS_MAIN}" style="${styleMain}">&lt;/div>
+          &lt;div class="${CLASS_YAXIS}" style="${styleScale}">&lt;/div>
         &lt;/div>
         &lt;div class="${CLASS_WIDGETSG}" style="${styleWidgets}">&lt;/div>
       &lt;/div>
@@ -687,7 +822,7 @@ this.oncontextmenu = window.oncontextmenu
     }
 
     this.#scrollPos = scrollPos
-    console.log("scrollPos:",this.#scrollPos)
+    // console.log("scrollPos:",this.#scrollPos)
   }
 
   offsetRange(offset) {
@@ -698,15 +833,24 @@ this.oncontextmenu = window.oncontextmenu
   }
 
   /**
+   * initialize range
+   * @param {number} start - index
+   * @param {number} end - index
+   */
+  getRange(start=0, end=0, config={}) {
+    this.#range = new Range(this.allData, start, end, config)
+    this.#range.interval = this.#time.timeFrameMS
+    this.#range.intervalStr = this.#time.timeFrame
+    this.#time.range = this.#range
+  }
+
+  /**
    * set start and end of range
    * @param {number} start - index
    * @param {number} end - index
    */
   setRange(start=0, end=this.rangeLimit) {
-    this.#range = getRange(this.allData, start, end)
-    this.#range.interval = this.#time.timeFrameMS
-    this.#range.intervalStr = this.#time.timeFrame
-    this.#time.range = this.#range
+    this.#range.set(start, end)
   }
 
   /**
@@ -717,6 +861,8 @@ this.oncontextmenu = window.oncontextmenu
    * @param {object} merge - merge data must be formatted to a Chart State
    * @param {boolean|object} newRange - false | {start: number, end: number}
    */
+  // TODO: merge indicator data?
+  // TODO: merge dataset?
   mergeData(merge, newRange=false) {
     if (!isObject(merge)) return false
 
@@ -729,7 +875,7 @@ this.oncontextmenu = window.oncontextmenu
       i = mData.length - 1
       j = data.length - 1
 
-      if (data.length == 0) this.allData.data = mData
+      if (data.length == 0) this.allData.data.push(...mData)
       else {
         const r1 = [data[0][0], data[j][0]]
         const r2 = [mData[0][0], mData[i][0]]
@@ -737,7 +883,7 @@ this.oncontextmenu = window.oncontextmenu
 
         // overlap between existing data and merge data
         if (o[1] >= o[0]) {
-
+// TODO: merge with overlap
         }
         // no overlap, insert the new data
         else {
@@ -774,6 +920,19 @@ this.oncontextmenu = window.oncontextmenu
     return true
   }
 
+  /**
+   * refresh / redraw the chart
+   */
+  refresh() {
+    this.MainPane.draw()
+    this.Chart.refresh()
+    const offCharts = this.MainPane.offCharts
+    offCharts.forEach((offChart, key) => {
+      offChart.refresh()
+    })
+    // TODO: drawing tools
+  }
+
   notImplemented() {
     if (!this.implemented) {
       let content = `
@@ -798,13 +957,13 @@ this.oncontextmenu = window.oncontextmenu
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="TradeXchart.module.exports.html">module.exports</a></li></ul><h3>Global</h3><ul><li><a href="global.html#init">init</a></li><li><a href="global.html#mergeData">mergeData</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#setPricePrecision">setPricePrecision</a></li><li><a href="global.html#setRange">setRange</a></li><li><a href="global.html#setVolumePrecision">setVolumePrecision</a></li><li><a href="global.html#updateRange">updateRange</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Axis.html">Axis</a></li><li><a href="Colour.html">Colour</a></li><li><a href="DMI.module.exports.html">module.exports</a></li><li><a href="Hit.html">Hit</a></li><li><a href="indicator.html">indicator</a></li><li><a href="Layer.html">Layer</a></li><li><a href="MainPane.html">MainPane</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="RSI.html">RSI</a></li><li><a href="RSI.module.exports.html">module.exports</a></li><li><a href="ScaleBar.html">ScaleBar</a></li><li><a href="Scene.html">Scene</a></li><li><a href="StateMachine.html">StateMachine</a></li><li><a href="ToolsBar.html">ToolsBar</a></li><li><a href="TradeXchart.html">TradeXchart</a></li><li><a href="TradeXchart.module.exports.html">module.exports</a></li><li><a href="Viewport.html">Viewport</a></li><li><a href="WebWorker.html">WebWorker</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addOffChart">addOffChart</a></li><li><a href="global.html#addTool">addTool</a></li><li><a href="global.html#binarySearch">binarySearch</a></li><li><a href="global.html#binarySearchNearest">binarySearchNearest</a></li><li><a href="global.html#calcIndicator">calcIndicator</a></li><li><a href="global.html#calcIndicatorStream">calcIndicatorStream</a></li><li><a href="global.html#calcTextWidth">calcTextWidth</a></li><li><a href="global.html#calcTimeIndex">calcTimeIndex</a></li><li><a href="global.html#CandleType">CandleType</a></li><li><a href="global.html#checkType">checkType</a></li><li><a href="global.html#copyDeep">copyDeep</a></li><li><a href="global.html#countDigits">countDigits</a></li><li><a href="global.html#createFont">createFont</a></li><li><a href="global.html#day_start">day_start</a></li><li><a href="global.html#decimalPlaces">decimalPlaces</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#detectInterval">detectInterval</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#drawTextBG">drawTextBG</a></li><li><a href="global.html#emit">emit</a></li><li><a href="global.html#end">end</a></li><li><a href="global.html#execute">execute</a></li><li><a href="global.html#float2Int">float2Int</a></li><li><a href="global.html#get_day">get_day</a></li><li><a href="global.html#get_month">get_month</a></li><li><a href="global.html#get_year">get_year</a></li><li><a href="global.html#getPixelRatio">getPixelRatio</a></li><li><a href="global.html#getPrecision">getPrecision</a></li><li><a href="global.html#getRandom">getRandom</a></li><li><a href="global.html#getRandomInt">getRandomInt</a></li><li><a href="global.html#getRandomIntBetween">getRandomIntBetween</a></li><li><a href="global.html#getRandomIntInclusive">getRandomIntInclusive</a></li><li><a href="global.html#getRange">getRange</a></li><li><a href="global.html#getTextRectHeight">getTextRectHeight</a></li><li><a href="global.html#getTextRectWidth">getTextRectWidth</a></li><li><a href="global.html#GlobalStyle">GlobalStyle</a></li><li><a href="global.html#hex">hex</a></li><li><a href="global.html#hexa">hexa</a></li><li><a href="global.html#id">id</a></li><li><a href="global.html#index10">index10</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#interval2MS">interval2MS</a></li><li><a href="global.html#isArray">isArray</a></li><li><a href="global.html#isBoolean">isBoolean</a></li><li><a href="global.html#isFunction">isFunction</a></li><li><a href="global.html#isNumber">isNumber</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#isValid">isValid</a></li><li><a href="global.html#isValidCandle">isValidCandle</a></li><li><a href="global.html#limit">limit</a></li><li><a href="global.html#loadState">loadState</a></li><li><a href="global.html#log10">log10</a></li><li><a href="global.html#maxMinPriceVol">maxMinPriceVol</a></li><li><a href="global.html#mean">mean</a></li><li><a href="global.html#mergeData">mergeData</a></li><li><a href="global.html#mergeDeep">mergeDeep</a></li><li><a href="global.html#month_start">month_start</a></li><li><a href="global.html#ms2TimeUnits">ms2TimeUnits</a></li><li><a href="global.html#nearestArrayValue">nearestArrayValue</a></li><li><a href="global.html#nice">nice</a></li><li><a href="global.html#numDigits">numDigits</a></li><li><a href="global.html#numDigits2">numDigits2</a></li><li><a href="global.html#off">off</a></li><li><a href="global.html#on">on</a></li><li><a href="global.html#power">power</a></li><li><a href="global.html#precision">precision</a></li><li><a href="global.html#price2YPos">price2YPos</a></li><li><a href="global.html#refresh">refresh</a></li><li><a href="global.html#renderClosedFillPath">renderClosedFillPath</a></li><li><a href="global.html#renderClosedStrokePath">renderClosedStrokePath</a></li><li><a href="global.html#renderFilledCircle">renderFilledCircle</a></li><li><a href="global.html#renderFilledDiamond">renderFilledDiamond</a></li><li><a href="global.html#renderFilledTriangle">renderFilledTriangle</a></li><li><a href="global.html#renderFillRect">renderFillRect</a></li><li><a href="global.html#renderFillRoundRect">renderFillRoundRect</a></li><li><a href="global.html#renderHorizontalLine">renderHorizontalLine</a></li><li><a href="global.html#renderLine">renderLine</a></li><li><a href="global.html#renderPath">renderPath</a></li><li><a href="global.html#renderRoundRect">renderRoundRect</a></li><li><a href="global.html#renderStrokedCircle">renderStrokedCircle</a></li><li><a href="global.html#renderStrokeFillRoundRect">renderStrokeFillRoundRect</a></li><li><a href="global.html#renderStrokeRoundRect">renderStrokeRoundRect</a></li><li><a href="global.html#renderText">renderText</a></li><li><a href="global.html#renderVerticalLine">renderVerticalLine</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#round">round</a></li><li><a href="global.html#saveState">saveState</a></li><li><a href="global.html#setDimensions">setDimensions</a></li><li><a href="global.html#setPricePrecision">setPricePrecision</a></li><li><a href="global.html#setPriceVolumePrecision">setPriceVolumePrecision</a></li><li><a href="global.html#setRange">setRange</a></li><li><a href="global.html#setStream">setStream</a></li><li><a href="global.html#setTheme">setTheme</a></li><li><a href="global.html#setVolumePrecision">setVolumePrecision</a></li><li><a href="global.html#start">start</a></li><li><a href="global.html#stop">stop</a></li><li><a href="global.html#time2XPos">time2XPos</a></li><li><a href="global.html#timestampDifference">timestampDifference</a></li><li><a href="global.html#updateLegends">updateLegends</a></li><li><a href="global.html#updateRange">updateRange</a></li><li><a href="global.html#validateConfig">validateConfig</a></li><li><a href="global.html#validateShallow">validateShallow</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#weave">weave</a></li><li><a href="global.html#YAxisPosition">YAxisPosition</a></li><li><a href="global.html#YAxisType">YAxisType</a></li><li><a href="global.html#year_start">year_start</a></li><li><a href="global.html#zoomRange">zoomRange</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Thu Sep 29 2022 11:32:15 GMT+0200 (Central European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Oct 18 2022 01:23:08 GMT+0200 (Central European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,18 +1,30 @@
 // number.js
 
-// Getting a random number between 0 (inclusive) and 1 (exclusive)
+/**
+ * Getting a random number between 0 (inclusive) and 1 (exclusive)
+ * @export
+ * @return {number}
+ */ 
 export function getRandom() {
   return Math.random();
 }
 
-// Getting a random number between two values
-// inclusive of the minimum, exclusive of the maximum
+/** 
+ * Getting a random number between two values
+ * inclusive of the minimum, exclusive of the maximum
+ * @export
+ * @return {number}
+ */
 export function getRandomInt(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-// Getting a random integer between two values
-// inclusive of the minimum, exclusive of the maximum
+/** 
+ * Getting a random integer between two values
+ * inclusive of the minimum, exclusive of the maximum
+ * @export
+ * @return {number}
+ */
 export function getRandomIntBetween(min, max) {
   min = Math.ceil(min) + 1;
   max = Math.floor(max);
@@ -20,8 +32,12 @@ export function getRandomIntBetween(min, max) {
   return Math.floor(Math.random() * (max - min) + min); 
 }
 
-// Getting a random integer between two values, inclusive
-// inclusive of the minimum, inclusive of the maximum
+/** 
+ * Getting a random integer between two values, inclusive
+ * inclusive of the minimum, inclusive of the maximum
+ * @export
+ * @return {number}
+ */
 export function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -30,6 +46,7 @@ export function getRandomIntInclusive(min, max) {
 
 /**
  * Binary search for the closest number
+ * @export
  * @param dataList
  * @param valueKey
  * @param targetNumber
@@ -67,7 +84,6 @@ export function getRandomIntInclusive(min, max) {
 
 /**
  * binary search on array
- *
  * @export
  * @param {array} list
  * @param {number} item
@@ -97,8 +113,9 @@ export function binarySearch(list, item) {
 
 /**
  * Optimize numbers
+ * @export
  * @param value
- * @return {number|number}
+ * @return {number}
  */
 export function nice (value) {
   const exponent = Math.floor(log10(value))
@@ -125,8 +142,6 @@ export function nice (value) {
 }
 
 /**
- *
- *
  * @export
  * @param {number} value
  * @return {number}  
@@ -145,8 +160,8 @@ export function countDigits(value) {
  * count integer digits
  * bitwise operations in JavaScript only work with 32-bit values (so a max of 2,147,483,647)
  * @export
- * @param {Number} value
- * @return {Number}  
+ * @param {number} value
+ * @return {number}  
  */
 export function numDigits(value) {
   return (Math.log10((value ^ (value >> 31)) - (value >> 31)) | 0) + 1;
@@ -154,7 +169,6 @@ export function numDigits(value) {
 
 /**
  * slightly slower
- *
  * @export
  * @param {number} x
  * @return {number}  
@@ -166,8 +180,8 @@ export function numDigits2(x) {
 /**
  * truncate floating point, works for positives as well as negatives
  * @export
- * @param {Number} value
- * @return {Number}  
+ * @param {number} value
+ * @return {number}  
  */
 export function float2Int(value) {
   return value | 0
@@ -176,8 +190,9 @@ export function float2Int(value) {
 
 /**
  * round to precision - fastest
- * @param value
- * @param precision
+ * @export
+ * @param {number} n
+ * @param {number} p
  * @return {number}
  */
  export function round (n, p) {
@@ -228,6 +243,7 @@ export function precision(value) {
  * Get the number of decimal places
  * converting to string and splitting by . is only a solution for up to 7 decimals
  * slowest
+ * @export
  * @param {number} - value
  * @return {number}
  */
@@ -245,7 +261,8 @@ export function getPrecision (value) {
 
 /**
  * log base 10
- * @param value
+ * @export
+ * @param {number} value
  * @return {number}
  */
 export function log10 (value) {
@@ -254,38 +271,46 @@ export function log10 (value) {
 
 /**
  * Exponential function of 10
- * @param value
+ * @export
+ * @param {number} value
  * @return {number}
  */
 export function index10 (value) {
   return Math.pow(10, value)
 }
 
+/**
+ * Exponential power
+ * @export
+ * @param {number} value
+ * @return {number}
+ */
 export function power (base, exponent) {
   return Math.pow(base, exponent)
 }
 
 /**
  * Calculate average of array
- * @param {array} arr
- * @param {number} N
+ * @export
+ * @param {array} arr - array of numbers
  * @return {number}  
  */
-export function mean(arr, N) {
+export function mean(arr) {
     let avg = 0;
     let i = 0
  
-    while (i++ < N) {
+    while (i++ < arr.length - 1) {
         avg += parseFloat((arr[i] - avg) / (i + 1));
     }
     return avg;
 }
 
 /**
- * limit number to a range
- * @param {number} val
- * @param {number} min
- * @param {number} max
+ * Limit number to a range between max and min
+ * @export
+ * @param {number} val - value to be bounded
+ * @param {number} min - lower bound
+ * @param {number} max - upper bound
  * @return {number}  
  */
 export function limit(val, min, max) {

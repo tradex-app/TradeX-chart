@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: scaleX/mediator.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: scaleX/mediator.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// mediator.js
+
+// import { core } from "./scaleX";
+import StateMachine from "./stateMachne"
+
+export default class Mediator {
+
+  valid
+  #core
+  #api
+  #hub
+  #subModules = {}
+  #stateMachine
+
+  constructor(core, api, modClass, options) {
+
+    this.#core = core
+    this.#hub = core.hub
+    this.#api = api
+
+    // Check that module has required methods
+    const required = ['constructor','start','end',"name","shortName","mediator","options"]
+    const target = Object.getOwnPropertyNames(modClass.prototype)
+    const intersection = required.filter(x => target.includes(x));
+
+    // Check that module has required properties
+    // const propertiesToTest = ["name","shortName","mediator","options"];
+    // const hasProperties = (propertiesToTest.every(function(x) { return x in modClass })) 
+
+    let name = modClass.prototype.constructor.name
+    // check that module is in the (fundamental) permitted list
+    // for modules that are fixed features of the project
+    if ("permittedClassNames" in api &amp;&amp; !api?.permittedClassNames.includes(name))
+      // or check that module conforms to the naming convention
+      // for modules that are 3rd party 
+      // or dynamically added in the project lifecycle
+      name = name.match(/^module_\s*([$A-Z_][0-9A-Z_$]*)/i)
+
+    // does the module class validate?
+    this.valid = 
+      // has required methods?
+      (required.length === intersection.length)
+      // has required properties?
+      // &amp;&amp; hasProperties 
+      // has a valid class name?
+      &amp;&amp; (name !== null)
+
+    this.log(`Is Module ${name} valid: ${this.valid}`)
+
+    if (this.valid)  return new modClass(this, options)
+  }
+
+  get api() { return this.#api }
+  get core() { return this.#core }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
+  
+  isStateMachineConfigValid(config) { StateMachine.validateConfig(config) }
+
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warning(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
+
+  /**
+   * Provision for modules to spawn other modules
+   *
+   * @param {String} id
+   * @param {Class} newModule
+   * @param {Object} options - initial provided configuration
+   * @param {Object} api - functions / methods, calculated properties
+   * @return {Instance}  
+   * @memberof Mediator
+   */
+  register(id, newModule, options, api) {
+
+    const instance = this.#core.register(id, newModule, options, api)
+
+    // track child modules instantiated by this module
+    this.#subModules[instance.modID] = instance
+    return instance
+  }
+
+  /** Subscribe to a topic
+  *
+  * @param {String} topic      - The topic name
+  * @param {Function} callback - The function that is called if another module
+  *                              publishes to the specified topic
+  * @param {Object}  context   - The context the function(s) belongs to
+  */
+  on(topic, handler, context) {
+    if (!this.#hub[topic]) this.#hub[topic] = [];
+    this.#hub[topic].push({handler, context});
+  }
+
+  /** Unsubscribe from a topic
+  *
+  * @param {String} topic - The topic name
+  * @param {Function} cb  - The function that is called if an other module
+  *                         publishes to the specified topic
+  */
+  off(topic, handler) {
+    const i = (this.#hub[topic] || []).findIndex(h => h === handler);
+    if (i > -1) this.#hub[topic].splice(i, 1);
+    if (this.#hub[topic].length === 0) delete this.#hub[topic];
+  }
+
+  /** Publish an topic
+  *
+  * @param {String} topic - The topic name
+  * @param {Object}  data - The data to publish
+  */
+  emit(topic, data) {
+    (this.#hub[topic] || []).forEach(cb => cb.handler.call(cb.context, data));
+
+    // (this.#hub[topic] || []).forEach(cb => cb.handler(data));
+  }
+
+  /** Execute a task
+  *
+  * @param {String} channel - The topic name
+  * @param {Object} data    - The data that gets published
+  * @param {Function} cb    - callback method
+  */
+  execute(channel, data, cb) {
+
+  }
+
+
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Axis.html">Axis</a></li><li><a href="Colour.html">Colour</a></li><li><a href="DMI.module.exports.html">module.exports</a></li><li><a href="Hit.html">Hit</a></li><li><a href="indicator.html">indicator</a></li><li><a href="Layer.html">Layer</a></li><li><a href="MainPane.html">MainPane</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="RSI.html">RSI</a></li><li><a href="RSI.module.exports.html">module.exports</a></li><li><a href="ScaleBar.html">ScaleBar</a></li><li><a href="Scene.html">Scene</a></li><li><a href="StateMachine.html">StateMachine</a></li><li><a href="ToolsBar.html">ToolsBar</a></li><li><a href="TradeXchart.html">TradeXchart</a></li><li><a href="TradeXchart.module.exports.html">module.exports</a></li><li><a href="Viewport.html">Viewport</a></li><li><a href="WebWorker.html">WebWorker</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addOffChart">addOffChart</a></li><li><a href="global.html#addTool">addTool</a></li><li><a href="global.html#binarySearch">binarySearch</a></li><li><a href="global.html#binarySearchNearest">binarySearchNearest</a></li><li><a href="global.html#calcIndicator">calcIndicator</a></li><li><a href="global.html#calcIndicatorStream">calcIndicatorStream</a></li><li><a href="global.html#calcTextWidth">calcTextWidth</a></li><li><a href="global.html#calcTimeIndex">calcTimeIndex</a></li><li><a href="global.html#CandleType">CandleType</a></li><li><a href="global.html#checkType">checkType</a></li><li><a href="global.html#copyDeep">copyDeep</a></li><li><a href="global.html#countDigits">countDigits</a></li><li><a href="global.html#createFont">createFont</a></li><li><a href="global.html#day_start">day_start</a></li><li><a href="global.html#decimalPlaces">decimalPlaces</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#detectInterval">detectInterval</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#drawTextBG">drawTextBG</a></li><li><a href="global.html#emit">emit</a></li><li><a href="global.html#end">end</a></li><li><a href="global.html#execute">execute</a></li><li><a href="global.html#float2Int">float2Int</a></li><li><a href="global.html#get_day">get_day</a></li><li><a href="global.html#get_month">get_month</a></li><li><a href="global.html#get_year">get_year</a></li><li><a href="global.html#getPixelRatio">getPixelRatio</a></li><li><a href="global.html#getPrecision">getPrecision</a></li><li><a href="global.html#getRandom">getRandom</a></li><li><a href="global.html#getRandomInt">getRandomInt</a></li><li><a href="global.html#getRandomIntBetween">getRandomIntBetween</a></li><li><a href="global.html#getRandomIntInclusive">getRandomIntInclusive</a></li><li><a href="global.html#getRange">getRange</a></li><li><a href="global.html#getTextRectHeight">getTextRectHeight</a></li><li><a href="global.html#getTextRectWidth">getTextRectWidth</a></li><li><a href="global.html#GlobalStyle">GlobalStyle</a></li><li><a href="global.html#hex">hex</a></li><li><a href="global.html#hexa">hexa</a></li><li><a href="global.html#id">id</a></li><li><a href="global.html#index10">index10</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#interval2MS">interval2MS</a></li><li><a href="global.html#isArray">isArray</a></li><li><a href="global.html#isBoolean">isBoolean</a></li><li><a href="global.html#isFunction">isFunction</a></li><li><a href="global.html#isNumber">isNumber</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#isValid">isValid</a></li><li><a href="global.html#isValidCandle">isValidCandle</a></li><li><a href="global.html#limit">limit</a></li><li><a href="global.html#loadState">loadState</a></li><li><a href="global.html#log10">log10</a></li><li><a href="global.html#maxMinPriceVol">maxMinPriceVol</a></li><li><a href="global.html#mean">mean</a></li><li><a href="global.html#mergeData">mergeData</a></li><li><a href="global.html#mergeDeep">mergeDeep</a></li><li><a href="global.html#month_start">month_start</a></li><li><a href="global.html#ms2TimeUnits">ms2TimeUnits</a></li><li><a href="global.html#nearestArrayValue">nearestArrayValue</a></li><li><a href="global.html#nice">nice</a></li><li><a href="global.html#numDigits">numDigits</a></li><li><a href="global.html#numDigits2">numDigits2</a></li><li><a href="global.html#off">off</a></li><li><a href="global.html#on">on</a></li><li><a href="global.html#power">power</a></li><li><a href="global.html#precision">precision</a></li><li><a href="global.html#price2YPos">price2YPos</a></li><li><a href="global.html#refresh">refresh</a></li><li><a href="global.html#renderClosedFillPath">renderClosedFillPath</a></li><li><a href="global.html#renderClosedStrokePath">renderClosedStrokePath</a></li><li><a href="global.html#renderFilledCircle">renderFilledCircle</a></li><li><a href="global.html#renderFilledDiamond">renderFilledDiamond</a></li><li><a href="global.html#renderFilledTriangle">renderFilledTriangle</a></li><li><a href="global.html#renderFillRect">renderFillRect</a></li><li><a href="global.html#renderFillRoundRect">renderFillRoundRect</a></li><li><a href="global.html#renderHorizontalLine">renderHorizontalLine</a></li><li><a href="global.html#renderLine">renderLine</a></li><li><a href="global.html#renderPath">renderPath</a></li><li><a href="global.html#renderRoundRect">renderRoundRect</a></li><li><a href="global.html#renderStrokedCircle">renderStrokedCircle</a></li><li><a href="global.html#renderStrokeFillRoundRect">renderStrokeFillRoundRect</a></li><li><a href="global.html#renderStrokeRoundRect">renderStrokeRoundRect</a></li><li><a href="global.html#renderText">renderText</a></li><li><a href="global.html#renderVerticalLine">renderVerticalLine</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#round">round</a></li><li><a href="global.html#saveState">saveState</a></li><li><a href="global.html#setDimensions">setDimensions</a></li><li><a href="global.html#setPricePrecision">setPricePrecision</a></li><li><a href="global.html#setPriceVolumePrecision">setPriceVolumePrecision</a></li><li><a href="global.html#setRange">setRange</a></li><li><a href="global.html#setStream">setStream</a></li><li><a href="global.html#setTheme">setTheme</a></li><li><a href="global.html#setVolumePrecision">setVolumePrecision</a></li><li><a href="global.html#start">start</a></li><li><a href="global.html#stop">stop</a></li><li><a href="global.html#time2XPos">time2XPos</a></li><li><a href="global.html#timestampDifference">timestampDifference</a></li><li><a href="global.html#updateLegends">updateLegends</a></li><li><a href="global.html#updateRange">updateRange</a></li><li><a href="global.html#validateConfig">validateConfig</a></li><li><a href="global.html#validateShallow">validateShallow</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#weave">weave</a></li><li><a href="global.html#YAxisPosition">YAxisPosition</a></li><li><a href="global.html#YAxisType">YAxisType</a></li><li><a href="global.html#year_start">year_start</a></li><li><a href="global.html#zoomRange">zoomRange</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Oct 18 2022 01:23:08 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

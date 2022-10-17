@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/overlays/inidcator.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/overlays/inidcator.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// indicator.js
+
+// const plotTypes = {
+//   area,
+//   bar,
+//   channel,
+//   line,
+// }
+
+import { renderFillRect } from "../../renderer/rect"
+import { renderLine } from "../../renderer/line"
+import {
+  STREAM_NEWVALUE,
+  STREAM_UPDATE
+} from "../../definitions/core"
+
+const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
+
+/**
+ * Base class for on and off chart indicators
+ * @export
+ * @class indicator
+ */
+export default class indicator {
+
+  #core
+  #target
+  #scene
+  #config
+  #xAxis
+  #yAxis
+  #overlay
+  #indicator
+  #type
+  #TALib
+  #range
+  #value = [0, 0]
+  #newValueCB
+  #updateValueCB
+  #precision = 2
+  #calcParams
+  #style = {}
+
+  constructor(target, overlay, xAxis, yAxis, config) {
+
+    this.#core = xAxis.core
+    this.#config = config
+    this.#target = target
+    this.#scene = target.scene
+    this.#xAxis = xAxis
+    this.#yAxis = yAxis
+    this.#overlay = overlay
+    this.#type = config.type
+    this.#indicator = config.indicator
+    this.#TALib = xAxis.core.TALib
+    this.#range = xAxis.range
+
+    this.eventsListen()
+  }
+
+  get core() { return this.#core }
+  get config() { return this.#config }
+  get target() { return this.#target }
+  get scene() { return this.#scene }
+  get xAxis() { return this.#xAxis }
+  get yAxis() { return this.#yAxis }
+  get type() { return this.#type }
+  get overlay() { return this.#overlay }
+  get indicator() { return this.#indicator }
+  get TALib() { return this.#TALib }
+  get range() { return this.#range }
+  set setNewValue(cb) { this.#newValueCB = cb}
+  set setUpdateValue(cb) { this.#updateValueCB = cb }
+  set precision(p) { this.#precision = p }
+  get precision() { return this.#precision }
+  set calcParams(p) { this.#calcParams = p }
+  get calcParams() { return this.#calcParams }
+  set style(s) { this.#style = s }
+  get style() { return this.#style }
+
+
+  set value(data) {
+    // round time to nearest current time unit
+    const tfms = this.core.time.timeFrameMS
+    let roundedTime = Math.floor(new Date(data[T]) / tfms) * tfms
+    data[T] = roundedTime
+
+    if (this.#value[T] !== data[T]) {
+      this.#value[T] = data[T]
+      this.#newValueCB(data)
+    }
+    else {
+      this.#updateValueCB(data)
+    }
+  }
+  get value() {
+    return this.#value
+  }
+
+  end() {
+    // this.off(STREAM_NEWVALUE, this.onStreamNewValue)
+    this.off(STREAM_UPDATE, this.onStreamUpdate)
+  }
+
+  eventsListen() {
+    // this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this))
+    this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this))
+  }
+
+  on(topic, handler, context) {
+    this.core.on(topic, handler, context)
+  }
+
+  off(topic, handler) {
+    this.core.off(topic, handler)
+  }
+
+  emit(topic, data) {
+    this.core.emit(topic, data)
+  }
+
+  onStreamNewValue(value) {
+    // this.value = value
+    console.log("onStreamNewValue(value):",value)
+  }
+
+  onStreamUpdate(candle) {
+    // console.log("onStreamUpdate(candle):", candle)
+    this.value = candle
+  }
+
+  indicatorInput(start, end) {
+    let input = []
+    do {
+      input.push(this.range.value(start)[C])
+    }
+    while (start++ &lt; end)
+    return input
+  }
+
+    /**
+   * Calculate indicator values for entire chart history
+   * @param {string} indicator - the TALib function to call
+   * @param {object} params - parameters for the TALib function
+   * @returns {boolean} - success or failure
+   */
+     calcIndicator (indicator, params) {
+      this.overlay.data = []
+      let step = this.calcParams[0]
+      // fail if there is not enough data to calculate
+      if (this.range.Length &lt; step) return false
+  
+      let data, end, entry, time;
+      let start = 0
+      let input = this.indicatorInput(start, this.range.Length - 1)
+      let hasNull = input.find(element => element === null)
+      if (hasNull) return false
+      
+      do {
+        end = start + step
+        data = input.slice(start, end)
+        entry = this.TALib[indicator](params)
+        time = this.range.value(end - 1)[0]
+        this.overlay.data.push([time, entry])
+        start++
+      } 
+      while (end &lt; this.range.Length)
+      return true
+    }
+  
+    /**
+     * Calculate indicator value for current stream candle
+     * @param {string} indicator - the TALib function to call
+     * @param {object} params - parameters for the TALib function
+     * @returns {array} - indicator data entry
+     */
+    calcIndicatorStream (indicator, params) {
+      let entry = this.TALib[indicator](params)
+      let end = this.range.dataLength
+      let time = this.range.value(end)[0]
+      return [time, entry.output[0]]
+    }
+
+  plot(plots, type, style) {
+
+    const ctx = this.#scene.context
+    ctx.save();
+
+    switch(type) {
+      case "renderLine": renderLine(ctx, plots, style);
+      case "renderFillRect": renderFillRect(ctx, plots[0], plots[1], plots[2], plots[3], style)
+    }
+
+    ctx.restore();
+  }
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Axis.html">Axis</a></li><li><a href="Colour.html">Colour</a></li><li><a href="DMI.module.exports.html">module.exports</a></li><li><a href="Hit.html">Hit</a></li><li><a href="indicator.html">indicator</a></li><li><a href="Layer.html">Layer</a></li><li><a href="MainPane.html">MainPane</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="RSI.html">RSI</a></li><li><a href="RSI.module.exports.html">module.exports</a></li><li><a href="ScaleBar.html">ScaleBar</a></li><li><a href="Scene.html">Scene</a></li><li><a href="StateMachine.html">StateMachine</a></li><li><a href="ToolsBar.html">ToolsBar</a></li><li><a href="TradeXchart.html">TradeXchart</a></li><li><a href="TradeXchart.module.exports.html">module.exports</a></li><li><a href="Viewport.html">Viewport</a></li><li><a href="WebWorker.html">WebWorker</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addOffChart">addOffChart</a></li><li><a href="global.html#addTool">addTool</a></li><li><a href="global.html#binarySearch">binarySearch</a></li><li><a href="global.html#binarySearchNearest">binarySearchNearest</a></li><li><a href="global.html#calcIndicator">calcIndicator</a></li><li><a href="global.html#calcIndicatorStream">calcIndicatorStream</a></li><li><a href="global.html#calcTextWidth">calcTextWidth</a></li><li><a href="global.html#calcTimeIndex">calcTimeIndex</a></li><li><a href="global.html#CandleType">CandleType</a></li><li><a href="global.html#checkType">checkType</a></li><li><a href="global.html#copyDeep">copyDeep</a></li><li><a href="global.html#countDigits">countDigits</a></li><li><a href="global.html#createFont">createFont</a></li><li><a href="global.html#day_start">day_start</a></li><li><a href="global.html#decimalPlaces">decimalPlaces</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#detectInterval">detectInterval</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#drawTextBG">drawTextBG</a></li><li><a href="global.html#emit">emit</a></li><li><a href="global.html#end">end</a></li><li><a href="global.html#execute">execute</a></li><li><a href="global.html#float2Int">float2Int</a></li><li><a href="global.html#get_day">get_day</a></li><li><a href="global.html#get_month">get_month</a></li><li><a href="global.html#get_year">get_year</a></li><li><a href="global.html#getPixelRatio">getPixelRatio</a></li><li><a href="global.html#getPrecision">getPrecision</a></li><li><a href="global.html#getRandom">getRandom</a></li><li><a href="global.html#getRandomInt">getRandomInt</a></li><li><a href="global.html#getRandomIntBetween">getRandomIntBetween</a></li><li><a href="global.html#getRandomIntInclusive">getRandomIntInclusive</a></li><li><a href="global.html#getRange">getRange</a></li><li><a href="global.html#getTextRectHeight">getTextRectHeight</a></li><li><a href="global.html#getTextRectWidth">getTextRectWidth</a></li><li><a href="global.html#GlobalStyle">GlobalStyle</a></li><li><a href="global.html#hex">hex</a></li><li><a href="global.html#hexa">hexa</a></li><li><a href="global.html#id">id</a></li><li><a href="global.html#index10">index10</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#interval2MS">interval2MS</a></li><li><a href="global.html#isArray">isArray</a></li><li><a href="global.html#isBoolean">isBoolean</a></li><li><a href="global.html#isFunction">isFunction</a></li><li><a href="global.html#isNumber">isNumber</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#isValid">isValid</a></li><li><a href="global.html#isValidCandle">isValidCandle</a></li><li><a href="global.html#limit">limit</a></li><li><a href="global.html#loadState">loadState</a></li><li><a href="global.html#log10">log10</a></li><li><a href="global.html#maxMinPriceVol">maxMinPriceVol</a></li><li><a href="global.html#mean">mean</a></li><li><a href="global.html#mergeData">mergeData</a></li><li><a href="global.html#mergeDeep">mergeDeep</a></li><li><a href="global.html#month_start">month_start</a></li><li><a href="global.html#ms2TimeUnits">ms2TimeUnits</a></li><li><a href="global.html#nearestArrayValue">nearestArrayValue</a></li><li><a href="global.html#nice">nice</a></li><li><a href="global.html#numDigits">numDigits</a></li><li><a href="global.html#numDigits2">numDigits2</a></li><li><a href="global.html#off">off</a></li><li><a href="global.html#on">on</a></li><li><a href="global.html#power">power</a></li><li><a href="global.html#precision">precision</a></li><li><a href="global.html#price2YPos">price2YPos</a></li><li><a href="global.html#refresh">refresh</a></li><li><a href="global.html#renderClosedFillPath">renderClosedFillPath</a></li><li><a href="global.html#renderClosedStrokePath">renderClosedStrokePath</a></li><li><a href="global.html#renderFilledCircle">renderFilledCircle</a></li><li><a href="global.html#renderFilledDiamond">renderFilledDiamond</a></li><li><a href="global.html#renderFilledTriangle">renderFilledTriangle</a></li><li><a href="global.html#renderFillRect">renderFillRect</a></li><li><a href="global.html#renderFillRoundRect">renderFillRoundRect</a></li><li><a href="global.html#renderHorizontalLine">renderHorizontalLine</a></li><li><a href="global.html#renderLine">renderLine</a></li><li><a href="global.html#renderPath">renderPath</a></li><li><a href="global.html#renderRoundRect">renderRoundRect</a></li><li><a href="global.html#renderStrokedCircle">renderStrokedCircle</a></li><li><a href="global.html#renderStrokeFillRoundRect">renderStrokeFillRoundRect</a></li><li><a href="global.html#renderStrokeRoundRect">renderStrokeRoundRect</a></li><li><a href="global.html#renderText">renderText</a></li><li><a href="global.html#renderVerticalLine">renderVerticalLine</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#round">round</a></li><li><a href="global.html#saveState">saveState</a></li><li><a href="global.html#setDimensions">setDimensions</a></li><li><a href="global.html#setPricePrecision">setPricePrecision</a></li><li><a href="global.html#setPriceVolumePrecision">setPriceVolumePrecision</a></li><li><a href="global.html#setRange">setRange</a></li><li><a href="global.html#setStream">setStream</a></li><li><a href="global.html#setTheme">setTheme</a></li><li><a href="global.html#setVolumePrecision">setVolumePrecision</a></li><li><a href="global.html#start">start</a></li><li><a href="global.html#stop">stop</a></li><li><a href="global.html#time2XPos">time2XPos</a></li><li><a href="global.html#timestampDifference">timestampDifference</a></li><li><a href="global.html#updateLegends">updateLegends</a></li><li><a href="global.html#updateRange">updateRange</a></li><li><a href="global.html#validateConfig">validateConfig</a></li><li><a href="global.html#validateShallow">validateShallow</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#weave">weave</a></li><li><a href="global.html#YAxisPosition">YAxisPosition</a></li><li><a href="global.html#YAxisType">YAxisType</a></li><li><a href="global.html#year_start">year_start</a></li><li><a href="global.html#zoomRange">zoomRange</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Oct 18 2022 01:23:08 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,11 +1,12 @@
 // path.js
 /**
  * Draw a path
- * @param ctx
- * @param coordinates
- * @param strokeFill
+ * @param {object} ctx - canvas reference
+ * @param {array} coords - array of x y coords [{x:x, y:y}, ...]
+ * @param {object} style - {lineWidth, strokeStyle, lineDash}
+ * @param {function} strokeFill
  */
-export function renderPath (ctx, coordinates, style, strokeFill) {
+export function renderPath (ctx, coords, style, strokeFill) {
   ctx.save()
   ctx.lineWidth = style.lineWidth || 1
   if (ctx.lineWidth % 2) {
@@ -17,13 +18,13 @@ export function renderPath (ctx, coordinates, style, strokeFill) {
   
   ctx.beginPath()
   let move = true
-  coordinates.forEach(coordinate => {
-    if (coordinate && coordinate.x !== null) {
+  coords.forEach(coord => {
+    if (coord && coord.x !== null) {
       if (move) {
-        ctx.moveTo(coordinate.x, coordinate.y)
+        ctx.moveTo(coord.x, coord.y)
         move = false
       } else {
-        ctx.lineTo(coordinate.x, coordinate.y)
+        ctx.lineTo(coord.x, coord.y)
       }
     }
   })
@@ -31,20 +32,26 @@ export function renderPath (ctx, coordinates, style, strokeFill) {
   ctx.restore()
 }
 
-export function renderCloseStrokePath (ctx, coordinates, style) {
-  renderPath(ctx, coordinates, style, () => {
+/**
+ * Render unfilled closed path
+ * @param {object} ctx - canvas reference
+ * @param {array} coords - array of x y coords [{x:x, y:y}, ...]
+ * @param {object} style
+ */
+export function renderClosedStrokePath (ctx, coords, style) {
+  renderPath(ctx, coords, style, () => {
     ctx.closePath()
     ctx.stroke()
   })
 }
 
 /**
- * 渲染填充路径
- * @param ctx
- * @param coordinates
+ * Render filled closed path
+ * @param {object} ctx - canvas reference
+ * @param {object} style
  */
-export function renderCloseFillPath (ctx, coordinates, style) {
-  renderPath(ctx, coordinates, style, () => {
+export function renderClosedFillPath (ctx, coords, style) {
+  renderPath(ctx, coords, style, () => {
     ctx.closePath()
     ctx.fill()
   })

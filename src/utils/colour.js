@@ -12,6 +12,12 @@ const isHSLA = /^hsla[(]\s*0*(?:[12]?\d{1,2}|3(?:[0-5]\d|60))\s*(?:\s*,\s*0*(?:\
 const isRGB  = /^rgba?((\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?)(,\s*[01]?\.?\d*)?)$/;
 const isRGBA = /^^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1(?:\.0*)?)\s*[)]$/
 
+/**
+ * Colour utility class
+ * colour modle transformations
+ * @export
+ * @class Colour
+ */
 export default class Colour {
   #value = {
     r: null,
@@ -34,6 +40,10 @@ export default class Colour {
     isValid: false
   }
 
+  /**
+   * 
+   * @param {string} colour 
+   */
   constructor (colour) {
 
     this.#validate(colour)
@@ -44,9 +54,24 @@ export default class Colour {
     if (isRGBA.test(colour)) this.#valueIsRGBA(colour)
   }
 
+  /** 
+   * All information for colour
+   * @type {string} 
+   */
   get value() { return this.#value }
+  /** 
+   * Is the provided colour valid
+   * @type {boolean} 
+   */
   get isValid() { return this.#value.isValid }
+  /** 
+   * CSS RGB value
+   * @type {string} */
   get hex() { return this.#value.hex.slice(0, -2) }
+  /** 
+   * CSS RGBA value
+   * @type {string} 
+   */
   get hexa() { return this.#value.hex }
   
   #validate(colour) {

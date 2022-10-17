@@ -205,7 +205,11 @@ export default class Chart {
     this.log(`${this.#name} instantiated`)
   }
 
-
+  /**
+   * Start chart and dependent components event listening. 
+   * Start the chart state machine
+   * Draw the chart
+   */
   start() {
 
     // X Axis - Timeline
@@ -271,14 +275,30 @@ export default class Chart {
     this.on("chart_yAxisRedraw", this.onYAxisRedraw.bind(this))
   }
 
+  /**
+   * Set a custom event listener
+   * @param {string} topic 
+   * @param {function} handler 
+   * @param {*} context 
+   */
   on(topic, handler, context) {
     this.#mediator.on(topic, handler, context)
   }
 
+  /**
+   * Remove a custom event listener
+   * @param {string} topic 
+   * @param {function} handler 
+   */
   off(topic, handler) {
     this.#mediator.off(topic, handler)
   }
 
+  /**
+   * Emit an event with optional data
+   * @param {string} topic 
+   * @param {*} data 
+   */
   emit(topic, data) {
     this.#mediator.emit(topic, data)
   }
@@ -383,6 +403,10 @@ export default class Chart {
     this.#Scale.setDimensions({w: null, h: h})
   }
 
+  /**
+   * Set chart dimensions
+   * @param {object} dim - dimensions {w:width, h: height}
+   */
   setDimensions(dim) {
     const buffer = this.config.buffer || BUFFERSIZE
     const width = dim.w - this.#elScale.clientWidth
@@ -659,22 +683,35 @@ export default class Chart {
 
   }
   
+  /**
+   * Refresh the entire chart
+   */
   refresh() {
     this.#Scale.draw()
     this.draw(this.range, true)
   }
 
+  /**
+   * Return the screen x position for a give time stamp
+   * @param {number} time - timestamp
+   * @returns {number} - x position on canvas
+   */
   time2XPos(time) {
     return this.#Time.xPos(time)
   }
 
+  /**
+   * 
+   * @param {number} price 
+   * @returns {number} - y position on canvas
+   */
   price2YPos(price) {
     return this.#Scale.yPos(price)
   }
 
   /**
    * Set the price accuracy
-   * @param pricePrecision - Price accuracy
+   * @param {number} pricePrecision - Price accuracy
    */
   setPriceVolumePrecision (pricePrecision) {
     if (!isNumber(pricePrecision) || pricePrecision < 0) {
@@ -686,7 +723,7 @@ export default class Chart {
 
   /**
    * Set the volume accuracy
-   * @param volumePrecision - Volume accuracy
+   * @param {number}volumePrecision - Volume accuracy
    */
   setPriceVolumePrecision (volumePrecision) {
     if (!isNumber(volumePrecision) || volumePrecision < 0) {
@@ -696,6 +733,11 @@ export default class Chart {
     this.#volumePrecision = volumePrecision
   }
 
+  /**
+   * Update chart and indicator legends
+   * @param {array} pos - cursor position x, y, defaults to current cursor position
+   * @param {array} candle - OHLCV
+   */
   updateLegends(pos=this.#cursorPos, candle=false) {
 
     const legends = this.#Legends.list
@@ -731,6 +773,7 @@ export default class Chart {
 
   /**
    * Zoom (contract or expand) range start
+   * emits: "chart_zoomDone"
    * @param {array} data - [newStart, newEnd, oldStart, oldEnd, inOut]
    */
   zoomRange(data) {
@@ -743,6 +786,11 @@ export default class Chart {
     this.emit("chart_zoomDone")
   }
 
+  /**
+   * Set the entire chart dimensions, this will cascade and resize components
+   * @param {number} width - width in pixels, defaults to current width
+   * @param {number} height - height in pixels, defaults to current height
+   */
   resize(width=this.width, height=this.height) {
     // adjust element, viewport and layers
     this.setDimensions({w: width, h: height})

@@ -3,6 +3,11 @@
 // import pixel aspect ratio
 import { float2Int, countDigits, numDigits, precision, nice, round } from '../../utils/number.js'
 
+/**
+ * Parent class that xAxis and yAxis extend
+ * @export
+ * @class Axis
+ */
 export default class Axis {
 
   #core

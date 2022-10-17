@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: utils/canvas.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: utils/canvas.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>export const defaultOptions = {
+  fontSize: 12,
+  fontWeight: "normal",
+  fontFamily: 'Helvetica Neue',
+  paddingLeft: 3,
+  paddingRight: 3,
+  paddingTop: 2,
+  paddingBottom: 2,
+  borderSize: 0,
+  txtCol: "#000",
+  bakCol: "#CCC"
+}
+
+/**
+ * Get screen ratio
+ * @param canvas
+ * @returns {number}
+ */
+export function getPixelRatio (canvas) {
+  return (canvas.ownerDocument &amp;&amp; canvas.ownerDocument.defaultView &amp;&amp; canvas.ownerDocument.defaultView.devicePixelRatio) || 2
+}
+
+/**
+ * Measure the width of the text
+ * @param ctx
+ * @param text
+ * @returns {number}
+ */
+export function calcTextWidth (ctx, text) {
+  return Math.round(ctx.measureText(text).width)
+}
+
+/**
+ * Create font
+ * @param fontSize
+ * @param fontFamily
+ * @param fontWeight
+ * @returns {string}
+ */
+export function createFont (
+  fontSize = defaultOptions.fontSize, 
+  fontWeight = defaultOptions.fontWeight, 
+  fontFamily = defaultOptions.fontFamily
+  ) {
+  return `${fontWeight} ${fontSize}px ${fontFamily}`
+}
+
+/**
+ * Get the width of the text box
+ * @param ctx
+ * @param text
+ * @param options
+ * @returns {number}
+ */
+export function getTextRectWidth (ctx, text, options) {
+  ctx.font = createFont(options.fontSize, options.fontWeight, options.fontFamily)
+  const textWidth = calcTextWidth(ctx, text)
+  const paddingLeft = options.paddingLeft || 0
+  const paddingRight = options.paddingRight || 0
+  const borderSize = options.borderSize || 0
+  return paddingLeft + paddingRight + textWidth + (borderSize * 2)
+}
+
+/**
+ * Get the height of the text box
+ * @param options
+ * @returns {number}
+ */
+export function getTextRectHeight (options) {
+  const paddingTop = options.paddingTop || 0
+  const paddingBottom = options.paddingBottom || 0
+  const borderSize = options.borderSize || 0
+  const fontSize = options.fontSize || 0
+  return paddingTop + paddingBottom + fontSize + (borderSize * 2)
+}
+
+/**
+ * draw text with background
+ * @export
+ * @param {canvas} ctx
+ * @param {string} txt
+ * @param {number} x
+ * @param {number} y
+ * @param {object} options - styling options
+ */
+export function drawTextBG(ctx, txt, x, y, options) {
+
+  /// lets save current state as we make a lot of changes        
+  ctx.save();
+
+  ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily)
+  /// draw text from top - makes life easier at the moment
+  ctx.textBaseline = 'top';
+
+  /// color for background
+  ctx.fillStyle = options.bakCol || defaultOptions.bakCol;
+  
+  /// get width of text
+  let width = getTextRectWidth(ctx, txt, options)
+  let height = getTextRectHeight(options)
+
+  /// draw background rect
+  ctx.fillRect(x, y, width, height);
+
+  // draw text on top
+  ctx.fillStyle = options.txtCol || defaultOptions.txtCol;
+  x = x + options?.paddingLeft
+  y = y + options?.paddingTop
+  ctx.fillText(txt, x, y);
+  
+  /// restore original state
+  ctx.restore();
+}
+
+
+function drawSpline(points, tension) {
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+
+  var t = (tension != null) ? tension : 1;
+  for (var i = 0; i &lt; points.length - 1; i++) {
+      var p0 = (i > 0) ? points[i - 1] : points[0];
+      var p1 = points[i];
+      var p2 = points[i + 1];
+      var p3 = (i != points.length - 2) ? points[i + 2] : p2;
+
+      var cp1x = p1.x + (p2.x - p0.x) / 6 * t;
+      var cp1y = p1.y + (p2.y - p0.y) / 6 * t;
+
+      var cp2x = p2.x - (p3.x - p1.x) / 6 * t;
+      var cp2y = p2.y - (p3.y - p1.y) / 6 * t;
+
+      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+  }
+  ctx.stroke();
+}
+
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Axis.html">Axis</a></li><li><a href="Colour.html">Colour</a></li><li><a href="DMI.module.exports.html">module.exports</a></li><li><a href="Hit.html">Hit</a></li><li><a href="indicator.html">indicator</a></li><li><a href="Layer.html">Layer</a></li><li><a href="MainPane.html">MainPane</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="RSI.html">RSI</a></li><li><a href="RSI.module.exports.html">module.exports</a></li><li><a href="ScaleBar.html">ScaleBar</a></li><li><a href="Scene.html">Scene</a></li><li><a href="StateMachine.html">StateMachine</a></li><li><a href="ToolsBar.html">ToolsBar</a></li><li><a href="TradeXchart.html">TradeXchart</a></li><li><a href="TradeXchart.module.exports.html">module.exports</a></li><li><a href="Viewport.html">Viewport</a></li><li><a href="WebWorker.html">WebWorker</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addOffChart">addOffChart</a></li><li><a href="global.html#addTool">addTool</a></li><li><a href="global.html#binarySearch">binarySearch</a></li><li><a href="global.html#binarySearchNearest">binarySearchNearest</a></li><li><a href="global.html#calcIndicator">calcIndicator</a></li><li><a href="global.html#calcIndicatorStream">calcIndicatorStream</a></li><li><a href="global.html#calcTextWidth">calcTextWidth</a></li><li><a href="global.html#calcTimeIndex">calcTimeIndex</a></li><li><a href="global.html#CandleType">CandleType</a></li><li><a href="global.html#checkType">checkType</a></li><li><a href="global.html#copyDeep">copyDeep</a></li><li><a href="global.html#countDigits">countDigits</a></li><li><a href="global.html#createFont">createFont</a></li><li><a href="global.html#day_start">day_start</a></li><li><a href="global.html#decimalPlaces">decimalPlaces</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#detectInterval">detectInterval</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#drawTextBG">drawTextBG</a></li><li><a href="global.html#emit">emit</a></li><li><a href="global.html#end">end</a></li><li><a href="global.html#execute">execute</a></li><li><a href="global.html#float2Int">float2Int</a></li><li><a href="global.html#get_day">get_day</a></li><li><a href="global.html#get_month">get_month</a></li><li><a href="global.html#get_year">get_year</a></li><li><a href="global.html#getPixelRatio">getPixelRatio</a></li><li><a href="global.html#getPrecision">getPrecision</a></li><li><a href="global.html#getRandom">getRandom</a></li><li><a href="global.html#getRandomInt">getRandomInt</a></li><li><a href="global.html#getRandomIntBetween">getRandomIntBetween</a></li><li><a href="global.html#getRandomIntInclusive">getRandomIntInclusive</a></li><li><a href="global.html#getRange">getRange</a></li><li><a href="global.html#getTextRectHeight">getTextRectHeight</a></li><li><a href="global.html#getTextRectWidth">getTextRectWidth</a></li><li><a href="global.html#GlobalStyle">GlobalStyle</a></li><li><a href="global.html#hex">hex</a></li><li><a href="global.html#hexa">hexa</a></li><li><a href="global.html#id">id</a></li><li><a href="global.html#index10">index10</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#interval2MS">interval2MS</a></li><li><a href="global.html#isArray">isArray</a></li><li><a href="global.html#isBoolean">isBoolean</a></li><li><a href="global.html#isFunction">isFunction</a></li><li><a href="global.html#isNumber">isNumber</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#isValid">isValid</a></li><li><a href="global.html#isValidCandle">isValidCandle</a></li><li><a href="global.html#limit">limit</a></li><li><a href="global.html#loadState">loadState</a></li><li><a href="global.html#log10">log10</a></li><li><a href="global.html#maxMinPriceVol">maxMinPriceVol</a></li><li><a href="global.html#mean">mean</a></li><li><a href="global.html#mergeData">mergeData</a></li><li><a href="global.html#mergeDeep">mergeDeep</a></li><li><a href="global.html#month_start">month_start</a></li><li><a href="global.html#ms2TimeUnits">ms2TimeUnits</a></li><li><a href="global.html#nearestArrayValue">nearestArrayValue</a></li><li><a href="global.html#nice">nice</a></li><li><a href="global.html#numDigits">numDigits</a></li><li><a href="global.html#numDigits2">numDigits2</a></li><li><a href="global.html#off">off</a></li><li><a href="global.html#on">on</a></li><li><a href="global.html#power">power</a></li><li><a href="global.html#precision">precision</a></li><li><a href="global.html#price2YPos">price2YPos</a></li><li><a href="global.html#refresh">refresh</a></li><li><a href="global.html#renderClosedFillPath">renderClosedFillPath</a></li><li><a href="global.html#renderClosedStrokePath">renderClosedStrokePath</a></li><li><a href="global.html#renderFilledCircle">renderFilledCircle</a></li><li><a href="global.html#renderFilledDiamond">renderFilledDiamond</a></li><li><a href="global.html#renderFilledTriangle">renderFilledTriangle</a></li><li><a href="global.html#renderFillRect">renderFillRect</a></li><li><a href="global.html#renderFillRoundRect">renderFillRoundRect</a></li><li><a href="global.html#renderHorizontalLine">renderHorizontalLine</a></li><li><a href="global.html#renderLine">renderLine</a></li><li><a href="global.html#renderPath">renderPath</a></li><li><a href="global.html#renderRoundRect">renderRoundRect</a></li><li><a href="global.html#renderStrokedCircle">renderStrokedCircle</a></li><li><a href="global.html#renderStrokeFillRoundRect">renderStrokeFillRoundRect</a></li><li><a href="global.html#renderStrokeRoundRect">renderStrokeRoundRect</a></li><li><a href="global.html#renderText">renderText</a></li><li><a href="global.html#renderVerticalLine">renderVerticalLine</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#round">round</a></li><li><a href="global.html#saveState">saveState</a></li><li><a href="global.html#setDimensions">setDimensions</a></li><li><a href="global.html#setPricePrecision">setPricePrecision</a></li><li><a href="global.html#setPriceVolumePrecision">setPriceVolumePrecision</a></li><li><a href="global.html#setRange">setRange</a></li><li><a href="global.html#setStream">setStream</a></li><li><a href="global.html#setTheme">setTheme</a></li><li><a href="global.html#setVolumePrecision">setVolumePrecision</a></li><li><a href="global.html#start">start</a></li><li><a href="global.html#stop">stop</a></li><li><a href="global.html#time2XPos">time2XPos</a></li><li><a href="global.html#timestampDifference">timestampDifference</a></li><li><a href="global.html#updateLegends">updateLegends</a></li><li><a href="global.html#updateRange">updateRange</a></li><li><a href="global.html#validateConfig">validateConfig</a></li><li><a href="global.html#validateShallow">validateShallow</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#weave">weave</a></li><li><a href="global.html#YAxisPosition">YAxisPosition</a></li><li><a href="global.html#YAxisType">YAxisType</a></li><li><a href="global.html#year_start">year_start</a></li><li><a href="global.html#zoomRange">zoomRange</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Tue Oct 18 2022 01:23:08 GMT+0200 (Central European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

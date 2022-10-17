@@ -1516,8 +1516,8 @@ function countDigits(value) {
  * count integer digits
  * bitwise operations in JavaScript only work with 32-bit values (so a max of 2,147,483,647)
  * @export
- * @param {Number} value
- * @return {Number}  
+ * @param {number} value
+ * @return {number}  
  */
 function numDigits(value) {
   return (Math.log10((value ^ (value >> 31)) - (value >> 31)) | 0) + 1;
@@ -1526,8 +1526,8 @@ function numDigits(value) {
 /**
  * truncate floating point, works for positives as well as negatives
  * @export
- * @param {Number} value
- * @return {Number}  
+ * @param {number} value
+ * @return {number}  
  */
 function float2Int(value) {
   return value | 0
@@ -4568,8 +4568,8 @@ class Viewport {
   }
   /**
    * get key's associated coordinate - applied to mouse events.
-   * @param {Number} x
-   * @param {Number} y
+   * @param {number} x
+   * @param {number} y
    * @returns {Integer} integer - returns -1 if no pixel is there
    */
   getIntersection(x, y) {
@@ -4675,8 +4675,8 @@ class Layer {
 
   /**
    * set layer position
-   * @param {Number} x
-   * @param {Number} y
+   * @param {number} x
+   * @param {number} y
    * @returns {Layer}
    */
   setPosition(x, y) {
@@ -4686,8 +4686,8 @@ class Layer {
   }
   /**
    * set layer size
-   * @param {Number} width
-   * @param {Number} height
+   * @param {number} width
+   * @param {number} height
    * @returns {Layer}
    */
   setSize(width, height) {
@@ -4809,8 +4809,8 @@ class Scene {
 
   /**
    * set scene size
-   * @param {Number} width
-   * @param {Number} height
+   * @param {number} width
+   * @param {number} height
    * @returns {Scene}
    */
   setSize(width, height) {
@@ -4850,7 +4850,7 @@ class Scene {
   /**
    * convert scene into an image
    * @param {String} type - type of image format
-   * @param {Number} quality - image quality 0 - 1
+   * @param {number} quality - image quality 0 - 1
    * @param {Function} cb - callback
    */
   toImage(type = "image/png", quality, cb) {
@@ -4870,7 +4870,7 @@ class Scene {
    * @param {Object} cfg - {filename}
    * @param {Function} cb - optional, by default opens image in new window / tab
    * @param {String} type - type of image format
-   * @param {Number} quality - image quality 0 - 1
+   * @param {number} quality - image quality 0 - 1
    */
   export(cfg, cb, type = "image/png", quality) {
     if (typeof cb !== "function") cb = this.blobCallback.bind({ cfg: cfg });
@@ -4929,8 +4929,8 @@ class Hit {
 
   /**
    * set hit size
-   * @param {Number} width
-   * @param {Number} height
+   * @param {number} width
+   * @param {number} height
    * @returns {Hit}
    */
   setSize(width, height) {
@@ -4964,8 +4964,8 @@ class Hit {
   }
   /**
    * get key associated with coordinate. This can be used for mouse interactivity.
-   * @param {Number} x
-   * @param {Number} y
+   * @param {number} x
+   * @param {number} y
    * @returns {Integer} integer - returns -1 if no pixel is there
    */
   getIntersection(x, y) {
@@ -5010,7 +5010,7 @@ class Hit {
   }
   /**
    * get canvas formatted color string from data index
-   * @param {Number} index
+   * @param {number} index
    * @returns {String}
    */
   getColorFromIndex(index) {
@@ -5030,7 +5030,7 @@ class Hit {
   }
   /**
    * converts integer value to rgb array
-   * @param {Number} number - positive number between 0 and 256*256*256 = 16,777,216
+   * @param {number} number - positive number between 0 and 256*256*256 = 16,777,216
    * @returns {Array}
    */
   intToRGB(number) {

@@ -48,10 +48,10 @@ const colour = {
 
   /**
      * Validates RGB(a) value
-     * @param  {Number} r
-     * @param  {Number} g
-     * @param  {Number} b
-     * @param  {Number} [a=0]
+     * @param  {number} r
+     * @param  {number} g
+     * @param  {number} b
+     * @param  {number} [a=0]
      * @return {Boolean}
      */
   isValidRGBn: function (r, g, b, a) {

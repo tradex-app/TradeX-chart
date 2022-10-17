@@ -1,15 +1,15 @@
 
 /**
  * Rounded filled rectangle with border
- * @param ctx
- * @param fillStyle
- * @param borderStyle
- * @param borderSize
- * @param x
- * @param y
- * @param width
- * @param height
- * @param borderRadius
+ * @param {object} ctx - canvas reference
+ * @param {string} fillStyle - CSS colour format
+ * @param {string} borderStyle - CSS colour format
+ * @param {number} borderSize - pixel width
+ * @param {number} x - canvas pixel position
+ * @param {number} y - canvas pixel position
+ * @param {number} width - pixel distance
+ * @param {number} height - pixel distance
+ * @param {number} borderRadius - pixel distance
  */
 export function renderStrokeFillRoundRect (
   ctx, x, y, width, height, 
@@ -21,12 +21,12 @@ export function renderStrokeFillRoundRect (
 
 /**
  * Filled rectangle
- * @param ctx
- * @param style
- * @param x
- * @param y
- * @param width
- * @param height
+ * @param {object} ctx - canvas reference
+ * @param {string} style - CSS colour format
+ * @param {number} x - canvas pixel position
+ * @param {number} y - canvas pixel position
+ * @param {number} width - pixel distance
+ * @param {number} height - pixel distance
  */
 export function renderFillRect (ctx, x, y, width, height, style) {
   ctx.fillStyle = style
@@ -35,14 +35,14 @@ export function renderFillRect (ctx, x, y, width, height, style) {
 
 /**
  * Rounded rectangle
- * @param ctx
- * @param borderStyle
- * @param borderSize
- * @param x
- * @param y
- * @param w
- * @param h
- * @param r
+ * @param {object} ctx - canvas reference
+ * @param {string} borderStyle - CSS colour format
+ * @param {number} borderSize - pixel width
+ * @param {number} x - canvas pixel position
+ * @param {number} y - canvas pixel position
+ * @param {number} w - width pixel distance
+ * @param {number} h - height pixel distance
+ * @param {number} r - radius pixel distance
  */
 export function renderStrokeRoundRect (
   ctx, x, y, w, h, r,
@@ -56,13 +56,13 @@ export function renderStrokeRoundRect (
 
 /**
  * Rounded filled rectangle
- * @param ctx
- * @param style
- * @param x
- * @param y
- * @param w
- * @param h
- * @param r
+ * @param {object} ctx - canvas reference
+ * @param {string} style - CSS colour format
+ * @param {number} x - canvas pixel position
+ * @param {number} y - canvas pixel position
+ * @param {number} w - width pixel distance
+ * @param {number} h - height pixel distance
+ * @param {number} r - radius pixel distance
  */
 export function renderFillRoundRect (ctx, x, y, w, h, r, style) {
   ctx.fillStyle = style
@@ -72,12 +72,12 @@ export function renderFillRoundRect (ctx, x, y, w, h, r, style) {
 
 /**
  * Rounded rectangle
- * @param ctx
- * @param x
- * @param y
- * @param w
- * @param h
- * @param r
+ * @param {object} ctx - canvas reference
+ * @param {number} x - canvas pixel position
+ * @param {number} y - canvas pixel position
+ * @param {number} w - width pixel distance
+ * @param {number} h - height pixel distance
+ * @param {number} r - radius pixel distance
  */
 export function renderRoundRect (ctx, x, y, w, h, r) {
   ctx.beginPath()

@@ -1,5 +1,5 @@
 /**
- * @param value
+ * @param {*} value
  * @return {boolean}
  */
  export function isArray (value) {
@@ -26,7 +26,7 @@ export function isObject (value) {
 }
 
 /**
- * @param value
+ * @param {*} value
  * @returns {boolean}
  */
 export function isNumber (value) {
@@ -34,7 +34,7 @@ export function isNumber (value) {
 }
 
 /**
- * @param value
+ * @param {*} value
  * @returns {boolean}
  */
 export function isValid (value) {
@@ -42,7 +42,7 @@ export function isValid (value) {
 }
 
 /**
- * @param value
+ * @param {*} value
  * @returns {boolean}
  */
 export function isBoolean (value) {
@@ -50,7 +50,7 @@ export function isBoolean (value) {
 }
 
 /**
- * @param value
+ * @param {*} value
  * @return {boolean}
  */
 export function isString (value) {
@@ -59,14 +59,10 @@ export function isString (value) {
 
 /**
  * @param {string} type
- * @param value
- * @param {string} name 
+ * @param {*} value
  * @return {boolean}
  */
-export function checkType(type, value, name) {
-  // if (typeof value !== type) {
-  //   return "" + name + " has to be a " + type;
-  // }
+export function checkType(type, value) {
   switch(type) {
     case 'array': isArray(value); break;
     case 'function': isFunction(value); break;

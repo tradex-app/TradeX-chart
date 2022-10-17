@@ -320,6 +320,7 @@ constructor (mediator, options={}) {
     config.cnt = cnt
     config.modID = `${ID}_${cnt}`
     config.container = container
+    config.CPUCores = navigator.hardwareConcurrency
 
     const core = new SX.Core(config)
 
@@ -699,6 +700,11 @@ constructor (mediator, options={}) {
     }
   }
 
+  /**
+   * specify a chart stream
+   * @param {object} stream 
+   * @returns {instance}
+   */
   setStream(stream) {
     if (this.stream?.constructor.name == "Stream") {
       this.error("Error: Invoke stopStream() before starting a new one.")
@@ -886,6 +892,9 @@ constructor (mediator, options={}) {
     return true
   }
 
+  /**
+   * refresh / redraw the chart
+   */
   refresh() {
     this.MainPane.draw()
     this.Chart.refresh()
