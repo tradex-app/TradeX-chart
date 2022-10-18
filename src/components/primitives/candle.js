@@ -6,7 +6,8 @@
 // CANDLE_DOWN_HOLLOW: 'candle_down_hollow',
 // OHLC: 'ohlc',
 
-import { CandleStyle } from "../../definitions/style"
+import { CandleType } from "../../definitions/style"
+import { defaultTheme } from "../../definitions/style"
 
 export default class Candle {
 
@@ -16,32 +17,27 @@ export default class Candle {
     this.scene = scene
     this.ctx = this.scene.context
     this.width = this.scene.width
-    this.cfg = config
-    this.cfg.candleType = this.cfg?.candleType || "CANDLE_SOLID"
-    this.cfg.colourCandleUp = this.cfg?.colourCandleUp || CandleStyle.COLOUR_CANDLE_UP
-    this.cfg.colourCandleDn = this.cfg?.colourCandleDn || CandleStyle.COLOUR_CANDLE_DN
-    this.cfg.colourWickUp = this.cfg?.colourWickUp || CandleStyle.COLOUR_WICK_UP
-    this.cfg.colourWickDn = this.cfg?.colourWickDn || CandleStyle.COLOUR_WICK_DN
+    this.cfg = {...defaultTheme.candle, ...config}
   }
 
   draw(data) {
     const ctx = this.ctx
     const hilo = data.raw[4] >= data.raw[1]
-    const bodyColour = hilo ? this.cfg.colourCandleUp : this.cfg.colourCandleDn
-    const wickColour = hilo ? this.cfg.colourWickUp : this.cfg.colourWickDn
+    const bodyColour = hilo ? this.cfg.candle.UpBodyColour : this.cfg.candle.DnBodyColour
+    const wickColour = hilo ? this.cfg.candle.UpWickColour : this.cfg.candle.DnWickColour
 
-    switch(this.cfg?.candleType) {
-      case "CANDLE_SOLID": 
+    switch(this.cfg.candle.Type) {
+      case CandleType.CANDLE_SOLID :
       this.fill = true
       break;
-      case "CANDLE_HOLLOW":
+      case CandleType.CANDLE_HOLLOW :
       case "OHLC":
         this.fill = false
         break;
-      case "CANDLE_UP_HOLLOW":
+      case CandleType.CANDLE_UP_HOLLOW :
         this.fill = false || !hilo
         break;
-      case "CANDLE_DOWN_HOLLOW":
+      case CandleType.CANDLE_DOWN_HOLLOW :
         this.fill = false || hilo
       // default:
       //   this.fill = true
@@ -62,7 +58,7 @@ export default class Candle {
     ctx.moveTo(x05, Math.floor(data.h))
 
     // Wicks
-    if (this.cfg.candleType === "OHLC") {
+    if (this.cfg.candle.Type === "OHLC") {
       ctx.lineTo(x05, Math.floor(data.l))
     }
     else {
@@ -93,7 +89,7 @@ export default class Candle {
       ctx.fill()
       ctx.stroke()
     } 
-    else if (data.w > 1.5 && !this.fill && this.cfg.candleType !== "OHLC") {
+    else if (data.w > 1.5 && !this.fill && this.cfg.candle.Type !== "OHLC") {
       let s = hilo ? 1 : -1
       ctx.rect(
         Math.floor(x - hw -1),
@@ -103,7 +99,7 @@ export default class Candle {
       )
       ctx.stroke()
     } 
-    else if (this.cfg.candleType === "OHLC") {
+    else if (this.cfg.candle.Type === "OHLC") {
       // ctx.strokeStyle = wickColour
       ctx.beginPath()
       ctx.moveTo(x05 - hw, data.o)

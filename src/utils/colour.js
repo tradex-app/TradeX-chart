@@ -41,7 +41,6 @@ export default class Colour {
   }
 
   /**
-   * 
    * @param {string} colour 
    */
   constructor (colour) {
@@ -97,6 +96,10 @@ export default class Colour {
     }
   }
 
+  /**
+   * Set hex value
+   * @param {string} hex 
+   */
   setHex(hex) {
     let val = this.#value;
     ([
@@ -108,6 +111,9 @@ export default class Colour {
     val.hex = "#" + val.r16 +val.g16 + val.b16 + val.a16
   }
 
+  /**
+   * @param {string} rgba 
+   */
   setRGBA(rgba) {
     let val = this.#value;
     [
@@ -120,6 +126,9 @@ export default class Colour {
     val.rgba = `rgb(${rgba[0]},${rgba[1]},${rgba[2]},${rgba[3]})`
   }
 
+  /**
+   * @param {string} hsla 
+   */
   setHSLA(hsla) {
     let val = this.#value;
     [

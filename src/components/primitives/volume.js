@@ -1,8 +1,7 @@
 // volume.js
 // draws a single volume bar
 
-import { VolumeStyle } from "../../definitions/style";
-
+import { defaultTheme } from "../../definitions/style"
 
 export default class VolumeBar {
 
@@ -10,15 +9,13 @@ export default class VolumeBar {
     this.scene = scene
     this.ctx = this.scene.context
     this.width = this.scene.width
-    this.cfg = config
-    this.cfg.colourVolumeUp = this.cfg?.colourVolumeUp || VolumeStyle.COLOUR_VOLUME_UP
-    this.cfg.colourVolumeDn = this.cfg?.colourVolumeDn || VolumeStyle.COLOUR_VOLUME_DN
+    this.cfg = {...defaultTheme.candle, ...config}
   }
 
   draw(data) {
     const ctx = this.ctx;
     const hilo = data.raw[4] >= data.raw[1];
-    const barColour = hilo ? this.cfg.colourVolumeUp : this.cfg.colourVolumeDn;
+    const barColour = hilo ? this.cfg.volume.UpColour: this.cfg.volume.DnColour
 
     ctx.save();
     ctx.strokeStyle = barColour;

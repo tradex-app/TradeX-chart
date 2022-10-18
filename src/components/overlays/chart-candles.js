@@ -1,7 +1,7 @@
 // chart-candles.js
 
 import Candle from "../primitives/candle";
-import { CandleStyle } from "../../definitions/style"
+import { CandleType } from "../../definitions/style"
 import { BUFFERSIZE } from "../../definitions/chart"
 
 export default class chartCandles extends Candle {
@@ -30,7 +30,7 @@ export default class chartCandles extends Candle {
   draw(range=this.#core.range) {
     this.#scene.clear()
 
-    const render = (this.#config.CandleType === "AREA") ?
+    const render = (this.#config.candle.Type === CandleType.AREA) ?
       (candle) => {} :
       (candle) => {super.draw(candle)}
     const offset = this.#xAxis.smoothScrollOffset || 0
@@ -64,7 +64,7 @@ export default class chartCandles extends Candle {
       candle.x = candle.x + candle.w
     }
 
-    if (this.#config.CandleType === "AREA") super.areaRender()
+    if (this.#config.candle.Type === CandleType.AREA) super.areaRender()
   }
 
 }

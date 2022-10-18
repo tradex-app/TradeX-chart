@@ -536,8 +536,7 @@ export default class Chart {
         this.#Time, 
         this.#Scale, 
         this.#theme)
-
-    this.#theme.maxVolumeH = this.#theme?.onchartVolumeH || VolumeStyle.ONCHART_VOLUME_HEIGHT
+    this.#theme.maxVolumeH = this.#theme?.volume?.Height || VolumeStyle.ONCHART_VOLUME_HEIGHT
     this.#chartVolume =
       new chartVolume(
         this.#layerVolume, 
@@ -748,8 +747,8 @@ export default class Chart {
     if (this.#Stream && ohlcv[4] === null) ohlcv = candle
 
     // TODO: get candle colours from config / theme
-    if (ohlcv[4] >= ohlcv[1]) colours = new Array(5).fill(CandleStyle.COLOUR_WICK_UP)
-    else colours = new Array(5).fill(CandleStyle.COLOUR_WICK_DN)
+    if (ohlcv[4] >= ohlcv[1]) colours = new Array(5).fill(this.theme.candle.UpWickColour)
+    else colours = new Array(5).fill(this.theme.candle.DnWickColour)
 
     inputs.O = this.#Scale.nicePrice(ohlcv[1])
     inputs.H = this.#Scale.nicePrice(ohlcv[2])

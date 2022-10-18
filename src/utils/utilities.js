@@ -158,3 +158,40 @@ export function b64toBlob(b64Data, contentType, sliceSize) {
   var blob = new Blob(byteArrays, {type: contentType});
   return blob;
 }
+
+/**
+ * Native Map object serialization - JSON.stringify(originalValue, replacer);
+ * Used as the second argument
+ * https://stackoverflow.com/a/56150320/15109215
+ * @param {*} key 
+ * @param {*} value 
+ * @returns 
+ */
+export function replacer(key, value) {
+  if(value instanceof Map) {
+    return {
+      dataType: 'Map',
+      value: Array.from(value.entries()), // or with spread: value: [...value]
+    };
+  } else {
+    return value;
+  }
+}
+
+/**
+ * Native Map object reconstitution from JSON - JSON.parse(str, reviver);
+ * Used as the second argument
+ * https://stackoverflow.com/a/56150320/15109215
+ * @param {*} key 
+ * @param {*} value 
+ * @returns 
+ */
+export function reviver(key, value) {
+  if(typeof value === 'object' && value !== null) {
+    if (value.dataType === 'Map') {
+      return new Map(value.value);
+    }
+  }
+  return value;
+}
+

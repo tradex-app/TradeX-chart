@@ -17,6 +17,7 @@ export default class yAxis extends Axis {
   #source
   #parent
   #chart
+  #core
 
   #yAxisType = YAXIS_TYPES[0]  // default, log, percent
   #yAxisPadding = 1.04
@@ -29,14 +30,16 @@ export default class yAxis extends Axis {
 
   constructor(parent, chart, yAxisType=YAXIS_TYPES[0]) {
     super(parent, chart)
+    this.#core = parent.mediator.api.core
     this.#chart = chart
     this.#parent = parent
     this.#source = parent.parent
     this.yAxisType = yAxisType
-    this.#yAxisGrid = (this.#parent.core.config?.yAxisGrid) ? 
-      this.#parent.core.config?.yAxisGrid : YAXIS_GRID
+    this.#yAxisGrid = (this.core.config?.yAxisGrid) ? 
+      this.core.config?.yAxisGrid : YAXIS_GRID
   }
 
+  get core() { return this.#core }
   get chart() { return this.#chart }
   get data() { return this.chart.data }
   get range() { return this.#parent.mediator.api.core.range }
@@ -53,6 +56,7 @@ export default class yAxis extends Axis {
   set yAxisTicks(t) { this.#yAxisTicks = isNumber(t) ? t : 0 }
   get yAxisTicks() { return this.#yAxisTicks }
   get yAxisGrads() { return this.#yAxisGrads }
+  get theme() { return this.core.theme }
 
   calcHeight() {
     let api = this.#chart.mediator.api

@@ -110,3 +110,27 @@ export const PriceLineStyle = {
   lineDash: [1,1]
 }
 
+export const defaultTheme = {
+  candle: {
+    Type: CandleType.CANDLE_SOLID,
+    UpBodyColour: CandleStyle.COLOUR_CANDLE_UP,
+    UpWickColour: CandleStyle.COLOUR_CANDLE_DN,
+    DnBodyColour: CandleStyle.COLOUR_WICK_UP,
+    DnWickColour: CandleStyle.COLOUR_WICK_DN,
+  },
+  volume: {
+    Height: VolumeStyle.ONCHART_VOLUME_HEIGHT,
+    UpColour: VolumeStyle.COLOUR_VOLUME_UP,
+    DnColour: VolumeStyle.COLOUR_VOLUME_DN,
+  },
+  chart: {
+    Background: GlobalStyle.COLOUR_BG,
+    BorderColour: GlobalStyle.COLOUR_BORDER,
+    TextColour: GlobalStyle.COLOUR_TXT,
+    GridColour: GridStyle.COLOUR_GRID,
+  },
+  onChart: {
+
+  },
+}
+

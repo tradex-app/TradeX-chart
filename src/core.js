@@ -12,6 +12,7 @@ import WidgetsG from './components/widgets'
 import State from './state'
 import { Range, calcTimeIndex } from "./helpers/range"
 import Stream from './helpers/stream'
+import Theme from "./helpers/theme"
 import WebWorker from "./helpers/webWorkers"
 import Indicators from './definitions/indicators'
 import * as Time from './utils/time'
@@ -445,6 +446,7 @@ constructor (mediator, options={}) {
 
   /**
    * Start the chart processing events and displaying data
+   * @memberof TradeXchart
    */
   start() {
     this.log("...processing state")
@@ -469,6 +471,7 @@ constructor (mediator, options={}) {
   /**
    * Stop all chart event processing and remove the chart from DOM.
    * In other words, destroy the chart.
+   * @memberof TradeXchart
    */
   end() {
     this.log("...cleanup the mess")
@@ -567,7 +570,7 @@ constructor (mediator, options={}) {
       rangeStartTS: (rangeStartTS) => this.#rangeStartTS = (isNumber(rangeStartTS)) ? rangeStartTS : undefined,
       rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
       indicators: (indicators) => this.#indicators = {...Indicators, ...indicators },
-      theme: (theme) => this.setTheme(theme),
+      theme: (theme) => this.addTheme(theme),
       stream: (stream) => this.#stream = (isObject(stream)) ? stream : {},
       pricePrecision: (precision) => this.setPricePrecision(precision),
       volumePrecision: (precision) => this.setVolumePrecision(precision),
@@ -615,6 +618,7 @@ constructor (mediator, options={}) {
    * Set chart width and height
    * @param {number} w - width in pixels
    * @param {number} h - height in pixels
+   * @memberof TradeXchart
    */
   setDimensions(w, h) {
     let width = this.width
@@ -645,9 +649,10 @@ constructor (mediator, options={}) {
   }
 
   /**
- * Set the price accuracy
- * @param {number} pricePrecision - Price accuracy
- */
+   * Set the price accuracy
+   * @param {number} pricePrecision - Price accuracy
+   * @memberof TradeXchart
+   */
     setPricePrecision (pricePrecision) {
     if (!isNumber(pricePrecision) || pricePrecision < 0) {
       pricePrecision = PRICE_PRECISION
@@ -658,6 +663,7 @@ constructor (mediator, options={}) {
   /**
    * Set the volume accuracy
    * @param {number} volumePrecision - Volume accuracy
+   * @memberof TradeXchart
    */
   setVolumePrecision (volumePrecision) {
     if (!isNumber(volumePrecision) || volumePrecision < 0) {
@@ -667,12 +673,24 @@ constructor (mediator, options={}) {
   }
 
   /**
-   * Set the chart theme
+   * Add a theme to the chart
    * @param {object} volumePrecision - Volume accuracy
+   * @memberof TradeXchart
    */
-  setTheme(theme) {
-    // TODO: validation
-    this.#theme = theme
+  addTheme(theme) {
+    const t = Theme.create(theme, this)
+
+    // if no themes are set then use this one
+    if (this.#theme === undefined) this.setTheme(t.ID)
+  }
+
+  /**
+ * Set the chart theme
+ * @param {object} volumePrecision - Volume accuracy
+ * @memberof TradeXchart
+ */
+  setTheme(ID) {
+    this.#theme = Theme.setCurrent(ID)
   }
 
   setScrollPos(pos) {
@@ -702,6 +720,7 @@ constructor (mediator, options={}) {
 
   /**
    * specify a chart stream
+   * @memberof TradeXchart
    * @param {object} stream 
    * @returns {instance}
    */
@@ -808,6 +827,7 @@ constructor (mediator, options={}) {
    * initialize range
    * @param {number} start - index
    * @param {number} end - index
+   * @memberof TradeXchart
    */
   getRange(start=0, end=0, config={}) {
     this.#range = new Range(this.allData, start, end, config)
@@ -820,6 +840,7 @@ constructor (mediator, options={}) {
    * set start and end of range
    * @param {number} start - index
    * @param {number} end - index
+   * @memberof TradeXchart
    */
   setRange(start=0, end=this.rangeLimit) {
     this.#range.set(start, end)
@@ -832,6 +853,7 @@ constructor (mediator, options={}) {
    * Optionally set a new range upon merge.
    * @param {object} merge - merge data must be formatted to a Chart State
    * @param {boolean|object} newRange - false | {start: number, end: number}
+   * @memberof TradeXchart
    */
   // TODO: merge indicator data?
   // TODO: merge dataset?
@@ -881,6 +903,7 @@ constructor (mediator, options={}) {
 
   /**
    * Resize the chart
+   * @memberof TradeXchart
    * @param {number} width - pixels
    * @param {number} height - pixels
    * @returns {boolean} - success or failure
@@ -894,6 +917,7 @@ constructor (mediator, options={}) {
 
   /**
    * refresh / redraw the chart
+   * @memberof TradeXchart
    */
   refresh() {
     this.MainPane.draw()

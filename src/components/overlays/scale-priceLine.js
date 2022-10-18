@@ -2,12 +2,13 @@
 
 import { STREAM_UPDATE } from "../../definitions/core"
 import { CandleStyle, YAxisStyle } from "../../definitions/style";
-import { drawTextBG } from "../../utils/canvas"
+import { drawTextBG, getTextRectHeight } from "../../utils/canvas"
 
 
 export default class scalePriceLine {
 
   #core
+  #theme
   #config
   #scale
   #target
@@ -21,6 +22,7 @@ export default class scalePriceLine {
     this.#config = config
     this.#scale = scale
     this.#core = scale.core
+    this.#theme = scale.core.theme
 
     this.start()
   }
@@ -77,8 +79,8 @@ export default class scalePriceLine {
     ctx.save()
 
     // TODO: get candle colours from config / theme
-    if (candle[4] >= candle[1]) options.bakCol = CandleStyle.COLOUR_CANDLE_UP
-    else options.bakCol = CandleStyle.COLOUR_CANDLE_DN
+    if (candle[4] >= candle[1]) options.bakCol = this.#theme.candle.UpBodyColour
+    else options.bakCol = this.#theme.candle.DnBodyColour
 
     ctx.fillStyle = options.bakCol
     ctx.fillRect(1, yPos, this.width, height)

@@ -54,8 +54,8 @@ export default class chartStreamCandle extends Candle {
     }
 
 
-    if (stream[4] >= stream[1]) this.#config.priceLineStyle.strokeStyle = CandleStyle.COLOUR_CANDLE_UP
-    else this.#config.priceLineStyle.strokeStyle = CandleStyle.COLOUR_CANDLE_DN
+    if (stream[4] >= stream[1]) this.#config.priceLineStyle.strokeStyle = this.#core.theme.candle.UpBodyColour
+    else this.#config.priceLineStyle.strokeStyle = this.#core.theme.candle.DnBodyColour
 
     // draw price line 
     renderHorizontalLine (
