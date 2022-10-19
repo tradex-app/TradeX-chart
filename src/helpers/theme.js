@@ -10,15 +10,15 @@ export default class Theme {
   static #current
 
   #config
-  #core
 
   constructor(theme, core) {
     this.#config = (isObject(theme))? theme : {}
-    this.#core = core
 
     const reserved = [
       "constructor"
     ]
+
+    theme = {...defaultTheme, ...theme}
 
     for (let t in theme) {
       if (reserved.includes(t)) continue
@@ -34,8 +34,7 @@ export default class Theme {
     const instance = new Theme(theme, core)
 
     Theme.#list.set(theme.ID, instance)
-
-    if (!(isObject(Theme.#current))) Theme.#current = instance
+    Theme.setCurrent(theme.ID)
 
     return instance
   }

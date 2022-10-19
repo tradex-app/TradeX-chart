@@ -26,8 +26,27 @@ const config = {
   // rangeStartTS: 1663059600000, // seconds price
   rangeLimit: 30,
   theme: {
-    candleType: "CANDLE_SOLID",
-    onchartVolumeH: 15,
+    candle: {
+      Type: "candle_down_hollow",
+      UpBodyColour: "#FAEB2488",
+      UpWickColour: "#FAEB24",
+      DnBodyColour: "#F900FE88",
+      DnWickColour: "#F900FE",
+    },
+    volume: {
+      Height: 15,
+      UpColour: "#FAEB2444",
+      DnColour: "#F900FE44",
+    },
+    chart: {
+      Background: "#141414",
+      BorderColour: "#666",
+      GridColour: "#333",
+      TextColour: "#ccc"
+    },
+    onChart: {
+
+    },
   },
   isCrypto: true,
   logs: false,

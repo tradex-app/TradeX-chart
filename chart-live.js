@@ -72,15 +72,15 @@ const config = {
   theme: {
     candle: {
       Type: "candle_solid",
-      UpBodyColour: "#02FFFF88",
-      UpWickColour: "#02FFFF",
-      DnBodyColour: "#F900FE88",
-      DnWickColour: "#F900FE",
+      UpBodyColour: "#00F04088",
+      UpWickColour: "#0F4",
+      DnBodyColour: "#F0004088",
+      DnWickColour: "#F04",
     },
     volume: {
       Height: 15,
-      UpColour: "#02FFFF88",
-      DnColour: "#F900FE88",
+      UpColour: "#00F04044",
+      DnColour: "#F0004044",
     },
     chart: {
       Background: "#141414",

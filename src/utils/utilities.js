@@ -165,7 +165,7 @@ export function b64toBlob(b64Data, contentType, sliceSize) {
  * https://stackoverflow.com/a/56150320/15109215
  * @param {*} key 
  * @param {*} value 
- * @returns 
+ * @returns {*}
  */
 export function replacer(key, value) {
   if(value instanceof Map) {
@@ -184,7 +184,7 @@ export function replacer(key, value) {
  * https://stackoverflow.com/a/56150320/15109215
  * @param {*} key 
  * @param {*} value 
- * @returns 
+ * @returns {*}
  */
 export function reviver(key, value) {
   if(typeof value === 'object' && value !== null) {

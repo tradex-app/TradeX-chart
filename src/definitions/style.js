@@ -48,8 +48,8 @@ export const CandleStyle = {
 }
 
 export const VolumeStyle = {
-  COLOUR_VOLUME_UP: "#00F04088",
-  COLOUR_VOLUME_DN: "#F0004088",
+  COLOUR_VOLUME_UP: "#00F04044",
+  COLOUR_VOLUME_DN: "#F0004044",
   ONCHART_VOLUME_HEIGHT: 15,
 }
 
@@ -114,8 +114,8 @@ export const defaultTheme = {
   candle: {
     Type: CandleType.CANDLE_SOLID,
     UpBodyColour: CandleStyle.COLOUR_CANDLE_UP,
-    UpWickColour: CandleStyle.COLOUR_CANDLE_DN,
-    DnBodyColour: CandleStyle.COLOUR_WICK_UP,
+    UpWickColour: CandleStyle.COLOUR_WICK_UP,
+    DnBodyColour: CandleStyle.COLOUR_CANDLE_DN,
     DnWickColour: CandleStyle.COLOUR_WICK_DN,
   },
   volume: {
@@ -132,5 +132,6 @@ export const defaultTheme = {
   onChart: {
 
   },
+  maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT,
 }
 

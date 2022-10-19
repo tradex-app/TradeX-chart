@@ -102,6 +102,7 @@ export default class OffChart {
     this.#parent = {...this.mediator.api.parent}
     this.#overlay = options.offChart
     this.#core = this.mediator.api.core
+    this.#theme = this.#core.theme
 
     this.#options = options
     this.#ID = this.#options.offChartID || uid("TX_OC_")
@@ -318,7 +319,6 @@ export default class OffChart {
       // id: (id) => this.setID(id),
       title: (title) => this.#title = title,
       yAxisDigits: (digits) => this.setYAxisDigits(digits),
-      theme: (theme) => this.setTheme(theme),
     }
   }
 
@@ -354,10 +354,6 @@ export default class OffChart {
     this.#Scale.resize(dim.w, dim.h)
 
     this.draw(undefined, true)
-  }
-
-  setTheme(theme) {
-    this.#theme = theme
   }
 
   setCursor(cursor) {

@@ -30,7 +30,7 @@ export default class chartCandles extends Candle {
   draw(range=this.#core.range) {
     this.#scene.clear()
 
-    const render = (this.#config.candle.Type === CandleType.AREA) ?
+    const render = (this.#core.theme.candle.Type === CandleType.AREA) ?
       (candle) => {} :
       (candle) => {super.draw(candle)}
     const offset = this.#xAxis.smoothScrollOffset || 0
@@ -64,7 +64,7 @@ export default class chartCandles extends Candle {
       candle.x = candle.x + candle.w
     }
 
-    if (this.#config.candle.Type === CandleType.AREA) super.areaRender()
+    if (this.#core.theme.candle.Type === CandleType.AREA) super.areaRender()
   }
 
 }

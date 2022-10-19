@@ -70,8 +70,27 @@ const config = {
   rangeStartTS: rangeStartTS,
   rangeLimit: 30,
   theme: {
-    candleType: "CANDLE_SOLID",
-    onchartVolumeH: 15,
+    candle: {
+      Type: "candle_solid",
+      UpBodyColour: "#0805F588",
+      UpWickColour: "#0805F5",
+      DnBodyColour: "#F6243888",
+      DnWickColour: "#F62438",
+    },
+    volume: {
+      Height: 15,
+      UpColour: "#F6243844",
+      DnColour: "#0805F544",
+    },
+    chart: {
+      Background: "#141414",
+      BorderColour: "#666",
+      GridColour: "#333",
+      TextColour: "#ccc"
+    },
+    onChart: {
+
+    },
   },
   isCrypto: true,
   logs: false,

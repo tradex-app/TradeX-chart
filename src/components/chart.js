@@ -114,6 +114,7 @@ export default class Chart {
     this.#elScale = mediator.api.elements.elChartScale
     this.#parent = {...this.#mediator.api.parent}
     this.#core = this.#mediator.api.core
+    this.#theme = this.#core.theme
     this.#onChart = this.#mediator.api.onChart
 
     this.#settings = this.#mediator.api.settings
@@ -383,7 +384,6 @@ export default class Chart {
       // id: (id) => this.setID(id),
       title: (title) => this.#title = title,
       yAxisDigits: (digits) => this.setYAxisDigits(digits),
-      theme: (theme) => this.setTheme(theme),
     }
   }
 
@@ -427,10 +427,6 @@ export default class Chart {
     this.#Scale.resize(dim.w, dim.h)
 
     this.draw(undefined, true)
-  }
-
-  setTheme(theme) {
-    this.#theme = theme
   }
 
   setYAxisDigits(digits) {

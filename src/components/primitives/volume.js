@@ -9,7 +9,7 @@ export default class VolumeBar {
     this.scene = scene
     this.ctx = this.scene.context
     this.width = this.scene.width
-    this.cfg = {...defaultTheme.candle, ...config}
+    this.cfg = {...defaultTheme, ...config}
   }
 
   draw(data) {
