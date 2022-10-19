@@ -5,6 +5,7 @@ export const GlobalStyle = {
   COLOUR_BG: "#141414",
   COLOUR_BORDER: "#666",
   COLOUR_TXT: "#CCC",
+  BORDER_THICKNESS: 0,
 }
 
 export const ToolsStyle = {
@@ -126,6 +127,7 @@ export const defaultTheme = {
   chart: {
     Background: GlobalStyle.COLOUR_BG,
     BorderColour: GlobalStyle.COLOUR_BORDER,
+    BorderThickness: GlobalStyle.BORDER_THICKNESS,
     TextColour: GlobalStyle.COLOUR_TXT,
     GridColour: GridStyle.COLOUR_GRID,
   },

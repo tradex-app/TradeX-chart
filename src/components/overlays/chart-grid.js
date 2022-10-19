@@ -31,7 +31,7 @@ export default class chartGrid {
     const xGrads = this.#xAxis.xAxisGrads.values
     const ctx = this.#scene.context
     ctx.save();
-    ctx.strokeStyle = GridStyle.COLOUR_GRID
+    ctx.strokeStyle = this.#core.theme.chart.GridColour || GridStyle.COLOUR_GRID
 
     // X Axis
     if (axes != "y") {
