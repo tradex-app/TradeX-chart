@@ -94,6 +94,8 @@ const XAxisStyle_FONTFAMILY = "Arial"
 export const XAxisStyle = {
   COLOUR_TICK: "#888",
   COLOUR_LABEL: "888",
+  COLOUR_CURSOR: "#000",
+  COLOUR_CURSOR_BG: "#CCC",
   FONTFAMILY: XAxisStyle_FONTFAMILY,
   FONTSIZE: XAxisStyle_FONTSIZE,
   FONTWEIGHT: XAxisStyle_FONTWEIGHT,
@@ -111,6 +113,11 @@ export const PriceLineStyle = {
   lineDash: [1,1]
 }
 
+export const LegendStyle = {
+  text: "font-size: 12px; font-family: Avenir, Helvetica, Arial, sans-serif;",
+  colour: "#ccc"
+}
+
 export const defaultTheme = {
   candle: {
     Type: CandleType.CANDLE_SOLID,
@@ -124,6 +131,26 @@ export const defaultTheme = {
     UpColour: VolumeStyle.COLOUR_VOLUME_UP,
     DnColour: VolumeStyle.COLOUR_VOLUME_DN,
   },
+  xAxis: {
+    colourTick: XAxisStyle.COLOUR_TICK,
+    colourLabel: XAxisStyle.COLOUR_LABEL,
+    colourCursor: XAxisStyle.COLOUR_CURSOR,
+    colourCursorBG: XAxisStyle.COLOUR_CURSOR_BG,
+    fontFamily: XAxisStyle.FONTFAMILY,
+    fontSize: XAxisStyle.FONTSIZE,
+    fontWeight: XAxisStyle.FONTWEIGHT,
+    line: "#656565"
+  },
+  yAxis: {
+    colourTick: YAxisStyle.COLOUR_TICK,
+    colourLabel: YAxisStyle.COLOUR_LABEL,
+    colourCursor: YAxisStyle.COLOUR_CURSOR,
+    colourCursorBG: YAxisStyle.COLOUR_CURSOR_BG,
+    fontFamily: YAxisStyle.FONTFAMILY,
+    fontSize: YAxisStyle.FONTSIZE,
+    fontWeight: YAxisStyle.FONTWEIGHT,
+    line: "#656565"
+  },
   chart: {
     Background: GlobalStyle.COLOUR_BG,
     BorderColour: GlobalStyle.COLOUR_BORDER,
@@ -134,6 +161,13 @@ export const defaultTheme = {
   onChart: {
 
   },
+  ofChart: {
+
+  },
   maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT,
+  legend: {
+    text: LegendStyle.text,
+    colour: LegendStyle.colour,
+  }
 }
 

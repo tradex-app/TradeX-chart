@@ -44,7 +44,8 @@ export default class Legends {
   }
 
   buildLegend(o) {
-    const styleLegend = `width: calc(100% - ${this.#core.scaleW}px - 1em); margin: .5em 0 1em 1em; font-size: 12px; text-align: left;`
+    const theme = this.#core.theme
+    const styleLegend = `width: calc(100% - ${this.#core.scaleW}px - 1em); margin: .5em 0 1em 1em; ${theme.legend.text}; color: ${theme.legend.colour}; text-align: left;`
       let styleLegendTitle = "margin-right: 1em; white-space: nowrap;"
     const styleInputs = "display: inline; margin-left: -1em;"
     const styleControls = "float: right; margin: 0.5em; opacity:0"

@@ -479,7 +479,7 @@ export default class MainPane {
   defaultNode() {
     const api = this.#mediator.api
     const styleRows = STYLE_ROWS + ` height: calc(100% - ${api.timeH}px)`
-    const styleTime = STYLE_TIME + ` height: ${api.timeH}px; border-color: ${api.chartBorderColour};`
+    const styleTime = STYLE_TIME + ` height: ${api.timeH}px; border-color: ${this.theme.xAxis.line};`
     const defaultRow = this.defaultRowNode()
 
     const node = `
@@ -510,8 +510,8 @@ export default class MainPane {
 
   rowNode(type) {
     const api = this.#mediator.api
-    const styleRow = STYLE_ROW + ` border-top: 1px solid ${api.chartBorderColour};`
-    const styleScale = STYLE_SCALE + ` border-color: ${api.chartBorderColour};`
+    const styleRow = STYLE_ROW + ` border-top: 1px solid ${this.theme.chart.BorderColour};`
+    const styleScale = STYLE_SCALE + ` border-color: ${this.theme.xAxis.line};`
 
     const node = `
       <div class="${CLASS_ROW} ${type}" style="${styleRow}">
@@ -526,8 +526,8 @@ export default class MainPane {
 
   scaleNode(type) {
     const api = this.#mediator.api
-    const styleRow = STYLE_ROW + ` border-top: 1px solid ${api.chartBorderColour};`
-    const styleScale = STYLE_SCALE + ` border-color: ${api.chartBorderColour};`
+    const styleRow = STYLE_ROW + ` border-top: 1px solid ${this.theme.chart.BorderColour};`
+    const styleScale = STYLE_SCALE + ` border-color: ${this.theme.yAxis.line};`
 
     const node = `
       <div class="${CLASS_ROW} ${type}" style="${styleRow}">

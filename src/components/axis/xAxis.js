@@ -35,6 +35,7 @@ export default class xAxis extends Axis {
   get core() { return this.chart.core }
   get data() { return this.chart.data }
   get range() { return this.parent.range }
+  get theme() { return this.chart.core.theme }
   get width() { return this.calcWidth() }
   get interval() { return this.range.interval }
   get intervalStr() { return this.range.intervalStr }
@@ -372,12 +373,12 @@ export default class xAxis extends Axis {
     const ctx = this.parent.layerLabels.scene.context
     const mid = this.width / this.range.Length * 0.5
     const offset = 0
-
+    const theme = this.theme.xAxis
 
     ctx.save();
-    ctx.strokeStyle = XAxisStyle.COLOUR_TICK
-    ctx.fillStyle = XAxisStyle.COLOUR_TICK
-    ctx.font = XAxisStyle.FONT_LABEL
+    ctx.strokeStyle = theme.colourTick
+    ctx.fillStyle = theme.colourTick
+    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
     for (let tick of grads) { 
       // ctx.font = (tick[3] == "major") ? XAxisStyle.FONT_LABEL_BOLD : XAxisStyle.FONT_LABEL
       let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5)

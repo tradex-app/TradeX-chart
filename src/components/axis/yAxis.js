@@ -266,10 +266,12 @@ export default class yAxis extends Axis {
 
     const grads = this.#yAxisGrads
     const ctx = this.#parent.layerLabels.scene.context
+    const theme = this.theme.yAxis
+
     ctx.save();
-    ctx.strokeStyle = YAxisStyle.COLOUR_TICK
-    ctx.fillStyle = YAxisStyle.COLOUR_TICK
-    ctx.font = YAxisStyle.FONT_LABEL
+    ctx.strokeStyle = theme.colourTick
+    ctx.fillStyle = theme.colourTick
+    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
     for (let tick of grads) {
       ctx.fillText(tick[0], this.yAxisTicks + 5, tick[1] + 4)
 

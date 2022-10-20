@@ -315,11 +315,11 @@ export default class ScaleBar {
         nice = this.nicePrice(price),
 
         options = {
-          fontSize: YAxisStyle.FONTSIZE * 1.05,
-          fontWeight: YAxisStyle.FONTWEIGHT,
-          fontFamily: YAxisStyle.FONTFAMILY,
-          txtCol: YAxisStyle.COLOUR_CURSOR,
-          bakCol: YAxisStyle.COLOUR_CURSOR_BG,
+          fontSize: this.theme.yAxis.fontSize * 1.05,
+          fontWeight: this.theme.yAxis.fontWeight,
+          fontFamily: this.theme.yAxis.fontFamily,
+          txtCol: this.theme.yAxis.colourCursor,
+          bakCol: this.theme.yAxis.colourCursorBG,
           paddingTop: 2,
           paddingBottom: 2,
           paddingLeft: 3,
