@@ -179,7 +179,7 @@ export default class OffChart {
   }
 
   start(index) {
-    
+
     this.#offChartID = index
 
     // X Axis - Timeline

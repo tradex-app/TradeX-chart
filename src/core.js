@@ -760,7 +760,7 @@ constructor (mediator, options={}) {
 
     const STYLE_TXCHART = "overflow: hidden;"
       let STYLE_UTILS = "border-bottom: 1px solid;"
-    const STYLE_BODY  = "position: relative;"
+      let STYLE_BODY  = "position: relative;"
     const STYLE_TOOLS = "position: absolute; top: 0; left: 0; height: 100%; min-height: 100%; border-right: 1px solid;"
     const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;";
 
@@ -768,6 +768,7 @@ constructor (mediator, options={}) {
     if (this.config?.utils?.none) {
       STYLE_UTILS = "border: none;"
       this.utilsH = 0
+      STYLE_BODY += " margin-top: -1px;"
     }
 
     const toolsVis = (this.toolsW == 0)? "visibility: hidden;" : "visibility: visible;"

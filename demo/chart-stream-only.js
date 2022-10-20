@@ -84,9 +84,10 @@ const config = {
       DnColour: "#F900FE44",
     },
     chart: {
-      Background: "#141414",
-      BorderColour: "#666",
-      GridColour: "#333",
+      Background: "#2A2B3A",
+      BorderColour: "#363C4E",
+      BorderThickness: 1,
+      GridColour: "#313647",
       TextColour: "#ccc"
     },
     onChart: {

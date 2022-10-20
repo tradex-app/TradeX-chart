@@ -7,7 +7,7 @@ import Timeline from './timeline'
 import CEL from "../components/primitives/canvas"
 import Chart from "./chart"
 import OffChart from "./offChart"
-import Overlays from "./overlays"
+import s from "./overlays"
 import chartGrid from "./overlays/chart-grid"
 import stateMachineConfig from "../state/state-mainPane"
 import { InputController, Keys } from "../input/controller"

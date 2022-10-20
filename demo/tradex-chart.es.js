@@ -915,6 +915,7 @@ const GlobalStyle = {
   COLOUR_BG: "#141414",
   COLOUR_BORDER: "#666",
   COLOUR_TXT: "#CCC",
+  BORDER_THICKNESS: 0,
 };
 
 const ToolsStyle = {
@@ -1019,6 +1020,7 @@ const defaultTheme = {
   chart: {
     Background: GlobalStyle.COLOUR_BG,
     BorderColour: GlobalStyle.COLOUR_BORDER,
+    BorderThickness: GlobalStyle.BORDER_THICKNESS,
     TextColour: GlobalStyle.COLOUR_TXT,
     GridColour: GridStyle.COLOUR_GRID,
   },
@@ -6641,7 +6643,7 @@ class chartGrid {
     const xGrads = this.#xAxis.xAxisGrads.values;
     const ctx = this.#scene.context;
     ctx.save();
-    ctx.strokeStyle = GridStyle.COLOUR_GRID;
+    ctx.strokeStyle = this.#core.theme.chart.GridColour || GridStyle.COLOUR_GRID;
 
     // X Axis
     if (axes != "y") {
@@ -11345,12 +11347,6 @@ class WebWorker$1 {
 
 // core.js
 
-const STYLE_TXCHART = "overflow: hidden;";
-const STYLE_UTILS = "border-bottom: 1px solid;";
-const STYLE_BODY  = "position: relative;";
-const STYLE_TOOLS = "position: absolute; top: 0; left: 0; height: 100%; min-height: 100%; border-right: 1px solid;";
-const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;";
-
 // wait for talib wasm to initialize 
 (async () => {
   await talib.init("node_modules/talib-web/lib/talib.wasm");
@@ -11967,7 +11963,8 @@ constructor (mediator, options={}) {
   }
 
   /**
-   * Add a theme to the chart
+   * Add a theme to the chart,
+   * if no current theme is set, make this the current one.
    * @param {object} volumePrecision - Volume accuracy
    * @memberof TradeXchart
    */
@@ -11985,6 +11982,10 @@ constructor (mediator, options={}) {
  */
   setTheme(ID) {
     this.#theme = Theme.setCurrent(ID);
+
+    let chart = this.#theme.chart;
+    this.#elTXChart.style.background = chart.Background;
+    this.#elTXChart.style.border = `${chart.BorderThickness}px solid ${chart.BorderColour}`;
   }
 
   setScrollPos(pos) {
@@ -12053,14 +12054,26 @@ constructor (mediator, options={}) {
 
   defaultNode() {
 
+    const STYLE_TXCHART = "overflow: hidden;";
+      let STYLE_UTILS = "border-bottom: 1px solid;";
+    const STYLE_BODY  = "position: relative;";
+    const STYLE_TOOLS = "position: absolute; top: 0; left: 0; height: 100%; min-height: 100%; border-right: 1px solid;";
+    const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;";
+
     if (this.config?.tools?.none) this.toolsW = 0;
-    if (this.config?.utils?.none) this.utilsH = 0;
+    if (this.config?.utils?.none) {
+      STYLE_UTILS = "border: none;";
+      this.utilsH = 0;
+    }
+
+    const toolsVis = (this.toolsW == 0)? "visibility: hidden;" : "visibility: visible;";
+    const utilsVis = (this.utilsH == 0)? "visibility: hidden;" : "visibility: visible;";
 
     const classesTXChart = CLASS_DEFAULT+" "+this.#userClasses; 
     const styleTXChart = STYLE_TXCHART + ` height: ${this.height}px; width: ${this.#chartW}px; background: ${this.chartBGColour}; color: ${this.chartTxtColour};`;
-    const styleUtils = STYLE_UTILS + ` height: ${this.utilsH}px; width: ${this.#chartW}px; border-color: ${this.chartBorderColour};`;
+    const styleUtils = STYLE_UTILS + ` height: ${this.utilsH}px; width: ${this.#chartW}px; border-color: ${this.chartBorderColour}; ${utilsVis}`;
     const styleBody = STYLE_BODY + ` height: calc(100% - ${this.utilsH}px); width: ${this.#chartW}px;`;
-    const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour};`;
+    const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour}; ${toolsVis}`;
     const styleMain = STYLE_MAIN + ` left: ${this.toolsW}px; width: calc(100% - ${this.toolsW}px);`;
     const styleWidgets = ` position: relative;`;
     const styleScale = `position: absolute; top: 0; right: 0; width: ${this.scaleW}px; height: 100%;`;
