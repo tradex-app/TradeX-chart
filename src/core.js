@@ -1,6 +1,6 @@
 // core.js
 
-import * as talib from "talib-web"
+// import * as talib from "talib-web"
 import DOM from './utils/DOM'
 import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeChecks'
 import SX from './scaleX/scale'
@@ -50,11 +50,6 @@ import { MINCANDLES, YAXIS_BOUNDS } from "./definitions/chart"
 import { GlobalStyle } from './definitions/style'
 import { precision } from "./utils/number"
 
-// wait for talib wasm to initialize 
-(async () => {
-  await talib.init("node_modules/talib-web/lib/talib.wasm")
-})();
-
 /**
  * The root class for the entire chart
  * @export
@@ -62,9 +57,10 @@ import { precision } from "./utils/number"
  */
 export default class TradeXchart {
 
-
   static #cnt = 0
   static #instances = {}
+  static #talibReady = false
+  static initErrMsg = `TradeX-chart requires "talib" to function properly. Without it, some features maybe missing or broken.`
 
   #id
   #name = NAME
@@ -94,8 +90,7 @@ export default class TradeXchart {
   #rangeStartTS
   #rangeLimit = RANGELIMIT
   #indicators = Indicators
-  #TALib = talib
-
+  #TALib
   #theme
   #chartW = 500
   #chartH = 400
@@ -161,23 +156,24 @@ export default class TradeXchart {
 /**
  * Creates an instance of TradeXchart.
  * @param {instance} mediator - module api
- * @param {object}[options={}] - chart configuration
+ * @param {object}[config={}] - chart configuration
  * @memberof TradeXchart
  */
-constructor (mediator, options={}) {
+constructor (mediator, config={}) {
 
     this.oncontextmenu = window.oncontextmenu
     this.#workers = WebWorker
+    this.#TALib = config.talib
 
-    this.logs = (options?.logs) ? options.logs : false
-    this.infos = (options?.infos) ? options.infos : false
-    this.warnings = (options?.warnings) ? options.warnings : false
-    this.errors = (options?.errors) ? options.errors : false
+    this.logs = (config?.logs) ? config.logs : false
+    this.infos = (config?.infos) ? config.infos : false
+    this.warnings = (config?.warnings) ? config.warnings : false
+    this.errors = (config?.errors) ? config.errors : false
 
-    let container = options?.container,
-        state = options?.state, 
-        deepValidate = options?.deepValidate || false, 
-        isCrypto = options?.isCrypto || false
+    let container = config?.container,
+        state = config?.state, 
+        deepValidate = config?.deepValidate || false, 
+        isCrypto = config?.isCrypto || false
     
     if (isString(container)) {
       if (container[0] === '#')
@@ -194,23 +190,23 @@ constructor (mediator, options={}) {
       this.#mediator = mediator
       this.#state = State.create(state, deepValidate, isCrypto)
       this.log(`Chart ${this.#id} created with a ${this.#state.status} state`)
-      delete(options.state)
+      delete(config.state)
 
       // time frame
       let tf = "1s"
       let ms = SECOND_MS
-      if (!isObject(options?.stream) && this.#state.data.chart.data.length < 2) {
+      if (!isObject(config?.stream) && this.#state.data.chart.data.length < 2) {
         this.warning(`${NAME} has no chart data or streaming provided.`)
         // has a time frame been provided?
-        ;({tf, ms} = isTimeFrame(options?.timeFrame))
+        ;({tf, ms} = isTimeFrame(config?.timeFrame))
         this.#time.timeFrame = tf
         this.#time.timeFrameMS = ms
         this.#chartIsEmpty = true
       }
       // is the chart streaming with an empty chart?
-      else if (isObject(options?.stream) && this.#state.data.chart.data.length < 2) {
+      else if (isObject(config?.stream) && this.#state.data.chart.data.length < 2) {
         // has a time frame been provided?
-        ;({tf, ms} = isTimeFrame(options?.timeFrame))
+        ;({tf, ms} = isTimeFrame(config?.timeFrame))
         console.log("tf:",tf,"ms:",ms)
 
         this.#time.timeFrame = tf
@@ -224,7 +220,7 @@ constructor (mediator, options={}) {
         this.#time.timeFrameMS = this.#state.data.chart.tfms
         this.#chartIsEmpty = false
       }
-      this.init(options)
+      this.init(config)
     }
   }
 
@@ -310,6 +306,22 @@ constructor (mediator, options={}) {
    * @memberof TradeXchart
    */
   static create(container, config={}, state) {
+
+    if (!TradeXchart.#talibReady) {
+      (async () => {
+        try {
+          if ((typeof config.talib !== "object") || 
+              // (config.talib[Symbol.toStringTag] !== "Module") ||
+              (typeof config.talib.init !== "function"))
+                throw new Error(`${TradeXchart.initErrMsg}`)
+          await config.talib.init("node_modules/talib-web/lib/talib.wasm");
+          TradeXchart.#talibReady = true
+        } catch (e) {
+          throw new Error(`${TradeXchart.initErrMsg} ${e.message}`)
+        }
+      })();
+    }
+
     const cnt = ++TradeXchart.#cnt
 
     config.cnt = cnt

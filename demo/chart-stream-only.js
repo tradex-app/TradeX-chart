@@ -1,4 +1,5 @@
-import { Chart, DOM } from './tradex-chart.es.js'
+import { Chart, DOM } from './src'
+import * as talib from "talib-web"
 // import './chart-live.css'
 
 // let state = undefined
@@ -100,7 +101,8 @@ const config = {
   warnings: true,
   errors: true,
   stream: streamVal,
-  maxCandleUpdate: 250
+  maxCandleUpdate: 250,
+  talib: talib
 }
 const chart = Chart.create(mount, config)
 // const chart = Chart.create(mount, config)

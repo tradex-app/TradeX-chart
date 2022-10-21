@@ -1,5 +1,3 @@
-import * as talib from './node_modules/talib-web/lib/index.esm.js';
-
 // DOM.js
 // DOM utilities
 
@@ -987,6 +985,8 @@ const XAxisStyle_FONTFAMILY = "Arial";
 const XAxisStyle = {
   COLOUR_TICK: "#888",
   COLOUR_LABEL: "888",
+  COLOUR_CURSOR: "#000",
+  COLOUR_CURSOR_BG: "#CCC",
   FONTFAMILY: XAxisStyle_FONTFAMILY,
   FONTSIZE: XAxisStyle_FONTSIZE,
   FONTWEIGHT: XAxisStyle_FONTWEIGHT,
@@ -1004,6 +1004,11 @@ const PriceLineStyle = {
   lineDash: [1,1]
 };
 
+const LegendStyle = {
+  text: "font-size: 12px; font-family: Avenir, Helvetica, Arial, sans-serif;",
+  colour: "#ccc"
+};
+
 const defaultTheme = {
   candle: {
     Type: CandleType.CANDLE_SOLID,
@@ -1017,6 +1022,26 @@ const defaultTheme = {
     UpColour: VolumeStyle.COLOUR_VOLUME_UP,
     DnColour: VolumeStyle.COLOUR_VOLUME_DN,
   },
+  xAxis: {
+    colourTick: XAxisStyle.COLOUR_TICK,
+    colourLabel: XAxisStyle.COLOUR_LABEL,
+    colourCursor: XAxisStyle.COLOUR_CURSOR,
+    colourCursorBG: XAxisStyle.COLOUR_CURSOR_BG,
+    fontFamily: XAxisStyle.FONTFAMILY,
+    fontSize: XAxisStyle.FONTSIZE,
+    fontWeight: XAxisStyle.FONTWEIGHT,
+    line: "#656565"
+  },
+  yAxis: {
+    colourTick: YAxisStyle.COLOUR_TICK,
+    colourLabel: YAxisStyle.COLOUR_LABEL,
+    colourCursor: YAxisStyle.COLOUR_CURSOR,
+    colourCursorBG: YAxisStyle.COLOUR_CURSOR_BG,
+    fontFamily: YAxisStyle.FONTFAMILY,
+    fontSize: YAxisStyle.FONTSIZE,
+    fontWeight: YAxisStyle.FONTWEIGHT,
+    line: "#656565"
+  },
   chart: {
     Background: GlobalStyle.COLOUR_BG,
     BorderColour: GlobalStyle.COLOUR_BORDER,
@@ -1027,7 +1052,14 @@ const defaultTheme = {
   onChart: {
 
   },
+  ofChart: {
+
+  },
   maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT,
+  legend: {
+    text: LegendStyle.text,
+    colour: LegendStyle.colour,
+  }
 };
 
 const NAME = "TradeX-Chart";
@@ -4202,6 +4234,7 @@ class xAxis extends Axis {
   get core() { return this.chart.core }
   get data() { return this.chart.data }
   get range() { return this.parent.range }
+  get theme() { return this.chart.core.theme }
   get width() { return this.calcWidth() }
   get interval() { return this.range.interval }
   get intervalStr() { return this.range.intervalStr }
@@ -4538,12 +4571,12 @@ class xAxis extends Axis {
     const ctx = this.parent.layerLabels.scene.context;
     this.width / this.range.Length * 0.5;
     const offset = 0;
-
+    const theme = this.theme.xAxis;
 
     ctx.save();
-    ctx.strokeStyle = XAxisStyle.COLOUR_TICK;
-    ctx.fillStyle = XAxisStyle.COLOUR_TICK;
-    ctx.font = XAxisStyle.FONT_LABEL;
+    ctx.strokeStyle = theme.colourTick;
+    ctx.fillStyle = theme.colourTick;
+    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`;
     for (let tick of grads) { 
       // ctx.font = (tick[3] == "major") ? XAxisStyle.FONT_LABEL_BOLD : XAxisStyle.FONT_LABEL
       let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5);
@@ -5556,11 +5589,11 @@ class Timeline {
         opts = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
         dateTimeStr = date.toLocaleDateString('en-GB', opts),
         options = {
-          fontSize: XAxisStyle.FONTSIZE * 1.05,
-          fontWeight: XAxisStyle.FONTWEIGHT,
-          fontFamily: XAxisStyle.FONTFAMILY,
-          txtCol: XAxisStyle.COLOUR_CURSOR,
-          bakCol: XAxisStyle.COLOUR_CURSOR_BG,
+          fontSize: this.theme.xAxis.fontSize * 1.05,
+          fontWeight: this.theme.xAxis.fontWeight,
+          fontFamily: this.theme.xAxis.fontFamily,
+          txtCol: this.theme.xAxis.colourCursor,
+          bakCol: this.theme.xAxis.colourCursorBG,
           paddingTop: 5,
           paddingBottom: 3,
           paddingLeft: 4,
@@ -5841,10 +5874,12 @@ class yAxis extends Axis {
 
     const grads = this.#yAxisGrads;
     const ctx = this.#parent.layerLabels.scene.context;
+    const theme = this.theme.yAxis;
+
     ctx.save();
-    ctx.strokeStyle = YAxisStyle.COLOUR_TICK;
-    ctx.fillStyle = YAxisStyle.COLOUR_TICK;
-    ctx.font = YAxisStyle.FONT_LABEL;
+    ctx.strokeStyle = theme.colourTick;
+    ctx.fillStyle = theme.colourTick;
+    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`;
     for (let tick of grads) {
       ctx.fillText(tick[0], this.yAxisTicks + 5, tick[1] + 4);
 
@@ -6413,11 +6448,11 @@ class ScaleBar {
         nice = this.nicePrice(price),
 
         options = {
-          fontSize: YAxisStyle.FONTSIZE * 1.05,
-          fontWeight: YAxisStyle.FONTWEIGHT,
-          fontFamily: YAxisStyle.FONTFAMILY,
-          txtCol: YAxisStyle.COLOUR_CURSOR,
-          bakCol: YAxisStyle.COLOUR_CURSOR_BG,
+          fontSize: this.theme.yAxis.fontSize * 1.05,
+          fontWeight: this.theme.yAxis.fontWeight,
+          fontFamily: this.theme.yAxis.fontFamily,
+          txtCol: this.theme.yAxis.colourCursor,
+          bakCol: this.theme.yAxis.colourCursorBG,
           paddingTop: 2,
           paddingBottom: 2,
           paddingLeft: 3,
@@ -6502,7 +6537,8 @@ class Legends {
   }
 
   buildLegend(o) {
-    const styleLegend = `width: calc(100% - ${this.#core.scaleW}px - 1em); margin: .5em 0 1em 1em; font-size: 12px; text-align: left;`;
+    const theme = this.#core.theme;
+    const styleLegend = `width: calc(100% - ${this.#core.scaleW}px - 1em); margin: .5em 0 1em 1em; ${theme.legend.text}; color: ${theme.legend.colour}; text-align: left;`;
       let styleLegendTitle = "margin-right: 1em; white-space: nowrap;";
     const styleInputs = "display: inline; margin-left: -1em;";
     const styleControls = "float: right; margin: 0.5em; opacity:0";
@@ -8320,7 +8356,7 @@ class OffChart {
   }
 
   start(index) {
-    
+
     this.#offChartID = index;
 
     // X Axis - Timeline
@@ -9339,7 +9375,7 @@ class MainPane {
   defaultNode() {
     const api = this.#mediator.api;
     const styleRows = STYLE_ROWS + ` height: calc(100% - ${api.timeH}px)`;
-    const styleTime = STYLE_TIME + ` height: ${api.timeH}px; border-color: ${api.chartBorderColour};`;
+    const styleTime = STYLE_TIME + ` height: ${api.timeH}px; border-color: ${this.theme.xAxis.line};`;
     const defaultRow = this.defaultRowNode();
 
     const node = `
@@ -9369,9 +9405,9 @@ class MainPane {
   }
 
   rowNode(type) {
-    const api = this.#mediator.api;
-    const styleRow = STYLE_ROW + ` border-top: 1px solid ${api.chartBorderColour};`;
-    const styleScale = STYLE_SCALE + ` border-color: ${api.chartBorderColour};`;
+    this.#mediator.api;
+    const styleRow = STYLE_ROW + ` border-top: 1px solid ${this.theme.chart.BorderColour};`;
+    const styleScale = STYLE_SCALE + ` border-color: ${this.theme.xAxis.line};`;
 
     const node = `
       <div class="${CLASS_ROW} ${type}" style="${styleRow}">
@@ -9385,9 +9421,9 @@ class MainPane {
   }
 
   scaleNode(type) {
-    const api = this.#mediator.api;
-    const styleRow = STYLE_ROW + ` border-top: 1px solid ${api.chartBorderColour};`;
-    const styleScale = STYLE_SCALE + ` border-color: ${api.chartBorderColour};`;
+    this.#mediator.api;
+    const styleRow = STYLE_ROW + ` border-top: 1px solid ${this.theme.chart.BorderColour};`;
+    const styleScale = STYLE_SCALE + ` border-color: ${this.theme.yAxis.line};`;
 
     const node = `
       <div class="${CLASS_ROW} ${type}" style="${styleRow}">
@@ -11347,11 +11383,6 @@ class WebWorker$1 {
 
 // core.js
 
-// wait for talib wasm to initialize 
-(async () => {
-  await talib.init("node_modules/talib-web/lib/talib.wasm");
-})();
-
 /**
  * The root class for the entire chart
  * @export
@@ -11359,9 +11390,10 @@ class WebWorker$1 {
  */
 class TradeXchart {
 
-
   static #cnt = 0
   static #instances = {}
+  static #talibReady = false
+  static initErrMsg = `TradeX-chart requires "talib" to function properly. Without it, some features maybe missing or broken.`
 
   #id
   #name = NAME
@@ -11391,8 +11423,7 @@ class TradeXchart {
   #rangeStartTS
   #rangeLimit = RANGELIMIT
   #indicators = Indicators
-  #TALib = talib
-
+  #TALib
   #theme
   #chartW = 500
   #chartH = 400
@@ -11458,23 +11489,24 @@ class TradeXchart {
 /**
  * Creates an instance of TradeXchart.
  * @param {instance} mediator - module api
- * @param {object}[options={}] - chart configuration
+ * @param {object}[config={}] - chart configuration
  * @memberof TradeXchart
  */
-constructor (mediator, options={}) {
+constructor (mediator, config={}) {
 
     this.oncontextmenu = window.oncontextmenu;
     this.#workers = WebWorker$1;
+    this.#TALib = config.talib;
 
-    this.logs = (options?.logs) ? options.logs : false;
-    this.infos = (options?.infos) ? options.infos : false;
-    this.warnings = (options?.warnings) ? options.warnings : false;
-    this.errors = (options?.errors) ? options.errors : false;
+    this.logs = (config?.logs) ? config.logs : false;
+    this.infos = (config?.infos) ? config.infos : false;
+    this.warnings = (config?.warnings) ? config.warnings : false;
+    this.errors = (config?.errors) ? config.errors : false;
 
-    let container = options?.container,
-        state = options?.state, 
-        deepValidate = options?.deepValidate || false, 
-        isCrypto = options?.isCrypto || false;
+    let container = config?.container,
+        state = config?.state, 
+        deepValidate = config?.deepValidate || false, 
+        isCrypto = config?.isCrypto || false;
     
     if (isString(container)) {
       if (container[0] === '#')
@@ -11491,22 +11523,22 @@ constructor (mediator, options={}) {
       this.#mediator = mediator;
       this.#state = State.create(state, deepValidate, isCrypto);
       this.log(`Chart ${this.#id} created with a ${this.#state.status} state`);
-      delete(options.state);
+      delete(config.state);
 
       // time frame
       let tf = "1s";
       let ms = SECOND_MS;
-      if (!isObject(options?.stream) && this.#state.data.chart.data.length < 2) {
+      if (!isObject(config?.stream) && this.#state.data.chart.data.length < 2) {
         this.warning(`${NAME} has no chart data or streaming provided.`)
         // has a time frame been provided?
-        ;({tf, ms} = isTimeFrame(options?.timeFrame));
+        ;({tf, ms} = isTimeFrame(config?.timeFrame));
         this.#time.timeFrame = tf;
         this.#time.timeFrameMS = ms;
         this.#chartIsEmpty = true;
       }
       // is the chart streaming with an empty chart?
-      else if (isObject(options?.stream) && this.#state.data.chart.data.length < 2) {
-({tf, ms} = isTimeFrame(options?.timeFrame));
+      else if (isObject(config?.stream) && this.#state.data.chart.data.length < 2) {
+({tf, ms} = isTimeFrame(config?.timeFrame));
         console.log("tf:",tf,"ms:",ms);
 
         this.#time.timeFrame = tf;
@@ -11520,7 +11552,7 @@ constructor (mediator, options={}) {
         this.#time.timeFrameMS = this.#state.data.chart.tfms;
         this.#chartIsEmpty = false;
       }
-      this.init(options);
+      this.init(config);
     }
   }
 
@@ -11606,6 +11638,22 @@ constructor (mediator, options={}) {
    * @memberof TradeXchart
    */
   static create(container, config={}, state) {
+
+    if (!TradeXchart.#talibReady) {
+      (async () => {
+        try {
+          if ((typeof config.talib !== "object") || 
+              // (config.talib[Symbol.toStringTag] !== "Module") ||
+              (typeof config.talib.init !== "function"))
+                throw new Error(`${TradeXchart.initErrMsg}`)
+          await config.talib.init("node_modules/talib-web/lib/talib.wasm");
+          TradeXchart.#talibReady = true;
+        } catch (e) {
+          throw new Error(`${TradeXchart.initErrMsg} ${e.message}`)
+        }
+      })();
+    }
+
     const cnt = ++TradeXchart.#cnt;
 
     config.cnt = cnt;
@@ -12056,7 +12104,7 @@ constructor (mediator, options={}) {
 
     const STYLE_TXCHART = "overflow: hidden;";
       let STYLE_UTILS = "border-bottom: 1px solid;";
-    const STYLE_BODY  = "position: relative;";
+      let STYLE_BODY  = "position: relative;";
     const STYLE_TOOLS = "position: absolute; top: 0; left: 0; height: 100%; min-height: 100%; border-right: 1px solid;";
     const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;";
 
@@ -12064,6 +12112,7 @@ constructor (mediator, options={}) {
     if (this.config?.utils?.none) {
       STYLE_UTILS = "border: none;";
       this.utilsH = 0;
+      STYLE_BODY += " margin-top: -1px;";
     }
 
     const toolsVis = (this.toolsW == 0)? "visibility: hidden;" : "visibility: visible;";
@@ -12249,4 +12298,4 @@ constructor (mediator, options={}) {
 
 }
 
-export { TradeXchart as Chart, DOM };
+export { TradeXchart as Chart, DOM, TradeXchart as default };
