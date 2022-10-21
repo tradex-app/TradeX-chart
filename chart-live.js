@@ -1,4 +1,5 @@
-import { Chart, DOM } from './src'
+import Chart from './src'
+import { DOM } from './src'
 // import './chart-live.css'
 
 // let state = undefined
