@@ -121,6 +121,12 @@ export default class yAxis extends Axis {
     return yPos
   }
 
+  lastYData2Pixel(yData) {
+    let height = yData - this.core.stream.lastPriceMin
+    let yPos = this.height - (height * this.yAxisRatio)
+    return yPos
+  }
+
   pixel2$(y) {
     let ratio = (this.height - y) / this.height
     let adjust = this.range.height * ratio

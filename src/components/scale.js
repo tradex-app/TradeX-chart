@@ -242,6 +242,8 @@ export default class ScaleBar {
   // convert chart price or offchart indicator y data to pixel pos
   yPos(yData) { return this.#yAxis.yPos(yData) }
 
+  yPosStream(yData) { return this.#yAxis.lastYData2Pixel(yData) }
+
   // convert pixel pos to chart price
   yPos2Price(y) { return this.#yAxis.yPos2Price(y) }
 

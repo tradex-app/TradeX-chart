@@ -119,8 +119,16 @@ export class Range {
     start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
     end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
   
+    const newStart = start
+    const newEnd = end
+    const oldStart = this.indexStart
+    const oldEnd = this.indexEnd
+      let inOut = this.Length
+
     this.indexStart = start
     this.indexEnd = end
+
+    inOut -= this.Length
 
     if (this.#init) {
       this.#init = false
@@ -135,8 +143,12 @@ export class Range {
     this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
     .then(maxMin => {
       this.setMaxMin(maxMin)
-    })
 
+      this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
+      this.#core.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
+      this.#core.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
+    })
+    
     return true
   }
 

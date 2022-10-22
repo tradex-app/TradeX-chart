@@ -235,6 +235,7 @@ export default class MainPane {
 
     // listen/subscribe/watch for parent notifications
     this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this))
+    // this.on("chart_zoom", this.draw.bind(this))
   }
 
   on(topic, handler, context) {
@@ -258,11 +259,13 @@ export default class MainPane {
     const newEnd = range.indexEnd + Math.floor(direction * XAXIS_ZOOM * range.Length)
     const oldStart = range.indexStart
     const oldEnd = range.indexEnd
-    const inOut = (range)? "out" : "in"
+    const inOut = (direction) ? "out" : "in"
 
-    this.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
-    this.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
-    this.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
+    this.#core.setRange(newStart, newEnd)
+
+    // this.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
+    // this.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
+    // this.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
 
     this.draw()
   }

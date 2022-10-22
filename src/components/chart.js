@@ -304,20 +304,6 @@ export default class Chart {
     this.#mediator.emit(topic, data)
   }
 
-  onMouseWheel(e) {
-    const direction = Math.sign(e.wheeldelta)
-    const range = this.range
-    const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length)
-    const newEnd = range.indexEnd + Math.floor(direction * XAXIS_ZOOM * range.Length)
-    const oldStart = range.indexStart
-    const oldEnd = range.indexEnd
-    const inOut = (range)? "out" : "in"
-
-    this.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
-    this.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
-    this.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
-  }
-  
   onMouseMove(e) {
     this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
     this.emit("chart_mousemove", this.#cursorPos)
@@ -773,7 +759,7 @@ export default class Chart {
    */
   zoomRange(data) {
 
-    this.#core.setRange(data[0], data[1])
+    // this.#core.setRange(data[0], data[1])
 
     // draw the chart - grid, candles, volume
     this.draw(this.range, true)
