@@ -257,16 +257,8 @@ export default class MainPane {
     const range = this.range
     const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length)
     const newEnd = range.indexEnd + Math.floor(direction * XAXIS_ZOOM * range.Length)
-    const oldStart = range.indexStart
-    const oldEnd = range.indexEnd
-    const inOut = (direction) ? "out" : "in"
 
     this.#core.setRange(newStart, newEnd)
-
-    // this.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
-    // this.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
-    // this.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
-
     this.draw()
   }
   

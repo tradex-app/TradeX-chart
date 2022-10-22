@@ -31,32 +31,50 @@ TradeX-chart targets browsers that support [ECMAScript 2022](https://www.ecma-in
 
 ## Demo
 
-### [Live Demo](https://tradex-chart.guildmedia.net)
+### [Live Demo](https://tradex-app.github.io/TradeX-chart/)
 
-Run the demo locally:
+## Install
 
-```
-npm install
-npm run demo
-```
-
-### Development
+### NPM
 
 ```
-npm install
-npm run dev
+npm install tradex-chart
 ```
 
-### Build
+### In Browser
 
 ```
-npm install
-npm run build
+<script src="tradex-chart.es.js"></script>
 ```
 
-### Production
+## How to Use
 
-How to use the chart in production... coming soon to a repo near you, once it is added to [npmjs.com](https://npmjs.com).
+Minimal working example:
+
+```javascript
+<div id="myChartDiv"></div>
+
+<script>
+
+import {Chart, DOM} from 'tradex-chart'
+import * as talib from "talib-web"
+
+const mount = DOM.findBySelector('#myChartDiv')
+const config = {
+  id: "TradeX_test",
+  title: "BTC/USDT",
+  width: 1000,
+  height: 800,
+  utils: {none: true},
+  tools: {none: true},
+  talib: talib
+}
+
+const chart = Chart.create(mount, config, state )
+chart.start(chart.getModID())
+
+</script>
+```
 
 ## Documentation
 
@@ -67,7 +85,6 @@ Full documentation including API can be found under [docs](/docs/documentation.m
 * Plain JavaScript with no framework dependencies
 * WIP: All chart features and functions accessible via API
 * Built in a modular manner
-* Build your own modular plugins
 * Provides message, emit and subscribe methods
 * State object defines chart configuration, on and off chart indicators, drawing tool overlays and can be imported or exported.
 * Chart implements a multi-layer canvas class which makes overlays easy. It also supports interaction through hit detection.

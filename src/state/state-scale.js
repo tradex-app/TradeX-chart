@@ -134,14 +134,14 @@ export default
           target: 'scale_drag',
           action (data) {
             console.log(`${this.id}: transition from "${this.state}" to "chart_pan"`)
-            this.context.origin.setScaleRange(data[5]) 
+            this.context.origin.setScaleRange(data.cursorPos[5]) 
           },
         },
         scale_dragDone: {
           target: 'idle',
           action (data) {
             console.log(`${this.id}: transition from "${this.state}" to "chart_panDone"`)
-            this.context.origin.setScaleRange(data[5]) 
+            this.context.origin.setScaleRange(data.cursorPos[5]) 
           },
         },
       }
