@@ -1455,7 +1455,7 @@ const DEFAULT_TIMEFRAMEMS = DEFAULT_TIMEINTERVAL;
 
 const PRICEDIGITS$1 = 6;
 
-const XAXIS_ZOOM$1 = 0.05;
+const XAXIS_ZOOM = 0.05;
 
 const YAXIS_STEP = 100;
 const YAXIS_GRID = 16;
@@ -5729,6 +5729,12 @@ class yAxis extends Axis {
     return yPos
   }
 
+  lastYData2Pixel(yData) {
+    let height = yData - this.core.stream.lastPriceMin;
+    let yPos = this.height - (height * this.yAxisRatio);
+    return yPos
+  }
+
   pixel2$(y) {
     let ratio = (this.height - y) / this.height;
     let adjust = this.range.height * ratio;
@@ -6041,14 +6047,14 @@ var stateMachineConfig$4 = {
           target: 'scale_drag',
           action (data) {
             console.log(`${this.id}: transition from "${this.state}" to "chart_pan"`);
-            this.context.origin.setScaleRange(data[5]); 
+            this.context.origin.setScaleRange(data.cursorPos[5]); 
           },
         },
         scale_dragDone: {
           target: 'idle',
           action (data) {
             console.log(`${this.id}: transition from "${this.state}" to "chart_panDone"`);
-            this.context.origin.setScaleRange(data[5]); 
+            this.context.origin.setScaleRange(data.cursorPos[5]); 
           },
         },
       }
@@ -6374,6 +6380,8 @@ class ScaleBar {
 
   // convert chart price or offchart indicator y data to pixel pos
   yPos(yData) { return this.#yAxis.yPos(yData) }
+
+  yPosStream(yData) { return this.#yAxis.lastYData2Pixel(yData) }
 
   // convert pixel pos to chart price
   yPos2Price(y) { return this.#yAxis.yPos2Price(y) }
@@ -6990,6 +6998,13 @@ class chartCandles extends Candle {
       x = range.value( c );
       if (x?.[7]) {
         this.#core.stream.lastXPos = candle.x;
+        this.#core.stream.lastYPos = {
+          o: candle.o,
+          h: candle.h,
+          l: candle.l,
+          c: candle.c,
+        };
+        this.#core.stream.lastPriceMin = range.priceMin;
         break
       }
       if (x[4] !== null) {
@@ -7545,20 +7560,6 @@ class Chart {
     this.#mediator.emit(topic, data);
   }
 
-  onMouseWheel(e) {
-    const direction = Math.sign(e.wheeldelta);
-    const range = this.range;
-    const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length);
-    const newEnd = range.indexEnd + Math.floor(direction * XAXIS_ZOOM * range.Length);
-    const oldStart = range.indexStart;
-    const oldEnd = range.indexEnd;
-    const inOut = (range)? "out" : "in";
-
-    this.emit("setRange", [newStart, newEnd, oldStart, oldEnd]);
-    this.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut]);
-    this.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd]);
-  }
-  
   onMouseMove(e) {
     this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)];
     this.emit("chart_mousemove", this.#cursorPos);
@@ -8013,7 +8014,7 @@ class Chart {
    */
   zoomRange(data) {
 
-    this.#core.setRange(data[0], data[1]);
+    // this.#core.setRange(data[0], data[1])
 
     // draw the chart - grid, candles, volume
     this.draw(this.range, true);
@@ -9131,6 +9132,7 @@ class MainPane {
 
     // listen/subscribe/watch for parent notifications
     this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this));
+    // this.on("chart_zoom", this.draw.bind(this))
   }
 
   on(topic, handler, context) {
@@ -9150,16 +9152,10 @@ class MainPane {
 
     const direction = Math.sign(e.wheeldelta) * -1;
     const range = this.range;
-    const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM$1 * range.Length);
-    const newEnd = range.indexEnd + Math.floor(direction * XAXIS_ZOOM$1 * range.Length);
-    const oldStart = range.indexStart;
-    const oldEnd = range.indexEnd;
-    const inOut = (range)? "out" : "in";
+    const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length);
+    const newEnd = range.indexEnd + Math.floor(direction * XAXIS_ZOOM * range.Length);
 
-    this.emit("setRange", [newStart, newEnd, oldStart, oldEnd]);
-    this.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut]);
-    this.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd]);
-
+    this.#core.setRange(newStart, newEnd);
     this.draw();
   }
   
@@ -10693,8 +10689,16 @@ class Range {
     start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start;
     end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end;
   
+    const newStart = start;
+    const newEnd = end;
+    const oldStart = this.indexStart;
+    const oldEnd = this.indexEnd;
+      let inOut = this.Length;
+
     this.indexStart = start;
     this.indexEnd = end;
+
+    inOut -= this.Length;
 
     if (this.#init) {
       this.#init = false;
@@ -10709,8 +10713,12 @@ class Range {
     this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
     .then(maxMin => {
       this.setMaxMin(maxMin);
-    });
 
+      this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd]);
+      this.#core.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut]);
+      this.#core.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd]);
+    });
+    
     return true
   }
 
@@ -11210,7 +11218,6 @@ class Theme {
     const instance = new Theme(theme, core);
 
     Theme.#list.set(theme.ID, instance);
-    Theme.setCurrent(theme.ID);
 
     return instance
   }
@@ -11222,16 +11229,17 @@ class Theme {
   static setCurrent(theme) {
     if (isString(theme) && Theme.list.has(theme)) {
       Theme.#current = theme;
-      return Theme.#list.get(theme)
     }
-    else {
-      // use existing current theme
-      if (isString(Theme.#current) && Theme.list.has(Theme.#current))
-        return Theme.#list.get(Theme.#current)
-      // or default
-      else
-        return defaultTheme
-    }
+    return Theme.getCurrent()
+  }
+
+  static getCurrent() {
+    // use existing current theme
+    if (isString(Theme.#current) && Theme.list.has(Theme.#current))
+      return Theme.#list.get(Theme.#current)
+    // or default
+    else
+      return defaultTheme
   }
 }
 
@@ -11604,7 +11612,7 @@ constructor (mediator, config={}) {
   get time() { return this.#time }
   get TimeUtils() { return Time }
 
-  get theme() { return this.#theme }
+  get theme() { return Theme.getCurrent() }
   get settings() { return this.#state.data.chart.settings }
   get indicators() { return this.#indicators }
   get TALib() { return this.#TALib }
@@ -11701,6 +11709,7 @@ constructor (mediator, config={}) {
 
     const id = (isObject(config) && isString(config.id)) ? config.id : null;
     this.setID(id);
+    // this.addTheme(config?.theme)
 
     this.mount();
 
@@ -11908,7 +11917,10 @@ constructor (mediator, config={}) {
       rangeStartTS: (rangeStartTS) => this.#rangeStartTS = (isNumber(rangeStartTS)) ? rangeStartTS : undefined,
       rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
       indicators: (indicators) => this.#indicators = {...Indicators, ...indicators },
-      theme: (theme) => this.addTheme(theme),
+      theme: (theme) => {
+        let t = this.addTheme(theme);
+        this.setTheme(t.ID);
+      },
       stream: (stream) => this.#stream = (isObject(stream)) ? stream : {},
       pricePrecision: (precision) => this.setPricePrecision(precision),
       volumePrecision: (precision) => this.setVolumePrecision(precision),
@@ -12017,10 +12029,7 @@ constructor (mediator, config={}) {
    * @memberof TradeXchart
    */
   addTheme(theme) {
-    const t = Theme.create(theme, this);
-
-    // if no themes are set then use this one
-    if (this.#theme === undefined) this.setTheme(t.ID);
+    return Theme.create(theme, this)
   }
 
   /**
@@ -12029,9 +12038,8 @@ constructor (mediator, config={}) {
  * @memberof TradeXchart
  */
   setTheme(ID) {
-    this.#theme = Theme.setCurrent(ID);
-
-    let chart = this.#theme.chart;
+    Theme.current = ID;
+    let chart = this.theme;
     this.#elTXChart.style.background = chart.Background;
     this.#elTXChart.style.border = `${chart.BorderThickness}px solid ${chart.BorderColour}`;
   }

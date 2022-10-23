@@ -272,7 +272,7 @@ constructor (mediator, config={}) {
   get time() { return this.#time }
   get TimeUtils() { return Time }
 
-  get theme() { return this.#theme }
+  get theme() { return Theme.getCurrent() }
   get settings() { return this.#state.data.chart.settings }
   get indicators() { return this.#indicators }
   get TALib() { return this.#TALib }
@@ -369,6 +369,7 @@ constructor (mediator, config={}) {
 
     const id = (isObject(config) && isString(config.id)) ? config.id : null
     this.setID(id)
+    // this.addTheme(config?.theme)
 
     this.mount()
 
@@ -576,7 +577,10 @@ constructor (mediator, config={}) {
       rangeStartTS: (rangeStartTS) => this.#rangeStartTS = (isNumber(rangeStartTS)) ? rangeStartTS : undefined,
       rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
       indicators: (indicators) => this.#indicators = {...Indicators, ...indicators },
-      theme: (theme) => this.addTheme(theme),
+      theme: (theme) => {
+        let t = this.addTheme(theme)
+        this.setTheme(t.ID)
+      },
       stream: (stream) => this.#stream = (isObject(stream)) ? stream : {},
       pricePrecision: (precision) => this.setPricePrecision(precision),
       volumePrecision: (precision) => this.setVolumePrecision(precision),
@@ -685,10 +689,7 @@ constructor (mediator, config={}) {
    * @memberof TradeXchart
    */
   addTheme(theme) {
-    const t = Theme.create(theme, this)
-
-    // if no themes are set then use this one
-    if (this.#theme === undefined) this.setTheme(t.ID)
+    return Theme.create(theme, this)
   }
 
   /**
@@ -697,9 +698,8 @@ constructor (mediator, config={}) {
  * @memberof TradeXchart
  */
   setTheme(ID) {
-    this.#theme = Theme.setCurrent(ID)
-
-    let chart = this.#theme.chart
+    Theme.current = ID
+    let chart = this.theme
     this.#elTXChart.style.background = chart.Background
     this.#elTXChart.style.border = `${chart.BorderThickness}px solid ${chart.BorderColour}`
   }

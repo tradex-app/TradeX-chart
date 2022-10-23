@@ -34,7 +34,6 @@ export default class Theme {
     const instance = new Theme(theme, core)
 
     Theme.#list.set(theme.ID, instance)
-    Theme.setCurrent(theme.ID)
 
     return instance
   }
@@ -46,15 +45,16 @@ export default class Theme {
   static setCurrent(theme) {
     if (isString(theme) && Theme.list.has(theme)) {
       Theme.#current = theme
-      return Theme.#list.get(theme)
     }
-    else {
-      // use existing current theme
-      if (isString(Theme.#current) && Theme.list.has(Theme.#current))
-        return Theme.#list.get(Theme.#current)
-      // or default
-      else
-        return defaultTheme
-    }
+    return Theme.getCurrent()
+  }
+
+  static getCurrent() {
+    // use existing current theme
+    if (isString(Theme.#current) && Theme.list.has(Theme.#current))
+      return Theme.#list.get(Theme.#current)
+    // or default
+    else
+      return defaultTheme
   }
 }
