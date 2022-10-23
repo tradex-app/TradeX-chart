@@ -255,6 +255,7 @@ constructor (mediator, config={}) {
   get WidgetsG() { return this.#WidgetsG }
   get Chart() { return this.#MainPane.chart }
 
+  get state() { return this.#state.data }
   get chartData() { return this.#state.data.chart.data }
   get offChart() { return this.#state.data.offchart }
   get onChart() { return this.#state.data.onchart }

@@ -94,7 +94,9 @@ chart.start(chart.getModID())
 
 ## Documentation
 
-Full documentation including API can be found under [docs](/docs/documentation.md).
+Documentation can be found under: 
+[Documentation](/docs/documentation.md)
+[API](https://tradex-app.github.io/TradeX-chart/api/)
 
 ## Features
 
