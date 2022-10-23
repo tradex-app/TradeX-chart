@@ -59,7 +59,22 @@ Minimal working example:
 import {Chart, DOM} from 'tradex-chart'
 import * as talib from "talib-web"
 
+// minimal data state
+let state = {
+  "ohlcv": [
+// [timestamp, open, high, low, close, volume]
+    [1543579200000,4035.6,4072.78348726,3965,4055.6,2157.50135341],
+    [1543582800000,4055.6,4100,4035,4059.1719252,1660.6115119],
+    [1543586400000,4059.1,4076.6,4014.1,4060,1070.09946267],
+    [1543590000000,4060.5,4060.5,3987.2,4049.2,1530.46774287],
+    [1543593600000,4049.2,4092.7,4035,4089.6691106,922.84509291]
+  ]
+}
+
+// or use document.getElementById('myChartDiv')
 const mount = DOM.findBySelector('#myChartDiv')
+
+// minimal config
 const config = {
   id: "TradeX_test",
   title: "BTC/USDT",
@@ -67,7 +82,8 @@ const config = {
   height: 800,
   utils: {none: true},
   tools: {none: true},
-  talib: talib
+  talib: talib,
+  rangeLimit: 30,
 }
 
 const chart = Chart.create(mount, config, state )
