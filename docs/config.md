@@ -16,6 +16,16 @@ const config = {
   rangeStartTS: rangeStartTS,
   // number of candles for the chart to display on start
   rangeLimit: 30,
+  // number of empty candles (time frame units) the chart will display after the last candle
+  limitFuture: 200,
+  // number of empty candles (time frame units) the chart will display before the first candle
+  limitPast: 200,
+  // minimum candles the chart will zoom to and display
+  minCandles: 20,
+  // maximum candles the chart will zoom to and display
+  minCandles: 1000,
+  // "padding" added to upper and lower price bounds for display
+  yAxisBounds: 0.005,
   // chart theme
   theme: {
     candle: {

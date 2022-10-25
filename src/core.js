@@ -868,7 +868,9 @@ constructor (mediator, config={}) {
    * @memberof TradeXchart
    */
   setRange(start=0, end=this.rangeLimit) {
-    this.#range.set(start, end)
+    const max = (this.config?.maxCandles)? this.config.maxCandles : 
+      (this.Chart?.layerWidth) ? this.Chart.layerWidth : undefined
+    this.#range.set(start, end, max)
   }
 
   /**

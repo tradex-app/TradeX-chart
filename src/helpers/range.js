@@ -1,7 +1,7 @@
 // range.js
 
 import { DAY_MS, interval2MS, ms2Interval, WEEK_MS } from "../utils/time"
-import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
+import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
 import { isNumber, isObject } from "../utils/typeChecks"
 import { limit } from "../utils/number"
 // import WebWorker from "./webWorkers"
@@ -18,9 +18,14 @@ export class Range {
   priceMax = 0
   volumeMin = 0
   volumeMax = 0
+  priceMinIdx = 0
+  priceMaxIdx = 0
+  volumeMinIdx = 0
+  volumeMaxIdx = 0
   limitFuture = LIMITFUTURE
   limitPast = LIMITPAST
   minCandles = MINCANDLES
+  maxCandles = MAXCANDLES
   yAxisBounds = YAXIS_BOUNDS
   rangeLimit = LIMITFUTURE
   anchor
@@ -42,7 +47,8 @@ export class Range {
     this.#init = true
     this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE
     this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST
-    this.minCandles = (isNumber(this.config?.limitCandles)) ? this.config.limitCandles : MINCANDLES
+    this.minCandles = (isNumber(this.config?.minCandles)) ? this.config.minCandles : MINCANDLES
+    this.maxCandles = (isNumber(this.config?.maxCandles)) ? this.config.maxCandles : MAXCANDLES
     this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS
     this.#core = config.core
 
@@ -104,14 +110,19 @@ export class Range {
     WebWorker.destroy(this.#worker.ID)
   }
 
-  set (start=0, end=this.dataLength) {
+  set (start=0, end=this.dataLength, max=this.maxCandles) {
     if (!isNumber(start) || 
         !isNumber(end)) return false
 
     // check and correct start and end argument order
     if (start > end) [start, end] = [end, start]
-    // minimum range constraint
-    if ((end - start) < this.minCandles) end = start + this.minCandles + 1
+    // range length constraint
+    end = limit(end, start + this.minCandles, start + max)
+
+    // // minimum range constraint
+    // if ((end - start) < this.minCandles) end = start + this.minCandles
+    // // maximum range constraint
+    // if ((end - start) > this.maxCandles) end = start + this.maxCandles
 
     // set out of history bounds limits
     start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
@@ -254,7 +265,7 @@ export class Range {
    * @return {object}  
    */
    maxMinPriceVol ( input ) {
-
+// console.time()
     let {data, start, end, that} = {...input}
 
     start = (typeof start === "number")? start : 0
@@ -265,7 +276,11 @@ export class Range {
         priceMin: 0,
         priceMax: 1,
         volumeMin: 0,
-        volumeMax: 0
+        volumeMax: 0,
+        priceMinIdx: 0,
+        priceMaxIdx: 0,
+        volumeMinIdx: 0,
+        volumeMaxIdx: 0,
       }
     }
     let l = data.length - 1
@@ -277,18 +292,45 @@ export class Range {
     let volumeMin = data[i][5]
     let volumeMax = data[i][5]
 
-    while(i++ < c) {
-      priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin
-      priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax
-      volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin
-      volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
-    }
+    let priceMinIdx  = i
+    let priceMaxIdx  = i
+    let volumeMinIdx = i
+    let volumeMaxIdx = i
 
+    while(i++ < c) {
+      // priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin
+      // priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax
+      // volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin
+      // volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
+
+      if (data[i][3] < priceMin) {
+        priceMin = data[i][3]
+        priceMinIdx = i
+      }
+      if (data[i][2] > priceMax) {
+        priceMax = data[i][2]
+        priceMaxIdx = i
+      }
+      if (data[i][5] < volumeMin) {
+        volumeMin = data[i][5]
+        volumeMinIdx = i
+      }
+      if (data[i][5] > volumeMax) {
+        volumeMax = data[i][5]
+        volumeMaxIdx = i
+      }
+    }
+// console.timeEnd()
     return {
       priceMin: priceMin * (1 - that.yAxisBounds),
       priceMax: priceMax * (1 + that.yAxisBounds),
       volumeMin: volumeMin,
-      volumeMax: volumeMax
+      volumeMax: volumeMax,
+
+      priceMinIdx: priceMinIdx,
+      priceMaxIdx: priceMaxIdx,
+      volumeMinIdx: volumeMinIdx,
+      volumeMaxIdx: volumeMaxIdx,
     }
 
     function limit(val, min, max) {

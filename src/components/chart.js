@@ -87,6 +87,7 @@ export default class Chart {
   #layerCursor
   #layersOnChart
   #layersTools = new Map()
+  #layerWidth
   
   #chartGrid
   #chartVolume
@@ -159,6 +160,8 @@ export default class Chart {
   get config() { return this.#core.config }
   get scrollPos() { return this.#core.scrollPos }
   get bufferPx() { return this.#core.bufferPx }
+  set layerWidth(w) { this.#layerWidth = w }
+  get layerWidth() { return this.#layerWidth }
 
   init(options) {
 
@@ -397,15 +400,15 @@ export default class Chart {
     const buffer = this.config.buffer || BUFFERSIZE
     const width = dim.w - this.#elScale.clientWidth
     const height = dim.h
-    const layerWidth = Math.round(width * ((100 + buffer) * 0.01))
+    this.layerWidth = Math.round(width * ((100 + buffer) * 0.01))
 
     this.#viewport.setSize(width, height)
-    this.#layerGrid.setSize(layerWidth, height)
-    this.#layerVolume.setSize(layerWidth, height)
+    this.#layerGrid.setSize(this.layerWidth, height)
+    this.#layerVolume.setSize(this.layerWidth, height)
     // TODO: iterate layersOnChart and setSize()
-    // this.#layersOnChart.setSize(layerWidth, height)
-    this.#layerCandles.setSize(layerWidth, height)
-    if (this.#Stream) this.#layerStream.setSize(layerWidth, height)
+    // this.#layersOnChart.setSize(this.layerWidth, height)
+    this.#layerCandles.setSize(this.layerWidth, height)
+    if (this.#Stream) this.#layerStream.setSize(this.layerWidth, height)
     this.#layerCursor.setSize(width, height)
 
     this.setWidth(dim.w)
@@ -538,8 +541,9 @@ export default class Chart {
     const buffer = this.config.buffer || BUFFERSIZE
     const width = this.#elViewport.clientWidth
     const height = this.#options.chartH || this.#parent.rowsH - 1
+    this.layerWidth = Math.round(width * ((100 + buffer) * 0.01))
     const layerConfig = { 
-      width: Math.round(width * ((100 + buffer) * 0.01)), 
+      width: this.layerWidth, 
       height: height
     }
     return {width, height, layerConfig}
