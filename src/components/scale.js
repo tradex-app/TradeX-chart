@@ -12,13 +12,6 @@ import { copyDeep, uid } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
 import scalePriceLine from './overlays/scale-priceLine'
 
-import { 
-  YAXIS_TYPES,
-  BUFFERSIZE
-} from "../definitions/chart";
-
-import { YAxisStyle } from "../definitions/style";
-
 /**
  * Provides the chart panes scale / yAxis
  * @export
@@ -39,8 +32,6 @@ export default class ScaleBar {
   #elScale
   #elScaleCanvas
   #elViewport
-
-  #yAxisType = YAXIS_TYPES[0]  // default, log, percent
 
   #viewport
   #layerLabels
@@ -85,8 +76,8 @@ export default class ScaleBar {
   get yAxisRatio() { return this.#yAxis.yAxisRatio }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
-  set yAxisType(t) { this.#yAxisType = YAXIS_TYPES.includes(t) ? t : YAXIS_TYPES[0] }
-  get yAxisType() { return this.#yAxisType }
+  set yAxisType(t) { this.#yAxis.yAxisType = t }
+  get yAxisType() { return this.#yAxis.yAxisType }
   get yAxisGrads() { return this.#yAxis.yAxisGrads }
   get viewport() { return this.#viewport }
   get pos() { return this.dimensions }
@@ -96,19 +87,17 @@ export default class ScaleBar {
   set scaleRange(r) { this.setScaleRange(r) }
   set rangeMode(m) { this.core.range.mode = m }
   get rangeMode() { return this.core.range.mode }
-  set rangeYFactor(f) { this.core.range.yFactor = f }
+  set rangeYFactor(f) { this.core.range.yFactor(f) }
 
   init() {
     this.mount(this.#elScale)
-
-    this.yAxisType = this.options.yAxisType
 
     this.log(`${this.#name} instantiated`)
   }
 
 
   start(data) {
-    this.#yAxis = new yAxis(this, this, this.yAxisType)
+    this.#yAxis = new yAxis(this, this, this.options.yAxisType)
     // prepare layered canvas
     this.createViewport()
     // draw the scale
@@ -142,6 +131,7 @@ export default class ScaleBar {
     this.#controller = new InputController(canvas, {disableContextMenu: false});
     this.#controller.on("drag", this.onDrag.bind(this));
     this.#controller.on("enddrag", this.onDragDone.bind(this));
+    this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
 
     this.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMove(e) })
     this.on(`${this.#parent.ID}_mouseout`, (e) => { this.eraseCursorPrice() })
@@ -198,6 +188,15 @@ export default class ScaleBar {
     this.emit("scale_dragDone", dragEvent)
   }
 
+  onMouseWheel(e) {
+    e.domEvent.preventDefault()
+
+    const direction = Math.sign(e.wheeldelta) * -1
+    const range = this.range
+
+    console.log(`Scale: mousewheel: ${direction}`)
+  }
+
   onStreamUpdate(e) {
 
   }
@@ -225,8 +224,11 @@ export default class ScaleBar {
   }
 
   setScaleRange(r) {
-    this.rangeMode = "manual"
-    this.rangeYFactor = r * 0.001
+    this.#yAxis.setMode = "manual"
+    this.#yAxis.setYFactor = r * 0.01
+    console.log(`r * 0.01`,r * 0.01)
+    this.parent.updateRange()
+    this.draw()
   }
 
   defaultNode() {

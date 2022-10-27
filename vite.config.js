@@ -1,6 +1,7 @@
 // vite.config.js
 const path = require('path')
 const { defineConfig } = require('vite')
+import cleanup from 'rollup-plugin-cleanup';
 
 const name = "TradeX-chart"
 const id = "tradex-chart"
@@ -19,6 +20,7 @@ export default defineConfig(({ command, mode }) => {
         },
         emptyOutDir: true,
         target: "esnext",
+        minify: "esbuild",
         rollupOptions: {
           // make sure to externalize deps that shouldn't be bundled into your library
           external: [
@@ -29,7 +31,10 @@ export default defineConfig(({ command, mode }) => {
             globals: {
               // vue: 'Vue'
             }
-          }
+          },
+          plugins: [
+            cleanup()
+          ]
         }
       },
     }

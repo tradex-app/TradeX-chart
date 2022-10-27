@@ -29,12 +29,6 @@ export class Range {
   yAxisBounds = YAXIS_BOUNDS
   rangeLimit = LIMITFUTURE
   anchor
-  #rangeMode = "automatic"
-  #yRangeManual = {
-    max: 1,
-    min: 0,
-    factor: 1
-  }
   #core
   #worker
   #init = true
@@ -103,8 +97,6 @@ export class Range {
   get interval () { return this.#interval }
   set intervalStr (i) { this.#intervalStr = i }
   get intervalStr () { return this.#intervalStr }
-  set mode (m) { this.setMode(m) }
-  get mode () { return this.#rangeMode }
 
   end() {
     WebWorker.destroy(this.#worker.ID)
@@ -118,12 +110,6 @@ export class Range {
     if (start > end) [start, end] = [end, start]
     // range length constraint
     end = limit(end, start + this.minCandles, start + max)
-
-    // // minimum range constraint
-    // if ((end - start) < this.minCandles) end = start + this.minCandles
-    // // maximum range constraint
-    // if ((end - start) > this.maxCandles) end = start + this.maxCandles
-
     // set out of history bounds limits
     start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
     end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
@@ -164,28 +150,12 @@ export class Range {
   }
 
   setMaxMin(maxMin) {
-    if (this.#rangeMode = "manual") {
-      // maxMin.priceMax = maxMin.priceMax * (1 + this.#yRangeManual.factor)
-      // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
-    }
     for (let m in maxMin) {
       this[m] = maxMin[m]
     }
     this.height = this.priceMax - this.priceMin
     this.volumeHeight = this.volumeMax - this.volumeMin
     this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
-  }
-
-  setMode(m) {
-    if (m == "automatic" || m == "manual") this.#rangeMode = m
-    if (m == "manual") this.#yRangeManual.factor = 0
-    this.#yRangeManual.max = this.priceMax
-    this.#yRangeManual.min = this.priceMin
-  }
-
-  yFactor(f) {
-    if (!isNumber(f) || this.#rangeMode !== "manual") return false
-    this.#yRangeManual.factor += f * -1
   }
 
   /**
@@ -298,11 +268,6 @@ export class Range {
     let volumeMaxIdx = i
 
     while(i++ < c) {
-      // priceMin  = (data[i][3] < priceMin) ? data[i][3] : priceMin
-      // priceMax  = (data[i][2] > priceMax) ? data[i][2] : priceMax
-      // volumeMin = (data[i][5] < volumeMin) ? data[i][5] : volumeMin
-      // volumeMax = (data[i][5] > volumeMax) ? data[i][5] : volumeMax
-
       if (data[i][3] < priceMin) {
         priceMin = data[i][3]
         priceMinIdx = i

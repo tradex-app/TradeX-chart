@@ -10,7 +10,6 @@ import {
   YAXIS_GRID,
   YAXIS_TYPES
 } from "../../definitions/chart";
-import { YAxisStyle } from "../../definitions/style";
 
 export default class yAxis extends Axis {
 
@@ -20,6 +19,12 @@ export default class yAxis extends Axis {
   #core
 
   #yAxisType = YAXIS_TYPES[0]  // default, log, percent
+  #mode = "automatic"
+  #transform = {
+    max: 1,
+    min: 0,
+    factor: 1
+  }
   #yAxisPadding = 1.04
   #yAxisStep = YAXIS_STEP
   #yAxisGrid = YAXIS_GRID
@@ -109,6 +114,7 @@ export default class yAxis extends Axis {
    * return chart price
    * handles Y Axis modes: default, log, percentate
    * @param {number} y
+   * @return {number}
    * @memberof yAxis
    */
   yPos2Price(y) {
@@ -136,6 +142,31 @@ export default class yAxis extends Axis {
   p100toPixel(yData) {
     return this.height * yData / 100
   }
+
+  yAxisTransform() {
+
+  }
+
+  setMode(m) {
+    if (!["automatic","manual"].includes(m)) return false
+    if (this.mode == "automatic" && m == "manual") {
+      this.#transform.factor = 0
+      this.#transform.max = this.priceMax
+      this.#transform.min = this.priceMin
+    }
+    else if (this.mode == "manual" && m == "automatic") {
+      this.#transform.factor = 0
+    }
+    this.#mode = m
+  }
+
+  setYFactor(f) {
+    if (!isNumber(f) || this.#mode !== "manual") return false
+    this.#transform.factor += f * -1
+    console.log(`this.#transform.factor`,this.#transform.factor)
+  }
+  
+
 
   calcGradations() {
 
