@@ -504,7 +504,6 @@ export default class MainPane {
   }
 
   rowNode(type) {
-    const api = this.#mediator.api
     const styleRow = STYLE_ROW + ` border-top: 1px solid ${this.theme.chart.BorderColour};`
     const styleScale = STYLE_SCALE + ` border-color: ${this.theme.xAxis.line};`
 
@@ -520,7 +519,6 @@ export default class MainPane {
   }
 
   scaleNode(type) {
-    const api = this.#mediator.api
     const styleRow = STYLE_ROW + ` border-top: 1px solid ${this.theme.chart.BorderColour};`
     const styleScale = STYLE_SCALE + ` border-color: ${this.theme.yAxis.line};`
 

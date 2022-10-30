@@ -16,8 +16,10 @@ export class Range {
   indexEnd = LIMITFUTURE
   priceMin = 0
   priceMax = 0
+  priceDiff = 0
   volumeMin = 0
   volumeMax = 0
+  volumeDiff = 0
   priceMinIdx = 0
   priceMaxIdx = 0
   volumeMinIdx = 0
@@ -153,8 +155,6 @@ export class Range {
     for (let m in maxMin) {
       this[m] = maxMin[m]
     }
-    this.height = this.priceMax - this.priceMin
-    this.volumeHeight = this.volumeMax - this.volumeMin
     this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
   }
 
@@ -286,11 +286,16 @@ export class Range {
       }
     }
 // console.timeEnd()
+
+    priceMin *= (1 - that.yAxisBounds)
+    priceMax *= (1 + that.yAxisBounds)
     return {
-      priceMin: priceMin * (1 - that.yAxisBounds),
-      priceMax: priceMax * (1 + that.yAxisBounds),
+      priceMin: priceMin,
+      priceMax: priceMax,
+      priceDiff: priceMax - priceMin,
       volumeMin: volumeMin,
       volumeMax: volumeMax,
+      volumeDiff: volumeMax - volumeMin,
 
       priceMinIdx: priceMinIdx,
       priceMaxIdx: priceMaxIdx,

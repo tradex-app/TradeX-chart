@@ -21,9 +21,23 @@ export default class yAxis extends Axis {
   #yAxisType = YAXIS_TYPES[0]  // default, log, percent
   #mode = "automatic"
   #transform = {
-    max: 1,
-    min: 0,
-    factor: 1
+    automatic: {
+      get max() { return this.range?.priceMax },
+      get min() { return this.range?.priceMin },
+      get mid() { return this.range?.priceMin + (this.range?.priceDiff * 0.5) },
+      get diff() { return this.range?.priceDiff },
+      zoom: 1,
+      offset: 0,
+      range: null
+    },
+    manual: {
+      max: 1,
+      min: 0,
+      mid: 0.5,
+      diff: 1,
+      zoom: 1,
+      offset: 0
+    }
   }
   #yAxisPadding = 1.04
   #yAxisStep = YAXIS_STEP
@@ -32,6 +46,8 @@ export default class yAxis extends Axis {
   #yAxisRound = 3
   #yAxisTicks = 3
   #yAxisGrads
+
+  range
 
   constructor(parent, chart, yAxisType=YAXIS_TYPES[0]) {
     super(parent, chart)
@@ -42,15 +58,32 @@ export default class yAxis extends Axis {
     this.yAxisType = yAxisType
     this.#yAxisGrid = (this.core.config?.yAxisGrid) ? 
       this.core.config?.yAxisGrid : YAXIS_GRID
+
+    this.#transform.automatic.range = this.#core.range
+    this.range = new Proxy(this.#core.range, {
+      get: (obj, prop) => {
+        const m = this.#mode
+        const t = this.#transform
+        switch (prop) {
+          case "max": return t[m][prop] // "priceMax"
+          case "min":  return t[m][prop] // "priceMin"
+          case "mid": return t[m][prop] // "priceMid"
+          case "diff": return t[m][prop] // "priceDiff"
+          case "zoom": return t[m][prop]
+          case "offset": return t[m][prop]
+          default: return obj[prop]
+        }
+      }
+    })
   }
 
   get core() { return this.#core }
   get chart() { return this.#chart }
   get data() { return this.chart.data }
-  get range() { return this.#parent.mediator.api.core.range }
+  // get range() { return this.#parent.mediator.api.core.range }
   get height() { return this.chart.height }
-  get rangeH() { return this.range.height * this.yAxisPadding }
-  get yAxisRatio() { return this.height / this.range.height }
+  get rangeH() { return this.range.diff * this.yAxisPadding }
+  get yAxisRatio() { return this.getYAxisRatio() }
   get yAxisPrecision() { return this.yAxisCalcPrecision }
   set yAxisPadding(p) { this.#yAxisPadding = p }
   get yAxisPadding() { return this.#yAxisPadding }
@@ -62,10 +95,19 @@ export default class yAxis extends Axis {
   get yAxisTicks() { return this.#yAxisTicks }
   get yAxisGrads() { return this.#yAxisGrads }
   get theme() { return this.core.theme }
+  set mode(m) { this.setMode(m) }
+  get mode() { return this.#mode }
+  set zoom(z) { this.setZoom(z) }
+  get zoom() { return this.range.zoom }
 
   calcHeight() {
     let api = this.#chart.mediator.api
     return api.height - api.utilsW - api.scaleW
+  }
+
+  getYAxisRatio() {
+    // const diff = (this.#mode == "automatic") ? this.range.diff : this.#transform.diff
+    return this.height / this.range.diff
   }
 
   yAxisRangeBounds() {
@@ -81,8 +123,8 @@ export default class yAxis extends Axis {
   }
 
   yAxisCalcPrecision() {
-    let integerCnt = this.numDigits(this.range.priceMax)
-    // let decimalCnt = this.precision(this.range.priceMax)
+    let integerCnt = this.numDigits(this.range.max)
+    // let decimalCnt = this.precision(this.range.max)
     return this.yDigits - integerCnt
   }
 
@@ -99,14 +141,9 @@ export default class yAxis extends Axis {
    */
   yPos(yData) {
     switch(this.yAxisType) {
-      case "percent" :
-        return this.p100toPixel(yData)
-        break;
-      case "log" :
-        return this.$2Pixel(log10(yData))
-        break;
-      default :
-        return this.$2Pixel(yData)
+      case "percent" : return this.p100toPixel(yData)
+      case "log" : return this.$2Pixel(log10(yData))
+      default : return this.$2Pixel(yData)
     }
   }
 
@@ -122,8 +159,8 @@ export default class yAxis extends Axis {
   }
 
   $2Pixel(yData) {
-    let height = yData - this.range.priceMin
-    let yPos = this.height - (height * this.yAxisRatio)
+    const height = yData - this.range.min
+    const yPos = this.height - (height * this.yAxisRatio)
     return yPos
   }
 
@@ -135,8 +172,8 @@ export default class yAxis extends Axis {
 
   pixel2$(y) {
     let ratio = (this.height - y) / this.height
-    let adjust = this.range.height * ratio
-    return this.range.priceMin + adjust
+    let adjust = this.range.diff * ratio
+    return this.range.min + adjust
   }
 
   p100toPixel(yData) {
@@ -149,24 +186,59 @@ export default class yAxis extends Axis {
 
   setMode(m) {
     if (!["automatic","manual"].includes(m)) return false
+
+    const t = this.#transform
     if (this.mode == "automatic" && m == "manual") {
-      this.#transform.factor = 0
-      this.#transform.max = this.priceMax
-      this.#transform.min = this.priceMin
+      t.manual.zoom = 0
+      t.manual.max = this.range.priceMax
+      t.manual.min = this.range.priceMin
+      this.#mode = m
     }
     else if (this.mode == "manual" && m == "automatic") {
-      this.#transform.factor = 0
+      t.manual.zoom = 0
+      this.#mode = m
     }
-    this.#mode = m
   }
 
-  setYFactor(f) {
-    if (!isNumber(f) || this.#mode !== "manual") return false
-    this.#transform.factor += f * -1
-    console.log(`this.#transform.factor`,this.#transform.factor)
+  setZoom(z) {
+    if (!isNumber(z) || this.#mode !== "manual") return false
+
+    const t = this.#transform
+    t.manual.zoom += z
+    console.log(JSON.stringify(t.manual))
+
+    const diff = t.manual.max - t.manual.min
+    const half = diff / 2
+    const r = z / this.height
+    const mid = half + t.manual.min // + offset
+    const min = t.manual.min * (1 - r)
+    const max = t.manual.max * (1 + r)
+    
+    if (max < min) return
+
+    t.manual.max =  max
+    t.manual.min = (min >= 0)? min : 0
+    t.manual.mid = mid
+    t.manual.diff = diff
+    t.manual.zoom = 1
+    t.manual.offset = 0
+
+    console.log("mid: ",mid)
+    console.log(JSON.stringify(t.manual))
   }
+
+//   setYFactor(f) {
+//     if (!isNumber(f) || this.#mode !== "manual") return false
+//     this.#transform.factor += f * -1
+//     console.log(`this.#transform.factor`,this.#transform.factor)
+//   }
   
-
+//   calc_zoom(event) {
+//     let d = this.drug.y - event.center.y
+//     let speed = d > 0 ? 3 : 1
+//     let k = 1 + speed * d / this.layout.height
+//     return Utils.clamp(this.drug.z * k, 0.005, 100)
+// }
 
   calcGradations() {
 
@@ -175,8 +247,8 @@ export default class yAxis extends Axis {
         this.#yAxisGrads = this.gradations(100, 0, false, true)
         break;
       default:
-        let max = (this.range.priceMax > 0) ? this.range.priceMax : 1
-        let min = (this.range.priceMin > 0) ? this.range.priceMin : 0
+        let max = (this.range.max > 0) ? this.range.max : 1
+        let min = (this.range.min > 0) ? this.range.min : 0
         this.#yAxisGrads = this.gradations(max, min)
         break;
     }
@@ -186,6 +258,9 @@ export default class yAxis extends Axis {
 
       let digits;
     const scaleGrads = [];
+
+    max = this.range.max
+    min = this.range.min
 
     if (fixed) {
       const rangeMid = (max + min) * 0.5

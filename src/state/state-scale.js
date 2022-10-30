@@ -124,7 +124,8 @@ export default
     },
     scale_drag: {
       onEnter(data) {
-        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+        console.log(`${this.context.origin.ID}: state: "${this.state}" - onEnter`)
+        this.context.origin.setScaleRange(data.cursorPos[5]) 
       },
       onExit(data) {
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
@@ -133,15 +134,15 @@ export default
         scale_drag: {
           target: 'scale_drag',
           action (data) {
-            console.log(`${this.id}: transition from "${this.state}" to "chart_pan"`)
-            this.context.origin.setScaleRange(data.cursorPos[5]) 
+            // console.log(`${this.context.origin.ID}: transition from "${this.state}" to "scale_drag"`)
+            // this.context.origin.setScaleRange(data.cursorPos[5]) 
           },
         },
         scale_dragDone: {
           target: 'idle',
           action (data) {
-            console.log(`${this.id}: transition from "${this.state}" to "chart_panDone"`)
-            this.context.origin.setScaleRange(data.cursorPos[5]) 
+            console.log(`${this.context.origin.ID}: transition from "${this.state}" to "idle"`)
+            // this.context.origin.setScaleRange(data.cursorPos[5]) 
           },
         },
       }

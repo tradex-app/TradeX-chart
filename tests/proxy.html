@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+  </head>
+  <body>
+    <script>
+let mode = "automatic"
+
+const transform = {
+	automatic: {
+  	max: "a",
+    min: "b",
+  },
+  manual: {
+  	max: 1,
+    min: 2
+  }
+}
+
+const t = new Proxy(transform, {
+	get: (obj, prop) => {
+    if (!obj.hasOwnProperty(mode)) throw new Error(`Object ${obj.constructor.name} does not support mode "${mode}"`)
+  	if (!obj.automatic.hasOwnProperty(prop)) throw new Error(`Property ${prop} does not exist in object ${obj.constructor.name}`)
+    
+    return obj[mode][prop]
+  }
+})
+
+console.log(t.max)
+mode = "manual"
+console.log(t.max)
+
+
+    </script>
+  </body>
+</html>

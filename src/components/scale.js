@@ -224,10 +224,10 @@ export default class ScaleBar {
   }
 
   setScaleRange(r) {
-    this.#yAxis.setMode = "manual"
-    this.#yAxis.setYFactor = r * 0.01
-    console.log(`r * 0.01`,r * 0.01)
-    this.parent.updateRange()
+    if (this.#yAxis.mode == "automatic") this.#yAxis.mode = "manual"
+
+    this.#yAxis.zoom = r
+    this.parent.draw(this.range, true)
     this.draw()
   }
 
@@ -353,7 +353,7 @@ export default class ScaleBar {
   }
 
   resize(width=this.width, height=this.height) {
-    // adjust partent element
+    // adjust parent element
     this.setDimensions({w: width, h: height})
     // // adjust layers
     // width -= this.#elScale.clientWidth
