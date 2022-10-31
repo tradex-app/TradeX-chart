@@ -85,7 +85,7 @@ export default class Stream {
    */
   set candle(data) {
     // const r = this.range
-    // if (data.p > r.priceMax || data.p < r.priceMin) {}
+    // if (data.p > r.valueMax || data.p < r.valueMin) {}
 
     // round time to nearest current time unit
     const tfms = this.#core.time.timeFrameMS

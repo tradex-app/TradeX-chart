@@ -22,10 +22,10 @@ export default class yAxis extends Axis {
   #mode = "automatic"
   #transform = {
     automatic: {
-      get max() { return this.range?.priceMax },
-      get min() { return this.range?.priceMin },
-      get mid() { return this.range?.priceMin + (this.range?.priceDiff * 0.5) },
-      get diff() { return this.range?.priceDiff },
+      get max() { return this.range?.valueMax },
+      get min() { return this.range?.valueMin },
+      get mid() { return this.range?.valueMin + (this.range?.valueDiff * 0.5) },
+      get diff() { return this.range?.valueDiff },
       zoom: 1,
       offset: 0,
       range: null
@@ -65,10 +65,10 @@ export default class yAxis extends Axis {
         const m = this.#mode
         const t = this.#transform
         switch (prop) {
-          case "max": return t[m][prop] // "priceMax"
-          case "min":  return t[m][prop] // "priceMin"
+          case "max": return t[m][prop] // "valueMax"
+          case "min":  return t[m][prop] // "valueMin"
           case "mid": return t[m][prop] // "priceMid"
-          case "diff": return t[m][prop] // "priceDiff"
+          case "diff": return t[m][prop] // "valueDiff"
           case "zoom": return t[m][prop]
           case "offset": return t[m][prop]
           default: return obj[prop]
@@ -190,8 +190,8 @@ export default class yAxis extends Axis {
     const t = this.#transform
     if (this.mode == "automatic" && m == "manual") {
       t.manual.zoom = 0
-      t.manual.max = this.range.priceMax
-      t.manual.min = this.range.priceMin
+      t.manual.max = this.range.valueMax
+      t.manual.min = this.range.valueMin
       this.#mode = m
     }
     else if (this.mode == "manual" && m == "automatic") {

@@ -525,8 +525,8 @@ constructor (mediator, config={}) {
     const r = this.range
     // is candle visible?
     if (r.inRange(candle[0])) {
-      const max = r.priceMax // * (1 - YAXIS_BOUNDS)
-      const min = r.priceMin // * (1 + YAXIS_BOUNDS)
+      const max = r.valueMax // * (1 - YAXIS_BOUNDS)
+      const min = r.valueMin // * (1 + YAXIS_BOUNDS)
       // is candle testing display boundaries?
       if (candle[2] > max || candle[3] < min) {
         // recalculate range

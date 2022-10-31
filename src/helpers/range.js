@@ -14,14 +14,14 @@ export class Range {
   #intervalStr = "1s"
   indexStart = 0
   indexEnd = LIMITFUTURE
-  priceMin = 0
-  priceMax = 0
-  priceDiff = 0
+  valueMin = 0
+  valueMax = 0
+  valueDiff = 0
   volumeMin = 0
   volumeMax = 0
   volumeDiff = 0
-  priceMinIdx = 0
-  priceMaxIdx = 0
+  valueMinIdx = 0
+  valueMaxIdx = 0
   volumeMinIdx = 0
   volumeMaxIdx = 0
   limitFuture = LIMITFUTURE
@@ -243,12 +243,12 @@ export class Range {
 
     if (data.length == 0) {
       return {
-        priceMin: 0,
-        priceMax: 1,
+        valueMin: 0,
+        valueMax: 1,
         volumeMin: 0,
         volumeMax: 0,
-        priceMinIdx: 0,
-        priceMaxIdx: 0,
+        valueMinIdx: 0,
+        valueMaxIdx: 0,
         volumeMinIdx: 0,
         volumeMaxIdx: 0,
       }
@@ -257,24 +257,24 @@ export class Range {
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
 
-    let priceMin  = data[i][3]
-    let priceMax  = data[i][2]
+    let valueMin  = data[i][3]
+    let valueMax  = data[i][2]
     let volumeMin = data[i][5]
     let volumeMax = data[i][5]
 
-    let priceMinIdx  = i
-    let priceMaxIdx  = i
+    let valueMinIdx  = i
+    let valueMaxIdx  = i
     let volumeMinIdx = i
     let volumeMaxIdx = i
 
     while(i++ < c) {
-      if (data[i][3] < priceMin) {
-        priceMin = data[i][3]
-        priceMinIdx = i
+      if (data[i][3] < valueMin) {
+        valueMin = data[i][3]
+        valueMinIdx = i
       }
-      if (data[i][2] > priceMax) {
-        priceMax = data[i][2]
-        priceMaxIdx = i
+      if (data[i][2] > valueMax) {
+        valueMax = data[i][2]
+        valueMaxIdx = i
       }
       if (data[i][5] < volumeMin) {
         volumeMin = data[i][5]
@@ -287,18 +287,18 @@ export class Range {
     }
 // console.timeEnd()
 
-    priceMin *= (1 - that.yAxisBounds)
-    priceMax *= (1 + that.yAxisBounds)
+    valueMin *= (1 - that.yAxisBounds)
+    valueMax *= (1 + that.yAxisBounds)
     return {
-      priceMin: priceMin,
-      priceMax: priceMax,
-      priceDiff: priceMax - priceMin,
+      valueMin: valueMin,
+      valueMax: valueMax,
+      valueDiff: valueMax - valueMin,
       volumeMin: volumeMin,
       volumeMax: volumeMax,
       volumeDiff: volumeMax - volumeMin,
 
-      priceMinIdx: priceMinIdx,
-      priceMaxIdx: priceMaxIdx,
+      valueMinIdx: valueMinIdx,
+      valueMaxIdx: valueMaxIdx,
       volumeMinIdx: volumeMinIdx,
       volumeMaxIdx: volumeMaxIdx,
     }
