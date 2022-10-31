@@ -100,13 +100,13 @@ export default class OffChart {
     this.#elOffChart = mediator.api.elements.elOffChart
     this.#elScale = mediator.api.elements.elScale
     this.#parent = {...this.mediator.api.parent}
-    this.#overlay = options.offChart
+    this.#overlay = {...options.offChart}
     this.#core = this.mediator.api.core
     this.#theme = this.#core.theme
 
-    this.#options = options
+    this.#options = {...options}
     this.#ID = this.#options.offChartID || uid("TX_OC_")
-    this.init(options)
+    this.init(this.#options)
   }
 
   log(l) { this.mediator.log(l) }
