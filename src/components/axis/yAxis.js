@@ -205,12 +205,9 @@ export default class yAxis extends Axis {
 
     const t = this.#transform
     t.manual.zoom += z
-    console.log(JSON.stringify(t.manual))
+    // console.log(JSON.stringify(t.manual))
 
-    const diff = t.manual.max - t.manual.min
-    const half = diff / 2
     const r = z / this.height
-    const mid = half + t.manual.min // + offset
     const min = t.manual.min * (1 - r)
     const max = t.manual.max * (1 + r)
     
@@ -218,13 +215,12 @@ export default class yAxis extends Axis {
 
     t.manual.max =  max
     t.manual.min = (min >= 0)? min : 0
-    t.manual.mid = mid
-    t.manual.diff = diff
+    t.manual.mid = (max - min) / 2
+    t.manual.diff = max - min
     t.manual.zoom = 1
     t.manual.offset = 0
 
-    console.log("mid: ",mid)
-    console.log(JSON.stringify(t.manual))
+    // console.log(JSON.stringify(t.manual))
   }
 
 //   setYFactor(f) {
@@ -259,8 +255,10 @@ export default class yAxis extends Axis {
       let digits;
     const scaleGrads = [];
 
-    max = this.range.max
-    min = this.range.min
+    // max = this.range.max
+    // min = this.range.min
+
+    this.#yAxisRound = this.countDigits(this.range.diff).integers
 
     if (fixed) {
       const rangeMid = (max + min) * 0.5
@@ -314,12 +312,13 @@ export default class yAxis extends Axis {
       let pos = this.height,
           step$ = (yEndRoundNumber - yStartRoundNumber) / niceNumber,
           stepP = this.height / step$,
+          step = this.countDigits(step$),
           nice;
 
       for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
       {
         digits = this.countDigits(y)
-        nice = this.niceValue(digits, decimals)
+        nice = this.niceValue(digits, decimals, step)
         scaleGrads.push([nice, round(pos), digits])
 
         pos -= stepP
@@ -329,22 +328,22 @@ export default class yAxis extends Axis {
     return scaleGrads
   }
 
-  niceValue(digits, decimals=true) {
+  niceValue(digits, decimals=true, step) {
     if (digits.integers) {
-      let x = digits.integers - this.#yAxisRound
-      if (x > 0) {
-        let factor = power(10, x)
+      let x = step.integers
+      if (x - 2 > 0) {
+        let factor = power(10, x - 2)
         return Math.floor(digits.value / factor) * factor
       }
       else {
         if (!decimals) return Math.floor(digits.value)
-        x = (x -1) * -1
+        x = (x > 0)? x : x * -1
         return round(digits.value, x)
       }
     }
     else {
-      let y = digits.decimals - this.#yAxisRound
-      y = (y -1) * -1
+      let y = digits.decimals - step.decimals
+      y = (y > 0)? y : y * -1
       return round(digits.value, y)
     }
   }
