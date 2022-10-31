@@ -58,6 +58,7 @@ export default
         },
         scale_drag: {
           target: 'scale_drag',
+          condition: 'receiver',
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
           },
@@ -124,8 +125,10 @@ export default
     },
     scale_drag: {
       onEnter(data) {
-        console.log(`${this.context.origin.ID}: state: "${this.state}" - onEnter`)
-        this.context.origin.setScaleRange(data.cursorPos[5]) 
+        // if (data.scale.ID == this.context.origin.ID) {
+          console.log(`${this.context.origin.ID}: state: "${this.state}" - onEnter`)
+          this.context.origin.setScaleRange(data.cursorPos[5]) 
+        // }
       },
       onExit(data) {
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
@@ -133,6 +136,7 @@ export default
       on: {
         scale_drag: {
           target: 'scale_drag',
+          condition: 'receiver',
           action (data) {
             // console.log(`${this.context.origin.ID}: transition from "${this.state}" to "scale_drag"`)
             // this.context.origin.setScaleRange(data.cursorPos[5]) 
@@ -140,6 +144,7 @@ export default
         },
         scale_dragDone: {
           target: 'idle',
+          condition: 'receiver',
           action (data) {
             console.log(`${this.context.origin.ID}: transition from "${this.state}" to "idle"`)
             // this.context.origin.setScaleRange(data.cursorPos[5]) 
@@ -150,6 +155,7 @@ export default
 
   },
   guards: {
+    receiver () { return (this.eventData.scale.ID == this.context.origin.ID) },
     zoomDone () { return true },
   }
 }

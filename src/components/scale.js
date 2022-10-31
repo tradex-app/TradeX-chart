@@ -46,13 +46,12 @@ export default class ScaleBar {
   constructor (mediator, options) {
 
     this.#mediator = mediator
-    this.#options = options
+    this.#options = {...options}
     this.#elScale = mediator.api.elements.elScale
     this.#chart = mediator.api.core.Chart
     this.#parent = mediator.api.parent
     this.#core = this.#mediator.api.core
 
-    this.#options = options
     this.#ID = this.#options.offChartID || uid("TX_scale_")
     this.init()
   }
@@ -169,7 +168,7 @@ export default class ScaleBar {
       e.movement.x, e.movement.y
     ]
     const dragEvent = {
-      divider: this,
+      scale: this,
       cursorPos: this.#cursorPos
     }
     this.emit("scale_drag", dragEvent)
@@ -182,7 +181,7 @@ export default class ScaleBar {
       e.movement.x, e.movement.y
     ]
     const dragEvent = {
-      divider: this,
+      scale: this,
       cursorPos: this.#cursorPos
     }
     this.emit("scale_dragDone", dragEvent)
