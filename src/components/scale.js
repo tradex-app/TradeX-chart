@@ -130,6 +130,7 @@ export default class ScaleBar {
     let canvas = this.#viewport.scene.canvas
     // create controller and use 'on' method to receive input events 
     this.#controller = new InputController(canvas, {disableContextMenu: false});
+    this.#controller.setCursor("ns-resize")
     this.#controller.on("drag", this.onDrag.bind(this));
     this.#controller.on("enddrag", this.onDragDone.bind(this));
     this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
@@ -230,6 +231,10 @@ export default class ScaleBar {
     this.#yAxis.zoom = r
     this.parent.draw(this.range, true)
     this.draw()
+  }
+
+  setCursor(cursor) {
+    this.#elScale.style.cursor = cursor
   }
 
   defaultNode() {

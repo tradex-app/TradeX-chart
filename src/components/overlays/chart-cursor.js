@@ -23,6 +23,7 @@ export default class chartCursor {
     this.#chart.on("chart_panDone", (e) => { this.onMouseDragX(e) })
     this.#chart.on("main_mousemove", (e) => { this.onMouseMoveX(e) })
     this.#chart.on(`${this.#chart.ID}_mousemove`, (e) => { this.onMouseMoveY(e) })
+    this.#chart.on(`${this.#chart.ID}_mouseenter`, (e) => { this.onMouseMoveY(e) })
   }
 
   onMouseDragX(e) {
