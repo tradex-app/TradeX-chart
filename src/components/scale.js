@@ -96,7 +96,9 @@ export default class ScaleBar {
 
 
   start(data) {
-    this.#yAxis = new yAxis(this, this, this.options.yAxisType)
+    const range = (this.#parent.name == "OffChart" ) ? 
+      this.#parent.offChartRange : undefined
+    this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
     // prepare layered canvas
     this.createViewport()
     // draw the scale

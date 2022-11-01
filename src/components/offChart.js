@@ -62,12 +62,12 @@ export default class OffChart {
   #elLegends
   #elScale
 
+  #offChartID
   #Scale
   #Time
   #Legends
   #Indicator
   #overlay
-  #offChartID
   #Divider
   #Stream
 
@@ -92,6 +92,12 @@ export default class OffChart {
   #title
   #theme
   #controller
+
+  #offChartRange = {
+    valueMax: 100,
+    valueMin: 0,
+    valueDiff: 100
+  }
 
 
   constructor (mediator, options) {
@@ -127,6 +133,7 @@ export default class OffChart {
   get element() { return this.#elOffChart }
   get widgets() { return this.#core.WidgetsG }
   get offChartID() { return this.#offChartID }
+  get offChartRange() { return this.#offChartRange }
   get data() {}
   get range() { return this.#core.range }
   get stream() { return this.#Stream }

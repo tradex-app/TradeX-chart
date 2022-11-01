@@ -47,9 +47,9 @@ export default class yAxis extends Axis {
   #yAxisTicks = 3
   #yAxisGrads
 
-  range
+  #range
 
-  constructor(parent, chart, yAxisType=YAXIS_TYPES[0]) {
+  constructor(parent, chart, yAxisType=YAXIS_TYPES[0], range) {
     super(parent, chart)
     this.#core = parent.mediator.api.core
     this.#chart = chart
@@ -59,8 +59,9 @@ export default class yAxis extends Axis {
     this.#yAxisGrid = (this.core.config?.yAxisGrid) ? 
       this.core.config?.yAxisGrid : YAXIS_GRID
 
-    this.#transform.automatic.range = this.#core.range
-    this.range = new Proxy(this.#core.range, {
+    range = (range) ? range : this.#core.range
+    this.#transform.automatic.range = range
+    this.#range = new Proxy(range, {
       get: (obj, prop) => {
         const m = this.#mode
         const t = this.#transform
@@ -82,7 +83,7 @@ export default class yAxis extends Axis {
   get data() { return this.chart.data }
   // get range() { return this.#parent.mediator.api.core.range }
   get height() { return this.chart.height }
-  get rangeH() { return this.range.diff * this.yAxisPadding }
+  get rangeH() { return this.#range.diff * this.yAxisPadding }
   get yAxisRatio() { return this.getYAxisRatio() }
   get yAxisPrecision() { return this.yAxisCalcPrecision }
   set yAxisPadding(p) { this.#yAxisPadding = p }
@@ -98,7 +99,7 @@ export default class yAxis extends Axis {
   set mode(m) { this.setMode(m) }
   get mode() { return this.#mode }
   set zoom(z) { this.setZoom(z) }
-  get zoom() { return this.range.zoom }
+  get zoom() { return this.#range.zoom }
 
   calcHeight() {
     let api = this.#chart.mediator.api
@@ -106,8 +107,8 @@ export default class yAxis extends Axis {
   }
 
   getYAxisRatio() {
-    // const diff = (this.#mode == "automatic") ? this.range.diff : this.#transform.diff
-    return this.height / this.range.diff
+    // const diff = (this.#mode == "automatic") ? this.#range.diff : this.#transform.diff
+    return this.height / this.#range.diff
   }
 
   yAxisRangeBounds() {
@@ -123,8 +124,8 @@ export default class yAxis extends Axis {
   }
 
   yAxisCalcPrecision() {
-    let integerCnt = this.numDigits(this.range.max)
-    // let decimalCnt = this.precision(this.range.max)
+    let integerCnt = this.numDigits(this.#range.max)
+    // let decimalCnt = this.precision(this.#range.max)
     return this.yDigits - integerCnt
   }
 
@@ -159,7 +160,7 @@ export default class yAxis extends Axis {
   }
 
   $2Pixel(yData) {
-    const height = yData - this.range.min
+    const height = yData - this.#range.min
     const yPos = this.height - (height * this.yAxisRatio)
     return yPos
   }
@@ -172,8 +173,8 @@ export default class yAxis extends Axis {
 
   pixel2$(y) {
     let ratio = (this.height - y) / this.height
-    let adjust = this.range.diff * ratio
-    return this.range.min + adjust
+    let adjust = this.#range.diff * ratio
+    return this.#range.min + adjust
   }
 
   p100toPixel(yData) {
@@ -190,8 +191,8 @@ export default class yAxis extends Axis {
     const t = this.#transform
     if (this.mode == "automatic" && m == "manual") {
       t.manual.zoom = 0
-      t.manual.max = this.range.valueMax
-      t.manual.min = this.range.valueMin
+      t.manual.max = this.#range.valueMax
+      t.manual.min = this.#range.valueMin
       this.#mode = m
     }
     else if (this.mode == "manual" && m == "automatic") {
@@ -243,8 +244,8 @@ export default class yAxis extends Axis {
         this.#yAxisGrads = this.gradations(100, 0, false, true)
         break;
       default:
-        let max = (this.range.max > 0) ? this.range.max : 1
-        let min = (this.range.min > 0) ? this.range.min : 0
+        let max = (this.#range.max > 0) ? this.#range.max : 1
+        let min = (this.#range.min > 0) ? this.#range.min : 0
         this.#yAxisGrads = this.gradations(max, min)
         break;
     }
@@ -257,10 +258,10 @@ export default class yAxis extends Axis {
           yGridSize;
     const scaleGrads = [];
 
-    // max = this.range.max
-    // min = this.range.min
+    // max = this.#range.max
+    // min = this.#range.min
 
-    this.#yAxisRound = this.countDigits(this.range.diff).integers
+    this.#yAxisRound = this.countDigits(this.#range.diff).integers
 
     // roughly divide the yRange into cells
     rangeH = max - min

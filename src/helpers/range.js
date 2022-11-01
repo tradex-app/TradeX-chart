@@ -85,6 +85,13 @@ export class Range {
       this.#interval = detectInterval(this.data)
       this.#intervalStr = ms2Interval(this.interval)
     }
+
+    // for (let i of this?.offChart) {
+    //   i.valueMin = 0
+    //   i.valueMax = 100
+    //   i.valueDiff = 100
+    // }
+
   }
 
   get dataLength () { return (this.data.length == 0) ? 0 : this.data.length - 1 }
