@@ -84,9 +84,11 @@ export default class ScaleBar {
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
   set scaleRange(r) { this.setScaleRange(r) }
-  set rangeMode(m) { this.core.range.mode = m }
-  get rangeMode() { return this.core.range.mode }
+  set rangeMode(m) { this.#yAxis.mode = m }
+  get rangeMode() { return this.#yAxis.mode }
   set rangeYFactor(f) { this.core.range.yFactor(f) }
+  set yOffset(o) { this.#yAxis.offset = o }
+  get yOffset() { return this.#yAxis.offset }
 
   init() {
     this.mount(this.#elScale)
@@ -97,7 +99,7 @@ export default class ScaleBar {
 
   start(data) {
     const range = (this.#parent.name == "OffChart" ) ? 
-      this.#parent.offChartRange : undefined
+      this.#parent.localRange : undefined
     this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
     // prepare layered canvas
     this.createViewport()

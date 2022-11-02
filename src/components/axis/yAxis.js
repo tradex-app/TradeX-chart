@@ -98,6 +98,8 @@ export default class yAxis extends Axis {
   get theme() { return this.core.theme }
   set mode(m) { this.setMode(m) }
   get mode() { return this.#mode }
+  set offset(o) { this.setOffset(o) }
+  get offset() { return this.#range.offset }
   set zoom(z) { this.setZoom(z) }
   get zoom() { return this.#range.zoom }
 
@@ -160,8 +162,9 @@ export default class yAxis extends Axis {
   }
 
   $2Pixel(yData) {
+    // const min = this.#range.min 
     const height = yData - this.#range.min
-    const yPos = this.height - (height * this.yAxisRatio)
+    const yPos = this.height - (height * this.yAxisRatio) + this.#range.offset
     return yPos
   }
 
@@ -199,6 +202,14 @@ export default class yAxis extends Axis {
       t.manual.zoom = 0
       this.#mode = m
     }
+  }
+
+  setOffset(o) {
+    if (!isNumber(o) || this.#mode !== "manual") return false
+
+    const t = this.#transform
+    t.manual.offset += o
+    console.log("t.manual.offset:",t.manual.offset)
   }
 
   setZoom(z) {

@@ -752,8 +752,13 @@ export default class Chart {
    * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
    */
   updateRange(pos) {
+    let update = false
+    if (this.#Scale.rangeMode == "manual") {
+      this.#Scale.yOffset = pos[5]
+      update = true
+    }
     // draw the chart - grid, candles, volume
-    this.draw(this.range)
+    this.draw(this.range, update)
   }
 
   /**

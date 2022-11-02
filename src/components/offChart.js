@@ -93,7 +93,7 @@ export default class OffChart {
   #theme
   #controller
 
-  #offChartRange = {
+  #localRange = {
     valueMax: 100,
     valueMin: 0,
     valueDiff: 100
@@ -133,7 +133,7 @@ export default class OffChart {
   get element() { return this.#elOffChart }
   get widgets() { return this.#core.WidgetsG }
   get offChartID() { return this.#offChartID }
-  get offChartRange() { return this.#offChartRange }
+  get localRange() { return this.#localRange }
   get data() {}
   get range() { return this.#core.range }
   get stream() { return this.#Stream }
