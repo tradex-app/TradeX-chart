@@ -502,7 +502,8 @@ export default class OffChart {
       }
   
       for (const legend in legends) {
-        this.#Legends.update(legend, {inputs: inputs})
+        let colour = this.#overlayIndicator.style.strokeStyle
+        this.#Legends.update(legend, {inputs: inputs, colours: [colour]})
       }
     }
   }
