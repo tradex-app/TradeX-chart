@@ -6,12 +6,13 @@ import { BUFFERSIZE } from "../../definitions/chart"
 
 export default class chartVolume extends VolumeBar {
 
-  #target
-  #scene
+  #core
   #config
+  #theme
   #xAxis
   #yAxis
-  #core
+  #target
+  #scene
 
   constructor(target, xAxis, yAxis, config) {
 

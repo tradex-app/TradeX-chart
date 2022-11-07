@@ -8,8 +8,8 @@ import { drawTextBG, getTextRectHeight } from "../../utils/canvas"
 export default class scalePriceLine {
 
   #core
-  #theme
   #config
+  #theme
   #scale
   #target
   #viewport

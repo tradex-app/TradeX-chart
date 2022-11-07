@@ -5,6 +5,7 @@
 import DOM from "../utils/DOM"
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import ScaleBar from "./scale"
+import Graph from "./graph"
 import CEL from "../components/primitives/canvas"
 import Legends from "./primitives/legend"
 import chartGrid from "./overlays/chart-grid"
@@ -60,6 +61,7 @@ export default class Chart {
   #options
   #core
   #parent
+
   #elChart
   #elCanvas
   #elViewport
@@ -68,6 +70,7 @@ export default class Chart {
 
   #Scale
   #Time
+  #Graph
   #Legends
   #onChart
   #Stream
@@ -202,6 +205,8 @@ export default class Chart {
     // Y Axis - Price Scale
     options.yAxisType = "default"
     this.#Scale = this.#mediator.register("Chart_ScaleBar", ScaleBar, options, api)
+
+    this.#Graph = new Graph(this, this.#elViewport)
 
     // onChart indicators
     // this.#onChart = this.#mediator.register("OnChart", OnChart, options, api)

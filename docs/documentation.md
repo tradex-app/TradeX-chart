@@ -6,6 +6,48 @@ eg. 0.100.6
 
 [Semantic Versioning](https://semver.org/)
 
+# Functional Organization
+
+* Factory
+  * Core
+    * Utils
+    * Widgets
+    * Body
+      * Tools
+      * Main Pane
+        * Rows
+          * Timeline (X Axis)
+          * Row
+            * Chart or Off Chart Indicators
+              * Price Scale (Y Axis)
+              * Graph
+                * Overlays
+                  * Grid
+                  * Cursor
+                  * Price Line
+                  * Candles
+                  * Volume
+                  * Technical Indicators
+                  * User Defined
+
+## Factory
+
+The static factory class is used to instantiate (multiple) chart instances.
+
+## Core
+
+The core starts the cascade of chart component creation. It provides:
+
+* Internal and external API
+* State management
+* Event messaging
+* Chart Data State
+  * Validation
+  * Export
+  * Range handling - data subset
+* Configuration
+* Themes
+
 # Configuration
 
 ```javascript
@@ -63,4 +105,3 @@ Details of the state structure are found in [state.md](state.md)
 # API
 
 [API Documentation](https://tradex-app.github.io/TradeX-chart/api/https:/)
-

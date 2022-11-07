@@ -6,12 +6,13 @@ import { BUFFERSIZE } from "../../definitions/chart"
 
 export default class chartGrid {
 
-  #target
-  #scene
+  #core
   #config
+  #theme
   #xAxis
   #yAxis
-  #core
+  #target
+  #scene
 
   constructor(target, xAxis, yAxis, config) {
 

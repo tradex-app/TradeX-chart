@@ -6,12 +6,14 @@ import { CandleType, PriceLineStyle } from "../../definitions/style";
 
 export default class chartStreamCandle extends Candle {
 
-  #target
-  #scene
+  #core
   #config
+  #theme
   #xAxis
   #yAxis
-  #core
+  #target
+  #scene
+
 
   constructor(target, xAxis, yAxis, config) {
 

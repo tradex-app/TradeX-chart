@@ -2,12 +2,14 @@
 
 export default class chartCursor {
 
-  #target
-  #scene
+  #core
   #config
-  #chart
+  #theme
   #xAxis
   #yAxis
+  #chart
+  #target
+  #scene
   #cursorPos = [0,0]
 
   constructor(target, chart, xAxis, yAxis, config) {
