@@ -309,6 +309,7 @@ export default class ScaleBar {
   draw() {
     this.#yAxis.draw()
     this.#viewport.render()
+    this.#parent.drawGrid()
   }
 
   drawCursorPrice() {

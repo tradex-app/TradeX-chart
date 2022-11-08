@@ -165,6 +165,7 @@ export default class Chart {
   get bufferPx() { return this.#core.bufferPx }
   set layerWidth(w) { this.#layerWidth = w }
   get layerWidth() { return this.#layerWidth }
+  get axes() { return "x" }
 
   init(options) {
 
@@ -505,10 +506,10 @@ export default class Chart {
     this.#chartCursor = 
     new chartCursor(
       this.#layerCursor, 
-      this,
       this.#Time, 
       this.#Scale, 
-      this.#theme)
+      this.#theme,
+      this)
 
     // this.#chartIndicators = this.chartIndicators()
     
@@ -539,7 +540,8 @@ export default class Chart {
         this.#layerGrid, 
         this.#Time, 
         this.#Scale, 
-        this.#theme)
+        this.#theme,
+        this)
   }
 
   layerConfig() {
@@ -669,6 +671,15 @@ export default class Chart {
     this.#viewport.render();
   }
 
+
+  drawGrid() {
+    if (this.#layerGrid) {
+      this.#layerGrid.setPosition(this.#core.scrollPos, 0)
+      this.#chartGrid.draw("y")
+      this.#viewport.render();
+    }
+  }
+
   drawStream(candle) {
 
   }
@@ -772,7 +783,6 @@ export default class Chart {
 
     // draw the chart - grid, candles, volume
     this.draw(this.range, true)
-
     this.emit("chart_zoomDone")
   }
 

@@ -15,17 +15,17 @@ export default class chartStreamCandle extends Candle {
   #scene
 
 
-  constructor(target, xAxis, yAxis, config) {
+  constructor(target, xAxis, yAxis, theme) {
 
-    super(target.scene, config)
+    super(target.scene, theme)
 
     this.#target = target
     this.#scene = target.scene
-    this.#config = config
+    this.#theme = theme
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#core = xAxis.mediator.api.core
-    this.#config.priceLineStyle = this.#config?.priceLineStyle || PriceLineStyle
+    this.#theme.priceLineStyle = this.#theme?.priceLineStyle || PriceLineStyle
   }
 
   get target() { return this.#target }
@@ -56,8 +56,8 @@ export default class chartStreamCandle extends Candle {
     }
 
 
-    if (stream[4] >= stream[1]) this.#config.priceLineStyle.strokeStyle = this.#core.theme.candle.UpBodyColour
-    else this.#config.priceLineStyle.strokeStyle = this.#core.theme.candle.DnBodyColour
+    if (stream[4] >= stream[1]) this.#theme.priceLineStyle.strokeStyle = this.#core.theme.candle.UpBodyColour
+    else this.#theme.priceLineStyle.strokeStyle = this.#core.theme.candle.DnBodyColour
 
     // draw price line 
     renderHorizontalLine (
@@ -65,7 +65,7 @@ export default class chartStreamCandle extends Candle {
       candle.c, 
       0, 
       this.#target.width, 
-      this.#config.priceLineStyle
+      this.#theme.priceLineStyle
     )
   }
 

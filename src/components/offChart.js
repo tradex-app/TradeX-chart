@@ -142,6 +142,8 @@ export default class OffChart {
   set width(w) { this.setWidth(w) } 
   get height() { return this.#elOffChart.clientHeight }
   set height(h) { this.setHeight(h) }
+  get axes() { return "x" }
+
 
   init(options) {
 
@@ -411,10 +413,10 @@ export default class OffChart {
     this.#overlayCursor = 
     new overlayCursor(
       this.#layerCursor, 
-      this,
       this.#Time, 
       this.#Scale, 
-      this.#theme)
+      this.#theme,
+      this)
 
     this.#overlayIndicator =
     new this.#Indicator(
@@ -429,7 +431,8 @@ export default class OffChart {
       this.#layerGrid, 
       this.#Time, 
       this.#Scale, 
-      this.#theme)
+      this.#theme,
+      this)
   }
 
   layerConfig() {
@@ -478,6 +481,12 @@ export default class OffChart {
       this.#overlayIndicator.draw(range)
     }
 
+    this.#viewport.render();
+  }
+
+  drawGrid() {
+    this.#layerGrid.setPosition(this.#core.scrollPos, 0)
+    this.#overlayGrid.draw("y")
     this.#viewport.render();
   }
 

@@ -14,16 +14,16 @@ export default class chartVolume extends VolumeBar {
   #target
   #scene
 
-  constructor(target, xAxis, yAxis, config) {
+  constructor(target, xAxis, yAxis, theme) {
 
-    super(target.scene, config)
+    super(target.scene, theme)
 
     this.#target = target
     this.#scene = target.scene
-    this.#config = config
+    this.#theme = theme
     this.#xAxis = xAxis
     this.#core = xAxis.mediator.api.core
-    this.#config.maxVolumeH = config?.maxVolumeH || 100
+    this.#theme.maxVolumeH = theme?.maxVolumeH || 100
   }
 
   draw(range=this.#core.range) {
@@ -38,7 +38,7 @@ export default class chartVolume extends VolumeBar {
       z: zeroPos
     }
 
-    const volH = Math.floor(zeroPos * this.#config.maxVolumeH / 100)
+    const volH = Math.floor(zeroPos * this.#theme.maxVolumeH / 100)
     const maxVol = range.volumeMax
 
     let o = this.#xAxis.rangeScrollOffset

@@ -22,6 +22,7 @@ export class Range {
   priceMaxIdx = 0
   volumeMinIdx = 0
   volumeMaxIdx = 0
+  old = {}
   limitFuture = LIMITFUTURE
   limitPast = LIMITPAST
   minCandles = MINCANDLES
@@ -155,6 +156,10 @@ export class Range {
     .then(maxMin => {
       this.setMaxMin(maxMin)
 
+      if (this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
+        this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
+      }
+
       this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
       this.#core.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
       this.#core.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
@@ -169,6 +174,7 @@ export class Range {
       // maxMin.priceMin = maxMin.priceMin * (1 - this.#yRangeManual.factor)
     }
     for (let m in maxMin) {
+      this.old[m] = this[m]
       this[m] = maxMin[m]
     }
     this.height = this.priceMax - this.priceMin

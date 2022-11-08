@@ -7,24 +7,25 @@ export default class chartCursor {
   #theme
   #xAxis
   #yAxis
-  #chart
+  #parent
   #target
   #scene
   #cursorPos = [0,0]
 
-  constructor(target, chart, xAxis, yAxis, config) {
+  constructor(target, xAxis, yAxis, theme, parent) {
 
     this.#target = target
     this.#scene = target.scene
-    this.#config = config
-    this.#chart = chart
+    this.#theme = theme
+    this.#parent = parent
     this.#xAxis = xAxis
     this.#yAxis = yAxis
+    this.#core = xAxis.core
 
-    this.#chart.on("chart_pan", (e) => { this.onMouseDragX(e) })
-    this.#chart.on("chart_panDone", (e) => { this.onMouseDragX(e) })
-    this.#chart.on("main_mousemove", (e) => { this.onMouseMoveX(e) })
-    this.#chart.on(`${this.#chart.ID}_mousemove`, (e) => { this.onMouseMoveY(e) })
+    this.#core.on("chart_pan", (e) => { this.onMouseDragX(e) })
+    this.#core.on("chart_panDone", (e) => { this.onMouseDragX(e) })
+    this.#core.on("main_mousemove", (e) => { this.onMouseMoveX(e) })
+    this.#core.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMoveY(e) })
   }
 
   onMouseDragX(e) {
@@ -43,7 +44,8 @@ export default class chartCursor {
   draw(drag = false) {
 
     let x = this.#cursorPos[0]
-        if (!drag) x = this.#xAxis.xPosSnap2CandlePos(x) + this.#xAxis.scrollOffsetPx
+    if (!drag) 
+      x = this.#xAxis.xPosSnap2CandlePos(x) + this.#xAxis.scrollOffsetPx
     let y = this.#cursorPos[1]
 
     this.#scene.clear()
@@ -61,7 +63,7 @@ export default class chartCursor {
     ctx.lineTo(x + offset, this.#scene.height)
     ctx.stroke()
     // Y
-    if (this.#chart.cursorActive) {
+    if (this.#parent.cursorActive) {
       ctx.beginPath()
       ctx.moveTo(0, y)
       ctx.lineTo(this.#scene.width, y)

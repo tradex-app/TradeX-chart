@@ -7,22 +7,22 @@ import { BUFFERSIZE } from "../../definitions/chart"
 export default class chartGrid {
 
   #core
-  #config
+  #config = {}
   #theme
   #xAxis
   #yAxis
   #target
   #scene
 
-  constructor(target, xAxis, yAxis, config) {
+  constructor(target, xAxis, yAxis, theme, parent) {
 
     this.#target = target
     this.#scene = target.scene
-    this.#config = config
+    this.#theme = theme
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#core = xAxis.core
-    this.#config.axes = config.axes || "both"
+    this.#config.axes = parent?.axes || "both"
   }
 
   draw(axes) {

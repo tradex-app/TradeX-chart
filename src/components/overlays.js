@@ -33,7 +33,8 @@ export default class Overlays {
         layer,
         this.#parent.TimeLine,
         this.#parent.Scale,
-        this.#core.theme
+        this.#core.theme,
+        this
       )
       this.#list.set(key, overlay)
     }

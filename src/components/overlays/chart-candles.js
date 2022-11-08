@@ -14,16 +14,16 @@ export default class chartCandles extends Candle {
   #target
   #scene
 
-  constructor(target, xAxis, yAxis, config) {
+  constructor(target, xAxis, yAxis, theme) {
 
-    super(target.scene, config)
+    super(target.scene, theme)
 
     this.#target = target
     this.#scene = target.scene
-    this.#config = config
+    this.#theme = theme
     this.#xAxis = xAxis
     this.#yAxis = yAxis
-    this.#core = xAxis.mediator.api.core
+    this.#core = xAxis.core
   }
 
   get target() { return this.#target }
