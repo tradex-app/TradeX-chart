@@ -27,6 +27,7 @@ export default class chartGrid {
 
   draw(axes) {
     axes = axes || this.#config.axes
+
     this.#scene.clear()
     
     const xGrads = this.#xAxis.xAxisGrads.values

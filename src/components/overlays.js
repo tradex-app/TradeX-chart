@@ -48,6 +48,7 @@ export default class Overlays {
 
   get parent() { return this.#parent }
   get layerConfig() { return this.#parent.layerConfig() }
+  get list() { return this.#list }
 
 
   start() {

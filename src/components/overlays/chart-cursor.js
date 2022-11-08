@@ -45,7 +45,7 @@ export default class chartCursor {
 
     let x = this.#cursorPos[0]
     if (!drag) 
-      x = this.#xAxis.xPosSnap2CandlePos(x) + this.#xAxis.scrollOffsetPx
+        x = this.#xAxis.xPosSnap2CandlePos(x) + this.#xAxis.scrollOffsetPx
     let y = this.#cursorPos[1]
 
     this.#scene.clear()

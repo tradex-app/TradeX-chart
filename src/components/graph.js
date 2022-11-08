@@ -33,6 +33,7 @@ export default class graph {
   #viewport
   #scene
   #overlays
+  #streamCandle
 
   #elChart
   #elCanvas
@@ -160,7 +161,22 @@ export default class graph {
   }
 
   draw(range=this.range, update=false) {
+    const oList = this.#overlays.list
+    for (let [key, overlay] of oList) {
+      // move this into overlay.instance
+      overlay.layer.setPosition(this.#core.scrollPos, 0)
+    }
+    if (this.parent.scrollPos == this.parent.bufferPx * -1 || 
+        this.parent.scrollPos == 0 || 
+        update == true) 
+    {
+      overlay.instance.draw()
+    }
+    // else if (this.#layerStream && this.#streamCandle) {
+    //   this.#overlays.list.get("stream").draw(this.#streamCandle)
+    // }
 
+    this.#viewport.render();
   }
 
 

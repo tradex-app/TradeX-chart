@@ -654,7 +654,7 @@ export default class Chart {
     this.#layerCandles.setPosition(this.#core.scrollPos, 0)
     if (this.#layerStream) {
       this.#layerStream.setPosition(this.#core.scrollPos, 0)
-    this.#core.stream.lastScrollPos = this.#core.scrollPos
+      this.#core.stream.lastScrollPos = this.#core.scrollPos
     }
 
     if (this.scrollPos == this.bufferPx * -1 || 
