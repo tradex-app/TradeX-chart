@@ -6,6 +6,7 @@ import { BUFFERSIZE } from "../../definitions/chart"
 
 export default class chartCandles extends Candle {
 
+  #parent
   #core
   #config
   #theme
@@ -14,33 +15,49 @@ export default class chartCandles extends Candle {
   #target
   #scene
 
-  constructor(target, xAxis, yAxis, theme) {
+  constructor(target, xAxis, yAxis, theme, parent) {
 
     super(target.scene, theme)
 
+    this.#parent = parent
+    this.#core = parent.core
     this.#target = target
     this.#scene = target.scene
     this.#theme = theme
     this.#xAxis = xAxis
     this.#yAxis = yAxis
-    this.#core = xAxis.core
   }
 
   get target() { return this.#target }
+  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
+  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
+  set position(p) { this.#target.setPosition(p[0], p[1]) }
 
-  draw(range=this.#core.range) {
+  draw(update=false, range=this.#core.range) {
+
+    console.log("------------------------------")
+    console.log("update:",update)
+    console.log("scrollPos:",this.#core.scrollPos)
+    console.log("bufferPx:",this.#core.bufferPx * -1)
+
+    if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
+        this.#core.scrollPos != 0 && 
+                      update != true) 
+    { return }
+    console.log("draw")
+
     this.#scene.clear()
 
     const render = (this.#core.theme.candle.Type === CandleType.AREA) ?
-      (candle) => {} :
-      (candle) => {super.draw(candle)}
-    const offset = this.#xAxis.smoothScrollOffset || 0
+        (candle) => {} :
+        (candle) => {super.draw(candle)}
+    const offset = this.xAxis.smoothScrollOffset || 0
     const candle = {
-      x: 2 + offset - this.#xAxis.candleW,
-      w: this.#xAxis.candleW
+      x: 2 + offset - this.xAxis.candleW,
+      w: this.xAxis.candleW
     }
 
-    let o = this.#xAxis.rangeScrollOffset;
+    let o = this.#core.rangeScrollOffset;
     let c = range.indexStart - o
     let i = range.Length + o + 2
     let x
@@ -59,10 +76,10 @@ export default class chartCandles extends Candle {
         break
       }
       if (x[4] !== null) {
-        candle.o = this.#yAxis.yPos(x[1])
-        candle.h = this.#yAxis.yPos(x[2])
-        candle.l = this.#yAxis.yPos(x[3])
-        candle.c = this.#yAxis.yPos(x[4])
+        candle.o = this.yAxis.yPos(x[1])
+        candle.h = this.yAxis.yPos(x[2])
+        candle.l = this.yAxis.yPos(x[3])
+        candle.c = this.yAxis.yPos(x[4])
         candle.raw = x
         // super.draw(candle)
         render(candle)

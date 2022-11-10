@@ -53,6 +53,15 @@ import {
 const STYLE_CHART = "" // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
 const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
 const STYLE_SCALE2 = "top: 0; right: 0; border-left: 1px solid;"
+
+const defaultOverlays = [
+  ["grid", {class: chartGrid, fixed: true, params: {axes: "y"}}],
+  ["volume", {class: chartVolume, fixed: false, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
+  ["candles", {class: chartCandles, fixed: false}],
+  ["cursor", {class: chartCursor, fixed: true}]
+]
+
+
 export default class Chart {
 
   #name = "Chart"
@@ -138,6 +147,7 @@ export default class Chart {
   get options() { return this.#options }
   get element() { return this.#elChart }
   get core() { return this.#core }
+  get time() { return this.#Time }
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
   set width(w) { this.setWidth(w) }
@@ -207,7 +217,6 @@ export default class Chart {
     options.yAxisType = "default"
     this.#Scale = this.#mediator.register("Chart_ScaleBar", ScaleBar, options, api)
 
-    this.#Graph = new Graph(this, this.#elViewport)
 
     // onChart indicators
     // this.#onChart = this.#mediator.register("OnChart", OnChart, options, api)
@@ -225,6 +234,27 @@ export default class Chart {
     // X Axis - Timeline
     this.#Time = this.mediator.api.Timeline
 
+    let overlays = new Map(defaultOverlays)
+
+    if (overlays.has("volume")) {
+      const volume = overlays.get("volume")
+      volume.params.maxVolumeH = this.#theme?.volume?.Height || VolumeStyle.ONCHART_VOLUME_HEIGHT
+      overlays.set("volume", volume)
+    }
+
+    // add the chart overlays
+    // overlays = [
+    //   defaultOverlays[0], 
+    //   ...overlays,
+    //   defaultOverlays[1]
+    // ]
+
+    overlays = Array.from(overlays)
+
+    this.#Graph = new Graph(this, this.#elViewport, overlays)
+
+    this.#elCanvas = this.#Graph.viewport.scene.canvas
+
     // start on chart indicators
 
     // Y Axis - Price Scale
@@ -238,7 +268,7 @@ export default class Chart {
     this.#Scale.start(`Chart says to Scale, "Thanks for the update!"`)
 
     // prepare layered canvas
-    this.createViewport()
+    // this.createViewport()
     // draw the chart - grid, candles, volume
     this.draw(this.range)
 
@@ -519,21 +549,24 @@ export default class Chart {
           this.#layerStream, 
           this.#Time, 
           this.#Scale, 
-          this.#theme);
+          this.#theme,
+          this);
 
     this.#chartCandles = 
       new chartCandles(
         this.#layerCandles, 
         this.#Time, 
         this.#Scale, 
-        this.#theme)
+        this.#theme,
+        this)
     this.#theme.maxVolumeH = this.#theme?.volume?.Height || VolumeStyle.ONCHART_VOLUME_HEIGHT
     this.#chartVolume =
       new chartVolume(
         this.#layerVolume, 
         this.#Time, 
         this.#Scale, 
-        this.#theme)
+        this.#theme,
+        this)
 
     this.#chartGrid =
       new chartGrid(
@@ -649,33 +682,35 @@ export default class Chart {
   }
 
   draw(range=this.range, update=false) {
-    this.#layerGrid.setPosition(this.#core.scrollPos, 0)
-    this.#layerVolume.setPosition(this.#core.scrollPos, 0)
-    this.#layerCandles.setPosition(this.#core.scrollPos, 0)
-    if (this.#layerStream) {
-      this.#layerStream.setPosition(this.#core.scrollPos, 0)
-      this.#core.stream.lastScrollPos = this.#core.scrollPos
-    }
 
-    if (this.scrollPos == this.bufferPx * -1 || 
-        this.scrollPos == 0 || 
-        update == true) 
-    {
-      this.#chartGrid.draw("y")
-      this.#chartVolume.draw(range)
-      this.#chartCandles.draw(range)
-    }
-    if (this.#layerStream && this.#streamCandle) 
-      this.#chartStreamCandle.draw(this.#streamCandle)
+    this.#Graph.draw(range, update)
+    // this.#layerGrid.setPosition(this.#core.scrollPos, 0)
+    // this.#layerVolume.setPosition(this.#core.scrollPos, 0)
+    // this.#layerCandles.setPosition(this.#core.scrollPos, 0)
+    // if (this.#layerStream) {
+    //   this.#layerStream.setPosition(this.#core.scrollPos, 0)
+    //   this.#core.stream.lastScrollPos = this.#core.scrollPos
+    // }
 
-    this.#viewport.render();
+    // // if (this.scrollPos == this.bufferPx * -1 || 
+    // //     this.scrollPos == 0 || 
+    // //     update == true) 
+    // // {
+    //   this.#chartGrid.draw(update, "y")
+    //   this.#chartVolume.draw(update, range)
+    //   this.#chartCandles.draw(update, range)
+    // // }
+    // if (this.#layerStream && this.#streamCandle) 
+    //   this.#chartStreamCandle.draw(update, this.#streamCandle)
+
+    // this.#viewport.render();
   }
 
 
   drawGrid() {
     if (this.#layerGrid) {
       this.#layerGrid.setPosition(this.#core.scrollPos, 0)
-      this.#chartGrid.draw("y")
+      this.#chartGrid.draw(true, "y")
       this.#viewport.render();
     }
   }

@@ -120,6 +120,8 @@ export default class OffChart {
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   get core() { return this.#core }
+  get time() { return this.#Time }
+  get scale() { return this.#Scale }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elOffChart) }
   get stateMachine() { return this.#mediator.stateMachine }

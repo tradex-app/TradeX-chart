@@ -101,6 +101,7 @@ export default class MainPane {
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
+  get core() { return this.#core }
   get chart() { return this.#Chart }
   get time() { return this.#Time }
   get offCharts() { return this.#OffCharts }
@@ -564,7 +565,8 @@ export default class MainPane {
         this.#layerGrid, 
         this.#Time, 
         null, 
-        config)
+        config,
+        this)
   }
 
   initXGrid() {
@@ -573,7 +575,7 @@ export default class MainPane {
 
   draw() {
     this.#layerGrid.setPosition(this.scrollPos, 0)
-    this.#chartGrid.draw("x")
+    this.#chartGrid.draw(true, "x")
     this.#viewport.render();
     this.#Time.draw()
   }

@@ -20,13 +20,17 @@ export default class chartCursor {
     this.#parent = parent
     this.#xAxis = xAxis
     this.#yAxis = yAxis
-    this.#core = xAxis.core
+    this.#core = parent.core
 
     this.#core.on("chart_pan", (e) => { this.onMouseDragX(e) })
     this.#core.on("chart_panDone", (e) => { this.onMouseDragX(e) })
     this.#core.on("main_mousemove", (e) => { this.onMouseMoveX(e) })
     this.#core.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMoveY(e) })
   }
+
+  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
+  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
+  set position(p) { return }
 
   onMouseDragX(e) {
     this.#cursorPos[0] = e[0]
@@ -41,11 +45,16 @@ export default class chartCursor {
     this.draw()
   }
 
-  draw(drag = false) {
+  draw(update=false, drag = false) {
+
+    if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
+        this.#core.scrollPos != 0 && 
+                      update != true) 
+    { return }
 
     let x = this.#cursorPos[0]
     if (!drag) 
-        x = this.#xAxis.xPosSnap2CandlePos(x) + this.#xAxis.scrollOffsetPx
+        x = this.xAxis.xPosSnap2CandlePos(x) + this.xAxis.scrollOffsetPx
     let y = this.#cursorPos[1]
 
     this.#scene.clear()
@@ -55,7 +64,7 @@ export default class chartCursor {
     ctx.setLineDash([5, 5])
 
     // X
-    const offset = this.#xAxis.smoothScrollOffset || 0
+    const offset = this.xAxis.smoothScrollOffset || 0
 
     ctx.strokeStyle = "#666"
     ctx.beginPath()

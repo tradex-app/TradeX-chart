@@ -27,6 +27,8 @@ export default class scalePriceLine {
     this.start()
   }
 
+  set position(p) { this.#target.setPosition(p[0], p[1]) }
+
   start() {
     this.eventListeners()
   }
@@ -54,7 +56,12 @@ export default class scalePriceLine {
     this.draw(e)
   }
 
-  draw(candle) {
+  draw(update=false, candle) {
+
+    if (this.#core.scrollPos != this.#core.bufferPx * -1 || 
+        this.#core.scrollPos != 0 || 
+                      update != true) 
+    { return }
 
     let price = candle[4],
         y = this.#scale.yPos(price),

@@ -46,10 +46,6 @@ export default class graph {
     this.#core = parent.core
     this.#config = this.core.config
     this.#theme = this.core.theme
-    // this.#Scale = this.#parent.scale
-    // this.#Time = this.core.TimeLine
-    // this.#xAxis = this.#Time.xAxis
-    // this.#yAxis = this.#Scale.yAxis
     this.#elChart = this.#parent.element
     this.#elViewport = elViewport
     
@@ -59,6 +55,7 @@ export default class graph {
     // this.eventsListen()
   }
 
+  get parent() { return this.#parent }
   get core() { return this.#core }
   get config() { return this.#config }
   set width(w) { this.setWidth(w) }
@@ -130,6 +127,8 @@ export default class graph {
 
   createViewport(overlays=[]) {
 
+    overlays = (overlays.length == 0) ? defaultOverlays : overlays
+
     const {width, height} = this.layerConfig()
 
     // create viewport
@@ -138,13 +137,8 @@ export default class graph {
       height: height,
       container: this.#elViewport
     });
-    this.#elCanvas = this.#viewport.scene.canvas
 
-    // overlays = [
-    //   defaultOverlays[0], 
-    //   ...overlays,
-    //   defaultOverlays[1]
-    // ]
+    this.#elCanvas = this.#viewport.scene.canvas
     this.#overlays = new Overlays(this, overlays)
   }
 
@@ -163,15 +157,15 @@ export default class graph {
   draw(range=this.range, update=false) {
     const oList = this.#overlays.list
     for (let [key, overlay] of oList) {
-      // move this into overlay.instance
-      overlay.layer.setPosition(this.#core.scrollPos, 0)
+      overlay.instance.position = [this.#core.scrollPos, 0]
+      overlay.instance.draw(update)
     }
-    if (this.parent.scrollPos == this.parent.bufferPx * -1 || 
-        this.parent.scrollPos == 0 || 
-        update == true) 
-    {
-      overlay.instance.draw()
-    }
+    // if (this.parent.scrollPos == this.parent.bufferPx * -1 || 
+    //     this.parent.scrollPos == 0 || 
+    //     update == true) 
+    // {
+    //   overlay.instance.draw()
+    // }
     // else if (this.#layerStream && this.#streamCandle) {
     //   this.#overlays.list.get("stream").draw(this.#streamCandle)
     // }

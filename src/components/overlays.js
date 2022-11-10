@@ -46,10 +46,12 @@ export default class Overlays {
   warning(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
+  get core() { return this.#core }
   get parent() { return this.#parent }
   get layerConfig() { return this.#parent.layerConfig() }
   get list() { return this.#list }
-
+  get scale() { return this.#parent.parent.scale }
+  get time() { return this.#parent.parent.time }
 
   start() {
     // Start the module's activities.

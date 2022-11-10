@@ -29,8 +29,21 @@ export default class chartStreamCandle extends Candle {
   }
 
   get target() { return this.#target }
+  set position(p) { this.setPosition(p[0], p[1]) }
 
-  draw(stream) {
+  setPosition(x, y) {
+    this.#target.setPosition(x, y)
+    this.#core.stream.lastScrollPos = this.#core.scrollPos
+  }
+
+
+  draw(update=false, stream) {
+
+    if (this.#core.scrollPos != this.#core.bufferPx * -1 || 
+        this.#core.scrollPos != 0 || 
+                      update != true) 
+    { return }
+
     this.#scene.clear()
 
     const r = this.#core.range

@@ -79,6 +79,8 @@ export default class indicator {
   get calcParams() { return this.#calcParams }
   set style(s) { this.#style = s }
   get style() { return this.#style }
+  set position(p) { this.#target.setPosition(p[0], p[1]) }
+
 
 
   set value(data) {
@@ -140,48 +142,48 @@ export default class indicator {
     return input
   }
 
-    /**
-   * Calculate indicator values for entire chart history
+  /**
+ * Calculate indicator values for entire chart history
+ * @param {string} indicator - the TALib function to call
+ * @param {object} params - parameters for the TALib function
+ * @returns {boolean} - success or failure
+ */
+  calcIndicator (indicator, params) {
+    this.overlay.data = []
+    let step = this.calcParams[0]
+    // fail if there is not enough data to calculate
+    if (this.range.Length < step) return false
+
+    let data, end, entry, time;
+    let start = 0
+    let input = this.indicatorInput(start, this.range.Length - 1)
+    let hasNull = input.find(element => element === null)
+    if (hasNull) return false
+    
+    do {
+      end = start + step
+      data = input.slice(start, end)
+      entry = this.TALib[indicator](params)
+      time = this.range.value(end - 1)[0]
+      this.overlay.data.push([time, entry])
+      start++
+    } 
+    while (end < this.range.Length)
+    return true
+  }
+
+  /**
+   * Calculate indicator value for current stream candle
    * @param {string} indicator - the TALib function to call
    * @param {object} params - parameters for the TALib function
-   * @returns {boolean} - success or failure
+   * @returns {array} - indicator data entry
    */
-     calcIndicator (indicator, params) {
-      this.overlay.data = []
-      let step = this.calcParams[0]
-      // fail if there is not enough data to calculate
-      if (this.range.Length < step) return false
-  
-      let data, end, entry, time;
-      let start = 0
-      let input = this.indicatorInput(start, this.range.Length - 1)
-      let hasNull = input.find(element => element === null)
-      if (hasNull) return false
-      
-      do {
-        end = start + step
-        data = input.slice(start, end)
-        entry = this.TALib[indicator](params)
-        time = this.range.value(end - 1)[0]
-        this.overlay.data.push([time, entry])
-        start++
-      } 
-      while (end < this.range.Length)
-      return true
-    }
-  
-    /**
-     * Calculate indicator value for current stream candle
-     * @param {string} indicator - the TALib function to call
-     * @param {object} params - parameters for the TALib function
-     * @returns {array} - indicator data entry
-     */
-    calcIndicatorStream (indicator, params) {
-      let entry = this.TALib[indicator](params)
-      let end = this.range.dataLength
-      let time = this.range.value(end)[0]
-      return [time, entry.output[0]]
-    }
+  calcIndicatorStream (indicator, params) {
+    let entry = this.TALib[indicator](params)
+    let end = this.range.dataLength
+    let time = this.range.value(end)[0]
+    return [time, entry.output[0]]
+  }
 
   plot(plots, type, style) {
 
@@ -194,5 +196,12 @@ export default class indicator {
     }
 
     ctx.restore();
+  }
+
+  draw(update=false) {
+    if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
+        this.#core.scrollPos != 0 && 
+                      update != true) 
+    { return }
   }
 }
