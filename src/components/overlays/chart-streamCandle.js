@@ -44,6 +44,7 @@ export default class chartStreamCandle extends Candle {
 
 
   draw(stream) {
+    
     if (stream === undefined) return
 
     this.#scene.clear()

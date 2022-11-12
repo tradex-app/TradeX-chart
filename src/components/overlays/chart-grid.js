@@ -39,11 +39,6 @@ export default class chartGrid {
 
   draw(axes) {
 
-    // if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
-    //     this.#core.scrollPos != 0 && 
-    //                   update != true) 
-    // { return }
-
     axes = axes || this.#config.axes
 
     this.#scene.clear()

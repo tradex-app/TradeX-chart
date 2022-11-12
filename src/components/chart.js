@@ -584,7 +584,7 @@ export default class Chart {
 
   drawGrid() {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
-    this.#chartGrid.draw(true, "y")
+    this.#chartGrid.draw("y")
     this.#Graph.render();
   }
 

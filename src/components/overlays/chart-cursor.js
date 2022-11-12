@@ -25,9 +25,10 @@ export default class chartCursor {
     this.#core.on("chart_pan", (e) => { this.onMouseDragX(e) })
     this.#core.on("chart_panDone", (e) => { this.onMouseDragX(e) })
     this.#core.on("main_mousemove", (e) => { this.onMouseMoveX(e) })
-    this.#core.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMoveY(e) })
+    this.#core.on(`${this.chart.ID}_mousemove`, (e) => { this.onMouseMove(e) })
   }
 
+  get chart() { return this.#parent.parent.parent }
   get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
   get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set position(p) { return }
@@ -40,17 +41,13 @@ export default class chartCursor {
     this.#cursorPos[0] = e[0]
     this.draw()
   }
-  onMouseMoveY(e) {
+  onMouseMove(e) {
+    this.#cursorPos[0] = e[0]
     this.#cursorPos[1] = e[1]
     this.draw()
   }
 
   draw(drag = false) {
-
-    // if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
-    //     this.#core.scrollPos != 0 && 
-    //                   update != true) 
-    // { return }
 
     let x = this.#cursorPos[0]
     if (!drag) 
@@ -72,7 +69,8 @@ export default class chartCursor {
     ctx.lineTo(x + offset, this.#scene.height)
     ctx.stroke()
     // Y
-    if (this.#parent.cursorActive) {
+    if (this.chart.cursorActive) {
+      console.log("draw cursor x")
       ctx.beginPath()
       ctx.moveTo(0, y)
       ctx.lineTo(this.#scene.width, y)
