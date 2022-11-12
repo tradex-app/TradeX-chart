@@ -165,7 +165,7 @@ export default class graph {
           this.#core.scrollPos == 0 || 
           update == true) 
       {
-        overlay.instance.draw(update)
+        overlay.instance.draw()
       }
       else if (this.#parent.streamCandle) {
         oList.get("stream").instance.draw(this.#streamCandle)

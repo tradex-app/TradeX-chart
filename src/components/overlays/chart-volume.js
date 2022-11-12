@@ -15,7 +15,7 @@ export default class chartVolume extends VolumeBar {
   #target
   #scene
 
-  constructor(target, xAxis, yAxis, theme, parent) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent) {
 
     super(target.scene, theme)
 
@@ -34,12 +34,7 @@ export default class chartVolume extends VolumeBar {
   get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set position(p) { this.#target.setPosition(p[0], p[1]) }
 
-  draw(update=false, range=this.#core.range) {
-
-    // if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
-    //     this.#core.scrollPos != 0 && 
-    //                   update != true) 
-    // { return }
+  draw(range=this.#core.range) {
 
     this.#scene.clear()
 

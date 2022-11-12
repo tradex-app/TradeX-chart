@@ -56,12 +56,7 @@ export default class scalePriceLine {
     this.draw(e)
   }
 
-  draw(update=false, candle) {
-
-    // if (this.#core.scrollPos != this.#core.bufferPx * -1 || 
-    //     this.#core.scrollPos != 0 || 
-    //                   update != true) 
-    // { return }
+  draw(candle) {
 
     if (candle === undefined) return
 

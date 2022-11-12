@@ -12,7 +12,7 @@ export default class chartCursor {
   #scene
   #cursorPos = [0,0]
 
-  constructor(target, xAxis, yAxis, theme, parent) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent) {
 
     this.#target = target
     this.#scene = target.scene
@@ -45,7 +45,7 @@ export default class chartCursor {
     this.draw()
   }
 
-  draw(update=false, drag = false) {
+  draw(drag = false) {
 
     // if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
     //     this.#core.scrollPos != 0 && 

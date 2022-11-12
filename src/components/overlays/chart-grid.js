@@ -16,7 +16,7 @@ export default class chartGrid {
   #scene
   #params
 
-  constructor(target, xAxis, yAxis, theme, parent, params) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
     this.#parent = parent
     this.#core = parent.core
@@ -37,7 +37,7 @@ export default class chartGrid {
   get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set position(p) { this.#target.setPosition(p[0], p[1]) }
 
-  draw(update=false, axes) {
+  draw(axes) {
 
     // if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
     //     this.#core.scrollPos != 0 && 

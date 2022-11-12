@@ -198,10 +198,7 @@ export default class indicator {
     ctx.restore();
   }
 
-  draw(update=false) {
-    // if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
-    //     this.#core.scrollPos != 0 && 
-    //                   update != true) 
-    // { return }
+  draw() {
+
   }
 }

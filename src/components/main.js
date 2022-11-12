@@ -575,7 +575,7 @@ export default class MainPane {
 
   draw() {
     this.#layerGrid.setPosition(this.scrollPos, 0)
-    this.#chartGrid.draw(true, "x")
+    this.#chartGrid.draw("x")
     this.#viewport.render();
     this.#Time.draw()
   }

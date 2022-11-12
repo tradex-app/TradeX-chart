@@ -16,7 +16,7 @@ export default class chartStreamCandle extends Candle {
   #scene
   #params
 
-  constructor(target, xAxis, yAxis, theme, parent, params) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
     super(target.scene, theme)
 
@@ -43,13 +43,7 @@ export default class chartStreamCandle extends Candle {
   }
 
 
-  draw(update=false, stream) {
-
-    // if (this.#core.scrollPos != this.#core.bufferPx * -1 || 
-    //     this.#core.scrollPos != 0 || 
-    //                   update != true) 
-    // { return }
-
+  draw(stream) {
     if (stream === undefined) return
 
     this.#scene.clear()
