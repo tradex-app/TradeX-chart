@@ -14,8 +14,9 @@ export default class chartGrid {
   #yAxis
   #target
   #scene
+  #params
 
-  constructor(target, xAxis, yAxis, theme, parent) {
+  constructor(target, xAxis, yAxis, theme, parent, params) {
 
     this.#parent = parent
     this.#core = parent.core
@@ -24,8 +25,12 @@ export default class chartGrid {
     this.#theme = theme
     this.#xAxis = xAxis
     this.#yAxis = yAxis
+    this.#params = params
 
-    this.#config.axes = parent?.axes || "both"
+    // this.#config.axes = parent?.axes || "both"
+    // this.#config.axes = params?.axes || parent.parent.parent.axes || "both"
+    this.#config.axes = params?.axes || "both"
+
   }
 
   get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
@@ -34,10 +39,10 @@ export default class chartGrid {
 
   draw(update=false, axes) {
 
-    if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
-        this.#core.scrollPos != 0 && 
-                      update != true) 
-    { return }
+    // if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
+    //     this.#core.scrollPos != 0 && 
+    //                   update != true) 
+    // { return }
 
     axes = axes || this.#config.axes
 

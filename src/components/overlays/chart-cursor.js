@@ -47,10 +47,10 @@ export default class chartCursor {
 
   draw(update=false, drag = false) {
 
-    if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
-        this.#core.scrollPos != 0 && 
-                      update != true) 
-    { return }
+    // if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
+    //     this.#core.scrollPos != 0 && 
+    //                   update != true) 
+    // { return }
 
     let x = this.#cursorPos[0]
     if (!drag) 

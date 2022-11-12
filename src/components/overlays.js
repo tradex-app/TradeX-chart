@@ -2,6 +2,7 @@
 // A base class for overlays components to extend upon
 
 
+import { isString } from "../utils/typeChecks"
 import { insertAtIndex } from "../utils/utilities"
 import CEL from "./primitives/canvas"
 
@@ -34,7 +35,8 @@ export default class Overlays {
         this.#parent.TimeLine,
         this.#parent.Scale,
         this.#core.theme,
-        this
+        this,
+        overlay.params
       )
       this.#list.set(key, overlay)
     }
@@ -91,6 +93,8 @@ export default class Overlays {
     this.#core.emit(topic, data)
   }
 
-
+  get(overlay) {
+    return this.#list.get(overlay)
+  }
 
 }

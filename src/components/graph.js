@@ -74,6 +74,7 @@ export default class graph {
   get Scale() { return this.#parent.Scale }
   get yAxis() { return this.#parent.Scale.yAxis }
   get viewport() { return this.#viewport }
+  get overlays() { return this.#overlays }
 
   setWidth() {}
 
@@ -158,20 +159,24 @@ export default class graph {
     const oList = this.#overlays.list
     for (let [key, overlay] of oList) {
       overlay.instance.position = [this.#core.scrollPos, 0]
-      overlay.instance.draw(update)
-    }
-    // if (this.parent.scrollPos == this.parent.bufferPx * -1 || 
-    //     this.parent.scrollPos == 0 || 
-    //     update == true) 
-    // {
-    //   overlay.instance.draw()
-    // }
-    // else if (this.#layerStream && this.#streamCandle) {
-    //   this.#overlays.list.get("stream").draw(this.#streamCandle)
-    // }
+      // overlay.instance.draw(update)
 
-    this.#viewport.render();
+      if (this.#core.scrollPos == this.#core.bufferPx * -1 || 
+          this.#core.scrollPos == 0 || 
+          update == true) 
+      {
+        overlay.instance.draw(update)
+      }
+      else if (this.#parent.streamCandle) {
+        oList.get("stream").instance.draw(this.#streamCandle)
+      }
+    }
+
+    this.#viewport.render()
   }
 
+  render() {
+    this.#viewport.render()
+  }
 
 }

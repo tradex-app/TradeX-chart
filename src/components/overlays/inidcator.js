@@ -199,9 +199,9 @@ export default class indicator {
   }
 
   draw(update=false) {
-    if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
-        this.#core.scrollPos != 0 && 
-                      update != true) 
-    { return }
+    // if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
+    //     this.#core.scrollPos != 0 && 
+    //                   update != true) 
+    // { return }
   }
 }

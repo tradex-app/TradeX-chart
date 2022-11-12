@@ -58,10 +58,12 @@ export default class scalePriceLine {
 
   draw(update=false, candle) {
 
-    if (this.#core.scrollPos != this.#core.bufferPx * -1 || 
-        this.#core.scrollPos != 0 || 
-                      update != true) 
-    { return }
+    // if (this.#core.scrollPos != this.#core.bufferPx * -1 || 
+    //     this.#core.scrollPos != 0 || 
+    //                   update != true) 
+    // { return }
+
+    if (candle === undefined) return
 
     let price = candle[4],
         y = this.#scale.yPos(price),

@@ -36,10 +36,10 @@ export default class chartVolume extends VolumeBar {
 
   draw(update=false, range=this.#core.range) {
 
-    if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
-        this.#core.scrollPos != 0 && 
-                      update != true) 
-    { return }
+    // if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
+    //     this.#core.scrollPos != 0 && 
+    //                   update != true) 
+    // { return }
 
     this.#scene.clear()
 

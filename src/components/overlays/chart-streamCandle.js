@@ -6,6 +6,7 @@ import { CandleType, PriceLineStyle } from "../../definitions/style";
 
 export default class chartStreamCandle extends Candle {
 
+  #parent
   #core
   #config
   #theme
@@ -13,22 +14,27 @@ export default class chartStreamCandle extends Candle {
   #yAxis
   #target
   #scene
+  #params
 
-
-  constructor(target, xAxis, yAxis, theme) {
+  constructor(target, xAxis, yAxis, theme, parent, params) {
 
     super(target.scene, theme)
 
+    this.#parent = parent
+    this.#core = parent.core
     this.#target = target
     this.#scene = target.scene
     this.#theme = theme
     this.#xAxis = xAxis
     this.#yAxis = yAxis
-    this.#core = xAxis.mediator.api.core
+    this.#params = params
+
     this.#theme.priceLineStyle = this.#theme?.priceLineStyle || PriceLineStyle
   }
 
   get target() { return this.#target }
+  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
+  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set position(p) { this.setPosition(p[0], p[1]) }
 
   setPosition(x, y) {
@@ -39,10 +45,12 @@ export default class chartStreamCandle extends Candle {
 
   draw(update=false, stream) {
 
-    if (this.#core.scrollPos != this.#core.bufferPx * -1 || 
-        this.#core.scrollPos != 0 || 
-                      update != true) 
-    { return }
+    // if (this.#core.scrollPos != this.#core.bufferPx * -1 || 
+    //     this.#core.scrollPos != 0 || 
+    //                   update != true) 
+    // { return }
+
+    if (stream === undefined) return
 
     this.#scene.clear()
 
@@ -50,16 +58,16 @@ export default class chartStreamCandle extends Candle {
     const render = (this.#core.theme.candle.Type === CandleType.AREA) ?
       (candle) => {} :
       (candle) => {super.draw(candle)}
-    const offset = this.#xAxis.smoothScrollOffset || 0
+    const offset = this.xAxis.smoothScrollOffset || 0
     const pos = this.#core.stream.lastXPos
     const candle = {
       x: pos, // offset + pos,
-      w: this.#xAxis.candleW
+      w: this.xAxis.candleW
     }
-    candle.o = this.#yAxis.yPos(stream[1])
-    candle.h = this.#yAxis.yPos(stream[2])
-    candle.l = this.#yAxis.yPos(stream[3])
-    candle.c = this.#yAxis.yPos(stream[4])
+    candle.o = this.yAxis.yPos(stream[1])
+    candle.h = this.yAxis.yPos(stream[2])
+    candle.l = this.yAxis.yPos(stream[3])
+    candle.c = this.yAxis.yPos(stream[4])
     candle.raw = stream
 
     if (r.inRange(stream[0])) {
@@ -67,7 +75,6 @@ export default class chartStreamCandle extends Candle {
 
       if (this.#core.theme.candle.Type === CandleType.AREA) super.areaRender()
     }
-
 
     if (stream[4] >= stream[1]) this.#theme.priceLineStyle.strokeStyle = this.#core.theme.candle.UpBodyColour
     else this.#theme.priceLineStyle.strokeStyle = this.#core.theme.candle.DnBodyColour

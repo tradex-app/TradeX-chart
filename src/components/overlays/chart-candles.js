@@ -35,17 +35,6 @@ export default class chartCandles extends Candle {
 
   draw(update=false, range=this.#core.range) {
 
-    console.log("------------------------------")
-    console.log("update:",update)
-    console.log("scrollPos:",this.#core.scrollPos)
-    console.log("bufferPx:",this.#core.bufferPx * -1)
-
-    if (this.#core.scrollPos != this.#core.bufferPx * -1 && 
-        this.#core.scrollPos != 0 && 
-                      update != true) 
-    { return }
-    console.log("draw")
-
     this.#scene.clear()
 
     const render = (this.#core.theme.candle.Type === CandleType.AREA) ?
