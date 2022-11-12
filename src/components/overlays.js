@@ -50,7 +50,7 @@ export default class Overlays {
 
   get core() { return this.#core }
   get parent() { return this.#parent }
-  get layerConfig() { return this.#parent.layerConfig() }
+  get layerConfig() { return this.#parent.layerConfig().layerConfig }
   get list() { return this.#list }
   get scale() { return this.#parent.parent.scale }
   get time() { return this.#parent.parent.time }

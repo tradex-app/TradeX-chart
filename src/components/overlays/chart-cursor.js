@@ -70,7 +70,6 @@ export default class chartCursor {
     ctx.stroke()
     // Y
     if (this.chart.cursorActive) {
-      console.log("draw cursor x")
       ctx.beginPath()
       ctx.moveTo(0, y)
       ctx.lineTo(this.#scene.width, y)
