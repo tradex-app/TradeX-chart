@@ -14,6 +14,7 @@ export default class chartVolume extends VolumeBar {
   #yAxis
   #target
   #scene
+  #volH
 
   constructor(target, xAxis=false, yAxis=false, theme, parent) {
 
@@ -46,24 +47,33 @@ export default class chartVolume extends VolumeBar {
       w: this.xAxis.candleW,
       z: zeroPos
     }
-
     const volH = Math.floor(zeroPos * this.#theme.maxVolumeH / 100)
-    const maxVol = range.volumeMax
 
     let o = this.#core.rangeScrollOffset
     let v = range.indexStart - o
     let i = range.Length + o + 1
     let x
-
-    while(i) {
+    let maxVol = 0
+  
+    while(i--) {
       x = range.value( v )
       if (x[4] !== null) {
-        volume.h = volH - ((maxVol - x[5]) * volH / maxVol)
+        maxVol = (x[5] > maxVol) ? x[5] : maxVol
+      }
+      v++
+    }
+
+    v = range.indexStart - o
+    i = range.Length + o + 1
+
+    while(i--) {
+      x = range.value( v )
+      if (x[4] !== null) {
+        volume.h = volH - (volH * ((maxVol - x[5]) / maxVol))
         volume.raw = data[v]
         super.draw(volume)
       }
       v++
-      i--
       volume.x = volume.x + volume.w
     }
   }
