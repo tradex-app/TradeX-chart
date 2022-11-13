@@ -24,6 +24,7 @@ export default class RSI extends indicator {
   #ID
   #name = 'Relative Strength Index'
   #shortName = 'RSI'
+  #params
   #onChart = false
   #checkParamCount = false
   #scaleOverlay = true
@@ -55,10 +56,16 @@ export default class RSI extends indicator {
    * @param {object} config - theme / styling
    * @memberof RSI
    */
-  constructor (target, overlay, xAxis, yAxis, config) {
-    super (target, overlay, xAxis, yAxis, config)
+  // constructor (target, overlay, xAxis, yAxis, config) {
 
-    this.#ID = overlay?.id || uid(this.#shortName)
+  constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
+
+    super (target, xAxis, yAxis, config, parent, params) 
+
+    const overlay = params.overlay
+
+    this.#ID = params.overlay?.id || uid(this.#shortName)
+    this.#params = params
     this.calcParams = (overlay?.calcParams) ? JSON.parse(overlay.calcParams) : calcParams
     this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
@@ -165,7 +172,8 @@ export default class RSI extends indicator {
    * Draw the current indicator range on its canvas layer and render it.
    * @param {object} range 
    */
-  draw(range) {
+  draw(range=this.range) {
+
     this.scene.clear()
 
     const data = this.overlay.data
@@ -203,14 +211,14 @@ export default class RSI extends indicator {
 
     // RSI plot
     plots.length = 0
-    const offset = this.xAxis.smoothScrollOffset || 0
+    const offset = this.Timeline.smoothScrollOffset || 0
     const plot = {
       x: (width * 0.5) + 2 + offset - (width * 2),
       w: width,
     }
 
     // account for "missing" entries because of indicator calculation
-    let o = this.xAxis.rangeScrollOffset;
+    let o = this.Timeline.rangeScrollOffset;
     let c = range.indexStart - (range.data.length - this.overlay.data.length) - o - 1
     let i = range.Length + o + 3
 

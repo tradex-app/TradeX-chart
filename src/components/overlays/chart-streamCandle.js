@@ -3,7 +3,7 @@
 import Candle from "../primitives/candle";
 import { renderHorizontalLine } from "../../renderer/line"
 import { CandleType, PriceLineStyle } from "../../definitions/style";
-import { isArray } from "../../utils/typeChecks";
+import { isArray, isObject } from "../../utils/typeChecks";
 
 export default class chartStreamCandle extends Candle {
 
@@ -41,6 +41,7 @@ export default class chartStreamCandle extends Candle {
   set position(p) { this.setPosition(p[0], p[1]) }
 
   setPosition(x, y) {
+    if (this.#core.stream === undefined) return
     this.#target.setPosition(x, y)
     this.#core.stream.lastScrollPos = this.#core.scrollPos
   }
@@ -57,7 +58,8 @@ export default class chartStreamCandle extends Candle {
 
   draw() {
     
-    if (!isArray(this.#chart.streamCandle)) return
+    if (this.#core.stream === undefined ||
+        !isArray(this.#chart.streamCandle)) return
 
     this.#scene.clear()
 

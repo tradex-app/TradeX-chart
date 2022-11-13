@@ -159,7 +159,6 @@ export default class graph {
     const oList = this.#overlays.list
     for (let [key, overlay] of oList) {
       overlay.instance.position = [this.#core.scrollPos, 0]
-      // overlay.instance.draw(update)
 
       if (this.#core.scrollPos == this.#core.bufferPx * -1 || 
           this.#core.scrollPos == 0 || 

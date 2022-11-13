@@ -23,6 +23,7 @@ const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
  */
 export default class indicator {
 
+  #parent
   #core
   #config
   #theme
@@ -43,19 +44,22 @@ export default class indicator {
   #calcParams
   #style = {}
 
-  constructor(target, overlay, xAxis, yAxis, config) {
+  // constructor(target, overlay, xAxis, yAxis, config) {
 
-    this.#core = xAxis.core
-    this.#config = config
+  constructor (target, xAxis=false, yAxis=false, config, parent, params) {
+
+    this.#parent = parent
+    this.#core = parent.core
     this.#target = target
     this.#scene = target.scene
+    this.#config = config
     this.#xAxis = xAxis
     this.#yAxis = yAxis
-    this.#overlay = overlay
+    this.#overlay = params.overlay
     this.#type = config.type
     this.#indicator = config.indicator
-    this.#TALib = xAxis.core.TALib
-    this.#range = xAxis.range
+    this.#TALib = this.#core.TALib
+    this.#range = this.xAxis.range
 
     this.eventsListen()
   }
@@ -64,13 +68,15 @@ export default class indicator {
   get config() { return this.#config }
   get target() { return this.#target }
   get scene() { return this.#scene }
-  get xAxis() { return this.#xAxis }
-  get yAxis() { return this.#yAxis }
+  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
+  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
+  get Timeline() { return this.#core.Timeline }
+  get Scale() { return this.#parent.scale }
   get type() { return this.#type }
   get overlay() { return this.#overlay }
   get indicator() { return this.#indicator }
   get TALib() { return this.#TALib }
-  get range() { return this.#range }
+  get range() { return this.yAxis.range }
   set setNewValue(cb) { this.#newValueCB = cb}
   set setUpdateValue(cb) { this.#updateValueCB = cb }
   set precision(p) { this.#precision = p }

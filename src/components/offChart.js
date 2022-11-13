@@ -4,6 +4,7 @@
 import DOM from "../utils/DOM"
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import ScaleBar from "./scale"
+import Graph from "./graph"
 import CEL from "../components/primitives/canvas"
 import Legends from "./primitives/legend"
 import overlayGrid from "./overlays/chart-grid"
@@ -64,6 +65,7 @@ export default class OffChart {
   #parent
 
   #elOffChart
+  #elCanvas
   #elViewport
   #elLegends
   #elScale
@@ -197,16 +199,18 @@ export default class OffChart {
     // X Axis - Timeline
     this.#Time = this.mediator.api.Timeline
 
-    // Y Axis - Price Scale
-    this.#Scale.on("started",(data)=>{this.log(`OffChart scale started: ${data}`)})
-    this.#Scale.start("OffChart",this.name,"yAxis Scale started")
     // add divider to allow manual resize of the offChart indicator
     const config = { offChart: this }
     this.#Divider = this.widgets.insert("Divider", config)
     this.#Divider.start()
 
     // prepare layered canvas
-    this.createViewport()
+    this.createGraph()
+
+    // Y Axis - Price Scale
+    this.#Scale.on("started",(data)=>{this.log(`OffChart scale started: ${data}`)})
+    this.#Scale.start("OffChart",this.name,"yAxis Scale started")
+
     // draw the chart - grid, candles, volume
     this.draw(this.range)
 
@@ -294,10 +298,7 @@ export default class OffChart {
   }
 
   onStreamListening(stream) {
-    if (this.#Stream !== stream) {
-      this.#Stream = stream
-      if (this.#layerStream === undefined) this.layerStream()
-    }
+    if (this.#Stream !== stream) this.#Stream = stream
   }
 
   onStreamNewValue(value) {
@@ -311,6 +312,12 @@ export default class OffChart {
     // this.#chartStreamCandle.draw(candle)
     this.#viewport.render()
 
+    this.updateLegends()
+  }
+
+  onStreamUpdate(candle) {
+    this.#streamCandle = candle
+    this.#Graph.render()
     this.updateLegends()
   }
 
@@ -397,52 +404,35 @@ export default class OffChart {
   // setOffChartTheme(chartTheme) {}
   // getOffChartTheme(chartTheme) {}
 
-  createViewport() {
+  createGraph() {
 
-    const {width, height, layerConfig} = this.layerConfig()
+    const indicator = [this.#overlay.name, {class: this.#Indicator, fixed: false, required: false, params: {overlay: this.#overlay}}]
 
-    // create viewport
-    this.#viewport = new CEL.Viewport({
-      width: width,
-      height: height,
-      container: this.#elViewport
-    });
+    defaultOverlays.splice(1, 0, indicator)
 
-    // create layers - grid, volume, candles
-    this.#layerGrid = new CEL.Layer(layerConfig);
-    this.#layersIndicator = this.layersOnRow(layerConfig)
-    this.#layerCursor = new CEL.Layer();
+    // let overlays = new Map(defaultOverlays)
 
-    // add layers
-    this.#viewport
-    .addLayer(this.#layerGrid)
-    .addLayer(this.#layersIndicator)
-    .addLayer(this.#layerCursor)
+    // if (overlays.has("volume")) {
+    //   const volume = overlays.get("volume")
+    //   volume.params.maxVolumeH = this.#theme?.volume?.Height || VolumeStyle.ONCHART_VOLUME_HEIGHT
+    //   overlays.set("volume", volume)
+    // }
 
-    // add overlays
-    this.#overlayCursor = 
-    new overlayCursor(
-      this.#layerCursor, 
-      this.#Time, 
-      this.#Scale, 
-      this.#theme,
-      this)
+    // add the chart overlays
+    // overlays = [
+    //   defaultOverlays[0], 
+    //   ...overlays,
+    //   defaultOverlays[1]
+    // ]
 
-    this.#overlayIndicator =
-    new this.#Indicator(
-      this.#layersIndicator,
-      this.#overlay,
-      this.#Time, 
-      this.#Scale, 
-      this.#theme)
+    // overlays = Array.from(overlays)
+    const overlays = defaultOverlays
 
-    this.#overlayGrid =
-    new overlayGrid(
-      this.#layerGrid, 
-      this.#Time, 
-      this.#Scale, 
-      this.#theme,
-      this)
+    this.#Graph = new Graph(this, this.#elViewport, overlays)
+    this.#overlayIndicator = this.#Graph.overlays.get(this.#overlay.name).instance
+    this.#layerGrid = this.#Graph.overlays.get("grid").layer
+    this.#overlayGrid = this.#Graph.overlays.get("grid").instance
+    this.#elCanvas = this.#Graph.viewport.scene.canvas
   }
 
   layerConfig() {
@@ -480,24 +470,13 @@ export default class OffChart {
   }
 
   draw(range=this.range, update=false) {
-    this.#layerGrid.setPosition(this.#core.scrollPos, 0)
-    this.#layersIndicator.setPosition(this.#core.scrollPos, 0)
-
-    if (this.scrollPos == this.bufferPx * -1 || 
-      this.scrollPos == 0 || 
-      update == true) 
-    {
-      this.#overlayGrid.draw("y")
-      this.#overlayIndicator.draw(range)
-    }
-
-    this.#viewport.render();
+    this.#Graph.draw(range, update)
   }
 
   drawGrid() {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
     this.#overlayGrid.draw("y")
-    this.#viewport.render();
+    this.#Graph.render();
   }
 
   refresh() {

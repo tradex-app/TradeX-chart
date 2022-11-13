@@ -277,6 +277,10 @@ export default class Chart {
     this.#controller = null
 
     this.off("main_mousemove", this.onMouseMove)
+    this.off(STREAM_LISTENING, this.onStreamListening)
+    this.off(STREAM_NEWVALUE, this.onStreamNewValue)
+    this.off(STREAM_UPDATE, this.onStreamUpdate)
+    this.off("chart_yAxisRedraw", this.onYAxisRedraw)
   }
 
 
@@ -289,10 +293,10 @@ export default class Chart {
     this.#controller.on("mousedown", this.onMouseDown.bind(this));
 
     // listen/subscribe/watch for parent notifications
-    this.on("main_mousemove", (pos) => this.updateLegends(pos))
-    this.on(STREAM_LISTENING, (stream) => this.onStreamListening(stream))
-    this.on(STREAM_NEWVALUE, (candle) => this.onStreamNewValue(candle))
-    this.on(STREAM_UPDATE, (candle) => this.onStreamUpdate(candle))
+    this.on("main_mousemove", this.updateLegends.bind(this))
+    this.on(STREAM_LISTENING, this.onStreamListening.bind(this))
+    this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this))
+    this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this))
     this.on("chart_yAxisRedraw", this.onYAxisRedraw.bind(this))
   }
 
