@@ -83,19 +83,19 @@ export default class graph {
   setDimensions(dim) {}
 
   eventsListen() {
-    // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(this.#elCanvas, {disableContextMenu: false});
-    this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
-    this.#controller.on("mouseout", this.onMouseOut.bind(this));
-    this.#controller.on("mousedown", this.onMouseDown.bind(this));
+    // // create controller and use 'on' method to receive input events 
+    // this.#controller = new InputController(this.#elCanvas, {disableContextMenu: false});
+    // this.#controller.on("mousemove", this.onMouseMove.bind(this));
+    // this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
+    // this.#controller.on("mouseout", this.onMouseOut.bind(this));
+    // this.#controller.on("mousedown", this.onMouseDown.bind(this));
 
-    // listen/subscribe/watch for parent notifications
-    this.on("main_mousemove", (pos) => this.updateLegends(pos))
-    this.on(STREAM_LISTENING, (stream) => this.onStreamListening(stream))
-    this.on(STREAM_NEWVALUE, (candle) => this.onStreamNewValue(candle))
-    this.on(STREAM_UPDATE, (candle) => this.onStreamUpdate(candle))
-    this.on("chart_yAxisRedraw", this.onYAxisRedraw.bind(this))
+    // // listen/subscribe/watch for parent notifications
+    // this.on("main_mousemove", (pos) => this.updateLegends(pos))
+    // this.on(STREAM_LISTENING, (stream) => this.onStreamListening(stream))
+    // this.on(STREAM_NEWVALUE, (candle) => this.onStreamNewValue(candle))
+    // this.on(STREAM_UPDATE, (candle) => this.onStreamUpdate(candle))
+    // this.on("chart_yAxisRedraw", this.onYAxisRedraw.bind(this))
   }
 
     /**
@@ -168,7 +168,7 @@ export default class graph {
         overlay.instance.draw()
       }
       else if (this.#parent.streamCandle) {
-        oList.get("stream").instance.draw(this.#streamCandle)
+        oList.get("stream").instance.draw()
       }
     }
 

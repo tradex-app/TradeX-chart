@@ -47,6 +47,12 @@ const STYLE_OFFCHART = "" // "position: absolute; top: 0; left: 0; border: 1px s
 const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
 const STYLE_SCALE2 = "top: 0; right: 0; border-left: 1px solid;"
 
+const defaultOverlays = [
+  ["grid", {class: overlayGrid, fixed: true, required: true, params: {axes: "y"}}],
+  ["cursor", {class: overlayCursor, fixed: true, required: true}]
+]
+
+
 export default class OffChart {
 
   #ID
@@ -64,6 +70,7 @@ export default class OffChart {
 
   #Scale
   #Time
+  #Graph
   #Legends
   #Indicator
   #overlay
@@ -79,6 +86,7 @@ export default class OffChart {
   #layersTools = new Map()
 
   #overlayGrid
+  #overlayIndicators = new Map()
   #overlayIndicator
   #overlayStream
   #overlayTools = new Map()

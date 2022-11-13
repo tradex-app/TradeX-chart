@@ -61,6 +61,7 @@ export default class chartCandles extends Candle {
           l: candle.l,
           c: candle.c,
         }
+        this.#core.stream.lastPriceMax = range.priceMax
         this.#core.stream.lastPriceMin = range.priceMin
         break
       }

@@ -3,6 +3,7 @@
 import Candle from "../primitives/candle";
 import { renderHorizontalLine } from "../../renderer/line"
 import { CandleType, PriceLineStyle } from "../../definitions/style";
+import { isArray } from "../../utils/typeChecks";
 
 export default class chartStreamCandle extends Candle {
 
@@ -15,6 +16,7 @@ export default class chartStreamCandle extends Candle {
   #target
   #scene
   #params
+  #chart
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
@@ -28,6 +30,7 @@ export default class chartStreamCandle extends Candle {
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#params = params
+    this.#chart = parent.parent.parent
 
     this.#theme.priceLineStyle = this.#theme?.priceLineStyle || PriceLineStyle
   }
@@ -42,14 +45,24 @@ export default class chartStreamCandle extends Candle {
     this.#core.stream.lastScrollPos = this.#core.scrollPos
   }
 
+  // Must calculate yPos from last candle from candle overlay
+  // to keep streaming candle position in sync
+  yPos(p) {
+    const rangeH = this.#core.stream.lastPriceMax - this.#core.stream.lastPriceMin
+    const height = p - this.#core.stream.lastPriceMin
+    const ratio = this.yAxis.height / rangeH
+    const yPos = this.yAxis.height - (height * ratio)
+    return yPos
+  }
 
-  draw(stream) {
+  draw() {
     
-    if (stream === undefined) return
+    if (!isArray(this.#chart.streamCandle)) return
 
     this.#scene.clear()
 
     const r = this.#core.range
+    const stream = this.#chart.streamCandle
     const render = (this.#core.theme.candle.Type === CandleType.AREA) ?
       (candle) => {} :
       (candle) => {super.draw(candle)}
@@ -59,10 +72,10 @@ export default class chartStreamCandle extends Candle {
       x: pos, // offset + pos,
       w: this.xAxis.candleW
     }
-    candle.o = this.yAxis.yPos(stream[1])
-    candle.h = this.yAxis.yPos(stream[2])
-    candle.l = this.yAxis.yPos(stream[3])
-    candle.c = this.yAxis.yPos(stream[4])
+    candle.o = this.yPos(stream[1])
+    candle.h = this.yPos(stream[2])
+    candle.l = this.yPos(stream[3])
+    candle.c = this.yPos(stream[4])
     candle.raw = stream
 
     if (r.inRange(stream[0])) {

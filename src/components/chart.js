@@ -236,29 +236,8 @@ export default class Chart {
     // X Axis - Timeline
     this.#Time = this.mediator.api.Timeline
 
-    let overlays = new Map(defaultOverlays)
-
-    if (overlays.has("volume")) {
-      const volume = overlays.get("volume")
-      volume.params.maxVolumeH = this.#theme?.volume?.Height || VolumeStyle.ONCHART_VOLUME_HEIGHT
-      overlays.set("volume", volume)
-    }
-
-    // add the chart overlays
-    // overlays = [
-    //   defaultOverlays[0], 
-    //   ...overlays,
-    //   defaultOverlays[1]
-    // ]
-
-    overlays = Array.from(overlays)
-
-    this.#Graph = new Graph(this, this.#elViewport, overlays)
-    this.#layerStream = this.#Graph.overlays.get("stream").layer
-    this.#chartStreamCandle = this.#Graph.overlays.get("stream").instance
-    this.#layerGrid = this.#Graph.overlays.get("grid").layer
-    this.#chartGrid = this.#Graph.overlays.get("grid").instance
-    this.#elCanvas = this.#Graph.viewport.scene.canvas
+    // create and start overlays
+    this.createGraph()
 
     // start on chart indicators
 
@@ -271,8 +250,6 @@ export default class Chart {
     // Y Axis - Price Scale
     this.#Scale.start(`Chart says to Scale, "Thanks for the update!"`)
 
-    // prepare layered canvas
-    // this.createViewport()
     // draw the chart - grid, candles, volume
     this.draw(this.range)
 
@@ -371,9 +348,7 @@ export default class Chart {
   }
 
   onStreamListening(stream) {
-    if (this.#Stream !== stream) {
-      this.#Stream = stream
-    }
+    if (this.#Stream !== stream) this.#Stream = stream
   }
 
   onStreamNewValue(candle) {
@@ -382,8 +357,8 @@ export default class Chart {
 
   onStreamUpdate(candle) {
     this.#streamCandle = candle
+    this.#chartStreamCandle.draw()
     this.#layerStream.setPosition(this.#core.stream.lastScrollPos, 0)
-    this.#chartStreamCandle.draw(candle)
     this.#Graph.render()
     this.updateLegends(this.#cursorPos, candle)
   }
@@ -494,7 +469,31 @@ export default class Chart {
   loadData(data) {}
   updateData(data) {}
 
-  createViewport() {}
+  createGraph() {
+    let overlays = new Map(defaultOverlays)
+
+    if (overlays.has("volume")) {
+      const volume = overlays.get("volume")
+      volume.params.maxVolumeH = this.#theme?.volume?.Height || VolumeStyle.ONCHART_VOLUME_HEIGHT
+      overlays.set("volume", volume)
+    }
+
+    // add the chart overlays
+    // overlays = [
+    //   defaultOverlays[0], 
+    //   ...overlays,
+    //   defaultOverlays[1]
+    // ]
+
+    overlays = Array.from(overlays)
+
+    this.#Graph = new Graph(this, this.#elViewport, overlays)
+    this.#layerStream = this.#Graph.overlays.get("stream").layer
+    this.#chartStreamCandle = this.#Graph.overlays.get("stream").instance
+    this.#layerGrid = this.#Graph.overlays.get("grid").layer
+    this.#chartGrid = this.#Graph.overlays.get("grid").instance
+    this.#elCanvas = this.#Graph.viewport.scene.canvas
+  }
 
   layerConfig() {
     const buffer = this.config.buffer || BUFFERSIZE
