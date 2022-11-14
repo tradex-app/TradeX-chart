@@ -268,7 +268,7 @@ export default class Chart {
   end() {
     this.#mediator.stateMachine.destroy()
     this.#Scale.end()
-    this.#viewport.destroy()
+    this.#Graph.destroy()
 
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
     this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
@@ -412,7 +412,7 @@ export default class Chart {
     const buffer = this.config.buffer || BUFFERSIZE
     const {w, h} = dim
     const width = w - this.#elScale.clientWidth
-    
+
     this.layerWidth = Math.round(width * ((100 + buffer) * 0.01))
     this.#Graph.setSize(width, h, this.layerWidth)
     this.setWidth(w)

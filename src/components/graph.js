@@ -76,6 +76,15 @@ export default class graph {
   get viewport() { return this.#viewport }
   get overlays() { return this.#overlays }
 
+  destroy() {
+    const oList = this.#overlays.list
+    for (let [key, overlay] of oList) {
+      overlay.instance = null
+    }
+    oList = null
+    this.#viewport.destroy()
+  }
+
   setSize(w, h, lw) {
     const oList = this.#overlays.list
 

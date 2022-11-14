@@ -228,10 +228,9 @@ export default class OffChart {
 
   end() {
     this.#mediator.stateMachine.destroy()
-    this.#viewport.destroy()
+    this.#Graph.destroy()
     this.#Scale.end()
     this.#Divider.end()
-    this.#Indicator.end()
 
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
     this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
