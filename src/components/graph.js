@@ -77,7 +77,7 @@ export default class graph {
   get overlays() { return this.#overlays }
 
   destroy() {
-    const oList = this.#overlays.list
+    let oList = this.#overlays.list
     for (let [key, overlay] of oList) {
       overlay.instance = null
     }
