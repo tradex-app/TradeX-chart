@@ -410,22 +410,14 @@ export default class Chart {
    */
   setDimensions(dim) {
     const buffer = this.config.buffer || BUFFERSIZE
-    const width = dim.w - this.#elScale.clientWidth
-    const height = dim.h
+    const {w, h} = dim
+    const width = w - this.#elScale.clientWidth
+    
     this.layerWidth = Math.round(width * ((100 + buffer) * 0.01))
-
-    this.#viewport.setSize(width, height)
-    this.#layerGrid.setSize(this.layerWidth, height)
-    this.#layerVolume.setSize(this.layerWidth, height)
-    // TODO: iterate layersOnChart and setSize()
-    // this.#layersOnChart.setSize(this.layerWidth, height)
-    this.#layerCandles.setSize(this.layerWidth, height)
-    if (this.#Stream) this.#layerStream.setSize(this.layerWidth, height)
-    this.#layerCursor.setSize(width, height)
-
-    this.setWidth(dim.w)
-    this.setHeight(dim.h)
-    this.#Scale.resize(dim.w, dim.h)
+    this.#Graph.setSize(width, h, this.layerWidth)
+    this.setWidth(w)
+    this.setHeight(h)
+    this.#Scale.resize(w, h)
 
     this.draw(undefined, true)
   }
@@ -496,6 +488,7 @@ export default class Chart {
     this.#chartStreamCandle = this.#Graph.overlays.get("stream").instance
     this.#layerGrid = this.#Graph.overlays.get("grid").layer
     this.#chartGrid = this.#Graph.overlays.get("grid").instance
+    this.#viewport = this.#Graph.viewport
     this.#elCanvas = this.#Graph.viewport.scene.canvas
   }
 

@@ -76,11 +76,15 @@ export default class graph {
   get viewport() { return this.#viewport }
   get overlays() { return this.#overlays }
 
-  setWidth() {}
+  setSize(w, h, lw) {
+    const oList = this.#overlays.list
 
-  setHeight() {}
+    this.#viewport.setSize(w, h)
 
-  setDimensions(dim) {}
+    for (let [key, overlay] of oList) {
+      overlay.layer.setSize(lw, h)
+    }
+  }
 
   eventsListen() {
     // // create controller and use 'on' method to receive input events 

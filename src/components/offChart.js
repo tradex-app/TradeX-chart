@@ -359,18 +359,14 @@ export default class OffChart {
 
   setDimensions(dim) {
     const buffer = this.config.buffer || BUFFERSIZE
-    const width = dim.w - this.#elScale.clientWidth
-    const height = dim.h
+    const {w, h} = dim
+    const width = w - this.#elScale.clientWidth
     const layerWidth = Math.round(width * ((100 + buffer) * 0.01))
 
-    this.#viewport.setSize(width, dim.h)
-    this.#layerGrid.setSize(layerWidth, height)
-    this.#layersIndicator.setSize(layerWidth, height)
-    this.#layerCursor.setSize(width, height)
-
-    this.setWidth(dim.w)
-    this.setHeight(dim.h)
-    this.#Scale.resize(dim.w, dim.h)
+    this.#Graph.setSize(width, h, layerWidth)
+    this.setWidth(w)
+    this.setHeight(h)
+    this.#Scale.resize(w, h)
 
     this.draw(undefined, true)
   }
@@ -432,6 +428,7 @@ export default class OffChart {
     this.#overlayIndicator = this.#Graph.overlays.get(this.#overlay.name).instance
     this.#layerGrid = this.#Graph.overlays.get("grid").layer
     this.#overlayGrid = this.#Graph.overlays.get("grid").instance
+    this.#viewport = this.#Graph.viewport
     this.#elCanvas = this.#Graph.viewport.scene.canvas
   }
 
