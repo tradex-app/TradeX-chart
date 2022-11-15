@@ -42,9 +42,11 @@ export default class chartVolume extends VolumeBar {
     const data = range.data
     const zeroPos = this.scene.height
     const offset = this.xAxis.smoothScrollOffset || 0
+    const width = this.xAxis.candleW
+    const w = (width > 5) ? Math.ceil(width * 0.8) : width
     const volume = {
       x: 0 + offset - this.xAxis.candleW,
-      w: this.xAxis.candleW,
+      w: w,
       z: zeroPos
     }
     const volH = Math.floor(zeroPos * this.#theme.maxVolumeH / 100)
@@ -74,7 +76,7 @@ export default class chartVolume extends VolumeBar {
         super.draw(volume)
       }
       v++
-      volume.x = volume.x + volume.w
+      volume.x = volume.x + width
     }
   }
 

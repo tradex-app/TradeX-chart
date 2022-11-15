@@ -6,8 +6,7 @@
 // CANDLE_DOWN_HOLLOW: 'candle_down_hollow',
 // OHLC: 'ohlc',
 
-import { CandleType } from "../../definitions/style"
-import { defaultTheme } from "../../definitions/style"
+import { CandleType, defaultTheme } from "../../definitions/style"
 
 export default class Candle {
 
@@ -31,7 +30,7 @@ export default class Candle {
       this.fill = true
       break;
       case CandleType.CANDLE_HOLLOW :
-      case "OHLC":
+      case CandleType.OHLC:
         this.fill = false
         break;
       case CandleType.CANDLE_UP_HOLLOW :
@@ -45,6 +44,7 @@ export default class Candle {
     }
 
     let w = Math.max(data.w -1, 1)
+        w = (w > 5) ? Math.ceil(w * 0.8) : w
     let hw = Math.max(Math.floor(w * 0.5), 1)
     let h = Math.abs(data.o - data.c)
     let max_h = data.c === data.o ? 1 : 2
@@ -58,7 +58,7 @@ export default class Candle {
     ctx.moveTo(x05, Math.floor(data.h))
 
     // Wicks
-    if (this.cfg.candle.Type === "OHLC") {
+    if (this.cfg.candle.Type === CandleType.OHLC) {
       ctx.lineTo(x05, Math.floor(data.l))
     }
     else {
@@ -81,25 +81,25 @@ export default class Candle {
 
       let s = hilo ? 1 : -1
       ctx.rect(
-        Math.floor(x - hw -1),
+        Math.floor(x - hw),
         data.c,
-        Math.floor(hw * 2 + 1),
+        Math.floor(hw * 2),
         s * Math.max(h, max_h),
       )
       ctx.fill()
       ctx.stroke()
     } 
-    else if (data.w > 1.5 && !this.fill && this.cfg.candle.Type !== "OHLC") {
+    else if (data.w > 1.5 && !this.fill && this.cfg.candle.Type !== CandleType.OHLC) {
       let s = hilo ? 1 : -1
       ctx.rect(
-        Math.floor(x - hw -1),
+        Math.floor(x - hw),
         data.c,
-        Math.floor(hw * 2 + 1),
+        Math.floor(hw * 2),
         s * Math.max(h, max_h),
       )
       ctx.stroke()
     } 
-    else if (this.cfg.candle.Type === "OHLC") {
+    else if (this.cfg.candle.Type === CandleType.OHLC) {
       // ctx.strokeStyle = wickColour
       ctx.beginPath()
       ctx.moveTo(x05 - hw, data.o)
