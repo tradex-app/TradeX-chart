@@ -160,7 +160,7 @@ export function b64toBlob(b64Data, contentType, sliceSize) {
 }
 
 /**
- * Native Map object serialization - JSON.stringify(originalValue, replacer);
+ * Native Map() object serialization - JSON.stringify(originalValue, replacer);
  * Used as the second argument
  * https://stackoverflow.com/a/56150320/15109215
  * @param {*} key 
@@ -179,7 +179,7 @@ export function replacer(key, value) {
 }
 
 /**
- * Native Map object reconstitution from JSON - JSON.parse(str, reviver);
+ * Native Map() object reconstitution from JSON - JSON.parse(str, reviver);
  * Used as the second argument
  * https://stackoverflow.com/a/56150320/15109215
  * @param {*} key 
@@ -193,5 +193,22 @@ export function reviver(key, value) {
     }
   }
   return value;
+}
+
+/**
+ * Instert at specific Map() index
+ * https://stackoverflow.com/a/53236461
+ * @export
+ * @param {number} index
+ * @param {number} key
+ * @param {*} value
+ * @param {map} map
+ * @return {map}  
+ */
+export function insertAtIndex(index, key, value, map){
+  const arr = Array.from(map);
+  arr.splice(index, 0, [key, value]);
+  map.clear();
+  arr.forEach(([k,v]) => map.set(k,v));
 }
 

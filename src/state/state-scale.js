@@ -46,12 +46,6 @@ export default
             // console.log('transition action for "yAxis_100" in "idle" state')
           },
         },
-        chart_pan: {
-          target: 'chart_pan',
-          action (data) {
-            // console.log('Scale: from "idle" to "chart_pan" state')
-          },
-        },
         chart_zoom: {
           target: 'chart_zoom',
           action (data) {
@@ -83,30 +77,6 @@ export default
         },
       }
     },
-    chart_pan: {
-      onEnter(data) {
-        // console.log('Scale: chart_pan: onEnter')
-      },
-      onExit(data) {
-        // console.log('Scale: chart_pan: onExit')
-      },
-      on: {
-        chart_pan: {
-          target: 'chart_pan',
-          action (data) {
-            // console.log('Scale: transition action for "chart_panDone" in "chart_pan" state')
-            this.context.origin.draw()
-          },
-        },
-        chart_panDone: {
-          target: 'idle',
-          action (data) {
-            // console.log('Scale: transition action for "chart_panDone" in "chart_pan" state')
-            this.context.origin.draw() 
-          },
-        },
-      }
-    },
     chart_zoom: {
       onEnter(data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
@@ -119,7 +89,7 @@ export default
           target: 'idle',
           condition: 'zoomDone',
           action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to "chart_zoom"`)
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
             this.context.origin.draw()
           },
         },

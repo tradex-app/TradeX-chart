@@ -6,40 +6,47 @@ import { BUFFERSIZE } from "../../definitions/chart"
 
 export default class chartCandles extends Candle {
 
-  #target
-  #scene
+  #parent
+  #core
   #config
+  #theme
   #xAxis
   #yAxis
-  #core
+  #target
+  #scene
 
-  constructor(target, xAxis, yAxis, config) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent) {
 
-    super(target.scene, config)
+    super(target.scene, theme)
 
+    this.#parent = parent
+    this.#core = parent.core
     this.#target = target
     this.#scene = target.scene
-    this.#config = config
+    this.#theme = theme
     this.#xAxis = xAxis
     this.#yAxis = yAxis
-    this.#core = xAxis.mediator.api.core
   }
 
   get target() { return this.#target }
+  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
+  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
+  set position(p) { this.#target.setPosition(p[0], p[1]) }
 
   draw(range=this.#core.range) {
+
     this.#scene.clear()
 
     const render = (this.#core.theme.candle.Type === CandleType.AREA) ?
-      (candle) => {} :
-      (candle) => {super.draw(candle)}
-    const offset = this.#xAxis.smoothScrollOffset || 0
+        (candle) => {} :
+        (candle) => {super.draw(candle)}
+    const offset = this.xAxis.smoothScrollOffset || 0
     const candle = {
-      x: 2 + offset - this.#xAxis.candleW,
-      w: this.#xAxis.candleW
+      x: 2 + offset - this.xAxis.candleW,
+      w: this.xAxis.candleW
     }
 
-    let o = this.#xAxis.rangeScrollOffset;
+    let o = this.#core.rangeScrollOffset;
     let c = range.indexStart - o
     let i = range.Length + o + 2
     let x
@@ -54,14 +61,15 @@ export default class chartCandles extends Candle {
           l: candle.l,
           c: candle.c,
         }
+        this.#core.stream.lastPriceMax = range.valueMax
         this.#core.stream.lastPriceMin = range.valueMin
         break
       }
       if (x[4] !== null) {
-        candle.o = this.#yAxis.yPos(x[1])
-        candle.h = this.#yAxis.yPos(x[2])
-        candle.l = this.#yAxis.yPos(x[3])
-        candle.c = this.#yAxis.yPos(x[4])
+        candle.o = this.yAxis.yPos(x[1])
+        candle.h = this.yAxis.yPos(x[2])
+        candle.l = this.yAxis.yPos(x[3])
+        candle.c = this.yAxis.yPos(x[4])
         candle.raw = x
         // super.draw(candle)
         render(candle)

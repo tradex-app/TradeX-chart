@@ -6,36 +6,51 @@ import { BUFFERSIZE } from "../../definitions/chart"
 
 export default class chartGrid {
 
-  #target
-  #scene
-  #config
+  #parent
+  #core
+  #config = {}
+  #theme
   #xAxis
   #yAxis
-  #core
+  #target
+  #scene
+  #params
 
-  constructor(target, xAxis, yAxis, config) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
+    this.#parent = parent
+    this.#core = parent.core
     this.#target = target
     this.#scene = target.scene
-    this.#config = config
+    this.#theme = theme
     this.#xAxis = xAxis
     this.#yAxis = yAxis
-    this.#core = xAxis.core
-    this.#config.axes = config.axes || "both"
+    this.#params = params
+
+    // this.#config.axes = parent?.axes || "both"
+    // this.#config.axes = params?.axes || parent.parent.parent.axes || "both"
+    this.#config.axes = params?.axes || "both"
+
   }
 
+  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
+  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
+  set position(p) { this.#target.setPosition(p[0], p[1]) }
+
   draw(axes) {
+
     axes = axes || this.#config.axes
+
     this.#scene.clear()
     
-    const xGrads = this.#xAxis.xAxisGrads.values
+    const xGrads = this.xAxis.xAxisGrads.values
     const ctx = this.#scene.context
     ctx.save();
     ctx.strokeStyle = this.#core.theme.chart.GridColour || GridStyle.COLOUR_GRID
 
     // X Axis
     if (axes != "y") {
-      const offset = this.#xAxis.smoothScrollOffset || 0
+      const offset = this.xAxis.smoothScrollOffset || 0
 
       for (let tick of xGrads) {
         ctx.beginPath()
@@ -47,7 +62,7 @@ export default class chartGrid {
 
     // Y Axis
     if (axes != "x") {
-      const yGrads = this.#yAxis.yAxisGrads
+      const yGrads = this.yAxis.yAxisGrads
       for (let tick of yGrads) {
         ctx.beginPath()
         ctx.moveTo(0, tick[1])

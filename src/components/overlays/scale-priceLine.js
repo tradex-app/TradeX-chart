@@ -8,8 +8,8 @@ import { drawTextBG, getTextRectHeight } from "../../utils/canvas"
 export default class scalePriceLine {
 
   #core
-  #theme
   #config
+  #theme
   #scale
   #target
   #viewport
@@ -26,6 +26,8 @@ export default class scalePriceLine {
 
     this.start()
   }
+
+  set position(p) { this.#target.setPosition(p[0], p[1]) }
 
   start() {
     this.eventListeners()
@@ -55,6 +57,8 @@ export default class scalePriceLine {
   }
 
   draw(candle) {
+
+    if (candle === undefined) return
 
     let price = candle[4],
         y = this.#scale.yPos(price),

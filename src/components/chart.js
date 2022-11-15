@@ -5,6 +5,7 @@
 import DOM from "../utils/DOM"
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import ScaleBar from "./scale"
+import Graph from "./graph"
 import CEL from "../components/primitives/canvas"
 import Legends from "./primitives/legend"
 import chartGrid from "./overlays/chart-grid"
@@ -52,6 +53,16 @@ import {
 const STYLE_CHART = "" // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
 const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
 const STYLE_SCALE2 = "top: 0; right: 0; border-left: 1px solid;"
+
+const defaultOverlays = [
+  ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
+  ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
+  ["candles", {class: chartCandles, fixed: false, required: true}],
+  ["stream", {class: chartStreamCandle, fixed: false, required: true}],
+  ["cursor", {class: chartCursor, fixed: true, required: true}]
+]
+
+
 export default class Chart {
 
   #name = "Chart"
@@ -60,6 +71,7 @@ export default class Chart {
   #options
   #core
   #parent
+
   #elChart
   #elCanvas
   #elViewport
@@ -68,6 +80,7 @@ export default class Chart {
 
   #Scale
   #Time
+  #Graph
   #Legends
   #onChart
   #Stream
@@ -135,6 +148,7 @@ export default class Chart {
   get options() { return this.#options }
   get element() { return this.#elChart }
   get core() { return this.#core }
+  get time() { return this.#Time }
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
   set width(w) { this.setWidth(w) }
@@ -149,6 +163,7 @@ export default class Chart {
   get data() { return this.#core.chartData }
   get range() { return this.#core.range }
   get stream() { return this.#Stream }
+  get streamCandle() { return this.#streamCandle }
   get onChart() { return this.#onChart }
   set priceDigits(digits) { this.setYAxisDigits(digits) }
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
@@ -162,6 +177,7 @@ export default class Chart {
   get bufferPx() { return this.#core.bufferPx }
   set layerWidth(w) { this.#layerWidth = w }
   get layerWidth() { return this.#layerWidth }
+  get axes() { return "x" }
 
   init(options) {
 
@@ -203,6 +219,7 @@ export default class Chart {
     options.yAxisType = "default"
     this.#Scale = this.#mediator.register("Chart_ScaleBar", ScaleBar, options, api)
 
+
     // onChart indicators
     // this.#onChart = this.#mediator.register("OnChart", OnChart, options, api)
 
@@ -219,20 +236,20 @@ export default class Chart {
     // X Axis - Timeline
     this.#Time = this.mediator.api.Timeline
 
+    // create and start overlays
+    this.createGraph()
+
     // start on chart indicators
 
-    // Y Axis - Price Scale
-    // this.#Scale.on("started",(data)=>{this.log(`Chart scale started: ${data}`)})
     const data = {inputs: {}}
     if (isObject(this.Stream)) {
       data.inputs.chart = {stream: this.Stream}
       // iterate over on chart indicators and add inputs if any
     }
 
+    // Y Axis - Price Scale
     this.#Scale.start(`Chart says to Scale, "Thanks for the update!"`)
 
-    // prepare layered canvas
-    this.createViewport()
     // draw the chart - grid, candles, volume
     this.draw(this.range)
 
@@ -251,7 +268,7 @@ export default class Chart {
   end() {
     this.#mediator.stateMachine.destroy()
     this.#Scale.end()
-    this.#viewport.destroy()
+    this.#Graph.destroy()
 
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
     this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
@@ -260,6 +277,10 @@ export default class Chart {
     this.#controller = null
 
     this.off("main_mousemove", this.onMouseMove)
+    this.off(STREAM_LISTENING, this.onStreamListening)
+    this.off(STREAM_NEWVALUE, this.onStreamNewValue)
+    this.off(STREAM_UPDATE, this.onStreamUpdate)
+    this.off("chart_yAxisRedraw", this.onYAxisRedraw)
   }
 
 
@@ -272,10 +293,10 @@ export default class Chart {
     this.#controller.on("mousedown", this.onMouseDown.bind(this));
 
     // listen/subscribe/watch for parent notifications
-    this.on("main_mousemove", (pos) => this.updateLegends(pos))
-    this.on(STREAM_LISTENING, (stream) => this.onStreamListening(stream))
-    this.on(STREAM_NEWVALUE, (candle) => this.onStreamNewValue(candle))
-    this.on(STREAM_UPDATE, (candle) => this.onStreamUpdate(candle))
+    this.on("main_mousemove", this.updateLegends.bind(this))
+    this.on(STREAM_LISTENING, this.onStreamListening.bind(this))
+    this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this))
+    this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this))
     this.on("chart_yAxisRedraw", this.onYAxisRedraw.bind(this))
   }
 
@@ -331,24 +352,18 @@ export default class Chart {
   }
 
   onStreamListening(stream) {
-    if (this.#Stream !== stream) {
-      this.#Stream = stream
-      if (this.#layerStream === undefined) this.layerStream()
-    }
+    if (this.#Stream !== stream) this.#Stream = stream
   }
 
   onStreamNewValue(candle) {
-    // this.#chartStreamCandle.draw(candle)
-    // this.#viewport.render()
     this.draw(this.range, true)
   }
 
   onStreamUpdate(candle) {
     this.#streamCandle = candle
+    this.#chartStreamCandle.draw()
     this.#layerStream.setPosition(this.#core.stream.lastScrollPos, 0)
-    this.#chartStreamCandle.draw(candle)
-    this.#viewport.render()
-
+    this.#Graph.render()
     this.updateLegends(this.#cursorPos, candle)
   }
 
@@ -361,11 +376,8 @@ export default class Chart {
     el.innerHTML = this.defaultNode()
 
     const api = this.#mediator.api
-    // this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .viewport`)
     this.#elLegends = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .legends`)
-    // this.#elScale = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .${CLASS_SCALE}`)
-    // this.#elScale  = DOM.findBySelector(`#${api.id} .${CLASS_YAXIS} .${CLASS_CHART} .${CLASS_ROW}`)
   }
 
   props() {
@@ -398,22 +410,14 @@ export default class Chart {
    */
   setDimensions(dim) {
     const buffer = this.config.buffer || BUFFERSIZE
-    const width = dim.w - this.#elScale.clientWidth
-    const height = dim.h
+    const {w, h} = dim
+    const width = w - this.#elScale.clientWidth
+
     this.layerWidth = Math.round(width * ((100 + buffer) * 0.01))
-
-    this.#viewport.setSize(width, height)
-    this.#layerGrid.setSize(this.layerWidth, height)
-    this.#layerVolume.setSize(this.layerWidth, height)
-    // TODO: iterate layersOnChart and setSize()
-    // this.#layersOnChart.setSize(this.layerWidth, height)
-    this.#layerCandles.setSize(this.layerWidth, height)
-    if (this.#Stream) this.#layerStream.setSize(this.layerWidth, height)
-    this.#layerCursor.setSize(width, height)
-
-    this.setWidth(dim.w)
-    this.setHeight(dim.h)
-    this.#Scale.resize(dim.w, dim.h)
+    this.#Graph.setSize(width, h, this.layerWidth)
+    this.setWidth(w)
+    this.setHeight(h)
+    this.#Scale.resize(w, h)
 
     this.draw(undefined, true)
   }
@@ -461,80 +465,31 @@ export default class Chart {
   loadData(data) {}
   updateData(data) {}
 
-  createViewport() {
+  createGraph() {
+    let overlays = new Map(defaultOverlays)
 
-    const {width, height, layerConfig} = this.layerConfig()
+    if (overlays.has("volume")) {
+      const volume = overlays.get("volume")
+      volume.params.maxVolumeH = this.#theme?.volume?.Height || VolumeStyle.ONCHART_VOLUME_HEIGHT
+      overlays.set("volume", volume)
+    }
 
-    // create viewport
-    this.#viewport = new CEL.Viewport({
-      width: width,
-      height: height,
-      container: this.#elViewport
-    });
-    this.#elCanvas = this.#viewport.scene.canvas
+    // add the chart overlays
+    // overlays = [
+    //   defaultOverlays[0], 
+    //   ...overlays,
+    //   defaultOverlays[1]
+    // ]
 
-    // create layers - grid, volume, candles
-    this.#layerGrid = new CEL.Layer(layerConfig);
-    this.#layerVolume = new CEL.Layer(layerConfig);
-    this.#layerCandles = new CEL.Layer(layerConfig);
-    this.#layersOnChart = this.layersOnChart(layerConfig)
-    this.#layerCursor = new CEL.Layer();
+    overlays = Array.from(overlays)
 
-    // add layers
-    this.#viewport
-          .addLayer(this.#layerGrid)
-          .addLayer(this.#layerVolume)
-
-    this.addLayersOnChart()
-
-    this.#viewport
-          .addLayer(this.#layerCandles)
-
-    if (isObject(this.config.stream)) 
-      this.addLayerStream()
-
-    this.#viewport
-          .addLayer(this.#layerCursor)
-
-    // add overlays
-    this.#chartCursor = 
-    new chartCursor(
-      this.#layerCursor, 
-      this,
-      this.#Time, 
-      this.#Scale, 
-      this.#theme)
-
-    // this.#chartIndicators = this.chartIndicators()
-    
-    if (isObject(this.config.stream))
-      this.#chartStreamCandle = 
-        new chartStreamCandle(
-          this.#layerStream, 
-          this.#Time, 
-          this.#Scale, 
-          this.#theme);
-
-    this.#chartCandles = 
-      new chartCandles(
-        this.#layerCandles, 
-        this.#Time, 
-        this.#Scale, 
-        this.#theme)
-    this.#theme.maxVolumeH = this.#theme?.volume?.Height || VolumeStyle.ONCHART_VOLUME_HEIGHT
-    this.#chartVolume =
-      new chartVolume(
-        this.#layerVolume, 
-        this.#Time, 
-        this.#Scale, 
-        this.#theme)
-
-    this.#chartGrid =
-      new chartGrid(
-        this.#layerGrid, 
-        this.#Time, 
-        this.#Scale, 
-        this.#theme)
+    this.#Graph = new Graph(this, this.#elViewport, overlays)
+    this.#layerStream = this.#Graph.overlays.get("stream").layer
+    this.#chartStreamCandle = this.#Graph.overlays.get("stream").instance
+    this.#layerGrid = this.#Graph.overlays.get("grid").layer
+    this.#chartGrid = this.#Graph.overlays.get("grid").instance
+    this.#viewport = this.#Graph.viewport
+    this.#elCanvas = this.#Graph.viewport.scene.canvas
   }
 
   layerConfig() {
@@ -619,49 +574,14 @@ export default class Chart {
     this.#chartTools.delete(tool)
   }
 
-  layerStream() {
-    // if the layer and instance were no set from chart config, do it now
-    this.addLayerStream()
-
-    if (!this.#chartStreamCandle) {
-      this.#chartStreamCandle = 
-      new chartStreamCandle(
-        this.#layerStream, 
-        this.#Time, 
-        this.#Scale, 
-        this.#theme)
-    }
-  }
-
-  addLayerStream() {
-    if (!this.#layerStream) {
-      const {width, height, layerConfig} = this.layerConfig()
-      this.#layerStream = new CEL.Layer(layerConfig);
-      this.#viewport.addLayer(this.#layerStream)
-    }
-  }
-
   draw(range=this.range, update=false) {
+    this.#Graph.draw(range, update)
+  }
+
+  drawGrid() {
     this.#layerGrid.setPosition(this.#core.scrollPos, 0)
-    this.#layerVolume.setPosition(this.#core.scrollPos, 0)
-    this.#layerCandles.setPosition(this.#core.scrollPos, 0)
-    if (this.#layerStream) {
-      this.#layerStream.setPosition(this.#core.scrollPos, 0)
-    this.#core.stream.lastScrollPos = this.#core.scrollPos
-    }
-
-    if (this.scrollPos == this.bufferPx * -1 || 
-        this.scrollPos == 0 || 
-        update == true) 
-    {
-      this.#chartGrid.draw("y")
-      this.#chartVolume.draw(range)
-      this.#chartCandles.draw(range)
-    }
-    if (this.#layerStream && this.#streamCandle) 
-      this.#chartStreamCandle.draw(this.#streamCandle)
-
-    this.#viewport.render();
+    this.#chartGrid.draw("y")
+    this.#Graph.render();
   }
 
   drawStream(candle) {
@@ -772,7 +692,6 @@ export default class Chart {
 
     // draw the chart - grid, candles, volume
     this.draw(this.range, true)
-
     this.emit("chart_zoomDone")
   }
 

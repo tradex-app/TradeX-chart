@@ -71,12 +71,13 @@ export default class ScaleBar {
   set height(h) { this.setHeight(h) }
   get height() { return this.#elScale.clientHeight }
   get width() { return this.#elScale.clientWidth }
-  get yAxisHeight() { return this.#yAxis.height }
-  get yAxisRatio() { return this.#yAxis.yAxisRatio }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
-  set yAxisType(t) { this.#yAxis.yAxisType = t }
+  get yAxis() { return this.#yAxis }
+  set yAxisType(t) { this.#yAxis.yAxisType = YAXIS_TYPES.includes(t) ? t : YAXIS_TYPES[0] }
   get yAxisType() { return this.#yAxis.yAxisType }
+  get yAxisHeight() { return this.#yAxis.height }
+  get yAxisRatio() { return this.#yAxis.yAxisRatio }
   get yAxisGrads() { return this.#yAxis.yAxisGrads }
   get viewport() { return this.#viewport }
   get pos() { return this.dimensions }
@@ -319,6 +320,7 @@ export default class ScaleBar {
   draw() {
     this.#yAxis.draw()
     this.#viewport.render()
+    this.#parent.drawGrid()
   }
 
   drawCursorPrice() {
