@@ -71,11 +71,11 @@ export default class Legends {
         styleDT = "display: inline; margin-left: 1em;",
         styleDD = "display: inline; margin-left: .25em;";
     for (input in o.inputs) {
-      let colour = ""
-      if (o.colours?.[i]) colour = ` color: ${o.colours[i]};`
+      let colour = (o.colours?.[i]) ? ` color: ${o.colours[i]};` : ""
+      let inputV = (o.inputs[input] !== undefined) ? o.inputs[input] : "---"
       inp +=
       `<dt style="${styleDT}">${input}:</dt>
-      <dd style="${styleDD}${colour}">${o.inputs[input]}</dd>`;
+      <dd style="${styleDD}${colour}">${inputV}</dd>`;
       ++i
     }
     return inp
