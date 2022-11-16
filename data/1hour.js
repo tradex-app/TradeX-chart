@@ -50407,7 +50407,9 @@ export default {
                     7837.6365241016
                 ]
             ],
-            "settings": {}
+            "settings": {
+                "period": 25
+            }
         },
         {
             "name": "EMA, 43",
@@ -67214,7 +67216,9 @@ export default {
                     7820.946243900578
                 ]
             ],
-            "settings": {}
+            "settings": {
+                "period": 43
+            }
         },
         {
             "name": "Trades",
@@ -85130,6 +85134,7 @@ export default {
                 ]
             ],
             "settings": {
+                "period": 20,
                 "upper": 70,
                 "lower": 30,
                 "backColor": "#9b9ba316",

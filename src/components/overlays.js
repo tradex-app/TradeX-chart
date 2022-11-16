@@ -26,19 +26,7 @@ export default class Overlays {
 
     // iterate over List, create and add overlays
     for (const [key, overlay] of this.#list) {
-      const layer = new CEL.Layer(this.layerConfig)
-      parent.viewport.addLayer(layer)
-
-      overlay.layer = layer
-      overlay.instance = new overlay.class(
-        layer,
-        this.#parent.TimeLine,
-        this.#parent.Scale,
-        this.#core.theme,
-        this,
-        overlay.params
-      )
-      this.#list.set(key, overlay)
+      this.addOverlay(key, overlay)
     }
 
   }
@@ -95,6 +83,28 @@ export default class Overlays {
 
   get(overlay) {
     return this.#list.get(overlay)
+  }
+
+  addOverlays(overlays) {
+    for (let o of overlays) {
+      this.addOverlay(o[0], o[1])
+    }
+  }
+
+  addOverlay(key, overlay) {
+    const layer = new CEL.Layer(this.layerConfig)
+    this.parent.viewport.addLayer(layer)
+
+    overlay.layer = layer
+    overlay.instance = new overlay.class(
+      layer,
+      this.#parent.TimeLine,
+      this.#parent.Scale,
+      this.#core.theme,
+      this,
+      overlay.params
+    )
+    this.#list.set(key, overlay)
   }
 
 }

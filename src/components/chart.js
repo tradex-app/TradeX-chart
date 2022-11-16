@@ -103,12 +103,9 @@ export default class Chart {
   #layerWidth
   
   #chartGrid
-  #chartVolume
   #chartIndicators = new Map()
-  #chartCandles
   #chartStreamCandle
   #chartTools = new Map()
-  #chartCursor
 
   #cursorPos = [0, 0]
   #cursorActive = false
@@ -239,7 +236,9 @@ export default class Chart {
     // create and start overlays
     this.createGraph()
 
-    // start on chart indicators
+    // create and start on chart indicators
+    this.addIndicators(this.mediator.api.onChart)
+
 
     const data = {inputs: {}}
     if (isObject(this.Stream)) {
@@ -492,50 +491,18 @@ export default class Chart {
     this.#elCanvas = this.#Graph.viewport.scene.canvas
   }
 
-  layerConfig() {
-    const buffer = this.config.buffer || BUFFERSIZE
-    const width = this.#elViewport.clientWidth
-    const height = this.#options.chartH || this.#parent.rowsH - 1
-    this.layerWidth = Math.round(width * ((100 + buffer) * 0.01))
-    const layerConfig = { 
-      width: this.layerWidth, 
-      height: height
-    }
-    return {width, height, layerConfig}
-  }
-
-  layersOnChart() {
-    let l = []
-    let { layerConfig } = this.layerConfig()
-
-    for (let i = 0; i < this.#onChart.length; i++) {
-      l[i] = new CEL.Layer(layerConfig)
-    }
-    return l
-  }
-
-  addLayersOnChart() {
-    for (let i = 0; i < this.#layersOnChart.length; i++) {
-      this.#viewport.addLayer(this.#layersOnChart[i])
+  addIndicators(indicators) {
+    for (let i of indicators) {
+      const overlay = {fixed: false, required: false}
+      if (i.type in this.core.TALib) {
+        overlay.class = this.core.indicators[i.type].ind
+        overlay.params = {overlay: i}
+        this.#chartIndicators.set(i.name, overlay)
+        this.#Graph.addOverlays(Array.from(this.#chartIndicators))
+      }
     }
   }
 
-  chartIndicators() {
-    const indicators = []
-    for (let i = 0; i < this.#layersOnChart.length; i++) {
-      indicators[i] = 
-        new indicator(
-          this.#layersOnChart[i], 
-          this.#Time,
-          this.#Scale,
-          this.config)
-    } 
-    return indicators
-  }
-
-  layersTools() {
-
-  }
 
   addTool(tool) {
     let { layerConfig } = this.layerConfig()

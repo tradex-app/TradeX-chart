@@ -168,6 +168,10 @@ export default class graph {
     return {width, height, layerConfig}
   }
 
+  addOverlays(overlays) {
+    this.#overlays.addOverlays(overlays)
+  }
+
   draw(range=this.range, update=false) {
     const oList = this.#overlays.list
     for (let [key, overlay] of oList) {

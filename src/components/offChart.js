@@ -90,9 +90,7 @@ export default class OffChart {
   #overlayGrid
   #overlayIndicators = new Map()
   #overlayIndicator
-  #overlayStream
   #overlayTools = new Map()
-  #overlayCursor
 
   #cursorPos = [0, 0]
   #cursorActive = false
@@ -191,8 +189,7 @@ export default class OffChart {
     api.parent = this
     api.elements.elScale = this.#elScale
 
-    // Y Axis - Price Scale
-    this.#Indicator = this.#mediator.api.indicators[this.#overlay.type].ind
+    this.#Indicator = api.indicators[this.#overlay.type].ind
     options.yAxisType = this.#Indicator.scale
     const id = options.offChart.type + "_ScaleBar"
     this.#Scale = this.mediator.register(id, ScaleBar, options, api)

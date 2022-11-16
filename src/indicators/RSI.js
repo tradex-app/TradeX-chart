@@ -66,7 +66,7 @@ export default class RSI extends indicator {
 
     this.#ID = params.overlay?.id || uid(this.#shortName)
     this.#params = params
-    this.calcParams = (overlay?.calcParams) ? JSON.parse(overlay.calcParams) : calcParams
+    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams
     this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
@@ -135,39 +135,6 @@ export default class RSI extends indicator {
     else return { inReal: input, timePeriod: step }
   }
  
-  calcTechnicalIndicator (dataList, { params, plots }) {
-    const sumCloseAs = []
-    const sumCloseBs = []
-    return dataList.map((kLineData, i) => {
-      const rsi = {}
-      const preClose = (dataList[i - 1] || kLineData).close
-      const tmp = kLineData.close - preClose
-      params.forEach((p, index) => {
-        if (tmp > 0) {
-          sumCloseAs[index] = (sumCloseAs[index] || 0) + tmp
-        } else {
-          sumCloseBs[index] = (sumCloseBs[index] || 0) + Math.abs(tmp)
-        }
-        if (i >= p - 1) {
-          if (sumCloseBs[index] !== 0) {
-            rsi[plots[index].key] = 100 - (100.0 / (1 + sumCloseAs[index] / sumCloseBs[index]))
-          } else {
-            rsi[plots[index].key] = 0
-          }
-          const agoData = dataList[i - (p - 1)]
-          const agoPreData = dataList[i - p] || agoData
-          const agoTmp = agoData.close - agoPreData.close
-          if (agoTmp > 0) {
-            sumCloseAs[index] -= agoTmp
-          } else {
-            sumCloseBs[index] -= Math.abs(agoTmp)
-          }
-        }
-      })
-      return rsi
-    })
-  }
-
   /**
    * Draw the current indicator range on its canvas layer and render it.
    * @param {object} range 
