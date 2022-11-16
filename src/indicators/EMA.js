@@ -130,7 +130,7 @@ const calcParams = [20]
     this.scene.clear()
 
     const data = this.overlay.data
-    const width = round(this.scene.width / range.Length, 1)
+    const width = this.xAxis.candleW
     const plots = []
     const offset = this.xAxis.smoothScrollOffset || 0
     const plot = {
@@ -139,17 +139,18 @@ const calcParams = [20]
     }
 
     // account for "missing" entries because of indicator calculation
+    let x = 2
     let o = this.Timeline.rangeScrollOffset;
     let c = range.indexStart - (range.data.length - this.overlay.data.length) - o
-    let i = range.Length + o + 1
+    let i = range.Length + o + x
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
-        plots[range.Length + o + 1 - i] = {x: null, y: null}
+        plots[range.Length + o + x - i] = {x: null, y: null}
       }
       else {
         plot.y = this.yAxis.yPos(data[c][1])
-        plots[range.Length + o + 1 - i] = {...plot}
+        plots[range.Length + o + x - i] = {...plot}
       }
       c++
       i--

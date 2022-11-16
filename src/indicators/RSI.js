@@ -185,17 +185,18 @@ export default class RSI extends indicator {
     }
 
     // account for "missing" entries because of indicator calculation
+    let x = 2
     let o = this.Timeline.rangeScrollOffset;
     let c = range.indexStart - (range.data.length - this.overlay.data.length) - o - 1
-    let i = range.Length + o + 3
+    let i = range.Length + o + x
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
-        plots[range.Length + o + 1 - i] = {x: null, y: null}
+        plots[range.Length + o + x - i] = {x: null, y: null}
       }
       else {
         plot.y = this.yAxis.yPos(100 - data[c][1])
-        plots[range.Length + o + 1 - i] = {...plot}
+        plots[range.Length + o + x - i] = {...plot}
       }
       c++
       i--
