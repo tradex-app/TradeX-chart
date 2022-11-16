@@ -6,7 +6,7 @@ TradeX-chart is a trade chart written in plain (vanilla) JavaScript with minimal
 
 It uses an event driven state managed architecture, providing a two way API to give you complete control over the chart.
 
-![](assets/20220927_130009_Screenshot_20220927_125708.png)
+![](assets/EMA.png)
 
 ## Table of Contents
 
@@ -94,7 +94,7 @@ chart.start(chart.getModID())
 
 ## Documentation
 
-Documentation can be found under: 
+Documentation can be found under:
 [Documentation](/docs/documentation.md)
 [API](https://tradex-app.github.io/TradeX-chart/api/)
 
@@ -116,6 +116,12 @@ Documentation can be found under:
   * OHLC
   * TODO: area
 * Chart pan / scroll via mouse or cursor keys
+
+## Support
+
+For the latest news on TradeX-chart, feedback, feature requests, and community, join us over on Discord.
+
+[TradeX Discord](https://discord.gg/XnfZudwpfg)
 
 ## Contributing
 

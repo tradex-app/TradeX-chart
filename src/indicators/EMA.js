@@ -139,7 +139,7 @@ const calcParams = [20]
     }
 
     // account for "missing" entries because of indicator calculation
-    let x = 2
+    let x = 3
     let o = this.Timeline.rangeScrollOffset;
     let c = range.indexStart - (range.data.length - this.overlay.data.length) - o
     let i = range.Length + o + x

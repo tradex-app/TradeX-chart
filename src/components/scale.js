@@ -134,9 +134,9 @@ export default class ScaleBar {
     // create controller and use 'on' method to receive input events 
     this.#controller = new InputController(canvas, {disableContextMenu: false});
     this.#controller.setCursor("ns-resize")
-    this.#controller.on("drag", this.onDrag.bind(this));
-    this.#controller.on("enddrag", this.onDragDone.bind(this));
-    this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
+    // this.#controller.on("drag", this.onDrag.bind(this));
+    // this.#controller.on("enddrag", this.onDragDone.bind(this));
+    // this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
 
     this.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMove(e) })
     this.on(`${this.#parent.ID}_mouseout`, (e) => { this.eraseCursorPrice() })
