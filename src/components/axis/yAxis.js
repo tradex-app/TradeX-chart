@@ -327,30 +327,32 @@ export default class yAxis extends Axis {
 
     // }
 
-      // try to find a nice number to round to
-      let niceNumber = Math.pow( 10 , Math.ceil( Math.log10( yGridSize ) ) );
-      if ( yGridSize < 0.25 * niceNumber ) niceNumber = 0.25 * niceNumber;
-      else if ( yGridSize < 0.5 * niceNumber ) niceNumber = 0.5 * niceNumber;
+    // try to find a nice number to round to
+    let niceNumber = Math.pow( 10 , Math.ceil( Math.log10( yGridSize ) ) );
+    if ( yGridSize < 0.25 * niceNumber ) niceNumber = 0.25 * niceNumber;
+    else if ( yGridSize < 0.5 * niceNumber ) niceNumber = 0.5 * niceNumber;
 
-      // find next largest nice number above yStart
-      var yStartRoundNumber = Math.ceil( min/niceNumber ) * niceNumber;
-      // find next lowest nice number below yEnd
-      var yEndRoundNumber = Math.floor( max/niceNumber ) * niceNumber;
+    // find next largest nice number above yStart
+    var yStartRoundNumber = Math.ceil( min/niceNumber ) * niceNumber;
+    // find next lowest nice number below yEnd
+    var yEndRoundNumber = Math.floor( max/niceNumber ) * niceNumber;
 
-      let pos = this.height,
-          step$ = (yEndRoundNumber - yStartRoundNumber) / niceNumber,
-          stepP = this.height / step$,
-          step = this.countDigits(step$),
-          nice;
+    let pos = this.height,
+        step$ = (yEndRoundNumber - yStartRoundNumber) / niceNumber,
+        stepP = this.height / step$,
+        step = this.countDigits(step$),
+        nice;
 
-      for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
-      {
-        digits = this.countDigits(y)
-        nice = this.niceValue(digits, decimals, step)
-        scaleGrads.push([nice, round(pos), digits])
+    for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
+    {
+      digits = this.countDigits(y)
+      nice = this.niceValue(digits, decimals, step)
+      scaleGrads.push([nice, round(pos), digits])
 
-        pos -= stepP
-      }
+      pos -= stepP
+    }
+    scaleGrads.shift()
+    scaleGrads.pop()
 
     return scaleGrads
   }
