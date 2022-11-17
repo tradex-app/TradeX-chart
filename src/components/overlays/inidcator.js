@@ -65,6 +65,8 @@ export default class indicator {
   }
 
   get core() { return this.#core }
+  get parent() { return this.#parent }
+  get chart() { return this.parent.parent.parent }
   get config() { return this.#config }
   get target() { return this.#target }
   get scene() { return this.#scene }

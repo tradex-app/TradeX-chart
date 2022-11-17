@@ -100,10 +100,9 @@ export default class Chart {
   #layerCursor
   #layersOnChart
   #layersTools = new Map()
-  #layerWidth
   
   #chartGrid
-  #chartIndicators = new Map()
+  #chartOverlays = new Map()
   #chartStreamCandle
   #chartTools = new Map()
 
@@ -172,9 +171,10 @@ export default class Chart {
   get config() { return this.#core.config }
   get scrollPos() { return this.#core.scrollPos }
   get bufferPx() { return this.#core.bufferPx }
-  set layerWidth(w) { this.#layerWidth = w }
-  get layerWidth() { return this.#layerWidth }
+  set layerWidth(w) { this.#Graph.layerWidth = w }
+  get layerWidth() { return this.#Graph.layerWidth }
   get axes() { return "x" }
+  get Legends() { return this.#Legends }
 
   init(options) {
 
@@ -237,7 +237,7 @@ export default class Chart {
     this.createGraph()
 
     // create and start on chart indicators
-    this.addIndicators(this.mediator.api.onChart)
+    this.addOverlays(this.mediator.api.onChart)
 
 
     const data = {inputs: {}}
@@ -473,13 +473,6 @@ export default class Chart {
       overlays.set("volume", volume)
     }
 
-    // add the chart overlays
-    // overlays = [
-    //   defaultOverlays[0], 
-    //   ...overlays,
-    //   defaultOverlays[1]
-    // ]
-
     overlays = Array.from(overlays)
 
     this.#Graph = new Graph(this, this.#elViewport, overlays)
@@ -491,18 +484,17 @@ export default class Chart {
     this.#elCanvas = this.#Graph.viewport.scene.canvas
   }
 
-  addIndicators(indicators) {
-    for (let i of indicators) {
-      const overlay = {fixed: false, required: false}
-      if (i.type in this.core.TALib) {
-        overlay.class = this.core.indicators[i.type].ind
-        overlay.params = {overlay: i}
-        this.#chartIndicators.set(i.name, overlay)
-        this.#Graph.addOverlays(Array.from(this.#chartIndicators))
+  addOverlays(overlays) {
+    for (let o of overlays) {
+      const config = {fixed: false, required: false}
+      if (o.type in this.core.TALib) {
+        config.class = this.core.indicators[o.type].ind
+        config.params = {overlay: o}
+        this.#chartOverlays.set(o.name, config)
       }
     }
+    this.#Graph.addOverlays(Array.from(this.#chartOverlays))
   }
-
 
   addTool(tool) {
     let { layerConfig } = this.layerConfig()

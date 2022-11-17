@@ -869,7 +869,7 @@ constructor (mediator, config={}) {
    */
   setRange(start=0, end=this.rangeLimit) {
     const max = (this.config?.maxCandles)? this.config.maxCandles : 
-      (this.Chart?.layerWidth) ? this.Chart.layerWidth : undefined
+      (this.Chart?.layerWidth) ? this.Chart.layerWidth : this.Chart.width
     this.#range.set(start, end, max)
   }
 

@@ -57,6 +57,7 @@ const calcParams = [20]
     this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
+    this.addLegend()
   }
 
   get ID() { return this.#ID }
@@ -65,13 +66,29 @@ const calcParams = [20]
   get onChart() { return this.#onChart }
   get plots() { return this.#plots }
 
-  calcIndicator(input) {
-    this.overlay.data = this.TAlib.Indicators.EMA.ema(input)
+  addLegend() {
+      let legend = {
+        id: this.#shortName,
+        title: this.#shortName,
+        type: this.#shortName
+      }
+      this.chart.Legends.add(legend)
+    }
+
+  updateLegend() {
+    this.parent.Legends.update()
   }
+    
+  // regeneratePlots (params) {
+  //   return params.map(p => {
+  //     return { key: `ema${p}`, title: `EMA${p}: `, type: 'line' }
+  //   })
+  // }
 
   regeneratePlots (params) {
-    return params.map(p => {
-      return { key: `ema${p}`, title: `EMA${p}: `, type: 'line' }
+    return params.map((_, index) => {
+      const num = index + 1
+      return { key: `ema${num}`, title: `EMA${num}: `, type: 'line' }
     })
   }
 

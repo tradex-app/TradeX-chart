@@ -40,6 +40,9 @@ export default class graph {
   #elViewport
   #elLegends
 
+  #layerWidth
+
+
   constructor(parent, elViewport, overlays) {
 
     this.#parent = parent
@@ -63,6 +66,8 @@ export default class graph {
   set height(h) { this.setHeight(h) }
   get height() { return this.#elChart.clientHeight }
   get dimensions() { return DOM.elementDimPos(this.#elChart) }
+  set layerWidth(w) { this.#layerWidth = w }
+  get layerWidth() { return this.#layerWidth }
   get stateMachine() { return this.#parent.stateMachine }
   set state(s) { this.#core.setState(s) }
   get state() { return this.#core.getState() }
