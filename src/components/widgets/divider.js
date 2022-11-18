@@ -158,7 +158,7 @@ export default class Divider {
   }
 
   onMouseDown(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.emit(`${this.ID}_mousedown`, this.#cursorPos)
     this.emit(`divider_mousedown`, {
       id: this.ID,
@@ -169,7 +169,7 @@ export default class Divider {
   }
 
   onMouseUp(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.emit(`${this.ID}_mouseup`, this.#cursorPos)
     this.emit(`divider_mouseup`, {
       id: this.ID,

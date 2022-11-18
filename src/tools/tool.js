@@ -139,7 +139,7 @@ export default class Tool {
 
   onMouseMove(e) {
     // this.#cursorPos = [e.layerX, e.layerY]
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
 
     this.emit("tool_mousemove", this.#cursorPos)
 

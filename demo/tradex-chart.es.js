@@ -3198,7 +3198,7 @@ class Tool {
 
   onMouseMove(e) {
     // this.#cursorPos = [e.layerX, e.layerY]
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)];
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
 
     this.emit("tool_mousemove", this.#cursorPos);
 
@@ -7561,20 +7561,20 @@ class Chart {
   }
 
   onMouseMove(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)];
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.emit("chart_mousemove", this.#cursorPos);
     this.updateLegends();
   }
 
   onMouseEnter(e) {
     this.#cursorActive = true;
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)];
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.emit(`${this.ID}_mouseenter`, this.#cursorPos);
   }
 
   onMouseOut(e) {
     this.#cursorActive = false;
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)];
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.emit(`${this.ID}_mouseout`, this.#cursorPos);
   }
 
@@ -8438,20 +8438,20 @@ class OffChart {
 
   onMouseMove(e) {
     // this.#cursorPos = [e.layerX, e.layerY]
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)];
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.emit(`${this.ID}_mousemove`, this.#cursorPos);
     this.updateLegends();
   }
 
   onMouseEnter(e) {
     this.#cursorActive = true;
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)];
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.emit(`${this.ID}_mouseenter`, this.#cursorPos);
   }
 
   onMouseOut(e) {
     this.#cursorActive = false;
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)];
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.emit(`${this.ID}_mouseout`, this.#cursorPos);
   }
 
@@ -10159,7 +10159,7 @@ class Divider {
   }
 
   onMouseDown(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)];
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.emit(`${this.ID}_mousedown`, this.#cursorPos);
     this.emit(`divider_mousedown`, {
       id: this.ID,
@@ -10170,7 +10170,7 @@ class Divider {
   }
 
   onMouseUp(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)];
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.emit(`${this.ID}_mouseup`, this.#cursorPos);
     this.emit(`divider_mouseup`, {
       id: this.ID,

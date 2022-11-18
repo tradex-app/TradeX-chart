@@ -175,15 +175,6 @@ export default class OffChart {
     
     this.mount(this.#elOffChart)
 
-    // Legends - to display indicator overlay Title, inputs and options
-    let offChartLegend = {
-      id: options.offChart.type,
-      title: options.offChart.name,
-      type: options.offChart.type
-    }
-    this.#Legends = new Legends(this.#elLegends, this)
-    this.#Legends.add(offChartLegend)
-
     // api - functions / methods, calculated properties provided by this module
     const api = {...this.mediator.api}
     api.parent = this
@@ -210,6 +201,17 @@ export default class OffChart {
 
     // prepare layered canvas
     this.createGraph()
+
+    // Legends - to display indicator overlay Title, inputs and options
+    let instance = this.#overlayIndicator
+    let offChartLegend = {
+      id: this.options.offChart.type,
+      title: this.options.offChart.name,
+      type: this.options.offChart.type,
+      source: instance.legendInputs.bind(instance)
+    }
+    this.#Legends = new Legends(this.#elLegends, this)
+    this.#Legends.add(offChartLegend)
 
     // Y Axis - Price Scale
     this.#Scale.on("started",(data)=>{this.log(`OffChart scale started: ${data}`)})
@@ -279,20 +281,20 @@ export default class OffChart {
 
   onMouseMove(e) {
     // this.#cursorPos = [e.layerX, e.layerY]
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.emit(`${this.ID}_mousemove`, this.#cursorPos)
-    this.updateLegends()
+    // this.updateLegends()
   }
 
   onMouseEnter(e) {
     this.#cursorActive = true
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.emit(`${this.ID}_mouseenter`, this.#cursorPos)
   }
 
   onMouseOut(e) {
     this.#cursorActive = false
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.emit(`${this.ID}_mouseout`, this.#cursorPos)
   }
 
@@ -409,22 +411,6 @@ export default class OffChart {
 
     defaultOverlays.splice(1, 0, indicator)
 
-    // let overlays = new Map(defaultOverlays)
-
-    // if (overlays.has("volume")) {
-    //   const volume = overlays.get("volume")
-    //   volume.params.maxVolumeH = this.#theme?.volume?.Height || VolumeStyle.ONCHART_VOLUME_HEIGHT
-    //   overlays.set("volume", volume)
-    // }
-
-    // add the chart overlays
-    // overlays = [
-    //   defaultOverlays[0], 
-    //   ...overlays,
-    //   defaultOverlays[1]
-    // ]
-
-    // overlays = Array.from(overlays)
     const overlays = defaultOverlays
 
     this.#Graph = new Graph(this, this.#elViewport, overlays)
@@ -446,29 +432,6 @@ export default class OffChart {
     return {width, height, layerConfig}
   }
 
-  layersOnRow(layerConfig) {
-    // let l = []
-
-    // for (let i = 0; i < this.#overlay.length; i++) {
-    //   l[i] = new CEL.Layer()
-    // }
-    // return l
-    return new CEL.Layer(layerConfig)
-  }
-
-  addLayersOnChart() {
-    // for (let i = 0; i < this.#layersIndicator.length; i++) {
-    //   this.#viewport.addLayer(this.#layersIndicator[i])
-    // }
-    this.#viewport.addLayer(this.#layersIndicator)
-  }
-
-  layerStream() {
-    const {width, height, layerConfig} = this.layerConfig()
-    this.#layerStream = new CEL.Layer(layerConfig);
-    this.#viewport.addLayer(this.#layerStream)
-  }
-
   draw(range=this.range, update=false) {
     this.#Graph.draw(range, update)
   }
@@ -484,25 +447,16 @@ export default class OffChart {
     this.#Scale.draw()
   }
 
-  updateLegends(pos=this.#cursorPos) {
+  /**
+   * Update chart and indicator legends
+   * @param {array} pos - cursor position x, y, defaults to current cursor position
+   * @param {array} candle - OHLCV
+   */
+   updateLegends(pos=this.#cursorPos, candle=false) {
     const legends = this.#Legends.list
-    const index = this.#Time.xPos2Index(pos[0])
-    const offset = this.range.data.length - this.#overlayIndicator.overlay.data.length
-    const entry = this.#overlayIndicator.overlay.data[index - offset]
 
-    if (entry !== undefined) {
-      const inputs = {}
-
-      for (let i = 0; i < this.#overlayIndicator.plots.length; i++) {
-        let plot = this.#overlayIndicator.plots[i]
-        // first entry value is expected to be timestamp, so skip it
-        inputs[plot.key] = this.#Scale.nicePrice(entry[i + 1])
-      }
-  
-      for (const legend in legends) {
-        let colour = this.#overlayIndicator.style.strokeStyle
-        this.#Legends.update(legend, {inputs: inputs, colours: [colour]})
-      }
+    for (const legend in legends) {
+      this.#Legends.update(legend, {pos, candle})
     }
   }
 

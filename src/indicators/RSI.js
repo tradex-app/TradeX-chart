@@ -8,6 +8,7 @@ import {
   YAXIS_TYPES
 } from "../definitions/chart";
 import { round } from "../utils/number";
+import { isArray } from "../utils/typeChecks";
 import { uid } from "../utils/utilities"
 
 const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
@@ -77,6 +78,29 @@ export default class RSI extends indicator {
   get shortName() { return this.#shortName }
   get onChart() { return this.#onChart }
   get plots() { return this.#plots }
+
+  addLegend() {
+    let legend = {
+      id: this.#shortName,
+      title: this.#shortName,
+      type: this.#shortName,
+      source: this.legendInputs.bind(this)
+    }
+    this.chart.Legends.add(legend)
+  }
+
+  legendInputs(pos=this.chart.cursorPos, candle) {
+    const inputs = {}
+    const index = this.Timeline.xPos2Index(pos[0])
+    let c = index  - (this.range.data.length - this.overlay.data.length)
+    let colours = [this.style.strokeStyle]
+
+    inputs.RSI_1 = this.Scale.nicePrice(this.overlay.data[c][1])
+
+    // if (isArray(this.chart.streamCandle)) value =
+
+    return {inputs, colours}
+  }
 
   regeneratePlots (params) {
     return params.map((_, index) => {
@@ -207,4 +231,5 @@ export default class RSI extends indicator {
 
     this.target.viewport.render();
   }
+
 }

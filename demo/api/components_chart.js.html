@@ -347,20 +347,20 @@ export default class Chart {
   }
   
   onMouseMove(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.emit("chart_mousemove", this.#cursorPos)
     this.updateLegends()
   }
 
   onMouseEnter(e) {
     this.#cursorActive = true
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.emit(`${this.ID}_mouseenter`, this.#cursorPos)
   }
 
   onMouseOut(e) {
     this.#cursorActive = false
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.emit(`${this.ID}_mouseout`, this.#cursorPos)
   }
 

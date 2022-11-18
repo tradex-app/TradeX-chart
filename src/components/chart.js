@@ -194,7 +194,8 @@ export default class Chart {
     let chartLegend = {
       id: "chart",
       title: this.#title,
-      type: "chart"
+      type: "chart",
+      source: this.legendInputs.bind(this)
     }
     this.#Legends = new Legends(this.#elLegends, this)
     this.#Legends.add(chartLegend)
@@ -328,20 +329,20 @@ export default class Chart {
   }
 
   onMouseMove(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.emit("chart_mousemove", this.#cursorPos)
-    this.updateLegends()
+    // this.updateLegends()
   }
 
   onMouseEnter(e) {
     this.#cursorActive = true
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.emit(`${this.ID}_mouseenter`, this.#cursorPos)
   }
 
   onMouseOut(e) {
     this.#cursorActive = false
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.emit(`${this.ID}_mouseout`, this.#cursorPos)
   }
 
@@ -597,21 +598,15 @@ export default class Chart {
     this.#volumePrecision = volumePrecision
   }
 
-  /**
-   * Update chart and indicator legends
-   * @param {array} pos - cursor position x, y, defaults to current cursor position
-   * @param {array} candle - OHLCV
-   */
-  updateLegends(pos=this.#cursorPos, candle=false) {
-
-    const legends = this.#Legends.list
+  legendInputs(pos=this.cursorPos, candle) {
     const inputs = {}
       let ohlcv = this.#Time.xPosOHLCV(pos[0])
       let colours = []
 
+    // if cursor is out of data history return streaming candle
     if (this.#Stream && ohlcv[4] === null) ohlcv = candle
 
-    // TODO: get candle colours from config / theme
+    // get candle colours from config / theme
     if (ohlcv[4] >= ohlcv[1]) colours = new Array(5).fill(this.theme.candle.UpWickColour)
     else colours = new Array(5).fill(this.theme.candle.DnWickColour)
 
@@ -621,8 +616,20 @@ export default class Chart {
     inputs.C = this.#Scale.nicePrice(ohlcv[4])
     inputs.V = this.#Scale.nicePrice(ohlcv[5])
 
+    return {inputs, colours}
+  }
+
+  /**
+   * Update chart and indicator legends
+   * @param {array} pos - cursor position x, y, defaults to current cursor position
+   * @param {array} candle - OHLCV
+   */
+  updateLegends(pos=this.#cursorPos, candle=false) {
+
+    const legends = this.#Legends.list
+
     for (const legend in legends) {
-      this.#Legends.update(legend, {inputs: inputs, colours: colours})
+      this.#Legends.update(legend, {pos, candle})
     }
   }
 

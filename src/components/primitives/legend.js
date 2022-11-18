@@ -48,7 +48,7 @@ export default class Legends {
     const styleLegend = `width: calc(100% - ${this.#core.scaleW}px - 1em); margin: .5em 0 1em 1em; ${theme.legend.text}; color: ${theme.legend.colour}; text-align: left;`
       let styleLegendTitle = "margin-right: 1em; white-space: nowrap;"
     const styleInputs = "display: inline; margin-left: -1em;"
-    const styleControls = "float: right; margin: 0.5em; opacity:0"
+    const styleControls = "float: right; margin: 0 0.5em 0; opacity:0"
     const mouseOver = "onmouseover='this.style.opacity=1'"
     const mouseOut = "onmouseout='this.style.opacity=0'"
 
@@ -110,13 +110,14 @@ export default class Legends {
 
     options.id = uid(options?.id || "legend")
     options.type = options?.type || "overlay"
+    // options.source
 
     const html = this.buildLegend(options)
     const elem = DOM.htmlToElement(html)
 
     this.#targetEl.appendChild(elem)
     const legendEl = DOM.findByID(options.id)
-    this.#list[options.id] = {el: legendEl, type: options.type}
+    this.#list[options.id] = {el: legendEl, type: options.type, source: options?.source}
 
     this.#controlsList = DOM.findBySelectorAll(`#${options.id} .controls .control`)
     for (let c of this.#controlsList) {
@@ -146,11 +147,13 @@ export default class Legends {
     return true
   }
 
+  // remove "data" as callback will provide this
   update(id, data) {
     if (!(isObject(data)) 
     || !(id in this.#list)) return false
 
-    const html = this.buildInputs(data)
+    let source = this.#list[id].source(data.pos)
+    const html = this.buildInputs(source)
     const el = DOM.findBySelector(`#${id} dl`)
     el.innerHTML = html
   }

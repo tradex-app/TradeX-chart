@@ -77,6 +77,10 @@ export default class xAxis extends Axis {
     return (this.range.rangeIndex(ts) * this.candleW) + (this.candleW * 0.5)
   }
 
+  t2Index(ts) {
+    return this.range.rangeIndex(ts)
+  }
+
   t2Pixel(ts) {
     return this.xPos(ts)
   }
@@ -89,8 +93,7 @@ export default class xAxis extends Axis {
   pixel2Index(x) {
     let o = this.core.rangeScrollOffset;
     let c = this.range.indexStart - o 
-    return c + 1
-      + Math.floor((x + (this.core.scrollPos * -1)) / this.candleW) 
+    return c + 1 + Math.floor((x + (this.core.scrollPos * -1)) / this.candleW) 
   }
 
   pixelOHLCV(x) {

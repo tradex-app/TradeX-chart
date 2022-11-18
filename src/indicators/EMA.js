@@ -67,18 +67,32 @@ const calcParams = [20]
   get plots() { return this.#plots }
 
   addLegend() {
-      let legend = {
-        id: this.#shortName,
-        title: this.#shortName,
-        type: this.#shortName
-      }
-      this.chart.Legends.add(legend)
+    let legend = {
+      id: this.#shortName,
+      title: this.#shortName,
+      type: this.#shortName,
+      source: this.legendInputs.bind(this)
     }
+    this.chart.Legends.add(legend)
+  }
 
   updateLegend() {
     this.parent.Legends.update()
   }
-    
+  
+  legendInputs(pos=this.chart.cursorPos, candle) {
+    const inputs = {}
+    const index = this.Timeline.xPos2Index(pos[0])
+    let c = index  - (this.range.data.length - this.overlay.data.length)
+    let colours = [this.style.strokeStyle]
+
+    inputs.EMA_1 = this.Scale.nicePrice(this.overlay.data[c][1])
+
+    // if (isArray(this.chart.streamCandle)) value =
+
+    return {inputs, colours}
+  }
+
   // regeneratePlots (params) {
   //   return params.map(p => {
   //     return { key: `ema${p}`, title: `EMA${p}: `, type: 'line' }
@@ -151,7 +165,7 @@ const calcParams = [20]
     const plots = []
     const offset = this.xAxis.smoothScrollOffset || 0
     const plot = {
-      x: (width * 0.5) + 2 + offset - (width * 2),
+      x: (width * 0.5) + 2 + offset - width,
       w: width,
     }
 
@@ -178,5 +192,6 @@ const calcParams = [20]
 
     this.target.viewport.render();
   }
+
 }
 
