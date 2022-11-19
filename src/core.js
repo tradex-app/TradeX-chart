@@ -16,6 +16,7 @@ import Theme from "./helpers/theme"
 import WebWorker from "./helpers/webWorkers"
 import Indicators from './definitions/indicators'
 import * as Time from './utils/time'
+import { limit } from './utils/number'
 import { interval2MS, isTimeFrame, SECOND_MS } from "./utils/time"
 
 
@@ -45,7 +46,7 @@ import {
   STREAM_UPDATE
 } from './definitions/core'
 
-import { MINCANDLES, YAXIS_BOUNDS } from "./definitions/chart"
+import { LIMITFUTURE, MINCANDLES, YAXIS_BOUNDS } from "./definitions/chart"
 
 import { GlobalStyle } from './definitions/style'
 import { precision } from "./utils/number"
@@ -871,6 +872,35 @@ constructor (mediator, config={}) {
     const max = (this.config?.maxCandles)? this.config.maxCandles : 
       (this.Chart?.layerWidth) ? this.Chart.layerWidth : this.Chart.width
     this.#range.set(start, end, max)
+  }
+
+  jumpToIndex(start, nearest=true, centre=true) {
+    let length = this.range.Length
+    let end = start + length
+
+    if (nearest) start = limit(start, 0, this.range.dataLength)
+    if (centre) {
+      start -= length / 2
+      end -= length / 2
+    }
+    this.setRange(start, end)
+  }
+
+  jumpToTS(ts, nearest=true, centre=true) {
+    let start = this.Timeline.xAxis.t2Index(ts)
+    this.jumpToIndex(start, nearest=true, centre=true)
+  }
+
+  jumpToStart(nearest=true, centre=true) {
+    this.jumpToIndex(0, nearest=true, centre=true)
+  }
+
+  jumpToEnd(nearest=true, centre=true) {
+    let end = this.range.dataLength - this.range.Length
+
+    if (centre) end += this.range.Length / 2
+
+    this.jumpToIndex(end, nearest=true, centre=false)
   }
 
   /**

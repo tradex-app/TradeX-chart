@@ -11,6 +11,7 @@ import { XAxisStyle } from "../definitions/style"
 import { drawTextBG } from "../utils/canvas"
 import { InputController } from "../input/controller"
 import stateMachineConfig from "../state/state-time"
+import { fwdEnd, rwdStart } from "../definitions/icons"
 
 import {
   BUFFERSIZE,
@@ -29,15 +30,22 @@ export default class Timeline {
   #xAxis
 
   #elViewport
-  #elViewTotal
+  #ElNavigation
 
   #viewport
-  #viewTotal
+  #navigation
+  #navList
   #layerLabels
   #layerOverlays
   #layerCursor
 
   #controller
+
+  #icons = {
+    width: 20,
+    height: 20,
+    fill: "#aaa"
+  }
 
   constructor (mediator, options) {
 
@@ -74,7 +82,7 @@ export default class Timeline {
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
   get viewport() { return this.#viewport }
-  get viewTotal() { return this.#viewTotal }
+  get navigation() { return this.#navigation }
   get range() { return this.#core.range }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elTime) }
@@ -95,17 +103,34 @@ export default class Timeline {
 
     const api = this.#mediator.api
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .viewport`)
-    this.#elViewTotal = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .viewTotal`)
+    this.#ElNavigation = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation`)
+    this.#navList = DOM.findBySelectorAll(`#${api.id} .${CLASS_TIME} .navigation .icon`)
+
+    for (let i of this.#navList) {
+      let svg = i.querySelector('svg');
+      svg.style.width = `${this.#icons.width}px`
+      svg.style.height = `${this.#icons.height}px`
+      svg.style.fill = `${this.#icons.fill}`
+
+      i.addEventListener('click', this.onMouseClick.bind(this))
+    }
   }
 
   defaultNode() {
-    // const node = `
-    //   <canvas width="" height="${this.mediator.api.timeH}"></canvas>
-    // `
+    const navStyle = ``
+    
     const node = `
     <div class="viewport"></div>
-    <div class="viewTotal"></div>
+    <div class="navigation" style="${navStyle}">${this.navigationNode()}</div>
   `
+    return node
+  }
+
+  navigationNode() {
+    const node = `
+    <span id="rwdStart" class="icon">${rwdStart}</span>
+    <span id="fwdEnd" class="icon">${fwdEnd}</span>
+    `
     return node
   }
 
@@ -117,7 +142,7 @@ export default class Timeline {
   setDimensions(dim) {
     const buffer = this.config.buffer || BUFFERSIZE
     const width = dim.w - this.#core.Chart.scale.width
-    const height = this.height
+    const height = this.height / 2
     const layerWidth = Math.round(width * ((100 + buffer) * 0.01))
 
     this.#viewport.setSize(width, this.height)
@@ -174,6 +199,19 @@ export default class Timeline {
     this.#mediator.emit(topic, data)
   }
 
+  onMouseClick(e) {
+    switch (e.currentTarget.id) {
+      case "fwdEnd":
+        this.ffwdEnd()
+        break
+      case "rwdStart":
+        this.rwdStart()
+        break
+      default:
+        break
+    }
+  }
+
   // -----------------------
 
   xPos(time) { return this.#xAxis.xPos(time) }
@@ -199,7 +237,7 @@ export default class Timeline {
     // create viewport
     this.#viewport = new CEL.Viewport({
       width: width,
-      height: height,
+      height: height / 2,
       container: this.#elViewport
     });
 
@@ -260,6 +298,16 @@ export default class Timeline {
   resize(width=this.width, height=this.height) {
     // adjust element, viewport and layers
     this.setDimensions({w: width, h: height})
+  }
+
+  ffwdEnd() {
+    this.core.jumpToEnd()
+    console.log("fwdEnd")
+  }
+
+  rwdStart() {
+    this.core.jumpToStart()
+    console.log("rwdStart")
   }
 
 }
