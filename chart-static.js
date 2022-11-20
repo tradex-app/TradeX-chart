@@ -41,9 +41,9 @@ const config = {
     },
     chart: {
       Background: "#141414",
-      BorderColour: "#666",
-      GridColour: "#333",
-      TextColour: "#ccc"
+      BorderColour: "#606060",
+      GridColour: "#303030",
+      TextColour: "#c0c0c0"
     },
     onChart: {
 

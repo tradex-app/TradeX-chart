@@ -7,11 +7,11 @@ import Timeline from './timeline'
 import CEL from "../components/primitives/canvas"
 import Chart from "./chart"
 import OffChart from "./offChart"
-import s from "./overlays"
 import chartGrid from "./overlays/chart-grid"
 import stateMachineConfig from "../state/state-mainPane"
 import { InputController, Keys } from "../input/controller"
-
+import { isNumber } from "../utils/typeChecks"
+import { debounce, throttle } from "../utils/utilities"
 
 import {
   CLASS_TIME,
@@ -30,8 +30,7 @@ import {
   ROWMINHEIGHT,
   OFFCHARTDEFAULTHEIGHT,
 } from "../definitions/chart"
-import { isNumber } from "../utils/typeChecks"
-import { timestampDiff } from "../utils/time"
+
 
 const STYLE_ROWS = "width:100%; min-width:100%;"
 const STYLE_ROW = "position: relative; overflow: hidden;"
@@ -227,7 +226,10 @@ export default class MainPane {
 
     this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    this.#controller.on("drag", this.onChartDrag.bind(this));
+    this.#controller.on("drag", debounce(this.onChartDrag, 1, this, true));
+    // this.#controller.on("drag", throttle(this.onChartDrag, 10, this, true));
+    // this.#controller.on("drag", this.onChartDrag.bind(this));
+
     this.#controller.on("enddrag", this.onChartDragDone.bind(this));
     this.#controller.on("keydown", this.onChartKeyDown.bind(this))
     this.#controller.on("keyup", this.onChartKeyUp.bind(this))

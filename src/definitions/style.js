@@ -171,3 +171,33 @@ export const defaultTheme = {
   }
 }
 
+const style = `
+<style>
+  .tradeXchart {}
+  .tradeXchart .tradeXtime .navigation { 
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 2px;
+  }
+  .tradeXchart .tradeXtime .navigation .icon { 
+    flex-basis: 20px;
+   }
+  .tradeXchart .tradeXtime .navigation #tScrollBar { 
+    height: 20px; 
+    border: 1px solid; 
+    border-radius: 3px; 
+    flex-basis: 100%;
+    overflow: hidden;
+  }
+  .tradeXchart .tradeXtime .navigation #tScrollBar .handle { 
+    height: 18px; 
+    border-radius: 2px; 
+    margin: 1px;
+  }
+
+</style>
+`
+export default style
+

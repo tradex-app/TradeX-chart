@@ -148,7 +148,7 @@ export default class Colour {
         hsla;
     switch (l) {
       case 4 :
-        rgba = [hex[1], hex[2], hex[3], "ff"]
+        rgba = [`${hex[1]}${hex[1]}`, `${hex[2]}${hex[2]}`, `${hex[3]}${hex[3]}`, "ff"]
         break;
       case 7 :
         rgba = [hex.substr(1,2), hex.substr(3,2), hex.substr(5,2), "ff"]

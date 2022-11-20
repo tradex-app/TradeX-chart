@@ -5,13 +5,15 @@
 import DOM from "../utils/DOM"
 import xAxis from "./axis/xAxis"
 import CEL from "./primitives/canvas"
-import { getTextRectWidth } from "../utils/canvas"
 import { CLASS_TIME } from "../definitions/core"
 import { XAxisStyle } from "../definitions/style"
-import { drawTextBG } from "../utils/canvas"
 import { InputController } from "../input/controller"
 import stateMachineConfig from "../state/state-time"
 import { fwdEnd, rwdStart } from "../definitions/icons"
+import Colour from "../utils/colour"
+import { drawTextBG, getTextRectWidth } from "../utils/canvas"
+import { debounce } from "../utils/utilities"
+
 
 import {
   BUFFERSIZE,
@@ -35,6 +37,8 @@ export default class Timeline {
   #viewport
   #navigation
   #navList
+  #navScrollBar
+  #navScrollHandle
   #layerLabels
   #layerOverlays
   #layerCursor
@@ -105,6 +109,8 @@ export default class Timeline {
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .viewport`)
     this.#ElNavigation = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation`)
     this.#navList = DOM.findBySelectorAll(`#${api.id} .${CLASS_TIME} .navigation .icon`)
+    this.#navScrollBar = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation #tScrollBar`)
+    this.#navScrollHandle = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation .handle`)
 
     for (let i of this.#navList) {
       let svg = i.querySelector('svg');
@@ -112,12 +118,13 @@ export default class Timeline {
       svg.style.height = `${this.#icons.height}px`
       svg.style.fill = `${this.#icons.fill}`
 
-      i.addEventListener('click', this.onMouseClick.bind(this))
+      // TODO: removeEventListener on end()
+      i.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
     }
   }
 
   defaultNode() {
-    const navStyle = ``
+    const navStyle = `width: calc(100% - ${this.core.scaleW}px);`
     
     const node = `
     <div class="viewport"></div>
@@ -127,8 +134,16 @@ export default class Timeline {
   }
 
   navigationNode() {
+    const theme = this.core.theme
+    const handleColour = new Colour(theme.chart.BorderColour)
+    const scrollBarStyle = ` border: 1px solid ${theme.chart.BorderColour};`
+    const handleStyle = ` background: ${handleColour.hex}44;`
     const node = `
     <span id="rwdStart" class="icon">${rwdStart}</span>
+    <span id="tScrollBar" style="${scrollBarStyle}">
+      <div class="viewport"></div>
+      <div class="handle" style="${handleStyle}"></div>
+    </span>
     <span id="fwdEnd" class="icon">${fwdEnd}</span>
     `
     return node
@@ -155,10 +170,10 @@ export default class Timeline {
   }
 
   start() {
-    this.emit("started")
-
     // prepare layered canvas
     this.createViewport()
+    // macro timeline scroll bar
+    this.onSetRange()
     // draw the Timeline
     this.#xAxis.initXAxisGrads()
     this.draw()
@@ -177,6 +192,7 @@ export default class Timeline {
     this.#viewport.destroy()
     this.#controller = null
     this.off("main_mousemove", this.drawCursorTime)
+    this.off("setRange", this.onSetRange)
   }
 
   eventsListen() {
@@ -184,7 +200,8 @@ export default class Timeline {
     // create controller and use 'on' method to receive input events 
     this.#controller = new InputController(canvas, {disableContextMenu: false});
 
-    this.on("main_mousemove", (e) => { this.drawCursorTime(e) })
+    this.on("main_mousemove", this.drawCursorTime.bind(this))
+    this.on("setRange", this.onSetRange.bind(this))
   }
 
   on(topic, handler, context) {
@@ -200,7 +217,8 @@ export default class Timeline {
   }
 
   onMouseClick(e) {
-    switch (e.currentTarget.id) {
+    const id = e?.currentTarget?.id || e.target.parentElement.id
+    switch (id) {
       case "fwdEnd":
         this.ffwdEnd()
         break
@@ -210,6 +228,18 @@ export default class Timeline {
       default:
         break
     }
+  }
+
+  onSetRange() {
+    let start = this.range.indexStart
+    let end = this.range.indexEnd
+    let scrollBarW = this.#navScrollBar.clientWidth
+    let rangeW = this.range.dataLength + this.range.limitFuture + this.range.limitPast
+    let ratio = scrollBarW / rangeW
+    let handleW = this.range.Length * ratio
+    let pos = ((start + this.range.limitPast) * ratio)
+    this.#navScrollHandle.style.width = `${handleW}px`
+    this.#navScrollHandle.style.marginLeft = `${pos}px`
   }
 
   // -----------------------

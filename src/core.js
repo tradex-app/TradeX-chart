@@ -15,6 +15,7 @@ import Stream from './helpers/stream'
 import Theme from "./helpers/theme"
 import WebWorker from "./helpers/webWorkers"
 import Indicators from './definitions/indicators'
+import style from './definitions/style'
 import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { interval2MS, isTimeFrame, SECOND_MS } from "./utils/time"
@@ -323,6 +324,9 @@ constructor (mediator, config={}) {
         }
       })();
     }
+
+    // add global stylesheet for all charts
+    if (TradeXchart.#cnt == 0) document.head.insertAdjacentHTML("beforeend", style)
 
     const cnt = ++TradeXchart.#cnt
 

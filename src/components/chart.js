@@ -3,6 +3,7 @@
 // Providing: the playground for price movements, indicators and drawing tools
 
 import DOM from "../utils/DOM"
+import { limit } from "../utils/number"
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import ScaleBar from "./scale"
 import Graph from "./graph"
@@ -599,12 +600,18 @@ export default class Chart {
   }
 
   legendInputs(pos=this.cursorPos, candle) {
-    const inputs = {}
-      let ohlcv = this.#Time.xPosOHLCV(pos[0])
-      let colours = []
+    // const inputs = {}
+    //   let ohlcv = this.#Time.xPosOHLCV(pos[0])
+    //   let colours = []
 
-    // if cursor is out of data history return streaming candle
-    if (this.#Stream && ohlcv[4] === null) ohlcv = candle
+    // // if cursor is out of data history return streaming candle
+    // if (this.#Stream && ohlcv[4] === null) ohlcv = candle
+
+    let inputs = {}
+    let colours = []
+    let index = this.#Time.xPos2Index(pos[0])
+        index = limit(index, 0, this.range.data.length - 1)
+    let ohlcv = this.range.data[index]
 
     // get candle colours from config / theme
     if (ohlcv[4] >= ohlcv[1]) colours = new Array(5).fill(this.theme.candle.UpWickColour)

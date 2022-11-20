@@ -5,7 +5,7 @@
  import { 
    YAXIS_TYPES
  } from "../definitions/chart";
-import { round } from "../utils/number";
+import { limit, round } from "../utils/number";
 import { uid } from "../utils/utilities"
 
 const calcParams = [20]
@@ -86,6 +86,7 @@ const calcParams = [20]
     let c = index  - (this.range.data.length - this.overlay.data.length)
     let colours = [this.style.strokeStyle]
 
+    c = limit(c, 0, this.overlay.data.length)
     inputs.EMA_1 = this.Scale.nicePrice(this.overlay.data[c][1])
 
     // if (isArray(this.chart.streamCandle)) value =
