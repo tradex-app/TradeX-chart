@@ -117,9 +117,6 @@ export default class Timeline {
       svg.style.width = `${this.#icons.width}px`
       svg.style.height = `${this.#icons.height}px`
       svg.style.fill = `${this.#icons.fill}`
-
-      // TODO: removeEventListener on end()
-      i.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
     }
   }
 
@@ -202,6 +199,13 @@ export default class Timeline {
 
     this.on("main_mousemove", this.drawCursorTime.bind(this))
     this.on("setRange", this.onSetRange.bind(this))
+
+    for (let i of this.#navList) {
+      // TODO: removeEventListener on end()
+      i.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
+    }
+
+    // this.#navScrollHandle.addEventListener('',)
   }
 
   on(topic, handler, context) {

@@ -95,7 +95,7 @@ export default class RSI extends indicator {
     let c = index  - (this.range.data.length - this.overlay.data.length)
     let colours = [this.style.strokeStyle]
 
-    c = limit(c, 0, this.overlay.data.length)
+    c = limit(c, 0, this.overlay.data.length - 1)
     inputs.RSI_1 = this.Scale.nicePrice(this.overlay.data[c][1])
 
     // if (isArray(this.chart.streamCandle)) value =

@@ -268,10 +268,16 @@ export function throttle(fn, threshhold=250, scope) {
       last = now;
       fn.apply(context, args);
     }
-    core.reset = function() {
-      cancelTimer();
-      last = 0;
-    }
-    return core
   };
+  function cancelTimer() {
+    if (timeout) {
+       clearTimeout(deferTimer);
+       timeout = undefined;
+    }
+  }
+  core.reset = function() {
+    cancelTimer();
+    last = 0;
+  }
+  return core
 }

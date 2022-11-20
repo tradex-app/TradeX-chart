@@ -2,17 +2,16 @@
 // dragable divider to resize off chart indicators
 
 import DOM from "../../utils/DOM"
+import { isNumber } from "../../utils/typeChecks"
+import { debounce, throttle } from "../../utils/utilities"
+import { InputController, Keys } from "../../input/controller"
+
 import {
   CLASS_DIVIDERS
 } from "../../definitions/core"
 import {
   DIVIDERHEIGHT
 } from "../../definitions/chart"
-import {
-  InputController,
-  Keys
-} from "../../input/controller"
-import { isNumber } from "../../utils/typeChecks"
 
 
 export default class Divider {
@@ -105,9 +104,9 @@ export default class Divider {
 
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
     this.#controller.on("mouseout", this.onMouseOut.bind(this))
-    this.#controller.on("drag", this.onDividerDrag.bind(this));
+    this.#controller.on("drag", debounce(this.onDividerDrag, 1, this, true));
     this.#controller.on("enddrag", this.onDividerDragDone.bind(this));
-    this.#controller.on("mousedown", this.onMouseDown.bind(this));
+    this.#controller.on("mousedown", debounce(this.onMouseDown, 100, this, true));
     this.#controller.on("mouseup", this.onMouseUp.bind(this));
   }
 

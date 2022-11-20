@@ -226,8 +226,8 @@ export default class MainPane {
 
     this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    this.#controller.on("drag", debounce(this.onChartDrag, 1, this, true));
-    // this.#controller.on("drag", throttle(this.onChartDrag, 10, this, true));
+    // this.#controller.on("drag", debounce(this.onChartDrag, 1, this, true));
+    this.#controller.on("drag", throttle(this.onChartDrag, 25, this, true));
     // this.#controller.on("drag", this.onChartDrag.bind(this));
 
     this.#controller.on("enddrag", this.onChartDragDone.bind(this));
