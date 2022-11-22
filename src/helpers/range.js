@@ -221,17 +221,28 @@ export class Range {
   }
 
   /**
-   * Is timestamp in current range
+   * Is timestamp in current range including future and past legal bounds
    * @param {number} t - timestamp
    * @returns {boolean}
    */
   inRange(t) {
-    if (t >= this.timeMin && t <= this.timeMax)
-      return true
-    else return false
+    return (t >= this.timeMin && t <= this.timeMax) ? true : false
   }
 
-  inPriceHistory (ts) { return this.inRange(ts) }
+  /**
+   * Is timestamp in current range only, excluding future and past legal bounds
+   * @param {number} t 
+   * @returns {boolean}
+   */
+  inPriceHistory (t) {
+    return (t >= this.timeStart && t <= this.timeFinish) ? true : false
+  }
+
+  inRenderRange (t) {
+    let i = this.getTimeIndex(t)
+    let o = this.#core.rangeScrollOffset
+    return (i >= this.indexStart - o && i <= this.indexEnd + o) ? true : false
+  }
   
   /**
    * Return index offset of timestamp relative to range start
@@ -319,17 +330,6 @@ export class Range {
     function limit(val, min, max) {
       return Math.min(max, Math.max(min, val));
     }
-  }
-
-  /**
-   * 
-   * @param {number} t 
-   * @returns {boolean}
-   */
-  inPriceHistory (t) {
-    if (t >= this.timeStart && t <= this.timeFinish)
-      return true
-    else return false
   }
 } // end class
 

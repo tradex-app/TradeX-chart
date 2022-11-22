@@ -174,16 +174,16 @@ const calcParams = [20]
     let x = 3
     let o = this.Timeline.rangeScrollOffset;
     let c = range.indexStart - (range.data.length - this.overlay.data.length) - o
-    let i = range.Length + o + x
+    let i = range.Length + (o * 2) + 2
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
-        plots[range.Length + o + x - i] = {x: null, y: null}
+        plots[range.Length + o - i] = {x: null, y: null}
       }
       else {
         plot.x = this.xAxis.xPos(data[c][0])
         plot.y = this.yAxis.yPos(data[c][1])
-        plots[range.Length + o + x - i] = {...plot}
+        plots[range.Length + o - i] = {...plot}
       }
       c++
       i--

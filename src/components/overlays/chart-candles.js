@@ -50,7 +50,7 @@ export default class chartCandles extends Candle {
 
     let o = this.#core.rangeScrollOffset;
     let c = range.indexStart - o
-    let i = range.Length + o + 2
+    let i = range.Length + (o * 2)
     let x
 
     if (this.#core.stream) {
@@ -81,7 +81,6 @@ export default class chartCandles extends Candle {
       }
       c++
       i--
-      // candle.x = bRound(candle.x + candle.w)
     }
 
     if (this.#core.theme.candle.Type === CandleType.AREA) super.areaRender()

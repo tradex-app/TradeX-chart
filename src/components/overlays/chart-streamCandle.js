@@ -74,13 +74,14 @@ export default class chartStreamCandle extends Candle {
       x: pos, // offset + pos,
       w: this.xAxis.candleW
     }
+    // candle.x = this.xAxis.xPos(stream[0])
     candle.o = this.yPos(stream[1])
     candle.h = this.yPos(stream[2])
     candle.l = this.yPos(stream[3])
     candle.c = this.yPos(stream[4])
     candle.raw = stream
 
-    if (r.inRange(stream[0])) {
+    if (r.inRenderRange(stream[0])) {
       render(candle)
 
       if (this.#core.theme.candle.Type === CandleType.AREA) super.areaRender()

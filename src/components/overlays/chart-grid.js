@@ -75,7 +75,6 @@ export default class chartGrid {
         ctx.stroke()
       }
     }
-
     ctx.restore();
   }
 
