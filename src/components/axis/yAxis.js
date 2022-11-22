@@ -1,7 +1,7 @@
 // yAxis.js
 
 import Axis from "./axis";
-import { limit, log10, power, precision, round } from "../../utils/number";
+import { bRound, limit, log10, power, precision, round } from "../../utils/number";
 import { isNumber } from "../../utils/typeChecks";
 
 import { 
@@ -144,9 +144,9 @@ export default class yAxis extends Axis {
    */
   yPos(yData) {
     switch(this.yAxisType) {
-      case "percent" : return this.p100toPixel(yData)
-      case "log" : return this.$2Pixel(log10(yData))
-      default : return this.$2Pixel(yData)
+      case "percent" : return bRound(this.p100toPixel(yData))
+      case "log" : return bRound(this.$2Pixel(log10(yData)))
+      default : return bRound(this.$2Pixel(yData))
     }
   }
 

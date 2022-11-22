@@ -220,12 +220,12 @@ export default class RSI extends indicator {
         plots[range.Length + o + x - i] = {x: null, y: null}
       }
       else {
+        plot.x = this.xAxis.xPos(data[c][0])
         plot.y = this.yAxis.yPos(100 - data[c][1])
         plots[range.Length + o + x - i] = {...plot}
       }
       c++
       i--
-      plot.x = plot.x + plot.w
     }
 
     this.plot(plots, "renderLine", this.style)

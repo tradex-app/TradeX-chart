@@ -93,8 +93,8 @@ export default class Slider {
   }
 
   setHandlePos() {
-    let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elHandles).top;
-        top = top - (this.height / 2)
-    this.#elHandle.style.top = `${top}px`
+    // let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elHandles).top;
+    //     top = top - (this.height / 2)
+    // this.#elHandle.style.top = `${top}px`
   }
 }

@@ -8729,8 +8729,8 @@ var stateMachineConfig$1 = {
             // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
           },
         },
-        chart_scrollto: {
-          target: 'chart_scrollto',
+        chart_scrollTo: {
+          target: 'chart_scrollTo',
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
           },
@@ -8797,7 +8797,7 @@ var stateMachineConfig$1 = {
         },
       }
     },
-    chart_scrollto: {
+    chart_scrollTo: {
       onEnter (data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },

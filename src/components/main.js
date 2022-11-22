@@ -76,6 +76,12 @@ export default class MainPane {
   #rowMinH = ROWMINHEIGHT // px
 
   #cursorPos = [0, 0]
+  #drag = {
+    active: false,
+    start: [0,0],
+    prev: [0,0],
+    delta: [0,0]
+  }
   #buffer
   
   #indicators
@@ -227,7 +233,7 @@ export default class MainPane {
     this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
     // this.#controller.on("drag", debounce(this.onChartDrag, 1, this, true));
-    this.#controller.on("drag", throttle(this.onChartDrag, 25, this, true));
+    this.#controller.on("drag", throttle(this.onChartDrag, 100, this, true));
     // this.#controller.on("drag", this.onChartDrag.bind(this));
 
     this.#controller.on("enddrag", this.onChartDragDone.bind(this));
@@ -280,23 +286,61 @@ export default class MainPane {
   }
 
   onChartDrag(e) {
-    this.#cursorPos = [
+    const d = this.#drag
+    if (!d.active) {
+      d.active = true
+      d.start = [e.dragstart.x, e.dragstart.y]
+      d.prev = d.start
+      d.delta = [e.movement.x, e.movement.y]
+    }
+    else {
+      d.delta = [
+        e.position.x - d.prev[0], 
+        e.position.y - d.prev[1]
+      ]
+      d.prev = [
+        e.position.x, 
+        e.position.y
+      ]
+    }
+
+    this.#cursorPos = ("n",[
       e.position.x, e.position.y, 
-      e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
-    ]
+      ...d.start,
+      ...d.delta
+    ])
+
+    // this.#cursorPos = [
+    //   e.position.x, e.position.y, 
+    //   e.dragstart.x, e.dragstart.y,
+    //   e.movement.x, e.movement.y
+    // ]
     this.emit("chart_pan", this.#cursorPos)
-    this.draw()
+    // draw() called via state machine updateRange()
+    // this.draw()
   }
 
   onChartDragDone(e) {
+    const d = this.#drag
+    d.active = false
+    d.delta = [
+      e.position.x - d.prev[0], 
+      e.position.y - d.prev[1]
+    ]
     this.#cursorPos = [
       e.position.x, e.position.y, 
-      e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
+      ...d.start,
+      ...d.delta
     ]
+
+    // this.#cursorPos = [
+    //   e.position.x, e.position.y, 
+    //   e.dragstart.x, e.dragstart.y,
+    //   e.movement.x, e.movement.y
+    // ]
     this.emit("chart_panDone", this.#cursorPos)
-    this.draw()
+    // draw() called via state machine updateRange()
+    // this.draw()
   }
 
   onChartKeyDown(e) {
@@ -310,7 +354,7 @@ export default class MainPane {
         this.emit("chart_pan", [step,null,0,null,step,null])
         break;
     }
-    this.draw()
+    // this.draw()
   }
 
   onChartKeyUp(e) {
@@ -324,7 +368,7 @@ export default class MainPane {
         this.emit("chart_panDone", [step,null,0,null,step,null])
         break;
     }
-    this.draw()
+    // this.draw()
   }
 
   onNewStreamValue(value) {
@@ -362,7 +406,7 @@ export default class MainPane {
 
     let height = dimensions.mainH - this.#Time.height
     let oldHeight = this.height
-    let chartW = dimensions.mainW // this.#Chart.width
+    let chartW = dimensions.mainW
     let chartH = Math.round(this.#Chart.height * dimensions.resizeH) - this.time.height
     let width = chartW - this.#Chart.scale.width
 
@@ -372,7 +416,7 @@ export default class MainPane {
     this.#core.scrollPos = -1
 
     this.#Time.setDimensions({w: dimensions.mainW})
-    this.#Time.draw()
+    // this.#Time.draw()
 
     this.#elGrid.style.height = `${height}px`
     this.#elGrid.style.width = `${width}px`

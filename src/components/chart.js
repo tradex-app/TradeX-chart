@@ -420,7 +420,7 @@ export default class Chart {
     this.setHeight(h)
     this.#Scale.resize(w, h)
 
-    this.draw(undefined, true)
+    this.draw(this.range, true)
   }
 
   setYAxisDigits(digits) {
@@ -537,6 +537,7 @@ export default class Chart {
 
   draw(range=this.range, update=false) {
     this.#Graph.draw(range, update)
+    // this.#Time.draw()
   }
 
   drawGrid() {

@@ -5,7 +5,7 @@
  import { 
    YAXIS_TYPES
  } from "../definitions/chart";
-import { limit, round } from "../utils/number";
+import { bRound, limit, round } from "../utils/number";
 import { uid } from "../utils/utilities"
 
 const calcParams = [20]
@@ -181,12 +181,12 @@ const calcParams = [20]
         plots[range.Length + o + x - i] = {x: null, y: null}
       }
       else {
+        plot.x = this.xAxis.xPos(data[c][0])
         plot.y = this.yAxis.yPos(data[c][1])
         plots[range.Length + o + x - i] = {...plot}
       }
       c++
       i--
-      plot.x = plot.x + plot.w
     }
 
     this.plot(plots, "renderLine", this.style)

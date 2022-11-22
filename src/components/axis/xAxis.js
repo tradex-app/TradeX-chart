@@ -4,7 +4,7 @@
 import Axis from "./axis";
 import { MAXGRADSPER } from "../../definitions/chart";
 import { isNumber } from "../../utils/typeChecks";
-import { round } from "../../utils/number"
+import { bRound, round } from "../../utils/number"
 import { 
   ms2TimeUnits, timestampDifference,
   isLeapYear, year_start, get_year, nextYear,
@@ -47,7 +47,7 @@ export default class xAxis extends Axis {
   get indexEnd() { return this.range.indexEnd }
   get timeMax() { return this.range.timeMax }
   get timeMin() { return this.range.timeMin }
-  get candleW() { return round(this.width / this.range.Length, 1) }
+  get candleW() { return bRound(this.width / this.range.Length) }
   get gradsMax() { return Math.trunc(this.width / MAXGRADSPER) }
       gradsYear(t) { return get_year(t) }
       gradsMonthName(t) { return get_monthName(t) }
@@ -74,7 +74,7 @@ export default class xAxis extends Axis {
  * @memberof xAxis
  */
   xPos(ts) {
-    return (this.range.rangeIndex(ts) * this.candleW) + (this.candleW * 0.5)
+    return bRound((this.range.rangeIndex(ts) * this.candleW) + (this.candleW * 0.5))
   }
 
   t2Index(ts) {
@@ -93,7 +93,7 @@ export default class xAxis extends Axis {
   pixel2Index(x) {
     let o = this.core.rangeScrollOffset;
     let c = this.range.indexStart - o 
-    return c + 1 + Math.floor((x + (this.core.scrollPos * -1)) / this.candleW) 
+    return c + 1 + bRound((x + (this.core.scrollPos * -1)) / this.candleW) 
   }
 
   pixelOHLCV(x) {
@@ -102,13 +102,9 @@ export default class xAxis extends Axis {
   }
 
   xPosSnap2CandlePos(x) {
-    let r = this.core.scrollPos % this.candleW
-    // let o = (x % this.candleW < this.candleW / 2) ? this.candleW : this.candleW * -1
-    let c = Math.floor((x / this.candleW)) // + o
-    return  (c * this.candleW) + (this.candleW / 2) // + o
-
-    // return ((this.pixel2Index(x) - this.range.indexStart) 
-    //         * this.candleW) - (this.candleW / 2)
+    let r = x % this.candleW
+    let o = (x % this.candleW) ? this.candleW / 2 : 0
+    return bRound((x - r) + o)
   }
 
   /**
@@ -312,8 +308,9 @@ export default class xAxis extends Axis {
   buildGrads(grads, t1, t2, majorGrad ,majorValue, minorValue, unitStart) {
     let th, to, min;
     const minorGrad = Math.floor(this.rangeLength / this.gradsMax) * this.range.interval
+    const limit = this.pixel2T(this.width + (this.candleW * 2)) 
 
-    while (t1 < t2) {
+    while (t1 < limit) {
       to = t1
       grads.entries[t1] = [majorValue(t1), this.t2Pixel(t1), t1, "major"]
 
@@ -374,7 +371,7 @@ export default class xAxis extends Axis {
 
     const grads = this.#xAxisGrads.values
     const ctx = this.parent.layerLabels.scene.context
-    const mid = this.width / this.range.Length * 0.5
+    const mid = bRound(this.width / this.range.Length * 0.5)
     const offset = 0
     const theme = this.theme.xAxis
 
@@ -383,13 +380,15 @@ export default class xAxis extends Axis {
     ctx.fillStyle = theme.colourTick
     ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
     for (let tick of grads) { 
+      let x = bRound(tick[1])
+      // console.log(bRound(x - mid))
       // ctx.font = (tick[3] == "major") ? XAxisStyle.FONT_LABEL_BOLD : XAxisStyle.FONT_LABEL
       let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5)
-      ctx.fillText(tick[0], tick[1] - w + offset, this.xAxisTicks + 12)
+      ctx.fillText(tick[0], x - w + offset, this.xAxisTicks + 12)
 
       ctx.beginPath()
-      ctx.moveTo(tick[1] + offset, 0)
-      ctx.lineTo(tick[1] + offset, this.xAxisTicks)
+      ctx.moveTo(x + offset, 0)
+      ctx.lineTo(x + offset, this.xAxisTicks)
       ctx.stroke()
     }
       ctx.restore();

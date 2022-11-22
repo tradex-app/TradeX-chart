@@ -48,7 +48,7 @@ export default class Candle {
     let hw = Math.max(Math.floor(w * 0.5), 1)
     let h = Math.abs(data.o - data.c)
     let max_h = data.c === data.o ? 1 : 2
-    let x = data.x + hw
+    let x = data.x // + hw
     let x05 = Math.floor(x) - 0.5
 
     ctx.save();

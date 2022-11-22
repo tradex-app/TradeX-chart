@@ -1,7 +1,7 @@
 // chart-volume.js
 
 import VolumeBar from "../primitives/volume";
-import { round } from "../../utils/number";
+import { bRound, round } from "../../utils/number";
 import { BUFFERSIZE } from "../../definitions/chart"
 
 export default class chartVolume extends VolumeBar {
@@ -70,13 +70,14 @@ export default class chartVolume extends VolumeBar {
 
     while(i--) {
       x = range.value( v )
+      volume.x = bRound(this.xAxis.xPos(x[0]) - (w / 2))
       if (x[4] !== null) {
         volume.h = volH - (volH * ((maxVol - x[5]) / maxVol))
         volume.raw = data[v]
         super.draw(volume)
       }
       v++
-      volume.x = volume.x + width
+      // volume.x = volume.x + width
     }
   }
 

@@ -187,7 +187,6 @@ export function float2Int(value) {
   return value | 0
 }
 
-
 /**
  * round to precision - fastest
  * @export
@@ -201,6 +200,21 @@ export function float2Int(value) {
   return Math.round((n + Number.EPSILON) * d) / d;
 }
 
+
+/**
+ * bankers round
+ * round half to even
+ * @export
+ * @param {number} n
+ * @param {number} [d=0]
+ * @return {number}  
+ */
+export function bRound(n, d=0) {
+  var x = n * Math.pow(10, d);
+  var r = Math.round(x);
+  var br = (((((x>0)?x:(-x))%1)===0.5)?(((0===(r%2)))?r:(r-1)):r);
+  return br / Math.pow(10, d);
+}
 
 /**
  * Get the number of decimal places

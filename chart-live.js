@@ -71,6 +71,7 @@ const config = {
   timeFrame: "1m",
   rangeStartTS: rangeStartTS,
   rangeLimit: 30,
+  buffer: 10,
   theme: {
     candle: {
       Type: "candle_solid",

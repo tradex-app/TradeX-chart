@@ -3,6 +3,8 @@
 import Candle from "../primitives/candle";
 import { CandleType } from "../../definitions/style"
 import { BUFFERSIZE } from "../../definitions/chart"
+import { timestampDiff } from "../../utils/time";
+import { bRound } from "../../utils/number";
 
 export default class chartCandles extends Candle {
 
@@ -42,7 +44,7 @@ export default class chartCandles extends Candle {
         (candle) => {super.draw(candle)}
     const offset = this.xAxis.smoothScrollOffset || 0
     const candle = {
-      x: 2 + offset - this.xAxis.candleW,
+      x: offset - this.xAxis.candleW,
       w: this.xAxis.candleW
     }
 
@@ -51,8 +53,14 @@ export default class chartCandles extends Candle {
     let i = range.Length + o + 2
     let x
 
+    if (this.#core.stream) {
+      this.#core.stream.lastPriceMax = range.valueMax
+      this.#core.stream.lastPriceMin = range.valueMin
+    }
+
     while(i) {
       x = range.value( c )
+      candle.x = this.xAxis.xPos(x[0])
       if (x?.[7]) {
         this.#core.stream.lastXPos = candle.x
         this.#core.stream.lastYPos = {
@@ -61,8 +69,6 @@ export default class chartCandles extends Candle {
           l: candle.l,
           c: candle.c,
         }
-        this.#core.stream.lastPriceMax = range.valueMax
-        this.#core.stream.lastPriceMin = range.valueMin
         break
       }
       if (x[4] !== null) {
@@ -71,12 +77,11 @@ export default class chartCandles extends Candle {
         candle.l = this.yAxis.yPos(x[3])
         candle.c = this.yAxis.yPos(x[4])
         candle.raw = x
-        // super.draw(candle)
         render(candle)
       }
       c++
       i--
-      candle.x = candle.x + candle.w
+      // candle.x = bRound(candle.x + candle.w)
     }
 
     if (this.#core.theme.candle.Type === CandleType.AREA) super.areaRender()

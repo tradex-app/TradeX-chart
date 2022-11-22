@@ -13,6 +13,7 @@ import { fwdEnd, rwdStart } from "../definitions/icons"
 import Colour from "../utils/colour"
 import { drawTextBG, getTextRectWidth } from "../utils/canvas"
 import { debounce } from "../utils/utilities"
+import Slider from "./widgets/slider"
 
 
 import {
