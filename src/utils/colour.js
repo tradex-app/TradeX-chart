@@ -98,7 +98,7 @@ export default class Colour {
 
   /**
    * Set hex value
-   * @param {string} hex 
+   * @param {array} hex 
    */
   setHex(hex) {
     let val = this.#value;
@@ -112,31 +112,31 @@ export default class Colour {
   }
 
   /**
-   * @param {string} rgba 
+   * @param {array} rgba 
    */
   setRGBA(rgba) {
     let val = this.#value;
-    [
+    ([
       val.r,
       val.g,
       val.b,
       val.a
-    ] = rgba
+    ] = rgba)
     val.rgb = `rgb(${rgba[0]},${rgba[1]},${rgba[2]})`
     val.rgba = `rgb(${rgba[0]},${rgba[1]},${rgba[2]},${rgba[3]})`
   }
 
   /**
-   * @param {string} hsla 
+   * @param {array} hsla 
    */
   setHSLA(hsla) {
     let val = this.#value;
-    [
+    ([
       val.h,
       val.s,
       val.l,
       val.a
-    ] = hsla
+    ] = hsla)
     val.hsl = `hsl(${hsla[0]},${hsla[1]}%,${hsla[2]}%)`
     val.hsla = `hsl(${hsla[0]},${hsla[1]}%,${hsla[2]}%,${hsla[3]})`
   }
@@ -169,9 +169,11 @@ export default class Colour {
   }
   #valueIsRGB(rgb) {
     this.#value.rgb = rgb
+    this.#RGBAToHex(rgba)
   }
   #valueIsRGBA(rgba) {
     this.#value.rgba = rgba
+    this.#RGBAToHex(rgba)
   }
 
   #RGBToHex (rgb) {
@@ -308,6 +310,41 @@ export default class Colour {
     }
     else return false
     return {r, g, b, a}
+  }
+
+  /**
+   * 
+   * @param {string} rgba 
+   */
+  #RGBAToHex (rgba) {
+    let x, isPercent,
+      i = 0,
+      y = [],
+      z = [],
+      rgb = rgba.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i);
+      rgb.shift()
+
+      for (let v of rgb) {
+        isPercent = v.indexOf("%") > -1;
+        x = parseFloat(v)
+        if (i < 3 && isPercent) {
+          x = Math.round(255 * x / 100)
+        }
+        else if (i == 3) {
+          if (!isPercent && x >= 0 && x <= 1) {
+            x = Math.round(255 * x);
+          } else if (isPercent && x >= 0 && x <= 100) {
+            x = Math.round(255 * x / 100)
+          } else {
+            x = "";
+          }
+        }
+        y[i] = (x | 1 << 8).toString(16).slice(1)
+        z[i++] = x
+      }
+      this.setHex(y)
+      this.setRGBA(z)
+      this.#hexToHSL(this.#value.hex)
   }
   
 }

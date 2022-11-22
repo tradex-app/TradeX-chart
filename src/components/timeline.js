@@ -33,18 +33,20 @@ export default class Timeline {
   #xAxis
 
   #elViewport
-  #ElNavigation
+  #elNavigation
 
   #viewport
   #navigation
-  #navList
-  #navScrollBar
-  #navScrollHandle
+  #elNavList
+  #elNavScrollBar
+  #elNavScrollHandle
+
   #layerLabels
   #layerOverlays
   #layerCursor
 
   #controller
+  #slider
 
   #icons = {
     width: 20,
@@ -108,12 +110,12 @@ export default class Timeline {
 
     const api = this.#mediator.api
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .viewport`)
-    this.#ElNavigation = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation`)
-    this.#navList = DOM.findBySelectorAll(`#${api.id} .${CLASS_TIME} .navigation .icon`)
-    this.#navScrollBar = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation #tScrollBar`)
-    this.#navScrollHandle = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation .handle`)
+    this.#elNavigation = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation`)
+    this.#elNavList = DOM.findBySelectorAll(`#${api.id} .${CLASS_TIME} .navigation .icon`)
+    this.#elNavScrollBar = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation #tScrollBar`)
+    this.#elNavScrollHandle = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation .handle`)
 
-    for (let i of this.#navList) {
+    for (let i of this.#elNavList) {
       let svg = i.querySelector('svg');
       svg.style.width = `${this.#icons.width}px`
       svg.style.height = `${this.#icons.height}px`
@@ -176,6 +178,14 @@ export default class Timeline {
     this.#xAxis.initXAxisGrads()
     this.draw()
 
+    const sliderCfg = {
+      core: this.#core,
+      elContainer: this.#elNavScrollBar,
+      elHandle: this.#elNavScrollHandle,
+      callback: null
+    }
+    this.#slider = new Slider(sliderCfg)
+
     // set up event listeners
     this.eventsListen()
 
@@ -201,12 +211,12 @@ export default class Timeline {
     this.on("main_mousemove", this.drawCursorTime.bind(this))
     this.on("setRange", this.onSetRange.bind(this))
 
-    for (let i of this.#navList) {
+    for (let i of this.#elNavList) {
       // TODO: removeEventListener on end()
       i.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
     }
 
-    // this.#navScrollHandle.addEventListener('',)
+    // this.#elNavScrollHandle.addEventListener('',)
   }
 
   on(topic, handler, context) {
@@ -238,13 +248,13 @@ export default class Timeline {
   onSetRange() {
     let start = this.range.indexStart
     let end = this.range.indexEnd
-    let scrollBarW = this.#navScrollBar.clientWidth
+    let scrollBarW = this.#elNavScrollBar.clientWidth
     let rangeW = this.range.dataLength + this.range.limitFuture + this.range.limitPast
     let ratio = scrollBarW / rangeW
     let handleW = this.range.Length * ratio
     let pos = ((start + this.range.limitPast) * ratio)
-    this.#navScrollHandle.style.width = `${handleW}px`
-    this.#navScrollHandle.style.marginLeft = `${pos}px`
+    this.#elNavScrollHandle.style.width = `${handleW}px`
+    this.#elNavScrollHandle.style.marginLeft = `${pos}px`
   }
 
   // -----------------------

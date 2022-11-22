@@ -2,6 +2,7 @@
 //  GUI slider
 
 import DOM from "../../utils/DOM"
+import Colour from "../../utils/colour"
 import { isFunction, isNumber } from "../../utils/typeChecks"
 import { debounce, throttle } from "../../utils/utilities"
 import { InputController, Keys } from "../../input/controller"
@@ -31,7 +32,7 @@ export default class Slider {
     this.#elHandle = (DOM.isElement(config.elHandle)) ? config.elHandle : false
     this.#callback = (isFunction(config.callback)) ? config.callback : false
 
-    if (this.#elContainer && this.#elHandle) {
+    if (DOM.isElement(this.#elContainer) && DOM.isElement(this.#elHandle)) {
 
       this.mount()
 
@@ -64,12 +65,27 @@ export default class Slider {
     this.#core.emit(topic, data)
   }
 
-  onMouseEnter() {}
-  onMouseOut() {}
-  onMouseDown() {}
-  onMouseUp() {}
-  onHandleDrag() {}
-  onHandleDragDone() {}
+  onMouseEnter() {
+    console.log("slider enter")
+    this.colour = new Colour(this.#elHandle.style.backgroundColor)
+    this.#elHandle.style.backgroundColor = this.colour.hex
+  }
+  onMouseOut() {
+    console.log("slider out")
+    this.#elHandle.style.backgroundColor = this.colour.hexa
+  }
+  onMouseDown() {
+    console.log("slider down")
+  }
+  onMouseUp() {
+    console.log("slider up")
+  }
+  onHandleDrag() {
+    console.log("slider drag")
+  }
+  onHandleDragDone() {
+    console.log("slider drag done")
+  }
 
   mount() {
     this.#containerDims.w = this.#elContainer.clientWidth
