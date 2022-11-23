@@ -91,9 +91,10 @@ export default class xAxis extends Axis {
   }
 
   pixel2Index(x) {
-    let o = this.core.rangeScrollOffset;
-    let c = this.range.indexStart - o 
-    return c + 1 + bRound((x + (this.core.scrollPos * -1)) / this.candleW) 
+    x -= this.candleW / 2
+    let c = this.range.indexStart 
+    let o = bRound(x / this.candleW)
+    return c + o // - 1
   }
 
   pixelOHLCV(x) {
@@ -103,7 +104,7 @@ export default class xAxis extends Axis {
 
   xPosSnap2CandlePos(x) {
     let r = x % this.candleW
-    let o = (x % this.candleW) ? this.candleW / 2 : 0
+    let o = (r) ? this.candleW / 2 : 0
     return bRound((x - r) + o)
   }
 

@@ -601,16 +601,10 @@ export default class Chart {
   }
 
   legendInputs(pos=this.cursorPos, candle) {
-    // const inputs = {}
-    //   let ohlcv = this.#Time.xPosOHLCV(pos[0])
-    //   let colours = []
-
-    // // if cursor is out of data history return streaming candle
-    // if (this.#Stream && ohlcv[4] === null) ohlcv = candle
-
+        pos = this.cursorPos
     let inputs = {}
     let colours = []
-    let index = this.#Time.xPos2Index(pos[0])
+    let index = this.#Time.xPos2Index(pos[0] - this.core.scrollPos)
         index = limit(index, 0, this.range.data.length - 1)
     let ohlcv = this.range.data[index]
 

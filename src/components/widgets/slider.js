@@ -80,8 +80,10 @@ export default class Slider {
   onMouseUp() {
     console.log("slider up")
   }
-  onHandleDrag() {
-    console.log("slider drag")
+  onHandleDrag(e) {
+    console.log("slider drag",e)
+    let x = parseInt(this.#elHandle.style.marginLeft)
+    this.#elHandle.style.marginLeft = (x + e.position.x )+ "px"
   }
   onHandleDragDone() {
     console.log("slider drag done")
@@ -94,7 +96,7 @@ export default class Slider {
 
     this.#handleDims.w = this.#elHandle.clientWidth
     this.#handleDims.h = this.#elHandle.clientHeight
-    this.#elHandle.style.margin = 0
+    this.#elHandle.style.marginRight = 0
     this.#elHandle.style.position = "absolute"
   }
 

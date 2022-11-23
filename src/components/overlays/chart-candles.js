@@ -47,6 +47,12 @@ export default class chartCandles extends Candle {
       x: offset - this.xAxis.candleW,
       w: this.xAxis.candleW
     }
+    const candles = {
+      in: {},
+      ts: {},
+      px: {},
+      list: []
+    }
 
     let o = this.#core.rangeScrollOffset;
     let c = range.indexStart - o
@@ -79,6 +85,11 @@ export default class chartCandles extends Candle {
         candle.raw = x
         render(candle)
       }
+      candles.list.unshift({} = {...candle})
+      candles.in[c] = i - 1
+      candles.ts[x[0]] = i - 1
+      candles.px[candle.x] = i - 1
+      this.#core.candles = candles
       c++
       i--
     }

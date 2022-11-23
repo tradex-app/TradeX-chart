@@ -137,7 +137,7 @@ export default class Timeline {
     const theme = this.core.theme
     const handleColour = new Colour(theme.chart.BorderColour)
     const scrollBarStyle = ` border: 1px solid ${theme.chart.BorderColour};`
-    const handleStyle = ` background: ${handleColour.hex}44;`
+    const handleStyle = `background: ${handleColour.hex}44; margin-top: 1px;`
     const node = `
     <span id="rwdStart" class="icon">${rwdStart}</span>
     <span id="tScrollBar" style="${scrollBarStyle}">

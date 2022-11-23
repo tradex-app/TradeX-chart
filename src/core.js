@@ -149,6 +149,7 @@ export default class TradeXchart {
 
   #workers
   #stream
+  #candles
   #pricePrecision
   #volumePrecision
 
@@ -296,6 +297,8 @@ constructor (mediator, config={}) {
   get stream() { return this.#stream }
   get worker() { return this.#workers }
   get isEmtpy() { return this.#chartIsEmpty }
+  set candles(c) { if (isObject(c)) this.#candles = c }
+  get candles() { return this.#candles }
 
 
   /**
