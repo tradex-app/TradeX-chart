@@ -433,7 +433,7 @@ export default class OffChart {
   }
 
   draw(range=this.range, update=false) {
-    this.#Graph.draw(range, update)
+    window.requestAnimationFrame(()=>this.#Graph.draw(range, update))
   }
 
   drawGrid() {

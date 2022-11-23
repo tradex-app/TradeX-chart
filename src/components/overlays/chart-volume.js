@@ -53,20 +53,19 @@ export default class chartVolume extends VolumeBar {
 
     let o = this.#core.rangeScrollOffset
     let v = range.indexStart - o
-    let i = range.Length + o + 1
+    let i = range.Length + (o * 2)
+    let j = i
+    let u = v
     let x
     let maxVol = 0
   
-    while(i--) {
-      x = range.value( v )
+    while(j--) {
+      x = range.value( u )
       if (x[4] !== null) {
         maxVol = (x[5] > maxVol) ? x[5] : maxVol
       }
-      v++
+      u++
     }
-
-    v = range.indexStart - o
-    i = range.Length + o + 1
 
     while(i--) {
       x = range.value( v )
@@ -77,7 +76,6 @@ export default class chartVolume extends VolumeBar {
         super.draw(volume)
       }
       v++
-      // volume.x = volume.x + width
     }
   }
 

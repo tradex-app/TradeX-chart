@@ -176,6 +176,7 @@ export default class Chart {
   get layerWidth() { return this.#Graph.layerWidth }
   get axes() { return "x" }
   get Legends() { return this.#Legends }
+  get Graph() { return this.#Graph }
 
   init(options) {
 
@@ -536,7 +537,7 @@ export default class Chart {
   }
 
   draw(range=this.range, update=false) {
-    this.#Graph.draw(range, update)
+    window.requestAnimationFrame(()=>this.#Graph.draw(range, update))
     // this.#Time.draw()
   }
 

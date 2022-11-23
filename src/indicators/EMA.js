@@ -166,24 +166,23 @@ const calcParams = [20]
     const plots = []
     const offset = this.xAxis.smoothScrollOffset || 0
     const plot = {
-      x: (width * 0.5) + 2 + offset - width,
       w: width,
     }
 
     // account for "missing" entries because of indicator calculation
-    let x = 3
-    let o = this.Timeline.rangeScrollOffset;
-    let c = range.indexStart - (range.data.length - this.overlay.data.length) - o
+    let o = this.Timeline.rangeScrollOffset
+    let d = range.data.length - this.overlay.data.length
+    let c = range.indexStart - d - 2
     let i = range.Length + (o * 2) + 2
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
-        plots[range.Length + o - i] = {x: null, y: null}
+        plots.push({x: null, y: null})
       }
       else {
         plot.x = this.xAxis.xPos(data[c][0])
         plot.y = this.yAxis.yPos(data[c][1])
-        plots[range.Length + o - i] = {...plot}
+        plots.push({...plot})
       }
       c++
       i--

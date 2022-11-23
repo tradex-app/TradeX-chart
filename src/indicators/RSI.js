@@ -205,23 +205,23 @@ export default class RSI extends indicator {
     plots.length = 0
     const offset = this.Timeline.smoothScrollOffset || 0
     const plot = {
-      x: (width * 0.5) + 2 + offset - (width * 2),
       w: width,
     }
 
     // account for "missing" entries because of indicator calculation
     let o = this.Timeline.rangeScrollOffset;
-    let c = range.indexStart - (range.data.length - this.overlay.data.length) - o - 1
+    let d = range.data.length - this.overlay.data.length
+    let c = range.indexStart - d - 2
     let i = range.Length + (o * 2) + 2
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
-        plots[range.Length + o - i] = {x: null, y: null}
+        plots.push({x: null, y: null})
       }
       else {
         plot.x = this.xAxis.xPos(data[c][0])
         plot.y = this.yAxis.yPos(100 - data[c][1])
-        plots[range.Length + o - i] = {...plot}
+        plots.push({...plot})
       }
       c++
       i--

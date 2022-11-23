@@ -618,10 +618,12 @@ export default class MainPane {
   }
 
   draw() {
-    this.#layerGrid.setPosition(this.scrollPos, 0)
-    this.#chartGrid.draw("x")
-    this.#viewport.render();
-    this.#Time.draw()
+    window.requestAnimationFrame(()=> {
+      this.#layerGrid.setPosition(this.scrollPos, 0)
+      this.#chartGrid.draw("x")
+      this.#viewport.render();
+      this.#Time.draw()
+    })
   }
 
   updateRange(pos) {
