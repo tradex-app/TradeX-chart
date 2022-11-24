@@ -314,7 +314,7 @@ export default class Timeline {
     let timestamp = this.xPos2Time(x),
         date = new Date(timestamp),
         opts = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
-        dateTimeStr = date.toLocaleDateString('en-GB', opts),
+        dateTimeStr = date.toUTCString(),
         options = {
           fontSize: this.theme.xAxis.fontSize * 1.05,
           fontWeight: this.theme.xAxis.fontWeight,
