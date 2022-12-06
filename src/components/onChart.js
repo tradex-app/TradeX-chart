@@ -448,7 +448,6 @@ export default class Chart {
     const node = `
       <div class="viewport" style="${styleChart}"></div>
       <div class="legends" style="${styleLegend}"></div>
-      <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
     this.#elScale.style.cssText = STYLE_SCALE2 + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`
     return node

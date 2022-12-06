@@ -141,8 +141,8 @@ export default class MainPane {
     this.#elRows = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`)
     this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
     this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
-    this.#elGrid = DOM.findBySelector(`#${api.id} .${CLASS_GRID}`)
-    this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_GRID} .viewport`)
+    this.#elGrid = DOM.findBySelector(`#${api.id} tradex-grid`)
+    this.#elViewport = this.#elGrid.viewport // DOM.findBySelector(`#${api.id} .${CLASS_GRID} .viewport`)
     this.#elChartScale  = DOM.findBySelector(`#${api.id} .${CLASS_YAXIS} .${CLASS_CHART}`)
 
     api.parent = this
@@ -540,9 +540,10 @@ export default class MainPane {
     const width = api.width - api.toolsW - api.scaleW
     const height = api.height - api.utilsH - api.timeH
     const styleGrid = ` width: ${width}px; height: ${height}px; overflow: hidden`
-      let node = `<div class="${CLASS_GRID}" style="position: absolute;">
-                      <div class="viewport" style="${styleGrid}"></div>
-                  </div>`
+      // let node = `<div class="${CLASS_GRID}" style="position: absolute;">
+      //                 <div class="viewport" style="${styleGrid}"></div>
+      //             </div>`
+      let node = `<tradex-grid></tradex-grid>`
           node += this.rowNode(CLASS_CHART)
 
     this.#elYAxis.innerHTML = this.scaleNode(CLASS_CHART)

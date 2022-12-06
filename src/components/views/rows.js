@@ -13,7 +13,7 @@ import {
   SCALEW,
 } from "../../definitions/core"
 
-window.customElements.define('tradex-gird', tradeXGrid)
+window.customElements.define('tradex-grid', tradeXGrid)
 window.customElements.define('tradex-onchart', tradeXOnChart)
 window.customElements.define('tradex-offchart', tradeXOffChart)
 

@@ -330,7 +330,11 @@ constructor (mediator, config={}) {
     }
 
     // add global stylesheet for all charts
-    if (TradeXchart.#cnt == 0) document.head.insertAdjacentHTML("beforeend", style)
+    if (TradeXchart.#cnt == 0) {
+      document.head.insertAdjacentHTML("beforeend", style)
+      // define <tradex-chart></tradex-chart>
+      window.customElements.define('tradex-chart', TXCElement)
+    }
 
     const cnt = ++TradeXchart.#cnt
 

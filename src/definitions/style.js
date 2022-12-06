@@ -222,6 +222,9 @@ const style = `
     margin: 1px;
   }
 
+  tradex-grid {
+    position: absolute;
+  }
 </style>
 `
 export default style
