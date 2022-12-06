@@ -10,6 +10,7 @@ export default class DMI extends indicator {
   #ID
   #name = 'Directional Movement Index'
   #shortName = 'DMI'
+  #params
   #onChart = false
   #precision = 2
   #calcParams = [20]
@@ -43,26 +44,45 @@ export default class DMI extends indicator {
  * @param {object} config - theme / styling
  * @memberof DMI
  */
-  constructor(target, overlay, xAxis, yAxis, config) {
-    super(target, xAxis, yAxis, config)
+  constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
+    super(target, xAxis, yAxis, config, parent, params)
 
-    this.#ID = uid(this.#shortName)
-    this.style = {...this.defaultStyle, ...config.style}
+    const overlay = params.overlay
+
+    this.#ID = params.overlay?.id || uid(this.#shortName)
+    this.#params = params
+    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams
+    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
+    this.setNewValue = (value) => { this.newValue(value) }
+    this.setUpdateValue = (value) => { this.UpdateValue(value) }
   }
 
   get ID() { return this.#ID }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get onChart() { return this.#onChart }
-  get style() { return this.#style }
   get plots() { return this.#plots }
 
-  indicatorStream() {
-    // return indicator stream
+  addLegend() {
+    let legend = {
+      id: this.#shortName,
+      title: this.#shortName,
+      type: this.#shortName,
+      source: this.legendInputs.bind(this)
+    }
+    this.chart.Legends.add(legend)
   }
 
-  calcIndicator(input) {
-    this.overlay.data = this.TALib.DMI(input)
+  legendInputs(pos=this.chart.cursorPos, candle) {
+    const inputs = {}
+    const index = this.Timeline.xPos2Index(pos[0])
+    let c = index  - (this.range.data.length - this.overlay.data.length)
+    let colours = [this.style.strokeStyle]
+
+    c = limit(c, 0, this.overlay.data.length - 1)
+    inputs.DMI_1 = this.Scale.nicePrice(this.overlay.data[c][1])
+
+    return {inputs, colours}
   }
 
   regeneratePlots (params) {
@@ -72,9 +92,55 @@ export default class DMI extends indicator {
     })
   }
 
-  updateIndicator (input) {
+  /**
+   * process stream and create new indicator data entry
+   * @param {array} value - current stream candle 
+   * @memberof RSI
+   */
+ newValue (value) {
+   let p = this.TALibParams()
+   if (!p) return false
 
-  }
+   let v = this.calcIndicatorStream(this.#shortName, this.TALibParams())
+   if (!v) return false
+
+   this.overlay.data.push([v[0], v[1]])
+
+   this.target.setPosition(this.core.scrollPos, 0)
+   this.draw(this.range)
+ }
+
+ /**
+  * process stream and update current (last) indicator data entry
+  * @param {array} value - current stream candle 
+  * @memberof RSI
+  */
+ UpdateValue (value) {
+   let l = this.overlay.data.length - 1
+   let p = this.TALibParams()
+   if (!p) return false
+
+   let v = this.calcIndicatorStream(this.#shortName, p)
+   if (!v) return false
+
+   this.overlay.data[l] = [v[0], v[1]]
+
+   this.target.setPosition(this.core.scrollPos, 0)
+   this.draw(this.range)
+
+   // console.log(`RSI stream input update: ${value}`)
+
+ }
+
+ TALibParams() {
+   let end = this.range.dataLength
+   let step = this.calcParams[0]
+   let start = end - step
+   let input = this.indicatorInput(start, end)
+   let hasNull = input.find(element => element === null)
+   if (hasNull) return false
+   else return { inReal: input, timePeriod: step }
+ }
 
   draw(range) {
     this.scene.clear()
@@ -85,5 +151,62 @@ export default class DMI extends indicator {
     const y1 = this.yAxis.yPos(100 - this.style.defaultHigh)
     const y2 = this.yAxis.yPos(100 - this.style.defaultLow)
 
+    // Fill the range between high and low
+    const plots = [0, y1, this.scene.width, y2 - y1]
+    let style = this.style.highLowRangeStyle
+    this.plot(plots, "renderFillRect", style)
+
+    // High RSI Range marker
+    plots.length = 0
+    plots[0] = {x: 0, y: y1}
+    plots[1] = {x: x2, y: y1}
+    style = {
+      lineWidth: this.style.highLowLineWidth,
+      strokeStyle: this.style.highStrokeStyle,
+      dash: [5, 5]
+    }
+    this.plot(plots, "renderLine", style)
+
+    // Low RSI Range marker
+    plots.length = 0
+    plots[0] = {x: 0, y: y2}
+    plots[1] = {x: x2, y: y2}
+    style = {
+      lineWidth: this.style.highLowLineWidth,
+      strokeStyle: this.style.lowStrokeStyle,
+      dash: [5, 5]
+    }
+    this.plot(plots, "renderLine", style)
+
+
+    // DMI plot
+    plots.length = 0
+    const offset = this.Timeline.smoothScrollOffset || 0
+    const plot = {
+      w: width,
+    }
+
+    // account for "missing" entries because of indicator calculation
+    let o = this.Timeline.rangeScrollOffset;
+    let d = range.data.length - this.overlay.data.length
+    let c = range.indexStart - d - 2
+    let i = range.Length + (o * 2) + 2
+
+    while(i) {
+      if (c < 0 || c >= this.overlay.data.length) {
+        plots.push({x: null, y: null})
+      }
+      else {
+        plot.x = this.xAxis.xPos(data[c][0])
+        plot.y = this.yAxis.yPos(100 - data[c][1])
+        plots.push({...plot})
+      }
+      c++
+      i--
+    }
+
+    this.plot(plots, "renderLine", this.style)
+
+    this.target.viewport.render();
   }
 }

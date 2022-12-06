@@ -15,8 +15,8 @@ eg. 0.100.6
     * Body
       * Tools
       * Main Pane
+        * Timeline (X Axis)
         * Rows
-          * Timeline (X Axis)
           * Row
             * Chart or Off Chart Indicators
               * Price Scale (Y Axis)

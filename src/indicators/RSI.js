@@ -43,6 +43,7 @@ export default class RSI extends indicator {
     lowStrokeStyle: "#848",
     highLowRangeStyle: "#22002220"
   }
+  #style = {}
 
   // YAXIS_TYPES - percent
   static scale = YAXIS_TYPES[1]
@@ -97,8 +98,6 @@ export default class RSI extends indicator {
 
     c = limit(c, 0, this.overlay.data.length - 1)
     inputs.RSI_1 = this.Scale.nicePrice(this.overlay.data[c][1])
-
-    // if (isArray(this.chart.streamCandle)) value =
 
     return {inputs, colours}
   }

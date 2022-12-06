@@ -7,6 +7,7 @@ DOM.findBySelector('#app').innerHTML = `
 <p>Trade chart written in plain (vanilla) JavaScript with minimal dependencies</p>
 <p>It is still under heavy development and thus not production ready as it still missing features and has bugs.<br/>
 I'm interested in constructive feedback (testing) or contributions.<br/>
+<strong>NPM Install: <a href="https://www.npmjs.com/package/tradex-chart">www.npmjs.com/package/tradex-chart</a></strong>
 <strong>GitHub Repository:</strong> <a href="https://github.com/tradex-app/TradeX-chart">github.com/tradex-app/TradeX-chart</a><br/>
 <strong>API Documentation:</strong> <a href="./api/">API</a>
 </p>

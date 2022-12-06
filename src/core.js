@@ -62,7 +62,7 @@ export default class TradeXchart {
   static #cnt = 0
   static #instances = {}
   static #talibReady = false
-  static initErrMsg = `TradeX-chart requires "talib" to function properly. Without it, some features maybe missing or broken.`
+  static initErrMsg = `${NAME} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`
 
   #id
   #name = NAME
@@ -228,7 +228,7 @@ constructor (mediator, config={}) {
   }
 
   log(l) { if (this.logs) console.log(l) }
-  info(i) { if (this.info) console.info(i) }
+  info(i) { if (this.infos) console.info(i) }
   warning(w) { if (this.warnings) console.warn(w) }
   error(e) { if (this.errors) console.error(e) }
 
@@ -694,7 +694,7 @@ constructor (mediator, config={}) {
   /**
    * Add a theme to the chart,
    * if no current theme is set, make this the current one.
-   * @param {object} volumePrecision - Volume accuracy
+   * @param {object} theme - Volume accuracy
    * @memberof TradeXchart
    */
   addTheme(theme) {
@@ -703,7 +703,7 @@ constructor (mediator, config={}) {
 
   /**
  * Set the chart theme
- * @param {object} volumePrecision - Volume accuracy
+ * @param {object} theme - Volume accuracy
  * @memberof TradeXchart
  */
   setTheme(ID) {
