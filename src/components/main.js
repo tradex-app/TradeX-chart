@@ -570,13 +570,18 @@ export default class MainPane {
     const styleRow = STYLE_ROW + ` border-top: 1px solid ${this.theme.chart.BorderColour};`
     const styleScale = STYLE_SCALE + ` border-color: ${this.theme.yAxis.line};`
 
+    // const node = `
+    //   <div class="${CLASS_ROW} ${type}" style="${styleRow}">
+    //     <div style="${styleScale}">
+    //       <canvas id=""><canvas/>
+    //     </div>
+    //   </div>
+    // `
     const node = `
-      <div class="${CLASS_ROW} ${type}" style="${styleRow}">
-        <div style="${styleScale}">
-          <canvas id=""><canvas/>
-        </div>
-      </div>
-    `
+    <div class="${CLASS_ROW} ${type}" style="${styleRow}">
+      <tradex-scale style="${styleScale}"></tradex-scale>
+    </div>
+  `
     return node
   }
 

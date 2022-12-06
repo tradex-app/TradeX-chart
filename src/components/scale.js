@@ -92,7 +92,7 @@ export default class ScaleBar {
   get yOffset() { return this.#yAxis.offset }
 
   init() {
-    this.mount(this.#elScale)
+    this.#elViewport = this.#elScale.querySelector(`tradex-scale`).viewport
 
     this.log(`${this.#name} instantiated`)
   }
@@ -206,12 +206,6 @@ export default class ScaleBar {
 
   }
 
-  mount(el) {
-    el.innerHTML = this.defaultNode()
-
-    this.#elViewport = el.querySelector(`.viewport`)
-  }
-
   setHeight(h) {
     this.#elScale.style.height = `${h}px`
   }
@@ -240,13 +234,6 @@ export default class ScaleBar {
     this.#elScale.style.cursor = cursor
   }
 
-  defaultNode() {
-    const api = this.mediator.api
-    const node = `
-      <div class="viewport"></div>
-    `
-    return node
-  }
 
   // -----------------------
 

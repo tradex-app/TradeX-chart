@@ -117,6 +117,7 @@ export default class Legends {
 
     this.#targetEl.appendChild(elem)
     const legendEl = DOM.findByID(options.id)
+    // const legendEl = this.#targetEl.elLegends
     this.#list[options.id] = {el: legendEl, type: options.type, source: options?.source}
 
     this.#controlsList = DOM.findBySelectorAll(`#${options.id} .controls .control`)

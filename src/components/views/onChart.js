@@ -3,6 +3,7 @@
 
 import element from "./classes/element"
 import graph from "./classes/graph"
+import tradeXLegend from "./legend"
 import { bRound } from "../../utils/number"
 
 import {
@@ -11,6 +12,8 @@ import {
   TIMEH,
   SCALEW,
 } from "../../definitions/core"
+
+window.customElements.define('tradex-legend', tradeXLegend)
 
 const template = document.createElement('template')
 template.innerHTML = `
@@ -36,9 +39,8 @@ template.innerHTML = `
   }
 </style>
 <div class="viewport"></div>
-<div class="legends"></div>
+<tradex-legend></tradex-legend>
 `
-// <div class="scale"></div>
 
 export default class tradeXOnChart extends element {
 
@@ -66,7 +68,6 @@ export default class tradeXOnChart extends element {
 
       this.#elViewport = this.shadowRoot.querySelector('.viewport')
       this.#elLegends = this.shadowRoot.querySelector('.legends')
-      // this.#elScale = this.shadowRoot.querySelector('.scale')
     }
   }
 
@@ -75,5 +76,4 @@ export default class tradeXOnChart extends element {
 
   get elViewport() { return this.#elViewport }
   get elLegends() { return this.#elLegends }
-  // get elScale() { return this.#elScale }
 }

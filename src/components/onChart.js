@@ -377,9 +377,12 @@ export default class Chart {
   mount(el) {
     el.innerHTML = this.defaultNode()
 
-    const api = this.#mediator.api
+    const api = this.#core
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .viewport`)
     this.#elLegends = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .legends`)
+
+    // this.#elViewport = DOM.findBySelector(`#${api.id} tradex-onchart`).elViewport
+    // this.#elLegends = DOM.findBySelector(`#${api.id} tradex-onchart`).elLegends
   }
 
   props() {
@@ -449,6 +452,7 @@ export default class Chart {
       <div class="viewport" style="${styleChart}"></div>
       <div class="legends" style="${styleLegend}"></div>
     `
+    // const node = `<tradex-onchart></tradex-onchart>`
     this.#elScale.style.cssText = STYLE_SCALE2 + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`
     return node
   }
