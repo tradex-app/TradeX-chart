@@ -1,19 +1,19 @@
 // graph.js
 // class
 
-import DOM from "../utils/DOM"
-import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
-import CEL from "../components/primitives/canvas"
-import Overlays from "./overlays"
+import DOM from "../../../utils/DOM"
+import { isArray, isBoolean, isNumber, isObject, isString } from '../../../utils/typeChecks'
+import CEL from "../../primitives/canvas"
+import Overlays from "../../overlays"
 
-import grid from "./overlays/chart-grid"
-import cursor from "./overlays/chart-cursor"
+import grid from "../../overlays/chart-grid"
+import cursor from "../../overlays/chart-cursor"
 const defaultOverlays = [
   ["grid", {class: grid, fixed: true}],
   ["cursor", {class: cursor, fixed: true}]
 ]
 
-import { BUFFERSIZE } from "../definitions/chart"
+import { BUFFERSIZE } from "../../../definitions/chart"
 
 export default class graph {
 
@@ -35,8 +35,8 @@ export default class graph {
 
     this.#parent = parent
     this.#core = parent.core
-    this.#config = this.#core.config
-    this.#theme = this.#core.theme
+    this.#config = this.core.config
+    this.#theme = this.core.theme
     this.#elparent = this.#parent.element
     this.#elViewport = elViewport
     

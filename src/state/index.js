@@ -4,10 +4,10 @@
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 // import Store from './store'
 // import customEvent from '../events/custom'
-import Dataset from '../helpers/dataset'
-import { validateDeep, validateShallow } from '../helpers/validateData'
+import Dataset from '../model/dataset'
+import { validateDeep, validateShallow } from '../model/validateData'
 import { mergeDeep } from '../utils/utilities'
-import { detectInterval } from '../helpers/range'
+import { detectInterval } from '../model/range'
 import { ms2Interval } from '../utils/time'
 import { SECOND, DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS } from '../definitions/chart'
 

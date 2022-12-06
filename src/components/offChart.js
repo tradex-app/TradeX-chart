@@ -4,7 +4,7 @@
 import DOM from "../utils/DOM"
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import ScaleBar from "./scale"
-import Graph from "./graph"
+import Graph from "./views/classes/graph"
 import CEL from "../components/primitives/canvas"
 import Legends from "./primitives/legend"
 import overlayGrid from "./overlays/chart-grid"

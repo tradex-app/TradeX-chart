@@ -1,31 +1,56 @@
 /**
  * Global
  */
+
+import {
+  UTILSH,
+  TOOLSW,
+  TIMEH,
+  SCALEW
+} from "./core"
+
+const FONTWEIGHT = "normal"
+const FONTSIZE = 12
+const FONTSTYLE = "normal"
+const FONTFAMILY = "Avenir, Helvetica, Arial, sans-serif"
+const COLOUR_BG = "#141414"
+const COLOUR_BORDER = "#666"
+const COLOUR_TXT = "#ccc"
+const COLOUR_ICON = "#888"
+const COLOUR_ICONHOVER = "#CCC"
+
 export const GlobalStyle = {
-  COLOUR_BG: "#141414",
-  COLOUR_BORDER: "#666",
-  COLOUR_TXT: "#CCC",
+  COLOUR_BG: COLOUR_BG,
+  COLOUR_BORDER: COLOUR_BORDER,
+  COLOUR_TXT: COLOUR_TXT,
+  COLOUR_ICON: COLOUR_ICON,
+  COLOUR_ICONHOVER: COLOUR_ICONHOVER,
   BORDER_THICKNESS: 0,
+  FONTWEIGHT: FONTWEIGHT,
+  FONTSIZE: FONTSIZE,
+  FONTSTYLE: FONTSTYLE,
+  FONTFAMILY: FONTFAMILY,
+  FONT: `font-style: ${FONTSTYLE}: font-size: ${FONTSIZE}px; font-weight: ${FONTWEIGHT}; font-family: ${FONTFAMILY};`,
 }
 
 export const ToolsStyle = {
-  COLOUR_ICON: "#888"
+  COLOUR_ICON: COLOUR_ICON
 }
 
 export const UtilsStyle = {
-  COLOUR_ICON: "#888"
+  COLOUR_ICON: COLOUR_ICON
 }
 
 export const MenuStyle = {
-  COLOUR_BG: "#141414",
-  COLOUR_BORDER: "#666",
-  COLOUR_TXT: "#CCC",
+  COLOUR_BG: COLOUR_BG,
+  COLOUR_BORDER: COLOUR_BORDER,
+  COLOUR_TXT: COLOUR_TXT,
 }
 
 export const WindowStyle = {
-  COLOUR_BG: "#141414",
-  COLOUR_BORDER: "#666",
-  COLOUR_TXT: "#CCC",
+  COLOUR_BG: COLOUR_BG,
+  COLOUR_BORDER: COLOUR_BORDER,
+  COLOUR_TXT: COLOUR_TXT,
 }
 
 /**
@@ -71,9 +96,9 @@ export const YAxisType = {
   LOG: 'log'
 }
 
-const YAxisStyle_FONTWEIGHT = "normal"
-const YAxisStyle_FONTSIZE = 12
-const YAxisStyle_FONTFAMILY = "Arial"
+const YAxisStyle_FONTWEIGHT = FONTWEIGHT
+const YAxisStyle_FONTSIZE = FONTSIZE
+const YAxisStyle_FONTFAMILY = FONTFAMILY
 
 export const YAxisStyle = {
   COLOUR_TICK: "#888",
@@ -87,9 +112,9 @@ export const YAxisStyle = {
   FONT_LABEL_BOLD: `bold ${YAxisStyle_FONTSIZE}px ${YAxisStyle_FONTFAMILY}`
 }
 
-const XAxisStyle_FONTWEIGHT = "normal"
-const XAxisStyle_FONTSIZE = 12
-const XAxisStyle_FONTFAMILY = "Arial"
+const XAxisStyle_FONTWEIGHT = FONTWEIGHT
+const XAxisStyle_FONTSIZE = FONTSIZE
+const XAxisStyle_FONTFAMILY = FONTFAMILY
 
 export const XAxisStyle = {
   COLOUR_TICK: "#888",
@@ -114,8 +139,8 @@ export const PriceLineStyle = {
 }
 
 export const LegendStyle = {
-  text: "font-size: 12px; font-family: Avenir, Helvetica, Arial, sans-serif;",
-  colour: "#ccc"
+  text: GlobalStyle.FONT,
+  colour: GlobalStyle.COLOUR_TXT
 }
 
 export const defaultTheme = {

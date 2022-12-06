@@ -1,25 +1,26 @@
 // core.js
+// it all begins here...
 
 // import * as talib from "talib-web"
-import DOM from './utils/DOM'
 import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeChecks'
+import DOM from './utils/DOM'
 import SX from './scaleX/scale'
-import UtilsBar from './components/utils'
-import ToolsBar from './components/tools'
-import MainPane from './components/main'
-import WidgetsG from './components/widgets'
-
+import style from './definitions/style'
+import TXCElement from "./components/views/tradeXchart"
 import State from './state'
-import { Range, calcTimeIndex } from "./helpers/range"
+import { Range, calcTimeIndex } from "./model/range"
+import StateMachine from './scaleX/stateMachne'
 import Stream from './helpers/stream'
 import Theme from "./helpers/theme"
 import WebWorker from "./helpers/webWorkers"
 import Indicators from './definitions/indicators'
-import style from './definitions/style'
 import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { interval2MS, isTimeFrame, SECOND_MS } from "./utils/time"
-
+import UtilsBar from './components/utils'
+import ToolsBar from './components/tools'
+import MainPane from './components/main'
+import WidgetsG from './components/widgets'
 
 import {
   NAME,
