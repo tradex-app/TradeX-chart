@@ -14,7 +14,6 @@ export default class Tool {
   #inCnt = null
   #name
   #shortName
-  #mediator
   #options
   #config
   #core
@@ -37,10 +36,9 @@ export default class Tool {
     this.#inCnt = config.cnt
     this.#ID = this.#config.ID || uid("TX_Tool_")
     this.#name = config.name
-    this.#mediator = config.target.mediator
-    this.#core = this.#mediator.api.core
-    this.#elChart = this.#mediator.api.elements.elChart
-    this.#parent = {...this.#mediator.api.parent}
+    this.#core = config.core
+    this.#elChart = config.elements.elChart
+    this.#parent = {...config.parent}
     this.#target = config.target
     this.#target.addTool(this)
     this.#elViewport = this.#layerTool.viewport
@@ -52,9 +50,9 @@ export default class Tool {
   get ID() { return this.#ID }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
-  get mediator() { return this.#mediator }
+  get core() { return this.#core }
 
-  get stateMachine() { return this.#mediator.stateMachine }
+  get stateMachine() { return this.#core.stateMachine }
 
   get state() { return this.#core.getState() }
   get data() { return this.#core.chartData }

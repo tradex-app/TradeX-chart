@@ -98,11 +98,6 @@ export default class yAxis extends Axis {
   set zoom(z) { this.setZoom(z) }
   get zoom() { return this.#range.zoom }
 
-  calcHeight() {
-    let api = this.#chart.mediator.api
-    return api.height - api.utilsW - api.scaleW
-  }
-
   getYAxisRatio() {
     // const diff = (this.#mode == "automatic") ? this.#range.diff : this.#transform.diff
     return this.height / this.#range.diff

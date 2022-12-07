@@ -16,7 +16,7 @@ export default class StateMachine {
   #statePrev
   #context
   #config
-  #mediator
+  #core
   #status = "stopped"
   #events
   #event
@@ -27,9 +27,9 @@ export default class StateMachine {
   /**
    * Instantiate state machine
    * @param {object} config - state definition
-   * @param {object} mediator - module mediate provides event handling
+   * @param {object} core - module mediate provides event handling
    */
-  constructor(config, mediator) {
+  constructor(config, core) {
     if (!StateMachine.validateConfig(config)) return false
 
     this.#id = config.id
@@ -37,7 +37,7 @@ export default class StateMachine {
     this.#state = config.initial
     this.#context = config.context
     this.#actions = config.actions
-    this.#mediator = mediator
+    this.#core = core
 
     this.#subscribe()
   }
@@ -47,7 +47,7 @@ export default class StateMachine {
   get state() { return this.#state }
   get previousSate() { return this.#statePrev }
   get context() { return this.#context }
-  get mediator() { return this.#mediator }
+  get core() { return this.#core }
   get status() { return this.#status }
   get event() { return this.#event }
   get eventData() { return this.#eventData }
@@ -150,13 +150,13 @@ export default class StateMachine {
     }
 
     for (let event of this.#events) {
-      this.#mediator.on(event, this.notify.bind(this, event), this.context)
+      this.#core.on(event, this.notify.bind(this, event), this.context)
     }
   }
 
   #unsubscribe() {
     for (let event of this.#events) {
-      this.#mediator.off(event, this.notify)
+      this.#core.off(event, this.notify)
     }
   }
 

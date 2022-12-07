@@ -52,12 +52,12 @@ export default class Overlays {
 
     // start State Machine 
     // stateMachineConfig.context.origin = this
-    // this.#mediator.stateMachine = stateMachineConfig
-    // this.#mediator.stateMachine.start()
+    // this.#core.stateMachine = stateMachineConfig
+    // this.#core.stateMachine.start()
   }
 
   end() {
-    // this.#mediator.stateMachine.destroy()
+    // this.#core.stateMachine.destroy()
     // Stop and clean up the module to prevent memory leaks.
     // It should remove: event listeners, timers, ect.
     // Put your toys away or it will end in tears.

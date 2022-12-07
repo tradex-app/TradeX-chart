@@ -9,8 +9,8 @@ export default [
     icon: chart, 
     event: "utils_indicators",
     sub: [],
-    // action: (e, mediator) => {
-    //   mediator.emit("utils_indicators", e)
+    // action: (e, core) => {
+    //   core.emit("utils_indicators", e)
     // }
   },
   {
@@ -18,8 +18,8 @@ export default [
     name: "Timezone", 
     icon: clock, 
     event: "utils_timezone",
-    // action: (e, mediator) => {
-    //   mediator.emit("utils_timezone", e)
+    // action: (e, core) => {
+    //   core.emit("utils_timezone", e)
     // }
   },
   {
@@ -27,8 +27,8 @@ export default [
     name: "Screenshot", 
     icon: camera, 
     event: "utils_screenshot",
-    // action: (e, mediator) => {
-    //   mediator.emit("utils_screenshot", e)
+    // action: (e, core) => {
+    //   core.emit("utils_screenshot", e)
     // }
   },
   {
@@ -36,8 +36,8 @@ export default [
     name: "Settings", 
     icon: config, 
     event: "utils_settings",
-    // action: (e, mediator) => {
-    //   mediator.emit("utils_settings", e)
+    // action: (e, core) => {
+    //   core.emit("utils_settings", e)
     // }
   },
 

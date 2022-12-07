@@ -13,7 +13,6 @@ export default class Window {
 
   #id
   #widgets
-  #mediator
   #core
   #config
   
@@ -33,8 +32,7 @@ export default class Window {
 
   constructor(widgets, config) {
     this.#widgets = widgets
-    this.#mediator = config.mediator
-    this.#core = this.#mediator.api.core
+    this.#core = config.core
     this.#config = config
     this.#id = config.id
     this.#elWindows = widgets.elements.elWindows
@@ -86,7 +84,7 @@ export default class Window {
   }
 
   eventsListen() {
-    const api = this.#mediator.api
+    const api = this.#core
     // add event listener to dragbar
     // const windowItems = DOM.findBySelectorAll(`#${api.id} #${this.#config.id} li`)
     // windowItems.forEach((item) => {
@@ -99,15 +97,15 @@ export default class Window {
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   // onWindowSelect(e) {
@@ -136,7 +134,7 @@ export default class Window {
   }
 
   mount(el) {
-    const api = this.#mediator.api
+    const api = this.#core
 
     if (el.lastElementChild == null) 
       el.innerHTML = this.windowNode()
@@ -201,7 +199,7 @@ export default class Window {
 
   // get your drag on
   dragBar(window) {
-    const api = this.#mediator.api
+    const api = this.#core
     const cPointer = "cursor: grab;"
     const over = `onmouseover="this.style.background ='#222'"`
     const out = `onmouseout="this.style.background ='none'"`
@@ -217,7 +215,7 @@ export default class Window {
   }
 
   closeIcon(window) {
-    const api = this.#mediator.api
+    const api = this.#core
     const cPointer = "cursor: pointer;"
     const over = `onmouseover="this.style.background ='#222'"`
     const out = `onmouseout="this.style.background ='none'"`

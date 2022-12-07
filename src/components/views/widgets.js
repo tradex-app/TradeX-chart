@@ -15,7 +15,6 @@ export default class tradeXWidgets extends element {
   }
 
   destroy() {
-
   }
 
   disconnectedCallback() {

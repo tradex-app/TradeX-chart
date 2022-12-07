@@ -14,9 +14,7 @@ export default class Widgets {
   #name = "Widgets"
   #shortName = "widgets"
   #core
-  #mediator
   #options
-  #parent
   #stateMachine
 
   #widgets
@@ -24,12 +22,9 @@ export default class Widgets {
   #widgetsInstances = {}
   #elements = {}
   #elWidgetsG
-  #elMenus
-  #elDividers
 
   #width
   #height
-
 
   constructor (core, options) {
 
