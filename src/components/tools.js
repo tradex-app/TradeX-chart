@@ -7,7 +7,7 @@ import { ToolsStyle } from "../definitions/style"
 import { CLASS_TOOLS } from "../definitions/core"
 import tools from "../definitions/tools"
 import Tool from '../tools/tool'
-import { timestampDiff } from "../utils/time"
+import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-tools"
 
 
@@ -20,8 +20,10 @@ export default class ToolsBar {
 
   #name = "Toolbar"
   #shortName = "tools"
-  #mediator
+  #core
   #options
+  #stateMachine
+
   #elTools
   #widgets
 
@@ -32,27 +34,29 @@ export default class ToolsBar {
   #toolTarget
 
 
-  constructor (mediator, options) {
+  constructor (core, options) {
 
-    this.#mediator = mediator
+    this.#core = core
     this.#options = options
-    this.#elTools = mediator.api.elements.elTools
+    this.#elTools = core.elTools
     this.#tools = tools || options.tools
-    this.#widgets = this.#mediator.api.core.WidgetsG
+    this.#widgets = core.WidgetsG
     this.init()
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warning(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
   get name() {return this.#name}
   get shortName() {return this.#shortName}
-  get mediator() {return this.#mediator}
+  get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elTools) }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
 
   init() {
     this.mount(this.#elTools)
@@ -71,14 +75,14 @@ export default class ToolsBar {
 
     // start State Machine 
     stateMachineConfig.context.origin = this
-    this.#mediator.stateMachine = stateMachineConfig
-    this.#mediator.stateMachine.start()
+    this.stateMachine = stateMachineConfig
+    this.stateMachine.start()
   }
 
   end() {
-    this.#mediator.stateMachine.destroy()
+    this.stateMachine.destroy()
     // remove event listeners
-    const api = this.#mediator.api
+    const api = this.#core
     const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`)
     for (let tool of tools) {
       for (let t of this.#tools) {
@@ -97,15 +101,15 @@ export default class ToolsBar {
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onIconClick(e) {
@@ -149,7 +153,7 @@ export default class ToolsBar {
   }
 
   initAllTools() {
-    const api = this.#mediator.api
+    const api = this.#core
     const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`)
     for (let tool of tools) {
 

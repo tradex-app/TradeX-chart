@@ -16,6 +16,7 @@ import chartStreamCandle from "./overlays/chart-streamCandle"
 import chartCursor from "./overlays/chart-cursor"
 import indicator from "./overlays/inidcator"
 import OnChart from "./overlays"
+import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-chart"
 import { InputController, Keys } from "../input/controller"
 import { CandleStyle, VolumeStyle } from "../definitions/style"
@@ -72,6 +73,7 @@ export default class Chart {
   #options
   #core
   #parent
+  #stateMachine
 
   #elChart
   #elCanvas
@@ -154,7 +156,6 @@ export default class Chart {
   get height() { return this.#elChart.clientHeight }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elChart) }
-  get stateMachine() { return this.#mediator.stateMachine }
   set state(s) { this.#core.setState(s) }
   get state() { return this.#core.getState() }
   get data() { return this.#core.chartData }
@@ -177,6 +178,8 @@ export default class Chart {
   get axes() { return "x" }
   get Legends() { return this.#Legends }
   get Graph() { return this.#Graph }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
 
   init(options) {
 
@@ -263,12 +266,12 @@ export default class Chart {
 
     // start State Machine 
     stateMachineConfig.context.origin = this
-    this.#mediator.stateMachine = stateMachineConfig
-    this.#mediator.stateMachine.start()
+    this.stateMachine = stateMachineConfig
+    this.stateMachine.start()
   }
 
   end() {
-    this.#mediator.stateMachine.destroy()
+    this.stateMachine.destroy()
     this.#Scale.end()
     this.#Graph.destroy()
 

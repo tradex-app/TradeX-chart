@@ -9,6 +9,7 @@ import CEL from "../components/primitives/canvas"
 import Legends from "./primitives/legend"
 import overlayGrid from "./overlays/chart-grid"
 import overlayCursor from "./overlays/chart-cursor"
+import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-offChart"
 import { uid } from "../utils/utilities"
 import { InputController, Keys } from "../input/controller"
@@ -63,6 +64,7 @@ export default class OffChart {
   #options
   #core
   #parent
+  #stateMachine
 
   #elOffChart
   #elCanvas
@@ -138,7 +140,6 @@ export default class OffChart {
   get scale() { return this.#Scale }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elOffChart) }
-  get stateMachine() { return this.#mediator.stateMachine }
   get elOffChart() { return this.#elOffChart }
   get element() { return this.#elOffChart }
   get widgets() { return this.#core.WidgetsG }
@@ -160,6 +161,8 @@ export default class OffChart {
   get height() { return this.#elOffChart.clientHeight }
   set height(h) { this.setHeight(h) }
   get axes() { return "x" }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
 
 
   init(options) {
@@ -228,12 +231,12 @@ export default class OffChart {
 
     // start State Machine 
     stateMachineConfig.context.origin = this
-    this.mediator.stateMachine = stateMachineConfig
-    this.mediator.stateMachine.start()
+    this.stateMachine = stateMachineConfig
+    this.stateMachine.start()
   }
 
   end() {
-    this.#mediator.stateMachine.destroy()
+    this.stateMachine.destroy()
     this.#Graph.destroy()
     this.#Scale.end()
     this.#Divider.end()

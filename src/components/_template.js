@@ -1,15 +1,19 @@
 // _template.js
 // A template file for Chart components
 
+import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-chart"
 
 export default class _template {
 
   #name = "Template"
   #shortName = "template"
+  #core
   #mediator
   #options
   #parent
+  #stateMachine
+
   #elTemplate
 
   #width
@@ -33,6 +37,8 @@ export default class _template {
   get shortName() {return this.#shortName}
   get mediator() {return this.#mediator}
   get options() {return this.#options}
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
 
   init() {
     this.mount(this.#elTemplate)
@@ -52,12 +58,12 @@ export default class _template {
 
     // start State Machine 
     // stateMachineConfig.context.origin = this
-    // this.#mediator.stateMachine = stateMachineConfig
-    // this.#mediator.stateMachine.start()
+    // this.stateMachine = stateMachineConfig
+    // this.stateMachine.start()
   }
 
   end() {
-    // this.#mediator.stateMachine.destroy()
+    // this.stateMachine.destroy()
     // Stop and clean up the module to prevent memory leaks.
     // It should remove: event listeners, timers, ect.
     // Put your toys away or it will end in tears.

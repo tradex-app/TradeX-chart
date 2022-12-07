@@ -6,6 +6,7 @@ import DOM from "../utils/DOM"
 import yAxis from "./axis/yAxis"
 import CEL from "./primitives/canvas"
 import { drawTextBG } from "../utils/canvas"
+import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
 import { InputController, } from "../input/controller"
 import { copyDeep, uid } from '../utils/utilities'
@@ -26,6 +27,8 @@ export default class ScaleBar {
   #options
   #parent
   #core
+  #stateMachine
+
   #chart
   #target
   #yAxis
@@ -90,6 +93,8 @@ export default class ScaleBar {
   set rangeYFactor(f) { this.core.range.yFactor(f) }
   set yOffset(o) { this.#yAxis.offset = o }
   get yOffset() { return this.#yAxis.offset }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
 
   init() {
     this.#elViewport = this.#elScale.querySelector(`tradex-scale`).viewport
@@ -112,12 +117,12 @@ export default class ScaleBar {
     // start State Machine 
     const newConfig = copyDeep(stateMachineConfig)
     newConfig.context.origin = this
-    this.mediator.stateMachine = newConfig
-    this.mediator.stateMachine.start()
+    this.stateMachine = newConfig
+    this.stateMachine.start()
   }
 
   end() {
-    this.#mediator.stateMachine.destroy()
+    this.stateMachine.destroy()
     this.#controller = null
     this.#viewport.destroy()
 

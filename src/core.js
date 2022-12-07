@@ -454,8 +454,8 @@ constructor (mediator, config={}) {
     }
 
     this.#WidgetsG = new WidgetsG(this, {widgets: config?.widgets})
-    this.#UtilsBar = this.#mediator.register("UtilsBar", UtilsBar, config, api)
-    this.#ToolsBar = this.#mediator.register("ToolsBar", ToolsBar, config, api)
+    this.#UtilsBar = new UtilsBar(this, config)
+    this.#ToolsBar = new ToolsBar(this, config)
     this.#MainPane = this.#mediator.register("MainPane", MainPane, config, api)
 
     api.Timeline = this.Timeline

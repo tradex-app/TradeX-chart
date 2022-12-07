@@ -8,6 +8,7 @@ import CEL from "./primitives/canvas"
 import { CLASS_TIME } from "../definitions/core"
 import { XAxisStyle } from "../definitions/style"
 import { InputController } from "../input/controller"
+import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-time"
 import { fwdEnd, rwdStart } from "../definitions/icons"
 import Colour from "../utils/colour"
@@ -24,13 +25,12 @@ export default class Timeline {
 
   #name = "Timeline"
   #shortName = "time"
-  #mediator
   #options
   #elTime
   #core
-  #parent
   #chart
   #xAxis
+  #stateMachine
 
   #elViewport
   #elNavigation
@@ -54,26 +54,23 @@ export default class Timeline {
     fill: "#aaa"
   }
 
-  constructor (mediator, options) {
+  constructor (core, options) {
 
-    this.#mediator = mediator
+    this.#core = core
     this.#options = options
-    this.#elTime = mediator.api.elements.elTime
-    this.#parent = mediator.api.MainPane
-    this.#chart = mediator.api.Chart
-    this.#core = mediator.api.core
+    this.#elTime = options.elements.elTime
+    this.#chart = core.Chart
     this.#xAxis = new xAxis(this, this.#chart)
     this.init()
   }
   
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warning(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
   get name() { return this.#name }
   get shortName() { return this.#shortName }
-  get mediator() { return this.#mediator }
   get options() { return this.#options }
   get core() { return this.#core }
   get height() { return this.#elTime.clientHeight }
@@ -98,6 +95,9 @@ export default class Timeline {
   get scrollOffsetPx() { return this.#core.scrollPos % this.candleW }
   get smoothScrollOffset() { return this.#core.smoothScrollOffset }
   get rangeScrollOffset() { return this.#core.rangeScrollOffset }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
+
  
   init() {
     this.mount(this.#elTime)
@@ -180,12 +180,12 @@ export default class Timeline {
 
     // start State Machine 
     stateMachineConfig.context.origin = this
-    this.#mediator.stateMachine = stateMachineConfig
-    this.#mediator.stateMachine.start()
+    this.stateMachine = stateMachineConfig
+    this.stateMachine.start()
   }
 
   end() {
-    this.#mediator.stateMachine.destroy()
+    this.stateMachine.destroy()
     this.#viewport.destroy()
     this.#controller = null
     this.off("main_mousemove", this.drawCursorTime)
@@ -209,15 +209,15 @@ export default class Timeline {
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onMouseClick(e) {

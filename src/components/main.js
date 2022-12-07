@@ -8,6 +8,7 @@ import CEL from "../components/primitives/canvas"
 import Chart from "./onChart"
 import OffChart from "./offChart"
 import chartGrid from "./overlays/chart-grid"
+import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-mainPane"
 import { InputController, Keys } from "../input/controller"
 import { isNumber } from "../utils/typeChecks"
@@ -46,12 +47,14 @@ import {
  */
 export default class MainPane {
 
-  #name = "Utilities"
+  #name = "MainPane"
   #shortName = "Main"
   #mediator
   #options
   #parent
   #core
+  #stateMachine
+
   #elYAxis
   #elMain
   #elRows
@@ -130,6 +133,8 @@ export default class MainPane {
   get buffer() { return this.#buffer }
   get bufferPx() { return this.getBufferPx() }
   get scrollPos() { return this.#core.scrollPos }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
 
 
   init(options) {
@@ -138,13 +143,14 @@ export default class MainPane {
     this.#indicators = this.#core.indicators
 
     const api = this.#mediator.api
+    const core = this.#core
 
-    this.#elRows = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`)
-    this.#elTime = DOM.findBySelector(`#${api.id} tradex-time`)
-    this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
-    this.#elGrid = DOM.findBySelector(`#${api.id} tradex-grid`)
-    this.#elViewport = this.#elGrid.viewport // DOM.findBySelector(`#${api.id} .${CLASS_GRID} .viewport`)
-    this.#elChartScale = DOM.findBySelector(`#${api.id} .${CLASS_YAXIS} .${CLASS_CHART}`)
+    this.#elRows = DOM.findBySelector(`#${core.id} .${CLASS_ROWS}`)
+    this.#elTime = DOM.findBySelector(`#${core.id} tradex-time`)
+    this.#elChart = DOM.findBySelector(`#${core.id} .${CLASS_CHART}`)
+    this.#elGrid = DOM.findBySelector(`#${core.id} tradex-grid`)
+    this.#elViewport = this.#elGrid.viewport
+    this.#elChartScale = DOM.findBySelector(`#${core.id} .${CLASS_YAXIS} .${CLASS_CHART}`)
 
     api.parent = this
     api.chartData = this.mediator.api.chartData
@@ -154,19 +160,19 @@ export default class MainPane {
     api.settings = this.#mediator.api.settings
 
     // api - functions / methods, calculated properties provided by this module
-    api.elements = 
-      {...api.elements, 
-        ...{
+    options.elements = 
+      {
           elChart: this.#elChart,
           elTime: this.#elTime,
           elRows: this.#elRows,
           elOffCharts: this.#elOffCharts,
           elChartScale: this.#elChartScale
-        }
       }
 
+    api.elements = {...api.elements, ...options.elements}
+
     // register timeline - xAxis
-    this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
+    this.#Time = new Timeline(this.#core, options)
     // register offChart
     this.registerOffCharts(options, api)
     // register chart
@@ -198,12 +204,12 @@ export default class MainPane {
 
     // start State Machine 
     stateMachineConfig.context.origin = this
-    this.#mediator.stateMachine = stateMachineConfig
-    this.#mediator.stateMachine.start()
+    this.stateMachine = stateMachineConfig
+    this.stateMachine.start()
   }
 
   end() {
-    this.#mediator.stateMachine.destroy()
+    this.stateMachine.destroy()
     this.#Time.end()
     this.#Chart.end()
     this.#OffCharts.forEach((offChart, key) => {

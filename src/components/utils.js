@@ -13,35 +13,33 @@ export default class UtilsBar {
 
   #name = "Utilities"
   #shortName = "utils"
-  #mediator
+  #core
   #options
   #elUtils
   #utils
-  #core
   #widgets
   #indicators
   #menus = {}
 
-  constructor (mediator, options) {
+  constructor (core, options) {
 
-    this.#mediator = mediator
+    this.#core = core
     this.#options = options
-    this.#elUtils = mediator.api.elements.elUtils
+    this.#elUtils = core.elUtils
     this.#utils = utilsList || options.utilsBar
-    this.#core = this.#mediator.api.core
-    this.#widgets = this.#mediator.api.core.WidgetsG
-    this.#indicators = this.options.indicators || indicators
+    this.#widgets = core.WidgetsG
+    this.#indicators = options.indicators || indicators
     this.init()
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warning(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
   get name() {return this.#name}
   get shortName() {return this.#shortName}
-  get mediator() {return this.#mediator}
+  get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elUtils) }
@@ -60,9 +58,9 @@ export default class UtilsBar {
   }
 
   end() {
-    this.#mediator.stateMachine.destroy()
+    // this.stateMachine.destroy()
     // remove event listeners
-    const api = this.#mediator.api
+    const api = this.#core
     const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
 
     for (let util of utils) {
@@ -87,15 +85,15 @@ export default class UtilsBar {
   }
   
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onIconClick(e) {
@@ -121,7 +119,7 @@ export default class UtilsBar {
   }
 
   initAllUtils() {
-    const api = this.#mediator.api
+    const api = this.#core
     const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
 
     for (let util of utils) {
