@@ -59,7 +59,7 @@ export default class Mediator {
 
   log(l) { this.#core.log(l) }
   info(i) { this.#core.info(i) }
-  warning(w) { this.#core.warn(w) }
+  warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
   /**
@@ -118,7 +118,7 @@ export default class Mediator {
 
   /** Execute a task
   *
-  * @param {String} channel - The topic name
+  * @param {String} topic - The topic name
   * @param {Object} data    - The data that gets published
   * @param {Function} cb    - callback method
   */

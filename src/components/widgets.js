@@ -6,15 +6,19 @@ import Menu from "./widgets/menu"
 import Dialogue from "./widgets/dialogue"
 import Divider from "./widgets/divider"
 import Window from "./widgets/window"
+import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-widgets"
 
 export default class Widgets {
 
   #name = "Widgets"
   #shortName = "widgets"
+  #core
   #mediator
   #options
   #parent
+  #stateMachine
+
   #widgets
   #widgetsList = { Dialogue, Divider, Menu, Window }
   #widgetsInstances = {}
@@ -27,51 +31,36 @@ export default class Widgets {
   #height
 
 
-  constructor (mediator, options) {
+  constructor (core, options) {
 
-    this.#mediator = mediator
+    this.#core = core
     this.#options = options
-    this.#widgets = options.widgets || this.#widgetsList
-    this.#elWidgetsG = this.#mediator.api.core.elWidgetsG
-    this.#parent = this.#mediator.api.parent
+    this.#widgets = {...this.#widgetsList, ...options.widgets}
+    this.#elWidgetsG = core.elWidgetsG
     this.init()
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warning(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
   get name() { return this.#name }
   get shortName() { return this.#shortName }
-  get mediator() { return this.#mediator }
+  get core() { return this.#core }
   get options() { return this.#options }
   get elements() { return this.#elements }
   get instances() { return this.#widgetsInstances }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
 
   init() {
     this.mount(this.#elWidgetsG)
 
-    // api - functions / methods, calculated properties provided by this module
-    const api = this.#mediator.api
-    api.parent = this.#mediator
-    // api.elements = this.#elements
-
-    // this.#elements = {
-    //   elWidgetsG: this.#elWidgetsG,
-    // }
-
-    api.elements = 
-    {...api.elements, 
-      ...{
-        elWidgetsG: this.#elWidgetsG
-      }
-    }
-
     for (let i in this.#widgets) {
       let widget = this.#widgets[i]
       let entry = `el${widget.name}`
-      this.#elements[entry] = DOM.findBySelector(`#${api.id} .${widget.class}`)
+      this.#elements[entry] = this.#elWidgetsG.querySelector(`.${widget.class}`)
     }
   }
 
@@ -81,14 +70,20 @@ export default class Widgets {
 
     // start State Machine 
     stateMachineConfig.context.origin = this
-    this.#mediator.stateMachine = stateMachineConfig
-    this.#mediator.stateMachine.start()
+    this.stateMachine = stateMachineConfig
+    this.stateMachine.start()
   }
 
   end() {
     // Stop and clean up the module to prevent memory leaks.
     // It should remove: event listeners, timers, ect.
     // Put your toys away or it will end in tears.
+    this.off("openMenu", this.onOpenMenu)
+    this.off("closeMenu", this.onCloseMenu)
+    this.off("offMenu", this.onCloseMenu)
+    this.off("menuItemSelected", this.onMenuItemSelected)
+    
+    this.stateMachine.destroy()
   }
 
   // listen/subscribe/watch for parent notifications
@@ -102,15 +97,15 @@ export default class Widgets {
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onResize(dimensions) {
@@ -170,7 +165,7 @@ export default class Widgets {
   }
 
   insert(type, config) {
-    config.mediator = this.mediator
+    config.core = this.core
     const widget = this.#widgets[type].create(this, config)
     this.#widgetsInstances[widget.id] = widget
     return widget

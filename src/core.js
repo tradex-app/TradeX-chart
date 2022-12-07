@@ -453,8 +453,7 @@ constructor (mediator, config={}) {
       }
     }
 
-
-    this.#WidgetsG = this.#mediator.register("WidgetsG", WidgetsG, config, api)
+    this.#WidgetsG = new WidgetsG(this, {widgets: config?.widgets})
     this.#UtilsBar = this.#mediator.register("UtilsBar", UtilsBar, config, api)
     this.#ToolsBar = this.#mediator.register("ToolsBar", ToolsBar, config, api)
     this.#MainPane = this.#mediator.register("MainPane", MainPane, config, api)
@@ -564,7 +563,9 @@ constructor (mediator, config={}) {
     this.#elYAxis  = DOM.findBySelector(`#${this.id} .${CLASS_YAXIS}`)
     this.#elRows  = DOM.findBySelector(`#${this.id} .${CLASS_ROWS}`)
     this.#elTime  = DOM.findBySelector(`#${this.id} .${CLASS_TIME}`)
-    this.#elWidgetsG = DOM.findBySelector(`#${this.id} .${CLASS_WIDGETSG}`)
+
+    this.#elWidgetsG  = DOM.findBySelector(`#${this.id} tradex-widgets`)
+    // this.#elWidgetsG = this.#elWidgetsG = this.#elTXChart.widgets
 
     this.#elements = {
       elTXChart: this.#elTXChart,
@@ -817,7 +818,7 @@ constructor (mediator, config={}) {
           <div class="${CLASS_MAIN}" style="${styleMain}"></div>
           <div class="${CLASS_YAXIS}" style="${styleScale}"></div>
         </div>
-        <div class="${CLASS_WIDGETSG}" style="${styleWidgets}"></div>
+        <tradex-widgets></tradex-widgets>
       </div>
     `
     return node

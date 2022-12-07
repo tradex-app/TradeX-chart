@@ -4,6 +4,7 @@
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import Tool from "./tool";
 import { lineConfig } from "../definitions/tools";
+import StateMachine from '../scaleX/stateMachne';
 
 // import tinycolor from 'tinycolor2';
 
@@ -12,6 +13,7 @@ export default class Line extends Tool {
 
   #colour = lineConfig.colour
   #lineWidth = lineConfig.lineWidth
+  #stateMachine
 
   constructor(config) {
     super(config)
@@ -25,6 +27,8 @@ export default class Line extends Tool {
   get colour() { return this.#colour }
   set lineWidth(width) { this.#lineWidth = (isNumber(width)) ? width : this.#lineWidth }
   get lineWidth() { return this.#lineWidth }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
 
   start() {
     this.eventsListen()

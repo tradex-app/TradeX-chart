@@ -164,7 +164,7 @@ export default class Window {
   static defaultNode() {
     const windowStyle = ``
     const node = `
-      <div class="${CLASS_WINDOWS}" style="${windowStyle}"></div>
+      <div slot="widget" class="${CLASS_WINDOWS}" style="${windowStyle}"></div>
     `
     return node
   }

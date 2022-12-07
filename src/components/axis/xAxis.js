@@ -25,17 +25,13 @@ export default class xAxis extends Axis {
   #xAxisGrads
   #xAxisSubGrads
 
-  constructor(parent, chart) {
-    super(parent, chart)
+  constructor(parent) {
+    super(parent)
 
     this.#xAxisSubGrads = buildSubGrads()
   }
 
-  get chart() { return this.parent.mediator.api.Chart }
-  get core() { return this.chart.core }
-  get data() { return this.chart.data }
   get range() { return this.parent.range }
-  get theme() { return this.chart.core.theme }
   get width() { return this.calcWidth() }
   get interval() { return this.range.interval }
   get intervalStr() { return this.range.intervalStr }
@@ -63,7 +59,7 @@ export default class xAxis extends Axis {
   get bufferPx() { return this.core.bufferPx }
 
   calcWidth() {
-    return this.core.Chart.width - this.core.Chart.scale.width
+    return bRound(this.core.Chart.width - this.core.Chart.scale.width)
   }
 
   /**

@@ -50,8 +50,7 @@ export default class yAxis extends Axis {
   #range
 
   constructor(parent, chart, yAxisType=YAXIS_TYPES[0], range) {
-    super(parent, chart)
-    this.#core = parent.mediator.api.core
+    super(parent)
     this.#chart = chart
     this.#parent = parent
     this.#source = parent.parent
@@ -59,7 +58,7 @@ export default class yAxis extends Axis {
     this.#yAxisGrid = (this.core.config?.yAxisGrid) ? 
       this.core.config?.yAxisGrid : YAXIS_GRID
 
-    range = (range) ? range : this.#core.range
+    range = (range) ? range : this.core.range
     this.#transform.automatic.range = range
     this.#range = new Proxy(range, {
       get: (obj, prop) => {
@@ -78,10 +77,7 @@ export default class yAxis extends Axis {
     })
   }
 
-  get core() { return this.#core }
   get chart() { return this.#chart }
-  get data() { return this.chart.data }
-  // get range() { return this.#parent.mediator.api.core.range }
   get height() { return this.chart.height }
   get rangeH() { return this.#range.diff * this.yAxisPadding }
   get yAxisRatio() { return this.getYAxisRatio() }
@@ -95,7 +91,6 @@ export default class yAxis extends Axis {
   set yAxisTicks(t) { this.#yAxisTicks = isNumber(t) ? t : 0 }
   get yAxisTicks() { return this.#yAxisTicks }
   get yAxisGrads() { return this.#yAxisGrads }
-  get theme() { return this.core.theme }
   set mode(m) { this.setMode(m) }
   get mode() { return this.#mode }
   set offset(o) { this.setOffset(o) }

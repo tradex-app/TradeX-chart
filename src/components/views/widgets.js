@@ -5,7 +5,7 @@ import element from "./classes/element"
 
 const template = document.createElement('template')
 template.innerHTML = `
-  <p>widgets</p>
+  <slot name="widget"></slot>
 `
 
 export default class tradeXWidgets extends element {

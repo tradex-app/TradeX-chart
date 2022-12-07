@@ -17,10 +17,10 @@ import {
 export default class Divider {
 
   #id
+  #core
+  #config
   #widgets
   #offChart
-  #mediator
-  #core
 
   #elDividers
   #elDivider
@@ -38,12 +38,12 @@ export default class Divider {
 
   constructor(widgets, config) {
     this.#widgets = widgets
-    this.#offChart = config.offChart
-    this.#mediator = config.mediator
-    this.#core = this.#mediator.api.core
+    this.#core = config.core
+    this.#config = config
     this.#id = config.id
+    this.#offChart = config.offChart
     this.#elDividers = widgets.elements.elDividers
-    this.#elOffChart = config.offChart.elOffChart
+    this.#elOffChart = this.#core.elOffChart
     this.init()
   }
 
@@ -111,15 +111,15 @@ export default class Divider {
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onMouseEnter() {
@@ -193,9 +193,8 @@ export default class Divider {
 
   static defaultNode() {
     const dividersStyle = `position: absolute;`
-
     const node = `
-  <div class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
+  <div slot="widget" class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
   `
     return node
   }
@@ -211,8 +210,8 @@ export default class Divider {
     const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: #FFFFFF00;`
 
     const node = `
-  <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
-  `
+      <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
+    `
     return node
   }
 

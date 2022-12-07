@@ -11,7 +11,6 @@ export default class Menu {
 
   #id
   #widgets
-  #mediator
   #core
   #config
   
@@ -31,8 +30,7 @@ export default class Menu {
 
   constructor(widgets, config) {
     this.#widgets = widgets
-    this.#mediator = config.mediator
-    this.#core = this.#mediator.api.core
+    this.#core = config.core
     this.#config = config
     this.#id = config.id
     this.#elMenus = widgets.elements.elMenus
@@ -77,7 +75,7 @@ export default class Menu {
 
   end() {
     // remove event listners
-    const api = this.#mediator.api
+    const api = this.#config
     const menuItems = DOM.findBySelectorAll(`#${api.id} .${CLASS_MENU} li`)
     menuItems.forEach((item) => {
       item.removeEventListener('click', this.onMenuSelect)
@@ -89,7 +87,7 @@ export default class Menu {
   }
 
   eventsListen() {
-    const api = this.#mediator.api
+    const api = this.#core
     const menuItems = DOM.findBySelectorAll(`#${api.id} #${this.#config.id} li`)
     menuItems.forEach((item) => {
       item.addEventListener('click', this.onMenuSelect.bind(this))
@@ -100,15 +98,15 @@ export default class Menu {
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onMenuSelect(e) {
@@ -136,7 +134,7 @@ export default class Menu {
   }
 
   mount(el) {
-    const api = this.#mediator.api
+    const api = this.#core
 
     if (el.lastElementChild == null) 
       el.innerHTML = this.menuNode()
@@ -149,7 +147,7 @@ export default class Menu {
   static defaultNode() {
     const menuStyle = ``
     const node = `
-      <div class="${CLASS_MENUS}" style="${menuStyle}"></div>
+      <div slot="widget" class="${CLASS_MENUS}" style="${menuStyle}"></div>
     `
     return node
   }
@@ -168,7 +166,6 @@ export default class Menu {
   }
 
   content(menu) {
-    const api = this.#mediator.api
     const listStyle = `list-style: none; text-align: left; margin:1em 1em 1em -2.5em; min-width: ${MENUMINWIDTH}px`
     const itemStyle = "padding: .25em 1em .25em 1em; white-space: nowrap;"
     const shortStyle = "display: inline-block; width: 4em;"
