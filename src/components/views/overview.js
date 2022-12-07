@@ -21,7 +21,7 @@ template.innerHTML = `
     align-items: stretch;
     gap: 2px;
   }
-  .ScrollBar {
+  .scrollBar {
     border: 1px solid ${GlobalStyle.COLOUR_BORDER};
     height: 20px;
     border-radius: 3px;

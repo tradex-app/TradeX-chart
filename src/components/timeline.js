@@ -106,31 +106,20 @@ export default class Timeline {
   }
 
   mount(el) {
-    el.innerHTML = this.defaultNode()
-
-    const api = this.#mediator.api
-    this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .viewport`)
-    this.#elNavigation = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation`)
-    this.#elNavList = DOM.findBySelectorAll(`#${api.id} .${CLASS_TIME} .navigation .icon`)
-    this.#elNavScrollBar = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation #tScrollBar`)
-    this.#elNavScrollHandle = DOM.findBySelector(`#${api.id} .${CLASS_TIME} .navigation .handle`)
+    const api = this.#core
+    this.#elViewport = el.viewport
+    this.#elNavigation = el.overview
+    this.#elNavList = el.overview.icons
+    this.#elNavScrollBar = el.overview.scrollBar
+    this.#elNavScrollHandle = el.overview.handle
 
     for (let i of this.#elNavList) {
-      let svg = i.querySelector('svg');
-      svg.style.width = `${this.#icons.width}px`
-      svg.style.height = `${this.#icons.height}px`
-      svg.style.fill = `${this.#icons.fill}`
+      i.style.width = `${this.#icons.width}px`
+      i.style.height = `${this.#icons.height}px`
+      i.style.fill = `${this.#icons.fill}`
     }
-  }
 
-  defaultNode() {
-    const navStyle = `width: calc(100% - ${this.core.scaleW}px);`
-    
-    const node = `
-    <div class="viewport"></div>
-    <div class="navigation" style="${navStyle}">${this.navigationNode()}</div>
-  `
-    return node
+    // el.style.cssText = `display: block; width: calc(100% - ${this.core.scaleW}px);`
   }
 
   navigationNode() {
@@ -157,7 +146,7 @@ export default class Timeline {
   setDimensions(dim) {
     const buffer = this.config.buffer || BUFFERSIZE
     const width = dim.w - this.#core.Chart.scale.width
-    const height = this.height / 2
+    const height = this.height
     const layerWidth = Math.round(width * ((100 + buffer) * 0.01))
 
     this.#viewport.setSize(width, this.height)

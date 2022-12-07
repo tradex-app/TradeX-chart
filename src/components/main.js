@@ -31,11 +31,12 @@ import {
   OFFCHARTDEFAULTHEIGHT,
 } from "../definitions/chart"
 
-
-const STYLE_ROWS = "width:100%; min-width:100%;"
-const STYLE_ROW = "position: relative; overflow: hidden;"
-const STYLE_TIME = "border-top: 1px solid; width:100%; min-width:100%;"
-const STYLE_SCALE = "border-left: 1px solid;"
+import {
+  STYLE_ROWS,
+  STYLE_ROW,
+  STYLE_TIME,
+  STYLE_SCALE
+} from "../definitions/style"
 
 
 /**
@@ -139,11 +140,11 @@ export default class MainPane {
     const api = this.#mediator.api
 
     this.#elRows = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`)
-    this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
+    this.#elTime = DOM.findBySelector(`#${api.id} tradex-time`)
     this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
     this.#elGrid = DOM.findBySelector(`#${api.id} tradex-grid`)
     this.#elViewport = this.#elGrid.viewport // DOM.findBySelector(`#${api.id} .${CLASS_GRID} .viewport`)
-    this.#elChartScale  = DOM.findBySelector(`#${api.id} .${CLASS_YAXIS} .${CLASS_CHART}`)
+    this.#elChartScale = DOM.findBySelector(`#${api.id} .${CLASS_YAXIS} .${CLASS_CHART}`)
 
     api.parent = this
     api.chartData = this.mediator.api.chartData
@@ -418,10 +419,10 @@ export default class MainPane {
     this.#Time.setDimensions({w: dimensions.mainW})
     // this.#Time.draw()
 
-    this.#elGrid.style.height = `${height}px`
-    this.#elGrid.style.width = `${width}px`
-    this.#elViewport.style.height = `${height}px`
-    this.#elViewport.style.width = `${width}px`
+    // this.#elGrid.style.height = `${height}px`
+    // this.#elGrid.style.width = `${width}px`
+    // this.#elViewport.style.height = `${height}px`
+    // this.#elViewport.style.width = `${width}px`
     this.#viewport.setSize(width, height)
 
     const buffer = this.buffer
@@ -521,29 +522,22 @@ export default class MainPane {
   defaultNode() {
     const api = this.#mediator.api
     const styleRows = STYLE_ROWS + ` height: calc(100% - ${api.timeH}px)`
-    const styleTime = STYLE_TIME + ` height: ${api.timeH}px; border-color: ${this.theme.xAxis.line};`
+    const styleTime = STYLE_TIME + `width: calc(100% - ${this.core.scaleW}px); height: ${api.timeH}px; border-color: ${this.theme.xAxis.line};`
     const defaultRow = this.defaultRowNode()
-
     const node = `
     <div class="${CLASS_ROWS}" style="${styleRows}">
       ${defaultRow}
     </div>
-    <div class="${CLASS_TIME}" style="${styleTime}">
-      <canvas id=""><canvas/>
-    </div>
+    <tradex-time style="${styleTime}"></tradex-time>
     `
     return node
   }
 
   defaultRowNode() {
     const api = this.#mediator.api
-    const width = api.width - api.toolsW - api.scaleW
-    const height = api.height - api.utilsH - api.timeH
-    const styleGrid = ` width: ${width}px; height: ${height}px; overflow: hidden`
-      // let node = `<div class="${CLASS_GRID}" style="position: absolute;">
-      //                 <div class="viewport" style="${styleGrid}"></div>
-      //             </div>`
-      let node = `<tradex-grid></tradex-grid>`
+    const width = api.toolsW + api.scaleW
+    const styleGrid = `width: calc(100% - ${width}px); overflow: hidden;`
+      let node = `<tradex-grid style="${styleGrid}"></tradex-grid>`
           node += this.rowNode(CLASS_CHART)
 
     this.#elYAxis.innerHTML = this.scaleNode(CLASS_CHART)
@@ -553,14 +547,8 @@ export default class MainPane {
 
   rowNode(type) {
     const styleRow = STYLE_ROW + ` border-top: 1px solid ${this.theme.chart.BorderColour};`
-    const styleScale = STYLE_SCALE + ` border-color: ${this.theme.xAxis.line};`
-
     const node = `
       <div class="${CLASS_ROW} ${type}" style="${styleRow}">
-        <canvas><canvas/>
-        <div style="${styleScale}">
-          <canvas id=""><canvas/>
-        </div>
       </div>
     `
     return node
@@ -569,14 +557,6 @@ export default class MainPane {
   scaleNode(type) {
     const styleRow = STYLE_ROW + ` border-top: 1px solid ${this.theme.chart.BorderColour};`
     const styleScale = STYLE_SCALE + ` border-color: ${this.theme.yAxis.line};`
-
-    // const node = `
-    //   <div class="${CLASS_ROW} ${type}" style="${styleRow}">
-    //     <div style="${styleScale}">
-    //       <canvas id=""><canvas/>
-    //     </div>
-    //   </div>
-    // `
     const node = `
     <div class="${CLASS_ROW} ${type}" style="${styleRow}">
       <tradex-scale style="${styleScale}"></tradex-scale>

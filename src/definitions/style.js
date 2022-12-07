@@ -19,6 +19,11 @@ const COLOUR_TXT = "#ccc"
 const COLOUR_ICON = "#888"
 const COLOUR_ICONHOVER = "#CCC"
 
+export const STYLE_ROWS = "width:100%; min-width:100%;"
+export const STYLE_ROW = "position: relative; overflow: hidden;"
+export const STYLE_TIME = "border-top: 1px solid;"
+export const STYLE_SCALE = "display: block; border-left: 1px solid;"
+
 export const GlobalStyle = {
   COLOUR_BG: COLOUR_BG,
   COLOUR_BORDER: COLOUR_BORDER,
