@@ -46,8 +46,8 @@ import {
 } from "../definitions/chart"
 
 const STYLE_OFFCHART = "" // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
-const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
-const STYLE_SCALE2 = "top: 0; right: 0; border-left: 1px solid;"
+const STYLE_SCALE = "position: absolute; top: 0; right: 0;"
+const STYLE_SCALE2 = "top: 0; right: 0;"
 
 const defaultOverlays = [
   ["grid", {class: overlayGrid, fixed: true, required: true, params: {axes: "y"}}],
@@ -178,15 +178,12 @@ export default class OffChart {
     
     this.mount(this.#elOffChart)
 
-    // api - functions / methods, calculated properties provided by this module
-    const api = {...this.mediator.api}
-    api.parent = this
-    api.elements.elScale = this.#elScale
-
-    this.#Indicator = api.indicators[this.#overlay.type].ind
-    options.yAxisType = this.#Indicator.scale
-    const id = options.offChart.type + "_ScaleBar"
-    this.#Scale = this.mediator.register(id, ScaleBar, options, api)
+    const opts = {...options}
+    opts.parent = this
+    this.#Indicator = this.#core.indicators[this.#overlay.type].ind
+    opts.yAxisType = this.#Indicator.scale
+    opts.elScale = this.#elScale
+    this.#Scale = new ScaleBar(this.#core, opts)
     this.#Time = this.core.Timeline
   }
 

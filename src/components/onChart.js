@@ -53,8 +53,8 @@ import {
 } from "../definitions/chart"
 
 const STYLE_CHART = "" // "position: absolute; top: 0; left: 0; border: 1px solid; border-top: none; border-bottom: none;"
-const STYLE_SCALE = "position: absolute; top: 0; right: 0; border-left: 1px solid;"
-const STYLE_SCALE2 = "top: 0; right: 0; border-left: 1px solid;"
+const STYLE_SCALE = "position: absolute; top: 0; right: 0;"
+const STYLE_SCALE2 = "top: 0; right: 0;"
 
 const defaultOverlays = [
   ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
@@ -205,22 +205,14 @@ export default class Chart {
     this.#Legends = new Legends(this.#elLegends, this)
     this.#Legends.add(chartLegend)
 
-    // api - functions / methods, calculated properties provided by this module
-    const api = {...this.#mediator.api}
-    api.parent = this
-    api.chart = this
-    api.elements = 
-    {...api.elements, 
-      ...{
-        elScale: this.#elScale
-      }
-    }
-    api.onChart = this.#mediator.api.onChart
-    api.legends = this.#Legends
-
-    // Y Axis - Price Scale
-    options.yAxisType = "default"
-    this.#Scale = this.#mediator.register("Chart_ScaleBar", ScaleBar, options, api)
+    const opts = {...options}
+    opts.parent = this
+    opts.chart = this
+    opts.elScale = this.#elScale
+    opts.onChart = this
+    opts.legends = this.#Legends
+    opts.yAxisType = "default"
+    this.#Scale = new ScaleBar(this.#core, opts)
 
 
     // onChart indicators

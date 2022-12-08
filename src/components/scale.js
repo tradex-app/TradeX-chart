@@ -23,10 +23,9 @@ export default class ScaleBar {
   #ID
   #name = "Y Scale Axis"
   #shortName = "scale"
-  #mediator
+  #core
   #options
   #parent
-  #core
   #stateMachine
 
   #chart
@@ -46,30 +45,27 @@ export default class ScaleBar {
   #priceLine
   #cursorPos
 
-  constructor (mediator, options) {
+  constructor (core, options) {
 
-    this.#mediator = mediator
+    this.#core = core
     this.#options = {...options}
-    this.#elScale = mediator.api.elements.elScale
-    this.#chart = mediator.api.core.Chart
-    this.#parent = mediator.api.parent
-    this.#core = this.#mediator.api.core
-
-    this.#ID = this.#options.offChartID || uid("TX_scale_")
+    this.#elScale = options.elScale
+    this.#chart = options.Chart
+    this.#parent = options.parent
+    this.#ID = options.offChartID || uid("TX_scale_")
     this.init()
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warning(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
   get ID() { return this.#ID }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
-  get mediator() { return this.#mediator }
-  get options() { return this.#options }
   get core() { return this.#core }
+  get options() { return this.#options }
   get parent() { return this.#parent }
   set height(h) { this.setHeight(h) }
   get height() { return this.#elScale.clientHeight }
@@ -152,15 +148,15 @@ export default class ScaleBar {
   }
 
   on(topic, handler, context) {
-    this.mediator.on(topic, handler, context)
+    this.core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.mediator.off(topic, handler)
+    this.core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.mediator.emit(topic, data)
+    this.core.emit(topic, data)
   }
 
   onResize(dimensions) {
