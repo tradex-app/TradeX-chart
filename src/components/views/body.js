@@ -72,3 +72,5 @@ export default class tradeXBody extends element {
   get scale() { return this.shadowRoot.querySelector('tradex-scale') }
 
 }
+
+window.customElements.define('tradex-body', tradeXBody)

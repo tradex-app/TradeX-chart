@@ -39,7 +39,7 @@ export default class ToolsBar {
     this.#core = core
     this.#options = options
     this.#elTools = core.elTools
-    this.#tools = tools || options.tools
+    this.#tools = tools || core.config.tools
     this.#widgets = core.WidgetsG
     this.init()
   }

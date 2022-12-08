@@ -1,11 +1,11 @@
-// widgets.js
-// <tradex-widgets></tradex-widgets>
+// row.js
+// <tradex-row></tradex-row>
 
 import element from "./classes/element"
 
 const template = document.createElement('template')
 template.innerHTML = `
-  <slot name="widget"></slot>
+  <slot name="chartPane"></slot>
 `
 
 export default class tradeXWidgets extends element {
@@ -20,5 +20,3 @@ export default class tradeXWidgets extends element {
   disconnectedCallback() {
   }
 }
-
-window.customElements.define('tradex-widgets', tradeXWidgets)

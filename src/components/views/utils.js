@@ -3,10 +3,15 @@
 
 import element from "./classes/element"
 
-const style = `display: inline-block; float: right;`
 const template = document.createElement('template')
 template.innerHTML = `
-  <div class="utilsOptions" style="${style}">
+  <style>
+    .utilsOptions {
+      display: inline-block; float: right;
+    }
+  </style>
+  <slot></slot>
+  <div class="utilsOptions">
   </div>
 `
 
@@ -23,3 +28,5 @@ export default class tradeXUtils extends element {
   disconnectedCallback() {
   }
 }
+
+window.customElements.define('tradex-utils', tradeXUtils)

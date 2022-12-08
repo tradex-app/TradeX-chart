@@ -420,10 +420,6 @@ export default class MainPane {
     this.#Time.setDimensions({w: dimensions.mainW})
     // this.#Time.draw()
 
-    // this.#elGrid.style.height = `${height}px`
-    // this.#elGrid.style.width = `${width}px`
-    // this.#elViewport.style.height = `${height}px`
-    // this.#elViewport.style.width = `${width}px`
     this.#viewport.setSize(width, height)
 
     const buffer = this.buffer

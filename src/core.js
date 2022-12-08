@@ -410,56 +410,10 @@ constructor (mediator, config={}) {
       this.setRange(start, end)
     }
 
-    // api - functions / methods, calculated properties provided by this module
-    const api = {
-      ...this.#mediator.api,
-      ...{
-        id: this.id,
-        parent: this.#mediator,
-        core: this,
-        inCnt: this.inCnt,
-        width: this.width,
-        width: this.width,
-        height: this.height,
-
-        chartBGColour: this.chartBGColour,
-        chartTxtColour: this.chartTxtColour,
-        chartBorderColour: this.chartBorderColour,
-      
-        utilsH: this.utilsH,
-        toolsW: this.toolsW,
-        timeH: this.timeH,
-        scaleW: this.scaleW,
-      
-        elements: this.#elements,
-
-        UtilsBar: this.UtilsBar,
-        ToolsBar: this.ToolsBar,
-        MainPane: this.MainPane,
-        WidgetsG: this.WidgetsG,
-        Chart: this.Chart,
-
-        chartData: this.chartData,
-        offChart: this.offChart,
-        onChart: this.onChart,
-        datasets: this.datasets,
-        rangeLimit: this.rangeLimit,
-        range: this.#range,
-        updateRange: (pos) => this.updateRange(pos),
-        indicators: this.indicators,
-        time: this.time,
-
-        settings: this.settings,
-      }
-    }
-
     this.#WidgetsG = new WidgetsG(this, {widgets: config?.widgets})
     this.#UtilsBar = new UtilsBar(this, config)
     this.#ToolsBar = new ToolsBar(this, config)
     this.#MainPane = new MainPane(this, config)
-
-    api.Timeline = this.Timeline
-    api.Chart = this.Chart
 
     this.log(`${this.#name} instantiated`)
   }
@@ -556,7 +510,7 @@ constructor (mediator, config={}) {
 
     // define the elements for the components to mount onto
     this.#elTXChart = DOM.findBySelector(`#${this.id}`)
-    this.#elUtils = DOM.findBySelector(`#${this.id} .${CLASS_UTILS}`)
+    this.#elUtils = DOM.findBySelector(`#${this.id} tradex-utils`)
     this.#elBody = DOM.findBySelector(`#${this.id} .${CLASS_BODY}`)
     this.#elTools = DOM.findBySelector(`#${this.id} .${CLASS_TOOLS}`)
     this.#elMain  = DOM.findBySelector(`#${this.id} .${CLASS_MAIN}`)
@@ -812,7 +766,7 @@ constructor (mediator, config={}) {
     
     const node = `
       <div id="${this.id}" class="${classesTXChart}" style="${styleTXChart}">
-        <div class="${CLASS_UTILS}" style="${styleUtils}"></div>
+        <tradex-utils class="${CLASS_UTILS}" style="${styleUtils}"></tradex-utils>
         <div class="${CLASS_BODY}" style="${styleBody}">
           <div class="${CLASS_TOOLS}" style="${styleTools}"></div>
           <div class="${CLASS_MAIN}" style="${styleMain}"></div>
