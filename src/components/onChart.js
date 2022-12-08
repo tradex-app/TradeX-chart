@@ -69,9 +69,8 @@ export default class Chart {
 
   #name = "Chart"
   #shortName = "chart"
-  #mediator
-  #options
   #core
+  #options
   #parent
   #stateMachine
 
@@ -120,33 +119,31 @@ export default class Chart {
   #controller
 
 
-  constructor (mediator, options) {
+  constructor (core, options) {
 
-    this.#mediator = mediator
-    this.#elChart = mediator.api.elements.elChart
-    this.#elScale = mediator.api.elements.elChartScale
-    this.#parent = {...this.#mediator.api.parent}
-    this.#core = this.#mediator.api.core
-    this.#theme = this.#core.theme
-    this.#onChart = this.#mediator.api.onChart
+    this.#core = core
+    this.#elChart = options.elements.elChart
+    this.#elScale = options.elements.elChartScale
+    this.#parent = {...options.parent}
+    this.#theme = core.theme
+    this.#onChart = core.onChart
 
-    this.#settings = this.#mediator.api.settings
+    this.#settings = core.settings
     this.#options = options
     this.init(options)
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warning(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
   get ID() { return "chart" }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
-  get mediator() { return this.#mediator }
+  get core() { return this.#core }
   get options() { return this.#options }
   get element() { return this.#elChart }
-  get core() { return this.#core }
   get time() { return this.#Time }
   get scale() { return this.#Scale }
   get elScale() { return this.#elScale }
@@ -229,13 +226,13 @@ export default class Chart {
   start() {
 
     // X Axis - Timeline
-    this.#Time = this.mediator.api.Timeline
+    this.#Time = this.#core.Timeline
 
     // create and start overlays
     this.createGraph()
 
     // create and start on chart indicators
-    this.addOverlays(this.mediator.api.onChart)
+    this.addOverlays(this.#core.onChart)
 
 
     const data = {inputs: {}}
@@ -304,7 +301,7 @@ export default class Chart {
    * @param {*} context 
    */
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   /**
@@ -313,7 +310,7 @@ export default class Chart {
    * @param {function} handler 
    */
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   /**
@@ -322,7 +319,7 @@ export default class Chart {
    * @param {*} data 
    */
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onMouseMove(e) {
@@ -434,7 +431,7 @@ export default class Chart {
   }
 
   defaultNode() {
-    const api = this.#mediator.api
+    const api = this.#core
     const rowsH = api.height - api.utilsW - api.timeH
     const width = api.width - api.toolsW - api.scaleW
     const height = this.#options.chartH || rowsH - 1

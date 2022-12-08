@@ -60,7 +60,6 @@ export default class OffChart {
   #ID
   #name = "OffChart"
   #shortName = "offChart"
-  #mediator
   #options
   #core
   #parent
@@ -110,14 +109,13 @@ export default class OffChart {
   }
 
 
-  constructor (mediator, options) {
+  constructor (core, options) {
 
-    this.#mediator = mediator
-    this.#elOffChart = mediator.api.elements.elOffChart
-    this.#elScale = mediator.api.elements.elScale
-    this.#parent = {...this.mediator.api.parent}
+    this.#core = core
+    this.#elOffChart = options.elements.elOffChart
+    this.#elScale = options.elements.elScale
+    this.#parent = {...options.parent}
     this.#overlay = {...options.offChart}
-    this.#core = this.mediator.api.core
     this.#theme = this.#core.theme
 
     this.#options = {...options}
@@ -125,15 +123,14 @@ export default class OffChart {
     this.init(this.#options)
   }
 
-  log(l) { this.mediator.log(l) }
-  info(i) { this.mediator.info(i) }
-  warning(w) { this.mediator.warn(w) }
-  error(e) { this.mediator.error(e) }
+  log(l) { this.core.log(l) }
+  info(i) { this.core.info(i) }
+  warning(w) { this.core.warn(w) }
+  error(e) { this.core.error(e) }
 
   get ID() { return this.#ID }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
-  get mediator() { return this.#mediator }
   get options() { return this.#options }
   get core() { return this.#core }
   get time() { return this.#Time }
@@ -192,7 +189,7 @@ export default class OffChart {
     this.#offChartID = index
 
     // X Axis - Timeline
-    this.#Time = this.mediator.api.Timeline
+    this.#Time = this.#core.Timeline
 
     // add divider to allow manual resize of the offChart indicator
     const config = { offChart: this }
@@ -268,15 +265,15 @@ export default class OffChart {
   }
 
   on(topic, handler, context) {
-    this.mediator.on(topic, handler, context)
+    this.core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.mediator.off(topic, handler)
+    this.core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.mediator.emit(topic, data)
+    this.core.emit(topic, data)
   }
 
   onMouseMove(e) {
@@ -330,7 +327,7 @@ export default class OffChart {
     el.id = this.#ID
     el.innerHTML = this.defaultNode()
 
-    const api = this.mediator.api
+    const api = this.#core
     // this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elViewport = DOM.findBySelector(`#${this.#ID} .viewport`)
     this.#elLegends = DOM.findBySelector(`#${this.#ID} .legends`)
@@ -381,7 +378,7 @@ export default class OffChart {
   }
 
   defaultNode() {
-    const api = this.mediator.api
+    const api = this.#core
     const width = api.width - api.toolsW - api.scaleW
     const height = this.#options.rowH
 

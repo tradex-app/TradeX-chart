@@ -49,7 +49,6 @@ export default class MainPane {
 
   #name = "MainPane"
   #shortName = "Main"
-  #mediator
   #options
   #parent
   #core
@@ -91,25 +90,23 @@ export default class MainPane {
   #indicators
   #controller
 
-  constructor (mediator, options) {
+  constructor (core, options) {
 
-    this.#mediator = mediator
+    this.#core = core
     this.#options = options
-    this.#parent = {...this.#mediator.api.parent}
-    this.#core = this.#mediator.api.core
+    this.#parent = {...core}
     this.#elMain = this.#core.elMain
     this.#elYAxis = this.#core.elYAxis
     this.init(options)
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warning(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
   get name() { return this.#name }
   get shortName() { return this.#shortName }
-  get mediator() { return this.#mediator }
   get core() { return this.#core }
   get chart() { return this.#Chart }
   get time() { return this.#Time }
@@ -140,11 +137,9 @@ export default class MainPane {
   init(options) {
     this.mount(this.#elMain)
 
-    this.#indicators = this.#core.indicators
-
-    const api = this.#mediator.api
     const core = this.#core
 
+    this.#indicators = this.#core.indicators
     this.#elRows = DOM.findBySelector(`#${core.id} .${CLASS_ROWS}`)
     this.#elTime = DOM.findBySelector(`#${core.id} tradex-time`)
     this.#elChart = DOM.findBySelector(`#${core.id} .${CLASS_CHART}`)
@@ -152,31 +147,31 @@ export default class MainPane {
     this.#elViewport = this.#elGrid.viewport
     this.#elChartScale = DOM.findBySelector(`#${core.id} .${CLASS_YAXIS} .${CLASS_CHART}`)
 
-    api.parent = this
-    api.chartData = this.mediator.api.chartData
-    api.onChart = this.#mediator.api.onChart
-    api.offChart = this.#mediator.api.offChart
-    api.rangeLimit = this.#mediator.api.rangeLimit
-    api.settings = this.#mediator.api.settings
+    options.parent = this
+    options.chartData = this.#core.chartData
+    options.onChart = this.#core.onChart
+    options.offChart = this.#core.offChart
+    options.rangeLimit = this.#core.rangeLimit
+    options.settings = this.#core.settings
 
     // api - functions / methods, calculated properties provided by this module
     options.elements = 
-      {
+      {...options.elements, 
+        ...{
           elChart: this.#elChart,
           elTime: this.#elTime,
           elRows: this.#elRows,
           elOffCharts: this.#elOffCharts,
           elChartScale: this.#elChartScale
+        }
       }
-
-    api.elements = {...api.elements, ...options.elements}
 
     // register timeline - xAxis
     this.#Time = new Timeline(this.#core, options)
     // register offChart
-    this.registerOffCharts(options, api)
+    this.registerOffCharts(options)
     // register chart
-    this.#Chart = this.#mediator.register("Chart", Chart, options, api)
+    this.#Chart = new Chart(this.#core, options)
 
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE
     this.#rowMinH = isNumber(this.config.rowMinH)? this.config.rowMinH : ROWMINHEIGHT
@@ -255,15 +250,15 @@ export default class MainPane {
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onMouseWheel(e) {
@@ -398,7 +393,7 @@ export default class MainPane {
   }
 
   setHeight(h) {
-    const api = this.#mediator.api
+    const api = this.#core
     const resize = this.rowsH / (h - api.timeH)
     const rows = this.#elRows.children
     /*
@@ -459,13 +454,13 @@ export default class MainPane {
     return w - Math.round(r)
   }
 
-  registerOffCharts(options, api) {
+  registerOffCharts(options) {
     
-    let a = this.#offChartDefaultH * this.#mediator.api.offChart.length,
+    let a = this.#offChartDefaultH * this.#core.offChart.length,
         offChartsH = Math.round( a / Math.log10( a * 2 ) ) / 100,
         rowsH = this.rowsH * offChartsH;
 
-    if (this.#mediator.api.offChart.length === 1) {
+    if (this.#core.offChart.length === 1) {
       // adjust chart size for first offChart
       options.rowH = this.rowsH * this.#offChartDefaultH / 100
       options.chartH = this.rowsH - options.rowH
@@ -477,8 +472,8 @@ export default class MainPane {
       options.chartH = this.rowsH - rowsH
     }
 
-    for (let o of this.#mediator.api.offChart) {
-      this.addOffChart(o, options, api)
+    for (let o of this.#core.offChart) {
+      this.addOffChart(o, options)
     }
     // this.emit("resizeChart", {w: this.rowsW, h: options.chartH})
     // this.#Chart.setDimensions({w: this.rowsW, h: options.chartH})
@@ -488,9 +483,8 @@ export default class MainPane {
    * add off chart indicator below chart and any other off charts
    * @param {object} offChart - data for the indicator
    * @param {object} options 
-   * @param {object} api 
    */
-  addOffChart(offChart, options, api) {
+  addOffChart(offChart, options) {
 
     this.#elRows.lastElementChild.insertAdjacentHTML("afterend", this.rowNode(offChart.type))
     this.#elOffCharts.push(this.#elRows.lastElementChild)
@@ -498,11 +492,11 @@ export default class MainPane {
     this.#elYAxis.lastElementChild.insertAdjacentHTML("afterend", this.scaleNode(offChart.type))
     this.#elYAxisScales.push(this.#elYAxis.lastElementChild)
 
-    api.elements.elOffChart = this.#elRows.lastElementChild
-    api.elements.elScale = this.#elYAxis.lastElementChild
+    options.elements.elOffChart = this.#elRows.lastElementChild
+    options.elements.elScale = this.#elYAxis.lastElementChild
     options.offChart = offChart
 
-    let o = this.#mediator.register("OffChart", OffChart, options, api)
+    let o = new OffChart(this.#core, options)
     
     this.#OffCharts.set(o.ID, o)
 
@@ -526,7 +520,7 @@ export default class MainPane {
   }
 
   defaultNode() {
-    const api = this.#mediator.api
+    const api = this.#core
     const styleRows = STYLE_ROWS + ` height: calc(100% - ${api.timeH}px)`
     const styleTime = STYLE_TIME + `width: calc(100% - ${this.core.scaleW}px); height: ${api.timeH}px; border-color: ${this.theme.xAxis.line};`
     const defaultRow = this.defaultRowNode()
@@ -540,7 +534,7 @@ export default class MainPane {
   }
 
   defaultRowNode() {
-    const api = this.#mediator.api
+    const api = this.#core
     const width = api.toolsW + api.scaleW
     const styleGrid = `width: calc(100% - ${width}px); overflow: hidden;`
       let node = `<tradex-grid style="${styleGrid}"></tradex-grid>`

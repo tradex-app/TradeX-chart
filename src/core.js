@@ -4,9 +4,10 @@
 // import * as talib from "talib-web"
 import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeChecks'
 import DOM from './utils/DOM'
+import * as Time from './utils/time'
+import { limit } from './utils/number'
+import { interval2MS, isTimeFrame, SECOND_MS } from "./utils/time"
 import SX from './scaleX/scale'
-import style from './definitions/style'
-import TXCElement from "./components/views/tradeXchart"
 import State from './state'
 import { Range, calcTimeIndex } from "./model/range"
 import StateMachine from './scaleX/stateMachne'
@@ -14,9 +15,8 @@ import Stream from './helpers/stream'
 import Theme from "./helpers/theme"
 import WebWorker from "./helpers/webWorkers"
 import Indicators from './definitions/indicators'
-import * as Time from './utils/time'
-import { limit } from './utils/number'
-import { interval2MS, isTimeFrame, SECOND_MS } from "./utils/time"
+import style from './definitions/style'
+import TXCElement from "./components/views/tradeXchart"
 import UtilsBar from './components/utils'
 import ToolsBar from './components/tools'
 import MainPane from './components/main'
@@ -456,7 +456,7 @@ constructor (mediator, config={}) {
     this.#WidgetsG = new WidgetsG(this, {widgets: config?.widgets})
     this.#UtilsBar = new UtilsBar(this, config)
     this.#ToolsBar = new ToolsBar(this, config)
-    this.#MainPane = this.#mediator.register("MainPane", MainPane, config, api)
+    this.#MainPane = new MainPane(this, config)
 
     api.Timeline = this.Timeline
     api.Chart = this.Chart
