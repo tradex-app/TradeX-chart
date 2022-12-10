@@ -13,10 +13,6 @@ import {
   SCALEW,
 } from "../../definitions/core"
 
-window.customElements.define('tradex-grid', tradeXGrid)
-window.customElements.define('tradex-onchart', tradeXOnChart)
-window.customElements.define('tradex-offchart', tradeXOffChart)
-
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
@@ -53,3 +49,5 @@ export default class tradeXRows extends element {
   get onChart() { return this.shadowRoot.querySelector('tradex-onchart') }
   get offChart() { return this.shadowRoot.querySelector('tradex-offchart') }
 }
+
+window.customElements.define('tradex-rows', tradeXRows)

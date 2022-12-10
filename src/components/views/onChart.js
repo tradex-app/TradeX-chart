@@ -13,8 +13,6 @@ import {
   SCALEW,
 } from "../../definitions/core"
 
-window.customElements.define('tradex-legend', tradeXLegend)
-
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
@@ -25,12 +23,7 @@ template.innerHTML = `
     width: 100%;
     height: 100%;
   }
-  scale {
-    width: ${SCALEW - 1}px; 
-    height: 100%; 
-    /* border-color: {api.chartBorderColour}; */
-  }
-  legends {
+  tradex-legends {
     position: absolute;
     top: 0;
     left: 0;
@@ -39,7 +32,7 @@ template.innerHTML = `
   }
 </style>
 <div class="viewport"></div>
-<tradex-legend></tradex-legend>
+<tradex-legends></tradex-legends>
 `
 
 export default class tradeXOnChart extends element {
@@ -77,3 +70,5 @@ export default class tradeXOnChart extends element {
   get elViewport() { return this.#elViewport }
   get elLegends() { return this.#elLegends }
 }
+
+window.customElements.define('tradex-onchart', tradeXOnChart)

@@ -15,9 +15,6 @@ import {
   GlobalStyle
 } from "../../definitions/style"
 
-window.customElements.define('tradex-rows', tradeXRows)
-window.customElements.define('tradex-time', tradeXTime)
-
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
@@ -52,3 +49,5 @@ export default class tradeXMain extends element {
   get rows() { return this.shadowRoot.querySelector('tradex-rows') }
   get time() { return this.shadowRoot.querySelector('tradex-time') }
 }
+
+window.customElements.define('tradex-main', tradeXMain)

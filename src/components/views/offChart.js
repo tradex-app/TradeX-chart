@@ -18,22 +18,16 @@ template.innerHTML = `
     width: 100%;
     height: 100%;
   }
-  <scale>
-    width: ${SCALEW - 1}px; 
-    height: 100%; 
-    /* border-color: {api.chartBorderColour}; */
-  </scale>
-  <legends>
-    width: 100%;
+  tradex-legends {
     position: absolute;
     top: 0;
     left: 0;
     z-index:100;
-  </legends>
+    width: 100%;
+  }
 </style>
 <div class="viewport"></div>
-<div class="legends"></div>
-<div class="scale"></div>
+<tradex-legends></tradex-legends>
 `
 
 export default class tradeXOffChart extends element {
@@ -69,3 +63,5 @@ export default class tradeXOffChart extends element {
   get elLegends() { return this.#elLegends }
 
 }
+
+window.customElements.define('tradex-offchart', tradeXOffChart)

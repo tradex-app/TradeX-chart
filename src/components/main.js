@@ -94,7 +94,7 @@ export default class MainPane {
 
     this.#core = core
     this.#options = options
-    this.#parent = {...core}
+    this.#parent = core
     this.#elMain = this.#core.elMain
     this.#elYAxis = this.#core.elYAxis
     this.init(options)

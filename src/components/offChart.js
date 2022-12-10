@@ -328,11 +328,8 @@ export default class OffChart {
     el.innerHTML = this.defaultNode()
 
     const api = this.#core
-    // this.#elWidgets = DOM.findBySelector(`#${api.id} .${CLASS_WIDGETS}`)
     this.#elViewport = DOM.findBySelector(`#${this.#ID} .viewport`)
-    this.#elLegends = DOM.findBySelector(`#${this.#ID} .legends`)
-    // this.#elScale = DOM.findBySelector(`#${this.#ID} .${CLASS_SCALE}`)
-    // this.#elScale2.style.cssText = this.#elScale.style.cssText
+    this.#elLegends = DOM.findBySelector(`#${this.#ID} tradex-legends`)
   }
 
   props() {
@@ -388,7 +385,7 @@ export default class OffChart {
 
     const node = `
       <div class="viewport" style="${styleOffChart}"></div>
-      <div class="legends" style="${styleLegend}"></div>
+      <tradex-legends style="${styleLegend}"></tradex-legends>
       <div class="${CLASS_SCALE}" style="${styleScale}"></div>
     `
     this.#elScale.style.cssText = STYLE_SCALE2 + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`

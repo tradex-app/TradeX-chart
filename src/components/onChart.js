@@ -371,10 +371,7 @@ export default class Chart {
 
     const api = this.#core
     this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .viewport`)
-    this.#elLegends = DOM.findBySelector(`#${api.id} .${CLASS_CHART} .legends`)
-
-    // this.#elViewport = DOM.findBySelector(`#${api.id} tradex-onchart`).elViewport
-    // this.#elLegends = DOM.findBySelector(`#${api.id} tradex-onchart`).elLegends
+    this.#elLegends = DOM.findBySelector(`#${api.id} .${CLASS_CHART} tradex-legends`)
   }
 
   props() {
@@ -442,7 +439,7 @@ export default class Chart {
 
     const node = `
       <div class="viewport" style="${styleChart}"></div>
-      <div class="legends" style="${styleLegend}"></div>
+      <tradex-legends style="${styleLegend}"></tradex-legends>
     `
     // const node = `<tradex-onchart></tradex-onchart>`
     this.#elScale.style.cssText = STYLE_SCALE2 + ` width: ${api.scaleW - 1}px; height: ${height}px; border-color: ${api.chartBorderColour};`

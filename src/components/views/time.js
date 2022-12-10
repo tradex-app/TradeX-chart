@@ -34,3 +34,5 @@ export default class tradeXTime extends element {
   get overview() { return this.shadowRoot.querySelector('tradex-overview') }
 
 }
+
+window.customElements.define('tradex-time', tradeXTime)

@@ -45,3 +45,5 @@ export default class tradeXScale extends element {
   get viewport() { return this.#viewport}
 
 }
+
+window.customElements.define('tradex-scale', tradeXScale)

@@ -16,10 +16,6 @@ import {
   GlobalStyle
 } from "../../definitions/style"
 
-window.customElements.define('tradex-tools', tradeXTools)
-window.customElements.define('tradex-main', tradeXMain)
-window.customElements.define('tradex-scale', tradeXScale)
-
 const template = document.createElement('template')
 template.innerHTML = `
 <style>

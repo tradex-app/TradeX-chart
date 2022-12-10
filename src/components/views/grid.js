@@ -25,3 +25,5 @@ export default class tradeXGrid extends element {
   get viewport() { return this.shadowRoot.querySelector('.viewport') }
 
 }
+
+window.customElements.define('tradex-grid', tradeXGrid)
