@@ -1,5 +1,7 @@
 import { Chart, DOM } from './src'
 import * as talib from "talib-web"
+import * as demo from './demo.js'
+
 // import './chart-live.css'
 
 import state from './data/1hour.js'
@@ -15,17 +17,17 @@ DOM.findBySelector('#app').innerHTML = `
 </div>
 
 `
-const mount = DOM.findBySelector('#test')
 const config = {
   id: "TradeX_test",
   title: "BTC/USDT",
-  width: 1000,
-  height: 800,
+  // width: 1000,
+  // height: 800,
   utils: {none: true},
   tools: {none: true},
   rangeStartTS: 1558429200000, // 21/05/2019, 11:00:00 - 1 hour price
   // rangeStartTS: 1663059600000, // seconds price
   rangeLimit: 30,
+  buffer: 5,
   theme: {
     candle: {
       Type: "candle_down_hollow",
@@ -56,36 +58,20 @@ const config = {
   errors: true,
   // stream: {},
   maxCandleUpdate: 250,
-  talib: talib
+  talib: talib,
+  state: state
 }
-const chart = Chart.create(mount, config, state )
+// const chart = Chart.create(mount, config, state)
+const chart = document.createElement("tradex-chart")
+chart.id = "test"
+document.getElementById("app").appendChild(chart)
 window.chart = chart
+chart.init(config)
 chart.start(chart.getModID())
 
 console.log("API: id:", chart.id)
 console.log("API: name:", chart.name)
 console.log("API: height:", chart.height)
-
-function internals() {
-  const data = {}
-  const tx = chart.Timeline.xAxis
-
-  data.rangeLength = [`range.length:`,`${tx.range.Length}`]
-  data.rangeIntervalStr = [`range.intervalStr:`,`${tx.range.intervalStr}`]
-  data.rangeStart = ["range.indexStart: ", tx.indexStart]
-  data.rangeEnd = ["range.indexEnd: ", tx.indexEnd]
-  data.rangeStartTS = ["range.indexStart TS: ", new Date(tx.range.value(tx.indexStart)[0])]
-  data.rangeEndTS = ["range.indexEnd TS: ", new Date(tx.range.value(tx.indexEnd)[0])]
-  data.scrollPos = ["scrollPos:", chart.scrollPos]
-  data.bufferPx = ["bufferPx:", chart.bufferPx]
-  data.gradsTimeSpan = ["grads.timeSpan: ", tx.xAxisGrads.timeSpan]
-  data.gradsUnits = ["grads.units: ", JSON.stringify(tx.xAxisGrads.units)]
-  data.mouseXPos = ["mouseXPos:", chart.mousePos.x]
-  data.mouseRangePos = ["xPos2Index:", chart.Timeline.xPos2Index(chart.mousePos.x)]
-
-
-  return data
-}
 
 const infoBox = {}
       infoBox.el = DOM.findBySelector('#info')
@@ -98,10 +84,10 @@ const infoBox = {}
         infoBox.el.innerHTML = inf
       }
 
-chart.on("chart_zoom", (e) => { infoBox.out(internals()) })
-chart.on("chart_pan", (e) => { infoBox.out(internals()) })
-chart.on("main_mousemove", (e) => { infoBox.out(internals()) })
-infoBox.out(internals())
+chart.on("chart_zoom", (e) => { infoBox.out(demo.internals()) })
+chart.on("chart_pan", (e) => { infoBox.out(demo.internals()) })
+chart.on("main_mousemove", (e) => { infoBox.out(demo.internals()) })
+infoBox.out(demo.internals())
 // test()
 
 let time = chart.range.value()[0]

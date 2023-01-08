@@ -3,20 +3,17 @@
 
 import element from "./classes/element"
 import graph from "./classes/graph"
-
 import {
-  UTILSH,
-  TOOLSW,
-  TIMEH,
-  SCALEW,
-} from "../../definitions/core"
+  GlobalStyle
+} from "../../definitions/style"
 
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
-  viewport {
+  .viewport {
     width: 100%;
-    height: 100%;
+    height: inherit;
+    background: var(--txc-onchart-background, none);
   }
   tradex-legends {
     position: absolute;
@@ -26,15 +23,15 @@ template.innerHTML = `
     width: 100%;
   }
 </style>
-<div class="viewport"></div>
 <tradex-legends></tradex-legends>
+<div class="viewport"></div>
 `
 
 export default class tradeXOffChart extends element {
 
   #parent
   #elViewport
-  #elLegends
+  #elLegend
   #elCanvas
   #options
 
@@ -52,16 +49,16 @@ export default class tradeXOffChart extends element {
     if (this.doInit) {
       this.doInit = false
       this.shadowRoot.appendChild(this.template.content.cloneNode(true))
-      this.style.display = "none"
+      this.#elViewport = this.shadowRoot.querySelector('.viewport')
+      this.#elLegend = this.shadowRoot.querySelector('tradex-legends')
     }
   }
 
   disconnectedCallback() {
   }
 
-  get elViewport() { return this.#elViewport }
-  get elLegends() { return this.#elLegends }
-
+  get viewport() { return this.#elViewport }
+  get legend() { return this.#elLegend }
 }
 
 window.customElements.define('tradex-offchart', tradeXOffChart)

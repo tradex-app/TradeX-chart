@@ -1,30 +1,32 @@
 // DOM.js
 // DOM utilities
 
+import { isObject } from "./typeChecks"
+
 const DOM = {
 
-  findByID(id) {
-    return document.getElementById(id)
+  findByID(id, base=document) {
+    return base.getElementById(id)
   },
 
-  findByClass(cl) {
-    return document.getElementsByClassName(cl)
+  findByClass(cl, base=document) {
+    return base.getElementsByClassName(cl)
   },
 
-  findByName(name) {
-    return document.getElementsByName(name)
+  findByName(name, base=document) {
+    return base.getElementsByName(name)
   },
 
-  fndByTag(tag) {
-    return document.getElementsByTagName(tag)
+  fndByTag(tag, base=document) {
+    return base.getElementsByTagName(tag)
   },
 
-  findBySelector(sel) {
-    return document.querySelector(sel)
+  findBySelector(sel, base=document) {
+    return base.querySelector(sel)
   },
 
-  findBySelectorAll(sel) {
-    return document.querySelectorAll(sel)
+  findBySelectorAll(sel, base=document) {
+    return base.querySelectorAll(sel)
   },
 
   // returns true if it is a DOM node
@@ -183,6 +185,66 @@ const DOM = {
     }
 
     document.addEventListener('click', outsideClickListener);
+  },
+
+  addStyleRule(styleSheet, selector, property, value) {
+    let r = this.findStyleRule(styleSheet, selector, property, value)
+    if (!r) return
+    // Change rule if it exists
+    else if (r.i >= 0) {
+      r.rules[r.i].style[r.property] = r.value;
+    }
+    else {
+      // Add rule if it does not
+      // r.styleSheet.insertRule(r.selector + " { " + r.property + ": " + r.value + "; }", 0);
+      this.addCSSRule(r.styleSheet, r.selector, r.rules, r.index)
+    }
+  },
+
+  deleteStyleRule(styleSheet, selector, property) {
+    let r = this.findStyleRule(styleSheet, selector, property, '')
+    let deleteRule = r.styleSheet.deleteRule || r.styleSheet.removeRule
+    deleteRule(r.i)
+  },
+
+  findStyleRule(styleSheet, selector, property, value) {
+    if (!styleSheet || !isObject(styleSheet)) return null
+    else if (styleSheet.constructor.name == "HTMLStyleElement") styleSheet = styleSheet.sheet
+    else if (styleSheet.constructor.name != "CSSStyleSheet") return null
+
+    let r = this.styleRuleSanitize(selector, property, value)
+    selector = r[0];
+    property = r[1];
+    value = r[2];
+
+    // Change rule if it exists
+    const rules = styleSheet.cssRules || styleSheet.rules;
+    for(var i = rules.length - 1; i > 0 ; --i) {
+      let rule = rules[i];
+      if(rule.selectorText === selector) {
+        break;
+      }
+    }
+
+    return {styleSheet, rules, selector, property, value, i};
+  },
+
+  styleRuleSanitize(selector, property, value) {
+    return [
+      // CSS (& HTML) reduce spaces in selector to one
+      selector = selector.toLowerCase().replace(/\s+/g, ' '),
+      property = property.toLowerCase(),
+      value = value.toLowerCase(),
+    ]
+  },
+
+  addCSSRule(sheet, selector, rules, index) {
+    if(sheet.insertRule) {
+      sheet.insertRule(selector + "{" + rules + "}", index);
+    }
+    else {
+      sheet.addRule(selector, rules, index);
+    }
   }
 
 }

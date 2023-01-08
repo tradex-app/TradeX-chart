@@ -1,4 +1,4 @@
-// state-chart.js
+// state-mainPain.js
 
 export default
 {
@@ -44,8 +44,8 @@ export default
             // console.log('offChart: transition from "idle" to "addIndicator" state')
           },
         },
-        resize: {
-          target: 'resize',
+        global_resize: {
+          target: 'global_resize',
           action (data) {
             // console.log('offChart: transition from "idle" to "addIndicator" state')
           },
@@ -189,10 +189,10 @@ export default
         }
       }
     },
-    resize: {
+    global_resize: {
       onEnter(data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
-        this.context.origin.setDimensions(data)
+        this.context.origin.setDimensions()
       },
       onExit(data) {
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)

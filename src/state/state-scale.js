@@ -1,4 +1,4 @@
-// state-chart.js
+// state-scale.js
 
 export default 
 {

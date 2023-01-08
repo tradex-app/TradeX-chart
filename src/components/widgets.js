@@ -64,7 +64,7 @@ export default class Widgets {
     this.eventsListen()
 
     // start State Machine 
-    stateMachineConfig.context.origin = this
+    stateMachineConfig.context = this
     this.stateMachine = stateMachineConfig
     this.stateMachine.start()
   }

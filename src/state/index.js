@@ -43,6 +43,16 @@ export default class State {
   #status = false
   #isEmpty = true
 
+  static create(state, deepValidate=false, isCrypto=false) {
+    const instance = new State(state, deepValidate, isCrypto)
+    State.#stateList.push(instance)
+    return instance
+  }
+
+  static delete(state) {
+
+  }
+  
   constructor(state, deepValidate=false, isCrypto=false) {
     // this.#store = new Store()
 
@@ -57,16 +67,6 @@ export default class State {
       this.#status = "default"
       this.#isEmpty = true
     }
-  }
-
-  static create(state, deepValidate=false, isCrypto=false) {
-    const instance = new State(state, deepValidate, isCrypto)
-    State.#stateList.push(instance)
-    return instance
-  }
-
-  static delete(state) {
-
   }
 
   get status() { return this.#status }

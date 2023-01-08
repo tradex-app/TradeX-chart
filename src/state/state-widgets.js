@@ -1,4 +1,4 @@
-// state-chart.js
+// state-widgets.js
 
 export default
 {
@@ -26,14 +26,14 @@ export default
       onEnter(data) {
         console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
-        // this.context.origin.instances[data.menu].open()
-        // this.context.origin.instances[data.menu].offMenu()
+        // this.context.instances[data.menu].open()
+        // this.context.instances[data.menu].offMenu()
 
       },
       onExit(data) {
         console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
 
-        // this.context.origin.instances[data.menu].close()
+        // this.context.instances[data.menu].close()
       },
       on: {
         closeMenu: {
@@ -48,14 +48,14 @@ export default
       onEnter(data) {
         console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
-        // this.context.origin.instances[data.menu].open()
-        // this.context.origin.instances[data.menu].offMenu()
+        // this.context.instances[data.menu].open()
+        // this.context.instances[data.menu].offMenu()
 
       },
       onExit(data) {
         console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
 
-        // this.context.origin.instances[data.menu].close()
+        // this.context.instances[data.menu].close()
       },
       on: {
         closeWindow: {

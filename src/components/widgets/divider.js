@@ -37,13 +37,16 @@ export default class Divider {
 
 
   constructor(widgets, config) {
+
+    const cfg = {...config}
+
     this.#widgets = widgets
-    this.#core = config.core
-    this.#config = config
-    this.#id = config.id
-    this.#offChart = config.offChart
+    this.#core = cfg.core
+    this.#config = cfg
+    this.#id = cfg.id
+    this.#offChart = cfg.offChart
     this.#elDividers = widgets.elements.elDividers
-    this.#elOffChart = this.#core.elOffChart
+    this.#elOffChart = this.#offChart.element
     this.init()
   }
 
@@ -71,7 +74,7 @@ export default class Divider {
   get config() { return this.#core.config }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elDivider) }
-  get height() { return this.#elDivider.clientHeight }
+  get height() { return this.#elDivider.getBoundingClientRect().height }
 
   init() {
     // insert element
@@ -104,8 +107,6 @@ export default class Divider {
 
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
     this.#controller.on("mouseout", this.onMouseOut.bind(this))
-    this.#controller.on("drag", debounce(this.onDividerDrag, 1, this, true));
-    this.#controller.on("enddrag", this.onDividerDragDone.bind(this));
     this.#controller.on("mousedown", debounce(this.onMouseDown, 100, this, true));
     this.#controller.on("mouseup", this.onMouseUp.bind(this));
   }
@@ -128,32 +129,6 @@ export default class Divider {
 
   onMouseOut() {
     this.#elDivider.style.background = "#FFFFFF00"
-  }
-
-  onDividerDrag(e) {
-    this.#cursorPos = [
-      Math.floor(e.position.x), Math.floor(e.position.y),
-      e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
-    ]
-    const dragEvent = {
-      divider: this,
-      cursorPos: this.#cursorPos
-    }
-    this.emit("divider_drag", dragEvent)
-  }
-
-  onDividerDragDone(e) {
-    this.#cursorPos = [
-      Math.floor(e.position.x), Math.floor(e.position.y),
-      e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
-    ]
-    const dragEvent = {
-      divider: this,
-      cursorPos: this.#cursorPos
-    }
-    this.emit("divider_dragDone", dragEvent)
   }
 
   onMouseDown(e) {
@@ -184,7 +159,7 @@ export default class Divider {
     else
       this.#elDividers.lastElementChild.insertAdjacentHTML("afterend", this.defaultNode())
 
-    this.#elDivider = DOM.findBySelector(`#${this.#id}`)
+    this.#elDivider = DOM.findBySelector(`#${this.#id}`, this.#elDividers)
   }
 
   setCursor(cursor) {
@@ -201,7 +176,7 @@ export default class Divider {
 
   dividerNode() {
     let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top,
-      width = this.#core.MainPane.rowsW,
+      width = this.#core.MainPane.rowsW + this.#core.scaleW,
       height = (isNumber(this.config.dividerHeight)) ? 
         this.config.dividerHeight : DIVIDERHEIGHT,
       left = this.#core.toolsW;

@@ -66,7 +66,7 @@ export function _set(obj, path, value) {
 }
 
 /**
- * Deep copy an object - no shared object references
+ * Deep copy an array or object - no shared object references
  * https://stackoverflow.com/a/122190/15109215
  *
  * @export
@@ -80,7 +80,7 @@ export function copyDeep(obj) {
   if (obj instanceof Date)
       var temp = new obj.constructor(); //or new Date(obj);
   else
-      var temp = obj.constructor();
+      var temp = Array.isArray(obj) ? [] : {}  // obj.constructor();
 
   for (var key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {

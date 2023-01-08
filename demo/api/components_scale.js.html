@@ -146,7 +146,7 @@ export default class ScaleBar {
 
     // start State Machine 
     const newConfig = copyDeep(stateMachineConfig)
-    newConfig.context.origin = this
+    newConfig.context = this
     this.mediator.stateMachine = newConfig
     this.mediator.stateMachine.start()
   }

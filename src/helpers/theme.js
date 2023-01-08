@@ -1,58 +1,58 @@
 // theme.js
 
 import { isObject, isString } from "../utils/typeChecks"
-import { uid } from "../utils/utilities"
+import { copyDeep, mergeDeep, uid } from "../utils/utilities"
 import { defaultTheme } from "../definitions/style"
 
 export default class Theme {
 
-  static #list = new Map()
-  static #current
+  #list = new Map()
+  #current
 
   #config
-
-  constructor(theme, core) {
-    this.#config = (isObject(theme))? theme : {}
-
-    const reserved = [
-      "constructor"
-    ]
-
-    theme = {...defaultTheme, ...theme}
-
-    for (let t in theme) {
-      if (reserved.includes(t)) continue
-      this[t] = theme[t]
-    }
-  }
 
   static create(theme, core) {
     if (!(isObject(theme))) return false
 
-    theme.ID = (isString(theme.name))? uid(theme.name) : uid("theme")
+    theme.ID = (isString(theme.name))? uid(theme.name) : `${core.id}.theme`
 
     const instance = new Theme(theme, core)
 
-    Theme.#list.set(theme.ID, instance)
+    instance.#list.set(theme.ID, instance)
 
     return instance
   }
 
-  static get list() { return Theme.#list }
-  static set current(theme) { Theme.setCurrent(theme) }
-  static get current() { return Theme.#current }
+  constructor(theme, core) {
+    this.#config = (isObject(theme))? theme : {}
 
-  static setCurrent(theme) {
-    if (isString(theme) && Theme.list.has(theme)) {
-      Theme.#current = theme
+    const reserved = ["constructor","list","current","setCurrent","getCurrent"]
+    const defaultT = copyDeep(defaultTheme)
+    const newTheme = copyDeep(theme)
+
+    const setTheme = mergeDeep(defaultT, newTheme)
+
+    for (let t in setTheme) {
+      if (reserved.includes(t)) continue
+      this[t] = setTheme[t]
     }
-    return Theme.getCurrent()
   }
 
-  static getCurrent() {
+  get list() { return this.#list }
+  set current(theme) { this.setCurrent(theme) }
+  get current() { return this.#current }
+
+  setCurrent(theme) {
+    if (isString(theme) && this.#list.has(theme)) {
+      this.#current = theme
+    }
+    return this.getCurrent()
+  }
+
+  getCurrent() {
     // use existing current theme
-    if (isString(Theme.#current) && Theme.list.has(Theme.#current))
-      return Theme.#list.get(Theme.#current)
+    if (isString(this.#current) && this.#list.has(this.#current))
+      return this.#list.get(this.#current)
     // or default
     else
       return defaultTheme

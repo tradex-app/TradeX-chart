@@ -73,11 +73,11 @@ const calcParams = [20]
       type: this.#shortName,
       source: this.legendInputs.bind(this)
     }
-    this.chart.Legends.add(legend)
+    this.chart.legend.add(legend)
   }
 
   updateLegend() {
-    this.parent.Legends.update()
+    this.parent.legend.update()
   }
   
   legendInputs(pos=this.chart.cursorPos, candle) {

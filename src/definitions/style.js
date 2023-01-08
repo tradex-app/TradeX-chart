@@ -2,12 +2,16 @@
  * Global
  */
 
-import {
-  UTILSH,
-  TOOLSW,
-  TIMEH,
-  SCALEW
-} from "./core"
+export const CHART_MINH = 400
+export const CHART_MINW = 500
+export const TX_MINW = "400px"
+export const TX_MINH = "300px"
+export const TX_MAXW = "100%"
+export const TX_MAXH = "100%"
+export const UTILSH = 35
+export const TOOLSW = 40
+export const TIMEH = 50
+export const SCALEW = 60
 
 const FONTWEIGHT = "normal"
 const FONTSIZE = 12
@@ -18,9 +22,10 @@ const COLOUR_BORDER = "#666"
 const COLOUR_TXT = "#ccc"
 const COLOUR_ICON = "#888"
 const COLOUR_ICONHOVER = "#CCC"
+const ICONSIZE = "30px"
 
 export const STYLE_ROWS = "width:100%; min-width:100%;"
-export const STYLE_ROW = "position: relative; overflow: hidden;"
+export const STYLE_ROW = "position: relative;"
 export const STYLE_TIME = "border-top: 1px solid;"
 export const STYLE_SCALE = "display: block; border-left: 1px solid;"
 
@@ -35,15 +40,18 @@ export const GlobalStyle = {
   FONTSIZE: FONTSIZE,
   FONTSTYLE: FONTSTYLE,
   FONTFAMILY: FONTFAMILY,
-  FONT: `font-style: ${FONTSTYLE}: font-size: ${FONTSIZE}px; font-weight: ${FONTWEIGHT}; font-family: ${FONTFAMILY};`,
+  FONT: `${FONTSTYLE} ${FONTSIZE}px ${FONTWEIGHT} ${FONTFAMILY}`,
+  FONTSTRING: `font-style: ${FONTSTYLE}; font-size: ${FONTSIZE}px; font-weight: ${FONTWEIGHT}; font-family: ${FONTFAMILY};`,
 }
 
 export const ToolsStyle = {
-  COLOUR_ICON: COLOUR_ICON
+  COLOUR_ICON: COLOUR_ICON,
+  ICONSIZE: ICONSIZE
 }
 
 export const UtilsStyle = {
-  COLOUR_ICON: COLOUR_ICON
+  COLOUR_ICON: COLOUR_ICON,
+  ICONSIZE: ICONSIZE
 }
 
 export const MenuStyle = {
@@ -144,7 +152,8 @@ export const PriceLineStyle = {
 }
 
 export const LegendStyle = {
-  text: GlobalStyle.FONT,
+  text: GlobalStyle.FONTSTRING,
+  font: GlobalStyle.FONT,
   colour: GlobalStyle.COLOUR_TXT
 }
 
@@ -169,7 +178,11 @@ export const defaultTheme = {
     fontFamily: XAxisStyle.FONTFAMILY,
     fontSize: XAxisStyle.FONTSIZE,
     fontWeight: XAxisStyle.FONTWEIGHT,
-    line: "#656565"
+    line: "#656565",
+    slider: "#555555",
+    handle: "#55555588",
+    icon: COLOUR_ICON,
+    iconHover: COLOUR_ICONHOVER
   },
   yAxis: {
     colourTick: YAxisStyle.COLOUR_TICK,
@@ -191,19 +204,46 @@ export const defaultTheme = {
   onChart: {
 
   },
-  ofChart: {
+  offChart: {
 
   },
-  maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT,
   legend: {
-    text: LegendStyle.text,
+    font: LegendStyle.font,
     colour: LegendStyle.colour,
+  },
+  icon: {
+    colour: COLOUR_ICON,
+    hover: COLOUR_ICONHOVER
   }
 }
 
+export const cssVars = `
+<style title="txc_CSSVars">
+  --txc-background: #141414:
+  --txc-border-color: #888;
+  --txc-time-scrollbar-color: #888;
+  --txc-time-handle-color: #888;
+  --txc-time-slider-color: #888;
+  --txc-time-cursor-fore: #222;
+  --txc-time-cursor-back: #ccc;
+  --txc-time-icon-color: #888;
+  --txc-time-icon-hover-color: #888;
+</style>`
+
 const style = `
 <style>
-  .tradeXchart {}
+  tradex-chart {
+    display: flex;
+    width: var(--txc-width, 100%);
+    height: var(--txc-height, 100%);
+    min-width: var(--txc-min-width, ${TX_MINW});
+    min-height: var(--txc-min-height, ${TX_MINH});
+    max-width: var(--txc-max-width, ${TX_MAXW});
+    max-height: var(--txc-max-height, ${TX_MAXH});
+    overflow: hidden;
+    background: var(--txc-background, ${GlobalStyle.COLOUR_BG});
+    font: var(--txc-font, ${GlobalStyle.FONT});
+  }
   .tradeXchart .tradeXtime .navigation { 
     display: flex;
     flex-direction: row;

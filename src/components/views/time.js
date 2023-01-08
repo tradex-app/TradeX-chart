@@ -9,6 +9,12 @@ window.customElements.define('tradex-overview', tradeXOverview)
 
 const template = document.createElement('template')
 template.innerHTML = `
+<style>
+  .viewport {
+    width: 100%;
+    height: 50%;
+  }
+</style>
 <div class="viewport"></div>
 <tradex-overview></tradex-overview>
 `

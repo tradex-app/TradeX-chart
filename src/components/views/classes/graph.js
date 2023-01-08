@@ -2,6 +2,7 @@
 // class
 
 import DOM from "../../../utils/DOM"
+import { copyDeep } from '../../../utils/utilities'
 import { isArray, isBoolean, isNumber, isObject, isString } from '../../../utils/typeChecks'
 import CEL from "../../primitives/canvas"
 import Overlays from "../../overlays"
@@ -48,9 +49,9 @@ export default class graph {
   get core() { return this.#core }
   get config() { return this.#config }
   set width(w) { this.setWidth(w) }
-  get width() { return this.#elparent.clientWidth }
+  get width() { return this.#elparent.getBoundingClientRect().width }
   set height(h) { this.setHeight(h) }
-  get height() { return this.#elparent.clientHeight }
+  get height() { return this.#elparent.getBoundingClientRect().height }
   get dimensions() { return DOM.elementDimPos(this.#elparent) }
   set layerWidth(w) { this.#layerWidth = w }
   get layerWidth() { return this.#layerWidth }
@@ -88,7 +89,7 @@ export default class graph {
 
   createViewport(overlays=[]) {
 
-    overlays = (overlays.length == 0) ? defaultOverlays : overlays
+    overlays = (overlays.length == 0) ? copyDeep(defaultOverlays) : overlays
 
     const {width, height} = this.layerConfig()
 
@@ -105,8 +106,8 @@ export default class graph {
 
   layerConfig() {
     const buffer = this.config?.buffer || BUFFERSIZE
-    const width = this.#elViewport.clientWidth
-    const height = this.#parent.height || this.#parent.rowsH - 1
+    const width = this.#elViewport.getBoundingClientRect().width
+    const height = this.#elViewport.getBoundingClientRect().height // this.#parent.height || this.#parent.rowsH - 1
     this.layerWidth = Math.round(width * ((100 + buffer) * 0.01))
     const layerConfig = { 
       width: this.layerWidth, 

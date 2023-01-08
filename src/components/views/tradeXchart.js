@@ -3,6 +3,7 @@
 
 import element from "./classes/element"
 import { debounce } from "../../utils/utilities"
+import { isObject } from "../../utils/typeChecks"
 
 import tradeXBody from "./body"
 import tradeXUtils from "./utils"
@@ -13,25 +14,16 @@ import {
   TOOLSW,
   TIMEH,
   SCALEW,
-} from "../../definitions/core"
+} from "../../definitions/style"
 import {
-  GlobalStyle
+  GlobalStyle, GridStyle, XAxisStyle, YAxisStyle
 } from "../../definitions/style"
 
-const template = document.createElement('template')
-template.innerHTML = `
-  <style>
-    :host tradex-chart { 
-      --txc-background-color: ${GlobalStyle.COLOUR_BG};
-      --txc-border-color: ${GlobalStyle.COLOUR_BORDER};
-      --txc-color: ${GlobalStyle.COLOUR_TXT};
-      --txc-font: ${GlobalStyle.FONT}
-    }
+const HTML = `
+  <style title="core">
     tradex-utils {
-      border-bottom: 1px solid;
       height: ${UTILSH}px; 
       width: 100%; 
-      border-color: var(--txc-border-color, ${GlobalStyle.COLOUR_BORDER}); 
     }
     tradex-body {
       position: relative;
@@ -42,9 +34,12 @@ template.innerHTML = `
       position: relative;
     }
   </style>
-    <tradex-utils></tradex-utils>
-    <tradex-body></tradex-body>
-    <tradex-widgets></tradex-widgets>
+  <div style="display: none;">
+    <slot></slot>
+  </div>
+  <tradex-utils></tradex-utils>
+  <tradex-body></tradex-body>
+  <tradex-widgets></tradex-widgets>
 `
 
 
@@ -53,9 +48,15 @@ export default class tradeXChart extends element {
   #elBody
   #elUtils
   #elWidgets
+  #oWidth
+  #oHeight
+  #template
 
   constructor () {
-    super(template)
+    const template = document.createElement('template')
+          template.innerHTML = HTML
+    super(template, "closed")
+    this.#template = template
   }
 
   destroy() {
@@ -63,7 +64,7 @@ export default class tradeXChart extends element {
   }
 
   static get observedAttributes() {
-    return ['disabled', 'height', 'stream', 'width']
+    return ['config', 'disabled', 'height', 'stream', 'width']
   }
 
   connectedCallback() {
@@ -71,19 +72,27 @@ export default class tradeXChart extends element {
     // https://stackoverflow.com/a/43837330/15109215
     if (this.doInit) {
       this.doInit = false
-      this.shadowRoot.appendChild(template.content.cloneNode(true))
+      this.shadowRoot.appendChild(this.#template.content.cloneNode(true))
       this.style.display = "block"
-      this.height = this.getAttribute('height')
-      this.width = this.getAttribute('width')
 
-      this.#elBody = this.shadowRoot.querySelector('tradex-body')
-      this.#elUtils = this.shadowRoot.querySelector('tradex-utils')
-      this.#elWidgets = this.shadowRoot.querySelector('tradex-widgets')
+      this.elWidgetsG = this.shadowRoot.querySelector('tradex-widgets')
+      this.elUtils = this.shadowRoot.querySelector('tradex-utils')
+      this.elBody = this.shadowRoot.querySelector('tradex-body')
+      this.elMain = this.elBody.main
+      this.elTime = this.elBody.main.time
+      this.elTools = this.elBody.tools 
+      this.elYAxis = this.elBody.scale
 
-      this.resizeObserver = new ResizeObserver(debounce(this.onResized, 100, this))
-      this.resizeObserver.observe(this)
-      
-      this.addEventListener('click', this.onClick.bind(this))
+      this.previousDimensions()
+
+      // set the width and height
+      let height = this.getAttribute('height') || "100%"
+      let width = this.getAttribute('width') || "100%"
+
+      this.setDimensions(width, height)
+
+      this.resizeObserver = new ResizeObserver(debounce(this.onResized, 50, this))
+      this.resizeObserver.observe(this)      
     }
   }
 
@@ -96,6 +105,8 @@ export default class tradeXChart extends element {
 
   attributeChangedCallback(prop, oldVal, newVal) {
     switch(prop) {
+      case "config":
+        break;
       case "disabled":
         break;
       case "height":
@@ -104,6 +115,8 @@ export default class tradeXChart extends element {
       case "width":
         this.width(newVal)
         break;
+        case "stream":
+          break;
       default:
         break;
     }
@@ -121,8 +134,8 @@ export default class tradeXChart extends element {
     }
   }
 
-  get test() { return this.t }
-  set test(t) { this.t = t; console.log(this.t) }
+  get oWidth() { return this.#oWidth }
+  get oHeight() { return this.#oHeight }
 
   get stream() {  }
   set stream(s) {  }
@@ -137,11 +150,17 @@ export default class tradeXChart extends element {
       console.log("onResize")
       console.log(this.offsetWidth)
       console.log(this.offsetHeight)
+
+      if (isObject(this.MainPane) && this.MainPane.constructor.name === "MainPane") {
+        this.previousDimensions()
+        this.emit("global_resize", {w: this.offsetWidth, h: this.offsetHeight}) 
+      }
     })
   }
 
-  onClick(e) {
-    console.log("I'm clicked!")
+  previousDimensions() {
+    this.#oWidth = this.offsetWidth
+    this.#oHeight = this.offsetHeight
   }
 
 }

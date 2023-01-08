@@ -31,8 +31,7 @@ export default class ScaleBar {
   #chart
   #target
   #yAxis
-  #elScale
-  #elScaleCanvas
+  #element
   #elViewport
 
   #viewport
@@ -49,10 +48,10 @@ export default class ScaleBar {
 
     this.#core = core
     this.#options = {...options}
-    this.#elScale = options.elScale
-    this.#chart = options.Chart
-    this.#parent = options.parent
-    this.#ID = options.offChartID || uid("TX_scale_")
+    this.#element = this.#options.elScale
+    this.#chart = this.#options.chart
+    this.#parent = this.#options.parent
+    this.#ID = this.#options.offChartID || uid("TX_scale_")
     this.init()
   }
 
@@ -68,8 +67,9 @@ export default class ScaleBar {
   get options() { return this.#options }
   get parent() { return this.#parent }
   set height(h) { this.setHeight(h) }
-  get height() { return this.#elScale.clientHeight }
-  get width() { return this.#elScale.clientWidth }
+  get height() { return this.#element.getBoundingClientRect().height }
+  get width() { return this.#element.getBoundingClientRect().width }
+  get element() { return this.#element }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
   get yAxis() { return this.#yAxis }
@@ -80,7 +80,7 @@ export default class ScaleBar {
   get yAxisGrads() { return this.#yAxis.yAxisGrads }
   get viewport() { return this.#viewport }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elScale) }
+  get dimensions() { return DOM.elementDimPos(this.#element) }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
   set scaleRange(r) { this.setScaleRange(r) }
@@ -93,7 +93,7 @@ export default class ScaleBar {
   get stateMachine() { return this.#stateMachine }
 
   init() {
-    this.#elViewport = this.#elScale.querySelector(`tradex-scale`).viewport
+    this.#elViewport = this.#element.viewport || this.#element
 
     this.log(`${this.#name} instantiated`)
   }
@@ -112,7 +112,7 @@ export default class ScaleBar {
 
     // start State Machine 
     const newConfig = copyDeep(stateMachineConfig)
-    newConfig.context.origin = this
+    newConfig.context = this
     this.stateMachine = newConfig
     this.stateMachine.start()
   }
@@ -208,11 +208,11 @@ export default class ScaleBar {
   }
 
   setHeight(h) {
-    this.#elScale.style.height = `${h}px`
+    this.#element.style.height = `${h}px`
   }
 
   setDimensions(dim) {
-    const width = this.#elScale.clientWidth
+    const width = this.#element.getBoundingClientRect().width
     this.#viewport.setSize(width, dim.h)
     // adjust layers
     this.#layerLabels.setSize(width, dim.h)
@@ -232,7 +232,7 @@ export default class ScaleBar {
   }
 
   setCursor(cursor) {
-    this.#elScale.style.cursor = cursor
+    this.#element.style.cursor = cursor
   }
 
 
@@ -258,15 +258,15 @@ export default class ScaleBar {
 
     // create viewport
     this.#viewport = new CEL.Viewport({
-      width: this.#elScale.clientWidth,
-      height: this.#elScale.clientHeight,
+      width: this.#element.getBoundingClientRect().width,
+      height: this.#element.getBoundingClientRect().height,
       container: this.#elViewport
     });
 
     // create layers - labels, overlays, cursor
     this.#layerLabels = new CEL.Layer(layerConfig);
     this.#layerOverlays = new CEL.Layer(layerConfig);
-    this.#layerCursor = new CEL.Layer();
+    this.#layerCursor = new CEL.Layer(layerConfig);
 
     // add layers
     this.#viewport
@@ -279,8 +279,8 @@ export default class ScaleBar {
   }
 
   layerConfig() {
-    const width = this.#elScale.clientWidth
-    const height = this.#elScale.clientHeight
+    const width = this.#element.getBoundingClientRect().width
+    const height = this.#element.getBoundingClientRect().height
     const layerConfig = { 
       width: width, 
       height: height
@@ -353,16 +353,6 @@ export default class ScaleBar {
   resize(width=this.width, height=this.height) {
     // adjust parent element
     this.setDimensions({w: width, h: height})
-    // // adjust layers
-    // width -= this.#elScale.clientWidth
-    // this.#layerCursor.setSize(width, height)
-    // // adjust width for scroll buffer
-    // const buffer = this.config.buffer || BUFFERSIZE
-    //       width = Math.round(width * ((100 + buffer) * 0.01))
-    // this.#layerLabels.setSize(width, height)
-    // this.#layerOverlays.setSize(width, height)
-    // // render
-    // this.draw(undefined, true)
   }
 
 }

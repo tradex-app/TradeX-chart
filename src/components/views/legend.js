@@ -11,20 +11,14 @@ const mouseOut = "onmouseout='this.style.opacity=0'"
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
-  .legend {
-    width: 100%; 
-    margin: .5em 0 1em 1em; 
-    text-align: left;
-  }
-  .title {
-    margin-right: 1em; 
+  ::slotted(.legend) {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
     white-space: nowrap;
-  }
-  dl {
-    display: inline; margin-left: -1em;
-  }
-  .controls {
-    float: right; margin: 0 0.5em 0; opacity:0
+    width: calc(100% - 1em); 
+    margin: 0 0 0 1em;
+    text-align: left;
   }
 </style>
 <div class="legends">
@@ -101,10 +95,12 @@ export default class tradeXLegend extends element {
     let id = o.ID
 
     // visibility
-    // move up
-    inp += `<span id="${id}_up" class="control">${up}</span>`
-    // move down
-    inp += `<span id="${id}_down" class="control">${down}</span>`
+    if (o?.type !== "chart") {
+      // move up
+      inp += `<span id="${id}_up" class="control">${up}</span>`
+      // move down
+      inp += `<span id="${id}_down" class="control">${down}</span>`
+    }
     // collapse
     inp += `<span id="${id}_collapse" class="control">${collapse}</span>`
     // maximize
@@ -112,7 +108,7 @@ export default class tradeXLegend extends element {
     // restore
     inp += `<span id="${id}_restore" class="control">${restore}</span>`
     // remove
-    inp += `<span id="${id}_remove" class="control">${close}</span>`
+    inp += (o?.type !== "chart") ? `<span id="${id}_remove" class="control">${close}</span>` : ``
     // config
     inp += `<span id="${id}_config" class="control">${config}</span>`
 

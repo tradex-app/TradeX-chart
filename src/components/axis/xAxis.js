@@ -32,7 +32,7 @@ export default class xAxis extends Axis {
   }
 
   get range() { return this.parent.range }
-  get width() { return this.calcWidth() }
+  get width() { return this.parent.width }
   get interval() { return this.range.interval }
   get intervalStr() { return this.range.intervalStr }
   get timeStart() { return this.range.timeStart }
@@ -44,6 +44,7 @@ export default class xAxis extends Axis {
   get timeMax() { return this.range.timeMax }
   get timeMin() { return this.range.timeMin }
   get candleW() { return bRound(this.width / this.range.Length) }
+  get candlesOnLayer() { return bRound(this.core.Chart.layerWidth / this.candleW )}
   get gradsMax() { return Math.trunc(this.width / MAXGRADSPER) }
       gradsYear(t) { return get_year(t) }
       gradsMonthName(t) { return get_monthName(t) }
@@ -57,10 +58,6 @@ export default class xAxis extends Axis {
   get xAxisSubGrads() { return this.#xAxisSubGrads }
   get scrollOffsetPx() { return this.core.scrollPos % this.candleW }
   get bufferPx() { return this.core.bufferPx }
-
-  calcWidth() {
-    return bRound(this.core.Chart.width - this.core.Chart.scale.width)
-  }
 
   /**
  * return canvas x co-ordinate

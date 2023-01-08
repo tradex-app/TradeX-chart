@@ -1,7 +1,7 @@
 // chart-volume.js
 
 import VolumeBar from "../primitives/volume";
-import { bRound, round } from "../../utils/number";
+import { bRound, round, limit } from "../../utils/number";
 import { BUFFERSIZE } from "../../definitions/chart"
 
 export default class chartVolume extends VolumeBar {
@@ -28,7 +28,7 @@ export default class chartVolume extends VolumeBar {
     this.#xAxis = xAxis
     this.#yAxis = yAxis
 
-    this.#theme.maxVolumeH = theme?.maxVolumeH || 100
+    this.#theme.volume.Height = limit(theme?.volume?.Height, 0, 100) || 100
   }
 
   get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
@@ -49,7 +49,7 @@ export default class chartVolume extends VolumeBar {
       w: w,
       z: zeroPos
     }
-    const volH = Math.floor(zeroPos * this.#theme.maxVolumeH / 100)
+    const volH = Math.floor(zeroPos * this.#theme.volume.Height / 100)
 
     let o = this.#core.rangeScrollOffset
     let v = range.indexStart - o

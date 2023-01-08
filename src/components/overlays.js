@@ -22,7 +22,7 @@ export default class Overlays {
 
     this.#parent = parent
     this.#core = parent.core
-    this.#list = new Map(list)
+    this.#list = new Map([...list])
 
     // iterate over List, create and add overlays
     for (const [key, overlay] of this.#list) {
@@ -51,7 +51,7 @@ export default class Overlays {
     this.eventsListen()
 
     // start State Machine 
-    // stateMachineConfig.context.origin = this
+    // stateMachineConfig.context = this
     // this.#core.stateMachine = stateMachineConfig
     // this.#core.stateMachine.start()
   }

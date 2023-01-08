@@ -2,7 +2,6 @@
 // <tradex-scale></tradex-scale>
 
 import element from "./classes/element"
-import graph from "./classes/graph"
 
 const template = document.createElement('template')
 template.innerHTML = `
@@ -10,14 +9,18 @@ template.innerHTML = `
   .viewport {
     width: 100%;
     height: 100%;
+    margin-top: 2px;
+    margin-left: 2px;
   }
 </style>
 <div class="viewport"></div>
+<slot name="offchart" id="offchart"></slot>
 `
 
 export default class tradeXScale extends element {
 
   #viewport
+  #offChartSlot
 
   constructor () {
     super(template)
@@ -36,6 +39,7 @@ export default class tradeXScale extends element {
       this.style.display = "block"
 
       this.#viewport = this.shadowRoot.querySelector('.viewport')
+      this.#offChartSlot = this.shadowRoot.querySelector('#offchart')
     }
   }
 
@@ -43,7 +47,8 @@ export default class tradeXScale extends element {
   }
 
   get viewport() { return this.#viewport}
-
+  get offCharts() { return this.shadowRoot.querySelectorAll('tradex-offchart') }
+  get offChartSlot() { return this.#offChartSlot }
 }
 
 window.customElements.define('tradex-scale', tradeXScale)

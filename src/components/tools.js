@@ -74,7 +74,7 @@ export default class ToolsBar {
     this.eventsListen()
 
     // start State Machine 
-    stateMachineConfig.context.origin = this
+    stateMachineConfig.context = this
     this.stateMachine = stateMachineConfig
     this.stateMachine.start()
   }
@@ -83,6 +83,7 @@ export default class ToolsBar {
     this.stateMachine.destroy()
     // remove event listeners
     const api = this.#core
+    // FIXME: #${api.id} NO LONGER VALID
     const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`)
     for (let tool of tools) {
       for (let t of this.#tools) {
@@ -187,7 +188,14 @@ export default class ToolsBar {
   }
 
   defaultNode() {
-    let toolbar = ""
+    let toolbar = `
+    <style>
+      svg {
+        height: ${ToolsStyle.ICONSIZE};
+        fill: ${ToolsStyle.COLOUR_ICON};
+      }
+    </style>
+    `
     for (const tool of this.#tools) {
       toolbar += this.iconNode(tool)
     }
@@ -196,7 +204,7 @@ export default class ToolsBar {
   }
 
   iconNode(tool) {
-    const iconStyle = `display: inline-block; height: ${this.#elTools.clientWidth}px; padding-right: 2px`
+    const iconStyle = `display: inline-block; height: ${ToolsStyle.ICONSIZE};`
     const menu = ("sub" in tool) ? `data-menu="true"` : ""
     return  `
       <div id="${tool.id}" data-event="${tool.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${tool.icon}</div>\n

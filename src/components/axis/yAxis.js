@@ -41,9 +41,9 @@ export default class yAxis extends Axis {
   }
   #yAxisPadding = 1.04
   #yAxisStep = YAXIS_STEP
-  #yAxisGrid = YAXIS_GRID
+  // #yAxisGrid = YAXIS_GRID
   #yAxisDigits = PRICEDIGITS
-  #yAxisRound = 3
+  // #yAxisRound = 3
   #yAxisTicks = 3
   #yAxisGrads
 
@@ -55,8 +55,8 @@ export default class yAxis extends Axis {
     this.#parent = parent
     this.#source = parent.parent
     this.yAxisType = yAxisType
-    this.#yAxisGrid = (this.core.config?.yAxisGrid) ? 
-      this.core.config?.yAxisGrid : YAXIS_GRID
+    // this.#yAxisGrid = (this.core.config?.yAxisGrid) ? 
+    //   this.core.config?.yAxisGrid : YAXIS_GRID
 
     range = (range) ? range : this.core.range
     this.#transform.automatic.range = range
@@ -262,12 +262,13 @@ export default class yAxis extends Axis {
     // max = this.#range.max
     // min = this.#range.min
 
-    this.#yAxisRound = this.countDigits(this.#range.diff).integers
+    // this.#yAxisRound = this.countDigits(this.#range.diff).integers
 
     // roughly divide the yRange into cells
     rangeH = max - min
     rangeH = (this.rangeH > 0) ? this.rangeH : 1
-    yGridSize = (rangeH)/this.#yAxisGrid;
+    yGridSize = (rangeH)/(this.height / (this.core.theme.yAxis.fontSize * 1.5));
+
 
     // if (fixed)
 

@@ -70,7 +70,7 @@ export default class DMI extends indicator {
       type: this.#shortName,
       source: this.legendInputs.bind(this)
     }
-    this.chart.Legends.add(legend)
+    this.chart.legend.add(legend)
   }
 
   legendInputs(pos=this.chart.cursorPos, candle) {

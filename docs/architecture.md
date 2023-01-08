@@ -155,7 +155,7 @@ export default class UtilsBar {
     this.eventsListen()
 
     // start State Machine 
-    // stateMachineConfig.context.origin = this
+    // stateMachineConfig.context = this
     // this.#mediator.stateMachine = stateMachineConfig
     // this.#mediator.stateMachine.start()
   }

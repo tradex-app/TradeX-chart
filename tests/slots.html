@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+  </head>
+  <body>
+    <tradex-main>
+      <div>
+        some content
+        <div>
+          more content
+        </div>
+      </div>
+      <div>
+        extra content
+      </div>
+      <div>
+        too much content
+      </div>
+      <tradex-indicator>RSI</tradex-indicator>
+    </tradex-main>
+    <script>
+const template1 = document.createElement('template')
+template1.innerHTML = `
+<style>
+</style>
+  <div style="display:none;">
+    <slot name="content1" slot="content2"></slot>
+  </div>
+  <tradex-inner></tradex-inner>
+  <slot></slot>
+`
+const template2 = document.createElement('template')
+template2.innerHTML = `
+<style>
+	border: 1px solid
+</style>
+<p>inner start</p>
+<slot name="content2"></slot>
+<p>inner stop</p>
+
+`
+
+class tradeXMain extends HTMLElement {
+
+  shadowRoot
+  template
+  doInit = true
+
+  constructor () {
+    super()
+
+    this.template = template1
+    this.shadowRoot = this.attachShadow({mode: 'open'})
+    // get updates when content is updated in the slot
+    this.shadowRoot.addEventListener('slotchange', 
+    e => {
+          let items = []
+          console.log(e.target.name)
+          console.log(e.target.children)
+          items = e.target.assignedElements()
+          const inner = this.shadowRoot.querySelector("tradex-inner")
+          for (let i of items) {
+            i.slot = "content2"
+            inner.appendChild(i)
+          }
+        })
+  }
+
+  destroy() {
+
+  }
+
+  connectedCallback() {
+    // element building must be done here
+    // https://stackoverflow.com/a/43837330/15109215
+    if (this.doInit) {
+      this.doInit = false
+      // get updates when content is updated in the slot
+      this.shadowRoot.addEventListener('slotchange', 
+        e => {
+          console.log(e.target.name)
+          console.log(e.currentTarget.children)
+        })
+
+      this.shadowRoot.appendChild(this.template.content.cloneNode(true))
+      this.style.display = "inline"
+    }
+  }
+
+  disconnectedCallback() {
+  }
+
+  get width() { return this.offsetWidth }
+  set width(w) { this.setDim(w, "width") }
+  get height() { return this.offsetHeight }
+  set height(h) { this.setDim(h, "height") }
+
+  setDim(x, d) {
+    if (isNumber(x)) x += "px"
+    else if (!isString(x)) return
+    this.style[d] = w
+  }
+
+  setCursor(cursor) {
+    this.style.cursor = cursor
+  }
+
+}
+
+window.customElements.define('tradex-main', tradeXMain)
+
+class tradeXInner extends HTMLElement {
+
+  shadowRoot
+  template
+  doInit = true
+
+  constructor () {
+    super()
+
+    this.template = template2
+    this.shadowRoot = this.attachShadow({mode: 'open'})
+  }
+
+  destroy() {
+
+  }
+
+  connectedCallback() {
+    // element building must be done here
+    // https://stackoverflow.com/a/43837330/15109215
+    if (this.doInit) {
+      this.doInit = false
+      // get updates when content is updated in the slot
+      this.shadowRoot.addEventListener('slotchange', 
+        event => 
+          console.log(event.currentTarget.children));
+      this.shadowRoot.appendChild(this.template.content.cloneNode(true))
+      this.style.display = "inline"
+    }
+  }
+
+  disconnectedCallback() {
+  }
+
+  get width() { return this.offsetWidth }
+  set width(w) { this.setDim(w, "width") }
+  get height() { return this.offsetHeight }
+  set height(h) { this.setDim(h, "height") }
+
+  setDim(x, d) {
+    if (isNumber(x)) x += "px"
+    else if (!isString(x)) return
+    this.style[d] = w
+  }
+
+  setCursor(cursor) {
+    this.style.cursor = cursor
+  }
+
+}
+
+window.customElements.define('tradex-inner', tradeXInner)
+
+
+    </script>
+  </body>
+</html>

@@ -134,6 +134,12 @@ class Viewport {
 }
 
 class Layer {
+
+  x = 0;
+  y = 0;
+  width = 0;
+  height = 0;
+  visible = true;
   /**
    * Layer constructor
    * @param {Object} cfg - {x, y, width, height}
@@ -142,11 +148,6 @@ class Layer {
     if (!cfg) cfg = {};
 
     this.id = CEL.idCnt++;
-    this.x = 0;
-    this.y = 0;
-    this.width = 0;
-    this.height = 0;
-    this.visible = true;
     this.hit = new CEL.Hit({
       contextType: cfg.contextType,
     });
@@ -273,6 +274,9 @@ class Layer {
 }
 
 class Scene {
+
+  width = 0;
+  height = 0;
   /**
    * Scene constructor
    * @param {Object} cfg - {width, height}
@@ -281,9 +285,6 @@ class Scene {
     if (!cfg) cfg = {};
 
     this.id = CEL.idCnt++;
-
-    this.width = 0;
-    this.height = 0;
     this.contextType = cfg.contextType || "2d";
 
     this.canvas = document.createElement("canvas");
@@ -391,6 +392,9 @@ class Scene {
 }
 
 class Hit {
+
+  width = 0;
+  height = 0;
   /**
    * Hit constructor
    * @param {Object} cfg - {width, height}
@@ -398,8 +402,6 @@ class Hit {
   constructor(cfg) {
     if (!cfg) cfg = {};
 
-    this.width = 0;
-    this.height = 0;
     this.contextType = cfg.contextType || "2d";
     this.canvas = document.createElement("canvas");
     this.canvas.className = "hit-canvas";

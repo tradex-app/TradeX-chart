@@ -1,4 +1,4 @@
-// state-chart.js
+// state-template.js
 
 export default
 {

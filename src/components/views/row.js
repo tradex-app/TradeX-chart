@@ -19,4 +19,8 @@ export default class tradeXWidgets extends element {
 
   disconnectedCallback() {
   }
+
+  get grid() { return this.querySelector('tradex-grid') }
+  get onChart() { return this.querySelector('tradex-onchart') }
+  get offCharts() { return this.querySelector('tradex-offchart').children }
 }

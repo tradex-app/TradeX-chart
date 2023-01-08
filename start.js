@@ -32,7 +32,7 @@ console.log("API: id:", chart.id)
 console.log("API: name:", chart.name)
 console.log("API: height:", chart.height)
 
-function internals() {
+function demo.internals() {
   const data = {}
   const tx = chart.Timeline.xAxis
 
@@ -60,7 +60,7 @@ const infoBox = {}
         infoBox.el.innerHTML = inf
       }
 
-chart.on("chart_zoom", (e) => { infoBox.out(internals()) })
-chart.on("chart_pan", (e) => { infoBox.out(internals()) })
-infoBox.out(internals())
+chart.on("chart_zoom", (e) => { infoBox.out(demo.internals()) })
+chart.on("chart_pan", (e) => { infoBox.out(demo.internals()) })
+infoBox.out(demo.internals())
 // test()

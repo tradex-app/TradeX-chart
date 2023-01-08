@@ -11,17 +11,20 @@ import {
   TOOLSW,
   TIMEH,
   SCALEW,
-} from "../../definitions/core"
+} from "../../definitions/style"
 
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
-  viewport {
-    position: absolute;
-    top: 0;
-    left: 0;
+  .viewport {
+    position: relative;
     width: 100%;
-    height: 100%;
+    height: inherit;
+    background: var(--txc-onchart-background, none);
+  }
+  .viewport canvas {
+    position: absolute;
+    top: 1px;
   }
   tradex-legends {
     position: absolute;
@@ -39,7 +42,7 @@ export default class tradeXOnChart extends element {
 
   #parent
   #elViewport
-  #elLegends
+  #elLegend
   #elScale
   #elCanvas
 
@@ -60,15 +63,15 @@ export default class tradeXOnChart extends element {
       this.style.display = "block"
 
       this.#elViewport = this.shadowRoot.querySelector('.viewport')
-      this.#elLegends = this.shadowRoot.querySelector('.legends')
+      this.#elLegend = this.shadowRoot.querySelector('tradex-legends')
     }
   }
 
   disconnectedCallback() {
   }
 
-  get elViewport() { return this.#elViewport }
-  get elLegends() { return this.#elLegends }
+  get viewport() { return this.#elViewport }
+  get legend() { return this.#elLegend }
 }
 
 window.customElements.define('tradex-onchart', tradeXOnChart)

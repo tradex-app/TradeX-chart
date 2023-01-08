@@ -87,7 +87,7 @@ export default class RSI extends indicator {
       type: this.#shortName,
       source: this.legendInputs.bind(this)
     }
-    this.chart.Legends.add(legend)
+    this.chart.legend.add(legend)
   }
 
   legendInputs(pos=this.chart.cursorPos, candle) {

@@ -114,17 +114,20 @@ export class Range {
 
   set (start=0, end=this.dataLength, max=this.maxCandles) {
     if (!isNumber(start) || 
-        !isNumber(end)) return false
+        !isNumber(end) ||
+        !isNumber(max)) return false
+    // integer guard, prevent decimals
+    start = Math.floor(start)
+    end = Math.ceil(end)
+    max = Math.ceil(max)
 
     // check and correct start and end argument order
     if (start > end) [start, end] = [end, start]
     // range length constraint
     end = limit(end, start + this.minCandles, start + max)
     // set out of history bounds limits
-    start = (start < this.limitPast * -1) ? this.limitPast * -1 : start
-    end = (end < (this.limitPast * -1) + this.minCandles) ? (this.limitPast * -1) + this.minCandles + 1 : end
-    start = (start > this.dataLength + this.limitFuture - this.minCandles) ? this.dataLength + this.limitFuture - this.minCandles - 1: start
-    end = (end > this.dataLength + this.limitFuture) ? this.dataLength + this.limitFuture : end
+    start = limit(start, this.limitPast * -1,  this.dataLength + this.limitFuture - this.minCandles - 1)
+    end = limit(end, (this.limitPast * -1) + this.minCandles + 1, this.dataLength + this.limitFuture)
   
     const newStart = start
     const newEnd = end

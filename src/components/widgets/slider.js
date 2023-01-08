@@ -6,9 +6,12 @@ import Colour from "../../utils/colour"
 import { isFunction, isNumber } from "../../utils/typeChecks"
 import { debounce, throttle } from "../../utils/utilities"
 import { InputController, Keys } from "../../input/controller"
+import { limit } from "../../utils/number"
 
 
 export default class Slider {
+
+  static #cnt
 
   #id 
   #core
@@ -22,11 +25,13 @@ export default class Slider {
   #constraint = {x: false, y: true}
 
   #cursorPos
+  #sliderPos = {x: 0, drag: false}
   #controller
   #callback
 
   constructor(config) {
 
+    this.#id = Slider.#cnt++
     this.#core = config.core
     this.#elContainer = (DOM.isElement(config.elContainer)) ? config.elContainer : false
     this.#elHandle = (DOM.isElement(config.elHandle)) ? config.elHandle : false
@@ -41,13 +46,15 @@ export default class Slider {
     }
   }
 
+  // TODO: remove event listeners on destroy
+
   eventsListen() {
     // create controller and use 'on' method to receive input events
   this.#controller = new InputController(this.#elHandle, {disableContextMenu: false});
 
-  this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
-  this.#controller.on("mouseout", this.onMouseOut.bind(this))
-  this.#controller.on("drag", debounce(this.onHandleDrag, 1, this, true));
+  this.#controller.on("mouseenter", debounce(this.onMouseEnter, 1, this, true));
+  this.#controller.on("mouseout", debounce(this.onMouseOut, 1, this, true));
+  this.#controller.on("drag", throttle(this.onHandleDrag, 100, this, true));
   this.#controller.on("enddrag", this.onHandleDragDone.bind(this));
   this.#controller.on("mousedown", debounce(this.onMouseDown, 100, this, true));
   this.#controller.on("mouseup", this.onMouseUp.bind(this));
@@ -66,53 +73,72 @@ export default class Slider {
   }
 
   onMouseEnter() {
-    console.log("slider enter")
-    this.colour = new Colour(this.#elHandle.style.backgroundColor)
-    this.#elHandle.style.backgroundColor = this.colour.hex
+    const backgroundColor = getComputedStyle(this.#elHandle).backgroundColor
+    if (backgroundColor) {
+      this.colour = new Colour(backgroundColor)
+      this.#elHandle.style.backgroundColor = this.colour.hex
+    }
   }
   onMouseOut() {
-    console.log("slider out")
     this.#elHandle.style.backgroundColor = this.colour.hexa
   }
   onMouseDown() {
-    console.log("slider down")
   }
-  onMouseUp() {
-    console.log("slider up")
+  onMouseUp(e) {
+    this.onHandleDragDone(e)
   }
   onHandleDrag(e) {
-    console.log("slider drag",e)
-    let x = parseInt(this.#elHandle.style.marginLeft)
-    this.#elHandle.style.marginLeft = (x + e.position.x )+ "px"
+    if (!this.#sliderPos.drag) {
+      this.#sliderPos.drag = true
+      this.#sliderPos.x = e.position.x
+    }
+    this.handlePos(e)
   }
-  onHandleDragDone() {
-    console.log("slider drag done")
+
+  onHandleDragDone(e) {
+    this.handlePos(e)
+    this.#sliderPos.drag = false
   }
 
   mount() {
-    this.#containerDims.w = this.#elContainer.clientWidth
-    this.#containerDims.h = this.#elContainer.clientHeight
+    this.#containerDims.w = this.#elContainer.getBoundingClientRect().width
+    this.#containerDims.h = this.#elContainer.getBoundingClientRect().height
     this.#elContainer.style.overflow = "hidden"
 
-    this.#handleDims.w = this.#elHandle.clientWidth
-    this.#handleDims.h = this.#elHandle.clientHeight
+    this.#handleDims.w = this.#elHandle.getBoundingClientRect().width
+    this.#handleDims.h = this.#elHandle.getBoundingClientRect().height
     this.#elHandle.style.marginRight = 0
     this.#elHandle.style.position = "absolute"
+  }
+
+  handlePos(e) {
+
+    let R = this.#core.range
+    let x = parseInt(this.#elHandle.style.marginLeft)
+    let w = this.#elContainer.getBoundingClientRect().width
+    let h = this.#elHandle.getBoundingClientRect().width
+    let m = w - h
+    let d = e.position.x - this.#sliderPos.x
+    let p = limit(x + d, 0, m)
+    let r = (R.dataLength + R.limitFuture + R.limitPast) / w
+    let s = Math.floor(p * r)
+
+    this.setHandleDims(p, h)
+    this.#core.jumpToIndex(s)
+  }
+
+  setHandleDims(p, w) {
+    let c = this.#elContainer.getBoundingClientRect().width
+        w = w || this.#elHandle.getBoundingClientRect().width
+    p = p / c * 100
+    this.#elHandle.style.marginLeft = `${p}%`
+
+    w  = w / c * 100
+    this.#elHandle.style.width = `${w}%`
   }
 
   setCursor(cursor) {
     this.#elHandle.style.cursor = cursor
   }
 
-  updateHandlePos(pos) {
-    let dividerY = this.#elHandle.offsetTop;
-        dividerY += pos[5]
-    this.#elHandle.style.top = `${dividerY}px`
-  }
-
-  setHandlePos() {
-    // let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elHandles).top;
-    //     top = top - (this.height / 2)
-    // this.#elHandle.style.top = `${top}px`
-  }
 }

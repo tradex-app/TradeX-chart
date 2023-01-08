@@ -40,7 +40,3 @@ export const STREAM_PRECISION = 8
 export const PRICE_PRECISION  = 2
 export const VOLUME_PRECISION = 2
 
-export const UTILSH = 35
-export const TOOLSW = 40
-export const TIMEH = 50
-export const SCALEW = 60

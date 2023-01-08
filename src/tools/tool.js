@@ -145,7 +145,7 @@ export default class Tool {
 
   createViewport() {
     const buffer = this.config.buffer || BUFFERSIZE
-    const width = this.#elViewport.clientWidth
+    const width = this.#elViewport.getBoundingClientRect().width
     const height = this.#options.chartH || this.#parent.rowsH - 1
     const layerConfig = { 
       width: Math.round(width * ((100 + buffer) * 0.01)), 

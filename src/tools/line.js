@@ -33,7 +33,7 @@ export default class Line extends Tool {
   start() {
     this.eventsListen()
     // // start State Machine 
-    // stateMachineConfig.context.origin = this
+    // stateMachineConfig.context = this
     // this.#core.stateMachine = stateMachineConfig
     // this.#core.stateMachine.start()
     // this.emit(`tool_start`, this.ID)

@@ -14,7 +14,7 @@ export default class StateMachine {
   #id
   #state
   #statePrev
-  #context
+  #context = {}
   #config
   #core
   #status = "stopped"
@@ -29,15 +29,17 @@ export default class StateMachine {
    * @param {object} config - state definition
    * @param {object} core - module mediate provides event handling
    */
-  constructor(config, core) {
+  constructor(config, context) {
     if (!StateMachine.validateConfig(config)) return false
 
-    this.#id = config.id
-    this.#config = config
-    this.#state = config.initial
-    this.#context = config.context
-    this.#actions = config.actions
-    this.#core = core
+    const cfg = {...config}
+
+    this.#id = cfg.id
+    this.#config = cfg
+    this.#state = cfg.initial
+    this.#context.origin = context
+    this.#actions = cfg.actions
+    this.#core = context.core
 
     this.#subscribe()
   }

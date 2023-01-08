@@ -56,7 +56,7 @@ export default class _template {
     this.eventsListen()
 
     // start State Machine 
-    // stateMachineConfig.context.origin = this
+    // stateMachineConfig.context = this
     // this.stateMachine = stateMachineConfig
     // this.stateMachine.start()
   }

@@ -153,7 +153,15 @@ export default class UtilsBar {
   defaultNode() {
     // let utilsBar = ""
     let style = `display: inline-block; float: right;`
-    let utilsBar = `<div style="${style}">`
+    let utilsBar = `
+    <div style="${style}">
+    <style>
+      svg {
+        height: ${UtilsStyle.ICONSIZE};
+        fill: ${UtilsStyle.COLOUR_ICON};
+      }
+    </style>
+    `
     for (const util of this.#utils) {
       utilsBar += this.iconNode(util)
     }
@@ -162,7 +170,7 @@ export default class UtilsBar {
   }
 
   iconNode(util) {
-    const iconStyle = `display: inline-block; height: ${this.#elUtils.clientHeight}px; padding-top: 2px`
+    const iconStyle = `display: inline-block; height: ${UtilsStyle.ICONSIZE}; padding-top: 2px`
     const menu = ("sub" in util) ? `data-menu="true"` : ""
     return  `
       <div id="TX_${util.id}" data-event="${util.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${util.icon}</div>\n

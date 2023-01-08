@@ -1,4 +1,4 @@
-// state-chart.js
+// state-time.js
 
 export default
 {

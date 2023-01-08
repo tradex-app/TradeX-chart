@@ -91,8 +91,9 @@ export const LIMITPAST = 200
 export const MINCANDLES = 20
 export const MAXCANDLES = 4096
 export const MAXGRADSPER = 75
-export const BUFFERSIZE = 20  // %
+export const BUFFERSIZE = 5  // %
 
 export const ROWMINHEIGHT = 50 // px
 export const OFFCHARTDEFAULTHEIGHT = 30 // %
 export const DIVIDERHEIGHT = 8 // px
+

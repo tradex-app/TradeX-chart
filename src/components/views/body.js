@@ -11,7 +11,7 @@ import {
   TOOLSW,
   TIMEH,
   SCALEW,
-} from "../../definitions/core"
+} from "../../definitions/style"
 import {
   GlobalStyle
 } from "../../definitions/style"
@@ -25,8 +25,6 @@ template.innerHTML = `
     width: ${TOOLSW}px;
     height: 100%; 
     min-height: 100%; 
-    border-right: 1px solid;
-    border-color: var(--txc-border-color, ${GlobalStyle.COLOUR_BORDER}); 
   }
   tradex-main {
     position: absolute; 
@@ -41,8 +39,6 @@ template.innerHTML = `
     right: 0; 
     width: ${SCALEW}px; 
     height: 100%;
-    border-left: 1px solid;
-    border-color: var(--txc-border-color, ${GlobalStyle.COLOUR_BORDER}); 
   }
 </style>
 <tradex-tools></tradex-tools>

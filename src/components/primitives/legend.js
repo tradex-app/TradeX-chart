@@ -2,7 +2,6 @@
 
 import { isObject } from "../../utils/typeChecks"
 import { uid } from "../../utils/utilities"
-import DOM from "../../utils/DOM"
 
 export default class Legends {
 
@@ -12,8 +11,8 @@ export default class Legends {
   #core
 
   #controls = {
-    width: 20,
-    height: 20,
+    width: 18,
+    height: 18,
     fill: "#aaa"
   }
   #controlsList
@@ -23,8 +22,6 @@ export default class Legends {
     this.#list = {}
     this.#parent = parent
     this.#core = parent.core
-
-    this.mount(target)
   }
 
   get list() { return this.#list }
@@ -33,31 +30,24 @@ export default class Legends {
 
   }
 
-  mount(el) {
-    // el.innerHTML = this.defaultNode()
-  }
-
-  defaultNode() {
-    const node = `
-    `
-  }
-
   buildLegend(o) {
     const theme = this.#core.theme
-    const styleInputs = "display: inline; margin-left: -1em;"
-    const styleLegend = `width: calc(100% - ${this.#core.scaleW}px - 1em); margin: .5em 0 1em 1em; ${theme.legend.text}; color: ${theme.legend.colour}; text-align: left;`
+      let styleInputs = "order: 1; display: inline; margin: 0 0 0 -1em;"
+    const styleLegend = `${theme.legend.text}; color: ${theme.legend.colour}; text-align: left;`
       let styleLegendTitle = "margin-right: 1em; white-space: nowrap;"
-    const styleControls = "float: right; margin: 0 0.5em 0; opacity:0"
+    const styleControls = "order:2; float: right; margin: 0 0.5em 0; opacity:0"
     const mouseOver = "onmouseover='this.style.opacity=1'"
     const mouseOut = "onmouseout='this.style.opacity=0'"
     const t = this.#targetEl
 
-    styleLegendTitle += (o?.type === "chart")? "font-size: 1.5em;" : "font-size: 1.2em;"
+    styleLegendTitle += (o?.type === "chart") ? "font-size: 1.5em;" : "font-size: 1.2em;"
 
     const node = `
       <div slot="legend" id="${o.id}" class="legend" style="${styleLegend}">
-        <span slot="title" class="title" style="${styleLegendTitle}">${o.title}</span>
-        <dl style="${styleInputs}">${t.buildInputs(o)}</dl>
+        <div>
+          <span slot="title" class="title" style="${styleLegendTitle}">${o.title}</span>
+          <dl style="${styleInputs}">${t.buildInputs(o)}</dl>
+        </div>
         <div slot="controls" class="controls" style="${styleControls}" ${mouseOver} ${mouseOut}>${t.buildControls(o)}</div>
       </div>
     `
@@ -113,6 +103,6 @@ export default class Legends {
 
     let source = this.#list[id].source(data.pos)
     const html = this.#targetEl.buildInputs(source)
-    const el = this.#targetEl.querySelector(`#${id} dl`).innerHTML = html
+    this.#targetEl.querySelector(`#${id} dl`).innerHTML = html
   }
 }

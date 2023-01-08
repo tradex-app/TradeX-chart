@@ -40,6 +40,8 @@ export default class Timeline {
   #elNavList
   #elNavScrollBar
   #elNavScrollHandle
+  #elRwdStart
+  #elFwdEnd
 
   #layerLabels
   #layerOverlays
@@ -73,9 +75,10 @@ export default class Timeline {
   get shortName() { return this.#shortName }
   get options() { return this.#options }
   get core() { return this.#core }
-  get height() { return this.#elTime.clientHeight }
+  get element() { return this.#elTime }
+  get height() { return this.#elTime.getBoundingClientRect().height }
   set width(w) { this.setWidth(w) }
-  get width() { return this.#elTime.clientWidth }
+  get width() { return this.#elTime.getBoundingClientRect().width }
   get xAxis() { return this.#xAxis }
   get xAxisWidth() { return this.#xAxis.width }
   get xAxisRatio() { return this.#xAxis.xAxisRatio }
@@ -83,6 +86,7 @@ export default class Timeline {
   get layerOverlays() { return this.#layerOverlays }
   get xAxisGrads() { return this.#xAxis.xAxisGrads }
   get candleW() { return this.#xAxis.candleW }
+  get candlesOnLayer() { return this.#xAxis.candlesOnLayer }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
   get viewport() { return this.#viewport }
@@ -112,60 +116,14 @@ export default class Timeline {
     this.#elNavList = el.overview.icons
     this.#elNavScrollBar = el.overview.scrollBar
     this.#elNavScrollHandle = el.overview.handle
+    this.#elRwdStart = el.overview.rwdStart
+    this.#elFwdEnd = el.overview.fwdEnd
 
-    for (let i of this.#elNavList) {
-      i.style.width = `${this.#icons.width}px`
-      i.style.height = `${this.#icons.height}px`
-      i.style.fill = `${this.#icons.fill}`
-    }
-
-    // el.style.cssText = `display: block; width: calc(100% - ${this.core.scaleW}px);`
-  }
-
-  navigationNode() {
-    const theme = this.core.theme
-    const handleColour = new Colour(theme.chart.BorderColour)
-    const scrollBarStyle = ` border: 1px solid ${theme.chart.BorderColour};`
-    const handleStyle = `background: ${handleColour.hex}44; margin-top: 1px;`
-    const node = `
-    <span id="rwdStart" class="icon">${rwdStart}</span>
-    <span id="tScrollBar" style="${scrollBarStyle}">
-      <div class="viewport"></div>
-      <div class="handle" style="${handleStyle}"></div>
-    </span>
-    <span id="fwdEnd" class="icon">${fwdEnd}</span>
-    `
-    return node
-  }
-
-  setWidth(w) {
-    this.#elTime.style.width = `${w}px`
-    this.#elViewport.style.width = w
-  }
-
-  setDimensions(dim) {
-    const buffer = this.config.buffer || BUFFERSIZE
-    const width = dim.w - this.#core.Chart.scale.width
-    const height = this.height
-    const layerWidth = Math.round(width * ((100 + buffer) * 0.01))
-
-    this.#viewport.setSize(width, this.height)
-    this.#layerLabels.setSize(layerWidth, height)
-    this.#layerOverlays.setSize(layerWidth, height)
-    this.#layerCursor.setSize(layerWidth, height)
-
-    this.setWidth(dim.w)
-    this.draw()
-  }
-
-  start() {
-    // prepare layered canvas
-    this.createViewport()
-    // macro timeline scroll bar
-    this.onSetRange()
-    // draw the Timeline
-    this.#xAxis.initXAxisGrads()
-    this.draw()
+    // for (let i of this.#elNavList) {
+    //   i.style.width = `${this.#icons.width}px`
+    //   i.style.height = `${this.#icons.height}px`
+    //   i.style.fill = `${this.#icons.fill}`
+    // }
 
     const sliderCfg = {
       core: this.#core,
@@ -174,12 +132,44 @@ export default class Timeline {
       callback: null
     }
     this.#slider = new Slider(sliderCfg)
+  }
+
+  setWidth(w) {
+    this.#elTime.style.width = `${w}px`
+    this.#elViewport.style.width = `${w}px`
+  }
+
+  setDimensions(dim) {
+    const buffer = this.config.buffer || BUFFERSIZE
+    const width = dim.w
+    const height = this.height
+    const layerWidth = Math.round(width * ((100 + buffer) * 0.01))
+
+    this.#viewport.setSize(width, this.height)
+    this.#layerLabels.setSize(layerWidth, height)
+    this.#layerOverlays.setSize(layerWidth, height)
+    this.#layerCursor.setSize(layerWidth, height)
+
+    // this.setWidth(dim.w)
+    this.draw()
+  }
+
+  start() {
+    // prepare layered canvas
+    this.createViewport()
+
+    // macro timeline scroll bar
+    this.onSetRange()
+
+    // draw the Timeline
+    this.#xAxis.initXAxisGrads()
+    this.draw()
 
     // set up event listeners
     this.eventsListen()
 
     // start State Machine 
-    stateMachineConfig.context.origin = this
+    stateMachineConfig.context = this
     this.stateMachine = stateMachineConfig
     this.stateMachine.start()
   }
@@ -190,6 +180,9 @@ export default class Timeline {
     this.#controller = null
     this.off("main_mousemove", this.drawCursorTime)
     this.off("setRange", this.onSetRange)
+
+    this.#elFwdEnd.removeEventListener('click', debounce)
+    this.#elRwdStart.removeEventListener('click', debounce)
   }
 
   eventsListen() {
@@ -200,12 +193,8 @@ export default class Timeline {
     this.on("main_mousemove", this.drawCursorTime.bind(this))
     this.on("setRange", this.onSetRange.bind(this))
 
-    for (let i of this.#elNavList) {
-      // TODO: removeEventListener on end()
-      i.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
-    }
-
-    // this.#elNavScrollHandle.addEventListener('',)
+    this.#elFwdEnd.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
+    this.#elRwdStart.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
   }
 
   on(topic, handler, context) {
@@ -224,26 +213,34 @@ export default class Timeline {
     const id = e?.currentTarget?.id || e.target.parentElement.id
     switch (id) {
       case "fwdEnd":
-        this.ffwdEnd()
+        this.onFwdEnd()
         break
       case "rwdStart":
-        this.rwdStart()
+        this.onRwdStart()
         break
       default:
         break
     }
   }
 
+  onFwdEnd() {
+    this.core.jumpToEnd()
+  }
+
+  onRwdStart() {
+    this.core.jumpToStart()
+  }
+
   onSetRange() {
     let start = this.range.indexStart
     let end = this.range.indexEnd
-    let scrollBarW = this.#elNavScrollBar.clientWidth
+    let scrollBarW = this.#elNavScrollBar.getBoundingClientRect().width
     let rangeW = this.range.dataLength + this.range.limitFuture + this.range.limitPast
     let ratio = scrollBarW / rangeW
     let handleW = this.range.Length * ratio
     let pos = ((start + this.range.limitPast) * ratio)
-    this.#elNavScrollHandle.style.width = `${handleW}px`
-    this.#elNavScrollHandle.style.marginLeft = `${pos}px`
+
+    this.#slider.setHandleDims(pos, handleW)
   }
 
   // -----------------------
@@ -262,7 +259,7 @@ export default class Timeline {
 
     const buffer = this.config.buffer || BUFFERSIZE
     const width = this.xAxisWidth
-    const height = this.#elTime.clientHeight
+    const height = this.#elTime.getBoundingClientRect().height
     const layerConfig = { 
       width: Math.round(width * ((100 + buffer) * 0.01)), 
       height: height
@@ -327,21 +324,6 @@ export default class Timeline {
 
     ctx.restore()
     this.#viewport.render()
-  }
-
-  resize(width=this.width, height=this.height) {
-    // adjust element, viewport and layers
-    this.setDimensions({w: width, h: height})
-  }
-
-  ffwdEnd() {
-    this.core.jumpToEnd()
-    console.log("fwdEnd")
-  }
-
-  rwdStart() {
-    this.core.jumpToStart()
-    console.log("rwdStart")
   }
 
 }

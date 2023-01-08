@@ -11,11 +11,11 @@ export default class element extends HTMLElement {
   id = uid()
   doInit = true
 
-  constructor (template) {
+  constructor (template, mode="open") {
     super()
 
     this.template = template
-    this.shadowRoot = this.attachShadow({mode: 'open'})
+    this.shadowRoot = this.attachShadow({mode: mode})
   }
 
   destroy() {

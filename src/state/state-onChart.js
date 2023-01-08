@@ -157,7 +157,7 @@ export default
   guards: {
     priceMaxMin () { return true },
     toolSelectedThis (conditionType, condition) { 
-      if (this.eventData === this.context.origin)
+      if (this.eventData === this.context)
         return true
       else
         return false

@@ -2,12 +2,11 @@
 // it all begins here...
 
 // import * as talib from "talib-web"
-import { isArray, isBoolean, isNumber, isObject, isString } from './utils/typeChecks'
+import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from './utils/typeChecks'
 import DOM from './utils/DOM'
 import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { interval2MS, isTimeFrame, SECOND_MS } from "./utils/time"
-import SX from './scaleX/scale'
 import State from './state'
 import { Range, calcTimeIndex } from "./model/range"
 import StateMachine from './scaleX/stateMachne'
@@ -15,8 +14,8 @@ import Stream from './helpers/stream'
 import Theme from "./helpers/theme"
 import WebWorker from "./helpers/webWorkers"
 import Indicators from './definitions/indicators'
-import style from './definitions/style'
-import TXCElement from "./components/views/tradeXchart"
+import style, { CHART_MINH, CHART_MINW, cssVars, TOOLSW } from './definitions/style'
+import Tradex_chart from "./components/views/tradeXchart"
 import UtilsBar from './components/utils'
 import ToolsBar from './components/tools'
 import MainPane from './components/main'
@@ -25,21 +24,6 @@ import WidgetsG from './components/widgets'
 import {
   NAME,
   ID,
-  CLASS_DEFAULT,
-  CLASS_UTILS ,
-  CLASS_BODY,
-  CLASS_WIDGETSG,
-  CLASS_TOOLS,
-  CLASS_MAIN,
-  CLASS_TIME,
-  CLASS_ROWS,
-  CLASS_ROW,
-  CLASS_CHART,
-  CLASS_SCALE,
-  CLASS_YAXIS,
-  CLASS_WIDGETS,
-  CLASS_ONCHART,
-  CLASS_OFFCHART,
   RANGELIMIT,
   PRICE_PRECISION,
   VOLUME_PRECISION,
@@ -58,18 +42,23 @@ import { precision } from "./utils/number"
  * @export
  * @class TradeXchart
  */
-export default class TradeXchart {
+export default class TradeXchart extends Tradex_chart {
 
   static #cnt = 0
+  static #cfg = {}
   static #instances = {}
   static #talibReady = false
   static initErrMsg = `${NAME} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`
+  static permittedClassNames = 
+  ["TradeXchart","Chart","MainPane","OffChart","OnChart",
+  "ScaleBar","Timeline","ToolsBar","UtilsBar","Widgets"]
 
   #id
   #name = NAME
   #shortName = NAME
   #el = undefined
   #mediator
+  #core
   #config
   #options
   #elements = {}
@@ -85,6 +74,7 @@ export default class TradeXchart {
 
   #inCnt = null
   #modID
+  #hub = {}
   #state = {}
   #userClasses = []
   #chartIsEmpty = true
@@ -95,10 +85,11 @@ export default class TradeXchart {
   #indicators = Indicators
   #TALib
   #theme
-  #chartW = 500
-  #chartH = 400
-  chartWMin = 500
-  chartHMin = 400
+  #themeTemp
+  #chartW = CHART_MINW
+  #chartH = CHART_MINH
+  chartWMin = CHART_MINW
+  chartHMin = CHART_MINH
   chartW_Reactive = true
   chartH_Reactive = true
   chartBGColour = GlobalStyle.COLOUR_BG
@@ -109,10 +100,6 @@ export default class TradeXchart {
   toolsW = 40
   timeH  = 50
   scaleW = 60
-
-  static permittedClassNames = 
-      ["TradeXchart","Chart","MainPane","OffChart","OnChart",
-      "ScaleBar","Timeline","ToolsBar","UtilsBar","Widgets"]
 
   #UtilsBar
   #ToolsBar
@@ -138,10 +125,12 @@ export default class TradeXchart {
     indexed: false
   }
 
+  // console outputs
   logs = false
   infos = false
   warnings = false
   errors = false
+  timer = false
   
   #mousePos = {x:0, y:0}
   #scrollPos = 0
@@ -156,100 +145,129 @@ export default class TradeXchart {
 
   #delayedSetRange = false
 
+  #renderer = {
+    status: "idle",
+    buffer: {
+      n: true,
+      "1": {},
+      "2": {}
+    },
+    curr: {
+      frame: null,
+      priority: 0
+    },
+    cache: []
+  }
 
-/**
- * Creates an instance of TradeXchart.
- * @param {instance} mediator - module api
- * @param {object}[config={}] - chart configuration
- * @memberof TradeXchart
- */
-constructor (mediator, config={}) {
+  /**
+   * Create a new TradeXchart instance
+   *
+   * @static
+   * @param {DOM_element} container - HTML element to mount the chart on
+   * @param {object} [config={}] - chart config
+   * @param {object} state - chart state
+   * @return {instance}  
+   * @memberof TradeXchart
+   */
+    static create(config={}) {
+
+      // global init for all TradeX charts
+      if (TradeXchart.#cnt == 0) {
+        TradeXchart.#cfg.CPUCores = navigator.hardwareConcurrency
+        TradeXchart.#cfg.api = {
+          permittedClassNames:TradeXchart.permittedClassNames,
+        }
+      }
+
+      if (!TradeXchart.#talibReady) {
+        (async () => {
+          try {
+            if ((typeof config.talib !== "object") || 
+                // (config.talib[Symbol.toStringTag] !== "Module") ||
+                (typeof config.talib.init !== "function"))
+                  throw new Error(`${TradeXchart.initErrMsg}`)
+            await config.talib.init("node_modules/talib-web/lib/talib.wasm");
+            TradeXchart.#talibReady = true
+          } catch (e) {
+            throw new Error(`${TradeXchart.initErrMsg} ${e.message}`)
+          }
+        })();
+      }
+      return TradeXchart.#cfg
+    }
+  
+    /**
+     * Destroy a chart instance, clean up and remove data
+     * @static
+     * @param {instance} chart 
+     * @memberof TradeXchart
+     */
+    static destroy(chart) {
+      if (chart.constructor.name === "TradeXchart") {
+        chart.end()
+        const inCnt = chart.inCnt;
+        delete TradeXchart.#instances[inCnt];
+      }
+    }
+  
+    static cnt() {
+      return TradeXchart.#cnt++
+    }
+
+  /**
+   * Creates an instance of TradeXchart.
+   * @param {instance} mediator - module api
+   * @param {object}[config={}] - chart configuration
+   * @memberof TradeXchart
+   */
+  constructor () {
+    super()
+    this.#inCnt = TradeXchart.cnt()
+    this.#id = `${ID}_${this.#inCnt}`
+
+    console.warn(`!WARNING!: ${NAME} breaking changes since V 0.101.7`)
+    console.log("TXC:",this.inCnt)
 
     this.oncontextmenu = window.oncontextmenu
     this.#workers = WebWorker
-    this.#TALib = config.talib
-
-    this.logs = (config?.logs) ? config.logs : false
-    this.infos = (config?.infos) ? config.infos : false
-    this.warnings = (config?.warnings) ? config.warnings : false
-    this.errors = (config?.errors) ? config.errors : false
-
-    let container = config?.container,
-        state = config?.state, 
-        deepValidate = config?.deepValidate || false, 
-        isCrypto = config?.isCrypto || false
-    
-    if (isString(container)) {
-      if (container[0] === '#')
-        container = DOM.findByID(container)
-      else
-        container = DOM.findBySelector(container)
-    }
-
-    if (!DOM.isElement(container)) 
-      this.error(`${NAME} cannot be mounted. Provided element does not exist in DOM`)
-    
-    else {
-      this.#el = container
-      this.#mediator = mediator
-      this.#state = State.create(state, deepValidate, isCrypto)
-      this.log(`Chart ${this.#id} created with a ${this.#state.status} state`)
-      delete(config.state)
-
-      // time frame
-      let tf = "1s"
-      let ms = SECOND_MS
-      if (!isObject(config?.stream) && this.#state.data.chart.data.length < 2) {
-        this.warning(`${NAME} has no chart data or streaming provided.`)
-        // has a time frame been provided?
-        ;({tf, ms} = isTimeFrame(config?.timeFrame))
-        this.#time.timeFrame = tf
-        this.#time.timeFrameMS = ms
-        this.#chartIsEmpty = true
-      }
-      // is the chart streaming with an empty chart?
-      else if (isObject(config?.stream) && this.#state.data.chart.data.length < 2) {
-        // has a time frame been provided?
-        ;({tf, ms} = isTimeFrame(config?.timeFrame))
-        console.log("tf:",tf,"ms:",ms)
-
-        this.#time.timeFrame = tf
-        this.#time.timeFrameMS = ms
-        this.#chartIsEmpty = true
-        this.#delayedSetRange = true
-      }
-      // chart has back history and optionally streaming
-      else {
-        this.#time.timeFrame = this.#state.data.chart.tf 
-        this.#time.timeFrameMS = this.#state.data.chart.tfms
-        this.#chartIsEmpty = false
-      }
-      this.init(config)
-    }
   }
 
   log(l) { if (this.logs) console.log(l) }
   info(i) { if (this.infos) console.info(i) }
   warning(w) { if (this.warnings) console.warn(w) }
   error(e) { if (this.errors) console.error(e) }
+  time(n) { if (this.timer) console.time(n) }
+  timeLog(n) { if (this.timer) console.timeLog(n) }
+  timeEnd(n) { if (this.timer) console.timeEnd(n) }
 
+  set id(id) { this.#id = id }
   get id() { return this.#id }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
   get options() { return this.#options }
   get config() { return this.#config }
+  get core() { return this.#core }
   get inCnt() { return this.#inCnt }
 
-  get width() { return this.#chartW }
+  get width() { return this.offsetWidth }
   set width(w) { this.setWidth(w) } 
-  get height() { return this.#chartH }
+  get height() { return this.offsetHeight }
   set height(h) { this.setHeight(h) }
 
+  set elUtils(el) { this.#elUtils = el }
   get elUtils() { return this.#elUtils }
+  set elTools(el) { this.#elTools = el }
   get elTools() { return this.#elTools }
+  set elBody(el) { this.#elBody = el }
+  get elBody() { return this.#elBody }
+  set elMain(el) { this.#elMain = el }
   get elMain() { return this.#elMain }
+  set elTime(el) { this.#elTime = el }
+  get elTime() { return this.#elTime }
+  set elYAxis(el) { this.#elYAxis = el }
   get elYAxis() { return this.#elYAxis }
+  set elWidgetsG(el) { this.#elWidgetsG = el }
   get elWidgetsG() { return this.#elWidgetsG }
 
   get UtilsBar() { return this.#UtilsBar }
@@ -277,12 +295,14 @@ constructor (mediator, config={}) {
   get time() { return this.#time }
   get TimeUtils() { return Time }
 
-  get theme() { return Theme.getCurrent() }
+  get theme() { return this.#theme.getCurrent() }
   get settings() { return this.#state.data.chart.settings }
   get indicators() { return this.#indicators }
   get TALib() { return this.#TALib }
+  get hub() { return this.#hub }
 
   get candleW() { return this.Timeline.candleW }
+  get candlesOnLayer() { return this.Timeline.candlesOnLayer }
   get buffer() { return this.MainPane.buffer }
   get bufferPx() { return this.MainPane.bufferPx }
   set scrollPos(pos) { this.setScrollPos(pos) }
@@ -301,91 +321,65 @@ constructor (mediator, config={}) {
   set candles(c) { if (isObject(c)) this.#candles = c }
   get candles() { return this.#candles }
 
-
-  /**
-   * Create a new TradeXchart instance
-   *
-   * @static
-   * @param {DOM_element} container - HTML element to mount the chart on
-   * @param {object} [config={}] - chart config
-   * @param {object} state - chart state
-   * @return {instance}  
-   * @memberof TradeXchart
-   */
-  static create(container, config={}, state) {
-
-    if (!TradeXchart.#talibReady) {
-      (async () => {
-        try {
-          if ((typeof config.talib !== "object") || 
-              // (config.talib[Symbol.toStringTag] !== "Module") ||
-              (typeof config.talib.init !== "function"))
-                throw new Error(`${TradeXchart.initErrMsg}`)
-          await config.talib.init("node_modules/talib-web/lib/talib.wasm");
-          TradeXchart.#talibReady = true
-        } catch (e) {
-          throw new Error(`${TradeXchart.initErrMsg} ${e.message}`)
-        }
-      })();
-    }
-
-    // add global stylesheet for all charts
-    if (TradeXchart.#cnt == 0) {
-      document.head.insertAdjacentHTML("beforeend", style)
-      // define <tradex-chart></tradex-chart>
-      window.customElements.define('tradex-chart', TXCElement)
-    }
-
-    const cnt = ++TradeXchart.#cnt
-
-    config.cnt = cnt
-    config.modID = `${ID}_${cnt}`
-    config.container = container
-    config.CPUCores = navigator.hardwareConcurrency
-
-    const core = new SX.Core(config)
-
-    const api = {
-      permittedClassNames:TradeXchart.permittedClassNames,
-    }
-
-    config.state = state
-
-    // register the parent module which will build and control everything
-    const instance = core.register(config.modID, TradeXchart, config, api)
-    TradeXchart.#instances[cnt] = core
-    return instance
-  }
-
-  /**
-   * Destroy a chart instance, clean up and remove data
-   * @static
-   * @param {instance} chart 
-   * @memberof TradeXchart
-   */
-  static destroy(chart) {
-    if (chart.constructor.name === "TradeXchart") {
-      chart.end()
-      const inCnt = chart.inCnt;
-      delete TradeXchart.#instances[inCnt];
-    }
-  }
-
   /**
    * Target element has been validated as a mount point, 
    * let's start building
    * @param {object} config - chart configuration
    */
   init(config) {
+    config = {...TradeXchart.create(config), ...config}
+    this.logs = (config?.logs) ? config.logs : false
+    this.infos = (config?.infos) ? config.infos : false
+    this.warnings = (config?.warnings) ? config.warnings : false
+    this.errors = (config?.errors) ? config.errors : false
+    this.timer = (config?.timer) ? config.timer : false
+
     this.#config = config
-    this.#inCnt = config.cnt
+    this.#inCnt = config.cnt || this.#inCnt
     this.#modID = config.modID
+    this.#TALib = config.talib
+    this.#el = this
+    this.#core = this
+
+    let state = config?.state
+    let deepValidate = config?.deepValidate || false
+    let isCrypto = config?.isCrypto || false
+    this.#state = State.create(state, deepValidate, isCrypto)
+    this.log(`Chart ${this.#id} created with a ${this.#state.status} state`)
+    delete(config.state)
+
+    // time frame
+    let tf = "1s"
+    let ms = SECOND_MS
+    if (!isObject(config?.stream) && this.#state.data.chart.data.length < 2) {
+      this.warning(`${NAME} has no chart data or streaming provided.`)
+      // has a time frame been provided?
+      ;({tf, ms} = isTimeFrame(config?.timeFrame))
+      this.#time.timeFrame = tf
+      this.#time.timeFrameMS = ms
+      this.#chartIsEmpty = true
+    }
+    // is the chart streaming with an empty chart?
+    else if (isObject(config?.stream) && this.#state.data.chart.data.length < 2) {
+      // has a time frame been provided?
+      ;({tf, ms} = isTimeFrame(config?.timeFrame))
+      console.log("tf:",tf,"ms:",ms)
+
+      this.#time.timeFrame = tf
+      this.#time.timeFrameMS = ms
+      this.#chartIsEmpty = true
+      this.#delayedSetRange = true
+    }
+    // chart has back history and optionally streaming
+    else {
+      this.#time.timeFrame = this.#state.data.chart.tf 
+      this.#time.timeFrameMS = this.#state.data.chart.tfms
+      this.#chartIsEmpty = false
+    }
 
     const id = (isObject(config) && isString(config.id)) ? config.id : null
     this.setID(id)
-    // this.addTheme(config?.theme)
-
-    this.mount()
+    this.classList.add(this.id)
 
     // process config
     if (isObject(config)) {
@@ -410,19 +404,16 @@ constructor (mediator, config={}) {
       this.setRange(start, end)
     }
 
+    this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`)
+
     this.#WidgetsG = new WidgetsG(this, {widgets: config?.widgets})
     this.#UtilsBar = new UtilsBar(this, config)
     this.#ToolsBar = new ToolsBar(this, config)
     this.#MainPane = new MainPane(this, config)
 
-    this.log(`${this.#name} instantiated`)
-  }
+    this.setTheme(this.#themeTemp.ID)
 
-  /**
-   * Start the chart processing events and displaying data
-   * @memberof TradeXchart
-   */
-  start() {
+    this.log(`${this.#name} instantiated`)
     this.log("...processing state")
 
     this.#scrollPos = this.bufferPx * -1
@@ -449,7 +440,7 @@ constructor (mediator, config={}) {
    */
   end() {
     this.log("...cleanup the mess")
-    this.#elTXChart.removeEventListener('mousemove', this.onMouseMove)
+    this.removeEventListener('mousemove', this.onMouseMove)
 
     this.off(STREAM_UPDATE, this.onStreamUpdate)
 
@@ -461,25 +452,60 @@ constructor (mediator, config={}) {
     this.#workers.end()
     this.#state = null
 
-    DOM.findByID(this.id).remove
+    // DOM.findByID(this.id).remove
   }
 
   eventsListen() {
-    this.#elTXChart.addEventListener('mousemove', this.onMouseMove.bind(this))
+    this.addEventListener('mousemove', this.onMouseMove.bind(this))
 
     this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this))
   }
 
-  on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+  /** Subscribe to a topic
+  *
+  * @param {String} topic      - The topic name
+  * @param {Function} callback - The function that is called if another module
+  *                              publishes to the specified topic
+  * @param {Object}  context   - The context the function(s) belongs to
+  */
+   on(topic, handler, context) {
+    if (!isString(topic) || !isFunction(handler)) return
+    if (!this.#hub[topic]) this.#hub[topic] = [];
+    this.#hub[topic].push({handler, context});
   }
 
+  /** Unsubscribe from a topic
+  *
+  * @param {String} topic - The topic name
+  * @param {Function} cb  - The function that is called if an other module
+  *                         publishes to the specified topic
+  */
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    if (!isString(topic)) return
+
+    const i = (this.#hub[topic] || []).findIndex(h => h === handler);
+    if (i > -1) this.#hub[topic].splice(i, 1);
+    if (this.#hub[topic].length === 0) delete this.#hub[topic];
   }
 
+  /** Publish an topic
+  *
+  * @param {String} topic - The topic name
+  * @param {Object}  data - The data to publish
+  */
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    if (!isString(topic)) return
+    (this.#hub[topic] || []).forEach(cb => cb.handler.call(cb.context, data));
+  }
+
+  /** Execute a task
+  *
+  * @param {String} topic - The topic name
+  * @param {Object} data    - The data that gets published
+  * @param {Function} cb    - callback method
+  */
+  execute(channel, data, cb) {
+
   }
 
   onMouseMove(e) {
@@ -504,41 +530,16 @@ constructor (mediator, config={}) {
     }
   }
 
-  mount() {
-    // mount the framework
-    this.#el.innerHTML = this.defaultNode()
-
-    // define the elements for the components to mount onto
-    this.#elTXChart = DOM.findBySelector(`#${this.id}`)
-    this.#elUtils = DOM.findBySelector(`#${this.id} tradex-utils`)
-    this.#elBody = DOM.findBySelector(`#${this.id} .${CLASS_BODY}`)
-    this.#elTools = DOM.findBySelector(`#${this.id} .${CLASS_TOOLS}`)
-    this.#elMain  = DOM.findBySelector(`#${this.id} .${CLASS_MAIN}`)
-    this.#elYAxis  = DOM.findBySelector(`#${this.id} .${CLASS_YAXIS}`)
-    this.#elRows  = DOM.findBySelector(`#${this.id} .${CLASS_ROWS}`)
-    this.#elTime  = DOM.findBySelector(`#${this.id} .${CLASS_TIME}`)
-
-    this.#elWidgetsG  = DOM.findBySelector(`#${this.id} tradex-widgets`)
-    // this.#elWidgetsG = this.#elWidgetsG = this.#elTXChart.widgets
-
-    this.#elements = {
-      elTXChart: this.#elTXChart,
-      elUtils: this.#elUtils,
-      elBody: this.#elBody,
-      elTools: this.#elTools,
-      elMain: this.#elMain,
-      elRows: this.#elRows,
-      elTime: this.#elTime,
-      elWidgetsG: this.#elWidgetsG
-    }
-  }
-
   props() {
     return {
       // id: (id) => this.setID(id),
       userClasses: (classes) => this.setUserClasses(classes),
       width: (width) => this.setWidth(width),
       height: (height) => this.setHeight(height),
+      widthMin: (width) => this.setWidthMin(width),
+      heightMin: (height) => this.setHeightMin(height),
+      widthMax: (width) => this.setWidthMax(width),
+      heightMax: (height) => this.setHeightMax(height),
       logs: (logs) => this.logs = (isBoolean(logs)) ? logs : false,
       infos: (infos) => this.infos = (isBoolean(infos)) ? infos : false,
       warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
@@ -546,19 +547,14 @@ constructor (mediator, config={}) {
       rangeStartTS: (rangeStartTS) => this.#rangeStartTS = (isNumber(rangeStartTS)) ? rangeStartTS : undefined,
       rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
       indicators: (indicators) => this.#indicators = {...Indicators, ...indicators },
-      theme: (theme) => {
-        let t = this.addTheme(theme)
-        this.setTheme(t.ID)
-      },
+      theme: (theme) => { this.#themeTemp = this.addTheme(theme) },
       stream: (stream) => this.#stream = (isObject(stream)) ? stream : {},
       pricePrecision: (precision) => this.setPricePrecision(precision),
       volumePrecision: (precision) => this.setVolumePrecision(precision),
     }
   }
 
-  getInCnt() {
-    return this.#inCnt
-  }
+  getInCnt() { return this.#inCnt }
 
   setID(id) {
     if (isString(id)) 
@@ -571,27 +567,41 @@ constructor (mediator, config={}) {
   getModID() { return this.#modID }
 
   setWidth(w) {
-    if (isNumber(w))
+    if (isNumber(w)) {
       this.#chartW = w
-    else 
-      this.#chartW = this.#el.parentElement.width
-
-    this.#elTXChart.style.width = `${this.#chartW}px`
-    this.#elUtils.style.width = `${this.#chartW}px`
-    this.#elBody.style.width = `${this.#chartW}px`
-    this.#elMain.style.width = `${this.#chartW - this.toolsW}px`
+      w += "px"
+    }
+    else if (isString(w)) {
+      // TODO: regex guard
+      // TODO: fallback w = "100%"
+    }
+    else {
+      this.#chartW = this.parentElement.getBoundingClientRect().width
+      w = this.#chartW + "px"
+    }
+    this.style.width = w
   }
 
   setHeight(h) {
-    if (isNumber(h))
+    if (isNumber(h)) {
       this.#chartH = h
-    else 
-      this.#chartH = this.#el.parentElement.clientHeight
-      
-    this.#elTXChart.style.height = `${this.#chartH}px`
-    this.#elBody.style.height = `${this.#chartH - this.utilsH}px`
-    this.#elMain.style.height= `${this.#chartH - this.utilsH}px`
+      h += "px"
+    }
+    else if (isString(h)) {
+      // TODO: regex guard
+      // TODO: fallback w = "100%"
+    }
+    else {
+      this.#chartH = this.parentElement.getBoundingClientRect().height
+      w = this.#chartH + "px"
+    }
+    this.style.height = h
   }
+
+  setWidthMin(w) { this.style.minWidth = `var(--txc-min-width, ${w})` }
+  setHeightMin(h) { this.style.minHeight = `var(--txc-min-height, ${w})` }
+  setWidthMax(w) { this.style.minWidth = `var(--txc-max-width, ${w})` }
+  setHeightMax(h) { this.style.minHeight = `var(--txc-max-height, ${w})` }
 
   /**
    * Set chart width and height
@@ -600,21 +610,33 @@ constructor (mediator, config={}) {
    * @memberof TradeXchart
    */
   setDimensions(w, h) {
+    let dims
+    // old values
     let width = this.width
     let height = this.height
-    this.setWidth(w)
-    this.setHeight(h)
 
-    this.emit("resize", {
+    // otherwise use a fallback width and height
+    if (!w || !h) {
+      const dims = this.getBoundingClientRect()
+      const parent = this.parentElement.getBoundingClientRect()
+
+      h = (!dims.height) ? (!parent.height) ? CHART_MINH : parent.height : dims.height;
+      w = (!dims.width) ? (!parent.width) ? CHART_MINW : parent.width : dims.width;
+    }
+
+    dims = {
       width: this.width,
       height: this.height,
-      mainW: this.#MainPane.width,
-      mainH: this.#MainPane.height,
       resizeW: w / width,
       resizeH: h / height,
       resizeWDiff: w - width,
       resizeHDiff: h - height
-    })
+    }
+
+    this.setWidth(w)
+    this.setHeight(h)
+
+    this.emit("global_resize", dims)
   }
 
   setUtilsH(h) {
@@ -658,7 +680,8 @@ constructor (mediator, config={}) {
    * @memberof TradeXchart
    */
   addTheme(theme) {
-    return Theme.create(theme, this)
+    this.#theme = Theme.create(theme, this)
+    return this.#theme
   }
 
   /**
@@ -667,10 +690,64 @@ constructor (mediator, config={}) {
  * @memberof TradeXchart
  */
   setTheme(ID) {
-    Theme.current = ID
-    let chart = this.theme
-    this.#elTXChart.style.background = chart.Background
-    this.#elTXChart.style.border = `${chart.BorderThickness}px solid ${chart.BorderColour}`
+    this.#theme.current = ID
+    const current = this.#theme
+    const style = document.querySelector(`style[title=${this.id}_style]`)
+    const borderColour = `var(--txc-border-color, ${current.chart.BorderColour}`
+
+    let innerHTML = `.${this.id} { `
+
+    // modify core style sheet custom CSS variables
+    innerHTML +=`--txc-background: ${current.chart.Background}; `
+
+    // Chart component
+    this.style.background = `var(--txc-background, ${current.chart.Background})`
+    this.style.border = `${current.chart.BorderThickness}px solid`
+    this.style.borderColor = borderColour
+
+    // Main Pane
+    innerHTML +=`--txc-border-color:  ${current.chart.BorderColour}; `
+    this.#elMain.rows.style.borderColor = borderColour
+
+    // Timeline
+    innerHTML += `--txc-time-scrollbar-color: ${current.chart.BorderColour}; `
+    innerHTML += `--txc-time-handle-color: ${current.xAxis.handle}; `
+    innerHTML += `--txc-time-slider-color: ${current.xAxis.slider}; `
+    innerHTML += `--txc-time-cursor-fore: ${current.xAxis.colourCursor}; `
+    innerHTML += `--txc-time-cursor-back: ${current.xAxis.colourCursorBG}; `
+    innerHTML += `--txc-time-icon-color: ${current.icon.colour}; `
+    innerHTML += `--txc-time-icon-hover-color: ${current.icon.hover}; `
+
+    this.#elTime.overview.scrollBar.style.borderColor = borderColour;
+    this.#elTime.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${current.xAxis.handle})`;
+
+    this.#elTime.overview.style.setProperty("--txc-time-slider-color", current.xAxis.slider);
+    this.#elTime.overview.style.setProperty("--txc-time-icon-color", current.icon.colour);
+    this.#elTime.overview.style.setProperty("--txc-time-icon-hover-color", current.icon.hover);
+
+    // Legends
+    for (let [key, legend] of Object.entries(this.Chart.legend.list)) {
+      legend.el.style.color = `var(--txc-legend-color, ${current.legend.colour})`
+      legend.el.style.font = `var(--txc-legend-font, ${current.legend.font})`
+      // TODO: control icons
+    }
+
+    // Utils
+    for (let t of this.#elUtils.icons) {
+      if (t.className != "icon-wrapper") continue
+
+      t.children[0].style.fill = current.icon.colour
+    }
+
+    // Tools
+    for (let t of this.#elTools.icons) {
+      if (t.className != "icon-wrapper") continue
+
+      t.children[0].style.fill = current.icon.colour
+    }
+
+    innerHTML += ` }`
+    style.innerHTML = innerHTML
   }
 
   setScrollPos(pos) {
@@ -736,52 +813,7 @@ constructor (mediator, config={}) {
       this.refresh()
     }
   }
-
-  defaultNode() {
-
-    const STYLE_TXCHART = "overflow: hidden;"
-      let STYLE_UTILS = "border-bottom: 1px solid;"
-      let STYLE_BODY  = "position: relative;"
-    const STYLE_TOOLS = "position: absolute; top: 0; left: 0; height: 100%; min-height: 100%; border-right: 1px solid;"
-    const STYLE_MAIN  = "position: absolute; top: 0; height: 100%;";
-
-    if (this.config?.tools?.none) this.toolsW = 0
-    if (this.config?.utils?.none) {
-      STYLE_UTILS = "border: none;"
-      this.utilsH = 0
-      STYLE_BODY += " margin-top: -1px;"
-    }
-
-    const toolsVis = (this.toolsW == 0)? "visibility: hidden;" : "visibility: visible;"
-    const utilsVis = (this.utilsH == 0)? "visibility: hidden;" : "visibility: visible;"
-
-    const classesTXChart = CLASS_DEFAULT+" "+this.#userClasses 
-    const styleTXChart = STYLE_TXCHART + ` height: ${this.height}px; width: ${this.#chartW}px; background: ${this.chartBGColour}; color: ${this.chartTxtColour};`
-    const styleUtils = STYLE_UTILS + ` height: ${this.utilsH}px; width: ${this.#chartW}px; border-color: ${this.chartBorderColour}; ${utilsVis}`
-    const styleBody = STYLE_BODY + ` height: calc(100% - ${this.utilsH}px); width: ${this.#chartW}px;`
-    const styleTools = STYLE_TOOLS + ` width: ${this.toolsW}px; border-color: ${this.chartBorderColour}; ${toolsVis}`
-    const styleMain = STYLE_MAIN + ` left: ${this.toolsW}px; width: calc(100% - ${this.toolsW}px);`
-    const styleWidgets = ` position: relative;`
-    const styleScale = `position: absolute; top: 0; right: 0; width: ${this.scaleW}px; height: 100%;`
-    
-    const node = `
-      <div id="${this.id}" class="${classesTXChart}" style="${styleTXChart}">
-        <tradex-utils class="${CLASS_UTILS}" style="${styleUtils}"></tradex-utils>
-        <div class="${CLASS_BODY}" style="${styleBody}">
-          <div class="${CLASS_TOOLS}" style="${styleTools}"></div>
-          <div class="${CLASS_MAIN}" style="${styleMain}"></div>
-          <div class="${CLASS_YAXIS}" style="${styleScale}"></div>
-        </div>
-        <tradex-widgets></tradex-widgets>
-      </div>
-    `
-    return node
-  }
-
-  setClasses(classes) {
-
-  }
-
+  
   /**
    * Calculate new range index / position from position difference
    * typically mouse drag or cursor keys
@@ -965,5 +997,13 @@ constructor (mediator, config={}) {
     else this.implemented.open()
   }
 
+} // end class TradeXchart
 
+// add global stylesheet for all charts
+if (!window.customElements.get('tradex-chart')) {
+  // insert global TradeX chart stylesheet
+  document.head.insertAdjacentHTML("beforeend", cssVars)
+  document.head.insertAdjacentHTML("beforeend", style)
+  // define <tradex-chart></tradex-chart>
+  window.customElements.define('tradex-chart', TradeXchart)
 }
