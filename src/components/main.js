@@ -223,6 +223,8 @@ export default class MainPane {
 
     this.#controller.removeEventListener("mousewheel", this.onMouseWheel);
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
+    this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
+    this.#controller.removeEventListener("mouseout", this.onMouseOut);
     this.#controller.removeEventListener("drag", this.onChartDrag);
     this.#controller.removeEventListener("enddrag", this.onChartDragDone);
     this.#controller.removeEventListener("keydown", this.onChartKeyDown)
@@ -243,6 +245,8 @@ export default class MainPane {
 
     this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
+    this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
+    this.#controller.on("mouseout", this.onMouseOut.bind(this));
     // this.#controller.on("drag", debounce(this.onChartDrag, 1, this, true));
     this.#controller.on("drag", throttle(this.onChartDrag, 100, this, true));
     // this.#controller.on("drag", this.onChartDrag.bind(this));
@@ -328,6 +332,14 @@ export default class MainPane {
     this.emit("chart_pan", this.#cursorPos)
     // draw() called via state machine updateRange()
     // this.draw()
+  }
+
+  onMouseEnter(e) {
+    this.core.Timeline.showCursorTime()
+  }
+
+  onMouseOut(e) {
+    this.core.Timeline.hideCursorTime()
   }
 
   onChartDragDone(e) {

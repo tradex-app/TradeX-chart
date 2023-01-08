@@ -263,10 +263,10 @@ const config4 = {
 }
 
 const configs = [
-  config1,
-  config2,
-  config3,
-  // config4,
+  {config: config1, stream: null},
+  {config: config2, stream: (chart) => {setInterval(stream.bind(chart), interval)}},
+  {config: config3, stream: null},
+  {config: config4, stream: (chart) => {livePrice(chart)}}
 ]
 
 const main = DOM.findBySelector('main')
@@ -286,9 +286,14 @@ function addChart() {
   let section = document.createElement("section")
       section.appendChild(chart)
       main.appendChild(section)
-  let config = (chart.inCnt >= configs.length) ? configs[chart.inCnt % configs.length] : configs[chart.inCnt]
+  let {config, stream} = (chart.inCnt >= configs.length) ? configs[chart.inCnt % configs.length] : configs[chart.inCnt]
       chart.init(config)
       window["chart"+chart.inCnt] = chart
+
+  if (typeof chart.stream.start === "function") {
+    chart.stream.start()
+    if (typeof stream === "function") stream(chart)
+  }
 }
 
 
@@ -336,6 +341,9 @@ function getRandomInt(min, max) {
 
 function stream() {
   let candle 
+  let chart = this
+  let time = chart.range.value()[0]
+
   if (!streamInit) {
     // candle = chart.allData.data[chart.range.dataLength - 1]
     candle = chart.range.value()
@@ -359,10 +367,33 @@ function stream() {
   chart.stream.onTick(tick)
 }
 
-// if (typeof chart.stream.start === "function") {
-//   chart.stream.start()
-//   const streamTimer = setInterval(stream, interval)
-// }
+function livePrice(chart) {
+  var ws = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@aggTrade");    
+  ws.onmessage = function (evt) { 
+  
+    /*
+    {
+      "e": "aggTrade",  // Event type
+      "E": 123456789,   // Event time
+      "s": "BNBBTC",    // Symbol
+      "a": 12345,       // Aggregate trade ID
+      "p": "0.001",     // Price
+      "q": "100",       // Quantity
+      "f": 100,         // First trade ID
+      "l": 105,         // Last trade ID
+      "T": 123456785,   // Trade time
+      "m": true,        // Is the buyer the market maker?
+      "M": true         // Ignore
+    }
+    */
+    
+    var msg = evt.data;
+    var obj = JSON.parse(msg);
+    if (obj.p) { 
+      chart.stream.onTick({t: obj.T, p: obj.p, q: obj.q})   
+    }
+  };
+}
 
 
 

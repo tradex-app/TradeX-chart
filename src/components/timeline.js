@@ -326,4 +326,14 @@ export default class Timeline {
     this.#viewport.render()
   }
 
+  hideCursorTime() {
+    this.#layerCursor.visible = false
+    this.#viewport.render()
+  }
+
+  showCursorTime() {
+    this.#layerCursor.visible = true
+    this.#viewport.render()
+  }
+
 }
