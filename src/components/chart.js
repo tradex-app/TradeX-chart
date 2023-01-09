@@ -235,12 +235,14 @@ export default class Chart {
   onMouseEnter(e) {
     this.#cursorActive = true;
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
+    this.scale.layerCursor.visible = true
     this.emit(`${this.ID}_mouseenter`, this.#cursorPos);
   }
 
   onMouseOut(e) {
     this.#cursorActive = false;
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
+    this.scale.layerCursor.visible = false
     this.emit(`${this.ID}_mouseout`, this.#cursorPos);
   }
 

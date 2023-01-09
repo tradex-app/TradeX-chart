@@ -336,10 +336,24 @@ export default class MainPane {
 
   onMouseEnter(e) {
     this.core.Timeline.showCursorTime()
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
+    this.core.Chart.graph.render()
+
+    for (let [key, offChart] of this.offCharts) {
+      offChart.graph.overlays.list.get("cursor").layer.visible = true
+      offChart.graph.render()
+    }
   }
 
   onMouseOut(e) {
     this.core.Timeline.hideCursorTime()
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false
+    this.core.Chart.graph.render()
+
+    for (let [key, offChart] of this.offCharts) {
+      offChart.graph.overlays.list.get("cursor").layer.visible = false
+      offChart.graph.render()
+    }
   }
 
   onChartDragDone(e) {
