@@ -77,7 +77,7 @@ const config1 = {
     },
     chart: {
       Background: "#141414",
-      BorderColour: "#600000",
+      BorderColour: "#666",
       GridColour: "#303030",
       TextColour: "#c0c0c0"
     },
@@ -103,7 +103,7 @@ const config2 = {
   utils: {none: true},
   tools: {none: true},
   timeFrame: "1m",
-  rangeStartTS: rangeStartTS,
+  rangeStartTS: state2.ohlcv.slice(-15)[0][0], // rangeStartTS,
   rangeLimit: 30,
   theme: {
     candle: {
@@ -120,7 +120,7 @@ const config2 = {
     },
     chart: {
       Background: "#141414",
-      BorderColour: "#000060",
+      BorderColour: "#666",
       GridColour: "#333",
       TextColour: "#ccc"
     },
@@ -266,7 +266,7 @@ const configs = [
   {config: config1, stream: null},
   {config: config2, stream: (chart) => {setInterval(stream.bind(chart), interval)}},
   {config: config3, stream: null},
-  {config: config4, stream: (chart) => {livePrice(chart)}}
+  // {config: config4, stream: (chart) => {livePrice(chart)}}
 ]
 
 const main = DOM.findBySelector('main')
@@ -389,7 +389,7 @@ function livePrice(chart) {
     
     var msg = evt.data;
     var obj = JSON.parse(msg);
-    if (obj.p) { 
+    if (typeof obj === "object" && obj.T && obj.p && obj.q) { 
       chart.stream.onTick({t: obj.T, p: obj.p, q: obj.q})   
     }
   };

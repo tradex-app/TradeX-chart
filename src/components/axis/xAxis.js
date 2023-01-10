@@ -318,6 +318,7 @@ export default class xAxis extends Axis {
       let x = Math.floor((t1 - to) / minorGrad)
       if (x > 0 ) {
         let y = Math.floor((t1 - to) / x)
+        // console.log(`y: ${y}, th: ${th}, t1: ${t1}`)
         while (th < t1) {
           th += y
           min = unitStart(th)

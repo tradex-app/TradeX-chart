@@ -58,7 +58,8 @@ export default class State {
 
     // validate state
     if (isObject(state)) {
-      this.#data = this.validateState(state, deepValidate, isCrypto)
+      const s = this.deepMerge({}, state)
+      this.#data = this.validateState(s, deepValidate, isCrypto)
       this.#status = "valid"
       this.#isEmpty = (this.#data.chart?.isEmpty) ? true : false
     }
