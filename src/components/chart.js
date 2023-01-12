@@ -353,6 +353,8 @@ export default class Chart {
    * @param {array} candle - OHLCV
    */
   updateLegends(pos = this.#cursorPos, candle = false) {
+    if (this.#core.isEmpty) return
+
     const legends = this.#Legends.list;
 
     for (const legend in legends) {

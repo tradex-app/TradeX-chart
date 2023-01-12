@@ -7,6 +7,7 @@ import DOM from './utils/DOM'
 import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { interval2MS, isTimeFrame, SECOND_MS } from "./utils/time"
+import { copyDeep } from './utils/utilities'
 import State from './state'
 import { Range, calcTimeIndex } from "./model/range"
 import StateMachine from './scaleX/stateMachne'
@@ -277,7 +278,7 @@ export default class TradeXchart extends Tradex_chart {
   get WidgetsG() { return this.#WidgetsG }
   get Chart() { return this.#MainPane.chart }
 
-  get state() { return this.#state.data }
+  get state() { return this.#state }
   get chartData() { return this.#state.data.chart.data }
   get offChart() { return this.#state.data.offchart }
   get onChart() { return this.#state.data.onchart }
@@ -317,7 +318,7 @@ export default class TradeXchart extends Tradex_chart {
   set stream(stream) { return this.setStream(stream) }
   get stream() { return this.#stream }
   get worker() { return this.#workers }
-  get isEmtpy() { return this.#chartIsEmpty }
+  get isEmpty() { return this.#chartIsEmpty }
   set candles(c) { if (isObject(c)) this.#candles = c }
   get candles() { return this.#candles }
 
@@ -341,12 +342,12 @@ export default class TradeXchart extends Tradex_chart {
     this.#el = this
     this.#core = this
 
-    let state = config?.state
+    let state = copyDeep(config?.state)
     let deepValidate = config?.deepValidate || false
     let isCrypto = config?.isCrypto || false
     this.#state = State.create(state, deepValidate, isCrypto)
+    delete config.state
     this.log(`Chart ${this.#id} created with a ${this.#state.status} state`)
-    delete(config.state)
 
     // time frame
     let tf = "1s"
@@ -647,6 +648,10 @@ export default class TradeXchart extends Tradex_chart {
   setToolsW(w) {
     this.toolsW = w
     this.#elTools.style.width = `${w}px`
+  }
+
+  setNotEmpty() {
+    this.#chartIsEmpty = false
   }
 
   /**

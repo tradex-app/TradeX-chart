@@ -54,7 +54,7 @@ export function _set(obj, path, value) {
     const sourceValue = source[key];
 
     if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
-      target[key] = targetValue.concat(sourceValue);
+      target[key] = mergeDeep(targetValue.concat([]), (sourceValue));
     } else if (isObject(targetValue) && isObject(sourceValue)) {
       target[key] = mergeDeep(Object.assign({}, targetValue), sourceValue);
     } else {
@@ -74,7 +74,7 @@ export function _set(obj, path, value) {
  * @return {object}  
  */
 export function copyDeep(obj) {
-  if (obj === null || typeof (obj) !== 'object' || 'isActiveClone' in obj)
+  if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
       return obj;
 
   if (obj instanceof Date)

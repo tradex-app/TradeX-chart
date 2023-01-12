@@ -6,7 +6,7 @@ import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeC
 // import customEvent from '../events/custom'
 import Dataset from '../model/dataset'
 import { validateDeep, validateShallow } from '../model/validateData'
-import { mergeDeep } from '../utils/utilities'
+import { copyDeep, mergeDeep } from '../utils/utilities'
 import { detectInterval } from '../model/range'
 import { ms2Interval } from '../utils/time'
 import { SECOND, DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS } from '../definitions/chart'
@@ -58,8 +58,7 @@ export default class State {
 
     // validate state
     if (isObject(state)) {
-      const s = this.deepMerge({}, state)
-      this.#data = this.validateState(s, deepValidate, isCrypto)
+      this.#data = this.validateState(state, deepValidate, isCrypto)
       this.#status = "valid"
       this.#isEmpty = (this.#data.chart?.isEmpty) ? true : false
     }
@@ -76,12 +75,15 @@ export default class State {
 
   validateState(state, deepValidate=false, isCrypto=false) {
 
+    const defaultState = copyDeep(DEFAULT_STATE)
+
     if (!('chart' in state)) {
-      state.chart = DEFAULT_STATE.chart
+      state.chart = defaultState.chart
       state.chart.data = state?.ohlcv || []
-      state.chart.settings = state?.settings || state.chart.settings
       state.chart.isEmpty = true
     }
+    state = mergeDeep(defaultState, state)
+
 
     if (deepValidate) 
       state.chart.data = validateDeep(state.chart.data, isCrypto) ? state.chart.data : []
@@ -100,15 +102,15 @@ export default class State {
       state.chart.tf = ms2Interval(state.chart.tfms)
 
     if (!('onchart' in state)) {
-        state.onchart = DEFAULT_STATE.onchart
+        state.onchart = defaultState.onchart
     }
 
     if (!('offchart' in state)) {
-        state.offchart = DEFAULT_STATE.offchart
+        state.offchart = defaultState.offchart
     }
 
     if (!state.chart.settings) {
-        state.chart.settings = DEFAULT_STATE.chart.settings
+        state.chart.settings = defaultState.chart.settings
     }
 
     // Remove ohlcv we have Data
@@ -128,7 +130,7 @@ export default class State {
   }
 
   defaultState() {
-    this.#data = DEFAULT_STATE
+    this.#data = copyDeep(DEFAULT_STATE)
   }
 
   deepMerge(target, source) {

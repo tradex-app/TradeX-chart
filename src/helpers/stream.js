@@ -58,7 +58,11 @@ export default class Stream {
 
   onTick(tick) {
     if (this.#status == STREAM_STARTED || this.#status == STREAM_LISTENING) {
-      if (isObject(tick)) this.candle = tick
+      if (isObject(tick)) {
+        this.lastTick = {...tick}
+        this.candle = tick
+        this.#core.setNotEmpty()
+      }
     }
   }
 

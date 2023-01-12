@@ -7,7 +7,7 @@ import * as demo from './demo.js'
 // let state = undefined
 import state1 from './data/1hour.json'
 import state2 from './data/data_btc_1m.js'
-// import state from './data/seconds.json'
+// import state4 from './data/seconds.js'
 // import state from './data/seconds-indicator'
 
 let state4 = {
@@ -30,7 +30,7 @@ let state4 = {
       ],
       [
           1663333203000,
-          19182.2,
+          19134.2,
           19182.2,
           19120.2,
           19133.5,
@@ -97,7 +97,7 @@ const config1 = {
 }
 const config2 = {
   id: "TradeX_test",
-  title: "BTC/USDT",
+  title: "TEST/USDT",
   // width: 1000,
   // height: 800,
   utils: {none: true},
@@ -220,13 +220,13 @@ const config3 = {
 }
 const config4 = {
   id: "TradeX_test",
-  title: "BTC/USDT",
+  title: "FUN/USDT",
   // width: 1000,
   // height: 800,
   utils: {none: true},
   tools: {none: true},
-  timeFrame: "1m",
-  rangeStartTS: rangeStartTS,
+  timeFrame: "1s",
+  rangeStartTS: state4.ohlcv.slice(-1)[0][0] - (15000),
   rangeLimit: 30,
   theme: {
     candle: {
@@ -265,8 +265,8 @@ const config4 = {
 const configs = [
   {config: config1, stream: null},
   {config: config2, stream: (chart) => {setInterval(stream.bind(chart), interval)}},
-  {config: config3, stream: null},
-  // {config: config4, stream: (chart) => {livePrice(chart)}}
+  {config: config3, stream: (chart) => {livePrice(chart)}},
+  {config: config4, stream: (chart) => {setInterval(stream.bind(chart), interval)}},
 ]
 
 const main = DOM.findBySelector('main')
@@ -342,20 +342,18 @@ function getRandomInt(min, max) {
 function stream() {
   let candle 
   let chart = this
-  let time = chart.range.value()[0]
+  let time = (chart.stream.lastTick) ? chart.stream.lastTick.t : chart.range.value()[0]
 
-  if (!streamInit) {
-    // candle = chart.allData.data[chart.range.dataLength - 1]
+  candle = chart.stream.candle
+  if (!candle) {
     candle = chart.range.value()
     streamInit = true
     time = time + chart.time.timeFrameMS - interval
   }
-  else candle = chart.stream.candle // chart.range.value()
 
   if (candle[4] === null) candle[4] = 1
   if (candle[5] === null) candle[5] = 1
 
-  // let candle = chart.range.value()
   let percent = getRandomInt(0, 1)
   let factor2 = getRandomInt(0, 10) % 2
   let sign = (Math.floor(factor2) === 1) ? 1 : -1

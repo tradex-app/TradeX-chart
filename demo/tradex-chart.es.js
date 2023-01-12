@@ -153,6 +153,53 @@ const DOM = {
       document.removeEventListener('click', outsideClickListener);
     };
     document.addEventListener('click', outsideClickListener);
+  },
+  addStyleRule(styleSheet, selector, property, value) {
+    let r = this.findStyleRule(styleSheet, selector, property, value);
+    if (!r) return
+    else if (r.i >= 0) {
+      r.rules[r.i].style[r.property] = r.value;
+    }
+    else {
+      this.addCSSRule(r.styleSheet, r.selector, r.rules, r.index);
+    }
+  },
+  deleteStyleRule(styleSheet, selector, property) {
+    let r = this.findStyleRule(styleSheet, selector, property, '');
+    let deleteRule = r.styleSheet.deleteRule || r.styleSheet.removeRule;
+    deleteRule(r.i);
+  },
+  findStyleRule(styleSheet, selector, property, value) {
+    if (!styleSheet || !isObject(styleSheet)) return null
+    else if (styleSheet.constructor.name == "HTMLStyleElement") styleSheet = styleSheet.sheet;
+    else if (styleSheet.constructor.name != "CSSStyleSheet") return null
+    let r = this.styleRuleSanitize(selector, property, value);
+    selector = r[0];
+    property = r[1];
+    value = r[2];
+    const rules = styleSheet.cssRules || styleSheet.rules;
+    for(var i = rules.length - 1; i > 0 ; --i) {
+      let rule = rules[i];
+      if(rule.selectorText === selector) {
+        break;
+      }
+    }
+    return {styleSheet, rules, selector, property, value, i};
+  },
+  styleRuleSanitize(selector, property, value) {
+    return [
+      selector = selector.toLowerCase().replace(/\s+/g, ' '),
+      property = property.toLowerCase(),
+      value = value.toLowerCase(),
+    ]
+  },
+  addCSSRule(sheet, selector, rules, index) {
+    if(sheet.insertRule) {
+      sheet.insertRule(selector + "{" + rules + "}", index);
+    }
+    else {
+      sheet.addRule(selector, rules, index);
+    }
   }
 };
 
@@ -571,7 +618,7 @@ function mergeDeep(target, source) {
     const targetValue = target[key];
     const sourceValue = source[key];
     if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
-      target[key] = targetValue.concat(sourceValue);
+      target[key] = mergeDeep(targetValue.concat([]), (sourceValue));
     } else if (isObject(targetValue) && isObject(sourceValue)) {
       target[key] = mergeDeep(Object.assign({}, targetValue), sourceValue);
     } else {
@@ -581,7 +628,7 @@ function mergeDeep(target, source) {
   return target;
 }
 function copyDeep(obj) {
-  if (obj === null || typeof (obj) !== 'object' || 'isActiveClone' in obj)
+  if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
       return obj;
   if (obj instanceof Date)
       var temp = new obj.constructor();
@@ -1041,12 +1088,13 @@ class State {
   get data() { return this.#data }
   get isEmpty() { return this.#isEmpty }
   validateState(state, deepValidate=false, isCrypto=false) {
+    const defaultState = copyDeep(DEFAULT_STATE);
     if (!('chart' in state)) {
-      state.chart = DEFAULT_STATE.chart;
+      state.chart = defaultState.chart;
       state.chart.data = state?.ohlcv || [];
-      state.chart.settings = state?.settings || state.chart.settings;
       state.chart.isEmpty = true;
     }
+    state = mergeDeep(defaultState, state);
     if (deepValidate)
       state.chart.data = validateDeep(state.chart.data, isCrypto) ? state.chart.data : [];
     else
@@ -1059,13 +1107,13 @@ class State {
     if (!isString(state.chart?.tfms) || deepValidate)
       state.chart.tf = ms2Interval(state.chart.tfms);
     if (!('onchart' in state)) {
-        state.onchart = DEFAULT_STATE.onchart;
+        state.onchart = defaultState.onchart;
     }
     if (!('offchart' in state)) {
-        state.offchart = DEFAULT_STATE.offchart;
+        state.offchart = defaultState.offchart;
     }
     if (!state.chart.settings) {
-        state.chart.settings = DEFAULT_STATE.chart.settings;
+        state.chart.settings = defaultState.chart.settings;
     }
     delete state.ohlcv;
     if (!('datasets' in state)) {
@@ -1078,7 +1126,7 @@ class State {
     return state
   }
   defaultState() {
-    this.#data = DEFAULT_STATE;
+    this.#data = copyDeep(DEFAULT_STATE);
   }
   deepMerge(target, source) {
     return mergeDeep(target, source)
@@ -1279,7 +1327,11 @@ class Stream {
   }
   onTick(tick) {
     if (this.#status == STREAM_STARTED || this.#status == STREAM_LISTENING) {
-      if (isObject(tick)) this.candle = tick;
+      if (isObject(tick)) {
+        this.lastTick = {...tick};
+        this.candle = tick;
+        this.#core.setNotEmpty();
+      }
     }
   }
   onUpdate() {
@@ -1472,6 +1524,8 @@ const defaultTheme = {
     line: "#656565",
     slider: "#555555",
     handle: "#55555588",
+    icon: COLOUR_ICON,
+    iconHover: COLOUR_ICONHOVER
   },
   yAxis: {
     colourTick: YAxisStyle.COLOUR_TICK,
@@ -1503,18 +1557,30 @@ const defaultTheme = {
     hover: COLOUR_ICONHOVER
   }
 };
+const cssVars = `
+<style title="txc_CSSVars">
+  --txc-background: #141414:
+  --txc-border-color: #888;
+  --txc-time-scrollbar-color: #888;
+  --txc-time-handle-color: #888;
+  --txc-time-slider-color: #888;
+  --txc-time-cursor-fore: #222;
+  --txc-time-cursor-back: #ccc;
+  --txc-time-icon-color: #888;
+  --txc-time-icon-hover-color: #888;
+</style>`;
 const style = `
 <style>
   tradex-chart {
     display: flex;
-    width: 100%;
-    height: 100%;
+    width: var(--txc-width, 100%);
+    height: var(--txc-height, 100%);
     min-width: var(--txc-min-width, ${TX_MINW});
     min-height: var(--txc-min-height, ${TX_MINH});
     max-width: var(--txc-max-width, ${TX_MAXW});
     max-height: var(--txc-max-height, ${TX_MAXH});
     overflow: hidden;
-    background-color: var(--txc-background-color, ${GlobalStyle.COLOUR_BG});
+    background: var(--txc-background, ${GlobalStyle.COLOUR_BG});
     font: var(--txc-font, ${GlobalStyle.FONT});
   }
   .tradeXchart .tradeXtime .navigation { 
@@ -3287,10 +3353,9 @@ template$c.innerHTML = `
     align-items: stretch;
     gap: 2px;
   }
-
   .scrollBar {
     position: relative;
-    border: 1px solid ${GlobalStyle.COLOUR_BORDER};
+    border: 1px solid var(--txc-time-scrollbar-color, ${GlobalStyle.COLOUR_BORDER});
     height: 20px;
     border-radius: 3px;
     flex-basis: 100%;
@@ -3307,7 +3372,8 @@ template$c.innerHTML = `
     height: 100%;
     margin: 0;
     padding: 0;
-    background: none;
+    background:  var(--txc-time-slider-color, #555);
+
   }
   .scrollBar input::-moz-range-thumb {
     -moz-appearance: none;
@@ -3349,73 +3415,73 @@ template$c.innerHTML = `
     border: 0;
   }
   input[type=range] {
-  -webkit-appearance: none;
-  background: none;
-}
+    -webkit-appearance: none;
+    background: none;
+  }
 
-input[type=range]::-webkit-slider-runnable-track {
-  height: 5px;
-  border: none;
-  border-radius: 3px;
-  background: transparent;
-}
+  input[type=range]::-webkit-slider-runnable-track {
+    height: 5px;
+    border: none;
+    border-radius: 3px;
+    background: transparent;
+  }
 
-input[type=range]::-ms-track {
-  height: 5px;
-  background: transparent;
-  border: none;
-  border-radius: 3px;
-}
+  input[type=range]::-ms-track {
+    height: 5px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+  }
 
-input[type=range]::-moz-range-track {
-  height: 5px;
-  background: transparent;
-  border: none;
-  border-radius: 3px;
-}
+  input[type=range]::-moz-range-track {
+    height: 5px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+  }
 
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  border: none;
-  height: 20px;
-  width: 16px;
-  border-radius: 3px;
-  background: var(--txc-time-slider-color, #555);
-  margin-top: -10px;
-  position: relative;
-  z-index: 10000;
-}
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 20px;
+    width: 16px;
+    border-radius: 3px;
+    background: var(--txc-time-slider-color, #555);
+    margin-top: -10px;
+    position: relative;
+    z-index: 10000;
+  }
 
-input[type=range]::-ms-thumb {
-  -webkit-appearance: none;
-  border: none;
-  height: 20px;
-  width: 16px;
-  border-radius: 3px;
-  background:  var(--txc-time-slider-color, #555);
-  margin-top: -5px;
-  position: relative;
-  z-index: 10000;
-}
+  input[type=range]::-ms-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 20px;
+    width: 16px;
+    border-radius: 3px;
+    background:  var(--txc-time-slider-color, #555);
+    margin-top: -5px;
+    position: relative;
+    z-index: 10000;
+  }
 
-input[type=range]::-moz-range-thumb {
-  -webkit-appearance: none;
-  border: none;
-  height: 100%;
-  width: 16px;
-  border-radius: 3px;
-  background:  var(--txc-time-slider-color, #555);
-  margin-top: -5px;
-  position: relative;
-  z-index: 10000;
-}
+  input[type=range]::-moz-range-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 100%;
+    width: 16px;
+    border-radius: 3px;
+    background:  var(--txc-time-slider-color, #555);
+    margin-top: -5px;
+    position: relative;
+    z-index: 10000;
+  }
 
-input[type=range]:focus {
-  outline: none;
-}
+  input[type=range]:focus {
+    outline: none;
+  }
 
   .handle {
-    background-color: ${handleColour.hex}44; 
+    background-color: var(--txc-time-handle-color, ${handleColour.hex}44); 
     width: 2px;
     height: 18px;
     margin: 1px;
@@ -3426,14 +3492,14 @@ input[type=range]:focus {
   .icon {
     flex-basis: ${iconW}px;
   }
-  .icon:hover {
-    fill: ${GlobalStyle.COLOUR_ICONHOVER};
-  }
   .icon svg {
-    fill: ${GlobalStyle.COLOUR_ICON};
+    fill: var(--txc-time-icon-color, ${GlobalStyle.COLOUR_ICON});
     width: ${iconW}px;
     height: ${iconH}px;
     margin-top: 1px;
+  }
+  .icon svg:hover {
+    fill: var(--txc-time-icon-hover-color, ${GlobalStyle.COLOUR_ICONHOVER});
   }
 </style>
 <div class="scrollBarWidget">
@@ -3476,6 +3542,7 @@ class tradeXOverview extends element {
   get max() { return this.shadowRoot.querySelector('#max') }
   get min() { return this.shadowRoot.querySelector('#min') }
   get sliders() { return this.shadowRoot.querySelectorAll('input') }
+  get overviewCSS() { return this.shadowRoot.querySelector('style[title=overview]') }
   onChangeSliderHandler() {
     console.log(`${this.input.value}, ${this.input.getAttribute('max')}`);
   }
@@ -3616,6 +3683,7 @@ template$8.innerHTML = `
     position: relative;
     width: 100%;
     height: inherit;
+    background: var(--txc-onchart-background, none);
   }
   .viewport canvas {
     position: absolute;
@@ -3665,6 +3733,7 @@ template$7.innerHTML = `
   .viewport {
     width: 100%;
     height: inherit;
+    background: var(--txc-onchart-background, none);
   }
   tradex-legends {
     position: absolute;
@@ -3927,18 +3996,7 @@ class tradeXWidgets extends element {
 window.customElements.define('tradex-widgets', tradeXWidgets);
 
 const HTML = `
-  <style>
-    :host tradex-chart { 
-      --txc-background-color: ${GlobalStyle.COLOUR_BG};
-      --txc-border-color: ${GlobalStyle.COLOUR_BORDER};
-      --txc-color: ${GlobalStyle.COLOUR_TXT};
-      --txc-font: ${GlobalStyle.FONT};
-      --txc-grid: ${GridStyle.COLOUR_GRID};
-      --txc-axis-color: ${GlobalStyle.COLOUR_TXT};
-      --txc-axis-font: ${GlobalStyle.FONT};
-      --txc-legend-color: ${GlobalStyle.COLOUR_TXT};
-      --txc-legend-font: ${GlobalStyle.FONT};
-    }
+  <style title="core">
     tradex-utils {
       height: ${UTILSH}px; 
       width: 100%; 
@@ -5949,11 +6007,6 @@ class Timeline {
     this.#elNavScrollHandle = el.overview.handle;
     this.#elRwdStart = el.overview.rwdStart;
     this.#elFwdEnd = el.overview.fwdEnd;
-    for (let i of this.#elNavList) {
-      i.style.width = `${this.#icons.width}px`;
-      i.style.height = `${this.#icons.height}px`;
-      i.style.fill = `${this.#icons.fill}`;
-    }
     const sliderCfg = {
       core: this.#core,
       elContainer: this.#elNavScrollBar,
@@ -6100,6 +6153,14 @@ class Timeline {
     ctx.save();
     drawTextBG(ctx, dateTimeStr, xPos, 1 , options);
     ctx.restore();
+    this.#viewport.render();
+  }
+  hideCursorTime() {
+    this.#layerCursor.visible = false;
+    this.#viewport.render();
+  }
+  showCursorTime() {
+    this.#layerCursor.visible = true;
     this.#viewport.render();
   }
 }
@@ -6261,11 +6322,13 @@ class Chart {
   onMouseEnter(e) {
     this.#cursorActive = true;
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
+    this.scale.layerCursor.visible = true;
     this.emit(`${this.ID}_mouseenter`, this.#cursorPos);
   }
   onMouseOut(e) {
     this.#cursorActive = false;
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
+    this.scale.layerCursor.visible = false;
     this.emit(`${this.ID}_mouseout`, this.#cursorPos);
   }
   onMouseDown(e) {
@@ -6332,6 +6395,7 @@ class Chart {
     this.draw();
   }
   updateLegends(pos = this.#cursorPos, candle = false) {
+    if (this.#core.isEmpty) return
     const legends = this.#Legends.list;
     for (const legend in legends) {
       this.#Legends.update(legend, { pos, candle });
@@ -6835,6 +6899,7 @@ class ScaleBar {
   get height() { return this.#element.getBoundingClientRect().height }
   get width() { return this.#element.getBoundingClientRect().width }
   get element() { return this.#element }
+  get layerCursor() { return this.#layerCursor }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
   get yAxis() { return this.#yAxis }
@@ -8366,6 +8431,8 @@ class MainPane {
     this.#viewport.destroy();
     this.#controller.removeEventListener("mousewheel", this.onMouseWheel);
     this.#controller.removeEventListener("mousemove", this.onMouseMove);
+    this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
+    this.#controller.removeEventListener("mouseout", this.onMouseOut);
     this.#controller.removeEventListener("drag", this.onChartDrag);
     this.#controller.removeEventListener("enddrag", this.onChartDragDone);
     this.#controller.removeEventListener("keydown", this.onChartKeyDown);
@@ -8379,6 +8446,8 @@ class MainPane {
     this.#controller = new InputController(this.#elRows, {disableContextMenu: false});
     this.#controller.on("mousewheel", this.onMouseWheel.bind(this));
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
+    this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
+    this.#controller.on("mouseout", this.onMouseOut.bind(this));
     this.#controller.on("drag", throttle(this.onChartDrag, 100, this));
     this.#controller.on("enddrag", this.onChartDragDone.bind(this));
     this.#controller.on("keydown", this.onChartKeyDown.bind(this));
@@ -8439,6 +8508,24 @@ class MainPane {
       ...d.delta
     ]);
     this.emit("chart_pan", this.#cursorPos);
+  }
+  onMouseEnter(e) {
+    this.core.Timeline.showCursorTime();
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true;
+    this.core.Chart.graph.render();
+    for (let [key, offChart] of this.offCharts) {
+      offChart.graph.overlays.list.get("cursor").layer.visible = true;
+      offChart.graph.render();
+    }
+  }
+  onMouseOut(e) {
+    this.core.Timeline.hideCursorTime();
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false;
+    this.core.Chart.graph.render();
+    for (let [key, offChart] of this.offCharts) {
+      offChart.graph.overlays.list.get("cursor").layer.visible = false;
+      offChart.graph.render();
+    }
   }
   onChartDragDone(e) {
     const d = this.#drag;
@@ -9511,7 +9598,7 @@ class TradeXchart extends tradeXChart {
   get Timeline() { return this.#MainPane.time }
   get WidgetsG() { return this.#WidgetsG }
   get Chart() { return this.#MainPane.chart }
-  get state() { return this.#state.data }
+  get state() { return this.#state }
   get chartData() { return this.#state.data.chart.data }
   get offChart() { return this.#state.data.offchart }
   get onChart() { return this.#state.data.onchart }
@@ -9547,7 +9634,7 @@ class TradeXchart extends tradeXChart {
   set stream(stream) { return this.setStream(stream) }
   get stream() { return this.#stream }
   get worker() { return this.#workers }
-  get isEmtpy() { return this.#chartIsEmpty }
+  get isEmpty() { return this.#chartIsEmpty }
   set candles(c) { if (isObject(c)) this.#candles = c; }
   get candles() { return this.#candles }
   init(config) {
@@ -9563,12 +9650,12 @@ class TradeXchart extends tradeXChart {
     this.#TALib = config.talib;
     this.#el = this;
     this.#core = this;
-    let state = config?.state;
+    let state = copyDeep(config?.state);
     let deepValidate = config?.deepValidate || false;
     let isCrypto = config?.isCrypto || false;
     this.#state = State.create(state, deepValidate, isCrypto);
+    delete config.state;
     this.log(`Chart ${this.#id} created with a ${this.#state.status} state`);
-    delete(config.state);
     let tf = "1s";
     let ms = SECOND_MS;
     if (!isObject(config?.stream) && this.#state.data.chart.data.length < 2) {
@@ -9593,6 +9680,7 @@ class TradeXchart extends tradeXChart {
     }
     const id = (isObject(config) && isString(config.id)) ? config.id : null;
     this.setID(id);
+    this.classList.add(this.id);
     if (isObject(config)) {
       for (const option in config) {
         if (option in this.props()) {
@@ -9610,6 +9698,7 @@ class TradeXchart extends tradeXChart {
       this.#rangeLimit = end - start;
       this.setRange(start, end);
     }
+    this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`);
     this.#WidgetsG = new Widgets(this, {widgets: config?.widgets});
     this.#UtilsBar = new UtilsBar(this, config);
     this.#ToolsBar = new ToolsBar(this, config);
@@ -9680,6 +9769,10 @@ class TradeXchart extends tradeXChart {
       userClasses: (classes) => this.setUserClasses(classes),
       width: (width) => this.setWidth(width),
       height: (height) => this.setHeight(height),
+      widthMin: (width) => this.setWidthMin(width),
+      heightMin: (height) => this.setHeightMin(height),
+      widthMax: (width) => this.setWidthMax(width),
+      heightMax: (height) => this.setHeightMax(height),
       logs: (logs) => this.logs = (isBoolean(logs)) ? logs : false,
       infos: (infos) => this.infos = (isBoolean(infos)) ? infos : false,
       warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
@@ -9726,6 +9819,10 @@ class TradeXchart extends tradeXChart {
     }
     this.style.height = h;
   }
+  setWidthMin(w) { this.style.minWidth = `var(--txc-min-width, ${w})`; }
+  setHeightMin(h) { this.style.minHeight = `var(--txc-min-height, ${w})`; }
+  setWidthMax(w) { this.style.minWidth = `var(--txc-max-width, ${w})`; }
+  setHeightMax(h) { this.style.minHeight = `var(--txc-max-height, ${w})`; }
   setDimensions(w, h) {
     let dims;
     let width = this.width;
@@ -9756,6 +9853,9 @@ class TradeXchart extends tradeXChart {
     this.toolsW = w;
     this.#elTools.style.width = `${w}px`;
   }
+  setNotEmpty() {
+    this.#chartIsEmpty = false;
+  }
     setPricePrecision (pricePrecision) {
     if (!isNumber(pricePrecision) || pricePrecision < 0) {
       pricePrecision = PRICE_PRECISION;
@@ -9775,17 +9875,27 @@ class TradeXchart extends tradeXChart {
   setTheme(ID) {
     this.#theme.current = ID;
     const current = this.#theme;
+    const style = document.querySelector(`style[title=${this.id}_style]`);
     const borderColour = `var(--txc-border-color, ${current.chart.BorderColour}`;
-    this.style.background = current.chart.Background;
-    this.style.border = `${current.chart.BorderThickness}px solid ${borderColour}`;
+    let innerHTML = `.${this.id} { `;
+    innerHTML +=`--txc-background: ${current.chart.Background}; `;
+    this.style.background = `var(--txc-background, ${current.chart.Background})`;
+    this.style.border = `${current.chart.BorderThickness}px solid`;
+    this.style.borderColor = borderColour;
+    innerHTML +=`--txc-border-color:  ${current.chart.BorderColour}; `;
     this.#elMain.rows.style.borderColor = borderColour;
+    innerHTML += `--txc-time-scrollbar-color: ${current.chart.BorderColour}; `;
+    innerHTML += `--txc-time-handle-color: ${current.xAxis.handle}; `;
+    innerHTML += `--txc-time-slider-color: ${current.xAxis.slider}; `;
+    innerHTML += `--txc-time-cursor-fore: ${current.xAxis.colourCursor}; `;
+    innerHTML += `--txc-time-cursor-back: ${current.xAxis.colourCursorBG}; `;
+    innerHTML += `--txc-time-icon-color: ${current.icon.colour}; `;
+    innerHTML += `--txc-time-icon-hover-color: ${current.icon.hover}; `;
     this.#elTime.overview.scrollBar.style.borderColor = borderColour;
-    this.#elTime.overview.handle.style.backgroundColor = current.xAxis.handle;
+    this.#elTime.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${current.xAxis.handle})`;
     this.#elTime.overview.style.setProperty("--txc-time-slider-color", current.xAxis.slider);
-    this.#elTime.overview.style.setProperty("--txc-time-cursor-fore", current.xAxis.colourCursor);
-    this.#elTime.overview.style.setProperty("--txc-time-cursor-back", current.xAxis.colourCursorBG);
-    this.#elTime.overview.icons[0].style.fill = current.icon.colour;
-    this.#elTime.overview.icons[1].style.fill = current.icon.colour;
+    this.#elTime.overview.style.setProperty("--txc-time-icon-color", current.icon.colour);
+    this.#elTime.overview.style.setProperty("--txc-time-icon-hover-color", current.icon.hover);
     for (let [key, legend] of Object.entries(this.Chart.legend.list)) {
       legend.el.style.color = `var(--txc-legend-color, ${current.legend.colour})`;
       legend.el.style.font = `var(--txc-legend-font, ${current.legend.font})`;
@@ -9798,6 +9908,8 @@ class TradeXchart extends tradeXChart {
       if (t.className != "icon-wrapper") continue
       t.children[0].style.fill = current.icon.colour;
     }
+    innerHTML += ` }`;
+    style.innerHTML = innerHTML;
   }
   setScrollPos(pos) {
     pos = Math.round(pos);
@@ -9965,6 +10077,7 @@ class TradeXchart extends tradeXChart {
   }
 }
 if (!window.customElements.get('tradex-chart')) {
+  document.head.insertAdjacentHTML("beforeend", cssVars);
   document.head.insertAdjacentHTML("beforeend", style);
   window.customElements.define('tradex-chart', TradeXchart);
 }
