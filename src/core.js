@@ -87,8 +87,7 @@ export default class TradeXchart extends Tradex_chart {
   #TALib
   #theme
   #themeTemp
-  #chartW = CHART_MINW
-  #chartH = CHART_MINH
+
   chartWMin = CHART_MINW
   chartHMin = CHART_MINH
   chartW_Reactive = true
@@ -250,11 +249,6 @@ export default class TradeXchart extends Tradex_chart {
   get config() { return this.#config }
   get core() { return this.#core }
   get inCnt() { return this.#inCnt }
-
-  get width() { return this.offsetWidth }
-  set width(w) { this.setWidth(w) } 
-  get height() { return this.offsetHeight }
-  set height(h) { this.setHeight(h) }
 
   set elUtils(el) { this.#elUtils = el }
   get elUtils() { return this.#elUtils }
@@ -567,42 +561,6 @@ export default class TradeXchart extends Tradex_chart {
 
   getModID() { return this.#modID }
 
-  setWidth(w) {
-    if (isNumber(w)) {
-      this.#chartW = w
-      w += "px"
-    }
-    else if (isString(w)) {
-      // TODO: regex guard
-      // TODO: fallback w = "100%"
-    }
-    else {
-      this.#chartW = this.parentElement.getBoundingClientRect().width
-      w = this.#chartW + "px"
-    }
-    this.style.width = w
-  }
-
-  setHeight(h) {
-    if (isNumber(h)) {
-      this.#chartH = h
-      h += "px"
-    }
-    else if (isString(h)) {
-      // TODO: regex guard
-      // TODO: fallback w = "100%"
-    }
-    else {
-      this.#chartH = this.parentElement.getBoundingClientRect().height
-      w = this.#chartH + "px"
-    }
-    this.style.height = h
-  }
-
-  setWidthMin(w) { this.style.minWidth = `var(--txc-min-width, ${w})` }
-  setHeightMin(h) { this.style.minHeight = `var(--txc-min-height, ${w})` }
-  setWidthMax(w) { this.style.minWidth = `var(--txc-max-width, ${w})` }
-  setHeightMax(h) { this.style.minHeight = `var(--txc-max-height, ${w})` }
 
   /**
    * Set chart width and height
@@ -611,31 +569,7 @@ export default class TradeXchart extends Tradex_chart {
    * @memberof TradeXchart
    */
   setDimensions(w, h) {
-    let dims
-    // old values
-    let width = this.width
-    let height = this.height
-
-    // otherwise use a fallback width and height
-    if (!w || !h) {
-      const dims = this.getBoundingClientRect()
-      const parent = this.parentElement.getBoundingClientRect()
-
-      h = (!dims.height) ? (!parent.height) ? CHART_MINH : parent.height : dims.height;
-      w = (!dims.width) ? (!parent.width) ? CHART_MINW : parent.width : dims.width;
-    }
-
-    dims = {
-      width: this.width,
-      height: this.height,
-      resizeW: w / width,
-      resizeH: h / height,
-      resizeWDiff: w - width,
-      resizeHDiff: h - height
-    }
-
-    this.setWidth(w)
-    this.setHeight(h)
+    const dims = super.setDimensions(w, h) 
 
     this.emit("global_resize", dims)
   }

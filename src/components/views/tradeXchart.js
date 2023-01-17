@@ -3,7 +3,7 @@
 
 import element from "./classes/element"
 import { debounce } from "../../utils/utilities"
-import { isObject } from "../../utils/typeChecks"
+import { isNumber, isObject, isString } from "../../utils/typeChecks"
 
 import tradeXBody from "./body"
 import tradeXUtils from "./utils"
@@ -14,6 +14,8 @@ import {
   TOOLSW,
   TIMEH,
   SCALEW,
+  CHART_MINH, 
+  CHART_MINW, 
 } from "../../definitions/style"
 import {
   GlobalStyle, GridStyle, XAxisStyle, YAxisStyle
@@ -51,6 +53,8 @@ export default class tradeXChart extends element {
   #oWidth
   #oHeight
   #template
+  #chartW = CHART_MINW
+  #chartH = CHART_MINH
 
   constructor () {
     const template = document.createElement('template')
@@ -133,7 +137,11 @@ export default class tradeXChart extends element {
         this.removeAttribute('disabled');
     }
   }
-
+  
+  get width() { return this.offsetWidth }
+  set width(w) { this.setWidth(w) } 
+  get height() { return this.offsetHeight }
+  set height(h) { this.setHeight(h) }
   get oWidth() { return this.#oWidth }
   get oHeight() { return this.#oHeight }
 
@@ -163,4 +171,76 @@ export default class tradeXChart extends element {
     this.#oHeight = this.offsetHeight
   }
 
+  setWidth(w) {
+    if (isNumber(w)) {
+      this.#chartW = w
+      w += "px"
+    }
+    else if (isString(w)) {
+      // TODO: regex guard
+      // TODO: fallback w = "100%"
+    }
+    else {
+      this.#chartW = this.parentElement.getBoundingClientRect().width
+      w = this.#chartW + "px"
+    }
+    this.style.width = w
+  }
+
+  setHeight(h) {
+    if (isNumber(h)) {
+      this.#chartH = h
+      h += "px"
+    }
+    else if (isString(h)) {
+      // TODO: regex guard
+      // TODO: fallback w = "100%"
+    }
+    else {
+      this.#chartH = this.parentElement.getBoundingClientRect().height
+      w = this.#chartH + "px"
+    }
+    this.style.height = h
+  }
+
+  setWidthMin(w) { this.style.minWidth = `var(--txc-min-width, ${w})` }
+  setHeightMin(h) { this.style.minHeight = `var(--txc-min-height, ${w})` }
+  setWidthMax(w) { this.style.minWidth = `var(--txc-max-width, ${w})` }
+  setHeightMax(h) { this.style.minHeight = `var(--txc-max-height, ${w})` }
+
+  /**
+   * Set chart width and height
+   * @param {number} w - width in pixels
+   * @param {number} h - height in pixels
+   * @memberof TradeXchart
+   */
+  setDimensions(w, h) {
+    let dims
+    // old values
+    let width = this.width
+    let height = this.height
+
+    // otherwise use a fallback width and height
+    if (!w || !h) {
+      const dims = this.getBoundingClientRect()
+      const parent = this.parentElement.getBoundingClientRect()
+
+      h = (!dims.height) ? (!parent.height) ? CHART_MINH : parent.height : dims.height;
+      w = (!dims.width) ? (!parent.width) ? CHART_MINW : parent.width : dims.width;
+    }
+
+    dims = {
+      width: this.width,
+      height: this.height,
+      resizeW: w / width,
+      resizeH: h / height,
+      resizeWDiff: w - width,
+      resizeHDiff: h - height
+    }
+
+    this.setWidth(w)
+    this.setHeight(h)
+
+    return dims
+  }
 }
