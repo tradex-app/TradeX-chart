@@ -179,6 +179,7 @@ export default class Chart {
     this.off(STREAM_LISTENING, this.onStreamListening);
     this.off(STREAM_NEWVALUE, this.onStreamNewValue);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
+    this.off("setRange", this.draw)
   }
 
   eventsListen() {
@@ -197,6 +198,8 @@ export default class Chart {
     this.on(STREAM_LISTENING, this.onStreamListening.bind(this));
     this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this));
     this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this));
+    this.on("setRange", this.draw.bind(this))
+    this.on("scrollUpdate", this.draw.bind(this))
   }
 
   /**
@@ -363,7 +366,9 @@ export default class Chart {
   }
 
   draw(range=this.range, update=false) {
-    window.requestAnimationFrame(()=>this.graph.draw(range, update))
+    window.requestAnimationFrame(() =>
+      this.graph.draw(range, update)
+    )
   }
 
   drawGrid() {

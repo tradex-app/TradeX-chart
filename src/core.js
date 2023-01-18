@@ -777,7 +777,9 @@ export default class TradeXchart extends Tradex_chart {
     }
 
     this.#scrollPos = scrollPos
-    // console.log("scrollPos:",this.#scrollPos)
+    window.requestAnimationFrame(() =>
+      this.emit("scrollUpdate", scrollPos)
+    )
   }
 
   offsetRange(offset) {

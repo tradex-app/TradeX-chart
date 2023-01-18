@@ -232,6 +232,7 @@ export default class MainPane {
     this.#controller = null
 
     this.off(STREAM_NEWVALUE, this.onNewStreamValue)
+    this.off("setRange", this.draw)
   }
 
 
@@ -248,7 +249,7 @@ export default class MainPane {
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
     this.#controller.on("mouseout", this.onMouseOut.bind(this));
     // this.#controller.on("drag", debounce(this.onChartDrag, 1, this, true));
-    this.#controller.on("drag", throttle(this.onChartDrag, 100, this, true));
+    this.#controller.on("drag", throttle(this.onChartDrag, 50, this, true));
     // this.#controller.on("drag", this.onChartDrag.bind(this));
 
     this.#controller.on("enddrag", this.onChartDragDone.bind(this));
@@ -259,6 +260,8 @@ export default class MainPane {
 
     // listen/subscribe/watch for parent notifications
     this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this))
+    this.on("setRange", this.draw.bind(this))
+    // this.on("scrollUpdate", this.draw.bind(this))
   }
 
   on(topic, handler, context) {
@@ -299,6 +302,28 @@ export default class MainPane {
     this.emit("main_mouseup", e)
   }
 
+  onMouseEnter(e) {
+    this.core.Timeline.showCursorTime()
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
+    this.core.Chart.graph.render()
+
+    for (let [key, offChart] of this.offCharts) {
+      offChart.graph.overlays.list.get("cursor").layer.visible = true
+      offChart.graph.render()
+    }
+  }
+
+  onMouseOut(e) {
+    this.core.Timeline.hideCursorTime()
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false
+    this.core.Chart.graph.render()
+
+    for (let [key, offChart] of this.offCharts) {
+      offChart.graph.overlays.list.get("cursor").layer.visible = false
+      offChart.graph.render()
+    }
+  }
+
   onChartDrag(e) {
     const d = this.#drag
     if (!d.active) {
@@ -332,28 +357,6 @@ export default class MainPane {
     this.emit("chart_pan", this.#cursorPos)
     // draw() called via state machine updateRange()
     // this.draw()
-  }
-
-  onMouseEnter(e) {
-    this.core.Timeline.showCursorTime()
-    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
-    this.core.Chart.graph.render()
-
-    for (let [key, offChart] of this.offCharts) {
-      offChart.graph.overlays.list.get("cursor").layer.visible = true
-      offChart.graph.render()
-    }
-  }
-
-  onMouseOut(e) {
-    this.core.Timeline.hideCursorTime()
-    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false
-    this.core.Chart.graph.render()
-
-    for (let [key, offChart] of this.offCharts) {
-      offChart.graph.overlays.list.get("cursor").layer.visible = false
-      offChart.graph.render()
-    }
   }
 
   onChartDragDone(e) {
@@ -621,7 +624,7 @@ export default class MainPane {
   updateRange(pos) {
     this.#core.updateRange(pos)
     // draw the grid
-    this.draw()
+    // this.draw()
   }
 
   zoomRange() {

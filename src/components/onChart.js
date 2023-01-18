@@ -128,6 +128,8 @@ export default class OnChart extends Chart {
 
   end() {
     this.off("chart_yAxisRedraw", this.onYAxisRedraw)
+    this.off("setRange", this.draw)
+
     super.end()
   }
 
