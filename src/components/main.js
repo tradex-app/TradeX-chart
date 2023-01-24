@@ -4,15 +4,16 @@
 
 import DOM from "../utils/DOM"
 import Timeline from './timeline'
-import CEL from "../components/primitives/canvas"
+import Graph from "./views/classes/graph"
 import Chart from "./onChart"
 import OffChart from "./offChart"
 import chartGrid from "./overlays/chart-grid"
+import watermark from "./overlays/chart-watermark"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-mainPane"
 import { InputController, Keys } from "../input/controller"
 import { isNumber, isObject } from "../utils/typeChecks"
-import { debounce, throttle } from "../utils/utilities"
+import { copyDeep, debounce, throttle } from "../utils/utilities"
 
 import {
   CLASS_TIME,
@@ -41,6 +42,10 @@ import {
 } from "../definitions/style"
 import { timestampDiff } from "../utils/time"
 
+const defaultOverlays = [
+  ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
+  ["grid", {class: chartGrid, fixed: false, required: true, params: {axes: "x"}}],
+]
 
 /**
  * Provides chart main pane that hosts, chart, off charts (indicators), timeline, widgets
@@ -68,9 +73,10 @@ export default class MainPane {
   #elCanvas
   #elViewport
 
+  #Graph
   #viewport
   #layerGrid
-  #layerLabels
+  #layerWatermark
   #OffCharts = new Map()
   #Chart
   #Time
@@ -196,11 +202,8 @@ export default class MainPane {
     })
     this.rowsOldH = this.rowsH
 
-    // prepare layered canvas
-    this.createViewport()
-    // draw watermark
-    // this.initWaterMark
-    // draw the chart - grid, candles, volume
+    // create and start overlays
+    this.createGraph()
     this.initXGrid()
 
     // set up event listeners
@@ -261,7 +264,8 @@ export default class MainPane {
     // listen/subscribe/watch for parent notifications
     this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this))
     this.on("setRange", this.draw.bind(this))
-    // this.on("scrollUpdate", this.draw.bind(this))
+    this.on("scrollUpdate", this.draw.bind(this))
+    this.on("chart_zoom", this.zoomRange.bind(this))
   }
 
   on(topic, handler, context) {
@@ -431,11 +435,13 @@ export default class MainPane {
   }
 
   setDimensions() {
-  
-    let resizeH = this.rowsH / this.#viewport.height
-    let chartH = Math.round(this.#Chart.height * resizeH)
+    this.#elRows.previousDimensions()
+
+    let resizeH = this.#elRows.heightDeltaR
+    let chartH = Math.round(this.chartH * resizeH)
     let width = this.rowsW
     let height = this.rowsH
+    let layerWidth = Math.round(width * ((100 + this.#buffer) * 0.01))
     let dimensions = {
       resizeH: resizeH,
       mainH: this.element.height,
@@ -443,35 +449,23 @@ export default class MainPane {
       rowsH: this.rowsH,
       rowsW: this.rowsW,
     }
+    // set on Chart dimensions
+    if (this.#OffCharts.size == 0 &&
+      chartH != this.#elRows.height) chartH = this.#elRows.height
 
     this.#core.scrollPos = -1
 
     this.#Time.setDimensions({w: width})
-    // this.#Time.draw()
-
-    this.#viewport.setSize(width, height)
-
-    const buffer = this.buffer
-    width = Math.round(width * ((100 + buffer) * 0.01))
-    this.#layerGrid.setSize(width, height)
-    this.#chartGrid.draw("x")
-    this.#viewport.render();
-
-    // set on Chart dimensions
-    if (this.#OffCharts.size == 0 &&
-        chartH != this.#elRows.height) chartH = this.#elRows.height
-    
+    this.#Graph.setSize(width, height, layerWidth)
     this.#Chart.setDimensions({w: width, h: chartH})
-
-    // set off Chart dimensions
     this.#OffCharts.forEach((offChart, key) => {
       chartH = Math.round(offChart.viewport.height * resizeH)
       offChart.setDimensions({w: width, h: chartH})
       offChart.Divider.setDividerPos()
     })
 
-    this.#core.range
     this.rowsOldH = this.rowsH
+    this.draw(this.range, true)
 
     this.emit("rowsResize", dimensions)
   }
@@ -574,62 +568,34 @@ export default class MainPane {
     return node
   }
 
-  createViewport() {
-    const buffer = this.buffer
-    const width = this.width - SCALEW
-    const height = this.rowsH
-    const layerConfig = { 
-      width: Math.round(width * ((100 + buffer) * 0.01)), 
-      height: height
-    }
+  createGraph() {
+    let overlays = copyDeep(defaultOverlays)
 
-    // create viewport
-    this.#viewport = new CEL.Viewport({
-      width: width,
-      height: height,
-      container: this.#elViewport
-    });
-    this.#elCanvas = this.#viewport.scene.canvas
-
-    this.#layerLabels = new CEL.Layer(layerConfig);
-    this.#layerGrid = new CEL.Layer(layerConfig);
-    // add layers
-    this.#viewport
-          .addLayer(this.#layerLabels)
-          .addLayer(this.#layerGrid)
-
-    const config = {...this.theme, ...{ axes: "x" }}
-    this.#chartGrid =
-      new chartGrid(
-        this.#layerGrid, 
-        this.#Time, 
-        null, 
-        config,
-        this)
+    this.#Graph = new Graph(this, this.#elViewport, overlays)
   }
 
   initXGrid() {
     this.draw()
   }
 
-  draw() {
+  draw(range=this.range, update=false) {
     window.requestAnimationFrame(()=> {
-      this.#layerGrid.setPosition(this.scrollPos, 0)
-      this.#chartGrid.draw("x")
-      this.#viewport.render();
-      this.#Time.draw()
+      this.#Graph.draw(range, update)
+      this.#Time.draw(range, update)
+      this.#Chart.draw(range, update)
+      this.#OffCharts.forEach((offChart, key) => {
+        offChart.draw(range, update)
+      })
     })
   }
 
   updateRange(pos) {
     this.#core.updateRange(pos)
-    // draw the grid
     // this.draw()
   }
 
   zoomRange() {
-    // draw the gird
-    this.draw()
+    this.draw(this.range, true)
   }
 
   resizeRowPair(divider, pos) {

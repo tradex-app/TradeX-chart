@@ -16,20 +16,6 @@ export default
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
-        // chart_pan: {
-        //   target: 'chart_pan',
-        //   action (data) {
-        //     this.context.origin.setCursor("grab")
-
-        //     // console.log(`${this.id}: transition from "${this.state}" to  "chart_pan"`)
-        //   },
-        // },
-        chart_zoom: {
-          target: 'chart_zoom',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
-          },
-        },
         xAxis_scale: {
           target: 'xAxis_scale',
           action (data) {
@@ -54,48 +40,6 @@ export default
             this.context.origin.setCursor("default")
 
             // console.log(`${this.id}: transition from "${this.state}" to  "xAxis_scale"`)
-          },
-        },
-      }
-    },
-    // chart_pan: {
-    //   onEnter (data) {
-    //     // console.log(`${this.id}: state: "${this.state}" - onEnter`)
-    //   },
-    //   onExit (data) {
-    //     // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
-    //   },
-    //   on: {
-    //     chart_pan: {
-    //       target: 'chart_pan',
-    //       action (data) {
-    //         // console.log(`${this.id}: transition from "${this.state}" to "chart_pan"`)
-    //         this.context.origin.updateRange(data) 
-    //       },
-    //     },
-    //     chart_panDone: {
-    //       target: 'idle',
-    //       action (data) {
-    //         // console.log(`${this.id}: transition from "${this.state}" to "chart_panDone"`)
-    //         this.context.origin.updateRange(data) 
-    //       },
-    //     },
-    //   }
-    // },
-    chart_zoom: {
-      onEnter (data) {
-        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
-      },
-      onExit (data) {
-        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
-      },
-      on: {
-        always: {
-          target: 'idle',
-          condition: 'zoomDone',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
-            this.context.origin.zoomRange(data) 
           },
         },
       }

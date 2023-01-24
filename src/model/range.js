@@ -159,7 +159,6 @@ export class Range {
       }
 
       this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
-      this.#core.emit("scrollUpdate")
       this.#core.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
       this.#core.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
     })

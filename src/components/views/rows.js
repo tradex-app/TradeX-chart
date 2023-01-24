@@ -47,12 +47,22 @@ template.innerHTML = `
 
 export default class tradeXRows extends element {
 
+  #oWidth
+  #oHeight
+  #widthCache
+  #heightCache
+
   constructor () {
     super(template)
   }
 
   destroy() {
 
+  }
+
+  connectedCallback() {
+    super.connectedCallback()
+    this.previousDimensions()
   }
 
   disconnectedCallback() {
@@ -62,6 +72,19 @@ export default class tradeXRows extends element {
   get onChart() { return this.shadowRoot.querySelector('tradex-onchart') }
   get offCharts() { return this.shadowRoot.querySelectorAll('tradex-offchart') }
   get offChartSlot() { return this.shadowRoot.querySelector('#offchart') }
+  get width() { return this.clientWidth }
+  get height() { return this.clientHeight }
+  get oWidth() { return this.#oWidth }
+  get oHeight() { return this.#oHeight }
+  get widthDeltaR() { return this.clientWidth / this.#oWidth }
+  get heightDeltaR() { return this.clientHeight / this.#oHeight }
+
+  previousDimensions() {
+    this.#oWidth = (this.#widthCache) ? this.#widthCache : this.clientWidth
+    this.#oHeight = (this.#heightCache) ? this.#heightCache : this.clientHeight
+    this.#widthCache = this.clientWidth
+    this.#heightCache = this.clientHeight
+  }
 }
 
 window.customElements.define('tradex-rows', tradeXRows)

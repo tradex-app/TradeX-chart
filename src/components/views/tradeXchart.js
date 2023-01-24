@@ -50,11 +50,13 @@ export default class tradeXChart extends element {
   #elBody
   #elUtils
   #elWidgets
-  #oWidth
-  #oHeight
   #template
   #chartW = CHART_MINW
   #chartH = CHART_MINH
+  #oWidth
+  #oHeight
+  #widthCache
+  #heightCache
 
   constructor () {
     const template = document.createElement('template')
@@ -144,6 +146,8 @@ export default class tradeXChart extends element {
   set height(h) { this.setHeight(h) }
   get oWidth() { return this.#oWidth }
   get oHeight() { return this.#oHeight }
+  get widthDeltaR() { return this.offsetWidth / this.#oWidth }
+  get heightDeltaR() { return this.offsetHeight / this.#oHeight }
 
   get stream() {  }
   set stream(s) {  }
@@ -167,8 +171,10 @@ export default class tradeXChart extends element {
   }
 
   previousDimensions() {
-    this.#oWidth = this.offsetWidth
-    this.#oHeight = this.offsetHeight
+    this.#oWidth = (this.#widthCache) ? this.#widthCache : this.offsetWidth
+    this.#oHeight = (this.#heightCache) ? this.#heightCache : this.offsetHeight
+    this.#widthCache = this.offsetWidth
+    this.#heightCache = this.offsetHeight
   }
 
   setWidth(w) {

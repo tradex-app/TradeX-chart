@@ -6,6 +6,13 @@ import graph from "./classes/graph"
 
 const template = document.createElement('template')
 template.innerHTML = `
+<style>
+  .viewport {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+</style>
   <div class="viewport"></div>
 `
 

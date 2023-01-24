@@ -152,21 +152,4 @@ export default class OffChart extends Chart {
     this.draw()
   }
 
-  /**
-   * Calculate new range index / position 
-   * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
-   */
-  updateRange(pos) {
-    // draw the chart - grid, candles, volume
-    this.draw(this.range)
-  }
-
-  /**
-   * Zoom (contract or expand) range start
-   */
-  zoomRange() {
-    // draw the chart - grid, candles, volume
-    this.draw(this.range, true)
-  }
-
 }

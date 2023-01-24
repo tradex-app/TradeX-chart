@@ -274,28 +274,4 @@ export default class OnChart extends Chart {
     return {inputs, colours}
   }
 
-  /**
-   * Calculate new range index / position 
-   * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
-   */
-  updateRange(pos) {
-    let update = false
-    if (this.scale.rangeMode == "manual") {
-      this.scale.yOffset = pos[5]
-      update = true
-    }
-    // draw the chart - grid, candles, volume
-    this.draw(this.range, update)
-  }
-
-  /**
-   * Zoom (contract or expand) range start
-   * emits: "chart_zoomDone"
-   */
-  zoomRange() {
-    // draw the chart - grid, candles, volume
-    this.draw(this.range, true)
-    this.emit("chart_zoomDone")
-  }
-
 }

@@ -263,7 +263,7 @@ const config4 = {
 }
 
 const configs = [
-  {config: config1, stream: null},
+  // {config: config1, stream: null},
   {config: config2, stream: (chart) => {setInterval(stream.bind(chart), interval)}},
   {config: config3, stream: (chart) => {livePrice(chart)}},
   {config: config4, stream: (chart) => {setInterval(stream.bind(chart), interval)}},
@@ -272,9 +272,9 @@ const configs = [
 const main = DOM.findBySelector('main')
 
 addChart()
-addChart()
-addChart()
-addChart()
+// addChart()
+// addChart()
+// addChart()
 
 
 let add = document.querySelector("#add")

@@ -180,6 +180,8 @@ export default class Chart {
     this.off(STREAM_NEWVALUE, this.onStreamNewValue);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
     this.off("setRange", this.draw)
+    this.off("scrollUpdate", this.draw)
+    this.off("chart_zoom", this.zoomRange)
   }
 
   eventsListen() {
@@ -198,8 +200,9 @@ export default class Chart {
     this.on(STREAM_LISTENING, this.onStreamListening.bind(this));
     this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this));
     this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this));
-    this.on("setRange", this.draw.bind(this))
-    this.on("scrollUpdate", this.draw.bind(this))
+    // this.on("setRange", this.draw.bind(this))
+    // this.on("scrollUpdate", this.draw.bind(this))
+    // this.on("chart_zoom", this.zoomRange.bind(this))
   }
 
   /**
@@ -294,7 +297,6 @@ export default class Chart {
     this.graph.setSize(w, h, this.layerWidth)
     // element widths are automatically handled by CSS
     this.setHeight(h)
-    this.scale.resize(w, h)
   }
 
   setCursor(cursor) {
@@ -366,9 +368,9 @@ export default class Chart {
   }
 
   draw(range=this.range, update=false) {
-    window.requestAnimationFrame(() =>
+    // window.requestAnimationFrame(() =>
       this.graph.draw(range, update)
-    )
+    // )
   }
 
   drawGrid() {
@@ -387,5 +389,13 @@ export default class Chart {
     // this.setDimensions({ w: width, h: height });
   }
 
+  /**
+ * Zoom (contract or expand) range start
+ */
+  zoomRange() {
+    // draw the chart - grid, candles, volume
+    this.draw(this.range, true)
+    this.emit("zoomDone")
+  }
   
 }
