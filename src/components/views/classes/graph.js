@@ -123,7 +123,6 @@ export default class graph {
   draw(range=this.range, update=false) {
     const oList = this.#overlays.list
     for (let [key, overlay] of oList) {
-      overlay.instance.position = [this.#core.scrollPos, 0]
 
       if (this.#core.scrollPos == this.#core.bufferPx * -1 || 
           this.#core.scrollPos == 0 || 
@@ -134,9 +133,9 @@ export default class graph {
       else if (this.#parent.streamCandle) {
         oList.get("stream").instance.draw()
       }
-    }
 
-    this.#viewport.render()
+      overlay.instance.position = [this.#core.scrollPos, 0]
+    }
   }
 
   render() {

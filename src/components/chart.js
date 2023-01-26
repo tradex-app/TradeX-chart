@@ -367,9 +367,14 @@ export default class Chart {
     }
   }
 
+  render() {
+    this.#Graph.render();
+    this.#Scale.render()
+  }
+
   draw(range=this.range, update=false) {
     // window.requestAnimationFrame(() =>
-      this.graph.draw(range, update)
+      this.#Graph.draw(range, update)
     // )
   }
 

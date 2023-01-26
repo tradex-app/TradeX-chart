@@ -76,8 +76,6 @@ export default class chartCursor {
       ctx.stroke()
     }
     ctx.restore();
-
-    this.#target.viewport.render();
   }
 
 }

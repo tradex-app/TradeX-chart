@@ -13,6 +13,7 @@ import stateMachineConfig from "../state/state-time"
 import { fwdEnd, rwdStart } from "../definitions/icons"
 import Colour from "../utils/colour"
 import { drawTextBG, getTextRectWidth } from "../utils/canvas"
+import { bRound } from "../utils/number"
 import { debounce } from "../utils/utilities"
 import Slider from "./widgets/slider"
 
@@ -284,13 +285,17 @@ export default class Timeline {
           .addLayer(this.#layerCursor);
   }
 
+  render() {
+    this.#viewport.render()
+  }
+
   draw() {
     this.#layerCursor.setPosition(this.scrollPos, 0)
     this.#layerLabels.setPosition(this.scrollPos, 0)
     this.#layerOverlays.setPosition(this.scrollPos, 0)
-    this.#xAxis.draw()
+    this.drawGrads()
+    this.drawOverlays()
     this.drawCursorTime()
-    this.#viewport.render()
   }
 
   drawCursorTime() {
@@ -334,6 +339,45 @@ export default class Timeline {
   showCursorTime() {
     this.#layerCursor.visible = true
     this.#viewport.render()
+  }
+
+  drawGrads() {
+    this.#layerLabels.scene.clear()
+    this.#xAxis.doCalcXAxisGrads()
+    
+    const grads = this.#xAxis.xAxisGrads.values
+    const ctx = this.#layerLabels.scene.context
+    const offset = 0
+    const theme = this.theme.xAxis
+
+    ctx.save();
+    ctx.strokeStyle = theme.colourTick
+    ctx.fillStyle = theme.colourTick
+    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
+    for (let tick of grads) { 
+      let x = bRound(tick[1])
+      // ctx.font = (tick[3] == "major") ? XAxisStyle.FONT_LABEL_BOLD : XAxisStyle.FONT_LABEL
+      let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5)
+      ctx.fillText(tick[0], x - w + offset, this.#xAxis.xAxisTicks + 12)
+
+      ctx.beginPath()
+      ctx.moveTo(x + offset, 0)
+      ctx.lineTo(x + offset, this.#xAxis.xAxisTicks)
+      ctx.stroke()
+    }
+    ctx.restore();
+  }
+
+  drawOverlays() {
+    this.#layerOverlays.scene.clear()
+
+    const grads = this.#xAxis.xAxisGrads.values
+    const ctx = this.#layerOverlays.scene.context
+    ctx.save();
+
+// draw overlays
+
+    ctx.restore();
   }
 
 }

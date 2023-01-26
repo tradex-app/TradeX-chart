@@ -579,12 +579,18 @@ export default class MainPane {
   }
 
   draw(range=this.range, update=false) {
+    this.#Graph.draw(range, update)
+    this.#Time.draw(range, update)
+    this.#Chart.draw(range, update)
+    this.#OffCharts.forEach((offChart, key) => {
+      offChart.draw(range, update)
+    })
     window.requestAnimationFrame(()=> {
-      this.#Graph.draw(range, update)
-      this.#Time.draw(range, update)
-      this.#Chart.draw(range, update)
+      this.#Graph.render()
+      this.#Time.render()
+      this.#Chart.render()
       this.#OffCharts.forEach((offChart, key) => {
-        offChart.draw(range, update)
+        offChart.render()
       })
     })
   }

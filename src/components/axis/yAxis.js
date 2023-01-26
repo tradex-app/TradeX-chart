@@ -267,7 +267,7 @@ export default class yAxis extends Axis {
     // roughly divide the yRange into cells
     rangeH = max - min
     rangeH = (this.rangeH > 0) ? this.rangeH : 1
-    yGridSize = (rangeH)/(this.height / (this.core.theme.yAxis.fontSize * 1.5));
+    yGridSize = (rangeH)/(this.height / (this.core.theme.yAxis.fontSize * 1.75));
 
 
     // if (fixed)
@@ -384,47 +384,5 @@ export default class yAxis extends Axis {
 
     return value
   }
-
-  draw() {
-    // calculate Y Axis gradations for labels and overlays
-    this.calcGradations()
-    this.drawLabels()
-    this.drawOverlays()
-  }
-
-  drawLabels() {
-    this.#parent.layerLabels.scene.clear()
-
-    const grads = this.#yAxisGrads
-    const ctx = this.#parent.layerLabels.scene.context
-    const theme = this.theme.yAxis
-
-    ctx.save();
-    ctx.strokeStyle = theme.colourTick
-    ctx.fillStyle = theme.colourTick
-    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
-    for (let tick of grads) {
-      ctx.fillText(tick[0], this.yAxisTicks + 5, tick[1] + 4)
-
-      ctx.beginPath()
-      ctx.moveTo(0, tick[1])
-      ctx.lineTo(this.yAxisTicks, tick[1])
-      ctx.stroke()
-    }
-    ctx.restore();
-  }
-
-  drawOverlays() {
-    this.#parent.layerOverlays.scene.clear()
-
-    const grads = this.#yAxisGrads
-    const ctx = this.#parent.layerOverlays.scene.context
-    ctx.save();
-
-// draw overlays
-
-    ctx.restore();
-  }
-
 
 }

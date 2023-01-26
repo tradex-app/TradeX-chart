@@ -355,44 +355,8 @@ export default class xAxis extends Axis {
     return `${m}:${s}`
   }
 
-  draw() {
+  doCalcXAxisGrads() {
     this.#xAxisGrads = this.calcXAxisGrads()
-    this.drawGrads()
-    this.drawOverlays()
-  }
-
-  drawGrads() {
-    this.parent.layerLabels.scene.clear()
-
-    const grads = this.#xAxisGrads.values
-    const ctx = this.parent.layerLabels.scene.context
-    const mid = bRound(this.width / this.range.Length * 0.5)
-    const offset = 0
-    const theme = this.theme.xAxis
-
-    ctx.save();
-    ctx.strokeStyle = theme.colourTick
-    ctx.fillStyle = theme.colourTick
-    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
-    for (let tick of grads) { 
-      let x = bRound(tick[1])
-      // console.log(bRound(x - mid))
-      // ctx.font = (tick[3] == "major") ? XAxisStyle.FONT_LABEL_BOLD : XAxisStyle.FONT_LABEL
-      let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5)
-      ctx.fillText(tick[0], x - w + offset, this.xAxisTicks + 12)
-
-      ctx.beginPath()
-      ctx.moveTo(x + offset, 0)
-      ctx.lineTo(x + offset, this.xAxisTicks)
-      ctx.stroke()
-    }
-      ctx.restore();
-  }
-
-  drawOverlays() {
-    this.parent.layerOverlays.scene.clear()
-
-    const grads = this.#xAxisGrads
   }
 
 }

@@ -306,9 +306,13 @@ export default class ScaleBar {
     }
   }
 
-  draw() {
-    this.#yAxis.draw()
+  render() {
     this.#viewport.render()
+  }
+
+  draw() {
+    this.drawLabels()
+    this.drawOverlays()
     this.#parent.drawGrid()
   }
 
@@ -349,6 +353,41 @@ export default class ScaleBar {
     this.#layerCursor.scene.clear()
     this.#viewport.render()
     return
+  }
+
+  drawLabels() {
+    this.#layerLabels.scene.clear()
+    this.#yAxis.calcGradations()
+
+    const grads = this.#yAxis.yAxisGrads
+    const ctx = this.#layerLabels.scene.context
+    const theme = this.theme.yAxis
+
+    ctx.save();
+    ctx.strokeStyle = theme.colourTick
+    ctx.fillStyle = theme.colourTick
+    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
+    for (let tick of grads) {
+      ctx.fillText(tick[0], this.#yAxis.yAxisTicks + 5, tick[1] + 4)
+
+      ctx.beginPath()
+      ctx.moveTo(0, tick[1])
+      ctx.lineTo(this.#yAxis.yAxisTicks, tick[1])
+      ctx.stroke()
+    }
+    ctx.restore();
+  }
+
+  drawOverlays() {
+    this.#layerOverlays.scene.clear()
+
+    const grads = this.#yAxis.yAxisGrads
+    const ctx = this.#layerOverlays.scene.context
+    ctx.save();
+
+// draw overlays
+
+    ctx.restore();
   }
 
   resize(width=this.width, height=this.height) {
