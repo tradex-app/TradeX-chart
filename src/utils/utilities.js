@@ -213,6 +213,19 @@ export function insertAtIndex(index, key, value, map){
 }
 
 /**
+ * Map() index handlers
+ * @param {*} map 
+ * @returns 
+ */
+export const firstItemInMap = map => map.entries().next().value
+export const firstKeyInMap = map => map.entries().next().value[0]
+export const firstValueInMap = map => map.entries().next().value[1]
+export const lastItemInMap = map => Array.from(map).pop();
+export const lastKeyInMap = map => Array.from(map.keys()).pop();
+export const lastValueInMap = map => Array.from(map.values()).pop();
+
+
+/**
  * Debounce: the original function will be called after the caller stops calling the 
  * decorated function after a specified period.
  * debouncing, executes the function if there was no new event in $wait milliseconds

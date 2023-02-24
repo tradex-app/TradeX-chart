@@ -5,6 +5,7 @@
 import DOM from "../utils/DOM"
 import Timeline from './timeline'
 import Graph from "./views/classes/graph"
+import renderLoop from "./views/classes/renderLoop"
 import Chart from "./onChart"
 import OffChart from "./offChart"
 import chartGrid from "./overlays/chart-grid"
@@ -16,12 +17,6 @@ import { isNumber, isObject } from "../utils/typeChecks"
 import { copyDeep, debounce, throttle } from "../utils/utilities"
 
 import {
-  CLASS_TIME,
-  CLASS_ROWS,
-  CLASS_ROW,
-  CLASS_GRID,
-  CLASS_CHART,
-  CLASS_YAXIS,
   STREAM_NEWVALUE,
 } from '../definitions/core'
 
@@ -34,13 +29,8 @@ import {
 } from "../definitions/chart"
 
 import {
-  SCALEW,
-  STYLE_ROWS,
   STYLE_ROW,
-  STYLE_TIME,
-  STYLE_SCALE
 } from "../definitions/style"
-import { timestampDiff } from "../utils/time"
 
 const defaultOverlays = [
   ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
@@ -195,6 +185,7 @@ export default class MainPane {
   start() {
     let i = 0
 
+    // start  timeline, chart, offChart
     this.#Time.start()
     this.#Chart.start()
     this.#OffCharts.forEach((offChart, key) => {
@@ -205,6 +196,13 @@ export default class MainPane {
     // create and start overlays
     this.createGraph()
     this.initXGrid()
+
+    renderLoop.init({
+      graphs: [this.#Graph],
+      range: this.range
+    })
+    renderLoop.start()
+    renderLoop.queueFrame(this.range, [this.#Graph], false)
 
     // set up event listeners
     this.eventsListen()

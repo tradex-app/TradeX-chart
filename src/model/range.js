@@ -334,6 +334,25 @@ export class Range {
       return Math.min(max, Math.max(min, val));
     }
   }
+
+  snapshot(start, end) {
+    return {
+      constructor: {name: "RangeSnapshot"},
+      ts: Date.now(),
+
+      data: this.data,
+      dataLength: this.dataLength,
+      Length: this.Length,
+      timeDuration: this.timeDuration,
+      timeMin: this.timeMin,
+      timeMax: this.timeMax,
+      rangeDuration: this.rangeDuration,
+      timeStart: this.timeStart,
+      timeFinish: this.timeFinish,
+      interval: this.interval,
+      intervalStr: this.intervalStr 
+    }
+  }
 } // end class
 
 

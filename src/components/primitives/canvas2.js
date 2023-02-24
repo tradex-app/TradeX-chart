@@ -1,15 +1,9 @@
 // canvas.js
 
+class Node {
 
-/**
- * Create multi-layered canvas
- * @class Viewport
- */
-class Viewport {
-/**
- * Viewport constructor
- * @param {Object} cfg - {width, height}
- */
+  parent = null
+  
   constructor(cfg={}) {
 
     this.container = cfg.container;
@@ -18,101 +12,80 @@ class Viewport {
     this.scene = new CEL.Scene();
 
     this.setSize(cfg.width || 0, cfg.height || 0);
-
-    // clear container
-    cfg.container.innerHTML = "";
-    cfg.container.appendChild(this.scene.canvas);
-
-    CEL.viewports.push(this);
   }
 
-  /**
+    /**
    * set viewport size
    * @param {Integer} width - viewport width in pixels
    * @param {Integer} height - viewport height in pixels
    * @returns {Viewport}
    */
-  setSize(width, height) {
-    this.width = width;
-    this.height = height;
-    this.scene.setSize(width, height);
-
-    this.layers.forEach(function (layer) {
-      layer.setSize(width, height);
-    });
-
-    return this;
-  }
-  /**
-   * add layer
-   * @param {CEL.Layer} layer
-   * @returns {Viewport}
-   */
-  addLayer(layer) {
-    this.layers.push(layer);
-    layer.setSize(layer.width || this.width, layer.height || this.height);
-    layer.viewport = this;
-    return this;
-  }
-  /**
-   * get key's associated coordinate - applied to mouse events.
-   * @param {number} x
-   * @param {number} y
-   * @returns {Integer} integer - returns -1 if no pixel is there
-   */
-  getIntersection(x, y) {
-    var layers = this.layers,
-      len = layers.length,
-      n = len - 1,
-      layer,
-      key;
-
-    while (n >= 0) {
-      layer = layers[n];
-      key = layer.hit.getIntersection(x, y);
-      if (key >= 0) {
-        return key;
+    setSize(width, height) {
+      this.width = width;
+      this.height = height;
+      this.scene.setSize(width, height);
+  
+      this.layers.forEach(function (layer) {
+        layer.setSize(width, height);
+      });
+  
+      return this;
+    }
+    /**
+     * add layer
+     * @param {CEL.Layer} layer
+     * @returns {Viewport}
+     */
+    addLayer(layer) {
+      this.layers.push(layer);
+      layer.setSize(layer.width || this.width, layer.height || this.height);
+      layer.parent = this;
+      return this;
+    }
+    /**
+     * get key's associated coordinate - applied to mouse events.
+     * @param {number} x
+     * @param {number} y
+     * @returns {Integer} integer - returns -1 if no pixel is there
+     */
+    getIntersection(x, y) {
+      var layers = this.layers,
+        len = layers.length,
+        n = len - 1,
+        layer,
+        key;
+  
+      while (n >= 0) {
+        layer = layers[n];
+        key = layer.hit.getIntersection(x, y);
+        if (key >= 0) {
+          return key;
+        }
+        n--;
       }
-      n--;
+  
+      return -1;
+    }
+    /**
+     * get layer index from parent
+     * @returns {Integer}
+     */
+    get index() {
+      let layer,
+          n = 0;
+  
+      for (layer of this.parent) {
+        if (this.id === layer.id) return n;
+        n++;
+      }
+  
+      return null;
     }
 
-    return -1;
-  }
-  /**
-   * get viewport index from all CEL viewports
-   * @returns {Integer}
-   */
-  getIndex() {
-    let viewports = CEL.viewports,
-      viewport,
-      n = 0;
-
-    for (viewport of viewports) {
-      if (this.id === viewport.id) return n;
-      n++;
-    }
-
-    return null;
-  }
-  /**
-   * destroy viewport
-   */
-  destroy() {
-    // remove layers
-    for (let layer of this.layers) {
-      layer.remove();
-    }
-
-    // clear dom
-    this.container.innerHTML = "";
-
-    // remove self from #viewports array
-    CEL.viewports.splice(this.getIndex(), 1);
-  }
   /**
    * composite all layers onto canvas
    */
-  render() {
+  render(all=false) {
     let scene = this.scene,
       layers = this.layers,
       layer;
@@ -120,6 +93,9 @@ class Viewport {
     scene.clear();
 
     for (layer of layers) {
+
+      if (all && layer.layers.length > 0) layer.render(all)
+
       if (layer.visible)
         scene.context.drawImage(
           layer.scene.canvas,
@@ -132,6 +108,44 @@ class Viewport {
   }
 }
 
+/**
+ * Create multi-layered canvas
+ * @class Viewport
+ */
+class Viewport extends Node {
+/**
+ * Viewport constructor
+ * @param {Object} cfg - {width, height}
+ */
+  constructor(cfg={}) {
+
+    super(cfg)
+
+    // clear container
+    cfg.container.innerHTML = "";
+    cfg.container.appendChild(this.scene.canvas);
+
+    CEL.viewports.push(this);
+  }
+
+  /**
+   * destroy viewport
+   */
+  destroy() {
+    // remove layers
+    for (let layer of layers) {
+      layer.remove();
+    }
+
+    // clear dom
+    this.container.innerHTML = "";
+
+    // remove self from #viewports array
+    CEL.viewports.splice(this.index, 1);
+  }
+
+}
+
 class Layer {
 
   x = 0;
@@ -139,6 +153,9 @@ class Layer {
   width = 0;
   height = 0;
   visible = true;
+  layers = [];
+  parent;
+
   /**
    * Layer constructor
    * @param {Object} cfg - {x, y, width, height}
@@ -160,7 +177,23 @@ class Layer {
       this.setSize(cfg.width, cfg.height);
     }
   }
+  /**
+   * get layer index from viewport layers
+   * @returns {Number|null}
+   */
+  get index() {
+    let layers = this.viewport.layers,
+      len = layers.length,
+      n = 0,
+      layer;
 
+    for (layer of layers) {
+      if (this.id === layer.id) return n;
+      n++;
+    }
+
+    return null;
+  }
   /**
    * set layer position
    * @param {number} x
@@ -185,89 +218,76 @@ class Layer {
     this.hit.setSize(width, height);
     return this;
   }
+  move(pos) {
+    let index = this.index,
+        viewport = this.viewport,
+        layers = viewport.layers;
+
+    switch (pos) {
+      case "up":
+        if (index < layers.length - 1) {
+          // swap
+          layers[index] = layers[index + 1];
+          layers[index + 1] = this;
+        }
+        break;
+      case "down":
+        if (index > 0) {
+          // swap
+          layers[index] = layers[index - 1];
+          layers[index - 1] = this;
+        }
+        break;
+      case "top":
+        layers.splice(index, 1);
+        layers.push(this);
+        break;
+      case "bottom":
+        layers.splice(index, 1);
+        layers.unshift(this);
+        break;
+    }
+    return this;
+  }
   /**
    * move up
    * @returns {Layer}
    */
   moveUp() {
-    let index = this.getIndex(),
-      viewport = this.viewport,
-      layers = viewport.layers;
-
-    if (index < layers.length - 1) {
-      // swap
-      layers[index] = layers[index + 1];
-      layers[index + 1] = this;
-    }
-
-    return this;
+    return this.move("up")
   }
   /**
    * move down
    * @returns {Layer}
    */
   moveDown() {
-    let index = this.getIndex(),
-      viewport = this.viewport,
-      layers = viewport.layers;
-
-    if (index > 0) {
-      // swap
-      layers[index] = layers[index - 1];
-      layers[index - 1] = this;
-    }
-
-    return this;
+    return this.move("down")
   }
   /**
    * move to top
    * @returns {Layer}
    */
   moveTop() {
-    let index = this.getIndex(),
-      viewport = this.viewport,
-      layers = viewport.layers;
-
-    layers.splice(index, 1);
-    layers.push(this);
+    return this.move("top")
   }
   /**
    * move to bottom
    * @returns {Layer}
    */
   moveBottom() {
-    let index = this.getIndex(),
-      viewport = this.viewport,
-      layers = viewport.layers;
-
-    layers.splice(index, 1);
-    layers.unshift(this);
-
-    return this;
-  }
-  /**
-   * get layer index from viewport layers
-   * @returns {Number|null}
-   */
-  getIndex() {
-    let layers = this.viewport.layers,
-      len = layers.length,
-      n = 0,
-      layer;
-
-    for (layer of layers) {
-      if (this.id === layer.id) return n;
-      n++;
-    }
-
-    return null;
+    return this.move("bottom")
   }
   /**
    * remove
    */
   remove() {
+    // remove child layers
+    for (let layer of this.layers) {
+      layer.remove()
+    }
     // remove this layer from layers array
-    this.viewport.layers.splice(this.getIndex(), 1);
+    this.parent.layers[this.index].scene.canvas = null
+    this.parent.layers.splice(this.index, 1);
   }
 }
 
