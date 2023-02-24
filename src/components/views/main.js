@@ -20,6 +20,16 @@ import {
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
+  #viewport {
+    position: absolute;
+    width: 100%;
+    height: inherit;
+    background: var(--txc-onchart-background, none);
+  }
+  #viewport canvas {
+    position: absolute;
+    top: 1px;
+  }
   tradex-rows {
     overflow: hidden;
     width: calc(100% - ${SCALEW}px);
@@ -34,6 +44,7 @@ template.innerHTML = `
     margin-left: 1px;
   }
 </style>
+<div id="viewport"></div>
 <tradex-rows></tradex-rows>
 <tradex-time></tradex-time>
 `

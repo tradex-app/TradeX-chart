@@ -82,7 +82,7 @@ class Viewport {
    * get viewport index from all CEL viewports
    * @returns {Integer}
    */
-  getIndex() {
+  get index() {
     let viewports = CEL.viewports,
       viewport,
       n = 0;
@@ -107,7 +107,7 @@ class Viewport {
     this.container.innerHTML = "";
 
     // remove self from #viewports array
-    CEL.viewports.splice(this.getIndex(), 1);
+    CEL.viewports.splice(this.index, 1);
   }
   /**
    * composite all layers onto canvas
@@ -160,7 +160,23 @@ class Layer {
       this.setSize(cfg.width, cfg.height);
     }
   }
+  /**
+   * get layer index from viewport layers
+   * @returns {Number|null}
+   */
+  get index() {
+    let layers = this.viewport.layers,
+      len = layers.length,
+      n = 0,
+      layer;
 
+    for (layer of layers) {
+      if (this.id === layer.id) return n;
+      n++;
+    }
+
+    return null;
+  }
   /**
    * set layer position
    * @param {number} x
@@ -185,89 +201,71 @@ class Layer {
     this.hit.setSize(width, height);
     return this;
   }
-  /**
-   * move up
-   * @returns {Layer}
-   */
-  moveUp() {
-    let index = this.getIndex(),
+  move(pos) {
+    let index = this.index,
       viewport = this.viewport,
       layers = viewport.layers;
 
+    switch (pos) {
+      case "up":
     if (index < layers.length - 1) {
       // swap
       layers[index] = layers[index + 1];
       layers[index + 1] = this;
     }
+        break;
+      case "down":
+        if (index > 0) {
 
+          layers[index] = layers[index - 1];
+          layers[index - 1] = this;
+        }
+        break;
+      case "top":
+        layers.splice(index, 1);
+        layers.push(this);
+        break;
+      case "bottom":
+        layers.splice(index, 1);
+        layers.unshift(this);
+        break;
+    }
     return this;
+  }
+  /**
+   * move up
+   * @returns {Layer}
+   */
+  moveUp() {
+    return this.move("up")
   }
   /**
    * move down
    * @returns {Layer}
    */
   moveDown() {
-    let index = this.getIndex(),
-      viewport = this.viewport,
-      layers = viewport.layers;
-
-    if (index > 0) {
-      // swap
-      layers[index] = layers[index - 1];
-      layers[index - 1] = this;
-    }
-
-    return this;
+    return this.move("down")
   }
   /**
    * move to top
    * @returns {Layer}
    */
   moveTop() {
-    let index = this.getIndex(),
-      viewport = this.viewport,
-      layers = viewport.layers;
-
-    layers.splice(index, 1);
-    layers.push(this);
+    return this.move("top")
   }
   /**
    * move to bottom
    * @returns {Layer}
    */
   moveBottom() {
-    let index = this.getIndex(),
-      viewport = this.viewport,
-      layers = viewport.layers;
-
-    layers.splice(index, 1);
-    layers.unshift(this);
-
-    return this;
-  }
-  /**
-   * get layer index from viewport layers
-   * @returns {Number|null}
-   */
-  getIndex() {
-    let layers = this.viewport.layers,
-      len = layers.length,
-      n = 0,
-      layer;
-
-    for (layer of layers) {
-      if (this.id === layer.id) return n;
-      n++;
-    }
-
-    return null;
+    return this.move("bottom")
   }
   /**
    * remove
    */
   remove() {
     // remove this layer from layers array
-    this.viewport.layers.splice(this.getIndex(), 1);
+    this.viewport.layers.splice(this.index, 1);
   }
 }
 

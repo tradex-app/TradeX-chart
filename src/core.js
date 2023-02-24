@@ -321,7 +321,7 @@ export default class TradeXchart extends Tradex_chart {
    * let's start building
    * @param {object} config - chart configuration
    */
-  init(config) {
+  start(config) {
     config = {...TradeXchart.create(config), ...config}
     this.logs = (config?.logs) ? config.logs : false
     this.infos = (config?.infos) ? config.infos : false

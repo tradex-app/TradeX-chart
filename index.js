@@ -287,7 +287,7 @@ function addChart() {
       section.appendChild(chart)
       main.appendChild(section)
   let {config, stream} = (chart.inCnt >= configs.length) ? configs[chart.inCnt % configs.length] : configs[chart.inCnt]
-      chart.init(config)
+      chart.start(config)
       window["chart"+chart.inCnt] = chart
 
   if (typeof chart.stream.start === "function") {
