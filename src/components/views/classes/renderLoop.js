@@ -1,7 +1,7 @@
 // renderLoop.js
 
 import { isArray, isFunction, isObject } from "../../../utils/typeChecks"
-import { firstKeyInMap, firstValueInMap, lastKeyInMap } from "../../../utils/utilities"
+import { firstItemInMap, firstKeyInMap, firstValueInMap, lastKeyInMap } from "../../../utils/utilities"
 
 
 const renderLoop = {
@@ -60,7 +60,7 @@ const renderLoop = {
     // any frames to render?
     if (this.renderQ.size === 0) return
 
-    const frame = firstValueInMap(this.renderQ)
+    const [ID, frame] = firstItemInMap(this.renderQ)
 
     if (frame.range.constructor.name !== "RangeSnapshot") return
 
@@ -70,6 +70,7 @@ const renderLoop = {
 
     for (let entry of frame.graphs) {
       if (isFunction(entry.render)) entry.render()
+      console.log(`render: ${ID}`)
     }
 
     this.frameDone()

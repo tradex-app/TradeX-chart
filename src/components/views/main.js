@@ -64,6 +64,7 @@ export default class tradeXMain extends element {
   disconnectedCallback() {
   }
 
+  get viewport() { return this.shadowRoot.querySelector('#viewport') }
   get rows() { return this.shadowRoot.querySelector('tradex-rows') }
   get time() { return this.shadowRoot.querySelector('tradex-time') }
 

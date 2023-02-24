@@ -31,6 +31,7 @@ import {
 import {
   STYLE_ROW,
 } from "../definitions/style"
+import graph from "./views/classes/graph"
 
 const defaultOverlays = [
   ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
@@ -142,7 +143,7 @@ export default class MainPane {
     this.#elTime = this.#elMain.time
     this.#elChart = this.#elMain.rows.onChart
     this.#elGrid = this.#elMain.rows.grid
-    this.#elViewport = this.#elMain.rows.grid.viewport
+    this.#elViewport = this.#elMain.viewport  // this.#elMain.rows.grid.viewport
     this.#elScale = this.#core.elBody.scale
 
     options.name = "Chart"
@@ -577,20 +578,34 @@ export default class MainPane {
   }
 
   draw(range=this.range, update=false) {
-    this.#Graph.draw(range, update)
-    this.#Time.draw(range, update)
-    this.#Chart.draw(range, update)
+    // this.#Graph.draw(range, update)
+    // this.#Time.draw(range, update)
+    // this.#Chart.draw(range, update)
+    // this.#OffCharts.forEach((offChart, key) => {
+    //   offChart.draw(range, update)
+    // })
+    // window.requestAnimationFrame(()=> {
+    //   this.#Graph.render()
+    //   this.#Time.render()
+    //   this.#Chart.render()
+    //   this.#OffCharts.forEach((offChart, key) => {
+    //     offChart.render()
+    //   })
+    // })
+
+    const graphs = [
+      this.#Graph,
+      this.#Time,
+      this.#Chart
+    ]
     this.#OffCharts.forEach((offChart, key) => {
-      offChart.draw(range, update)
+      graphs.push(offChart)
     })
-    window.requestAnimationFrame(()=> {
-      this.#Graph.render()
-      this.#Time.render()
-      this.#Chart.render()
-      this.#OffCharts.forEach((offChart, key) => {
-        offChart.render()
-      })
-    })
+
+    renderLoop.queueFrame(
+      this.range, 
+      graphs, 
+      update)
   }
 
   updateRange(pos) {
