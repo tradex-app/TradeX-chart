@@ -290,7 +290,7 @@ export default class ScaleBar {
   }
 
   layerStream() {
-    // if the layer and instance were no set, do it now
+    // if the layer and instance were not set, do it now
     if (!this.#layerPriceLine) {
       const {layerConfig} = this.layerConfig()
       this.#layerPriceLine = new CEL.Layer(layerConfig);

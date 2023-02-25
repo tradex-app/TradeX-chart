@@ -28,14 +28,11 @@ export default class chartCompositor {
 
   set position(p) { this.#target.setPosition(0, 0) }
 
-  draw(components) {
-
-    // components = components || this.#config.components
-    // if (!isArray(components) || components.length == 0) return
+  draw() {
 
     this.#scene.clear()
 
-    let x,y
+    let x,y,h,w
     const ctx = this.#scene.context
     ctx.save();
 
@@ -48,21 +45,24 @@ export default class chartCompositor {
       chart.graph.viewport.scene.height
     );
 
+    y = chart.height
     for (let oc of this.#core.MainPane.offCharts.values()) {
       x = 0
-      y = 0
+      h = oc.graph.viewport.scene.height
       this.#scene.context.drawImage(
         oc.graph.viewport.scene.canvas,
         x,
         y,
         oc.graph.viewport.scene.width,
-        oc.graph.viewport.scene.height
+        h
       );
+      x += h
     }
 
     const time = this.#core.MainPane.time
+    const rowsH = this.#core.MainPane.rowsH
     x = 0
-    y = 0
+    y = rowsH
     this.#scene.context.drawImage(
       time.graph.viewport.scene.canvas,
       x,

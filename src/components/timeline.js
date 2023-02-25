@@ -5,22 +5,23 @@
 import DOM from "../utils/DOM"
 import xAxis from "./axis/xAxis"
 import CEL from "./primitives/canvas"
-import { CLASS_TIME } from "../definitions/core"
-import { XAxisStyle } from "../definitions/style"
+import Graph from "./views/classes/graph"
 import { InputController } from "../input/controller"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-time"
-import { fwdEnd, rwdStart } from "../definitions/icons"
-import Colour from "../utils/colour"
 import { drawTextBG, getTextRectWidth } from "../utils/canvas"
 import { bRound } from "../utils/number"
-import { debounce } from "../utils/utilities"
+import { copyDeep, debounce } from "../utils/utilities"
 import Slider from "./widgets/slider"
-
 
 import {
   BUFFERSIZE,
 } from "../definitions/chart"
+
+const defaultOverlays = [
+
+]
+
 
 export default class Timeline {
 
@@ -36,6 +37,7 @@ export default class Timeline {
   #elViewport
   #elNavigation
 
+  #Graph
   #viewport
   #navigation
   #elNavList
@@ -90,6 +92,7 @@ export default class Timeline {
   get candlesOnLayer() { return this.#xAxis.candlesOnLayer }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
+  get graph() { return this.#Graph }
   get viewport() { return this.#viewport }
   get navigation() { return this.#navigation }
   get range() { return this.#core.range }
@@ -256,6 +259,12 @@ export default class Timeline {
 
   xPosOHLCV(x) { return this.#xAxis.xPosOHLCV(x) }
 
+  createGraph() {
+    let overlays = copyDeep(defaultOverlays)
+
+    this.#Graph = new Graph(this, this.#elViewport, overlays)
+  }
+
   createViewport() {
 
     const buffer = this.config.buffer || BUFFERSIZE
@@ -283,6 +292,9 @@ export default class Timeline {
           .addLayer(this.#layerLabels)
           .addLayer(this.#layerOverlays)
           .addLayer(this.#layerCursor);
+
+    // this is a hack
+    this.#Graph = {viewport: this.#viewport}
   }
 
   render() {
