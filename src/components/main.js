@@ -10,6 +10,7 @@ import Chart from "./onChart"
 import OffChart from "./offChart"
 import chartGrid from "./overlays/chart-grid"
 import watermark from "./overlays/chart-watermark"
+import chartCompositor from "./overlays/chart-compositor"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-mainPane"
 import { InputController, Keys } from "../input/controller"
@@ -578,21 +579,6 @@ export default class MainPane {
   }
 
   draw(range=this.range, update=false) {
-    // this.#Graph.draw(range, update)
-    // this.#Time.draw(range, update)
-    // this.#Chart.draw(range, update)
-    // this.#OffCharts.forEach((offChart, key) => {
-    //   offChart.draw(range, update)
-    // })
-    // window.requestAnimationFrame(()=> {
-    //   this.#Graph.render()
-    //   this.#Time.render()
-    //   this.#Chart.render()
-    //   this.#OffCharts.forEach((offChart, key) => {
-    //     offChart.render()
-    //   })
-    // })
-
     const graphs = [
       this.#Graph,
       this.#Time,

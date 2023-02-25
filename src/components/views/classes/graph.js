@@ -4,7 +4,7 @@
 import DOM from "../../../utils/DOM"
 import { copyDeep } from '../../../utils/utilities'
 import { isArray, isBoolean, isNumber, isObject, isString } from '../../../utils/typeChecks'
-import CEL from "../../primitives/canvas"
+import CEL from "../../primitives/canvas3"
 import Overlays from "../../overlays"
 
 import grid from "../../overlays/chart-grid"
@@ -87,14 +87,16 @@ export default class graph {
     }
   }
 
-  createViewport(overlays=[]) {
+  createViewport(overlays=[], node=false) {
 
     overlays = (overlays.length == 0) ? copyDeep(defaultOverlays) : overlays
 
     const {width, height} = this.layerConfig()
 
+    let viewport = (node) ? CEL.Node : CEL.Viewport
+
     // create viewport
-    this.#viewport = new CEL.Viewport({
+    this.#viewport = new viewport({
       width: width,
       height: height,
       container: this.#elViewport

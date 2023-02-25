@@ -70,7 +70,6 @@ const renderLoop = {
 
     for (let entry of frame.graphs) {
       if (isFunction(entry.render)) entry.render()
-      console.log(`render: ${ID}`)
     }
 
     this.frameDone()
