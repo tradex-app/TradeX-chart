@@ -186,7 +186,7 @@ export default class OnChart extends Chart {
 
     overlays = Array.from(overlays)
 
-    this.graph = new Graph(this, this.elViewport, overlays)
+    this.graph = new Graph(this, this.elViewport, overlays, false)
     this.#layerStream = this.graph.overlays.get("stream").layer
     this.#chartStreamCandle = this.graph.overlays.get("stream").instance
   }

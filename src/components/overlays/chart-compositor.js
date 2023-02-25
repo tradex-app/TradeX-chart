@@ -35,20 +35,23 @@ export default class chartCompositor {
 
     this.#scene.clear()
 
+    let x,y
     const ctx = this.#scene.context
     ctx.save();
 
-    const chart = this.#core.chart
-    scene.context.drawImage(
+    const chart = this.#core.MainPane.chart
+    this.#scene.context.drawImage(
       chart.graph.viewport.scene.canvas,
-      x,
-      y,
+      0,
+      0,
       chart.graph.viewport.scene.width,
       chart.graph.viewport.scene.height
     );
 
-    for (let oc of this.#core.offCharts.values()) {
-      scene.context.drawImage(
+    for (let oc of this.#core.MainPane.offCharts.values()) {
+      x = 0
+      y = 0
+      this.#scene.context.drawImage(
         oc.graph.viewport.scene.canvas,
         x,
         y,
@@ -57,8 +60,10 @@ export default class chartCompositor {
       );
     }
 
-    const time = this.#core.time
-    scene.context.drawImage(
+    const time = this.#core.MainPane.time
+    x = 0
+    y = 0
+    this.#scene.context.drawImage(
       time.graph.viewport.scene.canvas,
       x,
       y,

@@ -32,7 +32,7 @@ export default class graph {
   #layerWidth
 
 
-  constructor(parent, elViewport, overlays) {
+  constructor(parent, elViewport, overlays, node=false) {
 
     this.#parent = parent
     this.#core = parent.core
@@ -42,7 +42,7 @@ export default class graph {
     this.#elViewport = elViewport
     
     // create graph viewport with overlays
-    this.createViewport(overlays)
+    this.createViewport(overlays, node)
   }
 
   get parent() { return this.#parent }
