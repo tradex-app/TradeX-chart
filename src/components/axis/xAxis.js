@@ -2,7 +2,7 @@
 // Timeline that lurks down below
 
 import Axis from "./axis";
-import { MAXGRADSPER } from "../../definitions/chart";
+import { MAXGRADSPER, XAXIS_STEP } from "../../definitions/chart";
 import { isNumber } from "../../utils/typeChecks";
 import { bRound, round } from "../../utils/number"
 import { 
@@ -15,6 +15,7 @@ import {
   get_second, second_start,
   buildSubGrads,
 
+  TIMESCALES,
   SECOND_MS, MINUTE_MS, HOUR_MS, DAY_MS, WEEK_MS, MONTH_MS, MONTHR_MS, YEAR_MS,
  } from "../../utils/time";
 import { XAxisStyle } from "../../definitions/style";
@@ -24,6 +25,7 @@ export default class xAxis extends Axis {
   #xAxisTicks = 4
   #xAxisGrads
   #xAxisSubGrads
+  #indexBased = true
 
   constructor(parent) {
     super(parent)
@@ -124,30 +126,29 @@ export default class xAxis extends Axis {
     this.#xAxisGrads = this.calcXAxisGrads()
   }
 
-  calcXAxisGrads() {
-    const rangeStart = this.timeMin
-    const rangeEnd = this.timeMax
-    const intervalStr = this.intervalStr
+  calcXAxisGrads(range=this) {
+    const rangeStart = range.timeMin
+    const rangeEnd = range.timeMax
+    // const intervalStr = this.intervalStr
     const grads = {
       entries: {},
       values: [],
       major: [],
-      minor: []
+      minor: [],
+      range: range
     }
-    const unit = intervalStr.charAt(intervalStr.length - 1)
-    const numUnits = parseInt(intervalStr, 10)
+    // const unit = intervalStr.charAt(intervalStr.length - 1)
+    // const numUnits = parseInt(intervalStr, 10)
 
-// return grads
-
-      let days, t1, t2, units, unitStart, 
-          majorGrad, majorValue, minorValue;
-    
-      units = ms2TimeUnits(this.rangeDuration)
-      grads.units = ms2TimeUnits(this.rangeDuration)
+    let days, t1, t2, units, unitStart, 
+        majorGrad, majorValue, minorValue;
+  
+    units = ms2TimeUnits(range.rangeDuration)
+    grads.units = ms2TimeUnits(range.rangeDuration)
     
     // Years
     if (units.years > 0) {
-            
+      
       t1 = year_start(rangeStart)
       t2 = nextYear(year_start(rangeEnd)) + YEAR_MS
 
@@ -301,8 +302,14 @@ export default class xAxis extends Axis {
 
   buildGrads(grads, t1, t2, majorGrad ,majorValue, minorValue, unitStart) {
     let th, to, min;
-    const minorGrad = Math.floor(this.rangeLength / this.gradsMax) * this.range.interval
-    const limit = this.pixel2T(this.width + (this.candleW * 2)) 
+    const range = grads.range
+    const xStep = this.xStep(range)
+    const candleW = bRound(this.width / range.Length)
+    const minorGrad = Math.floor(range.Length / this.gradsMax) * range.interval
+    const limit = this.pixel2T(this.width + (candleW * 2)) 
+
+    const rangeStart = range.timeMin
+    t1 = rangeStart - (rangeStart % xStep) - xStep
 
     while (t1 < limit) {
       to = t1
@@ -320,6 +327,7 @@ export default class xAxis extends Axis {
         let y = Math.floor((t1 - to) / x)
         // console.log(`y: ${y}, th: ${th}, t1: ${t1}`)
         while (th < t1) {
+          // th += xStep
           th += y
           min = unitStart(th)
           grads.entries[min] = [minorValue(min), this.t2Pixel(min), min, "minor"]
@@ -330,6 +338,27 @@ export default class xAxis extends Axis {
     grads.values = Object.values(grads.entries)
 
     return grads
+  }
+
+  xStep(range) {
+
+    // minStep in pixels
+    let minStep = XAXIS_STEP;
+    let interval = this.#indexBased ? range.interval : 1
+    let xStep = 0
+    let candleW = bRound(this.width / range.Length)
+
+    let i = TIMESCALES.indexOf(interval)
+    while (i-- >= 0) {
+
+      const gradPixels = candleW * (TIMESCALES[i] / interval)
+      
+      if (gradPixels >= minStep) {
+        xStep = TIMESCALES[i]
+        return xStep
+      }
+    }
+
   }
 
   gradsWorker() {
@@ -355,8 +384,8 @@ export default class xAxis extends Axis {
     return `${m}:${s}`
   }
 
-  doCalcXAxisGrads() {
-    this.#xAxisGrads = this.calcXAxisGrads()
+  doCalcXAxisGrads(range) {
+    this.#xAxisGrads = this.calcXAxisGrads(range)
   }
 
 }

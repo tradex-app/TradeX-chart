@@ -46,7 +46,6 @@ export default class chartGrid {
 
     if (axes == "none") return
     
-    const xGrads = this.xAxis.xAxisGrads.values
     const ctx = this.#scene.context
     ctx.save();
     ctx.strokeStyle = this.#core.theme.chart.GridColour || GridStyle.COLOUR_GRID
@@ -54,6 +53,7 @@ export default class chartGrid {
     // X Axis
     if (axes != "y") {
       const offset = this.xAxis.smoothScrollOffset || 0
+      const xGrads = this.xAxis.xAxisGrads.values
 
       for (let tick of xGrads) {
         let x = bRound(tick[1])
@@ -79,26 +79,9 @@ export default class chartGrid {
   }
 
   drawX() {
-
-    this.#scene.clear()
-    
-    const xGrads = this.xAxis.xAxisGrads.values
-    const ctx = this.#scene.context
-    ctx.save();
-    ctx.strokeStyle = this.#core.theme.chart.GridColour || GridStyle.COLOUR_GRID
-
-    // X Axis
-    const offset = this.xAxis.smoothScrollOffset || 0
-
-    for (let tick of xGrads) {
-      let x = bRound(tick[1])
-      ctx.beginPath()
-      ctx.moveTo(x + offset, 0)
-      ctx.lineTo(x + offset, this.#scene.height)
-      ctx.stroke()
-    }
-    ctx.restore();
+    this.draw("x")
+    return
   }
-
+  
 }
 

@@ -80,6 +80,7 @@ export const DEFAULT_RANGELENGTH = 100
 export const PRICEDIGITS = 6
 
 export const XAXIS_ZOOM = 0.05
+export const XAXIS_STEP = 100
 
 export const YAXIS_STEP = 100
 export const YAXIS_GRID = 16

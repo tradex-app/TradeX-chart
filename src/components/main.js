@@ -265,7 +265,7 @@ export default class MainPane {
     this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this))
     this.on("setRange", this.draw.bind(this))
     this.on("scrollUpdate", this.draw.bind(this))
-    this.on("chart_zoom", this.zoomRange.bind(this))
+    this.on("chart_render", this.draw.bind(this))
   }
 
   on(topic, handler, context) {
@@ -289,7 +289,7 @@ export default class MainPane {
     const newEnd = range.indexEnd + Math.ceil(direction * XAXIS_ZOOM * range.Length)
 
     this.#core.setRange(newStart, newEnd)
-    this.draw()
+    this.draw(this.range, true)
   }
   
   onMouseMove(e) {

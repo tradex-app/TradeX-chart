@@ -50,12 +50,6 @@ export default
             // console.log(`${this.id}: transition from "${this.state}" to  "chart_pan"`)
           },
         },
-        chart_zoom: {
-          target: 'chart_zoom',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
-          },
-        },
       }
     },
     resize: {
@@ -98,26 +92,6 @@ export default
         },
       }
     },
-    chart_zoom: {
-      onEnter(data) {
-        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
-      },
-      onExit(data) {
-        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
-      },
-      on: {
-        always: {
-          target: 'idle',
-          condition: 'zoomDone',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to "chart_pan"`)
-            // this.context.origin.draw()
-          },
-        },
-      }
-    },
   },
-  guards: {
-    zoomDone () { return true },
-  }
+
 }

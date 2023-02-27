@@ -140,30 +140,37 @@ export class Range {
 
     inOut -= this.Length
 
-    if (this.#init) {
-      this.#init = false
-      let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this})
-      
-      this.setMaxMin(maxMin)
+    let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this})
+    
+    this.setMaxMin(maxMin)
 
-      return true
-    }
+    // if (this.#init || this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
+    //   this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
+    // }
+
+    this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
+    // this.#core.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
+    // this.#core.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
+
+    // if (this.#init) this.#init = false
+
+    return true
 
     // use web worker after init
-    this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
-    .then(maxMin => {
-      this.setMaxMin(maxMin)
+    // this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
+    // .then(maxMin => {
+    //   this.setMaxMin(maxMin)
 
-      if (this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
-        this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
-      }
+    //   if (this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
+    //     this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
+    //   }
 
-      this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
-      this.#core.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
-      this.#core.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
-    })
+    //   this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
+    //   this.#core.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
+    //   this.#core.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
+    // })
     
-    return true
+    // return true
   }
 
   setMaxMin(maxMin) {

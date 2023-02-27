@@ -181,7 +181,6 @@ export default class Chart {
     this.off(STREAM_UPDATE, this.onStreamUpdate);
     this.off("setRange", this.draw)
     this.off("scrollUpdate", this.draw)
-    this.off("chart_zoom", this.zoomRange)
   }
 
   eventsListen() {
@@ -202,7 +201,6 @@ export default class Chart {
     this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this));
     // this.on("setRange", this.draw.bind(this))
     // this.on("scrollUpdate", this.draw.bind(this))
-    // this.on("chart_zoom", this.zoomRange.bind(this))
   }
 
   /**

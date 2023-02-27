@@ -11,6 +11,7 @@ export default class chartCursor {
   #target
   #scene
   #cursorPos = [0,0]
+  #update = true
 
   constructor(target, xAxis=false, yAxis=false, theme, parent) {
 
@@ -32,19 +33,23 @@ export default class chartCursor {
   get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
   get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set position(p) { return }
+  get update() { return this.#update }
 
   onMouseDragX(e) {
     this.#cursorPos[0] = e[0]
     this.draw(true)
+    this.#core.emit("chart_render")
   }
   onMouseMoveX(e) {
     this.#cursorPos[0] = e[0]
     this.draw()
+    this.#core.emit("chart_render")
   }
   onMouseMove(e) {
     this.#cursorPos[0] = e[0]
     this.#cursorPos[1] = e[1]
     this.draw()
+    this.#core.emit("chart_render")
   }
 
   draw(drag = false) {
@@ -77,5 +82,4 @@ export default class chartCursor {
     }
     ctx.restore();
   }
-
 }

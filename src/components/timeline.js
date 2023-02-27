@@ -301,12 +301,12 @@ export default class Timeline {
     this.#viewport.render()
   }
 
-  draw() {
+  draw(range=this.range) {
     this.#layerCursor.setPosition(this.scrollPos, 0)
     this.#layerLabels.setPosition(this.scrollPos, 0)
     this.#layerOverlays.setPosition(this.scrollPos, 0)
-    this.drawGrads()
-    this.drawOverlays()
+    this.drawGrads(range)
+    this.drawOverlays(range)
     this.drawCursorTime()
   }
 
@@ -353,9 +353,9 @@ export default class Timeline {
     this.#viewport.render()
   }
 
-  drawGrads() {
+  drawGrads(range) {
     this.#layerLabels.scene.clear()
-    this.#xAxis.doCalcXAxisGrads()
+    this.#xAxis.doCalcXAxisGrads(range)
     
     const grads = this.#xAxis.xAxisGrads.values
     const ctx = this.#layerLabels.scene.context

@@ -8,6 +8,7 @@ export const monthDayCnt = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
 
 // BTC Genesis Block: 03/01/2009, 19:15:05
 export const BTCGENESIS = 1231006505000
+export const MILLISECOND = 1
 export const SECOND_MS = 1000
 export const MINUTE_MS = SECOND_MS*60
 export const HOUR_MS = MINUTE_MS*60
@@ -39,7 +40,47 @@ export const TIMEUNITSVALUESLONG = {
   seconds: SECOND_MS,
 }
 export const TIMEUNITSVALUES = { ...TIMEUNITSVALUESSHORT, ...TIMEUNITSVALUESLONG }
-
+export const TIMESCALES = [
+  YEAR_MS * 10,
+  YEAR_MS * 5,
+  YEAR_MS * 3,
+  YEAR_MS * 2,
+  YEAR_MS,
+  MONTHR_MS * 6,
+  MONTHR_MS * 4,
+  MONTHR_MS * 3,
+  MONTHR_MS * 2,
+  MONTHR_MS,
+  DAY_MS * 15,
+  DAY_MS * 10,
+  DAY_MS * 7,
+  DAY_MS * 5,
+  DAY_MS * 3,
+  DAY_MS * 2,
+  DAY_MS,
+  HOUR_MS * 12,
+  HOUR_MS * 6,
+  HOUR_MS * 4,
+  HOUR_MS * 2,
+  HOUR_MS,
+  MINUTE_MS * 30,
+  MINUTE_MS * 15,
+  MINUTE_MS * 10,
+  MINUTE_MS * 5,
+  MINUTE_MS * 2,
+  MINUTE_MS,
+  SECOND_MS * 30,
+  SECOND_MS * 15,
+  SECOND_MS * 10,
+  SECOND_MS * 5,
+  SECOND_MS * 2,
+  SECOND_MS,
+  MILLISECOND * 500,
+  MILLISECOND * 250,
+  MILLISECOND * 100,
+  MILLISECOND * 50,
+  MILLISECOND,
+];
 export const timezones = {
   0: 'Europe/London',
   '-120': 'Europe/Tallinn',

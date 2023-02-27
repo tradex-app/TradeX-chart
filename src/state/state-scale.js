@@ -46,17 +46,17 @@ export default
             // console.log('transition action for "yAxis_100" in "idle" state')
           },
         },
-        chart_zoom: {
-          target: 'chart_zoom',
+        setRange: {
+          target: 'setRange',
           action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
+            // console.log(`${this.id}: transition from "${this.state}" to  "setRange"`)
           },
         },
         scale_drag: {
           target: 'scale_drag',
           condition: 'receiver',
           action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
+            // console.log(`${this.id}: transition from "${this.state}" to  "scale_drag"`)
           },
         },
       }
@@ -77,7 +77,7 @@ export default
         },
       }
     },
-    chart_zoom: {
+    setRange: {
       onEnter(data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
