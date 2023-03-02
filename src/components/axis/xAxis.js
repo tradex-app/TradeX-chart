@@ -2,35 +2,31 @@
 // Timeline that lurks down below
 
 import Axis from "./axis";
-import { MAXGRADSPER, XAXIS_STEP } from "../../definitions/chart";
+import { XAXIS_STEP } from "../../definitions/chart";
 import { isNumber } from "../../utils/typeChecks";
-import { bRound, round } from "../../utils/number"
+import { bRound } from "../../utils/number"
 import { 
-  ms2TimeUnits, timestampDifference,
-  isLeapYear, year_start, get_year, nextYear,
-  month_start, get_month, get_monthName, nextMonth,
-  get_day, day_start, get_dayName,
-  get_hour, hour_start,
-  get_minute, minute_start,
-  get_second, second_start,
-  buildSubGrads,
+  ms2TimeUnits,
+  get_year,
+  get_month, get_monthName,
+  get_day,
+  get_hour,
+  get_minute,
+  get_second,
+  buildSubGrads, time_start,
 
-  TIMESCALES,
-  SECOND_MS, MINUTE_MS, HOUR_MS, DAY_MS, WEEK_MS, MONTH_MS, MONTHR_MS, YEAR_MS,
+  TIMESCALES, TIMESCALESRANK,
+  MINUTE_MS, HOUR_MS, DAY_MS,
  } from "../../utils/time";
-import { XAxisStyle } from "../../definitions/style";
 
 export default class xAxis extends Axis {
 
   #xAxisTicks = 4
   #xAxisGrads
-  #xAxisSubGrads
   #indexBased = true
 
   constructor(parent) {
     super(parent)
-
-    this.#xAxisSubGrads = buildSubGrads()
   }
 
   get range() { return this.parent.range }
@@ -47,17 +43,10 @@ export default class xAxis extends Axis {
   get timeMin() { return this.range.timeMin }
   get candleW() { return bRound(this.width / this.range.Length) }
   get candlesOnLayer() { return bRound(this.core.Chart.layerWidth / this.candleW )}
-  get gradsMax() { return Math.trunc(this.width / MAXGRADSPER) }
-      gradsYear(t) { return get_year(t) }
-      gradsMonthName(t) { return get_monthName(t) }
-      gradsDayName(t) { return get_dayName(t) +" "+ get_day(t) }
-      gradsHour(t) { return get_hour(t) + ":00" }
-      gradsMinute(t) { return "00:" + get_minute(t) }
   get xAxisRatio() { return this.width / this.range.rangeDuration }
   set xAxisTicks(t) { this.#xAxisTicks = isNumber(t) ? t : 0 }
   get xAxisTicks() { return this.#xAxisTicks }
   get xAxisGrads() { return this.#xAxisGrads }
-  get xAxisSubGrads() { return this.#xAxisSubGrads }
   get scrollOffsetPx() { return this.core.scrollPos % this.candleW }
   get bufferPx() { return this.core.bufferPx }
 
@@ -126,213 +115,59 @@ export default class xAxis extends Axis {
     this.#xAxisGrads = this.calcXAxisGrads()
   }
 
-  calcXAxisGrads(range=this) {
-    const rangeStart = range.timeMin
-    const rangeEnd = range.timeMax
-    // const intervalStr = this.intervalStr
+  calcXAxisGrads(range=this.range.snapshot()) {
     const grads = {
       entries: {},
       values: [],
       major: [],
       minor: [],
-      range: range
     }
-    // const unit = intervalStr.charAt(intervalStr.length - 1)
-    // const numUnits = parseInt(intervalStr, 10)
-
-    let days, t1, t2, units, unitStart, 
-        majorGrad, majorValue, minorValue;
-  
-    units = ms2TimeUnits(range.rangeDuration)
+    const units = ms2TimeUnits(range.rangeDuration)
     grads.units = ms2TimeUnits(range.rangeDuration)
-    
-    // Years
-    if (units.years > 0) {
-      
-      t1 = year_start(rangeStart)
-      t2 = nextYear(year_start(rangeEnd)) + YEAR_MS
 
-      grads.unit = ["y", "year"]
-      grads.timeSpan = `${units.years} years`
-
-      majorGrad = (ts) => { return nextYear(ts) }
-
-      unitStart = (ts) => { return month_start(ts) }
-
-      majorValue = (ts) => { 
-        return get_year(ts) 
+    for (let u in units) {
+      if (units[u] > 0) {
+        grads.units = [u, u]
+        grads.timeSpan = `${units[u]} ${u}`
+        break
       }
-      minorValue = (ts) => { 
-        if (get_month(ts) == 0 && get_day(ts) == 1 && get_hour(ts) == 0) return get_year(ts)
-        else return get_monthName(ts) 
-      }
-
-      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
     }
-      
-    // Months
-    else if (units.months > 0) {
+ 
+    const tf = range.interval
+    const {xStep, rank} = this.xStep(range)
+    const tLimit = this.pixel2T(this.width + (this.candleW * 2)) 
 
-      t1 = month_start(rangeStart)
-      t2 = month_start(rangeEnd) + MONTH_MS(get_month(rangeEnd))// + YEAR_MS
+    let t1 = range.timeMin - (range.timeMin % xStep) - xStep
+    let prev
+    let start = t1
 
-      grads.unit = ["M", "month"]
-      grads.timeSpan = `${units.months} months`
+    while (t1 < tLimit) {
 
-      // TODO: optimize nextMonth() - too slow on large rages
-      // majorGrad = (ts) => { return nextMonth(ts) }
-      majorGrad = (ts) => { return MONTHR_MS }
+      let y = time_start(t1, "years")
+      let m = time_start(t1, "months")
+      let d = time_start(t1, "days")
 
-      unitStart = (ts) => { return day_start(ts) }
-
-      majorValue = (ts) => { 
-        if (get_month(ts) == 0) return get_year(ts)
-        else return get_monthName(ts)
-      }
-      minorValue = (ts) => {
-        if (get_month(ts) == 0 && get_day(ts) == 1) return get_year(ts)
-        if (get_day(ts) == 1 && get_hour(ts) == 0) return get_monthName(ts)
-        else return this.gradsDayName(ts) 
+      if (!(y in grads.entries) && y >= start) {
+        grads.entries[y] = [this.dateTimeValue(y, tf), this.t2Pixel(y), y, "major"]
+        prev = y
       }
 
-      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
-    }
-    
-    // Days
-    else if (units.weeks > 0 || units.days > 0) {
-      days = units.weeks * 7 + units.days
-
-      t1 = day_start(rangeStart)
-      t2 = day_start(rangeEnd) + WEEK_MS
-
-      grads.unit = ["d", "day"]
-      grads.timeSpan = `${days} days`
-
-      majorGrad = (ts) => { return DAY_MS }
-
-      unitStart = (ts) => { return hour_start(ts) }
-
-      majorValue = (ts) => { 
-        if (get_month(ts) == 0 && get_day(ts) == 1) return get_year(ts)
-        else if (get_day(ts) == 1) return get_monthName(ts)
-        else return this.gradsDayName(ts) // null
-      }
-      minorValue = (ts) => { 
-        if (get_day(ts) == 1 && get_hour(ts) == 0) return get_monthName(ts)
-        else if (get_hour(ts) == 0) return this.gradsDayName(ts)
-        else return get_hour(ts) + ":00" 
+      else if (!(m in grads.entries) && m >= start) {
+        grads.entries[m] = [this.dateTimeValue(m, tf), this.t2Pixel(m), m, "major"]
+        prev = m
       }
 
-      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
-    }
-    
-    // Hours
-    else if (units.hours > 0) {
-      
-      t1 = hour_start(rangeStart)
-      t2 = hour_start(rangeEnd) + DAY_MS
-
-      grads.unit = ["h", "hour"]
-      grads.timeSpan = `${units.hours} hours`
-
-      majorGrad = (ts) => { return HOUR_MS }
-        
-      unitStart = (ts) => { return minute_start(ts) }
-
-      majorValue = (ts) => {
-        if (get_month(ts) == 0 && get_day(ts) == 1 && get_hour(ts) == 0) return get_year(ts)
-        else if (get_day(ts) == 1 && get_hour(ts) == 0) return get_monthName(ts)
-        else if (get_hour(ts) == 0) return this.gradsDayName(ts)
-        else return this.HM(ts)
-      }
-      minorValue = (ts) => { return this.HM(ts) }
-
-      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
-    }
-    
-    // Minutes
-    else if (units.minutes > 0) {
-      
-      t1 = minute_start(rangeStart)
-      t2 = minute_start(rangeEnd) + HOUR_MS
-
-      grads.unit = ["m", "minute"]
-      grads.timeSpan = `${units.minutes} minutes`
-
-      majorGrad = (ts) => { return MINUTE_MS }
-
-      unitStart = (ts) => { return second_start(ts) }
-
-      majorValue = (ts) => {
-        if (get_month(ts) == 0 && get_day(ts) == 1 && get_hour(ts) == 0 && get_minute(ts) == 0) return get_year(ts)
-        else if (get_day(ts) == 1 && get_hour(ts) == 0 && get_minute(ts) == 0) return get_monthName(ts)
-        else if (get_hour(ts) == 0 && get_minute(ts) == 0) return this.gradsDayName(ts)
-        else return this.HM(ts)
-      }
-      minorValue = (ts) => { return this.HMS(ts) }
-
-      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
-    }
-
-    // Seconds
-    else if (units.seconds > 0) {
-      
-      t1 = second_start(rangeStart) - MINUTE_MS
-      t2 = second_start(rangeEnd) + MINUTE_MS
-
-      grads.unit = ["s", "second"]
-      grads.timeSpan = `${units.seconds} seconds`
-
-      majorGrad = (ts) => { return SECOND_MS }
-        
-      unitStart = (ts) => { return second_start(ts) }
-
-      majorValue = (ts) => {
-        if (get_month(ts) == 0 && get_day(ts) == 1 && get_hour(ts) == 0 && get_minute(ts) == 0) return get_year(ts)
-        else if (get_day(ts) == 1 && get_hour(ts) == 0 && get_minute(ts) == 0) return get_monthName(ts)
-        else if (get_hour(ts) == 0 && get_minute(ts) == 0) return this.gradsDayName(ts)
-        else if (get_minute(ts) == 0 && get_second(ts) == 0) return this.HM(ts)
-        else return this.MS(ts)
-      }
-      minorValue = (ts) => { return this.MS(ts) }
-
-      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
-    }
-  }
-
-  buildGrads(grads, t1, t2, majorGrad ,majorValue, minorValue, unitStart) {
-    let th, to, min;
-    const range = grads.range
-    const xStep = this.xStep(range)
-    const candleW = bRound(this.width / range.Length)
-    const minorGrad = Math.floor(range.Length / this.gradsMax) * range.interval
-    const limit = this.pixel2T(this.width + (candleW * 2)) 
-
-    const rangeStart = range.timeMin
-    t1 = rangeStart - (rangeStart % xStep) - xStep
-
-    while (t1 < limit) {
-      to = t1
-      grads.entries[t1] = [majorValue(t1), this.t2Pixel(t1), t1, "major"]
-
-      th = t1
-      t1 += majorGrad(t1)
-
-      while ((t1 - to) < minorGrad) {
-        t1 += majorGrad(t1)
+      else if (!(d in grads.entries) && d >= start) {
+        grads.entries[d] = [this.dateTimeValue(d, tf), this.t2Pixel(d), d, "major"]
+        prev = d
       }
 
-      let x = Math.floor((t1 - to) / minorGrad)
-      if (x > 0 ) {
-        let y = Math.floor((t1 - to) / x)
-        // console.log(`y: ${y}, th: ${th}, t1: ${t1}`)
-        while (th < t1) {
-          // th += xStep
-          th += y
-          min = unitStart(th)
-          grads.entries[min] = [minorValue(min), this.t2Pixel(min), min, "minor"]
-        }
-      }
+      // else if (!(t1 in grads.entries)) {
+        grads.entries[t1] = [this.dateTimeValue(t1, tf), this.t2Pixel(t1), t1, "minor"]
+        prev = t1
+      // }      
+
+      t1 += xStep
     }
 
     grads.values = Object.values(grads.entries)
@@ -347,6 +182,7 @@ export default class xAxis extends Axis {
     let interval = this.#indexBased ? range.interval : 1
     let xStep = 0
     let candleW = bRound(this.width / range.Length)
+    let rank
 
     let i = TIMESCALES.indexOf(interval)
     while (i-- >= 0) {
@@ -355,10 +191,29 @@ export default class xAxis extends Axis {
       
       if (gradPixels >= minStep) {
         xStep = TIMESCALES[i]
-        return xStep
+        rank = TIMESCALESRANK[i]
+        return {xStep, rank}
       }
     }
+  }
 
+  dateTimeValue(ts, tf) {
+    let value
+    if ((ts / DAY_MS) % 1 === 0) {
+      const date = get_day(ts)
+      if (date === 1) {
+        let month = get_month(ts)
+        if (month === 0) return get_year(ts)
+        else return get_monthName(ts)
+      }
+      else return date
+    }
+    else {
+      // TODO: SECONDS_MS
+      if (tf < MINUTE_MS) return this.MS(ts)
+      else if (tf < HOUR_MS) return this.MS(ts)
+      else return this.HM(ts)
+    }
   }
 
   gradsWorker() {

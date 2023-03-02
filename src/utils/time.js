@@ -29,6 +29,7 @@ export const TIMEUNITSVALUESSHORT = {
   h: HOUR_MS,
   m: MINUTE_MS,
   s: SECOND_MS,
+  u: MILLISECOND
 }
 export const TIMEUNITSVALUESLONG = {
   years: YEAR_MS,
@@ -38,6 +39,7 @@ export const TIMEUNITSVALUESLONG = {
   hours: HOUR_MS,
   minutes: MINUTE_MS,
   seconds: SECOND_MS,
+  milliseconds: MILLISECOND
 }
 export const TIMEUNITSVALUES = { ...TIMEUNITSVALUESSHORT, ...TIMEUNITSVALUESLONG }
 export const TIMESCALES = [
@@ -81,6 +83,47 @@ export const TIMESCALES = [
   MILLISECOND * 50,
   MILLISECOND,
 ];
+export const TIMESCALESRANK = [
+  "years",
+  "years",
+  "years",
+  "years",
+  "years",
+  "months",
+  "months",
+  "months",
+  "months",
+  "months",
+  "years",
+  "days",
+  "days",
+  "days",
+  "days",
+  "days",
+  "days",
+  "hours",
+  "hours",
+  "hours",
+  "hours",
+  "hours",
+  "minutes",
+  "minutes",
+  "minutes",
+  "minutes",
+  "minutes",
+  "minutes",
+  "seconds",
+  "seconds",
+  "seconds",
+  "seconds",
+  "seconds",
+  "seconds",
+  "milliseconds",
+  "milliseconds",
+  "milliseconds",
+  "milliseconds",
+  "milliseconds",
+ ];
 export const timezones = {
   0: 'Europe/London',
   '-120': 'Europe/Tallinn',
@@ -458,4 +501,55 @@ export function dayOfYear(t) {
   let dayOfYear = dayCount[mn] + dn;
   if(mn > 1 && isLeapYear()) dayOfYear++;
   return dayOfYear;
+}
+
+export function time_start (t, unit) {
+
+  // if (!isValidTimestamp(t)) return false
+  // if (Object.keys(TIMEUNITSVALUESLONG).indexOf(unit) == -1) return false
+
+  const findStart = {
+    years: (t) => year_start(t),
+    months: (t) => month_start(t),
+    weeks: (t) => day_start(t),
+    days: (t) => day_start(t),
+    hours: (t) => hour_start(t),
+    minutes: (t) => minute_start(t),
+    seconds: (t) => second_start(t),
+  }
+  return findStart[unit](t)
+}
+
+export function unitRange (ts, tf) {
+  let start, end;
+  switch(tf) {
+    case "years" :
+      start = year_start(ts)
+      end = nextYear(ts)
+      break;
+    case "months" :
+      start = month_start(ts)
+      end = nextMonth(ts)
+      break;
+    case "weeks" :
+      start = day_start(ts)
+      end = start + DAY_MS
+      break;
+    case "days" :
+      start = day_start(ts)
+      end = start + DAY_MS
+      break;
+    case "hours" :
+      start = hour_start(ts)
+      end = start + HOUR_MS
+      break;
+    case "minutes" :
+      start = minute_start(ts)
+      end = start + MINUTE_MS
+      break;
+    case "seconds" :
+      start = second_start(ts)
+      end = start + SECOND_MS
+  }
+  return {start, end}
 }

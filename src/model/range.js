@@ -3,7 +3,7 @@
 import { DAY_MS, interval2MS, ms2Interval, WEEK_MS } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
 import { isNumber, isObject } from "../utils/typeChecks"
-import { limit } from "../utils/number"
+import { bRound, limit } from "../utils/number"
 // import WebWorker from "./webWorkers"
 // import WebWorker from "./webWorkers4"
 
@@ -55,7 +55,7 @@ export class Range {
     }
     function ${this.maxMinPriceVol.toString()}
   `
-    this.#worker = this.#core.worker.create("range", MaxMinPriceVolStr, undefined, this.#core)
+    // this.#worker = this.#core.worker.create("range", MaxMinPriceVolStr, undefined, this.#core)
 
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS
 
@@ -271,9 +271,13 @@ export class Range {
    maxMinPriceVol ( input ) {
 // console.time()
     let {data, start, end, that} = {...input}
+    let buffer = bRound(this.#core.bufferPx / this.#core.candleW)
 
-    start = (typeof start === "number")? start : 0
-    end = (typeof end === "number")? end : data?.length-1
+    buffer = (isNumber(buffer)) ? buffer : 0
+    start = (isNumber(start)) ? start - buffer : 0
+    start = (start > 0) ? start : 0
+
+    end = (typeof end === "number") ? end : data?.length-1
 
     if (data.length == 0) {
       return {
@@ -320,9 +324,14 @@ export class Range {
       }
     }
 // console.timeEnd()
+    let diff = valueMax - valueMin
+    valueMin -= diff * 0.1 //that.yAxisBounds
+    valueMin = (valueMin > 0) ? valueMin : 0
+    valueMax += diff * 0.1 //that.yAxisBounds
+    diff = valueMax - valueMin
 
-    valueMin *= (1 - that.yAxisBounds)
-    valueMax *= (1 + that.yAxisBounds)
+    // valueMin *= (1 - that.yAxisBounds)
+    // valueMax *= (1 + that.yAxisBounds)
     return {
       valueMin: valueMin,
       valueMax: valueMax,
