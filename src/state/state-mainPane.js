@@ -146,12 +146,6 @@ export default
             // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         },
-        main_mouseup: {
-          target: "idle",
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
-          },
-        }
       }
     },
     divider_mousemove: {

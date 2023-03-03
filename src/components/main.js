@@ -251,15 +251,12 @@ export default class MainPane {
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
     this.#controller.on("mouseout", this.onMouseOut.bind(this));
-    // this.#controller.on("drag", debounce(this.onChartDrag, 1, this, true));
+    this.#controller.on("mousedown", () => console.log("main_mousedown"))
     this.#controller.on("drag", throttle(this.onChartDrag, 50, this, true));
-    // this.#controller.on("drag", this.onChartDrag.bind(this));
 
     this.#controller.on("enddrag", this.onChartDragDone.bind(this));
     this.#controller.on("keydown", this.onChartKeyDown.bind(this))
     this.#controller.on("keyup", this.onChartKeyUp.bind(this))
-
-    this.#controller.on("mouseup", this.onMouseUp.bind(this))
 
     // listen/subscribe/watch for parent notifications
     this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this))
@@ -300,10 +297,6 @@ export default class MainPane {
     ]
 
     this.emit("main_mousemove", this.#cursorPos)
-  }
-
-  onMouseUp(e) {
-    this.emit("main_mouseup", e)
   }
 
   onMouseEnter(e) {

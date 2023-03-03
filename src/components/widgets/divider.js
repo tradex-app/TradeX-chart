@@ -140,10 +140,16 @@ export default class Divider {
       pos: this.#cursorPos,
       offChart: this.offChart
     })
+
+    document.addEventListener("mouseup", this.onMouseUp.bind(this))
   }
 
   onMouseUp(e) {
-    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
+    if ("position" in e)
+      this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
+
+    document.removeEventListener("mouseup", this.onMouseUp)
+
     this.emit(`${this.ID}_mouseup`, this.#cursorPos)
     this.emit(`divider_mouseup`, {
       id: this.ID,
