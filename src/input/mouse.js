@@ -67,6 +67,25 @@ class MouseAgent {
       
       controller.raise(this, "mousedown", this.createEventArgument(e));
     });
+
+    element.addEventListener("dblclick", (e) => {
+
+      const clientRect = element.getBoundingClientRect();
+
+      this.position.x = e.clientX - clientRect.left;
+      this.position.y = e.clientY - clientRect.top;
+
+      this.movement.x = 0;
+      this.movement.y = 0;
+
+      switch (e.button) {
+        case 0: this.pressedButtons._t_pushIfNotExist(MouseButtons.Left); break;
+        case 1: this.pressedButtons._t_pushIfNotExist(MouseButtons.Middle); break;
+        case 2: this.pressedButtons._t_pushIfNotExist(MouseButtons.Right); break;
+      }
+
+      controller.raise(this, "dblclick", this.createEventArgument(e));
+    });
  
     element.addEventListener("mousemove", e => {
       

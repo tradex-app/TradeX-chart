@@ -79,6 +79,7 @@ export default class Timeline {
   get options() { return this.#options }
   get core() { return this.#core }
   get element() { return this.#elTime }
+  get elViewport() { return this.#elViewport }
   get height() { return this.#elTime.getBoundingClientRect().height }
   set width(w) { this.setWidth(w) }
   get width() { return this.#elTime.getBoundingClientRect().width }
@@ -190,9 +191,10 @@ export default class Timeline {
   }
 
   eventsListen() {
-    let canvas = this.#viewport.scene.canvas
+    let timeline = this.#elViewport
     // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(canvas, {disableContextMenu: false});
+    this.#controller = new InputController(timeline, {disableContextMenu: false});
+    this.#controller.on("dblclick", this.onDoubleClick.bind(this))
 
     this.on("main_mousemove", this.drawCursorTime.bind(this))
     this.on("setRange", this.onSetRange.bind(this))
@@ -225,6 +227,10 @@ export default class Timeline {
       default:
         break
     }
+  }
+
+  onDoubleClick(e) {
+    this.core.jumpToEnd()
   }
 
   onFwdEnd() {

@@ -76,6 +76,7 @@ class InputController {
 
 new EventDispatcher(InputController).registerEvents(
   "mousedown", "mouseup", "mousemove", "mouseenter", "mouseout", "mousewheel",
+  "dblclick",
   "keydown", "keyup", "hotkey",
   "drag", "begindrag", "enddrag"
 );

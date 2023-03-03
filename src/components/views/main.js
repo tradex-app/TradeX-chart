@@ -25,6 +25,7 @@ template.innerHTML = `
     width: 100%;
     height: inherit;
     background: var(--txc-onchart-background, none);
+    z-index: 0;
   }
   #viewport canvas {
     position: absolute;
@@ -38,10 +39,12 @@ template.innerHTML = `
     border-color: var(--txc-border-color, ${GlobalStyle.COLOUR_BORDER}); 
   }
   tradex-time {
+    position: relative;
     width: calc(100% - ${SCALEW}px);
     height: ${TIMEH}px;
     overflow: hidden;
     margin-left: 1px;
+    z-index: 1;
   }
 </style>
 <div id="viewport"></div>
