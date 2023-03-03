@@ -291,9 +291,9 @@ export default class Chart {
     w = this.width
     h = (h) ? h : this.height
     
-    // this.layerWidth = Math.round(w * ((100 + buffer) * 0.01))
-    // this.graph.setSize(w, h, this.layerWidth)
-    this.graph.setSize(w, h, this.width)
+    this.layerWidth = Math.round(w * ((100 + buffer) * 0.01))
+    this.graph.setSize(w, h, this.layerWidth)
+    // this.graph.setSize(w, h, this.width)
     // element widths are automatically handled by CSS
     this.setHeight(h)
   }
