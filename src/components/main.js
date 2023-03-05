@@ -251,7 +251,6 @@ export default class MainPane {
     this.#controller.on("mousemove", this.onMouseMove.bind(this));
     this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
     this.#controller.on("mouseout", this.onMouseOut.bind(this));
-    this.#controller.on("mousedown", () => console.log("main_mousedown"))
     this.#controller.on("drag", throttle(this.onChartDrag, 50, this, true));
 
     this.#controller.on("enddrag", this.onChartDragDone.bind(this));
@@ -466,7 +465,7 @@ export default class MainPane {
   getBufferPx() { 
     let w = Math.round(this.width * this.buffer / 100) 
     let r = w % this.candleW
-    return w - Math.round(r)
+    return w - r
   }
 
   registerOffCharts(options) {

@@ -760,27 +760,50 @@ export default class TradeXchart extends Tradex_chart {
    */
   updateRange(pos) {
 
-    let dist, offset, scrollPos
-    offset = 0
+    if (pos[4] == 0) return
+
+    let dist, offset, scrollPos, r;
+
     dist = pos[4]
     scrollPos = this.#scrollPos + dist
+    r = scrollPos % this.candleW
 
     if (scrollPos < this.bufferPx * -1) {
       scrollPos = 0
-      offset = this.rangeScrollOffset * -1
-      this.offsetRange(offset)
+      this.offsetRange(this.rangeScrollOffset * -1)
     }
     else if (scrollPos > 0) {
       scrollPos = this.bufferPx * -1
-      offset = this.rangeScrollOffset
-      this.offsetRange(offset)
+      this.offsetRange(this.rangeScrollOffset)
     }
 
     this.#scrollPos = scrollPos
-    window.requestAnimationFrame(() =>
-      this.emit("scrollUpdate", scrollPos)
-    )
+    this.emit("scrollUpdate", scrollPos)
+
+    console.log(`Main W: ${this.#MainPane.width}, Candle W: ${this.candleW}, r: ${this.#MainPane.width % this.candleW}`)
+    console.log(`bufferPx: ${this.bufferPx}, offset: ${offset}, scrollPos: ${scrollPos} \n`)
   }
+
+
+  xupdateRange(pos) {
+
+    if (pos[4] == 0) return
+    
+    let dist, offset, scrollPos, r;
+    dist = pos[4]
+    scrollPos = this.#scrollPos + dist
+    r = scrollPos % this.candleW
+    offset = (scrollPos - r) / this.candleW
+
+    // if (dist > 0) offset = offset * -1
+    if (dist > 0) this.offsetRange(offset)
+    if (dist < 0) this.offsetRange(offset * -1)
+    this.scrollPos = r
+
+    this.#scrollPos = r
+    this.emit("scrollUpdate", scrollPos)
+  }
+
 
   offsetRange(offset) {
     let start = this.range.indexStart - offset,

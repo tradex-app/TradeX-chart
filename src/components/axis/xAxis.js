@@ -123,7 +123,7 @@ export default class xAxis extends Axis {
       minor: [],
     }
     const units = ms2TimeUnits(range.rangeDuration)
-    grads.units = ms2TimeUnits(range.rangeDuration)
+    grads.units = units
 
     for (let u in units) {
       if (units[u] > 0) {

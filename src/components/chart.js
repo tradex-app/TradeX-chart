@@ -179,8 +179,8 @@ export default class Chart {
     this.off(STREAM_LISTENING, this.onStreamListening);
     this.off(STREAM_NEWVALUE, this.onStreamNewValue);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
-    this.off("setRange", this.draw)
-    this.off("scrollUpdate", this.draw)
+    // this.off("setRange", this.draw)
+    // this.off("scrollUpdate", this.draw)
   }
 
   eventsListen() {
