@@ -5,6 +5,7 @@ import DOM from "../../utils/DOM"
 import { isNumber } from "../../utils/typeChecks"
 import { debounce, throttle } from "../../utils/utilities"
 import { InputController, Keys } from "../../input/controller"
+import Input from "../../input2"
 
 import {
   CLASS_DIVIDERS
@@ -28,6 +29,7 @@ export default class Divider {
 
   #cursorPos
   #controller
+  #input
 
   static dividerList = {}
   static divideCnt = 0
@@ -102,13 +104,20 @@ export default class Divider {
   }
 
   eventsListen() {
-    // create controller and use 'on' method to receive input events
-    this.#controller = new InputController(this.#elDivider, {disableContextMenu: false});
+    // // create controller and use 'on' method to receive input events
+    // this.#controller = new InputController(this.#elDivider, {disableContextMenu: false});
 
-    this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
-    this.#controller.on("mouseout", this.onMouseOut.bind(this))
-    this.#controller.on("mousedown", debounce(this.onMouseDown, 100, this, true));
-    this.#controller.on("mouseup", this.onMouseUp.bind(this));
+    // this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
+    // this.#controller.on("mouseout", this.onMouseOut.bind(this))
+    // this.#controller.on("mousedown", debounce(this.onMouseDown, 100, this, true));
+    // this.#controller.on("mouseup", this.onMouseUp.bind(this));
+
+    this.#input = new Input(this.#elDivider, {disableContextMenu: false});
+
+    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
+    this.#input.on("pointerout", this.onMouseOut.bind(this));
+    this.#input.on("pointerdown", debounce(this.onMouseDown, 100, this, true));
+    this.#input.on("pointerup", this.onMouseUp.bind(this));
   }
 
   on(topic, handler, context) {

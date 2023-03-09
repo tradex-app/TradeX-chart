@@ -207,6 +207,7 @@ class MouseAgent {
       dragend: this.dragend.clone(),
       wheeldelta: this.wheeldelta,
       domEvent: e,
+      timestamp: Date.now()
     }
   }
 

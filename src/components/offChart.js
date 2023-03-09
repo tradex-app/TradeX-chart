@@ -13,6 +13,7 @@ import overlayGrid from "./overlays/chart-grid"
 import overlayCursor from "./overlays/chart-cursor"
 import stateMachineConfig from "../state/state-offChart"
 import { uid } from "../utils/utilities"
+import Input from '../input2'
 
 const defaultOverlays = [
   ["grid", {class: overlayGrid, fixed: true, required: true, params: {axes: "y"}}],
@@ -39,6 +40,8 @@ export default class OffChart extends Chart {
     valueMin: 0,
     valueDiff: 100
   }
+
+  #input
 
 
   constructor (core, options) {
@@ -116,8 +119,18 @@ export default class OffChart extends Chart {
   }
 
   end() {
+    const main = this.core.MainPane
+    this.#input.off("pointerdrag", main.onChartDrag)
+    this.#input.off("pointerdragend", main.onChartDrag)
     this.#Divider.end()
     super.end()
+  }
+
+  eventsListen() {
+    const main = this.core.MainPane
+    this.#input = new Input(this.element, {disableContextMenu: false});
+    this.#input.on("pointerdrag", main.onChartDrag.bind(main))
+    this.#input.on("pointerdragend", main.onChartDragDone.bind(main))
   }
 
   onStreamUpdate(candle) {

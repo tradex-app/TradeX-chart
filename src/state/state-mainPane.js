@@ -105,7 +105,7 @@ export default
         always: {
           target: 'idle',
           action (data) {
-            console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
             this.context.origin.updateRange(data) 
           },
         },

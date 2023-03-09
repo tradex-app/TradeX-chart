@@ -780,8 +780,8 @@ export default class TradeXchart extends Tradex_chart {
     this.#scrollPos = scrollPos
     this.emit("scrollUpdate", scrollPos)
 
-    console.log(`Main W: ${this.#MainPane.width}, Candle W: ${this.candleW}, r: ${this.#MainPane.width % this.candleW}`)
-    console.log(`bufferPx: ${this.bufferPx}, offset: ${offset}, scrollPos: ${scrollPos} \n`)
+    // console.log(`Main W: ${this.#MainPane.width}, Candle W: ${this.candleW}, r: ${this.#MainPane.width % this.candleW}`)
+    // console.log(`dist: ${dist}, bufferPx: ${this.bufferPx}, offset: ${offset}, scrollPos: ${scrollPos} \n`)
   }
 
 
@@ -796,12 +796,15 @@ export default class TradeXchart extends Tradex_chart {
     offset = (scrollPos - r) / this.candleW
 
     // if (dist > 0) offset = offset * -1
-    if (dist > 0) this.offsetRange(offset)
-    if (dist < 0) this.offsetRange(offset * -1)
+    offset = (dist > 0) ? offset : offset * -1
+    this.offsetRange(offset)
     this.scrollPos = r
 
     this.#scrollPos = r
     this.emit("scrollUpdate", scrollPos)
+
+    // console.log(`Main W: ${this.#MainPane.width}, Candle W: ${this.candleW}, r: ${this.#MainPane.width % this.candleW}`)
+    // console.log(`dist: ${dist}, bufferPx: ${this.bufferPx}, offset: ${offset}, scrollPos: ${scrollPos} \n`)
   }
 
 

@@ -14,6 +14,7 @@ import chartCompositor from "./overlays/chart-compositor"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-mainPane"
 import { InputController, Keys } from "../input/controller"
+import Input from "../input2"
 import { isNumber, isObject } from "../utils/typeChecks"
 import { copyDeep, debounce, throttle } from "../utils/utilities"
 
@@ -89,6 +90,7 @@ export default class MainPane {
   
   #indicators
   #controller
+  #input
 
   constructor (core, options) {
 
@@ -241,21 +243,35 @@ export default class MainPane {
 
   eventsListen() {
     // Give Main focus so it can receive keyboard input
-    this.#elMain.tabIndex = 0
-    this.#elMain.focus()
+    this.#elRows.tabIndex = 0
+    this.#elRows.focus()
 
     // create controller and use 'on' method to receive input events 
     this.#controller = new InputController(this.#elRows, {disableContextMenu: false});
 
-    this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
-    this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
-    this.#controller.on("mouseout", this.onMouseOut.bind(this));
-    this.#controller.on("drag", throttle(this.onChartDrag, 50, this, true));
-
-    this.#controller.on("enddrag", this.onChartDragDone.bind(this));
+    // this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
+    // this.#controller.on("mousemove", this.onMouseMove.bind(this));
+    // this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
+    // this.#controller.on("mouseout", this.onMouseOut.bind(this));
+    // this.#controller.on("drag", throttle(this.onChartDrag, 50, this, true));
+    // this.#controller.on("enddrag", this.onChartDragDone.bind(this));
     this.#controller.on("keydown", this.onChartKeyDown.bind(this))
     this.#controller.on("keyup", this.onChartKeyUp.bind(this))
+
+
+    this.#input = new Input(this.#elRows, {disableContextMenu: false});
+
+    this.#input.on("wheel", this.onMouseWheel.bind(this))
+    this.#input.on("pointerdrag", this.onChartDrag.bind(this))
+    this.#input.on("pointerdragend", this.onChartDragDone.bind(this))
+    this.#input.on("pointermove", this.onMouseMove.bind(this))
+    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
+    this.#input.on("pointerout", this.onMouseOut.bind(this));
+
+    // this.#input.on("click", (e)=> {
+    //   console.log("click: ", e.domEvent.composedPath())
+    // });
+
 
     // listen/subscribe/watch for parent notifications
     this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this))
@@ -294,7 +310,7 @@ export default class MainPane {
       e.dragstart.x, e.dragstart.y,
       e.movement.x, e.movement.y
     ]
-
+    console.log("main_mousemove")
     this.emit("main_mousemove", this.#cursorPos)
   }
 
@@ -351,8 +367,6 @@ export default class MainPane {
     //   e.movement.x, e.movement.y
     // ]
     this.emit("chart_pan", this.#cursorPos)
-    // draw() called via state machine updateRange()
-    // this.draw()
   }
 
   onChartDragDone(e) {
@@ -374,8 +388,6 @@ export default class MainPane {
     //   e.movement.x, e.movement.y
     // ]
     this.emit("chart_panDone", this.#cursorPos)
-    // draw() called via state machine updateRange()
-    // this.draw()
   }
 
   onChartKeyDown(e) {
