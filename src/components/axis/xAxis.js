@@ -135,7 +135,7 @@ export default class xAxis extends Axis {
  
     const tf = range.interval
     const {xStep, rank} = this.xStep(range)
-    const tLimit = this.pixel2T(this.width + (this.candleW * 2)) 
+    const tLimit = this.pixel2T(this.width) + xStep
 
     let t1 = range.timeMin - (range.timeMin % xStep) - xStep
     let prev
