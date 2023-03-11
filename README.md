@@ -31,7 +31,7 @@ TradeX-chart targets browsers that support [ECMAScript 2022](https://www.ecma-in
 
 ## Demo
 
-### [Live Demo](https://tradex-app.github.io/TradeX-chart/)
+### [Live Demo](https://tradex-chart.guildmedia.net/)
 
 ## Install
 
