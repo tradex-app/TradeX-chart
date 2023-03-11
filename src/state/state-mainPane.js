@@ -38,10 +38,16 @@ export default
             // console.log('offChart: transition from "idle" to "addIndicator" state')
           },
         },
-        divider_mousedown: {
-          target: 'divider_mousedown',
+        // divider_mousedown: {
+        //   target: 'divider_mousedown',
+        //   action (data) {
+        //     // console.log('offChart: transition from "idle" to "addIndicator" state')
+        //   },
+        // },
+        divider_pointerdrag: {
+          target: 'divider_pointerdrag',
           action (data) {
-            // console.log('offChart: transition from "idle" to "addIndicator" state')
+            // console.log('offChart: transition from "idle" to "divider_pointerdrag" state')
           },
         },
         global_resize: {
@@ -132,8 +138,8 @@ export default
     },
     divider_mousedown: {
       onEnter(data) {
-        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
-
+        console.log(`${this.id}: stAate: "${this.state}" - onEnter`)
+console.log(data)
         this.context.divider = data
       },
       onExit(data) {
@@ -143,14 +149,14 @@ export default
         main_mousemove: {
           target: "divider_mousemove",
           action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
+            console.log(`${this.id}: transition from "${this.state}" to "divider_mousemove"`)
           },
         },
       }
     },
     divider_mousemove: {
       onEnter(data) {
-        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+        console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
         let divider = this.context.divider
         this.context.pair = this.context.origin.resizeRowPair(divider, data) 
@@ -178,9 +184,41 @@ export default
           action (data) {
             this.actions.removeProperty.call(this)
 
-            // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
+            console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         }
+      }
+    },
+    divider_pointerdrag: {
+      onEnter(data) {
+        console.log(`${this.id}: state: "${this.state}" - onEnter`)
+        console.log(data)
+        const pos = [
+          data.e.dragstart.x, data.e.dragstart.y,
+          data.e.dragend.x, data.e.dragend.y,
+          data.e.movement.x, data.e.movement.y
+        ]
+        this.context.pair = this.context.origin.resizeRowPair(data, pos) 
+
+      },
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+      },
+      on: {
+        divider_pointerdrag: {
+          target: "divider_pointerdrag",
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
+          },
+        },
+        divider_pointerdragend: {
+          target: "idle",
+          action (data) {
+            this.actions.removeProperty.call(this)
+
+            console.log(`${this.id}: transition from "${this.state}" to "divider_mousemove"`)
+          },
+        },
       }
     },
     global_resize: {

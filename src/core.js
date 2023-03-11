@@ -760,7 +760,7 @@ export default class TradeXchart extends Tradex_chart {
    */
   updateRange(pos) {
 
-    if (pos[4] == 0) return
+    if (!isArray(pos) || !isNumber(pos[4]) || pos[4] == 0) return
 
     let dist, offset, scrollPos, r;
 

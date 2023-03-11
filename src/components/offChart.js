@@ -28,6 +28,7 @@ export default class OffChart extends Chart {
   #Indicator
   #overlay
   #Divider
+
   #layerStream
   #layersIndicator
   #overlayIndicators = new Map()

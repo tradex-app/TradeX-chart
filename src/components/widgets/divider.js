@@ -109,15 +109,16 @@ export default class Divider {
 
     // this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
     // this.#controller.on("mouseout", this.onMouseOut.bind(this))
-    // this.#controller.on("mousedown", debounce(this.onMouseDown, 100, this, true));
-    // this.#controller.on("mouseup", this.onMouseUp.bind(this));
+    // this.#controller.on("mousedown", debounce(this.onPointerDrag, 100, this, true));
+    // this.#controller.on("mouseup", this.onPointerDragEnd.bind(this));
 
     this.#input = new Input(this.#elDivider, {disableContextMenu: false});
 
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
-    this.#input.on("pointerdown", debounce(this.onMouseDown, 100, this, true));
-    this.#input.on("pointerup", this.onMouseUp.bind(this));
+    // this.#input.on("pointerdrag", throttle(this.onPointerDrag, 100, this, true));
+    this.#input.on("pointerdrag", this.onPointerDrag.bind(this));
+    this.#input.on("pointerdragend", this.onPointerDragEnd.bind(this));
   }
 
   on(topic, handler, context) {
@@ -140,27 +141,27 @@ export default class Divider {
     this.#elDivider.style.background = "#FFFFFF00"
   }
 
-  onMouseDown(e) {
-    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
-    this.emit(`${this.ID}_mousedown`, this.#cursorPos)
-    this.emit(`divider_mousedown`, {
+  onPointerDrag(e) {
+    this.#cursorPos = [e.position.x, e.position.y]
+    this.emit(`${this.ID}_pointerdrag`, this.#cursorPos)
+    this.emit(`divider_pointerdrag`, {
       id: this.ID,
       e: e,
       pos: this.#cursorPos,
       offChart: this.offChart
     })
 
-    document.addEventListener("mouseup", this.onMouseUp.bind(this))
+    console.log("pointerdrag")
   }
 
-  onMouseUp(e) {
+  onPointerDragEnd(e) {
     if ("position" in e)
-      this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
+    this.#cursorPos = [e.position.x, e.position.y]
 
-    document.removeEventListener("mouseup", this.onMouseUp)
+    console.log(`divider_pointerdragend`)
 
-    this.emit(`${this.ID}_mouseup`, this.#cursorPos)
-    this.emit(`divider_mouseup`, {
+    this.emit(`${this.ID}_pointerdragend`, this.#cursorPos)
+    this.emit(`divider_pointerdragend`, {
       id: this.ID,
       e: e,
       pos: this.#cursorPos,

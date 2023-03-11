@@ -163,6 +163,13 @@ export class EventsAgent {
         case "pointerdrag":
           this.initPointerDrag(handler, options)
           break;
+        case "pointerdragend":
+          cb = function (e) {
+            this.motion(e)
+            handler(this.createEventArgument(e))
+          }
+          this.element.addEventListener(event, cb.bind(this), options)
+          break;
       }
     }
 
@@ -182,6 +189,7 @@ export class EventsAgent {
       e.target.removeEventListener("pointerdown", this.onPointerDown)
       e.target.removeEventListener("gotpointercapture", this.onPointerDrag)
       e.target.removeEventListener("lostpointercapture", this.onPointerDragEnd)
+      document.removeEventListener("pointerup", this.onPointerDragEnd)
     }
     
     element.removeEventListener(event, handler, options)
@@ -190,18 +198,20 @@ export class EventsAgent {
   }
  
   initPointerDrag (handler, options) {
-    this.dragStatus = "ready"
-    this.element.addEventListener("pointerdown", this.onPointerDown.bind(this), options)
-    // this.element.addEventListener("pointerup", this.onPointerDragEnd.bind(this), options)
-
-    this.element.addEventListener("gotpointercapture", this.onPointerCapture.bind(this), options)
-    this.element.addEventListener("lostpointercapture", this.onPointerDragEnd.bind(this), options)
-    this.element.addEventListener("pointermove", this.onPointerMove.bind(this), options)
+    if (!this.draginit) {
+      this.draginit = true
+      this.element.addEventListener("pointerdown", this.onPointerDown.bind(this), options)
+      this.element.addEventListener("gotpointercapture", this.onPointerCapture.bind(this), options)
+      this.element.addEventListener("lostpointercapture", this.onPointerDragEnd.bind(this), options)
+      this.element.addEventListener("pointermove", this.onPointerMove.bind(this), options) 
+      // document.addEventListener("pointerup", this.onPointerDragEnd.bind(this))
+    }
 
     let cb = function (e) {
       e = this.createEventArgument(e)
       handler(e)
     }
+    this.dragStatus = "ready"
     this.element.addEventListener("pointerdrag", cb.bind(this), options)
   }
 
@@ -219,13 +229,12 @@ export class EventsAgent {
   }
 
   onPointerMove (e) {
-    this.motion(e)
+    // console.log(`pos.x: ${this.position.x}, move.x: ${this.movement.x}`)
     if (this.dragStatus == "dragging") {
+      this.motion(e)
       this.dragend = this.position.clone()
       e.target.dispatchEvent(this.pointerdrag)
     }
-// console.log("onPointerMove: ", e.target)
-
   }
 
   onPointerCapture (e) {
@@ -235,8 +244,11 @@ export class EventsAgent {
   }
 
   onPointerDragEnd (e) {
-    this.dragStatus = "ready"
-    e.target.dispatchEvent(this.pointerdragend)
+    if (this.dragStatus == "dragging") {
+      this.dragStatus = "ready"
+      e.target.dispatchEvent(this.pointerdragend)
+      console.log(`onPointerDragEnd`)
+    }
   }
 
   createEventArgument(e) {
@@ -262,10 +274,12 @@ export class EventsAgent {
 
   motion(e) {
     
+    const clientX = e.clientX || this.position.x
+    const clientY = e.clientY || this.position.y
     const clientRect = e.target.getBoundingClientRect();
     const client = {
-      x: e.clientX - clientRect.left,
-      y: e.clientY - clientRect.top
+      x: clientX - clientRect.left,
+      y: clientY - clientRect.top
     }
 
     if (this.firstMovementUpdate) {

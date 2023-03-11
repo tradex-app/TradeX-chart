@@ -310,7 +310,7 @@ export default class MainPane {
       e.dragstart.x, e.dragstart.y,
       e.movement.x, e.movement.y
     ]
-    console.log("main_mousemove")
+    // console.log("main_mousemove", this.#cursorPos)
     this.emit("main_mousemove", this.#cursorPos)
   }
 
@@ -543,7 +543,7 @@ export default class MainPane {
 
     let o = new OffChart(this.#core, options)
     
-    this.#OffCharts.set(o.ID, o)
+    this.#OffCharts.set(o.id, o)
 
     this.emit("addOffChart", o)
   }
@@ -609,7 +609,7 @@ export default class MainPane {
 
   resizeRowPair(divider, pos) {
     let active = divider.offChart
-    let ID = active.ID
+    let ID = active.id
     let offCharts = [...this.#OffCharts.keys()]
     let i = offCharts.indexOf(ID)
     let prev = (i == 0) ? 
@@ -618,11 +618,13 @@ export default class MainPane {
     // why does activeH need - 1 to calc correct sizing?
     let activeH = active.height - pos[5] - 1
     let prevH  = prev.height + pos[5]
+
+    console.log(`pos[5]: ${pos[5]}, activeH: ${activeH}, prevH: ${prevH}`)
     
     if ( activeH >= this.#rowMinH
         && prevH >= this.#rowMinH) {
           divider.offChart.Divider.updateDividerPos(pos)
-          // console.log(`active: ${activeH}, prev: ${prevH}, total: ${activeH + prevH}`)
+          console.log(`active: ${activeH}, prev: ${prevH}, total: ${activeH + prevH}`)
           active.setDimensions({w:undefined, h:activeH})
           prev.setDimensions({w:undefined, h:prevH})
     }

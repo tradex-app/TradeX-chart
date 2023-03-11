@@ -52,10 +52,12 @@ export default class StateMachine {
   get core() { return this.#core }
   get status() { return this.#status }
   get event() { return this.#event }
+  get events() { return this.#events }
   get eventData() { return this.#eventData }
   get actions() { return this.#actions }
 
   notify(event, data) {
+
     this.#event = event
     this.#eventData = data
     const currStateConfig = this.#config.states[this.#state]
