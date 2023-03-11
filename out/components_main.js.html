@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: components/main.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: components/main.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// main.js
+// Main Pane that holds the chart and off chart indicators
+// Providing: chart, off chart indicators
+
+import DOM from "../utils/DOM"
+import Timeline from './timeline'
+import Graph from "./views/classes/graph"
+import renderLoop from "./views/classes/renderLoop"
+import Chart from "./onChart"
+import OffChart from "./offChart"
+import chartGrid from "./overlays/chart-grid"
+import watermark from "./overlays/chart-watermark"
+import chartCompositor from "./overlays/chart-compositor"
+import StateMachine from "../scaleX/stateMachne"
+import stateMachineConfig from "../state/state-mainPane"
+import { InputController, Keys } from "../input/controller"
+import Input from "../input2"
+import { isNumber, isObject } from "../utils/typeChecks"
+import { copyDeep, debounce, throttle } from "../utils/utilities"
+
+import {
+  STREAM_NEWVALUE,
+} from '../definitions/core'
+
+import {
+  PRICEDIGITS,
+  XAXIS_ZOOM,
+  BUFFERSIZE,
+  ROWMINHEIGHT,
+  OFFCHARTDEFAULTHEIGHT,
+} from "../definitions/chart"
+
+import {
+  STYLE_ROW,
+} from "../definitions/style"
+
+const defaultOverlays = [
+  ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
+  ["grid", {class: chartGrid, fixed: false, required: true, params: {axes: "x"}}],
+  // ["chartCompositor", {class: chartCompositor, fixed: true, required: true}]
+]
+
+/**
+ * Provides chart main pane that hosts, chart, off charts (indicators), timeline, widgets
+ * @export
+ * @class MainPane
+ */
+export default class MainPane {
+
+  #name = "MainPane"
+  #shortName = "Main"
+  #options
+  #parent
+  #core
+  #stateMachine
+
+  #elYAxis
+  #elMain
+  #elRows
+  #elTime
+  #elChart
+  #elScale
+  #elOffCharts = []
+  #elYAxisScales = []
+  #elGrid
+  #elCanvas
+  #elViewport
+
+  #Graph
+  #viewport
+  #layerGrid
+  #layerWatermark
+  #OffCharts = new Map()
+  #Chart
+  #Time
+  #chartGrid
+
+  #offChartDefaultH = OFFCHARTDEFAULTHEIGHT // %
+  #offChartDefaultWpx = 120
+  #rowMinH = ROWMINHEIGHT // px
+
+  #cursorPos = [0, 0]
+  #drag = {
+    active: false,
+    start: [0,0],
+    prev: [0,0],
+    delta: [0,0]
+  }
+  #buffer
+  
+  #indicators
+  #controller
+  #input
+
+  constructor (core, options) {
+
+    this.#core = core
+    this.#options = options
+    this.#parent = core
+    this.#elMain = this.#core.elMain
+    this.#elYAxis = this.#core.elYAxis
+    this.init(options)
+  }
+
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warning(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
+
+  get id() { return `${this.#core.id}.${this.#name}` }
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get core() { return this.#core }
+  get chart() { return this.#Chart }
+  get time() { return this.#Time }
+  get offCharts() { return this.#OffCharts }
+  get options() { return this.#options }
+  get element() { return this.#elMain }
+  get width() { return this.#elMain.getBoundingClientRect().width }
+  get height() { return this.#elMain.getBoundingClientRect().height }
+  get chartW() { return this.#elChart.getBoundingClientRect().width }
+  get chartH() { return this.#elChart.getBoundingClientRect().height }
+  get rowsW() { return this.#elRows.getBoundingClientRect().width }
+  get rowsH() { return this.#elRows.getBoundingClientRect().height }
+  get rowMinH() { return this.#rowMinH }
+  set rowMinH(h) { if (isNumber(h)) this.#rowMinH = Math.abs(h) }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elMain) }
+  get range() { return this.#core.range }
+  get cursorPos() { return this.#cursorPos }
+  get candleW() { return this.#Time.candleW }
+  get theme() { return this.#core.theme }
+  get config() { return this.#core.config }
+  get buffer() { return this.#buffer }
+  get bufferPx() { return this.getBufferPx() }
+  get scrollPos() { return this.#core.scrollPos }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
+
+
+  init(options) {
+    const core = this.#core
+
+    this.#indicators = this.#core.indicators
+    this.#elRows = this.#elMain.rows
+    this.#elTime = this.#elMain.time
+    this.#elChart = this.#elMain.rows.onChart
+    this.#elGrid = this.#elMain.rows.grid
+    this.#elViewport = this.#elMain.viewport  // this.#elMain.rows.grid.viewport
+    this.#elScale = this.#core.elBody.scale
+
+    options.name = "Chart"
+    options.shortName = "Chart"
+    options.parent = this
+    options.chartData = this.#core.chartData
+    options.onChart = this.#core.onChart
+    options.offChart = this.#core.offChart
+    options.rangeLimit = this.#core.rangeLimit
+    options.settings = this.#core.settings
+
+    // api - functions / methods, calculated properties provided by this module
+    options.elements = 
+      {...options.elements, 
+        ...{
+          elTarget: this.#elChart,
+          elTime: this.#elTime,
+          elRows: this.#elRows,
+          elOffCharts: this.#elOffCharts,
+          elScale: this.#elScale
+        }
+      }
+
+    // register timeline - xAxis
+    this.#Time = new Timeline(this.#core, options)
+    // register chart
+    this.#Chart = new Chart(this.#core, options)
+    // register offChart
+    this.registerOffCharts(options)
+
+    this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE
+    this.#rowMinH = isNumber(this.config.rowMinH)? this.config.rowMinH : ROWMINHEIGHT
+    this.#offChartDefaultH = isNumber(this.config.offChartDefaultH)? this.config.offChartDefaultH : OFFCHARTDEFAULTHEIGHT
+
+    this.rowsOldH = this.rowsH
+
+    this.log(`${this.#name} instantiated`)
+  }
+
+  start() {
+    let i = 0
+
+    // start  timeline, chart, offChart
+    this.#Time.start()
+    this.#Chart.start()
+    this.#OffCharts.forEach((offChart, key) => {
+      offChart.start(i++)
+    })
+    this.rowsOldH = this.rowsH
+
+    // create and start overlays
+    this.createGraph()
+    this.initXGrid()
+
+    renderLoop.init({
+      graphs: [this.#Graph],
+      range: this.range
+    })
+    renderLoop.start()
+    renderLoop.queueFrame(this.range, [this.#Graph], false)
+
+    // set up event listeners
+    this.eventsListen()
+
+    // start State Machine 
+    stateMachineConfig.id = this.id
+    this.stateMachine = stateMachineConfig
+    this.stateMachine.start()
+  }
+
+  end() {
+    this.stateMachine.destroy()
+    this.#Time.end()
+    this.#Chart.end()
+    this.#OffCharts.forEach((offChart, key) => {
+      offChart.end()
+    })
+    this.#viewport.destroy()
+
+    this.#controller.removeEventListener("mousewheel", this.onMouseWheel);
+    this.#controller.removeEventListener("mousemove", this.onMouseMove);
+    this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
+    this.#controller.removeEventListener("mouseout", this.onMouseOut);
+    this.#controller.removeEventListener("drag", this.onChartDrag);
+    this.#controller.removeEventListener("enddrag", this.onChartDragDone);
+    this.#controller.removeEventListener("keydown", this.onChartKeyDown)
+    this.#controller.removeEventListener("keyup", this.onChartKeyDown)
+    this.#controller = null
+
+    this.off(STREAM_NEWVALUE, this.onNewStreamValue)
+    this.off("setRange", this.draw)
+  }
+
+
+  eventsListen() {
+    // Give Main focus so it can receive keyboard input
+    this.#elRows.tabIndex = 0
+    this.#elRows.focus()
+
+    // create controller and use 'on' method to receive input events 
+    this.#controller = new InputController(this.#elRows, {disableContextMenu: false});
+
+    this.#controller.on("keydown", this.onChartKeyDown.bind(this))
+    this.#controller.on("keyup", this.onChartKeyUp.bind(this))
+
+
+    this.#input = new Input(this.#elRows, {disableContextMenu: false});
+
+    this.#input.on("wheel", this.onMouseWheel.bind(this))
+    this.#input.on("pointerdrag", this.onChartDrag.bind(this))
+    this.#input.on("pointerdragend", this.onChartDragDone.bind(this))
+    this.#input.on("pointermove", this.onMouseMove.bind(this))
+    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
+    this.#input.on("pointerout", this.onMouseOut.bind(this));
+
+    // listen/subscribe/watch for parent notifications
+    this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this))
+    this.on("setRange", this.draw.bind(this))
+    this.on("scrollUpdate", this.draw.bind(this))
+    this.on("chart_render", this.draw.bind(this))
+  }
+
+  on(topic, handler, context) {
+    this.#core.on(topic, handler, context)
+  }
+
+  off(topic, handler) {
+    this.#core.off(topic, handler)
+  }
+
+  emit(topic, data) {
+    this.#core.emit(topic, data)
+  }
+
+  onMouseWheel(e) {
+    e.domEvent.preventDefault()
+
+    const direction = Math.sign(e.wheeldelta) * -1
+    const range = this.range
+    const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length)
+    const newEnd = range.indexEnd + Math.ceil(direction * XAXIS_ZOOM * range.Length)
+
+    this.#core.setRange(newStart, newEnd)
+    this.draw(this.range, true)
+  }
+  
+  onMouseMove(e) {
+    this.#cursorPos = [
+      e.position.x, e.position.y, 
+      e.dragstart.x, e.dragstart.y,
+      e.movement.x, e.movement.y
+    ]
+    // console.log("main_mousemove", this.#cursorPos)
+    this.emit("main_mousemove", this.#cursorPos)
+  }
+
+  onMouseEnter(e) {
+    this.core.Timeline.showCursorTime()
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
+    this.core.Chart.graph.render()
+
+    for (let [key, offChart] of this.offCharts) {
+      offChart.graph.overlays.list.get("cursor").layer.visible = true
+      offChart.graph.render()
+    }
+  }
+
+  onMouseOut(e) {
+    this.core.Timeline.hideCursorTime()
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false
+    this.core.Chart.graph.render()
+
+    for (let [key, offChart] of this.offCharts) {
+      offChart.graph.overlays.list.get("cursor").layer.visible = false
+      offChart.graph.render()
+    }
+  }
+
+  onChartDrag(e) {
+    const d = this.#drag
+    if (!d.active) {
+      d.active = true
+      d.start = [e.dragstart.x, e.dragstart.y]
+      d.prev = d.start
+      d.delta = [e.movement.x, e.movement.y]
+    }
+    else {
+      d.delta = [
+        e.position.x - d.prev[0], 
+        e.position.y - d.prev[1]
+      ]
+      d.prev = [
+        e.position.x, 
+        e.position.y
+      ]
+    }
+
+    this.#cursorPos = ("n",[
+      e.position.x, e.position.y, 
+      ...d.start,
+      ...d.delta
+    ])
+
+    // this.#cursorPos = [
+    //   e.position.x, e.position.y, 
+    //   e.dragstart.x, e.dragstart.y,
+    //   e.movement.x, e.movement.y
+    // ]
+    this.emit("chart_pan", this.#cursorPos)
+  }
+
+  onChartDragDone(e) {
+    const d = this.#drag
+    d.active = false
+    d.delta = [
+      e.position.x - d.prev[0], 
+      e.position.y - d.prev[1]
+    ]
+    this.#cursorPos = [
+      e.position.x, e.position.y, 
+      ...d.start,
+      ...d.delta
+    ]
+
+    // this.#cursorPos = [
+    //   e.position.x, e.position.y, 
+    //   e.dragstart.x, e.dragstart.y,
+    //   e.movement.x, e.movement.y
+    // ]
+    this.emit("chart_panDone", this.#cursorPos)
+  }
+
+  onChartKeyDown(e) {
+    let step = (this.candleW > 1) ? this.candleW : 1
+
+    // [x2, y2, x1, y1, xdelta, ydelta]
+    switch (e.keyCode) {
+      case Keys.Left:
+        this.emit("chart_pan", [0,null,step,null,step * -1,null])
+        break;
+      case Keys.Right:
+        this.emit("chart_pan", [step,null,0,null,step,null])
+        break;
+    }
+    // this.draw()
+  }
+
+  onChartKeyUp(e) {
+    let step = (this.candleW > 1) ? this.candleW : 1
+
+    switch (e.keyCode) {
+      case Keys.Left:
+        this.emit("chart_panDone", [0,null,step,null,step * -1,null])
+        break;
+      case Keys.Right:
+        this.emit("chart_panDone", [step,null,0,null,step,null])
+        break;
+    }
+    // this.draw()
+  }
+
+  onNewStreamValue(value) {
+    this.draw()
+  }
+
+  mount(el) {
+    // set up chart scale (yAxis)
+    this.#elYAxis.innerHTML = this.scaleNode(CLASS_CHART)
+    this.#elYAxis.querySelector(`.${CLASS_CHART}`).style.height = "100%"
+    this.#elYAxis.querySelector(`.${CLASS_CHART} tradex-scale`).style.height = "100%"
+  }
+
+  setWidth(w) {
+    // width handled automatically by CSS
+  }
+
+  setHeight(h) {
+    // height handled automatically by CSS
+  }
+
+  setDimensions() {
+    this.#elRows.previousDimensions()
+
+    let resizeH = this.#elRows.heightDeltaR
+    let chartH = Math.round(this.chartH * resizeH)
+    let width = this.rowsW
+    let height = this.rowsH
+    let layerWidth = Math.round(width * ((100 + this.#buffer) * 0.01))
+    let dimensions = {
+      resizeH: resizeH,
+      mainH: this.element.height,
+      mainW: this.element.width,
+      rowsH: this.rowsH,
+      rowsW: this.rowsW,
+    }
+    // set on Chart dimensions
+    if (this.#OffCharts.size == 0 &amp;&amp;
+      chartH != this.#elRows.height) chartH = this.#elRows.height
+
+    this.#core.scrollPos = -1
+
+    this.#Time.setDimensions({w: width})
+    this.#Graph.setSize(width, height, layerWidth)
+    this.#Chart.setDimensions({w: width, h: chartH})
+    this.#OffCharts.forEach((offChart, key) => {
+      chartH = Math.round(offChart.viewport.height * resizeH)
+      offChart.setDimensions({w: width, h: chartH})
+      offChart.Divider.setDividerPos()
+    })
+
+    this.rowsOldH = this.rowsH
+    this.draw(this.range, true)
+
+    this.emit("rowsResize", dimensions)
+  }
+
+  getBufferPx() { 
+    let w = Math.round(this.width * this.buffer / 100) 
+    let r = w % this.candleW
+    return w - r
+  }
+
+  registerOffCharts(options) {
+    // are there any OffCharts to add?
+    if (this.#core.offChart.length === 0) return
+
+    let a = this.#offChartDefaultH * this.#core.offChart.length,
+    offChartsH = ( a / Math.log10( a * 2 ) ) / 100,
+    rowsH = Math.round(this.rowsH * offChartsH);
+
+    options.offChartsH = offChartsH
+
+    if (this.#core.offChart.length === 1) {
+      // adjust chart size for first offChart
+      options.rowH = Math.round(this.rowsH * this.#offChartDefaultH / 100)
+      options.chartH = this.rowsH - options.rowH
+    }
+    else {
+      // adjust chart size for subsequent offCharts
+      options.rowH = Math.round(rowsH / this.#OffCharts.size)
+      options.chartH = this.rowsH - rowsH
+      options.height = options.rowH
+    }
+
+    let p100 = options.chartH / this.rowsH * 100
+    this.#elChart.style.height = `${options.chartH}px`
+    this.#Chart.scale.element.style.height = `${options.chartH}px`
+
+    for (let o of this.#core.offChart) {
+      options.rowY = options.chartH
+      this.addOffChart(o, options)
+      options.rowY = options.chartH + options.rowH
+    }
+  }
+
+  /**
+   * add off chart indicator below chart and any other off charts
+   * @param {object} offChart - data for the indicator
+   * @param {object} options 
+   */
+  addOffChart(offChart, options) {
+    let rowEl, row
+    this.#elRows.insertAdjacentHTML("beforeend", this.#elMain.rowNode(offChart.type, this.#core))
+    rowEl = this.#elRows.lastElementChild
+    this.#elOffCharts.push(rowEl)
+    row = this.#elRows.offChartSlot.assignedElements().slice(-1)[0]
+    row.style.height = `${options.rowH}px`
+    row.style.width = `100%`
+
+    let axisEl, axis
+    this.#elYAxis.insertAdjacentHTML("beforeend", this.scaleNode(offChart.type))
+    axisEl = this.#elYAxis.lastElementChild
+    this.#elYAxisScales.push(axisEl)
+    axis = this.#elYAxis.offChartSlot.assignedElements().slice(-1)[0]
+    axis.style.height = `${options.rowH}px`
+    axis.style.width = `100%`
+
+    options.elements.elTarget = row
+    options.elements.elScale = axis
+    options.offChart = offChart
+    options.name = "OffChart"
+    options.shortName = "offChart"
+
+    let o = new OffChart(this.#core, options)
+    
+    this.#OffCharts.set(o.id, o)
+
+    this.emit("addOffChart", o)
+  }
+
+  addIndicator(ind) {
+    console.log(`Add the ${ind} indicator`)
+
+    // final indicator object
+    const indicator = this.#indicators[ind].ind
+    console.log("indicator:",indicator)
+    // check if we already have indicator data in the chart state
+    // generate indicator data
+    // let instance = new indicator(target, overlay, xAxis, yAxis, config)
+    // instance.calcIndicator(...)
+    // this.addOffChart(instance.overlay.data, options, api)
+    // 
+
+    this.emit("addIndicatorDone", indicator)
+  }
+
+  scaleNode(type) {
+    const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.chart.BorderColour};`
+    const node = `
+    &lt;div slot="offchart" class="viewport ${type}" style="$${styleRow}">&lt;/div>
+  `
+    return node
+  }
+
+  createGraph() {
+    let overlays = copyDeep(defaultOverlays)
+
+    this.#Graph = new Graph(this, this.#elViewport, overlays)
+  }
+
+  initXGrid() {
+    this.draw()
+  }
+
+  draw(range=this.range, update=false) {
+    const graphs = [
+      this.#Graph,
+      this.#Time,
+      this.#Chart
+    ]
+    this.#OffCharts.forEach((offChart, key) => {
+      graphs.push(offChart)
+    })
+
+    renderLoop.queueFrame(
+      this.range, 
+      graphs, 
+      update)
+  }
+
+  updateRange(pos) {
+    this.#core.updateRange(pos)
+    // this.draw()
+  }
+
+  zoomRange() {
+    this.draw(this.range, true)
+  }
+
+  resizeRowPair(divider, pos) {
+    let active = divider.offChart
+    let ID = active.id
+    let offCharts = [...this.#OffCharts.keys()]
+    let i = offCharts.indexOf(ID)
+    let prev = (i == 0) ? 
+      this.#Chart :
+      this.#OffCharts.get(offCharts[i]);
+    // why does activeH need - 1 to calc correct sizing?
+    let activeH = active.height - pos[5] - 1
+    let prevH  = prev.height + pos[5]
+
+    if ( activeH >= this.#rowMinH
+        &amp;&amp; prevH >= this.#rowMinH) {
+          divider.offChart.Divider.updateDividerPos(pos)
+          active.setDimensions({w:undefined, h:activeH})
+          prev.setDimensions({w:undefined, h:prevH})
+    }
+    active.element.style.userSelect = 'none';
+    // active.element.style.pointerEvents = 'none';
+    prev.element.style.userSelect = 'none';
+    // prev.element.style.pointerEvents = 'none';
+
+    return {active, prev}
+  }
+
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Axis.html">Axis</a></li><li><a href="Colour.html">Colour</a></li><li><a href="DMI.module.exports.html">module.exports</a></li><li><a href="EMA.module.exports.html">module.exports</a></li><li><a href="Hit.html">Hit</a></li><li><a href="indicator.html">indicator</a></li><li><a href="Layer.html">Layer</a></li><li><a href="MainPane.html">MainPane</a></li><li><a href="module.exports_module.exports.html">exports</a></li><li><a href="Node.html">Node</a></li><li><a href="RSI.html">RSI</a></li><li><a href="RSI.module.exports.html">module.exports</a></li><li><a href="ScaleBar.html">ScaleBar</a></li><li><a href="Scene.html">Scene</a></li><li><a href="StateMachine.html">StateMachine</a></li><li><a href="ToolsBar.html">ToolsBar</a></li><li><a href="TradeXchart.html">TradeXchart</a></li><li><a href="TradeXchart.module.exports.html">module.exports</a></li><li><a href="Viewport.html">Viewport</a></li><li><a href="WebWorker.html">WebWorker</a></li></ul><h3>Global</h3><ul><li><a href="global.html#addOffChart">addOffChart</a></li><li><a href="global.html#addTool">addTool</a></li><li><a href="global.html#binarySearch">binarySearch</a></li><li><a href="global.html#binarySearchNearest">binarySearchNearest</a></li><li><a href="global.html#bRound">bRound</a></li><li><a href="global.html#calcIndicator">calcIndicator</a></li><li><a href="global.html#calcIndicatorStream">calcIndicatorStream</a></li><li><a href="global.html#calcTextWidth">calcTextWidth</a></li><li><a href="global.html#calcTimeIndex">calcTimeIndex</a></li><li><a href="global.html#CandleType">CandleType</a></li><li><a href="global.html#CHART_MINH">CHART_MINH</a></li><li><a href="global.html#checkType">checkType</a></li><li><a href="global.html#copyDeep">copyDeep</a></li><li><a href="global.html#countDigits">countDigits</a></li><li><a href="global.html#createFont">createFont</a></li><li><a href="global.html#day_start">day_start</a></li><li><a href="global.html#debounce">debounce</a></li><li><a href="global.html#decimalPlaces">decimalPlaces</a></li><li><a href="global.html#destroy">destroy</a></li><li><a href="global.html#detectInterval">detectInterval</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#drawTextBG">drawTextBG</a></li><li><a href="global.html#emit">emit</a></li><li><a href="global.html#end">end</a></li><li><a href="global.html#execute">execute</a></li><li><a href="global.html#firstItemInMap">firstItemInMap</a></li><li><a href="global.html#float2Int">float2Int</a></li><li><a href="global.html#get_day">get_day</a></li><li><a href="global.html#get_month">get_month</a></li><li><a href="global.html#get_year">get_year</a></li><li><a href="global.html#getPixelRatio">getPixelRatio</a></li><li><a href="global.html#getPrecision">getPrecision</a></li><li><a href="global.html#getRandom">getRandom</a></li><li><a href="global.html#getRandomInt">getRandomInt</a></li><li><a href="global.html#getRandomIntBetween">getRandomIntBetween</a></li><li><a href="global.html#getRandomIntInclusive">getRandomIntInclusive</a></li><li><a href="global.html#getTextRectHeight">getTextRectHeight</a></li><li><a href="global.html#getTextRectWidth">getTextRectWidth</a></li><li><a href="global.html#hex">hex</a></li><li><a href="global.html#hexa">hexa</a></li><li><a href="global.html#id">id</a></li><li><a href="global.html#index10">index10</a></li><li><a href="global.html#insertAtIndex">insertAtIndex</a></li><li><a href="global.html#interval2MS">interval2MS</a></li><li><a href="global.html#isArray">isArray</a></li><li><a href="global.html#isBoolean">isBoolean</a></li><li><a href="global.html#isFunction">isFunction</a></li><li><a href="global.html#isNumber">isNumber</a></li><li><a href="global.html#isObject">isObject</a></li><li><a href="global.html#isString">isString</a></li><li><a href="global.html#isValid">isValid</a></li><li><a href="global.html#isValidCandle">isValidCandle</a></li><li><a href="global.html#limit">limit</a></li><li><a href="global.html#loadState">loadState</a></li><li><a href="global.html#log10">log10</a></li><li><a href="global.html#mean">mean</a></li><li><a href="global.html#mergeDeep">mergeDeep</a></li><li><a href="global.html#month_start">month_start</a></li><li><a href="global.html#ms2TimeUnits">ms2TimeUnits</a></li><li><a href="global.html#nearestArrayValue">nearestArrayValue</a></li><li><a href="global.html#nice">nice</a></li><li><a href="global.html#numDigits">numDigits</a></li><li><a href="global.html#numDigits2">numDigits2</a></li><li><a href="global.html#off">off</a></li><li><a href="global.html#on">on</a></li><li><a href="global.html#power">power</a></li><li><a href="global.html#precision">precision</a></li><li><a href="global.html#price2YPos">price2YPos</a></li><li><a href="global.html#refresh">refresh</a></li><li><a href="global.html#renderClosedFillPath">renderClosedFillPath</a></li><li><a href="global.html#renderClosedStrokePath">renderClosedStrokePath</a></li><li><a href="global.html#renderFilledCircle">renderFilledCircle</a></li><li><a href="global.html#renderFilledDiamond">renderFilledDiamond</a></li><li><a href="global.html#renderFilledTriangle">renderFilledTriangle</a></li><li><a href="global.html#renderFillRect">renderFillRect</a></li><li><a href="global.html#renderFillRoundRect">renderFillRoundRect</a></li><li><a href="global.html#renderHorizontalLine">renderHorizontalLine</a></li><li><a href="global.html#renderLine">renderLine</a></li><li><a href="global.html#renderPath">renderPath</a></li><li><a href="global.html#renderRoundRect">renderRoundRect</a></li><li><a href="global.html#renderStrokedCircle">renderStrokedCircle</a></li><li><a href="global.html#renderStrokeFillRoundRect">renderStrokeFillRoundRect</a></li><li><a href="global.html#renderStrokeRoundRect">renderStrokeRoundRect</a></li><li><a href="global.html#renderText">renderText</a></li><li><a href="global.html#renderVerticalLine">renderVerticalLine</a></li><li><a href="global.html#replacer">replacer</a></li><li><a href="global.html#resize">resize</a></li><li><a href="global.html#reviver">reviver</a></li><li><a href="global.html#round">round</a></li><li><a href="global.html#saveState">saveState</a></li><li><a href="global.html#setDimensions">setDimensions</a></li><li><a href="global.html#setHex">setHex</a></li><li><a href="global.html#setHSLA">setHSLA</a></li><li><a href="global.html#setPriceVolumePrecision">setPriceVolumePrecision</a></li><li><a href="global.html#setRGBA">setRGBA</a></li><li><a href="global.html#start">start</a></li><li><a href="global.html#stop">stop</a></li><li><a href="global.html#throttle">throttle</a></li><li><a href="global.html#time2XPos">time2XPos</a></li><li><a href="global.html#timestampDifference">timestampDifference</a></li><li><a href="global.html#updateLegends">updateLegends</a></li><li><a href="global.html#updateRange">updateRange</a></li><li><a href="global.html#validateConfig">validateConfig</a></li><li><a href="global.html#validateShallow">validateShallow</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#weave">weave</a></li><li><a href="global.html#YAxisPosition">YAxisPosition</a></li><li><a href="global.html#YAxisType">YAxisType</a></li><li><a href="global.html#year_start">year_start</a></li><li><a href="global.html#zoomRange">zoomRange</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Sat Mar 11 2023 22:32:46 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

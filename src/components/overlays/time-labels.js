@@ -11,6 +11,7 @@ export default class timeLabels {
   #target
   #scene
   #cursorPos = [0,0]
+  #xAxisGrads
 
   constructor(target, xAxis=false, yAxis=false, theme, parent) {
 
@@ -21,6 +22,7 @@ export default class timeLabels {
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#core = parent.core
+    this.#xAxisGrads = this.#xAxis.xAxisGrads
   }
 
   draw() {

@@ -215,7 +215,6 @@ export function insertAtIndex(index, key, value, map){
 /**
  * Map() index handlers
  * @param {*} map 
- * @returns 
  */
 export const firstItemInMap = map => map.entries().next().value
 export const firstKeyInMap = map => map.entries().next().value[0]

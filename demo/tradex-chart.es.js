@@ -209,6 +209,7 @@ const dayCntInc = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
 const dayCntLeapInc = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
 const monthDayCnt = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
 const BTCGENESIS = 1231006505000;
+const MILLISECOND = 1;
 const SECOND_MS = 1000;
 const MINUTE_MS = SECOND_MS*60;
 const HOUR_MS = MINUTE_MS*60;
@@ -229,6 +230,7 @@ const TIMEUNITSVALUESSHORT = {
   h: HOUR_MS,
   m: MINUTE_MS,
   s: SECOND_MS,
+  u: MILLISECOND
 };
 const TIMEUNITSVALUESLONG = {
   years: YEAR_MS,
@@ -238,8 +240,91 @@ const TIMEUNITSVALUESLONG = {
   hours: HOUR_MS,
   minutes: MINUTE_MS,
   seconds: SECOND_MS,
+  milliseconds: MILLISECOND
 };
 const TIMEUNITSVALUES = { ...TIMEUNITSVALUESSHORT, ...TIMEUNITSVALUESLONG };
+const TIMESCALES = [
+  YEAR_MS * 10,
+  YEAR_MS * 5,
+  YEAR_MS * 3,
+  YEAR_MS * 2,
+  YEAR_MS,
+  MONTHR_MS * 6,
+  MONTHR_MS * 4,
+  MONTHR_MS * 3,
+  MONTHR_MS * 2,
+  MONTHR_MS,
+  DAY_MS * 15,
+  DAY_MS * 10,
+  DAY_MS * 7,
+  DAY_MS * 5,
+  DAY_MS * 3,
+  DAY_MS * 2,
+  DAY_MS,
+  HOUR_MS * 12,
+  HOUR_MS * 6,
+  HOUR_MS * 4,
+  HOUR_MS * 2,
+  HOUR_MS,
+  MINUTE_MS * 30,
+  MINUTE_MS * 15,
+  MINUTE_MS * 10,
+  MINUTE_MS * 5,
+  MINUTE_MS * 2,
+  MINUTE_MS,
+  SECOND_MS * 30,
+  SECOND_MS * 15,
+  SECOND_MS * 10,
+  SECOND_MS * 5,
+  SECOND_MS * 2,
+  SECOND_MS,
+  MILLISECOND * 500,
+  MILLISECOND * 250,
+  MILLISECOND * 100,
+  MILLISECOND * 50,
+  MILLISECOND,
+];
+const TIMESCALESRANK = [
+  "years",
+  "years",
+  "years",
+  "years",
+  "years",
+  "months",
+  "months",
+  "months",
+  "months",
+  "months",
+  "years",
+  "days",
+  "days",
+  "days",
+  "days",
+  "days",
+  "days",
+  "hours",
+  "hours",
+  "hours",
+  "hours",
+  "hours",
+  "minutes",
+  "minutes",
+  "minutes",
+  "minutes",
+  "minutes",
+  "minutes",
+  "seconds",
+  "seconds",
+  "seconds",
+  "seconds",
+  "seconds",
+  "seconds",
+  "milliseconds",
+  "milliseconds",
+  "milliseconds",
+  "milliseconds",
+  "milliseconds",
+ ];
 const timezones = {
   0: 'Europe/London',
   '-120': 'Europe/Tallinn',
@@ -510,6 +595,51 @@ function dayOfYear(t) {
   if(mn > 1 && isLeapYear()) dayOfYear++;
   return dayOfYear;
 }
+function time_start (t, unit) {
+  const findStart = {
+    years: (t) => year_start(t),
+    months: (t) => month_start(t),
+    weeks: (t) => day_start(t),
+    days: (t) => day_start(t),
+    hours: (t) => hour_start(t),
+    minutes: (t) => minute_start(t),
+    seconds: (t) => second_start(t),
+  };
+  return findStart[unit](t)
+}
+function unitRange (ts, tf) {
+  let start, end;
+  switch(tf) {
+    case "years" :
+      start = year_start(ts);
+      end = nextYear(ts);
+      break;
+    case "months" :
+      start = month_start(ts);
+      end = nextMonth(ts);
+      break;
+    case "weeks" :
+      start = day_start(ts);
+      end = start + DAY_MS;
+      break;
+    case "days" :
+      start = day_start(ts);
+      end = start + DAY_MS;
+      break;
+    case "hours" :
+      start = hour_start(ts);
+      end = start + HOUR_MS;
+      break;
+    case "minutes" :
+      start = minute_start(ts);
+      end = start + MINUTE_MS;
+      break;
+    case "seconds" :
+      start = second_start(ts);
+      end = start + SECOND_MS;
+  }
+  return {start, end}
+}
 
 var Time = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
@@ -519,6 +649,7 @@ var Time = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   dayCntLeapInc: dayCntLeapInc,
   monthDayCnt: monthDayCnt,
   BTCGENESIS: BTCGENESIS,
+  MILLISECOND: MILLISECOND,
   SECOND_MS: SECOND_MS,
   MINUTE_MS: MINUTE_MS,
   HOUR_MS: HOUR_MS,
@@ -530,6 +661,8 @@ var Time = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   TIMEUNITSVALUESSHORT: TIMEUNITSVALUESSHORT,
   TIMEUNITSVALUESLONG: TIMEUNITSVALUESLONG,
   TIMEUNITSVALUES: TIMEUNITSVALUES,
+  TIMESCALES: TIMESCALES,
+  TIMESCALESRANK: TIMESCALESRANK,
   timezones: timezones,
   getTimezone: getTimezone,
   buildSubGrads: buildSubGrads,
@@ -558,7 +691,9 @@ var Time = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   year_start: year_start,
   nextYear: nextYear,
   isLeapYear: isLeapYear,
-  dayOfYear: dayOfYear
+  dayOfYear: dayOfYear,
+  time_start: time_start,
+  unitRange: unitRange
 }, Symbol.toStringTag, { value: 'Module' }));
 
 function getRandomIntBetween(min, max) {
@@ -657,6 +792,10 @@ function isArrayEqual(a1, a2) {
   }
   return true
 }
+const firstItemInMap = map => map.entries().next().value;
+const firstKeyInMap = map => map.entries().next().value[0];
+const firstValueInMap = map => map.entries().next().value[1];
+const lastKeyInMap = map => Array.from(map.keys()).pop();
  function debounce(fn, wait=100, scope, immediate=false) {
   var timeout;
   var core = function() {
@@ -761,14 +900,14 @@ const DEFAULT_TIMEFRAME = "1m";
 const DEFAULT_TIMEFRAMEMS = DEFAULT_TIMEINTERVAL;
 const PRICEDIGITS$1 = 6;
 const XAXIS_ZOOM = 0.05;
+const XAXIS_STEP = 100;
 const YAXIS_STEP = 100;
 const YAXIS_TYPES$1 = ["default", "percent", "log"];
-const YAXIS_BOUNDS = 0.005;
+const YAXIS_BOUNDS = 0.01;
 const LIMITFUTURE = 200;
 const LIMITPAST = 200;
 const MINCANDLES = 20;
 const MAXCANDLES = 4096;
-const MAXGRADSPER = 75;
 const BUFFERSIZE$1 = 5;
 const ROWMINHEIGHT = 50;
 const OFFCHARTDEFAULTHEIGHT = 30;
@@ -812,13 +951,12 @@ class Range$1 {
     this.maxCandles = (isNumber(this.config?.maxCandles)) ? this.config.maxCandles : MAXCANDLES;
     this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS;
     this.#core = config.core;
-    const MaxMinPriceVolStr = `
+    `
     (input) => {
       return maxMinPriceVol(input)
     }
     function ${this.maxMinPriceVol.toString()}
   `;
-    this.#worker = this.#core.worker.create("range", MaxMinPriceVolStr, undefined, this.#core);
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS;
     if (allData.data.length == 0) {
       let ts = Date.now();
@@ -879,22 +1017,9 @@ class Range$1 {
     this.indexStart = start;
     this.indexEnd = end;
     inOut -= this.Length;
-    if (this.#init) {
-      this.#init = false;
-      let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this});
-      this.setMaxMin(maxMin);
-      return true
-    }
-    this.#worker.postMessage({data: this.data, start: start, end: end, that: this})
-    .then(maxMin => {
-      this.setMaxMin(maxMin);
-      if (this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
-        this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin]);
-      }
-      this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd]);
-      this.#core.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut]);
-      this.#core.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd]);
-    });
+    let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this});
+    this.setMaxMin(maxMin);
+    this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd]);
     return true
   }
   setMaxMin(maxMin) {
@@ -951,8 +1076,11 @@ class Range$1 {
   rangeIndex (ts) { return this.getTimeIndex(ts) - this.indexStart }
    maxMinPriceVol ( input ) {
     let {data, start, end, that} = {...input};
-    start = (typeof start === "number")? start : 0;
-    end = (typeof end === "number")? end : data?.length-1;
+    let buffer = bRound(this.#core.bufferPx / this.#core.candleW);
+    buffer = (isNumber(buffer)) ? buffer : 0;
+    start = (isNumber(start)) ? start - buffer : 0;
+    start = (start > 0) ? start : 0;
+    end = (typeof end === "number") ? end : data?.length-1;
     if (data.length == 0) {
       return {
         valueMin: 0,
@@ -994,8 +1122,11 @@ class Range$1 {
         volumeMaxIdx = i;
       }
     }
-    valueMin *= (1 - that.yAxisBounds);
-    valueMax *= (1 + that.yAxisBounds);
+    let diff = valueMax - valueMin;
+    valueMin -= diff * 0.1;
+    valueMin = (valueMin > 0) ? valueMin : 0;
+    valueMax += diff * 0.1;
+    diff = valueMax - valueMin;
     return {
       valueMin: valueMin,
       valueMax: valueMax,
@@ -1010,6 +1141,23 @@ class Range$1 {
     }
     function limit(val, min, max) {
       return Math.min(max, Math.max(min, val));
+    }
+  }
+  snapshot(start, end) {
+    return {
+      constructor: {name: "RangeSnapshot"},
+      ts: Date.now(),
+      data: this.data,
+      dataLength: this.dataLength,
+      Length: this.Length,
+      timeDuration: this.timeDuration,
+      timeMin: this.timeMin,
+      timeMax: this.timeMax,
+      rangeDuration: this.rangeDuration,
+      timeStart: this.timeStart,
+      timeFinish: this.timeFinish,
+      interval: this.interval,
+      intervalStr: this.intervalStr
     }
   }
 }
@@ -1164,6 +1312,7 @@ class StateMachine {
   get core() { return this.#core }
   get status() { return this.#status }
   get event() { return this.#event }
+  get events() { return this.#events }
   get eventData() { return this.#eventData }
   get actions() { return this.#actions }
   notify(event, data) {
@@ -1278,7 +1427,6 @@ const NAME = "TradeX-Chart";
 const ID = "TradeXChart";
 const CLASS_UTILS     = "tradeXutils";
 const CLASS_TOOLS     = "tradeXtools";
-const CLASS_CHART     = "tradeXchart";
 const CLASS_MENUS     = "tradeXmenus";
 const CLASS_MENU      = "tradeXmenu";
 const CLASS_DIVIDERS  = "tradeXdividers";
@@ -1894,6 +2042,7 @@ class indicator {
     return input
   }
   calcIndicator (indicator, params) {
+    if (!this.core.TALibReady) return false
     this.overlay.data = [];
     let step = this.calcParams[0];
     if (this.range.Length < step) return false
@@ -1914,6 +2063,7 @@ class indicator {
     return true
   }
   calcIndicatorStream (indicator, params) {
+    if (!this.core.TALibReady) return false
     let entry = this.TALib[indicator](params);
     let end = this.range.dataLength;
     let time = this.range.value(end)[0];
@@ -2392,9 +2542,357 @@ class element extends HTMLElement {
   }
 }
 
-class Viewport {
+class Node$1 {
+    constructor(cfg={}) {
+      this.container = cfg.container;
+      this.layers = [];
+      this.id = CEL$1.idCnt++;
+      this.scene = new CEL$1.Scene();
+      this.setSize(cfg.width || 0, cfg.height || 0);
+    }
+    setSize(width, height) {
+      this.width = width;
+      this.height = height;
+      this.scene.setSize(width, height);
+      this.layers.forEach(function (layer) {
+        layer.setSize(width, height);
+      });
+      return this;
+    }
+    addLayer(layer) {
+      this.layers.push(layer);
+      layer.setSize(layer.width || this.width, layer.height || this.height);
+      layer.viewport = this;
+      return this;
+    }
+    getIntersection(x, y) {
+      var layers = this.layers,
+        len = layers.length,
+        n = len - 1,
+        layer,
+        key;
+      while (n >= 0) {
+        layer = layers[n];
+        key = layer.hit.getIntersection(x, y);
+        if (key >= 0) {
+          return key;
+        }
+        n--;
+      }
+      return -1;
+    }
+    get index() {
+      let viewports = CEL$1.viewports,
+        viewport,
+        n = 0;
+      for (viewport of viewports) {
+        if (this.id === viewport.id) return n;
+        n++;
+      }
+      return null;
+    }
+    destroy() {
+      for (let layer of this.layers) {
+        layer.remove();
+      }
+    }
+    render(all=false) {
+      let scene = this.scene,
+        layers = this.layers,
+        layer;
+      scene.clear();
+      for (layer of layers) {
+        if (all && layer.layers.length > 0) layer.render(all);
+        if (layer.visible)
+          scene.context.drawImage(
+            layer.scene.canvas,
+            layer.x,
+            layer.y,
+            layer.width,
+            layer.height
+          );
+      }
+    }
+  }
+class Viewport$1 extends Node$1 {
+  constructor(cfg={}) {
+    super(cfg);
+    cfg.container.innerHTML = "";
+    cfg.container.appendChild(this.scene.canvas);
+    CEL$1.viewports.push(this);
+  }
+  destroy() {
+    super.destroy();
+    this.container.innerHTML = "";
+    CEL$1.viewports.splice(this.index, 1);
+  }
+}
+class Layer$1 {
+  x = 0;
+  y = 0;
+  width = 0;
+  height = 0;
+  visible = true;
+  constructor(cfg={}) {
+    this.id = CEL$1.idCnt++;
+    this.hit = new CEL$1.Hit({
+      contextType: cfg.contextType,
+    });
+    this.scene = new CEL$1.Scene({
+      contextType: cfg.contextType,
+    });
+    if (cfg.x && cfg.y) {
+      this.setPosition(cfg.x, cfg.y);
+    }
+    if (cfg.width && cfg.height) {
+      this.setSize(cfg.width, cfg.height);
+    }
+  }
+  get index() {
+    let layers = this.viewport.layers;
+      layers.length;
+      let n = 0,
+      layer;
+    for (layer of layers) {
+      if (this.id === layer.id) return n;
+      n++;
+    }
+    return null;
+  }
+  setPosition(x, y) {
+    this.x = x;
+    this.y = y;
+    return this;
+  }
+  setSize(width, height) {
+    this.width = width;
+    this.height = height;
+    this.scene.setSize(width, height);
+    this.hit.setSize(width, height);
+    return this;
+  }
+  move(pos) {
+    let index = this.index,
+      viewport = this.viewport,
+      layers = viewport.layers;
+    switch (pos) {
+      case "up":
+    if (index < layers.length - 1) {
+      layers[index] = layers[index + 1];
+      layers[index + 1] = this;
+    }
+        break;
+      case "down":
+        if (index > 0) {
+          layers[index] = layers[index - 1];
+          layers[index - 1] = this;
+        }
+        break;
+      case "top":
+        layers.splice(index, 1);
+        layers.push(this);
+        break;
+      case "bottom":
+        layers.splice(index, 1);
+        layers.unshift(this);
+        break;
+    }
+    return this;
+  }
+  moveUp() {
+    return this.move("up")
+  }
+  moveDown() {
+    return this.move("down")
+  }
+  moveTop() {
+    return this.move("top")
+  }
+  moveBottom() {
+    return this.move("bottom")
+  }
+  remove() {
+    this.viewport.layers.splice(this.index, 1);
+  }
+}
+class Scene$1 {
+  width = 0;
+  height = 0;
   constructor(cfg) {
     if (!cfg) cfg = {};
+    this.id = CEL$1.idCnt++;
+    this.contextType = cfg.contextType || "2d";
+    this.canvas = document.createElement("canvas");
+    this.canvas.className = "scene-canvas";
+    this.canvas.style.display = "block";
+    this.context = this.canvas.getContext(this.contextType);
+    if (cfg.width && cfg.height) {
+      this.setSize(cfg.width, cfg.height);
+    }
+  }
+  setSize(width, height) {
+    this.width = width;
+    this.height = height;
+    this.canvas.width = width * CEL$1.pixelRatio;
+    this.canvas.style.width = `${width}px`;
+    this.canvas.height = height * CEL$1.pixelRatio;
+    this.canvas.style.height = `${height}px`;
+    if (this.contextType === "2d" && CEL$1.pixelRatio !== 1) {
+      this.context.scale(CEL$1.pixelRatio, CEL$1.pixelRatio);
+    }
+    return this;
+  }
+  clear() {
+    let context = this.context;
+    if (this.contextType === "2d") {
+      context.clearRect(
+        0,
+        0,
+        this.width * CEL$1.pixelRatio,
+        this.height * CEL$1.pixelRatio
+      );
+    }
+    else {
+      context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+    }
+    return this;
+  }
+  toImage(type = "image/png", quality, cb) {
+    let that = this,
+      imageObj = new Image(),
+      dataURL = this.canvas.toDataURL(type, quality);
+    imageObj.onload = function () {
+      imageObj.width = that.width;
+      imageObj.height = that.height;
+      cb(imageObj);
+    };
+    imageObj.src = dataURL;
+  }
+  export(cfg, cb, type = "image/png", quality) {
+    if (typeof cb !== "function") cb = this.blobCallback.bind({ cfg: cfg });
+    this.canvas.toBlob(cb, type, quality);
+  }
+  blobCallback(blob) {
+    let anchor = document.createElement("a"),
+      dataUrl = URL.createObjectURL(blob),
+      fileName = this.cfg.fileName || "canvas.png";
+    anchor.setAttribute("href", dataUrl);
+    anchor.setAttribute("target", "_blank");
+    anchor.setAttribute("export", fileName);
+    if (document.createEvent) {
+      Object.assign(document.createElement("a"), {
+        href: dataUrl,
+        target: "_blank",
+        export: fileName,
+      }).click();
+    } else if (anchor.click) {
+      anchor.click();
+    }
+  }
+}
+class Hit$1 {
+  width = 0;
+  height = 0;
+  constructor(cfg) {
+    if (!cfg) cfg = {};
+    this.contextType = cfg.contextType || "2d";
+    this.canvas = document.createElement("canvas");
+    this.canvas.className = "hit-canvas";
+    this.canvas.style.display = "none";
+    this.canvas.style.position = "relative";
+    this.context = this.canvas.getContext(this.contextType, {
+      preserveDrawingBuffer: true,
+      antialias: false,
+    });
+    if (cfg.width && cfg.height) {
+      this.setSize(cfg.width, cfg.height);
+    }
+  }
+  setSize(width, height) {
+    this.width = width;
+    this.height = height;
+    this.canvas.width = width * CEL$1.pixelRatio;
+    this.canvas.style.width = `${width}px`;
+    this.canvas.height = height * CEL$1.pixelRatio;
+    this.canvas.style.height = `${height}px`;
+    return this;
+  }
+  clear() {
+    let context = this.context;
+    if (this.contextType === "2d") {
+      context.clearRect(
+        0,
+        0,
+        this.width * CEL$1.pixelRatio,
+        this.height * CEL$1.pixelRatio
+      );
+    }
+    else {
+      context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+    }
+    return this;
+  }
+  getIntersection(x, y) {
+    let context = this.context,
+      data;
+    x = Math.round(x);
+    y = Math.round(y);
+    if (x < 0 || y < 0 || x > this.width || y > this.height) {
+      return -1;
+    }
+    if (this.contextType === "2d") {
+      data = context.getImageData(x, y, 1, 1).data;
+      if (data[3] < 255) {
+        return -1;
+      }
+    }
+    else {
+      data = new Uint8Array(4);
+      context.readPixels(
+        x * CEL$1.pixelRatio,
+        (this.height - y - 1) * CEL$1.pixelRatio,
+        1,
+        1,
+        context.RGBA,
+        context.UNSIGNED_BYTE,
+        data
+      );
+      if (data[0] === 255 && data[1] === 255 && data[2] === 255) {
+        return -1;
+      }
+    }
+    return this.rgbToInt(data);
+  }
+  getColorFromIndex(index) {
+    let rgb = this.intToRGB(index);
+    return "rgb(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ")";
+  }
+  rgbToInt(rgb) {
+    let r = rgb[0];
+    let g = rgb[1];
+    let b = rgb[2];
+    return (r << 16) + (g << 8) + b;
+  }
+  intToRGB(number) {
+    let r = (number & 0xff0000) >> 16;
+    let g = (number & 0x00ff00) >> 8;
+    let b = number & 0x0000ff;
+    return [r, g, b];
+  }
+}
+const CEL$1 = {
+  idCnt: 0,
+  viewports: [],
+  pixelRatio: (window && window.devicePixelRatio) || 1,
+  Node: Node$1,
+  Viewport: Viewport$1,
+  Layer: Layer$1,
+  Scene: Scene$1,
+  Hit: Hit$1,
+};
+
+class Viewport {
+  constructor(cfg={}) {
     this.container = cfg.container;
     this.layers = [];
     this.id = CEL.idCnt++;
@@ -2435,7 +2933,7 @@ class Viewport {
     }
     return -1;
   }
-  getIndex() {
+  get index() {
     let viewports = CEL.viewports,
       viewport,
       n = 0;
@@ -2446,11 +2944,11 @@ class Viewport {
     return null;
   }
   destroy() {
-    for (let layer of layers) {
+    for (let layer of this.layers) {
       layer.remove();
     }
     this.container.innerHTML = "";
-    CEL.viewports.splice(this.getIndex(), 1);
+    CEL.viewports.splice(this.index, 1);
   }
   render() {
     let scene = this.scene,
@@ -2475,8 +2973,7 @@ class Layer {
   width = 0;
   height = 0;
   visible = true;
-  constructor(cfg) {
-    if (!cfg) cfg = {};
+  constructor(cfg={}) {
     this.id = CEL.idCnt++;
     this.hit = new CEL.Hit({
       contextType: cfg.contextType,
@@ -2491,6 +2988,17 @@ class Layer {
       this.setSize(cfg.width, cfg.height);
     }
   }
+  get index() {
+    let layers = this.viewport.layers;
+      layers.length;
+      let n = 0,
+      layer;
+    for (layer of layers) {
+      if (this.id === layer.id) return n;
+      n++;
+    }
+    return null;
+  }
   setPosition(x, y) {
     this.x = x;
     this.y = y;
@@ -2503,54 +3011,48 @@ class Layer {
     this.hit.setSize(width, height);
     return this;
   }
-  moveUp() {
-    let index = this.getIndex(),
+  move(pos) {
+    let index = this.index,
       viewport = this.viewport,
       layers = viewport.layers;
+    switch (pos) {
+      case "up":
     if (index < layers.length - 1) {
       layers[index] = layers[index + 1];
       layers[index + 1] = this;
     }
+        break;
+      case "down":
+        if (index > 0) {
+          layers[index] = layers[index - 1];
+          layers[index - 1] = this;
+        }
+        break;
+      case "top":
+        layers.splice(index, 1);
+        layers.push(this);
+        break;
+      case "bottom":
+        layers.splice(index, 1);
+        layers.unshift(this);
+        break;
+    }
     return this;
+  }
+  moveUp() {
+    return this.move("up")
   }
   moveDown() {
-    let index = this.getIndex(),
-      viewport = this.viewport,
-      layers = viewport.layers;
-    if (index > 0) {
-      layers[index] = layers[index - 1];
-      layers[index - 1] = this;
-    }
-    return this;
+    return this.move("down")
   }
   moveTop() {
-    let index = this.getIndex(),
-      viewport = this.viewport,
-      layers = viewport.layers;
-    layers.splice(index, 1);
-    layers.push(this);
+    return this.move("top")
   }
   moveBottom() {
-    let index = this.getIndex(),
-      viewport = this.viewport,
-      layers = viewport.layers;
-    layers.splice(index, 1);
-    layers.unshift(this);
-    return this;
-  }
-  getIndex() {
-    let layers = this.viewport.layers;
-      layers.length;
-      let n = 0,
-      layer;
-    for (layer of layers) {
-      if (this.id === layer.id) return n;
-      n++;
-    }
-    return null;
+    return this.move("bottom")
   }
   remove() {
-    this.viewport.layers.splice(this.getIndex(), 1);
+    this.viewport.layers.splice(this.index, 1);
   }
 }
 class Scene {
@@ -2821,12 +3323,12 @@ class chartGrid {
     axes = axes || this.#config.axes;
     this.#scene.clear();
     if (axes == "none") return
-    const xGrads = this.xAxis.xAxisGrads.values;
     const ctx = this.#scene.context;
     ctx.save();
     ctx.strokeStyle = this.#core.theme.chart.GridColour || GridStyle.COLOUR_GRID;
     if (axes != "y") {
       const offset = this.xAxis.smoothScrollOffset || 0;
+      const xGrads = this.xAxis.xAxisGrads.values;
       for (let tick of xGrads) {
         let x = bRound(tick[1]);
         ctx.beginPath();
@@ -2848,20 +3350,8 @@ class chartGrid {
     ctx.restore();
   }
   drawX() {
-    this.#scene.clear();
-    const xGrads = this.xAxis.xAxisGrads.values;
-    const ctx = this.#scene.context;
-    ctx.save();
-    ctx.strokeStyle = this.#core.theme.chart.GridColour || GridStyle.COLOUR_GRID;
-    const offset = this.xAxis.smoothScrollOffset || 0;
-    for (let tick of xGrads) {
-      let x = bRound(tick[1]);
-      ctx.beginPath();
-      ctx.moveTo(x + offset, 0);
-      ctx.lineTo(x + offset, this.#scene.height);
-      ctx.stroke();
-    }
-    ctx.restore();
+    this.draw("x");
+    return
   }
 }
 
@@ -2875,6 +3365,7 @@ class chartCursor {
   #target
   #scene
   #cursorPos = [0,0]
+  #update = true
   constructor(target, xAxis=false, yAxis=false, theme, parent) {
     this.#target = target;
     this.#scene = target.scene;
@@ -2892,18 +3383,22 @@ class chartCursor {
   get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
   get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set position(p) { return }
+  get update() { return this.#update }
   onMouseDragX(e) {
     this.#cursorPos[0] = e[0];
     this.draw(true);
+    this.#core.emit("chart_render");
   }
   onMouseMoveX(e) {
     this.#cursorPos[0] = e[0];
     this.draw();
+    this.#core.emit("chart_render");
   }
   onMouseMove(e) {
     this.#cursorPos[0] = e[0];
     this.#cursorPos[1] = e[1];
     this.draw();
+    this.#core.emit("chart_render");
   }
   draw(drag = false) {
     let x = this.#cursorPos[0];
@@ -2927,11 +3422,10 @@ class chartCursor {
       ctx.stroke();
     }
     ctx.restore();
-    this.#target.viewport.render();
   }
 }
 
-const defaultOverlays$2 = [
+const defaultOverlays$4 = [
   ["grid", {class: chartGrid, fixed: true}],
   ["cursor", {class: chartCursor, fixed: true}]
 ];
@@ -2946,14 +3440,14 @@ class graph {
   #elCanvas
   #elViewport
   #layerWidth
-  constructor(parent, elViewport, overlays) {
+  constructor(parent, elViewport, overlays, node=false) {
     this.#parent = parent;
     this.#core = parent.core;
     this.#config = this.core.config;
     this.#theme = this.core.theme;
     this.#elparent = this.#parent.element;
     this.#elViewport = elViewport;
-    this.createViewport(overlays);
+    this.createViewport(overlays, node);
   }
   get parent() { return this.#parent }
   get core() { return this.#core }
@@ -2992,10 +3486,11 @@ class graph {
       overlay.layer.setSize(lw, h);
     }
   }
-  createViewport(overlays=[]) {
-    overlays = (overlays.length == 0) ? copyDeep(defaultOverlays$2) : overlays;
+  createViewport(overlays=[], node=false) {
+    overlays = (overlays.length == 0) ? copyDeep(defaultOverlays$4) : overlays;
     const {width, height} = this.layerConfig();
-    this.#viewport = new CEL.Viewport({
+    let viewport = (node) ? CEL$1.Node : CEL$1.Viewport;
+    this.#viewport = new viewport({
       width: width,
       height: height,
       container: this.#elViewport
@@ -3020,7 +3515,6 @@ class graph {
   draw(range=this.range, update=false) {
     const oList = this.#overlays.list;
     for (let [key, overlay] of oList) {
-      overlay.instance.position = [this.#core.scrollPos, 0];
       if (this.#core.scrollPos == this.#core.bufferPx * -1 ||
           this.#core.scrollPos == 0 ||
           update == true)
@@ -3030,8 +3524,8 @@ class graph {
       else if (this.#parent.streamCandle) {
         oList.get("stream").instance.draw();
       }
+      overlay.instance.position = [this.#core.scrollPos, 0];
     }
-    this.#viewport.render();
   }
   render() {
     this.#viewport.render();
@@ -3577,6 +4071,13 @@ window.customElements.define('tradex-time', tradeXTime);
 
 const template$a = document.createElement('template');
 template$a.innerHTML = `
+<style>
+  .viewport {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+</style>
   <div class="viewport"></div>
 `;
 class tradeXGrid extends element {
@@ -3804,10 +4305,18 @@ template$6.innerHTML = `
 <slot name="offchart" id="offchart"></slot>
 `;
 class tradeXRows extends element {
+  #oWidth
+  #oHeight
+  #widthCache
+  #heightCache
   constructor () {
     super(template$6);
   }
   destroy() {
+  }
+  connectedCallback() {
+    super.connectedCallback();
+    this.previousDimensions();
   }
   disconnectedCallback() {
   }
@@ -3815,12 +4324,35 @@ class tradeXRows extends element {
   get onChart() { return this.shadowRoot.querySelector('tradex-onchart') }
   get offCharts() { return this.shadowRoot.querySelectorAll('tradex-offchart') }
   get offChartSlot() { return this.shadowRoot.querySelector('#offchart') }
+  get width() { return this.clientWidth }
+  get height() { return this.clientHeight }
+  get oWidth() { return this.#oWidth }
+  get oHeight() { return this.#oHeight }
+  get widthDeltaR() { return this.clientWidth / this.#oWidth }
+  get heightDeltaR() { return this.clientHeight / this.#oHeight }
+  previousDimensions() {
+    this.#oWidth = (this.#widthCache) ? this.#widthCache : this.clientWidth;
+    this.#oHeight = (this.#heightCache) ? this.#heightCache : this.clientHeight;
+    this.#widthCache = this.clientWidth;
+    this.#heightCache = this.clientHeight;
+  }
 }
 window.customElements.define('tradex-rows', tradeXRows);
 
 const template$5 = document.createElement('template');
 template$5.innerHTML = `
 <style>
+  #viewport {
+    position: absolute;
+    width: 100%;
+    height: inherit;
+    background: var(--txc-onchart-background, none);
+    z-index: 0;
+  }
+  #viewport canvas {
+    position: absolute;
+    top: 1px;
+  }
   tradex-rows {
     overflow: hidden;
     width: calc(100% - ${SCALEW}px);
@@ -3829,12 +4361,15 @@ template$5.innerHTML = `
     border-color: var(--txc-border-color, ${GlobalStyle.COLOUR_BORDER}); 
   }
   tradex-time {
+    position: relative;
     width: calc(100% - ${SCALEW}px);
     height: ${TIMEH}px;
     overflow: hidden;
     margin-left: 1px;
+    z-index: 1;
   }
 </style>
+<div id="viewport"></div>
 <tradex-rows></tradex-rows>
 <tradex-time></tradex-time>
 `;
@@ -3847,6 +4382,7 @@ class tradeXMain extends element {
   }
   disconnectedCallback() {
   }
+  get viewport() { return this.shadowRoot.querySelector('#viewport') }
   get rows() { return this.shadowRoot.querySelector('tradex-rows') }
   get time() { return this.shadowRoot.querySelector('tradex-time') }
   rowNode(type, api) {
@@ -4021,9 +4557,13 @@ class tradeXChart extends element {
   #elBody
   #elUtils
   #elWidgets
+  #template
+  #chartW = CHART_MINW
+  #chartH = CHART_MINH
   #oWidth
   #oHeight
-  #template
+  #widthCache
+  #heightCache
   constructor () {
     const template = document.createElement('template');
           template.innerHTML = HTML;
@@ -4084,15 +4624,20 @@ class tradeXChart extends element {
         this.removeAttribute('disabled');
     }
   }
+  get width() { return this.offsetWidth }
+  set width(w) { this.setWidth(w); }
+  get height() { return this.offsetHeight }
+  set height(h) { this.setHeight(h); }
   get oWidth() { return this.#oWidth }
   get oHeight() { return this.#oHeight }
+  get widthDeltaR() { return this.offsetWidth / this.#oWidth }
+  get heightDeltaR() { return this.offsetHeight / this.#oHeight }
   get stream() {  }
   set stream(s) {  }
   get body() { return this.#elBody }
   get utils() { return this.#elUtils }
   get widgets() { return this.#elWidgets }
   onResized(entries) {
-    window.requestAnimationFrame(() => {
       console.log("onResize");
       console.log(this.offsetWidth);
       console.log(this.offsetHeight);
@@ -4100,11 +4645,62 @@ class tradeXChart extends element {
         this.previousDimensions();
         this.emit("global_resize", {w: this.offsetWidth, h: this.offsetHeight});
       }
-    });
   }
   previousDimensions() {
-    this.#oWidth = this.offsetWidth;
-    this.#oHeight = this.offsetHeight;
+    this.#oWidth = (this.#widthCache) ? this.#widthCache : this.offsetWidth;
+    this.#oHeight = (this.#heightCache) ? this.#heightCache : this.offsetHeight;
+    this.#widthCache = this.offsetWidth;
+    this.#heightCache = this.offsetHeight;
+  }
+  setWidth(w) {
+    if (isNumber(w)) {
+      this.#chartW = w;
+      w += "px";
+    }
+    else if (isString(w)) ;
+    else {
+      this.#chartW = this.parentElement.getBoundingClientRect().width;
+      w = this.#chartW + "px";
+    }
+    this.style.width = w;
+  }
+  setHeight(h) {
+    if (isNumber(h)) {
+      this.#chartH = h;
+      h += "px";
+    }
+    else if (isString(h)) ;
+    else {
+      this.#chartH = this.parentElement.getBoundingClientRect().height;
+      w = this.#chartH + "px";
+    }
+    this.style.height = h;
+  }
+  setWidthMin(w) { this.style.minWidth = `var(--txc-min-width, ${w})`; }
+  setHeightMin(h) { this.style.minHeight = `var(--txc-min-height, ${w})`; }
+  setWidthMax(w) { this.style.minWidth = `var(--txc-max-width, ${w})`; }
+  setHeightMax(h) { this.style.minHeight = `var(--txc-max-height, ${w})`; }
+  setDimensions(w, h) {
+    let dims;
+    let width = this.width;
+    let height = this.height;
+    if (!w || !h) {
+      const dims = this.getBoundingClientRect();
+      const parent = this.parentElement.getBoundingClientRect();
+      h = (!dims.height) ? (!parent.height) ? CHART_MINH : parent.height : dims.height;
+      w = (!dims.width) ? (!parent.width) ? CHART_MINW : parent.width : dims.width;
+    }
+    dims = {
+      width: this.width,
+      height: this.height,
+      resizeW: w / width,
+      resizeH: h / height,
+      resizeWDiff: w - width,
+      resizeHDiff: h - height
+    };
+    this.setWidth(w);
+    this.setHeight(h);
+    return dims
   }
 }
 
@@ -4290,7 +4886,7 @@ const OperationModes = {
   DragReady: 1,
   Dragging: 2,
 };
-class Point {
+class Point$1 {
   constructor() {
     this.set(...arguments);
   }
@@ -4306,7 +4902,7 @@ class Point {
     }
   }
   clone() {
-    return new Point(this.x, this.y);
+    return new Point$1(this.x, this.y);
   }
 }
 
@@ -4320,11 +4916,11 @@ class MouseAgent {
   constructor(controller) {
     this.controller = controller;
     this.element = controller.element;
-    this.position = new Point();
-    this.movement = new Point();
+    this.position = new Point$1();
+    this.movement = new Point$1();
     this.firstMovementUpdate = true;
-    this.dragstart = new Point();
-    this.dragend = new Point();
+    this.dragstart = new Point$1();
+    this.dragend = new Point$1();
     this.dragCheckThreshold = 3;
     this.wheeldelta = 0;
     this.pressedButtons = [];
@@ -4348,6 +4944,19 @@ class MouseAgent {
       }
       this.controller.operationMode = OperationModes.DragReady;
       controller.raise(this, "mousedown", this.createEventArgument(e));
+    });
+    element.addEventListener("dblclick", (e) => {
+      const clientRect = element.getBoundingClientRect();
+      this.position.x = e.clientX - clientRect.left;
+      this.position.y = e.clientY - clientRect.top;
+      this.movement.x = 0;
+      this.movement.y = 0;
+      switch (e.button) {
+        case 0: this.pressedButtons._t_pushIfNotExist(MouseButtons.Left); break;
+        case 1: this.pressedButtons._t_pushIfNotExist(MouseButtons.Middle); break;
+        case 2: this.pressedButtons._t_pushIfNotExist(MouseButtons.Right); break;
+      }
+      controller.raise(this, "dblclick", this.createEventArgument(e));
     });
     element.addEventListener("mousemove", e => {
       if (controller.operationMode == OperationModes.DragReady) {
@@ -4444,6 +5053,7 @@ class MouseAgent {
       dragend: this.dragend.clone(),
       wheeldelta: this.wheeldelta,
       domEvent: e,
+      timestamp: Date.now()
     }
   }
   setCursor(type) {
@@ -4835,14 +5445,14 @@ class TouchAgent {
 	}
 }
 
-const defaultOptions$1 = {
+const defaultOptions$2 = {
   elementId: undefined,
   elementInstance: undefined,
   disableContextMenu: true,
 };
 class InputController {
   constructor(element, options) {
-    this.options = { ...defaultOptions$1, ...options };
+    this.options = { ...defaultOptions$2, ...options };
     this.operationMode = OperationModes.None;
     this.element = element;
     if (!this.element && this.options.elementId) {
@@ -4856,7 +5466,6 @@ class InputController {
     this.touchAgent = new TouchAgent(this);
     this.currentAgent = null;
     if (this.options.disableContextMenu) {
-      console.log("culprit");
       window.oncontextmenu = (e) => {
         e.preventDefault();
         return false;
@@ -4886,6 +5495,7 @@ class InputController {
 }
 new EventDispatcher(InputController).registerEvents(
   "mousedown", "mouseup", "mousemove", "mouseenter", "mouseout", "mousewheel",
+  "dblclick",
   "keydown", "keyup", "hotkey",
   "drag", "begindrag", "enddrag"
 );
@@ -5403,10 +6013,9 @@ class Axis {
 class xAxis extends Axis {
   #xAxisTicks = 4
   #xAxisGrads
-  #xAxisSubGrads
+  #indexBased = true
   constructor(parent) {
     super(parent);
-    this.#xAxisSubGrads = buildSubGrads();
   }
   get range() { return this.parent.range }
   get width() { return this.parent.width }
@@ -5422,17 +6031,10 @@ class xAxis extends Axis {
   get timeMin() { return this.range.timeMin }
   get candleW() { return bRound(this.width / this.range.Length) }
   get candlesOnLayer() { return bRound(this.core.Chart.layerWidth / this.candleW )}
-  get gradsMax() { return Math.trunc(this.width / MAXGRADSPER) }
-      gradsYear(t) { return get_year(t) }
-      gradsMonthName(t) { return get_monthName(t) }
-      gradsDayName(t) { return get_dayName(t) +" "+ get_day(t) }
-      gradsHour(t) { return get_hour(t) + ":00" }
-      gradsMinute(t) { return "00:" + get_minute(t) }
   get xAxisRatio() { return this.width / this.range.rangeDuration }
   set xAxisTicks(t) { this.#xAxisTicks = isNumber(t) ? t : 0; }
   get xAxisTicks() { return this.#xAxisTicks }
   get xAxisGrads() { return this.#xAxisGrads }
-  get xAxisSubGrads() { return this.#xAxisSubGrads }
   get scrollOffsetPx() { return this.core.scrollPos % this.candleW }
   get bufferPx() { return this.core.bufferPx }
   xPos(ts) {
@@ -5475,149 +6077,77 @@ class xAxis extends Axis {
   initXAxisGrads() {
     this.#xAxisGrads = this.calcXAxisGrads();
   }
-  calcXAxisGrads() {
-    const rangeStart = this.timeMin;
-    const rangeEnd = this.timeMax;
-    const intervalStr = this.intervalStr;
+  calcXAxisGrads(range=this.range.snapshot()) {
     const grads = {
       entries: {},
       values: [],
       major: [],
-      minor: []
+      minor: [],
     };
-    intervalStr.charAt(intervalStr.length - 1);
-      let days, t1, t2, units, unitStart,
-          majorGrad, majorValue, minorValue;
-      units = ms2TimeUnits(this.rangeDuration);
-      grads.units = ms2TimeUnits(this.rangeDuration);
-    if (units.years > 0) {
-      t1 = year_start(rangeStart);
-      t2 = nextYear(year_start(rangeEnd)) + YEAR_MS;
-      grads.unit = ["y", "year"];
-      grads.timeSpan = `${units.years} years`;
-      majorGrad = (ts) => { return nextYear(ts) };
-      unitStart = (ts) => { return month_start(ts) };
-      majorValue = (ts) => {
-        return get_year(ts)
-      };
-      minorValue = (ts) => {
-        if (get_month(ts) == 0 && get_day(ts) == 1 && get_hour(ts) == 0) return get_year(ts)
-        else return get_monthName(ts)
-      };
-      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
-    }
-    else if (units.months > 0) {
-      t1 = month_start(rangeStart);
-      t2 = month_start(rangeEnd) + MONTH_MS(get_month(rangeEnd));
-      grads.unit = ["M", "month"];
-      grads.timeSpan = `${units.months} months`;
-      majorGrad = (ts) => { return MONTHR_MS };
-      unitStart = (ts) => { return day_start(ts) };
-      majorValue = (ts) => {
-        if (get_month(ts) == 0) return get_year(ts)
-        else return get_monthName(ts)
-      };
-      minorValue = (ts) => {
-        if (get_month(ts) == 0 && get_day(ts) == 1) return get_year(ts)
-        if (get_day(ts) == 1 && get_hour(ts) == 0) return get_monthName(ts)
-        else return this.gradsDayName(ts)
-      };
-      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
-    }
-    else if (units.weeks > 0 || units.days > 0) {
-      days = units.weeks * 7 + units.days;
-      t1 = day_start(rangeStart);
-      t2 = day_start(rangeEnd) + WEEK_MS;
-      grads.unit = ["d", "day"];
-      grads.timeSpan = `${days} days`;
-      majorGrad = (ts) => { return DAY_MS };
-      unitStart = (ts) => { return hour_start(ts) };
-      majorValue = (ts) => {
-        if (get_month(ts) == 0 && get_day(ts) == 1) return get_year(ts)
-        else if (get_day(ts) == 1) return get_monthName(ts)
-        else return this.gradsDayName(ts)
-      };
-      minorValue = (ts) => {
-        if (get_day(ts) == 1 && get_hour(ts) == 0) return get_monthName(ts)
-        else if (get_hour(ts) == 0) return this.gradsDayName(ts)
-        else return get_hour(ts) + ":00"
-      };
-      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
-    }
-    else if (units.hours > 0) {
-      t1 = hour_start(rangeStart);
-      t2 = hour_start(rangeEnd) + DAY_MS;
-      grads.unit = ["h", "hour"];
-      grads.timeSpan = `${units.hours} hours`;
-      majorGrad = (ts) => { return HOUR_MS };
-      unitStart = (ts) => { return minute_start(ts) };
-      majorValue = (ts) => {
-        if (get_month(ts) == 0 && get_day(ts) == 1 && get_hour(ts) == 0) return get_year(ts)
-        else if (get_day(ts) == 1 && get_hour(ts) == 0) return get_monthName(ts)
-        else if (get_hour(ts) == 0) return this.gradsDayName(ts)
-        else return this.HM(ts)
-      };
-      minorValue = (ts) => { return this.HM(ts) };
-      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
-    }
-    else if (units.minutes > 0) {
-      t1 = minute_start(rangeStart);
-      t2 = minute_start(rangeEnd) + HOUR_MS;
-      grads.unit = ["m", "minute"];
-      grads.timeSpan = `${units.minutes} minutes`;
-      majorGrad = (ts) => { return MINUTE_MS };
-      unitStart = (ts) => { return second_start(ts) };
-      majorValue = (ts) => {
-        if (get_month(ts) == 0 && get_day(ts) == 1 && get_hour(ts) == 0 && get_minute(ts) == 0) return get_year(ts)
-        else if (get_day(ts) == 1 && get_hour(ts) == 0 && get_minute(ts) == 0) return get_monthName(ts)
-        else if (get_hour(ts) == 0 && get_minute(ts) == 0) return this.gradsDayName(ts)
-        else return this.HM(ts)
-      };
-      minorValue = (ts) => { return this.HMS(ts) };
-      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
-    }
-    else if (units.seconds > 0) {
-      t1 = second_start(rangeStart) - MINUTE_MS;
-      t2 = second_start(rangeEnd) + MINUTE_MS;
-      grads.unit = ["s", "second"];
-      grads.timeSpan = `${units.seconds} seconds`;
-      majorGrad = (ts) => { return SECOND_MS };
-      unitStart = (ts) => { return second_start(ts) };
-      majorValue = (ts) => {
-        if (get_month(ts) == 0 && get_day(ts) == 1 && get_hour(ts) == 0 && get_minute(ts) == 0) return get_year(ts)
-        else if (get_day(ts) == 1 && get_hour(ts) == 0 && get_minute(ts) == 0) return get_monthName(ts)
-        else if (get_hour(ts) == 0 && get_minute(ts) == 0) return this.gradsDayName(ts)
-        else if (get_minute(ts) == 0 && get_second(ts) == 0) return this.HM(ts)
-        else return this.MS(ts)
-      };
-      minorValue = (ts) => { return this.MS(ts) };
-      return this.buildGrads(grads, t1, t2, majorGrad, majorValue, minorValue, unitStart)
-    }
-  }
-  buildGrads(grads, t1, t2, majorGrad ,majorValue, minorValue, unitStart) {
-    let th, to, min;
-    const minorGrad = Math.floor(this.rangeLength / this.gradsMax) * this.range.interval;
-    const limit = this.pixel2T(this.width + (this.candleW * 2));
-    while (t1 < limit) {
-      to = t1;
-      grads.entries[t1] = [majorValue(t1), this.t2Pixel(t1), t1, "major"];
-      th = t1;
-      t1 += majorGrad(t1);
-      while ((t1 - to) < minorGrad) {
-        t1 += majorGrad(t1);
+    const units = ms2TimeUnits(range.rangeDuration);
+    grads.units = units;
+    for (let u in units) {
+      if (units[u] > 0) {
+        grads.units = [u, u];
+        grads.timeSpan = `${units[u]} ${u}`;
+        break
       }
-      let x = Math.floor((t1 - to) / minorGrad);
-      if (x > 0 ) {
-        let y = Math.floor((t1 - to) / x);
-        while (th < t1) {
-          th += y;
-          min = unitStart(th);
-          grads.entries[min] = [minorValue(min), this.t2Pixel(min), min, "minor"];
-        }
+    }
+    const tf = range.interval;
+    const {xStep, rank} = this.xStep(range);
+    const tLimit = this.pixel2T(this.width) + xStep;
+    let t1 = range.timeMin - (range.timeMin % xStep) - xStep;
+    let start = t1;
+    while (t1 < tLimit) {
+      let y = time_start(t1, "years");
+      let m = time_start(t1, "months");
+      let d = time_start(t1, "days");
+      if (!(y in grads.entries) && y >= start) {
+        grads.entries[y] = [this.dateTimeValue(y, tf), this.t2Pixel(y), y, "major"];
       }
+      else if (!(m in grads.entries) && m >= start) {
+        grads.entries[m] = [this.dateTimeValue(m, tf), this.t2Pixel(m), m, "major"];
+      }
+      else if (!(d in grads.entries) && d >= start) {
+        grads.entries[d] = [this.dateTimeValue(d, tf), this.t2Pixel(d), d, "major"];
+      }
+        grads.entries[t1] = [this.dateTimeValue(t1, tf), this.t2Pixel(t1), t1, "minor"];
+      t1 += xStep;
     }
     grads.values = Object.values(grads.entries);
     return grads
+  }
+  xStep(range) {
+    let minStep = XAXIS_STEP;
+    let interval = this.#indexBased ? range.interval : 1;
+    let xStep = 0;
+    let candleW = bRound(this.width / range.Length);
+    let rank;
+    let i = TIMESCALES.indexOf(interval);
+    while (i-- >= 0) {
+      const gradPixels = candleW * (TIMESCALES[i] / interval);
+      if (gradPixels >= minStep) {
+        xStep = TIMESCALES[i];
+        rank = TIMESCALESRANK[i];
+        return {xStep, rank}
+      }
+    }
+  }
+  dateTimeValue(ts, tf) {
+    if ((ts / DAY_MS) % 1 === 0) {
+      const date = get_day(ts);
+      if (date === 1) {
+        let month = get_month(ts);
+        if (month === 0) return get_year(ts)
+        else return get_monthName(ts)
+      }
+      else return date
+    }
+    else {
+      if (tf < MINUTE_MS) return this.MS(ts)
+      else if (tf < HOUR_MS) return this.MS(ts)
+      else return this.HM(ts)
+    }
   }
   gradsWorker() {
   }
@@ -5637,36 +6167,8 @@ class xAxis extends Axis {
     let s = String(get_second(t)).padStart(2, '0');
     return `${m}:${s}`
   }
-  draw() {
-    this.#xAxisGrads = this.calcXAxisGrads();
-    this.drawGrads();
-    this.drawOverlays();
-  }
-  drawGrads() {
-    this.parent.layerLabels.scene.clear();
-    const grads = this.#xAxisGrads.values;
-    const ctx = this.parent.layerLabels.scene.context;
-    bRound(this.width / this.range.Length * 0.5);
-    const offset = 0;
-    const theme = this.theme.xAxis;
-    ctx.save();
-    ctx.strokeStyle = theme.colourTick;
-    ctx.fillStyle = theme.colourTick;
-    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`;
-    for (let tick of grads) {
-      let x = bRound(tick[1]);
-      let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5);
-      ctx.fillText(tick[0], x - w + offset, this.xAxisTicks + 12);
-      ctx.beginPath();
-      ctx.moveTo(x + offset, 0);
-      ctx.lineTo(x + offset, this.xAxisTicks);
-      ctx.stroke();
-    }
-      ctx.restore();
-  }
-  drawOverlays() {
-    this.parent.layerOverlays.scene.clear();
-    this.#xAxisGrads;
+  doCalcXAxisGrads(range) {
+    this.#xAxisGrads = this.calcXAxisGrads(range);
   }
 }
 
@@ -5711,11 +6213,6 @@ var stateMachineConfig$6 = {
           action (data) {
           },
         },
-        chart_zoom: {
-          target: 'chart_zoom',
-          action (data) {
-          },
-        },
       }
     },
     resize: {
@@ -5749,27 +6246,10 @@ var stateMachineConfig$6 = {
         },
       }
     },
-    chart_zoom: {
-      onEnter(data) {
-      },
-      onExit(data) {
-      },
-      on: {
-        always: {
-          target: 'idle',
-          condition: 'zoomDone',
-          action (data) {
-          },
-        },
-      }
-    },
   },
-  guards: {
-    zoomDone () { return true },
-  }
 };
 
-const defaultOptions = {
+const defaultOptions$1 = {
   fontSize: 12,
   fontWeight: "normal",
   fontFamily: 'Helvetica Neue',
@@ -5785,9 +6265,9 @@ function calcTextWidth (ctx, text) {
   return Math.round(ctx.measureText(text).width)
 }
 function createFont (
-  fontSize = defaultOptions.fontSize,
-  fontWeight = defaultOptions.fontWeight,
-  fontFamily = defaultOptions.fontFamily
+  fontSize = defaultOptions$1.fontSize,
+  fontWeight = defaultOptions$1.fontWeight,
+  fontFamily = defaultOptions$1.fontFamily
   ) {
   return `${fontWeight} ${fontSize}px ${fontFamily}`
 }
@@ -5810,11 +6290,11 @@ function drawTextBG(ctx, txt, x, y, options) {
   ctx.save();
   ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily);
   ctx.textBaseline = 'top';
-  ctx.fillStyle = options.bakCol || defaultOptions.bakCol;
+  ctx.fillStyle = options.bakCol || defaultOptions$1.bakCol;
   let width = getTextRectWidth(ctx, txt, options);
   let height = getTextRectHeight(options);
   ctx.fillRect(x, y, width, height);
-  ctx.fillStyle = options.txtCol || defaultOptions.txtCol;
+  ctx.fillStyle = options.txtCol || defaultOptions$1.txtCol;
   x = x + options?.paddingLeft;
   y = y + options?.paddingTop;
   ctx.fillText(txt, x, y);
@@ -5924,6 +6404,8 @@ class Slider {
   }
 }
 
+const defaultOverlays$3 = [
+];
 class Timeline {
   #name = "Timeline"
   #shortName = "time"
@@ -5935,6 +6417,7 @@ class Timeline {
   #stateMachine
   #elViewport
   #elNavigation
+  #Graph
   #viewport
   #navigation
   #elNavList
@@ -5969,6 +6452,7 @@ class Timeline {
   get options() { return this.#options }
   get core() { return this.#core }
   get element() { return this.#elTime }
+  get elViewport() { return this.#elViewport }
   get height() { return this.#elTime.getBoundingClientRect().height }
   set width(w) { this.setWidth(w); }
   get width() { return this.#elTime.getBoundingClientRect().width }
@@ -5982,6 +6466,7 @@ class Timeline {
   get candlesOnLayer() { return this.#xAxis.candlesOnLayer }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
+  get graph() { return this.#Graph }
   get viewport() { return this.#viewport }
   get navigation() { return this.#navigation }
   get range() { return this.#core.range }
@@ -6050,8 +6535,9 @@ class Timeline {
     this.#elRwdStart.removeEventListener('click', debounce);
   }
   eventsListen() {
-    let canvas = this.#viewport.scene.canvas;
-    this.#controller = new InputController(canvas, {disableContextMenu: false});
+    let timeline = this.#elViewport;
+    this.#controller = new InputController(timeline, {disableContextMenu: false});
+    this.#controller.on("dblclick", this.onDoubleClick.bind(this));
     this.on("main_mousemove", this.drawCursorTime.bind(this));
     this.on("setRange", this.onSetRange.bind(this));
     this.#elFwdEnd.addEventListener('click', debounce(this.onMouseClick, 1000, this, true));
@@ -6077,6 +6563,9 @@ class Timeline {
         break
     }
   }
+  onDoubleClick(e) {
+    this.core.jumpToEnd();
+  }
   onFwdEnd() {
     this.core.jumpToEnd();
   }
@@ -6098,6 +6587,10 @@ class Timeline {
   xPos2Time(x) { return this.#xAxis.xPos2Time(x) }
   xPos2Index(x) { return this.#xAxis.xPos2Index(x) }
   xPosOHLCV(x) { return this.#xAxis.xPosOHLCV(x) }
+  createGraph() {
+    let overlays = copyDeep(defaultOverlays$3);
+    this.#Graph = new graph(this, this.#elViewport, overlays);
+  }
   createViewport() {
     const buffer = this.config.buffer || BUFFERSIZE$1;
     const width = this.xAxisWidth;
@@ -6118,14 +6611,18 @@ class Timeline {
           .addLayer(this.#layerLabels)
           .addLayer(this.#layerOverlays)
           .addLayer(this.#layerCursor);
+    this.#Graph = {viewport: this.#viewport};
   }
-  draw() {
+  render() {
+    this.#viewport.render();
+  }
+  draw(range=this.range) {
     this.#layerCursor.setPosition(this.scrollPos, 0);
     this.#layerLabels.setPosition(this.scrollPos, 0);
     this.#layerOverlays.setPosition(this.scrollPos, 0);
-    this.#xAxis.draw();
+    this.drawGrads(range);
+    this.drawOverlays(range);
     this.drawCursorTime();
-    this.#viewport.render();
   }
   drawCursorTime() {
     const ctx = this.#layerCursor.scene.context;
@@ -6163,7 +6660,91 @@ class Timeline {
     this.#layerCursor.visible = true;
     this.#viewport.render();
   }
+  drawGrads(range) {
+    this.#layerLabels.scene.clear();
+    this.#xAxis.doCalcXAxisGrads(range);
+    const grads = this.#xAxis.xAxisGrads.values;
+    const ctx = this.#layerLabels.scene.context;
+    const offset = 0;
+    const theme = this.theme.xAxis;
+    ctx.save();
+    ctx.strokeStyle = theme.colourTick;
+    ctx.fillStyle = theme.colourTick;
+    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`;
+    for (let tick of grads) {
+      let x = bRound(tick[1]);
+      let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5);
+      ctx.fillText(tick[0], x - w + offset, this.#xAxis.xAxisTicks + 12);
+      ctx.beginPath();
+      ctx.moveTo(x + offset, 0);
+      ctx.lineTo(x + offset, this.#xAxis.xAxisTicks);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  drawOverlays() {
+    this.#layerOverlays.scene.clear();
+    this.#xAxis.xAxisGrads.values;
+    const ctx = this.#layerOverlays.scene.context;
+    ctx.save();
+    ctx.restore();
+  }
 }
+
+const renderLoop = {
+  renderQ: new Map(),
+  rendered: [],
+  renderLog: false,
+  dropFrames: true,
+  graphs: [],
+  range: {},
+  init: function (config) {
+    if (!isObject(config)) return
+    this.renderLog = config?.renderLog || false;
+    this.dropFrames = config?.dropFrames || true;
+    this.graphs = (isArray(config?.graphs)) ? [...config.graphs] : [];
+    this.range = (isObject(config?.range)) ? config.range : {};
+  },
+  queueFrame: function (range=this.range, graphs=this.graphs, update=false) {
+    if (this.renderQ.size > 1 && this.dropFrames) this.dropFrame();
+    const frameID = Date.now();
+    range = range.snapshot();
+    this.renderQ.set(frameID, {graphs, range, update});
+    return frameID
+  },
+  dropFrame: function (frame=-1) {
+    if (frame === -1) frame = lastKeyInMap(this.renderQ);
+    if (this.renderQ.size > 1 && this.renderQ.has(frame)) {
+      this.renderQ.delete(frame);
+    }
+  },
+  getFrame: function (frame=0) {
+    if (this.renderQ.has(frame)) return this.renderQ.get(frame)
+    else return firstValueInMap(this.renderQ)
+  },
+  frameDone: function () {
+    if (this.renderQ.size === 0) return
+    const key = firstKeyInMap(this.renderQ);
+    if (this.renderLog) this.rendered.push([key, Date.now()]);
+    this.renderQ.delete(key);
+  },
+  start: function () {
+    requestAnimationFrame(this.execute.bind(this));
+  },
+  execute: function () {
+    requestAnimationFrame(this.execute.bind(this));
+    if (this.renderQ.size === 0) return
+    const [ID, frame] = firstItemInMap(this.renderQ);
+    if (frame.range.constructor.name !== "RangeSnapshot") return
+    for (let entry of frame.graphs) {
+      if (isFunction(entry.draw)) entry.draw(frame.range, frame.update);
+    }
+    for (let entry of frame.graphs) {
+      if (isFunction(entry.render)) entry.render();
+    }
+    this.frameDone();
+  }
+};
 
 class Chart {
   #ID;
@@ -6363,7 +6944,6 @@ class Chart {
     this.layerWidth = Math.round(w * ((100 + buffer) * 0.01));
     this.graph.setSize(w, h, this.layerWidth);
     this.setHeight(h);
-    this.scale.resize(w, h);
   }
   setCursor(cursor) {
     this.element.style.cursor = cursor;
@@ -6401,8 +6981,12 @@ class Chart {
       this.#Legends.update(legend, { pos, candle });
     }
   }
+  render() {
+    this.#Graph.render();
+    this.#Scale.render();
+  }
   draw(range=this.range, update=false) {
-    window.requestAnimationFrame(()=>this.graph.draw(range, update));
+      this.#Graph.draw(range, update);
   }
   drawGrid() {
     this.layerGrid.setPosition(this.core.scrollPos, 0);
@@ -6410,6 +6994,10 @@ class Chart {
     this.#Graph.render();
   }
   resize(width = this.width, height = this.height) {
+  }
+  zoomRange() {
+    this.draw(this.range, true);
+    this.emit("zoomDone");
   }
 }
 
@@ -6589,7 +7177,7 @@ class yAxis extends Axis {
     const scaleGrads = [];
     rangeH = max - min;
     rangeH = (this.rangeH > 0) ? this.rangeH : 1;
-    yGridSize = (rangeH)/(this.height / (this.core.theme.yAxis.fontSize * 1.5));
+    yGridSize = (rangeH)/(this.height / (this.core.theme.yAxis.fontSize * 1.75));
     let niceNumber = Math.pow( 10 , Math.ceil( Math.log10( yGridSize ) ) );
     if ( yGridSize < 0.25 * niceNumber ) niceNumber = 0.25 * niceNumber;
     else if ( yGridSize < 0.5 * niceNumber ) niceNumber = 0.5 * niceNumber;
@@ -6644,36 +7232,6 @@ class yAxis extends Axis {
     }
     return value
   }
-  draw() {
-    this.calcGradations();
-    this.drawLabels();
-    this.drawOverlays();
-  }
-  drawLabels() {
-    this.#parent.layerLabels.scene.clear();
-    const grads = this.#yAxisGrads;
-    const ctx = this.#parent.layerLabels.scene.context;
-    const theme = this.theme.yAxis;
-    ctx.save();
-    ctx.strokeStyle = theme.colourTick;
-    ctx.fillStyle = theme.colourTick;
-    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`;
-    for (let tick of grads) {
-      ctx.fillText(tick[0], this.yAxisTicks + 5, tick[1] + 4);
-      ctx.beginPath();
-      ctx.moveTo(0, tick[1]);
-      ctx.lineTo(this.yAxisTicks, tick[1]);
-      ctx.stroke();
-    }
-    ctx.restore();
-  }
-  drawOverlays() {
-    this.#parent.layerOverlays.scene.clear();
-    this.#yAxisGrads;
-    const ctx = this.#parent.layerOverlays.scene.context;
-    ctx.save();
-    ctx.restore();
-  }
 }
 
 var stateMachineConfig$5 = {
@@ -6713,8 +7271,8 @@ var stateMachineConfig$5 = {
           action (data) {
           },
         },
-        chart_zoom: {
-          target: 'chart_zoom',
+        setRange: {
+          target: 'setRange',
           action (data) {
           },
         },
@@ -6739,7 +7297,7 @@ var stateMachineConfig$5 = {
         },
       }
     },
-    chart_zoom: {
+    setRange: {
       onEnter(data) {
       },
       onExit(data) {
@@ -7073,9 +7631,12 @@ class ScaleBar {
       );
     }
   }
-  draw() {
-    this.#yAxis.draw();
+  render() {
     this.#viewport.render();
+  }
+  draw() {
+    this.drawLabels();
+    this.drawOverlays();
     this.#parent.drawGrid();
   }
   drawCursorPrice() {
@@ -7108,6 +7669,32 @@ class ScaleBar {
     this.#layerCursor.scene.clear();
     this.#viewport.render();
     return
+  }
+  drawLabels() {
+    this.#layerLabels.scene.clear();
+    this.#yAxis.calcGradations();
+    const grads = this.#yAxis.yAxisGrads;
+    const ctx = this.#layerLabels.scene.context;
+    const theme = this.theme.yAxis;
+    ctx.save();
+    ctx.strokeStyle = theme.colourTick;
+    ctx.fillStyle = theme.colourTick;
+    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`;
+    for (let tick of grads) {
+      ctx.fillText(tick[0], this.#yAxis.yAxisTicks + 5, tick[1] + 4);
+      ctx.beginPath();
+      ctx.moveTo(0, tick[1]);
+      ctx.lineTo(this.#yAxis.yAxisTicks, tick[1]);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+  drawOverlays() {
+    this.#layerOverlays.scene.clear();
+    this.#yAxis.yAxisGrads;
+    const ctx = this.#layerOverlays.scene.context;
+    ctx.save();
+    ctx.restore();
   }
   resize(width=this.width, height=this.height) {
     this.setDimensions({w: width, h: height});
@@ -7554,17 +8141,6 @@ var stateMachineConfig$4 = {
       onExit (data) {
       },
       on: {
-        chart_pan: {
-          target: 'chart_pan',
-          action (data) {
-            this.context.origin.setCursor("grab");
-          },
-        },
-        chart_zoom: {
-          target: 'chart_zoom',
-          action (data) {
-          },
-        },
         xAxis_scale: {
           target: 'xAxis_scale',
           action (data) {
@@ -7584,41 +8160,6 @@ var stateMachineConfig$4 = {
           target: 'tool_activated',
           action (data) {
             this.context.origin.setCursor("default");
-          },
-        },
-      }
-    },
-    chart_pan: {
-      onEnter (data) {
-      },
-      onExit (data) {
-      },
-      on: {
-        chart_pan: {
-          target: 'chart_pan',
-          action (data) {
-            this.context.origin.updateRange(data);
-          },
-        },
-        chart_panDone: {
-          target: 'idle',
-          action (data) {
-            this.context.origin.updateRange(data);
-          },
-        },
-      }
-    },
-    chart_zoom: {
-      onEnter (data) {
-      },
-      onExit (data) {
-      },
-      on: {
-        always: {
-          target: 'idle',
-          condition: 'zoomDone',
-          action (data) {
-            this.context.origin.zoomRange(data);
           },
         },
       }
@@ -7680,7 +8221,7 @@ var stateMachineConfig$4 = {
   }
 };
 
-const defaultOverlays$1 = [
+const defaultOverlays$2 = [
   ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
   ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
   ["candles", {class: chartCandles, fixed: false, required: true}],
@@ -7746,6 +8287,7 @@ class OnChart extends Chart {
   }
   end() {
     this.off("chart_yAxisRedraw", this.onYAxisRedraw);
+    this.off("setRange", this.draw);
     super.end();
   }
   eventsListen() {
@@ -7779,14 +8321,14 @@ class OnChart extends Chart {
   loadData(data) {}
   updateData(data) {}
   createGraph() {
-    let overlays = new Map(copyDeep(defaultOverlays$1));
+    let overlays = new Map(copyDeep(defaultOverlays$2));
     if (overlays.has("volume")) {
       const volume = overlays.get("volume");
       volume.params.maxVolumeH = this.theme?.volume?.Height || VolumeStyle.ONCHART_VOLUME_HEIGHT;
       overlays.set("volume", volume);
     }
     overlays = Array.from(overlays);
-    this.graph = new graph(this, this.elViewport, overlays);
+    this.graph = new graph(this, this.elViewport, overlays, false);
     this.#layerStream = this.graph.overlays.get("stream").layer;
     this.#chartStreamCandle = this.graph.overlays.get("stream").instance;
   }
@@ -7841,18 +8383,6 @@ class OnChart extends Chart {
     inputs.V = this.scale.nicePrice(ohlcv[5]);
     return {inputs, colours}
   }
-  updateRange(pos) {
-    let update = false;
-    if (this.scale.rangeMode == "manual") {
-      this.scale.yOffset = pos[5];
-      update = true;
-    }
-    this.draw(this.range, update);
-  }
-  zoomRange() {
-    this.draw(this.range, true);
-    this.emit("chart_zoomDone");
-  }
 }
 
 var stateMachineConfig$3 = {
@@ -7867,17 +8397,6 @@ var stateMachineConfig$3 = {
       onExit(data) {
       },
       on: {
-        chart_pan: {
-          target: 'chart_pan',
-          action (data) {
-            this.context.origin.setCursor("grab");
-          },
-        },
-        chart_zoom: {
-          target: 'chart_zoom',
-          action (data) {
-          },
-        },
         chart_tool: {
           target: 'chart_tool',
           action (data) {
@@ -7902,42 +8421,6 @@ var stateMachineConfig$3 = {
           target: 'tool_activated',
           action (data) {
             this.context.origin.setCursor("default");
-          },
-        },
-      }
-    },
-    chart_pan: {
-      onEnter(data) {
-      },
-      onExit(data) {
-      },
-      on: {
-        chart_pan: {
-          target: 'chart_pan',
-          action (data) {
-            this.context.origin.updateRange(data);
-          },
-        },
-        chart_panDone: {
-          target: 'idle',
-          action (data) {
-            this.context.origin.updateRange(data);
-          },
-        },
-      }
-    },
-    chart_zoom: {
-      onEnter(data) {
-      },
-      onExit(data) {
-      },
-      on: {
-        always: {
-          target: 'idle',
-          condition: 'zoomDone',
-          action (data) {
-            this.context.origin.range;
-            this.context.origin.zoomRange();
           },
         },
       }
@@ -8008,7 +8491,323 @@ var stateMachineConfig$3 = {
   }
 };
 
-const defaultOverlays = [
+const status = {
+  idle: 0,
+  dragStart: 1,
+  dragging: 2
+};
+class Point {
+  x = 0;
+  y = 0;
+  constructor() {
+    if (arguments.length === 1) {
+      const { x, y } = arguments[0];
+      this.x = x;
+      this.y = y;
+    } else if (arguments.length > 1) {
+      const [x, y] = arguments;
+      this.x = x;
+      this.y = y;
+    }
+  }
+  clone() {
+    return new Point(this.x, this.y);
+  }
+}
+
+const keyboard = [
+  "keypress",
+  "keydown",
+  "keyup"
+];
+const pointer = [
+  "pointerdown",
+  "pointerup",
+  "pointerover", "pointerenter",
+  "pointerout", "pointerleave",
+  "pointermove",
+  "pointercancel",
+  "gotpointercapture",
+  "lostpointercapture",
+  "dblclick",
+  "click",
+  "wheel",
+  "contextmenu"
+];
+const mouse = [
+  "mousedown",
+  "mouseenter",
+  "mouseleave",
+  "mousemove",
+  "mouseout",
+  "mouseover",
+  "mouseup",
+];
+const touch = [
+  "touchcancel",
+  "touchend",
+  "touchmove",
+  "touchstart"
+];
+const pen = [
+];
+const misc = [
+];
+const custom = [
+  "pointerdrag",
+  "pointerdragend"
+];
+class EventsAgent {
+  constructor (input) {
+    this.input = input;
+    this.element = input.element;
+    if (window.PointerEvent) {
+      this.type = [...keyboard, ...pointer, ...mouse, ...touch, ...pen, ...misc, ...custom];
+    } else {
+      this.type = [...keyboard, ...mouse, ...touch, ...pen, ...misc, ...custom];
+    }
+    this.clientPosPrev = new Point([null, null]);
+    this.position = new Point();
+    this.movement = new Point([0, 0]);
+    this.dragstart = new Point([null, null]);
+    this.dragend = new Point([null, null]);
+    this.dragCheckThreshold = 3;
+    this.dragStatus = false;
+    this.wheeldelta = 0;
+    this.pointerButtons = [false, false, false, false, false];
+    this.pointerdrag = new Event("pointerdrag");
+    this.pointerdragend = new Event("pointerdragend");
+  }
+  has (event) {
+    if (this.type.indexOf(event) == -1) return false
+    else return true
+  }
+  addListener (event, handler, options) {
+    let cb = handler;
+    if (!this.has(event) ||
+        !isFunction(handler) ||
+        !DOM.isElement(this.element)
+    ) return false
+    if (pointer.indexOf(event) !== -1) {
+      switch (event) {
+        case "pointerdown":
+            cb = function (e) {
+              this.onPointerDown(e);
+              handler(this.createEventArgument(e));
+            };
+            break;
+        case "pointerup":
+          cb = function (e) {
+            this.onPointerUp(e);
+            handler(this.createEventArgument(e));
+          };
+          break;
+        case "pointermove":
+          cb = function (e) {
+            this.motion(e);
+            handler(this.createEventArgument(e));
+          };
+          break;
+        case "click":
+        case "dbclick":
+        case "pointerenter":
+        case "pointerleave":
+        case "pointerout":
+        case "pointerover":
+        case "contextmenu":
+          cb = function (e) {
+            this.location(e);
+            handler(this.createEventArgument(e));
+          };
+          break;
+        case "wheel":
+          cb = function (e) {
+            this.wheeldelta = e.wheelDelta;
+            handler(this.createEventArgument(e));
+          };
+          break;
+        case "pointercancel":
+        case "gotpointercapture":
+        case "lostpointercapture":
+        default :
+          cb = function (e) {
+            handler(e);
+          };
+          break;
+      }
+      this.element.addEventListener(event, cb.bind(this), options);
+      return cb
+    }
+    else if (custom.indexOf(event) == -1)
+      this.element.addEventListener(event, handler, options);
+    else {
+      switch (event) {
+        case "pointerdrag":
+          this.initPointerDrag(handler, options);
+          break;
+        case "pointerdragend":
+          cb = function (e) {
+            this.motion(e);
+            handler(this.createEventArgument(e));
+          };
+          this.element.addEventListener(event, cb.bind(this), options);
+          break;
+      }
+    }
+    return true
+  }
+  removerListener (event, handler, element, options) {
+    if (!this.has(event) ||
+        !isFunction(handler) ||
+        !DOM.isElement(element)
+    ) return false
+    if (event == "pointerdrag") {
+      e.target.removeEventListener("pointermove", this.onPointerDrag);
+      e.target.removeEventListener("pointerdown", this.onPointerDown);
+      e.target.removeEventListener("gotpointercapture", this.onPointerDrag);
+      e.target.removeEventListener("lostpointercapture", this.onPointerDragEnd);
+      document.removeEventListener("pointerup", this.onPointerDragEnd);
+    }
+    element.removeEventListener(event, handler, options);
+    return true
+  }
+  initPointerDrag (handler, options) {
+    if (!this.draginit) {
+      this.draginit = true;
+      this.element.addEventListener("pointerdown", this.onPointerDown.bind(this), options);
+      this.element.addEventListener("gotpointercapture", this.onPointerCapture.bind(this), options);
+      this.element.addEventListener("lostpointercapture", this.onPointerDragEnd.bind(this), options);
+      this.element.addEventListener("pointermove", this.onPointerMove.bind(this), options);
+    }
+    let cb = function (e) {
+      e = this.createEventArgument(e);
+      handler(e);
+    };
+    this.dragStatus = "ready";
+    this.element.addEventListener("pointerdrag", cb.bind(this), options);
+  }
+  onPointerDown (e) {
+    this.location(e);
+    this.pointerButtons[e.button] = true;
+    if (this.dragStatus == "ready") e.target.setPointerCapture(e.pointerId);
+  }
+  onPointerUp (e) {
+    this.location(e);
+    this.pointerButtons[e.button] = false;
+  }
+  onPointerMove (e) {
+    if (this.dragStatus == "dragging") {
+      this.motion(e);
+      this.dragend = this.position.clone();
+      e.target.dispatchEvent(this.pointerdrag);
+    }
+  }
+  onPointerCapture (e) {
+    this.dragstart = this.position.clone();
+    this.dragend = this.position.clone();
+    this.dragStatus = "dragging";
+  }
+  onPointerDragEnd (e) {
+    if (this.dragStatus == "dragging") {
+      this.dragStatus = "ready";
+      e.target.dispatchEvent(this.pointerdragend);
+    }
+  }
+  createEventArgument(e) {
+    return {
+      isProcessed: false,
+      position: this.position.clone(),
+      movement: this.movement.clone(),
+      dragstart: this.dragstart.clone(),
+      dragend: this.dragend.clone(),
+      wheeldelta: this.wheeldelta,
+      buttons: this.pointerButtons,
+      domEvent: e,
+      timeStamp: Date.now()
+    }
+  }
+  isButtonPressed(button) {
+    return (this.pointerButtons.indexOf(button) !== -1) ? true : false
+  }
+  setCursor(type) {
+		this.element.style.cursor = type;
+	}
+  motion(e) {
+    const prevClientX = this.clientPosPrev.x;
+    const prevClientY = this.clientPosPrev.y;
+    const clientX = e.clientX || this.position.x;
+    const clientY = e.clientY || this.position.y;
+    e.target.getBoundingClientRect();
+    this.movement.x = clientX - prevClientX;
+    this.movement.y = clientY - prevClientY;
+    this.position.x += this.movement.x;
+    this.position.y += this.movement.y;
+    this.clientPosPrev.x = clientX;
+    this.clientPosPrev.y = clientY;
+  }
+  location(e) {
+    const clientRect = e.target.getBoundingClientRect();
+    this.clientPosPrev.x = e.clientX;
+    this.clientPosPrev.y = e.clientY;
+    this.position.x = e.clientX - clientRect.left;
+    this.position.y = e.clientY - clientRect.top;
+    this.movement.x = 0;
+    this.movement.y = 0;
+  }
+}
+
+const defaultOptions = {
+  element: undefined,
+  contextMenu: true
+};
+class Input  {
+  constructor (element, options) {
+    this.options = { ...defaultOptions, ...options };
+    this.status = status.idle;
+    this.element = element;
+    if (!this.element && this.options.elementId) {
+      this.element = document.getElementById(this.options.elementId);
+    }
+    if (!this.element) {
+      throw "Must specify an element to receive user input.";
+    }
+    this.eventsAgent = new EventsAgent(this);
+    if (!this.options.contextMenu) {
+      window.oncontextmenu = (e) => {
+        e.preventDefault();
+        return false;
+      };
+    }
+  }
+  on (event, handler, options) {
+    return this.eventsAgent.addListener(event, handler, options)
+  }
+  off (event, handler, options) {
+    return this.eventsAgent.removeListener(event, handler, options)
+  }
+  invoke (agent, eventName, args) {
+    this.currentAgent = agent;
+    this.eventsAgent.invoke(eventName, this.createEventArgument(args));
+  }
+  createEventArgument (args) {
+    const arg = args || {};
+    arg.isButtonPressed = button => this.isButtonPressed(button);
+    arg.isKeyPressed = key => this.isKeyPressed(key);
+    arg.controller = this;
+    return arg;
+  }
+  isButtonPressed (button) {
+    return this.pointerAgent.isButtonPressed(button);
+  }
+  isKeyPressed (key) {
+    return this.keyboardAgent.isKeyPressed(key);
+  }
+  setCursor (type) {
+    this.pointerAgent.setCursor(type);
+  }
+}
+
+const defaultOverlays$1 = [
   ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
   ["cursor", {class: chartCursor, fixed: true, required: true}]
 ];
@@ -8028,6 +8827,7 @@ class OffChart extends Chart {
     valueMin: 0,
     valueDiff: 100
   }
+  #input
   constructor (core, options) {
     super(core, options);
     this.#ID = this.options.offChartID || uid("TX_OC_");
@@ -8077,8 +8877,17 @@ class OffChart extends Chart {
     this.stateMachine.start();
   }
   end() {
+    const main = this.core.MainPane;
+    this.#input.off("pointerdrag", main.onChartDrag);
+    this.#input.off("pointerdragend", main.onChartDrag);
     this.#Divider.end();
     super.end();
+  }
+  eventsListen() {
+    const main = this.core.MainPane;
+    this.#input = new Input(this.element, {disableContextMenu: false});
+    this.#input.on("pointerdrag", main.onChartDrag.bind(main));
+    this.#input.on("pointerdragend", main.onChartDragDone.bind(main));
   }
   onStreamUpdate(candle) {
     this.#streamCandle = candle;
@@ -8091,7 +8900,7 @@ class OffChart extends Chart {
   }
   createGraph() {
     const indicator = [this.#overlay.name, {class: this.#Indicator, fixed: false, required: false, params: {overlay: this.#overlay}}];
-    const overlays = copyDeep(defaultOverlays);
+    const overlays = copyDeep(defaultOverlays$1);
           overlays.splice(1, 0, indicator);
     this.graph = new graph(this, this.elViewport, overlays);
     this.#overlayIndicator = this.graph.overlays.get(this.#overlay.name).instance;
@@ -8100,11 +8909,34 @@ class OffChart extends Chart {
     this.scale.draw();
     this.draw();
   }
-  updateRange(pos) {
-    this.draw(this.range);
+}
+
+class chartWatermark {
+  #parent
+  #core
+  #config = {}
+  #theme
+  #xAxis
+  #yAxis
+  #target
+  #scene
+  #params
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
+    this.#parent = parent;
+    this.#core = parent.core;
+    this.#target = target;
+    this.#scene = target.scene;
+    this.#theme = theme;
+    this.#params = params;
+    this.#config.content = params?.content || "";
   }
-  zoomRange() {
-    this.draw(this.range, true);
+  set position(p) { this.#target.setPosition(0, 0); }
+  draw(content) {
+    content = content || this.#config.content;
+    this.#scene.clear();
+    const ctx = this.#scene.context;
+    ctx.save();
+    ctx.restore();
   }
 }
 
@@ -8124,8 +8956,8 @@ var stateMachineConfig$2 = {
           action (data) {
           },
         },
-        chart_zoom: {
-          target: 'chart_zoom',
+        setRange: {
+          target: 'setRange',
           action (data) {
           },
         },
@@ -8139,8 +8971,8 @@ var stateMachineConfig$2 = {
           action (data) {
           },
         },
-        divider_mousedown: {
-          target: 'divider_mousedown',
+        divider_pointerdrag: {
+          target: 'divider_pointerdrag',
           action (data) {
           },
         },
@@ -8171,7 +9003,7 @@ var stateMachineConfig$2 = {
         },
       }
     },
-    chart_zoom: {
+    setRange: {
       onEnter (data) {
       },
       onExit (data) {
@@ -8195,7 +9027,6 @@ var stateMachineConfig$2 = {
         always: {
           target: 'idle',
           action (data) {
-            console.log(`${this.id}: transition from "${this.state}" to "idle"`);
             this.context.origin.updateRange(data);
           },
         },
@@ -8217,6 +9048,8 @@ var stateMachineConfig$2 = {
     },
     divider_mousedown: {
       onEnter(data) {
+        console.log(`${this.id}: stAate: "${this.state}" - onEnter`);
+console.log(data);
         this.context.divider = data;
       },
       onExit(data) {
@@ -8225,17 +9058,14 @@ var stateMachineConfig$2 = {
         main_mousemove: {
           target: "divider_mousemove",
           action (data) {
+            console.log(`${this.id}: transition from "${this.state}" to "divider_mousemove"`);
           },
         },
-        main_mouseup: {
-          target: "idle",
-          action (data) {
-          },
-        }
       }
     },
     divider_mousemove: {
       onEnter(data) {
+        console.log(`${this.id}: state: "${this.state}" - onEnter`);
         let divider = this.context.divider;
         this.context.pair = this.context.origin.resizeRowPair(divider, data);
       },
@@ -8257,8 +9087,34 @@ var stateMachineConfig$2 = {
           target: "idle",
           action (data) {
             this.actions.removeProperty.call(this);
+            console.log(`${this.id}: transition from "${this.state}" to "ilde"`);
           },
         }
+      }
+    },
+    divider_pointerdrag: {
+      onEnter(data) {
+        const pos = [
+          data.e.dragstart.x, data.e.dragstart.y,
+          data.e.dragend.x, data.e.dragend.y,
+          data.e.movement.x, data.e.movement.y
+        ];
+        this.context.pair = this.context.origin.resizeRowPair(data, pos);
+      },
+      onExit(data) {
+      },
+      on: {
+        divider_pointerdrag: {
+          target: "divider_pointerdrag",
+          action (data) {
+          },
+        },
+        divider_pointerdragend: {
+          target: "idle",
+          action (data) {
+            this.actions.removeProperty.call(this);
+          },
+        },
       }
     },
     global_resize: {
@@ -8291,6 +9147,10 @@ var stateMachineConfig$2 = {
   }
 };
 
+const defaultOverlays = [
+  ["watermark", {class: chartWatermark, fixed: true, required: true, params: {content: null}}],
+  ["grid", {class: chartGrid, fixed: false, required: true, params: {axes: "x"}}],
+];
 class MainPane {
   #name = "MainPane"
   #shortName = "Main"
@@ -8309,9 +9169,10 @@ class MainPane {
   #elGrid
   #elCanvas
   #elViewport
+  #Graph
   #viewport
   #layerGrid
-  #layerLabels
+  #layerWatermark
   #OffCharts = new Map()
   #Chart
   #Time
@@ -8329,6 +9190,7 @@ class MainPane {
   #buffer
   #indicators
   #controller
+  #input
   constructor (core, options) {
     this.#core = core;
     this.#options = options;
@@ -8377,7 +9239,7 @@ class MainPane {
     this.#elTime = this.#elMain.time;
     this.#elChart = this.#elMain.rows.onChart;
     this.#elGrid = this.#elMain.rows.grid;
-    this.#elViewport = this.#elMain.rows.grid.viewport;
+    this.#elViewport = this.#elMain.viewport;
     this.#elScale = this.#core.elBody.scale;
     options.name = "Chart";
     options.shortName = "Chart";
@@ -8414,8 +9276,14 @@ class MainPane {
       offChart.start(i++);
     });
     this.rowsOldH = this.rowsH;
-    this.createViewport();
+    this.createGraph();
     this.initXGrid();
+    renderLoop.init({
+      graphs: [this.#Graph],
+      range: this.range
+    });
+    renderLoop.start();
+    renderLoop.queueFrame(this.range, [this.#Graph], false);
     this.eventsListen();
     stateMachineConfig$2.id = this.id;
     this.stateMachine = stateMachineConfig$2;
@@ -8439,21 +9307,25 @@ class MainPane {
     this.#controller.removeEventListener("keyup", this.onChartKeyDown);
     this.#controller = null;
     this.off(STREAM_NEWVALUE, this.onNewStreamValue);
+    this.off("setRange", this.draw);
   }
   eventsListen() {
-    this.#elMain.tabIndex = 0;
-    this.#elMain.focus();
+    this.#elRows.tabIndex = 0;
+    this.#elRows.focus();
     this.#controller = new InputController(this.#elRows, {disableContextMenu: false});
-    this.#controller.on("mousewheel", this.onMouseWheel.bind(this));
-    this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
-    this.#controller.on("mouseout", this.onMouseOut.bind(this));
-    this.#controller.on("drag", throttle(this.onChartDrag, 100, this));
-    this.#controller.on("enddrag", this.onChartDragDone.bind(this));
     this.#controller.on("keydown", this.onChartKeyDown.bind(this));
     this.#controller.on("keyup", this.onChartKeyUp.bind(this));
-    this.#controller.on("mouseup", this.onMouseUp.bind(this));
+    this.#input = new Input(this.#elRows, {disableContextMenu: false});
+    this.#input.on("wheel", this.onMouseWheel.bind(this));
+    this.#input.on("pointerdrag", this.onChartDrag.bind(this));
+    this.#input.on("pointerdragend", this.onChartDragDone.bind(this));
+    this.#input.on("pointermove", this.onMouseMove.bind(this));
+    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
+    this.#input.on("pointerout", this.onMouseOut.bind(this));
     this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this));
+    this.on("setRange", this.draw.bind(this));
+    this.on("scrollUpdate", this.draw.bind(this));
+    this.on("chart_render", this.draw.bind(this));
   }
   on(topic, handler, context) {
     this.#core.on(topic, handler, context);
@@ -8471,7 +9343,7 @@ class MainPane {
     const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length);
     const newEnd = range.indexEnd + Math.ceil(direction * XAXIS_ZOOM * range.Length);
     this.#core.setRange(newStart, newEnd);
-    this.draw();
+    this.draw(this.range, true);
   }
   onMouseMove(e) {
     this.#cursorPos = [
@@ -8481,8 +9353,23 @@ class MainPane {
     ];
     this.emit("main_mousemove", this.#cursorPos);
   }
-  onMouseUp(e) {
-    this.emit("main_mouseup", e);
+  onMouseEnter(e) {
+    this.core.Timeline.showCursorTime();
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true;
+    this.core.Chart.graph.render();
+    for (let [key, offChart] of this.offCharts) {
+      offChart.graph.overlays.list.get("cursor").layer.visible = true;
+      offChart.graph.render();
+    }
+  }
+  onMouseOut(e) {
+    this.core.Timeline.hideCursorTime();
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false;
+    this.core.Chart.graph.render();
+    for (let [key, offChart] of this.offCharts) {
+      offChart.graph.overlays.list.get("cursor").layer.visible = false;
+      offChart.graph.render();
+    }
   }
   onChartDrag(e) {
     const d = this.#drag;
@@ -8508,24 +9395,6 @@ class MainPane {
       ...d.delta
     ]);
     this.emit("chart_pan", this.#cursorPos);
-  }
-  onMouseEnter(e) {
-    this.core.Timeline.showCursorTime();
-    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true;
-    this.core.Chart.graph.render();
-    for (let [key, offChart] of this.offCharts) {
-      offChart.graph.overlays.list.get("cursor").layer.visible = true;
-      offChart.graph.render();
-    }
-  }
-  onMouseOut(e) {
-    this.core.Timeline.hideCursorTime();
-    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false;
-    this.core.Chart.graph.render();
-    for (let [key, offChart] of this.offCharts) {
-      offChart.graph.overlays.list.get("cursor").layer.visible = false;
-      offChart.graph.render();
-    }
   }
   onChartDragDone(e) {
     const d = this.#drag;
@@ -8576,10 +9445,12 @@ class MainPane {
   setHeight(h) {
   }
   setDimensions() {
-    let resizeH = this.rowsH / this.#viewport.height;
-    let chartH = Math.round(this.#Chart.height * resizeH);
+    this.#elRows.previousDimensions();
+    let resizeH = this.#elRows.heightDeltaR;
+    let chartH = Math.round(this.chartH * resizeH);
     let width = this.rowsW;
     let height = this.rowsH;
+    let layerWidth = Math.round(width * ((100 + this.#buffer) * 0.01));
     let dimensions = {
       resizeH: resizeH,
       mainH: this.element.height,
@@ -8587,30 +9458,25 @@ class MainPane {
       rowsH: this.rowsH,
       rowsW: this.rowsW,
     };
+    if (this.#OffCharts.size == 0 &&
+      chartH != this.#elRows.height) chartH = this.#elRows.height;
     this.#core.scrollPos = -1;
     this.#Time.setDimensions({w: width});
-    this.#viewport.setSize(width, height);
-    const buffer = this.buffer;
-    width = Math.round(width * ((100 + buffer) * 0.01));
-    this.#layerGrid.setSize(width, height);
-    this.#chartGrid.draw("x");
-    this.#viewport.render();
-    if (this.#OffCharts.size == 0 &&
-        chartH != this.#elRows.height) chartH = this.#elRows.height;
+    this.#Graph.setSize(width, height, layerWidth);
     this.#Chart.setDimensions({w: width, h: chartH});
     this.#OffCharts.forEach((offChart, key) => {
       chartH = Math.round(offChart.viewport.height * resizeH);
       offChart.setDimensions({w: width, h: chartH});
       offChart.Divider.setDividerPos();
     });
-    this.#core.range;
     this.rowsOldH = this.rowsH;
+    this.draw(this.range, true);
     this.emit("rowsResize", dimensions);
   }
   getBufferPx() {
     let w = Math.round(this.width * this.buffer / 100);
     let r = w % this.candleW;
-    return w - Math.round(r)
+    return w - r
   }
   registerOffCharts(options) {
     if (this.#core.offChart.length === 0) return
@@ -8657,7 +9523,7 @@ class MainPane {
     options.name = "OffChart";
     options.shortName = "offChart";
     let o = new OffChart(this.#core, options);
-    this.#OffCharts.set(o.ID, o);
+    this.#OffCharts.set(o.id, o);
     this.emit("addOffChart", o);
   }
   addIndicator(ind) {
@@ -8673,55 +9539,36 @@ class MainPane {
   `;
     return node
   }
-  createViewport() {
-    const buffer = this.buffer;
-    const width = this.width - SCALEW;
-    const height = this.rowsH;
-    const layerConfig = {
-      width: Math.round(width * ((100 + buffer) * 0.01)),
-      height: height
-    };
-    this.#viewport = new CEL.Viewport({
-      width: width,
-      height: height,
-      container: this.#elViewport
-    });
-    this.#elCanvas = this.#viewport.scene.canvas;
-    this.#layerLabels = new CEL.Layer(layerConfig);
-    this.#layerGrid = new CEL.Layer(layerConfig);
-    this.#viewport
-          .addLayer(this.#layerLabels)
-          .addLayer(this.#layerGrid);
-    const config = {...this.theme, ...{ axes: "x" }};
-    this.#chartGrid =
-      new chartGrid(
-        this.#layerGrid,
-        this.#Time,
-        null,
-        config,
-        this);
+  createGraph() {
+    let overlays = copyDeep(defaultOverlays);
+    this.#Graph = new graph(this, this.#elViewport, overlays);
   }
   initXGrid() {
     this.draw();
   }
-  draw() {
-    window.requestAnimationFrame(()=> {
-      this.#layerGrid.setPosition(this.scrollPos, 0);
-      this.#chartGrid.draw("x");
-      this.#viewport.render();
-      this.#Time.draw();
+  draw(range=this.range, update=false) {
+    const graphs = [
+      this.#Graph,
+      this.#Time,
+      this.#Chart
+    ];
+    this.#OffCharts.forEach((offChart, key) => {
+      graphs.push(offChart);
     });
+    renderLoop.queueFrame(
+      this.range,
+      graphs,
+      update);
   }
   updateRange(pos) {
     this.#core.updateRange(pos);
-    this.draw();
   }
   zoomRange() {
-    this.draw();
+    this.draw(this.range, true);
   }
   resizeRowPair(divider, pos) {
     let active = divider.offChart;
-    let ID = active.ID;
+    let ID = active.id;
     let offCharts = [...this.#OffCharts.keys()];
     let i = offCharts.indexOf(ID);
     let prev = (i == 0) ?
@@ -9107,6 +9954,7 @@ class Divider {
   #elOffChart
   #cursorPos
   #controller
+  #input
   static dividerList = {}
   static divideCnt = 0
   static class = CLASS_DIVIDERS
@@ -9148,19 +9996,19 @@ class Divider {
     this.eventsListen();
   }
   end() {
-    this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
-    this.#controller.removeEventListener("mouseout", this.onMouseOut);
-    this.#controller.removeEventListener("drag", this.onDividerDrag);
-    this.#controller.removeEventListener("enddrag", this.onDividerDragDone);
-    this.#controller = null;
+    this.#input.off("pointerenter", this.onMouseEnter);
+    this.#input.off("pointerout", this.onMouseOut);
+    this.#input.off("pointerdrag", this.onPointerDrag);
+    this.#input.off("pointerdragend", this.onPointerDragEnd);
+    this.#input = null;
     this.el.remove();
   }
   eventsListen() {
-    this.#controller = new InputController(this.#elDivider, {disableContextMenu: false});
-    this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
-    this.#controller.on("mouseout", this.onMouseOut.bind(this));
-    this.#controller.on("mousedown", debounce(this.onMouseDown, 100, this, true));
-    this.#controller.on("mouseup", this.onMouseUp.bind(this));
+    this.#input = new Input(this.#elDivider, {disableContextMenu: false});
+    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
+    this.#input.on("pointerout", this.onMouseOut.bind(this));
+    this.#input.on("pointerdrag", this.onPointerDrag.bind(this));
+    this.#input.on("pointerdragend", this.onPointerDragEnd.bind(this));
   }
   on(topic, handler, context) {
     this.#core.on(topic, handler, context);
@@ -9177,20 +10025,21 @@ class Divider {
   onMouseOut() {
     this.#elDivider.style.background = "#FFFFFF00";
   }
-  onMouseDown(e) {
-    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
-    this.emit(`${this.ID}_mousedown`, this.#cursorPos);
-    this.emit(`divider_mousedown`, {
+  onPointerDrag(e) {
+    this.#cursorPos = [e.position.x, e.position.y];
+    this.emit(`${this.ID}_pointerdrag`, this.#cursorPos);
+    this.emit(`divider_pointerdrag`, {
       id: this.ID,
       e: e,
       pos: this.#cursorPos,
       offChart: this.offChart
     });
   }
-  onMouseUp(e) {
-    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
-    this.emit(`${this.ID}_mouseup`, this.#cursorPos);
-    this.emit(`divider_mouseup`, {
+  onPointerDragEnd(e) {
+    if ("position" in e)
+    this.#cursorPos = [e.position.x, e.position.y];
+    this.emit(`${this.ID}_pointerdragend`, this.#cursorPos);
+    this.emit(`divider_pointerdragend`, {
       id: this.ID,
       e: e,
       pos: this.#cursorPos,
@@ -9419,6 +10268,7 @@ class TradeXchart extends tradeXChart {
   static #cfg = {}
   static #instances = {}
   static #talibReady = false
+  static get talibReady() { return TradeXchart.#talibReady }
   static initErrMsg = `${NAME} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`
   static permittedClassNames =
   ["TradeXchart","Chart","MainPane","OffChart","OnChart",
@@ -9455,8 +10305,6 @@ class TradeXchart extends tradeXChart {
   #TALib
   #theme
   #themeTemp
-  #chartW = CHART_MINW
-  #chartH = CHART_MINH
   chartWMin = CHART_MINW
   chartHMin = CHART_MINH
   chartW_Reactive = true
@@ -9574,10 +10422,6 @@ class TradeXchart extends tradeXChart {
   get config() { return this.#config }
   get core() { return this.#core }
   get inCnt() { return this.#inCnt }
-  get width() { return this.offsetWidth }
-  set width(w) { this.setWidth(w); }
-  get height() { return this.offsetHeight }
-  set height(h) { this.setHeight(h); }
   set elUtils(el) { this.#elUtils = el; }
   get elUtils() { return this.#elUtils }
   set elTools(el) { this.#elTools = el; }
@@ -9619,6 +10463,7 @@ class TradeXchart extends tradeXChart {
   get settings() { return this.#state.data.chart.settings }
   get indicators() { return this.#indicators }
   get TALib() { return this.#TALib }
+  get TALibReady() { return TradeXchart.talibReady }
   get hub() { return this.#hub }
   get candleW() { return this.Timeline.candleW }
   get candlesOnLayer() { return this.Timeline.candlesOnLayer }
@@ -9637,7 +10482,7 @@ class TradeXchart extends tradeXChart {
   get isEmpty() { return this.#chartIsEmpty }
   set candles(c) { if (isObject(c)) this.#candles = c; }
   get candles() { return this.#candles }
-  init(config) {
+  start(config) {
     config = {...TradeXchart.create(config), ...config};
     this.logs = (config?.logs) ? config.logs : false;
     this.infos = (config?.infos) ? config.infos : false;
@@ -9795,54 +10640,8 @@ class TradeXchart extends tradeXChart {
   }
   getID() { return this.#id }
   getModID() { return this.#modID }
-  setWidth(w) {
-    if (isNumber(w)) {
-      this.#chartW = w;
-      w += "px";
-    }
-    else if (isString(w)) ;
-    else {
-      this.#chartW = this.parentElement.getBoundingClientRect().width;
-      w = this.#chartW + "px";
-    }
-    this.style.width = w;
-  }
-  setHeight(h) {
-    if (isNumber(h)) {
-      this.#chartH = h;
-      h += "px";
-    }
-    else if (isString(h)) ;
-    else {
-      this.#chartH = this.parentElement.getBoundingClientRect().height;
-      w = this.#chartH + "px";
-    }
-    this.style.height = h;
-  }
-  setWidthMin(w) { this.style.minWidth = `var(--txc-min-width, ${w})`; }
-  setHeightMin(h) { this.style.minHeight = `var(--txc-min-height, ${w})`; }
-  setWidthMax(w) { this.style.minWidth = `var(--txc-max-width, ${w})`; }
-  setHeightMax(h) { this.style.minHeight = `var(--txc-max-height, ${w})`; }
   setDimensions(w, h) {
-    let dims;
-    let width = this.width;
-    let height = this.height;
-    if (!w || !h) {
-      const dims = this.getBoundingClientRect();
-      const parent = this.parentElement.getBoundingClientRect();
-      h = (!dims.height) ? (!parent.height) ? CHART_MINH : parent.height : dims.height;
-      w = (!dims.width) ? (!parent.width) ? CHART_MINW : parent.width : dims.width;
-    }
-    dims = {
-      width: this.width,
-      height: this.height,
-      resizeW: w / width,
-      resizeH: h / height,
-      resizeWDiff: w - width,
-      resizeHDiff: h - height
-    };
-    this.setWidth(w);
-    this.setHeight(h);
+    const dims = super.setDimensions(w, h);
     this.emit("global_resize", dims);
   }
   setUtilsH(h) {
@@ -9964,21 +10763,34 @@ class TradeXchart extends tradeXChart {
     }
   }
   updateRange(pos) {
-    let dist, offset, scrollPos;
-    offset = 0;
+    if (!isArray(pos) || !isNumber(pos[4]) || pos[4] == 0) return
+    let dist, scrollPos;
     dist = pos[4];
     scrollPos = this.#scrollPos + dist;
+    scrollPos % this.candleW;
     if (scrollPos < this.bufferPx * -1) {
       scrollPos = 0;
-      offset = this.rangeScrollOffset * -1;
-      this.offsetRange(offset);
+      this.offsetRange(this.rangeScrollOffset * -1);
     }
     else if (scrollPos > 0) {
       scrollPos = this.bufferPx * -1;
-      offset = this.rangeScrollOffset;
-      this.offsetRange(offset);
+      this.offsetRange(this.rangeScrollOffset);
     }
     this.#scrollPos = scrollPos;
+    this.emit("scrollUpdate", scrollPos);
+  }
+  xupdateRange(pos) {
+    if (pos[4] == 0) return
+    let dist, offset, scrollPos, r;
+    dist = pos[4];
+    scrollPos = this.#scrollPos + dist;
+    r = scrollPos % this.candleW;
+    offset = (scrollPos - r) / this.candleW;
+    offset = (dist > 0) ? offset : offset * -1;
+    this.offsetRange(offset);
+    this.scrollPos = r;
+    this.#scrollPos = r;
+    this.emit("scrollUpdate", scrollPos);
   }
   offsetRange(offset) {
     let start = this.range.indexStart - offset,
