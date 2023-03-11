@@ -69,25 +69,21 @@ export class EventsAgent {
       this.type = [...keyboard, ...mouse, ...touch, ...pen, ...misc, ...custom]
     }
 
+    this.clientPosPrev = new Point([null, null])
     // current mouse position
     this.position = new Point();
-
     // amount of mouse movement difference
-    this.movement = new Point([null, null]);
-    this.firstMovementUpdate = true;
-
-    // draging start and end position
+    this.movement = new Point([0, 0]);
+    // dragging start and end position
     this.dragstart = new Point([null, null]);
     this.dragend = new Point([null, null]);
     this.dragCheckThreshold = 3;
     this.dragStatus = false
-
     // mouse wheel
     this.wheeldelta = 0;
-
     // current pressed mouse buttons
-    this.pressedButtons = [];
-
+    this.pointerButtons = [false, false, false, false, false]
+    // custom events
     this.pointerdrag = new Event("pointerdrag")
     this.pointerdragend = new Event("pointerdragend")
   }
@@ -116,9 +112,14 @@ export class EventsAgent {
               handler(this.createEventArgument(e))
             }
             break;
+        case "pointerup":
+          cb = function (e) {
+            this.onPointerUp(e)
+            handler(this.createEventArgument(e))
+          }
+          break;
         case "pointermove":
           cb = function (e) {
-            console.log(e.clientY)
             this.motion(e)
             handler(this.createEventArgument(e))
           }
@@ -129,7 +130,6 @@ export class EventsAgent {
         case "pointerleave":
         case "pointerout":
         case "pointerover":
-        case "pointerup":
         case "contextmenu":
           cb = function (e) {
             this.location(e)
@@ -219,18 +219,17 @@ export class EventsAgent {
   onPointerDown (e) {
 
     this.location(e)
+    this.pointerButtons[e.button] = true
 
-    switch (e.button) {
-      // case 0: this.pressedButtons._t_pushIfNotExist(MouseButtons.Left); break;
-      // case 1: this.pressedButtons._t_pushIfNotExist(MouseButtons.Middle); break;
-      // case 2: this.pressedButtons._t_pushIfNotExist(MouseButtons.Right); break;
-    }
     if (this.dragStatus == "ready") e.target.setPointerCapture(e.pointerId)
-// console.log("onPointerDown: ", e.target)
+  }
+
+  onPointerUp (e) {
+    this.location(e)
+    this.pointerButtons[e.button] = false
   }
 
   onPointerMove (e) {
-    // console.log(`pos.x: ${this.position.x}, move.x: ${this.movement.x}`)
     if (this.dragStatus == "dragging") {
       this.motion(e)
       this.dragend = this.position.clone()
@@ -248,7 +247,6 @@ export class EventsAgent {
     if (this.dragStatus == "dragging") {
       this.dragStatus = "ready"
       e.target.dispatchEvent(this.pointerdragend)
-      console.log(`onPointerDragEnd`)
     }
   }
 
@@ -260,13 +258,14 @@ export class EventsAgent {
       dragstart: this.dragstart.clone(),
       dragend: this.dragend.clone(),
       wheeldelta: this.wheeldelta,
+      buttons: this.pointerButtons,
       domEvent: e,
-      timeStamp: e.timeStamp
+      timeStamp: Date.now()
     }
   }
 
   isButtonPressed(button) {
-    return this.pressedButtons.includes(button);
+    return (this.pointerButtons.indexOf(button) !== -1) ? true : false
   }
 
   setCursor(type) {
@@ -274,30 +273,32 @@ export class EventsAgent {
 	}
 
   motion(e) {
-    
+
+    const prevClientX = this.clientPosPrev.x
+    const prevClientY = this.clientPosPrev.y
     const clientX = e.clientX || this.position.x
     const clientY = e.clientY || this.position.y
     const clientRect = e.target.getBoundingClientRect();
-    const client = {
-      x: clientX - clientRect.left,
-      y: clientY - clientRect.top
-    }
+    // const client = {
+    //   x: clientX - clientRect.left,
+    //   y: clientY - clientRect.top
+    // }
 
-    if (this.firstMovementUpdate) {
-      this.movement.x = 0;
-      this.movement.y = 0;
-      this.firstMovementUpdate = false;
-    } else {
-      this.movement.x = client.x - this.position.x;
-      this.movement.y = client.y - this.position.y;
-    }
+    this.movement.x = clientX - prevClientX
+    this.movement.y = clientY - prevClientY
 
-    this.position.x = client.x;
-    this.position.y = client.y;
+    this.position.x += this.movement.x
+    this.position.y += this.movement.y
+
+    this.clientPosPrev.x = clientX
+    this.clientPosPrev.y = clientY
   }
 
   location(e) {
     const clientRect = e.target.getBoundingClientRect();
+
+    this.clientPosPrev.x = e.clientX
+    this.clientPosPrev.y = e.clientY
 
     this.position.x = e.clientX - clientRect.left;
     this.position.y = e.clientY - clientRect.top;

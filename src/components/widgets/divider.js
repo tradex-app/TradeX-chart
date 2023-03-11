@@ -92,26 +92,18 @@ export default class Divider {
   }
 
   end() {
-    // remove event listners
-    this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
-    this.#controller.removeEventListener("mouseout", this.onMouseOut);
-    this.#controller.removeEventListener("drag", this.onDividerDrag);
-    this.#controller.removeEventListener("enddrag", this.onDividerDragDone);
-    this.#controller = null
+    // remove event listeners
+    this.#input.off("pointerenter", this.onMouseEnter);
+    this.#input.off("pointerout", this.onMouseOut);
+    this.#input.off("pointerdrag", this.onPointerDrag);
+    this.#input.off("pointerdragend", this.onPointerDragEnd);
+    this.#input = null
 
     // remove element
     this.el.remove()
   }
 
   eventsListen() {
-    // // create controller and use 'on' method to receive input events
-    // this.#controller = new InputController(this.#elDivider, {disableContextMenu: false});
-
-    // this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
-    // this.#controller.on("mouseout", this.onMouseOut.bind(this))
-    // this.#controller.on("mousedown", debounce(this.onPointerDrag, 100, this, true));
-    // this.#controller.on("mouseup", this.onPointerDragEnd.bind(this));
-
     this.#input = new Input(this.#elDivider, {disableContextMenu: false});
 
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
@@ -150,16 +142,11 @@ export default class Divider {
       pos: this.#cursorPos,
       offChart: this.offChart
     })
-
-    console.log(`pointerdrag - pos: ${e.position.y}`)
   }
 
   onPointerDragEnd(e) {
     if ("position" in e)
     this.#cursorPos = [e.position.x, e.position.y]
-
-    console.log(`divider_pointerdragend`)
-
     this.emit(`${this.ID}_pointerdragend`, this.#cursorPos)
     this.emit(`divider_pointerdragend`, {
       id: this.ID,

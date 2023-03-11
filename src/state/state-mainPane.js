@@ -191,8 +191,6 @@ console.log(data)
     },
     divider_pointerdrag: {
       onEnter(data) {
-        console.log(`${this.id}: state: "${this.state}" - onEnter`)
-        console.log(data)
         const pos = [
           data.e.dragstart.x, data.e.dragstart.y,
           data.e.dragend.x, data.e.dragend.y,
@@ -216,7 +214,7 @@ console.log(data)
           action (data) {
             this.actions.removeProperty.call(this)
 
-            console.log(`${this.id}: transition from "${this.state}" to "divider_mousemove"`)
+            // console.log(`${this.id}: transition from "${this.state}" to "divider_mousemove"`)
           },
         },
       }

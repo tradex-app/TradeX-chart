@@ -249,12 +249,6 @@ export default class MainPane {
     // create controller and use 'on' method to receive input events 
     this.#controller = new InputController(this.#elRows, {disableContextMenu: false});
 
-    // this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
-    // this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    // this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
-    // this.#controller.on("mouseout", this.onMouseOut.bind(this));
-    // this.#controller.on("drag", throttle(this.onChartDrag, 50, this, true));
-    // this.#controller.on("enddrag", this.onChartDragDone.bind(this));
     this.#controller.on("keydown", this.onChartKeyDown.bind(this))
     this.#controller.on("keyup", this.onChartKeyUp.bind(this))
 
@@ -267,11 +261,6 @@ export default class MainPane {
     this.#input.on("pointermove", this.onMouseMove.bind(this))
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
-
-    // this.#input.on("click", (e)=> {
-    //   console.log("click: ", e.domEvent.composedPath())
-    // });
-
 
     // listen/subscribe/watch for parent notifications
     this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this))
@@ -619,12 +608,9 @@ export default class MainPane {
     let activeH = active.height - pos[5] - 1
     let prevH  = prev.height + pos[5]
 
-    console.log(`pos[5]: ${pos[5]}, activeH: ${activeH}, prevH: ${prevH}`)
-    
     if ( activeH >= this.#rowMinH
         && prevH >= this.#rowMinH) {
           divider.offChart.Divider.updateDividerPos(pos)
-          console.log(`active: ${activeH}, prev: ${prevH}, total: ${activeH + prevH}`)
           active.setDimensions({w:undefined, h:activeH})
           prev.setDimensions({w:undefined, h:prevH})
     }
