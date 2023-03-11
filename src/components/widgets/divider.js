@@ -151,7 +151,7 @@ export default class Divider {
       offChart: this.offChart
     })
 
-    console.log("pointerdrag")
+    console.log(`pointerdrag - pos: ${e.position.y}`)
   }
 
   onPointerDragEnd(e) {

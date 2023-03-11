@@ -157,6 +157,8 @@ export default class indicator {
  * @returns {boolean} - success or failure
  */
   calcIndicator (indicator, params) {
+    if (!this.core.TALibReady) return false
+
     this.overlay.data = []
     let step = this.calcParams[0]
     // fail if there is not enough data to calculate
@@ -187,6 +189,8 @@ export default class indicator {
    * @returns {array} - indicator data entry
    */
   calcIndicatorStream (indicator, params) {
+    if (!this.core.TALibReady) return false
+
     let entry = this.TALib[indicator](params)
     let end = this.range.dataLength
     let time = this.range.value(end)[0]

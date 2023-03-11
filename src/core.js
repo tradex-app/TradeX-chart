@@ -49,6 +49,7 @@ export default class TradeXchart extends Tradex_chart {
   static #cfg = {}
   static #instances = {}
   static #talibReady = false
+  static get talibReady() { return TradeXchart.#talibReady }
   static initErrMsg = `${NAME} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`
   static permittedClassNames = 
   ["TradeXchart","Chart","MainPane","OffChart","OnChart",
@@ -294,6 +295,7 @@ export default class TradeXchart extends Tradex_chart {
   get settings() { return this.#state.data.chart.settings }
   get indicators() { return this.#indicators }
   get TALib() { return this.#TALib }
+  get TALibReady() { return TradeXchart.talibReady }
   get hub() { return this.#hub }
 
   get candleW() { return this.Timeline.candleW }

@@ -118,6 +118,7 @@ export class EventsAgent {
             break;
         case "pointermove":
           cb = function (e) {
+            console.log(e.clientY)
             this.motion(e)
             handler(this.createEventArgument(e))
           }
