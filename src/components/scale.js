@@ -4,11 +4,11 @@
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import DOM from "../utils/DOM"
 import yAxis from "./axis/yAxis"
-import CEL from "./primitives/canvas"
+import CEL from "./primitives/canvas3"
 import { drawTextBG } from "../utils/canvas"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
-import { InputController, } from "../input/controller"
+import Input from '../input2'
 import { copyDeep, uid } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
 import scalePriceLine from './overlays/scale-priceLine'
@@ -40,7 +40,7 @@ export default class ScaleBar {
   #layerPriceLine
   #layerCursor
 
-  #controller
+  #input
   #priceLine
   #cursorPos
 
@@ -120,11 +120,11 @@ export default class ScaleBar {
 
   end() {
     this.stateMachine.destroy()
-    this.#controller = null
+    this.#input = null
     this.#viewport.destroy()
 
-    this.#controller.removeEventListener("drag", this.onDrag);
-    this.#controller.removeEventListener("enddrag", this.onDragDone);
+    // this.#controller.removeEventListener("drag", this.onDrag);
+    // this.#controller.removeEventListener("enddrag", this.onDragDone);
 
     this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove)
     this.off(`${this.#parent.ID}_mouseout`, this.eraseCursorPrice)
@@ -134,14 +134,14 @@ export default class ScaleBar {
   eventsListen() {
     let canvas = this.#viewport.scene.canvas
     // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(canvas, {disableContextMenu: false});
-    this.#controller.setCursor("ns-resize")
+    this.#input = new Input(canvas, {disableContextMenu: false});
+    this.#input.setCursor("ns-resize")
     // this.#controller.on("drag", this.onDrag.bind(this));
     // this.#controller.on("enddrag", this.onDragDone.bind(this));
     // this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
 
-    this.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMove(e) })
-    this.on(`${this.#parent.ID}_mouseout`, (e) => { this.eraseCursorPrice() })
+    this.on(`${this.#parent.id}_mousemove`, this.onMouseMove.bind(this))
+    this.on(`${this.#parent.id}_mouseout`, this.eraseCursorPrice.bind(this))
     this.on(STREAM_UPDATE, (e) => { this.onStreamUpdate(e) })
     // this.on("chart_pan", (e) => { this.drawCursorPrice() })
     // this.on("chart_panDone", (e) => { this.drawCursorPrice() })
@@ -317,9 +317,6 @@ export default class ScaleBar {
   }
 
   drawCursorPrice() {
-
-console.log(" drawCursorPrice()")
-
     let [x, y] = this.#cursorPos,
         price =  this.yPos2Price(y),
         nice = this.nicePrice(price),

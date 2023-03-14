@@ -9,7 +9,7 @@ import {
   isObject,
   isString,
 } from "../utils/typeChecks";
-import CEL from "../components/primitives/canvas";
+import CEL from "../components/primitives/canvas3";
 import StateMachine from "../scaleX/stateMachne";
 import { InputController, Keys } from "../input/controller";
 import Input from "../input2"
@@ -172,10 +172,8 @@ export default class Chart {
     this.#Scale.end();
     this.#Graph.destroy();
 
-    const main = this.core.MainPane
-    this.#inputM.off("pointerdrag", main.onChartDrag)
-    this.#inputM.off("pointerdragend", main.onChartDrag)
-
+    this.#input.off("pointerdrag", this.onChartDrag)
+    this.#input.off("pointerdragend", this.onChartDrag)
     this.#input.off("pointermove", this.onMouseMove)
     this.#input.off("pointerenter", this.onMouseEnter);
     this.#input.off("pointerout", this.onMouseOut);
@@ -189,15 +187,9 @@ export default class Chart {
   }
 
   eventsListen() {
-    this.#input = new Input(this.#elTarget, {
-      disableContextMenu: false,
-    });
-
-    const main = this.core.MainPane
-    this.#inputM = new Input(this.element, {disableContextMenu: false});
-    this.#inputM.on("pointerdrag", main.onChartDrag.bind(main))
-    this.#inputM.on("pointerdragend", main.onChartDragDone.bind(main))
-
+    this.#input = new Input(this.#elTarget, {disableContextMenu: false});
+    this.#input.on("pointerdrag", this.onChartDrag.bind(this))
+    this.#input.on("pointerdragend", this.onChartDragDone.bind(this))
     this.#input.on("pointermove", this.onMouseMove.bind(this))
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
@@ -238,6 +230,16 @@ export default class Chart {
     this.#core.emit(topic, data);
   }
 
+  onChartDrag(e) {
+    this.setCursor("grab")
+    this.core.MainPane.onChartDrag(e)
+  }
+
+  onChartDragDone(e) {
+    this.setCursor("crosshair")
+    this.core.MainPane.onChartDragDone(e)
+  }
+
   onMouseMove(e) {
     this.core.MainPane.onPointerActive(this)
     this.scale.layerCursor.visible = true
@@ -245,7 +247,6 @@ export default class Chart {
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.#Scale.onMouseMove(this.#cursorPos)
     this.emit(`${this.id}_mousemove`, this.#cursorPos)
-    console.log(`${this.id}_mousemove`, this.#cursorPos)
   }
 
   onMouseEnter(e) {

@@ -4,7 +4,7 @@
 
 import DOM from "../utils/DOM"
 import xAxis from "./axis/xAxis"
-import CEL from "./primitives/canvas"
+import CEL from "./primitives/canvas3"
 import Graph from "./views/classes/graph"
 import { InputController } from "../input/controller"
 import StateMachine from "../scaleX/stateMachne"

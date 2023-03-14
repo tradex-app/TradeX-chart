@@ -61,6 +61,7 @@ export default
     chart_pan: {
       onEnter (data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+        this.context.origin.setCursor("grab")
       },
       onExit (data) {
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
@@ -71,6 +72,7 @@ export default
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to "chart_pan"`)
             this.context.origin.updateRange(data) 
+            this.context.origin.setCursor("grab")
           },
         },
         chart_panDone: {
@@ -78,6 +80,7 @@ export default
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to "chart_panDone"`)
             this.context.origin.updateRange(data) 
+            this.context.origin.setCursor("default")
           },
         },
       }
@@ -138,8 +141,7 @@ export default
     },
     divider_mousedown: {
       onEnter(data) {
-        console.log(`${this.id}: stAate: "${this.state}" - onEnter`)
-console.log(data)
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
         this.context.divider = data
       },
       onExit(data) {

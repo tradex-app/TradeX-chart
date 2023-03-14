@@ -57,14 +57,14 @@ export default class Input  {
   }
 
   isButtonPressed (button) {
-    return this.pointerAgent.isButtonPressed(button);
+    return this.eventsAgent.isButtonPressed(button);
   }
   
   isKeyPressed (key) {
-    return this.keyboardAgent.isKeyPressed(key);
+    return this.eventsAgent.isKeyPressed(key);
   }
 
   setCursor (type) {
-    this.pointerAgent.setCursor(type);
+    this.eventsAgent.setCursor(type);
   }
 }

@@ -2,13 +2,15 @@
 
 import { isObject } from "../../utils/typeChecks"
 import { uid } from "../../utils/utilities"
+import Input from "../../input2"
 
 export default class Legends {
 
-  #targetEl
+  #elTarget
   #list
   #parent
   #core
+  #input
 
   #controls = {
     width: 18,
@@ -18,13 +20,28 @@ export default class Legends {
   #controlsList
 
   constructor(target, parent) {
-    this.#targetEl = target
+    this.#elTarget = target
     this.#list = {}
     this.#parent = parent
     this.#core = parent.core
+    this.eventsListen()
   }
 
   get list() { return this.#list }
+
+  eventsListen() {
+    this.moveEvent = new PointerEvent("pointermove", {bubbles: true, cancelable: true,})
+
+    this.#input = new Input(this.#elTarget, { disableContextMenu: false, });
+    this.#input.on("pointermove", this.onMouseMove.bind(this))
+  }
+
+  onMouseMove(e) {
+    // console.group("legend :",e)
+    // this.#parent.element.dispatchEvent(this.moveEvent)
+    // this.#core.MainPane.elements.elRows.dispatchEvent(this.moveEvent)
+    // this.#parent.onMouseMove(e)
+  }
 
   onMouseClick() {
 
@@ -38,7 +55,7 @@ export default class Legends {
     const styleControls = "order:2; float: right; margin: 0 0.5em 0; opacity:0"
     const mouseOver = "onmouseover='this.style.opacity=1'"
     const mouseOut = "onmouseout='this.style.opacity=0'"
-    const t = this.#targetEl
+    const t = this.#elTarget
 
     styleLegendTitle += (o?.type === "chart") ? "font-size: 1.5em;" : "font-size: 1.2em;"
 
@@ -64,8 +81,8 @@ export default class Legends {
     const html = this.buildLegend(options)
     // const elem = DOM.htmlToElement(html)
 
-    this.#targetEl.insertAdjacentHTML('beforeend', html)
-    const legendEl = this.#targetEl.querySelector(`#${options.id}`) // DOM.findByID(options.id)
+    this.#elTarget.insertAdjacentHTML('beforeend', html)
+    const legendEl = this.#elTarget.querySelector(`#${options.id}`) // DOM.findByID(options.id)
     this.#list[options.id] = {el: legendEl, type: options.type, source: options?.source}
 
     this.#controlsList = legendEl.querySelectorAll(`.control`)
@@ -102,7 +119,7 @@ export default class Legends {
     || !(id in this.#list)) return false
 
     let source = this.#list[id].source(data.pos)
-    const html = this.#targetEl.buildInputs(source)
-    this.#targetEl.querySelector(`#${id} dl`).innerHTML = html
+    const html = this.#elTarget.buildInputs(source)
+    this.#elTarget.querySelector(`#${id} dl`).innerHTML = html
   }
 }

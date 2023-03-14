@@ -122,6 +122,7 @@ export class EventsAgent {
           cb = function (e) {
             this.motion(e)
             handler(this.createEventArgument(e))
+            // console.log(`e.composedPath: `,e.composedPath())
           }
           break;
         case "click":
@@ -274,18 +275,11 @@ export class EventsAgent {
 
   motion(e) {
 
-    const prevClientX = this.clientPosPrev.x
-    const prevClientY = this.clientPosPrev.y
     const clientX = e.clientX || this.position.x
     const clientY = e.clientY || this.position.y
-    const clientRect = e.target.getBoundingClientRect();
-    // const client = {
-    //   x: clientX - clientRect.left,
-    //   y: clientY - clientRect.top
-    // }
 
-    this.movement.x = clientX - prevClientX
-    this.movement.y = clientY - prevClientY
+    this.movement.x = clientX - this.clientPosPrev.x
+    this.movement.y = clientY - this.clientPosPrev.y
 
     this.position.x += this.movement.x
     this.position.y += this.movement.y

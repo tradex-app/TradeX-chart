@@ -2546,8 +2546,8 @@ class Node$1 {
     constructor(cfg={}) {
       this.container = cfg.container;
       this.layers = [];
-      this.id = CEL$1.idCnt++;
-      this.scene = new CEL$1.Scene();
+      this.id = CEL.idCnt++;
+      this.scene = new CEL.Scene();
       this.setSize(cfg.width || 0, cfg.height || 0);
     }
     setSize(width, height) {
@@ -2582,7 +2582,7 @@ class Node$1 {
       return -1;
     }
     get index() {
-      let viewports = CEL$1.viewports,
+      let viewports = CEL.viewports,
         viewport,
         n = 0;
       for (viewport of viewports) {
@@ -2614,357 +2614,17 @@ class Node$1 {
       }
     }
   }
-class Viewport$1 extends Node$1 {
+class Viewport extends Node$1 {
   constructor(cfg={}) {
     super(cfg);
     cfg.container.innerHTML = "";
     cfg.container.appendChild(this.scene.canvas);
-    CEL$1.viewports.push(this);
+    CEL.viewports.push(this);
   }
   destroy() {
     super.destroy();
     this.container.innerHTML = "";
-    CEL$1.viewports.splice(this.index, 1);
-  }
-}
-class Layer$1 {
-  x = 0;
-  y = 0;
-  width = 0;
-  height = 0;
-  visible = true;
-  constructor(cfg={}) {
-    this.id = CEL$1.idCnt++;
-    this.hit = new CEL$1.Hit({
-      contextType: cfg.contextType,
-    });
-    this.scene = new CEL$1.Scene({
-      contextType: cfg.contextType,
-    });
-    if (cfg.x && cfg.y) {
-      this.setPosition(cfg.x, cfg.y);
-    }
-    if (cfg.width && cfg.height) {
-      this.setSize(cfg.width, cfg.height);
-    }
-  }
-  get index() {
-    let layers = this.viewport.layers;
-      layers.length;
-      let n = 0,
-      layer;
-    for (layer of layers) {
-      if (this.id === layer.id) return n;
-      n++;
-    }
-    return null;
-  }
-  setPosition(x, y) {
-    this.x = x;
-    this.y = y;
-    return this;
-  }
-  setSize(width, height) {
-    this.width = width;
-    this.height = height;
-    this.scene.setSize(width, height);
-    this.hit.setSize(width, height);
-    return this;
-  }
-  move(pos) {
-    let index = this.index,
-      viewport = this.viewport,
-      layers = viewport.layers;
-    switch (pos) {
-      case "up":
-    if (index < layers.length - 1) {
-      layers[index] = layers[index + 1];
-      layers[index + 1] = this;
-    }
-        break;
-      case "down":
-        if (index > 0) {
-          layers[index] = layers[index - 1];
-          layers[index - 1] = this;
-        }
-        break;
-      case "top":
-        layers.splice(index, 1);
-        layers.push(this);
-        break;
-      case "bottom":
-        layers.splice(index, 1);
-        layers.unshift(this);
-        break;
-    }
-    return this;
-  }
-  moveUp() {
-    return this.move("up")
-  }
-  moveDown() {
-    return this.move("down")
-  }
-  moveTop() {
-    return this.move("top")
-  }
-  moveBottom() {
-    return this.move("bottom")
-  }
-  remove() {
-    this.viewport.layers.splice(this.index, 1);
-  }
-}
-class Scene$1 {
-  width = 0;
-  height = 0;
-  constructor(cfg) {
-    if (!cfg) cfg = {};
-    this.id = CEL$1.idCnt++;
-    this.contextType = cfg.contextType || "2d";
-    this.canvas = document.createElement("canvas");
-    this.canvas.className = "scene-canvas";
-    this.canvas.style.display = "block";
-    this.context = this.canvas.getContext(this.contextType);
-    if (cfg.width && cfg.height) {
-      this.setSize(cfg.width, cfg.height);
-    }
-  }
-  setSize(width, height) {
-    this.width = width;
-    this.height = height;
-    this.canvas.width = width * CEL$1.pixelRatio;
-    this.canvas.style.width = `${width}px`;
-    this.canvas.height = height * CEL$1.pixelRatio;
-    this.canvas.style.height = `${height}px`;
-    if (this.contextType === "2d" && CEL$1.pixelRatio !== 1) {
-      this.context.scale(CEL$1.pixelRatio, CEL$1.pixelRatio);
-    }
-    return this;
-  }
-  clear() {
-    let context = this.context;
-    if (this.contextType === "2d") {
-      context.clearRect(
-        0,
-        0,
-        this.width * CEL$1.pixelRatio,
-        this.height * CEL$1.pixelRatio
-      );
-    }
-    else {
-      context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
-    }
-    return this;
-  }
-  toImage(type = "image/png", quality, cb) {
-    let that = this,
-      imageObj = new Image(),
-      dataURL = this.canvas.toDataURL(type, quality);
-    imageObj.onload = function () {
-      imageObj.width = that.width;
-      imageObj.height = that.height;
-      cb(imageObj);
-    };
-    imageObj.src = dataURL;
-  }
-  export(cfg, cb, type = "image/png", quality) {
-    if (typeof cb !== "function") cb = this.blobCallback.bind({ cfg: cfg });
-    this.canvas.toBlob(cb, type, quality);
-  }
-  blobCallback(blob) {
-    let anchor = document.createElement("a"),
-      dataUrl = URL.createObjectURL(blob),
-      fileName = this.cfg.fileName || "canvas.png";
-    anchor.setAttribute("href", dataUrl);
-    anchor.setAttribute("target", "_blank");
-    anchor.setAttribute("export", fileName);
-    if (document.createEvent) {
-      Object.assign(document.createElement("a"), {
-        href: dataUrl,
-        target: "_blank",
-        export: fileName,
-      }).click();
-    } else if (anchor.click) {
-      anchor.click();
-    }
-  }
-}
-class Hit$1 {
-  width = 0;
-  height = 0;
-  constructor(cfg) {
-    if (!cfg) cfg = {};
-    this.contextType = cfg.contextType || "2d";
-    this.canvas = document.createElement("canvas");
-    this.canvas.className = "hit-canvas";
-    this.canvas.style.display = "none";
-    this.canvas.style.position = "relative";
-    this.context = this.canvas.getContext(this.contextType, {
-      preserveDrawingBuffer: true,
-      antialias: false,
-    });
-    if (cfg.width && cfg.height) {
-      this.setSize(cfg.width, cfg.height);
-    }
-  }
-  setSize(width, height) {
-    this.width = width;
-    this.height = height;
-    this.canvas.width = width * CEL$1.pixelRatio;
-    this.canvas.style.width = `${width}px`;
-    this.canvas.height = height * CEL$1.pixelRatio;
-    this.canvas.style.height = `${height}px`;
-    return this;
-  }
-  clear() {
-    let context = this.context;
-    if (this.contextType === "2d") {
-      context.clearRect(
-        0,
-        0,
-        this.width * CEL$1.pixelRatio,
-        this.height * CEL$1.pixelRatio
-      );
-    }
-    else {
-      context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
-    }
-    return this;
-  }
-  getIntersection(x, y) {
-    let context = this.context,
-      data;
-    x = Math.round(x);
-    y = Math.round(y);
-    if (x < 0 || y < 0 || x > this.width || y > this.height) {
-      return -1;
-    }
-    if (this.contextType === "2d") {
-      data = context.getImageData(x, y, 1, 1).data;
-      if (data[3] < 255) {
-        return -1;
-      }
-    }
-    else {
-      data = new Uint8Array(4);
-      context.readPixels(
-        x * CEL$1.pixelRatio,
-        (this.height - y - 1) * CEL$1.pixelRatio,
-        1,
-        1,
-        context.RGBA,
-        context.UNSIGNED_BYTE,
-        data
-      );
-      if (data[0] === 255 && data[1] === 255 && data[2] === 255) {
-        return -1;
-      }
-    }
-    return this.rgbToInt(data);
-  }
-  getColorFromIndex(index) {
-    let rgb = this.intToRGB(index);
-    return "rgb(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ")";
-  }
-  rgbToInt(rgb) {
-    let r = rgb[0];
-    let g = rgb[1];
-    let b = rgb[2];
-    return (r << 16) + (g << 8) + b;
-  }
-  intToRGB(number) {
-    let r = (number & 0xff0000) >> 16;
-    let g = (number & 0x00ff00) >> 8;
-    let b = number & 0x0000ff;
-    return [r, g, b];
-  }
-}
-const CEL$1 = {
-  idCnt: 0,
-  viewports: [],
-  pixelRatio: (window && window.devicePixelRatio) || 1,
-  Node: Node$1,
-  Viewport: Viewport$1,
-  Layer: Layer$1,
-  Scene: Scene$1,
-  Hit: Hit$1,
-};
-
-class Viewport {
-  constructor(cfg={}) {
-    this.container = cfg.container;
-    this.layers = [];
-    this.id = CEL.idCnt++;
-    this.scene = new CEL.Scene();
-    this.setSize(cfg.width || 0, cfg.height || 0);
-    cfg.container.innerHTML = "";
-    cfg.container.appendChild(this.scene.canvas);
-    CEL.viewports.push(this);
-  }
-  setSize(width, height) {
-    this.width = width;
-    this.height = height;
-    this.scene.setSize(width, height);
-    this.layers.forEach(function (layer) {
-      layer.setSize(width, height);
-    });
-    return this;
-  }
-  addLayer(layer) {
-    this.layers.push(layer);
-    layer.setSize(layer.width || this.width, layer.height || this.height);
-    layer.viewport = this;
-    return this;
-  }
-  getIntersection(x, y) {
-    var layers = this.layers,
-      len = layers.length,
-      n = len - 1,
-      layer,
-      key;
-    while (n >= 0) {
-      layer = layers[n];
-      key = layer.hit.getIntersection(x, y);
-      if (key >= 0) {
-        return key;
-      }
-      n--;
-    }
-    return -1;
-  }
-  get index() {
-    let viewports = CEL.viewports,
-      viewport,
-      n = 0;
-    for (viewport of viewports) {
-      if (this.id === viewport.id) return n;
-      n++;
-    }
-    return null;
-  }
-  destroy() {
-    for (let layer of this.layers) {
-      layer.remove();
-    }
-    this.container.innerHTML = "";
     CEL.viewports.splice(this.index, 1);
-  }
-  render() {
-    let scene = this.scene,
-      layers = this.layers,
-      layer;
-    scene.clear();
-    for (layer of layers) {
-      if (layer.visible)
-        scene.context.drawImage(
-          layer.scene.canvas,
-          layer.x,
-          layer.y,
-          layer.width,
-          layer.height
-        );
-    }
   }
 }
 class Layer {
@@ -3224,6 +2884,7 @@ const CEL = {
   idCnt: 0,
   viewports: [],
   pixelRatio: (window && window.devicePixelRatio) || 1,
+  Node: Node$1,
   Viewport: Viewport,
   Layer: Layer,
   Scene: Scene,
@@ -3597,13 +3258,10 @@ class EventsAgent {
 		this.element.style.cursor = type;
 	}
   motion(e) {
-    const prevClientX = this.clientPosPrev.x;
-    const prevClientY = this.clientPosPrev.y;
     const clientX = e.clientX || this.position.x;
     const clientY = e.clientY || this.position.y;
-    e.target.getBoundingClientRect();
-    this.movement.x = clientX - prevClientX;
-    this.movement.y = clientY - prevClientY;
+    this.movement.x = clientX - this.clientPosPrev.x;
+    this.movement.y = clientY - this.clientPosPrev.y;
     this.position.x += this.movement.x;
     this.position.y += this.movement.y;
     this.clientPosPrev.x = clientX;
@@ -3661,13 +3319,13 @@ class Input  {
     return arg;
   }
   isButtonPressed (button) {
-    return this.pointerAgent.isButtonPressed(button);
+    return this.eventsAgent.isButtonPressed(button);
   }
   isKeyPressed (key) {
-    return this.keyboardAgent.isKeyPressed(key);
+    return this.eventsAgent.isKeyPressed(key);
   }
   setCursor (type) {
-    this.pointerAgent.setCursor(type);
+    this.eventsAgent.setCursor(type);
   }
 }
 
@@ -3810,7 +3468,7 @@ class graph {
   createViewport(overlays=[], node=false) {
     overlays = (overlays.length == 0) ? copyDeep(defaultOverlays$4) : overlays;
     const {width, height} = this.layerConfig();
-    let viewport = (node) ? CEL$1.Node : CEL$1.Viewport;
+    let viewport = (node) ? CEL.Node : CEL.Viewport;
     this.#viewport = new viewport({
       width: width,
       height: height,
@@ -7187,9 +6845,8 @@ class Chart {
     this.stateMachine.destroy();
     this.#Scale.end();
     this.#Graph.destroy();
-    const main = this.core.MainPane;
-    this.#inputM.off("pointerdrag", main.onChartDrag);
-    this.#inputM.off("pointerdragend", main.onChartDrag);
+    this.#input.off("pointerdrag", this.onChartDrag);
+    this.#input.off("pointerdragend", this.onChartDrag);
     this.#input.off("pointermove", this.onMouseMove);
     this.#input.off("pointerenter", this.onMouseEnter);
     this.#input.off("pointerout", this.onMouseOut);
@@ -7201,13 +6858,9 @@ class Chart {
     this.off(STREAM_UPDATE, this.onStreamUpdate);
   }
   eventsListen() {
-    this.#input = new Input(this.#elTarget, {
-      disableContextMenu: false,
-    });
-    const main = this.core.MainPane;
-    this.#inputM = new Input(this.element, {disableContextMenu: false});
-    this.#inputM.on("pointerdrag", main.onChartDrag.bind(main));
-    this.#inputM.on("pointerdragend", main.onChartDragDone.bind(main));
+    this.#input = new Input(this.#elTarget, {disableContextMenu: false});
+    this.#input.on("pointerdrag", this.onChartDrag.bind(this));
+    this.#input.on("pointerdragend", this.onChartDragDone.bind(this));
     this.#input.on("pointermove", this.onMouseMove.bind(this));
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
@@ -7226,6 +6879,14 @@ class Chart {
   emit(topic, data) {
     this.#core.emit(topic, data);
   }
+  onChartDrag(e) {
+    this.setCursor("grab");
+    this.core.MainPane.onChartDrag(e);
+  }
+  onChartDragDone(e) {
+    this.setCursor("crosshair");
+    this.core.MainPane.onChartDragDone(e);
+  }
   onMouseMove(e) {
     this.core.MainPane.onPointerActive(this);
     this.scale.layerCursor.visible = true;
@@ -7233,7 +6894,6 @@ class Chart {
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.#Scale.onMouseMove(this.#cursorPos);
     this.emit(`${this.id}_mousemove`, this.#cursorPos);
-    console.log(`${this.id}_mousemove`, this.#cursorPos);
   }
   onMouseEnter(e) {
     this.core.MainPane.onPointerActive(this);
@@ -7768,7 +7428,7 @@ class ScaleBar {
   #layerOverlays
   #layerPriceLine
   #layerCursor
-  #controller
+  #input
   #priceLine
   #cursorPos
   constructor (core, options) {
@@ -7834,20 +7494,18 @@ class ScaleBar {
   }
   end() {
     this.stateMachine.destroy();
-    this.#controller = null;
+    this.#input = null;
     this.#viewport.destroy();
-    this.#controller.removeEventListener("drag", this.onDrag);
-    this.#controller.removeEventListener("enddrag", this.onDragDone);
     this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove);
     this.off(`${this.#parent.ID}_mouseout`, this.eraseCursorPrice);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
   }
   eventsListen() {
     let canvas = this.#viewport.scene.canvas;
-    this.#controller = new InputController(canvas, {disableContextMenu: false});
-    this.#controller.setCursor("ns-resize");
-    this.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMove(e); });
-    this.on(`${this.#parent.ID}_mouseout`, (e) => { this.eraseCursorPrice(); });
+    this.#input = new Input(canvas, {disableContextMenu: false});
+    this.#input.setCursor("ns-resize");
+    this.on(`${this.#parent.id}_mousemove`, this.onMouseMove.bind(this));
+    this.on(`${this.#parent.id}_mouseout`, this.eraseCursorPrice.bind(this));
     this.on(STREAM_UPDATE, (e) => { this.onStreamUpdate(e); });
   }
   on(topic, handler, context) {
@@ -7977,7 +7635,6 @@ class ScaleBar {
     this.#parent.drawGrid();
   }
   drawCursorPrice() {
-console.log(" drawCursorPrice()");
     let [x, y] = this.#cursorPos,
         price =  this.yPos2Price(y),
         nice = this.nicePrice(price),
@@ -8040,10 +7697,11 @@ console.log(" drawCursorPrice()");
 }
 
 class Legends {
-  #targetEl
+  #elTarget
   #list
   #parent
   #core
+  #input
   #controls = {
     width: 18,
     height: 18,
@@ -8051,12 +7709,20 @@ class Legends {
   }
   #controlsList
   constructor(target, parent) {
-    this.#targetEl = target;
+    this.#elTarget = target;
     this.#list = {};
     this.#parent = parent;
     this.#core = parent.core;
+    this.eventsListen();
   }
   get list() { return this.#list }
+  eventsListen() {
+    this.moveEvent = new PointerEvent("pointermove", {bubbles: true, cancelable: true,});
+    this.#input = new Input(this.#elTarget, { disableContextMenu: false, });
+    this.#input.on("pointermove", this.onMouseMove.bind(this));
+  }
+  onMouseMove(e) {
+  }
   onMouseClick() {
   }
   buildLegend(o) {
@@ -8067,7 +7733,7 @@ class Legends {
     const styleControls = "order:2; float: right; margin: 0 0.5em 0; opacity:0";
     const mouseOver = "onmouseover='this.style.opacity=1'";
     const mouseOut = "onmouseout='this.style.opacity=0'";
-    const t = this.#targetEl;
+    const t = this.#elTarget;
     styleLegendTitle += (o?.type === "chart") ? "font-size: 1.5em;" : "font-size: 1.2em;";
     const node = `
       <div slot="legend" id="${o.id}" class="legend" style="${styleLegend}">
@@ -8086,8 +7752,8 @@ class Legends {
     options.type = options?.type || "overlay";
     options.parent = this.#parent.ID;
     const html = this.buildLegend(options);
-    this.#targetEl.insertAdjacentHTML('beforeend', html);
-    const legendEl = this.#targetEl.querySelector(`#${options.id}`);
+    this.#elTarget.insertAdjacentHTML('beforeend', html);
+    const legendEl = this.#elTarget.querySelector(`#${options.id}`);
     this.#list[options.id] = {el: legendEl, type: options.type, source: options?.source};
     this.#controlsList = legendEl.querySelectorAll(`.control`);
     for (let c of this.#controlsList) {
@@ -8113,8 +7779,8 @@ class Legends {
     if (!(isObject(data))
     || !(id in this.#list)) return false
     let source = this.#list[id].source(data.pos);
-    const html = this.#targetEl.buildInputs(source);
-    this.#targetEl.querySelector(`#${id} dl`).innerHTML = html;
+    const html = this.#elTarget.buildInputs(source);
+    this.#elTarget.querySelector(`#${id} dl`).innerHTML = html;
   }
 }
 
@@ -9001,6 +8667,7 @@ var stateMachineConfig$2 = {
     },
     chart_pan: {
       onEnter (data) {
+        this.context.origin.setCursor("grab");
       },
       onExit (data) {
       },
@@ -9009,12 +8676,14 @@ var stateMachineConfig$2 = {
           target: 'chart_pan',
           action (data) {
             this.context.origin.updateRange(data);
+            this.context.origin.setCursor("grab");
           },
         },
         chart_panDone: {
           target: 'idle',
           action (data) {
             this.context.origin.updateRange(data);
+            this.context.origin.setCursor("default");
           },
         },
       }
@@ -9064,8 +8733,6 @@ var stateMachineConfig$2 = {
     },
     divider_mousedown: {
       onEnter(data) {
-        console.log(`${this.id}: stAate: "${this.state}" - onEnter`);
-console.log(data);
         this.context.divider = data;
       },
       onExit(data) {
@@ -9185,6 +8852,7 @@ class MainPane {
   #elGrid
   #elCanvas
   #elViewport
+  #elements
   #Graph
   #viewport
   #layerGrid
@@ -9248,6 +8916,16 @@ class MainPane {
   get scrollPos() { return this.#core.scrollPos }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
   get stateMachine() { return this.#stateMachine }
+  get elements() {
+    return {
+      elTarget: this.#elChart,
+      elTime: this.#elTime,
+      elRows: this.#elRows,
+      elChart: this.#elChart,
+      elOffCharts: this.#elOffCharts,
+      elScale: this.#elScale
+    }
+  }
   init(options) {
     this.#core;
     this.#indicators = this.#core.indicators;
@@ -9271,6 +8949,7 @@ class MainPane {
           elTarget: this.#elChart,
           elTime: this.#elTime,
           elRows: this.#elRows,
+          elChart: this.#elChart,
           elOffCharts: this.#elOffCharts,
           elScale: this.#elScale
         }
@@ -9515,6 +9194,9 @@ class MainPane {
     let w = Math.round(this.width * this.buffer / 100);
     let r = w % this.candleW;
     return w - r
+  }
+  setCursor(cursor) {
+    this.element.style.cursor = cursor;
   }
   registerOffCharts(options) {
     if (this.#core.offChart.length === 0) return

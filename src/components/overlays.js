@@ -4,7 +4,7 @@
 
 import { isString } from "../utils/typeChecks"
 import { insertAtIndex } from "../utils/utilities"
-import CEL from "./primitives/canvas"
+import CEL from "./primitives/canvas3"
 
 
 

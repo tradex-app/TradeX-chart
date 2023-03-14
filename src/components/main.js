@@ -65,6 +65,7 @@ export default class MainPane {
   #elGrid
   #elCanvas
   #elViewport
+  #elements
 
   #Graph
   #viewport
@@ -136,6 +137,16 @@ export default class MainPane {
   get scrollPos() { return this.#core.scrollPos }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
+  get elements() {
+    return {
+      elTarget: this.#elChart,
+      elTime: this.#elTime,
+      elRows: this.#elRows,
+      elChart: this.#elChart,
+      elOffCharts: this.#elOffCharts,
+      elScale: this.#elScale
+    }
+  }
 
 
   init(options) {
@@ -165,6 +176,7 @@ export default class MainPane {
           elTarget: this.#elChart,
           elTime: this.#elTime,
           elRows: this.#elRows,
+          elChart: this.#elChart,
           elOffCharts: this.#elOffCharts,
           elScale: this.#elScale
         }
@@ -495,6 +507,10 @@ export default class MainPane {
     let w = Math.round(this.width * this.buffer / 100) 
     let r = w % this.candleW
     return w - r
+  }
+
+  setCursor(cursor) {
+    this.element.style.cursor = cursor
   }
 
   registerOffCharts(options) {
