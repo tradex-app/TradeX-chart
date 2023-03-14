@@ -226,12 +226,13 @@ export default class MainPane {
     })
     this.#viewport.destroy()
 
-    this.#controller.removeEventListener("mousewheel", this.onMouseWheel);
-    this.#controller.removeEventListener("mousemove", this.onMouseMove);
-    this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
-    this.#controller.removeEventListener("mouseout", this.onMouseOut);
-    this.#controller.removeEventListener("drag", this.onChartDrag);
-    this.#controller.removeEventListener("enddrag", this.onChartDragDone);
+    this.#input.off("wheel", this.onMouseWheel)
+    this.#input.off("pointerdrag", this.onChartDrag)
+    this.#input.off("pointerdragend", this.onChartDragDone)
+    this.#input.off("pointermove", this.onMouseMove)
+    this.#input.off("pointerenter", this.onMouseEnter);
+    this.#input.off("pointerout", this.onMouseOut);
+
     this.#controller.removeEventListener("keydown", this.onChartKeyDown)
     this.#controller.removeEventListener("keyup", this.onChartKeyDown)
     this.#controller = null
@@ -299,7 +300,12 @@ export default class MainPane {
       e.dragstart.x, e.dragstart.y,
       e.movement.x, e.movement.y
     ]
-    // console.log("main_mousemove", this.#cursorPos)
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
+
+    for (let [key, offChart] of this.offCharts) {
+      offChart.graph.overlays.list.get("cursor").layer.visible = true
+    }
+
     this.emit("main_mousemove", this.#cursorPos)
   }
 
@@ -316,6 +322,8 @@ export default class MainPane {
 
   onMouseOut(e) {
     this.core.Timeline.hideCursorTime()
+    this.onPointerActive(false)
+
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false
     this.core.Chart.graph.render()
 
@@ -323,6 +331,7 @@ export default class MainPane {
       offChart.graph.overlays.list.get("cursor").layer.visible = false
       offChart.graph.render()
     }
+    this.draw()
   }
 
   onChartDrag(e) {
@@ -410,6 +419,25 @@ export default class MainPane {
 
   onNewStreamValue(value) {
     this.draw()
+  }
+
+  onPointerActive(chart) {
+    if (chart) {
+      chart.cursorActive = true
+      chart.scale.layerCursor.visible = true
+    }
+
+    if (chart !== this.chart) {
+      this.chart.cursorActive = false
+      this.chart.scale.layerCursor.visible = false
+    }
+
+    this.#OffCharts.forEach((offChart, key) => {
+      if (chart !== offChart) {
+        offChart.cursorActive = false
+        offChart.scale.layerCursor.visible = false
+      }
+    }) 
   }
 
   mount(el) {

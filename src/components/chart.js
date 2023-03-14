@@ -12,6 +12,7 @@ import {
 import CEL from "../components/primitives/canvas";
 import StateMachine from "../scaleX/stateMachne";
 import { InputController, Keys } from "../input/controller";
+import Input from "../input2"
 import {
   STREAM_ERROR,
   STREAM_NONE,
@@ -63,6 +64,8 @@ export default class Chart {
   #title;
   #theme;
   #controller;
+  #input
+  #inputM
 
   constructor(core, options) {
     this.#core = core;
@@ -109,6 +112,7 @@ export default class Chart {
   get range() { return this.#core.range }
   get stream() { return this.#Stream }
   get cursorPos() { return this.#cursorPos }
+  set cursorActive(a) { this.#cursorActive = a }
   get cursorActive() { return this.#cursorActive }
   get cursorClick() { return this.#cursorClick }
   get candleW() { return this.#core.Timeline.candleW }
@@ -120,7 +124,6 @@ export default class Chart {
   get elScale() { return this.#elScale }
   get elLegend() { return this.#elTarget.legend }
   get elViewport() { return this.#elTarget.viewport }
-  get viewport() { return this.#viewport }
   set layerWidth(w) { this.#Graph.layerWidth = w }
   get layerWidth() { return this.#Graph.layerWidth }
   set legend(l) { this.#Legends = l }
@@ -169,38 +172,42 @@ export default class Chart {
     this.#Scale.end();
     this.#Graph.destroy();
 
-    this.#controller.removeEventListener("mousemove", this.onMouseMove);
-    this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
-    this.#controller.removeEventListener("mouseout", this.onMouseOut);
-    this.#controller.removeEventListener("mousedown", this.onMouseDown);
+    const main = this.core.MainPane
+    this.#inputM.off("pointerdrag", main.onChartDrag)
+    this.#inputM.off("pointerdragend", main.onChartDrag)
+
+    this.#input.off("pointermove", this.onMouseMove)
+    this.#input.off("pointerenter", this.onMouseEnter);
+    this.#input.off("pointerout", this.onMouseOut);
+    this.#input.off("pointerdown", this.onMouseDown);
     this.#controller = null;
 
     this.off("main_mousemove", this.onMouseMove);
     this.off(STREAM_LISTENING, this.onStreamListening);
     this.off(STREAM_NEWVALUE, this.onStreamNewValue);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
-    // this.off("setRange", this.draw)
-    // this.off("scrollUpdate", this.draw)
   }
 
   eventsListen() {
-    // create controller and use 'on' method to receive input events
-    // use canvas instead?
-    this.#controller = new InputController(this.#elTarget, {
+    this.#input = new Input(this.#elTarget, {
       disableContextMenu: false,
     });
-    this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
-    this.#controller.on("mouseout", this.onMouseOut.bind(this));
-    this.#controller.on("mousedown", this.onMouseDown.bind(this));
+
+    const main = this.core.MainPane
+    this.#inputM = new Input(this.element, {disableContextMenu: false});
+    this.#inputM.on("pointerdrag", main.onChartDrag.bind(main))
+    this.#inputM.on("pointerdragend", main.onChartDragDone.bind(main))
+
+    this.#input.on("pointermove", this.onMouseMove.bind(this))
+    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
+    this.#input.on("pointerout", this.onMouseOut.bind(this));
+    this.#input.on("pointerdown", this.onMouseDown.bind(this));
 
     // listen/subscribe/watch for parent notifications
     this.on("main_mousemove", this.updateLegends.bind(this));
     this.on(STREAM_LISTENING, this.onStreamListening.bind(this));
     this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this));
     this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this));
-    // this.on("setRange", this.draw.bind(this))
-    // this.on("scrollUpdate", this.draw.bind(this))
   }
 
   /**
@@ -232,22 +239,29 @@ export default class Chart {
   }
 
   onMouseMove(e) {
+    this.core.MainPane.onPointerActive(this)
+    this.scale.layerCursor.visible = true
+    this.graph.overlays.list.get("cursor").layer.visible = true
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
-    this.emit(`${this.ID}_mousemove`, this.#cursorPos)
+    this.#Scale.onMouseMove(this.#cursorPos)
+    this.emit(`${this.id}_mousemove`, this.#cursorPos)
+    console.log(`${this.id}_mousemove`, this.#cursorPos)
   }
 
   onMouseEnter(e) {
-    this.#cursorActive = true;
+    this.core.MainPane.onPointerActive(this)
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
+    this.core.MainPane.onMouseEnter()
     this.scale.layerCursor.visible = true
-    this.emit(`${this.ID}_mouseenter`, this.#cursorPos);
+    this.graph.overlays.list.get("cursor").layer.visible = true
+    this.emit(`${this.id}_mouseenter`, this.#cursorPos);
   }
 
   onMouseOut(e) {
     this.#cursorActive = false;
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.scale.layerCursor.visible = false
-    this.emit(`${this.ID}_mouseout`, this.#cursorPos);
+    this.emit(`${this.id}_mouseout`, this.#cursorPos);
   }
 
   onMouseDown(e) {

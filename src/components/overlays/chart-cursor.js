@@ -1,5 +1,8 @@
 // chart-cursor.js
 
+import { isObject } from "../../utils/typeChecks"
+import Input from "../../input2"
+
 export default class chartCursor {
 
   #core
@@ -12,6 +15,7 @@ export default class chartCursor {
   #scene
   #cursorPos = [0,0]
   #update = true
+  #input
 
   constructor(target, xAxis=false, yAxis=false, theme, parent) {
 
@@ -26,7 +30,10 @@ export default class chartCursor {
     this.#core.on("chart_pan", (e) => { this.onMouseDragX(e) })
     this.#core.on("chart_panDone", (e) => { this.onMouseDragX(e) })
     this.#core.on("main_mousemove", (e) => { this.onMouseMoveX(e) })
-    this.#core.on(`${this.chart.ID}_mousemove`, (e) => { this.onMouseMove(e) })
+
+    this.#input = new Input(this.#target.viewport.container, {disableContextMenu: false});
+    this.#input.on("pointermove", this.onMouseMove.bind(this))
+    this.#input.on("pointerenter", this.onMouseMove.bind(this));
   }
 
   get chart() { return this.#parent.parent.parent }
@@ -46,8 +53,11 @@ export default class chartCursor {
     this.#core.emit("chart_render")
   }
   onMouseMove(e) {
-    this.#cursorPos[0] = e[0]
-    this.#cursorPos[1] = e[1]
+    const x = (isObject(e)) ? e.position.x : e[0]
+    const y = (isObject(e)) ? e.position.y : e[1]
+
+    this.#cursorPos[0] = x
+    this.#cursorPos[1] = y
     this.draw()
     this.#core.emit("chart_render")
   }
@@ -80,6 +90,8 @@ export default class chartCursor {
       ctx.lineTo(this.#scene.width, y)
       ctx.stroke()
     }
+
     ctx.restore();
   }
+
 }

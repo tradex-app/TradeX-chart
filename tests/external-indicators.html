@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+</head>
+
+<body>
+  <script>
+    class Indicator {
+
+      constructor() { }
+
+      hello(txt) {
+        console.log(txt)
+      }
+    }
+
+    function indicator(Ind) {
+
+      return class Moon extends Ind {
+
+        constructor() {
+          super()
+        }
+
+      }
+
+      // return Moon
+    }
+
+    const foo = indicator(Indicator)
+    const test = new foo()
+    test.hello("test")
+
+    console.log(test)
+
+    // class foo extends Indicator {
+    //   constructor () {
+    //     super()
+    //   }
+    // }
+
+    // class indi {}
+
+
+  </script>
+</body>
+
+</html>

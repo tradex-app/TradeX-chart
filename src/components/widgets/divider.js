@@ -127,10 +127,12 @@ export default class Divider {
 
   onMouseEnter() {
     this.#elDivider.style.background = "#888888C0"
+    this.#core.MainPane.onMouseEnter()
   }
 
   onMouseOut() {
     this.#elDivider.style.background = "#FFFFFF00"
+    this.#core.MainPane.onMouseEnter()
   }
 
   onPointerDrag(e) {

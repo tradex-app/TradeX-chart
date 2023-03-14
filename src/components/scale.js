@@ -317,6 +317,9 @@ export default class ScaleBar {
   }
 
   drawCursorPrice() {
+
+console.log(" drawCursorPrice()")
+
     let [x, y] = this.#cursorPos,
         price =  this.yPos2Price(y),
         nice = this.nicePrice(price),

@@ -3,7 +3,7 @@
  * RSI
  * RSI = SUM(MAX(CLOSE - REF(CLOSE,1),0),N) / SUM(ABS(CLOSE - REF(CLOSE,1)),N) × 100
  */
-import indicator from "../components/overlays/inidcator"
+import indicator from "../components/overlays/indicator"
 import { 
   YAXIS_TYPES
 } from "../definitions/chart";

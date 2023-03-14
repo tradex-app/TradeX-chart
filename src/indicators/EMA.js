@@ -1,7 +1,7 @@
 /**
  * EMA
  */
- import indicator from "../components/overlays/inidcator"
+ import indicator from "../components/overlays/indicator"
  import { 
    YAXIS_TYPES
  } from "../definitions/chart";

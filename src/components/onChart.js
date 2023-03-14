@@ -15,7 +15,7 @@ import chartCursor from "./overlays/chart-cursor"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartStreamCandle from "./overlays/chart-streamCandle"
-import indicator from "./overlays/inidcator"
+import indicator from "./overlays/indicator"
 import stateMachineConfig from "../state/state-onChart"
 
 import { CandleStyle, VolumeStyle } from "../definitions/style"

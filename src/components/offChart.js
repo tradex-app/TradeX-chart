@@ -120,18 +120,13 @@ export default class OffChart extends Chart {
   }
 
   end() {
-    const main = this.core.MainPane
-    this.#input.off("pointerdrag", main.onChartDrag)
-    this.#input.off("pointerdragend", main.onChartDrag)
     this.#Divider.end()
+
     super.end()
   }
 
   eventsListen() {
-    const main = this.core.MainPane
-    this.#input = new Input(this.element, {disableContextMenu: false});
-    this.#input.on("pointerdrag", main.onChartDrag.bind(main))
-    this.#input.on("pointerdragend", main.onChartDragDone.bind(main))
+    super.eventsListen()
   }
 
   onStreamUpdate(candle) {
