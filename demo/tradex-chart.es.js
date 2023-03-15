@@ -3278,13 +3278,13 @@ class EventsAgent {
   }
 }
 
-const defaultOptions$2 = {
+const defaultOptions$3 = {
   element: undefined,
   contextMenu: true
 };
 class Input  {
   constructor (element, options) {
-    this.options = { ...defaultOptions$2, ...options };
+    this.options = { ...defaultOptions$3, ...options };
     this.status = status.idle;
     this.element = element;
     if (!this.element && this.options.elementId) {
@@ -3524,13 +3524,13 @@ const cursor =
 const del =
   `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="46.08" height="46.08" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"></path><path d="M6.535 3H21a1 1 0 011 1v16a1 1 0 01-1 1H6.535a1 1 0 01-.832-.445l-5.333-8a1 1 0 010-1.11l5.333-8A1 1 0 016.535 3zm.535 2l-4.666 7 4.666 7H20V5H7.07zM13 10.586l2.828-2.829 1.415 1.415L14.414 12l2.829 2.828-1.415 1.415L13 13.414l-2.828 2.829-1.415-1.415L11.586 12 8.757 9.172l1.415-1.415L13 10.586z"></path></svg>`;
 const fibonacci =
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="1" rx="0.5"></rect><rect x="4" y="9" width="16" height="1" rx="0.5"></rect><rect x="4" y="15" width="16" height="1" rx="0.5"></rect><rect x="4" y="18" width="16" height="1" rx="0.5"></rect><rect x="4" y="12" width="16" height="1" rx="0.5"></rect><ellipse cx="12" cy="18.5" rx="1.5" ry="1.5"></ellipse><ellipse cx="16" cy="6.5" rx="1.5" ry="1.5"></ellipse><ellipse cx="8" cy="6.5" rx="1.5" ry="1.5"></ellipse></svg>`;
+  `<svg width="46.08" height="46.08" aria-hidden="true" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g stroke-width="30.155"><rect x="14.757" y="240.92" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="147" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="334.84" width="482.49" height="30.155" rx="15.078"/></g ><g transform="translate(5.937 -288.34)"><path d="m23.904 712.34c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h173.93c-0.65295-3.3651-2.0312-6.4697-2.0312-10.026 0-7.1393 1.5573-13.888 4.0625-20.13zm276.35 0c2.5051 6.2423 4.0365 12.991 4.0365 20.13 0 3.5554-1.3526 6.6618-2.0052 10.026h173.93c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078z"/><path d="m250.06 759.97c17.965 0 32.545-14.58 32.545-32.545 0-17.965-14.58-32.545-32.545-32.545-17.965 0-32.545 14.58-32.545 32.545 0 17.965 14.58 32.545 32.545 32.545zm0 21.697c-29.964 0-54.242-24.279-54.242-54.242 0-29.964 24.279-54.242 54.242-54.242 29.964 0 54.242 24.279 54.242 54.242 0 29.964-24.279 54.242-54.242 54.242z" stroke-width="21.697"/></g ><path d="m144.05 18.672c-24.694 0-45.285 16.595-51.849 39.167h-62.37c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h62.37c6.5639 22.572 27.155 39.167 51.849 39.167s45.285-16.595 51.849-39.167h120.03c6.5639 22.572 27.155 39.167 51.849 39.167 24.694 0 45.285-16.595 51.849-39.167h62.552c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078h-62.552c-6.5639-22.572-27.155-39.167-51.849-39.167-24.694 0-45.285 16.595-51.849 39.167h-120.03c-6.5639-22.572-27.155-39.167-51.849-39.167zm0 21.693c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 1e-5 -32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552zm223.72 0c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 0-32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552z" stroke-width="30.155"/></svg>`;
 const line =
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g><rect x="5.989593505859375" y="17.303298950195312" width="14" height="1" rx="0.5" transform="matrix(0.7071067690849304,-0.7071067690849304,0.7071067690849304,0.7071067690849304,-10.480968421384205,9.30330124707234)"></rect><ellipse cx="16" cy="8" rx="1.5" ry="1.5"></ellipse><ellipse cx="7" cy="17" rx="1.5" ry="1.5"></ellipse></g></svg>`;
+  `<svg width="46.08" height="46.08" aria-hidden="true" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g transform="matrix(21.697 0 0 21.697 -47.758 -47.758)"><path d="m7.354 21.354 14-14-0.707-0.707-14 14z"/><path d="m22.5 7c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5zm-17 16c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z"/></g></svg>`;
 const measure =
   `<svg aria-hidden="true" width="46.08" height="46.08" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"> <path d="M 3.2758709,20.241377 11.758622,28.72413 28.72413,11.758622 20.241377,3.2758709 Z m 2.1206881,0 1.5905161,-1.590515 3.7112049,3.711203 1.060342,-1.060345 -3.7112027,-3.711204 1.0603441,-1.060344 2.1206876,2.12069 1.060346,-1.060346 -2.120689,-2.120688 1.060343,-1.060344 3.711203,3.711203 L 16,17.060346 l -3.711203,-3.711208 1.060341,-1.060341 2.12069,2.120687 1.060344,-1.060346 -2.120688,-2.120687 1.060344,-1.060343 3.711204,3.711205 1.060345,-1.060345 -3.711205,-3.7112046 1.060344,-1.0603441 2.120687,2.1206887 1.060346,-1.0603446 -2.120687,-2.1206883 1.590515,-1.5905161 6.362065,6.362063 -14.84482,14.84482 z" style="stroke-width:0.749776" /></svg>`;
 const range =
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 28" width="28" height="28"><path  clip-rule="evenodd" d="M4.5 5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 6.5A2.5 2.5 0 0 1 6.95 6H24v1H6.95A2.5 2.5 0 0 1 2 6.5zM4.5 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 16.5a2.5 2.5 0 0 1 4.95-.5h13.1a2.5 2.5 0 1 1 0 1H6.95A2.5 2.5 0 0 1 2 16.5zM22.5 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-18 6a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2 22.5a2.5 2.5 0 0 1 4.95-.5H24v1H6.95A2.5 2.5 0 0 1 2 22.5z"></path><path fill="currentColor"  clip-rule="evenodd" d="M22.4 8.94l-1.39.63-.41-.91 1.39-.63.41.91zm-4 1.8l-1.39.63-.41-.91 1.39-.63.41.91zm-4 1.8l-1.4.63-.4-.91 1.39-.63.41.91zm-4 1.8l-1.4.63-.4-.91 1.39-.63.41.91z"></path></svg>`;
+  `<svg aria-hidden="true" width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><g id="g930" transform="matrix(21.128963,0,0,21.128963,-29.235597,-50.369964)"><path clip-rule="evenodd" d="m 4.5,5 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,6.5 A 2.5,2.5 0 0 1 6.95,6 H 24 V 7 H 6.95 A 2.5,2.5 0 0 1 2,6.5 Z M 4.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,16.5 A 2.5,2.5 0 0 1 6.95,16 h 13.1 a 2.5,2.5 0 1 1 0,1 H 6.95 A 2.5,2.5 0 0 1 2,16.5 Z M 22.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z m -18,6 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,22.5 A 2.5,2.5 0 0 1 6.95,22 H 24 v 1 H 6.95 A 2.5,2.5 0 0 1 2,22.5 Z" id="path908" /><path clip-rule="evenodd" d="M 22.4,8.94 21.01,9.57 20.6,8.66 21.99,8.03 Z m -4,1.8 -1.39,0.63 -0.41,-0.91 1.39,-0.63 z m -4,1.8 -1.4,0.63 -0.4,-0.91 1.39,-0.63 z m -4,1.8 L 9,14.97 8.6,14.06 9.99,13.43 Z" id="path910" /></g></svg>`;
 const text =
   `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M231.359 147l-80.921 205h45.155l15.593-39.5h89.628l15.593 39.5h45.155l-80.921-205zm-3.594 123.5L256 198.967l28.235 71.533z"></path><path d="M384 56H128V16H16v112h40v256H16v112h112v-40h256v40h112V384h-40V128h40V16H384zM48 96V48h48v48zm48 368H48v-48h48zm288-40H128v-40H88V128h40V88h256v40h40v256h-40zm80-8v48h-48v-48zM416 48h48v48h-48z"></path></svg>`;
 const close =
@@ -4429,8 +4429,7 @@ class tradeXScale extends element {
 }
 window.customElements.define('tradex-scale', tradeXScale);
 
-const template$2 = document.createElement('template');
-template$2.innerHTML = `
+const right = `
 <style>
   tradex-tools {
     position: absolute; 
@@ -4458,6 +4457,65 @@ template$2.innerHTML = `
 <tradex-main></tradex-main>
 <tradex-scale></tradex-scale>
 `;
+const left = `
+<style>
+  tradex-tools {
+    position: absolute; 
+    top: 0; left: 0;
+    width: ${TOOLSW}px;
+    height: 100%; 
+    min-height: 100%; 
+  }
+  tradex-main {
+    position: absolute; 
+    top: 0;
+    right: 0;
+    width: calc(100% - ${TOOLSW}px);
+    height: 100%;
+  }
+  tradex-scale {
+    position: absolute; 
+    top: 0; 
+    left: ${SCALEW}px; 
+    width: ${SCALEW}px; 
+    height: 100%;
+  }
+</style>
+<tradex-tools></tradex-tools>
+<tradex-scale></tradex-scale>
+<tradex-main></tradex-main>
+`;
+const both = `
+<style>
+  tradex-tools {
+    position: absolute; 
+    top: 0; left: 0;
+    width: ${TOOLSW}px;
+    height: 100%; 
+    min-height: 100%; 
+  }
+  tradex-main {
+    position: absolute; 
+    top: 0;
+    right: 0;
+    width: calc(100% - ${TOOLSW}px);
+    height: 100%;
+  }
+  tradex-scale {
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    width: ${SCALEW}px; 
+    height: 100%;
+  }
+</style>
+<tradex-tools></tradex-tools>
+<tradex-main></tradex-main>
+<tradex-scale></tradex-scale>
+`;
+const template$2 = document.createElement('template');
+const locations = { left, right, both };
+template$2.innerHTML = right;
 class tradeXBody extends element {
   constructor () {
     super(template$2);
@@ -4469,6 +4527,30 @@ class tradeXBody extends element {
   get tools() { return this.shadowRoot.querySelector('tradex-tools') }
   get main() { return this.shadowRoot.querySelector('tradex-main') }
   get scale() { return this.shadowRoot.querySelector('tradex-scale') }
+  start(theme) {
+    let location = theme?.yAxis?.location;
+    let keys = Object.keys(locations);
+    location = (keys.includes(location)) ? location : "right";
+    this.setYAxisLocation(location);
+  }
+  setYAxisLocation(side) {
+    switch (side) {
+      case "left":
+        this.scale.style.left = `${TOOLSW}px`;
+        this.scale.style.right = undefined;
+        this.main.style.left = undefined;
+        this.main.style.right = `-${SCALEW}px`;
+        break;
+      case "both":
+      case "right":
+      default:
+        this.scale.style.left = undefined;
+        this.scale.style.right = 0;
+        this.main.style.left = undefined;
+        this.main.style.right = 0;
+        break;
+    }
+  }
 }
 window.customElements.define('tradex-body', tradeXBody);
 
@@ -5424,14 +5506,14 @@ class TouchAgent {
 	}
 }
 
-const defaultOptions$1 = {
+const defaultOptions$2 = {
   elementId: undefined,
   elementInstance: undefined,
   disableContextMenu: true,
 };
 class InputController {
   constructor(element, options) {
-    this.options = { ...defaultOptions$1, ...options };
+    this.options = { ...defaultOptions$2, ...options };
     this.operationMode = OperationModes.None;
     this.element = element;
     if (!this.element && this.options.elementId) {
@@ -5938,7 +6020,7 @@ class ToolsBar {
     return toolbar
   }
   iconNode(tool) {
-    const iconStyle = `display: inline-block; height: ${ToolsStyle.ICONSIZE};`;
+    const iconStyle = `display: inline-block; height: ${ToolsStyle.ICONSIZE}; margin-left: -3px;`;
     const menu = ("sub" in tool) ? `data-menu="true"` : "";
     return  `
       <div id="${tool.id}" data-event="${tool.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${tool.icon}</div>\n
@@ -6228,7 +6310,7 @@ var stateMachineConfig$6 = {
   },
 };
 
-const defaultOptions = {
+const defaultOptions$1 = {
   fontSize: 12,
   fontWeight: "normal",
   fontFamily: 'Helvetica Neue',
@@ -6244,9 +6326,9 @@ function calcTextWidth (ctx, text) {
   return Math.round(ctx.measureText(text).width)
 }
 function createFont (
-  fontSize = defaultOptions.fontSize,
-  fontWeight = defaultOptions.fontWeight,
-  fontFamily = defaultOptions.fontFamily
+  fontSize = defaultOptions$1.fontSize,
+  fontWeight = defaultOptions$1.fontWeight,
+  fontFamily = defaultOptions$1.fontFamily
   ) {
   return `${fontWeight} ${fontSize}px ${fontFamily}`
 }
@@ -6269,11 +6351,11 @@ function drawTextBG(ctx, txt, x, y, options) {
   ctx.save();
   ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily);
   ctx.textBaseline = 'top';
-  ctx.fillStyle = options.bakCol || defaultOptions.bakCol;
+  ctx.fillStyle = options.bakCol || defaultOptions$1.bakCol;
   let width = getTextRectWidth(ctx, txt, options);
   let height = getTextRectHeight(options);
   ctx.fillRect(x, y, width, height);
-  ctx.fillStyle = options.txtCol || defaultOptions.txtCol;
+  ctx.fillStyle = options.txtCol || defaultOptions$1.txtCol;
   x = x + options?.paddingLeft;
   y = y + options?.paddingTop;
   ctx.fillText(txt, x, y);
@@ -6646,6 +6728,7 @@ class Timeline {
     const ctx = this.#layerLabels.scene.context;
     const offset = 0;
     const theme = this.theme.xAxis;
+    const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true;
     ctx.save();
     ctx.strokeStyle = theme.colourTick;
     ctx.fillStyle = theme.colourTick;
@@ -6654,10 +6737,12 @@ class Timeline {
       let x = bRound(tick[1]);
       let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5);
       ctx.fillText(tick[0], x - w + offset, this.#xAxis.xAxisTicks + 12);
-      ctx.beginPath();
-      ctx.moveTo(x + offset, 0);
-      ctx.lineTo(x + offset, this.#xAxis.xAxisTicks);
-      ctx.stroke();
+      if (tickMarker) {
+        ctx.beginPath();
+        ctx.moveTo(x + offset, 0);
+        ctx.lineTo(x + offset, this.#xAxis.xAxisTicks);
+        ctx.stroke();
+      }
     }
     ctx.restore();
   }
@@ -7403,8 +7488,16 @@ class scalePriceLine {
     if (candle[4] >= candle[1]) options.bakCol = this.#theme.candle.UpBodyColour;
     else options.bakCol = this.#theme.candle.DnBodyColour;
     ctx.fillStyle = options.bakCol;
-    ctx.fillRect(1, yPos, this.width, height);
-    drawTextBG(ctx, `${nice}`, 1, yPos , options);
+    let x = 1;
+    ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily);
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = options.bakCol || defaultOptions.bakCol;
+    height = getTextRectHeight(options);
+    ctx.fillRect(x, yPos, this.#viewport.width, height);
+    ctx.fillStyle = options.txtCol || defaultOptions.txtCol;
+    x = x + options?.paddingLeft;
+    yPos += options?.paddingTop;
+    ctx.fillText(`${nice}`, x, yPos);
     ctx.restore();
     this.#viewport.render();
   }
@@ -7671,16 +7764,25 @@ class ScaleBar {
     const grads = this.#yAxis.yAxisGrads;
     const ctx = this.#layerLabels.scene.context;
     const theme = this.theme.yAxis;
+    const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true;
+      let tickPos = [];
+    switch (theme?.location) {
+      case "left": tickPos = [this.width, this.width - this.#yAxis.yAxisTicks]; break;
+      case "right":
+      default: tickPos = [1, this.#yAxis.yAxisTicks]; break;
+    }
     ctx.save();
     ctx.strokeStyle = theme.colourTick;
     ctx.fillStyle = theme.colourTick;
     ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`;
     for (let tick of grads) {
       ctx.fillText(tick[0], this.#yAxis.yAxisTicks + 5, tick[1] + 4);
-      ctx.beginPath();
-      ctx.moveTo(0, tick[1]);
-      ctx.lineTo(this.#yAxis.yAxisTicks, tick[1]);
-      ctx.stroke();
+      if (tickMarker) {
+        ctx.beginPath();
+        ctx.moveTo(tickPos[0], tick[1]);
+        ctx.lineTo(tickPos[1], tick[1]);
+        ctx.stroke();
+      }
     }
     ctx.restore();
   }
@@ -10275,6 +10377,7 @@ class TradeXchart extends tradeXChart {
     this.log("...processing state");
     this.#scrollPos = this.bufferPx * -1;
     this.eventsListen();
+    this.elBody.start(this.theme);
     this.UtilsBar.start();
     this.ToolsBar.start();
     this.MainPane.start();

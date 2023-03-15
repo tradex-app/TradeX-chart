@@ -17,6 +17,7 @@ import Slider from "./widgets/slider"
 import {
   BUFFERSIZE,
 } from "../definitions/chart"
+import { isBoolean } from "../utils/typeChecks"
 
 const defaultOverlays = [
 
@@ -367,6 +368,7 @@ export default class Timeline {
     const ctx = this.#layerLabels.scene.context
     const offset = 0
     const theme = this.theme.xAxis
+    const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true
 
     ctx.save();
     ctx.strokeStyle = theme.colourTick
@@ -378,10 +380,12 @@ export default class Timeline {
       let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5)
       ctx.fillText(tick[0], x - w + offset, this.#xAxis.xAxisTicks + 12)
 
-      ctx.beginPath()
-      ctx.moveTo(x + offset, 0)
-      ctx.lineTo(x + offset, this.#xAxis.xAxisTicks)
-      ctx.stroke()
+      if (tickMarker) {
+        ctx.beginPath()
+        ctx.moveTo(x + offset, 0)
+        ctx.lineTo(x + offset, this.#xAxis.xAxisTicks)
+        ctx.stroke()
+      }
     }
     ctx.restore();
   }

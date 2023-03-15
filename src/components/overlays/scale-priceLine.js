@@ -2,7 +2,7 @@
 
 import { STREAM_UPDATE } from "../../definitions/core"
 import { CandleStyle, YAxisStyle } from "../../definitions/style";
-import { drawTextBG, getTextRectHeight } from "../../utils/canvas"
+import { createFont, drawTextBG, getTextRectHeight } from "../../utils/canvas"
 
 
 export default class scalePriceLine {
@@ -87,9 +87,27 @@ export default class scalePriceLine {
     else options.bakCol = this.#theme.candle.DnBodyColour
 
     ctx.fillStyle = options.bakCol
-    ctx.fillRect(1, yPos, this.width, height)
 
-    drawTextBG(ctx, `${nice}`, 1, yPos , options)
+    let x = 1
+
+    ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily)
+    /// draw text from top - makes life easier at the moment
+    ctx.textBaseline = 'top';
+  
+    /// color for background
+    ctx.fillStyle = options.bakCol || defaultOptions.bakCol;
+
+    // get width of text
+    height = getTextRectHeight(options)
+
+    /// draw background rect
+    ctx.fillRect(x, yPos, this.#viewport.width, height);
+
+    // draw text on top
+    ctx.fillStyle = options.txtCol || defaultOptions.txtCol;
+    x = x + options?.paddingLeft
+    yPos += options?.paddingTop
+    ctx.fillText(`${nice}`, x, yPos);
 
     ctx.restore()
     this.#viewport.render()

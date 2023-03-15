@@ -44,6 +44,30 @@ let state4 = {
   }]
 }
 
+let state5 = {
+  "ohlcv": [],
+  "onchart": [
+    {
+      "name": "EMA, 25",
+      "type": "EMA",
+      "data": [],
+      "settings": {}
+  },
+  {
+      "name": "EMA, 43",
+      "type": "EMA",
+      "data": [],
+      "settings": {}
+  },
+  ],
+  "offchart": [
+    {
+      "name": "RSI, 20",
+      "type": "RSI",
+      "data": []
+    }]
+}
+
 // let rangeStartTS = 1558429200000 // 21/05/2019, 11:00:00 - 1 hour price
 // let rangeStartTS = 1663059600000 // seconds price
 let rangeStartTS = undefined
@@ -260,12 +284,96 @@ const config4 = {
   talib: talib,
   state: state4
 }
+const config5 = {
+  id: "Midnight",
+  title: "ETH/USDT",
+  // width: 1000,
+  // height: 800,
+  utils: {none: true},
+  tools: {none: true},
+  timeFrame: "1m",
+  rangeStartTS: rangeStartTS,
+  rangeLimit: 30,
+  theme: {
+    candle: {
+      Type: "candle_solid",
+      UpBodyColour: "#4c5fe7",
+      UpWickColour: "#4c5fe7",
+      DnBodyColour: "#4c5fe7",
+      DnWickColour: "#4c5fe7",
+    },
+    volume: {
+      Height: 15,
+      UpColour: "#4bc67c",
+      DnColour: "#2e384f",
+    },
+    xAxis: {
+      colourTick: "#6a6f80",
+      colourLabel: "#6a6f80",
+      colourCursor: "#2A2B3A",
+      colourCursorBG: "#aac0f7",
+      // fontFamily: XAxisStyle.FONTFAMILY,
+      // fontSize: XAxisStyle.FONTSIZE,
+      // fontWeight: XAxisStyle.FONTWEIGHT,
+      // line: "#656565"
+      slider: "#586ea6",
+      handle: "#586ea688",
+      tickMarker: false,
+    },
+    yAxis: {
+      colourTick: "#6a6f80",
+      colourLabel: "#6a6f80",
+      colourCursor: "#2A2B3A",
+      colourCursorBG: "#aac0f7",
+      // fontFamily: YAxisStyle.FONTFAMILY,
+      // fontSize: YAxisStyle.FONTSIZE,
+      // fontWeight: YAxisStyle.FONTWEIGHT,
+      // line: "#656565"
+      tickMarker: false,
+      location:"left",
+    },
+    chart: {
+      Background: "#0f1213",
+      BorderColour: "#00000000",
+      BorderThickness: 1,
+      GridColour: "#191e26",
+      TextColour: "#6a6f80"
+    },
+    onChart: {
+
+    },
+    offChart: {
+
+    },
+    time: {
+      // font: LegendStyle.font,
+      colour: "#96a9db",
+      handleColour: "#586ea6",
+    },
+    legend: {
+      colour: "#96a9db",
+    },
+    icon: {
+      colour: "#748bc7",
+      hover: "#96a9db"
+    }
+  },
+  isCrypto: true,
+  logs: false,
+  infos: true,
+  warnings: true,
+  errors: true,
+  stream: streamVal,
+  maxCandleUpdate: 250,
+  talib: talib
+}
 
 const configs = [
   {config: config1, stream: null},
   {config: config2, stream: (chart) => {setInterval(stream.bind(chart), interval)}},
-  {config: config3, stream: (chart) => {livePrice(chart)}},
+  {config: config3, stream: (chart) => {livePrice_Binance_BTCUSDT(chart)}},
   {config: config4, stream: (chart) => {setInterval(stream.bind(chart), interval)}},
+  {config: config5, stream: (chart) => {livePrice_Binance_ETHUSDT(chart)}},
 ]
 
 const main = DOM.findBySelector('main')
@@ -364,9 +472,17 @@ function stream() {
   chart.stream.onTick(tick)
 }
 
-function livePrice(chart) {
+function livePrice_Binance_BTCUSDT(chart) {
   var ws = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@aggTrade");    
-  ws.onmessage = function (evt) { 
+  ws.onmessage = (evt) => onWSMessage.call(this, evt, chart)
+}
+
+function livePrice_Binance_ETHUSDT(chart) {
+  var ws = new WebSocket("wss://stream.binance.com:9443/ws/ethusdt@aggTrade");    
+  ws.onmessage = (evt) => onWSMessage.call(this, evt, chart)
+}
+
+function onWSMessage (evt, chart) { 
   
     /*
     {

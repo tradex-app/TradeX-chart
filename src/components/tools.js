@@ -204,7 +204,7 @@ export default class ToolsBar {
   }
 
   iconNode(tool) {
-    const iconStyle = `display: inline-block; height: ${ToolsStyle.ICONSIZE};`
+    const iconStyle = `display: inline-block; height: ${ToolsStyle.ICONSIZE}; margin-left: -3px;`
     const menu = ("sub" in tool) ? `data-menu="true"` : ""
     return  `
       <div id="${tool.id}" data-event="${tool.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${tool.icon}</div>\n
