@@ -378,15 +378,16 @@ const configs = [
 ]
 
 const main = DOM.findBySelector('main')
+const add = document.querySelector("#add")
+      add.onclick = addChart
+
+
+// Add some charts
 
 addChart()
 addChart()
 addChart()
 addChart()
-
-
-let add = document.querySelector("#add")
-    add.onclick = addChart
 
 
 function addChart() {
@@ -394,7 +395,8 @@ function addChart() {
   let section = document.createElement("section")
       section.appendChild(chart)
       main.appendChild(section)
-  let {config, stream} = (chart.inCnt >= configs.length) ? configs[chart.inCnt % configs.length] : configs[chart.inCnt]
+
+  let {config, stream} = configs[(chart.inCnt + 1) % configs.length]
       chart.start(config)
       window["chart"+chart.inCnt] = chart
 
@@ -403,8 +405,6 @@ function addChart() {
     if (typeof stream === "function") stream(chart)
   }
 }
-
-
 
 
 function test(e) {

@@ -22,8 +22,8 @@ export function getPixelRatio (canvas) {
 
 /**
  * Measure the width of the text
- * @param ctx
- * @param text
+ * @param {canvas} ctx - HTML Canvas
+ * @param {string} text
  * @returns {number}
  */
 export function calcTextWidth (ctx, text) {
@@ -32,9 +32,9 @@ export function calcTextWidth (ctx, text) {
 
 /**
  * Create font
- * @param fontSize
- * @param fontFamily
- * @param fontWeight
+ * @param {string} fontSize
+ * @param {string} fontFamily
+ * @param {string} fontWeight
  * @returns {string}
  */
 export function createFont (
@@ -47,9 +47,9 @@ export function createFont (
 
 /**
  * Get the width of the text box
- * @param ctx
- * @param text
- * @param options
+ * @param {canvas} ctx - HTML Canvas
+ * @param {string} text
+ * @param {object} options
  * @returns {number}
  */
 export function getTextRectWidth (ctx, text, options) {
@@ -63,7 +63,7 @@ export function getTextRectWidth (ctx, text, options) {
 
 /**
  * Get the height of the text box
- * @param options
+ * @param {object} options
  * @returns {number}
  */
 export function getTextRectHeight (options) {
@@ -77,7 +77,7 @@ export function getTextRectHeight (options) {
 /**
  * draw text with background
  * @export
- * @param {canvas} ctx
+ * @param {canvas} ctx - HTML Canvas
  * @param {string} txt
  * @param {number} x
  * @param {number} y
@@ -112,8 +112,15 @@ export function drawTextBG(ctx, txt, x, y, options) {
   ctx.restore();
 }
 
-
-function drawSpline(points, tension) {
+/**
+ * Draw Spline
+ *
+ * @export
+ * @param {canvas} ctx - HTML Canvas
+ * @param {array} points - array of points [{x, y}, {x, y}...]
+ * @param {number} tension
+ */
+export function drawSpline(ctx, points, tension) {
   ctx.beginPath();
   ctx.moveTo(points[0].x, points[0].y);
 
@@ -135,3 +142,74 @@ function drawSpline(points, tension) {
   ctx.stroke();
 }
 
+/**
+ * Draw Regular Polygon 
+ *
+ * @export
+ * @param {canvas} ctx - HTML Canvas
+ * @param {number} x
+ * @param {number} y
+ * @param {number} radius
+ * @param {number} sides
+ * @param {number} rotateAngle - 90 degrees(negative direction i.e., -Math.PI/2) 
+ */
+export function regularPolygon (ctx, x, y, radius, sides, rotateAngle) {
+  if (sides < 3) return;
+  var a = (Math.PI * 2)/sides;
+  ctx.beginPath();
+  ctx.translate(x,y);
+  ctx.rotate(rotateAngle);
+  ctx.moveTo(radius,0);
+  for (var i = 1; i < sides; i++) {
+  ctx.lineTo(radius*Math.cos(a*i),radius*Math.sin(a*i));
+  }
+  ctx.closePath();
+}
+
+/**
+ * Draw Irregular Polygon
+ *
+ * @export
+ * @param {canvas} ctx - HTML Canvas
+ * @param {array} points - array of points [{x, y}, {x, y}...]
+ */
+export function drawPolygon (ctx, points) {
+  if (points.length > 0) {
+    ctx.beginPath();
+    var point = points[0];
+    ctx.moveTo(point.x, point.y); // point 1
+    for (var i = 1; i < points.length; ++i) {
+      point = points[i];
+      ctx.lineTo(point.x, point.y); // point from 2 up to (points.length - 1)
+    }
+    ctx.closePath(); // go back to point 1
+    ctx.stroke(); // draw stroke line
+  }
+};
+
+export function drawCircle(ctx, x, y, radius, fill, stroke, strokeWidth) {
+  ctx.beginPath()
+  ctx.arc(x, y, radius, 0, 2 * Math.PI, false)
+  fillStroke(ctx, fill, stroke, strokeWidth)
+}
+
+/**
+ * Fill and Stroke a Path
+ *
+ * @export
+ * @param {canvas} ctx - HTML Canvas
+ * @param {string} fill
+ * @param {string} stroke
+ * @param {number} strokeWidth
+ */
+export function fillStroke(ctx, fill, stroke, strokeWidth) {
+  if (fill) {
+    ctx.fillStyle = fill
+    ctx.fill()
+  }
+  if (stroke) {
+    ctx.lineWidth = strokeWidth || 1
+    ctx.strokeStyle = stroke
+    ctx.stroke()
+  }
+}

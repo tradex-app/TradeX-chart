@@ -71,8 +71,7 @@ let state = {
   ]
 }
 
-// or use document.getElementById('myChartDiv')
-const mount = DOM.findBySelector('#myChartDiv')
+
 
 // minimal config
 const config = {
@@ -86,8 +85,11 @@ const config = {
   rangeLimit: 30,
 }
 
-const chart = Chart.create(mount, config, state )
-chart.start(chart.getModID())
+const mount = document.getElementById('myChartDiv')
+const chart = document.createElement("tradex-chart")
+
+mount.appendChild(chart)
+chart.start(config)
 
 </script>
 ```

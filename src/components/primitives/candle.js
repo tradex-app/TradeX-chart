@@ -136,17 +136,42 @@ export default class Candle {
     this.areaCoordinates.push(data)
   }
 
-  areaRender() {
+  areaRender(core, range) {
+    const coords = this.areaCoordinates
+
+    if (coords.length == 0) return
+
+    const ctx = this.ctx
+    const bodyColour = this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour
+
+    // let o = core.rangeScrollOffset;
+    // let c = range.indexStart - o
+    // let i = range.Length + (o * 2)
+
+    let w = Math.max(coords[0].w -1, 1)
+        w = (w > 5) ? Math.ceil(w * 0.8) : w
+    let hw = Math.max(Math.floor(w * 0.5), 1)
+    // let h = Math.abs(data.o - data.c)
+    // let max_h = data.c === data.o ? 1 : 2
+    let x = coords[0].x // + hw
+    let x05 = Math.floor(x) - 0.5
+
     ctx.save();
+    ctx.fillStyle = 'rgba(100,100,100,0.5)';
+    ctx.strokeStyle = "#df4b26";
+    ctx.lineWidth = 1;
     ctx.beginPath()
+    ctx.moveTo(coords[0].x, coords[0].y);
 
-    let coords = this.areaCoordinates
-    for (let i = 0; i < coords.length; i++) {
-      const ctx = this.ctx
-      const hilo = coords[i].raw[4] >= data[i+1].raw[4]
-
-      
+    let i = 0
+    while ( i < coords.length) {
+      ctx.lineTo(coords[i].x, coords[i].y);
+      i++
     }
+
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
     ctx.restore();
   }
 }
