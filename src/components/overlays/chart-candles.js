@@ -96,7 +96,7 @@ export default class chartCandles extends Candle {
     }
 
     if (this.#core.theme.candle.Type === CandleType.AREA) 
-      super.areaRender(this.#core, range)
+      super.areaRender()
   }
 
 }

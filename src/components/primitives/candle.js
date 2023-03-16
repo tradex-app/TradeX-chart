@@ -7,6 +7,7 @@
 // OHLC: 'ohlc',
 
 import { CandleType, defaultTheme } from "../../definitions/style"
+import { isArray, isString } from "../../utils/typeChecks"
 
 export default class Candle {
 
@@ -136,45 +137,64 @@ export default class Candle {
     this.areaCoordinates.push(data)
   }
 
-  areaRender(core, range) {
+  areaRender() {
     const coords = this.areaCoordinates
 
-    if (coords.length == 0) return
+    // Nothing to process
+    if ( !isArray(coords) || coords.length == 0) return
 
     const ctx = this.ctx
-    const bodyColour = this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour
-
-    // let o = core.rangeScrollOffset;
-    // let c = range.indexStart - o
-    // let i = range.Length + (o * 2)
-
+    let fillStyle
     let w = Math.max(coords[0].w -1, 1)
         w = (w > 5) ? Math.ceil(w * 0.8) : w
     let hw = Math.max(Math.floor(w * 0.5), 1)
-    // let h = Math.abs(data.o - data.c)
-    // let max_h = data.c === data.o ? 1 : 2
     let x = coords[0].x // + hw
     let x05 = Math.floor(x) - 0.5
+    let start = [coords[0].x, coords[0].h]
 
     ctx.save();
-    ctx.fillStyle = 'rgba(100,100,100,0.5)';
-    ctx.strokeStyle = "#df4b26";
+    ctx.strokeStyle = this.cfg.candle.AreaLineColour || this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour
     ctx.lineWidth = 1;
     ctx.beginPath()
-    ctx.moveTo(coords[0].x, coords[0].y);
+    ctx.moveTo(coords[0].x, coords[0].h);
 
     let i = 0
     while ( i < coords.length) {
-      ctx.lineTo(coords[i].x, coords[i].y);
+      ctx.lineTo(coords[i].x, coords[i].h);
       i++
     }
 
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+    // if (this.cfg.AreaFill) {
+    if (true === false) {
+      const grd = ctx.createLinearGradient(0, 0, 0, this.scene.height);
+
+      if (isArray(this.cfg.AreaFillColour)) {
+        for (let [index, value] of this.cfg.AreaFillColour) {
+          grd.addColorStop(index, value)
+        }
+      }
+      else if (isString())
+        fillStyle = this.cfg.AreaFillColour
+      else
+        fillStyle = this.cfg.UpBodyColour || this.cfg.DnBodyColour
+
+      // render line
+      ctx.stroke();
+
+      ctx.lineTo(coords[i-1].x, this.scene.height)
+      ctx.lineTo(start[0], this.scene.height)
+      
+      ctx.fillStyle = fillStyle
+      ctx.closePath();
+      ctx.fill();
+    }
+    else
+      ctx.stroke();
+  
     ctx.restore();
   }
 }
+  
 
 
 // Convert to layout

@@ -297,7 +297,11 @@ const config5 = {
   rangeLimit: 30,
   theme: {
     candle: {
-      Type: "candle_solid",
+      Type: "area",
+      AreaFill: true,
+      AreaLineColour: "#4c5fe7",
+      AreaFillColour: ["#4c5fe780", "#4c5fe700"],
+
       UpBodyColour: "#4c5fe7",
       UpWickColour: "#4c5fe7",
       DnBodyColour: "#4c5fe7",
@@ -396,7 +400,7 @@ function addChart() {
       section.appendChild(chart)
       main.appendChild(section)
 
-  let {config, stream} = configs[(chart.inCnt + 1) % configs.length]
+  let {config, stream} = configs[(chart.inCnt) % configs.length]
       chart.start(config)
       window["chart"+chart.inCnt] = chart
 

@@ -71,8 +71,6 @@ let state = {
   ]
 }
 
-
-
 // minimal config
 const config = {
   id: "TradeX_test",

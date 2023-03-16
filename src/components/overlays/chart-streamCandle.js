@@ -66,7 +66,7 @@ export default class chartStreamCandle extends Candle {
     const r = this.#core.range
     const stream = this.#chart.streamCandle
     const render = (this.#core.theme.candle.Type === CandleType.AREA) ?
-      (candle) => {} :
+      (candle) => {this.areaRender(candle)} :
       (candle) => {super.draw(candle)}
     const offset = this.xAxis.smoothScrollOffset || 0
     const pos = this.#core.stream.lastXPos
@@ -83,8 +83,6 @@ export default class chartStreamCandle extends Candle {
 
     if (r.inRenderRange(stream[0])) {
       render(candle)
-
-      if (this.#core.theme.candle.Type === CandleType.AREA) super.areaRender()
     }
 
     if (stream[4] >= stream[1]) this.#theme.priceLineStyle.strokeStyle = this.#core.theme.candle.UpBodyColour
@@ -98,6 +96,43 @@ export default class chartStreamCandle extends Candle {
       this.#target.width, 
       this.#theme.priceLineStyle
     )
+  }
+
+  areaRender(candle) {
+    const r = this.#core.range
+    const raw = r.value(r.data.length - 2)
+
+    if (raw === null) return
+
+    const prev = {
+      x: this.xAxis.xPos(raw[0]),
+      o: this.yPos(raw[1]),
+      h: this.yPos(raw[2]),
+      l: this.yPos(raw[3]),
+      c: this.yPos(raw[4]),
+    }
+
+    const ctx = this.ctx
+    const bodyColour = this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour
+
+    let w = Math.max(candle.w -1, 1)
+    w = (w > 5) ? Math.ceil(w * 0.8) : w
+    let hw = Math.max(Math.floor(w * 0.5), 1)
+
+    let x = candle.x // + hw
+    let x05 = Math.floor(x) - 0.5
+
+    ctx.save();
+    ctx.fillStyle = bodyColour;
+    ctx.strokeStyle = bodyColour;
+    ctx.lineWidth = 1;
+    ctx.beginPath()
+    ctx.moveTo(candle.x, candle.c);
+    ctx.lineTo(prev.x, prev.h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
   }
 
 }
