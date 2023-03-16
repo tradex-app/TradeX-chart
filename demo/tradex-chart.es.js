@@ -8079,13 +8079,44 @@ class Candle {
     this.areaCoordinates.push(data);
   }
   areaRender() {
+    const coords = this.areaCoordinates;
+    if ( !isArray(coords) || coords.length == 0) return
+    let ctx = this.ctx;
+    let cfg = this.cfg.candle;
+    let fill;
+    Math.max(coords[0].w -1, 1);
+    coords[0].x;
+    let start = [coords[0].x, coords[0].h];
     ctx.save();
+    ctx.strokeStyle = cfg.AreaLineColour || cfg.UpBodyColour || cfg.DnBodyColour;
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    let coords = this.areaCoordinates;
-    for (let i = 0; i < coords.length; i++) {
-      this.ctx;
-      coords[i].raw[4] >= data[i+1].raw[4];
+    ctx.moveTo(coords[0].x, coords[0].h);
+    let i = 0;
+    while ( i < coords.length) {
+      ctx.lineTo(coords[i].x, coords[i].h);
+      i++;
     }
+    if (cfg.AreaFill) {
+      fill= ctx.createLinearGradient(0, 0, 0, this.scene.height);
+      if (isArray(cfg.AreaFillColour)) {
+        for (let [index, value] of cfg.AreaFillColour.entries()) {
+          fill.addColorStop(index, value);
+        }
+      }
+      else if (isString())
+        fill = cfg.AreaFillColour;
+      else
+        fill = cfg.UpBodyColour || cfg.DnBodyColour;
+      ctx.stroke();
+      ctx.lineTo(coords[i-1].x, this.scene.height);
+      ctx.lineTo(start[0], this.scene.height);
+      ctx.fillStyle = fill;
+      ctx.closePath();
+      ctx.fill();
+    }
+    else
+      ctx.stroke();
     ctx.restore();
   }
 }
@@ -8115,8 +8146,9 @@ class chartCandles extends Candle {
   set position(p) { this.#target.setPosition(p[0], p[1]); }
   draw(range=this.#core.range) {
     this.#scene.clear();
+    this.areaCoordinates = [];
     const render = (this.#core.theme.candle.Type === CandleType.AREA) ?
-        (candle) => {} :
+        (candle) => {this.area({...candle});} :
         (candle) => {super.draw(candle);};
     const offset = this.xAxis.smoothScrollOffset || 0;
     const candle = {
@@ -8155,7 +8187,8 @@ class chartCandles extends Candle {
       c++;
       i--;
     }
-    if (this.#core.theme.candle.Type === CandleType.AREA) super.areaRender();
+    if (this.#core.theme.candle.Type === CandleType.AREA)
+      super.areaRender();
   }
 }
 
@@ -8206,7 +8239,7 @@ class chartStreamCandle extends Candle {
     const r = this.#core.range;
     const stream = this.#chart.streamCandle;
     const render = (this.#core.theme.candle.Type === CandleType.AREA) ?
-      (candle) => {} :
+      (candle) => {this.areaRender(candle);} :
       (candle) => {super.draw(candle);};
     this.xAxis.smoothScrollOffset || 0;
     const pos = this.#core.stream.lastXPos;
@@ -8221,7 +8254,6 @@ class chartStreamCandle extends Candle {
     candle.raw = stream;
     if (r.inRenderRange(stream[0])) {
       render(candle);
-      if (this.#core.theme.candle.Type === CandleType.AREA) super.areaRender();
     }
     if (stream[4] >= stream[1]) this.#theme.priceLineStyle.strokeStyle = this.#core.theme.candle.UpBodyColour;
     else this.#theme.priceLineStyle.strokeStyle = this.#core.theme.candle.DnBodyColour;
@@ -8232,6 +8264,33 @@ class chartStreamCandle extends Candle {
       this.#target.width,
       this.#theme.priceLineStyle
     );
+  }
+  areaRender(candle) {
+    const r = this.#core.range;
+    const raw = r.value(r.data.length - 2);
+    if (raw === null) return
+    const prev = {
+      x: this.xAxis.xPos(raw[0]),
+      o: this.yPos(raw[1]),
+      h: this.yPos(raw[2]),
+      l: this.yPos(raw[3]),
+      c: this.yPos(raw[4]),
+    };
+    const ctx = this.ctx;
+    const bodyColour = this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour;
+    Math.max(candle.w -1, 1);
+    candle.x;
+    ctx.save();
+    ctx.fillStyle = bodyColour;
+    ctx.strokeStyle = bodyColour;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(candle.x, candle.c);
+    ctx.lineTo(prev.x, prev.h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
   }
 }
 

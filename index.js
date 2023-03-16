@@ -5,7 +5,7 @@ import * as demo from './demo.js'
 // import './chart-live.css'
 
 // let state = undefined
-import state1 from './data/1hour.json'
+import state1 from './data/1hour.js'
 import state2 from './data/data_btc_1m.js'
 // import state4 from './data/seconds.js'
 // import state from './data/seconds-indicator'

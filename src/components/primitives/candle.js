@@ -143,8 +143,9 @@ export default class Candle {
     // Nothing to process
     if ( !isArray(coords) || coords.length == 0) return
 
-    const ctx = this.ctx
-    let fillStyle
+    let ctx = this.ctx
+    let cfg = this.cfg.candle
+    let fill
     let w = Math.max(coords[0].w -1, 1)
         w = (w > 5) ? Math.ceil(w * 0.8) : w
     let hw = Math.max(Math.floor(w * 0.5), 1)
@@ -153,7 +154,7 @@ export default class Candle {
     let start = [coords[0].x, coords[0].h]
 
     ctx.save();
-    ctx.strokeStyle = this.cfg.candle.AreaLineColour || this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour
+    ctx.strokeStyle = cfg.AreaLineColour || cfg.UpBodyColour || cfg.DnBodyColour
     ctx.lineWidth = 1;
     ctx.beginPath()
     ctx.moveTo(coords[0].x, coords[0].h);
@@ -164,19 +165,18 @@ export default class Candle {
       i++
     }
 
-    // if (this.cfg.AreaFill) {
-    if (true === false) {
-      const grd = ctx.createLinearGradient(0, 0, 0, this.scene.height);
+    if (cfg.AreaFill) {
+      fill= ctx.createLinearGradient(0, 0, 0, this.scene.height);
 
-      if (isArray(this.cfg.AreaFillColour)) {
-        for (let [index, value] of this.cfg.AreaFillColour) {
-          grd.addColorStop(index, value)
+      if (isArray(cfg.AreaFillColour)) {
+        for (let [index, value] of cfg.AreaFillColour.entries()) {
+          fill.addColorStop(index, value)
         }
       }
       else if (isString())
-        fillStyle = this.cfg.AreaFillColour
+        fill = cfg.AreaFillColour
       else
-        fillStyle = this.cfg.UpBodyColour || this.cfg.DnBodyColour
+        fill = cfg.UpBodyColour || cfg.DnBodyColour
 
       // render line
       ctx.stroke();
@@ -184,7 +184,7 @@ export default class Candle {
       ctx.lineTo(coords[i-1].x, this.scene.height)
       ctx.lineTo(start[0], this.scene.height)
       
-      ctx.fillStyle = fillStyle
+      ctx.fillStyle = fill
       ctx.closePath();
       ctx.fill();
     }

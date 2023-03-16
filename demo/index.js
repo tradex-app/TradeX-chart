@@ -296,7 +296,11 @@ const config5 = {
   rangeLimit: 30,
   theme: {
     candle: {
-      Type: "candle_solid",
+      Type: "area",
+      AreaFill: true,
+      AreaLineColour: "#4c5fe7",
+      AreaFillColour: ["#4c5fe780", "#4c5fe700"],
+
       UpBodyColour: "#4c5fe7",
       UpWickColour: "#4c5fe7",
       DnBodyColour: "#4c5fe7",
@@ -377,15 +381,17 @@ const configs = [
 ]
 
 const main = DOM.findBySelector('main')
+const add = document.querySelector("#add")
+      add.onclick = addChart
+
+
+// Add some charts
 
 addChart()
 addChart()
 addChart()
 addChart()
-
-
-let add = document.querySelector("#add")
-    add.onclick = addChart
+addChart()
 
 
 function addChart() {
@@ -393,7 +399,8 @@ function addChart() {
   let section = document.createElement("section")
       section.appendChild(chart)
       main.appendChild(section)
-  let {config, stream} = (chart.inCnt >= configs.length) ? configs[chart.inCnt % configs.length] : configs[chart.inCnt]
+
+  let {config, stream} = configs[(chart.inCnt) % configs.length]
       chart.start(config)
       window["chart"+chart.inCnt] = chart
 
