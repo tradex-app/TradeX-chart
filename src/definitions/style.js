@@ -75,7 +75,8 @@ export const CandleType = {
   CANDLE_UP_HOLLOW: 'candle_up_hollow',
   CANDLE_DOWN_HOLLOW: 'candle_down_hollow',
   OHLC: 'ohlc',
-  AREA: 'area'
+  AREA: 'area',
+  LINE: 'line'
 }
 
 export const CandleStyle = {

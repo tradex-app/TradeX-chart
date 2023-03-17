@@ -65,9 +65,17 @@ export default class chartStreamCandle extends Candle {
 
     const r = this.#core.range
     const stream = this.#chart.streamCandle
-    const render = (this.#core.theme.candle.Type === CandleType.AREA) ?
-      (candle) => {this.areaRender(candle)} :
-      (candle) => {super.draw(candle)}
+    let render
+
+    switch (this.cfg.candle.Type) {
+      case CandleType.AREA:
+      case CandleType.LINE:
+        render = (candle) => {this.areaRender(candle)}
+        break;
+      default:
+        render = (candle) => {super.draw(candle)}
+        break;
+    }  
     const offset = this.xAxis.smoothScrollOffset || 0
     const pos = this.#core.stream.lastXPos
     const candle = {
@@ -85,8 +93,8 @@ export default class chartStreamCandle extends Candle {
       render(candle)
     }
 
-    if (stream[4] >= stream[1]) this.#theme.priceLineStyle.strokeStyle = this.#core.theme.candle.UpBodyColour
-    else this.#theme.priceLineStyle.strokeStyle = this.#core.theme.candle.DnBodyColour
+    if (stream[4] >= stream[1]) this.#theme.priceLineStyle.strokeStyle = this.cfg.candle.UpBodyColour
+    else this.#theme.priceLineStyle.strokeStyle = this.cfg.candle.DnBodyColour
 
     // draw price line 
     renderHorizontalLine (
@@ -121,6 +129,7 @@ export default class chartStreamCandle extends Candle {
 
     let x = candle.x // + hw
     let x05 = Math.floor(x) - 0.5
+    let fill
 
     ctx.save();
     ctx.fillStyle = bodyColour;
@@ -129,9 +138,33 @@ export default class chartStreamCandle extends Candle {
     ctx.beginPath()
     ctx.moveTo(candle.x, candle.c);
     ctx.lineTo(prev.x, prev.h);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+
+    if (this.cfg.candle.Type === CandleType.AREA) {
+      fill= ctx.createLinearGradient(0, 0, 0, this.scene.height);
+
+      if (isArray(this.cfg.candle.AreaFillColour)) {
+        for (let [index, value] of this.cfg.candle.AreaFillColour.entries()) {
+          fill.addColorStop(index, value)
+        }
+      }
+      else if (isString())
+        fill = this.cfg.candle.AreaFillColour
+      else
+        fill = this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour
+
+      // render line
+      ctx.stroke();
+
+      ctx.lineTo(prev.x, this.scene.height)
+      ctx.lineTo(candle.x, this.scene.height)
+      
+      ctx.fillStyle = fill
+      ctx.closePath();
+      ctx.fill();
+    }
+    else
+      ctx.stroke();
+
     ctx.restore();
   }
 

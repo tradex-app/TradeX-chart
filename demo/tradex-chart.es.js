@@ -16,7 +16,7 @@ function isNumber (value) {
 function isBoolean (value) {
   return typeof value === 'boolean'
 }
-function isString (value) {
+function isString$1 (value) {
   return typeof value === 'string'
 }
 
@@ -463,7 +463,7 @@ function timestampDifference(date1,date2) {
 }
 function isTimeFrame(tf) {
   let ms = SECOND_MS;
-  if (isString(tf)) {
+  if (isString$1(tf)) {
     ms = interval2MS(tf);
     if (ms) tf = tf;
     else {
@@ -475,7 +475,7 @@ function isTimeFrame(tf) {
   return {tf, ms}
 }
 function interval2MS(tf) {
-  if (!isString(tf)) return false
+  if (!isString$1(tf)) return false
   const regex = /([0-9]{1,2})([s|m|h|d|w|M|y])/gm;
   let m;
   if ((m = regex.exec(tf)) !== null) {
@@ -780,7 +780,7 @@ function copyDeep(obj) {
 }
 function uid(tag="ID") {
   if (isNumber(tag)) tag = tag.toString();
-  else if (!isString(tag)) tag = "ID";
+  else if (!isString$1(tag)) tag = "ID";
   const dateString = Date.now().toString(36);
   const randomness = Math.random().toString(36).substring(2,5);
   return `${tag}_${dateString}_${randomness}`
@@ -848,8 +848,8 @@ class Dataset {
   #data = []
   constructor(state, ds) {
     this.#state = state;
-    this.#id = (isString(ds.id)) ? ds.id : uid;
-    this.#type = (isString(ds.type)) ? ds.type : "default";
+    this.#id = (isString$1(ds.id)) ? ds.id : uid;
+    this.#type = (isString$1(ds.type)) ? ds.type : "default";
     this.#data = (isArray(ds.data)) ? ds.data : [];
   }
 }
@@ -1252,7 +1252,7 @@ class State {
       if (tfms < SECOND) tfms = DEFAULT_TIMEFRAMEMS;
       state.chart.tfms = tfms;
     }
-    if (!isString(state.chart?.tfms) || deepValidate)
+    if (!isString$1(state.chart?.tfms) || deepValidate)
       state.chart.tf = ms2Interval(state.chart.tfms);
     if (!('onchart' in state)) {
         state.onchart = defaultState.onchart;
@@ -1348,7 +1348,7 @@ class StateMachine {
             let cond = transition?.condition?.type || transition?.condition || false;
             if (
                 this.condition.call(this, cond, transition.condition)
-                && isString(transition.target)
+                && isString$1(transition.target)
               ) {
               transition?.action.call(this, data);
               this.#statePrev = this.#state;
@@ -1357,11 +1357,11 @@ class StateMachine {
             }
           }
         }
-        else if (isObject(transient) && isString(transient.target)) {
+        else if (isObject(transient) && isString$1(transient.target)) {
           let cond = transient?.condition?.type || transient?.condition || false;
           if (
               this.condition.call(this, cond, transient.condition)
-              && isString(transient.target)
+              && isString$1(transient.target)
             ) {
             transient?.action.call(this, data);
             this.#statePrev = this.#state;
@@ -1414,7 +1414,7 @@ class StateMachine {
       if ("on" in c.states[state]) {
         for (let e in c.states[state].on) {
           let event = c.states[state].on[e];
-          if (!isString(event.target)) return false
+          if (!isString$1(event.target)) return false
           if ("action" in event && !isFunction(event.action)) return false
         }
       }
@@ -1594,7 +1594,8 @@ const CandleType = {
   CANDLE_UP_HOLLOW: 'candle_up_hollow',
   CANDLE_DOWN_HOLLOW: 'candle_down_hollow',
   OHLC: 'ohlc',
-  AREA: 'area'
+  AREA: 'area',
+  LINE: 'line'
 };
 const CandleStyle = {
   COLOUR_CANDLE_UP: "#00F04088",
@@ -1766,7 +1767,7 @@ class Theme {
   #config
   static create(theme, core) {
     if (!(isObject(theme))) return false
-    theme.ID = (isString(theme.name))? uid(theme.name) : `${core.id}.theme`;
+    theme.ID = (isString$1(theme.name))? uid(theme.name) : `${core.id}.theme`;
     const instance = new Theme(theme, core);
     instance.#list.set(theme.ID, instance);
     return instance
@@ -1786,13 +1787,13 @@ class Theme {
   set current(theme) { this.setCurrent(theme); }
   get current() { return this.#current }
   setCurrent(theme) {
-    if (isString(theme) && this.#list.has(theme)) {
+    if (isString$1(theme) && this.#list.has(theme)) {
       this.#current = theme;
     }
     return this.getCurrent()
   }
   getCurrent() {
-    if (isString(this.#current) && this.#list.has(this.#current))
+    if (isString$1(this.#current) && this.#list.has(this.#current))
       return this.#list.get(this.#current)
     else
       return defaultTheme
@@ -1876,14 +1877,14 @@ class WebWorker$1 {
     if (isFunction(worker)) {
       worker = worker.toString();
     }
-    else if (isString(worker)) ;
+    else if (isString$1(worker)) ;
     else { return false }
-    ID = (isString(ID))? uid(ID) : uid("worker");
+    ID = (isString$1(ID))? uid(ID) : uid("worker");
     WebWorker$1.#threads.set(ID, new WebWorker$1.Thread(ID, worker, cb));
     return WebWorker$1.#threads.get(ID)
   }
   static destroy(ID) {
-    if (!isString(ID)) return false
+    if (!isString$1(ID)) return false
     WebWorker$1.#threads.get(ID).terminate();
     WebWorker$1.#threads.delete(ID);
   }
@@ -2534,7 +2535,7 @@ class element extends HTMLElement {
   set height(h) { this.setDim(h, "height"); }
   setDim(x, d) {
     if (isNumber(x)) x += "px";
-    else if (!isString(x)) return
+    else if (!isString$1(x)) return
     this.style[d] = w;
   }
   setCursor(cursor) {
@@ -3740,7 +3741,7 @@ class Colour {
     return `#${f(0)}${f(8)}${f(4)}`;
   }
   #hexToRGB(hex) {
-    if (isString(hex)) hex = /([a-f\d]{2})/ig.exec(hex);
+    if (isString$1(hex)) hex = /([a-f\d]{2})/ig.exec(hex);
     var rgba = [
         parseInt(hex[0], 16),
         parseInt(hex[1], 16),
@@ -3750,7 +3751,7 @@ class Colour {
     this.setRGBA(rgba);
   }
   #hexToHSL(hex) {
-    if (isString(hex)) hex = /([a-f\d]{2})/ig.exec(hex);
+    if (isString$1(hex)) hex = /([a-f\d]{2})/ig.exec(hex);
     let r = parseInt(hex[0], 16);
     let g = parseInt(hex[1], 16);
     let b = parseInt(hex[2], 16);
@@ -3762,7 +3763,7 @@ class Colour {
     let r,g,b,a;
     let v = this.#value;
     if (v.r && v.g && v.b && v.a) return {r, g, b, a} = {...v}
-    if (isString(rgb)) {
+    if (isString$1(rgb)) {
       let sep = rgb.indexOf(",") > -1 ? "," : " ";
       rgb = rgb.substr(4).split(")")[0].split(sep);
     }
@@ -3771,7 +3772,7 @@ class Colour {
       r = rgb[0];
       g = rgb[1];
       b = rgb[2];
-      a = (isString(rgb[3])) ? rgb[3] : "";
+      a = (isString$1(rgb[3])) ? rgb[3] : "";
     }
     else if (isObject(rgb)) {
       r = rgb.r;
@@ -4119,7 +4120,7 @@ class tradeXLegend extends element {
   get title() { return this.#title }
   set title(t) { this.setTittle(t); }
   setTittle(t) {
-    if (!isString) return
+    if (!isString$1) return
     this.#title = t;
     this.elTitle.innerHTML = t;
   }
@@ -4718,7 +4719,7 @@ class tradeXChart extends element {
       this.#chartW = w;
       w += "px";
     }
-    else if (isString(w)) ;
+    else if (isString$1(w)) ;
     else {
       this.#chartW = this.parentElement.getBoundingClientRect().width;
       w = this.#chartW + "px";
@@ -4730,7 +4731,7 @@ class tradeXChart extends element {
       this.#chartH = h;
       h += "px";
     }
-    else if (isString(h)) ;
+    else if (isString$1(h)) ;
     else {
       this.#chartH = this.parentElement.getBoundingClientRect().height;
       w = this.#chartH + "px";
@@ -7980,7 +7981,7 @@ class Candle {
     this.scene = scene;
     this.ctx = this.scene.context;
     this.width = this.scene.width;
-    this.cfg = {...defaultTheme.candle, ...config};
+    this.cfg = {...defaultTheme, ...config};
   }
   draw(data) {
     const ctx = this.ctx;
@@ -8097,14 +8098,14 @@ class Candle {
       ctx.lineTo(coords[i].x, coords[i].h);
       i++;
     }
-    if (cfg.AreaFill) {
+    if (cfg?.Type == "area") {
       fill= ctx.createLinearGradient(0, 0, 0, this.scene.height);
       if (isArray(cfg.AreaFillColour)) {
         for (let [index, value] of cfg.AreaFillColour.entries()) {
           fill.addColorStop(index, value);
         }
       }
-      else if (isString())
+      else if (isString$1())
         fill = cfg.AreaFillColour;
       else
         fill = cfg.UpBodyColour || cfg.DnBodyColour;
@@ -8147,9 +8148,16 @@ class chartCandles extends Candle {
   draw(range=this.#core.range) {
     this.#scene.clear();
     this.areaCoordinates = [];
-    const render = (this.#core.theme.candle.Type === CandleType.AREA) ?
-        (candle) => {this.area({...candle});} :
-        (candle) => {super.draw(candle);};
+    let render;
+    switch (this.cfg.candle.Type) {
+      case CandleType.AREA:
+      case CandleType.LINE:
+        render = (candle) => {this.area({...candle});};
+        break;
+      default:
+        render = (candle) => {super.draw(candle);};
+        break;
+    }
     const offset = this.xAxis.smoothScrollOffset || 0;
     const candle = {
       x: offset - this.xAxis.candleW,
@@ -8187,7 +8195,9 @@ class chartCandles extends Candle {
       c++;
       i--;
     }
-    if (this.#core.theme.candle.Type === CandleType.AREA)
+    if (this.cfg.candle.Type === CandleType.AREA ||
+        this.cfg.candle.Type === CandleType.LINE
+      )
       super.areaRender();
   }
 }
@@ -8238,9 +8248,16 @@ class chartStreamCandle extends Candle {
     this.#scene.clear();
     const r = this.#core.range;
     const stream = this.#chart.streamCandle;
-    const render = (this.#core.theme.candle.Type === CandleType.AREA) ?
-      (candle) => {this.areaRender(candle);} :
-      (candle) => {super.draw(candle);};
+    let render;
+    switch (this.cfg.candle.Type) {
+      case CandleType.AREA:
+      case CandleType.LINE:
+        render = (candle) => {this.areaRender(candle);};
+        break;
+      default:
+        render = (candle) => {super.draw(candle);};
+        break;
+    }
     this.xAxis.smoothScrollOffset || 0;
     const pos = this.#core.stream.lastXPos;
     const candle = {
@@ -8255,8 +8272,8 @@ class chartStreamCandle extends Candle {
     if (r.inRenderRange(stream[0])) {
       render(candle);
     }
-    if (stream[4] >= stream[1]) this.#theme.priceLineStyle.strokeStyle = this.#core.theme.candle.UpBodyColour;
-    else this.#theme.priceLineStyle.strokeStyle = this.#core.theme.candle.DnBodyColour;
+    if (stream[4] >= stream[1]) this.#theme.priceLineStyle.strokeStyle = this.cfg.candle.UpBodyColour;
+    else this.#theme.priceLineStyle.strokeStyle = this.cfg.candle.DnBodyColour;
     renderHorizontalLine (
       this.#scene.context,
       candle.c,
@@ -8280,6 +8297,7 @@ class chartStreamCandle extends Candle {
     const bodyColour = this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour;
     Math.max(candle.w -1, 1);
     candle.x;
+    let fill;
     ctx.save();
     ctx.fillStyle = bodyColour;
     ctx.strokeStyle = bodyColour;
@@ -8287,9 +8305,26 @@ class chartStreamCandle extends Candle {
     ctx.beginPath();
     ctx.moveTo(candle.x, candle.c);
     ctx.lineTo(prev.x, prev.h);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+    if (this.cfg.candle.Type === CandleType.AREA) {
+      fill= ctx.createLinearGradient(0, 0, 0, this.scene.height);
+      if (isArray(this.cfg.candle.AreaFillColour)) {
+        for (let [index, value] of this.cfg.candle.AreaFillColour.entries()) {
+          fill.addColorStop(index, value);
+        }
+      }
+      else if (isString())
+        fill = this.cfg.candle.AreaFillColour;
+      else
+        fill = this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour;
+      ctx.stroke();
+      ctx.lineTo(prev.x, this.scene.height);
+      ctx.lineTo(candle.x, this.scene.height);
+      ctx.fillStyle = fill;
+      ctx.closePath();
+      ctx.fill();
+    }
+    else
+      ctx.stroke();
     ctx.restore();
   }
 }
@@ -10406,7 +10441,7 @@ class TradeXchart extends tradeXChart {
       this.#time.timeFrameMS = this.#state.data.chart.tfms;
       this.#chartIsEmpty = false;
     }
-    const id = (isObject(config) && isString(config.id)) ? config.id : null;
+    const id = (isObject(config) && isString$1(config.id)) ? config.id : null;
     this.setID(id);
     this.classList.add(this.id);
     if (isObject(config)) {
@@ -10462,18 +10497,18 @@ class TradeXchart extends tradeXChart {
     this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this));
   }
    on(topic, handler, context) {
-    if (!isString(topic) || !isFunction(handler)) return
+    if (!isString$1(topic) || !isFunction(handler)) return
     if (!this.#hub[topic]) this.#hub[topic] = [];
     this.#hub[topic].push({handler, context});
   }
   off(topic, handler) {
-    if (!isString(topic)) return
+    if (!isString$1(topic)) return
     const i = (this.#hub[topic] || []).findIndex(h => h === handler);
     if (i > -1) this.#hub[topic].splice(i, 1);
     if (this.#hub[topic].length === 0) delete this.#hub[topic];
   }
   emit(topic, data) {
-    if (!isString(topic)) return
+    if (!isString$1(topic)) return
     (this.#hub[topic] || []).forEach(cb => cb.handler.call(cb.context, data));
   }
   execute(channel, data, cb) {
@@ -10517,7 +10552,7 @@ class TradeXchart extends tradeXChart {
   }
   getInCnt() { return this.#inCnt }
   setID(id) {
-    if (isString(id))
+    if (isString$1(id))
       this.#id = id + this.#inCnt;
     else
       this.#id = ID + this.#inCnt;
@@ -10602,7 +10637,7 @@ class TradeXchart extends tradeXChart {
     }
   }
   setUserClasses(c) {
-    if (isString(c)) {
+    if (isString$1(c)) {
       let uc = c.split(" ");
       this.#userClasses = uc;
     }
@@ -10622,7 +10657,7 @@ class TradeXchart extends tradeXChart {
       return false
     }
     else if (isObject(stream)) {
-      if (this.allData.data.length == 0 && isString(stream.timeFrame)) {
+      if (this.allData.data.length == 0 && isString$1(stream.timeFrame)) {
 ({tf, ms} = isTimeFrame(stream?.timeFrame));
         this.#time.timeFrame = tf;
         this.#time.timeFrameMS = ms;

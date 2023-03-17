@@ -114,7 +114,8 @@ Documentation can be found under:
   * solid up, hollow down
   * hollow up, solid down
   * OHLC
-  * TODO: area
+  * area
+  * line
 * Chart pan / scroll via mouse or cursor keys
 
 ## Support

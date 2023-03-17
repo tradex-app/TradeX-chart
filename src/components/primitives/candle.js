@@ -17,7 +17,7 @@ export default class Candle {
     this.scene = scene
     this.ctx = this.scene.context
     this.width = this.scene.width
-    this.cfg = {...defaultTheme.candle, ...config}
+    this.cfg = {...defaultTheme, ...config}
   }
 
   draw(data) {
@@ -165,7 +165,7 @@ export default class Candle {
       i++
     }
 
-    if (cfg.AreaFill) {
+    if (cfg?.Type == "area") {
       fill= ctx.createLinearGradient(0, 0, 0, this.scene.height);
 
       if (isArray(cfg.AreaFillColour)) {

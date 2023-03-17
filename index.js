@@ -254,15 +254,17 @@ const config4 = {
   rangeLimit: 30,
   theme: {
     candle: {
-      Type: "candle_solid",
-      UpBodyColour: "#0805F588",
-      UpWickColour: "#0805F5",
+      Type: "line",
+      AreaLineColour: "#08C5F5",
+
+      UpBodyColour: "#08C5F588",
+      UpWickColour: "#08C5F5",
       DnBodyColour: "#F6243888",
       DnWickColour: "#F62438",
     },
     volume: {
       Height: 15,
-      UpColour: "#F6243844",
+      UpColour: "#08C5F544",
       DnColour: "#0805F544",
     },
     chart: {
@@ -298,7 +300,6 @@ const config5 = {
   theme: {
     candle: {
       Type: "area",
-      AreaFill: true,
       AreaLineColour: "#4c5fe7",
       AreaFillColour: ["#4c5fe780", "#4c5fe700"],
 
