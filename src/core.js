@@ -165,12 +165,12 @@ export default class TradeXchart extends Tradex_chart {
    *
    * @static
    * @param {DOM_element} container - HTML element to mount the chart on
-   * @param {object} [config={}] - chart config
+   * @param {object} [txCfg={}] - chart config
    * @param {object} state - chart state
    * @return {instance}  
    * @memberof TradeXchart
    */
-    static create(config={}) {
+    static create(txCfg={}) {
 
       // global init for all TradeX charts
       if (TradeXchart.#cnt == 0) {
@@ -183,11 +183,11 @@ export default class TradeXchart extends Tradex_chart {
       if (!TradeXchart.#talibReady) {
         (async () => {
           try {
-            if ((typeof config.talib !== "object") || 
-                // (config.talib[Symbol.toStringTag] !== "Module") ||
-                (typeof config.talib.init !== "function"))
+            if ((typeof txCfg.talib !== "object") || 
+                // (txCfg.talib[Symbol.toStringTag] !== "Module") ||
+                (typeof txCfg.talib.init !== "function"))
                   throw new Error(`${TradeXchart.initErrMsg}`)
-            await config.talib.init("node_modules/talib-web/lib/talib.wasm");
+            await txCfg.talib.init("node_modules/talib-web/lib/talib.wasm");
             TradeXchart.#talibReady = true
           } catch (e) {
             throw new Error(`${TradeXchart.initErrMsg} ${e.message}`)
@@ -217,8 +217,6 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * Creates an instance of TradeXchart.
-   * @param {instance} mediator - module api
-   * @param {object}[config={}] - chart configuration
    * @memberof TradeXchart
    */
   constructor () {
@@ -321,45 +319,45 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * Target element has been validated as a mount point, 
    * let's start building
-   * @param {object} config - chart configuration
+   * @param {object} txCfg - chart configuration
    */
-  start(config) {
-    config = {...TradeXchart.create(config), ...config}
-    this.logs = (config?.logs) ? config.logs : false
-    this.infos = (config?.infos) ? config.infos : false
-    this.warnings = (config?.warnings) ? config.warnings : false
-    this.errors = (config?.errors) ? config.errors : false
-    this.timer = (config?.timer) ? config.timer : false
+  start(txCfg) {
+    txCfg = {...TradeXchart.create(txCfg), ...txCfg}
+    this.logs = (txCfg?.logs) ? txCfg.logs : false
+    this.infos = (txCfg?.infos) ? txCfg.infos : false
+    this.warnings = (txCfg?.warnings) ? txCfg.warnings : false
+    this.errors = (txCfg?.errors) ? txCfg.errors : false
+    this.timer = (txCfg?.timer) ? txCfg.timer : false
 
-    this.#config = config
-    this.#inCnt = config.cnt || this.#inCnt
-    this.#modID = config.modID
-    this.#TALib = config.talib
+    this.#config = txCfg
+    this.#inCnt = txCfg.cnt || this.#inCnt
+    this.#modID = txCfg.modID
+    this.#TALib = txCfg.talib
     this.#el = this
     this.#core = this
 
-    let state = copyDeep(config?.state)
-    let deepValidate = config?.deepValidate || false
-    let isCrypto = config?.isCrypto || false
+    let state = copyDeep(txCfg?.state)
+    let deepValidate = txCfg?.deepValidate || false
+    let isCrypto = txCfg?.isCrypto || false
     this.#state = State.create(state, deepValidate, isCrypto)
-    delete config.state
+    delete txCfg.state
     this.log(`Chart ${this.#id} created with a ${this.#state.status} state`)
 
     // time frame
     let tf = "1s"
     let ms = SECOND_MS
-    if (!isObject(config?.stream) && this.#state.data.chart.data.length < 2) {
+    if (!isObject(txCfg?.stream) && this.#state.data.chart.data.length < 2) {
       this.warning(`${NAME} has no chart data or streaming provided.`)
       // has a time frame been provided?
-      ;({tf, ms} = isTimeFrame(config?.timeFrame))
+      ;({tf, ms} = isTimeFrame(txCfg?.timeFrame))
       this.#time.timeFrame = tf
       this.#time.timeFrameMS = ms
       this.#chartIsEmpty = true
     }
     // is the chart streaming with an empty chart?
-    else if (isObject(config?.stream) && this.#state.data.chart.data.length < 2) {
+    else if (isObject(txCfg?.stream) && this.#state.data.chart.data.length < 2) {
       // has a time frame been provided?
-      ;({tf, ms} = isTimeFrame(config?.timeFrame))
+      ;({tf, ms} = isTimeFrame(txCfg?.timeFrame))
       console.log("tf:",tf,"ms:",ms)
 
       this.#time.timeFrame = tf
@@ -374,15 +372,15 @@ export default class TradeXchart extends Tradex_chart {
       this.#chartIsEmpty = false
     }
 
-    const id = (isObject(config) && isString(config.id)) ? config.id : null
+    const id = (isObject(txCfg) && isString(txCfg.id)) ? txCfg.id : null
     this.setID(id)
     this.classList.add(this.id)
 
     // process config
-    if (isObject(config)) {
-      for (const option in config) {
+    if (isObject(txCfg)) {
+      for (const option in txCfg) {
         if (option in this.props()) {
-          this.props()[option](config[option])
+          this.props()[option](txCfg[option])
         }
       }
     }
@@ -403,10 +401,10 @@ export default class TradeXchart extends Tradex_chart {
 
     this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`)
 
-    this.#WidgetsG = new WidgetsG(this, {widgets: config?.widgets})
-    this.#UtilsBar = new UtilsBar(this, config)
-    this.#ToolsBar = new ToolsBar(this, config)
-    this.#MainPane = new MainPane(this, config)
+    this.#WidgetsG = new WidgetsG(this, {widgets: txCfg?.widgets})
+    this.#UtilsBar = new UtilsBar(this, txCfg)
+    this.#ToolsBar = new ToolsBar(this, txCfg)
+    this.#MainPane = new MainPane(this, txCfg)
 
     this.setTheme(this.#themeTemp.ID)
 
@@ -782,34 +780,7 @@ export default class TradeXchart extends Tradex_chart {
 
     this.#scrollPos = scrollPos
     this.emit("scrollUpdate", scrollPos)
-
-    // console.log(`Main W: ${this.#MainPane.width}, Candle W: ${this.candleW}, r: ${this.#MainPane.width % this.candleW}`)
-    // console.log(`dist: ${dist}, bufferPx: ${this.bufferPx}, offset: ${offset}, scrollPos: ${scrollPos} \n`)
   }
-
-
-  xupdateRange(pos) {
-
-    if (pos[4] == 0) return
-    
-    let dist, offset, scrollPos, r;
-    dist = pos[4]
-    scrollPos = this.#scrollPos + dist
-    r = scrollPos % this.candleW
-    offset = (scrollPos - r) / this.candleW
-
-    // if (dist > 0) offset = offset * -1
-    offset = (dist > 0) ? offset : offset * -1
-    this.offsetRange(offset)
-    this.scrollPos = r
-
-    this.#scrollPos = r
-    this.emit("scrollUpdate", scrollPos)
-
-    // console.log(`Main W: ${this.#MainPane.width}, Candle W: ${this.candleW}, r: ${this.#MainPane.width % this.candleW}`)
-    // console.log(`dist: ${dist}, bufferPx: ${this.bufferPx}, offset: ${offset}, scrollPos: ${scrollPos} \n`)
-  }
-
 
   offsetRange(offset) {
     let start = this.range.indexStart - offset,

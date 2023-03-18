@@ -106,7 +106,7 @@ class Node {
 
         if (all && layer.layers.length > 0) layer.render(all)
 
-        if (layer.visible)
+        if (layer.visible && layer.width > 0 && layer.height > 0)
           scene.context.drawImage(
             layer.scene.canvas,
             layer.x,

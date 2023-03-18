@@ -33,7 +33,14 @@ const calcParams = [20]
   #style = {}
 
   // YAXIS_TYPES - default
+  static inCnt = 0
   static scale = YAXIS_TYPES[0]
+  static colours = [
+    "#9C27B0",
+    "#9C27B0",
+    "#66BB6A",
+    "#66BB6A"
+  ]
 
 
   /**
@@ -49,6 +56,7 @@ const calcParams = [20]
     
     super(target, xAxis, yAxis, config, parent, params) 
 
+    EMA.inCnt++
     const overlay = params.overlay
 
     this.#ID = params.overlay?.id || uid(this.#shortName)
