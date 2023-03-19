@@ -180,21 +180,20 @@ export default class xAxis extends Axis {
     // minStep in pixels
     let minStep = XAXIS_STEP;
     let interval = this.#indexBased ? range.interval : 1
-    let xStep = 0
+    let xStep = TIMESCALES[0]
     let candleW = bRound(this.width / range.Length)
-    let rank
+    let rank = TIMESCALESRANK[0]
 
     let i = TIMESCALES.indexOf(interval)
     while (i-- >= 0) {
 
       const gradPixels = candleW * (TIMESCALES[i] / interval)
       
-      if (gradPixels >= minStep) {
-        xStep = TIMESCALES[i]
-        rank = TIMESCALESRANK[i]
-        return {xStep, rank}
-      }
+      if (gradPixels >= minStep) break
     }
+    xStep = TIMESCALES[i]
+    rank = TIMESCALESRANK[i]
+    return {xStep, rank}
   }
 
   dateTimeValue(ts, tf) {

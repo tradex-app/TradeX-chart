@@ -514,7 +514,6 @@ function onWSMessage (evt, chart) {
       chart.stream.onTick({t: obj.T, p: obj.p, q: obj.q})   
     }
   };
-}
 
 
 
