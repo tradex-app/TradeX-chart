@@ -1,43 +1,28 @@
 // chart-volume.js
 
+import Overlay from "./overlay"
 import VolumeBar from "../primitives/volume";
-import { bRound, round, limit } from "../../utils/number";
-import { BUFFERSIZE } from "../../definitions/chart"
+import { bRound, limit } from "../../utils/number";
 
-export default class chartVolume extends VolumeBar {
 
-  #parent
-  #core
-  #config
-  #theme
-  #xAxis
-  #yAxis
-  #target
-  #scene
+export default class chartVolume extends Overlay {
+
+  #volumeBar
   #volH
 
-  constructor(target, xAxis=false, yAxis=false, theme, parent) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    super(target.scene, theme)
+    super(target, xAxis=false, yAxis=false, theme, parent, params)
 
-    this.#parent = parent
-    this.#core = parent.core
-    this.#target = target
-    this.#scene = target.scene
-    this.#theme = theme
-    this.#xAxis = xAxis
-    this.#yAxis = yAxis
-
-    this.#theme.volume.Height = limit(theme?.volume?.Height, 0, 100) || 100
+    this.#volumeBar = new VolumeBar(target.scene, theme)
+    this.theme.volume.Height = limit(theme?.volume?.Height, 0, 100) || 100
   }
 
-  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
-  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
-  set position(p) { this.#target.setPosition(p[0], p[1]) }
+  set position(p) { this.target.setPosition(p[0], p[1]) }
 
-  draw(range=this.#core.range) {
+  draw(range=this.core.range) {
 
-    this.#scene.clear()
+    this.scene.clear()
 
     const data = range.data
     const zeroPos = this.scene.height
@@ -49,9 +34,9 @@ export default class chartVolume extends VolumeBar {
       w: w,
       z: zeroPos
     }
-    const volH = Math.floor(zeroPos * this.#theme.volume.Height / 100)
+    const volH = Math.floor(zeroPos * this.theme.volume.Height / 100)
 
-    let o = this.#core.rangeScrollOffset
+    let o = this.core.rangeScrollOffset
     let v = range.indexStart - o
     let i = range.Length + (o * 2)
     let j = i
@@ -73,7 +58,7 @@ export default class chartVolume extends VolumeBar {
       if (x[4] !== null) {
         volume.h = volH - (volH * ((maxVol - x[5]) / maxVol))
         volume.raw = data[v]
-        super.draw(volume)
+        this.#volumeBar.draw(volume)
       }
       v++
     }

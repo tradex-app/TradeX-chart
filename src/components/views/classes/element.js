@@ -40,10 +40,10 @@ export default class element extends HTMLElement {
   get height() { return this.offsetHeight }
   set height(h) { this.setDim(h, "height") }
 
-  setDim(x, d) {
-    if (isNumber(x)) x += "px"
-    else if (!isString(x)) return
-    this.style[d] = w
+  setDim(v, d) {
+    if (isNumber(v)) v += "px"
+    else if (!isString(v)) return
+    this.style[d] = v
   }
 
   setCursor(cursor) {

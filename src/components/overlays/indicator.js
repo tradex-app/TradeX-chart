@@ -1,4 +1,13 @@
 // indicator.js
+// Base class for on and off chart indicators
+
+import Overlay from "./overlay"
+import { renderFillRect } from "../../renderer/rect"
+import { renderLine } from "../../renderer/line"
+import {
+  STREAM_NEWVALUE,
+  STREAM_UPDATE
+} from "../../definitions/core"
 
 // const plotTypes = {
 //   area,
@@ -7,13 +16,6 @@
 //   line,
 // }
 
-import { renderFillRect } from "../../renderer/rect"
-import { renderLine } from "../../renderer/line"
-import {
-  STREAM_NEWVALUE,
-  STREAM_UPDATE
-} from "../../definitions/core"
-
 const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
 
 /**
@@ -21,17 +23,8 @@ const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
  * @export
  * @class indicator
  */
-export default class indicator {
+export default class indicator extends Overlay {
 
-  #parent
-  #core
-  #config
-  #theme
-  #xAxis
-  #yAxis
-  #target
-  #scene
-  
   #overlay
   #indicator
   #type
@@ -44,41 +37,26 @@ export default class indicator {
   #calcParams
   #style = {}
 
-  // constructor(target, overlay, xAxis, yAxis, config) {
-
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
 
-    this.#parent = parent
-    this.#core = parent.core
-    this.#target = target
-    this.#scene = target.scene
-    this.#config = config
-    this.#xAxis = xAxis
-    this.#yAxis = yAxis
+    super(target, xAxis, yAxis, undefined, parent, params)
+
     this.#overlay = params.overlay
     this.#type = config.type
     this.#indicator = config.indicator
-    this.#TALib = this.#core.TALib
+    this.#TALib = this.core.TALib
     this.#range = this.xAxis.range
 
     this.eventsListen()
   }
 
-  get core() { return this.#core }
-  get parent() { return this.#parent }
-  get chart() { return this.parent.parent.parent }
-  get config() { return this.#config }
-  get target() { return this.#target }
-  get scene() { return this.#scene }
-  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
-  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
-  get Timeline() { return this.#core.Timeline }
-  get Scale() { return this.#parent.scale }
+  get Timeline() { return this.core.Timeline }
+  get Scale() { return this.parent.scale }
   get type() { return this.#type }
   get overlay() { return this.#overlay }
   get indicator() { return this.#indicator }
   get TALib() { return this.#TALib }
-  get range() { return this.#core.range }
+  get range() { return this.core.range }
   set setNewValue(cb) { this.#newValueCB = cb}
   set setUpdateValue(cb) { this.#updateValueCB = cb }
   set precision(p) { this.#precision = p }
@@ -87,9 +65,7 @@ export default class indicator {
   get calcParams() { return this.#calcParams }
   set style(s) { this.#style = s }
   get style() { return this.#style }
-  set position(p) { this.#target.setPosition(p[0], p[1]) }
-
-
+  set position(p) { this.target.setPosition(p[0], p[1]) }
 
   set value(data) {
     // round time to nearest current time unit
@@ -199,7 +175,7 @@ export default class indicator {
 
   plot(plots, type, style) {
 
-    const ctx = this.#scene.context
+    const ctx = this.scene.context
     ctx.save();
 
     switch(type) {

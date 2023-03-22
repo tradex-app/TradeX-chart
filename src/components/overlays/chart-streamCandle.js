@@ -1,56 +1,36 @@
 // chart-streamCandle.js
 
+import Overlay from "./overlay"
 import Candle from "../primitives/candle";
 import { renderHorizontalLine } from "../../renderer/line"
 import { CandleType, PriceLineStyle } from "../../definitions/style";
 import { isArray, isObject } from "../../utils/typeChecks";
 
-export default class chartStreamCandle extends Candle {
+export default class chartStreamCandle extends Overlay {
 
-  #parent
-  #core
-  #config
-  #theme
-  #xAxis
-  #yAxis
-  #target
-  #scene
-  #params
-  #chart
+  #candle
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    super(target.scene, theme)
+    super(target, xAxis=false, yAxis=false, theme, parent, params)
 
-    this.#parent = parent
-    this.#core = parent.core
-    this.#target = target
-    this.#scene = target.scene
-    this.#theme = theme
-    this.#xAxis = xAxis
-    this.#yAxis = yAxis
-    this.#params = params
-    this.#chart = parent.parent.parent
-
-    this.#theme.priceLineStyle = this.#theme?.priceLineStyle || PriceLineStyle
+    this.#candle = new Candle(target.scene, theme)
+    this.theme.priceLineStyle = this.theme?.priceLineStyle || PriceLineStyle
   }
 
-  get target() { return this.#target }
-  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
-  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set position(p) { this.setPosition(p[0], p[1]) }
 
   setPosition(x, y) {
-    if (this.#core.stream === undefined) return
-    this.#target.setPosition(x, y)
-    this.#core.stream.lastScrollPos = this.#core.scrollPos
+    if (this.core.stream === undefined) return
+    this.target.setPosition(x, y)
+    this.core.stream.lastScrollPos = this.core.scrollPos
   }
 
   // Must calculate yPos from last candle from candle overlay
   // to keep streaming candle position in sync
   yPos(p) {
-    const rangeH = this.#core.stream.lastPriceMax - this.#core.stream.lastPriceMin
-    const height = p - this.#core.stream.lastPriceMin
+    const rangeH = this.core.stream.lastPriceMax - this.core.stream.lastPriceMin
+    const height = p - this.core.stream.lastPriceMin
     const ratio = this.yAxis.height / rangeH
     const yPos = this.yAxis.height - (height * ratio)
     return yPos
@@ -58,26 +38,19 @@ export default class chartStreamCandle extends Candle {
 
   draw() {
     
-    if (this.#core.stream === undefined ||
-        !isArray(this.#chart.streamCandle)) return
+    if (this.core.stream === undefined ||
+        !isArray(this.chart.streamCandle)) return
 
-    this.#scene.clear()
+    this.scene.clear()
 
-    const r = this.#core.range
-    const stream = this.#chart.streamCandle
-    let render
-
-    switch (this.cfg.candle.Type) {
-      case CandleType.AREA:
-      case CandleType.LINE:
-        render = (candle) => {this.areaRender(candle)}
-        break;
-      default:
-        render = (candle) => {super.draw(candle)}
-        break;
-    }  
+    const r = this.core.range
+    const stream = this.chart.streamCandle
+    const render = (this.theme.candle.Type === CandleType.AREA ||
+                    this.theme.candle.Type === CandleType.LINE ) ?
+      (candle) => {this.areaRender(candle)} :
+      (candle) => {this.#candle.draw(candle)}
     const offset = this.xAxis.smoothScrollOffset || 0
-    const pos = this.#core.stream.lastXPos
+    const pos = this.core.stream.lastXPos
     const candle = {
       x: pos, // offset + pos,
       w: this.xAxis.candleW
@@ -93,21 +66,21 @@ export default class chartStreamCandle extends Candle {
       render(candle)
     }
 
-    if (stream[4] >= stream[1]) this.#theme.priceLineStyle.strokeStyle = this.cfg.candle.UpBodyColour
-    else this.#theme.priceLineStyle.strokeStyle = this.cfg.candle.DnBodyColour
+    if (stream[4] >= stream[1]) this.theme.priceLineStyle.strokeStyle = this.core.theme.candle.UpBodyColour
+    else this.theme.priceLineStyle.strokeStyle = this.core.theme.candle.DnBodyColour
 
     // draw price line 
     renderHorizontalLine (
-      this.#scene.context, 
+      this.scene.context, 
       candle.c, 
       0, 
-      this.#target.width, 
-      this.#theme.priceLineStyle
+      this.target.width, 
+      this.theme.priceLineStyle
     )
   }
 
   areaRender(candle) {
-    const r = this.#core.range
+    const r = this.core.range
     const raw = r.value(r.data.length - 2)
 
     if (raw === null) return
@@ -120,8 +93,9 @@ export default class chartStreamCandle extends Candle {
       c: this.yPos(raw[4]),
     }
 
-    const ctx = this.ctx
-    const bodyColour = this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour
+    const ctx = this.scene.context
+    const cfg = this.theme
+    const bodyColour = cfg.candle.UpBodyColour || cfg.candle.DnBodyColour
 
     let w = Math.max(candle.w -1, 1)
     w = (w > 5) ? Math.ceil(w * 0.8) : w
@@ -139,18 +113,18 @@ export default class chartStreamCandle extends Candle {
     ctx.moveTo(candle.x, candle.c);
     ctx.lineTo(prev.x, prev.h);
 
-    if (this.cfg.candle.Type === CandleType.AREA) {
+    if (cfg.candle.Type === CandleType.AREA) {
       fill= ctx.createLinearGradient(0, 0, 0, this.scene.height);
 
-      if (isArray(this.cfg.candle.AreaFillColour)) {
-        for (let [index, value] of this.cfg.candle.AreaFillColour.entries()) {
+      if (isArray(cfg.candle.AreaFillColour)) {
+        for (let [index, value] of cfg.candle.AreaFillColour.entries()) {
           fill.addColorStop(index, value)
         }
       }
       else if (isString())
-        fill = this.cfg.candle.AreaFillColour
+        fill = cfg.candle.AreaFillColour
       else
-        fill = this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour
+        fill = cfg.candle.UpBodyColour || cfg.candle.DnBodyColour
 
       // render line
       ctx.stroke();

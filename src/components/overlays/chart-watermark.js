@@ -1,43 +1,32 @@
 // chart-watermark.js
 
+import Overlay from "./overlay"
 
-export default class chartWatermark {
 
-  #parent
-  #core
-  #config = {}
-  #theme
-  #xAxis
-  #yAxis
-  #target
-  #scene
-  #params
+export default class chartWatermark extends Overlay {
+
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    this.#parent = parent
-    this.#core = parent.core
-    this.#target = target
-    this.#scene = target.scene
-    this.#theme = theme
-    this.#params = params
-    this.#config.content = params?.content || ""
+    super(target, xAxis, yAxis, theme, parent, params)
+
+    this.params.content = params?.content || ""
   }
 
-  set position(p) { this.#target.setPosition(0, 0) }
+  set position(p) { this.target.setPosition(0, 0) }
 
   draw(content) {
 
-    content = content || this.#config.content
+    content = content || this.params.content
 
-    this.#scene.clear()
+    this.scene.clear()
 
     // if (axes == "none") return
     
     // const xGrads = this.xAxis.xAxisGrads.values
-    const ctx = this.#scene.context
+    const ctx = this.scene.context
     ctx.save();
-    // ctx.strokeStyle = this.#core.theme.chart.GridColour || GridStyle.COLOUR_GRID
+    // ctx.strokeStyle = this.core.theme.chart.GridColour || GridStyle.COLOUR_GRID
 
     // // X Axis
     // if (axes != "y") {
@@ -47,7 +36,7 @@ export default class chartWatermark {
     //     let x = bRound(tick[1])
     //     ctx.beginPath()
     //     ctx.moveTo(x + offset, 0)
-    //     ctx.lineTo(x + offset, this.#scene.height)
+    //     ctx.lineTo(x + offset, this.scene.height)
     //     ctx.stroke()
     //   }
     // }
@@ -59,7 +48,7 @@ export default class chartWatermark {
     //     let y = bRound(tick[1])
     //     ctx.beginPath()
     //     ctx.moveTo(0, y)
-    //     ctx.lineTo(this.#scene.width, y)
+    //     ctx.lineTo(this.scene.width, y)
     //     ctx.stroke()
     //   }
     // }

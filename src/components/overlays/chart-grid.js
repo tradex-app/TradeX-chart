@@ -1,54 +1,34 @@
 // chart-grid.js
+// provides X and Y axis grid lines
 
+import Overlay from "./overlay"
 import { GridStyle } from "../../definitions/style"
-import { BUFFERSIZE } from "../../definitions/chart"
 import { bRound } from "../../utils/number"
 
 
-export default class chartGrid {
+export default class chartGrid extends Overlay{
 
-  #parent
-  #core
-  #config = {}
-  #theme
-  #xAxis
-  #yAxis
-  #target
-  #scene
-  #params
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    this.#parent = parent
-    this.#core = parent.core
-    this.#target = target
-    this.#scene = target.scene
-    this.#theme = theme
-    this.#xAxis = xAxis
-    this.#yAxis = yAxis
-    this.#params = params
+    super(target, xAxis, yAxis, theme, parent, params)
 
-    // this.#config.axes = parent?.axes || "both"
-    // this.#config.axes = params?.axes || parent.parent.parent.axes || "both"
-    this.#config.axes = params?.axes || "both"
-
+    this.params.axes = params?.axes || "both"
   }
 
-  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
-  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
-  set position(p) { this.#target.setPosition(p[0], p[1]) }
+  set position(p) { this.target.setPosition(p[0], p[1]) }
 
   draw(axes) {
 
-    axes = axes || this.#config.axes
+    axes = axes || this.params.axes
 
-    this.#scene.clear()
+    this.scene.clear()
 
     if (axes == "none") return
     
-    const ctx = this.#scene.context
+    const ctx = this.scene.context
     ctx.save();
-    ctx.strokeStyle = this.#core.theme.chart.GridColour || GridStyle.COLOUR_GRID
+    ctx.strokeStyle = this.core.theme.chart.GridColour || GridStyle.COLOUR_GRID
 
     // X Axis
     if (axes != "y") {
@@ -59,7 +39,7 @@ export default class chartGrid {
         let x = bRound(tick[1])
         ctx.beginPath()
         ctx.moveTo(x + offset, 0)
-        ctx.lineTo(x + offset, this.#scene.height)
+        ctx.lineTo(x + offset, this.scene.height)
         ctx.stroke()
       }
     }
@@ -71,7 +51,7 @@ export default class chartGrid {
         let y = bRound(tick[1])
         ctx.beginPath()
         ctx.moveTo(0, y)
-        ctx.lineTo(this.#scene.width, y)
+        ctx.lineTo(this.scene.width, y)
         ctx.stroke()
       }
     }

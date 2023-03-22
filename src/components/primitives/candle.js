@@ -11,7 +11,7 @@ import { isArray, isString } from "../../utils/typeChecks"
 
 export default class Candle {
 
-  areaCoordinates
+  areaCoordinates = []
 
   constructor(scene, config) {
     this.scene = scene
@@ -192,6 +192,7 @@ export default class Candle {
       ctx.stroke();
   
     ctx.restore();
+    coords.length = 0
   }
 }
   

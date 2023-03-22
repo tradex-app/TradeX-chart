@@ -1,34 +1,24 @@
 // time.labels.js
 
-export default class timeLabels {
+import Overlay from "./overlay"
 
-  #core
-  #config
-  #theme
-  #xAxis
-  #yAxis
-  #parent
-  #target
-  #scene
+
+export default class timeLabels extends Overlay {
+
   #cursorPos = [0,0]
   #xAxisGrads
 
-  constructor(target, xAxis=false, yAxis=false, theme, parent) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    this.#target = target
-    this.#scene = target.scene
-    this.#theme = theme
-    this.#parent = parent
-    this.#xAxis = xAxis
-    this.#yAxis = yAxis
-    this.#core = parent.core
-    this.#xAxisGrads = this.#xAxis.xAxisGrads
+    super(target, xAxis, yAxis, theme, parent, params)
+
+    this.xAxisGrads = this.xAxis.xAxisGrads
   }
 
   draw() {
-    this.#scene.clear()
-    const ctx = this.#scene.context
-    const grads = this.#xAxisGrads.values
+    this.scene.clear()
+    const ctx = this.scene.context
+    const grads = this.xAxisGrads.values
     const offset = 0
     const theme = this.theme.xAxis
 

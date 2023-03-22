@@ -1,8 +1,9 @@
 // time-cursor.js
 
+import Overlay from "./overlay"
 import { drawTextBG, getTextRectWidth } from "../../utils/canvas"
 
-export default class timeCursor {
+export default class timeCursor extends Overlay {
 
   #core
   #config
@@ -16,13 +17,7 @@ export default class timeCursor {
 
   constructor(target, xAxis=false, yAxis=false, theme, parent) {
 
-    this.#target = target
-    this.#scene = target.scene
-    this.#theme = theme
-    this.#parent = parent
-    this.#xAxis = xAxis
-    this.#yAxis = yAxis
-    this.#core = parent.core
+    super(target, xAxis, yAxis, theme, parent, params)
 
     this.start()
   }
@@ -35,9 +30,9 @@ export default class timeCursor {
 
   draw() {
 
-    const ctx = this.#scene.context
-    const rect = this.#target.viewport.container.getBoundingClientRect()
-    const x = this.#core.mousePos.x - rect.left
+    const ctx = this.scene.context
+    const rect = this.target.viewport.container.getBoundingClientRect()
+    const x = this.core.mousePos.x - rect.left
     let timestamp = this.xPos2Time(x),
     date = new Date(timestamp),
     opts = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
@@ -55,10 +50,10 @@ export default class timeCursor {
     },
     txtW = getTextRectWidth(ctx, dateTimeStr, options),
     xPos = x + this.bufferPx;
-    xPos = this.#xAxis.xPosSnap2CandlePos(xPos)
+    xPos = this.xAxis.xPosSnap2CandlePos(xPos)
     xPos = xPos - Math.round(txtW * 0.5) - this.scrollPos - this.bufferPx
 
-    this.#scene.clear()
+    this.scene.clear()
     ctx.save()
 
     drawTextBG(ctx, dateTimeStr, xPos, 1 , options)

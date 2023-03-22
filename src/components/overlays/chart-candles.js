@@ -1,54 +1,39 @@
 // chart-candles.js
 
+import Overlay from "./overlay"
 import Candle from "../primitives/candle";
 import { CandleType } from "../../definitions/style"
 import { BUFFERSIZE } from "../../definitions/chart"
 import { timestampDiff } from "../../utils/time";
 import { bRound } from "../../utils/number";
 
-export default class chartCandles extends Candle {
+export default class chartCandles extends Overlay {
 
-  #parent
-  #core
-  #config
-  #theme
-  #xAxis
-  #yAxis
-  #target
-  #scene
+  #candle
 
   constructor(target, xAxis=false, yAxis=false, theme, parent) {
 
-    super(target.scene, theme)
+    super(target, xAxis=false, yAxis=false, theme, parent)
 
-    this.#parent = parent
-    this.#core = parent.core
-    this.#target = target
-    this.#scene = target.scene
-    this.#theme = theme
-    this.#xAxis = xAxis
-    this.#yAxis = yAxis
+    this.#candle = new Candle(target.scene, theme)
   }
 
-  get target() { return this.#target }
-  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
-  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
-  set position(p) { this.#target.setPosition(p[0], p[1]) }
+  set position(p) { this.target.setPosition(p[0], p[1]) }
 
-  draw(range=this.#core.range) {
+  draw(range=this.core.range) {
 
-    this.#scene.clear()
-    this.areaCoordinates = []
+    this.scene.clear()
 
     let render
+    let type = this.theme.candle.Type
 
-    switch (this.cfg.candle.Type) {
+    switch (type) {
       case CandleType.AREA:
       case CandleType.LINE:
-        render = (candle) => {this.area({...candle})}
+        render = (candle) => {this.#candle.area({...candle})}
         break;
       default:
-        render = (candle) => {super.draw(candle)}
+        render = (candle) => {this.#candle.draw(candle)}
         break;
     }
     const offset = this.xAxis.smoothScrollOffset || 0
@@ -63,22 +48,22 @@ export default class chartCandles extends Candle {
     //   list: []
     // }
 
-    let o = this.#core.rangeScrollOffset;
+    let o = this.core.rangeScrollOffset;
     let c = range.indexStart - o
     let i = range.Length + (o * 2)
     let x
 
-    if (this.#core.stream) {
-      this.#core.stream.lastPriceMax = range.valueMax
-      this.#core.stream.lastPriceMin = range.valueMin
+    if (this.core.stream) {
+      this.core.stream.lastPriceMax = range.valueMax
+      this.core.stream.lastPriceMin = range.valueMin
     }
 
     while(i) {
       x = range.value( c )
       candle.x = this.xAxis.xPos(x[0])
       if (x?.[7]) {
-        this.#core.stream.lastXPos = candle.x
-        this.#core.stream.lastYPos = {
+        this.core.stream.lastXPos = candle.x
+        this.core.stream.lastYPos = {
           o: candle.o,
           h: candle.h,
           l: candle.l,
@@ -98,15 +83,15 @@ export default class chartCandles extends Candle {
       // candles.in[c] = i - 1
       // candles.ts[x[0]] = i - 1
       // candles.px[candle.x] = i - 1
-      // this.#core.candles = candles
+      // this.core.candles = candles
       c++
       i--
     }
 
-    if (this.cfg.candle.Type === CandleType.AREA ||
-        this.cfg.candle.Type === CandleType.LINE
+    if (type === CandleType.AREA ||
+        type === CandleType.LINE
       ) 
-      super.areaRender()
+      this.#candle.areaRender()
   }
 
 }

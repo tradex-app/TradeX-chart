@@ -120,7 +120,7 @@ export default class Stream {
     // create new stream candle
     this.prevCandle()
     // this.#candle = [data.t, open, data.p, data.p, open, data.q, null, true]
-    this.#candle = [data.t, data.p, data.p, data.p, data.p, data.q, null, true]
+    this.#candle = [data.t, data.o, data.h, data.l, data.c, data.v, null, true]
     this.#core.mergeData({data: [this.#candle]}, true)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
   }
@@ -145,10 +145,16 @@ export default class Stream {
     // https://stackoverflow.com/a/52772191
 
     let candle = this.#candle
-    candle[H] = data.p > candle[H] ? data.p : candle[H]
-    candle[L] = data.p < candle[L] ? data.p : candle[L]
-    candle[C] = data.p
-    candle[V] = parseFloat(candle[V] + data.q).toFixed(this.#precision)
+    // candle[H] = data.p > candle[H] ? data.p : candle[H]
+    // candle[L] = data.p < candle[L] ? data.p : candle[L]
+    // candle[C] = data.p
+    // candle[V] = parseFloat(candle[V] + data.q).toFixed(this.#precision)
+
+    candle[O] = parseFloat(data.o)
+    candle[H] = parseFloat(data.h)
+    candle[L] = parseFloat(data.l)
+    candle[C] = parseFloat(data.c)
+    candle[V] = parseFloat(data.v)
 
     // update the last candle in the state data
     this.#candle = candle

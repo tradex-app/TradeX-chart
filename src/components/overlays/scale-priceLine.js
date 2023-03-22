@@ -1,33 +1,24 @@
 // scale-priceLine.js
 
+import Overlay from "./overlay"
 import { STREAM_UPDATE } from "../../definitions/core"
 import { CandleStyle, YAxisStyle } from "../../definitions/style";
 import { createFont, drawTextBG, getTextRectHeight } from "../../utils/canvas"
 
 
-export default class scalePriceLine {
+export default class scalePriceLine extends Overlay {
 
-  #core
-  #config
-  #theme
-  #scale
-  #target
-  #viewport
-  #scene
 
-  constructor(target, scale, config) {
-    this.#target = target
-    this.#viewport = target.viewport
-    this.#scene = target.scene
-    this.#config = config
-    this.#scale = scale
-    this.#core = scale.core
-    this.#theme = scale.core.theme
+  constructor(target, xAxis, yAxis, theme, parent, params) {
+
+    super(target, xAxis, yAxis, theme, parent, params)
+
+    this.viewport = target.viewport
 
     this.start()
   }
 
-  set position(p) { this.#target.setPosition(p[0], p[1]) }
+  set position(p) { this.target.setPosition(p[0], p[1]) }
 
   start() {
     this.eventListeners()
@@ -41,15 +32,15 @@ export default class scalePriceLine {
   }
 
   on(topic, handler, context) {
-    this.#scale.on(topic, handler, context)
+    this.parent.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#scale.off(topic, handler)
+    this.parent.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#scale.emit(topic, data)
+    this.parent.emit(topic, data)
   }
 
   onStreamUpdate(e) {
@@ -61,8 +52,8 @@ export default class scalePriceLine {
     if (candle === undefined) return
 
     let price = candle[4],
-        y = this.#scale.yPos(price),
-        nice = this.#scale.nicePrice(price),
+        y = this.parent.yPos(price),
+        nice = this.parent.nicePrice(price),
         options = {
           fontSize: YAxisStyle.FONTSIZE * 1.05,
           fontWeight: YAxisStyle.FONTWEIGHT,
@@ -78,13 +69,13 @@ export default class scalePriceLine {
     height = options.fontSize + options.paddingTop + options.paddingBottom,
     yPos = y - (height * 0.5);
 
-    this.#scene.clear()
-    const ctx = this.#scene.context
+    this.scene.clear()
+    const ctx = this.scene.context
     ctx.save()
 
     // TODO: get candle colours from config / theme
-    if (candle[4] >= candle[1]) options.bakCol = this.#theme.candle.UpBodyColour
-    else options.bakCol = this.#theme.candle.DnBodyColour
+    if (candle[4] >= candle[1]) options.bakCol = this.theme.candle.UpBodyColour
+    else options.bakCol = this.theme.candle.DnBodyColour
 
     ctx.fillStyle = options.bakCol
 
@@ -101,7 +92,7 @@ export default class scalePriceLine {
     height = getTextRectHeight(options)
 
     /// draw background rect
-    ctx.fillRect(x, yPos, this.#viewport.width, height);
+    ctx.fillRect(x, yPos, this.viewport.width, height);
 
     // draw text on top
     ctx.fillStyle = options.txtCol || defaultOptions.txtCol;
@@ -110,6 +101,6 @@ export default class scalePriceLine {
     ctx.fillText(`${nice}`, x, yPos);
 
     ctx.restore()
-    this.#viewport.render()
+    this.viewport.render()
   }
 }

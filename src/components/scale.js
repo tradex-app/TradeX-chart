@@ -300,8 +300,10 @@ export default class ScaleBar {
       this.#priceLine =
       new scalePriceLine(
         this.#layerPriceLine,
-        this,
-        this.theme
+        undefined,
+        this.#yAxis,
+        this.theme,
+        this
       )
     }
   }

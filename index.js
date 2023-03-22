@@ -1,7 +1,8 @@
 import { Chart, DOM } from './src'
 import * as talib from "talib-web"
+import { isNumber } from './src/utils/typeChecks'
 import * as demo from './demo.js'
-
+import { TIMEUNITSVALUESSHORT } from "./src/utils/time"
 // import './chart-live.css'
 
 // let state = undefined
@@ -376,23 +377,15 @@ const config5 = {
 
 const configs = [
   {config: config1, stream: null},
-  {config: config2, stream: (chart) => {setInterval(stream.bind(chart), interval)}},
-  {config: config3, stream: (chart) => {livePrice_Binance_BTCUSDT(chart)}},
-  {config: config4, stream: (chart) => {setInterval(stream.bind(chart), interval)}},
-  {config: config5, stream: (chart) => {livePrice_Binance_ETHUSDT(chart)}},
+  {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
+  {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
 ]
 
 const main = DOM.findBySelector('main')
 const add = document.querySelector("#add")
       add.onclick = addChart
-
-
-// Add some charts
-
-addChart()
-addChart()
-addChart()
-addChart()
 
 
 function addChart() {
@@ -456,6 +449,8 @@ function stream() {
   let candle 
   let chart = this
   let time = (chart.stream.lastTick) ? chart.stream.lastTick.t : chart.range.value()[0]
+  let tf = chart.config.timeFrame
+  let tfms = TIMEUNITSVALUESSHORT[tf]
 
   candle = chart.stream.candle
   if (!candle) {
@@ -473,13 +468,101 @@ function stream() {
   let price = candle[4] + (candle[4] * (percent / 3000 * sign))
       time += interval
   let quantity = candle[5] * (factor2 / 500)
-  let tick = {t: time, p: price, q: quantity}
+  let tick = {t: time, c: price, v: quantity}
+
+  tick.o = (!isNumber(candle[1])) ? price: candle[1]
+  tick.h = (price >= candle[2]) ? price : candle[2]
+  tick.l = (price <= candle[3]) ? price : candle[3]
+
+  console.log(tick)
 
   chart.stream.onTick(tick)
 }
 
-function livePrice_Binance_BTCUSDT(chart) {
-  var ws = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@aggTrade");    
+class Stream {
+
+  chart
+  tick = {t: null, p: null, q: null}
+  candle = []
+  time
+  tf
+  tfms
+
+  constructor(chart, interval, tickerCb, klineCb) {
+
+    this.chart = chart
+    this.interval = interval
+    this.time = (chart.stream.lastTick) ? chart.stream.lastTick.t : chart.range.value()[0]
+    this.tf = chart.config.timeFrame
+    this.tfms = chart.time.timeFrameMS // TIMEUNITSVALUESSHORT[tf]
+    this.candle = chart.range.value()
+    this.tickerCb = (typeof tickerCb === "function") ? tickerCb : false
+    this.klineCb = (typeof klineCb === "function") ? klineCb : false
+
+    setInterval(this.ticker.bind(this), interval)
+  }
+
+  get volumeInc() {
+    let r = this.chart.range
+    let max = r.volumeDiff || 1
+    return getRandomInt(0, max) / (this.tfms / this.interval)
+  }
+
+  get priceInc() {
+    let factor2 = getRandomInt(0, 10) % 2
+    let sign = (Math.floor(factor2) === 1) ? 1 : -1
+    let r = this.chart.range
+    let max = r.valueDiff || 1
+    return getRandomInt(0, max / (this.tfms / this.interval)) * sign
+  }
+
+  ticker() {
+
+    this.tick.t = this.tick.t || this.candle[0] || Date.now()
+    this.tick.p = this.tick.p || this.candle[4] || 1
+    this.tick.q = this.tick.q || this.candle[5] || 1
+
+    let price = this.tick.p + this.priceInc
+        price = (price < 0) ? Math.abs(this.priceInc) : price
+    let time = this.tick.t + this.interval
+    this.tick = {t: time, p: price, q: this.volumeInc}
+
+    if (this.tickerCb) this.tickerCb(this.tick)
+    if (this.klineCb) this.kline()
+  }
+
+  kline() {
+    let t = this.candle[0]
+    let c = [...this.candle]
+    let p = this.tick.p
+
+    if (this.tick.t - t >= this.tfms ) {
+      t = this.tick.t - (this.tick.t % this.tfms)
+      c = [t, p, p, p, p, this.volumeInc]
+      c 
+    }
+    else {
+      c[2] = (c[2] < p ) ? p : c[2]
+      c[3] = (c[3] > p ) ? p : c[3]
+      c[4] = p
+      c[5] += this.tick.q
+    }
+    this.candle = c
+    this.klineCb({t: t, o: c[1], h: c[2], l: c[3], c: c[4], v: c[5]})
+  }
+}
+
+function livePrice_Binance(chart, symbol="btcusdt", interval="1m") {
+  // var ws = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@aggTrade");
+  var ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@kline_${interval}`);
+
+  ws.onmessage = (evt) => onWSMessage.call(this, evt, chart)
+}
+
+function livePrice_Binance_BTCUSDT(chart, symbol="btcusdt", interval="1m") {
+  // var ws = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@aggTrade");
+  var ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@kline_${interval}`);
+
   ws.onmessage = (evt) => onWSMessage.call(this, evt, chart)
 }
 
@@ -508,7 +591,16 @@ function onWSMessage (evt, chart) {
   
   var msg = evt.data;
   var obj = JSON.parse(msg);
-  if (typeof obj === "object" && obj.T && obj.p && obj.q) { 
-    chart.stream.onTick({t: obj.T, p: obj.p, q: obj.q})   
+  if (typeof obj === "object" && obj.k) { 
+    chart.stream.onTick(obj.k)   
   }
 };
+
+
+// Add some charts
+
+addChart()
+addChart()
+addChart()
+addChart()
+addChart()

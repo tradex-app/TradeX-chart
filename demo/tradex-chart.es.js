@@ -1445,7 +1445,7 @@ const STREAM_PRECISION = 8;
 const PRICE_PRECISION  = 2;
 const VOLUME_PRECISION = 2;
 
-const T$1 = 0, H = 2, L = 3, C$1 = 4, V = 5;
+const T$1 = 0, O = 1, H = 2, L = 3, C$1 = 4, V = 5;
 const empty = [null, null, null, null, null];
 class Stream {
   #core
@@ -1511,7 +1511,7 @@ class Stream {
   }
   newCandle(data) {
     this.prevCandle();
-    this.#candle = [data.t, data.p, data.p, data.p, data.p, data.q, null, true];
+    this.#candle = [data.t, data.o, data.h, data.l, data.c, data.v, null, true];
     this.#core.mergeData({data: [this.#candle]}, true);
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}};
   }
@@ -1524,10 +1524,11 @@ class Stream {
     data.p = parseFloat(data.p);
     data.q = parseFloat(data.q);
     let candle = this.#candle;
-    candle[H] = data.p > candle[H] ? data.p : candle[H];
-    candle[L] = data.p < candle[L] ? data.p : candle[L];
-    candle[C$1] = data.p;
-    candle[V] = parseFloat(candle[V] + data.q).toFixed(this.#precision);
+    candle[O] = parseFloat(data.o);
+    candle[H] = parseFloat(data.h);
+    candle[L] = parseFloat(data.l);
+    candle[C$1] = parseFloat(data.c);
+    candle[V] = parseFloat(data.v);
     this.#candle = candle;
     const d = this.#core.allData.data;
     const l = (d.length > 0) ? d.length -1 : 0;
@@ -1895,6 +1896,42 @@ class WebWorker$1 {
   }
 }
 
+class Overlay {
+  #parent
+  #core
+  #config = {}
+  #theme
+  #xAxis
+  #yAxis
+  #target
+  #scene
+  #params
+  #doDraw = true
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params={}) {
+    this.#core = parent.core;
+    this.#parent = parent;
+    this.#config = parent.core.config;
+    this.#target = target;
+    this.#scene = target.scene;
+    this.#theme = theme;
+    this.#xAxis = xAxis;
+    this.#yAxis = yAxis;
+    this.#params = params;
+  }
+  get core() { return this.#core }
+  get parent() { return this.#parent }
+  get target() { return this.#target }
+  get config() { return this.#config }
+  get params() { return this.#params }
+  get scene() { return this.#scene }
+  get theme() { return this.#theme }
+  get chart() { return this.#parent.parent.parent }
+  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
+  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
+  set doDraw(d) { this.#doDraw = (isBoolean(d)) ? d : false; }
+  get doDraw() { return this.#doDraw }
+}
+
 function renderFillRect (ctx, x, y, width, height, style) {
   ctx.fillStyle = style;
   ctx.fillRect(x, y, width, height);
@@ -1939,15 +1976,7 @@ function renderLine (ctx, coords, style) {
 }
 
 const T = 0, C = 4;
-class indicator {
-  #parent
-  #core
-  #config
-  #theme
-  #xAxis
-  #yAxis
-  #target
-  #scene
+class indicator extends Overlay {
   #overlay
   #indicator
   #type
@@ -1960,35 +1989,21 @@ class indicator {
   #calcParams
   #style = {}
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
-    this.#parent = parent;
-    this.#core = parent.core;
-    this.#target = target;
-    this.#scene = target.scene;
-    this.#config = config;
-    this.#xAxis = xAxis;
-    this.#yAxis = yAxis;
+    super(target, xAxis, yAxis, undefined, parent, params);
     this.#overlay = params.overlay;
     this.#type = config.type;
     this.#indicator = config.indicator;
-    this.#TALib = this.#core.TALib;
+    this.#TALib = this.core.TALib;
     this.#range = this.xAxis.range;
     this.eventsListen();
   }
-  get core() { return this.#core }
-  get parent() { return this.#parent }
-  get chart() { return this.parent.parent.parent }
-  get config() { return this.#config }
-  get target() { return this.#target }
-  get scene() { return this.#scene }
-  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
-  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
-  get Timeline() { return this.#core.Timeline }
-  get Scale() { return this.#parent.scale }
+  get Timeline() { return this.core.Timeline }
+  get Scale() { return this.parent.scale }
   get type() { return this.#type }
   get overlay() { return this.#overlay }
   get indicator() { return this.#indicator }
   get TALib() { return this.#TALib }
-  get range() { return this.#core.range }
+  get range() { return this.core.range }
   set setNewValue(cb) { this.#newValueCB = cb;}
   set setUpdateValue(cb) { this.#updateValueCB = cb; }
   set precision(p) { this.#precision = p; }
@@ -1997,7 +2012,7 @@ class indicator {
   get calcParams() { return this.#calcParams }
   set style(s) { this.#style = s; }
   get style() { return this.#style }
-  set position(p) { this.#target.setPosition(p[0], p[1]); }
+  set position(p) { this.target.setPosition(p[0], p[1]); }
   set value(data) {
     const tfms = this.core.time.timeFrameMS;
     let roundedTime = Math.floor(new Date(data[T]) / tfms) * tfms;
@@ -2071,7 +2086,7 @@ class indicator {
     return [time, entry.output[0]]
   }
   plot(plots, type, style) {
-    const ctx = this.#scene.context;
+    const ctx = this.scene.context;
     ctx.save();
     switch(type) {
       case "renderLine": renderLine(ctx, plots, style);
@@ -2541,10 +2556,10 @@ class element extends HTMLElement {
   set width(w) { this.setDim(w, "width"); }
   get height() { return this.offsetHeight }
   set height(h) { this.setDim(h, "height"); }
-  setDim(x, d) {
-    if (isNumber(x)) x += "px";
-    else if (!isString$1(x)) return
-    this.style[d] = w;
+  setDim(v, d) {
+    if (isNumber(v)) v += "px";
+    else if (!isString$1(v)) return
+    this.style[d] = v;
   }
   setCursor(cursor) {
     this.style.cursor = cursor;
@@ -2965,37 +2980,19 @@ class Overlays {
   }
 }
 
-class chartGrid {
-  #parent
-  #core
-  #config = {}
-  #theme
-  #xAxis
-  #yAxis
-  #target
-  #scene
-  #params
+class chartGrid extends Overlay{
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
-    this.#parent = parent;
-    this.#core = parent.core;
-    this.#target = target;
-    this.#scene = target.scene;
-    this.#theme = theme;
-    this.#xAxis = xAxis;
-    this.#yAxis = yAxis;
-    this.#params = params;
-    this.#config.axes = params?.axes || "both";
+    super(target, xAxis, yAxis, theme, parent, params);
+    this.params.axes = params?.axes || "both";
   }
-  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
-  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
-  set position(p) { this.#target.setPosition(p[0], p[1]); }
+  set position(p) { this.target.setPosition(p[0], p[1]); }
   draw(axes) {
-    axes = axes || this.#config.axes;
-    this.#scene.clear();
+    axes = axes || this.params.axes;
+    this.scene.clear();
     if (axes == "none") return
-    const ctx = this.#scene.context;
+    const ctx = this.scene.context;
     ctx.save();
-    ctx.strokeStyle = this.#core.theme.chart.GridColour || GridStyle.COLOUR_GRID;
+    ctx.strokeStyle = this.core.theme.chart.GridColour || GridStyle.COLOUR_GRID;
     if (axes != "y") {
       const offset = this.xAxis.smoothScrollOffset || 0;
       const xGrads = this.xAxis.xAxisGrads.values;
@@ -3003,7 +3000,7 @@ class chartGrid {
         let x = bRound(tick[1]);
         ctx.beginPath();
         ctx.moveTo(x + offset, 0);
-        ctx.lineTo(x + offset, this.#scene.height);
+        ctx.lineTo(x + offset, this.scene.height);
         ctx.stroke();
       }
     }
@@ -3013,7 +3010,7 @@ class chartGrid {
         let y = bRound(tick[1]);
         ctx.beginPath();
         ctx.moveTo(0, y);
-        ctx.lineTo(this.#scene.width, y);
+        ctx.lineTo(this.scene.width, y);
         ctx.stroke();
       }
     }
@@ -3338,47 +3335,30 @@ class Input  {
   }
 }
 
-class chartCursor {
-  #core
-  #config
-  #theme
-  #xAxis
-  #yAxis
-  #parent
-  #target
-  #scene
+class chartCursor extends Overlay{
   #cursorPos = [0,0]
   #update = true
   #input
-  constructor(target, xAxis=false, yAxis=false, theme, parent) {
-    this.#target = target;
-    this.#scene = target.scene;
-    this.#theme = theme;
-    this.#parent = parent;
-    this.#xAxis = xAxis;
-    this.#yAxis = yAxis;
-    this.#core = parent.core;
-    this.#core.on("chart_pan", (e) => { this.onMouseDragX(e); });
-    this.#core.on("chart_panDone", (e) => { this.onMouseDragX(e); });
-    this.#core.on("main_mousemove", (e) => { this.onMouseMoveX(e); });
-    this.#input = new Input(this.#target.viewport.container, {disableContextMenu: false});
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
+    super(target, xAxis=false, yAxis=false, theme, parent, params);
+    this.core.on("chart_pan", (e) => { this.onMouseDragX(e); });
+    this.core.on("chart_panDone", (e) => { this.onMouseDragX(e); });
+    this.core.on("main_mousemove", (e) => { this.onMouseMoveX(e); });
+    this.#input = new Input(this.target.viewport.container, {disableContextMenu: false});
     this.#input.on("pointermove", this.onMouseMove.bind(this));
     this.#input.on("pointerenter", this.onMouseMove.bind(this));
   }
-  get chart() { return this.#parent.parent.parent }
-  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
-  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set position(p) { return }
   get update() { return this.#update }
   onMouseDragX(e) {
     this.#cursorPos[0] = e[0];
     this.draw(true);
-    this.#core.emit("chart_render");
+    this.core.emit("chart_render");
   }
   onMouseMoveX(e) {
     this.#cursorPos[0] = e[0];
     this.draw();
-    this.#core.emit("chart_render");
+    this.core.emit("chart_render");
   }
   onMouseMove(e) {
     const x = (isObject(e)) ? e.position.x : e[0];
@@ -3386,27 +3366,27 @@ class chartCursor {
     this.#cursorPos[0] = x;
     this.#cursorPos[1] = y;
     this.draw();
-    this.#core.emit("chart_render");
+    this.core.emit("chart_render");
   }
   draw(drag = false) {
     let x = this.#cursorPos[0];
     if (!drag)
         x = this.xAxis.xPosSnap2CandlePos(x) + this.xAxis.scrollOffsetPx;
     let y = this.#cursorPos[1];
-    this.#scene.clear();
-    const ctx = this.#scene.context;
+    this.scene.clear();
+    const ctx = this.scene.context;
     ctx.save();
     ctx.setLineDash([5, 5]);
     const offset = this.xAxis.smoothScrollOffset || 0;
     ctx.strokeStyle = "#666";
     ctx.beginPath();
     ctx.moveTo(x + offset, 0);
-    ctx.lineTo(x + offset, this.#scene.height);
+    ctx.lineTo(x + offset, this.scene.height);
     ctx.stroke();
     if (this.chart.cursorActive) {
       ctx.beginPath();
       ctx.moveTo(0, y);
-      ctx.lineTo(this.#scene.width, y);
+      ctx.lineTo(this.scene.width, y);
       ctx.stroke();
     }
     ctx.restore();
@@ -6190,18 +6170,17 @@ class xAxis extends Axis {
   xStep(range) {
     let minStep = XAXIS_STEP;
     let interval = this.#indexBased ? range.interval : 1;
-    let xStep = 0;
+    let xStep = TIMESCALES[0];
     let candleW = bRound(this.width / range.Length);
-    let rank;
+    let rank = TIMESCALESRANK[0];
     let i = TIMESCALES.indexOf(interval);
     while (i-- >= 0) {
       const gradPixels = candleW * (TIMESCALES[i] / interval);
-      if (gradPixels >= minStep) {
-        xStep = TIMESCALES[i];
-        rank = TIMESCALESRANK[i];
-        return {xStep, rank}
-      }
+      if (gradPixels >= minStep) break
     }
+    xStep = TIMESCALES[i];
+    rank = TIMESCALESRANK[i];
+    return {xStep, rank}
   }
   dateTimeValue(ts, tf) {
     if ((ts / DAY_MS) % 1 === 0) {
@@ -7433,25 +7412,13 @@ var stateMachineConfig$5 = {
   }
 };
 
-class scalePriceLine {
-  #core
-  #config
-  #theme
-  #scale
-  #target
-  #viewport
-  #scene
-  constructor(target, scale, config) {
-    this.#target = target;
-    this.#viewport = target.viewport;
-    this.#scene = target.scene;
-    this.#config = config;
-    this.#scale = scale;
-    this.#core = scale.core;
-    this.#theme = scale.core.theme;
+class scalePriceLine extends Overlay {
+  constructor(target, xAxis, yAxis, theme, parent, params) {
+    super(target, xAxis, yAxis, theme, parent, params);
+    this.viewport = target.viewport;
     this.start();
   }
-  set position(p) { this.#target.setPosition(p[0], p[1]); }
+  set position(p) { this.target.setPosition(p[0], p[1]); }
   start() {
     this.eventListeners();
   }
@@ -7462,13 +7429,13 @@ class scalePriceLine {
     this.on(STREAM_UPDATE, (e) => { this.onStreamUpdate(e); });
   }
   on(topic, handler, context) {
-    this.#scale.on(topic, handler, context);
+    this.parent.on(topic, handler, context);
   }
   off(topic, handler) {
-    this.#scale.off(topic, handler);
+    this.parent.off(topic, handler);
   }
   emit(topic, data) {
-    this.#scale.emit(topic, data);
+    this.parent.emit(topic, data);
   }
   onStreamUpdate(e) {
     this.draw(e);
@@ -7476,8 +7443,8 @@ class scalePriceLine {
   draw(candle) {
     if (candle === undefined) return
     let price = candle[4],
-        y = this.#scale.yPos(price),
-        nice = this.#scale.nicePrice(price),
+        y = this.parent.yPos(price),
+        nice = this.parent.nicePrice(price),
         options = {
           fontSize: YAxisStyle.FONTSIZE * 1.05,
           fontWeight: YAxisStyle.FONTWEIGHT,
@@ -7491,24 +7458,24 @@ class scalePriceLine {
         },
     height = options.fontSize + options.paddingTop + options.paddingBottom,
     yPos = y - (height * 0.5);
-    this.#scene.clear();
-    const ctx = this.#scene.context;
+    this.scene.clear();
+    const ctx = this.scene.context;
     ctx.save();
-    if (candle[4] >= candle[1]) options.bakCol = this.#theme.candle.UpBodyColour;
-    else options.bakCol = this.#theme.candle.DnBodyColour;
+    if (candle[4] >= candle[1]) options.bakCol = this.theme.candle.UpBodyColour;
+    else options.bakCol = this.theme.candle.DnBodyColour;
     ctx.fillStyle = options.bakCol;
     let x = 1;
     ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily);
     ctx.textBaseline = 'top';
     ctx.fillStyle = options.bakCol || defaultOptions.bakCol;
     height = getTextRectHeight(options);
-    ctx.fillRect(x, yPos, this.#viewport.width, height);
+    ctx.fillRect(x, yPos, this.viewport.width, height);
     ctx.fillStyle = options.txtCol || defaultOptions.txtCol;
     x = x + options?.paddingLeft;
     yPos += options?.paddingTop;
     ctx.fillText(`${nice}`, x, yPos);
     ctx.restore();
-    this.#viewport.render();
+    this.viewport.render();
   }
 }
 
@@ -7723,8 +7690,10 @@ class ScaleBar {
       this.#priceLine =
       new scalePriceLine(
         this.#layerPriceLine,
-        this,
-        this.theme
+        undefined,
+        this.#yAxis,
+        this.theme,
+        this
       );
     }
   }
@@ -7919,32 +7888,17 @@ class VolumeBar {
   }
 }
 
-class chartVolume extends VolumeBar {
-  #parent
-  #core
-  #config
-  #theme
-  #xAxis
-  #yAxis
-  #target
-  #scene
+class chartVolume extends Overlay {
+  #volumeBar
   #volH
-  constructor(target, xAxis=false, yAxis=false, theme, parent) {
-    super(target.scene, theme);
-    this.#parent = parent;
-    this.#core = parent.core;
-    this.#target = target;
-    this.#scene = target.scene;
-    this.#theme = theme;
-    this.#xAxis = xAxis;
-    this.#yAxis = yAxis;
-    this.#theme.volume.Height = limit$1(theme?.volume?.Height, 0, 100) || 100;
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
+    super(target, xAxis=false, yAxis=false, theme, parent, params);
+    this.#volumeBar = new VolumeBar(target.scene, theme);
+    this.theme.volume.Height = limit$1(theme?.volume?.Height, 0, 100) || 100;
   }
-  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
-  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
-  set position(p) { this.#target.setPosition(p[0], p[1]); }
-  draw(range=this.#core.range) {
-    this.#scene.clear();
+  set position(p) { this.target.setPosition(p[0], p[1]); }
+  draw(range=this.core.range) {
+    this.scene.clear();
     const data = range.data;
     const zeroPos = this.scene.height;
     const offset = this.xAxis.smoothScrollOffset || 0;
@@ -7955,8 +7909,8 @@ class chartVolume extends VolumeBar {
       w: w,
       z: zeroPos
     };
-    const volH = Math.floor(zeroPos * this.#theme.volume.Height / 100);
-    let o = this.#core.rangeScrollOffset;
+    const volH = Math.floor(zeroPos * this.theme.volume.Height / 100);
+    let o = this.core.rangeScrollOffset;
     let v = range.indexStart - o;
     let i = range.Length + (o * 2);
     let j = i;
@@ -7976,7 +7930,7 @@ class chartVolume extends VolumeBar {
       if (x[4] !== null) {
         volume.h = volH - (volH * ((maxVol - x[5]) / maxVol));
         volume.raw = data[v];
-        super.draw(volume);
+        this.#volumeBar.draw(volume);
       }
       v++;
     }
@@ -7984,7 +7938,7 @@ class chartVolume extends VolumeBar {
 }
 
 class Candle {
-  areaCoordinates
+  areaCoordinates = []
   constructor(scene, config) {
     this.scene = scene;
     this.ctx = this.scene.context;
@@ -8127,43 +8081,28 @@ class Candle {
     else
       ctx.stroke();
     ctx.restore();
+    coords.length = 0;
   }
 }
 
-class chartCandles extends Candle {
-  #parent
-  #core
-  #config
-  #theme
-  #xAxis
-  #yAxis
-  #target
-  #scene
+class chartCandles extends Overlay {
+  #candle
   constructor(target, xAxis=false, yAxis=false, theme, parent) {
-    super(target.scene, theme);
-    this.#parent = parent;
-    this.#core = parent.core;
-    this.#target = target;
-    this.#scene = target.scene;
-    this.#theme = theme;
-    this.#xAxis = xAxis;
-    this.#yAxis = yAxis;
+    super(target, xAxis=false, yAxis=false, theme, parent);
+    this.#candle = new Candle(target.scene, theme);
   }
-  get target() { return this.#target }
-  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
-  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
-  set position(p) { this.#target.setPosition(p[0], p[1]); }
-  draw(range=this.#core.range) {
-    this.#scene.clear();
-    this.areaCoordinates = [];
+  set position(p) { this.target.setPosition(p[0], p[1]); }
+  draw(range=this.core.range) {
+    this.scene.clear();
     let render;
-    switch (this.cfg.candle.Type) {
+    let type = this.theme.candle.Type;
+    switch (type) {
       case CandleType.AREA:
       case CandleType.LINE:
-        render = (candle) => {this.area({...candle});};
+        render = (candle) => {this.#candle.area({...candle});};
         break;
       default:
-        render = (candle) => {super.draw(candle);};
+        render = (candle) => {this.#candle.draw(candle);};
         break;
     }
     const offset = this.xAxis.smoothScrollOffset || 0;
@@ -8171,20 +8110,20 @@ class chartCandles extends Candle {
       x: offset - this.xAxis.candleW,
       w: this.xAxis.candleW
     };
-    let o = this.#core.rangeScrollOffset;
+    let o = this.core.rangeScrollOffset;
     let c = range.indexStart - o;
     let i = range.Length + (o * 2);
     let x;
-    if (this.#core.stream) {
-      this.#core.stream.lastPriceMax = range.valueMax;
-      this.#core.stream.lastPriceMin = range.valueMin;
+    if (this.core.stream) {
+      this.core.stream.lastPriceMax = range.valueMax;
+      this.core.stream.lastPriceMin = range.valueMin;
     }
     while(i) {
       x = range.value( c );
       candle.x = this.xAxis.xPos(x[0]);
       if (x?.[7]) {
-        this.#core.stream.lastXPos = candle.x;
-        this.#core.stream.lastYPos = {
+        this.core.stream.lastXPos = candle.x;
+        this.core.stream.lastYPos = {
           o: candle.o,
           h: candle.h,
           l: candle.l,
@@ -8203,71 +8142,45 @@ class chartCandles extends Candle {
       c++;
       i--;
     }
-    if (this.cfg.candle.Type === CandleType.AREA ||
-        this.cfg.candle.Type === CandleType.LINE
+    if (type === CandleType.AREA ||
+        type === CandleType.LINE
       )
-      super.areaRender();
+      this.#candle.areaRender();
   }
 }
 
-class chartStreamCandle extends Candle {
-  #parent
-  #core
-  #config
-  #theme
-  #xAxis
-  #yAxis
-  #target
-  #scene
-  #params
-  #chart
+class chartStreamCandle extends Overlay {
+  #candle
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
-    super(target.scene, theme);
-    this.#parent = parent;
-    this.#core = parent.core;
-    this.#target = target;
-    this.#scene = target.scene;
-    this.#theme = theme;
-    this.#xAxis = xAxis;
-    this.#yAxis = yAxis;
-    this.#params = params;
-    this.#chart = parent.parent.parent;
-    this.#theme.priceLineStyle = this.#theme?.priceLineStyle || PriceLineStyle;
+    super(target, xAxis=false, yAxis=false, theme, parent, params);
+    this.#candle = new Candle(target.scene, theme);
+    this.theme.priceLineStyle = this.theme?.priceLineStyle || PriceLineStyle;
   }
-  get target() { return this.#target }
-  get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
-  get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set position(p) { this.setPosition(p[0], p[1]); }
   setPosition(x, y) {
-    if (this.#core.stream === undefined) return
-    this.#target.setPosition(x, y);
-    this.#core.stream.lastScrollPos = this.#core.scrollPos;
+    if (this.core.stream === undefined) return
+    this.target.setPosition(x, y);
+    this.core.stream.lastScrollPos = this.core.scrollPos;
   }
   yPos(p) {
-    const rangeH = this.#core.stream.lastPriceMax - this.#core.stream.lastPriceMin;
-    const height = p - this.#core.stream.lastPriceMin;
+    const rangeH = this.core.stream.lastPriceMax - this.core.stream.lastPriceMin;
+    const height = p - this.core.stream.lastPriceMin;
     const ratio = this.yAxis.height / rangeH;
     const yPos = this.yAxis.height - (height * ratio);
     return yPos
   }
   draw() {
-    if (this.#core.stream === undefined ||
-        !isArray(this.#chart.streamCandle)) return
-    this.#scene.clear();
-    const r = this.#core.range;
-    const stream = this.#chart.streamCandle;
-    let render;
-    switch (this.cfg.candle.Type) {
-      case CandleType.AREA:
-      case CandleType.LINE:
-        render = (candle) => {this.areaRender(candle);};
-        break;
-      default:
-        render = (candle) => {super.draw(candle);};
-        break;
-    }
+    if (this.core.stream === undefined ||
+        !isArray(this.chart.streamCandle)) return
+    this.scene.clear();
+    const r = this.core.range;
+    const stream = this.chart.streamCandle;
+    const render = (this.theme.candle.Type === CandleType.AREA ||
+                    this.theme.candle.Type === CandleType.LINE ) ?
+      (candle) => {this.areaRender(candle);} :
+      (candle) => {this.#candle.draw(candle);};
     this.xAxis.smoothScrollOffset || 0;
-    const pos = this.#core.stream.lastXPos;
+    const pos = this.core.stream.lastXPos;
     const candle = {
       x: pos,
       w: this.xAxis.candleW
@@ -8280,18 +8193,18 @@ class chartStreamCandle extends Candle {
     if (r.inRenderRange(stream[0])) {
       render(candle);
     }
-    if (stream[4] >= stream[1]) this.#theme.priceLineStyle.strokeStyle = this.cfg.candle.UpBodyColour;
-    else this.#theme.priceLineStyle.strokeStyle = this.cfg.candle.DnBodyColour;
+    if (stream[4] >= stream[1]) this.theme.priceLineStyle.strokeStyle = this.core.theme.candle.UpBodyColour;
+    else this.theme.priceLineStyle.strokeStyle = this.core.theme.candle.DnBodyColour;
     renderHorizontalLine (
-      this.#scene.context,
+      this.scene.context,
       candle.c,
       0,
-      this.#target.width,
-      this.#theme.priceLineStyle
+      this.target.width,
+      this.theme.priceLineStyle
     );
   }
   areaRender(candle) {
-    const r = this.#core.range;
+    const r = this.core.range;
     const raw = r.value(r.data.length - 2);
     if (raw === null) return
     const prev = {
@@ -8301,8 +8214,9 @@ class chartStreamCandle extends Candle {
       l: this.yPos(raw[3]),
       c: this.yPos(raw[4]),
     };
-    const ctx = this.ctx;
-    const bodyColour = this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour;
+    const ctx = this.scene.context;
+    const cfg = this.theme;
+    const bodyColour = cfg.candle.UpBodyColour || cfg.candle.DnBodyColour;
     Math.max(candle.w -1, 1);
     candle.x;
     let fill;
@@ -8313,17 +8227,17 @@ class chartStreamCandle extends Candle {
     ctx.beginPath();
     ctx.moveTo(candle.x, candle.c);
     ctx.lineTo(prev.x, prev.h);
-    if (this.cfg.candle.Type === CandleType.AREA) {
+    if (cfg.candle.Type === CandleType.AREA) {
       fill= ctx.createLinearGradient(0, 0, 0, this.scene.height);
-      if (isArray(this.cfg.candle.AreaFillColour)) {
-        for (let [index, value] of this.cfg.candle.AreaFillColour.entries()) {
+      if (isArray(cfg.candle.AreaFillColour)) {
+        for (let [index, value] of cfg.candle.AreaFillColour.entries()) {
           fill.addColorStop(index, value);
         }
       }
       else if (isString())
-        fill = this.cfg.candle.AreaFillColour;
+        fill = cfg.candle.AreaFillColour;
       else
-        fill = this.cfg.candle.UpBodyColour || this.cfg.candle.DnBodyColour;
+        fill = cfg.candle.UpBodyColour || cfg.candle.DnBodyColour;
       ctx.stroke();
       ctx.lineTo(prev.x, this.scene.height);
       ctx.lineTo(candle.x, this.scene.height);
@@ -8797,30 +8711,16 @@ class OffChart extends Chart {
   }
 }
 
-class chartWatermark {
-  #parent
-  #core
-  #config = {}
-  #theme
-  #xAxis
-  #yAxis
-  #target
-  #scene
-  #params
+class chartWatermark extends Overlay {
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
-    this.#parent = parent;
-    this.#core = parent.core;
-    this.#target = target;
-    this.#scene = target.scene;
-    this.#theme = theme;
-    this.#params = params;
-    this.#config.content = params?.content || "";
+    super(target, xAxis, yAxis, theme, parent, params);
+    this.params.content = params?.content || "";
   }
-  set position(p) { this.#target.setPosition(0, 0); }
+  set position(p) { this.target.setPosition(0, 0); }
   draw(content) {
-    content = content || this.#config.content;
-    this.#scene.clear();
-    const ctx = this.#scene.context;
+    content = content || this.params.content;
+    this.scene.clear();
+    const ctx = this.scene.context;
     ctx.save();
     ctx.restore();
   }
@@ -10808,4 +10708,4 @@ if (!window.customElements.get('tradex-chart')) {
   window.customElements.define('tradex-chart', TradeXchart);
 }
 
-export { TradeXchart as Chart, DOM, indicator as Indicator, TradeXchart as default };
+export { TradeXchart as Chart, DOM, indicator as Indicator, Overlay, copyDeep, TradeXchart as default };
