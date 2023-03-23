@@ -78,10 +78,11 @@ let streamInit = false
 const config1 = {
   id: "TradeX_test",
   title: "BTC/USDT",
+  symbol: "btcusdt",
   // width: 1000,
   // height: 800,
-  utils: {none: true},
-  tools: {none: true},
+  utils: {},
+  tools: {},
   timeFrame: "1m",
   rangeStartTS: rangeStartTS,
   rangeLimit: 30,
@@ -98,14 +99,26 @@ const config1 = {
       UpColour: "#FAEB2444",
       DnColour: "#F900FE44",
     },
+    xAxis: {
+      tickMarker: false,
+    },
+    yAxis: {
+      tickMarker: false,
+    },
     chart: {
       Background: "#141414",
-      BorderColour: "#666",
+      BorderColour: "#141414",
       GridColour: "#303030",
       TextColour: "#c0c0c0"
     },
     onChart: {
 
+    },
+    tools: {
+      location: "left"
+    },
+    utils: {
+      location: false
     },
   },
   isCrypto: true,
@@ -121,10 +134,11 @@ const config1 = {
 const config2 = {
   id: "TradeX_test",
   title: "TEST/USDT",
+  symbol: "testusdt",
   // width: 1000,
   // height: 800,
-  utils: {none: true},
-  tools: {none: true},
+  utils: {},
+  tools: {},
   timeFrame: "1m",
   rangeStartTS: state2.ohlcv.slice(-15)[0][0], // rangeStartTS,
   rangeLimit: 30,
@@ -164,10 +178,11 @@ const config2 = {
 const config3 = {
   id: "TradeX_Blue",
   title: "BTC/USDT",
+  symbol: "btcusdt",
   // width: 1000,
   // height: 800,
-  utils: {none: true},
-  tools: {none: true},
+  utils: {},
+  tools: {},
   timeFrame: "1m",
   rangeStartTS: rangeStartTS,
   rangeLimit: 30,
@@ -239,15 +254,19 @@ const config3 = {
   errors: true,
   stream: streamVal,
   maxCandleUpdate: 250,
-  talib: talib
+  talib: talib,
+  state: {
+
+  }
 }
 const config4 = {
   id: "TradeX_test",
   title: "FUN/USDT",
+  symbol: "funusdt",
   // width: 1000,
   // height: 800,
-  utils: {none: true},
-  tools: {none: true},
+  utils: {},
+  tools: {},
   timeFrame: "1s",
   rangeStartTS: state4.ohlcv.slice(-1)[0][0] - (15000),
   rangeLimit: 30,
@@ -266,9 +285,16 @@ const config4 = {
       UpColour: "#08C5F544",
       DnColour: "#0805F544",
     },
+    xAxis: {
+      tickMarker: false,
+    },
+    yAxis: {
+      tickMarker: false,
+      location:"left"
+    },
     chart: {
       Background: "#141414",
-      BorderColour: "#666",
+      BorderColour: "#141414",
       GridColour: "#333",
       TextColour: "#ccc"
     },
@@ -289,10 +315,11 @@ const config4 = {
 const config5 = {
   id: "Midnight",
   title: "ETH/USDT",
+  symbol: "ethusdt",
   // width: 1000,
   // height: 800,
-  utils: {none: true},
-  tools: {none: true},
+  utils: {},
+  tools: {},
   timeFrame: "1m",
   rangeStartTS: rangeStartTS,
   rangeLimit: 30,
@@ -361,6 +388,12 @@ const config5 = {
     icon: {
       colour: "#748bc7",
       hover: "#96a9db"
+    },
+    tools: {
+      location: false
+    },
+    utils: {
+      location: false
     }
   },
   isCrypto: true,

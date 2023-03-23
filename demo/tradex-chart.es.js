@@ -4907,6 +4907,7 @@ class tradeXChart extends element {
   #oHeight
   #widthCache
   #heightCache
+  #theme
   constructor () {
     const template = document.createElement('template');
           template.innerHTML = HTML;
@@ -4980,6 +4981,10 @@ class tradeXChart extends element {
   get body() { return this.#elBody }
   get utils() { return this.#elUtils }
   get widgets() { return this.#elWidgets }
+  elStart(theme) {
+    this.#theme = theme;
+    this.setUtilsLocation();
+  }
   onResized(entries) {
       console.log("onResize");
       console.log(this.offsetWidth);
@@ -5044,6 +5049,26 @@ class tradeXChart extends element {
     this.setWidth(w);
     this.setHeight(h);
     return dims
+  }
+  setUtilsLocation(pos=this.#theme?.utils?.location) {
+    this.#theme.utils = this.#theme.utils || {};
+    switch(pos) {
+      case "none":
+      case false:
+        this.#theme.utils.location = "none";
+        this.#theme.utils.height = 0;
+        this.elUtils.style.display = "none";
+        this.elUtils.style.height =`0px`;
+        this.elBody.style.height = `100%`;
+        break;
+      case "top":
+      default:
+        this.#theme.utils.location = "top";
+        this.#theme.utils.height = UTILSH;
+        this.elUtils.style.display = "block";
+        this.elUtils.style.height =`${UTILSH}px`;
+        this.elBody.style.height = `calc(100% - ${UTILSH}px)`;
+    }
   }
 }
 
@@ -10188,8 +10213,14 @@ class Divider {
       width = this.#core.MainPane.rowsW + this.#core.scaleW,
       height = (isNumber(this.config.dividerHeight)) ?
         this.config.dividerHeight : DIVIDERHEIGHT,
-      left = this.#core.toolsW;
+      left = this.#core.theme.tools.width;
       top -= height / 2;
+    switch(this.#core.theme.tools.location) {
+      case "left": break;
+      case false:
+      case "none":
+      case "right": left *= -1; break;
+    }
     const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: #FFFFFF00;`;
     const node = `
       <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
@@ -10673,6 +10704,7 @@ class TradeXchart extends tradeXChart {
     this.log("...processing state");
     this.#scrollPos = this.bufferPx * -1;
     this.eventsListen();
+    this.elStart(this.theme);
     this.elBody.start(this.theme);
     this.UtilsBar.start();
     this.ToolsBar.start();

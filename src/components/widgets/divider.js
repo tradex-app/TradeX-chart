@@ -184,8 +184,16 @@ export default class Divider {
       width = this.#core.MainPane.rowsW + this.#core.scaleW,
       height = (isNumber(this.config.dividerHeight)) ? 
         this.config.dividerHeight : DIVIDERHEIGHT,
-      left = this.#core.toolsW;
+      left = this.#core.theme.tools.width // this.#core.toolsW;
       top -= height / 2
+
+    switch(this.#core.theme.tools.location) {
+      case "left": break;
+      case false:
+      case "none":
+      case "right": left *= -1; break;
+      default: break
+    }
 
     const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: #FFFFFF00;`
 

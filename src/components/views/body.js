@@ -188,7 +188,6 @@ export default class tradeXBody extends element {
     }
     this.setYAxisLocation()
   }
-
 }
 
 window.customElements.define('tradex-body', tradeXBody)

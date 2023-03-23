@@ -57,6 +57,7 @@ export default class tradeXChart extends element {
   #oHeight
   #widthCache
   #heightCache
+  #theme
 
   constructor () {
     const template = document.createElement('template')
@@ -156,6 +157,10 @@ export default class tradeXChart extends element {
   get utils() { return this.#elUtils }
   get widgets() { return this.#elWidgets }
 
+  elStart(theme) {
+    this.#theme = theme
+    this.setUtilsLocation()
+  }
 
   onResized(entries) {
     // window.requestAnimationFrame(() => {
@@ -248,5 +253,26 @@ export default class tradeXChart extends element {
     this.setHeight(h)
 
     return dims
+  }
+
+  setUtilsLocation(pos=this.#theme?.utils?.location) {
+    this.#theme.utils = this.#theme.utils || {}
+    switch(pos) {
+      case "none":
+      case false:
+        this.#theme.utils.location = "none"
+        this.#theme.utils.height = 0
+        this.elUtils.style.display = "none"
+        this.elUtils.style.height =`0px`;
+        this.elBody.style.height = `100%`
+        break;
+      case "top":
+      default:
+        this.#theme.utils.location = "top"
+        this.#theme.utils.height = UTILSH
+        this.elUtils.style.display = "block"
+        this.elUtils.style.height =`${UTILSH}px`;
+        this.elBody.style.height = `calc(100% - ${UTILSH}px)`
+    }
   }
 }

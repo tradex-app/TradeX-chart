@@ -415,6 +415,7 @@ export default class TradeXchart extends Tradex_chart {
 
     this.eventsListen()
 
+    this.elStart(this.theme)
     this.elBody.start(this.theme)
     this.UtilsBar.start()
     this.ToolsBar.start()

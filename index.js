@@ -125,6 +125,9 @@ const config1 = {
 
     },
     tools: {
+      location: "left"
+    },
+    utils: {
       location: false
     },
   },
@@ -292,9 +295,16 @@ const config4 = {
       UpColour: "#08C5F544",
       DnColour: "#0805F544",
     },
+    xAxis: {
+      tickMarker: false,
+    },
+    yAxis: {
+      tickMarker: false,
+      location:"left"
+    },
     chart: {
       Background: "#141414",
-      BorderColour: "#666",
+      BorderColour: "#141414",
       GridColour: "#333",
       TextColour: "#ccc"
     },
@@ -390,7 +400,7 @@ const config5 = {
       hover: "#96a9db"
     },
     tools: {
-      location: "left"
+      location: false
     },
     utils: {
       location: false
