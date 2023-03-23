@@ -15,6 +15,7 @@ import {
 import {
   GlobalStyle
 } from "../../definitions/style"
+import { isNumber } from "../../utils/typeChecks"
 
 const right = `
 <style>
@@ -109,6 +110,8 @@ template.innerHTML = right
 
 export default class tradeXBody extends element {
 
+  #theme
+
   constructor () {
     super(template)
   }
@@ -125,30 +128,65 @@ export default class tradeXBody extends element {
   get scale() { return this.shadowRoot.querySelector('tradex-scale') }
 
   start(theme) {
-    let location = theme?.yAxis?.location
-    let keys = Object.keys(locations)
-    location = (keys.includes(location)) ? location : "right"
-    // this.shadowRoot.innerHTML = locations[location]
-    this.setYAxisLocation(location)
+    this.#theme = theme
+    this.setToolsLocation()
   }
 
-  setYAxisLocation(side) {
+  setYAxisLocation(side=this.#theme?.yAxis?.location) {
+    let toolsW = (isNumber(this.#theme?.tools?.width)) ? this.#theme.tools.width : TOOLSW
+    let offset
+
     switch (side) {
       case "left":
-        this.scale.style.left = `${TOOLSW}px`
+        offset = (toolsW == 0) ? 0 : SCALEW
+        this.scale.style.left = `${toolsW}px`
         this.scale.style.right = undefined
         this.main.style.left = undefined
-        this.main.style.right = `-${SCALEW}px`
+        this.main.style.right = `-${offset}px`
+        this.main.style.width = `calc(100% - ${toolsW}px)`
         break;
       case "both":
       case "right":
       default:
+        offset = (toolsW == 0) ? SCALEW : 0
         this.scale.style.left = undefined
         this.scale.style.right = 0
         this.main.style.left = undefined
-        this.main.style.right = 0
+        this.main.style.right = `${offset}px`
+        this.main.style.width = `calc(100% - ${toolsW}px)`
         break;
     }
+  }
+
+  setToolsLocation(side=this.#theme?.tools?.location) {
+    this.#theme.tools = this.#theme.tools || {}
+    switch(side) {
+      case "none":
+      case false:
+        this.#theme.tools.location = "none"
+        this.#theme.tools.width = 0
+        this.tools.style.display = "none"
+        this.tools.style.width =`0px`;
+        break;
+      case "right":
+        this.#theme.tools.location = "right"
+        this.#theme.tools.width = this.#theme?.tools?.width || TOOLSW
+        this.tools.style.display = "block"
+        this.tools.style.left = undefined;
+        this.tools.style.right = 0;
+        this.tools.style.width =`${TOOLSW}px`;
+        break;
+      case "left":
+      default:
+        this.#theme.tools.location = "left"
+        this.#theme.tools.width = this.#theme?.tools?.width || TOOLSW
+        this.tools.style.display = "block"
+        this.tools.style.left = 0;
+        this.tools.style.right = undefined;
+        this.tools.style.width =`${TOOLSW}px`;
+        break;
+    }
+    this.setYAxisLocation()
   }
 
 }

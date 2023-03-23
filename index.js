@@ -38,6 +38,14 @@ let state4 = {
           434.3
       ]
   ],
+onchart: [
+  {
+    "name": "SMA, 5",
+    "type": "SMA",
+    "data": [],
+    "settings": {period: 5}
+  }
+],
 "offchart": [
   {
     "name": "RSI, 20",
@@ -80,10 +88,11 @@ let streamInit = false
 const config1 = {
   id: "TradeX_test",
   title: "BTC/USDT",
+  symbol: "btcusdt",
   // width: 1000,
   // height: 800,
-  utils: {none: true},
-  tools: {none: true},
+  utils: {},
+  tools: {},
   timeFrame: "1m",
   rangeStartTS: rangeStartTS,
   rangeLimit: 30,
@@ -100,14 +109,23 @@ const config1 = {
       UpColour: "#FAEB2444",
       DnColour: "#F900FE44",
     },
+    xAxis: {
+      tickMarker: false,
+    },
+    yAxis: {
+      tickMarker: false,
+    },
     chart: {
       Background: "#141414",
-      BorderColour: "#666",
+      BorderColour: "#141414",
       GridColour: "#303030",
       TextColour: "#c0c0c0"
     },
     onChart: {
 
+    },
+    tools: {
+      location: false
     },
   },
   isCrypto: true,
@@ -123,10 +141,11 @@ const config1 = {
 const config2 = {
   id: "TradeX_test",
   title: "TEST/USDT",
+  symbol: "testusdt",
   // width: 1000,
   // height: 800,
-  utils: {none: true},
-  tools: {none: true},
+  utils: {},
+  tools: {},
   timeFrame: "1m",
   rangeStartTS: state2.ohlcv.slice(-15)[0][0], // rangeStartTS,
   rangeLimit: 30,
@@ -166,10 +185,11 @@ const config2 = {
 const config3 = {
   id: "TradeX_Blue",
   title: "BTC/USDT",
+  symbol: "btcusdt",
   // width: 1000,
   // height: 800,
-  utils: {none: true},
-  tools: {none: true},
+  utils: {},
+  tools: {},
   timeFrame: "1m",
   rangeStartTS: rangeStartTS,
   rangeLimit: 30,
@@ -241,15 +261,19 @@ const config3 = {
   errors: true,
   stream: streamVal,
   maxCandleUpdate: 250,
-  talib: talib
+  talib: talib,
+  state: {
+
+  }
 }
 const config4 = {
   id: "TradeX_test",
   title: "FUN/USDT",
+  symbol: "funusdt",
   // width: 1000,
   // height: 800,
-  utils: {none: true},
-  tools: {none: true},
+  utils: {},
+  tools: {},
   timeFrame: "1s",
   rangeStartTS: state4.ohlcv.slice(-1)[0][0] - (15000),
   rangeLimit: 30,
@@ -291,10 +315,11 @@ const config4 = {
 const config5 = {
   id: "Midnight",
   title: "ETH/USDT",
+  symbol: "ethusdt",
   // width: 1000,
   // height: 800,
-  utils: {none: true},
-  tools: {none: true},
+  utils: {},
+  tools: {},
   timeFrame: "1m",
   rangeStartTS: rangeStartTS,
   rangeLimit: 30,
@@ -363,6 +388,12 @@ const config5 = {
     icon: {
       colour: "#748bc7",
       hover: "#96a9db"
+    },
+    tools: {
+      location: "left"
+    },
+    utils: {
+      location: false
     }
   },
   isCrypto: true,
@@ -445,39 +476,6 @@ function getRandomInt(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-function stream() {
-  let candle 
-  let chart = this
-  let time = (chart.stream.lastTick) ? chart.stream.lastTick.t : chart.range.value()[0]
-  let tf = chart.config.timeFrame
-  let tfms = TIMEUNITSVALUESSHORT[tf]
-
-  candle = chart.stream.candle
-  if (!candle) {
-    candle = chart.range.value()
-    streamInit = true
-    time = time + chart.time.timeFrameMS - interval
-  }
-
-  if (candle[4] === null) candle[4] = 1
-  if (candle[5] === null) candle[5] = 1
-
-  let percent = getRandomInt(0, 1)
-  let factor2 = getRandomInt(0, 10) % 2
-  let sign = (Math.floor(factor2) === 1) ? 1 : -1
-  let price = candle[4] + (candle[4] * (percent / 3000 * sign))
-      time += interval
-  let quantity = candle[5] * (factor2 / 500)
-  let tick = {t: time, c: price, v: quantity}
-
-  tick.o = (!isNumber(candle[1])) ? price: candle[1]
-  tick.h = (price >= candle[2]) ? price : candle[2]
-  tick.l = (price <= candle[3]) ? price : candle[3]
-
-  console.log(tick)
-
-  chart.stream.onTick(tick)
-}
 
 class Stream {
 
@@ -499,6 +497,9 @@ class Stream {
     this.tickerCb = (typeof tickerCb === "function") ? tickerCb : false
     this.klineCb = (typeof klineCb === "function") ? klineCb : false
 
+    let r = this.chart.range
+    this.max = r.valueDiff / (this.tfms / this.interval) || 1
+
     setInterval(this.ticker.bind(this), interval)
   }
 
@@ -511,9 +512,8 @@ class Stream {
   get priceInc() {
     let factor2 = getRandomInt(0, 10) % 2
     let sign = (Math.floor(factor2) === 1) ? 1 : -1
-    let r = this.chart.range
-    let max = r.valueDiff || 1
-    return getRandomInt(0, max / (this.tfms / this.interval)) * sign
+
+    return getRandomInt(0, this.max) * sign
   }
 
   ticker() {
@@ -556,18 +556,6 @@ function livePrice_Binance(chart, symbol="btcusdt", interval="1m") {
   // var ws = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@aggTrade");
   var ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@kline_${interval}`);
 
-  ws.onmessage = (evt) => onWSMessage.call(this, evt, chart)
-}
-
-function livePrice_Binance_BTCUSDT(chart, symbol="btcusdt", interval="1m") {
-  // var ws = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@aggTrade");
-  var ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@kline_${interval}`);
-
-  ws.onmessage = (evt) => onWSMessage.call(this, evt, chart)
-}
-
-function livePrice_Binance_ETHUSDT(chart) {
-  var ws = new WebSocket("wss://stream.binance.com:9443/ws/ethusdt@aggTrade");    
   ws.onmessage = (evt) => onWSMessage.call(this, evt, chart)
 }
 

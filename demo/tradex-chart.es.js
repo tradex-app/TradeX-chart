@@ -2098,6 +2098,153 @@ class indicator extends Overlay {
   }
 }
 
+class DMI$1 extends indicator {
+  #ID
+  #name = 'Bollinger Bands'
+  #shortName = 'BB'
+  #params
+  #onChart = true
+  #precision = 2
+  #calcParams = [20]
+  #checkParamCount = false
+  #scaleOverlay = true
+  #plots = [
+    { key: 'BB_1', title: ' ', type: 'line' },
+  ]
+  #defaultStyle = {
+    strokeStyle: "#C80",
+    lineWidth: '1',
+    defaultHigh: 75,
+    defaultLow: 25,
+    highLowLineWidth: 1,
+    highLowStyle: "dashed",
+    highStrokeStyle: "#848",
+    lowStrokeStyle: "#848",
+    highLowRangeStyle: "#22002220"
+  }
+  #style = {}
+  static scale = YAXIS_TYPES$1[1]
+  constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
+    super(target, xAxis, yAxis, config, parent, params);
+    const overlay = params.overlay;
+    this.#ID = params.overlay?.id || uid(this.#shortName);
+    this.#params = params;
+    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams;
+    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style};
+    this.setNewValue = (value) => { this.newValue(value); };
+    this.setUpdateValue = (value) => { this.UpdateValue(value); };
+  }
+  get ID() { return this.#ID }
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get onChart() { return this.#onChart }
+  get plots() { return this.#plots }
+  addLegend() {
+    let legend = {
+      id: this.#shortName,
+      title: this.#shortName,
+      type: this.#shortName,
+      source: this.legendInputs.bind(this)
+    };
+    this.chart.legend.add(legend);
+  }
+  legendInputs(pos=this.chart.cursorPos, candle) {
+    const inputs = {};
+    const index = this.Timeline.xPos2Index(pos[0]);
+    let c = index  - (this.range.data.length - this.overlay.data.length);
+    let colours = [this.style.strokeStyle];
+    c = limit(c, 0, this.overlay.data.length - 1);
+    inputs.DMI_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
+    return {inputs, colours}
+  }
+  regeneratePlots (params) {
+    return params.map((_, index) => {
+      const num = index + 1;
+      return { key: `dmi${num}`, title: `DMI${num}: `, type: 'line' }
+    })
+  }
+ newValue (value) {
+   let p = this.TALibParams();
+   if (!p) return false
+   let v = this.calcIndicatorStream(this.#shortName, this.TALibParams());
+   if (!v) return false
+   this.overlay.data.push([v[0], v[1]]);
+   this.target.setPosition(this.core.scrollPos, 0);
+   this.draw(this.range);
+ }
+ UpdateValue (value) {
+   let l = this.overlay.data.length - 1;
+   let p = this.TALibParams();
+   if (!p) return false
+   let v = this.calcIndicatorStream(this.#shortName, p);
+   if (!v) return false
+   this.overlay.data[l] = [v[0], v[1]];
+   this.target.setPosition(this.core.scrollPos, 0);
+   this.draw(this.range);
+ }
+ TALibParams() {
+   let end = this.range.dataLength;
+   let step = this.calcParams[0];
+   let start = end - step;
+   let input = this.indicatorInput(start, end);
+   let hasNull = input.find(element => element === null);
+   if (hasNull) return false
+   else return { inReal: input, timePeriod: step }
+ }
+  draw(range) {
+    this.scene.clear();
+    const data = this.overlay.data;
+    const width = this.xAxis.candleW;
+    const x2 = this.scene.width + (this.xAxis.bufferPx * 2);
+    const y1 = this.yAxis.yPos(100 - this.style.defaultHigh);
+    const y2 = this.yAxis.yPos(100 - this.style.defaultLow);
+    const plots = [0, y1, this.scene.width, y2 - y1];
+    let style = this.style.highLowRangeStyle;
+    this.plot(plots, "renderFillRect", style);
+    plots.length = 0;
+    plots[0] = {x: 0, y: y1};
+    plots[1] = {x: x2, y: y1};
+    style = {
+      lineWidth: this.style.highLowLineWidth,
+      strokeStyle: this.style.highStrokeStyle,
+      dash: [5, 5]
+    };
+    this.plot(plots, "renderLine", style);
+    plots.length = 0;
+    plots[0] = {x: 0, y: y2};
+    plots[1] = {x: x2, y: y2};
+    style = {
+      lineWidth: this.style.highLowLineWidth,
+      strokeStyle: this.style.lowStrokeStyle,
+      dash: [5, 5]
+    };
+    this.plot(plots, "renderLine", style);
+    plots.length = 0;
+    this.Timeline.smoothScrollOffset || 0;
+    const plot = {
+      w: width,
+    };
+    let o = this.Timeline.rangeScrollOffset;
+    let d = range.data.length - this.overlay.data.length;
+    let c = range.indexStart - d - 2;
+    let i = range.Length + (o * 2) + 2;
+    while(i) {
+      if (c < 0 || c >= this.overlay.data.length) {
+        plots.push({x: null, y: null});
+      }
+      else {
+        plot.x = this.xAxis.xPos(data[c][0]);
+        plot.y = this.yAxis.yPos(100 - data[c][1]);
+        plots.push({...plot});
+      }
+      c++;
+      i--;
+    }
+    this.plot(plots, "renderLine", this.style);
+    this.target.viewport.render();
+  }
+}
+
 class DMI extends indicator {
   #ID
   #name = 'Directional Movement Index'
@@ -2245,7 +2392,7 @@ class DMI extends indicator {
   }
 }
 
-const calcParams$2 = [20];
+const calcParams$3 = [20];
  class EMA extends indicator {
   #ID
   #name ='Exponential Moving Average'
@@ -2281,7 +2428,7 @@ const calcParams$2 = [20];
     const overlay = params.overlay;
     this.#ID = params.overlay?.id || uid(this.#shortName);
     this.#params = params;
-    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams$2;
+    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams$3;
     this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style};
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.UpdateValue(value); };
@@ -2377,7 +2524,7 @@ const calcParams$2 = [20];
   }
 }
 
-const calcParams$1 = [20];
+const calcParams$2 = [20];
 class RSI extends indicator {
   #ID
   #name = 'Relative Strength Index'
@@ -2407,7 +2554,7 @@ class RSI extends indicator {
     const overlay = params.overlay;
     this.#ID = params.overlay?.id || uid(this.#shortName);
     this.#params = params;
-    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams$1;
+    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams$2;
     this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style};
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.UpdateValue(value); };
@@ -2523,12 +2670,165 @@ class RSI extends indicator {
   }
 }
 
+const calcParams$1 = [20];
+ class SMA extends indicator {
+  #ID
+  #name ='Simple Moving Average'
+  #shortName = 'SMA'
+  #params
+  #onChart = true
+  #series = 'price'
+  #precision = 2
+  #calcParams = [6, 12, 20]
+  #checkParamCount = false
+  #scaleOverlay = false
+  #plots = [
+    { key: 'sma6', title: 'SMA6: ', type: 'line' },
+  ]
+  #defaultStyle = {
+    strokeStyle: "#C80",
+    lineWidth: '1'
+  }
+  #style = {}
+  static inCnt = 0
+  static scale = YAXIS_TYPES$1[0]
+  static colours = [
+    "#9C27B0",
+    "#9C27B0",
+    "#66BB6A",
+    "#66BB6A"
+  ]
+  constructor(target, xAxis=false, yAxis=false, config, parent, params) {
+    super(target, xAxis, yAxis, config, parent, params);
+    SMA.inCnt++;
+    const overlay = params.overlay;
+    this.#ID = params.overlay?.id || uid(this.#shortName);
+    this.#params = params;
+    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams$1;
+    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style};
+    this.setNewValue = (value) => { this.newValue(value); };
+    this.setUpdateValue = (value) => { this.UpdateValue(value); };
+    this.addLegend();
+  }
+  get ID() { return this.#ID }
+  get name() { return this.#name }
+  get shortName() { return this.#shortName }
+  get onChart() { return this.#onChart }
+  get plots() { return this.#plots }
+  addLegend() {
+    let legend = {
+      id: this.#shortName,
+      title: this.#shortName,
+      type: this.#shortName,
+      source: this.legendInputs.bind(this)
+    };
+    this.chart.legend.add(legend);
+  }
+  updateLegend() {
+    this.parent.legend.update();
+  }
+  legendInputs(pos=this.chart.cursorPos, candle) {
+    const inputs = {};
+    const index = this.Timeline.xPos2Index(pos[0]);
+    let c = index  - (this.range.data.length - this.overlay.data.length);
+    let colours = [this.style.strokeStyle];
+    c = limit$1(c, 0, this.overlay.data.length - 1);
+    inputs.SMA_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
+    return {inputs, colours}
+  }
+  regeneratePlots (params) {
+    return params.map((_, index) => {
+      const num = index + 1;
+      return { key: `sma${num}`, title: `SMA${num}: `, type: 'line' }
+    })
+  }
+    newValue (value) {
+    let p = this.TALibParams();
+    if (!p) return false
+    let v = this.calcIndicatorStream(this.#shortName, this.TALibParams());
+    if (!v) return false
+    this.overlay.data.push([v[0], v[1]]);
+    this.target.setPosition(this.core.scrollPos, 0);
+    this.draw(this.range);
+  }
+   UpdateValue (value) {
+    let l = this.overlay.data.length - 1;
+    let p = this.TALibParams();
+    if (!p) return false
+    let v = this.calcIndicatorStream(this.#shortName, p);
+    if (!v) return false
+    this.overlay.data[l] = [v[0], v[1]];
+    this.target.setPosition(this.core.scrollPos, 0);
+    this.draw(this.range);
+  }
+  TALibParams() {
+    let end = this.range.dataLength;
+    let step = this.calcParams[0];
+    let start = end - step;
+    let input = this.indicatorInput(start, end);
+    let hasNull = input.find(element => element === null);
+    if (hasNull) return false
+    else return { inReal: input, timePeriod: step }
+  }
+  draw(range=this.range) {
+    this.scene.clear();
+    const data = this.overlay.data;
+    const width = this.xAxis.candleW;
+    const plots = [];
+    this.xAxis.smoothScrollOffset || 0;
+    const plot = {
+      w: width,
+    };
+    let o = this.Timeline.rangeScrollOffset;
+    let d = range.data.length - this.overlay.data.length;
+    let c = range.indexStart - d - 2;
+    let i = range.Length + (o * 2) + 2;
+    while(i) {
+      if (c < 0 || c >= this.overlay.data.length) {
+        plots.push({x: null, y: null});
+      }
+      else {
+        plot.x = this.xAxis.xPos(data[c][0]);
+        plot.y = this.yAxis.yPos(data[c][1]);
+        plots.push({...plot});
+      }
+      c++;
+      i--;
+    }
+    this.plot(plots, "renderLine", this.style);
+    this.target.viewport.render();
+  }
+}
+
+class Volume extends indicator {
+  #ID
+  #name = 'Relative Strength Index'
+  #shortName = 'RSI'
+  #params
+  #onChart = true
+  #checkParamCount = false
+  #scaleOverlay = true
+  #plots = [
+    { key: 'RSI_1', title: ' ', type: 'line' },
+  ]
+  #defaultStyle = {
+  }
+  #style = {}
+  static scale = YAXIS_TYPES$1[1]
+  constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
+    super (target, xAxis, yAxis, config, parent, params);
+    params.overlay;
+  }
+}
+
 var Indicators = {
   ADX: {id: "ADX", name: "Average Direction", event: "addIndicator"},
-  BB: {id: "BB", name: "Bollinger Bands", event: "addIndicator", ind: ""},
+  BB: {id: "BB", name: "Bollinger Bands", event: "addIndicator", ind: DMI$1},
   DMI: {id: "DMI", name: "Directional Movement", event: "addIndicator", ind: DMI},
   EMA: {id: "EMA", name: "Exponential Moving Average", event: "addIndicator", ind: EMA},
   RSI: {id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: RSI},
+  SMA: {id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: SMA},
+  Vol: {id: "Vol", name: "Volume", event: "addIndicator", ind: Volume},
 };
 
 class element extends HTMLElement {
@@ -3015,6 +3315,7 @@ class chartGrid extends Overlay{
       }
     }
     ctx.restore();
+    this.doDraw = false;
   }
   drawX() {
     this.draw("x");
@@ -4322,6 +4623,7 @@ template$5.innerHTML = `
     top: 1px;
   }
   tradex-rows {
+    position:relative;
     overflow: hidden;
     width: calc(100% - ${SCALEW}px);
     height: calc(100% - ${TIMEH}px);
@@ -4343,6 +4645,7 @@ template$5.innerHTML = `
 `;
 class tradeXMain extends element {
   #elYAxis
+  #theme
   constructor () {
     super(template$5);
   }
@@ -4353,6 +4656,10 @@ class tradeXMain extends element {
   get viewport() { return this.shadowRoot.querySelector('#viewport') }
   get rows() { return this.shadowRoot.querySelector('tradex-rows') }
   get time() { return this.shadowRoot.querySelector('tradex-time') }
+  start(theme) {
+    this.#theme = theme;
+    this.setMain();
+  }
   rowNode(type, api) {
     const styleRow = ` border-top: 1px solid ${api.theme.chart.BorderColour};`;
     const node = `
@@ -4360,6 +4667,14 @@ class tradeXMain extends element {
       </tradex-offchart>
     `;
     return node
+  }
+  setMain() {
+    let timeH = (isNumber(this.#theme?.time?.height)) ? this.#theme.time.height : TIMEH;
+    let offset = (this.#theme.tools.location == "none") ? 60 : 0;
+    this.rows.style.height = `calc(100% - ${timeH}px)`;
+    this.rows.style.left = `${offset}px`;
+    this.time.style.left = `${offset}px`;
+    this.viewport.style.left = `${offset}px`;
   }
 }
 window.customElements.define('tradex-main', tradeXMain);
@@ -4446,66 +4761,10 @@ const right = `
 <tradex-main></tradex-main>
 <tradex-scale></tradex-scale>
 `;
-const left = `
-<style>
-  tradex-tools {
-    position: absolute; 
-    top: 0; left: 0;
-    width: ${TOOLSW}px;
-    height: 100%; 
-    min-height: 100%; 
-  }
-  tradex-main {
-    position: absolute; 
-    top: 0;
-    right: 0;
-    width: calc(100% - ${TOOLSW}px);
-    height: 100%;
-  }
-  tradex-scale {
-    position: absolute; 
-    top: 0; 
-    left: ${SCALEW}px; 
-    width: ${SCALEW}px; 
-    height: 100%;
-  }
-</style>
-<tradex-tools></tradex-tools>
-<tradex-scale></tradex-scale>
-<tradex-main></tradex-main>
-`;
-const both = `
-<style>
-  tradex-tools {
-    position: absolute; 
-    top: 0; left: 0;
-    width: ${TOOLSW}px;
-    height: 100%; 
-    min-height: 100%; 
-  }
-  tradex-main {
-    position: absolute; 
-    top: 0;
-    right: 0;
-    width: calc(100% - ${TOOLSW}px);
-    height: 100%;
-  }
-  tradex-scale {
-    position: absolute; 
-    top: 0; 
-    right: 0; 
-    width: ${SCALEW}px; 
-    height: 100%;
-  }
-</style>
-<tradex-tools></tradex-tools>
-<tradex-main></tradex-main>
-<tradex-scale></tradex-scale>
-`;
 const template$2 = document.createElement('template');
-const locations = { left, right, both };
 template$2.innerHTML = right;
 class tradeXBody extends element {
+  #theme
   constructor () {
     super(template$2);
   }
@@ -4517,28 +4776,62 @@ class tradeXBody extends element {
   get main() { return this.shadowRoot.querySelector('tradex-main') }
   get scale() { return this.shadowRoot.querySelector('tradex-scale') }
   start(theme) {
-    let location = theme?.yAxis?.location;
-    let keys = Object.keys(locations);
-    location = (keys.includes(location)) ? location : "right";
-    this.setYAxisLocation(location);
+    this.#theme = theme;
+    this.setToolsLocation();
   }
-  setYAxisLocation(side) {
+  setYAxisLocation(side=this.#theme?.yAxis?.location) {
+    let toolsW = (isNumber(this.#theme?.tools?.width)) ? this.#theme.tools.width : TOOLSW;
+    let offset;
     switch (side) {
       case "left":
-        this.scale.style.left = `${TOOLSW}px`;
+        offset = (toolsW == 0) ? 0 : SCALEW;
+        this.scale.style.left = `${toolsW}px`;
         this.scale.style.right = undefined;
         this.main.style.left = undefined;
-        this.main.style.right = `-${SCALEW}px`;
+        this.main.style.right = `-${offset}px`;
+        this.main.style.width = `calc(100% - ${toolsW}px)`;
         break;
       case "both":
       case "right":
       default:
+        offset = (toolsW == 0) ? SCALEW : 0;
         this.scale.style.left = undefined;
         this.scale.style.right = 0;
         this.main.style.left = undefined;
-        this.main.style.right = 0;
+        this.main.style.right = `${offset}px`;
+        this.main.style.width = `calc(100% - ${toolsW}px)`;
         break;
     }
+  }
+  setToolsLocation(side=this.#theme?.tools?.location) {
+    this.#theme.tools = this.#theme.tools || {};
+    switch(side) {
+      case "none":
+      case false:
+        this.#theme.tools.location = "none";
+        this.#theme.tools.width = 0;
+        this.tools.style.display = "none";
+        this.tools.style.width =`0px`;
+        break;
+      case "right":
+        this.#theme.tools.location = "right";
+        this.#theme.tools.width = this.#theme?.tools?.width || TOOLSW;
+        this.tools.style.display = "block";
+        this.tools.style.left = undefined;
+        this.tools.style.right = 0;
+        this.tools.style.width =`${TOOLSW}px`;
+        break;
+      case "left":
+      default:
+        this.#theme.tools.location = "left";
+        this.#theme.tools.width = this.#theme?.tools?.width || TOOLSW;
+        this.tools.style.display = "block";
+        this.tools.style.left = 0;
+        this.tools.style.right = undefined;
+        this.tools.style.width =`${TOOLSW}px`;
+        break;
+    }
+    this.setYAxisLocation();
   }
 }
 window.customElements.define('tradex-body', tradeXBody);
@@ -9069,6 +9362,7 @@ class MainPane {
   }
   start() {
     let i = 0;
+    this.#elMain.start(this.theme);
     this.#Time.start();
     this.#Chart.start();
     this.#OffCharts.forEach((offChart, key) => {
@@ -10708,4 +11002,4 @@ if (!window.customElements.get('tradex-chart')) {
   window.customElements.define('tradex-chart', TradeXchart);
 }
 
-export { TradeXchart as Chart, DOM, indicator as Indicator, Overlay, copyDeep, TradeXchart as default };
+export { TradeXchart as Chart, DOM, indicator as Indicator, Overlay, copyDeep, TradeXchart as default, mergeDeep };

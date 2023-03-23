@@ -202,6 +202,7 @@ export default class MainPane {
     let i = 0
 
     // start  timeline, chart, offChart
+    this.#elMain.start(this.theme)
     this.#Time.start()
     this.#Chart.start()
     this.#OffCharts.forEach((offChart, key) => {

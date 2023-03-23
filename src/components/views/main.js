@@ -16,6 +16,7 @@ import {
   STYLE_SCALE,
   GlobalStyle
 } from "../../definitions/style"
+import { isNumber } from "../../utils/typeChecks"
 
 const template = document.createElement('template')
 template.innerHTML = `
@@ -32,6 +33,7 @@ template.innerHTML = `
     top: 1px;
   }
   tradex-rows {
+    position:relative;
     overflow: hidden;
     width: calc(100% - ${SCALEW}px);
     height: calc(100% - ${TIMEH}px);
@@ -55,6 +57,7 @@ template.innerHTML = `
 export default class tradeXMain extends element {
 
   #elYAxis
+  #theme
 
   constructor () {
     super(template)
@@ -71,6 +74,11 @@ export default class tradeXMain extends element {
   get rows() { return this.shadowRoot.querySelector('tradex-rows') }
   get time() { return this.shadowRoot.querySelector('tradex-time') }
 
+  start(theme) {
+    this.#theme = theme
+    this.setMain()
+  }
+
   rowNode(type, api) {
     const styleRow = ` border-top: 1px solid ${api.theme.chart.BorderColour};`
     const node = `
@@ -78,6 +86,15 @@ export default class tradeXMain extends element {
       </tradex-offchart>
     `
     return node
+  }
+
+  setMain() {
+    let timeH = (isNumber(this.#theme?.time?.height)) ? this.#theme.time.height : TIMEH
+    let offset = (this.#theme.tools.location == "none") ? 60 : 0
+    this.rows.style.height = `calc(100% - ${timeH}px)`
+    this.rows.style.left = `${offset}px`
+    this.time.style.left = `${offset}px`
+    this.viewport.style.left = `${offset}px`
   }
 
 }
