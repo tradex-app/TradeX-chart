@@ -1,5 +1,56 @@
 # Architecture
 
+# Architectural Organization
+
+* Factory
+  * Core
+    * Utils
+    * Widgets
+    * Body
+      * Tools
+      * Main Pane
+        * Timeline (X Axis)
+        * Rows
+          * Row
+            * Chart or Off Chart Indicators
+              * Price Scale (Y Axis)
+              * Graph
+                * Overlays
+                  * Grid
+                  * Cursor
+                  * Price Line
+                  * Candles
+                  * Volume
+                  * Technical Indicators
+                  * User Defined
+
+Most of these features can be accessed externally eg.
+
+``chart.offChart.entries().next().value[1]``
+
+Although it is recommended that use the API to modify the chart or respond to events.
+
+## Factory
+
+The static factory class is used to instantiate (multiple) chart instances. It registers the chart WebComponent.
+
+## Core
+
+The core starts the cascade of chart component creation. It provides:
+
+* Internal and external API
+* State management
+* Event messaging
+* Chart Data State
+  * Validation
+  * Export
+  * Range handling - data subset
+* Configuration
+* Themes
+
+
+# Patterns
+
 **Hook Observer Pattern**
 An extensible API like WordPress
 making it easy for third party programmers to write extensions to the core

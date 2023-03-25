@@ -1,10 +1,8 @@
 # README
 
-## WIP - under heavy development
+## WIP - under heavy development - NOT production ready
 
-TradeX-chart is a trade chart written in plain (vanilla) JavaScript with minimal dependencies; use it with any framework or backend.
-
-It uses an event driven state managed architecture, providing a two way API to give you complete control over the chart.
+TradeX-chart is a trade chart written in plain (vanilla) JavaScript with one dependency only; use it with any framework or backend.
 
 ![](assets/EMA.png)
 
@@ -21,7 +19,9 @@ It uses an event driven state managed architecture, providing a two way API to g
 
 TradeX-chart was created to give you the developer the freedom to choose your framework and not lock you in.
 
-Secondly after talking to other developers, top on their wishlist for a trading chart was more direct control over it, so they could create their own custom plots. The extensive API will give you power over your chart data like you never had before. Subscribe to the internal events messaging to trigger events in your own application.
+Secondly after talking to other developers, top on their wishlist for a trading chart was more direct control over it, so they could create their own custom plots. Subscribe to the internal events messaging to trigger events in your own application.
+
+Thirdly a fully themeable chart that can be integrated into any website or application design.
 
 ## Getting Started
 

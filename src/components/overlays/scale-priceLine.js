@@ -77,8 +77,6 @@ export default class scalePriceLine extends Overlay {
     if (candle[4] >= candle[1]) options.bakCol = this.theme.candle.UpBodyColour
     else options.bakCol = this.theme.candle.DnBodyColour
 
-    ctx.fillStyle = options.bakCol
-
     let x = 1
 
     ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily)
