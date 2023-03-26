@@ -129,13 +129,8 @@ export default class Stream {
    * @memberof Stream
    */
   set candle(data) {
-    // const r = this.range
-    // if (data.p > r.valueMax || data.p < r.valueMin) {}
-
     // round time to nearest current time unit
-    const tfms = this.#core.time.timeFrameMS
-    let roundedTime = Math.floor(new Date(data.t) / tfms) * tfms
-    data.t = roundedTime
+    data.t = this.roundTime(new Date(data.t))
 
     if (this.#candle[T] !== data.t) {
       this.newCandle(data)
@@ -149,6 +144,10 @@ export default class Stream {
     return (this.#candle !== empty) ? this.#candle : null
   }
 
+  roundTime(ts) {
+    return ts - (ts % this.#core.time.timeFrameMS)
+  }
+
   /**
    * add new candle to state data
    *
@@ -156,8 +155,6 @@ export default class Stream {
    * @memberof Stream
    */
   newCandle(data) {
-    // let open = this.range.value()[C] || data.p
-
     // create new stream candle
     this.prevCandle()
     // this.#candle = [data.t, open, data.p, data.p, open, data.q, null, true]
@@ -165,7 +162,7 @@ export default class Stream {
     this.#core.mergeData({data: [this.#candle]}, true)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
     this.#countDownMS = this.#time.timeFrameMS
-    this.#countDownStart = Date.now()
+    this.#countDownStart = this.roundTime(Date.now())
   }
 
   prevCandle() {
@@ -221,37 +218,39 @@ export default class Stream {
     }
     this.#countDownMS = cntDn
 
-    if (cntDn / YEAR_MS > 1) {
+    if (cntDn > YEAR_MS) {
       y = String(Math.floor(cntDn / YEAR_MS));
       M = String(Math.floor((cntDn % YEAR_MS) / MONTHR_MS)).padStart(2, '0');
-      this.#countDown = `${y}Y : ${M}M`
+      this.#countDown = `${y}Y ${M}M`
     }
-    else if (cntDn / MONTHR_MS > 1) {
+    else if (cntDn > MONTHR_MS) {
       M = String(Math.floor(cntDn / MONTHR_MS)).padStart(2, '0');
       d = String(Math.floor((cntDn % MONTHR_MS) / DAY_MS)).padStart(2, '0');
-      this.#countDown = `${M}M : ${d}D`
+      this.#countDown = `${M}M ${d}D`
     }
-    else if (cntDn / WEEK_MS > 1) {
+    else if (cntDn > WEEK_MS) {
       w = String(Math.floor(cntDn / WEEK_MS)).padStart(2, '0');
       d = String(Math.floor((cntDn % MONTHR_MS) / DAY_MS)).padStart(2, '0');
-      this.#countDown = `${w}W : ${d}D`
+      this.#countDown = `${w}W ${d}D`
     }
-    else if (cntDn / DAY_MS > 1) {
+    else if (cntDn > DAY_MS) {
       d = String(Math.floor(cntDn / DAY_MS)).padStart(2, '0');
       h = String(Math.floor((cntDn % DAY_MS) / HOUR_MS)).padStart(2, '0');
-      this.#countDown = `${d}D : ${h}H`
+      m = String(Math.floor((cntDn % HOUR_MS) / MINUTE_MS)).padStart(2, '0');
+      this.#countDown = `${d}D ${h}:${m}`
     }
-    else if (cntDn / HOUR_MS > 1) {
+    else if (cntDn > HOUR_MS) {
       h = String(Math.floor(cntDn / HOUR_MS)).padStart(2, '0');
       m = String(Math.floor((cntDn % HOUR_MS) / MINUTE_MS)).padStart(2, '0');
-      this.#countDown = `00:${h}:${m}`
+      s = String(Math.floor((cntDn % MINUTE_MS) / SECOND_MS)).padStart(2, '0');
+      this.#countDown = `${h}:${m}:${s}`
     }
-    else if (cntDn / MINUTE_MS > 1) {
+    else if (cntDn > MINUTE_MS) {
       m = String(Math.floor(cntDn / MINUTE_MS)).padStart(2, '0');
       s = String(Math.floor((cntDn % MINUTE_MS) / SECOND_MS)).padStart(2, '0');
       this.#countDown = `00:${m}:${s}`
     }
-    // else if (cntDn / SECOND_MS > 1) {
+    // else if (cntDn > SECOND_MS) {
     else {
       s = String(Math.floor(cntDn / SECOND_MS)).padStart(2, '0');
       u = String(cntDn % SECOND_MS).padStart(4, '0');
