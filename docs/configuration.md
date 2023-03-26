@@ -1,12 +1,12 @@
 # Configuration
 
 ```javascript
-const chart = Chart.create(mount, config, state )
+  // Create an empty chart and insert into the DOM
+  let chart = document.createElement("tradex-chart")
+  let mount = document.getElementByID("#mount")
+      mount.appendChild(chart)
+      chart.start(config)
 ```
-
-@param {DOM element} mount
-@param {object} config
-@param {object} state
 
 A DOM element is requried to mount the chart. Any contents of the element will be replaced by the chart
 

@@ -2,7 +2,7 @@
 
 ## WIP - under heavy development - NOT production ready
 
-TradeX-chart is a trade chart written in plain (vanilla) JavaScript with one dependency only; use it with any framework or backend.
+TradeX-chart is a trade chart written in plain (vanilla) JavaScript with one dependency only; use it with any framework or backend. Customize and theme the chart any way to match your website or app.
 
 ![](assets/EMA.png)
 

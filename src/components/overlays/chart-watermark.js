@@ -1,5 +1,6 @@
 // chart-watermark.js
 
+import { createFont, getTextRectHeight, getTextRectWidth } from "../../utils/canvas"
 import Overlay from "./overlay"
 
 
@@ -17,42 +18,35 @@ export default class chartWatermark extends Overlay {
 
   draw(content) {
 
+return
+
     content = content || this.params.content
 
-    this.scene.clear()
+    const options = {
+      fontSize: YAxisStyle.FONTSIZE * 1.05,
+      fontWeight: YAxisStyle.FONTWEIGHT,
+      fontFamily: YAxisStyle.FONTFAMILY,
+      txtCol: "#FFFFFF", //YAxisStyle.COLOUR_CURSOR,
+      bakCol: YAxisStyle.COLOUR_CURSOR_BG,
+      paddingTop: 2,
+      paddingBottom: 2,
+      paddingLeft: 3,
+      paddingRight: 3
+    }
 
-    // if (axes == "none") return
-    
-    // const xGrads = this.xAxis.xAxisGrads.values
+    this.scene.clear()
     const ctx = this.scene.context
     ctx.save();
-    // ctx.strokeStyle = this.core.theme.chart.GridColour || GridStyle.COLOUR_GRID
+    ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily)
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = options.txtCol || defaultOptions.txtCol;
 
-    // // X Axis
-    // if (axes != "y") {
-    //   const offset = this.xAxis.smoothScrollOffset || 0
+    height = getTextRectHeight(options)
+    width = getTextRectWidth(options)
 
-    //   for (let tick of xGrads) {
-    //     let x = bRound(tick[1])
-    //     ctx.beginPath()
-    //     ctx.moveTo(x + offset, 0)
-    //     ctx.lineTo(x + offset, this.scene.height)
-    //     ctx.stroke()
-    //   }
-    // }
-
-    // // Y Axis
-    // if (axes != "x") {
-    //   const yGrads = this.yAxis.yAxisGrads
-    //   for (let tick of yGrads) {
-    //     let y = bRound(tick[1])
-    //     ctx.beginPath()
-    //     ctx.moveTo(0, y)
-    //     ctx.lineTo(this.scene.width, y)
-    //     ctx.stroke()
-    //   }
-    // }
-    ctx.restore();
+    ctx.fillText(text, x, yPos);
+    ctx.restore()
+    this.viewport.render()
   }
 
 }
