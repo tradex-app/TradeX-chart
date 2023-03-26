@@ -346,31 +346,30 @@ export default class TradeXchart extends Tradex_chart {
     // time frame
     let tf = "1s"
     let ms = SECOND_MS
+    this.#chartIsEmpty = true
+
+    // is the chart empty - no data or stream
     if (!isObject(txCfg?.stream) && this.#state.data.chart.data.length < 2) {
       this.warning(`${NAME} has no chart data or streaming provided.`)
       // has a time frame been provided?
       ;({tf, ms} = isTimeFrame(txCfg?.timeFrame))
-      this.#time.timeFrame = tf
-      this.#time.timeFrameMS = ms
-      this.#chartIsEmpty = true
     }
     // is the chart streaming with an empty chart?
     else if (isObject(txCfg?.stream) && this.#state.data.chart.data.length < 2) {
       // has a time frame been provided?
       ;({tf, ms} = isTimeFrame(txCfg?.timeFrame))
-      console.log("tf:",tf,"ms:",ms)
 
-      this.#time.timeFrame = tf
-      this.#time.timeFrameMS = ms
-      this.#chartIsEmpty = true
       this.#delayedSetRange = true
     }
     // chart has back history and optionally streaming
     else {
-      this.#time.timeFrame = this.#state.data.chart.tf 
-      this.#time.timeFrameMS = this.#state.data.chart.tfms
+      tf = this.#state.data.chart.tf 
+      ms = this.#state.data.chart.tfms
       this.#chartIsEmpty = false
     }
+    this.#time.timeFrame = tf
+    this.#time.timeFrameMS = ms
+    console.log("tf:",tf,"ms:",ms)
 
     const id = (isObject(txCfg) && isString(txCfg.id)) ? txCfg.id : null
     this.setID(id)
@@ -733,7 +732,10 @@ export default class TradeXchart extends Tradex_chart {
         this.#time.timeFrame = tf
         this.#time.timeFrameMS = ms
       }
+
       this.#stream = new Stream(this)
+      this.#config.stream = this.#stream.config
+      
       return this.#stream
     }
   }

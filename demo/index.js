@@ -36,6 +36,14 @@ let state4 = {
           434.3
       ]
   ],
+onchart: [
+  {
+    "name": "SMA, 5",
+    "type": "SMA",
+    "data": [],
+    "settings": {period: 5}
+  }
+],
 "offchart": [
   {
     "name": "RSI, 20",
@@ -71,7 +79,10 @@ let state5 = {
 // let rangeStartTS = 1558429200000 // 21/05/2019, 11:00:00 - 1 hour price
 // let rangeStartTS = 1663059600000 // seconds price
 let rangeStartTS = undefined
-let streamVal = {}
+let streamVal = {
+  tfCountDown: true,
+  alerts: []
+}
 let interval = 500
 let streamInit = false
 
@@ -307,7 +318,10 @@ const config4 = {
   infos: true,
   warnings: true,
   errors: true,
-  stream: streamVal,
+  stream: {
+    tfCountDown: false,
+    alerts: []
+  },
   maxCandleUpdate: 250,
   talib: talib,
   state: state4
@@ -562,26 +576,22 @@ function livePrice_Binance(chart, symbol="btcusdt", interval="1m") {
 
 function onWSMessage (evt, chart) { 
   
-    /*
+
+  
+  var msg = evt.data;
+  var obj = JSON.parse(msg);
+  if (typeof obj === "object" && obj.k) { 
+
+    /* KLine data passed to the chart
     {
-      "e": "aggTrade",  // Event type
-      "E": 123456789,   // Event time
-      "s": "BNBBTC",    // Symbol
-      "a": 12345,       // Aggregate trade ID
-      "p": "0.001",     // Price
-      "q": "100",       // Quantity
-      "f": 100,         // First trade ID
-      "l": 105,         // Last trade ID
-      "T": 123456785,   // Trade time
-      "m": true,        // Is the buyer the market maker?
-      "M": true         // Ignore
+        t: timeStamp // timestamp of current candle in milliseconds
+        o: open  // open price
+        h: high  // high price
+        c: close  // close price
+        v: volume // volume
     }
     */
-    
-    var msg = evt.data;
-    var obj = JSON.parse(msg);
-    if (typeof obj === "object" && obj.T && obj.p && obj.q) { 
-      chart.stream.onTick({t: obj.T, p: obj.p, q: obj.q})   
+    chart.stream.onTick(obj.k)   
     }
   };
 

@@ -1,9 +1,5 @@
 import { Chart, DOM } from './src'
 import * as talib from "talib-web"
-import { isNumber } from './src/utils/typeChecks'
-import * as demo from './demo.js'
-import { TIMEUNITSVALUESSHORT } from "./src/utils/time"
-// import './chart-live.css'
 
 // let state = undefined
 import state1 from './data/1hour.js'
@@ -320,7 +316,10 @@ const config4 = {
   infos: true,
   warnings: true,
   errors: true,
-  stream: streamVal,
+  stream: {
+    tfCountDown: false,
+    alerts: []
+  },
   maxCandleUpdate: 250,
   talib: talib,
   state: state4

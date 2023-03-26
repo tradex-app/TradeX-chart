@@ -8,8 +8,8 @@ import Dataset from '../model/dataset'
 import { validateDeep, validateShallow } from '../model/validateData'
 import { copyDeep, mergeDeep } from '../utils/utilities'
 import { detectInterval } from '../model/range'
-import { ms2Interval } from '../utils/time'
-import { SECOND, DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS } from '../definitions/chart'
+import { ms2Interval, SECOND_MS } from '../utils/time'
+import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS } from '../definitions/chart'
 
 const DEFAULT_STATE = {
   chart: {
@@ -94,7 +94,7 @@ export default class State {
       let tfms = detectInterval(state.chart.data)
       // this SHOULD never happen, 
       // but there are limits to fixing broken data sent to chart
-      if (tfms < SECOND) tfms = DEFAULT_TIMEFRAMEMS
+      if (tfms < SECOND_MS) tfms = DEFAULT_TIMEFRAMEMS
       state.chart.tfms = tfms
     }
     

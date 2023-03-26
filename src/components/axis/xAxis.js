@@ -10,11 +10,8 @@ import {
   get_year,
   get_month, get_monthName,
   get_day,
-  get_hour,
-  get_minute,
-  get_second,
-  buildSubGrads, time_start,
-
+  time_start,
+  HM, MS,
   TIMESCALES, TIMESCALESRANK,
   MINUTE_MS, HOUR_MS, DAY_MS,
  } from "../../utils/time";
@@ -209,33 +206,14 @@ export default class xAxis extends Axis {
     }
     else {
       // TODO: SECONDS_MS
-      if (tf < MINUTE_MS) return this.MS(ts)
-      else if (tf < HOUR_MS) return this.MS(ts)
-      else return this.HM(ts)
+      if (tf < MINUTE_MS) return MS(ts)
+      else if (tf < HOUR_MS) return MS(ts)
+      else return HM(ts)
     }
   }
 
   gradsWorker() {
     
-  }
-
-  HM(t) {
-    let h = String(get_hour(t)).padStart(2, '0');
-    let m = String(get_minute(t)).padStart(2, '0');
-    return `${h}:${m}`
-  }
-
-  HMS(t) {
-    let h = String(get_hour(t)).padStart(2, '0');
-    let m = String(get_minute(t)).padStart(2, '0');
-    let s = String(get_second(t)).padStart(2, '0');
-    return `${h}:${m}:${s}`
-  }
-
-  MS(t) {
-    let m = String(get_minute(t)).padStart(2, '0');
-    let s = String(get_second(t)).padStart(2, '0');
-    return `${m}:${s}`
   }
 
   doCalcXAxisGrads(range) {

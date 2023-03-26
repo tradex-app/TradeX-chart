@@ -5,6 +5,7 @@ export const TIMEUNITSLONG = ['years','months','days','hours','minutes','seconds
 export const dayCntInc = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
 export const dayCntLeapInc = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
 export const monthDayCnt = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
+export const MONTHMAP = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; // Grid time steps
 
 // BTC Genesis Block: 03/01/2009, 19:15:05
 export const BTCGENESIS = 1231006505000
@@ -42,88 +43,71 @@ export const TIMEUNITSVALUESLONG = {
   milliseconds: MILLISECOND
 }
 export const TIMEUNITSVALUES = { ...TIMEUNITSVALUESSHORT, ...TIMEUNITSVALUESLONG }
-export const TIMESCALES = [
-  YEAR_MS * 10,
-  YEAR_MS * 5,
-  YEAR_MS * 3,
-  YEAR_MS * 2,
-  YEAR_MS,
-  MONTHR_MS * 6,
-  MONTHR_MS * 4,
-  MONTHR_MS * 3,
-  MONTHR_MS * 2,
-  MONTHR_MS,
-  DAY_MS * 15,
-  DAY_MS * 10,
-  DAY_MS * 7,
-  DAY_MS * 5,
-  DAY_MS * 3,
-  DAY_MS * 2,
-  DAY_MS,
-  HOUR_MS * 12,
-  HOUR_MS * 6,
-  HOUR_MS * 4,
-  HOUR_MS * 2,
-  HOUR_MS,
-  MINUTE_MS * 30,
-  MINUTE_MS * 15,
-  MINUTE_MS * 10,
-  MINUTE_MS * 5,
-  MINUTE_MS * 2,
-  MINUTE_MS,
-  SECOND_MS * 30,
-  SECOND_MS * 15,
-  SECOND_MS * 10,
-  SECOND_MS * 5,
-  SECOND_MS * 2,
-  SECOND_MS,
-  MILLISECOND * 500,
-  MILLISECOND * 250,
-  MILLISECOND * 100,
-  MILLISECOND * 50,
-  MILLISECOND,
-];
-export const TIMESCALESRANK = [
-  "years",
-  "years",
-  "years",
-  "years",
-  "years",
-  "months",
-  "months",
-  "months",
-  "months",
-  "months",
-  "years",
-  "days",
-  "days",
-  "days",
-  "days",
-  "days",
-  "days",
-  "hours",
-  "hours",
-  "hours",
-  "hours",
-  "hours",
-  "minutes",
-  "minutes",
-  "minutes",
-  "minutes",
-  "minutes",
-  "minutes",
-  "seconds",
-  "seconds",
-  "seconds",
-  "seconds",
-  "seconds",
-  "seconds",
-  "milliseconds",
-  "milliseconds",
-  "milliseconds",
-  "milliseconds",
-  "milliseconds",
- ];
+export const TIMESCALESVALUES = {
+  YEARS10: [ YEAR_MS * 10, "years" ],
+  YEARS5: [ YEAR_MS * 5, "years" ],
+  YEARS3: [ YEAR_MS * 3, "years" ],
+  YEARS2: [ YEAR_MS * 2, "years" ],
+  YEARS: [ YEAR_MS, "years" ],
+  MONTH6: [ MONTHR_MS * 6, "months" ],
+  MONTH4: [ MONTHR_MS * 4, "months" ],
+  MONTH3: [ MONTHR_MS * 3, "months" ],
+  MONTH2: [ MONTHR_MS * 2, "months" ],
+  MONTH: [ MONTHR_MS, "months" ],
+  DAY15: [ DAY_MS * 15, "years" ],
+  DAY10: [ DAY_MS * 10, "days" ],
+  DAY7: [ DAY_MS * 7, "days" ],
+  DAY5: [ DAY_MS * 5, "days" ],
+  DAY3: [ DAY_MS * 3, "days" ],
+  DAY2: [ DAY_MS * 2, "days" ],
+  DAY: [ DAY_MS, "days" ],
+  HOUR12: [ HOUR_MS * 12, "hours" ],
+  HOUR6: [ HOUR_MS * 6, "hours" ],
+  HOUR4: [ HOUR_MS * 4, "hours" ],
+  HOUR2: [ HOUR_MS * 2, "hours" ],
+  HOUR: [ HOUR_MS, "hours" ],
+  MINUTE30: [ MINUTE_MS * 30, "minutes" ],
+  MINUTE15: [ MINUTE_MS * 15, "minutes" ],
+  MINUTE10: [ MINUTE_MS * 10, "minutes" ],
+  MINUTE5: [ MINUTE_MS * 5, "minutes" ],
+  MINUTE2: [ MINUTE_MS * 2, "minutes" ],
+  MINUTE: [ MINUTE_MS, "minutes" ],
+  SECOND30: [ SECOND_MS * 30, "seconds" ],
+  SECOND15: [ SECOND_MS * 15, "seconds" ],
+  SECOND10: [ SECOND_MS * 10, "seconds" ],
+  SECOND5: [ SECOND_MS * 5, "seconds" ],
+  SECOND2: [ SECOND_MS * 2, "seconds" ],
+  SECOND: [ SECOND_MS, "seconds" ],
+  MILLISECOND500: [ MILLISECOND * 500, "milliseconds" ],
+  MILLISECOND250: [ MILLISECOND * 250, "milliseconds" ],
+  MILLISECOND100: [ MILLISECOND * 100, "milliseconds" ],
+  MILLISECOND50: [ MILLISECOND * 50, "milliseconds" ],
+  MILLISECOND: [ MILLISECOND, "milliseconds" ],
+}
+const timeScales = () => {
+  const values = Object.values(TIMESCALESVALUES)
+  const vals = []
+  for (let v = values.length; --v; v > 0) vals[v] = values[v][0]
+  return vals
+}
+export const TIMESCALES = timeScales();
+const timeRanks = () => {
+  const values = Object.values(TIMESCALESVALUES)
+  const vals = []
+  for (let v = values.length; --v; v > 0) vals[v] = values[v][1]
+  return vals
+}
+export const TIMESCALESRANK = timeRanks()
+export const TIMESCALESKEYS = Object.keys(TIMESCALESVALUES);
+
+const timeScalesValues = () => {
+  const values = {}
+  for (const [key, value] of Object.entries(TIMESCALESVALUES)) {
+    values[key] = value[0]
+  }
+  return values
+}
+export const TIMESCALESVALUESKEYS = timeScalesValues()
 export const timezones = {
   0: 'Europe/London',
   '-120': 'Europe/Tallinn',
@@ -552,4 +536,29 @@ export function unitRange (ts, tf) {
       end = start + SECOND_MS
   }
   return {start, end}
+}
+
+/* Time String Formatting */
+
+export function DM (t) {
+  let d = String(get_day(t)).padStart(2, '0');
+}
+
+export function HM (t) {
+  let h = String(get_hour(t)).padStart(2, '0');
+  let m = String(get_minute(t)).padStart(2, '0');
+  return `${h}:${m}`
+}
+
+export function HMS (t) {
+  let h = String(get_hour(t)).padStart(2, '0');
+  let m = String(get_minute(t)).padStart(2, '0');
+  let s = String(get_second(t)).padStart(2, '0');
+  return `${h}:${m}:${s}`
+}
+
+export function MS (t) {
+  let m = String(get_minute(t)).padStart(2, '0');
+  let s = String(get_second(t)).padStart(2, '0');
+  return `${m}:${s}`
 }

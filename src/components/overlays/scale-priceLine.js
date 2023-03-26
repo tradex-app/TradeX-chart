@@ -28,19 +28,7 @@ export default class scalePriceLine extends Overlay {
   }
 
   eventListeners() {
-    this.on(STREAM_UPDATE, (e) => { this.onStreamUpdate(e) })
-  }
-
-  on(topic, handler, context) {
-    this.parent.on(topic, handler, context)
-  }
-
-  off(topic, handler) {
-    this.parent.off(topic, handler)
-  }
-
-  emit(topic, data) {
-    this.parent.emit(topic, data)
+    this.core.on(STREAM_UPDATE, (e) => { this.onStreamUpdate(e) })
   }
 
   onStreamUpdate(e) {
@@ -50,6 +38,9 @@ export default class scalePriceLine extends Overlay {
   draw(candle) {
 
     if (candle === undefined) return
+
+    const streaming = this.core.stream.constructor.name == "Stream" &&
+                      this.config.stream.tfCountDown
 
     let price = candle[4],
         y = this.parent.yPos(price),
@@ -65,7 +56,7 @@ export default class scalePriceLine extends Overlay {
           paddingLeft: 3,
           paddingRight: 3
         },
-        
+    h,
     height = options.fontSize + options.paddingTop + options.paddingBottom,
     yPos = y - (height * 0.5);
 
@@ -87,7 +78,8 @@ export default class scalePriceLine extends Overlay {
     ctx.fillStyle = options.bakCol || defaultOptions.bakCol;
 
     // get width of text
-    height = getTextRectHeight(options)
+    h = getTextRectHeight(options)
+    height = (streaming) ? h * 2 : h
 
     /// draw background rect
     ctx.fillRect(x, yPos, this.viewport.width, height);
@@ -97,6 +89,13 @@ export default class scalePriceLine extends Overlay {
     x = x + options?.paddingLeft
     yPos += options?.paddingTop
     ctx.fillText(`${nice}`, x, yPos);
+
+    if (streaming) {
+      yPos += h
+      nice = this.core.stream.countDownUpdate()
+      ctx.font = createFont(options?.fontSize / 1.1, options?.fontWeight, options?.fontFamily)
+      ctx.fillText(nice, x, yPos);
+    }
 
     ctx.restore()
     this.viewport.render()

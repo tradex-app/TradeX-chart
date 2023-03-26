@@ -1,5 +1,36 @@
 # Change Log
 
+## [0.116.0] - 2023-03-26
+
+Added
+
+* Stream - current candle / time frame count down option on  Axis
+
+## [0.115.0] - 2023-03-23
+
+Added
+
+* Utils Bar - enable / disable
+
+## [0.114.0] - 2023-03-23
+
+Added
+
+* Tool Bar - enable / disable
+
+## [0.113.3] - 2023-03-22
+
+Changed
+
+* Chart now expects Kline data for price stream
+* Chart exports class Overlay for external  Overlays
+* Chart exports class Indicator for external Indicators
+* All Overlays now extend from class Overlay
+
+Fixed
+
+* Components - views (web components) - resizing
+
 ## [0.103.5] - 2022-09-23
 
 Fixed
