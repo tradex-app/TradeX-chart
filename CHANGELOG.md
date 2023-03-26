@@ -1,10 +1,16 @@
 # Change Log
 
-## [0.116.1] - 2023-03-26
+## [0.117.0] - 2023-03-27
 
 Added
 
-* FIXED: Stream - current candle / time frame count down calculation
+* Watermark
+
+## [0.116.1] - 2023-03-26
+
+Fixed
+
+* Stream - current candle / time frame count down calculation
 
 ## [0.116.0] - 2023-03-26
 

@@ -130,6 +130,9 @@ const config1 = {
       location: false
     },
   },
+  watermark: {
+    text: "BTC/USDT"
+  },
   isCrypto: true,
   logs: false,
   infos: true,
@@ -407,6 +410,10 @@ const config5 = {
     utils: {
       location: false
     }
+  },
+  watermark: {
+    text: "ETH/USDT",
+    textColour: "#13171e"
   },
   isCrypto: true,
   logs: false,

@@ -9096,14 +9096,53 @@ class OffChart extends Chart {
   }
 }
 
+const watermark = {
+  FONTSIZE: 50,
+  FONTWEIGHT: "bold",
+  FONTFAMILY: GlobalStyle.FONTFAMILY,
+  COLOUR: "#181818",
+};
 class chartWatermark extends Overlay {
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
     super(target, xAxis, yAxis, theme, parent, params);
     this.params.content = params?.content || "";
   }
   set position(p) { this.target.setPosition(0, 0); }
-  draw(content) {
-return
+  draw() {
+    let isText = isString$1(this.config?.watermark?.text);
+    let isImage = isString$1(this.config?.watermark?.imgURL);
+    if ( !isText && !isImage ) return
+    this.scene.clear();
+    const ctx = this.scene.context;
+    ctx.save();
+    if (isText) this.renderText();
+    else if (isImage) this.renderImage();
+    ctx.restore();
+  }
+  renderText() {
+    const size = this.core.config?.watermark?.fontSize;
+    const weight = this.core.config?.watermark?.fontWeight;
+    const family = this.core.config?.watermark?.fontFamily;
+    const colour = this.core.config?.watermark?.textColour;
+    const options = {
+      fontSize: size || watermark.FONTSIZE,
+      fontWeight: weight || watermark.FONTWEIGHT,
+      fontFamily: family || watermark.FONTFAMILY,
+      txtCol: colour || watermark.COLOUR,
+    };
+    const txt = this.config.watermark.text;
+    const ctx = this.scene.context;
+    ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily);
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = options.txtCol;
+    const height = getTextRectHeight(options);
+    const width = getTextRectWidth(ctx, txt, options);
+    const x = (this.scene.width - width) / 2;
+    const y = (this.scene.height - height) / 2;
+    ctx.fillText(txt, x, y);
+  }
+  renderImage() {
+    this.scene.context;
   }
 }
 
