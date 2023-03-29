@@ -1492,8 +1492,29 @@ class Stream {
   get config() { return this.#config }
   get countDownMS() { return this.#countDownMS }
   get countDown() { return this.#countDown }
-  emit(topic, data) {
-    this.#core.emit(topic, data);
+  get range() { return this.#core.range }
+  get status() { return this.#status }
+  set status({status, data}) {
+    this.#status = status;
+    this.emit(status, data);
+  }
+  set candle(data) {
+    data.t = this.roundTime(new Date(data.t));
+    data.o = data.o * 1;
+    data.h = data.h * 1;
+    data.l = data.l * 1;
+    data.c = data.c * 1;
+    data.v = data.v * 1;
+    if (this.#candle[T$1] !== data.t) {
+      this.newCandle(data);
+    }
+    else {
+      this.updateCandle(data);
+    }
+    this.status = {status: STREAM_LISTENING, data: this.#candle};
+  }
+  get candle() {
+    return (this.#candle !== empty) ? this.#candle : null
   }
   start() {
     this.status = {status: STREAM_STARTED};
@@ -1501,6 +1522,9 @@ class Stream {
   }
   stop() {
     this.status = {status: STREAM_STOPPED};
+  }
+  emit(topic, data) {
+    this.#core.emit(topic, data);
   }
   error() {
     this.status = {status: STREAM_ERROR};
@@ -1520,31 +1544,16 @@ class Stream {
       this.status = {status: STREAM_LISTENING, data: this.#candle};
     }
   }
-  get range() { return this.#core.range }
-  get status() { return this.#status }
-  set status({status, data}) {
-    this.#status = status;
-    this.emit(status, data);
-  }
-  set candle(data) {
-    data.t = this.roundTime(new Date(data.t));
-    if (this.#candle[T$1] !== data.t) {
-      this.newCandle(data);
-    }
-    else {
-      this.updateCandle(data);
-    }
-    this.status = {status: STREAM_LISTENING, data: this.#candle};
-  }
-  get candle() {
-    return (this.#candle !== empty) ? this.#candle : null
-  }
-  roundTime(ts) {
-    return ts - (ts % this.#core.time.timeFrameMS)
-  }
   newCandle(data) {
     this.prevCandle();
-    this.#candle = [data.t, data.o, data.h, data.l, data.c, data.v, null, true];
+    this.#candle =
+     [data.t,
+      data.o,
+      data.h,
+      data.l,
+      data.c,
+      data.v,
+      null, true];
     this.#core.mergeData({data: [this.#candle]}, true);
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}};
     this.#countDownMS = this.#time.timeFrameMS;
@@ -1556,20 +1565,19 @@ class Stream {
           d[d.length - 1].pop();
   }
   updateCandle(data) {
-    data.p = parseFloat(data.p);
-    data.q = parseFloat(data.q);
     let candle = this.#candle;
-    candle[O] = parseFloat(data.o);
-    candle[H] = parseFloat(data.h);
-    candle[L] = parseFloat(data.l);
-    candle[C$1] = parseFloat(data.c);
-    candle[V] = parseFloat(data.v);
+    candle[O] = data.o;
+    candle[H] = data.h;
+    candle[L] = data.l;
+    candle[C$1] = data.c;
+    candle[V] = data.v;
     this.#candle = candle;
     const d = this.#core.allData.data;
     const l = (d.length > 0) ? d.length -1 : 0;
     d[l] = this.#candle;
     this.countDownUpdate();
   }
+  parseCandle
   countDownUpdate() {
     let y,M,w,d,h,m,s;
     this.#time.timeFrameMS;
@@ -1616,6 +1624,9 @@ class Stream {
       this.#countDown = `00:00:${s}`;
     }
     return this.#countDown
+  }
+  roundTime(ts) {
+    return ts - (ts % this.#core.time.timeFrameMS)
   }
 }
 
@@ -11007,12 +11018,9 @@ class TradeXchart extends tradeXChart {
   }
   delayedSetRange() {
     while (this.#delayedSetRange) {
-      let r = this.range;
-      let l = Math.floor((r.indexEnd - r.indexStart) / 2);
-      this.setRange(l * -1, l);
       this.off(STREAM_UPDATE, this.delayedSetRange);
       this.#delayedSetRange = false;
-      this.refresh();
+      this.jumpToStart();
     }
   }
   updateRange(pos) {
@@ -11109,12 +11117,7 @@ class TradeXchart extends tradeXChart {
     return true
   }
   refresh() {
-    this.MainPane.draw();
-    this.Chart.refresh();
-    const offCharts = this.MainPane.offCharts;
-    offCharts.forEach((offChart, key) => {
-      offChart.refresh();
-    });
+    this.MainPane.draw(undefined, true);
   }
   notImplemented() {
     if (!this.implemented) {

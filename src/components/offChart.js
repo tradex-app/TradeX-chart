@@ -148,7 +148,6 @@ export default class OffChart extends Chart {
   createGraph() {
 
     const indicator = [this.#overlay.name, {class: this.#Indicator, fixed: false, required: false, params: {overlay: this.#overlay}}]
-
     const overlays = copyDeep(defaultOverlays)
           overlays.splice(1, 0, indicator)
 
@@ -156,6 +155,11 @@ export default class OffChart extends Chart {
     this.#overlayIndicator = this.graph.overlays.get(this.#overlay.name).instance
   }
 
+  /**
+   * Refresh offChart - overlays, grid, scale
+   * Indicator
+   * @memberof OffChart
+   */
   refresh() {
     this.scale.draw()
     this.draw()

@@ -204,7 +204,9 @@ export default class OnChart extends Chart {
   }
 
   /**
-   * Refresh the entire chart
+   * Refresh the chart - grid, scale
+   * prices, candles / line / area
+   * indicators
    */
   refresh() {
     this.scale.draw()

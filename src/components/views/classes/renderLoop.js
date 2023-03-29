@@ -63,7 +63,6 @@ const renderLoop = {
     const [ID, frame] = firstItemInMap(this.renderQ)
 
     if (frame.range.constructor.name !== "RangeSnapshot") return
-
     for (let entry of frame.graphs) {
       if (isFunction(entry.draw)) entry.draw(frame.range, frame.update)
     }

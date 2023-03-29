@@ -335,7 +335,7 @@ const config5 = {
   // height: 800,
   utils: {},
   tools: {},
-  timeFrame: "1m",
+  timeFrame: "5m",
   rangeStartTS: rangeStartTS,
   rangeLimit: 30,
   theme: {
@@ -431,6 +431,8 @@ const configs = [
   {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
   {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
   {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
+  // {config: config5, stream: (chart) => {once(chart)}},
+
 ]
 
 const main = DOM.findBySelector('main')
@@ -579,9 +581,6 @@ function livePrice_Binance(chart, symbol="btcusdt", interval="1m") {
 }
 
 function onWSMessage (evt, chart) { 
-  
-
-  
   var msg = evt.data;
   var obj = JSON.parse(msg);
   if (typeof obj === "object" && obj.k) { 
@@ -591,13 +590,31 @@ function onWSMessage (evt, chart) {
         t: timeStamp // timestamp of current candle in milliseconds
         o: open  // open price
         h: high  // high price
+        l. low // low price
         c: close  // close price
         v: volume // volume
       }
     */
+    // console.log(obj.k)
     chart.stream.onTick(obj.k)   
   }
 };
+
+function once (chart) {
+  const tick = {
+    t: Date.now(), // timestamp of current candle in milliseconds
+    o: 28000,  // open price
+    h: 28100,  // high price
+    l: 28060,
+    c: 28080,  // close price
+    v: 3 // volume
+  }
+  chart.stream.onTick(tick)  
+  tick.t = Date.now()
+  tick.c = 28083
+  chart.stream.onTick(tick)  
+
+}
 
 
 // Add some charts

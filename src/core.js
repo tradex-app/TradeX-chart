@@ -746,14 +746,15 @@ export default class TradeXchart extends Tradex_chart {
     }
   }
 
+  /**
+   * When chart is empty postpone range setting
+   * until first candle, then position on last
+   */
   delayedSetRange() {
     while (this.#delayedSetRange) {
-      let r = this.range
-      let l = Math.floor((r.indexEnd - r.indexStart) / 2)
-      this.setRange(l * -1, l)
       this.off(STREAM_UPDATE, this.delayedSetRange)
       this.#delayedSetRange = false
-      this.refresh()
+      this.jumpToStart()
     }
   }
   
@@ -763,7 +764,6 @@ export default class TradeXchart extends Tradex_chart {
    * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
    */
   updateRange(pos) {
-
     if (!isArray(pos) || !isNumber(pos[4]) || pos[4] == 0) return
 
     let dist, offset, scrollPos, r;
@@ -920,13 +920,12 @@ export default class TradeXchart extends Tradex_chart {
    * @memberof TradeXchart
    */
   refresh() {
-    this.MainPane.draw()
-    this.Chart.refresh()
-    const offCharts = this.MainPane.offCharts
-    offCharts.forEach((offChart, key) => {
-      offChart.refresh()
-    })
-    // TODO: drawing tools
+    this.MainPane.draw(undefined, true)
+    // this.Chart.refresh()
+    // const offCharts = this.MainPane.offCharts
+    // offCharts.forEach((offChart, key) => {
+    //   offChart.refresh()
+    // })
   }
 
   notImplemented() {

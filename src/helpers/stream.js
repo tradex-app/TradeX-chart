@@ -75,9 +75,39 @@ export default class Stream {
   get config() { return this.#config }
   get countDownMS() { return this.#countDownMS }
   get countDown() { return this.#countDown }
+  get range() { return this.#core.range }
+  get status() { return this.#status }
+  set status({status, data}) {
+    this.#status = status
+    this.emit(status, data)
+  }
 
-  emit(topic, data) {
-    this.#core.emit(topic, data)
+  /**
+   * process price tick
+   *
+   * @param {object} data - t: timestamp, p: price, q: quantity
+   * @memberof Stream
+   */
+  set candle(data) {
+    // round time to nearest current time unit
+    data.t = this.roundTime(new Date(data.t))
+    // ensure values are numbers
+    data.o = data.o * 1
+    data.h = data.h * 1
+    data.l = data.l * 1
+    data.c = data.c * 1
+    data.v = data.v * 1
+
+    if (this.#candle[T] !== data.t) {
+      this.newCandle(data)
+    }
+    else {
+      this.updateCandle(data)
+    }
+    this.status = {status: STREAM_LISTENING, data: this.#candle}
+  }
+  get candle() {
+    return (this.#candle !== empty) ? this.#candle : null
   }
 
   start() {
@@ -91,6 +121,10 @@ export default class Stream {
 
   stop() {
     this.status = {status: STREAM_STOPPED}
+  }
+  
+  emit(topic, data) {
+    this.#core.emit(topic, data)
   }
 
   error() {
@@ -114,39 +148,6 @@ export default class Stream {
     }
   }
 
-  get range() { return this.#core.range }
-
-  get status() { return this.#status }
-  set status({status, data}) {
-    this.#status = status
-    this.emit(status, data)
-  }
-
-  /**
-   * process price tick
-   *
-   * @param {object} data - t: timestamp, p: price, q: quantity
-   * @memberof Stream
-   */
-  set candle(data) {
-    // round time to nearest current time unit
-    data.t = this.roundTime(new Date(data.t))
-
-    if (this.#candle[T] !== data.t) {
-      this.newCandle(data)
-    }
-    else {
-      this.updateCandle(data)
-    }
-    this.status = {status: STREAM_LISTENING, data: this.#candle}
-  }
-  get candle() {
-    return (this.#candle !== empty) ? this.#candle : null
-  }
-
-  roundTime(ts) {
-    return ts - (ts % this.#core.time.timeFrameMS)
-  }
 
   /**
    * add new candle to state data
@@ -157,8 +158,14 @@ export default class Stream {
   newCandle(data) {
     // create new stream candle
     this.prevCandle()
-    // this.#candle = [data.t, open, data.p, data.p, open, data.q, null, true]
-    this.#candle = [data.t, data.o, data.h, data.l, data.c, data.v, null, true]
+    this.#candle = 
+     [data.t, 
+      data.o, 
+      data.h, 
+      data.l, 
+      data.c, 
+      data.v, 
+      null, true]
     this.#core.mergeData({data: [this.#candle]}, true)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
     this.#countDownMS = this.#time.timeFrameMS
@@ -178,23 +185,13 @@ export default class Stream {
    * @memberof Stream
    */
   updateCandle(data) {
-
-    data.p = parseFloat(data.p)
-    data.q = parseFloat(data.q)
-
-    // https://stackoverflow.com/a/52772191
-
     let candle = this.#candle
-    // candle[H] = data.p > candle[H] ? data.p : candle[H]
-    // candle[L] = data.p < candle[L] ? data.p : candle[L]
-    // candle[C] = data.p
-    // candle[V] = parseFloat(candle[V] + data.q).toFixed(this.#precision)
 
-    candle[O] = parseFloat(data.o)
-    candle[H] = parseFloat(data.h)
-    candle[L] = parseFloat(data.l)
-    candle[C] = parseFloat(data.c)
-    candle[V] = parseFloat(data.v)
+    candle[O] = data.o
+    candle[H] = data.h
+    candle[L] = data.l
+    candle[C] = data.c
+    candle[V] = data.v
 
     // update the last candle in the state data
     this.#candle = candle
@@ -205,6 +202,8 @@ export default class Stream {
 
     this.countDownUpdate()
   }
+
+  parseCandle
 
   countDownUpdate() {
     let y,M,w,d,h,m,s,u;
@@ -261,4 +260,7 @@ export default class Stream {
     return this.#countDown
   }
 
+  roundTime(ts) {
+    return ts - (ts % this.#core.time.timeFrameMS)
+  }
 }
