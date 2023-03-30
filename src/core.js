@@ -752,9 +752,11 @@ export default class TradeXchart extends Tradex_chart {
    */
   delayedSetRange() {
     while (this.#delayedSetRange) {
+      let l = this.range.Length * 0.5
+      this.setRange(l * -1, l)
+      // this.jumpToTS(this.range.value)
       this.off(STREAM_UPDATE, this.delayedSetRange)
       this.#delayedSetRange = false
-      this.jumpToStart()
     }
   }
   

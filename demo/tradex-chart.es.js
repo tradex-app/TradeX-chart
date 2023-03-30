@@ -11018,9 +11018,10 @@ class TradeXchart extends tradeXChart {
   }
   delayedSetRange() {
     while (this.#delayedSetRange) {
+      let l = this.range.Length * 0.5;
+      this.setRange(l * -1, l);
       this.off(STREAM_UPDATE, this.delayedSetRange);
       this.#delayedSetRange = false;
-      this.jumpToStart();
     }
   }
   updateRange(pos) {

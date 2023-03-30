@@ -2,6 +2,12 @@
 
 ## [0.117.0] - 2023-03-27
 
+Fixed
+
+* FIXED: Stream - ensure tick values are numbers
+
+## [0.117.0] - 2023-03-27
+
 Added
 
 * Watermark
