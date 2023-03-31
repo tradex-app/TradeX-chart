@@ -117,17 +117,21 @@ export class Range {
         !isNumber(end) ||
         !isNumber(max)) return false
     // integer guard, prevent decimals
-    start = Math.floor(start)
-    end = Math.ceil(end)
-    max = Math.ceil(max)
+    start = start | 0
+    end = end | 0
+    max = max | 0
+    max = limit(max, this.minCandles, this.maxCandles)
 
     // check and correct start and end argument order
     if (start > end) [start, end] = [end, start]
-    // range length constraint
+    // constrain range length
     end = limit(end, start + this.minCandles, start + max)
-    // set out of history bounds limits
+    let len = end - start
+    // constrain range start
     start = limit(start, this.limitPast * -1,  this.dataLength + this.limitFuture - this.minCandles - 1)
-    end = limit(end, (this.limitPast * -1) + this.minCandles + 1, this.dataLength + this.limitFuture)
+    // constrain range end
+    end = limit(end, start + this.minCandles, this.dataLength + this.limitFuture - 1)
+    start = (end - start < len) ? start - (len - (end - start)) : start
   
     const newStart = start
     const newEnd = end

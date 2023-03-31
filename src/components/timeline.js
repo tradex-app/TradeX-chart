@@ -6,12 +6,12 @@ import DOM from "../utils/DOM"
 import xAxis from "./axis/xAxis"
 import CEL from "./primitives/canvas3"
 import Graph from "./views/classes/graph"
-import { InputController } from "../input/controller"
+import Input from "../input2"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-time"
 import { drawTextBG, getTextRectWidth } from "../utils/canvas"
-import { bRound } from "../utils/number"
-import { copyDeep, debounce } from "../utils/utilities"
+import { bRound, limit } from "../utils/number"
+import { copyDeep, debounce,throttle } from "../utils/utilities"
 import Slider from "./widgets/slider"
 
 import {
@@ -51,7 +51,7 @@ export default class Timeline {
   #layerOverlays
   #layerCursor
 
-  #controller
+  #input
   #slider
 
   #icons = {
@@ -183,19 +183,25 @@ export default class Timeline {
   end() {
     this.stateMachine.destroy()
     this.#viewport.destroy()
-    this.#controller = null
+
+    this.#input.off("dblclick", this.onDoubleClick)
+    this.#input.off("pointerenter", this.onPointerEnter)
+    this.#input.on("pointerdrag", this.onPointerDrag)
+    this.#input = null
     this.off("main_mousemove", this.drawCursorTime)
     this.off("setRange", this.onSetRange)
-
     this.#elFwdEnd.removeEventListener('click', debounce)
     this.#elRwdStart.removeEventListener('click', debounce)
   }
 
   eventsListen() {
-    let timeline = this.#elViewport
-    // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(timeline, {disableContextMenu: false});
-    this.#controller.on("dblclick", this.onDoubleClick.bind(this))
+    let timeline = this.viewport.scene.canvas
+
+    this.#input = new Input(timeline, {disableContextMenu: false});
+    this.#input.on("dblclick", this.onDoubleClick.bind(this))
+    this.#input.on("pointerenter", this.onPointerEnter.bind(this))
+    this.#input.on("pointerdrag", this.onPointerDrag.bind(this))
+    // this.#input.on("pointerdrag", throttle(this.onPointerDrag, 100, this, true));
 
     this.on("main_mousemove", this.drawCursorTime.bind(this))
     this.on("setRange", this.onSetRange.bind(this))
@@ -230,6 +236,17 @@ export default class Timeline {
     }
   }
 
+  onPointerEnter(e) {
+    e.domEvent.target.style.cursor = "ew-resize"
+  }
+
+  onPointerDrag(e) {
+    let r = this.range
+    let start = r.indexStart - e.movement.x
+    let end = r.indexEnd
+    r.set(start,end)
+  }
+
   onDoubleClick(e) {
     this.core.jumpToEnd()
   }
@@ -243,13 +260,14 @@ export default class Timeline {
   }
 
   onSetRange() {
-    let start = this.range.indexStart
-    let end = this.range.indexEnd
+    let r = this.range
+    let start = r.indexStart
+    let end = r.indexEnd
     let scrollBarW = this.#elNavScrollBar.getBoundingClientRect().width
-    let rangeW = this.range.dataLength + this.range.limitFuture + this.range.limitPast
+    let rangeW = r.dataLength + r.limitFuture + r.limitPast
     let ratio = scrollBarW / rangeW
-    let handleW = this.range.Length * ratio
-    let pos = ((start + this.range.limitPast) * ratio)
+    let handleW = r.Length * ratio
+    let pos = ((start + r.limitPast) * ratio)
 
     this.#slider.setHandleDims(pos, handleW)
   }

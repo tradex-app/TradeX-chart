@@ -1,10 +1,22 @@
 # Change Log
 
-## [0.117.0] - 2023-03-27
+## [0.117.3] - 2023-03-31
 
 Fixed
 
-* FIXED: Stream - ensure tick values are numbers
+* Time scale drag to zoom candle history range
+
+## [0.117.2] - 2023-03-30
+
+Fixed
+
+* Centering on first stream candle of empty chart
+
+## [0.117.1] - 2023-03-30
+
+Fixed
+
+* Stream - ensure tick values are numbers
 
 ## [0.117.0] - 2023-03-27
 
