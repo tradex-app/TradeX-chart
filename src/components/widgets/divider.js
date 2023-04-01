@@ -3,9 +3,7 @@
 
 import DOM from "../../utils/DOM"
 import { isNumber } from "../../utils/typeChecks"
-import { debounce, throttle } from "../../utils/utilities"
-import { InputController, Keys } from "../../input/controller"
-import Input from "../../input2"
+import Input from "../../input"
 
 import {
   CLASS_DIVIDERS

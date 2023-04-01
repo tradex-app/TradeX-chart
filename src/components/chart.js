@@ -11,8 +11,7 @@ import {
 } from "../utils/typeChecks";
 import CEL from "../components/primitives/canvas3";
 import StateMachine from "../scaleX/stateMachne";
-import { InputController, Keys } from "../input/controller";
-import Input from "../input2"
+import Input from "../input"
 import {
   STREAM_ERROR,
   STREAM_NONE,
@@ -22,7 +21,6 @@ import {
   STREAM_UPDATE,
 } from "../definitions/core";
 import { BUFFERSIZE } from "../definitions/chart";
-import { timestampDiff } from "../utils/time";
 
 export default class Chart {
   #ID;
@@ -287,6 +285,10 @@ export default class Chart {
     };
   }
 
+  /**
+   * Set chart and it's scale height
+   * @param {number} h 
+   */
   setHeight(h) {
     if (!isNumber(h)) h = this.height || this.#parent.height;
 
@@ -297,9 +299,9 @@ export default class Chart {
   }
 
   /**
- * Set chart dimensions
- * @param {object} dim - dimensions {w:width, h: height}
- */
+   * Set chart dimensions
+   * @param {object} dim - dimensions {w:width, h: height}
+   */
   setDimensions(dim) {
     const buffer = this.config.buffer || BUFFERSIZE
       let {w, h} = dim
@@ -308,9 +310,10 @@ export default class Chart {
     
     this.layerWidth = Math.round(w * ((100 + buffer) * 0.01))
     this.graph.setSize(w, h, this.layerWidth)
-    // this.graph.setSize(w, h, this.width)
     // element widths are automatically handled by CSS
     this.setHeight(h)
+    this.draw(undefined, true)
+    this.core.MainPane.draw(undefined, false)
   }
 
   setCursor(cursor) {
@@ -387,9 +390,7 @@ export default class Chart {
   }
 
   draw(range=this.range, update=false) {
-    // window.requestAnimationFrame(() =>
       this.#Graph.draw(range, update)
-    // )
   }
 
   drawGrid() {

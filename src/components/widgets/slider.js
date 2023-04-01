@@ -5,8 +5,8 @@ import DOM from "../../utils/DOM"
 import Colour from "../../utils/colour"
 import { isFunction, isNumber } from "../../utils/typeChecks"
 import { debounce, throttle } from "../../utils/utilities"
-import { InputController, Keys } from "../../input/controller"
 import { limit } from "../../utils/number"
+import Input from "../../input"
 
 
 export default class Slider {
@@ -26,7 +26,7 @@ export default class Slider {
 
   #cursorPos
   #sliderPos = {x: 0, drag: false}
-  #controller
+  #input
   #callback
 
   constructor(config) {
@@ -49,15 +49,14 @@ export default class Slider {
   // TODO: remove event listeners on destroy
 
   eventsListen() {
-    // create controller and use 'on' method to receive input events
-  this.#controller = new InputController(this.#elHandle, {disableContextMenu: false});
+  this.#input = new Input(this.#elHandle, {disableContextMenu: false});
 
-  this.#controller.on("mouseenter", debounce(this.onMouseEnter, 1, this, true));
-  this.#controller.on("mouseout", debounce(this.onMouseOut, 1, this, true));
-  this.#controller.on("drag", throttle(this.onHandleDrag, 100, this, true));
-  this.#controller.on("enddrag", this.onHandleDragDone.bind(this));
-  this.#controller.on("mousedown", debounce(this.onMouseDown, 100, this, true));
-  this.#controller.on("mouseup", this.onMouseUp.bind(this));
+  this.#input.on("mouseenter", debounce(this.onMouseEnter, 1, this, true));
+  this.#input.on("mouseout", debounce(this.onMouseOut, 1, this, true));
+  this.#input.on("drag", throttle(this.onHandleDrag, 100, this, true));
+  this.#input.on("enddrag", this.onHandleDragDone.bind(this));
+  this.#input.on("mousedown", debounce(this.onMouseDown, 100, this, true));
+  this.#input.on("mouseup", this.onMouseUp.bind(this));
   }
 
   on(topic, handler, context) {

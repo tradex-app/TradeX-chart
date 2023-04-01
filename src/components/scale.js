@@ -8,7 +8,7 @@ import CEL from "./primitives/canvas3"
 import { drawTextBG } from "../utils/canvas"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
-import Input from '../input2'
+import Input from '../input'
 import { copyDeep, uid } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
 import scalePriceLine from './overlays/scale-priceLine'
@@ -162,6 +162,7 @@ export default class ScaleBar {
 
   onResize(dimensions) {
     this.setDimensions(dimensions)
+    console.log(this.parent.id,"scale resize")
   }
 
   onMouseMove(e) {
@@ -221,7 +222,7 @@ export default class ScaleBar {
     this.#layerCursor.setSize(width, dim.h)
 
     this.setHeight(dim.h)
-    this.draw(undefined, true)
+    this.draw()
   }
 
   setScaleRange(r) {

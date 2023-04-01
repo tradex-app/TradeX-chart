@@ -4,6 +4,10 @@ import { isBoolean, isFunction, isObject } from "../utils/typeChecks";
 import DOM from "../utils/DOM";
 import { Point } from "./definitions";
 
+// Keyboard events, key code definitions
+// https://www.toptal.com/developers/keycode
+// https://www.freecodecamp.org/news/javascript-keycode-list-keypress-event-key-codes/
+// https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode
 const keyboard = [
   "keypress",
   "keydown",
@@ -109,19 +113,19 @@ export class EventsAgent {
         case "pointerdown":
             cb = function (e) {
               this.onPointerDown(e)
-              handler(this.createEventArgument(e))
+              handler(this.createPointerEventArgument(e))
             }
             break;
         case "pointerup":
           cb = function (e) {
             this.onPointerUp(e)
-            handler(this.createEventArgument(e))
+            handler(this.createPointerEventArgument(e))
           }
           break;
         case "pointermove":
           cb = function (e) {
             this.motion(e)
-            handler(this.createEventArgument(e))
+            handler(this.createPointerEventArgument(e))
             // console.log(`e.composedPath: `,e.composedPath())
           }
           break;
@@ -134,13 +138,13 @@ export class EventsAgent {
         case "contextmenu":
           cb = function (e) {
             this.location(e)
-            handler(this.createEventArgument(e))
+            handler(this.createPointerEventArgument(e))
           }
           break;
         case "wheel":
           cb = function (e) {
             this.wheeldelta = e.wheelDelta;
-            handler(this.createEventArgument(e))
+            handler(this.createPointerEventArgument(e))
           }
           break;
         case "pointercancel":
@@ -168,7 +172,7 @@ export class EventsAgent {
         case "pointerdragend":
           cb = function (e) {
             this.motion(e)
-            handler(this.createEventArgument(e))
+            handler(this.createPointerEventArgument(e))
           }
           this.element.addEventListener(event, cb.bind(this), options)
           break;
@@ -210,7 +214,7 @@ export class EventsAgent {
     }
 
     let cb = function (e) {
-      e = this.createEventArgument(e)
+      e = this.createPointerEventArgument(e)
       handler(e)
     }
     this.dragStatus = "ready"
@@ -251,9 +255,10 @@ export class EventsAgent {
     }
   }
 
-  createEventArgument(e) {
+  createPointerEventArgument(e) {
     return {
       isProcessed: false,
+      pointerType: e.pointerType,
       position: this.position.clone(),
       movement: this.movement.clone(),
       dragstart: this.dragstart.clone(),
@@ -299,5 +304,9 @@ export class EventsAgent {
 
     this.movement.x = 0;
     this.movement.y = 0;
+  }
+
+  createKeyEventArgument(e) {
+    return e
   }
 }

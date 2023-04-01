@@ -2,7 +2,7 @@
 
 import { isObject } from "../../utils/typeChecks"
 import { uid } from "../../utils/utilities"
-import Input from "../../input2"
+import Input from "../../input"
 
 export default class Legends {
 

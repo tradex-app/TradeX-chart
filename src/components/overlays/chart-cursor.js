@@ -2,7 +2,7 @@
 
 import Overlay from "./overlay"
 import { isObject } from "../../utils/typeChecks"
-import Input from "../../input2"
+import Input from "../../input"
 
 export default class chartCursor extends Overlay{
 

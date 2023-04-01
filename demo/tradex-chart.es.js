@@ -1010,13 +1010,16 @@ class Range$1 {
     if (!isNumber(start) ||
         !isNumber(end) ||
         !isNumber(max)) return false
-    start = Math.floor(start);
-    end = Math.ceil(end);
-    max = Math.ceil(max);
+    start = start | 0;
+    end = end | 0;
+    max = max | 0;
+    max = limit$1(max, this.minCandles, this.maxCandles);
     if (start > end) [start, end] = [end, start];
     end = limit$1(end, start + this.minCandles, start + max);
+    let len = end - start;
     start = limit$1(start, this.limitPast * -1,  this.dataLength + this.limitFuture - this.minCandles - 1);
-    end = limit$1(end, (this.limitPast * -1) + this.minCandles + 1, this.dataLength + this.limitFuture);
+    end = limit$1(end, start + this.minCandles, this.dataLength + this.limitFuture - 1);
+    start = (end - start < len) ? start - (len - (end - start)) : start;
     const newStart = start;
     const newEnd = end;
     const oldStart = this.indexStart;
@@ -3422,7 +3425,7 @@ const status = {
   dragStart: 1,
   dragging: 2
 };
-class Point$1 {
+class Point {
   x = 0;
   y = 0;
   constructor() {
@@ -3437,7 +3440,7 @@ class Point$1 {
     }
   }
   clone() {
-    return new Point$1(this.x, this.y);
+    return new Point(this.x, this.y);
   }
 }
 
@@ -3492,11 +3495,11 @@ class EventsAgent {
     } else {
       this.type = [...keyboard, ...mouse, ...touch, ...pen, ...misc, ...custom];
     }
-    this.clientPosPrev = new Point$1([null, null]);
-    this.position = new Point$1();
-    this.movement = new Point$1([0, 0]);
-    this.dragstart = new Point$1([null, null]);
-    this.dragend = new Point$1([null, null]);
+    this.clientPosPrev = new Point([null, null]);
+    this.position = new Point();
+    this.movement = new Point([0, 0]);
+    this.dragstart = new Point([null, null]);
+    this.dragend = new Point([null, null]);
     this.dragCheckThreshold = 3;
     this.dragStatus = false;
     this.wheeldelta = 0;
@@ -3519,19 +3522,19 @@ class EventsAgent {
         case "pointerdown":
             cb = function (e) {
               this.onPointerDown(e);
-              handler(this.createEventArgument(e));
+              handler(this.createPointerEventArgument(e));
             };
             break;
         case "pointerup":
           cb = function (e) {
             this.onPointerUp(e);
-            handler(this.createEventArgument(e));
+            handler(this.createPointerEventArgument(e));
           };
           break;
         case "pointermove":
           cb = function (e) {
             this.motion(e);
-            handler(this.createEventArgument(e));
+            handler(this.createPointerEventArgument(e));
           };
           break;
         case "click":
@@ -3543,13 +3546,13 @@ class EventsAgent {
         case "contextmenu":
           cb = function (e) {
             this.location(e);
-            handler(this.createEventArgument(e));
+            handler(this.createPointerEventArgument(e));
           };
           break;
         case "wheel":
           cb = function (e) {
             this.wheeldelta = e.wheelDelta;
-            handler(this.createEventArgument(e));
+            handler(this.createPointerEventArgument(e));
           };
           break;
         case "pointercancel":
@@ -3574,7 +3577,7 @@ class EventsAgent {
         case "pointerdragend":
           cb = function (e) {
             this.motion(e);
-            handler(this.createEventArgument(e));
+            handler(this.createPointerEventArgument(e));
           };
           this.element.addEventListener(event, cb.bind(this), options);
           break;
@@ -3606,7 +3609,7 @@ class EventsAgent {
       this.element.addEventListener("pointermove", this.onPointerMove.bind(this), options);
     }
     let cb = function (e) {
-      e = this.createEventArgument(e);
+      e = this.createPointerEventArgument(e);
       handler(e);
     };
     this.dragStatus = "ready";
@@ -3639,9 +3642,10 @@ class EventsAgent {
       e.target.dispatchEvent(this.pointerdragend);
     }
   }
-  createEventArgument(e) {
+  createPointerEventArgument(e) {
     return {
       isProcessed: false,
+      pointerType: e.pointerType,
       position: this.position.clone(),
       movement: this.movement.clone(),
       dragstart: this.dragstart.clone(),
@@ -3677,15 +3681,18 @@ class EventsAgent {
     this.movement.x = 0;
     this.movement.y = 0;
   }
+  createKeyEventArgument(e) {
+    return e
+  }
 }
 
-const defaultOptions$3 = {
+const defaultOptions$2 = {
   element: undefined,
   contextMenu: true
 };
 class Input  {
   constructor (element, options) {
-    this.options = { ...defaultOptions$3, ...options };
+    this.options = { ...defaultOptions$2, ...options };
     this.status = status.idle;
     this.element = element;
     if (!this.element && this.options.elementId) {
@@ -5343,625 +5350,6 @@ class UtilsBar {
   }
 }
 
-const OperationModes = {
-  None: 0,
-  DragReady: 1,
-  Dragging: 2,
-};
-class Point {
-  constructor() {
-    this.set(...arguments);
-  }
-  set() {
-    if (arguments.length === 0) {
-      this.x = 0; this.y = 0;
-    } else if (arguments.length === 1) {
-      const { x, y } = arguments[0];
-      this.x = x; this.y = y;
-    } else if (arguments.length > 1) {
-      const [x, y] = arguments;
-      this.x = x; this.y = y;
-    }
-  }
-  clone() {
-    return new Point(this.x, this.y);
-  }
-}
-
-const MouseButtons = {
-  None: 0,
-  Left: 1,
-  Middle: 2,
-  Right: 3,
-};
-class MouseAgent {
-  constructor(controller) {
-    this.controller = controller;
-    this.element = controller.element;
-    this.position = new Point();
-    this.movement = new Point();
-    this.firstMovementUpdate = true;
-    this.dragstart = new Point();
-    this.dragend = new Point();
-    this.dragCheckThreshold = 3;
-    this.wheeldelta = 0;
-    this.pressedButtons = [];
-    this.attach();
-  }
-  attach() {
-    const element = this.element;
-    const controller = this.controller;
-    element.addEventListener("mousedown", (e) => {
-      const clientRect = element.getBoundingClientRect();
-      this.position.x = e.clientX - clientRect.left;
-      this.position.y = e.clientY - clientRect.top;
-      this.movement.x = 0;
-      this.movement.y = 0;
-      this.dragstart.x = this.position.x;
-      this.dragstart.y = this.position.y;
-      switch (e.button) {
-        case 0: this.pressedButtons._t_pushIfNotExist(MouseButtons.Left); break;
-        case 1: this.pressedButtons._t_pushIfNotExist(MouseButtons.Middle); break;
-        case 2: this.pressedButtons._t_pushIfNotExist(MouseButtons.Right); break;
-      }
-      this.controller.operationMode = OperationModes.DragReady;
-      controller.raise(this, "mousedown", this.createEventArgument(e));
-    });
-    element.addEventListener("dblclick", (e) => {
-      const clientRect = element.getBoundingClientRect();
-      this.position.x = e.clientX - clientRect.left;
-      this.position.y = e.clientY - clientRect.top;
-      this.movement.x = 0;
-      this.movement.y = 0;
-      switch (e.button) {
-        case 0: this.pressedButtons._t_pushIfNotExist(MouseButtons.Left); break;
-        case 1: this.pressedButtons._t_pushIfNotExist(MouseButtons.Middle); break;
-        case 2: this.pressedButtons._t_pushIfNotExist(MouseButtons.Right); break;
-      }
-      controller.raise(this, "dblclick", this.createEventArgument(e));
-    });
-    element.addEventListener("mousemove", e => {
-      if (controller.operationMode == OperationModes.DragReady) {
-        if (Math.abs(this.position.x - this.dragstart.x) > this.dragCheckThreshold
-          || Math.abs(this.position.y - this.dragstart.y) > this.dragCheckThreshold) {
-          controller.raise(this, "begindrag", this.createEventArgument(e));
-          controller.operationMode = OperationModes.Dragging;
-        }
-      }
-      else if (controller.operationMode === OperationModes.None) {
-        const clientRect = element.getBoundingClientRect();
-        const client = {
-          x: e.clientX - clientRect.left,
-          y: e.clientY - clientRect.top
-        };
-        if (this.firstMovementUpdate) {
-          this.movement.x = 0;
-          this.movement.y = 0;
-          this.firstMovementUpdate = false;
-        } else {
-          this.movement.x = client.x - this.position.x;
-          this.movement.y = client.y - this.position.y;
-        }
-        this.position.x = client.x;
-        this.position.y = client.y;
-        if (Math.abs(this.movement.x) > 0 || Math.abs(this.movement.y) > 0) {
-          controller.raise(this, "mousemove", this.createEventArgument(e));
-        }
-      }
-    });
-    element.addEventListener("wheel", (e) => {
-      this.wheeldelta = e.wheelDelta;
-      const arg = this.createEventArgument(e);
-      controller.raise(this, "mousewheel", arg);
-      if (arg.isProcessed) {
-        e.preventDefault();
-        return false;
-      }
-    }, { passive: false });
-    element.addEventListener("mouseenter", (e) => {
-      controller.raise(this, "mouseenter", this.createEventArgument(e));
-    });
-    element.addEventListener("mouseout", (e) => {
-      controller.raise(this, "mouseout", this.createEventArgument(e));
-    });
-    window.addEventListener("mousemove", (e) => {
-      const clientRect = element.getBoundingClientRect();
-      const client = {
-        x: e.clientX - clientRect.left,
-        y: e.clientY - clientRect.top
-      };
-      if (this.firstMovementUpdate) {
-        this.movement.x = 0;
-        this.movement.y = 0;
-        this.firstMovementUpdate = false;
-      } else {
-        this.movement.x = client.x - this.position.x;
-        this.movement.y = client.y - this.position.y;
-      }
-      this.position.x = client.x;
-      this.position.y = client.y;
-      switch (controller.operationMode) {
-        case OperationModes.Dragging:
-          controller.raise(this, "drag", this.createEventArgument(e));
-          break;
-      }
-    });
-    element.addEventListener("mouseup", e => {
-      if (controller.operationMode !== OperationModes.Dragging) {
-        controller.raise(this, "mouseup", this.createEventArgument(e));
-      }
-    });
-    window.addEventListener("mouseup", e => {
-      if (controller.operationMode === OperationModes.Dragging) {
-        controller.raise(this, "enddrag", this.createEventArgument(e));
-      }
-      controller.operationMode = OperationModes.None;
-      switch (e.button) {
-        case 0: this.pressedButtons._t_remove(MouseButtons.Left); break;
-        case 1: this.pressedButtons._t_remove(MouseButtons.Middle); break;
-        case 2: this.pressedButtons._t_remove(MouseButtons.Right); break;
-      }
-    });
-  }
-  isButtonPressed(button) {
-    return this.pressedButtons.includes(button);
-  }
-  createEventArgument(e) {
-    return {
-      isProcessed: false,
-      position: this.position.clone(),
-      movement: this.movement.clone(),
-      dragstart: this.dragstart.clone(),
-      dragend: this.dragend.clone(),
-      wheeldelta: this.wheeldelta,
-      domEvent: e,
-      timestamp: Date.now()
-    }
-  }
-  setCursor(type) {
-		this.element.style.cursor = type;
-	}
-}
-
-if (!Array.prototype._t_foreach) {
-	Object.defineProperty(Array.prototype, "_t_foreach", {
-		value: function(iterator) {
-			if (typeof iterator !== "function") return;
-			for (let i = 0; i < this.length; i++) {
-				const element = this[i];
-				iterator.call(this, i, element);
-			}
-		},
-		enumerable: false
-	});
-}
-if (!Array.prototype._t_remove) {
-	Object.defineProperty(Array.prototype, "_t_remove", {
-		value: function(element) {
-			var index = this.indexOf(element);
-			if (index > -1) this.splice(index, 1);
-		},
-		enumerable: false
-	});
-}
-if (!Array.prototype._t_removeAt) {
-	Object.defineProperty(Array.prototype, "_t_removeAt", {
-		value: function(index, count = 1) {
-			this.splice(index, count);
-		}
-	});
-}
-if (!Array.prototype._t_clear) {
-	Object.defineProperty(Array.prototype, "_t_clear", {
-		value: function() {
-			this.length = 0;
-		},
-		enumerable: false
-	});
-}
-if (!Array.prototype._t_pushIfNotExist) {
-	Object.defineProperty(Array.prototype, "_t_pushIfNotExist", {
-		value: function(element) {
-			if (!this.includes(element)) {
-				this.push(element);
-			}
-		},
-		enumerable: false
-	});
-}
-if (!Array.prototype._t_set) {
-	Object.defineProperty(Array.prototype, "_t_set", {
-		value: function(i) {
-			if (arguments.length > 1) {
-				for (var j = 1; j < arguments.length - 1; j++) {
-					this[i++] = arguments[j];
-				}
-			}
-		},
-		enumerable: false
-	});
-}
-if (!Object.prototype._t_foreach) {
-  Object.defineProperty(Object.prototype, "_t_foreach", {
-    value: function(iterator) {
-      if (this == null) {
-        throw Error("Cannot iterate over null object");
-      }
-      const _this = this || window;
-      for (const key in _this) {
-        if (_this.hasOwnProperty(key)) {
-          const ret = iterator.call(_this, key, _this[key]);
-          if (ret === false) break;
-        }
-      }
-    },
-    enumerable: false,
-  });
-}
-
-class EventDispatcher {
-  constructor(cstor) {
-    if (!cstor) {
-      throw Error("Object to define events cannot be null or undefined");
-    }
-    this.cstor = cstor;
-    const cstorProto = Object.getPrototypeOf(cstor);
-    if (cstorProto.__events) {
-      cstor.__events = { ...cstorProto.__events };
-    } else {
-      cstor.__events = {};
-    }
-  }
-  registerEvents() {
-    for (let i = 0; i < arguments.length; i++) {
-      const eventName = arguments[i];
-      this.cstor.__events[eventName] = null;
-      this.setupPrototypeEventDispatcher(this.cstor, eventName);
-		}
-  }
-  setupPrototypeEventDispatcher(cstor, name) {
-    const _this = this;
-    const addEventListener = function(eventName, listener) {
-      const obj = this;
-      if (eventName.indexOf(" ") > 0) {
-        const eventNames = eventName.split(" ");
-        for (let i = 0; i < eventNames.length; i++) {
-          _this.addEventListenerForObject(obj, eventNames[i], listener);
-        }
-      } else {
-        _this.addEventListenerForObject(obj, eventName, listener);
-      }
-      return listener;
-    };
-    const raiseEvent = function(name, args) {
-      if (typeof this._eventListeners !== "object"
-        || !this._eventListeners.hasOwnProperty(name)) {
-        return;
-      }
-      const listenerList = this._eventListeners[name];
-      let ret;
-      for (let i = 0; i < listenerList.length; i++) {
-        const listener = listenerList[i];
-        ret = listener.call(this, args);
-        if (ret) {
-          break;
-        }
-      }
-      return ret;
-    };
-    const proto = cstor.prototype;
-    proto.addEventListener = addEventListener;
-      proto.on = proto.addEventListener;
-      proto.raiseEvent = raiseEvent;
-    if (typeof proto.removeEventListener !== "function") {
-      proto.removeEventListener = function(eventName, listener) {
-        if (!this._eventListeners.hasOwnProperty(eventName)) {
-          if (!(function() {
-            if (eventName.startsWith("on")) {
-              const eventNameWithoutOn = eventName.substr(2);
-              if (cstor.__events.hasOwnProperty(eventNameWithoutOn)) {
-                console.warn("recommended to remove 'on' prefix for removing event listener: " + eventName);
-                eventName = eventNameWithoutOn;
-                return true;
-              }
-            }
-            return false;
-          })()) {
-            console.warn("listener to be removed from an event which does not exist: " + eventName);
-            return;
-          }
-        }
-        this._eventListeners[eventName]._t_remove(listener);
-      };
-    }
-    Object.defineProperty(proto, "on" + name, {
-      get: function() {
-        return function() {
-          return raiseEvent.call(this, name, ...arguments);
-        }
-      },
-      set: function(listener) {
-        if (typeof this._eventListeners === "undefined") {
-          Object.defineProperty(this, "_eventListeners", {
-            value: {},
-            enumerable: false,
-          });
-        }
-        this._eventListeners[name] = [listener];
-      },
-      enumerable: false,
-    });
-  }
-  addEventListenerForObject(obj, eventName, listener) {
-    const cstor = Object.getPrototypeOf(obj).constructor;
-    if (!cstor.__events.hasOwnProperty(eventName)) {
-      if (!(function() {
-        if (eventName.startsWith("on")) {
-          const eventNameWithoutOn = eventName.substr(2);
-          if (cstor.__events.hasOwnProperty(eventNameWithoutOn)) {
-            console.warn("recommended to remove 'on' prefix for adding event listener: " + eventName);
-            eventName = eventNameWithoutOn;
-            return true;
-          }
-        }
-        return false;
-      }).call(this)) {
-        console.warn("event to be listened does not exist: " + eventName);
-        return;
-      }
-    }
-    if (typeof obj._eventListeners === "undefined") {
-      Object.defineProperty(obj, "_eventListeners", {
-        value: {},
-        enumerable: false,
-      });
-    }
-    if (!obj._eventListeners.hasOwnProperty(eventName)) {
-      obj._eventListeners[eventName] = [];
-    }
-    obj._eventListeners[eventName]._t_pushIfNotExist(listener);
-  }
-}
-
-const Keys = {
-  Backspace: 8, Tab: 9, Enter: 13,
-  Shift: 16, Control: 17, Alt: 18,
-  Escape: 27, Space: 32, PageUp: 33, PageDown: 34,
-  End: 35, Home: 36,
-  Left: 37, Up: 38, Right: 39, Down: 40,
-  Insert: 45, Delete: 46,
-  D0: 48, D1: 49, D2: 50, D3: 51, D4: 52,
-  D5: 53, D6: 54, D7: 55, D8: 56, D9: 57,
-  A: 65, B: 66, C: 67, D: 68, E: 69, F: 70, G: 71,
-  H: 72, I: 73, J: 74, K: 75, L: 76, M: 77, N: 78,
-  O: 79, P: 80, Q: 81, R: 82, S: 83, T: 84,
-  U: 85, V: 86, W: 87, X: 88, Y: 89, Z: 90,
-  Command_Firefox: 224, Command_Opera: 17,
-  Command_Left: 91, Command_Right: 93,
-  Multiply: 106, Add: 107, Subtract: 108, Divide: 111,
-  Backquote: 192,
-};
-const FunctionKeys = {
-  Control: 0x1000,
-  Alt: 0x2000,
-  Shift: 0x4000,
-  Command: 0x10000,
-  Windows: 0x20000,
-};
-const functionKeyCode = [
-  Keys.Control, Keys.Shift, Keys.Alt,
-  Keys.Command_Left, Keys.Command_Right,
-  Keys.Command_Firefox, Keys.Command_Opera
-];
-function isFunctionKey(keyCode) {
-  return functionKeyCode.includes(keyCode);
-}
-class KeyboardAgent {
-  constructor(controller) {
-    this.controller = controller;
-    this.element = controller.element;
-    this.lastKeyCode = 0;
-    this.pressedKeys = [];
-    this.attach();
-  }
-  attach() {
-    const controller = this.controller;
-    const element = this.element;
-    element.addEventListener("keydown", e => {
-      this.pressedKeys._t_pushIfNotExist(e.keyCode);
-      this.lastKeyCode = e.keyCode;
-      const arg = this.createEventArgument(e);
-      if (arg.isHotkey) {
-        controller.raise(this, "hotkey", arg);
-      }
-      if (!arg.isProcessed) {
-        controller.raise(this, "keydown", arg);
-      }
-      if (arg.isProcessed) {
-        e.preventDefault();
-        return false;
-      }
-    });
-    element.addEventListener("keyup", (e) => {
-      this.pressedKeys._t_remove(e.keyCode);
-      this.lastKeyCode = e.keyCode;
-      const arg = this.createEventArgument(e);
-      controller.raise(this, "keyup", arg);
-      if (arg.isProcessed) {
-        e.preventDefault();
-        return false;
-      }
-    });
-    element.addEventListener("blur", (e) => {
-      this.pressedKeys = [];
-    });
-    window.addEventListener("blur", (e) => {
-      this.pressedKeys = [];
-    });
-  }
-  createEventArgument(e) {
-    const arg = {
-      domEvent: e,
-      keyCode: e.keyCode,
-      keyValue: e.keyCode,
-    };
-    let functionKeyDown = false;
-    if (e.ctrlKey) {
-      arg.keyValue |= FunctionKeys.Control;
-      functionKeyDown = true;
-    }
-    if (e.altKey) {
-      arg.keyValue |= FunctionKeys.Alt;
-      functionKeyDown = true;
-    }
-    if (e.shiftKey) {
-      arg.keyValue |= FunctionKeys.Shift;
-      functionKeyDown = true;
-    }
-    if (e.metaKey) {
-      arg.keyValue |= FunctionKeys.Command;
-      functionKeyDown = true;
-    }
-    if (functionKeyDown) {
-      if (!isFunctionKey(e.keyCode)) arg.isHotkey = true;
-    }
-    return arg;
-  }
-  isKeyPressed(key) {
-    return this.pressedKeys.includes(key);
-  }
-}
-
-class TouchAgent {
-  constructor(controller) {
-    this.controller = controller;
-    this.element = controller.element;
-    this.fingers = 0;
-    this.attach();
-  }
-  attach() {
-    const controller = this.controller;
-    const element = this.element;
-    const mouseAgent = this.controller.mouseAgent;
-    element.addEventListener("touchstart", (e) => {
-      if (typeof e.touches === "object") {
-        const t = e.touches[0];
-        const clientRect = element.getBoundingClientRect();
-        mouseAgent.position.x = t.clientX - clientRect.left;
-        mouseAgent.position.y = t.clientY - clientRect.top;
-        mouseAgent.movement.x = 0;
-        mouseAgent.movement.y = 0;
-        mouseAgent.dragstart.x = mouseAgent.position.x;
-        mouseAgent.dragstart.y = mouseAgent.position.y;
-        controller.operationMode = OperationModes.DragReady;
-        this.fingers = e.touches.length;
-        controller.raise(this, "mousedown", this.createEventArgument(e));
-      }
-    }, { passive: true });
-    window.addEventListener("touchmove", (e) => {
-			if (typeof e.touches === "object") {
-				const t = e.touches[0];
-				const clientRect = element.getBoundingClientRect();
-				const client = {
-					x: t.clientX - clientRect.left,
-					y: t.clientY - clientRect.top
-        };
-				mouseAgent.movement.x = (client.x - mouseAgent.position.x);
-				mouseAgent.movement.y = (client.y - mouseAgent.position.y);
-				mouseAgent.position.x = client.x;
-				mouseAgent.position.y = client.y;
-				switch (controller.operationMode) {
-					case OperationModes.DragReady:
-            controller.raise(this, "begindrag", this.createEventArgument(e));
-						e.preventDefault();
-						controller.operationMode = OperationModes.Dragging;
-						break;
-					case OperationModes.Dragging:
-  					controller.raise(this, "drag", this.createEventArgument(e));
-						e.preventDefault();
-						break;
-				}
-			}
-		}, { passive: false });
-		window.addEventListener("touchend", (e) => {
-			if (e.touches) {
-				this.fingers = e.length;
-			} else {
-				this.fingers = 0;
-      }
-      if (controller.operationMode === OperationModes.Dragging) {
-        controller.raise(this, "enddrag", this.createEventArgument(e));
-        controller.operationMode = OperationModes.None;
-      } else {
-        controller.operationMode = OperationModes.None;
-        controller.raise(this, "mouseup", this.createEventArgument(e));
-      }
-		});
-	}
-  createEventArgument(e) {
-    const arg = this.controller.mouseAgent.createEventArgument(e);
-    arg.touch = {
-			fingers: this.fingers
-		};
-		return arg;
-	}
-}
-
-const defaultOptions$2 = {
-  elementId: undefined,
-  elementInstance: undefined,
-  disableContextMenu: true,
-};
-class InputController {
-  constructor(element, options) {
-    this.options = { ...defaultOptions$2, ...options };
-    this.operationMode = OperationModes.None;
-    this.element = element;
-    if (!this.element && this.options.elementId) {
-      this.element = document.getElementById(this.options.elementId);
-    }
-    if (!this.element) {
-      throw "Must specify an element to receive user input.";
-    }
-    this.mouseAgent = new MouseAgent(this);
-    this.keyboardAgent = new KeyboardAgent(this);
-    this.touchAgent = new TouchAgent(this);
-    this.currentAgent = null;
-    if (this.options.disableContextMenu) {
-      window.oncontextmenu = (e) => {
-        e.preventDefault();
-        return false;
-      };
-    }
-  }
-  raise(agent, eventName, args) {
-    this.currentAgent = agent;
-    this.raiseEvent(eventName, this.createEventArgument(args));
-  }
-  createEventArgument(args) {
-    const arg = args || {};
-    arg.isButtonPressed = button => this.isButtonPressed(button);
-    arg.isKeyPressed = key => this.isKeyPressed(key);
-    arg.controller = this;
-    return arg;
-  }
-  isButtonPressed(button) {
-    return this.mouseAgent.isButtonPressed(button);
-  }
-  isKeyPressed(key) {
-    return this.keyboardAgent.isKeyPressed(key);
-  }
-  setCursor(type) {
-    this.mouseAgent.setCursor(type);
-  }
-}
-new EventDispatcher(InputController).registerEvents(
-  "mousedown", "mouseup", "mousemove", "mouseenter", "mouseout", "mousewheel",
-  "dblclick",
-  "keydown", "keyup", "hotkey",
-  "drag", "begindrag", "enddrag"
-);
-
 class Tool {
   static #cnt = 0
   static #instances = {}
@@ -5973,7 +5361,7 @@ class Tool {
   #config
   #core
   #parent
-  #controller
+  #input
   #elChart
   #elCanvas
   #elViewport
@@ -6036,10 +5424,11 @@ class Tool {
   }
   end() { this.stop(); }
   stop() {
+    this.#input.off("mousemove", this.onMouseMove);
   }
   eventsListen() {
-    this.#controller = new InputController(this.#elCanvas, {disableContextMenu: false});
-    this.#controller.on("mousemove", this.onMouseMove.bind(this));
+    this.#input = new Input(this.#elCanvas, {disableContextMenu: false});
+    this.#input.on("mousemove", this.onMouseMove.bind(this));
   }
   on(topic, handler, context) {
     this.#core.on(topic, handler, context);
@@ -6757,7 +6146,7 @@ class Slider {
   #constraint = {x: false, y: true}
   #cursorPos
   #sliderPos = {x: 0, drag: false}
-  #controller
+  #input
   #callback
   constructor(config) {
     this.#id = Slider.#cnt++;
@@ -6771,13 +6160,13 @@ class Slider {
     }
   }
   eventsListen() {
-  this.#controller = new InputController(this.#elHandle, {disableContextMenu: false});
-  this.#controller.on("mouseenter", debounce(this.onMouseEnter, 1, this, true));
-  this.#controller.on("mouseout", debounce(this.onMouseOut, 1, this, true));
-  this.#controller.on("drag", throttle(this.onHandleDrag, 100, this));
-  this.#controller.on("enddrag", this.onHandleDragDone.bind(this));
-  this.#controller.on("mousedown", debounce(this.onMouseDown, 100, this, true));
-  this.#controller.on("mouseup", this.onMouseUp.bind(this));
+  this.#input = new Input(this.#elHandle, {disableContextMenu: false});
+  this.#input.on("mouseenter", debounce(this.onMouseEnter, 1, this, true));
+  this.#input.on("mouseout", debounce(this.onMouseOut, 1, this, true));
+  this.#input.on("drag", throttle(this.onHandleDrag, 100, this));
+  this.#input.on("enddrag", this.onHandleDragDone.bind(this));
+  this.#input.on("mousedown", debounce(this.onMouseDown, 100, this, true));
+  this.#input.on("mouseup", this.onMouseUp.bind(this));
   }
   on(topic, handler, context) {
     this.#core.on(topic, handler, context);
@@ -6873,7 +6262,7 @@ class Timeline {
   #layerLabels
   #layerOverlays
   #layerCursor
-  #controller
+  #input
   #slider
   #icons = {
     width: 20,
@@ -6973,16 +6362,21 @@ class Timeline {
   end() {
     this.stateMachine.destroy();
     this.#viewport.destroy();
-    this.#controller = null;
+    this.#input.off("dblclick", this.onDoubleClick);
+    this.#input.off("pointerenter", this.onPointerEnter);
+    this.#input.on("pointerdrag", this.onPointerDrag);
+    this.#input = null;
     this.off("main_mousemove", this.drawCursorTime);
     this.off("setRange", this.onSetRange);
     this.#elFwdEnd.removeEventListener('click', debounce);
     this.#elRwdStart.removeEventListener('click', debounce);
   }
   eventsListen() {
-    let timeline = this.#elViewport;
-    this.#controller = new InputController(timeline, {disableContextMenu: false});
-    this.#controller.on("dblclick", this.onDoubleClick.bind(this));
+    let timeline = this.viewport.scene.canvas;
+    this.#input = new Input(timeline, {disableContextMenu: false});
+    this.#input.on("dblclick", this.onDoubleClick.bind(this));
+    this.#input.on("pointerenter", this.onPointerEnter.bind(this));
+    this.#input.on("pointerdrag", this.onPointerDrag.bind(this));
     this.on("main_mousemove", this.drawCursorTime.bind(this));
     this.on("setRange", this.onSetRange.bind(this));
     this.#elFwdEnd.addEventListener('click', debounce(this.onMouseClick, 1000, this, true));
@@ -7008,6 +6402,15 @@ class Timeline {
         break
     }
   }
+  onPointerEnter(e) {
+    e.domEvent.target.style.cursor = "ew-resize";
+  }
+  onPointerDrag(e) {
+    let r = this.range;
+    let start = r.indexStart - e.movement.x;
+    let end = r.indexEnd;
+    r.set(start,end);
+  }
   onDoubleClick(e) {
     this.core.jumpToEnd();
   }
@@ -7018,13 +6421,14 @@ class Timeline {
     this.core.jumpToStart();
   }
   onSetRange() {
-    let start = this.range.indexStart;
-    this.range.indexEnd;
+    let r = this.range;
+    let start = r.indexStart;
+    r.indexEnd;
     let scrollBarW = this.#elNavScrollBar.getBoundingClientRect().width;
-    let rangeW = this.range.dataLength + this.range.limitFuture + this.range.limitPast;
+    let rangeW = r.dataLength + r.limitFuture + r.limitPast;
     let ratio = scrollBarW / rangeW;
-    let handleW = this.range.Length * ratio;
-    let pos = ((start + this.range.limitPast) * ratio);
+    let handleW = r.Length * ratio;
+    let pos = ((start + r.limitPast) * ratio);
     this.#slider.setHandleDims(pos, handleW);
   }
   xPos(time) { return this.#xAxis.xPos(time) }
@@ -7410,6 +6814,8 @@ class Chart {
     this.layerWidth = Math.round(w * ((100 + buffer) * 0.01));
     this.graph.setSize(w, h, this.layerWidth);
     this.setHeight(h);
+    this.draw(undefined, true);
+    this.core.MainPane.draw(undefined, false);
   }
   setCursor(cursor) {
     this.element.style.cursor = cursor;
@@ -7984,6 +7390,7 @@ class ScaleBar {
   }
   onResize(dimensions) {
     this.setDimensions(dimensions);
+    console.log(this.parent.id,"scale resize");
   }
   onMouseMove(e) {
     this.#cursorPos = (isArray(e)) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)];
@@ -8031,7 +7438,7 @@ class ScaleBar {
     this.#layerOverlays.setSize(width, dim.h);
     this.#layerCursor.setSize(width, dim.h);
     this.setHeight(dim.h);
-    this.draw(undefined, true);
+    this.draw();
   }
   setScaleRange(r) {
     if (this.#yAxis.mode == "automatic") this.#yAxis.mode = "manual";
@@ -9534,19 +8941,18 @@ class MainPane {
     this.#input.off("pointermove", this.onMouseMove);
     this.#input.off("pointerenter", this.onMouseEnter);
     this.#input.off("pointerout", this.onMouseOut);
-    this.#controller.removeEventListener("keydown", this.onChartKeyDown);
-    this.#controller.removeEventListener("keyup", this.onChartKeyDown);
-    this.#controller = null;
+    this.#input.off("keydown", this.onChartKeyDown);
+    this.#input.off("keyup", this.onChartKeyDown);
+    this.#input = null;
     this.off(STREAM_NEWVALUE, this.onNewStreamValue);
     this.off("setRange", this.draw);
   }
   eventsListen() {
     this.#elRows.tabIndex = 0;
     this.#elRows.focus();
-    this.#controller = new InputController(this.#elRows, {disableContextMenu: false});
-    this.#controller.on("keydown", this.onChartKeyDown.bind(this));
-    this.#controller.on("keyup", this.onChartKeyUp.bind(this));
     this.#input = new Input(this.#elRows, {disableContextMenu: false});
+    this.#input.on("keydown", this.onChartKeyDown.bind(this));
+    this.#input.on("keyup", this.onChartKeyUp.bind(this));
     this.#input.on("wheel", this.onMouseWheel.bind(this));
     this.#input.on("pointerdrag", this.onChartDrag.bind(this));
     this.#input.on("pointerdragend", this.onChartDragDone.bind(this));
@@ -9649,22 +9055,22 @@ class MainPane {
   }
   onChartKeyDown(e) {
     let step = (this.candleW > 1) ? this.candleW : 1;
-    switch (e.keyCode) {
-      case Keys.Left:
+    switch (e.key) {
+      case "ArrowLeft":
         this.emit("chart_pan", [0,null,step,null,step * -1,null]);
         break;
-      case Keys.Right:
+      case "ArrowRight":
         this.emit("chart_pan", [step,null,0,null,step,null]);
         break;
     }
   }
   onChartKeyUp(e) {
     let step = (this.candleW > 1) ? this.candleW : 1;
-    switch (e.keyCode) {
-      case Keys.Left:
+    switch (e.key) {
+      case "ArrowLeft":
         this.emit("chart_panDone", [0,null,step,null,step * -1,null]);
         break;
-      case Keys.Right:
+      case "ArrowRight":
         this.emit("chart_panDone", [step,null,0,null,step,null]);
         break;
     }

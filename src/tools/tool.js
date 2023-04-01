@@ -2,7 +2,7 @@
 // base class for chart drawing tools
 
 import { uid } from "../utils/utilities"
-import { InputController } from "../input/controller"
+import Input from "../input"
 
 
 export default class Tool {
@@ -18,7 +18,7 @@ export default class Tool {
   #config
   #core
   #parent
-  #controller
+  #input
   #elChart
   #elCanvas
   #elViewport
@@ -99,7 +99,7 @@ export default class Tool {
   end() { this.stop() }
 
   stop() {
-    // this.#controller.removeEventListener("mousemove", this.onMouseMove);
+    this.#input.off("mousemove", this.onMouseMove);
     // this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
     // this.#controller.removeEventListener("mouseout", this.onMouseOut);
 
@@ -109,11 +109,9 @@ export default class Tool {
   }
 
   eventsListen() {
-    // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(this.#elCanvas, {disableContextMenu: false});
+    this.#input = new Input(this.#elCanvas, {disableContextMenu: false});
 
-    // move event
-    this.#controller.on("mousemove", this.onMouseMove.bind(this));
+    this.#input.on("mousemove", this.onMouseMove.bind(this));
     // // enter event
     // this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
     // // out event

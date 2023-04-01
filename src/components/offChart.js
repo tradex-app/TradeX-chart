@@ -13,7 +13,7 @@ import overlayGrid from "./overlays/chart-grid"
 import overlayCursor from "./overlays/chart-cursor"
 import stateMachineConfig from "../state/state-offChart"
 import { uid } from "../utils/utilities"
-import Input from '../input2'
+import Input from '../input'
 
 const defaultOverlays = [
   ["grid", {class: overlayGrid, fixed: true, required: true, params: {axes: "y"}}],

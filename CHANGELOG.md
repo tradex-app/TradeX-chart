@@ -1,5 +1,15 @@
 # Change Log
 
+## [0.117.4] - 2023-04-xx
+
+Changed
+
+* Obsolete input Controller removed and replaced with Input class
+
+Fixed
+
+* Update (draw() render()) on/offCharts on setDimensions() (resize)
+
 ## [0.117.3] - 2023-03-31
 
 Fixed

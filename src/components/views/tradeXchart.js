@@ -163,7 +163,6 @@ export default class tradeXChart extends element {
   }
 
   onResized(entries) {
-    // window.requestAnimationFrame(() => {
       console.log("onResize")
       console.log(this.offsetWidth)
       console.log(this.offsetHeight)
@@ -172,7 +171,6 @@ export default class tradeXChart extends element {
         this.previousDimensions()
         this.emit("global_resize", {w: this.offsetWidth, h: this.offsetHeight}) 
       }
-    // })
   }
 
   previousDimensions() {

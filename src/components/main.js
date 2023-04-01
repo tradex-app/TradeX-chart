@@ -10,11 +10,10 @@ import Chart from "./onChart"
 import OffChart from "./offChart"
 import chartGrid from "./overlays/chart-grid"
 import watermark from "./overlays/chart-watermark"
-import chartCompositor from "./overlays/chart-compositor"
+// import chartCompositor from "./overlays/chart-compositor"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-mainPane"
-import { InputController, Keys } from "../input/controller"
-import Input from "../input2"
+import Input from "../input"
 import { isNumber, isObject } from "../utils/typeChecks"
 import { copyDeep, debounce, throttle } from "../utils/utilities"
 
@@ -246,9 +245,9 @@ export default class MainPane {
     this.#input.off("pointerenter", this.onMouseEnter);
     this.#input.off("pointerout", this.onMouseOut);
 
-    this.#controller.removeEventListener("keydown", this.onChartKeyDown)
-    this.#controller.removeEventListener("keyup", this.onChartKeyDown)
-    this.#controller = null
+    this.#input.off("keydown", this.onChartKeyDown)
+    this.#input.off("keyup", this.onChartKeyDown)
+    this.#input = null
 
     this.off(STREAM_NEWVALUE, this.onNewStreamValue)
     this.off("setRange", this.draw)
@@ -260,14 +259,10 @@ export default class MainPane {
     this.#elRows.tabIndex = 0
     this.#elRows.focus()
 
-    // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(this.#elRows, {disableContextMenu: false});
-
-    this.#controller.on("keydown", this.onChartKeyDown.bind(this))
-    this.#controller.on("keyup", this.onChartKeyUp.bind(this))
-
-
     this.#input = new Input(this.#elRows, {disableContextMenu: false});
+
+    this.#input.on("keydown", this.onChartKeyDown.bind(this))
+    this.#input.on("keyup", this.onChartKeyUp.bind(this))
 
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("pointerdrag", this.onChartDrag.bind(this))
@@ -405,11 +400,11 @@ export default class MainPane {
     let step = (this.candleW > 1) ? this.candleW : 1
 
     // [x2, y2, x1, y1, xdelta, ydelta]
-    switch (e.keyCode) {
-      case Keys.Left:
+    switch (e.key) {
+      case "ArrowLeft":
         this.emit("chart_pan", [0,null,step,null,step * -1,null])
         break;
-      case Keys.Right:
+      case "ArrowRight":
         this.emit("chart_pan", [step,null,0,null,step,null])
         break;
     }
@@ -419,11 +414,11 @@ export default class MainPane {
   onChartKeyUp(e) {
     let step = (this.candleW > 1) ? this.candleW : 1
 
-    switch (e.keyCode) {
-      case Keys.Left:
+    switch (e.key) {
+      case "ArrowLeft":
         this.emit("chart_panDone", [0,null,step,null,step * -1,null])
         break;
-      case Keys.Right:
+      case "ArrowRight":
         this.emit("chart_panDone", [step,null,0,null,step,null])
         break;
     }
