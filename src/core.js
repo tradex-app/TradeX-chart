@@ -426,7 +426,8 @@ export default class TradeXchart extends Tradex_chart {
     if (this.#delayedSetRange) 
       this.on(STREAM_UPDATE, this.delayedSetRange.bind(this))
 
-    this.refresh()
+    // this.refresh()
+    this.resize(this.width, this.height)
   }
 
   /**

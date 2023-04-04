@@ -6,34 +6,20 @@ import { CandleStyle, YAxisStyle } from "../../definitions/style";
 import { createFont, drawTextBG, getTextRectHeight } from "../../utils/canvas"
 
 
-export default class scalePriceLine extends Overlay {
+export default class ScalePriceLine extends Overlay {
 
 
   constructor(target, xAxis, yAxis, theme, parent, params) {
 
+    parent = yAxis
+    yAxis = yAxis.yAxis
+
     super(target, xAxis, yAxis, theme, parent, params)
 
     this.viewport = target.viewport
-
-    this.start()
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
-
-  start() {
-    this.eventListeners()
-  }
-  end() {
-    this.off(STREAM_UPDATE, this.onStreamUpdate)
-  }
-
-  eventListeners() {
-    this.core.on(STREAM_UPDATE, (e) => { this.onStreamUpdate(e) })
-  }
-
-  onStreamUpdate(e) {
-    this.draw(e)
-  }
 
   draw(candle) {
 

@@ -2,32 +2,26 @@
 
 import Overlay from "./overlay"
 
-export default class scaleOverly extends Overlay {
+export default class ScaleOverly extends Overlay {
 
 
   constructor(target, xAxis, yAxis, theme, parent, params) {
 
+    parent = yAxis
+    yAxis = yAxis.yAxis
+
     super(target, xAxis, yAxis, theme, parent, params)
 
     this.viewport = target.viewport
-
-    this.start()
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
 
-  start() {
-    this.eventListeners()
-  }
-
-  end() {}
-
-  eventListeners() {}
-
   draw() {
-
-    this.scene.clear()
     const ctx = this.scene.context
+    const yAxis = this.yAxis.yAxis
+    this.scene.clear()
+
     ctx.save()
 
     ctx.restore()

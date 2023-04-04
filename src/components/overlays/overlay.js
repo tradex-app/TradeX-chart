@@ -41,4 +41,35 @@ export default class Overlay {
   get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set doDraw(d) { this.#doDraw = (isBoolean(d)) ? d : false }
   get doDraw() { return this.#doDraw }
+
+  /**
+   * Set a custom event listener
+   * @param {string} topic
+   * @param {function} handler
+   * @param {*} context
+   * @memberof Overlay
+   */
+  on(topic, handler, context) {
+    this.#core.on(topic, handler, context);
+  }
+
+  /**
+   * Remove a custom event listener
+   * @param {string} topic
+   * @param {function} handler
+   * @memberof Overlay
+   */
+  off(topic, handler) {
+    this.#core.off(topic, handler);
+  }
+
+  /**
+   * Broadcast an event
+   * @param {string} topic
+   * @param {*} data
+   * @memberof Overlay
+   */
+  emit(topic, data) {
+    this.core.emit(topic, data)
+  }
 }

@@ -305,8 +305,8 @@ export default class Chart {
   setDimensions(dim) {
     const buffer = this.config.buffer || BUFFERSIZE
       let {w, h} = dim
-    w = this.width
-    h = (h) ? h : this.height
+               w = this.width
+               h = (h) ? h : this.height
     
     this.layerWidth = Math.round(w * ((100 + buffer) * 0.01))
     this.graph.setSize(w, h, this.layerWidth)

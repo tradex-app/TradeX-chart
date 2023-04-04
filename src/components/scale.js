@@ -1,17 +1,27 @@
 // scale.js
 // Scale bar that lives on the side of the chart
 
-import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
+import { isArray } from '../utils/typeChecks'
 import DOM from "../utils/DOM"
 import yAxis from "./axis/yAxis"
-import CEL from "./primitives/canvas3"
-import { drawTextBG } from "../utils/canvas"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
 import Input from '../input'
 import { copyDeep, uid } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
-import scalePriceLine from './overlays/scale-priceLine'
+
+import Graph from "./views/classes/graph"
+import ScaleCursor from './overlays/scale-cursor'
+import ScaleLabels from './overlays/scale-labels'
+import ScaleOverly from './overlays/scale-overlays'
+import ScalePriceLine from './overlays/scale-priceLine'
+
+const defaultOverlays = [
+  ["labels", {class: ScaleLabels, fixed: true, required: true}],
+  ["overlay", {class: ScaleOverly, fixed: true, required: true}],
+  ["price", {class: ScalePriceLine, fixed: true, required: true}],
+  ["cursor", {class: ScaleCursor, fixed: true, required: true}],
+]
 
 /**
  * Provides the chart panes scale / yAxis
@@ -39,6 +49,8 @@ export default class ScaleBar {
   #layerOverlays
   #layerPriceLine
   #layerCursor
+  #scaleOverlays = new Map()
+  #Graph
 
   #input
   #priceLine
@@ -73,12 +85,15 @@ export default class ScaleBar {
   get layerCursor() { return this.#layerCursor }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
+  get layerPriceLine() { return this.#layerPriceLine }
   get yAxis() { return this.#yAxis }
   set yAxisType(t) { this.#yAxis.yAxisType = YAXIS_TYPES.includes(t) ? t : YAXIS_TYPES[0] }
   get yAxisType() { return this.#yAxis.yAxisType }
   get yAxisHeight() { return this.#yAxis.height }
   get yAxisRatio() { return this.#yAxis.yAxisRatio }
   get yAxisGrads() { return this.#yAxis.yAxisGrads }
+  set graph(g) { this.#Graph = g }
+  get graph() { return this.#Graph }
   get viewport() { return this.#viewport }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#element) }
@@ -92,22 +107,27 @@ export default class ScaleBar {
   get yOffset() { return this.#yAxis.offset }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
+  get Scale() { return this }
 
   init() {
     this.#elViewport = this.#element.viewport || this.#element
-
-    this.log(`${this.#name} instantiated`)
   }
 
-
-  start(data) {
+  start() {
     const range = (this.#parent.name == "OffChart" ) ? 
       this.#parent.localRange : undefined
     this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
-    // prepare layered canvas
-    this.createViewport()
+
+    // create and start overlays
+    this.createGraph()
+
+    // create and start on chart indicators
+    this.addOverlays([])
+
     // draw the scale
+    this.#yAxis.calcGradations()
     this.draw()
+
     // set up event listeners
     this.eventsListen()
 
@@ -127,12 +147,12 @@ export default class ScaleBar {
     // this.#controller.removeEventListener("enddrag", this.onDragDone);
 
     this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove)
-    this.off(`${this.#parent.ID}_mouseout`, this.eraseCursorPrice)
+    this.off(`${this.#parent.ID}_mouseout`, this.#layerCursor.erase)
     this.off(STREAM_UPDATE, this.onStreamUpdate)
   }
 
   eventsListen() {
-    let canvas = this.#viewport.scene.canvas
+    let canvas = this.#Graph.viewport.scene.canvas
     // create controller and use 'on' method to receive input events 
     this.#input = new Input(canvas, {disableContextMenu: false});
     this.#input.setCursor("ns-resize")
@@ -141,8 +161,10 @@ export default class ScaleBar {
     // this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
 
     this.on(`${this.#parent.id}_mousemove`, this.onMouseMove.bind(this))
-    this.on(`${this.#parent.id}_mouseout`, this.eraseCursorPrice.bind(this))
-    this.on(STREAM_UPDATE, (e) => { this.onStreamUpdate(e) })
+    this.on(`${this.#parent.id}_mouseout`, this.#layerCursor.erase.bind(this.#layerCursor))
+    this.on(STREAM_UPDATE, this.#layerPriceLine.draw.bind(this.#layerPriceLine))
+
+    // this.on(STREAM_UPDATE, (e) => { this.#layerPriceLine.draw(e) })
     // this.on("chart_pan", (e) => { this.drawCursorPrice() })
     // this.on("chart_panDone", (e) => { this.drawCursorPrice() })
     // this.on("resizeChart", (dimensions) => this.onResize.bind(this))
@@ -162,12 +184,11 @@ export default class ScaleBar {
 
   onResize(dimensions) {
     this.setDimensions(dimensions)
-    console.log(this.parent.id,"scale resize")
   }
 
   onMouseMove(e) {
     this.#cursorPos = (isArray(e)) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)]
-    this.drawCursorPrice()
+    this.#layerCursor.draw(this.#cursorPos)
   }
 
   onDrag(e) {
@@ -215,11 +236,7 @@ export default class ScaleBar {
 
   setDimensions(dim) {
     const width = this.#element.getBoundingClientRect().width
-    this.#viewport.setSize(width, dim.h)
-    // adjust layers
-    this.#layerLabels.setSize(width, dim.h)
-    this.#layerOverlays.setSize(width, dim.h)
-    this.#layerCursor.setSize(width, dim.h)
+    this.#Graph.setSize(width, dim.h, width)
 
     this.setHeight(dim.h)
     this.draw()
@@ -237,9 +254,6 @@ export default class ScaleBar {
     this.#element.style.cursor = cursor
   }
 
-
-  // -----------------------
-
   // convert chart price or offchart indicator y data to pixel pos
   yPos(yData) { return this.#yAxis.yPos(yData) }
 
@@ -253,154 +267,43 @@ export default class ScaleBar {
     return this.#yAxis.limitPrecision(digits)
   }
 
-  // create canvas layers with handling methods
-  createViewport() {
 
-    const {layerConfig} = this.layerConfig()
+  createGraph() {
+    let overlays = new Map(copyDeep(defaultOverlays))
+        overlays = Array.from(overlays)
 
-    // create viewport
-    this.#viewport = new CEL.Viewport({
-      width: this.#element.getBoundingClientRect().width,
-      height: this.#element.getBoundingClientRect().height,
-      container: this.#elViewport
-    });
-
-    // create layers - labels, overlays, cursor
-    this.#layerLabels = new CEL.Layer(layerConfig);
-    this.#layerOverlays = new CEL.Layer(layerConfig);
-    this.#layerCursor = new CEL.Layer(layerConfig);
-
-    // add layers
-    this.#viewport
-          .addLayer(this.#layerLabels);
-    if (isObject(this.config.stream)) 
-          this.layerStream()
-    this.#viewport
-          .addLayer(this.#layerOverlays)
-          .addLayer(this.#layerCursor);
+    this.graph = new Graph(this, this.#elViewport, overlays, false)
+    this.#layerCursor = this.graph.overlays.get("cursor").instance
+    this.#layerLabels = this.graph.overlays.get("labels").instance
+    this.#layerOverlays = this.graph.overlays.get("overlay").instance
+    this.#layerPriceLine = this.graph.overlays.get("price").instance
   }
 
-  layerConfig() {
-    const width = this.#element.getBoundingClientRect().width
-    const height = this.#element.getBoundingClientRect().height
-    const layerConfig = { 
-      width: width, 
-      height: height
+  /**
+   * Add any non-default overlays
+   *
+   * @param {array} overlays
+   * @memberof Scale
+   */
+  addOverlays(overlays) {
+    for (let o of overlays) {
+      // const config = {fixed: false, required: false}
+      // if (o.type in this.core.TALib) {
+      //   config.class = this.core.indicators[o.type].ind
+      //   config.params = {overlay: o}
+      //   this.#scaleOverlays.set(o.name, config)
+      // }
     }
-    return {width, height, layerConfig}
-  }
-
-  layerStream() {
-    // if the layer and instance were not set, do it now
-    if (!this.#layerPriceLine) {
-      const {layerConfig} = this.layerConfig()
-      this.#layerPriceLine = new CEL.Layer(layerConfig);
-      this.#viewport.addLayer(this.#layerPriceLine)
-    }
-    if (!this.#priceLine) {
-      this.#priceLine =
-      new scalePriceLine(
-        this.#layerPriceLine,
-        undefined,
-        this.#yAxis,
-        this.theme,
-        this
-      )
-    }
+    this.graph.addOverlays(Array.from(this.#scaleOverlays))
   }
 
   render() {
-    this.#viewport.render()
+    this.#Graph.render()
   }
 
-  draw() {
-    this.drawLabels()
-    this.drawOverlays()
+  draw(range=this.range, update=true) {
+    this.#Graph.draw(range, update)
     this.#parent.drawGrid()
-  }
-
-  drawCursorPrice() {
-    let [x, y] = this.#cursorPos,
-        price =  this.yPos2Price(y),
-        nice = this.nicePrice(price),
-
-        options = {
-          fontSize: this.theme.yAxis.fontSize * 1.05,
-          fontWeight: this.theme.yAxis.fontWeight,
-          fontFamily: this.theme.yAxis.fontFamily,
-          txtCol: this.theme.yAxis.colourCursor,
-          bakCol: this.theme.yAxis.colourCursorBG,
-          paddingTop: 2,
-          paddingBottom: 2,
-          paddingLeft: 3,
-          paddingRight: 3
-        },
-        
-        height = options.fontSize + options.paddingTop + options.paddingBottom,
-        yPos = y - (height * 0.5);
-
-    this.#layerCursor.scene.clear()
-    const ctx = this.#layerCursor.scene.context
-    ctx.save()
-
-    ctx.fillStyle = options.bakCol
-    ctx.fillRect(1, yPos, this.width, height)
-
-    drawTextBG(ctx, `${nice}`, 1, yPos , options)
-
-    ctx.restore()
-    this.#viewport.render()
-  }
-
-  eraseCursorPrice() {
-    this.#layerCursor.scene.clear()
-    this.#viewport.render()
-    return
-  }
-
-  drawLabels() {
-    this.#layerLabels.scene.clear()
-    this.#yAxis.calcGradations()
-
-    const grads = this.#yAxis.yAxisGrads
-    const ctx = this.#layerLabels.scene.context
-    const theme = this.theme.yAxis
-    const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true
-      let tickPos = []
-
-    switch (theme?.location) {
-      case "left": tickPos = [this.width, this.width - this.#yAxis.yAxisTicks]; break;
-      case "right":
-      default: tickPos = [1, this.#yAxis.yAxisTicks]; break;
-    }
-
-    ctx.save();
-    ctx.strokeStyle = theme.colourTick
-    ctx.fillStyle = theme.colourTick
-    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
-    for (let tick of grads) {
-      ctx.fillText(tick[0], this.#yAxis.yAxisTicks + 5, tick[1] + 4)
-
-      if (tickMarker) {
-        ctx.beginPath()
-        ctx.moveTo(tickPos[0], tick[1])
-        ctx.lineTo(tickPos[1], tick[1])
-        ctx.stroke()
-      }
-    }
-    ctx.restore();
-  }
-
-  drawOverlays() {
-    this.#layerOverlays.scene.clear()
-
-    const grads = this.#yAxis.yAxisGrads
-    const ctx = this.#layerOverlays.scene.context
-    ctx.save();
-
-// draw overlays
-
-    ctx.restore();
   }
 
   resize(width=this.width, height=this.height) {

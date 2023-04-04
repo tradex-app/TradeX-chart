@@ -40,7 +40,6 @@ export default class OnChart extends Chart {
   #volumePrecision
 
   #layerStream
-  #layersOnChart
   #chartOverlays = new Map()
   #chartStreamCandle
 
@@ -109,7 +108,7 @@ export default class OnChart extends Chart {
     }
 
     // Y Axis - Price Scale
-    this.scale.start(`Chart says to Scale, "Thanks for the update!"`)
+    this.scale.start()
 
     // draw the chart - grid, candles, volume
     this.draw(this.range)
@@ -191,6 +190,12 @@ export default class OnChart extends Chart {
     this.#chartStreamCandle = this.graph.overlays.get("stream").instance
   }
 
+  /**
+   * Add any non-default overlays
+   *
+   * @param {array} overlays
+   * @memberof OnChart
+   */
   addOverlays(overlays) {
     for (let o of overlays) {
       const config = {fixed: false, required: false}

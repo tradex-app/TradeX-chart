@@ -438,12 +438,14 @@ export default class MainPane {
     if (chart !== this.chart) {
       this.chart.cursorActive = false
       this.chart.scale.layerCursor.visible = false
+      this.chart.scale.layerCursor.erase()
     }
 
     this.#OffCharts.forEach((offChart, key) => {
       if (chart !== offChart) {
         offChart.cursorActive = false
         offChart.scale.layerCursor.visible = false
+        offChart.scale.layerCursor.erase()
       }
     }) 
   }

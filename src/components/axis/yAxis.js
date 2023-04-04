@@ -259,64 +259,10 @@ export default class yAxis extends Axis {
           yGridSize;
     const scaleGrads = [];
 
-    // max = this.#range.max
-    // min = this.#range.min
-
-    // this.#yAxisRound = this.countDigits(this.#range.diff).integers
-
     // roughly divide the yRange into cells
     rangeH = max - min
     rangeH = (this.rangeH > 0) ? this.rangeH : 1
     yGridSize = (rangeH)/(this.height / (this.core.theme.yAxis.fontSize * 1.75));
-
-
-    // if (fixed)
-
-    // if (fixed) {
-    //   // const rangeMid = (max + min) * 0.5
-    //   // const midH = this.height * 0.5
-    //   // digits = this.countDigits(rangeMid)
-    //   // const scaleMid = this.niceValue(digits, decimals)
-  
-    //   // scaleGrads.push([scaleMid, round(midH), digits])
-  
-    //   // let grad = round(power(log10(midH), 2) - 1),
-    //   //     step$ = (max - scaleMid) / grad,
-    //   //     stepP = midH / grad,
-    //   //     upper = scaleMid + step$,
-    //   //     pos = midH - stepP,
-    //   //     nice, 
-    //   //     entry;
-    //   // while (upper <= max) {
-    //   //   digits = this.countDigits(upper)
-    //   //   nice = this.niceValue(digits, decimals)
-    //   //   entry = [nice, round(pos), digits]
-    //   //   scaleGrads.unshift(entry)
-    //   //   upper += step$
-    //   //   pos -= stepP
-    //   // }
-    //   // let lower = scaleMid - step$
-    //   //     pos = midH + stepP
-    //   // while (lower >= min) {
-    //   //   digits = this.countDigits(lower)
-    //   //   nice = this.niceValue(digits, decimals)
-    //   //   entry = [nice, round(pos), digits]
-    //   //   scaleGrads.push(entry)
-    //   //   lower -= step$
-    //   //   pos += stepP
-    //   // }
-
-    //   // roughly divide the yRange into cells
-    //   rangeH = (this.rangeH > 0) ? this.rangeH : 1
-    //   yGridSize = (rangeH)/this.#yAxisGrid;
-    // }
-    // else {
-    //   // roughly divide the yRange into cells
-    //   rangeH = (this.rangeH > 0) ? this.rangeH : 1
-    //   yGridSize = (rangeH)/this.#yAxisGrid;
-
-
-    // }
 
     // try to find a nice number to round to
     let niceNumber = Math.pow( 10 , Math.ceil( Math.log10( yGridSize ) ) );

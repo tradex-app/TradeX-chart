@@ -1,48 +1,33 @@
 // scale-cursor.js
 
+import { isArray } from "../../utils/typeChecks"
+import { drawTextBG } from "../../utils/canvas"
 import Overlay from "./overlay"
 
-export default class scaleCursor extends Overlay {
+export default class ScaleCursor extends Overlay {
 
-  #cursorPos
+  #cursorPos = [0, 0]
 
   constructor(target, xAxis, yAxis, theme, parent, params) {
+
+    parent = yAxis
+    yAxis = yAxis.yAxis
 
     super(target, xAxis, yAxis, theme, parent, params)
 
     this.viewport = target.viewport
-
-    this.start()
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
 
-  start() {
-    this.eventListeners()
-  }
+  draw(cursorPos) {
+    if (!this.parent.parent.cursorActive) return
 
-  end() {
-    this.off(`${this.parent.id}_mousemove`, this.onMouseMove)
-    this.off(`${this.parent.id}_mouseout`, this.eraseCursorPrice)
-  }
-
-  eventListeners() {
-    this.on(`${this.parent.id}_mousemove`, this.onMouseMove.bind(this))
-    this.on(`${this.parent.id}_mouseout`, this.eraseCursorPrice.bind(this))
-  }
-
-  onMouseMove(e) {
-    this.#cursorPos = (isArray(e)) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)]
-    this.draw()
-  }
-
-  draw() {
-
-    const ctx = this.scene.context
+    this.#cursorPos = (isArray(cursorPos)) ? cursorPos : this.#cursorPos
 
     let [x, y] = this.#cursorPos,
-    price =  this.yPos2Price(y),
-    nice = this.nicePrice(price),
+    price =  this.parent.yPos2Price(y),
+    nice = this.parent.nicePrice(price),
 
     options = {
       fontSize: this.theme.yAxis.fontSize * 1.05,
@@ -58,14 +43,20 @@ export default class scaleCursor extends Overlay {
     
     height = options.fontSize + options.paddingTop + options.paddingBottom,
     yPos = y - (height * 0.5);
+    const ctx = this.scene.context
 
     this.scene.clear()
     ctx.save()
 
+    ctx.fillStyle = options.bakCol
+    ctx.fillRect(1, yPos, this.width, height)
+
+    drawTextBG(ctx, `${nice}`, 1, yPos , options)
+
     ctx.restore()
   }
 
-  eraseCursorPrice() {
+  erase() {
     this.scene.clear()
     this.target.viewport.render()
     return

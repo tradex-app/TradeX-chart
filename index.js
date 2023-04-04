@@ -1,5 +1,5 @@
 import { Chart, DOM } from './src'
-import * as talib from "talib-web"
+import * as talib from './node_modules/talib-web/lib/index.esm'
 
 // let state = undefined
 import state1 from './data/1hour.js'

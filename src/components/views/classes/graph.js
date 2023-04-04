@@ -136,7 +136,8 @@ export default class graph {
         oList.get("stream").instance.draw()
       }
 
-      overlay.instance.position = [this.#core.scrollPos, 0]
+      if (!overlay.fixed)
+        overlay.instance.position = [this.#core.scrollPos, 0]
     }
   }
 
