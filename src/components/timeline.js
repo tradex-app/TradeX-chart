@@ -1,35 +1,42 @@
 // timeLine.js
-// Time bar that lives at the bottom of the chart
-// Providing: chart drawing Time
+// Timeline bar that lives at the bottom of the chart
 
 import DOM from "../utils/DOM"
 import xAxis from "./axis/xAxis"
 import CEL from "./primitives/canvas3"
-import Graph from "./views/classes/graph"
 import Input from "../input"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-time"
 import { drawTextBG, getTextRectWidth } from "../utils/canvas"
 import { bRound, limit } from "../utils/number"
+import { isBoolean } from "../utils/typeChecks"
 import { copyDeep, debounce,throttle } from "../utils/utilities"
 import Slider from "./widgets/slider"
+import { BUFFERSIZE } from "../definitions/chart"
 
-import {
-  BUFFERSIZE,
-} from "../definitions/chart"
-import { isBoolean } from "../utils/typeChecks"
+import Graph from "./views/classes/graph"
+import TimeLabels from "./overlays/time-labels"
+import TimeOverlays from "./overlays/time-overlays"
+import TimeCursor from "./overlays/time-cursor"
 
 const defaultOverlays = [
-
+  ["labels", {class: TimeLabels, fixed: false, required: true}],
+  ["overlay", {class: TimeOverlays, fixed: false, required: true}],
+  ["cursor", {class: TimeCursor, fixed: false, required: true}],
 ]
 
 
+/**
+ * Provides the timeline for the chart component
+ * @export
+ * @class Timeline
+ */
 export default class Timeline {
 
   #name = "Timeline"
   #shortName = "time"
   #options
-  #elTime
+  #element
   #core
   #chart
   #xAxis
@@ -39,6 +46,7 @@ export default class Timeline {
   #elNavigation
 
   #Graph
+  #timeOverlays = new Map()
   #viewport
   #navigation
   #elNavList
@@ -64,7 +72,7 @@ export default class Timeline {
 
     this.#core = core
     this.#options = options
-    this.#elTime = options.elements.elTime
+    this.#element = options.elements.elTime
     this.#chart = core.Chart
     this.#xAxis = new xAxis(this, this.#chart)
     this.init()
@@ -79,11 +87,11 @@ export default class Timeline {
   get shortName() { return this.#shortName }
   get options() { return this.#options }
   get core() { return this.#core }
-  get element() { return this.#elTime }
+  get element() { return this.#element }
   get elViewport() { return this.#elViewport }
-  get height() { return this.#elTime.getBoundingClientRect().height }
+  get height() { return this.#element.getBoundingClientRect().height }
   set width(w) { this.setWidth(w) }
-  get width() { return this.#elTime.getBoundingClientRect().width }
+  get width() { return this.#element.getBoundingClientRect().width }
   get xAxis() { return this.#xAxis }
   get xAxisWidth() { return this.#xAxis.width }
   get xAxisRatio() { return this.#xAxis.xAxisRatio }
@@ -99,7 +107,7 @@ export default class Timeline {
   get navigation() { return this.#navigation }
   get range() { return this.#core.range }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elTime) }
+  get dimensions() { return DOM.elementDimPos(this.#element) }
   get bufferPx() { return this.#core.bufferPx }
   get scrollPos() { return this.#core.scrollPos }
   get scrollOffsetPx() { return this.#core.scrollPos % this.candleW }
@@ -107,16 +115,10 @@ export default class Timeline {
   get rangeScrollOffset() { return this.#core.rangeScrollOffset }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
-
+  get time() { return this }
  
   init() {
-    this.mount(this.#elTime)
-
-    this.log(`${this.#name} instantiated`)
-  }
-
-  mount(el) {
-    const api = this.#core
+    const el = this.#element
     this.#elViewport = el.viewport
     this.#elNavigation = el.overview
     this.#elNavList = el.overview.icons
@@ -141,7 +143,7 @@ export default class Timeline {
   }
 
   setWidth(w) {
-    this.#elTime.style.width = `${w}px`
+    this.#element.style.width = `${w}px`
     this.#elViewport.style.width = `${w}px`
   }
 
@@ -151,10 +153,7 @@ export default class Timeline {
     const height = this.height
     const layerWidth = Math.round(width * ((100 + buffer) * 0.01))
 
-    this.#viewport.setSize(width, this.height)
-    this.#layerLabels.setSize(layerWidth, height)
-    this.#layerOverlays.setSize(layerWidth, height)
-    this.#layerCursor.setSize(layerWidth, height)
+    this.#Graph.setSize(width, height, layerWidth)
 
     // this.setWidth(dim.w)
     this.draw()
@@ -162,7 +161,10 @@ export default class Timeline {
 
   start() {
     // prepare layered canvas
-    this.createViewport()
+    // this.createViewport()
+
+    // create and start overlays
+    this.createGraph()
 
     // macro timeline scroll bar
     this.onSetRange()
@@ -195,15 +197,15 @@ export default class Timeline {
   }
 
   eventsListen() {
-    let timeline = this.viewport.scene.canvas
+    let canvas = this.#Graph.viewport.scene.canvas
 
-    this.#input = new Input(timeline, {disableContextMenu: false});
+    this.#input = new Input(canvas, {disableContextMenu: false});
     this.#input.on("dblclick", this.onDoubleClick.bind(this))
     this.#input.on("pointerenter", this.onPointerEnter.bind(this))
     this.#input.on("pointerdrag", this.onPointerDrag.bind(this))
     // this.#input.on("pointerdrag", throttle(this.onPointerDrag, 100, this, true));
 
-    this.on("main_mousemove", this.drawCursorTime.bind(this))
+    this.on("main_mousemove", this.#layerCursor.draw.bind(this.#layerCursor))
     this.on("setRange", this.onSetRange.bind(this))
 
     this.#elFwdEnd.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
@@ -287,137 +289,47 @@ export default class Timeline {
   createGraph() {
     let overlays = copyDeep(defaultOverlays)
 
-    this.#Graph = new Graph(this, this.#elViewport, overlays)
+    this.#Graph = new Graph(this, this.#elViewport, overlays, false)
+    this.#layerCursor = this.graph.overlays.get("cursor").instance
+    this.#layerLabels = this.graph.overlays.get("labels").instance
+    this.#layerOverlays = this.graph.overlays.get("overlay").instance
   }
 
-  createViewport() {
-
-    const buffer = this.config.buffer || BUFFERSIZE
-    const width = this.xAxisWidth
-    const height = this.#elTime.getBoundingClientRect().height
-    const layerConfig = { 
-      width: Math.round(width * ((100 + buffer) * 0.01)), 
-      height: height
+  /**
+   * Add any non-default overlays
+   *
+   * @param {array} overlays
+   * @memberof Scale
+   */
+  addOverlays(overlays) {
+    for (let o of overlays) {
+      // const config = {fixed: false, required: false}
+      // if (o.type in this.core.TALib) {
+      //   config.class = this.core.indicators[o.type].ind
+      //   config.params = {overlay: o}
+      //   this.#timeOverlays.set(o.name, config)
+      // }
     }
-
-    // create viewport
-    this.#viewport = new CEL.Viewport({
-      width: width,
-      height: height / 2,
-      container: this.#elViewport
-    });
-
-    // create layers - labels, overlays, cursor
-    this.#layerLabels = new CEL.Layer(layerConfig);
-    this.#layerOverlays = new CEL.Layer(layerConfig);
-    this.#layerCursor = new CEL.Layer(layerConfig);
-
-    // add layers
-    this.#viewport
-          .addLayer(this.#layerLabels)
-          .addLayer(this.#layerOverlays)
-          .addLayer(this.#layerCursor);
-
-    // this is a hack
-    this.#Graph = {viewport: this.#viewport}
+    this.graph.addOverlays(Array.from(this.#timeOverlays))
   }
 
   render() {
-    this.#viewport.render()
+    this.#Graph.render()
   }
 
-  draw(range=this.range) {
-    this.#layerCursor.setPosition(this.scrollPos, 0)
-    this.#layerLabels.setPosition(this.scrollPos, 0)
-    this.#layerOverlays.setPosition(this.scrollPos, 0)
-    this.drawGrads(range)
-    this.drawOverlays(range)
-    this.drawCursorTime()
-  }
-
-  drawCursorTime() {
-    const ctx = this.#layerCursor.scene.context
-    const rect = this.#elViewport.getBoundingClientRect()
-    const x = this.#core.mousePos.x - rect.left
-    let timestamp = this.xPos2Time(x),
-        date = new Date(timestamp),
-        opts = { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' },
-        dateTimeStr = date.toUTCString(),
-        options = {
-          fontSize: this.theme.xAxis.fontSize * 1.05,
-          fontWeight: this.theme.xAxis.fontWeight,
-          fontFamily: this.theme.xAxis.fontFamily,
-          txtCol: this.theme.xAxis.colourCursor,
-          bakCol: this.theme.xAxis.colourCursorBG,
-          paddingTop: 5,
-          paddingBottom: 3,
-          paddingLeft: 4,
-          paddingRight: 4
-        },
-        txtW = getTextRectWidth(ctx, dateTimeStr, options),
-        xPos = x + this.bufferPx;
-        xPos = this.#xAxis.xPosSnap2CandlePos(xPos)
-        xPos = xPos - Math.round(txtW * 0.5) - this.scrollPos - this.bufferPx
-
-    this.#layerCursor.scene.clear()
-    ctx.save()
-
-    drawTextBG(ctx, dateTimeStr, xPos, 1 , options)
-
-    ctx.restore()
-    this.#viewport.render()
+  draw(range=this.range, update=true) {
+    this.#xAxis.doCalcXAxisGrads(range)
+    this.#Graph.draw(range, update)
   }
 
   hideCursorTime() {
     this.#layerCursor.visible = false
-    this.#viewport.render()
+    this.render()
   }
 
   showCursorTime() {
     this.#layerCursor.visible = true
-    this.#viewport.render()
-  }
-
-  drawGrads(range) {
-    this.#layerLabels.scene.clear()
-    this.#xAxis.doCalcXAxisGrads(range)
-    
-    const grads = this.#xAxis.xAxisGrads.values
-    const ctx = this.#layerLabels.scene.context
-    const offset = 0
-    const theme = this.theme.xAxis
-    const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true
-
-    ctx.save();
-    ctx.strokeStyle = theme.colourTick
-    ctx.fillStyle = theme.colourTick
-    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
-    for (let tick of grads) { 
-      let x = bRound(tick[1])
-      // ctx.font = (tick[3] == "major") ? XAxisStyle.FONT_LABEL_BOLD : XAxisStyle.FONT_LABEL
-      let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5)
-      ctx.fillText(tick[0], x - w + offset, this.#xAxis.xAxisTicks + 12)
-
-      if (tickMarker) {
-        ctx.beginPath()
-        ctx.moveTo(x + offset, 0)
-        ctx.lineTo(x + offset, this.#xAxis.xAxisTicks)
-        ctx.stroke()
-      }
-    }
-    ctx.restore();
-  }
-
-  drawOverlays() {
-    this.#layerOverlays.scene.clear()
-
-    const grads = this.#xAxis.xAxisGrads.values
-    const ctx = this.#layerOverlays.scene.context
-    ctx.save();
-
-// draw overlays
-
-    ctx.restore();
+    this.render()
   }
 
 }

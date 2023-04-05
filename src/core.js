@@ -426,8 +426,7 @@ export default class TradeXchart extends Tradex_chart {
     if (this.#delayedSetRange) 
       this.on(STREAM_UPDATE, this.delayedSetRange.bind(this))
 
-    // this.refresh()
-    this.resize(this.width, this.height)
+    this.refresh()
   }
 
   /**
@@ -923,6 +922,9 @@ export default class TradeXchart extends Tradex_chart {
    * @memberof TradeXchart
    */
   refresh() {
+    let start = this.range.indexStart
+    let end = this.range.indexEnd
+    this.setRange(start, end)
     this.MainPane.draw(undefined, true)
     // this.Chart.refresh()
     // const offCharts = this.MainPane.offCharts

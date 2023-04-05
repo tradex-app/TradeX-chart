@@ -112,6 +112,10 @@ export default class xAxis extends Axis {
     this.#xAxisGrads = this.calcXAxisGrads()
   }
 
+  doCalcXAxisGrads(range) {
+    this.#xAxisGrads = this.calcXAxisGrads(range)
+  }
+
   calcXAxisGrads(range=this.range.snapshot()) {
     const grads = {
       entries: {},
@@ -216,8 +220,5 @@ export default class xAxis extends Axis {
     
   }
 
-  doCalcXAxisGrads(range) {
-    this.#xAxisGrads = this.calcXAxisGrads(range)
-  }
 
 }

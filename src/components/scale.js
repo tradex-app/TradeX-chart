@@ -269,8 +269,9 @@ export default class ScaleBar {
 
 
   createGraph() {
-    let overlays = new Map(copyDeep(defaultOverlays))
-        overlays = Array.from(overlays)
+    // let overlays = new Map(copyDeep(defaultOverlays))
+    //     overlays = Array.from(overlays)
+    let overlays = copyDeep(defaultOverlays)
 
     this.graph = new Graph(this, this.#elViewport, overlays, false)
     this.#layerCursor = this.graph.overlays.get("cursor").instance

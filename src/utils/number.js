@@ -218,6 +218,8 @@ export function bRound(n, d=0) {
 
 /**
  * Get the number of decimal places
+ * JavaScript limit of 308 decimal places
+ * 1e+309 = Infinity
  * fastest method
  * @export
  * @param {number} value
@@ -228,7 +230,10 @@ export function precision(value) {
   if (isNaN(value)) return 0;
   if (!isFinite(value)) return 0;
   var e = 1, p = 0;
-  while (Math.round(value * e) / e !== value) { e *= 10; p++; }
+  while (Math.round(value * e) / e !== value) { 
+    e *= 10; 
+    if (e === Infinity) break;
+    p++; }
   return p;
 }
 
