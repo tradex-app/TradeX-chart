@@ -18,6 +18,7 @@ import { isNumber, isObject } from "../utils/typeChecks"
 import { copyDeep, debounce, throttle } from "../utils/utilities"
 
 import {
+  STREAM_FIRSTVALUE,
   STREAM_NEWVALUE,
 } from '../definitions/core'
 
@@ -136,6 +137,7 @@ export default class MainPane {
   get scrollPos() { return this.#core.scrollPos }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
+  get graph() { return this.#Graph }
   get elements() {
     return {
       elTarget: this.#elChart,
@@ -211,7 +213,7 @@ export default class MainPane {
 
     // create and start overlays
     this.createGraph()
-    this.initXGrid()
+    this.draw(this.range, true)
 
     renderLoop.init({
       graphs: [this.#Graph],
@@ -271,7 +273,8 @@ export default class MainPane {
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
 
-    // listen/subscribe/watch for parent notifications
+    // listen/subscribe/watch for notifications
+    this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue.bind(this))
     this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this))
     this.on("setRange", this.draw.bind(this))
     this.on("scrollUpdate", this.draw.bind(this))
@@ -425,8 +428,12 @@ export default class MainPane {
     // this.draw()
   }
 
+  onFirstStreamValue(value) {
+    this.chart.scale.xAxis.calcXAxisGrads(this.range,)
+    this.draw(this.range, true)
+  }
+
   onNewStreamValue(value) {
-    this.draw()
   }
 
   onPointerActive(chart) {
@@ -609,16 +616,13 @@ export default class MainPane {
     this.#Graph = new Graph(this, this.#elViewport, overlays)
   }
 
-  initXGrid() {
-    this.draw()
-  }
-
   draw(range=this.range, update=false) {
     const graphs = [
       this.#Graph,
       this.#Time,
       this.#Chart
     ]
+    this.time.xAxis.doCalcXAxisGrads(range)
     this.#OffCharts.forEach((offChart, key) => {
       graphs.push(offChart)
     })

@@ -32,7 +32,7 @@ export default class chartGrid extends Overlay{
 
     // X Axis
     if (axes != "y") {
-      const offset = this.xAxis.smoothScrollOffset || 0
+      const offset = 0 // this.xAxis.smoothScrollOffset || 0
       const xGrads = this.xAxis.xAxisGrads.values
 
       for (let tick of xGrads) {

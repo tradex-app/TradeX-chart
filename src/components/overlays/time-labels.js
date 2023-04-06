@@ -36,7 +36,6 @@ export default class TimeLabels extends Overlay {
       // ctx.font = (tick[3] == "major") ? XAxisStyle.FONT_LABEL_BOLD : XAxisStyle.FONT_LABEL
       let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5)
       ctx.fillText(tick[0], x - w + offset, this.xAxis.xAxisTicks + 12)
-
       ctx.beginPath()
       ctx.moveTo(x + offset, 0)
       ctx.lineTo(x + offset, this.xAxis.xAxisTicks)

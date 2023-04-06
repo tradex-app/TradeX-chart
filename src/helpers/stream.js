@@ -21,6 +21,7 @@ import {
   STREAM_LISTENING,
   STREAM_STARTED,
   STREAM_STOPPED,
+  STREAM_FIRSTVALUE,
   STREAM_NEWVALUE,
   STREAM_UPDATE,
   STREAM_MAXUPDATE,
@@ -49,6 +50,7 @@ export default class Stream {
   #countDownStart = 0
   #countDownMS = 0
   #countDown = ""
+  #dataReceived = false
 
   static validateConfig(c) {
     if (!isObject(c)) return defaultStreamConfig
@@ -80,6 +82,12 @@ export default class Stream {
   set status({status, data}) {
     this.#status = status
     this.emit(status, data)
+  }
+  set dataReceived(data) {
+    if (this.#dataReceived) return
+
+    this.#dataReceived = true
+    this.status = {status: STREAM_FIRSTVALUE, data}
   }
 
   /**

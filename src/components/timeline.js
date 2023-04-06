@@ -318,7 +318,6 @@ export default class Timeline {
   }
 
   draw(range=this.range, update=true) {
-    this.#xAxis.doCalcXAxisGrads(range)
     this.#Graph.draw(range, update)
   }
 

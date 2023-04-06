@@ -32,6 +32,7 @@ export const STREAM_LISTENING = "stream_Listening"
 export const STREAM_STARTED   = "stream_Started"
 export const STREAM_STOPPED   = "stream_Stopped"
 export const STREAM_ERROR     = "stream_Error"
+export const STREAM_FIRSTVALUE= "stream_candleFirst"
 export const STREAM_UPDATE    = "stream_candleUpdate"
 export const STREAM_NEWVALUE  = "stream_candleNew"
 export const STREAM_MAXUPDATE = 250
