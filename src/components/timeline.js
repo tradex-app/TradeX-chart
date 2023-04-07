@@ -3,14 +3,10 @@
 
 import DOM from "../utils/DOM"
 import xAxis from "./axis/xAxis"
-import CEL from "./primitives/canvas3"
 import Input from "../input"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-time"
-import { drawTextBG, getTextRectWidth } from "../utils/canvas"
-import { bRound, limit } from "../utils/number"
-import { isBoolean } from "../utils/typeChecks"
-import { copyDeep, debounce,throttle } from "../utils/utilities"
+import { copyDeep, debounce, throttle } from "../utils/utilities"
 import Slider from "./widgets/slider"
 import { BUFFERSIZE } from "../definitions/chart"
 

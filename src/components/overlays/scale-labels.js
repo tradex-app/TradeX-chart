@@ -20,7 +20,7 @@ export default class ScaleLabels extends Overlay {
   draw() {
     const ctx = this.scene.context
     const yAxis = this.yAxis
-    const grads = yAxis.yAxisGrads || []
+    const grads = this.yAxis.calcGradations() || []
     const theme = this.theme.yAxis
     const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true
       let tickPos = []
@@ -31,7 +31,6 @@ export default class ScaleLabels extends Overlay {
       default: tickPos = [1, yAxis.yAxisTicks]; break;
     }
 
-    yAxis.calcGradations()
     this.scene.clear()
     ctx.save()
     ctx.strokeStyle = theme.colourTick

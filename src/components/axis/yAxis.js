@@ -250,6 +250,7 @@ export default class yAxis extends Axis {
         this.#yAxisGrads = this.gradations(max, min)
         break;
     }
+    return this.#yAxisGrads
   }
 
   gradations(max, min, decimals=true, fixed=false) {

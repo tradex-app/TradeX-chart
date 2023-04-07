@@ -12,6 +12,8 @@ export default class TimeCursor extends Overlay {
     xAxis = parent.time.xAxis
 
     super(target, xAxis, yAxis, theme, parent)
+
+    this.viewport = target.viewport
   }
 
   // set position(p) { return }
@@ -34,7 +36,7 @@ export default class TimeCursor extends Overlay {
       paddingTop: 5,
       paddingBottom: 3,
       paddingLeft: 4,
-      paddingRight: 4
+      paddingRight: 4,
     },
     txtW = getTextRectWidth(ctx, dateTimeStr, options),
     xPos = x + this.core.bufferPx;

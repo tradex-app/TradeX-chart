@@ -77,17 +77,16 @@ export default class OffChart extends Chart {
 
     this.#offChartID = index
 
-    // X Axis - Timeline
-    this.time = this.core.Timeline
+    super.start(stateMachineConfig)
+  
+    // set up event listeners
+    this.eventsListen()
 
     // add divider to allow manual resize of the offChart indicator
     const oc = this
     const config = { offChart: oc }
     this.#Divider = this.widgets.insert("Divider", config)
     this.#Divider.start()
-
-    // prepare layered canvas
-    this.createGraph()
 
     // Legends - to display indicator overlay Title, inputs and options
     let instance = this.#overlayIndicator
@@ -99,24 +98,6 @@ export default class OffChart extends Chart {
     }
     this.legend = new Legends(this.elLegend, this)
     this.legend.add(offChartLegend)
-
-    // Y Axis - Price Scale
-    this.scale.on("started",(data)=>{this.log(`OffChart scale started: ${data}`)})
-    this.scale.start("OffChart",this.name,"yAxis Scale started")
-
-    // draw the chart - grid, candles, volume
-    this.draw(this.range)
-
-    // set mouse pointer
-    this.setCursor("crosshair")
-  
-    // set up event listeners
-    this.eventsListen()
-
-    // start State Machine 
-    stateMachineConfig.id = this.id
-    this.stateMachine = stateMachineConfig
-    this.stateMachine.start()
   }
 
   end() {

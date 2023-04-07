@@ -165,8 +165,8 @@ export default class ScaleBar {
     this.on(STREAM_UPDATE, this.#layerPriceLine.draw.bind(this.#layerPriceLine))
 
     // this.on(STREAM_UPDATE, (e) => { this.#layerPriceLine.draw(e) })
-    // this.on("chart_pan", (e) => { this.drawCursorPrice() })
-    // this.on("chart_panDone", (e) => { this.drawCursorPrice() })
+    this.on("chart_pan", this.onMouseMove.bind(this))
+    this.on("chart_panDone", this.onMouseMove.bind(this))
     // this.on("resizeChart", (dimensions) => this.onResize.bind(this))
   }
 

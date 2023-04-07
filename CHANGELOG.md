@@ -1,6 +1,39 @@
 # Change Log
 
-## [0.117.4] - 2023-04-xx
+## [0.117.8] - 2023-04-06
+
+Changed
+
+* Refactored onChart and offChart code out to chart parent class
+
+FIXED
+
+* Y Scale grads sync to current range
+* Y Scale price line default width
+
+## [0.117.7] - 2023-04-06
+
+Added
+
+* Event - STREAM_FIRSTVALUE
+
+Fixed
+
+* X grid sync timeline on streaming
+
+## [0.117.6] - 2023-04-05
+
+Changed
+
+* Timeline - now uses Graph to manage overlays
+
+## [0.117.5] - 2023-04-03
+
+Changed
+
+* Scale - now uses Graph to manage overlays
+
+## [0.117.4] - 2023-04-01
 
 Changed
 

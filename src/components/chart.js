@@ -9,7 +9,7 @@ import {
   isObject,
   isString,
 } from "../utils/typeChecks";
-import CEL from "../components/primitives/canvas3";
+import CEL from "./primitives/canvas";
 import StateMachine from "../scaleX/stateMachne";
 import Input from "../input"
 import {
@@ -17,6 +17,7 @@ import {
   STREAM_NONE,
   STREAM_LISTENING,
   STREAM_STOPPED,
+  STREAM_FIRSTVALUE,
   STREAM_NEWVALUE,
   STREAM_UPDATE,
 } from "../definitions/core";
@@ -140,7 +141,7 @@ export default class Chart {
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
 
-  start() {
+  start(stateMachineConfig) {
     // X Axis - Timeline
     this.#Time = this.#core.Timeline;
 
@@ -148,7 +149,7 @@ export default class Chart {
     this.createGraph();
 
     // Y Axis - Price Scale
-    this.#Scale.start(this.name, "yAxis Scale started");
+    this.#Scale.start();
 
     // draw the chart - grid, candles, volume
     this.draw(this.range);
@@ -156,10 +157,8 @@ export default class Chart {
     // set mouse pointer
     this.setCursor("crosshair");
 
-    // set up event listeners
-    this.eventsListen();
-
     // start State Machine
+    stateMachineConfig.id = this.id
     stateMachineConfig.context = this;
     this.stateMachine = stateMachineConfig;
     this.stateMachine.start();
@@ -182,6 +181,7 @@ export default class Chart {
     this.off(STREAM_LISTENING, this.onStreamListening);
     this.off(STREAM_NEWVALUE, this.onStreamNewValue);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
+    this.off(STREAM_FIRSTVALUE, this.onStreamNewValue)
   }
 
   eventsListen() {
@@ -198,6 +198,7 @@ export default class Chart {
     this.on(STREAM_LISTENING, this.onStreamListening.bind(this));
     this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this));
     this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this));
+    this.on(STREAM_FIRSTVALUE, this.onStreamNewValue.bind(this))
   }
 
   /**

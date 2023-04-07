@@ -38,7 +38,8 @@ export default class ScaleCursor extends Overlay {
       paddingTop: 2,
       paddingBottom: 2,
       paddingLeft: 3,
-      paddingRight: 3
+      paddingRight: 3,
+      width: this.viewport.width
     },
     
     height = options.fontSize + options.paddingTop + options.paddingBottom,

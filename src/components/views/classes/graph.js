@@ -4,7 +4,7 @@
 import DOM from "../../../utils/DOM"
 import { copyDeep } from '../../../utils/utilities'
 import { isArray, isBoolean, isNumber, isObject, isString } from '../../../utils/typeChecks'
-import CEL from "../../primitives/canvas3"
+import CEL from "../../primitives/canvas"
 import Overlays from "../../overlays"
 
 import grid from "../../overlays/chart-grid"

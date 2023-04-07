@@ -4,8 +4,7 @@
 
 import { isString } from "../utils/typeChecks"
 import { insertAtIndex } from "../utils/utilities"
-import CEL from "./primitives/canvas3"
-
+import CEL from "./primitives/canvas"
 
 
 export default class Overlays {

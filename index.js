@@ -35,12 +35,12 @@ let state4 = {
       ]
   ],
 onchart: [
-  {
-    "name": "SMA, 5",
-    "type": "SMA",
-    "data": [],
-    "settings": {period: 5}
-  }
+  // {
+  //   "name": "SMA, 5",
+  //   "type": "SMA",
+  //   "data": [],
+  //   "settings": {period: 5}
+  // }
 ],
 "offchart": [
   {

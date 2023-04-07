@@ -96,8 +96,8 @@ export function drawTextBG(ctx, txt, x, y, options) {
   ctx.fillStyle = options.bakCol || defaultOptions.bakCol;
   
   /// get width of text
-  let width = getTextRectWidth(ctx, txt, options)
-  let height = getTextRectHeight(options)
+  let width = options.width || getTextRectWidth(ctx, txt, options)
+  let height = options.height || getTextRectHeight(options)
 
   /// draw background rect
   ctx.fillRect(x, y, width, height);
@@ -106,7 +106,7 @@ export function drawTextBG(ctx, txt, x, y, options) {
   ctx.fillStyle = options.txtCol || defaultOptions.txtCol;
   x = x + options?.paddingLeft
   y = y + options?.paddingTop
-  ctx.fillText(txt, x, y);
+  ctx.fillText(`${txt}`, x, y);
   
   /// restore original state
   ctx.restore();

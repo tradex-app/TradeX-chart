@@ -92,11 +92,11 @@ export default class OnChart extends Chart {
    * Draw the chart
    */
   start() {
-    // X Axis - Timeline
-    this.time = this.core.Timeline
 
-    // create and start overlays
-    this.createGraph()
+    super.start(stateMachineConfig)
+
+    // set up event listeners
+    this.eventsListen();
 
     // create and start on chart indicators
     this.addOverlays(this.core.onChart)
@@ -106,39 +106,16 @@ export default class OnChart extends Chart {
       data.inputs.chart = {stream: this.Stream}
       // iterate over on chart indicators and add inputs if any
     }
-
-    // Y Axis - Price Scale
-    this.scale.start()
-
-    // draw the chart - grid, candles, volume
-    this.draw(this.range)
-
-    // set mouse pointer
-    this.setCursor("crosshair")
-
-    // set up event listeners
-    this.eventsListen()
-
-    // start State Machine 
-    stateMachineConfig.id = this.id
-    this.stateMachine = stateMachineConfig
-    this.stateMachine.start()
   }
 
   end() {
     this.off("chart_yAxisRedraw", this.onYAxisRedraw)
-    this.off("setRange", this.draw)
-
     super.end()
   }
 
   eventsListen() {
     super.eventsListen()
     this.on("chart_yAxisRedraw", this.onYAxisRedraw.bind(this))
-  }
-
-  onStreamNewValue(candle) {
-    this.draw(this.range, true)
   }
 
   onStreamUpdate(candle) {
