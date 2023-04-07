@@ -37,6 +37,7 @@ const mouse = [
   "mouseout",
   "mouseover",
   "mouseup",
+  "mousewheel",
 ]
 
 const touch = [

@@ -26,8 +26,8 @@ export default class yAxis extends Axis {
       get min() { return this.range?.valueMin },
       get mid() { return this.range?.valueMin + (this.range?.valueDiff * 0.5) },
       get diff() { return this.range?.valueDiff },
-      zoom: 1,
-      offset: 0,
+      get zoom() { return 1 },
+      get offset() { return 0 },
       range: null
     },
     manual: {
@@ -41,9 +41,7 @@ export default class yAxis extends Axis {
   }
   #yAxisPadding = 1.04
   #yAxisStep = YAXIS_STEP
-  // #yAxisGrid = YAXIS_GRID
   #yAxisDigits = PRICEDIGITS
-  // #yAxisRound = 3
   #yAxisTicks = 3
   #yAxisGrads
 
@@ -55,8 +53,6 @@ export default class yAxis extends Axis {
     this.#parent = parent
     this.#source = parent.parent
     this.yAxisType = yAxisType
-    // this.#yAxisGrid = (this.core.config?.yAxisGrid) ? 
-    //   this.core.config?.yAxisGrid : YAXIS_GRID
 
     range = (range) ? range : this.core.range
     this.#transform.automatic.range = range
@@ -206,23 +202,24 @@ export default class yAxis extends Axis {
     if (!isNumber(z) || this.#mode !== "manual") return false
 
     const t = this.#transform
-    t.manual.zoom += z
-    // console.log(JSON.stringify(t.manual))
-
     const r = z / this.height
-    const min = t.manual.min * (1 - r)
-    const max = t.manual.max * (1 + r)
+
+      let min = t.manual.min
+      let max = t.manual.max
+    const delta = max - min;
+    const delta10P = delta * 0.01;
+    const change = z * delta10P;
+          min -= change;
+          max += change;
     
-    if (max < min) return
+    if (max < min || min <= delta)  return
 
     t.manual.max =  max
-    t.manual.min = (min >= 0)? min : 0
-    t.manual.mid = (max - min) / 2
-    t.manual.diff = max - min
-    t.manual.zoom = 1
+    t.manual.min = (min >= 0.001)? min : 0.001
+    t.manual.mid = (delta) / 2
+    t.manual.diff = delta
+    t.manual.zoom = change
     t.manual.offset = 0
-
-    // console.log(JSON.stringify(t.manual))
   }
 
 //   setYFactor(f) {

@@ -7,7 +7,7 @@ import yAxis from "./axis/yAxis"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
 import Input from '../input'
-import { copyDeep, uid } from '../utils/utilities'
+import { copyDeep, throttle, uid } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
 
 import Graph from "./views/classes/graph"
@@ -118,17 +118,10 @@ export default class ScaleBar {
       this.#parent.localRange : undefined
     this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
 
-    // create and start overlays
     this.createGraph()
-
-    // create and start on chart indicators
     this.addOverlays([])
-
-    // draw the scale
     this.#yAxis.calcGradations()
     this.draw()
-
-    // set up event listeners
     this.eventsListen()
 
     // start State Machine 
@@ -143,28 +136,28 @@ export default class ScaleBar {
     this.#input = null
     this.#viewport.destroy()
 
-    // this.#controller.removeEventListener("drag", this.onDrag);
-    // this.#controller.removeEventListener("enddrag", this.onDragDone);
+    this.#input.on("pointerdrag", this.onDrag);
+    this.#input.on("wheel", this.onMouseWheel)
+    this.#input.on("dblclick", this.resetScaleRange)
 
     this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove)
     this.off(`${this.#parent.ID}_mouseout`, this.#layerCursor.erase)
     this.off(STREAM_UPDATE, this.onStreamUpdate)
+    this.off("chart_pan", this.onMouseMove)
+    this.off("chart_panDone", this.onMouseMove)
   }
 
   eventsListen() {
     let canvas = this.#Graph.viewport.scene.canvas
-    // create controller and use 'on' method to receive input events 
     this.#input = new Input(canvas, {disableContextMenu: false});
     this.#input.setCursor("ns-resize")
-    // this.#controller.on("drag", this.onDrag.bind(this));
-    // this.#controller.on("enddrag", this.onDragDone.bind(this));
-    // this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
+    this.#input.on("pointerdrag", throttle(this.onDrag, 100, this, true));
+    this.#input.on("wheel", this.onMouseWheel.bind(this))
+    this.#input.on("dblclick", this.resetScaleRange.bind(this))
 
     this.on(`${this.#parent.id}_mousemove`, this.onMouseMove.bind(this))
     this.on(`${this.#parent.id}_mouseout`, this.#layerCursor.erase.bind(this.#layerCursor))
     this.on(STREAM_UPDATE, this.#layerPriceLine.draw.bind(this.#layerPriceLine))
-
-    // this.on(STREAM_UPDATE, (e) => { this.#layerPriceLine.draw(e) })
     this.on("chart_pan", this.onMouseMove.bind(this))
     this.on("chart_panDone", this.onMouseMove.bind(this))
     // this.on("resizeChart", (dimensions) => this.onResize.bind(this))
@@ -201,6 +194,8 @@ export default class ScaleBar {
       scale: this,
       cursorPos: this.#cursorPos
     }
+    this.setScaleRange(this.#cursorPos[5])
+    this.render()
     this.emit("scale_drag", dragEvent)
   }
 
@@ -214,6 +209,7 @@ export default class ScaleBar {
       scale: this,
       cursorPos: this.#cursorPos
     }
+    this.setScaleRange(this.#cursorPos[5])
     this.emit("scale_dragDone", dragEvent)
   }
 
@@ -221,9 +217,8 @@ export default class ScaleBar {
     e.domEvent.preventDefault()
 
     const direction = Math.sign(e.wheeldelta) * -1
-    const range = this.range
-
-    console.log(`Scale: mousewheel: ${direction}`)
+    this.setScaleRange(direction)
+    this.render()
   }
 
   onStreamUpdate(e) {
@@ -250,6 +245,12 @@ export default class ScaleBar {
     this.draw()
   }
 
+  resetScaleRange() {
+    this.#yAxis.mode = "automatic"
+    this.draw()
+    this.core.MainPane.draw(undefined, true)
+  }
+
   setCursor(cursor) {
     this.#element.style.cursor = cursor
   }
@@ -269,8 +270,6 @@ export default class ScaleBar {
 
 
   createGraph() {
-    // let overlays = new Map(copyDeep(defaultOverlays))
-    //     overlays = Array.from(overlays)
     let overlays = copyDeep(defaultOverlays)
 
     this.graph = new Graph(this, this.#elViewport, overlays, false)

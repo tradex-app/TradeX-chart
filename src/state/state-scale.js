@@ -99,7 +99,7 @@ export default
       onEnter(data) {
         // if (data.scale.ID == this.context.origin.ID) {
           console.log(`${this.context.origin.ID}: state: "${this.state}" - onEnter`)
-          this.context.origin.setScaleRange(data.cursorPos[5]) 
+          // this.context.origin.setScaleRange(data.cursorPos[5]) 
         // }
       },
       onExit(data) {
