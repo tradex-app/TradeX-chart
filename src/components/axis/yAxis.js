@@ -202,7 +202,7 @@ export default class yAxis extends Axis {
     if (!isNumber(z) || this.#mode !== "manual") return false
 
     const t = this.#transform
-    const r = z / this.height
+    // const r = (z == 0) ? 0 : z / this.height
 
       let min = t.manual.min
       let max = t.manual.max
@@ -244,7 +244,8 @@ export default class yAxis extends Axis {
       default:
         let max = (this.#range.max > 0) ? this.#range.max : 1
         let min = (this.#range.min > 0) ? this.#range.min : 0
-        this.#yAxisGrads = this.gradations(max, min)
+        let off = this.#range.offset
+        this.#yAxisGrads = this.gradations(max + off, min + off)
         break;
     }
     return this.#yAxisGrads

@@ -52,13 +52,6 @@ export default
             // console.log(`${this.id}: transition from "${this.state}" to  "setRange"`)
           },
         },
-        scale_drag: {
-          target: 'scale_drag',
-          condition: 'receiver',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "scale_drag"`)
-          },
-        },
       }
     },
     resize: {
@@ -95,36 +88,6 @@ export default
         },
       }
     },
-    scale_drag: {
-      onEnter(data) {
-        // if (data.scale.ID == this.context.origin.ID) {
-          console.log(`${this.context.origin.ID}: state: "${this.state}" - onEnter`)
-          // this.context.origin.setScaleRange(data.cursorPos[5]) 
-        // }
-      },
-      onExit(data) {
-        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
-      },
-      on: {
-        scale_drag: {
-          target: 'scale_drag',
-          condition: 'receiver',
-          action (data) {
-            // console.log(`${this.context.origin.ID}: transition from "${this.state}" to "scale_drag"`)
-            // this.context.origin.setScaleRange(data.cursorPos[5]) 
-          },
-        },
-        scale_dragDone: {
-          target: 'idle',
-          condition: 'receiver',
-          action (data) {
-            console.log(`${this.context.origin.ID}: transition from "${this.state}" to "idle"`)
-            // this.context.origin.setScaleRange(data.cursorPos[5]) 
-          },
-        },
-      }
-    },
-
   },
   guards: {
     receiver () { return (this.eventData.scale.ID == this.context.origin.ID) },

@@ -152,14 +152,15 @@ export default class ScaleBar {
     this.#input = new Input(canvas, {disableContextMenu: false});
     this.#input.setCursor("ns-resize")
     this.#input.on("pointerdrag", throttle(this.onDrag, 100, this, true));
+    this.#input.on("pointerdragend", this.onDragDone.bind(this))
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("dblclick", this.resetScaleRange.bind(this))
 
     this.on(`${this.#parent.id}_mousemove`, this.onMouseMove.bind(this))
     this.on(`${this.#parent.id}_mouseout`, this.#layerCursor.erase.bind(this.#layerCursor))
     this.on(STREAM_UPDATE, this.#layerPriceLine.draw.bind(this.#layerPriceLine))
-    this.on("chart_pan", this.onMouseMove.bind(this))
-    this.on("chart_panDone", this.onMouseMove.bind(this))
+    this.on("chart_pan", this.onChartDrag.bind(this))
+    this.on("chart_panDone", this.onChartDrag.bind(this))
     // this.on("resizeChart", (dimensions) => this.onResize.bind(this))
   }
 
@@ -196,7 +197,6 @@ export default class ScaleBar {
     }
     this.setScaleRange(this.#cursorPos[5])
     this.render()
-    this.emit("scale_drag", dragEvent)
   }
 
   onDragDone(e) {
@@ -210,7 +210,7 @@ export default class ScaleBar {
       cursorPos: this.#cursorPos
     }
     this.setScaleRange(this.#cursorPos[5])
-    this.emit("scale_dragDone", dragEvent)
+    this.render()
   }
 
   onMouseWheel(e) {
@@ -223,6 +223,13 @@ export default class ScaleBar {
 
   onStreamUpdate(e) {
 
+  }
+
+  onChartDrag(e) {
+    if (this.#yAxis.mode !== "manual") return
+    // this.#yAxis.offset = e.movement.y
+    this.#yAxis.offset = e[5]
+    this.render()
   }
 
   setHeight(h) {
