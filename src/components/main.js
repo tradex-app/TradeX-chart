@@ -9,7 +9,6 @@ import renderLoop from "./views/classes/renderLoop"
 import Chart from "./onChart"
 import OffChart from "./offChart"
 import chartGrid from "./overlays/chart-grid"
-import watermark from "./overlays/chart-watermark"
 // import chartCompositor from "./overlays/chart-compositor"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-mainPane"
@@ -35,7 +34,6 @@ import {
 } from "../definitions/style"
 
 const defaultOverlays = [
-  ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
   ["grid", {class: chartGrid, fixed: false, required: true, params: {axes: "x"}}],
   // ["chartCompositor", {class: chartCompositor, fixed: true, required: true}]
 ]

@@ -150,7 +150,7 @@ export default class yAxis extends Axis {
   $2Pixel(yData) {
     // const min = this.#range.min 
     const height = yData - this.#range.min
-    const yPos = this.height - (height * this.yAxisRatio) + this.#range.offset
+    const yPos = this.height - (height * this.yAxisRatio)
     return yPos
   }
 
@@ -191,11 +191,17 @@ export default class yAxis extends Axis {
   }
 
   setOffset(o) {
-    if (!isNumber(o) || this.#mode !== "manual") return false
+    if (!isNumber(o) || o == 0 || this.#mode !== "manual") return false
 
     const t = this.#transform
-    t.manual.offset += o
-    console.log("t.manual.offset:",t.manual.offset)
+    let max = this.pixel2$(o * -1)
+    let min = this.pixel2$(this.height - o)
+    let delta = max - min;
+    t.manual.min = min
+    t.manual.max = max
+    t.manual.mid = (delta) / 2
+    t.manual.diff = delta
+    t.manual.zoom = 0
   }
 
   setZoom(z) {
@@ -219,7 +225,8 @@ export default class yAxis extends Axis {
     t.manual.mid = (delta) / 2
     t.manual.diff = delta
     t.manual.zoom = change
-    t.manual.offset = 0
+
+    this.calcGradations()
   }
 
 //   setYFactor(f) {
@@ -287,8 +294,10 @@ export default class yAxis extends Axis {
 
       pos -= stepP
     }
+    if (this.#mode !== "manual") {
     scaleGrads.shift()
     scaleGrads.pop()
+    }
 
     return scaleGrads
   }

@@ -15,12 +15,14 @@ import chartCursor from "./overlays/chart-cursor"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartStreamCandle from "./overlays/chart-streamCandle"
+import watermark from "./overlays/chart-watermark"
 import indicator from "./overlays/indicator"
 import stateMachineConfig from "../state/state-onChart"
 
 import { CandleStyle, VolumeStyle } from "../definitions/style"
 
 const defaultOverlays = [
+  ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
   ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
   ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
   ["candles", {class: chartCandles, fixed: false, required: true}],

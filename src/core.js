@@ -460,8 +460,7 @@ export default class TradeXchart extends Tradex_chart {
   /** Subscribe to a topic
   *
   * @param {String} topic      - The topic name
-  * @param {Function} callback - The function that is called if another module
-  *                              publishes to the specified topic
+  * @param {Function} callback - The function or method that is called
   * @param {Object}  context   - The context the function(s) belongs to
   */
    on(topic, handler, context) {

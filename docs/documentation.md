@@ -13,4 +13,6 @@ eg. 0.100.6
 * [API Documentation](https://tradex-app.github.io/TradeX-chart/api/)
 * [Configuration](configuration.md)
 * [Chart State](state.md)
+* [Events](events.md)
 * [Streaming Price Data](streaming-price-data.md)
+

@@ -48,7 +48,7 @@ export default class chartGrid extends Overlay{
     if (axes != "x") {
       const yGrads = this.yAxis.yAxisGrads
       for (let tick of yGrads) {
-        let y = bRound(tick[1])
+        let y = this.yAxis.$2Pixel(tick[0])
         ctx.beginPath()
         ctx.moveTo(0, y)
         ctx.lineTo(this.scene.width, y)

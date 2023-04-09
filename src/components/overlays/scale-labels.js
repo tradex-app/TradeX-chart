@@ -24,6 +24,7 @@ export default class ScaleLabels extends Overlay {
     const theme = this.theme.yAxis
     const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true
       let tickPos = []
+      let y
 
     switch (theme?.location) {
       case "left": tickPos = [this.width, this.width - yAxis.yAxisTicks]; break;
@@ -37,12 +38,13 @@ export default class ScaleLabels extends Overlay {
     ctx.fillStyle = theme.colourTick
     ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
     for (let tick of grads) {
-      ctx.fillText(tick[0], yAxis.yAxisTicks + 5, tick[1] + 4)
+      y = yAxis.$2Pixel(tick[0])
+      ctx.fillText(tick[0], yAxis.yAxisTicks + 5, y + 4)
 
       if (tickMarker) {
         ctx.beginPath()
-        ctx.moveTo(tickPos[0], tick[1])
-        ctx.lineTo(tickPos[1], tick[1])
+        ctx.moveTo(tickPos[0], y)
+        ctx.lineTo(tickPos[1], y)
         ctx.stroke()
       }
     }

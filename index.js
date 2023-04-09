@@ -124,7 +124,7 @@ const config1 = {
 
     },
     tools: {
-      location: "left"
+      location: false
     },
     utils: {
       location: false
@@ -175,6 +175,9 @@ const config2 = {
     },
     onChart: {
 
+    },
+    utils: {
+      location: false
     },
   },
   isCrypto: true,
@@ -620,7 +623,7 @@ function once (chart) {
 // Add some charts
 
 addChart()
-addChart()
-addChart()
-addChart()
-addChart()
+// addChart()
+// addChart()
+// addChart()
+// addChart()
