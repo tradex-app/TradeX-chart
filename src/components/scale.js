@@ -200,17 +200,7 @@ export default class ScaleBar {
   }
 
   onDragDone(e) {
-    this.#cursorPos = [
-      Math.floor(e.position.x), Math.floor(e.position.y),
-      e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
-    ]
-    const dragEvent = {
-      scale: this,
-      cursorPos: this.#cursorPos
-    }
-    this.setScaleRange(this.#cursorPos[5])
-    this.render()
+
   }
 
   onMouseWheel(e) {
@@ -227,9 +217,9 @@ export default class ScaleBar {
 
   onChartDrag(e) {
     if (this.#yAxis.mode !== "manual") return
-    // this.#yAxis.offset = e.movement.y
     this.#yAxis.offset = e[5]
-    this.render()
+    this.parent.draw(this.range, true)
+    this.draw()
   }
 
   setHeight(h) {
@@ -254,8 +244,8 @@ export default class ScaleBar {
 
   resetScaleRange() {
     this.#yAxis.mode = "automatic"
+    this.parent.draw(this.range, true)
     this.draw()
-    this.core.MainPane.draw(undefined, true)
   }
 
   setCursor(cursor) {

@@ -192,7 +192,7 @@ export default class yAxis extends Axis {
 
   setOffset(o) {
     if (!isNumber(o) || o == 0 || this.#mode !== "manual") return false
-
+    
     const t = this.#transform
     let max = this.pixel2$(o * -1)
     let min = this.pixel2$(this.height - o)

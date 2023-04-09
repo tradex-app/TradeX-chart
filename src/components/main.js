@@ -13,8 +13,8 @@ import chartGrid from "./overlays/chart-grid"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-mainPane"
 import Input from "../input"
-import { isNumber, isObject } from "../utils/typeChecks"
-import { copyDeep, debounce, throttle } from "../utils/utilities"
+import { isNumber } from "../utils/typeChecks"
+import { copyDeep } from "../utils/utilities"
 
 import {
   STREAM_FIRSTVALUE,
@@ -368,32 +368,21 @@ export default class MainPane {
       ...d.delta
     ])
 
-    // this.#cursorPos = [
-    //   e.position.x, e.position.y, 
-    //   e.dragstart.x, e.dragstart.y,
-    //   e.movement.x, e.movement.y
-    // ]
+    this.#Chart.scale.onChartDrag(d.delta[1])
+
     this.emit("chart_pan", this.#cursorPos)
   }
 
   onChartDragDone(e) {
     const d = this.#drag
     d.active = false
-    d.delta = [
-      e.position.x - d.prev[0], 
-      e.position.y - d.prev[1]
-    ]
+    d.delta = [ 0, 0 ]
     this.#cursorPos = [
-      e.position.x, e.position.y, 
+      ...d.prev,
       ...d.start,
       ...d.delta
     ]
 
-    // this.#cursorPos = [
-    //   e.position.x, e.position.y, 
-    //   e.dragstart.x, e.dragstart.y,
-    //   e.movement.x, e.movement.y
-    // ]
     this.emit("chart_panDone", this.#cursorPos)
   }
 
