@@ -47,6 +47,7 @@ export default class OffChart extends Chart {
 
   constructor (core, options) {
 
+    options.type = "offChart"
     super(core, options)
 
     this.#ID = this.options.offChartID || uid("TX_OC_")

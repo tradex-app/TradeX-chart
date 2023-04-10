@@ -27,6 +27,7 @@ export default class Chart {
   #ID;
   #name
   #shortName
+  #type
   #core;
   #options;
   #parent;
@@ -78,6 +79,7 @@ export default class Chart {
     this.#parent = this.#options.parent;
     this.#theme = core.theme;
     this.#settings = core.settings;
+    this.#type = options.type || "offChart"
 
     // process options
     for (const option in this.#options) {
@@ -97,6 +99,7 @@ export default class Chart {
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get title() { return this.#title }
+  get type() { return this.#type }
   get parent() { return this.#parent }
   get core() { return this.#core }
   get options() { return this.#options }
@@ -232,11 +235,13 @@ export default class Chart {
   onChartDrag(e) {
     this.setCursor("grab")
     this.core.MainPane.onChartDrag(e)
+    this.scale.onChartDrag(e)
   }
 
   onChartDragDone(e) {
     this.setCursor("crosshair")
     this.core.MainPane.onChartDragDone(e)
+    // this.scale.onChartDragDone(e)
   }
 
   onMouseMove(e) {

@@ -265,8 +265,6 @@ export default class MainPane {
     this.#input.on("keyup", this.onChartKeyUp.bind(this))
 
     this.#input.on("wheel", this.onMouseWheel.bind(this))
-    this.#input.on("pointerdrag", this.onChartDrag.bind(this))
-    this.#input.on("pointerdragend", this.onChartDragDone.bind(this))
     this.#input.on("pointermove", this.onMouseMove.bind(this))
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
@@ -368,8 +366,6 @@ export default class MainPane {
       ...d.delta
     ])
 
-    this.#Chart.scale.onChartDrag(d.delta[1])
-
     this.emit("chart_pan", this.#cursorPos)
   }
 
@@ -398,7 +394,6 @@ export default class MainPane {
         this.emit("chart_pan", [step,null,0,null,step,null])
         break;
     }
-    // this.draw()
   }
 
   onChartKeyUp(e) {

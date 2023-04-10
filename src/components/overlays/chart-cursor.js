@@ -28,6 +28,7 @@ export default class chartCursor extends Overlay{
 
   onMouseDragX(e) {
     this.#cursorPos[0] = e[0]
+    this.#cursorPos[1] = e[1]
     this.draw(true)
     this.core.emit("chart_render")
   }

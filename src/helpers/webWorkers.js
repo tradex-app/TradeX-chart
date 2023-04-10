@@ -3,8 +3,8 @@
 // https://gist.github.com/sergiodxa/06fabb866653bd8b3165e9fe9fd8036b
 
 import { uid } from "../utils/utilities";
-import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from '../utils/typeChecks'
-import { timestampDiff } from "../utils/time";
+import { isFunction, isString } from '../utils/typeChecks'
+// import { timestampDiff } from "../utils/time";
 
 class ThreadWorker {
 

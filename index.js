@@ -623,7 +623,7 @@ function once (chart) {
 // Add some charts
 
 addChart()
-// addChart()
-// addChart()
-// addChart()
-// addChart()
+addChart()
+addChart()
+addChart()
+addChart()

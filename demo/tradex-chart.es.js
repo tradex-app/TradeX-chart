@@ -742,7 +742,10 @@ function precision(value) {
   if (isNaN(value)) return 0;
   if (!isFinite(value)) return 0;
   var e = 1, p = 0;
-  while (Math.round(value * e) / e !== value) { e *= 10; p++; }
+  while (Math.round(value * e) / e !== value) {
+    e *= 10;
+    if (e === Infinity) break;
+    p++; }
   return p;
 }
 function log10 (value) {
@@ -1449,6 +1452,7 @@ const STREAM_LISTENING = "stream_Listening";
 const STREAM_STARTED   = "stream_Started";
 const STREAM_STOPPED   = "stream_Stopped";
 const STREAM_ERROR     = "stream_Error";
+const STREAM_FIRSTVALUE= "stream_candleFirst";
 const STREAM_UPDATE    = "stream_candleUpdate";
 const STREAM_NEWVALUE  = "stream_candleNew";
 const STREAM_MAXUPDATE = 250;
@@ -1474,6 +1478,7 @@ class Stream {
   #countDownStart = 0
   #countDownMS = 0
   #countDown = ""
+  #dataReceived = false
   static validateConfig(c) {
     if (!isObject(c)) return defaultStreamConfig
     else {
@@ -1500,6 +1505,11 @@ class Stream {
   set status({status, data}) {
     this.#status = status;
     this.emit(status, data);
+  }
+  set dataReceived(data) {
+    if (this.#dataReceived) return
+    this.#dataReceived = true;
+    this.status = {status: STREAM_FIRSTVALUE, data};
   }
   set candle(data) {
     data.t = this.roundTime(new Date(data.t));
@@ -2027,6 +2037,15 @@ class Overlay {
   get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set doDraw(d) { this.#doDraw = (isBoolean(d)) ? d : false; }
   get doDraw() { return this.#doDraw }
+  on(topic, handler, context) {
+    this.#core.on(topic, handler, context);
+  }
+  off(topic, handler) {
+    this.#core.off(topic, handler);
+  }
+  emit(topic, data) {
+    this.core.emit(topic, data);
+  }
 }
 
 function renderFillRect (ctx, x, y, width, height, style) {
@@ -3391,7 +3410,7 @@ class chartGrid extends Overlay{
     ctx.save();
     ctx.strokeStyle = this.core.theme.chart.GridColour || GridStyle.COLOUR_GRID;
     if (axes != "y") {
-      const offset = this.xAxis.smoothScrollOffset || 0;
+      const offset = 0;
       const xGrads = this.xAxis.xAxisGrads.values;
       for (let tick of xGrads) {
         let x = bRound(tick[1]);
@@ -3404,7 +3423,7 @@ class chartGrid extends Overlay{
     if (axes != "x") {
       const yGrads = this.yAxis.yAxisGrads;
       for (let tick of yGrads) {
-        let y = bRound(tick[1]);
+        let y = this.yAxis.$2Pixel(tick[0]);
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(this.scene.width, y);
@@ -3471,6 +3490,7 @@ const mouse = [
   "mouseout",
   "mouseover",
   "mouseup",
+  "mousewheel",
 ];
 const touch = [
   "touchcancel",
@@ -3686,13 +3706,13 @@ class EventsAgent {
   }
 }
 
-const defaultOptions$2 = {
+const defaultOptions$1 = {
   element: undefined,
   contextMenu: true
 };
 class Input  {
   constructor (element, options) {
-    this.options = { ...defaultOptions$2, ...options };
+    this.options = { ...defaultOptions$1, ...options };
     this.status = status.idle;
     this.element = element;
     if (!this.element && this.options.elementId) {
@@ -3754,6 +3774,7 @@ class chartCursor extends Overlay{
   get update() { return this.#update }
   onMouseDragX(e) {
     this.#cursorPos[0] = e[0];
+    this.#cursorPos[1] = e[1];
     this.draw(true);
     this.core.emit("chart_render");
   }
@@ -3795,7 +3816,7 @@ class chartCursor extends Overlay{
   }
 }
 
-const defaultOverlays$4 = [
+const defaultOverlays$5 = [
   ["grid", {class: chartGrid, fixed: true}],
   ["cursor", {class: chartCursor, fixed: true}]
 ];
@@ -3857,7 +3878,7 @@ class graph {
     }
   }
   createViewport(overlays=[], node=false) {
-    overlays = (overlays.length == 0) ? copyDeep(defaultOverlays$4) : overlays;
+    overlays = (overlays.length == 0) ? copyDeep(defaultOverlays$5) : overlays;
     const {width, height} = this.layerConfig();
     let viewport = (node) ? CEL.Node : CEL.Viewport;
     this.#viewport = new viewport({
@@ -3894,7 +3915,8 @@ class graph {
       else if (this.#parent.streamCandle) {
         oList.get("stream").instance.draw();
       }
-      overlay.instance.position = [this.#core.scrollPos, 0];
+      if (!overlay.fixed)
+        overlay.instance.position = [this.#core.scrollPos, 0];
     }
   }
   render() {
@@ -5609,7 +5631,7 @@ const lineConfig = {
   lineWidth: 1
 };
 
-var stateMachineConfig$7 = {
+var stateMachineConfig$6 = {
   id: "template",
   initial: "idle",
   context: {},
@@ -5706,8 +5728,8 @@ class ToolsBar {
     this.initAllTools();
     this.addAllTools();
     this.eventsListen();
-    stateMachineConfig$7.context = this;
-    this.stateMachine = stateMachineConfig$7;
+    stateMachineConfig$6.context = this;
+    this.stateMachine = stateMachineConfig$6;
     this.stateMachine.start();
   }
   end() {
@@ -5928,6 +5950,9 @@ class xAxis extends Axis {
   initXAxisGrads() {
     this.#xAxisGrads = this.calcXAxisGrads();
   }
+  doCalcXAxisGrads(range) {
+    this.#xAxisGrads = this.calcXAxisGrads(range);
+  }
   calcXAxisGrads(range=this.range.snapshot()) {
     const grads = {
       entries: {},
@@ -6001,12 +6026,9 @@ class xAxis extends Axis {
   }
   gradsWorker() {
   }
-  doCalcXAxisGrads(range) {
-    this.#xAxisGrads = this.calcXAxisGrads(range);
-  }
 }
 
-var stateMachineConfig$6 = {
+var stateMachineConfig$5 = {
   id: "time",
   initial: "idle",
   context: {},
@@ -6082,58 +6104,6 @@ var stateMachineConfig$6 = {
     },
   },
 };
-
-const defaultOptions$1 = {
-  fontSize: 12,
-  fontWeight: "normal",
-  fontFamily: 'Helvetica Neue',
-  paddingLeft: 3,
-  paddingRight: 3,
-  paddingTop: 2,
-  paddingBottom: 2,
-  borderSize: 0,
-  txtCol: "#000",
-  bakCol: "#CCC"
-};
-function calcTextWidth (ctx, text) {
-  return Math.round(ctx.measureText(text).width)
-}
-function createFont (
-  fontSize = defaultOptions$1.fontSize,
-  fontWeight = defaultOptions$1.fontWeight,
-  fontFamily = defaultOptions$1.fontFamily
-  ) {
-  return `${fontWeight} ${fontSize}px ${fontFamily}`
-}
-function getTextRectWidth (ctx, text, options) {
-  ctx.font = createFont(options.fontSize, options.fontWeight, options.fontFamily);
-  const textWidth = calcTextWidth(ctx, text);
-  const paddingLeft = options.paddingLeft || 0;
-  const paddingRight = options.paddingRight || 0;
-  const borderSize = options.borderSize || 0;
-  return paddingLeft + paddingRight + textWidth + (borderSize * 2)
-}
-function getTextRectHeight (options) {
-  const paddingTop = options.paddingTop || 0;
-  const paddingBottom = options.paddingBottom || 0;
-  const borderSize = options.borderSize || 0;
-  const fontSize = options.fontSize || 0;
-  return paddingTop + paddingBottom + fontSize + (borderSize * 2)
-}
-function drawTextBG(ctx, txt, x, y, options) {
-  ctx.save();
-  ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily);
-  ctx.textBaseline = 'top';
-  ctx.fillStyle = options.bakCol || defaultOptions$1.bakCol;
-  let width = getTextRectWidth(ctx, txt, options);
-  let height = getTextRectHeight(options);
-  ctx.fillRect(x, y, width, height);
-  ctx.fillStyle = options.txtCol || defaultOptions$1.txtCol;
-  x = x + options?.paddingLeft;
-  y = y + options?.paddingTop;
-  ctx.fillText(txt, x, y);
-  ctx.restore();
-}
 
 class Slider {
   static #cnt
@@ -6238,13 +6208,154 @@ class Slider {
   }
 }
 
-const defaultOverlays$3 = [
+class TimeLabels extends Overlay {
+  #cursorPos = [0,0]
+  #xAxisGrads
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
+    xAxis = parent.time.xAxis;
+    super(target, xAxis, yAxis, theme, parent);
+  }
+  set position(p) { this.target.setPosition(p[0], p[1]); }
+  draw(range) {
+    this.scene.clear();
+    const ctx = this.scene.context;
+    const grads = this.xAxis.xAxisGrads.values;
+    const offset = 0;
+    const theme = this.theme.xAxis;
+    ctx.save();
+    ctx.strokeStyle = theme.colourTick;
+    ctx.fillStyle = theme.colourTick;
+    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`;
+    for (let tick of grads) {
+      let x = bRound(tick[1]);
+      let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5);
+      ctx.fillText(tick[0], x - w + offset, this.xAxis.xAxisTicks + 12);
+      ctx.beginPath();
+      ctx.moveTo(x + offset, 0);
+      ctx.lineTo(x + offset, this.xAxis.xAxisTicks);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
+class TimeOverlays extends Overlay {
+  #cursorPos = [0,0]
+  #xAxisGrads
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
+    xAxis = parent.time.xAxis;
+    super(target, xAxis, yAxis, theme, parent);
+  }
+  set position(p) { this.target.setPosition(p[0], p[1]); }
+  draw() {
+    this.scene.clear();
+    const ctx = this.scene.context;
+    this.xAxis.xAxisGrads.values;
+    this.theme.xAxis;
+    ctx.save();
+    ctx.restore();
+  }
+}
+
+const defaultOptions = {
+  fontSize: 12,
+  fontWeight: "normal",
+  fontFamily: 'Helvetica Neue',
+  paddingLeft: 3,
+  paddingRight: 3,
+  paddingTop: 2,
+  paddingBottom: 2,
+  borderSize: 0,
+  txtCol: "#000",
+  bakCol: "#CCC"
+};
+function calcTextWidth (ctx, text) {
+  return Math.round(ctx.measureText(text).width)
+}
+function createFont (
+  fontSize = defaultOptions.fontSize,
+  fontWeight = defaultOptions.fontWeight,
+  fontFamily = defaultOptions.fontFamily
+  ) {
+  return `${fontWeight} ${fontSize}px ${fontFamily}`
+}
+function getTextRectWidth (ctx, text, options) {
+  ctx.font = createFont(options.fontSize, options.fontWeight, options.fontFamily);
+  const textWidth = calcTextWidth(ctx, text);
+  const paddingLeft = options.paddingLeft || 0;
+  const paddingRight = options.paddingRight || 0;
+  const borderSize = options.borderSize || 0;
+  return paddingLeft + paddingRight + textWidth + (borderSize * 2)
+}
+function getTextRectHeight (options) {
+  const paddingTop = options.paddingTop || 0;
+  const paddingBottom = options.paddingBottom || 0;
+  const borderSize = options.borderSize || 0;
+  const fontSize = options.fontSize || 0;
+  return paddingTop + paddingBottom + fontSize + (borderSize * 2)
+}
+function drawTextBG(ctx, txt, x, y, options) {
+  ctx.save();
+  ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily);
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = options.bakCol || defaultOptions.bakCol;
+  let width = options.width || getTextRectWidth(ctx, txt, options);
+  let height = options.height || getTextRectHeight(options);
+  ctx.fillRect(x, y, width, height);
+  ctx.fillStyle = options.txtCol || defaultOptions.txtCol;
+  x = x + options?.paddingLeft;
+  y = y + options?.paddingTop;
+  ctx.fillText(`${txt}`, x, y);
+  ctx.restore();
+}
+
+class TimeCursor extends Overlay {
+  #cursorPos = [0,0]
+  constructor(target, xAxis=false, yAxis=false, theme, parent) {
+    xAxis = parent.time.xAxis;
+    super(target, xAxis, yAxis, theme, parent);
+    this.viewport = target.viewport;
+  }
+  set position(p) { this.target.setPosition(p[0], p[1]); }
+  draw() {
+    const ctx = this.scene.context;
+    const rect = this.target.viewport.container.getBoundingClientRect();
+    const x = this.core.mousePos.x - rect.left;
+    let timestamp = this.xAxis.xPos2Time(x),
+    date = new Date(timestamp),
+    dateTimeStr = date.toUTCString(),
+    options = {
+      fontSize: this.theme.xAxis.fontSize * 1.05,
+      fontWeight: this.theme.xAxis.fontWeight,
+      fontFamily: this.theme.xAxis.fontFamily,
+      txtCol: this.theme.xAxis.colourCursor,
+      bakCol: this.theme.xAxis.colourCursorBG,
+      paddingTop: 5,
+      paddingBottom: 3,
+      paddingLeft: 4,
+      paddingRight: 4,
+    },
+    txtW = getTextRectWidth(ctx, dateTimeStr, options),
+    xPos = x + this.core.bufferPx;
+    xPos = this.xAxis.xPosSnap2CandlePos(xPos);
+    xPos = xPos - Math.round(txtW * 0.5) - this.core.scrollPos - this.core.bufferPx;
+    this.scene.clear();
+    ctx.save();
+    drawTextBG(ctx, dateTimeStr, xPos, 1 , options);
+    ctx.restore();
+  }
+}
+
+const defaultOverlays$4 = [
+  ["labels", {class: TimeLabels, fixed: false, required: true}],
+  ["overlay", {class: TimeOverlays, fixed: false, required: true}],
+  ["cursor", {class: TimeCursor, fixed: false, required: true}],
 ];
 class Timeline {
   #name = "Timeline"
   #shortName = "time"
   #options
-  #elTime
+  #element
   #core
   #chart
   #xAxis
@@ -6252,6 +6363,7 @@ class Timeline {
   #elViewport
   #elNavigation
   #Graph
+  #timeOverlays = new Map()
   #viewport
   #navigation
   #elNavList
@@ -6272,7 +6384,7 @@ class Timeline {
   constructor (core, options) {
     this.#core = core;
     this.#options = options;
-    this.#elTime = options.elements.elTime;
+    this.#element = options.elements.elTime;
     this.#chart = core.Chart;
     this.#xAxis = new xAxis(this, this.#chart);
     this.init();
@@ -6285,11 +6397,11 @@ class Timeline {
   get shortName() { return this.#shortName }
   get options() { return this.#options }
   get core() { return this.#core }
-  get element() { return this.#elTime }
+  get element() { return this.#element }
   get elViewport() { return this.#elViewport }
-  get height() { return this.#elTime.getBoundingClientRect().height }
+  get height() { return this.#element.getBoundingClientRect().height }
   set width(w) { this.setWidth(w); }
-  get width() { return this.#elTime.getBoundingClientRect().width }
+  get width() { return this.#element.getBoundingClientRect().width }
   get xAxis() { return this.#xAxis }
   get xAxisWidth() { return this.#xAxis.width }
   get xAxisRatio() { return this.#xAxis.xAxisRatio }
@@ -6305,7 +6417,7 @@ class Timeline {
   get navigation() { return this.#navigation }
   get range() { return this.#core.range }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elTime) }
+  get dimensions() { return DOM.elementDimPos(this.#element) }
   get bufferPx() { return this.#core.bufferPx }
   get scrollPos() { return this.#core.scrollPos }
   get scrollOffsetPx() { return this.#core.scrollPos % this.candleW }
@@ -6313,12 +6425,9 @@ class Timeline {
   get rangeScrollOffset() { return this.#core.rangeScrollOffset }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
   get stateMachine() { return this.#stateMachine }
+  get time() { return this }
   init() {
-    this.mount(this.#elTime);
-    this.log(`${this.#name} instantiated`);
-  }
-  mount(el) {
-    this.#core;
+    const el = this.#element;
     this.#elViewport = el.viewport;
     this.#elNavigation = el.overview;
     this.#elNavList = el.overview.icons;
@@ -6335,7 +6444,7 @@ class Timeline {
     this.#slider = new Slider(sliderCfg);
   }
   setWidth(w) {
-    this.#elTime.style.width = `${w}px`;
+    this.#element.style.width = `${w}px`;
     this.#elViewport.style.width = `${w}px`;
   }
   setDimensions(dim) {
@@ -6343,20 +6452,17 @@ class Timeline {
     const width = dim.w;
     const height = this.height;
     const layerWidth = Math.round(width * ((100 + buffer) * 0.01));
-    this.#viewport.setSize(width, this.height);
-    this.#layerLabels.setSize(layerWidth, height);
-    this.#layerOverlays.setSize(layerWidth, height);
-    this.#layerCursor.setSize(layerWidth, height);
+    this.#Graph.setSize(width, height, layerWidth);
     this.draw();
   }
   start() {
-    this.createViewport();
+    this.createGraph();
     this.onSetRange();
     this.#xAxis.initXAxisGrads();
     this.draw();
     this.eventsListen();
-    stateMachineConfig$6.context = this;
-    this.stateMachine = stateMachineConfig$6;
+    stateMachineConfig$5.context = this;
+    this.stateMachine = stateMachineConfig$5;
     this.stateMachine.start();
   }
   end() {
@@ -6372,12 +6478,12 @@ class Timeline {
     this.#elRwdStart.removeEventListener('click', debounce);
   }
   eventsListen() {
-    let timeline = this.viewport.scene.canvas;
-    this.#input = new Input(timeline, {disableContextMenu: false});
+    let canvas = this.#Graph.viewport.scene.canvas;
+    this.#input = new Input(canvas, {disableContextMenu: false});
     this.#input.on("dblclick", this.onDoubleClick.bind(this));
     this.#input.on("pointerenter", this.onPointerEnter.bind(this));
     this.#input.on("pointerdrag", this.onPointerDrag.bind(this));
-    this.on("main_mousemove", this.drawCursorTime.bind(this));
+    this.on("main_mousemove", this.#layerCursor.draw.bind(this.#layerCursor));
     this.on("setRange", this.onSetRange.bind(this));
     this.#elFwdEnd.addEventListener('click', debounce(this.onMouseClick, 1000, this, true));
     this.#elRwdStart.addEventListener('click', debounce(this.onMouseClick, 1000, this, true));
@@ -6413,12 +6519,15 @@ class Timeline {
   }
   onDoubleClick(e) {
     this.core.jumpToEnd();
+    this.core.MainPane.draw(undefined, true);
   }
   onFwdEnd() {
     this.core.jumpToEnd();
+    this.core.MainPane.draw(undefined, true);
   }
   onRwdStart() {
     this.core.jumpToStart();
+    this.core.MainPane.draw(undefined, true);
   }
   onSetRange() {
     let r = this.range;
@@ -6437,109 +6546,30 @@ class Timeline {
   xPos2Index(x) { return this.#xAxis.xPos2Index(x) }
   xPosOHLCV(x) { return this.#xAxis.xPosOHLCV(x) }
   createGraph() {
-    let overlays = copyDeep(defaultOverlays$3);
-    this.#Graph = new graph(this, this.#elViewport, overlays);
+    let overlays = copyDeep(defaultOverlays$4);
+    this.#Graph = new graph(this, this.#elViewport, overlays, false);
+    this.#layerCursor = this.graph.overlays.get("cursor").instance;
+    this.#layerLabels = this.graph.overlays.get("labels").instance;
+    this.#layerOverlays = this.graph.overlays.get("overlay").instance;
   }
-  createViewport() {
-    const buffer = this.config.buffer || BUFFERSIZE$1;
-    const width = this.xAxisWidth;
-    const height = this.#elTime.getBoundingClientRect().height;
-    const layerConfig = {
-      width: Math.round(width * ((100 + buffer) * 0.01)),
-      height: height
-    };
-    this.#viewport = new CEL.Viewport({
-      width: width,
-      height: height / 2,
-      container: this.#elViewport
-    });
-    this.#layerLabels = new CEL.Layer(layerConfig);
-    this.#layerOverlays = new CEL.Layer(layerConfig);
-    this.#layerCursor = new CEL.Layer(layerConfig);
-    this.#viewport
-          .addLayer(this.#layerLabels)
-          .addLayer(this.#layerOverlays)
-          .addLayer(this.#layerCursor);
-    this.#Graph = {viewport: this.#viewport};
+  addOverlays(overlays) {
+    for (let o of overlays) {
+    }
+    this.graph.addOverlays(Array.from(this.#timeOverlays));
   }
   render() {
-    this.#viewport.render();
+    this.#Graph.render();
   }
-  draw(range=this.range) {
-    this.#layerCursor.setPosition(this.scrollPos, 0);
-    this.#layerLabels.setPosition(this.scrollPos, 0);
-    this.#layerOverlays.setPosition(this.scrollPos, 0);
-    this.drawGrads(range);
-    this.drawOverlays(range);
-    this.drawCursorTime();
-  }
-  drawCursorTime() {
-    const ctx = this.#layerCursor.scene.context;
-    const rect = this.#elViewport.getBoundingClientRect();
-    const x = this.#core.mousePos.x - rect.left;
-    let timestamp = this.xPos2Time(x),
-        date = new Date(timestamp),
-        dateTimeStr = date.toUTCString(),
-        options = {
-          fontSize: this.theme.xAxis.fontSize * 1.05,
-          fontWeight: this.theme.xAxis.fontWeight,
-          fontFamily: this.theme.xAxis.fontFamily,
-          txtCol: this.theme.xAxis.colourCursor,
-          bakCol: this.theme.xAxis.colourCursorBG,
-          paddingTop: 5,
-          paddingBottom: 3,
-          paddingLeft: 4,
-          paddingRight: 4
-        },
-        txtW = getTextRectWidth(ctx, dateTimeStr, options),
-        xPos = x + this.bufferPx;
-        xPos = this.#xAxis.xPosSnap2CandlePos(xPos);
-        xPos = xPos - Math.round(txtW * 0.5) - this.scrollPos - this.bufferPx;
-    this.#layerCursor.scene.clear();
-    ctx.save();
-    drawTextBG(ctx, dateTimeStr, xPos, 1 , options);
-    ctx.restore();
-    this.#viewport.render();
+  draw(range=this.range, update=true) {
+    this.#Graph.draw(range, update);
   }
   hideCursorTime() {
     this.#layerCursor.visible = false;
-    this.#viewport.render();
+    this.render();
   }
   showCursorTime() {
     this.#layerCursor.visible = true;
-    this.#viewport.render();
-  }
-  drawGrads(range) {
-    this.#layerLabels.scene.clear();
-    this.#xAxis.doCalcXAxisGrads(range);
-    const grads = this.#xAxis.xAxisGrads.values;
-    const ctx = this.#layerLabels.scene.context;
-    const offset = 0;
-    const theme = this.theme.xAxis;
-    const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true;
-    ctx.save();
-    ctx.strokeStyle = theme.colourTick;
-    ctx.fillStyle = theme.colourTick;
-    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`;
-    for (let tick of grads) {
-      let x = bRound(tick[1]);
-      let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5);
-      ctx.fillText(tick[0], x - w + offset, this.#xAxis.xAxisTicks + 12);
-      if (tickMarker) {
-        ctx.beginPath();
-        ctx.moveTo(x + offset, 0);
-        ctx.lineTo(x + offset, this.#xAxis.xAxisTicks);
-        ctx.stroke();
-      }
-    }
-    ctx.restore();
-  }
-  drawOverlays() {
-    this.#layerOverlays.scene.clear();
-    this.#xAxis.xAxisGrads.values;
-    const ctx = this.#layerOverlays.scene.context;
-    ctx.save();
-    ctx.restore();
+    this.render();
   }
 }
 
@@ -6602,6 +6632,7 @@ class Chart {
   #ID;
   #name
   #shortName
+  #type
   #core;
   #options;
   #parent;
@@ -6645,6 +6676,7 @@ class Chart {
     this.#parent = this.#options.parent;
     this.#theme = core.theme;
     this.#settings = core.settings;
+    this.#type = options.type || "offChart";
     for (const option in this.#options) {
       if (option in this.props()) {
         this.props()[option](this.#options[option]);
@@ -6660,6 +6692,7 @@ class Chart {
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get title() { return this.#title }
+  get type() { return this.#type }
   get parent() { return this.#parent }
   get core() { return this.#core }
   get options() { return this.#options }
@@ -6703,13 +6736,13 @@ class Chart {
   get overlayTools() { return this.#overlayTools }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
   get stateMachine() { return this.#stateMachine }
-  start() {
+  start(stateMachineConfig) {
     this.#Time = this.#core.Timeline;
     this.createGraph();
-    this.#Scale.start(this.name, "yAxis Scale started");
+    this.#Scale.start();
     this.draw(this.range);
     this.setCursor("crosshair");
-    this.eventsListen();
+    stateMachineConfig.id = this.id;
     stateMachineConfig.context = this;
     this.stateMachine = stateMachineConfig;
     this.stateMachine.start();
@@ -6729,6 +6762,7 @@ class Chart {
     this.off(STREAM_LISTENING, this.onStreamListening);
     this.off(STREAM_NEWVALUE, this.onStreamNewValue);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
+    this.off(STREAM_FIRSTVALUE, this.onStreamNewValue);
   }
   eventsListen() {
     this.#input = new Input(this.#elTarget, {disableContextMenu: false});
@@ -6742,6 +6776,7 @@ class Chart {
     this.on(STREAM_LISTENING, this.onStreamListening.bind(this));
     this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this));
     this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this));
+    this.on(STREAM_FIRSTVALUE, this.onStreamNewValue.bind(this));
   }
   on(topic, handler, context) {
     this.#core.on(topic, handler, context);
@@ -6755,6 +6790,7 @@ class Chart {
   onChartDrag(e) {
     this.setCursor("grab");
     this.core.MainPane.onChartDrag(e);
+    this.scale.onChartDrag(e);
   }
   onChartDragDone(e) {
     this.setCursor("crosshair");
@@ -6809,8 +6845,8 @@ class Chart {
   setDimensions(dim) {
     const buffer = this.config.buffer || BUFFERSIZE$1;
       let {w, h} = dim;
-    w = this.width;
-    h = (h) ? h : this.height;
+               w = this.width;
+               h = (h) ? h : this.height;
     this.layerWidth = Math.round(w * ((100 + buffer) * 0.01));
     this.graph.setSize(w, h, this.layerWidth);
     this.setHeight(h);
@@ -6886,8 +6922,8 @@ class yAxis extends Axis {
       get min() { return this.range?.valueMin },
       get mid() { return this.range?.valueMin + (this.range?.valueDiff * 0.5) },
       get diff() { return this.range?.valueDiff },
-      zoom: 1,
-      offset: 0,
+      get zoom() { return 1 },
+      get offset() { return 0 },
       range: null
     },
     manual: {
@@ -6930,6 +6966,7 @@ class yAxis extends Axis {
     });
   }
   get chart() { return this.#chart }
+  get range() { return this.#range }
   get height() { return this.chart.height }
   get rangeH() { return this.#range.diff * this.yAxisPadding }
   get yAxisRatio() { return this.getYAxisRatio() }
@@ -6965,23 +7002,23 @@ class yAxis extends Axis {
   }
   yAxisCursor() {
   }
-  yPos(yData) {
+  yPos(y) {
     switch(this.yAxisType) {
-      case "percent" : return bRound(this.p100toPixel(yData))
-      case "log" : return bRound(this.$2Pixel(log10(yData)))
-      default : return bRound(this.$2Pixel(yData))
+      case "percent" : return bRound(this.p100toPixel(y))
+      case "log" : return bRound(this.$2Pixel(log10(y)))
+      default : return bRound(this.$2Pixel(y))
     }
   }
   yPos2Price(y) {
     return this.pixel2$(y)
   }
-  $2Pixel(yData) {
-    const height = yData - this.#range.min;
-    const yPos = this.height - (height * this.yAxisRatio) + this.#range.offset;
+  $2Pixel(y) {
+    const height = y - this.#range.min;
+    const yPos = this.height - (height * this.yAxisRatio);
     return yPos
   }
-  lastYData2Pixel(yData) {
-    let height = yData - this.core.stream.lastPriceMin;
+  lastYData2Pixel(y) {
+    let height = y - this.core.stream.lastPriceMin;
     let yPos = this.height - (height * this.yAxisRatio);
     return yPos
   }
@@ -6990,8 +7027,9 @@ class yAxis extends Axis {
     let adjust = this.#range.diff * ratio;
     return this.#range.min + adjust
   }
-  p100toPixel(yData) {
-    return this.height * yData / 100
+  p100toPixel(y) {
+      let ratio = this.height / this.#range.diff;
+      return (y - this.#range.max) * -1 * ratio
   }
   yAxisTransform() {
   }
@@ -7010,37 +7048,52 @@ class yAxis extends Axis {
     }
   }
   setOffset(o) {
-    if (!isNumber(o) || this.#mode !== "manual") return false
+    if (!isNumber(o) || o == 0 || this.#mode !== "manual") return false
     const t = this.#transform;
-    t.manual.offset += o;
-    console.log("t.manual.offset:",t.manual.offset);
+    let max = this.pixel2$(o * -1);
+    let min = this.pixel2$(this.height - o);
+    let delta = max - min;
+    t.manual.min = min;
+    t.manual.max = max;
+    t.manual.mid = (delta) / 2;
+    t.manual.diff = delta;
+    t.manual.zoom = 0;
   }
   setZoom(z) {
     if (!isNumber(z) || this.#mode !== "manual") return false
     const t = this.#transform;
-    t.manual.zoom += z;
-    const r = z / this.height;
-    const min = t.manual.min * (1 - r);
-    const max = t.manual.max * (1 + r);
-    if (max < min) return
+      let min = t.manual.min;
+      let max = t.manual.max;
+    const delta = max - min;
+    const delta10P = delta * 0.01;
+    const change = z * delta10P;
+          min -= change;
+          max += change;
+    if (max < min || min <= Infinity * -1 || max >= Infinity)  return
     t.manual.max =  max;
-    t.manual.min = (min >= 0)? min : 0;
-    t.manual.mid = (max - min) / 2;
-    t.manual.diff = max - min;
-    t.manual.zoom = 1;
-    t.manual.offset = 0;
+    t.manual.min = min;
+    t.manual.mid = (delta) / 2;
+    t.manual.diff = delta;
+    t.manual.zoom = change;
+    this.calcGradations();
   }
   calcGradations() {
+    let max, min, off;
     switch (this.yAxisType) {
       case "percent":
-        this.#yAxisGrads = this.gradations(100, 0, false, true);
+        max = (this.#range.max > 0) ? this.#range.max : 100;
+        min = (this.#range.min > 0) ? this.#range.min : 0;
+        off = this.#range.offset;
+        this.#yAxisGrads = this.gradations(max + off, min + off);
         break;
       default:
-        let max = (this.#range.max > 0) ? this.#range.max : 1;
-        let min = (this.#range.min > 0) ? this.#range.min : 0;
-        this.#yAxisGrads = this.gradations(max, min);
+        max = (this.#range.max > 0) ? this.#range.max : 1;
+        min = (this.#range.min > 0) ? this.#range.min : 0;
+        off = this.#range.offset;
+        this.#yAxisGrads = this.gradations(max + off, min + off);
         break;
     }
+    return this.#yAxisGrads
   }
   gradations(max, min, decimals=true, fixed=false) {
       let digits,
@@ -7067,8 +7120,15 @@ class yAxis extends Axis {
       scaleGrads.push([nice, round(pos), digits]);
       pos -= stepP;
     }
-    scaleGrads.shift();
-    scaleGrads.pop();
+    if (this.#mode !== "manual") {
+      const theme = this.core.theme.yAxis;
+      if (scaleGrads.slice(-1)[0][1] <= theme.fontSize * 0.1) {
+        scaleGrads.pop();
+      }
+      if (scaleGrads[0][1] >= this.height - (theme.fontSize * 0.1)) {
+        scaleGrads.shift();
+      }
+    }
     return scaleGrads
   }
   niceValue(digits, decimals=true, step) {
@@ -7106,7 +7166,7 @@ class yAxis extends Axis {
   }
 }
 
-var stateMachineConfig$5 = {
+var stateMachineConfig$4 = {
   id: "scale",
   initial: "idle",
   context: {},
@@ -7148,12 +7208,6 @@ var stateMachineConfig$5 = {
           action (data) {
           },
         },
-        scale_drag: {
-          target: 'scale_drag',
-          condition: 'receiver',
-          action (data) {
-          },
-        },
       }
     },
     resize: {
@@ -7184,29 +7238,6 @@ var stateMachineConfig$5 = {
         },
       }
     },
-    scale_drag: {
-      onEnter(data) {
-          console.log(`${this.context.origin.ID}: state: "${this.state}" - onEnter`);
-          this.context.origin.setScaleRange(data.cursorPos[5]);
-      },
-      onExit(data) {
-      },
-      on: {
-        scale_drag: {
-          target: 'scale_drag',
-          condition: 'receiver',
-          action (data) {
-          },
-        },
-        scale_dragDone: {
-          target: 'idle',
-          condition: 'receiver',
-          action (data) {
-            console.log(`${this.context.origin.ID}: transition from "${this.state}" to "idle"`);
-          },
-        },
-      }
-    },
   },
   guards: {
     receiver () { return (this.eventData.scale.ID == this.context.origin.ID) },
@@ -7214,31 +7245,121 @@ var stateMachineConfig$5 = {
   }
 };
 
-class scalePriceLine extends Overlay {
+class ScaleCursor extends Overlay {
+  #cursorPos = [0, 0]
   constructor(target, xAxis, yAxis, theme, parent, params) {
+    parent = yAxis;
+    yAxis = yAxis.yAxis;
     super(target, xAxis, yAxis, theme, parent, params);
     this.viewport = target.viewport;
-    this.start();
   }
   set position(p) { this.target.setPosition(p[0], p[1]); }
-  start() {
-    this.eventListeners();
+  draw(cursorPos) {
+    if (!this.parent.parent.cursorActive) return
+    this.#cursorPos = (isArray(cursorPos)) ? cursorPos : this.#cursorPos;
+    let [x, y] = this.#cursorPos,
+    price =  this.parent.yPos2Price(y),
+    nice = this.parent.nicePrice(price),
+    options = {
+      fontSize: this.theme.yAxis.fontSize * 1.05,
+      fontWeight: this.theme.yAxis.fontWeight,
+      fontFamily: this.theme.yAxis.fontFamily,
+      txtCol: this.theme.yAxis.colourCursor,
+      bakCol: this.theme.yAxis.colourCursorBG,
+      paddingTop: 2,
+      paddingBottom: 2,
+      paddingLeft: 3,
+      paddingRight: 3,
+      width: this.viewport.width
+    },
+    height = options.fontSize + options.paddingTop + options.paddingBottom,
+    yPos = y - (height * 0.5);
+    const ctx = this.scene.context;
+    this.scene.clear();
+    ctx.save();
+    ctx.fillStyle = options.bakCol;
+    ctx.fillRect(1, yPos, this.width, height);
+    drawTextBG(ctx, `${nice}`, 1, yPos , options);
+    ctx.restore();
   }
-  end() {
-    this.off(STREAM_UPDATE, this.onStreamUpdate);
+  erase() {
+    this.scene.clear();
+    this.target.viewport.render();
+    return
   }
-  eventListeners() {
-    this.core.on(STREAM_UPDATE, (e) => { this.onStreamUpdate(e); });
+}
+
+class ScaleLabels extends Overlay {
+  constructor(target, xAxis, yAxis, theme, parent, params) {
+    parent = yAxis;
+    yAxis = yAxis.yAxis;
+    super(target, xAxis, yAxis, theme, parent, params);
+    this.viewport = target.viewport;
   }
-  onStreamUpdate(e) {
-    this.draw(e);
+  set position(p) { this.target.setPosition(p[0], p[1]); }
+  draw() {
+    const ctx = this.scene.context;
+    const yAxis = this.yAxis;
+    const grads = this.yAxis.calcGradations() || [];
+    const theme = this.theme.yAxis;
+    const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true;
+      let tickPos = [];
+      let y;
+    switch (theme?.location) {
+      case "left": tickPos = [this.width, this.width - yAxis.yAxisTicks]; break;
+      case "right":
+      default: tickPos = [1, yAxis.yAxisTicks]; break;
+    }
+    this.scene.clear();
+    ctx.save();
+    ctx.strokeStyle = theme.colourTick;
+    ctx.fillStyle = theme.colourTick;
+    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`;
+    for (let tick of grads) {
+      y = yAxis.$2Pixel(tick[0]);
+      ctx.fillText(tick[0], yAxis.yAxisTicks + 5, y + (theme.fontSize * 0.3));
+      if (tickMarker) {
+        ctx.beginPath();
+        ctx.moveTo(tickPos[0], y);
+        ctx.lineTo(tickPos[1], y);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
   }
+}
+
+class ScaleOverly extends Overlay {
+  constructor(target, xAxis, yAxis, theme, parent, params) {
+    parent = yAxis;
+    yAxis = yAxis.yAxis;
+    super(target, xAxis, yAxis, theme, parent, params);
+    this.viewport = target.viewport;
+  }
+  set position(p) { this.target.setPosition(p[0], p[1]); }
+  draw() {
+    const ctx = this.scene.context;
+    this.yAxis.yAxis;
+    this.scene.clear();
+    ctx.save();
+    ctx.restore();
+  }
+}
+
+class ScalePriceLine extends Overlay {
+  constructor(target, xAxis, yAxis, theme, parent, params) {
+    parent = yAxis;
+    yAxis = yAxis.yAxis;
+    super(target, xAxis, yAxis, theme, parent, params);
+    this.viewport = target.viewport;
+  }
+  set position(p) { this.target.setPosition(p[0], p[1]); }
   draw(candle) {
     if (candle === undefined) return
+    const ctx = this.scene.context;
     const streaming = this.core.stream.constructor.name == "Stream" &&
                       this.config.stream.tfCountDown;
     let price = candle[4],
-        y = this.parent.yPos(price),
         nice = this.parent.nicePrice(price),
         options = {
           fontSize: YAxisStyle.FONTSIZE * 1.05,
@@ -7248,39 +7369,34 @@ class scalePriceLine extends Overlay {
           bakCol: YAxisStyle.COLOUR_CURSOR_BG,
           paddingTop: 2,
           paddingBottom: 2,
-          paddingLeft: 3,
-          paddingRight: 3
+          paddingLeft: 5,
+          paddingRight: 3,
+          width: this.viewport.width
         },
-    h,
-    height = options.fontSize + options.paddingTop + options.paddingBottom,
-    yPos = y - (height * 0.5);
+        x = 0,
+        h = getTextRectHeight(options),
+        y = this.parent.yPos(price) - (h * 0.5);
     this.scene.clear();
-    const ctx = this.scene.context;
     ctx.save();
     if (candle[4] >= candle[1]) options.bakCol = this.theme.candle.UpBodyColour;
     else options.bakCol = this.theme.candle.DnBodyColour;
-    let x = 1;
-    ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily);
-    ctx.textBaseline = 'top';
-    ctx.fillStyle = options.bakCol || defaultOptions.bakCol;
-    h = getTextRectHeight(options);
-    height = (streaming) ? h * 2 : h;
-    ctx.fillRect(x, yPos, this.viewport.width, height);
-    ctx.fillStyle = options.txtCol || defaultOptions.txtCol;
-    x = x + options?.paddingLeft;
-    yPos += options?.paddingTop;
-    ctx.fillText(`${nice}`, x, yPos);
+    drawTextBG(ctx, nice, x, y, options);
     if (streaming) {
-      yPos += h;
       nice = this.core.stream.countDownUpdate();
-      ctx.font = createFont(options?.fontSize / 1.1, options?.fontWeight, options?.fontFamily);
-      ctx.fillText(nice, x, yPos);
+      options.fontSize = options?.fontSize / 1.1;
+      drawTextBG(ctx, nice, x, y+h, options);
     }
     ctx.restore();
     this.viewport.render();
   }
 }
 
+const defaultOverlays$3 = [
+  ["labels", {class: ScaleLabels, fixed: true, required: true}],
+  ["overlay", {class: ScaleOverly, fixed: true, required: true}],
+  ["price", {class: ScalePriceLine, fixed: true, required: true}],
+  ["cursor", {class: ScaleCursor, fixed: true, required: true}],
+];
 class ScaleBar {
   #ID
   #name = "Y Scale Axis"
@@ -7299,6 +7415,8 @@ class ScaleBar {
   #layerOverlays
   #layerPriceLine
   #layerCursor
+  #scaleOverlays = new Map()
+  #Graph
   #input
   #priceLine
   #cursorPos
@@ -7328,12 +7446,15 @@ class ScaleBar {
   get layerCursor() { return this.#layerCursor }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
+  get layerPriceLine() { return this.#layerPriceLine }
   get yAxis() { return this.#yAxis }
   set yAxisType(t) { this.#yAxis.yAxisType = YAXIS_TYPES.includes(t) ? t : YAXIS_TYPES[0]; }
   get yAxisType() { return this.#yAxis.yAxisType }
   get yAxisHeight() { return this.#yAxis.height }
   get yAxisRatio() { return this.#yAxis.yAxisRatio }
   get yAxisGrads() { return this.#yAxis.yAxisGrads }
+  set graph(g) { this.#Graph = g; }
+  get graph() { return this.#Graph }
   get viewport() { return this.#viewport }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#element) }
@@ -7347,18 +7468,20 @@ class ScaleBar {
   get yOffset() { return this.#yAxis.offset }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
   get stateMachine() { return this.#stateMachine }
+  get Scale() { return this }
   init() {
     this.#elViewport = this.#element.viewport || this.#element;
-    this.log(`${this.#name} instantiated`);
   }
-  start(data) {
+  start() {
     const range = (this.#parent.name == "OffChart" ) ?
       this.#parent.localRange : undefined;
     this.#yAxis = new yAxis(this, this, this.options.yAxisType, range);
-    this.createViewport();
+    this.createGraph();
+    this.addOverlays([]);
+    this.#yAxis.calcGradations();
     this.draw();
     this.eventsListen();
-    const newConfig = copyDeep(stateMachineConfig$5);
+    const newConfig = copyDeep(stateMachineConfig$4);
     newConfig.context = this;
     this.stateMachine = newConfig;
     this.stateMachine.start();
@@ -7367,17 +7490,26 @@ class ScaleBar {
     this.stateMachine.destroy();
     this.#input = null;
     this.#viewport.destroy();
+    this.#input.on("pointerdrag", this.onDrag);
+    this.#input.on("wheel", this.onMouseWheel);
+    this.#input.on("dblclick", this.resetScaleRange);
     this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove);
-    this.off(`${this.#parent.ID}_mouseout`, this.eraseCursorPrice);
+    this.off(`${this.#parent.ID}_mouseout`, this.#layerCursor.erase);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
+    this.off("chart_pan", this.onMouseMove);
+    this.off("chart_panDone", this.onMouseMove);
   }
   eventsListen() {
-    let canvas = this.#viewport.scene.canvas;
+    let canvas = this.#Graph.viewport.scene.canvas;
     this.#input = new Input(canvas, {disableContextMenu: false});
     this.#input.setCursor("ns-resize");
+    this.#input.on("pointerdrag", throttle(this.onDrag, 100, this));
+    this.#input.on("pointerdragend", this.onDragDone.bind(this));
+    this.#input.on("wheel", this.onMouseWheel.bind(this));
+    this.#input.on("dblclick", this.resetScaleRange.bind(this));
     this.on(`${this.#parent.id}_mousemove`, this.onMouseMove.bind(this));
-    this.on(`${this.#parent.id}_mouseout`, this.eraseCursorPrice.bind(this));
-    this.on(STREAM_UPDATE, (e) => { this.onStreamUpdate(e); });
+    this.on(`${this.#parent.id}_mouseout`, this.#layerCursor.erase.bind(this.#layerCursor));
+    this.on(STREAM_UPDATE, this.#layerPriceLine.draw.bind(this.#layerPriceLine));
   }
   on(topic, handler, context) {
     this.core.on(topic, handler, context);
@@ -7390,11 +7522,10 @@ class ScaleBar {
   }
   onResize(dimensions) {
     this.setDimensions(dimensions);
-    console.log(this.parent.id,"scale resize");
   }
   onMouseMove(e) {
     this.#cursorPos = (isArray(e)) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)];
-    this.drawCursorPrice();
+    this.#layerCursor.draw(this.#cursorPos);
   }
   onDrag(e) {
     this.#cursorPos = [
@@ -7402,47 +7533,46 @@ class ScaleBar {
       e.dragstart.x, e.dragstart.y,
       e.movement.x, e.movement.y
     ];
-    const dragEvent = {
+    ({
       scale: this,
       cursorPos: this.#cursorPos
-    };
-    this.emit("scale_drag", dragEvent);
+    });
+    this.setScaleRange(this.#cursorPos[5]);
+    this.render();
   }
   onDragDone(e) {
-    this.#cursorPos = [
-      Math.floor(e.position.x), Math.floor(e.position.y),
-      e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
-    ];
-    const dragEvent = {
-      scale: this,
-      cursorPos: this.#cursorPos
-    };
-    this.emit("scale_dragDone", dragEvent);
   }
   onMouseWheel(e) {
     e.domEvent.preventDefault();
     const direction = Math.sign(e.wheeldelta) * -1;
-    this.range;
-    console.log(`Scale: mousewheel: ${direction}`);
+    this.setScaleRange(direction);
+    this.render();
   }
   onStreamUpdate(e) {
+  }
+  onChartDrag(e) {
+    if (this.#yAxis.mode !== "manual") return
+    this.#yAxis.offset = this.#core.MainPane.cursorPos[5];
+    this.parent.draw(this.range, true);
+    this.draw();
   }
   setHeight(h) {
     this.#element.style.height = `${h}px`;
   }
   setDimensions(dim) {
     const width = this.#element.getBoundingClientRect().width;
-    this.#viewport.setSize(width, dim.h);
-    this.#layerLabels.setSize(width, dim.h);
-    this.#layerOverlays.setSize(width, dim.h);
-    this.#layerCursor.setSize(width, dim.h);
+    this.#Graph.setSize(width, dim.h, width);
     this.setHeight(dim.h);
     this.draw();
   }
   setScaleRange(r) {
     if (this.#yAxis.mode == "automatic") this.#yAxis.mode = "manual";
     this.#yAxis.zoom = r;
+    this.parent.draw(this.range, true);
+    this.draw();
+  }
+  resetScaleRange() {
+    this.#yAxis.mode = "automatic";
     this.parent.draw(this.range, true);
     this.draw();
   }
@@ -7456,123 +7586,25 @@ class ScaleBar {
     let digits = this.#yAxis.countDigits($);
     return this.#yAxis.limitPrecision(digits)
   }
-  createViewport() {
-    const {layerConfig} = this.layerConfig();
-    this.#viewport = new CEL.Viewport({
-      width: this.#element.getBoundingClientRect().width,
-      height: this.#element.getBoundingClientRect().height,
-      container: this.#elViewport
-    });
-    this.#layerLabels = new CEL.Layer(layerConfig);
-    this.#layerOverlays = new CEL.Layer(layerConfig);
-    this.#layerCursor = new CEL.Layer(layerConfig);
-    this.#viewport
-          .addLayer(this.#layerLabels);
-    if (isObject(this.config.stream))
-          this.layerStream();
-    this.#viewport
-          .addLayer(this.#layerOverlays)
-          .addLayer(this.#layerCursor);
+  createGraph() {
+    let overlays = copyDeep(defaultOverlays$3);
+    this.graph = new graph(this, this.#elViewport, overlays, false);
+    this.#layerCursor = this.graph.overlays.get("cursor").instance;
+    this.#layerLabels = this.graph.overlays.get("labels").instance;
+    this.#layerOverlays = this.graph.overlays.get("overlay").instance;
+    this.#layerPriceLine = this.graph.overlays.get("price").instance;
   }
-  layerConfig() {
-    const width = this.#element.getBoundingClientRect().width;
-    const height = this.#element.getBoundingClientRect().height;
-    const layerConfig = {
-      width: width,
-      height: height
-    };
-    return {width, height, layerConfig}
-  }
-  layerStream() {
-    if (!this.#layerPriceLine) {
-      const {layerConfig} = this.layerConfig();
-      this.#layerPriceLine = new CEL.Layer(layerConfig);
-      this.#viewport.addLayer(this.#layerPriceLine);
+  addOverlays(overlays) {
+    for (let o of overlays) {
     }
-    if (!this.#priceLine) {
-      this.#priceLine =
-      new scalePriceLine(
-        this.#layerPriceLine,
-        undefined,
-        this.#yAxis,
-        this.theme,
-        this
-      );
-    }
+    this.graph.addOverlays(Array.from(this.#scaleOverlays));
   }
   render() {
-    this.#viewport.render();
+    this.#Graph.render();
   }
-  draw() {
-    this.drawLabels();
-    this.drawOverlays();
+  draw(range=this.range, update=true) {
+    this.#Graph.draw(range, update);
     this.#parent.drawGrid();
-  }
-  drawCursorPrice() {
-    let [x, y] = this.#cursorPos,
-        price =  this.yPos2Price(y),
-        nice = this.nicePrice(price),
-        options = {
-          fontSize: this.theme.yAxis.fontSize * 1.05,
-          fontWeight: this.theme.yAxis.fontWeight,
-          fontFamily: this.theme.yAxis.fontFamily,
-          txtCol: this.theme.yAxis.colourCursor,
-          bakCol: this.theme.yAxis.colourCursorBG,
-          paddingTop: 2,
-          paddingBottom: 2,
-          paddingLeft: 3,
-          paddingRight: 3
-        },
-        height = options.fontSize + options.paddingTop + options.paddingBottom,
-        yPos = y - (height * 0.5);
-    this.#layerCursor.scene.clear();
-    const ctx = this.#layerCursor.scene.context;
-    ctx.save();
-    ctx.fillStyle = options.bakCol;
-    ctx.fillRect(1, yPos, this.width, height);
-    drawTextBG(ctx, `${nice}`, 1, yPos , options);
-    ctx.restore();
-    this.#viewport.render();
-  }
-  eraseCursorPrice() {
-    this.#layerCursor.scene.clear();
-    this.#viewport.render();
-    return
-  }
-  drawLabels() {
-    this.#layerLabels.scene.clear();
-    this.#yAxis.calcGradations();
-    const grads = this.#yAxis.yAxisGrads;
-    const ctx = this.#layerLabels.scene.context;
-    const theme = this.theme.yAxis;
-    const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true;
-      let tickPos = [];
-    switch (theme?.location) {
-      case "left": tickPos = [this.width, this.width - this.#yAxis.yAxisTicks]; break;
-      case "right":
-      default: tickPos = [1, this.#yAxis.yAxisTicks]; break;
-    }
-    ctx.save();
-    ctx.strokeStyle = theme.colourTick;
-    ctx.fillStyle = theme.colourTick;
-    ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`;
-    for (let tick of grads) {
-      ctx.fillText(tick[0], this.#yAxis.yAxisTicks + 5, tick[1] + 4);
-      if (tickMarker) {
-        ctx.beginPath();
-        ctx.moveTo(tickPos[0], tick[1]);
-        ctx.lineTo(tickPos[1], tick[1]);
-        ctx.stroke();
-      }
-    }
-    ctx.restore();
-  }
-  drawOverlays() {
-    this.#layerOverlays.scene.clear();
-    this.#yAxis.yAxisGrads;
-    const ctx = this.#layerOverlays.scene.context;
-    ctx.save();
-    ctx.restore();
   }
   resize(width=this.width, height=this.height) {
     this.setDimensions({w: width, h: height});
@@ -7965,13 +7997,6 @@ class chartStreamCandle extends Overlay {
     this.target.setPosition(x, y);
     this.core.stream.lastScrollPos = this.core.scrollPos;
   }
-  yPos(p) {
-    const rangeH = this.core.stream.lastPriceMax - this.core.stream.lastPriceMin;
-    const height = p - this.core.stream.lastPriceMin;
-    const ratio = this.yAxis.height / rangeH;
-    const yPos = this.yAxis.height - (height * ratio);
-    return yPos
-  }
   draw() {
     if (this.core.stream === undefined ||
         !isArray(this.chart.streamCandle)) return
@@ -7988,10 +8013,10 @@ class chartStreamCandle extends Overlay {
       x: pos,
       w: this.xAxis.candleW
     };
-    candle.o = this.yPos(stream[1]);
-    candle.h = this.yPos(stream[2]);
-    candle.l = this.yPos(stream[3]);
-    candle.c = this.yPos(stream[4]);
+    candle.o = this.yAxis.yPos(stream[1]);
+    candle.h = this.yAxis.yPos(stream[2]);
+    candle.l = this.yAxis.yPos(stream[3]);
+    candle.c = this.yAxis.yPos(stream[4]);
     candle.raw = stream;
     if (r.inRenderRange(stream[0])) {
       render(candle);
@@ -8012,10 +8037,10 @@ class chartStreamCandle extends Overlay {
     if (raw === null) return
     const prev = {
       x: this.xAxis.xPos(raw[0]),
-      o: this.yPos(raw[1]),
-      h: this.yPos(raw[2]),
-      l: this.yPos(raw[3]),
-      c: this.yPos(raw[4]),
+      o: this.yAxis.yPos(raw[1]),
+      h: this.yAxis.yPos(raw[2]),
+      l: this.yAxis.yPos(raw[3]),
+      c: this.yAxis.yPos(raw[4]),
     };
     const ctx = this.scene.context;
     const cfg = this.theme;
@@ -8054,7 +8079,57 @@ class chartStreamCandle extends Overlay {
   }
 }
 
-var stateMachineConfig$4 = {
+const watermark = {
+  FONTSIZE: 50,
+  FONTWEIGHT: "bold",
+  FONTFAMILY: GlobalStyle.FONTFAMILY,
+  COLOUR: "#181818",
+};
+class chartWatermark extends Overlay {
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
+    super(target, xAxis, yAxis, theme, parent, params);
+    this.params.content = params?.content || "";
+  }
+  set position(p) { this.target.setPosition(0, 0); }
+  draw() {
+    let isText = isString$1(this.config?.watermark?.text);
+    let isImage = isString$1(this.config?.watermark?.imgURL);
+    if ( !isText && !isImage ) return
+    this.scene.clear();
+    const ctx = this.scene.context;
+    ctx.save();
+    if (isText) this.renderText();
+    else if (isImage) this.renderImage();
+    ctx.restore();
+  }
+  renderText() {
+    const size = this.core.config?.watermark?.fontSize;
+    const weight = this.core.config?.watermark?.fontWeight;
+    const family = this.core.config?.watermark?.fontFamily;
+    const colour = this.core.config?.watermark?.textColour;
+    const options = {
+      fontSize: size || watermark.FONTSIZE,
+      fontWeight: weight || watermark.FONTWEIGHT,
+      fontFamily: family || watermark.FONTFAMILY,
+      txtCol: colour || watermark.COLOUR,
+    };
+    const txt = this.config.watermark.text;
+    const ctx = this.scene.context;
+    ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily);
+    ctx.textBaseline = 'top';
+    ctx.fillStyle = options.txtCol;
+    const height = getTextRectHeight(options);
+    const width = getTextRectWidth(ctx, txt, options);
+    const x = (this.scene.width - width) / 2;
+    const y = (this.scene.height - height) / 2;
+    ctx.fillText(txt, x, y);
+  }
+  renderImage() {
+    this.scene.context;
+  }
+}
+
+var stateMachineConfig$3 = {
   id: "chart",
   initial: "idle",
   context: {},
@@ -8147,6 +8222,7 @@ var stateMachineConfig$4 = {
 };
 
 const defaultOverlays$2 = [
+  ["watermark", {class: chartWatermark, fixed: true, required: true, params: {content: null}}],
   ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
   ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
   ["candles", {class: chartCandles, fixed: false, required: true}],
@@ -8161,11 +8237,11 @@ class OnChart extends Chart {
   #pricePrecision
   #volumePrecision
   #layerStream
-  #layersOnChart
   #chartOverlays = new Map()
   #chartStreamCandle
   #streamCandle
   constructor (core, options) {
+    options.type = "onChart";
     super(core, options);
     this.#onChart = core.onChart;
     this.init(options);
@@ -8196,31 +8272,20 @@ class OnChart extends Chart {
     this.log(`${this.name} instantiated`);
   }
   start() {
-    this.time = this.core.Timeline;
-    this.createGraph();
+    super.start(stateMachineConfig$3);
+    this.eventsListen();
     this.addOverlays(this.core.onChart);
     if (isObject(this.Stream)) {
       ({stream: this.Stream});
     }
-    this.scale.start(`Chart says to Scale, "Thanks for the update!"`);
-    this.draw(this.range);
-    this.setCursor("crosshair");
-    this.eventsListen();
-    stateMachineConfig$4.id = this.id;
-    this.stateMachine = stateMachineConfig$4;
-    this.stateMachine.start();
   }
   end() {
     this.off("chart_yAxisRedraw", this.onYAxisRedraw);
-    this.off("setRange", this.draw);
     super.end();
   }
   eventsListen() {
     super.eventsListen();
     this.on("chart_yAxisRedraw", this.onYAxisRedraw.bind(this));
-  }
-  onStreamNewValue(candle) {
-    this.draw(this.range, true);
   }
   onStreamUpdate(candle) {
     this.#streamCandle = candle;
@@ -8310,7 +8375,7 @@ class OnChart extends Chart {
   }
 }
 
-var stateMachineConfig$3 = {
+var stateMachineConfig$2 = {
   id: "offChart",
   initial: "idle",
   context: {},
@@ -8438,6 +8503,7 @@ class OffChart extends Chart {
   }
   #input
   constructor (core, options) {
+    options.type = "offChart";
     super(core, options);
     this.#ID = this.options.offChartID || uid("TX_OC_");
     this.#overlay = options.offChart;
@@ -8461,12 +8527,12 @@ class OffChart extends Chart {
   }
   start(index) {
     this.#offChartID = index;
-    this.time = this.core.Timeline;
+    super.start(stateMachineConfig$2);
+    this.eventsListen();
     const oc = this;
     const config = { offChart: oc };
     this.#Divider = this.widgets.insert("Divider", config);
     this.#Divider.start();
-    this.createGraph();
     let instance = this.#overlayIndicator;
     let offChartLegend = {
       id: this.options.offChart.type,
@@ -8476,14 +8542,6 @@ class OffChart extends Chart {
     };
     this.legend = new Legends(this.elLegend, this);
     this.legend.add(offChartLegend);
-    this.scale.on("started",(data)=>{this.log(`OffChart scale started: ${data}`);});
-    this.scale.start("OffChart",this.name,"yAxis Scale started");
-    this.draw(this.range);
-    this.setCursor("crosshair");
-    this.eventsListen();
-    stateMachineConfig$3.id = this.id;
-    this.stateMachine = stateMachineConfig$3;
-    this.stateMachine.start();
   }
   end() {
     this.#Divider.end();
@@ -8514,57 +8572,7 @@ class OffChart extends Chart {
   }
 }
 
-const watermark = {
-  FONTSIZE: 50,
-  FONTWEIGHT: "bold",
-  FONTFAMILY: GlobalStyle.FONTFAMILY,
-  COLOUR: "#181818",
-};
-class chartWatermark extends Overlay {
-  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
-    super(target, xAxis, yAxis, theme, parent, params);
-    this.params.content = params?.content || "";
-  }
-  set position(p) { this.target.setPosition(0, 0); }
-  draw() {
-    let isText = isString$1(this.config?.watermark?.text);
-    let isImage = isString$1(this.config?.watermark?.imgURL);
-    if ( !isText && !isImage ) return
-    this.scene.clear();
-    const ctx = this.scene.context;
-    ctx.save();
-    if (isText) this.renderText();
-    else if (isImage) this.renderImage();
-    ctx.restore();
-  }
-  renderText() {
-    const size = this.core.config?.watermark?.fontSize;
-    const weight = this.core.config?.watermark?.fontWeight;
-    const family = this.core.config?.watermark?.fontFamily;
-    const colour = this.core.config?.watermark?.textColour;
-    const options = {
-      fontSize: size || watermark.FONTSIZE,
-      fontWeight: weight || watermark.FONTWEIGHT,
-      fontFamily: family || watermark.FONTFAMILY,
-      txtCol: colour || watermark.COLOUR,
-    };
-    const txt = this.config.watermark.text;
-    const ctx = this.scene.context;
-    ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily);
-    ctx.textBaseline = 'top';
-    ctx.fillStyle = options.txtCol;
-    const height = getTextRectHeight(options);
-    const width = getTextRectWidth(ctx, txt, options);
-    const x = (this.scene.width - width) / 2;
-    const y = (this.scene.height - height) / 2;
-    ctx.fillText(txt, x, y);
-  }
-  renderImage() {
-    this.scene.context;
-  }
-}
-
-var stateMachineConfig$2 = {
+var stateMachineConfig$1 = {
   id: "main",
   initial: "idle",
   context: {},
@@ -8773,7 +8781,6 @@ var stateMachineConfig$2 = {
 };
 
 const defaultOverlays = [
-  ["watermark", {class: chartWatermark, fixed: true, required: true, params: {content: null}}],
   ["grid", {class: chartGrid, fixed: false, required: true, params: {axes: "x"}}],
 ];
 class MainPane {
@@ -8858,6 +8865,7 @@ class MainPane {
   get scrollPos() { return this.#core.scrollPos }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
   get stateMachine() { return this.#stateMachine }
+  get graph() { return this.#Graph }
   get elements() {
     return {
       elTarget: this.#elChart,
@@ -8915,7 +8923,7 @@ class MainPane {
     });
     this.rowsOldH = this.rowsH;
     this.createGraph();
-    this.initXGrid();
+    this.draw(this.range, true);
     renderLoop.init({
       graphs: [this.#Graph],
       range: this.range
@@ -8923,8 +8931,8 @@ class MainPane {
     renderLoop.start();
     renderLoop.queueFrame(this.range, [this.#Graph], false);
     this.eventsListen();
-    stateMachineConfig$2.id = this.id;
-    this.stateMachine = stateMachineConfig$2;
+    stateMachineConfig$1.id = this.id;
+    this.stateMachine = stateMachineConfig$1;
     this.stateMachine.start();
   }
   end() {
@@ -8954,11 +8962,10 @@ class MainPane {
     this.#input.on("keydown", this.onChartKeyDown.bind(this));
     this.#input.on("keyup", this.onChartKeyUp.bind(this));
     this.#input.on("wheel", this.onMouseWheel.bind(this));
-    this.#input.on("pointerdrag", this.onChartDrag.bind(this));
-    this.#input.on("pointerdragend", this.onChartDragDone.bind(this));
     this.#input.on("pointermove", this.onMouseMove.bind(this));
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
+    this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue.bind(this));
     this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this));
     this.on("setRange", this.draw.bind(this));
     this.on("scrollUpdate", this.draw.bind(this));
@@ -9042,12 +9049,9 @@ class MainPane {
   onChartDragDone(e) {
     const d = this.#drag;
     d.active = false;
-    d.delta = [
-      e.position.x - d.prev[0],
-      e.position.y - d.prev[1]
-    ];
+    d.delta = [ 0, 0 ];
     this.#cursorPos = [
-      e.position.x, e.position.y,
+      ...d.prev,
       ...d.start,
       ...d.delta
     ];
@@ -9075,8 +9079,11 @@ class MainPane {
         break;
     }
   }
+  onFirstStreamValue(value) {
+    this.chart.scale.xAxis.calcXAxisGrads(this.range,);
+    this.draw(this.range, true);
+  }
   onNewStreamValue(value) {
-    this.draw();
   }
   onPointerActive(chart) {
     if (chart) {
@@ -9086,11 +9093,13 @@ class MainPane {
     if (chart !== this.chart) {
       this.chart.cursorActive = false;
       this.chart.scale.layerCursor.visible = false;
+      this.chart.scale.layerCursor.erase();
     }
     this.#OffCharts.forEach((offChart, key) => {
       if (chart !== offChart) {
         offChart.cursorActive = false;
         offChart.scale.layerCursor.visible = false;
+        offChart.scale.layerCursor.erase();
       }
     });
   }
@@ -9205,15 +9214,13 @@ class MainPane {
     let overlays = copyDeep(defaultOverlays);
     this.#Graph = new graph(this, this.#elViewport, overlays);
   }
-  initXGrid() {
-    this.draw();
-  }
   draw(range=this.range, update=false) {
     const graphs = [
       this.#Graph,
       this.#Time,
       this.#Chart
     ];
+    this.time.xAxis.doCalcXAxisGrads(range);
     this.#OffCharts.forEach((offChart, key) => {
       graphs.push(offChart);
     });
@@ -9758,7 +9765,7 @@ class Divider {
   }
 }
 
-var stateMachineConfig$1 = {
+var stateMachineConfig = {
   id: "widgets",
   initial: "idle",
   context: {},
@@ -9856,8 +9863,8 @@ class Widgets {
   }
   start() {
     this.eventsListen();
-    stateMachineConfig$1.context = this;
-    this.stateMachine = stateMachineConfig$1;
+    stateMachineConfig.context = this;
+    this.stateMachine = stateMachineConfig;
     this.stateMachine.start();
   }
   end() {
@@ -10524,6 +10531,9 @@ class TradeXchart extends tradeXChart {
     return true
   }
   refresh() {
+    let start = this.range.indexStart;
+    let end = this.range.indexEnd;
+    this.setRange(start, end);
     this.MainPane.draw(undefined, true);
   }
   notImplemented() {

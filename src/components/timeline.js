@@ -247,14 +247,17 @@ export default class Timeline {
 
   onDoubleClick(e) {
     this.core.jumpToEnd()
+    this.core.MainPane.draw(undefined, true)
   }
 
   onFwdEnd() {
     this.core.jumpToEnd()
+    this.core.MainPane.draw(undefined, true)
   }
 
   onRwdStart() {
     this.core.jumpToStart()
+    this.core.MainPane.draw(undefined, true)
   }
 
   onSetRange() {

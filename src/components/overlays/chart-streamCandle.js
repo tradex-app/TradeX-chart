@@ -26,16 +26,6 @@ export default class chartStreamCandle extends Overlay {
     this.core.stream.lastScrollPos = this.core.scrollPos
   }
 
-  // Must calculate yPos from last candle from candle overlay
-  // to keep streaming candle position in sync
-  yPos(p) {
-    const rangeH = this.core.stream.lastPriceMax - this.core.stream.lastPriceMin
-    const height = p - this.core.stream.lastPriceMin
-    const ratio = this.yAxis.height / rangeH
-    const yPos = this.yAxis.height - (height * ratio)
-    return yPos
-  }
-
   draw() {
     
     if (this.core.stream === undefined ||
@@ -52,14 +42,13 @@ export default class chartStreamCandle extends Overlay {
     const offset = this.xAxis.smoothScrollOffset || 0
     const pos = this.core.stream.lastXPos
     const candle = {
-      x: pos, // offset + pos,
+      x: pos,
       w: this.xAxis.candleW
     }
-    // candle.x = this.xAxis.xPos(stream[0])
-    candle.o = this.yPos(stream[1])
-    candle.h = this.yPos(stream[2])
-    candle.l = this.yPos(stream[3])
-    candle.c = this.yPos(stream[4])
+    candle.o = this.yAxis.yPos(stream[1])
+    candle.h = this.yAxis.yPos(stream[2])
+    candle.l = this.yAxis.yPos(stream[3])
+    candle.c = this.yAxis.yPos(stream[4])
     candle.raw = stream
 
     if (r.inRenderRange(stream[0])) {
@@ -87,10 +76,10 @@ export default class chartStreamCandle extends Overlay {
 
     const prev = {
       x: this.xAxis.xPos(raw[0]),
-      o: this.yPos(raw[1]),
-      h: this.yPos(raw[2]),
-      l: this.yPos(raw[3]),
-      c: this.yPos(raw[4]),
+      o: this.yAxis.yPos(raw[1]),
+      h: this.yAxis.yPos(raw[2]),
+      l: this.yAxis.yPos(raw[3]),
+      c: this.yAxis.yPos(raw[4]),
     }
 
     const ctx = this.scene.context

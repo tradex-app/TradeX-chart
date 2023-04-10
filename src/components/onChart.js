@@ -50,6 +50,7 @@ export default class OnChart extends Chart {
 
   constructor (core, options) {
 
+    options.type = "onChart"
     super(core, options)
 
     this.#onChart = core.onChart

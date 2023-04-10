@@ -10,6 +10,7 @@ import {
   YAXIS_GRID,
   YAXIS_TYPES
 } from "../../definitions/chart";
+import { time_start } from "../../utils/time";
 
 export default class yAxis extends Axis {
 
@@ -74,6 +75,7 @@ export default class yAxis extends Axis {
   }
 
   get chart() { return this.#chart }
+  get range() { return this.#range }
   get height() { return this.chart.height }
   get rangeH() { return this.#range.diff * this.yAxisPadding }
   get yAxisRatio() { return this.getYAxisRatio() }
@@ -124,15 +126,15 @@ export default class yAxis extends Axis {
   /**
    * return canvas y co-ordinate
    * handles Y Axis modes: default, log, percentate
-   * @param {number} yData - chart price or offchart indicator y data
+   * @param {number} y - chart price or offchart indicator y data
    * @return {number}  
    * @memberof yAxis
    */
-  yPos(yData) {
+  yPos(y) {
     switch(this.yAxisType) {
-      case "percent" : return bRound(this.p100toPixel(yData))
-      case "log" : return bRound(this.$2Pixel(log10(yData)))
-      default : return bRound(this.$2Pixel(yData))
+      case "percent" : return bRound(this.p100toPixel(y))
+      case "log" : return bRound(this.$2Pixel(log10(y)))
+      default : return bRound(this.$2Pixel(y))
     }
   }
 
@@ -147,15 +149,15 @@ export default class yAxis extends Axis {
     return this.pixel2$(y)
   }
 
-  $2Pixel(yData) {
+  $2Pixel(y) {
     // const min = this.#range.min 
-    const height = yData - this.#range.min
+    const height = y - this.#range.min
     const yPos = this.height - (height * this.yAxisRatio)
     return yPos
   }
 
-  lastYData2Pixel(yData) {
-    let height = yData - this.core.stream.lastPriceMin
+  lastYData2Pixel(y) {
+    let height = y - this.core.stream.lastPriceMin
     let yPos = this.height - (height * this.yAxisRatio)
     return yPos
   }
@@ -166,8 +168,15 @@ export default class yAxis extends Axis {
     return this.#range.min + adjust
   }
 
-  p100toPixel(yData) {
-    return this.height * yData / 100
+  p100toPixel(y) {
+    // if (this.mode == "automatic")
+    //   return this.height * y / 100
+    // else {
+      // return this.pixel2$(y)
+      let ratio = this.height / this.#range.diff
+      return (y - this.#range.max) * -1 * ratio
+    // }
+
   }
 
   yAxisTransform() {
@@ -192,7 +201,7 @@ export default class yAxis extends Axis {
 
   setOffset(o) {
     if (!isNumber(o) || o == 0 || this.#mode !== "manual") return false
-    
+
     const t = this.#transform
     let max = this.pixel2$(o * -1)
     let min = this.pixel2$(this.height - o)
@@ -218,10 +227,11 @@ export default class yAxis extends Axis {
           min -= change;
           max += change;
     
-    if (max < min || min <= delta)  return
+    // if (max < min || min <= delta)  return
+    if (max < min || min <= Infinity * -1 || max >= Infinity)  return
 
     t.manual.max =  max
-    t.manual.min = (min >= 0.001)? min : 0.001
+    t.manual.min = min // (min >= 0.001)? min : 0.001
     t.manual.mid = (delta) / 2
     t.manual.diff = delta
     t.manual.zoom = change
@@ -229,29 +239,19 @@ export default class yAxis extends Axis {
     this.calcGradations()
   }
 
-//   setYFactor(f) {
-//     if (!isNumber(f) || this.#mode !== "manual") return false
-//     this.#transform.factor += f * -1
-//     console.log(`this.#transform.factor`,this.#transform.factor)
-//   }
-  
-//   calc_zoom(event) {
-//     let d = this.drug.y - event.center.y
-//     let speed = d > 0 ? 3 : 1
-//     let k = 1 + speed * d / this.layout.height
-//     return Utils.clamp(this.drug.z * k, 0.005, 100)
-// }
-
   calcGradations() {
-
+    let max, min, off;
     switch (this.yAxisType) {
       case "percent":
-        this.#yAxisGrads = this.gradations(100, 0, false, true)
+        max = (this.#range.max > 0) ? this.#range.max : 100
+        min = (this.#range.min > 0) ? this.#range.min : 0
+        off = this.#range.offset
+        this.#yAxisGrads = this.gradations(max + off, min + off)
         break;
       default:
-        let max = (this.#range.max > 0) ? this.#range.max : 1
-        let min = (this.#range.min > 0) ? this.#range.min : 0
-        let off = this.#range.offset
+        max = (this.#range.max > 0) ? this.#range.max : 1
+        min = (this.#range.min > 0) ? this.#range.min : 0
+        off = this.#range.offset
         this.#yAxisGrads = this.gradations(max + off, min + off)
         break;
     }
@@ -294,9 +294,18 @@ export default class yAxis extends Axis {
 
       pos -= stepP
     }
+
+    // remove first or last grads if too close to the edge
     if (this.#mode !== "manual") {
-    scaleGrads.shift()
-    scaleGrads.pop()
+
+      const theme = this.core.theme.yAxis
+      if (scaleGrads.slice(-1)[0][1] <= theme.fontSize * 0.1) {
+        scaleGrads.pop()
+      }
+
+      if (scaleGrads[0][1] >= this.height - (theme.fontSize * 0.1)) {
+        scaleGrads.shift()
+      }
     }
 
     return scaleGrads

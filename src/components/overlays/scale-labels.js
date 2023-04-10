@@ -39,7 +39,7 @@ export default class ScaleLabels extends Overlay {
     ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
     for (let tick of grads) {
       y = yAxis.$2Pixel(tick[0])
-      ctx.fillText(tick[0], yAxis.yAxisTicks + 5, y + 4)
+      ctx.fillText(tick[0], yAxis.yAxisTicks + 5, y + (theme.fontSize * 0.3))
 
       if (tickMarker) {
         ctx.beginPath()
