@@ -44,3 +44,6 @@ export const rwdStart =
 
 export const noConnection = 
   `<svg style="height:46px;width:46px" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><g transform="matrix(.72648 0 0 .72648 -.71775 -1.081)">  <path d="m3.707 21.71 17-17-1.414-1.42-2.555 2.56c-1.246-1.15-2.91-1.85-4.738-1.85-2.858 0-5.314 1.71-6.402 4.16-2.638 0.64-4.598 3.01-4.598 5.84 0 2.06 1.04 3.88 2.625 4.96l-1.332 1.33zm1.37-4.2c-1.238-0.68-2.077-2-2.077-3.51 0-2.03 1.506-3.7 3.459-3.96l0.611-0.09 0.201-0.58c0.676-1.96 2.54-3.37 4.729-3.37 1.275 0 2.438 0.48 3.322 1.26zm3.166 2.49 2-2h7.757c1.657 0 3-1.34 3-3s-1.343-3-3-3v-2c2.761 0 5 2.24 5 5s-2.239 5-5 5z"/></g></svg>`
+
+export const add =
+  `<svg width="46.08" height="46.08" version="1.1" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="32"/><path d="m256 346.51v-181.02m-90.51 90.51h181.02" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>`

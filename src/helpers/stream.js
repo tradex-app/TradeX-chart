@@ -14,6 +14,7 @@
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import { YEAR_MS, MONTHR_MS, WEEK_MS, DAY_MS, HOUR_MS, MINUTE_MS, SECOND_MS, MILLISECOND } from '../utils/time';
 import { copyDeep, mergeDeep } from '../utils/utilities';
+import Alerts from './alerts';
 
 import {
   STREAM_ERROR,
@@ -51,6 +52,10 @@ export default class Stream {
   #countDownMS = 0
   #countDown = ""
   #dataReceived = false
+  #lastPriceMax
+  #lastPriceMin
+  #lastTick = empty
+
 
   static validateConfig(c) {
     if (!isObject(c)) return defaultStreamConfig
@@ -89,6 +94,19 @@ export default class Stream {
     this.#dataReceived = true
     this.status = {status: STREAM_FIRSTVALUE, data}
   }
+  get alerts() { return Alerts }
+  get lastPriceMin() { return this.#lastPriceMin }
+  set lastPriceMin(p) { if (isNumber(p)) this.#lastPriceMin = p }
+  get lastPriceMax() { return this.#lastPriceMax }
+  set lastPriceMax(p) { if (isNumber(p)) this.#lastPriceMax = p }
+  get lastTick() { return this.#lastTick }
+  set lastTick(t) { 
+    if (!isArray(t)) return
+    
+    const prevLastTick = this.#lastTick
+    this.#lastTick = t
+    this.alerts.check(t, this.#candle)
+  }
 
   /**
    * process price tick
@@ -97,6 +115,8 @@ export default class Stream {
    * @memberof Stream
    */
   set candle(data) {
+    // store last tick for alerts
+    const lastTick = [...this.#candle]
     // round time to nearest current time unit
     data.t = this.roundTime(new Date(data.t))
     // ensure values are numbers
@@ -113,6 +133,7 @@ export default class Stream {
       this.updateCandle(data)
     }
     this.status = {status: STREAM_LISTENING, data: this.#candle}
+    this.lastTick = lastTick
   }
   get candle() {
     return (this.#candle !== empty) ? this.#candle : null
@@ -142,7 +163,6 @@ export default class Stream {
   onTick(tick) {
     if (this.#status == STREAM_STARTED || this.#status == STREAM_LISTENING) {
       if (isObject(tick)) {
-        this.lastTick = {...tick}
         this.candle = tick
         this.#core.setNotEmpty()
       }

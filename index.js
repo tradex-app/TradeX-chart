@@ -627,3 +627,12 @@ addChart()
 addChart()
 addChart()
 addChart()
+
+function h($,p,c) {alert(`alert`,$,p[4],c[4])} 
+
+function alertTest ($, p, c) {
+  if ($ > p[4] && $ < c[4]) return true
+  else return false
+}
+
+window.chart1.stream.alerts.add(13010, alertTest, h)
