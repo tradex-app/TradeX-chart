@@ -1,21 +1,41 @@
 // alerts.js
 // provide subscription to price stream for handler execution
 
-import { isFunction, isNumber, isString } from "../utils/typeChecks"
+import { isArray, isFunction, isNumber } from "../utils/typeChecks"
 import { uid } from "../utils/utilities"
 
 const ALERT = "alert"
 
 export default class Alerts {
 
-  static #list = new Map()
+  #list = new Map()
+  #handlers = {}
 
-  #price
-  #condition
-  #handlers = new Map()
+  constructor(alerts) {
+    if (isArray(alerts)) {
+      for (let a of alerts) {
+        this.add(a?.price, a?.condition, a?.handler)
+      }
+    }
+  }
 
-  static get list() {
-    return Alerts.#list
+  get list() { return this.#list }
+  get handlers() { return this.#handlers }
+
+  destroy() {
+    this.#list.clear()
+    this.#handlers = {}
+  }
+
+  batchAdd(alerts) {
+    if (isArray(alerts)) {
+      let ids = []
+      for (let a of alerts) {
+        ids.push(this.add(a?.price, a?.condition, a?.handler))
+      }
+      return ids
+    }
+    else return false
   }
 
   /**
@@ -25,92 +45,110 @@ export default class Alerts {
    * @param {number} price - price trigger
    * @param {function} condition - function returns true or false
    * @param {function} handler - function to execute on condition true
-   * @return {instance}  
+   * @return {string} - id string  
    * @memberof Alerts
    */
-  static add(price, condition, handler) {
-
-    if (!isNumber(price) ||
+  add(price, condition, handler) {
+    if (isNaN(price) ||
         !isFunction(handler)) return false
 
-    let id, instance;
+    const id = uid(ALERT)
+    const alert = {price, condition}
 
-    if (Alerts.list.has({price, condition})) {
-      instance = Alerts.list.get({price, condition})
-      id = instance.addHandler(handler)
+    if (this.list.has(alert)) {
+      let value = this.list.get(alert)
+      value[id] = handler
     }
     else {
-      instance = new Alerts(price, condition)
-      id = instance.addHandler(handler)
-      Alerts.list.set({price, condition}, instance)
+      const entry = {}
+      entry[id] = handler
+      this.list.set(alert, entry)
     }
+    this.#handlers[id] = {alert, handler}
 
     return id
   }
 
-  static remove(id) {
-    const instance = Alerts.instanceByID(id)
+  /**
+   * Remove alert handler
+   *
+   * @param {string} id
+   * @return {boolean}  - success or failure
+   * @memberof Alerts
+   */
+  remove(id) {
+    if (!(id in this.#handlers)) return false
 
-    // check if a valid alert handler id
-    if (!instance) return false
+    const handler = this.#handlers[id]
+    const alert = handler.alert
+    const value = this.#list.get(alert)
+    value.delete(id)
+    handler.delete(id)
 
-    const r = instance.removeHandler(id)
+    if (Object.keys(value).length == 0)
+      this.#list.delete(alert)
 
-    if (instance.handlers.size == 0)
-      Alerts.list.delete({price, condition})
-
-    return r
+    return true
   }
 
-  static delete(price, condition) {
+  /**
+   * delete alert - will remove all subscribed handlers
+   *
+   * @param {number} price
+   * @param {*} condition
+   * @return {*} 
+   * @memberof Alerts
+   */
+  delete(price, condition) {
 
-    if (Alerts.list.has({price, condition})) 
-      Alerts.list.get({price, condition}).destroy()
-
-    return Alerts.list.delete({price, condition})
-  }
-
-  static pause(id) {
-    const instance = Alerts.instanceByID(id)
-  }
-
-  static instanceByID(id) {
-    for (let instance of Alerts.list) {
-      if (instance.handlers.has(id)) return instance
+    if (this.list.has({price, condition})) {
+      const alert = this.list.get({price, condition})
+      for (let id in alert) {
+        this.#handlers.delete(id)
+        alert.delete(id)
+      }
     }
-    return false
+    return this.list.delete({price, condition})
   }
 
-  static check(prev, curr) {
-    for (let [key, instance] of Alerts.list) {
-      if (instance.condition(prev, curr)) {
-        for (let [key, handler] of instance.handlers) {
-          handler(instance.price, prev, curr)
+  pause(id) {
+    if (!(id in this.#handlers)) return false
+
+    const handler = this.#handlers[id]
+  }
+
+  /**
+   * return handler by id
+   *
+   * @param {string} id
+   * @return {function}  
+   * @memberof Alerts
+   */
+  handlerByID(id) {
+    if (!(id in this.#handlers)) return false
+    else return this.#handlers[id].handler
+  }
+
+  /**
+   * check all alerts and execute handlers if true
+   *
+   * @param {number} prev
+   * @param {number} curr
+   * @memberof Alerts
+   */
+  check(prev, curr) {
+    if (!isArray(prev) || !isArray(curr)) return
+
+    for (let [key, handlers] of this.list) {
+      if (key.condition(key.price, prev, curr)) {
+        for (let id in handlers) {
+          try {
+            handlers[id](key.price, prev, curr)
+          }
+          catch(e) { console.error(e) }
         }
       }
     }
   }
 
-  constructor(price, condition) {
-    this.#price = price
-    this.#condition = condition
-  }
-
-  get price() { return this.#price }
-  get condition() { return this.#condition }
-  get handlers() { return this.#handlers }
-
-  destroy() {
-    this.#handlers.clear()
-  }
-
-  addHandler(handler) {
-    const id = uid(ALERT)
-    this.#handlers.set(id, handler)
-    return id
-  }
-
-  removeHandler(id) {
-    return this.#handlers.delete(id)
-  }
 }

@@ -1,37 +1,38 @@
+<div align="center">
+
+[![Version](https://badgen.net/npm/v/tradex-chart)](https://www.npmjs.com/package/tradex-chart)
+[![Size](https://badgen.net/bundlephobia/minzip/tradex-chart)](https://bundlephobia.com/result?p=tradex-chart)
+[![LICENSE](https://badgen.net/github/license/tradex-app/tradex-chart)](LICENSE)
+[![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/tradex-app/TradeX-chart)
+[![NPM](https://badgen.net/badge/icon/npm?icon=npm&label)](https://www.npmjs.com/package/tradex-chart)
+
+</div>
+
 # README
 
 ## WIP - under heavy development - NOT production ready
 
-TradeX-chart is a trade chart written in plain (vanilla) JavaScript with one dependency only; use it with any framework or backend. Customize and theme the chart any way to match your website or app.
+TradeX-chart is a trade chart written in plain (vanilla) JavaScript with **one** dependency only; use it with any framework or backend. Customize and theme the chart any way to match your website or app.
 
 ![](assets/EMA.png)
 
 ## Table of Contents
 
-* [Why](#why)
 * [Demo](#demo)
 * [Getting Started](#getting-started)
 * [Documentation](/docs/documentation.md)
 * [Features](#features)
 * [License](/LICENSE)
 
-## Why
+## Demo
 
-TradeX-chart was created to give you the developer the freedom to choose your framework and not lock you in.
-
-Secondly after talking to other developers, top on their wishlist for a trading chart was more direct control over it, so they could create their own custom plots. Subscribe to the internal events messaging to trigger events in your own application.
-
-Thirdly a fully themeable chart that can be integrated into any website or application design.
+### [Live Demo](https://tradex-chart.guildmedia.net/)
 
 ## Getting Started
 
 ### Requirements
 
 TradeX-chart targets browsers that support [ECMAScript 2022](https://www.ecma-international.org/wp-content/uploads/ECMA-262_13th_edition_june_2022.pdfhttps:/).
-
-## Demo
-
-### [Live Demo](https://tradex-chart.guildmedia.net/)
 
 ## Install
 
@@ -104,8 +105,8 @@ Documentation can be found under:
 * WIP: All chart features and functions accessible via API
 * Built in a modular manner
 * Provides message, emit and subscribe methods
-* State object defines chart configuration, on and off chart indicators, drawing tool overlays and can be imported or exported.
-* Chart implements a multi-layer canvas class which makes overlays easy. It also supports interaction through hit detection.
+* State object defines chart configuration, on and off chart indicators
+* Drawing tool overlays and can be imported or exported.
 * Export chart to png, jpg, webp.
 * Indicator calculation provided by [talib-web](https://https://anchegt.github.io/talib-web/) as a WebAssembly module.
 * Supports multiple candle types:

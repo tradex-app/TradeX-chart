@@ -55,6 +55,7 @@ export default class Stream {
   #lastPriceMax
   #lastPriceMin
   #lastTick = empty
+  #alerts
 
 
   static validateConfig(c) {
@@ -94,7 +95,7 @@ export default class Stream {
     this.#dataReceived = true
     this.status = {status: STREAM_FIRSTVALUE, data}
   }
-  get alerts() { return Alerts }
+  get alerts() { return this.#alerts }
   get lastPriceMin() { return this.#lastPriceMin }
   set lastPriceMin(p) { if (isNumber(p)) this.#lastPriceMin = p }
   get lastPriceMax() { return this.#lastPriceMax }
@@ -144,11 +145,13 @@ export default class Stream {
     // this.#core.chartData.push([0,0,0,0,0,0])
     // iterate over indicators add empty value to end
 
+    this.#alerts = new Alerts(this.#config.alerts)
     this.status = {status: STREAM_STARTED}
     this.#updateTimer = setInterval(this.onUpdate.bind(this), this.#maxUpdate)
   }
 
   stop() {
+    this.#alerts.destroy()
     this.status = {status: STREAM_STOPPED}
   }
   

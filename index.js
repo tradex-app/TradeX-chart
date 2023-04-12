@@ -628,7 +628,7 @@ addChart()
 addChart()
 addChart()
 
-function h($,p,c) {alert(`alert`,$,p[4],c[4])} 
+function h($,p,c) {console.log(`alert`,$,p[4],c[4])} 
 
 function alertTest ($, p, c) {
   if ($ > p[4] && $ < c[4]) return true

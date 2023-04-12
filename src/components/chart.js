@@ -183,6 +183,7 @@ export default class Chart {
     this.off("main_mousemove", this.onMouseMove);
     this.off(STREAM_LISTENING, this.onStreamListening);
     this.off(STREAM_NEWVALUE, this.onStreamNewValue);
+    this.off(STREAM_UPDATE, this.onStreamUpdate);
     this.off(STREAM_FIRSTVALUE, this.onStreamNewValue)
   }
 
@@ -199,6 +200,7 @@ export default class Chart {
     this.on("main_mousemove", this.updateLegends.bind(this));
     this.on(STREAM_LISTENING, this.onStreamListening.bind(this));
     this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this));
+    this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this));
     this.on(STREAM_FIRSTVALUE, this.onStreamNewValue.bind(this))
   }
 

@@ -1437,6 +1437,94 @@ class StateMachine {
   }
 }
 
+const ALERT = "alert";
+class Alerts {
+  #list = new Map()
+  #handlers = {}
+  constructor(alerts) {
+    if (isArray(alerts)) {
+      for (let a of alerts) {
+        this.add(a?.price, a?.condition, a?.handler);
+      }
+    }
+  }
+  get list() { return this.#list }
+  get handlers() { return this.#handlers }
+  destroy() {
+    this.#list.clear();
+    this.#handlers = {};
+  }
+  batchAdd(alerts) {
+    if (isArray(alerts)) {
+      let ids = [];
+      for (let a of alerts) {
+        ids.push(this.add(a?.price, a?.condition, a?.handler));
+      }
+      return ids
+    }
+    else return false
+  }
+  add(price, condition, handler) {
+    if (isNaN(price) ||
+        !isFunction(handler)) return false
+    const id = uid(ALERT);
+    const alert = {price, condition};
+    if (this.list.has(alert)) {
+      let value = this.list.get(alert);
+      value[id] = handler;
+    }
+    else {
+      const entry = {};
+      entry[id] = handler;
+      this.list.set(alert, entry);
+    }
+    this.#handlers[id] = {alert, handler};
+    return id
+  }
+  remove(id) {
+    if (!(id in this.#handlers)) return false
+    const handler = this.#handlers[id];
+    const alert = handler.alert;
+    const value = this.#list.get(alert);
+    value.delete(id);
+    handler.delete(id);
+    if (Object.keys(value).length == 0)
+      this.#list.delete(alert);
+    return true
+  }
+  delete(price, condition) {
+    if (this.list.has({price, condition})) {
+      const alert = this.list.get({price, condition});
+      for (let id in alert) {
+        this.#handlers.delete(id);
+        alert.delete(id);
+      }
+    }
+    return this.list.delete({price, condition})
+  }
+  pause(id) {
+    if (!(id in this.#handlers)) return false
+    this.#handlers[id];
+  }
+  handlerByID(id) {
+    if (!(id in this.#handlers)) return false
+    else return this.#handlers[id].handler
+  }
+  check(prev, curr) {
+    if (!isArray(prev) || !isArray(curr)) return
+    for (let [key, handlers] of this.list) {
+      if (key.condition(key.price, prev, curr)) {
+        for (let id in handlers) {
+          try {
+            handlers[id](key.price, prev, curr);
+          }
+          catch(e) { console.error(e); }
+        }
+      }
+    }
+  }
+}
+
 const NAME = "TradeX-Chart";
 const ID = "TradeXChart";
 const CLASS_UTILS     = "tradeXutils";
@@ -1479,6 +1567,10 @@ class Stream {
   #countDownMS = 0
   #countDown = ""
   #dataReceived = false
+  #lastPriceMax
+  #lastPriceMin
+  #lastTick = empty
+  #alerts
   static validateConfig(c) {
     if (!isObject(c)) return defaultStreamConfig
     else {
@@ -1511,7 +1603,20 @@ class Stream {
     this.#dataReceived = true;
     this.status = {status: STREAM_FIRSTVALUE, data};
   }
+  get alerts() { return this.#alerts }
+  get lastPriceMin() { return this.#lastPriceMin }
+  set lastPriceMin(p) { if (isNumber(p)) this.#lastPriceMin = p; }
+  get lastPriceMax() { return this.#lastPriceMax }
+  set lastPriceMax(p) { if (isNumber(p)) this.#lastPriceMax = p; }
+  get lastTick() { return this.#lastTick }
+  set lastTick(t) {
+    if (!isArray(t)) return
+    this.#lastTick;
+    this.#lastTick = t;
+    this.alerts.check(t, this.#candle);
+  }
   set candle(data) {
+    const lastTick = [...this.#candle];
     data.t = this.roundTime(new Date(data.t));
     data.o = data.o * 1;
     data.h = data.h * 1;
@@ -1525,15 +1630,18 @@ class Stream {
       this.updateCandle(data);
     }
     this.status = {status: STREAM_LISTENING, data: this.#candle};
+    this.lastTick = lastTick;
   }
   get candle() {
     return (this.#candle !== empty) ? this.#candle : null
   }
   start() {
+    this.#alerts = new Alerts(this.#config.alerts);
     this.status = {status: STREAM_STARTED};
     this.#updateTimer = setInterval(this.onUpdate.bind(this), this.#maxUpdate);
   }
   stop() {
+    this.#alerts.destroy();
     this.status = {status: STREAM_STOPPED};
   }
   emit(topic, data) {
@@ -1545,7 +1653,6 @@ class Stream {
   onTick(tick) {
     if (this.#status == STREAM_STARTED || this.#status == STREAM_LISTENING) {
       if (isObject(tick)) {
-        this.lastTick = {...tick};
         this.candle = tick;
         this.#core.setNotEmpty();
       }
