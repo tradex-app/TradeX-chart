@@ -899,7 +899,6 @@ export default class TradeXchart extends Tradex_chart {
       }
       this.setRange(start, end)
     }
-
   }
 
   /**

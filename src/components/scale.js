@@ -159,9 +159,6 @@ export default class ScaleBar {
     this.on(`${this.#parent.id}_mousemove`, this.onMouseMove.bind(this))
     this.on(`${this.#parent.id}_mouseout`, this.#layerCursor.erase.bind(this.#layerCursor))
     this.on(STREAM_UPDATE, this.#layerPriceLine.draw.bind(this.#layerPriceLine))
-    // this.on("chart_pan", this.onChartDrag.bind(this))
-    // this.on("chart_panDone", this.onChartDrag.bind(this))
-    // this.on("resizeChart", (dimensions) => this.onResize.bind(this))
   }
 
   on(topic, handler, context) {

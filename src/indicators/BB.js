@@ -8,18 +8,11 @@ import {
 import { uid } from "../utils/utilities"
 
 export default class DMI extends indicator {
-  #ID
-  #name = 'Bollinger Bands'
-  #shortName = 'BB'
-  #params
-  #onChart = true
+
   #precision = 2
   #calcParams = [20]
   #checkParamCount = false
-  #scaleOverlay = true
-  #plots = [
-    { key: 'BB_1', title: ' ', type: 'line' },
-  ]
+
   #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1',
@@ -49,29 +42,19 @@ export default class DMI extends indicator {
     super(target, xAxis, yAxis, config, parent, params)
 
     const overlay = params.overlay
-
-    this.#ID = params.overlay?.id || uid(this.#shortName)
-    this.#params = params
+    
+    this.name = 'Bollinger Bands'
+    this.shortName = 'BB'
+    this.ID = params.overlay?.id || uid(this.shortName)
+    this.onChart = true
+    this.scaleOverlay = false
+    this.plots = [
+      { key: 'BB_1', title: ' ', type: 'line' },
+    ]
     this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams
     this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
-  }
-
-  get ID() { return this.#ID }
-  get name() { return this.#name }
-  get shortName() { return this.#shortName }
-  get onChart() { return this.#onChart }
-  get plots() { return this.#plots }
-
-  addLegend() {
-    let legend = {
-      id: this.#shortName,
-      title: this.#shortName,
-      type: this.#shortName,
-      source: this.legendInputs.bind(this)
-    }
-    this.chart.legend.add(legend)
   }
 
   legendInputs(pos=this.chart.cursorPos, candle) {
@@ -81,7 +64,7 @@ export default class DMI extends indicator {
     let colours = [this.style.strokeStyle]
 
     c = limit(c, 0, this.overlay.data.length - 1)
-    inputs.DMI_1 = this.Scale.nicePrice(this.overlay.data[c][1])
+    inputs.BB_1 = this.Scale.nicePrice(this.overlay.data[c][1])
 
     return {inputs, colours}
   }
@@ -92,56 +75,6 @@ export default class DMI extends indicator {
       return { key: `dmi${num}`, title: `DMI${num}: `, type: 'line' }
     })
   }
-
-  /**
-   * process stream and create new indicator data entry
-   * @param {array} value - current stream candle 
-   * @memberof RSI
-   */
- newValue (value) {
-   let p = this.TALibParams()
-   if (!p) return false
-
-   let v = this.calcIndicatorStream(this.#shortName, this.TALibParams())
-   if (!v) return false
-
-   this.overlay.data.push([v[0], v[1]])
-
-   this.target.setPosition(this.core.scrollPos, 0)
-   this.draw(this.range)
- }
-
- /**
-  * process stream and update current (last) indicator data entry
-  * @param {array} value - current stream candle 
-  * @memberof RSI
-  */
- UpdateValue (value) {
-   let l = this.overlay.data.length - 1
-   let p = this.TALibParams()
-   if (!p) return false
-
-   let v = this.calcIndicatorStream(this.#shortName, p)
-   if (!v) return false
-
-   this.overlay.data[l] = [v[0], v[1]]
-
-   this.target.setPosition(this.core.scrollPos, 0)
-   this.draw(this.range)
-
-   // console.log(`RSI stream input update: ${value}`)
-
- }
-
- TALibParams() {
-   let end = this.range.dataLength
-   let step = this.calcParams[0]
-   let start = end - step
-   let input = this.indicatorInput(start, end)
-   let hasNull = input.find(element => element === null)
-   if (hasNull) return false
-   else return { inReal: input, timePeriod: step }
- }
 
   draw(range) {
     this.scene.clear()
@@ -157,7 +90,7 @@ export default class DMI extends indicator {
     let style = this.style.highLowRangeStyle
     this.plot(plots, "renderFillRect", style)
 
-    // High RSI Range marker
+    // High BB Range marker
     plots.length = 0
     plots[0] = {x: 0, y: y1}
     plots[1] = {x: x2, y: y1}
@@ -168,7 +101,7 @@ export default class DMI extends indicator {
     }
     this.plot(plots, "renderLine", style)
 
-    // Low RSI Range marker
+    // Low BB Range marker
     plots.length = 0
     plots[0] = {x: 0, y: y2}
     plots[1] = {x: x2, y: y2}
@@ -199,7 +132,7 @@ export default class DMI extends indicator {
       }
       else {
         plot.x = this.xAxis.xPos(data[c][0])
-        plot.y = this.yAxis.yPos(100 - data[c][1])
+        plot.y = this.yAxis.yPos(data[c][1])
         plots.push({...plot})
       }
       c++

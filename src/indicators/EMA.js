@@ -1,3 +1,4 @@
+// EMA.js
 /**
  * EMA
  */
@@ -11,16 +12,10 @@ import { uid } from "../utils/utilities"
 const calcParams = [20]
  
  export default class EMA extends indicator {
-  #ID
-  #name ='Exponential Moving Average'
-  #shortName = 'EMA'
-  #params
-  #onChart = true
   #series = 'price'
   #precision = 2
   #calcParams = [6, 12, 20]
-  #checkParamCount = false
-  #scaleOverlay = false
+
   #plots = [
     { key: 'ema6', title: 'EMA6: ', type: 'line' },
     { key: 'ema12', title: 'EMA12: ', type: 'line' },
@@ -59,29 +54,17 @@ const calcParams = [20]
     EMA.inCnt++
     const overlay = params.overlay
 
-    this.#ID = params.overlay?.id || uid(this.#shortName)
-    this.#params = params
+    this.name = 'Exponential Moving Average'
+    this.shortName = 'EMA'
+    this.ID = params.overlay?.id || uid(this.shortName)
+    this.onChart = true
+    this.checkParamCount = false
+    this.scaleOverlay = false
     this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams
     this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
     this.addLegend()
-  }
-
-  get ID() { return this.#ID }
-  get name() { return this.#name }
-  get shortName() { return this.#shortName }
-  get onChart() { return this.#onChart }
-  get plots() { return this.#plots }
-
-  addLegend() {
-    let legend = {
-      id: this.#shortName,
-      title: this.#shortName,
-      type: this.#shortName,
-      source: this.legendInputs.bind(this)
-    }
-    this.chart.legend.add(legend)
   }
 
   updateLegend() {
@@ -102,12 +85,6 @@ const calcParams = [20]
     return {inputs, colours}
   }
 
-  // regeneratePlots (params) {
-  //   return params.map(p => {
-  //     return { key: `ema${p}`, title: `EMA${p}: `, type: 'line' }
-  //   })
-  // }
-
   regeneratePlots (params) {
     return params.map((_, index) => {
       const num = index + 1
@@ -116,55 +93,9 @@ const calcParams = [20]
   }
 
   /**
- * process stream and create new indicator data entry
- * @param {array} value - current stream candle 
- * @memberof RSI
- */
-    newValue (value) {
-    let p = this.TALibParams()
-    if (!p) return false
-
-    let v = this.calcIndicatorStream(this.#shortName, this.TALibParams())
-    if (!v) return false
-
-    this.overlay.data.push([v[0], v[1]])
-
-    this.target.setPosition(this.core.scrollPos, 0)
-    this.draw(this.range)
-  }
-
-  /**
-   * process stream and update current (last) indicator data entry
-   * @param {array} value - current stream candle 
-   * @memberof RSI
+   * Draw the current indicator range on its canvas layer and render it.
+   * @param {object} range 
    */
-   UpdateValue (value) {
-    let l = this.overlay.data.length - 1
-    let p = this.TALibParams()
-    if (!p) return false
-
-    let v = this.calcIndicatorStream(this.#shortName, p)
-    if (!v) return false
-
-    this.overlay.data[l] = [v[0], v[1]]
-
-    this.target.setPosition(this.core.scrollPos, 0)
-    this.draw(this.range)
-
-    // console.log(`RSI stream input update: ${value}`)
-
-  }
-
-  TALibParams() {
-    let end = this.range.dataLength
-    let step = this.calcParams[0]
-    let start = end - step
-    let input = this.indicatorInput(start, end)
-    let hasNull = input.find(element => element === null)
-    if (hasNull) return false
-    else return { inReal: input, timePeriod: step }
-  }
-
   draw(range=this.range) {
 
     this.scene.clear()
@@ -200,6 +131,5 @@ const calcParams = [20]
 
     this.target.viewport.render();
   }
-
 }
 
