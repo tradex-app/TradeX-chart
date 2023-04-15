@@ -2353,7 +2353,7 @@ class DMI$1 extends indicator {
     this.#ID = params.overlay?.id || uid(this.#shortName);
     this.#params = params;
     this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams;
-    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style};
+        this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.UpdateValue(value); };
   }
@@ -2419,8 +2419,8 @@ class DMI$1 extends indicator {
     const data = this.overlay.data;
     const width = this.xAxis.candleW;
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2);
-    const y1 = this.yAxis.yPos(100 - this.style.defaultHigh);
-    const y2 = this.yAxis.yPos(100 - this.style.defaultLow);
+    const y1 = this.yAxis.yPos(this.style.defaultHigh);
+    const y2 = this.yAxis.yPos(this.style.defaultLow);
     const plots = [0, y1, this.scene.width, y2 - y1];
     let style = this.style.highLowRangeStyle;
     this.plot(plots, "renderFillRect", style);
@@ -2500,7 +2500,7 @@ class DMI extends indicator {
     this.#ID = params.overlay?.id || uid(this.#shortName);
     this.#params = params;
     this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams;
-    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style};
+        this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.UpdateValue(value); };
   }
@@ -2566,8 +2566,8 @@ class DMI extends indicator {
     const data = this.overlay.data;
     const width = this.xAxis.candleW;
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2);
-    const y1 = this.yAxis.yPos(100 - this.style.defaultHigh);
-    const y2 = this.yAxis.yPos(100 - this.style.defaultLow);
+    const y1 = this.yAxis.yPos(this.style.defaultHigh);
+    const y2 = this.yAxis.yPos(this.style.defaultLow);
     const plots = [0, y1, this.scene.width, y2 - y1];
     let style = this.style.highLowRangeStyle;
     this.plot(plots, "renderFillRect", style);
@@ -2652,7 +2652,7 @@ const calcParams$3 = [20];
     this.#ID = params.overlay?.id || uid(this.#shortName);
     this.#params = params;
     this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams$3;
-    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style};
+        this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.UpdateValue(value); };
     this.addLegend();
@@ -2778,7 +2778,7 @@ class RSI extends indicator {
     this.#ID = params.overlay?.id || uid(this.#shortName);
     this.#params = params;
     this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams$2;
-    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style};
+        this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.UpdateValue(value); };
   }
@@ -2844,8 +2844,8 @@ class RSI extends indicator {
     const data = this.overlay.data;
     const width = this.xAxis.candleW;
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2);
-    const y1 = this.yAxis.yPos(100 - this.style.defaultHigh);
-    const y2 = this.yAxis.yPos(100 - this.style.defaultLow);
+    const y1 = this.yAxis.yPos(this.style.defaultHigh);
+    const y2 = this.yAxis.yPos(this.style.defaultLow);
     const plots = [0, y1, this.scene.width, y2 - y1];
     let style = this.style.highLowRangeStyle;
     this.plot(plots, "renderFillRect", style);
@@ -2928,7 +2928,7 @@ const calcParams$1 = [20];
     this.#ID = params.overlay?.id || uid(this.#shortName);
     this.#params = params;
     this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams$1;
-    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style};
+        this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.UpdateValue(value); };
     this.addLegend();

@@ -503,6 +503,13 @@ export default class MainPane {
   registerOffCharts(options) {
     // are there any OffCharts to add?
     if (this.#core.offChart.length === 0) return
+    // remove any offChart indicators that are not supported
+    for (const [i, o] of this.#core.offChart.entries()) {
+      if (o.type in this.core.indicators) continue
+      
+      this.#core.log(`offChart indicator ${this.#core.offChart.type} not added: not supported.`)
+      this.#core.offChart.splice(i, 1)
+    }
 
     let a = this.#offChartDefaultH * this.#core.offChart.length,
     offChartsH = ( a / Math.log10( a * 2 ) ) / 100,

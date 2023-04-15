@@ -4,6 +4,7 @@
 import Overlay from "./overlay"
 import { renderFillRect } from "../../renderer/rect"
 import { renderLine } from "../../renderer/line"
+import { limit } from "../../utils/number"
 import {
   STREAM_NEWVALUE,
   STREAM_UPDATE
@@ -29,7 +30,6 @@ export default class indicator extends Overlay {
   #name
   #shortName
   #onChart
-  #checkParamCount
   #scaleOverlay
   #plots
   #params
@@ -42,7 +42,6 @@ export default class indicator extends Overlay {
   #newValueCB
   #updateValueCB
   #precision = 2
-  #calcParams
   #style = {}
 
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
@@ -51,7 +50,7 @@ export default class indicator extends Overlay {
 
     this.#params = params
     this.#overlay = params.overlay
-    this.#type = config.type
+    this.#type = config.type  // remove?
     this.#indicator = config.indicator
     this.#TALib = this.core.TALib
     this.#range = this.xAxis.range
@@ -67,8 +66,6 @@ export default class indicator extends Overlay {
   set shortName(n) { this.#shortName = n }
   get onChart() { return this.#onChart }
   set onChart(c) { this.#onChart = c }
-  get checkParamCount() { return this.#checkParamCount }
-  set checkParamCount(c) { this.#checkParamCount = c }
   get scaleOverlay() { return this.#scaleOverlay }
   set scaleOverlay(o) { this.#scaleOverlay = o }
   get plots() { return this.#plots }
@@ -85,8 +82,6 @@ export default class indicator extends Overlay {
   set setUpdateValue(cb) { this.#updateValueCB = cb }
   set precision(p) { this.#precision = p }
   get precision() { return this.#precision }
-  set calcParams(p) { this.#calcParams = p }
-  get calcParams() { return this.#calcParams }
   set style(s) { this.#style = s }
   get style() { return this.#style }
   set position(p) { this.target.setPosition(p[0], p[1]) }
@@ -141,6 +136,14 @@ export default class indicator extends Overlay {
     this.value = candle
   }
 
+  defineInputs(i) {
+    if (i) {
+      const input = {...this.definition.input, ...i}
+            input.delete("style")
+      this.definition.input = input
+    }
+  }
+
   addLegend() {
     let legend = {
       id: this.shortName,
@@ -149,6 +152,16 @@ export default class indicator extends Overlay {
       source: this.legendInputs.bind(this)
     }
     this.chart.legend.add(legend)
+  }
+
+  legendInputs(pos=this.chart.cursorPos) {
+    const colours = [this.style.strokeStyle]
+    const index = this.Timeline.xPos2Index(pos[0])
+    let c = index  - (this.range.data.length - this.overlay.data.length)
+    let l = limit(this.overlay.data.length - 1, 0, Infinity)
+        c = limit(c, 0, l)
+
+    return {c, colours}
   }
 
   indicatorInput(start, end) {
@@ -162,7 +175,7 @@ export default class indicator extends Overlay {
 
   TALibParams() {
     let end = this.range.dataLength
-    let step = this.calcParams[0]
+    let step = this.definition.input.timePeriod
     let start = end - step
     let input = this.indicatorInput(start, end)
     let hasNull = input.find(element => element === null)
@@ -180,7 +193,7 @@ export default class indicator extends Overlay {
     if (!this.core.TALibReady) return false
 
     this.overlay.data = []
-    let step = this.calcParams[0]
+    let step = this.definition.timePeriod
     // fail if there is not enough data to calculate
     if (this.range.Length < step) return false
 
@@ -226,7 +239,7 @@ export default class indicator extends Overlay {
     let p = this.TALibParams()
     if (!p) return false
 
-    let v = this.calcIndicatorStream(this.shortName, this.TALibParams())
+    let v = this.calcIndicatorStream(this.libName, p)
     if (!v) return false
 
     this.overlay.data.push(v)
@@ -245,7 +258,7 @@ export default class indicator extends Overlay {
     let p = this.TALibParams()
     if (!p) return false
 
-    let v = this.calcIndicatorStream(this.shortName, p)
+    let v = this.calcIndicatorStream(this.libName, p)
     if (!v) return false
 
     this.overlay.data[l] = [v[0], v[1]]

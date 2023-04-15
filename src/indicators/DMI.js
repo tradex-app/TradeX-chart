@@ -1,15 +1,24 @@
 // DMI.js
 
 import indicator from "../components/overlays/indicator"
-import { 
-  YAXIS_TYPES
-} from "../definitions/chart";
+import { ADX as adx } from "./talib-api";
+import { YAXIS_TYPES } from "../definitions/chart";
 import { uid } from "../utils/utilities"
 
-export default class DMI extends indicator {
-  #precision = 2
-  #calcParams = [20]
 
+export default class DMI extends indicator {
+
+  name = 'Directional Movement Index'
+  shortName = 'DMI'
+  libName = null
+  definition = {
+    input: {
+
+    },
+    output: {
+
+    },
+  }
   #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1',
@@ -21,7 +30,12 @@ export default class DMI extends indicator {
     lowStrokeStyle: "#848",
     highLowRangeStyle: "#22002220"
   }
-  #style = {}
+  precision = 2
+  onChart = false
+  scaleOverlay = true
+  plots = [
+    { key: 'DMI_1', title: ' ', type: 'line' },
+  ]
 
   // YAXIS_TYPES - percent
   static scale = YAXIS_TYPES[1]
@@ -42,28 +56,18 @@ export default class DMI extends indicator {
 
     const overlay = params.overlay
 
-    this.name = 'Directional Movement Index'
-    this.shortName = 'DMI'
     this.ID = params.overlay?.id || uid(this.shortName)
-    this.onChart = false
-    this.checkParamCount = false
-    this.scaleOverlay = true
-    this.plots = [
-      { key: 'DMI_1', title: ' ', type: 'line' },
-    ]
-    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams
-    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
+    this.defineInputs(overlay?.settings)
+    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
   }
 
-  legendInputs(pos=this.chart.cursorPos, candle) {
-    const inputs = {}
-    const index = this.Timeline.xPos2Index(pos[0])
-    let c = index  - (this.range.data.length - this.overlay.data.length)
-    let colours = [this.style.strokeStyle]
+  legendInputs(pos=this.chart.cursorPos) {
+    if (this.overlay.data.length == 0) return false
 
-    c = limit(c, 0, this.overlay.data.length - 1)
+    const inputs = {}
+    const {c, colours} = super.legendInputs(pos)
     inputs.DMI_1 = this.Scale.nicePrice(this.overlay.data[c][1])
 
     return {inputs, colours}
@@ -87,8 +91,8 @@ export default class DMI extends indicator {
     const data = this.overlay.data
     const width = this.xAxis.candleW
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2)
-    const y1 = this.yAxis.yPos(100 - this.style.defaultHigh)
-    const y2 = this.yAxis.yPos(100 - this.style.defaultLow)
+    const y1 = this.yAxis.yPos(this.style.defaultHigh)
+    const y2 = this.yAxis.yPos(this.style.defaultLow)
 
     // Fill the range between high and low
     const plots = [0, y1, this.scene.width, y2 - y1]

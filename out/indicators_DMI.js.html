@@ -79,8 +79,8 @@ export default class DMI extends indicator {
 
     this.#ID = params.overlay?.id || uid(this.#shortName)
     this.#params = params
-    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams
-    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
+    this.calcParams = (overlay?.settings) ? overlay.settings : calcParams
+        this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
   }
@@ -176,8 +176,8 @@ export default class DMI extends indicator {
     const data = this.overlay.data
     const width = this.xAxis.candleW
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2)
-    const y1 = this.yAxis.yPos(100 - this.style.defaultHigh)
-    const y2 = this.yAxis.yPos(100 - this.style.defaultLow)
+    const y1 = this.yAxis.yPos(this.style.defaultHigh)
+    const y2 = this.yAxis.yPos(this.style.defaultLow)
 
     // Fill the range between high and low
     const plots = [0, y1, this.scene.width, y2 - y1]

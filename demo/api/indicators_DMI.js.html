@@ -110,8 +110,8 @@ export default class DMI extends indicator {
     const data = this.overlay.data
     const width = this.xAxis.candleW
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2)
-    const y1 = this.yAxis.yPos(100 - this.style.defaultHigh)
-    const y2 = this.yAxis.yPos(100 - this.style.defaultLow)
+    const y1 = this.yAxis.yPos(this.style.defaultHigh)
+    const y2 = this.yAxis.yPos(this.style.defaultLow)
 
   }
 }</code></pre>

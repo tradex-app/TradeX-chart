@@ -179,7 +179,7 @@ export default class OnChart extends Chart {
   addOverlays(overlays) {
     for (let o of overlays) {
       const config = {fixed: false, required: false}
-      if (o.type in this.core.TALib) {
+      if (o.type in this.core.indicators) {
         config.class = this.core.indicators[o.type].ind
         config.params = {overlay: o}
         this.#chartOverlays.set(o.name, config)

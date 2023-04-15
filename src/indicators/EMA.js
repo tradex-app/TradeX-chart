@@ -2,30 +2,38 @@
 /**
  * EMA
  */
- import indicator from "../components/overlays/indicator"
- import { 
-   YAXIS_TYPES
- } from "../definitions/chart";
+import indicator from "../components/overlays/indicator"
+import { EMA as ema } from "./talib-api";
+import { YAXIS_TYPES } from "../definitions/chart";
 import { bRound, limit, round } from "../utils/number";
 import { uid } from "../utils/utilities"
 
-const calcParams = [20]
  
  export default class EMA extends indicator {
-  #series = 'price'
-  #precision = 2
-  #calcParams = [6, 12, 20]
 
-  #plots = [
-    { key: 'ema6', title: 'EMA6: ', type: 'line' },
-    { key: 'ema12', title: 'EMA12: ', type: 'line' },
-    { key: 'ema20', title: 'EMA20: ', type: 'line' }
-  ]
+  name = 'Exponential Moving Average'
+  shortName = 'EMA'
+  libName = 'EMA'
+  definition = {
+    input: {
+      inReal: [], 
+      timePeriod: 20 // 30
+    },
+    output: {
+      output: [],
+    },
+  }
   #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1'
   }
-  #style = {}
+  precision = 2
+  onChart = true
+  checkParamCount = false
+  scaleOverlay = false
+  plots = [
+    { key: 'EMA_1', title: 'EMA: ', type: 'line' },
+  ]
 
   // YAXIS_TYPES - default
   static inCnt = 0
@@ -54,14 +62,9 @@ const calcParams = [20]
     EMA.inCnt++
     const overlay = params.overlay
 
-    this.name = 'Exponential Moving Average'
-    this.shortName = 'EMA'
     this.ID = params.overlay?.id || uid(this.shortName)
-    this.onChart = true
-    this.checkParamCount = false
-    this.scaleOverlay = false
-    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams
-    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
+    this.defineInputs(overlay?.settings)
+    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
     this.addLegend()
@@ -71,16 +74,12 @@ const calcParams = [20]
     this.parent.legend.update()
   }
   
-  legendInputs(pos=this.chart.cursorPos, candle) {
+  legendInputs(pos=this.chart.cursorPos) {
+    if (this.overlay.data.length == 0) return false
+
     const inputs = {}
-    const index = this.Timeline.xPos2Index(pos[0])
-    let c = index  - (this.range.data.length - this.overlay.data.length)
-    let colours = [this.style.strokeStyle]
-
-    c = limit(c, 0, this.overlay.data.length - 1)
+    const {c, colours} = super.legendInputs(pos)
     inputs.EMA_1 = this.Scale.nicePrice(this.overlay.data[c][1])
-
-    // if (isArray(this.chart.streamCandle)) value =
 
     return {inputs, colours}
   }

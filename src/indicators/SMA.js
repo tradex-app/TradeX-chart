@@ -2,26 +2,37 @@
  * SMA
  * Simple Moving Average
  */
- import indicator from "../components/overlays/indicator"
- import { 
-   YAXIS_TYPES
- } from "../definitions/chart";
+import indicator from "../components/overlays/indicator"
+import { SMA as sma } from "./talib-api";
+import { YAXIS_TYPES } from "../definitions/chart";
 import { bRound, limit, round } from "../utils/number";
 import { uid } from "../utils/utilities"
 
-const calcParams = [20]
  
  export default class SMA extends indicator {
 
-  #series = 'price'
-  #precision = 2
-  #calcParams = [6, 12, 20]
-
+  name = 'Simple Moving Average'
+  shortName = 'SMA'
+  libName = 'SMA'
+  definition = {
+    input: {
+      inReal: [], 
+      timePeriod: 20 // 30
+    },
+    output: {
+      output: [],
+    },
+  }
   #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1'
   }
-  #style = {}
+  #precision = 2
+  onChart = true
+  scaleOverlay = false
+  plots = [
+    { key: 'SMA_1', title: 'SMA: ', type: 'line' },
+  ]
 
   // YAXIS_TYPES - default
   static inCnt = 0
@@ -50,55 +61,27 @@ const calcParams = [20]
     SMA.inCnt++
     const overlay = params.overlay
 
-    this.name = 'Simple Moving Average'
-    this.shortName = 'SMA'
     this.ID = params.overlay?.id || uid(this.shortName)
-    this.onChart = true
-    this.checkParamCount = false
-    this.scaleOverlay = false
-    this.plots = [
-      { key: 'sma6', title: 'SMA6: ', type: 'line' },
-    ]
-    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams
-    this.style = (overlay?.settings) ? {...this.#defaultStyle, ...overlay.settings} : {...this.#defaultStyle, ...config.style}
+    this.defineInputs(overlay?.settings)
+    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
     this.addLegend()
-  }
-
-  addLegend() {
-    let legend = {
-      id: this.shortName,
-      title: this.shortName,
-      type: this.shortName,
-      source: this.legendInputs.bind(this)
-    }
-    this.chart.legend.add(legend)
   }
 
   updateLegend() {
     this.parent.legend.update()
   }
   
-  legendInputs(pos=this.chart.cursorPos, candle) {
+  legendInputs(pos=this.chart.cursorPos) {
+    if (this.overlay.data.length == 0) return false
+
     const inputs = {}
-    const index = this.Timeline.xPos2Index(pos[0])
-    let c = index  - (this.range.data.length - this.overlay.data.length)
-    let colours = [this.style.strokeStyle]
-
-    c = limit(c, 0, this.overlay.data.length - 1)
+    const {c, colours} = super.legendInputs(pos)
     inputs.SMA_1 = this.Scale.nicePrice(this.overlay.data[c][1])
-
-    // if (isArray(this.chart.streamCandle)) value =
 
     return {inputs, colours}
   }
-
-  // regeneratePlots (params) {
-  //   return params.map(p => {
-  //     return { key: `sma${p}`, title: `SMA${p}: `, type: 'line' }
-  //   })
-  // }
 
   regeneratePlots (params) {
     return params.map((_, index) => {
