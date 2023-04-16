@@ -274,6 +274,7 @@ export default class Timeline {
   }
 
   // -----------------------
+  t2Index(ts) { return this.#xAxis.t2Index(ts) }
 
   xPos(time) { return this.#xAxis.xPos(time) }
 

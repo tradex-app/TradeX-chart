@@ -5,7 +5,7 @@ import Overlay from "./overlay"
 import { renderFillRect } from "../../renderer/rect"
 import { renderLine } from "../../renderer/line"
 import { limit } from "../../utils/number"
-import { isObject } from "../../utils/typeChecks"
+import { isObject, isString } from "../../utils/typeChecks"
 import {
   STREAM_NEWVALUE,
   STREAM_UPDATE
@@ -218,47 +218,80 @@ export default class indicator extends Overlay {
  * Calculate indicator values for entire chart history
  * @param {string} indicator - the TALib function to call
  * @param {object} params - parameters for the TALib function
+ * @param {object} [range=this.range] - range instance or definition
  * @returns {boolean} - success or failure
  */
-  calcIndicator (indicator, params) {
-    if (!this.core.TALibReady) return false
+  calcIndicator (indicator, params={}, range=this.range) {
+    if (!this.core.TALibReady ||
+        !isString(indicator) ||
+        !(indicator in this.TALib) ||
+        !isObject(range)
+        ) return false
 
-    this.overlay.data = []
-    let step = this.definition.timePeriod
-    // fail if there is not enough data to calculate
-    if (this.range.Length < step) return false
+    let input, start, end, entry;
 
-    let data, end, entry, time;
-    let start = 0
-    let input = this.indicatorInput(start, this.range.Length - 1)
-    let hasNull = input.find(element => element === null)
-    if (hasNull) return false
-    
-    do {
-      end = start + step
-      data = input.slice(start, end)
-      entry = this.TALib[indicator](params)
-      time = this.range.value(end - 1)[0]
-      this.overlay.data.push([time, entry])
-      start++
-    } 
-    while (end < this.range.Length)
-    return true
+    // is it the Range instance?
+    if (range.constructor.name == "Range") {
+      input = this.indicatorInput(0, this.range.Length - 1)
+    }
+    else if ( "indexStart" in range || "indexEnd" in range ||
+              "tsStart" in range ||  "tsEnd" in range ) {
+      start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0
+      end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1
+
+      if ( end - start < this.definition.input.timePeriod )
+        return false
+
+      input = this.indicatorInput(start, end)
+
+      let hasNull = input.find(element => element === null)
+      if (hasNull) return false
+    }
+    else return false
+
+    params.inReal = input
+
+    entry = this.TALib[indicator](params)
+
+    // assign entry to a timestamp
+    let data = []
+    let v
+    let i
+
+    for (let l = 0; l < end - start; l++) {
+      v = []
+      i = 0
+      for (let o of this.definition.output) {
+        v[i++] = entry[o.name][l]
+      }
+      data.push([this.range.value(start + l), v])
+    }
+
+// Merge the data
+// this.core.mergeData(merge, newRange=false)
+//   this.overlay.data.push([time, entry])
+
+    return data
   }
 
   /**
    * Calculate indicator value for current stream candle
    * @param {string} indicator - the TALib function to call
    * @param {object} params - parameters for the TALib function
+   * @param {object} range - Range instance
    * @returns {array} - indicator data entry
    */
-  calcIndicatorStream (indicator, params) {
+  calcIndicatorStream (indicator, params, range=this.range) {
     if (!this.core.TALibReady ||
-        this.#range.dataLength < this.definition.input.timePeriod ) return false
+        !isString(indicator) ||
+        !(indicator in this.TALib) ||
+        range.constructor.name !== "Range" ||
+        range.dataLength < this.definition.input.timePeriod 
+        ) return false
 
     let entry = this.TALib[indicator](params)
-    let end = this.range.dataLength
-    let time = this.range.value(end)[0]
+    let end = range.dataLength
+    let time = range.value(end)[0]
     let v = []
     let i = 0
 

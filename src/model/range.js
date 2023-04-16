@@ -36,6 +36,14 @@ export class Range {
   #worker
   #init = true
 
+  /**
+   * Creates an instance of Range.
+   * @param {object} allData - State data object representing on and off chart data
+   * @param {number} [start=0] - initial index start
+   * @param {number} [end=allData.data.length-1] - initial index end
+   * @param {object} [config={}] - range config
+   * @memberof Range
+   */
   constructor( allData, start=0, end=allData.data.length-1, config={}) {
     if (!isObject(allData)) return false
     if (!isObject(config)) return false
@@ -112,6 +120,14 @@ export class Range {
     WebWorker.destroy(this.#worker.ID)
   }
 
+  /**
+   * set Range index start and end
+   * @param {number} [start=0]
+   * @param {number} [end=this.dataLength]
+   * @param {number} [max=this.maxCandles]
+   * @return {boolean} - success or failure
+   * @memberof Range
+   */
   set (start=0, end=this.dataLength, max=this.maxCandles) {
     if (!isNumber(start) || 
         !isNumber(end) ||
@@ -175,7 +191,7 @@ export class Range {
     // return true
   }
 
-  setMaxMin(maxMin) {
+  setMaxMin ( maxMin ) {
     for (let m in maxMin) {
       this.old[m] = this[m]
       this[m] = maxMin[m]
@@ -184,7 +200,7 @@ export class Range {
   }
 
   /**
-   * 
+   * return value at index
    * @param {number} index - price history index, out of bounds will return null filled entry
    * @returns {array}
    */
@@ -243,13 +259,19 @@ export class Range {
 
   /**
    * Is timestamp in current range only, excluding future and past legal bounds
-   * @param {number} t 
+   * @param {number} t - timestamp
    * @returns {boolean}
    */
   inPriceHistory (t) {
     return (t >= this.timeStart && t <= this.timeFinish) ? true : false
   }
 
+  /**
+   * is timestamp in visible render range?
+   * @param {number} t - timestamp
+   * @return {boolean}  
+   * @memberof Range
+   */
   inRenderRange (t) {
     let i = this.getTimeIndex(t)
     let o = this.#core.rangeScrollOffset
@@ -325,7 +347,7 @@ export class Range {
         volumeMaxIdx = i
       }
     }
-// console.timeEnd()
+
     let diff = valueMax - valueMin
     valueMin -= diff * 0.1 //that.yAxisBounds
     valueMin = (valueMin > 0) ? valueMin : 0

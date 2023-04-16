@@ -436,11 +436,11 @@ const config5 = {
 }
 
 const configs = [
-  // {config: config1, stream: null},
-  // {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  // {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
+  {config: config1, stream: null},
+  {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
   {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  // {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
+  {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
   // {config: config5, stream: (chart) => {once(chart)}},
 
 ]
@@ -630,16 +630,16 @@ function once (chart) {
 // Add some charts
 
 addChart()
-// addChart()
-// addChart()
-// addChart()
-// addChart()
+addChart()
+addChart()
+addChart()
+addChart()
 
-// function h($,p,c) {console.log(`alert`,$,p[4],c[4])} 
+function h($,p,c) {console.log(`alert`,$,p[4],c[4])} 
 
-// function alertTest ($, p, c) {
-//   if ($ > p[4] && $ < c[4]) return true
-//   else return false
-// }
+function alertTest ($, p, c) {
+  if ($ > p[4] && $ < c[4]) return true
+  else return false
+}
 
-// window.chart1.stream.alerts.add(13010, alertTest, h)
+window.chart1.stream.alerts.add(13010, alertTest, h)
