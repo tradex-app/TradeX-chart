@@ -4,7 +4,7 @@
  * RSI = SUM(MAX(CLOSE - REF(CLOSE,1),0),N) / SUM(ABS(CLOSE - REF(CLOSE,1)),N) × 100
  */
 import indicator from "../components/overlays/indicator"
-import {RSI as rsi } from "./talib-api";
+import {RSI as talibAPI } from "./talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { limit, round } from "../utils/number";
 import { isArray } from "../utils/typeChecks";
@@ -27,9 +27,7 @@ export default class RSI extends indicator {
       inReal: [], 
       timePeriod: 20 // 5
     },
-    output: {
-      output: [],
-    },
+    output: {},
   }
   #defaultStyle = {
     strokeStyle: "#C80",
@@ -68,7 +66,7 @@ export default class RSI extends indicator {
     const overlay = params.overlay
 
     this.ID = params.overlay?.id || uid(this.shortName)
-    this.defineInputs(overlay?.settings)
+    this.defineIndicator(overlay?.settings, talibAPI)
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }

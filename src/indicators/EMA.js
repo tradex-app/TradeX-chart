@@ -3,7 +3,7 @@
  * EMA
  */
 import indicator from "../components/overlays/indicator"
-import { EMA as ema } from "./talib-api";
+import { EMA as talibAPI } from "./talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { bRound, limit, round } from "../utils/number";
 import { uid } from "../utils/utilities"
@@ -63,7 +63,7 @@ import { uid } from "../utils/utilities"
     const overlay = params.overlay
 
     this.ID = params.overlay?.id || uid(this.shortName)
-    this.defineInputs(overlay?.settings)
+    this.defineIndicator(overlay?.settings, talibAPI)
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }

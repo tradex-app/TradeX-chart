@@ -3,7 +3,7 @@
 // 
 
 import indicator from "../components/overlays/indicator"
-import { BBANDS as bb } from "./talib-api";
+import { BBANDS as talibAPI } from "./talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { uid } from "../utils/utilities"
 
@@ -62,7 +62,7 @@ export default class BB extends indicator {
     const overlay = params.overlay
     
     this.ID = params.overlay?.id || uid(this.shortName)
-    this.defineInputs(overlay?.settings)
+    this.defineIndicator(overlay?.settings, talibAPI)
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
@@ -143,16 +143,16 @@ export default class BB extends indicator {
         plots.upper.push({x: null, y: null})
       }
       else {
-        plot.x = this.xAxis.xPos(data[c][0].lowerBand)
-        plot.y = this.yAxis.yPos(data[c][1].lowerBand)
+        plot.x = this.xAxis.xPos(data[c][0])
+        plot.y = this.yAxis.yPos(data[c][1][0])
         plots.lower.push({...plot})
 
-        plot.x = this.xAxis.xPos(data[c][0].middleBand)
-        plot.y = this.yAxis.yPos(data[c][1].middleBand)
+        plot.x = this.xAxis.xPos(data[c][0])
+        plot.y = this.yAxis.yPos(data[c][1][1])
         plots.middle.push({...plot})
 
-        plot.x = this.xAxis.xPos(data[c][0].upperBand)
-        plot.y = this.yAxis.yPos(data[c][1].upperBand)
+        plot.x = this.xAxis.xPos(data[c][0])
+        plot.y = this.yAxis.yPos(data[c][1][2])
         plots.upper.push({...plot})
       }
       c++

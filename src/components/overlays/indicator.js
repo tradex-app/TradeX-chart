@@ -5,6 +5,7 @@ import Overlay from "./overlay"
 import { renderFillRect } from "../../renderer/rect"
 import { renderLine } from "../../renderer/line"
 import { limit } from "../../utils/number"
+import { isObject } from "../../utils/typeChecks"
 import {
   STREAM_NEWVALUE,
   STREAM_UPDATE
@@ -136,12 +137,35 @@ export default class indicator extends Overlay {
     this.value = candle
   }
 
-  defineInputs(i) {
-    if (i) {
-      const input = {...this.definition.input, ...i}
-            input.delete("style")
-      this.definition.input = input
+  /**
+   * validate indicator inputs and outputs
+   *
+   * @param {object} i
+   * @param {object} api
+   * @memberof indicator
+   */
+  defineIndicator(i, api) {
+    if (!isObject(i)) i = {}
+
+    this.definition.output = api.outputs
+    const input = {...this.definition.input, ...i}
+          delete input.style
+    // process options
+    for (let i of api.options) {
+      if (i.name in input) {
+        if (typeof input[i.name] !== i.type) {
+          input[i.name] = i.defaultValue
+          continue
+        }
+        else if ("range" in i) {
+          input[i.name] = limit(input[i.name], i.range.min, i.range.max)
+        }
+      }
+      // input.timePeriod required to eliminate garbage values on stream start
+      else if (i.name == "timePeriod") 
+        input.timePeriod = i.defaultValue
     }
+    this.definition.input = input
   }
 
   addLegend() {
@@ -154,6 +178,13 @@ export default class indicator extends Overlay {
     this.chart.legend.add(legend)
   }
 
+  /**
+   * return index from cursor position and colours
+   *
+   * @param {array} [pos=this.chart.cursorPos]
+   * @return {object}  
+   * @memberof indicator
+   */
   legendInputs(pos=this.chart.cursorPos) {
     const colours = [this.style.strokeStyle]
     const index = this.Timeline.xPos2Index(pos[0])
@@ -222,12 +253,20 @@ export default class indicator extends Overlay {
    * @returns {array} - indicator data entry
    */
   calcIndicatorStream (indicator, params) {
-    if (!this.core.TALibReady) return false
+    if (!this.core.TALibReady ||
+        this.#range.dataLength < this.definition.input.timePeriod ) return false
 
     let entry = this.TALib[indicator](params)
     let end = this.range.dataLength
     let time = this.range.value(end)[0]
-    return [time, entry.output[0]]
+    let v = []
+    let i = 0
+
+    for (let o of this.definition.output) {
+      v[i++] = entry[o.name][0]
+    }
+
+    return [time, v]
   }
 
   /**

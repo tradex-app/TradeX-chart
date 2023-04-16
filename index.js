@@ -294,7 +294,7 @@ const config4 = {
   rangeLimit: 30,
   theme: {
     candle: {
-      Type: "line",
+      Type: "candle_down_hollow",
       AreaLineColour: "#08C5F5",
 
       UpBodyColour: "#08C5F588",
