@@ -7,6 +7,8 @@ import state2 from './data/data_btc_1m.js'
 // import state4 from './data/seconds.js'
 // import state from './data/seconds-indicator'
 
+const wasm = "node_modules/talib-web/lib/talib.wasm"
+
 let state4 = {
   "ohlcv": [
       [
@@ -148,6 +150,7 @@ const config1 = {
   stream: streamVal,
   maxCandleUpdate: 250,
   talib: talib,
+  wasm: wasm,
   state: state1
 }
 const config2 = {
@@ -195,6 +198,7 @@ const config2 = {
   stream: streamVal,
   maxCandleUpdate: 250,
   talib: talib,
+  wasm: wasm,
   state: state2
 }
 const config3 = {
@@ -277,6 +281,7 @@ const config3 = {
   stream: streamVal,
   maxCandleUpdate: 250,
   talib: talib,
+  wasm: wasm,
   state: {
 
   }
@@ -335,6 +340,7 @@ const config4 = {
   },
   maxCandleUpdate: 250,
   talib: talib,
+  wasm: wasm,
   state: state4
 }
 const config5 = {
@@ -432,15 +438,16 @@ const config5 = {
   errors: true,
   stream: streamVal,
   maxCandleUpdate: 250,
-  talib: talib
+  talib: talib,
+  wasm: wasm,
 }
 
 const configs = [
-  {config: config1, stream: null},
+  // {config: config1, stream: null},
   {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
-  {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
+  // {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
+  // {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  // {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
   // {config: config5, stream: (chart) => {once(chart)}},
 
 ]
@@ -630,10 +637,10 @@ function once (chart) {
 // Add some charts
 
 addChart()
-addChart()
-addChart()
-addChart()
-addChart()
+// addChart()
+// addChart()
+// addChart()
+// addChart()
 
 function h($,p,c) {console.log(`alert`,$,p[4],c[4])} 
 

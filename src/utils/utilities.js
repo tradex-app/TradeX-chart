@@ -326,3 +326,15 @@ export const extender = (baseClass, ...mixins) => {
   return base;
 }
 
+/**
+ * return promise state: fulfilled, rejected, pendings
+ * @export
+ * @param {*} p
+ * @return {*}  
+ */
+export function promiseState(p) {
+  const t = {};
+  return Promise.race([p, t])
+    .then(v => (v === t)? "pending" : "fulfilled", () => "rejected");
+}
+

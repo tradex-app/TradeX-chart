@@ -6,6 +6,7 @@ import indicator from "../components/overlays/indicator"
 import { BBANDS as talibAPI } from "./talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { uid } from "../utils/utilities"
+import { isPromise } from "../utils/typeChecks";
 
 
 export default class BB extends indicator {
@@ -61,9 +62,30 @@ export default class BB extends indicator {
 
     const overlay = params.overlay
     
+    // initialize indicator values
     this.ID = params.overlay?.id || uid(this.shortName)
     this.defineIndicator(overlay?.settings, talibAPI)
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
+
+    // calculate back history if missing
+    if (this.overlay.data.length < this.definition.input.timePeriod) {
+      let data 
+      
+      if (this.core.TALibReady) {
+        data = this.calcIndicator(this.libName, this.definition.input, this.range);
+        if (data) this.overlay.data = data
+      }
+      else if (isPromise(this.core.TALibPromise))
+        this.core.TALibPromise.then(
+          () => { 
+            data = this.calcIndicator(this.libName, this.definition.input, this.range);
+            if (data) this.overlay.data = data
+          },
+          (e) => { this.core.error(e) }
+        )
+    }
+
+    // enable processing of price stream
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
   }
@@ -81,7 +103,11 @@ export default class BB extends indicator {
   regeneratePlots (params) {
     return params.map((_, index) => {
       const num = index + 1
-      return { key: `dmi${num}`, title: `DMI${num}: `, type: 'line' }
+      return {
+        key: `${this.shortName}${num}`, 
+        title: `${this.shortName}${num}: `, 
+        type: 'line'
+      }
     })
   }
 

@@ -1,60 +1,76 @@
 /**
- * @param {*} value
+ * @param {*} v
  * @return {boolean}
  */
- export function isArray (value) {
-  return Array.isArray(value)
+ export function isArray (v) {
+  return Array.isArray(v)
 }
 
 /**
- * @param {*} value
+ * @param {*} v
  * @return {boolean}
  */
-export function isFunction (value) {
-  return value && typeof value === 'function'
+export function isFunction (v) {
+  return v && typeof v === 'function'
 }
 
 /**
- * @param {*} value
+ * @param {*} v
  * @return {boolean}
  */
-export function isObject (value) {
+export function isObject (v) {
   return (
-  typeof value === 'object' &&
-  !Array.isArray(value) &&
-  value !== null)
+  typeof v === 'object' &&
+  !Array.isArray(v) &&
+  v !== null)
 }
 
 /**
- * @param {*} value
+ * @param {*} v
  * @returns {boolean}
  */
-export function isNumber (value) {
-  return typeof value === 'number' && !isNaN(value)
+export function isNumber (v) {
+  return typeof v === 'number' && !isNaN(v)
 }
 
 /**
- * @param {*} value
+ * @param {*} v
  * @returns {boolean}
  */
-export function isValid (value) {
-  return value !== null && value !== undefined
+export function isValid (v) {
+  return v !== null && v !== undefined
 }
 
 /**
- * @param {*} value
+ * @param {*} v
  * @returns {boolean}
  */
-export function isBoolean (value) {
-  return typeof value === 'boolean'
+export function isBoolean (v) {
+  return typeof v === 'boolean'
 }
 
 /**
- * @param {*} value
+ * @param {*} v
  * @return {boolean}
  */
-export function isString (value) {
-  return typeof value === 'string'
+export function isString (v) {
+  return typeof v === 'string'
+}
+
+/**
+ * @export
+ * @param {*} v
+ */
+export function isPromise (v) {
+  return !!v && (isObject(v) || isFunction(v)) && isFunction(v.then);
+}
+
+/**
+ * @export
+ * @param {*} v
+ */
+export function isError (v) {
+  return v instanceof Error ;
 }
 
 /**
@@ -71,6 +87,8 @@ export function checkType(type, value) {
     case 'valid': isValid(value); break;
     case 'boolean': isBoolean(value); break;
     case 'string': isString(value); break;
+    case 'promise': isPromise(value); break;
+    case 'Error': isError(value); break;
     default: throw new Error(`No known test for type: ${type}`)
   }
 };
