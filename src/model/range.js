@@ -1,8 +1,8 @@
 // range.js
 
-import { DAY_MS, interval2MS, ms2Interval, WEEK_MS } from "../utils/time"
+import { ms2Interval } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
-import { isNumber, isObject } from "../utils/typeChecks"
+import { isNumber, isObject, isString } from "../utils/typeChecks"
 import { bRound, limit } from "../utils/number"
 // import WebWorker from "./webWorkers"
 // import WebWorker from "./webWorkers4"
@@ -204,29 +204,100 @@ export class Range {
    * @param {number} index - price history index, out of bounds will return null filled entry
    * @returns {array}
    */
-  value ( index ) {
+  value ( index, id="chart" ) {
+
+    let data
+    
+    if (id == "chart") data = this.data
+    else {
+      data = this.getDataById(id)
+      if (!data) return null
+    }
     // return last value as default
-    if (!isNumber(index)) index = this.data.length - 1
+    if (!isNumber(index)) index = data.length - 1
   
-    let v = this.data[index]
+    let v = data[index]
     if (v !== undefined) return v
     else {
-      const len = this.data.length - 1
+      const len = data.length - 1
       v = [null, null, null, null, null, null]
 
-      if (this.data.length < 1) {
+      if (data.length < 1) {
         v[0] = Date.now() + (this.interval * index)
         return v
       }
       else if (index < 0) {
-        v[0] = this.data[0][0] + (this.interval * index)
+        v[0] = data[0][0] + (this.interval * index)
         return v
       }
       else if (index > len) {
-        v[0] = this.data[len][0] + (this.interval * (index - len))
+        v[0] = data[len][0] + (this.interval * (index - len))
         return v
       }
       else return null
+    }
+  }
+
+  /**
+   * INCOMPLETE!!!
+   * return value by timestamp
+   * @param {number} ts
+   * @param {string} id
+   * @return {*}  
+   * @memberof Range
+   */
+  valueByTS ( ts, id ) {
+    if (!isNumber(ts) || !isString(id)) return false
+
+    const idx = this.getTimeIndex(ts)
+
+    switch (id) {
+      case "chart": 
+
+        break;
+      case "onchart": break;
+      case "offchart": break;
+      case "dataset": break;
+      case "all": break;
+      default: 
+        if (id.length = 0) return this.value(idx)
+        else {
+          const idParts = id.split('_')
+        }
+        break;
+    }
+  }
+
+  /**
+   * return data for id
+   * @param {string} id
+   * @return {array}  
+   * @memberof Range
+   */
+  getDataById(id) {
+    if (!isString(id)) return false
+
+    const idParts = id.split('_')
+
+    switch (idParts[1]) {
+      case "chart": 
+        return this.data;
+      case "onchart":
+        for (let o of this.onChart) {
+          if (idParts[2] in o) return o[idParts[2]]
+        }
+        return false;
+      case "offchart":
+        for (let o of this.offChart) {
+          if (idParts[2] in o) return o[idParts[2]]
+        }
+        return false;
+      case "datasets":
+        for (let o of this.datasets) {
+          if (idParts[2] in o) return o[idParts[2]]
+        }
+      return false;
+      default: return false
     }
   }
 

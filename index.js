@@ -38,16 +38,11 @@ let state4 = {
   ],
 onchart: [
   {
-    "name": "BB",
-    "type": "BB",
-    "data": []
+    "name": "SMA, 5",
+    "type": "SMA",
+    "data": [],
+    "settings": {period: 5}
   }
-  // {
-  //   "name": "SMA, 5",
-  //   "type": "SMA",
-  //   "data": [],
-  //   "settings": {period: 5}
-  // }
 ],
 "offchart": [
   {
@@ -443,13 +438,12 @@ const config5 = {
 }
 
 const configs = [
-  // {config: config1, stream: null},
+  {config: config1, stream: null},
   {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  // {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
-  // {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  // {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
+  {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
+  {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
   // {config: config5, stream: (chart) => {once(chart)}},
-
 ]
 
 const main = DOM.findBySelector('main')
@@ -467,7 +461,7 @@ function addChart() {
       chart.start(config)
       window["chart"+chart.inCnt] = chart
 
-  if (typeof chart.stream.start === "function") {
+  if (typeof chart?.stream?.start === "function") {
     chart.stream.start()
     if (typeof stream === "function") stream(chart)
   }
@@ -637,10 +631,10 @@ function once (chart) {
 // Add some charts
 
 addChart()
-// addChart()
-// addChart()
-// addChart()
-// addChart()
+addChart()
+addChart()
+addChart()
+addChart()
 
 function h($,p,c) {console.log(`alert`,$,p[4],c[4])} 
 

@@ -1,4 +1,7 @@
 // path.js
+
+import { isArray } from "../utils/typeChecks"
+
 /**
  * Draw a path
  * @param {object} ctx - canvas reference
@@ -14,7 +17,8 @@ export function renderPath (ctx, coords, style, strokeFill) {
   }
   ctx.strokeStyle = style.strokeStyle
 
-  if ("lineDash" in style) ctx.setLineDash(style.lineDash)
+  if ("lineDash" in style && isArray(style.lineDash)) 
+    ctx.setLineDash(style.lineDash)
   
   ctx.beginPath()
   let move = true

@@ -80003,9 +80003,14 @@ export default {
     ],
   onchart: [
     {
-      "name": "BB",
-      "type": "BB",
-      "data": []
+      name: "BB",
+      type: "BB",
+      data: [],
+      settings: {
+        style: {
+          
+        }
+      },
     }
   ]
 }

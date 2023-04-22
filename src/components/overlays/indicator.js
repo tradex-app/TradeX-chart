@@ -5,7 +5,7 @@ import Overlay from "./overlay"
 import { renderFillRect } from "../../renderer/rect"
 import { renderLine } from "../../renderer/line"
 import { limit } from "../../utils/number"
-import { isObject, isString } from "../../utils/typeChecks"
+import { isObject, isString, isPromise } from "../../utils/typeChecks"
 import {
   STREAM_NEWVALUE,
   STREAM_UPDATE
@@ -207,7 +207,7 @@ export default class indicator extends Overlay {
   TALibParams() {
     let end = this.range.dataLength
     let step = this.definition.input.timePeriod
-    let start = end - step
+    let start = end - step + 1
     let input = this.indicatorInput(start, end)
     let hasNull = input.find(element => element === null)
     if (hasNull) return false
@@ -235,12 +235,13 @@ export default class indicator extends Overlay {
     // is it the Range instance?
     if (range.constructor.name == "Range") {
       start = 0
-      end = range.dataLength
+      end = range.dataLength - p + 2
     }
     else if ( "indexStart" in range || "indexEnd" in range ||
               "tsStart" in range ||  "tsEnd" in range ) {
       start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0
       end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1
+      end - p
     }
     else return false
 
@@ -265,44 +266,35 @@ export default class indicator extends Overlay {
         v[i++] = entry[o.name][0]
       }
       // store entry with timestamp
-      data.push([this.range.value(start + p)[0], v])
+      data.push([this.range.value(start + p - 1)[0], v])
       start++
     }
 
-/*
-
-    while (start < end) {
-
-      params.inReal = this.indicatorInput(start, start + p)
-      // let hasNull = params.inReal.find(element => element === null)
-      // if (hasNull) return false
-
-console.log(params.inReal)
-
-      entry = this.TALib[indicator](params)
-
-      // iterate over entries
-      for (let c = 0; c < p-2; c++ ) {
-        // iterate over output/s
-        v = []
-        i = 0
-        for (let o of this.definition.output) {
-          v[i++] = entry[o.name][c]
-        }
-        // store entry with timestamp
-        data.push([this.range.value(start + c)[0], v])
-      }
-      // if (star + p - 2 < end)
-        start += p - 2
-      // else
-    }
-*/
-
-// Merge the data
-// this.core.mergeData(merge, newRange=false)
-//   this.overlay.data.push([time, entry])
-
     return data
+  }
+
+  /**
+   * calculate back history if missing
+   * @memberof indicator
+   */
+  calcIndicatorHistory () {
+
+    if (this.overlay.data.length < this.definition.input.timePeriod) {
+      let data 
+      
+      if (this.core.TALibReady) {
+        data = this.calcIndicator(this.libName, this.definition.input, this.range);
+        if (data) this.overlay.data = data
+      }
+      else if (isPromise(this.core.TALibPromise))
+        this.core.TALibPromise.then(
+          () => { 
+            data = this.calcIndicator(this.libName, this.definition.input, this.range);
+            if (data) this.overlay.data = data
+          },
+          (e) => { this.core.error(e) }
+        )
+    } 
   }
 
   /**

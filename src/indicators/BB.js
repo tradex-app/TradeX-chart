@@ -6,7 +6,6 @@ import indicator from "../components/overlays/indicator"
 import { BBANDS as talibAPI } from "./talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { uid } from "../utils/utilities"
-import { isPromise } from "../utils/typeChecks";
 
 
 export default class BB extends indicator {
@@ -28,15 +27,16 @@ export default class BB extends indicator {
     },
   }
   #defaultStyle = {
-    strokeStyle: "#C80",
-    lineWidth: '1',
-    defaultHigh: 75,
-    defaultLow: 25,
-    highLowLineWidth: 1,
-    highLowStyle: "dashed",
-    highStrokeStyle: "#848",
-    lowStrokeStyle: "#848",
-    highLowRangeStyle: "#22002220"
+    lowerStrokeStyle: "#08c",
+    lowerLineWidth: '1',
+    lowerLineDash: undefined,
+    middleStrokeStyle: "#0080c088",
+    middleLineWidth: '1',
+    middleLineDash: undefined,
+    upperStrokeStyle: "#08c",
+    upperLineWidth: '1',
+    upperLineDash: undefined,
+    fillStyle: "#0080c044"
   }
   precision = 2
   onChart = true
@@ -66,25 +66,8 @@ export default class BB extends indicator {
     this.ID = params.overlay?.id || uid(this.shortName)
     this.defineIndicator(overlay?.settings, talibAPI)
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
-
     // calculate back history if missing
-    if (this.overlay.data.length < this.definition.input.timePeriod) {
-      let data 
-      
-      if (this.core.TALibReady) {
-        data = this.calcIndicator(this.libName, this.definition.input, this.range);
-        if (data) this.overlay.data = data
-      }
-      else if (isPromise(this.core.TALibPromise))
-        this.core.TALibPromise.then(
-          () => { 
-            data = this.calcIndicator(this.libName, this.definition.input, this.range);
-            if (data) this.overlay.data = data
-          },
-          (e) => { this.core.error(e) }
-        )
-    }
-
+    this.calcIndicatorHistory()
     // enable processing of price stream
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
@@ -117,38 +100,6 @@ export default class BB extends indicator {
     const plots = {lower: [], middle: [], upper: []}
     const data = this.overlay.data
     const width = this.xAxis.candleW
-    // const x2 = this.scene.width + (this.xAxis.bufferPx * 2)
-    // const y1 = this.yAxis.yPos(this.style.defaultHigh)
-    // const y2 = this.yAxis.yPos(this.style.defaultLow)
-
-    // // Fill the range between high and low
-    // const plots = [0, y1, this.scene.width, y2 - y1]
-    // let style = this.style.highLowRangeStyle
-    // this.plot(plots, "renderFillRect", style)
-
-    // // High BB Range marker
-    // plots.length = 0
-    // plots[0] = {x: 0, y: y1}
-    // plots[1] = {x: x2, y: y1}
-    // style = {
-    //   lineWidth: this.style.highLowLineWidth,
-    //   strokeStyle: this.style.highStrokeStyle,
-    //   dash: [5, 5]
-    // }
-    // this.plot(plots, "renderLine", style)
-
-    // // Low BB Range marker
-    // plots.length = 0
-    // plots[0] = {x: 0, y: y2}
-    // plots[1] = {x: x2, y: y2}
-    // style = {
-    //   lineWidth: this.style.highLowLineWidth,
-    //   strokeStyle: this.style.lowStrokeStyle,
-    //   dash: [5, 5]
-    // }
-    // this.plot(plots, "renderLine", style)
-
-
     // DMI plot
     plots.length = 0
     const offset = this.Timeline.smoothScrollOffset || 0
@@ -156,11 +107,12 @@ export default class BB extends indicator {
       w: width,
     }
 
-    // account for "missing" entries because of indicator calculation
+    let t = range.value(range.indexStart)[0]
+    let s = this.overlay.data[0][0]
+    let c = (t - s) / range.interval
     let o = this.Timeline.rangeScrollOffset;
-    let d = range.data.length - this.overlay.data.length
-    let c = range.indexStart - d - 2
-    let i = range.Length + (o * 2) + 2
+    let i = range.Length + o + 2
+    let style = {}
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
@@ -185,9 +137,24 @@ export default class BB extends indicator {
       i--
     }
 
-    this.plot(plots.lower, "renderLine", this.style)
-    this.plot(plots.middle, "renderLine", this.style)
-    this.plot(plots.upper, "renderLine", this.style)
+    style = {
+      lineWidth: this.style.lowerLineWidth, 
+      strokeStyle: this.style.lowerStrokeStyle, 
+      lineDash: this.style.lowerLineDash
+    }
+    this.plot(plots.lower, "renderLine", style)
+    style = {
+      lineWidth: this.style.middleLineWidth, 
+      strokeStyle: this.style.middleStrokeStyle, 
+      lineDash: this.style.middleLineDash
+    }
+    this.plot(plots.middle, "renderLine", style)
+    style = {
+      lineWidth: this.style.upperLineWidth, 
+      strokeStyle: this.style.upperStrokeStyle, 
+      lineDash: this.style.upperLineDash
+    }
+    this.plot(plots.upper, "renderLine", style)
 
     this.target.viewport.render();
   }
