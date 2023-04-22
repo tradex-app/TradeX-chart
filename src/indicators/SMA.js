@@ -91,6 +91,7 @@ import { uid } from "../utils/utilities"
   }
 
   draw(range=this.range) {
+    if (this.overlay.data.length < 2 ) return false
 
     this.scene.clear()
 

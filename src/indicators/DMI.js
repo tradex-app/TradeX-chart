@@ -85,6 +85,7 @@ export default class DMI extends indicator {
    * @param {object} range 
    */
   draw(range=this.range) {
+    if (this.overlay.data.length < 2 ) return false
 
     this.scene.clear()
 

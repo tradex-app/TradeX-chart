@@ -95,6 +95,8 @@ export default class BB extends indicator {
   }
 
   draw(range=this.range) {
+    if (this.overlay.data.length < 2 ) return false
+
     this.scene.clear()
 
     const plots = {lower: [], middle: [], upper: []}
