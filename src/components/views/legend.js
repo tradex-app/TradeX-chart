@@ -77,14 +77,17 @@ export default class tradeXLegend extends element {
     let i = 0,
         inp = "",
         input,
-        styleDT = "display: inline; margin-left: 1em;",
+        blank = "", //"&nbsp;",
+        styleDT = "display: inline; margin-left: ",
         styleDD = "display: inline; margin-left: .25em;";
     for (input in o.inputs) {
-      let colour = (o.colours?.[i]) ? ` color: ${o.colours[i]};` : ""
-      let inputV = (o.inputs[input] !== undefined) ? o.inputs[input] : "---"
+      let colour = (o?.colours?.[i]) ? ` color: ${o.colours[i]};` : ""
+      let value = (o?.inputs?.[input] !== undefined) ? o.inputs[input] : blank
+      let label = (o?.labels?.[i]) ? `${input}:` : blank
+          styleDT += (o?.labels?.[i]) ? "1em;" : ".25em"
       inp +=
-      `<dt style="${styleDT}">${input}:</dt>
-      <dd style="${styleDD}${colour}">${inputV}</dd>`;
+      `<dt style="${styleDT}">${label}</dt>
+      <dd style="${styleDD}${colour}">${value}</dd>`;
       ++i
     }
     return inp

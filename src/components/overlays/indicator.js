@@ -187,7 +187,9 @@ export default class indicator extends Overlay {
    */
   legendInputs(pos=this.chart.cursorPos) {
     const colours = [this.style.strokeStyle]
-    const index = this.Timeline.xPos2Index(pos[0])
+
+    let index = this.Timeline.xPos2Index(pos[0])
+
     let c = index  - (this.range.data.length - this.overlay.data.length)
     let l = limit(this.overlay.data.length - 1, 0, Infinity)
         c = limit(c, 0, l)
