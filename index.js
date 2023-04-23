@@ -48,9 +48,8 @@ onchart: [
   {
     "name": "RSI, 20",
     "type": "RSI",
-    "data": []
+    "data": [],
   },
-
 ]
 }
 
@@ -75,7 +74,8 @@ let state5 = {
       "name": "RSI, 20",
       "type": "RSI",
       "data": []
-    }]
+    }
+  ]
 }
 
 // let rangeStartTS = 1558429200000 // 21/05/2019, 11:00:00 - 1 hour price

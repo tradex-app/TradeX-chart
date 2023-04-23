@@ -64,6 +64,9 @@ import { uid } from "../utils/utilities"
     this.ID = params.overlay?.id || uid(this.shortName)
     this.defineIndicator(overlay?.settings, talibAPI)
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
+    // calculate back history if missing
+    this.calcIndicatorHistory()
+    // enable processing of price stream
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
     this.addLegend()
@@ -81,13 +84,6 @@ import { uid } from "../utils/utilities"
     inputs.SMA_1 = this.Scale.nicePrice(this.overlay.data[c][1])
 
     return {inputs, colours}
-  }
-
-  regeneratePlots (params) {
-    return params.map((_, index) => {
-      const num = index + 1
-      return { key: `sma${num}`, title: `SMA${num}: `, type: 'line' }
-    })
   }
 
   draw(range=this.range) {

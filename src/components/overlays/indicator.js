@@ -204,10 +204,21 @@ export default class indicator extends Overlay {
     return input
   }
 
+  regeneratePlots (params) {
+    return params.map((_, index) => {
+      const num = index + 1
+      return {
+        key: `${this.shortName}${num}`, 
+        title: `${this.shortName}${num}: `, 
+        type: 'line'
+      }
+    })
+  }
+
   TALibParams() {
     let end = this.range.dataLength
     let step = this.definition.input.timePeriod
-    let start = end - step + 1
+    let start = end - step //+ 1
     let input = this.indicatorInput(start, end)
     let hasNull = input.find(element => element === null)
     if (hasNull) return false
@@ -235,7 +246,7 @@ export default class indicator extends Overlay {
     // is it the Range instance?
     if (range.constructor.name == "Range") {
       start = 0
-      end = range.dataLength - p + 2
+      end = range.dataLength - p + 1
     }
     else if ( "indexStart" in range || "indexEnd" in range ||
               "tsStart" in range ||  "tsEnd" in range ) {

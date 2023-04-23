@@ -27,7 +27,9 @@ export default class RSI extends indicator {
       inReal: [], 
       timePeriod: 20 // 5
     },
-    output: {},
+    output: {
+      output: [],
+    },
   }
   #defaultStyle = {
     strokeStyle: "#C80",
@@ -68,6 +70,9 @@ export default class RSI extends indicator {
     this.ID = params.overlay?.id || uid(this.shortName)
     this.defineIndicator(overlay?.settings, talibAPI)
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
+    // calculate back history if missing
+    this.calcIndicatorHistory()
+    // enable processing of price stream
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
   }
@@ -80,13 +85,6 @@ export default class RSI extends indicator {
     inputs.RSI_1 = this.Scale.nicePrice(this.overlay.data[c][1])
 
     return {inputs, colours}
-  }
-
-  regeneratePlots (params) {
-    return params.map((_, index) => {
-      const num = index + 1
-      return { key: `rsi${num}`, title: `RSI${num}: `, type: 'line' }
-    })
   }
 
   /**

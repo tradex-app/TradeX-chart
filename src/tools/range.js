@@ -3,7 +3,7 @@
 import Tool from "./tool";
 
 
-export default class Range extends Tool {
+export default class RangeTool extends Tool {
 
   constructor(config) {
     super(config)

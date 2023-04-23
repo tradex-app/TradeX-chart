@@ -80012,5 +80012,12 @@ export default {
         }
       },
     }
+  ],
+  offchart: [
+    {
+    "name": "RSI, 20",
+    "type": "RSI",
+    "data": [],
+    }
   ]
 }

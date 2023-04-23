@@ -71,6 +71,7 @@ export default class BB extends indicator {
     // enable processing of price stream
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.UpdateValue(value) }
+    this.addLegend()
   }
 
   legendInputs(pos=this.chart.cursorPos) {
@@ -81,17 +82,6 @@ export default class BB extends indicator {
     inputs.BB_1 = this.Scale.nicePrice(this.overlay.data[c][1])
 
     return {inputs, colours}
-  }
-
-  regeneratePlots (params) {
-    return params.map((_, index) => {
-      const num = index + 1
-      return {
-        key: `${this.shortName}${num}`, 
-        title: `${this.shortName}${num}: `, 
-        type: 'line'
-      }
-    })
   }
 
   draw(range=this.range) {

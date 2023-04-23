@@ -1,13 +1,13 @@
 import { Chart, DOM } from './tradex-chart.es.js'
 import * as talib from "./node_modules/talib-web/lib/index.esm.js"
 
-// import './chart-live.css'
-
 // let state = undefined
 import state1 from './data/1hour.js'
 import state2 from './data/data_btc_1m.js'
-// import state from './data/seconds.json'
+// import state4 from './data/seconds.js'
 // import state from './data/seconds-indicator'
+
+const wasm = "node_modules/talib-web/lib/talib.wasm"
 
 let state4 = {
   "ohlcv": [
@@ -48,8 +48,9 @@ onchart: [
   {
     "name": "RSI, 20",
     "type": "RSI",
-    "data": []
-  }]
+    "data": [],
+  },
+]
 }
 
 let state5 = {
@@ -73,7 +74,8 @@ let state5 = {
       "name": "RSI, 20",
       "type": "RSI",
       "data": []
-    }]
+    }
+  ]
 }
 
 // let rangeStartTS = 1558429200000 // 21/05/2019, 11:00:00 - 1 hour price
@@ -126,11 +128,14 @@ const config1 = {
 
     },
     tools: {
-      location: "left"
+      location: false
     },
     utils: {
       location: false
     },
+  },
+  watermark: {
+    text: "BTC/USDT"
   },
   isCrypto: true,
   logs: false,
@@ -140,6 +145,7 @@ const config1 = {
   stream: streamVal,
   maxCandleUpdate: 250,
   talib: talib,
+  wasm: wasm,
   state: state1
 }
 const config2 = {
@@ -175,6 +181,9 @@ const config2 = {
     onChart: {
 
     },
+    utils: {
+      location: false
+    },
   },
   isCrypto: true,
   logs: false,
@@ -184,6 +193,7 @@ const config2 = {
   stream: streamVal,
   maxCandleUpdate: 250,
   talib: talib,
+  wasm: wasm,
   state: state2
 }
 const config3 = {
@@ -266,6 +276,7 @@ const config3 = {
   stream: streamVal,
   maxCandleUpdate: 250,
   talib: talib,
+  wasm: wasm,
   state: {
 
   }
@@ -283,7 +294,7 @@ const config4 = {
   rangeLimit: 30,
   theme: {
     candle: {
-      Type: "line",
+      Type: "candle_down_hollow",
       AreaLineColour: "#08C5F5",
 
       UpBodyColour: "#08C5F588",
@@ -324,6 +335,7 @@ const config4 = {
   },
   maxCandleUpdate: 250,
   talib: talib,
+  wasm: wasm,
   state: state4
 }
 const config5 = {
@@ -334,7 +346,7 @@ const config5 = {
   // height: 800,
   utils: {},
   tools: {},
-  timeFrame: "1m",
+  timeFrame: "5m",
   rangeStartTS: rangeStartTS,
   rangeLimit: 30,
   theme: {
@@ -410,6 +422,10 @@ const config5 = {
       location: false
     }
   },
+  watermark: {
+    text: "ETH/USDT",
+    textColour: "#13171e"
+  },
   isCrypto: true,
   logs: false,
   infos: true,
@@ -417,7 +433,8 @@ const config5 = {
   errors: true,
   stream: streamVal,
   maxCandleUpdate: 250,
-  talib: talib
+  talib: talib,
+  wasm: wasm,
 }
 
 const configs = [
@@ -426,6 +443,7 @@ const configs = [
   {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
   {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
   {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
+  // {config: config5, stream: (chart) => {once(chart)}},
 ]
 
 const main = DOM.findBySelector('main')
@@ -443,13 +461,11 @@ function addChart() {
       chart.start(config)
       window["chart"+chart.inCnt] = chart
 
-  if (typeof chart.stream.start === "function") {
+  if (typeof chart?.stream?.start === "function") {
     chart.stream.start()
     if (typeof stream === "function") stream(chart)
   }
 }
-
-
 
 
 function test(e) {
@@ -491,6 +507,7 @@ let time = chart.range.value()[0]
 function getRandomInt(min, max) {
   return Math.random() * (max - min) + min;
 }
+
 
 class Stream {
 
@@ -554,7 +571,7 @@ class Stream {
     if (this.tick.t - t >= this.tfms ) {
       t = this.tick.t - (this.tick.t % this.tfms)
       c = [t, p, p, p, p, this.volumeInc]
-      c 
+      c
     }
     else {
       c[2] = (c[2] < p ) ? p : c[2]
@@ -574,26 +591,41 @@ function livePrice_Binance(chart, symbol="btcusdt", interval="1m") {
   ws.onmessage = (evt) => onWSMessage.call(this, evt, chart)
 }
 
-function onWSMessage (evt, chart) { 
-  
-
-  
+function onWSMessage (evt, chart) {
   var msg = evt.data;
   var obj = JSON.parse(msg);
-  if (typeof obj === "object" && obj.k) { 
+  if (typeof obj === "object" && obj.k) {
 
     /* KLine data passed to the chart
-    {
+      {
         t: timeStamp // timestamp of current candle in milliseconds
         o: open  // open price
         h: high  // high price
+        l. low // low price
         c: close  // close price
         v: volume // volume
-    }
+      }
     */
-    chart.stream.onTick(obj.k)   
-    }
-  };
+    // console.log(obj.k)
+    chart.stream.onTick(obj.k)
+  }
+};
+
+function once (chart) {
+  const tick = {
+    t: Date.now(), // timestamp of current candle in milliseconds
+    o: 28000,  // open price
+    h: 28100,  // high price
+    l: 28060,
+    c: 28080,  // close price
+    v: 3 // volume
+  }
+  chart.stream.onTick(tick)
+  tick.t = Date.now()
+  tick.c = 28083
+  chart.stream.onTick(tick)
+
+}
 
 
 // Add some charts
@@ -603,3 +635,12 @@ addChart()
 addChart()
 addChart()
 addChart()
+
+function h($,p,c) {console.log(`alert`,$,p[4],c[4])}
+
+function alertTest ($, p, c) {
+  if ($ > p[4] && $ < c[4]) return true
+  else return false
+}
+
+window.chart1.stream.alerts.add(13010, alertTest, h)

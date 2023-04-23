@@ -1,23 +1,26 @@
-function isArray (value) {
-  return Array.isArray(value)
+function isArray (v) {
+  return Array.isArray(v)
 }
-function isFunction (value) {
-  return value && typeof value === 'function'
+function isFunction (v) {
+  return v && typeof v === 'function'
 }
-function isObject (value) {
+function isObject (v) {
   return (
-  typeof value === 'object' &&
-  !Array.isArray(value) &&
-  value !== null)
+  typeof v === 'object' &&
+  !Array.isArray(v) &&
+  v !== null)
 }
-function isNumber (value) {
-  return typeof value === 'number' && !isNaN(value)
+function isNumber (v) {
+  return typeof v === 'number' && !isNaN(v)
 }
-function isBoolean (value) {
-  return typeof value === 'boolean'
+function isBoolean (v) {
+  return typeof v === 'boolean'
 }
-function isString$1 (value) {
-  return typeof value === 'string'
+function isString$1 (v) {
+  return typeof v === 'string'
+}
+function isPromise (v) {
+  return !!v && (isObject(v) || isFunction(v)) && isFunction(v.then);
 }
 
 const DOM = {
@@ -754,7 +757,7 @@ function log10 (value) {
 function power (base, exponent) {
   return Math.pow(base, exponent)
 }
-function limit$1(val, min, max) {
+function limit(val, min, max) {
   return Math.min(max, Math.max(min, val));
 }
 
@@ -924,7 +927,7 @@ const ROWMINHEIGHT = 50;
 const OFFCHARTDEFAULTHEIGHT = 30;
 const DIVIDERHEIGHT = 8;
 
-class Range$1 {
+class Range {
   data
   #interval = DEFAULT_TIMEFRAMEMS
   #intervalStr = "1s"
@@ -1016,12 +1019,12 @@ class Range$1 {
     start = start | 0;
     end = end | 0;
     max = max | 0;
-    max = limit$1(max, this.minCandles, this.maxCandles);
+    max = limit(max, this.minCandles, this.maxCandles);
     if (start > end) [start, end] = [end, start];
-    end = limit$1(end, start + this.minCandles, start + max);
+    end = limit(end, start + this.minCandles, start + max);
     let len = end - start;
-    start = limit$1(start, this.limitPast * -1,  this.dataLength + this.limitFuture - this.minCandles - 1);
-    end = limit$1(end, start + this.minCandles, this.dataLength + this.limitFuture - 1);
+    start = limit(start, this.limitPast * -1,  this.dataLength + this.limitFuture - this.minCandles - 1);
+    end = limit(end, start + this.minCandles, this.dataLength + this.limitFuture - 1);
     start = (end - start < len) ? start - (len - (end - start)) : start;
     const newStart = start;
     const newEnd = end;
@@ -1036,33 +1039,81 @@ class Range$1 {
     this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd]);
     return true
   }
-  setMaxMin(maxMin) {
+  setMaxMin ( maxMin ) {
     for (let m in maxMin) {
       this.old[m] = this[m];
       this[m] = maxMin[m];
     }
     this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1;
   }
-  value ( index ) {
-    if (!isNumber(index)) index = this.data.length - 1;
-    let v = this.data[index];
+  value ( index, id="chart" ) {
+    let data;
+    if (id == "chart") data = this.data;
+    else {
+      data = this.getDataById(id);
+      if (!data) return null
+    }
+    if (!isNumber(index)) index = data.length - 1;
+    let v = data[index];
     if (v !== undefined) return v
     else {
-      const len = this.data.length - 1;
+      const len = data.length - 1;
       v = [null, null, null, null, null, null];
-      if (this.data.length < 1) {
+      if (data.length < 1) {
         v[0] = Date.now() + (this.interval * index);
         return v
       }
       else if (index < 0) {
-        v[0] = this.data[0][0] + (this.interval * index);
+        v[0] = data[0][0] + (this.interval * index);
         return v
       }
       else if (index > len) {
-        v[0] = this.data[len][0] + (this.interval * (index - len));
+        v[0] = data[len][0] + (this.interval * (index - len));
         return v
       }
       else return null
+    }
+  }
+  valueByTS ( ts, id ) {
+    if (!isNumber(ts) || !isString$1(id)) return false
+    const idx = this.getTimeIndex(ts);
+    switch (id) {
+      case "chart":
+        break;
+      case "onchart": break;
+      case "offchart": break;
+      case "dataset": break;
+      case "all": break;
+      default:
+        if (id.length = 0) return this.value(idx)
+        else {
+          id.split('_');
+        }
+        break;
+    }
+  }
+  getDataById(id) {
+    if (!isString$1(id)) return false
+    const idParts = id.split('_');
+    switch (idParts[1]) {
+      case "chart":
+        return this.data;
+      case "onchart":
+        for (let o of this.onChart) {
+          if (idParts[2] in o) return o[idParts[2]]
+        }
+        return false;
+      case "offchart":
+        for (let o of this.offChart) {
+          if (idParts[2] in o) return o[idParts[2]]
+        }
+        return false;
+      case "datasets":
+        for (let o of this.datasets) {
+          if (idParts[2] in o) return o[idParts[2]]
+        }
+      return false;
+      default: return false
     }
   }
    getTimeIndex (ts) {
@@ -2167,7 +2218,8 @@ function renderPath (ctx, coords, style, strokeFill) {
     ctx.translate(0.5, 0.5);
   }
   ctx.strokeStyle = style.strokeStyle;
-  if ("lineDash" in style) ctx.setLineDash(style.lineDash);
+  if ("lineDash" in style && isArray(style.lineDash))
+    ctx.setLineDash(style.lineDash);
   ctx.beginPath();
   let move = true;
   coords.forEach(coord => {
@@ -2200,6 +2252,13 @@ function renderLine (ctx, coords, style) {
 
 const T = 0, C = 4;
 class indicator extends Overlay {
+  #ID
+  #name
+  #shortName
+  #onChart
+  #scaleOverlay
+  #plots
+  #params
   #overlay
   #indicator
   #type
@@ -2209,10 +2268,10 @@ class indicator extends Overlay {
   #newValueCB
   #updateValueCB
   #precision = 2
-  #calcParams
   #style = {}
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
     super(target, xAxis, yAxis, undefined, parent, params);
+    this.#params = params;
     this.#overlay = params.overlay;
     this.#type = config.type;
     this.#indicator = config.indicator;
@@ -2220,6 +2279,19 @@ class indicator extends Overlay {
     this.#range = this.xAxis.range;
     this.eventsListen();
   }
+  get ID() { return this.#ID }
+  set ID(id) { this.#ID = id; }
+  get name() { return this.#name }
+  set name(n) { this.#name = n; }
+  get shortName() { return this.#shortName }
+  set shortName(n) { this.#shortName = n; }
+  get onChart() { return this.#onChart }
+  set onChart(c) { this.#onChart = c; }
+  get scaleOverlay() { return this.#scaleOverlay }
+  set scaleOverlay(o) { this.#scaleOverlay = o; }
+  get plots() { return this.#plots }
+  set plots(p) { this.#plots = p; }
+  get params() { return this.#params }
   get Timeline() { return this.core.Timeline }
   get Scale() { return this.parent.scale }
   get type() { return this.#type }
@@ -2231,8 +2303,6 @@ class indicator extends Overlay {
   set setUpdateValue(cb) { this.#updateValueCB = cb; }
   set precision(p) { this.#precision = p; }
   get precision() { return this.#precision }
-  set calcParams(p) { this.#calcParams = p; }
-  get calcParams() { return this.#calcParams }
   set style(s) { this.#style = s; }
   get style() { return this.#style }
   set position(p) { this.target.setPosition(p[0], p[1]); }
@@ -2272,6 +2342,43 @@ class indicator extends Overlay {
   onStreamUpdate(candle) {
     this.value = candle;
   }
+  defineIndicator(i, api) {
+    if (!isObject(i)) i = {};
+    this.definition.output = api.outputs;
+    const input = {...this.definition.input, ...i};
+          delete input.style;
+    for (let i of api.options) {
+      if (i.name in input) {
+        if (typeof input[i.name] !== i.type) {
+          input[i.name] = i.defaultValue;
+          continue
+        }
+        else if ("range" in i) {
+          input[i.name] = limit(input[i.name], i.range.min, i.range.max);
+        }
+      }
+      else if (i.name == "timePeriod")
+        input.timePeriod = i.defaultValue;
+    }
+    this.definition.input = input;
+  }
+  addLegend() {
+    let legend = {
+      id: this.shortName,
+      title: this.shortName,
+      type: this.shortName,
+      source: this.legendInputs.bind(this)
+    };
+    this.chart.legend.add(legend);
+  }
+  legendInputs(pos=this.chart.cursorPos) {
+    const colours = [this.style.strokeStyle];
+    const index = this.Timeline.xPos2Index(pos[0]);
+    let c = index  - (this.range.data.length - this.overlay.data.length);
+    let l = limit(this.overlay.data.length - 1, 0, Infinity);
+        c = limit(c, 0, l);
+    return {c, colours}
+  }
   indicatorInput(start, end) {
     let input = [];
     do {
@@ -2280,33 +2387,112 @@ class indicator extends Overlay {
     while (start++ < end)
     return input
   }
-  calcIndicator (indicator, params) {
-    if (!this.core.TALibReady) return false
-    this.overlay.data = [];
-    let step = this.calcParams[0];
-    if (this.range.Length < step) return false
-    let end, entry, time;
-    let start = 0;
-    let input = this.indicatorInput(start, this.range.Length - 1);
+  regeneratePlots (params) {
+    return params.map((_, index) => {
+      const num = index + 1;
+      return {
+        key: `${this.shortName}${num}`,
+        title: `${this.shortName}${num}: `,
+        type: 'line'
+      }
+    })
+  }
+  TALibParams() {
+    let end = this.range.dataLength;
+    let step = this.definition.input.timePeriod;
+    let start = end - step;
+    let input = this.indicatorInput(start, end);
     let hasNull = input.find(element => element === null);
     if (hasNull) return false
-    do {
-      end = start + step;
-      input.slice(start, end);
+    else return { inReal: input, timePeriod: step }
+  }
+  calcIndicator (indicator, params={}, range=this.range) {
+    if (!this.core.TALibReady ||
+        !isString$1(indicator) ||
+        !(indicator in this.TALib) ||
+        !isObject(range)
+        ) return false
+        params.timePeriod = params.timePeriod || this.definition.input.timePeriod;
+    let start, end;
+    let p = params.timePeriod;
+    if (range.constructor.name == "Range") {
+      start = 0;
+      end = range.dataLength - p + 1;
+    }
+    else if ( "indexStart" in range || "indexEnd" in range ||
+              "tsStart" in range ||  "tsEnd" in range ) {
+      start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0;
+      end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1;
+    }
+    else return false
+    if ( end - start < p ) return false
+    let data = [];
+    let i, v, entry;
+    while (start < end) {
+      params.inReal = this.indicatorInput(start, start + p);
       entry = this.TALib[indicator](params);
-      time = this.range.value(end - 1)[0];
-      this.overlay.data.push([time, entry]);
+      v = [];
+      i = 0;
+      for (let o of this.definition.output) {
+        v[i++] = entry[o.name][0];
+      }
+      data.push([this.range.value(start + p - 1)[0], v]);
       start++;
     }
-    while (end < this.range.Length)
-    return true
+    return data
   }
-  calcIndicatorStream (indicator, params) {
-    if (!this.core.TALibReady) return false
+  calcIndicatorHistory () {
+    if (this.overlay.data.length < this.definition.input.timePeriod) {
+      let data;
+      if (this.core.TALibReady) {
+        data = this.calcIndicator(this.libName, this.definition.input, this.range);
+        if (data) this.overlay.data = data;
+      }
+      else if (isPromise(this.core.TALibPromise))
+        this.core.TALibPromise.then(
+          () => {
+            data = this.calcIndicator(this.libName, this.definition.input, this.range);
+            if (data) this.overlay.data = data;
+          },
+          (e) => { this.core.error(e); }
+        );
+    }
+  }
+  calcIndicatorStream (indicator, params, range=this.range) {
+    if (!this.core.TALibReady ||
+        !isString$1(indicator) ||
+        !(indicator in this.TALib) ||
+        range.constructor.name !== "Range" ||
+        range.dataLength < this.definition.input.timePeriod
+        ) return false
     let entry = this.TALib[indicator](params);
-    let end = this.range.dataLength;
-    let time = this.range.value(end)[0];
-    return [time, entry.output[0]]
+    let end = range.dataLength;
+    let time = range.value(end)[0];
+    let v = [];
+    let i = 0;
+    for (let o of this.definition.output) {
+      v[i++] = entry[o.name][0];
+    }
+    return [time, v]
+  }
+  newValue (value) {
+    let p = this.TALibParams();
+    if (!p) return false
+    let v = this.calcIndicatorStream(this.libName, p);
+    if (!v) return false
+    this.overlay.data.push(v);
+    this.target.setPosition(this.core.scrollPos, 0);
+    this.draw(this.range);
+  }
+  UpdateValue (value) {
+    let l = this.overlay.data.length - 1;
+    let p = this.TALibParams();
+    if (!p) return false
+    let v = this.calcIndicatorStream(this.libName, p);
+    if (!v) return false
+    this.overlay.data[l] = [v[0], v[1]];
+    this.target.setPosition(this.core.scrollPos, 0);
+    this.draw(this.range);
   }
   plot(plots, type, style) {
     const ctx = this.scene.context;
@@ -2321,166 +2507,300 @@ class indicator extends Overlay {
   }
 }
 
-class DMI$1 extends indicator {
-  #ID
-  #name = 'Bollinger Bands'
-  #shortName = 'BB'
-  #params
-  #onChart = true
-  #precision = 2
-  #calcParams = [20]
-  #checkParamCount = false
-  #scaleOverlay = true
-  #plots = [
+const ADX = {
+  name: "ADX",
+  camelCaseName: "adx",
+  group: "Momentum Indicators",
+  description: "Average Directional Movement Index",
+  inputs: [{
+    name: "high",
+    type: "number"
+  }, {
+    name: "low",
+    type: "number"
+  }, {
+    name: "close",
+    type: "number"
+  }],
+  options: [{
+    name: "timePeriod",
+    displayName: "Time Period",
+    defaultValue: 14,
+    hint: "Number of period",
+    type: "number",
+    range: {
+      min: 2,
+      max: 100000
+    }
+  }],
+  outputs: [{
+    name: "output",
+    type: "number",
+    plot: "line"
+  }]
+};
+const BBANDS = {
+  name: "BBANDS",
+  camelCaseName: "bbands",
+  group: "Overlap Studies",
+  description: "Bollinger Bands",
+  inputs: [{
+    name: "inReal",
+    type: "number"
+  }],
+  options: [{
+    name: "timePeriod",
+    displayName: "Time Period",
+    defaultValue: 5,
+    hint: "Number of period",
+    type: "number",
+    range: {
+      min: 2,
+      max: 100000
+    }
+  }, {
+    name: "nbDevUp",
+    displayName: "Deviations up",
+    defaultValue: 2,
+    hint: "Deviation multiplier for upper band",
+    type: "number",
+    range: {
+      min: -3e+37,
+      max: 3e+37
+    }
+  }, {
+    name: "nbDevDn",
+    displayName: "Deviations down",
+    defaultValue: 2,
+    hint: "Deviation multiplier for lower band",
+    type: "number",
+    range: {
+      min: -3e+37,
+      max: 3e+37
+    }
+  }, {
+    name: "MAType",
+    displayName: "MA Type",
+    defaultValue: 0,
+    hint: "Type of Moving Average",
+    type: "MAType"
+  }],
+  outputs: [{
+    name: "upperBand",
+    type: "number",
+    plot: "limit_upper"
+  }, {
+    name: "middleBand",
+    type: "number",
+    plot: "line"
+  }, {
+    name: "lowerBand",
+    type: "number",
+    plot: "limit_lower"
+  }]
+};
+const EMA$1 = {
+  name: "EMA",
+  camelCaseName: "ema",
+  group: "Overlap Studies",
+  description: "Exponential Moving Average",
+  inputs: [{
+    name: "inReal",
+    type: "number"
+  }],
+  options: [{
+    name: "timePeriod",
+    displayName: "Time Period",
+    defaultValue: 30,
+    hint: "Number of period",
+    type: "number",
+    range: {
+      min: 2,
+      max: 100000
+    }
+  }],
+  outputs: [{
+    name: "output",
+    type: "number",
+    plot: "line"
+  }]
+};
+const RSI$1 = {
+  name: "RSI",
+  camelCaseName: "rsi",
+  group: "Momentum Indicators",
+  description: "Relative Strength Index",
+  inputs: [{
+    name: "inReal",
+    type: "number"
+  }],
+  options: [{
+    name: "timePeriod",
+    displayName: "Time Period",
+    defaultValue: 14,
+    hint: "Number of period",
+    type: "number",
+    range: {
+      min: 2,
+      max: 100000
+    }
+  }],
+  outputs: [{
+    name: "output",
+    type: "number",
+    plot: "line"
+  }]
+};
+const SMA$1 = {
+  name: "SMA",
+  camelCaseName: "sma",
+  group: "Overlap Studies",
+  description: "Simple Moving Average",
+  inputs: [{
+    name: "inReal",
+    type: "number"
+  }],
+  options: [{
+    name: "timePeriod",
+    displayName: "Time Period",
+    defaultValue: 30,
+    hint: "Number of period",
+    type: "number",
+    range: {
+      min: 2,
+      max: 100000
+    }
+  }],
+  outputs: [{
+    name: "output",
+    type: "number",
+    plot: "line"
+  }]
+};
+
+class BB extends indicator {
+  name = 'Bollinger Bands'
+  shortName = 'BB'
+  libName = 'BBANDS'
+  definition = {
+    input: {
+      inReal: [],
+      nbDevDn: 2,
+      nbDevUp: 2,
+      timePeriod: 20
+    },
+    output: {
+      lowerBand: [],
+      middleBand: [],
+      upperBand: []
+    },
+  }
+  #defaultStyle = {
+    lowerStrokeStyle: "#08c",
+    lowerLineWidth: '1',
+    lowerLineDash: undefined,
+    middleStrokeStyle: "#0080c088",
+    middleLineWidth: '1',
+    middleLineDash: undefined,
+    upperStrokeStyle: "#08c",
+    upperLineWidth: '1',
+    upperLineDash: undefined,
+    fillStyle: "#0080c044"
+  }
+  precision = 2
+  onChart = true
+  scaleOverlay = false
+  plots = [
     { key: 'BB_1', title: ' ', type: 'line' },
   ]
-  #defaultStyle = {
-    strokeStyle: "#C80",
-    lineWidth: '1',
-    defaultHigh: 75,
-    defaultLow: 25,
-    highLowLineWidth: 1,
-    highLowStyle: "dashed",
-    highStrokeStyle: "#848",
-    lowStrokeStyle: "#848",
-    highLowRangeStyle: "#22002220"
-  }
-  #style = {}
-  static scale = YAXIS_TYPES$1[1]
+  static scale = YAXIS_TYPES$1[0]
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
     super(target, xAxis, yAxis, config, parent, params);
     const overlay = params.overlay;
-    this.#ID = params.overlay?.id || uid(this.#shortName);
-    this.#params = params;
-    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams;
-        this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
+    this.ID = params.overlay?.id || uid(this.shortName);
+    this.defineIndicator(overlay?.settings, BBANDS);
+    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
+    this.calcIndicatorHistory();
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.UpdateValue(value); };
+    this.addLegend();
   }
-  get ID() { return this.#ID }
-  get name() { return this.#name }
-  get shortName() { return this.#shortName }
-  get onChart() { return this.#onChart }
-  get plots() { return this.#plots }
-  addLegend() {
-    let legend = {
-      id: this.#shortName,
-      title: this.#shortName,
-      type: this.#shortName,
-      source: this.legendInputs.bind(this)
-    };
-    this.chart.legend.add(legend);
-  }
-  legendInputs(pos=this.chart.cursorPos, candle) {
+  legendInputs(pos=this.chart.cursorPos) {
+    if (this.overlay.data.length == 0) return false
     const inputs = {};
-    const index = this.Timeline.xPos2Index(pos[0]);
-    let c = index  - (this.range.data.length - this.overlay.data.length);
-    let colours = [this.style.strokeStyle];
-    c = limit(c, 0, this.overlay.data.length - 1);
-    inputs.DMI_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
+    const {c, colours} = super.legendInputs(pos);
+    inputs.BB_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
     return {inputs, colours}
   }
-  regeneratePlots (params) {
-    return params.map((_, index) => {
-      const num = index + 1;
-      return { key: `dmi${num}`, title: `DMI${num}: `, type: 'line' }
-    })
-  }
- newValue (value) {
-   let p = this.TALibParams();
-   if (!p) return false
-   let v = this.calcIndicatorStream(this.#shortName, this.TALibParams());
-   if (!v) return false
-   this.overlay.data.push([v[0], v[1]]);
-   this.target.setPosition(this.core.scrollPos, 0);
-   this.draw(this.range);
- }
- UpdateValue (value) {
-   let l = this.overlay.data.length - 1;
-   let p = this.TALibParams();
-   if (!p) return false
-   let v = this.calcIndicatorStream(this.#shortName, p);
-   if (!v) return false
-   this.overlay.data[l] = [v[0], v[1]];
-   this.target.setPosition(this.core.scrollPos, 0);
-   this.draw(this.range);
- }
- TALibParams() {
-   let end = this.range.dataLength;
-   let step = this.calcParams[0];
-   let start = end - step;
-   let input = this.indicatorInput(start, end);
-   let hasNull = input.find(element => element === null);
-   if (hasNull) return false
-   else return { inReal: input, timePeriod: step }
- }
-  draw(range) {
+  draw(range=this.range) {
+    if (this.overlay.data.length < 2 ) return false
     this.scene.clear();
+    const plots = {lower: [], middle: [], upper: []};
     const data = this.overlay.data;
     const width = this.xAxis.candleW;
-    const x2 = this.scene.width + (this.xAxis.bufferPx * 2);
-    const y1 = this.yAxis.yPos(this.style.defaultHigh);
-    const y2 = this.yAxis.yPos(this.style.defaultLow);
-    const plots = [0, y1, this.scene.width, y2 - y1];
-    let style = this.style.highLowRangeStyle;
-    this.plot(plots, "renderFillRect", style);
-    plots.length = 0;
-    plots[0] = {x: 0, y: y1};
-    plots[1] = {x: x2, y: y1};
-    style = {
-      lineWidth: this.style.highLowLineWidth,
-      strokeStyle: this.style.highStrokeStyle,
-      dash: [5, 5]
-    };
-    this.plot(plots, "renderLine", style);
-    plots.length = 0;
-    plots[0] = {x: 0, y: y2};
-    plots[1] = {x: x2, y: y2};
-    style = {
-      lineWidth: this.style.highLowLineWidth,
-      strokeStyle: this.style.lowStrokeStyle,
-      dash: [5, 5]
-    };
-    this.plot(plots, "renderLine", style);
     plots.length = 0;
     this.Timeline.smoothScrollOffset || 0;
     const plot = {
       w: width,
     };
+    let t = range.value(range.indexStart)[0];
+    let s = this.overlay.data[0][0];
+    let c = (t - s) / range.interval;
     let o = this.Timeline.rangeScrollOffset;
-    let d = range.data.length - this.overlay.data.length;
-    let c = range.indexStart - d - 2;
-    let i = range.Length + (o * 2) + 2;
+    let i = range.Length + o + 2;
+    let style = {};
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
-        plots.push({x: null, y: null});
+        plots.lower.push({x: null, y: null});
+        plots.middle.push({x: null, y: null});
+        plots.upper.push({x: null, y: null});
       }
       else {
         plot.x = this.xAxis.xPos(data[c][0]);
-        plot.y = this.yAxis.yPos(100 - data[c][1]);
-        plots.push({...plot});
+        plot.y = this.yAxis.yPos(data[c][1][0]);
+        plots.lower.push({...plot});
+        plot.x = this.xAxis.xPos(data[c][0]);
+        plot.y = this.yAxis.yPos(data[c][1][1]);
+        plots.middle.push({...plot});
+        plot.x = this.xAxis.xPos(data[c][0]);
+        plot.y = this.yAxis.yPos(data[c][1][2]);
+        plots.upper.push({...plot});
       }
       c++;
       i--;
     }
-    this.plot(plots, "renderLine", this.style);
+    style = {
+      lineWidth: this.style.lowerLineWidth,
+      strokeStyle: this.style.lowerStrokeStyle,
+      lineDash: this.style.lowerLineDash
+    };
+    this.plot(plots.lower, "renderLine", style);
+    style = {
+      lineWidth: this.style.middleLineWidth,
+      strokeStyle: this.style.middleStrokeStyle,
+      lineDash: this.style.middleLineDash
+    };
+    this.plot(plots.middle, "renderLine", style);
+    style = {
+      lineWidth: this.style.upperLineWidth,
+      strokeStyle: this.style.upperStrokeStyle,
+      lineDash: this.style.upperLineDash
+    };
+    this.plot(plots.upper, "renderLine", style);
     this.target.viewport.render();
   }
 }
 
 class DMI extends indicator {
-  #ID
-  #name = 'Directional Movement Index'
-  #shortName = 'DMI'
-  #params
-  #onChart = false
-  #precision = 2
-  #calcParams = [20]
-  #checkParamCount = false
-  #scaleOverlay = true
-  #plots = [
-    { key: 'DMI_1', title: ' ', type: 'line' },
-  ]
+  name = 'Directional Movement Index'
+  shortName = 'DMI'
+  libName = null
+  definition = {
+    input: {
+    },
+    output: {
+    },
+  }
   #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1',
@@ -2492,76 +2812,32 @@ class DMI extends indicator {
     lowStrokeStyle: "#848",
     highLowRangeStyle: "#22002220"
   }
-  #style = {}
+  precision = 2
+  onChart = false
+  scaleOverlay = true
+  plots = [
+    { key: 'DMI_1', title: ' ', type: 'line' },
+  ]
   static scale = YAXIS_TYPES$1[1]
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
     super(target, xAxis, yAxis, config, parent, params);
     const overlay = params.overlay;
-    this.#ID = params.overlay?.id || uid(this.#shortName);
-    this.#params = params;
-    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams;
-        this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
+    this.ID = params.overlay?.id || uid(this.shortName);
+    this.defineIndicator(overlay?.settings, ADX);
+    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
+    this.calcIndicatorHistory();
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.UpdateValue(value); };
   }
-  get ID() { return this.#ID }
-  get name() { return this.#name }
-  get shortName() { return this.#shortName }
-  get onChart() { return this.#onChart }
-  get plots() { return this.#plots }
-  addLegend() {
-    let legend = {
-      id: this.#shortName,
-      title: this.#shortName,
-      type: this.#shortName,
-      source: this.legendInputs.bind(this)
-    };
-    this.chart.legend.add(legend);
-  }
-  legendInputs(pos=this.chart.cursorPos, candle) {
+  legendInputs(pos=this.chart.cursorPos) {
+    if (this.overlay.data.length == 0) return false
     const inputs = {};
-    const index = this.Timeline.xPos2Index(pos[0]);
-    let c = index  - (this.range.data.length - this.overlay.data.length);
-    let colours = [this.style.strokeStyle];
-    c = limit(c, 0, this.overlay.data.length - 1);
+    const {c, colours} = super.legendInputs(pos);
     inputs.DMI_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
     return {inputs, colours}
   }
-  regeneratePlots (params) {
-    return params.map((_, index) => {
-      const num = index + 1;
-      return { key: `dmi${num}`, title: `DMI${num}: `, type: 'line' }
-    })
-  }
- newValue (value) {
-   let p = this.TALibParams();
-   if (!p) return false
-   let v = this.calcIndicatorStream(this.#shortName, this.TALibParams());
-   if (!v) return false
-   this.overlay.data.push([v[0], v[1]]);
-   this.target.setPosition(this.core.scrollPos, 0);
-   this.draw(this.range);
- }
- UpdateValue (value) {
-   let l = this.overlay.data.length - 1;
-   let p = this.TALibParams();
-   if (!p) return false
-   let v = this.calcIndicatorStream(this.#shortName, p);
-   if (!v) return false
-   this.overlay.data[l] = [v[0], v[1]];
-   this.target.setPosition(this.core.scrollPos, 0);
-   this.draw(this.range);
- }
- TALibParams() {
-   let end = this.range.dataLength;
-   let step = this.calcParams[0];
-   let start = end - step;
-   let input = this.indicatorInput(start, end);
-   let hasNull = input.find(element => element === null);
-   if (hasNull) return false
-   else return { inReal: input, timePeriod: step }
- }
-  draw(range) {
+  draw(range=this.range) {
+    if (this.overlay.data.length < 2 ) return false
     this.scene.clear();
     const data = this.overlay.data;
     const width = this.xAxis.candleW;
@@ -2604,7 +2880,7 @@ class DMI extends indicator {
       }
       else {
         plot.x = this.xAxis.xPos(data[c][0]);
-        plot.y = this.yAxis.yPos(100 - data[c][1]);
+        plot.y = this.yAxis.yPos(data[c][1]);
         plots.push({...plot});
       }
       c++;
@@ -2615,28 +2891,30 @@ class DMI extends indicator {
   }
 }
 
-const calcParams$3 = [20];
- class EMA extends indicator {
-  #ID
-  #name ='Exponential Moving Average'
-  #shortName = 'EMA'
-  #params
-  #onChart = true
-  #series = 'price'
-  #precision = 2
-  #calcParams = [6, 12, 20]
-  #checkParamCount = false
-  #scaleOverlay = false
-  #plots = [
-    { key: 'ema6', title: 'EMA6: ', type: 'line' },
-    { key: 'ema12', title: 'EMA12: ', type: 'line' },
-    { key: 'ema20', title: 'EMA20: ', type: 'line' }
-  ]
+class EMA extends indicator {
+  name = 'Exponential Moving Average'
+  shortName = 'EMA'
+  libName = 'EMA'
+  definition = {
+    input: {
+      inReal: [],
+      timePeriod: 20
+    },
+    output: {
+      output: [],
+    },
+  }
   #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1'
   }
-  #style = {}
+  precision = 2
+  onChart = true
+  checkParamCount = false
+  scaleOverlay = false
+  plots = [
+    { key: 'EMA_1', title: 'EMA: ', type: 'line' },
+  ]
   static inCnt = 0
   static scale = YAXIS_TYPES$1[0]
   static colours = [
@@ -2649,75 +2927,26 @@ const calcParams$3 = [20];
     super(target, xAxis, yAxis, config, parent, params);
     EMA.inCnt++;
     const overlay = params.overlay;
-    this.#ID = params.overlay?.id || uid(this.#shortName);
-    this.#params = params;
-    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams$3;
-        this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
+    this.ID = params.overlay?.id || uid(this.shortName);
+    this.defineIndicator(overlay?.settings, EMA$1);
+    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
+    this.calcIndicatorHistory();
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.UpdateValue(value); };
     this.addLegend();
   }
-  get ID() { return this.#ID }
-  get name() { return this.#name }
-  get shortName() { return this.#shortName }
-  get onChart() { return this.#onChart }
-  get plots() { return this.#plots }
-  addLegend() {
-    let legend = {
-      id: this.#shortName,
-      title: this.#shortName,
-      type: this.#shortName,
-      source: this.legendInputs.bind(this)
-    };
-    this.chart.legend.add(legend);
-  }
   updateLegend() {
     this.parent.legend.update();
   }
-  legendInputs(pos=this.chart.cursorPos, candle) {
+  legendInputs(pos=this.chart.cursorPos) {
+    if (this.overlay.data.length == 0) return false
     const inputs = {};
-    const index = this.Timeline.xPos2Index(pos[0]);
-    let c = index  - (this.range.data.length - this.overlay.data.length);
-    let colours = [this.style.strokeStyle];
-    c = limit$1(c, 0, this.overlay.data.length - 1);
+    const {c, colours} = super.legendInputs(pos);
     inputs.EMA_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
     return {inputs, colours}
   }
-  regeneratePlots (params) {
-    return params.map((_, index) => {
-      const num = index + 1;
-      return { key: `ema${num}`, title: `EMA${num}: `, type: 'line' }
-    })
-  }
-    newValue (value) {
-    let p = this.TALibParams();
-    if (!p) return false
-    let v = this.calcIndicatorStream(this.#shortName, this.TALibParams());
-    if (!v) return false
-    this.overlay.data.push([v[0], v[1]]);
-    this.target.setPosition(this.core.scrollPos, 0);
-    this.draw(this.range);
-  }
-   UpdateValue (value) {
-    let l = this.overlay.data.length - 1;
-    let p = this.TALibParams();
-    if (!p) return false
-    let v = this.calcIndicatorStream(this.#shortName, p);
-    if (!v) return false
-    this.overlay.data[l] = [v[0], v[1]];
-    this.target.setPosition(this.core.scrollPos, 0);
-    this.draw(this.range);
-  }
-  TALibParams() {
-    let end = this.range.dataLength;
-    let step = this.calcParams[0];
-    let start = end - step;
-    let input = this.indicatorInput(start, end);
-    let hasNull = input.find(element => element === null);
-    if (hasNull) return false
-    else return { inReal: input, timePeriod: step }
-  }
   draw(range=this.range) {
+    if (this.overlay.data.length < 2 ) return false
     this.scene.clear();
     const data = this.overlay.data;
     const width = this.xAxis.candleW;
@@ -2747,18 +2976,19 @@ const calcParams$3 = [20];
   }
 }
 
-const calcParams$2 = [20];
 class RSI extends indicator {
-  #ID
-  #name = 'Relative Strength Index'
-  #shortName = 'RSI'
-  #params
-  #onChart = false
-  #checkParamCount = false
-  #scaleOverlay = true
-  #plots = [
-    { key: 'RSI_1', title: ' ', type: 'line' },
-  ]
+  name = 'Relative Strength Index'
+  shortName = 'RSI'
+  libName = 'RSI'
+  definition = {
+    input: {
+      inReal: [],
+      timePeriod: 20
+    },
+    output: {
+      output: [],
+    },
+  }
   #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1',
@@ -2770,76 +3000,31 @@ class RSI extends indicator {
     lowStrokeStyle: "#848",
     highLowRangeStyle: "#22002220"
   }
-  #style = {}
+  onChart = false
+  checkParamCount = false
+  plots = [
+    { key: 'RSI_1', title: ' ', type: 'line' },
+  ]
   static scale = YAXIS_TYPES$1[1]
   constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
     super (target, xAxis, yAxis, config, parent, params);
     const overlay = params.overlay;
-    this.#ID = params.overlay?.id || uid(this.#shortName);
-    this.#params = params;
-    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams$2;
-        this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
+    this.ID = params.overlay?.id || uid(this.shortName);
+    this.defineIndicator(overlay?.settings, RSI$1);
+    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
+    this.calcIndicatorHistory();
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.UpdateValue(value); };
   }
-  get ID() { return this.#ID }
-  get name() { return this.#name }
-  get shortName() { return this.#shortName }
-  get onChart() { return this.#onChart }
-  get plots() { return this.#plots }
-  addLegend() {
-    let legend = {
-      id: this.#shortName,
-      title: this.#shortName,
-      type: this.#shortName,
-      source: this.legendInputs.bind(this)
-    };
-    this.chart.legend.add(legend);
-  }
-  legendInputs(pos=this.chart.cursorPos, candle) {
+  legendInputs(pos=this.chart.cursorPos) {
+    if (this.overlay.data.length == 0) return false
     const inputs = {};
-    const index = this.Timeline.xPos2Index(pos[0]);
-    let c = index  - (this.range.data.length - this.overlay.data.length);
-    let colours = [this.style.strokeStyle];
-    c = limit$1(c, 0, this.overlay.data.length - 1);
+    const {c, colours} = super.legendInputs(pos);
     inputs.RSI_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
     return {inputs, colours}
   }
-  regeneratePlots (params) {
-    return params.map((_, index) => {
-      const num = index + 1;
-      return { key: `rsi${num}`, title: `RSI${num}: `, type: 'line' }
-    })
-  }
-  newValue (value) {
-    let p = this.TALibParams();
-    if (!p) return false
-    let v = this.calcIndicatorStream(this.#shortName, this.TALibParams());
-    if (!v) return false
-    this.overlay.data.push([v[0], v[1]]);
-    this.target.setPosition(this.core.scrollPos, 0);
-    this.draw(this.range);
-  }
-  UpdateValue (value) {
-    let l = this.overlay.data.length - 1;
-    let p = this.TALibParams();
-    if (!p) return false
-    let v = this.calcIndicatorStream(this.#shortName, p);
-    if (!v) return false
-    this.overlay.data[l] = [v[0], v[1]];
-    this.target.setPosition(this.core.scrollPos, 0);
-    this.draw(this.range);
-  }
-  TALibParams() {
-    let end = this.range.dataLength;
-    let step = this.calcParams[0];
-    let start = end - step;
-    let input = this.indicatorInput(start, end);
-    let hasNull = input.find(element => element === null);
-    if (hasNull) return false
-    else return { inReal: input, timePeriod: step }
-  }
   draw(range=this.range) {
+    if (this.overlay.data.length < 2 ) return false
     this.scene.clear();
     const data = this.overlay.data;
     const width = this.xAxis.candleW;
@@ -2882,7 +3067,7 @@ class RSI extends indicator {
       }
       else {
         plot.x = this.xAxis.xPos(data[c][0]);
-        plot.y = this.yAxis.yPos(100 - data[c][1]);
+        plot.y = this.yAxis.yPos(data[c][1]);
         plots.push({...plot});
       }
       c++;
@@ -2893,26 +3078,29 @@ class RSI extends indicator {
   }
 }
 
-const calcParams$1 = [20];
- class SMA extends indicator {
-  #ID
-  #name ='Simple Moving Average'
-  #shortName = 'SMA'
-  #params
-  #onChart = true
-  #series = 'price'
-  #precision = 2
-  #calcParams = [6, 12, 20]
-  #checkParamCount = false
-  #scaleOverlay = false
-  #plots = [
-    { key: 'sma6', title: 'SMA6: ', type: 'line' },
-  ]
+class SMA extends indicator {
+  name = 'Simple Moving Average'
+  shortName = 'SMA'
+  libName = 'SMA'
+  definition = {
+    input: {
+      inReal: [],
+      timePeriod: 20
+    },
+    output: {
+      output: [],
+    },
+  }
   #defaultStyle = {
     strokeStyle: "#C80",
     lineWidth: '1'
   }
-  #style = {}
+  #precision = 2
+  onChart = true
+  scaleOverlay = false
+  plots = [
+    { key: 'SMA_1', title: 'SMA: ', type: 'line' },
+  ]
   static inCnt = 0
   static scale = YAXIS_TYPES$1[0]
   static colours = [
@@ -2925,75 +3113,26 @@ const calcParams$1 = [20];
     super(target, xAxis, yAxis, config, parent, params);
     SMA.inCnt++;
     const overlay = params.overlay;
-    this.#ID = params.overlay?.id || uid(this.#shortName);
-    this.#params = params;
-    this.calcParams = (overlay?.settings?.period) ? JSON.parse(overlay.settings.period) : calcParams$1;
-        this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
+    this.ID = params.overlay?.id || uid(this.shortName);
+    this.defineIndicator(overlay?.settings, SMA$1);
+    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
+    this.calcIndicatorHistory();
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.UpdateValue(value); };
     this.addLegend();
   }
-  get ID() { return this.#ID }
-  get name() { return this.#name }
-  get shortName() { return this.#shortName }
-  get onChart() { return this.#onChart }
-  get plots() { return this.#plots }
-  addLegend() {
-    let legend = {
-      id: this.#shortName,
-      title: this.#shortName,
-      type: this.#shortName,
-      source: this.legendInputs.bind(this)
-    };
-    this.chart.legend.add(legend);
-  }
   updateLegend() {
     this.parent.legend.update();
   }
-  legendInputs(pos=this.chart.cursorPos, candle) {
+  legendInputs(pos=this.chart.cursorPos) {
+    if (this.overlay.data.length == 0) return false
     const inputs = {};
-    const index = this.Timeline.xPos2Index(pos[0]);
-    let c = index  - (this.range.data.length - this.overlay.data.length);
-    let colours = [this.style.strokeStyle];
-    c = limit$1(c, 0, this.overlay.data.length - 1);
+    const {c, colours} = super.legendInputs(pos);
     inputs.SMA_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
     return {inputs, colours}
   }
-  regeneratePlots (params) {
-    return params.map((_, index) => {
-      const num = index + 1;
-      return { key: `sma${num}`, title: `SMA${num}: `, type: 'line' }
-    })
-  }
-    newValue (value) {
-    let p = this.TALibParams();
-    if (!p) return false
-    let v = this.calcIndicatorStream(this.#shortName, this.TALibParams());
-    if (!v) return false
-    this.overlay.data.push([v[0], v[1]]);
-    this.target.setPosition(this.core.scrollPos, 0);
-    this.draw(this.range);
-  }
-   UpdateValue (value) {
-    let l = this.overlay.data.length - 1;
-    let p = this.TALibParams();
-    if (!p) return false
-    let v = this.calcIndicatorStream(this.#shortName, p);
-    if (!v) return false
-    this.overlay.data[l] = [v[0], v[1]];
-    this.target.setPosition(this.core.scrollPos, 0);
-    this.draw(this.range);
-  }
-  TALibParams() {
-    let end = this.range.dataLength;
-    let step = this.calcParams[0];
-    let start = end - step;
-    let input = this.indicatorInput(start, end);
-    let hasNull = input.find(element => element === null);
-    if (hasNull) return false
-    else return { inReal: input, timePeriod: step }
-  }
   draw(range=this.range) {
+    if (this.overlay.data.length < 2 ) return false
     this.scene.clear();
     const data = this.overlay.data;
     const width = this.xAxis.candleW;
@@ -3046,7 +3185,7 @@ class Volume extends indicator {
 
 var Indicators = {
   ADX: {id: "ADX", name: "Average Direction", event: "addIndicator"},
-  BB: {id: "BB", name: "Bollinger Bands", event: "addIndicator", ind: DMI$1},
+  BB: {id: "BB", name: "Bollinger Bands", event: "addIndicator", ind: BB},
   DMI: {id: "DMI", name: "Directional Movement", event: "addIndicator", ind: DMI},
   EMA: {id: "EMA", name: "Exponential Moving Average", event: "addIndicator", ind: EMA},
   RSI: {id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: RSI},
@@ -5627,7 +5766,7 @@ class Measure extends Tool {
   }
 }
 
-class Range extends Tool {
+class RangeTool extends Tool {
   constructor(config) {
     super(config);
   }
@@ -5695,7 +5834,7 @@ var tools = [
     name: "Range",
     icon: range,
     event: "tool_activated",
-    class: Range,
+    class: RangeTool,
     sub: [
       {
         id: "rng",
@@ -6296,7 +6435,7 @@ class Slider {
     let h = this.#elHandle.getBoundingClientRect().width;
     let m = w - h;
     let d = e.position.x - this.#sliderPos.x;
-    let p = limit$1(x + d, 0, m);
+    let p = limit(x + d, 0, m);
     let r = (R.dataLength + R.limitFuture + R.limitPast) / w;
     let s = Math.floor(p * r);
     this.setHandleDims(p, h);
@@ -6647,6 +6786,7 @@ class Timeline {
     let pos = ((start + r.limitPast) * ratio);
     this.#slider.setHandleDims(pos, handleW);
   }
+  t2Index(ts) { return this.#xAxis.t2Index(ts) }
   xPos(time) { return this.#xAxis.xPos(time) }
   xPosSnap2CandlePos(x) { return this.#xAxis.xPosSnap2CandlePos(x) }
   xPos2Time(x) { return this.#xAxis.xPos2Time(x) }
@@ -7262,7 +7402,7 @@ class yAxis extends Axis {
         cnt = this.#yAxisDigits - digits.total,
         cnt2 = 4 - digits.integers;
     if (cnt < 1) {
-      let decimals = limit$1(digits.decimals + cnt, 0, 100);
+      let decimals = limit(digits.decimals + cnt, 0, 100);
       value = Number.parseFloat(value).toFixed(decimals);
     }
     else if (cnt2 < 1) {
@@ -7836,7 +7976,7 @@ class chartVolume extends Overlay {
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
     super(target, xAxis=false, yAxis=false, theme, parent, params);
     this.#volumeBar = new VolumeBar(target.scene, theme);
-    this.theme.volume.Height = limit$1(theme?.volume?.Height, 0, 100) || 100;
+    this.theme.volume.Height = limit(theme?.volume?.Height, 0, 100) || 100;
   }
   set position(p) { this.target.setPosition(p[0], p[1]); }
   draw(range=this.core.range) {
@@ -8432,7 +8572,7 @@ class OnChart extends Chart {
   addOverlays(overlays) {
     for (let o of overlays) {
       const config = {fixed: false, required: false};
-      if (o.type in this.core.TALib) {
+      if (o.type in this.core.indicators) {
         config.class = this.core.indicators[o.type].ind;
         config.params = {overlay: o};
         this.#chartOverlays.set(o.name, config);
@@ -8469,7 +8609,7 @@ class OnChart extends Chart {
     let inputs = {};
     let colours = [];
     let index = this.time.xPos2Index(pos[0] - this.core.scrollPos);
-        index = limit$1(index, 0, this.range.data.length - 1);
+        index = limit(index, 0, this.range.data.length - 1);
     let ohlcv = this.range.data[index];
     if (ohlcv[4] >= ohlcv[1]) colours = new Array(5).fill(this.theme.candle.UpWickColour);
     else colours = new Array(5).fill(this.theme.candle.DnWickColour);
@@ -9258,6 +9398,11 @@ class MainPane {
   }
   registerOffCharts(options) {
     if (this.#core.offChart.length === 0) return
+    for (const [i, o] of this.#core.offChart.entries()) {
+      if (o.type in this.core.indicators) continue
+      this.#core.log(`offChart indicator ${this.#core.offChart.type} not added: not supported.`);
+      this.#core.offChart.splice(i, 1);
+    }
     let a = this.#offChartDefaultH * this.#core.offChart.length,
     offChartsH = ( a / Math.log10( a * 2 ) ) / 100,
     rowsH = Math.round(this.rowsH * offChartsH);
@@ -9516,7 +9661,7 @@ class Menu {
     let posR = pos.left + pos.width;
     if (posR > this.#elWidgetsG.offsetWidth) {
       let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width);
-          o = limit$1(o, 0, this.#elWidgetsG.offsetWidth);
+          o = limit(o, 0, this.#elWidgetsG.offsetWidth);
       this.#elMenu.style.left = `${o}px`;
     }
   }
@@ -10051,8 +10196,12 @@ class TradeXchart extends tradeXChart {
   static #cnt = 0
   static #cfg = {}
   static #instances = {}
+  static #talibPromise = null
   static #talibReady = false
+  static #talibError = null
+  static get talibPromise() { return TradeXchart.#talibPromise }
   static get talibReady() { return TradeXchart.#talibReady }
+  static get talibError() { return TradeXchart.#talibError }
   static initErrMsg = `${NAME} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`
   static permittedClassNames =
   ["TradeXchart","Chart","MainPane","OffChart","OnChart",
@@ -10156,20 +10305,17 @@ class TradeXchart extends tradeXChart {
           permittedClassNames:TradeXchart.permittedClassNames,
         };
       }
-      if (!TradeXchart.#talibReady) {
-        (async () => {
-          try {
-            if ((typeof txCfg.talib !== "object") ||
-                (typeof txCfg.talib.init !== "function"))
-                  throw new Error(`${TradeXchart.initErrMsg}`)
-            await txCfg.talib.init("node_modules/talib-web/lib/talib.wasm");
-            TradeXchart.#talibReady = true;
-          } catch (e) {
-            throw new Error(`${TradeXchart.initErrMsg} ${e.message}`)
+      if ((typeof txCfg.talib !== "object") ||
+          (typeof txCfg.talib.init !== "function")) {
+            TradeXchart.#talibReady = false;
+            TradeXchart.#talibError = new Error(`${TradeXchart.initErrMsg}`);
           }
-        })();
-      }
-      return TradeXchart.#cfg
+      if (!TradeXchart.#talibReady && TradeXchart.#talibError === null)
+      TradeXchart.#talibPromise = txCfg.talib.init(txCfg.wasm);
+      TradeXchart.#talibPromise.then(
+          () => { TradeXchart.#talibReady = true; },
+          () => { TradeXchart.#talibReady = false; }
+        );
     }
     static destroy(chart) {
       if (chart.constructor.name === "TradeXchart") {
@@ -10248,6 +10394,8 @@ class TradeXchart extends tradeXChart {
   get indicators() { return this.#indicators }
   get TALib() { return this.#TALib }
   get TALibReady() { return TradeXchart.talibReady }
+  get TALibError() { return TradeXchart.talibError }
+  get TALibPromise() { return TradeXchart.talibPromise }
   get hub() { return this.#hub }
   get candleW() { return this.Timeline.candleW }
   get candlesOnLayer() { return this.Timeline.candlesOnLayer }
@@ -10267,7 +10415,8 @@ class TradeXchart extends tradeXChart {
   set candles(c) { if (isObject(c)) this.#candles = c; }
   get candles() { return this.#candles }
   start(txCfg) {
-    txCfg = {...TradeXchart.create(txCfg), ...txCfg};
+    let initCfg = TradeXchart.create(txCfg);
+    txCfg = {...initCfg, ...txCfg};
     this.logs = (txCfg?.logs) ? txCfg.logs : false;
     this.infos = (txCfg?.infos) ? txCfg.infos : false;
     this.warnings = (txCfg?.warnings) ? txCfg.warnings : false;
@@ -10567,7 +10716,7 @@ class TradeXchart extends tradeXChart {
     this.setRange(start, end);
   }
   getRange(start=0, end=0, config={}) {
-    this.#range = new Range$1(this.allData, start, end, config);
+    this.#range = new Range(this.allData, start, end, config);
     this.#range.interval = this.#time.timeFrameMS;
     this.#range.intervalStr = this.#time.timeFrame;
     this.#time.range = this.#range;
@@ -10580,7 +10729,7 @@ class TradeXchart extends tradeXChart {
   jumpToIndex(start, nearest=true, centre=true) {
     let length = this.range.Length;
     let end = start + length;
-    if (nearest) start = limit$1(start, 0, this.range.dataLength);
+    if (nearest) start = limit(start, 0, this.range.dataLength);
     if (centre) {
       start -= length / 2;
       end -= length / 2;
