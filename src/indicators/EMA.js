@@ -1,7 +1,6 @@
 // EMA.js
-/**
- * EMA
- */
+// https://hackape.github.io/talib.js/modules/_index_.html#ema
+
 import indicator from "../components/overlays/indicator"
 import { EMA as talibAPI } from "./talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";

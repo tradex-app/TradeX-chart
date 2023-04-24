@@ -1,6 +1,6 @@
 // BB.js
 // Bollinger Bands
-// 
+// https://hackape.github.io/talib.js/modules/_index_.html#bbands
 
 import indicator from "../components/overlays/indicator"
 import { BBANDS as talibAPI } from "./talib-api";
@@ -78,10 +78,17 @@ export default class BB extends indicator {
     if (this.overlay.data.length == 0) return false
 
     const inputs = {}
-    const {c, colours} = super.legendInputs(pos)
-    inputs.BB_1 = this.Scale.nicePrice(this.overlay.data[c][1])
-
-    return {inputs, colours}
+      let labels = [false, false, false]
+      let {c, colours} = super.legendInputs(pos)
+    inputs.Hi = this.Scale.nicePrice(this.overlay.data[c][1][0])
+    inputs.Mid = this.Scale.nicePrice(this.overlay.data[c][1][1])
+    inputs.Lo = this.Scale.nicePrice(this.overlay.data[c][1][2])
+    colours = [
+      this.style.upperStrokeStyle,
+      this.style.middleStrokeStyle,
+      this.style.lowerStrokeStyle
+    ]
+    return {inputs, colours, labels}
   }
 
   draw(range=this.range) {

@@ -1,6 +1,8 @@
 // inidicators.js
 // exports the list of default indicators 
 // the list can be extended / merged with a custom list on chart start()
+// Docs - https://hackape.github.io/talib.js/modules/_index_.html
+
 
 import BB from "../indicators/BB"
 import DMI from "../indicators/DMI"

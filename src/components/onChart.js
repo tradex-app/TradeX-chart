@@ -246,6 +246,7 @@ export default class OnChart extends Chart {
         pos = this.cursorPos
     let inputs = {}
     let colours = []
+    let labels = [true, true, true, true, true]
     let index = this.time.xPos2Index(pos[0] - this.core.scrollPos)
         index = limit(index, 0, this.range.data.length - 1)
     let ohlcv = this.range.data[index]
@@ -260,7 +261,7 @@ export default class OnChart extends Chart {
     inputs.C = this.scale.nicePrice(ohlcv[4])
     inputs.V = this.scale.nicePrice(ohlcv[5])
 
-    return {inputs, colours}
+    return {inputs, colours, labels}
   }
 
 }

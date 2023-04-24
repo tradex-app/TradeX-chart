@@ -1,12 +1,42 @@
 # Change Log
 
-## [0.117.8] - 2023-04-06
+## [0.120.1] - 2023-04-23
+
+Added
+
+* Legends - optional labels
+
+Fixed
+
+* Indicator - Bollinger Bands - legend
+
+## [0.120.0] - 2023-04-23
+
+Added
+
+* Indicator - calculate back history on start if not provided in the config state
+* TALib - async ready status now implemented
+* TALib - function input output definitions to ensure correct data in / out
+* Indicators - can use TALib input output definitions
+
+Fixed
+
+* Indicators - fixed range pointers for back history and live price stream
+* Indicators - BB, DMI, EMA, RSI, SMA - data length check on draw()
+
+## [0.119.0] - 2023-04-07
+
+Added
+
+* User Defined Chart Alerts - invoked via API or config
+
+## [0.118.0] - 2023-04-10
 
 Changed
 
 * Refactored onChart and offChart code out to chart parent class
 
-FIXED
+Fixed
 
 * Y Scale grads sync to current range
 * Y Scale price line default width
