@@ -64,6 +64,8 @@ export default class OnChart extends Chart {
   get onChart() { return this.#onChart }
   set priceDigits(digits) { this.setYAxisDigits(digits) }
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
+  get indicators() { return this.#chartOverlays }
+
 
   init(options) {
 

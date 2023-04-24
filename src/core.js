@@ -273,6 +273,7 @@ export default class TradeXchart extends Tradex_chart {
   get Timeline() { return this.#MainPane.time }
   get WidgetsG() { return this.#WidgetsG }
   get Chart() { return this.#MainPane.chart }
+  get Indicators() { return this.#MainPane.indicators }
 
   get state() { return this.#state }
   get chartData() { return this.#state.data.chart.data }
@@ -870,9 +871,18 @@ export default class TradeXchart extends Tradex_chart {
 
     let i, j, p=0, start, end;
     const data = this.allData.data
-    const mData = merge?.data
+    const mData = merge?.data || false
+    const onChart = this.allData?.onChart
+    const mOnChart = merge?.onChart || false
+    const offChart = this.allData?.offChart
+    const mOffChart = merge?.offChart || false
+    const dataset = this.allData?.dataset?.data
+    const mDataset = merge?.dataset?.data || false
+    const trades = this.allData?.trades?.data
+    const mTrades = merge?.trades?.data || false
     const inc = (this.range.inRange(mData[0][0])) ? 1 : 0
 
+    // Do we have price data?
     if (isArray(mData) && mData.length > 0) {
       i = mData.length - 1
       j = data.length - 1
@@ -890,7 +900,47 @@ export default class TradeXchart extends Tradex_chart {
         // no overlap, insert the new data
         else {
           this.allData.data.push(...mData)
+
         }
+      }
+    }
+/*
+* chart will ignore any indicators in merge data
+* for sanity reasons, instead will trigger 
+* calculation for merged data for existing indicators
+
+    // Do we have onChart indicators?
+    if (isArray(mOnChart) && mOnChart.length > 0) {
+      for (let o of mOnChart) {
+        // if (o )
+        if (isArray(o?.data) && o?.data.length > 0) {
+
+        }
+      }
+    }
+
+    // Do we have offChart indicators?
+    if (isArray(mOffChart) && mOffChart.length > 0) {
+      for (let o of mOffChart) {
+        if (isArray(o?.data) && o?.data.length > 0) {
+
+        }
+      }
+    }
+*/
+    // Do we have datasets?
+    if (isArray(mDataset) && mDataset.length > 0) {
+      for (let o of mDataset) {
+        if (isArray(o?.data) && o?.data.length > 0) {
+
+        }
+      }
+    }
+
+    // Do we have trades?
+    if (isArray(trades) && trades.length > 0) {
+      for (let d of trades) {
+        
       }
     }
 
@@ -905,6 +955,30 @@ export default class TradeXchart extends Tradex_chart {
         end = this.range.indexEnd + inc
       }
       this.setRange(start, end)
+    }
+  }
+
+  hasStateIndicator(i, dataset="searchAll") {
+    if (!isString(i) || !isString(dataset)) return false
+
+    const find = function(i, d) {
+      for (let e of d) {
+        if (e?.id == i || e.name == i) return true
+        else return false
+      }
+    }
+    let r
+
+    if (dataset == "searchAll") {
+      for (let d of this.allData) {
+        if (find(i, d)) return true
+      }
+      return false
+    }
+    else {
+      if (dataset in this.allData) {
+        return find(i, d)
+      }
     }
   }
 

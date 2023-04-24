@@ -136,6 +136,10 @@ export default class MainPane {
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
   get graph() { return this.#Graph }
+  get indicators() { return {
+    onchart: this.#Chart.indicators,
+    offchart: this.#OffCharts
+  } }
   get elements() {
     return {
       elTarget: this.#elChart,
