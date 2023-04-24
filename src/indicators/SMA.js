@@ -1,3 +1,5 @@
+// SMA.js
+// https://hackape.github.io/talib.js/modules/_index_.html#sma
 /**
  * SMA
  * Simple Moving Average

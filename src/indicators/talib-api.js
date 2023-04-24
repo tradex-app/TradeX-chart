@@ -1,5 +1,7 @@
 
 // talib-api.js
+// JSON - https://github.com/newproplus/talib-web/blob/master-new/src/api.json
+// Docs - https://hackape.github.io/talib.js/modules/_index_.html
 
 export const ACCBANDS = {
   name: "ACCBANDS",

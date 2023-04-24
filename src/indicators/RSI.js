@@ -1,4 +1,5 @@
 // RSI.js
+// https://hackape.github.io/talib.js/modules/_index_.html#rsi
 /**
  * RSI
  * RSI = SUM(MAX(CLOSE - REF(CLOSE,1),0),N) / SUM(ABS(CLOSE - REF(CLOSE,1)),N) × 100

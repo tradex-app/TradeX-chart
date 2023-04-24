@@ -1,6 +1,6 @@
 // BB.js
 // Bollinger Bands
-// 
+// https://hackape.github.io/talib.js/modules/_index_.html#bbands
 
 import indicator from "../components/overlays/indicator"
 import { BBANDS as talibAPI } from "./talib-api";
