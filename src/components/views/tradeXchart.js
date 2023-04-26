@@ -15,7 +15,8 @@ import {
   TIMEH,
   SCALEW,
   CHART_MINH, 
-  CHART_MINW, 
+  CHART_MINW,
+  TX_MINH
 } from "../../definitions/style"
 import {
   GlobalStyle, GridStyle, XAxisStyle, YAxisStyle
@@ -82,6 +83,7 @@ export default class tradeXChart extends element {
       this.doInit = false
       this.shadowRoot.appendChild(this.#template.content.cloneNode(true))
       this.style.display = "block"
+      this.style.minHeight = TX_MINH
 
       this.elWidgetsG = this.shadowRoot.querySelector('tradex-widgets')
       this.elUtils = this.shadowRoot.querySelector('tradex-utils')
@@ -264,6 +266,7 @@ export default class tradeXChart extends element {
         this.elUtils.style.display = "none"
         this.elUtils.style.height =`0px`;
         this.elBody.style.height = `100%`
+        this.elBody.style.minHeight = `${CHART_MINH}px`
         break;
       case "top":
       default:
@@ -272,6 +275,7 @@ export default class tradeXChart extends element {
         this.elUtils.style.display = "block"
         this.elUtils.style.height =`${UTILSH}px`;
         this.elBody.style.height = `calc(100% - ${UTILSH}px)`
+        this.elBody.style.minHeight = `${CHART_MINH - UTILSH}px`
     }
   }
 }

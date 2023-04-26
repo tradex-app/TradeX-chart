@@ -887,8 +887,10 @@ export default class TradeXchart extends Tradex_chart {
       i = mData.length - 1
       j = data.length - 1
 
-      if (data.length == 0) this.allData.data.push(...mData)
-      if (calc) this.calcAllIndicators()
+      if (data.length == 0) {
+        this.allData.data.push(...mData)
+        if (calc) this.calcAllIndicators()
+      }
       else {
         const r1 = [data[0][0], data[j][0]]
         const r2 = [mData[0][0], mData[i][0]]

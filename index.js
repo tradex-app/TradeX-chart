@@ -628,6 +628,12 @@ function once (chart) {
 
 }
 
+function h($,p,c) {console.log(`alert`,$,p[4],c[4])} 
+
+function alertTest ($, p, c) {
+  if ($ > p[4] && $ < c[4]) return true
+  else return false
+}
 
 // Add some charts
 
@@ -637,11 +643,6 @@ addChart()
 addChart()
 addChart()
 
-function h($,p,c) {console.log(`alert`,$,p[4],c[4])} 
-
-function alertTest ($, p, c) {
-  if ($ > p[4] && $ < c[4]) return true
-  else return false
-}
+// add an alert
 
 window.chart1.stream.alerts.add(13010, alertTest, h)

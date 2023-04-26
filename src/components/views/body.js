@@ -11,6 +11,7 @@ import {
   TOOLSW,
   TIMEH,
   SCALEW,
+  CHART_MINH,
 } from "../../definitions/style"
 import {
   GlobalStyle
