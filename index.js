@@ -462,6 +462,7 @@ function addChart() {
       window["chart"+chart.inCnt] = chart
 
   if (typeof chart?.stream?.start === "function") {
+    // chart is ready and waiting for a websocket stream
     chart.stream.start()
     if (typeof stream === "function") stream(chart)
   }

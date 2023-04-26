@@ -79,7 +79,7 @@ export default class indicator extends Overlay {
   get indicator() { return this.#indicator }
   get TALib() { return this.#TALib }
   get range() { return this.core.range }
-  set setNewValue(cb) { this.#newValueCB = cb}
+  set setNewValue(cb) { this.#newValueCB = cb }
   set setUpdateValue(cb) { this.#updateValueCB = cb }
   set precision(p) { this.#precision = p }
   get precision() { return this.#precision }

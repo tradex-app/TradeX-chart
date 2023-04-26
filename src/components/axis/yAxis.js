@@ -296,7 +296,7 @@ export default class yAxis extends Axis {
     }
 
     // remove first or last grads if too close to the edge
-    if (this.#mode !== "manual") {
+    if (this.#mode !== "manual" && scaleGrads.length !== 0) {
 
       const theme = this.core.theme.yAxis
       if (scaleGrads.slice(-1)[0][1] <= theme.fontSize * 0.1) {

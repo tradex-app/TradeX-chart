@@ -2,10 +2,10 @@
  * Global
  */
 
-export const CHART_MINH = 400
-export const CHART_MINW = 500
-export const TX_MINW = "400px"
-export const TX_MINH = "300px"
+export const CHART_MINH = 300
+export const CHART_MINW = 400
+export const TX_MINW = `${CHART_MINW}px`
+export const TX_MINH = `${CHART_MINH}px`
 export const TX_MAXW = "100%"
 export const TX_MAXH = "100%"
 export const UTILSH = 35

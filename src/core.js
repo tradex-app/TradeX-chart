@@ -15,7 +15,7 @@ import Stream from './helpers/stream'
 import Theme from "./helpers/theme"
 import WebWorker from "./helpers/webWorkers"
 import Indicators from './definitions/indicators'
-import style, { CHART_MINH, CHART_MINW, cssVars, TOOLSW } from './definitions/style'
+import style, { CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH } from './definitions/style'
 import Tradex_chart from "./components/views/tradeXchart"
 import UtilsBar from './components/utils'
 import ToolsBar from './components/tools'
@@ -101,10 +101,10 @@ export default class TradeXchart extends Tradex_chart {
   chartTxtColour = GlobalStyle.COLOUR_TXT
   chartBorderColour = GlobalStyle.COLOUR_BORDER
 
-  utilsH = 35
-  toolsW = 40
-  timeH  = 50
-  scaleW = 60
+  utilsH = UTILSH
+  toolsW = TOOLSW
+  timeH  = TIMEH
+  scaleW = SCALEW
 
   #UtilsBar
   #ToolsBar
@@ -866,7 +866,7 @@ export default class TradeXchart extends Tradex_chart {
    */
   // TODO: merge indicator data?
   // TODO: merge dataset?
-  mergeData(merge, newRange=false) {
+  mergeData(merge, newRange=false, calc=true) {
     if (!isObject(merge)) return false
 
     let i, j, p=0, start, end;
@@ -888,6 +888,7 @@ export default class TradeXchart extends Tradex_chart {
       j = data.length - 1
 
       if (data.length == 0) this.allData.data.push(...mData)
+      if (calc) this.calcAllIndicators()
       else {
         const r1 = [data[0][0], data[j][0]]
         const r2 = [mData[0][0], mData[i][0]]
@@ -900,8 +901,7 @@ export default class TradeXchart extends Tradex_chart {
         // no overlap, insert the new data
         else {
           this.allData.data.push(...mData)
-
-        }
+          if (calc) this.calcAllIndicators()
       }
     }
 /*
@@ -955,6 +955,17 @@ export default class TradeXchart extends Tradex_chart {
         end = this.range.indexEnd + inc
       }
       this.setRange(start, end)
+    }
+  }
+
+  }
+
+  calcAllIndicators() {
+    for (let i of this.Indicators.onchart.values()) {
+      i.instance.calcIndicatorHistory()
+    }
+    for (let i of this.Indicators.offchart.values()) {
+      i.instance.calcIndicatorHistory()
     }
   }
 

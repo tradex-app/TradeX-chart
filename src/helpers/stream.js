@@ -197,7 +197,7 @@ export default class Stream {
       data.c, 
       data.v, 
       null, true]
-    this.#core.mergeData({data: [this.#candle]}, true)
+    this.#core.mergeData({data: [this.#candle]}, true, false)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
     this.#countDownMS = this.#time.timeFrameMS
     this.#countDownStart = this.roundTime(Date.now())
