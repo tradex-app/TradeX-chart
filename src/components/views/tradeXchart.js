@@ -31,7 +31,7 @@ const HTML = `
     tradex-body {
       position: relative;
       height: calc(100% - ${UTILSH}px); 
-      min-height: ${CHART_MINH - UTILSH}px,
+      min-height: ${CHART_MINH - UTILSH}px;
       width: 100%;
     }
     tradex-widgets {

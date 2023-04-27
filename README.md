@@ -1,3 +1,9 @@
+# README
+
+## WIP - under heavy development - NOT production ready
+
+TradeX-chart is a highly customizable stock trade chart with **one** dependency written in plain JavaScript; use it with any framework or backend.
+
 <div align="center">
 
 [![Version](https://badgen.net/npm/v/tradex-chart)](https://www.npmjs.com/package/tradex-chart)
@@ -6,13 +12,7 @@
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/tradex-app/TradeX-chart)
 [![NPM](https://badgen.net/badge/icon/npm?icon=npm&label)](https://www.npmjs.com/package/tradex-chart)
 
-</div>
-
-# README
-
-## WIP - under heavy development - NOT production ready
-
-TradeX-chart is a trade chart written in plain (vanilla) JavaScript with **one** dependency only; use it with any framework or backend. Customize and theme the chart any way to match your website or app.
+</div>S
 
 ![](assets/EMA.png)
 
