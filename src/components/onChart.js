@@ -183,7 +183,10 @@ export default class OnChart extends Chart {
       const config = {fixed: false, required: false}
       if (o.type in this.core.indicators) {
         config.class = this.core.indicators[o.type].ind
-        config.params = {overlay: o}
+        config.params = {
+          overlay: o,
+          params: this.core.indicators[o.type]?.parmas
+        }
         this.#chartOverlays.set(o.name, config)
       }
     }

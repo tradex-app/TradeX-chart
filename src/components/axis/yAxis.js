@@ -296,17 +296,17 @@ export default class yAxis extends Axis {
     }
 
     // remove first or last grads if too close to the edge
-    if (this.#mode !== "manual" && scaleGrads.length !== 0) {
+    // if (this.#mode !== "manual" && scaleGrads.length !== 0) {
 
-      const theme = this.core.theme.yAxis
-      if (scaleGrads.slice(-1)[0][1] <= theme.fontSize * 0.1) {
-        scaleGrads.pop()
-      }
+    //   const theme = this.core.theme.yAxis
+    //   if (scaleGrads.slice(-1)[0][1] <= theme.fontSize * 0.1) {
+    //     scaleGrads.pop()
+    //   }
 
-      if (scaleGrads[0][1] >= this.height - (theme.fontSize * 0.1)) {
-        scaleGrads.shift()
-      }
-    }
+    //   if (scaleGrads[0][1] >= this.height - (theme.fontSize * 0.1)) {
+    //     scaleGrads.shift()
+    //   }
+    // }
 
     return scaleGrads
   }

@@ -26,6 +26,7 @@ export default class OffChart extends Chart {
   #ID
   #offChartID
   #Indicator
+  #IndicatorParams
   #overlay
   #Divider
 
@@ -69,6 +70,7 @@ export default class OffChart extends Chart {
     opts.chart = this
     opts.elScale = this.elScale
     this.#Indicator = this.core.indicators[this.#overlay.type].ind
+    this.#IndicatorParams = this.core.indicators[this.#overlay.type]?.params
     opts.yAxisType = this.#Indicator.scale
     this.scale = new ScaleBar(this.core, opts)
     this.time = this.core.Timeline
