@@ -580,7 +580,6 @@ export default class MainPane {
   }
 
   addIndicator(ind) {
-    console.log(`Add the ${ind} indicator`)
 
     // final indicator object
     const indicator = this.#indicators[ind].ind
@@ -592,7 +591,6 @@ export default class MainPane {
     // this.addOffChart(instance.overlay.data, options, api)
     // 
 
-    this.emit("addIndicatorDone", indicator)
   }
 
   scaleNode(type) {

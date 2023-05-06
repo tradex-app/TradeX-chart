@@ -87,6 +87,11 @@ export default class indicator extends Overlay {
   get style() { return this.#style }
   set position(p) { this.target.setPosition(p[0], p[1]) }
 
+  /**
+   * process candle value
+   * data - [timestamp, open, high, low, close, volume]
+   * @memberof indicator
+   */
   set value(data) {
     // round time to nearest current time unit
     const tfms = this.core.time.timeFrameMS
@@ -129,9 +134,14 @@ export default class indicator extends Overlay {
 
   onStreamNewValue(value) {
     // this.value = value
-    console.log("onStreamNewValue(value):",value)
+    // console.log("onStreamNewValue(value):",value)
   }
 
+  /**
+   * process new candle stream value
+   * @param {array} candle - [timestamp, open, high, low, close, volume]
+   * @memberof Indicator
+   */
   onStreamUpdate(candle) {
     // console.log("onStreamUpdate(candle):", candle)
     this.value = candle
@@ -180,7 +190,6 @@ export default class indicator extends Overlay {
 
   /**
    * return index from cursor position and colours
-   *
    * @param {array} [pos=this.chart.cursorPos]
    * @return {object}  
    * @memberof indicator
@@ -245,7 +254,7 @@ export default class indicator extends Overlay {
     let start, end;
     let p = params.timePeriod
 
-    // is it the Range instance?
+    // is it a Range instance?
     if (range.constructor.name == "Range") {
       start = 0
       end = range.dataLength - p + 1
@@ -291,20 +300,20 @@ export default class indicator extends Overlay {
    * @memberof indicator
    */
   calcIndicatorHistory () {
-
+    // if overlay history is missing, calculate it
     if (this.overlay.data.length < this.definition.input.timePeriod) {
-      let data 
-      
-      if (this.core.TALibReady) {
+      let data;
+      const calc = () => {
         data = this.calcIndicator(this.libName, this.definition.input, this.range);
         if (data) this.overlay.data = data
       }
+      
+      if (this.core.TALibReady) {
+        calc()
+      }
       else if (isPromise(this.core.TALibPromise))
         this.core.TALibPromise.then(
-          () => { 
-            data = this.calcIndicator(this.libName, this.definition.input, this.range);
-            if (data) this.overlay.data = data
-          },
+          calc(),
           (e) => { this.core.error(e) }
         )
     } 
@@ -361,7 +370,7 @@ export default class indicator extends Overlay {
    * @param {array} value - current stream candle 
    * @memberof indicator
    */
-  UpdateValue (value) {
+  updateValue (value) {
     let l = this.overlay.data.length - 1
     let p = this.TALibParams()
     if (!p) return false

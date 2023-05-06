@@ -536,7 +536,6 @@ export default class TradeXchart extends Tradex_chart {
   props() {
     return {
       // id: (id) => this.setID(id),
-      userClasses: (classes) => this.setUserClasses(classes),
       width: (width) => this.setWidth(width),
       height: (height) => this.setHeight(height),
       widthMin: (width) => this.setWidthMin(width),
@@ -549,7 +548,7 @@ export default class TradeXchart extends Tradex_chart {
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
       rangeStartTS: (rangeStartTS) => this.#rangeStartTS = (isNumber(rangeStartTS)) ? rangeStartTS : undefined,
       rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
-      indicators: (indicators) => this.#indicators = {...Indicators, ...indicators },
+      indicators: (indicators) => this.setIndicators(indicators),
       theme: (theme) => { this.#themeTemp = this.addTheme(theme) },
       stream: (stream) => this.#stream = (isObject(stream)) ? stream : {},
       pricePrecision: (precision) => this.setPricePrecision(precision),
@@ -702,23 +701,6 @@ export default class TradeXchart extends Tradex_chart {
     if (isNumber(pos) && pos <= 0 && pos >= this.bufferPx * -1) this.#scrollPos = pos
     else {
       this.emit("Error", `setScrollPos: not a valid value`)
-    }
-  }
-
-  setUserClasses(c) {
-    if (isString(c)) {
-      let uc = c.split(" ")
-      this.#userClasses = uc
-    }
-    else if (isArray(c)) {
-      this.#userClasses = c
-    }
-    else {
-      this.warn(`Supplied user classes not valid. Expecting type String or Array`)
-    }
-
-    for (let cl of this.#userClasses) {
-      classes.add(cl)
     }
   }
 
@@ -962,15 +944,84 @@ export default class TradeXchart extends Tradex_chart {
 
   }
 
-  calcAllIndicators() {
-    for (let i of this.Indicators.onchart.values()) {
-      i.instance.calcIndicatorHistory()
-    }
-    for (let i of this.Indicators.offchart.values()) {
-      i.instance.calcIndicatorHistory()
-    }
+  /**
+   * validate indicator
+   * @param {class} i - indicator class
+   */
+  isIndicator(i) {
+    if (
+      typeof i === "function" &&
+      // ("ID" in i) &&
+      // isString(i?.name) &&
+      // isString(i?.shortName) &&
+      ("onChart" in i.prototype) &&
+      isFunction(i.prototype?.draw)
+    ) return true
+    else return false
   }
 
+  /**
+   * import indicators
+   * @param {object} i - indicators {id, name, event, ind}
+   * @param {boolean} flush - expunge default indicators
+   * @returns boolean
+   */
+  setIndicators(i, flush=false) {
+    if (!isObject(i)) return false
+    if (flush) {
+      console.warn(`Expunging all default indicators!`)
+      this.#indicators = {}
+    }
+    for (const [k, v] of Object.entries(i)) {
+      if (
+        isString(v?.id) && 
+        isString(v?.name) && 
+        isString(v?.event) && 
+        this.isIndicator(v?.ind)
+      ) {
+        this.#indicators[k] = v
+      }
+    }
+    return true
+  }
+
+  /**
+   * add an indicator - default or registered user defined
+   * @param {string} i - indicator
+   * @param {string} name - identifier
+   * @param {object} params - {settings, data}
+   * @returns 
+   */
+  addIndicator(i, name=i, params={}) {
+    if (
+      !isString(i) &&
+      !(i in this.#indicators) &&
+      !isString(name) &&
+      !isObject(params)
+    ) return false
+    
+    const indicator = {
+      type: i,
+      name: name,
+      ...params
+    }
+
+    console.log(`Adding the ${name} : ${i} indicator`)
+
+    if (this.#indicators[i].ind.prototype.onChart)
+      this.Chart.addIndicator(indicator);
+    else
+      this.#MainPane.addIndicator(indicator);
+
+    this.emit("addIndicatorDone", indicator)
+  }
+
+  /**
+   * Does current chart state have indicator
+   * @param {string} i - indicator id or name
+   * @param {string} dataset 
+   * @returns indicator or false
+   */
   hasStateIndicator(i, dataset="searchAll") {
     if (!isString(i) || !isString(dataset)) return false
 
@@ -992,6 +1043,15 @@ export default class TradeXchart extends Tradex_chart {
       if (dataset in this.allData) {
         return find(i, d)
       }
+    }
+  }
+
+  calcAllIndicators() {
+    for (let i of this.Indicators.onchart.values()) {
+      i.instance.calcIndicatorHistory()
+    }
+    for (let i of this.Indicators.offchart.values()) {
+      i.instance.calcIndicatorHistory()
     }
   }
 

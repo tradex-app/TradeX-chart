@@ -28,17 +28,19 @@ export default class Volume extends indicator {
   }
   #style = {}
 
-  // YAXIS_TYPES - percent
-  static scale = YAXIS_TYPES[1]
+  
+  // static onChart = "both"
+  // static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
 
   /**
    * Creates an instance of Volume.
    * @param {object} target - canvas scene
-   * @param {object} overlay - data for the overlay
-   * @param {instance} xAxis - timeline axis
-   * @param {instance} yAxis - scale axis
+   * @param {object} xAxis - timeline axis instance
+   * @param {object} yAxis - scale axis instance
    * @param {object} config - theme / styling
+   * @param {object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {object} params - contains minimum of overlay instance
    * @memberof Volume
    */
   // constructor (target, overlay, xAxis, yAxis, config) {
@@ -49,5 +51,7 @@ export default class Volume extends indicator {
 
     const overlay = params.overlay
   }
+
+  get onChart() { return "both" }
 
 }

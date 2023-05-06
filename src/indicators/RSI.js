@@ -5,7 +5,7 @@
  * RSI = SUM(MAX(CLOSE - REF(CLOSE,1),0),N) / SUM(ABS(CLOSE - REF(CLOSE,1)),N) × 100
  */
 import indicator from "../components/overlays/indicator"
-import {RSI as talibAPI } from "./talib-api";
+import {RSI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { limit, round } from "../utils/number";
 import { isArray } from "../utils/typeChecks";
@@ -43,23 +43,24 @@ export default class RSI extends indicator {
     lowStrokeStyle: "#848",
     highLowRangeStyle: "#22002220"
   }
-  onChart = false
   checkParamCount = false
   plots = [
     { key: 'RSI_1', title: ' ', type: 'line' },
   ]
 
-  // YAXIS_TYPES - percent
-  static scale = YAXIS_TYPES[1]
+
+  // static onChart = false
+  // static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
 
   /**
    * Creates an instance of RSI.
    * @param {object} target - canvas scene
-   * @param {object} overlay - data for the overlay
-   * @param {instance} xAxis - timeline axis
-   * @param {instance} yAxis - scale axis
+   * @param {object} xAxis - timeline axis instance
+   * @param {object} yAxis - scale axis instance
    * @param {object} config - theme / styling
+   * @param {object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {object} params - contains minimum of overlay instance
    * @memberof RSI
    */
   constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
@@ -75,8 +76,10 @@ export default class RSI extends indicator {
     this.calcIndicatorHistory()
     // enable processing of price stream
     this.setNewValue = (value) => { this.newValue(value) }
-    this.setUpdateValue = (value) => { this.UpdateValue(value) }
+    this.setUpdateValue = (value) => { this.updateValue(value) }
   }
+
+  get onChart() { return false }
 
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false

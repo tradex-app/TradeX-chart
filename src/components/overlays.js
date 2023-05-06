@@ -85,25 +85,39 @@ export default class Overlays {
   }
 
   addOverlays(overlays) {
+    let r = [];
+    let s;
     for (let o of overlays) {
-      this.addOverlay(o[0], o[1])
+      s = this.addOverlay(o[0], o[1])
+      r.push([o[0]], s)
     }
+    return r
   }
 
   addOverlay(key, overlay) {
-    const layer = new CEL.Layer(this.layerConfig)
-    this.parent.viewport.addLayer(layer)
+    // try / catch in case user defined custom overlays (indicator) error
+    try {
+      const layer = new CEL.Layer(this.layerConfig)
+      this.parent.viewport.addLayer(layer)
+  
+      overlay.layer = layer
+      overlay.instance = new overlay.class(
+        layer,
+        this.#parent.TimeLine,
+        this.#parent.Scale,
+        this.#core.theme,
+        this,
+        overlay.params
+      )
+      this.#list.set(key, overlay)
+      return true
+    }
+    catch (e) {
+      console.error(`Error: Cannot instantiate ${key} overlay / indicator`)
+      console.error(e)
+      return false
+    }
 
-    overlay.layer = layer
-    overlay.instance = new overlay.class(
-      layer,
-      this.#parent.TimeLine,
-      this.#parent.Scale,
-      this.#core.theme,
-      this,
-      overlay.params
-    )
-    this.#list.set(key, overlay)
   }
 
 }

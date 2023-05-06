@@ -90,7 +90,7 @@ export default class RSI extends indicator {
     this.calcParams = (overlay?.calcParams) ? JSON.parse(overlay.calcParams) : calcParams
         this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
-    this.setUpdateValue = (value) => { this.UpdateValue(value) }
+    this.setUpdateValue = (value) => { this.updateValue(value) }
   }
 
   get ID() { return this.#ID }

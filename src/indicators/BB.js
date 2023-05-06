@@ -3,7 +3,7 @@
 // https://hackape.github.io/talib.js/modules/_index_.html#bbands
 
 import indicator from "../components/overlays/indicator"
-import { BBANDS as talibAPI } from "./talib-api";
+import { BBANDS as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { uid } from "../utils/utilities"
 
@@ -39,22 +39,23 @@ export default class BB extends indicator {
     fillStyle: "#0080c044"
   }
   precision = 2
-  onChart = true
   scaleOverlay = false
   plots = [
     { key: 'BB_1', title: ' ', type: 'line' },
   ]
 
-  // YAXIS_TYPES - default
-  static scale = YAXIS_TYPES[0]
+
+  // static onChart = true
+  // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
 
   /**
  * Creates an instance of DMI.
- * @param {object} target - canvas scene
- * @param {object} overlay - data for the overlay
- * @param {instance} xAxis - timeline axis
- * @param {instance} yAxis - scale axis
- * @param {object} config - theme / styling
+   * @param {object} target - canvas scene
+   * @param {object} xAxis - timeline axis instance
+   * @param {object} yAxis - scale axis instance
+   * @param {object} config - theme / styling
+   * @param {object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {object} params - contains minimum of overlay instance
  * @memberof DMI
  */
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
@@ -70,10 +71,23 @@ export default class BB extends indicator {
     this.calcIndicatorHistory()
     // enable processing of price stream
     this.setNewValue = (value) => { this.newValue(value) }
-    this.setUpdateValue = (value) => { this.UpdateValue(value) }
+    this.setUpdateValue = (value) => { this.updateValue(value) }
     this.addLegend()
   }
 
+  /**
+   * define where indicator should be displayed
+   * valid returned values can be: true, false (boolean), both (string)
+   * @readonly
+   */
+  get onChart() { return true }
+
+  /**
+   * return inputs required to display indicator legend on chart pane
+   * @param {array} [pos=this.chart.cursorPos] - optional
+   * @return {object} - {inputs, colours, labels}
+   * @memberof BB
+   */
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
 

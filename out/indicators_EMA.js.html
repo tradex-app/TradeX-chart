@@ -84,7 +84,7 @@ const calcParams = [20]
     this.calcParams = (overlay?.settings) ? overlay.settings : calcParams
         this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     this.setNewValue = (value) => { this.newValue(value) }
-    this.setUpdateValue = (value) => { this.UpdateValue(value) }
+    this.setUpdateValue = (value) => { this.updateValue(value) }
     this.addLegend()
   }
 

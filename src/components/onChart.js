@@ -42,7 +42,6 @@ export default class OnChart extends Chart {
   #volumePrecision
 
   #layerStream
-  #chartOverlays = new Map()
   #chartStreamCandle
 
   #streamCandle
@@ -64,7 +63,7 @@ export default class OnChart extends Chart {
   get onChart() { return this.#onChart }
   set priceDigits(digits) { this.setYAxisDigits(digits) }
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
-  get indicators() { return this.#chartOverlays }
+  get indicators() { return this.overlays }
 
 
   init(options) {
@@ -185,12 +184,14 @@ export default class OnChart extends Chart {
         config.class = this.core.indicators[o.type].ind
         config.params = {
           overlay: o,
-          params: this.core.indicators[o.type]?.parmas
         }
-        this.#chartOverlays.set(o.name, config)
+        this.overlays.set(o.name, config)
       }
     }
-    this.graph.addOverlays(Array.from(this.#chartOverlays))
+    const r = this.graph.addOverlays(Array.from(this.overlays))
+    for (let o of r) {
+      if (!o[0]) this.overlays.delete(o[0])
+    }
   }
 
   /**

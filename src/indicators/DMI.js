@@ -1,7 +1,7 @@
 // DMI.js
 
 import indicator from "../components/overlays/indicator"
-import { ADX as talibAPI } from "./talib-api";
+import { DX as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { uid } from "../utils/utilities"
 
@@ -9,7 +9,7 @@ import { uid } from "../utils/utilities"
 export default class DMI extends indicator {
 
   name = 'Directional Movement Index'
-  shortName = 'DMI'
+  shortName = 'DX'
   libName = null
   definition = {
     input: {
@@ -31,23 +31,23 @@ export default class DMI extends indicator {
     highLowRangeStyle: "#22002220"
   }
   precision = 2
-  onChart = false
   scaleOverlay = true
   plots = [
     { key: 'DMI_1', title: ' ', type: 'line' },
   ]
 
-  // YAXIS_TYPES - percent
-  static scale = YAXIS_TYPES[1]
+  // static onChart = false
+  // static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
 
   /**
  * Creates an instance of DMI.
- * @param {object} target - canvas scene
- * @param {object} overlay - data for the overlay
- * @param {instance} xAxis - timeline axis
- * @param {instance} yAxis - scale axis
- * @param {object} config - theme / styling
+   * @param {object} target - canvas scene
+   * @param {object} xAxis - timeline axis instance
+   * @param {object} yAxis - scale axis instance
+   * @param {object} config - theme / styling
+   * @param {object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {object} params - contains minimum of overlay instance
  * @memberof DMI
  */
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
@@ -63,8 +63,10 @@ export default class DMI extends indicator {
     this.calcIndicatorHistory()
     // enable processing of price stream
     this.setNewValue = (value) => { this.newValue(value) }
-    this.setUpdateValue = (value) => { this.UpdateValue(value) }
+    this.setUpdateValue = (value) => { this.updateValue(value) }
   }
+
+  get onChart() { return false }
 
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false

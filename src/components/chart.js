@@ -51,6 +51,7 @@ export default class Chart {
   #layerCursor;
   #layersTools = new Map();
 
+  #overlays = new Map()
   #overlayGrid;
   #overlayIndicators = new Map();
   #overlayTools = new Map();
@@ -139,6 +140,7 @@ export default class Chart {
   get graph() { return this.#Graph }
   get viewport() { return this.#Graph.viewport }
   get layerGrid() { return this.#Graph.overlays.get("grid").layer }
+  get overlays() { return this.#overlays }
   get overlayGrid() { return this.#Graph.overlays.get("grid").instance }
   get overlayTools() { return this.#overlayTools }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
@@ -322,8 +324,37 @@ export default class Chart {
     this.core.MainPane.draw(undefined, false)
   }
 
+  /**
+   * set cursor type
+   * @param {string} cursor 
+   */
   setCursor(cursor) {
     this.element.style.cursor = cursor
+  }
+
+  /**
+   * add an indicator
+   * @param {object} i - {type, name, ...[params]}
+   */
+  addIndicator(i) {
+    const onChart = (this.type === "onChart" ) ? true : false;
+    const indClass = this.core.indicators[i.type].ind
+    const indType = (indClass.constructor.type === "both") ? onChart : indClass.prototype.onChart
+    if (
+        i?.type in this.core.indicators &&
+        onChart === indType
+      ) {
+      const config = {
+        class: indClass,
+        params: {overlay: i}
+      }
+      const r = this.graph.addOverlay(i.name, config)
+      if (r) {
+        this.#overlays.set(i.name, config)
+        return true
+      }
+    }
+    else return false
   }
 
   addTool(tool) {

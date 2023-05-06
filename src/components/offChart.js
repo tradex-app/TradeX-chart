@@ -53,6 +53,7 @@ export default class OffChart extends Chart {
 
     this.#ID = this.options.offChartID || uid("TX_OC_")
     this.#overlay = options.offChart
+    this.overlays.set(options.offChart.name, options.offChart)
     this.init(options)
   }
 
@@ -70,7 +71,6 @@ export default class OffChart extends Chart {
     opts.chart = this
     opts.elScale = this.elScale
     this.#Indicator = this.core.indicators[this.#overlay.type].ind
-    this.#IndicatorParams = this.core.indicators[this.#overlay.type]?.params
     opts.yAxisType = this.#Indicator.scale
     this.scale = new ScaleBar(this.core, opts)
     this.time = this.core.Timeline
@@ -130,7 +130,6 @@ export default class OffChart extends Chart {
   }
 
   createGraph() {
-
     const indicator = [this.#overlay.name, {class: this.#Indicator, fixed: false, required: false, params: {overlay: this.#overlay}}]
     const overlays = copyDeep(defaultOverlays)
           overlays.splice(1, 0, indicator)

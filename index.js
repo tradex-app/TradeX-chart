@@ -6,6 +6,7 @@ import state1 from './data/1hour.js'
 import state2 from './data/data_btc_1m.js'
 // import state4 from './data/seconds.js'
 // import state from './data/seconds-indicator'
+import TEST from './custom-indicator'
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
@@ -643,6 +644,10 @@ addChart()
 addChart()
 addChart()
 
+// add custom indicator definition
+chart0.setIndicators({
+  TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST}
+})
+chart0.addIndicator("TEST", "Test1", {data: []})
 // add an alert
-
-window.chart1.stream.alerts.add(13010, alertTest, h)
+chart1.stream.alerts.add(13010, alertTest, h)

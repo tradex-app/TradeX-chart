@@ -118,8 +118,23 @@ export default class graph {
     return {width, height, layerConfig}
   }
 
-  addOverlays(overlays) {
-    this.#overlays.addOverlays(overlays)
+  /**
+   * add an array of overlays to Graph
+   * @param {array} o - array of overlays [[name, config], ...]
+   * @returns array - array of overlay statuses [[name, boolean], ...]
+   */
+  addOverlays(o) {
+    return this.#overlays.addOverlays(o)
+  }
+
+  /**
+   * add a single overlay to Graph
+   * @param {string} key - identifier
+   * @param {object} overlay - {class, params}
+   * @returns boolean
+   */
+  addOverlay(key, overlay) {
+    return this.#overlays.addOverlay(key, overlay)
   }
 
   draw(range=this.range, update=false) {

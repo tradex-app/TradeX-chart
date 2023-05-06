@@ -2,7 +2,7 @@
 // https://hackape.github.io/talib.js/modules/_index_.html#ema
 
 import indicator from "../components/overlays/indicator"
-import { EMA as talibAPI } from "./talib-api";
+import { EMA as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { bRound, limit, round } from "../utils/number";
 import { uid } from "../utils/utilities"
@@ -27,16 +27,16 @@ import { uid } from "../utils/utilities"
     lineWidth: '1'
   }
   precision = 2
-  onChart = true
   checkParamCount = false
   scaleOverlay = false
   plots = [
     { key: 'EMA_1', title: 'EMA: ', type: 'line' },
   ]
 
-  // YAXIS_TYPES - default
+
   static inCnt = 0
-  static scale = YAXIS_TYPES[0]
+  // static onChart = true
+  // static scale = YAXIS_TYPES[0] // defualt
   static colours = [
     "#9C27B0",
     "#9C27B0",
@@ -48,10 +48,11 @@ import { uid } from "../utils/utilities"
   /**
    * Creates an instance of EMA.
    * @param {object} target - canvas scene
-   * @param {object} overlay - data for the overlay
-   * @param {instance} xAxis - timeline axis
-   * @param {instance} yAxis - scale axis
+   * @param {object} xAxis - timeline axis instance
+   * @param {object} yAxis - scale axis instance
    * @param {object} config - theme / styling
+   * @param {object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {object} params - contains minimum of overlay instance
    * @memberof EMA
    */
   constructor(target, xAxis=false, yAxis=false, config, parent, params) {
@@ -68,9 +69,11 @@ import { uid } from "../utils/utilities"
     this.calcIndicatorHistory()
     // enable processing of price stream
     this.setNewValue = (value) => { this.newValue(value) }
-    this.setUpdateValue = (value) => { this.UpdateValue(value) }
+    this.setUpdateValue = (value) => { this.updateValue(value) }
     this.addLegend()
   }
+
+  get onChart() { return true }
 
   updateLegend() {
     this.parent.legend.update()
