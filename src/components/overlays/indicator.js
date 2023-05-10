@@ -2,6 +2,7 @@
 // Base class for on and off chart indicators
 
 import Overlay from "./overlay"
+import { Range } from "../../model/range"
 import { renderFillRect } from "../../renderer/rect"
 import { renderLine } from "../../renderer/line"
 import { limit } from "../../utils/number"
@@ -255,7 +256,7 @@ export default class indicator extends Overlay {
         let p = params.timePeriod
     
         // is it a Range instance?
-        if (range.constructor.name == "Range") {
+        if (range instanceof Range) {
           start = 0
           end = range.dataLength - p + 1
         }
@@ -323,7 +324,7 @@ export default class indicator extends Overlay {
     if (!this.core.TALibReady ||
         !isString(indicator) ||
         !(indicator in this.TALib) ||
-        range.constructor.name !== "Range" ||
+        !(range instanceof Range) ||
         range.dataLength < this.definition.input.timePeriod 
         ) return false
 

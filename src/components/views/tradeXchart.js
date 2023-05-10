@@ -2,6 +2,7 @@
 // <tradex-chart></tradex-chart>
 
 import element from "./classes/element"
+import MainPane from "../main"
 import { debounce } from "../../utils/utilities"
 import { isNumber, isObject, isString } from "../../utils/typeChecks"
 
@@ -170,7 +171,7 @@ export default class tradeXChart extends element {
       console.log(this.offsetWidth)
       console.log(this.offsetHeight)
 
-      if (isObject(this.MainPane) && this.MainPane.constructor.name === "MainPane") {
+      if (isObject(this.MainPane) && this.MainPane instanceof MainPane) {
         this.previousDimensions()
         this.emit("global_resize", {w: this.offsetWidth, h: this.offsetHeight}) 
       }

@@ -77,7 +77,7 @@ export default class Core {
   register(id, newModule, options, api) {
     ++this.#modCnt
     let instance = new Mediator(this, api, newModule, options)
-    if (instance.constructor.name === "Mediator") {
+    if (instance instanceof Mediator) {
       throw new Error(`module failed: ${id}`)
     }
     aspect.before(instance, "start").add(this, "beforeModStart", false, id)

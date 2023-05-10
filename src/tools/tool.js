@@ -89,7 +89,7 @@ export default class Tool {
   }
 
   static destroy(tool) {
-    if (tool.constructor.name === "Tool") {
+    if (tool instanceof Tool) {
       const inCnt = tool.inCnt
       delete Tool.#instances[inCnt]
     }

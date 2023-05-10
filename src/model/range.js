@@ -1,5 +1,6 @@
 // range.js
 
+import TradeXchart from "../core"
 import { ms2Interval } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
 import { isNumber, isObject, isString } from "../utils/typeChecks"
@@ -47,15 +48,15 @@ export class Range {
   constructor( allData, start=0, end=allData.data.length-1, config={}) {
     if (!isObject(allData)) return false
     if (!isObject(config)) return false
-    if (!(config?.core?.constructor.name == "TradeXchart")) return false
+    if (!(config?.core instanceof TradeXchart)) return false
 
-    this.#init = true
-    this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE
-    this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST
-    this.minCandles = (isNumber(this.config?.minCandles)) ? this.config.minCandles : MINCANDLES
-    this.maxCandles = (isNumber(this.config?.maxCandles)) ? this.config.maxCandles : MAXCANDLES
-    this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS
-    this.#core = config.core
+    this.#init = true;
+    this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE;
+    this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST;
+    this.minCandles = (isNumber(this.config?.minCandles)) ? this.config.minCandles : MINCANDLES;
+    this.maxCandles = (isNumber(this.config?.maxCandles)) ? this.config.maxCandles : MAXCANDLES;
+    this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS;
+    this.#core = config.core;
 
     const MaxMinPriceVolStr = `
     (input) => {
@@ -448,7 +449,7 @@ export class Range {
 
   snapshot(start, end) {
     return {
-      constructor: {name: "RangeSnapshot"},
+      snapshot: true,
       ts: Date.now(),
 
       data: this.data,

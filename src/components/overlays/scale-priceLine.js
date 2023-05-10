@@ -1,6 +1,7 @@
 // scale-priceLine.js
 
 import Overlay from "./overlay"
+import Stream from "../../helpers/stream";
 import { STREAM_UPDATE } from "../../definitions/core"
 import { CandleStyle, YAxisStyle } from "../../definitions/style";
 import { createFont, drawTextBG, getTextRectHeight } from "../../utils/canvas"
@@ -26,7 +27,7 @@ export default class ScalePriceLine extends Overlay {
     if (candle === undefined) return
 
     const ctx = this.scene.context
-    const streaming = this.core.stream.constructor.name == "Stream" &&
+    const streaming = this.core.stream instanceof Stream &&
                       this.config.stream.tfCountDown
 
     let price = candle[4],

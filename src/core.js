@@ -215,7 +215,7 @@ export default class TradeXchart extends Tradex_chart {
      * @memberof TradeXchart
      */
     static destroy(chart) {
-      if (chart.constructor.name === "TradeXchart") {
+      if (chart instanceof TradeXchart) {
         chart.end()
         const inCnt = chart.inCnt;
         delete TradeXchart.#instances[inCnt];
@@ -720,7 +720,7 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {instance}
    */
   setStream(stream) {
-    if (this.stream?.constructor.name == "Stream") {
+    if (this.stream instanceof Stream) {
       this.error("Error: Invoke stopStream() before starting a new one.")
       return false
     }
@@ -739,7 +739,7 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   stopStream() {
-    if (this.stream.constructor.name == "Stream") {
+    if (this.stream instanceof Stream) {
       this.stream.stop()
     }
   }
