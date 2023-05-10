@@ -5,6 +5,7 @@ import element from "./classes/element"
 import graph from "./classes/graph"
 import tradeXOverview from "./overview"
 
+// if (window.customElements.get('tradex-overview') !== undefined)
 window.customElements.define('tradex-overview', tradeXOverview)
 
 const template = document.createElement('template')

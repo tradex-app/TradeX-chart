@@ -50,9 +50,11 @@ export default class TradeXchart extends Tradex_chart {
   static #instances = {}
   static #talibPromise = null
   static #talibReady = false
+  static #talibAwait = []
   static #talibError = null
   static get talibPromise() { return TradeXchart.#talibPromise }
   static get talibReady() { return TradeXchart.#talibReady }
+  static get talibAwait() { return TradeXchart.#talibAwait }
   static get talibError() { return TradeXchart.#talibError }
   static initErrMsg = `${NAME} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`
   static permittedClassNames = 
@@ -195,7 +197,13 @@ export default class TradeXchart extends Tradex_chart {
       if (!TradeXchart.#talibReady && TradeXchart.#talibError === null)
       TradeXchart.#talibPromise = txCfg.talib.init(txCfg.wasm)
       TradeXchart.#talibPromise.then(
-          () => { TradeXchart.#talibReady = true },
+          () => { 
+            TradeXchart.#talibReady = true;
+            // process functions waiting for talibReady
+            for (let c of TradeXchart.#talibAwait) {
+              if (isFunction(c)) c()
+            }
+          },
           () => { TradeXchart.#talibReady = false }
         )
     }
@@ -299,6 +307,7 @@ export default class TradeXchart extends Tradex_chart {
   get TALib() { return this.#TALib }
   get TALibReady() { return TradeXchart.talibReady }
   get TALibError() { return TradeXchart.talibError }
+  get talibAwait() { return TradeXchart.talibAwait }
   get TALibPromise() { return TradeXchart.talibPromise }
   get hub() { return this.#hub }
 

@@ -9,7 +9,15 @@ export default class Test extends Indicator {
   name = "Test Custom Inicator"
   shortName = "Test"
 
-  #defaultStyle = {}
+  timePeriod = 20
+
+  #defaultStyle = {
+    strokeStyle: "#0088cc",
+    lineWidth: '1',
+    lineDash: undefined,
+  }
+
+  style = {}
 
   /**
    * Creates an instance of Test.
@@ -48,10 +56,12 @@ export default class Test extends Indicator {
    * return inputs required to display indicator legend on chart pane
    * @return {object} - {inputs, colours, labels}
    */
-  legendInputs() {
+  legendInputs(pos=this.chart.cursorPos) {
+    if (this.overlay.data.length == 0) return false
+
     let labels = [false]
-    let inputs = {x: 0}
-    let colours = ["#ccc"]
+    let {c, colours} = super.legendInputs(pos)
+    let inputs = {x: this.Scale.nicePrice(this.overlay.data[c][1])}
 
     return {inputs, colours, labels}
   }
@@ -65,15 +75,54 @@ export default class Test extends Indicator {
     this.value = candle
   }
 
-  calcIndicatorHistory() {
+  calcIndicator(range=this.range) {
+    let start, end;
+    let p = this.timePeriod
 
+    // is it a Range instance?
+    if (range.constructor.name == "Range") {
+      start = 0
+      end = range.dataLength - p + 1
+    }
+    else if ( "indexStart" in range || "indexEnd" in range ||
+              "tsStart" in range ||  "tsEnd" in range ) {
+      start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0
+      end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1
+      end - p
+    }
+    else return false
+
+    // if not enough data for calculation fail
+    if ( end - start < p ) return false
+
+    let data = [];
+    let i, v, entry;
+
+    while (start < end) {
+      v = 0
+      for (i=0; i<p; i++) {
+        v += this.range.value(start)[4]
+      }
+      v /= p
+      data.push([this.range.value(start + p - 1)[0], v])
+      start++
+    }
+    return data
+  }
+
+  calcIndicatorHistory() {
+    // if overlay history is missing, calculate it
+    if (this.overlay.data.length < this.timePeriod) {
+      const data = this.calcIndicator()
+      if (data) this.overlay.data = data
+    }
   }
   
   /**
    * draw the indicator
    * @param {object} range - current displayed range of candles
    */
-  draw(range) {
+  draw(range=this.range) {
     console.log("draw custom indicator")
 
     // minimum of two candles are required for this indicator
@@ -82,6 +131,39 @@ export default class Test extends Indicator {
     this.scene.clear()
 
     // draw your indicator...
+
+    const plots = []
+    const data = this.overlay.data
+    const width = this.xAxis.candleW
+    const plot = {
+      w: width,
+    }
+    let t = range.value(range.indexStart)[0]
+    let s = this.overlay.data[0][0]
+    let c = (t - s) / range.interval
+    let o = this.Timeline.rangeScrollOffset;
+    let i = range.Length + o + 2
+    let style = {}
+
+    while(i) {
+      if (c < 0 || c >= this.overlay.data.length) {
+        plots.push({x: null, y: null})
+      }
+      else {
+        plot.x = this.xAxis.xPos(data[c][0])
+        plot.y = this.yAxis.yPos(data[c][1])
+        plots.push({...plot})
+      }
+      c++
+      i--
+    }
+
+    // style = {
+    //   lineWidth: this.style.lineWidth, 
+    //   strokeStyle: this.style.strokeStyle, 
+    //   lineDash: this.style.lineDash
+    // }
+    this.plot(plots, "renderLine", this.style)
 
     // render the 
     this.target.viewport.render();

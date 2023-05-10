@@ -9,7 +9,7 @@ import { bRound, limit } from "../utils/number"
 
 export class Range {
 
-  data
+  data = []
   #interval = DEFAULT_TIMEFRAMEMS
   #intervalStr = "1s"
   indexStart = 0
@@ -103,7 +103,7 @@ export class Range {
 
   }
 
-  get dataLength () { return (this.data.length == 0) ? 0 : this.data.length - 1 }
+  get dataLength () { return (this?.data.length == 0) ? 0 : this.data.length - 1 }
   get Length () { return this.indexEnd - this.indexStart }
   get timeDuration () { return this.timeFinish - this.timeStart }
   get timeMin () { return this.value(this.indexStart)[0] }

@@ -114,7 +114,6 @@ export default class BB extends indicator {
     const data = this.overlay.data
     const width = this.xAxis.candleW
     // DMI plot
-    plots.length = 0
     const offset = this.Timeline.smoothScrollOffset || 0
     const plot = {
       w: width,

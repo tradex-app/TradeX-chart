@@ -244,55 +244,54 @@ export default class indicator extends Overlay {
  * @returns {boolean} - success or failure
  */
   calcIndicator (indicator, params={}, range=this.range) {
-    if (!this.core.TALibReady ||
-        !isString(indicator) ||
+    if (!isString(indicator) ||
         !(indicator in this.TALib) ||
-        !isObject(range)
+        !isObject(range) ||
+        !this.core.TALibReady
         ) return false
 
         params.timePeriod = params.timePeriod || this.definition.input.timePeriod;
-    let start, end;
-    let p = params.timePeriod
-
-    // is it a Range instance?
-    if (range.constructor.name == "Range") {
-      start = 0
-      end = range.dataLength - p + 1
-    }
-    else if ( "indexStart" in range || "indexEnd" in range ||
-              "tsStart" in range ||  "tsEnd" in range ) {
-      start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0
-      end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1
-      end - p
-    }
-    else return false
-
-    // if not enough data for calculation fail
-    if ( end - start < p ) return false
-
-    let data = [];
-    let i, v, entry;
-
-
-    while (start < end) {
-
-      params.inReal = this.indicatorInput(start, start + p)
-      // let hasNull = params.inReal.find(element => element === null)
-      // if (hasNull) return false
-
-      entry = this.TALib[indicator](params)
-
-      v = []
-      i = 0
-      for (let o of this.definition.output) {
-        v[i++] = entry[o.name][0]
-      }
-      // store entry with timestamp
-      data.push([this.range.value(start + p - 1)[0], v])
-      start++
-    }
-
-    return data
+        let start, end;
+        let p = params.timePeriod
+    
+        // is it a Range instance?
+        if (range.constructor.name == "Range") {
+          start = 0
+          end = range.dataLength - p + 1
+        }
+        else if ( "indexStart" in range || "indexEnd" in range ||
+                  "tsStart" in range ||  "tsEnd" in range ) {
+          start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0
+          end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1
+          end - p
+        }
+        else return false
+    
+        // if not enough data for calculation fail
+        if ( end - start < p ) return false
+    
+        let data = [];
+        let i, v, entry;
+    
+    
+        while (start < end) {
+    
+          params.inReal = this.indicatorInput(start, start + p)
+          // let hasNull = params.inReal.find(element => element === null)
+          // if (hasNull) return false
+    
+          entry = this.TALib[indicator](params)
+    
+          v = []
+          i = 0
+          for (let o of this.definition.output) {
+            v[i++] = entry[o.name][0]
+          }
+          // store entry with timestamp
+          data.push([this.range.value(start + p - 1)[0], v])
+          start++
+        }
+        return data
   }
 
   /**
@@ -305,17 +304,11 @@ export default class indicator extends Overlay {
       let data;
       const calc = () => {
         data = this.calcIndicator(this.libName, this.definition.input, this.range);
-        if (data) this.overlay.data = data
+        if (data) this.overlay.data = data;
       }
       
-      if (this.core.TALibReady) {
-        calc()
-      }
-      else if (isPromise(this.core.TALibPromise))
-        this.core.TALibPromise.then(
-          calc(),
-          (e) => { this.core.error(e) }
-        )
+      if (this.core.TALibReady) calc()
+      else  this.core.talibAwait.push(calc.bind(this))
     } 
   }
 
