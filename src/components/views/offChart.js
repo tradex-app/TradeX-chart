@@ -61,4 +61,4 @@ export default class tradeXOffChart extends element {
   get legend() { return this.#elLegend }
 }
 
-window.customElements.define('tradex-offchart', tradeXOffChart)
+customElements.get('tradex-offchart') || window.customElements.define('tradex-offchart', tradeXOffChart)

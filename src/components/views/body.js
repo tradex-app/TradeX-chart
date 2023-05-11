@@ -191,4 +191,4 @@ export default class tradeXBody extends element {
   }
 }
 
-window.customElements.define('tradex-body', tradeXBody)
+customElements.get('tradex-body') || window.customElements.define('tradex-body', tradeXBody)

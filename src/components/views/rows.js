@@ -87,4 +87,4 @@ export default class tradeXRows extends element {
   }
 }
 
-window.customElements.define('tradex-rows', tradeXRows)
+customElements.get('tradex-rows') || window.customElements.define('tradex-rows', tradeXRows)

@@ -31,4 +31,4 @@ export default class tradeXUtils extends element {
   get icons() { return this.shadowRoot.querySelector('slot').assignedElements()[0].children }
 }
 
-window.customElements.define('tradex-utils', tradeXUtils)
+customElements.get('tradex-utils') || window.customElements.define('tradex-utils', tradeXUtils)

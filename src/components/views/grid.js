@@ -33,4 +33,4 @@ export default class tradeXGrid extends element {
 
 }
 
-window.customElements.define('tradex-grid', tradeXGrid)
+customElements.get('tradex-grid') || window.customElements.define('tradex-grid', tradeXGrid)

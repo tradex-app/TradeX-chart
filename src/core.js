@@ -1113,6 +1113,8 @@ if (!window.customElements.get('tradex-chart')) {
   // insert global TradeX chart stylesheet
   document.head.insertAdjacentHTML("beforeend", cssVars)
   document.head.insertAdjacentHTML("beforeend", style)
+// }
+// else {
   // define <tradex-chart></tradex-chart>
-  window.customElements.define('tradex-chart', TradeXchart)
+  customElements.get('tradex-chart') || customElements.define('tradex-chart', TradeXchart)
 }

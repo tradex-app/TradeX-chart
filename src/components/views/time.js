@@ -6,7 +6,7 @@ import graph from "./classes/graph"
 import tradeXOverview from "./overview"
 
 // if (window.customElements.get('tradex-overview') !== undefined)
-window.customElements.define('tradex-overview', tradeXOverview)
+customElements.get('tradex-overview') || window.customElements.define('tradex-overview', tradeXOverview)
 
 const template = document.createElement('template')
 template.innerHTML = `
@@ -42,4 +42,4 @@ export default class tradeXTime extends element {
 
 }
 
-window.customElements.define('tradex-time', tradeXTime)
+customElements.get('tradex-time') || window.customElements.define('tradex-time', tradeXTime)

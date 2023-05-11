@@ -21,4 +21,4 @@ export default class tradeXWidgets extends element {
   }
 }
 
-window.customElements.define('tradex-widgets', tradeXWidgets)
+customElements.get('tradex-widgets') || window.customElements.define('tradex-widgets', tradeXWidgets)

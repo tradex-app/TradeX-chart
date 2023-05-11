@@ -119,4 +119,4 @@ export default class tradeXLegend extends element {
   }
 }
 
-window.customElements.define('tradex-legends', tradeXLegend)
+customElements.get('tradex-legends') || window.customElements.define('tradex-legends', tradeXLegend)

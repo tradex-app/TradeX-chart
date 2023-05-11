@@ -99,4 +99,4 @@ export default class tradeXMain extends element {
 
 }
 
-window.customElements.define('tradex-main', tradeXMain)
+customElements.get('tradex-main') || window.customElements.define('tradex-main', tradeXMain)

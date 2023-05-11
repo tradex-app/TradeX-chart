@@ -74,4 +74,4 @@ export default class tradeXOnChart extends element {
   get legend() { return this.#elLegend }
 }
 
-window.customElements.define('tradex-onchart', tradeXOnChart)
+customElements.get('tradex-onchart') || window.customElements.define('tradex-onchart', tradeXOnChart)

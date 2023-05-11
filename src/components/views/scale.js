@@ -51,4 +51,4 @@ export default class tradeXScale extends element {
   get offChartSlot() { return this.#offChartSlot }
 }
 
-window.customElements.define('tradex-scale', tradeXScale)
+customElements.get('tradex-scale') || window.customElements.define('tradex-scale', tradeXScale)
