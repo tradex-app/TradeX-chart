@@ -474,14 +474,6 @@ export default class MainPane {
       rowsW: this.rowsW,
     }
 
-console.log(`oHeight: ${this.#elRows.oHeight}`)
-console.log(`rowsH: ${this.#elRows.height}`)
-console.log(`resizeH: ${resizeH}`)
-console.log(`width: ${width}`)
-console.log(`height: ${height}`)
-console.log(`dimensions${dimensions}`)
-
-
     // set on Chart dimensions
     if (this.#OffCharts.size == 0 &&
       chartH != this.#elRows.height) chartH = this.#elRows.height

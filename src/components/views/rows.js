@@ -80,8 +80,6 @@ export default class tradeXRows extends element {
   get heightDeltaR() { return this.clientHeight / this.#oHeight }
 
   previousDimensions() {
-console.log(`oWidth: ${this.oWidth}, oHeight: ${this.oHeight}`)
-
     this.#oWidth = (this.#widthCache) ? this.#widthCache : this.clientWidth
     this.#oHeight = (this.#heightCache) ? this.#heightCache : this.clientHeight
     this.#widthCache = this.clientWidth
