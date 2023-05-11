@@ -473,6 +473,15 @@ export default class MainPane {
       rowsH: this.rowsH,
       rowsW: this.rowsW,
     }
+
+console.log(`oHeight: ${this.#elRows.oHeight}`)
+console.log(`rowsH: ${this.#elRows.height}`)
+console.log(`resizeH: ${resizeH}`)
+console.log(`width: ${width}`)
+console.log(`height: ${height}`)
+console.log(`dimensions${dimensions}`)
+
+
     // set on Chart dimensions
     if (this.#OffCharts.size == 0 &&
       chartH != this.#elRows.height) chartH = this.#elRows.height
@@ -505,6 +514,8 @@ export default class MainPane {
   }
 
   registerOffCharts(options) {
+    this.#elRows.previousDimensions()
+
     // are there any OffCharts to add?
     if (this.#core.offChart.length === 0) return
     // remove any offChart indicators that are not supported

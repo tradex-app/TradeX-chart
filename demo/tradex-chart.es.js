@@ -928,7 +928,7 @@ const OFFCHARTDEFAULTHEIGHT = 30;
 const DIVIDERHEIGHT = 8;
 
 class Range {
-  data
+  data = []
   #interval = DEFAULT_TIMEFRAMEMS
   #intervalStr = "1s"
   indexStart = 0
@@ -957,7 +957,7 @@ class Range {
   constructor( allData, start=0, end=allData.data.length-1, config={}) {
     if (!isObject(allData)) return false
     if (!isObject(config)) return false
-    if (!(config?.core?.constructor.name == "TradeXchart")) return false
+    if (!(config?.core instanceof TradeXchart)) return false
     this.#init = true;
     this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE;
     this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST;
@@ -997,7 +997,7 @@ class Range {
       this.#intervalStr = ms2Interval(this.interval);
     }
   }
-  get dataLength () { return (this.data.length == 0) ? 0 : this.data.length - 1 }
+  get dataLength () { return (this?.data.length == 0) ? 0 : this.data.length - 1 }
   get Length () { return this.indexEnd - this.indexStart }
   get timeDuration () { return this.timeFinish - this.timeStart }
   get timeMin () { return this.value(this.indexStart)[0] }
@@ -1210,7 +1210,7 @@ class Range {
   }
   snapshot(start, end) {
     return {
-      constructor: {name: "RangeSnapshot"},
+      snapshot: true,
       ts: Date.now(),
       data: this.data,
       dataLength: this.dataLength,
@@ -1725,7 +1725,7 @@ class Stream {
       data.c,
       data.v,
       null, true];
-    this.#core.mergeData({data: [this.#candle]}, true);
+    this.#core.mergeData({data: [this.#candle]}, true, false);
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}};
     this.#countDownMS = this.#time.timeFrameMS;
     this.#countDownStart = this.roundTime(Date.now());
@@ -1801,10 +1801,10 @@ class Stream {
   }
 }
 
-const CHART_MINH = 400;
-const CHART_MINW = 500;
-const TX_MINW = "400px";
-const TX_MINH = "300px";
+const CHART_MINH = 300;
+const CHART_MINW = 400;
+const TX_MINW = `${CHART_MINW}px`;
+const TX_MINH = `${CHART_MINH}px`;
 const TX_MAXW = "100%";
 const TX_MAXH = "100%";
 const UTILSH = 35;
@@ -2299,7 +2299,7 @@ class indicator extends Overlay {
   get indicator() { return this.#indicator }
   get TALib() { return this.#TALib }
   get range() { return this.core.range }
-  set setNewValue(cb) { this.#newValueCB = cb;}
+  set setNewValue(cb) { this.#newValueCB = cb; }
   set setUpdateValue(cb) { this.#updateValueCB = cb; }
   set precision(p) { this.#precision = p; }
   get precision() { return this.#precision }
@@ -2337,7 +2337,6 @@ class indicator extends Overlay {
     this.core.emit(topic, data);
   }
   onStreamNewValue(value) {
-    console.log("onStreamNewValue(value):",value);
   }
   onStreamUpdate(candle) {
     this.value = candle;
@@ -2373,7 +2372,7 @@ class indicator extends Overlay {
   }
   legendInputs(pos=this.chart.cursorPos) {
     const colours = [this.style.strokeStyle];
-    const index = this.Timeline.xPos2Index(pos[0]);
+    let index = this.Timeline.xPos2Index(pos[0]);
     let c = index  - (this.range.data.length - this.overlay.data.length);
     let l = limit(this.overlay.data.length - 1, 0, Infinity);
         c = limit(c, 0, l);
@@ -2407,62 +2406,56 @@ class indicator extends Overlay {
     else return { inReal: input, timePeriod: step }
   }
   calcIndicator (indicator, params={}, range=this.range) {
-    if (!this.core.TALibReady ||
-        !isString$1(indicator) ||
+    if (!isString$1(indicator) ||
         !(indicator in this.TALib) ||
-        !isObject(range)
+        !isObject(range) ||
+        !this.core.TALibReady
         ) return false
         params.timePeriod = params.timePeriod || this.definition.input.timePeriod;
-    let start, end;
-    let p = params.timePeriod;
-    if (range.constructor.name == "Range") {
-      start = 0;
-      end = range.dataLength - p + 1;
-    }
-    else if ( "indexStart" in range || "indexEnd" in range ||
-              "tsStart" in range ||  "tsEnd" in range ) {
-      start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0;
-      end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1;
-    }
-    else return false
-    if ( end - start < p ) return false
-    let data = [];
-    let i, v, entry;
-    while (start < end) {
-      params.inReal = this.indicatorInput(start, start + p);
-      entry = this.TALib[indicator](params);
-      v = [];
-      i = 0;
-      for (let o of this.definition.output) {
-        v[i++] = entry[o.name][0];
-      }
-      data.push([this.range.value(start + p - 1)[0], v]);
-      start++;
-    }
-    return data
+        let start, end;
+        let p = params.timePeriod;
+        if (range instanceof Range) {
+          start = 0;
+          end = range.dataLength - p + 1;
+        }
+        else if ( "indexStart" in range || "indexEnd" in range ||
+                  "tsStart" in range ||  "tsEnd" in range ) {
+          start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0;
+          end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1;
+        }
+        else return false
+        if ( end - start < p ) return false
+        let data = [];
+        let i, v, entry;
+        while (start < end) {
+          params.inReal = this.indicatorInput(start, start + p);
+          entry = this.TALib[indicator](params);
+          v = [];
+          i = 0;
+          for (let o of this.definition.output) {
+            v[i++] = entry[o.name][0];
+          }
+          data.push([this.range.value(start + p - 1)[0], v]);
+          start++;
+        }
+        return data
   }
   calcIndicatorHistory () {
     if (this.overlay.data.length < this.definition.input.timePeriod) {
       let data;
-      if (this.core.TALibReady) {
+      const calc = () => {
         data = this.calcIndicator(this.libName, this.definition.input, this.range);
         if (data) this.overlay.data = data;
-      }
-      else if (isPromise(this.core.TALibPromise))
-        this.core.TALibPromise.then(
-          () => {
-            data = this.calcIndicator(this.libName, this.definition.input, this.range);
-            if (data) this.overlay.data = data;
-          },
-          (e) => { this.core.error(e); }
-        );
+      };
+      if (this.core.TALibReady) calc();
+      else  this.core.talibAwait.push(calc.bind(this));
     }
   }
   calcIndicatorStream (indicator, params, range=this.range) {
     if (!this.core.TALibReady ||
         !isString$1(indicator) ||
         !(indicator in this.TALib) ||
-        range.constructor.name !== "Range" ||
+        !(range instanceof Range) ||
         range.dataLength < this.definition.input.timePeriod
         ) return false
     let entry = this.TALib[indicator](params);
@@ -2484,7 +2477,7 @@ class indicator extends Overlay {
     this.target.setPosition(this.core.scrollPos, 0);
     this.draw(this.range);
   }
-  UpdateValue (value) {
+  updateValue (value) {
     let l = this.overlay.data.length - 1;
     let p = this.TALibParams();
     if (!p) return false
@@ -2507,38 +2500,6 @@ class indicator extends Overlay {
   }
 }
 
-const ADX = {
-  name: "ADX",
-  camelCaseName: "adx",
-  group: "Momentum Indicators",
-  description: "Average Directional Movement Index",
-  inputs: [{
-    name: "high",
-    type: "number"
-  }, {
-    name: "low",
-    type: "number"
-  }, {
-    name: "close",
-    type: "number"
-  }],
-  options: [{
-    name: "timePeriod",
-    displayName: "Time Period",
-    defaultValue: 14,
-    hint: "Number of period",
-    type: "number",
-    range: {
-      min: 2,
-      max: 100000
-    }
-  }],
-  outputs: [{
-    name: "output",
-    type: "number",
-    plot: "line"
-  }]
-};
 const BBANDS = {
   name: "BBANDS",
   camelCaseName: "bbands",
@@ -2597,6 +2558,38 @@ const BBANDS = {
     name: "lowerBand",
     type: "number",
     plot: "limit_lower"
+  }]
+};
+const DX = {
+  name: "DX",
+  camelCaseName: "dx",
+  group: "Momentum Indicators",
+  description: "Directional Movement Index",
+  inputs: [{
+    name: "high",
+    type: "number"
+  }, {
+    name: "low",
+    type: "number"
+  }, {
+    name: "close",
+    type: "number"
+  }],
+  options: [{
+    name: "timePeriod",
+    displayName: "Time Period",
+    defaultValue: 14,
+    hint: "Number of period",
+    type: "number",
+    range: {
+      min: 2,
+      max: 100000
+    }
+  }],
+  outputs: [{
+    name: "output",
+    type: "number",
+    plot: "line"
   }]
 };
 const EMA$1 = {
@@ -2708,12 +2701,10 @@ class BB extends indicator {
     fillStyle: "#0080c044"
   }
   precision = 2
-  onChart = true
   scaleOverlay = false
   plots = [
     { key: 'BB_1', title: ' ', type: 'line' },
   ]
-  static scale = YAXIS_TYPES$1[0]
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
     super(target, xAxis, yAxis, config, parent, params);
     const overlay = params.overlay;
@@ -2722,15 +2713,24 @@ class BB extends indicator {
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.calcIndicatorHistory();
     this.setNewValue = (value) => { this.newValue(value); };
-    this.setUpdateValue = (value) => { this.UpdateValue(value); };
+    this.setUpdateValue = (value) => { this.updateValue(value); };
     this.addLegend();
   }
+  get onChart() { return true }
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
     const inputs = {};
-    const {c, colours} = super.legendInputs(pos);
-    inputs.BB_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
-    return {inputs, colours}
+      let labels = [false, false, false];
+      let {c, colours} = super.legendInputs(pos);
+    inputs.Hi = this.Scale.nicePrice(this.overlay.data[c][1][0]);
+    inputs.Mid = this.Scale.nicePrice(this.overlay.data[c][1][1]);
+    inputs.Lo = this.Scale.nicePrice(this.overlay.data[c][1][2]);
+    colours = [
+      this.style.upperStrokeStyle,
+      this.style.middleStrokeStyle,
+      this.style.lowerStrokeStyle
+    ];
+    return {inputs, colours, labels}
   }
   draw(range=this.range) {
     if (this.overlay.data.length < 2 ) return false
@@ -2738,7 +2738,6 @@ class BB extends indicator {
     const plots = {lower: [], middle: [], upper: []};
     const data = this.overlay.data;
     const width = this.xAxis.candleW;
-    plots.length = 0;
     this.Timeline.smoothScrollOffset || 0;
     const plot = {
       w: width,
@@ -2793,7 +2792,7 @@ class BB extends indicator {
 
 class DMI extends indicator {
   name = 'Directional Movement Index'
-  shortName = 'DMI'
+  shortName = 'DX'
   libName = null
   definition = {
     input: {
@@ -2813,22 +2812,21 @@ class DMI extends indicator {
     highLowRangeStyle: "#22002220"
   }
   precision = 2
-  onChart = false
   scaleOverlay = true
   plots = [
     { key: 'DMI_1', title: ' ', type: 'line' },
   ]
-  static scale = YAXIS_TYPES$1[1]
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
     super(target, xAxis, yAxis, config, parent, params);
     const overlay = params.overlay;
     this.ID = params.overlay?.id || uid(this.shortName);
-    this.defineIndicator(overlay?.settings, ADX);
+    this.defineIndicator(overlay?.settings, DX);
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.calcIndicatorHistory();
     this.setNewValue = (value) => { this.newValue(value); };
-    this.setUpdateValue = (value) => { this.UpdateValue(value); };
+    this.setUpdateValue = (value) => { this.updateValue(value); };
   }
+  get onChart() { return false }
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
     const inputs = {};
@@ -2909,14 +2907,12 @@ class EMA extends indicator {
     lineWidth: '1'
   }
   precision = 2
-  onChart = true
   checkParamCount = false
   scaleOverlay = false
   plots = [
     { key: 'EMA_1', title: 'EMA: ', type: 'line' },
   ]
   static inCnt = 0
-  static scale = YAXIS_TYPES$1[0]
   static colours = [
     "#9C27B0",
     "#9C27B0",
@@ -2932,9 +2928,10 @@ class EMA extends indicator {
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.calcIndicatorHistory();
     this.setNewValue = (value) => { this.newValue(value); };
-    this.setUpdateValue = (value) => { this.UpdateValue(value); };
+    this.setUpdateValue = (value) => { this.updateValue(value); };
     this.addLegend();
   }
+  get onChart() { return true }
   updateLegend() {
     this.parent.legend.update();
   }
@@ -3000,12 +2997,10 @@ class RSI extends indicator {
     lowStrokeStyle: "#848",
     highLowRangeStyle: "#22002220"
   }
-  onChart = false
   checkParamCount = false
   plots = [
     { key: 'RSI_1', title: ' ', type: 'line' },
   ]
-  static scale = YAXIS_TYPES$1[1]
   constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
     super (target, xAxis, yAxis, config, parent, params);
     const overlay = params.overlay;
@@ -3014,8 +3009,9 @@ class RSI extends indicator {
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.calcIndicatorHistory();
     this.setNewValue = (value) => { this.newValue(value); };
-    this.setUpdateValue = (value) => { this.UpdateValue(value); };
+    this.setUpdateValue = (value) => { this.updateValue(value); };
   }
+  get onChart() { return false }
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
     const inputs = {};
@@ -3102,7 +3098,6 @@ class SMA extends indicator {
     { key: 'SMA_1', title: 'SMA: ', type: 'line' },
   ]
   static inCnt = 0
-  static scale = YAXIS_TYPES$1[0]
   static colours = [
     "#9C27B0",
     "#9C27B0",
@@ -3118,9 +3113,10 @@ class SMA extends indicator {
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.calcIndicatorHistory();
     this.setNewValue = (value) => { this.newValue(value); };
-    this.setUpdateValue = (value) => { this.UpdateValue(value); };
+    this.setUpdateValue = (value) => { this.updateValue(value); };
     this.addLegend();
   }
+  get onChart() { return true }
   updateLegend() {
     this.parent.legend.update();
   }
@@ -3176,15 +3172,14 @@ class Volume extends indicator {
   #defaultStyle = {
   }
   #style = {}
-  static scale = YAXIS_TYPES$1[1]
   constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
     super (target, xAxis, yAxis, config, parent, params);
     params.overlay;
   }
+  get onChart() { return "both" }
 }
 
 var Indicators = {
-  ADX: {id: "ADX", name: "Average Direction", event: "addIndicator"},
   BB: {id: "BB", name: "Bollinger Bands", event: "addIndicator", ind: BB},
   DMI: {id: "DMI", name: "Directional Movement", event: "addIndicator", ind: DMI},
   EMA: {id: "EMA", name: "Exponential Moving Average", event: "addIndicator", ind: EMA},
@@ -3225,6 +3220,936 @@ class element extends HTMLElement {
   }
   setCursor(cursor) {
     this.style.cursor = cursor;
+  }
+}
+
+class Axis {
+  #core
+  #parent
+  #chart
+  constructor(parent) {
+    this.#parent = parent;
+    this.#core = this.#parent.core;
+    this.#chart = this.#core.Chart;
+  }
+  get core() { return this.#core }
+  get chart() { return this.#chart }
+  get parent() { return this.#parent }
+  get theme() { return this.#core.theme }
+  get width() { return this.#chart.width }
+  get height() { return this.#chart.height }
+  get data() { return this.#chart.data }
+  get range() { return this.#chart.range }
+  get yDigits() { return this.#chart.yAxisDigits }
+  float2Int(value) { return float2Int(value) }
+  numDigits(value) { return numDigits(value) }
+  countDigits(value) { return countDigits(value) }
+  precision(value) { return precision(value) }
+}
+
+class xAxis extends Axis {
+  #xAxisTicks = 4
+  #xAxisGrads
+  #indexBased = true
+  constructor(parent) {
+    super(parent);
+  }
+  get range() { return this.parent.range }
+  get width() { return this.parent.width }
+  get interval() { return this.range.interval }
+  get intervalStr() { return this.range.intervalStr }
+  get timeStart() { return this.range.timeStart }
+  get timeFinish() { return this.range.timeFinish }
+  get rangeDuration() { return this.range.rangeDuration }
+  get rangeLength() { return this.range.Length }
+  get indexStart() { return this.range.indexStart }
+  get indexEnd() { return this.range.indexEnd }
+  get timeMax() { return this.range.timeMax }
+  get timeMin() { return this.range.timeMin }
+  get candleW() { return bRound(this.width / this.range.Length) }
+  get candlesOnLayer() { return bRound(this.core.Chart.layerWidth / this.candleW )}
+  get xAxisRatio() { return this.width / this.range.rangeDuration }
+  set xAxisTicks(t) { this.#xAxisTicks = isNumber(t) ? t : 0; }
+  get xAxisTicks() { return this.#xAxisTicks }
+  get xAxisGrads() { return this.#xAxisGrads }
+  get scrollOffsetPx() { return this.core.scrollPos % this.candleW }
+  get bufferPx() { return this.core.bufferPx }
+  xPos(ts) {
+    return bRound((this.range.rangeIndex(ts) * this.candleW) + (this.candleW * 0.5))
+  }
+  t2Index(ts) {
+    return this.range.rangeIndex(ts)
+  }
+  t2Pixel(ts) {
+    return this.xPos(ts)
+  }
+  pixel2T(x) {
+    let c = this.pixel2Index(x);
+    return this.range.value(c)[0]
+  }
+  pixel2Index(x) {
+    x -= this.candleW / 2;
+    let c = this.range.indexStart;
+    let o = bRound(x / this.candleW);
+    return c + o
+  }
+  pixelOHLCV(x) {
+    let c = this.pixel2Index(x);
+    return this.range.value(c)
+  }
+  xPosSnap2CandlePos(x) {
+    let r = x % this.candleW;
+    let o = (r) ? this.candleW / 2 : 0;
+    return bRound((x - r) + o)
+  }
+  xPos2Time(x) {
+    return this.pixel2T(x)
+  }
+  xPos2Index(x) {
+    return this.pixel2Index(x)
+  }
+  xPosOHLCV(x) {
+    return this.pixelOHLCV(x)
+  }
+  initXAxisGrads() {
+    this.#xAxisGrads = this.calcXAxisGrads();
+  }
+  doCalcXAxisGrads(range) {
+    this.#xAxisGrads = this.calcXAxisGrads(range);
+  }
+  calcXAxisGrads(range=this.range.snapshot()) {
+    const grads = {
+      entries: {},
+      values: [],
+      major: [],
+      minor: [],
+    };
+    const units = ms2TimeUnits(range.rangeDuration);
+    grads.units = units;
+    for (let u in units) {
+      if (units[u] > 0) {
+        grads.units = [u, u];
+        grads.timeSpan = `${units[u]} ${u}`;
+        break
+      }
+    }
+    const tf = range.interval;
+    const {xStep, rank} = this.xStep(range);
+    const tLimit = this.pixel2T(this.width) + xStep;
+    let t1 = range.timeMin - (range.timeMin % xStep) - xStep;
+    let start = t1;
+    while (t1 < tLimit) {
+      let y = time_start(t1, "years");
+      let m = time_start(t1, "months");
+      let d = time_start(t1, "days");
+      if (!(y in grads.entries) && y >= start) {
+        grads.entries[y] = [this.dateTimeValue(y, tf), this.t2Pixel(y), y, "major"];
+      }
+      else if (!(m in grads.entries) && m >= start) {
+        grads.entries[m] = [this.dateTimeValue(m, tf), this.t2Pixel(m), m, "major"];
+      }
+      else if (!(d in grads.entries) && d >= start) {
+        grads.entries[d] = [this.dateTimeValue(d, tf), this.t2Pixel(d), d, "major"];
+      }
+        grads.entries[t1] = [this.dateTimeValue(t1, tf), this.t2Pixel(t1), t1, "minor"];
+      t1 += xStep;
+    }
+    grads.values = Object.values(grads.entries);
+    return grads
+  }
+  xStep(range) {
+    let minStep = XAXIS_STEP;
+    let interval = this.#indexBased ? range.interval : 1;
+    let xStep = TIMESCALES[0];
+    let candleW = bRound(this.width / range.Length);
+    let rank = TIMESCALESRANK[0];
+    let i = TIMESCALES.indexOf(interval);
+    while (i-- >= 0) {
+      const gradPixels = candleW * (TIMESCALES[i] / interval);
+      if (gradPixels >= minStep) break
+    }
+    xStep = TIMESCALES[i];
+    rank = TIMESCALESRANK[i];
+    return {xStep, rank}
+  }
+  dateTimeValue(ts, tf) {
+    if ((ts / DAY_MS) % 1 === 0) {
+      const date = get_day(ts);
+      if (date === 1) {
+        let month = get_month(ts);
+        if (month === 0) return get_year(ts)
+        else return get_monthName(ts)
+      }
+      else return date
+    }
+    else {
+      if (tf < MINUTE_MS) return MS(ts)
+      else if (tf < HOUR_MS) return MS(ts)
+      else return HM(ts)
+    }
+  }
+  gradsWorker() {
+  }
+}
+
+const status = {
+  idle: 0,
+  dragStart: 1,
+  dragging: 2
+};
+class Point {
+  x = 0;
+  y = 0;
+  constructor() {
+    if (arguments.length === 1) {
+      const { x, y } = arguments[0];
+      this.x = x;
+      this.y = y;
+    } else if (arguments.length > 1) {
+      const [x, y] = arguments;
+      this.x = x;
+      this.y = y;
+    }
+  }
+  clone() {
+    return new Point(this.x, this.y);
+  }
+}
+
+const keyboard = [
+  "keypress",
+  "keydown",
+  "keyup"
+];
+const pointer = [
+  "pointerdown",
+  "pointerup",
+  "pointerover", "pointerenter",
+  "pointerout", "pointerleave",
+  "pointermove",
+  "pointercancel",
+  "gotpointercapture",
+  "lostpointercapture",
+  "dblclick",
+  "click",
+  "wheel",
+  "contextmenu"
+];
+const mouse = [
+  "mousedown",
+  "mouseenter",
+  "mouseleave",
+  "mousemove",
+  "mouseout",
+  "mouseover",
+  "mouseup",
+  "mousewheel",
+];
+const touch = [
+  "touchcancel",
+  "touchend",
+  "touchmove",
+  "touchstart"
+];
+const pen = [
+];
+const misc = [
+];
+const custom = [
+  "pointerdrag",
+  "pointerdragend"
+];
+class EventsAgent {
+  constructor (input) {
+    this.input = input;
+    this.element = input.element;
+    if (window.PointerEvent) {
+      this.type = [...keyboard, ...pointer, ...mouse, ...touch, ...pen, ...misc, ...custom];
+    } else {
+      this.type = [...keyboard, ...mouse, ...touch, ...pen, ...misc, ...custom];
+    }
+    this.clientPosPrev = new Point([null, null]);
+    this.position = new Point();
+    this.movement = new Point([0, 0]);
+    this.dragstart = new Point([null, null]);
+    this.dragend = new Point([null, null]);
+    this.dragCheckThreshold = 3;
+    this.dragStatus = false;
+    this.wheeldelta = 0;
+    this.pointerButtons = [false, false, false, false, false];
+    this.pointerdrag = new Event("pointerdrag");
+    this.pointerdragend = new Event("pointerdragend");
+  }
+  has (event) {
+    if (this.type.indexOf(event) == -1) return false
+    else return true
+  }
+  addListener (event, handler, options) {
+    let cb = handler;
+    if (!this.has(event) ||
+        !isFunction(handler) ||
+        !DOM.isElement(this.element)
+    ) return false
+    if (pointer.indexOf(event) !== -1) {
+      switch (event) {
+        case "pointerdown":
+            cb = function (e) {
+              this.onPointerDown(e);
+              handler(this.createPointerEventArgument(e));
+            };
+            break;
+        case "pointerup":
+          cb = function (e) {
+            this.onPointerUp(e);
+            handler(this.createPointerEventArgument(e));
+          };
+          break;
+        case "pointermove":
+          cb = function (e) {
+            this.motion(e);
+            handler(this.createPointerEventArgument(e));
+          };
+          break;
+        case "click":
+        case "dbclick":
+        case "pointerenter":
+        case "pointerleave":
+        case "pointerout":
+        case "pointerover":
+        case "contextmenu":
+          cb = function (e) {
+            this.location(e);
+            handler(this.createPointerEventArgument(e));
+          };
+          break;
+        case "wheel":
+          cb = function (e) {
+            this.wheeldelta = e.wheelDelta;
+            handler(this.createPointerEventArgument(e));
+          };
+          break;
+        case "pointercancel":
+        case "gotpointercapture":
+        case "lostpointercapture":
+        default :
+          cb = function (e) {
+            handler(e);
+          };
+          break;
+      }
+      this.element.addEventListener(event, cb.bind(this), options);
+      return cb
+    }
+    else if (custom.indexOf(event) == -1)
+      this.element.addEventListener(event, handler, options);
+    else {
+      switch (event) {
+        case "pointerdrag":
+          this.initPointerDrag(handler, options);
+          break;
+        case "pointerdragend":
+          cb = function (e) {
+            this.motion(e);
+            handler(this.createPointerEventArgument(e));
+          };
+          this.element.addEventListener(event, cb.bind(this), options);
+          break;
+      }
+    }
+    return true
+  }
+  removerListener (event, handler, element, options) {
+    if (!this.has(event) ||
+        !isFunction(handler) ||
+        !DOM.isElement(element)
+    ) return false
+    if (event == "pointerdrag") {
+      e.target.removeEventListener("pointermove", this.onPointerDrag);
+      e.target.removeEventListener("pointerdown", this.onPointerDown);
+      e.target.removeEventListener("gotpointercapture", this.onPointerDrag);
+      e.target.removeEventListener("lostpointercapture", this.onPointerDragEnd);
+      document.removeEventListener("pointerup", this.onPointerDragEnd);
+    }
+    element.removeEventListener(event, handler, options);
+    return true
+  }
+  initPointerDrag (handler, options) {
+    if (!this.draginit) {
+      this.draginit = true;
+      this.element.addEventListener("pointerdown", this.onPointerDown.bind(this), options);
+      this.element.addEventListener("gotpointercapture", this.onPointerCapture.bind(this), options);
+      this.element.addEventListener("lostpointercapture", this.onPointerDragEnd.bind(this), options);
+      this.element.addEventListener("pointermove", this.onPointerMove.bind(this), options);
+    }
+    let cb = function (e) {
+      e = this.createPointerEventArgument(e);
+      handler(e);
+    };
+    this.dragStatus = "ready";
+    this.element.addEventListener("pointerdrag", cb.bind(this), options);
+  }
+  onPointerDown (e) {
+    this.location(e);
+    this.pointerButtons[e.button] = true;
+    if (this.dragStatus == "ready") e.target.setPointerCapture(e.pointerId);
+  }
+  onPointerUp (e) {
+    this.location(e);
+    this.pointerButtons[e.button] = false;
+  }
+  onPointerMove (e) {
+    if (this.dragStatus == "dragging") {
+      this.motion(e);
+      this.dragend = this.position.clone();
+      e.target.dispatchEvent(this.pointerdrag);
+    }
+  }
+  onPointerCapture (e) {
+    this.dragstart = this.position.clone();
+    this.dragend = this.position.clone();
+    this.dragStatus = "dragging";
+  }
+  onPointerDragEnd (e) {
+    if (this.dragStatus == "dragging") {
+      this.dragStatus = "ready";
+      e.target.dispatchEvent(this.pointerdragend);
+    }
+  }
+  createPointerEventArgument(e) {
+    return {
+      isProcessed: false,
+      pointerType: e.pointerType,
+      position: this.position.clone(),
+      movement: this.movement.clone(),
+      dragstart: this.dragstart.clone(),
+      dragend: this.dragend.clone(),
+      wheeldelta: this.wheeldelta,
+      buttons: this.pointerButtons,
+      domEvent: e,
+      timeStamp: Date.now()
+    }
+  }
+  isButtonPressed(button) {
+    return (this.pointerButtons.indexOf(button) !== -1) ? true : false
+  }
+  setCursor(type) {
+		this.element.style.cursor = type;
+	}
+  motion(e) {
+    const clientX = e.clientX || this.position.x;
+    const clientY = e.clientY || this.position.y;
+    this.movement.x = clientX - this.clientPosPrev.x;
+    this.movement.y = clientY - this.clientPosPrev.y;
+    this.position.x += this.movement.x;
+    this.position.y += this.movement.y;
+    this.clientPosPrev.x = clientX;
+    this.clientPosPrev.y = clientY;
+  }
+  location(e) {
+    const clientRect = e.target.getBoundingClientRect();
+    this.clientPosPrev.x = e.clientX;
+    this.clientPosPrev.y = e.clientY;
+    this.position.x = e.clientX - clientRect.left;
+    this.position.y = e.clientY - clientRect.top;
+    this.movement.x = 0;
+    this.movement.y = 0;
+  }
+  createKeyEventArgument(e) {
+    return e
+  }
+}
+
+const defaultOptions$1 = {
+  element: undefined,
+  contextMenu: true
+};
+class Input  {
+  constructor (element, options) {
+    this.options = { ...defaultOptions$1, ...options };
+    this.status = status.idle;
+    this.element = element;
+    if (!this.element && this.options.elementId) {
+      this.element = document.getElementById(this.options.elementId);
+    }
+    if (!this.element) {
+      throw "Must specify an element to receive user input.";
+    }
+    this.eventsAgent = new EventsAgent(this);
+    if (!this.options.contextMenu) {
+      window.oncontextmenu = (e) => {
+        e.preventDefault();
+        return false;
+      };
+    }
+  }
+  on (event, handler, options) {
+    return this.eventsAgent.addListener(event, handler, options)
+  }
+  off (event, handler, options) {
+    return this.eventsAgent.removeListener(event, handler, options)
+  }
+  invoke (agent, eventName, args) {
+    this.currentAgent = agent;
+    this.eventsAgent.invoke(eventName, this.createEventArgument(args));
+  }
+  createEventArgument (args) {
+    const arg = args || {};
+    arg.isButtonPressed = button => this.isButtonPressed(button);
+    arg.isKeyPressed = key => this.isKeyPressed(key);
+    arg.controller = this;
+    return arg;
+  }
+  isButtonPressed (button) {
+    return this.eventsAgent.isButtonPressed(button);
+  }
+  isKeyPressed (key) {
+    return this.eventsAgent.isKeyPressed(key);
+  }
+  setCursor (type) {
+    this.eventsAgent.setCursor(type);
+  }
+}
+
+var stateMachineConfig$6 = {
+  id: "time",
+  initial: "idle",
+  context: {},
+  states: {
+    idle: {
+      onEnter(data) {
+      },
+      onExit(data) {
+      },
+      on: {
+        resize: {
+          target: 'resize',
+          action (data) {
+          },
+        },
+        xAxis_scale: {
+          target: 'scale',
+          action (data) {
+          },
+        },
+        xAxis_inc: {
+          target: 'incremental',
+          action (data) {
+          },
+        },
+        xAxis_log: {
+          target: 'logarithmic',
+          action (data) {
+          },
+        },
+        xAxis_100: {
+          target: 'percentual',
+          action (data) {
+          },
+        },
+        chart_pan: {
+          target: 'chart_pan',
+          action (data) {
+          },
+        },
+      }
+    },
+    resize: {
+      onEnter(data) {
+      },
+      onExit(data) {
+      },
+      on: {
+        someEvent: {
+          target: '',
+          action (data) {
+          },
+        },
+      }
+    },
+    chart_pan: {
+      onEnter(data) {
+      },
+      onExit(data) {
+      },
+      on: {
+        chart_pan: {
+          target: 'chart_pan',
+          action (data) {
+          },
+        },
+        chart_panDone: {
+          target: 'idle',
+          action (data) {
+          },
+        },
+      }
+    },
+  },
+};
+
+const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+typeof process !== 'undefined'
+  && process.versions != null
+  && process.versions.node != null;
+
+const isHex  = /^#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
+const isHSL  = /^hsla?((\d{1,3}?),\s*(\d{1,3}%),\s*(\d{1,3}%)(,\s*[01]?\.?\d*)?)$/;
+const isHSLA = /^hsla[(]\s*0*(?:[12]?\d{1,2}|3(?:[0-5]\d|60))\s*(?:\s*,\s*0*(?:\d\d?(?:\.\d+)?\s*%|\.\d+\s*%|100(?:\.0*)?\s*%)){2}\s*,\s*0*(?:\.\d+|1(?:\.0*)?)\s*[)]$/;
+const isRGB  = /^rgba?((\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?)(,\s*[01]?\.?\d*)?)$/;
+const isRGBA = /^^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1(?:\.0*)?)\s*[)]$/;
+class Colour {
+  #value = {
+    r: null,
+    g: null,
+    b: null,
+    a: null,
+    h: null,
+    s: null,
+    l: null,
+    v: null,
+    r16: null,
+    g16: null,
+    b16: null,
+    a16: null,
+    hex: null,
+    hsl: null,
+    hsla: null,
+    rgb: null,
+    rgba: null,
+    isValid: false
+  }
+  constructor (colour) {
+    this.#validate(colour);
+    if (isHex.test(colour)) this.#valueIsHex(colour);
+    if (isHSL.test(colour)) this.#valueIsHSL(colour);
+    if (isHSLA.test(colour)) this.#valueIsHSLA(colour);
+    if (isRGB.test(colour)) this.#valueIsRGB(colour);
+    if (isRGBA.test(colour)) this.#valueIsRGBA(colour);
+  }
+  get value() { return this.#value }
+  get isValid() { return this.#value.isValid }
+  get hex() { return this.#value.hex.slice(0, -2) }
+  get hexa() { return this.#value.hex }
+  #validate(colour) {
+    if (isBrowser) {
+      let el = document.getElementById('divValidColourTest');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'divValidColourTest';
+      }
+      el.style.backgroundColor = "";
+      el.style.backgroundColor = colour;
+      this.#value.isValid = (el.style.backgroundColor.length) ? true : false;
+    }
+    else {
+      this.#value.isValid = (
+        isHex.test(colour) ||
+        isHSL.test(colour) ||
+        isHSLA.test(colour) ||
+        isRGB.test(colour) ||
+        isRGBA.test(colour)
+      ) ? true : false;
+    }
+  }
+  setHex(hex) {
+    let val = this.#value;
+    ([
+      val.r16,
+      val.g16,
+      val.b16,
+      val.a16
+    ] = hex);
+    val.hex = "#" + val.r16 +val.g16 + val.b16 + val.a16;
+  }
+  setRGBA(rgba) {
+    let val = this.#value;
+    ([
+      val.r,
+      val.g,
+      val.b,
+      val.a
+    ] = rgba);
+    val.rgb = `rgb(${rgba[0]},${rgba[1]},${rgba[2]})`;
+    val.rgba = `rgb(${rgba[0]},${rgba[1]},${rgba[2]},${rgba[3]})`;
+  }
+  setHSLA(hsla) {
+    let val = this.#value;
+    ([
+      val.h,
+      val.s,
+      val.l,
+      val.a
+    ] = hsla);
+    val.hsl = `hsl(${hsla[0]},${hsla[1]}%,${hsla[2]}%)`;
+    val.hsla = `hsl(${hsla[0]},${hsla[1]}%,${hsla[2]}%,${hsla[3]})`;
+  }
+  #valueIsHex(hex) {
+    this.#value.hex = hex;
+    let l = hex.length,
+        rgba;
+    switch (l) {
+      case 4 :
+        rgba = [`${hex[1]}${hex[1]}`, `${hex[2]}${hex[2]}`, `${hex[3]}${hex[3]}`, "ff"];
+        break;
+      case 7 :
+        rgba = [hex.substr(1,2), hex.substr(3,2), hex.substr(5,2), "ff"];
+        break;
+      case 9 :
+        rgba = [hex.substr(1,2), hex.substr(3,2), hex.substr(5,2), hex.substr(7,2)];
+        break
+    }
+    this.setHex(rgba);
+    this.#hexToRGB(rgba);
+    this.#hexToHSL(rgba);
+  }
+  #valueIsHSL(hsl) {
+    this.#value.hsl = hsl;
+  }
+  #valueIsHSLA(hsla) {
+    this.#value.hsla = hsla;
+  }
+  #valueIsRGB(rgb) {
+    this.#value.rgb = rgb;
+    this.#RGBAToHex(rgba);
+  }
+  #valueIsRGBA(rgba) {
+    this.#value.rgba = rgba;
+    this.#RGBAToHex(rgba);
+  }
+  #RGBToHex (rgb) {
+    let {r,g,b,a} = this.#getRGB(rgb);
+    if (r.length == 1)
+      r = "0" + r;
+    if (g.length == 1)
+      g = "0" + g;
+    if (b.length == 1)
+      b = "0" + b;
+    if (a.length == 1)
+      a = "0" + a;
+    this.value.r = r;
+    this.value.g = g;
+    this.value.b = b;
+    this.value.a = a;
+    this.setHex([r,g,b,a]);
+    return this
+  }
+  #RGBToHSL (rgb) {
+    let {r,g,b,a} = this.#getRGB(rgb);
+    r = parseInt(r, 16) / 255;
+    g = parseInt(g, 16) / 255;
+    b = parseInt(b, 16) / 255;
+    a = parseInt(a, 16) / 255;
+    const l = Math.max(r, g, b);
+    const s = l - Math.min(r, g, b);
+    const h = s
+      ? l === r
+        ? (g - b) / s
+        : l === g
+        ? 2 + (b - r) / s
+        : 4 + (r - g) / s
+      : 0;
+    let hsla = [
+      (60 * h < 0 ? 60 * h + 360 : 60 * h).toString(),
+      (100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0)).toString(),
+      ((100 * (2 * l - s)) / 2).toString(),
+      (a).toString()
+    ];
+    this.setHSLA(hsla);
+    return this
+  }
+  #HSLToRGB (h, s, l) {
+    s /= 100;
+    l /= 100;
+    const k = n => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = n =>
+      l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return [255 * f(0), 255 * f(8), 255 * f(4)];
+  };
+  #hslToHex(h, s, l) {
+    l /= 100;
+    const a = s * Math.min(l, 1 - l) / 100;
+    const f = n => {
+      const k = (n + h / 30) % 12;
+      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color).toString(16).padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+  }
+  #hexToRGB(hex) {
+    if (isString$1(hex)) hex = /([a-f\d]{2})/ig.exec(hex);
+    var rgba = [
+        parseInt(hex[0], 16),
+        parseInt(hex[1], 16),
+        parseInt(hex[2], 16),
+        parseInt(hex[3], 16) / 255
+    ];
+    this.setRGBA(rgba);
+  }
+  #hexToHSL(hex) {
+    if (isString$1(hex)) hex = /([a-f\d]{2})/ig.exec(hex);
+    let r = parseInt(hex[0], 16);
+    let g = parseInt(hex[1], 16);
+    let b = parseInt(hex[2], 16);
+    let a = parseInt(hex[3], 16);
+    r /= 255, g /= 255, b /= 255, a /= 255;
+    this.setHSLA([r,g,b,a]);
+  }
+  #getRGB (rgb) {
+    let r,g,b,a;
+    let v = this.#value;
+    if (v.r && v.g && v.b && v.a) return {r, g, b, a} = {...v}
+    if (isString$1(rgb)) {
+      let sep = rgb.indexOf(",") > -1 ? "," : " ";
+      rgb = rgb.substr(4).split(")")[0].split(sep);
+    }
+    if (isArray(rgb)) {
+      if (rgb.length < 3 || rgb.length > 4) return false
+      r = rgb[0];
+      g = rgb[1];
+      b = rgb[2];
+      a = (isString$1(rgb[3])) ? rgb[3] : "";
+    }
+    else if (isObject(rgb)) {
+      r = rgb.r;
+      g = rgb.g;
+      b = rgb.b;
+      a = ("a" in rgb) ? rgb.a : "";
+    }
+    else return false
+    return {r, g, b, a}
+  }
+  #RGBAToHex (rgba) {
+    let x, isPercent,
+      i = 0,
+      y = [],
+      z = [],
+      rgb = rgba.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i);
+      rgb.shift();
+      for (let v of rgb) {
+        isPercent = v.indexOf("%") > -1;
+        x = parseFloat(v);
+        if (i < 3 && isPercent) {
+          x = Math.round(255 * x / 100);
+        }
+        else if (i == 3) {
+          if (!isPercent && x >= 0 && x <= 1) {
+            x = Math.round(255 * x);
+          } else if (isPercent && x >= 0 && x <= 100) {
+            x = Math.round(255 * x / 100);
+          } else {
+            x = "";
+          }
+        }
+        y[i] = (x | 1 << 8).toString(16).slice(1);
+        z[i++] = x;
+      }
+      this.setHex(y);
+      this.setRGBA(z);
+      this.#hexToHSL(this.#value.hex);
+  }
+}
+
+class Slider {
+  static #cnt
+  #id
+  #core
+  #elContainer
+  #elHandle
+  #containerDims = {w: 0, h: 0}
+  #handleDims = {w: 0, h: 0, x: 0, y: 0}
+  #constraint = {x: false, y: true}
+  #cursorPos
+  #sliderPos = {x: 0, drag: false}
+  #input
+  #callback
+  constructor(config) {
+    this.#id = Slider.#cnt++;
+    this.#core = config.core;
+    this.#elContainer = (DOM.isElement(config.elContainer)) ? config.elContainer : false;
+    this.#elHandle = (DOM.isElement(config.elHandle)) ? config.elHandle : false;
+    this.#callback = (isFunction(config.callback)) ? config.callback : false;
+    if (DOM.isElement(this.#elContainer) && DOM.isElement(this.#elHandle)) {
+      this.mount();
+      this.eventsListen();
+    }
+  }
+  eventsListen() {
+  this.#input = new Input(this.#elHandle, {disableContextMenu: false});
+  this.#input.on("mouseenter", debounce(this.onMouseEnter, 1, this, true));
+  this.#input.on("mouseout", debounce(this.onMouseOut, 1, this, true));
+  this.#input.on("drag", throttle(this.onHandleDrag, 100, this));
+  this.#input.on("enddrag", this.onHandleDragDone.bind(this));
+  this.#input.on("mousedown", debounce(this.onMouseDown, 100, this, true));
+  this.#input.on("mouseup", this.onMouseUp.bind(this));
+  }
+  on(topic, handler, context) {
+    this.#core.on(topic, handler, context);
+  }
+  off(topic, handler) {
+    this.#core.off(topic, handler);
+  }
+  emit(topic, data) {
+    this.#core.emit(topic, data);
+  }
+  onMouseEnter() {
+    const backgroundColor = getComputedStyle(this.#elHandle).backgroundColor;
+    if (backgroundColor) {
+      this.colour = new Colour(backgroundColor);
+      this.#elHandle.style.backgroundColor = this.colour.hex;
+    }
+  }
+  onMouseOut() {
+    this.#elHandle.style.backgroundColor = this.colour.hexa;
+  }
+  onMouseDown() {
+  }
+  onMouseUp(e) {
+    this.onHandleDragDone(e);
+  }
+  onHandleDrag(e) {
+    if (!this.#sliderPos.drag) {
+      this.#sliderPos.drag = true;
+      this.#sliderPos.x = e.position.x;
+    }
+    this.handlePos(e);
+  }
+  onHandleDragDone(e) {
+    this.handlePos(e);
+    this.#sliderPos.drag = false;
+  }
+  mount() {
+    this.#containerDims.w = this.#elContainer.getBoundingClientRect().width;
+    this.#containerDims.h = this.#elContainer.getBoundingClientRect().height;
+    this.#elContainer.style.overflow = "hidden";
+    this.#handleDims.w = this.#elHandle.getBoundingClientRect().width;
+    this.#handleDims.h = this.#elHandle.getBoundingClientRect().height;
+    this.#elHandle.style.marginRight = 0;
+    this.#elHandle.style.position = "absolute";
+  }
+  handlePos(e) {
+    let R = this.#core.range;
+    let x = parseInt(this.#elHandle.style.marginLeft);
+    let w = this.#elContainer.getBoundingClientRect().width;
+    let h = this.#elHandle.getBoundingClientRect().width;
+    let m = w - h;
+    let d = e.position.x - this.#sliderPos.x;
+    let p = limit(x + d, 0, m);
+    let r = (R.dataLength + R.limitFuture + R.limitPast) / w;
+    let s = Math.floor(p * r);
+    this.setHandleDims(p, h);
+    this.#core.jumpToIndex(s);
+  }
+  setHandleDims(p, w) {
+    let c = this.#elContainer.getBoundingClientRect().width;
+        w = w || this.#elHandle.getBoundingClientRect().width;
+    p = p / c * 100;
+    this.#elHandle.style.marginLeft = `${p}%`;
+    w  = w / c * 100;
+    this.#elHandle.style.width = `${w}%`;
+  }
+  setCursor(cursor) {
+    this.#elHandle.style.cursor = cursor;
   }
 }
 
@@ -3622,23 +4547,35 @@ class Overlays {
     return this.#list.get(overlay)
   }
   addOverlays(overlays) {
+    let r = [];
+    let s;
     for (let o of overlays) {
-      this.addOverlay(o[0], o[1]);
+      s = this.addOverlay(o[0], o[1]);
+      r.push([o[0]], s);
     }
+    return r
   }
   addOverlay(key, overlay) {
-    const layer = new CEL.Layer(this.layerConfig);
-    this.parent.viewport.addLayer(layer);
-    overlay.layer = layer;
-    overlay.instance = new overlay.class(
-      layer,
-      this.#parent.TimeLine,
-      this.#parent.Scale,
-      this.#core.theme,
-      this,
-      overlay.params
-    );
-    this.#list.set(key, overlay);
+    try {
+      const layer = new CEL.Layer(this.layerConfig);
+      this.parent.viewport.addLayer(layer);
+      overlay.layer = layer;
+      overlay.instance = new overlay.class(
+        layer,
+        this.#parent.TimeLine,
+        this.#parent.Scale,
+        this.#core.theme,
+        this,
+        overlay.params
+      );
+      this.#list.set(key, overlay);
+      return true
+    }
+    catch (e) {
+      console.error(`Error: Cannot instantiate ${key} overlay / indicator`);
+      console.error(e);
+      return false
+    }
   }
 }
 
@@ -3682,324 +4619,6 @@ class chartGrid extends Overlay{
   drawX() {
     this.draw("x");
     return
-  }
-}
-
-const status = {
-  idle: 0,
-  dragStart: 1,
-  dragging: 2
-};
-class Point {
-  x = 0;
-  y = 0;
-  constructor() {
-    if (arguments.length === 1) {
-      const { x, y } = arguments[0];
-      this.x = x;
-      this.y = y;
-    } else if (arguments.length > 1) {
-      const [x, y] = arguments;
-      this.x = x;
-      this.y = y;
-    }
-  }
-  clone() {
-    return new Point(this.x, this.y);
-  }
-}
-
-const keyboard = [
-  "keypress",
-  "keydown",
-  "keyup"
-];
-const pointer = [
-  "pointerdown",
-  "pointerup",
-  "pointerover", "pointerenter",
-  "pointerout", "pointerleave",
-  "pointermove",
-  "pointercancel",
-  "gotpointercapture",
-  "lostpointercapture",
-  "dblclick",
-  "click",
-  "wheel",
-  "contextmenu"
-];
-const mouse = [
-  "mousedown",
-  "mouseenter",
-  "mouseleave",
-  "mousemove",
-  "mouseout",
-  "mouseover",
-  "mouseup",
-  "mousewheel",
-];
-const touch = [
-  "touchcancel",
-  "touchend",
-  "touchmove",
-  "touchstart"
-];
-const pen = [
-];
-const misc = [
-];
-const custom = [
-  "pointerdrag",
-  "pointerdragend"
-];
-class EventsAgent {
-  constructor (input) {
-    this.input = input;
-    this.element = input.element;
-    if (window.PointerEvent) {
-      this.type = [...keyboard, ...pointer, ...mouse, ...touch, ...pen, ...misc, ...custom];
-    } else {
-      this.type = [...keyboard, ...mouse, ...touch, ...pen, ...misc, ...custom];
-    }
-    this.clientPosPrev = new Point([null, null]);
-    this.position = new Point();
-    this.movement = new Point([0, 0]);
-    this.dragstart = new Point([null, null]);
-    this.dragend = new Point([null, null]);
-    this.dragCheckThreshold = 3;
-    this.dragStatus = false;
-    this.wheeldelta = 0;
-    this.pointerButtons = [false, false, false, false, false];
-    this.pointerdrag = new Event("pointerdrag");
-    this.pointerdragend = new Event("pointerdragend");
-  }
-  has (event) {
-    if (this.type.indexOf(event) == -1) return false
-    else return true
-  }
-  addListener (event, handler, options) {
-    let cb = handler;
-    if (!this.has(event) ||
-        !isFunction(handler) ||
-        !DOM.isElement(this.element)
-    ) return false
-    if (pointer.indexOf(event) !== -1) {
-      switch (event) {
-        case "pointerdown":
-            cb = function (e) {
-              this.onPointerDown(e);
-              handler(this.createPointerEventArgument(e));
-            };
-            break;
-        case "pointerup":
-          cb = function (e) {
-            this.onPointerUp(e);
-            handler(this.createPointerEventArgument(e));
-          };
-          break;
-        case "pointermove":
-          cb = function (e) {
-            this.motion(e);
-            handler(this.createPointerEventArgument(e));
-          };
-          break;
-        case "click":
-        case "dbclick":
-        case "pointerenter":
-        case "pointerleave":
-        case "pointerout":
-        case "pointerover":
-        case "contextmenu":
-          cb = function (e) {
-            this.location(e);
-            handler(this.createPointerEventArgument(e));
-          };
-          break;
-        case "wheel":
-          cb = function (e) {
-            this.wheeldelta = e.wheelDelta;
-            handler(this.createPointerEventArgument(e));
-          };
-          break;
-        case "pointercancel":
-        case "gotpointercapture":
-        case "lostpointercapture":
-        default :
-          cb = function (e) {
-            handler(e);
-          };
-          break;
-      }
-      this.element.addEventListener(event, cb.bind(this), options);
-      return cb
-    }
-    else if (custom.indexOf(event) == -1)
-      this.element.addEventListener(event, handler, options);
-    else {
-      switch (event) {
-        case "pointerdrag":
-          this.initPointerDrag(handler, options);
-          break;
-        case "pointerdragend":
-          cb = function (e) {
-            this.motion(e);
-            handler(this.createPointerEventArgument(e));
-          };
-          this.element.addEventListener(event, cb.bind(this), options);
-          break;
-      }
-    }
-    return true
-  }
-  removerListener (event, handler, element, options) {
-    if (!this.has(event) ||
-        !isFunction(handler) ||
-        !DOM.isElement(element)
-    ) return false
-    if (event == "pointerdrag") {
-      e.target.removeEventListener("pointermove", this.onPointerDrag);
-      e.target.removeEventListener("pointerdown", this.onPointerDown);
-      e.target.removeEventListener("gotpointercapture", this.onPointerDrag);
-      e.target.removeEventListener("lostpointercapture", this.onPointerDragEnd);
-      document.removeEventListener("pointerup", this.onPointerDragEnd);
-    }
-    element.removeEventListener(event, handler, options);
-    return true
-  }
-  initPointerDrag (handler, options) {
-    if (!this.draginit) {
-      this.draginit = true;
-      this.element.addEventListener("pointerdown", this.onPointerDown.bind(this), options);
-      this.element.addEventListener("gotpointercapture", this.onPointerCapture.bind(this), options);
-      this.element.addEventListener("lostpointercapture", this.onPointerDragEnd.bind(this), options);
-      this.element.addEventListener("pointermove", this.onPointerMove.bind(this), options);
-    }
-    let cb = function (e) {
-      e = this.createPointerEventArgument(e);
-      handler(e);
-    };
-    this.dragStatus = "ready";
-    this.element.addEventListener("pointerdrag", cb.bind(this), options);
-  }
-  onPointerDown (e) {
-    this.location(e);
-    this.pointerButtons[e.button] = true;
-    if (this.dragStatus == "ready") e.target.setPointerCapture(e.pointerId);
-  }
-  onPointerUp (e) {
-    this.location(e);
-    this.pointerButtons[e.button] = false;
-  }
-  onPointerMove (e) {
-    if (this.dragStatus == "dragging") {
-      this.motion(e);
-      this.dragend = this.position.clone();
-      e.target.dispatchEvent(this.pointerdrag);
-    }
-  }
-  onPointerCapture (e) {
-    this.dragstart = this.position.clone();
-    this.dragend = this.position.clone();
-    this.dragStatus = "dragging";
-  }
-  onPointerDragEnd (e) {
-    if (this.dragStatus == "dragging") {
-      this.dragStatus = "ready";
-      e.target.dispatchEvent(this.pointerdragend);
-    }
-  }
-  createPointerEventArgument(e) {
-    return {
-      isProcessed: false,
-      pointerType: e.pointerType,
-      position: this.position.clone(),
-      movement: this.movement.clone(),
-      dragstart: this.dragstart.clone(),
-      dragend: this.dragend.clone(),
-      wheeldelta: this.wheeldelta,
-      buttons: this.pointerButtons,
-      domEvent: e,
-      timeStamp: Date.now()
-    }
-  }
-  isButtonPressed(button) {
-    return (this.pointerButtons.indexOf(button) !== -1) ? true : false
-  }
-  setCursor(type) {
-		this.element.style.cursor = type;
-	}
-  motion(e) {
-    const clientX = e.clientX || this.position.x;
-    const clientY = e.clientY || this.position.y;
-    this.movement.x = clientX - this.clientPosPrev.x;
-    this.movement.y = clientY - this.clientPosPrev.y;
-    this.position.x += this.movement.x;
-    this.position.y += this.movement.y;
-    this.clientPosPrev.x = clientX;
-    this.clientPosPrev.y = clientY;
-  }
-  location(e) {
-    const clientRect = e.target.getBoundingClientRect();
-    this.clientPosPrev.x = e.clientX;
-    this.clientPosPrev.y = e.clientY;
-    this.position.x = e.clientX - clientRect.left;
-    this.position.y = e.clientY - clientRect.top;
-    this.movement.x = 0;
-    this.movement.y = 0;
-  }
-  createKeyEventArgument(e) {
-    return e
-  }
-}
-
-const defaultOptions$1 = {
-  element: undefined,
-  contextMenu: true
-};
-class Input  {
-  constructor (element, options) {
-    this.options = { ...defaultOptions$1, ...options };
-    this.status = status.idle;
-    this.element = element;
-    if (!this.element && this.options.elementId) {
-      this.element = document.getElementById(this.options.elementId);
-    }
-    if (!this.element) {
-      throw "Must specify an element to receive user input.";
-    }
-    this.eventsAgent = new EventsAgent(this);
-    if (!this.options.contextMenu) {
-      window.oncontextmenu = (e) => {
-        e.preventDefault();
-        return false;
-      };
-    }
-  }
-  on (event, handler, options) {
-    return this.eventsAgent.addListener(event, handler, options)
-  }
-  off (event, handler, options) {
-    return this.eventsAgent.removeListener(event, handler, options)
-  }
-  invoke (agent, eventName, args) {
-    this.currentAgent = agent;
-    this.eventsAgent.invoke(eventName, this.createEventArgument(args));
-  }
-  createEventArgument (args) {
-    const arg = args || {};
-    arg.isButtonPressed = button => this.isButtonPressed(button);
-    arg.isKeyPressed = key => this.isKeyPressed(key);
-    arg.controller = this;
-    return arg;
-  }
-  isButtonPressed (button) {
-    return this.eventsAgent.isButtonPressed(button);
-  }
-  isKeyPressed (key) {
-    return this.eventsAgent.isKeyPressed(key);
-  }
-  setCursor (type) {
-    this.eventsAgent.setCursor(type);
   }
 }
 
@@ -4146,8 +4765,11 @@ class graph {
     };
     return {width, height, layerConfig}
   }
-  addOverlays(overlays) {
-    this.#overlays.addOverlays(overlays);
+  addOverlays(o) {
+    return this.#overlays.addOverlays(o)
+  }
+  addOverlay(key, overlay) {
+    return this.#overlays.addOverlay(key, overlay)
   }
   draw(range=this.range, update=false) {
     const oList = this.#overlays.list;
@@ -4167,2290 +4789,6 @@ class graph {
   }
   render() {
     this.#viewport.render();
-  }
-}
-
-const camera =
-  `<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" ><path d="M471.993 112h-89.2l-16.242-46.75a32.023 32.023 0 00-30.229-21.5H175.241a31.991 31.991 0 00-30.294 21.691L129.1 112H40a24.027 24.027 0 00-24 24v312a24.027 24.027 0 0024 24h431.993a24.027 24.027 0 0024-24V136a24.027 24.027 0 00-24-24zm-8 328H48.007V144h104.01l23.224-68.25h161.081l23.71 68.25h103.961z" class="ci-primary"></path><path d="M256 168a114 114 0 10114 114 114.13 114.13 0 00-114-114zm0 196a82 82 0 1182-82 82.093 82.093 0 01-82 82z"></path></svg>`;
-const chart =
-  `<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M376 160v32h65.372L252 381.373l-72-72L76.686 412.686l22.628 22.628L180 354.627l72 72 212-211.999V280h32V160H376z"></path><path d="M48 104H16v392h480v-32H48V104z"></path></svg>`;
-const clock =
-  `<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M271.514 95.5h-32v178.111l115.613 54.948 13.737-28.902-97.35-46.268V95.5z"></path><path d="M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208z"></path></svg>`;
-const config =
-  `<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M245.151 168a88 88 0 1088 88 88.1 88.1 0 00-88-88zm0 144a56 56 0 1156-56 56.063 56.063 0 01-56 56z"></path><path d="M464.7 322.319l-31.77-26.153a193.081 193.081 0 000-80.332l31.77-26.153a19.941 19.941 0 004.606-25.439l-32.612-56.483a19.936 19.936 0 00-24.337-8.73l-38.561 14.447a192.038 192.038 0 00-69.54-40.192l-6.766-40.571A19.936 19.936 0 00277.762 16H212.54a19.937 19.937 0 00-19.728 16.712l-6.762 40.572a192.03 192.03 0 00-69.54 40.192L77.945 99.027a19.937 19.937 0 00-24.334 8.731L21 164.245a19.94 19.94 0 004.61 25.438l31.767 26.151a193.081 193.081 0 000 80.332l-31.77 26.153A19.942 19.942 0 0021 347.758l32.612 56.483a19.937 19.937 0 0024.337 8.73l38.562-14.447a192.03 192.03 0 0069.54 40.192l6.762 40.571A19.937 19.937 0 00212.54 496h65.222a19.936 19.936 0 0019.728-16.712l6.763-40.572a192.038 192.038 0 0069.54-40.192l38.564 14.449a19.938 19.938 0 0024.334-8.731l32.609-56.487a19.939 19.939 0 00-4.6-25.436zm-50.636 57.12l-48.109-18.024-7.285 7.334a159.955 159.955 0 01-72.625 41.973l-10 2.636L267.6 464h-44.89l-8.442-50.642-10-2.636a159.955 159.955 0 01-72.625-41.973l-7.285-7.334-48.117 18.024L53.8 340.562l39.629-32.624-2.7-9.973a160.9 160.9 0 010-83.93l2.7-9.972L53.8 171.439l22.446-38.878 48.109 18.024 7.285-7.334a159.955 159.955 0 0172.625-41.973l10-2.636L222.706 48H267.6l8.442 50.642 10 2.636a159.955 159.955 0 0172.625 41.973l7.285 7.334 48.109-18.024 22.447 38.877-39.629 32.625 2.7 9.972a160.9 160.9 0 010 83.93l-2.7 9.973 39.629 32.623z"></path></svg>`;
-const cursor =
-  `<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><rect x="16" y="240.18" width="188.84" height="31.635"/><g transform="translate(-3.3234e-7 -112.18)"><rect x="307.16" y="352.37" width="188.84" height="31.635"/></g><rect transform="rotate(-90)" x="-496" y="240.18" width="188.84" height="31.635"/><rect transform="rotate(-90)" x="-204.84" y="240.18" width="188.84" height="31.635"/></svg>`;
-const del =
-  `<svg width="46.08" height="46.08" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"></path><path d="M6.535 3H21a1 1 0 011 1v16a1 1 0 01-1 1H6.535a1 1 0 01-.832-.445l-5.333-8a1 1 0 010-1.11l5.333-8A1 1 0 016.535 3zm.535 2l-4.666 7 4.666 7H20V5H7.07zM13 10.586l2.828-2.829 1.415 1.415L14.414 12l2.829 2.828-1.415 1.415L13 13.414l-2.828 2.829-1.415-1.415L11.586 12 8.757 9.172l1.415-1.415L13 10.586z"></path></svg>`;
-const fibonacci =
-  `<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g stroke-width="30.155"><rect x="14.757" y="240.92" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="147" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="334.84" width="482.49" height="30.155" rx="15.078"/></g ><g transform="translate(5.937 -288.34)"><path d="m23.904 712.34c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h173.93c-0.65295-3.3651-2.0312-6.4697-2.0312-10.026 0-7.1393 1.5573-13.888 4.0625-20.13zm276.35 0c2.5051 6.2423 4.0365 12.991 4.0365 20.13 0 3.5554-1.3526 6.6618-2.0052 10.026h173.93c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078z"/><path d="m250.06 759.97c17.965 0 32.545-14.58 32.545-32.545 0-17.965-14.58-32.545-32.545-32.545-17.965 0-32.545 14.58-32.545 32.545 0 17.965 14.58 32.545 32.545 32.545zm0 21.697c-29.964 0-54.242-24.279-54.242-54.242 0-29.964 24.279-54.242 54.242-54.242 29.964 0 54.242 24.279 54.242 54.242 0 29.964-24.279 54.242-54.242 54.242z" stroke-width="21.697"/></g ><path d="m144.05 18.672c-24.694 0-45.285 16.595-51.849 39.167h-62.37c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h62.37c6.5639 22.572 27.155 39.167 51.849 39.167s45.285-16.595 51.849-39.167h120.03c6.5639 22.572 27.155 39.167 51.849 39.167 24.694 0 45.285-16.595 51.849-39.167h62.552c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078h-62.552c-6.5639-22.572-27.155-39.167-51.849-39.167-24.694 0-45.285 16.595-51.849 39.167h-120.03c-6.5639-22.572-27.155-39.167-51.849-39.167zm0 21.693c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 1e-5 -32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552zm223.72 0c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 0-32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552z" stroke-width="30.155"/></svg>`;
-const line =
-  `<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g transform="matrix(21.697 0 0 21.697 -47.758 -47.758)"><path d="m7.354 21.354 14-14-0.707-0.707-14 14z"/><path d="m22.5 7c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5zm-17 16c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z"/></g></svg>`;
-const measure =
-  `<svg width="46.08" height="46.08" viewBox="0 0 32 32"><path d="M 3.2758709,20.241377 11.758622,28.72413 28.72413,11.758622 20.241377,3.2758709 Z m 2.1206881,0 1.5905161,-1.590515 3.7112049,3.711203 1.060342,-1.060345 -3.7112027,-3.711204 1.0603441,-1.060344 2.1206876,2.12069 1.060346,-1.060346 -2.120689,-2.120688 1.060343,-1.060344 3.711203,3.711203 L 16,17.060346 l -3.711203,-3.711208 1.060341,-1.060341 2.12069,2.120687 1.060344,-1.060346 -2.120688,-2.120687 1.060344,-1.060343 3.711204,3.711205 1.060345,-1.060345 -3.711205,-3.7112046 1.060344,-1.0603441 2.120687,2.1206887 1.060346,-1.0603446 -2.120687,-2.1206883 1.590515,-1.5905161 6.362065,6.362063 -14.84482,14.84482 z" style="stroke-width:0.749776" /></svg>`;
-const range =
-  `<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><g id="g930" transform="matrix(21.128963,0,0,21.128963,-29.235597,-50.369964)"><path clip-rule="evenodd" d="m 4.5,5 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,6.5 A 2.5,2.5 0 0 1 6.95,6 H 24 V 7 H 6.95 A 2.5,2.5 0 0 1 2,6.5 Z M 4.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,16.5 A 2.5,2.5 0 0 1 6.95,16 h 13.1 a 2.5,2.5 0 1 1 0,1 H 6.95 A 2.5,2.5 0 0 1 2,16.5 Z M 22.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z m -18,6 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,22.5 A 2.5,2.5 0 0 1 6.95,22 H 24 v 1 H 6.95 A 2.5,2.5 0 0 1 2,22.5 Z" id="path908" /><path clip-rule="evenodd" d="M 22.4,8.94 21.01,9.57 20.6,8.66 21.99,8.03 Z m -4,1.8 -1.39,0.63 -0.41,-0.91 1.39,-0.63 z m -4,1.8 -1.4,0.63 -0.4,-0.91 1.39,-0.63 z m -4,1.8 L 9,14.97 8.6,14.06 9.99,13.43 Z" id="path910" /></g></svg>`;
-const text =
-  `<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M231.359 147l-80.921 205h45.155l15.593-39.5h89.628l15.593 39.5h45.155l-80.921-205zm-3.594 123.5L256 198.967l28.235 71.533z"></path><path d="M384 56H128V16H16v112h40v256H16v112h112v-40h256v40h112V384h-40V128h40V16H384zM48 96V48h48v48zm48 368H48v-48h48zm288-40H128v-40H88V128h40V88h256v40h40v256h-40zm80-8v48h-48v-48zM416 48h48v48h-48z"></path></svg>`;
-const close =
-  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g718" transform="translate(0,1.2499996)"><path d="M 7.5010125,7.9560661 5.355012,10.103066 c -0.472,0.472 -1.18,-0.2360003 -0.708,-0.7080003 L 7.6470125,6.3950659 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999998 c 0.472,0.472 -0.236,1.1800003 -0.708,0.7080003 L 8.5010125,7.9560661 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m 7.4989873,5.5439348 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>`;
-const up =
-  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,7.7026182 -2.1460003,2.147 c -0.472,0.4719998 -1.18,-0.236 -0.708,-0.708 l 3.0000003,-3 c 0.1953639,-0.1958581 0.5126361,-0.1958581 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.1799998 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6-3" /></svg>`;
-const down =
-  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,8.2973819 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.1958581 0.5126361,0.1958581 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></svg>`;
-const restore =
-  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g687" transform="translate(15.647255,-0.0288128)"><path d="m -8.1462425,10.484879 -2.1460005,2.146999 c -0.472,0.472 -1.18,-0.236 -0.708,-0.708 l 3.0000005,-2.9999994 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999994 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1460005,-2.146999 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m -8.1482677,5.5727476 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>`;
-const maximize =
-  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g611" transform="translate(0.2050748,-0.8829888)"><path d="m 7.2959375,11.933818 -2.146,-2.1469999 c -0.472,-0.4719998 -1.18,0.2359999 -0.708,0.7079999 l 3,3 c 0.195364,0.195858 0.512636,0.195858 0.708,0 l 3.0000005,-3 c 0.472,-0.472 -0.236,-1.1799997 -0.708,-0.7079999 L 8.2959375,11.933818 c -0.431103,0.417289 -0.523896,0.423024 -1,0 z" style="" id="path566" /><path d="m 7.2939123,5.8321596 -2.146,2.147 c -0.4719998,0.472 -1.1799998,-0.236 -0.708,-0.708 l 3,-3 c 0.1953639,-0.195858 0.5126361,-0.195858 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6" /></g></svg>`;
-const collapse =
-  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 11.500447,8.5 c 0.666666,0 0.666666,-1 0,-1 H 4.444275 c -0.1571231,0 -0.224029,0.07336 -0.2978281,0.1459999 -0.1958579,0.195364 -0.1958579,0.5126361 0,0.7080001 0,0 0.113806,0.146 0.320186,0.146 z" style="" id="path887" /></svg>`;
-const fwdEnd =
-  `<svg class="ov-icon" width="46.08" height="46.08" font-size="2.88em" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m14 15c0.55228 0 1-0.44772 1-1v-12c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1zm0-15c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2v-12c0-1.1046 0.89543-2 2-2z" fill-rule="evenodd"/><g transform="translate(-1.1585)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>`;
-const rwdStart =
-  `<svg class="ov-icon" width="46.08" height="46.08" font-size="2.88em" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m2 15c-0.55228 0-1-0.44772-1-1v-12c0-0.55228 0.44772-1 1-1h12c0.55228 0 1 0.44772 1 1v12c0 0.55228-0.44772 1-1 1zm0-15c-1.1046 0-2 0.89543-2 2v12c0 1.1046 0.89543 2 2 2h12c1.1046 0 2-0.89543 2-2v-12c0-1.1046-0.89543-2-2-2z" fill-rule="evenodd"/><g transform="matrix(-1 0 0 1 17.159 0)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>`;
-
-const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
-typeof process !== 'undefined'
-  && process.versions != null
-  && process.versions.node != null;
-
-const isHex  = /^#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
-const isHSL  = /^hsla?((\d{1,3}?),\s*(\d{1,3}%),\s*(\d{1,3}%)(,\s*[01]?\.?\d*)?)$/;
-const isHSLA = /^hsla[(]\s*0*(?:[12]?\d{1,2}|3(?:[0-5]\d|60))\s*(?:\s*,\s*0*(?:\d\d?(?:\.\d+)?\s*%|\.\d+\s*%|100(?:\.0*)?\s*%)){2}\s*,\s*0*(?:\.\d+|1(?:\.0*)?)\s*[)]$/;
-const isRGB  = /^rgba?((\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?)(,\s*[01]?\.?\d*)?)$/;
-const isRGBA = /^^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1(?:\.0*)?)\s*[)]$/;
-class Colour {
-  #value = {
-    r: null,
-    g: null,
-    b: null,
-    a: null,
-    h: null,
-    s: null,
-    l: null,
-    v: null,
-    r16: null,
-    g16: null,
-    b16: null,
-    a16: null,
-    hex: null,
-    hsl: null,
-    hsla: null,
-    rgb: null,
-    rgba: null,
-    isValid: false
-  }
-  constructor (colour) {
-    this.#validate(colour);
-    if (isHex.test(colour)) this.#valueIsHex(colour);
-    if (isHSL.test(colour)) this.#valueIsHSL(colour);
-    if (isHSLA.test(colour)) this.#valueIsHSLA(colour);
-    if (isRGB.test(colour)) this.#valueIsRGB(colour);
-    if (isRGBA.test(colour)) this.#valueIsRGBA(colour);
-  }
-  get value() { return this.#value }
-  get isValid() { return this.#value.isValid }
-  get hex() { return this.#value.hex.slice(0, -2) }
-  get hexa() { return this.#value.hex }
-  #validate(colour) {
-    if (isBrowser) {
-      let el = document.getElementById('divValidColourTest');
-      if (!el) {
-        el = document.createElement('div');
-        el.id = 'divValidColourTest';
-      }
-      el.style.backgroundColor = "";
-      el.style.backgroundColor = colour;
-      this.#value.isValid = (el.style.backgroundColor.length) ? true : false;
-    }
-    else {
-      this.#value.isValid = (
-        isHex.test(colour) ||
-        isHSL.test(colour) ||
-        isHSLA.test(colour) ||
-        isRGB.test(colour) ||
-        isRGBA.test(colour)
-      ) ? true : false;
-    }
-  }
-  setHex(hex) {
-    let val = this.#value;
-    ([
-      val.r16,
-      val.g16,
-      val.b16,
-      val.a16
-    ] = hex);
-    val.hex = "#" + val.r16 +val.g16 + val.b16 + val.a16;
-  }
-  setRGBA(rgba) {
-    let val = this.#value;
-    ([
-      val.r,
-      val.g,
-      val.b,
-      val.a
-    ] = rgba);
-    val.rgb = `rgb(${rgba[0]},${rgba[1]},${rgba[2]})`;
-    val.rgba = `rgb(${rgba[0]},${rgba[1]},${rgba[2]},${rgba[3]})`;
-  }
-  setHSLA(hsla) {
-    let val = this.#value;
-    ([
-      val.h,
-      val.s,
-      val.l,
-      val.a
-    ] = hsla);
-    val.hsl = `hsl(${hsla[0]},${hsla[1]}%,${hsla[2]}%)`;
-    val.hsla = `hsl(${hsla[0]},${hsla[1]}%,${hsla[2]}%,${hsla[3]})`;
-  }
-  #valueIsHex(hex) {
-    this.#value.hex = hex;
-    let l = hex.length,
-        rgba;
-    switch (l) {
-      case 4 :
-        rgba = [`${hex[1]}${hex[1]}`, `${hex[2]}${hex[2]}`, `${hex[3]}${hex[3]}`, "ff"];
-        break;
-      case 7 :
-        rgba = [hex.substr(1,2), hex.substr(3,2), hex.substr(5,2), "ff"];
-        break;
-      case 9 :
-        rgba = [hex.substr(1,2), hex.substr(3,2), hex.substr(5,2), hex.substr(7,2)];
-        break
-    }
-    this.setHex(rgba);
-    this.#hexToRGB(rgba);
-    this.#hexToHSL(rgba);
-  }
-  #valueIsHSL(hsl) {
-    this.#value.hsl = hsl;
-  }
-  #valueIsHSLA(hsla) {
-    this.#value.hsla = hsla;
-  }
-  #valueIsRGB(rgb) {
-    this.#value.rgb = rgb;
-    this.#RGBAToHex(rgba);
-  }
-  #valueIsRGBA(rgba) {
-    this.#value.rgba = rgba;
-    this.#RGBAToHex(rgba);
-  }
-  #RGBToHex (rgb) {
-    let {r,g,b,a} = this.#getRGB(rgb);
-    if (r.length == 1)
-      r = "0" + r;
-    if (g.length == 1)
-      g = "0" + g;
-    if (b.length == 1)
-      b = "0" + b;
-    if (a.length == 1)
-      a = "0" + a;
-    this.value.r = r;
-    this.value.g = g;
-    this.value.b = b;
-    this.value.a = a;
-    this.setHex([r,g,b,a]);
-    return this
-  }
-  #RGBToHSL (rgb) {
-    let {r,g,b,a} = this.#getRGB(rgb);
-    r = parseInt(r, 16) / 255;
-    g = parseInt(g, 16) / 255;
-    b = parseInt(b, 16) / 255;
-    a = parseInt(a, 16) / 255;
-    const l = Math.max(r, g, b);
-    const s = l - Math.min(r, g, b);
-    const h = s
-      ? l === r
-        ? (g - b) / s
-        : l === g
-        ? 2 + (b - r) / s
-        : 4 + (r - g) / s
-      : 0;
-    let hsla = [
-      (60 * h < 0 ? 60 * h + 360 : 60 * h).toString(),
-      (100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0)).toString(),
-      ((100 * (2 * l - s)) / 2).toString(),
-      (a).toString()
-    ];
-    this.setHSLA(hsla);
-    return this
-  }
-  #HSLToRGB (h, s, l) {
-    s /= 100;
-    l /= 100;
-    const k = n => (n + h / 30) % 12;
-    const a = s * Math.min(l, 1 - l);
-    const f = n =>
-      l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-    return [255 * f(0), 255 * f(8), 255 * f(4)];
-  };
-  #hslToHex(h, s, l) {
-    l /= 100;
-    const a = s * Math.min(l, 1 - l) / 100;
-    const f = n => {
-      const k = (n + h / 30) % 12;
-      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-      return Math.round(255 * color).toString(16).padStart(2, '0');
-    };
-    return `#${f(0)}${f(8)}${f(4)}`;
-  }
-  #hexToRGB(hex) {
-    if (isString$1(hex)) hex = /([a-f\d]{2})/ig.exec(hex);
-    var rgba = [
-        parseInt(hex[0], 16),
-        parseInt(hex[1], 16),
-        parseInt(hex[2], 16),
-        parseInt(hex[3], 16) / 255
-    ];
-    this.setRGBA(rgba);
-  }
-  #hexToHSL(hex) {
-    if (isString$1(hex)) hex = /([a-f\d]{2})/ig.exec(hex);
-    let r = parseInt(hex[0], 16);
-    let g = parseInt(hex[1], 16);
-    let b = parseInt(hex[2], 16);
-    let a = parseInt(hex[3], 16);
-    r /= 255, g /= 255, b /= 255, a /= 255;
-    this.setHSLA([r,g,b,a]);
-  }
-  #getRGB (rgb) {
-    let r,g,b,a;
-    let v = this.#value;
-    if (v.r && v.g && v.b && v.a) return {r, g, b, a} = {...v}
-    if (isString$1(rgb)) {
-      let sep = rgb.indexOf(",") > -1 ? "," : " ";
-      rgb = rgb.substr(4).split(")")[0].split(sep);
-    }
-    if (isArray(rgb)) {
-      if (rgb.length < 3 || rgb.length > 4) return false
-      r = rgb[0];
-      g = rgb[1];
-      b = rgb[2];
-      a = (isString$1(rgb[3])) ? rgb[3] : "";
-    }
-    else if (isObject(rgb)) {
-      r = rgb.r;
-      g = rgb.g;
-      b = rgb.b;
-      a = ("a" in rgb) ? rgb.a : "";
-    }
-    else return false
-    return {r, g, b, a}
-  }
-  #RGBAToHex (rgba) {
-    let x, isPercent,
-      i = 0,
-      y = [],
-      z = [],
-      rgb = rgba.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i);
-      rgb.shift();
-      for (let v of rgb) {
-        isPercent = v.indexOf("%") > -1;
-        x = parseFloat(v);
-        if (i < 3 && isPercent) {
-          x = Math.round(255 * x / 100);
-        }
-        else if (i == 3) {
-          if (!isPercent && x >= 0 && x <= 1) {
-            x = Math.round(255 * x);
-          } else if (isPercent && x >= 0 && x <= 100) {
-            x = Math.round(255 * x / 100);
-          } else {
-            x = "";
-          }
-        }
-        y[i] = (x | 1 << 8).toString(16).slice(1);
-        z[i++] = x;
-      }
-      this.setHex(y);
-      this.setRGBA(z);
-      this.#hexToHSL(this.#value.hex);
-  }
-}
-
-const iconW = 20;
-const iconH = 20;
-const handleColour = new Colour(GlobalStyle.COLOUR_BORDER);
-const template$c = document.createElement('template');
-template$c.innerHTML = `
-<style>
-  .scrollBarWidget {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: stretch;
-    gap: 2px;
-  }
-  .scrollBar {
-    position: relative;
-    border: 1px solid var(--txc-time-scrollbar-color, ${GlobalStyle.COLOUR_BORDER});
-    height: 20px;
-    border-radius: 3px;
-    flex-basis: 100%;
-    overflow: hidden;
-  }
-  .scrollBar input {
-    pointer-events: none;
-    position: absolute;
-    overflow: hidden;
-    left: 0;
-    top: 0;
-    width: 100%;
-    outline: none;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    background:  var(--txc-time-slider-color, #555);
-
-  }
-  .scrollBar input::-moz-range-thumb {
-    -moz-appearance: none;
-    appearance: none; 
-    pointer-events: auto;
-    position: relative;
-    z-index: 10;
-    outline: 0;
-    height: 100%;
-  }
-  .scrollBar input::-webkit-slider-thumb {
-    -webkit-appearance: none !important;
-    appearance: none; 
-    pointer-events: auto;
-    position: relative;
-    z-index: 1;
-    height: 100%;
-  }
-  .scrollBar input::-moz-range-track {
-    position: relative;
-    z-index: -1;
-    background-color: rgba(0, 0, 0, 1);
-    border: 0;
-  }
-  .scrollBar input:last-of-type::-moz-range-track {
-    -moz-appearance: none;
-    background: none transparent;
-    border: 0;
-  }
-  .scrollBar input[type="range"]::-webkit-slider-runnable-track {
-    -webkit-appearance: none !important;
-    appearance: none;
-    background: none transparent;
-    cursor: default;
-    height: 1px; /* Required for Samsung internet based browsers */
-    outline: 0;
-  }
-  .scrollBar input[type=range]::-moz-focus-outer {
-    border: 0;
-  }
-  input[type=range] {
-    -webkit-appearance: none;
-    background: none;
-  }
-
-  input[type=range]::-webkit-slider-runnable-track {
-    height: 5px;
-    border: none;
-    border-radius: 3px;
-    background: transparent;
-  }
-
-  input[type=range]::-ms-track {
-    height: 5px;
-    background: transparent;
-    border: none;
-    border-radius: 3px;
-  }
-
-  input[type=range]::-moz-range-track {
-    height: 5px;
-    background: transparent;
-    border: none;
-    border-radius: 3px;
-  }
-
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    border: none;
-    height: 20px;
-    width: 16px;
-    border-radius: 3px;
-    background: var(--txc-time-slider-color, #555);
-    margin-top: -10px;
-    position: relative;
-    z-index: 10000;
-  }
-
-  input[type=range]::-ms-thumb {
-    -webkit-appearance: none;
-    border: none;
-    height: 20px;
-    width: 16px;
-    border-radius: 3px;
-    background:  var(--txc-time-slider-color, #555);
-    margin-top: -5px;
-    position: relative;
-    z-index: 10000;
-  }
-
-  input[type=range]::-moz-range-thumb {
-    -webkit-appearance: none;
-    border: none;
-    height: 100%;
-    width: 16px;
-    border-radius: 3px;
-    background:  var(--txc-time-slider-color, #555);
-    margin-top: -5px;
-    position: relative;
-    z-index: 10000;
-  }
-
-  input[type=range]:focus {
-    outline: none;
-  }
-
-  .handle {
-    background-color: var(--txc-time-handle-color, ${handleColour.hex}44); 
-    width: 2px;
-    height: 18px;
-    margin: 1px;
-    margin-left: 872.968px;
-    margin-right: 0px;
-    position: absolute;
-  }
-  .icon {
-    flex-basis: ${iconW}px;
-  }
-  .icon svg {
-    fill: var(--txc-time-icon-color, ${GlobalStyle.COLOUR_ICON});
-    width: ${iconW}px;
-    height: ${iconH}px;
-    margin-top: 1px;
-  }
-  .icon svg:hover {
-    fill: var(--txc-time-icon-hover-color, ${GlobalStyle.COLOUR_ICONHOVER});
-  }
-</style>
-<div class="scrollBarWidget">
-  <span id="rwdStart" class="icon rwdStart">${rwdStart}</span>
-  <span class="scrollBar">
-    <div class="viewport"></div>
-    <input id="min" class="min" name="min" type="range" step="1" min="0" max="3000" />
-    <input id="max" class="max" name="max" type="range" step="1" min="0" max="3000" />
-    <div class="handle"></div>
-  </span>
-  <span id="fwdEnd" class="icon fwdEnd">${fwdEnd}</span>
-</div>
-`;
-class tradeXOverview extends element {
-  #template
-  constructor () {
-    super(template$c);
-    this.#template = template$c;
-  }
-  destroy() {
-  }
-  connectedCallback() {
-    if (this.doInit) {
-      this.doInit = false;
-      this.shadowRoot.appendChild(this.#template.content.cloneNode(true));
-      document.getElementById('slider-bar');
-      this.max.addEventListener('input', this.onChangeSliderHandler.bind({self: this, input: this.max}));
-      this.min.addEventListener('input', this.onChangeSliderHandler.bind({self: this, input: this.min}));
-    }
-  }
-  disconnectedCallback() {
-  }
-  get scrollBarWidget() { return this.shadowRoot.querySelector('.scrollBarWidget') }
-  get rwdStart() { return this.shadowRoot.querySelector('.rwdStart') }
-  get fwdEnd() { return this.shadowRoot.querySelector('.fwdEnd') }
-  get scrollBar() { return this.shadowRoot.querySelector('.scrollBar') }
-  get viewport() { return this.shadowRoot.querySelector('.viewport') }
-  get handle() { return this.shadowRoot.querySelector('.handle') }
-  get icons() { return this.shadowRoot.querySelectorAll('svg') }
-  get max() { return this.shadowRoot.querySelector('#max') }
-  get min() { return this.shadowRoot.querySelector('#min') }
-  get sliders() { return this.shadowRoot.querySelectorAll('input') }
-  get overviewCSS() { return this.shadowRoot.querySelector('style[title=overview]') }
-  onChangeSliderHandler() {
-    console.log(`${this.input.value}, ${this.input.getAttribute('max')}`);
-  }
-}
-
-window.customElements.define('tradex-overview', tradeXOverview);
-const template$b = document.createElement('template');
-template$b.innerHTML = `
-<style>
-  .viewport {
-    width: 100%;
-    height: 50%;
-  }
-</style>
-<div class="viewport"></div>
-<tradex-overview></tradex-overview>
-`;
-class tradeXTime extends element {
-  constructor () {
-    super(template$b);
-  }
-  destroy() {
-  }
-  disconnectedCallback() {
-  }
-  createGraph() {
-  }
-  get viewport() { return this.shadowRoot.querySelector('.viewport') }
-  get overview() { return this.shadowRoot.querySelector('tradex-overview') }
-}
-window.customElements.define('tradex-time', tradeXTime);
-
-const template$a = document.createElement('template');
-template$a.innerHTML = `
-<style>
-  .viewport {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-</style>
-  <div class="viewport"></div>
-`;
-class tradeXGrid extends element {
-  constructor () {
-    super(template$a);
-  }
-  destroy() {
-  }
-  disconnectedCallback() {
-  }
-  get viewport() { return this.shadowRoot.querySelector('.viewport') }
-}
-window.customElements.define('tradex-grid', tradeXGrid);
-
-const template$9 = document.createElement('template');
-template$9.innerHTML = `
-<style>
-  ::slotted(.legend) {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    white-space: nowrap;
-    width: calc(100% - 1em); 
-    margin: 0 0 0 1em;
-    text-align: left;
-  }
-</style>
-<div class="legends">
-  <slot name="legend"></slot>
-</div>
-`;
-class tradeXLegend extends element {
-  #title
-  #elLegend
-  #elTitle
-  #elInputs
-  #elControls
-  constructor () {
-    super(template$9);
-  }
-  destroy() {
-  }
-  connectedCallback() {
-    if (this.doInit) {
-      this.doInit = false;
-      this.shadowRoot.appendChild(this.template.content.cloneNode(true));
-      this.style.display = "block";
-      this.#elLegend = this.shadowRoot.querySelector('.legend');
-      this.#elTitle = this.shadowRoot.querySelector('.title');
-      this.#elInputs = this.shadowRoot.querySelector('dl');
-      this.#elControls = this.shadowRoot.querySelector('.controls');
-    }
-  }
-  disconnectedCallback() {
-  }
-  get elLegend() { return this.#elLegend }
-  get elTitle() { return this.#elTitle }
-  get elInputs() { return this.#elInputs }
-  get elControls() { return this.#elControls }
-  get title() { return this.#title }
-  set title(t) { this.setTittle(t); }
-  setTittle(t) {
-    if (!isString$1) return
-    this.#title = t;
-    this.elTitle.innerHTML = t;
-  }
-  buildInputs(o) {
-    let i = 0,
-        inp = "",
-        input,
-        styleDT = "display: inline; margin-left: 1em;",
-        styleDD = "display: inline; margin-left: .25em;";
-    for (input in o.inputs) {
-      let colour = (o.colours?.[i]) ? ` color: ${o.colours[i]};` : "";
-      let inputV = (o.inputs[input] !== undefined) ? o.inputs[input] : "---";
-      inp +=
-      `<dt style="${styleDT}">${input}:</dt>
-      <dd style="${styleDD}${colour}">${inputV}</dd>`;
-      ++i;
-    }
-    return inp
-  }
-  buildControls(o) {
-    let inp = "";
-    let id = o.ID;
-    if (o?.type !== "chart") {
-      inp += `<span id="${id}_up" class="control">${up}</span>`;
-      inp += `<span id="${id}_down" class="control">${down}</span>`;
-    }
-    inp += `<span id="${id}_collapse" class="control">${collapse}</span>`;
-    inp += `<span id="${id}_maximize" class="control">${maximize}</span>`;
-    inp += `<span id="${id}_restore" class="control">${restore}</span>`;
-    inp += (o?.type !== "chart") ? `<span id="${id}_remove" class="control">${close}</span>` : ``;
-    inp += `<span id="${id}_config" class="control">${config}</span>`;
-    return inp
-  }
-}
-window.customElements.define('tradex-legends', tradeXLegend);
-
-const template$8 = document.createElement('template');
-template$8.innerHTML = `
-<style>
-  .viewport {
-    position: relative;
-    width: 100%;
-    height: inherit;
-    background: var(--txc-onchart-background, none);
-  }
-  .viewport canvas {
-    position: absolute;
-    top: 1px;
-  }
-  tradex-legends {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index:100;
-    width: 100%;
-  }
-</style>
-<div class="viewport"></div>
-<tradex-legends></tradex-legends>
-`;
-class tradeXOnChart extends element {
-  #parent
-  #elViewport
-  #elLegend
-  #elScale
-  #elCanvas
-  constructor () {
-    super(template$8);
-  }
-  destroy() {
-  }
-  connectedCallback() {
-    if (this.doInit) {
-      this.doInit = false;
-      this.shadowRoot.appendChild(this.template.content.cloneNode(true));
-      this.style.display = "block";
-      this.#elViewport = this.shadowRoot.querySelector('.viewport');
-      this.#elLegend = this.shadowRoot.querySelector('tradex-legends');
-    }
-  }
-  disconnectedCallback() {
-  }
-  get viewport() { return this.#elViewport }
-  get legend() { return this.#elLegend }
-}
-window.customElements.define('tradex-onchart', tradeXOnChart);
-
-const template$7 = document.createElement('template');
-template$7.innerHTML = `
-<style>
-  .viewport {
-    width: 100%;
-    height: inherit;
-    background: var(--txc-onchart-background, none);
-  }
-  tradex-legends {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index:100;
-    width: 100%;
-  }
-</style>
-<tradex-legends></tradex-legends>
-<div class="viewport"></div>
-`;
-class tradeXOffChart extends element {
-  #parent
-  #elViewport
-  #elLegend
-  #elCanvas
-  #options
-  constructor () {
-    super(template$7);
-  }
-  destroy() {
-  }
-  connectedCallback() {
-    if (this.doInit) {
-      this.doInit = false;
-      this.shadowRoot.appendChild(this.template.content.cloneNode(true));
-      this.#elViewport = this.shadowRoot.querySelector('.viewport');
-      this.#elLegend = this.shadowRoot.querySelector('tradex-legends');
-    }
-  }
-  disconnectedCallback() {
-  }
-  get viewport() { return this.#elViewport }
-  get legend() { return this.#elLegend }
-}
-window.customElements.define('tradex-offchart', tradeXOffChart);
-
-const template$6 = document.createElement('template');
-template$6.innerHTML = `
-<style>
-  tradex-grid, tradex-onchart, tradex-offchart {
-    overflow: hidden;
-  }
-  tradex-grid {
-    position: absolute;
-    height: inherit;
-  }
-  tradex-onchart {
-    position: relative;
-    height: 100%;
-  }
-  tradex-grid,
-  tradex-onchart {
-    display: block;
-    width: 100%;
-  }
-  ::slotted(tradex-offchart) {
-    display: block;
-    position: relative;
-    top: 1px;
-    width: 100%;
-    border-top: 1px solid;
-  }
-</style>
-<tradex-grid></tradex-grid>
-<tradex-onchart></tradex-onchart>
-<slot name="offchart" id="offchart"></slot>
-`;
-class tradeXRows extends element {
-  #oWidth
-  #oHeight
-  #widthCache
-  #heightCache
-  constructor () {
-    super(template$6);
-  }
-  destroy() {
-  }
-  connectedCallback() {
-    super.connectedCallback();
-    this.previousDimensions();
-  }
-  disconnectedCallback() {
-  }
-  get grid() { return this.shadowRoot.querySelector('tradex-grid') }
-  get onChart() { return this.shadowRoot.querySelector('tradex-onchart') }
-  get offCharts() { return this.shadowRoot.querySelectorAll('tradex-offchart') }
-  get offChartSlot() { return this.shadowRoot.querySelector('#offchart') }
-  get width() { return this.clientWidth }
-  get height() { return this.clientHeight }
-  get oWidth() { return this.#oWidth }
-  get oHeight() { return this.#oHeight }
-  get widthDeltaR() { return this.clientWidth / this.#oWidth }
-  get heightDeltaR() { return this.clientHeight / this.#oHeight }
-  previousDimensions() {
-    this.#oWidth = (this.#widthCache) ? this.#widthCache : this.clientWidth;
-    this.#oHeight = (this.#heightCache) ? this.#heightCache : this.clientHeight;
-    this.#widthCache = this.clientWidth;
-    this.#heightCache = this.clientHeight;
-  }
-}
-window.customElements.define('tradex-rows', tradeXRows);
-
-const template$5 = document.createElement('template');
-template$5.innerHTML = `
-<style>
-  #viewport {
-    position: absolute;
-    width: 100%;
-    height: inherit;
-    background: var(--txc-onchart-background, none);
-    z-index: 0;
-  }
-  #viewport canvas {
-    position: absolute;
-    top: 1px;
-  }
-  tradex-rows {
-    position:relative;
-    overflow: hidden;
-    width: calc(100% - ${SCALEW}px);
-    height: calc(100% - ${TIMEH}px);
-    border: 1px solid;
-    border-color: var(--txc-border-color, ${GlobalStyle.COLOUR_BORDER}); 
-  }
-  tradex-time {
-    position: relative;
-    width: calc(100% - ${SCALEW}px);
-    height: ${TIMEH}px;
-    overflow: hidden;
-    margin-left: 1px;
-    z-index: 1;
-  }
-</style>
-<div id="viewport"></div>
-<tradex-rows></tradex-rows>
-<tradex-time></tradex-time>
-`;
-class tradeXMain extends element {
-  #elYAxis
-  #theme
-  constructor () {
-    super(template$5);
-  }
-  destroy() {
-  }
-  disconnectedCallback() {
-  }
-  get viewport() { return this.shadowRoot.querySelector('#viewport') }
-  get rows() { return this.shadowRoot.querySelector('tradex-rows') }
-  get time() { return this.shadowRoot.querySelector('tradex-time') }
-  start(theme) {
-    this.#theme = theme;
-    this.setMain();
-  }
-  rowNode(type, api) {
-    const styleRow = ` border-top: 1px solid ${api.theme.chart.BorderColour};`;
-    const node = `
-      <tradex-offchart slot="offchart" class="${type}" style="${styleRow}">
-      </tradex-offchart>
-    `;
-    return node
-  }
-  setMain() {
-    let timeH = (isNumber(this.#theme?.time?.height)) ? this.#theme.time.height : TIMEH;
-    let offset = (this.#theme.tools.location == "none") ? 60 : 0;
-    this.rows.style.height = `calc(100% - ${timeH}px)`;
-    this.rows.style.left = `${offset}px`;
-    this.time.style.left = `${offset}px`;
-    this.viewport.style.left = `${offset}px`;
-  }
-}
-window.customElements.define('tradex-main', tradeXMain);
-
-const template$4 = document.createElement('template');
-template$4.innerHTML = `
-  <slot></slot>
-`;
-class tradeXTools extends element {
-  constructor () {
-    super(template$4);
-  }
-  destroy() {
-  }
-  disconnectedCallback() {
-  }
-  get icons() { return this.shadowRoot.querySelector('slot').assignedElements() }
-}
-window.customElements.define('tradex-tools', tradeXTools);
-
-const template$3 = document.createElement('template');
-template$3.innerHTML = `
-<style>
-  .viewport {
-    width: 100%;
-    height: 100%;
-    margin-top: 2px;
-    margin-left: 2px;
-  }
-</style>
-<div class="viewport"></div>
-<slot name="offchart" id="offchart"></slot>
-`;
-class tradeXScale extends element {
-  #viewport
-  #offChartSlot
-  constructor () {
-    super(template$3);
-  }
-  destroy() {
-  }
-  connectedCallback() {
-    if (this.doInit) {
-      this.doInit = false;
-      this.shadowRoot.appendChild(this.template.content.cloneNode(true));
-      this.style.display = "block";
-      this.#viewport = this.shadowRoot.querySelector('.viewport');
-      this.#offChartSlot = this.shadowRoot.querySelector('#offchart');
-    }
-  }
-  disconnectedCallback() {
-  }
-  get viewport() { return this.#viewport}
-  get offCharts() { return this.shadowRoot.querySelectorAll('tradex-offchart') }
-  get offChartSlot() { return this.#offChartSlot }
-}
-window.customElements.define('tradex-scale', tradeXScale);
-
-const right = `
-<style>
-  tradex-tools {
-    position: absolute; 
-    top: 0; left: 0;
-    width: ${TOOLSW}px;
-    height: 100%; 
-    min-height: 100%; 
-  }
-  tradex-main {
-    position: absolute; 
-    top: 0;
-    right: 0;
-    width: calc(100% - ${TOOLSW}px);
-    height: 100%;
-  }
-  tradex-scale {
-    position: absolute; 
-    top: 0; 
-    right: 0; 
-    width: ${SCALEW}px; 
-    height: 100%;
-  }
-</style>
-<tradex-tools></tradex-tools>
-<tradex-main></tradex-main>
-<tradex-scale></tradex-scale>
-`;
-const template$2 = document.createElement('template');
-template$2.innerHTML = right;
-class tradeXBody extends element {
-  #theme
-  constructor () {
-    super(template$2);
-  }
-  destroy() {
-  }
-  disconnectedCallback() {
-  }
-  get tools() { return this.shadowRoot.querySelector('tradex-tools') }
-  get main() { return this.shadowRoot.querySelector('tradex-main') }
-  get scale() { return this.shadowRoot.querySelector('tradex-scale') }
-  start(theme) {
-    this.#theme = theme;
-    this.setToolsLocation();
-  }
-  setYAxisLocation(side=this.#theme?.yAxis?.location) {
-    let toolsW = (isNumber(this.#theme?.tools?.width)) ? this.#theme.tools.width : TOOLSW;
-    let offset;
-    switch (side) {
-      case "left":
-        offset = (toolsW == 0) ? 0 : SCALEW;
-        this.scale.style.left = `${toolsW}px`;
-        this.scale.style.right = undefined;
-        this.main.style.left = undefined;
-        this.main.style.right = `-${offset}px`;
-        this.main.style.width = `calc(100% - ${toolsW}px)`;
-        break;
-      case "both":
-      case "right":
-      default:
-        offset = (toolsW == 0) ? SCALEW : 0;
-        this.scale.style.left = undefined;
-        this.scale.style.right = 0;
-        this.main.style.left = undefined;
-        this.main.style.right = `${offset}px`;
-        this.main.style.width = `calc(100% - ${toolsW}px)`;
-        break;
-    }
-  }
-  setToolsLocation(side=this.#theme?.tools?.location) {
-    this.#theme.tools = this.#theme.tools || {};
-    switch(side) {
-      case "none":
-      case false:
-        this.#theme.tools.location = "none";
-        this.#theme.tools.width = 0;
-        this.tools.style.display = "none";
-        this.tools.style.width =`0px`;
-        break;
-      case "right":
-        this.#theme.tools.location = "right";
-        this.#theme.tools.width = this.#theme?.tools?.width || TOOLSW;
-        this.tools.style.display = "block";
-        this.tools.style.left = undefined;
-        this.tools.style.right = 0;
-        this.tools.style.width =`${TOOLSW}px`;
-        break;
-      case "left":
-      default:
-        this.#theme.tools.location = "left";
-        this.#theme.tools.width = this.#theme?.tools?.width || TOOLSW;
-        this.tools.style.display = "block";
-        this.tools.style.left = 0;
-        this.tools.style.right = undefined;
-        this.tools.style.width =`${TOOLSW}px`;
-        break;
-    }
-    this.setYAxisLocation();
-  }
-}
-window.customElements.define('tradex-body', tradeXBody);
-
-const template$1 = document.createElement('template');
-template$1.innerHTML = `
-  <style>
-    .utilsOptions {
-      display: inline-block; float: right;
-    }
-  </style>
-  <slot></slot>
-  <div class="utilsOptions">
-  </div>
-`;
-class tradeXUtils extends element {
-  constructor () {
-    super(template$1);
-  }
-  destroy() {
-  }
-  disconnectedCallback() {
-  }
-  get icons() { return this.shadowRoot.querySelector('slot').assignedElements()[0].children }
-}
-window.customElements.define('tradex-utils', tradeXUtils);
-
-const template = document.createElement('template');
-template.innerHTML = `
-  <slot name="widget"></slot>
-`;
-class tradeXWidgets extends element {
-  constructor () {
-    super(template);
-  }
-  destroy() {
-  }
-  disconnectedCallback() {
-  }
-}
-window.customElements.define('tradex-widgets', tradeXWidgets);
-
-const HTML = `
-  <style title="core">
-    tradex-utils {
-      height: ${UTILSH}px; 
-      width: 100%; 
-    }
-    tradex-body {
-      position: relative;
-      height: calc(100% - ${UTILSH}px); 
-      width: 100%;
-    }
-    tradex-widgets {
-      position: relative;
-    }
-  </style>
-  <div style="display: none;">
-    <slot></slot>
-  </div>
-  <tradex-utils></tradex-utils>
-  <tradex-body></tradex-body>
-  <tradex-widgets></tradex-widgets>
-`;
-class tradeXChart extends element {
-  #elBody
-  #elUtils
-  #elWidgets
-  #template
-  #chartW = CHART_MINW
-  #chartH = CHART_MINH
-  #oWidth
-  #oHeight
-  #widthCache
-  #heightCache
-  #theme
-  constructor () {
-    const template = document.createElement('template');
-          template.innerHTML = HTML;
-    super(template, "closed");
-    this.#template = template;
-  }
-  destroy() {
-    this.resizeObserver.disconnect();
-  }
-  static get observedAttributes() {
-    return ['config', 'disabled', 'height', 'stream', 'width']
-  }
-  connectedCallback() {
-    if (this.doInit) {
-      this.doInit = false;
-      this.shadowRoot.appendChild(this.#template.content.cloneNode(true));
-      this.style.display = "block";
-      this.elWidgetsG = this.shadowRoot.querySelector('tradex-widgets');
-      this.elUtils = this.shadowRoot.querySelector('tradex-utils');
-      this.elBody = this.shadowRoot.querySelector('tradex-body');
-      this.elMain = this.elBody.main;
-      this.elTime = this.elBody.main.time;
-      this.elTools = this.elBody.tools;
-      this.elYAxis = this.elBody.scale;
-      this.previousDimensions();
-      let height = this.getAttribute('height') || "100%";
-      let width = this.getAttribute('width') || "100%";
-      this.setDimensions(width, height);
-      this.resizeObserver = new ResizeObserver(debounce(this.onResized, 50, this));
-      this.resizeObserver.observe(this);
-    }
-  }
-  disconnectedCallback() {
-    this.resizeObserver.disconnect();
-    this.removeEventListener('click', this.onClick);
-  }
-  attributeChangedCallback(prop, oldVal, newVal) {
-    switch(prop) {
-      case "config":
-        break;
-      case "disabled":
-        break;
-      case "height":
-        this.height(newVal);
-        break;
-      case "width":
-        this.width(newVal);
-        break;
-    }
-  }
-  get id() { return this.getAttribute('id'); }
-  set id(id) { this.setAttribute('id', id); }
-  get disabled() { return this.hasAttribute('disabled'); }
-  set disabled(d) {
-    if (d) {
-        this.setAttribute('disabled', '');
-    } else {
-        this.removeAttribute('disabled');
-    }
-  }
-  get width() { return this.offsetWidth }
-  set width(w) { this.setWidth(w); }
-  get height() { return this.offsetHeight }
-  set height(h) { this.setHeight(h); }
-  get oWidth() { return this.#oWidth }
-  get oHeight() { return this.#oHeight }
-  get widthDeltaR() { return this.offsetWidth / this.#oWidth }
-  get heightDeltaR() { return this.offsetHeight / this.#oHeight }
-  get stream() {  }
-  set stream(s) {  }
-  get body() { return this.#elBody }
-  get utils() { return this.#elUtils }
-  get widgets() { return this.#elWidgets }
-  elStart(theme) {
-    this.#theme = theme;
-    this.setUtilsLocation();
-  }
-  onResized(entries) {
-      console.log("onResize");
-      console.log(this.offsetWidth);
-      console.log(this.offsetHeight);
-      if (isObject(this.MainPane) && this.MainPane.constructor.name === "MainPane") {
-        this.previousDimensions();
-        this.emit("global_resize", {w: this.offsetWidth, h: this.offsetHeight});
-      }
-  }
-  previousDimensions() {
-    this.#oWidth = (this.#widthCache) ? this.#widthCache : this.offsetWidth;
-    this.#oHeight = (this.#heightCache) ? this.#heightCache : this.offsetHeight;
-    this.#widthCache = this.offsetWidth;
-    this.#heightCache = this.offsetHeight;
-  }
-  setWidth(w) {
-    if (isNumber(w)) {
-      this.#chartW = w;
-      w += "px";
-    }
-    else if (isString$1(w)) ;
-    else {
-      this.#chartW = this.parentElement.getBoundingClientRect().width;
-      w = this.#chartW + "px";
-    }
-    this.style.width = w;
-  }
-  setHeight(h) {
-    if (isNumber(h)) {
-      this.#chartH = h;
-      h += "px";
-    }
-    else if (isString$1(h)) ;
-    else {
-      this.#chartH = this.parentElement.getBoundingClientRect().height;
-      w = this.#chartH + "px";
-    }
-    this.style.height = h;
-  }
-  setWidthMin(w) { this.style.minWidth = `var(--txc-min-width, ${w})`; }
-  setHeightMin(h) { this.style.minHeight = `var(--txc-min-height, ${w})`; }
-  setWidthMax(w) { this.style.minWidth = `var(--txc-max-width, ${w})`; }
-  setHeightMax(h) { this.style.minHeight = `var(--txc-max-height, ${w})`; }
-  setDimensions(w, h) {
-    let dims;
-    let width = this.width;
-    let height = this.height;
-    if (!w || !h) {
-      const dims = this.getBoundingClientRect();
-      const parent = this.parentElement.getBoundingClientRect();
-      h = (!dims.height) ? (!parent.height) ? CHART_MINH : parent.height : dims.height;
-      w = (!dims.width) ? (!parent.width) ? CHART_MINW : parent.width : dims.width;
-    }
-    dims = {
-      width: this.width,
-      height: this.height,
-      resizeW: w / width,
-      resizeH: h / height,
-      resizeWDiff: w - width,
-      resizeHDiff: h - height
-    };
-    this.setWidth(w);
-    this.setHeight(h);
-    return dims
-  }
-  setUtilsLocation(pos=this.#theme?.utils?.location) {
-    this.#theme.utils = this.#theme.utils || {};
-    switch(pos) {
-      case "none":
-      case false:
-        this.#theme.utils.location = "none";
-        this.#theme.utils.height = 0;
-        this.elUtils.style.display = "none";
-        this.elUtils.style.height =`0px`;
-        this.elBody.style.height = `100%`;
-        break;
-      case "top":
-      default:
-        this.#theme.utils.location = "top";
-        this.#theme.utils.height = UTILSH;
-        this.elUtils.style.display = "block";
-        this.elUtils.style.height =`${UTILSH}px`;
-        this.elBody.style.height = `calc(100% - ${UTILSH}px)`;
-    }
-  }
-}
-
-var utilsList = [
-  {
-    id: "indicators",
-    name: "Indicators",
-    icon: chart,
-    event: "utils_indicators",
-    sub: [],
-  },
-  {
-    id: "timezone",
-    name: "Timezone",
-    icon: clock,
-    event: "utils_timezone",
-  },
-  {
-    id: "screenshot",
-    name: "Screenshot",
-    icon: camera,
-    event: "utils_screenshot",
-  },
-  {
-    id: "settings",
-    name: "Settings",
-    icon: config,
-    event: "utils_settings",
-  },
-];
-
-class UtilsBar {
-  #name = "Utilities"
-  #shortName = "utils"
-  #core
-  #options
-  #elUtils
-  #utils
-  #widgets
-  #indicators
-  #menus = {}
-  constructor (core, options) {
-    this.#core = core;
-    this.#options = options;
-    this.#elUtils = core.elUtils;
-    this.#utils = core.config?.utilsBar || utilsList;
-    this.#widgets = core.WidgetsG;
-    this.#indicators = core.indicators || Indicators;
-    this.init();
-  }
-  log(l) { this.#core.log(l); }
-  info(i) { this.#core.info(i); }
-  warning(w) { this.#core.warn(w); }
-  error(e) { this.#core.error(e); }
-  get name() {return this.#name}
-  get shortName() {return this.#shortName}
-  get core() {return this.#core}
-  get options() {return this.#options}
-  get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elUtils) }
-  init() {
-    this.mount(this.#elUtils);
-    this.log(`${this.#name} instantiated`);
-  }
-  start() {
-    this.initAllUtils();
-    this.eventsListen();
-  }
-  end() {
-    const api = this.#core;
-    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`);
-    for (let util of utils) {
-      for (let u of this.#utils) {
-        if (u.id === id)
-          util.removeEventListener("click", this.onIconClick);
-      }
-    }
-    this.off("utils_indicators", this.onIndicators);
-    this.off("utils_timezone", this.onTimezone);
-    this.off("utils_settings", this.onSettings);
-    this.off("utils_screenshot", this.onScreenshot);
-  }
-  eventsListen() {
-    this.on("utils_indicators", this.onIndicators.bind(this));
-    this.on("utils_timezone", this.onTimezone.bind(this));
-    this.on("utils_settings", this.onSettings.bind(this));
-    this.on("utils_screenshot", this.onScreenshot.bind(this));
-  }
-  on(topic, handler, context) {
-    this.#core.on(topic, handler, context);
-  }
-  off(topic, handler) {
-    this.#core.off(topic, handler);
-  }
-  emit(topic, data) {
-    this.#core.emit(topic, data);
-  }
-  onIconClick(e) {
-    let evt = e.currentTarget.dataset.event,
-        menu = e.currentTarget.dataset.menu || false,
-        data = {
-          target: e.currentTarget.id,
-          menu: menu,
-          evt: e.currentTarget.dataset.event
-        };
-    this.emit(evt, data);
-    if (menu) this.emit("openMenu", data);
-    else {
-      this.emit("menuItemSelected", data);
-      this.emit("utilSelected", data);
-    }
-  }
-  mount(el) {
-    el.innerHTML = this.defaultNode();
-  }
-  initAllUtils() {
-    const api = this.#core;
-    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`);
-    for (let util of utils) {
-      let id = util.id.replace('TX_', ''),
-          svg = util.querySelector('svg');
-          svg.style.fill = UtilsStyle.COLOUR_ICON;
-          svg.style.height = "90%";
-      for (let u of this.#utils) {
-        if (u.id === id) {
-          util.addEventListener("click", this.onIconClick.bind(this));
-          if (u.id === "indicators") u.sub = Object.values(this.#indicators);
-          if (u?.sub) {
-            let config = {
-              content: u.sub,
-              primary: util
-            };
-            let menu = this.#widgets.insert("Menu", config);
-            util.dataset.menu = menu.id;
-            menu.start();
-          }
-        }
-      }
-    }
-  }
-  defaultNode() {
-    let style = `display: inline-block; float: right;`;
-    let utilsBar = `
-    <div style="${style}">
-    <style>
-      svg {
-        height: ${UtilsStyle.ICONSIZE};
-        fill: ${UtilsStyle.COLOUR_ICON};
-      }
-    </style>
-    `;
-    for (const util of this.#utils) {
-      utilsBar += this.iconNode(util);
-    }
-    return utilsBar + "</div>"
-  }
-  iconNode(util) {
-    const iconStyle = `display: inline-block; height: ${UtilsStyle.ICONSIZE}; padding-top: 2px`;
-    const menu = ("sub" in util) ? `data-menu="true"` : "";
-    return  `
-      <div id="TX_${util.id}" data-event="${util.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${util.icon}</div>\n
-    `
-  }
-  onIndicators(data) {
-    console.log(`Indicator:`,data);
-  }
-  onTimezone(data) {
-    console.log(`Timezone:`,data);
-    this.#core.notImplemented();
-  }
-  onSettings(data) {
-    console.log(`Settings:`,data);
-    this.#core.notImplemented();
-  }
-  onScreenshot(data) {
-    console.log(`Screenshot:`,data);
-    this.#core.notImplemented();
-  }
-}
-
-class Tool {
-  static #cnt = 0
-  static #instances = {}
-  #ID
-  #inCnt = null
-  #name
-  #shortName
-  #options
-  #config
-  #core
-  #parent
-  #input
-  #elChart
-  #elCanvas
-  #elViewport
-  #layerTool
-  #target
-  #cursorPos = [0, 0]
-  #cursorActive = false
-  #cursorClick
-  constructor(config) {
-    this.#config = config;
-    this.#inCnt = config.cnt;
-    this.#ID = this.#config.ID || uid("TX_Tool_");
-    this.#name = config.name;
-    this.#core = config.core;
-    this.#elChart = config.elements.elChart;
-    this.#parent = {...config.parent};
-    this.#target = config.target;
-    this.#target.addTool(this);
-    this.#elViewport = this.#layerTool.viewport;
-    this.#elCanvas = this.#elViewport.scene.canvas;
-    this.#cursorClick = config.pos;
-  }
-  get inCnt() { return this.#inCnt }
-  get ID() { return this.#ID }
-  get name() {return this.#name}
-  get shortName() { return this.#shortName }
-  get core() { return this.#core }
-  get stateMachine() { return this.#core.stateMachine }
-  get state() { return this.#core.getState() }
-  get data() { return this.#core.chartData }
-  get range() { return this.#core.range }
-  get target() { return this.#target }
-  set layerTool(layer) { this.#layerTool = layer; }
-  get layerTool() { return this.#layerTool }
-  get elViewport() { return this.#elViewport }
-  get cursorPos() { return this.#cursorPos }
-  get cursorActive() { return this.#cursorActive }
-  get cursorClick() { return this.#cursorClick }
-  get candleW() { return this.#core.Timeline.candleW }
-  get theme() { return this.#core.theme }
-  get config() { return this.#core.config }
-  get scrollPos() { return this.#core.scrollPos }
-  get bufferPx() { return this.#core.bufferPx }
-  static create(target, config) {
-    const cnt = ++Tool.#cnt;
-    config.cnt = cnt;
-    config.modID = `${config.toolID}_${cnt}`;
-    config.toolID = config.modID;
-    config.target = target;
-    const tool = new config.tool(config);
-    Tool.#instances[cnt] = tool;
-    target.chartToolAdd(tool);
-    return tool
-  }
-  static destroy(tool) {
-    if (tool.constructor.name === "Tool") {
-      const inCnt = tool.inCnt;
-      delete Tool.#instances[inCnt];
-    }
-  }
-  end() { this.stop(); }
-  stop() {
-    this.#input.off("mousemove", this.onMouseMove);
-  }
-  eventsListen() {
-    this.#input = new Input(this.#elCanvas, {disableContextMenu: false});
-    this.#input.on("mousemove", this.onMouseMove.bind(this));
-  }
-  on(topic, handler, context) {
-    this.#core.on(topic, handler, context);
-  }
-  off(topic, handler) {
-    this.#core.off(topic, handler);
-  }
-  emit(topic, data) {
-    this.#core.emit(topic, data);
-  }
-  onMouseMove(e) {
-    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
-    this.emit("tool_mousemove", this.#cursorPos);
-  }
-  createViewport() {
-    this.config.buffer || BUFFERSIZE;
-    this.#elViewport.getBoundingClientRect().width;
-    this.#options.chartH || this.#parent.rowsH - 1;
-  }
-  draw() {
-  }
-}
-
-class Fibonacci extends Tool {
-  constructor(config) {
-    super(config);
-  }
-}
-
-class Line extends Tool {
-  #colour = lineConfig.colour
-  #lineWidth = lineConfig.lineWidth
-  #stateMachine
-  constructor(config) {
-    super(config);
-  }
-  set colour(colour=this.#colour) {
-    this.#colour = colour;
-  }
-  get colour() { return this.#colour }
-  set lineWidth(width) { this.#lineWidth = (isNumber(width)) ? width : this.#lineWidth; }
-  get lineWidth() { return this.#lineWidth }
-  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
-  get stateMachine() { return this.#stateMachine }
-  start() {
-    this.eventsListen();
-    let [x1, y1] = this.cursorClick;
-    const scene = this.layerTool.scene;
-    scene.clear();
-    const ctx = this.layerTool.scene.context;
-    ctx.save();
-    ctx.lineWidth = this.lineWidth;
-    ctx.strokeStyle = this.colour;
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(300, 150);
-    ctx.stroke();
-    ctx.closePath();
-    ctx.restore();
-    this.elViewport.render();
-  }
-}
-
-class Measure extends Tool {
-  constructor(config) {
-    super(config);
-  }
-}
-
-class RangeTool extends Tool {
-  constructor(config) {
-    super(config);
-  }
-}
-
-class Text extends Tool {
-  constructor(config) {
-    super(config);
-  }
-}
-
-var tools = [
-  {
-    id: "cursor",
-    name: "Cursor",
-    icon: cursor,
-    event: "tool_activated",
-  },
-  {
-    id: "line",
-    name: "Line",
-    icon: line,
-    event: "tool_activated",
-    class: Line,
-    sub: [
-      {
-        id: "ray",
-        name: "Ray",
-        icon: line,
-        event: "tool_activated",
-        class: Line,
-      },
-      {
-        id: "hRay",
-        name: "Horizontal Ray",
-        icon: line,
-        event: "tool_activated",
-        class: Line,
-      },
-      {
-        id: "vRay",
-        name: "Vertical Ray",
-        icon: line,
-        event: "tool_activated",
-        class: Line,
-      },
-    ]
-  },
-  {
-    id: "fibonacci",
-    name: "Fibonacci",
-    icon: fibonacci,
-    event: "tool_activated",
-    class: Fibonacci,
-    sub: [
-      {
-        id: "fib",
-        name: "Not Implemented Yet",
-        icon: line,
-      }
-    ]
-  },
-  {
-    id: "range",
-    name: "Range",
-    icon: range,
-    event: "tool_activated",
-    class: RangeTool,
-    sub: [
-      {
-        id: "rng",
-        name: "Not Implemented Yet",
-        icon: line,
-      }
-    ]
-  },
-  {
-    id: "text",
-    name: "Text",
-    icon: text,
-    event: "tool_activated",
-    class: Text,
-    sub: [
-      {
-        id: "txt",
-        name: "Not Implemented Yet",
-        icon: line,
-      }
-    ]
-  },
-  {
-    id: "measure",
-    name: "Measure",
-    icon: measure,
-    event: "tool_activated",
-    class: Measure,
-  },
-  {
-    id: "delete",
-    name: "Delete",
-    icon: del,
-    event: "tool_activated",
-    class: undefined,
-  }
-];
-const lineConfig = {
-  colour: "#8888AACC",
-  lineWidth: 1
-};
-
-var stateMachineConfig$6 = {
-  id: "template",
-  initial: "idle",
-  context: {},
-  states: {
-    idle: {
-      onEnter(data) {
-        console.log('idle: onEnter');
-      },
-      onExit(data) {
-        console.log('idle: onExit');
-      },
-      on: {
-        tool_activated: {
-          target: 'tool_activated',
-          action (data) {
-            this.context.origin.onToolActivated(data);
-          },
-        },
-      }
-    },
-    tool_activated: {
-      onEnter (data) {
-      },
-      onExit (data) {
-      },
-      on: {
-        tool_targetSelected: {
-          target: 'tool_addToTarget',
-          action (data) {
-            this.context.origin.onToolTargetSelected(data);
-          },
-        },
-      }
-    },
-    tool_addToTarget: {
-      onEnter (data) {
-      },
-      onExit (data) {
-      },
-      on: {
-        always: {
-          target: 'idle',
-          condition: 'toolTarget',
-          action (data) {
-            this.context.origin.addNewTool();
-          },
-        },
-      }
-    },
-  },
-  guards: {
-    toolTarget () { return true }
-  }
-};
-
-class ToolsBar {
-  #name = "Toolbar"
-  #shortName = "tools"
-  #core
-  #options
-  #stateMachine
-  #elTools
-  #widgets
-  #Tool = Tool
-  #tools
-  #toolClasses = {}
-  #activeTool = undefined
-  #toolTarget
-  constructor (core, options) {
-    this.#core = core;
-    this.#options = options;
-    this.#elTools = core.elTools;
-    this.#tools = tools || core.config.tools;
-    this.#widgets = core.WidgetsG;
-    this.init();
-  }
-  log(l) { this.#core.log(l); }
-  info(i) { this.#core.info(i); }
-  warning(w) { this.#core.warn(w); }
-  error(e) { this.#core.error(e); }
-  get name() {return this.#name}
-  get shortName() {return this.#shortName}
-  get core() {return this.#core}
-  get options() {return this.#options}
-  get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elTools) }
-  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
-  get stateMachine() { return this.#stateMachine }
-  init() {
-    this.mount(this.#elTools);
-    this.log(`${this.#name} instantiated`);
-  }
-  start() {
-    this.initAllTools();
-    this.addAllTools();
-    this.eventsListen();
-    stateMachineConfig$6.context = this;
-    this.stateMachine = stateMachineConfig$6;
-    this.stateMachine.start();
-  }
-  end() {
-    this.stateMachine.destroy();
-    const api = this.#core;
-    const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`);
-    for (let tool of tools) {
-      for (let t of this.#tools) {
-        if (t.id === id)
-          tool.removeEventListener("click", this.onIconClick);
-      }
-    }
-    this.off("tool_selected", this.onToolSelect);
-    this.off("tool_deselected", this.onToolDeselect);
-  }
-  eventsListen() {
-    this.on("tool_selected", (e) => { this.onToolSelect.bind(this); });
-    this.on("tool_deselected", (e) => { this.onToolDeselect.bind(this); });
-  }
-  on(topic, handler, context) {
-    this.#core.on(topic, handler, context);
-  }
-  off(topic, handler) {
-    this.#core.off(topic, handler);
-  }
-  emit(topic, data) {
-    this.#core.emit(topic, data);
-  }
-  onIconClick(e) {
-    e.currentTarget.dataset.event;
-        let menu = e.currentTarget.dataset.menu || false,
-        data = {
-          target: e.currentTarget.id,
-          menu: menu,
-          evt: e.currentTarget.dataset.event,
-          tool: e.currentTarget.dataset.tool
-        };
-    if (menu) this.emit("openMenu", data);
-    else {
-      this.emit("menuItemSelected", data);
-    }
-  }
-  onToolTargetSelected(tool) {
-    console.log("tool_targetSelected", tool.target);
-    this.#toolTarget = tool.target;
-  }
-  onToolActivated(tool) {
-    console.log("Tool activated:", tool);
-    this.#activeTool = tool;
-  }
-  onToolSelect(e) {
-  }
-  onToolDeselect(e) {
-  }
-  mount(el) {
-    el.innerHTML = this.defaultNode();
-  }
-  initAllTools() {
-    const api = this.#core;
-    const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`);
-    for (let tool of tools) {
-      let id = tool.id,
-          svg = tool.querySelector('svg');
-          svg.style.fill = ToolsStyle.COLOUR_ICON;
-          svg.style.width = "90%";
-      for (let t of this.#tools) {
-        if (t.id === id) {
-          tool.addEventListener("click", this.onIconClick.bind(this));
-          if (t?.sub) {
-            let config = {
-              content: t.sub,
-              primary: tool
-            };
-            let menu = this.#widgets.insert("Menu", config);
-            tool.dataset.menu = menu.id;
-            menu.start();
-            for (let s of t.sub) {
-              this.#toolClasses[s.id] = s.class;
-            }
-          }
-          else {
-            this.#toolClasses[t.id] = t.class;
-          }
-        }
-      }
-    }
-  }
-  defaultNode() {
-    let toolbar = `
-    <style>
-      svg {
-        height: ${ToolsStyle.ICONSIZE};
-        fill: ${ToolsStyle.COLOUR_ICON};
-      }
-    </style>
-    `;
-    for (const tool of this.#tools) {
-      toolbar += this.iconNode(tool);
-    }
-    return toolbar
-  }
-  iconNode(tool) {
-    const iconStyle = `display: inline-block; height: ${ToolsStyle.ICONSIZE}; margin-left: -3px;`;
-    const menu = ("sub" in tool) ? `data-menu="true"` : "";
-    return  `
-      <div id="${tool.id}" data-event="${tool.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${tool.icon}</div>\n
-    `
-  }
-  addTool(tool=this.#activeTool, target=this.#toolTarget) {
-    let config = {
-      name: tool,
-      tool: this.#toolClasses[tool],
-      pos: target.cursorClick
-    };
-    let toolInstance = this.#Tool.create(target, config);
-    toolInstance.start();
-    console.log(toolInstance);
-    return toolInstance
-  }
-  addNewTool(tool, target) {
-    let t = this.addTool(tool, target);
-    this.activeTool = (t);
-    this.emit(`tool_active`, t);
-    this.emit(`tool_${t.ID}_active`, t);
-  }
-  addAllTools() {
-  }
-}
-
-class Axis {
-  #core
-  #parent
-  #chart
-  constructor(parent) {
-    this.#parent = parent;
-    this.#core = this.#parent.core;
-    this.#chart = this.#core.Chart;
-  }
-  get core() { return this.#core }
-  get chart() { return this.#chart }
-  get parent() { return this.#parent }
-  get theme() { return this.#core.theme }
-  get width() { return this.#chart.width }
-  get height() { return this.#chart.height }
-  get data() { return this.#chart.data }
-  get range() { return this.#chart.range }
-  get yDigits() { return this.#chart.yAxisDigits }
-  float2Int(value) { return float2Int(value) }
-  numDigits(value) { return numDigits(value) }
-  countDigits(value) { return countDigits(value) }
-  precision(value) { return precision(value) }
-}
-
-class xAxis extends Axis {
-  #xAxisTicks = 4
-  #xAxisGrads
-  #indexBased = true
-  constructor(parent) {
-    super(parent);
-  }
-  get range() { return this.parent.range }
-  get width() { return this.parent.width }
-  get interval() { return this.range.interval }
-  get intervalStr() { return this.range.intervalStr }
-  get timeStart() { return this.range.timeStart }
-  get timeFinish() { return this.range.timeFinish }
-  get rangeDuration() { return this.range.rangeDuration }
-  get rangeLength() { return this.range.Length }
-  get indexStart() { return this.range.indexStart }
-  get indexEnd() { return this.range.indexEnd }
-  get timeMax() { return this.range.timeMax }
-  get timeMin() { return this.range.timeMin }
-  get candleW() { return bRound(this.width / this.range.Length) }
-  get candlesOnLayer() { return bRound(this.core.Chart.layerWidth / this.candleW )}
-  get xAxisRatio() { return this.width / this.range.rangeDuration }
-  set xAxisTicks(t) { this.#xAxisTicks = isNumber(t) ? t : 0; }
-  get xAxisTicks() { return this.#xAxisTicks }
-  get xAxisGrads() { return this.#xAxisGrads }
-  get scrollOffsetPx() { return this.core.scrollPos % this.candleW }
-  get bufferPx() { return this.core.bufferPx }
-  xPos(ts) {
-    return bRound((this.range.rangeIndex(ts) * this.candleW) + (this.candleW * 0.5))
-  }
-  t2Index(ts) {
-    return this.range.rangeIndex(ts)
-  }
-  t2Pixel(ts) {
-    return this.xPos(ts)
-  }
-  pixel2T(x) {
-    let c = this.pixel2Index(x);
-    return this.range.value(c)[0]
-  }
-  pixel2Index(x) {
-    x -= this.candleW / 2;
-    let c = this.range.indexStart;
-    let o = bRound(x / this.candleW);
-    return c + o
-  }
-  pixelOHLCV(x) {
-    let c = this.pixel2Index(x);
-    return this.range.value(c)
-  }
-  xPosSnap2CandlePos(x) {
-    let r = x % this.candleW;
-    let o = (r) ? this.candleW / 2 : 0;
-    return bRound((x - r) + o)
-  }
-  xPos2Time(x) {
-    return this.pixel2T(x)
-  }
-  xPos2Index(x) {
-    return this.pixel2Index(x)
-  }
-  xPosOHLCV(x) {
-    return this.pixelOHLCV(x)
-  }
-  initXAxisGrads() {
-    this.#xAxisGrads = this.calcXAxisGrads();
-  }
-  doCalcXAxisGrads(range) {
-    this.#xAxisGrads = this.calcXAxisGrads(range);
-  }
-  calcXAxisGrads(range=this.range.snapshot()) {
-    const grads = {
-      entries: {},
-      values: [],
-      major: [],
-      minor: [],
-    };
-    const units = ms2TimeUnits(range.rangeDuration);
-    grads.units = units;
-    for (let u in units) {
-      if (units[u] > 0) {
-        grads.units = [u, u];
-        grads.timeSpan = `${units[u]} ${u}`;
-        break
-      }
-    }
-    const tf = range.interval;
-    const {xStep, rank} = this.xStep(range);
-    const tLimit = this.pixel2T(this.width) + xStep;
-    let t1 = range.timeMin - (range.timeMin % xStep) - xStep;
-    let start = t1;
-    while (t1 < tLimit) {
-      let y = time_start(t1, "years");
-      let m = time_start(t1, "months");
-      let d = time_start(t1, "days");
-      if (!(y in grads.entries) && y >= start) {
-        grads.entries[y] = [this.dateTimeValue(y, tf), this.t2Pixel(y), y, "major"];
-      }
-      else if (!(m in grads.entries) && m >= start) {
-        grads.entries[m] = [this.dateTimeValue(m, tf), this.t2Pixel(m), m, "major"];
-      }
-      else if (!(d in grads.entries) && d >= start) {
-        grads.entries[d] = [this.dateTimeValue(d, tf), this.t2Pixel(d), d, "major"];
-      }
-        grads.entries[t1] = [this.dateTimeValue(t1, tf), this.t2Pixel(t1), t1, "minor"];
-      t1 += xStep;
-    }
-    grads.values = Object.values(grads.entries);
-    return grads
-  }
-  xStep(range) {
-    let minStep = XAXIS_STEP;
-    let interval = this.#indexBased ? range.interval : 1;
-    let xStep = TIMESCALES[0];
-    let candleW = bRound(this.width / range.Length);
-    let rank = TIMESCALESRANK[0];
-    let i = TIMESCALES.indexOf(interval);
-    while (i-- >= 0) {
-      const gradPixels = candleW * (TIMESCALES[i] / interval);
-      if (gradPixels >= minStep) break
-    }
-    xStep = TIMESCALES[i];
-    rank = TIMESCALESRANK[i];
-    return {xStep, rank}
-  }
-  dateTimeValue(ts, tf) {
-    if ((ts / DAY_MS) % 1 === 0) {
-      const date = get_day(ts);
-      if (date === 1) {
-        let month = get_month(ts);
-        if (month === 0) return get_year(ts)
-        else return get_monthName(ts)
-      }
-      else return date
-    }
-    else {
-      if (tf < MINUTE_MS) return MS(ts)
-      else if (tf < HOUR_MS) return MS(ts)
-      else return HM(ts)
-    }
-  }
-  gradsWorker() {
-  }
-}
-
-var stateMachineConfig$5 = {
-  id: "time",
-  initial: "idle",
-  context: {},
-  states: {
-    idle: {
-      onEnter(data) {
-      },
-      onExit(data) {
-      },
-      on: {
-        resize: {
-          target: 'resize',
-          action (data) {
-          },
-        },
-        xAxis_scale: {
-          target: 'scale',
-          action (data) {
-          },
-        },
-        xAxis_inc: {
-          target: 'incremental',
-          action (data) {
-          },
-        },
-        xAxis_log: {
-          target: 'logarithmic',
-          action (data) {
-          },
-        },
-        xAxis_100: {
-          target: 'percentual',
-          action (data) {
-          },
-        },
-        chart_pan: {
-          target: 'chart_pan',
-          action (data) {
-          },
-        },
-      }
-    },
-    resize: {
-      onEnter(data) {
-      },
-      onExit(data) {
-      },
-      on: {
-        someEvent: {
-          target: '',
-          action (data) {
-          },
-        },
-      }
-    },
-    chart_pan: {
-      onEnter(data) {
-      },
-      onExit(data) {
-      },
-      on: {
-        chart_pan: {
-          target: 'chart_pan',
-          action (data) {
-          },
-        },
-        chart_panDone: {
-          target: 'idle',
-          action (data) {
-          },
-        },
-      }
-    },
-  },
-};
-
-class Slider {
-  static #cnt
-  #id
-  #core
-  #elContainer
-  #elHandle
-  #containerDims = {w: 0, h: 0}
-  #handleDims = {w: 0, h: 0, x: 0, y: 0}
-  #constraint = {x: false, y: true}
-  #cursorPos
-  #sliderPos = {x: 0, drag: false}
-  #input
-  #callback
-  constructor(config) {
-    this.#id = Slider.#cnt++;
-    this.#core = config.core;
-    this.#elContainer = (DOM.isElement(config.elContainer)) ? config.elContainer : false;
-    this.#elHandle = (DOM.isElement(config.elHandle)) ? config.elHandle : false;
-    this.#callback = (isFunction(config.callback)) ? config.callback : false;
-    if (DOM.isElement(this.#elContainer) && DOM.isElement(this.#elHandle)) {
-      this.mount();
-      this.eventsListen();
-    }
-  }
-  eventsListen() {
-  this.#input = new Input(this.#elHandle, {disableContextMenu: false});
-  this.#input.on("mouseenter", debounce(this.onMouseEnter, 1, this, true));
-  this.#input.on("mouseout", debounce(this.onMouseOut, 1, this, true));
-  this.#input.on("drag", throttle(this.onHandleDrag, 100, this));
-  this.#input.on("enddrag", this.onHandleDragDone.bind(this));
-  this.#input.on("mousedown", debounce(this.onMouseDown, 100, this, true));
-  this.#input.on("mouseup", this.onMouseUp.bind(this));
-  }
-  on(topic, handler, context) {
-    this.#core.on(topic, handler, context);
-  }
-  off(topic, handler) {
-    this.#core.off(topic, handler);
-  }
-  emit(topic, data) {
-    this.#core.emit(topic, data);
-  }
-  onMouseEnter() {
-    const backgroundColor = getComputedStyle(this.#elHandle).backgroundColor;
-    if (backgroundColor) {
-      this.colour = new Colour(backgroundColor);
-      this.#elHandle.style.backgroundColor = this.colour.hex;
-    }
-  }
-  onMouseOut() {
-    this.#elHandle.style.backgroundColor = this.colour.hexa;
-  }
-  onMouseDown() {
-  }
-  onMouseUp(e) {
-    this.onHandleDragDone(e);
-  }
-  onHandleDrag(e) {
-    if (!this.#sliderPos.drag) {
-      this.#sliderPos.drag = true;
-      this.#sliderPos.x = e.position.x;
-    }
-    this.handlePos(e);
-  }
-  onHandleDragDone(e) {
-    this.handlePos(e);
-    this.#sliderPos.drag = false;
-  }
-  mount() {
-    this.#containerDims.w = this.#elContainer.getBoundingClientRect().width;
-    this.#containerDims.h = this.#elContainer.getBoundingClientRect().height;
-    this.#elContainer.style.overflow = "hidden";
-    this.#handleDims.w = this.#elHandle.getBoundingClientRect().width;
-    this.#handleDims.h = this.#elHandle.getBoundingClientRect().height;
-    this.#elHandle.style.marginRight = 0;
-    this.#elHandle.style.position = "absolute";
-  }
-  handlePos(e) {
-    let R = this.#core.range;
-    let x = parseInt(this.#elHandle.style.marginLeft);
-    let w = this.#elContainer.getBoundingClientRect().width;
-    let h = this.#elHandle.getBoundingClientRect().width;
-    let m = w - h;
-    let d = e.position.x - this.#sliderPos.x;
-    let p = limit(x + d, 0, m);
-    let r = (R.dataLength + R.limitFuture + R.limitPast) / w;
-    let s = Math.floor(p * r);
-    this.setHandleDims(p, h);
-    this.#core.jumpToIndex(s);
-  }
-  setHandleDims(p, w) {
-    let c = this.#elContainer.getBoundingClientRect().width;
-        w = w || this.#elHandle.getBoundingClientRect().width;
-    p = p / c * 100;
-    this.#elHandle.style.marginLeft = `${p}%`;
-    w  = w / c * 100;
-    this.#elHandle.style.width = `${w}%`;
-  }
-  setCursor(cursor) {
-    this.#elHandle.style.cursor = cursor;
   }
 }
 
@@ -6707,8 +5045,8 @@ class Timeline {
     this.#xAxis.initXAxisGrads();
     this.draw();
     this.eventsListen();
-    stateMachineConfig$5.context = this;
-    this.stateMachine = stateMachineConfig$5;
+    stateMachineConfig$6.context = this;
+    this.stateMachine = stateMachineConfig$6;
     this.stateMachine.start();
   }
   end() {
@@ -6864,7 +5202,7 @@ const renderLoop = {
     requestAnimationFrame(this.execute.bind(this));
     if (this.renderQ.size === 0) return
     const [ID, frame] = firstItemInMap(this.renderQ);
-    if (frame.range.constructor.name !== "RangeSnapshot") return
+    if (!frame.range?.snapshot) return
     for (let entry of frame.graphs) {
       if (isFunction(entry.draw)) entry.draw(frame.range, frame.update);
     }
@@ -6899,6 +5237,7 @@ class Chart {
   #layerStream;
   #layerCursor;
   #layersTools = new Map();
+  #overlays = new Map()
   #overlayGrid;
   #overlayIndicators = new Map();
   #overlayTools = new Map();
@@ -6979,6 +5318,7 @@ class Chart {
   get graph() { return this.#Graph }
   get viewport() { return this.#Graph.viewport }
   get layerGrid() { return this.#Graph.overlays.get("grid").layer }
+  get overlays() { return this.#overlays }
   get overlayGrid() { return this.#Graph.overlays.get("grid").instance }
   get overlayTools() { return this.#overlayTools }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
@@ -7102,6 +5442,26 @@ class Chart {
   }
   setCursor(cursor) {
     this.element.style.cursor = cursor;
+  }
+  addIndicator(i) {
+    const onChart = (this.type === "onChart" ) ? true : false;
+    const indClass = this.core.indicators[i.type].ind;
+    const indType = (indClass.constructor.type === "both") ? onChart : indClass.prototype.onChart;
+    if (
+        i?.type in this.core.indicators &&
+        onChart === indType
+      ) {
+      const config = {
+        class: indClass,
+        params: {overlay: i}
+      };
+      const r = this.graph.addOverlay(i.name, config);
+      if (r) {
+        this.#overlays.set(i.name, config);
+        return true
+      }
+    }
+    else return false
   }
   addTool(tool) {
     let { layerConfig } = this.layerConfig();
@@ -7367,15 +5727,6 @@ class yAxis extends Axis {
       scaleGrads.push([nice, round(pos), digits]);
       pos -= stepP;
     }
-    if (this.#mode !== "manual") {
-      const theme = this.core.theme.yAxis;
-      if (scaleGrads.slice(-1)[0][1] <= theme.fontSize * 0.1) {
-        scaleGrads.pop();
-      }
-      if (scaleGrads[0][1] >= this.height - (theme.fontSize * 0.1)) {
-        scaleGrads.shift();
-      }
-    }
     return scaleGrads
   }
   niceValue(digits, decimals=true, step) {
@@ -7413,7 +5764,7 @@ class yAxis extends Axis {
   }
 }
 
-var stateMachineConfig$4 = {
+var stateMachineConfig$5 = {
   id: "scale",
   initial: "idle",
   context: {},
@@ -7604,7 +5955,7 @@ class ScalePriceLine extends Overlay {
   draw(candle) {
     if (candle === undefined) return
     const ctx = this.scene.context;
-    const streaming = this.core.stream.constructor.name == "Stream" &&
+    const streaming = this.core.stream instanceof Stream &&
                       this.config.stream.tfCountDown;
     let price = candle[4],
         nice = this.parent.nicePrice(price),
@@ -7728,7 +6079,7 @@ class ScaleBar {
     this.#yAxis.calcGradations();
     this.draw();
     this.eventsListen();
-    const newConfig = copyDeep(stateMachineConfig$4);
+    const newConfig = copyDeep(stateMachineConfig$5);
     newConfig.context = this;
     this.stateMachine = newConfig;
     this.stateMachine.start();
@@ -8376,7 +6727,7 @@ class chartWatermark extends Overlay {
   }
 }
 
-var stateMachineConfig$3 = {
+var stateMachineConfig$4 = {
   id: "chart",
   initial: "idle",
   context: {},
@@ -8484,7 +6835,6 @@ class OnChart extends Chart {
   #pricePrecision
   #volumePrecision
   #layerStream
-  #chartOverlays = new Map()
   #chartStreamCandle
   #streamCandle
   constructor (core, options) {
@@ -8500,6 +6850,7 @@ class OnChart extends Chart {
   get onChart() { return this.#onChart }
   set priceDigits(digits) { this.setYAxisDigits(digits); }
   get priceDigits() { return this.#yAxisDigits || PRICEDIGITS }
+  get indicators() { return this.overlays }
   init(options) {
     let chartLegend = {
       id: "chart",
@@ -8519,7 +6870,7 @@ class OnChart extends Chart {
     this.log(`${this.name} instantiated`);
   }
   start() {
-    super.start(stateMachineConfig$3);
+    super.start(stateMachineConfig$4);
     this.eventsListen();
     this.addOverlays(this.core.onChart);
     if (isObject(this.Stream)) {
@@ -8574,11 +6925,16 @@ class OnChart extends Chart {
       const config = {fixed: false, required: false};
       if (o.type in this.core.indicators) {
         config.class = this.core.indicators[o.type].ind;
-        config.params = {overlay: o};
-        this.#chartOverlays.set(o.name, config);
+        config.params = {
+          overlay: o,
+        };
+        this.overlays.set(o.name, config);
       }
     }
-    this.graph.addOverlays(Array.from(this.#chartOverlays));
+    const r = this.graph.addOverlays(Array.from(this.overlays));
+    for (let o of r) {
+      if (!o[0]) this.overlays.delete(o[0]);
+    }
   }
   refresh() {
     this.scale.draw();
@@ -8608,6 +6964,7 @@ class OnChart extends Chart {
         pos = this.cursorPos;
     let inputs = {};
     let colours = [];
+    let labels = [true, true, true, true, true];
     let index = this.time.xPos2Index(pos[0] - this.core.scrollPos);
         index = limit(index, 0, this.range.data.length - 1);
     let ohlcv = this.range.data[index];
@@ -8618,11 +6975,11 @@ class OnChart extends Chart {
     inputs.L = this.scale.nicePrice(ohlcv[3]);
     inputs.C = this.scale.nicePrice(ohlcv[4]);
     inputs.V = this.scale.nicePrice(ohlcv[5]);
-    return {inputs, colours}
+    return {inputs, colours, labels}
   }
 }
 
-var stateMachineConfig$2 = {
+var stateMachineConfig$3 = {
   id: "offChart",
   initial: "idle",
   context: {},
@@ -8736,6 +7093,7 @@ class OffChart extends Chart {
   #ID
   #offChartID
   #Indicator
+  #IndicatorParams
   #overlay
   #Divider
   #layerStream
@@ -8754,6 +7112,7 @@ class OffChart extends Chart {
     super(core, options);
     this.#ID = this.options.offChartID || uid("TX_OC_");
     this.#overlay = options.offChart;
+    this.overlays.set(options.offChart.name, options.offChart);
     this.init(options);
   }
   get elOffChart() { return this.element }
@@ -8774,7 +7133,7 @@ class OffChart extends Chart {
   }
   start(index) {
     this.#offChartID = index;
-    super.start(stateMachineConfig$2);
+    super.start(stateMachineConfig$3);
     this.eventsListen();
     const oc = this;
     const config = { offChart: oc };
@@ -8819,7 +7178,7 @@ class OffChart extends Chart {
   }
 }
 
-var stateMachineConfig$1 = {
+var stateMachineConfig$2 = {
   id: "main",
   initial: "idle",
   context: {},
@@ -9113,6 +7472,10 @@ class MainPane {
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
   get stateMachine() { return this.#stateMachine }
   get graph() { return this.#Graph }
+  get indicators() { return {
+    onchart: this.#Chart.indicators,
+    offchart: this.#OffCharts
+  } }
   get elements() {
     return {
       elTarget: this.#elChart,
@@ -9178,8 +7541,8 @@ class MainPane {
     renderLoop.start();
     renderLoop.queueFrame(this.range, [this.#Graph], false);
     this.eventsListen();
-    stateMachineConfig$1.id = this.id;
-    this.stateMachine = stateMachineConfig$1;
+    stateMachineConfig$2.id = this.id;
+    this.stateMachine = stateMachineConfig$2;
     this.stateMachine.start();
   }
   end() {
@@ -9373,6 +7736,12 @@ class MainPane {
       rowsH: this.rowsH,
       rowsW: this.rowsW,
     };
+console.log(`oHeight: ${this.#elRows.oHeight}`);
+console.log(`rowsH: ${this.#elRows.height}`);
+console.log(`resizeH: ${resizeH}`);
+console.log(`width: ${width}`);
+console.log(`height: ${height}`);
+console.log(`dimensions${dimensions}`);
     if (this.#OffCharts.size == 0 &&
       chartH != this.#elRows.height) chartH = this.#elRows.height;
     this.#core.scrollPos = -1;
@@ -9397,6 +7766,7 @@ class MainPane {
     this.element.style.cursor = cursor;
   }
   registerOffCharts(options) {
+    this.#elRows.previousDimensions();
     if (this.#core.offChart.length === 0) return
     for (const [i, o] of this.#core.offChart.entries()) {
       if (o.type in this.core.indicators) continue
@@ -9450,10 +7820,8 @@ class MainPane {
     this.emit("addOffChart", o);
   }
   addIndicator(ind) {
-    console.log(`Add the ${ind} indicator`);
     const indicator = this.#indicators[ind].ind;
     console.log("indicator:",indicator);
-    this.emit("addIndicatorDone", indicator);
   }
   scaleNode(type) {
     const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.chart.BorderColour};`;
@@ -9506,6 +7874,1686 @@ class MainPane {
     active.element.style.userSelect = 'none';
     prev.element.style.userSelect = 'none';
     return {active, prev}
+  }
+}
+
+const camera =
+  `<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" ><path d="M471.993 112h-89.2l-16.242-46.75a32.023 32.023 0 00-30.229-21.5H175.241a31.991 31.991 0 00-30.294 21.691L129.1 112H40a24.027 24.027 0 00-24 24v312a24.027 24.027 0 0024 24h431.993a24.027 24.027 0 0024-24V136a24.027 24.027 0 00-24-24zm-8 328H48.007V144h104.01l23.224-68.25h161.081l23.71 68.25h103.961z" class="ci-primary"></path><path d="M256 168a114 114 0 10114 114 114.13 114.13 0 00-114-114zm0 196a82 82 0 1182-82 82.093 82.093 0 01-82 82z"></path></svg>`;
+const chart =
+  `<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M376 160v32h65.372L252 381.373l-72-72L76.686 412.686l22.628 22.628L180 354.627l72 72 212-211.999V280h32V160H376z"></path><path d="M48 104H16v392h480v-32H48V104z"></path></svg>`;
+const clock =
+  `<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M271.514 95.5h-32v178.111l115.613 54.948 13.737-28.902-97.35-46.268V95.5z"></path><path d="M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208z"></path></svg>`;
+const config =
+  `<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M245.151 168a88 88 0 1088 88 88.1 88.1 0 00-88-88zm0 144a56 56 0 1156-56 56.063 56.063 0 01-56 56z"></path><path d="M464.7 322.319l-31.77-26.153a193.081 193.081 0 000-80.332l31.77-26.153a19.941 19.941 0 004.606-25.439l-32.612-56.483a19.936 19.936 0 00-24.337-8.73l-38.561 14.447a192.038 192.038 0 00-69.54-40.192l-6.766-40.571A19.936 19.936 0 00277.762 16H212.54a19.937 19.937 0 00-19.728 16.712l-6.762 40.572a192.03 192.03 0 00-69.54 40.192L77.945 99.027a19.937 19.937 0 00-24.334 8.731L21 164.245a19.94 19.94 0 004.61 25.438l31.767 26.151a193.081 193.081 0 000 80.332l-31.77 26.153A19.942 19.942 0 0021 347.758l32.612 56.483a19.937 19.937 0 0024.337 8.73l38.562-14.447a192.03 192.03 0 0069.54 40.192l6.762 40.571A19.937 19.937 0 00212.54 496h65.222a19.936 19.936 0 0019.728-16.712l6.763-40.572a192.038 192.038 0 0069.54-40.192l38.564 14.449a19.938 19.938 0 0024.334-8.731l32.609-56.487a19.939 19.939 0 00-4.6-25.436zm-50.636 57.12l-48.109-18.024-7.285 7.334a159.955 159.955 0 01-72.625 41.973l-10 2.636L267.6 464h-44.89l-8.442-50.642-10-2.636a159.955 159.955 0 01-72.625-41.973l-7.285-7.334-48.117 18.024L53.8 340.562l39.629-32.624-2.7-9.973a160.9 160.9 0 010-83.93l2.7-9.972L53.8 171.439l22.446-38.878 48.109 18.024 7.285-7.334a159.955 159.955 0 0172.625-41.973l10-2.636L222.706 48H267.6l8.442 50.642 10 2.636a159.955 159.955 0 0172.625 41.973l7.285 7.334 48.109-18.024 22.447 38.877-39.629 32.625 2.7 9.972a160.9 160.9 0 010 83.93l-2.7 9.973 39.629 32.623z"></path></svg>`;
+const cursor =
+  `<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><rect x="16" y="240.18" width="188.84" height="31.635"/><g transform="translate(-3.3234e-7 -112.18)"><rect x="307.16" y="352.37" width="188.84" height="31.635"/></g><rect transform="rotate(-90)" x="-496" y="240.18" width="188.84" height="31.635"/><rect transform="rotate(-90)" x="-204.84" y="240.18" width="188.84" height="31.635"/></svg>`;
+const del =
+  `<svg width="46.08" height="46.08" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"></path><path d="M6.535 3H21a1 1 0 011 1v16a1 1 0 01-1 1H6.535a1 1 0 01-.832-.445l-5.333-8a1 1 0 010-1.11l5.333-8A1 1 0 016.535 3zm.535 2l-4.666 7 4.666 7H20V5H7.07zM13 10.586l2.828-2.829 1.415 1.415L14.414 12l2.829 2.828-1.415 1.415L13 13.414l-2.828 2.829-1.415-1.415L11.586 12 8.757 9.172l1.415-1.415L13 10.586z"></path></svg>`;
+const fibonacci =
+  `<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g stroke-width="30.155"><rect x="14.757" y="240.92" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="147" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="334.84" width="482.49" height="30.155" rx="15.078"/></g ><g transform="translate(5.937 -288.34)"><path d="m23.904 712.34c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h173.93c-0.65295-3.3651-2.0312-6.4697-2.0312-10.026 0-7.1393 1.5573-13.888 4.0625-20.13zm276.35 0c2.5051 6.2423 4.0365 12.991 4.0365 20.13 0 3.5554-1.3526 6.6618-2.0052 10.026h173.93c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078z"/><path d="m250.06 759.97c17.965 0 32.545-14.58 32.545-32.545 0-17.965-14.58-32.545-32.545-32.545-17.965 0-32.545 14.58-32.545 32.545 0 17.965 14.58 32.545 32.545 32.545zm0 21.697c-29.964 0-54.242-24.279-54.242-54.242 0-29.964 24.279-54.242 54.242-54.242 29.964 0 54.242 24.279 54.242 54.242 0 29.964-24.279 54.242-54.242 54.242z" stroke-width="21.697"/></g ><path d="m144.05 18.672c-24.694 0-45.285 16.595-51.849 39.167h-62.37c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h62.37c6.5639 22.572 27.155 39.167 51.849 39.167s45.285-16.595 51.849-39.167h120.03c6.5639 22.572 27.155 39.167 51.849 39.167 24.694 0 45.285-16.595 51.849-39.167h62.552c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078h-62.552c-6.5639-22.572-27.155-39.167-51.849-39.167-24.694 0-45.285 16.595-51.849 39.167h-120.03c-6.5639-22.572-27.155-39.167-51.849-39.167zm0 21.693c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 1e-5 -32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552zm223.72 0c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 0-32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552z" stroke-width="30.155"/></svg>`;
+const line =
+  `<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g transform="matrix(21.697 0 0 21.697 -47.758 -47.758)"><path d="m7.354 21.354 14-14-0.707-0.707-14 14z"/><path d="m22.5 7c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5zm-17 16c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z"/></g></svg>`;
+const measure =
+  `<svg width="46.08" height="46.08" viewBox="0 0 32 32"><path d="M 3.2758709,20.241377 11.758622,28.72413 28.72413,11.758622 20.241377,3.2758709 Z m 2.1206881,0 1.5905161,-1.590515 3.7112049,3.711203 1.060342,-1.060345 -3.7112027,-3.711204 1.0603441,-1.060344 2.1206876,2.12069 1.060346,-1.060346 -2.120689,-2.120688 1.060343,-1.060344 3.711203,3.711203 L 16,17.060346 l -3.711203,-3.711208 1.060341,-1.060341 2.12069,2.120687 1.060344,-1.060346 -2.120688,-2.120687 1.060344,-1.060343 3.711204,3.711205 1.060345,-1.060345 -3.711205,-3.7112046 1.060344,-1.0603441 2.120687,2.1206887 1.060346,-1.0603446 -2.120687,-2.1206883 1.590515,-1.5905161 6.362065,6.362063 -14.84482,14.84482 z" style="stroke-width:0.749776" /></svg>`;
+const range =
+  `<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><g id="g930" transform="matrix(21.128963,0,0,21.128963,-29.235597,-50.369964)"><path clip-rule="evenodd" d="m 4.5,5 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,6.5 A 2.5,2.5 0 0 1 6.95,6 H 24 V 7 H 6.95 A 2.5,2.5 0 0 1 2,6.5 Z M 4.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,16.5 A 2.5,2.5 0 0 1 6.95,16 h 13.1 a 2.5,2.5 0 1 1 0,1 H 6.95 A 2.5,2.5 0 0 1 2,16.5 Z M 22.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z m -18,6 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,22.5 A 2.5,2.5 0 0 1 6.95,22 H 24 v 1 H 6.95 A 2.5,2.5 0 0 1 2,22.5 Z" id="path908" /><path clip-rule="evenodd" d="M 22.4,8.94 21.01,9.57 20.6,8.66 21.99,8.03 Z m -4,1.8 -1.39,0.63 -0.41,-0.91 1.39,-0.63 z m -4,1.8 -1.4,0.63 -0.4,-0.91 1.39,-0.63 z m -4,1.8 L 9,14.97 8.6,14.06 9.99,13.43 Z" id="path910" /></g></svg>`;
+const text =
+  `<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M231.359 147l-80.921 205h45.155l15.593-39.5h89.628l15.593 39.5h45.155l-80.921-205zm-3.594 123.5L256 198.967l28.235 71.533z"></path><path d="M384 56H128V16H16v112h40v256H16v112h112v-40h256v40h112V384h-40V128h40V16H384zM48 96V48h48v48zm48 368H48v-48h48zm288-40H128v-40H88V128h40V88h256v40h40v256h-40zm80-8v48h-48v-48zM416 48h48v48h-48z"></path></svg>`;
+const close =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g718" transform="translate(0,1.2499996)"><path d="M 7.5010125,7.9560661 5.355012,10.103066 c -0.472,0.472 -1.18,-0.2360003 -0.708,-0.7080003 L 7.6470125,6.3950659 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999998 c 0.472,0.472 -0.236,1.1800003 -0.708,0.7080003 L 8.5010125,7.9560661 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m 7.4989873,5.5439348 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>`;
+const up =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,7.7026182 -2.1460003,2.147 c -0.472,0.4719998 -1.18,-0.236 -0.708,-0.708 l 3.0000003,-3 c 0.1953639,-0.1958581 0.5126361,-0.1958581 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.1799998 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6-3" /></svg>`;
+const down =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,8.2973819 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.1958581 0.5126361,0.1958581 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></svg>`;
+const restore =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g687" transform="translate(15.647255,-0.0288128)"><path d="m -8.1462425,10.484879 -2.1460005,2.146999 c -0.472,0.472 -1.18,-0.236 -0.708,-0.708 l 3.0000005,-2.9999994 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999994 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1460005,-2.146999 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m -8.1482677,5.5727476 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>`;
+const maximize =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g611" transform="translate(0.2050748,-0.8829888)"><path d="m 7.2959375,11.933818 -2.146,-2.1469999 c -0.472,-0.4719998 -1.18,0.2359999 -0.708,0.7079999 l 3,3 c 0.195364,0.195858 0.512636,0.195858 0.708,0 l 3.0000005,-3 c 0.472,-0.472 -0.236,-1.1799997 -0.708,-0.7079999 L 8.2959375,11.933818 c -0.431103,0.417289 -0.523896,0.423024 -1,0 z" style="" id="path566" /><path d="m 7.2939123,5.8321596 -2.146,2.147 c -0.4719998,0.472 -1.1799998,-0.236 -0.708,-0.708 l 3,-3 c 0.1953639,-0.195858 0.5126361,-0.195858 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6" /></g></svg>`;
+const collapse =
+  `<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 11.500447,8.5 c 0.666666,0 0.666666,-1 0,-1 H 4.444275 c -0.1571231,0 -0.224029,0.07336 -0.2978281,0.1459999 -0.1958579,0.195364 -0.1958579,0.5126361 0,0.7080001 0,0 0.113806,0.146 0.320186,0.146 z" style="" id="path887" /></svg>`;
+const fwdEnd =
+  `<svg class="ov-icon" width="46.08" height="46.08" font-size="2.88em" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m14 15c0.55228 0 1-0.44772 1-1v-12c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1zm0-15c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2v-12c0-1.1046 0.89543-2 2-2z" fill-rule="evenodd"/><g transform="translate(-1.1585)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>`;
+const rwdStart =
+  `<svg class="ov-icon" width="46.08" height="46.08" font-size="2.88em" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m2 15c-0.55228 0-1-0.44772-1-1v-12c0-0.55228 0.44772-1 1-1h12c0.55228 0 1 0.44772 1 1v12c0 0.55228-0.44772 1-1 1zm0-15c-1.1046 0-2 0.89543-2 2v12c0 1.1046 0.89543 2 2 2h12c1.1046 0 2-0.89543 2-2v-12c0-1.1046-0.89543-2-2-2z" fill-rule="evenodd"/><g transform="matrix(-1 0 0 1 17.159 0)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>`;
+
+const iconW = 20;
+const iconH = 20;
+const handleColour = new Colour(GlobalStyle.COLOUR_BORDER);
+const template$c = document.createElement('template');
+template$c.innerHTML = `
+<style>
+  .scrollBarWidget {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 2px;
+  }
+  .scrollBar {
+    position: relative;
+    border: 1px solid var(--txc-time-scrollbar-color, ${GlobalStyle.COLOUR_BORDER});
+    height: 20px;
+    border-radius: 3px;
+    flex-basis: 100%;
+    overflow: hidden;
+  }
+  .scrollBar input {
+    pointer-events: none;
+    position: absolute;
+    overflow: hidden;
+    left: 0;
+    top: 0;
+    width: 100%;
+    outline: none;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background:  var(--txc-time-slider-color, #555);
+
+  }
+  .scrollBar input::-moz-range-thumb {
+    -moz-appearance: none;
+    appearance: none; 
+    pointer-events: auto;
+    position: relative;
+    z-index: 10;
+    outline: 0;
+    height: 100%;
+  }
+  .scrollBar input::-webkit-slider-thumb {
+    -webkit-appearance: none !important;
+    appearance: none; 
+    pointer-events: auto;
+    position: relative;
+    z-index: 1;
+    height: 100%;
+  }
+  .scrollBar input::-moz-range-track {
+    position: relative;
+    z-index: -1;
+    background-color: rgba(0, 0, 0, 1);
+    border: 0;
+  }
+  .scrollBar input:last-of-type::-moz-range-track {
+    -moz-appearance: none;
+    background: none transparent;
+    border: 0;
+  }
+  .scrollBar input[type="range"]::-webkit-slider-runnable-track {
+    -webkit-appearance: none !important;
+    appearance: none;
+    background: none transparent;
+    cursor: default;
+    height: 1px; /* Required for Samsung internet based browsers */
+    outline: 0;
+  }
+  .scrollBar input[type=range]::-moz-focus-outer {
+    border: 0;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    background: none;
+  }
+
+  input[type=range]::-webkit-slider-runnable-track {
+    height: 5px;
+    border: none;
+    border-radius: 3px;
+    background: transparent;
+  }
+
+  input[type=range]::-ms-track {
+    height: 5px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+  }
+
+  input[type=range]::-moz-range-track {
+    height: 5px;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 20px;
+    width: 16px;
+    border-radius: 3px;
+    background: var(--txc-time-slider-color, #555);
+    margin-top: -10px;
+    position: relative;
+    z-index: 10000;
+  }
+
+  input[type=range]::-ms-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 20px;
+    width: 16px;
+    border-radius: 3px;
+    background:  var(--txc-time-slider-color, #555);
+    margin-top: -5px;
+    position: relative;
+    z-index: 10000;
+  }
+
+  input[type=range]::-moz-range-thumb {
+    -webkit-appearance: none;
+    border: none;
+    height: 100%;
+    width: 16px;
+    border-radius: 3px;
+    background:  var(--txc-time-slider-color, #555);
+    margin-top: -5px;
+    position: relative;
+    z-index: 10000;
+  }
+
+  input[type=range]:focus {
+    outline: none;
+  }
+
+  .handle {
+    background-color: var(--txc-time-handle-color, ${handleColour.hex}44); 
+    width: 2px;
+    height: 18px;
+    margin: 1px;
+    margin-left: 872.968px;
+    margin-right: 0px;
+    position: absolute;
+  }
+  .icon {
+    flex-basis: ${iconW}px;
+  }
+  .icon svg {
+    fill: var(--txc-time-icon-color, ${GlobalStyle.COLOUR_ICON});
+    width: ${iconW}px;
+    height: ${iconH}px;
+    margin-top: 1px;
+  }
+  .icon svg:hover {
+    fill: var(--txc-time-icon-hover-color, ${GlobalStyle.COLOUR_ICONHOVER});
+  }
+</style>
+<div class="scrollBarWidget">
+  <span id="rwdStart" class="icon rwdStart">${rwdStart}</span>
+  <span class="scrollBar">
+    <div class="viewport"></div>
+    <input id="min" class="min" name="min" type="range" step="1" min="0" max="3000" />
+    <input id="max" class="max" name="max" type="range" step="1" min="0" max="3000" />
+    <div class="handle"></div>
+  </span>
+  <span id="fwdEnd" class="icon fwdEnd">${fwdEnd}</span>
+</div>
+`;
+class tradeXOverview extends element {
+  #template
+  constructor () {
+    super(template$c);
+    this.#template = template$c;
+  }
+  destroy() {
+  }
+  connectedCallback() {
+    if (this.doInit) {
+      this.doInit = false;
+      this.shadowRoot.appendChild(this.#template.content.cloneNode(true));
+      document.getElementById('slider-bar');
+      this.max.addEventListener('input', this.onChangeSliderHandler.bind({self: this, input: this.max}));
+      this.min.addEventListener('input', this.onChangeSliderHandler.bind({self: this, input: this.min}));
+    }
+  }
+  disconnectedCallback() {
+  }
+  get scrollBarWidget() { return this.shadowRoot.querySelector('.scrollBarWidget') }
+  get rwdStart() { return this.shadowRoot.querySelector('.rwdStart') }
+  get fwdEnd() { return this.shadowRoot.querySelector('.fwdEnd') }
+  get scrollBar() { return this.shadowRoot.querySelector('.scrollBar') }
+  get viewport() { return this.shadowRoot.querySelector('.viewport') }
+  get handle() { return this.shadowRoot.querySelector('.handle') }
+  get icons() { return this.shadowRoot.querySelectorAll('svg') }
+  get max() { return this.shadowRoot.querySelector('#max') }
+  get min() { return this.shadowRoot.querySelector('#min') }
+  get sliders() { return this.shadowRoot.querySelectorAll('input') }
+  get overviewCSS() { return this.shadowRoot.querySelector('style[title=overview]') }
+  onChangeSliderHandler() {
+    console.log(`${this.input.value}, ${this.input.getAttribute('max')}`);
+  }
+}
+
+customElements.get('tradex-overview') || window.customElements.define('tradex-overview', tradeXOverview);
+const template$b = document.createElement('template');
+template$b.innerHTML = `
+<style>
+  .viewport {
+    width: 100%;
+    height: 50%;
+  }
+</style>
+<div class="viewport"></div>
+<tradex-overview></tradex-overview>
+`;
+class tradeXTime extends element {
+  constructor () {
+    super(template$b);
+  }
+  destroy() {
+  }
+  disconnectedCallback() {
+  }
+  createGraph() {
+  }
+  get viewport() { return this.shadowRoot.querySelector('.viewport') }
+  get overview() { return this.shadowRoot.querySelector('tradex-overview') }
+}
+customElements.get('tradex-time') || window.customElements.define('tradex-time', tradeXTime);
+
+const template$a = document.createElement('template');
+template$a.innerHTML = `
+<style>
+  .viewport {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+  <div class="viewport"></div>
+`;
+class tradeXGrid extends element {
+  constructor () {
+    super(template$a);
+  }
+  destroy() {
+  }
+  disconnectedCallback() {
+  }
+  get viewport() { return this.shadowRoot.querySelector('.viewport') }
+}
+customElements.get('tradex-grid') || window.customElements.define('tradex-grid', tradeXGrid);
+
+const template$9 = document.createElement('template');
+template$9.innerHTML = `
+<style>
+  ::slotted(.legend) {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    white-space: nowrap;
+    width: calc(100% - 1em); 
+    margin: 0 0 0 1em;
+    text-align: left;
+  }
+</style>
+<div class="legends">
+  <slot name="legend"></slot>
+</div>
+`;
+class tradeXLegend extends element {
+  #title
+  #elLegend
+  #elTitle
+  #elInputs
+  #elControls
+  constructor () {
+    super(template$9);
+  }
+  destroy() {
+  }
+  connectedCallback() {
+    if (this.doInit) {
+      this.doInit = false;
+      this.shadowRoot.appendChild(this.template.content.cloneNode(true));
+      this.style.display = "block";
+      this.#elLegend = this.shadowRoot.querySelector('.legend');
+      this.#elTitle = this.shadowRoot.querySelector('.title');
+      this.#elInputs = this.shadowRoot.querySelector('dl');
+      this.#elControls = this.shadowRoot.querySelector('.controls');
+    }
+  }
+  disconnectedCallback() {
+  }
+  get elLegend() { return this.#elLegend }
+  get elTitle() { return this.#elTitle }
+  get elInputs() { return this.#elInputs }
+  get elControls() { return this.#elControls }
+  get title() { return this.#title }
+  set title(t) { this.setTittle(t); }
+  setTittle(t) {
+    if (!isString$1) return
+    this.#title = t;
+    this.elTitle.innerHTML = t;
+  }
+  buildInputs(o) {
+    let i = 0,
+        inp = "",
+        input,
+        blank = "",
+        styleDT = "display: inline; margin-left: ",
+        styleDD = "display: inline; margin-left: .25em;";
+    for (input in o.inputs) {
+      let colour = (o?.colours?.[i]) ? ` color: ${o.colours[i]};` : "";
+      let value = (o?.inputs?.[input] !== undefined) ? o.inputs[input] : blank;
+      let label = (o?.labels?.[i]) ? `${input}:` : blank;
+          styleDT += (o?.labels?.[i]) ? "1em;" : ".25em";
+      inp +=
+      `<dt style="${styleDT}">${label}</dt>
+      <dd style="${styleDD}${colour}">${value}</dd>`;
+      ++i;
+    }
+    return inp
+  }
+  buildControls(o) {
+    let inp = "";
+    let id = o.ID;
+    if (o?.type !== "chart") {
+      inp += `<span id="${id}_up" class="control">${up}</span>`;
+      inp += `<span id="${id}_down" class="control">${down}</span>`;
+    }
+    inp += `<span id="${id}_collapse" class="control">${collapse}</span>`;
+    inp += `<span id="${id}_maximize" class="control">${maximize}</span>`;
+    inp += `<span id="${id}_restore" class="control">${restore}</span>`;
+    inp += (o?.type !== "chart") ? `<span id="${id}_remove" class="control">${close}</span>` : ``;
+    inp += `<span id="${id}_config" class="control">${config}</span>`;
+    return inp
+  }
+}
+customElements.get('tradex-legends') || window.customElements.define('tradex-legends', tradeXLegend);
+
+const template$8 = document.createElement('template');
+template$8.innerHTML = `
+<style>
+  .viewport {
+    position: relative;
+    width: 100%;
+    height: inherit;
+    background: var(--txc-onchart-background, none);
+  }
+  .viewport canvas {
+    position: absolute;
+    top: 1px;
+  }
+  tradex-legends {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index:100;
+    width: 100%;
+  }
+</style>
+<div class="viewport"></div>
+<tradex-legends></tradex-legends>
+`;
+class tradeXOnChart extends element {
+  #parent
+  #elViewport
+  #elLegend
+  #elScale
+  #elCanvas
+  constructor () {
+    super(template$8);
+  }
+  destroy() {
+  }
+  connectedCallback() {
+    if (this.doInit) {
+      this.doInit = false;
+      this.shadowRoot.appendChild(this.template.content.cloneNode(true));
+      this.style.display = "block";
+      this.#elViewport = this.shadowRoot.querySelector('.viewport');
+      this.#elLegend = this.shadowRoot.querySelector('tradex-legends');
+    }
+  }
+  disconnectedCallback() {
+  }
+  get viewport() { return this.#elViewport }
+  get legend() { return this.#elLegend }
+}
+customElements.get('tradex-onchart') || window.customElements.define('tradex-onchart', tradeXOnChart);
+
+const template$7 = document.createElement('template');
+template$7.innerHTML = `
+<style>
+  .viewport {
+    width: 100%;
+    height: inherit;
+    background: var(--txc-onchart-background, none);
+  }
+  tradex-legends {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index:100;
+    width: 100%;
+  }
+</style>
+<tradex-legends></tradex-legends>
+<div class="viewport"></div>
+`;
+class tradeXOffChart extends element {
+  #parent
+  #elViewport
+  #elLegend
+  #elCanvas
+  #options
+  constructor () {
+    super(template$7);
+  }
+  destroy() {
+  }
+  connectedCallback() {
+    if (this.doInit) {
+      this.doInit = false;
+      this.shadowRoot.appendChild(this.template.content.cloneNode(true));
+      this.#elViewport = this.shadowRoot.querySelector('.viewport');
+      this.#elLegend = this.shadowRoot.querySelector('tradex-legends');
+    }
+  }
+  disconnectedCallback() {
+  }
+  get viewport() { return this.#elViewport }
+  get legend() { return this.#elLegend }
+}
+customElements.get('tradex-offchart') || window.customElements.define('tradex-offchart', tradeXOffChart);
+
+const template$6 = document.createElement('template');
+template$6.innerHTML = `
+<style>
+  tradex-grid, tradex-onchart, tradex-offchart {
+    overflow: hidden;
+  }
+  tradex-grid {
+    position: absolute;
+    height: inherit;
+  }
+  tradex-onchart {
+    position: relative;
+    height: 100%;
+  }
+  tradex-grid,
+  tradex-onchart {
+    display: block;
+    width: 100%;
+  }
+  ::slotted(tradex-offchart) {
+    display: block;
+    position: relative;
+    top: 1px;
+    width: 100%;
+    border-top: 1px solid;
+  }
+</style>
+<tradex-grid></tradex-grid>
+<tradex-onchart></tradex-onchart>
+<slot name="offchart" id="offchart"></slot>
+`;
+class tradeXRows extends element {
+  #oWidth
+  #oHeight
+  #widthCache
+  #heightCache
+  constructor () {
+    super(template$6);
+  }
+  destroy() {
+  }
+  connectedCallback() {
+    super.connectedCallback();
+    this.previousDimensions();
+  }
+  disconnectedCallback() {
+  }
+  get grid() { return this.shadowRoot.querySelector('tradex-grid') }
+  get onChart() { return this.shadowRoot.querySelector('tradex-onchart') }
+  get offCharts() { return this.shadowRoot.querySelectorAll('tradex-offchart') }
+  get offChartSlot() { return this.shadowRoot.querySelector('#offchart') }
+  get width() { return this.clientWidth }
+  get height() { return this.clientHeight }
+  get oWidth() { return this.#oWidth }
+  get oHeight() { return this.#oHeight }
+  get widthDeltaR() { return this.clientWidth / this.#oWidth }
+  get heightDeltaR() { return this.clientHeight / this.#oHeight }
+  previousDimensions() {
+console.log(`oWidth: ${this.oWidth}, oHeight: ${this.oHeight}`);
+    this.#oWidth = (this.#widthCache) ? this.#widthCache : this.clientWidth;
+    this.#oHeight = (this.#heightCache) ? this.#heightCache : this.clientHeight;
+    this.#widthCache = this.clientWidth;
+    this.#heightCache = this.clientHeight;
+  }
+}
+customElements.get('tradex-rows') || window.customElements.define('tradex-rows', tradeXRows);
+
+const template$5 = document.createElement('template');
+template$5.innerHTML = `
+<style>
+  #viewport {
+    position: absolute;
+    width: 100%;
+    height: inherit;
+    background: var(--txc-onchart-background, none);
+    z-index: 0;
+  }
+  #viewport canvas {
+    position: absolute;
+    top: 1px;
+  }
+  tradex-rows {
+    position:relative;
+    overflow: hidden;
+    width: calc(100% - ${SCALEW}px);
+    height: calc(100% - ${TIMEH}px);
+    border: 1px solid;
+    border-color: var(--txc-border-color, ${GlobalStyle.COLOUR_BORDER}); 
+  }
+  tradex-time {
+    position: relative;
+    width: calc(100% - ${SCALEW}px);
+    height: ${TIMEH}px;
+    overflow: hidden;
+    margin-left: 1px;
+    z-index: 1;
+  }
+</style>
+<div id="viewport"></div>
+<tradex-rows></tradex-rows>
+<tradex-time></tradex-time>
+`;
+class tradeXMain extends element {
+  #elYAxis
+  #theme
+  constructor () {
+    super(template$5);
+  }
+  destroy() {
+  }
+  disconnectedCallback() {
+  }
+  get viewport() { return this.shadowRoot.querySelector('#viewport') }
+  get rows() { return this.shadowRoot.querySelector('tradex-rows') }
+  get time() { return this.shadowRoot.querySelector('tradex-time') }
+  start(theme) {
+    this.#theme = theme;
+    this.setMain();
+  }
+  rowNode(type, api) {
+    const styleRow = ` border-top: 1px solid ${api.theme.chart.BorderColour};`;
+    const node = `
+      <tradex-offchart slot="offchart" class="${type}" style="${styleRow}">
+      </tradex-offchart>
+    `;
+    return node
+  }
+  setMain() {
+    let timeH = (isNumber(this.#theme?.time?.height)) ? this.#theme.time.height : TIMEH;
+    let offset = (this.#theme.tools.location == "none") ? 60 : 0;
+    this.rows.style.height = `calc(100% - ${timeH}px)`;
+    this.rows.style.left = `${offset}px`;
+    this.time.style.left = `${offset}px`;
+    this.viewport.style.left = `${offset}px`;
+  }
+}
+customElements.get('tradex-main') || window.customElements.define('tradex-main', tradeXMain);
+
+const template$4 = document.createElement('template');
+template$4.innerHTML = `
+  <slot></slot>
+`;
+class tradeXTools extends element {
+  constructor () {
+    super(template$4);
+  }
+  destroy() {
+  }
+  disconnectedCallback() {
+  }
+  get icons() { return this.shadowRoot.querySelector('slot').assignedElements() }
+}
+customElements.get('tradex-tools') || window.customElements.define('tradex-tools', tradeXTools);
+
+const template$3 = document.createElement('template');
+template$3.innerHTML = `
+<style>
+  .viewport {
+    width: 100%;
+    height: 100%;
+    margin-top: 2px;
+    margin-left: 2px;
+  }
+</style>
+<div class="viewport"></div>
+<slot name="offchart" id="offchart"></slot>
+`;
+class tradeXScale extends element {
+  #viewport
+  #offChartSlot
+  constructor () {
+    super(template$3);
+  }
+  destroy() {
+  }
+  connectedCallback() {
+    if (this.doInit) {
+      this.doInit = false;
+      this.shadowRoot.appendChild(this.template.content.cloneNode(true));
+      this.style.display = "block";
+      this.#viewport = this.shadowRoot.querySelector('.viewport');
+      this.#offChartSlot = this.shadowRoot.querySelector('#offchart');
+    }
+  }
+  disconnectedCallback() {
+  }
+  get viewport() { return this.#viewport}
+  get offCharts() { return this.shadowRoot.querySelectorAll('tradex-offchart') }
+  get offChartSlot() { return this.#offChartSlot }
+}
+customElements.get('tradex-scale') || window.customElements.define('tradex-scale', tradeXScale);
+
+const right = `
+<style>
+  tradex-tools {
+    position: absolute; 
+    top: 0; left: 0;
+    width: ${TOOLSW}px;
+    height: 100%; 
+    min-height: 100%; 
+  }
+  tradex-main {
+    position: absolute; 
+    top: 0;
+    right: 0;
+    width: calc(100% - ${TOOLSW}px);
+    height: 100%;
+  }
+  tradex-scale {
+    position: absolute; 
+    top: 0; 
+    right: 0; 
+    width: ${SCALEW}px; 
+    height: 100%;
+  }
+</style>
+<tradex-tools></tradex-tools>
+<tradex-main></tradex-main>
+<tradex-scale></tradex-scale>
+`;
+const template$2 = document.createElement('template');
+template$2.innerHTML = right;
+class tradeXBody extends element {
+  #theme
+  constructor () {
+    super(template$2);
+  }
+  destroy() {
+  }
+  disconnectedCallback() {
+  }
+  get tools() { return this.shadowRoot.querySelector('tradex-tools') }
+  get main() { return this.shadowRoot.querySelector('tradex-main') }
+  get scale() { return this.shadowRoot.querySelector('tradex-scale') }
+  start(theme) {
+    this.#theme = theme;
+    this.setToolsLocation();
+  }
+  setYAxisLocation(side=this.#theme?.yAxis?.location) {
+    let toolsW = (isNumber(this.#theme?.tools?.width)) ? this.#theme.tools.width : TOOLSW;
+    let offset;
+    switch (side) {
+      case "left":
+        offset = (toolsW == 0) ? 0 : SCALEW;
+        this.scale.style.left = `${toolsW}px`;
+        this.scale.style.right = undefined;
+        this.main.style.left = undefined;
+        this.main.style.right = `-${offset}px`;
+        this.main.style.width = `calc(100% - ${toolsW}px)`;
+        break;
+      case "both":
+      case "right":
+      default:
+        offset = (toolsW == 0) ? SCALEW : 0;
+        this.scale.style.left = undefined;
+        this.scale.style.right = 0;
+        this.main.style.left = undefined;
+        this.main.style.right = `${offset}px`;
+        this.main.style.width = `calc(100% - ${toolsW}px)`;
+        break;
+    }
+  }
+  setToolsLocation(side=this.#theme?.tools?.location) {
+    this.#theme.tools = this.#theme.tools || {};
+    switch(side) {
+      case "none":
+      case false:
+        this.#theme.tools.location = "none";
+        this.#theme.tools.width = 0;
+        this.tools.style.display = "none";
+        this.tools.style.width =`0px`;
+        break;
+      case "right":
+        this.#theme.tools.location = "right";
+        this.#theme.tools.width = this.#theme?.tools?.width || TOOLSW;
+        this.tools.style.display = "block";
+        this.tools.style.left = undefined;
+        this.tools.style.right = 0;
+        this.tools.style.width =`${TOOLSW}px`;
+        break;
+      case "left":
+      default:
+        this.#theme.tools.location = "left";
+        this.#theme.tools.width = this.#theme?.tools?.width || TOOLSW;
+        this.tools.style.display = "block";
+        this.tools.style.left = 0;
+        this.tools.style.right = undefined;
+        this.tools.style.width =`${TOOLSW}px`;
+        break;
+    }
+    this.setYAxisLocation();
+  }
+}
+customElements.get('tradex-body') || window.customElements.define('tradex-body', tradeXBody);
+
+const template$1 = document.createElement('template');
+template$1.innerHTML = `
+  <style>
+    .utilsOptions {
+      display: inline-block; float: right;
+    }
+  </style>
+  <slot></slot>
+  <div class="utilsOptions">
+  </div>
+`;
+class tradeXUtils extends element {
+  constructor () {
+    super(template$1);
+  }
+  destroy() {
+  }
+  disconnectedCallback() {
+  }
+  get icons() { return this.shadowRoot.querySelector('slot').assignedElements()[0].children }
+}
+customElements.get('tradex-utils') || window.customElements.define('tradex-utils', tradeXUtils);
+
+const template = document.createElement('template');
+template.innerHTML = `
+  <slot name="widget"></slot>
+`;
+class tradeXWidgets extends element {
+  constructor () {
+    super(template);
+  }
+  destroy() {
+  }
+  disconnectedCallback() {
+  }
+}
+customElements.get('tradex-widgets') || window.customElements.define('tradex-widgets', tradeXWidgets);
+
+const HTML = `
+  <style title="core">
+    tradex-utils {
+      height: ${UTILSH}px; 
+      width: 100%; 
+    }
+    tradex-body {
+      position: relative;
+      height: calc(100% - ${UTILSH}px); 
+      min-height: ${CHART_MINH - UTILSH}px;
+      width: 100%;
+    }
+    tradex-widgets {
+      position: relative;
+    }
+  </style>
+  <div style="display: none;">
+    <slot></slot>
+  </div>
+  <tradex-utils></tradex-utils>
+  <tradex-body></tradex-body>
+  <tradex-widgets></tradex-widgets>
+`;
+class tradeXChart extends element {
+  #elBody
+  #elUtils
+  #elWidgets
+  #template
+  #chartW = CHART_MINW
+  #chartH = CHART_MINH
+  #oWidth
+  #oHeight
+  #widthCache
+  #heightCache
+  #theme
+  constructor () {
+    const template = document.createElement('template');
+          template.innerHTML = HTML;
+    super(template, "closed");
+    this.#template = template;
+  }
+  destroy() {
+    this.resizeObserver.disconnect();
+  }
+  static get observedAttributes() {
+    return ['config', 'disabled', 'height', 'stream', 'width']
+  }
+  connectedCallback() {
+    if (this.doInit) {
+      this.doInit = false;
+      this.shadowRoot.appendChild(this.#template.content.cloneNode(true));
+      this.style.display = "block";
+      this.style.minHeight = TX_MINH;
+      this.elWidgetsG = this.shadowRoot.querySelector('tradex-widgets');
+      this.elUtils = this.shadowRoot.querySelector('tradex-utils');
+      this.elBody = this.shadowRoot.querySelector('tradex-body');
+      this.elMain = this.elBody.main;
+      this.elTime = this.elBody.main.time;
+      this.elTools = this.elBody.tools;
+      this.elYAxis = this.elBody.scale;
+      this.previousDimensions();
+      let height = this.getAttribute('height') || "100%";
+      let width = this.getAttribute('width') || "100%";
+      this.setDimensions(width, height);
+      this.resizeObserver = new ResizeObserver(debounce(this.onResized, 50, this));
+      this.resizeObserver.observe(this);
+    }
+  }
+  disconnectedCallback() {
+    this.resizeObserver.disconnect();
+    this.removeEventListener('click', this.onClick);
+  }
+  attributeChangedCallback(prop, oldVal, newVal) {
+    switch(prop) {
+      case "config":
+        break;
+      case "disabled":
+        break;
+      case "height":
+        this.height(newVal);
+        break;
+      case "width":
+        this.width(newVal);
+        break;
+    }
+  }
+  get id() { return this.getAttribute('id'); }
+  set id(id) { this.setAttribute('id', id); }
+  get disabled() { return this.hasAttribute('disabled'); }
+  set disabled(d) {
+    if (d) {
+        this.setAttribute('disabled', '');
+    } else {
+        this.removeAttribute('disabled');
+    }
+  }
+  get width() { return this.offsetWidth }
+  set width(w) { this.setWidth(w); }
+  get height() { return this.offsetHeight }
+  set height(h) { this.setHeight(h); }
+  get oWidth() { return this.#oWidth }
+  get oHeight() { return this.#oHeight }
+  get widthDeltaR() { return this.offsetWidth / this.#oWidth }
+  get heightDeltaR() { return this.offsetHeight / this.#oHeight }
+  get stream() {  }
+  set stream(s) {  }
+  get body() { return this.#elBody }
+  get utils() { return this.#elUtils }
+  get widgets() { return this.#elWidgets }
+  elStart(theme) {
+    this.#theme = theme;
+    this.setUtilsLocation();
+  }
+  onResized(entries) {
+      console.log("onResize");
+      console.log(this.offsetWidth);
+      console.log(this.offsetHeight);
+      if (isObject(this.MainPane) && this.MainPane instanceof MainPane) {
+        this.previousDimensions();
+        this.emit("global_resize", {w: this.offsetWidth, h: this.offsetHeight});
+      }
+  }
+  previousDimensions() {
+    this.#oWidth = (this.#widthCache) ? this.#widthCache : this.offsetWidth;
+    this.#oHeight = (this.#heightCache) ? this.#heightCache : this.offsetHeight;
+    this.#widthCache = this.offsetWidth;
+    this.#heightCache = this.offsetHeight;
+  }
+  setWidth(w) {
+    if (isNumber(w)) {
+      this.#chartW = w;
+      w += "px";
+    }
+    else if (isString$1(w)) ;
+    else {
+      this.#chartW = this.parentElement.getBoundingClientRect().width;
+      w = this.#chartW + "px";
+    }
+    this.style.width = w;
+  }
+  setHeight(h) {
+    if (isNumber(h)) {
+      this.#chartH = h;
+      h += "px";
+    }
+    else if (isString$1(h)) ;
+    else {
+      this.#chartH = this.parentElement.getBoundingClientRect().height;
+      w = this.#chartH + "px";
+    }
+    this.style.height = h;
+  }
+  setWidthMin(w) { this.style.minWidth = `var(--txc-min-width, ${w})`; }
+  setHeightMin(h) { this.style.minHeight = `var(--txc-min-height, ${w})`; }
+  setWidthMax(w) { this.style.minWidth = `var(--txc-max-width, ${w})`; }
+  setHeightMax(h) { this.style.minHeight = `var(--txc-max-height, ${w})`; }
+  setDimensions(w, h) {
+    let dims;
+    let width = this.width;
+    let height = this.height;
+    if (!w || !h) {
+      const dims = this.getBoundingClientRect();
+      const parent = this.parentElement.getBoundingClientRect();
+      h = (!dims.height) ? (!parent.height) ? CHART_MINH : parent.height : dims.height;
+      w = (!dims.width) ? (!parent.width) ? CHART_MINW : parent.width : dims.width;
+    }
+    dims = {
+      width: this.width,
+      height: this.height,
+      resizeW: w / width,
+      resizeH: h / height,
+      resizeWDiff: w - width,
+      resizeHDiff: h - height
+    };
+    this.setWidth(w);
+    this.setHeight(h);
+    return dims
+  }
+  setUtilsLocation(pos=this.#theme?.utils?.location) {
+    this.#theme.utils = this.#theme.utils || {};
+    switch(pos) {
+      case "none":
+      case false:
+        this.#theme.utils.location = "none";
+        this.#theme.utils.height = 0;
+        this.elUtils.style.display = "none";
+        this.elUtils.style.height =`0px`;
+        this.elBody.style.height = `100%`;
+        this.elBody.style.minHeight = `${CHART_MINH}px`;
+        break;
+      case "top":
+      default:
+        this.#theme.utils.location = "top";
+        this.#theme.utils.height = UTILSH;
+        this.elUtils.style.display = "block";
+        this.elUtils.style.height =`${UTILSH}px`;
+        this.elBody.style.height = `calc(100% - ${UTILSH}px)`;
+        this.elBody.style.minHeight = `${CHART_MINH - UTILSH}px`;
+    }
+  }
+}
+
+var utilsList = [
+  {
+    id: "indicators",
+    name: "Indicators",
+    icon: chart,
+    event: "utils_indicators",
+    sub: [],
+  },
+  {
+    id: "timezone",
+    name: "Timezone",
+    icon: clock,
+    event: "utils_timezone",
+  },
+  {
+    id: "screenshot",
+    name: "Screenshot",
+    icon: camera,
+    event: "utils_screenshot",
+  },
+  {
+    id: "settings",
+    name: "Settings",
+    icon: config,
+    event: "utils_settings",
+  },
+];
+
+class UtilsBar {
+  #name = "Utilities"
+  #shortName = "utils"
+  #core
+  #options
+  #elUtils
+  #utils
+  #widgets
+  #indicators
+  #menus = {}
+  constructor (core, options) {
+    this.#core = core;
+    this.#options = options;
+    this.#elUtils = core.elUtils;
+    this.#utils = core.config?.utilsBar || utilsList;
+    this.#widgets = core.WidgetsG;
+    this.#indicators = core.indicators || Indicators;
+    this.init();
+  }
+  log(l) { this.#core.log(l); }
+  info(i) { this.#core.info(i); }
+  warning(w) { this.#core.warn(w); }
+  error(e) { this.#core.error(e); }
+  get name() {return this.#name}
+  get shortName() {return this.#shortName}
+  get core() {return this.#core}
+  get options() {return this.#options}
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elUtils) }
+  init() {
+    this.mount(this.#elUtils);
+    this.log(`${this.#name} instantiated`);
+  }
+  start() {
+    this.initAllUtils();
+    this.eventsListen();
+  }
+  end() {
+    const api = this.#core;
+    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`);
+    for (let util of utils) {
+      for (let u of this.#utils) {
+        if (u.id === id)
+          util.removeEventListener("click", this.onIconClick);
+      }
+    }
+    this.off("utils_indicators", this.onIndicators);
+    this.off("utils_timezone", this.onTimezone);
+    this.off("utils_settings", this.onSettings);
+    this.off("utils_screenshot", this.onScreenshot);
+  }
+  eventsListen() {
+    this.on("utils_indicators", this.onIndicators.bind(this));
+    this.on("utils_timezone", this.onTimezone.bind(this));
+    this.on("utils_settings", this.onSettings.bind(this));
+    this.on("utils_screenshot", this.onScreenshot.bind(this));
+  }
+  on(topic, handler, context) {
+    this.#core.on(topic, handler, context);
+  }
+  off(topic, handler) {
+    this.#core.off(topic, handler);
+  }
+  emit(topic, data) {
+    this.#core.emit(topic, data);
+  }
+  onIconClick(e) {
+    let evt = e.currentTarget.dataset.event,
+        menu = e.currentTarget.dataset.menu || false,
+        data = {
+          target: e.currentTarget.id,
+          menu: menu,
+          evt: e.currentTarget.dataset.event
+        };
+    this.emit(evt, data);
+    if (menu) this.emit("openMenu", data);
+    else {
+      this.emit("menuItemSelected", data);
+      this.emit("utilSelected", data);
+    }
+  }
+  mount(el) {
+    el.innerHTML = this.defaultNode();
+  }
+  initAllUtils() {
+    const api = this.#core;
+    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`);
+    for (let util of utils) {
+      let id = util.id.replace('TX_', ''),
+          svg = util.querySelector('svg');
+          svg.style.fill = UtilsStyle.COLOUR_ICON;
+          svg.style.height = "90%";
+      for (let u of this.#utils) {
+        if (u.id === id) {
+          util.addEventListener("click", this.onIconClick.bind(this));
+          if (u.id === "indicators") u.sub = Object.values(this.#indicators);
+          if (u?.sub) {
+            let config = {
+              content: u.sub,
+              primary: util
+            };
+            let menu = this.#widgets.insert("Menu", config);
+            util.dataset.menu = menu.id;
+            menu.start();
+          }
+        }
+      }
+    }
+  }
+  defaultNode() {
+    let style = `display: inline-block; float: right;`;
+    let utilsBar = `
+    <div style="${style}">
+    <style>
+      svg {
+        height: ${UtilsStyle.ICONSIZE};
+        fill: ${UtilsStyle.COLOUR_ICON};
+      }
+    </style>
+    `;
+    for (const util of this.#utils) {
+      utilsBar += this.iconNode(util);
+    }
+    return utilsBar + "</div>"
+  }
+  iconNode(util) {
+    const iconStyle = `display: inline-block; height: ${UtilsStyle.ICONSIZE}; padding-top: 2px`;
+    const menu = ("sub" in util) ? `data-menu="true"` : "";
+    return  `
+      <div id="TX_${util.id}" data-event="${util.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${util.icon}</div>\n
+    `
+  }
+  onIndicators(data) {
+    console.log(`Indicator:`,data);
+  }
+  onTimezone(data) {
+    console.log(`Timezone:`,data);
+    this.#core.notImplemented();
+  }
+  onSettings(data) {
+    console.log(`Settings:`,data);
+    this.#core.notImplemented();
+  }
+  onScreenshot(data) {
+    console.log(`Screenshot:`,data);
+    this.#core.notImplemented();
+  }
+}
+
+class Tool {
+  static #cnt = 0
+  static #instances = {}
+  #ID
+  #inCnt = null
+  #name
+  #shortName
+  #options
+  #config
+  #core
+  #parent
+  #input
+  #elChart
+  #elCanvas
+  #elViewport
+  #layerTool
+  #target
+  #cursorPos = [0, 0]
+  #cursorActive = false
+  #cursorClick
+  constructor(config) {
+    this.#config = config;
+    this.#inCnt = config.cnt;
+    this.#ID = this.#config.ID || uid("TX_Tool_");
+    this.#name = config.name;
+    this.#core = config.core;
+    this.#elChart = config.elements.elChart;
+    this.#parent = {...config.parent};
+    this.#target = config.target;
+    this.#target.addTool(this);
+    this.#elViewport = this.#layerTool.viewport;
+    this.#elCanvas = this.#elViewport.scene.canvas;
+    this.#cursorClick = config.pos;
+  }
+  get inCnt() { return this.#inCnt }
+  get ID() { return this.#ID }
+  get name() {return this.#name}
+  get shortName() { return this.#shortName }
+  get core() { return this.#core }
+  get stateMachine() { return this.#core.stateMachine }
+  get state() { return this.#core.getState() }
+  get data() { return this.#core.chartData }
+  get range() { return this.#core.range }
+  get target() { return this.#target }
+  set layerTool(layer) { this.#layerTool = layer; }
+  get layerTool() { return this.#layerTool }
+  get elViewport() { return this.#elViewport }
+  get cursorPos() { return this.#cursorPos }
+  get cursorActive() { return this.#cursorActive }
+  get cursorClick() { return this.#cursorClick }
+  get candleW() { return this.#core.Timeline.candleW }
+  get theme() { return this.#core.theme }
+  get config() { return this.#core.config }
+  get scrollPos() { return this.#core.scrollPos }
+  get bufferPx() { return this.#core.bufferPx }
+  static create(target, config) {
+    const cnt = ++Tool.#cnt;
+    config.cnt = cnt;
+    config.modID = `${config.toolID}_${cnt}`;
+    config.toolID = config.modID;
+    config.target = target;
+    const tool = new config.tool(config);
+    Tool.#instances[cnt] = tool;
+    target.chartToolAdd(tool);
+    return tool
+  }
+  static destroy(tool) {
+    if (tool instanceof Tool) {
+      const inCnt = tool.inCnt;
+      delete Tool.#instances[inCnt];
+    }
+  }
+  end() { this.stop(); }
+  stop() {
+    this.#input.off("mousemove", this.onMouseMove);
+  }
+  eventsListen() {
+    this.#input = new Input(this.#elCanvas, {disableContextMenu: false});
+    this.#input.on("mousemove", this.onMouseMove.bind(this));
+  }
+  on(topic, handler, context) {
+    this.#core.on(topic, handler, context);
+  }
+  off(topic, handler) {
+    this.#core.off(topic, handler);
+  }
+  emit(topic, data) {
+    this.#core.emit(topic, data);
+  }
+  onMouseMove(e) {
+    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
+    this.emit("tool_mousemove", this.#cursorPos);
+  }
+  createViewport() {
+    this.config.buffer || BUFFERSIZE;
+    this.#elViewport.getBoundingClientRect().width;
+    this.#options.chartH || this.#parent.rowsH - 1;
+  }
+  draw() {
+  }
+}
+
+class Fibonacci extends Tool {
+  constructor(config) {
+    super(config);
+  }
+}
+
+class Line extends Tool {
+  #colour = lineConfig.colour
+  #lineWidth = lineConfig.lineWidth
+  #stateMachine
+  constructor(config) {
+    super(config);
+  }
+  set colour(colour=this.#colour) {
+    this.#colour = colour;
+  }
+  get colour() { return this.#colour }
+  set lineWidth(width) { this.#lineWidth = (isNumber(width)) ? width : this.#lineWidth; }
+  get lineWidth() { return this.#lineWidth }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
+  get stateMachine() { return this.#stateMachine }
+  start() {
+    this.eventsListen();
+    let [x1, y1] = this.cursorClick;
+    const scene = this.layerTool.scene;
+    scene.clear();
+    const ctx = this.layerTool.scene.context;
+    ctx.save();
+    ctx.lineWidth = this.lineWidth;
+    ctx.strokeStyle = this.colour;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(300, 150);
+    ctx.stroke();
+    ctx.closePath();
+    ctx.restore();
+    this.elViewport.render();
+  }
+}
+
+class Measure extends Tool {
+  constructor(config) {
+    super(config);
+  }
+}
+
+class RangeTool extends Tool {
+  constructor(config) {
+    super(config);
+  }
+}
+
+class Text extends Tool {
+  constructor(config) {
+    super(config);
+  }
+}
+
+var tools = [
+  {
+    id: "cursor",
+    name: "Cursor",
+    icon: cursor,
+    event: "tool_activated",
+  },
+  {
+    id: "line",
+    name: "Line",
+    icon: line,
+    event: "tool_activated",
+    class: Line,
+    sub: [
+      {
+        id: "ray",
+        name: "Ray",
+        icon: line,
+        event: "tool_activated",
+        class: Line,
+      },
+      {
+        id: "hRay",
+        name: "Horizontal Ray",
+        icon: line,
+        event: "tool_activated",
+        class: Line,
+      },
+      {
+        id: "vRay",
+        name: "Vertical Ray",
+        icon: line,
+        event: "tool_activated",
+        class: Line,
+      },
+    ]
+  },
+  {
+    id: "fibonacci",
+    name: "Fibonacci",
+    icon: fibonacci,
+    event: "tool_activated",
+    class: Fibonacci,
+    sub: [
+      {
+        id: "fib",
+        name: "Not Implemented Yet",
+        icon: line,
+      }
+    ]
+  },
+  {
+    id: "range",
+    name: "Range",
+    icon: range,
+    event: "tool_activated",
+    class: RangeTool,
+    sub: [
+      {
+        id: "rng",
+        name: "Not Implemented Yet",
+        icon: line,
+      }
+    ]
+  },
+  {
+    id: "text",
+    name: "Text",
+    icon: text,
+    event: "tool_activated",
+    class: Text,
+    sub: [
+      {
+        id: "txt",
+        name: "Not Implemented Yet",
+        icon: line,
+      }
+    ]
+  },
+  {
+    id: "measure",
+    name: "Measure",
+    icon: measure,
+    event: "tool_activated",
+    class: Measure,
+  },
+  {
+    id: "delete",
+    name: "Delete",
+    icon: del,
+    event: "tool_activated",
+    class: undefined,
+  }
+];
+const lineConfig = {
+  colour: "#8888AACC",
+  lineWidth: 1
+};
+
+var stateMachineConfig$1 = {
+  id: "template",
+  initial: "idle",
+  context: {},
+  states: {
+    idle: {
+      onEnter(data) {
+        console.log('idle: onEnter');
+      },
+      onExit(data) {
+        console.log('idle: onExit');
+      },
+      on: {
+        tool_activated: {
+          target: 'tool_activated',
+          action (data) {
+            this.context.origin.onToolActivated(data);
+          },
+        },
+      }
+    },
+    tool_activated: {
+      onEnter (data) {
+      },
+      onExit (data) {
+      },
+      on: {
+        tool_targetSelected: {
+          target: 'tool_addToTarget',
+          action (data) {
+            this.context.origin.onToolTargetSelected(data);
+          },
+        },
+      }
+    },
+    tool_addToTarget: {
+      onEnter (data) {
+      },
+      onExit (data) {
+      },
+      on: {
+        always: {
+          target: 'idle',
+          condition: 'toolTarget',
+          action (data) {
+            this.context.origin.addNewTool();
+          },
+        },
+      }
+    },
+  },
+  guards: {
+    toolTarget () { return true }
+  }
+};
+
+class ToolsBar {
+  #name = "Toolbar"
+  #shortName = "tools"
+  #core
+  #options
+  #stateMachine
+  #elTools
+  #widgets
+  #Tool = Tool
+  #tools
+  #toolClasses = {}
+  #activeTool = undefined
+  #toolTarget
+  constructor (core, options) {
+    this.#core = core;
+    this.#options = options;
+    this.#elTools = core.elTools;
+    this.#tools = tools || core.config.tools;
+    this.#widgets = core.WidgetsG;
+    this.init();
+  }
+  log(l) { this.#core.log(l); }
+  info(i) { this.#core.info(i); }
+  warning(w) { this.#core.warn(w); }
+  error(e) { this.#core.error(e); }
+  get name() {return this.#name}
+  get shortName() {return this.#shortName}
+  get core() {return this.#core}
+  get options() {return this.#options}
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elTools) }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
+  get stateMachine() { return this.#stateMachine }
+  init() {
+    this.mount(this.#elTools);
+    this.log(`${this.#name} instantiated`);
+  }
+  start() {
+    this.initAllTools();
+    this.addAllTools();
+    this.eventsListen();
+    stateMachineConfig$1.context = this;
+    this.stateMachine = stateMachineConfig$1;
+    this.stateMachine.start();
+  }
+  end() {
+    this.stateMachine.destroy();
+    const api = this.#core;
+    const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`);
+    for (let tool of tools) {
+      for (let t of this.#tools) {
+        if (t.id === id)
+          tool.removeEventListener("click", this.onIconClick);
+      }
+    }
+    this.off("tool_selected", this.onToolSelect);
+    this.off("tool_deselected", this.onToolDeselect);
+  }
+  eventsListen() {
+    this.on("tool_selected", (e) => { this.onToolSelect.bind(this); });
+    this.on("tool_deselected", (e) => { this.onToolDeselect.bind(this); });
+  }
+  on(topic, handler, context) {
+    this.#core.on(topic, handler, context);
+  }
+  off(topic, handler) {
+    this.#core.off(topic, handler);
+  }
+  emit(topic, data) {
+    this.#core.emit(topic, data);
+  }
+  onIconClick(e) {
+    e.currentTarget.dataset.event;
+        let menu = e.currentTarget.dataset.menu || false,
+        data = {
+          target: e.currentTarget.id,
+          menu: menu,
+          evt: e.currentTarget.dataset.event,
+          tool: e.currentTarget.dataset.tool
+        };
+    if (menu) this.emit("openMenu", data);
+    else {
+      this.emit("menuItemSelected", data);
+    }
+  }
+  onToolTargetSelected(tool) {
+    console.log("tool_targetSelected", tool.target);
+    this.#toolTarget = tool.target;
+  }
+  onToolActivated(tool) {
+    console.log("Tool activated:", tool);
+    this.#activeTool = tool;
+  }
+  onToolSelect(e) {
+  }
+  onToolDeselect(e) {
+  }
+  mount(el) {
+    el.innerHTML = this.defaultNode();
+  }
+  initAllTools() {
+    const api = this.#core;
+    const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`);
+    for (let tool of tools) {
+      let id = tool.id,
+          svg = tool.querySelector('svg');
+          svg.style.fill = ToolsStyle.COLOUR_ICON;
+          svg.style.width = "90%";
+      for (let t of this.#tools) {
+        if (t.id === id) {
+          tool.addEventListener("click", this.onIconClick.bind(this));
+          if (t?.sub) {
+            let config = {
+              content: t.sub,
+              primary: tool
+            };
+            let menu = this.#widgets.insert("Menu", config);
+            tool.dataset.menu = menu.id;
+            menu.start();
+            for (let s of t.sub) {
+              this.#toolClasses[s.id] = s.class;
+            }
+          }
+          else {
+            this.#toolClasses[t.id] = t.class;
+          }
+        }
+      }
+    }
+  }
+  defaultNode() {
+    let toolbar = `
+    <style>
+      svg {
+        height: ${ToolsStyle.ICONSIZE};
+        fill: ${ToolsStyle.COLOUR_ICON};
+      }
+    </style>
+    `;
+    for (const tool of this.#tools) {
+      toolbar += this.iconNode(tool);
+    }
+    return toolbar
+  }
+  iconNode(tool) {
+    const iconStyle = `display: inline-block; height: ${ToolsStyle.ICONSIZE}; margin-left: -3px;`;
+    const menu = ("sub" in tool) ? `data-menu="true"` : "";
+    return  `
+      <div id="${tool.id}" data-event="${tool.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${tool.icon}</div>\n
+    `
+  }
+  addTool(tool=this.#activeTool, target=this.#toolTarget) {
+    let config = {
+      name: tool,
+      tool: this.#toolClasses[tool],
+      pos: target.cursorClick
+    };
+    let toolInstance = this.#Tool.create(target, config);
+    toolInstance.start();
+    console.log(toolInstance);
+    return toolInstance
+  }
+  addNewTool(tool, target) {
+    let t = this.addTool(tool, target);
+    this.activeTool = (t);
+    this.emit(`tool_active`, t);
+    this.emit(`tool_${t.ID}_active`, t);
+  }
+  addAllTools() {
   }
 }
 
@@ -10198,9 +10246,11 @@ class TradeXchart extends tradeXChart {
   static #instances = {}
   static #talibPromise = null
   static #talibReady = false
+  static #talibAwait = []
   static #talibError = null
   static get talibPromise() { return TradeXchart.#talibPromise }
   static get talibReady() { return TradeXchart.#talibReady }
+  static get talibAwait() { return TradeXchart.#talibAwait }
   static get talibError() { return TradeXchart.#talibError }
   static initErrMsg = `${NAME} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`
   static permittedClassNames =
@@ -10245,10 +10295,10 @@ class TradeXchart extends tradeXChart {
   chartBGColour = GlobalStyle.COLOUR_BG
   chartTxtColour = GlobalStyle.COLOUR_TXT
   chartBorderColour = GlobalStyle.COLOUR_BORDER
-  utilsH = 35
-  toolsW = 40
-  timeH  = 50
-  scaleW = 60
+  utilsH = UTILSH
+  toolsW = TOOLSW
+  timeH  = TIMEH
+  scaleW = SCALEW
   #UtilsBar
   #ToolsBar
   #MainPane = {
@@ -10313,12 +10363,17 @@ class TradeXchart extends tradeXChart {
       if (!TradeXchart.#talibReady && TradeXchart.#talibError === null)
       TradeXchart.#talibPromise = txCfg.talib.init(txCfg.wasm);
       TradeXchart.#talibPromise.then(
-          () => { TradeXchart.#talibReady = true; },
+          () => {
+            TradeXchart.#talibReady = true;
+            for (let c of TradeXchart.#talibAwait) {
+              if (isFunction(c)) c();
+            }
+          },
           () => { TradeXchart.#talibReady = false; }
         );
     }
     static destroy(chart) {
-      if (chart.constructor.name === "TradeXchart") {
+      if (chart instanceof TradeXchart) {
         chart.end();
         const inCnt = chart.inCnt;
         delete TradeXchart.#instances[inCnt];
@@ -10372,6 +10427,7 @@ class TradeXchart extends tradeXChart {
   get Timeline() { return this.#MainPane.time }
   get WidgetsG() { return this.#WidgetsG }
   get Chart() { return this.#MainPane.chart }
+  get Indicators() { return this.#MainPane.indicators }
   get state() { return this.#state }
   get chartData() { return this.#state.data.chart.data }
   get offChart() { return this.#state.data.offchart }
@@ -10395,6 +10451,7 @@ class TradeXchart extends tradeXChart {
   get TALib() { return this.#TALib }
   get TALibReady() { return TradeXchart.talibReady }
   get TALibError() { return TradeXchart.talibError }
+  get talibAwait() { return TradeXchart.talibAwait }
   get TALibPromise() { return TradeXchart.talibPromise }
   get hub() { return this.#hub }
   get candleW() { return this.Timeline.candleW }
@@ -10543,7 +10600,6 @@ class TradeXchart extends tradeXChart {
   }
   props() {
     return {
-      userClasses: (classes) => this.setUserClasses(classes),
       width: (width) => this.setWidth(width),
       height: (height) => this.setHeight(height),
       widthMin: (width) => this.setWidthMin(width),
@@ -10556,7 +10612,7 @@ class TradeXchart extends tradeXChart {
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
       rangeStartTS: (rangeStartTS) => this.#rangeStartTS = (isNumber(rangeStartTS)) ? rangeStartTS : undefined,
       rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
-      indicators: (indicators) => this.#indicators = {...Indicators, ...indicators },
+      indicators: (indicators) => this.setIndicators(indicators),
       theme: (theme) => { this.#themeTemp = this.addTheme(theme); },
       stream: (stream) => this.#stream = (isObject(stream)) ? stream : {},
       pricePrecision: (precision) => this.setPricePrecision(precision),
@@ -10649,23 +10705,8 @@ class TradeXchart extends tradeXChart {
       this.emit("Error", `setScrollPos: not a valid value`);
     }
   }
-  setUserClasses(c) {
-    if (isString$1(c)) {
-      let uc = c.split(" ");
-      this.#userClasses = uc;
-    }
-    else if (isArray(c)) {
-      this.#userClasses = c;
-    }
-    else {
-      this.warn(`Supplied user classes not valid. Expecting type String or Array`);
-    }
-    for (let cl of this.#userClasses) {
-      classes.add(cl);
-    }
-  }
   setStream(stream) {
-    if (this.stream?.constructor.name == "Stream") {
+    if (this.stream instanceof Stream) {
       this.error("Error: Invoke stopStream() before starting a new one.");
       return false
     }
@@ -10681,7 +10722,7 @@ class TradeXchart extends tradeXChart {
     }
   }
   stopStream() {
-    if (this.stream.constructor.name == "Stream") {
+    if (this.stream instanceof Stream) {
       this.stream.stop();
     }
   }
@@ -10748,16 +10789,27 @@ class TradeXchart extends tradeXChart {
     if (centre) end += this.range.Length / 2;
     this.jumpToIndex(end, nearest=true, centre=false);
   }
-  mergeData(merge, newRange=false) {
+  mergeData(merge, newRange=false, calc=true) {
     if (!isObject(merge)) return false
     let i, j, start, end;
     const data = this.allData.data;
-    const mData = merge?.data;
+    const mData = merge?.data || false;
+    this.allData?.onChart;
+    merge?.onChart || false;
+    this.allData?.offChart;
+    merge?.offChart || false;
+    this.allData?.dataset?.data;
+    const mDataset = merge?.dataset?.data || false;
+    const trades = this.allData?.trades?.data;
+    merge?.trades?.data || false;
     const inc = (this.range.inRange(mData[0][0])) ? 1 : 0;
     if (isArray(mData) && mData.length > 0) {
       i = mData.length - 1;
       j = data.length - 1;
-      if (data.length == 0) this.allData.data.push(...mData);
+      if (data.length == 0) {
+        this.allData.data.push(...mData);
+        if (calc) this.calcAllIndicators();
+      }
       else {
         const r1 = [data[0][0], data[j][0]];
         const r2 = [mData[0][0], mData[i][0]];
@@ -10765,7 +10817,16 @@ class TradeXchart extends tradeXChart {
         if (o[1] >= o[0]) ;
         else {
           this.allData.data.push(...mData);
-        }
+          if (calc) this.calcAllIndicators();
+      }
+    }
+    if (isArray(mDataset) && mDataset.length > 0) {
+      for (let o of mDataset) {
+        if (isArray(o?.data) && o?.data.length > 0) ;
+      }
+    }
+    if (isArray(trades) && trades.length > 0) {
+      for (let d of trades) {
       }
     }
     if (newRange) {
@@ -10779,6 +10840,80 @@ class TradeXchart extends tradeXChart {
         end = this.range.indexEnd + inc;
       }
       this.setRange(start, end);
+    }
+  }
+  }
+  isIndicator(i) {
+    if (
+      typeof i === "function" &&
+      ("onChart" in i.prototype) &&
+      isFunction(i.prototype?.draw)
+    ) return true
+    else return false
+  }
+  setIndicators(i, flush=false) {
+    if (!isObject(i)) return false
+    if (flush) {
+      console.warn(`Expunging all default indicators!`);
+      this.#indicators = {};
+    }
+    for (const [k, v] of Object.entries(i)) {
+      if (
+        isString$1(v?.id) &&
+        isString$1(v?.name) &&
+        isString$1(v?.event) &&
+        this.isIndicator(v?.ind)
+      ) {
+        this.#indicators[k] = v;
+      }
+    }
+    return true
+  }
+  addIndicator(i, name=i, params={}) {
+    if (
+      !isString$1(i) &&
+      !(i in this.#indicators) &&
+      !isString$1(name) &&
+      !isObject(params)
+    ) return false
+    const indicator = {
+      type: i,
+      name: name,
+      ...params
+    };
+    console.log(`Adding the ${name} : ${i} indicator`);
+    if (this.#indicators[i].ind.prototype.onChart)
+      this.Chart.addIndicator(indicator);
+    else
+      this.#MainPane.addIndicator(indicator);
+    this.emit("addIndicatorDone", indicator);
+  }
+  hasStateIndicator(i, dataset="searchAll") {
+    if (!isString$1(i) || !isString$1(dataset)) return false
+    const find = function(i, d) {
+      for (let e of d) {
+        if (e?.id == i || e.name == i) return true
+        else return false
+      }
+    };
+    if (dataset == "searchAll") {
+      for (let d of this.allData) {
+        if (find(i, d)) return true
+      }
+      return false
+    }
+    else {
+      if (dataset in this.allData) {
+        return find(i, d)
+      }
+    }
+  }
+  calcAllIndicators() {
+    for (let i of this.Indicators.onchart.values()) {
+      i.instance.calcIndicatorHistory();
+    }
+    for (let i of this.Indicators.offchart.values()) {
+      i.instance.calcIndicatorHistory();
     }
   }
   resize(width, height) {
@@ -10807,7 +10942,7 @@ class TradeXchart extends tradeXChart {
 if (!window.customElements.get('tradex-chart')) {
   document.head.insertAdjacentHTML("beforeend", cssVars);
   document.head.insertAdjacentHTML("beforeend", style);
-  window.customElements.define('tradex-chart', TradeXchart);
+  customElements.get('tradex-chart') || customElements.define('tradex-chart', TradeXchart);
 }
 
-export { TradeXchart as Chart, DOM, indicator as Indicator, Overlay, copyDeep, TradeXchart as default, mergeDeep };
+export { TradeXchart as Chart, DOM, indicator as Indicator, Overlay, copyDeep, isPromise, mergeDeep, uid };
