@@ -52,6 +52,36 @@ JSON.stringify(chart.state)
 
 Details of the state structure are found in [state.md](state.md)
 
+# Candle Types
+
+```javascript
+export const CandleType = {
+  CANDLE_SOLID: 'candle_solid',
+  CANDLE_HOLLOW: 'candle_hollow',
+  CANDLE_UP_HOLLOW: 'candle_up_hollow',
+  CANDLE_DOWN_HOLLOW: 'candle_down_hollow',
+  OHLC: 'ohlc',
+  AREA: 'area',
+  LINE: 'line'
+}
+```
+
+## CANDLE_SOLID
+![CANDLE_SOLID](./assets/CANDLE_SOLID.png)
+## CANDLE_HOLLOW
+![CANDLE_HOLLOW](./assets/CANDLE_HOLLOW.png)
+## CANDLE_UP_HOLLOW
+![CANDLE_UP_HOLLOW](./assets/CANDLE_UP_HOLLOW.png)
+## CANDLE_DOWN_HOLLOW
+![CANDLE_DOWN_HOLLOW](./assets/CANDLE_DOWN_HOLLOW.png)
+## OHLC
+![OHLC](./assets/OHLC.png)
+## AREA
+![AREA](./assets/CANDLE_AREA.png)
+## LINE
+![LINE](./assets/CANDLE_LINE.png)
+
+
 # Config
 
 ```javascript

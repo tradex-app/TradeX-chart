@@ -1344,6 +1344,23 @@ class State {
   deepMerge(target, source) {
     return mergeDeep(target, source)
   }
+  exportState(config={}) {
+    if (!isObject) config = {};
+    const type = config?.type;
+    const data = copyDeep(this.#data);
+    const vals = data.chart.data;
+    let stateExport;
+    if (vals.length > 0 &&
+        vals[vals.length - 1].length > 6)
+        vals.length = vals.length - 1;
+    switch(type) {
+      case "json":
+      default :
+        const {replacer, space} = {...config};
+        stateExport = JSON.stringify(data, replacer, space);
+    }
+    return stateExport
+  }
 }
 
 class StateMachine {
@@ -1733,7 +1750,7 @@ class Stream {
   prevCandle() {
     const d = this.#core.allData.data;
     if (d.length > 0 && d[d.length - 1][7])
-          d[d.length - 1].pop();
+          d[d.length - 1].length = 6;
   }
   updateCandle(data) {
     let candle = this.#candle;
@@ -7736,12 +7753,6 @@ class MainPane {
       rowsH: this.rowsH,
       rowsW: this.rowsW,
     };
-console.log(`oHeight: ${this.#elRows.oHeight}`);
-console.log(`rowsH: ${this.#elRows.height}`);
-console.log(`resizeH: ${resizeH}`);
-console.log(`width: ${width}`);
-console.log(`height: ${height}`);
-console.log(`dimensions${dimensions}`);
     if (this.#OffCharts.size == 0 &&
       chartH != this.#elRows.height) chartH = this.#elRows.height;
     this.#core.scrollPos = -1;
@@ -8416,7 +8427,6 @@ class tradeXRows extends element {
   get widthDeltaR() { return this.clientWidth / this.#oWidth }
   get heightDeltaR() { return this.clientHeight / this.#oHeight }
   previousDimensions() {
-console.log(`oWidth: ${this.oWidth}, oHeight: ${this.oHeight}`);
     this.#oWidth = (this.#widthCache) ? this.#widthCache : this.clientWidth;
     this.#oHeight = (this.#heightCache) ? this.#heightCache : this.clientHeight;
     this.#widthCache = this.clientWidth;

@@ -206,7 +206,7 @@ export default class Stream {
   prevCandle() {
     const d = this.#core.allData.data
     if (d.length > 0 && d[d.length - 1][7]) 
-          d[d.length - 1].pop()
+          d[d.length - 1].length = 6
   }
 
   /**

@@ -137,4 +137,32 @@ export default class State {
     return mergeDeep(target, source)
   }
 
+
+  /**
+   * export state - default json
+   * @param {object} [config={}] - default {type:"json"}
+   * @return {*}  
+   * @memberof State
+   */
+  exportState(config={}) {
+    if (!isObject) config = {}
+    const type = config?.type
+    const data = copyDeep(this.#data)
+    const vals = data.chart.data
+    let stateExport;
+
+    // trim streaming candle because it is not complete
+    if (vals.length > 0 &&
+        vals[vals.length - 1].length > 6)
+        vals.length = vals.length - 1
+
+    switch(type) {
+      case "json":
+      default :
+        const {replacer, space} = {...config};
+        stateExport = JSON.stringify(data, replacer, space);
+    }
+    return stateExport
+  }
+
 }
