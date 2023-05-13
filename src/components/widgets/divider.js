@@ -18,6 +18,7 @@ export default class Divider {
   #id
   #core
   #config
+  #theme
   #widgets
   #offChart
 
@@ -43,6 +44,7 @@ export default class Divider {
     this.#widgets = widgets
     this.#core = cfg.core
     this.#config = cfg
+    this.#theme = cfg.core.theme
     this.#id = cfg.id
     this.#offChart = cfg.offChart
     this.#elDividers = widgets.elements.elDividers
@@ -124,12 +126,12 @@ export default class Divider {
   }
 
   onMouseEnter() {
-    this.#elDivider.style.background = "#888888C0"
+    this.#elDivider.style.background = this.#theme.divider.active
     this.#core.MainPane.onMouseEnter()
   }
 
   onMouseOut() {
-    this.#elDivider.style.background = "#FFFFFF00"
+    this.#elDivider.style.background = this.#theme.divider.idle
     this.#core.MainPane.onMouseEnter()
   }
 
@@ -193,7 +195,7 @@ export default class Divider {
       default: break
     }
 
-    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: #FFFFFF00;`
+    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: ${this.#theme.divider.idle};`
 
     const node = `
       <div id="${this.#id}" class="divider" style="${styleDivider}"></div>

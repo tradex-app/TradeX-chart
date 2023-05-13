@@ -597,7 +597,7 @@ export default class MainPane {
   }
 
   scaleNode(type) {
-    const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.chart.BorderColour};`
+    const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.offChart.separator};`
     const node = `
     <div slot="offchart" class="viewport ${type}" style="$${styleRow}"></div>
   `

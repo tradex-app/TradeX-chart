@@ -98,6 +98,10 @@ export class EventsAgent {
     else return true
   }
 
+  isTouch(e) {
+    return e.type === "touch"
+  }
+
   addListener (event, handler, options) {
     let cb = handler
 
@@ -223,7 +227,6 @@ export class EventsAgent {
   }
 
   onPointerDown (e) {
-
     this.location(e)
     this.pointerButtons[e.button] = true
 

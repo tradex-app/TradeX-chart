@@ -80,6 +80,7 @@ export default class TradeXchart extends Tradex_chart {
   #elYAxis
   #elWidgetsG
 
+  #ready = false
   #inCnt = null
   #modID
   #hub = {}
@@ -283,6 +284,7 @@ export default class TradeXchart extends Tradex_chart {
   get Chart() { return this.#MainPane.chart }
   get Indicators() { return this.#MainPane.indicators }
 
+  get ready() { return this.#ready }
   get state() { return this.#state }
   get chartData() { return this.#state.data.chart.data }
   get offChart() { return this.#state.data.offchart }
@@ -301,7 +303,7 @@ export default class TradeXchart extends Tradex_chart {
   get time() { return this.#time }
   get TimeUtils() { return Time }
 
-  get theme() { return this.#theme.getCurrent() }
+  get theme() { return this.#theme }
   get settings() { return this.#state.data.chart.settings }
   get indicators() { return this.#indicators }
   get TALib() { return this.#TALib }
@@ -443,6 +445,7 @@ export default class TradeXchart extends Tradex_chart {
     if (this.#delayedSetRange) 
       this.on(STREAM_UPDATE, this.delayedSetRange.bind(this))
 
+    this.#ready = true
     this.refresh()
   }
 
@@ -632,58 +635,63 @@ export default class TradeXchart extends Tradex_chart {
    * Add a theme to the chart,
    * if no current theme is set, make this the current one.
    * @param {object} theme - Volume accuracy
+   * @returns {instance} - theme instance
    * @memberof TradeXchart
    */
   addTheme(theme) {
-    this.#theme = Theme.create(theme, this)
-    return this.#theme
+    const t = Theme.create(theme, this)
+    if (!(this.#theme instanceof Theme)) this.#theme = t
+    return t
   }
 
   /**
  * Set the chart theme
- * @param {object} theme - Volume accuracy
+ * @param {string} theme - theme identifier
  * @memberof TradeXchart
  */
   setTheme(ID) {
-    this.#theme.current = ID
-    const current = this.#theme
+
+    if(!this.theme.list.has(ID)) return false
+
+    this.#theme.setTheme(ID, this)
+    const theme = this.#theme
     const style = document.querySelector(`style[title=${this.id}_style]`)
-    const borderColour = `var(--txc-border-color, ${current.chart.BorderColour}`
+    const borderColour = `var(--txc-border-color, ${theme.chart.BorderColour}`
 
     let innerHTML = `.${this.id} { `
 
     // modify core style sheet custom CSS variables
-    innerHTML +=`--txc-background: ${current.chart.Background}; `
+    innerHTML +=`--txc-background: ${theme.chart.Background}; `
 
     // Chart component
-    this.style.background = `var(--txc-background, ${current.chart.Background})`
-    this.style.border = `${current.chart.BorderThickness}px solid`
+    this.style.background = `var(--txc-background, ${theme.chart.Background})`
+    this.style.border = `${theme.chart.BorderThickness}px solid`
     this.style.borderColor = borderColour
 
     // Main Pane
-    innerHTML +=`--txc-border-color:  ${current.chart.BorderColour}; `
+    innerHTML +=`--txc-border-color:  ${theme.chart.BorderColour}; `
     this.#elMain.rows.style.borderColor = borderColour
 
     // Timeline
-    innerHTML += `--txc-time-scrollbar-color: ${current.chart.BorderColour}; `
-    innerHTML += `--txc-time-handle-color: ${current.xAxis.handle}; `
-    innerHTML += `--txc-time-slider-color: ${current.xAxis.slider}; `
-    innerHTML += `--txc-time-cursor-fore: ${current.xAxis.colourCursor}; `
-    innerHTML += `--txc-time-cursor-back: ${current.xAxis.colourCursorBG}; `
-    innerHTML += `--txc-time-icon-color: ${current.icon.colour}; `
-    innerHTML += `--txc-time-icon-hover-color: ${current.icon.hover}; `
+    innerHTML += `--txc-time-scrollbar-color: ${theme.chart.BorderColour}; `
+    innerHTML += `--txc-time-handle-color: ${theme.xAxis.handle}; `
+    innerHTML += `--txc-time-slider-color: ${theme.xAxis.slider}; `
+    innerHTML += `--txc-time-cursor-fore: ${theme.xAxis.colourCursor}; `
+    innerHTML += `--txc-time-cursor-back: ${theme.xAxis.colourCursorBG}; `
+    innerHTML += `--txc-time-icon-color: ${theme.icon.colour}; `
+    innerHTML += `--txc-time-icon-hover-color: ${theme.icon.hover}; `
 
     this.#elTime.overview.scrollBar.style.borderColor = borderColour;
-    this.#elTime.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${current.xAxis.handle})`;
+    this.#elTime.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${theme.xAxis.handle})`;
 
-    this.#elTime.overview.style.setProperty("--txc-time-slider-color", current.xAxis.slider);
-    this.#elTime.overview.style.setProperty("--txc-time-icon-color", current.icon.colour);
-    this.#elTime.overview.style.setProperty("--txc-time-icon-hover-color", current.icon.hover);
+    this.#elTime.overview.style.setProperty("--txc-time-slider-color", theme.xAxis.slider);
+    this.#elTime.overview.style.setProperty("--txc-time-icon-color", theme.icon.colour);
+    this.#elTime.overview.style.setProperty("--txc-time-icon-hover-color", theme.icon.hover);
 
     // Legends
     for (let [key, legend] of Object.entries(this.Chart.legend.list)) {
-      legend.el.style.color = `var(--txc-legend-color, ${current.legend.colour})`
-      legend.el.style.font = `var(--txc-legend-font, ${current.legend.font})`
+      legend.el.style.color = `var(--txc-legend-color, ${theme.legend.colour})`
+      legend.el.style.font = `var(--txc-legend-font, ${theme.legend.font})`
       // TODO: control icons
     }
 
@@ -691,14 +699,14 @@ export default class TradeXchart extends Tradex_chart {
     for (let t of this.#elUtils.icons) {
       if (t.className != "icon-wrapper") continue
 
-      t.children[0].style.fill = current.icon.colour
+      t.children[0].style.fill = theme.icon.colour
     }
 
     // Tools
     for (let t of this.#elTools.icons) {
       if (t.className != "icon-wrapper") continue
 
-      t.children[0].style.fill = current.icon.colour
+      t.children[0].style.fill = theme.icon.colour
     }
 
     innerHTML += ` }`
@@ -1083,15 +1091,12 @@ export default class TradeXchart extends Tradex_chart {
    * @memberof TradeXchart
    */
   refresh() {
+    if (!this.ready) return
+
     let start = this.range.indexStart
     let end = this.range.indexEnd
     this.setRange(start, end)
     this.MainPane.draw(undefined, true)
-    // this.Chart.refresh()
-    // const offCharts = this.MainPane.offCharts
-    // offCharts.forEach((offChart, key) => {
-    //   offChart.refresh()
-    // })
   }
 
   notImplemented() {

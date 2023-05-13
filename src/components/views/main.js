@@ -80,7 +80,7 @@ export default class tradeXMain extends element {
   }
 
   rowNode(type, api) {
-    const styleRow = ` border-top: 1px solid ${api.theme.chart.BorderColour};`
+    const styleRow = ` border-top: 1px solid ${api.theme.offChart.separator};`
     const node = `
       <tradex-offchart slot="offchart" class="${type}" style="${styleRow}">
       </tradex-offchart>

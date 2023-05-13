@@ -13,11 +13,11 @@ export default class Candle {
 
   areaCoordinates = []
 
-  constructor(scene, config) {
+  constructor(scene, theme) {
     this.scene = scene
     this.ctx = this.scene.context
     this.width = this.scene.width
-    this.cfg = {...defaultTheme, ...config}
+    this.cfg = theme
   }
 
   draw(data) {

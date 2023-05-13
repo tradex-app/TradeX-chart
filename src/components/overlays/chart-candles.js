@@ -3,9 +3,7 @@
 import Overlay from "./overlay"
 import Candle from "../primitives/candle";
 import { CandleType } from "../../definitions/style"
-import { BUFFERSIZE } from "../../definitions/chart"
-import { timestampDiff } from "../../utils/time";
-import { bRound } from "../../utils/number";
+
 
 export default class chartCandles extends Overlay {
 

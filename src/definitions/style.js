@@ -2,6 +2,8 @@
  * Global
  */
 
+import Divider from "../components/widgets/divider"
+
 export const CHART_MINH = 300
 export const CHART_MINW = 400
 export const TX_MINW = `${CHART_MINW}px`
@@ -158,6 +160,11 @@ export const LegendStyle = {
   colour: GlobalStyle.COLOUR_TXT
 }
 
+const DividerStyle = {
+  ACTIVE: "#888888C0",
+  IDLE: "#FFFFFF00"
+}
+
 export const defaultTheme = {
   candle: {
     Type: CandleType.CANDLE_SOLID,
@@ -206,7 +213,7 @@ export const defaultTheme = {
 
   },
   offChart: {
-
+    separator: "#666"
   },
   legend: {
     font: LegendStyle.font,
@@ -215,6 +222,10 @@ export const defaultTheme = {
   icon: {
     colour: COLOUR_ICON,
     hover: COLOUR_ICONHOVER
+  },
+  divider: {
+    active: DividerStyle.ACTIVE,
+    idle: DividerStyle.IDLE
   }
 }
 
