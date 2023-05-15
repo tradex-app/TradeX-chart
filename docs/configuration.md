@@ -75,7 +75,7 @@ export const CandleType = {
 ## CANDLE_DOWN_HOLLOW
 ![CANDLE_DOWN_HOLLOW](./assets/CANDLE_DOWN_HOLLOW.png)
 ## OHLC
-![OHLC](./assets/OHLC.png)
+![OHLC](./assets/CANDLE_OHLC.png)
 ## AREA
 ![AREA](./assets/CANDLE_AREA.png)
 ## LINE

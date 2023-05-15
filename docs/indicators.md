@@ -29,14 +29,8 @@ Of course the [functions provided by the TA-Lib](indicators_talib.md) can still 
 All indicators relying upon TA-Lib functions should defer any data processing until the promise is fulfilled.
 
 ```javascript
-      if (chart.TALibReady) {
-        calc()
-      }
-      else if (isPromise(chart.TALibPromise))
-        chart.TALibPromise.then(
-          calc(),
-          (e) => { chart.error(e) }
-        )
+      if (this.core.TALibReady) calc()
+      else  this.core.talibAwait.push(calc.bind(this))
 ```
 
 ### Registering Custom Indicators

@@ -15,4 +15,6 @@ eg. 0.100.6
 * [Chart State](state.md)
 * [Events](events.md)
 * [Streaming Price Data](streaming-price-data.md)
+* [Indicators](indicators.md)
+* [Development Road Map](TradeX-chart-Development-Roadmap.pdf)
 

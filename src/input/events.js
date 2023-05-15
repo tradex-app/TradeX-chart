@@ -98,7 +98,7 @@ export class EventsAgent {
     else return true
   }
 
-  isTouch(e) {
+  isTouch (e) {
     return e.type === "touch"
   }
 
@@ -118,19 +118,19 @@ export class EventsAgent {
         case "pointerdown":
             cb = function (e) {
               this.onPointerDown(e)
-              handler(this.createPointerEventArgument(e))
+              handler(this.pointerEventData(e))
             }
             break;
         case "pointerup":
           cb = function (e) {
             this.onPointerUp(e)
-            handler(this.createPointerEventArgument(e))
+            handler(this.pointerEventData(e))
           }
           break;
         case "pointermove":
           cb = function (e) {
             this.motion(e)
-            handler(this.createPointerEventArgument(e))
+            handler(this.pointerEventData(e))
             // console.log(`e.composedPath: `,e.composedPath())
           }
           break;
@@ -143,13 +143,13 @@ export class EventsAgent {
         case "contextmenu":
           cb = function (e) {
             this.location(e)
-            handler(this.createPointerEventArgument(e))
+            handler(this.pointerEventData(e))
           }
           break;
         case "wheel":
           cb = function (e) {
             this.wheeldelta = e.wheelDelta;
-            handler(this.createPointerEventArgument(e))
+            handler(this.pointerEventData(e))
           }
           break;
         case "pointercancel":
@@ -177,7 +177,7 @@ export class EventsAgent {
         case "pointerdragend":
           cb = function (e) {
             this.motion(e)
-            handler(this.createPointerEventArgument(e))
+            handler(this.pointerEventData(e))
           }
           this.element.addEventListener(event, cb.bind(this), options)
           break;
@@ -219,7 +219,7 @@ export class EventsAgent {
     }
 
     let cb = function (e) {
-      e = this.createPointerEventArgument(e)
+      e = this.pointerEventData(e)
       handler(e)
     }
     this.dragStatus = "ready"
@@ -259,7 +259,7 @@ export class EventsAgent {
     }
   }
 
-  createPointerEventArgument(e) {
+  pointerEventData(e) {
     return {
       isProcessed: false,
       pointerType: e.pointerType,

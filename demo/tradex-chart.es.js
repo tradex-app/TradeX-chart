@@ -1818,6 +1818,482 @@ class Stream {
   }
 }
 
+const status = {
+  idle: 0,
+  dragStart: 1,
+  dragging: 2
+};
+class Point {
+  x = 0;
+  y = 0;
+  constructor() {
+    if (arguments.length === 1) {
+      const { x, y } = arguments[0];
+      this.x = x;
+      this.y = y;
+    } else if (arguments.length > 1) {
+      const [x, y] = arguments;
+      this.x = x;
+      this.y = y;
+    }
+  }
+  clone() {
+    return new Point(this.x, this.y);
+  }
+}
+
+const keyboard = [
+  "keypress",
+  "keydown",
+  "keyup"
+];
+const pointer = [
+  "pointerdown",
+  "pointerup",
+  "pointerover", "pointerenter",
+  "pointerout", "pointerleave",
+  "pointermove",
+  "pointercancel",
+  "gotpointercapture",
+  "lostpointercapture",
+  "dblclick",
+  "click",
+  "wheel",
+  "contextmenu"
+];
+const mouse = [
+  "mousedown",
+  "mouseenter",
+  "mouseleave",
+  "mousemove",
+  "mouseout",
+  "mouseover",
+  "mouseup",
+  "mousewheel",
+];
+const touch = [
+  "touchcancel",
+  "touchend",
+  "touchmove",
+  "touchstart"
+];
+const pen = [
+];
+const misc = [
+];
+const custom = [
+  "pointerdrag",
+  "pointerdragend"
+];
+class EventsAgent {
+  constructor (input) {
+    this.input = input;
+    this.element = input.element;
+    if (window.PointerEvent) {
+      this.type = [...keyboard, ...pointer, ...mouse, ...touch, ...pen, ...misc, ...custom];
+    } else {
+      this.type = [...keyboard, ...mouse, ...touch, ...pen, ...misc, ...custom];
+    }
+    this.clientPosPrev = new Point([null, null]);
+    this.position = new Point();
+    this.movement = new Point([0, 0]);
+    this.dragstart = new Point([null, null]);
+    this.dragend = new Point([null, null]);
+    this.dragCheckThreshold = 3;
+    this.dragStatus = false;
+    this.wheeldelta = 0;
+    this.pointerButtons = [false, false, false, false, false];
+    this.pointerdrag = new Event("pointerdrag");
+    this.pointerdragend = new Event("pointerdragend");
+  }
+  has (event) {
+    if (this.type.indexOf(event) == -1) return false
+    else return true
+  }
+  isTouch(e) {
+    return e.type === "touch"
+  }
+  addListener (event, handler, options) {
+    let cb = handler;
+    if (!this.has(event) ||
+        !isFunction(handler) ||
+        !DOM.isElement(this.element)
+    ) return false
+    if (pointer.indexOf(event) !== -1) {
+      switch (event) {
+        case "pointerdown":
+            cb = function (e) {
+              this.onPointerDown(e);
+              handler(this.createPointerEventArgument(e));
+            };
+            break;
+        case "pointerup":
+          cb = function (e) {
+            this.onPointerUp(e);
+            handler(this.createPointerEventArgument(e));
+          };
+          break;
+        case "pointermove":
+          cb = function (e) {
+            this.motion(e);
+            handler(this.createPointerEventArgument(e));
+          };
+          break;
+        case "click":
+        case "dbclick":
+        case "pointerenter":
+        case "pointerleave":
+        case "pointerout":
+        case "pointerover":
+        case "contextmenu":
+          cb = function (e) {
+            this.location(e);
+            handler(this.createPointerEventArgument(e));
+          };
+          break;
+        case "wheel":
+          cb = function (e) {
+            this.wheeldelta = e.wheelDelta;
+            handler(this.createPointerEventArgument(e));
+          };
+          break;
+        case "pointercancel":
+        case "gotpointercapture":
+        case "lostpointercapture":
+        default :
+          cb = function (e) {
+            handler(e);
+          };
+          break;
+      }
+      this.element.addEventListener(event, cb.bind(this), options);
+      return cb
+    }
+    else if (custom.indexOf(event) == -1)
+      this.element.addEventListener(event, handler, options);
+    else {
+      switch (event) {
+        case "pointerdrag":
+          this.initPointerDrag(handler, options);
+          break;
+        case "pointerdragend":
+          cb = function (e) {
+            this.motion(e);
+            handler(this.createPointerEventArgument(e));
+          };
+          this.element.addEventListener(event, cb.bind(this), options);
+          break;
+      }
+    }
+    return true
+  }
+  removerListener (event, handler, element, options) {
+    if (!this.has(event) ||
+        !isFunction(handler) ||
+        !DOM.isElement(element)
+    ) return false
+    if (event == "pointerdrag") {
+      e.target.removeEventListener("pointermove", this.onPointerDrag);
+      e.target.removeEventListener("pointerdown", this.onPointerDown);
+      e.target.removeEventListener("gotpointercapture", this.onPointerDrag);
+      e.target.removeEventListener("lostpointercapture", this.onPointerDragEnd);
+      document.removeEventListener("pointerup", this.onPointerDragEnd);
+    }
+    element.removeEventListener(event, handler, options);
+    return true
+  }
+  initPointerDrag (handler, options) {
+    if (!this.draginit) {
+      this.draginit = true;
+      this.element.addEventListener("pointerdown", this.onPointerDown.bind(this), options);
+      this.element.addEventListener("gotpointercapture", this.onPointerCapture.bind(this), options);
+      this.element.addEventListener("lostpointercapture", this.onPointerDragEnd.bind(this), options);
+      this.element.addEventListener("pointermove", this.onPointerMove.bind(this), options);
+    }
+    let cb = function (e) {
+      e = this.createPointerEventArgument(e);
+      handler(e);
+    };
+    this.dragStatus = "ready";
+    this.element.addEventListener("pointerdrag", cb.bind(this), options);
+  }
+  onPointerDown (e) {
+    this.location(e);
+    this.pointerButtons[e.button] = true;
+    if (this.dragStatus == "ready") e.target.setPointerCapture(e.pointerId);
+  }
+  onPointerUp (e) {
+    this.location(e);
+    this.pointerButtons[e.button] = false;
+  }
+  onPointerMove (e) {
+    if (this.dragStatus == "dragging") {
+      this.motion(e);
+      this.dragend = this.position.clone();
+      e.target.dispatchEvent(this.pointerdrag);
+    }
+  }
+  onPointerCapture (e) {
+    this.dragstart = this.position.clone();
+    this.dragend = this.position.clone();
+    this.dragStatus = "dragging";
+  }
+  onPointerDragEnd (e) {
+    if (this.dragStatus == "dragging") {
+      this.dragStatus = "ready";
+      e.target.dispatchEvent(this.pointerdragend);
+    }
+  }
+  createPointerEventArgument(e) {
+    return {
+      isProcessed: false,
+      pointerType: e.pointerType,
+      position: this.position.clone(),
+      movement: this.movement.clone(),
+      dragstart: this.dragstart.clone(),
+      dragend: this.dragend.clone(),
+      wheeldelta: this.wheeldelta,
+      buttons: this.pointerButtons,
+      domEvent: e,
+      timeStamp: Date.now()
+    }
+  }
+  isButtonPressed(button) {
+    return (this.pointerButtons.indexOf(button) !== -1) ? true : false
+  }
+  setCursor(type) {
+		this.element.style.cursor = type;
+	}
+  motion(e) {
+    const clientX = e.clientX || this.position.x;
+    const clientY = e.clientY || this.position.y;
+    this.movement.x = clientX - this.clientPosPrev.x;
+    this.movement.y = clientY - this.clientPosPrev.y;
+    this.position.x += this.movement.x;
+    this.position.y += this.movement.y;
+    this.clientPosPrev.x = clientX;
+    this.clientPosPrev.y = clientY;
+  }
+  location(e) {
+    const clientRect = e.target.getBoundingClientRect();
+    this.clientPosPrev.x = e.clientX;
+    this.clientPosPrev.y = e.clientY;
+    this.position.x = e.clientX - clientRect.left;
+    this.position.y = e.clientY - clientRect.top;
+    this.movement.x = 0;
+    this.movement.y = 0;
+  }
+  createKeyEventArgument(e) {
+    return e
+  }
+}
+
+const defaultOptions$1 = {
+  element: undefined,
+  contextMenu: true
+};
+class Input  {
+  constructor (element, options) {
+    this.options = { ...defaultOptions$1, ...options };
+    this.status = status.idle;
+    this.element = element;
+    if (!this.element && this.options.elementId) {
+      this.element = document.getElementById(this.options.elementId);
+    }
+    if (!this.element) {
+      throw "Must specify an element to receive user input.";
+    }
+    this.eventsAgent = new EventsAgent(this);
+    if (!this.options.contextMenu) {
+      window.oncontextmenu = (e) => {
+        e.preventDefault();
+        return false;
+      };
+    }
+  }
+  on (event, handler, options) {
+    return this.eventsAgent.addListener(event, handler, options)
+  }
+  off (event, handler, options) {
+    return this.eventsAgent.removeListener(event, handler, options)
+  }
+  invoke (agent, eventName, args) {
+    this.currentAgent = agent;
+    this.eventsAgent.invoke(eventName, this.createEventArgument(args));
+  }
+  createEventArgument (args) {
+    const arg = args || {};
+    arg.isButtonPressed = button => this.isButtonPressed(button);
+    arg.isKeyPressed = key => this.isKeyPressed(key);
+    arg.controller = this;
+    return arg;
+  }
+  isButtonPressed (button) {
+    return this.eventsAgent.isButtonPressed(button);
+  }
+  isKeyPressed (key) {
+    return this.eventsAgent.isKeyPressed(key);
+  }
+  setCursor (type) {
+    this.eventsAgent.setCursor(type);
+  }
+}
+
+class Divider {
+  #id
+  #core
+  #config
+  #theme
+  #widgets
+  #offChart
+  #elDividers
+  #elDivider
+  #elOffChart
+  #cursorPos
+  #controller
+  #input
+  static dividerList = {}
+  static divideCnt = 0
+  static class = CLASS_DIVIDERS
+  static name = "Dividers"
+  static type = "divider"
+  constructor(widgets, config) {
+    const cfg = {...config};
+    this.#widgets = widgets;
+    this.#core = cfg.core;
+    this.#config = cfg;
+    this.#theme = cfg.core.theme;
+    this.#id = cfg.id;
+    this.#offChart = cfg.offChart;
+    this.#elDividers = widgets.elements.elDividers;
+    this.#elOffChart = this.#offChart.element;
+    this.init();
+  }
+  static create(widgets, config) {
+    const id = `divider${++Divider.divideCnt}`;
+    config.id = id;
+    Divider.dividerList[id] = new Divider(widgets, config);
+    return Divider.dividerList[id]
+  }
+  static destroy(id) {
+    Divider.dividerList[id].end();
+    delete Divider.dividerList[id];
+  }
+  get el() { return this.#elDivider }
+  get ID() { return this.#id }
+  get offChart() { return this.#offChart }
+  get config() { return this.#core.config }
+  get pos() { return this.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elDivider) }
+  get height() { return this.#elDivider.getBoundingClientRect().height }
+  init() {
+    this.mount();
+  }
+  start() {
+    this.setCursor("n-resize");
+    this.eventsListen();
+  }
+  end() {
+    this.#input.off("pointerenter", this.onMouseEnter);
+    this.#input.off("pointerout", this.onMouseOut);
+    this.#input.off("pointerdrag", this.onPointerDrag);
+    this.#input.off("pointerdragend", this.onPointerDragEnd);
+    this.#input = null;
+    this.el.remove();
+  }
+  eventsListen() {
+    this.#input = new Input(this.#elDivider, {disableContextMenu: false});
+    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
+    this.#input.on("pointerout", this.onMouseOut.bind(this));
+    this.#input.on("pointerdrag", this.onPointerDrag.bind(this));
+    this.#input.on("pointerdragend", this.onPointerDragEnd.bind(this));
+  }
+  on(topic, handler, context) {
+    this.#core.on(topic, handler, context);
+  }
+  off(topic, handler) {
+    this.#core.off(topic, handler);
+  }
+  emit(topic, data) {
+    this.#core.emit(topic, data);
+  }
+  onMouseEnter() {
+    this.#elDivider.style.background = this.#theme.divider.active;
+    this.#core.MainPane.onMouseEnter();
+  }
+  onMouseOut() {
+    this.#elDivider.style.background = this.#theme.divider.idle;
+    this.#core.MainPane.onMouseEnter();
+  }
+  onPointerDrag(e) {
+    this.#cursorPos = [e.position.x, e.position.y];
+    this.emit(`${this.ID}_pointerdrag`, this.#cursorPos);
+    this.emit(`divider_pointerdrag`, {
+      id: this.ID,
+      e: e,
+      pos: this.#cursorPos,
+      offChart: this.offChart
+    });
+  }
+  onPointerDragEnd(e) {
+    if ("position" in e)
+    this.#cursorPos = [e.position.x, e.position.y];
+    this.emit(`${this.ID}_pointerdragend`, this.#cursorPos);
+    this.emit(`divider_pointerdragend`, {
+      id: this.ID,
+      e: e,
+      pos: this.#cursorPos,
+      offChart: this.offChart
+    });
+  }
+  mount() {
+    if (this.#elDividers.lastElementChild == null)
+      this.#elDividers.innerHTML = this.dividerNode();
+    else
+      this.#elDividers.lastElementChild.insertAdjacentHTML("afterend", this.defaultNode());
+    this.#elDivider = DOM.findBySelector(`#${this.#id}`, this.#elDividers);
+  }
+  setCursor(cursor) {
+    this.#elDivider.style.cursor = cursor;
+  }
+  static defaultNode() {
+    const dividersStyle = `position: absolute;`;
+    const node = `
+  <div slot="widget" class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
+  `;
+    return node
+  }
+  dividerNode() {
+    let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top,
+      width = this.#core.MainPane.rowsW + this.#core.scaleW,
+      height = (isNumber(this.config.dividerHeight)) ?
+        this.config.dividerHeight : DIVIDERHEIGHT,
+      left = this.#core.theme.tools.width;
+      top -= height / 2;
+    switch(this.#core.theme.tools.location) {
+      case "left": break;
+      case false:
+      case "none":
+      case "right": left *= -1; break;
+    }
+    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: ${this.#theme.divider.idle};`;
+    const node = `
+      <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
+    `;
+    return node
+  }
+  updateDividerPos(pos) {
+    let dividerY = this.#elDivider.offsetTop;
+        dividerY += pos[5];
+    this.#elDivider.style.top = `${dividerY}px`;
+  }
+  setDividerPos() {
+    let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top;
+        top = top - (this.height / 2);
+    this.#elDivider.style.top = `${top}px`;
+  }
+}
+
 const CHART_MINH = 300;
 const CHART_MINW = 400;
 const TX_MINW = `${CHART_MINW}px`;
@@ -1932,6 +2408,10 @@ const LegendStyle = {
   font: GlobalStyle.FONT,
   colour: GlobalStyle.COLOUR_TXT
 };
+const DividerStyle = {
+  ACTIVE: "#888888C0",
+  IDLE: "#FFFFFF00"
+};
 const defaultTheme = {
   candle: {
     Type: CandleType.CANDLE_SOLID,
@@ -1979,6 +2459,7 @@ const defaultTheme = {
   onChart: {
   },
   offChart: {
+    separator: "#666"
   },
   legend: {
     font: LegendStyle.font,
@@ -1987,6 +2468,10 @@ const defaultTheme = {
   icon: {
     colour: COLOUR_ICON,
     hover: COLOUR_ICONHOVER
+  },
+  divider: {
+    active: DividerStyle.ACTIVE,
+    idle: DividerStyle.IDLE
   }
 };
 const cssVars = `
@@ -2044,20 +2529,25 @@ const style = `
 </style>
 `;
 
+const reserved = ["constructor","list","setCurrent","setTheme","setValue"];
 class Theme {
-  #list = new Map()
-  #current
-  #config
+  static #list = new Map()
+  static get list() { return Theme.#list }
+  #core
   static create(theme, core) {
     if (!(isObject(theme))) return false
     theme.ID = (isString$1(theme.name))? uid(theme.name) : `${core.id}.theme`;
     const instance = new Theme(theme, core);
-    instance.#list.set(theme.ID, instance);
+    Theme.list.set(theme.ID, instance);
     return instance
   }
   constructor(theme, core) {
-    this.#config = (isObject(theme))? theme : {};
-    const reserved = ["constructor","list","current","setCurrent","getCurrent"];
+    this.#core = core;
+    this.setCurrent(theme);
+  }
+  get list() { return Theme.list }
+  setCurrent(theme={}) {
+    theme = (isObject(theme))? theme : {};
     const defaultT = copyDeep(defaultTheme);
     const newTheme = copyDeep(theme);
     const setTheme = mergeDeep(defaultT, newTheme);
@@ -2065,21 +2555,44 @@ class Theme {
       if (reserved.includes(t)) continue
       this[t] = setTheme[t];
     }
+    this.#core.refresh();
   }
-  get list() { return this.#list }
-  set current(theme) { this.setCurrent(theme); }
-  get current() { return this.#current }
-  setCurrent(theme) {
-    if (isString$1(theme) && this.#list.has(theme)) {
-      this.#current = theme;
+  setTheme(theme) {
+    if (isString$1(theme) && Theme.list.has(theme)) {
+      const t = Theme.list.get(theme);
+      this.setCurrent(t);
+      return true
     }
-    return this.getCurrent()
+    return false
   }
-  getCurrent() {
-    if (isString$1(this.#current) && this.#list.has(this.#current))
-      return this.#list.get(this.#current)
-    else
-      return defaultTheme
+  setValue(key, value) {
+    if (key in this) {
+      this[key] = value;
+      this.#core.refresh();
+    }
+  }
+  deleteTheme(theme) {
+    if (isString$1(theme) && Theme.list.has(theme)) {
+      return true
+    }
+    return false
+  }
+  exportTheme(config={}) {
+    if (!isObject) config = {};
+    const type = config?.type;
+    const data = {};
+    let themeExport;
+    for (let t in this) {
+      if (reserved.includes(t)) continue
+      data[t] = this[t];
+    }
+    switch(type) {
+      case "json":
+      default :
+        const {replacer, space} = {...config};
+        themeExport = JSON.stringify(data, replacer, space);
+    }
+    return themeExport
   }
 }
 
@@ -3406,324 +3919,6 @@ class xAxis extends Axis {
     }
   }
   gradsWorker() {
-  }
-}
-
-const status = {
-  idle: 0,
-  dragStart: 1,
-  dragging: 2
-};
-class Point {
-  x = 0;
-  y = 0;
-  constructor() {
-    if (arguments.length === 1) {
-      const { x, y } = arguments[0];
-      this.x = x;
-      this.y = y;
-    } else if (arguments.length > 1) {
-      const [x, y] = arguments;
-      this.x = x;
-      this.y = y;
-    }
-  }
-  clone() {
-    return new Point(this.x, this.y);
-  }
-}
-
-const keyboard = [
-  "keypress",
-  "keydown",
-  "keyup"
-];
-const pointer = [
-  "pointerdown",
-  "pointerup",
-  "pointerover", "pointerenter",
-  "pointerout", "pointerleave",
-  "pointermove",
-  "pointercancel",
-  "gotpointercapture",
-  "lostpointercapture",
-  "dblclick",
-  "click",
-  "wheel",
-  "contextmenu"
-];
-const mouse = [
-  "mousedown",
-  "mouseenter",
-  "mouseleave",
-  "mousemove",
-  "mouseout",
-  "mouseover",
-  "mouseup",
-  "mousewheel",
-];
-const touch = [
-  "touchcancel",
-  "touchend",
-  "touchmove",
-  "touchstart"
-];
-const pen = [
-];
-const misc = [
-];
-const custom = [
-  "pointerdrag",
-  "pointerdragend"
-];
-class EventsAgent {
-  constructor (input) {
-    this.input = input;
-    this.element = input.element;
-    if (window.PointerEvent) {
-      this.type = [...keyboard, ...pointer, ...mouse, ...touch, ...pen, ...misc, ...custom];
-    } else {
-      this.type = [...keyboard, ...mouse, ...touch, ...pen, ...misc, ...custom];
-    }
-    this.clientPosPrev = new Point([null, null]);
-    this.position = new Point();
-    this.movement = new Point([0, 0]);
-    this.dragstart = new Point([null, null]);
-    this.dragend = new Point([null, null]);
-    this.dragCheckThreshold = 3;
-    this.dragStatus = false;
-    this.wheeldelta = 0;
-    this.pointerButtons = [false, false, false, false, false];
-    this.pointerdrag = new Event("pointerdrag");
-    this.pointerdragend = new Event("pointerdragend");
-  }
-  has (event) {
-    if (this.type.indexOf(event) == -1) return false
-    else return true
-  }
-  addListener (event, handler, options) {
-    let cb = handler;
-    if (!this.has(event) ||
-        !isFunction(handler) ||
-        !DOM.isElement(this.element)
-    ) return false
-    if (pointer.indexOf(event) !== -1) {
-      switch (event) {
-        case "pointerdown":
-            cb = function (e) {
-              this.onPointerDown(e);
-              handler(this.createPointerEventArgument(e));
-            };
-            break;
-        case "pointerup":
-          cb = function (e) {
-            this.onPointerUp(e);
-            handler(this.createPointerEventArgument(e));
-          };
-          break;
-        case "pointermove":
-          cb = function (e) {
-            this.motion(e);
-            handler(this.createPointerEventArgument(e));
-          };
-          break;
-        case "click":
-        case "dbclick":
-        case "pointerenter":
-        case "pointerleave":
-        case "pointerout":
-        case "pointerover":
-        case "contextmenu":
-          cb = function (e) {
-            this.location(e);
-            handler(this.createPointerEventArgument(e));
-          };
-          break;
-        case "wheel":
-          cb = function (e) {
-            this.wheeldelta = e.wheelDelta;
-            handler(this.createPointerEventArgument(e));
-          };
-          break;
-        case "pointercancel":
-        case "gotpointercapture":
-        case "lostpointercapture":
-        default :
-          cb = function (e) {
-            handler(e);
-          };
-          break;
-      }
-      this.element.addEventListener(event, cb.bind(this), options);
-      return cb
-    }
-    else if (custom.indexOf(event) == -1)
-      this.element.addEventListener(event, handler, options);
-    else {
-      switch (event) {
-        case "pointerdrag":
-          this.initPointerDrag(handler, options);
-          break;
-        case "pointerdragend":
-          cb = function (e) {
-            this.motion(e);
-            handler(this.createPointerEventArgument(e));
-          };
-          this.element.addEventListener(event, cb.bind(this), options);
-          break;
-      }
-    }
-    return true
-  }
-  removerListener (event, handler, element, options) {
-    if (!this.has(event) ||
-        !isFunction(handler) ||
-        !DOM.isElement(element)
-    ) return false
-    if (event == "pointerdrag") {
-      e.target.removeEventListener("pointermove", this.onPointerDrag);
-      e.target.removeEventListener("pointerdown", this.onPointerDown);
-      e.target.removeEventListener("gotpointercapture", this.onPointerDrag);
-      e.target.removeEventListener("lostpointercapture", this.onPointerDragEnd);
-      document.removeEventListener("pointerup", this.onPointerDragEnd);
-    }
-    element.removeEventListener(event, handler, options);
-    return true
-  }
-  initPointerDrag (handler, options) {
-    if (!this.draginit) {
-      this.draginit = true;
-      this.element.addEventListener("pointerdown", this.onPointerDown.bind(this), options);
-      this.element.addEventListener("gotpointercapture", this.onPointerCapture.bind(this), options);
-      this.element.addEventListener("lostpointercapture", this.onPointerDragEnd.bind(this), options);
-      this.element.addEventListener("pointermove", this.onPointerMove.bind(this), options);
-    }
-    let cb = function (e) {
-      e = this.createPointerEventArgument(e);
-      handler(e);
-    };
-    this.dragStatus = "ready";
-    this.element.addEventListener("pointerdrag", cb.bind(this), options);
-  }
-  onPointerDown (e) {
-    this.location(e);
-    this.pointerButtons[e.button] = true;
-    if (this.dragStatus == "ready") e.target.setPointerCapture(e.pointerId);
-  }
-  onPointerUp (e) {
-    this.location(e);
-    this.pointerButtons[e.button] = false;
-  }
-  onPointerMove (e) {
-    if (this.dragStatus == "dragging") {
-      this.motion(e);
-      this.dragend = this.position.clone();
-      e.target.dispatchEvent(this.pointerdrag);
-    }
-  }
-  onPointerCapture (e) {
-    this.dragstart = this.position.clone();
-    this.dragend = this.position.clone();
-    this.dragStatus = "dragging";
-  }
-  onPointerDragEnd (e) {
-    if (this.dragStatus == "dragging") {
-      this.dragStatus = "ready";
-      e.target.dispatchEvent(this.pointerdragend);
-    }
-  }
-  createPointerEventArgument(e) {
-    return {
-      isProcessed: false,
-      pointerType: e.pointerType,
-      position: this.position.clone(),
-      movement: this.movement.clone(),
-      dragstart: this.dragstart.clone(),
-      dragend: this.dragend.clone(),
-      wheeldelta: this.wheeldelta,
-      buttons: this.pointerButtons,
-      domEvent: e,
-      timeStamp: Date.now()
-    }
-  }
-  isButtonPressed(button) {
-    return (this.pointerButtons.indexOf(button) !== -1) ? true : false
-  }
-  setCursor(type) {
-		this.element.style.cursor = type;
-	}
-  motion(e) {
-    const clientX = e.clientX || this.position.x;
-    const clientY = e.clientY || this.position.y;
-    this.movement.x = clientX - this.clientPosPrev.x;
-    this.movement.y = clientY - this.clientPosPrev.y;
-    this.position.x += this.movement.x;
-    this.position.y += this.movement.y;
-    this.clientPosPrev.x = clientX;
-    this.clientPosPrev.y = clientY;
-  }
-  location(e) {
-    const clientRect = e.target.getBoundingClientRect();
-    this.clientPosPrev.x = e.clientX;
-    this.clientPosPrev.y = e.clientY;
-    this.position.x = e.clientX - clientRect.left;
-    this.position.y = e.clientY - clientRect.top;
-    this.movement.x = 0;
-    this.movement.y = 0;
-  }
-  createKeyEventArgument(e) {
-    return e
-  }
-}
-
-const defaultOptions$1 = {
-  element: undefined,
-  contextMenu: true
-};
-class Input  {
-  constructor (element, options) {
-    this.options = { ...defaultOptions$1, ...options };
-    this.status = status.idle;
-    this.element = element;
-    if (!this.element && this.options.elementId) {
-      this.element = document.getElementById(this.options.elementId);
-    }
-    if (!this.element) {
-      throw "Must specify an element to receive user input.";
-    }
-    this.eventsAgent = new EventsAgent(this);
-    if (!this.options.contextMenu) {
-      window.oncontextmenu = (e) => {
-        e.preventDefault();
-        return false;
-      };
-    }
-  }
-  on (event, handler, options) {
-    return this.eventsAgent.addListener(event, handler, options)
-  }
-  off (event, handler, options) {
-    return this.eventsAgent.removeListener(event, handler, options)
-  }
-  invoke (agent, eventName, args) {
-    this.currentAgent = agent;
-    this.eventsAgent.invoke(eventName, this.createEventArgument(args));
-  }
-  createEventArgument (args) {
-    const arg = args || {};
-    arg.isButtonPressed = button => this.isButtonPressed(button);
-    arg.isKeyPressed = key => this.isKeyPressed(key);
-    arg.controller = this;
-    return arg;
-  }
-  isButtonPressed (button) {
-    return this.eventsAgent.isButtonPressed(button);
-  }
-  isKeyPressed (key) {
-    return this.eventsAgent.isKeyPressed(key);
-  }
-  setCursor (type) {
-    this.eventsAgent.setCursor(type);
   }
 }
 
@@ -6315,11 +6510,11 @@ class Legends {
 }
 
 class VolumeBar {
-  constructor(scene, config) {
+  constructor(scene, theme) {
     this.scene = scene;
     this.ctx = this.scene.context;
     this.width = this.scene.width;
-    this.cfg = {...defaultTheme, ...config};
+    this.cfg = theme;
   }
   draw(data) {
     const ctx = this.ctx;
@@ -6389,11 +6584,11 @@ class chartVolume extends Overlay {
 
 class Candle {
   areaCoordinates = []
-  constructor(scene, config) {
+  constructor(scene, theme) {
     this.scene = scene;
     this.ctx = this.scene.context;
     this.width = this.scene.width;
-    this.cfg = {...defaultTheme, ...config};
+    this.cfg = theme;
   }
   draw(data) {
     const ctx = this.ctx;
@@ -7835,7 +8030,7 @@ class MainPane {
     console.log("indicator:",indicator);
   }
   scaleNode(type) {
-    const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.chart.BorderColour};`;
+    const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.offChart.separator};`;
     const node = `
     <div slot="offchart" class="viewport ${type}" style="$${styleRow}"></div>
   `;
@@ -8488,7 +8683,7 @@ class tradeXMain extends element {
     this.setMain();
   }
   rowNode(type, api) {
-    const styleRow = ` border-top: 1px solid ${api.theme.chart.BorderColour};`;
+    const styleRow = ` border-top: 1px solid ${api.theme.offChart.separator};`;
     const node = `
       <tradex-offchart slot="offchart" class="${type}" style="${styleRow}">
       </tradex-offchart>
@@ -9922,159 +10117,6 @@ class Dialogue extends Window {
   }
 }
 
-class Divider {
-  #id
-  #core
-  #config
-  #widgets
-  #offChart
-  #elDividers
-  #elDivider
-  #elOffChart
-  #cursorPos
-  #controller
-  #input
-  static dividerList = {}
-  static divideCnt = 0
-  static class = CLASS_DIVIDERS
-  static name = "Dividers"
-  static type = "divider"
-  constructor(widgets, config) {
-    const cfg = {...config};
-    this.#widgets = widgets;
-    this.#core = cfg.core;
-    this.#config = cfg;
-    this.#id = cfg.id;
-    this.#offChart = cfg.offChart;
-    this.#elDividers = widgets.elements.elDividers;
-    this.#elOffChart = this.#offChart.element;
-    this.init();
-  }
-  static create(widgets, config) {
-    const id = `divider${++Divider.divideCnt}`;
-    config.id = id;
-    Divider.dividerList[id] = new Divider(widgets, config);
-    return Divider.dividerList[id]
-  }
-  static destroy(id) {
-    Divider.dividerList[id].end();
-    delete Divider.dividerList[id];
-  }
-  get el() { return this.#elDivider }
-  get ID() { return this.#id }
-  get offChart() { return this.#offChart }
-  get config() { return this.#core.config }
-  get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elDivider) }
-  get height() { return this.#elDivider.getBoundingClientRect().height }
-  init() {
-    this.mount();
-  }
-  start() {
-    this.setCursor("n-resize");
-    this.eventsListen();
-  }
-  end() {
-    this.#input.off("pointerenter", this.onMouseEnter);
-    this.#input.off("pointerout", this.onMouseOut);
-    this.#input.off("pointerdrag", this.onPointerDrag);
-    this.#input.off("pointerdragend", this.onPointerDragEnd);
-    this.#input = null;
-    this.el.remove();
-  }
-  eventsListen() {
-    this.#input = new Input(this.#elDivider, {disableContextMenu: false});
-    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
-    this.#input.on("pointerout", this.onMouseOut.bind(this));
-    this.#input.on("pointerdrag", this.onPointerDrag.bind(this));
-    this.#input.on("pointerdragend", this.onPointerDragEnd.bind(this));
-  }
-  on(topic, handler, context) {
-    this.#core.on(topic, handler, context);
-  }
-  off(topic, handler) {
-    this.#core.off(topic, handler);
-  }
-  emit(topic, data) {
-    this.#core.emit(topic, data);
-  }
-  onMouseEnter() {
-    this.#elDivider.style.background = "#888888C0";
-    this.#core.MainPane.onMouseEnter();
-  }
-  onMouseOut() {
-    this.#elDivider.style.background = "#FFFFFF00";
-    this.#core.MainPane.onMouseEnter();
-  }
-  onPointerDrag(e) {
-    this.#cursorPos = [e.position.x, e.position.y];
-    this.emit(`${this.ID}_pointerdrag`, this.#cursorPos);
-    this.emit(`divider_pointerdrag`, {
-      id: this.ID,
-      e: e,
-      pos: this.#cursorPos,
-      offChart: this.offChart
-    });
-  }
-  onPointerDragEnd(e) {
-    if ("position" in e)
-    this.#cursorPos = [e.position.x, e.position.y];
-    this.emit(`${this.ID}_pointerdragend`, this.#cursorPos);
-    this.emit(`divider_pointerdragend`, {
-      id: this.ID,
-      e: e,
-      pos: this.#cursorPos,
-      offChart: this.offChart
-    });
-  }
-  mount() {
-    if (this.#elDividers.lastElementChild == null)
-      this.#elDividers.innerHTML = this.dividerNode();
-    else
-      this.#elDividers.lastElementChild.insertAdjacentHTML("afterend", this.defaultNode());
-    this.#elDivider = DOM.findBySelector(`#${this.#id}`, this.#elDividers);
-  }
-  setCursor(cursor) {
-    this.#elDivider.style.cursor = cursor;
-  }
-  static defaultNode() {
-    const dividersStyle = `position: absolute;`;
-    const node = `
-  <div slot="widget" class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
-  `;
-    return node
-  }
-  dividerNode() {
-    let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top,
-      width = this.#core.MainPane.rowsW + this.#core.scaleW,
-      height = (isNumber(this.config.dividerHeight)) ?
-        this.config.dividerHeight : DIVIDERHEIGHT,
-      left = this.#core.theme.tools.width;
-      top -= height / 2;
-    switch(this.#core.theme.tools.location) {
-      case "left": break;
-      case false:
-      case "none":
-      case "right": left *= -1; break;
-    }
-    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: #FFFFFF00;`;
-    const node = `
-      <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
-    `;
-    return node
-  }
-  updateDividerPos(pos) {
-    let dividerY = this.#elDivider.offsetTop;
-        dividerY += pos[5];
-    this.#elDivider.style.top = `${dividerY}px`;
-  }
-  setDividerPos() {
-    let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top;
-        top = top - (this.height / 2);
-    this.#elDivider.style.top = `${top}px`;
-  }
-}
-
 var stateMachineConfig = {
   id: "widgets",
   initial: "idle",
@@ -10284,6 +10326,7 @@ class TradeXchart extends tradeXChart {
   #elTime
   #elYAxis
   #elWidgetsG
+  #ready = false
   #inCnt = null
   #modID
   #hub = {}
@@ -10438,6 +10481,7 @@ class TradeXchart extends tradeXChart {
   get WidgetsG() { return this.#WidgetsG }
   get Chart() { return this.#MainPane.chart }
   get Indicators() { return this.#MainPane.indicators }
+  get ready() { return this.#ready }
   get state() { return this.#state }
   get chartData() { return this.#state.data.chart.data }
   get offChart() { return this.#state.data.offchart }
@@ -10455,7 +10499,7 @@ class TradeXchart extends tradeXChart {
   get range() { return this.#range }
   get time() { return this.#time }
   get TimeUtils() { return Time }
-  get theme() { return this.#theme.getCurrent() }
+  get theme() { return this.#theme }
   get settings() { return this.#state.data.chart.settings }
   get indicators() { return this.#indicators }
   get TALib() { return this.#TALib }
@@ -10559,6 +10603,7 @@ class TradeXchart extends tradeXChart {
     this.stream = this.#config.stream;
     if (this.#delayedSetRange)
       this.on(STREAM_UPDATE, this.delayedSetRange.bind(this));
+    this.#ready = true;
     this.refresh();
   }
   end() {
@@ -10666,44 +10711,46 @@ class TradeXchart extends tradeXChart {
     this.#volumePrecision = volumePrecision;
   }
   addTheme(theme) {
-    this.#theme = Theme.create(theme, this);
-    return this.#theme
+    const t = Theme.create(theme, this);
+    if (!(this.#theme instanceof Theme)) this.#theme = t;
+    return t
   }
   setTheme(ID) {
-    this.#theme.current = ID;
-    const current = this.#theme;
+    if(!this.theme.list.has(ID)) return false
+    this.#theme.setTheme(ID, this);
+    const theme = this.#theme;
     const style = document.querySelector(`style[title=${this.id}_style]`);
-    const borderColour = `var(--txc-border-color, ${current.chart.BorderColour}`;
+    const borderColour = `var(--txc-border-color, ${theme.chart.BorderColour}`;
     let innerHTML = `.${this.id} { `;
-    innerHTML +=`--txc-background: ${current.chart.Background}; `;
-    this.style.background = `var(--txc-background, ${current.chart.Background})`;
-    this.style.border = `${current.chart.BorderThickness}px solid`;
+    innerHTML +=`--txc-background: ${theme.chart.Background}; `;
+    this.style.background = `var(--txc-background, ${theme.chart.Background})`;
+    this.style.border = `${theme.chart.BorderThickness}px solid`;
     this.style.borderColor = borderColour;
-    innerHTML +=`--txc-border-color:  ${current.chart.BorderColour}; `;
+    innerHTML +=`--txc-border-color:  ${theme.chart.BorderColour}; `;
     this.#elMain.rows.style.borderColor = borderColour;
-    innerHTML += `--txc-time-scrollbar-color: ${current.chart.BorderColour}; `;
-    innerHTML += `--txc-time-handle-color: ${current.xAxis.handle}; `;
-    innerHTML += `--txc-time-slider-color: ${current.xAxis.slider}; `;
-    innerHTML += `--txc-time-cursor-fore: ${current.xAxis.colourCursor}; `;
-    innerHTML += `--txc-time-cursor-back: ${current.xAxis.colourCursorBG}; `;
-    innerHTML += `--txc-time-icon-color: ${current.icon.colour}; `;
-    innerHTML += `--txc-time-icon-hover-color: ${current.icon.hover}; `;
+    innerHTML += `--txc-time-scrollbar-color: ${theme.chart.BorderColour}; `;
+    innerHTML += `--txc-time-handle-color: ${theme.xAxis.handle}; `;
+    innerHTML += `--txc-time-slider-color: ${theme.xAxis.slider}; `;
+    innerHTML += `--txc-time-cursor-fore: ${theme.xAxis.colourCursor}; `;
+    innerHTML += `--txc-time-cursor-back: ${theme.xAxis.colourCursorBG}; `;
+    innerHTML += `--txc-time-icon-color: ${theme.icon.colour}; `;
+    innerHTML += `--txc-time-icon-hover-color: ${theme.icon.hover}; `;
     this.#elTime.overview.scrollBar.style.borderColor = borderColour;
-    this.#elTime.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${current.xAxis.handle})`;
-    this.#elTime.overview.style.setProperty("--txc-time-slider-color", current.xAxis.slider);
-    this.#elTime.overview.style.setProperty("--txc-time-icon-color", current.icon.colour);
-    this.#elTime.overview.style.setProperty("--txc-time-icon-hover-color", current.icon.hover);
+    this.#elTime.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${theme.xAxis.handle})`;
+    this.#elTime.overview.style.setProperty("--txc-time-slider-color", theme.xAxis.slider);
+    this.#elTime.overview.style.setProperty("--txc-time-icon-color", theme.icon.colour);
+    this.#elTime.overview.style.setProperty("--txc-time-icon-hover-color", theme.icon.hover);
     for (let [key, legend] of Object.entries(this.Chart.legend.list)) {
-      legend.el.style.color = `var(--txc-legend-color, ${current.legend.colour})`;
-      legend.el.style.font = `var(--txc-legend-font, ${current.legend.font})`;
+      legend.el.style.color = `var(--txc-legend-color, ${theme.legend.colour})`;
+      legend.el.style.font = `var(--txc-legend-font, ${theme.legend.font})`;
     }
     for (let t of this.#elUtils.icons) {
       if (t.className != "icon-wrapper") continue
-      t.children[0].style.fill = current.icon.colour;
+      t.children[0].style.fill = theme.icon.colour;
     }
     for (let t of this.#elTools.icons) {
       if (t.className != "icon-wrapper") continue
-      t.children[0].style.fill = current.icon.colour;
+      t.children[0].style.fill = theme.icon.colour;
     }
     innerHTML += ` }`;
     style.innerHTML = innerHTML;
@@ -10932,6 +10979,7 @@ class TradeXchart extends tradeXChart {
     return true
   }
   refresh() {
+    if (!this.ready) return
     let start = this.range.indexStart;
     let end = this.range.indexEnd;
     this.setRange(start, end);
