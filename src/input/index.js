@@ -200,8 +200,8 @@ export default class Input  {
     this.clientPosPrev.x = e.center.x
     this.clientPosPrev.y = e.center.y
 
-    this.position.x = e.center.x - clientRect.left;
-    this.position.y = e.center.y - clientRect.top;
+    this.position.x = e.center.x //- clientRect.left;
+    this.position.y = e.center.y //- clientRect.top;
 
     this.movement.x = 0;
     this.movement.y = 0;

@@ -397,6 +397,16 @@ export default class MainPane {
       case "ArrowRight":
         this.emit("chart_pan", [step,null,0,null,step,null])
         break;
+      case "ArrowUp":
+        e.wheeldelta = -1
+        e.domEvent = e.srcEvent
+        this.onMouseWheel(e)
+        break;
+      case "ArrowDown":
+        e.wheeldelta = 1
+        e.domEvent = e.srcEvent
+        this.onMouseWheel(e)
+        break;
     }
   }
 
