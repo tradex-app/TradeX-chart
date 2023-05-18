@@ -1,5 +1,7 @@
 // definitions.js
 
+import { isNumber } from "../utils/typeChecks";
+
 export const status = {
   idle: 0,
   dragStart: 1,
@@ -8,21 +10,27 @@ export const status = {
 
 export class Point {
 
-  x = 0; 
-  y = 0;
+  #x = 0; 
+  #y = 0;
 
   constructor() {
 
     if (arguments.length === 1) {
       const { x, y } = arguments[0];
-      this.x = x; 
-      this.y = y;
-    } else if (arguments.length > 1) {
+      this.x = x || 0;
+      this.y = y || 0;
+    }
+    else if (arguments.length > 1) {
       const [x, y] = arguments;
-      this.x = x;
-      this.y = y;
+      this.x = x || 0;
+      this.y = y || 0;
     }
   }
+
+  set x(x) { if (isNumber(x)) this.#x = x }
+  get x() { return this.#x }
+  set y(y) { if (isNumber(y)) this.#y = y }
+  get y() { return this.#y }
 
   clone() {
     return new Point(this.x, this.y);

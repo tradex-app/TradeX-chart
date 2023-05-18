@@ -1,51 +1,124 @@
 // index.js
 // input controller, pointer, keys
+// https://uber-web.github.io/mjolnir.js
 
-import { status } from "./definitions"
-import { EventsAgent } from "./events";
+import { isBoolean, isFunction, isObject, isString } from "../utils/typeChecks";
+import DOM from "../utils/DOM";
+import { Point, status } from "./definitions"
+import { EventManager } from "mjolnir.js";
+import PointerAgent from "./pointer";
+import TouchAgent from "./touch";
+import KeyboardAgent from "./keyboard";
 
 const defaultOptions = {
   element: undefined,
-  contextMenu: true
+  contextMenu: true,
+  panX: true,
+  panY: true
 }
 
 export default class Input  {
 
+  #options
+  #element
+  #eventsAgent
+  #pointer = null
+  #key = null
+  #touch = null
+  #panX
+  #panY
+  #wheelDelta
+  #status
+
+
   constructor (element, options) {
 
-    this.options = { ...defaultOptions, ...options };
-    this.status = status.idle
-    this.element = element
+    this.#options = { ...defaultOptions, ...options };
+    this.#status = status.idle
+    this.#element = element
 
-    if (!this.element && this.options.elementId) {
-      this.element = document.getElementById(this.options.elementId);
+    if (!this.#element && this.#options.elementId) {
+      this.#element = document.getElementById(this.#options.elementId);
     }
 
-    if (!this.element) {
+    if (!DOM.isElement(this.#element)) {
       throw "Must specify an element to receive user input.";
     }
 
-    this.eventsAgent = new EventsAgent(this);
-
-    if (!this.options.contextMenu) {
+    if (!this.#options.contextMenu) {
       window.oncontextmenu = (e) => {
         e.preventDefault();
         return false;
       };
     }
+
+    this.#eventsAgent = new EventManager(this.#element);
+    this.pointerInit()
   }
 
-  on (event, handler, options) {
-    return this.eventsAgent.addListener(event, handler, options)
+  get agent() { return this.#eventsAgent }
+  get pointer() { 
+    if (this.#pointer instanceof PointerAgent) return this.#pointer
+    this.#pointer = new PointerAgent(this)
+    return this.#pointer
+  }
+  get touch() { 
+    if (this.#touch instanceof TouchAgent) return this.#touch
+    this.#touch = new TouchAgent(this)
+    return this.#touch
+  }
+  get key() { 
+    if (this.#key instanceof KeyboardAgent) return this.#key
+    this.#key = new KeyboardAgent(this)
+    return this.#key
+  }
+  get status() { return this.#status }
+  get element() { return this.#element }
+  set panX(x) { if (isBoolean(x)) this.#panX = x }
+  set panY(x) { if (isBoolean(y)) this.#panY = y }
+  set wheeldelta(w) { this.#wheelDelta = w.delta }
+  get wheeldelta() { return this.#wheelDelta }
+
+  destroy() {
+    this.#eventsAgent.destroy()
+    this.#pointer = undefined
+    this.#key = undefined
+    this.#touch = undefined
+  }
+
+  isValid(event, handler) {
+    return (
+        isString(event) ||
+        isFunction(handler)
+    ) ? true : false;
+  }
+
+  validOptions(options) {
+    return (isObject(options) && isBoolean(options)) ? options : undefined;
+  }
+
+  on (event, handler, options, once=false) {
+    if (!this.isValid(event, handler)) return false
+    if (this.pointer.has(event)) this.#pointer.on(event, handler, options, once)
+    else if (this.touch.has(event)) this.#touch.on(event, handler, options, once)
+    else if (this.key.has(event)) this.#key.on(event, handler, options, once)
+    else this.element.addEventListener(event, handler, this.validOptions(options))
   }
 
   off (event, handler, options) {
-    return this.eventsAgent.removeListener(event, handler, options)
+    if (this.#pointer?.has(event)) this.#pointer.off(event, handler, options)
+    else if (this.#touch?.has(event)) this.#touch.off(event, handler, options)
+    else if (this.#key?.has(event)) this.#key.off(event, handler, options)
+    else this.element.removeEventListener(event, handler, this.validOptions(options))
   }
 
+  once (event, handler, options) {
+    this.on(event, handler, options, true)
+  }
+/*
   invoke (agent, eventName, args) {
     this.currentAgent = agent;
-    this.eventsAgent.invoke(eventName, this.createEventArgument(args));
+    this.#eventsAgent.invoke(eventName, this.createEventArgument(args));
   }
 
   createEventArgument (args) {
@@ -57,14 +130,93 @@ export default class Input  {
   }
 
   isButtonPressed (button) {
-    return this.eventsAgent.isButtonPressed(button);
+    return this.#eventsAgent.isButtonPressed(button);
   }
   
   isKeyPressed (key) {
-    return this.eventsAgent.isKeyPressed(key);
+    return this.#eventsAgent.isKeyPressed(key);
+  }
+*/
+  setCursor(type) {
+		this.#element.style.cursor = type;
+	}
+
+  pointerInit() {
+    this.clientPosPrev = new Point([null, null])
+    // current mouse position
+    this.position = new Point([0, 0]);
+    // amount of mouse movement difference
+    this.movement = new Point([0, 0]);
+    // dragging start and end position
+    this.dragstart = new Point([null, null]);
+    this.dragend = new Point([null, null]);
+    this.dragCheckThreshold = 3;
+    this.dragStatus = false
+    // mouse wheel
+    this.wheeldelta = 0;
+    // current pressed mouse buttons
+    this.pointerButtons = [false, false, false, false, false]
+    // custom events
+    this.pointerdrag = new Event("pointerdrag")
+    this.pointerdragend = new Event("pointerdragend")
   }
 
-  setCursor (type) {
-    this.eventsAgent.setCursor(type);
+  pointerEventData(e) {
+    return {
+      isProcessed: false,
+      pointerType: e.pointerType,
+      position: this.position.clone(),
+      movement: this.movement.clone(),
+      dragstart: this.dragstart.clone(),
+      dragend: this.dragend.clone(),
+      wheeldelta: this.wheeldelta,
+      buttons: this.pointerButtons,
+      domEvent: e,
+      timeStamp: Date.now()
+    }
   }
+
+  motion(e) {
+
+    // const clientX = e.clientX || this.position.x
+    // const clientY = e.clientY || this.position.y
+
+    const clientX = e.center.x || this.position.x
+    const clientY = e.center.y || this.position.y
+
+    this.movement.x = clientX - this.clientPosPrev.x
+    this.movement.y = clientY - this.clientPosPrev.y
+
+    this.position.x += this.movement.x
+    this.position.y += this.movement.y
+
+    this.clientPosPrev.x = clientX
+    this.clientPosPrev.y = clientY
+  }
+
+  location(e) {
+    const clientRect = e.target.getBoundingClientRect();
+
+    this.clientPosPrev.x = e.center.x
+    this.clientPosPrev.y = e.center.y
+
+    this.position.x = e.center.x - clientRect.left;
+    this.position.y = e.center.y - clientRect.top;
+
+    this.movement.x = 0;
+    this.movement.y = 0;
+  }
+
+  onPointerDown (e) {
+    this.location(e)
+    this.pointerButtons[e.srcEvent.button] = true
+
+    // if (this.dragStatus == "ready") e.target.setPointerCapture(e.pointerId)
+  }
+
+  onPointerUp (e) {
+    this.location(e)
+    this.pointerButtons[e.srcEvent.button] = false
+  }
+
 }

@@ -3,6 +3,7 @@
 import { isBoolean, isFunction, isObject } from "../utils/typeChecks";
 import DOM from "../utils/DOM";
 import { Point } from "./definitions";
+import { PointerAgent } from "./pointer";
 
 // Keyboard events, key code definitions
 // https://www.toptal.com/developers/keycode
@@ -17,9 +18,9 @@ const keyboard = [
 const pointer = [
   "pointerdown", // - Pointer becomes active
   "pointerup", // - Pointer stops being active
-  "pointerover", "pointerenter", // - Pointer enters element boundries
-  "pointerout", "pointerleave", // - Pointer leaves element boundries
-  "pointermove", // - Pointer moves while inside the element's boundries
+  "pointerover", "pointerenter", // - Pointer enters element boundaries
+  "pointerout", "pointerleave", // - Pointer leaves element boundaries
+  "pointermove", // - Pointer moves while inside the element's boundaries
   "pointercancel", // - Pointer has stopped generating events, e.g. input device deactivated
   "gotpointercapture", // - Pointer has entered pointer capture state, e.g. dragging a movable element
   "lostpointercapture", // - Pointer capture state has ended
@@ -59,6 +60,128 @@ const custom = [
   "pointerdragend"
 ]
 
+export class EventAgent2 {
+
+  #types
+  #input
+  #element
+
+  constructor(input) {
+
+    this.#input = input
+    this.#element = input.element
+
+    // Pointer Events enabled.
+    this.#types = (window.PointerEvent) ? PointerAgent.types : []
+    this.#types = [...keyboard, ...mouse, ...touch, ...pen, ...misc, ...custom]
+    this.pointerInit()
+  }
+
+  get types() { return this.#types }
+
+  has (event) {
+    return (this.#types.indexOf(event) == -1) ? false : true
+  }
+
+  isValid(event, handler) {
+    return (
+        this.has(event) || 
+        isFunction(handler) || 
+        DOM.isElement(this.element) 
+    ) ? true : false
+  }
+
+  validOptions(options) {
+    return (isObject(options) && isBoolean(options)) ? options : undefined;
+  }
+
+
+  pointerInit() {
+    this.clientPosPrev = new Point([null, null])
+    // current mouse position
+    this.position = new Point();
+    // amount of mouse movement difference
+    this.movement = new Point([0, 0]);
+    // dragging start and end position
+    this.dragstart = new Point([null, null]);
+    this.dragend = new Point([null, null]);
+    this.dragCheckThreshold = 3;
+    this.dragStatus = false
+    // mouse wheel
+    this.wheeldelta = 0;
+    // current pressed mouse buttons
+    this.pointerButtons = [false, false, false, false, false]
+    // custom events
+    this.pointerdrag = new Event("pointerdrag")
+    this.pointerdragend = new Event("pointerdragend")
+  }
+
+  pointerEventData(e) {
+    return {
+      isProcessed: false,
+      pointerType: e.pointerType,
+      position: this.position.clone(),
+      movement: this.movement.clone(),
+      dragstart: this.dragstart.clone(),
+      dragend: this.dragend.clone(),
+      wheeldelta: this.wheeldelta,
+      buttons: this.pointerButtons,
+      domEvent: e,
+      timeStamp: Date.now()
+    }
+  }
+
+  motion(e) {
+    const clientX = e.clientX || this.position.x
+    const clientY = e.clientY || this.position.y
+
+    this.movement.x = clientX - this.clientPosPrev.x
+    this.movement.y = clientY - this.clientPosPrev.y
+
+    this.position.x += this.movement.x
+    this.position.y += this.movement.y
+
+    this.clientPosPrev.x = clientX
+    this.clientPosPrev.y = clientY
+  }
+
+  location(e) {
+    const clientRect = e.target.getBoundingClientRect();
+
+    this.clientPosPrev.x = e.clientX
+    this.clientPosPrev.y = e.clientY
+
+    this.position.x = e.clientX - clientRect.left;
+    this.position.y = e.clientY - clientRect.top;
+
+    this.movement.x = 0;
+    this.movement.y = 0;
+  }
+
+  addListener (event, handler, options) {
+    if (!this.isValid(event, handler)) return false
+
+    let opt = this.validOptions(options)
+    let cb = handler
+  }
+
+  removerListener (event, handler, element, options) {
+    if (!this.has(event) || 
+        !isFunction(handler) || 
+        !DOM.isElement(element) 
+    ) return false
+
+    if (!isObject(options) && !isBoolean(options)) options == undefined
+
+    this.#element.removeEventListener(event, handler, options)
+
+    return true
+  }
+
+}
+
+
+
 export class EventsAgent {
 
   constructor (input) {
@@ -68,10 +191,10 @@ export class EventsAgent {
 
     if (window.PointerEvent) {
       // Pointer Events enabled.
-      this.type = [...keyboard, ...pointer, ...mouse, ...touch, ...pen, ...misc, ...custom]
+      this.types = [...keyboard, ...PointerAgent.types, ...mouse, ...touch, ...pen, ...misc, ...custom]
     } else {
       // Pointer Events not supported
-      this.type = [...keyboard, ...mouse, ...touch, ...pen, ...misc, ...custom]
+      this.types = [...keyboard, ...mouse, ...touch, ...pen, ...misc, ...custom]
     }
 
     this.clientPosPrev = new Point([null, null])
@@ -94,8 +217,7 @@ export class EventsAgent {
   }
 
   has (event) {
-    if (this.type.indexOf(event) == -1) return false
-    else return true
+    return (this.types.indexOf(event) == -1) ? false : true
   }
 
   isTouch (e) {
@@ -195,19 +317,21 @@ export class EventsAgent {
 
     if (!isObject(options) && !isBoolean(options)) options == undefined
 
+    let e = this.element
+
     if (event == "pointerdrag") {
-      e.target.removeEventListener("pointermove", this.onPointerDrag)
-      e.target.removeEventListener("pointerdown", this.onPointerDown)
-      e.target.removeEventListener("gotpointercapture", this.onPointerDrag)
-      e.target.removeEventListener("lostpointercapture", this.onPointerDragEnd)
+      e.removeEventListener("pointermove", this.onPointerDrag)
+      e.removeEventListener("pointerdown", this.onPointerDown)
+      e.removeEventListener("gotpointercapture", this.onPointerDrag)
+      e.removeEventListener("lostpointercapture", this.onPointerDragEnd)
       document.removeEventListener("pointerup", this.onPointerDragEnd)
     }
     
-    element.removeEventListener(event, handler, options)
+    e.removeEventListener(event, handler, options)
 
     return true
   }
- 
+
   initPointerDrag (handler, options) {
     if (!this.draginit) {
       this.draginit = true

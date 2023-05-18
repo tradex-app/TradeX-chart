@@ -6,7 +6,7 @@ import DOM from "../utils/DOM"
 import yAxis from "./axis/yAxis"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
-import Input from '../input'
+import Input from "../input"
 import { copyDeep, throttle, uid } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
 

@@ -1,149 +1,25 @@
 // pointer.js
 
-// import DeviceAgent from "./deviceAgent"
+import DeviceAgent from "./deviceAgent"
+import { isBoolean, isFunction, isObject } from "../utils/typeChecks";
+import DOM from "../utils/DOM";
 
+const types = [
+  "pointerdown", // - Pointer becomes active
+  "pointerup", // - Pointer stops being active
+  "pointerover", "pointerenter", // - Pointer enters element boundaries
+  "pointerout", "pointerleave", // - Pointer leaves element boundaries
+  "pointermove", // - Pointer moves while inside the element's boundaries
+  "pointercancel", // - Pointer has stopped generating events, e.g. input device deactivated
+  "gotpointercapture", // - Pointer has entered pointer capture state, e.g. dragging a movable element
+  "lostpointercapture", // - Pointer capture state has ended
+  "dblclick", // double click / tap
+  "click",
+  "wheel", // 
+  "contextmenu"
+]
 
-
-export default class PointerAgent {
-
-  #types = [
-    "pointerdown", // - Pointer becomes active
-    "pointerup", // - Pointer stops being active
-    "pointerover", "pointerenter", // - Pointer enters element boundaries
-    "pointerout", "pointerleave", // - Pointer leaves element boundaries
-    "pointermove", // - Pointer moves while inside the element's boundaries
-    "pointercancel", // - Pointer has stopped generating events, e.g. input device deactivated
-    "gotpointercapture", // - Pointer has entered pointer capture state, e.g. dragging a movable element
-    "lostpointercapture", // - Pointer capture state has ended
-    "click", // alias of tap
-    "dblclick", // alias of tap
-    "anyclick", // alias of anytap
-    "wheel", // 
-    "contextmenu",
-    
-"pointerdrag",
-"pointerdragend",
-
-    "pan",
-    "panstart",
-    "panmove",
-    "panup",
-    "pandown",
-    "panleft",
-    "panright",
-    "panend",
-    "pancancel"
-  ]
-
-  #input
-
-  constructor(input) {
-    this.#input = input
-  }
-
-  has(event) {
-    return (this.#types.indexOf(event) == -1) ? false : true
-  }
-
-  on (event, handler, options, once) {
-    let cb = handler
-
-    switch (event) {
-      case "pointerdown":
-          cb = function (e) {
-            this.#input.onPointerDown(e)
-            handler(this.#input.pointerEventData(e))
-          }
-          break;
-      case "pointerup":
-        cb = function (e) {
-          this.#input.onPointerUp(e)
-          handler(this.#input.pointerEventData(e))
-        }
-        break;
-      case "pointermove":
-        cb = function (e) {
-          this.#input.motion(e)
-          handler(this.#input.pointerEventData(e))
-        }
-        break;
-      case "click":
-      case "dbclick":
-      case "pointerenter":
-      case "pointerleave":
-      case "pointerout":
-      case "pointerover":
-      case "contextmenu":
-        cb = function (e) {
-          this.#input.location(e)
-          handler(this.#input.pointerEventData(e))
-        }
-        break;
-      case "wheel":
-        cb = function (e) {
-          this.#input.wheeldelta = e;
-          handler(this.#input.pointerEventData(e))
-        }
-        break;
-      case "pointercancel":
-      case "gotpointercapture":
-      case "lostpointercapture":
-        cb = function (e) {
-          handler(e)
-        }
-        break;
-      case "pointerdrag":
-        // this.initPointerDrag(handler, options)
-        // return true;
-        cb = function (e) {
-          this.#input.motion(e)
-          handler(this.#input.pointerEventData(e))
-        }
-        event = "panmove"
-        break;
-      case "pointerdragend":
-        cb = function (e) {
-          this.#input.motion(e)
-          handler(this.#input.pointerEventData(e))
-        }
-        event = "panend"
-        break;
-    }
-    if (once) this.#input.agent.once(event, cb.bind(this), options)
-    else this.#input.agent.on(event, cb.bind(this), options)
-    return cb
-  }
-
-  off (event, handler, options) {
-    this.#input.agent.off(event, handler, options)
-  }
-}
-/*
-const f = {
-
-  types: [
-    "pointerdown", // - Pointer becomes active
-    "pointerup", // - Pointer stops being active
-    "pointerover", "pointerenter", // - Pointer enters element boundaries
-    "pointerout", "pointerleave", // - Pointer leaves element boundaries
-    "pointermove", // - Pointer moves while inside the element's boundaries
-    "pointercancel", // - Pointer has stopped generating events, e.g. input device deactivated
-    "gotpointercapture", // - Pointer has entered pointer capture state, e.g. dragging a movable element
-    "lostpointercapture", // - Pointer capture state has ended
-    "dblclick", // double click / tap
-    "click",
-    "wheel", // 
-    "contextmenu"
-  ],
-
-  has: function(event) {
-    return (this.#types.indexOf(event) == -1) ? false : true
-  }
-}
-
-
-
-export class _PointerAgent extends DeviceAgent {
+export class PointerAgent extends DeviceAgent {
 
   constructor(input) {
     super(input)
@@ -199,19 +75,19 @@ export class _PointerAgent extends DeviceAgent {
       case "pointerdown":
           cb = function (e) {
             this.onPointerDown(e)
-            handler(this.#input.pointerEventData(e))
+            handler(this.pointerEventData(e))
           }
           break;
       case "pointerup":
         cb = function (e) {
           this.onPointerUp(e)
-          handler(this.#input.pointerEventData(e))
+          handler(this.pointerEventData(e))
         }
         break;
       case "pointermove":
         cb = function (e) {
-          this.#input.motion(e)
-          handler(this.#input.pointerEventData(e))
+          this.motion(e)
+          handler(this.pointerEventData(e))
           // console.log(`e.composedPath: `,e.composedPath())
         }
         break;
@@ -223,14 +99,14 @@ export class _PointerAgent extends DeviceAgent {
       case "pointerover":
       case "contextmenu":
         cb = function (e) {
-          this.#input.location(e)
-          handler(this.#input.pointerEventData(e))
+          this.location(e)
+          handler(this.pointerEventData(e))
         }
         break;
       case "wheel":
         cb = function (e) {
           this.wheeldelta = e.wheelDelta;
-          handler(this.#input.pointerEventData(e))
+          handler(this.pointerEventData(e))
         }
         break;
       case "pointercancel":
@@ -245,8 +121,8 @@ export class _PointerAgent extends DeviceAgent {
         return true;
       case "pointerdragend":
         cb = function (e) {
-          this.#input.motion(e)
-          handler(this.#input.pointerEventData(e))
+          this.motion(e)
+          handler(this.pointerEventData(e))
         }
         break;
     }
@@ -281,7 +157,7 @@ export class _PointerAgent extends DeviceAgent {
     }
 
     let cb = function (e) {
-      e = this.#input.pointerEventData(e)
+      e = this.pointerEventData(e)
       handler(e)
     }
     this.dragStatus = "ready"
@@ -289,20 +165,20 @@ export class _PointerAgent extends DeviceAgent {
   }
 
   onPointerDown (e) {
-    this.#input.location(e)
+    this.location(e)
     this.pointerButtons[e.button] = true
 
     if (this.dragStatus == "ready") e.target.setPointerCapture(e.pointerId)
   }
 
   onPointerUp (e) {
-    this.#input.location(e)
+    this.location(e)
     this.pointerButtons[e.button] = false
   }
 
   onPointerMove (e) {
     if (this.dragStatus == "dragging") {
-      this.#input.motion(e)
+      this.motion(e)
       this.dragend = this.position.clone()
       e.target.dispatchEvent(this.pointerdrag)
     }
@@ -350,4 +226,3 @@ export class _PointerAgent extends DeviceAgent {
   }
 
 }
-*/
