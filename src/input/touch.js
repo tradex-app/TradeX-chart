@@ -45,7 +45,13 @@ export default class TouchAgent {
     let cb = handler
 
     switch (event) {
-
+    //   case "swipe":
+    //     cb = function (e) {
+    //       this.logit(e)
+    //       this.#input.onPointerDown(e)
+    //       handler(this.#input.pointerEventData(e))
+    //     }
+    //     break; 
     }
     if (once) this.#input.agent.once(event, cb.bind(this), options)
     else this.#input.agent.on(event, cb.bind(this), options)

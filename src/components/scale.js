@@ -151,7 +151,7 @@ export default class ScaleBar {
     let canvas = this.#Graph.viewport.scene.canvas
     this.#input = new Input(canvas, {disableContextMenu: false});
     this.#input.setCursor("ns-resize")
-    this.#input.on("pointerdrag", this.onDrag.bind(this)) // throttle(this.onDrag, 100, this, true));
+    this.#input.on("pointerdrag", throttle(this.onDrag, 100, this, true));
     this.#input.on("pointerdragend", this.onDragDone.bind(this))
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("dblclick", this.resetScaleRange.bind(this))
