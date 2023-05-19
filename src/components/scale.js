@@ -151,7 +151,7 @@ export default class ScaleBar {
     let canvas = this.#Graph.viewport.scene.canvas
     this.#input = new Input(canvas, {disableContextMenu: false});
     this.#input.setCursor("ns-resize")
-    this.#input.on("pointerdrag", throttle(this.onDrag, 100, this, true));
+    this.#input.on("pointerdrag", this.onDrag.bind(this)) // throttle(this.onDrag, 100, this, true));
     this.#input.on("pointerdragend", this.onDragDone.bind(this))
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("dblclick", this.resetScaleRange.bind(this))
@@ -188,11 +188,9 @@ export default class ScaleBar {
       e.dragstart.x, e.dragstart.y,
       e.movement.x, e.movement.y
     ]
-    const dragEvent = {
-      scale: this,
-      cursorPos: this.#cursorPos
-    }
-    this.setScaleRange(this.#cursorPos[5])
+    // this.setScaleRange(this.#cursorPos[5])
+
+    this.setScaleRange(e.movement.y)
     this.render()
   }
 
@@ -214,7 +212,7 @@ export default class ScaleBar {
 
   onChartDrag(e) {
     if (this.#yAxis.mode !== "manual") return
-    this.#yAxis.offset = this.#core.MainPane.cursorPos[5] // e[5]
+    this.#yAxis.offset = e.domEvent.srcEvent.movementY // this.#core.MainPane.cursorPos[5] // e[5]
     this.parent.draw(this.range, true)
     this.draw()
   }

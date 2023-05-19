@@ -25,10 +25,12 @@ export default class Input  {
   #pointer = null
   #key = null
   #touch = null
+
+  #status
+  #isPan = false
   #panX
   #panY
   #wheelDelta
-  #status
 
 
   constructor (element, options) {
@@ -74,6 +76,7 @@ export default class Input  {
   }
   get status() { return this.#status }
   get element() { return this.#element }
+  get isPan() { return this.#isPan }
   set panX(x) { if (isBoolean(x)) this.#panX = x }
   set panY(x) { if (isBoolean(y)) this.#panY = y }
   set wheeldelta(w) { this.#wheelDelta = w.delta }
@@ -177,12 +180,8 @@ export default class Input  {
   }
 
   motion(e) {
-
-    // const clientX = e.clientX || this.position.x
-    // const clientY = e.clientY || this.position.y
-
-    const clientX = e.center.x || this.position.x
-    const clientY = e.center.y || this.position.y
+    const clientX = e.srcEvent.clientX || this.position.x
+    const clientY = e.srcEvent.clientY || this.position.y
 
     this.movement.x = clientX - this.clientPosPrev.x
     this.movement.y = clientY - this.clientPosPrev.y
@@ -195,13 +194,13 @@ export default class Input  {
   }
 
   location(e) {
-    const clientRect = e.target.getBoundingClientRect();
+    const clientRect = e.srcEvent.target.getBoundingClientRect();
 
-    this.clientPosPrev.x = e.center.x
-    this.clientPosPrev.y = e.center.y
+    this.clientPosPrev.x = e.srcEvent.clientX // = this.position.x
+    this.clientPosPrev.y = e.srcEvent.clientY // = this.position.y
 
-    this.position.x = e.center.x //- clientRect.left;
-    this.position.y = e.center.y //- clientRect.top;
+    this.position.x = e.srcEvent.clientX - clientRect.left;
+    this.position.y = e.srcEvent.clientY- clientRect.top;
 
     this.movement.x = 0;
     this.movement.y = 0;
@@ -210,8 +209,6 @@ export default class Input  {
   onPointerDown (e) {
     this.location(e)
     this.pointerButtons[e.srcEvent.button] = true
-
-    // if (this.dragStatus == "ready") e.target.setPointerCapture(e.pointerId)
   }
 
   onPointerUp (e) {
@@ -219,4 +216,12 @@ export default class Input  {
     this.pointerButtons[e.srcEvent.button] = false
   }
 
+  startPointerDrag(e) {
+    this.#isPan = true
+    this.onPointerDown(e)
+  }
+
+  endPointerDrag(e) {
+    this.#isPan = false
+  }
 }

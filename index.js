@@ -639,10 +639,10 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
-addChart()
-addChart()
-addChart()
-addChart()
+// addChart()
+// addChart()
+// addChart()
+// addChart()
 
 // add custom indicator definition
 chart0.setIndicators({

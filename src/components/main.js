@@ -351,9 +351,10 @@ export default class MainPane {
       d.active = true
       d.start = [e.dragstart.x, e.dragstart.y]
       d.prev = d.start
-      d.delta = [e.movement.x, e.movement.y]
+      d.delta = [0, 0] //[e.movement.x, e.movement.y]
     }
     else {
+    // d.delta = [e.movement.x, e.movement.y]
       d.delta = [
         e.position.x - d.prev[0], 
         e.position.y - d.prev[1]
@@ -363,7 +364,6 @@ export default class MainPane {
         e.position.y
       ]
     }
-
     this.#cursorPos = ("n",[
       e.position.x, e.position.y, 
       ...d.start,

@@ -123,8 +123,6 @@ export default class Test extends Indicator {
    * @param {object} range - current displayed range of candles
    */
   draw(range=this.range) {
-    console.log("draw custom indicator")
-
     // minimum of two candles are required for this indicator
     if (this.overlay.data.length < 2 ) return false
     // clear the indicator overlay (chart layer)

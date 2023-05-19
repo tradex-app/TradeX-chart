@@ -93,17 +93,17 @@ export default class PointerAgent {
         }
         break;
       case "pointerdrag":
-        // this.initPointerDrag(handler, options)
-        // return true;
         cb = function (e) {
           this.#input.motion(e)
           handler(this.#input.pointerEventData(e))
         }
+        this.#input.agent.on("panstart", this.#input.startPointerDrag.bind(this.#input))
         event = "panmove"
         break;
       case "pointerdragend":
         cb = function (e) {
           this.#input.motion(e)
+          this.#input.endPointerDrag(e)
           handler(this.#input.pointerEventData(e))
         }
         event = "panend"

@@ -29,15 +29,6 @@ export default class TouchAgent {
     'tripanright',
     'tripanend',
     'tripancancel',
-    'pan',
-    'panstart',
-    'panmove',
-    'panup',
-    'pandown',
-    'panleft',
-    'panright',
-    'panend',
-    'pancancel'
   ]
 
   #input
