@@ -180,6 +180,7 @@ export default class Chart {
     this.#input.off("pointerenter", this.onMouseEnter);
     this.#input.off("pointerout", this.onMouseOut);
     this.#input.off("pointerdown", this.onMouseDown);
+    this.#input.off("pointerup", this.onMouseUp);
     this.#controller = null;
 
     this.off("main_mousemove", this.onMouseMove);
@@ -197,6 +198,7 @@ export default class Chart {
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
     this.#input.on("pointerdown", this.onMouseDown.bind(this));
+    this.#input.on("pointerup", this.onMouseUp.bind(this));
 
     // listen/subscribe/watch for parent notifications
     this.on("main_mousemove", this.updateLegends.bind(this));
@@ -272,9 +274,14 @@ export default class Chart {
   }
 
   onMouseDown(e) {
+    this.#core.pointerButtons[e.domEvent.srcEvent.button] = true
     this.#cursorClick = [Math.floor(e.position.x), Math.floor(e.position.y)];
     if (this.stateMachine.state === "tool_activated")
       this.emit("tool_targetSelected", { target: this, position: e });
+  }
+
+  onMouseUp(e) {
+    this.#core.pointerButtons[e.domEvent.srcEvent.button] = false
   }
 
   onStreamListening(stream) {

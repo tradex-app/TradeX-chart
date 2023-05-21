@@ -295,6 +295,7 @@ export default class MainPane {
 
   onMouseWheel(e) {
     e.domEvent.preventDefault()
+    if (this.#core.pointerButtons[0]) return
 
     const direction = Math.sign(e.wheeldelta) * -1
     const range = this.range

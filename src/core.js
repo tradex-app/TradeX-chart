@@ -140,10 +140,11 @@ export default class TradeXchart extends Tradex_chart {
   errors = false
   timer = false
   
-  #mousePos = {x:0, y:0}
   #scrollPos = 0
   #smoothScrollOffset = 0
   #panBeginPos = [null, null, null, null]
+  #pointerPos = {x:0, y:0}
+  #pointerButtons = [false, false, false]
 
   #workers
   #stream
@@ -153,19 +154,19 @@ export default class TradeXchart extends Tradex_chart {
 
   #delayedSetRange = false
 
-  #renderer = {
-    status: "idle",
-    buffer: {
-      n: true,
-      "1": {},
-      "2": {}
-    },
-    curr: {
-      frame: null,
-      priority: 0
-    },
-    cache: []
-  }
+  // #renderer = {
+  //   status: "idle",
+  //   buffer: {
+  //     n: true,
+  //     "1": {},
+  //     "2": {}
+  //   },
+  //   curr: {
+  //     frame: null,
+  //     priority: 0
+  //   },
+  //   cache: []
+  // }
 
   /**
    * Create a new TradeXchart instance
@@ -321,7 +322,8 @@ export default class TradeXchart extends Tradex_chart {
   get scrollPos() { return this.#scrollPos }
   get smoothScrollOffset() { return 0 } //{ return this.#smoothScrollOffset }
   get rangeScrollOffset() { return Math.floor(this.bufferPx / this.candleW) }
-  get mousePos() { return this.#mousePos }
+  get mousePos() { return this.#pointerPos }
+  get pointerButtons() { return this.#pointerButtons }
 
   get pricePrecision() { return this.#pricePrecision }
   get volumePrecision() { return this.#volumePrecision }
@@ -524,8 +526,8 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   onMouseMove(e) {
-    this.#mousePos.x = e.clientX
-    this.#mousePos.y = e.clientY
+    this.#pointerPos.x = e.clientX
+    this.#pointerPos.y = e.clientY
   }
 
   onStreamUpdate(candle) {

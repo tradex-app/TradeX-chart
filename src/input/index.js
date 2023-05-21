@@ -32,6 +32,7 @@ export default class Input  {
   #panY
   #wheelDelta
 
+  pad = {left: false}
 
   constructor (element, options) {
 
