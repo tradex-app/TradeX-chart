@@ -50,6 +50,5 @@ export default class ScaleLabels extends Overlay {
     }
     ctx.restore()
   }
-
 }
 

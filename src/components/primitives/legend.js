@@ -59,14 +59,19 @@ export default class Legends {
 
     styleLegendTitle += (o?.type === "chart") ? "font-size: 1.5em;" : "font-size: 1.2em;"
 
+    const controls = (!theme.legend.controls) ? "" :
+    `
+      <div slot="controls" class="controls" style="${styleControls}" ${mouseOver} ${mouseOut}>${t.buildControls(o)}</div>
+    `;
+
     const node = `
       <div slot="legend" id="${o.id}" class="legend" style="${styleLegend}">
         <div>
           <span slot="title" class="title" style="${styleLegendTitle}">${o.title}</span>
           <dl style="${styleInputs}">${t.buildInputs(o)}</dl>
         </div>
-        <div slot="controls" class="controls" style="${styleControls}" ${mouseOver} ${mouseOut}>${t.buildControls(o)}</div>
-      </div>
+        ${controls}
+     </div>
     `
     return node
   }

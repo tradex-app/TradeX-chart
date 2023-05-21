@@ -134,12 +134,18 @@ const config1 = {
     utils: {
       location: false
     },
+    time: {
+      navigation: false
+    },
+    legend: {
+       controls: false
+    }
   },
   watermark: {
     text: "BTC/USDT"
   },
   isCrypto: true,
-  logs: false,
+  logs: true,
   infos: true,
   warnings: true,
   errors: true,
@@ -639,10 +645,10 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
-// addChart()
-// addChart()
-// addChart()
-// addChart()
+addChart()
+addChart()
+addChart()
+addChart()
 
 // add custom indicator definition
 chart0.setIndicators({

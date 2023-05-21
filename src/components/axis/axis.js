@@ -1,7 +1,7 @@
 // axis.js
 
 // import pixel aspect ratio
-import { float2Int, countDigits, numDigits, precision, nice, round } from '../../utils/number.js'
+import { float2Int, countDigits, numDigits, precision } from '../../utils/number.js'
 
 /**
  * Parent class that xAxis and yAxis extend

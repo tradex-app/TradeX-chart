@@ -4,6 +4,7 @@
 import element from "./classes/element"
 import graph from "./classes/graph"
 import tradeXOverview from "./overview"
+import { TIMESCALEH, TIMENAVIGATIONH } from "../../definitions/style"
 
 // if (window.customElements.get('tradex-overview') !== undefined)
 customElements.get('tradex-overview') || window.customElements.define('tradex-overview', tradeXOverview)
@@ -13,7 +14,10 @@ template.innerHTML = `
 <style>
   .viewport {
     width: 100%;
-    height: 50%;
+    height: ${TIMESCALEH}px;
+  }
+  tradex-overview {
+    height: ${TIMENAVIGATIONH}px;
   }
 </style>
 <div class="viewport"></div>

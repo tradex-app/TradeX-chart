@@ -216,9 +216,4 @@ export default class xAxis extends Axis {
     }
   }
 
-  gradsWorker() {
-    
-  }
-
-
 }

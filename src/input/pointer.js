@@ -128,6 +128,7 @@ export default class PointerAgent {
   }
 
   logit(e) {
+    return
     let o = `pointer: ${e.pointerType}, event: ${e.type}, `
     if ("deltaX" in e) o += `deltaX: ${e.deltaX}, `
     if ("deltaY" in e) o += `deltaY: ${e.deltaY}, `

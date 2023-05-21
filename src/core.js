@@ -1,7 +1,7 @@
 // core.js
 // it all begins here...
 
-// import * as talib from "talib-web"
+import * as packageJSON from '../package.json'
 import { isArray, isBoolean, isFunction, isNumber, isObject, isString, isError, isPromise } from './utils/typeChecks'
 import DOM from './utils/DOM'
 import * as Time from './utils/time'
@@ -45,6 +45,7 @@ import { precision } from "./utils/number"
  */
 export default class TradeXchart extends Tradex_chart {
 
+  static #version = packageJSON.version
   static #cnt = 0
   static #cfg = {}
   static #instances = {}
@@ -52,6 +53,7 @@ export default class TradeXchart extends Tradex_chart {
   static #talibReady = false
   static #talibAwait = []
   static #talibError = null
+  static get version() { return TradeXchart.#version }
   static get talibPromise() { return TradeXchart.#talibPromise }
   static get talibReady() { return TradeXchart.#talibReady }
   static get talibAwait() { return TradeXchart.#talibAwait }
@@ -428,7 +430,7 @@ export default class TradeXchart extends Tradex_chart {
 
     this.setTheme(this.#themeTemp.ID)
 
-    this.log(`${this.#name} instantiated`)
+    this.log(`${this.#name} V${TradeXchart.version} instantiated`)
     this.log("...processing state")
 
     this.#scrollPos = this.bufferPx * -1

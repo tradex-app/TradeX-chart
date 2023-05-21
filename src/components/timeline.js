@@ -14,6 +14,7 @@ import Graph from "./views/classes/graph"
 import TimeLabels from "./overlays/time-labels"
 import TimeOverlays from "./overlays/time-overlays"
 import TimeCursor from "./overlays/time-cursor"
+import { isBoolean } from "../utils/typeChecks"
 
 const defaultOverlays = [
   ["labels", {class: TimeLabels, fixed: false, required: true}],
@@ -136,6 +137,8 @@ export default class Timeline {
       callback: null
     }
     this.#slider = new Slider(sliderCfg)
+    if ( this.#core.theme?.time?.navigation === false )
+      this.navigationDisplay(false)
   }
 
   setWidth(w) {
@@ -153,6 +156,11 @@ export default class Timeline {
 
     // this.setWidth(dim.w)
     this.draw()
+  }
+
+  navigationDisplay(visible) {
+    if (!isBoolean(visible)) return
+    this.#elNavigation.style = "display: none;"
   }
 
   start() {

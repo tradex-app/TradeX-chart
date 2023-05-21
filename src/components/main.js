@@ -31,6 +31,7 @@ import {
 
 import {
   STYLE_ROW,
+  TIMESCALEH
 } from "../definitions/style"
 
 const defaultOverlays = [
@@ -184,6 +185,12 @@ export default class MainPane {
           elScale: this.#elScale
         }
       }
+
+    if ( this.#core.theme?.time?.navigation === false ) {
+      const timeHeight = { height: TIMESCALEH }
+      this.#core.theme.time = {...this.#core.theme?.time, ...timeHeight}
+      this.#elRows.style.height = `calc(100% - ${TIMESCALEH}px)`
+    }
 
     // register timeline - xAxis
     this.#Time = new Timeline(this.#core, options)

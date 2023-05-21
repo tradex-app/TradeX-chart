@@ -1,3 +1,20 @@
+function _mergeNamespaces(n, m) {
+  m.forEach(function (e) {
+    e && typeof e !== 'string' && !Array.isArray(e) && Object.keys(e).forEach(function (k) {
+      if (k !== 'default' && !(k in n)) {
+        var d = Object.getOwnPropertyDescriptor(e, k);
+        Object.defineProperty(n, k, d.get ? d : {
+          enumerable: true,
+          get: function () { return e[k]; }
+        });
+      }
+    });
+  });
+  return Object.freeze(Object.defineProperty(n, Symbol.toStringTag, { value: 'Module' }));
+}
+
+const version = "0.121.8";
+
 function isArray (v) {
   return Array.isArray(v)
 }
@@ -1824,78 +1841,2644 @@ const status = {
   dragging: 2
 };
 class Point {
-  x = 0;
-  y = 0;
+  #x = 0;
+  #y = 0;
   constructor() {
     if (arguments.length === 1) {
       const { x, y } = arguments[0];
-      this.x = x;
-      this.y = y;
-    } else if (arguments.length > 1) {
+      this.x = x || 0;
+      this.y = y || 0;
+    }
+    else if (arguments.length > 1) {
       const [x, y] = arguments;
-      this.x = x;
-      this.y = y;
+      this.x = x || 0;
+      this.y = y || 0;
     }
   }
+  set x(x) { if (isNumber(x)) this.#x = x; }
+  get x() { return this.#x }
+  set y(y) { if (isNumber(y)) this.#y = y; }
+  get y() { return this.#y }
   clone() {
     return new Point(this.x, this.y);
   }
 }
 
-const keyboard = [
-  "keypress",
-  "keydown",
-  "keyup"
-];
-const pointer = [
-  "pointerdown",
-  "pointerup",
-  "pointerover", "pointerenter",
-  "pointerout", "pointerleave",
-  "pointermove",
-  "pointercancel",
-  "gotpointercapture",
-  "lostpointercapture",
-  "dblclick",
-  "click",
-  "wheel",
-  "contextmenu"
-];
-const mouse = [
-  "mousedown",
-  "mouseenter",
-  "mouseleave",
-  "mousemove",
-  "mouseout",
-  "mouseover",
-  "mouseup",
-  "mousewheel",
-];
-const touch = [
-  "touchcancel",
-  "touchend",
-  "touchmove",
-  "touchstart"
-];
-const pen = [
-];
-const misc = [
-];
-const custom = [
-  "pointerdrag",
-  "pointerdragend"
-];
-class EventsAgent {
-  constructor (input) {
-    this.input = input;
-    this.element = input.element;
-    if (window.PointerEvent) {
-      this.type = [...keyboard, ...pointer, ...mouse, ...touch, ...pen, ...misc, ...custom];
-    } else {
-      this.type = [...keyboard, ...mouse, ...touch, ...pen, ...misc, ...custom];
+var hammer$1 = {exports: {}};
+
+/*! Hammer.JS - v2.0.7 - 2016-04-22
+ * http://hammerjs.github.io/
+ *
+ * Copyright (c) 2016 Jorik Tangelder;
+ * Licensed under the MIT license */
+(function (module) {
+(function(window, document, exportName, undefined$1) {
+var VENDOR_PREFIXES = ['', 'webkit', 'Moz', 'MS', 'ms', 'o'];
+var TEST_ELEMENT = document.createElement('div');
+var TYPE_FUNCTION = 'function';
+var round = Math.round;
+var abs = Math.abs;
+var now = Date.now;
+function setTimeoutContext(fn, timeout, context) {
+    return setTimeout(bindFn(fn, context), timeout);
+}
+function invokeArrayArg(arg, fn, context) {
+    if (Array.isArray(arg)) {
+        each(arg, context[fn], context);
+        return true;
     }
+    return false;
+}
+function each(obj, iterator, context) {
+    var i;
+    if (!obj) {
+        return;
+    }
+    if (obj.forEach) {
+        obj.forEach(iterator, context);
+    } else if (obj.length !== undefined$1) {
+        i = 0;
+        while (i < obj.length) {
+            iterator.call(context, obj[i], i, obj);
+            i++;
+        }
+    } else {
+        for (i in obj) {
+            obj.hasOwnProperty(i) && iterator.call(context, obj[i], i, obj);
+        }
+    }
+}
+function deprecate(method, name, message) {
+    var deprecationMessage = 'DEPRECATED METHOD: ' + name + '\n' + message + ' AT \n';
+    return function() {
+        var e = new Error('get-stack-trace');
+        var stack = e && e.stack ? e.stack.replace(/^[^\(]+?[\n$]/gm, '')
+            .replace(/^\s+at\s+/gm, '')
+            .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@') : 'Unknown Stack Trace';
+        var log = window.console && (window.console.warn || window.console.log);
+        if (log) {
+            log.call(window.console, deprecationMessage, stack);
+        }
+        return method.apply(this, arguments);
+    };
+}
+var assign;
+if (typeof Object.assign !== 'function') {
+    assign = function assign(target) {
+        if (target === undefined$1 || target === null) {
+            throw new TypeError('Cannot convert undefined or null to object');
+        }
+        var output = Object(target);
+        for (var index = 1; index < arguments.length; index++) {
+            var source = arguments[index];
+            if (source !== undefined$1 && source !== null) {
+                for (var nextKey in source) {
+                    if (source.hasOwnProperty(nextKey)) {
+                        output[nextKey] = source[nextKey];
+                    }
+                }
+            }
+        }
+        return output;
+    };
+} else {
+    assign = Object.assign;
+}
+var extend = deprecate(function extend(dest, src, merge) {
+    var keys = Object.keys(src);
+    var i = 0;
+    while (i < keys.length) {
+        if (!merge || (merge && dest[keys[i]] === undefined$1)) {
+            dest[keys[i]] = src[keys[i]];
+        }
+        i++;
+    }
+    return dest;
+}, 'extend', 'Use `assign`.');
+var merge = deprecate(function merge(dest, src) {
+    return extend(dest, src, true);
+}, 'merge', 'Use `assign`.');
+function inherit(child, base, properties) {
+    var baseP = base.prototype,
+        childP;
+    childP = child.prototype = Object.create(baseP);
+    childP.constructor = child;
+    childP._super = baseP;
+    if (properties) {
+        assign(childP, properties);
+    }
+}
+function bindFn(fn, context) {
+    return function boundFn() {
+        return fn.apply(context, arguments);
+    };
+}
+function boolOrFn(val, args) {
+    if (typeof val == TYPE_FUNCTION) {
+        return val.apply(args ? args[0] || undefined$1 : undefined$1, args);
+    }
+    return val;
+}
+function ifUndefined(val1, val2) {
+    return (val1 === undefined$1) ? val2 : val1;
+}
+function addEventListeners(target, types, handler) {
+    each(splitStr(types), function(type) {
+        target.addEventListener(type, handler, false);
+    });
+}
+function removeEventListeners(target, types, handler) {
+    each(splitStr(types), function(type) {
+        target.removeEventListener(type, handler, false);
+    });
+}
+function hasParent(node, parent) {
+    while (node) {
+        if (node == parent) {
+            return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
+}
+function inStr(str, find) {
+    return str.indexOf(find) > -1;
+}
+function splitStr(str) {
+    return str.trim().split(/\s+/g);
+}
+function inArray(src, find, findByKey) {
+    if (src.indexOf && !findByKey) {
+        return src.indexOf(find);
+    } else {
+        var i = 0;
+        while (i < src.length) {
+            if ((findByKey && src[i][findByKey] == find) || (!findByKey && src[i] === find)) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
+    }
+}
+function toArray(obj) {
+    return Array.prototype.slice.call(obj, 0);
+}
+function uniqueArray(src, key, sort) {
+    var results = [];
+    var values = [];
+    var i = 0;
+    while (i < src.length) {
+        var val = key ? src[i][key] : src[i];
+        if (inArray(values, val) < 0) {
+            results.push(src[i]);
+        }
+        values[i] = val;
+        i++;
+    }
+    if (sort) {
+        if (!key) {
+            results = results.sort();
+        } else {
+            results = results.sort(function sortUniqueArray(a, b) {
+                return a[key] > b[key];
+            });
+        }
+    }
+    return results;
+}
+function prefixed(obj, property) {
+    var prefix, prop;
+    var camelProp = property[0].toUpperCase() + property.slice(1);
+    var i = 0;
+    while (i < VENDOR_PREFIXES.length) {
+        prefix = VENDOR_PREFIXES[i];
+        prop = (prefix) ? prefix + camelProp : property;
+        if (prop in obj) {
+            return prop;
+        }
+        i++;
+    }
+    return undefined$1;
+}
+var _uniqueId = 1;
+function uniqueId() {
+    return _uniqueId++;
+}
+function getWindowForElement(element) {
+    var doc = element.ownerDocument || element;
+    return (doc.defaultView || doc.parentWindow || window);
+}
+var MOBILE_REGEX = /mobile|tablet|ip(ad|hone|od)|android/i;
+var SUPPORT_TOUCH = ('ontouchstart' in window);
+var SUPPORT_POINTER_EVENTS = prefixed(window, 'PointerEvent') !== undefined$1;
+var SUPPORT_ONLY_TOUCH = SUPPORT_TOUCH && MOBILE_REGEX.test(navigator.userAgent);
+var INPUT_TYPE_TOUCH = 'touch';
+var INPUT_TYPE_PEN = 'pen';
+var INPUT_TYPE_MOUSE = 'mouse';
+var INPUT_TYPE_KINECT = 'kinect';
+var COMPUTE_INTERVAL = 25;
+var INPUT_START = 1;
+var INPUT_MOVE = 2;
+var INPUT_END = 4;
+var INPUT_CANCEL = 8;
+var DIRECTION_NONE = 1;
+var DIRECTION_LEFT = 2;
+var DIRECTION_RIGHT = 4;
+var DIRECTION_UP = 8;
+var DIRECTION_DOWN = 16;
+var DIRECTION_HORIZONTAL = DIRECTION_LEFT | DIRECTION_RIGHT;
+var DIRECTION_VERTICAL = DIRECTION_UP | DIRECTION_DOWN;
+var DIRECTION_ALL = DIRECTION_HORIZONTAL | DIRECTION_VERTICAL;
+var PROPS_XY = ['x', 'y'];
+var PROPS_CLIENT_XY = ['clientX', 'clientY'];
+function Input(manager, callback) {
+    var self = this;
+    this.manager = manager;
+    this.callback = callback;
+    this.element = manager.element;
+    this.target = manager.options.inputTarget;
+    this.domHandler = function(ev) {
+        if (boolOrFn(manager.options.enable, [manager])) {
+            self.handler(ev);
+        }
+    };
+    this.init();
+}
+Input.prototype = {
+    handler: function() { },
+    init: function() {
+        this.evEl && addEventListeners(this.element, this.evEl, this.domHandler);
+        this.evTarget && addEventListeners(this.target, this.evTarget, this.domHandler);
+        this.evWin && addEventListeners(getWindowForElement(this.element), this.evWin, this.domHandler);
+    },
+    destroy: function() {
+        this.evEl && removeEventListeners(this.element, this.evEl, this.domHandler);
+        this.evTarget && removeEventListeners(this.target, this.evTarget, this.domHandler);
+        this.evWin && removeEventListeners(getWindowForElement(this.element), this.evWin, this.domHandler);
+    }
+};
+function createInputInstance(manager) {
+    var Type;
+    var inputClass = manager.options.inputClass;
+    if (inputClass) {
+        Type = inputClass;
+    } else if (SUPPORT_POINTER_EVENTS) {
+        Type = PointerEventInput;
+    } else if (SUPPORT_ONLY_TOUCH) {
+        Type = TouchInput;
+    } else if (!SUPPORT_TOUCH) {
+        Type = MouseInput;
+    } else {
+        Type = TouchMouseInput;
+    }
+    return new (Type)(manager, inputHandler);
+}
+function inputHandler(manager, eventType, input) {
+    var pointersLen = input.pointers.length;
+    var changedPointersLen = input.changedPointers.length;
+    var isFirst = (eventType & INPUT_START && (pointersLen - changedPointersLen === 0));
+    var isFinal = (eventType & (INPUT_END | INPUT_CANCEL) && (pointersLen - changedPointersLen === 0));
+    input.isFirst = !!isFirst;
+    input.isFinal = !!isFinal;
+    if (isFirst) {
+        manager.session = {};
+    }
+    input.eventType = eventType;
+    computeInputData(manager, input);
+    manager.emit('hammer.input', input);
+    manager.recognize(input);
+    manager.session.prevInput = input;
+}
+function computeInputData(manager, input) {
+    var session = manager.session;
+    var pointers = input.pointers;
+    var pointersLength = pointers.length;
+    if (!session.firstInput) {
+        session.firstInput = simpleCloneInputData(input);
+    }
+    if (pointersLength > 1 && !session.firstMultiple) {
+        session.firstMultiple = simpleCloneInputData(input);
+    } else if (pointersLength === 1) {
+        session.firstMultiple = false;
+    }
+    var firstInput = session.firstInput;
+    var firstMultiple = session.firstMultiple;
+    var offsetCenter = firstMultiple ? firstMultiple.center : firstInput.center;
+    var center = input.center = getCenter(pointers);
+    input.timeStamp = now();
+    input.deltaTime = input.timeStamp - firstInput.timeStamp;
+    input.angle = getAngle(offsetCenter, center);
+    input.distance = getDistance(offsetCenter, center);
+    computeDeltaXY(session, input);
+    input.offsetDirection = getDirection(input.deltaX, input.deltaY);
+    var overallVelocity = getVelocity(input.deltaTime, input.deltaX, input.deltaY);
+    input.overallVelocityX = overallVelocity.x;
+    input.overallVelocityY = overallVelocity.y;
+    input.overallVelocity = (abs(overallVelocity.x) > abs(overallVelocity.y)) ? overallVelocity.x : overallVelocity.y;
+    input.scale = firstMultiple ? getScale(firstMultiple.pointers, pointers) : 1;
+    input.rotation = firstMultiple ? getRotation(firstMultiple.pointers, pointers) : 0;
+    input.maxPointers = !session.prevInput ? input.pointers.length : ((input.pointers.length >
+        session.prevInput.maxPointers) ? input.pointers.length : session.prevInput.maxPointers);
+    computeIntervalInputData(session, input);
+    var target = manager.element;
+    if (hasParent(input.srcEvent.target, target)) {
+        target = input.srcEvent.target;
+    }
+    input.target = target;
+}
+function computeDeltaXY(session, input) {
+    var center = input.center;
+    var offset = session.offsetDelta || {};
+    var prevDelta = session.prevDelta || {};
+    var prevInput = session.prevInput || {};
+    if (input.eventType === INPUT_START || prevInput.eventType === INPUT_END) {
+        prevDelta = session.prevDelta = {
+            x: prevInput.deltaX || 0,
+            y: prevInput.deltaY || 0
+        };
+        offset = session.offsetDelta = {
+            x: center.x,
+            y: center.y
+        };
+    }
+    input.deltaX = prevDelta.x + (center.x - offset.x);
+    input.deltaY = prevDelta.y + (center.y - offset.y);
+}
+function computeIntervalInputData(session, input) {
+    var last = session.lastInterval || input,
+        deltaTime = input.timeStamp - last.timeStamp,
+        velocity, velocityX, velocityY, direction;
+    if (input.eventType != INPUT_CANCEL && (deltaTime > COMPUTE_INTERVAL || last.velocity === undefined$1)) {
+        var deltaX = input.deltaX - last.deltaX;
+        var deltaY = input.deltaY - last.deltaY;
+        var v = getVelocity(deltaTime, deltaX, deltaY);
+        velocityX = v.x;
+        velocityY = v.y;
+        velocity = (abs(v.x) > abs(v.y)) ? v.x : v.y;
+        direction = getDirection(deltaX, deltaY);
+        session.lastInterval = input;
+    } else {
+        velocity = last.velocity;
+        velocityX = last.velocityX;
+        velocityY = last.velocityY;
+        direction = last.direction;
+    }
+    input.velocity = velocity;
+    input.velocityX = velocityX;
+    input.velocityY = velocityY;
+    input.direction = direction;
+}
+function simpleCloneInputData(input) {
+    var pointers = [];
+    var i = 0;
+    while (i < input.pointers.length) {
+        pointers[i] = {
+            clientX: round(input.pointers[i].clientX),
+            clientY: round(input.pointers[i].clientY)
+        };
+        i++;
+    }
+    return {
+        timeStamp: now(),
+        pointers: pointers,
+        center: getCenter(pointers),
+        deltaX: input.deltaX,
+        deltaY: input.deltaY
+    };
+}
+function getCenter(pointers) {
+    var pointersLength = pointers.length;
+    if (pointersLength === 1) {
+        return {
+            x: round(pointers[0].clientX),
+            y: round(pointers[0].clientY)
+        };
+    }
+    var x = 0, y = 0, i = 0;
+    while (i < pointersLength) {
+        x += pointers[i].clientX;
+        y += pointers[i].clientY;
+        i++;
+    }
+    return {
+        x: round(x / pointersLength),
+        y: round(y / pointersLength)
+    };
+}
+function getVelocity(deltaTime, x, y) {
+    return {
+        x: x / deltaTime || 0,
+        y: y / deltaTime || 0
+    };
+}
+function getDirection(x, y) {
+    if (x === y) {
+        return DIRECTION_NONE;
+    }
+    if (abs(x) >= abs(y)) {
+        return x < 0 ? DIRECTION_LEFT : DIRECTION_RIGHT;
+    }
+    return y < 0 ? DIRECTION_UP : DIRECTION_DOWN;
+}
+function getDistance(p1, p2, props) {
+    if (!props) {
+        props = PROPS_XY;
+    }
+    var x = p2[props[0]] - p1[props[0]],
+        y = p2[props[1]] - p1[props[1]];
+    return Math.sqrt((x * x) + (y * y));
+}
+function getAngle(p1, p2, props) {
+    if (!props) {
+        props = PROPS_XY;
+    }
+    var x = p2[props[0]] - p1[props[0]],
+        y = p2[props[1]] - p1[props[1]];
+    return Math.atan2(y, x) * 180 / Math.PI;
+}
+function getRotation(start, end) {
+    return getAngle(end[1], end[0], PROPS_CLIENT_XY) + getAngle(start[1], start[0], PROPS_CLIENT_XY);
+}
+function getScale(start, end) {
+    return getDistance(end[0], end[1], PROPS_CLIENT_XY) / getDistance(start[0], start[1], PROPS_CLIENT_XY);
+}
+var MOUSE_INPUT_MAP = {
+    mousedown: INPUT_START,
+    mousemove: INPUT_MOVE,
+    mouseup: INPUT_END
+};
+var MOUSE_ELEMENT_EVENTS = 'mousedown';
+var MOUSE_WINDOW_EVENTS = 'mousemove mouseup';
+function MouseInput() {
+    this.evEl = MOUSE_ELEMENT_EVENTS;
+    this.evWin = MOUSE_WINDOW_EVENTS;
+    this.pressed = false;
+    Input.apply(this, arguments);
+}
+inherit(MouseInput, Input, {
+    handler: function MEhandler(ev) {
+        var eventType = MOUSE_INPUT_MAP[ev.type];
+        if (eventType & INPUT_START && ev.button === 0) {
+            this.pressed = true;
+        }
+        if (eventType & INPUT_MOVE && ev.which !== 1) {
+            eventType = INPUT_END;
+        }
+        if (!this.pressed) {
+            return;
+        }
+        if (eventType & INPUT_END) {
+            this.pressed = false;
+        }
+        this.callback(this.manager, eventType, {
+            pointers: [ev],
+            changedPointers: [ev],
+            pointerType: INPUT_TYPE_MOUSE,
+            srcEvent: ev
+        });
+    }
+});
+var POINTER_INPUT_MAP = {
+    pointerdown: INPUT_START,
+    pointermove: INPUT_MOVE,
+    pointerup: INPUT_END,
+    pointercancel: INPUT_CANCEL,
+    pointerout: INPUT_CANCEL
+};
+var IE10_POINTER_TYPE_ENUM = {
+    2: INPUT_TYPE_TOUCH,
+    3: INPUT_TYPE_PEN,
+    4: INPUT_TYPE_MOUSE,
+    5: INPUT_TYPE_KINECT
+};
+var POINTER_ELEMENT_EVENTS = 'pointerdown';
+var POINTER_WINDOW_EVENTS = 'pointermove pointerup pointercancel';
+if (window.MSPointerEvent && !window.PointerEvent) {
+    POINTER_ELEMENT_EVENTS = 'MSPointerDown';
+    POINTER_WINDOW_EVENTS = 'MSPointerMove MSPointerUp MSPointerCancel';
+}
+function PointerEventInput() {
+    this.evEl = POINTER_ELEMENT_EVENTS;
+    this.evWin = POINTER_WINDOW_EVENTS;
+    Input.apply(this, arguments);
+    this.store = (this.manager.session.pointerEvents = []);
+}
+inherit(PointerEventInput, Input, {
+    handler: function PEhandler(ev) {
+        var store = this.store;
+        var removePointer = false;
+        var eventTypeNormalized = ev.type.toLowerCase().replace('ms', '');
+        var eventType = POINTER_INPUT_MAP[eventTypeNormalized];
+        var pointerType = IE10_POINTER_TYPE_ENUM[ev.pointerType] || ev.pointerType;
+        var isTouch = (pointerType == INPUT_TYPE_TOUCH);
+        var storeIndex = inArray(store, ev.pointerId, 'pointerId');
+        if (eventType & INPUT_START && (ev.button === 0 || isTouch)) {
+            if (storeIndex < 0) {
+                store.push(ev);
+                storeIndex = store.length - 1;
+            }
+        } else if (eventType & (INPUT_END | INPUT_CANCEL)) {
+            removePointer = true;
+        }
+        if (storeIndex < 0) {
+            return;
+        }
+        store[storeIndex] = ev;
+        this.callback(this.manager, eventType, {
+            pointers: store,
+            changedPointers: [ev],
+            pointerType: pointerType,
+            srcEvent: ev
+        });
+        if (removePointer) {
+            store.splice(storeIndex, 1);
+        }
+    }
+});
+var SINGLE_TOUCH_INPUT_MAP = {
+    touchstart: INPUT_START,
+    touchmove: INPUT_MOVE,
+    touchend: INPUT_END,
+    touchcancel: INPUT_CANCEL
+};
+var SINGLE_TOUCH_TARGET_EVENTS = 'touchstart';
+var SINGLE_TOUCH_WINDOW_EVENTS = 'touchstart touchmove touchend touchcancel';
+function SingleTouchInput() {
+    this.evTarget = SINGLE_TOUCH_TARGET_EVENTS;
+    this.evWin = SINGLE_TOUCH_WINDOW_EVENTS;
+    this.started = false;
+    Input.apply(this, arguments);
+}
+inherit(SingleTouchInput, Input, {
+    handler: function TEhandler(ev) {
+        var type = SINGLE_TOUCH_INPUT_MAP[ev.type];
+        if (type === INPUT_START) {
+            this.started = true;
+        }
+        if (!this.started) {
+            return;
+        }
+        var touches = normalizeSingleTouches.call(this, ev, type);
+        if (type & (INPUT_END | INPUT_CANCEL) && touches[0].length - touches[1].length === 0) {
+            this.started = false;
+        }
+        this.callback(this.manager, type, {
+            pointers: touches[0],
+            changedPointers: touches[1],
+            pointerType: INPUT_TYPE_TOUCH,
+            srcEvent: ev
+        });
+    }
+});
+function normalizeSingleTouches(ev, type) {
+    var all = toArray(ev.touches);
+    var changed = toArray(ev.changedTouches);
+    if (type & (INPUT_END | INPUT_CANCEL)) {
+        all = uniqueArray(all.concat(changed), 'identifier', true);
+    }
+    return [all, changed];
+}
+var TOUCH_INPUT_MAP = {
+    touchstart: INPUT_START,
+    touchmove: INPUT_MOVE,
+    touchend: INPUT_END,
+    touchcancel: INPUT_CANCEL
+};
+var TOUCH_TARGET_EVENTS = 'touchstart touchmove touchend touchcancel';
+function TouchInput() {
+    this.evTarget = TOUCH_TARGET_EVENTS;
+    this.targetIds = {};
+    Input.apply(this, arguments);
+}
+inherit(TouchInput, Input, {
+    handler: function MTEhandler(ev) {
+        var type = TOUCH_INPUT_MAP[ev.type];
+        var touches = getTouches.call(this, ev, type);
+        if (!touches) {
+            return;
+        }
+        this.callback(this.manager, type, {
+            pointers: touches[0],
+            changedPointers: touches[1],
+            pointerType: INPUT_TYPE_TOUCH,
+            srcEvent: ev
+        });
+    }
+});
+function getTouches(ev, type) {
+    var allTouches = toArray(ev.touches);
+    var targetIds = this.targetIds;
+    if (type & (INPUT_START | INPUT_MOVE) && allTouches.length === 1) {
+        targetIds[allTouches[0].identifier] = true;
+        return [allTouches, allTouches];
+    }
+    var i,
+        targetTouches,
+        changedTouches = toArray(ev.changedTouches),
+        changedTargetTouches = [],
+        target = this.target;
+    targetTouches = allTouches.filter(function(touch) {
+        return hasParent(touch.target, target);
+    });
+    if (type === INPUT_START) {
+        i = 0;
+        while (i < targetTouches.length) {
+            targetIds[targetTouches[i].identifier] = true;
+            i++;
+        }
+    }
+    i = 0;
+    while (i < changedTouches.length) {
+        if (targetIds[changedTouches[i].identifier]) {
+            changedTargetTouches.push(changedTouches[i]);
+        }
+        if (type & (INPUT_END | INPUT_CANCEL)) {
+            delete targetIds[changedTouches[i].identifier];
+        }
+        i++;
+    }
+    if (!changedTargetTouches.length) {
+        return;
+    }
+    return [
+        uniqueArray(targetTouches.concat(changedTargetTouches), 'identifier', true),
+        changedTargetTouches
+    ];
+}
+var DEDUP_TIMEOUT = 2500;
+var DEDUP_DISTANCE = 25;
+function TouchMouseInput() {
+    Input.apply(this, arguments);
+    var handler = bindFn(this.handler, this);
+    this.touch = new TouchInput(this.manager, handler);
+    this.mouse = new MouseInput(this.manager, handler);
+    this.primaryTouch = null;
+    this.lastTouches = [];
+}
+inherit(TouchMouseInput, Input, {
+    handler: function TMEhandler(manager, inputEvent, inputData) {
+        var isTouch = (inputData.pointerType == INPUT_TYPE_TOUCH),
+            isMouse = (inputData.pointerType == INPUT_TYPE_MOUSE);
+        if (isMouse && inputData.sourceCapabilities && inputData.sourceCapabilities.firesTouchEvents) {
+            return;
+        }
+        if (isTouch) {
+            recordTouches.call(this, inputEvent, inputData);
+        } else if (isMouse && isSyntheticEvent.call(this, inputData)) {
+            return;
+        }
+        this.callback(manager, inputEvent, inputData);
+    },
+    destroy: function destroy() {
+        this.touch.destroy();
+        this.mouse.destroy();
+    }
+});
+function recordTouches(eventType, eventData) {
+    if (eventType & INPUT_START) {
+        this.primaryTouch = eventData.changedPointers[0].identifier;
+        setLastTouch.call(this, eventData);
+    } else if (eventType & (INPUT_END | INPUT_CANCEL)) {
+        setLastTouch.call(this, eventData);
+    }
+}
+function setLastTouch(eventData) {
+    var touch = eventData.changedPointers[0];
+    if (touch.identifier === this.primaryTouch) {
+        var lastTouch = {x: touch.clientX, y: touch.clientY};
+        this.lastTouches.push(lastTouch);
+        var lts = this.lastTouches;
+        var removeLastTouch = function() {
+            var i = lts.indexOf(lastTouch);
+            if (i > -1) {
+                lts.splice(i, 1);
+            }
+        };
+        setTimeout(removeLastTouch, DEDUP_TIMEOUT);
+    }
+}
+function isSyntheticEvent(eventData) {
+    var x = eventData.srcEvent.clientX, y = eventData.srcEvent.clientY;
+    for (var i = 0; i < this.lastTouches.length; i++) {
+        var t = this.lastTouches[i];
+        var dx = Math.abs(x - t.x), dy = Math.abs(y - t.y);
+        if (dx <= DEDUP_DISTANCE && dy <= DEDUP_DISTANCE) {
+            return true;
+        }
+    }
+    return false;
+}
+var PREFIXED_TOUCH_ACTION = prefixed(TEST_ELEMENT.style, 'touchAction');
+var NATIVE_TOUCH_ACTION = PREFIXED_TOUCH_ACTION !== undefined$1;
+var TOUCH_ACTION_COMPUTE = 'compute';
+var TOUCH_ACTION_AUTO = 'auto';
+var TOUCH_ACTION_MANIPULATION = 'manipulation';
+var TOUCH_ACTION_NONE = 'none';
+var TOUCH_ACTION_PAN_X = 'pan-x';
+var TOUCH_ACTION_PAN_Y = 'pan-y';
+var TOUCH_ACTION_MAP = getTouchActionProps();
+function TouchAction(manager, value) {
+    this.manager = manager;
+    this.set(value);
+}
+TouchAction.prototype = {
+    set: function(value) {
+        if (value == TOUCH_ACTION_COMPUTE) {
+            value = this.compute();
+        }
+        if (NATIVE_TOUCH_ACTION && this.manager.element.style && TOUCH_ACTION_MAP[value]) {
+            this.manager.element.style[PREFIXED_TOUCH_ACTION] = value;
+        }
+        this.actions = value.toLowerCase().trim();
+    },
+    update: function() {
+        this.set(this.manager.options.touchAction);
+    },
+    compute: function() {
+        var actions = [];
+        each(this.manager.recognizers, function(recognizer) {
+            if (boolOrFn(recognizer.options.enable, [recognizer])) {
+                actions = actions.concat(recognizer.getTouchAction());
+            }
+        });
+        return cleanTouchActions(actions.join(' '));
+    },
+    preventDefaults: function(input) {
+        var srcEvent = input.srcEvent;
+        var direction = input.offsetDirection;
+        if (this.manager.session.prevented) {
+            srcEvent.preventDefault();
+            return;
+        }
+        var actions = this.actions;
+        var hasNone = inStr(actions, TOUCH_ACTION_NONE) && !TOUCH_ACTION_MAP[TOUCH_ACTION_NONE];
+        var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y) && !TOUCH_ACTION_MAP[TOUCH_ACTION_PAN_Y];
+        var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X) && !TOUCH_ACTION_MAP[TOUCH_ACTION_PAN_X];
+        if (hasNone) {
+            var isTapPointer = input.pointers.length === 1;
+            var isTapMovement = input.distance < 2;
+            var isTapTouchTime = input.deltaTime < 250;
+            if (isTapPointer && isTapMovement && isTapTouchTime) {
+                return;
+            }
+        }
+        if (hasPanX && hasPanY) {
+            return;
+        }
+        if (hasNone ||
+            (hasPanY && direction & DIRECTION_HORIZONTAL) ||
+            (hasPanX && direction & DIRECTION_VERTICAL)) {
+            return this.preventSrc(srcEvent);
+        }
+    },
+    preventSrc: function(srcEvent) {
+        this.manager.session.prevented = true;
+        srcEvent.preventDefault();
+    }
+};
+function cleanTouchActions(actions) {
+    if (inStr(actions, TOUCH_ACTION_NONE)) {
+        return TOUCH_ACTION_NONE;
+    }
+    var hasPanX = inStr(actions, TOUCH_ACTION_PAN_X);
+    var hasPanY = inStr(actions, TOUCH_ACTION_PAN_Y);
+    if (hasPanX && hasPanY) {
+        return TOUCH_ACTION_NONE;
+    }
+    if (hasPanX || hasPanY) {
+        return hasPanX ? TOUCH_ACTION_PAN_X : TOUCH_ACTION_PAN_Y;
+    }
+    if (inStr(actions, TOUCH_ACTION_MANIPULATION)) {
+        return TOUCH_ACTION_MANIPULATION;
+    }
+    return TOUCH_ACTION_AUTO;
+}
+function getTouchActionProps() {
+    if (!NATIVE_TOUCH_ACTION) {
+        return false;
+    }
+    var touchMap = {};
+    var cssSupports = window.CSS && window.CSS.supports;
+    ['auto', 'manipulation', 'pan-y', 'pan-x', 'pan-x pan-y', 'none'].forEach(function(val) {
+        touchMap[val] = cssSupports ? window.CSS.supports('touch-action', val) : true;
+    });
+    return touchMap;
+}
+var STATE_POSSIBLE = 1;
+var STATE_BEGAN = 2;
+var STATE_CHANGED = 4;
+var STATE_ENDED = 8;
+var STATE_RECOGNIZED = STATE_ENDED;
+var STATE_CANCELLED = 16;
+var STATE_FAILED = 32;
+function Recognizer(options) {
+    this.options = assign({}, this.defaults, options || {});
+    this.id = uniqueId();
+    this.manager = null;
+    this.options.enable = ifUndefined(this.options.enable, true);
+    this.state = STATE_POSSIBLE;
+    this.simultaneous = {};
+    this.requireFail = [];
+}
+Recognizer.prototype = {
+    defaults: {},
+    set: function(options) {
+        assign(this.options, options);
+        this.manager && this.manager.touchAction.update();
+        return this;
+    },
+    recognizeWith: function(otherRecognizer) {
+        if (invokeArrayArg(otherRecognizer, 'recognizeWith', this)) {
+            return this;
+        }
+        var simultaneous = this.simultaneous;
+        otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
+        if (!simultaneous[otherRecognizer.id]) {
+            simultaneous[otherRecognizer.id] = otherRecognizer;
+            otherRecognizer.recognizeWith(this);
+        }
+        return this;
+    },
+    dropRecognizeWith: function(otherRecognizer) {
+        if (invokeArrayArg(otherRecognizer, 'dropRecognizeWith', this)) {
+            return this;
+        }
+        otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
+        delete this.simultaneous[otherRecognizer.id];
+        return this;
+    },
+    requireFailure: function(otherRecognizer) {
+        if (invokeArrayArg(otherRecognizer, 'requireFailure', this)) {
+            return this;
+        }
+        var requireFail = this.requireFail;
+        otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
+        if (inArray(requireFail, otherRecognizer) === -1) {
+            requireFail.push(otherRecognizer);
+            otherRecognizer.requireFailure(this);
+        }
+        return this;
+    },
+    dropRequireFailure: function(otherRecognizer) {
+        if (invokeArrayArg(otherRecognizer, 'dropRequireFailure', this)) {
+            return this;
+        }
+        otherRecognizer = getRecognizerByNameIfManager(otherRecognizer, this);
+        var index = inArray(this.requireFail, otherRecognizer);
+        if (index > -1) {
+            this.requireFail.splice(index, 1);
+        }
+        return this;
+    },
+    hasRequireFailures: function() {
+        return this.requireFail.length > 0;
+    },
+    canRecognizeWith: function(otherRecognizer) {
+        return !!this.simultaneous[otherRecognizer.id];
+    },
+    emit: function(input) {
+        var self = this;
+        var state = this.state;
+        function emit(event) {
+            self.manager.emit(event, input);
+        }
+        if (state < STATE_ENDED) {
+            emit(self.options.event + stateStr(state));
+        }
+        emit(self.options.event);
+        if (input.additionalEvent) {
+            emit(input.additionalEvent);
+        }
+        if (state >= STATE_ENDED) {
+            emit(self.options.event + stateStr(state));
+        }
+    },
+    tryEmit: function(input) {
+        if (this.canEmit()) {
+            return this.emit(input);
+        }
+        this.state = STATE_FAILED;
+    },
+    canEmit: function() {
+        var i = 0;
+        while (i < this.requireFail.length) {
+            if (!(this.requireFail[i].state & (STATE_FAILED | STATE_POSSIBLE))) {
+                return false;
+            }
+            i++;
+        }
+        return true;
+    },
+    recognize: function(inputData) {
+        var inputDataClone = assign({}, inputData);
+        if (!boolOrFn(this.options.enable, [this, inputDataClone])) {
+            this.reset();
+            this.state = STATE_FAILED;
+            return;
+        }
+        if (this.state & (STATE_RECOGNIZED | STATE_CANCELLED | STATE_FAILED)) {
+            this.state = STATE_POSSIBLE;
+        }
+        this.state = this.process(inputDataClone);
+        if (this.state & (STATE_BEGAN | STATE_CHANGED | STATE_ENDED | STATE_CANCELLED)) {
+            this.tryEmit(inputDataClone);
+        }
+    },
+    process: function(inputData) { },
+    getTouchAction: function() { },
+    reset: function() { }
+};
+function stateStr(state) {
+    if (state & STATE_CANCELLED) {
+        return 'cancel';
+    } else if (state & STATE_ENDED) {
+        return 'end';
+    } else if (state & STATE_CHANGED) {
+        return 'move';
+    } else if (state & STATE_BEGAN) {
+        return 'start';
+    }
+    return '';
+}
+function directionStr(direction) {
+    if (direction == DIRECTION_DOWN) {
+        return 'down';
+    } else if (direction == DIRECTION_UP) {
+        return 'up';
+    } else if (direction == DIRECTION_LEFT) {
+        return 'left';
+    } else if (direction == DIRECTION_RIGHT) {
+        return 'right';
+    }
+    return '';
+}
+function getRecognizerByNameIfManager(otherRecognizer, recognizer) {
+    var manager = recognizer.manager;
+    if (manager) {
+        return manager.get(otherRecognizer);
+    }
+    return otherRecognizer;
+}
+function AttrRecognizer() {
+    Recognizer.apply(this, arguments);
+}
+inherit(AttrRecognizer, Recognizer, {
+    defaults: {
+        pointers: 1
+    },
+    attrTest: function(input) {
+        var optionPointers = this.options.pointers;
+        return optionPointers === 0 || input.pointers.length === optionPointers;
+    },
+    process: function(input) {
+        var state = this.state;
+        var eventType = input.eventType;
+        var isRecognized = state & (STATE_BEGAN | STATE_CHANGED);
+        var isValid = this.attrTest(input);
+        if (isRecognized && (eventType & INPUT_CANCEL || !isValid)) {
+            return state | STATE_CANCELLED;
+        } else if (isRecognized || isValid) {
+            if (eventType & INPUT_END) {
+                return state | STATE_ENDED;
+            } else if (!(state & STATE_BEGAN)) {
+                return STATE_BEGAN;
+            }
+            return state | STATE_CHANGED;
+        }
+        return STATE_FAILED;
+    }
+});
+function PanRecognizer() {
+    AttrRecognizer.apply(this, arguments);
+    this.pX = null;
+    this.pY = null;
+}
+inherit(PanRecognizer, AttrRecognizer, {
+    defaults: {
+        event: 'pan',
+        threshold: 10,
+        pointers: 1,
+        direction: DIRECTION_ALL
+    },
+    getTouchAction: function() {
+        var direction = this.options.direction;
+        var actions = [];
+        if (direction & DIRECTION_HORIZONTAL) {
+            actions.push(TOUCH_ACTION_PAN_Y);
+        }
+        if (direction & DIRECTION_VERTICAL) {
+            actions.push(TOUCH_ACTION_PAN_X);
+        }
+        return actions;
+    },
+    directionTest: function(input) {
+        var options = this.options;
+        var hasMoved = true;
+        var distance = input.distance;
+        var direction = input.direction;
+        var x = input.deltaX;
+        var y = input.deltaY;
+        if (!(direction & options.direction)) {
+            if (options.direction & DIRECTION_HORIZONTAL) {
+                direction = (x === 0) ? DIRECTION_NONE : (x < 0) ? DIRECTION_LEFT : DIRECTION_RIGHT;
+                hasMoved = x != this.pX;
+                distance = Math.abs(input.deltaX);
+            } else {
+                direction = (y === 0) ? DIRECTION_NONE : (y < 0) ? DIRECTION_UP : DIRECTION_DOWN;
+                hasMoved = y != this.pY;
+                distance = Math.abs(input.deltaY);
+            }
+        }
+        input.direction = direction;
+        return hasMoved && distance > options.threshold && direction & options.direction;
+    },
+    attrTest: function(input) {
+        return AttrRecognizer.prototype.attrTest.call(this, input) &&
+            (this.state & STATE_BEGAN || (!(this.state & STATE_BEGAN) && this.directionTest(input)));
+    },
+    emit: function(input) {
+        this.pX = input.deltaX;
+        this.pY = input.deltaY;
+        var direction = directionStr(input.direction);
+        if (direction) {
+            input.additionalEvent = this.options.event + direction;
+        }
+        this._super.emit.call(this, input);
+    }
+});
+function PinchRecognizer() {
+    AttrRecognizer.apply(this, arguments);
+}
+inherit(PinchRecognizer, AttrRecognizer, {
+    defaults: {
+        event: 'pinch',
+        threshold: 0,
+        pointers: 2
+    },
+    getTouchAction: function() {
+        return [TOUCH_ACTION_NONE];
+    },
+    attrTest: function(input) {
+        return this._super.attrTest.call(this, input) &&
+            (Math.abs(input.scale - 1) > this.options.threshold || this.state & STATE_BEGAN);
+    },
+    emit: function(input) {
+        if (input.scale !== 1) {
+            var inOut = input.scale < 1 ? 'in' : 'out';
+            input.additionalEvent = this.options.event + inOut;
+        }
+        this._super.emit.call(this, input);
+    }
+});
+function PressRecognizer() {
+    Recognizer.apply(this, arguments);
+    this._timer = null;
+    this._input = null;
+}
+inherit(PressRecognizer, Recognizer, {
+    defaults: {
+        event: 'press',
+        pointers: 1,
+        time: 251,
+        threshold: 9
+    },
+    getTouchAction: function() {
+        return [TOUCH_ACTION_AUTO];
+    },
+    process: function(input) {
+        var options = this.options;
+        var validPointers = input.pointers.length === options.pointers;
+        var validMovement = input.distance < options.threshold;
+        var validTime = input.deltaTime > options.time;
+        this._input = input;
+        if (!validMovement || !validPointers || (input.eventType & (INPUT_END | INPUT_CANCEL) && !validTime)) {
+            this.reset();
+        } else if (input.eventType & INPUT_START) {
+            this.reset();
+            this._timer = setTimeoutContext(function() {
+                this.state = STATE_RECOGNIZED;
+                this.tryEmit();
+            }, options.time, this);
+        } else if (input.eventType & INPUT_END) {
+            return STATE_RECOGNIZED;
+        }
+        return STATE_FAILED;
+    },
+    reset: function() {
+        clearTimeout(this._timer);
+    },
+    emit: function(input) {
+        if (this.state !== STATE_RECOGNIZED) {
+            return;
+        }
+        if (input && (input.eventType & INPUT_END)) {
+            this.manager.emit(this.options.event + 'up', input);
+        } else {
+            this._input.timeStamp = now();
+            this.manager.emit(this.options.event, this._input);
+        }
+    }
+});
+function RotateRecognizer() {
+    AttrRecognizer.apply(this, arguments);
+}
+inherit(RotateRecognizer, AttrRecognizer, {
+    defaults: {
+        event: 'rotate',
+        threshold: 0,
+        pointers: 2
+    },
+    getTouchAction: function() {
+        return [TOUCH_ACTION_NONE];
+    },
+    attrTest: function(input) {
+        return this._super.attrTest.call(this, input) &&
+            (Math.abs(input.rotation) > this.options.threshold || this.state & STATE_BEGAN);
+    }
+});
+function SwipeRecognizer() {
+    AttrRecognizer.apply(this, arguments);
+}
+inherit(SwipeRecognizer, AttrRecognizer, {
+    defaults: {
+        event: 'swipe',
+        threshold: 10,
+        velocity: 0.3,
+        direction: DIRECTION_HORIZONTAL | DIRECTION_VERTICAL,
+        pointers: 1
+    },
+    getTouchAction: function() {
+        return PanRecognizer.prototype.getTouchAction.call(this);
+    },
+    attrTest: function(input) {
+        var direction = this.options.direction;
+        var velocity;
+        if (direction & (DIRECTION_HORIZONTAL | DIRECTION_VERTICAL)) {
+            velocity = input.overallVelocity;
+        } else if (direction & DIRECTION_HORIZONTAL) {
+            velocity = input.overallVelocityX;
+        } else if (direction & DIRECTION_VERTICAL) {
+            velocity = input.overallVelocityY;
+        }
+        return this._super.attrTest.call(this, input) &&
+            direction & input.offsetDirection &&
+            input.distance > this.options.threshold &&
+            input.maxPointers == this.options.pointers &&
+            abs(velocity) > this.options.velocity && input.eventType & INPUT_END;
+    },
+    emit: function(input) {
+        var direction = directionStr(input.offsetDirection);
+        if (direction) {
+            this.manager.emit(this.options.event + direction, input);
+        }
+        this.manager.emit(this.options.event, input);
+    }
+});
+function TapRecognizer() {
+    Recognizer.apply(this, arguments);
+    this.pTime = false;
+    this.pCenter = false;
+    this._timer = null;
+    this._input = null;
+    this.count = 0;
+}
+inherit(TapRecognizer, Recognizer, {
+    defaults: {
+        event: 'tap',
+        pointers: 1,
+        taps: 1,
+        interval: 300,
+        time: 250,
+        threshold: 9,
+        posThreshold: 10
+    },
+    getTouchAction: function() {
+        return [TOUCH_ACTION_MANIPULATION];
+    },
+    process: function(input) {
+        var options = this.options;
+        var validPointers = input.pointers.length === options.pointers;
+        var validMovement = input.distance < options.threshold;
+        var validTouchTime = input.deltaTime < options.time;
+        this.reset();
+        if ((input.eventType & INPUT_START) && (this.count === 0)) {
+            return this.failTimeout();
+        }
+        if (validMovement && validTouchTime && validPointers) {
+            if (input.eventType != INPUT_END) {
+                return this.failTimeout();
+            }
+            var validInterval = this.pTime ? (input.timeStamp - this.pTime < options.interval) : true;
+            var validMultiTap = !this.pCenter || getDistance(this.pCenter, input.center) < options.posThreshold;
+            this.pTime = input.timeStamp;
+            this.pCenter = input.center;
+            if (!validMultiTap || !validInterval) {
+                this.count = 1;
+            } else {
+                this.count += 1;
+            }
+            this._input = input;
+            var tapCount = this.count % options.taps;
+            if (tapCount === 0) {
+                if (!this.hasRequireFailures()) {
+                    return STATE_RECOGNIZED;
+                } else {
+                    this._timer = setTimeoutContext(function() {
+                        this.state = STATE_RECOGNIZED;
+                        this.tryEmit();
+                    }, options.interval, this);
+                    return STATE_BEGAN;
+                }
+            }
+        }
+        return STATE_FAILED;
+    },
+    failTimeout: function() {
+        this._timer = setTimeoutContext(function() {
+            this.state = STATE_FAILED;
+        }, this.options.interval, this);
+        return STATE_FAILED;
+    },
+    reset: function() {
+        clearTimeout(this._timer);
+    },
+    emit: function() {
+        if (this.state == STATE_RECOGNIZED) {
+            this._input.tapCount = this.count;
+            this.manager.emit(this.options.event, this._input);
+        }
+    }
+});
+function Hammer(element, options) {
+    options = options || {};
+    options.recognizers = ifUndefined(options.recognizers, Hammer.defaults.preset);
+    return new Manager(element, options);
+}
+Hammer.VERSION = '2.0.7';
+Hammer.defaults = {
+    domEvents: false,
+    touchAction: TOUCH_ACTION_COMPUTE,
+    enable: true,
+    inputTarget: null,
+    inputClass: null,
+    preset: [
+        [RotateRecognizer, {enable: false}],
+        [PinchRecognizer, {enable: false}, ['rotate']],
+        [SwipeRecognizer, {direction: DIRECTION_HORIZONTAL}],
+        [PanRecognizer, {direction: DIRECTION_HORIZONTAL}, ['swipe']],
+        [TapRecognizer],
+        [TapRecognizer, {event: 'doubletap', taps: 2}, ['tap']],
+        [PressRecognizer]
+    ],
+    cssProps: {
+        userSelect: 'none',
+        touchSelect: 'none',
+        touchCallout: 'none',
+        contentZooming: 'none',
+        userDrag: 'none',
+        tapHighlightColor: 'rgba(0,0,0,0)'
+    }
+};
+var STOP = 1;
+var FORCED_STOP = 2;
+function Manager(element, options) {
+    this.options = assign({}, Hammer.defaults, options || {});
+    this.options.inputTarget = this.options.inputTarget || element;
+    this.handlers = {};
+    this.session = {};
+    this.recognizers = [];
+    this.oldCssProps = {};
+    this.element = element;
+    this.input = createInputInstance(this);
+    this.touchAction = new TouchAction(this, this.options.touchAction);
+    toggleCssProps(this, true);
+    each(this.options.recognizers, function(item) {
+        var recognizer = this.add(new (item[0])(item[1]));
+        item[2] && recognizer.recognizeWith(item[2]);
+        item[3] && recognizer.requireFailure(item[3]);
+    }, this);
+}
+Manager.prototype = {
+    set: function(options) {
+        assign(this.options, options);
+        if (options.touchAction) {
+            this.touchAction.update();
+        }
+        if (options.inputTarget) {
+            this.input.destroy();
+            this.input.target = options.inputTarget;
+            this.input.init();
+        }
+        return this;
+    },
+    stop: function(force) {
+        this.session.stopped = force ? FORCED_STOP : STOP;
+    },
+    recognize: function(inputData) {
+        var session = this.session;
+        if (session.stopped) {
+            return;
+        }
+        this.touchAction.preventDefaults(inputData);
+        var recognizer;
+        var recognizers = this.recognizers;
+        var curRecognizer = session.curRecognizer;
+        if (!curRecognizer || (curRecognizer && curRecognizer.state & STATE_RECOGNIZED)) {
+            curRecognizer = session.curRecognizer = null;
+        }
+        var i = 0;
+        while (i < recognizers.length) {
+            recognizer = recognizers[i];
+            if (session.stopped !== FORCED_STOP && (
+                    !curRecognizer || recognizer == curRecognizer ||
+                    recognizer.canRecognizeWith(curRecognizer))) {
+                recognizer.recognize(inputData);
+            } else {
+                recognizer.reset();
+            }
+            if (!curRecognizer && recognizer.state & (STATE_BEGAN | STATE_CHANGED | STATE_ENDED)) {
+                curRecognizer = session.curRecognizer = recognizer;
+            }
+            i++;
+        }
+    },
+    get: function(recognizer) {
+        if (recognizer instanceof Recognizer) {
+            return recognizer;
+        }
+        var recognizers = this.recognizers;
+        for (var i = 0; i < recognizers.length; i++) {
+            if (recognizers[i].options.event == recognizer) {
+                return recognizers[i];
+            }
+        }
+        return null;
+    },
+    add: function(recognizer) {
+        if (invokeArrayArg(recognizer, 'add', this)) {
+            return this;
+        }
+        var existing = this.get(recognizer.options.event);
+        if (existing) {
+            this.remove(existing);
+        }
+        this.recognizers.push(recognizer);
+        recognizer.manager = this;
+        this.touchAction.update();
+        return recognizer;
+    },
+    remove: function(recognizer) {
+        if (invokeArrayArg(recognizer, 'remove', this)) {
+            return this;
+        }
+        recognizer = this.get(recognizer);
+        if (recognizer) {
+            var recognizers = this.recognizers;
+            var index = inArray(recognizers, recognizer);
+            if (index !== -1) {
+                recognizers.splice(index, 1);
+                this.touchAction.update();
+            }
+        }
+        return this;
+    },
+    on: function(events, handler) {
+        if (events === undefined$1) {
+            return;
+        }
+        if (handler === undefined$1) {
+            return;
+        }
+        var handlers = this.handlers;
+        each(splitStr(events), function(event) {
+            handlers[event] = handlers[event] || [];
+            handlers[event].push(handler);
+        });
+        return this;
+    },
+    off: function(events, handler) {
+        if (events === undefined$1) {
+            return;
+        }
+        var handlers = this.handlers;
+        each(splitStr(events), function(event) {
+            if (!handler) {
+                delete handlers[event];
+            } else {
+                handlers[event] && handlers[event].splice(inArray(handlers[event], handler), 1);
+            }
+        });
+        return this;
+    },
+    emit: function(event, data) {
+        if (this.options.domEvents) {
+            triggerDomEvent(event, data);
+        }
+        var handlers = this.handlers[event] && this.handlers[event].slice();
+        if (!handlers || !handlers.length) {
+            return;
+        }
+        data.type = event;
+        data.preventDefault = function() {
+            data.srcEvent.preventDefault();
+        };
+        var i = 0;
+        while (i < handlers.length) {
+            handlers[i](data);
+            i++;
+        }
+    },
+    destroy: function() {
+        this.element && toggleCssProps(this, false);
+        this.handlers = {};
+        this.session = {};
+        this.input.destroy();
+        this.element = null;
+    }
+};
+function toggleCssProps(manager, add) {
+    var element = manager.element;
+    if (!element.style) {
+        return;
+    }
+    var prop;
+    each(manager.options.cssProps, function(value, name) {
+        prop = prefixed(element.style, name);
+        if (add) {
+            manager.oldCssProps[prop] = element.style[prop];
+            element.style[prop] = value;
+        } else {
+            element.style[prop] = manager.oldCssProps[prop] || '';
+        }
+    });
+    if (!add) {
+        manager.oldCssProps = {};
+    }
+}
+function triggerDomEvent(event, data) {
+    var gestureEvent = document.createEvent('Event');
+    gestureEvent.initEvent(event, true, true);
+    gestureEvent.gesture = data;
+    data.target.dispatchEvent(gestureEvent);
+}
+assign(Hammer, {
+    INPUT_START: INPUT_START,
+    INPUT_MOVE: INPUT_MOVE,
+    INPUT_END: INPUT_END,
+    INPUT_CANCEL: INPUT_CANCEL,
+    STATE_POSSIBLE: STATE_POSSIBLE,
+    STATE_BEGAN: STATE_BEGAN,
+    STATE_CHANGED: STATE_CHANGED,
+    STATE_ENDED: STATE_ENDED,
+    STATE_RECOGNIZED: STATE_RECOGNIZED,
+    STATE_CANCELLED: STATE_CANCELLED,
+    STATE_FAILED: STATE_FAILED,
+    DIRECTION_NONE: DIRECTION_NONE,
+    DIRECTION_LEFT: DIRECTION_LEFT,
+    DIRECTION_RIGHT: DIRECTION_RIGHT,
+    DIRECTION_UP: DIRECTION_UP,
+    DIRECTION_DOWN: DIRECTION_DOWN,
+    DIRECTION_HORIZONTAL: DIRECTION_HORIZONTAL,
+    DIRECTION_VERTICAL: DIRECTION_VERTICAL,
+    DIRECTION_ALL: DIRECTION_ALL,
+    Manager: Manager,
+    Input: Input,
+    TouchAction: TouchAction,
+    TouchInput: TouchInput,
+    MouseInput: MouseInput,
+    PointerEventInput: PointerEventInput,
+    TouchMouseInput: TouchMouseInput,
+    SingleTouchInput: SingleTouchInput,
+    Recognizer: Recognizer,
+    AttrRecognizer: AttrRecognizer,
+    Tap: TapRecognizer,
+    Pan: PanRecognizer,
+    Swipe: SwipeRecognizer,
+    Pinch: PinchRecognizer,
+    Rotate: RotateRecognizer,
+    Press: PressRecognizer,
+    on: addEventListeners,
+    off: removeEventListeners,
+    each: each,
+    merge: merge,
+    extend: extend,
+    assign: assign,
+    inherit: inherit,
+    bindFn: bindFn,
+    prefixed: prefixed
+});
+var freeGlobal = (typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : {}));
+freeGlobal.Hammer = Hammer;
+if (typeof undefined$1 === 'function' && undefined$1.amd) {
+    undefined$1(function() {
+        return Hammer;
+    });
+} else if (module.exports) {
+    module.exports = Hammer;
+} else {
+    window[exportName] = Hammer;
+}
+})(window, document, 'Hammer');
+}(hammer$1));
+var hammer = hammer$1.exports;
+
+var hammerjs = /*#__PURE__*/_mergeNamespaces({
+  __proto__: null,
+  'default': hammer
+}, [hammer$1.exports]);
+
+const INPUT_START = 1;
+const INPUT_MOVE = 2;
+const INPUT_END = 4;
+const MOUSE_INPUT_MAP = {
+    mousedown: INPUT_START,
+    mousemove: INPUT_MOVE,
+    mouseup: INPUT_END
+};
+function some(array, predict) {
+    for (let i = 0; i < array.length; i++) {
+        if (predict(array[i])) {
+            return true;
+        }
+    }
+    return false;
+}
+function enhancePointerEventInput(PointerEventInput) {
+    const oldHandler = PointerEventInput.prototype.handler;
+    PointerEventInput.prototype.handler = function handler(ev) {
+        const store = this.store;
+        if (ev.button > 0 && ev.type === 'pointerdown') {
+            if (!some(store, e => e.pointerId === ev.pointerId)) {
+                store.push(ev);
+            }
+        }
+        oldHandler.call(this, ev);
+    };
+}
+function enhanceMouseInput(MouseInput) {
+    MouseInput.prototype.handler = function handler(ev) {
+        let eventType = MOUSE_INPUT_MAP[ev.type];
+        if (eventType & INPUT_START && ev.button >= 0) {
+            this.pressed = true;
+        }
+        if (eventType & INPUT_MOVE && ev.which === 0) {
+            eventType = INPUT_END;
+        }
+        if (!this.pressed) {
+            return;
+        }
+        if (eventType & INPUT_END) {
+            this.pressed = false;
+        }
+        this.callback(this.manager, eventType, {
+            pointers: [ev],
+            changedPointers: [ev],
+            pointerType: 'mouse',
+            srcEvent: ev
+        });
+    };
+}
+
+enhancePointerEventInput(hammer$1.exports.PointerEventInput);
+enhanceMouseInput(hammer$1.exports.MouseInput);
+const Manager = hammer$1.exports.Manager;
+
+class Input$1 {
+    constructor(element, callback, options) {
+        this.element = element;
+        this.callback = callback;
+        this.options = { enable: true, ...options };
+    }
+}
+
+const RECOGNIZERS = hammerjs
+    ? [
+        [hammerjs.Pan, { event: 'tripan', pointers: 3, threshold: 0, enable: false }],
+        [hammerjs.Rotate, { enable: false }],
+        [hammerjs.Pinch, { enable: false }],
+        [hammerjs.Swipe, { enable: false }],
+        [hammerjs.Pan, { threshold: 0, enable: false }],
+        [hammerjs.Press, { enable: false }],
+        [hammerjs.Tap, { event: 'doubletap', taps: 2, enable: false }],
+        [hammerjs.Tap, { event: 'anytap', enable: false }],
+        [hammerjs.Tap, { enable: false }]
+    ]
+    : null;
+const RECOGNIZER_COMPATIBLE_MAP = {
+    tripan: ['rotate', 'pinch', 'pan'],
+    rotate: ['pinch'],
+    pinch: ['pan'],
+    pan: ['press', 'doubletap', 'anytap', 'tap'],
+    doubletap: ['anytap'],
+    anytap: ['tap']
+};
+const RECOGNIZER_FALLBACK_MAP = {
+    doubletap: ['tap']
+};
+const BASIC_EVENT_ALIASES = {
+    pointerdown: 'pointerdown',
+    pointermove: 'pointermove',
+    pointerup: 'pointerup',
+    touchstart: 'pointerdown',
+    touchmove: 'pointermove',
+    touchend: 'pointerup',
+    mousedown: 'pointerdown',
+    mousemove: 'pointermove',
+    mouseup: 'pointerup'
+};
+const INPUT_EVENT_TYPES = {
+    KEY_EVENTS: ['keydown', 'keyup'],
+    MOUSE_EVENTS: ['mousedown', 'mousemove', 'mouseup', 'mouseover', 'mouseout', 'mouseleave'],
+    WHEEL_EVENTS: [
+        'wheel',
+        'mousewheel'
+    ]
+};
+const EVENT_RECOGNIZER_MAP = {
+    tap: 'tap',
+    anytap: 'anytap',
+    doubletap: 'doubletap',
+    press: 'press',
+    pinch: 'pinch',
+    pinchin: 'pinch',
+    pinchout: 'pinch',
+    pinchstart: 'pinch',
+    pinchmove: 'pinch',
+    pinchend: 'pinch',
+    pinchcancel: 'pinch',
+    rotate: 'rotate',
+    rotatestart: 'rotate',
+    rotatemove: 'rotate',
+    rotateend: 'rotate',
+    rotatecancel: 'rotate',
+    tripan: 'tripan',
+    tripanstart: 'tripan',
+    tripanmove: 'tripan',
+    tripanup: 'tripan',
+    tripandown: 'tripan',
+    tripanleft: 'tripan',
+    tripanright: 'tripan',
+    tripanend: 'tripan',
+    tripancancel: 'tripan',
+    pan: 'pan',
+    panstart: 'pan',
+    panmove: 'pan',
+    panup: 'pan',
+    pandown: 'pan',
+    panleft: 'pan',
+    panright: 'pan',
+    panend: 'pan',
+    pancancel: 'pan',
+    swipe: 'swipe',
+    swipeleft: 'swipe',
+    swiperight: 'swipe',
+    swipeup: 'swipe',
+    swipedown: 'swipe'
+};
+const GESTURE_EVENT_ALIASES = {
+    click: 'tap',
+    anyclick: 'anytap',
+    dblclick: 'doubletap',
+    mousedown: 'pointerdown',
+    mousemove: 'pointermove',
+    mouseup: 'pointerup',
+    mouseover: 'pointerover',
+    mouseout: 'pointerout',
+    mouseleave: 'pointerleave'
+};
+
+const userAgent = typeof navigator !== 'undefined' && navigator.userAgent ? navigator.userAgent.toLowerCase() : '';
+const window_ = typeof window !== 'undefined' ? window : global;
+let passiveSupported = false;
+try {
+    const options = {
+        get passive() {
+            passiveSupported = true;
+            return true;
+        }
+    };
+    window_.addEventListener('test', null, options);
+    window_.removeEventListener('test', null);
+}
+catch (err) {
+    passiveSupported = false;
+}
+
+const firefox = userAgent.indexOf('firefox') !== -1;
+const { WHEEL_EVENTS } = INPUT_EVENT_TYPES;
+const EVENT_TYPE$1 = 'wheel';
+const WHEEL_DELTA_MAGIC_SCALER = 4.000244140625;
+const WHEEL_DELTA_PER_LINE = 40;
+const SHIFT_MULTIPLIER = 0.25;
+class WheelInput extends Input$1 {
+    constructor(element, callback, options) {
+        super(element, callback, options);
+        this.handleEvent = (event) => {
+            if (!this.options.enable) {
+                return;
+            }
+            let value = event.deltaY;
+            if (window_.WheelEvent) {
+                if (firefox && event.deltaMode === window_.WheelEvent.DOM_DELTA_PIXEL) {
+                    value /= window_.devicePixelRatio;
+                }
+                if (event.deltaMode === window_.WheelEvent.DOM_DELTA_LINE) {
+                    value *= WHEEL_DELTA_PER_LINE;
+                }
+            }
+            if (value !== 0 && value % WHEEL_DELTA_MAGIC_SCALER === 0) {
+                value = Math.floor(value / WHEEL_DELTA_MAGIC_SCALER);
+            }
+            if (event.shiftKey && value) {
+                value = value * SHIFT_MULTIPLIER;
+            }
+            this.callback({
+                type: EVENT_TYPE$1,
+                center: {
+                    x: event.clientX,
+                    y: event.clientY
+                },
+                delta: -value,
+                srcEvent: event,
+                pointerType: 'mouse',
+                target: event.target
+            });
+        };
+        this.events = (this.options.events || []).concat(WHEEL_EVENTS);
+        this.events.forEach(event => element.addEventListener(event, this.handleEvent, passiveSupported ? { passive: false } : false));
+    }
+    destroy() {
+        this.events.forEach(event => this.element.removeEventListener(event, this.handleEvent));
+    }
+    enableEventType(eventType, enabled) {
+        if (eventType === EVENT_TYPE$1) {
+            this.options.enable = enabled;
+        }
+    }
+}
+
+const { MOUSE_EVENTS: MOUSE_EVENTS$1 } = INPUT_EVENT_TYPES;
+const MOVE_EVENT_TYPE = 'pointermove';
+const OVER_EVENT_TYPE = 'pointerover';
+const OUT_EVENT_TYPE = 'pointerout';
+const ENTER_EVENT_TYPE = 'pointerenter';
+const LEAVE_EVENT_TYPE = 'pointerleave';
+class MoveInput extends Input$1 {
+    constructor(element, callback, options) {
+        super(element, callback, options);
+        this.handleEvent = (event) => {
+            this.handleOverEvent(event);
+            this.handleOutEvent(event);
+            this.handleEnterEvent(event);
+            this.handleLeaveEvent(event);
+            this.handleMoveEvent(event);
+        };
+        this.pressed = false;
+        const { enable } = this.options;
+        this.enableMoveEvent = enable;
+        this.enableLeaveEvent = enable;
+        this.enableEnterEvent = enable;
+        this.enableOutEvent = enable;
+        this.enableOverEvent = enable;
+        this.events = (this.options.events || []).concat(MOUSE_EVENTS$1);
+        this.events.forEach(event => element.addEventListener(event, this.handleEvent));
+    }
+    destroy() {
+        this.events.forEach(event => this.element.removeEventListener(event, this.handleEvent));
+    }
+    enableEventType(eventType, enabled) {
+        if (eventType === MOVE_EVENT_TYPE) {
+            this.enableMoveEvent = enabled;
+        }
+        if (eventType === OVER_EVENT_TYPE) {
+            this.enableOverEvent = enabled;
+        }
+        if (eventType === OUT_EVENT_TYPE) {
+            this.enableOutEvent = enabled;
+        }
+        if (eventType === ENTER_EVENT_TYPE) {
+            this.enableEnterEvent = enabled;
+        }
+        if (eventType === LEAVE_EVENT_TYPE) {
+            this.enableLeaveEvent = enabled;
+        }
+    }
+    handleOverEvent(event) {
+        if (this.enableOverEvent) {
+            if (event.type === 'mouseover') {
+                this._emit(OVER_EVENT_TYPE, event);
+            }
+        }
+    }
+    handleOutEvent(event) {
+        if (this.enableOutEvent) {
+            if (event.type === 'mouseout') {
+                this._emit(OUT_EVENT_TYPE, event);
+            }
+        }
+    }
+    handleEnterEvent(event) {
+        if (this.enableEnterEvent) {
+            if (event.type === 'mouseenter') {
+                this._emit(ENTER_EVENT_TYPE, event);
+            }
+        }
+    }
+    handleLeaveEvent(event) {
+        if (this.enableLeaveEvent) {
+            if (event.type === 'mouseleave') {
+                this._emit(LEAVE_EVENT_TYPE, event);
+            }
+        }
+    }
+    handleMoveEvent(event) {
+        if (this.enableMoveEvent) {
+            switch (event.type) {
+                case 'mousedown':
+                    if (event.button >= 0) {
+                        this.pressed = true;
+                    }
+                    break;
+                case 'mousemove':
+                    if (event.which === 0) {
+                        this.pressed = false;
+                    }
+                    if (!this.pressed) {
+                        this._emit(MOVE_EVENT_TYPE, event);
+                    }
+                    break;
+                case 'mouseup':
+                    this.pressed = false;
+                    break;
+            }
+        }
+    }
+    _emit(type, event) {
+        this.callback({
+            type,
+            center: {
+                x: event.clientX,
+                y: event.clientY
+            },
+            srcEvent: event,
+            pointerType: 'mouse',
+            target: event.target
+        });
+    }
+}
+
+const { KEY_EVENTS } = INPUT_EVENT_TYPES;
+const DOWN_EVENT_TYPE = 'keydown';
+const UP_EVENT_TYPE = 'keyup';
+class KeyInput extends Input$1 {
+    constructor(element, callback, options) {
+        super(element, callback, options);
+        this.handleEvent = (event) => {
+            const targetElement = (event.target || event.srcElement);
+            if ((targetElement.tagName === 'INPUT' && targetElement.type === 'text') ||
+                targetElement.tagName === 'TEXTAREA') {
+                return;
+            }
+            if (this.enableDownEvent && event.type === 'keydown') {
+                this.callback({
+                    type: DOWN_EVENT_TYPE,
+                    srcEvent: event,
+                    key: event.key,
+                    target: event.target
+                });
+            }
+            if (this.enableUpEvent && event.type === 'keyup') {
+                this.callback({
+                    type: UP_EVENT_TYPE,
+                    srcEvent: event,
+                    key: event.key,
+                    target: event.target
+                });
+            }
+        };
+        this.enableDownEvent = this.options.enable;
+        this.enableUpEvent = this.options.enable;
+        this.events = (this.options.events || []).concat(KEY_EVENTS);
+        element.tabIndex = this.options.tabIndex || 0;
+        element.style.outline = 'none';
+        this.events.forEach(event => element.addEventListener(event, this.handleEvent));
+    }
+    destroy() {
+        this.events.forEach(event => this.element.removeEventListener(event, this.handleEvent));
+    }
+    enableEventType(eventType, enabled) {
+        if (eventType === DOWN_EVENT_TYPE) {
+            this.enableDownEvent = enabled;
+        }
+        if (eventType === UP_EVENT_TYPE) {
+            this.enableUpEvent = enabled;
+        }
+    }
+}
+
+const EVENT_TYPE = 'contextmenu';
+class ContextmenuInput extends Input$1 {
+    constructor(element, callback, options) {
+        super(element, callback, options);
+        this.handleEvent = (event) => {
+            if (!this.options.enable) {
+                return;
+            }
+            this.callback({
+                type: EVENT_TYPE,
+                center: {
+                    x: event.clientX,
+                    y: event.clientY
+                },
+                srcEvent: event,
+                pointerType: 'mouse',
+                target: event.target
+            });
+        };
+        element.addEventListener('contextmenu', this.handleEvent);
+    }
+    destroy() {
+        this.element.removeEventListener('contextmenu', this.handleEvent);
+    }
+    enableEventType(eventType, enabled) {
+        if (eventType === EVENT_TYPE) {
+            this.options.enable = enabled;
+        }
+    }
+}
+
+const DOWN_EVENT = 1;
+const MOVE_EVENT = 2;
+const UP_EVENT = 4;
+const MOUSE_EVENTS = {
+    pointerdown: DOWN_EVENT,
+    pointermove: MOVE_EVENT,
+    pointerup: UP_EVENT,
+    mousedown: DOWN_EVENT,
+    mousemove: MOVE_EVENT,
+    mouseup: UP_EVENT
+};
+const MOUSE_EVENT_WHICH_LEFT = 1;
+const MOUSE_EVENT_WHICH_MIDDLE = 2;
+const MOUSE_EVENT_WHICH_RIGHT = 3;
+const MOUSE_EVENT_BUTTON_LEFT = 0;
+const MOUSE_EVENT_BUTTON_MIDDLE = 1;
+const MOUSE_EVENT_BUTTON_RIGHT = 2;
+const MOUSE_EVENT_BUTTONS_LEFT_MASK = 1;
+const MOUSE_EVENT_BUTTONS_RIGHT_MASK = 2;
+const MOUSE_EVENT_BUTTONS_MIDDLE_MASK = 4;
+function whichButtons(event) {
+    const eventType = MOUSE_EVENTS[event.srcEvent.type];
+    if (!eventType) {
+        return null;
+    }
+    const { buttons, button, which } = event.srcEvent;
+    let leftButton = false;
+    let middleButton = false;
+    let rightButton = false;
+    if (
+    eventType === UP_EVENT ||
+        (eventType === MOVE_EVENT && !Number.isFinite(buttons))) {
+        leftButton = which === MOUSE_EVENT_WHICH_LEFT;
+        middleButton = which === MOUSE_EVENT_WHICH_MIDDLE;
+        rightButton = which === MOUSE_EVENT_WHICH_RIGHT;
+    }
+    else if (eventType === MOVE_EVENT) {
+        leftButton = Boolean(buttons & MOUSE_EVENT_BUTTONS_LEFT_MASK);
+        middleButton = Boolean(buttons & MOUSE_EVENT_BUTTONS_MIDDLE_MASK);
+        rightButton = Boolean(buttons & MOUSE_EVENT_BUTTONS_RIGHT_MASK);
+    }
+    else if (eventType === DOWN_EVENT) {
+        leftButton = button === MOUSE_EVENT_BUTTON_LEFT;
+        middleButton = button === MOUSE_EVENT_BUTTON_MIDDLE;
+        rightButton = button === MOUSE_EVENT_BUTTON_RIGHT;
+    }
+    return { leftButton, middleButton, rightButton };
+}
+function getOffsetPosition(event, rootElement) {
+    const center = event.center;
+    if (!center) {
+        return null;
+    }
+    const rect = rootElement.getBoundingClientRect();
+    const scaleX = rect.width / rootElement.offsetWidth || 1;
+    const scaleY = rect.height / rootElement.offsetHeight || 1;
+    const offsetCenter = {
+        x: (center.x - rect.left - rootElement.clientLeft) / scaleX,
+        y: (center.y - rect.top - rootElement.clientTop) / scaleY
+    };
+    return { center, offsetCenter };
+}
+
+const DEFAULT_OPTIONS$1 = {
+    srcElement: 'root',
+    priority: 0
+};
+class EventRegistrar {
+    constructor(eventManager) {
+        this.handleEvent = (event) => {
+            if (this.isEmpty()) {
+                return;
+            }
+            const mjolnirEvent = this._normalizeEvent(event);
+            let target = event.srcEvent.target;
+            while (target && target !== mjolnirEvent.rootElement) {
+                this._emit(mjolnirEvent, target);
+                if (mjolnirEvent.handled) {
+                    return;
+                }
+                target = target.parentNode;
+            }
+            this._emit(mjolnirEvent, 'root');
+        };
+        this.eventManager = eventManager;
+        this.handlers = [];
+        this.handlersByElement = new Map();
+        this._active = false;
+    }
+    isEmpty() {
+        return !this._active;
+    }
+    add(type, handler, options, once = false, passive = false) {
+        const { handlers, handlersByElement } = this;
+        let opts = DEFAULT_OPTIONS$1;
+        if (typeof options === 'string' || (options && options.addEventListener)) {
+            opts = { ...DEFAULT_OPTIONS$1, srcElement: options };
+        }
+        else if (options) {
+            opts = { ...DEFAULT_OPTIONS$1, ...options };
+        }
+        let entries = handlersByElement.get(opts.srcElement);
+        if (!entries) {
+            entries = [];
+            handlersByElement.set(opts.srcElement, entries);
+        }
+        const entry = {
+            type,
+            handler,
+            srcElement: opts.srcElement,
+            priority: opts.priority
+        };
+        if (once) {
+            entry.once = true;
+        }
+        if (passive) {
+            entry.passive = true;
+        }
+        handlers.push(entry);
+        this._active = this._active || !entry.passive;
+        let insertPosition = entries.length - 1;
+        while (insertPosition >= 0) {
+            if (entries[insertPosition].priority >= entry.priority) {
+                break;
+            }
+            insertPosition--;
+        }
+        entries.splice(insertPosition + 1, 0, entry);
+    }
+    remove(type, handler) {
+        const { handlers, handlersByElement } = this;
+        for (let i = handlers.length - 1; i >= 0; i--) {
+            const entry = handlers[i];
+            if (entry.type === type && entry.handler === handler) {
+                handlers.splice(i, 1);
+                const entries = handlersByElement.get(entry.srcElement);
+                entries.splice(entries.indexOf(entry), 1);
+                if (entries.length === 0) {
+                    handlersByElement.delete(entry.srcElement);
+                }
+            }
+        }
+        this._active = handlers.some(entry => !entry.passive);
+    }
+    _emit(event, srcElement) {
+        const entries = this.handlersByElement.get(srcElement);
+        if (entries) {
+            let immediatePropagationStopped = false;
+            const stopPropagation = () => {
+                event.handled = true;
+            };
+            const stopImmediatePropagation = () => {
+                event.handled = true;
+                immediatePropagationStopped = true;
+            };
+            const entriesToRemove = [];
+            for (let i = 0; i < entries.length; i++) {
+                const { type, handler, once } = entries[i];
+                handler({
+                    ...event,
+                    type,
+                    stopPropagation,
+                    stopImmediatePropagation
+                });
+                if (once) {
+                    entriesToRemove.push(entries[i]);
+                }
+                if (immediatePropagationStopped) {
+                    break;
+                }
+            }
+            for (let i = 0; i < entriesToRemove.length; i++) {
+                const { type, handler } = entriesToRemove[i];
+                this.remove(type, handler);
+            }
+        }
+    }
+    _normalizeEvent(event) {
+        const rootElement = this.eventManager.getElement();
+        return {
+            ...event,
+            ...whichButtons(event),
+            ...getOffsetPosition(event, rootElement),
+            preventDefault: () => {
+                event.srcEvent.preventDefault();
+            },
+            stopImmediatePropagation: null,
+            stopPropagation: null,
+            handled: false,
+            rootElement
+        };
+    }
+}
+
+const DEFAULT_OPTIONS = {
+    events: null,
+    recognizers: null,
+    recognizerOptions: {},
+    Manager,
+    touchAction: 'none',
+    tabIndex: 0
+};
+class EventManager {
+    constructor(element = null, options) {
+        this._onBasicInput = (event) => {
+            const { srcEvent } = event;
+            const alias = BASIC_EVENT_ALIASES[srcEvent.type];
+            if (alias) {
+                this.manager.emit(alias, event);
+            }
+        };
+        this._onOtherEvent = (event) => {
+            this.manager.emit(event.type, event);
+        };
+        this.options = { ...DEFAULT_OPTIONS, ...options };
+        this.events = new Map();
+        this.setElement(element);
+        const { events } = this.options;
+        if (events) {
+            this.on(events);
+        }
+    }
+    getElement() {
+        return this.element;
+    }
+    setElement(element) {
+        if (this.element) {
+            this.destroy();
+        }
+        this.element = element;
+        if (!element) {
+            return;
+        }
+        const { options } = this;
+        const ManagerClass = options.Manager;
+        this.manager = new ManagerClass(element, {
+            touchAction: options.touchAction,
+            recognizers: options.recognizers || RECOGNIZERS
+        }).on('hammer.input', this._onBasicInput);
+        if (!options.recognizers) {
+            Object.keys(RECOGNIZER_COMPATIBLE_MAP).forEach(name => {
+                const recognizer = this.manager.get(name);
+                if (recognizer) {
+                    RECOGNIZER_COMPATIBLE_MAP[name].forEach(otherName => {
+                        recognizer.recognizeWith(otherName);
+                    });
+                }
+            });
+        }
+        for (const recognizerName in options.recognizerOptions) {
+            const recognizer = this.manager.get(recognizerName);
+            if (recognizer) {
+                const recognizerOption = options.recognizerOptions[recognizerName];
+                delete recognizerOption.enable;
+                recognizer.set(recognizerOption);
+            }
+        }
+        this.wheelInput = new WheelInput(element, this._onOtherEvent, {
+            enable: false
+        });
+        this.moveInput = new MoveInput(element, this._onOtherEvent, {
+            enable: false
+        });
+        this.keyInput = new KeyInput(element, this._onOtherEvent, {
+            enable: false,
+            tabIndex: options.tabIndex
+        });
+        this.contextmenuInput = new ContextmenuInput(element, this._onOtherEvent, {
+            enable: false
+        });
+        for (const [eventAlias, eventRegistrar] of this.events) {
+            if (!eventRegistrar.isEmpty()) {
+                this._toggleRecognizer(eventRegistrar.recognizerName, true);
+                this.manager.on(eventAlias, eventRegistrar.handleEvent);
+            }
+        }
+    }
+    destroy() {
+        if (this.element) {
+            this.wheelInput.destroy();
+            this.moveInput.destroy();
+            this.keyInput.destroy();
+            this.contextmenuInput.destroy();
+            this.manager.destroy();
+            this.wheelInput = null;
+            this.moveInput = null;
+            this.keyInput = null;
+            this.contextmenuInput = null;
+            this.manager = null;
+            this.element = null;
+        }
+    }
+    on(event, handler, opts) {
+        this._addEventHandler(event, handler, opts, false);
+    }
+    once(event, handler, opts) {
+        this._addEventHandler(event, handler, opts, true);
+    }
+    watch(event, handler, opts) {
+        this._addEventHandler(event, handler, opts, false, true);
+    }
+    off(event, handler) {
+        this._removeEventHandler(event, handler);
+    }
+    _toggleRecognizer(name, enabled) {
+        const { manager } = this;
+        if (!manager) {
+            return;
+        }
+        const recognizer = manager.get(name);
+        if (recognizer && recognizer.options.enable !== enabled) {
+            recognizer.set({ enable: enabled });
+            const fallbackRecognizers = RECOGNIZER_FALLBACK_MAP[name];
+            if (fallbackRecognizers && !this.options.recognizers) {
+                fallbackRecognizers.forEach(otherName => {
+                    const otherRecognizer = manager.get(otherName);
+                    if (enabled) {
+                        otherRecognizer.requireFailure(name);
+                        recognizer.dropRequireFailure(otherName);
+                    }
+                    else {
+                        otherRecognizer.dropRequireFailure(name);
+                    }
+                });
+            }
+        }
+        this.wheelInput.enableEventType(name, enabled);
+        this.moveInput.enableEventType(name, enabled);
+        this.keyInput.enableEventType(name, enabled);
+        this.contextmenuInput.enableEventType(name, enabled);
+    }
+    _addEventHandler(event, handler, opts, once, passive) {
+        if (typeof event !== 'string') {
+            opts = handler;
+            for (const eventName in event) {
+                this._addEventHandler(eventName, event[eventName], opts, once, passive);
+            }
+            return;
+        }
+        const { manager, events } = this;
+        const eventAlias = GESTURE_EVENT_ALIASES[event] || event;
+        let eventRegistrar = events.get(eventAlias);
+        if (!eventRegistrar) {
+            eventRegistrar = new EventRegistrar(this);
+            events.set(eventAlias, eventRegistrar);
+            eventRegistrar.recognizerName = EVENT_RECOGNIZER_MAP[eventAlias] || eventAlias;
+            if (manager) {
+                manager.on(eventAlias, eventRegistrar.handleEvent);
+            }
+        }
+        eventRegistrar.add(event, handler, opts, once, passive);
+        if (!eventRegistrar.isEmpty()) {
+            this._toggleRecognizer(eventRegistrar.recognizerName, true);
+        }
+    }
+    _removeEventHandler(event, handler) {
+        if (typeof event !== 'string') {
+            for (const eventName in event) {
+                this._removeEventHandler(eventName, event[eventName]);
+            }
+            return;
+        }
+        const { events } = this;
+        const eventAlias = GESTURE_EVENT_ALIASES[event] || event;
+        const eventRegistrar = events.get(eventAlias);
+        if (!eventRegistrar) {
+            return;
+        }
+        eventRegistrar.remove(event, handler);
+        if (eventRegistrar.isEmpty()) {
+            const { recognizerName } = eventRegistrar;
+            let isRecognizerUsed = false;
+            for (const eh of events.values()) {
+                if (eh.recognizerName === recognizerName && !eh.isEmpty()) {
+                    isRecognizerUsed = true;
+                    break;
+                }
+            }
+            if (!isRecognizerUsed) {
+                this._toggleRecognizer(recognizerName, false);
+            }
+        }
+    }
+}
+
+class PointerAgent {
+  #types = [
+    "pointerdown",
+    "pointerup",
+    "pointerover", "pointerenter",
+    "pointerout", "pointerleave",
+    "pointermove",
+    "pointercancel",
+    "gotpointercapture",
+    "lostpointercapture",
+    "click",
+    "dblclick",
+    "anyclick",
+    "wheel",
+    "contextmenu",
+"pointerdrag",
+"pointerdragend",
+    "pan",
+    "panstart",
+    "panmove",
+    "panup",
+    "pandown",
+    "panleft",
+    "panright",
+    "panend",
+    "pancancel"
+  ]
+  #input
+  #pad = {
+    left: false
+  }
+  constructor(input) {
+    this.#input = input;
+  }
+  has(event) {
+    return (this.#types.indexOf(event) == -1) ? false : true
+  }
+  on (event, handler, options, once) {
+    let cb = handler;
+    switch (event) {
+      case "pointerdown":
+          cb = function (e) {
+            this.logit(e);
+            if (e.leftButton) this.#input.pad.left = true;
+            this.#input.onPointerDown(e);
+            handler(this.#input.pointerEventData(e));
+          };
+          break;
+      case "pointerup":
+        cb = function (e) {
+          this.logit(e);
+          this.#input.onPointerUp(e);
+          handler(this.#input.pointerEventData(e));
+        };
+        break;
+      case "pointermove":
+        cb = function (e) {
+          this.#input.motion(e);
+          handler(this.#input.pointerEventData(e));
+        };
+        break;
+      case "click":
+      case "dbclick":
+      case "pointerenter":
+      case "pointerleave":
+      case "pointerout":
+      case "pointerover":
+      case "contextmenu":
+        cb = function (e) {
+          this.#input.location(e);
+          handler(this.#input.pointerEventData(e));
+        };
+        break;
+      case "wheel":
+        cb = function (e) {
+          this.logit(e);
+          this.#input.wheeldelta = e;
+          handler(this.#input.pointerEventData(e));
+        };
+        break;
+      case "pointercancel":
+      case "gotpointercapture":
+      case "lostpointercapture":
+        cb = function (e) {
+          handler(e);
+        };
+        break;
+      case "pointerdrag":
+        cb = function (e) {
+          this.logit(e);
+          this.#input.motion(e);
+          handler(this.#input.pointerEventData(e));
+        };
+        this.#input.agent.on("panstart", this.#input.startPointerDrag.bind(this.#input));
+        event = "panmove";
+        break;
+      case "pointerdragend":
+        cb = function (e) {
+          this.logit(e);
+          this.#input.motion(e);
+          this.#input.endPointerDrag(e);
+          handler(this.#input.pointerEventData(e));
+        };
+        event = "panend";
+        break;
+    }
+    if (once) this.#input.agent.once(event, cb.bind(this), options);
+    else this.#input.agent.on(event, cb.bind(this), options);
+    return cb
+  }
+  off (event, handler, options) {
+    this.#input.agent.off(event, handler, options);
+  }
+  logit(e) {
+    return
+  }
+}
+
+class TouchAgent {
+  #types = [
+    'rotate',
+    'rotatestart',
+    'rotatemove',
+    'rotateend',
+    'rotatecancel',
+    'pinch',
+    'pinchin',
+    'pinchout',
+    'pinchstart',
+    'pinchmove',
+    'pinchend',
+    'pinchcancel',
+    'swipe',
+    'swipeleft',
+    'swiperight',
+    'swipeup',
+    'swipedown',
+    'tripan',
+    'tripanstart',
+    'tripanmove',
+    'tripanup',
+    'tripandown',
+    'tripanleft',
+    'tripanright',
+    'tripanend',
+    'tripancancel',
+  ]
+  #input
+  constructor(input) {
+    this.#input = input;
+  }
+  has(event) {
+    return (this.#types.indexOf(event) == -1) ? false : true
+  }
+  on (event, handler, options, once) {
+    let cb = handler;
+    if (once) this.#input.agent.once(event, cb.bind(this), options);
+    else this.#input.agent.on(event, cb.bind(this), options);
+    return cb
+  }
+  off (event, handler, options) {
+    this.#input.agent.off(event, handler, options);
+  }
+}
+
+class KeyboardAgent {
+  #types = [
+    'keydown',
+    'keyup',
+  ]
+  #input
+  constructor(input) {
+    this.#input = input;
+  }
+  has(event) {
+    return (this.#types.indexOf(event) == -1) ? false : true
+  }
+  on (event, handler, options, once) {
+    let cb = handler;
+    if (once) this.#input.agent.once(event, cb.bind(this), options);
+    else this.#input.agent.on(event, cb.bind(this), options);
+    return cb
+  }
+  off (event, handler, options) {
+    this.#input.agent.off(event, handler, options);
+  }
+}
+
+const defaultOptions$1 = {
+  element: undefined,
+  contextMenu: true,
+  panX: true,
+  panY: true
+};
+class Input  {
+  #options
+  #element
+  #eventsAgent
+  #pointer = null
+  #key = null
+  #touch = null
+  #status
+  #isPan = false
+  #panX
+  #panY
+  #wheelDelta
+  pad = {left: false}
+  constructor (element, options) {
+    this.#options = { ...defaultOptions$1, ...options };
+    this.#status = status.idle;
+    this.#element = element;
+    if (!this.#element && this.#options.elementId) {
+      this.#element = document.getElementById(this.#options.elementId);
+    }
+    if (!DOM.isElement(this.#element)) {
+      throw "Must specify an element to receive user input.";
+    }
+    if (!this.#options.contextMenu) {
+      window.oncontextmenu = (e) => {
+        e.preventDefault();
+        return false;
+      };
+    }
+    this.#eventsAgent = new EventManager(this.#element);
+    this.pointerInit();
+  }
+  get agent() { return this.#eventsAgent }
+  get pointer() {
+    if (this.#pointer instanceof PointerAgent) return this.#pointer
+    this.#pointer = new PointerAgent(this);
+    return this.#pointer
+  }
+  get touch() {
+    if (this.#touch instanceof TouchAgent) return this.#touch
+    this.#touch = new TouchAgent(this);
+    return this.#touch
+  }
+  get key() {
+    if (this.#key instanceof KeyboardAgent) return this.#key
+    this.#key = new KeyboardAgent(this);
+    return this.#key
+  }
+  get status() { return this.#status }
+  get element() { return this.#element }
+  get isPan() { return this.#isPan }
+  set panX(x) { if (isBoolean(x)) this.#panX = x; }
+  set panY(x) { if (isBoolean(y)) this.#panY = y; }
+  set wheeldelta(w) { this.#wheelDelta = w.delta; }
+  get wheeldelta() { return this.#wheelDelta }
+  destroy() {
+    this.#eventsAgent.destroy();
+    this.#pointer = undefined;
+    this.#key = undefined;
+    this.#touch = undefined;
+  }
+  isValid(event, handler) {
+    return (
+        isString$1(event) ||
+        isFunction(handler)
+    ) ? true : false;
+  }
+  validOptions(options) {
+    return (isObject(options) && isBoolean(options)) ? options : undefined;
+  }
+  on (event, handler, options, once=false) {
+    if (!this.isValid(event, handler)) return false
+    if (this.pointer.has(event)) this.#pointer.on(event, handler, options, once);
+    else if (this.touch.has(event)) this.#touch.on(event, handler, options, once);
+    else if (this.key.has(event)) this.#key.on(event, handler, options, once);
+    else this.element.addEventListener(event, handler, this.validOptions(options));
+  }
+  off (event, handler, options) {
+    if (this.#pointer?.has(event)) this.#pointer.off(event, handler, options);
+    else if (this.#touch?.has(event)) this.#touch.off(event, handler, options);
+    else if (this.#key?.has(event)) this.#key.off(event, handler, options);
+    else this.element.removeEventListener(event, handler, this.validOptions(options));
+  }
+  once (event, handler, options) {
+    this.on(event, handler, options, true);
+  }
+  setCursor(type) {
+		this.#element.style.cursor = type;
+	}
+  pointerInit() {
     this.clientPosPrev = new Point([null, null]);
-    this.position = new Point();
+    this.position = new Point([0, 0]);
     this.movement = new Point([0, 0]);
     this.dragstart = new Point([null, null]);
     this.dragend = new Point([null, null]);
@@ -1906,145 +4489,7 @@ class EventsAgent {
     this.pointerdrag = new Event("pointerdrag");
     this.pointerdragend = new Event("pointerdragend");
   }
-  has (event) {
-    if (this.type.indexOf(event) == -1) return false
-    else return true
-  }
-  isTouch(e) {
-    return e.type === "touch"
-  }
-  addListener (event, handler, options) {
-    let cb = handler;
-    if (!this.has(event) ||
-        !isFunction(handler) ||
-        !DOM.isElement(this.element)
-    ) return false
-    if (pointer.indexOf(event) !== -1) {
-      switch (event) {
-        case "pointerdown":
-            cb = function (e) {
-              this.onPointerDown(e);
-              handler(this.createPointerEventArgument(e));
-            };
-            break;
-        case "pointerup":
-          cb = function (e) {
-            this.onPointerUp(e);
-            handler(this.createPointerEventArgument(e));
-          };
-          break;
-        case "pointermove":
-          cb = function (e) {
-            this.motion(e);
-            handler(this.createPointerEventArgument(e));
-          };
-          break;
-        case "click":
-        case "dbclick":
-        case "pointerenter":
-        case "pointerleave":
-        case "pointerout":
-        case "pointerover":
-        case "contextmenu":
-          cb = function (e) {
-            this.location(e);
-            handler(this.createPointerEventArgument(e));
-          };
-          break;
-        case "wheel":
-          cb = function (e) {
-            this.wheeldelta = e.wheelDelta;
-            handler(this.createPointerEventArgument(e));
-          };
-          break;
-        case "pointercancel":
-        case "gotpointercapture":
-        case "lostpointercapture":
-        default :
-          cb = function (e) {
-            handler(e);
-          };
-          break;
-      }
-      this.element.addEventListener(event, cb.bind(this), options);
-      return cb
-    }
-    else if (custom.indexOf(event) == -1)
-      this.element.addEventListener(event, handler, options);
-    else {
-      switch (event) {
-        case "pointerdrag":
-          this.initPointerDrag(handler, options);
-          break;
-        case "pointerdragend":
-          cb = function (e) {
-            this.motion(e);
-            handler(this.createPointerEventArgument(e));
-          };
-          this.element.addEventListener(event, cb.bind(this), options);
-          break;
-      }
-    }
-    return true
-  }
-  removerListener (event, handler, element, options) {
-    if (!this.has(event) ||
-        !isFunction(handler) ||
-        !DOM.isElement(element)
-    ) return false
-    if (event == "pointerdrag") {
-      e.target.removeEventListener("pointermove", this.onPointerDrag);
-      e.target.removeEventListener("pointerdown", this.onPointerDown);
-      e.target.removeEventListener("gotpointercapture", this.onPointerDrag);
-      e.target.removeEventListener("lostpointercapture", this.onPointerDragEnd);
-      document.removeEventListener("pointerup", this.onPointerDragEnd);
-    }
-    element.removeEventListener(event, handler, options);
-    return true
-  }
-  initPointerDrag (handler, options) {
-    if (!this.draginit) {
-      this.draginit = true;
-      this.element.addEventListener("pointerdown", this.onPointerDown.bind(this), options);
-      this.element.addEventListener("gotpointercapture", this.onPointerCapture.bind(this), options);
-      this.element.addEventListener("lostpointercapture", this.onPointerDragEnd.bind(this), options);
-      this.element.addEventListener("pointermove", this.onPointerMove.bind(this), options);
-    }
-    let cb = function (e) {
-      e = this.createPointerEventArgument(e);
-      handler(e);
-    };
-    this.dragStatus = "ready";
-    this.element.addEventListener("pointerdrag", cb.bind(this), options);
-  }
-  onPointerDown (e) {
-    this.location(e);
-    this.pointerButtons[e.button] = true;
-    if (this.dragStatus == "ready") e.target.setPointerCapture(e.pointerId);
-  }
-  onPointerUp (e) {
-    this.location(e);
-    this.pointerButtons[e.button] = false;
-  }
-  onPointerMove (e) {
-    if (this.dragStatus == "dragging") {
-      this.motion(e);
-      this.dragend = this.position.clone();
-      e.target.dispatchEvent(this.pointerdrag);
-    }
-  }
-  onPointerCapture (e) {
-    this.dragstart = this.position.clone();
-    this.dragend = this.position.clone();
-    this.dragStatus = "dragging";
-  }
-  onPointerDragEnd (e) {
-    if (this.dragStatus == "dragging") {
-      this.dragStatus = "ready";
-      e.target.dispatchEvent(this.pointerdragend);
-    }
-  }
-  createPointerEventArgument(e) {
+  pointerEventData(e) {
     return {
       isProcessed: false,
       pointerType: e.pointerType,
@@ -2058,15 +4503,9 @@ class EventsAgent {
       timeStamp: Date.now()
     }
   }
-  isButtonPressed(button) {
-    return (this.pointerButtons.indexOf(button) !== -1) ? true : false
-  }
-  setCursor(type) {
-		this.element.style.cursor = type;
-	}
   motion(e) {
-    const clientX = e.clientX || this.position.x;
-    const clientY = e.clientY || this.position.y;
+    const clientX = e.srcEvent.clientX || this.position.x;
+    const clientY = e.srcEvent.clientY || this.position.y;
     this.movement.x = clientX - this.clientPosPrev.x;
     this.movement.y = clientY - this.clientPosPrev.y;
     this.position.x += this.movement.x;
@@ -2075,67 +4514,28 @@ class EventsAgent {
     this.clientPosPrev.y = clientY;
   }
   location(e) {
-    const clientRect = e.target.getBoundingClientRect();
-    this.clientPosPrev.x = e.clientX;
-    this.clientPosPrev.y = e.clientY;
-    this.position.x = e.clientX - clientRect.left;
-    this.position.y = e.clientY - clientRect.top;
+    const clientRect = e.srcEvent.target.getBoundingClientRect() || 0;
+    this.clientPosPrev.x = e.srcEvent.clientX;
+    this.clientPosPrev.y = e.srcEvent.clientY;
+    this.position.x = e.srcEvent.clientX - clientRect.left;
+    this.position.y = e.srcEvent.clientY- clientRect.top;
     this.movement.x = 0;
     this.movement.y = 0;
   }
-  createKeyEventArgument(e) {
-    return e
+  onPointerDown (e) {
+    this.location(e);
+    this.pointerButtons[e.srcEvent.button] = true;
   }
-}
-
-const defaultOptions$1 = {
-  element: undefined,
-  contextMenu: true
-};
-class Input  {
-  constructor (element, options) {
-    this.options = { ...defaultOptions$1, ...options };
-    this.status = status.idle;
-    this.element = element;
-    if (!this.element && this.options.elementId) {
-      this.element = document.getElementById(this.options.elementId);
-    }
-    if (!this.element) {
-      throw "Must specify an element to receive user input.";
-    }
-    this.eventsAgent = new EventsAgent(this);
-    if (!this.options.contextMenu) {
-      window.oncontextmenu = (e) => {
-        e.preventDefault();
-        return false;
-      };
-    }
+  onPointerUp (e) {
+    this.location(e);
+    this.pointerButtons[e.srcEvent.button] = false;
   }
-  on (event, handler, options) {
-    return this.eventsAgent.addListener(event, handler, options)
+  startPointerDrag(e) {
+    this.#isPan = true;
+    this.onPointerDown(e);
   }
-  off (event, handler, options) {
-    return this.eventsAgent.removeListener(event, handler, options)
-  }
-  invoke (agent, eventName, args) {
-    this.currentAgent = agent;
-    this.eventsAgent.invoke(eventName, this.createEventArgument(args));
-  }
-  createEventArgument (args) {
-    const arg = args || {};
-    arg.isButtonPressed = button => this.isButtonPressed(button);
-    arg.isKeyPressed = key => this.isKeyPressed(key);
-    arg.controller = this;
-    return arg;
-  }
-  isButtonPressed (button) {
-    return this.eventsAgent.isButtonPressed(button);
-  }
-  isKeyPressed (key) {
-    return this.eventsAgent.isKeyPressed(key);
-  }
-  setCursor (type) {
-    this.eventsAgent.setCursor(type);
+  endPointerDrag(e) {
+    this.#isPan = false;
   }
 }
 
@@ -2302,7 +4702,9 @@ const TX_MAXW = "100%";
 const TX_MAXH = "100%";
 const UTILSH = 35;
 const TOOLSW = 40;
-const TIMEH = 50;
+const TIMESCALEH = 25;
+const TIMENAVIGATIONH = 25;
+const TIMEH = TIMESCALEH + TIMENAVIGATIONH;
 const SCALEW = 60;
 const FONTWEIGHT = "normal";
 const FONTSIZE = 12;
@@ -3918,8 +6320,6 @@ class xAxis extends Axis {
       else return HM(ts)
     }
   }
-  gradsWorker() {
-  }
 }
 
 var stateMachineConfig$6 = {
@@ -5018,6 +7418,7 @@ class TimeLabels extends Overlay {
     const grads = this.xAxis.xAxisGrads.values;
     const offset = 0;
     const theme = this.theme.xAxis;
+    const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true;
     ctx.save();
     ctx.strokeStyle = theme.colourTick;
     ctx.fillStyle = theme.colourTick;
@@ -5026,10 +7427,12 @@ class TimeLabels extends Overlay {
       let x = bRound(tick[1]);
       let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5);
       ctx.fillText(tick[0], x - w + offset, this.xAxis.xAxisTicks + 12);
-      ctx.beginPath();
-      ctx.moveTo(x + offset, 0);
-      ctx.lineTo(x + offset, this.xAxis.xAxisTicks);
-      ctx.stroke();
+      if (tickMarker) {
+        ctx.beginPath();
+        ctx.moveTo(x + offset, 0);
+        ctx.lineTo(x + offset, this.xAxis.xAxisTicks);
+        ctx.stroke();
+      }
     }
     ctx.restore();
   }
@@ -5238,6 +7641,8 @@ class Timeline {
       callback: null
     };
     this.#slider = new Slider(sliderCfg);
+    if ( this.#core.theme?.time?.navigation === false )
+      this.navigationDisplay(false);
   }
   setWidth(w) {
     this.#element.style.width = `${w}px`;
@@ -5250,6 +7655,10 @@ class Timeline {
     const layerWidth = Math.round(width * ((100 + buffer) * 0.01));
     this.#Graph.setSize(width, height, layerWidth);
     this.draw();
+  }
+  navigationDisplay(visible) {
+    if (!isBoolean(visible)) return
+    this.#elNavigation.style = "display: none;";
   }
   start() {
     this.createGraph();
@@ -5556,6 +7965,7 @@ class Chart {
     this.#input.off("pointerenter", this.onMouseEnter);
     this.#input.off("pointerout", this.onMouseOut);
     this.#input.off("pointerdown", this.onMouseDown);
+    this.#input.off("pointerup", this.onMouseUp);
     this.#controller = null;
     this.off("main_mousemove", this.onMouseMove);
     this.off(STREAM_LISTENING, this.onStreamListening);
@@ -5571,6 +7981,7 @@ class Chart {
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
     this.#input.on("pointerdown", this.onMouseDown.bind(this));
+    this.#input.on("pointerup", this.onMouseUp.bind(this));
     this.on("main_mousemove", this.updateLegends.bind(this));
     this.on(STREAM_LISTENING, this.onStreamListening.bind(this));
     this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this));
@@ -5618,9 +8029,13 @@ class Chart {
     this.emit(`${this.id}_mouseout`, this.#cursorPos);
   }
   onMouseDown(e) {
+    this.#core.pointerButtons[e.domEvent.srcEvent.button] = true;
     this.#cursorClick = [Math.floor(e.position.x), Math.floor(e.position.y)];
     if (this.stateMachine.state === "tool_activated")
       this.emit("tool_targetSelected", { target: this, position: e });
+  }
+  onMouseUp(e) {
+    this.#core.pointerButtons[e.domEvent.srcEvent.button] = false;
   }
   onStreamListening(stream) {
     if (this.#Stream !== stream) this.#Stream = stream;
@@ -6343,11 +8758,7 @@ class ScaleBar {
       e.dragstart.x, e.dragstart.y,
       e.movement.x, e.movement.y
     ];
-    ({
-      scale: this,
-      cursorPos: this.#cursorPos
-    });
-    this.setScaleRange(this.#cursorPos[5]);
+    this.setScaleRange(e.movement.y);
     this.render();
   }
   onDragDone(e) {
@@ -6362,7 +8773,7 @@ class ScaleBar {
   }
   onChartDrag(e) {
     if (this.#yAxis.mode !== "manual") return
-    this.#yAxis.offset = this.#core.MainPane.cursorPos[5];
+    this.#yAxis.offset = e.domEvent.srcEvent.movementY;
     this.parent.draw(this.range, true);
     this.draw();
   }
@@ -6460,14 +8871,18 @@ class Legends {
     const mouseOut = "onmouseout='this.style.opacity=0'";
     const t = this.#elTarget;
     styleLegendTitle += (o?.type === "chart") ? "font-size: 1.5em;" : "font-size: 1.2em;";
+    const controls = (!theme.legend.controls) ? "" :
+    `
+      <div slot="controls" class="controls" style="${styleControls}" ${mouseOver} ${mouseOut}>${t.buildControls(o)}</div>
+    `;
     const node = `
       <div slot="legend" id="${o.id}" class="legend" style="${styleLegend}">
         <div>
           <span slot="title" class="title" style="${styleLegendTitle}">${o.title}</span>
           <dl style="${styleInputs}">${t.buildInputs(o)}</dl>
         </div>
-        <div slot="controls" class="controls" style="${styleControls}" ${mouseOver} ${mouseOut}>${t.buildControls(o)}</div>
-      </div>
+        ${controls}
+     </div>
     `;
     return node
   }
@@ -7726,6 +10141,11 @@ class MainPane {
           elScale: this.#elScale
         }
       };
+    if ( this.#core.theme?.time?.navigation === false ) {
+      const timeHeight = { height: TIMESCALEH };
+      this.#core.theme.time = {...this.#core.theme?.time, ...timeHeight};
+      this.#elRows.style.height = `calc(100% - ${TIMESCALEH}px)`;
+    }
     this.#Time = new Timeline(this.#core, options);
     this.#Chart = new OnChart(this.#core, options);
     this.registerOffCharts(options);
@@ -7787,6 +10207,7 @@ class MainPane {
     this.#input.on("pointermove", this.onMouseMove.bind(this));
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
+    this.#input.on("pointerup", this.onChartDragDone.bind(this));
     this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue.bind(this));
     this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this));
     this.on("setRange", this.draw.bind(this));
@@ -7803,8 +10224,16 @@ class MainPane {
     this.#core.emit(topic, data);
   }
   onMouseWheel(e) {
-    e.domEvent.preventDefault();
     const direction = Math.sign(e.wheeldelta) * -1;
+    e.domEvent.preventDefault();
+    if (this.#core.pointerButtons[0]) {
+      e.dragstart.x = this.#cursorPos[0];
+      e.dragstart.y = this.#cursorPos[1];
+      e.position.x = this.#cursorPos[0] + direction;
+      e.position.y = this.#cursorPos[1];
+      this.onChartDrag(e);
+      return
+    }
     const range = this.range;
     const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length);
     const newEnd = range.indexEnd + Math.ceil(direction * XAXIS_ZOOM * range.Length);
@@ -7849,7 +10278,7 @@ class MainPane {
       d.active = true;
       d.start = [e.dragstart.x, e.dragstart.y];
       d.prev = d.start;
-      d.delta = [e.movement.x, e.movement.y];
+      d.delta = [0, 0];
     }
     else {
       d.delta = [
@@ -7887,6 +10316,16 @@ class MainPane {
         break;
       case "ArrowRight":
         this.emit("chart_pan", [step,null,0,null,step,null]);
+        break;
+      case "ArrowUp":
+        e.wheeldelta = -1;
+        e.domEvent = e.srcEvent;
+        this.onMouseWheel(e);
+        break;
+      case "ArrowDown":
+        e.wheeldelta = 1;
+        e.domEvent = e.srcEvent;
+        this.onMouseWheel(e);
         break;
     }
   }
@@ -8336,7 +10775,10 @@ template$b.innerHTML = `
 <style>
   .viewport {
     width: 100%;
-    height: 50%;
+    height: ${TIMESCALEH}px;
+  }
+  tradex-overview {
+    height: ${TIMENAVIGATIONH}px;
   }
 </style>
 <div class="viewport"></div>
@@ -10293,6 +12735,7 @@ class Widgets {
 }
 
 class TradeXchart extends tradeXChart {
+  static #version = version
   static #cnt = 0
   static #cfg = {}
   static #instances = {}
@@ -10300,6 +12743,7 @@ class TradeXchart extends tradeXChart {
   static #talibReady = false
   static #talibAwait = []
   static #talibError = null
+  static get version() { return TradeXchart.#version }
   static get talibPromise() { return TradeXchart.#talibPromise }
   static get talibReady() { return TradeXchart.#talibReady }
   static get talibAwait() { return TradeXchart.#talibAwait }
@@ -10378,29 +12822,17 @@ class TradeXchart extends tradeXChart {
   warnings = false
   errors = false
   timer = false
-  #mousePos = {x:0, y:0}
   #scrollPos = 0
   #smoothScrollOffset = 0
   #panBeginPos = [null, null, null, null]
+  #pointerPos = {x:0, y:0}
+  #pointerButtons = [false, false, false]
   #workers
   #stream
   #candles
   #pricePrecision
   #volumePrecision
   #delayedSetRange = false
-  #renderer = {
-    status: "idle",
-    buffer: {
-      n: true,
-      "1": {},
-      "2": {}
-    },
-    curr: {
-      frame: null,
-      priority: 0
-    },
-    cache: []
-  }
     static create(txCfg={}) {
       if (TradeXchart.#cnt == 0) {
         TradeXchart.#cfg.CPUCores = navigator.hardwareConcurrency;
@@ -10516,7 +12948,8 @@ class TradeXchart extends tradeXChart {
   get scrollPos() { return this.#scrollPos }
   get smoothScrollOffset() { return 0 }
   get rangeScrollOffset() { return Math.floor(this.bufferPx / this.candleW) }
-  get mousePos() { return this.#mousePos }
+  get mousePos() { return this.#pointerPos }
+  get pointerButtons() { return this.#pointerButtons }
   get pricePrecision() { return this.#pricePrecision }
   get volumePrecision() { return this.#volumePrecision }
   set stream(stream) { return this.setStream(stream) }
@@ -10590,7 +13023,7 @@ class TradeXchart extends tradeXChart {
     this.#ToolsBar = new ToolsBar(this, txCfg);
     this.#MainPane = new MainPane(this, txCfg);
     this.setTheme(this.#themeTemp.ID);
-    this.log(`${this.#name} instantiated`);
+    this.log(`${this.#name} V${TradeXchart.version} instantiated`);
     this.log("...processing state");
     this.#scrollPos = this.bufferPx * -1;
     this.eventsListen();
@@ -10639,8 +13072,8 @@ class TradeXchart extends tradeXChart {
   execute(channel, data, cb) {
   }
   onMouseMove(e) {
-    this.#mousePos.x = e.clientX;
-    this.#mousePos.y = e.clientY;
+    this.#pointerPos.x = e.clientX;
+    this.#pointerPos.y = e.clientY;
   }
   onStreamUpdate(candle) {
     const r = this.range;

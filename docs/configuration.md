@@ -36,7 +36,7 @@ const config = {
 
 ``rangeLimit`` defines the initial number of candles to display
 
-Further config options are explained in [config.md](config.md)
+[Config Object Options](#config-object-options) provides a complete overview of all settings.
 
 ## State
 
@@ -82,18 +82,20 @@ export const CandleType = {
 ![LINE](./assets/CANDLE_LINE.png)
 
 
-# Config
+# Config Object Options
 
 ```javascript
 const config = {
   id: "TradeX_test",
   title: "BTC/USDT",
+  // width and height are pixel values.
+  // if none are provided, the chart will responsively resize to the parent element that contains it
   width: 1000,
   height: 800,
   // utils bar config
-  utils: {none: true},
+  utils: {},
   // tools bar config
-  tools: {none: true},
+  tools: {},
   // timeframes: s, m, h, d, M, y
   timeFrame: "1m",
   // timestamp for the chart to start on
@@ -113,7 +115,10 @@ const config = {
   // chart theme
   theme: {
     candle: {
+      // candle types: 'candle_hollow','candle_up_hollow','candle_down_hollow','ohlc','area','line'
       Type: "candle_solid",
+      AreaLineColour: "#4c5fe7",
+      AreaFillColour: ["#4c5fe780", "#4c5fe700"],
       UpBodyColour: "#00F04088",
       UpWickColour: "#0F4",
       DnBodyColour: "#F0004088",
@@ -124,6 +129,31 @@ const config = {
       UpColour: "#00F04044",
       DnColour: "#F0004044",
     },
+    xAxis: {
+      colourTick: "#6a6f80",
+      colourLabel: "#6a6f80",
+      colourCursor: "#2A2B3A",
+      colourCursorBG: "#aac0f7",
+      // fontFamily: XAxisStyle.FONTFAMILY,
+      // fontSize: XAxisStyle.FONTSIZE,
+      // fontWeight: XAxisStyle.FONTWEIGHT,
+      // line: "#656565"
+      slider: "#586ea6",
+      handle: "#586ea688",
+      tickMarker: false,
+    },
+    yAxis: {
+      colourTick: "#6a6f80",
+      colourLabel: "#6a6f80",
+      colourCursor: "#2A2B3A",
+      colourCursorBG: "#aac0f7",
+      // fontFamily: YAxisStyle.FONTFAMILY,
+      // fontSize: YAxisStyle.FONTSIZE,
+      // fontWeight: YAxisStyle.FONTWEIGHT,
+      // line: "#656565"
+      tickMarker: false,
+      location:"left",
+    },
     chart: {
       Background: "#141414",
       BorderColour: "#666",
@@ -133,18 +163,52 @@ const config = {
     onChart: {
 
     },
+    offChart: {
+
+    },
+    tools: {
+      // tool bar locations: "left", "right", false - defaults to left
+      location: false
+    },
+    utils: {
+      // utils bar locations: false - defaults to true
+      location: false
+    },
+    time: {
+      // timeline navigation: false - defaults to true
+      navigation: false
+    },
+    legend: {
+      // legend controls: false - defaults to true
+      // display icons, order, visible, remove, config
+      controls: false
+      // default text colour
+      colour: "#96a9db",
+    }
   },
   // used for chart data validation, timestamps compared against BTC genisis block
   isCrypto: true,
+  // enable console.log output - WARNING! my impact performance
   logs: false,
+  // enable console.info output - WARNING! my impact performance
   infos: true,
+  // enable console.warning output - WARNING! my impact performance
   warnings: true,
+  // enable console.error output - WARNING! my impact performance
   errors: true,
   // enable live updates for a price stream
   stream: {},
   // maximum rate in milliseconds that a live stream should be REDRAWN, does not throttle actual stream rate
   maxCandleUpdate: 250,
   // pointer to talib-web library, required if you want to see indicators
-  talib: talib
+  talib: talib,
+  // file path (relative to server document root) for the talib-web .wasm file
+  // required if you want to see indicators
+  wasm: wasm,
+  // initial data sate provided to the chart, price history, indicators, datasets
+  // is optional - chart will start without one, and await data via the API
+  state: {
+    // Details of the state structure are found in [state.md](state.md)
+  }
 }
 ```

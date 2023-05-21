@@ -92,8 +92,8 @@ const config1 = {
   id: "TradeX_test",
   title: "BTC/USDT",
   symbol: "btcusdt",
-  // width: 1000,
-  // height: 800,
+  // width: 600,
+  // height: 500,
   utils: {},
   tools: {},
   timeFrame: "1m",
@@ -133,12 +133,18 @@ const config1 = {
     utils: {
       location: false
     },
+    time: {
+      navigation: false
+    },
+    legend: {
+       controls: false
+    }
   },
   watermark: {
     text: "BTC/USDT"
   },
   isCrypto: true,
-  logs: false,
+  logs: true,
   infos: true,
   warnings: true,
   errors: true,

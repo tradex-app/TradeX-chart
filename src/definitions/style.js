@@ -12,7 +12,9 @@ export const TX_MAXW = "100%"
 export const TX_MAXH = "100%"
 export const UTILSH = 35
 export const TOOLSW = 40
-export const TIMEH = 50
+export const TIMESCALEH = 25
+export const TIMENAVIGATIONH = 25
+export const TIMEH = TIMESCALEH + TIMENAVIGATIONH
 export const SCALEW = 60
 
 const FONTWEIGHT = "normal"
