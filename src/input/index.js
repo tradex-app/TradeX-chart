@@ -195,7 +195,7 @@ export default class Input  {
   }
 
   location(e) {
-    const clientRect = e.srcEvent.target.getBoundingClientRect();
+    const clientRect = e.srcEvent.target.getBoundingClientRect() || 0;
 
     this.clientPosPrev.x = e.srcEvent.clientX // = this.position.x
     this.clientPosPrev.y = e.srcEvent.clientY // = this.position.y

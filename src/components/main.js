@@ -272,6 +272,7 @@ export default class MainPane {
     this.#input.on("pointermove", this.onMouseMove.bind(this))
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
+    this.#input.on("pointerup", this.onChartDragDone.bind(this))
 
     // listen/subscribe/watch for notifications
     this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue.bind(this))
@@ -294,10 +295,19 @@ export default class MainPane {
   }
 
   onMouseWheel(e) {
-    e.domEvent.preventDefault()
-    if (this.#core.pointerButtons[0]) return
-
     const direction = Math.sign(e.wheeldelta) * -1
+    e.domEvent.preventDefault()
+
+    // a dirty hack to handle touch pad 
+    // confusion over pan and zoom events
+    if (this.#core.pointerButtons[0]) {
+      e.dragstart.x = this.#cursorPos[0]
+      e.dragstart.y = this.#cursorPos[1]
+      e.position.x = this.#cursorPos[0] + direction
+      e.position.y = this.#cursorPos[1]
+      this.onChartDrag(e)
+      return
+    }
     const range = this.range
     const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length)
     const newEnd = range.indexEnd + Math.ceil(direction * XAXIS_ZOOM * range.Length)
