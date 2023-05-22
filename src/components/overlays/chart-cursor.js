@@ -49,10 +49,12 @@ export default class chartCursor extends Overlay{
 
   draw(drag = false) {
 
-    let x = this.#cursorPos[0]
+    const rect = this.target.viewport.container.getBoundingClientRect()
+    let y = this.core.mousePos.y - rect.top
+    let x = this.core.mousePos.x - rect.left
+
     if (!drag) 
         x = this.xAxis.xPosSnap2CandlePos(x) + this.xAxis.scrollOffsetPx
-    let y = this.#cursorPos[1]
 
     this.scene.clear()
     const ctx = this.scene.context

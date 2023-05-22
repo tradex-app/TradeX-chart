@@ -54,6 +54,8 @@ export default class Test extends Indicator {
 
   /**
    * return inputs required to display indicator legend on chart pane
+   * legends can display multiple values
+   * @param {array} [pos=this.chart.cursorPos] - optional
    * @return {object} - {inputs, colours, labels}
    */
   legendInputs(pos=this.chart.cursorPos) {
@@ -63,6 +65,11 @@ export default class Test extends Indicator {
     let {c, colours} = super.legendInputs(pos)
     let inputs = {x: this.Scale.nicePrice(this.overlay.data[c][1])}
 
+    /**
+      @param {object} inputs - property names are used as labels
+      @param {array} colours - array of #rrggbb(aa) values
+      @param {array} labels - array of which input labels to dispaly [true, false, ...]
+    */
     return {inputs, colours, labels}
   }
 
