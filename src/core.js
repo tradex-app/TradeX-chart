@@ -1014,6 +1014,7 @@ export default class TradeXchart extends Tradex_chart {
    * @returns 
    */
   addIndicator(i, name=i, params={}) {
+    console.log(`addIndicator() ${i}, ${name}, ${params}`)
     if (
       !isString(i) &&
       !(i in this.#indicators) &&

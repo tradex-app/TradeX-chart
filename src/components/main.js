@@ -176,14 +176,7 @@ export default class MainPane {
     // api - functions / methods, calculated properties provided by this module
     options.elements = 
       {...options.elements, 
-        ...{
-          elTarget: this.#elChart,
-          elTime: this.#elTime,
-          elRows: this.#elRows,
-          elChart: this.#elChart,
-          elOffCharts: this.#elOffCharts,
-          elScale: this.#elScale
-        }
+        ...this.elements
       }
 
     if ( this.#core.theme?.time?.navigation === false ) {
@@ -546,23 +539,27 @@ export default class MainPane {
       this.#core.offChart.splice(i, 1)
     }
 
-    let a = this.#offChartDefaultH * this.#core.offChart.length,
-    offChartsH = ( a / Math.log10( a * 2 ) ) / 100,
-    rowsH = Math.round(this.rowsH * offChartsH);
+    // let a = this.#offChartDefaultH * this.#core.offChart.length,
+    // offChartsH = ( a / Math.log10( a * 2 ) ) / 100,
+    // rowsH = Math.round(this.rowsH * offChartsH);
 
-    options.offChartsH = offChartsH
+    // options.offChartsH = offChartsH
 
-    if (this.#core.offChart.length === 1) {
-      // adjust chart size for first offChart
-      options.rowH = Math.round(this.rowsH * this.#offChartDefaultH / 100)
-      options.chartH = this.rowsH - options.rowH
-    }
-    else {
-      // adjust chart size for subsequent offCharts
-      options.rowH = Math.round(rowsH / this.#OffCharts.size)
-      options.chartH = this.rowsH - rowsH
-      options.height = options.rowH
-    }
+    // if (this.#core.offChart.length === 1) {
+    //   // adjust chart size for first offChart
+    //   options.rowH = Math.round(this.rowsH * this.#offChartDefaultH / 100)
+    //   options.chartH = this.rowsH - options.rowH
+    // }
+    // else {
+    //   // adjust chart size for subsequent offCharts
+    //   options.rowH = Math.round(rowsH / this.#OffCharts.size)
+    //   options.chartH = this.rowsH - rowsH
+    //   options.height = options.rowH
+    // }
+
+    let heights = this.calcOffChartHeights(this.#core.offChart.length)
+
+    options = {...options, ...heights}
 
     let p100 = options.chartH / this.rowsH * 100
     this.#elChart.style.height = `${options.chartH}px`
@@ -610,18 +607,44 @@ export default class MainPane {
     this.emit("addOffChart", o)
   }
 
-  addIndicator(ind) {
+  addIndicator(i) {
+    const onChart = (this.type === "onChart" ) ? true : false;
+    const indicator = this.core.indicators[i.type].ind
+    const indType = (indicator.constructor.type === "both") ? onChart : indicator.prototype.onChart
+    if (
+      i?.type in this.core.indicators &&
+      onChart === indType
+    ) {
+      const cnt = this.#OffCharts.size + 1
+      const heights = this.calcOffChartHeights(cnt)
+      const options = {...heights}
+            options.elements = this.elements
 
-    // final indicator object
-    const indicator = this.#indicators[ind].ind
-    console.log("indicator:",indicator)
-    // check if we already have indicator data in the chart state
-    // generate indicator data
-    // let instance = new indicator(target, overlay, xAxis, yAxis, config)
-    // instance.calcIndicator(...)
-    // this.addOffChart(instance.overlay.data, options, api)
-    // 
+      // this.addOffChart(i, options)
+    }
+    else return false
+  }
 
+  calcOffChartHeights(cnt) {
+    let a = this.#offChartDefaultH * this.#core.offChart.length,
+        offChartsH = ( a / Math.log10( a * 2 ) ) / 100,
+        rowsH = Math.round(this.rowsH * offChartsH),
+        options = {};
+
+    options.offChartsH = offChartsH
+
+    if (cnt === 1) {
+      // adjust chart size for first offChart
+      options.rowH = Math.round(this.rowsH * this.#offChartDefaultH / 100)
+      options.chartH = this.rowsH - options.rowH
+    }
+    else {
+      // adjust chart size for subsequent offCharts
+      options.rowH = Math.round(rowsH / this.#OffCharts.size)
+      options.chartH = this.rowsH - rowsH
+      options.height = options.rowH
+    }
+    return options
   }
 
   scaleNode(type) {

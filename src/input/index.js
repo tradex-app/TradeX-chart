@@ -181,21 +181,30 @@ export default class Input  {
   }
 
   motion(e) {
+    let clientRect = {left: 0, top: 0}
+    try {
+      clientRect = e.srcEvent.target?.getBoundingClientRect()
+    }
+    catch (err) {}
     const clientX = e.srcEvent.clientX || this.position.x
     const clientY = e.srcEvent.clientY || this.position.y
 
     this.movement.x = clientX - this.clientPosPrev.x
     this.movement.y = clientY - this.clientPosPrev.y
 
-    this.position.x += this.movement.x
-    this.position.y += this.movement.y
+    this.position.x = clientX - clientRect.left;
+    this.position.y = clientY- clientRect.top;
 
     this.clientPosPrev.x = clientX
     this.clientPosPrev.y = clientY
   }
 
   location(e) {
-    const clientRect = e.srcEvent.target.getBoundingClientRect() || 0;
+    let clientRect = {left: 0, top: 0}
+    try {
+      clientRect = e.srcEvent.target?.getBoundingClientRect()
+    }
+    catch (err) {}
 
     this.clientPosPrev.x = e.srcEvent.clientX // = this.position.x
     this.clientPosPrev.y = e.srcEvent.clientY // = this.position.y

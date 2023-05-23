@@ -7,6 +7,7 @@ import state2 from './data/data_btc_1m.js'
 // import state4 from './data/seconds.js'
 // import state from './data/seconds-indicator'
 import TEST from './custom-indicator'
+import DMI from './DMI'
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
@@ -652,8 +653,10 @@ addChart()
 
 // add custom indicator definition
 chart0.setIndicators({
-  TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST}
+  TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST},
+  DMI: {id: "DMI", name: "Directional Movement Indicator", event: "addIndicator", ind: DMI }
 })
 chart0.addIndicator("TEST", "Test1", {data: []})
+chart0.addIndicator("DMI", "DMI1", {data: []})
 // add an alert
 chart1.stream.alerts.add(13010, alertTest, h)

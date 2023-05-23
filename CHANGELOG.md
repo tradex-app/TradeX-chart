@@ -1,5 +1,76 @@
 # Change Log
 
+## [0.121.8] - 2023-05-22
+
+Added
+
+* Mjolnir integration - touch device support
+* Keys - cursor up / down set chart zoom
+* Config Options - disable: time navigation, legend controls
+
+Fixed
+
+* Mouse Left Zoom Lock - prevent unintended zoom on touch pads
+* timeline tick rendering
+* Chart Cursor - crosshair, X and Y scale cursor positioning
+
+## [0.121.7] - 2023-05-12
+
+Fixed
+
+* Theme - list, hot swapping, modify values, delete
+* Divider - uses theme definition
+* Off Chart - separator (top border) uses theme definition
+* Candles - use current theme definition
+
+## [0.121.6] - 2023-05-12
+
+Added
+
+* chart state export - chart.state.exportState()
+
+
+## [0.121.4] - 2023-05-12
+
+Fixed
+
+* incorrect Rows size on chart starting with fixed size
+
+## [0.121.3] - 2023-05-11
+
+Fixed
+
+* customElements.define() - define once
+
+## [0.121.2] - 2023-05-10
+
+Fixed
+
+* replaced constructor.name comparisons with instanceof, to eliminate issue with minify changing class names
+
+## [0.121.1] - 2023-05-07
+
+Added
+
+* Custom Indicators
+
+Fixed
+
+* TALib - indicator history calculation on chart.start() now queued until talib is ready
+
+## [0.120.1] - 2023-04-26
+
+Added
+
+* Indicator API
+* Indicators - calculate indicators on mergeData()
+
+Fixed
+
+* edge case empty scaleGrads
+* min chart heightt - accounts for Utils bar
+* mergeData()
+
 ## [0.120.1] - 2023-04-23
 
 Added
