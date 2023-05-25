@@ -562,3 +562,26 @@ export function MS (t) {
   let s = String(get_second(t)).padStart(2, '0');
   return `${m}:${s}`
 }
+
+
+/**
+ * Nearest value by time (in timeseries)
+ * @export
+ * @param {number} t - timestamp
+ * @param {array} ts - [[ts,x,y,z...], ....]
+ * @return {array} - [index, val]
+ */
+export function nearestTs(t, ts) {
+    let dist = Infinity
+    let val = null
+    let index = -1
+    for (let i = 0; i < ts.length; i++) {
+        let ti = ts[i][0]
+        if (Math.abs(ti - t) < dist) {
+            dist = Math.abs(ti - t)
+            val = ts[i]
+            index = i
+        }
+    }
+    return [index, val]
+}

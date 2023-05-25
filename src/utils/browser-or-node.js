@@ -1,21 +1,36 @@
 // https://github.com/flexdinesh/browser-or-node
 
-export const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+export const isBrowser = 
+typeof window !== 'undefined' && 
+typeof window.document !== 'undefined';
 
 /* eslint-disable no-restricted-globals */
-export const isWebWorker = typeof self === 'object'
-  && self.constructor
-  && self.constructor.name === 'DedicatedWorkerGlobalScope';
+export const isWebWorker = 
+  typeof self === 'object' &&
+  self.constructor &&
+  self.constructor.name === 'DedicatedWorkerGlobalScope';
 /* eslint-enable no-restricted-globals */
 
-export const isNode = typeof process !== 'undefined'
-  && process.versions != null
-  && process.versions.node != null;
+export const isNode = 
+  typeof process !== 'undefined' &&
+  process.versions != null &&
+  process.versions.node != null;
 
 /* eslint-disable no-undef */
-export const isJsDom = () => (typeof window !== 'undefined' && window.name === 'nodejs')
-  || navigator.userAgent.includes('Node.js')
-  || navigator.userAgent.includes('jsdom');
+export const isJsDom = 
+  (typeof window !== 'undefined' && window.name === 'nodejs') ||
+  navigator.userAgent.includes('Node.js') ||
+  navigator.userAgent.includes('jsdom');
+
+export const isTouchDevice = (w => 
+  'onorientationchange' in w ||
+  w.matchMedia("(any-pointer:coarse)").matches ||
+  (!!navigator.maxTouchPoints ||
+  !!navigator.msMaxTouchPoints ||
+  ('ontouchstart' in w ||
+  (w.DocumentTouch &&
+  document instanceof w.DocumentTouch))))
+  (typeof window !== 'undefined' ? window : {})
 
 export const getGlobalObject = () => {
   if (typeof globalThis !== 'undefined') { return globalThis; }

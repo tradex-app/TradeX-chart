@@ -1,4 +1,4 @@
-// DMI.js
+// DX.js
 
 import indicator from "../components/overlays/indicator"
 import { DX as talibAPI } from "../definitions/talib-api";
@@ -6,7 +6,7 @@ import { YAXIS_TYPES } from "../definitions/chart";
 import { uid } from "../utils/utilities"
 
 
-export default class DMI extends indicator {
+export default class DX extends indicator {
 
   name = 'Directional Movement Index'
   shortName = 'DX'
@@ -33,22 +33,23 @@ export default class DMI extends indicator {
   precision = 2
   scaleOverlay = true
   plots = [
-    { key: 'DMI_1', title: ' ', type: 'line' },
+    { key: 'DX_1', title: ' ', type: 'line' },
   ]
 
-  // static onChart = false
-  // static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
+  static inCnt = 0
+  static onChart = false
+  static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
 
   /**
- * Creates an instance of DMI.
+ * Creates an instance of DX.
    * @param {object} target - canvas scene
    * @param {object} xAxis - timeline axis instance
    * @param {object} yAxis - scale axis instance
    * @param {object} config - theme / styling
    * @param {object} parent - (on/off)chart pane instance that hosts the indicator
    * @param {object} params - contains minimum of overlay instance
- * @memberof DMI
+ * @memberof DX
  */
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
 
@@ -66,14 +67,14 @@ export default class DMI extends indicator {
     this.setUpdateValue = (value) => { this.updateValue(value) }
   }
 
-  get onChart() { return false }
+  get onChart() { return DX.onChart }
 
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
 
     const inputs = {}
     const {c, colours} = super.legendInputs(pos)
-    inputs.DMI_1 = this.Scale.nicePrice(this.overlay.data[c][1])
+    inputs.DX_1 = this.Scale.nicePrice(this.overlay.data[c][1])
 
     return {inputs, colours}
   }
@@ -121,7 +122,7 @@ export default class DMI extends indicator {
     this.plot(plots, "renderLine", style)
 
 
-    // DMI plot
+    // DX plot
     plots.length = 0
     const offset = this.Timeline.smoothScrollOffset || 0
     const plot = {

@@ -4,7 +4,7 @@
 // Theme list available globally to all charts
 
 import { isObject, isString } from "../utils/typeChecks"
-import { copyDeep, mergeDeep, uid } from "../utils/utilities"
+import { copyDeep, mergeDeep, getProperty, setProperty, uid } from "../utils/utilities"
 import { defaultTheme } from "../definitions/style"
 
 const reserved = ["constructor","list","setCurrent","setTheme","setValue"]
@@ -92,17 +92,33 @@ export default class Theme {
 
   /**
    * set theme value and refresh chart
-   * @param {string} key 
+   * @param {string} path- "candle" or "candle.Type"
    * @param {*} value 
+   * @return {boolean}
    * @memberof Theme
    */
-  setValue(key, value) {
-    if (key in this) {
-      this[key] = value
-      this.#core.refresh()
+  setProperty(path, value) {
+    if (!isString(path)) return undefined
+
+    const old = getProperty(this, path)
+    const keys = path.split(".")
+
+    if (keys.length == 1) {
+      this[keys[0]] = value
     }
+    else {
+      let k = keys.shift()
+      this[k] = setProperty(this[k], keys.join('.'), value)
+    }
+
+    this.#core.refresh()
+
+    return old
   }
 
+  getProperty(path) {
+    return getProperty(this, path)
+  }
 
   /**
    * delete theme from global list

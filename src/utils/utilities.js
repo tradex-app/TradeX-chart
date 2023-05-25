@@ -92,13 +92,67 @@ export function copyDeep(obj) {
   return temp;
 }
 
-// unique ID
-export function uid(tag="ID") {
-  if (isNumber(tag)) tag = tag.toString()
-  else if (!isString(tag)) tag = "ID"
-  const dateString = Date.now().toString(36);
-  const randomness = Math.random().toString(36).substring(2,5);
-  return `${tag}_${dateString}_${randomness}`
+/**
+ * recursively execute a function on object properties
+ * @export
+ * @param {object} obj
+ * @param {function} propExec
+ */
+export function objRecurse (obj, propExec) {
+  if (!isObject(obj)) return
+  for (var k in obj) {
+    if (typeof obj[k] === 'object' && obj[k] !== null) {
+      objRecurs(obj[k], propExec)
+    } else if (obj.hasOwnProperty(k)) {
+      propExec(k, obj[k])
+    }
+  }
+}
+
+export const findInObjectById = (obj, id, updateFn) => {
+  // have found the object
+  if (obj["Id"] === id) {
+    return updateFn(obj);
+  }
+  else {
+    // iterate over the properties
+    for (var propertyName in obj) {
+      // any object that is not a simple value
+      if (obj[propertyName] !== null && typeof obj[propertyName] === 'object') {
+        // recurse into the object and write back the result to the object graph
+        obj[propertyName] = findInObjectById(obj[propertyName], id, updateFn);
+      }
+    }
+  }
+  return obj;
+};
+
+export function objRecurseUpdate (path, obj) {
+	const keys = path.split(".")
+  let i, k;
+  const cb = (obj) => {
+    for (i; i < keys.length; i++) {
+      k = findInObjectById(obj, keys[i], cb)
+    }
+  }
+
+}
+
+export function setProperty (obj, path, value) {
+  const [head, ...rest] = path.split('.')
+
+  return {
+      ...obj,
+      [head]: rest.length
+          ? setProperty(obj[head], rest.join('.'), value)
+          : value
+  }
+}
+
+export function getProperty(obj, path) {
+  const keys = path.split(".")
+  return keys.reduce((o, key) =>
+      (o && o[key] !== 'undefined') ? o[key] : undefined, obj);
 }
 
 export function isArrayEqual(a1, a2) {
@@ -132,6 +186,15 @@ export function nearestArrayValue(x, array) {
     }
   }
   return [index, val]
+}
+
+// unique ID
+export function uid(tag="ID") {
+  if (isNumber(tag)) tag = tag.toString()
+  else if (!isString(tag)) tag = "ID"
+  const dateString = Date.now().toString(36);
+  const randomness = Math.random().toString(36).substring(2,5);
+  return `${tag}_${dateString}_${randomness}`
 }
 
 // https://stackoverflow.com/a/20151856/15109215

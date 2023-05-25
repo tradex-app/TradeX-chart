@@ -3,6 +3,7 @@
 // https://uber-web.github.io/mjolnir.js
 
 import { isBoolean, isFunction, isObject, isString } from "../utils/typeChecks";
+import { isTouchDevice } from "../utils/browser-or-node";
 import DOM from "../utils/DOM";
 import { Point, status } from "./definitions"
 import { EventManager } from "mjolnir.js";
@@ -25,6 +26,7 @@ export default class Input  {
   #pointer = null
   #key = null
   #touch = null
+  #isTouch
 
   #status
   #isPan = false
@@ -38,6 +40,7 @@ export default class Input  {
 
     this.#options = { ...defaultOptions, ...options };
     this.#status = status.idle
+    this.#isTouch = isTouchDevice
     this.#element = element
 
     if (!this.#element && this.#options.elementId) {
@@ -54,8 +57,14 @@ export default class Input  {
         return false;
       };
     }
-
-    this.#eventsAgent = new EventManager(this.#element);
+    const T = this.#isTouch ? 10 : 0
+    const opts = {
+      recognizerOptions: {
+        pan: {threshold: T},
+        pinch: {threshold: 0}
+      }
+    }
+    this.#eventsAgent = new EventManager(this.#element, opts);
     this.pointerInit()
   }
 
@@ -77,6 +86,7 @@ export default class Input  {
   }
   get status() { return this.#status }
   get element() { return this.#element }
+  get isTouch() { return this.#isTouch }
   get isPan() { return this.#isPan }
   set panX(x) { if (isBoolean(x)) this.#panX = x }
   set panY(x) { if (isBoolean(y)) this.#panY = y }

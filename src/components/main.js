@@ -13,7 +13,7 @@ import chartGrid from "./overlays/chart-grid"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-mainPane"
 import Input from "../input"
-import { isNumber } from "../utils/typeChecks"
+import { isBoolean, isNumber } from "../utils/typeChecks"
 import { copyDeep } from "../utils/utilities"
 
 import {
@@ -578,6 +578,7 @@ export default class MainPane {
    * @param {object} options 
    */
   addOffChart(offChart, options) {
+    // insert a row to mount the indicator on
     let rowEl, row
     this.#elRows.insertAdjacentHTML("beforeend", this.#elMain.rowNode(offChart.type, this.#core))
     rowEl = this.#elRows.lastElementChild
@@ -586,6 +587,7 @@ export default class MainPane {
     row.style.height = `${options.rowH}px`
     row.style.width = `100%`
 
+    // insert a YAxis for the new indicator
     let axisEl, axis
     this.#elYAxis.insertAdjacentHTML("beforeend", this.scaleNode(offChart.type))
     axisEl = this.#elYAxis.lastElementChild
@@ -608,19 +610,23 @@ export default class MainPane {
   }
 
   addIndicator(i) {
-    const onChart = (this.type === "onChart" ) ? true : false;
     const indicator = this.core.indicators[i.type].ind
-    const indType = (indicator.constructor.type === "both") ? onChart : indicator.prototype.onChart
+    const indType = (
+      indicator.onChart === "both" && 
+      isBoolean(i.onChart)) ? 
+      i.onChart : false;
     if (
       i?.type in this.core.indicators &&
-      onChart === indType
+      indType === false
     ) {
       const cnt = this.#OffCharts.size + 1
       const heights = this.calcOffChartHeights(cnt)
       const options = {...heights}
-            options.elements = this.elements
+            options.parent = this
+            options.title = i.name
+            options.elements = {}
 
-      // this.addOffChart(i, options)
+      this.addOffChart(i, options)
     }
     else return false
   }

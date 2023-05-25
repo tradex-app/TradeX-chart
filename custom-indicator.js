@@ -19,6 +19,12 @@ export default class Test extends Indicator {
 
   style = {}
 
+  static inCnt = 0
+  static onChart = true
+  // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
+  static colours = []
+
+
   /**
    * Creates an instance of Test.
    * @param {object} target - canvas scene
@@ -54,7 +60,7 @@ export default class Test extends Indicator {
    * valid returned values can be: true, false (boolean), both (string)
    * @readonly
    */
-  get onChart() { return true }
+  get onChart() { return Test.onChart }
 
   /**
    * return inputs required to display indicator legend on chart pane

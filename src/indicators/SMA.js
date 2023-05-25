@@ -38,7 +38,7 @@ import { uid } from "../utils/utilities"
 
   
   static inCnt = 0
-  // static onChart = false
+  static onChart = true
   // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
   static colours = [
     "#9C27B0",
@@ -76,7 +76,7 @@ import { uid } from "../utils/utilities"
     this.addLegend()
   }
 
-  get onChart() { return true }
+  get onChart() { return SMA.onChart }
 
   updateLegend() {
     this.parent.legend.update()

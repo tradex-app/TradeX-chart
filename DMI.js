@@ -2,6 +2,7 @@
 // Directional Movement Index 
 
 import { Indicator, Range, uid } from "./src"
+import { YAXIS_TYPES } from "./src/definitions/chart"
 
 export default class DMI extends Indicator {
 
@@ -35,6 +36,11 @@ export default class DMI extends Indicator {
 
   style = {}
 
+  static inCnt = 0
+  static onChart = false
+  static scale = YAXIS_TYPES[0] // defualt
+
+
   /**
    * Creates an instance of DMI.
    * @param {object} target - canvas scene
@@ -66,7 +72,7 @@ export default class DMI extends Indicator {
    * valid returned values can be: true, false (boolean), both (string)
    * @readonly
    */
-  get onChart() { return false }
+  get onChart() { return DMI.onChart }
 
   /**
    * return inputs required to display indicator legend on chart pane

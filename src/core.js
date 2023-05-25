@@ -1030,7 +1030,7 @@ export default class TradeXchart extends Tradex_chart {
 
     console.log(`Adding the ${name} : ${i} indicator`)
 
-    if (this.#indicators[i].ind.prototype.onChart)
+    if (this.#indicators[i].ind.onChart)
       this.Chart.addIndicator(indicator);
     else
       this.#MainPane.addIndicator(indicator);

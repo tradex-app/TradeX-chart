@@ -13,7 +13,7 @@ function _mergeNamespaces(n, m) {
   return Object.freeze(Object.defineProperty(n, Symbol.toStringTag, { value: 'Module' }));
 }
 
-const version = "0.121.8";
+const version = "0.121.10";
 
 function isArray (v) {
   return Array.isArray(v)
@@ -662,6 +662,20 @@ function MS (t) {
   let s = String(get_second(t)).padStart(2, '0');
   return `${m}:${s}`
 }
+function nearestTs(t, ts) {
+    let dist = Infinity;
+    let val = null;
+    let index = -1;
+    for (let i = 0; i < ts.length; i++) {
+        let ti = ts[i][0];
+        if (Math.abs(ti - t) < dist) {
+            dist = Math.abs(ti - t);
+            val = ts[i];
+            index = i;
+        }
+    }
+    return [index, val]
+}
 
 var Time = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   __proto__: null,
@@ -723,7 +737,8 @@ var Time = /*#__PURE__*/Object.freeze(/*#__PURE__*/Object.defineProperty({
   DM: DM,
   HM: HM,
   HMS: HMS,
-  MS: MS
+  MS: MS,
+  nearestTs: nearestTs
 }, Symbol.toStringTag, { value: 'Module' }));
 
 function getRandomIntBetween(min, max) {
@@ -811,12 +826,19 @@ function copyDeep(obj) {
   }
   return temp;
 }
-function uid(tag="ID") {
-  if (isNumber(tag)) tag = tag.toString();
-  else if (!isString$1(tag)) tag = "ID";
-  const dateString = Date.now().toString(36);
-  const randomness = Math.random().toString(36).substring(2,5);
-  return `${tag}_${dateString}_${randomness}`
+function setProperty (obj, path, value) {
+  const [head, ...rest] = path.split('.');
+  return {
+      ...obj,
+      [head]: rest.length
+          ? setProperty(obj[head], rest.join('.'), value)
+          : value
+  }
+}
+function getProperty(obj, path) {
+  const keys = path.split(".");
+  return keys.reduce((o, key) =>
+      (o && o[key] !== 'undefined') ? o[key] : undefined, obj);
 }
 function isArrayEqual(a1, a2) {
   let i = a1.length;
@@ -824,6 +846,13 @@ function isArrayEqual(a1, a2) {
       if (a1[i] !== a2[i]) return false;
   }
   return true
+}
+function uid(tag="ID") {
+  if (isNumber(tag)) tag = tag.toString();
+  else if (!isString$1(tag)) tag = "ID";
+  const dateString = Date.now().toString(36);
+  const randomness = Math.random().toString(36).substring(2,5);
+  return `${tag}_${dateString}_${randomness}`
 }
 const firstItemInMap = map => map.entries().next().value;
 const firstKeyInMap = map => map.entries().next().value[0];
@@ -1834,6 +1863,25 @@ class Stream {
     return ts - (ts % this.#core.time.timeFrameMS)
   }
 }
+
+const isBrowser =
+typeof window !== 'undefined' &&
+typeof window.document !== 'undefined';
+typeof process !== 'undefined' &&
+  process.versions != null &&
+  process.versions.node != null;
+(typeof window !== 'undefined' && window.name === 'nodejs') ||
+  navigator.userAgent.includes('Node.js') ||
+  navigator.userAgent.includes('jsdom');
+const isTouchDevice = (w =>
+  'onorientationchange' in w ||
+  w.matchMedia("(any-pointer:coarse)").matches ||
+  (!!navigator.maxTouchPoints ||
+  !!navigator.msMaxTouchPoints ||
+  ('ontouchstart' in w ||
+  (w.DocumentTouch &&
+  document instanceof w.DocumentTouch))))
+  (typeof window !== 'undefined' ? window : {});
 
 const status = {
   idle: 0,
@@ -4394,6 +4442,7 @@ class Input  {
   #pointer = null
   #key = null
   #touch = null
+  #isTouch
   #status
   #isPan = false
   #panX
@@ -4403,6 +4452,7 @@ class Input  {
   constructor (element, options) {
     this.#options = { ...defaultOptions$1, ...options };
     this.#status = status.idle;
+    this.#isTouch = isTouchDevice;
     this.#element = element;
     if (!this.#element && this.#options.elementId) {
       this.#element = document.getElementById(this.#options.elementId);
@@ -4416,7 +4466,14 @@ class Input  {
         return false;
       };
     }
-    this.#eventsAgent = new EventManager(this.#element);
+    const T = this.#isTouch ? 10 : 0;
+    const opts = {
+      recognizerOptions: {
+        pan: {threshold: T},
+        pinch: {threshold: 0}
+      }
+    };
+    this.#eventsAgent = new EventManager(this.#element, opts);
     this.pointerInit();
   }
   get agent() { return this.#eventsAgent }
@@ -4437,6 +4494,7 @@ class Input  {
   }
   get status() { return this.#status }
   get element() { return this.#element }
+  get isTouch() { return this.#isTouch }
   get isPan() { return this.#isPan }
   set panX(x) { if (isBoolean(x)) this.#panX = x; }
   set panY(x) { if (isBoolean(y)) this.#panY = y; }
@@ -4504,17 +4562,26 @@ class Input  {
     }
   }
   motion(e) {
+    let clientRect = {left: 0, top: 0};
+    try {
+      clientRect = e.srcEvent.target?.getBoundingClientRect();
+    }
+    catch (err) {}
     const clientX = e.srcEvent.clientX || this.position.x;
     const clientY = e.srcEvent.clientY || this.position.y;
     this.movement.x = clientX - this.clientPosPrev.x;
     this.movement.y = clientY - this.clientPosPrev.y;
-    this.position.x += this.movement.x;
-    this.position.y += this.movement.y;
+    this.position.x = clientX - clientRect.left;
+    this.position.y = clientY- clientRect.top;
     this.clientPosPrev.x = clientX;
     this.clientPosPrev.y = clientY;
   }
   location(e) {
-    const clientRect = e.srcEvent.target.getBoundingClientRect() || 0;
+    let clientRect = {left: 0, top: 0};
+    try {
+      clientRect = e.srcEvent.target?.getBoundingClientRect();
+    }
+    catch (err) {}
     this.clientPosPrev.x = e.srcEvent.clientX;
     this.clientPosPrev.y = e.srcEvent.clientY;
     this.position.x = e.srcEvent.clientX - clientRect.left;
@@ -4967,11 +5034,22 @@ class Theme {
     }
     return false
   }
-  setValue(key, value) {
-    if (key in this) {
-      this[key] = value;
-      this.#core.refresh();
+  setProperty(path, value) {
+    if (!isString$1(path)) return undefined
+    const old = getProperty(this, path);
+    const keys = path.split(".");
+    if (keys.length == 1) {
+      this[keys[0]] = value;
     }
+    else {
+      let k = keys.shift();
+      this[k] = setProperty(this[k], keys.join('.'), value);
+    }
+    this.#core.refresh();
+    return old
+  }
+  getProperty(path) {
+    return getProperty(this, path)
   }
   deleteTheme(theme) {
     if (isString$1(theme) && Theme.list.has(theme)) {
@@ -5492,38 +5570,6 @@ const BBANDS = {
     plot: "limit_lower"
   }]
 };
-const DX = {
-  name: "DX",
-  camelCaseName: "dx",
-  group: "Momentum Indicators",
-  description: "Directional Movement Index",
-  inputs: [{
-    name: "high",
-    type: "number"
-  }, {
-    name: "low",
-    type: "number"
-  }, {
-    name: "close",
-    type: "number"
-  }],
-  options: [{
-    name: "timePeriod",
-    displayName: "Time Period",
-    defaultValue: 14,
-    hint: "Number of period",
-    type: "number",
-    range: {
-      min: 2,
-      max: 100000
-    }
-  }],
-  outputs: [{
-    name: "output",
-    type: "number",
-    plot: "line"
-  }]
-};
 const EMA$1 = {
   name: "EMA",
   camelCaseName: "ema",
@@ -5637,6 +5683,8 @@ class BB extends indicator {
   plots = [
     { key: 'BB_1', title: ' ', type: 'line' },
   ]
+  static inCnt = 0
+  static onChart = true
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
     super(target, xAxis, yAxis, config, parent, params);
     const overlay = params.overlay;
@@ -5648,7 +5696,7 @@ class BB extends indicator {
     this.setUpdateValue = (value) => { this.updateValue(value); };
     this.addLegend();
   }
-  get onChart() { return true }
+  get onChart() { return BB.onChart }
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
     const inputs = {};
@@ -5670,7 +5718,6 @@ class BB extends indicator {
     const plots = {lower: [], middle: [], upper: []};
     const data = this.overlay.data;
     const width = this.xAxis.candleW;
-    this.Timeline.smoothScrollOffset || 0;
     const plot = {
       w: width,
     };
@@ -5722,105 +5769,6 @@ class BB extends indicator {
   }
 }
 
-class DMI extends indicator {
-  name = 'Directional Movement Index'
-  shortName = 'DX'
-  libName = null
-  definition = {
-    input: {
-    },
-    output: {
-    },
-  }
-  #defaultStyle = {
-    strokeStyle: "#C80",
-    lineWidth: '1',
-    defaultHigh: 75,
-    defaultLow: 25,
-    highLowLineWidth: 1,
-    highLowStyle: "dashed",
-    highStrokeStyle: "#848",
-    lowStrokeStyle: "#848",
-    highLowRangeStyle: "#22002220"
-  }
-  precision = 2
-  scaleOverlay = true
-  plots = [
-    { key: 'DMI_1', title: ' ', type: 'line' },
-  ]
-  constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
-    super(target, xAxis, yAxis, config, parent, params);
-    const overlay = params.overlay;
-    this.ID = params.overlay?.id || uid(this.shortName);
-    this.defineIndicator(overlay?.settings, DX);
-    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
-    this.calcIndicatorHistory();
-    this.setNewValue = (value) => { this.newValue(value); };
-    this.setUpdateValue = (value) => { this.updateValue(value); };
-  }
-  get onChart() { return false }
-  legendInputs(pos=this.chart.cursorPos) {
-    if (this.overlay.data.length == 0) return false
-    const inputs = {};
-    const {c, colours} = super.legendInputs(pos);
-    inputs.DMI_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
-    return {inputs, colours}
-  }
-  draw(range=this.range) {
-    if (this.overlay.data.length < 2 ) return false
-    this.scene.clear();
-    const data = this.overlay.data;
-    const width = this.xAxis.candleW;
-    const x2 = this.scene.width + (this.xAxis.bufferPx * 2);
-    const y1 = this.yAxis.yPos(this.style.defaultHigh);
-    const y2 = this.yAxis.yPos(this.style.defaultLow);
-    const plots = [0, y1, this.scene.width, y2 - y1];
-    let style = this.style.highLowRangeStyle;
-    this.plot(plots, "renderFillRect", style);
-    plots.length = 0;
-    plots[0] = {x: 0, y: y1};
-    plots[1] = {x: x2, y: y1};
-    style = {
-      lineWidth: this.style.highLowLineWidth,
-      strokeStyle: this.style.highStrokeStyle,
-      dash: [5, 5]
-    };
-    this.plot(plots, "renderLine", style);
-    plots.length = 0;
-    plots[0] = {x: 0, y: y2};
-    plots[1] = {x: x2, y: y2};
-    style = {
-      lineWidth: this.style.highLowLineWidth,
-      strokeStyle: this.style.lowStrokeStyle,
-      dash: [5, 5]
-    };
-    this.plot(plots, "renderLine", style);
-    plots.length = 0;
-    this.Timeline.smoothScrollOffset || 0;
-    const plot = {
-      w: width,
-    };
-    let o = this.Timeline.rangeScrollOffset;
-    let d = range.data.length - this.overlay.data.length;
-    let c = range.indexStart - d - 2;
-    let i = range.Length + (o * 2) + 2;
-    while(i) {
-      if (c < 0 || c >= this.overlay.data.length) {
-        plots.push({x: null, y: null});
-      }
-      else {
-        plot.x = this.xAxis.xPos(data[c][0]);
-        plot.y = this.yAxis.yPos(data[c][1]);
-        plots.push({...plot});
-      }
-      c++;
-      i--;
-    }
-    this.plot(plots, "renderLine", this.style);
-    this.target.viewport.render();
-  }
-}
-
 class EMA extends indicator {
   name = 'Exponential Moving Average'
   shortName = 'EMA'
@@ -5845,6 +5793,7 @@ class EMA extends indicator {
     { key: 'EMA_1', title: 'EMA: ', type: 'line' },
   ]
   static inCnt = 0
+  static onChart = true
   static colours = [
     "#9C27B0",
     "#9C27B0",
@@ -5863,7 +5812,7 @@ class EMA extends indicator {
     this.setUpdateValue = (value) => { this.updateValue(value); };
     this.addLegend();
   }
-  get onChart() { return true }
+  get onChart() { return EMA.onChart }
   updateLegend() {
     this.parent.legend.update();
   }
@@ -5933,6 +5882,9 @@ class RSI extends indicator {
   plots = [
     { key: 'RSI_1', title: ' ', type: 'line' },
   ]
+  static inCnt = 0
+  static onChart = false
+  static scale = YAXIS_TYPES$1[1]
   constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
     super (target, xAxis, yAxis, config, parent, params);
     const overlay = params.overlay;
@@ -5943,7 +5895,7 @@ class RSI extends indicator {
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.updateValue(value); };
   }
-  get onChart() { return false }
+  get onChart() { return RSI.onChart }
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
     const inputs = {};
@@ -6030,6 +5982,7 @@ class SMA extends indicator {
     { key: 'SMA_1', title: 'SMA: ', type: 'line' },
   ]
   static inCnt = 0
+  static onChart = true
   static colours = [
     "#9C27B0",
     "#9C27B0",
@@ -6048,7 +6001,7 @@ class SMA extends indicator {
     this.setUpdateValue = (value) => { this.updateValue(value); };
     this.addLegend();
   }
-  get onChart() { return true }
+  get onChart() { return SMA.onChart }
   updateLegend() {
     this.parent.legend.update();
   }
@@ -6113,7 +6066,6 @@ class Volume extends indicator {
 
 var Indicators = {
   BB: {id: "BB", name: "Bollinger Bands", event: "addIndicator", ind: BB},
-  DMI: {id: "DMI", name: "Directional Movement", event: "addIndicator", ind: DMI},
   EMA: {id: "EMA", name: "Exponential Moving Average", event: "addIndicator", ind: EMA},
   RSI: {id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: RSI},
   SMA: {id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: SMA},
@@ -6398,11 +6350,6 @@ var stateMachineConfig$6 = {
     },
   },
 };
-
-const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
-typeof process !== 'undefined'
-  && process.versions != null
-  && process.versions.node != null;
 
 const isHex  = /^#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const isHSL  = /^hsla?((\d{1,3}?),\s*(\d{1,3}%),\s*(\d{1,3}%)(,\s*[01]?\.?\d*)?)$/;
@@ -7269,10 +7216,11 @@ class chartCursor extends Overlay{
     this.core.emit("chart_render");
   }
   draw(drag = false) {
-    let x = this.#cursorPos[0];
+    const rect = this.target.viewport.container.getBoundingClientRect();
+    let y = this.core.mousePos.y - rect.top;
+    let x = this.core.mousePos.x - rect.left;
     if (!drag)
         x = this.xAxis.xPosSnap2CandlePos(x) + this.xAxis.scrollOffsetPx;
-    let y = this.#cursorPos[1];
     this.scene.clear();
     const ctx = this.scene.context;
     ctx.save();
@@ -8479,26 +8427,26 @@ class ScaleCursor extends Overlay {
     this.viewport = target.viewport;
   }
   set position(p) { this.target.setPosition(p[0], p[1]); }
-  draw(cursorPos) {
+  draw() {
     if (!this.parent.parent.cursorActive) return
-    this.#cursorPos = (isArray(cursorPos)) ? cursorPos : this.#cursorPos;
-    let [x, y] = this.#cursorPos,
-    price =  this.parent.yPos2Price(y),
-    nice = this.parent.nicePrice(price),
-    options = {
-      fontSize: this.theme.yAxis.fontSize * 1.05,
-      fontWeight: this.theme.yAxis.fontWeight,
-      fontFamily: this.theme.yAxis.fontFamily,
-      txtCol: this.theme.yAxis.colourCursor,
-      bakCol: this.theme.yAxis.colourCursorBG,
-      paddingTop: 2,
-      paddingBottom: 2,
-      paddingLeft: 3,
-      paddingRight: 3,
-      width: this.viewport.width
-    },
-    height = options.fontSize + options.paddingTop + options.paddingBottom,
-    yPos = y - (height * 0.5);
+    const rect = this.target.viewport.container.getBoundingClientRect();
+    let y = this.core.mousePos.y - rect.top,
+        price =  this.parent.yPos2Price(y),
+        nice = this.parent.nicePrice(price),
+        options = {
+          fontSize: this.theme.yAxis.fontSize * 1.05,
+          fontWeight: this.theme.yAxis.fontWeight,
+          fontFamily: this.theme.yAxis.fontFamily,
+          txtCol: this.theme.yAxis.colourCursor,
+          bakCol: this.theme.yAxis.colourCursorBG,
+          paddingTop: 2,
+          paddingBottom: 2,
+          paddingLeft: 3,
+          paddingRight: 3,
+          width: this.viewport.width
+        },
+        height = options.fontSize + options.paddingTop + options.paddingBottom,
+        yPos = y - (height * 0.5);
     const ctx = this.scene.context;
     this.scene.clear();
     ctx.save();
@@ -8832,6 +8780,14 @@ class ScaleBar {
   }
 }
 
+const userSelect = [
+  "-webkit-touch-callout",
+  "-webkit-user-select",
+  "-khtml-user-select",
+  "-moz-user-select",
+  "-ms-user-select",
+  "user-select",
+];
 class Legends {
   #elTarget
   #list
@@ -8856,10 +8812,22 @@ class Legends {
     this.moveEvent = new PointerEvent("pointermove", {bubbles: true, cancelable: true,});
     this.#input = new Input(this.#elTarget, { disableContextMenu: false, });
     this.#input.on("pointermove", this.onMouseMove.bind(this));
+    this.#core.on("chart_pan", this.onChartPan.bind(this));
+    this.#core.on("chart_panDone", this.onChartPanDone.bind(this));
   }
   onMouseMove(e) {
   }
   onMouseClick() {
+  }
+  onChartPan() {
+    for (let property of userSelect) {
+      this.#elTarget.style.setProperty(property, "none");
+    }
+  }
+  onChartPanDone() {
+    for (let property of userSelect) {
+      this.#elTarget.style.removeProperty(property);
+    }
   }
   buildLegend(o) {
     const theme = this.#core.theme;
@@ -10132,14 +10100,7 @@ class MainPane {
     options.settings = this.#core.settings;
     options.elements =
       {...options.elements,
-        ...{
-          elTarget: this.#elChart,
-          elTime: this.#elTime,
-          elRows: this.#elRows,
-          elChart: this.#elChart,
-          elOffCharts: this.#elOffCharts,
-          elScale: this.#elScale
-        }
+        ...this.elements
       };
     if ( this.#core.theme?.time?.navigation === false ) {
       const timeHeight = { height: TIMESCALEH };
@@ -10418,19 +10379,8 @@ class MainPane {
       this.#core.log(`offChart indicator ${this.#core.offChart.type} not added: not supported.`);
       this.#core.offChart.splice(i, 1);
     }
-    let a = this.#offChartDefaultH * this.#core.offChart.length,
-    offChartsH = ( a / Math.log10( a * 2 ) ) / 100,
-    rowsH = Math.round(this.rowsH * offChartsH);
-    options.offChartsH = offChartsH;
-    if (this.#core.offChart.length === 1) {
-      options.rowH = Math.round(this.rowsH * this.#offChartDefaultH / 100);
-      options.chartH = this.rowsH - options.rowH;
-    }
-    else {
-      options.rowH = Math.round(rowsH / this.#OffCharts.size);
-      options.chartH = this.rowsH - rowsH;
-      options.height = options.rowH;
-    }
+    let heights = this.calcOffChartHeights(this.#core.offChart.length);
+    options = {...options, ...heights};
     options.chartH / this.rowsH * 100;
     this.#elChart.style.height = `${options.chartH}px`;
     this.#Chart.scale.element.style.height = `${options.chartH}px`;
@@ -10464,9 +10414,42 @@ class MainPane {
     this.#OffCharts.set(o.id, o);
     this.emit("addOffChart", o);
   }
-  addIndicator(ind) {
-    const indicator = this.#indicators[ind].ind;
-    console.log("indicator:",indicator);
+  addIndicator(i) {
+    const indicator = this.core.indicators[i.type].ind;
+    const indType = (
+      indicator.onChart === "both" &&
+      isBoolean(i.onChart)) ?
+      i.onChart : false;
+    if (
+      i?.type in this.core.indicators &&
+      indType === false
+    ) {
+      const cnt = this.#OffCharts.size + 1;
+      const heights = this.calcOffChartHeights(cnt);
+      const options = {...heights};
+            options.parent = this;
+            options.title = i.name;
+            options.elements = {};
+      this.addOffChart(i, options);
+    }
+    else return false
+  }
+  calcOffChartHeights(cnt) {
+    let a = this.#offChartDefaultH * this.#core.offChart.length,
+        offChartsH = ( a / Math.log10( a * 2 ) ) / 100,
+        rowsH = Math.round(this.rowsH * offChartsH),
+        options = {};
+    options.offChartsH = offChartsH;
+    if (cnt === 1) {
+      options.rowH = Math.round(this.rowsH * this.#offChartDefaultH / 100);
+      options.chartH = this.rowsH - options.rowH;
+    }
+    else {
+      options.rowH = Math.round(rowsH / this.#OffCharts.size);
+      options.chartH = this.rowsH - rowsH;
+      options.height = options.rowH;
+    }
+    return options
   }
   scaleNode(type) {
     const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.offChart.separator};`;
@@ -13360,6 +13343,7 @@ class TradeXchart extends tradeXChart {
     return true
   }
   addIndicator(i, name=i, params={}) {
+    console.log(`addIndicator() ${i}, ${name}, ${params}`);
     if (
       !isString$1(i) &&
       !(i in this.#indicators) &&
@@ -13372,7 +13356,7 @@ class TradeXchart extends tradeXChart {
       ...params
     };
     console.log(`Adding the ${name} : ${i} indicator`);
-    if (this.#indicators[i].ind.prototype.onChart)
+    if (this.#indicators[i].ind.onChart)
       this.Chart.addIndicator(indicator);
     else
       this.#MainPane.addIndicator(indicator);
@@ -13436,4 +13420,4 @@ if (!window.customElements.get('tradex-chart')) {
   customElements.get('tradex-chart') || customElements.define('tradex-chart', TradeXchart);
 }
 
-export { TradeXchart as Chart, DOM, indicator as Indicator, Overlay, copyDeep, isPromise, mergeDeep, uid };
+export { TradeXchart as Chart, DOM, indicator as Indicator, Overlay, Range, copyDeep, isPromise, mergeDeep, uid };

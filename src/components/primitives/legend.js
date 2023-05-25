@@ -4,6 +4,15 @@ import { isObject } from "../../utils/typeChecks"
 import { uid } from "../../utils/utilities"
 import Input from "../../input"
 
+const userSelect = [
+  "-webkit-touch-callout",
+  "-webkit-user-select",
+  "-khtml-user-select",
+  "-moz-user-select",
+  "-ms-user-select",
+  "user-select",
+]
+
 export default class Legends {
 
   #elTarget
@@ -34,6 +43,9 @@ export default class Legends {
 
     this.#input = new Input(this.#elTarget, { disableContextMenu: false, });
     this.#input.on("pointermove", this.onMouseMove.bind(this))
+
+    this.#core.on("chart_pan", this.onChartPan.bind(this))
+    this.#core.on("chart_panDone", this.onChartPanDone.bind(this))
   }
 
   onMouseMove(e) {
@@ -44,7 +56,18 @@ export default class Legends {
   }
 
   onMouseClick() {
+  }
 
+  onChartPan() {
+    for (let property of userSelect) {
+      this.#elTarget.style.setProperty(property, "none");
+    }
+  }
+
+  onChartPanDone() {
+    for (let property of userSelect) {
+      this.#elTarget.style.removeProperty(property);
+    }
   }
 
   buildLegend(o) {

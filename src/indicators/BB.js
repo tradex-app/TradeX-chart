@@ -44,19 +44,19 @@ export default class BB extends indicator {
     { key: 'BB_1', title: ' ', type: 'line' },
   ]
 
-
-  // static onChart = true
+  static inCnt = 0
+  static onChart = true
   // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
 
   /**
- * Creates an instance of DMI.
+ * Creates an instance of BB.
    * @param {object} target - canvas scene
    * @param {object} xAxis - timeline axis instance
    * @param {object} yAxis - scale axis instance
    * @param {object} config - theme / styling
    * @param {object} parent - (on/off)chart pane instance that hosts the indicator
    * @param {object} params - contains minimum of overlay instance
- * @memberof DMI
+ * @memberof BB
  */
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
     super(target, xAxis, yAxis, config, parent, params)
@@ -80,7 +80,7 @@ export default class BB extends indicator {
    * valid returned values can be: true, false (boolean), both (string)
    * @readonly
    */
-  get onChart() { return true }
+  get onChart() { return BB.onChart }
 
   /**
    * return inputs required to display indicator legend on chart pane

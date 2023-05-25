@@ -656,7 +656,7 @@ chart0.setIndicators({
   TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST},
   DMI: {id: "DMI", name: "Directional Movement Indicator", event: "addIndicator", ind: DMI }
 })
-chart0.addIndicator("TEST", "Test1", {data: []})
-chart0.addIndicator("DMI", "DMI1", {data: []})
+chart0.addIndicator("TEST", "Test1", {data: [], settings: {}})
+// chart0.addIndicator("DMI", "DMI1", {data: []})
 // add an alert
-chart1.stream.alerts.add(13010, alertTest, h)
+// chart1.stream.alerts.add(13010, alertTest, h)

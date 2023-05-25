@@ -48,9 +48,9 @@ export default class RSI extends indicator {
     { key: 'RSI_1', title: ' ', type: 'line' },
   ]
 
-
-  // static onChart = false
-  // static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
+  static inCnt = 0
+  static onChart = false
+  static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
 
   /**
@@ -79,7 +79,7 @@ export default class RSI extends indicator {
     this.setUpdateValue = (value) => { this.updateValue(value) }
   }
 
-  get onChart() { return false }
+  get onChart() { return RSI.onChart }
 
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
