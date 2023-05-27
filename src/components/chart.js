@@ -24,6 +24,10 @@ import {
 import { BUFFERSIZE } from "../definitions/chart";
 
 export default class Chart {
+
+  static #cnt = 0
+  static get cnt() { return Chart.#cnt++ }
+
   #ID;
   #name
   #shortName
@@ -32,6 +36,7 @@ export default class Chart {
   #options;
   #parent;
   #stateMachine;
+  #chartCnt
 
   #elTarget;
   #elCanvas;
@@ -71,6 +76,7 @@ export default class Chart {
   constructor(core, options) {
     this.#core = core;
     if (!isObject(options)) return
+    this.#chartCnt = Chart.cnt
     this.#options = {...options}
 
     this.#name = options.name
@@ -96,7 +102,7 @@ export default class Chart {
   error(e) { this.core.error(e) }
 
   set id(id) { this.#ID = id }
-  get id() { return (this.#ID) ? `${this.#ID}` : `${this.#core.id}.${this.#name}` }
+  get id() { return (this.#ID) ? `${this.#ID}` : `${this.#core.id}.${this.#name}_${this.#chartCnt}` }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get title() { return this.#title }

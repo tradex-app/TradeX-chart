@@ -1,6 +1,7 @@
 // element.js
 // base class for views to build upon
 
+import { SHORTNAME } from "../../../definitions/core"
 import { uid } from "../../../utils/utilities"
 import { isNumber, isString } from "../../../utils/typeChecks"
 
@@ -8,7 +9,7 @@ export default class element extends HTMLElement {
 
   shadowRoot
   template
-  id = uid()
+  id = uid( SHORTNAME )
   doInit = true
 
   constructor (template, mode="open") {

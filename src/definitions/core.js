@@ -1,4 +1,5 @@
 export const NAME = "TradeX-Chart"
+export const SHORTNAME = "TX"
 export const ID = "TradeXChart"
 
 export const CLASS_DEFAULT   = "tradeXchart"

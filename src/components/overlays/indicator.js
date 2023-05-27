@@ -28,6 +28,9 @@ const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
  */
 export default class indicator extends Overlay {
 
+  static #cnt = 0
+  static get cnt() { return ++indicator.#cnt }
+
   #ID
   #name
   #shortName

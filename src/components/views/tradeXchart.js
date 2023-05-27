@@ -12,9 +12,6 @@ import tradeXwidgets from "./widgets"
 
 import {
   UTILSH,
-  TOOLSW,
-  TIMEH,
-  SCALEW,
   CHART_MINH, 
   CHART_MINW,
   TX_MINH
@@ -167,9 +164,7 @@ export default class tradeXChart extends element {
   }
 
   onResized(entries) {
-      console.log("onResize")
-      console.log(this.offsetWidth)
-      console.log(this.offsetHeight)
+      this.log(`onResize w: ${this.offsetWidth}, h: ${this.offsetHeight}`)
 
       if (isObject(this.MainPane) && this.MainPane instanceof MainPane) {
         this.previousDimensions()

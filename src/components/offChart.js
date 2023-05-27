@@ -51,8 +51,11 @@ export default class OffChart extends Chart {
     options.type = "offChart"
     super(core, options)
 
-    this.#ID = this.options.offChartID || uid("TX_OC_")
+    // this.#ID = this.options.offChartID || uid("TX_OC_")
     this.#overlay = options.offChart
+    this.#overlay.cnt = this.core.indicators[this.#overlay.type].ind.cnt
+    this.#overlay.id = `${this.id}.${options.offChart.type}_${this.#overlay.cnt}`
+    this.#overlay.paneID = this.id
     this.overlays.set(options.offChart.name, options.offChart)
     this.init(options)
   }

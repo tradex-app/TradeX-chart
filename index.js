@@ -92,7 +92,7 @@ let interval = 500
 let streamInit = false
 
 const config1 = {
-  id: "TradeX_test",
+  // id: "TradeX_test",
   title: "BTC/USDT",
   symbol: "btcusdt",
   // width: 600,
@@ -500,7 +500,7 @@ chart.id = "test"
 document.getElementById("app").appendChild(chart)
 window.chart = chart
 chart.init(config)
-chart.start(chart.getModID())
+chart.start()
 
 console.log("API: id:", chart.id)
 console.log("API: name:", chart.name)

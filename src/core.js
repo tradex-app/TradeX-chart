@@ -3,11 +3,10 @@
 
 import * as packageJSON from '../package.json'
 import { isArray, isBoolean, isFunction, isNumber, isObject, isString, isError, isPromise } from './utils/typeChecks'
-import DOM from './utils/DOM'
 import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { isTimeFrame, SECOND_MS } from "./utils/time"
-import { copyDeep, promiseState } from './utils/utilities'
+import { copyDeep, promiseState, uid } from './utils/utilities'
 import State from './state'
 import { Range, calcTimeIndex } from "./model/range"
 import StateMachine from './scaleX/stateMachne'
@@ -24,19 +23,15 @@ import WidgetsG from './components/widgets'
 
 import {
   NAME,
+  SHORTNAME,
   ID,
   RANGELIMIT,
   PRICE_PRECISION,
   VOLUME_PRECISION,
-  STREAM_LISTENING,
-  STREAM_NEWVALUE,
-  STREAM_UPDATE
+  STREAM_UPDATE,
 } from './definitions/core'
 
-import { LIMITFUTURE, MINCANDLES, YAXIS_BOUNDS } from "./definitions/chart"
-
 import { GlobalStyle } from './definitions/style'
-import { precision } from "./utils/number"
 
 /**
  * The root class for the entire chart
@@ -63,16 +58,14 @@ export default class TradeXchart extends Tradex_chart {
   ["TradeXchart","Chart","MainPane","OffChart","OnChart",
   "ScaleBar","Timeline","ToolsBar","UtilsBar","Widgets"]
 
-  #id
   #name = NAME
-  #shortName = NAME
+  #shortName = SHORTNAME
   #el = undefined
   #mediator
   #core
   #config
   #options
   #elements = {}
-  #elTXChart
   #elUtils
   #elBody
   #elTools
@@ -84,15 +77,12 @@ export default class TradeXchart extends Tradex_chart {
 
   #ready = false
   #inCnt = null
-  #modID
   #hub = {}
   #state = {}
   #userClasses = []
   #chartIsEmpty = true
   #data
   #range
-  #rangeStartTS
-  #rangeLimit = RANGELIMIT
   #indicators = Indicators
   #TALib
   #theme
@@ -144,7 +134,6 @@ export default class TradeXchart extends Tradex_chart {
   
   #scrollPos = 0
   #smoothScrollOffset = 0
-  #panBeginPos = [null, null, null, null]
   #pointerPos = {x:0, y:0}
   #pointerButtons = [false, false, false]
 
@@ -223,10 +212,10 @@ export default class TradeXchart extends Tradex_chart {
   constructor () {
     super()
     this.#inCnt = TradeXchart.cnt()
-    this.#id = `${ID}_${this.#inCnt}`
+    // this.#id = `${ID}_${this.#inCnt}`
 
     console.warn(`!WARNING!: ${NAME} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`)
-    console.log("TXC:",this.inCnt)
+    this.log(`${SHORTNAME} instance count: ${this.inCnt}`)
 
     this.oncontextmenu = window.oncontextmenu
     this.#workers = WebWorker
@@ -240,8 +229,6 @@ export default class TradeXchart extends Tradex_chart {
   timeLog(n) { if (this.timer) console.timeLog(n) }
   timeEnd(n) { if (this.timer) console.timeEnd(n) }
 
-  set id(id) { this.#id = id }
-  get id() { return this.#id }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get mediator() { return this.#mediator }
@@ -329,6 +316,8 @@ export default class TradeXchart extends Tradex_chart {
    * @param {object} txCfg - chart configuration
    */
   start(txCfg) {
+    this.log(`${NAME} configuring...`)
+
     let initCfg = TradeXchart.create(txCfg)
 
     txCfg = {...initCfg, ...txCfg}
@@ -337,20 +326,24 @@ export default class TradeXchart extends Tradex_chart {
     this.warnings = (txCfg?.warnings) ? txCfg.warnings : false
     this.errors = (txCfg?.errors) ? txCfg.errors : false
     this.timer = (txCfg?.timer) ? txCfg.timer : false
-
     this.#config = txCfg
     this.#inCnt = txCfg.cnt || this.#inCnt
-    this.#modID = txCfg.modID
     this.#TALib = txCfg.talib
     this.#el = this
     this.#core = this
+
+    const id = (isObject(txCfg) && isString(txCfg.id)) ? txCfg.id : null
+    this.setID(id)
+    this.classList.add(this.id)
+
+    this.log("processing state...")
 
     let state = copyDeep(txCfg?.state)
     let deepValidate = txCfg?.deepValidate || false
     let isCrypto = txCfg?.isCrypto || false
     this.#state = State.create(state, deepValidate, isCrypto)
     delete txCfg.state
-    this.log(`Chart ${this.#id} created with a ${this.#state.status} state`)
+    this.log(`Chart ${this.id} created with a ${this.#state.status} state`)
 
     // time frame
     let tf = "1s"
@@ -378,11 +371,7 @@ export default class TradeXchart extends Tradex_chart {
     }
     this.#time.timeFrame = tf
     this.#time.timeFrameMS = ms
-    console.log("tf:",tf,"ms:",ms)
-
-    const id = (isObject(txCfg) && isString(txCfg.id)) ? txCfg.id : null
-    this.setID(id)
-    this.classList.add(this.id)
+    this.log(`tf: ${tf} ms: ${ms}`)
 
     // process config
     if (isObject(txCfg)) {
@@ -419,8 +408,7 @@ export default class TradeXchart extends Tradex_chart {
 
     this.setTheme(this.#themeTemp.ID)
 
-    this.log(`${this.#name} V${TradeXchart.version} instantiated`)
-    this.log("...processing state")
+    this.log(`${this.#name} V${TradeXchart.version} configured and running...`)
 
     this.#scrollPos = this.bufferPx * -1
 
@@ -563,14 +551,10 @@ export default class TradeXchart extends Tradex_chart {
 
   setID(id) {
     if (isString(id)) 
-      this.#id = id + this.#inCnt
+      this.id = id
     else 
-      this.#id = ID + this.#inCnt
+      this.id = `${uid( SHORTNAME )}_${this.#inCnt}`
   }
-  getID() { return this.#id }
-
-  getModID() { return this.#modID }
-
 
   /**
    * Set chart width and height

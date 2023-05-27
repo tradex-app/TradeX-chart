@@ -13108,7 +13108,6 @@ class TradeXchart extends tradeXChart {
       this.#id = ID + this.#inCnt;
   }
   getID() { return this.#id }
-  getModID() { return this.#modID }
   setDimensions(w, h) {
     const dims = super.setDimensions(w, h);
     this.emit("global_resize", dims);
