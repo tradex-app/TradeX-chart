@@ -13,7 +13,7 @@ function _mergeNamespaces(n, m) {
   return Object.freeze(Object.defineProperty(n, Symbol.toStringTag, { value: 'Module' }));
 }
 
-const version = "0.121.10";
+const version = "0.121.11";
 
 function isArray (v) {
   return Array.isArray(v)
@@ -963,7 +963,8 @@ const XAXIS_ZOOM = 0.05;
 const XAXIS_STEP = 100;
 const YAXIS_STEP = 100;
 const YAXIS_TYPES$1 = ["default", "percent", "log"];
-const YAXIS_BOUNDS = 0.01;
+const YAXIS_BOUNDS = 0.3;
+const INTITIALCNT = 30;
 const LIMITFUTURE = 200;
 const LIMITPAST = 200;
 const MINCANDLES = 20;
@@ -990,6 +991,7 @@ class Range {
   volumeMinIdx = 0
   volumeMaxIdx = 0
   old = {}
+  initialCnt = INTITIALCNT
   limitFuture = LIMITFUTURE
   limitPast = LIMITPAST
   minCandles = MINCANDLES
@@ -1005,11 +1007,7 @@ class Range {
     if (!isObject(config)) return false
     if (!(config?.core instanceof TradeXchart)) return false
     this.#init = true;
-    this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE;
-    this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST;
-    this.minCandles = (isNumber(this.config?.minCandles)) ? this.config.minCandles : MINCANDLES;
-    this.maxCandles = (isNumber(this.config?.maxCandles)) ? this.config.maxCandles : MAXCANDLES;
-    this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS;
+    this.setConfig(config);
     this.#core = config.core;
     `
     (input) => {
@@ -1058,7 +1056,7 @@ class Range {
   end() {
     WebWorker.destroy(this.#worker.ID);
   }
-  set (start=0, end=this.dataLength, max=this.maxCandles) {
+  set (start=0, end=this.dataLength, max=this.maxCandles, config) {
     if (!isNumber(start) ||
         !isNumber(end) ||
         !isNumber(max)) return false
@@ -1082,8 +1080,18 @@ class Range {
     inOut -= this.Length;
     let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this});
     this.setMaxMin(maxMin);
+    this.setConfig(config);
     this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd]);
     return true
+  }
+  setConfig(config) {
+    if (!isObject(config)) return false
+    this.initialCnt = (isNumber(config?.initialCnt)) ? config.initialCnt : INTITIALCNT;
+    this.limitFuture = (isNumber(config?.limitFuture)) ? config.limitFuture : LIMITFUTURE;
+    this.limitPast = (isNumber(config?.limitPast)) ? config.limitPast : LIMITPAST;
+    this.minCandles = (isNumber(config?.minCandles)) ? config.minCandles : MINCANDLES;
+    this.maxCandles = (isNumber(config?.maxCandles)) ? config.maxCandles : MAXCANDLES;
+    this.yAxisBounds = (isNumber(config?.yAxisBounds)) ? config.yAxisBounds : YAXIS_BOUNDS;
   }
   setMaxMin ( maxMin ) {
     for (let m in maxMin) {
@@ -1234,9 +1242,9 @@ class Range {
       }
     }
     let diff = valueMax - valueMin;
-    valueMin -= diff * 0.1;
+    valueMin -= diff * that.yAxisBounds;
     valueMin = (valueMin > 0) ? valueMin : 0;
-    valueMax += diff * 0.1;
+    valueMax += diff * that.yAxisBounds;
     diff = valueMax - valueMin;
     return {
       valueMin: valueMin,
@@ -8228,6 +8236,7 @@ class yAxis extends Axis {
       t.manual.zoom = 0;
       this.#mode = m;
     }
+    return true
   }
   setOffset(o) {
     if (!isNumber(o) || o == 0 || this.#mode !== "manual") return false
@@ -8734,7 +8743,7 @@ class ScaleBar {
     this.setHeight(dim.h);
     this.draw();
   }
-  setScaleRange(r) {
+  setScaleRange(r=0) {
     if (this.#yAxis.mode == "automatic") this.#yAxis.mode = "manual";
     this.#yAxis.zoom = r;
     this.parent.draw(this.range, true);
@@ -12854,7 +12863,7 @@ class TradeXchart extends tradeXChart {
     super();
     this.#inCnt = TradeXchart.cnt();
     this.#id = `${ID}_${this.#inCnt}`;
-    console.warn(`!WARNING!: ${NAME} breaking changes since V 0.101.7`);
+    console.warn(`!WARNING!: ${NAME} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`);
     console.log("TXC:",this.inCnt);
     this.oncontextmenu = window.oncontextmenu;
     this.#workers = WebWorker$1;
@@ -12910,7 +12919,7 @@ class TradeXchart extends tradeXChart {
       datasets: this.datasets
     }
   }
-  get rangeLimit() { return (isNumber(this.#rangeLimit)) ? this.#rangeLimit : RANGELIMIT }
+  get rangeLimit() { return (isNumber(this.#range.initialCnt)) ? this.#range.initialCnt : RANGELIMIT }
   get range() { return this.#range }
   get time() { return this.#time }
   get TimeUtils() { return Time }
@@ -12990,14 +12999,17 @@ class TradeXchart extends tradeXChart {
         }
       }
     }
-    this.getRange(null, null, {interval: this.#time.timeFrameMS, core: this});
+    const rangeConfig = ("range" in txCfg) ? txCfg.range : {};
+          rangeConfig.interval = this.#time.timeFrameMS;
+          rangeConfig.core = this;
+    this.getRange(null, null, rangeConfig);
     if (this.#range.Length > 1) {
-      const rangeStart = calcTimeIndex(this.#time, this.#rangeStartTS);
+      const rangeStart = calcTimeIndex(this.#time, this.#config?.range?.startTS);
       const end = (rangeStart) ?
-        rangeStart + this.#rangeLimit :
+        rangeStart + this.#range.initialCnt :
         this.chartData.length - 1;
-      const start = (rangeStart) ? rangeStart : end - this.#rangeLimit;
-      this.#rangeLimit = end - start;
+      const start = (rangeStart) ? rangeStart : end - this.#range.initialCnt;
+      this.#range.initialCnt = end - start;
       this.setRange(start, end);
     }
     this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`);
@@ -13081,8 +13093,6 @@ class TradeXchart extends tradeXChart {
       infos: (infos) => this.infos = (isBoolean(infos)) ? infos : false,
       warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
-      rangeStartTS: (rangeStartTS) => this.#rangeStartTS = (isNumber(rangeStartTS)) ? rangeStartTS : undefined,
-      rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
       indicators: (indicators) => this.setIndicators(indicators),
       theme: (theme) => { this.#themeTemp = this.addTheme(theme); },
       stream: (stream) => this.#stream = (isObject(stream)) ? stream : {},

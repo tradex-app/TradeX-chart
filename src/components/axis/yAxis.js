@@ -140,7 +140,7 @@ export default class yAxis extends Axis {
 
   /**
    * return chart price
-   * handles Y Axis modes: default, log, percentate
+   * handles Y Axis modes: default, log, percentage
    * @param {number} y
    * @return {number}
    * @memberof yAxis
@@ -149,40 +149,63 @@ export default class yAxis extends Axis {
     return this.pixel2$(y)
   }
 
+  /**
+   * convert price (YAxis value) to y pixel position relative top left (0,0)
+   * @param {number} y - price
+   * @return {number} - y pixel position
+   * @memberof yAxis
+   */
   $2Pixel(y) {
-    // const min = this.#range.min 
     const height = y - this.#range.min
     const yPos = this.height - (height * this.yAxisRatio)
     return yPos
   }
 
+  /**
+   * convert last stream value to y pixel position relative top left (0,0)
+   * @param {number} y - last stream value 
+   * @return {number} - y pixel position
+   * @memberof yAxis
+   */
   lastYData2Pixel(y) {
     let height = y - this.core.stream.lastPriceMin
     let yPos = this.height - (height * this.yAxisRatio)
     return yPos
   }
 
+  /**
+   * convert pixel position to price (YAxis value)
+   * @param {number} y - pixel position relative top left (0,0)
+   * @return {number} - price (YAxis value)
+   * @memberof yAxis
+   */
   pixel2$(y) {
     let ratio = (this.height - y) / this.height
     let adjust = this.#range.diff * ratio
     return this.#range.min + adjust
   }
 
+  /**
+   * convert percentage scale to y pixel position relative top left (0,0)
+   * @param {number} y - percentage
+   * @return {number} - y pixel position
+   * @memberof yAxis
+   */
   p100toPixel(y) {
-    // if (this.mode == "automatic")
-    //   return this.height * y / 100
-    // else {
-      // return this.pixel2$(y)
       let ratio = this.height / this.#range.diff
       return (y - this.#range.max) * -1 * ratio
-    // }
-
   }
 
   yAxisTransform() {
 
   }
 
+  /**
+   * set YAxis mode - automatic or manual positioning and scaling
+   * @param {string} m - "automatic" or "manual"
+   * @return {boolean} - success or failure
+   * @memberof yAxis
+   */
   setMode(m) {
     if (!["automatic","manual"].includes(m)) return false
 
@@ -197,6 +220,7 @@ export default class yAxis extends Axis {
       t.manual.zoom = 0
       this.#mode = m
     }
+    return true
   }
 
   setOffset(o) {
@@ -259,7 +283,6 @@ export default class yAxis extends Axis {
   }
 
   gradations(max, min, decimals=true, fixed=false) {
-
       let digits,
           rangeH,
           yGridSize;

@@ -16,5 +16,7 @@ eg. 0.100.6
 * [Events](events.md)
 * [Streaming Price Data](streaming-price-data.md)
 * [Indicators](indicators.md)
+* [Themes](themes.md)
+* [Tricks and Tips](tricks_tips.md)
 * [Development Road Map](TradeX-chart-Development-Roadmap.pdf)
 

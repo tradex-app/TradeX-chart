@@ -156,20 +156,6 @@ export default class TradeXchart extends Tradex_chart {
 
   #delayedSetRange = false
 
-  // #renderer = {
-  //   status: "idle",
-  //   buffer: {
-  //     n: true,
-  //     "1": {},
-  //     "2": {}
-  //   },
-  //   curr: {
-  //     frame: null,
-  //     priority: 0
-  //   },
-  //   cache: []
-  // }
-
   /**
    * Create a new TradeXchart instance
    *
@@ -239,7 +225,7 @@ export default class TradeXchart extends Tradex_chart {
     this.#inCnt = TradeXchart.cnt()
     this.#id = `${ID}_${this.#inCnt}`
 
-    console.warn(`!WARNING!: ${NAME} breaking changes since V 0.101.7`)
+    console.warn(`!WARNING!: ${NAME} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`)
     console.log("TXC:",this.inCnt)
 
     this.oncontextmenu = window.oncontextmenu
@@ -301,7 +287,7 @@ export default class TradeXchart extends Tradex_chart {
       datasets: this.datasets
     }
   }
-  get rangeLimit() { return (isNumber(this.#rangeLimit)) ? this.#rangeLimit : RANGELIMIT }
+  get rangeLimit() { return (isNumber(this.#range.initialCnt)) ? this.#range.initialCnt : RANGELIMIT }
   get range() { return this.#range }
   get time() { return this.#time }
   get TimeUtils() { return Time }
@@ -408,16 +394,19 @@ export default class TradeXchart extends Tradex_chart {
     }
 
     // set default range
-    this.getRange(null, null, {interval: this.#time.timeFrameMS, core: this})
+    const rangeConfig = ("range" in txCfg) ? txCfg.range : {}
+          rangeConfig.interval = this.#time.timeFrameMS
+          rangeConfig.core = this
+    this.getRange(null, null, rangeConfig)
 
     if (this.#range.Length > 1) {
       // now set user defined (if any) range
-      const rangeStart = calcTimeIndex(this.#time, this.#rangeStartTS)
+      const rangeStart = calcTimeIndex(this.#time, this.#config?.range?.startTS)
       const end = (rangeStart) ? 
-        rangeStart + this.#rangeLimit :
+        rangeStart + this.#range.initialCnt :
         this.chartData.length - 1
-      const start = (rangeStart) ? rangeStart : end - this.#rangeLimit
-      this.#rangeLimit = end - start
+      const start = (rangeStart) ? rangeStart : end - this.#range.initialCnt
+      this.#range.initialCnt = end - start
       this.setRange(start, end)
     }
 
@@ -562,8 +551,6 @@ export default class TradeXchart extends Tradex_chart {
       infos: (infos) => this.infos = (isBoolean(infos)) ? infos : false,
       warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
-      rangeStartTS: (rangeStartTS) => this.#rangeStartTS = (isNumber(rangeStartTS)) ? rangeStartTS : undefined,
-      rangeLimit: (rangeLimit) => this.#rangeLimit = (isNumber(rangeLimit)) ? rangeLimit : RANGELIMIT,
       indicators: (indicators) => this.setIndicators(indicators),
       theme: (theme) => { this.#themeTemp = this.addTheme(theme) },
       stream: (stream) => this.#stream = (isObject(stream)) ? stream : {},

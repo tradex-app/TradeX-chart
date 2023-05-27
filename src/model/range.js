@@ -2,7 +2,7 @@
 
 import TradeXchart from "../core"
 import { ms2Interval } from "../utils/time"
-import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS } from "../definitions/chart"
+import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS, INTITIALCNT } from "../definitions/chart"
 import { isNumber, isObject, isString } from "../utils/typeChecks"
 import { bRound, limit } from "../utils/number"
 // import WebWorker from "./webWorkers"
@@ -26,6 +26,7 @@ export class Range {
   volumeMinIdx = 0
   volumeMaxIdx = 0
   old = {}
+  initialCnt = INTITIALCNT
   limitFuture = LIMITFUTURE
   limitPast = LIMITPAST
   minCandles = MINCANDLES
@@ -51,11 +52,7 @@ export class Range {
     if (!(config?.core instanceof TradeXchart)) return false
 
     this.#init = true;
-    this.limitFuture = (isNumber(this.config?.limitFuture)) ? this.config.limitFuture : LIMITFUTURE;
-    this.limitPast = (isNumber(this.config?.limitPast)) ? this.config.limitPast : LIMITPAST;
-    this.minCandles = (isNumber(this.config?.minCandles)) ? this.config.minCandles : MINCANDLES;
-    this.maxCandles = (isNumber(this.config?.maxCandles)) ? this.config.maxCandles : MAXCANDLES;
-    this.yAxisBounds = (isNumber(this.config?.limitBounds)) ? this.config.limitBounds : YAXIS_BOUNDS;
+    this.setConfig(config)
     this.#core = config.core;
 
     const MaxMinPriceVolStr = `
@@ -129,7 +126,7 @@ export class Range {
    * @return {boolean} - success or failure
    * @memberof Range
    */
-  set (start=0, end=this.dataLength, max=this.maxCandles) {
+  set (start=0, end=this.dataLength, max=this.maxCandles, config) {
     if (!isNumber(start) || 
         !isNumber(end) ||
         !isNumber(max)) return false
@@ -164,6 +161,7 @@ export class Range {
     let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this})
     
     this.setMaxMin(maxMin)
+    this.setConfig(config)
 
     // if (this.#init || this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
     //   this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
@@ -190,6 +188,17 @@ export class Range {
     // })
     
     // return true
+  }
+
+  setConfig(config) {
+    if (!isObject(config)) return false
+
+    this.initialCnt = (isNumber(config?.initialCnt)) ? config.initialCnt : INTITIALCNT;
+    this.limitFuture = (isNumber(config?.limitFuture)) ? config.limitFuture : LIMITFUTURE;
+    this.limitPast = (isNumber(config?.limitPast)) ? config.limitPast : LIMITPAST;
+    this.minCandles = (isNumber(config?.minCandles)) ? config.minCandles : MINCANDLES;
+    this.maxCandles = (isNumber(config?.maxCandles)) ? config.maxCandles : MAXCANDLES;
+    this.yAxisBounds = (isNumber(config?.yAxisBounds)) ? config.yAxisBounds : YAXIS_BOUNDS;
   }
 
   setMaxMin ( maxMin ) {
@@ -421,9 +430,9 @@ export class Range {
     }
 
     let diff = valueMax - valueMin
-    valueMin -= diff * 0.1 //that.yAxisBounds
+    valueMin -= diff * that.yAxisBounds
     valueMin = (valueMin > 0) ? valueMin : 0
-    valueMax += diff * 0.1 //that.yAxisBounds
+    valueMax += diff * that.yAxisBounds
     diff = valueMax - valueMin
 
     // valueMin *= (1 - that.yAxisBounds)

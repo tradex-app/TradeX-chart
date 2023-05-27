@@ -92,9 +92,9 @@ export default class Theme {
 
   /**
    * set theme value and refresh chart
-   * @param {string} path- "candle" or "candle.Type"
+   * @param {string} path - "candle" or "candle.Type"
    * @param {*} value 
-   * @return {boolean}
+   * @return {*} - previous value
    * @memberof Theme
    */
   setProperty(path, value) {

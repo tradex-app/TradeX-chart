@@ -229,7 +229,11 @@ export default class ScaleBar {
     this.draw()
   }
 
-  setScaleRange(r) {
+  /**
+   * Set price chart or off chart indicator to manual scaling and positioning
+   * @param {number} r - scale adjustment value
+   */
+  setScaleRange(r=0) {
     if (this.#yAxis.mode == "automatic") this.#yAxis.mode = "manual"
 
     this.#yAxis.zoom = r
@@ -237,6 +241,10 @@ export default class ScaleBar {
     this.draw()
   }
 
+  /**
+   * Set price chart or off chart indicator to automatic scaling and positioning
+   * @param {number} r - scale adjustment value
+   */
   resetScaleRange() {
     this.#yAxis.mode = "automatic"
     this.parent.draw(this.range, true)

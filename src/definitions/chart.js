@@ -16,8 +16,9 @@ export const XAXIS_STEP = 100
 export const YAXIS_STEP = 100
 export const YAXIS_GRID = 16
 export const YAXIS_TYPES = ["default", "percent", "log"]
-export const YAXIS_BOUNDS = 0.01
+export const YAXIS_BOUNDS = 0.3
 
+export const INTITIALCNT = 30
 export const LIMITFUTURE = 200
 export const LIMITPAST = 200
 export const MINCANDLES = 20

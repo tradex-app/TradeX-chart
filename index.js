@@ -1,4 +1,5 @@
 import { Chart, DOM } from './src'
+import { LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS } from "./src/definitions/chart"
 import * as talib from './node_modules/talib-web/lib/index.esm'
 
 // let state = undefined
@@ -99,8 +100,15 @@ const config1 = {
   utils: {},
   tools: {},
   timeFrame: "1m",
-  rangeStartTS: rangeStartTS,
-  rangeLimit: 30,
+  range: {
+    startTS: rangeStartTS,  // formerly rangeStartTS
+    initialCnt: 30,    // formerly rangeLimit
+    limitFuture: LIMITFUTURE,
+    limitPast: LIMITPAST,
+    minCandles: MINCANDLES,
+    maxCandles: MAXCANDLES,
+    yAxisBounds: 0.3
+  },
   theme: {
     candle: {
       Type: "candle_down_hollow",
@@ -165,8 +173,9 @@ const config2 = {
   utils: {},
   tools: {},
   timeFrame: "1m",
-  rangeStartTS: state2.ohlcv.slice(-15)[0][0], // rangeStartTS,
-  rangeLimit: 30,
+  range: {
+    startTS: state2.ohlcv.slice(-15)[0][0], // rangeStartTS,
+  },
   theme: {
     candle: {
       Type: "candle_solid",
@@ -213,8 +222,9 @@ const config3 = {
   utils: {},
   tools: {},
   timeFrame: "1m",
-  rangeStartTS: rangeStartTS,
-  rangeLimit: 30,
+  range: {
+    startTs: rangeStartTS,
+  },
   theme: {
     candle: {
       Type: "candle_solid",
@@ -298,8 +308,10 @@ const config4 = {
   utils: {},
   tools: {},
   timeFrame: "1s",
-  rangeStartTS: state4.ohlcv.slice(-1)[0][0] - (15000),
-  rangeLimit: 30,
+  range: {
+    startTS: state4.ohlcv.slice(-1)[0][0] - (15000),
+    initialCnt: 40
+  },
   theme: {
     candle: {
       Type: "candle_down_hollow",
@@ -355,8 +367,9 @@ const config5 = {
   utils: {},
   tools: {},
   timeFrame: "5m",
-  rangeStartTS: rangeStartTS,
-  rangeLimit: 30,
+  range: {
+    startTs: rangeStartTS,
+  },
   theme: {
     candle: {
       Type: "area",

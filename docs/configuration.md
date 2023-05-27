@@ -52,7 +52,11 @@ JSON.stringify(chart.state)
 
 Details of the state structure are found in [state.md](state.md)
 
-# Candle Types
+## Themes
+
+For API methods to manipulate chart themes refer to [themes](themes.md).
+
+### Candle Types
 
 ```javascript
 export const CandleType = {
@@ -65,21 +69,7 @@ export const CandleType = {
   LINE: 'line'
 }
 ```
-
-## CANDLE_SOLID
-![CANDLE_SOLID](./assets/CANDLE_SOLID.png)
-## CANDLE_HOLLOW
-![CANDLE_HOLLOW](./assets/CANDLE_HOLLOW.png)
-## CANDLE_UP_HOLLOW
-![CANDLE_UP_HOLLOW](./assets/CANDLE_UP_HOLLOW.png)
-## CANDLE_DOWN_HOLLOW
-![CANDLE_DOWN_HOLLOW](./assets/CANDLE_DOWN_HOLLOW.png)
-## OHLC
-![OHLC](./assets/CANDLE_OHLC.png)
-## AREA
-![AREA](./assets/CANDLE_AREA.png)
-## LINE
-![LINE](./assets/CANDLE_LINE.png)
+Refer to [Candle Types](themes.md#candle-types) for visual examples of each candle type.
 
 
 # Config Object Options

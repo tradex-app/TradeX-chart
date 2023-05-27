@@ -21,6 +21,7 @@ export default class Test extends Indicator {
 
   static inCnt = 0
   static onChart = true
+  // static scale is required for off chart indicators
   // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
   static colours = []
 

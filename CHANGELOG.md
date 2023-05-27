@@ -1,5 +1,26 @@
 # Change Log
 
+## [0.121.11] - 2023-05-27
+
+Added
+
+* chart padding, the space above and below the candle range can now be set via the config.
+
+## [0.121.10] - 2023-05-26
+
+Added
+
+* Theme - setProperty, getProperty using path "candle.Type"
+* isTouch - touch device flag
+* Legends - set deselect on chart drag
+
+## [0.121.9] - 2023-05-24
+
+Fixed
+
+* Pointer drag , and move events that start within the chart and cross outside of it.
+* Chart Cursor - crosshair, X and Y scale cursor positioning
+
 ## [0.121.8] - 2023-05-22
 
 Added
