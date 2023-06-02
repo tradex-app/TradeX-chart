@@ -81,6 +81,8 @@ const config = {
   utils: {none: true},
   tools: {none: true},
   talib: talib,
+  // see configuration.md#config regarding talib.wasm
+  // `${window.location.origin}/talib.wasm`
   rangeLimit: 30,
 }
 

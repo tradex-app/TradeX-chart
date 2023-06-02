@@ -33,8 +33,8 @@ export default class RSI extends indicator {
     },
   }
   #defaultStyle = {
-    strokeStyle: "#C80",
-    lineWidth: '1',
+    stroke: "#C80",
+    width: '1',
     defaultHigh: 75,
     defaultLow: 25,
     highLowLineWidth: 1,
@@ -108,16 +108,16 @@ export default class RSI extends indicator {
 
     // Fill the range between high and low
     const plots = [0, y1, this.scene.width, y2 - y1]
-    let style = this.style.highLowRangeStyle
-    this.plot(plots, "renderFillRect", style)
+    let style = {fill: this.style.highLowRangeStyle}
+    this.plot(plots, "renderRect", style)
 
     // High RSI Range marker
     plots.length = 0
     plots[0] = {x: 0, y: y1}
     plots[1] = {x: x2, y: y1}
     style = {
-      lineWidth: this.style.highLowLineWidth,
-      strokeStyle: this.style.highStrokeStyle,
+      width: this.style.highLowLineWidth,
+      stroke: this.style.highStrokeStyle,
       dash: [5, 5]
     }
     this.plot(plots, "renderLine", style)
@@ -127,8 +127,8 @@ export default class RSI extends indicator {
     plots[0] = {x: 0, y: y2}
     plots[1] = {x: x2, y: y2}
     style = {
-      lineWidth: this.style.highLowLineWidth,
-      strokeStyle: this.style.lowStrokeStyle,
+      width: this.style.highLowLineWidth,
+      stroke: this.style.lowStrokeStyle,
       dash: [5, 5]
     }
     this.plot(plots, "renderLine", style)

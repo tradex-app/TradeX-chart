@@ -2,9 +2,8 @@
 
 import Overlay from "./overlay"
 import Stream from "../../helpers/stream";
-import { STREAM_UPDATE } from "../../definitions/core"
-import { CandleStyle, YAxisStyle } from "../../definitions/style";
-import { createFont, drawTextBG, getTextRectHeight } from "../../utils/canvas"
+import { YAxisStyle } from "../../definitions/style";
+import { renderTextBG, getTextRectHeight } from "../../renderer/text"
 
 
 export default class ScalePriceLine extends Overlay {
@@ -54,12 +53,12 @@ export default class ScalePriceLine extends Overlay {
     if (candle[4] >= candle[1]) options.bakCol = this.theme.candle.UpBodyColour
     else options.bakCol = this.theme.candle.DnBodyColour
 
-    drawTextBG(ctx, nice, x, y, options)
+    renderTextBG(ctx, nice, x, y, options)
 
     if (streaming) {
       nice = this.core.stream.countDownUpdate()
       options.fontSize = options?.fontSize / 1.1
-      drawTextBG(ctx, nice, x, y+h, options)
+      renderTextBG(ctx, nice, x, y+h, options)
     }
 
     ctx.restore()

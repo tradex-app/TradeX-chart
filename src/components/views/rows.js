@@ -3,27 +3,20 @@
 
 import element from "./classes/element"
 import tradeXGrid from "./grid"
-import tradeXOnChart from "./onChart"
-import tradeXOffChart from "./offChart"
+import tradeXChartPane from "./chartPane"
 
-import {
-  UTILSH,
-  TOOLSW,
-  TIMEH,
-  SCALEW,
-} from "../../definitions/style"
 
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
-  tradex-grid, tradex-onchart, tradex-offchart {
+  tradex-grid, tradex-chartpane {
     overflow: hidden;
   }
   tradex-grid {
     position: absolute;
     height: inherit;
   }
-  tradex-onchart {
+  tradex-chartpane.primary {
     position: relative;
     height: 100%;
   }
@@ -32,7 +25,7 @@ template.innerHTML = `
     display: block;
     width: 100%;
   }
-  ::slotted(tradex-offchart) {
+  ::slotted(tradex-chartpane) {
     display: block;
     position: relative;
     top: 1px;
@@ -41,8 +34,8 @@ template.innerHTML = `
   }
 </style>
 <tradex-grid></tradex-grid>
-<tradex-onchart></tradex-onchart>
-<slot name="offchart" id="offchart"></slot>
+<tradex-chartpane id="primary"></tradex-chartpane>
+<slot name="chartpane" id="chartpane"></slot>
 `
 
 export default class tradeXRows extends element {
@@ -69,9 +62,9 @@ export default class tradeXRows extends element {
   }
 
   get grid() { return this.shadowRoot.querySelector('tradex-grid') }
-  get onChart() { return this.shadowRoot.querySelector('tradex-onchart') }
-  get offCharts() { return this.shadowRoot.querySelectorAll('tradex-offchart') }
-  get offChartSlot() { return this.shadowRoot.querySelector('#offchart') }
+  get primary() { return this.shadowRoot.querySelector('#primary') }
+  get chartPanes() { return this.shadowRoot.querySelectorAll('tradex-chartpane') }
+  get chartPaneSlot() { return this.shadowRoot.querySelector('#chartpane') }
   get width() { return this.clientWidth }
   get height() { return this.clientHeight }
   get oWidth() { return this.#oWidth }

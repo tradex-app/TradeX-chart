@@ -48,6 +48,21 @@ export const GlobalStyle = {
   FONTSTRING: `font-style: ${FONTSTYLE}; font-size: ${FONTSIZE}px; font-weight: ${FONTWEIGHT}; font-family: ${FONTFAMILY};`,
 }
 
+export const CanvasStyle = {
+  fontSize: FONTSIZE,
+  fontWeight: FONTWEIGHT,
+  fontFamily: FONTFAMILY,
+  paddingLeft: 3,
+  paddingRight: 3,
+  paddingTop: 2,
+  paddingBottom: 2,
+  borderSize: 1,
+  txtCol: "#000",
+  bakCol: "#ccc",
+  stroke: "fff",
+  fill: "888"
+}
+
 export const ToolsStyle = {
   COLOUR_ICON: COLOUR_ICON,
   ICONSIZE: ICONSIZE
@@ -151,9 +166,9 @@ export const GridStyle = {
 }
 
 export const PriceLineStyle = {
-  lineWidth: 1,
-  strokeStyle: "#ccc",
-  lineDash: [1,1]
+  width: 1,
+  stroke: "#ccc",
+  dash: [1,1]
 }
 
 export const LegendStyle = {

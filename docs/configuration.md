@@ -28,11 +28,14 @@ const config = {
   width: 1000,
   height: 800,
   talib: talib,
+  // talib: `${window.location.origin}/talib.wasm`
   rangeLimit: 30,
 }
 ```
 
 ``talib`` is a pointer to the [talib-web](https://https//anchegt.github.io/talib-web/) technical indicator library compiled as a WebAssembly module. TradeX-chart will take care of instantiating it.
+
+Depending upon the server configuration, ``.wasm`` files might be served with an incorrect mime type when loaded from a subdirectory. If that is the case, copy ``tablib.wasm`` from ``./modules/talib-web/lib/`` to the web server root, and reference it in the config as following: ``talib: `${window.location.origin}/talib.wasm` ``
 
 ``rangeLimit`` defines the initial number of candles to display
 

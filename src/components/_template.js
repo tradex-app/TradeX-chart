@@ -29,7 +29,7 @@ export default class _template {
 
   log(l) { this.#core.log(l) }
   info(i) { this.#core.info(i) }
-  warning(w) { this.#core.warn(w) }
+  warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
   get name() {return this.#name}

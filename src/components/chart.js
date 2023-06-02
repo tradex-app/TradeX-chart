@@ -2,6 +2,7 @@
 // base class for onChart and offChart
 
 import DOM from "../utils/DOM";
+import { limit } from "../utils/number"
 import {
   isArray,
   isBoolean,
@@ -12,6 +13,13 @@ import {
 import CEL from "./primitives/canvas";
 import StateMachine from "../scaleX/stateMachne";
 import Input from "../input"
+import ScaleBar from "./scale"
+import chartGrid from "./overlays/chart-grid"
+import chartCursor from "./overlays/chart-cursor"
+import chartVolume from "./overlays/chart-volume"
+import chartCandles from "./overlays/chart-candles"
+import chartStreamCandle from "./overlays/chart-streamCandle"
+import watermark from "./overlays/chart-watermark"
 import {
   STREAM_ERROR,
   STREAM_NONE,
@@ -21,7 +29,25 @@ import {
   STREAM_NEWVALUE,
   STREAM_UPDATE,
 } from "../definitions/core";
-import { BUFFERSIZE } from "../definitions/chart";
+import { BUFFERSIZE, YAXIS_TYPES } from "../definitions/chart";
+import { VolumeStyle } from "../definitions/style"
+
+const defaultOverlays = {
+  onChart: [
+    ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
+    ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
+    ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
+    ["candles", {class: chartCandles, fixed: false, required: true}],
+    ["stream", {class: chartStreamCandle, fixed: false, required: true}],
+    ["cursor", {class: chartCursor, fixed: true, required: true}]
+  ],
+  offChart: [
+    ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
+    ["cursor", {class: chartCursor, fixed: true, required: true}]
+  ]
+}
+
+
 
 export default class Chart {
 
@@ -31,7 +57,7 @@ export default class Chart {
   #ID;
   #name
   #shortName
-  #type
+  #title;
   #core;
   #options;
   #parent;
@@ -39,39 +65,30 @@ export default class Chart {
   #chartCnt
 
   #elTarget;
-  #elCanvas;
-  #elViewport;
-  #elLegend;
   #elScale;
 
   #Scale;
   #Time;
   #Graph;
   #Legends;
+  #Divider;
   #Stream;
 
+  #streamCandle
+
   #viewport;
-  #layerGrid;
-  #layerStream;
-  #layerCursor;
   #layersTools = new Map();
 
   #overlays = new Map()
-  #overlayGrid;
-  #overlayIndicators = new Map();
   #overlayTools = new Map();
 
   #cursorPos = [0, 0];
   #cursorActive = false;
   #cursorClick;
 
-  #settings;
-  #streamCandle;
-  #title;
-  #theme;
-  #controller;
   #input
-  #inputM
+
+  #yAxisType
 
   constructor(core, options) {
     this.#core = core;
@@ -84,9 +101,6 @@ export default class Chart {
     this.#elTarget = this.#options.elements.elTarget;
     this.#elScale = this.#options.elements.elScale;
     this.#parent = this.#options.parent;
-    this.#theme = core.theme;
-    this.#settings = core.settings;
-    this.#type = options.type || "offChart"
 
     // process options
     for (const option in this.#options) {
@@ -106,7 +120,6 @@ export default class Chart {
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get title() { return this.#title }
-  get type() { return this.#type }
   get parent() { return this.#parent }
   get core() { return this.#core }
   get options() { return this.#options }
@@ -120,6 +133,7 @@ export default class Chart {
   get data() {}
   get range() { return this.#core.range }
   get stream() { return this.#Stream }
+  get streamCandle() { return this.#streamCandle }
   get cursorPos() { return this.#cursorPos }
   set cursorActive(a) { this.#cursorActive = a }
   get cursorActive() { return this.#cursorActive }
@@ -141,6 +155,8 @@ export default class Chart {
   get time() { return this.#Time }
   set scale(s) { this.#Scale = s }
   get scale() { return this.#Scale }
+  set yAxisType(t) { this.setYAxisType(t) }
+  get yAxisType() { return this.#yAxisType }
   get axes() { return "x" }
   set graph(g) { this.#Graph = g }
   get graph() { return this.#Graph }
@@ -149,8 +165,19 @@ export default class Chart {
   get overlays() { return this.#overlays }
   get overlayGrid() { return this.#Graph.overlays.get("grid").instance }
   get overlayTools() { return this.#overlayTools }
+  get overlaysDefault() { return defaultOverlays[this.type] }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
+  get Divider() { return this.#Divider }
+
+  init(options) {
+    const opts = {...options}
+    opts.parent = this
+    opts.chart = this
+    opts.elScale = this.elScale
+    opts.yAxisType = this.yAxisType
+    this.scale = new ScaleBar(this.core, opts)
+  }
 
   start(stateMachineConfig) {
     // X Axis - Timeline
@@ -173,6 +200,14 @@ export default class Chart {
     stateMachineConfig.context = this;
     this.stateMachine = stateMachineConfig;
     this.stateMachine.start();
+
+    // set up event listeners
+    this.eventsListen()
+
+    // add divider to allow manual resize of the chart pane
+    const cfg = { chartPane: this }
+    this.#Divider = this.core.WidgetsG.insert("Divider", cfg)
+    this.#Divider.start()
   }
 
   end() {
@@ -187,13 +222,17 @@ export default class Chart {
     this.#input.off("pointerout", this.onMouseOut);
     this.#input.off("pointerdown", this.onMouseDown);
     this.#input.off("pointerup", this.onMouseUp);
-    this.#controller = null;
 
     this.off("main_mousemove", this.onMouseMove);
     this.off(STREAM_LISTENING, this.onStreamListening);
     this.off(STREAM_NEWVALUE, this.onStreamNewValue);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
     this.off(STREAM_FIRSTVALUE, this.onStreamNewValue)
+
+    if (this.isOnChart)
+      this.off("chart_yAxisRedraw", this.onYAxisRedraw)
+    else
+      this.Divider.end()
   }
 
   eventsListen() {
@@ -212,6 +251,9 @@ export default class Chart {
     this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this));
     this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this));
     this.on(STREAM_FIRSTVALUE, this.onStreamNewValue.bind(this))
+
+    if (this.isOnChart) 
+      this.on("chart_yAxisRedraw", this.onYAxisRedraw.bind(this))
   }
 
   /**
@@ -298,6 +340,25 @@ export default class Chart {
     this.draw(this.range, true);
   }
 
+  onStreamUpdate(candle) {
+    if (this.isOnChart) {
+      this.#streamCandle = candle
+      this.chartStreamCandle.draw()
+      this.layerStream.setPosition(this.core.stream.lastScrollPos, 0)
+      this.updateLegends(this.cursorPos, candle)
+    }
+    else this.updateLegends()
+    this.graph.render()
+  }
+
+  /**
+   * refresh the scale (yAxis) on Stream Update
+   * @memberof OnChart
+   */
+  onYAxisRedraw() {
+    if (this.isOnChart) this.refresh()
+  }
+
   props() {
     return {
       // id: (id) => this.setID(id),
@@ -335,6 +396,7 @@ export default class Chart {
     this.setHeight(h)
     this.draw(undefined, true)
     this.core.MainPane.draw(undefined, false)
+    this.draw(undefined, true)
   }
 
   /**
@@ -343,6 +405,42 @@ export default class Chart {
    */
   setCursor(cursor) {
     this.element.style.cursor = cursor
+  }
+
+  setYAxisType(t) {
+    if (
+      !isString(t) ||
+      !YAXIS_TYPES.includes(t)  ||
+      (this.type == "onChart" && t == "percent")
+    ) return false
+    this.#yAxisType = t
+  }
+
+  /**
+   * Add any non-default overlays
+   *
+   * @param {array} overlays
+   * @memberof OnChart
+   */
+  addOverlays(overlays) {
+    for (let o of overlays) {
+      const config = {fixed: false, required: false}
+      if (o.type in this.core.indicators) {
+        config.cnt = this.core.indicators[o.type].ind.cnt
+        config.id = `${this.id}.${o.type}_${config.cnt}`
+        config.class = this.core.indicators[o.type].ind
+        config.params = {
+          overlay: o,
+        }
+        o.id = config.id
+        o.paneID = this.id
+        this.overlays.set(o.name, config)
+      }
+    }
+    const r = this.graph.addOverlays(Array.from(this.overlays))
+    for (let o of r) {
+      if (!o[0]) this.overlays.delete(o[0])
+    }
   }
 
   /**
@@ -412,11 +510,12 @@ export default class Chart {
   }
 
   /**
-   * Refresh the entire chart
+   * Refresh offChart - overlays, grid, scale, indicators
+   * @memberof Chart
    */
   refresh() {
-    this.#Scale.draw();
-    this.draw();
+    this.scale.draw()
+    this.draw(undefined, this.isOnChart)
   }
 
   /**
@@ -432,6 +531,40 @@ export default class Chart {
     for (const legend in legends) {
       this.#Legends.update(legend, { pos, candle });
     }
+  }
+
+  /**
+   * 
+   * @param {array} pos - cursor pos [x, y]
+   * @returns {object} - legend data 
+   */
+  legendInputs(pos=this.cursorPos) {
+    pos = this.cursorPos
+    let inputs = {}
+    let colours = []
+    let labels = [true, true, true, true, true]
+    let index = this.time.xPos2Index(pos[0] - this.core.scrollPos)
+        index = limit(index, 0, this.range.data.length - 1)
+    let ohlcv = this.range.data[index]
+
+    // get candle colours from config / theme
+    if (ohlcv[4] >= ohlcv[1]) colours = new Array(5).fill(this.theme.candle.UpWickColour)
+    else colours = new Array(5).fill(this.theme.candle.DnWickColour)
+
+    inputs.O = this.scale.nicePrice(ohlcv[1])
+    inputs.H = this.scale.nicePrice(ohlcv[2])
+    inputs.L = this.scale.nicePrice(ohlcv[3])
+    inputs.C = this.scale.nicePrice(ohlcv[4])
+    inputs.V = this.scale.nicePrice(ohlcv[5])
+
+    return {inputs, colours, labels}
+  }
+
+  createGraph() {
+    let overlays = copyDeep(this.overlaysDefault)
+    this.graph = new Graph(this, this.elViewport, overlays, false)
+    this.layerStream = this.graph.overlays.get("stream")?.layer
+    this.chartStreamCandle = this.graph.overlays.get("stream")?.instance
   }
 
   render() {
@@ -460,12 +593,30 @@ export default class Chart {
   }
 
   /**
- * Zoom (contract or expand) range start
- */
+   * Zoom (contract or expand) range start
+   */
   zoomRange() {
     // draw the chart - grid, candles, volume
     this.draw(this.range, true)
     this.emit("zoomDone")
+  }
+
+
+  /**
+   * Return the screen x position for a give time stamp
+   * @param {number} time - timestamp
+   * @returns {number} - x position on canvas
+   */
+  time2XPos(time) {
+    return this.time.xPos(time)
+  }
+
+  /**
+   * @param {number} price 
+   * @returns {number} - y position on canvas
+   */
+  price2YPos(price) {
+    return this.scale.yPos(price)
   }
   
 }

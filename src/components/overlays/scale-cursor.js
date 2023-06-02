@@ -1,7 +1,6 @@
 // scale-cursor.js
 
-import { isArray } from "../../utils/typeChecks"
-import { drawTextBG } from "../../utils/canvas"
+import { renderTextBG } from "../../renderer/text"
 import Overlay from "./overlay"
 
 export default class ScaleCursor extends Overlay {
@@ -50,7 +49,7 @@ export default class ScaleCursor extends Overlay {
     ctx.fillStyle = options.bakCol
     ctx.fillRect(1, yPos, this.width, height)
 
-    drawTextBG(ctx, `${nice}`, 1, yPos , options)
+    renderTextBG(ctx, `${nice}`, 1, yPos , options)
 
     ctx.restore()
   }

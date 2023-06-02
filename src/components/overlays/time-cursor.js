@@ -1,7 +1,7 @@
 // time-cursor.js
 
 import Overlay from "./overlay"
-import { drawTextBG, getTextRectWidth } from "../../utils/canvas"
+import { renderTextBG, getTextRectWidth } from "../../renderer/text"
 
 export default class TimeCursor extends Overlay {
 
@@ -46,7 +46,7 @@ export default class TimeCursor extends Overlay {
     this.scene.clear()
     ctx.save()
 
-    drawTextBG(ctx, dateTimeStr, xPos, 1 , options)
+    renderTextBG(ctx, dateTimeStr, xPos, 1 , options)
 
     ctx.restore()
     // this.#viewport.render()

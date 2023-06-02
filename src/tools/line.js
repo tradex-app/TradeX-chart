@@ -12,7 +12,7 @@ import StateMachine from '../scaleX/stateMachne';
 export default class Line extends Tool {
 
   #colour = lineConfig.colour
-  #lineWidth = lineConfig.lineWidth
+  #lineWidth = lineConfig.width
   #stateMachine
 
   constructor(config) {

@@ -152,7 +152,7 @@ export default class Chart {
 
   log(l) { this.#mediator.log(l) }
   info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
+  warn(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
   get ID() { return "chart" }
@@ -738,7 +738,7 @@ export default class Chart {
    */
   setPriceVolumePrecision (pricePrecision) {
     if (!isNumber(pricePrecision) || pricePrecision &lt; 0) {
-      this.warning('setPriceVolumePrecision', 'pricePrecision', 'pricePrecision must be a number and greater than zero!!!')
+      this.warn('setPriceVolumePrecision', 'pricePrecision', 'pricePrecision must be a number and greater than zero!!!')
       return
     }
     this.#pricePrecision = pricePrecision

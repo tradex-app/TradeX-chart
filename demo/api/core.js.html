@@ -234,7 +234,7 @@ constructor (mediator, options={}) {
       let tf = "1s"
       let ms = SECOND_MS
       if (!isObject(options?.stream) &amp;&amp; this.#state.data.chart.data.length &lt; 2) {
-        this.warning(`${NAME} has no chart data or streaming provided.`)
+        this.warn(`${NAME} has no chart data or streaming provided.`)
         // has a time frame been provided?
         ;({tf, ms} = isTimeFrame(options?.timeFrame))
         this.#time.timeFrame = tf
@@ -264,7 +264,7 @@ constructor (mediator, options={}) {
 
   log(l) { if (this.logs) console.log(l) }
   info(i) { if (this.info) console.info(i) }
-  warning(w) { if (this.warnings) console.warn(w) }
+  warn(w) { if (this.warnings) console.warn(w) }
   error(e) { if (this.errors) console.error(e) }
 
   get id() { return this.#id }

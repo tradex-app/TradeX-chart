@@ -2,7 +2,7 @@
 
 import Overlay from "./overlay"
 import Candle from "../primitives/candle";
-import { renderHorizontalLine } from "../../renderer/line"
+import { renderLineHorizontal } from "../../renderer/line"
 import { CandleType, PriceLineStyle } from "../../definitions/style";
 import { isArray, isObject } from "../../utils/typeChecks";
 
@@ -55,11 +55,11 @@ export default class chartStreamCandle extends Overlay {
       render(candle)
     }
 
-    if (stream[4] >= stream[1]) this.theme.priceLineStyle.strokeStyle = this.core.theme.candle.UpBodyColour
-    else this.theme.priceLineStyle.strokeStyle = this.core.theme.candle.DnBodyColour
+    if (stream[4] >= stream[1]) this.theme.priceLineStyle.stroke = this.core.theme.candle.UpBodyColour
+    else this.theme.priceLineStyle.stroke = this.core.theme.candle.DnBodyColour
 
     // draw price line 
-    renderHorizontalLine (
+    renderLineHorizontal (
       this.scene.context, 
       candle.c, 
       0, 

@@ -8,10 +8,11 @@ import { renderPath } from './path'
  * @param {number} y - canvas pixel position
  * @param {number} left - canvas pixel position
  * @param {number} right - canvas pixel position
+ * @param {object} opts 
  */
-export function renderHorizontalLine (ctx, y, left, right, style) {
+export function renderLineHorizontal (ctx, y, left, right, opts) {
   const coords = [{x:left, y:y}, {x:right, y:y}]
-  renderPath(ctx, coords, style, () => {
+  renderPath(ctx, coords, opts, () => {
     ctx.stroke()
     ctx.closePath()
   })
@@ -23,10 +24,11 @@ export function renderHorizontalLine (ctx, y, left, right, style) {
  * @param {number} x - canvas pixel position
  * @param {number} top - canvas pixel position
  * @param {number} bottom - canvas pixel position
+ * @param {object} opts 
  */
-export function renderVerticalLine (ctx, x, top, bottom, style) {
+export function renderLineVertical (ctx, x, top, bottom, opts) {
   coords = [{x:x, y:top}, {x:x, y,bottom}]
-  renderPath(ctx, coords, style, () => {
+  renderPath(ctx, coords, opts, () => {
     ctx.stroke()
     ctx.closePath()
   })
@@ -36,9 +38,10 @@ export function renderVerticalLine (ctx, x, top, bottom, style) {
  * Render line - open path
  * @param {object} ctx - canvas reference
  * @param {array} coords - array of x y coords [{x:x, y:y}, ...]
+ * @param {object} opts 
  */
-export function renderLine (ctx, coords, style) {
-  renderPath(ctx, coords, style, () => {
+export function renderLine (ctx, coords, opts) {
+  renderPath(ctx, coords, opts, () => {
     ctx.stroke()
     ctx.closePath()
   })

@@ -1,26 +1,20 @@
-// onchart.js
-// <tradex-onchart></tradex-onchart>
+// chartPane.js
+// <tradex-chartpane></tradex-chartpane>
 
 import element from "./classes/element"
-import graph from "./classes/graph"
 import tradeXLegend from "./legend"
-import { bRound } from "../../utils/number"
 
-import {
-  UTILSH,
-  TOOLSW,
-  TIMEH,
-  SCALEW,
-} from "../../definitions/style"
 
 const template = document.createElement('template')
+// position: relative ??? offChart no
+// .viewport canvas ??? offChart no
 template.innerHTML = `
 <style>
   .viewport {
     position: relative;
     width: 100%;
     height: inherit;
-    background: var(--txc-onchart-background, none);
+    background: var(--txc-chartpane-background, none);
   }
   .viewport canvas {
     position: absolute;
@@ -38,13 +32,10 @@ template.innerHTML = `
 <tradex-legends></tradex-legends>
 `
 
-export default class tradeXOnChart extends element {
+export default class tradeXChartPane extends element {
 
-  #parent
   #elViewport
   #elLegend
-  #elScale
-  #elCanvas
 
   constructor () {
     super(template)
@@ -59,9 +50,8 @@ export default class tradeXOnChart extends element {
     // https://stackoverflow.com/a/43837330/15109215
     if (this.doInit) {
       this.doInit = false
-      this.shadowRoot.appendChild(this.template.content.cloneNode(true))
       this.style.display = "block"
-
+      this.shadowRoot.appendChild(this.template.content.cloneNode(true))
       this.#elViewport = this.shadowRoot.querySelector('.viewport')
       this.#elLegend = this.shadowRoot.querySelector('tradex-legends')
     }
@@ -74,4 +64,4 @@ export default class tradeXOnChart extends element {
   get legend() { return this.#elLegend }
 }
 
-customElements.get('tradex-onchart') || window.customElements.define('tradex-onchart', tradeXOnChart)
+customElements.get('tradex-chartpane') || window.customElements.define('tradex-chartpane', tradeXChartPane)

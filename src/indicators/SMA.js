@@ -26,8 +26,8 @@ import { uid } from "../utils/utilities"
     },
   }
   #defaultStyle = {
-    strokeStyle: "#C80",
-    lineWidth: '1'
+    stroke: "#C80",
+    width: '1'
   }
   #precision = 2
   onChart = true

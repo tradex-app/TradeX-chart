@@ -12,9 +12,9 @@ export default class Test extends Indicator {
   timePeriod = 20
 
   #defaultStyle = {
-    strokeStyle: "#0088cc",
+    stroke: "#0088cc",
     lineWidth: "1",
-    lineDash: undefined,
+    dash: undefined,
   }
 
   style = {}

@@ -263,7 +263,7 @@ export default class OnChart extends Chart {
    */
   setPriceVolumePrecision (pricePrecision) {
     if (!isNumber(pricePrecision) || pricePrecision &lt; 0) {
-      this.warning('setPriceVolumePrecision', 'pricePrecision', 'pricePrecision must be a number and greater than zero!!!')
+      this.warn('setPriceVolumePrecision', 'pricePrecision', 'pricePrecision must be a number and greater than zero!!!')
       return
     }
     this.#pricePrecision = pricePrecision

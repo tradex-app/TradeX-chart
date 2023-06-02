@@ -263,7 +263,7 @@ export default class TradeXchart extends Tradex_chart {
 
   log(l) { if (this.logs) console.log(l) }
   info(i) { if (this.infos) console.info(i) }
-  warning(w) { if (this.warnings) console.warn(w) }
+  warn(w) { if (this.warnings) console.warn(w) }
   error(e) { if (this.errors) console.error(e) }
   time(n) { if (this.timer) console.time(n) }
   timeLog(n) { if (this.timer) console.timeLog(n) }
@@ -377,7 +377,7 @@ export default class TradeXchart extends Tradex_chart {
     let tf = "1s"
     let ms = SECOND_MS
     if (!isObject(config?.stream) &amp;&amp; this.#state.data.chart.data.length &lt; 2) {
-      this.warning(`${NAME} has no chart data or streaming provided.`)
+      this.warn(`${NAME} has no chart data or streaming provided.`)
       // has a time frame been provided?
       ;({tf, ms} = isTimeFrame(config?.timeFrame))
       this.#time.timeFrame = tf

@@ -25,7 +25,7 @@ template.innerHTML = `
     position: absolute;
     width: 100%;
     height: inherit;
-    background: var(--txc-onchart-background, none);
+    background: var(--txc-chartpane-background, none);
     z-index: 0;
   }
   #viewport canvas {
@@ -82,8 +82,8 @@ export default class tradeXMain extends element {
   rowNode(type, api) {
     const styleRow = ` border-top: 1px solid ${api.theme.offChart.separator};`
     const node = `
-      <tradex-offchart slot="offchart" class="${type}" style="${styleRow}">
-      </tradex-offchart>
+      <tradex-chartpane slot="chartpane" class="${type}" style="${styleRow}">
+      </tradex-chartpane>
     `
     return node
   }

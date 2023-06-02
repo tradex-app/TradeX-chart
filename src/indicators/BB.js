@@ -148,21 +148,21 @@ export default class BB extends indicator {
     }
 
     style = {
-      lineWidth: this.style.lowerLineWidth, 
-      strokeStyle: this.style.lowerStrokeStyle, 
-      lineDash: this.style.lowerLineDash
+      width: this.style.lowerLineWidth, 
+      stroke: this.style.lowerStrokeStyle, 
+      dash: this.style.lowerLineDash
     }
     this.plot(plots.lower, "renderLine", style)
     style = {
-      lineWidth: this.style.middleLineWidth, 
-      strokeStyle: this.style.middleStrokeStyle, 
-      lineDash: this.style.middleLineDash
+      width: this.style.middleLineWidth, 
+      stroke: this.style.middleStrokeStyle, 
+      dash: this.style.middleLineDash
     }
     this.plot(plots.middle, "renderLine", style)
     style = {
-      lineWidth: this.style.upperLineWidth, 
-      strokeStyle: this.style.upperStrokeStyle, 
-      lineDash: this.style.upperLineDash
+      width: this.style.upperLineWidth, 
+      stroke: this.style.upperStrokeStyle, 
+      dash: this.style.upperLineDash
     }
     this.plot(plots.upper, "renderLine", style)
 

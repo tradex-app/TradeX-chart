@@ -249,10 +249,10 @@ export default
       let active = this.context.pair.active,
       prev = this.context.pair.prev;
 
-      active.element.style.removeProperty('user-select');
-      // active.element.style.removeProperty('pointer-events');
-      prev.element.style.removeProperty('user-select');
-      // prev.element.style.removeProperty('pointer-events');
+      if (active !== undefined)
+        active.element.style.removeProperty('user-select');
+      if (prev !== undefined)
+        prev.element.style.removeProperty('user-select');
     }
   }
 }

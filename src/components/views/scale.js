@@ -14,13 +14,13 @@ template.innerHTML = `
   }
 </style>
 <div class="viewport"></div>
-<slot name="offchart" id="offchart"></slot>
+<slot name="chartpane" id="chartPane"></slot>
 `
 
 export default class tradeXScale extends element {
 
   #viewport
-  #offChartSlot
+  #chartPaneSlot
 
   constructor () {
     super(template)
@@ -39,7 +39,7 @@ export default class tradeXScale extends element {
       this.style.display = "block"
 
       this.#viewport = this.shadowRoot.querySelector('.viewport')
-      this.#offChartSlot = this.shadowRoot.querySelector('#offchart')
+      this.#chartPaneSlot = this.shadowRoot.querySelector('#chartPane')
     }
   }
 
@@ -47,8 +47,8 @@ export default class tradeXScale extends element {
   }
 
   get viewport() { return this.#viewport}
-  get offCharts() { return this.shadowRoot.querySelectorAll('tradex-offchart') }
-  get offChartSlot() { return this.#offChartSlot }
+  get chartPanes() { return this.shadowRoot.querySelectorAll('.scale') }
+  get chartPaneSlot() { return this.#chartPaneSlot }
 }
 
 customElements.get('tradex-scale') || window.customElements.define('tradex-scale', tradeXScale)

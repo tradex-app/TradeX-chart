@@ -1,6 +1,6 @@
 // chart-watermark.js
 
-import { createFont, getTextRectHeight, getTextRectWidth } from "../../utils/canvas"
+import { createFont, getTextRectHeight, getTextRectWidth } from "../../renderer/text"
 import { isObject, isString } from "../../utils/typeChecks"
 import Overlay from "./overlay"
 import { GlobalStyle } from "../../definitions/style"

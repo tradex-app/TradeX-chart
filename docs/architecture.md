@@ -181,7 +181,7 @@ export default class UtilsBar {
   // suggested
   log(l) { this.#mediator.log(l) }
   info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
+  warn(w) { this.#mediator.warn(w) }
   error(e) { this.#mediator.error(e) }
 
   // required

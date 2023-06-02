@@ -105,6 +105,6 @@ export default [
 
 export const lineConfig = {
   colour: "#8888AACC",
-  lineWidth: 1
+  width: 1
 }
 

@@ -70,13 +70,12 @@ export default class MainPane {
   #viewport
   #layerGrid
   #layerWatermark
-  #OffCharts = new Map()
+  #ChartPanes = new Map()
   #Chart
   #Time
   #chartGrid
 
   #offChartDefaultH = OFFCHARTDEFAULTHEIGHT // %
-  #offChartDefaultWpx = 120
   #rowMinH = ROWMINHEIGHT // px
 
   #cursorPos = [0, 0]
@@ -104,7 +103,7 @@ export default class MainPane {
 
   log(l) { this.#core.log(l) }
   info(i) { this.#core.info(i) }
-  warning(w) { this.#core.warn(w) }
+  warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
   get id() { return `${this.#core.id}.${this.#name}` }
@@ -113,7 +112,7 @@ export default class MainPane {
   get core() { return this.#core }
   get chart() { return this.#Chart }
   get time() { return this.#Time }
-  get offCharts() { return this.#OffCharts }
+  get offCharts() { return this.#ChartPanes }
   get options() { return this.#options }
   get element() { return this.#elMain }
   get width() { return this.#elMain.getBoundingClientRect().width }
@@ -139,7 +138,7 @@ export default class MainPane {
   get graph() { return this.#Graph }
   get indicators() { return {
     onchart: this.#Chart.indicators,
-    offchart: this.#OffCharts
+    offchart: this.#ChartPanes
   } }
   get elements() {
     return {
@@ -159,7 +158,7 @@ export default class MainPane {
     this.#indicators = this.#core.indicators
     this.#elRows = this.#elMain.rows
     this.#elTime = this.#elMain.time
-    this.#elChart = this.#elMain.rows.onChart
+    this.#elChart = this.#elMain.rows.primary
     this.#elGrid = this.#elMain.rows.grid
     this.#elViewport = this.#elMain.viewport  // this.#elMain.rows.grid.viewport
     this.#elScale = this.#core.elBody.scale
@@ -190,7 +189,7 @@ export default class MainPane {
     // register chart
     this.#Chart = new Chart(this.#core, options)
     // register offChart
-    this.registerOffCharts(options)
+    this.registerChartPanes(options)
 
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE
     this.#rowMinH = isNumber(this.config.rowMinH)? this.config.rowMinH : ROWMINHEIGHT
@@ -208,7 +207,7 @@ export default class MainPane {
     this.#elMain.start(this.theme)
     this.#Time.start()
     this.#Chart.start()
-    this.#OffCharts.forEach((offChart, key) => {
+    this.#ChartPanes.forEach((offChart, key) => {
       offChart.start(i++)
     })
     this.rowsOldH = this.rowsH
@@ -237,7 +236,7 @@ export default class MainPane {
     this.stateMachine.destroy()
     this.#Time.end()
     this.#Chart.end()
-    this.#OffCharts.forEach((offChart, key) => {
+    this.#ChartPanes.forEach((offChart, key) => {
       offChart.end()
     })
     this.#viewport.destroy()
@@ -455,7 +454,7 @@ export default class MainPane {
       this.chart.scale.layerCursor.erase()
     }
 
-    this.#OffCharts.forEach((offChart, key) => {
+    this.#ChartPanes.forEach((offChart, key) => {
       if (chart !== offChart) {
         offChart.cursorActive = false
         offChart.scale.layerCursor.visible = false
@@ -496,7 +495,7 @@ export default class MainPane {
     }
 
     // set on Chart dimensions
-    if (this.#OffCharts.size == 0 &&
+    if (this.#ChartPanes.size == 0 &&
       chartH != this.#elRows.height) chartH = this.#elRows.height
 
     this.#core.scrollPos = -1
@@ -504,7 +503,7 @@ export default class MainPane {
     this.#Time.setDimensions({w: width})
     this.#Graph.setSize(width, height, layerWidth)
     this.#Chart.setDimensions({w: width, h: chartH})
-    this.#OffCharts.forEach((offChart, key) => {
+    this.#ChartPanes.forEach((offChart, key) => {
       chartH = Math.round(offChart.viewport.height * resizeH)
       offChart.setDimensions({w: width, h: chartH})
       offChart.Divider.setDividerPos()
@@ -526,7 +525,7 @@ export default class MainPane {
     this.element.style.cursor = cursor
   }
 
-  registerOffCharts(options) {
+  registerChartPanes(options) {
     this.#elRows.previousDimensions()
 
     // are there any OffCharts to add?
@@ -552,12 +551,12 @@ export default class MainPane {
     // }
     // else {
     //   // adjust chart size for subsequent offCharts
-    //   options.rowH = Math.round(rowsH / this.#OffCharts.size)
+    //   options.rowH = Math.round(rowsH / this.#ChartPanes.size)
     //   options.chartH = this.rowsH - rowsH
     //   options.height = options.rowH
     // }
 
-    let heights = this.calcOffChartHeights(this.#core.offChart.length)
+    let heights = this.calcChartPaneHeights(this.#core.offChart.length)
 
     options = {...options, ...heights}
 
@@ -567,7 +566,7 @@ export default class MainPane {
 
     for (let o of this.#core.offChart) {
       options.rowY = options.chartH
-      this.addOffChart(o, options)
+      this.addChartPane(o, options)
       options.rowY = options.chartH + options.rowH
     }
   }
@@ -577,13 +576,13 @@ export default class MainPane {
    * @param {object} offChart - data for the indicator
    * @param {object} options 
    */
-  addOffChart(offChart, options) {
+  addChartPane(offChart, options) {
     // insert a row to mount the indicator on
     let rowEl, row
     this.#elRows.insertAdjacentHTML("beforeend", this.#elMain.rowNode(offChart.type, this.#core))
     rowEl = this.#elRows.lastElementChild
     this.#elOffCharts.push(rowEl)
-    row = this.#elRows.offChartSlot.assignedElements().slice(-1)[0]
+    row = this.#elRows.chartPaneSlot.assignedElements().slice(-1)[0]
     row.style.height = `${options.rowH}px`
     row.style.width = `100%`
 
@@ -592,7 +591,7 @@ export default class MainPane {
     this.#elYAxis.insertAdjacentHTML("beforeend", this.scaleNode(offChart.type))
     axisEl = this.#elYAxis.lastElementChild
     this.#elYAxisScales.push(axisEl)
-    axis = this.#elYAxis.offChartSlot.assignedElements().slice(-1)[0]
+    axis = this.#elYAxis.chartPaneSlot.assignedElements().slice(-1)[0]
     axis.style.height = `${options.rowH}px`
     axis.style.width = `100%`
 
@@ -604,9 +603,9 @@ export default class MainPane {
 
     let o = new OffChart(this.#core, options)
     
-    this.#OffCharts.set(o.id, o)
+    this.#ChartPanes.set(o.id, o)
 
-    this.emit("addOffChart", o)
+    this.emit("addChartPane", o)
   }
 
   addIndicator(i) {
@@ -619,19 +618,19 @@ export default class MainPane {
       i?.type in this.core.indicators &&
       indType === false
     ) {
-      const cnt = this.#OffCharts.size + 1
-      const heights = this.calcOffChartHeights(cnt)
+      const cnt = this.#ChartPanes.size + 1
+      const heights = this.calcChartPaneHeights(cnt)
       const options = {...heights}
             options.parent = this
             options.title = i.name
             options.elements = {}
 
-      this.addOffChart(i, options)
+      this.addChartPane(i, options)
     }
     else return false
   }
 
-  calcOffChartHeights(cnt) {
+  calcChartPaneHeights(cnt) {
     let a = this.#offChartDefaultH * this.#core.offChart.length,
         offChartsH = ( a / Math.log10( a * 2 ) ) / 100,
         rowsH = Math.round(this.rowsH * offChartsH),
@@ -646,7 +645,7 @@ export default class MainPane {
     }
     else {
       // adjust chart size for subsequent offCharts
-      options.rowH = Math.round(rowsH / this.#OffCharts.size)
+      options.rowH = Math.round(rowsH / this.#ChartPanes.size)
       options.chartH = this.rowsH - rowsH
       options.height = options.rowH
     }
@@ -656,7 +655,7 @@ export default class MainPane {
   scaleNode(type) {
     const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.offChart.separator};`
     const node = `
-    <div slot="offchart" class="viewport ${type}" style="$${styleRow}"></div>
+    <div slot="chartpane" class="viewport scale ${type}" style="$${styleRow}"></div>
   `
     return node
   }
@@ -674,7 +673,7 @@ export default class MainPane {
       this.#Chart
     ]
     this.time.xAxis.doCalcXAxisGrads(range)
-    this.#OffCharts.forEach((offChart, key) => {
+    this.#ChartPanes.forEach((offChart, key) => {
       graphs.push(offChart)
     })
 
@@ -694,20 +693,22 @@ export default class MainPane {
   }
 
   resizeRowPair(divider, pos) {
-    let active = divider.offChart
+    let active = divider.chartPane
     let ID = active.id
-    let offCharts = [...this.#OffCharts.keys()]
-    let i = offCharts.indexOf(ID)
+    let chartPanes = [...this.#ChartPanes.keys()]
+    let i = chartPanes.indexOf(ID)
     let prev = (i == 0) ? 
       this.#Chart :
-      this.#OffCharts.get(offCharts[i]);
+      this.#ChartPanes.get(chartPanes[i]);
+    if (i == -1) return {active, prev}
+
     // why does activeH need - 1 to calc correct sizing?
     let activeH = active.height - pos[5] - 1
     let prevH  = prev.height + pos[5]
 
     if ( activeH >= this.#rowMinH
         && prevH >= this.#rowMinH) {
-          divider.offChart.Divider.updateDividerPos(pos)
+          divider.chartPane.Divider.updateDividerPos(pos)
           active.setDimensions({w:undefined, h:activeH})
           prev.setDimensions({w:undefined, h:prevH})
     }

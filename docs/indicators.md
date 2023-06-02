@@ -63,7 +63,9 @@ const offChartIndicators = chart.Indicators.offchart.entries()
 
 ### Indicator Definitions
 
-Legends can display multiple values if formatted correctly. Each indicator class is required to provide a ``legendInputs(pos)`` method that the chart will call.
+Indicators must provide a ``legendInputs(pos)`` method. The chart will pass the current mouse position to the indicator in an array, ``[x, y]``.
+
+Legends can display multiple values if formatted correctly.
 
 If the indicator provides no values for it's legend then simply return false.
 
@@ -72,8 +74,66 @@ legendInputs() {
   return false;
 }
 ```
+When the indicator does provide values for it's legend, then the `legendInputs()` method must return an object with three entries.
 
+```javascript
+ return {inputs, colours, labels}
+```
+where the three entries are defined as the following:
 
+```javascript
+/**
+  @param {object} inputs - property names are used as labels
+  @param {array} colours - array of #rrggbb(aa) values
+  @param {array} labels - array of which input labels to dispaly [true, false, ...]
+*/
+```
+#### inputs
+is an object that provides the legend labels and values.
+For example the Bollinger Band indicator has three values. It's returned ``inputs`` object would look like the following:
+
+```javascript
+{ Hi: "13016.1", Mid: "13011.2", Lo: "13006.2" }
+```
+The object property names are used as the labels for the indicator.
+The Bollinger Band indicator legend would look like this on the chart:
+
+```javascript
+ Hi: 13016.1  Mid: 13011.2  Lo: 13006.2
+```
+If you wanted a label with spaces, then the object property name would have to be quoted. ``"some value": 12345``
+
+#### colours
+is an array of ``"#rrggbb(aa)"`` string values corresponding to the legend values
+
+#### lables
+is an array that specifies which of the legend labels are displayed.
+In the Bollinger Band example, if you wanted to silence all labels, use an array of ``[false, false, false]``.
+
+### Canvas Drawing Methods
+
+The base ``Indicator`` class which all others, including custom incators are built atop, offers the ``plot()`` method for drawing to the canvas. 
+
+The ``Indicator`` class also exposes a pointer to the canvas directly, so you could also use your own functions instead.
+
+``plot()`` offers the following options:
+
+* [``renderLine``](./canvas_methods.md#renderline)
+* [``renderLineHorizontal``](./canvas_methods.md#renderlinehorizontal)
+* [``renderLineVertical``](./canvas_methods.md#renderlinevertical)
+* [``renderPathStroke``](./canvas_methods.md#renderpathstroke)
+* [``renderPathClosed``](./canvas_methods.md#renderpathclosed)
+* [``renderSpline``](./canvas_methods.md#renderspline)
+* [``renderRect``](./canvas_methods.md#renderrect)
+* [``renderPolygonRegular``](./canvas_methods.md#renderpolygonregular)
+* [``renderPolygonIrregular``](./canvas_methods.md#renderpolygonirregular)
+* [``renderRectRound``](./canvas_methods.md#renderrectround)
+* [``renderTriangle``](./canvas_methods.md#rendertriangle)
+* [``renderDiamond``](./canvas_methods.md#renderdiamond)
+* [``renderCircle``](./canvas_methods.md#rendercircle)
+* [``renderImage``](./canvas_methods.md#renderimage)
+
+Refer to the [Canvas Methods](./canvas_methods.md) documentation for parameter configuration.
 
 ### Minimal Custom Indicator Definition
 
@@ -92,9 +152,9 @@ export default class Test extends Indicator {
   timePeriod = 20
 
   #defaultStyle = {
-    strokeStyle: "#0088cc",
-    lineWidth: "1",
-    lineDash: undefined,
+    stroke: "#0088cc",
+    width: "1",
+    dash: undefined,
   }
 
   style = {}

@@ -78,7 +78,8 @@ export default class TradeXchart extends Tradex_chart {
   #ready = false
   #inCnt = null
   #hub = {}
-  #state = {}
+  #State = State
+  #state
   #userClasses = []
   #chartIsEmpty = true
   #data
@@ -223,7 +224,7 @@ export default class TradeXchart extends Tradex_chart {
 
   log(l) { if (this.logs) console.log(l) }
   info(i) { if (this.infos) console.info(i) }
-  warning(w) { if (this.warnings) console.warn(w) }
+  warn(w) { if (this.warnings) console.warn(w) }
   error(e) { if (this.errors) console.error(e) }
   time(n) { if (this.timer) console.time(n) }
   timeLog(n) { if (this.timer) console.timeLog(n) }
@@ -262,10 +263,10 @@ export default class TradeXchart extends Tradex_chart {
 
   get ready() { return this.#ready }
   get state() { return this.#state }
-  get chartData() { return this.#state.data.chart.data }
-  get offChart() { return this.#state.data.offchart }
-  get onChart() { return this.#state.data.onchart }
-  get datasets() { return this.#state.data.datasets }
+  get chartData() { return this.state.data.chart.data }
+  get offChart() { return this.state.data.offchart }
+  get onChart() { return this.state.data.onchart }
+  get datasets() { return this.state.data.datasets }
   get allData() {
     return {
       data: this.chartData,
@@ -280,7 +281,7 @@ export default class TradeXchart extends Tradex_chart {
   get TimeUtils() { return Time }
 
   get theme() { return this.#theme }
-  get settings() { return this.#state.data.chart.settings }
+  get settings() { return this.state.data.chart.settings }
   get indicators() { return this.#indicators }
   get TALib() { return this.#TALib }
   get TALibReady() { return TradeXchart.talibReady }
@@ -338,12 +339,15 @@ export default class TradeXchart extends Tradex_chart {
 
     this.log("processing state...")
 
-    let state = copyDeep(txCfg?.state)
+    let state = copyDeep(txCfg?.state) || {}
+        state.id = this.id
+        state.core = this
     let deepValidate = txCfg?.deepValidate || false
     let isCrypto = txCfg?.isCrypto || false
-    this.#state = State.create(state, deepValidate, isCrypto)
+    // create default state
+    this.#state = this.#State.create(state, deepValidate, isCrypto)
     delete txCfg.state
-    this.log(`Chart ${this.id} created with a ${this.#state.status} state`)
+    this.log(`${this.name} id: ${this.id} : created with a ${this.state.status} state`)
 
     // time frame
     let tf = "1s"
@@ -351,13 +355,13 @@ export default class TradeXchart extends Tradex_chart {
     this.#chartIsEmpty = true
 
     // is the chart empty - no data or stream
-    if (!isObject(txCfg?.stream) && this.#state.data.chart.data.length < 2) {
-      this.warning(`${NAME} has no chart data or streaming provided.`)
+    if (!isObject(txCfg?.stream) && this.state.data.chart.data.length < 2) {
+      this.warn(`${NAME} has no chart data or streaming provided.`)
       // has a time frame been provided?
       ;({tf, ms} = isTimeFrame(txCfg?.timeFrame))
     }
     // is the chart streaming with an empty chart?
-    else if (isObject(txCfg?.stream) && this.#state.data.chart.data.length < 2) {
+    else if (isObject(txCfg?.stream) && this.state.data.chart.data.length < 2) {
       // has a time frame been provided?
       ;({tf, ms} = isTimeFrame(txCfg?.timeFrame))
 
@@ -365,8 +369,8 @@ export default class TradeXchart extends Tradex_chart {
     }
     // chart has back history and optionally streaming
     else {
-      tf = this.#state.data.chart.tf 
-      ms = this.#state.data.chart.tfms
+      tf = this.state.data.chart.tf 
+      ms = this.state.data.chart.tfms
       this.#chartIsEmpty = false
     }
     this.#time.timeFrame = tf
@@ -447,7 +451,7 @@ export default class TradeXchart extends Tradex_chart {
     this.WidgetsG.end()
 
     this.#workers.end()
-    this.#state = null
+    this.#State = null
 
     // DOM.findByID(this.id).remove
   }
@@ -520,7 +524,7 @@ export default class TradeXchart extends Tradex_chart {
         // recalculate range
         // TODO: instead of recalculate, update Range
         this.setRange(r.indexStart, r.indexEnd)
-
+        // trigger chart to redraw the scale (yAxis)
         this.emit("chart_yAxisRedraw", this.range)
       }
     }

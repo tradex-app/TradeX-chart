@@ -3,8 +3,7 @@
 
 import Overlay from "./overlay"
 import { Range } from "../../model/range"
-import { renderFillRect } from "../../renderer/rect"
-import { renderLine } from "../../renderer/line"
+import canvas from "../../renderer/canvas"
 import { limit } from "../../utils/number"
 import { isObject, isString, isPromise } from "../../utils/typeChecks"
 import {
@@ -386,17 +385,30 @@ export default class indicator extends Overlay {
    *
    * @param {array} plots - array of x y coords [{x:x, y:y}, ...]
    * @param {string} type
-   * @param {object} style
+   * @param {object} opts
    * @memberof indicator
    */
-  plot(plots, type, style) {
+  plot(plots, type, opts ) {
 
     const ctx = this.scene.context
+    const p = plots
     ctx.save();
 
     switch(type) {
-      case "renderLine": renderLine(ctx, plots, style);
-      case "renderFillRect": renderFillRect(ctx, plots[0], plots[1], plots[2], plots[3], style)
+      case "renderLine": canvas[type]( ctx, p, opts ); break;
+      case "renderLineHorizontal": canvas[type]( ctx, p[0], p[1], p[2], opts ); break;
+      case "renderLineVertical": canvas[type]( ctx, p[0], p[1], p[2], opts ); break;
+      case "renderPathStroke": canvas[type]( ctx, p, opts.style, opts ); break;
+      case "renderPathClosed": canvas[type]( ctx, p, opts ); break;
+      case "renderSpline": canvas[type]( ctx, p, opts ); break;
+      case "renderRect": canvas[type]( ctx, p[0], p[1], p[2], p[3], opts ); break;
+      case "renderRectRound": canvas[type]( ctx, p[0], p[1], p[2], p[3], p[4], opts ); break;
+      case "renderPolygonRegular": canvas[type]( ctx, p[0], p[1], p[2], p[3], p[4], opts ); break;
+      case "renderPolygonIrregular": canvas[type]( ctx, p, opts ); break;
+      case "renderTriangle": canvas[type]( ctx, p[0], p[1], p[2], opts); break;
+      case "renderDiamond": canvas[type]( ctx, p[0], p[1], p[2], p[3], opts); break;
+      case "renderCircle": canvas[type]( ctx, p[0], p[1], p[2], opts ); break;
+      case "renderImage": canvas[type]( ctx, opts.src, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7] )
     }
 
     ctx.restore();

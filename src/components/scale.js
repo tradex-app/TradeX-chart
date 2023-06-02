@@ -63,13 +63,13 @@ export default class ScaleBar {
     this.#element = this.#options.elScale
     this.#chart = this.#options.chart
     this.#parent = this.#options.parent
-    this.#ID = this.#options.offChartID || uid("TX_scale_")
+    this.#ID = `${this.#parent.id}.scale`
     this.init()
   }
 
   log(l) { this.#core.log(l) }
   info(i) { this.#core.info(i) }
-  warning(w) { this.#core.warn(w) }
+  warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
   get ID() { return this.#ID }
