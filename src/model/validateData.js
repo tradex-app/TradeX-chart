@@ -4,11 +4,11 @@ import { isValidTimeInRange } from '../utils/time'
 
 
 /**
- * Validate price history data
- *
+ * Validate price a sample of history data
  * @export
- * @param {Array} data
- * @return {Boolean}  
+ * @param {array} data
+ * @param {boolean} isCrypto - check against BTC genesis date
+ * @return {boolean}  
  */
 export function validateShallow(data, isCrypto=false) {
 
@@ -29,6 +29,13 @@ export function validateShallow(data, isCrypto=false) {
   return true
 }
 
+/**
+ * Validate entire price history data
+ * @export
+ * @param {array} data
+ * @param {boolean} isCrypto - check against BTC genesis date
+ * @return {boolean}  
+ */
 export function validateDeep(data, isCrypto=false) {
   if (!isArray(data)) return false
 

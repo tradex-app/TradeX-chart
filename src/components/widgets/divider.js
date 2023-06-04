@@ -93,7 +93,7 @@ export default class Divider {
 
   end() {
     // remove event listeners
-    this.#input.off("pointerenter", this.onMouseEnter);
+    this.#input.off("pointerover", this.onMouseEnter);
     this.#input.off("pointerout", this.onMouseOut);
     this.#input.off("pointerdrag", this.onPointerDrag);
     this.#input.off("pointerdragend", this.onPointerDragEnd);
@@ -106,7 +106,7 @@ export default class Divider {
   eventsListen() {
     this.#input = new Input(this.#elDivider, {disableContextMenu: false});
 
-    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
+    this.#input.on("pointerover", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
     this.#input.on("pointerdrag", this.onPointerDrag.bind(this));
     this.#input.on("pointerdragend", this.onPointerDragEnd.bind(this));

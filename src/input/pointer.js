@@ -7,6 +7,7 @@
 export default class PointerAgent {
 
   #types = [
+    "mouseenter",
     "pointerdown", // - Pointer becomes active
     "pointerup", // - Pointer stops being active
     "pointerover", "pointerenter", // - Pointer enters element boundaries
@@ -21,8 +22,8 @@ export default class PointerAgent {
     "wheel", // 
     "contextmenu",
     
-"pointerdrag",
-"pointerdragend",
+    "pointerdrag",
+    "pointerdragend",
 
     "pan",
     "panstart",
@@ -81,6 +82,7 @@ export default class PointerAgent {
       case "pointerover":
       case "contextmenu":
         cb = function (e) {
+          this.logit(e)
           this.#input.location(e)
           handler(this.#input.pointerEventData(e))
         }

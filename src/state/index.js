@@ -23,10 +23,10 @@ const DEFAULT_STATE = {
     indexed: false,
     data: [],
     settings: {},
-    row: {},
     tf: DEFAULT_TIMEFRAME,
     tfms: DEFAULT_TIMEFRAMEMS
   },
+  views: [],
   onchart: [],
   offchart: [],
   datasets: [],
@@ -54,10 +54,12 @@ export default class State {
     if (!isObject(state)) {
       state = {}
     }
-    if (!('chart' in state)) {
+    if (!isObject(state.chart)) {
       state.chart = defaultState.chart
-      state.chart.data = state?.ohlcv || []
       state.chart.isEmpty = true
+      state.chart.data = (isArray(state.ohlcv)) ? state.ohlcv : []
+      // Remove ohlcv we have Data
+      delete state.ohlcv
     }
 
     state = mergeDeep(defaultState, state)
@@ -77,25 +79,65 @@ export default class State {
     
     if (!isString(state.chart?.tfms) || deepValidate)
       state.chart.tf = ms2Interval(state.chart.tfms)
+    
+    if (!isArray(state.views)) {
+      state.views = defaultState.views
+    }
 
-    if (!('onchart' in state)) {
+    if (!isArray(state.onchart)) {
         state.onchart = defaultState.onchart
     }
 
-    if (!('offchart' in state)) {
+    if (!isArray(state.offchart)) {
         state.offchart = defaultState.offchart
     }
 
-    if (!state.chart.settings) {
+    if (!isObject(state.chart.settings)) {
         state.chart.settings = defaultState.chart.settings
     }
 
-    // Remove ohlcv we have Data
-    delete state.ohlcv
-
-    if (!('datasets' in state)) {
+    if (!isArray(state.datasets)) {
         state.datasets = []
     }
+
+    // Build chart order
+    if (state.views.length == 0) {
+      // add primary chart
+      state.views.push(["onchart", state.onchart])
+      // add secondary charts if they exist
+      for (let o in state) {
+        if (o.indexOf("offchart") == 0) {
+          state.views.push([o, state[o]])
+        }
+      }
+    }
+    // Process chart order
+    let o = state.views
+    let c = o.length
+    while (c--) {
+      if (!isArray(o[c]) || o[c].length == 0)
+        o.splice(c, 1)
+      else {
+        // check each indicator entry
+        let i = state.views[c][1]
+        let x = i.length
+        while (x--) {
+          if (!isObject(i[x]) &&
+              !isString(i[x].name) &&
+              !isString(i[x].type) &&
+              !isArray(i[x].data))
+                i.splice(x, 1)
+          else if (!isObject(i[x].settings))
+            i[x].settings = {}
+        }
+      }
+    }
+    // ensure state has the mandatory onchart entry
+    if (state.views.length == 0)
+      state.views[0] = ["onchart", defaultState.onchart]
+    state.views = new Map(state.views)
+    if (!state.views.has("onchart"))
+      state.views.add("onchart", defaultState.onchart)
 
     // Init dataset proxies
     for (var ds of state.datasets) {
@@ -130,7 +172,7 @@ export default class State {
  */
   static export(key, config={}) {
     if (!State.has(key)) return false
-    if (!isObject) config = {}
+    if (!isObject(config)) config = {}
     const state = State.get(key)
     const type = config?.type
     const data = copyDeep(state.data)
@@ -141,6 +183,8 @@ export default class State {
     if (vals.length > 0 &&
         vals[vals.length - 1].length > 6)
         vals.length = vals.length - 1
+
+    // data.
 
     switch(type) {
       case "json":
