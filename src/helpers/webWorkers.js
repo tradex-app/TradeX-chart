@@ -28,15 +28,15 @@ class ThreadWorker {
 
 class Thread {
 
-  #ID
+  #id
   #cb
   #err
   #req = 0
   #reqList = {}
   #worker
 
-  constructor(ID, fn, cb, err) {
-    this.#ID = ID
+  constructor(id, fn, cb, err) {
+    this.#id = id
     this.#cb = cb
     this.#err = err
     const workerFn = `
@@ -50,7 +50,7 @@ class Thread {
     URL.revokeObjectURL(blobURL);
   }
 
-  get ID() { return this.#ID }
+  get id() { return this.#id }
   get req() { return `r_${this.#req}` }
 
   onmessage(m) {

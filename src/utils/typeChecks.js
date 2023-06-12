@@ -57,6 +57,10 @@ export function isString (v) {
   return typeof v === 'string'
 }
 
+export function isMap(v) {
+  return v instanceof Map
+}
+
 /**
  * @export
  * @param {*} v

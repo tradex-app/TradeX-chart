@@ -3,7 +3,7 @@
 
 
 import { isString } from "../utils/typeChecks"
-import { insertAtIndex } from "../utils/utilities"
+import { xMap } from "../utils/utilities"
 import CEL from "./primitives/canvas"
 
 
@@ -21,7 +21,7 @@ export default class Overlays {
 
     this.#parent = parent
     this.#core = parent.core
-    this.#list = new Map([...list])
+    this.#list = new xMap([...list])
 
     // iterate over List, create and add overlays
     for (const [key, overlay] of this.#list) {
@@ -43,23 +43,12 @@ export default class Overlays {
   get time() { return this.#parent.parent.time }
 
   start() {
-    // Start the module's activities.
-    // Play time!
-
     // set up event listeners
     this.eventsListen()
-
-    // start State Machine 
-    // stateMachineConfig.context = this
-    // this.#core.stateMachine = stateMachineConfig
-    // this.#core.stateMachine.start()
   }
 
   end() {
-    // this.#core.stateMachine.destroy()
-    // Stop and clean up the module to prevent memory leaks.
-    // It should remove: event listeners, timers, ect.
-    // Put your toys away or it will end in tears.
+    this.#parent.off("resize", (dimensions) => this.onResize)
   }
 
 
@@ -89,7 +78,7 @@ export default class Overlays {
     let s;
     for (let o of overlays) {
       s = this.addOverlay(o[0], o[1])
-      r.push([o[0]], s)
+      r.push([o[0], s])
     }
     return r
   }

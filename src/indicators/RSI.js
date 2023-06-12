@@ -7,8 +7,6 @@
 import indicator from "../components/overlays/indicator"
 import {RSI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
-import { limit, round } from "../utils/number";
-import { isArray } from "../utils/typeChecks";
 import { uid } from "../utils/utilities"
 
 
@@ -69,7 +67,7 @@ export default class RSI extends indicator {
 
     const overlay = params.overlay
 
-    this.ID = params.overlay?.id || uid(this.shortName)
+    this.id = params.overlay?.id || uid(this.shortName)
     this.defineIndicator(overlay?.settings, talibAPI)
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     // calculate back history if missing
@@ -77,6 +75,7 @@ export default class RSI extends indicator {
     // enable processing of price stream
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.updateValue(value) }
+    this.addLegend()
   }
 
   get onChart() { return RSI.onChart }
@@ -86,7 +85,7 @@ export default class RSI extends indicator {
 
     const inputs = {}
     const {c, colours} = super.legendInputs(pos)
-    inputs.RSI_1 = this.Scale.nicePrice(this.overlay.data[c][1])
+    inputs.RSI_1 = this.scale.nicePrice(this.overlay.data[c][1])
 
     return {inputs, colours}
   }
@@ -96,12 +95,8 @@ export default class RSI extends indicator {
    * @param {object} range 
    */
   draw(range=this.range) {
-    if (this.overlay.data.length < 2 ) return false
-
     this.scene.clear()
 
-    const data = this.overlay.data
-    const width = this.xAxis.candleW
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2)
     const y1 = this.yAxis.yPos(this.style.defaultHigh)
     const y2 = this.yAxis.yPos(this.style.defaultLow)
@@ -118,7 +113,7 @@ export default class RSI extends indicator {
     style = {
       width: this.style.highLowLineWidth,
       stroke: this.style.highStrokeStyle,
-      dash: [5, 5]
+      dash: [1, 1]
     }
     this.plot(plots, "renderLine", style)
 
@@ -129,9 +124,19 @@ export default class RSI extends indicator {
     style = {
       width: this.style.highLowLineWidth,
       stroke: this.style.lowStrokeStyle,
-      dash: [5, 5]
+      dash: [1, 1]
     }
     this.plot(plots, "renderLine", style)
+
+    // exit if no data to render
+    if (this.overlay.data.length < 2 ) {
+      this.target.viewport.render();
+      return false
+    }
+
+    // we have data, draw something
+    const data = this.overlay.data
+    const width = this.xAxis.candleW
 
     // RSI plot
     plots.length = 0

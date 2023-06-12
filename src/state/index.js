@@ -4,7 +4,7 @@
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import Dataset from '../model/dataset'
 import { validateDeep, validateShallow } from '../model/validateData'
-import { copyDeep, mergeDeep, uid } from '../utils/utilities'
+import { copyDeep, mergeDeep, xMap, uid } from '../utils/utilities'
 import { detectInterval } from '../model/range'
 import { ms2Interval, SECOND_MS } from '../utils/time'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS } from '../definitions/chart'
@@ -18,6 +18,7 @@ const DEFAULT_STATE = {
   status: "default",
   isEmpty: true,
   chart: {
+    name: "Primary",
     type: "candles",
     candleType: "CANDLE_SOLID",
     indexed: false,
@@ -33,9 +34,11 @@ const DEFAULT_STATE = {
   tools: [],
   ohlcv: []
 }
+
+
 export default class State {
 
-  static #stateList = new Map()
+  static #stateList = new xMap()
   
   static get default() { return copyDeep(DEFAULT_STATE) }
   static get list() { return State.#stateList }
@@ -130,14 +133,17 @@ export default class State {
           else if (!isObject(i[x].settings))
             i[x].settings = {}
         }
+        // if after check, no valid indicators, delete entry
+        if (o[c].length == 0) o.splice(c, 1)
       }
     }
     // ensure state has the mandatory onchart entry
     if (state.views.length == 0)
       state.views[0] = ["onchart", defaultState.onchart]
-    state.views = new Map(state.views)
-    if (!state.views.has("onchart"))
-      state.views.add("onchart", defaultState.onchart)
+    state.views = new xMap(state.views)
+    if (!state.views.has("onchart")) 
+      state.views.insert("onchart", defaultState.onchart, 0)
+    state.views.get("onchart").push(state.chart)
 
     // Init dataset proxies
     for (var ds of state.datasets) {
@@ -183,8 +189,9 @@ export default class State {
     if (vals.length > 0 &&
         vals[vals.length - 1].length > 6)
         vals.length = vals.length - 1
-
-    // data.
+    data.views.get("onchart").pop()
+    // convert Map/() to array
+    data.views = Array.from(data.views)
 
     switch(type) {
       case "json":

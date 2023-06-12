@@ -24,10 +24,8 @@ export default class Divider {
 
   #elDividers
   #elDivider
-  #elOffChart
 
   #cursorPos
-  #controller
   #input
 
   static dividerList = {}
@@ -36,25 +34,9 @@ export default class Divider {
   static name = "Dividers"
   static type = "divider"
 
-
-  constructor(widgets, config) {
-
-    const cfg = {...config}
-
-    this.#widgets = widgets
-    this.#core = cfg.core
-    this.#config = cfg
-    this.#theme = cfg.core.theme
-    this.#id = cfg.id
-    this.#chartPane = cfg.chartPane
-    this.#elDividers = widgets.elements.elDividers
-    this.#elOffChart = this.#chartPane.element
-    this.init()
-  }
-
   static create(widgets, config) {
 
-    const id = `divider${++Divider.divideCnt}`
+    const id = `divider_${++Divider.divideCnt}`
     config.id = id
 
     // add entry
@@ -70,8 +52,30 @@ export default class Divider {
     delete Divider.dividerList[id]
   }
 
+  static defaultNode() {
+    const dividersStyle = `position: absolute;`
+    const node = `
+  <div slot="widget" class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
+  `
+    return node
+  }
+
+  constructor(widgets, config) {
+
+    const cfg = {...config}
+
+    this.#widgets = widgets
+    this.#core = cfg.core
+    this.#config = cfg
+    this.#theme = cfg.core.theme
+    this.#id = cfg.id
+    this.#chartPane = cfg.chartPane
+    this.#elDividers = widgets.elements.elDividers
+    this.init()
+  }
+
   get el() { return this.#elDivider }
-  get ID() { return this.#id }
+  get id() { return this.#id }
   get chartPane() { return this.#chartPane }
   get config() { return this.#core.config }
   get pos() { return this.dimensions }
@@ -136,9 +140,9 @@ export default class Divider {
 
   onPointerDrag(e) {
     this.#cursorPos = [e.position.x, e.position.y]
-    this.emit(`${this.ID}_pointerdrag`, this.#cursorPos)
+    this.emit(`${this.id}_pointerdrag`, this.#cursorPos)
     this.emit(`divider_pointerdrag`, {
-      id: this.ID,
+      id: this.id,
       e: e,
       pos: this.#cursorPos,
       chartPane: this.chartPane
@@ -148,9 +152,9 @@ export default class Divider {
   onPointerDragEnd(e) {
     if ("position" in e)
     this.#cursorPos = [e.position.x, e.position.y]
-    this.emit(`${this.ID}_pointerdragend`, this.#cursorPos)
+    this.emit(`${this.id}_pointerdragend`, this.#cursorPos)
     this.emit(`divider_pointerdragend`, {
-      id: this.ID,
+      id: this.id,
       e: e,
       pos: this.#cursorPos,
       chartPane: this.chartPane
@@ -168,14 +172,6 @@ export default class Divider {
 
   setCursor(cursor) {
     this.#elDivider.style.cursor = cursor
-  }
-
-  static defaultNode() {
-    const dividersStyle = `position: absolute;`
-    const node = `
-  <div slot="widget" class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
-  `
-    return node
   }
 
   dividerNode() {
@@ -202,23 +198,23 @@ export default class Divider {
     return node
   }
 
-  updateDividerPos(pos) {
+  updatePos(pos) {
     let dividerY = this.#elDivider.offsetTop;
         dividerY += pos[5]
     this.#elDivider.style.top = `${dividerY}px`
   }
 
-  setDividerPos() {
+  setPos() {
     let top = this.#chartPane.pos.top - DOM.elementDimPos(this.#elDividers).top;
         top = top - (this.height / 2)
     this.#elDivider.style.top = `${top}px`
   }
 
-  hideDivider() {
+  hide() {
     this.#elDivider.style.display = `none`
   }
 
-  showDivider() {
+  show() {
     this.#elDivider.style.display = `block`
   }
 }

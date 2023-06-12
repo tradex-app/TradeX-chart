@@ -2,11 +2,11 @@
 
 
 import { isArray, isFunction, isObject } from "../../../utils/typeChecks"
-import { firstItemInMap, firstKeyInMap, firstValueInMap, lastKeyInMap } from "../../../utils/utilities"
+import { xMap } from "../../../utils/utilities"
 
 
 const renderLoop = {
-  renderQ: new Map(),
+  renderQ: new xMap(),
   rendered: [],
   renderLog: false,
   dropFrames: true,
@@ -32,7 +32,7 @@ const renderLoop = {
   },
 
   dropFrame: function (frame=-1) {
-    if (frame === -1) frame = lastKeyInMap(this.renderQ)
+    if (frame === -1) frame = this.renderQ.lastKey()
     if (this.renderQ.size > 1 && this.renderQ.has(frame)) {
       this.renderQ.delete(frame)
     }
@@ -41,12 +41,12 @@ const renderLoop = {
   getFrame: function (frame=0) {
     if (this.renderQ.has(frame)) return this.renderQ.get(frame)
     // return first frame
-    else return firstValueInMap(this.renderQ)
+    else return this.renderQ.firstValue()
   },
 
   frameDone: function () {
     if (this.renderQ.size === 0) return
-    const key = firstKeyInMap(this.renderQ)
+    const key = this.renderQ.firstKey()
     if (this.renderLog) this.rendered.push([key, Date.now()])
     this.renderQ.delete(key)
   },
@@ -61,7 +61,7 @@ const renderLoop = {
     // any frames to render?
     if (this.renderQ.size === 0) return
 
-    const [ID, frame] = firstItemInMap(this.renderQ)
+    const [ID, frame] = this.renderQ.firstEntry()
 
     if (!frame.range?.snapshot) return
     for (let entry of frame.graphs) {

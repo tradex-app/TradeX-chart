@@ -6,7 +6,7 @@ import xAxis from "./axis/xAxis"
 import Input from "../input"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-time"
-import { copyDeep, debounce, throttle } from "../utils/utilities"
+import { copyDeep, debounce, throttle, xMap } from "../utils/utilities"
 import Slider from "./widgets/slider"
 import { BUFFERSIZE } from "../definitions/chart"
 
@@ -43,7 +43,7 @@ export default class Timeline {
   #elNavigation
 
   #Graph
-  #timeOverlays = new Map()
+  #timeOverlays = new xMap()
   #viewport
   #navigation
   #elNavList

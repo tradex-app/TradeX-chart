@@ -40,7 +40,7 @@ export default class Menu {
 
   static create(widgets, config) {
 
-    const id = `menu${++Menu.menuCnt}`
+    const id = `menu_${++Menu.menuCnt}`
     config.id = id
 
     // add entry

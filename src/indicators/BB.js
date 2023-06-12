@@ -64,7 +64,7 @@ export default class BB extends indicator {
     const overlay = params.overlay
     
     // initialize indicator values
-    this.ID = params.overlay?.id || uid(this.shortName)
+    this.id = params.overlay?.id || uid(this.shortName)
     this.defineIndicator(overlay?.settings, talibAPI)
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     // calculate back history if missing
@@ -94,9 +94,9 @@ export default class BB extends indicator {
     const inputs = {}
       let labels = [false, false, false]
       let {c, colours} = super.legendInputs(pos)
-    inputs.Hi = this.Scale.nicePrice(this.overlay.data[c][1][0])
-    inputs.Mid = this.Scale.nicePrice(this.overlay.data[c][1][1])
-    inputs.Lo = this.Scale.nicePrice(this.overlay.data[c][1][2])
+    inputs.Hi = this.scale.nicePrice(this.overlay.data[c][1][0])
+    inputs.Mid = this.scale.nicePrice(this.overlay.data[c][1][1])
+    inputs.Lo = this.scale.nicePrice(this.overlay.data[c][1][2])
     colours = [
       this.style.upperStrokeStyle,
       this.style.middleStrokeStyle,

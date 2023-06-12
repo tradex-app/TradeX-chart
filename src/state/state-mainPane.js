@@ -1,5 +1,7 @@
 // state-mainPain.js
 
+import { isObject } from "../utils/typeChecks"
+
 export default
 {
   id: "main",
@@ -249,9 +251,9 @@ export default
       let active = this.context.pair.active,
       prev = this.context.pair.prev;
 
-      if (active !== undefined)
+      if ( isObject(active) )
         active.element.style.removeProperty('user-select');
-      if (prev !== undefined)
+      if ( isObject(prev) )
         prev.element.style.removeProperty('user-select');
     }
   }

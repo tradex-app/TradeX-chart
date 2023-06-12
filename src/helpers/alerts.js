@@ -2,13 +2,13 @@
 // provide subscription to price stream for handler execution
 
 import { isArray, isFunction, isNumber } from "../utils/typeChecks"
-import { uid } from "../utils/utilities"
+import { uid, xMap } from "../utils/utilities"
 
 const ALERT = "alert"
 
 export default class Alerts {
 
-  #list = new Map()
+  #list = new xMap()
   #handlers = {}
 
   constructor(alerts) {

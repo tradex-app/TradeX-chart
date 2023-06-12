@@ -10,7 +10,7 @@ export default class Tool {
   static #cnt = 0
   static #instances = {}
 
-  #ID
+  #id
   #inCnt = null
   #name
   #shortName
@@ -34,7 +34,7 @@ export default class Tool {
   constructor(config) {
     this.#config = config
     this.#inCnt = config.cnt
-    this.#ID = this.#config.ID || uid("TX_Tool_")
+    this.#id = this.#config.ID || uid("TX_Tool_")
     this.#name = config.name
     this.#core = config.core
     this.#elChart = config.elements.elChart
@@ -47,7 +47,7 @@ export default class Tool {
   }
 
   get inCnt() { return this.#inCnt }
-  get ID() { return this.#ID }
+  get id() { return this.#id }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
   get core() { return this.#core }

@@ -65,7 +65,7 @@ import { uid } from "../utils/utilities"
     SMA.inCnt++
     const overlay = params.overlay
 
-    this.ID = params.overlay?.id || uid(this.shortName)
+    this.id = params.overlay?.id || uid(this.shortName)
     this.defineIndicator(overlay?.settings, talibAPI)
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     // calculate back history if missing
@@ -87,7 +87,7 @@ import { uid } from "../utils/utilities"
 
     const inputs = {}
     const {c, colours} = super.legendInputs(pos)
-    inputs.SMA_1 = this.Scale.nicePrice(this.overlay.data[c][1])
+    inputs.SMA_1 = this.scale.nicePrice(this.overlay.data[c][1])
 
     return {inputs, colours}
   }

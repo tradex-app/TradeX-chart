@@ -13,7 +13,7 @@ function _mergeNamespaces(n, m) {
   return Object.freeze(Object.defineProperty(n, Symbol.toStringTag, { value: 'Module' }));
 }
 
-const version = "0.121.12";
+const version = "0.122.0";
 
 function isArray (v) {
   return Array.isArray(v)
@@ -627,7 +627,7 @@ function mergeDeep(target, source) {
   });
   return target;
 }
-function copyDeep$1(obj) {
+function copyDeep(obj) {
   if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
       return obj;
   if (obj instanceof Date)
@@ -637,7 +637,7 @@ function copyDeep$1(obj) {
   for (var key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
           obj['isActiveClone'] = null;
-          temp[key] = copyDeep$1(obj[key]);
+          temp[key] = copyDeep(obj[key]);
           delete obj['isActiveClone'];
       }
   }
@@ -664,17 +664,128 @@ function isArrayEqual(a1, a2) {
   }
   return true
 }
+function swapArrayElements(array, index1, index2) {
+  [myArray[index1], myArray[index2]] = [myArray[index2], myArray[index1]];
+}
 function uid(tag="ID") {
   if (isNumber(tag)) tag = tag.toString();
   else if (!isString$1(tag)) tag = "ID";
+  tag = tag.replace(/ |,|;|:|\.|#/g, "_");
   const dateString = Date.now().toString(36);
   const randomness = Math.random().toString(36).substring(2,5);
   return `${tag}_${dateString}_${randomness}`
 }
-const firstItemInMap = map => map.entries().next().value;
+const firstEntryInMap = map => map.entries().next().value;
 const firstKeyInMap = map => map.entries().next().value[0];
 const firstValueInMap = map => map.entries().next().value[1];
-const lastKeyInMap = map => Array.from(map.keys()).pop();
+const lastEntryInMap = map => [...map].pop();
+const lastKeyInMap = map => [...map.keys()].pop();
+const lastValueInMap = map => [...map.values()].pop();
+class xMap extends Map {
+  constructor(x) {
+    super(x);
+  }
+  indexOfKey(key) {
+    return [...this.keys()].indexOf(key);
+  }
+  indexOfValue(value) {
+    return [...this.values()].indexOf(value)
+  }
+  entryAtIndex(index) {
+    return [...this.entries()][index]
+  }
+  keyAtIndex(index) {
+    return [...this.keys()][index]
+  }
+  valueAtIndex(index) {
+    return [...this.values()][index]
+  }
+  insert(key, value, index) {
+    return insertAtMapIndex(index, key, value, this)
+  }
+  remove(index) {
+    return removeMapIndex(index, this)
+  }
+  firstEntry() {
+    return firstEntryInMap(this)
+  }
+  firstKey() {
+    return firstKeyInMap(this)
+  }
+  firstValue() {
+    return firstValueInMap(this)
+  }
+  lastEntry() {
+    return lastEntryInMap(this)
+  }
+  lastKey() {
+    return lastKeyInMap(this)
+  }
+  lastValue() {
+    return lastValueInMap(this)
+  }
+  prevCurrNext(key) {
+    let prev = curr = next = null;
+    for (let keyVal of this) {
+      prev = curr;
+      curr = keyVal;
+      if (keyVal.key == key) break
+    }
+    return {prev, curr, next}
+  }
+  union(...iterables) {
+    if (typeof super.prototype.union === "function")
+      super.union(...iterables);
+    else {
+      for (const iterable of iterables) {
+        for (const item of iterable) {
+            this.set(...item);
+        }
+      }
+    }
+  }
+  setMultiple(array) {
+    if (!isArray(array)) return false
+    arr.forEach(([k,v]) => this.set(k,v));
+    return true
+  }
+  populate(array) {
+    if (!isArray(array)) return false
+    this.clear();
+    arr.forEach(([k,v]) => this.set(k,v));
+    return true
+  }
+  insertIndex(index, key, value){
+    if (!isNumber(index)) return false
+    const arr = [...this];
+    arr.splice(index, 0, [key, value]);
+    this.populate(arr);
+    return true
+  }
+  removeIndex(index) {
+    if (!isNumber(index)) return false
+    const arr = [...this];
+    arr.splice(index, 1);
+    this.populate(arr);
+    return true
+  }
+  swapIndices(index1, index2) {
+    if (!isNumber(index1) || !isNumber(index2)) return false
+    const arr = [...this];
+    swapArrayElements(arr, index1, index2);
+    this.populate(arr);
+    return true
+  }
+  swapKeys(key1, key2) {
+    const arr = [...this],
+        indexA = arr.findIndex(([v]) => v === key1),
+        indexB = arr.findIndex(([v]) => v === key2);
+    [arr[indexA], arr[indexB]] = [arr[indexB], arr[indexA]];
+    this.clear();
+    arr.forEach(([k,v]) => this.set(k,v));
+    return true
+  }
+}
  function debounce(fn, wait=100, scope, immediate=false) {
   var timeout;
   var core = function() {
@@ -871,7 +982,7 @@ class Range {
   set intervalStr (i) { this.#intervalStr = i; }
   get intervalStr () { return this.#intervalStr }
   end() {
-    WebWorker.destroy(this.#worker.ID);
+    WebWorker.destroy(this.#worker.id);
   }
   set (start=0, end=this.dataLength, max=this.maxCandles, config) {
     if (!isNumber(start) ||
@@ -1150,15 +1261,16 @@ const DEFAULT_STATE = {
   status: "default",
   isEmpty: true,
   chart: {
+    name: "Primary",
     type: "candles",
     candleType: "CANDLE_SOLID",
     indexed: false,
     data: [],
     settings: {},
-    row: {},
     tf: DEFAULT_TIMEFRAME,
     tfms: DEFAULT_TIMEFRAMEMS
   },
+  views: [],
   onchart: [],
   offchart: [],
   datasets: [],
@@ -1166,8 +1278,8 @@ const DEFAULT_STATE = {
   ohlcv: []
 };
 class State {
-  static #stateList = new Map()
-  static get default() { return copyDeep$1(DEFAULT_STATE) }
+  static #stateList = new xMap()
+  static get default() { return copyDeep(DEFAULT_STATE) }
   static get list() { return State.#stateList }
   static create(state, deepValidate=false, isCrypto=false) {
     const instance = new State(state, deepValidate, isCrypto);
@@ -1180,10 +1292,11 @@ class State {
     if (!isObject(state)) {
       state = {};
     }
-    if (!('chart' in state)) {
+    if (!isObject(state.chart)) {
       state.chart = defaultState.chart;
-      state.chart.data = state?.ohlcv || [];
       state.chart.isEmpty = true;
+      state.chart.data = (isArray(state.ohlcv)) ? state.ohlcv : [];
+      delete state.ohlcv;
     }
     state = mergeDeep(defaultState, state);
     if (deepValidate)
@@ -1197,19 +1310,55 @@ class State {
     }
     if (!isString$1(state.chart?.tfms) || deepValidate)
       state.chart.tf = ms2Interval(state.chart.tfms);
-    if (!('onchart' in state)) {
+    if (!isArray(state.views)) {
+      state.views = defaultState.views;
+    }
+    if (!isArray(state.onchart)) {
         state.onchart = defaultState.onchart;
     }
-    if (!('offchart' in state)) {
+    if (!isArray(state.offchart)) {
         state.offchart = defaultState.offchart;
     }
-    if (!state.chart.settings) {
+    if (!isObject(state.chart.settings)) {
         state.chart.settings = defaultState.chart.settings;
     }
-    delete state.ohlcv;
-    if (!('datasets' in state)) {
+    if (!isArray(state.datasets)) {
         state.datasets = [];
     }
+    if (state.views.length == 0) {
+      state.views.push(["onchart", state.onchart]);
+      for (let o in state) {
+        if (o.indexOf("offchart") == 0) {
+          state.views.push([o, state[o]]);
+        }
+      }
+    }
+    let o = state.views;
+    let c = o.length;
+    while (c--) {
+      if (!isArray(o[c]) || o[c].length == 0)
+        o.splice(c, 1);
+      else {
+        let i = state.views[c][1];
+        let x = i.length;
+        while (x--) {
+          if (!isObject(i[x]) &&
+              !isString$1(i[x].name) &&
+              !isString$1(i[x].type) &&
+              !isArray(i[x].data))
+                i.splice(x, 1);
+          else if (!isObject(i[x].settings))
+            i[x].settings = {};
+        }
+        if (o[c].length == 0) o.splice(c, 1);
+      }
+    }
+    if (state.views.length == 0)
+      state.views[0] = ["onchart", defaultState.onchart];
+    state.views = new xMap(state.views);
+    if (!state.views.has("onchart"))
+      state.views.insert("onchart", defaultState.onchart, 0);
+    state.views.get("onchart").push(state.chart);
     for (var ds of state.datasets) {
       if (!this.#dss) this.#dss = {};
       this.dss[ds.id] = new Dataset(this, ds);
@@ -1230,15 +1379,17 @@ class State {
   }
   static export(key, config={}) {
     if (!State.has(key)) return false
-    if (!isObject) config = {};
+    if (!isObject(config)) config = {};
     const state = State.get(key);
     const type = config?.type;
-    const data = copyDeep$1(state.data);
+    const data = copyDeep(state.data);
     const vals = data.chart.data;
     let stateExport;
     if (vals.length > 0 &&
         vals[vals.length - 1].length > 6)
         vals.length = vals.length - 1;
+    data.views.get("onchart").pop();
+    data.views = Array.from(data.views);
     switch(type) {
       case "json":
       default :
@@ -1466,7 +1617,7 @@ class StateMachine {
 
 const ALERT = "alert";
 class Alerts {
-  #list = new Map()
+  #list = new xMap()
   #handlers = {}
   constructor(alerts) {
     if (isArray(alerts)) {
@@ -1578,7 +1729,7 @@ class Stream {
   static validateConfig(c) {
     if (!isObject(c)) return defaultStreamConfig
     else {
-      let d = copyDeep$1(defaultStreamConfig);
+      let d = copyDeep(defaultStreamConfig);
       c = mergeDeep(d, c);
       c.tfCountDown = (isBoolean(c.tfCountDown)) ? c.tfCountDown : defaultStreamConfig.tfCountDown;
       c.alerts = (isArray(c.alerts)) ? c.alerts : defaultStreamConfig.alerts;
@@ -1936,6 +2087,7 @@ const DOM = {
     }
   }
 };
+var DOM$1 = DOM;
 
 const isBrowser =
 typeof window !== 'undefined' &&
@@ -4329,8 +4481,8 @@ class PointerAgent {
     "anyclick",
     "wheel",
     "contextmenu",
-"pointerdrag",
-"pointerdragend",
+    "pointerdrag",
+    "pointerdragend",
     "pan",
     "panstart",
     "panmove",
@@ -4383,6 +4535,7 @@ class PointerAgent {
       case "pointerover":
       case "contextmenu":
         cb = function (e) {
+          this.logit(e);
           this.#input.location(e);
           handler(this.#input.pointerEventData(e));
         };
@@ -4530,7 +4683,7 @@ class Input  {
     if (!this.#element && this.#options.elementId) {
       this.#element = document.getElementById(this.#options.elementId);
     }
-    if (!DOM.isElement(this.#element)) {
+    if (!DOM$1.isElement(this.#element)) {
       throw "Must specify an element to receive user input.";
     }
     if (!this.#options.contextMenu) {
@@ -4688,15 +4841,30 @@ class Divider {
   #chartPane
   #elDividers
   #elDivider
-  #elOffChart
   #cursorPos
-  #controller
   #input
   static dividerList = {}
   static divideCnt = 0
   static class = CLASS_DIVIDERS
   static name = "Dividers"
   static type = "divider"
+  static create(widgets, config) {
+    const id = `divider_${++Divider.divideCnt}`;
+    config.id = id;
+    Divider.dividerList[id] = new Divider(widgets, config);
+    return Divider.dividerList[id]
+  }
+  static destroy(id) {
+    Divider.dividerList[id].end();
+    delete Divider.dividerList[id];
+  }
+  static defaultNode() {
+    const dividersStyle = `position: absolute;`;
+    const node = `
+  <div slot="widget" class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
+  `;
+    return node
+  }
   constructor(widgets, config) {
     const cfg = {...config};
     this.#widgets = widgets;
@@ -4706,25 +4874,14 @@ class Divider {
     this.#id = cfg.id;
     this.#chartPane = cfg.chartPane;
     this.#elDividers = widgets.elements.elDividers;
-    this.#elOffChart = this.#chartPane.element;
     this.init();
   }
-  static create(widgets, config) {
-    const id = `divider${++Divider.divideCnt}`;
-    config.id = id;
-    Divider.dividerList[id] = new Divider(widgets, config);
-    return Divider.dividerList[id]
-  }
-  static destroy(id) {
-    Divider.dividerList[id].end();
-    delete Divider.dividerList[id];
-  }
   get el() { return this.#elDivider }
-  get ID() { return this.#id }
+  get id() { return this.#id }
   get chartPane() { return this.#chartPane }
   get config() { return this.#core.config }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elDivider) }
+  get dimensions() { return DOM$1.elementDimPos(this.#elDivider) }
   get height() { return this.#elDivider.getBoundingClientRect().height }
   init() {
     this.mount();
@@ -4734,7 +4891,7 @@ class Divider {
     this.eventsListen();
   }
   end() {
-    this.#input.off("pointerenter", this.onMouseEnter);
+    this.#input.off("pointerover", this.onMouseEnter);
     this.#input.off("pointerout", this.onMouseOut);
     this.#input.off("pointerdrag", this.onPointerDrag);
     this.#input.off("pointerdragend", this.onPointerDragEnd);
@@ -4743,7 +4900,7 @@ class Divider {
   }
   eventsListen() {
     this.#input = new Input(this.#elDivider, {disableContextMenu: false});
-    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
+    this.#input.on("pointerover", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
     this.#input.on("pointerdrag", this.onPointerDrag.bind(this));
     this.#input.on("pointerdragend", this.onPointerDragEnd.bind(this));
@@ -4767,9 +4924,9 @@ class Divider {
   }
   onPointerDrag(e) {
     this.#cursorPos = [e.position.x, e.position.y];
-    this.emit(`${this.ID}_pointerdrag`, this.#cursorPos);
+    this.emit(`${this.id}_pointerdrag`, this.#cursorPos);
     this.emit(`divider_pointerdrag`, {
-      id: this.ID,
+      id: this.id,
       e: e,
       pos: this.#cursorPos,
       chartPane: this.chartPane
@@ -4778,9 +4935,9 @@ class Divider {
   onPointerDragEnd(e) {
     if ("position" in e)
     this.#cursorPos = [e.position.x, e.position.y];
-    this.emit(`${this.ID}_pointerdragend`, this.#cursorPos);
+    this.emit(`${this.id}_pointerdragend`, this.#cursorPos);
     this.emit(`divider_pointerdragend`, {
-      id: this.ID,
+      id: this.id,
       e: e,
       pos: this.#cursorPos,
       chartPane: this.chartPane
@@ -4791,20 +4948,13 @@ class Divider {
       this.#elDividers.innerHTML = this.dividerNode();
     else
       this.#elDividers.lastElementChild.insertAdjacentHTML("afterend", this.dividerNode());
-    this.#elDivider = DOM.findBySelector(`#${this.#id}`, this.#elDividers);
+    this.#elDivider = DOM$1.findBySelector(`#${this.#id}`, this.#elDividers);
   }
   setCursor(cursor) {
     this.#elDivider.style.cursor = cursor;
   }
-  static defaultNode() {
-    const dividersStyle = `position: absolute;`;
-    const node = `
-  <div slot="widget" class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
-  `;
-    return node
-  }
   dividerNode() {
-    let top = this.#chartPane.pos.top - DOM.elementDimPos(this.#elDividers).top,
+    let top = this.#chartPane.pos.top - DOM$1.elementDimPos(this.#elDividers).top,
       width = this.#core.MainPane.rowsW + this.#core.scaleW,
       height = (isNumber(this.config.dividerHeight)) ?
         this.config.dividerHeight : DIVIDERHEIGHT,
@@ -4822,20 +4972,20 @@ class Divider {
     `;
     return node
   }
-  updateDividerPos(pos) {
+  updatePos(pos) {
     let dividerY = this.#elDivider.offsetTop;
         dividerY += pos[5];
     this.#elDivider.style.top = `${dividerY}px`;
   }
-  setDividerPos() {
-    let top = this.#chartPane.pos.top - DOM.elementDimPos(this.#elDividers).top;
+  setPos() {
+    let top = this.#chartPane.pos.top - DOM$1.elementDimPos(this.#elDividers).top;
         top = top - (this.height / 2);
     this.#elDivider.style.top = `${top}px`;
   }
-  hideDivider() {
+  hide() {
     this.#elDivider.style.display = `none`;
   }
-  showDivider() {
+  show() {
     this.#elDivider.style.display = `block`;
   }
 }
@@ -5026,6 +5176,11 @@ const defaultTheme = {
   legend: {
     font: LegendStyle.font,
     colour: LegendStyle.colour,
+    controls: true,
+    controlsColour: "#aaa",
+    controlsOver: "#fff",
+    controlsW: 18,
+    controlsH: 18,
   },
   icon: {
     colour: COLOUR_ICON,
@@ -5093,14 +5248,14 @@ const style = `
 
 const reserved = ["constructor","list","setCurrent","setTheme","setValue"];
 class Theme {
-  static #list = new Map()
+  static #list = new xMap()
   static get list() { return Theme.#list }
   #core
   static create(theme, core) {
     if (!(isObject(theme))) return false
-    theme.ID = (isString$1(theme.name))? uid(theme.name) : `${core.id}.theme`;
+    theme.id = (isString$1(theme.name))? uid(theme.name) : `${core.id}.theme`;
     const instance = new Theme(theme, core);
-    Theme.list.set(theme.ID, instance);
+    Theme.list.set(theme.id, instance);
     return instance
   }
   constructor(theme, core) {
@@ -5110,8 +5265,8 @@ class Theme {
   get list() { return Theme.list }
   setCurrent(theme={}) {
     theme = (isObject(theme))? theme : {};
-    const defaultT = copyDeep$1(defaultTheme);
-    const newTheme = copyDeep$1(theme);
+    const defaultT = copyDeep(defaultTheme);
+    const newTheme = copyDeep(theme);
     const setTheme = mergeDeep(defaultT, newTheme);
     for (let t in setTheme) {
       if (reserved.includes(t)) continue
@@ -5146,6 +5301,7 @@ class Theme {
   }
   deleteTheme(theme) {
     if (isString$1(theme) && Theme.list.has(theme)) {
+      Theme.list.delete(theme);
       return true
     }
     return false
@@ -5185,14 +5341,14 @@ class ThreadWorker {
   }
 }
 class Thread {
-  #ID
+  #id
   #cb
   #err
   #req = 0
   #reqList = {}
   #worker
-  constructor(ID, fn, cb, err) {
-    this.#ID = ID;
+  constructor(id, fn, cb, err) {
+    this.#id = id;
     this.#cb = cb;
     this.#err = err;
     const workerFn = `
@@ -5205,7 +5361,7 @@ class Thread {
     this.#worker = new Worker(blobURL);
     URL.revokeObjectURL(blobURL);
   }
-  get ID() { return this.#ID }
+  get id() { return this.#id }
   get req() { return `r_${this.#req}` }
   onmessage(m) {
     return (isFunction(this.#cb))? this.#cb(m) : m
@@ -5457,7 +5613,7 @@ function renderPath (ctx, coords, style, strokeFill) {
     ctx.translate(0.5, 0.5);
   }
   ctx.strokeStyle = style.stroke;
-  if ("lineDash" in style && isArray(style.dash))
+  if (isArray(style.dash))
     ctx.setLineDash(style.dash);
   ctx.beginPath();
   let move = true;
@@ -5609,8 +5765,8 @@ class indicator extends Overlay {
     this.#range = this.xAxis.range;
     this.eventsListen();
   }
-  get ID() { return this.#ID }
-  set ID(id) { this.#ID = id; }
+  get id() { return this.#ID }
+  set id(id) { this.#ID = id.replace(/ |,|;|:|\.|#/g, "_"); }
   get name() { return this.#name }
   set name(n) { this.#name = n; }
   get shortName() { return this.#shortName }
@@ -5623,7 +5779,7 @@ class indicator extends Overlay {
   set plots(p) { this.#plots = p; }
   get params() { return this.#params }
   get Timeline() { return this.core.Timeline }
-  get Scale() { return this.parent.scale }
+  get scale() { return this.parent.scale }
   get type() { return this.#type }
   get overlay() { return this.#overlay }
   get indicator() { return this.#indicator }
@@ -5693,9 +5849,10 @@ class indicator extends Overlay {
   }
   addLegend() {
     let legend = {
-      id: this.shortName,
+      id: this.id,
       title: this.shortName,
-      type: this.shortName,
+      type: "indicator",
+      parent: this,
       source: this.legendInputs.bind(this)
     };
     this.chart.legend.add(legend);
@@ -5707,6 +5864,23 @@ class indicator extends Overlay {
     let l = limit(this.overlay.data.length - 1, 0, Infinity);
         c = limit(c, 0, l);
     return {c, colours}
+  }
+  onLegendAction(e) {
+    const action = this.chart.legend.onMouseClick(e.currentTarget);
+    console.log(`Legend Control: ${action.id} ${action.icon}`);
+    console.log(`onChart: ${this.onChart}`);
+    console.log(this.parent.parent.parent.element);
+    console.log(this.parent.parent.parent.view);
+    switch(action.icon) {
+      case "up": break;
+      case "down": break;
+      case "collapse": break;
+      case "maximize": break;
+      case "restore": break;
+      case "remove": break;
+      case "config": break;
+      default: return;
+    }
   }
   indicatorInput(start, end) {
     let input = [];
@@ -6021,7 +6195,7 @@ class BB extends indicator {
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
     super(target, xAxis, yAxis, config, parent, params);
     const overlay = params.overlay;
-    this.ID = params.overlay?.id || uid(this.shortName);
+    this.id = params.overlay?.id || uid(this.shortName);
     this.defineIndicator(overlay?.settings, BBANDS);
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.calcIndicatorHistory();
@@ -6035,9 +6209,9 @@ class BB extends indicator {
     const inputs = {};
       let labels = [false, false, false];
       let {c, colours} = super.legendInputs(pos);
-    inputs.Hi = this.Scale.nicePrice(this.overlay.data[c][1][0]);
-    inputs.Mid = this.Scale.nicePrice(this.overlay.data[c][1][1]);
-    inputs.Lo = this.Scale.nicePrice(this.overlay.data[c][1][2]);
+    inputs.Hi = this.scale.nicePrice(this.overlay.data[c][1][0]);
+    inputs.Mid = this.scale.nicePrice(this.overlay.data[c][1][1]);
+    inputs.Lo = this.scale.nicePrice(this.overlay.data[c][1][2]);
     colours = [
       this.style.upperStrokeStyle,
       this.style.middleStrokeStyle,
@@ -6137,7 +6311,7 @@ class EMA extends indicator {
     super(target, xAxis, yAxis, config, parent, params);
     EMA.inCnt++;
     const overlay = params.overlay;
-    this.ID = params.overlay?.id || uid(this.shortName);
+    this.id = params.overlay?.id || uid(this.shortName);
     this.defineIndicator(overlay?.settings, EMA$1);
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.calcIndicatorHistory();
@@ -6153,7 +6327,7 @@ class EMA extends indicator {
     if (this.overlay.data.length == 0) return false
     const inputs = {};
     const {c, colours} = super.legendInputs(pos);
-    inputs.EMA_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
+    inputs.EMA_1 = this.scale.nicePrice(this.overlay.data[c][1]);
     return {inputs, colours}
   }
   draw(range=this.range) {
@@ -6221,26 +6395,24 @@ class RSI extends indicator {
   constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
     super (target, xAxis, yAxis, config, parent, params);
     const overlay = params.overlay;
-    this.ID = params.overlay?.id || uid(this.shortName);
+    this.id = params.overlay?.id || uid(this.shortName);
     this.defineIndicator(overlay?.settings, RSI$1);
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.calcIndicatorHistory();
     this.setNewValue = (value) => { this.newValue(value); };
     this.setUpdateValue = (value) => { this.updateValue(value); };
+    this.addLegend();
   }
   get onChart() { return RSI.onChart }
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
     const inputs = {};
     const {c, colours} = super.legendInputs(pos);
-    inputs.RSI_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
+    inputs.RSI_1 = this.scale.nicePrice(this.overlay.data[c][1]);
     return {inputs, colours}
   }
   draw(range=this.range) {
-    if (this.overlay.data.length < 2 ) return false
     this.scene.clear();
-    const data = this.overlay.data;
-    const width = this.xAxis.candleW;
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2);
     const y1 = this.yAxis.yPos(this.style.defaultHigh);
     const y2 = this.yAxis.yPos(this.style.defaultLow);
@@ -6253,7 +6425,7 @@ class RSI extends indicator {
     style = {
       width: this.style.highLowLineWidth,
       stroke: this.style.highStrokeStyle,
-      dash: [5, 5]
+      dash: [1, 1]
     };
     this.plot(plots, "renderLine", style);
     plots.length = 0;
@@ -6262,9 +6434,15 @@ class RSI extends indicator {
     style = {
       width: this.style.highLowLineWidth,
       stroke: this.style.lowStrokeStyle,
-      dash: [5, 5]
+      dash: [1, 1]
     };
     this.plot(plots, "renderLine", style);
+    if (this.overlay.data.length < 2 ) {
+      this.target.viewport.render();
+      return false
+    }
+    const data = this.overlay.data;
+    const width = this.xAxis.candleW;
     plots.length = 0;
     this.Timeline.smoothScrollOffset || 0;
     const plot = {
@@ -6326,7 +6504,7 @@ class SMA extends indicator {
     super(target, xAxis, yAxis, config, parent, params);
     SMA.inCnt++;
     const overlay = params.overlay;
-    this.ID = params.overlay?.id || uid(this.shortName);
+    this.id = params.overlay?.id || uid(this.shortName);
     this.defineIndicator(overlay?.settings, SMA$1);
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style};
     this.calcIndicatorHistory();
@@ -6342,7 +6520,7 @@ class SMA extends indicator {
     if (this.overlay.data.length == 0) return false
     const inputs = {};
     const {c, colours} = super.legendInputs(pos);
-    inputs.SMA_1 = this.Scale.nicePrice(this.overlay.data[c][1]);
+    inputs.SMA_1 = this.scale.nicePrice(this.overlay.data[c][1]);
     return {inputs, colours}
   }
   draw(range=this.range) {
@@ -6607,7 +6785,7 @@ class xAxis extends Axis {
   }
 }
 
-var stateMachineConfig$6 = {
+var stateMachineConfig$5 = {
   id: "time",
   initial: "idle",
   context: {},
@@ -6958,10 +7136,10 @@ class Slider {
   constructor(config) {
     this.#id = Slider.#cnt++;
     this.#core = config.core;
-    this.#elContainer = (DOM.isElement(config.elContainer)) ? config.elContainer : false;
-    this.#elHandle = (DOM.isElement(config.elHandle)) ? config.elHandle : false;
+    this.#elContainer = (DOM$1.isElement(config.elContainer)) ? config.elContainer : false;
+    this.#elHandle = (DOM$1.isElement(config.elHandle)) ? config.elHandle : false;
     this.#callback = (isFunction(config.callback)) ? config.callback : false;
-    if (DOM.isElement(this.#elContainer) && DOM.isElement(this.#elHandle)) {
+    if (DOM$1.isElement(this.#elContainer) && DOM$1.isElement(this.#elHandle)) {
       this.mount();
       this.eventsListen();
     }
@@ -7393,6 +7571,7 @@ const CEL = {
   Scene: Scene,
   Hit: Hit,
 };
+var CEL$1 = CEL;
 
 class Overlays {
   #core
@@ -7403,7 +7582,7 @@ class Overlays {
   constructor (parent, list=[]) {
     this.#parent = parent;
     this.#core = parent.core;
-    this.#list = new Map([...list]);
+    this.#list = new xMap([...list]);
     for (const [key, overlay] of this.#list) {
       this.addOverlay(key, overlay);
     }
@@ -7422,6 +7601,7 @@ class Overlays {
     this.eventsListen();
   }
   end() {
+    this.#parent.off("resize", (dimensions) => this.onResize);
   }
   eventsListen() {
     this.#parent.on("resize", (dimensions) => this.onResize.bind(this));
@@ -7443,13 +7623,13 @@ class Overlays {
     let s;
     for (let o of overlays) {
       s = this.addOverlay(o[0], o[1]);
-      r.push([o[0]], s);
+      r.push([o[0], s]);
     }
     return r
   }
   addOverlay(key, overlay) {
     try {
-      const layer = new CEL.Layer(this.layerConfig);
+      const layer = new CEL$1.Layer(this.layerConfig);
       this.parent.viewport.addLayer(layer);
       overlay.layer = layer;
       overlay.instance = new overlay.class(
@@ -7605,7 +7785,7 @@ class graph {
   get width() { return this.#elparent.getBoundingClientRect().width }
   set height(h) { this.setHeight(h); }
   get height() { return this.#elparent.getBoundingClientRect().height }
-  get dimensions() { return DOM.elementDimPos(this.#elparent) }
+  get dimensions() { return DOM$1.elementDimPos(this.#elparent) }
   set layerWidth(w) { this.#layerWidth = w; }
   get layerWidth() { return this.#layerWidth }
   get stateMachine() { return this.#parent.stateMachine }
@@ -7636,9 +7816,9 @@ class graph {
     }
   }
   createViewport(overlays=[], node=false) {
-    overlays = (overlays.length == 0) ? copyDeep$1(defaultOverlays$4) : overlays;
+    overlays = (overlays.length == 0) ? copyDeep(defaultOverlays$4) : overlays;
     const {width, height} = this.layerConfig();
-    let viewport = (node) ? CEL.Node : CEL.Viewport;
+    let viewport = (node) ? CEL$1.Node : CEL$1.Viewport;
     this.#viewport = new viewport({
       width: width,
       height: height,
@@ -7791,7 +7971,7 @@ class Timeline {
   #elViewport
   #elNavigation
   #Graph
-  #timeOverlays = new Map()
+  #timeOverlays = new xMap()
   #viewport
   #navigation
   #elNavList
@@ -7845,7 +8025,7 @@ class Timeline {
   get navigation() { return this.#navigation }
   get range() { return this.#core.range }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#element) }
+  get dimensions() { return DOM$1.elementDimPos(this.#element) }
   get bufferPx() { return this.#core.bufferPx }
   get scrollPos() { return this.#core.scrollPos }
   get scrollOffsetPx() { return this.#core.scrollPos % this.candleW }
@@ -7895,8 +8075,8 @@ class Timeline {
     this.#xAxis.initXAxisGrads();
     this.draw();
     this.eventsListen();
-    stateMachineConfig$6.context = this;
-    this.stateMachine = stateMachineConfig$6;
+    stateMachineConfig$5.context = this;
+    this.stateMachine = stateMachineConfig$5;
     this.stateMachine.start();
   }
   end() {
@@ -7981,7 +8161,7 @@ class Timeline {
   xPos2Index(x) { return this.#xAxis.xPos2Index(x) }
   xPosOHLCV(x) { return this.#xAxis.xPosOHLCV(x) }
   createGraph() {
-    let overlays = copyDeep$1(defaultOverlays$3);
+    let overlays = copyDeep(defaultOverlays$3);
     this.#Graph = new graph(this, this.#elViewport, overlays, false);
     this.#layerCursor = this.graph.overlays.get("cursor").instance;
     this.#layerLabels = this.graph.overlays.get("labels").instance;
@@ -8009,7 +8189,7 @@ class Timeline {
 }
 
 const renderLoop = {
-  renderQ: new Map(),
+  renderQ: new xMap(),
   rendered: [],
   renderLog: false,
   dropFrames: true,
@@ -8030,18 +8210,18 @@ const renderLoop = {
     return frameID
   },
   dropFrame: function (frame=-1) {
-    if (frame === -1) frame = lastKeyInMap(this.renderQ);
+    if (frame === -1) frame = this.renderQ.lastKey();
     if (this.renderQ.size > 1 && this.renderQ.has(frame)) {
       this.renderQ.delete(frame);
     }
   },
   getFrame: function (frame=0) {
     if (this.renderQ.has(frame)) return this.renderQ.get(frame)
-    else return firstValueInMap(this.renderQ)
+    else return this.renderQ.firstValue()
   },
   frameDone: function () {
     if (this.renderQ.size === 0) return
-    const key = firstKeyInMap(this.renderQ);
+    const key = this.renderQ.firstKey();
     if (this.renderLog) this.rendered.push([key, Date.now()]);
     this.renderQ.delete(key);
   },
@@ -8051,7 +8231,7 @@ const renderLoop = {
   execute: function () {
     requestAnimationFrame(this.execute.bind(this));
     if (this.renderQ.size === 0) return
-    const [ID, frame] = firstItemInMap(this.renderQ);
+    const [ID, frame] = this.renderQ.firstEntry();
     if (!frame.range?.snapshot) return
     for (let entry of frame.graphs) {
       if (isFunction(entry.draw)) entry.draw(frame.range, frame.update);
@@ -8060,6 +8240,237 @@ const renderLoop = {
       if (isFunction(entry.render)) entry.render();
     }
     this.frameDone();
+  }
+};
+var renderLoop$1 = renderLoop;
+
+const userSelect = [
+  "-webkit-touch-callout",
+  "-webkit-user-select",
+  "-khtml-user-select",
+  "-moz-user-select",
+  "-ms-user-select",
+  "user-select",
+];
+class Legends {
+  #elTarget
+  #list
+  #parent
+  #core
+  #theme
+  #input
+  #controlsList
+  constructor(target, parent) {
+    this.#elTarget = target;
+    this.#list = {};
+    this.#parent = parent;
+    this.#core = parent.core;
+    this.#theme = parent.core.theme.legend;
+    this.eventsListen();
+  }
+  get elTarget() { return this.#elTarget }
+  get list() { return this.#list }
+  end() {
+    this.#core.off("chart_pan", this.onChartPan);
+    this.#core.off("chart_panDone", this.onChartPanDone);
+  }
+  eventsListen() {
+    this.#core.on("chart_pan", this.onChartPan.bind(this));
+    this.#core.on("chart_panDone", this.onChartPanDone.bind(this));
+  }
+  onMouseClick(e) {
+    const which = (s) => {
+      if (isString$1(s.dataset.icon))
+        return {id: s.id, icon: s.dataset.icon}
+      else if (s.parentElement.className !== "controls")
+        return which(s.parentElement)
+      else
+        return false
+    };
+    return which(e)
+  }
+  onMouseOver(e) {
+  }
+  onChartPan() {
+    for (let property of userSelect) {
+      this.#elTarget.style.setProperty(property, "none");
+    }
+  }
+  onChartPanDone() {
+    for (let property of userSelect) {
+      this.#elTarget.style.removeProperty(property);
+    }
+  }
+  buildLegend(o) {
+    const theme = this.#core.theme;
+      let styleInputs = "";
+      let styleLegend = `${theme.legend.font}; color: ${theme.legend.colour}; text-align: left;`;
+      let styleLegendTitle = "";
+    const styleControls = "";
+    const t = this.#elTarget;
+    const controls = (!theme.legend.controls) ? "" :
+    `
+      <div class="controls" style="${styleControls}">
+        ${t.buildControls(o)}
+      </div>
+    `;
+    switch (o?.type) {
+      case "chart":
+        styleLegendTitle += "font-size: 1.5em;";
+        break;
+      case "offchart":
+        styleLegend += " margin-bottom: -1.5em;";
+        styleLegendTitle += "";
+        o.title = "";
+        break;
+      default:
+        styleLegendTitle += "font-size: 1.2em;";
+        break;
+    }
+    const node = `
+      <div id="legend_${o.id}" class="legend ${o.type}" style="${styleLegend}" data-type="${o.type}" data-id="${o.id}" data-parent="${o.parent.id}">
+        <div class="lower">
+          <span class="title" style="${styleLegendTitle}">${o.title}</span>
+          <dl style="${styleInputs}">${t.buildInputs(o)}</dl>
+        </div>
+        <div class="upper">
+            <span class="title" style="${styleLegendTitle}">${o.title}</span>
+            ${controls}
+      </div>
+     </div>
+    `;
+    return node
+  }
+  add(options) {
+    if (!isObject(options) || !("title" in options)) return false
+    const parentError = () => {this.#core.error("ERROR: Legend parent missing!");};
+    options.id = options?.id || uid("legend");
+    options.type = options?.type || "overlay";
+    options.parent = options?.parent || parentError;
+    const html = this.buildLegend(options);
+    this.#elTarget.legends.insertAdjacentHTML('beforeend', html);
+    const legendEl = this.#elTarget.legends.querySelector(`#legend_${options.id}`);
+    this.#list[options.id] = {el: legendEl, type: options.type, source: options?.source};
+    this.#controlsList = legendEl.querySelectorAll(`.control`);
+    for (let c of this.#controlsList) {
+      let svg = c.querySelector('svg');
+      svg.style.width = `${this.#theme.controlsW}px`;
+      svg.style.height = `${this.#theme.controlsH}px`;
+      svg.style.fill = `${this.#theme.controlsColour}`;
+      svg.onpointerover = (e) => e.currentTarget.style.fill = this.#theme.controlsOver;
+      svg.onpointerout = (e) => e.currentTarget.style.fill = this.#theme.controlsColour;
+      c.addEventListener('click', options.parent.onLegendAction.bind(options.parent));
+    }
+    return options.id
+  }
+  remove(id) {
+    if (!(id in this.#list)
+    || this.#list[id].type === "chart") return false
+    this.#list[id].el.remove();
+    delete this.#list[id];
+    for (let c of this.#controlsList) {
+      c.removeEventListener('click', this.onMouseClick);
+    }
+    return true
+  }
+  update(id, data) {
+    if (!(isObject(data))
+    || !(id in this.#list)) return false
+    let source = this.#list[id].source(data.pos);
+    const html = this.#elTarget.buildInputs(source);
+    this.#elTarget.legends.querySelector(`#legend_${id} dl`).innerHTML = html;
+  }
+}
+
+var stateMachineConfig$4 = {
+  id: "chart",
+  initial: "idle",
+  context: {},
+  states: {
+    idle: {
+      onEnter (data) {
+        this.context.origin.setCursor("crosshair");
+      },
+      onExit (data) {
+      },
+      on: {
+        xAxis_scale: {
+          target: 'xAxis_scale',
+          action (data) {
+          },
+        },
+        chart_yAxisRedraw: {
+          target: 'chart_yAxisRedraw',
+          action (data) {
+          },
+        },
+        chart_tool: {
+          target: 'chart_tool',
+          action (data) {
+          },
+        },
+        tool_activated: {
+          target: 'tool_activated',
+          action (data) {
+            this.context.origin.setCursor("default");
+          },
+        },
+      }
+    },
+    xAxis_scale: {
+      onEnter (data) {
+      },
+      onExit (data) {
+      },
+      on: {
+        Idle: {
+          target: 'idle',
+          action (data) {
+          },
+        },
+      }
+    },
+    chart_yAxisRedraw: {
+      onEnter(data) {
+      },
+      onExit(data) {
+      },
+      on: {
+        always: {
+          target: 'idle',
+          condition: 'yAxisRedraw',
+          action (data) {
+            this.context.origin.drawGrid();
+          },
+        },
+      }
+    },
+    tool_activated: {
+      onEnter (data) {
+      },
+      onExit (data) {
+      },
+      on: {
+        tool_targetSelected: {
+          target: 'idle',
+          condition: 'toolSelectedThis',
+          action (data) {
+            console.log("tool_targetSelected:", data);
+          },
+        },
+      }
+    },
+  },
+  guards: {
+    priceMaxMin () { return true },
+    toolSelectedThis (conditionType, condition) {
+      if (this.eventData === this.context)
+        return true
+      else
+        return false
+     },
+    yAxisRedraw () { return true },
+    zoomDone () { return true },
   }
 };
 
@@ -8312,7 +8723,7 @@ class yAxis extends Axis {
   }
 }
 
-var stateMachineConfig$5 = {
+var stateMachineConfig$3 = {
   id: "scale",
   initial: "idle",
   context: {},
@@ -8386,7 +8797,7 @@ var stateMachineConfig$5 = {
     },
   },
   guards: {
-    receiver () { return (this.eventData.scale.ID == this.context.origin.ID) },
+    receiver () { return (this.eventData.scale.id == this.context.origin.id) },
     zoomDone () { return true },
   }
 };
@@ -8544,7 +8955,7 @@ const defaultOverlays$2 = [
   ["cursor", {class: ScaleCursor, fixed: true, required: true}],
 ];
 class ScaleBar {
-  #ID
+  #id
   #name = "Y Scale Axis"
   #shortName = "scale"
   #core
@@ -8561,7 +8972,7 @@ class ScaleBar {
   #layerOverlays
   #layerPriceLine
   #layerCursor
-  #scaleOverlays = new Map()
+  #scaleOverlays = new xMap()
   #Graph
   #input
   #priceLine
@@ -8572,14 +8983,14 @@ class ScaleBar {
     this.#element = this.#options.elScale;
     this.#chart = this.#options.chart;
     this.#parent = this.#options.parent;
-    this.#ID = `${this.#parent.id}.scale`;
+    this.#id = `${this.#parent.id}.scale`;
     this.init();
   }
   log(l) { this.#core.log(l); }
   info(i) { this.#core.info(i); }
   warn(w) { this.#core.warn(w); }
   error(e) { this.#core.error(e); }
-  get ID() { return this.#ID }
+  get id() { return this.#id }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get core() { return this.#core }
@@ -8603,7 +9014,7 @@ class ScaleBar {
   get graph() { return this.#Graph }
   get viewport() { return this.#viewport }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#element) }
+  get dimensions() { return DOM$1.elementDimPos(this.#element) }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
   set scaleRange(r) { this.setScaleRange(r); }
@@ -8619,15 +9030,15 @@ class ScaleBar {
     this.#elViewport = this.#element.viewport || this.#element;
   }
   start() {
-    const range = (this.#parent.name == "OffChart" ) ?
-      this.#parent.localRange : undefined;
+    const range = (this.#parent.name == "Chart" ) ?
+      undefined : this.#parent.localRange;
     this.#yAxis = new yAxis(this, this, this.options.yAxisType, range);
     this.createGraph();
     this.addOverlays([]);
     this.#yAxis.calcGradations();
     this.draw();
     this.eventsListen();
-    const newConfig = copyDeep$1(stateMachineConfig$5);
+    const newConfig = copyDeep(stateMachineConfig$3);
     newConfig.context = this;
     this.stateMachine = newConfig;
     this.stateMachine.start();
@@ -8639,8 +9050,8 @@ class ScaleBar {
     this.#input.on("pointerdrag", this.onDrag);
     this.#input.on("wheel", this.onMouseWheel);
     this.#input.on("dblclick", this.resetScaleRange);
-    this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove);
-    this.off(`${this.#parent.ID}_mouseout`, this.#layerCursor.erase);
+    this.off(`${this.#parent.id}_mousemove`, this.onMouseMove);
+    this.off(`${this.#parent.id}_mouseout`, this.#layerCursor.erase);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
     this.off("chart_pan", this.onMouseMove);
     this.off("chart_panDone", this.onMouseMove);
@@ -8729,7 +9140,7 @@ class ScaleBar {
     return this.#yAxis.limitPrecision(digits)
   }
   createGraph() {
-    let overlays = copyDeep$1(defaultOverlays$2);
+    let overlays = copyDeep(defaultOverlays$2);
     this.graph = new graph(this, this.#elViewport, overlays, false);
     this.#layerCursor = this.graph.overlays.get("cursor").instance;
     this.#layerLabels = this.graph.overlays.get("labels").instance;
@@ -9133,6 +9544,16 @@ class chartStreamCandle extends Overlay {
   }
 }
 
+class chartTrades extends Overlay {
+  constructor(target, xAxis=false, yAxis=false, theme, parent) {
+    super(target, xAxis=false, yAxis=false, theme, parent);
+  }
+  set position(p) { this.target.setPosition(p[0], p[1]); }
+  draw(range=this.core.range) {
+    this.scene.clear();
+  }
+}
+
 const watermark = {
   FONTSIZE: 50,
   FONTWEIGHT: "bold",
@@ -9197,6 +9618,20 @@ const defaultOverlays$1 = {
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ]
 };
+const optionalOverlays = {
+  onChart: {
+    "trades": {class: chartTrades, fixed: false, required: false}
+  },
+  offChart: {
+    "candles": {class: chartCandles, fixed: false, required: true},
+  }
+};
+const chartLegend = {
+  id: "chart",
+  title: "",
+  type: "chart",
+  source: () => {}
+};
 class Chart {
   static #cnt = 0
   static get cnt() { return Chart.#cnt++ }
@@ -9209,6 +9644,7 @@ class Chart {
   #parent;
   #stateMachine;
   #chartCnt
+  #type
   #elTarget;
   #elScale;
   #Scale;
@@ -9218,52 +9654,84 @@ class Chart {
   #Divider;
   #Stream;
   #streamCandle
+  #view
   #viewport;
-  #layersTools = new Map();
-  #overlays = new Map()
-  #overlayTools = new Map();
+  #layersTools = new xMap();
+  #overlays = new xMap()
+  #overlayTools = new xMap();
   #cursorPos = [0, 0];
   #cursorActive = false;
   #cursorClick;
   #input
   #yAxisType
+  #localRange = {
+    valueMax: 100,
+    valueMin: 0,
+    valueDiff: 100
+  }
   constructor(core, options) {
     this.#core = core;
-    if (!isObject(options)) return
     this.#chartCnt = Chart.cnt;
+    if (!isObject(options)) return
     this.#options = {...options};
-    this.#name = options.name;
-    this.#shortName = options.shortName;
-    this.#elTarget = this.#options.elements.elTarget;
+    this.#name = this.#options.name;
+    this.#shortName = this.#options.shortName;
+    this.#title = this.#options.title;
+    this.#type = (this.#options.type == "onchart") ? "onChart" : "offChart";
+    this.#view = this.#options.view;
     this.#elScale = this.#options.elements.elScale;
     this.#parent = this.#options.parent;
-    for (const option in this.#options) {
-      if (option in this.props()) {
-        this.props()[option](this.#options[option]);
-      }
+    this.#elTarget = this.#options.elements.elTarget;
+    this.#elTarget.id = this.id;
+    this.legend = new Legends(this.elLegend, this);
+    if (this.isOnChart) {
+      chartLegend.type = "chart";
+      chartLegend.title = this.title;
+      chartLegend.parent = this;
+      chartLegend.source = this.legendInputs.bind(this);
+      this.legend.add(chartLegend);
+      this.yAxisType = "default";
     }
+    else {
+      chartLegend.type = "offchart";
+      chartLegend.title = "";
+      chartLegend.parent = this;
+      chartLegend.source = () => { return {inputs:{}, colours:[], labels: []} };
+      this.legend.add(chartLegend);
+      this.yAxisType = this.core.indicators[options.view[0].type].ind.scale;
+    }
+    const opts = {...options};
+          opts.parent = this;
+          opts.chart = this;
+          opts.elScale = this.elScale;
+          opts.yAxisType = this.yAxisType;
+    this.scale = new ScaleBar(this.core, opts);
+    this.log(`${this.name} instantiated`);
   }
   log(l) { this.core.log(l); }
   info(i) { this.core.info(i); }
   warn(w) { this.core.warn(w); }
   error(e) { this.core.error(e); }
-  set id(id) { this.#ID = id; }
-  get id() { return (this.#ID) ? `${this.#ID}` : `${this.#core.id}.${this.#name}_${this.#chartCnt}` }
+  set id(id) { this.#ID = id.replace(/ |,|;|:|\.|#/g, "_"); }
+  get id() { return (this.#ID) ? `${this.#ID}` : `${this.#core.id}-${this.#name}_${this.#chartCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get title() { return this.#title }
   get parent() { return this.#parent }
   get core() { return this.#core }
+  get type() { return this.#type }
+  get isOnChart() { return this.#type === "onChart" }
   get options() { return this.#options }
   get element() { return this.#elTarget }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elTarget) }
+  get dimensions() { return DOM$1.elementDimPos(this.#elTarget) }
   set width(w) { this.setWidth(w); }
   get width() { return this.#elTarget.getBoundingClientRect().width }
   set height(h) { this.setHeight(h); }
   get height() { return this.#elTarget.getBoundingClientRect().height }
   get data() {}
   get range() { return this.#core.range }
+  get localRange() { return this.#localRange }
   get stream() { return this.#Stream }
   get streamCandle() { return this.#streamCandle }
   get cursorPos() { return this.#cursorPos }
@@ -9292,32 +9760,26 @@ class Chart {
   get axes() { return "x" }
   set graph(g) { this.#Graph = g; }
   get graph() { return this.#Graph }
+  get view() { return this.#view }
   get viewport() { return this.#Graph.viewport }
   get layerGrid() { return this.#Graph.overlays.get("grid").layer }
   get overlays() { return this.#overlays }
   get overlayGrid() { return this.#Graph.overlays.get("grid").instance }
   get overlayTools() { return this.#overlayTools }
   get overlaysDefault() { return defaultOverlays$1[this.type] }
+  get indicators() { return this.overlays }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
   get stateMachine() { return this.#stateMachine }
   get Divider() { return this.#Divider }
-  init(options) {
-    const opts = {...options};
-    opts.parent = this;
-    opts.chart = this;
-    opts.elScale = this.elScale;
-    opts.yAxisType = this.yAxisType;
-    this.scale = new ScaleBar(this.core, opts);
-  }
-  start(stateMachineConfig) {
+  start() {
     this.#Time = this.#core.Timeline;
     this.createGraph();
     this.#Scale.start();
     this.draw(this.range);
     this.setCursor("crosshair");
-    stateMachineConfig.id = this.id;
-    stateMachineConfig.context = this;
-    this.stateMachine = stateMachineConfig;
+    stateMachineConfig$4.id = this.id;
+    stateMachineConfig$4.context = this;
+    this.stateMachine = stateMachineConfig$4;
     this.stateMachine.start();
     this.eventsListen();
     const cfg = { chartPane: this };
@@ -9430,12 +9892,6 @@ class Chart {
   onYAxisRedraw() {
     if (this.isOnChart) this.refresh();
   }
-  props() {
-    return {
-      title: (title) => (this.#title = title),
-      yAxisDigits: (digits) => this.setYAxisDigits(digits),
-    };
-  }
   setHeight(h) {
     if (!isNumber(h)) h = this.height || this.#parent.height;
     this.#elTarget.style.height = `${h}px`;
@@ -9467,27 +9923,33 @@ class Chart {
     this.#yAxisType = t;
   }
   addOverlays(overlays) {
+    if (!isArray(overlays) || overlays.length < 1) return false
     for (let o of overlays) {
       const config = {fixed: false, required: false};
       if (o.type in this.core.indicators) {
         config.cnt = this.core.indicators[o.type].ind.cnt;
-        config.id = `${this.id}.${o.type}_${config.cnt}`;
+        config.id = `${this.id}-${o.type}_${config.cnt}`;
         config.class = this.core.indicators[o.type].ind;
-        config.params = {
-          overlay: o,
-        };
-        o.id = config.id;
-        o.paneID = this.id;
-        this.overlays.set(o.name, config);
       }
+      else if (o.type in optionalOverlays[this.type]) {
+        config.cnt = 1;
+        config.id = `${this.id}-${o.type}`;
+        config.class = optionalOverlays[this.type][o.type].class;
+      }
+      else continue
+      config.params = { overlay: o, };
+      o.id = config.id;
+      o.paneID = this.id;
+      this.overlays.set(o.name, config);
     }
     const r = this.graph.addOverlays(Array.from(this.overlays));
     for (let o of r) {
-      if (!o[0]) this.overlays.delete(o[0]);
+      if (!o[1]) this.overlays.delete(o[0]);
     }
+    return true
   }
   addIndicator(i) {
-    const onChart = (this.type === "onChart" ) ? true : false;
+    const onChart = this.type === "onChart";
     const indClass = this.core.indicators[i.type].ind;
     const indType = (indClass.constructor.type === "both") ? onChart : indClass.prototype.onChart;
     if (
@@ -9508,7 +9970,7 @@ class Chart {
   }
   addTool(tool) {
     let { layerConfig } = this.layerConfig();
-    let layer = new CEL.Layer(layerConfig);
+    let layer = new CEL$1.Layer(layerConfig);
     this.#layersTools.set(tool.id, layer);
     this.#viewport.addLayer(layer);
     tool.layerTool = layer;
@@ -9533,9 +9995,8 @@ class Chart {
     this.draw(undefined, this.isOnChart);
   }
   updateLegends(pos = this.#cursorPos, candle = false) {
-    if (this.#core.isEmpty) return
-    const legends = this.#Legends.list;
-    for (const legend in legends) {
+    if (this.#core.isEmpty || !isObject(this.#Legends)) return
+    for (const legend in this.#Legends.list) {
       this.#Legends.update(legend, { pos, candle });
     }
   }
@@ -9556,11 +10017,61 @@ class Chart {
     inputs.V = this.scale.nicePrice(ohlcv[5]);
     return {inputs, colours, labels}
   }
+  onLegendAction(e) {
+    const action = this.#Legends.onMouseClick(e.currentTarget);
+    const el = this.element;
+    const prevEl = el.previousElementSibling;
+    const nextEl = el.nextElementSibling;
+    const parentEl = el.parentNode;
+    const scaleEl = this.scale.element;
+    const prevScaleEl = scaleEl.previousElementSibling;
+    const nextScaleEl = scaleEl.nextElementSibling;
+    const parentScaleEl = scaleEl.parentNode;
+    const prevPane = (prevEl !== null) ? this.core.MainPane.chartPanes.get(prevEl.id) : null;
+    const nextPane = (nextEl !== null) ? this.core.MainPane.chartPanes.get(nextEl.id) : null;
+    switch(action.icon) {
+      case "up":
+        if (!isObject(prevEl) || !isObject(prevScaleEl)) return
+        parentEl.insertBefore(el, prevEl);
+        parentScaleEl.insertBefore(scaleEl, prevScaleEl);
+        this.Divider.setPos();
+        if (prevPane !== null) {
+          prevPane.Divider.setPos();
+          prevPane.Divider.show();
+          this.core.MainPane.chartPanes.swapKeys(this.id, prevEl.id);
+        }
+        if (el.previousElementSibling === null)
+          this.Divider.hide();
+        return;
+      case "down":
+        if (!isObject(nextEl) || !isObject(nextScaleEl)) return
+        parentEl.insertBefore(nextEl, el);
+        parentScaleEl.insertBefore(nextScaleEl, scaleEl);
+        this.Divider.setPos();
+        if (nextPane !== null) {
+          nextPane.Divider.setPos();
+          this.Divider.show();
+          this.core.MainPane.chartPanes.swapKeys(this.id, nextEl.id);
+        }
+        if (nextEl.previousElementSibling === null)
+          nextPane.Divider.hide();
+        return;
+      case "collapse": return;
+      case "maximize": return;
+      case "restore": return;
+      case "remove": return;
+      case "config": return;
+      default: return;
+    }
+  }
   createGraph() {
     let overlays = copyDeep(this.overlaysDefault);
-    this.graph = new Graph(this, this.elViewport, overlays, false);
-    this.layerStream = this.graph.overlays.get("stream")?.layer;
-    this.chartStreamCandle = this.graph.overlays.get("stream")?.instance;
+    this.graph = new graph(this, this.elViewport, overlays, false);
+    if (this.isOnChart) {
+      this.layerStream = this.graph.overlays.get("stream")?.layer;
+      this.chartStreamCandle = this.graph.overlays.get("stream")?.instance;
+    }
+    this.addOverlays(this.view);
   }
   render() {
     this.#Graph.render();
@@ -9585,398 +10096,6 @@ class Chart {
   }
   price2YPos(price) {
     return this.scale.yPos(price)
-  }
-}
-
-const userSelect = [
-  "-webkit-touch-callout",
-  "-webkit-user-select",
-  "-khtml-user-select",
-  "-moz-user-select",
-  "-ms-user-select",
-  "user-select",
-];
-class Legends {
-  #elTarget
-  #list
-  #parent
-  #core
-  #input
-  #controls = {
-    width: 18,
-    height: 18,
-    fill: "#aaa"
-  }
-  #controlsList
-  constructor(target, parent) {
-    this.#elTarget = target;
-    this.#list = {};
-    this.#parent = parent;
-    this.#core = parent.core;
-    this.eventsListen();
-  }
-  get list() { return this.#list }
-  eventsListen() {
-    this.moveEvent = new PointerEvent("pointermove", {bubbles: true, cancelable: true,});
-    this.#input = new Input(this.#elTarget, { disableContextMenu: false, });
-    this.#input.on("pointermove", this.onMouseMove.bind(this));
-    this.#core.on("chart_pan", this.onChartPan.bind(this));
-    this.#core.on("chart_panDone", this.onChartPanDone.bind(this));
-  }
-  onMouseMove(e) {
-  }
-  onMouseClick() {
-  }
-  onChartPan() {
-    for (let property of userSelect) {
-      this.#elTarget.style.setProperty(property, "none");
-    }
-  }
-  onChartPanDone() {
-    for (let property of userSelect) {
-      this.#elTarget.style.removeProperty(property);
-    }
-  }
-  buildLegend(o) {
-    const theme = this.#core.theme;
-      let styleInputs = "order: 1; display: inline; margin: 0 0 0 -1em;";
-    const styleLegend = `${theme.legend.text}; color: ${theme.legend.colour}; text-align: left;`;
-      let styleLegendTitle = "margin-right: 1em; white-space: nowrap;";
-    const styleControls = "order:2; float: right; margin: 0 0.5em 0; opacity:0";
-    const mouseOver = "onmouseover='this.style.opacity=1'";
-    const mouseOut = "onmouseout='this.style.opacity=0'";
-    const t = this.#elTarget;
-    styleLegendTitle += (o?.type === "chart") ? "font-size: 1.5em;" : "font-size: 1.2em;";
-    const controls = (!theme.legend.controls) ? "" :
-    `
-      <div slot="controls" class="controls" style="${styleControls}" ${mouseOver} ${mouseOut}>${t.buildControls(o)}</div>
-    `;
-    const node = `
-      <div slot="legend" id="${o.id}" class="legend" style="${styleLegend}">
-        <div>
-          <span slot="title" class="title" style="${styleLegendTitle}">${o.title}</span>
-          <dl style="${styleInputs}">${t.buildInputs(o)}</dl>
-        </div>
-        ${controls}
-     </div>
-    `;
-    return node
-  }
-  add(options) {
-    if (!isObject(options) || !("title" in options)) return false
-    options.id = uid(options?.id || "legend");
-    options.type = options?.type || "overlay";
-    options.parent = this.#parent.ID;
-    const html = this.buildLegend(options);
-    this.#elTarget.insertAdjacentHTML('beforeend', html);
-    const legendEl = this.#elTarget.querySelector(`#${options.id}`);
-    this.#list[options.id] = {el: legendEl, type: options.type, source: options?.source};
-    this.#controlsList = legendEl.querySelectorAll(`.control`);
-    for (let c of this.#controlsList) {
-      let svg = c.querySelector('svg');
-      svg.style.width = `${this.#controls.width}px`;
-      svg.style.height = `${this.#controls.height}px`;
-      svg.style.fill = `${this.#controls.fill}`;
-      c.addEventListener('click', this.onMouseClick.bind(this));
-    }
-    return options.id
-  }
-  remove(id) {
-    if (!(id in this.#list)
-    || this.#list[id].type === "chart") return false
-    this.#list[id].el.remove();
-    delete this.#list[id];
-    for (let c of this.#controlsList) {
-      c.removeEventListener('click', this.onMouseClick);
-    }
-    return true
-  }
-  update(id, data) {
-    if (!(isObject(data))
-    || !(id in this.#list)) return false
-    let source = this.#list[id].source(data.pos);
-    const html = this.#elTarget.buildInputs(source);
-    this.#elTarget.querySelector(`#${id} dl`).innerHTML = html;
-  }
-}
-
-var stateMachineConfig$4 = {
-  id: "chart",
-  initial: "idle",
-  context: {},
-  states: {
-    idle: {
-      onEnter (data) {
-        this.context.origin.setCursor("crosshair");
-      },
-      onExit (data) {
-      },
-      on: {
-        xAxis_scale: {
-          target: 'xAxis_scale',
-          action (data) {
-          },
-        },
-        chart_yAxisRedraw: {
-          target: 'chart_yAxisRedraw',
-          action (data) {
-          },
-        },
-        chart_tool: {
-          target: 'chart_tool',
-          action (data) {
-          },
-        },
-        tool_activated: {
-          target: 'tool_activated',
-          action (data) {
-            this.context.origin.setCursor("default");
-          },
-        },
-      }
-    },
-    xAxis_scale: {
-      onEnter (data) {
-      },
-      onExit (data) {
-      },
-      on: {
-        Idle: {
-          target: 'idle',
-          action (data) {
-          },
-        },
-      }
-    },
-    chart_yAxisRedraw: {
-      onEnter(data) {
-      },
-      onExit(data) {
-      },
-      on: {
-        always: {
-          target: 'idle',
-          condition: 'yAxisRedraw',
-          action (data) {
-            this.context.origin.drawGrid();
-          },
-        },
-      }
-    },
-    tool_activated: {
-      onEnter (data) {
-      },
-      onExit (data) {
-      },
-      on: {
-        tool_targetSelected: {
-          target: 'idle',
-          condition: 'toolSelectedThis',
-          action (data) {
-            console.log("tool_targetSelected:", data);
-          },
-        },
-      }
-    },
-  },
-  guards: {
-    priceMaxMin () { return true },
-    toolSelectedThis (conditionType, condition) {
-      if (this.eventData === this.context)
-        return true
-      else
-        return false
-     },
-    yAxisRedraw () { return true },
-    zoomDone () { return true },
-  }
-};
-
-class OnChart extends Chart {
-  #onChart
-  constructor (core, options) {
-    super(core, options);
-    this.#onChart = core.onChart;
-    let chartLegend = {
-      id: "chart",
-      title: this.title,
-      type: "chart",
-      source: this.legendInputs.bind(this)
-    };
-    this.legend = new Legends(this.elLegend, this);
-    this.legend.add(chartLegend);
-    this.yAxisType = "default";
-    this.init(options);
-    this.log(`${this.name} instantiated`);
-  }
-  get type() { return "onChart" }
-  get isOnChart() { return true }
-  get isPrimaryChart() { return true }
-  get onChart() { return this.#onChart }
-  get indicators() { return this.overlays }
-  start() {
-    super.start(stateMachineConfig$4);
-    this.addOverlays(this.core.onChart);
-  }
-  createGraph() {
-    let overlays = copyDeep$1(this.overlaysDefault);
-    this.graph = new graph(this, this.elViewport, overlays, false);
-    this.layerStream = this.graph.overlays.get("stream").layer;
-    this.chartStreamCandle = this.graph.overlays.get("stream").instance;
-  }
-}
-
-var stateMachineConfig$3 = {
-  id: "offChart",
-  initial: "idle",
-  context: {},
-  states: {
-    idle: {
-      onEnter(data) {
-        this.context.origin.setCursor("crosshair");
-      },
-      onExit(data) {
-      },
-      on: {
-        chart_tool: {
-          target: 'chart_tool',
-          action (data) {
-          },
-        },
-        xAxis_scale: {
-          target: 'xAxis_scale',
-          action (data) {
-          },
-        },
-        offChart_mouseDown: {
-          target: 'offChart_mouseDown',
-          action (data) {
-          },
-        },
-        offChart_mouseUp: {
-          target: 'offChart_mouseUp',
-          action (data) {
-          },
-        },
-        tool_activated: {
-          target: 'tool_activated',
-          action (data) {
-            this.context.origin.setCursor("default");
-          },
-        },
-      }
-    },
-    xAxis_scale: {
-      onEnter(data) {
-      },
-      onExit(data) {
-      },
-      on: {
-        Idle: {
-          target: 'idle',
-          action (data) {
-          },
-        },
-      }
-    },
-    offChart_mouseDown: {
-      onEnter(data) {
-      },
-      onExit(data) {
-      },
-      on: {
-        Idle: {
-          target: 'idle',
-          action (data) {
-          },
-        },
-      }
-    },
-    offChart_mouseUp: {
-      onEnter(data) {
-      },
-      onExit(data) {
-      },
-      on: {
-        Idle: {
-          target: 'idle',
-          action (data) {
-          },
-        },
-      }
-    },
-    tool_activated: {
-      onEnter(data) {
-      },
-      onExit(data) {
-      },
-      on: {
-        tool_targetSelected: {
-          target: 'idle',
-          condition: 'toolSelectedThis',
-          action (data) {
-            console.log("tool_targetSelected:", data);
-          },
-        },
-      }
-    },
-  },
-  guards: {
-    zoomDone () { return true },
-    toolSelectedThis (conditionType, condition) {
-      if (this.eventData === this.context)
-        return true
-      else
-        return false
-     },
-  }
-};
-
-class OffChart extends Chart {
-  #Indicator
-  #overlay
-  #Divider
-  #overlayIndicator
-  #localRange = {
-    valueMax: 100,
-    valueMin: 0,
-    valueDiff: 100
-  }
-  constructor (core, options) {
-    super(core, options);
-    this.#overlay = options.offChart;
-    this.#overlay.cnt = this.core.indicators[this.#overlay.type].ind.cnt;
-    this.#overlay.id = `${this.id}.${options.offChart.type}_${this.#overlay.cnt}`;
-    this.#overlay.paneID = this.id;
-    this.overlays.set(options.offChart.name, options.offChart);
-    this.#Indicator = this.core.indicators[this.#overlay.type].ind;
-    this.yAxisType = this.#Indicator.scale;
-    this.init(options);
-    this.time = this.core.Timeline;
-  }
-  get type() { return "offChart" }
-  get isOnChart() { return false }
-  get isPrimaryChart() { return false }
-  get localRange() { return this.#localRange }
-  get indicators() { return this.overlays }
-  start(index) {
-    super.start(stateMachineConfig$3);
-    let instance = this.#overlayIndicator;
-    let offChartLegend = {
-      id: this.options.offChart.type,
-      title: this.options.offChart.name,
-      type: this.options.offChart.type,
-      source: instance.legendInputs.bind(instance)
-    };
-    this.legend = new Legends(this.elLegend, this);
-    this.legend.add(offChartLegend);
-  }
-  createGraph() {
-    const indicator = [this.#overlay.name, {class: this.#Indicator, fixed: false, required: false, params: {overlay: this.#overlay}}];
-    const overlays = copyDeep$1(this.overlaysDefault);
-          overlays.splice(1, 0, indicator);
-    this.graph = new graph(this, this.elViewport, overlays);
-    this.#overlayIndicator = this.graph.overlays.get(this.#overlay.name).instance;
   }
 }
 
@@ -10182,9 +10301,9 @@ var stateMachineConfig$2 = {
     removeProperty () {
       let active = this.context.pair.active,
       prev = this.context.pair.prev;
-      if (active !== undefined)
+      if ( isObject(active) )
         active.element.style.removeProperty('user-select');
-      if (prev !== undefined)
+      if ( isObject(prev) )
         prev.element.style.removeProperty('user-select');
     }
   }
@@ -10193,6 +10312,7 @@ var stateMachineConfig$2 = {
 const defaultOverlays = [
   ["grid", {class: chartGrid, fixed: false, required: true, params: {axes: "x"}}],
 ];
+const nonIndicators = ["candles", "trades"];
 class MainPane {
   #name = "MainPane"
   #shortName = "Main"
@@ -10204,10 +10324,9 @@ class MainPane {
   #elMain
   #elRows
   #elTime
-  #elChart
+  #elOnChart
   #elScale
   #elOffCharts = []
-  #elYAxisScales = []
   #elGrid
   #elCanvas
   #elViewport
@@ -10216,11 +10335,11 @@ class MainPane {
   #viewport
   #layerGrid
   #layerWatermark
-  #ChartPanes = new Map()
+  #ChartPanes = new xMap()
   #Chart
   #Time
   #chartGrid
-  #offChartDefaultH = OFFCHARTDEFAULTHEIGHT
+  #viewDefaultH = OFFCHARTDEFAULTHEIGHT
   #rowMinH = ROWMINHEIGHT
   #cursorPos = [0, 0]
   #drag = {
@@ -10245,25 +10364,31 @@ class MainPane {
   info(i) { this.#core.info(i); }
   warn(w) { this.#core.warn(w); }
   error(e) { this.#core.error(e); }
-  get id() { return `${this.#core.id}.${this.#name}` }
+  get id() { return `${this.#core.id}-${this.#name}` }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get core() { return this.#core }
   get chart() { return this.#Chart }
-  get time() { return this.#Time }
   get offCharts() { return this.#ChartPanes }
+  get chartPanes() { return this.#ChartPanes }
+  get time() { return this.#Time }
   get options() { return this.#options }
   get element() { return this.#elMain }
+  get elRows() { return this.#elMain.rows }
+  get elOnChart() { return this.#elMain.rows.primary }
+  get elOffChart() { return this.#elMain.rows.secondary }
+  get elPanes() { return this.#elMain.rows.chartPanes }
+  get elPaneSlot() { return this.#elMain.rows.chartPaneSlot }
   get width() { return this.#elMain.getBoundingClientRect().width }
   get height() { return this.#elMain.getBoundingClientRect().height }
-  get chartW() { return this.#elChart.getBoundingClientRect().width }
-  get chartH() { return this.#elChart.getBoundingClientRect().height }
+  get chartW() { return this.elOnChart.getBoundingClientRect().width }
+  get chartH() { return this.elOnChart.getBoundingClientRect().height }
   get rowsW() { return this.#elRows.getBoundingClientRect().width }
   get rowsH() { return this.#elRows.getBoundingClientRect().height }
   get rowMinH() { return this.#rowMinH }
   set rowMinH(h) { if (isNumber(h)) this.#rowMinH = Math.abs(h); }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elMain) }
+  get dimensions() { return DOM$1.elementDimPos(this.#elMain) }
   get range() { return this.#core.range }
   get cursorPos() { return this.#cursorPos }
   get candleW() { return this.#Time.candleW }
@@ -10275,17 +10400,17 @@ class MainPane {
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
   get stateMachine() { return this.#stateMachine }
   get graph() { return this.#Graph }
+  get views() { return this.#core.state.data.views }
   get indicators() { return {
     onchart: this.#Chart.indicators,
     offchart: this.#ChartPanes
   } }
   get elements() {
     return {
-      elTarget: this.#elChart,
+      elRows: this.elRows,
+      elOnChart: this.elOnChart,
+      elOffCharts: this.elOffCharts,
       elTime: this.#elTime,
-      elRows: this.#elRows,
-      elChart: this.#elChart,
-      elOffCharts: this.#elOffCharts,
       elScale: this.#elScale
     }
   }
@@ -10294,7 +10419,6 @@ class MainPane {
     this.#indicators = this.#core.indicators;
     this.#elRows = this.#elMain.rows;
     this.#elTime = this.#elMain.time;
-    this.#elChart = this.#elMain.rows.primary;
     this.#elGrid = this.#elMain.rows.grid;
     this.#elViewport = this.#elMain.viewport;
     this.#elScale = this.#core.elBody.scale;
@@ -10316,11 +10440,10 @@ class MainPane {
       this.#elRows.style.height = `calc(100% - ${TIMESCALEH}px)`;
     }
     this.#Time = new Timeline(this.#core, options);
-    this.#Chart = new OnChart(this.#core, options);
     this.registerChartPanes(options);
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE$1;
     this.#rowMinH = isNumber(this.config.rowMinH)? this.config.rowMinH : ROWMINHEIGHT;
-    this.#offChartDefaultH = isNumber(this.config.offChartDefaultH)? this.config.offChartDefaultH : OFFCHARTDEFAULTHEIGHT;
+    this.#viewDefaultH = isNumber(this.config.offChartDefaultH)? this.config.offChartDefaultH : OFFCHARTDEFAULTHEIGHT;
     this.rowsOldH = this.rowsH;
     this.log(`${this.#name} instantiated`);
   }
@@ -10328,19 +10451,19 @@ class MainPane {
     let i = 0;
     this.#elMain.start(this.theme);
     this.#Time.start();
-    this.#Chart.start();
-    this.#ChartPanes.forEach((offChart, key) => {
-      offChart.start(i++);
+    this.#ChartPanes.forEach((view, key) => {
+      view.start(i++);
+      if (i === 1) view.Divider.hide();
     });
     this.rowsOldH = this.rowsH;
     this.createGraph();
     this.draw(this.range, true);
-    renderLoop.init({
+    renderLoop$1.init({
       graphs: [this.#Graph],
       range: this.range
     });
-    renderLoop.start();
-    renderLoop.queueFrame(this.range, [this.#Graph], false);
+    renderLoop$1.start();
+    renderLoop$1.queueFrame(this.range, [this.#Graph], false);
     this.eventsListen();
     stateMachineConfig$2.id = this.id;
     this.stateMachine = stateMachineConfig$2;
@@ -10556,17 +10679,19 @@ class MainPane {
       rowsH: this.rowsH,
       rowsW: this.rowsW,
     };
-    if (this.#ChartPanes.size == 0 &&
-      chartH != this.#elRows.height) chartH = this.#elRows.height;
     this.#core.scrollPos = -1;
     this.#Time.setDimensions({w: width});
     this.#Graph.setSize(width, height, layerWidth);
-    this.#Chart.setDimensions({w: width, h: chartH});
-    this.#ChartPanes.forEach((offChart, key) => {
-      chartH = Math.round(offChart.viewport.height * resizeH);
-      offChart.setDimensions({w: width, h: chartH});
-      offChart.Divider.setDividerPos();
-    });
+    if (this.#ChartPanes.size == 1 && chartH != this.#elRows.height) {
+      this.#Chart.setDimensions({w: width, h: this.#elRows.height});
+    }
+    else {
+      this.#ChartPanes.forEach((offChart, key) => {
+        chartH = Math.round(offChart.viewport.height * resizeH);
+        offChart.setDimensions({w: width, h: chartH});
+        offChart.Divider.setPos();
+      });
+    }
     this.rowsOldH = this.rowsH;
     this.draw(this.range, true);
     this.emit("rowsResize", dimensions);
@@ -10581,46 +10706,62 @@ class MainPane {
   }
   registerChartPanes(options) {
     this.#elRows.previousDimensions();
-    if (this.#core.offChart.length === 0) return
-    for (const [i, o] of this.#core.offChart.entries()) {
-      if (o.type in this.core.indicators) continue
-      this.#core.log(`offChart indicator ${this.#core.offChart.type} not added: not supported.`);
-      this.#core.offChart.splice(i, 1);
+    let keys;
+    keys = this.views.keys();
+    for (let k of keys) {
+      let oc = this.views.get(k);
+      if (oc.length === 0 ) {
+        if (k !== "onchart") this.views.delete(k);
+        continue
+      }
+      for (const [i, o] of oc.entries()) {
+        if (isObject(o) &&
+            ( o.type in this.core.indicators ||
+              nonIndicators.includes(o.type)))
+            continue
+        this.#core.log(`offChart indicator ${oc.type} not added: not supported.`);
+        oc.splice(i, 1);
+      }
     }
-    let heights = this.calcChartPaneHeights(this.#core.offChart.length);
+    let heights = this.calcChartPaneHeights();
     options = {...options, ...heights};
-    options.chartH / this.rowsH * 100;
-    this.#elChart.style.height = `${options.chartH}px`;
-    this.#Chart.scale.element.style.height = `${options.chartH}px`;
-    for (let o of this.#core.offChart) {
-      options.rowY = options.chartH;
-      this.addChartPane(o, options);
-      options.rowY = options.chartH + options.rowH;
+    options.rowY = 0;
+    keys = this.views.keys();
+    for (let k of keys) {
+      options.type = k;
+      options.view = this.views.get(k);
+      this.addChartView(options);
+      options.rowY += (k == "onchart") ? options.chartH : options.rowH;
     }
   }
-  addChartPane(offChart, options) {
-    let rowEl, row;
-    this.#elRows.insertAdjacentHTML("beforeend", this.#elMain.rowNode(offChart.type, this.#core));
-    rowEl = this.#elRows.lastElementChild;
-    this.#elOffCharts.push(rowEl);
+  addChartView(options) {
+    let row,
+        h = (options.type == "onchart") ? options.chartH : options.rowH;
+    this.#elRows.insertAdjacentHTML(
+      "beforeend",
+      this.#elMain.rowNode(options.type, this.#core));
     row = this.#elRows.chartPaneSlot.assignedElements().slice(-1)[0];
-    row.style.height = `${options.rowH}px`;
+    row.style.height = `${h}px`;
     row.style.width = `100%`;
-    let axisEl, axis;
-    this.#elYAxis.insertAdjacentHTML("beforeend", this.scaleNode(offChart.type));
-    axisEl = this.#elYAxis.lastElementChild;
-    this.#elYAxisScales.push(axisEl);
+    let axis;
+    this.#elYAxis.insertAdjacentHTML("beforeend", this.scaleNode(options.type));
     axis = this.#elYAxis.chartPaneSlot.assignedElements().slice(-1)[0];
-    axis.style.height = `${options.rowH}px`;
+    axis.style.height = `${h}px`;
     axis.style.width = `100%`;
     options.elements.elTarget = row;
     options.elements.elScale = axis;
-    options.offChart = offChart;
-    options.name = "OffChart";
-    options.shortName = "offChart";
-    let o = new OffChart(this.#core, options);
+    let o;
+    if (options.type == "onchart") {
+      o = new Chart(this.#core, options);
+      this.#Chart = o;
+    }
+    else {
+      options.name = options.view[0].name || "OffChart";
+      options.shortName = options.view[0].type || "OffChart";
+      o = new Chart(this.#core, options);
+    }
     this.#ChartPanes.set(o.id, o);
-    this.emit("addChartPane", o);
+    this.emit("addChartView", o);
   }
   addIndicator(i) {
     const indicator = this.core.indicators[i.type].ind;
@@ -10638,18 +10779,22 @@ class MainPane {
             options.parent = this;
             options.title = i.name;
             options.elements = {};
-      this.addChartPane(i, options);
+      this.addChartView(i, options);
     }
     else return false
   }
-  calcChartPaneHeights(cnt) {
-    let a = this.#offChartDefaultH * this.#core.offChart.length,
-        offChartsH = ( a / Math.log10( a * 2 ) ) / 100,
-        rowsH = Math.round(this.rowsH * offChartsH),
+  calcChartPaneHeights() {
+    let cnt = this.views.size,
+        a = this.#viewDefaultH * (cnt - 1),
+        ratio = ( a / Math.log10( a * 2 ) ) / 100,
+        rowsH = Math.round(this.rowsH * ratio),
         options = {};
-    options.offChartsH = offChartsH;
     if (cnt === 1) {
-      options.rowH = Math.round(this.rowsH * this.#offChartDefaultH / 100);
+      options.rowH = 0;
+      options.chartH = this.rowsH;
+    }
+    else if (cnt === 2) {
+      options.rowH = Math.round(this.rowsH * this.#viewDefaultH / 100);
       options.chartH = this.rowsH - options.rowH;
     }
     else {
@@ -10667,7 +10812,7 @@ class MainPane {
     return node
   }
   createGraph() {
-    let overlays = copyDeep$1(defaultOverlays);
+    let overlays = copyDeep(defaultOverlays);
     this.#Graph = new graph(this, this.#elViewport, overlays);
   }
   draw(range=this.range, update=false) {
@@ -10680,7 +10825,7 @@ class MainPane {
     this.#ChartPanes.forEach((offChart, key) => {
       graphs.push(offChart);
     });
-    renderLoop.queueFrame(
+    renderLoop$1.queueFrame(
       this.range,
       graphs,
       update);
@@ -10692,19 +10837,19 @@ class MainPane {
     this.draw(this.range, true);
   }
   resizeRowPair(divider, pos) {
+    const error = {active: null, prev: null};
+    if (!isObject(divider) || !isArray(pos)) return error
     let active = divider.chartPane;
-    let ID = active.id;
+    let id = active.id;
     let chartPanes = [...this.#ChartPanes.keys()];
-    let i = chartPanes.indexOf(ID);
-    let prev = (i == 0) ?
-      this.#Chart :
-      this.#ChartPanes.get(chartPanes[i]);
-    if (i == -1) return {active, prev}
+    let i = chartPanes.indexOf(id);
+    if (i < 1) return error
+    let prev = this.#ChartPanes.get(chartPanes[i - 1]);
     let activeH = active.height - pos[5] - 1;
     let prevH  = prev.height + pos[5];
     if ( activeH >= this.#rowMinH
         && prevH >= this.#rowMinH) {
-          divider.chartPane.Divider.updateDividerPos(pos);
+          divider.chartPane.Divider.updatePos(pos);
           active.setDimensions({w:undefined, h:activeH});
           prev.setDimensions({w:undefined, h:prevH});
     }
@@ -11017,26 +11162,102 @@ customElements.get('tradex-grid') || window.customElements.define('tradex-grid',
 const template$8 = document.createElement('template');
 template$8.innerHTML = `
 <style>
-  ::slotted(.legend) {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    white-space: nowrap;
-    width: calc(100% - 1em); 
-    margin: 0 0 0 1em;
-    text-align: left;
-  }
+
+.legend {
+  display: block;
+  position: relative;
+  width: 100%;
+  min-height: 2em;
+  margin: 0;
+}
+.legend * {
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+}
+.legend .upper,
+.legend .lower {
+  display: block;
+  position: absolute;
+  top: 0
+  width: 100%;
+  padding: 0 0.5em;
+  white-space: nowrap;
+}
+.legend .controls {
+  opacity: 0;
+}
+.legend .controls svg {
+  vertical-align: text-top;
+  margin-bottom: 0.2em;
+}
+.legend dl {
+  display: inline; 
+  margin: 0 0 0 -1em;
+  overflow: hidden;
+}
+.legend dl:first-child,
+.legend dl dt:first-of-type {
+  margin-left: 0;
+}
+.legend dt {
+  display: inline; margin-left: 1em;
+}
+.legend dd {
+  display: inline; margin-left: .25em; color: #F900FE;
+}
+.legend .upper:hover {
+  background: #444444cc;
+  border-radius: 5px;
+}
+.legend .upper:hover .controls {
+  opacity: 1;
+}
+.legend .title {
+  margin-right: 1em;
+  white-space: nowrap;
+}
+.legend .lower .title {
+  visibility:hidden;
+}
+.legend .controls,
+.legend dl {
+  display: inline;
+}
+.legend .control {
+  margin-right:2px;
+}
+
+
+.chart .upper {
+  right: 0;
+  z-index:1;
+}
+.chart .upper .title,
+.offchart .upper .title {
+  display: none;
+}
+.chart .lower .title {
+  visibility: visible;
+}
+
+.offchart .upper {
+  right: 0;
+  z-index:1;
+}
 </style>
 <div class="legends">
   <slot name="legend"></slot>
 </div>
 `;
-class tradeXLegend extends element {
+class tradeXLegends extends element {
   #title
-  #elLegend
+  #elLegends
   #elTitle
   #elInputs
   #elControls
+  #slot
+  #hub = []
   constructor () {
     super(template$8);
   }
@@ -11047,20 +11268,29 @@ class tradeXLegend extends element {
       this.doInit = false;
       this.shadowRoot.appendChild(this.template.content.cloneNode(true));
       this.style.display = "block";
-      this.#elLegend = this.shadowRoot.querySelector('.legend');
+      this.#slot = this.shadowRoot.querySelector('slot');
+      this.#elLegends = this.shadowRoot.querySelector('.legends');
       this.#elTitle = this.shadowRoot.querySelector('.title');
       this.#elInputs = this.shadowRoot.querySelector('dl');
       this.#elControls = this.shadowRoot.querySelector('.controls');
+      this.#slot.addEventListener('slotchange', this.onSlotChange.bind(this));
     }
   }
   disconnectedCallback() {
   }
-  get elLegend() { return this.#elLegend }
+  get slot() { return this.#slot }
+  get legends() { return this.#elLegends }
   get elTitle() { return this.#elTitle }
   get elInputs() { return this.#elInputs }
   get elControls() { return this.#elControls }
   get title() { return this.#title }
   set title(t) { this.setTittle(t); }
+  onSlotChange(e) {
+    this.#hub.forEach(cb => cb.handler.call(cb.context, e));
+  }
+  insert(legend) {
+    this.legends.insertAdjacentHTML('beforeend', legend);
+  }
   setTittle(t) {
     if (!isString$1) return
     this.#title = t;
@@ -11071,8 +11301,8 @@ class tradeXLegend extends element {
         inp = "",
         input,
         blank = "",
-        styleDT = "display: inline; margin-left: ",
-        styleDD = "display: inline; margin-left: .25em;";
+        styleDT = "",
+        styleDD = "";
     for (input in o.inputs) {
       let colour = (o?.colours?.[i]) ? ` color: ${o.colours[i]};` : "";
       let value = (o?.inputs?.[input] !== undefined) ? o.inputs[input] : blank;
@@ -11087,20 +11317,18 @@ class tradeXLegend extends element {
   }
   buildControls(o) {
     let inp = "";
-    let id = o.ID;
-    if (o?.type !== "chart") {
-      inp += `<span id="${id}_up" class="control">${up}</span>`;
-      inp += `<span id="${id}_down" class="control">${down}</span>`;
-    }
-    inp += `<span id="${id}_collapse" class="control">${collapse}</span>`;
-    inp += `<span id="${id}_maximize" class="control">${maximize}</span>`;
-    inp += `<span id="${id}_restore" class="control">${restore}</span>`;
-    inp += (o?.type !== "chart") ? `<span id="${id}_remove" class="control">${close}</span>` : ``;
-    inp += `<span id="${id}_config" class="control">${config}</span>`;
+    let id = o.id;
+      inp += `<span id="${id}_up" class="control" data-icon="up">${up}</span>`;
+      inp += `<span id="${id}_down" class="control" data-icon="down">${down}</span>`;
+    inp += `<span id="${id}_collapse" class="control" data-icon="collapse">${collapse}</span>`;
+    inp += `<span id="${id}_maximize" class="control" data-icon="maximize">${maximize}</span>`;
+    inp += `<span id="${id}_restore" class="control" data-icon="restore">${restore}</span>`;
+    inp += (o?.type == "offchart") ? `<span id="${id}_remove" class="control" data-icon="remove">${close}</span>` : ``;
+    inp += (o?.type !== "offchart") ? `<span id="${id}_config" class="control" data-icon="config">${config}</span>` : ``;
     return inp
   }
 }
-customElements.get('tradex-legends') || window.customElements.define('tradex-legends', tradeXLegend);
+customElements.get('tradex-legends') || window.customElements.define('tradex-legends', tradeXLegends);
 
 const template$7 = document.createElement('template');
 template$7.innerHTML = `
@@ -11153,32 +11381,29 @@ customElements.get('tradex-chartpane') || window.customElements.define('tradex-c
 const template$6 = document.createElement('template');
 template$6.innerHTML = `
 <style>
-  tradex-grid, tradex-chartpane {
-    overflow: hidden;
-  }
   tradex-grid {
     position: absolute;
     height: inherit;
   }
-  tradex-chartpane.primary {
-    position: relative;
-    height: 100%;
-  }
-  tradex-grid,
-  tradex-onchart {
+  tradex-grid {
     display: block;
     width: 100%;
+  }
+  slot[name="chartpane"] {
+    display: flex;
+    flex-direction: column;
   }
   ::slotted(tradex-chartpane) {
     display: block;
     position: relative;
-    top: 1px;
+    top: 0;
     width: 100%;
-    border-top: 1px solid;
+  }
+  ::slotted(tradex-chartpane:first-of-type) {
+    border-top: none !important;
   }
 </style>
 <tradex-grid></tradex-grid>
-<tradex-chartpane id="primary"></tradex-chartpane>
 <slot name="chartpane" id="chartpane"></slot>
 `;
 class tradeXRows extends element {
@@ -11198,9 +11423,10 @@ class tradeXRows extends element {
   disconnectedCallback() {
   }
   get grid() { return this.shadowRoot.querySelector('tradex-grid') }
-  get primary() { return this.shadowRoot.querySelector('#primary') }
-  get chartPanes() { return this.shadowRoot.querySelectorAll('tradex-chartpane') }
-  get chartPaneSlot() { return this.shadowRoot.querySelector('#chartpane') }
+  get primary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("onchart") ); }
+  get secondary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("offchart") ); }
+  get chartPanes() { return this.chartPaneSlot.assignedElements() }
+  get chartPaneSlot() { return this.shadowRoot.querySelector('slot[name="chartpane"]') }
   get width() { return this.clientWidth }
   get height() { return this.clientHeight }
   get oWidth() { return this.#oWidth }
@@ -11309,35 +11535,35 @@ template$3.innerHTML = `
   .viewport {
     width: 100%;
     height: 100%;
-    margin-top: 2px;
-    margin-left: 2px;
+    display: block;
+    position: absolute;
+    z-index: -100;
+  }
+  slot[name="chartpane"] {
+    display: flex;
+    flex-direction: column;
+  }
+  ::slotted(div.scale:first-of-type) {
+    border-top: none !important;
   }
 </style>
 <div class="viewport"></div>
 <slot name="chartpane" id="chartPane"></slot>
 `;
 class tradeXScale extends element {
-  #viewport
-  #chartPaneSlot
   constructor () {
     super(template$3);
   }
   destroy() {
   }
   connectedCallback() {
-    if (this.doInit) {
-      this.doInit = false;
-      this.shadowRoot.appendChild(this.template.content.cloneNode(true));
-      this.style.display = "block";
-      this.#viewport = this.shadowRoot.querySelector('.viewport');
-      this.#chartPaneSlot = this.shadowRoot.querySelector('#chartPane');
-    }
+    super.connectedCallback();
   }
   disconnectedCallback() {
   }
-  get viewport() { return this.#viewport}
-  get chartPanes() { return this.shadowRoot.querySelectorAll('.scale') }
-  get chartPaneSlot() { return this.#chartPaneSlot }
+  get viewport() { return this.shadowRoot.querySelector('.viewport') }
+  get chartPanes() { return this.chartPaneSlot.assignedElements() }
+  get chartPaneSlot() { return this.shadowRoot.querySelector('slot[name="chartpane"]') }
 }
 customElements.get('tradex-scale') || window.customElements.define('tradex-scale', tradeXScale);
 
@@ -11359,7 +11585,7 @@ const right = `
   }
   tradex-scale {
     position: absolute; 
-    top: 0; 
+    top: 1px;
     right: 0; 
     width: ${SCALEW}px; 
     height: 100%;
@@ -11569,7 +11795,7 @@ class tradeXChart extends element {
     }
   }
   get id() { return this.getAttribute('id'); }
-  set id(id) { this.setAttribute('id', id); }
+  set id(id) { this.setAttribute('id', id.replace(/ |,|;|:|\.|#/g, "_")); }
   get disabled() { return this.hasAttribute('disabled'); }
   set disabled(d) {
     if (d) {
@@ -11738,7 +11964,7 @@ class UtilsBar {
   get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elUtils) }
+  get dimensions() { return DOM$1.elementDimPos(this.#elUtils) }
   init() {
     this.mount(this.#elUtils);
     this.log(`${this.#name} instantiated`);
@@ -11749,7 +11975,7 @@ class UtilsBar {
   }
   end() {
     const api = this.#core;
-    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`);
+    const utils = DOM$1.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`);
     for (let util of utils) {
       for (let u of this.#utils) {
         if (u.id === id)
@@ -11796,7 +12022,7 @@ class UtilsBar {
   }
   initAllUtils() {
     const api = this.#core;
-    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`);
+    const utils = DOM$1.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`);
     for (let util of utils) {
       let id = util.id.replace('TX_', ''),
           svg = util.querySelector('svg');
@@ -11862,7 +12088,7 @@ class UtilsBar {
 class Tool {
   static #cnt = 0
   static #instances = {}
-  #ID
+  #id
   #inCnt = null
   #name
   #shortName
@@ -11882,7 +12108,7 @@ class Tool {
   constructor(config) {
     this.#config = config;
     this.#inCnt = config.cnt;
-    this.#ID = this.#config.ID || uid("TX_Tool_");
+    this.#id = this.#config.ID || uid("TX_Tool_");
     this.#name = config.name;
     this.#core = config.core;
     this.#elChart = config.elements.elChart;
@@ -11894,7 +12120,7 @@ class Tool {
     this.#cursorClick = config.pos;
   }
   get inCnt() { return this.#inCnt }
-  get ID() { return this.#ID }
+  get id() { return this.#id }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
   get core() { return this.#core }
@@ -12204,7 +12430,7 @@ class ToolsBar {
   get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elTools) }
+  get dimensions() { return DOM$1.elementDimPos(this.#elTools) }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
   get stateMachine() { return this.#stateMachine }
   init() {
@@ -12222,7 +12448,7 @@ class ToolsBar {
   end() {
     this.stateMachine.destroy();
     const api = this.#core;
-    const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`);
+    const tools = DOM$1.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`);
     for (let tool of tools) {
       for (let t of this.#tools) {
         if (t.id === id)
@@ -12276,7 +12502,7 @@ class ToolsBar {
   }
   initAllTools() {
     const api = this.#core;
-    const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`);
+    const tools = DOM$1.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`);
     for (let tool of tools) {
       let id = tool.id,
           svg = tool.querySelector('svg');
@@ -12340,7 +12566,7 @@ class ToolsBar {
     let t = this.addTool(tool, target);
     this.activeTool = (t);
     this.emit(`tool_active`, t);
-    this.emit(`tool_${t.ID}_active`, t);
+    this.emit(`tool_${t.id}_active`, t);
   }
   addAllTools() {
   }
@@ -12373,7 +12599,7 @@ class Menu {
     this.init();
   }
   static create(widgets, config) {
-    const id = `menu${++Menu.menuCnt}`;
+    const id = `menu_${++Menu.menuCnt}`;
     config.id = id;
     Menu.menuList[id] = new Menu(widgets, config);
     return Menu.menuList[id]
@@ -12385,7 +12611,7 @@ class Menu {
   get el() { return this.#elMenu }
   get id() { return this.#id }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elMenu) }
+  get dimensions() { return DOM$1.elementDimPos(this.#elMenu) }
   init() {
     this.mount(this.#elMenus);
   }
@@ -12395,7 +12621,7 @@ class Menu {
   }
   end() {
     const api = this.#config;
-    const menuItems = DOM.findBySelectorAll(`#${api.id} .${CLASS_MENU} li`);
+    const menuItems = DOM$1.findBySelectorAll(`#${api.id} .${CLASS_MENU} li`);
     menuItems.forEach((item) => {
       item.removeEventListener('click', this.onMenuSelect);
     });
@@ -12403,7 +12629,7 @@ class Menu {
   }
   eventsListen() {
     const api = this.#core;
-    const menuItems = DOM.findBySelectorAll(`#${api.id} #${this.#config.id} li`);
+    const menuItems = DOM$1.findBySelectorAll(`#${api.id} #${this.#config.id} li`);
     menuItems.forEach((item) => {
       item.addEventListener('click', this.onMenuSelect.bind(this));
     });
@@ -12431,7 +12657,7 @@ class Menu {
   onOutsideClickListener(e) {
     if (!this.#elMenu.contains(e.target)
     && (!this.#config.primary.contains(e.target))
-    && DOM.isVisible(this.#elMenu)) {
+    && DOM$1.isVisible(this.#elMenu)) {
       let data = {
         target: e.currentTarget.id,
         menu: this.#id,
@@ -12445,7 +12671,7 @@ class Menu {
       el.innerHTML = this.menuNode();
     else
       el.lastElementChild.insertAdjacentHTML("afterend", this.menuNode());
-    this.#elMenu = DOM.findBySelector(`#${api.id} #${this.#config.id}`);
+    this.#elMenu = DOM$1.findBySelector(`#${api.id} #${this.#config.id}`);
   }
   static defaultNode() {
     const menuStyle = ``;
@@ -12494,7 +12720,7 @@ class Menu {
     if (id) this.emit("closeMenu", {menu: id});
     Menu.currentActive = this;
     this.#elMenu.style.display = "block";
-    let pos = DOM.elementDimPos(this.#elMenu);
+    let pos = DOM$1.elementDimPos(this.#elMenu);
     let posR = pos.left + pos.width;
     if (posR > this.#elWidgetsG.offsetWidth) {
       let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width);
@@ -12535,7 +12761,7 @@ class Window {
     this.init();
   }
   static create(widgets, config) {
-    const id = `window${++Window.windowCnt}`;
+    const id = `window_${++Window.windowCnt}`;
     config.id = id;
     Window.windowList[id] = new Window(widgets, config);
     return Window.windowList[id]
@@ -12549,7 +12775,7 @@ class Window {
   get pos() { return this.dimensions }
   get config() { return this.#config }
   set config(c) { this.#config = c; }
-  get dimensions() { return DOM.elementDimPos(this.#elWindow) }
+  get dimensions() { return DOM$1.elementDimPos(this.#elWindow) }
   init() {
     this.mount(this.#elWindows);
   }
@@ -12577,7 +12803,7 @@ class Window {
   }
   onOutsideClickListener(e) {
     if (!this.#elWindow.contains(e.target)
-    && DOM.isVisible(this.#elWindow)) {
+    && DOM$1.isVisible(this.#elWindow)) {
       let data = {
         target: e.currentTarget.id,
         window: this.#id,
@@ -12591,14 +12817,14 @@ class Window {
       el.innerHTML = this.windowNode();
     else
       el.lastElementChild.insertAdjacentHTML("afterend", this.windowNode());
-    this.#elWindow = DOM.findBySelector(`#${api.id} #${this.#config.id}`);
+    this.#elWindow = DOM$1.findBySelector(`#${api.id} #${this.#config.id}`);
     let x, y;
     if (this.#config.x && this.#config.y) {
       x = this.#config.x;
       y = this.#config.y;
     }
     else {
-      let dims = DOM.elementDimPos(this.#elWindow);
+      let dims = DOM$1.elementDimPos(this.#elWindow);
       x = (this.#core.width - dims.width) / 2;
       y = (this.#core.height - dims.height) / 2;
     }
@@ -13092,10 +13318,10 @@ class TradeXchart extends tradeXChart {
   get isEmpty() { return this.#chartIsEmpty }
   set candles(c) { if (isObject(c)) this.#candles = c; }
   get candles() { return this.#candles }
-  start(txCfg) {
+  start(cfg) {
     this.log(`${NAME} configuring...`);
-    let initCfg = TradeXchart.create(txCfg);
-    txCfg = {...initCfg, ...txCfg};
+    TradeXchart.create(cfg);
+    const txCfg = {...cfg};
     this.logs = (txCfg?.logs) ? txCfg.logs : false;
     this.infos = (txCfg?.infos) ? txCfg.infos : false;
     this.warnings = (txCfg?.warnings) ? txCfg.warnings : false;
@@ -13110,7 +13336,7 @@ class TradeXchart extends tradeXChart {
     this.setID(id);
     this.classList.add(this.id);
     this.log("processing state...");
-    let state = copyDeep$1(txCfg?.state) || {};
+    let state = copyDeep(txCfg?.state) || {};
         state.id = this.id;
         state.core = this;
     let deepValidate = txCfg?.deepValidate || false;
@@ -13162,7 +13388,7 @@ class TradeXchart extends tradeXChart {
     this.#UtilsBar = new UtilsBar(this, txCfg);
     this.#ToolsBar = new ToolsBar(this, txCfg);
     this.#MainPane = new MainPane(this, txCfg);
-    this.setTheme(this.#themeTemp.ID);
+    this.setTheme(this.#themeTemp.id);
     this.log(`${this.#name} V${TradeXchart.version} configured and running...`);
     this.#scrollPos = this.bufferPx * -1;
     this.eventsListen();
@@ -13572,4 +13798,4 @@ if (!window.customElements.get('tradex-chart')) {
   customElements.get('tradex-chart') || customElements.define('tradex-chart', TradeXchart);
 }
 
-export { TradeXchart as Chart, DOM, indicator as Indicator, Overlay, Range, canvas, copyDeep$1 as copyDeep, isPromise, mergeDeep, uid };
+export { TradeXchart as Chart, DOM$1 as DOM, indicator as Indicator, Overlay, Range, canvas, copyDeep, isPromise, mergeDeep, uid };

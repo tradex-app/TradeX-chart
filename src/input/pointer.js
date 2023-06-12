@@ -7,7 +7,6 @@
 export default class PointerAgent {
 
   #types = [
-    "mouseenter",
     "pointerdown", // - Pointer becomes active
     "pointerup", // - Pointer stops being active
     "pointerover", "pointerenter", // - Pointer enters element boundaries

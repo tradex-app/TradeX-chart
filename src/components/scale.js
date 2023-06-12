@@ -7,7 +7,7 @@ import yAxis from "./axis/yAxis"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
 import Input from "../input"
-import { copyDeep, throttle, uid } from '../utils/utilities'
+import { copyDeep, throttle, uid, xMap } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
 
 import Graph from "./views/classes/graph"
@@ -30,7 +30,7 @@ const defaultOverlays = [
  */
 export default class ScaleBar {
 
-  #ID
+  #id
   #name = "Y Scale Axis"
   #shortName = "scale"
   #core
@@ -49,7 +49,7 @@ export default class ScaleBar {
   #layerOverlays
   #layerPriceLine
   #layerCursor
-  #scaleOverlays = new Map()
+  #scaleOverlays = new xMap()
   #Graph
 
   #input
@@ -63,7 +63,7 @@ export default class ScaleBar {
     this.#element = this.#options.elScale
     this.#chart = this.#options.chart
     this.#parent = this.#options.parent
-    this.#ID = `${this.#parent.id}.scale`
+    this.#id = `${this.#parent.id}.scale`
     this.init()
   }
 
@@ -72,7 +72,7 @@ export default class ScaleBar {
   warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
-  get ID() { return this.#ID }
+  get id() { return this.#id }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get core() { return this.#core }
@@ -114,8 +114,8 @@ export default class ScaleBar {
   }
 
   start() {
-    const range = (this.#parent.name == "OffChart" ) ? 
-      this.#parent.localRange : undefined
+    const range = (this.#parent.name == "Chart" ) ? 
+      undefined : this.#parent.localRange
     this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
 
     this.createGraph()
@@ -140,8 +140,8 @@ export default class ScaleBar {
     this.#input.on("wheel", this.onMouseWheel)
     this.#input.on("dblclick", this.resetScaleRange)
 
-    this.off(`${this.#parent.ID}_mousemove`, this.onMouseMove)
-    this.off(`${this.#parent.ID}_mouseout`, this.#layerCursor.erase)
+    this.off(`${this.#parent.id}_mousemove`, this.onMouseMove)
+    this.off(`${this.#parent.id}_mouseout`, this.#layerCursor.erase)
     this.off(STREAM_UPDATE, this.onStreamUpdate)
     this.off("chart_pan", this.onMouseMove)
     this.off("chart_panDone", this.onMouseMove)

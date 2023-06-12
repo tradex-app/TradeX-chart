@@ -314,14 +314,14 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * Target element has been validated as a mount point, 
    * let's start building
-   * @param {object} txCfg - chart configuration
+   * @param {object} cfg - chart configuration
    */
-  start(txCfg) {
+  start(cfg) {
     this.log(`${NAME} configuring...`)
 
-    let initCfg = TradeXchart.create(txCfg)
+    TradeXchart.create(cfg)
 
-    txCfg = {...initCfg, ...txCfg}
+    const txCfg = {...cfg}
     this.logs = (txCfg?.logs) ? txCfg.logs : false
     this.infos = (txCfg?.infos) ? txCfg.infos : false
     this.warnings = (txCfg?.warnings) ? txCfg.warnings : false
@@ -410,7 +410,7 @@ export default class TradeXchart extends Tradex_chart {
     this.#ToolsBar = new ToolsBar(this, txCfg)
     this.#MainPane = new MainPane(this, txCfg)
 
-    this.setTheme(this.#themeTemp.ID)
+    this.setTheme(this.#themeTemp.id)
 
     this.log(`${this.#name} V${TradeXchart.version} configured and running...`)
 

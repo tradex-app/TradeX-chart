@@ -115,7 +115,7 @@ export class Range {
   get intervalStr () { return this.#intervalStr }
 
   end() {
-    WebWorker.destroy(this.#worker.ID)
+    WebWorker.destroy(this.#worker.id)
   }
 
   /**

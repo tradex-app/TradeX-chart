@@ -42,7 +42,7 @@ export default class Window {
 
   static create(widgets, config) {
 
-    const id = `window${++Window.windowCnt}`
+    const id = `window_${++Window.windowCnt}`
     config.id = id
 
     // add entry

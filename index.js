@@ -147,7 +147,7 @@ const config1 = {
       navigation: false
     },
     legend: {
-       controls: false
+       controls: true
     }
   },
   watermark: {

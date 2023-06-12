@@ -90,7 +90,7 @@ export default
     },
   },
   guards: {
-    receiver () { return (this.eventData.scale.ID == this.context.origin.ID) },
+    receiver () { return (this.eventData.scale.id == this.context.origin.id) },
     zoomDone () { return true },
   }
 }

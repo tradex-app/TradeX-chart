@@ -67222,7 +67222,7 @@ export default {
         },
         {
             "name": "Trades",
-            "type": "Trades",
+            "type": "trades",
             "data": [
                 [
                     1543658400000,

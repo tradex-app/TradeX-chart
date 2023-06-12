@@ -36,7 +36,7 @@ const right = `
   }
   tradex-scale {
     position: absolute; 
-    top: 0; 
+    top: 1px;
     right: 0; 
     width: ${SCALEW}px; 
     height: 100%;
@@ -65,7 +65,7 @@ const left = `
   }
   tradex-scale {
     position: absolute; 
-    top: 0; 
+    top: 1px; 
     left: ${SCALEW}px; 
     width: ${SCALEW}px; 
     height: 100%;
@@ -94,7 +94,7 @@ const both = `
   }
   tradex-scale {
     position: absolute; 
-    top: 0; 
+    top: 1px;
     right: 0; 
     width: ${SCALEW}px; 
     height: 100%;

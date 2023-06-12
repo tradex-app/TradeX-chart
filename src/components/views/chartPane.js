@@ -2,7 +2,7 @@
 // <tradex-chartpane></tradex-chartpane>
 
 import element from "./classes/element"
-import tradeXLegend from "./legend"
+import tradeXLegends from "./legends"
 
 
 const template = document.createElement('template')

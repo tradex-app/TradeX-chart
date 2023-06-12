@@ -20,7 +20,7 @@ export function renderPath (ctx, coords, style, strokeFill) {
   }
   ctx.strokeStyle = style.stroke
 
-  if ("lineDash" in style && isArray(style.dash)) 
+  if (isArray(style.dash)) 
     ctx.setLineDash(style.dash)
   
   ctx.beginPath()

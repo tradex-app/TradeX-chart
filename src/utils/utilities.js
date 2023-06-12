@@ -1,4 +1,4 @@
-import { isArray, isBoolean, isNumber, isObject, isString } from './typeChecks'
+import { isArray, isBoolean, isMap, isNumber, isObject, isString } from './typeChecks'
 
 var _hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -188,10 +188,18 @@ export function nearestArrayValue(x, array) {
   return [index, val]
 }
 
+export function swapArrayElements(array, index1, index2) {
+  [myArray[index1], myArray[index2]] = [myArray[index2], myArray[index1]];
+}
+
 // unique ID
 export function uid(tag="ID") {
+  // sanitize tag - make it HTML and CSS friendly
   if (isNumber(tag)) tag = tag.toString()
   else if (!isString(tag)) tag = "ID"
+  tag = tag.replace(/ |,|;|:|\.|#/g, "_");
+
+  // add "randomness" to make id unique
   const dateString = Date.now().toString(36);
   const randomness = Math.random().toString(36).substring(2,5);
   return `${tag}_${dateString}_${randomness}`
@@ -234,7 +242,7 @@ export function replacer(key, value) {
   if(value instanceof Map) {
     return {
       dataType: 'Map',
-      value: Array.from(value.entries()), // or with spread: value: [...value]
+      value: [...value.entries()], // or with spread: value: [...value]
     };
   } else {
     return value;
@@ -259,33 +267,138 @@ export function reviver(key, value) {
 }
 
 /**
- * Instert at specific Map() index
- * https://stackoverflow.com/a/53236461
- * @export
- * @param {number} index
- * @param {number} key
- * @param {*} value
- * @param {map} map
- * @return {map}  
- */
-export function insertAtIndex(index, key, value, map){
-  const arr = Array.from(map);
-  arr.splice(index, 0, [key, value]);
-  map.clear();
-  arr.forEach(([k,v]) => map.set(k,v));
-}
-
-/**
  * Map() index handlers
  * @param {*} map 
  */
-export const firstItemInMap = map => map.entries().next().value
+export const firstEntryInMap = map => map.entries().next().value
 export const firstKeyInMap = map => map.entries().next().value[0]
 export const firstValueInMap = map => map.entries().next().value[1]
-export const lastItemInMap = map => Array.from(map).pop();
-export const lastKeyInMap = map => Array.from(map.keys()).pop();
-export const lastValueInMap = map => Array.from(map.values()).pop();
+export const lastEntryInMap = map => [...map].pop();
+export const lastKeyInMap = map => [...map.keys()].pop();
+export const lastValueInMap = map => [...map.values()].pop();
 
+export class xMap extends Map {
+  constructor(x) {
+    super(x)
+  }
+  indexOfKey(key) {
+    return [...this.keys()].indexOf(key);
+  }
+  indexOfValue(value) {
+    return [...this.values()].indexOf(value)
+  }
+  entryAtIndex(index) {
+    return [...this.entries()][index]
+  }
+  keyAtIndex(index) {
+    return [...this.keys()][index]
+  }
+  valueAtIndex(index) {
+    return [...this.values()][index]
+  }
+  insert(key, value, index) {
+    return insertAtMapIndex(index, key, value, this)
+  }
+  remove(index) {
+    return removeMapIndex(index, this)
+  }
+  firstEntry() {
+    return firstEntryInMap(this)
+  }
+  firstKey() {
+    return firstKeyInMap(this) 
+  }
+  firstValue() {
+    return firstValueInMap(this)
+  }
+  lastEntry() {
+    return lastEntryInMap(this)
+  }
+  lastKey() {
+    return lastKeyInMap(this)
+  }
+  lastValue() {
+    return lastValueInMap(this)
+  }
+  prevCurrNext(key) {
+    let prev = curr = next = null;
+
+    for (let keyVal of this) {
+      prev = curr
+      curr = keyVal
+      if (keyVal.key == key) break
+    }
+    return {prev, curr, next}
+  }
+  // https://stackoverflow.com/a/41328397/15109215
+  union(...iterables) {
+    if (typeof super.prototype.union === "function")
+      super.union(...iterables)
+    else {
+      for (const iterable of iterables) {
+        for (const item of iterable) {
+            this.set(...item);
+        }
+      }
+    }
+  }
+
+  setMultiple(array) {
+    if (!isArray(array)) return false
+    arr.forEach(([k,v]) => this.set(k,v));
+    return true
+  }
+
+  populate(array) {
+    if (!isArray(array)) return false
+    this.clear()
+    arr.forEach(([k,v]) => this.set(k,v));
+    return true
+  }
+
+  /**
+   * Insert at specific Map() index
+   * https://stackoverflow.com/a/53236461
+   * @param {number} index
+   * @param {*} key
+   * @param {*} value
+   * @return {boolean}
+   */
+  insertIndex(index, key, value){
+    if (!isNumber(index)) return false
+    const arr = [...this];
+    arr.splice(index, 0, [key, value]);
+    this.populate(arr)
+    return true
+  }
+
+  removeIndex(index) {
+    if (!isNumber(index)) return false
+    const arr = [...this];
+    arr.splice(index, 1)
+    this.populate(arr)
+    return true
+  }
+
+  swapIndices(index1, index2) {
+    if (!isNumber(index1) || !isNumber(index2)) return false
+    const arr = [...this];
+    swapArrayElements(arr, index1, index2)
+    this.populate(arr)
+    return true
+  }
+
+  swapKeys(key1, key2) {
+    const arr = [...this],
+        indexA = arr.findIndex(([v]) => v === key1),
+        indexB = arr.findIndex(([v]) => v === key2);
+    
+    [arr[indexA], arr[indexB]] = [arr[indexB], arr[indexA]];
+    this.clear()
+    arr.forEach(([k,v]) => this.set(k,v));
+    return true
+  }
+}
 
 /**
  * Debounce: the original function will be called after the caller stops calling the 

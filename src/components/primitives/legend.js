@@ -1,6 +1,6 @@
 // legend.js
 
-import { isObject } from "../../utils/typeChecks"
+import { isObject, isString } from "../../utils/typeChecks"
 import { uid } from "../../utils/utilities"
 import Input from "../../input"
 
@@ -19,13 +19,10 @@ export default class Legends {
   #list
   #parent
   #core
+  #theme
   #input
 
-  #controls = {
-    width: 18,
-    height: 18,
-    fill: "#aaa"
-  }
+
   #controlsList
 
   constructor(target, parent) {
@@ -33,29 +30,45 @@ export default class Legends {
     this.#list = {}
     this.#parent = parent
     this.#core = parent.core
+    this.#theme = parent.core.theme.legend
     this.eventsListen()
   }
 
+  get elTarget() { return this.#elTarget }
   get list() { return this.#list }
 
-  eventsListen() {
-    this.moveEvent = new PointerEvent("pointermove", {bubbles: true, cancelable: true,})
+  end() {
+    this.#core.off("chart_pan", this.onChartPan)
+    this.#core.off("chart_panDone", this.onChartPanDone)
+  }
 
-    this.#input = new Input(this.#elTarget, { disableContextMenu: false, });
-    this.#input.on("pointermove", this.onMouseMove.bind(this))
+  eventsListen() {
+
+    // this.#input = new Input(this.#elTarget, { disableContextMenu: false, });
 
     this.#core.on("chart_pan", this.onChartPan.bind(this))
     this.#core.on("chart_panDone", this.onChartPanDone.bind(this))
   }
 
-  onMouseMove(e) {
-    // console.group("legend :",e)
-    // this.#parent.element.dispatchEvent(this.moveEvent)
-    // this.#core.MainPane.elements.elRows.dispatchEvent(this.moveEvent)
-    // this.#parent.onMouseMove(e)
+  /**
+   * process legend actions
+   * @param {object} e - pointer event
+   * @memberof Legends
+   */
+  onMouseClick(e) {
+    const which = (s) => {
+      if (isString(s.dataset.icon)) 
+        return {id: s.id, icon: s.dataset.icon}
+      else if (s.parentElement.className !== "controls") 
+        return which(s.parentElement)
+      else
+        return false
+    }
+    return which(e)
   }
 
-  onMouseClick() {
+  onMouseOver(e) {
+
   }
 
   onChartPan() {
@@ -72,28 +85,43 @@ export default class Legends {
 
   buildLegend(o) {
     const theme = this.#core.theme
-      let styleInputs = "order: 1; display: inline; margin: 0 0 0 -1em;"
-    const styleLegend = `${theme.legend.text}; color: ${theme.legend.colour}; text-align: left;`
-      let styleLegendTitle = "margin-right: 1em; white-space: nowrap;"
-    const styleControls = "order:2; float: right; margin: 0 0.5em 0; opacity:0"
-    const mouseOver = "onmouseover='this.style.opacity=1'"
-    const mouseOut = "onmouseout='this.style.opacity=0'"
+      let styleInputs = "" //"display: inline; margin: 0 0 0 -1em;"
+      let styleLegend = `${theme.legend.font}; color: ${theme.legend.colour}; text-align: left;`
+      let styleLegendTitle = "" //"margin-right: 1em; white-space: nowrap;"
+    const styleControls = ""
     const t = this.#elTarget
-
-    styleLegendTitle += (o?.type === "chart") ? "font-size: 1.5em;" : "font-size: 1.2em;"
 
     const controls = (!theme.legend.controls) ? "" :
     `
-      <div slot="controls" class="controls" style="${styleControls}" ${mouseOver} ${mouseOut}>${t.buildControls(o)}</div>
+      <div class="controls" style="${styleControls}">
+        ${t.buildControls(o)}
+      </div>
     `;
 
+    switch (o?.type) {
+      case "chart":
+        styleLegendTitle += "font-size: 1.5em;"; 
+        break;
+      case "offchart":
+        styleLegend += " margin-bottom: -1.5em;";
+        styleLegendTitle += ""; 
+        o.title = ""
+        break;
+      default:
+        styleLegendTitle += "font-size: 1.2em;"; 
+        break;
+    }
+
     const node = `
-      <div slot="legend" id="${o.id}" class="legend" style="${styleLegend}">
-        <div>
-          <span slot="title" class="title" style="${styleLegendTitle}">${o.title}</span>
+      <div id="legend_${o.id}" class="legend ${o.type}" style="${styleLegend}" data-type="${o.type}" data-id="${o.id}" data-parent="${o.parent.id}">
+        <div class="lower">
+          <span class="title" style="${styleLegendTitle}">${o.title}</span>
           <dl style="${styleInputs}">${t.buildInputs(o)}</dl>
         </div>
-        ${controls}
+        <div class="upper">
+            <span class="title" style="${styleLegendTitle}">${o.title}</span>
+            ${controls}
+      </div>
      </div>
     `
     return node
@@ -102,25 +130,32 @@ export default class Legends {
   add(options) {
     if (!isObject(options) || !("title" in options)) return false
 
-    options.id = uid(options?.id || "legend")
+    const parentError = () => {this.#core.error("ERROR: Legend parent missing!")}
+    options.id = options?.id || uid("legend")
     options.type = options?.type || "overlay"
-    options.parent = this.#parent.ID
+    options.parent = options?.parent || parentError
 
     const html = this.buildLegend(options)
     // const elem = DOM.htmlToElement(html)
 
-    this.#elTarget.insertAdjacentHTML('beforeend', html)
-    const legendEl = this.#elTarget.querySelector(`#${options.id}`) // DOM.findByID(options.id)
+    this.#elTarget.legends.insertAdjacentHTML('beforeend', html)
+    const legendEl = this.#elTarget.legends.querySelector(`#legend_${options.id}`)
     this.#list[options.id] = {el: legendEl, type: options.type, source: options?.source}
 
     this.#controlsList = legendEl.querySelectorAll(`.control`)
     for (let c of this.#controlsList) {
       let svg = c.querySelector('svg');
-      svg.style.width = `${this.#controls.width}px`
-      svg.style.height = `${this.#controls.height}px`
-      svg.style.fill = `${this.#controls.fill}`
 
-      c.addEventListener('click', this.onMouseClick.bind(this))
+// TODO: set values dynamically via CSS variables
+// https://stackoverflow.com/a/60357706/15109215
+
+      svg.style.width = `${this.#theme.controlsW}px`
+      svg.style.height = `${this.#theme.controlsH}px`
+      svg.style.fill = `${this.#theme.controlsColour}`
+      svg.onpointerover = (e) => e.currentTarget.style.fill = this.#theme.controlsOver
+      svg.onpointerout = (e) => e.currentTarget.style.fill = this.#theme.controlsColour
+
+      c.addEventListener('click', options.parent.onLegendAction.bind(options.parent))
     }
 
     return options.id
@@ -148,6 +183,7 @@ export default class Legends {
 
     let source = this.#list[id].source(data.pos)
     const html = this.#elTarget.buildInputs(source)
-    this.#elTarget.querySelector(`#${id} dl`).innerHTML = html
+    this.#elTarget.legends.querySelector(`#legend_${id} dl`).innerHTML = html
   }
 }
+

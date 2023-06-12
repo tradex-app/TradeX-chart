@@ -9,8 +9,16 @@ template.innerHTML = `
   .viewport {
     width: 100%;
     height: 100%;
-    margin-top: 2px;
-    margin-left: 2px;
+    display: block;
+    position: absolute;
+    z-index: -100;
+  }
+  slot[name="chartpane"] {
+    display: flex;
+    flex-direction: column;
+  }
+  ::slotted(div.scale:first-of-type) {
+    border-top: none !important;
   }
 </style>
 <div class="viewport"></div>
@@ -18,9 +26,6 @@ template.innerHTML = `
 `
 
 export default class tradeXScale extends element {
-
-  #viewport
-  #chartPaneSlot
 
   constructor () {
     super(template)
@@ -31,24 +36,15 @@ export default class tradeXScale extends element {
   }
 
   connectedCallback() {
-    // element building must be done here
-    // https://stackoverflow.com/a/43837330/15109215
-    if (this.doInit) {
-      this.doInit = false
-      this.shadowRoot.appendChild(this.template.content.cloneNode(true))
-      this.style.display = "block"
-
-      this.#viewport = this.shadowRoot.querySelector('.viewport')
-      this.#chartPaneSlot = this.shadowRoot.querySelector('#chartPane')
-    }
+    super.connectedCallback()
   }
 
   disconnectedCallback() {
   }
 
-  get viewport() { return this.#viewport}
-  get chartPanes() { return this.shadowRoot.querySelectorAll('.scale') }
-  get chartPaneSlot() { return this.#chartPaneSlot }
+  get viewport() { return this.shadowRoot.querySelector('.viewport') }
+  get chartPanes() { return this.chartPaneSlot.assignedElements() } 
+  get chartPaneSlot() { return this.shadowRoot.querySelector('slot[name="chartpane"]') }
 }
 
 customElements.get('tradex-scale') || window.customElements.define('tradex-scale', tradeXScale)

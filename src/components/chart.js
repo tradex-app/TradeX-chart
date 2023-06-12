@@ -1,17 +1,18 @@
 // chart.js
-// base class for onChart and offChart
+// Chart - where most of the magic happens
+// base class provides onChart and offChart
+// Providing: the playground for price movements, indicators and drawing tools
+
 
 import DOM from "../utils/DOM";
 import { limit } from "../utils/number"
-import {
-  isArray,
-  isBoolean,
-  isNumber,
-  isObject,
-  isString,
-} from "../utils/typeChecks";
+import { isArray, isNumber, isObject, isString } from "../utils/typeChecks";
+import { copyDeep, xMap } from "../utils/utilities";
 import CEL from "./primitives/canvas";
+import Legends from "./primitives/legend"
+import Graph from "./views/classes/graph"
 import StateMachine from "../scaleX/stateMachne";
+import stateMachineConfig from "../state/state-onChart"
 import Input from "../input"
 import ScaleBar from "./scale"
 import chartGrid from "./overlays/chart-grid"
@@ -19,6 +20,7 @@ import chartCursor from "./overlays/chart-cursor"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartStreamCandle from "./overlays/chart-streamCandle"
+import chartTrades from "./overlays/chart-trades"
 import watermark from "./overlays/chart-watermark"
 import {
   STREAM_ERROR,
@@ -46,8 +48,23 @@ const defaultOverlays = {
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ]
 }
+const optionalOverlays = {
+  onChart: {
+    "trades": {class: chartTrades, fixed: false, required: false}
+  },
+  offChart: {
+    "candles": {class: chartCandles, fixed: false, required: true},
+  }
+}
 
+const chartLegend = {
+  id: "chart",
+  title: "",
+  type: "chart",
+  source: () => {}
+}
 
+const chartTypes = [ "onchart", "offchart" ]
 
 export default class Chart {
 
@@ -63,6 +80,7 @@ export default class Chart {
   #parent;
   #stateMachine;
   #chartCnt
+  #type
 
   #elTarget;
   #elScale;
@@ -76,11 +94,12 @@ export default class Chart {
 
   #streamCandle
 
+  #view
   #viewport;
-  #layersTools = new Map();
+  #layersTools = new xMap();
 
-  #overlays = new Map()
-  #overlayTools = new Map();
+  #overlays = new xMap()
+  #overlayTools = new xMap();
 
   #cursorPos = [0, 0];
   #cursorActive = false;
@@ -90,24 +109,59 @@ export default class Chart {
 
   #yAxisType
 
+  // localRange required by offChart scale
+  #localRange = {
+    valueMax: 100,
+    valueMin: 0,
+    valueDiff: 100
+  }
+
   constructor(core, options) {
     this.#core = core;
-    if (!isObject(options)) return
     this.#chartCnt = Chart.cnt
-    this.#options = {...options}
 
-    this.#name = options.name
-    this.#shortName = options.shortName
-    this.#elTarget = this.#options.elements.elTarget;
+    if (!isObject(options)) return
+
+    this.#options = {...options}
+    this.#name = this.#options.name
+    this.#shortName = this.#options.shortName
+    this.#title = this.#options.title
+    this.#type = (this.#options.type == "onchart") ? "onChart" : "offChart"
+    this.#view = this.#options.view
     this.#elScale = this.#options.elements.elScale;
     this.#parent = this.#options.parent;
+    this.#elTarget = this.#options.elements.elTarget;
+    this.#elTarget.id = this.id
 
-    // process options
-    for (const option in this.#options) {
-      if (option in this.props()) {
-        this.props()[option](this.#options[option])
-      }
+    // set up legends
+    this.legend = new Legends(this.elLegend, this)
+
+    if (this.isOnChart) {
+      chartLegend.type = "chart"
+      chartLegend.title = this.title
+      chartLegend.parent = this
+      chartLegend.source = this.legendInputs.bind(this)
+      this.legend.add(chartLegend)
+      this.yAxisType = "default"
     }
+    else {
+      chartLegend.type = "offchart"
+      chartLegend.title = ""
+      chartLegend.parent = this
+      chartLegend.source = () => { return {inputs:{}, colours:[], labels: []} }
+      this.legend.add(chartLegend)
+      this.yAxisType = this.core.indicators[options.view[0].type].ind.scale
+    }
+
+    // set up Scale (Y Axis)
+    const opts = {...options}
+          opts.parent = this
+          opts.chart = this
+          opts.elScale = this.elScale
+          opts.yAxisType = this.yAxisType
+    this.scale = new ScaleBar(this.core, opts)
+
+    this.log(`${this.name} instantiated`)
   }
 
   log(l) { this.core.log(l) }
@@ -115,13 +169,15 @@ export default class Chart {
   warn(w) { this.core.warn(w) }
   error(e) { this.core.error(e) }
 
-  set id(id) { this.#ID = id }
-  get id() { return (this.#ID) ? `${this.#ID}` : `${this.#core.id}.${this.#name}_${this.#chartCnt}` }
+  set id(id) { this.#ID = id.replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return (this.#ID) ? `${this.#ID}` : `${this.#core.id}-${this.#name}_${this.#chartCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get title() { return this.#title }
   get parent() { return this.#parent }
   get core() { return this.#core }
+  get type() { return this.#type }
+  get isOnChart() { return this.#type === "onChart" }
   get options() { return this.#options }
   get element() { return this.#elTarget }
   get pos() { return this.dimensions }
@@ -132,6 +188,7 @@ export default class Chart {
   get height() { return this.#elTarget.getBoundingClientRect().height }
   get data() {}
   get range() { return this.#core.range }
+  get localRange() { return this.#localRange }
   get stream() { return this.#Stream }
   get streamCandle() { return this.#streamCandle }
   get cursorPos() { return this.#cursorPos }
@@ -160,26 +217,24 @@ export default class Chart {
   get axes() { return "x" }
   set graph(g) { this.#Graph = g }
   get graph() { return this.#Graph }
+  get view() { return this.#view }
   get viewport() { return this.#Graph.viewport }
   get layerGrid() { return this.#Graph.overlays.get("grid").layer }
   get overlays() { return this.#overlays }
   get overlayGrid() { return this.#Graph.overlays.get("grid").instance }
   get overlayTools() { return this.#overlayTools }
   get overlaysDefault() { return defaultOverlays[this.type] }
+  get indicators() { return this.overlays }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
   get Divider() { return this.#Divider }
 
-  init(options) {
-    const opts = {...options}
-    opts.parent = this
-    opts.chart = this
-    opts.elScale = this.elScale
-    opts.yAxisType = this.yAxisType
-    this.scale = new ScaleBar(this.core, opts)
-  }
-
-  start(stateMachineConfig) {
+  /**
+   * Start chart and dependent components event listening. 
+   * Start the chart state machine
+   * Draw the chart
+   */
+  start() {
     // X Axis - Timeline
     this.#Time = this.#core.Timeline;
 
@@ -359,14 +414,6 @@ export default class Chart {
     if (this.isOnChart) this.refresh()
   }
 
-  props() {
-    return {
-      // id: (id) => this.setID(id),
-      title: (title) => (this.#title = title),
-      yAxisDigits: (digits) => this.setYAxisDigits(digits),
-    };
-  }
-
   /**
    * Set chart and it's scale height
    * @param {number} h 
@@ -417,30 +464,44 @@ export default class Chart {
   }
 
   /**
-   * Add any non-default overlays
+   * Add non-default overlays (indicators)
    *
-   * @param {array} overlays
+   * @param {array} overlays - list of overlays
+   * @returns {boolean} 
    * @memberof OnChart
    */
   addOverlays(overlays) {
+    if (!isArray(overlays) || overlays.length < 1) return false
+
     for (let o of overlays) {
       const config = {fixed: false, required: false}
+
+      // Indicators
       if (o.type in this.core.indicators) {
         config.cnt = this.core.indicators[o.type].ind.cnt
-        config.id = `${this.id}.${o.type}_${config.cnt}`
+        config.id = `${this.id}-${o.type}_${config.cnt}`
         config.class = this.core.indicators[o.type].ind
-        config.params = {
-          overlay: o,
-        }
-        o.id = config.id
-        o.paneID = this.id
-        this.overlays.set(o.name, config)
       }
+      // other overlay types
+      else if (o.type in optionalOverlays[this.type]) {
+        config.cnt = 1
+        config.id = `${this.id}-${o.type}`
+        config.class = optionalOverlays[this.type][o.type].class
+      }
+      else continue
+
+      config.params = { overlay: o, }
+      o.id = config.id
+      o.paneID = this.id
+      this.overlays.set(o.name, config)
     }
     const r = this.graph.addOverlays(Array.from(this.overlays))
+    
+    // if overlay failed, remove from list
     for (let o of r) {
-      if (!o[0]) this.overlays.delete(o[0])
+      if (!o[1]) this.overlays.delete(o[0])
     }
+    return true
   }
 
   /**
@@ -448,7 +509,7 @@ export default class Chart {
    * @param {object} i - {type, name, ...[params]}
    */
   addIndicator(i) {
-    const onChart = (this.type === "onChart" ) ? true : false;
+    const onChart = this.type === "onChart"
     const indClass = this.core.indicators[i.type].ind
     const indType = (indClass.constructor.type === "both") ? onChart : indClass.prototype.onChart
     if (
@@ -524,11 +585,9 @@ export default class Chart {
    * @param {array} candle - OHLCV
    */
   updateLegends(pos = this.#cursorPos, candle = false) {
-    if (this.#core.isEmpty) return
+    if (this.#core.isEmpty || !isObject(this.#Legends)) return
 
-    const legends = this.#Legends.list;
-
-    for (const legend in legends) {
+    for (const legend in this.#Legends.list) {
       this.#Legends.update(legend, { pos, candle });
     }
   }
@@ -560,11 +619,78 @@ export default class Chart {
     return {inputs, colours, labels}
   }
 
+  /**
+   * execute legend action
+   * @param {object} e - event
+   * @memberof Chart
+   */
+  onLegendAction(e) {
+
+    const action = this.#Legends.onMouseClick(e.currentTarget)
+
+    const el = this.element
+    const prevEl = el.previousElementSibling
+    const nextEl = el.nextElementSibling
+    const parentEl = el.parentNode
+
+    const scaleEl = this.scale.element
+    const prevScaleEl = scaleEl.previousElementSibling
+    const nextScaleEl = scaleEl.nextElementSibling
+    const parentScaleEl = scaleEl.parentNode
+        
+    const prevPane = (prevEl !== null) ? this.core.MainPane.chartPanes.get(prevEl.id) : null
+    const nextPane = (nextEl !== null) ? this.core.MainPane.chartPanes.get(nextEl.id) : null
+
+    switch(action.icon) {
+      case "up": 
+        if (!isObject(prevEl) || !isObject(prevScaleEl)) return
+        parentEl.insertBefore(el, prevEl)
+        parentScaleEl.insertBefore(scaleEl, prevScaleEl)
+        this.Divider.setPos()
+
+        if (prevPane !== null) {
+          prevPane.Divider.setPos()
+          prevPane.Divider.show()
+          this.core.MainPane.chartPanes.swapKeys(this.id, prevEl.id)
+        }
+        if (el.previousElementSibling === null)
+          this.Divider.hide()
+        return;
+      case "down":
+        if (!isObject(nextEl) || !isObject(nextScaleEl)) return
+        parentEl.insertBefore(nextEl, el)
+        parentScaleEl.insertBefore(nextScaleEl, scaleEl)
+        this.Divider.setPos()
+
+        if (nextPane !== null) { 
+          nextPane.Divider.setPos()
+          this.Divider.show()
+          this.core.MainPane.chartPanes.swapKeys(this.id, nextEl.id)
+        }
+        if (nextEl.previousElementSibling === null)
+          nextPane.Divider.hide()
+          
+        return;
+      case "collapse": return;
+      case "maximize": return;
+      case "restore": return;
+      case "remove": return;
+      case "config": return;
+      default: return;
+    }
+  }
+
   createGraph() {
     let overlays = copyDeep(this.overlaysDefault)
     this.graph = new Graph(this, this.elViewport, overlays, false)
-    this.layerStream = this.graph.overlays.get("stream")?.layer
-    this.chartStreamCandle = this.graph.overlays.get("stream")?.instance
+
+    if (this.isOnChart) {
+      this.layerStream = this.graph.overlays.get("stream")?.layer
+      this.chartStreamCandle = this.graph.overlays.get("stream")?.instance
+    }
+
+    // add non-default overlays ie. indicators
+    this.addOverlays(this.view)
   }
 
   render() {

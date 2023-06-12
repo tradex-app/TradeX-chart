@@ -36,9 +36,9 @@ export default class Line extends Tool {
     // stateMachineConfig.context = this
     // this.#core.stateMachine = stateMachineConfig
     // this.#core.stateMachine.start()
-    // this.emit(`tool_start`, this.ID)
+    // this.emit(`tool_start`, this.id)
     // // progress state from idle to active
-    // this.#core.stateMachine.notify(`tool_${this.#name}_start`, this.ID)
+    // this.#core.stateMachine.notify(`tool_${this.#name}_start`, this.id)
 
     let [x1, y1] = this.cursorClick
 

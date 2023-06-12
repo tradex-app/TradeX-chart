@@ -41,7 +41,7 @@ export default class Test extends Indicator {
 
     const overlay = params.overlay
     // initialize indicator values
-    this.ID = params.overlay?.id || uid(this.shortName)
+    this.id = params.overlay?.id || uid(this.shortName)
     // merge user defined settings (if any) with defaults
     this.style = (overlay?.settings?.style) 
       ? { ...this.#defaultStyle, ...overlay.settings.style } 
@@ -77,7 +77,7 @@ export default class Test extends Indicator {
     // c - retrieve data index
     let {c, colours} = super.legendInputs(pos)
     // build an object of input keys (labels) and values
-    let inputs = {x: this.Scale.nicePrice(this.overlay.data[c][1])}
+    let inputs = {x: this.scale.nicePrice(this.overlay.data[c][1])}
 
     /**
       @param {object} inputs - property names are used as labels

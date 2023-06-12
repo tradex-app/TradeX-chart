@@ -9,32 +9,29 @@ import tradeXChartPane from "./chartPane"
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
-  tradex-grid, tradex-chartpane {
-    overflow: hidden;
-  }
   tradex-grid {
     position: absolute;
     height: inherit;
   }
-  tradex-chartpane.primary {
-    position: relative;
-    height: 100%;
-  }
-  tradex-grid,
-  tradex-onchart {
+  tradex-grid {
     display: block;
     width: 100%;
+  }
+  slot[name="chartpane"] {
+    display: flex;
+    flex-direction: column;
   }
   ::slotted(tradex-chartpane) {
     display: block;
     position: relative;
-    top: 1px;
+    top: 0;
     width: 100%;
-    border-top: 1px solid;
+  }
+  ::slotted(tradex-chartpane:first-of-type) {
+    border-top: none !important;
   }
 </style>
 <tradex-grid></tradex-grid>
-<tradex-chartpane id="primary"></tradex-chartpane>
 <slot name="chartpane" id="chartpane"></slot>
 `
 
@@ -62,9 +59,10 @@ export default class tradeXRows extends element {
   }
 
   get grid() { return this.shadowRoot.querySelector('tradex-grid') }
-  get primary() { return this.shadowRoot.querySelector('#primary') }
-  get chartPanes() { return this.shadowRoot.querySelectorAll('tradex-chartpane') }
-  get chartPaneSlot() { return this.shadowRoot.querySelector('#chartpane') }
+  get primary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("onchart") ); }
+  get secondary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("offchart") ); }
+  get chartPanes() { return this.chartPaneSlot.assignedElements() } 
+  get chartPaneSlot() { return this.shadowRoot.querySelector('slot[name="chartpane"]') }
   get width() { return this.clientWidth }
   get height() { return this.clientHeight }
   get oWidth() { return this.#oWidth }

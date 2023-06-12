@@ -234,7 +234,7 @@ export default class ToolsBar {
     let t = this.addTool(tool, target)
     this.activeTool = (t)
     this.emit(`tool_active`, t)
-    this.emit(`tool_${t.ID}_active`, t)
+    this.emit(`tool_${t.id}_active`, t)
 
     // add tool entry to Data State
   }

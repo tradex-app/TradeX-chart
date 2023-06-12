@@ -5,7 +5,7 @@ import Overlay from "./overlay"
 import { Range } from "../../model/range"
 import canvas from "../../renderer/canvas"
 import { limit } from "../../utils/number"
-import { isObject, isString, isPromise } from "../../utils/typeChecks"
+import { isObject, isString } from "../../utils/typeChecks"
 import {
   STREAM_NEWVALUE,
   STREAM_UPDATE
@@ -62,8 +62,8 @@ export default class indicator extends Overlay {
     this.eventsListen()
   }
 
-  get ID() { return this.#ID }
-  set ID(id) { this.#ID = id }
+  get id() { return this.#ID }
+  set id(id) { this.#ID = id.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   set name(n) { this.#name = n }
   get shortName() { return this.#shortName }
@@ -76,7 +76,7 @@ export default class indicator extends Overlay {
   set plots(p) { this.#plots = p }
   get params() { return this.#params }
   get Timeline() { return this.core.Timeline }
-  get Scale() { return this.parent.scale }
+  get scale() { return this.parent.scale }
   get type() { return this.#type }
   get overlay() { return this.#overlay }
   get indicator() { return this.#indicator }
@@ -183,9 +183,10 @@ export default class indicator extends Overlay {
 
   addLegend() {
     let legend = {
-      id: this.shortName,
+      id: this.id,
       title: this.shortName,
-      type: this.shortName,
+      type: "indicator",
+      parent: this,
       source: this.legendInputs.bind(this)
     }
     this.chart.legend.add(legend)
@@ -207,6 +208,31 @@ export default class indicator extends Overlay {
         c = limit(c, 0, l)
 
     return {c, colours}
+  }
+
+  /**
+   * execute legend action
+   * @param {object} e - event
+   * @memberof indicator
+   */
+  onLegendAction(e) {
+
+    const action = this.chart.legend.onMouseClick(e.currentTarget)
+    console.log(`Legend Control: ${action.id} ${action.icon}`)
+    console.log(`onChart: ${this.onChart}`)
+    console.log(this.parent.parent.parent.element)
+    console.log(this.parent.parent.parent.view)
+
+    switch(action.icon) {
+      case "up": break;
+      case "down": break;
+      case "collapse": break;
+      case "maximize": break;
+      case "restore": break;
+      case "remove": break;
+      case "config": break;
+      default: return;
+    }
   }
 
   indicatorInput(start, end) {

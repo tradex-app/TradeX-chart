@@ -235,6 +235,11 @@ export const defaultTheme = {
   legend: {
     font: LegendStyle.font,
     colour: LegendStyle.colour,
+    controls: true,
+    controlsColour: "#aaa",
+    controlsOver: "#fff",
+    controlsW: 18,
+    controlsH: 18,
   },
   icon: {
     colour: COLOUR_ICON,

@@ -56,7 +56,7 @@ export default class DMI extends Indicator {
 
     const overlay = params.overlay
     // initialize indicator values
-    this.ID = params.overlay?.id || uid(this.shortName)
+    this.id = params.overlay?.id || uid(this.shortName)
     // merge user defined settings (if any) with defaults
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
     // calculate back history if missing
@@ -85,7 +85,7 @@ export default class DMI extends Indicator {
 
     let labels = [false]
     let {c, colours} = super.legendInputs(pos)
-    let inputs = {x: this.Scale.nicePrice(this.overlay.data[c][1])}
+    let inputs = {x: this.scale.nicePrice(this.overlay.data[c][1])}
 
     /**
       @param {object} inputs - property names are used as labels

@@ -4,14 +4,14 @@
 // Theme list available globally to all charts
 
 import { isObject, isString } from "../utils/typeChecks"
-import { copyDeep, mergeDeep, getProperty, setProperty, uid } from "../utils/utilities"
+import { copyDeep, mergeDeep, getProperty, setProperty, uid, xMap } from "../utils/utilities"
 import { defaultTheme } from "../definitions/style"
 
 const reserved = ["constructor","list","setCurrent","setTheme","setValue"]
 
 export default class Theme {
 
-  static #list = new Map()
+  static #list = new xMap()
   static get list() { return Theme.#list }
 
   #core
@@ -27,11 +27,11 @@ export default class Theme {
   static create(theme, core) {
     if (!(isObject(theme))) return false
 
-    theme.ID = (isString(theme.name))? uid(theme.name) : `${core.id}.theme`
+    theme.id = (isString(theme.name))? uid(theme.name) : `${core.id}.theme`
 
     const instance = new Theme(theme, core)
 
-    Theme.list.set(theme.ID, instance)
+    Theme.list.set(theme.id, instance)
 
     return instance
   }
