@@ -67,7 +67,6 @@ export default class MainPane {
   #elements
 
   #Graph
-  #viewport
   #layerGrid
   #layerWatermark
   #ChartPanes = new xMap()
@@ -241,28 +240,19 @@ export default class MainPane {
     this.stateMachine.start()
   }
 
-  end() {
+  destroy() {
     this.stateMachine.destroy()
-    this.#Time.end()
-    this.#Chart.end()
+    this.#Time.destroy()
     this.#ChartPanes.forEach((offChart, key) => {
-      offChart.end()
+      offChart.destroy()
     })
-    this.#viewport.destroy()
-
-    this.#input.off("wheel", this.onMouseWheel)
-    this.#input.off("pointerdrag", this.onChartDrag)
-    this.#input.off("pointerdragend", this.onChartDragDone)
-    this.#input.off("pointermove", this.onMouseMove)
-    this.#input.off("pointerenter", this.onMouseEnter);
-    this.#input.off("pointerout", this.onMouseOut);
-
-    this.#input.off("keydown", this.onChartKeyDown)
-    this.#input.off("keyup", this.onChartKeyDown)
-    this.#input = null
+    this.#Graph.destroy();
+    this.#input.destroy()
 
     this.off(STREAM_NEWVALUE, this.onNewStreamValue)
     this.off("setRange", this.draw)
+
+    this.element.remove
   }
 
 

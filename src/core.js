@@ -445,10 +445,10 @@ export default class TradeXchart extends Tradex_chart {
 
     this.off(STREAM_UPDATE, this.onStreamUpdate)
 
-    this.UtilsBar.end()
-    this.ToolsBar.end()
-    this.MainPane.end()
-    this.WidgetsG.end()
+    this.UtilsBar.destroy()
+    this.ToolsBar.destroy()
+    this.MainPane.destroy()
+    this.WidgetsG.destroy()
 
     this.#workers.end()
     this.#State = null

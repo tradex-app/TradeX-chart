@@ -169,7 +169,7 @@ export default class Chart {
   warn(w) { this.core.warn(w) }
   error(e) { this.core.error(e) }
 
-  set id(id) { this.#ID = id.replace(/ |,|;|:|\.|#/g, "_") }
+  set id(id) { this.#ID = String(id).replace(/ |,|;|:|\.|#/g, "_") }
   get id() { return (this.#ID) ? `${this.#ID}` : `${this.#core.id}-${this.#name}_${this.#chartCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
@@ -265,18 +265,16 @@ export default class Chart {
     this.#Divider.start()
   }
 
-  end() {
+  /**
+   * destroy chart pane instance
+   */
+  destroy() {
     this.stateMachine.destroy();
-    this.#Scale.end();
+    this.Divider.destroy()
+    this.#Scale.destroy();
     this.#Graph.destroy();
-
-    this.#input.off("pointerdrag", this.onChartDrag)
-    this.#input.off("pointerdragend", this.onChartDrag)
-    this.#input.off("pointermove", this.onMouseMove)
-    this.#input.off("pointerenter", this.onMouseEnter);
-    this.#input.off("pointerout", this.onMouseOut);
-    this.#input.off("pointerdown", this.onMouseDown);
-    this.#input.off("pointerup", this.onMouseUp);
+    this.#input.destroy()
+    this.legend.destroy()
 
     this.off("main_mousemove", this.onMouseMove);
     this.off(STREAM_LISTENING, this.onStreamListening);
@@ -286,8 +284,10 @@ export default class Chart {
 
     if (this.isOnChart)
       this.off("chart_yAxisRedraw", this.onYAxisRedraw)
-    else
-      this.Divider.end()
+
+    // TODO: remove state entry
+
+    this.element.remove()
   }
 
   eventsListen() {
@@ -674,7 +674,11 @@ export default class Chart {
       case "collapse": return;
       case "maximize": return;
       case "restore": return;
-      case "remove": return;
+      case "remove":
+        this.core.log(`Deleting chart pane: ${this.id}`)
+        this.core.MainPane.chartPanes.delete(this.id)
+        this.destroy()
+        return;
       case "config": return;
       default: return;
     }

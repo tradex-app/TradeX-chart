@@ -36,6 +36,18 @@ export function _set(obj, path, value) {
     return res[last] = value;
 }
 
+// For this function:
+// - level 0 is self
+// - level 1 is parent
+// - level 2 is grandparent
+// and so on.
+// https://stackoverflow.com/a/49417317/15109215
+export function getPrototypeAt(level, obj) {
+  let proto = Object.getPrototypeOf(obj);
+  while (level--) proto = Object.getPrototypeOf(proto);
+  return proto;
+}
+
 /**
  * Deep merge two objects.
  * https://gist.github.com/ahtcx/0cd94e62691f539160b32ecda18af3d6?permalink_comment_id=2930530#gistcomment-2930530

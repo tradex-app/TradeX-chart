@@ -44,7 +44,6 @@ export default class Timeline {
 
   #Graph
   #timeOverlays = new xMap()
-  #viewport
   #navigation
   #elNavList
   #elNavScrollBar
@@ -100,7 +99,6 @@ export default class Timeline {
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
   get graph() { return this.#Graph }
-  get viewport() { return this.#viewport }
   get navigation() { return this.#navigation }
   get range() { return this.#core.range }
   get pos() { return this.dimensions }
@@ -186,18 +184,17 @@ export default class Timeline {
     this.stateMachine.start()
   }
 
-  end() {
+  destroy() {
     this.stateMachine.destroy()
-    this.#viewport.destroy()
+    this.#Graph.destroy();
+    this.#input.destroy()
 
-    this.#input.off("dblclick", this.onDoubleClick)
-    this.#input.off("pointerenter", this.onPointerEnter)
-    this.#input.on("pointerdrag", this.onPointerDrag)
-    this.#input = null
     this.off("main_mousemove", this.drawCursorTime)
     this.off("setRange", this.onSetRange)
     this.#elFwdEnd.removeEventListener('click', debounce)
     this.#elRwdStart.removeEventListener('click', debounce)
+
+    this.element.remove()
   }
 
   eventsListen() {

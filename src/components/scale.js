@@ -44,7 +44,6 @@ export default class ScaleBar {
   #element
   #elViewport
 
-  #viewport
   #layerLabels
   #layerOverlays
   #layerPriceLine
@@ -94,7 +93,6 @@ export default class ScaleBar {
   get yAxisGrads() { return this.#yAxis.yAxisGrads }
   set graph(g) { this.#Graph = g }
   get graph() { return this.#Graph }
-  get viewport() { return this.#viewport }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#element) }
   get theme() { return this.#core.theme }
@@ -131,20 +129,18 @@ export default class ScaleBar {
     this.stateMachine.start()
   }
 
-  end() {
+  destroy() {
     this.stateMachine.destroy()
-    this.#input = null
-    this.#viewport.destroy()
-
-    this.#input.on("pointerdrag", this.onDrag);
-    this.#input.on("wheel", this.onMouseWheel)
-    this.#input.on("dblclick", this.resetScaleRange)
+    this.#Graph.destroy()
+    this.#input.destroy()
 
     this.off(`${this.#parent.id}_mousemove`, this.onMouseMove)
     this.off(`${this.#parent.id}_mouseout`, this.#layerCursor.erase)
     this.off(STREAM_UPDATE, this.onStreamUpdate)
     this.off("chart_pan", this.onMouseMove)
     this.off("chart_panDone", this.onMouseMove)
+
+    this.element.remove()
   }
 
   eventsListen() {

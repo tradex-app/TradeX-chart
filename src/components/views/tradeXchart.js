@@ -131,7 +131,7 @@ export default class tradeXChart extends element {
   }
 
   get id() { return this.getAttribute('id'); }
-  set id(id) { this.setAttribute('id', id.replace(/ |,|;|:|\.|#/g, "_")); }
+  set id(id) { this.setAttribute('id', String(id).replace(/ |,|;|:|\.|#/g, "_")); }
 
   get disabled() { return this.hasAttribute('disabled'); }
   set disabled(d) {

@@ -63,7 +63,7 @@ export default class indicator extends Overlay {
   }
 
   get id() { return this.#ID }
-  set id(id) { this.#ID = id.replace(/ |,|;|:|\.|#/g, "_") }
+  set id(id) { this.#ID = String(id).replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   set name(n) { this.#name = n }
   get shortName() { return this.#shortName }

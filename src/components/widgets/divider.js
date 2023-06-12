@@ -45,9 +45,11 @@ export default class Divider {
     return Divider.dividerList[id]
   }
 
-  static destroy(id) {
-    Divider.dividerList[id].end()
-
+  static destroy() {
+    // destroy all dividers
+    for (let id in Divider.dividerList) {
+      Divider.dividerList[id].destroy()
+    }
     // remove entry
     delete Divider.dividerList[id]
   }
@@ -95,16 +97,13 @@ export default class Divider {
     this.eventsListen()
   }
 
-  end() {
+  destroy() {
     // remove event listeners
-    this.#input.off("pointerover", this.onMouseEnter);
-    this.#input.off("pointerout", this.onMouseOut);
-    this.#input.off("pointerdrag", this.onPointerDrag);
-    this.#input.off("pointerdragend", this.onPointerDragEnd);
-    this.#input = null
-
+    this.#input.destroy()
     // remove element
     this.el.remove()
+    // remove entry from list
+    delete Divider.dividerList[this.id]
   }
 
   eventsListen() {

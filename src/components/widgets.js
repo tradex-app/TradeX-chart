@@ -69,7 +69,7 @@ export default class Widgets {
     this.stateMachine.start()
   }
 
-  end() {
+  destroy() {
     // Stop and clean up the module to prevent memory leaks.
     // It should remove: event listeners, timers, ect.
     // Put your toys away or it will end in tears.

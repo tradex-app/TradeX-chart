@@ -79,7 +79,7 @@ export default class ToolsBar {
     this.stateMachine.start()
   }
 
-  end() {
+  destroy() {
     this.stateMachine.destroy()
     // remove event listeners
     const api = this.#core

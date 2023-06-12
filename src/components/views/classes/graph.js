@@ -3,7 +3,7 @@
 
 import DOM from "../../../utils/DOM"
 import { copyDeep } from '../../../utils/utilities'
-import { isArray, isBoolean, isNumber, isObject, isString } from '../../../utils/typeChecks'
+import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from '../../../utils/typeChecks'
 import CEL from "../../primitives/canvas"
 import Overlays from "../../overlays"
 
@@ -137,9 +137,18 @@ export default class graph {
     return this.#overlays.addOverlay(key, overlay)
   }
 
+  /**
+   * iterate over the list of overlays and draw them
+   * @param {object} [range=this.range]
+   * @param {boolean} [update=false] - force immediate render?
+   * @memberof graph
+   */
   draw(range=this.range, update=false) {
     const oList = this.#overlays.list
     for (let [key, overlay] of oList) {
+      // is it a valid overlay?
+      if (!isObject(overlay) || 
+          !isFunction(overlay?.instance?.draw)) continue
 
       if (this.#core.scrollPos == this.#core.bufferPx * -1 || 
           this.#core.scrollPos == 0 || 

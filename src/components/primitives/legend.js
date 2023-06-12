@@ -37,9 +37,14 @@ export default class Legends {
   get elTarget() { return this.#elTarget }
   get list() { return this.#list }
 
-  end() {
+  destroy() {
     this.#core.off("chart_pan", this.onChartPan)
     this.#core.off("chart_panDone", this.onChartPanDone)
+
+    for (let l in this.#list) {
+      this.remove(l)
+    }
+    this.#elTarget.remove()
   }
 
   eventsListen() {
@@ -171,7 +176,6 @@ export default class Legends {
     for (let c of this.#controlsList) {
       c.removeEventListener('click', this.onMouseClick)
     }
-    
 
     return true
   }
