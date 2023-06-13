@@ -81,6 +81,7 @@ export default class Chart {
   #stateMachine;
   #chartCnt
   #type
+  #status = "idle"
 
   #elTarget;
   #elScale;
@@ -161,6 +162,7 @@ export default class Chart {
           opts.yAxisType = this.yAxisType
     this.scale = new ScaleBar(this.core, opts)
 
+    this.#status = "init"
     this.log(`${this.name} instantiated`)
   }
 
@@ -177,6 +179,7 @@ export default class Chart {
   get parent() { return this.#parent }
   get core() { return this.#core }
   get type() { return this.#type }
+  get status() { return this.#status }
   get isOnChart() { return this.#type === "onChart" }
   get options() { return this.#options }
   get element() { return this.#elTarget }
@@ -263,12 +266,15 @@ export default class Chart {
     const cfg = { chartPane: this }
     this.#Divider = this.core.WidgetsG.insert("Divider", cfg)
     this.#Divider.start()
+    this.#status = "running"
   }
 
   /**
    * destroy chart pane instance
    */
   destroy() {
+    if (this.#status === "destroyed") return
+
     this.stateMachine.destroy();
     this.Divider.destroy()
     this.#Scale.destroy();
@@ -288,6 +294,9 @@ export default class Chart {
     // TODO: remove state entry
 
     this.element.remove()
+    this.#status = "destroyed"
+
+    this.emit("destroyChartView", this.id)
   }
 
   eventsListen() {
@@ -301,14 +310,14 @@ export default class Chart {
     this.#input.on("pointerup", this.onMouseUp.bind(this));
 
     // listen/subscribe/watch for parent notifications
-    this.on("main_mousemove", this.updateLegends.bind(this));
-    this.on(STREAM_LISTENING, this.onStreamListening.bind(this));
-    this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this));
-    this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this));
-    this.on(STREAM_FIRSTVALUE, this.onStreamNewValue.bind(this))
+    this.on("main_mousemove", this.updateLegends, this);
+    this.on(STREAM_LISTENING, this.onStreamListening, this);
+    this.on(STREAM_NEWVALUE, this.onStreamNewValue, this);
+    this.on(STREAM_UPDATE, this.onStreamUpdate, this);
+    this.on(STREAM_FIRSTVALUE, this.onStreamNewValue, this)
 
     if (this.isOnChart) 
-      this.on("chart_yAxisRedraw", this.onYAxisRedraw.bind(this))
+      this.on("chart_yAxisRedraw", this.onYAxisRedraw, this)
   }
 
   /**
@@ -676,7 +685,6 @@ export default class Chart {
       case "restore": return;
       case "remove":
         this.core.log(`Deleting chart pane: ${this.id}`)
-        this.core.MainPane.chartPanes.delete(this.id)
         this.destroy()
         return;
       case "config": return;

@@ -428,7 +428,7 @@ export default class TradeXchart extends Tradex_chart {
     this.stream = this.#config.stream
 
     if (this.#delayedSetRange) 
-      this.on(STREAM_UPDATE, this.delayedSetRange.bind(this))
+      this.on(STREAM_UPDATE, this.delayedSetRange, this)
 
     this.#ready = true
     this.refresh()
@@ -439,11 +439,10 @@ export default class TradeXchart extends Tradex_chart {
    * In other words, destroy the chart.
    * @memberof TradeXchart
    */
-  end() {
+  destroy() {
     this.log("...cleanup the mess")
     this.removeEventListener('mousemove', this.onMouseMove)
-
-    this.off(STREAM_UPDATE, this.onStreamUpdate)
+    this.#hub = null
 
     this.UtilsBar.destroy()
     this.ToolsBar.destroy()
@@ -459,7 +458,7 @@ export default class TradeXchart extends Tradex_chart {
   eventsListen() {
     this.addEventListener('mousemove', this.onMouseMove.bind(this))
 
-    this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this))
+    this.on(STREAM_UPDATE, this.onStreamUpdate, this)
   }
 
   /** Subscribe to a topic
@@ -488,7 +487,10 @@ export default class TradeXchart extends Tradex_chart {
     for (let i=0; i<this.#hub[topic].length; i++) {
       if (this.#hub[topic][i].handler === handler) {
         this.#hub[topic].splice(i, 1);
-        if (this.#hub[topic].length === 0) delete this.#hub[topic];
+        if (this.#hub[topic].length === 0) {
+          delete this.#hub[topic];
+          break
+        }
       }
     }
   }

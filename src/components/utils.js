@@ -77,11 +77,11 @@ export default class UtilsBar {
   }
 
   eventsListen() {
-    this.on("utils_indicators", this.onIndicators.bind(this))
-    this.on("utils_timezone", this.onTimezone.bind(this))
-    this.on("utils_settings", this.onSettings.bind(this))
-    this.on("utils_screenshot", this.onScreenshot.bind(this))
-    // this.on("resize", (dimensions) => this.onResize.bind(this))
+    this.on("utils_indicators", this.onIndicators, this)
+    this.on("utils_timezone", this.onTimezone, this)
+    this.on("utils_settings", this.onSettings, this)
+    this.on("utils_screenshot", this.onScreenshot, this)
+    // this.on("resize", (dimensions) => this.onResize, this)
   }
   
   on(topic, handler, context) {

@@ -66,17 +66,15 @@ export default class _template {
     // this.stateMachine.start()
   }
 
-  end() {
+  destroy() {
     // this.stateMachine.destroy()
-    // Stop and clean up the module to prevent memory leaks.
-    // It should remove: event listeners, timers, ect.
-    // Put your toys away or it will end in tears.
+    // this.off("resize", this.onResize)
   }
 
 
   eventsListen() {
     // listen/subscribe/watch for parent notifications
-    this.on("resize", (dimensions) => this.onResize.bind(this))
+    this.on("resize", (dimensions) => this.onResize, this)
   }
 
   on(topic, handler, context) {

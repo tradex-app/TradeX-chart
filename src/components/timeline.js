@@ -210,8 +210,8 @@ export default class Timeline {
     this.#input.on("pointerdrag", this.onPointerDrag.bind(this))
     // this.#input.on("pointerdrag", throttle(this.onPointerDrag, 100, this, true));
 
-    this.on("main_mousemove", this.#layerCursor.draw.bind(this.#layerCursor))
-    this.on("setRange", this.onSetRange.bind(this))
+    this.on("main_mousemove", this.#layerCursor.draw, this.#layerCursor)
+    this.on("setRange", this.onSetRange, this)
 
     this.#elFwdEnd.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
     this.#elRwdStart.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))

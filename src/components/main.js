@@ -12,7 +12,7 @@ import chartGrid from "./overlays/chart-grid"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-mainPane"
 import Input from "../input"
-import { isArray, isBoolean, isNumber, isObject } from "../utils/typeChecks"
+import { isArray, isBoolean, isNumber, isObject, isString } from "../utils/typeChecks"
 import { copyDeep, xMap } from "../utils/utilities"
 
 import {
@@ -193,7 +193,7 @@ export default class MainPane {
     this.#Time = new Timeline(this.#core, options)
 
     // register chart views
-    this.registerChartPanes(options)
+    this.registerChartViews(options)
 
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE
     this.#rowMinH = isNumber(this.config.rowMinH)? this.config.rowMinH : ROWMINHEIGHT
@@ -250,8 +250,12 @@ export default class MainPane {
     this.#Graph.destroy();
     this.#input.destroy()
 
+    this.off(STREAM_FIRSTVALUE, this.onFirstStreamValue)
     this.off(STREAM_NEWVALUE, this.onNewStreamValue)
     this.off("setRange", this.draw)
+    this.off("scrollUpdate", this.draw)
+    this.off("chart_render", this.draw)
+    this.off("destroyChartView", this.removeChartView)
 
     this.element.remove
   }
@@ -274,11 +278,12 @@ export default class MainPane {
     this.#input.on("pointerup", this.onChartDragDone.bind(this))
 
     // listen/subscribe/watch for notifications
-    this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue.bind(this))
-    this.on(STREAM_NEWVALUE, this.onNewStreamValue.bind(this))
-    this.on("setRange", this.draw.bind(this))
-    this.on("scrollUpdate", this.draw.bind(this))
-    this.on("chart_render", this.draw.bind(this))
+    this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue, this)
+    this.on(STREAM_NEWVALUE, this.onNewStreamValue, this)
+    this.on("setRange", this.draw, this)
+    this.on("scrollUpdate", this.draw, this)
+    this.on("chart_render", this.draw, this)
+    this.on("destroyChartView", this.removeChartView, this)
   }
 
   on(topic, handler, context) {
@@ -504,10 +509,10 @@ export default class MainPane {
       this.#Chart.setDimensions({w: width, h: this.#elRows.height})
     }
     else {
-      this.#ChartPanes.forEach((offChart, key) => {
-        chartH = Math.round(offChart.viewport.height * resizeH)
-        offChart.setDimensions({w: width, h: chartH})
-        offChart.Divider.setPos()
+      this.#ChartPanes.forEach((chartView, key) => {
+        chartH = Math.round(chartView.viewport.height * resizeH)
+        chartView.setDimensions({w: width, h: chartH})
+        chartView.Divider.setPos()
       })
     }
 
@@ -527,7 +532,7 @@ export default class MainPane {
     this.element.style.cursor = cursor
   }
 
-  registerChartPanes(options) {
+  registerChartViews(options) {
     this.#elRows.previousDimensions()
 
     let keys;
@@ -615,6 +620,34 @@ export default class MainPane {
     this.emit("addChartView", o)
   }
 
+  removeChartView(viewID) {
+    if (!isString(viewID) ||
+        !this.#ChartPanes.has(viewID)
+    ) return false
+
+    const chartView = this.#ChartPanes.get(viewID)
+    const w = this.rowsW
+      let h = chartView.viewport.height
+      let x = Math.floor(h / (this.#ChartPanes.size - 1))
+      let r = h % x
+
+    if (chartView.status !== "destroyed")
+      this.chartView.destroy()
+
+    this.#ChartPanes.delete(viewID)
+
+    // resize remaining charts
+    this.#ChartPanes.forEach((chartView, key) => {
+      h = chartView.viewport.height
+      chartView.setDimensions({w: w, h: h + x + r})
+      chartView.Divider.setPos()
+      r = 0
+    })
+    this.draw(this.range, true)
+
+    // this.emit("rowsResize", dimensions)
+  }
+
   /**
    * add an indicator after the chart has started
    * @param {object} i - indicator
@@ -689,8 +722,8 @@ export default class MainPane {
       this.#Chart
     ]
     this.time.xAxis.doCalcXAxisGrads(range)
-    this.#ChartPanes.forEach((offChart, key) => {
-      graphs.push(offChart)
+    this.#ChartPanes.forEach((chartView, key) => {
+      graphs.push(chartView)
     })
 
     renderLoop.queueFrame(

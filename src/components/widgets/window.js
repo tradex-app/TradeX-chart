@@ -76,7 +76,7 @@ export default class Window {
     this.open()
   }
 
-  end() {
+  destroy() {
     // remove event listners
     document.removeEventListener('click', this.onOutsideClickListener)
     // remove element

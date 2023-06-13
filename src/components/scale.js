@@ -139,8 +139,6 @@ export default class ScaleBar {
     this.off(`${this.#parent.id}_mousemove`, this.onMouseMove)
     this.off(`${this.#parent.id}_mouseout`, this.#layerCursor.erase)
     this.off(STREAM_UPDATE, this.onStreamUpdate)
-    this.off("chart_pan", this.onMouseMove)
-    this.off("chart_panDone", this.onMouseMove)
 
     this.element.remove()
   }
@@ -154,9 +152,9 @@ export default class ScaleBar {
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("dblclick", this.resetScaleRange.bind(this))
 
-    this.on(`${this.#parent.id}_mousemove`, this.onMouseMove.bind(this))
-    this.on(`${this.#parent.id}_mouseout`, this.#layerCursor.erase.bind(this.#layerCursor))
-    this.on(STREAM_UPDATE, this.#layerPriceLine.draw.bind(this.#layerPriceLine))
+    this.on(`${this.#parent.id}_mousemove`, this.onMouseMove, this)
+    this.on(`${this.#parent.id}_mouseout`, this.#layerCursor.erase, this.#layerCursor)
+    this.on(STREAM_UPDATE, this.#layerPriceLine.draw, this.#layerPriceLine)
   }
 
   on(topic, handler, context) {

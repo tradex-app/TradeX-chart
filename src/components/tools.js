@@ -101,8 +101,8 @@ export default class ToolsBar {
   }
 
   eventsListen() {
-    this.on("tool_selected", (e) => { this.onToolSelect.bind(this) })
-    this.on("tool_deselected", (e) => { this.onToolDeselect.bind(this) })
+    this.on("tool_selected", this.onToolSelect, this)
+    this.on("tool_deselected", this.onToolDeselect, this)
   }
 
   on(topic, handler, context) {

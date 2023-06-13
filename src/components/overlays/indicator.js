@@ -119,8 +119,8 @@ export default class indicator extends Overlay {
   }
 
   eventsListen() {
-    // this.on(STREAM_NEWVALUE, this.onStreamNewValue.bind(this))
-    this.on(STREAM_UPDATE, this.onStreamUpdate.bind(this))
+    // this.on(STREAM_NEWVALUE, this.onStreamNewValue, this)
+    this.on(STREAM_UPDATE, this.onStreamUpdate, this)
   }
 
   on(topic, handler, context) {
