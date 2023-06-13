@@ -10,10 +10,33 @@ export default class Tool {
   static #cnt = 0
   static #instances = {}
 
+  static create(target, config) {
+    const cnt = ++Tool.#cnt
+    
+    config.cnt = cnt
+    config.modID = `${config.toolID}_${cnt}`
+    config.toolID = config.modID
+    config.target = target
+
+    const tool = new config.tool(config)
+
+    Tool.#instances[cnt] = tool
+    target.chartToolAdd(tool)
+
+    return tool
+  }
+
+  static destroy(tool) {
+    if (tool instanceof Tool) {
+      const inCnt = tool.inCnt
+      delete Tool.#instances[inCnt]
+    }
+  }
+
   #id
   #inCnt = null
-  #name
-  #shortName
+  #name = "Line Tool"
+  #shortName = "TX_Tool"
   #options
   #config
   #core
@@ -46,8 +69,9 @@ export default class Tool {
     this.#cursorClick = config.pos
   }
 
+  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}_${this.#inCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
   get inCnt() { return this.#inCnt }
-  get id() { return this.#id }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
   get core() { return this.#core }
@@ -70,30 +94,6 @@ export default class Tool {
   get config() { return this.#core.config }
   get scrollPos() { return this.#core.scrollPos }
   get bufferPx() { return this.#core.bufferPx }
-
-
-  static create(target, config) {
-    const cnt = ++Tool.#cnt
-    
-    config.cnt = cnt
-    config.modID = `${config.toolID}_${cnt}`
-    config.toolID = config.modID
-    config.target = target
-
-    const tool = new config.tool(config)
-
-    Tool.#instances[cnt] = tool
-    target.chartToolAdd(tool)
-
-    return tool
-  }
-
-  static destroy(tool) {
-    if (tool instanceof Tool) {
-      const inCnt = tool.inCnt
-      delete Tool.#instances[inCnt]
-    }
-  }
 
 
   end() { this.stop() }

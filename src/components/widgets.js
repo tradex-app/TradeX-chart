@@ -11,6 +11,7 @@ import stateMachineConfig from "../state/state-widgets"
 
 export default class Widgets {
 
+  #id
   #name = "Widgets"
   #shortName = "widgets"
   #core
@@ -40,6 +41,8 @@ export default class Widgets {
   warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
+  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get core() { return this.#core }
@@ -64,6 +67,7 @@ export default class Widgets {
     this.eventsListen()
 
     // start State Machine 
+    stateMachineConfig.id = this.id
     stateMachineConfig.context = this
     this.stateMachine = stateMachineConfig
     this.stateMachine.start()

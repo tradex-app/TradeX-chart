@@ -62,7 +62,7 @@ export default class ScaleBar {
     this.#element = this.#options.elScale
     this.#chart = this.#options.chart
     this.#parent = this.#options.parent
-    this.#id = `${this.#parent.id}.scale`
+    this.id = `${this.#parent.id}_scale`
     this.init()
   }
 
@@ -71,7 +71,8 @@ export default class ScaleBar {
   warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
-  get id() { return this.#id }
+  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get core() { return this.#core }
@@ -124,6 +125,7 @@ export default class ScaleBar {
 
     // start State Machine 
     const newConfig = copyDeep(stateMachineConfig)
+    newConfig.id = this.id
     newConfig.context = this
     this.stateMachine = newConfig
     this.stateMachine.start()

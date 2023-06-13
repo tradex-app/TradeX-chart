@@ -236,6 +236,7 @@ export default class MainPane {
 
     // start State Machine 
     stateMachineConfig.id = this.id
+    stateMachineConfig.context = this;
     this.stateMachine = stateMachineConfig
     this.stateMachine.start()
   }

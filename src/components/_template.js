@@ -6,6 +6,7 @@ import stateMachineConfig from "../state/state-chart"
 
 export default class _template {
 
+  #id
   #name = "Template"
   #shortName = "template"
   #core
@@ -20,6 +21,7 @@ export default class _template {
 
   constructor (core, options) {
 
+    this.id = options?.id || "ID"
     this.#core = core
     this.#options = options
     this.#elTemplate = options.elements.elTemplate
@@ -32,6 +34,8 @@ export default class _template {
   warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
+  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return this.#id }
   get name() {return this.#name}
   get shortName() {return this.#shortName}
   get core() {return this.#core}
@@ -56,6 +60,7 @@ export default class _template {
     this.eventsListen()
 
     // start State Machine 
+    // stateMachineConfig.id = this.id
     // stateMachineConfig.context = this
     // this.stateMachine = stateMachineConfig
     // this.stateMachine.start()

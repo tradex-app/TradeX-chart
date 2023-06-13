@@ -465,7 +465,7 @@ export default class TradeXchart extends Tradex_chart {
   /** Subscribe to a topic
   *
   * @param {String} topic      - The topic name
-  * @param {Function} callback - The function or method that is called
+  * @param {Function} handler - The function or method that is called
   * @param {Object}  context   - The context the function(s) belongs to
   */
    on(topic, handler, context) {
@@ -477,15 +477,20 @@ export default class TradeXchart extends Tradex_chart {
   /** Unsubscribe from a topic
   *
   * @param {String} topic - The topic name
-  * @param {Function} cb  - The function that is called if an other module
-  *                         publishes to the specified topic
+  * @param {Function} handler  - function to remove
   */
   off(topic, handler) {
-    if (!isString(topic)) return
+    if (!isString(topic) || 
+        !isFunction(handler) ||
+        !(topic in this.#hub)
+        ) return
 
-    const i = (this.#hub[topic] || []).findIndex(h => h === handler);
-    if (i > -1) this.#hub[topic].splice(i, 1);
-    if (this.#hub[topic].length === 0) delete this.#hub[topic];
+    for (let i=0; i<this.#hub[topic].length; i++) {
+      if (this.#hub[topic][i].handler === handler) {
+        this.#hub[topic].splice(i, 1);
+        if (this.#hub[topic].length === 0) delete this.#hub[topic];
+      }
+    }
   }
 
   /** Publish an topic

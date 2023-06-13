@@ -71,7 +71,7 @@ export default class Chart {
   static #cnt = 0
   static get cnt() { return Chart.#cnt++ }
 
-  #ID;
+  #id;
   #name
   #shortName
   #title;
@@ -169,8 +169,8 @@ export default class Chart {
   warn(w) { this.core.warn(w) }
   error(e) { this.core.error(e) }
 
-  set id(id) { this.#ID = String(id).replace(/ |,|;|:|\.|#/g, "_") }
-  get id() { return (this.#ID) ? `${this.#ID}` : `${this.#core.id}-${this.#name}_${this.#chartCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
+  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#name}_${this.#chartCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get title() { return this.#title }

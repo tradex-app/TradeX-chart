@@ -176,29 +176,33 @@ export function isArrayEqual(a1, a2) {
 }
 
 /**
- *Find nearest number value in Array
+ * Find nearest number value in Array
  *
  * @param {number} x
  * @param {array} array
  * @return {array} - index, value
  */
 export function nearestArrayValue(x, array) {
-  let dist = Infinity
-  let val = null
-  let index = -1
-  let i = 0
+  let minDist = Infinity;
+  let minDistIndex = -1;
+  let minValue = null;
+  let i = 0;
 
-  while(i++ < array.length) {
-    let xi = array[i]
-    let diff = Math.abs(xi - x)
-    if (diff < dist) {
-      dist = diff
-      val = xi
-      index = i
+  // Find the closest array element to x by iterating over the array in reverse order
+  while (i++ < array.length) {
+    let xi = array[i];
+    let diff = Math.abs(xi - x);
+    if (diff < minDist) {
+      minDist = diff;
+      minDistIndex = i;
+      minValue = xi;
     }
   }
-  return [index, val]
+
+  // Return the index and value of the closest array element
+  return [minDistIndex, minValue];
 }
+
 
 export function swapArrayElements(array, index1, index2) {
   [myArray[index1], myArray[index2]] = [myArray[index2], myArray[index1]];

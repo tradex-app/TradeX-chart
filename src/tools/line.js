@@ -33,6 +33,7 @@ export default class Line extends Tool {
   start() {
     this.eventsListen()
     // // start State Machine 
+    // stateMachineConfig.id = this.id
     // stateMachineConfig.context = this
     // this.#core.stateMachine = stateMachineConfig
     // this.#core.stateMachine.start()
@@ -62,5 +63,8 @@ export default class Line extends Tool {
     this.elViewport.render()
   }
 
+  destroy() {
+    this.stateMachine.destroy()
+  }
 
 }

@@ -34,7 +34,7 @@ export default class StateMachine {
 
     const cfg = {...config}
 
-    this.#id = cfg.id
+    this.id = cfg.id
     this.#config = cfg
     this.#state = cfg.initial
     this.#context.origin = context
@@ -45,6 +45,7 @@ export default class StateMachine {
   }
 
   /** @type {string} */
+  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
   get id() { return this.#id }
   get state() { return this.#state }
   get previousSate() { return this.#statePrev }
@@ -149,18 +150,16 @@ export default class StateMachine {
 
     for (let state in this.#config.states) {
       for (let event in this.#config.states[state].on) {
-        this.#events.add(event)
+        let cb = this.notify.bind(this, event)
+        this.#events.add({topic:event, cb})
+        this.#core.on(event, cb, this.context)
       }
-    }
-
-    for (let event of this.#events) {
-      this.#core.on(event, this.notify.bind(this, event), this.context)
     }
   }
 
   #unsubscribe() {
     for (let event of this.#events) {
-      this.#core.off(event, this.notify)
+      this.#core.off(event.topic, event.cb)
     }
   }
 
