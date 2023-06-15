@@ -165,6 +165,48 @@ export default class tradeXLegends extends element {
     this.elTitle.innerHTML = t
   }
 
+  buildLegend(o, theme) {
+      let styleInputs = "" //"display: inline; margin: 0 0 0 -1em;"
+      let styleLegend = `${theme.legend.font}; color: ${theme.legend.colour}; text-align: left;`
+      let styleLegendTitle = "" //"margin-right: 1em; white-space: nowrap;"
+    const styleControls = ""
+
+    const controls = (!theme.legend.controls) ? "" :
+    `
+      <div class="controls" style="${styleControls}">
+        ${this.buildControls(o)}
+      </div>
+    `;
+
+    switch (o?.type) {
+      case "chart":
+        styleLegendTitle += "font-size: 1.5em;"; 
+        break;
+      case "offchart":
+        styleLegend += " margin-bottom: -1.5em;";
+        styleLegendTitle += ""; 
+        o.title = ""
+        break;
+      default:
+        styleLegendTitle += "font-size: 1.2em;"; 
+        break;
+    }
+
+    const node = `
+      <div id="legend_${o.id}" class="legend ${o.type}" style="${styleLegend}" data-type="${o.type}" data-id="${o.id}" data-parent="${o.parent.id}">
+        <div class="lower">
+          <span class="title" style="${styleLegendTitle}">${o.title}</span>
+          <dl style="${styleInputs}">${this.buildInputs(o)}</dl>
+        </div>
+        <div class="upper">
+            <span class="title" style="${styleLegendTitle}">${o.title}</span>
+            ${controls}
+      </div>
+     </div>
+    `
+    return node
+  }
+
   buildInputs(o) {
     let i = 0,
         inp = "",
@@ -203,7 +245,7 @@ export default class tradeXLegends extends element {
     // restore
     inp += `<span id="${id}_restore" class="control" data-icon="restore">${restore}</span>`
     // remove
-    inp += (o?.type == "offchart") ? `<span id="${id}_remove" class="control" data-icon="remove">${close}</span>` : ``
+    inp += (o?.type !== "chart") ? `<span id="${id}_remove" class="control" data-icon="remove">${close}</span>` : ``
     // config
     inp += (o?.type !== "offchart") ? `<span id="${id}_config" class="control" data-icon="config">${config}</span>` : ``
 

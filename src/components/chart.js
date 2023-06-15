@@ -98,8 +98,6 @@ export default class Chart {
   #view
   #viewport;
   #layersTools = new xMap();
-
-  #overlays = new xMap()
   #overlayTools = new xMap();
 
   #cursorPos = [0, 0];
@@ -151,7 +149,7 @@ export default class Chart {
       chartLegend.parent = this
       chartLegend.source = () => { return {inputs:{}, colours:[], labels: []} }
       this.legend.add(chartLegend)
-      this.yAxisType = this.core.indicators[options.view[0].type].ind.scale
+      this.yAxisType = this.core.indicatorClasses[options.view[0].type].ind.scale
     }
 
     // set up Scale (Y Axis)
@@ -181,6 +179,7 @@ export default class Chart {
   get type() { return this.#type }
   get status() { return this.#status }
   get isOnChart() { return this.#type === "onChart" }
+  get isPrimary() { return this.#options.view.primary || false }
   get options() { return this.#options }
   get element() { return this.#elTarget }
   get pos() { return this.dimensions }
@@ -223,11 +222,12 @@ export default class Chart {
   get view() { return this.#view }
   get viewport() { return this.#Graph.viewport }
   get layerGrid() { return this.#Graph.overlays.get("grid").layer }
-  get overlays() { return this.#overlays }
+  // get overlays() { return this.#overlays }
+  get overlays() { return this.getOverlays() }
   get overlayGrid() { return this.#Graph.overlays.get("grid").instance }
   get overlayTools() { return this.#overlayTools }
   get overlaysDefault() { return defaultOverlays[this.type] }
-  get indicators() { return this.overlays }
+  get indicators() { return this.getIndicators() }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
   get Divider() { return this.#Divider }
@@ -273,7 +273,12 @@ export default class Chart {
    * destroy chart pane instance
    */
   destroy() {
-    if (this.#status === "destroyed") return
+    if ( this.#status === "destroyed") return
+    // has this been invoked from removeChartView() ?
+    if ( !this.core.MainPane.chartDeleteList[this.id] ) {
+      this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartView()" instead.`)
+      return
+    }
 
     this.stateMachine.destroy();
     this.Divider.destroy()
@@ -295,7 +300,10 @@ export default class Chart {
 
     this.element.remove()
     this.#status = "destroyed"
+  }
 
+  remove() {
+    this.core.log(`Deleting chart pane: ${this.id}`)
     this.emit("destroyChartView", this.id)
   }
 
@@ -315,6 +323,7 @@ export default class Chart {
     this.on(STREAM_NEWVALUE, this.onStreamNewValue, this);
     this.on(STREAM_UPDATE, this.onStreamUpdate, this);
     this.on(STREAM_FIRSTVALUE, this.onStreamNewValue, this)
+    this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this)
 
     if (this.isOnChart) 
       this.on("chart_yAxisRedraw", this.onYAxisRedraw, this)
@@ -423,6 +432,10 @@ export default class Chart {
     if (this.isOnChart) this.refresh()
   }
 
+  onDeleteIndicator(i) {
+    this.removeIndicator(i.id)
+  }
+
   /**
    * Set chart and it's scale height
    * @param {number} h 
@@ -482,14 +495,16 @@ export default class Chart {
   addOverlays(overlays) {
     if (!isArray(overlays) || overlays.length < 1) return false
 
+    const overlayList = []
+
     for (let o of overlays) {
       const config = {fixed: false, required: false}
 
       // Indicators
-      if (o.type in this.core.indicators) {
-        config.cnt = this.core.indicators[o.type].ind.cnt
+      if (o.type in this.core.indicatorClasses) {
+        config.cnt = this.core.indicatorClasses[o.type].ind.cnt
         config.id = `${this.id}-${o.type}_${config.cnt}`
-        config.class = this.core.indicators[o.type].ind
+        config.class = this.core.indicatorClasses[o.type].ind
       }
       // other overlay types
       else if (o.type in optionalOverlays[this.type]) {
@@ -502,15 +517,15 @@ export default class Chart {
       config.params = { overlay: o, }
       o.id = config.id
       o.paneID = this.id
-      this.overlays.set(o.name, config)
+      overlayList.push([o.id, config])
     }
-    const r = this.graph.addOverlays(Array.from(this.overlays))
+    this.graph.addOverlays(overlayList)
     
-    // if overlay failed, remove from list
-    for (let o of r) {
-      if (!o[1]) this.overlays.delete(o[0])
-    }
     return true
+  }
+
+  getOverlays() {
+    return Object.fromEntries([...this.#Graph.overlays.list])
   }
 
   /**
@@ -519,23 +534,41 @@ export default class Chart {
    */
   addIndicator(i) {
     const onChart = this.type === "onChart"
-    const indClass = this.core.indicators[i.type].ind
+    const indClass = this.core.indicatorClasses[i.type].ind
     const indType = (indClass.constructor.type === "both") ? onChart : indClass.prototype.onChart
     if (
-        i?.type in this.core.indicators &&
+        i?.type in this.core.indicatorClasses &&
         onChart === indType
       ) {
+      i.paneID = this.id
       const config = {
         class: indClass,
         params: {overlay: i}
       }
       const r = this.graph.addOverlay(i.name, config)
-      if (r) {
-        this.#overlays.set(i.name, config)
-        return true
-      }
     }
     else return false
+  }
+
+  getIndicators() {
+    const indicators = Object.keys(this.core.indicatorClasses)
+    const ind = {}
+
+    for (let [key, value] of Object.entries(this.overlays)) {
+      if (indicators.includes(value.params?.overlay?.type)) 
+      ind[key] = value
+    }
+    return ind
+  }
+
+  removeIndicator(id) {
+    if (!isString(id) || !(id in this.indicators)) return false
+
+    this.indicators[id].instance.destroy()
+    this.graph.removeOverlay(id)
+
+    if (Object.keys(this.indicators).length === 0 && !this.isPrimary)
+      this.emit("destroyChartView", this.id)
   }
 
   addTool(tool) {
@@ -683,10 +716,7 @@ export default class Chart {
       case "collapse": return;
       case "maximize": return;
       case "restore": return;
-      case "remove":
-        this.core.log(`Deleting chart pane: ${this.id}`)
-        this.destroy()
-        return;
+      case "remove": this.remove(); return;
       case "config": return;
       default: return;
     }

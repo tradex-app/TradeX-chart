@@ -47,6 +47,7 @@ export default class indicator extends Overlay {
   #updateValueCB
   #precision = 2
   #style = {}
+  #legendID
 
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
 
@@ -68,6 +69,7 @@ export default class indicator extends Overlay {
   set name(n) { this.#name = n }
   get shortName() { return this.#shortName }
   set shortName(n) { this.#shortName = n }
+  get chartPane() { return this.#params.overlay.paneID }
   get onChart() { return this.#onChart }
   set onChart(c) { this.#onChart = c }
   get scaleOverlay() { return this.#scaleOverlay }
@@ -79,6 +81,7 @@ export default class indicator extends Overlay {
   get scale() { return this.parent.scale }
   get type() { return this.#type }
   get overlay() { return this.#overlay }
+  get legendID() { return this.#legendID }
   get indicator() { return this.#indicator }
   get TALib() { return this.#TALib }
   get range() { return this.core.range }
@@ -113,9 +116,12 @@ export default class indicator extends Overlay {
     return this.#value
   }
 
-  end() {
+  destroy() {
     // this.off(STREAM_NEWVALUE, this.onStreamNewValue)
     this.off(STREAM_UPDATE, this.onStreamUpdate)
+
+    this.chart.legend.remove(this.#legendID)
+    // TODO: remove state data
   }
 
   eventsListen() {
@@ -148,6 +154,32 @@ export default class indicator extends Overlay {
   onStreamUpdate(candle) {
     // console.log("onStreamUpdate(candle):", candle)
     this.value = candle
+  }
+
+  /**
+   * execute legend action
+   * @param {object} e - event
+   * @memberof Chart
+   */
+  onLegendAction(e) {
+
+    const action = this.chart.legend.onMouseClick(e.currentTarget)
+
+    switch(action.icon) {
+      case "up": 
+        return;
+      case "down":
+        return;
+      case "collapse": return;
+      case "maximize": return;
+      case "restore": return;
+      case "remove":
+        this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPane}`)
+        this.emit(`${this.chartPane}_removeIndicator`, {id: this.id, paneID: this.chartPane})
+        return;
+      case "config": return;
+      default: return;
+    }
   }
 
   /**
@@ -189,7 +221,7 @@ export default class indicator extends Overlay {
       parent: this,
       source: this.legendInputs.bind(this)
     }
-    this.chart.legend.add(legend)
+    this.#legendID = this.chart.legend.add(legend)
   }
 
   /**
@@ -208,31 +240,6 @@ export default class indicator extends Overlay {
         c = limit(c, 0, l)
 
     return {c, colours}
-  }
-
-  /**
-   * execute legend action
-   * @param {object} e - event
-   * @memberof indicator
-   */
-  onLegendAction(e) {
-
-    const action = this.chart.legend.onMouseClick(e.currentTarget)
-    console.log(`Legend Control: ${action.id} ${action.icon}`)
-    console.log(`onChart: ${this.onChart}`)
-    console.log(this.parent.parent.parent.element)
-    console.log(this.parent.parent.parent.view)
-
-    switch(action.icon) {
-      case "up": break;
-      case "down": break;
-      case "collapse": break;
-      case "maximize": break;
-      case "restore": break;
-      case "remove": break;
-      case "config": break;
-      default: return;
-    }
   }
 
   indicatorInput(start, end) {

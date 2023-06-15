@@ -1,10 +1,8 @@
 # TradeXChart
 
-TradeXChart follows [breaking].[feature].[fix] versioning
+TradeXChart follows [breaking].[feature].[fix] [eemantic Versioning](https://semver.org/)
 
 eg. 0.100.6
-
-[Semantic Versioning](https://semver.org/)
 
 
 # Contents

@@ -2,7 +2,7 @@
 // class
 
 import DOM from "../../../utils/DOM"
-import { copyDeep } from '../../../utils/utilities'
+import { copyDeep, xMap } from '../../../utils/utilities'
 import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from '../../../utils/typeChecks'
 import CEL from "../../primitives/canvas"
 import Overlays from "../../overlays"
@@ -69,11 +69,7 @@ export default class graph {
   get overlays() { return this.#overlays }
 
   destroy() {
-    let oList = this.#overlays.list
-    for (let [key, overlay] of oList) {
-      overlay.instance = null
-    }
-    oList = null
+    this.#overlays.destroy()
     this.#viewport.destroy()
   }
 
@@ -138,6 +134,15 @@ export default class graph {
   }
 
   /**
+   * remove overlay from Graph
+   * @param {string} key - identifier
+   * @returns boolean
+   */
+  removeOverlay(key) {
+    return this.#overlays.removeOverlay(key)
+  }
+
+  /**
    * iterate over the list of overlays and draw them
    * @param {object} [range=this.range]
    * @param {boolean} [update=false] - force immediate render?
@@ -145,6 +150,9 @@ export default class graph {
    */
   draw(range=this.range, update=false) {
     const oList = this.#overlays.list
+    // guard against overlays host (chart pane) deletion
+    if (!(oList instanceof xMap)) return false
+
     for (let [key, overlay] of oList) {
       // is it a valid overlay?
       if (!isObject(overlay) || 

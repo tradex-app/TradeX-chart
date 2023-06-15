@@ -314,7 +314,7 @@ export default class Timeline {
     for (let o of overlays) {
       // const config = {fixed: false, required: false}
       // if (o.type in this.core.TALib) {
-      //   config.class = this.core.indicators[o.type].ind
+      //   config.class = this.core.indicatorClasses[o.type].ind
       //   config.params = {overlay: o}
       //   this.#timeOverlays.set(o.name, config)
       // }

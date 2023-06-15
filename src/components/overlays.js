@@ -47,14 +47,14 @@ export default class Overlays {
     this.eventsListen()
   }
 
-  end() {
-    this.#parent.off("resize", (dimensions) => this.onResize)
+  destroy() {
+    for (let k of this.#list.keys()) {
+      this.removeOverlay(k)
+    }
+    this.#list = null
   }
 
-
   eventsListen() {
-    // listen/subscribe/watch for parent notifications
-    this.#parent.on("resize", (dimensions) => this.onResize.bind(this))
   }
 
   on(topic, handler, context) {
@@ -75,16 +75,17 @@ export default class Overlays {
 
   addOverlays(overlays) {
     let r = [];
-    let s;
+    let k, s;
     for (let o of overlays) {
       s = this.addOverlay(o[0], o[1])
-      r.push([o[0], s])
+      k = s.instance?.id || o[0]
+      r.push([k, s])
     }
     return r
   }
 
   addOverlay(key, overlay) {
-    // try / catch in case user defined custom overlays (indicator) error
+    // try / catch in case user defined custom overlays (indicator) errors
     try {
       const layer = new CEL.Layer(this.layerConfig)
       this.parent.viewport.addLayer(layer)
@@ -98,7 +99,9 @@ export default class Overlays {
         this,
         overlay.params
       )
-      this.#list.set(key, overlay)
+      if (!isString(overlay.instance?.id)) overlay.instance.id = key
+
+      this.#list.set(overlay.instance.id, overlay)
       return true
     }
     catch (e) {
@@ -106,7 +109,12 @@ export default class Overlays {
       console.error(e)
       return false
     }
-
   }
 
+  removeOverlay(key) {
+    if (this.#list.has(key)) {
+      this.#list.get(key).layer.remove()
+      this.#list.delete(key)
+    }
+  }
 }

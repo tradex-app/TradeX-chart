@@ -16,6 +16,8 @@ export default class Overlay {
   #params
   #doDraw = true
 
+  id
+
   constructor(target, xAxis=false, yAxis=false, theme, parent, params={}) {
 
     this.#core = parent.core
@@ -41,6 +43,9 @@ export default class Overlay {
   get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set doDraw(d) { this.#doDraw = (isBoolean(d)) ? d : false }
   get doDraw() { return this.#doDraw }
+
+  destroy() {
+  }
 
   /**
    * Set a custom event listener

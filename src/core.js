@@ -259,20 +259,17 @@ export default class TradeXchart extends Tradex_chart {
   get Timeline() { return this.#MainPane.time }
   get WidgetsG() { return this.#WidgetsG }
   get Chart() { return this.#MainPane.chart }
+  get ChartPanes() { return this.#MainPane.chartPanes }
   get Indicators() { return this.#MainPane.indicators }
 
   get ready() { return this.#ready }
   get state() { return this.#state }
-  get chartData() { return this.state.data.chart.data }
-  get offChart() { return this.state.data.offchart }
-  get onChart() { return this.state.data.onchart }
-  get datasets() { return this.state.data.datasets }
   get allData() {
     return {
-      data: this.chartData,
-      onChart: this.onChart,
-      offChart: this.offChart,
-      datasets: this.datasets
+      data: this.state.data.chart.data,
+      onChart: this.state.data.offchart,
+      offChart: this.state.data.offchart,
+      datasets: this.state.data.datasets
     }
   }
   get rangeLimit() { return (isNumber(this.#range.initialCnt)) ? this.#range.initialCnt : RANGELIMIT }
@@ -282,7 +279,7 @@ export default class TradeXchart extends Tradex_chart {
 
   get theme() { return this.#theme }
   get settings() { return this.state.data.chart.settings }
-  get indicators() { return this.#indicators }
+  get indicatorClasses() { return this.#indicators }
   get TALib() { return this.#TALib }
   get TALibReady() { return TradeXchart.talibReady }
   get TALibError() { return TradeXchart.talibError }
@@ -397,7 +394,7 @@ export default class TradeXchart extends Tradex_chart {
       const rangeStart = calcTimeIndex(this.#time, this.#config?.range?.startTS)
       const end = (rangeStart) ? 
         rangeStart + this.#range.initialCnt :
-        this.chartData.length - 1
+        this.allData.data.length - 1
       const start = (rangeStart) ? rangeStart : end - this.#range.initialCnt
       this.#range.initialCnt = end - start
       this.setRange(start, end)

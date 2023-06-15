@@ -53,6 +53,7 @@ export default class MainPane {
   #parent
   #core
   #stateMachine
+  #destruction = false
 
   #elYAxis
   #elMain
@@ -60,7 +61,7 @@ export default class MainPane {
   #elTime
   #elOnChart
   #elScale
-  #elOffCharts = []
+  #elOffCharts = {}
   #elGrid
   #elCanvas
   #elViewport
@@ -73,6 +74,7 @@ export default class MainPane {
   #Chart
   #Time
   #chartGrid
+  #chartDeleteList = []
 
   #viewDefaultH = OFFCHARTDEFAULTHEIGHT // %
   #rowMinH = ROWMINHEIGHT // px
@@ -110,8 +112,8 @@ export default class MainPane {
   get shortName() { return this.#shortName }
   get core() { return this.#core }
   get chart() { return this.#Chart }
-  get offCharts() { return this.#ChartPanes }
   get chartPanes() { return this.#ChartPanes }
+  get chartDeleteList() { return this.#chartDeleteList }
   get time() { return this.#Time }
   get options() { return this.#options }
   get element() { return this.#elMain }
@@ -142,10 +144,7 @@ export default class MainPane {
   get stateMachine() { return this.#stateMachine }
   get graph() { return this.#Graph }
   get views() { return this.#core.state.data.views }
-  get indicators() { return {
-    onchart: this.#Chart.indicators,
-    offchart: this.#ChartPanes
-  } }
+  get indicators() { return this.getIndicators() }
   get elements() {
     return {
       elRows: this.elRows,
@@ -160,7 +159,7 @@ export default class MainPane {
   init(options) {
     const core = this.#core
 
-    this.#indicators = this.#core.indicators
+    this.#indicators = this.#core.indicatorClasses
     this.#elRows = this.#elMain.rows
     this.#elTime = this.#elMain.time
     this.#elGrid = this.#elMain.rows.grid
@@ -242,10 +241,13 @@ export default class MainPane {
   }
 
   destroy() {
+    this.#destruction = true
     this.stateMachine.destroy()
     this.#Time.destroy()
-    this.#ChartPanes.forEach((offChart, key) => {
-      offChart.destroy()
+    this.#ChartPanes.forEach((chartPane, key) => {
+      this.#chartDeleteList[key] = true
+      chartPane.destroy()
+      delete this.#chartDeleteList[key]
     })
     this.#Graph.destroy();
     this.#input.destroy()
@@ -328,7 +330,7 @@ export default class MainPane {
     ]
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
 
-    for (let [key, offChart] of this.offCharts) {
+    for (let [key, offChart] of this.chartPanes) {
       offChart.graph.overlays.list.get("cursor").layer.visible = true
     }
 
@@ -340,7 +342,7 @@ export default class MainPane {
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
     this.core.Chart.graph.render()
 
-    for (let [key, offChart] of this.offCharts) {
+    for (let [key, offChart] of this.chartPanes) {
       offChart.graph.overlays.list.get("cursor").layer.visible = true
       offChart.graph.render()
     }
@@ -353,7 +355,7 @@ export default class MainPane {
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false
     this.core.Chart.graph.render()
 
-    for (let [key, offChart] of this.offCharts) {
+    for (let [key, offChart] of this.chartPanes) {
       offChart.graph.overlays.list.get("cursor").layer.visible = false
       offChart.graph.render()
     }
@@ -468,21 +470,6 @@ export default class MainPane {
     }) 
   }
 
-  mount(el) {
-    // set up chart scale (yAxis)
-    this.#elYAxis.innerHTML = this.scaleNode(CLASS_CHART)
-    this.#elYAxis.querySelector(`.${CLASS_CHART}`).style.height = "100%"
-    this.#elYAxis.querySelector(`.${CLASS_CHART} tradex-scale`).style.height = "100%"
-  }
-
-  setWidth(w) {
-    // width handled automatically by CSS
-  }
-
-  setHeight(h) {
-    // height handled automatically by CSS
-  }
-
   setDimensions() {
     this.#elRows.previousDimensions()
 
@@ -532,20 +519,28 @@ export default class MainPane {
     this.element.style.cursor = cursor
   }
 
+  getIndicators() {
+    const ind = {}
+
+    this.#ChartPanes.forEach(
+      (value, key) => {
+        ind[key] = value.indicators
+      }
+    )
+    return ind
+  }
+
   registerChartViews(options) {
     this.#elRows.previousDimensions()
 
-    let keys;
-
-    keys = this.views.keys()
+    const onChart = []
     // iterate over chart panes and remove invalid indicators
-    for (let k of keys) {
+    for (let [k,oc] of this.views) {
 
-      // validate offChart entry
-      let oc = this.views.get(k) 
-      // are there any indicators to add?
-      if (oc.length === 0 ) {
-        if (k !== "onchart") this.views.delete(k)
+      if (k === "onchart") onChart.push(oc)
+      // validate entry - are there any indicators to add?
+      if (oc.length === 0 && k !== "onchart") {
+        this.views.delete(k)
         continue
       }
 
@@ -553,25 +548,31 @@ export default class MainPane {
       for (const [i, o] of oc.entries()) {
         // is valid?
         if (isObject(o) &&
-            ( o.type in this.core.indicators ||
+            ( o.type in this.core.indicatorClasses ||
               nonIndicators.includes(o.type))) 
             continue
         // remove invalid
-        this.#core.log(`offChart indicator ${oc.type} not added: not supported.`)
+        this.#core.log(`indicator ${oc.type} not added: not supported.`)
         oc.splice(i, 1)
       }
     }
- 
+    // set the primary chart
+    let primary = onChart[0]
+    for (let o of onChart) {
+      if (o?.primary === true) primary = o
+      else o.primary = false
+    }
+    primary.primary = true
+
     let heights = this.calcChartPaneHeights()
 
     options = {...options, ...heights}
 
     options.rowY = 0
-    keys = this.views.keys()
     // add chart views
-    for (let k of keys) {
+    for (let [k,v] of this.views) {
       options.type = k
-      options.view = this.views.get(k)
+      options.view = v
       this.addChartView(options)
       options.rowY += (k == "onchart") ? options.chartH : options.rowH
     }
@@ -622,19 +623,28 @@ export default class MainPane {
 
   removeChartView(viewID) {
     if (!isString(viewID) ||
-        !this.#ChartPanes.has(viewID)
+        !this.#ChartPanes.has(viewID) 
     ) return false
 
     const chartView = this.#ChartPanes.get(viewID)
+    if (chartView.isPrimary) {
+      this.#core.error(`Cannot remove primary chart! ${viewID}`)
+      return false
+    }
+
+    // enable deletion
+    this.#chartDeleteList[viewID] = true
+
     const w = this.rowsW
       let h = chartView.viewport.height
       let x = Math.floor(h / (this.#ChartPanes.size - 1))
       let r = h % x
 
     if (chartView.status !== "destroyed")
-      this.chartView.destroy()
+      chartView.destroy()
 
     this.#ChartPanes.delete(viewID)
+    delete this.#chartDeleteList[viewID]
 
     // resize remaining charts
     this.#ChartPanes.forEach((chartView, key) => {
@@ -644,8 +654,7 @@ export default class MainPane {
       r = 0
     })
     this.draw(this.range, true)
-
-    // this.emit("rowsResize", dimensions)
+    return true
   }
 
   /**
@@ -654,13 +663,13 @@ export default class MainPane {
    * @returns 
    */
   addIndicator(i) {
-    const indicator = this.core.indicators[i.type].ind
+    const indicator = this.core.indicatorClasses[i.type].ind
     const indType = (
       indicator.onChart === "both" && 
       isBoolean(i.onChart)) ? 
       i.onChart : false;
     if (
-      i?.type in this.core.indicators &&
+      i?.type in this.core.indicatorClasses &&
       indType === false
     ) {
       const cnt = this.#ChartPanes.size + 1
@@ -688,12 +697,12 @@ export default class MainPane {
       options.chartH = this.rowsH
     }
     else if (cnt === 2) {
-      // adjust chart size for first offChart
+      // adjust chart size for first secondary chart pane
       options.rowH = Math.round(this.rowsH * this.#viewDefaultH / 100)
       options.chartH = this.rowsH - options.rowH
     }
     else {
-      // adjust chart size for subsequent offCharts
+      // adjust chart size for subsequent chart panes
       options.rowH = Math.round(rowsH / this.#ChartPanes.size)
       options.chartH = this.rowsH - rowsH
       options.height = options.rowH

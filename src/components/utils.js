@@ -28,7 +28,7 @@ export default class UtilsBar {
     this.#elUtils = core.elUtils
     this.#utils = core.config?.utilsBar || utilsList
     this.#widgets = core.WidgetsG
-    this.#indicators = core.indicators || indicators
+    this.#indicators = core.indicatorClasses || indicators
     this.init()
   }
 
