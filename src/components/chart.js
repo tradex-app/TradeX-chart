@@ -115,6 +115,8 @@ export default class Chart {
     valueDiff: 100
   }
 
+  #indicatorDeleteList = {}
+
   constructor(core, options) {
     this.#core = core;
     this.#chartCnt = Chart.cnt
@@ -193,6 +195,8 @@ export default class Chart {
   get localRange() { return this.#localRange }
   get stream() { return this.#Stream }
   get streamCandle() { return this.#streamCandle }
+  set cursor(c) { this.element.style.cursor = c }
+  get cursor() { return this.element.style.cursor }
   get cursorPos() { return this.#cursorPos }
   set cursorActive(a) { this.#cursorActive = a }
   get cursorActive() { return this.#cursorActive }
@@ -222,7 +226,6 @@ export default class Chart {
   get view() { return this.#view }
   get viewport() { return this.#Graph.viewport }
   get layerGrid() { return this.#Graph.overlays.get("grid").layer }
-  // get overlays() { return this.#overlays }
   get overlays() { return this.getOverlays() }
   get overlayGrid() { return this.#Graph.overlays.get("grid").instance }
   get overlayTools() { return this.#overlayTools }
@@ -231,6 +234,9 @@ export default class Chart {
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
   get Divider() { return this.#Divider }
+  get indicatorDeleteList() { return this.#indicatorDeleteList }
+  get siblingPrev() { return this.sibling("prev") }
+  get siblingNext() { return this.sibling("next") }
 
   /**
    * Start chart and dependent components event listening. 
@@ -251,7 +257,7 @@ export default class Chart {
     this.draw(this.range);
 
     // set mouse pointer
-    this.setCursor("crosshair");
+    this.cursor = "crosshair"
 
     // start State Machine
     stateMachineConfig.id = this.id
@@ -276,7 +282,7 @@ export default class Chart {
     if ( this.#status === "destroyed") return
     // has this been invoked from removeChartView() ?
     if ( !this.core.MainPane.chartDeleteList[this.id] ) {
-      this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartView()" instead.`)
+      this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartPane()" instead.`)
       return
     }
 
@@ -358,13 +364,13 @@ export default class Chart {
   }
 
   onChartDrag(e) {
-    this.setCursor("grab")
+    this.cursor = "grab"
     this.core.MainPane.onChartDrag(e)
     this.scale.onChartDrag(e)
   }
 
   onChartDragDone(e) {
-    this.setCursor("crosshair")
+    this.cursor = "crosshair"
     this.core.MainPane.onChartDragDone(e)
     // this.scale.onChartDragDone(e)
   }
@@ -466,14 +472,7 @@ export default class Chart {
     this.draw(undefined, true)
     this.core.MainPane.draw(undefined, false)
     this.draw(undefined, true)
-  }
-
-  /**
-   * set cursor type
-   * @param {string} cursor 
-   */
-  setCursor(cursor) {
-    this.element.style.cursor = cursor
+    this.Divider.setPos()
   }
 
   setYAxisType(t) {
@@ -530,7 +529,7 @@ export default class Chart {
 
   /**
    * add an indicator
-   * @param {object} i - {type, name, ...[params]}
+   * @param {object} i - {type, name, ...params}
    */
   addIndicator(i) {
     const onChart = this.type === "onChart"
@@ -545,7 +544,7 @@ export default class Chart {
         class: indClass,
         params: {overlay: i}
       }
-      const r = this.graph.addOverlay(i.name, config)
+      return this.graph.addOverlay(i.name, config)
     }
     else return false
   }
@@ -564,11 +563,17 @@ export default class Chart {
   removeIndicator(id) {
     if (!isString(id) || !(id in this.indicators)) return false
 
+    // enable deletion
+    this.#indicatorDeleteList[id] = true
+
     this.indicators[id].instance.destroy()
     this.graph.removeOverlay(id)
+    this.draw()
 
     if (Object.keys(this.indicators).length === 0 && !this.isPrimary)
       this.emit("destroyChartView", this.id)
+
+    delete this.#indicatorDeleteList[id]
   }
 
   addTool(tool) {
@@ -670,49 +675,9 @@ export default class Chart {
 
     const action = this.#Legends.onMouseClick(e.currentTarget)
 
-    const el = this.element
-    const prevEl = el.previousElementSibling
-    const nextEl = el.nextElementSibling
-    const parentEl = el.parentNode
-
-    const scaleEl = this.scale.element
-    const prevScaleEl = scaleEl.previousElementSibling
-    const nextScaleEl = scaleEl.nextElementSibling
-    const parentScaleEl = scaleEl.parentNode
-        
-    const prevPane = (prevEl !== null) ? this.core.MainPane.chartPanes.get(prevEl.id) : null
-    const nextPane = (nextEl !== null) ? this.core.MainPane.chartPanes.get(nextEl.id) : null
-
     switch(action.icon) {
-      case "up": 
-        if (!isObject(prevEl) || !isObject(prevScaleEl)) return
-        parentEl.insertBefore(el, prevEl)
-        parentScaleEl.insertBefore(scaleEl, prevScaleEl)
-        this.Divider.setPos()
-
-        if (prevPane !== null) {
-          prevPane.Divider.setPos()
-          prevPane.Divider.show()
-          this.core.MainPane.chartPanes.swapKeys(this.id, prevEl.id)
-        }
-        if (el.previousElementSibling === null)
-          this.Divider.hide()
-        return;
-      case "down":
-        if (!isObject(nextEl) || !isObject(nextScaleEl)) return
-        parentEl.insertBefore(nextEl, el)
-        parentScaleEl.insertBefore(nextScaleEl, scaleEl)
-        this.Divider.setPos()
-
-        if (nextPane !== null) { 
-          nextPane.Divider.setPos()
-          this.Divider.show()
-          this.core.MainPane.chartPanes.swapKeys(this.id, nextEl.id)
-        }
-        if (nextEl.previousElementSibling === null)
-          nextPane.Divider.hide()
-          
-        return;
+      case "up": this.reorderUp(); return;
+      case "down": this.reorderDown(); return;
       case "collapse": return;
       case "maximize": return;
       case "restore": return;
@@ -720,6 +685,60 @@ export default class Chart {
       case "config": return;
       default: return;
     }
+  }
+
+  reorderUp() {
+    const {
+      el,
+      prevEl,
+      parentEl,
+      scaleEl,
+      prevScaleEl,
+      parentScaleEl,
+      prevPane,
+    } = {...this.currPrevNext()}
+
+    if (!isObject(prevEl) || !isObject(prevScaleEl)) return false
+    parentEl.insertBefore(el, prevEl)
+    parentScaleEl.insertBefore(scaleEl, prevScaleEl)
+    this.Divider.setPos()
+
+    if (prevPane !== null) {
+      prevPane.Divider.setPos()
+      prevPane.Divider.show()
+      this.core.MainPane.chartPanes.swapKeys(this.id, prevEl.id)
+    }
+    if (el.previousElementSibling === null)
+      this.Divider.hide()
+
+    return true;
+  }
+
+  reorderDown() {
+    const {
+      el,
+      nextEl,
+      parentEl,
+      scaleEl,
+      nextScaleEl,
+      parentScaleEl,
+      nextPane
+    } = {...this.currPrevNext()}
+
+    if (!isObject(nextEl) || !isObject(nextScaleEl)) return false
+    parentEl.insertBefore(nextEl, el)
+    parentScaleEl.insertBefore(nextScaleEl, scaleEl)
+    this.Divider.setPos()
+
+    if (nextPane !== null) { 
+      nextPane.Divider.setPos()
+      this.Divider.show()
+      this.core.MainPane.chartPanes.swapKeys(this.id, nextEl.id)
+    }
+    if (nextEl.previousElementSibling === null)
+      nextPane.Divider.hide()
+      
+    return true;
   }
 
   createGraph() {
@@ -751,13 +770,39 @@ export default class Chart {
   }
 
   /**
-   * Set the entire chart dimensions, this will cascade and resize components
-   * @param {number} width - width in pixels, defaults to current width
+   * Set chart pane and previous sibling heights
    * @param {number} height - height in pixels, defaults to current height
    */
-  resize(width = this.width, height = this.height) {
-    // adjust element, viewport and layers
-    // this.setDimensions({ w: width, h: height });
+  resize(height) {
+    const active = this
+    const prev = this.sibling()
+    if (prev === null) return {active: null, prev: null}
+
+    let yDelta, activeH, prevH;
+
+    if (isNumber(height) && height > this.core.MainPane.rowMinH) {
+
+    }
+    else {
+      yDelta = this.core.MainPane.cursorPos[5]
+      activeH = this.height - yDelta - 1
+      prevH  = prev.height + yDelta
+    }
+
+
+    if ( activeH >= this.core.MainPane.rowMinH
+      && prevH >= this.core.MainPane.rowMinH) {
+        active.setDimensions({w:undefined, h:activeH})
+        prev.setDimensions({w:undefined, h:prevH})
+        active.Divider.setPos()
+    }
+
+    active.element.style.userSelect = 'none';
+    // active.element.style.pointerEvents = 'none';
+    prev.element.style.userSelect = 'none';
+    // prev.element.style.pointerEvents = 'none';
+
+    return {active, prev}
   }
 
   /**
@@ -785,6 +830,46 @@ export default class Chart {
    */
   price2YPos(price) {
     return this.scale.yPos(price)
+  }
+
+  currPrevNext() {
+    const el = this.element
+    const prevEl = el.previousElementSibling
+    const nextEl = el.nextElementSibling
+    const parentEl = el.parentNode
+
+    const scaleEl = this.scale.element
+    const prevScaleEl = scaleEl.previousElementSibling
+    const nextScaleEl = scaleEl.nextElementSibling
+    const parentScaleEl = scaleEl.parentNode
+        
+    const prevPane = (prevEl !== null) ? this.core.MainPane.chartPanes.get(prevEl.id) : null
+    const nextPane = (nextEl !== null) ? this.core.MainPane.chartPanes.get(nextEl.id) : null
+
+    return {
+      el,
+      prevEl,
+      nextEl,
+      parentEl,
+      scaleEl,
+      prevScaleEl,
+      nextScaleEl,
+      parentScaleEl,
+      prevPane,
+      nextPane
+    }
+  }
+
+  sibling(s) {
+    s = (["prev", "next"].includes(s)) ? s : "prev"
+
+    let chartPanes = [...this.core.MainPane.chartPanes.keys()]
+    let i = chartPanes.indexOf(this.id)
+
+    if (s == "prev") --i
+    else ++i
+
+    return this.#core.MainPane.chartPanes.get(chartPanes[i]) || null
   }
   
 }

@@ -10,6 +10,10 @@ const template = document.createElement('template')
 // .viewport canvas ??? offChart no
 template.innerHTML = `
 <style>
+  :host {
+    overflow: hidden;
+  }
+
   .viewport {
     position: relative;
     width: 100%;

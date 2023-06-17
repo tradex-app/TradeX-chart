@@ -8,6 +8,7 @@ import Graph from "./views/classes/graph"
 import renderLoop from "./views/classes/renderLoop"
 import Chart from "./chart"
 import chartGrid from "./overlays/chart-grid"
+import Divider from "./widgets/divider"
 // import chartCompositor from "./overlays/chart-compositor"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-mainPane"
@@ -79,6 +80,7 @@ export default class MainPane {
   #viewDefaultH = OFFCHARTDEFAULTHEIGHT // %
   #rowMinH = ROWMINHEIGHT // px
 
+  #position = {}
   #cursorPos = [0, 0]
   #drag = {
     active: false,
@@ -133,6 +135,8 @@ export default class MainPane {
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elMain) }
   get range() { return this.#core.range }
+  set cursor(c) { this.element.style.cursor = c }
+  get cursor() { return this.element.style.cursor }
   get cursorPos() { return this.#cursorPos }
   get candleW() { return this.#Time.candleW }
   get theme() { return this.#core.theme }
@@ -257,7 +261,7 @@ export default class MainPane {
     this.off("setRange", this.draw)
     this.off("scrollUpdate", this.draw)
     this.off("chart_render", this.draw)
-    this.off("destroyChartView", this.removeChartView)
+    this.off("destroyChartView", this.removeChartPane)
 
     this.element.remove
   }
@@ -274,10 +278,13 @@ export default class MainPane {
     this.#input.on("keyup", this.onChartKeyUp.bind(this))
 
     this.#input.on("wheel", this.onMouseWheel.bind(this))
-    this.#input.on("pointermove", this.onMouseMove.bind(this))
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
     this.#input.on("pointerup", this.onChartDragDone.bind(this))
+    this.#input.on("pointermove", this.onMouseMove.bind(this))
+
+    // this.pointermove = this.onMouseMove.bind(this)
+    // this.#elRows.addEventListener("pointermove", this.pointermove)
 
     // listen/subscribe/watch for notifications
     this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue, this)
@@ -285,7 +292,7 @@ export default class MainPane {
     this.on("setRange", this.draw, this)
     this.on("scrollUpdate", this.draw, this)
     this.on("chart_render", this.draw, this)
-    this.on("destroyChartView", this.removeChartView, this)
+    this.on("destroyChartView", this.removeChartPane, this)
   }
 
   on(topic, handler, context) {
@@ -323,10 +330,46 @@ export default class MainPane {
   }
   
   onMouseMove(e) {
+    // console.log(e)
+    // return
+    // console.log(`onMouseMove:`, e.position.x, e.position.y, e.movement.x, e.movement.y)
+    // console.log(e.domEvent.center.y)
+    // console.log(e.domEvent.offsetCenter.y)
+
+    // const clientRect = this.elRows.getBoundingClientRect();
+    // const p = this.#position
+    // p.x2 = p?.x1
+    // p.y2 = p?.y1
+    // p.x1 = e.clientX - clientRect.left;
+    // p.y1 = e.clientY - clientRect.top;
+    // p.dx = p.x1 - p.x2
+    // p.dy = p.y1 - p.y2
+
+    // this.#cursorPos = [
+    //   p.x1, p.y1,
+    //   p.x2, p.y2,
+    //   p.dx, p.dy
+    // ]
+
+    // console.log(      p.x1, p.y1,
+    //   p.x2, p.y2,
+    //   p.dx, p.dy)
+
+    const p = this.#position
+    p.d2x = p?.d1x || null
+    p.d2y = p?.d1y || null
+    p.d1x = e.movement.x
+    p.d1y = e.movement.y
+    p.dx = Math.floor((p.d1x + p.d2x) / 2)
+    p.dy = Math.floor((p.d1y + p.d2y) / 2)
+    p.ts2 = p?.ts1 || null
+    p.ts1 = Date.now()
+
     this.#cursorPos = [
       e.position.x, e.position.y, 
       e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
+      p.dx, p.dy,
+      p.ts1, p.ts1 - p.ts2
     ]
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
 
@@ -499,7 +542,6 @@ export default class MainPane {
       this.#ChartPanes.forEach((chartView, key) => {
         chartH = Math.round(chartView.viewport.height * resizeH)
         chartView.setDimensions({w: width, h: chartH})
-        chartView.Divider.setPos()
       })
     }
 
@@ -513,10 +555,6 @@ export default class MainPane {
     let w = Math.round(this.width * this.buffer / 100) 
     let r = w % this.candleW
     return w - r
-  }
-
-  setCursor(cursor) {
-    this.element.style.cursor = cursor
   }
 
   getIndicators() {
@@ -573,16 +611,16 @@ export default class MainPane {
     for (let [k,v] of this.views) {
       options.type = k
       options.view = v
-      this.addChartView(options)
+      this.addChartPane(options)
       options.rowY += (k == "onchart") ? options.chartH : options.rowH
     }
   }
 
   /**
-   * add chart view - provides onChart and offChart indicators
+   * add chart pane - provides onChart and offChart indicators
    * @param {object} options 
    */
-  addChartView(options) {
+  addChartPane(options) {
     // insert a row to mount the indicator on
     let row,
         h = (options.type == "onchart") ? options.chartH : options.rowH;
@@ -617,11 +655,12 @@ export default class MainPane {
     }
     
     this.#ChartPanes.set(o.id, o)
-
     this.emit("addChartView", o)
+
+    return o
   }
 
-  removeChartView(viewID) {
+  removeChartPane(viewID) {
     if (!isString(viewID) ||
         !this.#ChartPanes.has(viewID) 
     ) return false
@@ -635,7 +674,7 @@ export default class MainPane {
     // enable deletion
     this.#chartDeleteList[viewID] = true
 
-    const w = this.rowsW
+    let w = this.rowsW
       let h = chartView.viewport.height
       let x = Math.floor(h / (this.#ChartPanes.size - 1))
       let r = h % x
@@ -650,7 +689,6 @@ export default class MainPane {
     this.#ChartPanes.forEach((chartView, key) => {
       h = chartView.viewport.height
       chartView.setDimensions({w: w, h: h + x + r})
-      chartView.Divider.setPos()
       r = 0
     })
     this.draw(this.range, true)
@@ -668,25 +706,31 @@ export default class MainPane {
       indicator.onChart === "both" && 
       isBoolean(i.onChart)) ? 
       i.onChart : false;
+
+    // adding off chart indicator
     if (
       i?.type in this.core.indicatorClasses &&
       indType === false
     ) {
       const cnt = this.#ChartPanes.size + 1
+      const view = (isArray(i?.view) && i.view.length > 0) ? 
+        i.view : [{ name: i.name, type: i.type }]
       const heights = this.calcChartPaneHeights(cnt)
-      const options = {...heights}
+      const options = {...i, ...heights}
             options.parent = this
             options.title = i.name
-            options.elements = {}
+            options.elements = { ...this.elements }
+            options.view = view
 
-      this.addChartView(i, options)
+      return this.addChartPane(options)
     }
     else return false
   }
 
-  calcChartPaneHeights() {
-    let cnt = this.views.size,
-        a = this.#viewDefaultH * (cnt - 1),
+  calcChartPaneHeights(cnt = this.views.size) {
+    if (!isNumber(cnt) || cnt < 1) cnt = this.views.size || 1
+
+    let a = this.#viewDefaultH * (cnt - 1),
         ratio = ( a / Math.log10( a * 2 ) ) / 100,
         rowsH = Math.round(this.rowsH * ratio),
         options = {};
@@ -748,43 +792,6 @@ export default class MainPane {
 
   zoomRange() {
     this.draw(this.range, true)
-  }
-
-  /**
-   * resize a pair of adjacent chart panes and position their divider
-   * @param {object} divider 
-   * @param {array} pos 
-   * @returns {object} - {active, previous} chart panes
-   */
-  resizeRowPair(divider, pos) {
-    const error = {active: null, prev: null}
-    if (!isObject(divider) || !isArray(pos)) return error
-
-    let active = divider.chartPane
-    let id = active.id
-    let chartPanes = [...this.#ChartPanes.keys()]
-    let i = chartPanes.indexOf(id)
-
-    if (i < 1) return error
-
-    let prev = this.#ChartPanes.get(chartPanes[i - 1]);
-    // why does activeH need - 1 to calc correct sizing?
-    let activeH = active.height - pos[5] - 1
-    let prevH  = prev.height + pos[5]
-
-    if ( activeH >= this.#rowMinH
-        && prevH >= this.#rowMinH) {
-          divider.chartPane.Divider.updatePos(pos)
-          active.setDimensions({w:undefined, h:activeH})
-          prev.setDimensions({w:undefined, h:prevH})
-    }
-
-    active.element.style.userSelect = 'none';
-    // active.element.style.pointerEvents = 'none';
-    prev.element.style.userSelect = 'none';
-    // prev.element.style.pointerEvents = 'none';
-
-    return {active, prev}
   }
 
 }

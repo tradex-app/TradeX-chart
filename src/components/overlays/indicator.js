@@ -48,6 +48,7 @@ export default class indicator extends Overlay {
   #precision = 2
   #style = {}
   #legendID
+  #status
 
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
 
@@ -117,11 +118,26 @@ export default class indicator extends Overlay {
   }
 
   destroy() {
+    if ( this.#status === "destroyed") return
+    // has this been invoked from removeIndicator() ?
+    const chartPane = this.core.MainPane.chartPanes.get(this.chartPane)
+    if ( !chartPane.indicatorDeleteList[this.id] ) {
+      this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeIndicator()" instead.`)
+      return
+    }
+
     // this.off(STREAM_NEWVALUE, this.onStreamNewValue)
     this.off(STREAM_UPDATE, this.onStreamUpdate)
 
     this.chart.legend.remove(this.#legendID)
     // TODO: remove state data
+    this.#status = "destroyed"
+  }
+
+  remove() {
+    this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPane}`)
+    this.emit(`${this.chartPane}_removeIndicator`, {id: this.id, paneID: this.chartPane})
+    return;
   }
 
   eventsListen() {
@@ -173,14 +189,14 @@ export default class indicator extends Overlay {
       case "collapse": return;
       case "maximize": return;
       case "restore": return;
-      case "remove":
-        this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPane}`)
-        this.emit(`${this.chartPane}_removeIndicator`, {id: this.id, paneID: this.chartPane})
-        return;
+      case "remove": this.remove(); return;
       case "config": return;
       default: return;
     }
   }
+
+
+
 
   /**
    * validate indicator inputs and outputs

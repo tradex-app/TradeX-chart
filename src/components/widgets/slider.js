@@ -46,6 +46,9 @@ export default class Slider {
     }
   }
 
+  set cursor(c) { this.#elHandle.style.cursor = c }
+  get cursor() { return this.#elHandle.style.cursor }
+
   // TODO: remove event listeners on destroy
 
   eventsListen() {
@@ -134,10 +137,6 @@ export default class Slider {
 
     w  = w / c * 100
     this.#elHandle.style.width = `${w}%`
-  }
-
-  setCursor(cursor) {
-    this.#elHandle.style.cursor = cursor
   }
 
 }

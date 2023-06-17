@@ -50,6 +50,8 @@ export default
           target: 'divider_pointerdrag',
           action (data) {
             // console.log('offChart: transition from "idle" to "divider_pointerdrag" state')
+            this.context.currCursor = this.context.origin.cursor
+            this.context.origin.cursor = "row-resize"
           },
         },
         global_resize: {
@@ -63,7 +65,7 @@ export default
     chart_pan: {
       onEnter (data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
-        this.context.origin.setCursor("grab")
+        this.context.origin.cursor = "grab"
       },
       onExit (data) {
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
@@ -74,7 +76,7 @@ export default
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to "chart_pan"`)
             this.context.origin.updateRange(data) 
-            this.context.origin.setCursor("grab")
+            this.context.origin.cursor = "grab"
           },
         },
         chart_panDone: {
@@ -82,7 +84,7 @@ export default
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to "chart_panDone"`)
             this.context.origin.updateRange(data) 
-            this.context.origin.setCursor("default")
+            this.context.origin.cursor = "default"
           },
         },
       }
@@ -195,12 +197,6 @@ export default
     },
     divider_pointerdrag: {
       onEnter(data) {
-        const pos = [
-          data.e.dragstart.x, data.e.dragstart.y,
-          data.e.dragend.x, data.e.dragend.y,
-          data.e.movement.x, data.e.movement.y
-        ]
-        this.context.pair = this.context.origin.resizeRowPair(data, pos) 
 
       },
       onExit(data) {
@@ -216,9 +212,10 @@ export default
         divider_pointerdragend: {
           target: "idle",
           action (data) {
-            this.actions.removeProperty.call(this)
-
-            // console.log(`${this.id}: transition from "${this.state}" to "divider_mousemove"`)
+            // this.actions.removeProperty.call(this)
+            // this.context.pair.active.Divider.setPos()
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+            this.context.origin.cursor = this.context.currCursor
           },
         },
       }

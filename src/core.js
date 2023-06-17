@@ -1001,20 +1001,32 @@ export default class TradeXchart extends Tradex_chart {
       !isObject(params)
     ) return false
     
+    this.log(`Adding the ${name} : ${i} indicator`)
+
+    let r
+
+    if (this.#indicators[i].ind.onChart) {
     const indicator = {
       type: i,
       name: name,
       ...params
     }
+      r = this.Chart.addIndicator(indicator);
+    }
+    else {
+      const view = (isArray(params?.view)) ?
+        params.view :
+        [{name, type: i, ...params}]
+      const options = {
+        type: i,
+        name: name,
+        view: view
+      }
+      r = this.#MainPane.addIndicator(options);
+    }
 
-    console.log(`Adding the ${name} : ${i} indicator`)
-
-    if (this.#indicators[i].ind.onChart)
-      this.Chart.addIndicator(indicator);
-    else
-      this.#MainPane.addIndicator(indicator);
-
-    this.emit("addIndicatorDone", indicator)
+    this.emit("addIndicatorDone", r)
+    console.log(`Added indicator:`, r)
   }
 
   /**

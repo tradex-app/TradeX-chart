@@ -8,7 +8,7 @@ export default
   states: {
     idle: {
       onEnter(data) {
-        this.context.origin.setCursor("ns-resize")
+        this.context.origin.cursor = "ns-resize"
 
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },

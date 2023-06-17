@@ -8,7 +8,7 @@ export default
   states: {
     idle: {
       onEnter(data) {
-        this.context.origin.setCursor("crosshair")
+        this.context.origin.cursor = "crosshair"
 
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
@@ -43,7 +43,7 @@ export default
         tool_activated: {
           target: 'tool_activated',
           action (data) {
-            this.context.origin.setCursor("default")
+            this.context.origin.cursor = "default"
 
             // console.log(`${this.id}: transition from "${this.state}" to  "xAxis_scale"`)
           },

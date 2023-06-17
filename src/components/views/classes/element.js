@@ -40,15 +40,14 @@ export default class element extends HTMLElement {
   set width(w) { this.setDim(w, "width") }
   get height() { return this.offsetHeight }
   set height(h) { this.setDim(h, "height") }
+  set cursor(c) { this.style.cursor = c }
+  get cursor() { return this.style.cursor }
 
   setDim(v, d) {
     if (isNumber(v)) v += "px"
-    else if (!isString(v)) return
+    if (!["width", "height"].includes(d) || !isString(v)) return
     this.style[d] = v
   }
 
-  setCursor(cursor) {
-    this.style.cursor = cursor
-  }
 
 }

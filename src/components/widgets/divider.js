@@ -83,6 +83,8 @@ export default class Divider {
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elDivider) }
   get height() { return this.#elDivider.getBoundingClientRect().height }
+  set cursor(c) { this.#elDivider.style.cursor = c }
+  get cursor() { return this.#elDivider.style.cursor }
 
   init() {
     // insert element
@@ -91,7 +93,7 @@ export default class Divider {
 
   start() {
     // set mouse pointer
-    this.setCursor("n-resize")
+    this.cursor = "row-resize"
 
     // set up event listeners
     this.eventsListen()
@@ -138,7 +140,8 @@ export default class Divider {
   }
 
   onPointerDrag(e) {
-    this.#cursorPos = [e.position.x, e.position.y]
+    this.#cursorPos = this.#core.MainPane.cursorPos // [e.position.x, e.position.y]
+    this.#elDivider.style.background = this.#theme.divider.active
     this.emit(`${this.id}_pointerdrag`, this.#cursorPos)
     this.emit(`divider_pointerdrag`, {
       id: this.id,
@@ -146,11 +149,13 @@ export default class Divider {
       pos: this.#cursorPos,
       chartPane: this.chartPane
     })
+    this.chartPane.resize()
   }
 
   onPointerDragEnd(e) {
     if ("position" in e)
-    this.#cursorPos = [e.position.x, e.position.y]
+    this.#elDivider.style.background = this.#theme.divider.idle
+    this.#cursorPos = this.#core.MainPane.cursorPos // [e.position.x, e.position.y]
     this.emit(`${this.id}_pointerdragend`, this.#cursorPos)
     this.emit(`divider_pointerdragend`, {
       id: this.id,
@@ -158,6 +163,7 @@ export default class Divider {
       pos: this.#cursorPos,
       chartPane: this.chartPane
     })
+    this.chartPane.resize()
   }
 
   mount() {
@@ -167,10 +173,6 @@ export default class Divider {
       this.#elDividers.lastElementChild.insertAdjacentHTML("afterend", this.dividerNode())
 
     this.#elDivider = DOM.findBySelector(`#${this.#id}`, this.#elDividers)
-  }
-
-  setCursor(cursor) {
-    this.#elDivider.style.cursor = cursor
   }
 
   dividerNode() {
@@ -195,12 +197,6 @@ export default class Divider {
       <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
     `
     return node
-  }
-
-  updatePos(pos) {
-    let dividerY = this.#elDivider.offsetTop;
-        dividerY += pos[5]
-    this.#elDivider.style.top = `${dividerY}px`
   }
 
   setPos() {

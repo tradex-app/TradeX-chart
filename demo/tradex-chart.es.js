@@ -13,7 +13,7 @@ function _mergeNamespaces(n, m) {
   return Object.freeze(Object.defineProperty(n, Symbol.toStringTag, { value: 'Module' }));
 }
 
-const version = "0.123.0";
+const version = "0.124.1";
 
 function isArray (v) {
   return Array.isArray(v)
@@ -4885,11 +4885,13 @@ class Divider {
   get pos() { return this.dimensions }
   get dimensions() { return DOM$1.elementDimPos(this.#elDivider) }
   get height() { return this.#elDivider.getBoundingClientRect().height }
+  set cursor(c) { this.#elDivider.style.cursor = c; }
+  get cursor() { return this.#elDivider.style.cursor }
   init() {
     this.mount();
   }
   start() {
-    this.setCursor("n-resize");
+    this.cursor = "row-resize";
     this.eventsListen();
   }
   destroy() {
@@ -4922,7 +4924,8 @@ class Divider {
     this.#core.MainPane.onMouseEnter();
   }
   onPointerDrag(e) {
-    this.#cursorPos = [e.position.x, e.position.y];
+    this.#cursorPos = this.#core.MainPane.cursorPos;
+    this.#elDivider.style.background = this.#theme.divider.active;
     this.emit(`${this.id}_pointerdrag`, this.#cursorPos);
     this.emit(`divider_pointerdrag`, {
       id: this.id,
@@ -4930,10 +4933,12 @@ class Divider {
       pos: this.#cursorPos,
       chartPane: this.chartPane
     });
+    this.chartPane.resize();
   }
   onPointerDragEnd(e) {
     if ("position" in e)
-    this.#cursorPos = [e.position.x, e.position.y];
+    this.#elDivider.style.background = this.#theme.divider.idle;
+    this.#cursorPos = this.#core.MainPane.cursorPos;
     this.emit(`${this.id}_pointerdragend`, this.#cursorPos);
     this.emit(`divider_pointerdragend`, {
       id: this.id,
@@ -4941,6 +4946,7 @@ class Divider {
       pos: this.#cursorPos,
       chartPane: this.chartPane
     });
+    this.chartPane.resize();
   }
   mount() {
     if (this.#elDividers.lastElementChild == null)
@@ -4948,9 +4954,6 @@ class Divider {
     else
       this.#elDividers.lastElementChild.insertAdjacentHTML("afterend", this.dividerNode());
     this.#elDivider = DOM$1.findBySelector(`#${this.#id}`, this.#elDividers);
-  }
-  setCursor(cursor) {
-    this.#elDivider.style.cursor = cursor;
   }
   dividerNode() {
     let top = this.#chartPane.pos.top - DOM$1.elementDimPos(this.#elDividers).top,
@@ -4970,11 +4973,6 @@ class Divider {
       <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
     `;
     return node
-  }
-  updatePos(pos) {
-    let dividerY = this.#elDivider.offsetTop;
-        dividerY += pos[5];
-    this.#elDivider.style.top = `${dividerY}px`;
   }
   setPos() {
     let top = this.#chartPane.pos.top - DOM$1.elementDimPos(this.#elDividers).top;
@@ -5430,6 +5428,7 @@ class Overlay {
   #scene
   #params
   #doDraw = true
+  id
   constructor(target, xAxis=false, yAxis=false, theme, parent, params={}) {
     this.#core = parent.core;
     this.#parent = parent;
@@ -5453,6 +5452,8 @@ class Overlay {
   get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
   set doDraw(d) { this.#doDraw = (isBoolean(d)) ? d : false; }
   get doDraw() { return this.#doDraw }
+  destroy() {
+  }
   on(topic, handler, context) {
     this.#core.on(topic, handler, context);
   }
@@ -5754,6 +5755,8 @@ class indicator extends Overlay {
   #updateValueCB
   #precision = 2
   #style = {}
+  #legendID
+  #status
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
     super(target, xAxis, yAxis, undefined, parent, params);
     this.#params = params;
@@ -5770,6 +5773,7 @@ class indicator extends Overlay {
   set name(n) { this.#name = n; }
   get shortName() { return this.#shortName }
   set shortName(n) { this.#shortName = n; }
+  get chartPane() { return this.#params.overlay.paneID }
   get onChart() { return this.#onChart }
   set onChart(c) { this.#onChart = c; }
   get scaleOverlay() { return this.#scaleOverlay }
@@ -5781,6 +5785,7 @@ class indicator extends Overlay {
   get scale() { return this.parent.scale }
   get type() { return this.#type }
   get overlay() { return this.#overlay }
+  get legendID() { return this.#legendID }
   get indicator() { return this.#indicator }
   get TALib() { return this.#TALib }
   get range() { return this.core.range }
@@ -5806,8 +5811,21 @@ class indicator extends Overlay {
   get value() {
     return this.#value
   }
-  end() {
+  destroy() {
+    if ( this.#status === "destroyed") return
+    const chartPane = this.core.MainPane.chartPanes.get(this.chartPane);
+    if ( !chartPane.indicatorDeleteList[this.id] ) {
+      this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeIndicator()" instead.`);
+      return
+    }
     this.off(STREAM_UPDATE, this.onStreamUpdate);
+    this.chart.legend.remove(this.#legendID);
+    this.#status = "destroyed";
+  }
+  remove() {
+    this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPane}`);
+    this.emit(`${this.chartPane}_removeIndicator`, {id: this.id, paneID: this.chartPane});
+    return;
   }
   eventsListen() {
     this.on(STREAM_UPDATE, this.onStreamUpdate, this);
@@ -5825,6 +5843,21 @@ class indicator extends Overlay {
   }
   onStreamUpdate(candle) {
     this.value = candle;
+  }
+  onLegendAction(e) {
+    const action = this.chart.legend.onMouseClick(e.currentTarget);
+    switch(action.icon) {
+      case "up":
+        return;
+      case "down":
+        return;
+      case "collapse": return;
+      case "maximize": return;
+      case "restore": return;
+      case "remove": this.remove(); return;
+      case "config": return;
+      default: return;
+    }
   }
   defineIndicator(i, api) {
     if (!isObject(i)) i = {};
@@ -5854,7 +5887,7 @@ class indicator extends Overlay {
       parent: this,
       source: this.legendInputs.bind(this)
     };
-    this.chart.legend.add(legend);
+    this.#legendID = this.chart.legend.add(legend);
   }
   legendInputs(pos=this.chart.cursorPos) {
     const colours = [this.style.strokeStyle];
@@ -5863,23 +5896,6 @@ class indicator extends Overlay {
     let l = limit(this.overlay.data.length - 1, 0, Infinity);
         c = limit(c, 0, l);
     return {c, colours}
-  }
-  onLegendAction(e) {
-    const action = this.chart.legend.onMouseClick(e.currentTarget);
-    console.log(`Legend Control: ${action.id} ${action.icon}`);
-    console.log(`onChart: ${this.onChart}`);
-    console.log(this.parent.parent.parent.element);
-    console.log(this.parent.parent.parent.view);
-    switch(action.icon) {
-      case "up": break;
-      case "down": break;
-      case "collapse": break;
-      case "maximize": break;
-      case "restore": break;
-      case "remove": break;
-      case "config": break;
-      default: return;
-    }
   }
   indicatorInput(start, end) {
     let input = [];
@@ -6607,13 +6623,12 @@ class element extends HTMLElement {
   set width(w) { this.setDim(w, "width"); }
   get height() { return this.offsetHeight }
   set height(h) { this.setDim(h, "height"); }
+  set cursor(c) { this.style.cursor = c; }
+  get cursor() { return this.style.cursor }
   setDim(v, d) {
     if (isNumber(v)) v += "px";
-    else if (!isString$1(v)) return
+    if (!["width", "height"].includes(d) || !isString$1(v)) return
     this.style[d] = v;
-  }
-  setCursor(cursor) {
-    this.style.cursor = cursor;
   }
 }
 
@@ -7143,6 +7158,8 @@ class Slider {
       this.eventsListen();
     }
   }
+  set cursor(c) { this.#elHandle.style.cursor = c; }
+  get cursor() { return this.#elHandle.style.cursor }
   eventsListen() {
   this.#input = new Input(this.#elHandle, {disableContextMenu: false});
   this.#input.on("mouseenter", debounce(this.onMouseEnter, 1, this, true));
@@ -7216,9 +7233,6 @@ class Slider {
     this.#elHandle.style.marginLeft = `${p}%`;
     w  = w / c * 100;
     this.#elHandle.style.width = `${w}%`;
-  }
-  setCursor(cursor) {
-    this.#elHandle.style.cursor = cursor;
   }
 }
 
@@ -7599,11 +7613,13 @@ class Overlays {
   start() {
     this.eventsListen();
   }
-  end() {
-    this.#parent.off("resize", (dimensions) => this.onResize);
+  destroy() {
+    for (let k of this.#list.keys()) {
+      this.removeOverlay(k);
+    }
+    this.#list = null;
   }
   eventsListen() {
-    this.#parent.on("resize", (dimensions) => this.onResize.bind(this));
   }
   on(topic, handler, context) {
     this.#core.on(topic, handler, context);
@@ -7619,10 +7635,11 @@ class Overlays {
   }
   addOverlays(overlays) {
     let r = [];
-    let s;
+    let k, s;
     for (let o of overlays) {
       s = this.addOverlay(o[0], o[1]);
-      r.push([o[0], s]);
+      k = s.instance?.id || o[0];
+      r.push([k, s]);
     }
     return r
   }
@@ -7639,13 +7656,20 @@ class Overlays {
         this,
         overlay.params
       );
-      this.#list.set(key, overlay);
+      if (!isString$1(overlay.instance?.id)) overlay.instance.id = key;
+      this.#list.set(overlay.instance.id, overlay);
       return true
     }
     catch (e) {
       console.error(`Error: Cannot instantiate ${key} overlay / indicator`);
       console.error(e);
       return false
+    }
+  }
+  removeOverlay(key) {
+    if (this.#list.has(key)) {
+      this.#list.get(key).layer.remove();
+      this.#list.delete(key);
     }
   }
 }
@@ -7800,11 +7824,7 @@ class graph {
   get viewport() { return this.#viewport }
   get overlays() { return this.#overlays }
   destroy() {
-    let oList = this.#overlays.list;
-    for (let [key, overlay] of oList) {
-      overlay.instance = null;
-    }
-    oList = null;
+    this.#overlays.destroy();
     this.#viewport.destroy();
   }
   setSize(w, h, lw) {
@@ -7843,8 +7863,12 @@ class graph {
   addOverlay(key, overlay) {
     return this.#overlays.addOverlay(key, overlay)
   }
+  removeOverlay(key) {
+    return this.#overlays.removeOverlay(key)
+  }
   draw(range=this.range, update=false) {
     const oList = this.#overlays.list;
+    if (!(oList instanceof xMap)) return false
     for (let [key, overlay] of oList) {
       if (!isObject(overlay) ||
           !isFunction(overlay?.instance?.draw)) continue
@@ -8306,65 +8330,33 @@ class Legends {
       this.#elTarget.style.removeProperty(property);
     }
   }
-  buildLegend(o) {
-    const theme = this.#core.theme;
-      let styleInputs = "";
-      let styleLegend = `${theme.legend.font}; color: ${theme.legend.colour}; text-align: left;`;
-      let styleLegendTitle = "";
-    const styleControls = "";
-    const t = this.#elTarget;
-    const controls = (!theme.legend.controls) ? "" :
-    `
-      <div class="controls" style="${styleControls}">
-        ${t.buildControls(o)}
-      </div>
-    `;
-    switch (o?.type) {
-      case "chart":
-        styleLegendTitle += "font-size: 1.5em;";
-        break;
-      case "offchart":
-        styleLegend += " margin-bottom: -1.5em;";
-        styleLegendTitle += "";
-        o.title = "";
-        break;
-      default:
-        styleLegendTitle += "font-size: 1.2em;";
-        break;
-    }
-    const node = `
-      <div id="legend_${o.id}" class="legend ${o.type}" style="${styleLegend}" data-type="${o.type}" data-id="${o.id}" data-parent="${o.parent.id}">
-        <div class="lower">
-          <span class="title" style="${styleLegendTitle}">${o.title}</span>
-          <dl style="${styleInputs}">${t.buildInputs(o)}</dl>
-        </div>
-        <div class="upper">
-            <span class="title" style="${styleLegendTitle}">${o.title}</span>
-            ${controls}
-      </div>
-     </div>
-    `;
-    return node
-  }
   add(options) {
     if (!isObject(options) || !("title" in options)) return false
+    let click;
     const parentError = () => {this.#core.error("ERROR: Legend parent missing!");};
     options.id = options?.id || uid("legend");
     options.type = options?.type || "overlay";
     options.parent = options?.parent || parentError;
-    const html = this.buildLegend(options);
+    const html = this.elTarget.buildLegend(options, this.#core.theme);
     this.#elTarget.legends.insertAdjacentHTML('beforeend', html);
     const legendEl = this.#elTarget.legends.querySelector(`#legend_${options.id}`);
-    this.#list[options.id] = {el: legendEl, type: options.type, source: options?.source};
     this.#controlsList = legendEl.querySelectorAll(`.control`);
-    for (let c of this.#controlsList) {
-      let svg = c.querySelector('svg');
+    this.#list[options.id] = {
+      el: legendEl,
+      type: options.type,
+      source: options?.source,
+      click: []
+    };
+    for (let el of this.#controlsList) {
+      let svg = el.querySelector('svg');
       svg.style.width = `${this.#theme.controlsW}px`;
       svg.style.height = `${this.#theme.controlsH}px`;
       svg.style.fill = `${this.#theme.controlsColour}`;
       svg.onpointerover = (e) => e.currentTarget.style.fill = this.#theme.controlsOver;
       svg.onpointerout = (e) => e.currentTarget.style.fill = this.#theme.controlsColour;
-      c.addEventListener('click', options.parent.onLegendAction.bind(options.parent));
+      click = options.parent.onLegendAction.bind(options.parent);
+      this.#list[options.id].click.push({el, click});
+      el.addEventListener('click', click);
     }
     return options.id
   }
@@ -8372,10 +8364,10 @@ class Legends {
     if (!(id in this.#list)
     || this.#list[id].type === "chart") return false
     this.#list[id].el.remove();
-    delete this.#list[id];
-    for (let c of this.#controlsList) {
-      c.removeEventListener('click', this.onMouseClick);
+    for (let c of this.#list[id].click) {
+      c.el.removeEventListener('click', c.click);
     }
+    delete this.#list[id];
     return true
   }
   update(id, data) {
@@ -8394,7 +8386,7 @@ var stateMachineConfig$4 = {
   states: {
     idle: {
       onEnter (data) {
-        this.context.origin.setCursor("crosshair");
+        this.context.origin.cursor = "crosshair";
       },
       onExit (data) {
       },
@@ -8417,7 +8409,7 @@ var stateMachineConfig$4 = {
         tool_activated: {
           target: 'tool_activated',
           action (data) {
-            this.context.origin.setCursor("default");
+            this.context.origin.cursor = "default";
           },
         },
       }
@@ -8735,7 +8727,7 @@ var stateMachineConfig$3 = {
   states: {
     idle: {
       onEnter(data) {
-        this.context.origin.setCursor("ns-resize");
+        this.context.origin.cursor = "ns-resize";
       },
       onExit(data) {
       },
@@ -9005,6 +8997,8 @@ class ScaleBar {
   get height() { return this.#element.getBoundingClientRect().height }
   get width() { return this.#element.getBoundingClientRect().width }
   get element() { return this.#element }
+  set cursor(c) { this.#element.style.cursor = c; }
+  get cursor() { return this.#element.style.cursor }
   get layerCursor() { return this.#layerCursor }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
@@ -9129,9 +9123,6 @@ class ScaleBar {
     this.#yAxis.mode = "automatic";
     this.parent.draw(this.range, true);
     this.draw();
-  }
-  setCursor(cursor) {
-    this.#element.style.cursor = cursor;
   }
   yPos(yData) { return this.#yAxis.yPos(yData) }
   yPosStream(yData) { return this.#yAxis.lastYData2Pixel(yData) }
@@ -9659,7 +9650,6 @@ class Chart {
   #view
   #viewport;
   #layersTools = new xMap();
-  #overlays = new xMap()
   #overlayTools = new xMap();
   #cursorPos = [0, 0];
   #cursorActive = false;
@@ -9671,6 +9661,7 @@ class Chart {
     valueMin: 0,
     valueDiff: 100
   }
+  #indicatorDeleteList = {}
   constructor(core, options) {
     this.#core = core;
     this.#chartCnt = Chart.cnt;
@@ -9700,7 +9691,7 @@ class Chart {
       chartLegend.parent = this;
       chartLegend.source = () => { return {inputs:{}, colours:[], labels: []} };
       this.legend.add(chartLegend);
-      this.yAxisType = this.core.indicators[options.view[0].type].ind.scale;
+      this.yAxisType = this.core.indicatorClasses[options.view[0].type].ind.scale;
     }
     const opts = {...options};
           opts.parent = this;
@@ -9725,6 +9716,7 @@ class Chart {
   get type() { return this.#type }
   get status() { return this.#status }
   get isOnChart() { return this.#type === "onChart" }
+  get isPrimary() { return this.#options.view.primary || false }
   get options() { return this.#options }
   get element() { return this.#elTarget }
   get pos() { return this.dimensions }
@@ -9738,6 +9730,8 @@ class Chart {
   get localRange() { return this.#localRange }
   get stream() { return this.#Stream }
   get streamCandle() { return this.#streamCandle }
+  set cursor(c) { this.element.style.cursor = c; }
+  get cursor() { return this.element.style.cursor }
   get cursorPos() { return this.#cursorPos }
   set cursorActive(a) { this.#cursorActive = a; }
   get cursorActive() { return this.#cursorActive }
@@ -9767,20 +9761,23 @@ class Chart {
   get view() { return this.#view }
   get viewport() { return this.#Graph.viewport }
   get layerGrid() { return this.#Graph.overlays.get("grid").layer }
-  get overlays() { return this.#overlays }
+  get overlays() { return this.getOverlays() }
   get overlayGrid() { return this.#Graph.overlays.get("grid").instance }
   get overlayTools() { return this.#overlayTools }
   get overlaysDefault() { return defaultOverlays$1[this.type] }
-  get indicators() { return this.overlays }
+  get indicators() { return this.getIndicators() }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
   get stateMachine() { return this.#stateMachine }
   get Divider() { return this.#Divider }
+  get indicatorDeleteList() { return this.#indicatorDeleteList }
+  get siblingPrev() { return this.sibling("prev") }
+  get siblingNext() { return this.sibling("next") }
   start() {
     this.#Time = this.#core.Timeline;
     this.createGraph();
     this.#Scale.start();
     this.draw(this.range);
-    this.setCursor("crosshair");
+    this.cursor = "crosshair";
     stateMachineConfig$4.id = this.id;
     stateMachineConfig$4.context = this;
     this.stateMachine = stateMachineConfig$4;
@@ -9792,7 +9789,11 @@ class Chart {
     this.#status = "running";
   }
   destroy() {
-    if (this.#status === "destroyed") return
+    if ( this.#status === "destroyed") return
+    if ( !this.core.MainPane.chartDeleteList[this.id] ) {
+      this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartPane()" instead.`);
+      return
+    }
     this.stateMachine.destroy();
     this.Divider.destroy();
     this.#Scale.destroy();
@@ -9808,6 +9809,9 @@ class Chart {
       this.off("chart_yAxisRedraw", this.onYAxisRedraw);
     this.element.remove();
     this.#status = "destroyed";
+  }
+  remove() {
+    this.core.log(`Deleting chart pane: ${this.id}`);
     this.emit("destroyChartView", this.id);
   }
   eventsListen() {
@@ -9824,6 +9828,7 @@ class Chart {
     this.on(STREAM_NEWVALUE, this.onStreamNewValue, this);
     this.on(STREAM_UPDATE, this.onStreamUpdate, this);
     this.on(STREAM_FIRSTVALUE, this.onStreamNewValue, this);
+    this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this);
     if (this.isOnChart)
       this.on("chart_yAxisRedraw", this.onYAxisRedraw, this);
   }
@@ -9837,12 +9842,12 @@ class Chart {
     this.#core.emit(topic, data);
   }
   onChartDrag(e) {
-    this.setCursor("grab");
+    this.cursor = "grab";
     this.core.MainPane.onChartDrag(e);
     this.scale.onChartDrag(e);
   }
   onChartDragDone(e) {
-    this.setCursor("crosshair");
+    this.cursor = "crosshair";
     this.core.MainPane.onChartDragDone(e);
   }
   onMouseMove(e) {
@@ -9895,6 +9900,9 @@ class Chart {
   onYAxisRedraw() {
     if (this.isOnChart) this.refresh();
   }
+  onDeleteIndicator(i) {
+    this.removeIndicator(i.id);
+  }
   setHeight(h) {
     if (!isNumber(h)) h = this.height || this.#parent.height;
     this.#elTarget.style.height = `${h}px`;
@@ -9913,9 +9921,7 @@ class Chart {
     this.draw(undefined, true);
     this.core.MainPane.draw(undefined, false);
     this.draw(undefined, true);
-  }
-  setCursor(cursor) {
-    this.element.style.cursor = cursor;
+    this.Divider.setPos();
   }
   setYAxisType(t) {
     if (
@@ -9927,12 +9933,13 @@ class Chart {
   }
   addOverlays(overlays) {
     if (!isArray(overlays) || overlays.length < 1) return false
+    const overlayList = [];
     for (let o of overlays) {
       const config = {fixed: false, required: false};
-      if (o.type in this.core.indicators) {
-        config.cnt = this.core.indicators[o.type].ind.cnt;
+      if (o.type in this.core.indicatorClasses) {
+        config.cnt = this.core.indicatorClasses[o.type].ind.cnt;
         config.id = `${this.id}-${o.type}_${config.cnt}`;
-        config.class = this.core.indicators[o.type].ind;
+        config.class = this.core.indicatorClasses[o.type].ind;
       }
       else if (o.type in optionalOverlays[this.type]) {
         config.cnt = 1;
@@ -9943,33 +9950,49 @@ class Chart {
       config.params = { overlay: o, };
       o.id = config.id;
       o.paneID = this.id;
-      this.overlays.set(o.name, config);
+      overlayList.push([o.id, config]);
     }
-    const r = this.graph.addOverlays(Array.from(this.overlays));
-    for (let o of r) {
-      if (!o[1]) this.overlays.delete(o[0]);
-    }
+    this.graph.addOverlays(overlayList);
     return true
+  }
+  getOverlays() {
+    return Object.fromEntries([...this.#Graph.overlays.list])
   }
   addIndicator(i) {
     const onChart = this.type === "onChart";
-    const indClass = this.core.indicators[i.type].ind;
+    const indClass = this.core.indicatorClasses[i.type].ind;
     const indType = (indClass.constructor.type === "both") ? onChart : indClass.prototype.onChart;
     if (
-        i?.type in this.core.indicators &&
+        i?.type in this.core.indicatorClasses &&
         onChart === indType
       ) {
+      i.paneID = this.id;
       const config = {
         class: indClass,
         params: {overlay: i}
       };
-      const r = this.graph.addOverlay(i.name, config);
-      if (r) {
-        this.#overlays.set(i.name, config);
-        return true
-      }
+      return this.graph.addOverlay(i.name, config)
     }
     else return false
+  }
+  getIndicators() {
+    const indicators = Object.keys(this.core.indicatorClasses);
+    const ind = {};
+    for (let [key, value] of Object.entries(this.overlays)) {
+      if (indicators.includes(value.params?.overlay?.type))
+      ind[key] = value;
+    }
+    return ind
+  }
+  removeIndicator(id) {
+    if (!isString$1(id) || !(id in this.indicators)) return false
+    this.#indicatorDeleteList[id] = true;
+    this.indicators[id].instance.destroy();
+    this.graph.removeOverlay(id);
+    this.draw();
+    if (Object.keys(this.indicators).length === 0 && !this.isPrimary)
+      this.emit("destroyChartView", this.id);
+    delete this.#indicatorDeleteList[id];
   }
   addTool(tool) {
     let { layerConfig } = this.layerConfig();
@@ -10022,53 +10045,62 @@ class Chart {
   }
   onLegendAction(e) {
     const action = this.#Legends.onMouseClick(e.currentTarget);
-    const el = this.element;
-    const prevEl = el.previousElementSibling;
-    const nextEl = el.nextElementSibling;
-    const parentEl = el.parentNode;
-    const scaleEl = this.scale.element;
-    const prevScaleEl = scaleEl.previousElementSibling;
-    const nextScaleEl = scaleEl.nextElementSibling;
-    const parentScaleEl = scaleEl.parentNode;
-    const prevPane = (prevEl !== null) ? this.core.MainPane.chartPanes.get(prevEl.id) : null;
-    const nextPane = (nextEl !== null) ? this.core.MainPane.chartPanes.get(nextEl.id) : null;
     switch(action.icon) {
-      case "up":
-        if (!isObject(prevEl) || !isObject(prevScaleEl)) return
-        parentEl.insertBefore(el, prevEl);
-        parentScaleEl.insertBefore(scaleEl, prevScaleEl);
-        this.Divider.setPos();
-        if (prevPane !== null) {
-          prevPane.Divider.setPos();
-          prevPane.Divider.show();
-          this.core.MainPane.chartPanes.swapKeys(this.id, prevEl.id);
-        }
-        if (el.previousElementSibling === null)
-          this.Divider.hide();
-        return;
-      case "down":
-        if (!isObject(nextEl) || !isObject(nextScaleEl)) return
-        parentEl.insertBefore(nextEl, el);
-        parentScaleEl.insertBefore(nextScaleEl, scaleEl);
-        this.Divider.setPos();
-        if (nextPane !== null) {
-          nextPane.Divider.setPos();
-          this.Divider.show();
-          this.core.MainPane.chartPanes.swapKeys(this.id, nextEl.id);
-        }
-        if (nextEl.previousElementSibling === null)
-          nextPane.Divider.hide();
-        return;
+      case "up": this.reorderUp(); return;
+      case "down": this.reorderDown(); return;
       case "collapse": return;
       case "maximize": return;
       case "restore": return;
-      case "remove":
-        this.core.log(`Deleting chart pane: ${this.id}`);
-        this.destroy();
-        return;
+      case "remove": this.remove(); return;
       case "config": return;
       default: return;
     }
+  }
+  reorderUp() {
+    const {
+      el,
+      prevEl,
+      parentEl,
+      scaleEl,
+      prevScaleEl,
+      parentScaleEl,
+      prevPane,
+    } = {...this.currPrevNext()};
+    if (!isObject(prevEl) || !isObject(prevScaleEl)) return false
+    parentEl.insertBefore(el, prevEl);
+    parentScaleEl.insertBefore(scaleEl, prevScaleEl);
+    this.Divider.setPos();
+    if (prevPane !== null) {
+      prevPane.Divider.setPos();
+      prevPane.Divider.show();
+      this.core.MainPane.chartPanes.swapKeys(this.id, prevEl.id);
+    }
+    if (el.previousElementSibling === null)
+      this.Divider.hide();
+    return true;
+  }
+  reorderDown() {
+    const {
+      el,
+      nextEl,
+      parentEl,
+      scaleEl,
+      nextScaleEl,
+      parentScaleEl,
+      nextPane
+    } = {...this.currPrevNext()};
+    if (!isObject(nextEl) || !isObject(nextScaleEl)) return false
+    parentEl.insertBefore(nextEl, el);
+    parentScaleEl.insertBefore(nextScaleEl, scaleEl);
+    this.Divider.setPos();
+    if (nextPane !== null) {
+      nextPane.Divider.setPos();
+      this.Divider.show();
+      this.core.MainPane.chartPanes.swapKeys(this.id, nextEl.id);
+    }
+    if (nextEl.previousElementSibling === null)
+      nextPane.Divider.hide();
+    return true;
   }
   createGraph() {
     let overlays = copyDeep(this.overlaysDefault);
@@ -10091,7 +10123,26 @@ class Chart {
     this.overlayGrid.draw("y");
     this.#Graph.render();
   }
-  resize(width = this.width, height = this.height) {
+  resize(height) {
+    const active = this;
+    const prev = this.sibling();
+    if (prev === null) return {active: null, prev: null}
+    let yDelta, activeH, prevH;
+    if (isNumber(height) && height > this.core.MainPane.rowMinH) ;
+    else {
+      yDelta = this.core.MainPane.cursorPos[5];
+      activeH = this.height - yDelta - 1;
+      prevH  = prev.height + yDelta;
+    }
+    if ( activeH >= this.core.MainPane.rowMinH
+      && prevH >= this.core.MainPane.rowMinH) {
+        active.setDimensions({w:undefined, h:activeH});
+        prev.setDimensions({w:undefined, h:prevH});
+        active.Divider.setPos();
+    }
+    active.element.style.userSelect = 'none';
+    prev.element.style.userSelect = 'none';
+    return {active, prev}
   }
   zoomRange() {
     this.draw(this.range, true);
@@ -10102,6 +10153,38 @@ class Chart {
   }
   price2YPos(price) {
     return this.scale.yPos(price)
+  }
+  currPrevNext() {
+    const el = this.element;
+    const prevEl = el.previousElementSibling;
+    const nextEl = el.nextElementSibling;
+    const parentEl = el.parentNode;
+    const scaleEl = this.scale.element;
+    const prevScaleEl = scaleEl.previousElementSibling;
+    const nextScaleEl = scaleEl.nextElementSibling;
+    const parentScaleEl = scaleEl.parentNode;
+    const prevPane = (prevEl !== null) ? this.core.MainPane.chartPanes.get(prevEl.id) : null;
+    const nextPane = (nextEl !== null) ? this.core.MainPane.chartPanes.get(nextEl.id) : null;
+    return {
+      el,
+      prevEl,
+      nextEl,
+      parentEl,
+      scaleEl,
+      prevScaleEl,
+      nextScaleEl,
+      parentScaleEl,
+      prevPane,
+      nextPane
+    }
+  }
+  sibling(s) {
+    s = (["prev", "next"].includes(s)) ? s : "prev";
+    let chartPanes = [...this.core.MainPane.chartPanes.keys()];
+    let i = chartPanes.indexOf(this.id);
+    if (s == "prev") --i;
+    else ++i;
+    return this.#core.MainPane.chartPanes.get(chartPanes[i]) || null
   }
 }
 
@@ -10139,6 +10222,8 @@ var stateMachineConfig$2 = {
         divider_pointerdrag: {
           target: 'divider_pointerdrag',
           action (data) {
+            this.context.currCursor = this.context.origin.cursor;
+            this.context.origin.cursor = "row-resize";
           },
         },
         global_resize: {
@@ -10150,7 +10235,7 @@ var stateMachineConfig$2 = {
     },
     chart_pan: {
       onEnter (data) {
-        this.context.origin.setCursor("grab");
+        this.context.origin.cursor = "grab";
       },
       onExit (data) {
       },
@@ -10159,14 +10244,14 @@ var stateMachineConfig$2 = {
           target: 'chart_pan',
           action (data) {
             this.context.origin.updateRange(data);
-            this.context.origin.setCursor("grab");
+            this.context.origin.cursor = "grab";
           },
         },
         chart_panDone: {
           target: 'idle',
           action (data) {
             this.context.origin.updateRange(data);
-            this.context.origin.setCursor("default");
+            this.context.origin.cursor = "default";
           },
         },
       }
@@ -10260,12 +10345,6 @@ var stateMachineConfig$2 = {
     },
     divider_pointerdrag: {
       onEnter(data) {
-        const pos = [
-          data.e.dragstart.x, data.e.dragstart.y,
-          data.e.dragend.x, data.e.dragend.y,
-          data.e.movement.x, data.e.movement.y
-        ];
-        this.context.pair = this.context.origin.resizeRowPair(data, pos);
       },
       onExit(data) {
       },
@@ -10278,7 +10357,7 @@ var stateMachineConfig$2 = {
         divider_pointerdragend: {
           target: "idle",
           action (data) {
-            this.actions.removeProperty.call(this);
+            this.context.origin.cursor = this.context.currCursor;
           },
         },
       }
@@ -10326,13 +10405,14 @@ class MainPane {
   #parent
   #core
   #stateMachine
+  #destruction = false
   #elYAxis
   #elMain
   #elRows
   #elTime
   #elOnChart
   #elScale
-  #elOffCharts = []
+  #elOffCharts = {}
   #elGrid
   #elCanvas
   #elViewport
@@ -10344,8 +10424,10 @@ class MainPane {
   #Chart
   #Time
   #chartGrid
+  #chartDeleteList = []
   #viewDefaultH = OFFCHARTDEFAULTHEIGHT
   #rowMinH = ROWMINHEIGHT
+  #position = {}
   #cursorPos = [0, 0]
   #drag = {
     active: false,
@@ -10374,8 +10456,8 @@ class MainPane {
   get shortName() { return this.#shortName }
   get core() { return this.#core }
   get chart() { return this.#Chart }
-  get offCharts() { return this.#ChartPanes }
   get chartPanes() { return this.#ChartPanes }
+  get chartDeleteList() { return this.#chartDeleteList }
   get time() { return this.#Time }
   get options() { return this.#options }
   get element() { return this.#elMain }
@@ -10395,6 +10477,8 @@ class MainPane {
   get pos() { return this.dimensions }
   get dimensions() { return DOM$1.elementDimPos(this.#elMain) }
   get range() { return this.#core.range }
+  set cursor(c) { this.element.style.cursor = c; }
+  get cursor() { return this.element.style.cursor }
   get cursorPos() { return this.#cursorPos }
   get candleW() { return this.#Time.candleW }
   get theme() { return this.#core.theme }
@@ -10406,10 +10490,7 @@ class MainPane {
   get stateMachine() { return this.#stateMachine }
   get graph() { return this.#Graph }
   get views() { return this.#core.state.data.views }
-  get indicators() { return {
-    onchart: this.#Chart.indicators,
-    offchart: this.#ChartPanes
-  } }
+  get indicators() { return this.getIndicators() }
   get elements() {
     return {
       elRows: this.elRows,
@@ -10421,7 +10502,7 @@ class MainPane {
   }
   init(options) {
     this.#core;
-    this.#indicators = this.#core.indicators;
+    this.#indicators = this.#core.indicatorClasses;
     this.#elRows = this.#elMain.rows;
     this.#elTime = this.#elMain.time;
     this.#elGrid = this.#elMain.rows.grid;
@@ -10476,10 +10557,13 @@ class MainPane {
     this.stateMachine.start();
   }
   destroy() {
+    this.#destruction = true;
     this.stateMachine.destroy();
     this.#Time.destroy();
-    this.#ChartPanes.forEach((offChart, key) => {
-      offChart.destroy();
+    this.#ChartPanes.forEach((chartPane, key) => {
+      this.#chartDeleteList[key] = true;
+      chartPane.destroy();
+      delete this.#chartDeleteList[key];
     });
     this.#Graph.destroy();
     this.#input.destroy();
@@ -10488,7 +10572,7 @@ class MainPane {
     this.off("setRange", this.draw);
     this.off("scrollUpdate", this.draw);
     this.off("chart_render", this.draw);
-    this.off("destroyChartView", this.removeChartView);
+    this.off("destroyChartView", this.removeChartPane);
     this.element.remove;
   }
   eventsListen() {
@@ -10498,16 +10582,16 @@ class MainPane {
     this.#input.on("keydown", this.onChartKeyDown.bind(this));
     this.#input.on("keyup", this.onChartKeyUp.bind(this));
     this.#input.on("wheel", this.onMouseWheel.bind(this));
-    this.#input.on("pointermove", this.onMouseMove.bind(this));
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
     this.#input.on("pointerup", this.onChartDragDone.bind(this));
+    this.#input.on("pointermove", this.onMouseMove.bind(this));
     this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue, this);
     this.on(STREAM_NEWVALUE, this.onNewStreamValue, this);
     this.on("setRange", this.draw, this);
     this.on("scrollUpdate", this.draw, this);
     this.on("chart_render", this.draw, this);
-    this.on("destroyChartView", this.removeChartView, this);
+    this.on("destroyChartView", this.removeChartPane, this);
   }
   on(topic, handler, context) {
     this.#core.on(topic, handler, context);
@@ -10536,13 +10620,23 @@ class MainPane {
     this.draw(this.range, true);
   }
   onMouseMove(e) {
+    const p = this.#position;
+    p.d2x = p?.d1x || null;
+    p.d2y = p?.d1y || null;
+    p.d1x = e.movement.x;
+    p.d1y = e.movement.y;
+    p.dx = Math.floor((p.d1x + p.d2x) / 2);
+    p.dy = Math.floor((p.d1y + p.d2y) / 2);
+    p.ts2 = p?.ts1 || null;
+    p.ts1 = Date.now();
     this.#cursorPos = [
       e.position.x, e.position.y,
       e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
+      p.dx, p.dy,
+      p.ts1, p.ts1 - p.ts2
     ];
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true;
-    for (let [key, offChart] of this.offCharts) {
+    for (let [key, offChart] of this.chartPanes) {
       offChart.graph.overlays.list.get("cursor").layer.visible = true;
     }
     this.emit("main_mousemove", this.#cursorPos);
@@ -10551,7 +10645,7 @@ class MainPane {
     this.core.Timeline.showCursorTime();
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true;
     this.core.Chart.graph.render();
-    for (let [key, offChart] of this.offCharts) {
+    for (let [key, offChart] of this.chartPanes) {
       offChart.graph.overlays.list.get("cursor").layer.visible = true;
       offChart.graph.render();
     }
@@ -10561,7 +10655,7 @@ class MainPane {
     this.onPointerActive(false);
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false;
     this.core.Chart.graph.render();
-    for (let [key, offChart] of this.offCharts) {
+    for (let [key, offChart] of this.chartPanes) {
       offChart.graph.overlays.list.get("cursor").layer.visible = false;
       offChart.graph.render();
     }
@@ -10659,15 +10753,6 @@ class MainPane {
       }
     });
   }
-  mount(el) {
-    this.#elYAxis.innerHTML = this.scaleNode(CLASS_CHART);
-    this.#elYAxis.querySelector(`.${CLASS_CHART}`).style.height = "100%";
-    this.#elYAxis.querySelector(`.${CLASS_CHART} tradex-scale`).style.height = "100%";
-  }
-  setWidth(w) {
-  }
-  setHeight(h) {
-  }
   setDimensions() {
     this.#elRows.previousDimensions();
     let resizeH = this.#elRows.heightDeltaR;
@@ -10692,7 +10777,6 @@ class MainPane {
       this.#ChartPanes.forEach((chartView, key) => {
         chartH = Math.round(chartView.viewport.height * resizeH);
         chartView.setDimensions({w: width, h: chartH});
-        chartView.Divider.setPos();
       });
     }
     this.rowsOldH = this.rowsH;
@@ -10704,40 +10788,50 @@ class MainPane {
     let r = w % this.candleW;
     return w - r
   }
-  setCursor(cursor) {
-    this.element.style.cursor = cursor;
+  getIndicators() {
+    const ind = {};
+    this.#ChartPanes.forEach(
+      (value, key) => {
+        ind[key] = value.indicators;
+      }
+    );
+    return ind
   }
   registerChartViews(options) {
     this.#elRows.previousDimensions();
-    let keys;
-    keys = this.views.keys();
-    for (let k of keys) {
-      let oc = this.views.get(k);
-      if (oc.length === 0 ) {
-        if (k !== "onchart") this.views.delete(k);
+    const onChart = [];
+    for (let [k,oc] of this.views) {
+      if (k === "onchart") onChart.push(oc);
+      if (oc.length === 0 && k !== "onchart") {
+        this.views.delete(k);
         continue
       }
       for (const [i, o] of oc.entries()) {
         if (isObject(o) &&
-            ( o.type in this.core.indicators ||
+            ( o.type in this.core.indicatorClasses ||
               nonIndicators.includes(o.type)))
             continue
-        this.#core.log(`offChart indicator ${oc.type} not added: not supported.`);
+        this.#core.log(`indicator ${oc.type} not added: not supported.`);
         oc.splice(i, 1);
       }
     }
+    let primary = onChart[0];
+    for (let o of onChart) {
+      if (o?.primary === true) primary = o;
+      else o.primary = false;
+    }
+    primary.primary = true;
     let heights = this.calcChartPaneHeights();
     options = {...options, ...heights};
     options.rowY = 0;
-    keys = this.views.keys();
-    for (let k of keys) {
+    for (let [k,v] of this.views) {
       options.type = k;
-      options.view = this.views.get(k);
-      this.addChartView(options);
+      options.view = v;
+      this.addChartPane(options);
       options.rowY += (k == "onchart") ? options.chartH : options.rowH;
     }
   }
-  addChartView(options) {
+  addChartPane(options) {
     let row,
         h = (options.type == "onchart") ? options.chartH : options.rowH;
     this.#elRows.insertAdjacentHTML(
@@ -10765,50 +10859,60 @@ class MainPane {
     }
     this.#ChartPanes.set(o.id, o);
     this.emit("addChartView", o);
+    return o
   }
-  removeChartView(viewID) {
+  removeChartPane(viewID) {
     if (!isString$1(viewID) ||
         !this.#ChartPanes.has(viewID)
     ) return false
     const chartView = this.#ChartPanes.get(viewID);
-    const w = this.rowsW;
+    if (chartView.isPrimary) {
+      this.#core.error(`Cannot remove primary chart! ${viewID}`);
+      return false
+    }
+    this.#chartDeleteList[viewID] = true;
+    let w = this.rowsW;
       let h = chartView.viewport.height;
       let x = Math.floor(h / (this.#ChartPanes.size - 1));
       let r = h % x;
     if (chartView.status !== "destroyed")
-      this.chartView.destroy();
+      chartView.destroy();
     this.#ChartPanes.delete(viewID);
+    delete this.#chartDeleteList[viewID];
     this.#ChartPanes.forEach((chartView, key) => {
       h = chartView.viewport.height;
       chartView.setDimensions({w: w, h: h + x + r});
-      chartView.Divider.setPos();
       r = 0;
     });
     this.draw(this.range, true);
+    return true
   }
   addIndicator(i) {
-    const indicator = this.core.indicators[i.type].ind;
+    const indicator = this.core.indicatorClasses[i.type].ind;
     const indType = (
       indicator.onChart === "both" &&
       isBoolean(i.onChart)) ?
       i.onChart : false;
     if (
-      i?.type in this.core.indicators &&
+      i?.type in this.core.indicatorClasses &&
       indType === false
     ) {
       const cnt = this.#ChartPanes.size + 1;
+      const view = (isArray(i?.view) && i.view.length > 0) ?
+        i.view : [{ name: i.name, type: i.type }];
       const heights = this.calcChartPaneHeights(cnt);
-      const options = {...heights};
+      const options = {...i, ...heights};
             options.parent = this;
             options.title = i.name;
-            options.elements = {};
-      this.addChartView(i, options);
+            options.elements = { ...this.elements };
+            options.view = view;
+      return this.addChartPane(options)
     }
     else return false
   }
-  calcChartPaneHeights() {
-    let cnt = this.views.size,
-        a = this.#viewDefaultH * (cnt - 1),
+  calcChartPaneHeights(cnt = this.views.size) {
+    if (!isNumber(cnt) || cnt < 1) cnt = this.views.size || 1;
+    let a = this.#viewDefaultH * (cnt - 1),
         ratio = ( a / Math.log10( a * 2 ) ) / 100,
         rowsH = Math.round(this.rowsH * ratio),
         options = {};
@@ -10858,27 +10962,6 @@ class MainPane {
   }
   zoomRange() {
     this.draw(this.range, true);
-  }
-  resizeRowPair(divider, pos) {
-    const error = {active: null, prev: null};
-    if (!isObject(divider) || !isArray(pos)) return error
-    let active = divider.chartPane;
-    let id = active.id;
-    let chartPanes = [...this.#ChartPanes.keys()];
-    let i = chartPanes.indexOf(id);
-    if (i < 1) return error
-    let prev = this.#ChartPanes.get(chartPanes[i - 1]);
-    let activeH = active.height - pos[5] - 1;
-    let prevH  = prev.height + pos[5];
-    if ( activeH >= this.#rowMinH
-        && prevH >= this.#rowMinH) {
-          divider.chartPane.Divider.updatePos(pos);
-          active.setDimensions({w:undefined, h:activeH});
-          prev.setDimensions({w:undefined, h:prevH});
-    }
-    active.element.style.userSelect = 'none';
-    prev.element.style.userSelect = 'none';
-    return {active, prev}
   }
 }
 
@@ -11319,6 +11402,44 @@ class tradeXLegends extends element {
     this.#title = t;
     this.elTitle.innerHTML = t;
   }
+  buildLegend(o, theme) {
+      let styleInputs = "";
+      let styleLegend = `${theme.legend.font}; color: ${theme.legend.colour}; text-align: left;`;
+      let styleLegendTitle = "";
+    const styleControls = "";
+    const controls = (!theme.legend.controls) ? "" :
+    `
+      <div class="controls" style="${styleControls}">
+        ${this.buildControls(o)}
+      </div>
+    `;
+    switch (o?.type) {
+      case "chart":
+        styleLegendTitle += "font-size: 1.5em;";
+        break;
+      case "offchart":
+        styleLegend += " margin-bottom: -1.5em;";
+        styleLegendTitle += "";
+        o.title = "";
+        break;
+      default:
+        styleLegendTitle += "font-size: 1.2em;";
+        break;
+    }
+    const node = `
+      <div id="legend_${o.id}" class="legend ${o.type}" style="${styleLegend}" data-type="${o.type}" data-id="${o.id}" data-parent="${o.parent.id}">
+        <div class="lower">
+          <span class="title" style="${styleLegendTitle}">${o.title}</span>
+          <dl style="${styleInputs}">${this.buildInputs(o)}</dl>
+        </div>
+        <div class="upper">
+            <span class="title" style="${styleLegendTitle}">${o.title}</span>
+            ${controls}
+      </div>
+     </div>
+    `;
+    return node
+  }
   buildInputs(o) {
     let i = 0,
         inp = "",
@@ -11346,7 +11467,7 @@ class tradeXLegends extends element {
     inp += `<span id="${id}_collapse" class="control" data-icon="collapse">${collapse}</span>`;
     inp += `<span id="${id}_maximize" class="control" data-icon="maximize">${maximize}</span>`;
     inp += `<span id="${id}_restore" class="control" data-icon="restore">${restore}</span>`;
-    inp += (o?.type == "offchart") ? `<span id="${id}_remove" class="control" data-icon="remove">${close}</span>` : ``;
+    inp += (o?.type !== "chart") ? `<span id="${id}_remove" class="control" data-icon="remove">${close}</span>` : ``;
     inp += (o?.type !== "offchart") ? `<span id="${id}_config" class="control" data-icon="config">${config}</span>` : ``;
     return inp
   }
@@ -11356,6 +11477,10 @@ customElements.get('tradex-legends') || window.customElements.define('tradex-leg
 const template$7 = document.createElement('template');
 template$7.innerHTML = `
 <style>
+  :host {
+    overflow: hidden;
+  }
+
   .viewport {
     position: relative;
     width: 100%;
@@ -11975,7 +12100,7 @@ class UtilsBar {
     this.#elUtils = core.elUtils;
     this.#utils = core.config?.utilsBar || utilsList;
     this.#widgets = core.WidgetsG;
-    this.#indicators = core.indicators || Indicators;
+    this.#indicators = core.indicatorClasses || Indicators;
     this.init();
   }
   log(l) { this.#core.log(l); }
@@ -13307,19 +13432,16 @@ class TradeXchart extends tradeXChart {
   get Timeline() { return this.#MainPane.time }
   get WidgetsG() { return this.#WidgetsG }
   get Chart() { return this.#MainPane.chart }
+  get ChartPanes() { return this.#MainPane.chartPanes }
   get Indicators() { return this.#MainPane.indicators }
   get ready() { return this.#ready }
   get state() { return this.#state }
-  get chartData() { return this.state.data.chart.data }
-  get offChart() { return this.state.data.offchart }
-  get onChart() { return this.state.data.onchart }
-  get datasets() { return this.state.data.datasets }
   get allData() {
     return {
-      data: this.chartData,
-      onChart: this.onChart,
-      offChart: this.offChart,
-      datasets: this.datasets
+      data: this.state.data.chart.data,
+      onChart: this.state.data.offchart,
+      offChart: this.state.data.offchart,
+      datasets: this.state.data.datasets
     }
   }
   get rangeLimit() { return (isNumber(this.#range.initialCnt)) ? this.#range.initialCnt : RANGELIMIT }
@@ -13328,7 +13450,7 @@ class TradeXchart extends tradeXChart {
   get TimeUtils() { return Time }
   get theme() { return this.#theme }
   get settings() { return this.state.data.chart.settings }
-  get indicators() { return this.#indicators }
+  get indicatorClasses() { return this.#indicators }
   get TALib() { return this.#TALib }
   get TALibReady() { return TradeXchart.talibReady }
   get TALibError() { return TradeXchart.talibError }
@@ -13413,7 +13535,7 @@ class TradeXchart extends tradeXChart {
       const rangeStart = calcTimeIndex(this.#time, this.#config?.range?.startTS);
       const end = (rangeStart) ?
         rangeStart + this.#range.initialCnt :
-        this.chartData.length - 1;
+        this.allData.data.length - 1;
       const start = (rangeStart) ? rangeStart : end - this.#range.initialCnt;
       this.#range.initialCnt = end - start;
       this.setRange(start, end);
@@ -13772,17 +13894,29 @@ class TradeXchart extends tradeXChart {
       !isString$1(name) &&
       !isObject(params)
     ) return false
+    this.log(`Adding the ${name} : ${i} indicator`);
+    let r;
+    if (this.#indicators[i].ind.onChart) {
     const indicator = {
       type: i,
       name: name,
       ...params
     };
-    console.log(`Adding the ${name} : ${i} indicator`);
-    if (this.#indicators[i].ind.onChart)
-      this.Chart.addIndicator(indicator);
-    else
-      this.#MainPane.addIndicator(indicator);
-    this.emit("addIndicatorDone", indicator);
+      r = this.Chart.addIndicator(indicator);
+    }
+    else {
+      const view = (isArray(params?.view)) ?
+        params.view :
+        [{name, type: i, ...params}];
+      const options = {
+        type: i,
+        name: name,
+        view: view
+      };
+      r = this.#MainPane.addIndicator(options);
+    }
+    this.emit("addIndicatorDone", r);
+    console.log(`Added indicator:`, r);
   }
   hasStateIndicator(i, dataset="searchAll") {
     if (!isString$1(i) || !isString$1(dataset)) return false

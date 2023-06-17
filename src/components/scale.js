@@ -82,6 +82,8 @@ export default class ScaleBar {
   get height() { return this.#element.getBoundingClientRect().height }
   get width() { return this.#element.getBoundingClientRect().width }
   get element() { return this.#element }
+  set cursor(c) { this.#element.style.cursor = c }
+  get cursor() { return this.#element.style.cursor }
   get layerCursor() { return this.#layerCursor }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
@@ -245,10 +247,6 @@ export default class ScaleBar {
     this.#yAxis.mode = "automatic"
     this.parent.draw(this.range, true)
     this.draw()
-  }
-
-  setCursor(cursor) {
-    this.#element.style.cursor = cursor
   }
 
   // convert chart price or offchart indicator y data to pixel pos
