@@ -1,12 +1,12 @@
 // DX.js
 
-import indicator from "../components/overlays/indicator"
+import Indicator from "../components/overlays/indicator"
 import { DX as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { uid } from "../utils/utilities"
 
 
-export default class DX extends indicator {
+export default class DX extends Indicator {
 
   name = 'Directional Movement Index'
   shortName = 'DX'

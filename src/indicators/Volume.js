@@ -1,6 +1,6 @@
 // Volume.js
 
-import indicator from "../components/overlays/indicator"
+import Indicator from "../components/overlays/indicator"
 import { 
   YAXIS_TYPES
 } from "../definitions/chart";
@@ -12,7 +12,7 @@ import { isBoolean } from "../utils/typeChecks";
  * @class Volume
  * @extends {indicator}
  */
-export default class Volume extends indicator {
+export default class Volume extends Indicator {
   #ID
   #name = 'Relative Strength Index'
   #shortName = 'RSI'

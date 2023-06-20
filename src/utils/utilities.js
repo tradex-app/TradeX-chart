@@ -290,6 +290,20 @@ export function uid(tag="ID") {
   return `${tag}_${dateString}_${randomness}`
 }
 
+/**
+ * test if (array of) values exist in target array
+ * @param {array} values - single value or array of values 
+ * @param {array|*} arr - target array to search
+ * @return {boolean}  
+ */
+export function valuesInArray(values, arr) {
+  if (!isArray(arr)) return false
+  if (!isArray(values)) return arr.includes(values)
+  return values.every(value => {
+    return arr.includes(value)
+  })
+}
+
 // https://stackoverflow.com/a/20151856/15109215
 export function b64toBlob(b64Data, contentType, sliceSize) {
   contentType = contentType || '';

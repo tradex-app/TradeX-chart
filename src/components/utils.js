@@ -6,7 +6,7 @@ import DOM from "../utils/DOM"
 import { UtilsStyle } from "../definitions/style"
 import { CLASS_UTILS } from "../definitions/core"
 import utilsList from "../definitions/utils"
-import indicators from "../definitions/indicators"
+import Indicators from "../definitions/indicators"
 
 
 export default class UtilsBar {

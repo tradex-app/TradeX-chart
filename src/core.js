@@ -961,7 +961,7 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   /**
-   * import indicators
+   * import Indicators
    * @param {object} i - indicators {id, name, event, ind}
    * @param {boolean} flush - expunge default indicators
    * @returns boolean
@@ -990,43 +990,19 @@ export default class TradeXchart extends Tradex_chart {
    * @param {string} i - indicator
    * @param {string} name - identifier
    * @param {object} params - {settings, data}
-   * @returns 
+   * @returns {Indicator|false} - indicator instance or false
    */
   addIndicator(i, name=i, params={}) {
-    console.log(`addIndicator() ${i}, ${name}, ${params}`)
-    if (
-      !isString(i) &&
-      !(i in this.#indicators) &&
-      !isString(name) &&
-      !isObject(params)
-    ) return false
-    
-    this.log(`Adding the ${name} : ${i} indicator`)
+    return this.#MainPane.addIndicator(i, name=i, params={})
+  }
 
-    let r
-
-    if (this.#indicators[i].ind.onChart) {
-    const indicator = {
-      type: i,
-      name: name,
-      ...params
-    }
-      r = this.Chart.addIndicator(indicator);
-    }
-    else {
-      const view = (isArray(params?.view)) ?
-        params.view :
-        [{name, type: i, ...params}]
-      const options = {
-        type: i,
-        name: name,
-        view: view
-      }
-      r = this.#MainPane.addIndicator(options);
-    }
-
-    this.emit("addIndicatorDone", r)
-    console.log(`Added indicator:`, r)
+  /**
+   * remove an indicator - default or registered user defined
+   * @param {string|Indicator} i - indicator id or Indicator instance
+   * @returns {boolean} - success / failure
+   */
+  removeIndicator(i) {
+    return this.#MainPane.removeIndicator(i)
   }
 
   /**

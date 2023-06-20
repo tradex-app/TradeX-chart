@@ -54,6 +54,7 @@ export default class ScaleBar {
   #input
   #priceLine
   #cursorPos
+  #position = {}
 
   constructor (core, options) {
 
@@ -149,7 +150,9 @@ export default class ScaleBar {
     let canvas = this.#Graph.viewport.scene.canvas
     this.#input = new Input(canvas, {disableContextMenu: false});
     this.#input.setCursor("ns-resize")
-    this.#input.on("pointerdrag", throttle(this.onDrag, 100, this, true));
+    // this.#input.on("pointerdrag", throttle(this.onDrag, 100, this, true));
+    this.#input.on("pointerdrag", this.onDrag.bind(this));
+
     this.#input.on("pointerdragend", this.onDragDone.bind(this))
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("dblclick", this.resetScaleRange.bind(this))
@@ -186,9 +189,7 @@ export default class ScaleBar {
       e.dragstart.x, e.dragstart.y,
       e.movement.x, e.movement.y
     ]
-    // this.setScaleRange(this.#cursorPos[5])
-
-    this.setScaleRange(e.movement.y)
+    this.setScaleRange(Math.sign(e.movement.y))
     this.render()
   }
 
@@ -221,10 +222,11 @@ export default class ScaleBar {
 
   setDimensions(dim) {
     const width = this.#element.getBoundingClientRect().width
-    this.#Graph.setSize(width, dim.h, width)
-
     this.setHeight(dim.h)
-    this.draw()
+    if (this.graph instanceof Graph) {
+      this.#Graph.setSize(width, dim.h, width)
+      this.draw()
+    }
   }
 
   /**

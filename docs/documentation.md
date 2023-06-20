@@ -9,6 +9,7 @@ eg. 0.100.6
 
 * [Architecture](architecture.md)
 * [API Documentation](https://tradex-app.github.io/TradeX-chart/api/) (not currently up to date!)
+* [API Examples](api-examples.md)
 * [Configuration](configuration.md)
 * [Chart State](state.md)
 * [Events](events.md)

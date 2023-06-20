@@ -8,13 +8,13 @@ import Graph from "./views/classes/graph"
 import renderLoop from "./views/classes/renderLoop"
 import Chart from "./chart"
 import chartGrid from "./overlays/chart-grid"
-import Divider from "./widgets/divider"
+import Indicator from "./overlays/indicator"
 // import chartCompositor from "./overlays/chart-compositor"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-mainPane"
 import Input from "../input"
 import { isArray, isBoolean, isNumber, isObject, isString } from "../utils/typeChecks"
-import { copyDeep, xMap } from "../utils/utilities"
+import { copyDeep, valuesInArray, xMap } from "../utils/utilities"
 
 import {
   STREAM_FIRSTVALUE,
@@ -330,31 +330,6 @@ export default class MainPane {
   }
   
   onMouseMove(e) {
-    // console.log(e)
-    // return
-    // console.log(`onMouseMove:`, e.position.x, e.position.y, e.movement.x, e.movement.y)
-    // console.log(e.domEvent.center.y)
-    // console.log(e.domEvent.offsetCenter.y)
-
-    // const clientRect = this.elRows.getBoundingClientRect();
-    // const p = this.#position
-    // p.x2 = p?.x1
-    // p.y2 = p?.y1
-    // p.x1 = e.clientX - clientRect.left;
-    // p.y1 = e.clientY - clientRect.top;
-    // p.dx = p.x1 - p.x2
-    // p.dy = p.y1 - p.y2
-
-    // this.#cursorPos = [
-    //   p.x1, p.y1,
-    //   p.x2, p.y2,
-    //   p.dx, p.dy
-    // ]
-
-    // console.log(      p.x1, p.y1,
-    //   p.x2, p.y2,
-    //   p.dx, p.dy)
-
     const p = this.#position
     p.d2x = p?.d1x || null
     p.d2y = p?.d1y || null
@@ -539,9 +514,9 @@ export default class MainPane {
       this.#Chart.setDimensions({w: width, h: this.#elRows.height})
     }
     else {
-      this.#ChartPanes.forEach((chartView, key) => {
-        chartH = Math.round(chartView.viewport.height * resizeH)
-        chartView.setDimensions({w: width, h: chartH})
+      this.#ChartPanes.forEach((chartPane, key) => {
+        chartH = Math.round(chartPane.viewport.height * resizeH)
+        chartPane.setDimensions({w: width, h: chartH})
       })
     }
 
@@ -601,18 +576,12 @@ export default class MainPane {
       else o.primary = false
     }
     primary.primary = true
-
-    let heights = this.calcChartPaneHeights()
-
-    options = {...options, ...heights}
-
     options.rowY = 0
     // add chart views
     for (let [k,v] of this.views) {
       options.type = k
       options.view = v
       this.addChartPane(options)
-      options.rowY += (k == "onchart") ? options.chartH : options.rowH
     }
   }
 
@@ -622,11 +591,20 @@ export default class MainPane {
    */
   addChartPane(options) {
     // insert a row to mount the indicator on
-    let row,
-        h = (options.type == "onchart") ? options.chartH : options.rowH;
+    const heights = this.calcChartPaneHeights()
+    let h
 
-    this.#elRows.insertAdjacentHTML(
-      "beforeend", 
+    // resize charts panes to accommodate the new addition
+    for (h in heights) {
+      if (this.#ChartPanes.has(h))
+        this.#ChartPanes.get(h).setDimensions({w: this.rowsW, h: heights[h]})
+      // else break
+    }
+    h = heights[h]
+
+    // insert a row for the new indicator
+    let row
+    this.#elRows.insertAdjacentHTML("beforeend", 
       this.#elMain.rowNode(options.type, this.#core))
     row = this.#elRows.chartPaneSlot.assignedElements().slice(-1)[0]
     row.style.height = `${h}px`
@@ -634,7 +612,8 @@ export default class MainPane {
 
     // insert a YAxis for the new indicator
     let axis
-    this.#elYAxis.insertAdjacentHTML("beforeend", this.scaleNode(options.type))
+    this.#elYAxis.insertAdjacentHTML("beforeend", 
+      this.scaleNode(options.type))
     axis = this.#elYAxis.chartPaneSlot.assignedElements().slice(-1)[0]
     axis.style.height = `${h}px`
     axis.style.width = `100%`
@@ -642,6 +621,7 @@ export default class MainPane {
     options.elements.elTarget = row
     options.elements.elScale = axis
 
+    // instantiate the indicator
     let o
     if (options.type == "onchart") {
       // options.id
@@ -660,35 +640,40 @@ export default class MainPane {
     return o
   }
 
-  removeChartPane(viewID) {
-    if (!isString(viewID) ||
-        !this.#ChartPanes.has(viewID) 
+  /**
+   * remove chart pane from the Main Pane
+   * @param {string} paneID 
+   * @returns 
+   */
+  removeChartPane(paneID) {
+    if (!isString(paneID) ||
+        !this.#ChartPanes.has(paneID) 
     ) return false
 
-    const chartView = this.#ChartPanes.get(viewID)
-    if (chartView.isPrimary) {
-      this.#core.error(`Cannot remove primary chart! ${viewID}`)
+    const chartPane = this.#ChartPanes.get(paneID)
+    if (chartPane.isPrimary) {
+      this.#core.error(`Cannot remove primary chart pane! ${paneID}`)
       return false
     }
 
     // enable deletion
-    this.#chartDeleteList[viewID] = true
+    this.#chartDeleteList[paneID] = true
 
-    let w = this.rowsW
-      let h = chartView.viewport.height
+      let w = this.rowsW
+      let h = chartPane.viewport.height
       let x = Math.floor(h / (this.#ChartPanes.size - 1))
       let r = h % x
 
-    if (chartView.status !== "destroyed")
-      chartView.destroy()
+    if (chartPane.status !== "destroyed")
+      chartPane.destroy()
 
-    this.#ChartPanes.delete(viewID)
-    delete this.#chartDeleteList[viewID]
+    this.#ChartPanes.delete(paneID)
+    delete this.#chartDeleteList[paneID]
 
-    // resize remaining charts
-    this.#ChartPanes.forEach((chartView, key) => {
-      h = chartView.viewport.height
-      chartView.setDimensions({w: w, h: h + x + r})
+    // resize remaining chart panes
+    this.#ChartPanes.forEach((chartPane, key) => {
+      h = chartPane.viewport.height
+      chartPane.setDimensions({w: w, h: h + x + r})
       r = 0
     })
     this.draw(this.range, true)
@@ -697,61 +682,137 @@ export default class MainPane {
 
   /**
    * add an indicator after the chart has started
-   * @param {object} i - indicator
+   * @param {string} i - indicator type eg. EMA, DMI, RSI
+   * @param {string} name - identifier
+   * @param {object} params - {settings, data}
    * @returns 
    */
-  addIndicator(i) {
-    const indicator = this.core.indicatorClasses[i.type].ind
-    const indType = (
-      indicator.onChart === "both" && 
-      isBoolean(i.onChart)) ? 
-      i.onChart : false;
-
-    // adding off chart indicator
+  addIndicator(i, name=i, params={})  {
     if (
-      i?.type in this.core.indicatorClasses &&
-      indType === false
-    ) {
-      const cnt = this.#ChartPanes.size + 1
-      const view = (isArray(i?.view) && i.view.length > 0) ? 
-        i.view : [{ name: i.name, type: i.type }]
-      const heights = this.calcChartPaneHeights(cnt)
-      const options = {...i, ...heights}
-            options.parent = this
-            options.title = i.name
-            options.elements = { ...this.elements }
-            options.view = view
+      !isString(i) &&
+      !(i in this.#indicators) &&
+      !isString(name) &&
+      !isObject(params)
+    ) return false
 
-      return this.addChartPane(options)
+    this.log(`Adding the ${name} : ${i} indicator`)
+
+    if (!isArray(params?.data)) params.data = []
+    if (!isObject(params?.settings)) params.settings = {}
+
+    let instance
+
+    // add on chart indicator
+    if (this.#indicators[i].ind.onChart) {
+      const indicator = {
+        type: i,
+        name: name,
+        ...params
+      }
+        instance = this.#Chart.addIndicator(indicator);
+    }
+    // add off chart indicator
+    else {
+      const indicator = this.core.indicatorClasses[i].ind
+      const indType = (
+        indicator.onChart === "both" && 
+        isBoolean(i.onChart)) ? 
+        i.onChart : false;
+        
+      if (!isArray(params.view)) params.view = [{name, type: i, ...params}]
+      // check all views are valid
+      for (let v = 0; v < params.view.length; v++) {
+        if (!isObject(params.view[v]) || !valuesInArray(["name", "type"], Object.keys(params.view[v])))
+            params.view.splice(v,1)
+      }
+      if (params.view.length == 0) return false
+        
+      params.parent = this
+      params.title = name
+      params.elements = { ...this.elements }
+
+      instance = this.addChartPane(params)
+      instance.start()
+    }
+    this.#core.refresh()
+    this.emit("addIndicatorDone", instance)
+    console.log(`Added indicator:`, instance.id)
+
+    return instance
+  }
+
+  /**
+   * remove an indicator - default or registered user defined
+   * @param {string|Indicator} i - indicator id or Indicator instance
+   * @returns {boolean} - success / failure
+   */
+  removeIndicator(i) {
+    // remove by ID
+    if (isString(i)) {
+      for (const p of this.#ChartPanes.values()) {
+        if (i in p.indicators) {
+          p.indicators[i].instance.remove()
+          return true
+        }
+      }
+    }
+    // remove by instance
+    else if (i instanceof Indicator) {
+      i.remove()
+      return true
     }
     else return false
   }
 
-  calcChartPaneHeights(cnt = this.views.size) {
-    if (!isNumber(cnt) || cnt < 1) cnt = this.views.size || 1
-
-    let a = this.#viewDefaultH * (cnt - 1),
-        ratio = ( a / Math.log10( a * 2 ) ) / 100,
-        rowsH = Math.round(this.rowsH * ratio),
-        options = {};
+  calcChartPaneHeights() {
+    const cnt = this.#ChartPanes.size + 1
+    const a = this.#viewDefaultH * (cnt - 1),
+          ratio = ( a / Math.log10( a * 2 ) ) / 100,
+          rowsH = Math.round(this.rowsH * ratio),
+          sizes = {};
 
     if (cnt === 1) {
       // only adding the primary (price) chart
-      options.rowH = 0
-      options.chartH = this.rowsH
+      sizes.new = this.rowsH
     }
     else if (cnt === 2) {
       // adjust chart size for first secondary chart pane
-      options.rowH = Math.round(this.rowsH * this.#viewDefaultH / 100)
-      options.chartH = this.rowsH - options.rowH
+      const first = this.#ChartPanes.firstKey()
+      const newPane = Math.round(this.rowsH * this.#viewDefaultH / 100)
+      sizes[first] = this.rowsH - newPane
+      sizes.new = newPane
+    }
+    else if (cnt === 3) {
+      const first = this.#ChartPanes.firstEntry()
+      const second = this.#ChartPanes.lastEntry()
+      const newPane = Math.round(this.rowsH * this.#viewDefaultH / 100)
+
+      let ratio = this.rowsH / (this.rowsH + newPane)
+      // adjust all to fit
+      sizes[first[0]] = Math.floor(first[1].viewport.height * ratio)
+      sizes[second[0]] = Math.floor(second[1].viewport.height * ratio)
+      sizes.new = Math.floor(newPane * ratio)
+      // account for remainder
+      sizes.new += this.rowsH - (sizes[first[0]] + sizes[second[0]] + sizes.new)
     }
     else {
-      // adjust chart size for subsequent chart panes
-      options.rowH = Math.round(rowsH / this.#ChartPanes.size)
-      options.chartH = this.rowsH - rowsH
-      options.height = options.rowH
+      let total = 0
+      for (let p of this.#ChartPanes) {
+        sizes[p[0]] = p[1].viewport.height
+        total += p[1].viewport.height
+      }
+      sizes.new = Math.floor(total / (this.#ChartPanes.size + 1))
+
+      let ratio = this.rowsH / (this.rowsH + sizes.new)
+          total = 0
+      for (let s in sizes) {
+        sizes[s] = Math.floor(sizes[s] * ratio)
+        total += sizes[s]
+      }
+      // account for remainder
+      sizes.new += this.rowsH - total
     }
-    return options
+    return sizes
   }
 
   scaleNode(type) {
@@ -775,8 +836,8 @@ export default class MainPane {
       this.#Chart
     ]
     this.time.xAxis.doCalcXAxisGrads(range)
-    this.#ChartPanes.forEach((chartView, key) => {
-      graphs.push(chartView)
+    this.#ChartPanes.forEach((chartPane, key) => {
+      graphs.push(chartPane)
     })
 
     renderLoop.queueFrame(

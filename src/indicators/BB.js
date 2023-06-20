@@ -2,13 +2,13 @@
 // Bollinger Bands
 // https://hackape.github.io/talib.js/modules/_index_.html#bbands
 
-import indicator from "../components/overlays/indicator"
+import Indicator from "../components/overlays/indicator"
 import { BBANDS as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { uid } from "../utils/utilities"
 
 
-export default class BB extends indicator {
+export default class BB extends Indicator {
 
   name = 'Bollinger Bands'
   shortName = 'BB'

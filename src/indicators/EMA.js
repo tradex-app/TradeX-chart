@@ -1,14 +1,14 @@
 // EMA.js
 // https://hackape.github.io/talib.js/modules/_index_.html#ema
 
-import indicator from "../components/overlays/indicator"
+import Indicator from "../components/overlays/indicator"
 import { EMA as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { bRound, limit, round } from "../utils/number";
 import { uid } from "../utils/utilities"
 
  
- export default class EMA extends indicator {
+ export default class EMA extends Indicator {
 
   name = 'Exponential Moving Average'
   shortName = 'EMA'

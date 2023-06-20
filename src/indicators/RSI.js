@@ -4,7 +4,7 @@
  * RSI
  * RSI = SUM(MAX(CLOSE - REF(CLOSE,1),0),N) / SUM(ABS(CLOSE - REF(CLOSE,1)),N) × 100
  */
-import indicator from "../components/overlays/indicator"
+import Indicator from "../components/overlays/indicator"
 import {RSI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { uid } from "../utils/utilities"
@@ -16,7 +16,7 @@ import { uid } from "../utils/utilities"
  * @class RSI
  * @extends {indicator}
  */
-export default class RSI extends indicator {
+export default class RSI extends Indicator {
 
   name = 'Relative Strength Index'
   shortName = 'RSI'

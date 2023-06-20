@@ -231,10 +231,10 @@ export default class Chart {
   get overlayTools() { return this.#overlayTools }
   get overlaysDefault() { return defaultOverlays[this.type] }
   get indicators() { return this.getIndicators() }
+  get indicatorDeleteList() { return this.#indicatorDeleteList }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
   get Divider() { return this.#Divider }
-  get indicatorDeleteList() { return this.#indicatorDeleteList }
   get siblingPrev() { return this.sibling("prev") }
   get siblingNext() { return this.sibling("next") }
 
@@ -461,18 +461,21 @@ export default class Chart {
    */
   setDimensions(dim) {
     const buffer = this.config.buffer || BUFFERSIZE
-      let {w, h} = dim
+      let {w, h} = dim;
                w = this.width
                h = (h) ? h : this.height
     
-    this.layerWidth = Math.round(w * ((100 + buffer) * 0.01))
-    this.graph.setSize(w, h, this.layerWidth)
     // element widths are automatically handled by CSS
     this.setHeight(h)
-    this.draw(undefined, true)
-    this.core.MainPane.draw(undefined, false)
-    this.draw(undefined, true)
-    this.Divider.setPos()
+    // has .start() already been executed?
+    if (this.graph instanceof Graph) {
+      this.layerWidth = Math.round(w * ((100 + buffer) * 0.01))
+      this.graph.setSize(w, h, this.layerWidth)
+      this.draw(undefined, true)
+      this.core.MainPane.draw(undefined, false)
+      this.draw(undefined, true)
+      this.Divider.setPos()
+    }
   }
 
   setYAxisType(t) {
@@ -554,8 +557,10 @@ export default class Chart {
     const ind = {}
 
     for (let [key, value] of Object.entries(this.overlays)) {
-      if (indicators.includes(value.params?.overlay?.type)) 
-      ind[key] = value
+      if (indicators.includes(value.params?.overlay?.type)) {
+        let id = value.id || value.instance.id
+        ind[id] = value
+      }
     }
     return ind
   }

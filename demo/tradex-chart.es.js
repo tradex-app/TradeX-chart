@@ -13,7 +13,7 @@ function _mergeNamespaces(n, m) {
   return Object.freeze(Object.defineProperty(n, Symbol.toStringTag, { value: 'Module' }));
 }
 
-const version = "0.124.1";
+const version = "0.125.0";
 
 function isArray (v) {
   return Array.isArray(v)
@@ -674,6 +674,13 @@ function uid(tag="ID") {
   const dateString = Date.now().toString(36);
   const randomness = Math.random().toString(36).substring(2,5);
   return `${tag}_${dateString}_${randomness}`
+}
+function valuesInArray(values, arr) {
+  if (!isArray(arr)) return false
+  if (!isArray(values)) return arr.includes(values)
+  return values.every(value => {
+    return arr.includes(value)
+  })
 }
 const firstEntryInMap = map => map.entries().next().value;
 const firstKeyInMap = map => map.entries().next().value[0];
@@ -5735,10 +5742,11 @@ var canvas = {
 };
 
 const T = 0, C = 4;
-class indicator extends Overlay {
+class Indicator extends Overlay {
   static #cnt = 0
-  static get cnt() { return ++indicator.#cnt }
+  static get cnt() { return ++Indicator.#cnt }
   #ID
+  #cnt_
   #name
   #shortName
   #onChart
@@ -5759,6 +5767,7 @@ class indicator extends Overlay {
   #status
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
     super(target, xAxis, yAxis, undefined, parent, params);
+    this.#cnt_ = Overlay.cnt;
     this.#params = params;
     this.#overlay = params.overlay;
     this.#type = config.type;
@@ -5767,13 +5776,14 @@ class indicator extends Overlay {
     this.#range = this.xAxis.range;
     this.eventsListen();
   }
-  get id() { return this.#ID }
+  get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
   set id(id) { this.#ID = String(id).replace(/ |,|;|:|\.|#/g, "_"); }
   get name() { return this.#name }
   set name(n) { this.#name = n; }
   get shortName() { return this.#shortName }
   set shortName(n) { this.#shortName = n; }
-  get chartPane() { return this.#params.overlay.paneID }
+  get chartPane() { return this.core.MainPane.chartPanes.get(this.chartPaneID) }
+  get chartPaneID() { return this.#params.overlay.paneID }
   get onChart() { return this.#onChart }
   set onChart(c) { this.#onChart = c; }
   get scaleOverlay() { return this.#scaleOverlay }
@@ -5813,7 +5823,7 @@ class indicator extends Overlay {
   }
   destroy() {
     if ( this.#status === "destroyed") return
-    const chartPane = this.core.MainPane.chartPanes.get(this.chartPane);
+    const chartPane = this.core.MainPane.chartPanes.get(this.chartPaneID);
     if ( !chartPane.indicatorDeleteList[this.id] ) {
       this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeIndicator()" instead.`);
       return
@@ -5823,8 +5833,8 @@ class indicator extends Overlay {
     this.#status = "destroyed";
   }
   remove() {
-    this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPane}`);
-    this.emit(`${this.chartPane}_removeIndicator`, {id: this.id, paneID: this.chartPane});
+    this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPaneID}`);
+    this.emit(`${this.chartPaneID}_removeIndicator`, {id: this.id, paneID: this.chartPaneID});
     return;
   }
   eventsListen() {
@@ -6171,7 +6181,7 @@ const SMA$1 = {
   }]
 };
 
-class BB extends indicator {
+class BB extends Indicator {
   name = 'Bollinger Bands'
   shortName = 'BB'
   libName = 'BBANDS'
@@ -6291,7 +6301,7 @@ class BB extends indicator {
   }
 }
 
-class EMA extends indicator {
+class EMA extends Indicator {
   name = 'Exponential Moving Average'
   shortName = 'EMA'
   libName = 'EMA'
@@ -6376,7 +6386,7 @@ class EMA extends indicator {
   }
 }
 
-class RSI extends indicator {
+class RSI extends Indicator {
   name = 'Relative Strength Index'
   shortName = 'RSI'
   libName = 'RSI'
@@ -6484,7 +6494,7 @@ class RSI extends indicator {
   }
 }
 
-class SMA extends indicator {
+class SMA extends Indicator {
   name = 'Simple Moving Average'
   shortName = 'SMA'
   libName = 'SMA'
@@ -6569,7 +6579,7 @@ class SMA extends indicator {
   }
 }
 
-class Volume extends indicator {
+class Volume extends Indicator {
   #ID
   #name = 'Relative Strength Index'
   #shortName = 'RSI'
@@ -8973,6 +8983,7 @@ class ScaleBar {
   #input
   #priceLine
   #cursorPos
+  #position = {}
   constructor (core, options) {
     this.#core = core;
     this.#options = {...options};
@@ -9055,7 +9066,7 @@ class ScaleBar {
     let canvas = this.#Graph.viewport.scene.canvas;
     this.#input = new Input(canvas, {disableContextMenu: false});
     this.#input.setCursor("ns-resize");
-    this.#input.on("pointerdrag", throttle(this.onDrag, 100, this));
+    this.#input.on("pointerdrag", this.onDrag.bind(this));
     this.#input.on("pointerdragend", this.onDragDone.bind(this));
     this.#input.on("wheel", this.onMouseWheel.bind(this));
     this.#input.on("dblclick", this.resetScaleRange.bind(this));
@@ -9085,7 +9096,7 @@ class ScaleBar {
       e.dragstart.x, e.dragstart.y,
       e.movement.x, e.movement.y
     ];
-    this.setScaleRange(e.movement.y);
+    this.setScaleRange(Math.sign(e.movement.y));
     this.render();
   }
   onDragDone(e) {
@@ -9109,9 +9120,11 @@ class ScaleBar {
   }
   setDimensions(dim) {
     const width = this.#element.getBoundingClientRect().width;
-    this.#Graph.setSize(width, dim.h, width);
     this.setHeight(dim.h);
-    this.draw();
+    if (this.graph instanceof graph) {
+      this.#Graph.setSize(width, dim.h, width);
+      this.draw();
+    }
   }
   setScaleRange(r=0) {
     if (this.#yAxis.mode == "automatic") this.#yAxis.mode = "manual";
@@ -9766,10 +9779,10 @@ class Chart {
   get overlayTools() { return this.#overlayTools }
   get overlaysDefault() { return defaultOverlays$1[this.type] }
   get indicators() { return this.getIndicators() }
+  get indicatorDeleteList() { return this.#indicatorDeleteList }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this); }
   get stateMachine() { return this.#stateMachine }
   get Divider() { return this.#Divider }
-  get indicatorDeleteList() { return this.#indicatorDeleteList }
   get siblingPrev() { return this.sibling("prev") }
   get siblingNext() { return this.sibling("next") }
   start() {
@@ -9915,13 +9928,15 @@ class Chart {
       let {w, h} = dim;
                w = this.width;
                h = (h) ? h : this.height;
-    this.layerWidth = Math.round(w * ((100 + buffer) * 0.01));
-    this.graph.setSize(w, h, this.layerWidth);
     this.setHeight(h);
-    this.draw(undefined, true);
-    this.core.MainPane.draw(undefined, false);
-    this.draw(undefined, true);
-    this.Divider.setPos();
+    if (this.graph instanceof graph) {
+      this.layerWidth = Math.round(w * ((100 + buffer) * 0.01));
+      this.graph.setSize(w, h, this.layerWidth);
+      this.draw(undefined, true);
+      this.core.MainPane.draw(undefined, false);
+      this.draw(undefined, true);
+      this.Divider.setPos();
+    }
   }
   setYAxisType(t) {
     if (
@@ -9979,8 +9994,10 @@ class Chart {
     const indicators = Object.keys(this.core.indicatorClasses);
     const ind = {};
     for (let [key, value] of Object.entries(this.overlays)) {
-      if (indicators.includes(value.params?.overlay?.type))
-      ind[key] = value;
+      if (indicators.includes(value.params?.overlay?.type)) {
+        let id = value.id || value.instance.id;
+        ind[id] = value;
+      }
     }
     return ind
   }
@@ -10774,9 +10791,9 @@ class MainPane {
       this.#Chart.setDimensions({w: width, h: this.#elRows.height});
     }
     else {
-      this.#ChartPanes.forEach((chartView, key) => {
-        chartH = Math.round(chartView.viewport.height * resizeH);
-        chartView.setDimensions({w: width, h: chartH});
+      this.#ChartPanes.forEach((chartPane, key) => {
+        chartH = Math.round(chartPane.viewport.height * resizeH);
+        chartPane.setDimensions({w: width, h: chartH});
       });
     }
     this.rowsOldH = this.rowsH;
@@ -10821,27 +10838,30 @@ class MainPane {
       else o.primary = false;
     }
     primary.primary = true;
-    let heights = this.calcChartPaneHeights();
-    options = {...options, ...heights};
     options.rowY = 0;
     for (let [k,v] of this.views) {
       options.type = k;
       options.view = v;
       this.addChartPane(options);
-      options.rowY += (k == "onchart") ? options.chartH : options.rowH;
     }
   }
   addChartPane(options) {
-    let row,
-        h = (options.type == "onchart") ? options.chartH : options.rowH;
-    this.#elRows.insertAdjacentHTML(
-      "beforeend",
+    const heights = this.calcChartPaneHeights();
+    let h;
+    for (h in heights) {
+      if (this.#ChartPanes.has(h))
+        this.#ChartPanes.get(h).setDimensions({w: this.rowsW, h: heights[h]});
+    }
+    h = heights[h];
+    let row;
+    this.#elRows.insertAdjacentHTML("beforeend",
       this.#elMain.rowNode(options.type, this.#core));
     row = this.#elRows.chartPaneSlot.assignedElements().slice(-1)[0];
     row.style.height = `${h}px`;
     row.style.width = `100%`;
     let axis;
-    this.#elYAxis.insertAdjacentHTML("beforeend", this.scaleNode(options.type));
+    this.#elYAxis.insertAdjacentHTML("beforeend",
+      this.scaleNode(options.type));
     axis = this.#elYAxis.chartPaneSlot.assignedElements().slice(-1)[0];
     axis.style.height = `${h}px`;
     axis.style.width = `100%`;
@@ -10861,75 +10881,130 @@ class MainPane {
     this.emit("addChartView", o);
     return o
   }
-  removeChartPane(viewID) {
-    if (!isString$1(viewID) ||
-        !this.#ChartPanes.has(viewID)
+  removeChartPane(paneID) {
+    if (!isString$1(paneID) ||
+        !this.#ChartPanes.has(paneID)
     ) return false
-    const chartView = this.#ChartPanes.get(viewID);
-    if (chartView.isPrimary) {
-      this.#core.error(`Cannot remove primary chart! ${viewID}`);
+    const chartPane = this.#ChartPanes.get(paneID);
+    if (chartPane.isPrimary) {
+      this.#core.error(`Cannot remove primary chart pane! ${paneID}`);
       return false
     }
-    this.#chartDeleteList[viewID] = true;
-    let w = this.rowsW;
-      let h = chartView.viewport.height;
+    this.#chartDeleteList[paneID] = true;
+      let w = this.rowsW;
+      let h = chartPane.viewport.height;
       let x = Math.floor(h / (this.#ChartPanes.size - 1));
       let r = h % x;
-    if (chartView.status !== "destroyed")
-      chartView.destroy();
-    this.#ChartPanes.delete(viewID);
-    delete this.#chartDeleteList[viewID];
-    this.#ChartPanes.forEach((chartView, key) => {
-      h = chartView.viewport.height;
-      chartView.setDimensions({w: w, h: h + x + r});
+    if (chartPane.status !== "destroyed")
+      chartPane.destroy();
+    this.#ChartPanes.delete(paneID);
+    delete this.#chartDeleteList[paneID];
+    this.#ChartPanes.forEach((chartPane, key) => {
+      h = chartPane.viewport.height;
+      chartPane.setDimensions({w: w, h: h + x + r});
       r = 0;
     });
     this.draw(this.range, true);
     return true
   }
-  addIndicator(i) {
-    const indicator = this.core.indicatorClasses[i.type].ind;
-    const indType = (
-      indicator.onChart === "both" &&
-      isBoolean(i.onChart)) ?
-      i.onChart : false;
+  addIndicator(i, name=i, params={})  {
     if (
-      i?.type in this.core.indicatorClasses &&
-      indType === false
-    ) {
-      const cnt = this.#ChartPanes.size + 1;
-      const view = (isArray(i?.view) && i.view.length > 0) ?
-        i.view : [{ name: i.name, type: i.type }];
-      const heights = this.calcChartPaneHeights(cnt);
-      const options = {...i, ...heights};
-            options.parent = this;
-            options.title = i.name;
-            options.elements = { ...this.elements };
-            options.view = view;
-      return this.addChartPane(options)
+      !isString$1(i) &&
+      !(i in this.#indicators) &&
+      !isString$1(name) &&
+      !isObject(params)
+    ) return false
+    this.log(`Adding the ${name} : ${i} indicator`);
+    if (!isArray(params?.data)) params.data = [];
+    if (!isObject(params?.settings)) params.settings = {};
+    let instance;
+    if (this.#indicators[i].ind.onChart) {
+      const indicator = {
+        type: i,
+        name: name,
+        ...params
+      };
+        instance = this.#Chart.addIndicator(indicator);
+    }
+    else {
+      const indicator = this.core.indicatorClasses[i].ind;
+      (
+        indicator.onChart === "both" &&
+        isBoolean(i.onChart)) ?
+        i.onChart : false;
+      if (!isArray(params.view)) params.view = [{name, type: i, ...params}];
+      for (let v = 0; v < params.view.length; v++) {
+        if (!isObject(params.view[v]) || !valuesInArray(["name", "type"], Object.keys(params.view[v])))
+            params.view.splice(v,1);
+      }
+      if (params.view.length == 0) return false
+      params.parent = this;
+      params.title = name;
+      params.elements = { ...this.elements };
+      instance = this.addChartPane(params);
+      instance.start();
+    }
+    this.#core.refresh();
+    this.emit("addIndicatorDone", instance);
+    console.log(`Added indicator:`, instance.id);
+    return instance
+  }
+  removeIndicator(i) {
+    if (isString$1(i)) {
+      for (const p of this.#ChartPanes.values()) {
+        if (i in p.indicators) {
+          p.indicators[i].instance.remove();
+          return true
+        }
+      }
+    }
+    else if (i instanceof Indicator) {
+      i.remove();
+      return true
     }
     else return false
   }
-  calcChartPaneHeights(cnt = this.views.size) {
-    if (!isNumber(cnt) || cnt < 1) cnt = this.views.size || 1;
-    let a = this.#viewDefaultH * (cnt - 1),
-        ratio = ( a / Math.log10( a * 2 ) ) / 100,
-        rowsH = Math.round(this.rowsH * ratio),
-        options = {};
+  calcChartPaneHeights() {
+    const cnt = this.#ChartPanes.size + 1;
+    const a = this.#viewDefaultH * (cnt - 1),
+          ratio = ( a / Math.log10( a * 2 ) ) / 100;
+          Math.round(this.rowsH * ratio);
+          const sizes = {};
     if (cnt === 1) {
-      options.rowH = 0;
-      options.chartH = this.rowsH;
+      sizes.new = this.rowsH;
     }
     else if (cnt === 2) {
-      options.rowH = Math.round(this.rowsH * this.#viewDefaultH / 100);
-      options.chartH = this.rowsH - options.rowH;
+      const first = this.#ChartPanes.firstKey();
+      const newPane = Math.round(this.rowsH * this.#viewDefaultH / 100);
+      sizes[first] = this.rowsH - newPane;
+      sizes.new = newPane;
+    }
+    else if (cnt === 3) {
+      const first = this.#ChartPanes.firstEntry();
+      const second = this.#ChartPanes.lastEntry();
+      const newPane = Math.round(this.rowsH * this.#viewDefaultH / 100);
+      let ratio = this.rowsH / (this.rowsH + newPane);
+      sizes[first[0]] = Math.floor(first[1].viewport.height * ratio);
+      sizes[second[0]] = Math.floor(second[1].viewport.height * ratio);
+      sizes.new = Math.floor(newPane * ratio);
+      sizes.new += this.rowsH - (sizes[first[0]] + sizes[second[0]] + sizes.new);
     }
     else {
-      options.rowH = Math.round(rowsH / this.#ChartPanes.size);
-      options.chartH = this.rowsH - rowsH;
-      options.height = options.rowH;
+      let total = 0;
+      for (let p of this.#ChartPanes) {
+        sizes[p[0]] = p[1].viewport.height;
+        total += p[1].viewport.height;
+      }
+      sizes.new = Math.floor(total / (this.#ChartPanes.size + 1));
+      let ratio = this.rowsH / (this.rowsH + sizes.new);
+          total = 0;
+      for (let s in sizes) {
+        sizes[s] = Math.floor(sizes[s] * ratio);
+        total += sizes[s];
+      }
+      sizes.new += this.rowsH - total;
     }
-    return options
+    return sizes
   }
   scaleNode(type) {
     const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.offChart.separator};`;
@@ -10949,8 +11024,8 @@ class MainPane {
       this.#Chart
     ];
     this.time.xAxis.doCalcXAxisGrads(range);
-    this.#ChartPanes.forEach((chartView, key) => {
-      graphs.push(chartView);
+    this.#ChartPanes.forEach((chartPane, key) => {
+      graphs.push(chartPane);
     });
     renderLoop$1.queueFrame(
       this.range,
@@ -12100,7 +12175,7 @@ class UtilsBar {
     this.#elUtils = core.elUtils;
     this.#utils = core.config?.utilsBar || utilsList;
     this.#widgets = core.WidgetsG;
-    this.#indicators = core.indicatorClasses || Indicators;
+    this.#indicators = core.indicatorClasses || indicators;
     this.init();
   }
   log(l) { this.#core.log(l); }
@@ -13887,36 +13962,10 @@ class TradeXchart extends tradeXChart {
     return true
   }
   addIndicator(i, name=i, params={}) {
-    console.log(`addIndicator() ${i}, ${name}, ${params}`);
-    if (
-      !isString$1(i) &&
-      !(i in this.#indicators) &&
-      !isString$1(name) &&
-      !isObject(params)
-    ) return false
-    this.log(`Adding the ${name} : ${i} indicator`);
-    let r;
-    if (this.#indicators[i].ind.onChart) {
-    const indicator = {
-      type: i,
-      name: name,
-      ...params
-    };
-      r = this.Chart.addIndicator(indicator);
-    }
-    else {
-      const view = (isArray(params?.view)) ?
-        params.view :
-        [{name, type: i, ...params}];
-      const options = {
-        type: i,
-        name: name,
-        view: view
-      };
-      r = this.#MainPane.addIndicator(options);
-    }
-    this.emit("addIndicatorDone", r);
-    console.log(`Added indicator:`, r);
+    return this.#MainPane.addIndicator(i, name=i, params={})
+  }
+  removeIndicator(i) {
+    return this.#MainPane.removeIndicator(i)
   }
   hasStateIndicator(i, dataset="searchAll") {
     if (!isString$1(i) || !isString$1(dataset)) return false
@@ -13976,4 +14025,4 @@ if (!window.customElements.get('tradex-chart')) {
   customElements.get('tradex-chart') || customElements.define('tradex-chart', TradeXchart);
 }
 
-export { TradeXchart as Chart, DOM$1 as DOM, indicator as Indicator, Overlay, Range, canvas, copyDeep, isPromise, mergeDeep, uid };
+export { TradeXchart as Chart, DOM$1 as DOM, Indicator, Overlay, Range, canvas, copyDeep, isPromise, mergeDeep, uid };

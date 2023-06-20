@@ -4,14 +4,14 @@
  * SMA
  * Simple Moving Average
  */
-import indicator from "../components/overlays/indicator"
+import Indicator from "../components/overlays/indicator"
 import { SMA as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { bRound, limit, round } from "../utils/number";
 import { uid } from "../utils/utilities"
 
  
- export default class SMA extends indicator {
+ export default class SMA extends Indicator {
 
   name = 'Simple Moving Average'
   shortName = 'SMA'

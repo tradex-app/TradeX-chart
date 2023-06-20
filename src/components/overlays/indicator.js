@@ -25,12 +25,13 @@ const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
  * @export
  * @class indicator
  */
-export default class indicator extends Overlay {
+export default class Indicator extends Overlay {
 
   static #cnt = 0
-  static get cnt() { return ++indicator.#cnt }
+  static get cnt() { return ++Indicator.#cnt }
 
   #ID
+  #cnt_
   #name
   #shortName
   #onChart
@@ -54,6 +55,7 @@ export default class indicator extends Overlay {
 
     super(target, xAxis, yAxis, undefined, parent, params)
 
+    this.#cnt_ = Overlay.cnt
     this.#params = params
     this.#overlay = params.overlay
     this.#type = config.type  // remove?
@@ -64,13 +66,14 @@ export default class indicator extends Overlay {
     this.eventsListen()
   }
 
-  get id() { return this.#ID }
+  get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
   set id(id) { this.#ID = String(id).replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   set name(n) { this.#name = n }
   get shortName() { return this.#shortName }
   set shortName(n) { this.#shortName = n }
-  get chartPane() { return this.#params.overlay.paneID }
+  get chartPane() { return this.core.MainPane.chartPanes.get(this.chartPaneID) }
+  get chartPaneID() { return this.#params.overlay.paneID }
   get onChart() { return this.#onChart }
   set onChart(c) { this.#onChart = c }
   get scaleOverlay() { return this.#scaleOverlay }
@@ -120,7 +123,7 @@ export default class indicator extends Overlay {
   destroy() {
     if ( this.#status === "destroyed") return
     // has this been invoked from removeIndicator() ?
-    const chartPane = this.core.MainPane.chartPanes.get(this.chartPane)
+    const chartPane = this.core.MainPane.chartPanes.get(this.chartPaneID)
     if ( !chartPane.indicatorDeleteList[this.id] ) {
       this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeIndicator()" instead.`)
       return
@@ -135,8 +138,8 @@ export default class indicator extends Overlay {
   }
 
   remove() {
-    this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPane}`)
-    this.emit(`${this.chartPane}_removeIndicator`, {id: this.id, paneID: this.chartPane})
+    this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPaneID}`)
+    this.emit(`${this.chartPaneID}_removeIndicator`, {id: this.id, paneID: this.chartPaneID})
     return;
   }
 
