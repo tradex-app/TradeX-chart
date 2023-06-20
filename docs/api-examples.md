@@ -120,26 +120,3 @@ chart1.MainPane.chartPanes.get("TradeX_test-Chart_2").removeIndicator("TradeX_te
 chart1.MainPane.chartPanes.get("TradeX_test-RSI__20_3").indicators["TradeX_test-RSI__20_3-RSI_5"].instance.remove()
 ```
 
-
-
-
-Initial tests demonstrate that adding, removing and re-ordering of indicators, after, the chart has started, now works.
-
-Removing and re-ordering is possible via the chart GUI and API.
-Adding, removing and re-ordering is possible via the API.
-
-To add an "empty" indicator is as simple as:
-
-```javascript
-chart0.addIndicator("RSI", "RSI")
-```
-
-If the chart has price history data, the indicator will automatically calculate it's values with it's defaults.
-
-However, indicators can also be added with data and or with custom settings.
-
-```javascript
-chart0.addIndicator("EMA", "EMA", {data, settings})
-```
-
-Removing an indicator:
