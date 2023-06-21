@@ -298,6 +298,7 @@ export default class Chart {
     this.off(STREAM_NEWVALUE, this.onStreamNewValue);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
     this.off(STREAM_FIRSTVALUE, this.onStreamNewValue)
+    this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this)
 
     if (this.isOnChart)
       this.off("chart_yAxisRedraw", this.onYAxisRedraw)
@@ -581,6 +582,11 @@ export default class Chart {
     delete this.#indicatorDeleteList[id]
   }
 
+  indicatorVisible(id, v) {
+    if (!isString(id) || !(id in this.indicators)) return false
+    this.indicators[id].instance.visible(v)
+  }
+
   addTool(tool) {
     let { layerConfig } = this.layerConfig();
     let layer = new CEL.Layer(layerConfig);
@@ -672,7 +678,8 @@ export default class Chart {
   }
 
   /**
-   * execute legend action
+   * execute legend action for this chart pane
+   * (not indicators)
    * @param {object} e - event
    * @memberof Chart
    */
@@ -683,7 +690,7 @@ export default class Chart {
     switch(action.icon) {
       case "up": this.reorderUp(); return;
       case "down": this.reorderDown(); return;
-      case "collapse": return;
+      case "visible": return;
       case "maximize": return;
       case "restore": return;
       case "remove": this.remove(); return;
@@ -711,7 +718,7 @@ export default class Chart {
     if (prevPane !== null) {
       prevPane.Divider.setPos()
       prevPane.Divider.show()
-      this.core.MainPane.chartPanes.swapKeys(this.id, prevEl.id)
+      this.core.ChartPanes.swapKeys(this.id, prevEl.id)
     }
     if (el.previousElementSibling === null)
       this.Divider.hide()
@@ -738,7 +745,7 @@ export default class Chart {
     if (nextPane !== null) { 
       nextPane.Divider.setPos()
       this.Divider.show()
-      this.core.MainPane.chartPanes.swapKeys(this.id, nextEl.id)
+      this.core.ChartPanes.swapKeys(this.id, nextEl.id)
     }
     if (nextEl.previousElementSibling === null)
       nextPane.Divider.hide()
@@ -848,8 +855,8 @@ export default class Chart {
     const nextScaleEl = scaleEl.nextElementSibling
     const parentScaleEl = scaleEl.parentNode
         
-    const prevPane = (prevEl !== null) ? this.core.MainPane.chartPanes.get(prevEl.id) : null
-    const nextPane = (nextEl !== null) ? this.core.MainPane.chartPanes.get(nextEl.id) : null
+    const prevPane = (prevEl !== null) ? this.core.ChartPanes.get(prevEl.id) : null
+    const nextPane = (nextEl !== null) ? this.core.ChartPanes.get(nextEl.id) : null
 
     return {
       el,
@@ -868,13 +875,13 @@ export default class Chart {
   sibling(s) {
     s = (["prev", "next"].includes(s)) ? s : "prev"
 
-    let chartPanes = [...this.core.MainPane.chartPanes.keys()]
+    let chartPanes = [...this.core.ChartPanes.keys()]
     let i = chartPanes.indexOf(this.id)
 
     if (s == "prev") --i
     else ++i
 
-    return this.#core.MainPane.chartPanes.get(chartPanes[i]) || null
+    return this.#core.ChartPanes.get(chartPanes[i]) || null
   }
   
 }

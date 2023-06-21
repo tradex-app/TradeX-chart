@@ -239,7 +239,7 @@ export default class tradeXLegends extends element {
       inp += `<span id="${id}_down" class="control" data-icon="down">${down}</span>`
     // }
     // collapse
-    inp += `<span id="${id}_collapse" class="control" data-icon="collapse">${collapse}</span>`
+    inp += `<span id="${id}_collapse" class="control" data-icon="visible">${collapse}</span>`
     // maximize
     inp += `<span id="${id}_maximize" class="control" data-icon="maximize">${maximize}</span>`
     // restore

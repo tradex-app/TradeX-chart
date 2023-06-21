@@ -5,7 +5,7 @@ import Overlay from "./overlay"
 import { Range } from "../../model/range"
 import canvas from "../../renderer/canvas"
 import { limit } from "../../utils/number"
-import { isObject, isString } from "../../utils/typeChecks"
+import { isBoolean, isObject, isString } from "../../utils/typeChecks"
 import {
   STREAM_NEWVALUE,
   STREAM_UPDATE
@@ -72,7 +72,7 @@ export default class Indicator extends Overlay {
   set name(n) { this.#name = n }
   get shortName() { return this.#shortName }
   set shortName(n) { this.#shortName = n }
-  get chartPane() { return this.core.MainPane.chartPanes.get(this.chartPaneID) }
+  get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
   get chartPaneID() { return this.#params.overlay.paneID }
   get onChart() { return this.#onChart }
   set onChart(c) { this.#onChart = c }
@@ -123,7 +123,7 @@ export default class Indicator extends Overlay {
   destroy() {
     if ( this.#status === "destroyed") return
     // has this been invoked from removeIndicator() ?
-    const chartPane = this.core.MainPane.chartPanes.get(this.chartPaneID)
+    const chartPane = this.core.ChartPanes.get(this.chartPaneID)
     if ( !chartPane.indicatorDeleteList[this.id] ) {
       this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeIndicator()" instead.`)
       return
@@ -140,7 +140,17 @@ export default class Indicator extends Overlay {
   remove() {
     this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPaneID}`)
     this.emit(`${this.chartPaneID}_removeIndicator`, {id: this.id, paneID: this.chartPaneID})
-    return;
+  }
+
+  visible(v) {
+    if (isBoolean(v)) {
+      this.emit(`${this.chartPaneID}_visibleIndicator`, {id: this.id, paneID: this.chartPaneID, visible: v})
+      this.chartPane.indicators[this.id].layer.visible = v
+      this.draw()
+    }
+    else {
+      return this.chartPane.indicators[this.id].layer.visible
+    }
   }
 
   eventsListen() {
@@ -185,11 +195,9 @@ export default class Indicator extends Overlay {
     const action = this.chart.legend.onMouseClick(e.currentTarget)
 
     switch(action.icon) {
-      case "up": 
-        return;
-      case "down":
-        return;
-      case "collapse": return;
+      case "up": return;
+      case "down": return;
+      case "visible": this.visible(!this.visible()); return;
       case "maximize": return;
       case "restore": return;
       case "remove": this.remove(); return;

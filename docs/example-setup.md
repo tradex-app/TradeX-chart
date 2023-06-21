@@ -58,9 +58,9 @@ The chart pane IDs are used as the ``Map()`` keys.
 
 ### Remove
 ```javascript
-chart0.MainPane.chartPanes.removeChartPane("TX_lixi72el_tc8_0-RSI__20_1")
+chart0.chartPanes.removeChartPane("TX_lixi72el_tc8_0-RSI__20_1")
 
-chart0.MainPane.chartPanes.get("TX_lixi72el_tc8_0-RSI__20_1").remove() 
+chart0.chartPanes.get("TX_lixi72el_tc8_0-RSI__20_1").remove() 
 ```
 
 
@@ -72,7 +72,7 @@ chart0.MainPane.chartPanes.get("TX_lixi72el_tc8_0-RSI__20_1").remove()
 
 ### Remove
 ```javascript
-chart1.MainPane.chartPanes.get("TradeX_test-Chart_2").removeIndicator("TradeX_test-Chart_2-BB_4")
+chart1.chartPanes.get("TradeX_test-Chart_2").removeIndicator("TradeX_test-Chart_2-BB_4")
 
-chart1.MainPane.chartPanes.get("TradeX_test-RSI__20_3").indicators["TradeX_test-RSI__20_3-RSI_5"].instance.remove()
+chart1.chartPanes.get("TradeX_test-RSI__20_3").indicators["TradeX_test-RSI__20_3-RSI_5"].instance.remove()
 ```
