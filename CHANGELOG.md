@@ -1,5 +1,78 @@
 # Change Log
 
+## [0.125.0] - 2023-06-20
+
+Added
+
+* Indicators - add via api
+* Indicators - remove via api or chart GUI
+* Indicators - re-order via api or chart GUI
+
+Fixed
+
+* Price Y Axis scale smooth scaling with mouse pointer
+
+## [0.124.1] - 2023-06-17
+
+Changed
+
+* Divider - drag - refactored from MainPane to chart pane resize()
+* Cursor - set, get refactored
+
+FIXED
+
+* Divider - drag - display
+
+## [0.124.0] - 2023-06-17
+
+Added 
+
+* Indicators - remove via API and GUI
+
+Changed 
+
+* ChartPane - guard - no remove primary, no user destroy()
+
+Fixed
+
+* Legend - properly remove icon events
+* Indicators - remove legend on destroy()
+
+## [0.123.0] - 2023-06-14
+
+Changed
+
+* Chart View - remove via API and legend icon
+
+Fixed
+
+* Cleaned up event unsubscribing
+* StateMachine - unsubscribe incorrect function reference
+* StateMachine configs now provide id
+* further id sanitation throughout TradeX
+
+## [0.122.0] - 2023-06-12
+
+Added
+
+* Legend Controls - re-order chart panes
+* xMap()
+
+Changed
+
+* Chart.js - now provides both onChart offChart
+* Reorganize canvas helper functions
+* IDs -  standardized throughout TradeX component
+* console output moved to internal methods
+
+Fixed
+
+* Property Naming clean up - ID -> id for standardization
+* Legends - refactored which() into onMouseClick()
+* Legend - title
+* Pane / View sizing issue
+* Divider - pointer over / enter
+
 ## [0.121.11] - 2023-05-27
 
 Added
