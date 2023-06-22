@@ -1,5 +1,22 @@
 # Change Log
 
+## [0.127.0] - 2023-06-22
+
+Added
+
+* Indicator - invokeConfig()
+* Indicator - settings()
+
+## [0.126.0] - 2023-06-21
+
+Added
+
+* Indicator - visibility
+
+Changed
+
+* Use shorter API path - chart.chartPanes instead of chart.MainPane.chartPanes
+
 ## [0.125.0] - 2023-06-20
 
 Added

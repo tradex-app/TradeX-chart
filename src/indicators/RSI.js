@@ -79,6 +79,8 @@ export default class RSI extends Indicator {
   }
 
   get onChart() { return RSI.onChart }
+  get defaultStyle() { return this.#defaultStyle }
+
 
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false

@@ -162,7 +162,10 @@ const config1 = {
   maxCandleUpdate: 250,
   talib: talib,
   wasm: wasm,
-  state: state1
+  state: state1,
+  callbacks: {
+    indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
+  }
 }
 const config2 = {
   id: "TradeX_test",

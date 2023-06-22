@@ -584,7 +584,12 @@ export default class Chart {
 
   indicatorVisible(id, v) {
     if (!isString(id) || !(id in this.indicators)) return false
-    this.indicators[id].instance.visible(v)
+    return this.indicators[id].instance.visible(v)
+  }
+
+  indicatorSettings(id, s) {
+    if (!isString(id) || !(id in this.indicators)) return false
+    return this.indicators[id].instance.settings(s)
   }
 
   addTool(tool) {

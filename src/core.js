@@ -330,7 +330,7 @@ export default class TradeXchart extends Tradex_chart {
     this.#el = this
     this.#core = this
 
-    const id = (isObject(txCfg) && isString(txCfg.id)) ? txCfg.id : null
+    const id = (isString(txCfg?.id)) ? txCfg.id : null
     this.setID(id)
     this.classList.add(this.id)
 
@@ -373,6 +373,8 @@ export default class TradeXchart extends Tradex_chart {
     this.#time.timeFrame = tf
     this.#time.timeFrameMS = ms
     this.log(`tf: ${tf} ms: ${ms}`)
+
+    this.#config.callbacks = this.#config.callbacks || {}
 
     // process config
     if (isObject(txCfg)) {
@@ -997,6 +999,14 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   /**
+   * retrieve indicator by ID
+   * @param {string} i - indicator ID
+   */
+  getIndicator(i) {
+    return this.#MainPane.getIndicator(i)
+  }
+
+  /**
    * remove an indicator - default or registered user defined
    * @param {string|Indicator} i - indicator id or Indicator instance
    * @returns {boolean} - success / failure
@@ -1004,6 +1014,16 @@ export default class TradeXchart extends Tradex_chart {
   removeIndicator(i) {
     return this.#MainPane.removeIndicator(i)
   }
+
+    /**
+   * set or get indicator settings
+   * @param {string|Indicator} i - indicator id or Indicator instance
+   * @param {object} s - settings
+   * @returns {boolean} - success / failure
+   */
+    indicatorSettings(i, s) {
+      return this.#MainPane.indicatorSettings(i, s)
+    }
 
   /**
    * Does current chart state have indicator
@@ -1035,6 +1055,7 @@ export default class TradeXchart extends Tradex_chart {
     }
   }
 
+  // TODO: rewrite for chart panes
   calcAllIndicators() {
     for (let i of this.Indicators.onchart.values()) {
       i.instance.calcIndicatorHistory()

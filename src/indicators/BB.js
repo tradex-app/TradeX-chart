@@ -81,6 +81,7 @@ export default class BB extends Indicator {
    * @readonly
    */
   get onChart() { return BB.onChart }
+  get defaultStyle() { return this.#defaultStyle }
 
   /**
    * return inputs required to display indicator legend on chart pane

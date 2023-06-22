@@ -532,17 +532,6 @@ export default class MainPane {
     return w - r
   }
 
-  getIndicators() {
-    const ind = {}
-
-    this.#ChartPanes.forEach(
-      (value, key) => {
-        ind[key] = value.indicators
-      }
-    )
-    return ind
-  }
-
   registerChartViews(options) {
     this.#elRows.previousDimensions()
 
@@ -742,6 +731,34 @@ export default class MainPane {
   }
 
   /**
+   * return indicators grouped by Chart Pane
+   * @param {string} i - indicator ID
+   */
+  getIndicators() {
+    const ind = {}
+
+    this.#ChartPanes.forEach(
+      (value, key) => {
+        ind[key] = value.indicators
+      }
+    )
+    return ind
+  }
+
+  /**
+   * retrieve indicator by ID
+   * @param {string} i - indicator ID
+   */
+  getIndicator(i) {
+    if (!isString(i)) return false
+    for (const p of this.#ChartPanes.values()) {
+      if (i in p.indicators) {
+        return p.indicators[i].instance
+      }
+    }
+  }
+
+  /**
    * remove an indicator - default or registered user defined
    * @param {string|Indicator} i - indicator id or Indicator instance
    * @returns {boolean} - success / failure
@@ -760,6 +777,28 @@ export default class MainPane {
     else if (i instanceof Indicator) {
       i.remove()
       return true
+    }
+    else return false
+  }
+
+  /**
+   * set or get indicator settings
+   * @param {string|Indicator} i - indicator id or Indicator instance
+   * @param {object} s - settings
+   * @returns {boolean} - success / failure
+   */
+  indicatorSettings(i, s) {
+    // find by ID
+    if (isString(i)) {
+      for (const p of this.#ChartPanes.values()) {
+        if (i in p.indicators) {
+          return p.indicators[i].instance.settings(s)
+        }
+      }
+    }
+    // find by instance
+    else if (i instanceof Indicator) {
+      return i.settings(s)
     }
     else return false
   }

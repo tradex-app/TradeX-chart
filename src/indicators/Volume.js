@@ -53,5 +53,7 @@ export default class Volume extends Indicator {
   }
 
   get onChart() { return "both" }
+  get defaultStyle() { return this.#defaultStyle }
+
 
 }

@@ -74,6 +74,8 @@ import { uid } from "../utils/utilities"
   }
 
   get onChart() { return EMA.onChart }
+  get defaultStyle() { return this.#defaultStyle }
+
 
   updateLegend() {
     this.parent.legend.update()

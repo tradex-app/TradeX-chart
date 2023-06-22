@@ -62,6 +62,8 @@ export default class Test extends Indicator {
    * @readonly
    */
   get onChart() { return Test.onChart }
+  get defaultStyle() { return this.#defaultStyle }
+
 
   /**
    * return inputs required to display indicator legend on chart pane

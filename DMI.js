@@ -73,6 +73,8 @@ export default class DMI extends Indicator {
    * @readonly
    */
   get onChart() { return DMI.onChart }
+  get defaultStyle() { return this.#defaultStyle }
+
 
   /**
    * return inputs required to display indicator legend on chart pane

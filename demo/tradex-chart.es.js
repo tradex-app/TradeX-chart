@@ -13,7 +13,7 @@ function _mergeNamespaces(n, m) {
   return Object.freeze(Object.defineProperty(n, Symbol.toStringTag, { value: 'Module' }));
 }
 
-const version = "0.125.0";
+const version = "0.127.0";
 
 function isArray (v) {
   return Array.isArray(v)
@@ -5782,7 +5782,7 @@ class Indicator extends Overlay {
   set name(n) { this.#name = n; }
   get shortName() { return this.#shortName }
   set shortName(n) { this.#shortName = n; }
-  get chartPane() { return this.core.MainPane.chartPanes.get(this.chartPaneID) }
+  get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
   get chartPaneID() { return this.#params.overlay.paneID }
   get onChart() { return this.#onChart }
   set onChart(c) { this.#onChart = c; }
@@ -5823,7 +5823,7 @@ class Indicator extends Overlay {
   }
   destroy() {
     if ( this.#status === "destroyed") return
-    const chartPane = this.core.MainPane.chartPanes.get(this.chartPaneID);
+    const chartPane = this.core.ChartPanes.get(this.chartPaneID);
     if ( !chartPane.indicatorDeleteList[this.id] ) {
       this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeIndicator()" instead.`);
       return
@@ -5835,7 +5835,31 @@ class Indicator extends Overlay {
   remove() {
     this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPaneID}`);
     this.emit(`${this.chartPaneID}_removeIndicator`, {id: this.id, paneID: this.chartPaneID});
-    return;
+  }
+  visible(v) {
+    if (isBoolean(v)) {
+      this.emit(`${this.chartPaneID}_visibleIndicator`, {id: this.id, paneID: this.chartPaneID, visible: v});
+      this.chartPane.indicators[this.id].layer.visible = v;
+      this.draw();
+    }
+    return this.chartPane.indicators[this.id].layer.visible
+  }
+  settings(s) {
+    if (isObject(s)) {
+      if (isObject(s?.config)) this.params.overlay.settings =
+       {...this.params.overlay.settings, ...s.config};
+      if (isObject(s?.style)) this.style =
+        {...this.style, ...s.style};
+      this.draw();
+    }
+    return {
+      config: this.params.overlay.settings,
+      style: this.style,
+      defaultStyle: this?.defaultStyle,
+      plots: this.plots,
+      precision: this.precision,
+      definition: this.definition,
+    }
   }
   eventsListen() {
     this.on(STREAM_UPDATE, this.onStreamUpdate, this);
@@ -5857,17 +5881,26 @@ class Indicator extends Overlay {
   onLegendAction(e) {
     const action = this.chart.legend.onMouseClick(e.currentTarget);
     switch(action.icon) {
-      case "up":
-        return;
-      case "down":
-        return;
-      case "collapse": return;
+      case "up": return;
+      case "down": return;
+      case "visible": this.visible(!this.visible()); return;
       case "maximize": return;
       case "restore": return;
       case "remove": this.remove(); return;
-      case "config": return;
+      case "config": this.invokeSettings(); return;
       default: return;
     }
+  }
+  invokeSettings(c) {
+    if (isFunction(c?.fn)) {
+      let r = C.fn(this);
+      if (c?.own) return r
+    }
+    else if (isFunction(this.core.config.callbacks?.indicatorSettings?.fn)) {
+      let r = this.core.config.callbacks.indicatorSettings.fn(this);
+      if (this.core.config.callbacks?.indicatorSettings?.own) return r
+    }
+    this.core.log(`invokeSettings: ${this.id}`);
   }
   defineIndicator(i, api) {
     if (!isObject(i)) i = {};
@@ -6229,6 +6262,7 @@ class BB extends Indicator {
     this.addLegend();
   }
   get onChart() { return BB.onChart }
+  get defaultStyle() { return this.#defaultStyle }
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
     const inputs = {};
@@ -6345,6 +6379,7 @@ class EMA extends Indicator {
     this.addLegend();
   }
   get onChart() { return EMA.onChart }
+  get defaultStyle() { return this.#defaultStyle }
   updateLegend() {
     this.parent.legend.update();
   }
@@ -6429,6 +6464,7 @@ class RSI extends Indicator {
     this.addLegend();
   }
   get onChart() { return RSI.onChart }
+  get defaultStyle() { return this.#defaultStyle }
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
     const inputs = {};
@@ -6538,6 +6574,7 @@ class SMA extends Indicator {
     this.addLegend();
   }
   get onChart() { return SMA.onChart }
+  get defaultStyle() { return this.#defaultStyle }
   updateLegend() {
     this.parent.legend.update();
   }
@@ -6598,6 +6635,7 @@ class Volume extends Indicator {
     params.overlay;
   }
   get onChart() { return "both" }
+  get defaultStyle() { return this.#defaultStyle }
 }
 
 var Indicators = {
@@ -9818,6 +9856,7 @@ class Chart {
     this.off(STREAM_NEWVALUE, this.onStreamNewValue);
     this.off(STREAM_UPDATE, this.onStreamUpdate);
     this.off(STREAM_FIRSTVALUE, this.onStreamNewValue);
+    this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this);
     if (this.isOnChart)
       this.off("chart_yAxisRedraw", this.onYAxisRedraw);
     this.element.remove();
@@ -10011,6 +10050,14 @@ class Chart {
       this.emit("destroyChartView", this.id);
     delete this.#indicatorDeleteList[id];
   }
+  indicatorVisible(id, v) {
+    if (!isString$1(id) || !(id in this.indicators)) return false
+    return this.indicators[id].instance.visible(v)
+  }
+  indicatorSettings(id, s) {
+    if (!isString$1(id) || !(id in this.indicators)) return false
+    return this.indicators[id].instance.settings(s)
+  }
   addTool(tool) {
     let { layerConfig } = this.layerConfig();
     let layer = new CEL$1.Layer(layerConfig);
@@ -10065,7 +10112,7 @@ class Chart {
     switch(action.icon) {
       case "up": this.reorderUp(); return;
       case "down": this.reorderDown(); return;
-      case "collapse": return;
+      case "visible": return;
       case "maximize": return;
       case "restore": return;
       case "remove": this.remove(); return;
@@ -10090,7 +10137,7 @@ class Chart {
     if (prevPane !== null) {
       prevPane.Divider.setPos();
       prevPane.Divider.show();
-      this.core.MainPane.chartPanes.swapKeys(this.id, prevEl.id);
+      this.core.ChartPanes.swapKeys(this.id, prevEl.id);
     }
     if (el.previousElementSibling === null)
       this.Divider.hide();
@@ -10113,7 +10160,7 @@ class Chart {
     if (nextPane !== null) {
       nextPane.Divider.setPos();
       this.Divider.show();
-      this.core.MainPane.chartPanes.swapKeys(this.id, nextEl.id);
+      this.core.ChartPanes.swapKeys(this.id, nextEl.id);
     }
     if (nextEl.previousElementSibling === null)
       nextPane.Divider.hide();
@@ -10180,8 +10227,8 @@ class Chart {
     const prevScaleEl = scaleEl.previousElementSibling;
     const nextScaleEl = scaleEl.nextElementSibling;
     const parentScaleEl = scaleEl.parentNode;
-    const prevPane = (prevEl !== null) ? this.core.MainPane.chartPanes.get(prevEl.id) : null;
-    const nextPane = (nextEl !== null) ? this.core.MainPane.chartPanes.get(nextEl.id) : null;
+    const prevPane = (prevEl !== null) ? this.core.ChartPanes.get(prevEl.id) : null;
+    const nextPane = (nextEl !== null) ? this.core.ChartPanes.get(nextEl.id) : null;
     return {
       el,
       prevEl,
@@ -10197,11 +10244,11 @@ class Chart {
   }
   sibling(s) {
     s = (["prev", "next"].includes(s)) ? s : "prev";
-    let chartPanes = [...this.core.MainPane.chartPanes.keys()];
+    let chartPanes = [...this.core.ChartPanes.keys()];
     let i = chartPanes.indexOf(this.id);
     if (s == "prev") --i;
     else ++i;
-    return this.#core.MainPane.chartPanes.get(chartPanes[i]) || null
+    return this.#core.ChartPanes.get(chartPanes[i]) || null
   }
 }
 
@@ -10805,15 +10852,6 @@ class MainPane {
     let r = w % this.candleW;
     return w - r
   }
-  getIndicators() {
-    const ind = {};
-    this.#ChartPanes.forEach(
-      (value, key) => {
-        ind[key] = value.indicators;
-      }
-    );
-    return ind
-  }
   registerChartViews(options) {
     this.#elRows.previousDimensions();
     const onChart = [];
@@ -10949,6 +10987,23 @@ class MainPane {
     console.log(`Added indicator:`, instance.id);
     return instance
   }
+  getIndicators() {
+    const ind = {};
+    this.#ChartPanes.forEach(
+      (value, key) => {
+        ind[key] = value.indicators;
+      }
+    );
+    return ind
+  }
+  getIndicator(i) {
+    if (!isString$1(i)) return false
+    for (const p of this.#ChartPanes.values()) {
+      if (i in p.indicators) {
+        return p.indicators[i].instance
+      }
+    }
+  }
   removeIndicator(i) {
     if (isString$1(i)) {
       for (const p of this.#ChartPanes.values()) {
@@ -10961,6 +11016,19 @@ class MainPane {
     else if (i instanceof Indicator) {
       i.remove();
       return true
+    }
+    else return false
+  }
+  indicatorSettings(i, s) {
+    if (isString$1(i)) {
+      for (const p of this.#ChartPanes.values()) {
+        if (i in p.indicators) {
+          return p.indicators[i].instance.settings(s)
+        }
+      }
+    }
+    else if (i instanceof Indicator) {
+      return i.settings(s)
     }
     else return false
   }
@@ -11539,7 +11607,7 @@ class tradeXLegends extends element {
     let id = o.id;
       inp += `<span id="${id}_up" class="control" data-icon="up">${up}</span>`;
       inp += `<span id="${id}_down" class="control" data-icon="down">${down}</span>`;
-    inp += `<span id="${id}_collapse" class="control" data-icon="collapse">${collapse}</span>`;
+    inp += `<span id="${id}_collapse" class="control" data-icon="visible">${collapse}</span>`;
     inp += `<span id="${id}_maximize" class="control" data-icon="maximize">${maximize}</span>`;
     inp += `<span id="${id}_restore" class="control" data-icon="restore">${restore}</span>`;
     inp += (o?.type !== "chart") ? `<span id="${id}_remove" class="control" data-icon="remove">${close}</span>` : ``;
@@ -13564,7 +13632,7 @@ class TradeXchart extends tradeXChart {
     this.#TALib = txCfg.talib;
     this.#el = this;
     this.#core = this;
-    const id = (isObject(txCfg) && isString$1(txCfg.id)) ? txCfg.id : null;
+    const id = (isString$1(txCfg?.id)) ? txCfg.id : null;
     this.setID(id);
     this.classList.add(this.id);
     this.log("processing state...");
@@ -13595,6 +13663,7 @@ class TradeXchart extends tradeXChart {
     this.#time.timeFrame = tf;
     this.#time.timeFrameMS = ms;
     this.log(`tf: ${tf} ms: ${ms}`);
+    this.#config.callbacks = this.#config.callbacks || {};
     if (isObject(txCfg)) {
       for (const option in txCfg) {
         if (option in this.props()) {
@@ -13964,9 +14033,15 @@ class TradeXchart extends tradeXChart {
   addIndicator(i, name=i, params={}) {
     return this.#MainPane.addIndicator(i, name=i, params={})
   }
+  getIndicator(i) {
+    return this.#MainPane.getIndicator(i)
+  }
   removeIndicator(i) {
     return this.#MainPane.removeIndicator(i)
   }
+    indicatorSettings(i, s) {
+      return this.#MainPane.indicatorSettings(i, s)
+    }
   hasStateIndicator(i, dataset="searchAll") {
     if (!isString$1(i) || !isString$1(dataset)) return false
     const find = function(i, d) {

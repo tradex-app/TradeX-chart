@@ -5,7 +5,7 @@ import Overlay from "./overlay"
 import { Range } from "../../model/range"
 import canvas from "../../renderer/canvas"
 import { limit } from "../../utils/number"
-import { isBoolean, isObject, isString } from "../../utils/typeChecks"
+import { isBoolean, isFunction, isObject, isString } from "../../utils/typeChecks"
 import {
   STREAM_NEWVALUE,
   STREAM_UPDATE
@@ -142,14 +142,39 @@ export default class Indicator extends Overlay {
     this.emit(`${this.chartPaneID}_removeIndicator`, {id: this.id, paneID: this.chartPaneID})
   }
 
+  /**
+   * set or get indicator visibility
+   * @param {boolean} v - visible
+   * @returns {boolean}
+   */
   visible(v) {
     if (isBoolean(v)) {
       this.emit(`${this.chartPaneID}_visibleIndicator`, {id: this.id, paneID: this.chartPaneID, visible: v})
       this.chartPane.indicators[this.id].layer.visible = v
       this.draw()
     }
-    else {
-      return this.chartPane.indicators[this.id].layer.visible
+    return this.chartPane.indicators[this.id].layer.visible
+  }
+
+  /**
+   * set or get indicator settings
+   * @param {object} s - settings
+   */
+  settings(s) {
+    if (isObject(s)) {
+      if (isObject(s?.config)) this.params.overlay.settings = 
+       {...this.params.overlay.settings, ...s.config}
+      if (isObject(s?.style)) this.style =
+        {...this.style, ...s.style}
+      this.draw()
+    }
+    return {
+      config: this.params.overlay.settings,
+      style: this.style,
+      defaultStyle: this?.defaultStyle,
+      plots: this.plots,
+      precision: this.precision,
+      definition: this.definition,
     }
   }
 
@@ -201,17 +226,30 @@ export default class Indicator extends Overlay {
       case "maximize": return;
       case "restore": return;
       case "remove": this.remove(); return;
-      case "config": return;
+      case "config": this.invokeSettings(); return;
       default: return;
     }
   }
 
-
-
+  /**
+   * invoke indicator settings callback, user defined or default
+   * @param {object} c - {fn: function, own: boolean}, own flag will bypass default action
+   * @returns 
+   */
+  invokeSettings(c) {
+    if (isFunction(c?.fn)) {
+      let r = C.fn(this)
+      if (c?.own) return r
+    }
+    else if (isFunction(this.core.config.callbacks?.indicatorSettings?.fn)) {
+      let r = this.core.config.callbacks.indicatorSettings.fn(this)
+      if (this.core.config.callbacks?.indicatorSettings?.own) return r
+    }
+    this.core.log(`invokeSettings: ${this.id}`)
+  }
 
   /**
    * validate indicator inputs and outputs
-   *
    * @param {object} i
    * @param {object} api
    * @memberof indicator

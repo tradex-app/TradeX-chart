@@ -202,6 +202,8 @@ export default class Test extends Indicator {
    * @readonly
    */
   get onChart() { return Test.onChart }
+  get defaultStyle() { return this.#defaultStyle }
+
 
   /**
    * return inputs required to display indicator legend on chart pane
@@ -330,5 +332,31 @@ export default class Test extends Indicator {
   }
 }
 ```
+## Settings
 
+Current indicator settings can be retrieved with the following call:
+```javascript
+chart0.getIndicator("TX_lj7216mu_vq6_0-Chart_0-EMA_1").settings()
+```
 
+Indicator settings can also modified with the same call by passing an object:
+```javascript
+const newSettings = {}
+chart0.getIndicator("TX_lj7216mu_vq6_0-Chart_0-EMA_1").settings(newSettings)
+```
+### Invokeing the Settings Dialogue
+
+The indicator Settings Dialogue can be invoked with the following:
+```javascript
+chart0.getIndicator("TX_lj7216mu_vq6_0-Chart_0-EMA_1").invokeSettings()
+```
+Invocation of the Settings Dialogue can be modified or replaced with a user defined function, either by passing an object to the method:
+```javascript
+const callback = {
+    indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
+  }
+chart0.getIndicator("TX_lj7216mu_vq6_0-Chart_0-EMA_1").invokeSettings(callback)
+```
+Setting ``own: true`` will cause the default dialogue not to be invoked.
+
+Alternatively, if in the initial chart configuration, the ``config.callbacks.indicatorSettings`` is given a callback object, this will make the change permanent.

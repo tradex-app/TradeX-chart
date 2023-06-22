@@ -69,6 +69,8 @@ export default class DX extends Indicator {
   }
 
   get onChart() { return DX.onChart }
+  get defaultStyle() { return this.#defaultStyle }
+
 
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false

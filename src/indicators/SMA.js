@@ -77,6 +77,8 @@ import { uid } from "../utils/utilities"
   }
 
   get onChart() { return SMA.onChart }
+  get defaultStyle() { return this.#defaultStyle }
+
 
   updateLegend() {
     this.parent.legend.update()
