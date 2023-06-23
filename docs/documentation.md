@@ -17,6 +17,5 @@ eg. 0.100.6
 * [Indicators](indicators.md)
 * [Overlays](overlays.md)
 * [Themes](themes.md)
-* [Tricks and Tips](tricks_tips.md)
 * [Development Road Map](TradeX-chart-Development-Roadmap.pdf)
 

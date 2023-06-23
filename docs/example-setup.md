@@ -21,18 +21,18 @@ chart0.reset()
 chart0.expunge()
 chart0.state.create()
 chart0.state.export()
-chart0.use()
-chart0.has()
-data
-delete
-get
-id
-isEmpty
-status
+chart0.state.use()
+chart0.state.has()
+chart0.state.data
+chart0.state.delete
+chart0.state.get
+chart0.state.id
+chart0.state.isEmpty
+chart0.state.status
 
 List all states available 
 ```javascript
-chart0.list()
+chart0.state.list()
 ```
 
 

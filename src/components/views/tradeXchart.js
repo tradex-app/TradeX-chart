@@ -22,6 +22,10 @@ import {
 
 const HTML = `
   <style title="core">
+    :host {
+      position: relative;
+      z-index: 0;
+    }
     tradex-utils {
       height: ${UTILSH}px; 
       width: 100%; 

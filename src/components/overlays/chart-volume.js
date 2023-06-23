@@ -45,8 +45,6 @@ export default class chartVolume extends Overlay {
     }
     const volH = Math.floor(zeroPos * this.theme.volume.Height / 100)
 
-console.log(`w: ${this.scene.width} r: ${range.Length}`)
-
     let o = this.core.rangeScrollOffset
     let v = range.indexStart - o
     let i = range.Length + (o * 2)

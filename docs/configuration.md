@@ -202,6 +202,10 @@ const config = {
   // is optional - chart will start without one, and await data via the API
   state: {
     // Details of the state structure are found in [state.md](state.md)
+  },
+  // user defined functions to run with or replace default methods
+  callbacks: {
+    indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
   }
 }
 ```
