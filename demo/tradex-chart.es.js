@@ -13,7 +13,7 @@ function _mergeNamespaces(n, m) {
   return Object.freeze(Object.defineProperty(n, Symbol.toStringTag, { value: 'Module' }));
 }
 
-const version = "0.127.0";
+const version = "0.127.1";
 
 function isArray (v) {
   return Array.isArray(v)
@@ -9245,14 +9245,17 @@ class chartVolume extends Overlay {
     const data = range.data;
     const zeroPos = this.scene.height;
     const offset = this.xAxis.smoothScrollOffset || 0;
-    const width = this.xAxis.candleW;
-    const w = (width > 5) ? Math.ceil(width * 0.8) : width;
+    let w = Math.max(this.xAxis.candleW -1, 1);
+    if (w < 3) w = 1;
+    else if (w < 5) w = 3;
+    else if (w > 5) w = Math.ceil(w * 0.8);
     const volume = {
       x: 0 + offset - this.xAxis.candleW,
       w: w,
       z: zeroPos
     };
     const volH = Math.floor(zeroPos * this.theme.volume.Height / 100);
+console.log(`w: ${this.scene.width} r: ${range.Length}`);
     let o = this.core.rangeScrollOffset;
     let v = range.indexStart - o;
     let i = range.Length + (o * 2);
@@ -9308,7 +9311,9 @@ class Candle {
         this.fill = hilo;
     }
     let w = Math.max(data.w -1, 1);
-        w = (w > 5) ? Math.ceil(w * 0.8) : w;
+    if (w < 3) w = 1;
+    else if (w < 5) w = 3;
+    else if (w > 5) w = Math.ceil(w * 0.8);
     let hw = Math.max(Math.floor(w * 0.5), 1);
     let h = Math.abs(data.o - data.c);
     let max_h = data.c === data.o ? 1 : 2;
@@ -9333,7 +9338,19 @@ class Candle {
     }
     ctx.lineTo(x05, Math.floor(data.l));
     ctx.stroke();
-    if (data.w > 1.5 && this.fill) {
+    if (w == 3) {
+      ctx.fillStyle = wickColour;
+      let s = hilo ? 1 : -1;
+      ctx.rect(
+        Math.floor(x - hw),
+        data.c,
+        Math.floor(hw * 2),
+        s * Math.max(h, max_h),
+      );
+        ctx.fill();
+      ctx.stroke();
+    }
+    else if (w > 3 && this.fill) {
       ctx.fillStyle = bodyColour;
       let s = hilo ? 1 : -1;
       ctx.rect(
@@ -9345,7 +9362,7 @@ class Candle {
       ctx.fill();
       ctx.stroke();
     }
-    else if (data.w > 1.5 && !this.fill && this.cfg.candle.Type !== CandleType.OHLC) {
+    else if (w > 3 && !this.fill && this.cfg.candle.Type !== CandleType.OHLC) {
       let s = hilo ? 1 : -1;
       ctx.rect(
         Math.floor(x - hw),
@@ -9364,7 +9381,7 @@ class Candle {
       ctx.stroke();
     }
     else {
-        ctx.strokeStyle = bodyColour;
+        ctx.strokeStyle = wickColour;
         ctx.beginPath();
         ctx.moveTo(
             x05,

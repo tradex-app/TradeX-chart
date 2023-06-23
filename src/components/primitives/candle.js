@@ -47,7 +47,11 @@ export default class Candle {
     }
 
     let w = Math.max(data.w -1, 1)
-        w = (w > 5) ? Math.ceil(w * 0.8) : w
+    
+    if (w < 3) w = 1
+    else if (w < 5) w = 3
+    else if (w > 5) w = Math.ceil(w * 0.8)
+
     let hw = Math.max(Math.floor(w * 0.5), 1)
     let h = Math.abs(data.o - data.c)
     let max_h = data.c === data.o ? 1 : 2
@@ -77,9 +81,24 @@ export default class Candle {
     ctx.lineTo(x05, Math.floor(data.l))
     ctx.stroke()
 
-    // Body
-    if (data.w > 1.5 && this.fill) {
 
+
+    // Body
+    if (w == 3) {
+      ctx.fillStyle = wickColour
+
+      let s = hilo ? 1 : -1
+      ctx.rect(
+        Math.floor(x - hw),
+        data.c,
+        Math.floor(hw * 2),
+        s * Math.max(h, max_h),
+      )
+      // if (!this.fill && this.cfg.candle.Type !== CandleType.OHLC) 
+        ctx.fill()
+      ctx.stroke()
+    }
+    else if (w > 3 && this.fill) {
       ctx.fillStyle = bodyColour
 
       let s = hilo ? 1 : -1
@@ -92,7 +111,7 @@ export default class Candle {
       ctx.fill()
       ctx.stroke()
     } 
-    else if (data.w > 1.5 && !this.fill && this.cfg.candle.Type !== CandleType.OHLC) {
+    else if (w > 3 && !this.fill && this.cfg.candle.Type !== CandleType.OHLC) {
       let s = hilo ? 1 : -1
       ctx.rect(
         Math.floor(x - hw),
@@ -113,8 +132,8 @@ export default class Candle {
       ctx.stroke()
     }
     else {
-        // candle to thin for fill, just draw paths
-        ctx.strokeStyle = bodyColour
+        // candle too thin for fill, just draw paths
+        ctx.strokeStyle = wickColour
 
         ctx.beginPath()
         ctx.moveTo(
