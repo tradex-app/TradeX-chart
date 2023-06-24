@@ -3,12 +3,11 @@
 // Providing: chart drawing tools
 
 import DOM from "../utils/DOM"
-import { ToolsStyle } from "../definitions/style"
-import { CLASS_TOOLS } from "../definitions/core"
 import tools from "../definitions/tools"
 import Tool from '../tools/tool'
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-tools"
+import { ToolsStyle } from "../definitions/style"
 
 
 /**
@@ -33,6 +32,7 @@ export default class ToolsBar {
   #toolClasses = {}
   #activeTool = undefined
   #toolTarget
+  #toolEvents = {click:[], pointerover:[]}
 
 
   constructor (core, options) {
@@ -86,13 +86,13 @@ export default class ToolsBar {
   destroy() {
     this.stateMachine.destroy()
     // remove event listeners
-    const api = this.#core
-    // FIXME: #${api.id} NO LONGER VALID
-    const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`)
+    const tools = this.#elTools.querySelectorAll(`.icon-wrapper`)
     for (let tool of tools) {
       for (let t of this.#tools) {
         if (t.id === id)
-          tool.removeEventListener("click", this.onIconClick)
+          tool.removeEventListener("click", this.#toolEvents[id].click)
+          tool.removeEventListener("pointerover", this.#toolEvents[id].pointerover)
+          tool.removeEventListener("pointerout", this.#toolEvents[id].pointerout)
       }
     }
 
@@ -135,8 +135,18 @@ export default class ToolsBar {
     }
   }
 
+  onIconOut(e) {
+    const svg = e.currentTarget.querySelector('svg');
+          svg.style.fill = ToolsStyle.COLOUR_ICON
+  }
+
+  onIconOver(e) {
+    const svg = e.currentTarget.querySelector('svg');
+          svg.style.fill = ToolsStyle.COLOUR_ICONHOVER
+  }
+
   onToolTargetSelected(tool) {
-    console.log("tool_targetSelected", tool.target)
+    console.log("tool_targetSelected:", tool.target)
     this.#toolTarget = tool.target
   }
 
@@ -154,12 +164,11 @@ export default class ToolsBar {
   }
 
   mount(el) {
-    el.innerHTML = this.defaultNode()
+    el.innerHTML = this.#elTools.defaultNode(this.#tools)
   }
 
   initAllTools() {
-    const api = this.#core
-    const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`)
+    const tools = this.#elTools.querySelectorAll(`.icon-wrapper`)
     for (let tool of tools) {
 
       let id = tool.id, //.replace('TX_', ''),
@@ -169,7 +178,14 @@ export default class ToolsBar {
 
       for (let t of this.#tools) {
         if (t.id === id) {
-          tool.addEventListener("click", this.onIconClick.bind(this))
+          this.#toolEvents[id] = {}
+          this.#toolEvents[id].click = this.onIconClick.bind(this)
+          this.#toolEvents[id].pointerover = this.onIconOver.bind(this)
+          this.#toolEvents[id].pointerout = this.onIconOut.bind(this)
+          tool.addEventListener("click", this.#toolEvents[id].click)
+          tool.addEventListener("pointerover", this.#toolEvents[id].pointerover)
+          tool.addEventListener("pointerout", this.#toolEvents[id].pointerout)
+
           if (t?.sub) {
             let config = {
               content: t.sub,
@@ -191,29 +207,7 @@ export default class ToolsBar {
     }
   }
 
-  defaultNode() {
-    let toolbar = `
-    <style>
-      svg {
-        height: ${ToolsStyle.ICONSIZE};
-        fill: ${ToolsStyle.COLOUR_ICON};
-      }
-    </style>
-    `
-    for (const tool of this.#tools) {
-      toolbar += this.iconNode(tool)
-    }
 
-    return toolbar
-  }
-
-  iconNode(tool) {
-    const iconStyle = `display: inline-block; height: ${ToolsStyle.ICONSIZE}; margin-left: -3px;`
-    const menu = ("sub" in tool) ? `data-menu="true"` : ""
-    return  `
-      <div id="${tool.id}" data-event="${tool.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${tool.icon}</div>\n
-    `
-  }
 
   /**
    * add tool to chart row from data state

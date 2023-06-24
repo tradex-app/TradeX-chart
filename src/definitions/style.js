@@ -10,8 +10,8 @@ export const TX_MINW = `${CHART_MINW}px`
 export const TX_MINH = `${CHART_MINH}px`
 export const TX_MAXW = "100%"
 export const TX_MAXH = "100%"
-export const UTILSH = 35
-export const TOOLSW = 40
+export const UTILSH = 30
+export const TOOLSW = 35
 export const TIMESCALEH = 25
 export const TIMENAVIGATIONH = 25
 export const TIMEH = TIMESCALEH + TIMENAVIGATIONH
@@ -26,7 +26,7 @@ const COLOUR_BORDER = "#666"
 const COLOUR_TXT = "#ccc"
 const COLOUR_ICON = "#888"
 const COLOUR_ICONHOVER = "#CCC"
-const ICONSIZE = "30px"
+const ICONSIZE = "25px"
 
 export const STYLE_ROWS = "width:100%; min-width:100%;"
 export const STYLE_ROW = "position: relative;"
@@ -65,6 +65,7 @@ export const CanvasStyle = {
 
 export const ToolsStyle = {
   COLOUR_ICON: COLOUR_ICON,
+  COLOUR_ICONHOVER: COLOUR_ICONHOVER,
   ICONSIZE: ICONSIZE
 }
 

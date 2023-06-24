@@ -76,7 +76,7 @@ export default class Menu {
   end() {
     // remove event listners
     const api = this.#config
-    const menuItems = DOM.findBySelectorAll(`#${api.id} .${CLASS_MENU} li`)
+    const menuItems = this.#elMenus.querySelectorAll(`.${CLASS_MENU} li`)
     menuItems.forEach((item) => {
       item.removeEventListener('click', this.onMenuSelect)
     })
@@ -88,7 +88,7 @@ export default class Menu {
 
   eventsListen() {
     const api = this.#core
-    const menuItems = DOM.findBySelectorAll(`#${api.id} #${this.#config.id} li`)
+    const menuItems = this.#elMenus.querySelectorAll(`#${this.#config.id} li`)
     menuItems.forEach((item) => {
       item.addEventListener('click', this.onMenuSelect.bind(this))
     })
@@ -141,7 +141,7 @@ export default class Menu {
     else
       el.lastElementChild.insertAdjacentHTML("afterend", this.menuNode())
 
-    this.#elMenu = DOM.findBySelector(`#${api.id} #${this.#config.id}`)
+    this.#elMenu = this.#elMenus.querySelector(`#${this.#config.id}`)
   }
 
   static defaultNode() {
