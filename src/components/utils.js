@@ -7,6 +7,8 @@ import { UtilsStyle } from "../definitions/style"
 import { CLASS_UTILS } from "../definitions/core"
 import utilsList from "../definitions/utils"
 import Indicators from "../definitions/indicators"
+import { debounce } from "../utils/utilities"
+import { isObject } from "../utils/typeChecks"
 
 
 export default class UtilsBar {
@@ -20,6 +22,7 @@ export default class UtilsBar {
   #widgets
   #indicators
   #menus = {}
+  #utilsEvents = {}
 
   constructor (core, options) {
 
@@ -64,9 +67,12 @@ export default class UtilsBar {
     const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
 
     for (let util of utils) {
+      let id = util.id.replace('TX_', '')
       for (let u of this.#utils) {
         if (u.id === id)
-          util.removeEventListener("click", this.onIconClick)
+          util.removeEventListener("click", this.#utilsEvents[id].click)
+          util.removeEventListener("pointerover", this.#utilsEvents[id].pointerover)
+          util.removeEventListener("pointerout", this.#utilsEvents[id].pointerout)
       }
     }
 
@@ -97,12 +103,17 @@ export default class UtilsBar {
   }
 
   onIconClick(e) {
-    let evt = e.currentTarget.dataset.event,
-        menu = e.currentTarget.dataset.menu || false,
+    if (!isObject(e.originalTarget)) return false
+
+    const target = DOM.findTargetParentWithClass(e.originalTarget, "icon-wrapper")
+    if (!isObject(target)) return false
+
+    let evt = target.dataset.event;
+    let menu = target.dataset.menu || false,
         data = {
-          target: e.currentTarget.id,
+          target: target.id,
           menu: menu,
-          evt: e.currentTarget.dataset.event
+          evt: evt
         };
         
     this.emit(evt, data)
@@ -114,13 +125,22 @@ export default class UtilsBar {
     }
   }
 
+  onIconOver(e) {
+    const svg = e.currentTarget.querySelector('svg');
+          svg.style.fill = UtilsStyle.COLOUR_ICONHOVER
+  }
+
+  onIconOut(e) {
+    const svg = e.currentTarget.querySelector('svg');
+          svg.style.fill = UtilsStyle.COLOUR_ICON
+  }
+
   mount(el) {
-    el.innerHTML = this.defaultNode()
+    el.innerHTML = this.#elUtils.defaultNode(this.#utils)
   }
 
   initAllUtils() {
-    const api = this.#core
-    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
+    const utils = this.#elUtils.querySelectorAll(`.icon-wrapper`)
 
     for (let util of utils) {
 
@@ -132,7 +152,13 @@ export default class UtilsBar {
 
       for (let u of this.#utils) {
         if (u.id === id) {
-          util.addEventListener("click", this.onIconClick.bind(this))
+          this.#utilsEvents[id] = {}
+          this.#utilsEvents[id].click = debounce(this.onIconClick, 50, this) // this.onIconClick.bind(this)
+          this.#utilsEvents[id].pointerover = this.onIconOver.bind(this)
+          this.#utilsEvents[id].pointerout = this.onIconOut.bind(this)
+          util.addEventListener("click", this.#utilsEvents[id].click)
+          util.addEventListener("pointerover", this.#utilsEvents[id].pointerover)
+          util.addEventListener("pointerout", this.#utilsEvents[id].pointerout)
 
           if (u.id === "indicators") u.sub = Object.values(this.#indicators)
 
@@ -149,34 +175,6 @@ export default class UtilsBar {
       }
     }
   }
-
-  defaultNode() {
-    // let utilsBar = ""
-    let style = `display: inline-block; float: right;`
-    let utilsBar = `
-    <div style="${style}">
-    <style>
-      svg {
-        height: ${UtilsStyle.ICONSIZE};
-        fill: ${UtilsStyle.COLOUR_ICON};
-      }
-    </style>
-    `
-    for (const util of this.#utils) {
-      utilsBar += this.iconNode(util)
-    }
-
-    return utilsBar + "</div>"
-  }
-
-  iconNode(util) {
-    const iconStyle = `display: inline-block; height: ${UtilsStyle.ICONSIZE}; padding-top: 2px`
-    const menu = ("sub" in util) ? `data-menu="true"` : ""
-    return  `
-      <div id="TX_${util.id}" data-event="${util.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${util.icon}</div>\n
-    `
-  }
-
 
   onIndicators(data) {
     console.log(`Indicator:`,data)

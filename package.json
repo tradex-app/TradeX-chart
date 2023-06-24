@@ -12,7 +12,7 @@
     }
   },
   "private": false,
-  "version": "0.127.3",
+  "version": "0.128.0",
   "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",

@@ -1,7 +1,7 @@
 // DOM.js
 // DOM utilities
 
-import { isObject } from "./typeChecks"
+import { isObject, isString } from "./typeChecks"
 
 const DOM = {
 
@@ -245,6 +245,19 @@ const DOM = {
     else {
       sheet.addRule(selector, rules, index);
     }
+  },
+
+  /**
+   * recursively search back through DOM for element with matching class
+   * @param {HTMLElement} el 
+   * @param {string} selector 
+   * @returns {HTMLElement|null}
+   */
+  findTargetParentWithClass(el, selector) {
+    if (!this.isElement(el) || !isString(selector)) return null
+
+    if (el.classList.contains(selector)) return el
+    else return this.findTargetParentWithClass(el.parentElement, selector)
   }
 
 }

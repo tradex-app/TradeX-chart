@@ -18,5 +18,5 @@ export default {
   EMA: {id: "EMA", name: "Exponential Moving Average", event: "addIndicator", ind: EMA},
   RSI: {id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: RSI},
   SMA: {id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: SMA},
-  Vol: {id: "Vol", name: "Volume", event: "addIndicator", ind: Volume},
+  // Vol: {id: "Vol", name: "Volume", event: "addIndicator", ind: Volume},
 }

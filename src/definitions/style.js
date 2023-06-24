@@ -71,6 +71,7 @@ export const ToolsStyle = {
 
 export const UtilsStyle = {
   COLOUR_ICON: COLOUR_ICON,
+  COLOUR_ICONHOVER: COLOUR_ICONHOVER,
   ICONSIZE: ICONSIZE
 }
 

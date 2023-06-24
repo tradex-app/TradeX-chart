@@ -23,6 +23,8 @@ export default class Window {
   #cursorPos
   #controller
 
+  #windowEvents = {}
+
   static windowList = {}
   static windowCnt = 0
   static class = CLASS_WINDOWS
@@ -141,7 +143,7 @@ export default class Window {
     else
       el.lastElementChild.insertAdjacentHTML("afterend", this.windowNode())
 
-    this.#elWindow = DOM.findBySelector(`#${api.id} #${this.#config.id}`)
+    this.#elWindow = this.#elWindows.querySelector(`#${this.#config.id}`)
     
     let x, y;
     if (this.#config.x && this.#config.y) {
@@ -199,7 +201,6 @@ export default class Window {
 
   // get your drag on
   dragBar(window) {
-    const api = this.#core
     const cPointer = "cursor: grab;"
     const over = `onmouseover="this.style.background ='#222'"`
     const out = `onmouseout="this.style.background ='none'"`
@@ -215,7 +216,6 @@ export default class Window {
   }
 
   closeIcon(window) {
-    const api = this.#core
     const cPointer = "cursor: pointer;"
     const over = `onmouseover="this.style.background ='#222'"`
     const out = `onmouseout="this.style.background ='none'"`
@@ -254,7 +254,8 @@ export default class Window {
 
     setTimeout(() => {
       // click event outside of window
-      document.addEventListener('click', this.onOutsideClickListener.bind(this))
+      this.#windowEvents.click = this.onOutsideClickListener.bind(this)
+      document.addEventListener('click', this.#windowEvents.click)
     }, 1000)
   }
 
@@ -264,6 +265,6 @@ export default class Window {
     this.#elWindow.style.display = "none"
     this.emit("windowClosed", this.id)
 
-    document.removeEventListener('click', this.onOutsideClickListener)
+    document.removeEventListener('click', this.#windowEvents.click)
   }
 }
