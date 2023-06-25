@@ -21,6 +21,8 @@ export default class Menu {
   #cursorPos
   #controller
 
+  #menuEvents = {}
+
   static menuList = {}
   static menuCnt = 0
   static class = CLASS_MENUS
@@ -75,26 +77,23 @@ export default class Menu {
 
   end() {
     // remove event listners
-    const api = this.#config
-    const menuItems = this.#elMenus.querySelectorAll(`.${CLASS_MENU} li`)
+    const menuItems = this.#elMenus.querySelectorAll(`#${this.id} li`)
     menuItems.forEach((item) => {
-      item.removeEventListener('click', this.onMenuSelect)
+      item.removeEventListener('click', this.#menuEvents[this.id][item.id])
     })
 
-    document.removeEventListener('click', this.onOutsideClickListener)
+    document.removeEventListener('click', this.#menuEvents[this.id].outside)
     // remove element
     // this.el.remove()
   }
 
   eventsListen() {
-    const api = this.#core
-    const menuItems = this.#elMenus.querySelectorAll(`#${this.#config.id} li`)
+    const menuItems = this.#elMenus.querySelectorAll(`#${this.id} li`)
+    this.#menuEvents[this.id] = {}
     menuItems.forEach((item) => {
-      item.addEventListener('click', this.onMenuSelect.bind(this))
+      this.#menuEvents[this.id][item.id] = this.onMenuSelect.bind(this)
+      item.addEventListener('click', this.#menuEvents[this.id][item.id])
     })
-
-    // click event outside of menu
-    document.addEventListener('click', this.onOutsideClickListener.bind(this))
   }
 
   on(topic, handler, context) {
@@ -116,9 +115,10 @@ export default class Menu {
           menu: this.#id,
           evt: evt
         };
-        
-    this.emit("menuItemSelected", data)
-    this.emit("closeMenu", data)
+
+    this.emit("menuItem_selected", data)
+    this.emit("menu_close", data)
+    console.log("menu_close")
   }
 
   onOutsideClickListener(e) {
@@ -129,19 +129,18 @@ export default class Menu {
         target: e.currentTarget.id, 
         menu: this.#id,
       };
-      this.emit("closeMenu", data)
+      this.emit("menu_close", data)
     }
+    document.removeEventListener('click', this.#menuEvents[this.id].outside)
   }
 
   mount(el) {
-    const api = this.#core
-
     if (el.lastElementChild == null) 
       el.innerHTML = this.menuNode()
     else
       el.lastElementChild.insertAdjacentHTML("afterend", this.menuNode())
 
-    this.#elMenu = this.#elMenus.querySelector(`#${this.#config.id}`)
+    this.#elMenu = this.#elMenus.querySelector(`#${this.id}`)
   }
 
   static defaultNode() {
@@ -197,8 +196,7 @@ export default class Menu {
 
   // display the menu
   open() {
-    let id = Menu.currentActive?.id || false
-    if (id) this.emit("closeMenu", {menu: id})
+    if (Menu.currentActive === this) return true
 
     Menu.currentActive = this
     this.#elMenu.style.display = "block"
@@ -210,6 +208,12 @@ export default class Menu {
           o = limit(o, 0, this.#elWidgetsG.offsetWidth)
       this.#elMenu.style.left = `${o}px`
     }
+
+    setTimeout(() => {
+      // click event outside of menu
+      this.#menuEvents[this.id].outside = this.onOutsideClickListener.bind(this)
+      document.addEventListener('click', this.#menuEvents[this.id].outside)
+    }, 250)
   }
 
   // hide the menu

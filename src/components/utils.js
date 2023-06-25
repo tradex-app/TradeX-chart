@@ -9,6 +9,8 @@ import utilsList from "../definitions/utils"
 import Indicators from "../definitions/indicators"
 import { debounce } from "../utils/utilities"
 import { isObject } from "../utils/typeChecks"
+import StateMachine from "../scaleX/stateMachne"
+import stateMachineConfig from "../state/state-utils"
 
 
 export default class UtilsBar {
@@ -23,6 +25,8 @@ export default class UtilsBar {
   #indicators
   #menus = {}
   #utilsEvents = {}
+  #stateMachine
+  #timers = {}
 
   constructor (core, options) {
 
@@ -31,7 +35,7 @@ export default class UtilsBar {
     this.#elUtils = core.elUtils
     this.#utils = core.config?.utilsBar || utilsList
     this.#widgets = core.WidgetsG
-    this.#indicators = core.indicatorClasses || indicators
+    this.#indicators = core.indicatorClasses || Indicators
     this.init()
   }
 
@@ -46,18 +50,22 @@ export default class UtilsBar {
   get options() {return this.#options}
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elUtils) }
+  get stateMachine() { return this.#stateMachine }
 
   init() {
-    this.mount(this.#elUtils)
+    // mount the default or custom utils bar definition
+    this.#elUtils.innerHTML = this.#elUtils.defaultNode(this.#utils)
 
     this.log(`${this.#name} instantiated`)
   }
 
   start() {
+    // activate utils icons and menus
     this.initAllUtils()
-
     // set up event listeners
     this.eventsListen()
+    // start state machine
+    // this.#stateMachine = new StateMachine(stateMachineConfig, this)
   }
 
   destroy() {
@@ -103,10 +111,13 @@ export default class UtilsBar {
   }
 
   onIconClick(e) {
-    if (!isObject(e.originalTarget)) return false
+    // if (!isObject(e.originalTarget)) return false
 
-    const target = DOM.findTargetParentWithClass(e.originalTarget, "icon-wrapper")
+    const target = DOM.findTargetParentWithClass(e.target, "icon-wrapper")
     if (!isObject(target)) return false
+    const now = Date.now()
+    if (now - this.#timers[target.id] < 1000) return false
+    this.#timers[target.id] = now
 
     let evt = target.dataset.event;
     let menu = target.dataset.menu || false,
@@ -115,13 +126,13 @@ export default class UtilsBar {
           menu: menu,
           evt: evt
         };
-        
+    
     this.emit(evt, data)
 
-    if (menu) this.emit("openMenu", data)
+    if (menu) this.emit("menu_open", data)
     else {
-      this.emit("menuItemSelected", data)
-      this.emit("utilSelected", data)
+      // this.emit("menuItem_selected", data)
+      this.emit("util_selected", data)
     }
   }
 
@@ -135,32 +146,30 @@ export default class UtilsBar {
           svg.style.fill = UtilsStyle.COLOUR_ICON
   }
 
-  mount(el) {
-    el.innerHTML = this.#elUtils.defaultNode(this.#utils)
-  }
-
   initAllUtils() {
     const utils = this.#elUtils.querySelectorAll(`.icon-wrapper`)
 
     for (let util of utils) {
+
+      this.#timers[util.id] = 0
 
       let id = util.id.replace('TX_', ''),
           svg = util.querySelector('svg');
           svg.style.fill = UtilsStyle.COLOUR_ICON
           svg.style.height = "90%"
 
-
+      // iterate over default or custom utils bar definition
       for (let u of this.#utils) {
         if (u.id === id) {
           this.#utilsEvents[id] = {}
-          this.#utilsEvents[id].click = debounce(this.onIconClick, 50, this) // this.onIconClick.bind(this)
+          this.#utilsEvents[id].click = this.onIconClick.bind(this) // debounce(this.onIconClick, 50, this) // this.onIconClick.bind(this)
           this.#utilsEvents[id].pointerover = this.onIconOver.bind(this)
           this.#utilsEvents[id].pointerout = this.onIconOut.bind(this)
           util.addEventListener("click", this.#utilsEvents[id].click)
           util.addEventListener("pointerover", this.#utilsEvents[id].pointerover)
           util.addEventListener("pointerout", this.#utilsEvents[id].pointerout)
 
-          if (u.id === "indicators") u.sub = Object.values(this.#indicators)
+          if (id === "indicators") u.sub = Object.values(this.#indicators)
 
           if (u?.sub) {
             let config = {
@@ -177,21 +186,21 @@ export default class UtilsBar {
   }
 
   onIndicators(data) {
-    console.log(`Indicator:`,data)
+    // console.log(`Indicator:`,data)
   }
 
   onTimezone(data) {
-    console.log(`Timezone:`,data)
+    // console.log(`Timezone:`,data)
     this.#core.notImplemented()
   }
 
   onSettings(data) {
-    console.log(`Settings:`,data)
+    // console.log(`Settings:`,data)
     this.#core.notImplemented()
   }
 
   onScreenshot(data) {
-    console.log(`Screenshot:`,data)
+    // console.log(`Screenshot:`,data)
     this.#core.notImplemented()
   }
 

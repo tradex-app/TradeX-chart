@@ -77,10 +77,10 @@ export default class Widgets {
     // Stop and clean up the module to prevent memory leaks.
     // It should remove: event listeners, timers, ect.
     // Put your toys away or it will end in tears.
-    this.off("openMenu", this.onOpenMenu)
-    this.off("closeMenu", this.onCloseMenu)
-    this.off("offMenu", this.onCloseMenu)
-    this.off("menuItemSelected", this.onMenuItemSelected)
+    this.off("menu_open", this.onOpenMenu)
+    this.off("menu_close", this.onCloseMenu)
+    this.off("menu_off", this.onCloseMenu)
+    this.off("menuItem_selected", this.onMenuItemSelected)
     
     this.stateMachine.destroy()
   }
@@ -89,10 +89,10 @@ export default class Widgets {
   eventsListen() {
     // this.on("resize", (dimensions) => this.onResize, this)
 
-    this.on("openMenu", this.onOpenMenu, this)
-    this.on("closeMenu", this.onCloseMenu, this)
-    this.on("offMenu", this.onCloseMenu, this)
-    this.on("menuItemSelected", this.onMenuItemSelected, this)
+    this.on("menu_open", this.onOpenMenu, this)
+    this.on("menu_close", this.onCloseMenu, this)
+    this.on("menu_off", this.onCloseMenu, this)
+    this.on("menuItem_selected", this.onMenuItemSelected, this)
   }
 
   on(topic, handler, context) {
@@ -112,12 +112,12 @@ export default class Widgets {
   }
 
   onOpenMenu(data) {
-    console.log("onOpenMenu:", data)
+    // console.log("onOpenMenu:", data)
 
     this.#widgetsInstances[data.menu].open()
   }
   onCloseMenu(data) {
-    console.log("onCloseMenu:", data)
+    // console.log("onCloseMenu:", data)
 
     this.#widgetsInstances[data.menu].close()
   }

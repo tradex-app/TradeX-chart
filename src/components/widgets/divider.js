@@ -4,13 +4,8 @@
 import DOM from "../../utils/DOM"
 import { isNumber } from "../../utils/typeChecks"
 import Input from "../../input"
-
-import {
-  CLASS_DIVIDERS
-} from "../../definitions/core"
-import {
-  DIVIDERHEIGHT
-} from "../../definitions/chart"
+import { CLASS_DIVIDERS } from "../../definitions/core"
+import { DIVIDERHEIGHT } from "../../definitions/chart"
 
 
 export default class Divider {

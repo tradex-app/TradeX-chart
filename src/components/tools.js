@@ -129,9 +129,9 @@ export default class ToolsBar {
         
     // this.emit(evt, data)
 
-    if (menu) this.emit("openMenu", data)
+    if (menu) this.emit("menu_open", data)
     else {
-      this.emit("menuItemSelected", data)
+      this.emit("menuItem_selected", data)
     }
   }
 

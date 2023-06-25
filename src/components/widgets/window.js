@@ -132,6 +132,7 @@ export default class Window {
         window: this.#id,
       };
       this.emit("closeWindow", data)
+      document.removeEventListener('click', this.#windowEvents.click)
     }
   }
 
@@ -245,26 +246,23 @@ export default class Window {
 
   // display the window
   open() {
-    // let id = Window.currentActive?.id || false
-    // if (id !== this.#id) this.emit("closeWindow", {window: id})
+    if (Window.currentActive === this) return true
 
     Window.currentActive = this
     this.#elWindow.style.display = "block"
-    this.emit("windowOpened", this.id)
+    this.emit("window_opened", this.id)
 
     setTimeout(() => {
       // click event outside of window
       this.#windowEvents.click = this.onOutsideClickListener.bind(this)
       document.addEventListener('click', this.#windowEvents.click)
-    }, 1000)
+    }, 250)
   }
 
   // hide the window
   close() {
     Window.currentActive = null
     this.#elWindow.style.display = "none"
-    this.emit("windowClosed", this.id)
-
-    document.removeEventListener('click', this.#windowEvents.click)
+    this.emit("window_closed", this.id)
   }
 }

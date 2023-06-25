@@ -8,60 +8,66 @@ export default
   states: {
     idle: {
       onEnter(data) {
-        console.log(`${this.id}: state: "${this.state}" - onEnter`)
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
       onExit(data) {
-        console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
-        openMenu: {
-          target: 'openMenu',
+        menu_open: {
+          target: 'menu_open',
           action (data) {
-            console.log(`${this.id}: transition from "${this.state}" to "openMenu" on ${this.event}`)
+            // console.log(`${this.id}: transition from "${this.state}" to "menu_open" on ${this.event}`)
+          },
+        },
+        window_open: {
+          target: 'window_open',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "menu_open" on ${this.event}`)
           },
         },
       }
     },
-    openMenu: {
+    menu_open: {
       onEnter(data) {
-        console.log(`${this.id}: state: "${this.state}" - onEnter`)
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
         // this.context.instances[data.menu].open()
-        // this.context.instances[data.menu].offMenu()
+        // this.context.instances[data.menu].menu_off()
 
       },
       onExit(data) {
-        console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
 
         // this.context.instances[data.menu].close()
       },
       on: {
-        closeMenu: {
+        menu_close: {
           target: "idle",
           action (data) {
-            console.log(`${this.id}: transition from "${this.state}" to "idle" on "${this.event}"`)
+            // console.log(`${this.id}: transition from "${this.state}" to "idle" on "${this.event}"`)
           },
         },
       }
     },
-    openWindow: {
+    window_open: {
       onEnter(data) {
-        console.log(`${this.id}: state: "${this.state}" - onEnter`)
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
         // this.context.instances[data.menu].open()
-        // this.context.instances[data.menu].offMenu()
+        // this.context.instances[data.menu].menu_off()
 
       },
       onExit(data) {
-        console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
 
         // this.context.instances[data.menu].close()
       },
       on: {
-        closeWindow: {
+        window_close: {
           target: "idle",
           action (data) {
-            console.log(`${this.id}: transition from "${this.state}" to "idle" on "${this.event}"`)
+            // console.log(`${this.id}: transition from "${this.state}" to "idle" on "${this.event}"`)
           },
         },
       }
