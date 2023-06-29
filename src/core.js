@@ -881,7 +881,7 @@ export default class TradeXchart extends Tradex_chart {
    * @param {boolean} centre - center the range on the start value
    */
   jumpToStart(centre=true) {
-    this.jumpToIndex(0, nearest=true, centre)
+    this.jumpToIndex(0, true, centre)
   }
 
   /**
@@ -891,7 +891,7 @@ export default class TradeXchart extends Tradex_chart {
   jumpToEnd(centre=true) {
     let end = this.range.dataLength - this.range.Length
     if (centre) end += this.range.Length / 2
-    this.jumpToIndex(end, nearest=true, centre)
+    this.jumpToIndex(end, true, centre)
   }
 
   /**
@@ -1071,20 +1071,20 @@ export default class TradeXchart extends Tradex_chart {
     return this.#MainPane.removeIndicator(i)
   }
 
-    /**
+  /**
    * set or get indicator settings
    * @param {string|Indicator} i - indicator id or Indicator instance
    * @param {Object} s - settings
    * @returns {Object} - settings
    */
-    indicatorSettings(i, s) {
-      return this.#MainPane.indicatorSettings(i, s)
-    }
+  indicatorSettings(i, s) {
+    return this.#MainPane.indicatorSettings(i, s)
+  }
 
   /**
    * Does current chart state have indicator
    * @param {string} i - indicator id or name
-   * @param {string} dataset 
+   * @param {string} dataset -
    * @returns {Indicator|false}
    */
   hasStateIndicator(i, dataset="searchAll") {
@@ -1092,7 +1092,7 @@ export default class TradeXchart extends Tradex_chart {
 
     const find = function(i, d) {
       for (let e of d) {
-        if (e?.id == i || e.name == i) return true
+        if (e?.id == i || e?.name == i) return true
         else return false
       }
     }
@@ -1116,11 +1116,10 @@ export default class TradeXchart extends Tradex_chart {
    * calculate all indicators currently in use
    */
   calcAllIndicators() {
-    for (let i of this.Indicators.onchart.values()) {
-      i.instance.calcIndicatorHistory()
-    }
-    for (let i of this.Indicators.offchart.values()) {
-      i.instance.calcIndicatorHistory()
+    for (const [key, value] of Object.entries(this.Indicators)) {
+      for (const [k, ind] of Object.entries(value)) {
+        ind.instance.calcIndicatorHistory()
+      }
     }
   }
 
