@@ -129,7 +129,7 @@ const DOM = {
 
   /**
  * @param {String} HTML representing a single element
- * @return {Element}
+ * @returns {Element}
  */
   htmlToElement(html) {
     var template = document.createElement('template');
@@ -140,7 +140,7 @@ const DOM = {
 
   /**
  * @param {String} HTML representing any number of sibling elements
- * @return {NodeList} 
+ * @returns {NodeList} 
  */
   htmlToElements(html) {
     var template = document.createElement('template');

@@ -40,10 +40,10 @@ export class Range {
 
   /**
    * Creates an instance of Range.
-   * @param {object} allData - State data object representing on and off chart data
+   * @param {Object} allData - State data object representing on and off chart data
    * @param {number} [start=0] - initial index start
    * @param {number} [end=allData.data.length-1] - initial index end
-   * @param {object} [config={}] - range config
+   * @param {Object} [config={}] - range config
    * @memberof Range
    */
   constructor( allData, start=0, end=allData.data.length-1, config={}) {
@@ -123,7 +123,7 @@ export class Range {
    * @param {number} [start=0]
    * @param {number} [end=this.dataLength]
    * @param {number} [max=this.maxCandles]
-   * @return {boolean} - success or failure
+   * @returns {boolean} - success or failure
    * @memberof Range
    */
   set (start=0, end=this.dataLength, max=this.maxCandles, config) {
@@ -253,7 +253,7 @@ export class Range {
    * return value by timestamp
    * @param {number} ts
    * @param {string} id
-   * @return {*}  
+   * @returns {*}  
    * @memberof Range
    */
   valueByTS ( ts, id ) {
@@ -281,7 +281,7 @@ export class Range {
   /**
    * return data for id
    * @param {string} id
-   * @return {array}  
+   * @returns {Array}  
    * @memberof Range
    */
   getDataById(id) {
@@ -350,7 +350,7 @@ export class Range {
   /**
    * is timestamp in visible render range?
    * @param {number} t - timestamp
-   * @return {boolean}  
+   * @returns {boolean}  
    * @memberof Range
    */
   inRenderRange (t) {
@@ -368,10 +368,10 @@ export class Range {
 
   /**
    * Find price maximum and minimum, volume maximum and minimum
-   * @param {array} data
+   * @param {Array} data
    * @param {number} [start=0]
    * @param {number} [end=data.length-1]
-   * @return {object}  
+   * @returns {Object}  
    */
    maxMinPriceVol ( input ) {
 // console.time()
@@ -490,7 +490,7 @@ export function rangeDatasetValue( range, indicator, index ) {
 
 /**
  * Detects candles interval
- * @param {array} ohlcv - array of ohlcv values (price history)
+ * @param {Array} ohlcv - array of ohlcv values (price history)
  * @returns {number} - milliseconds
  */
 export function detectInterval(ohlcv) {
@@ -510,7 +510,7 @@ export function detectInterval(ohlcv) {
 
 /**
  * Calculate the index for a given time stamp
- * @param {object} time - time object provided by core
+ * @param {Object} time - time object provided by core
  * @param {number} timeStamp 
  * @returns {number}
  */

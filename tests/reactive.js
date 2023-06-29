@@ -75,7 +75,7 @@ function reactive(v) {
 
 /**
  * @param {*} v
- * @return {Object}  
+ * @returns {Object}  
  */
 function ref(v) {
 

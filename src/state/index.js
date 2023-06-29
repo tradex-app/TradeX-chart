@@ -172,8 +172,8 @@ export default class State {
   /**
  * export state - default json
  * @param {string} key - state unique identifier
- * @param {object} [config={}] - default {type:"json"}
- * @return {*}  
+ * @param {Object} [config={}] - default {type:"json"}
+ * @returns {*}  
  * @memberof State
  */
   static export(key, config={}) {

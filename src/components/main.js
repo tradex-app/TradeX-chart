@@ -576,7 +576,7 @@ export default class MainPane {
 
   /**
    * add chart pane - provides onChart and offChart indicators
-   * @param {object} options 
+   * @param {Object} options 
    */
   addChartPane(options) {
     // insert a row to mount the indicator on
@@ -673,7 +673,7 @@ export default class MainPane {
    * add an indicator after the chart has started
    * @param {string} i - indicator type eg. EMA, DMI, RSI
    * @param {string} name - identifier
-   * @param {object} params - {settings, data}
+   * @param {Object} params - {settings, data}
    * @returns 
    */
   addIndicator(i, name=i, params={})  {
@@ -784,7 +784,7 @@ export default class MainPane {
   /**
    * set or get indicator settings
    * @param {string|Indicator} i - indicator id or Indicator instance
-   * @param {object} s - settings
+   * @param {Object} s - settings
    * @returns {boolean} - success / failure
    */
   indicatorSettings(i, s) {

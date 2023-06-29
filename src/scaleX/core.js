@@ -71,7 +71,7 @@ export default class Core {
    * @param {Class} newModule
    * @param {Object} options - initial provided configuration
    * @param {Object} api - functions / methods, calculated properties
-   * @return {Instance}  
+   * @returns {Instance}  
    * @memberof Core
    */
   register(id, newModule, options, api) {

@@ -57,7 +57,7 @@ export default class Legends {
 
   /**
    * process legend actions
-   * @param {object} e - pointer event
+   * @param {Object} e - pointer event
    * @memberof Legends
    */
   onMouseClick(e) {

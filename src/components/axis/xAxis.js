@@ -51,7 +51,7 @@ export default class xAxis extends Axis {
  * return canvas x co-ordinate
  * handles X Axis modes: default, indexed
  * @param {number} ts - chart time stamp
- * @return {number}  
+ * @returns {number}  
  * @memberof xAxis
  */
   xPos(ts) {

@@ -1,6 +1,6 @@
 /**
  * @param {*} v
- * @return {boolean}
+ * @returns {boolean}
  */
  export function isArray (v) {
   return Array.isArray(v)
@@ -8,7 +8,7 @@
 
 /**
  * @param {*} v
- * @return {boolean}
+ * @returns {boolean}
  */
 export function isFunction (v) {
   return v && typeof v === 'function'
@@ -16,7 +16,7 @@ export function isFunction (v) {
 
 /**
  * @param {*} v
- * @return {boolean}
+ * @returns {boolean}
  */
 export function isObject (v) {
   return (
@@ -51,7 +51,7 @@ export function isBoolean (v) {
 
 /**
  * @param {*} v
- * @return {boolean}
+ * @returns {boolean}
  */
 export function isString (v) {
   return typeof v === 'string'
@@ -80,7 +80,7 @@ export function isError (v) {
 /**
  * @param {string} type
  * @param {*} value
- * @return {boolean}
+ * @returns {boolean}
  */
 export function checkType(type, value) {
   switch(type) {

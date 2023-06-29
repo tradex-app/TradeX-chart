@@ -6,9 +6,9 @@ import { isValidTimeInRange } from '../utils/time'
 /**
  * Validate price a sample of history data
  * @export
- * @param {array} data
+ * @param {Array} data
  * @param {boolean} isCrypto - check against BTC genesis date
- * @return {boolean}  
+ * @returns {boolean}  
  */
 export function validateShallow(data, isCrypto=false) {
 
@@ -32,9 +32,9 @@ export function validateShallow(data, isCrypto=false) {
 /**
  * Validate entire price history data
  * @export
- * @param {array} data
+ * @param {Array} data
  * @param {boolean} isCrypto - check against BTC genesis date
- * @return {boolean}  
+ * @returns {boolean}  
  */
 export function validateDeep(data, isCrypto=false) {
   if (!isArray(data)) return false
@@ -61,7 +61,7 @@ export function validateDeep(data, isCrypto=false) {
  * @export
  * @param {Array} c - [ timestamp(ms), open, high, low, close, volume ]
  * @param {Boolean} isCrypto - are we working with crypto? Validate against BTC genesis
- * @return {Boolean}  
+ * @returns {Boolean}  
  */
 export function isValidCandle(c, isCrypto=false) {
   if (!isArray(c)) return false

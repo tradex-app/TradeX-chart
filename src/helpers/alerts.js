@@ -45,7 +45,7 @@ export default class Alerts {
    * @param {number} price - price trigger
    * @param {function} condition - function returns true or false
    * @param {function} handler - function to execute on condition true
-   * @return {string} - id string  
+   * @returns {string} - id string  
    * @memberof Alerts
    */
   add(price, condition, handler) {
@@ -73,7 +73,7 @@ export default class Alerts {
    * Remove alert handler
    *
    * @param {string} id
-   * @return {boolean}  - success or failure
+   * @returns {boolean}  - success or failure
    * @memberof Alerts
    */
   remove(id) {
@@ -96,7 +96,7 @@ export default class Alerts {
    *
    * @param {number} price
    * @param {*} condition
-   * @return {*} 
+   * @returns {*} 
    * @memberof Alerts
    */
   delete(price, condition) {
@@ -121,7 +121,7 @@ export default class Alerts {
    * return handler by id
    *
    * @param {string} id
-   * @return {function}  
+   * @returns {function}  
    * @memberof Alerts
    */
   handlerByID(id) {

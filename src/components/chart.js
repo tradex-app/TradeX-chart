@@ -458,7 +458,7 @@ export default class Chart {
 
   /**
    * Set chart dimensions
-   * @param {object} dim - dimensions {w:width, h: height}
+   * @param {Object} dim - dimensions {w:width, h: height}
    */
   setDimensions(dim) {
     const buffer = this.config.buffer || BUFFERSIZE
@@ -491,7 +491,7 @@ export default class Chart {
   /**
    * Add non-default overlays (indicators)
    *
-   * @param {array} overlays - list of overlays
+   * @param {Array} overlays - list of overlays
    * @returns {boolean} 
    * @memberof OnChart
    */
@@ -533,7 +533,7 @@ export default class Chart {
 
   /**
    * add an indicator
-   * @param {object} i - {type, name, ...params}
+   * @param {Object} i - {type, name, ...params}
    */
   addIndicator(i) {
     const onChart = this.type === "onChart"
@@ -644,8 +644,8 @@ export default class Chart {
 
   /**
    * Update chart and indicator legends
-   * @param {array} pos - cursor position x, y, defaults to current cursor position
-   * @param {array} candle - OHLCV
+   * @param {Array} pos - cursor position x, y, defaults to current cursor position
+   * @param {Array} candle - OHLCV
    */
   updateLegends(pos = this.#cursorPos, candle = false) {
     if (this.#core.isEmpty || !isObject(this.#Legends)) return
@@ -657,7 +657,7 @@ export default class Chart {
 
   /**
    * 
-   * @param {array} pos - cursor pos [x, y]
+   * @param {Array} pos - cursor pos [x, y]
    * @returns {object} - legend data 
    */
   legendInputs(pos=this.cursorPos) {
@@ -685,7 +685,7 @@ export default class Chart {
   /**
    * execute legend action for this chart pane
    * (not indicators)
-   * @param {object} e - event
+   * @param {Object} e - event
    * @memberof Chart
    */
   onLegendAction(e) {

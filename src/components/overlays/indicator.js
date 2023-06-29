@@ -158,7 +158,7 @@ export default class Indicator extends Overlay {
 
   /**
    * set or get indicator settings
-   * @param {object} s - settings
+   * @param {Object} s - settings
    */
   settings(s) {
     if (isObject(s)) {
@@ -202,7 +202,7 @@ export default class Indicator extends Overlay {
 
   /**
    * process new candle stream value
-   * @param {array} candle - [timestamp, open, high, low, close, volume]
+   * @param {Array} candle - [timestamp, open, high, low, close, volume]
    * @memberof Indicator
    */
   onStreamUpdate(candle) {
@@ -212,7 +212,7 @@ export default class Indicator extends Overlay {
 
   /**
    * execute legend action
-   * @param {object} e - event
+   * @param {Object} e - event
    * @memberof Chart
    */
   onLegendAction(e) {
@@ -233,7 +233,7 @@ export default class Indicator extends Overlay {
 
   /**
    * invoke indicator settings callback, user defined or default
-   * @param {object} c - {fn: function, own: boolean}, own flag will bypass default action
+   * @param {Object} c - {fn: function, own: boolean}, own flag will bypass default action
    * @returns 
    */
   invokeSettings(c) {
@@ -250,8 +250,8 @@ export default class Indicator extends Overlay {
 
   /**
    * validate indicator inputs and outputs
-   * @param {object} i
-   * @param {object} api
+   * @param {Object} i
+   * @param {Object} api
    * @memberof indicator
    */
   defineIndicator(i, api) {
@@ -291,8 +291,8 @@ export default class Indicator extends Overlay {
 
   /**
    * return index from cursor position and colours
-   * @param {array} [pos=this.chart.cursorPos]
-   * @return {object}  
+   * @param {Array} [pos=this.chart.cursorPos]
+   * @returns {Object}  
    * @memberof indicator
    */
   legendInputs(pos=this.chart.cursorPos) {
@@ -340,8 +340,8 @@ export default class Indicator extends Overlay {
   /**
  * Calculate indicator values for entire chart history
  * @param {string} indicator - the TALib function to call
- * @param {object} params - parameters for the TALib function
- * @param {object} [range=this.range] - range instance or definition
+ * @param {Object} params - parameters for the TALib function
+ * @param {Object} [range=this.range] - range instance or definition
  * @returns {boolean} - success or failure
  */
   calcIndicator (indicator, params={}, range=this.range) {
@@ -416,8 +416,8 @@ export default class Indicator extends Overlay {
   /**
    * Calculate indicator value for current stream candle
    * @param {string} indicator - the TALib function to call
-   * @param {object} params - parameters for the TALib function
-   * @param {object} range - Range instance
+   * @param {Object} params - parameters for the TALib function
+   * @param {Object} range - Range instance
    * @returns {array} - indicator data entry
    */
   calcIndicatorStream (indicator, params, range=this.range) {
@@ -443,7 +443,7 @@ export default class Indicator extends Overlay {
 
   /**
    * process stream and create new indicator data entry
-   * @param {array} value - current stream candle 
+   * @param {Array} value - current stream candle 
    * @memberof indicator
    */
   newValue (value) {
@@ -461,7 +461,7 @@ export default class Indicator extends Overlay {
 
   /**
    * process stream and update current (last) indicator data entry
-   * @param {array} value - current stream candle 
+   * @param {Array} value - current stream candle 
    * @memberof indicator
    */
   updateValue (value) {
@@ -481,9 +481,9 @@ export default class Indicator extends Overlay {
   /**
    * plot 
    *
-   * @param {array} plots - array of x y coords [{x:x, y:y}, ...]
+   * @param {Array} plots - array of x y coords [{x:x, y:y}, ...]
    * @param {string} type
-   * @param {object} opts
+   * @param {Object} opts
    * @memberof indicator
    */
   plot(plots, type, opts ) {

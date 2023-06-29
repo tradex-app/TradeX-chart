@@ -53,12 +53,12 @@ export default class RSI extends Indicator {
 
   /**
    * Creates an instance of RSI.
-   * @param {object} target - canvas scene
-   * @param {object} xAxis - timeline axis instance
-   * @param {object} yAxis - scale axis instance
-   * @param {object} config - theme / styling
-   * @param {object} parent - (on/off)chart pane instance that hosts the indicator
-   * @param {object} params - contains minimum of overlay instance
+   * @param {Object} target - canvas scene
+   * @param {Object} xAxis - timeline axis instance
+   * @param {Object} yAxis - scale axis instance
+   * @param {Object} config - theme / styling
+   * @param {Object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {Object} params - contains minimum of overlay instance
    * @memberof RSI
    */
   constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
@@ -94,7 +94,7 @@ export default class RSI extends Indicator {
 
   /**
    * Draw the current indicator range on its canvas layer and render it.
-   * @param {object} range 
+   * @param {Object} range 
    */
   draw(range=this.range) {
     this.scene.clear()

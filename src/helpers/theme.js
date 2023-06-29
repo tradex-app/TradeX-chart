@@ -19,9 +19,9 @@ export default class Theme {
   /**
    * theme factory
    * @static
-   * @param {object} theme
-   * @param {object} core
-   * @return {instance}  
+   * @param {Object} theme
+   * @param {Object} core
+   * @returns {instance}  
    * @memberof Theme
    */
   static create(theme, core) {
@@ -38,8 +38,8 @@ export default class Theme {
 
   /**
    * Creates an instance of Theme.
-   * @param {object} theme
-   * @param {object} core
+   * @param {Object} theme
+   * @param {Object} core
    * @memberof Theme
    */
   constructor(theme, core) {
@@ -56,7 +56,7 @@ export default class Theme {
 
   /**
    * modify all theme values
-   * @param {object} [theme={}]
+   * @param {Object} [theme={}]
    * @memberof Theme
    */
   setCurrent(theme={}) {
@@ -78,7 +78,7 @@ export default class Theme {
   /**
    * set theme and refresh chart
    * @param {string} theme - identifier
-   * @return {boolean} - success / failure
+   * @returns {boolean} - success / failure
    * @memberof Theme
    */
   setTheme(theme) {
@@ -94,7 +94,7 @@ export default class Theme {
    * set theme value and refresh chart
    * @param {string} path - "candle" or "candle.Type"
    * @param {*} value 
-   * @return {*} - previous value
+   * @returns {*} - previous value
    * @memberof Theme
    */
   setProperty(path, value) {
@@ -123,7 +123,7 @@ export default class Theme {
   /**
    * delete theme from global list
    * @param {string} theme
-   * @return {boolean} 
+   * @returns {boolean} 
    * @memberof Theme
    */
   deleteTheme(theme) {
@@ -136,8 +136,8 @@ export default class Theme {
 
   /**
    * export theme - default json
-   * @param {object} [config={}] - default {type:"json"}
-   * @return {*}
+   * @param {Object} [config={}] - default {type:"json"}
+   * @returns {*}
    * @memberof Theme
    */
   exportTheme(config={}) {

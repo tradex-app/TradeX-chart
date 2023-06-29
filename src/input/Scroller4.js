@@ -130,7 +130,7 @@ class Scroller {
   /** {Date} Timestamp of last move of finger. Used to limit tracking range for deceleration speed. */
   #lastTouchMove = null
 
-  /** {Array} List of positions, uses three indexes for each state: left, top, timestamp */
+  /** {array} List of positions, uses three indexes for each state: left, top, timestamp */
   #positions = null
 
 
@@ -297,7 +297,7 @@ class Scroller {
     /**
 		 * Returns the scroll position and zooming values
 		 *
-		 * @return {Map} `left` and `top` scroll position and `zoom` level
+		 * @returns {Map} `left` and `top` scroll position and `zoom` level
 		 */
 		getValues() {
 
@@ -313,7 +313,7 @@ class Scroller {
 		/**
 		 * Returns the maximum scroll values
 		 *
-		 * @return {Map} `left` and `top` maximum scroll values
+		 * @returns {Map} `left` and `top` maximum scroll values
 		 */
 		getScrollMax() {
 

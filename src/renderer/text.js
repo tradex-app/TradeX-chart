@@ -33,7 +33,7 @@ export function createFont (
  * Get the width of the text box
  * @param {canvas} ctx - HTML Canvas
  * @param {string} text
- * @param {object} opts
+ * @param {Object} opts
  * @returns {number}
  */
 export function getTextRectWidth (ctx, text, opts) {
@@ -47,7 +47,7 @@ export function getTextRectWidth (ctx, text, opts) {
 
 /**
  * Get the height of the text box
- * @param {object} opts
+ * @param {Object} opts
  * @returns {number}
  */
 export function getTextRectHeight (opts) {
@@ -60,10 +60,10 @@ export function getTextRectHeight (opts) {
 
 /**
  * Text
- * @param {object} ctx - canvas reference
+ * @param {Object} ctx - canvas reference
  * @param {number} x - canvas pixel position
  * @param {number} y - canvas pixel position
- * @param {object} opts - {text, colour}
+ * @param {Object} opts - {text, colour}
  */
 export function renderText (ctx, x, y, opts) {
   ctx.fillStyle = opts?.colour
@@ -86,7 +86,7 @@ export function renderText (ctx, x, y, opts) {
  * @param {string} txt
  * @param {number} x
  * @param {number} y
- * @param {object} opts - styling options
+ * @param {Object} opts - styling options
  */
 export function renderTextBG(ctx, txt, x, y, opts) {
 

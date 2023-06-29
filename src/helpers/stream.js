@@ -112,7 +112,7 @@ export default class Stream {
   /**
    * process price tick
    *
-   * @param {object} data - t: timestamp, p: price, q: quantity
+   * @param {Object} data - t: timestamp, p: price, q: quantity
    * @memberof Stream
    */
   set candle(data) {
@@ -183,7 +183,7 @@ export default class Stream {
   /**
    * add new candle to state data
    *
-   * @param {object} data - t: timestamp, p: price, q: quantity
+   * @param {Object} data - t: timestamp, p: price, q: quantity
    * @memberof Stream
    */
   newCandle(data) {
@@ -212,7 +212,7 @@ export default class Stream {
   /**
    * update existing candle with current tick
    *
-   * @param {object} data - t: timestamp, p: price, q: quantity
+   * @param {Object} data - t: timestamp, p: price, q: quantity
    * @memberof Stream
    */
   updateCandle(data) {

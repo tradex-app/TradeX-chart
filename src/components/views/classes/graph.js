@@ -116,7 +116,7 @@ export default class graph {
 
   /**
    * add an array of overlays to Graph
-   * @param {array} o - array of overlays [[name, config], ...]
+   * @param {Array} o - array of overlays [[name, config], ...]
    * @returns array - array of overlay statuses [[name, boolean], ...]
    */
   addOverlays(o) {
@@ -126,7 +126,7 @@ export default class graph {
   /**
    * add a single overlay to Graph
    * @param {string} key - identifier
-   * @param {object} overlay - {class, params}
+   * @param {Object} overlay - {class, params}
    * @returns boolean
    */
   addOverlay(key, overlay) {
@@ -144,7 +144,7 @@ export default class graph {
 
   /**
    * iterate over the list of overlays and draw them
-   * @param {object} [range=this.range]
+   * @param {Object} [range=this.range]
    * @param {boolean} [update=false] - force immediate render?
    * @memberof graph
    */

@@ -21,6 +21,7 @@
     "demo": "vite build && vite serve --open /demo.html"
   },
   "devDependencies": {
+    "jsdoc-to-markdown": "^8.0.0",
     "rollup-plugin-cleanup": "^3.2.1",
     "vite": "^2.9.13"
   },

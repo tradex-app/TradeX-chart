@@ -6,9 +6,9 @@ import { fillStroke } from "./canvas";
 
 /**
  * Draw a path
- * @param {object} ctx - canvas reference
- * @param {array} coords - array of x y coords [{x:x, y:y}, ...]
- * @param {object} style - {width, stroke, fill, dash}
+ * @param {Object} ctx - canvas reference
+ * @param {Array} coords - array of x y coords [{x:x, y:y}, ...]
+ * @param {Object} style - {width, stroke, fill, dash}
  * @param {function} strokeFill
  */
 export function renderPath (ctx, coords, style, strokeFill) {
@@ -41,9 +41,9 @@ export function renderPath (ctx, coords, style, strokeFill) {
 
 /**
  * Render an open path of multiple points
- * @param {object} ctx - canvas reference
- * @param {array} coords - array of x y coords [{x:x, y:y}, ...]
- * @param {object} style - {width, stroke, dash}
+ * @param {Object} ctx - canvas reference
+ * @param {Array} coords - array of x y coords [{x:x, y:y}, ...]
+ * @param {Object} style - {width, stroke, dash}
  */
 export function renderPathStroke (ctx, coords, style) {
   renderPath(ctx, coords, style, () => {
@@ -53,9 +53,9 @@ export function renderPathStroke (ctx, coords, style) {
 
 /**
  * Render unfilled closed path of multiple points
- * @param {object} ctx - canvas reference
- * @param {array} coords - array of x y coords [{x:x, y:y}, ...]
- * @param {object} style - {width, stroke, fill, dash}
+ * @param {Object} ctx - canvas reference
+ * @param {Array} coords - array of x y coords [{x:x, y:y}, ...]
+ * @param {Object} style - {width, stroke, fill, dash}
  */
 export function renderPathClosed (ctx, coords, style) {
   renderPath(ctx, coords, style, () => {
@@ -67,7 +67,7 @@ export function renderPathClosed (ctx, coords, style) {
 /**
  * Draw Spline of multiple points
  * @param {canvas} ctx - HTML Canvas
- * @param {array} points - array of points [{x, y}, {x, y}...]
+ * @param {Array} points - array of points [{x, y}, {x, y}...]
  * @param {number} tension
  */
 export function renderSpline(ctx, points, tension) {

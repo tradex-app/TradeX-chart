@@ -50,12 +50,12 @@ export default class BB extends Indicator {
 
   /**
  * Creates an instance of BB.
-   * @param {object} target - canvas scene
-   * @param {object} xAxis - timeline axis instance
-   * @param {object} yAxis - scale axis instance
-   * @param {object} config - theme / styling
-   * @param {object} parent - (on/off)chart pane instance that hosts the indicator
-   * @param {object} params - contains minimum of overlay instance
+   * @param {Object} target - canvas scene
+   * @param {Object} xAxis - timeline axis instance
+   * @param {Object} yAxis - scale axis instance
+   * @param {Object} config - theme / styling
+   * @param {Object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {Object} params - contains minimum of overlay instance
  * @memberof BB
  */
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
@@ -85,8 +85,8 @@ export default class BB extends Indicator {
 
   /**
    * return inputs required to display indicator legend on chart pane
-   * @param {array} [pos=this.chart.cursorPos] - optional
-   * @return {object} - {inputs, colours, labels}
+   * @param {Array} [pos=this.chart.cursorPos] - optional
+   * @returns {Object} - {inputs, colours, labels}
    * @memberof BB
    */
   legendInputs(pos=this.chart.cursorPos) {

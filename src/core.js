@@ -32,11 +32,12 @@ import {
 } from './definitions/core'
 
 import { GlobalStyle } from './definitions/style'
+import Indicator from './components/overlays/indicator'
 
 /**
  * The root class for the entire chart
- * @export
  * @class TradeXchart
+ * @extends Tradex_chart
  */
 export default class TradeXchart extends Tradex_chart {
 
@@ -48,13 +49,14 @@ export default class TradeXchart extends Tradex_chart {
   static #talibReady = false
   static #talibAwait = []
   static #talibError = null
+  /** @returns {string} - return TradeX Chart version number */
   static get version() { return TradeXchart.#version }
   static get talibPromise() { return TradeXchart.#talibPromise }
   static get talibReady() { return TradeXchart.#talibReady }
   static get talibAwait() { return TradeXchart.#talibAwait }
   static get talibError() { return TradeXchart.#talibError }
-  static initErrMsg = `${NAME} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`
-  static permittedClassNames = 
+  static #initErrMsg = `${NAME} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`
+  static #permittedClassNames = 
   ["TradeXchart","Chart","MainPane","OffChart","OnChart",
   "ScaleBar","Timeline","ToolsBar","UtilsBar","Widgets"]
 
@@ -148,12 +150,11 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * Create a new TradeXchart instance
-   *
    * @static
    * @param {DOM_element} container - HTML element to mount the chart on
-   * @param {object} [txCfg={}] - chart config
-   * @param {object} state - chart state
-   * @return {instance}  
+   * @param {Object} [txCfg={}] - chart config
+   * @param {Object} state - chart state
+   * @returns {instance} TradeXchart
    * @memberof TradeXchart
    */
     static create(txCfg={}) {
@@ -162,7 +163,7 @@ export default class TradeXchart extends Tradex_chart {
       if (TradeXchart.#cnt == 0) {
         TradeXchart.#cfg.CPUCores = navigator.hardwareConcurrency
         TradeXchart.#cfg.api = {
-          permittedClassNames:TradeXchart.permittedClassNames,
+          permittedClassNames:TradeXchart.#permittedClassNames,
         }
       }
 
@@ -170,7 +171,7 @@ export default class TradeXchart extends Tradex_chart {
           // (txCfg.talib[Symbol.toStringTag] !== "Module") ||
           (typeof txCfg.talib.init !== "function")) {
             TradeXchart.#talibReady = false
-            TradeXchart.#talibError = new Error(`${TradeXchart.initErrMsg}`)
+            TradeXchart.#talibError = new Error(`${TradeXchart.#initErrMsg}`)
           }
 
       // init TALib
@@ -201,14 +202,18 @@ export default class TradeXchart extends Tradex_chart {
         delete TradeXchart.#instances[inCnt];
       }
     }
-  
+ 
+    /**
+     * @private
+     * @returns {number}
+     */
     static cnt() {
       return TradeXchart.#cnt++
     }
 
   /**
    * Creates an instance of TradeXchart.
-   * @memberof TradeXchart
+   * @private
    */
   constructor () {
     super()
@@ -230,10 +235,15 @@ export default class TradeXchart extends Tradex_chart {
   timeLog(n) { if (this.timer) console.timeLog(n) }
   timeEnd(n) { if (this.timer) console.timeEnd(n) }
 
+  /** @returns {string} - user defined chart name */
   get name() { return this.#name }
+
+  /** @returns {string} - user defined short chart name */
   get shortName() { return this.#shortName }
-  get mediator() { return this.#mediator }
+
   get options() { return this.#options }
+
+  /** @returns {object} - current chart configuration including defaults */
   get config() { return this.#config }
   get core() { return this.#core }
   get inCnt() { return this.#inCnt }
@@ -258,12 +268,22 @@ export default class TradeXchart extends Tradex_chart {
   get MainPane() { return this.#MainPane }
   get Timeline() { return this.#MainPane.time }
   get WidgetsG() { return this.#WidgetsG }
+
+  /** @returns {object} - primary chart pane - displays price history (candles) */
   get Chart() { return this.#MainPane.chart }
+
+  /** @returns {Map} - all chart panes, primary and secondary */
   get ChartPanes() { return this.#MainPane.chartPanes }
+
+  /** @returns {object} - all chart indicators in use, grouped by chart panes */
   get Indicators() { return this.#MainPane.indicators }
 
   get ready() { return this.#ready }
+
+  /** @returns {State} - current state instance */
   get state() { return this.#state }
+
+  /** @returns {object} - all state datasets */
   get allData() {
     return {
       data: this.state.data.chart.data,
@@ -311,7 +331,7 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * Target element has been validated as a mount point, 
    * let's start building
-   * @param {object} cfg - chart configuration
+   * @param {Object} cfg - chart configuration
    */
   start(cfg) {
     this.log(`${NAME} configuring...`)
@@ -454,34 +474,40 @@ export default class TradeXchart extends Tradex_chart {
     // DOM.findByID(this.id).remove
   }
 
+  /**
+   * @private
+   */
   eventsListen() {
     this.addEventListener('mousemove', this.onMouseMove.bind(this))
 
     this.on(STREAM_UPDATE, this.onStreamUpdate, this)
   }
 
-  /** Subscribe to a topic
-  *
-  * @param {String} topic      - The topic name
-  * @param {Function} handler - The function or method that is called
+  /** 
+  * Subscribe to a topic
+  * @param {string} topic      - The topic name
+  * @param {function} handler - The function or method that is called
   * @param {Object}  context   - The context the function(s) belongs to
+  * @returns {boolean}
   */
    on(topic, handler, context) {
-    if (!isString(topic) || !isFunction(handler)) return
+    if (!isString(topic) || !isFunction(handler)) return false
     if (!this.#hub[topic]) this.#hub[topic] = [];
     this.#hub[topic].push({handler, context});
+    return true
   }
 
-  /** Unsubscribe from a topic
-  *
-  * @param {String} topic - The topic name
-  * @param {Function} handler  - function to remove
+  /** 
+  * Unsubscribe from a topic
+  * @param {string} topic - The topic name
+  * @param {function} handler  - function to remove
+  * @returns {boolean}
   */
   off(topic, handler) {
     if (!isString(topic) || 
         !isFunction(handler) ||
         !(topic in this.#hub)
-        ) return
+        ) return false
 
     for (let i=0; i<this.#hub[topic].length; i++) {
       if (this.#hub[topic][i].handler === handler) {
@@ -492,23 +518,25 @@ export default class TradeXchart extends Tradex_chart {
         }
       }
     }
+    return true
   }
 
-  /** Publish an topic
-  *
-  * @param {String} topic - The topic name
+  /**
+  * Publish a topic
+  * @param {string} topic - The topic name
   * @param {Object}  data - The data to publish
+  * @returns {boolean}
   */
   emit(topic, data) {
     if (!isString(topic)) return
     (this.#hub[topic] || []).forEach(cb => cb.handler.call(cb.context, data));
   }
 
-  /** Execute a task
-  *
-  * @param {String} topic - The topic name
+  /**
+  * Execute a task
+  * @param {string} topic - The topic name
   * @param {Object} data    - The data that gets published
-  * @param {Function} cb    - callback method
+  * @param {function} cb    - callback method
   */
   execute(channel, data, cb) {
 
@@ -619,7 +647,7 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * Add a theme to the chart,
    * if no current theme is set, make this the current one.
-   * @param {object} theme - Volume accuracy
+   * @param {Object} theme - Volume accuracy
    * @returns {instance} - theme instance
    * @memberof TradeXchart
    */
@@ -632,6 +660,7 @@ export default class TradeXchart extends Tradex_chart {
   /**
  * Set the chart theme
  * @param {string} theme - theme identifier
+ * @returns {boolean}
  * @memberof TradeXchart
  */
   setTheme(ID) {
@@ -696,6 +725,8 @@ export default class TradeXchart extends Tradex_chart {
 
     innerHTML += ` }`
     style.innerHTML = innerHTML
+
+    return true
   }
 
   setScrollPos(pos) {
@@ -709,7 +740,7 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * specify a chart stream
    * @memberof TradeXchart
-   * @param {object} stream 
+   * @param {Object} stream 
    * @returns {instance}
    */
   setStream(stream) {
@@ -731,6 +762,10 @@ export default class TradeXchart extends Tradex_chart {
     }
   }
 
+  /**
+   * stop a chart stream
+   * will halt any updates to price or indicators
+   */
   stopStream() {
     if (this.stream instanceof Stream) {
       this.stream.stop()
@@ -740,6 +775,7 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * When chart is empty postpone range setting
    * until first candle, then position on last
+   * @private
    */
   delayedSetRange() {
     while (this.#delayedSetRange) {
@@ -754,7 +790,8 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * Calculate new range index / position from position difference
    * typically mouse drag or cursor keys
-   * @param {array} pos - [x2, y2, x1, y1, xdelta, ydelta]
+   * @private
+   * @param {Array.<number>} pos - [x2, y2, x1, y1, xdelta, ydelta]
    */
   updateRange(pos) {
     if (!isArray(pos) || !isNumber(pos[4]) || pos[4] == 0) return
@@ -810,6 +847,12 @@ export default class TradeXchart extends Tradex_chart {
     this.#range.set(start, end, max)
   }
 
+  /**
+   * set Range start index
+   * @param {number} start - starting index of state data
+   * @param {boolean} nearest - limit range start - no out of range values
+   * @param {boolean} centre - center the range on the start value
+   */
   jumpToIndex(start, nearest=true, centre=true) {
     let length = this.range.Length
     let end = start + length
@@ -822,21 +865,33 @@ export default class TradeXchart extends Tradex_chart {
     this.setRange(start, end)
   }
 
+  /**
+   * set Range start to time stamp
+   * @param {number} ts - timestamp
+   * @param {boolean} nearest - limit range start - no out of range values
+   * @param {boolean} centre - center the range on the start value
+   */
   jumpToTS(ts, nearest=true, centre=true) {
     let start = this.Timeline.xAxis.t2Index(ts)
     this.jumpToIndex(start, nearest=true, centre=true)
   }
 
-  jumpToStart(nearest=true, centre=true) {
-    this.jumpToIndex(0, nearest=true, centre=true)
+  /**
+   * set Range start to state data start
+   * @param {boolean} centre - center the range on the start value
+   */
+  jumpToStart(centre=true) {
+    this.jumpToIndex(0, nearest=true, centre)
   }
 
-  jumpToEnd(nearest=true, centre=true) {
+  /**
+   * set Range start to state data end
+   * @param {boolean} centre - center the range on the end value
+   */
+  jumpToEnd(centre=true) {
     let end = this.range.dataLength - this.range.Length
-
     if (centre) end += this.range.Length / 2
-
-    this.jumpToIndex(end, nearest=true, centre=false)
+    this.jumpToIndex(end, nearest=true, centre)
   }
 
   /**
@@ -844,9 +899,8 @@ export default class TradeXchart extends Tradex_chart {
    * Used for populating a chart with back history.
    * Merge data must be formatted to a Chart State.
    * Optionally set a new range upon merge.
-   * @param {object} merge - merge data must be formatted to a Chart State
+   * @param {Object} merge - merge data must be formatted to a Chart State
    * @param {boolean|object} newRange - false | {start: number, end: number}
-   * @memberof TradeXchart
    */
   // TODO: merge indicator data?
   // TODO: merge dataset?
@@ -949,6 +1003,7 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * validate indicator
    * @param {class} i - indicator class
+   * @returns {boolean}
    */
   isIndicator(i) {
     if (
@@ -964,9 +1019,9 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * import Indicators
-   * @param {object} i - indicators {id, name, event, ind}
+   * @param {Object} i - indicators {id, name, event, ind}
    * @param {boolean} flush - expunge default indicators
-   * @returns boolean
+   * @returns {boolean}
    */
   setIndicators(i, flush=false) {
     if (!isObject(i)) return false
@@ -991,7 +1046,7 @@ export default class TradeXchart extends Tradex_chart {
    * add an indicator - default or registered user defined
    * @param {string} i - indicator
    * @param {string} name - identifier
-   * @param {object} params - {settings, data}
+   * @param {Object} params - {settings, data}
    * @returns {Indicator|false} - indicator instance or false
    */
   addIndicator(i, name=i, params={}) {
@@ -1001,6 +1056,7 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * retrieve indicator by ID
    * @param {string} i - indicator ID
+   * @returns {Indicator|false} - indicator instance or false
    */
   getIndicator(i) {
     return this.#MainPane.getIndicator(i)
@@ -1018,8 +1074,8 @@ export default class TradeXchart extends Tradex_chart {
     /**
    * set or get indicator settings
    * @param {string|Indicator} i - indicator id or Indicator instance
-   * @param {object} s - settings
-   * @returns {boolean} - success / failure
+   * @param {Object} s - settings
+   * @returns {Object} - settings
    */
     indicatorSettings(i, s) {
       return this.#MainPane.indicatorSettings(i, s)
@@ -1029,7 +1085,7 @@ export default class TradeXchart extends Tradex_chart {
    * Does current chart state have indicator
    * @param {string} i - indicator id or name
    * @param {string} dataset 
-   * @returns indicator or false
+   * @returns {Indicator|false}
    */
   hasStateIndicator(i, dataset="searchAll") {
     if (!isString(i) || !isString(dataset)) return false
@@ -1056,6 +1112,9 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   // TODO: rewrite for chart panes
+  /**
+   * calculate all indicators currently in use
+   */
   calcAllIndicators() {
     for (let i of this.Indicators.onchart.values()) {
       i.instance.calcIndicatorHistory()
