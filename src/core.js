@@ -122,8 +122,6 @@ export default class TradeXchart extends Tradex_chart {
     range: {},
     timeFrameMS: 0,
     timeFrame: `undefined`,
-    // rangeTotal: true,
-    // total: {},
     timeZone: '',
     indexed: false
   }
@@ -390,8 +388,6 @@ export default class TradeXchart extends Tradex_chart {
       ms = this.state.data.chart.tfms
       this.#chartIsEmpty = false
     }
-    this.#time.timeFrame = tf
-    this.#time.timeFrameMS = ms
     this.log(`tf: ${tf} ms: ${ms}`)
 
     this.#config.callbacks = this.#config.callbacks || {}
@@ -407,7 +403,7 @@ export default class TradeXchart extends Tradex_chart {
 
     // set default range
     const rangeConfig = ("range" in txCfg) ? txCfg.range : {}
-          rangeConfig.interval = this.#time.timeFrameMS
+          rangeConfig.interval = ms
           rangeConfig.core = this
     this.getRange(null, null, rangeConfig)
 
@@ -751,8 +747,10 @@ export default class TradeXchart extends Tradex_chart {
     else if (isObject(stream)) {
       if (this.allData.data.length == 0 && isString(stream.timeFrame)) {
         ;({tf, ms} = isTimeFrame(stream?.timeFrame))
-        this.#time.timeFrame = tf
+        this.range.interval = ms
+        this.range.intervalStr = tf
         this.#time.timeFrameMS = ms
+        this.#time.timeFrame = tf
       }
 
       this.#stream = new Stream(this)
@@ -830,9 +828,9 @@ export default class TradeXchart extends Tradex_chart {
    */
   getRange(start=0, end=0, config={}) {
     this.#range = new Range(this.allData, start, end, config)
-    this.#range.interval = this.#time.timeFrameMS
-    this.#range.intervalStr = this.#time.timeFrame
     this.#time.range = this.#range
+    this.#time.timeFrameMS = this.#range.interval
+    this.#time.timeFrame = this.#range.intervalStr
   }
 
   /**
@@ -1114,7 +1112,6 @@ export default class TradeXchart extends Tradex_chart {
     }
   }
 
-  // TODO: rewrite for chart panes
   /**
    * calculate all indicators currently in use
    */

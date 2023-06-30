@@ -65,6 +65,7 @@ export class Range {
 
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS
 
+    // no data - use provided time frame / interval
     if (allData.data.length == 0) {
       let ts = Date.now()
       start = 0
@@ -72,33 +73,28 @@ export class Range {
       this.#interval = tf
       this.#intervalStr = ms2Interval(this.interval)
       this.anchor = ts - (ts % tf) // - (this.limitPast * this.#interval)
-    }  
+    } 
+    // nimimum of two entries to calculate time frame / interval
     else if (allData.data.length < 2) {
       this.#interval = tf
       this.#intervalStr = ms2Interval(this.interval)
     }
-    else if (end == 0 && allData.data.length >= this.rangeLimit)
+    // if (allData.data.length > 2) {
+    else {
+      this.#interval = detectInterval(allData.data)
+      this.#intervalStr = ms2Interval(this.interval)
+    }
+    // adjust range end if out of bounds
+    if (end == 0 && allData.data.length >= this.rangeLimit)
       end = this.rangeLimit
     else if (end == 0)
       end = allData.data.length
-    
+
+    // mirror allData entries
     for (let data in allData) {
       this[data] = allData[data]
     }
-
-    if (!this.set(start, end)) return false
-
-    if (allData.data.length > 2) {
-      this.#interval = detectInterval(this.data)
-      this.#intervalStr = ms2Interval(this.interval)
-    }
-
-    // for (let i of this?.secondaryPane) {
-    //   i.valueMin = 0
-    //   i.valueMax = 100
-    //   i.valueDiff = 100
-    // }
-
+    this.set(start, end)
   }
 
   get dataLength () { return (this?.data.length == 0) ? 0 : this.data.length - 1 }
