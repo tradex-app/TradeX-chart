@@ -37,7 +37,7 @@ export default class DMI extends Indicator {
   style = {}
 
   static inCnt = 0
-  static onChart = false
+  static primaryPane = false
   static scale = YAXIS_TYPES[0] // defualt
 
 
@@ -72,7 +72,7 @@ export default class DMI extends Indicator {
    * valid returned values can be: true, false (boolean), both (string)
    * @readonly
    */
-  get onChart() { return DMI.onChart }
+  get primaryPane() { return DMI.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
 
 

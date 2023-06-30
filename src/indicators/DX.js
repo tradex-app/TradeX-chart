@@ -37,7 +37,7 @@ export default class DX extends Indicator {
   ]
 
   static inCnt = 0
-  static onChart = false
+  static primaryPane = false
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
 
@@ -68,7 +68,7 @@ export default class DX extends Indicator {
     this.addLegend()
   }
 
-  get onChart() { return DX.onChart }
+  get primaryPane() { return DX.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
 
 

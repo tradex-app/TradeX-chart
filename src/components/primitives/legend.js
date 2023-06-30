@@ -38,8 +38,8 @@ export default class Legends {
   get list() { return this.#list }
 
   destroy() {
-    this.#core.off("chart_pan", this.onChartPan)
-    this.#core.off("chart_panDone", this.onChartPanDone)
+    this.#core.off("chart_pan", this.primaryPanePan)
+    this.#core.off("chart_panDone", this.primaryPanePanDone)
 
     for (let l in this.#list) {
       this.remove(l)
@@ -51,8 +51,8 @@ export default class Legends {
 
     // this.#input = new Input(this.#elTarget, { disableContextMenu: false, });
 
-    this.#core.on("chart_pan", this.onChartPan.bind(this))
-    this.#core.on("chart_panDone", this.onChartPanDone.bind(this))
+    this.#core.on("chart_pan", this.primaryPanePan.bind(this))
+    this.#core.on("chart_panDone", this.primaryPanePanDone.bind(this))
   }
 
   /**
@@ -76,13 +76,13 @@ export default class Legends {
 
   }
 
-  onChartPan() {
+  primaryPanePan() {
     for (let property of userSelect) {
       this.#elTarget.style.setProperty(property, "none");
     }
   }
 
-  onChartPanDone() {
+  primaryPanePanDone() {
     for (let property of userSelect) {
       this.#elTarget.style.removeProperty(property);
     }

@@ -22,9 +22,9 @@ export function internals() {
   data.mouseXPos = ["mouseXPos:", chart.mousePos.x]
   data.mouseRangePos = ["xPos2Index:", chart.Timeline.xPos2Index(chart.mousePos.x)]
   data.candleW = ["candleW:", chart.candleW]
-  data.onChartW = ["onChartW:", chart.Chart.width]
-  data.onChartLayerW = ["onChartLayerW:", chart.Chart.layerWidth]
-  data.onChartViewportW = ["onChartViewportW:", chart.Chart.graph.viewport.width]
+  data.primaryPaneW = ["primaryPaneW:", chart.Chart.width]
+  data.primaryPaneLayerW = ["primaryPaneLayerW:", chart.Chart.layerWidth]
+  data.primaryPaneViewportW = ["primaryPaneViewportW:", chart.Chart.graph.viewport.width]
   data.candlesOnLayer = ["candlesOnLayer:", chart.candlesOnLayer]
 
   return data

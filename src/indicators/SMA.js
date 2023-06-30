@@ -30,7 +30,7 @@ import { uid } from "../utils/utilities"
     width: '1'
   }
   #precision = 2
-  onChart = true
+  primaryPane = true
   scaleOverlay = false
   plots = [
     { key: 'SMA_1', title: 'SMA: ', type: 'line' },
@@ -38,7 +38,7 @@ import { uid } from "../utils/utilities"
 
   
   static inCnt = 0
-  static onChart = true
+  static primaryPane = true
   // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
   static colours = [
     "#9C27B0",
@@ -76,7 +76,7 @@ import { uid } from "../utils/utilities"
     this.addLegend()
   }
 
-  get onChart() { return SMA.onChart }
+  get primaryPane() { return SMA.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
 
 

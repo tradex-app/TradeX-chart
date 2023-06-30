@@ -59,8 +59,8 @@ The list of registered indicators, both default and custom can be accessed via t
 
 ```javascript
 // returns a Map() iterator of indicators
-const onChartIndicators = chart.Indicators.onchart.entries()
-const offChartIndicators = chart.Indicators.offchart.entries()
+const primaryPaneIndicators = chart.Indicators.primary.entries()
+const secondaryPaneIndicators = chart.Indicators.secondary.entries()
 ```
 
 ### Indicator Definitions
@@ -162,7 +162,7 @@ export default class Test extends Indicator {
   style = {}
 
   static inCnt = 0
-  static onChart = true
+  static primaryPane = true
   // static scale is required for off chart indicators
   // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
   static colours = []
@@ -203,7 +203,7 @@ export default class Test extends Indicator {
    * valid returned values can be: true, false (boolean), both (string)
    * @readonly
    */
-  get onChart() { return Test.onChart }
+  get primaryPane() { return Test.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
 
 

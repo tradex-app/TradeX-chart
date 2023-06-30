@@ -28,7 +28,7 @@ title: Architecture
 
 Most of these features can be accessed externally eg.
 
-``chart.offChart.entries().next().value[1]``
+``chart.secondaryPane.entries().next().value[1]``
 
 Although it is recommended that use the API to modify the chart or respond to events.
 

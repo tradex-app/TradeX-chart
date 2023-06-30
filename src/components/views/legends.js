@@ -83,14 +83,14 @@ template.innerHTML = `
   z-index:1;
 }
 .chart .upper .title,
-.offchart .upper .title {
+.secondary .upper .title {
   display: none;
 }
 .chart .lower .title {
   visibility: visible;
 }
 
-.offchart .upper {
+.secondary .upper {
   right: 0;
   z-index:1;
 }
@@ -182,7 +182,7 @@ export default class tradeXLegends extends element {
       case "chart":
         styleLegendTitle += "font-size: 1.5em;"; 
         break;
-      case "offchart":
+      case "secondary":
         styleLegend += " margin-bottom: -1.5em;";
         styleLegendTitle += ""; 
         o.title = ""
@@ -247,7 +247,7 @@ export default class tradeXLegends extends element {
     // remove
     inp += (o?.type !== "chart") ? `<span id="${id}_remove" class="control" data-icon="remove">${close}</span>` : ``
     // config
-    inp += (o?.type !== "offchart") ? `<span id="${id}_config" class="control" data-icon="config">${config}</span>` : ``
+    inp += (o?.type !== "secondary") ? `<span id="${id}_config" class="control" data-icon="config">${config}</span>` : ``
 
     return inp
   }

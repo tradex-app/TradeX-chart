@@ -47,7 +47,7 @@ export default class RSI extends Indicator {
   ]
 
   static inCnt = 0
-  static onChart = false
+  static primaryPane = false
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
 
@@ -78,7 +78,7 @@ export default class RSI extends Indicator {
     this.addLegend()
   }
 
-  get onChart() { return RSI.onChart }
+  get primaryPane() { return RSI.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
 
 

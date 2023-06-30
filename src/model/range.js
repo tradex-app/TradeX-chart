@@ -93,7 +93,7 @@ export class Range {
       this.#intervalStr = ms2Interval(this.interval)
     }
 
-    // for (let i of this?.offChart) {
+    // for (let i of this?.secondaryPane) {
     //   i.valueMin = 0
     //   i.valueMax = 100
     //   i.valueDiff = 100
@@ -265,8 +265,8 @@ export class Range {
       case "chart": 
 
         break;
-      case "onchart": break;
-      case "offchart": break;
+      case "primary": break;
+      case "secondary": break;
       case "dataset": break;
       case "all": break;
       default: 
@@ -292,13 +292,13 @@ export class Range {
     switch (idParts[1]) {
       case "chart": 
         return this.data;
-      case "onchart":
-        for (let o of this.onChart) {
+      case "primary":
+        for (let o of this.primaryPane) {
           if (idParts[2] in o) return o[idParts[2]]
         }
         return false;
-      case "offchart":
-        for (let o of this.offChart) {
+      case "secondary":
+        for (let o of this.secondaryPane) {
           if (idParts[2] in o) return o[idParts[2]]
         }
         return false;
@@ -478,7 +478,7 @@ export class Range {
 
 
 export function rangeOnchartValue( range, indicator, index ) {
-  const len = range.onchart[indicator].length - 1
+  const len = range.primary[indicator].length - 1
   const value = null
 }
 

@@ -33601,7 +33601,7 @@ export default {
             173.28647568
         ]
     ],
-    "onchart": [
+    "primary": [
         {
             "name": "EMA, 25",
             "type": "EMA",
@@ -68407,7 +68407,7 @@ export default {
             }
         }
     ],
-    "offchart": [
+    "secondary": [
         {
             "name": "RSI, 20",
             "type": "RSI",

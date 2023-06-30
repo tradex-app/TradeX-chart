@@ -80001,7 +80001,7 @@ export default {
     0
     ]
     ],
-  onchart: [
+  primary: [
     {
       name: "BB",
       type: "BB",
@@ -80013,7 +80013,7 @@ export default {
       },
     }
   ],
-  offchart: [
+  secondary: [
     {
     "name": "RSI, 20",
     "type": "RSI",

@@ -21,6 +21,6 @@ export default class tradeXWidgets extends element {
   }
 
   get grid() { return this.querySelector('tradex-grid') }
-  get onChart() { return this.querySelector('tradex-onchart') }
-  get offCharts() { return this.querySelector('tradex-offchart').children }
+  get primaryPane() { return this.querySelector('tradex-primary') }
+  get secondaryPanes() { return this.querySelector('tradex-secondary').children }
 }

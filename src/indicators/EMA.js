@@ -35,7 +35,7 @@ import { uid } from "../utils/utilities"
 
 
   static inCnt = 0
-  static onChart = true
+  static primaryPane = true
   // static scale = YAXIS_TYPES[0] // defualt
   static colours = [
     "#9C27B0",
@@ -73,7 +73,7 @@ import { uid } from "../utils/utilities"
     this.addLegend()
   }
 
-  get onChart() { return EMA.onChart }
+  get primaryPane() { return EMA.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
 
 

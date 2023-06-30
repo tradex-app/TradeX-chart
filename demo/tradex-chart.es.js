@@ -1069,8 +1069,8 @@ class Range {
     switch (id) {
       case "chart":
         break;
-      case "onchart": break;
-      case "offchart": break;
+      case "primary": break;
+      case "secondary": break;
       case "dataset": break;
       case "all": break;
       default:
@@ -1087,13 +1087,13 @@ class Range {
     switch (idParts[1]) {
       case "chart":
         return this.data;
-      case "onchart":
-        for (let o of this.onChart) {
+      case "primary":
+        for (let o of this.primaryPane) {
           if (idParts[2] in o) return o[idParts[2]]
         }
         return false;
-      case "offchart":
-        for (let o of this.offChart) {
+      case "secondary":
+        for (let o of this.secondaryPane) {
           if (idParts[2] in o) return o[idParts[2]]
         }
         return false;
@@ -1278,8 +1278,8 @@ const DEFAULT_STATE = {
     tfms: DEFAULT_TIMEFRAMEMS
   },
   views: [],
-  onchart: [],
-  offchart: [],
+  primary: [],
+  secondary: [],
   datasets: [],
   tools: [],
   ohlcv: []
@@ -1320,11 +1320,11 @@ class State {
     if (!isArray(state.views)) {
       state.views = defaultState.views;
     }
-    if (!isArray(state.onchart)) {
-        state.onchart = defaultState.onchart;
+    if (!isArray(state.primary)) {
+        state.primary = defaultState.primary;
     }
-    if (!isArray(state.offchart)) {
-        state.offchart = defaultState.offchart;
+    if (!isArray(state.secondary)) {
+        state.secondary = defaultState.secondary;
     }
     if (!isObject(state.chart.settings)) {
         state.chart.settings = defaultState.chart.settings;
@@ -1333,9 +1333,9 @@ class State {
         state.datasets = [];
     }
     if (state.views.length == 0) {
-      state.views.push(["onchart", state.onchart]);
+      state.views.push(["primary", state.primary]);
       for (let o in state) {
-        if (o.indexOf("offchart") == 0) {
+        if (o.indexOf("secondary") == 0) {
           state.views.push([o, state[o]]);
         }
       }
@@ -1361,11 +1361,11 @@ class State {
       }
     }
     if (state.views.length == 0)
-      state.views[0] = ["onchart", defaultState.onchart];
+      state.views[0] = ["primary", defaultState.primary];
     state.views = new xMap(state.views);
-    if (!state.views.has("onchart"))
-      state.views.insert("onchart", defaultState.onchart, 0);
-    state.views.get("onchart").push(state.chart);
+    if (!state.views.has("primary"))
+      state.views.insert("primary", defaultState.primary, 0);
+    state.views.get("primary").push(state.chart);
     for (var ds of state.datasets) {
       if (!this.#dss) this.#dss = {};
       this.dss[ds.id] = new Dataset(this, ds);
@@ -1395,7 +1395,7 @@ class State {
     if (vals.length > 0 &&
         vals[vals.length - 1].length > 6)
         vals.length = vals.length - 1;
-    data.views.get("onchart").pop();
+    data.views.get("primary").pop();
     data.views = Array.from(data.views);
     switch(type) {
       case "json":
@@ -5172,9 +5172,9 @@ const defaultTheme = {
     TextColour: GlobalStyle.COLOUR_TXT,
     GridColour: GridStyle.COLOUR_GRID,
   },
-  onChart: {
+  primaryPane: {
   },
-  offChart: {
+  secondaryPane: {
     separator: "#666"
   },
   legend: {
@@ -5749,7 +5749,7 @@ class Indicator extends Overlay {
   #cnt_
   #name
   #shortName
-  #onChart
+  #primaryPane
   #scaleOverlay
   #plots
   #params
@@ -5784,8 +5784,8 @@ class Indicator extends Overlay {
   set shortName(n) { this.#shortName = n; }
   get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
   get chartPaneID() { return this.#params.overlay.paneID }
-  get onChart() { return this.#onChart }
-  set onChart(c) { this.#onChart = c; }
+  get primaryPane() { return this.#primaryPane }
+  set primaryPane(c) { this.#primaryPane = c; }
   get scaleOverlay() { return this.#scaleOverlay }
   set scaleOverlay(o) { this.#scaleOverlay = o; }
   get plots() { return this.#plots }
@@ -6249,7 +6249,7 @@ class BB extends Indicator {
     { key: 'BB_1', title: ' ', type: 'line' },
   ]
   static inCnt = 0
-  static onChart = true
+  static primaryPane = true
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
     super(target, xAxis, yAxis, config, parent, params);
     const overlay = params.overlay;
@@ -6261,7 +6261,7 @@ class BB extends Indicator {
     this.setUpdateValue = (value) => { this.updateValue(value); };
     this.addLegend();
   }
-  get onChart() { return BB.onChart }
+  get primaryPane() { return BB.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
@@ -6359,7 +6359,7 @@ class EMA extends Indicator {
     { key: 'EMA_1', title: 'EMA: ', type: 'line' },
   ]
   static inCnt = 0
-  static onChart = true
+  static primaryPane = true
   static colours = [
     "#9C27B0",
     "#9C27B0",
@@ -6378,7 +6378,7 @@ class EMA extends Indicator {
     this.setUpdateValue = (value) => { this.updateValue(value); };
     this.addLegend();
   }
-  get onChart() { return EMA.onChart }
+  get primaryPane() { return EMA.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
   updateLegend() {
     this.parent.legend.update();
@@ -6450,7 +6450,7 @@ class RSI extends Indicator {
     { key: 'RSI_1', title: ' ', type: 'line' },
   ]
   static inCnt = 0
-  static onChart = false
+  static primaryPane = false
   static scale = YAXIS_TYPES$1[1]
   constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
     super (target, xAxis, yAxis, config, parent, params);
@@ -6463,7 +6463,7 @@ class RSI extends Indicator {
     this.setUpdateValue = (value) => { this.updateValue(value); };
     this.addLegend();
   }
-  get onChart() { return RSI.onChart }
+  get primaryPane() { return RSI.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
@@ -6548,13 +6548,13 @@ class SMA extends Indicator {
     width: '1'
   }
   #precision = 2
-  onChart = true
+  primaryPane = true
   scaleOverlay = false
   plots = [
     { key: 'SMA_1', title: 'SMA: ', type: 'line' },
   ]
   static inCnt = 0
-  static onChart = true
+  static primaryPane = true
   static colours = [
     "#9C27B0",
     "#9C27B0",
@@ -6573,7 +6573,7 @@ class SMA extends Indicator {
     this.setUpdateValue = (value) => { this.updateValue(value); };
     this.addLegend();
   }
-  get onChart() { return SMA.onChart }
+  get primaryPane() { return SMA.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
   updateLegend() {
     this.parent.legend.update();
@@ -6621,7 +6621,7 @@ class Volume extends Indicator {
   #name = 'Relative Strength Index'
   #shortName = 'RSI'
   #params
-  #onChart = true
+  #primaryPane = true
   #checkParamCount = false
   #scaleOverlay = true
   #plots = [
@@ -6634,7 +6634,7 @@ class Volume extends Indicator {
     super (target, xAxis, yAxis, config, parent, params);
     params.overlay;
   }
-  get onChart() { return "both" }
+  get primaryPane() { return "both" }
   get defaultStyle() { return this.#defaultStyle }
 }
 
@@ -8344,16 +8344,16 @@ class Legends {
   get elTarget() { return this.#elTarget }
   get list() { return this.#list }
   destroy() {
-    this.#core.off("chart_pan", this.onChartPan);
-    this.#core.off("chart_panDone", this.onChartPanDone);
+    this.#core.off("chart_pan", this.primaryPanePan);
+    this.#core.off("chart_panDone", this.primaryPanePanDone);
     for (let l in this.#list) {
       this.remove(l);
     }
     this.#elTarget.remove();
   }
   eventsListen() {
-    this.#core.on("chart_pan", this.onChartPan.bind(this));
-    this.#core.on("chart_panDone", this.onChartPanDone.bind(this));
+    this.#core.on("chart_pan", this.primaryPanePan.bind(this));
+    this.#core.on("chart_panDone", this.primaryPanePanDone.bind(this));
   }
   onMouseClick(e) {
     const which = (s) => {
@@ -8368,12 +8368,12 @@ class Legends {
   }
   onMouseOver(e) {
   }
-  onChartPan() {
+  primaryPanePan() {
     for (let property of userSelect) {
       this.#elTarget.style.setProperty(property, "none");
     }
   }
-  onChartPanDone() {
+  primaryPanePanDone() {
     for (let property of userSelect) {
       this.#elTarget.style.removeProperty(property);
     }
@@ -9147,7 +9147,7 @@ class ScaleBar {
   }
   onStreamUpdate(e) {
   }
-  onChartDrag(e) {
+  primaryPaneDrag(e) {
     if (this.#yAxis.mode !== "manual") return
     this.#yAxis.offset = e.domEvent.srcEvent.movementY;
     this.parent.draw(this.range, true);
@@ -9665,7 +9665,7 @@ class chartWatermark extends Overlay {
 }
 
 const defaultOverlays$1 = {
-  onChart: [
+  primaryPane: [
     ["watermark", {class: chartWatermark, fixed: true, required: true, params: {content: null}}],
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
     ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
@@ -9673,16 +9673,16 @@ const defaultOverlays$1 = {
     ["stream", {class: chartStreamCandle, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ],
-  offChart: [
+  secondaryPane: [
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ]
 };
 const optionalOverlays = {
-  onChart: {
+  primaryPane: {
     "trades": {class: chartTrades, fixed: false, required: false}
   },
-  offChart: {
+  secondaryPane: {
     "candles": {class: chartCandles, fixed: false, required: true},
   }
 };
@@ -9738,14 +9738,14 @@ class Chart {
     this.#name = this.#options.name;
     this.#shortName = this.#options.shortName;
     this.#title = this.#options.title;
-    this.#type = (this.#options.type == "onchart") ? "onChart" : "offChart";
+    this.#type = (this.#options.type == "primary") ? "primaryPane" : "secondaryPane";
     this.#view = this.#options.view;
     this.#elScale = this.#options.elements.elScale;
     this.#parent = this.#options.parent;
     this.#elTarget = this.#options.elements.elTarget;
     this.#elTarget.id = this.id;
     this.legend = new Legends(this.elLegend, this);
-    if (this.isOnChart) {
+    if (this.isPrimary) {
       chartLegend.type = "chart";
       chartLegend.title = this.title;
       chartLegend.parent = this;
@@ -9754,7 +9754,7 @@ class Chart {
       this.yAxisType = "default";
     }
     else {
-      chartLegend.type = "offchart";
+      chartLegend.type = "secondary";
       chartLegend.title = "";
       chartLegend.parent = this;
       chartLegend.source = () => { return {inputs:{}, colours:[], labels: []} };
@@ -9783,7 +9783,7 @@ class Chart {
   get core() { return this.#core }
   get type() { return this.#type }
   get status() { return this.#status }
-  get isOnChart() { return this.#type === "onChart" }
+  get isPrimary() { return this.#type === "primaryPane" }
   get isPrimary() { return this.#options.view.primary || false }
   get options() { return this.#options }
   get element() { return this.#elTarget }
@@ -9874,7 +9874,7 @@ class Chart {
     this.off(STREAM_UPDATE, this.onStreamUpdate);
     this.off(STREAM_FIRSTVALUE, this.onStreamNewValue);
     this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this);
-    if (this.isOnChart)
+    if (this.isPrimary)
       this.off("chart_yAxisRedraw", this.onYAxisRedraw);
     this.element.remove();
     this.#status = "destroyed";
@@ -9885,8 +9885,8 @@ class Chart {
   }
   eventsListen() {
     this.#input = new Input(this.#elTarget, {disableContextMenu: false});
-    this.#input.on("pointerdrag", this.onChartDrag.bind(this));
-    this.#input.on("pointerdragend", this.onChartDragDone.bind(this));
+    this.#input.on("pointerdrag", this.primaryPaneDrag.bind(this));
+    this.#input.on("pointerdragend", this.primaryPaneDragDone.bind(this));
     this.#input.on("pointermove", this.onMouseMove.bind(this));
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
@@ -9898,7 +9898,7 @@ class Chart {
     this.on(STREAM_UPDATE, this.onStreamUpdate, this);
     this.on(STREAM_FIRSTVALUE, this.onStreamNewValue, this);
     this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this);
-    if (this.isOnChart)
+    if (this.isPrimary)
       this.on("chart_yAxisRedraw", this.onYAxisRedraw, this);
   }
   on(topic, handler, context) {
@@ -9910,14 +9910,14 @@ class Chart {
   emit(topic, data) {
     this.#core.emit(topic, data);
   }
-  onChartDrag(e) {
+  primaryPaneDrag(e) {
     this.cursor = "grab";
-    this.core.MainPane.onChartDrag(e);
-    this.scale.onChartDrag(e);
+    this.core.MainPane.primaryPaneDrag(e);
+    this.scale.primaryPaneDrag(e);
   }
-  onChartDragDone(e) {
+  primaryPaneDragDone(e) {
     this.cursor = "crosshair";
-    this.core.MainPane.onChartDragDone(e);
+    this.core.MainPane.primaryPaneDragDone(e);
   }
   onMouseMove(e) {
     this.core.MainPane.onPointerActive(this);
@@ -9957,7 +9957,7 @@ class Chart {
     this.draw(this.range, true);
   }
   onStreamUpdate(candle) {
-    if (this.isOnChart) {
+    if (this.isPrimary) {
       this.#streamCandle = candle;
       this.chartStreamCandle.draw();
       this.layerStream.setPosition(this.core.stream.lastScrollPos, 0);
@@ -9967,7 +9967,7 @@ class Chart {
     this.graph.render();
   }
   onYAxisRedraw() {
-    if (this.isOnChart) this.refresh();
+    if (this.isPrimary) this.refresh();
   }
   onDeleteIndicator(i) {
     this.removeIndicator(i.id);
@@ -9998,7 +9998,7 @@ class Chart {
     if (
       !isString$1(t) ||
       !YAXIS_TYPES$1.includes(t)  ||
-      (this.type == "onChart" && t == "percent")
+      (this.type == "primaryPane" && t == "percent")
     ) return false
     this.#yAxisType = t;
   }
@@ -10030,12 +10030,12 @@ class Chart {
     return Object.fromEntries([...this.#Graph.overlays.list])
   }
   addIndicator(i) {
-    const onChart = this.type === "onChart";
+    const primaryPane = this.type === "primaryPane";
     const indClass = this.core.indicatorClasses[i.type].ind;
-    const indType = (indClass.constructor.type === "both") ? onChart : indClass.prototype.onChart;
+    const indType = (indClass.constructor.type === "both") ? primaryPane : indClass.prototype.primaryPane;
     if (
         i?.type in this.core.indicatorClasses &&
-        onChart === indType
+        primaryPane === indType
       ) {
       i.paneID = this.id;
       const config = {
@@ -10099,7 +10099,7 @@ class Chart {
   }
   refresh() {
     this.scale.draw();
-    this.draw(undefined, this.isOnChart);
+    this.draw(undefined, this.isPrimary);
   }
   updateLegends(pos = this.#cursorPos, candle = false) {
     if (this.#core.isEmpty || !isObject(this.#Legends)) return
@@ -10186,7 +10186,7 @@ class Chart {
   createGraph() {
     let overlays = copyDeep(this.overlaysDefault);
     this.graph = new graph(this, this.elViewport, overlays, false);
-    if (this.isOnChart) {
+    if (this.isPrimary) {
       this.layerStream = this.graph.overlays.get("stream")?.layer;
       this.chartStreamCandle = this.graph.overlays.get("stream")?.instance;
     }
@@ -10491,9 +10491,9 @@ class MainPane {
   #elMain
   #elRows
   #elTime
-  #elOnChart
+  #elPrimary
   #elScale
-  #elOffCharts = {}
+  #elSecondarys = {}
   #elGrid
   #elCanvas
   #elViewport
@@ -10543,14 +10543,14 @@ class MainPane {
   get options() { return this.#options }
   get element() { return this.#elMain }
   get elRows() { return this.#elMain.rows }
-  get elOnChart() { return this.#elMain.rows.primary }
-  get elOffChart() { return this.#elMain.rows.secondary }
+  get elPrimary() { return this.#elMain.rows.primary }
+  get elSecondary() { return this.#elMain.rows.secondary }
   get elPanes() { return this.#elMain.rows.chartPanes }
   get elPaneSlot() { return this.#elMain.rows.chartPaneSlot }
   get width() { return this.#elMain.getBoundingClientRect().width }
   get height() { return this.#elMain.getBoundingClientRect().height }
-  get chartW() { return this.elOnChart.getBoundingClientRect().width }
-  get chartH() { return this.elOnChart.getBoundingClientRect().height }
+  get chartW() { return this.elPrimary.getBoundingClientRect().width }
+  get chartH() { return this.elPrimary.getBoundingClientRect().height }
   get rowsW() { return this.#elRows.getBoundingClientRect().width }
   get rowsH() { return this.#elRows.getBoundingClientRect().height }
   get rowMinH() { return this.#rowMinH }
@@ -10575,8 +10575,8 @@ class MainPane {
   get elements() {
     return {
       elRows: this.elRows,
-      elOnChart: this.elOnChart,
-      elOffCharts: this.elOffCharts,
+      elPrimary: this.elPrimary,
+      elSecondarys: this.elSecondarys,
       elTime: this.#elTime,
       elScale: this.#elScale
     }
@@ -10593,8 +10593,8 @@ class MainPane {
     options.shortName = "Chart";
     options.parent = this;
     options.chartData = this.#core.chartData;
-    options.onChart = this.#core.onChart;
-    options.offChart = this.#core.offChart;
+    options.primaryPane = this.#core.primaryPane;
+    options.secondaryPane = this.#core.secondaryPane;
     options.rangeLimit = this.#core.rangeLimit;
     options.settings = this.#core.settings;
     options.elements =
@@ -10610,7 +10610,7 @@ class MainPane {
     this.registerChartViews(options);
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE$1;
     this.#rowMinH = isNumber(this.config.rowMinH)? this.config.rowMinH : ROWMINHEIGHT;
-    this.#viewDefaultH = isNumber(this.config.offChartDefaultH)? this.config.offChartDefaultH : OFFCHARTDEFAULTHEIGHT;
+    this.#viewDefaultH = isNumber(this.config.secondaryPaneDefaultH)? this.config.secondaryPaneDefaultH : OFFCHARTDEFAULTHEIGHT;
     this.rowsOldH = this.rowsH;
     this.log(`${this.#name} instantiated`);
   }
@@ -10660,12 +10660,12 @@ class MainPane {
     this.#elRows.tabIndex = 0;
     this.#elRows.focus();
     this.#input = new Input(this.#elRows, {disableContextMenu: false});
-    this.#input.on("keydown", this.onChartKeyDown.bind(this));
-    this.#input.on("keyup", this.onChartKeyUp.bind(this));
+    this.#input.on("keydown", this.primaryPaneKeyDown.bind(this));
+    this.#input.on("keyup", this.primaryPaneKeyUp.bind(this));
     this.#input.on("wheel", this.onMouseWheel.bind(this));
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
-    this.#input.on("pointerup", this.onChartDragDone.bind(this));
+    this.#input.on("pointerup", this.primaryPaneDragDone.bind(this));
     this.#input.on("pointermove", this.onMouseMove.bind(this));
     this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue, this);
     this.on(STREAM_NEWVALUE, this.onNewStreamValue, this);
@@ -10691,7 +10691,7 @@ class MainPane {
       e.dragstart.y = this.#cursorPos[1];
       e.position.x = this.#cursorPos[0] + direction;
       e.position.y = this.#cursorPos[1];
-      this.onChartDrag(e);
+      this.primaryPaneDrag(e);
       return
     }
     const range = this.range;
@@ -10717,8 +10717,8 @@ class MainPane {
       p.ts1, p.ts1 - p.ts2
     ];
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true;
-    for (let [key, offChart] of this.chartPanes) {
-      offChart.graph.overlays.list.get("cursor").layer.visible = true;
+    for (let [key, secondaryPane] of this.chartPanes) {
+      secondaryPane.graph.overlays.list.get("cursor").layer.visible = true;
     }
     this.emit("main_mousemove", this.#cursorPos);
   }
@@ -10726,9 +10726,9 @@ class MainPane {
     this.core.Timeline.showCursorTime();
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true;
     this.core.Chart.graph.render();
-    for (let [key, offChart] of this.chartPanes) {
-      offChart.graph.overlays.list.get("cursor").layer.visible = true;
-      offChart.graph.render();
+    for (let [key, secondaryPane] of this.chartPanes) {
+      secondaryPane.graph.overlays.list.get("cursor").layer.visible = true;
+      secondaryPane.graph.render();
     }
   }
   onMouseOut(e) {
@@ -10736,13 +10736,13 @@ class MainPane {
     this.onPointerActive(false);
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false;
     this.core.Chart.graph.render();
-    for (let [key, offChart] of this.chartPanes) {
-      offChart.graph.overlays.list.get("cursor").layer.visible = false;
-      offChart.graph.render();
+    for (let [key, secondaryPane] of this.chartPanes) {
+      secondaryPane.graph.overlays.list.get("cursor").layer.visible = false;
+      secondaryPane.graph.render();
     }
     this.draw();
   }
-  onChartDrag(e) {
+  primaryPaneDrag(e) {
     const d = this.#drag;
     if (!d.active) {
       d.active = true;
@@ -10767,7 +10767,7 @@ class MainPane {
     ]);
     this.emit("chart_pan", this.#cursorPos);
   }
-  onChartDragDone(e) {
+  primaryPaneDragDone(e) {
     const d = this.#drag;
     d.active = false;
     d.delta = [ 0, 0 ];
@@ -10778,7 +10778,7 @@ class MainPane {
     ];
     this.emit("chart_panDone", this.#cursorPos);
   }
-  onChartKeyDown(e) {
+  primaryPaneKeyDown(e) {
     let step = (this.candleW > 1) ? this.candleW : 1;
     switch (e.key) {
       case "ArrowLeft":
@@ -10799,7 +10799,7 @@ class MainPane {
         break;
     }
   }
-  onChartKeyUp(e) {
+  primaryPaneKeyUp(e) {
     let step = (this.candleW > 1) ? this.candleW : 1;
     switch (e.key) {
       case "ArrowLeft":
@@ -10826,11 +10826,11 @@ class MainPane {
       this.chart.scale.layerCursor.visible = false;
       this.chart.scale.layerCursor.erase();
     }
-    this.#ChartPanes.forEach((offChart, key) => {
-      if (chart !== offChart) {
-        offChart.cursorActive = false;
-        offChart.scale.layerCursor.visible = false;
-        offChart.scale.layerCursor.erase();
+    this.#ChartPanes.forEach((secondaryPane, key) => {
+      if (chart !== secondaryPane) {
+        secondaryPane.cursorActive = false;
+        secondaryPane.scale.layerCursor.visible = false;
+        secondaryPane.scale.layerCursor.erase();
       }
     });
   }
@@ -10871,10 +10871,10 @@ class MainPane {
   }
   registerChartViews(options) {
     this.#elRows.previousDimensions();
-    const onChart = [];
+    const primaryPane = [];
     for (let [k,oc] of this.views) {
-      if (k === "onchart") onChart.push(oc);
-      if (oc.length === 0 && k !== "onchart") {
+      if (k === "primary") primaryPane.push(oc);
+      if (oc.length === 0 && k !== "primary") {
         this.views.delete(k);
         continue
       }
@@ -10887,8 +10887,8 @@ class MainPane {
         oc.splice(i, 1);
       }
     }
-    let primary = onChart[0];
-    for (let o of onChart) {
+    let primary = primaryPane[0];
+    for (let o of primaryPane) {
       if (o?.primary === true) primary = o;
       else o.primary = false;
     }
@@ -10923,13 +10923,13 @@ class MainPane {
     options.elements.elTarget = row;
     options.elements.elScale = axis;
     let o;
-    if (options.type == "onchart") {
+    if (options.type == "primary") {
       o = new Chart(this.#core, options);
       this.#Chart = o;
     }
     else {
-      options.name = options.view[0].name || "OffChart";
-      options.shortName = options.view[0].type || "OffChart";
+      options.name = options.view[0].name || "Secondary";
+      options.shortName = options.view[0].type || "Secondary";
       o = new Chart(this.#core, options);
     }
     this.#ChartPanes.set(o.id, o);
@@ -10973,7 +10973,7 @@ class MainPane {
     if (!isArray(params?.data)) params.data = [];
     if (!isObject(params?.settings)) params.settings = {};
     let instance;
-    if (this.#indicators[i].ind.onChart) {
+    if (this.#indicators[i].ind.primaryPane) {
       const indicator = {
         type: i,
         name: name,
@@ -10984,9 +10984,9 @@ class MainPane {
     else {
       const indicator = this.core.indicatorClasses[i].ind;
       (
-        indicator.onChart === "both" &&
-        isBoolean(i.onChart)) ?
-        i.onChart : false;
+        indicator.primaryPane === "both" &&
+        isBoolean(i.primaryPane)) ?
+        i.primaryPane : false;
       if (!isArray(params.view)) params.view = [{name, type: i, ...params}];
       for (let v = 0; v < params.view.length; v++) {
         if (!isObject(params.view[v]) || !valuesInArray(["name", "type"], Object.keys(params.view[v])))
@@ -11092,7 +11092,7 @@ class MainPane {
     return sizes
   }
   scaleNode(type) {
-    const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.offChart.separator};`;
+    const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.secondaryPane.separator};`;
     const node = `
     <div slot="chartpane" class="viewport scale ${type}" style="$${styleRow}"></div>
   `;
@@ -11500,14 +11500,14 @@ template$8.innerHTML = `
   z-index:1;
 }
 .chart .upper .title,
-.offchart .upper .title {
+.secondary .upper .title {
   display: none;
 }
 .chart .lower .title {
   visibility: visible;
 }
 
-.offchart .upper {
+.secondary .upper {
   right: 0;
   z-index:1;
 }
@@ -11577,7 +11577,7 @@ class tradeXLegends extends element {
       case "chart":
         styleLegendTitle += "font-size: 1.5em;";
         break;
-      case "offchart":
+      case "secondary":
         styleLegend += " margin-bottom: -1.5em;";
         styleLegendTitle += "";
         o.title = "";
@@ -11628,7 +11628,7 @@ class tradeXLegends extends element {
     inp += `<span id="${id}_maximize" class="control" data-icon="maximize">${maximize}</span>`;
     inp += `<span id="${id}_restore" class="control" data-icon="restore">${restore}</span>`;
     inp += (o?.type !== "chart") ? `<span id="${id}_remove" class="control" data-icon="remove">${close}</span>` : ``;
-    inp += (o?.type !== "offchart") ? `<span id="${id}_config" class="control" data-icon="config">${config}</span>` : ``;
+    inp += (o?.type !== "secondary") ? `<span id="${id}_config" class="control" data-icon="config">${config}</span>` : ``;
     return inp
   }
 }
@@ -11731,8 +11731,8 @@ class tradeXRows extends element {
   disconnectedCallback() {
   }
   get grid() { return this.shadowRoot.querySelector('tradex-grid') }
-  get primary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("onchart") ); }
-  get secondary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("offchart") ); }
+  get primary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("primary") ); }
+  get secondary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("secondary") ); }
   get chartPanes() { return this.chartPaneSlot.assignedElements() }
   get chartPaneSlot() { return this.shadowRoot.querySelector('slot[name="chartpane"]') }
   get width() { return this.clientWidth }
@@ -11803,7 +11803,7 @@ class tradeXMain extends element {
     this.setMain();
   }
   rowNode(type, api) {
-    const styleRow = ` border-top: 1px solid ${api.theme.offChart.separator};`;
+    const styleRow = ` border-top: 1px solid ${api.theme.secondaryPane.separator};`;
     const node = `
       <tradex-chartpane slot="chartpane" class="${type}" style="${styleRow}">
       </tradex-chartpane>
@@ -13438,7 +13438,7 @@ class TradeXchart extends tradeXChart {
   static get talibError() { return TradeXchart.#talibError }
   static initErrMsg = `${NAME} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`
   static permittedClassNames =
-  ["TradeXchart","Chart","MainPane","OffChart","OnChart",
+  ["TradeXchart","Chart","MainPane","Secondary","Primary",
   "ScaleBar","Timeline","ToolsBar","UtilsBar","Widgets"]
   #name = NAME
   #shortName = SHORTNAME
@@ -13599,8 +13599,8 @@ class TradeXchart extends tradeXChart {
   get allData() {
     return {
       data: this.state.data.chart.data,
-      onChart: this.state.data.offchart,
-      offChart: this.state.data.offchart,
+      primaryPane: this.state.data.secondary,
+      secondaryPane: this.state.data.secondary,
       datasets: this.state.data.datasets
     }
   }
@@ -13972,10 +13972,10 @@ class TradeXchart extends tradeXChart {
     let i, j, start, end;
     const data = this.allData.data;
     const mData = merge?.data || false;
-    this.allData?.onChart;
-    merge?.onChart || false;
-    this.allData?.offChart;
-    merge?.offChart || false;
+    this.allData?.primaryPane;
+    merge?.primaryPane || false;
+    this.allData?.secondaryPane;
+    merge?.secondaryPane || false;
     this.allData?.dataset?.data;
     const mDataset = merge?.dataset?.data || false;
     const trades = this.allData?.trades?.data;
@@ -14024,7 +14024,7 @@ class TradeXchart extends tradeXChart {
   isIndicator(i) {
     if (
       typeof i === "function" &&
-      ("onChart" in i.prototype) &&
+      ("primaryPane" in i.prototype) &&
       isFunction(i.prototype?.draw)
     ) return true
     else return false
@@ -14080,10 +14080,10 @@ class TradeXchart extends tradeXChart {
     }
   }
   calcAllIndicators() {
-    for (let i of this.Indicators.onchart.values()) {
+    for (let i of this.Indicators.primary.values()) {
       i.instance.calcIndicatorHistory();
     }
-    for (let i of this.Indicators.offchart.values()) {
+    for (let i of this.Indicators.secondary.values()) {
       i.instance.calcIndicatorHistory();
     }
   }

@@ -126,7 +126,7 @@ export default class yAxis extends Axis {
   /**
    * return canvas y co-ordinate
    * handles Y Axis modes: default, log, percentate
-   * @param {number} y - chart price or offchart indicator y data
+   * @param {number} y - chart price or secondary indicator y data
    * @returns {number}  
    * @memberof yAxis
    */

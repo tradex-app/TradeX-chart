@@ -23,7 +23,7 @@ export default class Test extends Indicator {
   style = {}
 
   static inCnt = 0
-  static onChart = true
+  static primaryPane = true
   // static scale is required for off chart indicators
   // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
   static colours = []
@@ -63,7 +63,7 @@ export default class Test extends Indicator {
    * define where indicator should be displayed
    * @returns {boolean|string} valid returned values can be: true, false (boolean), both (string)
    */
-  get onChart() { return Test.onChart }
+  get primaryPane() { return Test.primaryPane }
   /** @returns {Object} */
   get defaultStyle() { return this.#defaultStyle }
 

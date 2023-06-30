@@ -37,19 +37,19 @@ export default
         addIndicator: {
           target: 'addIndicator',
           action (data) {
-            // console.log('offChart: transition from "idle" to "addIndicator" state')
+            // console.log('secondaryPane: transition from "idle" to "addIndicator" state')
           },
         },
         // divider_mousedown: {
         //   target: 'divider_mousedown',
         //   action (data) {
-        //     // console.log('offChart: transition from "idle" to "addIndicator" state')
+        //     // console.log('secondaryPane: transition from "idle" to "addIndicator" state')
         //   },
         // },
         divider_pointerdrag: {
           target: 'divider_pointerdrag',
           action (data) {
-            // console.log('offChart: transition from "idle" to "divider_pointerdrag" state')
+            // console.log('secondaryPane: transition from "idle" to "divider_pointerdrag" state')
             this.context.currCursor = this.context.origin.cursor
             this.context.origin.cursor = "row-resize"
           },
@@ -57,7 +57,7 @@ export default
         global_resize: {
           target: 'global_resize',
           action (data) {
-            // console.log('offChart: transition from "idle" to "addIndicator" state')
+            // console.log('secondaryPane: transition from "idle" to "addIndicator" state')
           },
         },
       }

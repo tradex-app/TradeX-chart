@@ -209,7 +209,7 @@ export default class ScaleBar {
 
   }
 
-  onChartDrag(e) {
+  primaryPaneDrag(e) {
     if (this.#yAxis.mode !== "manual") return
     this.#yAxis.offset = e.domEvent.srcEvent.movementY // this.#core.MainPane.cursorPos[5] // e[5]
     this.parent.draw(this.range, true)
@@ -251,7 +251,7 @@ export default class ScaleBar {
     this.draw()
   }
 
-  // convert chart price or offchart indicator y data to pixel pos
+  // convert chart price or secondary indicator y data to pixel pos
   yPos(yData) { return this.#yAxis.yPos(yData) }
 
   yPosStream(yData) { return this.#yAxis.lastYData2Pixel(yData) }

@@ -293,7 +293,7 @@ export function uid(tag="ID") {
 /**
  * test if (array of) values exist in target array
  * @param {Array} values - single value or array of values 
- * @param {array|*} arr - target array to search
+ * @param {Array|*} arr - target array to search
  * @returns {boolean}  
  */
 export function valuesInArray(values, arr) {

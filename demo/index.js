@@ -36,7 +36,7 @@ let state4 = {
           434.3
       ]
   ],
-onchart: [
+primary: [
   {
     "name": "SMA, 5",
     "type": "SMA",
@@ -44,7 +44,7 @@ onchart: [
     "settings": {period: 5}
   }
 ],
-"offchart": [
+"secondary": [
   {
     "name": "RSI, 20",
     "type": "RSI",
@@ -55,7 +55,7 @@ onchart: [
 
 let state5 = {
   "ohlcv": [],
-  "onchart": [
+  "primary": [
     {
       "name": "EMA, 25",
       "type": "EMA",
@@ -69,7 +69,7 @@ let state5 = {
       "settings": {}
   },
   ],
-  "offchart": [
+  "secondary": [
     {
       "name": "RSI, 20",
       "type": "RSI",
@@ -124,7 +124,7 @@ const config1 = {
       GridColour: "#303030",
       TextColour: "#c0c0c0"
     },
-    onChart: {
+    primaryPane: {
 
     },
     tools: {
@@ -184,7 +184,7 @@ const config2 = {
       GridColour: "#333",
       TextColour: "#ccc"
     },
-    onChart: {
+    primaryPane: {
 
     },
     utils: {
@@ -255,10 +255,10 @@ const config3 = {
       GridColour: "#313647",
       TextColour: "#96a9db"
     },
-    onChart: {
+    primaryPane: {
 
     },
-    offChart: {
+    secondaryPane: {
 
     },
     time: {
@@ -326,7 +326,7 @@ const config4 = {
       GridColour: "#333",
       TextColour: "#ccc"
     },
-    onChart: {
+    primaryPane: {
 
     },
   },
@@ -403,10 +403,10 @@ const config5 = {
       GridColour: "#191e26",
       TextColour: "#6a6f80"
     },
-    onChart: {
+    primaryPane: {
 
     },
-    offChart: {
+    secondaryPane: {
 
     },
     time: {

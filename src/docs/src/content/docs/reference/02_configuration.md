@@ -165,10 +165,10 @@ const config = {
       GridColour: "#333",
       TextColour: "#ccc"
     },
-    onChart: {
+    primaryPane: {
 
     },
-    offChart: {
+    secondaryPane: {
 
     },
     tools: {

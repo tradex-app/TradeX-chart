@@ -18,8 +18,8 @@ settings: Object {  }
 ​​​​​​​
 datasets: Array []
 ​​
-offchart: Array []
+secondary: Array []
 ​​
-onchart: Array []
+primary: Array []
 }
 ```

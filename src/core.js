@@ -6,9 +6,9 @@ import { isArray, isBoolean, isFunction, isNumber, isObject, isString, isError, 
 import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { isTimeFrame, SECOND_MS } from "./utils/time"
-import { copyDeep, promiseState, uid } from './utils/utilities'
+import { copyDeep, uid } from './utils/utilities'
 import State from './state'
-import { Range, calcTimeIndex } from "./model/range"
+import { Range, calcTimeIndex, detectInterval } from "./model/range"
 import StateMachine from './scaleX/stateMachne'
 import Stream from './helpers/stream'
 import Theme from "./helpers/theme"
@@ -57,7 +57,7 @@ export default class TradeXchart extends Tradex_chart {
   static get talibError() { return TradeXchart.#talibError }
   static #initErrMsg = `${NAME} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`
   static #permittedClassNames = 
-  ["TradeXchart","Chart","MainPane","OffChart","OnChart",
+  ["TradeXchart","Chart","MainPane","Secondary","Primary",
   "ScaleBar","Timeline","ToolsBar","UtilsBar","Widgets"]
 
   #name = NAME
@@ -119,11 +119,11 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   #time = {
-    rangeTotal: true,
     range: {},
-    total: {},
     timeFrameMS: 0,
-    timeFrame: '',
+    timeFrame: `undefined`,
+    // rangeTotal: true,
+    // total: {},
     timeZone: '',
     indexed: false
   }
@@ -287,8 +287,8 @@ export default class TradeXchart extends Tradex_chart {
   get allData() {
     return {
       data: this.state.data.chart.data,
-      onChart: this.state.data.offchart,
-      offChart: this.state.data.offchart,
+      primaryPane: this.state.data.secondary,
+      secondaryPane: this.state.data.secondary,
       datasets: this.state.data.datasets
     }
   }
@@ -925,10 +925,12 @@ export default class TradeXchart extends Tradex_chart {
       i = mData.length - 1
       j = data.length - 1
 
+      // chart is empty so simply add the new data
       if (data.length == 0) {
         this.allData.data.push(...mData)
         if (calc) this.calcAllIndicators()
       }
+      // chart has data, check for overlap
       else {
         const r1 = [data[0][0], data[j][0]]
         const r2 = [mData[0][0], mData[i][0]]
@@ -936,7 +938,8 @@ export default class TradeXchart extends Tradex_chart {
 
         // overlap between existing data and merge data
         if (o[1] >= o[0]) {
-// TODO: merge with overlap
+          const unified = []
+
         }
         // no overlap, insert the new data
         else {
@@ -949,9 +952,9 @@ export default class TradeXchart extends Tradex_chart {
 * for sanity reasons, instead will trigger 
 * calculation for merged data for existing indicators
 
-    // Do we have onChart indicators?
-    if (isArray(mOnChart) && mOnChart.length > 0) {
-      for (let o of mOnChart) {
+    // Do we have primaryPane indicators?
+    if (isArray(mPrimary) && mPrimary.length > 0) {
+      for (let o of mPrimary) {
         // if (o )
         if (isArray(o?.data) && o?.data.length > 0) {
 
@@ -959,9 +962,9 @@ export default class TradeXchart extends Tradex_chart {
       }
     }
 
-    // Do we have offChart indicators?
-    if (isArray(mOffChart) && mOffChart.length > 0) {
-      for (let o of mOffChart) {
+    // Do we have secondaryPane indicators?
+    if (isArray(mSecondary) && mSecondary.length > 0) {
+      for (let o of mSecondary) {
         if (isArray(o?.data) && o?.data.length > 0) {
 
         }
@@ -1011,7 +1014,7 @@ export default class TradeXchart extends Tradex_chart {
       // ("ID" in i) &&
       // isString(i?.name) &&
       // isString(i?.shortName) &&
-      ("onChart" in i.prototype) &&
+      ("primaryPane" in i.prototype) &&
       isFunction(i.prototype?.draw)
     ) return true
     else return false

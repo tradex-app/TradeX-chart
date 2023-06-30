@@ -52,7 +52,7 @@ chart.emit("some_event", {value: "foo"})
 The following list of events is not exhaustive as the chart is still under heavy development and subject to change until the release of version 1.0.
 
 * addIndicatorDone
-* addOffChart
+* addSecondary
 * chart_pan
 * chart_panDone
 * chart_render

@@ -17,7 +17,7 @@ export default class Volume extends Indicator {
   #name = 'Relative Strength Index'
   #shortName = 'RSI'
   #params
-  #onChart = true
+  #primaryPane = true
   #checkParamCount = false
   #scaleOverlay = true
   #plots = [
@@ -29,7 +29,7 @@ export default class Volume extends Indicator {
   #style = {}
 
   
-  // static onChart = "both"
+  // static primaryPane = "both"
   // static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
 
@@ -52,7 +52,7 @@ export default class Volume extends Indicator {
     const overlay = params.overlay
   }
 
-  get onChart() { return "both" }
+  get primaryPane() { return "both" }
   get defaultStyle() { return this.#defaultStyle }
 
 

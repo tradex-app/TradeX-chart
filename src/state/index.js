@@ -28,8 +28,8 @@ const DEFAULT_STATE = {
     tfms: DEFAULT_TIMEFRAMEMS
   },
   views: [],
-  onchart: [],
-  offchart: [],
+  primary: [],
+  secondary: [],
   datasets: [],
   tools: [],
   ohlcv: []
@@ -87,12 +87,12 @@ export default class State {
       state.views = defaultState.views
     }
 
-    if (!isArray(state.onchart)) {
-        state.onchart = defaultState.onchart
+    if (!isArray(state.primary)) {
+        state.primary = defaultState.primary
     }
 
-    if (!isArray(state.offchart)) {
-        state.offchart = defaultState.offchart
+    if (!isArray(state.secondary)) {
+        state.secondary = defaultState.secondary
     }
 
     if (!isObject(state.chart.settings)) {
@@ -106,10 +106,10 @@ export default class State {
     // Build chart order
     if (state.views.length == 0) {
       // add primary chart
-      state.views.push(["onchart", state.onchart])
+      state.views.push(["primary", state.primary])
       // add secondary charts if they exist
       for (let o in state) {
-        if (o.indexOf("offchart") == 0) {
+        if (o.indexOf("secondary") == 0) {
           state.views.push([o, state[o]])
         }
       }
@@ -137,13 +137,13 @@ export default class State {
         if (o[c].length == 0) o.splice(c, 1)
       }
     }
-    // ensure state has the mandatory onchart entry
+    // ensure state has the mandatory primary entry
     if (state.views.length == 0)
-      state.views[0] = ["onchart", defaultState.onchart]
+      state.views[0] = ["primary", defaultState.primary]
     state.views = new xMap(state.views)
-    if (!state.views.has("onchart")) 
-      state.views.insert("onchart", defaultState.onchart, 0)
-    state.views.get("onchart").push(state.chart)
+    if (!state.views.has("primary")) 
+      state.views.insert("primary", defaultState.primary, 0)
+    state.views.get("primary").push(state.chart)
 
     // Init dataset proxies
     for (var ds of state.datasets) {
@@ -189,7 +189,7 @@ export default class State {
     if (vals.length > 0 &&
         vals[vals.length - 1].length > 6)
         vals.length = vals.length - 1
-    data.views.get("onchart").pop()
+    data.views.get("primary").pop()
     // convert Map/() to array
     data.views = Array.from(data.views)
 

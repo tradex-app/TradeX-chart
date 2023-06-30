@@ -11,7 +11,7 @@ import chartGrid from "./overlays/chart-grid"
 import Indicator from "./overlays/indicator"
 // import chartCompositor from "./overlays/chart-compositor"
 import StateMachine from "../scaleX/stateMachne"
-import stateMachineConfig from "../state/state-mainPane"
+import stateMachineConfig from "../state/state-main"
 import Input from "../input"
 import { isArray, isBoolean, isNumber, isObject, isString } from "../utils/typeChecks"
 import { copyDeep, valuesInArray, xMap } from "../utils/utilities"
@@ -60,9 +60,9 @@ export default class MainPane {
   #elMain
   #elRows
   #elTime
-  #elOnChart
+  #elPrimary
   #elScale
-  #elOffCharts = {}
+  #elSecondarys = {}
   #elGrid
   #elCanvas
   #elViewport
@@ -120,14 +120,14 @@ export default class MainPane {
   get options() { return this.#options }
   get element() { return this.#elMain }
   get elRows() { return this.#elMain.rows }
-  get elOnChart() { return this.#elMain.rows.primary }
-  get elOffChart() { return this.#elMain.rows.secondary }
+  get elPrimary() { return this.#elMain.rows.primary }
+  get elSecondary() { return this.#elMain.rows.secondary }
   get elPanes() { return this.#elMain.rows.chartPanes }
   get elPaneSlot() { return this.#elMain.rows.chartPaneSlot }
   get width() { return this.#elMain.getBoundingClientRect().width }
   get height() { return this.#elMain.getBoundingClientRect().height }
-  get chartW() { return this.elOnChart.getBoundingClientRect().width }
-  get chartH() { return this.elOnChart.getBoundingClientRect().height }
+  get chartW() { return this.elPrimary.getBoundingClientRect().width }
+  get chartH() { return this.elPrimary.getBoundingClientRect().height }
   get rowsW() { return this.#elRows.getBoundingClientRect().width }
   get rowsH() { return this.#elRows.getBoundingClientRect().height }
   get rowMinH() { return this.#rowMinH }
@@ -152,8 +152,8 @@ export default class MainPane {
   get elements() {
     return {
       elRows: this.elRows,
-      elOnChart: this.elOnChart,
-      elOffCharts: this.elOffCharts,
+      elPrimary: this.elPrimary,
+      elSecondarys: this.elSecondarys,
       elTime: this.#elTime,
       elScale: this.#elScale
     }
@@ -174,8 +174,8 @@ export default class MainPane {
     options.shortName = "Chart"
     options.parent = this
     options.chartData = this.#core.chartData
-    options.onChart = this.#core.onChart
-    options.offChart = this.#core.offChart
+    options.primaryPane = this.#core.primaryPane
+    options.secondaryPane = this.#core.secondaryPane
 
     options.rangeLimit = this.#core.rangeLimit
     options.settings = this.#core.settings
@@ -200,7 +200,7 @@ export default class MainPane {
 
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE
     this.#rowMinH = isNumber(this.config.rowMinH)? this.config.rowMinH : ROWMINHEIGHT
-    this.#viewDefaultH = isNumber(this.config.offChartDefaultH)? this.config.offChartDefaultH : OFFCHARTDEFAULTHEIGHT
+    this.#viewDefaultH = isNumber(this.config.secondaryPaneDefaultH)? this.config.secondaryPaneDefaultH : OFFCHARTDEFAULTHEIGHT
 
     this.rowsOldH = this.rowsH
 
@@ -210,7 +210,7 @@ export default class MainPane {
   start() {
     let i = 0
 
-    // start timeline, chart, offChart
+    // start timeline, chart, secondaryPane
     this.#elMain.start(this.theme)
     this.#Time.start()
     
@@ -274,13 +274,13 @@ export default class MainPane {
 
     this.#input = new Input(this.#elRows, {disableContextMenu: false});
 
-    this.#input.on("keydown", this.onChartKeyDown.bind(this))
-    this.#input.on("keyup", this.onChartKeyUp.bind(this))
+    this.#input.on("keydown", this.primaryPaneKeyDown.bind(this))
+    this.#input.on("keyup", this.primaryPaneKeyUp.bind(this))
 
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
-    this.#input.on("pointerup", this.onChartDragDone.bind(this))
+    this.#input.on("pointerup", this.primaryPaneDragDone.bind(this))
     this.#input.on("pointermove", this.onMouseMove.bind(this))
 
     // this.pointermove = this.onMouseMove.bind(this)
@@ -318,7 +318,7 @@ export default class MainPane {
       e.dragstart.y = this.#cursorPos[1]
       e.position.x = this.#cursorPos[0] + direction
       e.position.y = this.#cursorPos[1]
-      this.onChartDrag(e)
+      this.primaryPaneDrag(e)
       return
     }
     const range = this.range
@@ -348,8 +348,8 @@ export default class MainPane {
     ]
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
 
-    for (let [key, offChart] of this.chartPanes) {
-      offChart.graph.overlays.list.get("cursor").layer.visible = true
+    for (let [key, secondaryPane] of this.chartPanes) {
+      secondaryPane.graph.overlays.list.get("cursor").layer.visible = true
     }
 
     this.emit("main_mousemove", this.#cursorPos)
@@ -360,9 +360,9 @@ export default class MainPane {
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
     this.core.Chart.graph.render()
 
-    for (let [key, offChart] of this.chartPanes) {
-      offChart.graph.overlays.list.get("cursor").layer.visible = true
-      offChart.graph.render()
+    for (let [key, secondaryPane] of this.chartPanes) {
+      secondaryPane.graph.overlays.list.get("cursor").layer.visible = true
+      secondaryPane.graph.render()
     }
   }
 
@@ -373,14 +373,14 @@ export default class MainPane {
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false
     this.core.Chart.graph.render()
 
-    for (let [key, offChart] of this.chartPanes) {
-      offChart.graph.overlays.list.get("cursor").layer.visible = false
-      offChart.graph.render()
+    for (let [key, secondaryPane] of this.chartPanes) {
+      secondaryPane.graph.overlays.list.get("cursor").layer.visible = false
+      secondaryPane.graph.render()
     }
     this.draw()
   }
 
-  onChartDrag(e) {
+  primaryPaneDrag(e) {
     const d = this.#drag
     if (!d.active) {
       d.active = true
@@ -408,7 +408,7 @@ export default class MainPane {
     this.emit("chart_pan", this.#cursorPos)
   }
 
-  onChartDragDone(e) {
+  primaryPaneDragDone(e) {
     const d = this.#drag
     d.active = false
     d.delta = [ 0, 0 ]
@@ -421,7 +421,7 @@ export default class MainPane {
     this.emit("chart_panDone", this.#cursorPos)
   }
 
-  onChartKeyDown(e) {
+  primaryPaneKeyDown(e) {
     let step = (this.candleW > 1) ? this.candleW : 1
 
     // [x2, y2, x1, y1, xdelta, ydelta]
@@ -445,7 +445,7 @@ export default class MainPane {
     }
   }
 
-  onChartKeyUp(e) {
+  primaryPaneKeyUp(e) {
     let step = (this.candleW > 1) ? this.candleW : 1
 
     switch (e.key) {
@@ -479,11 +479,11 @@ export default class MainPane {
       this.chart.scale.layerCursor.erase()
     }
 
-    this.#ChartPanes.forEach((offChart, key) => {
-      if (chart !== offChart) {
-        offChart.cursorActive = false
-        offChart.scale.layerCursor.visible = false
-        offChart.scale.layerCursor.erase()
+    this.#ChartPanes.forEach((secondaryPane, key) => {
+      if (chart !== secondaryPane) {
+        secondaryPane.cursorActive = false
+        secondaryPane.scale.layerCursor.visible = false
+        secondaryPane.scale.layerCursor.erase()
       }
     }) 
   }
@@ -535,13 +535,13 @@ export default class MainPane {
   registerChartViews(options) {
     this.#elRows.previousDimensions()
 
-    const onChart = []
+    const primaryPane = []
     // iterate over chart panes and remove invalid indicators
     for (let [k,oc] of this.views) {
 
-      if (k === "onchart") onChart.push(oc)
+      if (k === "primary") primaryPane.push(oc)
       // validate entry - are there any indicators to add?
-      if (oc.length === 0 && k !== "onchart") {
+      if (oc.length === 0 && k !== "primary") {
         this.views.delete(k)
         continue
       }
@@ -559,8 +559,8 @@ export default class MainPane {
       }
     }
     // set the primary chart
-    let primary = onChart[0]
-    for (let o of onChart) {
+    let primary = primaryPane[0]
+    for (let o of primaryPane) {
       if (o?.primary === true) primary = o
       else o.primary = false
     }
@@ -575,7 +575,7 @@ export default class MainPane {
   }
 
   /**
-   * add chart pane - provides onChart and offChart indicators
+   * add chart pane - provides primaryPane and secondaryPane indicators
    * @param {Object} options 
    */
   addChartPane(options) {
@@ -612,14 +612,14 @@ export default class MainPane {
 
     // instantiate the indicator
     let o
-    if (options.type == "onchart") {
+    if (options.type == "primary") {
       // options.id
       o = new Chart(this.#core, options)
       this.#Chart = o
     }
     else {
-      options.name = options.view[0].name || "OffChart"
-      options.shortName = options.view[0].type || "OffChart"
+      options.name = options.view[0].name || "Secondary"
+      options.shortName = options.view[0].type || "Secondary"
       o = new Chart(this.#core, options);
     }
     
@@ -692,7 +692,7 @@ export default class MainPane {
     let instance
 
     // add on chart indicator
-    if (this.#indicators[i].ind.onChart) {
+    if (this.#indicators[i].ind.primaryPane) {
       const indicator = {
         type: i,
         name: name,
@@ -704,9 +704,9 @@ export default class MainPane {
     else {
       const indicator = this.core.indicatorClasses[i].ind
       const indType = (
-        indicator.onChart === "both" && 
-        isBoolean(i.onChart)) ? 
-        i.onChart : false;
+        indicator.primaryPane === "both" && 
+        isBoolean(i.primaryPane)) ? 
+        i.primaryPane : false;
         
       if (!isArray(params.view)) params.view = [{name, type: i, ...params}]
       // check all views are valid
@@ -855,7 +855,7 @@ export default class MainPane {
   }
 
   scaleNode(type) {
-    const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.offChart.separator};`
+    const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.secondaryPane.separator};`
     const node = `
     <div slot="chartpane" class="viewport scale ${type}" style="$${styleRow}"></div>
   `

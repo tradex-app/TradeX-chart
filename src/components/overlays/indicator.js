@@ -34,7 +34,7 @@ export default class Indicator extends Overlay {
   #cnt_
   #name
   #shortName
-  #onChart
+  #primaryPane
   #scaleOverlay
   #plots
   #params
@@ -74,8 +74,8 @@ export default class Indicator extends Overlay {
   set shortName(n) { this.#shortName = n }
   get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
   get chartPaneID() { return this.#params.overlay.paneID }
-  get onChart() { return this.#onChart }
-  set onChart(c) { this.#onChart = c }
+  get primaryPane() { return this.#primaryPane }
+  set primaryPane(c) { this.#primaryPane = c }
   get scaleOverlay() { return this.#scaleOverlay }
   set scaleOverlay(o) { this.#scaleOverlay = o }
   get plots() { return this.#plots }

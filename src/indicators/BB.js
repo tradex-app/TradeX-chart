@@ -45,7 +45,7 @@ export default class BB extends Indicator {
   ]
 
   static inCnt = 0
-  static onChart = true
+  static primaryPane = true
   // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
 
   /**
@@ -80,7 +80,7 @@ export default class BB extends Indicator {
    * valid returned values can be: true, false (boolean), both (string)
    * @readonly
    */
-  get onChart() { return BB.onChart }
+  get primaryPane() { return BB.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
 
   /**
