@@ -199,9 +199,7 @@ export default class ScaleBar {
 
   onMouseWheel(e) {
     e.domEvent.preventDefault()
-
-    const direction = Math.sign(e.wheeldelta) * -1
-    this.setScaleRange(direction)
+    this.setScaleRange(Math.sign(e.wheeldelta) * -1)
     this.render()
   }
 
@@ -209,7 +207,7 @@ export default class ScaleBar {
 
   }
 
-  primaryPaneDrag(e) {
+  onChartDrag(e) {
     if (this.#yAxis.mode !== "manual") return
     this.#yAxis.offset = e.domEvent.srcEvent.movementY // this.#core.MainPane.cursorPos[5] // e[5]
     this.parent.draw(this.range, true)

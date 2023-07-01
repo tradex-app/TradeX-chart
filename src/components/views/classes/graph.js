@@ -149,6 +149,7 @@ export default class graph {
    * @memberof graph
    */
   draw(range=this.range, update=false) {
+
     const oList = this.#overlays.list
     // guard against overlays host (chart pane) deletion
     if (!(oList instanceof xMap)) return false
@@ -158,15 +159,7 @@ export default class graph {
       if (!isObject(overlay) || 
           !isFunction(overlay?.instance?.draw)) continue
 
-      if (this.#core.scrollPos == this.#core.bufferPx * -1 || 
-          this.#core.scrollPos == 0 || 
-          update == true) 
-      {
-        overlay.instance.draw()
-      }
-      else if (this.#parent.streamCandle) {
-        oList.get("stream").instance.draw()
-      }
+      overlay.instance.draw()
 
       if (!overlay.fixed)
         overlay.instance.position = [this.#core.scrollPos, 0]

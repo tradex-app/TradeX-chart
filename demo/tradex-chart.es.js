@@ -9147,7 +9147,7 @@ class ScaleBar {
   }
   onStreamUpdate(e) {
   }
-  primaryPaneDrag(e) {
+  onChartDrag(e) {
     if (this.#yAxis.mode !== "manual") return
     this.#yAxis.offset = e.domEvent.srcEvent.movementY;
     this.parent.draw(this.range, true);
@@ -9885,8 +9885,8 @@ class Chart {
   }
   eventsListen() {
     this.#input = new Input(this.#elTarget, {disableContextMenu: false});
-    this.#input.on("pointerdrag", this.primaryPaneDrag.bind(this));
-    this.#input.on("pointerdragend", this.primaryPaneDragDone.bind(this));
+    this.#input.on("pointerdrag", this.onChartDrag.bind(this));
+    this.#input.on("pointerdragend", this.onChartDragDone.bind(this));
     this.#input.on("pointermove", this.onMouseMove.bind(this));
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
@@ -9910,14 +9910,14 @@ class Chart {
   emit(topic, data) {
     this.#core.emit(topic, data);
   }
-  primaryPaneDrag(e) {
+  onChartDrag(e) {
     this.cursor = "grab";
-    this.core.MainPane.primaryPaneDrag(e);
-    this.scale.primaryPaneDrag(e);
+    this.core.MainPane.onChartDrag(e);
+    this.scale.onChartDrag(e);
   }
-  primaryPaneDragDone(e) {
+  onChartDragDone(e) {
     this.cursor = "crosshair";
-    this.core.MainPane.primaryPaneDragDone(e);
+    this.core.MainPane.onChartDragDone(e);
   }
   onMouseMove(e) {
     this.core.MainPane.onPointerActive(this);
@@ -10665,7 +10665,7 @@ class MainPane {
     this.#input.on("wheel", this.onMouseWheel.bind(this));
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
-    this.#input.on("pointerup", this.primaryPaneDragDone.bind(this));
+    this.#input.on("pointerup", this.onChartDragDone.bind(this));
     this.#input.on("pointermove", this.onMouseMove.bind(this));
     this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue, this);
     this.on(STREAM_NEWVALUE, this.onNewStreamValue, this);
@@ -10691,7 +10691,7 @@ class MainPane {
       e.dragstart.y = this.#cursorPos[1];
       e.position.x = this.#cursorPos[0] + direction;
       e.position.y = this.#cursorPos[1];
-      this.primaryPaneDrag(e);
+      this.onChartDrag(e);
       return
     }
     const range = this.range;
@@ -10742,7 +10742,7 @@ class MainPane {
     }
     this.draw();
   }
-  primaryPaneDrag(e) {
+  onChartDrag(e) {
     const d = this.#drag;
     if (!d.active) {
       d.active = true;
@@ -10767,7 +10767,7 @@ class MainPane {
     ]);
     this.emit("chart_pan", this.#cursorPos);
   }
-  primaryPaneDragDone(e) {
+  onChartDragDone(e) {
     const d = this.#drag;
     d.active = false;
     d.delta = [ 0, 0 ];

@@ -316,8 +316,8 @@ export default class Chart {
 
   eventsListen() {
     this.#input = new Input(this.#elTarget, {disableContextMenu: false});
-    this.#input.on("pointerdrag", this.primaryPaneDrag.bind(this))
-    this.#input.on("pointerdragend", this.primaryPaneDragDone.bind(this))
+    this.#input.on("pointerdrag", this.onChartDrag.bind(this))
+    this.#input.on("pointerdragend", this.onChartDragDone.bind(this))
     this.#input.on("pointermove", this.onMouseMove.bind(this))
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
@@ -364,16 +364,17 @@ export default class Chart {
     this.#core.emit(topic, data);
   }
 
-  primaryPaneDrag(e) {
+  onChartDrag(e) {
     this.cursor = "grab"
-    this.core.MainPane.primaryPaneDrag(e)
-    this.scale.primaryPaneDrag(e)
+    this.core.MainPane.onChartDrag(e)
+    this.scale.onChartDrag(e)
+    // console.log(e)
   }
 
-  primaryPaneDragDone(e) {
+  onChartDragDone(e) {
     this.cursor = "crosshair"
-    this.core.MainPane.primaryPaneDragDone(e)
-    // this.scale.primaryPaneDragDone(e)
+    this.core.MainPane.onChartDragDone(e)
+    // this.scale.onChartDragDone(e)
   }
 
   onMouseMove(e) {

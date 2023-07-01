@@ -274,13 +274,13 @@ export default class MainPane {
 
     this.#input = new Input(this.#elRows, {disableContextMenu: false});
 
-    this.#input.on("keydown", this.primaryPaneKeyDown.bind(this))
-    this.#input.on("keyup", this.primaryPaneKeyUp.bind(this))
+    this.#input.on("keydown", this.onChartKeyDown.bind(this))
+    this.#input.on("keyup", this.onChartKeyUp.bind(this))
 
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));
-    this.#input.on("pointerup", this.primaryPaneDragDone.bind(this))
+    this.#input.on("pointerup", this.onChartDragDone.bind(this))
     this.#input.on("pointermove", this.onMouseMove.bind(this))
 
     // this.pointermove = this.onMouseMove.bind(this)
@@ -318,7 +318,7 @@ export default class MainPane {
       e.dragstart.y = this.#cursorPos[1]
       e.position.x = this.#cursorPos[0] + direction
       e.position.y = this.#cursorPos[1]
-      this.primaryPaneDrag(e)
+      this.onChartDrag(e)
       return
     }
     const range = this.range
@@ -380,7 +380,7 @@ export default class MainPane {
     this.draw()
   }
 
-  primaryPaneDrag(e) {
+  onChartDrag(e) {
     const d = this.#drag
     if (!d.active) {
       d.active = true
@@ -408,7 +408,7 @@ export default class MainPane {
     this.emit("chart_pan", this.#cursorPos)
   }
 
-  primaryPaneDragDone(e) {
+  onChartDragDone(e) {
     const d = this.#drag
     d.active = false
     d.delta = [ 0, 0 ]
@@ -417,11 +417,10 @@ export default class MainPane {
       ...d.start,
       ...d.delta
     ]
-
     this.emit("chart_panDone", this.#cursorPos)
   }
 
-  primaryPaneKeyDown(e) {
+  onChartKeyDown(e) {
     let step = (this.candleW > 1) ? this.candleW : 1
 
     // [x2, y2, x1, y1, xdelta, ydelta]
@@ -445,7 +444,7 @@ export default class MainPane {
     }
   }
 
-  primaryPaneKeyUp(e) {
+  onChartKeyUp(e) {
     let step = (this.candleW > 1) ? this.candleW : 1
 
     switch (e.key) {

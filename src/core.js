@@ -905,13 +905,34 @@ export default class TradeXchart extends Tradex_chart {
   mergeData(merge, newRange=false, calc=true) {
     if (!isObject(merge)) return false
 
-    let i, j, p=0, start, end;
+//     let i, j, p=0, start, end;
+
+    let i, j, p=0, start;
+    let end = merge.data.length -1
+    // if the chart empty is empty set the range to the merge data
+    if (this.#chartIsEmpty || !isNumber(this.#time.timeFrameMS)) {
+      if (!isObject(newRange) ||
+          !isNumber(newRange.start) ||
+          !isNumber(newRange.end) ) {
+
+        if (end > 1) {
+          newRange = {start: end - this.range.initialCnt, end}
+        }
+      }
+    }
+    // timeframes don't match
+    if (end > 1 &&
+        this.#time.timeFrameMS !== detectInterval(newRange.data)) {
+      this.error(`ERROR: ${this.id}: merge data time frame does not match existing time frame!`)
+      return false
+    }
+//
     const data = this.allData.data
     const mData = merge?.data || false
-    const onChart = this.allData?.onChart
-    const mOnChart = merge?.onChart || false
-    const offChart = this.allData?.offChart
-    const mOffChart = merge?.offChart || false
+    const primaryPane = this.allData?.primaryPane
+    const mPrimary = merge?.primaryPane || false
+    const secondaryPane = this.allData?.secondaryPane
+    const mSecondary = merge?.secondaryPane || false
     const dataset = this.allData?.dataset?.data
     const mDataset = merge?.dataset?.data || false
     const trades = this.allData?.trades?.data
@@ -926,7 +947,6 @@ export default class TradeXchart extends Tradex_chart {
       // chart is empty so simply add the new data
       if (data.length == 0) {
         this.allData.data.push(...mData)
-        if (calc) this.calcAllIndicators()
       }
       // chart has data, check for overlap
       else {
@@ -936,15 +956,37 @@ export default class TradeXchart extends Tradex_chart {
 
         // overlap between existing data and merge data
         if (o[1] >= o[0]) {
-          const unified = []
-
+          let merged = []
+          let older, newer;
+          if (data[0][0] < mData[0][0]) {
+            older = data
+            newer = mData
+          }
+          else {
+            older = mData
+            newer = data
+          }
+          let o = 0
+          while (older[o][0] < newer[0][0]) {
+            merged.push(older[o])
+            o++
+          }
+          // append newer array
+          merged = merged.concat(newer)
+          // are there any trailing entries to append?
+          let i = o + newer.length
+          if (i < older.length) {
+            merged = merged.concat(older.slice(i))
+          }
+          this.allData.data = merged
         }
         // no overlap, insert the new data
         else {
           this.allData.data.push(...mData)
-          if (calc) this.calcAllIndicators()
+        }
       }
-    }
+      if (calc) this.calcAllIndicators()
+
 /*
 * chart will ignore any indicators in merge data
 * for sanity reasons, instead will trigger 
