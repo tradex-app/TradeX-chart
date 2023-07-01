@@ -843,6 +843,11 @@ export default class TradeXchart extends Tradex_chart {
     const max = (this.config?.maxCandles)? this.config.maxCandles : 
       (this.Chart?.layerWidth) ? this.Chart.layerWidth : this.Chart.width
     this.#range.set(start, end, max)
+
+    if (start < 0) 
+      this.emit("range_limitPast", {start, end})
+    else if (end > this.range.dataLength) 
+      this.emit("range_limitFuture", {start, end})
   }
 
   /**
