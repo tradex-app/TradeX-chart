@@ -6,7 +6,7 @@ import { renderLineHorizontal } from "../../renderer/line"
 import { CandleType, PriceLineStyle } from "../../definitions/style";
 import { isArray, isObject } from "../../utils/typeChecks";
 
-export default class chartStreamCandle extends Overlay {
+export default class chartCandleStream extends Overlay {
 
   #candle
 

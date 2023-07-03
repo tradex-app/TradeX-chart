@@ -400,18 +400,13 @@ export default class Indicator extends Overlay {
    * @memberof indicator
    */
   calcIndicatorHistory () {
-    // if overlay history is missing, calculate it
-    if (this.overlay.data.length < this.definition.input.timePeriod) {
-      let data;
-      const calc = () => {
-        data = this.calcIndicator(this.libName, this.definition.input, this.range);
-        if (data) this.overlay.data = data;
-      }
-      
-      if (this.core.TALibReady) calc()
-      else  this.core.talibAwait.push(calc.bind(this))
-    } 
-  }
+    const calc = () => {
+      let data = this.calcIndicator(this.libName, this.definition.input, this.range);
+      if (data) this.overlay.data = data;
+    }
+    if (this.core.TALibReady) calc()
+    else  this.core.talibAwait.push(calc.bind(this))
+  } 
 
   /**
    * Calculate indicator value for current stream candle

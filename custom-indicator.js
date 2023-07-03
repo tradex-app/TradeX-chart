@@ -52,9 +52,7 @@ export default class Test extends Indicator {
     // calculate back history if missing
     this.calcIndicatorHistory()
     // enable processing of price stream
-    this.setUpdateValue = (value) => { 
-      this.updateValue(value) 
-    }
+    this.setUpdateValue = (value) => { this.updateValue(value) }
     // add the indicator legend to the chart pane
     this.addLegend()
   }

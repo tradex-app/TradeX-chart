@@ -708,12 +708,10 @@ chart0.setIndicators({
 })
 chart0.addIndicator("TEST", "Test1", {data: [], settings: {}})
 // chart0.addIndicator("DMI", "DMI1", {data: []})
-chart1.on("range_limitPast", (e) => onRangeLimit(e, "past"))
-chart1.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
+chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
+chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 
 // add an alert
 chart1.stream.alerts.add(13010, alertTest, h)
-// chart1.on("range_limitPast", (e)=>{console.log("range_limitPast:",e)})
-// chart1.on("range_limitFuture", (e)=>{console.log("range_limitFuture:",e)})
-chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
-chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
+chart1.on("range_limitPast", (e) => onRangeLimit(e, "past"))
+chart1.on("range_limitFuture", (e) => onRangeLimit(e, "future"))

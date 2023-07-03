@@ -853,14 +853,15 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * set Range start index
    * @param {number} start - starting index of state data
-   * @param {boolean} nearest - limit range start - no out of range values
+   * @param {boolean} limited - limit range start - no out of range values
    * @param {boolean} centre - center the range on the start value
    */
-  jumpToIndex(start, nearest=true, centre=true) {
+  jumpToIndex(start, limited=true, centre=true) {
+    if (limited) start = limit(start, 0, this.range.dataLength)
+    
     let length = this.range.Length
     let end = start + length
 
-    if (nearest) start = limit(start, 0, this.range.dataLength)
     if (centre) {
       start -= length / 2
       end -= length / 2
@@ -871,19 +872,19 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * set Range start to time stamp
    * @param {number} ts - timestamp
-   * @param {boolean} nearest - limit range start - no out of range values
+   * @param {boolean} limited - limit range start - no out of range values
    * @param {boolean} centre - center the range on the start value
    */
-  jumpToTS(ts, nearest=true, centre=true) {
+  jumpToTS(ts, limited=true, centre=true) {
     let start = this.Timeline.xAxis.t2Index(ts)
-    this.jumpToIndex(start, nearest=true, centre=true)
+    this.jumpToIndex(start, limited=true, centre=true)
   }
 
   /**
    * set Range start to state data start
    * @param {boolean} centre - center the range on the start value
    */
-  jumpToStart(centre=true) {
+  jumpToStart(centre=false) {
     this.jumpToIndex(0, true, centre)
   }
 
@@ -894,7 +895,7 @@ export default class TradeXchart extends Tradex_chart {
   jumpToEnd(centre=true) {
     let end = this.range.dataLength - this.range.Length
     if (centre) end += this.range.Length / 2
-    this.jumpToIndex(end, true, centre)
+    this.jumpToIndex(end, true, false)
   }
 
   /**
@@ -908,9 +909,10 @@ export default class TradeXchart extends Tradex_chart {
   // TODO: merge indicator data?
   // TODO: merge dataset?
   mergeData(merge, newRange=false, calc=true) {
-    if (!isObject(merge)) return false
-
-//     let i, j, p=0, start, end;
+    if (!isObject(merge)) {
+      this.error(`ERROR: ${this.id}: merge data must be type Object!`)
+      return false
+    }
 
     let i, j, p=0, start;
     let end = merge.data.length -1
@@ -944,25 +946,40 @@ export default class TradeXchart extends Tradex_chart {
     const mTrades = merge?.trades?.data || false
     const inc = (this.range.inRange(mData[0][0])) ? 1 : 0
 
+    // Not valid chart data
+    if ("data" in merge &&
+        !isArray(mData)) {
+      this.error(`ERROR: ${this.id}: merge chart data must be of type Array!`)
+      return false
+    }
+
     // Do we have price data?
     if (isArray(mData) && mData.length > 0) {
       i = mData.length - 1
       j = data.length - 1
 
+      // if not a candle stream
+      if (!isBoolean(mData[i][7]) &&
+          mData[i].length !== 8 &&
+          mData[i][6] !== null &&
+          mData[i][7] !== true
+          ) {
+        // sanitize data, must be numbers
+        // entries must be: [ts,o,h,l,c,v]
+        for (let i of mData) {
+          for (let j=0; j<6; j++) {
+            i.length = 6
+            i[j] *= 1
+          }
+        }
+      }
+      
       // chart is empty so simply add the new data
       if (data.length == 0) {
         this.allData.data.push(...mData)
       }
       // chart has data, check for overlap
       else {
-        // sanitize data, must be numbers
-        for (let i of mData) {
-          i.length = 6
-          for (let j=0; j<6; j++) {
-            i[j] *= 1
-          }
-        }
-
         let merged = []
         let older, newer;
         if (data[0][0] < mData[0][0]) {
@@ -1015,13 +1032,9 @@ export default class TradeXchart extends Tradex_chart {
 
         // no overlap, insert the new data
         else {
-          // if (newer.length == 1 &&
-          //     older[length-1][0] == newer[0][0])
-          // merged = older.push(...newer)
           merged = older.concat(newer)
         }
 
-        // this.allData.data = merged
         this.state.data.chart.data = merged
       }
       if (calc) this.calcAllIndicators()
@@ -1078,7 +1091,7 @@ export default class TradeXchart extends Tradex_chart {
       }
       this.setRange(start, end)
     }
-  }
+    }
 
   }
 
