@@ -955,6 +955,14 @@ export default class TradeXchart extends Tradex_chart {
       }
       // chart has data, check for overlap
       else {
+        // sanitize data, must be numbers
+        for (let i of mData) {
+          i.length = 6
+          for (let j=0; j<6; j++) {
+            i[j] *= 1
+          }
+        }
+
         let merged = []
         let older, newer;
         if (data[0][0] < mData[0][0]) {
