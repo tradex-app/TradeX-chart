@@ -141,10 +141,6 @@ export default class Stream {
   }
 
   start() {
-    // add empty value to range end
-    // this.#core.chartData.push([0,0,0,0,0,0])
-    // iterate over indicators add empty value to end
-
     this.#alerts = new Alerts(this.#config.alerts)
     this.status = {status: STREAM_STARTED}
     this.#updateTimer = setInterval(this.onUpdate.bind(this), this.#maxUpdate)
@@ -182,7 +178,6 @@ export default class Stream {
 
   /**
    * add new candle to state data
-   *
    * @param {Object} data - t: timestamp, p: price, q: quantity
    * @memberof Stream
    */
@@ -233,8 +228,6 @@ export default class Stream {
 
     this.countDownUpdate()
   }
-
-  parseCandle
 
   countDownUpdate() {
     let y,M,w,d,h,m,s,u;

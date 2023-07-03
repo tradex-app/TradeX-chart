@@ -616,6 +616,27 @@ function livePrice_Binance(chart, symbol="btcusdt", interval="1m") {
   ws.onmessage = (evt) => onWSMessage.call(this, evt, chart)
 }
 
+let waiting = false
+
+function kline_Binance(chart, symbol="BTCUSDT", start, limit=100, interval="1m") {
+  if (!waiting) {
+    waiting = true
+    try {
+      fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${start}&limit=${limit}`)
+      .then(r => r.json())
+      .then(d => {
+        console.log(d)
+        waiting = false
+        chart.mergeData({data: d})
+      })
+    }
+    catch(e) {
+      console.error(e)
+      waiting = false
+    }
+  }
+}
+
 function onWSMessage (evt, chart) { 
   var msg = evt.data;
   var obj = JSON.parse(msg);
@@ -636,6 +657,20 @@ function onWSMessage (evt, chart) {
   }
 };
 
+function onRangeLimit(e, x) {
+  const range = e.chart.range
+  const limit = 100
+  const start = range.timeStart - (range.interval * limit)
+  const end = range.timeEnd
+  const interval = range.intervalStr
+  if (x == "past") {
+    kline_Binance(e.chart, undefined, start, limit, interval)
+  }
+  if (x == "future") {
+
+  }
+}
+
 function once (chart) {
   const tick = {
     t: Date.now(), // timestamp of current candle in milliseconds
@@ -649,7 +684,6 @@ function once (chart) {
   tick.t = Date.now()
   tick.c = 28083
   chart.stream.onTick(tick)  
-
 }
 
 function h($,p,c) {console.log(`alert`,$,p[4],c[4])} 
@@ -674,8 +708,12 @@ chart0.setIndicators({
 })
 chart0.addIndicator("TEST", "Test1", {data: [], settings: {}})
 // chart0.addIndicator("DMI", "DMI1", {data: []})
+chart1.on("range_limitPast", (e) => onRangeLimit(e, "past"))
+chart1.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 
 // add an alert
 chart1.stream.alerts.add(13010, alertTest, h)
-chart1.on("range_limitPast", (e)=>{console.log("range_limitPast:",e)})
-chart1.on("range_limitFuture", (e)=>{console.log("range_limitFuture:",e)})
+// chart1.on("range_limitPast", (e)=>{console.log("range_limitPast:",e)})
+// chart1.on("range_limitFuture", (e)=>{console.log("range_limitFuture:",e)})
+chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
+chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))

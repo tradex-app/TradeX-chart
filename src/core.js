@@ -827,7 +827,7 @@ export default class TradeXchart extends Tradex_chart {
    * @memberof TradeXchart
    */
   getRange(start=0, end=0, config={}) {
-    this.#range = new Range(this.allData, start, end, config)
+    this.#range = new Range(start, end, config)
     this.#time.range = this.#range
     this.#time.timeFrameMS = this.#range.interval
     this.#time.timeFrame = this.#range.intervalStr
@@ -845,9 +845,9 @@ export default class TradeXchart extends Tradex_chart {
     this.#range.set(start, end, max)
 
     if (start < 0) 
-      this.emit("range_limitPast", {start, end})
+      this.emit("range_limitPast", {chart: this, start, end})
     else if (end > this.range.dataLength) 
-      this.emit("range_limitFuture", {start, end})
+      this.emit("range_limitFuture", {chart: this, start, end})
   }
 
   /**
@@ -927,7 +927,7 @@ export default class TradeXchart extends Tradex_chart {
     }
     // timeframes don't match
     if (end > 1 &&
-        this.#time.timeFrameMS !== detectInterval(newRange.data)) {
+        this.#time.timeFrameMS !== detectInterval(merge.data)) {
       this.error(`ERROR: ${this.id}: merge data time frame does not match existing time frame!`)
       return false
     }
@@ -955,27 +955,36 @@ export default class TradeXchart extends Tradex_chart {
       }
       // chart has data, check for overlap
       else {
-        const r1 = [data[0][0], data[j][0]]
-        const r2 = [mData[0][0], mData[i][0]]
-        const o = [Math.max(r1[0], r2[0]), Math.min(r1[1], r2[1])]
+        let merged = []
+        let older, newer;
+        if (data[0][0] < mData[0][0]) {
+          older = data
+          newer = mData
+        }
+        else {
+          older = mData
+          newer = data
+        }
+
+        // handle price stream
+        if (newer.length == 1 &&
+            newer[0][0] == older[older.length-1][0]) {
+            older[older.length-1] = newer[0]
+            merged = older
+        }
+        else if (newer.length == 1 &&
+            newer[0][0] == older[older.length-1][0] + this.range.interval) {
+            merged = older.concat(newer)
+        }
 
         // overlap between existing data and merge data
-        if (o[1] >= o[0]) {
-          let merged = []
-          let older, newer;
-          if (data[0][0] < mData[0][0]) {
-            older = data
-            newer = mData
-          }
-          else {
-            older = mData
-            newer = data
-          }
+        else if (older[older.length-1][0] >= newer[0][0]) {
           let o = 0
           while (older[o][0] < newer[0][0]) {
             merged.push(older[o])
             o++
           }
+
           // append newer array
           merged = merged.concat(newer)
           // are there any trailing entries to append?
@@ -983,12 +992,29 @@ export default class TradeXchart extends Tradex_chart {
           if (i < older.length) {
             merged = merged.concat(older.slice(i))
           }
-          this.allData.data = merged
         }
+
+        // no overlap, but a gap exists
+        else if (newer[0][0] - older[older.length-1][0] > this.range.interval) {
+          merged = older
+          let fill = older[older.length-1][0]
+          let gap = Math.floor((newer[0][0] - fill) / this.range.interval)
+          for(gap; gap > 0; gap--) {
+            merged.push([fill,null,null,null,null,null])
+            merged = merged.concat(newer)
+          }
+        }
+
         // no overlap, insert the new data
         else {
-          this.allData.data.push(...mData)
+          // if (newer.length == 1 &&
+          //     older[length-1][0] == newer[0][0])
+          // merged = older.push(...newer)
+          merged = older.concat(newer)
         }
+
+        // this.allData.data = merged
+        this.state.data.chart.data = merged
       }
       if (calc) this.calcAllIndicators()
 

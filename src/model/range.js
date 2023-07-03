@@ -10,7 +10,6 @@ import { bRound, limit } from "../utils/number"
 
 export class Range {
 
-  data = []
   #interval = DEFAULT_TIMEFRAMEMS
   #intervalStr = "1s"
   indexStart = 0
@@ -40,20 +39,20 @@ export class Range {
 
   /**
    * Creates an instance of Range.
-   * @param {Object} allData - State data object representing on and off chart data
-   * @param {number} [start=0] - initial index start
-   * @param {number} [end=allData.data.length-1] - initial index end
+   * @param {number} start - initial index start
+   * @param {number} end - initial index end
    * @param {Object} [config={}] - range config
    * @memberof Range
    */
-  constructor( allData, start=0, end=allData.data.length-1, config={}) {
-    if (!isObject(allData)) return false
+  constructor( start, end, config={}) {
     if (!isObject(config)) return false
     if (!(config?.core instanceof TradeXchart)) return false
 
     this.#init = true;
     this.setConfig(config)
     this.#core = config.core;
+    start = (isNumber(start)) ? start : 0
+    end = (isNumber(end)) ? end : this.data.length-1
 
     const MaxMinPriceVolStr = `
     (input) => {
@@ -66,7 +65,7 @@ export class Range {
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS
 
     // no data - use provided time frame / interval
-    if (allData.data.length == 0) {
+    if (this.data.length == 0) {
       let ts = Date.now()
       start = 0
       end = this.rangeLimit
@@ -75,29 +74,27 @@ export class Range {
       this.anchor = ts - (ts % tf) // - (this.limitPast * this.#interval)
     } 
     // nimimum of two entries to calculate time frame / interval
-    else if (allData.data.length < 2) {
+    else if (this.data.length < 2) {
       this.#interval = tf
       this.#intervalStr = ms2Interval(this.interval)
     }
-    // if (allData.data.length > 2) {
+    // if (this.data.length > 2) {
     else {
-      this.#interval = detectInterval(allData.data)
+      this.#interval = detectInterval(this.data)
       this.#intervalStr = ms2Interval(this.interval)
     }
     // adjust range end if out of bounds
-    if (end == 0 && allData.data.length >= this.rangeLimit)
+    if (end == 0 && this.data.length >= this.rangeLimit)
       end = this.rangeLimit
     else if (end == 0)
-      end = allData.data.length
+      end = this.data.length
 
-    // mirror allData entries
-    for (let data in allData) {
-      this[data] = allData[data]
-    }
     this.set(start, end)
   }
 
-  get dataLength () { return (this?.data.length == 0) ? 0 : this.data.length - 1 }
+  get allData () { return this.#core.allData }
+  get data () { return this.allData?.data || [] }
+  get dataLength () { return (this.allData?.data.length == 0) ? 0 : this.allData.data.length - 1 }
   get Length () { return this.indexEnd - this.indexStart }
   get timeDuration () { return this.timeFinish - this.timeStart }
   get timeMin () { return this.value(this.indexStart)[0] }
@@ -289,17 +286,17 @@ export class Range {
       case "chart": 
         return this.data;
       case "primary":
-        for (let o of this.primaryPane) {
+        for (let o of this.allData.primaryPane) {
           if (idParts[2] in o) return o[idParts[2]]
         }
         return false;
       case "secondary":
-        for (let o of this.secondaryPane) {
+        for (let o of this.allData.secondaryPane) {
           if (idParts[2] in o) return o[idParts[2]]
         }
         return false;
       case "datasets":
-        for (let o of this.datasets) {
+        for (let o of this.allData.datasets) {
           if (idParts[2] in o) return o[idParts[2]]
         }
       return false;
