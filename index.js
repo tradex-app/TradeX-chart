@@ -626,8 +626,8 @@ function kline_Binance(chart, symbol="BTCUSDT", start, limit=100, interval="1m")
       .then(r => r.json())
       .then(d => {
         console.log(d)
-        waiting = false
         chart.mergeData({data: d})
+        waiting = false
       })
     }
     catch(e) {
@@ -706,7 +706,7 @@ chart0.setIndicators({
   TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST},
   DMI: {id: "DMI", name: "Directional Movement Indicator", event: "addIndicator", ind: DMI }
 })
-chart0.addIndicator("TEST", "Test1", {data: [], settings: {}})
+// chart0.addIndicator("TEST", "Test1", {data: [], settings: {}})
 // chart0.addIndicator("DMI", "DMI1", {data: []})
 chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
 chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))

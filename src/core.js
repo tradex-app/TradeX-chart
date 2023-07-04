@@ -62,12 +62,10 @@ export default class TradeXchart extends Tradex_chart {
 
   #name = NAME
   #shortName = SHORTNAME
-  #el = undefined
-  #mediator
   #core
   #config
   #options
-  #elements = {}
+  #el
   #elUtils
   #elBody
   #elTools
@@ -82,9 +80,7 @@ export default class TradeXchart extends Tradex_chart {
   #hub = {}
   #State = State
   #state
-  #userClasses = []
   #chartIsEmpty = true
-  #data
   #range
   #indicators = Indicators
   #TALib
@@ -145,6 +141,7 @@ export default class TradeXchart extends Tradex_chart {
   #volumePrecision
 
   #delayedSetRange = false
+  #mergeList = []
 
   /**
    * Create a new TradeXchart instance
@@ -914,7 +911,6 @@ export default class TradeXchart extends Tradex_chart {
       return false
     }
 
-    let i, j, p=0, start;
     let end = merge.data.length -1
     // if the chart empty is empty set the range to the merge data
     if (this.#chartIsEmpty || !isNumber(this.#time.timeFrameMS)) {
@@ -933,7 +929,32 @@ export default class TradeXchart extends Tradex_chart {
       this.error(`ERROR: ${this.id}: merge data time frame does not match existing time frame!`)
       return false
     }
-//
+    // Not valid chart data
+    if ("data" in merge &&
+        !isArray(merge.data)) {
+      this.error(`ERROR: ${this.id}: merge chart data must be of type Array!`)
+      return false
+    }
+    // convert newRange values to timestamps
+    if (isObject(newRange)) {
+      newRange.start = (isNumber(newRange.start)) ? this.#range.value(newRange.start)[0] : this.#range.timeMin
+      newRange.end = (isNumber(newRange.end)) ? this.#range.value(newRange.end)[0] : this.#range.timeMax
+    }
+    // queue merge if necessary
+    // prevents indicator calculation execution choking
+    this.#mergeList.push({merge, newRange, calc})
+
+    while (this.#mergeList.length > 0) {
+      // setTimeout(() => {
+        this.#mergeDataProcess()
+      // })
+    }
+    return true
+  }
+
+  #mergeDataProcess() {
+    let i, j, start, end;
+    let { merge, newRange, calc } = {...this.#mergeList.shift()}
     const data = this.allData.data
     const mData = merge?.data || false
     const primaryPane = this.allData?.primaryPane
@@ -945,18 +966,16 @@ export default class TradeXchart extends Tradex_chart {
     const trades = this.allData?.trades?.data
     const mTrades = merge?.trades?.data || false
     const inc = (this.range.inRange(mData[0][0])) ? 1 : 0
-
-    // Not valid chart data
-    if ("data" in merge &&
-        !isArray(mData)) {
-      this.error(`ERROR: ${this.id}: merge chart data must be of type Array!`)
-      return false
-    }
+    const refresh = {}
 
     // Do we have price data?
     if (isArray(mData) && mData.length > 0) {
       i = mData.length - 1
       j = data.length - 1
+
+      refresh.mData = 
+      this.range.inRange(mData[0][0]) &&
+      this.range.inRange(mData[0][i])
 
       // if not a candle stream
       if (!isBoolean(mData[i][7]) &&
@@ -982,6 +1001,12 @@ export default class TradeXchart extends Tradex_chart {
       else {
         let merged = []
         let older, newer;
+        newRange = (newRange) ? newRange :
+          {
+            start: this.#range.timeMin,
+            end: this.#range.timeMax
+          }
+
         if (data[0][0] < mData[0][0]) {
           older = data
           newer = mData
@@ -1039,60 +1064,66 @@ export default class TradeXchart extends Tradex_chart {
       }
       if (calc) this.calcAllIndicators()
 
-/*
-* chart will ignore any indicators in merge data
-* for sanity reasons, instead will trigger 
-* calculation for merged data for existing indicators
+  /*
+  * chart will ignore any indicators in merge data
+  * for sanity reasons, instead will trigger 
+  * calculation for merged data for existing indicators
 
-    // Do we have primaryPane indicators?
-    if (isArray(mPrimary) && mPrimary.length > 0) {
-      for (let o of mPrimary) {
-        // if (o )
-        if (isArray(o?.data) && o?.data.length > 0) {
+      // Do we have primaryPane indicators?
+      if (isArray(mPrimary) && mPrimary.length > 0) {
+        for (let o of mPrimary) {
+          // if (o )
+          if (isArray(o?.data) && o?.data.length > 0) {
 
+          }
         }
       }
-    }
 
-    // Do we have secondaryPane indicators?
-    if (isArray(mSecondary) && mSecondary.length > 0) {
-      for (let o of mSecondary) {
-        if (isArray(o?.data) && o?.data.length > 0) {
+      // Do we have secondaryPane indicators?
+      if (isArray(mSecondary) && mSecondary.length > 0) {
+        for (let o of mSecondary) {
+          if (isArray(o?.data) && o?.data.length > 0) {
 
+          }
         }
       }
-    }
-*/
-    // Do we have datasets?
-    if (isArray(mDataset) && mDataset.length > 0) {
-      for (let o of mDataset) {
-        if (isArray(o?.data) && o?.data.length > 0) {
+  */
+      // Do we have datasets?
+      if (isArray(mDataset) && mDataset.length > 0) {
+        for (let o of mDataset) {
+          if (isArray(o?.data) && o?.data.length > 0) {
 
+          }
         }
       }
-    }
 
-    // Do we have trades?
-    if (isArray(trades) && trades.length > 0) {
-      for (let d of trades) {
-        
+      // Do we have trades?
+      if (isArray(trades) && trades.length > 0) {
+        for (let d of trades) {
+          
+        }
       }
-    }
 
-    if (newRange) {
-      if (isObject(newRange)) {
-        start = (isNumber(newRange.start)) ? newRange.start : this.range.indexStart
-        end = (isNumber(newRange.end)) ? newRange.end : this.range.indexEnd
+      if (newRange) {
+        if (isObject(newRange)) {
+          start = (isNumber(newRange.start)) ? this.range.getTimeIndex(newRange.start) : this.range.indexStart
+          end = (isNumber(newRange.end)) ? this.range.getTimeIndex(newRange.end) : this.range.indexEnd
+        }
+        else {
+          if (mData[0][0] )
+          start = this.range.indexStart + inc
+          end = this.range.indexEnd + inc
+        }
+        this.setRange(start, end)
       }
-      else {
-        if (mData[0][0] )
-        start = this.range.indexStart + inc
-        end = this.range.indexEnd + inc
-      }
-      this.setRange(start, end)
-    }
-    }
 
+      let r, u = false;
+      for (r in refresh) {
+        u || r
+      }
+      this.refresh()
+      return true
+    }
   }
 
   /**
