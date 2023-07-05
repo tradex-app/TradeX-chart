@@ -3,7 +3,7 @@
 
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import Dataset from '../model/dataset'
-import { validateDeep, validateShallow } from '../model/validateData'
+import { validateDeep, validateShallow, sanitizeCandles } from '../model/validateData'
 import { copyDeep, mergeDeep, xMap, uid } from '../utils/utilities'
 import { detectInterval } from '../model/range'
 import { ms2Interval, SECOND_MS } from '../utils/time'
@@ -209,6 +209,7 @@ export default class State {
   #core
   #status = false
   #isEmpty = true
+  #mergeList = []
 
   constructor(state, deepValidate=false, isCrypto=false) {
     // validate state
@@ -231,17 +232,45 @@ export default class State {
   get key() { return this.#key }
   get status() { return this.#status }
   get isEmpty() { return this.#isEmpty }
+  get allData() {
+    return {
+      data: this.#data.chart.data,
+      primaryPane: this.#data.secondary,
+      secondaryPane: this.#data.secondary,
+      datasets: this.#data.datasets
+    }
+  }
   get data() { return this.#data }
   get core() { return (this.#core !== undefined) ? this.#core : false }
+  get time() { return this.#core.time }
+  get range() { return this.#core.range }
+  
+  error(e) { this.#core.error(e) }
 
+  /**
+   * 
+   * @param {Object} state 
+   * @param {boolean} deepValidate - validate every entry rather than a sample
+   * @param {boolean} isCrypto - validate time stamps against BTC genesis block
+   * @returns {State} - State instance
+   */
   create(state, deepValidate, isCrypto) {
     return State.create(state, deepValidate, isCrypto)
   }
 
+  /**
+   * delete a current or stored chart state
+   * @param {string} key - state id
+   * @returns 
+   */
   delete(key) {
+    if (!isString(key)) return false
+    // delete any state but this instance
     if (key !== this.key) {
       State.delete(key)
     }
+    // if delete this instance
+    // create an empty default state to replace it
     else {
       if (State.has(key)) {
         const empty = State.create()
@@ -285,7 +314,239 @@ export default class State {
     }
   }
 
+  /**
+   * export state as an object
+   * @param {string} key - state id
+   * @param {Object} config 
+   * @returns {Object}
+   */
   export(key=this.key, config={}) {
     return State.export(key, config={})
+  }
+
+  /**
+   * Merge a block of data into the state.
+   * Used for populating a chart with back history.
+   * Merge data must follow a State format.
+   * Optionally set a new range upon merge.
+   * @param {Object} merge - merge data must be formatted to a Chart State
+   * @param {boolean|object} newRange - false | {start: number, end: number}
+   */
+  // TODO: merge indicator data?
+  // TODO: merge dataset?
+  mergeData(merge, newRange=false, calc=true) {
+    if (!isObject(merge)) {
+      this.error(`ERROR: ${this.id}: merge data must be type Object!`)
+      return false
+    }
+
+    let end = merge.data.length -1
+    // if the chart empty is empty set the range to the merge data
+    if (this.#isEmpty || !isNumber(this.time.timeFrameMS)) {
+      if (!isObject(newRange) ||
+          !isNumber(newRange.start) ||
+          !isNumber(newRange.end) ) {
+
+        if (end > 1) {
+          newRange = {start: end - this.range.initialCnt, end}
+        }
+      }
+    }
+    // timeframes don't match
+    if (end > 1 &&
+        this.time.timeFrameMS !== detectInterval(merge.data)) {
+      this.error(`ERROR: ${this.core.id}: merge data time frame does not match existing time frame!`)
+      return false
+    }
+    // Not valid chart data
+    if ("data" in merge &&
+        !isArray(merge.data)) {
+      this.error(`ERROR: ${this.core.id}: merge chart data must be of type Array!`)
+      return false
+    }
+    // convert newRange values to timestamps
+    if (isObject(newRange)) {
+      newRange.start = (isNumber(newRange.start)) ? this.range.value(newRange.start)[0] : this.range.timeMin
+      newRange.end = (isNumber(newRange.end)) ? this.range.value(newRange.end)[0] : this.range.timeMax
+    }
+    // queue merge if necessary
+    // prevents indicator calculation execution choking
+    this.#mergeList.push({merge, newRange, calc})
+
+    while (this.#mergeList.length > 0) {
+      // setTimeout(() => {
+        this.#mergeDataProcess()
+      // })
+    }
+    return true
+  }
+
+  #mergeDataProcess() {
+    let i, j, start, end;
+    let { merge, newRange, calc } = {...this.#mergeList.shift()}
+    let mData = merge?.data || false
+    const data = this.allData.data
+    const primaryPane = this.allData?.primaryPane
+    const mPrimary = merge?.primaryPane || false
+    const secondaryPane = this.allData?.secondaryPane
+    const mSecondary = merge?.secondaryPane || false
+    const dataset = this.allData?.dataset?.data
+    const mDataset = merge?.dataset?.data || false
+    const trades = this.allData?.trades?.data
+    const mTrades = merge?.trades?.data || false
+    const inc = (this.range.inRange(mData[0][0])) ? 1 : 0
+    const refresh = {}
+
+    // Do we have price data?
+    if (isArray(mData) && mData.length > 0) {
+      i = mData.length - 1
+      j = data.length - 1
+
+      refresh.mData = 
+      this.range.inRange(mData[0][0]) &&
+      this.range.inRange(mData[0][i])
+
+      // if not a candle stream
+      if (!isBoolean(mData[i][7]) &&
+          mData[i].length !== 8 &&
+          mData[i][6] !== null &&
+          mData[i][7] !== true
+          ) {
+        // sanitize data, must be numbers
+        // entries must be: [ts,o,h,l,c,v]
+        mData = sanitizeCandles(mData)
+      }
+      
+      // chart is empty so simply add the new data
+      if (data.length == 0) {
+        this.allData.data.push(...mData)
+      }
+      // chart has data, check for overlap
+      else {
+        let merged = []
+        let older, newer;
+        newRange = (newRange) ? newRange :
+          {
+            start: this.range.timeMin,
+            end: this.range.timeMax
+          }
+
+        if (data[0][0] < mData[0][0]) {
+          older = data
+          newer = mData
+        }
+        else {
+          older = mData
+          newer = data
+        }
+
+        // handle price stream
+        if (newer.length == 1 &&
+            newer[0][0] == older[older.length-1][0]) {
+            older[older.length-1] = newer[0]
+            merged = older
+        }
+        else if (newer.length == 1 &&
+            newer[0][0] == older[older.length-1][0] + this.range.interval) {
+            merged = older.concat(newer)
+        }
+
+        // overlap between existing data and merge data
+        else if (older[older.length-1][0] >= newer[0][0]) {
+          let o = 0
+          while (older[o][0] < newer[0][0]) {
+            merged.push(older[o])
+            o++
+          }
+
+          // append newer array
+          merged = merged.concat(newer)
+          // are there any trailing entries to append?
+          let i = o + newer.length
+          if (i < older.length) {
+            merged = merged.concat(older.slice(i))
+          }
+        }
+
+        // no overlap, but a gap exists
+        else if (newer[0][0] - older[older.length-1][0] > this.range.interval) {
+          merged = older
+          let fill = older[older.length-1][0]
+          let gap = Math.floor((newer[0][0] - fill) / this.range.interval)
+          for(gap; gap > 0; gap--) {
+            merged.push([fill,null,null,null,null,null])
+            merged = merged.concat(newer)
+          }
+        }
+
+        // no overlap, insert the new data
+        else {
+          merged = older.concat(newer)
+        }
+
+        this.data.chart.data = merged
+      }
+      if (calc) this.#core.calcAllIndicators()
+
+  /*
+  * chart will ignore any indicators in merge data
+  * for sanity reasons, instead will trigger 
+  * calculation for merged data for existing indicators
+
+      // Do we have primaryPane indicators?
+      if (isArray(mPrimary) && mPrimary.length > 0) {
+        for (let o of mPrimary) {
+          // if (o )
+          if (isArray(o?.data) && o?.data.length > 0) {
+
+          }
+        }
+      }
+
+      // Do we have secondaryPane indicators?
+      if (isArray(mSecondary) && mSecondary.length > 0) {
+        for (let o of mSecondary) {
+          if (isArray(o?.data) && o?.data.length > 0) {
+
+          }
+        }
+      }
+  */
+      // Do we have datasets?
+      if (isArray(mDataset) && mDataset.length > 0) {
+        for (let o of mDataset) {
+          if (isArray(o?.data) && o?.data.length > 0) {
+
+          }
+        }
+      }
+
+      // Do we have trades?
+      if (isArray(trades) && trades.length > 0) {
+        for (let d of trades) {
+          
+        }
+      }
+
+      if (newRange) {
+        if (isObject(newRange)) {
+          start = (isNumber(newRange.start)) ? this.range.getTimeIndex(newRange.start) : this.range.indexStart
+          end = (isNumber(newRange.end)) ? this.range.getTimeIndex(newRange.end) : this.range.indexEnd
+        }
+        else {
+          if (mData[0][0] )
+          start = this.range.indexStart + inc
+          end = this.range.indexEnd + inc
+        }
+        this.#core.setRange(start, end)
+      }
+
+      let r, u = false;
+      for (r in refresh) {
+        u || r
+      }
+      this.#core.refresh()
+      return true
+    }
   }
 }

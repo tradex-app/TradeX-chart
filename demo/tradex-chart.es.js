@@ -854,9 +854,9 @@ class Dataset {
 function validateShallow(data, isCrypto=false) {
   if (!isArray(data)) return false
   let rnd = getRandomIntBetween(0, data.length);
-  if (!isValidCandle(data[0], isCrypto)) return false
-  if (!isValidCandle(data[rnd], isCrypto)) return false
-  if (!isValidCandle(data[data.length - 1], isCrypto)) return false
+  if (!isCandleValid(data[0], isCrypto)) return false
+  if (!isCandleValid(data[rnd], isCrypto)) return false
+  if (!isCandleValid(data[data.length - 1], isCrypto)) return false
   let t1 = data[0][0];
   let t2 = data[1][0];
   let t3 = data[2][0];
@@ -868,14 +868,14 @@ function validateDeep(data, isCrypto=false) {
   let i = 0;
   let prev = 0;
   while (i < data.length) {
-    if (!isValidCandle(data[i], isCrypto)) return false
+    if (!isCandleValid(data[i], isCrypto)) return false
     if (data[i][0] < prev) return false
     prev = data[i][0];
     i++;
   }
   return true
 }
-function isValidCandle(c, isCrypto=false) {
+function isCandleValid(c, isCrypto=false) {
   if (!isArray(c)) return false
   if (c.length !== 6) return false
   if (isCrypto)
