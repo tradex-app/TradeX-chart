@@ -80015,9 +80015,12 @@ export default {
   ],
   secondary: [
     {
-    "name": "RSI, 20",
-    "type": "RSI",
-    "data": [],
+      name: "RSI, 20",
+      type: "RSI",
+      data: [],
+      settings: {
+        timePeriod: 20  
+      }
     }
   ]
 }

@@ -262,7 +262,9 @@ export default class Indicator extends Overlay {
           delete input.style
     // process options
     for (let i of api.options) {
+      // validate input values against definition defaults
       if (i.name in input) {
+        // if input value is type is incorrect, use the default
         if (typeof input[i.name] !== i.type) {
           input[i.name] = i.defaultValue
           continue

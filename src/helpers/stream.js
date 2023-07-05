@@ -163,7 +163,6 @@ export default class Stream {
     if (this.#status == STREAM_STARTED || this.#status == STREAM_LISTENING) {
       if (isObject(tick)) {
         this.candle = tick
-        this.#core.setNotEmpty()
       }
     }
   }
@@ -192,7 +191,7 @@ export default class Stream {
       data.c, 
       data.v, 
       null, true]
-    this.#core.mergeData({data: [this.#candle]}, true, false)
+    this.#core.state.mergeData({data: [this.#candle]}, true, false)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
     this.#countDownMS = this.#time.timeFrameMS
     this.#countDownStart = this.roundTime(Date.now())

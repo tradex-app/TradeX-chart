@@ -44,7 +44,7 @@ primary: [
     "name": "SMA, 5",
     "type": "SMA",
     "data": [],
-    "settings": {period: 5}
+    "settings": {timePeriod: 5}
   }
 ],
 "secondary": [
@@ -52,6 +52,7 @@ primary: [
     "name": "RSI, 20",
     "type": "RSI",
     "data": [],
+    "settings": {timePeriod: 20}
   },
 ]
 }
@@ -63,20 +64,21 @@ let state5 = {
       "name": "EMA, 25",
       "type": "EMA",
       "data": [],
-      "settings": {}
+      "settings": {timePeriod: 25}
   },
   {
       "name": "EMA, 43",
       "type": "EMA",
       "data": [],
-      "settings": {}
+      "settings": {timePeriod: 43}
   },
   ],
   "secondary": [
     {
       "name": "RSI, 20",
       "type": "RSI",
-      "data": []
+      "data": [],
+      "settings": {timePeriod: 20}
     }
   ]
 }
@@ -712,6 +714,8 @@ chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
 chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 
 // add an alert
-chart1.stream.alerts.add(13010, alertTest, h)
-chart1.on("range_limitPast", (e) => onRangeLimit(e, "past"))
-chart1.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
+if (typeof chart1 === "object") {
+  chart1.stream.alerts.add(13010, alertTest, h)
+  chart1.on("range_limitPast", (e) => onRangeLimit(e, "past"))
+  chart1.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
+}

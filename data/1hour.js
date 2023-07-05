@@ -50408,7 +50408,7 @@ export default {
                 ]
             ],
             "settings": {
-                "period": 25
+                "timePeriod": 25
             }
         },
         {
@@ -67217,7 +67217,7 @@ export default {
                 ]
             ],
             "settings": {
-                "period": 43
+                "timePeriod": 43
             }
         },
         {
@@ -85134,7 +85134,7 @@ export default {
                 ]
             ],
             "settings": {
-                "period": 20,
+                "timePeriod": 20,
                 "upper": 70,
                 "lower": 30,
                 "backColor": "#9b9ba316",

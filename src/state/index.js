@@ -72,6 +72,8 @@ export default class State {
     else 
       state.chart.data = validateShallow(state.chart.data, isCrypto) ? state.chart.data : []
 
+    state.chart.isEmpty = (state.chart.data.length == 0) ? true : false
+
     if (!isNumber(state.chart?.tf) || deepValidate) {
       let tfms = detectInterval(state.chart.data)
       // this SHOULD never happen, 
@@ -369,21 +371,8 @@ export default class State {
       newRange.start = (isNumber(newRange.start)) ? this.range.value(newRange.start)[0] : this.range.timeMin
       newRange.end = (isNumber(newRange.end)) ? this.range.value(newRange.end)[0] : this.range.timeMax
     }
-    // queue merge if necessary
-    // prevents indicator calculation execution choking
-    this.#mergeList.push({merge, newRange, calc})
 
-    while (this.#mergeList.length > 0) {
-      // setTimeout(() => {
-        this.#mergeDataProcess()
-      // })
-    }
-    return true
-  }
-
-  #mergeDataProcess() {
-    let i, j, start, end;
-    let { merge, newRange, calc } = {...this.#mergeList.shift()}
+    let i, j, start;
     let mData = merge?.data || false
     const data = this.allData.data
     const primaryPane = this.allData?.primaryPane
@@ -545,7 +534,9 @@ export default class State {
       for (r in refresh) {
         u || r
       }
+
       this.#core.refresh()
+      this.#isEmpty = false
       return true
     }
   }

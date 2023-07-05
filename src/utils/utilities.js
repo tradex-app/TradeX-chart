@@ -602,7 +602,7 @@ export const extender = (baseClass, ...mixins) => {
 }
 
 /**
- * return promise state: fulfilled, rejected, pendings
+ * return promise state: fulfilled, rejected, pending
  * @export
  * @param {*} p
  * @returns {*}  

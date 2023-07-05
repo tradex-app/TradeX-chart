@@ -80,7 +80,6 @@ export default class TradeXchart extends Tradex_chart {
   #hub = {}
   #State = State
   #state
-  #chartIsEmpty = true
   #range
   #indicators = Indicators
   #TALib
@@ -141,6 +140,7 @@ export default class TradeXchart extends Tradex_chart {
   #volumePrecision
 
   #delayedSetRange = false
+  #mergingData = false
 
   /**
    * Create a new TradeXchart instance
@@ -318,7 +318,7 @@ export default class TradeXchart extends Tradex_chart {
   set stream(stream) { return this.setStream(stream) }
   get stream() { return this.#stream }
   get worker() { return this.#workers }
-  get isEmpty() { return this.#chartIsEmpty }
+  get isEmpty() { return this.#state.IsEmpty }
   set candles(c) { if (isObject(c)) this.#candles = c }
   get candles() { return this.#candles }
 
@@ -362,7 +362,6 @@ export default class TradeXchart extends Tradex_chart {
     // time frame
     let tf = "1s"
     let ms = SECOND_MS
-    this.#chartIsEmpty = true
 
     // is the chart empty - no data or stream
     if (!isObject(txCfg?.stream) && this.state.data.chart.data.length < 2) {
@@ -381,7 +380,6 @@ export default class TradeXchart extends Tradex_chart {
     else {
       tf = this.state.data.chart.tf 
       ms = this.state.data.chart.tfms
-      this.#chartIsEmpty = false
     }
     this.log(`tf: ${tf} ms: ${ms}`)
 
@@ -605,10 +603,6 @@ export default class TradeXchart extends Tradex_chart {
   setToolsW(w) {
     this.toolsW = w
     this.#elTools.style.width = `${w}px`
-  }
-
-  setNotEmpty() {
-    this.#chartIsEmpty = false
   }
 
   /**
@@ -839,9 +833,9 @@ export default class TradeXchart extends Tradex_chart {
       (this.Chart?.layerWidth) ? this.Chart.layerWidth : this.Chart.width
     this.#range.set(start, end, max)
 
-    if (start < 0) 
+    if (start < 0 && !this.#mergingData) 
       this.emit("range_limitPast", {chart: this, start, end})
-    else if (end > this.range.dataLength) 
+    else if (end > this.range.dataLength && !this.#mergingData) 
       this.emit("range_limitFuture", {chart: this, start, end})
   }
 
@@ -904,7 +898,10 @@ export default class TradeXchart extends Tradex_chart {
   // TODO: merge indicator data?
   // TODO: merge dataset?
   mergeData(merge, newRange=false, calc=true) {
-    return this.state.mergeData(merge, newRange, calc)
+    this.#mergingData = true
+    let m = this.state.mergeData(merge, newRange, calc)
+    if (isBoolean(m)) this.#mergingData = false
+    return m
   }
 
   /**
