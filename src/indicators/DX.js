@@ -26,8 +26,8 @@ export default class DX extends Indicator {
     defaultLow: 25,
     highLowLineWidth: 1,
     highLowStyle: "dashed",
-    highStrokeStyle: "#848",
-    lowStrokeStyle: "#848",
+    highStroke: "#848",
+    lowStroke: "#848",
     highLowRangeStyle: "#22002220"
   }
   precision = 2
@@ -108,7 +108,7 @@ export default class DX extends Indicator {
     plots[1] = {x: x2, y: y1}
     style = {
       width: this.style.highLowLineWidth,
-      stroke: this.style.highStrokeStyle,
+      stroke: this.style.highStroke,
       dash: [5, 5]
     }
     this.plot(plots, "renderLine", style)
@@ -119,7 +119,7 @@ export default class DX extends Indicator {
     plots[1] = {x: x2, y: y2}
     style = {
       width: this.style.highLowLineWidth,
-      stroke: this.style.lowStrokeStyle,
+      stroke: this.style.lowStroke,
       dash: [5, 5]
     }
     this.plot(plots, "renderLine", style)

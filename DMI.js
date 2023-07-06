@@ -23,13 +23,13 @@ export default class DMI extends Indicator {
     },
   }
   #defaultStyle = {
-    highStrokeStyle: "#0088cc",
+    highStroke: "#0088cc",
     highLineWidth: '1',
     highLineDash: undefined,
-    lowStrokeStyle: "#0088cc",
+    lowStroke: "#0088cc",
     lowLineWidth: '1',
     lowLineDash: undefined,
-    closeStrokeStyle: "#0088cc",
+    closeStroke: "#0088cc",
     closeLineWidth: '1',
     closeLineDash: undefined,
   }

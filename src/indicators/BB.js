@@ -27,13 +27,13 @@ export default class BB extends Indicator {
     },
   }
   #defaultStyle = {
-    lowerStrokeStyle: "#08c",
+    lowerStroke: "#08c",
     lowerLineWidth: '1',
     lowerLineDash: undefined,
-    middleStrokeStyle: "#0080c088",
+    middleStroke: "#0080c088",
     middleLineWidth: '1',
     middleLineDash: undefined,
-    upperStrokeStyle: "#08c",
+    upperStroke: "#08c",
     upperLineWidth: '1',
     upperLineDash: undefined,
     fillStyle: "#0080c044"
@@ -99,9 +99,9 @@ export default class BB extends Indicator {
     inputs.Mid = this.scale.nicePrice(this.overlay.data[c][1][1])
     inputs.Lo = this.scale.nicePrice(this.overlay.data[c][1][2])
     colours = [
-      this.style.upperStrokeStyle,
-      this.style.middleStrokeStyle,
-      this.style.lowerStrokeStyle
+      this.style.upperStroke,
+      this.style.middleStroke,
+      this.style.lowerStroke
     ]
     return {inputs, colours, labels}
   }
@@ -150,19 +150,19 @@ export default class BB extends Indicator {
 
     style = {
       width: this.style.lowerLineWidth, 
-      stroke: this.style.lowerStrokeStyle, 
+      stroke: this.style.lowerStroke, 
       dash: this.style.lowerLineDash
     }
     this.plot(plots.lower, "renderLine", style)
     style = {
       width: this.style.middleLineWidth, 
-      stroke: this.style.middleStrokeStyle, 
+      stroke: this.style.middleStroke, 
       dash: this.style.middleLineDash
     }
     this.plot(plots.middle, "renderLine", style)
     style = {
       width: this.style.upperLineWidth, 
-      stroke: this.style.upperStrokeStyle, 
+      stroke: this.style.upperStroke, 
       dash: this.style.upperLineDash
     }
     this.plot(plots.upper, "renderLine", style)

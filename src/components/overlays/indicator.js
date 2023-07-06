@@ -298,7 +298,7 @@ export default class Indicator extends Overlay {
    * @memberof indicator
    */
   legendInputs(pos=this.chart.cursorPos) {
-    const colours = [this.style.strokeStyle]
+    const colours = [this.style.stroke]
 
     let index = this.Timeline.xPos2Index(pos[0])
 
