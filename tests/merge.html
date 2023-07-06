@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+  </head>
+  <body>
+    <script>
+const mData = [
+	[1001, 101],
+  [1002, 102],
+  [1003, 103],
+  [1004, 104],
+  [1005, 105]
+]
+
+const data = [
+	[999, 199],
+	[1000, 200],
+	[1001, 201],
+  [1002, 202],
+  [1003, 203],
+  [1004, 204],
+  [1005, 205],
+  [1006, 206],
+  [1007, 207]
+]
+let merged = []
+let older, newer;
+if (data[0][0] < mData[0][0]) {
+	older = data
+  newer = mData
+}
+else {
+	older = mData
+  newer = data
+}
+let o = 0
+while (older[o][0] < newer[0][0]) {
+	merged.push(older[o])
+  o++
+}
+// append newer array
+merged = merged.concat(newer)
+// are there any trailing entries to append?
+let i = o + newer.length
+if (i < older.length) {
+	merged = merged.concat(older.slice(i))
+}
+console.log(merged)
+
+
+    </script>
+  </body>
+</html>

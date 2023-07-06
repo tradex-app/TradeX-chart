@@ -26,8 +26,8 @@ export default class DX extends Indicator {
     defaultLow: 25,
     highLowLineWidth: 1,
     highLowStyle: "dashed",
-    highStrokeStyle: "#848",
-    lowStrokeStyle: "#848",
+    highStroke: "#848",
+    lowStroke: "#848",
     highLowRangeStyle: "#22002220"
   }
   precision = 2
@@ -37,18 +37,18 @@ export default class DX extends Indicator {
   ]
 
   static inCnt = 0
-  static onChart = false
+  static primaryPane = false
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
 
   /**
  * Creates an instance of DX.
-   * @param {object} target - canvas scene
-   * @param {object} xAxis - timeline axis instance
-   * @param {object} yAxis - scale axis instance
-   * @param {object} config - theme / styling
-   * @param {object} parent - (on/off)chart pane instance that hosts the indicator
-   * @param {object} params - contains minimum of overlay instance
+   * @param {Object} target - canvas scene
+   * @param {Object} xAxis - timeline axis instance
+   * @param {Object} yAxis - scale axis instance
+   * @param {Object} config - theme / styling
+   * @param {Object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {Object} params - contains minimum of overlay instance
  * @memberof DX
  */
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
@@ -68,7 +68,7 @@ export default class DX extends Indicator {
     this.addLegend()
   }
 
-  get onChart() { return DX.onChart }
+  get primaryPane() { return DX.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
 
 
@@ -84,7 +84,7 @@ export default class DX extends Indicator {
 
   /**
    * Draw the current indicator range on its canvas layer and render it.
-   * @param {object} range 
+   * @param {Object} range 
    */
   draw(range=this.range) {
     if (this.overlay.data.length < 2 ) return false
@@ -108,7 +108,7 @@ export default class DX extends Indicator {
     plots[1] = {x: x2, y: y1}
     style = {
       width: this.style.highLowLineWidth,
-      stroke: this.style.highStrokeStyle,
+      stroke: this.style.highStroke,
       dash: [5, 5]
     }
     this.plot(plots, "renderLine", style)
@@ -119,7 +119,7 @@ export default class DX extends Indicator {
     plots[1] = {x: x2, y: y2}
     style = {
       width: this.style.highLowLineWidth,
-      stroke: this.style.lowStrokeStyle,
+      stroke: this.style.lowStroke,
       dash: [5, 5]
     }
     this.plot(plots, "renderLine", style)

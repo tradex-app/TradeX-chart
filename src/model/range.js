@@ -10,7 +10,6 @@ import { bRound, limit } from "../utils/number"
 
 export class Range {
 
-  data = []
   #interval = DEFAULT_TIMEFRAMEMS
   #intervalStr = "1s"
   indexStart = 0
@@ -40,20 +39,20 @@ export class Range {
 
   /**
    * Creates an instance of Range.
-   * @param {object} allData - State data object representing on and off chart data
-   * @param {number} [start=0] - initial index start
-   * @param {number} [end=allData.data.length-1] - initial index end
-   * @param {object} [config={}] - range config
+   * @param {number} start - initial index start
+   * @param {number} end - initial index end
+   * @param {Object} [config={}] - range config
    * @memberof Range
    */
-  constructor( allData, start=0, end=allData.data.length-1, config={}) {
-    if (!isObject(allData)) return false
+  constructor( start, end, config={}) {
     if (!isObject(config)) return false
     if (!(config?.core instanceof TradeXchart)) return false
 
     this.#init = true;
     this.setConfig(config)
     this.#core = config.core;
+    start = (isNumber(start)) ? start : 0
+    end = (isNumber(end)) ? end : this.data.length-1
 
     const MaxMinPriceVolStr = `
     (input) => {
@@ -65,43 +64,37 @@ export class Range {
 
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS
 
-    if (allData.data.length == 0) {
+    // no data - use provided time frame / interval
+    if (this.data.length == 0) {
       let ts = Date.now()
       start = 0
       end = this.rangeLimit
       this.#interval = tf
       this.#intervalStr = ms2Interval(this.interval)
       this.anchor = ts - (ts % tf) // - (this.limitPast * this.#interval)
-    }  
-    else if (allData.data.length < 2) {
+    } 
+    // nimimum of two entries to calculate time frame / interval
+    else if (this.data.length < 2) {
       this.#interval = tf
       this.#intervalStr = ms2Interval(this.interval)
     }
-    else if (end == 0 && allData.data.length >= this.rangeLimit)
-      end = this.rangeLimit
-    else if (end == 0)
-      end = allData.data.length
-    
-    for (let data in allData) {
-      this[data] = allData[data]
-    }
-
-    if (!this.set(start, end)) return false
-
-    if (allData.data.length > 2) {
+    // if (this.data.length > 2) {
+    else {
       this.#interval = detectInterval(this.data)
       this.#intervalStr = ms2Interval(this.interval)
     }
+    // adjust range end if out of bounds
+    if (end == 0 && this.data.length >= this.rangeLimit)
+      end = this.rangeLimit
+    else if (end == 0)
+      end = this.data.length
 
-    // for (let i of this?.offChart) {
-    //   i.valueMin = 0
-    //   i.valueMax = 100
-    //   i.valueDiff = 100
-    // }
-
+    this.set(start, end)
   }
 
-  get dataLength () { return (this?.data.length == 0) ? 0 : this.data.length - 1 }
+  get allData () { return this.#core.allData }
+  get data () { return this.allData?.data || [] }
+  get dataLength () { return (this.allData?.data.length == 0) ? 0 : this.allData.data.length - 1 }
   get Length () { return this.indexEnd - this.indexStart }
   get timeDuration () { return this.timeFinish - this.timeStart }
   get timeMin () { return this.value(this.indexStart)[0] }
@@ -123,7 +116,7 @@ export class Range {
    * @param {number} [start=0]
    * @param {number} [end=this.dataLength]
    * @param {number} [max=this.maxCandles]
-   * @return {boolean} - success or failure
+   * @returns {boolean} - success or failure
    * @memberof Range
    */
   set (start=0, end=this.dataLength, max=this.maxCandles, config) {
@@ -253,7 +246,7 @@ export class Range {
    * return value by timestamp
    * @param {number} ts
    * @param {string} id
-   * @return {*}  
+   * @returns {*}  
    * @memberof Range
    */
   valueByTS ( ts, id ) {
@@ -265,8 +258,8 @@ export class Range {
       case "chart": 
 
         break;
-      case "onchart": break;
-      case "offchart": break;
+      case "primary": break;
+      case "secondary": break;
       case "dataset": break;
       case "all": break;
       default: 
@@ -281,7 +274,7 @@ export class Range {
   /**
    * return data for id
    * @param {string} id
-   * @return {array}  
+   * @returns {Array}  
    * @memberof Range
    */
   getDataById(id) {
@@ -292,18 +285,18 @@ export class Range {
     switch (idParts[1]) {
       case "chart": 
         return this.data;
-      case "onchart":
-        for (let o of this.onChart) {
+      case "primary":
+        for (let o of this.allData.primaryPane) {
           if (idParts[2] in o) return o[idParts[2]]
         }
         return false;
-      case "offchart":
-        for (let o of this.offChart) {
+      case "secondary":
+        for (let o of this.allData.secondaryPane) {
           if (idParts[2] in o) return o[idParts[2]]
         }
         return false;
       case "datasets":
-        for (let o of this.datasets) {
+        for (let o of this.allData.datasets) {
           if (idParts[2] in o) return o[idParts[2]]
         }
       return false;
@@ -350,7 +343,7 @@ export class Range {
   /**
    * is timestamp in visible render range?
    * @param {number} t - timestamp
-   * @return {boolean}  
+   * @returns {boolean}  
    * @memberof Range
    */
   inRenderRange (t) {
@@ -368,10 +361,10 @@ export class Range {
 
   /**
    * Find price maximum and minimum, volume maximum and minimum
-   * @param {array} data
+   * @param {Array} data
    * @param {number} [start=0]
    * @param {number} [end=data.length-1]
-   * @return {object}  
+   * @returns {Object}  
    */
    maxMinPriceVol ( input ) {
 // console.time()
@@ -478,7 +471,7 @@ export class Range {
 
 
 export function rangeOnchartValue( range, indicator, index ) {
-  const len = range.onchart[indicator].length - 1
+  const len = range.primary[indicator].length - 1
   const value = null
 }
 
@@ -490,7 +483,7 @@ export function rangeDatasetValue( range, indicator, index ) {
 
 /**
  * Detects candles interval
- * @param {array} ohlcv - array of ohlcv values (price history)
+ * @param {Array} ohlcv - array of ohlcv values (price history)
  * @returns {number} - milliseconds
  */
 export function detectInterval(ohlcv) {
@@ -510,7 +503,7 @@ export function detectInterval(ohlcv) {
 
 /**
  * Calculate the index for a given time stamp
- * @param {object} time - time object provided by core
+ * @param {Object} time - time object provided by core
  * @param {number} timeStamp 
  * @returns {number}
  */

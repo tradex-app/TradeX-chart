@@ -116,7 +116,7 @@ export default class graph {
 
   /**
    * add an array of overlays to Graph
-   * @param {array} o - array of overlays [[name, config], ...]
+   * @param {Array} o - array of overlays [[name, config], ...]
    * @returns array - array of overlay statuses [[name, boolean], ...]
    */
   addOverlays(o) {
@@ -126,7 +126,7 @@ export default class graph {
   /**
    * add a single overlay to Graph
    * @param {string} key - identifier
-   * @param {object} overlay - {class, params}
+   * @param {Object} overlay - {class, params}
    * @returns boolean
    */
   addOverlay(key, overlay) {
@@ -144,11 +144,12 @@ export default class graph {
 
   /**
    * iterate over the list of overlays and draw them
-   * @param {object} [range=this.range]
+   * @param {Object} [range=this.range]
    * @param {boolean} [update=false] - force immediate render?
    * @memberof graph
    */
   draw(range=this.range, update=false) {
+
     const oList = this.#overlays.list
     // guard against overlays host (chart pane) deletion
     if (!(oList instanceof xMap)) return false
@@ -158,15 +159,7 @@ export default class graph {
       if (!isObject(overlay) || 
           !isFunction(overlay?.instance?.draw)) continue
 
-      if (this.#core.scrollPos == this.#core.bufferPx * -1 || 
-          this.#core.scrollPos == 0 || 
-          update == true) 
-      {
-        overlay.instance.draw()
-      }
-      else if (this.#parent.streamCandle) {
-        oList.get("stream").instance.draw()
-      }
+      overlay.instance.draw()
 
       if (!overlay.fixed)
         overlay.instance.position = [this.#core.scrollPos, 0]

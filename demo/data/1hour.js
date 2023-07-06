@@ -33601,7 +33601,7 @@ export default {
             173.28647568
         ]
     ],
-    "onchart": [
+    "primary": [
         {
             "name": "EMA, 25",
             "type": "EMA",
@@ -50407,7 +50407,9 @@ export default {
                     7837.6365241016
                 ]
             ],
-            "settings": {}
+            "settings": {
+                "timePeriod": 25
+            }
         },
         {
             "name": "EMA, 43",
@@ -67214,7 +67216,9 @@ export default {
                     7820.946243900578
                 ]
             ],
-            "settings": {}
+            "settings": {
+                "timePeriod": 43
+            }
         },
         {
             "name": "Trades",
@@ -68403,7 +68407,7 @@ export default {
             }
         }
     ],
-    "offchart": [
+    "secondary": [
         {
             "name": "RSI, 20",
             "type": "RSI",
@@ -85130,6 +85134,7 @@ export default {
                 ]
             ],
             "settings": {
+                "timePeriod": 20,
                 "upper": 70,
                 "lower": 30,
                 "backColor": "#9b9ba316",

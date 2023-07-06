@@ -3,7 +3,7 @@
 /**
  * Getting a random number between 0 (inclusive) and 1 (exclusive)
  * @export
- * @return {number}
+ * @returns {number}
  */ 
 export function getRandom() {
   return Math.random();
@@ -13,7 +13,7 @@ export function getRandom() {
  * Getting a random number between two values
  * inclusive of the minimum, exclusive of the maximum
  * @export
- * @return {number}
+ * @returns {number}
  */
 export function getRandomInt(min, max) {
   return Math.random() * (max - min) + min;
@@ -23,7 +23,7 @@ export function getRandomInt(min, max) {
  * Getting a random integer between two values
  * inclusive of the minimum, exclusive of the maximum
  * @export
- * @return {number}
+ * @returns {number}
  */
 export function getRandomIntBetween(min, max) {
   min = Math.ceil(min) + 1;
@@ -36,7 +36,7 @@ export function getRandomIntBetween(min, max) {
  * Getting a random integer between two values, inclusive
  * inclusive of the minimum, inclusive of the maximum
  * @export
- * @return {number}
+ * @returns {number}
  */
 export function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
@@ -50,7 +50,7 @@ export function getRandomIntInclusive(min, max) {
  * @param dataList
  * @param valueKey
  * @param targetNumber
- * @return {number}
+ * @returns {number}
  */
  export function binarySearchNearest (dataList, valueKey, targetNumber) {
   let left = 0
@@ -85,9 +85,9 @@ export function getRandomIntInclusive(min, max) {
 /**
  * binary search on array
  * @export
- * @param {array} list
+ * @param {Array} list
  * @param {number} item
- * @return {number} - array index
+ * @returns {number} - array index
  */
 export function binarySearch(list, item) {
   let low = 0
@@ -115,7 +115,7 @@ export function binarySearch(list, item) {
  * Optimize numbers
  * @export
  * @param value
- * @return {number}
+ * @returns {number}
  */
 export function nice (value) {
   const exponent = Math.floor(log10(value))
@@ -144,7 +144,7 @@ export function nice (value) {
 /**
  * @export
  * @param {number} value
- * @return {number}  
+ * @returns {number}  
  */
 export function countDigits(value) {
   const digits = {}
@@ -161,7 +161,7 @@ export function countDigits(value) {
  * bitwise operations in JavaScript only work with 32-bit values (so a max of 2,147,483,647)
  * @export
  * @param {number} value
- * @return {number}  
+ * @returns {number}  
  */
 export function numDigits(value) {
   return (Math.log10((value ^ (value >> 31)) - (value >> 31)) | 0) + 1;
@@ -171,7 +171,7 @@ export function numDigits(value) {
  * slightly slower
  * @export
  * @param {number} x
- * @return {number}  
+ * @returns {number}  
  */
 export function numDigits2(x) {
   return Math.max(Math.floor(Math.log10(Math.abs(x))), 0) + 1;
@@ -181,7 +181,7 @@ export function numDigits2(x) {
  * truncate floating point, works for positives as well as negatives
  * @export
  * @param {number} value
- * @return {number}  
+ * @returns {number}  
  */
 export function float2Int(value) {
   return value | 0
@@ -192,7 +192,7 @@ export function float2Int(value) {
  * @export
  * @param {number} n
  * @param {number} p
- * @return {number}
+ * @returns {number}
  */
  export function round (n, p) {
 	p = p || 100
@@ -207,7 +207,7 @@ export function float2Int(value) {
  * @export
  * @param {number} n
  * @param {number} [d=0]
- * @return {number}  
+ * @returns {number}  
  */
 export function bRound(n, d=0) {
   var x = n * Math.pow(10, d);
@@ -223,7 +223,7 @@ export function bRound(n, d=0) {
  * fastest method
  * @export
  * @param {number} value
- * @return {number}  
+ * @returns {number}  
  */
 export function precision(value) {
   if (typeof value !== "number") value = parseFloat(value); 
@@ -244,7 +244,7 @@ export function precision(value) {
  * close second for speed
  * @export
  * @param {number} n
- * @return {number}  
+ * @returns {number}  
  */
  export function decimalPlaces(n) {
   function hasFraction(n) {
@@ -264,7 +264,7 @@ export function precision(value) {
  * slowest
  * @export
  * @param {number} - value
- * @return {number}
+ * @returns {number}
  */
 export function getPrecision (value) {
   const str = value.toString()
@@ -282,7 +282,7 @@ export function getPrecision (value) {
  * log base 10
  * @export
  * @param {number} value
- * @return {number}
+ * @returns {number}
  */
 export function log10 (value) {
   return Math.log(value) / Math.log(10)
@@ -292,7 +292,7 @@ export function log10 (value) {
  * Exponential function of 10
  * @export
  * @param {number} value
- * @return {number}
+ * @returns {number}
  */
 export function index10 (value) {
   return Math.pow(10, value)
@@ -302,7 +302,7 @@ export function index10 (value) {
  * Exponential power
  * @export
  * @param {number} value
- * @return {number}
+ * @returns {number}
  */
 export function power (base, exponent) {
   return Math.pow(base, exponent)
@@ -311,8 +311,8 @@ export function power (base, exponent) {
 /**
  * Calculate average of array
  * @export
- * @param {array} arr - array of numbers
- * @return {number}  
+ * @param {Array} arr - array of numbers
+ * @returns {number}  
  */
 export function mean(arr) {
     let avg = 0;
@@ -330,7 +330,7 @@ export function mean(arr) {
  * @param {number} val - value to be bounded
  * @param {number} min - lower bound
  * @param {number} max - upper bound
- * @return {number}  
+ * @returns {number}  
  */
 export function limit(val, min, max) {
   return Math.min(max, Math.max(min, val));

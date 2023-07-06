@@ -30,7 +30,7 @@ import { uid } from "../utils/utilities"
     width: '1'
   }
   #precision = 2
-  onChart = true
+  primaryPane = true
   scaleOverlay = false
   plots = [
     { key: 'SMA_1', title: 'SMA: ', type: 'line' },
@@ -38,7 +38,7 @@ import { uid } from "../utils/utilities"
 
   
   static inCnt = 0
-  static onChart = true
+  static primaryPane = true
   // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
   static colours = [
     "#9C27B0",
@@ -50,12 +50,12 @@ import { uid } from "../utils/utilities"
 
   /**
    * Creates an instance of SMA.
-   * @param {object} target - canvas scene
-   * @param {object} xAxis - timeline axis instance
-   * @param {object} yAxis - scale axis instance
-   * @param {object} config - theme / styling
-   * @param {object} parent - (on/off)chart pane instance that hosts the indicator
-   * @param {object} params - contains minimum of overlay instance
+   * @param {Object} target - canvas scene
+   * @param {Object} xAxis - timeline axis instance
+   * @param {Object} yAxis - scale axis instance
+   * @param {Object} config - theme / styling
+   * @param {Object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {Object} params - contains minimum of overlay instance
    * @memberof SMA
    */
   constructor(target, xAxis=false, yAxis=false, config, parent, params) {
@@ -76,7 +76,7 @@ import { uid } from "../utils/utilities"
     this.addLegend()
   }
 
-  get onChart() { return SMA.onChart }
+  get primaryPane() { return SMA.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
 
 

@@ -199,6 +199,174 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"docs": {
+"api/core-old.md": {
+	id: "api/core-old.md";
+  slug: "api/core-old";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"api/core.md": {
+	id: "api/core.md";
+  slug: "api/core";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"api/core2.md": {
+	id: "api/core2.md";
+  slug: "api/core2";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"documentation.mdx": {
+	id: "documentation.mdx";
+  slug: "documentation";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"guides/custom_indicator.mdx": {
+	id: "guides/custom_indicator.mdx";
+  slug: "guides/custom_indicator";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"guides/howto.md": {
+	id: "guides/howto.md";
+  slug: "guides/howto";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/test.md": {
+	id: "guides/test.md";
+  slug: "guides/test";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"index.mdx": {
+	id: "index.mdx";
+  slug: "index";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"reference/01_getting_started.md": {
+	id: "reference/01_getting_started.md";
+  slug: "reference/01_getting_started";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/02_configuration.md": {
+	id: "reference/02_configuration.md";
+  slug: "reference/02_configuration";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/api-examples.md": {
+	id: "reference/api-examples.md";
+  slug: "reference/api-examples";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/architecture.md": {
+	id: "reference/architecture.md";
+  slug: "reference/architecture";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/canvas_methods.md": {
+	id: "reference/canvas_methods.md";
+  slug: "reference/canvas_methods";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/events.md": {
+	id: "reference/events.md";
+  slug: "reference/events";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/example.md": {
+	id: "reference/example.md";
+  slug: "reference/example";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/index.md": {
+	id: "reference/index.md";
+  slug: "reference";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/indicators.md": {
+	id: "reference/indicators.md";
+  slug: "reference/indicators";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/indicators_default.md": {
+	id: "reference/indicators_default.md";
+  slug: "reference/indicators_default";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/indicators_talib.md": {
+	id: "reference/indicators_talib.md";
+  slug: "reference/indicators_talib";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/overlays.md": {
+	id: "reference/overlays.md";
+  slug: "reference/overlays";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/state.md": {
+	id: "reference/state.md";
+  slug: "reference/state";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/state_machine.md": {
+	id: "reference/state_machine.md";
+  slug: "reference/state_machine";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/streaming-price-data.md": {
+	id: "reference/streaming-price-data.md";
+  slug: "reference/streaming-price-data";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/themes.md": {
+	id: "reference/themes.md";
+  slug: "reference/themes";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 };
 
 	};
@@ -209,5 +377,5 @@ declare module 'astro:content' {
 
 	type AnyEntryMap = ContentEntryMap & DataEntryMap;
 
-	type ContentConfig = never;
+	type ContentConfig = typeof import("../src/content/config");
 }

@@ -23,13 +23,13 @@ export default class DMI extends Indicator {
     },
   }
   #defaultStyle = {
-    highStrokeStyle: "#0088cc",
+    highStroke: "#0088cc",
     highLineWidth: '1',
     highLineDash: undefined,
-    lowStrokeStyle: "#0088cc",
+    lowStroke: "#0088cc",
     lowLineWidth: '1',
     lowLineDash: undefined,
-    closeStrokeStyle: "#0088cc",
+    closeStroke: "#0088cc",
     closeLineWidth: '1',
     closeLineDash: undefined,
   }
@@ -37,18 +37,18 @@ export default class DMI extends Indicator {
   style = {}
 
   static inCnt = 0
-  static onChart = false
+  static primaryPane = false
   static scale = YAXIS_TYPES[0] // defualt
 
 
   /**
    * Creates an instance of DMI.
-   * @param {object} target - canvas scene
-   * @param {object} xAxis - timeline axis instance
-   * @param {object} yAxis - scale axis instance
-   * @param {object} config - theme / styling
-   * @param {object} parent - (on/off)chart pane instance that hosts the indicator
-   * @param {object} params - contains minimum of overlay instance
+   * @param {Object} target - canvas scene
+   * @param {Object} xAxis - timeline axis instance
+   * @param {Object} yAxis - scale axis instance
+   * @param {Object} config - theme / styling
+   * @param {Object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {Object} params - contains minimum of overlay instance
    * @memberof DMI
    */
   constructor(target, xAxis=false, yAxis=false, config, parent, params) {
@@ -72,15 +72,15 @@ export default class DMI extends Indicator {
    * valid returned values can be: true, false (boolean), both (string)
    * @readonly
    */
-  get onChart() { return DMI.onChart }
+  get primaryPane() { return DMI.primaryPane }
   get defaultStyle() { return this.#defaultStyle }
 
 
   /**
    * return inputs required to display indicator legend on chart pane
    * legends can display multiple values
-   * @param {array} [pos=this.chart.cursorPos] - optional
-   * @return {object} - {inputs, colours, labels}
+   * @param {Array} [pos=this.chart.cursorPos] - optional
+   * @returns {Object} - {inputs, colours, labels}
    */
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
@@ -90,16 +90,16 @@ export default class DMI extends Indicator {
     let inputs = {x: this.scale.nicePrice(this.overlay.data[c][1])}
 
     /**
-      @param {object} inputs - property names are used as labels
-      @param {array} colours - array of #rrggbb(aa) values
-      @param {array} labels - array of which input labels to dispaly [true, false, ...]
+      @param {Object} inputs - property names are used as labels
+      @param {Array} colours - array of #rrggbb(aa) values
+      @param {Array} labels - array of which input labels to dispaly [true, false, ...]
     */
     return {inputs, colours, labels}
   }
 
   /**
    * process new candle stream value
-   * @param {array} candle - [timestamp, open, high, low, close, volume]
+   * @param {Array} candle - [timestamp, open, high, low, close, volume]
    * @memberof DMI
    */
   updateValue(candle) {
@@ -159,7 +159,7 @@ export default class DMI extends Indicator {
   
   /**
    * draw the indicator
-   * @param {object} range - current displayed range of candles
+   * @param {Object} range - current displayed range of candles
    */
   draw(range=this.range) {
     // minimum of two candles are required for this indicator

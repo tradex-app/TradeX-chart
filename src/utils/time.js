@@ -242,7 +242,7 @@ export const timestampDiff = {
  *
  * @param {timestamp} date1 - milliseconds
  * @param {timestamp} date2 - milliseconds
- * @return {object}  
+ * @returns {Object}  
  */
 export function timestampDifference(date1,date2) {
   let years = timestampDiff.inYears(date1,date2)
@@ -293,7 +293,7 @@ export function isTimeFrame(tf) {
  * convert interval (timeframe) string to milliseconds
  * @export
  * @param {string} tf
- * @return {number}
+ * @returns {number}
  */
 export function interval2MS(tf) {
   if (!isString(tf)) return false
@@ -311,7 +311,7 @@ export function interval2MS(tf) {
  *
  * @export
  * @param {number} milliseconds
- * @return {object}  
+ * @returns {Object}  
  */
 export function ms2TimeUnits( milliseconds ) {
   // let years, months, _weeks, weeks, days, hours, minutes, seconds;
@@ -389,7 +389,7 @@ export function hour_start(t) {
  * day number of the month
  *
  * @param {timestamp} t - timestamp ms
- * @return {number} - day number of the month
+ * @returns {number} - day number of the month
  */
  export function get_day(t) {
   return t ? new Date(t).getUTCDate() : null
@@ -403,7 +403,7 @@ export function get_dayName(t, locale="en-GB", len="short") {
  * Start of the day (zero millisecond)
  *
  * @param {timestamp} t - timestamp ms
- * @return {timestamp} - timestamp ms
+ * @returns {timestamp} - timestamp ms
  */
  export function day_start(t) {
   return new Date(t).setUTCHours(0,0,0,0)
@@ -413,7 +413,7 @@ export function get_dayName(t, locale="en-GB", len="short") {
  * month number of the year
  *
  * @param {timestamp} t - timestamp ms
- * @return {number} - month number of the year
+ * @returns {number} - month number of the year
  */
  export function get_month(t) {
   if (!t) return undefined
@@ -428,7 +428,7 @@ export function get_monthName(t, locale="en-GB", len="short") {
  * Start of the month (zero millisecond)
  *
  * @param {timestamp} t - timestamp ms
- * @return {timestamp} - timestamp ms
+ * @returns {timestamp} - timestamp ms
  */
  export function month_start(t) {
   let date = new Date(t)
@@ -448,7 +448,7 @@ export function nextMonth(t) {
  * the year
  *
  * @param {timestamp} t - timestamp ms
- * @return {number} - the year
+ * @returns {number} - the year
  */
  export function get_year(t) {
   if (!t) return undefined
@@ -459,7 +459,7 @@ export function nextMonth(t) {
  * Start of the year (zero millisecond)
  *
  * @param {timestamp} t - timestamp ms
- * @return {timestamp} - timestamp ms
+ * @returns {timestamp} - timestamp ms
  */
  export function year_start(t) {
   return Date.UTC(new Date(t).getUTCFullYear())
@@ -568,8 +568,8 @@ export function MS (t) {
  * Nearest value by time (in timeseries)
  * @export
  * @param {number} t - timestamp
- * @param {array} ts - [[ts,x,y,z...], ....]
- * @return {array} - [index, val]
+ * @param {Array} ts - [[ts,x,y,z...], ....]
+ * @returns {Array} - [index, val]
  */
 export function nearestTs(t, ts) {
     let dist = Infinity

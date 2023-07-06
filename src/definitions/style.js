@@ -228,10 +228,10 @@ export const defaultTheme = {
     TextColour: GlobalStyle.COLOUR_TXT,
     GridColour: GridStyle.COLOUR_GRID,
   },
-  onChart: {
+  primaryPane: {
 
   },
-  offChart: {
+  secondaryPane: {
     separator: "#666"
   },
   legend: {

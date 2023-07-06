@@ -6,18 +6,18 @@ import { isValidTimeInRange } from '../utils/time'
 /**
  * Validate price a sample of history data
  * @export
- * @param {array} data
+ * @param {Array} data
  * @param {boolean} isCrypto - check against BTC genesis date
- * @return {boolean}  
+ * @returns {boolean}  
  */
 export function validateShallow(data, isCrypto=false) {
 
   if (!isArray(data)) return false
 
   let rnd = getRandomIntBetween(0, data.length)
-  if (!isValidCandle(data[0], isCrypto)) return false
-  if (!isValidCandle(data[rnd], isCrypto)) return false
-  if (!isValidCandle(data[data.length - 1], isCrypto)) return false
+  if (!isCandleValid(data[0], isCrypto)) return false
+  if (!isCandleValid(data[rnd], isCrypto)) return false
+  if (!isCandleValid(data[data.length - 1], isCrypto)) return false
 
   // is ascending order?
   let t1 = data[0][0]
@@ -32,9 +32,9 @@ export function validateShallow(data, isCrypto=false) {
 /**
  * Validate entire price history data
  * @export
- * @param {array} data
+ * @param {Array} data
  * @param {boolean} isCrypto - check against BTC genesis date
- * @return {boolean}  
+ * @returns {boolean}  
  */
 export function validateDeep(data, isCrypto=false) {
   if (!isArray(data)) return false
@@ -43,7 +43,7 @@ export function validateDeep(data, isCrypto=false) {
   let prev = 0
   while (i < data.length) {
 
-    if (!isValidCandle(data[i], isCrypto)) return false
+    if (!isCandleValid(data[i], isCrypto)) return false
 
     // is ascending order?
     if (data[i][0] < prev) return false
@@ -61,9 +61,9 @@ export function validateDeep(data, isCrypto=false) {
  * @export
  * @param {Array} c - [ timestamp(ms), open, high, low, close, volume ]
  * @param {Boolean} isCrypto - are we working with crypto? Validate against BTC genesis
- * @return {Boolean}  
+ * @returns {Boolean}  
  */
-export function isValidCandle(c, isCrypto=false) {
+export function isCandleValid(c, isCrypto=false) {
   if (!isArray(c)) return false
   if (c.length !== 6) return false
   // timestamp (ms)
@@ -83,4 +83,19 @@ export function isValidCandle(c, isCrypto=false) {
   ) return false
   // is valid!
   return true
+}
+
+/**
+ * sanitize data, must be an array of numbers
+ * entries must be: [ts,o,h,l,c,v]
+ * @param {Array} c 
+ */
+export function sanitizeCandles(c) {
+  for (let i of c) {
+    for (let j=0; j<6; j++) {
+      i.length = 6
+      i[j] *= 1
+    }
+  }
+  return c
 }

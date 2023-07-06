@@ -1,0 +1,16 @@
+/* src/styles/custom.css */
+:root {
+  --sl-content-width:100%;
+  /* --sl-content-margin-inline: 0; */
+}
+
+[data-has-sidebar] .main-pane:where(.astro-VRNAM7M3) {
+  --sl-content-margin-inline: 0 0;
+  /* order:1; */
+  /* width:calc(var(--sl-content-width) + (100% - var(--sl-content-width) - var(--sl-sidebar-width)) / 2)  */
+  width:calc(var(--sl-content-width) + (100% - var(--sl-content-width) - var(--sl-sidebar-width)) ) 
+ }
+
+.hero {
+  padding-block: clamp(2.5rem,calc(1rem + 5vmin),5rem);
+}

@@ -26,8 +26,8 @@ export default class StateMachine {
 
   /**
    * Instantiate state machine
-   * @param {object} config - state definition
-   * @param {object} core - module mediate provides event handling
+   * @param {Object} config - state definition
+   * @param {Object} core - module mediate provides event handling
    */
   constructor(config, context) {
     if (!StateMachine.validateConfig(config)) return false
@@ -165,7 +165,7 @@ export default class StateMachine {
 
   /**
    * @static
-   * @param {object} c - state definition
+   * @param {Object} c - state definition
    * @returns {boolean} - valid true or false
    */
   static validateConfig(c) {

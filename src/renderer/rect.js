@@ -5,12 +5,12 @@ import { CanvasStyle } from "../definitions/style";
 
 /**
  * Rounded rectangle
- * @param {object} ctx - canvas reference
+ * @param {Object} ctx - canvas reference
  * @param {number} x - canvas pixel position
  * @param {number} y - canvas pixel position
  * @param {number} w - width pixel distance
  * @param {number} h - height pixel distance
- * @param {object} opts - {border, size}
+ * @param {Object} opts - {border, size}
  */
 export function renderRectStroke (ctx, x, y, w, h, opts) {
   ctx.lineWidth = opts?.size || CanvasStyle.borderSize
@@ -22,7 +22,7 @@ export function renderRectStroke (ctx, x, y, w, h, opts) {
 
 /**
  * Filled rectangle
- * @param {object} ctx - canvas reference
+ * @param {Object} ctx - canvas reference
  * @param {number} x - canvas pixel position
  * @param {number} y - canvas pixel position
  * @param {number} w - width pixel distance
@@ -36,12 +36,12 @@ export function renderRectFill (ctx, x, y, w, h, opts) {
 
 /**
  * Stroked and Filled rectangle
- * @param {object} ctx - canvas reference
+ * @param {Object} ctx - canvas reference
  * @param {number} x - canvas pixel position
  * @param {number} y - canvas pixel position
  * @param {number} w - width pixel distance
  * @param {number} h - height pixel distance
- * @param {object} opts - {fill, size, border}
+ * @param {Object} opts - {fill, size, border}
  */
 export function renderRect (ctx, x, y, w, h, opts) {
   if (isString(opts.fill)) 
@@ -52,13 +52,13 @@ export function renderRect (ctx, x, y, w, h, opts) {
 
 /**
  * Rounded rectangle
- * @param {object} ctx - canvas reference
+ * @param {Object} ctx - canvas reference
  * @param {number} x - canvas pixel position
  * @param {number} y - canvas pixel position
  * @param {number} w - width pixel distance
  * @param {number} h - height pixel distance
  * @param {number} r - radius pixel distance
- * @param {object} opts - {border, size}
+ * @param {Object} opts - {border, size}
  */
 export function renderRectRoundStroke (
   ctx, x, y, w, h, r, opts
@@ -71,13 +71,13 @@ export function renderRectRoundStroke (
 
 /**
  * Rounded filled rectangle
- * @param {object} ctx - canvas reference
+ * @param {Object} ctx - canvas reference
  * @param {number} x - canvas pixel position
  * @param {number} y - canvas pixel position
  * @param {number} w - width pixel distance
  * @param {number} h - height pixel distance
  * @param {number} r - radius pixel distance
- * @param {object} opts - CSS colour format
+ * @param {Object} opts - CSS colour format
  */
 export function renderRectRoundFill (ctx, x, y, w, h, r, opts) {
   ctx.fillStyle = opts?.fill || CanvasStyle.fill
@@ -87,7 +87,7 @@ export function renderRectRoundFill (ctx, x, y, w, h, r, opts) {
 
 /**
  * Rounded rectangle
- * @param {object} ctx - canvas reference
+ * @param {Object} ctx - canvas reference
  * @param {number} x - canvas pixel position
  * @param {number} y - canvas pixel position
  * @param {number} w - width pixel distance
@@ -106,13 +106,13 @@ export function renderRectRoundPath (ctx, x, y, w, h, r) {
 
 /**
  * Rounded filled rectangle with border
- * @param {object} ctx - canvas reference
+ * @param {Object} ctx - canvas reference
  * @param {number} x - canvas pixel position
  * @param {number} y - canvas pixel position
  * @param {number} w - width pixel distance
  * @param {number} h - height pixel distance
  * @param {number} r - radius pixel distance
- * @param {object} opts - {fill, border, size}
+ * @param {Object} opts - {fill, border, size}
  */
 export function renderRectRound (
   ctx, x, y, w, h, r, opts

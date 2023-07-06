@@ -213,7 +213,7 @@ export default class ToolsBar {
    * add tool to chart row from data state
    * or add as new tool from toolbar
    * @param {class} tool 
-   * @param {object} target
+   * @param {Object} target
    */
   addTool(tool=this.#activeTool, target=this.#toolTarget) {
     let config = {

@@ -6,8 +6,8 @@ import tradeXLegends from "./legends"
 
 
 const template = document.createElement('template')
-// position: relative ??? offChart no
-// .viewport canvas ??? offChart no
+// position: relative ??? secondaryPane no
+// .viewport canvas ??? secondaryPane no
 template.innerHTML = `
 <style>
   :host {

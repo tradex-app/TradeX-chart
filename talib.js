@@ -3,6 +3,10 @@ import data from './data/1minute.js'
 
 const wasm = "./node_modules/talib-web/lib/talib.wasm"
 
+/**
+ * main
+ * @async
+ */
 async function main() {
   try {
     await talib.init(wasm);

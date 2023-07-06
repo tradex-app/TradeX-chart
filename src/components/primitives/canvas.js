@@ -541,7 +541,7 @@ class Hit {
   /**
    * converts integer value to rgb array
    * @param {number} number - positive number between 0 and 256*256*256 = 16,777,216
-   * @returns {Array}
+   * @returns {array}
    */
   intToRGB(number) {
     let r = (number & 0xff0000) >> 16;

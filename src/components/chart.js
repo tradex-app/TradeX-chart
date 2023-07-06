@@ -1,6 +1,6 @@
 // chart.js
 // Chart - where most of the magic happens
-// base class provides onChart and offChart
+// base class provides primaryPane and secondaryPane
 // Providing: the playground for price movements, indicators and drawing tools
 
 
@@ -12,14 +12,14 @@ import CEL from "./primitives/canvas";
 import Legends from "./primitives/legend"
 import Graph from "./views/classes/graph"
 import StateMachine from "../scaleX/stateMachne";
-import stateMachineConfig from "../state/state-onChart"
+import stateMachineConfig from "../state/state-chartPane"
 import Input from "../input"
 import ScaleBar from "./scale"
 import chartGrid from "./overlays/chart-grid"
 import chartCursor from "./overlays/chart-cursor"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
-import chartStreamCandle from "./overlays/chart-streamCandle"
+import chartCandleStream from "./overlays/chart-candleStream"
 import chartTrades from "./overlays/chart-trades"
 import watermark from "./overlays/chart-watermark"
 import {
@@ -35,24 +35,24 @@ import { BUFFERSIZE, YAXIS_TYPES } from "../definitions/chart";
 import { VolumeStyle } from "../definitions/style"
 
 const defaultOverlays = {
-  onChart: [
+  primaryPane: [
     ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
     ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
     ["candles", {class: chartCandles, fixed: false, required: true}],
-    ["stream", {class: chartStreamCandle, fixed: false, required: true}],
+    ["stream", {class: chartCandleStream, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ],
-  offChart: [
+  secondaryPane: [
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ]
 }
 const optionalOverlays = {
-  onChart: {
+  primaryPane: {
     "trades": {class: chartTrades, fixed: false, required: false}
   },
-  offChart: {
+  secondaryPane: {
     "candles": {class: chartCandles, fixed: false, required: true},
   }
 }
@@ -64,7 +64,7 @@ const chartLegend = {
   source: () => {}
 }
 
-const chartTypes = [ "onchart", "offchart" ]
+const chartTypes = [ "primary", "secondary" ]
 
 export default class Chart {
 
@@ -108,7 +108,7 @@ export default class Chart {
 
   #yAxisType
 
-  // localRange required by offChart scale
+  // localRange required by secondaryPane scale
   #localRange = {
     valueMax: 100,
     valueMin: 0,
@@ -127,7 +127,7 @@ export default class Chart {
     this.#name = this.#options.name
     this.#shortName = this.#options.shortName
     this.#title = this.#options.title
-    this.#type = (this.#options.type == "onchart") ? "onChart" : "offChart"
+    this.#type = (this.#options.type == "primary") ? "primaryPane" : "secondaryPane"
     this.#view = this.#options.view
     this.#elScale = this.#options.elements.elScale;
     this.#parent = this.#options.parent;
@@ -137,7 +137,7 @@ export default class Chart {
     // set up legends
     this.legend = new Legends(this.elLegend, this)
 
-    if (this.isOnChart) {
+    if (this.isPrimary) {
       chartLegend.type = "chart"
       chartLegend.title = this.title
       chartLegend.parent = this
@@ -146,7 +146,7 @@ export default class Chart {
       this.yAxisType = "default"
     }
     else {
-      chartLegend.type = "offchart"
+      chartLegend.type = "secondary"
       chartLegend.title = ""
       chartLegend.parent = this
       chartLegend.source = () => { return {inputs:{}, colours:[], labels: []} }
@@ -180,7 +180,7 @@ export default class Chart {
   get core() { return this.#core }
   get type() { return this.#type }
   get status() { return this.#status }
-  get isOnChart() { return this.#type === "onChart" }
+  get isPrimary() { return this.#type === "primaryPane" }
   get isPrimary() { return this.#options.view.primary || false }
   get options() { return this.#options }
   get element() { return this.#elTarget }
@@ -300,7 +300,7 @@ export default class Chart {
     this.off(STREAM_FIRSTVALUE, this.onStreamNewValue)
     this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this)
 
-    if (this.isOnChart)
+    if (this.isPrimary)
       this.off("chart_yAxisRedraw", this.onYAxisRedraw)
 
     // TODO: remove state entry
@@ -332,7 +332,7 @@ export default class Chart {
     this.on(STREAM_FIRSTVALUE, this.onStreamNewValue, this)
     this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this)
 
-    if (this.isOnChart) 
+    if (this.isPrimary) 
       this.on("chart_yAxisRedraw", this.onYAxisRedraw, this)
   }
 
@@ -368,6 +368,7 @@ export default class Chart {
     this.cursor = "grab"
     this.core.MainPane.onChartDrag(e)
     this.scale.onChartDrag(e)
+    // console.log(e)
   }
 
   onChartDragDone(e) {
@@ -421,7 +422,7 @@ export default class Chart {
   }
 
   onStreamUpdate(candle) {
-    if (this.isOnChart) {
+    if (this.isPrimary) {
       this.#streamCandle = candle
       this.chartStreamCandle.draw()
       this.layerStream.setPosition(this.core.stream.lastScrollPos, 0)
@@ -433,10 +434,10 @@ export default class Chart {
 
   /**
    * refresh the scale (yAxis) on Stream Update
-   * @memberof OnChart
+   * @memberof Primary
    */
   onYAxisRedraw() {
-    if (this.isOnChart) this.refresh()
+    if (this.isPrimary) this.refresh()
   }
 
   onDeleteIndicator(i) {
@@ -458,7 +459,7 @@ export default class Chart {
 
   /**
    * Set chart dimensions
-   * @param {object} dim - dimensions {w:width, h: height}
+   * @param {Object} dim - dimensions {w:width, h: height}
    */
   setDimensions(dim) {
     const buffer = this.config.buffer || BUFFERSIZE
@@ -483,7 +484,7 @@ export default class Chart {
     if (
       !isString(t) ||
       !YAXIS_TYPES.includes(t)  ||
-      (this.type == "onChart" && t == "percent")
+      (this.type == "primaryPane" && t == "percent")
     ) return false
     this.#yAxisType = t
   }
@@ -491,9 +492,9 @@ export default class Chart {
   /**
    * Add non-default overlays (indicators)
    *
-   * @param {array} overlays - list of overlays
+   * @param {Array} overlays - list of overlays
    * @returns {boolean} 
-   * @memberof OnChart
+   * @memberof Primary
    */
   addOverlays(overlays) {
     if (!isArray(overlays) || overlays.length < 1) return false
@@ -533,15 +534,15 @@ export default class Chart {
 
   /**
    * add an indicator
-   * @param {object} i - {type, name, ...params}
+   * @param {Object} i - {type, name, ...params}
    */
   addIndicator(i) {
-    const onChart = this.type === "onChart"
+    const primaryPane = this.type === "primaryPane"
     const indClass = this.core.indicatorClasses[i.type].ind
-    const indType = (indClass.constructor.type === "both") ? onChart : indClass.prototype.onChart
+    const indType = (indClass.constructor.type === "both") ? primaryPane : indClass.prototype.primaryPane
     if (
         i?.type in this.core.indicatorClasses &&
-        onChart === indType
+        primaryPane === indType
       ) {
       i.paneID = this.id
       const config = {
@@ -609,7 +610,7 @@ export default class Chart {
     // for (let i = 0; i < this.#layersTools.length; i++) {
     // tools[i] =
     // new indicator(
-    //   this.#layersOnChart[i],
+    //   this.#layersPrimary[i],
     //   this.#Time,
     //   this.#Scale,
     //   this.config)
@@ -634,18 +635,18 @@ export default class Chart {
   }
 
   /**
-   * Refresh offChart - overlays, grid, scale, indicators
+   * Refresh secondaryPane - overlays, grid, scale, indicators
    * @memberof Chart
    */
   refresh() {
     this.scale.draw()
-    this.draw(undefined, this.isOnChart)
+    this.draw(undefined, this.isPrimary)
   }
 
   /**
    * Update chart and indicator legends
-   * @param {array} pos - cursor position x, y, defaults to current cursor position
-   * @param {array} candle - OHLCV
+   * @param {Array} pos - cursor position x, y, defaults to current cursor position
+   * @param {Array} candle - OHLCV
    */
   updateLegends(pos = this.#cursorPos, candle = false) {
     if (this.#core.isEmpty || !isObject(this.#Legends)) return
@@ -657,7 +658,7 @@ export default class Chart {
 
   /**
    * 
-   * @param {array} pos - cursor pos [x, y]
+   * @param {Array} pos - cursor pos [x, y]
    * @returns {object} - legend data 
    */
   legendInputs(pos=this.cursorPos) {
@@ -685,7 +686,7 @@ export default class Chart {
   /**
    * execute legend action for this chart pane
    * (not indicators)
-   * @param {object} e - event
+   * @param {Object} e - event
    * @memberof Chart
    */
   onLegendAction(e) {
@@ -762,7 +763,7 @@ export default class Chart {
     let overlays = copyDeep(this.overlaysDefault)
     this.graph = new Graph(this, this.elViewport, overlays, false)
 
-    if (this.isOnChart) {
+    if (this.isPrimary) {
       this.layerStream = this.graph.overlays.get("stream")?.layer
       this.chartStreamCandle = this.graph.overlays.get("stream")?.instance
     }

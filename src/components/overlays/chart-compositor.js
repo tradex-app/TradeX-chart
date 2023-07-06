@@ -33,7 +33,7 @@ export default class chartCompositor extends Overlay{
     );
 
     y = chart.height
-    for (let oc of this.core.MainPane.offCharts.values()) {
+    for (let oc of this.core.MainPane.secondaryPanes.values()) {
       x = 0
       h = oc.graph.viewport.scene.height
       this.scene.context.drawImage(

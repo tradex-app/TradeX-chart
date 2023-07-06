@@ -4,6 +4,9 @@
 // import { Indicator } from "tradex-chart"
 import { Indicator, Range, uid } from "./src"
 
+/**
+ * custom indicator class
+ */
 export default class Test extends Indicator {
 
   name = "Test Custom Inicator"
@@ -20,7 +23,7 @@ export default class Test extends Indicator {
   style = {}
 
   static inCnt = 0
-  static onChart = true
+  static primaryPane = true
   // static scale is required for off chart indicators
   // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
   static colours = []
@@ -28,12 +31,12 @@ export default class Test extends Indicator {
 
   /**
    * Creates an instance of Test.
-   * @param {object} target - canvas scene
-   * @param {object} xAxis - timeline axis instance
-   * @param {object} yAxis - scale axis instance
-   * @param {object} config - theme / styling
-   * @param {object} parent - (on/off)chart pane instance that hosts the indicator
-   * @param {object} params - contains minimum of overlay instance
+   * @param {Object} target - canvas scene
+   * @param {Object} xAxis - timeline axis instance
+   * @param {Object} yAxis - scale axis instance
+   * @param {Object} config - theme / styling
+   * @param {Object} parent - chart pane instance (primary|secondary) that hosts the indicator
+   * @param {Object} params - contains minimum of overlay instance
    * @memberof Test
    */
   constructor(target, xAxis=false, yAxis=false, config, parent, params) {
@@ -49,27 +52,25 @@ export default class Test extends Indicator {
     // calculate back history if missing
     this.calcIndicatorHistory()
     // enable processing of price stream
-    this.setUpdateValue = (value) => { 
-      this.updateValue(value) 
-    }
+    this.setUpdateValue = (value) => { this.updateValue(value) }
     // add the indicator legend to the chart pane
     this.addLegend()
   }
 
   /**
    * define where indicator should be displayed
-   * valid returned values can be: true, false (boolean), both (string)
-   * @readonly
+   * @returns {boolean|string} valid returned values can be: true, false (boolean), both (string)
    */
-  get onChart() { return Test.onChart }
+  get primaryPane() { return Test.primaryPane }
+  /** @returns {Object} */
   get defaultStyle() { return this.#defaultStyle }
 
 
   /**
    * return inputs required to display indicator legend on chart pane
    * legends can display multiple values
-   * @param {array} [pos=this.chart.cursorPos] - optional
-   * @return {object} - {inputs, colours, labels}
+   * @param {Array} [pos=this.chart.cursorPos] - optional
+   * @returns {Object} - {inputs, colours, labels}
    */
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
@@ -82,22 +83,27 @@ export default class Test extends Indicator {
     let inputs = {x: this.scale.nicePrice(this.overlay.data[c][1])}
 
     /**
-      @param {object} inputs - property names are used as labels
-      @param {array} colours - array of #rrggbb(aa) values
-      @param {array} labels - array of which input labels to dispaly [true, false, ...]
+      @param {Object} inputs - property names are used as labels {label: string}
+      @param {Array.<string>} colours - array of #rrggbb(aa) values
+      @param {Array.<string>} labels - array of which input labels to dispaly [true, false, ...]
     */
     return {inputs, colours, labels}
   }
 
   /**
    * process new candle stream value
-   * @param {array} candle - [timestamp, open, high, low, close, volume]
+   * @param {Array.<number>} candle - [timestamp, open, high, low, close, volume]
    * @memberof Test
    */
   updateValue(candle) {
     this.value = candle
   }
 
+  /**
+   * calculate indicator values
+   * @param {Object} range - instance of Range
+   * @returns {boolean|array}
+   */
   calcIndicator(range=this.range) {
     let start, end;
     // number of values to use in indicator calculation
@@ -145,7 +151,7 @@ export default class Test extends Indicator {
   
   /**
    * draw the indicator
-   * @param {object} range - current displayed range of candles
+   * @param {Object} range - current displayed range of candles
    */
   draw(range=this.range) {
     // minimum of two candles are required for this indicator

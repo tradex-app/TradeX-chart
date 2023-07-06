@@ -98,7 +98,7 @@ export default class Colour {
 
   /**
    * Set hex value
-   * @param {array} hex 
+   * @param {Array} hex 
    */
   setHex(hex) {
     let val = this.#value;
@@ -112,7 +112,7 @@ export default class Colour {
   }
 
   /**
-   * @param {array} rgba 
+   * @param {Array} rgba 
    */
   setRGBA(rgba) {
     let val = this.#value;
@@ -127,7 +127,7 @@ export default class Colour {
   }
 
   /**
-   * @param {array} hsla 
+   * @param {Array} hsla 
    */
   setHSLA(hsla) {
     let val = this.#value;

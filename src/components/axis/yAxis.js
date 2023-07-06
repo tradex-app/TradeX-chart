@@ -126,8 +126,8 @@ export default class yAxis extends Axis {
   /**
    * return canvas y co-ordinate
    * handles Y Axis modes: default, log, percentate
-   * @param {number} y - chart price or offchart indicator y data
-   * @return {number}  
+   * @param {number} y - chart price or secondary indicator y data
+   * @returns {number}  
    * @memberof yAxis
    */
   yPos(y) {
@@ -142,7 +142,7 @@ export default class yAxis extends Axis {
    * return chart price
    * handles Y Axis modes: default, log, percentage
    * @param {number} y
-   * @return {number}
+   * @returns {number}
    * @memberof yAxis
    */
   yPos2Price(y) {
@@ -152,7 +152,7 @@ export default class yAxis extends Axis {
   /**
    * convert price (YAxis value) to y pixel position relative top left (0,0)
    * @param {number} y - price
-   * @return {number} - y pixel position
+   * @returns {number} - y pixel position
    * @memberof yAxis
    */
   $2Pixel(y) {
@@ -164,7 +164,7 @@ export default class yAxis extends Axis {
   /**
    * convert last stream value to y pixel position relative top left (0,0)
    * @param {number} y - last stream value 
-   * @return {number} - y pixel position
+   * @returns {number} - y pixel position
    * @memberof yAxis
    */
   lastYData2Pixel(y) {
@@ -176,7 +176,7 @@ export default class yAxis extends Axis {
   /**
    * convert pixel position to price (YAxis value)
    * @param {number} y - pixel position relative top left (0,0)
-   * @return {number} - price (YAxis value)
+   * @returns {number} - price (YAxis value)
    * @memberof yAxis
    */
   pixel2$(y) {
@@ -188,7 +188,7 @@ export default class yAxis extends Axis {
   /**
    * convert percentage scale to y pixel position relative top left (0,0)
    * @param {number} y - percentage
-   * @return {number} - y pixel position
+   * @returns {number} - y pixel position
    * @memberof yAxis
    */
   p100toPixel(y) {
@@ -203,7 +203,7 @@ export default class yAxis extends Axis {
   /**
    * set YAxis mode - automatic or manual positioning and scaling
    * @param {string} m - "automatic" or "manual"
-   * @return {boolean} - success or failure
+   * @returns {boolean} - success or failure
    * @memberof yAxis
    */
   setMode(m) {

@@ -112,7 +112,7 @@ export default class Stream {
   /**
    * process price tick
    *
-   * @param {object} data - t: timestamp, p: price, q: quantity
+   * @param {Object} data - t: timestamp, p: price, q: quantity
    * @memberof Stream
    */
   set candle(data) {
@@ -141,10 +141,6 @@ export default class Stream {
   }
 
   start() {
-    // add empty value to range end
-    // this.#core.chartData.push([0,0,0,0,0,0])
-    // iterate over indicators add empty value to end
-
     this.#alerts = new Alerts(this.#config.alerts)
     this.status = {status: STREAM_STARTED}
     this.#updateTimer = setInterval(this.onUpdate.bind(this), this.#maxUpdate)
@@ -167,7 +163,6 @@ export default class Stream {
     if (this.#status == STREAM_STARTED || this.#status == STREAM_LISTENING) {
       if (isObject(tick)) {
         this.candle = tick
-        this.#core.setNotEmpty()
       }
     }
   }
@@ -182,8 +177,7 @@ export default class Stream {
 
   /**
    * add new candle to state data
-   *
-   * @param {object} data - t: timestamp, p: price, q: quantity
+   * @param {Object} data - t: timestamp, p: price, q: quantity
    * @memberof Stream
    */
   newCandle(data) {
@@ -197,7 +191,7 @@ export default class Stream {
       data.c, 
       data.v, 
       null, true]
-    this.#core.mergeData({data: [this.#candle]}, true, false)
+    this.#core.state.mergeData({data: [this.#candle]}, true, false)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
     this.#countDownMS = this.#time.timeFrameMS
     this.#countDownStart = this.roundTime(Date.now())
@@ -212,7 +206,7 @@ export default class Stream {
   /**
    * update existing candle with current tick
    *
-   * @param {object} data - t: timestamp, p: price, q: quantity
+   * @param {Object} data - t: timestamp, p: price, q: quantity
    * @memberof Stream
    */
   updateCandle(data) {
@@ -233,8 +227,6 @@ export default class Stream {
 
     this.countDownUpdate()
   }
-
-  parseCandle
 
   countDownUpdate() {
     let y,M,w,d,h,m,s,u;

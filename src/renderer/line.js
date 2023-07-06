@@ -4,11 +4,11 @@ import { renderPath } from './path'
 
 /**
  * Draw a horizontal straight line
- * @param {object} ctx - canvas reference
+ * @param {Object} ctx - canvas reference
  * @param {number} y - canvas pixel position
  * @param {number} left - canvas pixel position
  * @param {number} right - canvas pixel position
- * @param {object} opts 
+ * @param {Object} opts 
  */
 export function renderLineHorizontal (ctx, y, left, right, opts) {
   const coords = [{x:left, y:y}, {x:right, y:y}]
@@ -20,11 +20,11 @@ export function renderLineHorizontal (ctx, y, left, right, opts) {
 
 /**
  * Draw a vertical straight line
- * @param {object} ctx - canvas reference
+ * @param {Object} ctx - canvas reference
  * @param {number} x - canvas pixel position
  * @param {number} top - canvas pixel position
  * @param {number} bottom - canvas pixel position
- * @param {object} opts 
+ * @param {Object} opts 
  */
 export function renderLineVertical (ctx, x, top, bottom, opts) {
   coords = [{x:x, y:top}, {x:x, y,bottom}]
@@ -36,9 +36,9 @@ export function renderLineVertical (ctx, x, top, bottom, opts) {
 
 /**
  * Render line - open path
- * @param {object} ctx - canvas reference
- * @param {array} coords - array of x y coords [{x:x, y:y}, ...]
- * @param {object} opts 
+ * @param {Object} ctx - canvas reference
+ * @param {Array} coords - array of x y coords [{x:x, y:y}, ...]
+ * @param {Object} opts 
  */
 export function renderLine (ctx, coords, opts) {
   renderPath(ctx, coords, opts, () => {

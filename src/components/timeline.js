@@ -307,7 +307,7 @@ export default class Timeline {
   /**
    * Add any non-default overlays
    *
-   * @param {array} overlays
+   * @param {Array} overlays
    * @memberof Scale
    */
   addOverlays(overlays) {

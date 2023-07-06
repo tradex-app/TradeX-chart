@@ -59,8 +59,8 @@ export default class tradeXRows extends element {
   }
 
   get grid() { return this.shadowRoot.querySelector('tradex-grid') }
-  get primary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("onchart") ); }
-  get secondary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("offchart") ); }
+  get primary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("primary") ); }
+  get secondary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("secondary") ); }
   get chartPanes() { return this.chartPaneSlot.assignedElements() } 
   get chartPaneSlot() { return this.shadowRoot.querySelector('slot[name="chartpane"]') }
   get width() { return this.clientWidth }

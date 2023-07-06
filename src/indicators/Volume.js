@@ -17,7 +17,7 @@ export default class Volume extends Indicator {
   #name = 'Relative Strength Index'
   #shortName = 'RSI'
   #params
-  #onChart = true
+  #primaryPane = true
   #checkParamCount = false
   #scaleOverlay = true
   #plots = [
@@ -29,18 +29,18 @@ export default class Volume extends Indicator {
   #style = {}
 
   
-  // static onChart = "both"
+  // static primaryPane = "both"
   // static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
 
   /**
    * Creates an instance of Volume.
-   * @param {object} target - canvas scene
-   * @param {object} xAxis - timeline axis instance
-   * @param {object} yAxis - scale axis instance
-   * @param {object} config - theme / styling
-   * @param {object} parent - (on/off)chart pane instance that hosts the indicator
-   * @param {object} params - contains minimum of overlay instance
+   * @param {Object} target - canvas scene
+   * @param {Object} xAxis - timeline axis instance
+   * @param {Object} yAxis - scale axis instance
+   * @param {Object} config - theme / styling
+   * @param {Object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {Object} params - contains minimum of overlay instance
    * @memberof Volume
    */
   // constructor (target, overlay, xAxis, yAxis, config) {
@@ -52,7 +52,7 @@ export default class Volume extends Indicator {
     const overlay = params.overlay
   }
 
-  get onChart() { return "both" }
+  get primaryPane() { return "both" }
   get defaultStyle() { return this.#defaultStyle }
 
 

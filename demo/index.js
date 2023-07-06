@@ -9,6 +9,12 @@ import state2 from './data/data_btc_1m.js'
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
+export const LIMITFUTURE = 200
+export const LIMITPAST = 200
+export const MINCANDLES = 20
+export const MAXCANDLES = 4096
+
+
 let state4 = {
   "ohlcv": [
       [
@@ -36,44 +42,46 @@ let state4 = {
           434.3
       ]
   ],
-onchart: [
+primary: [
   {
     "name": "SMA, 5",
     "type": "SMA",
     "data": [],
-    "settings": {period: 5}
+    "settings": {timePeriod: 5}
   }
 ],
-"offchart": [
+"secondary": [
   {
     "name": "RSI, 20",
     "type": "RSI",
     "data": [],
+    "settings": {timePeriod: 20}
   },
 ]
 }
 
 let state5 = {
   "ohlcv": [],
-  "onchart": [
+  "primary": [
     {
       "name": "EMA, 25",
       "type": "EMA",
       "data": [],
-      "settings": {}
+      "settings": {timePeriod: 25}
   },
   {
       "name": "EMA, 43",
       "type": "EMA",
       "data": [],
-      "settings": {}
+      "settings": {timePeriod: 43}
   },
   ],
-  "offchart": [
+  "secondary": [
     {
       "name": "RSI, 20",
       "type": "RSI",
-      "data": []
+      "data": [],
+      "settings": {timePeriod: 20}
     }
   ]
 }
@@ -89,7 +97,7 @@ let interval = 500
 let streamInit = false
 
 const config1 = {
-  id: "TradeX_test",
+  // id: "TradeX_test",
   title: "BTC/USDT",
   symbol: "btcusdt",
   // width: 600,
@@ -97,8 +105,15 @@ const config1 = {
   utils: {},
   tools: {},
   timeFrame: "1m",
-  rangeStartTS: rangeStartTS,
-  rangeLimit: 30,
+  range: {
+    startTS: rangeStartTS,  // formerly rangeStartTS
+    initialCnt: 30,    // formerly rangeLimit
+    limitFuture: LIMITFUTURE,
+    limitPast: LIMITPAST,
+    minCandles: MINCANDLES,
+    maxCandles: MAXCANDLES,
+    yAxisBounds: 0.3
+  },
   theme: {
     candle: {
       Type: "candle_down_hollow",
@@ -124,7 +139,7 @@ const config1 = {
       GridColour: "#303030",
       TextColour: "#c0c0c0"
     },
-    onChart: {
+    primaryPane: {
 
     },
     tools: {
@@ -137,7 +152,7 @@ const config1 = {
       navigation: false
     },
     legend: {
-       controls: false
+       controls: true
     }
   },
   watermark: {
@@ -152,7 +167,10 @@ const config1 = {
   maxCandleUpdate: 250,
   talib: talib,
   wasm: wasm,
-  state: state1
+  state: state1,
+  callbacks: {
+    indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
+  }
 }
 const config2 = {
   id: "TradeX_test",
@@ -163,8 +181,9 @@ const config2 = {
   utils: {},
   tools: {},
   timeFrame: "1m",
-  rangeStartTS: state2.ohlcv.slice(-15)[0][0], // rangeStartTS,
-  rangeLimit: 30,
+  range: {
+    startTS: state2.ohlcv.slice(-15)[0][0], // rangeStartTS,
+  },
   theme: {
     candle: {
       Type: "candle_solid",
@@ -184,7 +203,7 @@ const config2 = {
       GridColour: "#333",
       TextColour: "#ccc"
     },
-    onChart: {
+    primaryPane: {
 
     },
     utils: {
@@ -211,8 +230,9 @@ const config3 = {
   utils: {},
   tools: {},
   timeFrame: "1m",
-  rangeStartTS: rangeStartTS,
-  rangeLimit: 30,
+  range: {
+    startTs: rangeStartTS,
+  },
   theme: {
     candle: {
       Type: "candle_solid",
@@ -255,10 +275,10 @@ const config3 = {
       GridColour: "#313647",
       TextColour: "#96a9db"
     },
-    onChart: {
+    primaryPane: {
 
     },
-    offChart: {
+    secondaryPane: {
 
     },
     time: {
@@ -296,8 +316,10 @@ const config4 = {
   utils: {},
   tools: {},
   timeFrame: "1s",
-  rangeStartTS: state4.ohlcv.slice(-1)[0][0] - (15000),
-  rangeLimit: 30,
+  range: {
+    startTS: state4.ohlcv.slice(-1)[0][0] - (15000),
+    initialCnt: 40
+  },
   theme: {
     candle: {
       Type: "candle_down_hollow",
@@ -326,7 +348,7 @@ const config4 = {
       GridColour: "#333",
       TextColour: "#ccc"
     },
-    onChart: {
+    primaryPane: {
 
     },
   },
@@ -353,8 +375,9 @@ const config5 = {
   utils: {},
   tools: {},
   timeFrame: "5m",
-  rangeStartTS: rangeStartTS,
-  rangeLimit: 30,
+  range: {
+    startTs: rangeStartTS,
+  },
   theme: {
     candle: {
       Type: "area",
@@ -403,10 +426,10 @@ const config5 = {
       GridColour: "#191e26",
       TextColour: "#6a6f80"
     },
-    onChart: {
+    primaryPane: {
 
     },
-    offChart: {
+    secondaryPane: {
 
     },
     time: {
@@ -468,6 +491,7 @@ function addChart() {
       window["chart"+chart.inCnt] = chart
 
   if (typeof chart?.stream?.start === "function") {
+    // chart is ready and waiting for a websocket stream
     chart.stream.start()
     if (typeof stream === "function") stream(chart)
   }
@@ -597,6 +621,27 @@ function livePrice_Binance(chart, symbol="btcusdt", interval="1m") {
   ws.onmessage = (evt) => onWSMessage.call(this, evt, chart)
 }
 
+let waiting = false
+
+function kline_Binance(chart, symbol="BTCUSDT", start, limit=100, interval="1m") {
+  if (!waiting) {
+    waiting = true
+    try {
+      fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${start}&limit=${limit}`)
+      .then(r => r.json())
+      .then(d => {
+        console.log(d)
+        chart.mergeData({data: d})
+        waiting = false
+      })
+    }
+    catch(e) {
+      console.error(e)
+      waiting = false
+    }
+  }
+}
+
 function onWSMessage (evt, chart) {
   var msg = evt.data;
   var obj = JSON.parse(msg);
@@ -617,6 +662,20 @@ function onWSMessage (evt, chart) {
   }
 };
 
+function onRangeLimit(e, x) {
+  const range = e.chart.range
+  const limit = 100
+  const start = range.timeStart - (range.interval * limit)
+  const end = range.timeEnd
+  const interval = range.intervalStr
+  if (x == "past") {
+    kline_Binance(e.chart, undefined, start, limit, interval)
+  }
+  if (x == "future") {
+
+  }
+}
+
 function once (chart) {
   const tick = {
     t: Date.now(), // timestamp of current candle in milliseconds
@@ -630,9 +689,14 @@ function once (chart) {
   tick.t = Date.now()
   tick.c = 28083
   chart.stream.onTick(tick)
-
 }
 
+function h($,p,c) {console.log(`alert`,$,p[4],c[4])}
+
+function alertTest ($, p, c) {
+  if ($ > p[4] && $ < c[4]) return true
+  else return false
+}
 
 // Add some charts
 
@@ -642,11 +706,19 @@ addChart()
 addChart()
 addChart()
 
-function h($,p,c) {console.log(`alert`,$,p[4],c[4])}
+// add custom indicator definition
+chart0.setIndicators({
+  // TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST},
+  // DMI: {id: "DMI", name: "Directional Movement Indicator", event: "addIndicator", ind: DMI }
+})
+// chart0.addIndicator("TEST", "Test1", {data: [], settings: {}})
+// chart0.addIndicator("DMI", "DMI1", {data: []})
+chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
+chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 
-function alertTest ($, p, c) {
-  if ($ > p[4] && $ < c[4]) return true
-  else return false
+// add an alert
+if (typeof chart1 === "object") {
+  chart1.stream.alerts.add(13010, alertTest, h)
+  chart1.on("range_limitPast", (e) => onRangeLimit(e, "past"))
+  chart1.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 }
-
-window.chart1.stream.alerts.add(13010, alertTest, h)

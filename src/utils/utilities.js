@@ -51,8 +51,8 @@ export function getPrototypeAt(level, obj) {
 /**
  * Deep merge two objects.
  * https://gist.github.com/ahtcx/0cd94e62691f539160b32ecda18af3d6?permalink_comment_id=2930530#gistcomment-2930530
- * @param {object} target
- * @param {object} source
+ * @param {Object} target
+ * @param {Object} source
  * @returns {object}
  */
  export function mergeDeep(target, source) {
@@ -82,8 +82,8 @@ export function getPrototypeAt(level, obj) {
  * https://stackoverflow.com/a/122190/15109215
  *
  * @export
- * @param {object} obj
- * @return {object}  
+ * @param {Object} obj
+ * @returns {Object}  
  */
 export function copyDeep(obj) {
   if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
@@ -107,7 +107,7 @@ export function copyDeep(obj) {
 /**
  * recursively execute a function on object properties
  * @export
- * @param {object} obj
+ * @param {Object} obj
  * @param {function} propExec
  */
 export function objRecurse (obj, propExec) {
@@ -248,8 +248,8 @@ export function isArrayEqual(a1, a2) {
  * Find nearest number value in Array
  *
  * @param {number} x
- * @param {array} array
- * @return {array} - index, value
+ * @param {Array} array
+ * @returns {Array} - index, value
  */
 export function nearestArrayValue(x, array) {
   let minDist = Infinity;
@@ -292,9 +292,9 @@ export function uid(tag="ID") {
 
 /**
  * test if (array of) values exist in target array
- * @param {array} values - single value or array of values 
- * @param {array|*} arr - target array to search
- * @return {boolean}  
+ * @param {Array} values - single value or array of values 
+ * @param {Array|*} arr - target array to search
+ * @returns {boolean}  
  */
 export function valuesInArray(values, arr) {
   if (!isArray(arr)) return false
@@ -461,7 +461,7 @@ export class xMap extends Map {
    * @param {number} index
    * @param {*} key
    * @param {*} value
-   * @return {boolean}
+   * @returns {boolean}
    */
   insertIndex(index, key, value){
     if (!isNumber(index)) return false
@@ -602,10 +602,10 @@ export const extender = (baseClass, ...mixins) => {
 }
 
 /**
- * return promise state: fulfilled, rejected, pendings
+ * return promise state: fulfilled, rejected, pending
  * @export
  * @param {*} p
- * @return {*}  
+ * @returns {*}  
  */
 export function promiseState(p) {
   const t = {};

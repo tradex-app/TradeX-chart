@@ -69,7 +69,7 @@ export default class Mediator {
    * @param {Class} newModule
    * @param {Object} options - initial provided configuration
    * @param {Object} api - functions / methods, calculated properties
-   * @return {Instance}  
+   * @returns {Instance}  
    * @memberof Mediator
    */
   register(id, newModule, options, api) {

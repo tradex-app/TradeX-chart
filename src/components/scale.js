@@ -199,9 +199,7 @@ export default class ScaleBar {
 
   onMouseWheel(e) {
     e.domEvent.preventDefault()
-
-    const direction = Math.sign(e.wheeldelta) * -1
-    this.setScaleRange(direction)
+    this.setScaleRange(Math.sign(e.wheeldelta) * -1)
     this.render()
   }
 
@@ -251,7 +249,7 @@ export default class ScaleBar {
     this.draw()
   }
 
-  // convert chart price or offchart indicator y data to pixel pos
+  // convert chart price or secondary indicator y data to pixel pos
   yPos(yData) { return this.#yAxis.yPos(yData) }
 
   yPosStream(yData) { return this.#yAxis.lastYData2Pixel(yData) }
@@ -278,7 +276,7 @@ export default class ScaleBar {
   /**
    * Add any non-default overlays
    *
-   * @param {array} overlays
+   * @param {Array} overlays
    * @memberof Scale
    */
   addOverlays(overlays) {

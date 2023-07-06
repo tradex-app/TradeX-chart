@@ -11,7 +11,7 @@ import { fillStroke } from "./canvas";
  * @param {number} radius
  * @param {number} sides
  * @param {number} rotateAngle - 90 degrees(negative direction i.e., -Math.PI/2) 
- * @param {object} opts - {fill, size, border, rotate}
+ * @param {Object} opts - {fill, size, border, rotate}
  */
 export function renderPolygonRegular (ctx, x, y, radius, sides, rotateAngle, opts) {
   if (sides < 3) return;
@@ -31,8 +31,8 @@ export function renderPolygonRegular (ctx, x, y, radius, sides, rotateAngle, opt
 /**
  * Draw Irregular Polygon
  * @param {canvas} ctx - HTML Canvas
- * @param {array} points - array of points [{x, y}, {x, y}...]
- * @param {object} opts - {fill, size, border, rotate}
+ * @param {Array} points - array of points [{x, y}, {x, y}...]
+ * @param {Object} opts - {fill, size, border, rotate}
  */
 export function renderPolygonIrregular (ctx, points, opts) {
   if (points.length > 0) {
@@ -51,11 +51,11 @@ export function renderPolygonIrregular (ctx, points, opts) {
 
 /**
  * Render triangle
- * @param {object} ctx - canvas reference
+ * @param {Object} ctx - canvas reference
  * @param {number} x - canvas pixel position
  * @param {number} y - canvas pixel position
  * @param {number} h - height pixel distance
- * @param {object} opts - {fill, size, border, rotate}
+ * @param {Object} opts - {fill, size, border, rotate}
  */
 export function renderTriangle (ctx, x, y, h, opts) {
   renderPolygonRegular (ctx, x, y, h, 3, opts?.rotate || 0) 
@@ -65,12 +65,12 @@ export function renderTriangle (ctx, x, y, h, opts) {
 
 /**
  * Render diamond
- * @param {object} ctx - canvas reference
+ * @param {Object} ctx - canvas reference
  * @param {number} x - canvas pixel position
  * @param {number} y - canvas pixel position
  * @param {number} w - width pixel distance
  * @param {number} h - height pixel distance
- * @param {object} opts - {fill, size, border, rotate}
+ * @param {Object} opts - {fill, size, border, rotate}
  */
 export function renderDiamond (ctx, x, y, w, h, opts) {
   ctx.beginPath()
