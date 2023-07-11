@@ -175,6 +175,7 @@ export default class Chart {
   get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#name}_${this.#chartCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
+  set title(t) { this.setTitle(t) }
   get title() { return this.#title }
   get parent() { return this.#parent }
   get core() { return this.#core }
@@ -442,6 +443,23 @@ export default class Chart {
 
   onDeleteIndicator(i) {
     this.removeIndicator(i.id)
+  }
+
+  setTitle(t) {
+    if (!isString(t)) return false
+
+    this.#title = t
+    chartLegend.title = t
+    const title = this.legend.list.chart.el.querySelectorAll(".title")
+    for (let n of title) {
+      n.innerHTML = t
+    }
+    return true
+  }
+
+  setWatermark(w) {
+    if (isString(w.text) || isString(w)) this.core.config.watermark.text = w
+    else if ("imgURL" in w) this.core.config.watermark.imgURL = w
   }
 
   /**

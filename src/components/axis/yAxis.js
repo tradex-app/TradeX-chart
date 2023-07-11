@@ -56,22 +56,7 @@ export default class yAxis extends Axis {
     this.yAxisType = yAxisType
 
     range = (range) ? range : this.core.range
-    this.#transform.automatic.range = range
-    this.#range = new Proxy(range, {
-      get: (obj, prop) => {
-        const m = this.#mode
-        const t = this.#transform
-        switch (prop) {
-          case "max": return t[m][prop] // "valueMax"
-          case "min":  return t[m][prop] // "valueMin"
-          case "mid": return t[m][prop] // "priceMid"
-          case "diff": return t[m][prop] // "valueDiff"
-          case "zoom": return t[m][prop]
-          case "offset": return t[m][prop]
-          default: return obj[prop]
-        }
-      }
-    })
+    this.setRange(range)
   }
 
   get chart() { return this.#chart }
@@ -261,6 +246,25 @@ export default class yAxis extends Axis {
     t.manual.zoom = change
 
     this.calcGradations()
+  }
+
+  setRange(range) {
+    this.#transform.automatic.range = range
+    this.#range = new Proxy(range, {
+      get: (obj, prop) => {
+        const m = this.#mode
+        const t = this.#transform
+        switch (prop) {
+          case "max": return t[m][prop] // "valueMax"
+          case "min":  return t[m][prop] // "valueMin"
+          case "mid": return t[m][prop] // "priceMid"
+          case "diff": return t[m][prop] // "valueDiff"
+          case "zoom": return t[m][prop]
+          case "offset": return t[m][prop]
+          default: return obj[prop]
+        }
+      }
+    })
   }
 
   calcGradations() {

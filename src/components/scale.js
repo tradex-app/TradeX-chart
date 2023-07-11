@@ -134,6 +134,13 @@ export default class ScaleBar {
     this.stateMachine.start()
   }
 
+  restart() {
+    // TODO: remove old overlays
+    // create and use new YAxis
+    this.#yAxis.setRange(this.#core.range)
+    this.draw()
+  }
+
   destroy() {
     this.stateMachine.destroy()
     this.#Graph.destroy()
