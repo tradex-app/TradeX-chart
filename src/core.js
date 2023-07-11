@@ -584,6 +584,22 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   /**
+   * set chart title
+   * @param {string} t - title displayed top left before OHLCV
+   */
+  setTitle(t) {
+    this.Chart.setTitle(t)
+  }
+
+  /**
+   * set chart watermark
+   * @param {Object} w - {text, imgURL: URL | data:URL}
+   */
+  setWatermark(w) {
+    this.Chart.setWatermark(w)
+  }
+
+  /**
    * Set chart width and height
    * @param {number} w - width in pixels
    * @param {number} h - height in pixels
@@ -720,6 +736,81 @@ export default class TradeXchart extends Tradex_chart {
     else {
       this.emit("Error", `setScrollPos: not a valid value`)
     }
+  }
+
+  /**
+   * 
+   * @param {string} key - state id
+   * @returns 
+   */
+  setState(key) {
+    // invalid state id
+    if (!State.has(key)) {
+      this.warn(`${this.name} id: ${this.id} : Specified state does not exist`)
+      return false
+    }
+
+    // same as current state, nothing to do
+    if (key === this.key) return true
+    
+    // stop any streams
+    this.stream.stop()
+    // clean up panes
+    this.MainPane.reset()
+    // set chart to use state
+    this.#state = State.get(key)
+    // create new Range
+    const rangeConfig = {
+      interval: this.#state.data.chart.tfms,
+      core: this
+    }
+    this.getRange(null, null, rangeConfig)
+
+    // set Range
+    if (this.range.Length > 1) {
+      const rangeStart = calcTimeIndex(this.time, undefined)
+      const end = (rangeStart) ? 
+        rangeStart + this.range.initialCnt :
+        this.#state.data.chart.data.length - 1
+      const start = (rangeStart) ? rangeStart : end - this.range.initialCnt
+      this.range.initialCnt = end - start
+      this.setRange(start, end)
+    }
+
+    // rebuild chart
+    this.MainPane.restart()
+
+    this.refresh()
+  }
+
+  /**
+   * validate and register a chart state
+   * @param {Object} state 
+   * @param {boolean} deepValidate - validate every entry rather than a sample
+   * @param {boolean} isCrypto - validate time stamps against BTC genesis block
+   * @returns {State} - State instance
+   */
+  createState(state, deepValidate, isCrypto) {
+    return this.state.create(state, deepValidate, isCrypto)
+  }
+
+  /**
+   * delete a current or stored chart state
+   * @param {string} key - state id
+   * @returns {boolean}
+   */
+  deleteState(key) {
+    return this.state.delete(key)
+  }
+
+  /**
+   * export state as an object
+   * @param {string} key - state id
+   * @param {Object} config 
+   * @returns {Object}
+   */
+  exportState(key=this.key, config={}) {
+    return this.state.export(key=this.key, config={})
   }
 
   /**

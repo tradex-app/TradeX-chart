@@ -93,6 +93,22 @@ const DOM = {
     return false;
   },
 
+  /**
+   * test if image, return image object or false
+   * @param {*} img - image resource, URL, data:URL
+   * @param {function} cb - callback to return image or false
+   */
+  isImage(img, cb) {
+    const i = new Image()
+    i.src = img
+
+    if (i.complete) cb(i)
+    else {
+      i.onload = () => cb(i)
+      i.onerror = () => cb(false)
+    }
+  },
+
   elementDimPos(el) {
     if (!this.isElement(el)) return false
 

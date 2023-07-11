@@ -263,9 +263,31 @@ export default class MainPane {
     this.off("chart_render", this.draw)
     this.off("destroyChartView", this.removeChartPane)
 
-    this.element.remove
+    // this.element.remove
   }
 
+  reset() {
+    for (let p in this.#core.Indicators) {
+      for (let i in this.#core.Indicators[p]) {
+        this.#core.Indicators[p][i].instance.remove()
+      }
+    }
+  }
+
+  restart() {
+    this.chart.scale.restart()
+
+    this.validateIndicators()
+
+    for (let [k,v] of this.views) {
+      for (let i of v) {
+        if (k === "primary" && i.type === "candles") continue
+        this.addIndicator(i.type, i.name, {data: i.data, settings: i.settings})
+      }
+    }
+
+    this.draw(this.range, true)
+  }
 
   eventsListen() {
     // Give Main focus so it can receive keyboard input
@@ -534,29 +556,8 @@ export default class MainPane {
   registerChartViews(options) {
     this.#elRows.previousDimensions()
 
-    const primaryPane = []
-    // iterate over chart panes and remove invalid indicators
-    for (let [k,oc] of this.views) {
+    const primaryPane = this.validateIndicators()
 
-      if (k === "primary") primaryPane.push(oc)
-      // validate entry - are there any indicators to add?
-      if (oc.length === 0 && k !== "primary") {
-        this.views.delete(k)
-        continue
-      }
-
-      // remove any indicators that are not supported
-      for (const [i, o] of oc.entries()) {
-        // is valid?
-        if (isObject(o) &&
-            ( o.type in this.core.indicatorClasses ||
-              nonIndicators.includes(o.type))) 
-            continue
-        // remove invalid
-        this.#core.log(`indicator ${oc.type} not added: not supported.`)
-        oc.splice(i, 1)
-      }
-    }
     // set the primary chart
     let primary = primaryPane[0]
     for (let o of primaryPane) {
@@ -668,6 +669,33 @@ export default class MainPane {
     return true
   }
 
+  validateIndicators() {
+    const primaryPane = []
+    // iterate over chart panes and remove invalid indicators
+    for (let [k,oc] of this.views) {
+
+      if (k === "primary") primaryPane.push(oc)
+      // validate entry - are there any indicators to add?
+      if (oc.length === 0 && k !== "primary") {
+        this.views.delete(k)
+        continue
+      }
+
+      // remove any indicators that are not supported
+      for (const [i, o] of oc.entries()) {
+        // is valid?
+        if (isObject(o) &&
+            ( o.type in this.core.indicatorClasses ||
+              nonIndicators.includes(o.type))) 
+            continue
+        // remove invalid
+        this.#core.log(`indicator ${oc.type} not added: not supported.`)
+        oc.splice(i, 1)
+      }
+    }
+    return primaryPane
+  }
+
   /**
    * add an indicator after the chart has started
    * @param {string} i - indicator type eg. EMA, DMI, RSI
@@ -690,7 +718,7 @@ export default class MainPane {
 
     let instance
 
-    // add on chart indicator
+    // add primary chart indicator
     if (this.#indicators[i].ind.primaryPane) {
       const indicator = {
         type: i,
@@ -699,7 +727,7 @@ export default class MainPane {
       }
         instance = this.#Chart.addIndicator(indicator);
     }
-    // add off chart indicator
+    // add secondary chart indicator
     else {
       const indicator = this.core.indicatorClasses[i].ind
       const indType = (

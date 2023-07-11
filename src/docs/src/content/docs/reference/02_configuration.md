@@ -57,15 +57,15 @@ If that is the case, copy ``tablib.wasm`` from ``./modules/talib-web/lib/`` to t
 
 State is a snapshot of the entirety of the chart data state, including chart price data, indicators, drawing tools, datasets and theme. Where properties of Config and ``state.settings`` overlap, Config properties take priority.
 
-Future versions of TradeX-chart will allow you to swap chart states.
+Chart states can be loaded (swapped) as desired. By default the chart can hold multiple states in memory.
 
 The chart state can be exported to be reused later.
 
 ```javascript
-JSON.stringify(chart.state)
+chart.state.export(key)
 ```
 
-Details of the state structure are found in [state](../state)
+More information the chart data state are found in the [state](../state) documentation.
 
 ## Themes
 

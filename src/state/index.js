@@ -5,7 +5,7 @@ import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeC
 import Dataset from '../model/dataset'
 import { validateDeep, validateShallow, sanitizeCandles } from '../model/validateData'
 import { copyDeep, mergeDeep, xMap, uid } from '../utils/utilities'
-import { detectInterval } from '../model/range'
+import { calcTimeIndex, detectInterval } from '../model/range'
 import { ms2Interval, SECOND_MS } from '../utils/time'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS } from '../definitions/chart'
 import { SHORTNAME } from '../definitions/core'
@@ -250,7 +250,7 @@ export default class State {
   error(e) { this.#core.error(e) }
 
   /**
-   * 
+   * validate and register a chart state
    * @param {Object} state 
    * @param {boolean} deepValidate - validate every entry rather than a sample
    * @param {boolean} isCrypto - validate time stamps against BTC genesis block
@@ -263,7 +263,7 @@ export default class State {
   /**
    * delete a current or stored chart state
    * @param {string} key - state id
-   * @returns 
+   * @returns {boolean}
    */
   delete(key) {
     if (!isString(key)) return false
@@ -280,6 +280,7 @@ export default class State {
         State.delete(key)
       }
     }
+    return true
   }
 
   list() {
@@ -296,24 +297,50 @@ export default class State {
 
   use(key) {
     const core = this.core
+
+    // invalid state id
     if (!State.has(key)) {
-      if (core)
-        core.warn(`${core.name} id: ${core.id} : Specified state does not exist`)
+      core.warn(`${core.name} id: ${core.id} : Specified state does not exist`)
       return false
     }
+
+    // same as current state, nothing to do
     if (key === this.key) return true
     
+    // stop any streams
+    core.stream.stop()
+    // clean up panes
+    core.MainPane.reset()
+    // set chart to use state
     let source = State.get(key)
-        this.#id = source.id
-        this.#key = source.key
-        this.#status = source.status
-        this.#isEmpty = source.isEmpty
-        this.#data = source.data
+    this.#id = source.id
+    // this.#key = source.key
+    this.#status = source.status
+    this.#isEmpty = source.isEmpty
+    this.#data = source.data
 
-    if (core) {
-      // TODO: build method to rebuild chart from state
-      core.refresh()
+    // create new Range
+    const rangeConfig = {
+      interval: source.data.chart.tfms,
+      core
     }
+    core.getRange(null, null, rangeConfig)
+
+    // set Range
+    if (this.range.Length > 1) {
+      const rangeStart = calcTimeIndex(core.time, undefined)
+      const end = (rangeStart) ? 
+        rangeStart + this.range.initialCnt :
+        source.data.length - 1
+      const start = (rangeStart) ? rangeStart : end - this.range.initialCnt
+      this.range.initialCnt = end - start
+      core.setRange(start, end)
+    }
+
+    // rebuild chart
+    core.MainPane.restart()
+
+    core.refresh()
   }
 
   /**

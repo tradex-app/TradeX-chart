@@ -1,7 +1,9 @@
 // chart-watermark.js
 
 import { createFont, getTextRectHeight, getTextRectWidth } from "../../renderer/text"
+import { renderImage } from "../../renderer/canvas"
 import { isObject, isString } from "../../utils/typeChecks"
+import DOM from "../../utils/DOM"
 import Overlay from "./overlay"
 import { GlobalStyle } from "../../definitions/style"
 
@@ -10,6 +12,8 @@ const watermark = {
   FONTWEIGHT: "bold",
   FONTFAMILY: GlobalStyle.FONTFAMILY,
   COLOUR: "#181818",
+  IMGWIDTH: "200",
+  IMGHEIGHT: "200"
 }
 
 export default class chartWatermark extends Overlay {
@@ -26,19 +30,19 @@ export default class chartWatermark extends Overlay {
 
   draw() {
 
-    let isText = isString(this.config?.watermark?.text)
-    let isImage = isString(this.config?.watermark?.imgURL)
+    if ( this.config?.watermark?.imgURL )
+      DOM.isImage(this.config?.watermark?.imgURL, this.renderImage.bind(this))
 
-    if ( !isText && !isImage ) return
+    else if ( isString(this.config?.watermark?.text) ) {
+      this.scene.clear()
+      const ctx = this.scene.context
+      ctx.save();
+      this.renderText()
+      ctx.restore()
+    }
+    else return
 
-    this.scene.clear()
-    const ctx = this.scene.context
-    ctx.save();
 
-    if (isText) this.renderText()
-    else if (isImage) this.renderImage()
-
-    ctx.restore()
   }
 
   renderText() {
@@ -66,8 +70,19 @@ export default class chartWatermark extends Overlay {
     ctx.fillText(txt, x, y);
   }
 
-  renderImage() {
+  renderImage(i) {
+    if (!i) return
+
+    const height = this.core.config?.watermark?.imgHeight || watermark.IMGHEIGHT
+    const width = this.core.config?.watermark?.imgWidth || watermark.IMGWIDTH
+    const x = (this.scene.width - width) / 2
+    const y = (this.scene.height - height) / 2
+
+    this.scene.clear()
     const ctx = this.scene.context
+    ctx.save();
+    renderImage(ctx, i, x, y, height, width )
+    ctx.restore()
   }
 }
 
