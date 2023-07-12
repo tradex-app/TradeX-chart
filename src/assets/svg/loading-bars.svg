@@ -1,0 +1,19 @@
+<svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+ <g fill="#fff">
+  <rect transform="scale(-1)" x="-15" y="-100" width="15" height="100">
+   <animate attributeName="height" attributeType="XML" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>
+  </rect>
+  <rect transform="scale(-1)" x="-36.25" y="-100" width="15" height="100">
+   <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>
+  </rect>
+  <rect transform="scale(-1)" x="-57.5" y="-100" width="15" height="100">
+   <animate attributeName="height" attributeType="XML" begin="0.3s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>
+  </rect>
+  <rect transform="scale(-1)" x="-78.75" y="-100" width="15" height="100">
+   <animate attributeName="height" attributeType="XML" begin="0.5s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>
+  </rect>
+  <rect transform="scale(-1)" x="-100" y="-100" width="15" height="100">
+   <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>
+  </rect>
+ </g>
+</svg>

@@ -5,6 +5,7 @@ import DOM from "../utils/DOM"
 import Menu from "./widgets/menu"
 import Dialogue from "./widgets/dialogue"
 import Divider from "./widgets/divider"
+import Progress from "./widgets/progress"
 import Window from "./widgets/window"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-widgets"
@@ -19,7 +20,7 @@ export default class Widgets {
   #stateMachine
 
   #widgets
-  #widgetsList = { Dialogue, Divider, Menu, Window }
+  #widgetsList = { Divider, Progress, Menu, Window, Dialogue }
   #widgetsInstances = {}
   #elements = {}
   #elWidgetsG

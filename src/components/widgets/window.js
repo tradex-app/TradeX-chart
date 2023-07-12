@@ -54,7 +54,7 @@ export default class Window {
   }
 
   static destroy(id) {
-    Window.windowList[id].end()
+    Window.windowList[id].destroy()
 
     // remove entry
     delete Window.windowList[id]

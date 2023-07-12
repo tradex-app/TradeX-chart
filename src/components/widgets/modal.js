@@ -5,7 +5,7 @@ import Window from "./window";
 
 export default class Modal extends Window {
 
-  static type = "window"
+  static type = "modal"
 
   constructor(widgets, config) {
     super()

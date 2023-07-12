@@ -47,3 +47,62 @@ export const noConnection =
 
 export const add =
   `<svg width="46.08" height="46.08" version="1.1" viewBox="0 0 512 512"><path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192 192-86 192-192z" fill="none" stroke="#000" stroke-miterlimit="10" stroke-width="32"/><path d="m256 346.51v-181.02m-90.51 90.51h181.02" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>`
+
+export const loadingBars =
+  `<svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <g fill="#fff">
+   <rect transform="scale(-1)" x="-15" y="-100" width="15" height="100">
+    <animate attributeName="height" attributeType="XML" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>
+   </rect>
+   <rect transform="scale(-1)" x="-36.25" y="-100" width="15" height="100">
+    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>
+   </rect>
+   <rect transform="scale(-1)" x="-57.5" y="-100" width="15" height="100">
+    <animate attributeName="height" attributeType="XML" begin="0.3s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>
+   </rect>
+   <rect transform="scale(-1)" x="-78.75" y="-100" width="15" height="100">
+    <animate attributeName="height" attributeType="XML" begin="0.5s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>
+   </rect>
+   <rect transform="scale(-1)" x="-100" y="-100" width="15" height="100">
+    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>
+   </rect>
+  </g>
+ </svg>`
+
+ export const loadingSpin = 
+  `<svg version="1.1" id="L7" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+  viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+   <path fill="#fff" d="M42.3,39.6c5.7-4.3,13.9-3.1,18.1,2.7c4.3,5.7,3.1,13.9-2.7,18.1l4.1,5.5c8.8-6.5,10.6-19,4.1-27.7
+  c-6.5-8.8-19-10.6-27.7-4.1L42.3,39.6z">
+      <animateTransform
+         attributeName="transform"
+         attributeType="XML"
+         type="rotate"
+         dur="3s"
+         from="0 50 50"
+         to="360 50 50"
+         repeatCount="indefinite" />
+  </path>
+ <path fill="#fff" d="M82,35.7C74.1,18,53.4,10.1,35.7,18S10.1,46.6,18,64.3l7.6-3.4c-6-13.5,0-29.3,13.5-35.3s29.3,0,35.3,13.5
+  L82,35.7z">
+      <animateTransform
+         attributeName="transform"
+         attributeType="XML"
+         type="rotate"
+         dur="2s"
+         from="0 50 50"
+         to="360 50 50"
+         repeatCount="indefinite" />
+  </path>
+   <path fill="#fff" d="M31.6,3.5C5.9,13.6-6.6,42.7,3.5,68.4c10.1,25.7,39.2,38.3,64.9,28.1l-3.1-7.9c-21.3,8.4-45.4-2-53.8-23.3
+  c-8.4-21.3,2-45.4,23.3-53.8L31.6,3.5z">
+      <animateTransform
+         attributeName="transform"
+         attributeType="XML"
+         type="rotate"
+         dur="1s"
+         from="0 50 50"
+         to="360 50 50"
+         repeatCount="indefinite" />
+  </path>
+</svg>`

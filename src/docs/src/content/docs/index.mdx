@@ -7,8 +7,8 @@ hero:
   image:
     file: ../../assets/tx.svg
   actions:
-    - text: Example Guide
-      link: /guides/custom_indicator/
+    - text: Examples
+      link: /examples/custom_indicator/
       icon: right-arrow
       variant: primary
     - text: Read the TradeX docs
@@ -16,23 +16,31 @@ hero:
       icon: right-arrow
 ---
 
+<iframe src="https://codesandbox.io/embed/tradex-chart-live-price-history-wip-5qfqk8?autoresize=1&fontsize=14&hidenavigation=1&theme=dark&view=preview"
+     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
+     title="TradeX-chart - live price history (WIP)"
+     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+     sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+   ></iframe>
+
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
 ## Next steps
 
 <CardGrid>
-  <Card title="Update content" icon="pencil">
-    Edit `src/content/docs/index.mdx` to see this page change.
+  <Card title="Live Examples" icon="pencil">
+    [Explore more examples](examples/static_chart/).
   </Card>
-  <Card title="Add new content" icon="add-document">
-    Add Markdown or MDX files to `src/content/docs` to create new pages.
+    <Card title="Read the docs" icon="open-book">
+    Learn more in [TradeX Referenc](reference/).
   </Card>
-  <Card title="Configure your site" icon="setting">
-    Edit your `sidebar` and other config in `astro.config.mjs`.
+  <Card title="Quick How To" icon="add-document">
+    [How To](guides/howto) will give you quick and practical solutions.
   </Card>
-  <Card title="Read the docs" icon="open-book">
-    Learn more in [the Starlight Docs](https://starlight.astro.build/).
+  <Card title="API" icon="setting">
+    Look up the [API options](api/core).
   </Card>
+
 </CardGrid>
 
 
