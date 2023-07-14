@@ -9,6 +9,7 @@ import Progress from "./widgets/progress"
 import Window from "./widgets/window"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-widgets"
+import { isObject } from "../utils/typeChecks"
 
 export default class Widgets {
 
@@ -52,6 +53,7 @@ export default class Widgets {
   get instances() { return this.#widgetsInstances }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
+  get types() { return this.#widgets }
 
   init() {
     this.mount(this.#elWidgetsG)
@@ -75,15 +77,20 @@ export default class Widgets {
   }
 
   destroy() {
-    // Stop and clean up the module to prevent memory leaks.
-    // It should remove: event listeners, timers, ect.
-    // Put your toys away or it will end in tears.
     this.off("menu_open", this.onOpenMenu)
     this.off("menu_close", this.onCloseMenu)
     this.off("menu_off", this.onCloseMenu)
     this.off("menuItem_selected", this.onMenuItemSelected)
     
     this.stateMachine.destroy()
+
+    for (let i in this.#widgetsInstances) {
+      this.delete(i)
+    }
+
+    for (let t in this.#widgets) {
+      this.#widgets[t].destroy(id)
+    }
   }
 
   // listen/subscribe/watch for parent notifications
@@ -165,15 +172,19 @@ export default class Widgets {
   }
 
   insert(type, config) {
+    if (!(type in this.#widgets) || !isObject(config)) return false
+
     config.core = this.core
     const widget = this.#widgets[type].create(this, config)
     this.#widgetsInstances[widget.id] = widget
     return widget
   }
 
-  remove(type, id) {
-    delete(this.#widgetsInstances[id])
+  delete(id) {
+    if (!isString(id)) return false
+
     this.#widgets[type].destroy(id)
+    return true
   }
 
 }

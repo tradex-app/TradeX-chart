@@ -2,12 +2,15 @@
 
 import { loadingBars, loadingSpin } from "../../definitions/icons"
 import { CLASS_PROGRESS } from "../../definitions/core"
+import { ProgressStyle } from "../../definitions/style"
+import { isObject } from "../../utils/typeChecks"
 
 
 export default class Progress {
 
-  static windowList = {}
-  static windowCnt = 0
+  static progressList = {}
+  static progressCnt = 0
+  static class = CLASS_PROGRESS
   static type = "progress"
   static name = "Progress"
   static icons = {
@@ -48,7 +51,8 @@ export default class Progress {
   
   #elWidgetsG
   #elProgress
-  #elMenu
+  #elProg
+  #elIcon
 
   constructor(widgets, config) {
     this.#widgets = widgets
@@ -60,15 +64,59 @@ export default class Progress {
     this.init()
   }
 
-  init() {
+  get type() { return Progress.type }
 
+  init() {
+    // insert element
+    this.mount(this.#elProgress)
   }
 
-  progressNode() {
-    const progressStyle = `position: absolute; z-index: 1000; display: block; fill: ${progressStyle.COLOUR};`
+  start() {
+    // is progress feedback enabled?
+    if (!isObject(this.#core.config?.progress) ||
+        !isObject(this.#core.config.progress?.loading))
+        return false
+
+    this.#elProg.style.display = "block"
+
+    const x = (this.#core.elBody.width / 2) - (this.#elProg.clientWidth / 2)
+    const y = (this.#core.elBody.height / -2) - (this.#elProg.clientHeight / 2)
+
+    this.#elProg.style.top =  `${y}px`
+    this.#elProg.style.left = `${x}px`
+  }
+
+  stop() {
+    this.#elProg.style.display = "none"
+  }
+
+  /**
+   * Build Progress Node
+   * @param {Object} p - {type, icon}
+   */
+  progressNode(p) {
+    const progressStyle = `position: absolute; z-index: 1000; display: none; justify-content: center; align-items: center;`
+    const contentStyle = ``
+    const content = `<div class="content" style="${contentStyle}">${p.icon}</div>`
 
     let node = `
-      <div
+      <div id="${this.#config.id}" class="progress ${p.type}" style="${progressStyle}">${content}</div>
     `
+    return node
+  }
+
+  mount(el) {
+    let type = "loadingBars"
+    if (this.#config?.type in Progress.icons) type = this.#config?.type
+
+    const p = {type, icon: Progress.icons[type]}
+    if (el.lastElementChild == null) 
+      el.innerHTML = this.progressNode(p)
+    else
+      el.lastElementChild.insertAdjacentHTML("afterend", this.progressNode(p))
+
+    this.#elProg = this.#elProgress.querySelector(`#${this.#config.id}`)
+    this.#elIcon = this.#elProg.querySelector(`svg`)
+    this.#elIcon.style.fill = `${ProgressStyle.COLOUR_ICONHOVER};`
   }
 }

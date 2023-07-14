@@ -133,6 +133,7 @@ export default class TradeXchart extends Tradex_chart {
   #pointerPos = {x:0, y:0}
   #pointerButtons = [false, false, false]
 
+  #progress
   #workers
   #stream
   #candles
@@ -321,6 +322,7 @@ export default class TradeXchart extends Tradex_chart {
   get isEmpty() { return this.#state.IsEmpty }
   set candles(c) { if (isObject(c)) this.#candles = c }
   get candles() { return this.#candles }
+  get progress() { return this.#progress }
 
   /**
    * let's start building the chart
@@ -433,6 +435,8 @@ export default class TradeXchart extends Tradex_chart {
     this.MainPane.start()
     this.WidgetsG.start()
 
+    this.#progress = this.WidgetsG.insert("Progress", {})
+
     this.stream = this.#config.stream
 
     if (this.#delayedSetRange) 
@@ -470,6 +474,8 @@ export default class TradeXchart extends Tradex_chart {
     this.addEventListener('mousemove', this.onMouseMove.bind(this))
 
     this.on(STREAM_UPDATE, this.onStreamUpdate, this)
+    // this.on("range_limitPast", () => this.#progress.start())
+    this.on("state_mergeComplete", () => this.#progress.stop())
   }
 
   /** 

@@ -216,7 +216,8 @@ const config2 = {
   maxCandleUpdate: 250,
   talib: talib,
   wasm: wasm,
-  state: state2
+  state: state2,
+  progress: {loading:{}}
 }
 const config3 = {
   id: "TradeX_Blue",
@@ -666,6 +667,7 @@ function onRangeLimit(e, x) {
   const end = range.timeEnd
   const interval = range.intervalStr
   if (x == "past") {
+    e.chart.progress.start()
     kline_Binance(e.chart, undefined, start, limit, interval)
   }
   if (x == "future") {

@@ -50,7 +50,7 @@ export const add =
 
 export const loadingBars =
   `<svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-  <g fill="#fff">
+  <g>
    <rect transform="scale(-1)" x="-15" y="-100" width="15" height="100">
     <animate attributeName="height" attributeType="XML" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>
    </rect>

@@ -27,7 +27,7 @@ export default class Menu {
   static menuCnt = 0
   static class = CLASS_MENUS
   static name = "Menus"
-  static type = "menu"
+  static type = "Menu"
   static currentActive
 
   constructor(widgets, config) {
@@ -62,6 +62,8 @@ export default class Menu {
   get id() { return this.#id }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elMenu) }
+  get type() { return Menu.type }
+
 
   init() {
     // insert element

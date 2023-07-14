@@ -29,7 +29,7 @@ export default class Window {
   static windowCnt = 0
   static class = CLASS_WINDOWS
   static name = "Windows"
-  static type = "window"
+  static type = "Window"
   static currentActive = null
 
   constructor(widgets, config) {
@@ -66,6 +66,8 @@ export default class Window {
   get config() { return this.#config }
   set config(c) { this.#config = c }
   get dimensions() { return DOM.elementDimPos(this.#elWindow) }
+  get type() { return Window.type }
+
 
   init() {
     // insert element
@@ -137,8 +139,6 @@ export default class Window {
   }
 
   mount(el) {
-    const api = this.#core
-
     if (el.lastElementChild == null) 
       el.innerHTML = this.windowNode()
     else

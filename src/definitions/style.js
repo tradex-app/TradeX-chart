@@ -22,10 +22,10 @@ const FONTSIZE = 12
 const FONTSTYLE = "normal"
 const FONTFAMILY = "Avenir, Helvetica, Arial, sans-serif"
 const COLOUR_BG = "#141414"
-const COLOUR_BORDER = "#666"
-const COLOUR_TXT = "#ccc"
-const COLOUR_ICON = "#888"
-const COLOUR_ICONHOVER = "#CCC"
+const COLOUR_BORDER = "#666666"
+const COLOUR_TXT = "#cccccc"
+const COLOUR_ICON = "#888888"
+const COLOUR_ICONHOVER = "#cccccc"
 const ICONSIZE = "25px"
 
 export const STYLE_ROWS = "width:100%; min-width:100%;"
@@ -57,10 +57,10 @@ export const CanvasStyle = {
   paddingTop: 2,
   paddingBottom: 2,
   borderSize: 1,
-  txtCol: "#000",
-  bakCol: "#ccc",
-  stroke: "fff",
-  fill: "888"
+  txtCol: "#000000",
+  bakCol: "#cccccc",
+  stroke: "ffffff",
+  fill: "888888"
 }
 
 export const ToolsStyle = {
@@ -85,6 +85,10 @@ export const WindowStyle = {
   COLOUR_BG: COLOUR_BG,
   COLOUR_BORDER: COLOUR_BORDER,
   COLOUR_TXT: COLOUR_TXT,
+}
+
+export const ProgressStyle = {
+  FILL: COLOUR_ICONHOVER+"88"
 }
 
 /**
