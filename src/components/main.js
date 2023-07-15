@@ -379,6 +379,7 @@ export default class MainPane {
 
   onMouseEnter(e) {
     this.core.Timeline.showCursorTime()
+
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
     this.core.Chart.graph.render()
 
