@@ -184,9 +184,6 @@ export default class Timeline {
   }
 
   start() {
-    // prepare layered canvas
-    // this.createViewport()
-
     // create and start overlays
     this.createGraph()
 
@@ -209,15 +206,16 @@ export default class Timeline {
 
   destroy() {
     this.stateMachine.destroy()
-    this.#Graph.destroy()
     this.#input.destroy()
     this.#input2.destroy()
+    this.#input3.destroy()
 
     this.off("main_mousemove", this.drawCursorTime)
     this.off("setRange", this.onSetRange)
     this.#elFwdEnd.removeEventListener('click', debounce)
     this.#elRwdStart.removeEventListener('click', debounce)
 
+    this.#Graph.destroy()
     this.element.remove()
   }
 
@@ -232,30 +230,14 @@ export default class Timeline {
     // this.#input.on("pointerdrag", throttle(this.onPointerDrag, 100, this, true));
 
     this.#input2 = new Input(this.#elFwdEnd, {disableContextMenu: false});
-    this.#input2.on("pointerover", () => {
-      this.#jump.end = true
-      this.#elNavigation.style.visibility = "visible"
-      this.#Graph.overlays.list.get("cursor").layer.visible = false
-      this.render()
-    })
-    this.#input2.on("pointerleave", () => {
-      this.#jump.end = false
-      if (this.#core.theme?.time?.navigation === false)
-        this.#elNavigation.style.visibility = "hidden"
-    })
+    this.#input2.on("pointerover", () => this.showJump(this.#jump.end))
+    this.#input2.on("pointerleave", () => this.hideJump(this.#jump.end))
+    // this.#input2.on("click", () => debounce(this.onMouseClick, 1000, this, true))
 
     this.#input3 = new Input(this.#elRwdStart, {disableContextMenu: false});
-    this.#input3.on("pointerover", () => {
-      this.#jump.start = true
-      this.#elNavigation.style.visibility = "visible"
-      this.#Graph.overlays.list.get("cursor").layer.visible = false
-      this.render()
-    })
-    this.#input3.on("pointerleave", () => {
-      this.#jump.start = false
-      if (this.#core.theme?.time?.navigation === false)
-        this.#elNavigation.style.visibility = "hidden"
-    })
+    this.#input3.on("pointerover", () => this.showJump(this.#jump.start))
+    this.#input3.on("pointerleave", () => this.hideJump(this.#jump.start))
+    // this.#input3.on('click', () => debounce(this.onMouseClick, 1000, this, true))
 
     this.on("main_mousemove", this.#layerCursor.draw, this.#layerCursor)
     this.on("setRange", this.onSetRange, this)
@@ -293,9 +275,7 @@ export default class Timeline {
   onPointerEnter(e) {
     e.domEvent.target.style.cursor = "ew-resize"
     this.#elNavigation.style.visibility = "visible"
-    this.#Graph.overlays.list.get("cursor").layer.visible = false
-    this.render()
-    // this.hideCursorTime()
+    this.hideCursorTime()
   }
 
   onPointerLeave(e) {
@@ -303,14 +283,6 @@ export default class Timeline {
          !(this.#jump.end && this.#jump.start)) {
 
       this.#elNavigation.style.visibility = "hidden"
-      this.#Graph.overlays.list.get("cursor").layer.visible = true
-      this.render()
-      // this.showCursorTime()
-    }
-    else {
-      this.#Graph.overlays.list.get("cursor").layer.visible = true
-      this.render()
-      // this.showCursorTime()
     }
   }
 
@@ -398,15 +370,25 @@ export default class Timeline {
   }
 
   hideCursorTime() {
-    this.#layerCursor.visible = false
-    // this.#Graph.overlays.list.get("cursor").layer.visible = false
+    this.#Graph.overlays.list.get("cursor").layer.visible = false
     this.render()
   }
 
   showCursorTime() {
-    this.#layerCursor.visible = true
-    // this.#Graph.overlays.list.get("cursor").layer.visible = true
+    this.#Graph.overlays.list.get("cursor").layer.visible = true
     this.render()
+  }
+
+  hideJump(j) {
+    j = false
+    if (this.#core.theme?.time?.navigation === false)
+      this.#elNavigation.style.visibility = "hidden"
+  }
+
+  showJump(j) {
+    j = true
+    this.#elNavigation.style.visibility = "visible"
+    this.hideCursorTime()
   }
 
 }
