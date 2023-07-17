@@ -9,4 +9,12 @@ description: TradeX Chart static price history example
      allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
      sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
    ></iframe>
-   
+
+## Providing Price History to the Chart
+
+There are two ways to load price history into the chart:
+
+1. Config provided upon ``start(config)``
+2. API via ``chart.mergeData({data: d})``
+
+When using either option the data has to be proved in a [``State`` object format](../../reference/state/#state-object).

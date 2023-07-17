@@ -227,16 +227,23 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
-"examples/custom_indicator.mdx": {
-	id: "examples/custom_indicator.mdx";
-  slug: "examples/custom_indicator";
+"examples/01_static_chart.mdx": {
+	id: "examples/01_static_chart.mdx";
+  slug: "examples/01_static_chart";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
-"examples/static_chart.mdx": {
-	id: "examples/static_chart.mdx";
-  slug: "examples/static_chart";
+"examples/02_live_history_chart.mdx": {
+	id: "examples/02_live_history_chart.mdx";
+  slug: "examples/02_live_history_chart";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"examples/custom_indicator.mdx": {
+	id: "examples/custom_indicator.mdx";
+  slug: "examples/custom_indicator";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">

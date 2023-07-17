@@ -104,7 +104,7 @@ const theState = chart.state.get(key)
 
 ## State Object
 
-The following data state object example demonstrates all possible options.
+The following data state object example demonstrates all possible options. 
 
 ```javascript
 {​​
@@ -127,3 +127,6 @@ secondary: Array []
 primary: Array []
 }
 ```
+:::note
+You do not have include all first level properties for the state to be valid.
+:::

@@ -1,6 +1,7 @@
 import Chart from './core'
 import canvas from './renderer/canvas'
 import DOM from './utils/DOM'
+import StateMachine from './scaleX/stateMachne'
 import Overlay from './components/overlays/overlay'
 import Indicator from './components/overlays/indicator'
 import { Range } from './model/range'
@@ -13,6 +14,7 @@ export {
   canvas,
   copyDeep, 
   DOM, 
+  StateMachine,
   Indicator, 
   isPromise,
   mergeDeep, 
