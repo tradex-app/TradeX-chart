@@ -360,10 +360,11 @@ export default class State {
    * Optionally set a new range upon merge.
    * @param {Object} merge - merge data must be formatted to a Chart State
    * @param {boolean|object} newRange - false | {start: number, end: number}
+   * @param {boolean} calc - automatically calculate indicator data (ignore any existing)
    */
   // TODO: merge indicator data?
   // TODO: merge dataset?
-  mergeData(merge, newRange=false, calc=true) {
+  mergeData(merge, newRange=false, calc=false) {
     if (!isObject(merge)) {
       this.error(`ERROR: ${this.id}: merge data must be type Object!`)
       return false
@@ -439,95 +440,39 @@ export default class State {
       }
       // chart has data, check for overlap
       else {
-        let merged = []
-        let older, newer;
         newRange = (newRange) ? newRange :
-          {
-            start: this.range.timeMin,
-            end: this.range.timeMax
-          }
-
-        if (data[0][0] < mData[0][0]) {
-          older = data
-          newer = mData
+        {
+          start: this.range.timeMin,
+          end: this.range.timeMax
         }
-        else {
-          older = mData
-          newer = data
-        }
-
-        // handle price stream
-        if (newer.length == 1 &&
-            newer[0][0] == older[older.length-1][0]) {
-            older[older.length-1] = newer[0]
-            merged = older
-        }
-        else if (newer.length == 1 &&
-            newer[0][0] == older[older.length-1][0] + this.range.interval) {
-            merged = older.concat(newer)
-        }
-
-        // overlap between existing data and merge data
-        else if (older[older.length-1][0] >= newer[0][0]) {
-          let o = 0
-          while (older[o][0] < newer[0][0]) {
-            merged.push(older[o])
-            o++
-          }
-
-          // append newer array
-          merged = merged.concat(newer)
-          // are there any trailing entries to append?
-          let i = o + newer.length
-          if (i < older.length) {
-            merged = merged.concat(older.slice(i))
-          }
-        }
-
-        // no overlap, but a gap exists
-        else if (newer[0][0] - older[older.length-1][0] > this.range.interval) {
-          merged = older
-          let fill = older[older.length-1][0]
-          let gap = Math.floor((newer[0][0] - fill) / this.range.interval)
-          for(gap; gap > 0; gap--) {
-            merged.push([fill,null,null,null,null,null])
-            merged = merged.concat(newer)
-          }
-        }
-
-        // no overlap, insert the new data
-        else {
-          merged = older.concat(newer)
-        }
-
-        this.data.chart.data = merged
+        this.data.chart.data = this.merge(data, mData)
       }
+
+      // calculate all indicators if required
+      // and ignore and overwrite any existing data
       if (calc) this.#core.calcAllIndicators()
 
-  /*
-  * chart will ignore any indicators in merge data
-  * for sanity reasons, instead will trigger 
-  * calculation for merged data for existing indicators
+      // otherwise merge the new indicator data
+      else {
+        // Do we have primaryPane indicators?
+        if (isArray(mPrimary) && mPrimary.length > 0) {
+          for (let o of mPrimary) {
+            if (isArray(o?.data) && o?.data.length > 0) {
 
-      // Do we have primaryPane indicators?
-      if (isArray(mPrimary) && mPrimary.length > 0) {
-        for (let o of mPrimary) {
-          // if (o )
-          if (isArray(o?.data) && o?.data.length > 0) {
+            }
+          }
+        }
 
+        // Do we have secondaryPane indicators?
+        if (isArray(mSecondary) && mSecondary.length > 0) {
+          for (let o of mSecondary) {
+            if (isArray(o?.data) && o?.data.length > 0) {
+
+            }
           }
         }
       }
 
-      // Do we have secondaryPane indicators?
-      if (isArray(mSecondary) && mSecondary.length > 0) {
-        for (let o of mSecondary) {
-          if (isArray(o?.data) && o?.data.length > 0) {
-
-          }
-        }
-      }
-  */
       // Do we have datasets?
       if (isArray(mDataset) && mDataset.length > 0) {
         for (let o of mDataset) {
@@ -559,14 +504,76 @@ export default class State {
 
       let r, u = false;
       for (r in refresh) {
-        u || r
+        u = u || r
       }
 
       if (merge.data.length > 1) this.#core.emit("state_mergeComplete")
 
-      this.#core.refresh()
+      if (u) this.#core.refresh()
       this.#isEmpty = false
       return true
     }
+  }
+
+  merge(data, mData) {   
+    let merged = []
+    let older, newer;
+
+    if (data[0][0] < mData[0][0]) {
+      older = data
+      newer = mData
+    }
+    else {
+      older = mData
+      newer = data
+    }
+
+    // handle price stream
+    if (newer.length == 1 &&
+        newer[0][0] == older[older.length-1][0]) {
+        older[older.length-1] = newer[0]
+        merged = older
+    }
+    else if (newer.length == 1 &&
+        newer[0][0] == older[older.length-1][0] + this.range.interval) {
+        merged = older.concat(newer)
+    }
+
+    // overlap between existing data and merge data
+    else if (older[older.length-1][0] >= newer[0][0]) {
+      let o = 0
+      while (older[o][0] < newer[0][0]) {
+        merged.push(older[o])
+        o++
+      }
+
+      // append newer array
+      merged = merged.concat(newer)
+      // are there any trailing entries to append?
+      let i = o + newer.length
+      if (i < older.length) {
+        merged = merged.concat(older.slice(i))
+      }
+    }
+
+    // no overlap, but a gap exists
+    else if (newer[0][0] - older[older.length-1][0] > this.range.interval) {
+      merged = older
+      let fill = older[older.length-1][0]
+      let gap = Math.floor((newer[0][0] - fill) / this.range.interval)
+      for(gap; gap > 0; gap--) {
+        let arr = Array(newer[0].length).fill(null)
+            arr[0] = fill
+        merged.push(arr)
+        merged = merged.concat(newer)
+      }
+    }
+
+    // no overlap, insert the new data
+    else {
+      merged = older.concat(newer)
+    }
+
+    return merged
   }
 }

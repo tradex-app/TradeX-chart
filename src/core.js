@@ -991,10 +991,11 @@ export default class TradeXchart extends Tradex_chart {
    * Optionally set a new range upon merge.
    * @param {Object} merge - merge data must be formatted to a Chart State
    * @param {boolean|object} newRange - false | {start: number, end: number}
+   * @param {boolean} calc - automatically calculate indicator data (ignore any existing)
    */
   // TODO: merge indicator data?
   // TODO: merge dataset?
-  mergeData(merge, newRange=false, calc=true) {
+  mergeData(merge, newRange=false, calc=false) {
     this.#mergingData = true
     let m = this.state.mergeData(merge, newRange, calc)
     if (isBoolean(m)) this.#mergingData = false
