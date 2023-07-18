@@ -562,6 +562,8 @@ export default class State {
         u || r
       }
 
+      if (merge.data.length > 1) this.#core.emit("state_mergeComplete")
+
       this.#core.refresh()
       this.#isEmpty = false
       return true

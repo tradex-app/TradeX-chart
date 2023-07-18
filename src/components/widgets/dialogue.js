@@ -4,7 +4,7 @@ import Window from "./window";
 
 export default class Dialogue extends Window {
 
-  static type = "window"
+  static type = "Dialogue"
 
 
   constructor(widgets, config) {
@@ -15,4 +15,6 @@ export default class Dialogue extends Window {
     this.config = config
   }
   
+  get type() { return Dialogue.type }
+
 }

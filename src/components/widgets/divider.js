@@ -27,7 +27,7 @@ export default class Divider {
   static divideCnt = 0
   static class = CLASS_DIVIDERS
   static name = "Dividers"
-  static type = "divider"
+  static type = "Divider"
 
   static create(widgets, config) {
 
@@ -80,6 +80,8 @@ export default class Divider {
   get height() { return this.#elDivider.getBoundingClientRect().height }
   set cursor(c) { this.#elDivider.style.cursor = c }
   get cursor() { return this.#elDivider.style.cursor }
+  get type() { return Divider.type }
+
 
   init() {
     // insert element

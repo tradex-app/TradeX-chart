@@ -54,6 +54,8 @@ export default class Tool {
   #cursorActive = false
   #cursorClick
 
+  #boundingBox = {TL: [0,0], BR: [0,0]}
+
   constructor(config) {
     this.#config = config
     this.#inCnt = config.cnt
@@ -95,6 +97,7 @@ export default class Tool {
   get scrollPos() { return this.#core.scrollPos }
   get bufferPx() { return this.#core.bufferPx }
 
+  get visible() { return this.isVisible() }
 
   end() { this.stop() }
 
@@ -139,6 +142,10 @@ export default class Tool {
 
     this.emit("tool_mousemove", this.#cursorPos)
 
+  }
+
+  isVisible() {
+    // convert #boundingBox to pixel co-ordinates
   }
 
   createViewport() {

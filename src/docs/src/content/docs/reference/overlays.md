@@ -48,7 +48,10 @@ Here's a list of the current in-built overlays:
 * time cursor
 * time labels
 
-Note that [indicators](indicators.md) are a special (child) class of overlays. Both standard and custom indicators are extensions of the indicator class. This hints at what you can achieve by extending the overlay class yourself.
+:::note
+[Indicators](indicators.md) are a special (child) class of overlays. Both standard and custom indicators are extensions of the indicator class.  
+This hints at what you can achieve by extending the overlay class yourself.
+:::
 
 ## Customization
 

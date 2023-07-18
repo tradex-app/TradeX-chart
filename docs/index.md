@@ -6,7 +6,7 @@ title: Introduction
 
 TradeX Chart is a highly customizable lightweight financial chart.
 
-It is open source custom HTML component built in plain JavaScript with no frame work dependencies.
+It is open source custom HTML component built in plain JavaScript with no framework dependencies.
 
 :::caution
 TradeX Chart is currently in heavy development, with the API not yet finalized. However, it is already suitable for displaying candlestick / time-series data.

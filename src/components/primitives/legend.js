@@ -147,8 +147,9 @@ export default class Legends {
 
   // remove "data" as callback will provide this
   update(id, data) {
-    if (!(isObject(data)) 
-    || !(id in this.#list)) return false
+    if (!(isObject(data)) ||
+        !(id in this.#list) ||
+        this.#core.range.data.length == 0) return false
 
     let source = this.#list[id].source(data.pos)
     const html = this.#elTarget.buildInputs(source)

@@ -368,6 +368,8 @@ export default class MainPane {
       p.dx, p.dy,
       p.ts1, p.ts1 - p.ts2
     ]
+
+    this.core.Timeline.showCursorTime()
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
 
     for (let [key, secondaryPane] of this.chartPanes) {
@@ -379,6 +381,7 @@ export default class MainPane {
 
   onMouseEnter(e) {
     this.core.Timeline.showCursorTime()
+
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
     this.core.Chart.graph.render()
 
@@ -389,9 +392,9 @@ export default class MainPane {
   }
 
   onMouseOut(e) {
-    this.core.Timeline.hideCursorTime()
     this.onPointerActive(false)
 
+    this.core.Timeline.hideCursorTime()
     this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false
     this.core.Chart.graph.render()
 
