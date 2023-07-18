@@ -19,7 +19,7 @@ import { Indicator } from 'tradex-chart'
 Render line - open path
 
 * @param {Object} ctx - canvas reference
-* @param {Array} coords - array of x y coords [{x:x, y:y}, ...]
+* @param {Array} coords - array of x y coords ``[{x:x, y:y}, ...]``
 * @param {Object} opts 
 
 ## renderLineHorizontal
@@ -43,19 +43,19 @@ Draw a vertical straight line
 Render an open path of multiple points
 
 * @param {Object} ctx - canvas reference
-* @param {Array} coords - array of x y coords [ {x:x, y:y}, ...]
+* @param {Array} coords - array of x y coords ``[{x:x, y:y}, ...]``
 * @param {Object} style - {width, stroke, dash}
 ## renderPathClosed
 Render unfilled closed path of multiple points
 
 * @param {Object} ctx - canvas reference
-* @param {Array} coords - array of x y coords [{x:x, y:y}, ...]
+* @param {Array} coords - array of x y coords ``[{x:x, y:y}, ...]``
 * @param {Object} style - {width, stroke, fill, dash}
 ## renderSpline
 Draw Spline of multiple points
 
 * @param {canvas} ctx - HTML Canvas
-* @param {Array} points - array of points [{x, y}, {x, y}...]
+* @param {Array} points - array of points ``[{x:x, y:y}, ...]``
 * @param {number} tension
 ## renderRect
 Stroked and or Filled rectangle
@@ -90,7 +90,7 @@ Draw Regular Polygon
 Draw Irregular Polygon
 
 * @param {canvas} ctx - HTML Canvas
-* @param {Array} points - array of points [{x, y}, {x, y}...]
+* @param {Array} points - array of points ``[{x:x, y:y}, ...]``
 * @param {Object} opts - {fill, size, border, rotate}
 ## renderTriangle
 Render triangle

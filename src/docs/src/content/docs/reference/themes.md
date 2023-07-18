@@ -47,9 +47,9 @@ const candleTheme = {
 chart0.theme.setProperty("candle", candleTheme)
 ```
 
-**Note**
-
+:::note
 Do not directly modify the theme values. the ``setProperty()`` must be used.
+:::
 
 ### getProperty(path)
 
