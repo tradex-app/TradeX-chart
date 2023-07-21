@@ -12,7 +12,7 @@ TradeX-chart is a highly customizable stock trade chart with **one** dependency 
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/tradex-app/TradeX-chart)
 [![NPM](https://badgen.net/badge/icon/npm?icon=npm&label)](https://www.npmjs.com/package/tradex-chart)
 
-</div>S
+</div>
 
 ![](assets/EMA.png)
 
@@ -104,7 +104,7 @@ Documentation can be found under:
 ## Features
 
 * Plain JavaScript with no framework dependencies
-* WIP: All chart features and functions accessible via API
+* All chart features and functions accessible via API
 * Built in a modular manner
 * Provides message, emit and subscribe methods
 * State object defines chart configuration, on and off chart indicators

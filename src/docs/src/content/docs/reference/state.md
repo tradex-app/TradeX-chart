@@ -8,6 +8,7 @@ The chart data state defines what information the chart displays.
 * indicators
 * trades
 * drawings
+* events
 * annotations
 
 Data states can be provided to the chart either via the config object at ``chart.start(config)``, or by creating a state separately and telling the chart to use it.
@@ -18,11 +19,11 @@ Data can be then later added via a price stream (typically provided by an exchan
 
 ## Config
 
-The chart config object has a state property ``config.state``. It requires a valid [data state object](#state-object). 
+The chart config object has a state property ``config.state``. It requires a valid [state config object](#state-config-object). 
 
 ## Create and Use a State
 
-A [data state (object)](#state-object) must be first validated by the chart. If valid, will register it for later use and return the id key assigned to it. This means the chart can hold multiple states in memory to be used as desired allowing for easy swapping.
+A [data state (object)](#state-config-object) must be first validated by the chart. If valid, will register it for later use and return the id key assigned to it. This means the chart can hold multiple states in memory to be used as desired allowing for easy swapping.
 
 ```javascript
 const key = chart.state.create(state)
@@ -53,7 +54,7 @@ Blocks of back history can be merged into the chart via the following method.
 ```javascript
 chart.mergeData(data)
 ```
-The data must be formatted as a valid chart state.
+The data must be formatted as a valid [state config object](#state-config-object).
 
 A data merge into the state does the following:
 
@@ -72,7 +73,7 @@ chart.deleteState(key)
 
 ## Export
 
-The chart can export any data state contained in memory to a JSoN object.
+The chart can export any data state contained in memory to a JSoN object. The export will be formatted as a [state config object](#state-config-object).
 
 ```javascript
 const xport = chart.exportState(key)
@@ -80,7 +81,7 @@ const xport = chart.exportState(key)
 
 ## List
 
-Return a ``Map()`` of all chart states currently in memory. This includes states in use by other charts.
+Return a ``Map()`` of all [chart data states](#internal-chart-data-state) currently in memory. This includes states in use by other charts.
 
 ```javascript
 const list = chart.state.list()
@@ -96,37 +97,47 @@ const exists = chart.state.has(key)
 
 ## Get
 
-Return the specified state object.
+Return the specified [internal data state object](#internal-chart-data-state).
 
 ```javascript
 const theState = chart.state.get(key)
 ```
 
-## State Object
+## State Config Object
 
-The following data state object example demonstrates all possible options. 
+The following data state config object example demonstrates all possible options that can be submitted to the chart on initial ``chart.start(config)`` as the ``config.state`` property, or at a later time as a [merge of data](#merging-data-into-the-state) into the existing chart state. Usually such a merge is done when the chart scrolls to the left / past boundary, and more back history needs to be loaded into the chart. ``chart.mergeData(data)``
 
 ```javascript
-{​​
-chart: Object { type: "candles", candleType: "CANDLE_SOLID", indexed: false, … }
-​​​
-candleType: "CANDLE_SOLID"
+{
 
-type: "candles"
-​​​
-data: Array(10002) [ (6) […], (6) […], (6) […], … ]
-​​​
-indexed: false
-​​​​
-settings: Object {  }
-​​​​​​​
-datasets: Array []
+  // [timestamp, open, hight, low, close, volume]​​
+  ohlcv: [],
+
+  // list of indicators for the primary chart pane (price history)
+  primary: [],
 ​​
-secondary: Array []
-​​
-primary: Array []
+  // list of indicators not displayed on the primary chart pane
+  secondary: [],
+
+  // user defined data
+  datasets: [],
+
+  // list of trades
+  trades: [],
+
+  // list of drawing tools used
+  tools: []
+
+  // list of news / events
+  events: []
+
+  // list of user defined annotations
+  annotations: []
 }
 ```
 :::note
-You do not have include all first level properties for the state to be valid.
+State Config properties are optional, you do not have to include all of them for the state to be valid.
 :::
+
+## Internal Chart Data State
+

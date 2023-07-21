@@ -233,10 +233,16 @@ export const defaultTheme = {
     GridColour: GridStyle.COLOUR_GRID,
   },
   primaryPane: {
-
+    separator: "#666"
   },
   secondaryPane: {
     separator: "#666"
+  },
+  time: {
+    navigation: false,
+    font: LegendStyle.font,
+    colour: "#96a9db",
+    handleColour: "#586ea6",
   },
   legend: {
     font: LegendStyle.font,

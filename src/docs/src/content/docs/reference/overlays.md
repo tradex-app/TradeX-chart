@@ -1,5 +1,6 @@
 ---
 title: Overlays
+description: Overlays in the simplest form are a chart pane layer
 ---
 
 Overlays in the simplest form are a layer, that exist either on:

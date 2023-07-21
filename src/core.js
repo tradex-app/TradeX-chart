@@ -405,10 +405,10 @@ export default class TradeXchart extends Tradex_chart {
     if (this.#range.Length > 1) {
       // now set user defined (if any) range
       const rangeStart = calcTimeIndex(this.#time, this.#config?.range?.startTS)
-      const end = (rangeStart) ? 
+      const end = (isNumber(rangeStart)) ? 
         rangeStart + this.#range.initialCnt :
         this.allData.data.length - 1
-      const start = (rangeStart) ? rangeStart : end - this.#range.initialCnt
+      const start = (isNumber(rangeStart)) ? rangeStart : end - this.#range.initialCnt
       this.#range.initialCnt = end - start
       this.setRange(start, end)
     }

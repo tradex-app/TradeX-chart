@@ -2,7 +2,7 @@
 // a simple Finite State Machine
 
 import { isArray, isFunction, isObject, isString } from "../utils/typeChecks"
-import { isArrayEqual, uid } from "../utils/utilities"
+import { valuesInArray } from "../utils/utilities"
 
 /**
  * Finite State Machine
@@ -174,7 +174,7 @@ export default class StateMachine {
     const required = ["id", "initial", "context", "states"]
       let keys = Object.keys(c)
 
-    if (!isArrayEqual(required, keys)) return false
+    if (!valuesInArray(required, keys)) return false
 
     if (!(c.initial in c.states)) return false
 

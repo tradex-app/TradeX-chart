@@ -236,10 +236,26 @@ export class DoubleLinkedList {
 }
 
 
+/**
+ * array comparison
+ * @param {Array} a1
+ * @param {Array} a2
+ * @return {boolean}
+ */
 export function isArrayEqual(a1, a2) {
+  if (!isArray(a1) || !isArray(a2)) return false
+  if (a1.length !== a2.length) return false
   let i = a1.length;
   while (i--) {
-      if (a1[i] !== a2[i]) return false;
+    if (isArray(a1[i]) || isArray(a2[i])) {
+      if (!isArrayEqual(a1[i], a2[i])) return false
+      continue
+    }
+    if (isObject(a1[i]) || isObject(a1[i])) {
+      if (!isObject(a1[i], a2[i])) return false
+      continue
+    }
+    if (a1[i] !== a2[i]) return false;
   }
   return true
 }
@@ -277,19 +293,6 @@ export function swapArrayElements(array, index1, index2) {
   [myArray[index1], myArray[index2]] = [myArray[index2], myArray[index1]];
 }
 
-// unique ID
-export function uid(tag="ID") {
-  // sanitize tag - make it HTML and CSS friendly
-  if (isNumber(tag)) tag = tag.toString()
-  else if (!isString(tag)) tag = "ID"
-  tag = tag.replace(/ |,|;|:|\.|#/g, "_");
-
-  // add "randomness" to make id unique
-  const dateString = Date.now().toString(36);
-  const randomness = Math.random().toString(36).substring(2,5);
-  return `${tag}_${dateString}_${randomness}`
-}
-
 /**
  * test if (array of) values exist in target array
  * @param {Array} values - single value or array of values 
@@ -302,6 +305,46 @@ export function valuesInArray(values, arr) {
   return values.every(value => {
     return arr.includes(value)
   })
+}
+
+
+/**
+ * object comparison
+ * @param {Object} obj1
+ * @param {Object} obj2
+ * @return {boolean}
+ */
+export function isObjectEqual(obj1, obj2) {
+  if (!isObject(obj1) || !isObject(obj2)) return false
+
+  const obj1Keys = Object.keys(obj1).sort();
+  const obj2Keys = Object.keys(obj2).sort();
+
+  if (obj1Keys.length !== obj2Keys.length) return false
+
+  else {
+    const areEqual = obj1Keys.every((key, index) => {
+      const val1 = obj1[key];
+      const val2 = obj2[obj2Keys[index]];
+      if (isArray(val1) || isArray(val2)) return isArrayEqual(val1, val2)
+      if (isObject(val1) || isObject(val2)) return isObjectEqual(val1, val2)
+      return val1 === val2;
+    });
+    return areEqual
+  }
+}
+
+// unique ID
+export function uid(tag="ID") {
+  // sanitize tag - make it HTML and CSS friendly
+  if (isNumber(tag)) tag = tag.toString()
+  else if (!isString(tag)) tag = "ID"
+  tag = tag.replace(/ |,|;|:|\.|#/g, "_");
+
+  // add "randomness" to make id unique
+  const dateString = Date.now().toString(36);
+  const randomness = Math.random().toString(36).substring(2,5);
+  return `${tag}_${dateString}_${randomness}`
 }
 
 // https://stackoverflow.com/a/20151856/15109215

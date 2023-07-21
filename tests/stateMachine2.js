@@ -1,3 +1,4 @@
+import { valuesInArray } from "../src/utils/utilities"
 
 
 function isFunction (value) {
@@ -70,7 +71,7 @@ class StateMachine {
     const required = ["id", "initial", "context", "states"]
       let keys = Object.keys(c)
 
-    if (!isArrayEqual(required, keys)) return false
+    if (!valuesInArray(required, keys)) return false
 
     if (!(c.initial in c.states)) return false
 

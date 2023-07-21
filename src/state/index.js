@@ -4,7 +4,7 @@
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import Dataset from '../model/dataset'
 import { validateDeep, validateShallow, sanitizeCandles } from '../model/validateData'
-import { copyDeep, mergeDeep, xMap, uid } from '../utils/utilities'
+import { copyDeep, mergeDeep, xMap, uid, isObjectEqual } from '../utils/utilities'
 import { calcTimeIndex, detectInterval } from '../model/range'
 import { ms2Interval, SECOND_MS } from '../utils/time'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS } from '../definitions/chart'
@@ -359,7 +359,7 @@ export default class State {
    * Merge data must follow a State format.
    * Optionally set a new range upon merge.
    * @param {Object} merge - merge data must be formatted to a Chart State
-   * @param {boolean|object} newRange - false | {start: number, end: number}
+   * @param {boolean|object} newRange - false | {startTS: number, endTS: number} | {start: number, end: number}
    * @param {boolean} calc - automatically calculate indicator data (ignore any existing)
    */
   // TODO: merge indicator data?
@@ -369,49 +369,58 @@ export default class State {
       this.error(`ERROR: ${this.id}: merge data must be type Object!`)
       return false
     }
-
-    let end = merge.data.length -1
+    let end = (isArray(merge?.ohlcv)) ? merge.ohlcv.length -1 : 0
+    // timeframes don't match
+    if (end > 1 &&
+        this.time.timeFrameMS !== detectInterval(merge?.ohlcv)) {
+      this.error(`ERROR: ${this.core.id}: merge data time frame does not match existing time frame!`)
+      return false
+    }
+    // // Not valid chart data
+    // if (!isArray(merge?.ohlcv)) {
+    //   this.error(`ERROR: ${this.core.id}: merge chart data must be of type Array!`)
+    //   return false
+    // }
     // if the chart empty is empty set the range to the merge data
     if (this.#isEmpty || !isNumber(this.time.timeFrameMS)) {
       if (!isObject(newRange) ||
           !isNumber(newRange.start) ||
           !isNumber(newRange.end) ) {
-
         if (end > 1) {
           newRange = {start: end - this.range.initialCnt, end}
         }
       }
     }
-    // timeframes don't match
-    if (end > 1 &&
-        this.time.timeFrameMS !== detectInterval(merge.data)) {
-      this.error(`ERROR: ${this.core.id}: merge data time frame does not match existing time frame!`)
-      return false
-    }
-    // Not valid chart data
-    if ("data" in merge &&
-        !isArray(merge.data)) {
-      this.error(`ERROR: ${this.core.id}: merge chart data must be of type Array!`)
-      return false
-    }
     // convert newRange values to timestamps
     if (isObject(newRange)) {
-      newRange.start = (isNumber(newRange.start)) ? this.range.value(newRange.start)[0] : this.range.timeMin
-      newRange.end = (isNumber(newRange.end)) ? this.range.value(newRange.end)[0] : this.range.timeMax
+      if (isNumber(newRange?.startTS))
+        newRange.start = newRange.startTS
+      else
+        newRange.start = (isNumber(newRange.start)) ? this.range.value(newRange.start)[0] : this.range.timeMin
+      if (isNumber(newRange?.endTS))
+        newRange.end = newRange.endTS
+      else
+        newRange.end = (isNumber(newRange.end)) ? this.range.value(newRange.end)[0] : this.range.timeMax
+    }
+    // ensure range remains temporally fixed
+    else {
+      newRange = {}
+      newRange.start = this.range.timeMin
+      newRange.end = this.range.timeMax
     }
 
     let i, j, start;
-    let mData = merge?.data || false
+    let mData = merge?.ohlcv || false
     const data = this.allData.data
     const primaryPane = this.allData?.primaryPane
-    const mPrimary = merge?.primaryPane || false
+    const mPrimary = merge?.primary || false
     const secondaryPane = this.allData?.secondaryPane
-    const mSecondary = merge?.secondaryPane || false
+    const mSecondary = merge?.secondary || false
     const dataset = this.allData?.dataset?.data
     const mDataset = merge?.dataset?.data || false
     const trades = this.allData?.trades?.data
     const mTrades = merge?.trades?.data || false
-    const inc = (this.range.inRange(mData[0][0])) ? 1 : 0
+    const inc = (!isArray(mData)) ? 0 : (this.range.inRange(mData[0][0])) ? 1 : 0
     const refresh = {}
 
     // Do we have price data?
@@ -458,7 +467,13 @@ export default class State {
         if (isArray(mPrimary) && mPrimary.length > 0) {
           for (let o of mPrimary) {
             if (isArray(o?.data) && o?.data.length > 0) {
-
+              for (let p of primaryPane) {
+                if (p.name === o.name &&
+                    p.type === o.type &&
+                    isObjectEqual(p.settings, o.settings)) {
+                      p.data = this.merge(p.data, o.data)
+                    }
+              }
             }
           }
         }
@@ -507,7 +522,7 @@ export default class State {
         u = u || r
       }
 
-      if (merge.data.length > 1) this.#core.emit("state_mergeComplete")
+      if (merge.ohlcv.length > 1) this.#core.emit("state_mergeComplete")
 
       if (u) this.#core.refresh()
       this.#isEmpty = false

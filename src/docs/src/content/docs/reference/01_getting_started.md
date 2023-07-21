@@ -18,11 +18,15 @@ yarn add tradex-chart
 
 ### CDN
 You can use `jsDelivr`, `unpkg` or others.
-```bash
+```html
+<!-- jsdelivr -->
+<script src="https://cdn.jsdelivr.net/npm/tradex-chart/dist/tradex-chart.umd.min.js"></script>
+
+<!-- unpkg -->
 <script src=" https://cdn.jsdelivr.net/npm/tradex-chart@0.128.1/dist/tradex-chart.umd.min.js "></script>
 ```
 
-## Creating the Chart
+## Step 1.  Creating the Chart
 
 TradeX Chart is a custom HTML element. It must be created and inserted into the DOM.
 
@@ -35,4 +39,12 @@ let mount = document.getElementByID("#mount")
     mount.appendChild(chart)
 ```
 
-Without a configuration, the chart won't do anything useful, so you need define a few things. The following section, [Configuration](../02_configuration), will show you what is possible.
+## Step 2.  Configure and Start the Chart
+
+After the chart has mounted on the DOM, start it with a configuration object.
+
+```javascript
+chart.start(config)
+```
+
+Without a configuration, the chart won't do anything useful, so you need define a few things. The [Configuration](../02_configuration) documentation will explain what options are available.

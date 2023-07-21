@@ -231,7 +231,7 @@ const config3 = {
   tools: {},
   timeFrame: "1m",
   range: {
-    startTs: rangeStartTS,
+    startTS: rangeStartTS,
   },
   theme: {
     candle: {
@@ -376,7 +376,7 @@ const config5 = {
   tools: {},
   timeFrame: "5m",
   range: {
-    startTs: rangeStartTS,
+    startTS: rangeStartTS,
   },
   theme: {
     candle: {

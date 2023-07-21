@@ -248,6 +248,13 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"examples/static_chart.mdx": {
+	id: "examples/static_chart.mdx";
+  slug: "examples/static_chart";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
 "guides/custom_indicator.mdx": {
 	id: "guides/custom_indicator.mdx";
   slug: "guides/custom_indicator";
@@ -356,6 +363,13 @@ declare module 'astro:content' {
 "reference/overlays.md": {
 	id: "reference/overlays.md";
   slug: "reference/overlays";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/range.md": {
+	id: "reference/range.md";
+  slug: "reference/range";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">

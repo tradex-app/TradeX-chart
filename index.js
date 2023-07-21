@@ -12,6 +12,44 @@ import DMI from './DMI'
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
+// build a split state to test all merge features
+const state1_5a = {primary:[], secondary:[]}
+const state1_5b = {primary:[], secondary:[]}
+let l = state1.ohlcv.length
+state1_5a.ohlcv = state1.ohlcv.slice(0,l/2)
+state1_5b.ohlcv = state1.ohlcv.slice(l/2)
+
+// split the indicators
+for (let p of state1.primary) {
+  let l = p.data.length
+  let pra = {
+    name: p.name,
+    type: p.type,
+    settings: p.settings
+  }
+  let prb = {...pra}
+
+  pra.data = p.data.slice(0,l/2)
+  prb.data = p.data.slice(l/2)
+  state1_5a.primary.push(pra)
+  state1_5b.primary.push(prb)
+}
+
+for (let p of state1.secondary) {
+  let l = p.data.length
+  let pra = {
+    name: p.name,
+    type: p.type,
+    settings: p.settings
+  }
+  let prb = {...pra}
+
+  pra.data = p.data.slice(0,l/2)
+  prb.data = p.data.slice(l/2)
+  state1_5a.secondary.push(pra)
+  state1_5b.secondary.push(prb)
+}
+
 let state4 = {
   "ohlcv": [
       [
@@ -229,7 +267,7 @@ const config3 = {
   tools: {},
   timeFrame: "1m",
   range: {
-    startTs: rangeStartTS,
+    startTS: rangeStartTS,
   },
   theme: {
     candle: {
@@ -374,7 +412,7 @@ const config5 = {
   tools: {},
   timeFrame: "5m",
   range: {
-    startTs: rangeStartTS,
+    startTS: rangeStartTS,
   },
   theme: {
     candle: {
@@ -463,6 +501,104 @@ const config5 = {
   talib: talib,
   wasm: wasm,
 }
+const config6 = {
+  id: "Midnight",
+  title: "BTC/USDT",
+  symbol: "btcusdt",
+  // width: 1000,
+  // height: 800,
+  utils: {},
+  tools: {},
+  timeFrame: "1h",
+  range: {
+    startTS: state1_5b.ohlcv[0][0] // rangeStartTS,
+  },
+  theme: {
+    candle: {
+      Type: "candle_solid",
+      AreaLineColour: "#4c5fe7",
+      AreaFillColour: ["#4c5fe780", "#4c5fe700"],
+
+      UpBodyColour: "#4c5fe7",
+      UpWickColour: "#4c5fe7",
+      DnBodyColour: "#2e384f88",
+      DnWickColour: "#2e384f",
+    },
+    volume: {
+      Height: 15,
+      UpColour: "#4bc67c",
+      DnColour: "#2e384f",
+    },
+    xAxis: {
+      colourTick: "#6a6f80",
+      colourLabel: "#6a6f80",
+      colourCursor: "#2A2B3A",
+      colourCursorBG: "#aac0f7",
+      // fontFamily: XAxisStyle.FONTFAMILY,
+      // fontSize: XAxisStyle.FONTSIZE,
+      // fontWeight: XAxisStyle.FONTWEIGHT,
+      // line: "#656565"
+      slider: "#586ea6",
+      handle: "#586ea688",
+      tickMarker: false,
+    },
+    yAxis: {
+      colourTick: "#6a6f80",
+      colourLabel: "#6a6f80",
+      colourCursor: "#2A2B3A",
+      colourCursorBG: "#aac0f7",
+      // fontFamily: YAxisStyle.FONTFAMILY,
+      // fontSize: YAxisStyle.FONTSIZE,
+      // fontWeight: YAxisStyle.FONTWEIGHT,
+      // line: "#656565"
+      tickMarker: false,
+      location:"left",
+    },
+    chart: {
+      Background: "#0f1213",
+      BorderColour: "#00000000",
+      BorderThickness: 1,
+      GridColour: "#191e26",
+      TextColour: "#6a6f80"
+    },
+    primaryPane: {
+
+    },
+    secondaryPane: {
+
+    },
+    time: {
+
+    },
+    legend: {
+      colour: "#96a9db",
+    },
+    icon: {
+      colour: "#748bc7",
+      hover: "#96a9db"
+    },
+    tools: {
+      location: false
+    },
+    utils: {
+      location: false
+    }
+  },
+  watermark: {
+    text: "ETH/USDT",
+    textColour: "#13171e"
+  },
+  isCrypto: true,
+  logs: false,
+  infos: true,
+  warnings: true,
+  errors: true,
+  stream: streamVal,
+  maxCandleUpdate: 250,
+  talib: talib,
+  wasm: wasm,
+  state: state1_5b
+}
 
 const configs = [
   {config: config1, stream: null},
@@ -470,7 +606,7 @@ const configs = [
   {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
   {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
   {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
-  // {config: config5, stream: (chart) => {once(chart)}},
+  {config: config6, stream: null},
 ]
 
 const main = DOM.findBySelector('main')
@@ -629,7 +765,7 @@ function kline_Binance(chart, symbol="BTCUSDT", start, limit=100, interval="1m")
       .then(r => r.json())
       .then(d => {
         console.log(d)
-        chart.mergeData({data: d})
+        chart.mergeData({ohlcv: d}, false, true)
         waiting = false
       })
     }
@@ -704,6 +840,7 @@ addChart()
 addChart()
 addChart()
 addChart()
+addChart()
 
 // add custom indicator definition
 chart0.setIndicators({
@@ -721,3 +858,6 @@ if (typeof chart1 === "object") {
   chart1.on("range_limitPast", (e) => onRangeLimit(e, "past"))
   chart1.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 }
+
+// test merging indicator data
+chart5.mergeData(state1_5a, false)

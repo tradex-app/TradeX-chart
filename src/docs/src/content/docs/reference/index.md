@@ -15,11 +15,14 @@ TradeX Chart is currently in heavy development, with the API not yet finalized. 
 ## Features
 
 * Lightweight and smooth with one dependency
+* Framework independent, thus future proofing the chart
+* API that is logical and organized, making it easy to use
 * Built-in indicators
 * Custom indicators - build your own
-* Highly customizable
-  * Themes - style everything in the chart
+* Highly customizable and extensible
+  * Themes - style everything in the chart, make it a native part of your app
   * Functionality - subscribe and respond to the chart's internal events
+  * Add the features you desire
 
 ## Where to Download TradeX Chart
 
