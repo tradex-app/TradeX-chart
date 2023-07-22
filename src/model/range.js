@@ -205,6 +205,7 @@ export class Range {
   /**
    * return value at index
    * @param {number} index - price history index, out of bounds will return null filled entry
+   * @param {string} id - defaults to returning chart price history 
    * @returns {array}
    */
   value ( index, id="chart" ) {
@@ -367,7 +368,6 @@ export class Range {
    * @returns {Object}  
    */
    maxMinPriceVol ( input ) {
-// console.time()
     let {data, start, end, that} = {...input}
     let buffer = bRound(this.#core.bufferPx / this.#core.candleW)
 

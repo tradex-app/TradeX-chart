@@ -631,7 +631,7 @@ function kline_Binance(chart, symbol="BTCUSDT", start, limit=100, interval="1m")
       .then(r => r.json())
       .then(d => {
         console.log(d)
-        chart.mergeData({data: d})
+        chart.mergeData({ohlcv: d}, false, true)
         waiting = false
       })
     }

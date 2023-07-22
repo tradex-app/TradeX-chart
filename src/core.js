@@ -397,7 +397,7 @@ export default class TradeXchart extends Tradex_chart {
     }
 
     // set default range
-    const rangeConfig = ("range" in txCfg) ? txCfg.range : {}
+    const rangeConfig = (isObject(txCfg?.range)) ? txCfg.range : {}
           rangeConfig.interval = ms
           rangeConfig.core = this
     this.getRange(null, null, rangeConfig)
@@ -411,6 +411,9 @@ export default class TradeXchart extends Tradex_chart {
       const start = (isNumber(rangeStart)) ? rangeStart : end - this.#range.initialCnt
       this.#range.initialCnt = end - start
       this.setRange(start, end)
+
+      if (txCfg.range?.center)
+        this.jumpToIndex(start, true, true)
     }
 
     this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`)
@@ -939,16 +942,16 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * set Range start index
    * @param {number} start - starting index of state data
-   * @param {boolean} limited - limit range start - no out of range values
-   * @param {boolean} centre - center the range on the start value
+   * @param {boolean} limited - limit the range start to in bounds values of the data history
+   * @param {boolean} center - center the range on the start value
    */
-  jumpToIndex(start, limited=true, centre=true) {
+  jumpToIndex(start, limited=true, center=true) {
     if (limited) start = limit(start, 0, this.range.dataLength)
     
     let length = this.range.Length
     let end = start + length
 
-    if (centre) {
+    if (center) {
       start -= length / 2
       end -= length / 2
     }
@@ -958,29 +961,29 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * set Range start to time stamp
    * @param {number} ts - timestamp
-   * @param {boolean} limited - limit range start - no out of range values
-   * @param {boolean} centre - center the range on the start value
+   * @param {boolean} limited - limit the range start to in bounds values of the data history
+   * @param {boolean} center - center the range on the start value
    */
-  jumpToTS(ts, limited=true, centre=true) {
+  jumpToTS(ts, limited=true, center=true) {
     let start = this.Timeline.xAxis.t2Index(ts)
-    this.jumpToIndex(start, limited=true, centre=true)
+    this.jumpToIndex(start, limited, center)
   }
 
   /**
    * set Range start to state data start
-   * @param {boolean} centre - center the range on the start value
+   * @param {boolean} center - center the range on the start value
    */
-  jumpToStart(centre=false) {
-    this.jumpToIndex(0, true, centre)
+  jumpToStart(center=false) {
+    this.jumpToIndex(0, true, center)
   }
 
   /**
    * set Range start to state data end
-   * @param {boolean} centre - center the range on the end value
+   * @param {boolean} center - center the range on the end value
    */
-  jumpToEnd(centre=true) {
+  jumpToEnd(center=true) {
     let end = this.range.dataLength - this.range.Length
-    if (centre) end += this.range.Length / 2
+    if (center) end += this.range.Length / 2
     this.jumpToIndex(end, true, false)
   }
 
@@ -993,7 +996,6 @@ export default class TradeXchart extends Tradex_chart {
    * @param {boolean|object} newRange - false | {start: number, end: number}
    * @param {boolean} calc - automatically calculate indicator data (ignore any existing)
    */
-  // TODO: merge indicator data?
   // TODO: merge dataset?
   mergeData(merge, newRange=false, calc=false) {
     this.#mergingData = true

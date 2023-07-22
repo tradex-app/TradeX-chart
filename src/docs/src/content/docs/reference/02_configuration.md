@@ -67,6 +67,12 @@ chart.state.export(key)
 
 More information the chart data state are found in the [state](../state) documentation.
 
+## Range
+
+Range determines the initial start and end timestamps for the price history (candles) that the chart displays.
+
+Refer to [Initial Range Config](../range#initial-range-config) for more detail.
+
 ## Themes
 
 For API methods to manipulate chart themes refer to [themes](../themes)
@@ -103,20 +109,11 @@ const config = {
   tools: {},
   // timeframes: s, m, h, d, M, y
   timeFrame: "1m",
-  // timestamp for the chart to start on
-  rangeStartTS: rangeStartTS,
-  // number of candles for the chart to display on start
-  rangeLimit: 30,
-  // number of empty candles (time frame units) the chart will display after the last candle
-  limitFuture: 200,
-  // number of empty candles (time frame units) the chart will display before the first candle
-  limitPast: 200,
-  // minimum candles the chart will zoom to and display
-  minCandles: 20,
-  // maximum candles the chart will zoom to and display
-  minCandles: 1000,
-  // "padding" added to upper and lower price bounds for display
-  yAxisBounds: 0.005,
+  // initial Range definition
+  range: {
+    // see documentation Range, Initial Range Config
+  }
+
   // chart theme
   theme: {
     candle: {

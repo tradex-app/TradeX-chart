@@ -141,13 +141,14 @@ const config1 = {
   tools: {},
   timeFrame: "1m",
   range: {
-    startTS: rangeStartTS,  // formerly rangeStartTS
-    initialCnt: 30,    // formerly rangeLimit
+    startTS: rangeStartTS, // state1.ohlcv.slice(-1)[0][0],
+    initialCnt: 30,
     limitFuture: LIMITFUTURE,
     limitPast: LIMITPAST,
     minCandles: MINCANDLES,
     maxCandles: MAXCANDLES,
-    yAxisBounds: 0.3
+    yAxisBounds: 0.3,
+    center: true
   },
   theme: {
     candle: {
