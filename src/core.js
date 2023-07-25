@@ -1054,7 +1054,7 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {Indicator|false} - indicator instance or false
    */
   addIndicator(i, name=i, params={}) {
-    return this.#MainPane.addIndicator(i, name=i, params={})
+    return this.#MainPane.addIndicator(i, name, params)
   }
 
   /**

@@ -123,16 +123,16 @@ The following data state config object example demonstrates all possible options
   datasets: [],
 
   // list of trades
-  trades: [],
+  trades: {},
 
   // list of drawing tools used
-  tools: []
+  tools: {},
 
   // list of news / events
-  events: []
+  events: {},
 
   // list of user defined annotations
-  annotations: []
+  annotations: {}
 }
 ```
 :::note

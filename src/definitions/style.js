@@ -3,6 +3,7 @@
  */
 
 import Divider from "../components/widgets/divider"
+import { arrowDown, arrowUp, arrowDownRound, arrowUpRound, arrowDownRoundSolid, arrowUpRoundSolid, buySolid, sellSolid } from "./icons"
 
 export const CHART_MINH = 300
 export const CHART_MINW = 400
@@ -56,11 +57,11 @@ export const CanvasStyle = {
   paddingRight: 3,
   paddingTop: 2,
   paddingBottom: 2,
-  borderSize: 1,
+  borderWidth: 1,
   txtCol: "#000000",
   bakCol: "#cccccc",
-  stroke: "ffffff",
-  fill: "888888"
+  stroke: "#ffffff",
+  fill: "#888888"
 }
 
 export const ToolsStyle = {
@@ -183,10 +184,21 @@ export const LegendStyle = {
   colour: GlobalStyle.COLOUR_TXT
 }
 
-const DividerStyle = {
+export const DividerStyle = {
   ACTIVE: "#888888C0",
   IDLE: "#FFFFFF00"
 }
+
+export const watermark = {
+  FONTSIZE: 50,
+  FONTWEIGHT: "bold",
+  FONTFAMILY: GlobalStyle.FONTFAMILY,
+  COLOUR: "#181818",
+  IMGWIDTH: "200",
+  IMGHEIGHT: "200"
+}
+
+const tradeIcons = { arrowDown, arrowUp, arrowDownRound, arrowUpRound, arrowDownRoundSolid, arrowUpRoundSolid, buySolid, sellSolid }
 
 export const defaultTheme = {
   candle: {
@@ -260,7 +272,18 @@ export const defaultTheme = {
   divider: {
     active: DividerStyle.ACTIVE,
     idle: DividerStyle.IDLE
-  }
+  },
+  watermark: watermark,
+  trades: {
+    iconBuy: tradeIcons.arrowUp,
+    iconSell: tradeIcons.arrowDown,
+    iconHeight: 30,
+    iconWidth: 30,
+    buyColour: "#0f0",
+    sellColour: "#f00",
+    defaultIcons: tradeIcons,
+    offset: 10
+  },
 }
 
 export const cssVars = `

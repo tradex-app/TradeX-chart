@@ -65,7 +65,11 @@ Do not directly modify the theme values. the ``setProperty()`` must be used.
 chart0.theme.getProperty("candle.Type")
 ```
 
-## Candle Types
+## Theme Properties
+
+
+
+### Candle Types
 
 ```javascript
 export const CandleType = {
@@ -79,17 +83,34 @@ export const CandleType = {
 }
 ```
 
-### CANDLE_SOLID
+#### CANDLE_SOLID
 ![CANDLE_SOLID](../../../assets/CANDLE_SOLID.png)
-### CANDLE_HOLLOW
+#### CANDLE_HOLLOW
 ![CANDLE_HOLLOW](../../../assets/CANDLE_HOLLOW.png)
-### CANDLE_UP_HOLLOW
+#### CANDLE_UP_HOLLOW
 ![CANDLE_UP_HOLLOW](../../../assets/CANDLE_UP_HOLLOW.png)
-### CANDLE_DOWN_HOLLOW
+#### CANDLE_DOWN_HOLLOW
 ![CANDLE_DOWN_HOLLOW](../../../assets/CANDLE_DOWN_HOLLOW.png)
-### OHLC
+#### OHLC
 ![OHLC](../../../assets/CANDLE_OHLC.png)
-### AREA
+#### AREA
 ![AREA](../../../assets/CANDLE_AREA.png)
-### LINE
+#### LINE
 ![LINE](../../../assets/CANDLE_LINE.png)
+
+
+### Trades
+
+```javascript
+const config = {
+  theme: {
+    trades: {
+      Type: "",
+      Types: {
+        TRADE_ARROW: {},
+        TRADE_BUBBLE: {}
+      }
+    }
+  }
+}
+```

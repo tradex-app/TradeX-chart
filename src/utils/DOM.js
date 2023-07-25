@@ -3,6 +3,7 @@
 
 import { isObject, isString } from "./typeChecks"
 
+
 const DOM = {
 
   findByID(id, base=document) {
@@ -95,10 +96,21 @@ const DOM = {
 
   /**
    * test if image, return image object or false
-   * @param {*} img - image resource, URL, data:URL
+   * @param {*} img - image resource, URL, data:URL, svg
    * @param {function} cb - callback to return image or false
    */
   isImage(img, cb) {
+    const svg = /<\s*svg[^>]*>(.*?)<\s*\/\s*svg>/;
+
+    if (svg.test(img)) { 
+      // img = this.htmlToElement(img)
+      // const xml = new XMLSerializer().serializeToString(img);
+      // img = `data:image/svg+xml;base64,${btoa(xml)}`
+
+      var DOMURL = window.URL || window.webkitURL || window;
+      var img = new Blob([img], {type: 'image/svg+xml'});
+      var img = DOMURL.createObjectURL(img);
+    }
     const i = new Image()
     i.src = img
 

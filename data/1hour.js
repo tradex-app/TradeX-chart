@@ -85142,6 +85142,21 @@ export default {
             }
         }
     ],
+    trades: {
+        1558670400000: [
+            {
+                timestamp: 1558670400000,
+                id: "012335353",
+                side: "buy",
+                price: 7844,
+                amount: 0.25,
+                filled: 0.25,
+                average: 7845,
+                total: 1961,
+                tag: "Bot ABC - BTC/USDT"
+            }
+        ]
+    },
     "tools": [
         {
             "type": "Cursor",

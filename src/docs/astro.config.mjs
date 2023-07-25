@@ -45,4 +45,17 @@ export default defineConfig({
 
   // Process images with sharp: https://docs.astro.build/en/guides/assets/#using-sharp
   image: { service: { entrypoint: 'astro/assets/services/sharp' } },
+  markdown: {
+    shikiConfig: {
+      // Choose from Shiki's built-in themes (or add your own)
+      // https://github.com/shikijs/shiki/blob/main/docs/themes.md
+      theme: 'min-dark',
+      // Add custom languages
+      // Note: Shiki has countless langs built-in, including .astro!
+      // https://github.com/shikijs/shiki/blob/main/docs/languages.md
+      langs: [],
+      // Enable word wrap to prevent horizontal scrolling
+      wrap: true,
+    },
+  },
 });

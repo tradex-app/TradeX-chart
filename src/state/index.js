@@ -27,12 +27,15 @@ const DEFAULT_STATE = {
     tf: DEFAULT_TIMEFRAME,
     tfms: DEFAULT_TIMEFRAMEMS
   },
+  ohlcv: [],
   views: [],
   primary: [],
   secondary: [],
   datasets: [],
-  tools: [],
-  ohlcv: []
+  tools: {},
+  trades: {},
+  events: {},
+  annotations: {}
 }
 
 

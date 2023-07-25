@@ -25,7 +25,7 @@ export function renderPolygonRegular (ctx, x, y, radius, sides, rotateAngle, opt
   }
   ctx.closePath();
 
-  fillStroke(ctx, opts?.fill, opts?.stroke, opts?.size)
+  fillStroke(ctx, opts?.fill, opts?.stroke, opts?.width)
 }
 
 /**
@@ -45,7 +45,7 @@ export function renderPolygonIrregular (ctx, points, opts) {
     }
     ctx.closePath(); // go back to point 1
 
-    fillStroke(ctx, opts?.fill, opts?.stroke, opts?.size)
+    fillStroke(ctx, opts?.fill, opts?.stroke, opts?.width)
   }
 };
 
@@ -58,9 +58,9 @@ export function renderPolygonIrregular (ctx, points, opts) {
  * @param {Object} opts - {fill, size, border, rotate}
  */
 export function renderTriangle (ctx, x, y, h, opts) {
-  renderPolygonRegular (ctx, x, y, h, 3, opts?.rotate || 0) 
+  renderPolygonRegular (ctx, x, y, h, 3, opts?.rotate || 0, opts) 
 
-  fillStroke(ctx, opts?.fill, opts?.stroke, opts?.size)
+  fillStroke(ctx, opts?.fill, opts?.stroke, opts?.width)
 }
 
 /**
@@ -80,5 +80,5 @@ export function renderDiamond (ctx, x, y, w, h, opts) {
   ctx.lineTo(x, y + h / 2)
   ctx.closePath()
 
-  fillStroke(ctx, opts?.fill, opts?.stroke, opts?.size)
+  fillStroke(ctx, opts?.fill, opts?.stroke, opts?.width)
 }

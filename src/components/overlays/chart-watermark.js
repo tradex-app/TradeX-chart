@@ -5,16 +5,7 @@ import { renderImage } from "../../renderer/canvas"
 import { isObject, isString } from "../../utils/typeChecks"
 import DOM from "../../utils/DOM"
 import Overlay from "./overlay"
-import { GlobalStyle } from "../../definitions/style"
 
-const watermark = {
-  FONTSIZE: 50,
-  FONTWEIGHT: "bold",
-  FONTFAMILY: GlobalStyle.FONTFAMILY,
-  COLOUR: "#181818",
-  IMGWIDTH: "200",
-  IMGHEIGHT: "200"
-}
 
 export default class chartWatermark extends Overlay {
 
@@ -51,10 +42,10 @@ export default class chartWatermark extends Overlay {
     const family = this.core.config?.watermark?.fontFamily
     const colour = this.core.config?.watermark?.textColour
     const options = {
-      fontSize: size || watermark.FONTSIZE,
-      fontWeight: weight || watermark.FONTWEIGHT,
-      fontFamily: family || watermark.FONTFAMILY,
-      txtCol: colour || watermark.COLOUR,
+      fontSize: size || this.theme.watermark.FONTSIZE,
+      fontWeight: weight || this.theme.watermark.FONTWEIGHT,
+      fontFamily: family || this.theme.watermark.FONTFAMILY,
+      txtCol: colour || this.theme.watermark.COLOUR,
     }
     const txt = this.config.watermark.text
     const ctx = this.scene.context
@@ -73,8 +64,8 @@ export default class chartWatermark extends Overlay {
   renderImage(i) {
     if (!i) return
 
-    const height = this.core.config?.watermark?.imgHeight || watermark.IMGHEIGHT
-    const width = this.core.config?.watermark?.imgWidth || watermark.IMGWIDTH
+    const height = this.core.config?.watermark?.imgHeight || this.theme.watermark.IMGHEIGHT
+    const width = this.core.config?.watermark?.imgWidth || this.theme.watermark.IMGWIDTH
     const x = (this.scene.width - width) / 2
     const y = (this.scene.height - height) / 2
 

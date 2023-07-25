@@ -13,7 +13,7 @@ import { CanvasStyle } from "../definitions/style";
  * @param {Object} opts - {border, size}
  */
 export function renderRectStroke (ctx, x, y, w, h, opts) {
-  ctx.lineWidth = opts?.size || CanvasStyle.borderSize
+  ctx.lineWidth = opts?.width || CanvasStyle.borderWidth
   ctx.strokeStyle = opts?.border || CanvasStyle.stroke
   ctx.beginPath();
   ctx.rect(x, y, w, h);
@@ -46,7 +46,7 @@ export function renderRectFill (ctx, x, y, w, h, opts) {
 export function renderRect (ctx, x, y, w, h, opts) {
   if (isString(opts.fill)) 
     renderRectFill(ctx, x, y, w, h, opts)
-  if (isNumber(opts.size) && opts.size > 0)
+  if (isNumber(opts.width) && opts.width > 0)
     renderRectStroke(ctx, x, y, w, h, opts)
 }
 
@@ -63,7 +63,7 @@ export function renderRect (ctx, x, y, w, h, opts) {
 export function renderRectRoundStroke (
   ctx, x, y, w, h, r, opts
   ) {
-  ctx.lineWidth = opts?.size || CanvasStyle.borderSize
+  ctx.lineWidth = opts?.width || CanvasStyle.borderWidth
   ctx.strokeStyle = opts?.border || CanvasStyle.stroke
   renderRectRoundPath(ctx, x, y, w, h, r)
   ctx.stroke()
@@ -119,6 +119,6 @@ export function renderRectRound (
 ) {
   if (isString(opts.fill)) 
     renderRectRoundFill(ctx, x, y, w, h, r, opts?.fill)
-  if (isNumber(opts.size) && opts.size > 0)
-    renderRectRoundStroke(ctx, x, y, w, h, r, opts?.border, opts?.size)
+  if (isNumber(opts.width) && opts.width > 0)
+    renderRectRoundStroke(ctx, x, y, w, h, r, opts?.border, opts?.width)
 }

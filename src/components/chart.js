@@ -41,6 +41,8 @@ const defaultOverlays = {
     ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
     ["candles", {class: chartCandles, fixed: false, required: true}],
     ["stream", {class: chartCandleStream, fixed: false, required: true}],
+    ["trades", {class: chartTrades, fixed: false, required: false}],
+
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ],
   secondaryPane: [
@@ -50,7 +52,7 @@ const defaultOverlays = {
 }
 const optionalOverlays = {
   primaryPane: {
-    "trades": {class: chartTrades, fixed: false, required: false}
+    // "trades": {class: chartTrades, fixed: false, required: false}
   },
   secondaryPane: {
     "candles": {class: chartCandles, fixed: false, required: true},

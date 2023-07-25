@@ -14,5 +14,5 @@ export function renderCircle (ctx, x, y, r, opts) {
   ctx.arc(x, y, r, 0, Math.PI * 2)
   ctx.closePath()
 
-  fillStroke(ctx, opts?.fill, opts?.stroke, opts?.size)
+  fillStroke(ctx, opts?.fill, opts?.stroke, opts?.width)
 }
