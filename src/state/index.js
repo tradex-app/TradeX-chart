@@ -379,11 +379,13 @@ export default class State {
       this.error(`ERROR: ${this.core.id}: merge data time frame does not match existing time frame!`)
       return false
     }
+
     // // Not valid chart data
     // if (!isArray(merge?.ohlcv)) {
     //   this.error(`ERROR: ${this.core.id}: merge chart data must be of type Array!`)
     //   return false
     // }
+
     // if the chart empty is empty set the range to the merge data
     if (this.#isEmpty || !isNumber(this.time.timeFrameMS)) {
       if (!isObject(newRange) ||
@@ -444,6 +446,15 @@ export default class State {
         // sanitize data, must be numbers
         // entries must be: [ts,o,h,l,c,v]
         mData = sanitizeCandles(mData)
+      }
+      // is a candle stream
+      else {
+        // should range auto increment?
+        if (newRange.end >= this.range.timeFinish &&
+            newRange.start <= this.range.timeFinish) {
+              newRange.start += this.range.interval
+              newRange.end += this.range.interval
+            }
       }
       
       // chart is empty so simply add the new data
