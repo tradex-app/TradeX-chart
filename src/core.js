@@ -1127,6 +1127,24 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   /**
+   * Add a trade entry to the chat
+   * @param {Object} t - trade entry
+   * @returns {boolean}
+   */
+  addTrade(t) {
+    return this.#State.addTrade(t)    
+  }
+
+  /**
+   * 
+   * @param {number} t 
+   * @returns {boolean}
+   */
+  removeTrade(t) {
+    return this.#State.removeTrade(t)
+  }
+
+  /**
    * Resize the chart
    * @memberof TradeXchart
    * @param {number} width - pixels

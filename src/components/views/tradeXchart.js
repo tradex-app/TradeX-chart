@@ -146,6 +146,7 @@ export default class tradeXChart extends element {
     }
   }
   
+  get dimensions() { return this.getBoundingClientRect() }
   get width() { return this.offsetWidth }
   set width(w) { this.setWidth(w) } 
   get height() { return this.offsetHeight }

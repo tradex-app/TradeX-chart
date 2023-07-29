@@ -297,6 +297,13 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
+"reference/annotations.md": {
+	id: "reference/annotations.md";
+  slug: "reference/annotations";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "reference/api-examples.md": {
 	id: "reference/api-examples.md";
   slug: "reference/api-examples";
@@ -398,6 +405,20 @@ declare module 'astro:content' {
 "reference/themes.md": {
 	id: "reference/themes.md";
   slug: "reference/themes";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/trades.md": {
+	id: "reference/trades.md";
+  slug: "reference/trades";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/widgets.md": {
+	id: "reference/widgets.md";
+  slug: "reference/widgets";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">

@@ -4,7 +4,7 @@
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import Dataset from '../model/dataset'
 import { validateDeep, validateShallow, sanitizeCandles } from '../model/validateData'
-import { copyDeep, mergeDeep, xMap, uid, isObjectEqual } from '../utils/utilities'
+import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual } from '../utils/utilities'
 import { calcTimeIndex, detectInterval } from '../model/range'
 import { ms2Interval, SECOND_MS } from '../utils/time'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS } from '../definitions/chart'
@@ -36,6 +36,17 @@ const DEFAULT_STATE = {
   trades: {},
   events: {},
   annotations: {}
+}
+const TRADE = {
+  timestamp: "number",
+  id: "string",
+  side: "string",
+  price: "number",
+  amount: "number",
+  filled: "number",
+  average: "number",
+  total: "number",
+  tag: "string",
 }
 
 
@@ -423,8 +434,8 @@ export default class State {
     const mSecondary = merge?.secondary || false
     const dataset = this.allData?.dataset?.data
     const mDataset = merge?.dataset?.data || false
-    const trades = this.allData?.trades?.data
-    const mTrades = merge?.trades?.data || false
+    const trades = this.allData?.trades
+    const mTrades = merge?.trades || false
     const inc = (!isArray(mData)) ? 0 : (this.range.inRange(mData[0][0])) ? 1 : 0
     const refresh = {}
 
@@ -512,8 +523,8 @@ export default class State {
       }
 
       // Do we have trades?
-      if (isArray(trades) && trades.length > 0) {
-        for (let d of trades) {
+      if (isObject(trades)) {
+        for (let d in trades) {
           
         }
       }
@@ -544,7 +555,7 @@ export default class State {
     }
   }
 
-  merge(data, mData) {   
+  merge(data, mData) {
     let merged = []
     let older, newer;
 
@@ -605,4 +616,25 @@ export default class State {
 
     return merged
   }
+
+  addTrade(t) {
+    // validate trade entry
+    const k1 = Object.keys(t)
+    const k2 = Object.keys(TRADE)
+    if (!isObject(t) ||
+        !isArrayEqual(k1, k2)) return false
+    for (let k of k2) {
+      if (typeof t[k] !== TRADE[k]) return false
+    }
+
+    // insert the trade
+    const ts = t.timestamp - (t.timestamp % this.time.timeFrameMS)
+    const d = new Date(ts)
+          t.dateStr =`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+    if (!isArray(this.allData.trades[ts]))
+      this.allData.trades[ts] = []
+    this.allData.trades[ts].push(t)
+    return true
+  }
 }
+

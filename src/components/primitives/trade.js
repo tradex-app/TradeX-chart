@@ -1,10 +1,11 @@
 // trade.js
 // draw a single trade marker
 
-import { renderImage } from "../../renderer/canvas"
 import DOM from "../../utils/DOM"
 import { renderTriangle } from "../../renderer/polygon"
 import { renderLine } from "../../renderer/line"
+import { renderImage } from "../../renderer/canvas"
+import { limit } from "../../utils/number"
 
 
 export default class Trade {
@@ -49,7 +50,7 @@ export default class Trade {
         img.setAttribute("height", h)
         img.onload = () => {
           canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-          cb(canvas)
+          // cb(canvas)
         };
         img.src = image64;
     return img
@@ -58,37 +59,16 @@ export default class Trade {
   draw(data) {
     this.data = data
     const i = (data.side === "buy") ? this.buy : this.sell
-  //   DOM.isImage(i, this.renderImage.bind(this))
-  // }
-
-  // renderImage(i) {
-  //   // if (!i) return
-
-    // let svg = DOM.htmlToElement(i)
-    //     svg.style.fill = "#fff"
-    //     svg = svg.outerHTML
-
-    const h = this.cfg.iconHeight
-    const w = this.cfg.iconWidth
+    const c = this.cfg
+    const h = limit(data.w, c.iconMinDim, c.iconHeight)
+    const w = limit(data.w, c.iconMinDim, c.iconWidth)
     const x = this.data.x
     const y = this.data.y
-
     const ctx = this.scene.context
     ctx.save();
-    // renderImage(ctx, i, x, y, height, width )
-
-    // let DOMURL = window.URL || window.webkitURL || window;
-    // let img1 = new Image();
-    // let blob = new Blob([svg], {type: 'image/svg+xml'});
-    // let url = DOMURL.createObjectURL(blob);
-    // img1.onload = function() {
-    //    ctx.drawImage(img1, x, y, w, h);
-    //    DOMURL.revokeObjectURL(url);
-    // }
-    // img1.src = url;
-
     ctx.drawImage(i, x, y, w, h);
-    // renderTriangle(ctx, x+10, y+10, 30, {fill:"#fff", stroke:"#f00", width:1})
     ctx.restore()
+
+    return {x,y,w,h}
   }
 }

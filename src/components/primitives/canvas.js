@@ -557,11 +557,11 @@ const CEL = {
   viewports: [],
   pixelRatio: (window && window.devicePixelRatio) || 1,
 
-  Node: Node,
-  Viewport: Viewport,
-  Layer: Layer,
-  Scene: Scene,
-  Hit: Hit,
+  Node,
+  Viewport,
+  Layer,
+  Scene,
+  Hit,
 };
 
 export default CEL

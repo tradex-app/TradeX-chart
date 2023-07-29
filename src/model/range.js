@@ -243,14 +243,14 @@ export class Range {
   }
 
   /**
-   * INCOMPLETE!!!
+   * TODO: Finish this!!!
    * return value by timestamp
    * @param {number} ts
    * @param {string} id
    * @returns {*}  
    * @memberof Range
    */
-  valueByTS ( ts, id ) {
+  valueByTS ( ts, id="" ) {
     if (!isNumber(ts) || !isString(id)) return false
 
     const idx = this.getTimeIndex(ts)
@@ -264,7 +264,7 @@ export class Range {
       case "dataset": break;
       case "all": break;
       default: 
-        if (id.length = 0) return this.value(idx)
+        if (id.length === 0) return this.value(idx)
         else {
           const idParts = id.split('_')
         }

@@ -85,7 +85,64 @@ export function renderImage (ctx, image, sx, sy, sWidth, sHeight, dx, dy, dWidth
   ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 }
 
+/**
+ * convert an image to HTML canvas
+ * @param {image} image - valid image source
+ * @param {canvas} canvas - HTML canvas
+ * @returns {canvas}
+ */
+export function imageToCanvs(image, canvas) {
+  let w = image.naturalWidth || image.width;
+  let h = image.naturalHeight || image.height;
+
+  if (canvas === undefined) canvas = createCanvas(w, h)
+
+  canvas.ctx.drawImage(image, 0, 0);
+  return canvas;
+}
+
+const channels = {
+  red: "#FF0000FF",
+  green: "#00FF00FF",
+  blue: "#0000FFFF",
+  alpa: "#000000FF"
+};
+
+export function getChannel(channelName, image) {
+  const copy = imageToCanvs(image);
+  const ctx = copy.ctx;
+  ctx.fillStyle = channels[channelName];
+  ctx.globalCompositeOperation = "multiply";
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.globalCompositeOperation = "destination-in";
+  ctx.drawImage(image, 0, 0);
+  ctx.globalCompositeOperation = "source-over";
+  return copy;
+}
+
+export function seperateRGB(image) {
+  return {
+    red: getChannel("red", image),
+    green: getChannel("green", image),
+    blue: getChannel("blue", image),
+    alpha: getChannel("alpha", image)
+  };
+}
+
+export function createCanvas(w, h) {
+  const can = document.createElement("canvas");
+  can.ctx = can.getContext("2d");
+  can.width = w || can.ctx.canvas.width;
+  can.height = h || can.ctx.canvas.height;
+  return can;
+}
+
+
 export default {
+  createCanvas,
+  imageToCanvs,
+  seperateRGB,
+  getChannel,
   getPixelRatio,
   fillStroke,
   calcTextWidth,

@@ -279,6 +279,7 @@ export const defaultTheme = {
     iconSell: tradeIcons.arrowDown,
     iconHeight: 30,
     iconWidth: 30,
+    iconMinDim: 10,
     buyColour: "#0f0",
     sellColour: "#f00",
     defaultIcons: tradeIcons,
