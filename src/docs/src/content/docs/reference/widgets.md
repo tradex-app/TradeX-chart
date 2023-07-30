@@ -2,7 +2,7 @@
 title: Widgets
 description: How to use TradeX Chart widgets
 ---
-TradeX Chart has a number of widgets, but only a select number are exposed to the developer to make use of.
+TradeX Chart has a number of widgets, but only a select number are exposed to the developer to make use of. The others are used by default with certain chart components.
 
 * [Dialogue](#dialogue)
 * Progress

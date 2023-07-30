@@ -16,34 +16,43 @@ const userSelect = [
 export default class Legends {
 
   #elTarget
-  #list
   #parent
   #core
   #theme
   #input
-
-
+  #controls
+  #collapse
+  #collapseList = []
   #controlsList
+  #list = {}
+  #show
+  #hide
+  #toggle = null
+
 
   constructor(target, parent) {
     this.#elTarget = target
-    this.#list = {}
     this.#parent = parent
     this.#core = parent.core
     this.#theme = parent.core.theme.legend
+    this.init()
     this.eventsListen()
   }
 
   get elTarget() { return this.#elTarget }
   get list() { return this.#list }
+  set collapse(c) { this.setCollapse(c) }
+  get collapse() { return this.#collapse }
 
   destroy() {
     this.#core.off("chart_pan", this.primaryPanePan)
     this.#core.off("chart_panDone", this.primaryPanePanDone)
 
     for (let l in this.#list) {
+      if (l === "collapse") continue
       this.remove(l)
     }
+    // TODO: remove collapse listeners
     this.#elTarget.remove()
   }
 
@@ -53,6 +62,19 @@ export default class Legends {
 
     this.#core.on("chart_pan", this.primaryPanePan.bind(this))
     this.#core.on("chart_panDone", this.primaryPanePanDone.bind(this))
+  }
+
+  init() {
+    const legends = this.#elTarget.legends
+    this.#controls = legends.querySelector(`.controls`)
+    this.#collapse = legends.querySelectorAll(`.control`)
+    this.#show = legends.querySelector("#showLegends")
+    this.#hide = legends.querySelector("#hideLegends")
+    this.#controls.style.display = "none"
+    this.icons(this.#collapse, {id: "collapse", parent: this})
+    this.#elTarget.legends.classList.add("hide")
+    this.#toggle = "hide"
+    this.collapse = "show"
   }
 
   /**
@@ -76,6 +98,28 @@ export default class Legends {
 
   }
 
+  onLegendAction(e) {
+    const which = this.onMouseClick(e.currentTarget)
+    this.setCollapse(which.icon)
+  }
+
+  setCollapse(c) {
+    // collapse the legends
+    if (c === "show" && this.#toggle !== "show") {
+      this.#toggle = c
+      this.#show.style.display = "none"
+      this.#hide.style.display = "inline-block"
+      this.#elTarget.legends.classList.toggle("hide")
+    }
+    // expand the legends
+    else if (c === "hide" && this.#toggle !== "hide") {
+      this.#toggle = c
+      this.#show.style.display = "inline-block"
+      this.#hide.style.display = "none"
+      this.#elTarget.legends.classList.toggle("hide")
+    }
+  }
+
   primaryPanePan() {
     for (let property of userSelect) {
       this.#elTarget.style.setProperty(property, "none");
@@ -91,7 +135,6 @@ export default class Legends {
   add(options) {
     if (!isObject(options) || !("title" in options)) return false
 
-    let click
     const parentError = () => {this.#core.error("ERROR: Legend parent missing!")}
     options.id = options?.id || uid("legend")
     options.type = options?.type || "overlay"
@@ -109,22 +152,16 @@ export default class Legends {
       source: options?.source,
       click: []
     }
+    // style and add event listeners
+    this.icons(this.#controlsList, options)
 
-    for (let el of this.#controlsList) {
-      let svg = el.querySelector('svg');
-
-// TODO: set values dynamically via CSS variables
-// https://stackoverflow.com/a/60357706/15109215
-
-      svg.style.width = `${this.#theme.controlsW}px`
-      svg.style.height = `${this.#theme.controlsH}px`
-      svg.style.fill = `${this.#theme.controlsColour}`
-      svg.onpointerover = (e) => e.currentTarget.style.fill = this.#theme.controlsOver
-      svg.onpointerout = (e) => e.currentTarget.style.fill = this.#theme.controlsColour
-
-      click = options.parent.onLegendAction.bind(options.parent)
-      this.#list[options.id].click.push({el, click})
-      el.addEventListener('click', click)
+    // only display the collapse control if indicator legend
+    if (options.type == "indicator") {
+      this.#controls.style.display = "block"
+      // do not display collapse control if a singular secondary pane indicator
+      if (!options.parent.primaryPane &&
+        Object.keys(this.#list).length < 3)
+        this.#controls.style.display = "none"
     }
 
     return options.id
@@ -142,6 +179,10 @@ export default class Legends {
 
     delete this.#list[id]
 
+    // hide the collapse control if no indicator legends
+    if (Object.keys(this.#list).length < 2)
+      this.#controls.style.display = "none"
+
     return true
   }
 
@@ -154,6 +195,30 @@ export default class Legends {
     let source = this.#list[id].source(data.pos)
     const html = this.#elTarget.buildInputs(source)
     this.#elTarget.legends.querySelector(`#legend_${id} dl`).innerHTML = html
+  }
+
+  icons(icons, options) {
+    let click
+
+    for (let el of icons) {
+      let svg = el.querySelector('svg');
+
+// TODO: set values dynamically via CSS variables
+// https://stackoverflow.com/a/60357706/15109215
+
+      svg.style.width = `${this.#theme.controlsW}px`
+      svg.style.height = `${this.#theme.controlsH}px`
+      svg.style.fill = `${this.#theme.controlsColour}`
+      svg.onpointerover = (e) => e.currentTarget.style.fill = this.#theme.controlsOver
+      svg.onpointerout = (e) => e.currentTarget.style.fill = this.#theme.controlsColour
+
+      click = options.parent.onLegendAction.bind(options.parent)
+      if (options.id === "collapse")
+        this.#collapseList.push({el, click})
+      else
+        this.#list[options.id].click.push({el, click})
+      el.addEventListener('click', click)
+    }
   }
 }
 

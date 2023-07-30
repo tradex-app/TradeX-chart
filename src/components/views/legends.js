@@ -3,7 +3,7 @@
 
 import element from "./classes/element"
 import { isString } from "../../utils/typeChecks"
-import { close, up, down, restore, maximize, collapse, config } from "../../definitions/icons"
+import { close, up, up2, down, down2, restore, maximize, collapse, config } from "../../definitions/icons"
 
 
 const mouseOver = "onmouseover='this.style.opacity=1'"
@@ -11,6 +11,15 @@ const mouseOut = "onmouseout='this.style.opacity=0'"
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
+
+.legends {
+  display: flex;
+  flex-direction: column;
+}
+.legends .collapse {
+  order: 999;
+  padding-left: 0.5em;
+}
 
 .legend {
   display: block;
@@ -78,6 +87,10 @@ template.innerHTML = `
 }
 
 
+.legends.hide .legend.indicator {
+  display:none;
+}
+
 .chart .upper {
   right: 0;
   z-index:1;
@@ -97,6 +110,10 @@ template.innerHTML = `
 </style>
 <div class="legends">
   <slot name="legend"></slot>
+  <div class="controls collapse">
+    <span id="hideLegends" class="control" data-icon="hide" style="display:none">${up}</span>
+    <span id="showLegends" class="control" data-icon="show" style="display:none">${down}</span>
+  </div>
 </div>
 `
 
@@ -234,9 +251,9 @@ export default class tradeXLegends extends element {
     // visibility
     // if (o?.type !== "chart") {
       // move up
-      inp += `<span id="${id}_up" class="control" data-icon="up">${up}</span>`
+      inp += `<span id="${id}_up" class="control" data-icon="up">${up2}</span>`
       // move down
-      inp += `<span id="${id}_down" class="control" data-icon="down">${down}</span>`
+      inp += `<span id="${id}_down" class="control" data-icon="down">${down2}</span>`
     // }
     // collapse
     inp += `<span id="${id}_collapse" class="control" data-icon="visible">${collapse}</span>`
