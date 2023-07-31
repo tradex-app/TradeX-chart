@@ -1166,7 +1166,12 @@ export default class TradeXchart extends Tradex_chart {
       let content = `
         This feature is not implemented yet.
       `;
-      let config = { content }
+      let config = { 
+        content,
+        styles: {
+          content: {padding: "1em"}
+        }
+      }
       this.implemented = this.#WidgetsG.insert("Dialogue", config)
       this.implemented.start()
     }

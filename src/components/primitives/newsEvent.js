@@ -1,11 +1,11 @@
-// trade.js
-// draw a single trade marker
+// newsEvent.js
+// draw a single news event marker
 
 import DOM from "../../utils/DOM"
 import { limit } from "../../utils/number"
 
 
-export default class Trade {
+export default class NewsEvent {
 
   data
   buy

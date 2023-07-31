@@ -86,7 +86,7 @@ export default class Window {
   start() {
     // set up event listeners
     this.eventsListen()
-    this.open()
+    this.close()
   }
 
   destroy() {
