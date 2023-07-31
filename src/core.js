@@ -13,25 +13,15 @@ import StateMachine from './scaleX/stateMachne'
 import Stream from './helpers/stream'
 import Theme from "./helpers/theme"
 import WebWorker from "./helpers/webWorkers"
-import Indicators from './definitions/indicators'
-import style, { CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH } from './definitions/style'
 import Tradex_chart from "./components/views/tradeXchart"
 import UtilsBar from './components/utils'
 import ToolsBar from './components/tools'
 import MainPane from './components/main'
 import WidgetsG from './components/widgets'
 
-import {
-  NAME,
-  SHORTNAME,
-  ID,
-  RANGELIMIT,
-  PRICE_PRECISION,
-  VOLUME_PRECISION,
-  STREAM_UPDATE,
-} from './definitions/core'
-
-import { GlobalStyle } from './definitions/style'
+import { NAME, SHORTNAME, ID, RANGELIMIT, PRICE_PRECISION, VOLUME_PRECISION, STREAM_UPDATE } from './definitions/core'
+import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH } from './definitions/style'
+import Indicators from './definitions/indicators'
 import Indicator from './components/overlays/indicator'
 
 /**

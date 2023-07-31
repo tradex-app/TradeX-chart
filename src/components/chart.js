@@ -657,11 +657,18 @@ export default class Chart {
 
   /**
    * Refresh secondaryPane - overlays, grid, scale, indicators
-   * @memberof Chart
    */
   refresh() {
     this.scale.draw()
     this.draw(undefined, this.isPrimary)
+  }
+
+  /**
+   * Set the visibility of all indicator legends on this pane
+   * @param {string} v - "show" | "hide" all indicator legends
+   */
+  legendsVisibility(v) {
+    this.legend.setCollapse(v)
   }
 
   /**

@@ -156,22 +156,26 @@ const DOM = {
   },
 
   /**
- * @param {String} HTML representing a single element
- * @returns {Element}
- */
+   * Convert string into HTML element
+   * @param {String} HTML representing a single element
+   * @returns {Element}
+   */
   htmlToElement(html) {
-    var template = document.createElement('template');
+    if (!isString(html)) return false
+    const template = document.createElement('template');
     html = html.trim(); // Never return a text node of whitespace as the result
     template.innerHTML = html;
     return template.content.firstChild;
   },
 
   /**
- * @param {String} HTML representing any number of sibling elements
- * @returns {NodeList} 
- */
+   * convert string into HTML element/s
+   * @param {String} HTML representing any number of sibling elements
+   * @returns {NodeList} 
+   */
   htmlToElements(html) {
-    var template = document.createElement('template');
+    if (!isString(html)) return false
+    const template = document.createElement('template');
     template.innerHTML = html;
     return template.content.childNodes;
   },
@@ -213,6 +217,29 @@ const DOM = {
     }
 
     document.addEventListener('click', outsideClickListener);
+  },
+
+  /**
+   * Get style property of element
+   * @param {string|HTMLElement} el 
+   * @param {string} styleProp 
+   * @returns {string}
+   */
+  getStyle(el, styleProp) {
+    let x, y;
+    if (isString(el))
+      x = document.getElementById(el);
+    else if (this.isElement(el))
+      x = el
+    else 
+      return false
+    if (!isString(styleProp))
+      return false
+    if (window.getComputedStyle)
+        y = document.defaultView.getComputedStyle(x,null).getPropertyValue(styleProp); 
+    else if (x.currentStyle)
+        y = x.currentStyle[styleProp];
+    return y;
   },
 
   addStyleRule(styleSheet, selector, property, value) {

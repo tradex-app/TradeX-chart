@@ -49,6 +49,9 @@ export default class chartTrades extends Overlay {
   get trades() { return this.core.state.data.trades }
 
   isTradeSelected(e) {
+    if (this.core.config?.trades?.display === false ||
+        this.core.config?.trades?.displayInfo === false) return
+
     const x = e[0]
     const y = e[1]
     const d = this.theme.trades
@@ -90,6 +93,7 @@ export default class chartTrades extends Overlay {
     </style>`
     c += `<dl>`
     for (let k in h) {
+      if (k == "timestamp") continue
       c += `<dt>${k}</dt><dd>${h[k]}</dd>`
     }
     c += `</dl>`
@@ -97,6 +101,7 @@ export default class chartTrades extends Overlay {
   }
 
   draw(range=this.core.range) {
+    if (this.core.config?.trades?.display === false) return
 
     this.scene.clear()
     this.#trades.length = 0

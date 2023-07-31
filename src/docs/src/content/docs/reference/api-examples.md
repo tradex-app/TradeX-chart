@@ -78,6 +78,21 @@ The visual stacking of chart panes can be changed by raising or lowering them ab
 chart0.ChartPanes.get("TX_lj4rpog3_ujm_0-RSI__20_1").reorderUp()
 chart0.ChartPanes.get("TX_lj4rpog3_ujm_0-RSI__20_1").reorderDown()
 ```
+## Primary Chart Pane
+
+The primary chart pane that displays the price history (candles) can be accessed like so:
+
+```javascript
+chart0.Chart
+```
+This exposes the following methods.
+
+### Set Visibility for Legends on Primary
+
+´´´javascript
+chart0.Chart.legendsVisibility("hide") 
+```
+Accepts either ``show`` or ``hide`` to toggle the visibility of all indicator legends on the Primary pane.
 
 ## Indicators
 

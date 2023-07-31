@@ -283,7 +283,7 @@ export default class Window {
     let iPos = this.#core.dimensions
     let px = Math.round((iPos.width - wPos.width) / 2)
     let py = iPos.height - Math.round((iPos.height - wPos.height) / 2)
-    let pz = 0
+    let pz = DOM.getStyle(this.#elWindow, "z-index")
 
     if (isObject(p)) {
       let {x,y,z} = {...p}

@@ -81,4 +81,21 @@ trades: {
 }
 }
 ```
+## Trade Marker Event
 
+By default, if a trade marker is clicked, it will invoke the trades overlay method which will display the trade data over the chart.
+
+This can be disabled via the [chart config](../../02_configuration).
+
+```javascript
+const config = {
+  trades: { 
+    display: true,
+    displayInfo: false 
+  }
+}
+```
+
+The chart emits a ``trade_selected`` [event](../../events) which you can subscribe to and invoke your own method.
+
+The event will pass the information for that [trade entry](#trade-entry) to the subscribed event listener.

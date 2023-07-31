@@ -64,4 +64,5 @@ The following list of events is not exhaustive as the chart is still under heavy
 * main_mousemove
 * scrollUpdate
 * setRange
+* trade_selected
 * zoomDone
