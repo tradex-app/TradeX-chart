@@ -3,7 +3,7 @@
  */
 
 import Divider from "../components/widgets/divider"
-import { arrowDown, arrowUp, arrowDownRound, arrowUpRound, arrowDownRoundSolid, arrowUpRoundSolid, buySolid, sellSolid } from "./icons"
+import { arrowDown, arrowUp, arrowDownRound, arrowUpRound, arrowDownRoundSolid, arrowUpRoundSolid, buySolid, sellSolid, noteSolid, lightning } from "./icons"
 
 export const CHART_MINH = 300
 export const CHART_MINW = 400
@@ -199,6 +199,7 @@ export const watermark = {
 }
 
 const tradeIcons = { arrowDown, arrowUp, arrowDownRound, arrowUpRound, arrowDownRoundSolid, arrowUpRoundSolid, buySolid, sellSolid }
+const eventIcons = { noteSolid, lightning }
 
 export const defaultTheme = {
   candle: {
@@ -283,6 +284,15 @@ export const defaultTheme = {
     buyColour: "#0f0",
     sellColour: "#f00",
     defaultIcons: tradeIcons,
+    offset: 10
+  },
+  events: {
+    iconEvent: eventIcons.lightning,
+    iconHeight: 30,
+    iconWidth: 30,
+    iconMinDim: 10,
+    iconColour: "#f00",
+    defaultIcons: eventIcons,
     offset: 10
   },
 }

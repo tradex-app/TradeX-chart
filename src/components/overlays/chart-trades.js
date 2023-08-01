@@ -46,7 +46,7 @@ export default class chartTrades extends Overlay {
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
-  get trades() { return this.core.state.data.trades }
+  get trades() { return this.core.state.data?.trades }
 
   isTradeSelected(e) {
     if (this.core.config?.trades?.display === false ||
@@ -67,7 +67,6 @@ export default class chartTrades extends Overlay {
             x <= tx + (w / 2)) &&
             (y >= ty &&
             y <= ty + w)) {
-              console.log("trade ",ts," selected")
               let content = ``
               for (let t of this.trades[tr]) {
                 content += this.buildTradeHTML(t)

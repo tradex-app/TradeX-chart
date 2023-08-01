@@ -1,7 +1,7 @@
 // DOM.js
 // DOM utilities
 
-import { isObject, isString } from "./typeChecks"
+import { isNumber, isObject, isString } from "./typeChecks"
 
 
 const DOM = {
@@ -100,9 +100,7 @@ const DOM = {
    * @param {function} cb - callback to return image or false
    */
   isImage(img, cb) {
-    const svg = /<\s*svg[^>]*>(.*?)<\s*\/\s*svg>/;
-
-    if (svg.test(img)) { 
+    if (this.isSVG(img)) { 
       // img = this.htmlToElement(img)
       // const xml = new XMLSerializer().serializeToString(img);
       // img = `data:image/svg+xml;base64,${btoa(xml)}`
@@ -119,6 +117,17 @@ const DOM = {
       i.onload = () => cb(i)
       i.onerror = () => cb(false)
     }
+  },
+
+  /**
+   * test if input is a valud SVG string
+   * @param {string} html - valid svg
+   * @returns 
+   */
+  isSVG(html) {
+    if (!isString(html)) return false
+    const svg = /<\s*svg[^>]*>(.*?)<\s*\/\s*svg>/;
+    return svg.test(html)
   },
 
   elementDimPos(el) {
@@ -178,6 +187,42 @@ const DOM = {
     const template = document.createElement('template');
     template.innerHTML = html;
     return template.content.childNodes;
+  },
+
+  svgToImage(html, fill, dims) {
+    if (!this.isSVG(html) ||
+        !isNumber(dims?.w) ||
+        !isNumber(dims?.h))
+        return false
+
+    let w = dims.w
+    let h = dims.h
+    let canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+    let svg = this.htmlToElement(html)
+        svg.style.fill = fill
+        svg.setAttribute("width", w)
+        svg.setAttribute("height", h)
+        svg.xmlns = "http://www.w3.org/2000/svg"
+
+    // get svg data
+    let xml = new XMLSerializer().serializeToString(svg);
+
+    // make it base64
+    let svg64 = btoa(xml);
+    let b64Start = "data:image/svg+xml;base64,";
+
+    // prepend a "header"
+    let image64 = b64Start + svg64;
+    let img = new Image(); //document.createElement("img")
+        img.setAttribute("width", w)
+        img.setAttribute("height", h)
+        img.onload = () => {
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        };
+        img.src = image64;
+    return img
   },
 
   //  https://stackoverflow.com/a/3028037/15109215

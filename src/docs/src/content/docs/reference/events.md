@@ -59,8 +59,9 @@ The following list of events is not exhaustive as the chart is still under heavy
 * chart_yAxisRedraw
 * divider_pointerdrag
 * divider_pointerdragend
-* global_resize
 * Error
+* event_selected
+* global_resize
 * main_mousemove
 * scrollUpdate
 * setRange
