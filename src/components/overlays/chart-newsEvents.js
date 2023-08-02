@@ -5,6 +5,7 @@ import Overlay from "./overlay"
 import NewsEvent from "../primitives/newsEvent"
 import { limit } from "../../utils/number"
 import { debounce } from "../../utils/utilities"
+import { isString } from "../../utils/typeChecks"
 
 const config = {
   dragBar: false,
@@ -30,9 +31,9 @@ export default class chartNewsEvents extends Overlay {
   #dialogue
   #debounce = (e) => debounce(this.isNewsEventSelected, 100, this)
 
-  constructor(target, xAxis=false, yAxis=false, theme, parent) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    super(target, xAxis=false, yAxis=false, theme, parent)
+    super(target, xAxis=false, yAxis=false, theme, parent, params)
 
     this.#event = new NewsEvent(target.scene, theme)
       this.emit()
@@ -46,7 +47,7 @@ export default class chartNewsEvents extends Overlay {
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
-  get events() { return this.core.state.data?.events }
+  get data() { return this.overlay.data }
 
   isNewsEventSelected(e) {
     if (this.core.config?.events?.display === false ||
@@ -58,23 +59,23 @@ export default class chartNewsEvents extends Overlay {
     const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight)
     const ts = this.xAxis.pixel2T(x)
     const c = this.core.range.valueByTS(ts)
-    for (let tr in this.events) {
+    for (let tr in this.data) {
       tr *= 1
       if (ts === tr) {
         let tx = this.xAxis.xPos(ts)
-        let ty = this.yAxis.yPos(c[2]) - (w * 1.5)
+        let ty = this.scene.height - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
         if ((x >= tx - (w / 2) &&
             x <= tx + (w / 2)) &&
             (y >= ty &&
             y <= ty + w)) {
               console.log("event ",ts," selected")
               let content = ``
-              for (let t of this.events[tr]) {
+              for (let t of this.data[tr]) {
                 content += this.buildNewsEventHTML(t)
               }
               const config = {
                 dimensions: {h: 150, w: 150},
-                position: {x: tx + (w / 2) + 1, y: ty},
+                position: {x: tx + (w / 2) + 1, y: ty, relativeY: "bottom"},
                 content: content,
               }
               this.core.emit("event_selected", tr)
@@ -85,18 +86,16 @@ export default class chartNewsEvents extends Overlay {
   }
 
   buildNewsEventHTML(h) {
+    let t = h?.title
     let c = 
     `<style>
-    dt, dd {display: inline-block; font-size: 0.9em;}
-    dt {min-width: 40%;}
-    dd {min-width: 60%; margin: 0;}
+    h1, p {display: inline-block; font-size: 0.9em;
+    max-width: 98%;
     </style>`
-    c += `<dl>`
-    for (let k in h) {
-      if (k == "timestamp") continue
-      c += `<dt>${k}</dt><dd>${h[k]}</dd>`
-    }
-    c += `</dl>`
+    if (isString(h?.url))
+      t = `<a href="${h?.url}" target="${h?.target}">${t}</a>`
+    c += `<h1>${t}</h1>`
+    c += `<p>${h?.content}</p>`
     return c
   }
 
@@ -122,11 +121,10 @@ export default class chartNewsEvents extends Overlay {
       x = range.value( c )
       t = `${x[0]}`
       // fetch events (if any) for timestamp
-      if (Object.keys(this.events).indexOf(t) >= 0) {
-        for (let tr of this.events[t]) {
+      if (Object.keys(this.data).indexOf(t) >= 0) {
+        for (let tr of this.data[t]) {
           event.x = this.xAxis.xPos(x[0]) - (this.xAxis.candleW / 2)
-          event.y = this.yAxis.yPos(x[2]) - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
-          event.side = tr.side
+          event.y = this.scene.height - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
           this.#events.push(this.#event.draw(event))
         }
       }

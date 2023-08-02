@@ -38,7 +38,7 @@ const defaultOverlays = [
   ["grid", {class: chartGrid, fixed: false, required: true, params: {axes: "x"}}],
   // ["chartCompositor", {class: chartCompositor, fixed: true, required: true}]
 ]
-const nonIndicators = ["candles", "trades"]
+const nonIndicators = ["candles", "trades", "events"]
 
 
 /**

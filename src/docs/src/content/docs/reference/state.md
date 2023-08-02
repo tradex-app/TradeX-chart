@@ -105,7 +105,7 @@ const theState = chart.state.get(key)
 
 ## State Config Object
 
-The following data state config object example demonstrates all possible options that can be submitted to the chart on initial ``chart.start(config)`` as the ``config.state`` property, or at a later time as a [merge of data](#merging-data-into-the-state) into the existing chart state. Usually such a merge is done when the chart scrolls to the left / past boundary, and more back history needs to be loaded into the chart. ``chart.mergeData(data)``
+The following data state config object example demonstrates the possible options that can be submitted to the chart on initial ``chart.start(config)`` as the ``config.state`` property, or at a later time as a [merge of data](#merging-data-into-the-state) into the existing chart state. Usually such a merge is done when the chart scrolls to the left / past boundary, and more back history needs to be loaded into the chart. ``chart.mergeData(data)``
 
 ```javascript
 {
@@ -113,26 +113,61 @@ The following data state config object example demonstrates all possible options
   // [timestamp, open, hight, low, close, volume]​​
   ohlcv: [],
 
-  // list of indicators for the primary chart pane (price history)
-  primary: [],
+  // list of indicators and overlays for the primary chart pane (price history)
+  primary: [
+    // indicator
+    {
+      name: "EMA 25",
+      type: "EMA",
+      settings: {},
+      data: {}
+    },
+    // list of trades
+    {
+      name: "Trades",
+      type: "trades",
+      settings: {},
+      data: {}
+    },
+    // list of news / events
+    {
+      name: "Events",
+      type: "events",
+      settings: {},
+      data: {}
+    },
+    // list of drawing tools used
+    {
+      name: "Drawings",
+      type: "drawings",
+      settings: {},
+      data: {}
+    },
+    // list of user defined annotations
+    {
+      name: "Annotations",
+      type: "annotations",
+      settings: {},
+      data: {}
+    }
+  ],
 ​​
-  // list of indicators not displayed on the primary chart pane
-  secondary: [],
+  // list of indicators and overlays not displayed on the primary chart pane
+  secondary: [
+    // indicator
+    {
+      name: "RSI 20",
+      type: "RSI",
+      settings: {},
+      data: {},
+      drawings: {}
+    },
+  ],
 
   // user defined data
   datasets: [],
 
-  // list of trades
-  trades: {},
 
-  // list of drawing tools used
-  tools: {},
-
-  // list of news / events
-  events: {},
-
-  // list of user defined annotations
-  annotations: {}
 }
 ```
 :::note

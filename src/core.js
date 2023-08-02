@@ -1127,11 +1127,29 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * 
-   * @param {number} t 
+   * @param {object} t - trade
    * @returns {boolean}
    */
   removeTrade(t) {
     return this.#State.removeTrade(t)
+  }
+
+  /**
+   * Add a event entry to the chat
+   * @param {Object} e - event entry
+   * @returns {boolean}
+   */
+  addTrade(e) {
+    return this.#State.addTrade(e)    
+  }
+
+  /**
+   * 
+   * @param {object} e
+   * @returns {boolean}
+   */
+  removeEvent(e) {
+    return this.#State.removeEvent(e)
   }
 
   /**

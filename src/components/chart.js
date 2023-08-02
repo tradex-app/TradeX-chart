@@ -20,6 +20,7 @@ import chartCursor from "./overlays/chart-cursor"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartCandleStream from "./overlays/chart-candleStream"
+import chartNewsEvents from "./overlays/chart-newsEvents";
 import chartTrades from "./overlays/chart-trades"
 import watermark from "./overlays/chart-watermark"
 import {
@@ -50,7 +51,8 @@ const defaultOverlays = {
 }
 const optionalOverlays = {
   primaryPane: {
-    "trades": {class: chartTrades, fixed: false, required: false}
+    "trades": {class: chartTrades, fixed: false, required: false},
+    "events": {class: chartNewsEvents, fixed: false, required: false}
   },
   secondaryPane: {
     "candles": {class: chartCandles, fixed: false, required: true},

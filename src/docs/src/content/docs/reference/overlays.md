@@ -38,11 +38,12 @@ Here's a list of the current in-built overlays:
 * chart candles
 * chart cursor
 * chart grid
+* [chart news events](../../news_events)
 * chart streaming candle
-* chart trades
+* [chart trades](../../trades)
 * chart volume
 * chart watermark
-* ([indicators](indicators.md))
+* ([indicators](../../indicators))
 * scale cursor
 * scale labels
 * scale price line

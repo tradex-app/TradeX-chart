@@ -49,6 +49,14 @@ const TRADE = {
   tag: "string",
 }
 
+const EVENT = {
+  timestamp: "number",
+  id: "string",
+  title: "string",
+  content: "string",
+  url: "string",
+}
+
 
 export default class State {
 
@@ -436,6 +444,8 @@ export default class State {
     const mDataset = merge?.dataset?.data || false
     const trades = this.allData?.trades
     const mTrades = merge?.trades || false
+    const events = this.allData?.events
+    const mEventss = merge?.events || false    
     const inc = (!isArray(mData)) ? 0 : (this.range.inRange(mData[0][0])) ? 1 : 0
     const refresh = {}
 
@@ -519,6 +529,13 @@ export default class State {
           if (isArray(o?.data) && o?.data.length > 0) {
 
           }
+        }
+      }
+
+      // Do we have events?
+      if (isObject(events)) {
+        for (let e in events) {
+          
         }
       }
 
@@ -635,6 +652,44 @@ export default class State {
       this.allData.trades[ts] = []
     this.allData.trades[ts].push(t)
     return true
+  }
+
+  /**
+   * Remove trade entry from state
+   * TODO:
+   * @param {object} t - trade
+   */
+  removeTrade(t) {
+    console.log("TODO: state.removeTrade()")
+  }
+
+  addEvent(e) {
+    // validate event entry
+    const k1 = Object.keys(e)
+    const k2 = Object.keys(EVENT)
+    if (!isObject(e) ||
+        !isArrayEqual(k1, k2)) return false
+    for (let k of k2) {
+      if (typeof t[k] !== EVENT[k]) return false
+    }
+
+    // insert the event
+    const ts = t.timestamp - (t.timestamp % this.time.timeFrameMS)
+    const d = new Date(ts)
+          e.dateStr =`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+    if (!isArray(this.allData.events[ts]))
+      this.allData.events[ts] = []
+    this.allData.events[ts].push(e)
+    return true
+  }
+
+  /**
+   * Remove trade entry from state
+   * TODO:
+   * @param {object} e - event
+   */
+  removeEvent(e) {
+    console.log("TODO: state.removeEvent()")
   }
 }
 

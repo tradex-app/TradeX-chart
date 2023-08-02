@@ -10,6 +10,9 @@ import state2 from './data/data_btc_1m.js'
 import TEST from './custom-indicator'
 import DMI from './DMI'
 
+// import data from "./data/data"
+// data.ohlcv.reverse()
+
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
 // build a split state to test all merge features
@@ -19,8 +22,11 @@ let l = state1.ohlcv.length
 state1_5a.ohlcv = state1.ohlcv.slice(0,l/2)
 state1_5b.ohlcv = state1.ohlcv.slice(l/2)
 
+const exclude = ["trades","events","drawings","annotations"]
 // split the indicators
 for (let p of state1.primary) {
+  if (exclude.includes(p.type)) continue
+
   let l = p.data.length
   let pra = {
     name: p.name,
@@ -837,6 +843,7 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
+/*
 addChart()
 addChart()
 addChart()
@@ -862,3 +869,4 @@ if (typeof chart1 === "object") {
 
 // test merging indicator data
 chart5.mergeData(state1_5a, false)
+*/

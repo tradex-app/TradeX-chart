@@ -291,6 +291,7 @@ export default class Window {
       if (isNumber(y)) py = iPos.height - (y + wPos.height)
       if (isNumber(z)) pz = z
     }
+    if (p?.relativeY == "bottom") py += wPos.height
     this.#elWindow.style.left = `${px}px`
     this.#elWindow.style.bottom = `${py}px`
     this.#elWindow.style["z-index"] = `${pz}`

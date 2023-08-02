@@ -291,7 +291,7 @@ export const defaultTheme = {
     iconHeight: 30,
     iconWidth: 30,
     iconMinDim: 10,
-    iconColour: "#f00",
+    iconColour: "#ccc",
     defaultIcons: eventIcons,
     offset: 10
   },

@@ -27,12 +27,13 @@ export default class chartTrades extends Overlay {
 
   #trade
   #trades = []
+  #data
   #dialogue
   #debounce = (e) => debounce(this.isTradeSelected, 100, this)
 
-  constructor(target, xAxis=false, yAxis=false, theme, parent) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    super(target, xAxis=false, yAxis=false, theme, parent)
+    super(target, xAxis=false, yAxis=false, theme, parent, params)
 
     this.#trade = new Trade(target.scene, theme)
       this.emit()
@@ -46,7 +47,7 @@ export default class chartTrades extends Overlay {
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
-  get trades() { return this.core.state.data?.trades }
+  get data() { return this.overlay.data }
 
   isTradeSelected(e) {
     if (this.core.config?.trades?.display === false ||
@@ -58,7 +59,7 @@ export default class chartTrades extends Overlay {
     const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight)
     const ts = this.xAxis.pixel2T(x)
     const c = this.core.range.valueByTS(ts)
-    for (let tr in this.trades) {
+    for (let tr in this.data) {
       tr *= 1
       if (ts === tr) {
         let tx = this.xAxis.xPos(ts)
@@ -68,7 +69,7 @@ export default class chartTrades extends Overlay {
             (y >= ty &&
             y <= ty + w)) {
               let content = ``
-              for (let t of this.trades[tr]) {
+              for (let t of this.data[tr]) {
                 content += this.buildTradeHTML(t)
               }
               const config = {
@@ -121,8 +122,8 @@ export default class chartTrades extends Overlay {
       x = range.value( c )
       t = `${x[0]}`
       // fetch trades (if any) for timestamp
-      if (Object.keys(this.trades).indexOf(t) >= 0) {
-        for (let tr of this.trades[t]) {
+      if (Object.keys(this.data).indexOf(t) >= 0) {
+        for (let tr of this.data[t]) {
           trade.x = this.xAxis.xPos(x[0]) - (this.xAxis.candleW / 2)
           trade.y = this.yAxis.yPos(x[2]) - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
           trade.side = tr.side

@@ -41,6 +41,7 @@ export default class Overlay {
   get chart() { return this.#parent.parent.parent }
   get xAxis() { return this.#xAxis || this.#parent.time.xAxis }
   get yAxis() { return this.#yAxis || this.#parent.scale.yAxis }
+  get overlay() { return this.#params.overlay }
   set doDraw(d) { this.#doDraw = (isBoolean(d)) ? d : false }
   get doDraw() { return this.#doDraw }
 

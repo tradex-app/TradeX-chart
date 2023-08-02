@@ -1,5 +1,16 @@
 # Change Log
 
+## [0.135.0] - 2023-07-02
+
+Added
+
+* Overlay - News Events
+
+Changed
+
+* Config - trades, events - moved into primary
+  drawings moved into primary and secondary
+
 ## [0.127.0] - 2023-06-22
 
 Added
