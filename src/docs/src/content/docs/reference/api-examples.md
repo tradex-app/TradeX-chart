@@ -4,6 +4,11 @@ title: API Examples
 
 This documentation gives example API work flows. TradeX-chart is organized in a hierarchical structure, which is reflected in the API, allowing you to reach down into the depths of the chart, giving you granular control of it's behavior and appearance.
 
+:::tip
+Many of these examples can be used in the browser developer tool console, to find out what the chart is doing.  
+Assign the chart instance to a global variable and explore via the console.
+:::
+
 ## Chart Root
 
 ### Chart ID

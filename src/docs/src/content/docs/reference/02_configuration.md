@@ -65,7 +65,7 @@ The chart state can be exported to be reused later.
 chart.state.export(key)
 ```
 
-More information the chart data state are found in the [state](../state) documentation.
+More information the chart data state are found in the [state documentation](../state) .
 
 ## Range
 
@@ -90,10 +90,15 @@ export const CandleType = {
   LINE: 'line'
 }
 ```
-Refer to [Candle Types](themes#candle-types) for visual examples of each candle type.
+Refer to [Candle Type Theme](themes#candle-types) for visual examples of each candle type.
 
 
 # Config Object Options
+
+More detailed configuration options not included below:
+
+* [Initial Range Config](../range/#intial-range-config)
+* [Theme Properties](../themes/#theme-properties)
 
 ```javascript
 const config = {
@@ -109,12 +114,12 @@ const config = {
   tools: {},
   // timeframes: s, m, h, d, M, y
   timeFrame: "1m",
-  // initial Range definition
+  // initial Range Config
   range: {
     // see documentation Range, Initial Range Config
   }
 
-  // chart theme
+  // chart theme - see Theme Properties for more detail
   theme: {
     candle: {
       // candle types: 'candle_hollow','candle_up_hollow','candle_down_hollow','ohlc','area','line'

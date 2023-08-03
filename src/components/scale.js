@@ -1,7 +1,7 @@
 // scale.js
 // Scale bar that lives on the side of the chart
 
-import { isArray } from '../utils/typeChecks'
+import { isArray, isObject } from '../utils/typeChecks'
 import DOM from "../utils/DOM"
 import yAxis from "./axis/yAxis"
 import StateMachine from "../scaleX/stateMachne"
@@ -49,6 +49,7 @@ export default class ScaleBar {
   #layerPriceLine
   #layerCursor
   #scaleOverlays = new xMap()
+  #additionalOverlays = []
   #Graph
 
   #input
@@ -121,7 +122,6 @@ export default class ScaleBar {
     this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
 
     this.createGraph()
-    this.addOverlays([])
     this.#yAxis.calcGradations()
     this.draw()
     this.eventsListen()
@@ -278,6 +278,8 @@ export default class ScaleBar {
     this.#layerLabels = this.graph.overlays.get("labels").instance
     this.#layerOverlays = this.graph.overlays.get("overlay").instance
     this.#layerPriceLine = this.graph.overlays.get("price").instance
+
+    this.graph.addOverlays(this.#additionalOverlays)
   }
 
   /**
@@ -287,15 +289,19 @@ export default class ScaleBar {
    * @memberof Scale
    */
   addOverlays(overlays) {
-    for (let o of overlays) {
-      // const config = {fixed: false, required: false}
-      // if (o.type in this.core.TALib) {
-      //   config.class = this.core.indicatorClasses[o.type].ind
-      //   config.params = {overlay: o}
-      //   this.#scaleOverlays.set(o.name, config)
-      // }
-    }
-    this.graph.addOverlays(Array.from(this.#scaleOverlays))
+    if (!isArray(overlays)) return false
+    if (this.graph === undefined)
+      this.#additionalOverlays.push(...overlays)
+    else
+      this.graph.addOverlays(overlays)
+  }
+
+  addOverlay(key, overlay) {
+    if (!isObject(overlay)) return false
+    if (this.graph === undefined)
+      this.#additionalOverlays.push([key, overlay])
+    else
+      return this.graph.addOverlay(key, overlay)
   }
 
   render() {

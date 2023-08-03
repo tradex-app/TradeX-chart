@@ -1139,8 +1139,8 @@ export default class TradeXchart extends Tradex_chart {
    * @param {Object} e - event entry
    * @returns {boolean}
    */
-  addTrade(e) {
-    return this.#State.addTrade(e)    
+  addEvent(e) {
+    return this.#State.addEvent(e)    
   }
 
   /**

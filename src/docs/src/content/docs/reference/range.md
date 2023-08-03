@@ -30,6 +30,26 @@ const config = {
   }
 }
 ```
+### startTS - center - initialCnt
+
+On first starting ``chart.start()``, the chart will present the range, ``initialCnt`` the number of viewable price records (candles), starting from the start timestamp ``startTS``. If none is specified, the chart will present the last, most recent price history. ``center`` will place the ``startTS`` in the center of the chart.
+
+:::note
+All timestamps must be in milliseconds!
+:::
+
+### minCandles
+
+``minCandles`` is the minimum number of price records (candles) that the chart will display. This is also the minimum zoom level. If not specified, the chart will use a default.
+
+### limitFuture - limitPast
+
+These limits are the "padding" / "empty" candles at the end or start of the price data history. Say you have 1000 price records (candles) ``limitFuture`` and ``limitPast`` will then allow the chart to scroll, say for example, another 50 to the past, or future, depending upon what you define. If you add more data (merge) to the chart it doesn't matter, the padding is always present on either end no matter the dataset size. The chart will use defaults if neither are specified.
+
+### yAxisBounds
+
+``yAxisBounds`` determines the amount of padding between the chart border and the highest and lowest price records (candles). If ot specified a default will be used. This value is only used in automatic display mode, where the chart can only be scrolled / panned left or right In manual mode when the chart can be panned up, down, left or right, this value is ignored, until the display mode is reset to automatic again.
+
 ## Set Range
 
 ``setRange(start, end)`` expects price history data index values for ``start`` and ``end``. 

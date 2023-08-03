@@ -174,5 +174,25 @@ The following data state config object example demonstrates the possible options
 State Config properties are optional, you do not have to include all of them for the state to be valid.
 :::
 
+### Time Series Datasets - Candles and Indicators
+
+:::note
+The chart expects all time series datasets to be contiguous, having no gaps in the data.
+:::
+
+Any gaps in time series data should be filled with a "null" entry such as the following:
+
+```javascript
+// [number, number, number, number, number, number]
+[timestamp, null, null, null, null, null]
+```
+
+For candle and standard indicator data, the chart expects the values of each entry array to be **numbers**. Some exchanges return their data as strings and thus must be converted to numbers.
+
+All timestamps must be **milliseconds**! 
+
+So check your exchange data carefully and feed the chart a diet of good data.
+
+
 ## Internal Chart Data State
 

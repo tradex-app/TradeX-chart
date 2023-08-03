@@ -379,6 +379,8 @@ export class Range {
 
     if (data.length == 0) {
       return {
+        valueLo: 0,
+        valueHi: 1,
         valueMin: 0,
         valueMax: 1,
         volumeMin: 0,
@@ -423,25 +425,27 @@ export class Range {
     }
 
     let diff = valueMax - valueMin
+    let valueLo = valueMin
+    let valueHi = valueMax
     valueMin -= diff * that.yAxisBounds
     valueMin = (valueMin > 0) ? valueMin : 0
     valueMax += diff * that.yAxisBounds
     diff = valueMax - valueMin
 
-    // valueMin *= (1 - that.yAxisBounds)
-    // valueMax *= (1 + that.yAxisBounds)
     return {
-      valueMin: valueMin,
-      valueMax: valueMax,
+      valueLo,
+      valueHi,
+      valueMin,
+      valueMax,
       valueDiff: valueMax - valueMin,
-      volumeMin: volumeMin,
-      volumeMax: volumeMax,
+      volumeMin,
+      volumeMax,
       volumeDiff: volumeMax - volumeMin,
 
-      valueMinIdx: valueMinIdx,
-      valueMaxIdx: valueMaxIdx,
-      volumeMinIdx: volumeMinIdx,
-      volumeMaxIdx: volumeMaxIdx,
+      valueMinIdx,
+      valueMaxIdx,
+      volumeMinIdx,
+      volumeMaxIdx
     }
 
     function limit(val, min, max) {

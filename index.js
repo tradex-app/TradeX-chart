@@ -10,8 +10,7 @@ import state2 from './data/data_btc_1m.js'
 import TEST from './custom-indicator'
 import DMI from './DMI'
 
-// import data from "./data/data"
-// data.ohlcv.reverse()
+import data from "./data/data"
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
@@ -22,7 +21,7 @@ let l = state1.ohlcv.length
 state1_5a.ohlcv = state1.ohlcv.slice(0,l/2)
 state1_5b.ohlcv = state1.ohlcv.slice(l/2)
 
-const exclude = ["trades","events","drawings","annotations"]
+const exclude = ["trades","events","drawings","annotations","hiLo"]
 // split the indicators
 for (let p of state1.primary) {
   if (exclude.includes(p.type)) continue

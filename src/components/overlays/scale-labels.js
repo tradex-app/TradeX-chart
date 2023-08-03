@@ -1,4 +1,5 @@
 // scale-labels.js
+// draw scale values and tick markers
 
 import Overlay from "./overlay"
 import { isBoolean } from "../../utils/typeChecks"

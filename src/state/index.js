@@ -145,15 +145,18 @@ export default class State {
       if (!isArray(o[c]) || o[c].length == 0)
         o.splice(c, 1)
       else {
-        // check each indicator entry
+        // check each overlay / indicator entry
         let i = state.views[c][1]
         let x = i.length
         while (x--) {
-          if (!isObject(i[x]) &&
-              !isString(i[x].name) &&
-              !isString(i[x].type) &&
-              !isArray(i[x].data))
+          // remove if invalid
+          if (!isObject(i[x]) ||
+              !isString(i[x].name) ||
+              !isString(i[x].type)
+              // !isArray(i[x].data)
+              )
                 i.splice(x, 1)
+          // default settings if necessary
           else if (!isObject(i[x].settings))
             i[x].settings = {}
         }

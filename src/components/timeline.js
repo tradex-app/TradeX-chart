@@ -44,6 +44,7 @@ export default class Timeline {
 
   #Graph
   #timeOverlays = new xMap()
+  #additionalOverlays = []
   #navigation
   #elNavList
   #elNavScrollBar
@@ -341,6 +342,8 @@ export default class Timeline {
     this.#layerCursor = this.graph.overlays.get("cursor").instance
     this.#layerLabels = this.graph.overlays.get("labels").instance
     this.#layerOverlays = this.graph.overlays.get("overlay").instance
+
+    this.graph.addOverlays(this.#additionalOverlays)
   }
 
   /**
@@ -350,15 +353,19 @@ export default class Timeline {
    * @memberof Scale
    */
   addOverlays(overlays) {
-    for (let o of overlays) {
-      // const config = {fixed: false, required: false}
-      // if (o.type in this.core.TALib) {
-      //   config.class = this.core.indicatorClasses[o.type].ind
-      //   config.params = {overlay: o}
-      //   this.#timeOverlays.set(o.name, config)
-      // }
-    }
-    this.graph.addOverlays(Array.from(this.#timeOverlays))
+    if (!isArray(overlays)) return false
+    if (this.graph === undefined)
+      this.#additionalOverlays.push(...overlays)
+    else
+      this.graph.addOverlays(overlays)
+  }
+
+  addOverlay(key, overlay) {
+    if (!isObject(overlay)) return false
+    if (this.graph === undefined)
+      this.#additionalOverlays.push([key, overlay])
+    else
+      return this.graph.addOverlay(key, overlay)
   }
 
   render() {

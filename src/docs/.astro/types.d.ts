@@ -367,6 +367,13 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
+"reference/news_events.md": {
+	id: "reference/news_events.md";
+  slug: "reference/news_events";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "reference/overlays.md": {
 	id: "reference/overlays.md";
   slug: "reference/overlays";
