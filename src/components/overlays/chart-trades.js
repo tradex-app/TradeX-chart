@@ -33,7 +33,7 @@ export default class chartTrades extends Overlay {
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    super(target, xAxis=false, yAxis=false, theme, parent, params)
+    super(target, xAxis, yAxis, theme, parent, params)
 
     this.#trade = new Trade(target.scene, theme)
       this.emit()

@@ -280,6 +280,7 @@ export default class ScaleBar {
     this.#layerPriceLine = this.graph.overlays.get("price").instance
 
     this.graph.addOverlays(this.#additionalOverlays)
+    this.#layerCursor.target.moveTop()
   }
 
   /**
@@ -300,8 +301,11 @@ export default class ScaleBar {
     if (!isObject(overlay)) return false
     if (this.graph === undefined)
       this.#additionalOverlays.push([key, overlay])
-    else
-      return this.graph.addOverlay(key, overlay)
+    else {
+      let o = this.graph.addOverlay(key, overlay)
+      this.#layerCursor.target.moveTop()
+      return o
+    }
   }
 
   render() {

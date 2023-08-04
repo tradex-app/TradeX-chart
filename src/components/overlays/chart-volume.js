@@ -12,7 +12,7 @@ export default class chartVolume extends Overlay {
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    super(target, xAxis=false, yAxis=false, theme, parent, params)
+    super(target, xAxis, yAxis, theme, parent, params)
 
     this.#volumeBar = new VolumeBar(target.scene, theme)
     this.theme.volume.Height = limit(theme?.volume?.Height, 0, 100) || 100

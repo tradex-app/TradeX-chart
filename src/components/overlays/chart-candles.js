@@ -11,7 +11,7 @@ export default class chartCandles extends Overlay {
 
   constructor(target, xAxis=false, yAxis=false, theme, parent) {
 
-    super(target, xAxis=false, yAxis=false, theme, parent)
+    super(target, xAxis, yAxis, theme, parent)
 
     this.#candle = new Candle(target.scene, theme)
   }

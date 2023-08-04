@@ -8,7 +8,7 @@ export default class chartCompositor extends Overlay{
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    super(target, xAxis=false, yAxis=false, theme, parent, params)
+    super(target, xAxis, yAxis, theme, parent, params)
 
     this.params.components = params?.components || []
   }

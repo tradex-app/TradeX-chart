@@ -12,7 +12,7 @@ export default class chartCursor extends Overlay{
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    super(target, xAxis=false, yAxis=false, theme, parent, params)
+    super(target, xAxis, yAxis, theme, parent, params)
 
     this.core.on("chart_pan", (e) => { this.onMouseDragX(e) })
     this.core.on("chart_panDone", (e) => { this.onMouseDragX(e) })

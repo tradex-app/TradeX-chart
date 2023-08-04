@@ -2,7 +2,6 @@
 title: Overlays
 description: Overlays in the simplest form are a chart pane layer
 ---
-
 Overlays in the simplest form are a layer, that exist either on:
 
 * Primary chart (candlestick price view)
@@ -33,32 +32,78 @@ Overlays (layers) have the following features:
 * boxes, circles, text, images...
 * automatically resize with the chart or pane displaying them.
 
-Here's a list of the current in-built overlays:
+## Built-in Overlays
 
-* chart candles
-* chart cursor
-* chart grid
-* [chart news events](../../news_events)
-* chart streaming candle
-* [chart trades](../../trades)
-* chart volume
-* chart watermark
-* ([indicators](../../indicators))
-* scale cursor
-* scale labels
-* scale price line
-* time cursor
-* time labels
+
+| Name                                   | Key    | Default  |
+| ---------------------------------------- | -------- | ---------- |
+| Chart Candles                          |        |          |
+| Chart Cursor                           |        |          |
+| Chart Grid                             |        |          |
+| Chart High Low                         | hiLo   | optional |
+| [Chart News Events](../../news_events) | events | optional |
+| Chart Streaming Candle                 |        |          |
+| [Chart Trades](../../trades)           | trades | optional |
+| Chart Volume                           |        |          |
+| Chart Watermark                        |        | optional |
+| [Indicators](../../indicators)         |        | optional |
+| Scale Cursor                           |        |          |
+| Scale Labels                           |        |          |
+| Scale Price Line                       |        | optional |
+| Time Cursor                            |        |          |
+| Time Labels                            |        |          |
 
 :::note
-[Indicators](indicators.md) are a special (child) class of overlays. Both standard and custom indicators are extensions of the indicator class.  
-This hints at what you can achieve by extending the overlay class yourself.
+[Indicators](../indicators.md) are a special (child) class of overlays.
+Both standard and custom indicators are extensions of the indicator class.
+Indicators draw a visual interpretation (calculation) of either the price history data (candles) or their own unique dataset.
 :::
 
-## Customization
+## Adding Optional Overlays
 
-For a standard chart, you will not have to have to concern yourself with overlays. Many config options, influence certain overlays. You don't even have to know they are there or how they function.
+To add indicators to the chart, refer to the [indicator documentation](../indicators).
 
-But if you wish to modify what information the chart displays or it's functionality, you will have engage directly with them.
+**Scale Price Line** and **Chart Watermark** are always present, but must be enabled via the [chart config](../02_configuration).
 
-TradeX-chart exports the ``Overlay`` class for you extend upon to build custom overlays
+The following ovelays are added via the [initial chart state](../state) supplied by the chart config.
+
+* Chart High Low
+* Chart Events
+* Chart Trades
+
+```javascript
+chart.Chart.addOverlays()
+```
+
+## Custom Overlays
+
+TradeX-chart exports the ``Overlay`` class for you extend to build your own custom overlays.
+
+```javascript
+import { overlays } from "tradex-chart"
+```
+
+The [TradeX-chart GitHub repository](https://github.com/tradex-app/TradeX-chart/tree/master/src/components/overlays) is a good starting point for examples of how to build overlays.
+
+### Basic Overlay
+
+The foundation of an overlay looks like the following:
+
+```javascript
+import { overlays } from "tradex-chart"
+
+export default class customOverlay extends Overlay {
+
+  constructor(target, xAxis=false, yAxis=false, theme, parent) {
+    // instantiate parent class Overlay
+    super(target, xAxis, yAxis, theme, parent)
+  }
+
+  set position(p) { this.target.setPosition(p[0], p[1]) }
+
+  draw(range=this.core.range) {
+  
+    // draw your overlay
+  }
+}
+```

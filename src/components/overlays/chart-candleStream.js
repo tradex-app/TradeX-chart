@@ -12,7 +12,7 @@ export default class chartCandleStream extends Overlay {
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    super(target, xAxis=false, yAxis=false, theme, parent, params)
+    super(target, xAxis, yAxis, theme, parent, params)
 
     this.#candle = new Candle(target.scene, theme)
     this.theme.priceLineStyle = this.theme?.priceLineStyle || PriceLineStyle

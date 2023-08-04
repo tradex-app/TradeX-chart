@@ -17,6 +17,7 @@ export default class chartWatermark extends Overlay {
     this.params.content = params?.content || ""
   }
 
+  // Overlay position is fixed and won't pan / scroll with the chart
   set position(p) { this.target.setPosition(0, 0) }
 
   draw() {
