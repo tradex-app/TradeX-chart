@@ -33,8 +33,6 @@ export default class chartWatermark extends Overlay {
       ctx.restore()
     }
     else return
-
-
   }
 
   renderText() {

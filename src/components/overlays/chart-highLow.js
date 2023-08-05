@@ -18,13 +18,16 @@ export default class chartHighLow extends Overlay {
 
     // add the overlay to the Scale (yAxis)
     const hiLo = {class: scaleHighLow, fixed: true, required: false}
-    this.scaleOverly = this.chart.scale.addOverlay("hiLo", hiLo)
+    if (this.core.config?.highLow === true)
+      this.scaleOverly = this.chart.scale.addOverlay("hiLo", hiLo)
   }
 
   // Overlay position is fixed and won't pan / scroll with the chart
   set position(p) { this.target.setPosition(0, 0) }
 
   draw(range=this.core.range) {
+    if (this.core.config?.highLow !== true) return 
+
     this.scene.clear()
 
     let txt, x, y;
@@ -48,7 +51,7 @@ export default class chartHighLow extends Overlay {
     renderLineHorizontal(ctx, y, 0, r, opts)
 
     txt = "High"
-    x = r - (w + 25)
+    x = (this.theme.yAxis.location == "left") ? 0 : r - (w + 25)
     drawText(ctx, txt, x, y, w, theme)
 
     // Lowest Price

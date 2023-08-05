@@ -402,9 +402,9 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
-"reference/streaming-price-data.md": {
-	id: "reference/streaming-price-data.md";
-  slug: "reference/streaming-price-data";
+"reference/streaming_price_data.md": {
+	id: "reference/streaming_price_data.md";
+  slug: "reference/streaming_price_data";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">

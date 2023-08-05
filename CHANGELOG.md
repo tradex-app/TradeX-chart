@@ -1,6 +1,8 @@
 # Change Log
 
-## [0.135.0] - 2023-07-02
+## [0.136.0]() - 2023-08
+
+## [0.135.0](https://github.com/tradex-app/TradeX-chart/commit/e26c7cbe7baaac45c9199a5d904e1cdb6fe7b9f9) - 2023-08-02
 
 Added
 
@@ -10,6 +12,74 @@ Changed
 
 * Config - trades, events - moved into primary
   drawings moved into primary and secondary
+
+## [0.134.2] - 2023-08-01
+
+Added
+
+* svgToImage()
+* isSVG()
+
+## [0.134.1](https://github.com/tradex-app/TradeX-chart/commit/920cee8320bd3fe49ce237c6d31368158f108afa) - 2023-07-31
+
+Fixed
+
+* Dialogue window (not implemented message) opening when it shouldn't
+
+## [0.134.0]/(https://github.com/tradex-app/TradeX-chart/commit/91c9b3b649f6b5972ec8d51caddbcf41a9eddc39) - 2023-07-31
+
+Added
+
+* Trades - Overlay
+
+## [0.133.0](https://github.com/tradex-app/TradeX-chart/commit/91c9b3b649f6b5972ec8d51caddbcf41a9eddc39) - 2023-07-30
+
+Added
+
+* Legends - show / hide all
+
+## [0.132.3](https://github.com/tradex-app/TradeX-chart/commit/62ae8b2251a397bf98b1584b227e0688bcc45230) - 2023-07-29
+
+Fixed
+
+* Widgets - window
+* Streaming candle range auto increment
+* FireFox render SVG to canvas
+
+## [0.132.2](https://github.com/tradex-app/TradeX-chart/commit/86fdd1321ed6b2e6fbdf8c8c21826945d36cde90) - 2023-07-25
+
+Fixed
+
+* addChartIndicator()
+
+## [0.132.1](https://github.com/tradex-app/TradeX-chart/commit/7593ac62f7b887900ac6834a6b0de9264bfe9722) - 2023-07-22
+
+Fixed
+
+* Config - range - center option
+
+## [0.131.1](https://github.com/tradex-app/TradeX-chart/commit/e178d98a129a1154f2a738aacb5dfcefdc95919c) - 2023-07-21
+
+Added
+
+* Merge Indicator data
+
+Fixed
+* rangeStart
+
+Changed
+
+* Timeline - navigation - hidden by default
+* State - mergeData - object requires "ohlcv" instead of "data"
+* Automatic indicator calculation on merge = true to enable
+
+## [0.130.0]
+
+## [0.129.0]
+
+## [0.128.1]
+
+## [0.127.1]
 
 ## [0.127.0] - 2023-06-22
 

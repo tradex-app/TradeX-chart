@@ -10,11 +10,23 @@ They are available via the exported ``canvas`` object.
 ```javascript
 import { canvas } from 'tradex-chart'
 ```
-And also via the ``Indicator`` class used for building custom indicators.
+And also via the ``Indicator`` class used for [building custom indicators](../indicators/#custom-indicators), accessable via the ``plot( plots, type, opts )`` method.
 
-```javascript
-import { Indicator } from 'tradex-chart'
-```
+* [``renderLine``](#renderline)
+* [``renderLineHorizontal``](#renderlinehorizontal)
+* [``renderLineVertical``](#renderlinevertical)
+* [``renderPathStroke``](#renderpathstroke)
+* [``renderPathClosed``](#renderpathclosed)
+* [``renderSpline``](#renderspline)
+* [``renderRect``](#renderrect)
+* [``renderPolygonRegular``](#renderpolygonregular)
+* [``renderPolygonIrregular``](#renderpolygonirregular)
+* [``renderRectRound``](#renderrectround)
+* [``renderTriangle``](#rendertriangle)
+* [``renderDiamond``](#renderdiamond)
+* [``renderCircle``](#rendercircle)
+* [``renderImage``](#renderimage)
+
 ## renderLine
 Render line - open path
 

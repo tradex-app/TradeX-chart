@@ -199,6 +199,7 @@ const config1 = {
   watermark: {
     text: "BTC/USDT"
   },
+  highLow: true,
   isCrypto: true,
   logs: true,
   infos: true,
@@ -255,6 +256,7 @@ const config2 = {
   logs: false,
   infos: true,
   warnings: true,
+  highLow: true,
   errors: true,
   stream: streamVal,
   maxCandleUpdate: 250,
@@ -340,6 +342,7 @@ const config3 = {
   logs: false,
   infos: true,
   warnings: true,
+  highLow: true,
   errors: true,
   stream: streamVal,
   maxCandleUpdate: 250,
@@ -398,6 +401,7 @@ const config4 = {
   logs: false,
   infos: true,
   warnings: true,
+  highLow: true,
   errors: true,
   stream: {
     tfCountDown: false,
@@ -501,6 +505,7 @@ const config5 = {
   logs: false,
   infos: true,
   warnings: true,
+  highLow: true,
   errors: true,
   stream: streamVal,
   maxCandleUpdate: 250,
@@ -842,7 +847,6 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
-/*
 addChart()
 addChart()
 addChart()
@@ -868,4 +872,3 @@ if (typeof chart1 === "object") {
 
 // test merging indicator data
 chart5.mergeData(state1_5a, false)
-*/

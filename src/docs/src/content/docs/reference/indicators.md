@@ -1,11 +1,9 @@
 ---
 title: Indicators
 ---
-
 TradeX-chart provides a set of [default indicators](#default-indicators) based upon TA-Lib. The chart uses a Web Assembly version of the library, [talib-web](https://github.com/newproplus/talib-web).
 
-TradeX-chart may or may not implement all of the indicators provided by TA-Lib. 
-
+TradeX-chart may or may not implement all of the indicators provided by TA-Lib.
 
 Indicators are grouped as:
 
@@ -55,6 +53,7 @@ chart.setIndicators({
   TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST}, false
 })
 ```
+
 The list of registered indicators, both default and custom can be accessed via the chart API.
 
 ```javascript
@@ -76,11 +75,13 @@ legendInputs() {
   return false;
 }
 ```
+
 When the indicator does provide values for it's legend, then the `legendInputs()` method must return an object with three entries.
 
 ```javascript
  return {inputs, colours, labels}
 ```
+
 where the three entries are defined as the following:
 
 ```javascript
@@ -90,52 +91,52 @@ where the three entries are defined as the following:
   @param {Array} labels - array of which input labels to dispaly [true, false, ...]
 */
 ```
+
 #### inputs
+
 is an object that provides the legend labels and values.
 For example the Bollinger Band indicator has three values. It's returned ``inputs`` object would look like the following:
 
 ```javascript
 { Hi: "13016.1", Mid: "13011.2", Lo: "13006.2" }
 ```
+
 The object property names are used as the labels for the indicator.
 The Bollinger Band indicator legend would look like this on the chart:
 
 ```javascript
  Hi: 13016.1  Mid: 13011.2  Lo: 13006.2
 ```
+
 If you wanted a label with spaces, then the object property name would have to be quoted. ``"some value": 12345``
 
 #### colours
+
 is an array of ``"#rrggbb(aa)"`` string values corresponding to the legend values
 
 #### lables
+
 is an array that specifies which of the legend labels are displayed.
 In the Bollinger Band example, if you wanted to silence all labels, use an array of ``[false, false, false]``.
 
 ### Canvas Drawing Methods
 
-The base ``Indicator`` class which all others, including custom incators are built atop, offers the ``plot()`` method for drawing to the canvas. 
+The base ``Indicator`` class which all others, including custom indicators are built atop, offers the ``plot()`` method for drawing to the canvas.
 
 The ``Indicator`` class also exposes a pointer to the canvas directly, so you could also use your own functions instead.
 
-``plot()`` offers the following options:
+Refer to the [Canvas Methods documentation](../canvas_mehtods) for the available functions.
 
-* [``renderLine``](./canvas_methods.md#renderline)
-* [``renderLineHorizontal``](./canvas_methods.md#renderlinehorizontal)
-* [``renderLineVertical``](./canvas_methods.md#renderlinevertical)
-* [``renderPathStroke``](./canvas_methods.md#renderpathstroke)
-* [``renderPathClosed``](./canvas_methods.md#renderpathclosed)
-* [``renderSpline``](./canvas_methods.md#renderspline)
-* [``renderRect``](./canvas_methods.md#renderrect)
-* [``renderPolygonRegular``](./canvas_methods.md#renderpolygonregular)
-* [``renderPolygonIrregular``](./canvas_methods.md#renderpolygonirregular)
-* [``renderRectRound``](./canvas_methods.md#renderrectround)
-* [``renderTriangle``](./canvas_methods.md#rendertriangle)
-* [``renderDiamond``](./canvas_methods.md#renderdiamond)
-* [``renderCircle``](./canvas_methods.md#rendercircle)
-* [``renderImage``](./canvas_methods.md#renderimage)
+```javascript
+this.plot (plots, type, opts )
+```
 
-Refer to the [Canvas Methods](./canvas_methods.md) documentation for parameter configuration.
+
+| Parameters | Type   | Description                                       |
+| ------------ | -------- | --------------------------------------------------- |
+| plots      | Array  | array of x y coords [ { x, y }, ...]             |
+| type       | string | [Canvas Methods documentation](../canvas_mehtods) |
+| opts       | object | [Canvas Methods documentation](../canvas_mehtods) |
 
 ### Minimal Custom Indicator Definition
 
@@ -334,31 +335,39 @@ export default class Test extends Indicator {
   }
 }
 ```
+
 ## Settings
 
 Current indicator settings can be retrieved with the following call:
+
 ```javascript
 chart0.getIndicator("TX_lj7216mu_vq6_0-Chart_0-EMA_1").settings()
 ```
 
 Indicator settings can also modified with the same call by passing an object:
+
 ```javascript
 const newSettings = {}
 chart0.getIndicator("TX_lj7216mu_vq6_0-Chart_0-EMA_1").settings(newSettings)
 ```
+
 ### Invokeing the Settings Dialogue
 
 The indicator Settings Dialogue can be invoked with the following:
+
 ```javascript
 chart0.getIndicator("TX_lj7216mu_vq6_0-Chart_0-EMA_1").invokeSettings()
 ```
+
 Invocation of the Settings Dialogue can be modified or replaced with a user defined function, either by passing an object to the method:
+
 ```javascript
 const callback = {
     indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
   }
 chart0.getIndicator("TX_lj7216mu_vq6_0-Chart_0-EMA_1").invokeSettings(callback)
 ```
+
 Setting ``own: true`` will cause the default dialogue not to be invoked.
 
 Alternatively, if in the initial chart configuration, the ``config.callbacks.indicatorSettings`` is given a callback object, this will make the change permanent.

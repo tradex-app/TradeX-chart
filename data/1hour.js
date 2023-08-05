@@ -67272,12 +67272,7 @@ export default {
                 ]
             },
         },
-        {
-            name: "HiLo",
-            type: "hiLo",
-            settings: {},
-            data: {}
-        }
+
     ],
     "secondary": [
         {

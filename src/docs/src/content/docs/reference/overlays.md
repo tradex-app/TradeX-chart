@@ -40,7 +40,7 @@ Overlays (layers) have the following features:
 | Chart Candles                          |        |          |
 | Chart Cursor                           |        |          |
 | Chart Grid                             |        |          |
-| Chart High Low                         | hiLo   | optional |
+| Chart High Low                         |        | optional |
 | [Chart News Events](../../news_events) | events | optional |
 | Chart Streaming Candle                 |        |          |
 | [Chart Trades](../../trades)           | trades | optional |
@@ -63,17 +63,16 @@ Indicators draw a visual interpretation (calculation) of either the price histor
 
 To add indicators to the chart, refer to the [indicator documentation](../indicators).
 
-**Scale Price Line** and **Chart Watermark** are always present, but must be enabled via the [chart config](../02_configuration).
+Optional overlays are always present, but must be enabled via the [chart config](../02_configuration).
 
-The following ovelays are added via the [initial chart state](../state) supplied by the chart config.
+* Scale Price Line - ``stream: {}`` see: [Streaming Price Data](../streaming_price_data)
+* Chart High Low - ``hightLow: true``
+* Chart Watermark - ``watermark: { text: "text goes here" }`` see: TODO: Watermark Options
 
-* Chart High Low
-* Chart Events
-* Chart Trades
+The following ovelays are an exception and are added via the [initial chart state](../state) supplied by the chart config, because they may provide a dataset to be included in the chart data state. See their corresponding documentation for more detail.
 
-```javascript
-chart.Chart.addOverlays()
-```
+* [Chart News Events](../../news_events)
+* [Chart Trades](../../trades)
 
 ## Custom Overlays
 
@@ -85,7 +84,7 @@ import { overlays } from "tradex-chart"
 
 The [TradeX-chart GitHub repository](https://github.com/tradex-app/TradeX-chart/tree/master/src/components/overlays) is a good starting point for examples of how to build overlays.
 
-### Basic Overlay
+### Basic Custom Overlay
 
 The foundation of an overlay looks like the following:
 
@@ -99,11 +98,49 @@ export default class customOverlay extends Overlay {
     super(target, xAxis, yAxis, theme, parent)
   }
 
+  // position() will pan / scroll your overlay with the rest of the chart
   set position(p) { this.target.setPosition(p[0], p[1]) }
+  // if you want your overlay NOT to pan / scroll, then replace the above with:
+  // set position(p) { this.target.setPosition(0, 0) }
 
+  // draw your overlay
   draw(range=this.core.range) {
   
-    // draw your overlay
+    // clear the layer provided to your overlay
+    this.scene.clear()
+    // HTML canvas context
+    const ctx = this.scene.context
+    ctx.save();
+
+    // draw something on the canvas
+
+    ctx.restore()
   }
 }
 ```
+
+### What the Parent Overlay Class Provides
+
+The parent ``Overlay`` class provides everything needed to draw on the chart.
+
+| Name    | Description                                            |
+| --------- | -------------------------------------------------------- |
+| core    | [chart root API](../../api/core)                       |
+| parent  | pane that overlay is applied to                        |
+| config  | [chart config](../02_configuration)                    |
+| theme   | [chart theme](../themes)                               |
+| params  | parameters that the overlay was created with           |
+| target  | layer methods and properties                           |
+| scene   | layer canvas provided to the overlay                   |
+| chart   | chart pane                                             |
+| xAxis   | methods and properties for the timeline                |
+| yAxis   | methods and properties for the (price) scale           |
+| context | "chart", "xAxis", "yAxis" - where the overlay is added |
+
+### Drawing on the Overlay
+
+TODO:
+
+### Adding a Custom Overlay to the Chart
+
+TODO:
