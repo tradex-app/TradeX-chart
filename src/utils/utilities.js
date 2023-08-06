@@ -262,7 +262,6 @@ export function isArrayEqual(a1, a2) {
 
 /**
  * Find nearest number value in Array
- *
  * @param {number} x
  * @param {Array} array
  * @returns {Array} - index, value
@@ -288,7 +287,24 @@ export function nearestArrayValue(x, array) {
   return [minDistIndex, minValue];
 }
 
+/**
+ * Move an array element from one position to another
+ * @param {Array} arr
+ * @param {number} fromIndex
+ * @param {number} toIndex
+ */
+export function arrayMove(arr, fromIndex, toIndex) {
+  var element = arr[fromIndex];
+  arr.splice(fromIndex, 1);
+  arr.splice(toIndex, 0, element);
+}
 
+/**
+ * Swap array element positions
+ * @param {Array} array 
+ * @param {number} index1 
+ * @param {number} index2 
+ */
 export function swapArrayElements(array, index1, index2) {
   [myArray[index1], myArray[index2]] = [myArray[index2], myArray[index1]];
 }

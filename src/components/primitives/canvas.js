@@ -1,5 +1,8 @@
 // canvas.js
 
+import { limit } from "../../utils/number";
+import { arrayMove } from "../../utils/utilities";
+
 class Node {
   /**
    * Viewport constructor
@@ -16,9 +19,9 @@ class Node {
     }
   
     /**
-     * set viewport size
-     * @param {Integer} width - viewport width in pixels
-     * @param {Integer} height - viewport height in pixels
+     * set viewport size in pixels and all layers in the stack which are composited into the viewport.
+     * @param {number} width - viewport width in pixels
+     * @param {number} height - viewport height in pixels
      * @returns {Viewport}
      */
     setSize(width, height) {
@@ -32,8 +35,9 @@ class Node {
   
       return this;
     }
+
     /**
-     * add layer
+     * add layer a layer to the viewport
      * @param {CEL.Layer} layer
      * @returns {Viewport}
      */
@@ -44,17 +48,16 @@ class Node {
       return this;
     }
     /**
-     * get key's associated coordinate - applied to mouse events.
+     * return associated hit id for coordinates - utilized for pointer events.
      * @param {number} x
      * @param {number} y
-     * @returns {Integer} integer - returns -1 if no pixel is there
+     * @returns {Integer} integer - returns -1 if transparent
      */
     getIntersection(x, y) {
       var layers = this.layers,
-        len = layers.length,
-        n = len - 1,
-        layer,
-        key;
+          n = layers.length - 1,
+          layer,
+          key;
   
       while (n >= 0) {
         layer = layers[n];
@@ -67,8 +70,9 @@ class Node {
   
       return -1;
     }
+
     /**
-     * get viewport index from all CEL viewports
+     * get viewport index in all CEL viewports
      * @returns {Integer}
      */
     get index() {
@@ -83,6 +87,7 @@ class Node {
   
       return null;
     }
+
     /**
      * destroy viewport
      */
@@ -92,13 +97,13 @@ class Node {
         layer.remove();
       }
     }
+
     /**
      * composite all layers onto canvas
      */
     render(all=false) {
-      let scene = this.scene,
-        layers = this.layers,
-        layer;
+      let {scene, layers} = this,
+          layer;
   
       scene.clear();
   
@@ -182,23 +187,23 @@ class Layer {
       this.setSize(cfg.width, cfg.height);
     }
   }
+
   /**
    * get layer index from viewport layers
    * @returns {Number|null}
    */
   get index() {
     let layers = this.viewport.layers,
-      len = layers.length,
-      n = 0,
-      layer;
+        n = 0,
+        layer;
 
     for (layer of layers) {
       if (this.id === layer.id) return n;
       n++;
     }
-
     return null;
   }
+
   /**
    * set layer position
    * @param {number} x
@@ -210,8 +215,9 @@ class Layer {
     this.y = y;
     return this;
   }
+
   /**
-   * set layer size
+   * set layer size and associated hit detection layer
    * @param {number} width
    * @param {number} height
    * @returns {Layer}
@@ -223,22 +229,32 @@ class Layer {
     this.hit.setSize(width, height);
     return this;
   }
+
+  /**
+   * 
+   * @param {string} [pos="up"|"down"|"top"|"bottom"|number] - position in layer stack
+   * @returns 
+   */
   move(pos) {
-    let index = this.index,
-      viewport = this.viewport,
-      layers = viewport.layers;
+    let {index, viewport} = this,
+        layers = viewport.layers,
+        order;
+
+    if (typeof pos === "number") {
+      order = limit(Math.floor(pos), (layers.length - 1) * -1, layers.length - 1)
+      pos = "order"
+    }
 
     switch (pos) {
       case "up":
-    if (index < layers.length - 1) {
-      // swap
-      layers[index] = layers[index + 1];
-      layers[index + 1] = this;
-    }
+        if (index < layers.length - 1) {
+          // swap
+          layers[index] = layers[index + 1];
+          layers[index + 1] = this;
+        }
         break;
       case "down":
         if (index > 0) {
-
           layers[index] = layers[index - 1];
           layers[index - 1] = this;
         }
@@ -250,6 +266,9 @@ class Layer {
       case "bottom":
         layers.splice(index, 1);
         layers.unshift(this);
+        break;
+      case "order":
+        arrayMove(layers, this.index, order)
         break;
     }
     return this;
@@ -322,41 +341,19 @@ class Scene {
    * @returns {Scene}
    */
   setSize(width, height) {
-    this.width = width;
-    this.height = height;
-    this.canvas.width = width * CEL.pixelRatio;
-    this.canvas.style.width = `${width}px`
-    this.canvas.height = height * CEL.pixelRatio;
-    this.canvas.style.height = `${height}px`
-
-    if (this.contextType === "2d" && CEL.pixelRatio !== 1) {
-      this.context.scale(CEL.pixelRatio, CEL.pixelRatio);
-    }
-
-    return this;
+    return setSize(width, height, this);
   }
+
   /**
    * clear scene
    * @returns {Scene}
    */
   clear() {
-    let context = this.context;
-    if (this.contextType === "2d") {
-      context.clearRect(
-        0,
-        0,
-        this.width * CEL.pixelRatio,
-        this.height * CEL.pixelRatio
-      );
-    }
-    // webgl or webgl2
-    else {
-      context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
-    }
-    return this;
+    return clear(this);
   }
+
   /**
-   * convert scene into an image
+   * convert scene into an HTML image source
    * @param {String} type - type of image format
    * @param {number} quality - image quality 0 - 1
    * @param {Function} cb - callback
@@ -373,8 +370,9 @@ class Scene {
     };
     imageObj.src = dataURL;
   }
+
   /**
-   * export scene as an image
+   * export scene as an image file
    * @param {Object} cfg - {filename}
    * @param {Function} cb - optional, by default opens image in new window / tab
    * @param {String} type - type of image format
@@ -388,8 +386,7 @@ class Scene {
   blobCallback(blob) {
     let anchor = document.createElement("a"),
       dataUrl = URL.createObjectURL(blob),
-      fileName = this.cfg.fileName || "canvas.png",
-      event;
+      fileName = this.cfg.fileName || "canvas.png";
 
     // set <a></a> attributes
     anchor.setAttribute("href", dataUrl);
@@ -426,7 +423,7 @@ class Hit {
     this.canvas.style.display = "none";
     this.canvas.style.position = "relative";
     this.context = this.canvas.getContext(this.contextType, {
-      // add preserveDrawingBuffer to pick colors with readPixels for hit detection
+      // add preserveDrawingBuffer to pick colours with readPixels for hit detection
       preserveDrawingBuffer: true,
       // fix webgl antialiasing picking issue
       antialias: false,
@@ -444,43 +441,26 @@ class Hit {
    * @returns {Hit}
    */
   setSize(width, height) {
-    this.width = width;
-    this.height = height;
-    this.canvas.width = width * CEL.pixelRatio;
-    this.canvas.style.width = `${width}px`
-    this.canvas.height = height * CEL.pixelRatio;
-    this.canvas.style.height = `${height}px`
-    return this;
+    return setSize(width, height, this);
   }
+
   /**
    * clear hit
    * @returns {Hit}
    */
   clear() {
-    let context = this.context;
-    if (this.contextType === "2d") {
-      context.clearRect(
-        0,
-        0,
-        this.width * CEL.pixelRatio,
-        this.height * CEL.pixelRatio
-      );
-    }
-    // webgl or webgl2
-    else {
-      context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
-    }
-    return this;
+    return clear(this);
   }
+
   /**
-   * get key associated with coordinate. This can be used for mouse interactivity.
+   * Test if a hit for coordinates. This can be used for pointer interactivity.
    * @param {number} x
    * @param {number} y
-   * @returns {Integer} integer - returns -1 if no pixel is there
+   * @returns {Integer} layer index - returns -1 if no pixel is there
    */
   getIntersection(x, y) {
     let context = this.context,
-      data;
+        data;
 
     x = Math.round(x);
     y = Math.round(y);
@@ -519,11 +499,11 @@ class Hit {
     return this.rgbToInt(data);
   }
   /**
-   * get canvas formatted color string from data index
+   * get canvas formatted colour string from data index
    * @param {number} index
    * @returns {String}
    */
-  getColorFromIndex(index) {
+  getIndexValue(index) {
     let rgb = this.intToRGB(index);
     return "rgb(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ")";
   }
@@ -549,6 +529,37 @@ class Hit {
     let b = number & 0x0000ff;
     return [r, g, b];
   }
+}
+
+function clear(that) {
+  let context = that.context;
+  if (that.contextType === "2d") {
+    context.clearRect(
+      0,
+      0,
+      that.width * CEL.pixelRatio,
+      that.height * CEL.pixelRatio
+    );
+  }
+  // webgl or webgl2
+  else {
+    context.clear(context.COLOR_BUFFER_BIT | context.DEPTH_BUFFER_BIT);
+  }
+  return that;
+}
+
+function setSize(width, height, that) {
+  that.width = width;
+  that.height = height;
+  that.canvas.width = width * CEL.pixelRatio;
+  that.canvas.style.width = `${width}px`
+  that.canvas.height = height * CEL.pixelRatio;
+  that.canvas.style.height = `${height}px`
+
+  if (that.contextType === "2d" && CEL.pixelRatio !== 1) {
+    that.context.scale(CEL.pixelRatio, CEL.pixelRatio);
+  }
+  return that;
 }
 
 // Canvas Extension Layers

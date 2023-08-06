@@ -1,6 +1,10 @@
 # Change Log
 
-## [0.136.0]() - 2023-08
+## [0.136.0](https://github.com/tradex-app/TradeX-chart/commit/8da2af9e4c93c7bf3b0976e489412181f1c541ef) - 2023-08-05
+
+Added
+
+* High Low Marker
 
 ## [0.135.0](https://github.com/tradex-app/TradeX-chart/commit/e26c7cbe7baaac45c9199a5d904e1cdb6fe7b9f9) - 2023-08-02
 
