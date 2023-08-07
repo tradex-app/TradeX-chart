@@ -69,7 +69,7 @@ export function renderText (ctx, x, y, opts) {
   ctx.fillStyle = opts?.colour
   ctx.font = createFont(opts?.fontSize, opts?.fontWeight, opts?.fontFamily) 
   ctx.textAlign = opts?.textAlign || "start"
-  ctx.textBaseLine = opts?.textBaseLine || "alphabetic"
+  ctx.textBaseline = opts?.textBaseLine || "alphabetic"
   ctx.direction = opts?.direction || "inherit"
   ctx.lineWidth = opts?.width
   ctx.strokeStyle = opts?.border

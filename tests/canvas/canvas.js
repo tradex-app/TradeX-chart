@@ -178,7 +178,7 @@ var Concrete = {},
           i = document.createElement("a"),
           n = URL.createObjectURL(t),
           s = h.fileName || "canvas.png";
-        i.setAttribute("href", n),
+          i.setAttribute("href", n),
           i.setAttribute("target", "_blank"),
           i.setAttribute("download", s),
           document.createEvent

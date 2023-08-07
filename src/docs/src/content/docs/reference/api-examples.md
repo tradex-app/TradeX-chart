@@ -48,6 +48,14 @@ export (save) chart.state.exportState() the current chart state
 create a new state const NewState = chart.state.createState() , this adds to the in memory list of states
 select the new state chart.state = NewState
 
+### Export Image
+
+``exportImage()`` will export a ``.png`` image snapshot of the chart, excluding the utils or tool bars.
+
+```javascript
+chart0.exportImage()
+```
+
 ## Main Pane
 
 ``MainPane.chartPanes`` returns a ``Map()`` of all existing chart panes.

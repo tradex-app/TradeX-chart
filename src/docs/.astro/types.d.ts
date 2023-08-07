@@ -318,6 +318,13 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
+"reference/canvas_extension_layers.md": {
+	id: "reference/canvas_extension_layers.md";
+  slug: "reference/canvas_extension_layers";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "reference/canvas_methods.md": {
 	id: "reference/canvas_methods.md";
   slug: "reference/canvas_methods";

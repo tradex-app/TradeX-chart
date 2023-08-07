@@ -248,7 +248,7 @@ export default class Window {
 
     // get your drag on
     title(window) {
-      const titleStyle = ``
+      let titleStyle = ``
       let cfg = this.config?.styles?.title
       for (let k in cfg) {
         titleStyle += `${k}: ${cfg[k]}; `
@@ -265,6 +265,7 @@ export default class Window {
     const out = `onmouseout="this.style.background ='none'"`
     let closeIconStyle = `${cPointer} `
     let cfg = this.config?.styles?.closeIcon
+    let titleStyle = ``
     for (let k in cfg) {
       titleStyle += `${k}: ${cfg[k]}; `
     }

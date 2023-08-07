@@ -3,6 +3,8 @@
 import { limit } from "../../utils/number";
 import { arrayMove } from "../../utils/utilities";
 
+const composition = ["source-over","source-atop","source-in","source-out","destination-over","destination-atop","destination-in","destination-out","lighter","copy","xor","multiply","screen","overlay","darken","lighten","color-dodge","color-burn","hard-light","soft-light","difference","exclusion","hue","saturation","color","luminosity"]
+
 class Node {
   /**
    * Viewport constructor
@@ -111,6 +113,9 @@ class Node {
 
         if (all && layer.layers.length > 0) layer.render(all)
 
+        if (composition.includes(layer?.composition))
+          scene.context.globalCompositeOperation = layer.composition
+
         if (layer.visible && layer.width > 0 && layer.height > 0)
           scene.context.drawImage(
             layer.scene.canvas,
@@ -166,6 +171,7 @@ class Layer {
   width = 0;
   height = 0;
   visible = true;
+  composition = null
   /**
    * Layer constructor
    * @param {Object} cfg - {x, y, width, height}
@@ -185,6 +191,9 @@ class Layer {
     }
     if (cfg.width && cfg.height) {
       this.setSize(cfg.width, cfg.height);
+    }
+    if (cfg.composition) {
+      this.setComposition(cfg.composition)
     }
   }
 
@@ -228,6 +237,18 @@ class Layer {
     this.scene.setSize(width, height);
     this.hit.setSize(width, height);
     return this;
+  }
+
+  /**
+   * set layer composition / blending mode
+   * @param {string} comp - composition type
+   * @returns 
+   */
+  setComposition(comp) {
+    if (composition.includes(comp)) {
+      this.composition = comp
+      return this
+    }
   }
 
   /**
@@ -385,22 +406,23 @@ class Scene {
 
   blobCallback(blob) {
     let anchor = document.createElement("a"),
-      dataUrl = URL.createObjectURL(blob),
-      fileName = this.cfg.fileName || "canvas.png";
+        dataUrl = URL.createObjectURL(blob),
+        fileName = this.cfg.fileName || "canvas.png";
 
     // set <a></a> attributes
     anchor.setAttribute("href", dataUrl);
     anchor.setAttribute("target", "_blank");
-    anchor.setAttribute("export", fileName);
+    anchor.setAttribute("download", fileName);
 
     // invoke click
     if (document.createEvent) {
       Object.assign(document.createElement("a"), {
         href: dataUrl,
         target: "_blank",
-        export: fileName,
+        download: fileName,
       }).click();
-    } else if (anchor.click) {
+    } 
+    else if (anchor.click) {
       anchor.click();
     }
   }

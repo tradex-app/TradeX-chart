@@ -243,6 +243,12 @@ export const defaultTheme = {
     BorderColour: GlobalStyle.COLOUR_BORDER,
     BorderThickness: GlobalStyle.BORDER_THICKNESS,
     TextColour: GlobalStyle.COLOUR_TXT,
+    FontWeight: GlobalStyle.FONTWEIGHT,
+    FontSize: GlobalStyle.FONTSIZE,
+    FontStyle: GlobalStyle.FONTSTYLE,
+    FontFamily: GlobalStyle.FONTFAMILY,
+    Font: GlobalStyle.FONT,
+    FontString: GlobalStyle.FONTSTRING,
     GridColour: GridStyle.COLOUR_GRID,
   },
   primaryPane: {

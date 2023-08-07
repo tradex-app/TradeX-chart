@@ -294,3 +294,35 @@ function drawHitCircle(config) {
 ```javascript
 const dataIndex = hit.getIntersection(20, 30);
 ```
+
+---
+
+
+| Value            | Description                                                                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| source-over      | **Default**<br>Displays the source over the destination                                                                                                  |
+| source-atop      | Displays the source on top of the destination. The part of the source image that is outside the destination is not shown                             |
+| source-in        | Displays the source in the destination. Only the part of the source that is INSIDE the destination is shown, and the destination is transparent      |
+| source-out       | Displays the source out of the destination. Only the part of the source that is OUTSIDE the destination is shown, and the destination is transparent |
+| destination-over | Displays the destination over the source                                                                                                             |
+| destination-atop | Displays the destination on top of the source. The part of the destination that is outside the source is not shown                                   |
+| destination-in   | Displays the destination in the source. Only the part of the destination that is INSIDE the source is shown, and the source is transparent           |
+| destination-out  | Displays the destination out of the source. Only the part of the destination that is OUTSIDE the source is shown, and the source is transparent      |
+| lighter          | Displays the source + the destination                                                                                                                |
+| copy             | Displays the source. The destination is ignored                                                                                                      |
+| xor              | The source is combined by using an exclusive OR with the destination                                                                                 |
+| multiply |   |
+| screen |   |
+| overlay |   |
+| darken |   |
+| lighten |   |
+| color-dodge |   |
+| color-burn |   |
+| hard-light |   |
+| soft-light |   |
+| difference |   |
+| exclusion |   |
+| hue |   |
+| saturation |   |
+| color |   |
+| luminosity |   |

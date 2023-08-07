@@ -23,6 +23,7 @@ import { NAME, SHORTNAME, ID, RANGELIMIT, PRICE_PRECISION, VOLUME_PRECISION, STR
 import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH } from './definitions/style'
 import Indicators from './definitions/indicators'
 import Indicator from './components/overlays/indicator'
+import exportImage from './utils/exportImage'
 
 /**
  * The root class for the entire chart
@@ -543,7 +544,7 @@ export default class TradeXchart extends Tradex_chart {
       const min = r.valueMin // * (1 + YAXIS_BOUNDS)
       // is candle testing display boundaries?
       if (candle[2] > max || candle[3] < min) {
-        // recalculate range
+        // update range
         // TODO: instead of recalculate, update Range
         this.setRange(r.indexStart, r.indexEnd)
         // trigger chart to redraw the scale (yAxis)
@@ -1177,6 +1178,13 @@ export default class TradeXchart extends Tradex_chart {
     let end = this.range.indexEnd
     this.setRange(start, end)
     this.MainPane.draw(undefined, true)
+  }
+
+  /**
+   * export image snapshot of the chart
+   */
+  exportImage() {
+    exportImage(this)
   }
 
   notImplemented() {
