@@ -252,7 +252,7 @@ class Layer {
   }
 
   /**
-   * 
+   * change the stacking order of the layer
    * @param {string} [pos="up"|"down"|"top"|"bottom"|number] - position in layer stack
    * @returns 
    */

@@ -2,6 +2,7 @@
 title: Canvas Extension Layers
 description: Provides a layered functionality to HTML canvas
 ---
+
 Canvas Extension Layers are a Html5 Canvas framework that enables hit detection, layering, pixel ratio management, exports, and downloads for either ``2d`` or ``webgl`` canvas modes.
 
 ## CEL
@@ -127,17 +128,69 @@ layer.setPosition(50, 50);
 
 ### setSize()
 
+Set layer size and associated hit detection layer
+
 ```javascript
 layer.setSize(600, 200);
 ```
 
+### setComposition()
+
+Set layer composition / blending mode.
+
+```javascript
+layer.setCompositin("multiply");
+```
+
+| Value            | Description                                                                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| source-over      | **Default**<br>Displays the source over the destination                                                                                              |
+| source-atop      | Displays the source on top of the destination. The part of the source image that is outside the destination is not shown                             |
+| source-in        | Displays the source in the destination. Only the part of the source that is INSIDE the destination is shown, and the destination is transparent      |
+| source-out       | Displays the source out of the destination. Only the part of the source that is OUTSIDE the destination is shown, and the destination is transparent |
+| destination-over | Displays the destination over the source                                                                                                             |
+| destination-atop | Displays the destination on top of the source. The part of the destination that is outside the source is not shown                                   |
+| destination-in   | Displays the destination in the source. Only the part of the destination that is INSIDE the source is shown, and the source is transparent           |
+| destination-out  | Displays the destination out of the source. Only the part of the destination that is OUTSIDE the source is shown, and the source is transparent      |
+| lighter          | Displays the source + the destination                                                                                                                |
+| copy             | Displays the source. The destination is ignored                                                                                                      |
+| xor              | The source is combined by using an exclusive OR with the destination                                                                                 |
+| multiply         |                                                                                                                                                      |
+| screen           |                                                                                                                                                      |
+| overlay          |                                                                                                                                                      |
+| darken           |                                                                                                                                                      |
+| lighten          |                                                                                                                                                      |
+| color-dodge      |                                                                                                                                                      |
+| color-burn       |                                                                                                                                                      |
+| hard-light       |                                                                                                                                                      |
+| soft-light       |                                                                                                                                                      |
+| difference       |                                                                                                                                                      |
+| exclusion        |                                                                                                                                                      |
+| hue              |                                                                                                                                                      |
+| saturation       |                                                                                                                                                      |
+| color            |                                                                                                                                                      |
+| luminosity       |                                                                                                                                                      |
+
+### move()
+
+Change the stacking order of the layer. It accepts one parameter of type ``string`` from the following values: ``"up", "down", "top", "bottom"`` or of type ``number`` specifying which layer order to set it to with the lowest layer having a value of zero. Negative values will position the layer after the topmost layer.
+
+```javascript
+// move to top of layer stack
+layer.move("top");
+```
+
 ### moveUp()
+
+Move layer on position up the stack.
 
 ```javascript
 layer.moveUp();
 ```
 
 ### moveDown()
+
+Move layer on position down the stack.
 
 ```javascript
 layer.moveDown();
@@ -213,20 +266,41 @@ scene.clear();
 
 ### toImage()
 
+
+| Parameter | Type     | Description                                                  | Required |
+| ----------- | ---------- | :------------------------------------------------------------- | ---------- |
+| type      | string   | image type, "image/png" (default), "image/jpg", "image/webp" | false    |
+| quality   | number   | image quality                                                | false    |
+| cb        | function | callback to receive the data URL                             | true     |
+
 ```javascript
-scene.toImage(function(image) {
+const cb = function(imageURL) {
   // do something with the image
-});
+}
+scene.toImage(type, quality, cb);
 ```
 
-### download()
+A callback function is **required** to receive the data URL. ``toImage`` will export a ``.png`` image by default.
+
+### export()
+
+``export()`` will trigger a file download, exporting a ``.png`` image snapshot of the scene.
+
+
+| Parameter | Type     | Description                                                  | Required |
+| :---------- | ---------- | :------------------------------------------------------------- | ---------- |
+| cfg       | object   | {fileName}                                                   | false    |
+| cb        | function | alternative handler                                          | false    |
+| type      | string   | image type, "image/png" (default), "image/jpg", "image/webp" | false    |
+| quality   | number   | image quality                                                | false    |
 
 ```javascript
-// download the canvas as an image to your computer.  Cool!
-scene.download({
-  fileName: 'my-file.png'
-});
+// download the canvas as an image to your computer.
+const cfg = {fileName: 'my-file.png'}
+scene.export(cfg, null, type, quality);
 ```
+
+By default, ``export()`` will export a ``.png`` image for download. If no file name is supplied, it will use the chart id by default.
 
 ## Hit Detection
 
@@ -295,34 +369,3 @@ function drawHitCircle(config) {
 const dataIndex = hit.getIntersection(20, 30);
 ```
 
----
-
-
-| Value            | Description                                                                                                                                          |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| source-over      | **Default**<br>Displays the source over the destination                                                                                                  |
-| source-atop      | Displays the source on top of the destination. The part of the source image that is outside the destination is not shown                             |
-| source-in        | Displays the source in the destination. Only the part of the source that is INSIDE the destination is shown, and the destination is transparent      |
-| source-out       | Displays the source out of the destination. Only the part of the source that is OUTSIDE the destination is shown, and the destination is transparent |
-| destination-over | Displays the destination over the source                                                                                                             |
-| destination-atop | Displays the destination on top of the source. The part of the destination that is outside the source is not shown                                   |
-| destination-in   | Displays the destination in the source. Only the part of the destination that is INSIDE the source is shown, and the source is transparent           |
-| destination-out  | Displays the destination out of the source. Only the part of the destination that is OUTSIDE the source is shown, and the source is transparent      |
-| lighter          | Displays the source + the destination                                                                                                                |
-| copy             | Displays the source. The destination is ignored                                                                                                      |
-| xor              | The source is combined by using an exclusive OR with the destination                                                                                 |
-| multiply |   |
-| screen |   |
-| overlay |   |
-| darken |   |
-| lighten |   |
-| color-dodge |   |
-| color-burn |   |
-| hard-light |   |
-| soft-light |   |
-| difference |   |
-| exclusion |   |
-| hue |   |
-| saturation |   |
-| color |   |
-| luminosity |   |

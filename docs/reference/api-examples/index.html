@@ -564,7 +564,7 @@ select the new state chart.state = NewState</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.downloadImage(</span><span style="color: #FFAB70">"mychart.png"</span><span style="color: #B392F0">)</span></span></code></pre>
 <p>By default, <code>downloadImage()</code> will export a <code>.png</code> image for download. If no file name is supplied, it will use the chart id by default.</p>
 <h3 id="data-url-export">Data URL Export</h3>
-<p><code>toImage()</code> will create a chart image snapshot as a data URL to use as an image source.</p>
+<p><code>toImageURL()</code> will create a chart image snapshot as a data URL to use as an image source.</p>
 
 
 
@@ -599,7 +599,7 @@ select the new state chart.state = NewState</p>
 <span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// do something with the dataURL</span></span>
 <span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// examples: save to server, attach to email, send to an API</span></span>
 <span class="line"><span style="color: #B392F0">}</span></span>
-<span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.toImage(cb)</span></span></code></pre>
+<span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.toImageURL(cb)</span></span></code></pre>
 <p>A callback function is <strong>required</strong> to receive the data URL. <code>toImage</code> will export a <code>.png</code> image by default.</p>
 <h2 id="main-pane">Main Pane</h2>
 <p><code>MainPane.chartPanes</code> returns a <code>Map()</code> of all existing chart panes.</p>
@@ -661,7 +661,7 @@ chart0.Chart.legendsVisibility(“hide”)</p>
     
     <p>
       Last updated:
-      <time datetime="2023-08-07T22:44:18.000Z">
+      <time datetime="2023-08-08T13:44:39.000Z">
         Aug 8, 2023
       </time>
     </p>

@@ -424,6 +424,16 @@
         </a>
         
       </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#setcomposition" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">setComposition()</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#move" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">move()</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
         <a href="#moveup" class="astro-G2BYWC46" style="--depth: 1;">
           <span class="astro-G2BYWC46" style="--depth: 1;">moveUp()</span>
         </a>
@@ -491,8 +501,8 @@
         </a>
         
       </li><li class="astro-G2BYWC46" style="--depth: 1;">
-        <a href="#download" class="astro-G2BYWC46" style="--depth: 1;">
-          <span class="astro-G2BYWC46" style="--depth: 1;">download()</span>
+        <a href="#export" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">export()</span>
         </a>
         
       </li>
@@ -652,6 +662,16 @@
         </a>
         
       </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#setcomposition" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">setComposition()</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#move" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">move()</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
         <a href="#moveup" class="astro-G2BYWC46" style="--depth: 1;">
           <span class="astro-G2BYWC46" style="--depth: 1;">moveUp()</span>
         </a>
@@ -719,8 +739,8 @@
         </a>
         
       </li><li class="astro-G2BYWC46" style="--depth: 1;">
-        <a href="#download" class="astro-G2BYWC46" style="--depth: 1;">
-          <span class="astro-G2BYWC46" style="--depth: 1;">download()</span>
+        <a href="#export" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">export()</span>
         </a>
         
       </li>
@@ -842,10 +862,134 @@
 <p>Set the layer position relative to the viewport.</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">layer</span><span style="color: #B392F0">.setPosition(</span><span style="color: #F8F8F8">50</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">50</span><span style="color: #B392F0">);</span></span></code></pre>
 <h3 id="setsize-1">setSize()</h3>
+<p>Set layer size and associated hit detection layer</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">layer</span><span style="color: #B392F0">.setSize(</span><span style="color: #F8F8F8">600</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">200</span><span style="color: #B392F0">);</span></span></code></pre>
+<h3 id="setcomposition">setComposition()</h3>
+<p>Set layer composition / blending mode.</p>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">layer</span><span style="color: #B392F0">.setCompositin(</span><span style="color: #FFAB70">"multiply"</span><span style="color: #B392F0">);</span></span></code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Value</th><th>Description</th></tr></thead><tbody><tr><td>source-over</td><td><strong>Default</strong><br>Displays the source over the destination</td></tr><tr><td>source-atop</td><td>Displays the source on top of the destination. The part of the source image that is outside the destination is not shown</td></tr><tr><td>source-in</td><td>Displays the source in the destination. Only the part of the source that is INSIDE the destination is shown, and the destination is transparent</td></tr><tr><td>source-out</td><td>Displays the source out of the destination. Only the part of the source that is OUTSIDE the destination is shown, and the destination is transparent</td></tr><tr><td>destination-over</td><td>Displays the destination over the source</td></tr><tr><td>destination-atop</td><td>Displays the destination on top of the source. The part of the destination that is outside the source is not shown</td></tr><tr><td>destination-in</td><td>Displays the destination in the source. Only the part of the destination that is INSIDE the source is shown, and the source is transparent</td></tr><tr><td>destination-out</td><td>Displays the destination out of the source. Only the part of the destination that is OUTSIDE the source is shown, and the source is transparent</td></tr><tr><td>lighter</td><td>Displays the source + the destination</td></tr><tr><td>copy</td><td>Displays the source. The destination is ignored</td></tr><tr><td>xor</td><td>The source is combined by using an exclusive OR with the destination</td></tr><tr><td>multiply</td><td></td></tr><tr><td>screen</td><td></td></tr><tr><td>overlay</td><td></td></tr><tr><td>darken</td><td></td></tr><tr><td>lighten</td><td></td></tr><tr><td>color-dodge</td><td></td></tr><tr><td>color-burn</td><td></td></tr><tr><td>hard-light</td><td></td></tr><tr><td>soft-light</td><td></td></tr><tr><td>difference</td><td></td></tr><tr><td>exclusion</td><td></td></tr><tr><td>hue</td><td></td></tr><tr><td>saturation</td><td></td></tr><tr><td>color</td><td></td></tr><tr><td>luminosity</td><td></td></tr></tbody></table>
+<h3 id="move">move()</h3>
+<p>Change the stacking order of the layer. It accepts one parameter of type <code>string</code> from the following values: <code>"up", "down", "top", "bottom"</code> or of type <code>number</code> specifying which layer order to set it to with the lowest layer having a value of zero. Negative values will position the layer after the topmost layer.</p>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #6B737C">// move to top of layer stack</span></span>
+<span class="line"><span style="color: #79B8FF">layer</span><span style="color: #B392F0">.move(</span><span style="color: #FFAB70">"top"</span><span style="color: #B392F0">);</span></span></code></pre>
 <h3 id="moveup">moveUp()</h3>
+<p>Move layer on position up the stack.</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">layer</span><span style="color: #B392F0">.moveUp();</span></span></code></pre>
 <h3 id="movedown">moveDown()</h3>
+<p>Move layer on position down the stack.</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">layer</span><span style="color: #B392F0">.moveDown();</span></span></code></pre>
 <h3 id="movetotop">moveToTop()</h3>
 <p>Place the layer on the top of the stack, giving it the highest index value.</p>
@@ -873,14 +1017,83 @@
 <h3 id="clear">clear()</h3>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">scene</span><span style="color: #B392F0">.clear();</span></span></code></pre>
 <h3 id="toimage">toImage()</h3>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">scene</span><span style="color: #B392F0">.toImage(</span><span style="color: #F97583">function</span><span style="color: #B392F0">(image) {</span></span>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Parameter</th><th>Type</th><th align="left">Description</th><th>Required</th></tr></thead><tbody><tr><td>type</td><td>string</td><td align="left">image type, “image/png” (default), “image/jpg”, “image/webp”</td><td>false</td></tr><tr><td>quality</td><td>number</td><td align="left">image quality</td><td>false</td></tr><tr><td>cb</td><td>function</td><td align="left">callback to receive the data URL</td><td>true</td></tr></tbody></table>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> cb </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #F97583">function</span><span style="color: #B392F0">(imageURL) {</span></span>
 <span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// do something with the image</span></span>
-<span class="line"><span style="color: #B392F0">});</span></span></code></pre>
-<h3 id="download">download()</h3>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #6B737C">// download the canvas as an image to your computer.  Cool!</span></span>
-<span class="line"><span style="color: #79B8FF">scene</span><span style="color: #B392F0">.download({</span></span>
-<span class="line"><span style="color: #B392F0">  fileName</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">'my-file.png'</span></span>
-<span class="line"><span style="color: #B392F0">});</span></span></code></pre>
+<span class="line"><span style="color: #B392F0">}</span></span>
+<span class="line"><span style="color: #79B8FF">scene</span><span style="color: #B392F0">.toImage(type</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> quality</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> cb);</span></span></code></pre>
+<p>A callback function is <strong>required</strong> to receive the data URL. <code>toImage</code> will export a <code>.png</code> image by default.</p>
+<h3 id="export">export()</h3>
+<p><code>export()</code> will trigger a file download, exporting a <code>.png</code> image snapshot of the scene.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th align="left">Parameter</th><th>Type</th><th align="left">Description</th><th>Required</th></tr></thead><tbody><tr><td align="left">cfg</td><td>object</td><td align="left">{fileName}</td><td>false</td></tr><tr><td align="left">cb</td><td>function</td><td align="left">alternative handler</td><td>false</td></tr><tr><td align="left">type</td><td>string</td><td align="left">image type, “image/png” (default), “image/jpg”, “image/webp”</td><td>false</td></tr><tr><td align="left">quality</td><td>number</td><td align="left">image quality</td><td>false</td></tr></tbody></table>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #6B737C">// download the canvas as an image to your computer.</span></span>
+<span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">cfg</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {fileName</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">'my-file.png'</span><span style="color: #B392F0">}</span></span>
+<span class="line"><span style="color: #79B8FF">scene</span><span style="color: #B392F0">.export(cfg</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">null</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> type</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> quality);</span></span></code></pre>
+<p>By default, <code>export()</code> will export a <code>.png</code> image for download. If no file name is supplied, it will use the chart id by default.</p>
 <h2 id="hit-detection">Hit Detection</h2>
 <h3 id="constructor-3">constructor</h3>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">hit</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #F97583">new</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">CEL</span><span style="color: #B392F0">.Hit();</span></span></code></pre>
@@ -912,122 +1125,7 @@
 <span class="line"><span style="color: #B392F0">}</span></span></code></pre>
 <h3 id="getintersection-1">getIntersection()</h3>
 <p><code>getIntersection(x, y)</code> tests if a hit for coordinates. This can be used for pointer interactivity. Returns the associated layer index value or -1 if not hit.</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">dataIndex</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">hit</span><span style="color: #B392F0">.getIntersection(</span><span style="color: #F8F8F8">20</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">30</span><span style="color: #B392F0">);</span></span></code></pre>
-<hr>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<table><thead><tr><th>Value</th><th>Description</th></tr></thead><tbody><tr><td>source-over</td><td><strong>Default</strong><br>Displays the source over the destination</td></tr><tr><td>source-atop</td><td>Displays the source on top of the destination. The part of the source image that is outside the destination is not shown</td></tr><tr><td>source-in</td><td>Displays the source in the destination. Only the part of the source that is INSIDE the destination is shown, and the destination is transparent</td></tr><tr><td>source-out</td><td>Displays the source out of the destination. Only the part of the source that is OUTSIDE the destination is shown, and the destination is transparent</td></tr><tr><td>destination-over</td><td>Displays the destination over the source</td></tr><tr><td>destination-atop</td><td>Displays the destination on top of the source. The part of the destination that is outside the source is not shown</td></tr><tr><td>destination-in</td><td>Displays the destination in the source. Only the part of the destination that is INSIDE the source is shown, and the source is transparent</td></tr><tr><td>destination-out</td><td>Displays the destination out of the source. Only the part of the destination that is OUTSIDE the source is shown, and the source is transparent</td></tr><tr><td>lighter</td><td>Displays the source + the destination</td></tr><tr><td>copy</td><td>Displays the source. The destination is ignored</td></tr><tr><td>xor</td><td>The source is combined by using an exclusive OR with the destination</td></tr><tr><td>multiply</td><td></td></tr><tr><td>screen</td><td></td></tr><tr><td>overlay</td><td></td></tr><tr><td>darken</td><td></td></tr><tr><td>lighten</td><td></td></tr><tr><td>color-dodge</td><td></td></tr><tr><td>color-burn</td><td></td></tr><tr><td>hard-light</td><td></td></tr><tr><td>soft-light</td><td></td></tr><tr><td>difference</td><td></td></tr><tr><td>exclusion</td><td></td></tr><tr><td>hue</td><td></td></tr><tr><td>saturation</td><td></td></tr><tr><td>color</td><td></td></tr><tr><td>luminosity</td><td></td></tr></tbody></table></div>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">dataIndex</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">hit</span><span style="color: #B392F0">.getIntersection(</span><span style="color: #F8F8F8">20</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">30</span><span style="color: #B392F0">);</span></span></code></pre></div>
               <footer class="astro-3YYAFB3N">
   <div class="meta flex astro-3YYAFB3N">
     

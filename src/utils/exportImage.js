@@ -36,19 +36,25 @@ export default function exportImage(core, dest, type, quality, output) {
   ctx.drawImage(mainScene.canvas, 0, 0, mainScene.width, mainScene.height)
   // iterate over chart panes and y axes
   let y = 0
+  let x1 = 0 
+  let x2 = width - core.Chart.scale.width
+  if (theme?.yAxis?.location == "left") {
+    x1 = core.Chart.scale.width
+    x2 = 0
+  }
   let opts
   for (const [key, value] of core.ChartPanes) {
     let scene = value.graph.viewport.scene
     let {width, height} = scene
-    let time = value.scale.graph.viewport.scene
-    let {width: w, height: h} = time
+    let scale = value.scale.graph.viewport.scene
+    let {width: w, height: h} = scale
     // draw divider
     if (y > 0) {
       opts = { stroke: "#ccc"} // theme.chart.BorderColour}
       renderLineHorizontal(ctx, y, 0, main.width, opts)
     }
-    ctx.drawImage(scene.canvas, 0, y, width, height)
-    ctx.drawImage(time.canvas, width, y-1, w, h)
+    ctx.drawImage(scene.canvas, x1, y, width, height)
+    ctx.drawImage(scale.canvas, x2, y-1, w, h)
     y += height
   }
   // timeline

@@ -66,7 +66,7 @@ By default, ``downloadImage()`` will export a ``.png`` image for download. If no
 
 ### Data URL Export
 
-``toImage()`` will create a chart image snapshot as a data URL to use as an image source.
+``toImageURL()`` will create a chart image snapshot as a data URL to use as an image source.
 
 
 | Parameter | Type     | Description                                                  | Required |
@@ -80,7 +80,7 @@ const cb = (dataURL) => {
   // do something with the dataURL
   // examples: save to server, attach to email, send to an API
 }
-chart0.toImage(cb)
+chart0.toImageURL(cb)
 ```
 
 A callback function is **required** to receive the data URL. ``toImage`` will export a ``.png`` image by default.
