@@ -375,7 +375,7 @@ class Scene {
 
   /**
    * convert scene into an HTML image source
-   * @param {String} type - type of image format
+   * @param {String} type - image format "img/png"|"img/jpg"|"img/webp"
    * @param {number} quality - image quality 0 - 1
    * @param {Function} cb - callback
    */
@@ -396,7 +396,7 @@ class Scene {
    * export scene as an image file
    * @param {Object} cfg - {filename}
    * @param {Function} cb - optional, by default opens image in new window / tab
-   * @param {String} type - type of image format
+   * @param {String} type - image format "img/png"|"img/jpg"|"img/webp"
    * @param {number} quality - image quality 0 - 1
    */
   export(cfg, cb, type = "image/png", quality) {

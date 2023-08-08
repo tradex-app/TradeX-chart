@@ -121,8 +121,16 @@
             </summary>
             <ul class="astro-3II7XXMS">
   <li class="astro-3II7XXMS">
+        <a href="/examples/01_static_chart/" class="astro-3II7XXMS">
+            Static Price History
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/examples/02_live_history_chart/" class="astro-3II7XXMS">
+            Pice History with Live Price Feed
+          </a>
+      </li><li class="astro-3II7XXMS">
         <a href="/examples/custom_indicator/" class="astro-3II7XXMS">
-            Custom indicator
+            Custom Indicator
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/examples/static_chart/" class="astro-3II7XXMS">
@@ -139,6 +147,10 @@
             </summary>
             <ul class="astro-3II7XXMS">
   <li class="astro-3II7XXMS">
+        <a href="/guides/custom_indicator/" class="astro-3II7XXMS">
+            Custom Indicator - How to Build and Use
+          </a>
+      </li><li class="astro-3II7XXMS">
         <a href="/guides/howto/" class="astro-3II7XXMS">
             How To
           </a>
@@ -169,12 +181,20 @@
             Configuration
           </a>
       </li><li class="astro-3II7XXMS">
+        <a href="/reference/annotations/" class="astro-3II7XXMS">
+            Annotations
+          </a>
+      </li><li class="astro-3II7XXMS">
         <a href="/reference/api-examples/" class="astro-3II7XXMS">
             API Examples
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/architecture/" class="astro-3II7XXMS">
             Architecture
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/canvas_extension_layers/" class="astro-3II7XXMS">
+            Canvas Extension Layers
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/canvas_methods/" class="astro-3II7XXMS">
@@ -201,8 +221,16 @@
             TA-Lib Functions
           </a>
       </li><li class="astro-3II7XXMS">
+        <a href="/reference/news_events/" class="astro-3II7XXMS">
+            News Events
+          </a>
+      </li><li class="astro-3II7XXMS">
         <a href="/reference/overlays/" class="astro-3II7XXMS">
             Overlays
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/range/" class="astro-3II7XXMS">
+            Range
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/state/" class="astro-3II7XXMS">
@@ -213,12 +241,20 @@
             State Machine
           </a>
       </li><li class="astro-3II7XXMS">
-        <a href="/reference/streaming-price-data/" class="astro-3II7XXMS">
+        <a href="/reference/streaming_price_data/" class="astro-3II7XXMS">
             Streaming Price Data to the Chart
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/themes/" class="astro-3II7XXMS">
             Themes
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/trades/" class="astro-3II7XXMS">
+            Trades
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/widgets/" class="astro-3II7XXMS">
+            Widgets
           </a>
       </li>
 </ul>
@@ -382,9 +418,9 @@
 <li>@param {function} handler - function or method</li>
 <li>@param {Object}   context - Optional context the function belongs to</li>
 </ul>
-<pre is:raw="" class="astro-code css-variables" style="background-color: var(--astro-code-color-background); overflow-x: auto;" tabindex="0"><code><span class="line"><span style="color: var(--astro-code-token-constant)">chart</span><span style="color: var(--astro-code-token-function)">.on</span><span style="color: var(--astro-code-color-text)">(</span><span style="color: var(--astro-code-token-string-expression)">"stream_candleUpdate"</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> onSomeEven</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-color-text)">)</span></span></code></pre>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart</span><span style="color: #B392F0">.on(</span><span style="color: #FFAB70">"stream_candleUpdate"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> onSomeEven</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">)</span></span></code></pre>
 <p>The handler will be passed one parameter if any dependent upon the event.</p>
-<pre is:raw="" class="astro-code css-variables" style="background-color: var(--astro-code-color-background); overflow-x: auto;" tabindex="0"><code><span class="line"><span style="color: var(--astro-code-token-keyword)">function</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-function)">onSomeEvent</span><span style="color: var(--astro-code-color-text)">(data) { </span><span style="color: var(--astro-code-token-constant)">console</span><span style="color: var(--astro-code-token-function)">.log</span><span style="color: var(--astro-code-color-text)">(data) }</span></span></code></pre>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">function</span><span style="color: #B392F0"> onSomeEvent(data) { </span><span style="color: #79B8FF">console</span><span style="color: #B392F0">.log(data) }</span></span></code></pre>
 <p>Event handlers will be executed in first in last out order.</p>
 <h2 id="unsubscribing">Unsubscribing</h2>
 <p>Unsubscribing from the event uses the <code>chart.off(string, function)</code> method.</p>
@@ -392,14 +428,14 @@
 <li>@param {string}   topic   - event name</li>
 <li>@param {function} handler - function or method</li>
 </ul>
-<pre is:raw="" class="astro-code css-variables" style="background-color: var(--astro-code-color-background); overflow-x: auto;" tabindex="0"><code><span class="line"><span style="color: var(--astro-code-token-constant)">chart</span><span style="color: var(--astro-code-token-function)">.off</span><span style="color: var(--astro-code-color-text)">(</span><span style="color: var(--astro-code-token-string-expression)">"stream_candleUpdate"</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> onSomeEven)</span></span></code></pre>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart</span><span style="color: #B392F0">.off(</span><span style="color: #FFAB70">"stream_candleUpdate"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> onSomeEven)</span></span></code></pre>
 <h2 id="event-publishing">Event Publishing</h2>
 <p>The same method that the chart uses internally is also exposed on the public API. Developers can take advantage of this for their own purposes and generate their own events and use the same subscribe and unsubscribe methods detailed above.</p>
 <ul>
 <li>@param {String} topic - The topic name</li>
 <li>@param {Object} data  - The data to publish</li>
 </ul>
-<pre is:raw="" class="astro-code css-variables" style="background-color: var(--astro-code-color-background); overflow-x: auto;" tabindex="0"><code><span class="line"><span style="color: var(--astro-code-token-constant)">chart</span><span style="color: var(--astro-code-token-function)">.emit</span><span style="color: var(--astro-code-color-text)">(</span><span style="color: var(--astro-code-token-string-expression)">"some_event"</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> {value</span><span style="color: var(--astro-code-token-keyword)">:</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-string-expression)">"foo"</span><span style="color: var(--astro-code-color-text)">})</span></span></code></pre>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart</span><span style="color: #B392F0">.emit(</span><span style="color: #FFAB70">"some_event"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> {value</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"foo"</span><span style="color: #B392F0">})</span></span></code></pre>
 <h2 id="event-list">Event List</h2>
 <p>The following list of events is not exhaustive as the chart is still under heavy development and subject to change until the release of version 1.0.</p>
 <ul>
@@ -411,11 +447,13 @@
 <li>chart_yAxisRedraw</li>
 <li>divider_pointerdrag</li>
 <li>divider_pointerdragend</li>
-<li>global_resize</li>
 <li>Error</li>
+<li>event_selected</li>
+<li>global_resize</li>
 <li>main_mousemove</li>
 <li>scrollUpdate</li>
 <li>setRange</li>
+<li>trade_selected</li>
 <li>zoomDone</li>
 </ul></div>
               <footer class="astro-3YYAFB3N">
@@ -423,8 +461,8 @@
     
     <p>
       Last updated:
-      <time datetime="2023-06-30T13:19:48.000Z">
-        Jun 30, 2023
+      <time datetime="2023-08-01T02:50:15.000Z">
+        Aug 1, 2023
       </time>
     </p>
   </div>

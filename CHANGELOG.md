@@ -1,5 +1,19 @@
 # Change Log
 
+## [0.137.1] - 2023-08-08
+
+Added
+
+* Chart to image URL ``toImageURL()``
+* Image download and data URL, image type options
+
+## [0.137.0] - 2023.08-08
+
+Added
+
+* Chart Image Snapshot Download
+* CEL - layer composition
+
 ## [0.136.0](https://github.com/tradex-app/TradeX-chart/commit/8da2af9e4c93c7bf3b0976e489412181f1c541ef) - 2023-08-05
 
 Added

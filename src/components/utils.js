@@ -126,6 +126,7 @@ export default class UtilsBar {
           menu: menu,
           evt: evt
         };
+    let action = target.dataset.action
     
     this.emit(evt, data)
 
@@ -134,6 +135,8 @@ export default class UtilsBar {
       // this.emit("menuItem_selected", data)
       this.emit("util_selected", data)
     }
+
+    if (action) action(data, this.#core)
   }
 
   onIconOver(e) {
@@ -200,8 +203,7 @@ export default class UtilsBar {
   }
 
   onScreenshot(data) {
-    // console.log(`Screenshot:`,data)
-    this.#core.notImplemented()
+    this.#core.downloadImage()
   }
 
 

@@ -1181,10 +1181,18 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   /**
-   * export image snapshot of the chart
+   * Create a chart image snapshot as a data URL to use as an image source
+   * @param {function} cb - callback function to receive the generated data URL
    */
-  exportImage() {
-    exportImage(this)
+  toImageURL(cb, type, quality) {
+    exportImage(this, cb, type, quality, "url")
+  }
+
+  /**
+   * download image snapshot of the chart
+   */
+  downloadImage(fileName=`${this.id}.png`, type, quality) {
+    exportImage(this, fileName, type, quality, "download")
   }
 
   notImplemented() {

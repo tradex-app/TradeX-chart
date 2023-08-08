@@ -121,8 +121,16 @@
             </summary>
             <ul class="astro-3II7XXMS">
   <li class="astro-3II7XXMS">
+        <a href="/examples/01_static_chart/" class="astro-3II7XXMS">
+            Static Price History
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/examples/02_live_history_chart/" class="astro-3II7XXMS">
+            Pice History with Live Price Feed
+          </a>
+      </li><li class="astro-3II7XXMS">
         <a href="/examples/custom_indicator/" class="astro-3II7XXMS">
-            Custom indicator
+            Custom Indicator
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/examples/static_chart/" class="astro-3II7XXMS">
@@ -139,6 +147,10 @@
             </summary>
             <ul class="astro-3II7XXMS">
   <li class="astro-3II7XXMS">
+        <a href="/guides/custom_indicator/" class="astro-3II7XXMS">
+            Custom Indicator - How to Build and Use
+          </a>
+      </li><li class="astro-3II7XXMS">
         <a href="/guides/howto/" class="astro-3II7XXMS">
             How To
           </a>
@@ -169,12 +181,20 @@
             Configuration
           </a>
       </li><li class="astro-3II7XXMS">
+        <a href="/reference/annotations/" class="astro-3II7XXMS">
+            Annotations
+          </a>
+      </li><li class="astro-3II7XXMS">
         <a href="/reference/api-examples/" class="astro-3II7XXMS">
             API Examples
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/architecture/" aria-current="page" class="astro-3II7XXMS">
             Architecture
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/canvas_extension_layers/" class="astro-3II7XXMS">
+            Canvas Extension Layers
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/canvas_methods/" class="astro-3II7XXMS">
@@ -201,8 +221,16 @@
             TA-Lib Functions
           </a>
       </li><li class="astro-3II7XXMS">
+        <a href="/reference/news_events/" class="astro-3II7XXMS">
+            News Events
+          </a>
+      </li><li class="astro-3II7XXMS">
         <a href="/reference/overlays/" class="astro-3II7XXMS">
             Overlays
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/range/" class="astro-3II7XXMS">
+            Range
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/state/" class="astro-3II7XXMS">
@@ -213,12 +241,20 @@
             State Machine
           </a>
       </li><li class="astro-3II7XXMS">
-        <a href="/reference/streaming-price-data/" class="astro-3II7XXMS">
+        <a href="/reference/streaming_price_data/" class="astro-3II7XXMS">
             Streaming Price Data to the Chart
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/themes/" class="astro-3II7XXMS">
             Themes
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/trades/" class="astro-3II7XXMS">
+            Trades
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/widgets/" class="astro-3II7XXMS">
+            Widgets
           </a>
       </li>
 </ul>
@@ -579,84 +615,84 @@ inter-dependency issues.</p>
 <p>Refrences: [3]</p>
 <h1 id="modules">Modules</h1>
 <h2 id="module-template">Module Template</h2>
-<pre is:raw="" class="astro-code css-variables" style="background-color: var(--astro-code-color-background); overflow-x: auto;" tabindex="0"><code><span class="line"><span style="color: var(--astro-code-token-comment)">// optional State Machine</span></span>
-<span class="line"><span style="color: var(--astro-code-token-comment)">// import stateMachineConfig from "../state/state-chart"</span></span>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #6B737C">// optional State Machine</span></span>
+<span class="line"><span style="color: #6B737C">// import stateMachineConfig from "../state/state-chart"</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-token-keyword)">export</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-keyword)">default</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-keyword)">class</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-function)">UtilsBar</span><span style="color: var(--astro-code-color-text)"> {</span></span>
+<span class="line"><span style="color: #F97583">export</span><span style="color: #B392F0"> </span><span style="color: #F97583">default</span><span style="color: #B392F0"> </span><span style="color: #F97583">class</span><span style="color: #B392F0"> UtilsBar {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  #modID                 </span><span style="color: var(--astro-code-token-comment)">// required - set by the Core</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  #name </span><span style="color: var(--astro-code-token-keyword)">=</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-string-expression)">"Utilities"</span><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-comment)">// required</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  #shortName </span><span style="color: var(--astro-code-token-keyword)">=</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-string-expression)">"utils"</span><span style="color: var(--astro-code-color-text)">   </span><span style="color: var(--astro-code-token-comment)">// required</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  #mediator              </span><span style="color: var(--astro-code-token-comment)">// required</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  #options               </span><span style="color: var(--astro-code-token-comment)">// required</span></span>
+<span class="line"><span style="color: #B392F0">  #modID                 </span><span style="color: #6B737C">// required - set by the Core</span></span>
+<span class="line"><span style="color: #B392F0">  #name </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"Utilities"</span><span style="color: #B392F0">    </span><span style="color: #6B737C">// required</span></span>
+<span class="line"><span style="color: #B392F0">  #shortName </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"utils"</span><span style="color: #B392F0">   </span><span style="color: #6B737C">// required</span></span>
+<span class="line"><span style="color: #B392F0">  #mediator              </span><span style="color: #6B737C">// required</span></span>
+<span class="line"><span style="color: #B392F0">  #options               </span><span style="color: #6B737C">// required</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-comment)">// user defined properties follow...</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// user defined properties follow...</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-comment)">// required - can be empty</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-keyword)">constructor</span><span style="color: var(--astro-code-color-text)"> (mediator</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> options) {</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// required - can be empty</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">constructor</span><span style="color: #B392F0"> (mediator</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> options) {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-color-text)">.#mediator </span><span style="color: var(--astro-code-token-keyword)">=</span><span style="color: var(--astro-code-color-text)"> mediator</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-color-text)">.#options </span><span style="color: var(--astro-code-token-keyword)">=</span><span style="color: var(--astro-code-color-text)"> options</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-token-function)">.init</span><span style="color: var(--astro-code-color-text)">()</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  }</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.#mediator </span><span style="color: #F97583">=</span><span style="color: #B392F0"> mediator</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.#options </span><span style="color: #F97583">=</span><span style="color: #B392F0"> options</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.init()</span></span>
+<span class="line"><span style="color: #B392F0">  }</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-comment)">// suggested</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-function)">log</span><span style="color: var(--astro-code-color-text)">(l) { </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-token-function)">.</span><span style="color: var(--astro-code-token-constant)">#mediator</span><span style="color: var(--astro-code-token-function)">.log</span><span style="color: var(--astro-code-color-text)">(l) }</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-function)">info</span><span style="color: var(--astro-code-color-text)">(i) { </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-token-function)">.</span><span style="color: var(--astro-code-token-constant)">#mediator</span><span style="color: var(--astro-code-token-function)">.info</span><span style="color: var(--astro-code-color-text)">(i) }</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-function)">warn</span><span style="color: var(--astro-code-color-text)">(w) { </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-token-function)">.</span><span style="color: var(--astro-code-token-constant)">#mediator</span><span style="color: var(--astro-code-token-function)">.warn</span><span style="color: var(--astro-code-color-text)">(w) }</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-function)">error</span><span style="color: var(--astro-code-color-text)">(e) { </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-token-function)">.</span><span style="color: var(--astro-code-token-constant)">#mediator</span><span style="color: var(--astro-code-token-function)">.error</span><span style="color: var(--astro-code-color-text)">(e) }</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// suggested</span></span>
+<span class="line"><span style="color: #B392F0">  log(l) { </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">#mediator</span><span style="color: #B392F0">.log(l) }</span></span>
+<span class="line"><span style="color: #B392F0">  info(i) { </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">#mediator</span><span style="color: #B392F0">.info(i) }</span></span>
+<span class="line"><span style="color: #B392F0">  warn(w) { </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">#mediator</span><span style="color: #B392F0">.warn(w) }</span></span>
+<span class="line"><span style="color: #B392F0">  error(e) { </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">#mediator</span><span style="color: #B392F0">.error(e) }</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-comment)">// required</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-keyword)">get</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-function)">name</span><span style="color: var(--astro-code-color-text)">() {</span><span style="color: var(--astro-code-token-keyword)">return</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-color-text)">.#name}</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-comment)">// required</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-keyword)">get</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-function)">shortName</span><span style="color: var(--astro-code-color-text)">() {</span><span style="color: var(--astro-code-token-keyword)">return</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-color-text)">.#shortName}</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-comment)">// required</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-keyword)">get</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-function)">mediator</span><span style="color: var(--astro-code-color-text)">() {</span><span style="color: var(--astro-code-token-keyword)">return</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-color-text)">.#mediator}</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-comment)">// required</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-keyword)">get</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-function)">options</span><span style="color: var(--astro-code-color-text)">() {</span><span style="color: var(--astro-code-token-keyword)">return</span><span style="color: var(--astro-code-color-text)"> </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-color-text)">.#options}</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// required</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">get</span><span style="color: #B392F0"> name() {</span><span style="color: #F97583">return</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.#name}</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// required</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">get</span><span style="color: #B392F0"> shortName() {</span><span style="color: #F97583">return</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.#shortName}</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// required</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">get</span><span style="color: #B392F0"> mediator() {</span><span style="color: #F97583">return</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.#mediator}</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// required</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">get</span><span style="color: #B392F0"> options() {</span><span style="color: #F97583">return</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.#options}</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-function)">init</span><span style="color: var(--astro-code-color-text)">() {</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-token-function)">.mount</span><span style="color: var(--astro-code-color-text)">(</span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-color-text)">.#elUtils)</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  }</span></span>
+<span class="line"><span style="color: #B392F0">  init() {</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.mount(</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.#elUtils)</span></span>
+<span class="line"><span style="color: #B392F0">  }</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-comment)">// required</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-function)">start</span><span style="color: var(--astro-code-color-text)">() {</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-comment)">// Start the module's activities.</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-comment)">// Play time!</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// required</span></span>
+<span class="line"><span style="color: #B392F0">  start() {</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// Start the module's activities.</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// Play time!</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-comment)">// set up event listeners</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-token-function)">.eventsListen</span><span style="color: var(--astro-code-color-text)">()</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// set up event listeners</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.eventsListen()</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-comment)">// start State Machine </span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-comment)">// stateMachineConfig.context = this</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-comment)">// this.#mediator.stateMachine = stateMachineConfig</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-comment)">// this.#mediator.stateMachine.start()</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  }</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// start State Machine </span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// stateMachineConfig.context = this</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// this.#mediator.stateMachine = stateMachineConfig</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// this.#mediator.stateMachine.start()</span></span>
+<span class="line"><span style="color: #B392F0">  }</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-comment)">// required</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-function)">end</span><span style="color: var(--astro-code-color-text)">() {</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-comment)">// Stop and clean up the module to prevent memory leaks.</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-comment)">// It should remove: event listeners, timers, ect.</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-comment)">// Put your toys away or it will end in tears.</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  }</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// required</span></span>
+<span class="line"><span style="color: #B392F0">  end() {</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// Stop and clean up the module to prevent memory leaks.</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// It should remove: event listeners, timers, ect.</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// Put your toys away or it will end in tears.</span></span>
+<span class="line"><span style="color: #B392F0">  }</span></span>
 <span class="line"></span>
 <span class="line"></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-comment)">// recommended</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-function)">on</span><span style="color: var(--astro-code-color-text)">(topic</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> handler</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> context) {</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-token-function)">.</span><span style="color: var(--astro-code-token-constant)">#mediator</span><span style="color: var(--astro-code-token-function)">.on</span><span style="color: var(--astro-code-color-text)">(topic</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> handler</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> context)</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  }</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// recommended</span></span>
+<span class="line"><span style="color: #B392F0">  on(topic</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> handler</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> context) {</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">#mediator</span><span style="color: #B392F0">.on(topic</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> handler</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> context)</span></span>
+<span class="line"><span style="color: #B392F0">  }</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-comment)">// recommended</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-function)">off</span><span style="color: var(--astro-code-color-text)">(topic</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> handler) {</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-token-function)">.</span><span style="color: var(--astro-code-token-constant)">#mediator</span><span style="color: var(--astro-code-token-function)">.off</span><span style="color: var(--astro-code-color-text)">(topic</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> handler)</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  }</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// recommended</span></span>
+<span class="line"><span style="color: #B392F0">  off(topic</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> handler) {</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">#mediator</span><span style="color: #B392F0">.off(topic</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> handler)</span></span>
+<span class="line"><span style="color: #B392F0">  }</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-comment)">// recommended</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  </span><span style="color: var(--astro-code-token-function)">emit</span><span style="color: var(--astro-code-color-text)">(topic</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> data) {</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">    </span><span style="color: var(--astro-code-token-constant)">this</span><span style="color: var(--astro-code-token-function)">.</span><span style="color: var(--astro-code-token-constant)">#mediator</span><span style="color: var(--astro-code-token-function)">.emit</span><span style="color: var(--astro-code-color-text)">(topic</span><span style="color: var(--astro-code-token-punctuation)">,</span><span style="color: var(--astro-code-color-text)"> data)</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">  }</span></span>
-<span class="line"><span style="color: var(--astro-code-color-text)">}</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// recommended</span></span>
+<span class="line"><span style="color: #B392F0">  emit(topic</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> data) {</span></span>
+<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">#mediator</span><span style="color: #B392F0">.emit(topic</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> data)</span></span>
+<span class="line"><span style="color: #B392F0">  }</span></span>
+<span class="line"><span style="color: #B392F0">}</span></span>
 <span class="line"></span></code></pre>
 <h1 id="references">References</h1>
 <ol>
@@ -685,12 +721,12 @@ inter-dependency issues.</p>
           <span class="link-title astro-WI2SPLHG">API Examples</span>
         </span>
       </a>
-  <a href="/reference/canvas_methods/" rel="next" class="astro-WI2SPLHG">
+  <a href="/reference/canvas_extension_layers/" rel="next" class="astro-WI2SPLHG">
         <svg aria-hidden="true" class="astro-WI2SPLHG astro-HURVU4DH" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62C17.8724 11.4973 17.801 11.3851 17.71 11.29L12.71 6.29C12.6168 6.19676 12.5061 6.1228 12.3842 6.07234C12.2624 6.02188 12.1319 5.99591 12 5.99591C11.7337 5.99591 11.4783 6.1017 11.29 6.29C11.1968 6.38324 11.1228 6.49393 11.0723 6.61575C11.0219 6.73758 10.9959 6.86814 10.9959 7C10.9959 7.2663 11.1017 7.5217 11.29 7.71L14.59 11H7C6.73478 11 6.48043 11.1054 6.29289 11.2929C6.10536 11.4804 6 11.7348 6 12C6 12.2652 6.10536 12.5196 6.29289 12.7071C6.48043 12.8946 6.73478 13 7 13H14.59L11.29 16.29C11.1963 16.383 11.1219 16.4936 11.0711 16.6154C11.0203 16.7373 10.9942 16.868 10.9942 17C10.9942 17.132 11.0203 17.2627 11.0711 17.3846C11.1219 17.5064 11.1963 17.617 11.29 17.71C11.383 17.8037 11.4936 17.8781 11.6154 17.9289C11.7373 17.9797 11.868 18.0058 12 18.0058C12.132 18.0058 12.2627 17.9797 12.3846 17.9289C12.5064 17.8781 12.617 17.8037 12.71 17.71L17.71 12.71C17.801 12.6149 17.8724 12.5028 17.92 12.38C18.02 12.1365 18.02 11.8635 17.92 11.62Z" /></svg>
         <span class="astro-WI2SPLHG">
           Next
           <br class="astro-WI2SPLHG">
-          <span class="link-title astro-WI2SPLHG">Canvas Methods</span>
+          <span class="link-title astro-WI2SPLHG">Canvas Extension Layers</span>
         </span>
       </a>
 </div>

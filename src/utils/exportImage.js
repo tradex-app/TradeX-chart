@@ -5,7 +5,14 @@ import { renderLineHorizontal } from "../renderer/line"
 import { renderRectFill } from "../renderer/rect"
 import { renderText } from "../renderer/text"
 
-export default function exportImage(core) {
+/**
+ * 
+ * @param {tradeXChart} core - root API
+ * @param {string} type - image type "img/png"|"img/jpg"|"img/webp"
+ * @param {number} quality - image quality 0 - 1
+ * @param {sting} output - generate a data URL or file download "url"|"download"
+ */
+export default function exportImage(core, dest, type, quality, output) {
   const theme = core.theme
   const container = document.createElement("template")
   const time = core.Timeline.graph.viewport.scene
@@ -59,5 +66,24 @@ export default function exportImage(core) {
 
   ctx.restore()
 
-  imgViewport.scene.export({fileName: `${core.id}.png`})
+  const cleanUp = () => {
+    imgViewport.destroy()
+    container.remove()
+  }
+
+  switch(output) {
+    case "url": 
+      const cb = (r) => {
+        dest(r)
+        cleanUp()
+      }
+      imgViewport.scene.toImage(type, quality, cb); 
+      break;
+    case "download":
+    default:
+      // trigger file download
+      imgViewport.scene.export({fileName: dest}, null, type, quality);
+      cleanUp;
+      break;
+  }
 }
