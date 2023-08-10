@@ -17,6 +17,8 @@ const viewports = CEL.viewports;
 
 ## CEL.Viewport
 
+The viewport hosts the layer stack and renders this into the final HTML ``canvas`` element visible to the end user.
+
 ### constructor
 
 Create a multi-layered canvas.
@@ -79,6 +81,8 @@ viewport.destroy();
 ```
 
 ## CEL.Layer
+
+A CEL layer provides a ``scene`` and ``hit``, both of which contain a HTML canvas element. The scene canvases composited into the final ``viewport`` canvas that the end user can see. The hit canvas remains hidden from the end user, and is used for pointer interaction detection.
 
 ### constructor
 

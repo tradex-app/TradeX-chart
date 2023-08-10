@@ -35,11 +35,11 @@ export default class chartNewsEvents extends Overlay {
 
     super(target, xAxis, yAxis, theme, parent, params)
 
-    this.#event = new NewsEvent(target.scene, theme)
-      this.emit()
-      this.core.on("primary_pointerdown", debounce(this.isNewsEventSelected, 200, this), this)
-      this.#dialogue = this.core.WidgetsG.insert("Dialogue", config)
-      this.#dialogue.start()
+    this.#event = new NewsEvent(target, theme)
+    this.emit()
+    this.core.on("primary_pointerdown", debounce(this.isNewsEventSelected, 200, this), this)
+    this.#dialogue = this.core.WidgetsG.insert("Dialogue", config)
+    this.#dialogue.start()
   }
 
   destroy() {
@@ -58,7 +58,7 @@ export default class chartNewsEvents extends Overlay {
     const d = this.theme.events
     const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight)
     const ts = this.xAxis.pixel2T(x)
-    const k = this.target.viewport.getIntersection(x,y)
+    const k = this.hit.getIntersection(x,y)
 
     if (k == -1) return
 
@@ -95,6 +95,7 @@ export default class chartNewsEvents extends Overlay {
   draw(range=this.core.range) {
     if (this.core.config?.events?.display === false) return
 
+    this.hit.clear()
     this.scene.clear()
     this.#events.length = 0
 
@@ -108,7 +109,7 @@ export default class chartNewsEvents extends Overlay {
     let o = this.core.rangeScrollOffset;
     let c = range.indexStart - o
     let i = range.Length + (o * 2)
-    let x, t;
+    let x, t, k;
 
     while(i) {
       x = range.value( c )
@@ -119,7 +120,7 @@ export default class chartNewsEvents extends Overlay {
         for (let tr of this.data[t]) {
           event.x = this.xAxis.xPos(x[0]) - (this.xAxis.candleW / 2)
           event.y = this.scene.height - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
-          trade.key = k
+          event.key = k
           this.#events.push(this.#event.draw(event))
         }
       }

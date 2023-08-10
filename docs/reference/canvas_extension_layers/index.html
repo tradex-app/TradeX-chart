@@ -819,6 +819,7 @@
 <p>Return an array of instantiated viewports</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">viewports</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">CEL</span><span style="color: #B392F0">.viewports;</span></span></code></pre>
 <h2 id="celviewport">CEL.Viewport</h2>
+<p>The viewport hosts the layer stack and renders this into the final HTML <code>canvas</code> element visible to the end user.</p>
 <h3 id="constructor">constructor</h3>
 <p>Create a multi-layered canvas.</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">viewport</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #F97583">new</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">CEL</span><span style="color: #B392F0">.Viewport();</span></span></code></pre>
@@ -843,6 +844,7 @@
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #6B737C">// goodbye forever</span></span>
 <span class="line"><span style="color: #79B8FF">viewport</span><span style="color: #B392F0">.destroy();</span></span></code></pre>
 <h2 id="cellayer">CEL.Layer</h2>
+<p>A CEL layer provides a <code>scene</code> and <code>hit</code>, both of which contain a HTML canvas element. The scene canvases composited into the final <code>viewport</code> canvas that the end user can see. The hit canvas remains hidden from the end user, and is used for pointer interaction detection.</p>
 <h3 id="constructor-1">constructor</h3>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">layer</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #F97583">new</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">CEL</span><span style="color: #B392F0">.Layer();</span></span></code></pre>
 <h3 id="scene-1">scene</h3>
@@ -1140,8 +1142,8 @@
     
     <p>
       Last updated:
-      <time datetime="2023-08-08T18:15:40.000Z">
-        Aug 8, 2023
+      <time datetime="2023-08-10T14:33:24.000Z">
+        Aug 10, 2023
       </time>
     </p>
   </div>

@@ -35,11 +35,11 @@ export default class chartTrades extends Overlay {
 
     super(target, xAxis, yAxis, theme, parent, params)
 
-      this.#trade = new Trade(target, theme)
-      this.emit()
-      this.core.on("primary_pointerdown", debounce(this.isTradeSelected, 200, this), this)
-      this.#dialogue = this.core.WidgetsG.insert("Dialogue", config)
-      this.#dialogue.start()
+    this.#trade = new Trade(target, theme)
+    this.emit()
+    this.core.on("primary_pointerdown", debounce(this.isTradeSelected, 200, this), this)
+    this.#dialogue = this.core.WidgetsG.insert("Dialogue", config)
+    this.#dialogue.start()
   }
 
   destroy() {
@@ -59,7 +59,7 @@ export default class chartTrades extends Overlay {
     const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight)
     const ts = this.xAxis.pixel2T(x)
     const c = this.core.range.valueByTS(ts)
-    const k = this.target.viewport.getIntersection(x,y)
+    const k = this.hit.getIntersection(x,y)
 
     if (k == -1) return
 

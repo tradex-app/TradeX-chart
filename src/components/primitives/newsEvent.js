@@ -10,13 +10,15 @@ export default class NewsEvent {
   data
   icon
 
-  constructor(scene, theme) {
-    this.scene = scene
+  constructor(target, theme) {
+    this.scene = target.scene
+    this.hit = target.hit
     this.ctx = this.scene.context
+    this.ctxH = this.hit.context
     this.width = this.scene.width
     this.cfg = theme.events
-    const dims = {w: this.cfg.iconWidth, h: this.cfg.iconHeight}
-    this.icon = DOM.svgToImage(this.cfg.iconEvent, this.cfg.iconColour, dims)
+    this.dims = {w: this.cfg.iconWidth, h: this.cfg.iconHeight}
+    this.icon = DOM.svgToImage(this.cfg.iconEvent, this.cfg.iconColour, this.dims)
   }
 
   draw(data) {
@@ -29,7 +31,8 @@ export default class NewsEvent {
     const w = limit(data.w, c.iconMinDim, c.iconWidth)
     const x = this.data.x
     const y = this.data.y
-    const ctx = this.scene.context
+    const ctx = this.ctx
+    const ctxH = this.ctxH
     // draw icon
     ctx.save();
     ctx.drawImage(i, x, y, w, h);
