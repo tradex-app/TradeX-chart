@@ -1,5 +1,19 @@
 # Change Log
 
+## [0.137.3] - 2023-08-10
+
+Fixed
+
+* Chart Trades - pixel perfect hit detection
+* Documentation
+
+
+## [0.137.2](https://github.com/tradex-app/TradeX-chart/commit/1538be7f2ec488c61766b5d49dd6c4726d90c987) - 2023-08-08
+
+Fixed
+
+* Chart Image Export - yAxis positioning
+
 ## [0.137.1] - 2023-08-08
 
 Added
@@ -7,7 +21,7 @@ Added
 * Chart to image URL ``toImageURL()``
 * Image download and data URL, image type options
 
-## [0.137.0] - 2023.08-08
+## [0.137.0](https://github.com/tradex-app/TradeX-chart/commit/c328a052c4354375a584b93a1031d69597b6bc58) - 2023.08-08
 
 Added
 

@@ -180,9 +180,11 @@ class Layer {
 
     this.id = CEL.idCnt++;
     this.hit = new CEL.Hit({
+      layer: this,
       contextType: cfg.contextType,
     });
     this.scene = new CEL.Scene({
+      layer: this,
       contextType: cfg.contextType,
     });
 
@@ -343,6 +345,7 @@ class Scene {
     if (!cfg) cfg = {};
 
     this.id = CEL.idCnt++;
+    this.layer = cfg.layer
     this.contextType = cfg.contextType || "2d";
 
     this.canvas = document.createElement("canvas");
@@ -404,6 +407,18 @@ class Scene {
     this.canvas.toBlob(cb, type, quality);
   }
 
+  /**
+   * export hit as an image file - for debugging / testing purposes
+   * @param {Object} cfg - {filename}
+   * @param {Function} cb - optional, by default opens image in new window / tab
+   * @param {String} type - image format "img/png"|"img/jpg"|"img/webp"
+   * @param {number} quality - image quality 0 - 1
+   */
+  exportHit(cfg, cb, type = "image/png", quality) {
+    if (typeof cb !== "function") cb = this.blobCallback.bind({ cfg });
+    this.layer.hit.canvas.toBlob(cb, type, quality);
+  }
+
   blobCallback(blob) {
     let anchor = document.createElement("a"),
         dataUrl = URL.createObjectURL(blob),
@@ -438,7 +453,7 @@ class Hit {
    */
   constructor(cfg) {
     if (!cfg) cfg = {};
-
+    this.layer = cfg.layer
     this.contextType = cfg.contextType || "2d";
     this.canvas = document.createElement("canvas");
     this.canvas.className = "hit-canvas";
@@ -484,8 +499,8 @@ class Hit {
     let context = this.context,
         data;
 
-    x = Math.round(x);
-    y = Math.round(y);
+    x = Math.round(x - this.layer.x);
+    y = Math.round(y - this.layer.y);
 
     // if x or y are out of bounds return -1
     if (x < 0 || y < 0 || x > this.width || y > this.height) {

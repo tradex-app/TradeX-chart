@@ -15,6 +15,7 @@ export default class Overlay {
   #yAxis
   #target
   #scene
+  #hit
   #params
   #doDraw = true
 
@@ -27,6 +28,7 @@ export default class Overlay {
     this.#config = parent.core.config
     this.#target = target
     this.#scene = target.scene
+    this.#hit = target.hit
     this.#theme = theme
     this.#xAxis = xAxis
     this.#yAxis = yAxis
@@ -39,6 +41,7 @@ export default class Overlay {
   get config() { return this.#config }
   get params() { return this.#params }
   get scene() { return this.#scene }
+  get hit() { return this.#hit }
   get theme() { return this.#theme }
   get chart() { return this.#parent.parent.parent }
   get xAxis() { return this.getXAxis() }

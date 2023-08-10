@@ -23,15 +23,22 @@ export default class NewsEvent {
     this.data = data
     const i = this.icon
     const c = this.cfg
+    const k = this.hit.getIndexValue(data.key)
+    const hit = DOM.svgToImage(c.iconEvent, k, this.dims)
     const h = limit(data.w, c.iconMinDim, c.iconHeight)
     const w = limit(data.w, c.iconMinDim, c.iconWidth)
     const x = this.data.x
     const y = this.data.y
     const ctx = this.scene.context
+    // draw icon
     ctx.save();
     ctx.drawImage(i, x, y, w, h);
     ctx.restore()
+    // draw mask to hit layer
+    ctxH.save();
+    ctxH.drawImage(hit, x, y, w, h);
+    ctxH.restore()
 
-    return {x,y,w,h}
+    return {x,y,w,h,k}
   }
 }

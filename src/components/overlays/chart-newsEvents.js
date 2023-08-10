@@ -58,31 +58,24 @@ export default class chartNewsEvents extends Overlay {
     const d = this.theme.events
     const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight)
     const ts = this.xAxis.pixel2T(x)
-    const c = this.core.range.valueByTS(ts)
-    for (let tr in this.data) {
-      tr *= 1
-      if (ts === tr) {
-        let tx = this.xAxis.xPos(ts)
-        let ty = this.scene.height - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
-        if ((x >= tx - (w / 2) &&
-            x <= tx + (w / 2)) &&
-            (y >= ty &&
-            y <= ty + w)) {
-              console.log("event ",ts," selected")
-              let content = ``
-              for (let t of this.data[tr]) {
-                content += this.buildNewsEventHTML(t)
-              }
-              const config = {
-                dimensions: {h: 150, w: 150},
-                position: {x: tx + (w / 2) + 1, y: ty, relativeY: "bottom"},
-                content: content,
-              }
-              this.core.emit("event_selected", tr)
-              this.#dialogue.open(config)
-            }
-      }
+    const k = this.target.viewport.getIntersection(x,y)
+
+    if (k == -1) return
+
+    let tr = Object.keys(this.data)[k] * 1
+    let tx = this.xAxis.xPos(ts)
+    let ty = this.scene.height - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
+    let content = ``
+    for (let t of this.data[tr]) {
+      content += this.buildNewsEventHTML(t)
     }
+    const config = {
+      dimensions: {h: 150, w: 150},
+      position: {x: tx + (w / 2) + 1, y: ty, relativeY: "bottom"},
+      content: content,
+    }
+    this.core.emit("event_selected", tr)
+    this.#dialogue.open(config)
   }
 
   buildNewsEventHTML(h) {
@@ -120,11 +113,13 @@ export default class chartNewsEvents extends Overlay {
     while(i) {
       x = range.value( c )
       t = `${x[0]}`
+      k = Object.keys(this.data).indexOf(t)
       // fetch events (if any) for timestamp
-      if (Object.keys(this.data).indexOf(t) >= 0) {
+      if (k >= 0) {
         for (let tr of this.data[t]) {
           event.x = this.xAxis.xPos(x[0]) - (this.xAxis.candleW / 2)
           event.y = this.scene.height - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
+          trade.key = k
           this.#events.push(this.#event.draw(event))
         }
       }

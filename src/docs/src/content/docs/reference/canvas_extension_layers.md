@@ -304,6 +304,18 @@ By default, ``export()`` will export a ``.png`` image for download. If no file n
 
 ## Hit Detection
 
+Canvas Extension Layers provides an API for pixel perfect hit detection of pointers. 
+
+:::note
+Hit detection is automatically provided with each layer.
+:::
+
+```javascript
+const layer = new CEL.Layer(cfg);
+const hit = layer.hit
+```
+See [Hit Detection](../hit_detection) for information on how to implement it.
+
 ### constructor
 
 ```javascript

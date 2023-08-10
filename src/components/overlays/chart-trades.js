@@ -35,7 +35,7 @@ export default class chartTrades extends Overlay {
 
     super(target, xAxis, yAxis, theme, parent, params)
 
-    this.#trade = new Trade(target.scene, theme)
+      this.#trade = new Trade(target, theme)
       this.emit()
       this.core.on("primary_pointerdown", debounce(this.isTradeSelected, 200, this), this)
       this.#dialogue = this.core.WidgetsG.insert("Dialogue", config)
@@ -59,29 +59,24 @@ export default class chartTrades extends Overlay {
     const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight)
     const ts = this.xAxis.pixel2T(x)
     const c = this.core.range.valueByTS(ts)
-    for (let tr in this.data) {
-      tr *= 1
-      if (ts === tr) {
-        let tx = this.xAxis.xPos(ts)
-        let ty = this.yAxis.yPos(c[2]) - (w * 1.5)
-        if ((x >= tx - (w / 2) &&
-            x <= tx + (w / 2)) &&
-            (y >= ty &&
-            y <= ty + w)) {
-              let content = ``
-              for (let t of this.data[tr]) {
-                content += this.buildTradeHTML(t)
-              }
-              const config = {
-                dimensions: {h: 150, w: 150},
-                position: {x: tx + (w / 2) + 1, y: ty},
-                content: content,
-              }
-              this.core.emit("trade_selected", tr)
-              this.#dialogue.open(config)
-            }
-      }
+    const k = this.target.viewport.getIntersection(x,y)
+
+    if (k == -1) return
+
+    let tr = Object.keys(this.data)[k] * 1
+    let tx = this.xAxis.xPos(tr)
+    let ty = this.yAxis.yPos(c[2]) - (w * 1.5)
+    let content = ``
+    for (let t of this.data[tr]) {
+      content += this.buildTradeHTML(t)
     }
+    const config = {
+      dimensions: {h: 150, w: 150},
+      position: {x: tx + (w / 2) + 1, y: ty},
+      content: content,
+    }
+    this.core.emit("trade_selected", tr)
+    this.#dialogue.open(config)
   }
 
   buildTradeHTML(h) {
@@ -103,6 +98,7 @@ export default class chartTrades extends Overlay {
   draw(range=this.core.range) {
     if (this.core.config?.trades?.display === false) return
 
+    this.hit.clear()
     this.scene.clear()
     this.#trades.length = 0
 
@@ -116,24 +112,24 @@ export default class chartTrades extends Overlay {
     let o = this.core.rangeScrollOffset;
     let c = range.indexStart - o
     let i = range.Length + (o * 2)
-    let x, t;
+    let x, t, k;
 
     while(i) {
       x = range.value( c )
       t = `${x[0]}`
+      k = Object.keys(this.data).indexOf(t)
       // fetch trades (if any) for timestamp
-      if (Object.keys(this.data).indexOf(t) >= 0) {
+      if (k >= 0) {
         for (let tr of this.data[t]) {
           trade.x = this.xAxis.xPos(x[0]) - (this.xAxis.candleW / 2)
           trade.y = this.yAxis.yPos(x[2]) - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
           trade.side = tr.side
+          trade.key = k
           this.#trades.push(this.#trade.draw(trade))
         }
       }
       c++
       i--
     }
-    // draw mask to hit layer
-
   }
 }

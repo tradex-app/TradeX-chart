@@ -346,6 +346,13 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
+"reference/hit_detection.md": {
+	id: "reference/hit_detection.md";
+  slug: "reference/hit_detection";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "reference/index.md": {
 	id: "reference/index.md";
   slug: "reference";
