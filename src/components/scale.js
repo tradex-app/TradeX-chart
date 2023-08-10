@@ -1,165 +1,184 @@
 // scale.js
 // Scale bar that lives on the side of the chart
 
+import { isArray, isObject } from '../utils/typeChecks'
 import DOM from "../utils/DOM"
 import yAxis from "./axis/yAxis"
-import CEL from "./primitives/canvas"
-import { drawTextBG } from "../utils/canvas"
+import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
-import { InputController, } from "../input/controller"
-import { copyDeep, uid } from '../utils/utilities'
+import Input from "../input"
+import { copyDeep, throttle, uid, xMap } from '../utils/utilities'
+import { STREAM_UPDATE } from "../definitions/core"
 
-import {
-  NAME,
-  ID,
-  CLASS_DEFAULT,
-  CLASS_UTILS ,
-  CLASS_BODY,
-  CLASS_WIDGETSG,
-  CLASS_TOOLS,
-  CLASS_MAIN,
-  CLASS_TIME,
-  CLASS_ROWS,
-  CLASS_ROW,
-  CLASS_CHART,
-  CLASS_SCALE,
-  CLASS_WIDGETS,
-  CLASS_ONCHART,
-  CLASS_OFFCHART,
-} from '../definitions/core'
+import Graph from "./views/classes/graph"
+import ScaleCursor from './overlays/scale-cursor'
+import ScaleLabels from './overlays/scale-labels'
+import ScaleOverly from './overlays/scale-overlays'
+import ScalePriceLine from './overlays/scale-priceLine'
 
-import { 
-  YAXIS_TYPES,
-  BUFFERSIZE
-} from "../definitions/chart";
+const defaultOverlays = [
+  ["labels", {class: ScaleLabels, fixed: true, required: true}],
+  ["overlay", {class: ScaleOverly, fixed: true, required: true}],
+  ["price", {class: ScalePriceLine, fixed: true, required: true}],
+  ["cursor", {class: ScaleCursor, fixed: true, required: true}],
+]
 
-import { YAxisStyle } from "../definitions/style";
-import { isArray } from "../utils/typeChecks"
-
+/**
+ * Provides the chart panes scale / yAxis
+ * @export
+ * @class ScaleBar
+ */
 export default class ScaleBar {
 
-  #ID
+  #id
   #name = "Y Scale Axis"
   #shortName = "scale"
-  #mediator
+  #core
   #options
   #parent
-  #core
+  #stateMachine
+
   #chart
   #target
   #yAxis
-  #elScale
-  #elScaleCanvas
+  #element
   #elViewport
 
-  #yAxisType = YAXIS_TYPES[0]  // default, log, percent
-
-  #viewport
   #layerLabels
   #layerOverlays
+  #layerPriceLine
   #layerCursor
+  #scaleOverlays = new xMap()
+  #additionalOverlays = []
+  #Graph
 
+  #input
+  #priceLine
   #cursorPos
+  #position = {}
 
+  constructor (core, options) {
 
-  constructor (mediator, options) {
-
-    this.#mediator = mediator
-    this.#options = options
-    this.#elScale = mediator.api.elements.elScale
-    this.#chart = mediator.api.core.Chart
-    this.#parent = mediator.api.parent
-    this.#core = this.#mediator.api.core
-
-    this.#options = options
-    this.#ID = this.#options.offChartID || uid("TX_scale_")
+    this.#core = core
+    this.#options = {...options}
+    this.#element = this.#options.elScale
+    this.#chart = this.#options.chart
+    this.#parent = this.#options.parent
+    this.id = `${this.#parent.id}_scale`
     this.init()
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warn(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
-  get ID() { return this.#ID }
+  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
-  get mediator() { return this.#mediator }
+  get core() { return this.#core }
   get options() { return this.#options }
+  get parent() { return this.#parent }
   set height(h) { this.setHeight(h) }
-  get height() { return this.#elScale.clientHeight }
-  get width() { return this.#elScale.clientWidth }
-  get yAxisHeight() { return this.#yAxis.height }
-  get yAxisRatio() { return this.#yAxis.yAxisRatio }
+  get height() { return this.#element.getBoundingClientRect().height }
+  get width() { return this.#element.getBoundingClientRect().width }
+  get element() { return this.#element }
+  set cursor(c) { this.#element.style.cursor = c }
+  get cursor() { return this.#element.style.cursor }
+  get layerCursor() { return this.#layerCursor }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
-  set yAxisType(t) { this.#yAxisType = YAXIS_TYPES.includes(t) ? t : YAXIS_TYPES[0] }
-  get yAxisType() { return this.#yAxisType }
+  get layerPriceLine() { return this.#layerPriceLine }
+  get yAxis() { return this.#yAxis }
+  set yAxisType(t) { this.#yAxis.yAxisType = YAXIS_TYPES.includes(t) ? t : YAXIS_TYPES[0] }
+  get yAxisType() { return this.#yAxis.yAxisType }
+  get yAxisHeight() { return this.#yAxis.height }
+  get yAxisRatio() { return this.#yAxis.yAxisRatio }
   get yAxisGrads() { return this.#yAxis.yAxisGrads }
-  get viewport() { return this.#viewport }
+  set graph(g) { this.#Graph = g }
+  get graph() { return this.#Graph }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elScale) }
+  get dimensions() { return DOM.elementDimPos(this.#element) }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
+  set scaleRange(r) { this.setScaleRange(r) }
+  set rangeMode(m) { this.#yAxis.mode = m }
+  get rangeMode() { return this.#yAxis.mode }
+  set rangeYFactor(f) { this.core.range.yFactor(f) }
+  set yOffset(o) { this.#yAxis.offset = o }
+  get yOffset() { return this.#yAxis.offset }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
+  get Scale() { return this }
 
   init() {
-    this.mount(this.#elScale)
-
-    this.yAxisType = this.options.yAxisType
-
-    this.log(`${this.#name} instantiated`)
+    this.#elViewport = this.#element.viewport || this.#element
   }
 
+  start() {
+    const range = (this.#parent.name == "Chart" ) ? 
+      undefined : this.#parent.localRange
+    this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
 
-  start(data) {
-    this.emit("started",data)
-
-    this.#yAxis = new yAxis(this, this, this.yAxisType)
-
-    // prepare layered canvas
-    this.createViewport()
-    // draw the scale
+    this.createGraph()
+    this.#yAxis.calcGradations()
     this.draw()
-
-    // set up event listeners
     this.eventsListen()
 
     // start State Machine 
     const newConfig = copyDeep(stateMachineConfig)
-    newConfig.context.origin = this
-    this.mediator.stateMachine = newConfig
-    this.mediator.stateMachine.start()
+    newConfig.id = this.id
+    newConfig.context = this
+    this.stateMachine = newConfig
+    this.stateMachine.start()
   }
 
-  end() {
-    // this.off(`${this.#parent.ID}_mousemove`, (e) => { this.offMouseMove(e) })
-    // this.off(`${this.#parent.ID}_mouseout`, (e) => { this.offMouseMove(e) })
-    // this.off("chart_pan", (e) => { this.drawCursorPrice() })
-    // this.off("chart_panDone", (e) => { this.eraseCursorPrice() })
+  restart() {
+    // TODO: remove old overlays
+    // create and use new YAxis
+    this.#yAxis.setRange(this.#core.range)
+    this.draw()
+  }
+
+  destroy() {
+    this.stateMachine.destroy()
+    this.#Graph.destroy()
+    this.#input.destroy()
+
+    this.off(`${this.#parent.id}_mousemove`, this.onMouseMove)
+    this.off(`${this.#parent.id}_mouseout`, this.#layerCursor.erase)
+    this.off(STREAM_UPDATE, this.onStreamUpdate)
+
+    this.element.remove()
   }
 
   eventsListen() {
-    let canvas = this.#viewport.scene.canvas
-    // create controller and use 'on' method to receive input events 
-    const controller = new InputController(canvas);
+    let canvas = this.#Graph.viewport.scene.canvas
+    this.#input = new Input(canvas, {disableContextMenu: false});
+    this.#input.setCursor("ns-resize")
+    // this.#input.on("pointerdrag", throttle(this.onDrag, 100, this, true));
+    this.#input.on("pointerdrag", this.onDrag.bind(this));
 
-    this.on(`${this.#parent.ID}_mousemove`, (e) => { this.onMouseMove(e) })
-    this.on(`${this.#parent.ID}_mouseout`, (e) => { this.eraseCursorPrice() })
-    // this.on("chart_pan", (e) => { this.drawCursorPrice() })
-    // this.on("chart_panDone", (e) => { this.drawCursorPrice() })
-    // this.on("resizeChart", (dimensions) => this.onResize.bind(this))
+    this.#input.on("pointerdragend", this.onDragDone.bind(this))
+    this.#input.on("wheel", this.onMouseWheel.bind(this))
+    this.#input.on("dblclick", this.resetScaleRange.bind(this))
+
+    this.on(`${this.#parent.id}_mousemove`, this.onMouseMove, this)
+    this.on(`${this.#parent.id}_mouseout`, this.#layerCursor.erase, this.#layerCursor)
+    this.on(STREAM_UPDATE, this.#layerPriceLine.draw, this.#layerPriceLine)
   }
 
   on(topic, handler, context) {
-    this.mediator.on(topic, handler, context)
+    this.core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.mediator.off(topic, handler)
+    this.core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.mediator.emit(topic, data)
+    this.core.emit(topic, data)
   }
 
   onResize(dimensions) {
@@ -168,43 +187,79 @@ export default class ScaleBar {
 
   onMouseMove(e) {
     this.#cursorPos = (isArray(e)) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)]
-    this.drawCursorPrice()
+    this.#layerCursor.draw(this.#cursorPos)
   }
 
-  mount(el) {
-    el.innerHTML = this.defaultNode()
+  onDrag(e) {
+    this.#cursorPos = [
+      Math.floor(e.position.x), Math.floor(e.position.y),
+      e.dragstart.x, e.dragstart.y,
+      e.movement.x, e.movement.y
+    ]
+    this.setScaleRange(Math.sign(e.movement.y))
+    this.render()
+  }
 
-    this.#elViewport = el.querySelector(`.viewport`)
+  onDragDone(e) {
+
+  }
+
+  onMouseWheel(e) {
+    e.domEvent.preventDefault()
+    this.setScaleRange(Math.sign(e.wheeldelta) * -1)
+    this.render()
+  }
+
+  onStreamUpdate(e) {
+
+  }
+
+  onChartDrag(e) {
+    if (this.#yAxis.mode !== "manual") return
+    this.#yAxis.offset = e.domEvent.srcEvent.movementY // this.#core.MainPane.cursorPos[5] // e[5]
+    this.parent.draw(this.range, true)
+    this.draw()
   }
 
   setHeight(h) {
-    this.#elScale.style.height = `${h}px`
+    this.#element.style.height = `${h}px`
   }
 
   setDimensions(dim) {
-    const width = this.#elScale.clientWidth
-    this.#viewport.setSize(width, dim.h)
-    // adjust layers
-    this.#layerLabels.setSize(width, dim.h)
-    this.#layerOverlays.setSize(width, dim.h)
-    this.#layerCursor.setSize(width, dim.h)
-
+    const width = this.#element.getBoundingClientRect().width
     this.setHeight(dim.h)
-    this.draw(undefined, true)
+    if (this.graph instanceof Graph) {
+      this.#Graph.setSize(width, dim.h, width)
+      this.draw()
+    }
   }
 
-  defaultNode() {
-    const api = this.mediator.api
-    const node = `
-      <div class="viewport"></div>
-    `
-    return node
+  /**
+   * Set price chart or off chart indicator to manual scaling and positioning
+   * @param {number} r - scale adjustment value
+   */
+  setScaleRange(r=0) {
+    if (this.#yAxis.mode == "automatic") this.#yAxis.mode = "manual"
+
+    this.#yAxis.zoom = r
+    this.parent.draw(this.range, true)
+    this.draw()
   }
 
-  // -----------------------
+  /**
+   * Set price chart or off chart indicator to automatic scaling and positioning
+   * @param {number} r - scale adjustment value
+   */
+  resetScaleRange() {
+    this.#yAxis.mode = "automatic"
+    this.parent.draw(this.range, true)
+    this.draw()
+  }
 
-  // convert chart price or offchart indicator y data to pixel pos
+  // convert chart price or secondary indicator y data to pixel pos
   yPos(yData) { return this.#yAxis.yPos(yData) }
+
+  yPosStream(yData) { return this.#yAxis.lastYData2Pixel(yData) }
 
   // convert pixel pos to chart price
   yPos2Price(y) { return this.#yAxis.yPos2Price(y) }
@@ -214,92 +269,59 @@ export default class ScaleBar {
     return this.#yAxis.limitPrecision(digits)
   }
 
-  // create canvas layers with handling methods
-  createViewport() {
 
-    const width = this.#elScale.clientWidth
-    const height = this.#elScale.clientHeight
-    const layerConfig = { 
-      width: width, 
-      height: height
+  createGraph() {
+    let overlays = copyDeep(defaultOverlays)
+
+    this.graph = new Graph(this, this.#elViewport, overlays, false)
+    this.#layerCursor = this.graph.overlays.get("cursor").instance
+    this.#layerLabels = this.graph.overlays.get("labels").instance
+    this.#layerOverlays = this.graph.overlays.get("overlay").instance
+    this.#layerPriceLine = this.graph.overlays.get("price").instance
+
+    this.graph.addOverlays(this.#additionalOverlays)
+    this.#layerPriceLine.target.moveTop()
+    this.#layerCursor.target.moveTop()
+  }
+
+  /**
+   * Add any non-default overlays
+   *
+   * @param {Array} overlays
+   * @memberof Scale
+   */
+  addOverlays(overlays) {
+    if (!isArray(overlays)) return false
+    if (this.graph === undefined)
+      this.#additionalOverlays.push(...overlays)
+    else
+      this.graph.addOverlays(overlays)
+  }
+
+  addOverlay(key, overlay) {
+    if (!isObject(overlay)) return false
+    if (this.graph === undefined)
+      this.#additionalOverlays.push([key, overlay])
+    else {
+      let o = this.graph.addOverlay(key, overlay)
+      this.#layerPriceLine.target.moveTop()
+      this.#layerCursor.target.moveTop()
+      return o
     }
-
-    // create viewport
-    this.#viewport = new CEL.Viewport({
-      width: this.#elScale.clientWidth,
-      height: this.#elScale.clientHeight,
-      container: this.#elViewport
-    });
-
-    // create layers - labels, overlays, cursor
-    this.#layerLabels = new CEL.Layer(layerConfig);
-    this.#layerOverlays = new CEL.Layer(layerConfig);
-    this.#layerCursor = new CEL.Layer();
-
-    // add layers
-    this.#viewport
-          .addLayer(this.#layerLabels)
-          .addLayer(this.#layerOverlays)
-          .addLayer(this.#layerCursor);
   }
 
-  draw() {
-    this.#yAxis.draw()
-    this.#viewport.render()
+  render() {
+    this.#Graph.render()
   }
 
-  drawCursorPrice() {
-    let [x, y] = this.#cursorPos,
-        price =  this.yPos2Price(y),
-        nice = this.nicePrice(price),
-
-        options = {
-          fontSize: YAxisStyle.FONTSIZE * 1.05,
-          fontWeight: YAxisStyle.FONTWEIGHT,
-          fontFamily: YAxisStyle.FONTFAMILY,
-          txtCol: YAxisStyle.COLOUR_CURSOR,
-          bakCol: YAxisStyle.COLOUR_CURSOR_BG,
-          paddingTop: 2,
-          paddingBottom: 2,
-          paddingLeft: 3,
-          paddingRight: 3
-        },
-        
-        height = options.fontSize + options.paddingTop + options.paddingBottom,
-        yPos = y - (height * 0.5);
-
-    this.#layerCursor.scene.clear()
-    const ctx = this.#layerCursor.scene.context
-    ctx.save()
-
-    ctx.fillStyle = options.bakCol
-    ctx.fillRect(1, yPos, this.width, height)
-
-    drawTextBG(ctx, `${nice}`, 1, yPos , options)
-
-    ctx.restore()
-    this.#viewport.render()
-  }
-
-  eraseCursorPrice() {
-    this.#layerCursor.scene.clear()
-    this.#viewport.render()
-    return
+  draw(range=this.range, update=true) {
+    this.#Graph.draw(range, update)
+    this.#parent.drawGrid()
   }
 
   resize(width=this.width, height=this.height) {
-    // adjust partent element
+    // adjust parent element
     this.setDimensions({w: width, h: height})
-    // // adjust layers
-    // width -= this.#elScale.clientWidth
-    // this.#layerCursor.setSize(width, height)
-    // // adjust width for scroll buffer
-    // const buffer = this.config.buffer || BUFFERSIZE
-    //       width = Math.round(width * ((100 + buffer) * 0.01))
-    // this.#layerLabels.setSize(width, height)
-    // this.#layerOverlays.setSize(width, height)
-    // // render
-    // this.draw(undefined, true)
   }
 
 }

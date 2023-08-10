@@ -23,3 +23,27 @@ dist-ssr
 *.sln
 *.sw?
 
+# Documentation directories
+
+# build output
+./src/docs/dist/
+# generated types
+./src/docs/.astro/
+
+# dependencies
+./src/docs/node_modules/
+
+# logs
+./src/docs/npm-debug.log*
+./src/docs/yarn-debug.log*
+./src/docs/yarn-error.log*
+./src/docs/pnpm-debug.log*
+
+
+# environment variables
+./src/docs/.env
+./src/docs/.env.production
+
+# macOS-specific files
+./src/docs/.DS_Store
+

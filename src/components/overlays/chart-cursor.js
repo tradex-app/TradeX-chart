@@ -1,73 +1,84 @@
 // chart-cursor.js
 
-export default class chartCursor {
+import Overlay from "./overlay"
+import { isObject } from "../../utils/typeChecks"
+import Input from "../../input"
 
-  #target
-  #scene
-  #config
-  #chart
-  #xAxis
-  #yAxis
+export default class chartCursor extends Overlay{
+
   #cursorPos = [0,0]
+  #update = true
+  #input
 
-  constructor(target, chart, xAxis, yAxis, config) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    this.#target = target
-    this.#scene = target.scene
-    this.#config = config
-    this.#chart = chart
-    this.#xAxis = xAxis
-    this.#yAxis = yAxis
+    super(target, xAxis, yAxis, theme, parent, params)
 
-    this.#chart.on("chart_pan", (e) => { this.onMouseDragX(e) })
-    this.#chart.on("chart_panDone", (e) => { this.onMouseDragX(e) })
-    this.#chart.on("main_mousemove", (e) => { this.onMouseMoveX(e) })
-    this.#chart.on(`${this.#chart.ID}_mousemove`, (e) => { this.onMouseMoveY(e) })
+    this.core.on("chart_pan", (e) => { this.onMouseDragX(e) })
+    this.core.on("chart_panDone", (e) => { this.onMouseDragX(e) })
+    this.core.on("main_mousemove", (e) => { this.onMouseMoveX(e) })
+
+    this.#input = new Input(this.target.viewport.container, {disableContextMenu: false});
+    this.#input.on("pointermove", this.onMouseMove.bind(this))
+    this.#input.on("pointerenter", this.onMouseMove.bind(this));
   }
+
+  set position(p) { return }
+  get update() { return this.#update }
 
   onMouseDragX(e) {
     this.#cursorPos[0] = e[0]
+    this.#cursorPos[1] = e[1]
     this.draw(true)
+    this.core.emit("chart_render")
   }
   onMouseMoveX(e) {
     this.#cursorPos[0] = e[0]
     this.draw()
+    this.core.emit("chart_render")
   }
-  onMouseMoveY(e) {
-    this.#cursorPos[1] = e[1]
+  onMouseMove(e) {
+    const x = (isObject(e)) ? e.position.x : e[0]
+    const y = (isObject(e)) ? e.position.y : e[1]
+
+    this.#cursorPos[0] = x
+    this.#cursorPos[1] = y
     this.draw()
+    this.core.emit("chart_render")
   }
 
   draw(drag = false) {
 
-    let x = this.#cursorPos[0]
-        if (!drag) x = this.#xAxis.xPosSnap2CandlePos(x) + this.#xAxis.scrollOffsetPx
-    let y = this.#cursorPos[1]
+    const rect = this.target.viewport.container.getBoundingClientRect()
+    let y = this.core.mousePos.y - rect.top
+    let x = this.core.mousePos.x - rect.left
 
-    this.#scene.clear()
-    const ctx = this.#scene.context
+    if (!drag) 
+        x = this.xAxis.xPosSnap2CandlePos(x) + this.xAxis.scrollOffsetPx
+
+    this.scene.clear()
+    const ctx = this.scene.context
     ctx.save();
 
     ctx.setLineDash([5, 5])
 
     // X
-    const offset = this.#xAxis.smoothScrollOffset || 0
+    const offset = this.xAxis.smoothScrollOffset || 0
 
     ctx.strokeStyle = "#666"
     ctx.beginPath()
     ctx.moveTo(x + offset, 0)
-    ctx.lineTo(x + offset, this.#scene.height)
+    ctx.lineTo(x + offset, this.scene.height)
     ctx.stroke()
     // Y
-    if (this.#chart.cursorActive) {
+    if (this.chart.cursorActive) {
       ctx.beginPath()
       ctx.moveTo(0, y)
-      ctx.lineTo(this.#scene.width, y)
+      ctx.lineTo(this.scene.width, y)
       ctx.stroke()
     }
-    ctx.restore();
 
-    this.#target.viewport.render();
+    ctx.restore();
   }
 
 }

@@ -3,12 +3,14 @@
 import DOM from "../../utils/DOM"
 import { CLASS_MENUS, CLASS_MENU } from "../../definitions/core"
 import { MenuStyle } from "../../definitions/style"
+import { limit } from "../../utils/number"
+
+const MENUMINWIDTH = 150
 
 export default class Menu {
 
   #id
   #widgets
-  #mediator
   #core
   #config
   
@@ -19,17 +21,18 @@ export default class Menu {
   #cursorPos
   #controller
 
+  #menuEvents = {}
+
   static menuList = {}
   static menuCnt = 0
   static class = CLASS_MENUS
   static name = "Menus"
-  static type = "menu"
+  static type = "Menu"
   static currentActive
 
   constructor(widgets, config) {
     this.#widgets = widgets
-    this.#mediator = config.mediator
-    this.#core = this.#mediator.api.core
+    this.#core = config.core
     this.#config = config
     this.#id = config.id
     this.#elMenus = widgets.elements.elMenus
@@ -39,7 +42,7 @@ export default class Menu {
 
   static create(widgets, config) {
 
-    const id = `menu${++Menu.menuCnt}`
+    const id = `menu_${++Menu.menuCnt}`
     config.id = id
 
     // add entry
@@ -59,6 +62,8 @@ export default class Menu {
   get id() { return this.#id }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elMenu) }
+  get type() { return Menu.type }
+
 
   init() {
     // insert element
@@ -74,38 +79,35 @@ export default class Menu {
 
   end() {
     // remove event listners
-    const api = this.#mediator.api
-    const menuItems = DOM.findBySelectorAll(`#${api.id} .${CLASS_MENU} li`)
+    const menuItems = this.#elMenus.querySelectorAll(`#${this.id} li`)
     menuItems.forEach((item) => {
-      item.removeEventListener('click', this.onMenuSelect)
+      item.removeEventListener('click', this.#menuEvents[this.id][item.id])
     })
 
-    document.removeEventListener('click', this.onOutsideClickListener)
+    document.removeEventListener('click', this.#menuEvents[this.id].outside)
     // remove element
     // this.el.remove()
   }
 
   eventsListen() {
-    const api = this.#mediator.api
-    const menuItems = DOM.findBySelectorAll(`#${api.id} #${this.#config.id} li`)
+    const menuItems = this.#elMenus.querySelectorAll(`#${this.id} li`)
+    this.#menuEvents[this.id] = {}
     menuItems.forEach((item) => {
-      item.addEventListener('click', this.onMenuSelect.bind(this))
+      this.#menuEvents[this.id][item.id] = this.onMenuSelect.bind(this)
+      item.addEventListener('click', this.#menuEvents[this.id][item.id])
     })
-
-    // click event outside of menu
-    document.addEventListener('click', this.onOutsideClickListener.bind(this))
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onMenuSelect(e) {
@@ -115,9 +117,10 @@ export default class Menu {
           menu: this.#id,
           evt: evt
         };
-        
-    this.emit("menuItemSelected", data)
-    this.emit("closeMenu", data)
+
+    this.emit("menuItem_selected", data)
+    this.emit("menu_close", data)
+    console.log("menu_close")
   }
 
   onOutsideClickListener(e) {
@@ -128,25 +131,24 @@ export default class Menu {
         target: e.currentTarget.id, 
         menu: this.#id,
       };
-      this.emit("closeMenu", data)
+      this.emit("menu_close", data)
     }
+    document.removeEventListener('click', this.#menuEvents[this.id].outside)
   }
 
   mount(el) {
-    const api = this.#mediator.api
-
     if (el.lastElementChild == null) 
       el.innerHTML = this.menuNode()
     else
       el.lastElementChild.insertAdjacentHTML("afterend", this.menuNode())
 
-    this.#elMenu = DOM.findBySelector(`#${api.id} #${this.#config.id}`)
+    this.#elMenu = this.#elMenus.querySelector(`#${this.id}`)
   }
 
   static defaultNode() {
     const menuStyle = ``
     const node = `
-      <div class="${CLASS_MENUS}" style="${menuStyle}"></div>
+      <div slot="widget" class="${CLASS_MENUS}" style="${menuStyle}"></div>
     `
     return node
   }
@@ -165,9 +167,8 @@ export default class Menu {
   }
 
   content(menu) {
-    const api = this.#mediator.api
-    const listStyle = "list-style: none; text-align: left; margin:1em 1em 1em -2.5em;"
-    const itemStyle = "padding: .25em 1em .25em 1em;"
+    const listStyle = `list-style: none; text-align: left; margin:1em 1em 1em -2.5em; min-width: ${MENUMINWIDTH}px`
+    const itemStyle = "padding: .25em 1em .25em 1em; white-space: nowrap;"
     const shortStyle = "display: inline-block; width: 4em;"
     const cPointer = "cursor: pointer;"
     const over = `onmouseover="this.style.background ='#222'"`
@@ -197,11 +198,24 @@ export default class Menu {
 
   // display the menu
   open() {
-    let id = Menu.currentActive?.id || false
-    if (id) this.emit("closeMenu", {menu: id})
+    if (Menu.currentActive === this) return true
 
     Menu.currentActive = this
     this.#elMenu.style.display = "block"
+
+    let pos = DOM.elementDimPos(this.#elMenu)
+    let posR = pos.left + pos.width
+    if (posR > this.#elWidgetsG.offsetWidth) {
+      let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width)
+          o = limit(o, 0, this.#elWidgetsG.offsetWidth)
+      this.#elMenu.style.left = `${o}px`
+    }
+
+    setTimeout(() => {
+      // click event outside of menu
+      this.#menuEvents[this.id].outside = this.onOutsideClickListener.bind(this)
+      document.addEventListener('click', this.#menuEvents[this.id].outside)
+    }, 250)
   }
 
   // hide the menu

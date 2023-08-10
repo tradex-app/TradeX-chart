@@ -4,36 +4,42 @@
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import Tool from "./tool";
 import { lineConfig } from "../definitions/tools";
+import StateMachine from '../scaleX/stateMachne';
 
-import tinycolor from "tinycolor"
+// import tinycolor from 'tinycolor2';
 
 
 export default class Line extends Tool {
 
   #colour = lineConfig.colour
-  #lineWidth = lineConfig.lineWidth
+  #lineWidth = lineConfig.width
+  #stateMachine
 
   constructor(config) {
     super(config)
   }
 
   set colour(colour=this.#colour) {
-    const c = tinycolor(colour)
-    this.#colour = (c.isValid()) ? colour : this.#colour
+    // const c = tinycolor(colour)
+    // this.#colour = (c.isValid()) ? colour : this.#colour
+    this.#colour = colour
   }
   get colour() { return this.#colour }
   set lineWidth(width) { this.#lineWidth = (isNumber(width)) ? width : this.#lineWidth }
   get lineWidth() { return this.#lineWidth }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
 
   start() {
     this.eventsListen()
     // // start State Machine 
-    // stateMachineConfig.context.origin = this
-    // this.#mediator.stateMachine = stateMachineConfig
-    // this.#mediator.stateMachine.start()
-    // this.emit(`tool_start`, this.ID)
+    // stateMachineConfig.id = this.id
+    // stateMachineConfig.context = this
+    // this.#core.stateMachine = stateMachineConfig
+    // this.#core.stateMachine.start()
+    // this.emit(`tool_start`, this.id)
     // // progress state from idle to active
-    // this.#mediator.stateMachine.notify(`tool_${this.#name}_start`, this.ID)
+    // this.#core.stateMachine.notify(`tool_${this.#name}_start`, this.id)
 
     let [x1, y1] = this.cursorClick
 
@@ -57,5 +63,8 @@ export default class Line extends Tool {
     this.elViewport.render()
   }
 
+  destroy() {
+    this.stateMachine.destroy()
+  }
 
 }

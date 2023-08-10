@@ -1,46 +1,55 @@
 // _template.js
 // A template file for Chart components
 
+import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-chart"
 
 export default class _template {
 
+  #id
   #name = "Template"
   #shortName = "template"
-  #mediator
+  #core
   #options
   #parent
+  #stateMachine
+
   #elTemplate
 
   #width
   #height
 
-  constructor (mediator, options) {
+  constructor (core, options) {
 
-    this.#mediator = mediator
+    this.id = options?.id || "ID"
+    this.#core = core
     this.#options = options
     this.#elTemplate = options.elements.elTemplate
-    this.#parent = {...this.#mediator.api.parent}
+    this.#parent = {...options.parent}
     this.init()
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warn(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
+  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return this.#id }
   get name() {return this.#name}
   get shortName() {return this.#shortName}
-  get mediator() {return this.#mediator}
+  get core() {return this.#core}
   get options() {return this.#options}
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
 
   init() {
     this.mount(this.#elTemplate)
 
     // api - functions / methods, calculated properties provided by this module
-    const api = this.#mediator.api
-    api.parent = this.#mediator
-    api.elements = {}
+    // const api = this.#core
+    // api.parent = this.#mediator
+    // api.elements = {}
   }
 
   start() {
@@ -51,33 +60,33 @@ export default class _template {
     this.eventsListen()
 
     // start State Machine 
-    // stateMachineConfig.context.origin = this
-    // this.#mediator.stateMachine = stateMachineConfig
-    // this.#mediator.stateMachine.start()
+    // stateMachineConfig.id = this.id
+    // stateMachineConfig.context = this
+    // this.stateMachine = stateMachineConfig
+    // this.stateMachine.start()
   }
 
-  end() {
-    // Stop and clean up the module to prevent memory leaks.
-    // It should remove: event listeners, timers, ect.
-    // Put your toys away or it will end in tears.
+  destroy() {
+    // this.stateMachine.destroy()
+    // this.off("resize", this.onResize)
   }
 
 
   eventsListen() {
     // listen/subscribe/watch for parent notifications
-    this.on("resize", (dimensions) => this.onResize.bind(this))
+    this.on("resize", (dimensions) => this.onResize, this)
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onResize(dimensions) {

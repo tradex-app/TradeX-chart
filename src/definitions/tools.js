@@ -20,7 +20,7 @@ export default [
     name: "Line",
     icon: line,
     event: "tool_activated",
-    class: Line,
+/*  class: Line,
     sub: [
       {
         id: "ray",
@@ -43,7 +43,7 @@ export default [
         event: "tool_activated",
         class: Line,
       },
-    ]
+    ] */
   },
   {
     id: "fibonacci",
@@ -51,7 +51,13 @@ export default [
     icon: fibonacci,
     event: "tool_activated",
     class: Fibonacci,
-    sub: []
+    sub: [
+      {
+        id: "fib",
+        name: "Not Implemented Yet",
+        icon: line,
+      }
+    ]
   },
   {
     id: "range",
@@ -59,7 +65,13 @@ export default [
     icon: range,
     event: "tool_activated",
     class: Range,
-    sub: []
+    sub: [
+      {
+        id: "rng",
+        name: "Not Implemented Yet",
+        icon: line,
+      }
+    ]
   },
   {
     id: "text",
@@ -67,7 +79,13 @@ export default [
     icon: text,
     event: "tool_activated",
     class: Text,
-    sub: []
+    sub: [
+      {
+        id: "txt",
+        name: "Not Implemented Yet",
+        icon: line,
+      }
+    ]
   },
   {
     id: "measure",
@@ -87,6 +105,6 @@ export default [
 
 export const lineConfig = {
   colour: "#8888AACC",
-  lineWidth: 1
+  width: 1
 }
 

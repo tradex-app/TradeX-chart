@@ -3,20 +3,27 @@
 // Providing: chart drawing tools
 
 import DOM from "../utils/DOM"
-import { ToolsStyle } from "../definitions/style"
-import { CLASS_TOOLS } from "../definitions/core"
 import tools from "../definitions/tools"
 import Tool from '../tools/tool'
-import { timestampDiff } from "../utils/time"
+import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-tools"
+import { ToolsStyle } from "../definitions/style"
 
 
+/**
+ * Provides the drawing tools for the chart.
+ * @export
+ * @class ToolsBar
+ */
 export default class ToolsBar {
 
+  #id
   #name = "Toolbar"
   #shortName = "tools"
-  #mediator
+  #core
   #options
+  #stateMachine
+
   #elTools
   #widgets
 
@@ -25,29 +32,34 @@ export default class ToolsBar {
   #toolClasses = {}
   #activeTool = undefined
   #toolTarget
+  #toolEvents = {click:[], pointerover:[]}
 
 
-  constructor (mediator, options) {
+  constructor (core, options) {
 
-    this.#mediator = mediator
+    this.#core = core
     this.#options = options
-    this.#elTools = mediator.api.elements.elTools
-    this.#tools = tools || options.tools
-    this.#widgets = this.#mediator.api.core.WidgetsG
+    this.#elTools = core.elTools
+    this.#tools = tools || core.config.tools
+    this.#widgets = core.WidgetsG
     this.init()
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warn(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
+  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() {return this.#name}
   get shortName() {return this.#shortName}
-  get mediator() {return this.#mediator}
+  get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elTools) }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
 
   init() {
     this.mount(this.#elTools)
@@ -61,44 +73,48 @@ export default class ToolsBar {
     this.initAllTools()
     // add all on and off chart tools
     this.addAllTools()
-
     // set up event listeners
     this.eventsListen()
 
     // start State Machine 
-    stateMachineConfig.context.origin = this
-    this.#mediator.stateMachine = stateMachineConfig
-    this.#mediator.stateMachine.start()
+    stateMachineConfig.id = this.id
+    stateMachineConfig.context = this
+    this.stateMachine = stateMachineConfig
+    this.stateMachine.start()
   }
 
-  end() {
+  destroy() {
+    this.stateMachine.destroy()
     // remove event listeners
-    const api = this.#mediator.api
-    const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`)
+    const tools = this.#elTools.querySelectorAll(`.icon-wrapper`)
     for (let tool of tools) {
       for (let t of this.#tools) {
         if (t.id === id)
-          tool.removeEventListener("click", this.onIconClick)
+          tool.removeEventListener("click", this.#toolEvents[id].click)
+          tool.removeEventListener("pointerover", this.#toolEvents[id].pointerover)
+          tool.removeEventListener("pointerout", this.#toolEvents[id].pointerout)
       }
     }
+
+    this.off("tool_selected", this.onToolSelect)
+    this.off("tool_deselected", this.onToolDeselect)
   }
 
   eventsListen() {
-    this.on("tool_selected", (e) => { this.onToolSelect.bind(this) })
-    this.on("tool_deselected", (e) => { this.onToolDeselect.bind(this) })
-
+    this.on("tool_selected", this.onToolSelect, this)
+    this.on("tool_deselected", this.onToolDeselect, this)
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onIconClick(e) {
@@ -113,14 +129,24 @@ export default class ToolsBar {
         
     // this.emit(evt, data)
 
-    if (menu) this.emit("openMenu", data)
+    if (menu) this.emit("menu_open", data)
     else {
-      this.emit("menuItemSelected", data)
+      this.emit("menuItem_selected", data)
     }
   }
 
+  onIconOut(e) {
+    const svg = e.currentTarget.querySelector('svg');
+          svg.style.fill = ToolsStyle.COLOUR_ICON
+  }
+
+  onIconOver(e) {
+    const svg = e.currentTarget.querySelector('svg');
+          svg.style.fill = ToolsStyle.COLOUR_ICONHOVER
+  }
+
   onToolTargetSelected(tool) {
-    console.log("tool_targetSelected", tool.target)
+    console.log("tool_targetSelected:", tool.target)
     this.#toolTarget = tool.target
   }
 
@@ -138,12 +164,11 @@ export default class ToolsBar {
   }
 
   mount(el) {
-    el.innerHTML = this.defaultNode()
+    el.innerHTML = this.#elTools.defaultNode(this.#tools)
   }
 
   initAllTools() {
-    const api = this.#mediator.api
-    const tools = DOM.findBySelectorAll(`#${api.id} .${CLASS_TOOLS} .icon-wrapper`)
+    const tools = this.#elTools.querySelectorAll(`.icon-wrapper`)
     for (let tool of tools) {
 
       let id = tool.id, //.replace('TX_', ''),
@@ -153,7 +178,14 @@ export default class ToolsBar {
 
       for (let t of this.#tools) {
         if (t.id === id) {
-          tool.addEventListener("click", this.onIconClick.bind(this))
+          this.#toolEvents[id] = {}
+          this.#toolEvents[id].click = this.onIconClick.bind(this)
+          this.#toolEvents[id].pointerover = this.onIconOver.bind(this)
+          this.#toolEvents[id].pointerout = this.onIconOut.bind(this)
+          tool.addEventListener("click", this.#toolEvents[id].click)
+          tool.addEventListener("pointerover", this.#toolEvents[id].pointerover)
+          tool.addEventListener("pointerout", this.#toolEvents[id].pointerout)
+
           if (t?.sub) {
             let config = {
               content: t.sub,
@@ -175,28 +207,13 @@ export default class ToolsBar {
     }
   }
 
-  defaultNode() {
-    let toolbar = ""
-    for (const tool of this.#tools) {
-      toolbar += this.iconNode(tool)
-    }
 
-    return toolbar
-  }
-
-  iconNode(tool) {
-    const iconStyle = `display: inline-block; height: ${this.#elTools.clientWidth}px; padding-right: 2px`
-    const menu = ("sub" in tool) ? `data-menu="true"` : ""
-    return  `
-      <div id="${tool.id}" data-event="${tool.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${tool.icon}</div>\n
-    `
-  }
 
   /**
    * add tool to chart row from data state
    * or add as new tool from toolbar
    * @param {class} tool 
-   * @param {object} target
+   * @param {Object} target
    */
   addTool(tool=this.#activeTool, target=this.#toolTarget) {
     let config = {
@@ -215,7 +232,7 @@ export default class ToolsBar {
     let t = this.addTool(tool, target)
     this.activeTool = (t)
     this.emit(`tool_active`, t)
-    this.emit(`tool_${t.ID}_active`, t)
+    this.emit(`tool_${t.id}_active`, t)
 
     // add tool entry to Data State
   }

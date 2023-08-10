@@ -1,27 +1,32 @@
 # README
 
-## WIP - under heavy development
+## WIP - under heavy development - NOT production ready
 
-TradeX-chart is a trade chart written in plain (vanilla) JavaScript with minimal dependencies; use it with any framework or backend.
+TradeX-chart is a highly customizable stock trade chart with **one** dependency written in plain JavaScript; use it with any framework or backend.
 
-It provides a two way API to give you complete control over the chart.
+<div align="center">
 
-![](assets/20220706_133347_screenshot.png)
+[![Version](https://badgen.net/npm/v/tradex-chart)](https://www.npmjs.com/package/tradex-chart)
+[![Size](https://badgen.net/bundlephobia/minzip/tradex-chart)](https://bundlephobia.com/result?p=tradex-chart)
+[![LICENSE](https://badgen.net/github/license/tradex-app/tradex-chart)](LICENSE)
+[![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/tradex-app/TradeX-chart)
+[![NPM](https://badgen.net/badge/icon/npm?icon=npm&label)](https://www.npmjs.com/package/tradex-chart)
+
+</div>
+
+![](assets/EMA.png)
 
 ## Table of Contents
 
-* [Why](#why)
 * [Demo](#demo)
 * [Getting Started](#getting-started)
 * [Documentation](/docs/documentation.md)
 * [Features](#features)
 * [License](/LICENSE)
 
-## Why
+## Demo
 
-TradeX-chart was created to give you the developer the freedom to choose your framework and not lock you in.
-
-Secondly after talking to other developers, top on their wishlist for a trading chart was more direct control over it, so they could create their own custom plots. The extensive API will give you power over your chart data like you never had before. Subscribe to the internal events messaging to trigger events in your own application.
+### [Live Demo](https://tradex-chart.guildmedia.net/)
 
 ## Getting Started
 
@@ -29,46 +34,81 @@ Secondly after talking to other developers, top on their wishlist for a trading 
 
 TradeX-chart targets browsers that support [ECMAScript 2022](https://www.ecma-international.org/wp-content/uploads/ECMA-262_13th_edition_june_2022.pdfhttps:/).
 
-### Demo
+## Install
 
-Run the demo locally:
-
-```
-npm install
-npm run demo
-```
-
-### Development
+### NPM
 
 ```
-npm install
-npm run dev
+npm install tradex-chart
 ```
 
-### Build
+### In Browser
 
 ```
-npm install
-npm run build
+<script src="tradex-chart.es.js"></script>
 ```
 
-### Production
+## How to Use
 
-How to use the chart in production... coming soon to a repo near you, once it is added to [npmjs.com](https://npmjs.com).
+Minimal working example:
+
+```javascript
+<div id="myChartDiv"></div>
+
+<script>
+
+import {Chart, DOM} from 'tradex-chart'
+import * as talib from "talib-web"
+
+// minimal data state
+let state = {
+  "ohlcv": [
+// [timestamp, open, high, low, close, volume]
+    [1543579200000,4035.6,4072.78348726,3965,4055.6,2157.50135341],
+    [1543582800000,4055.6,4100,4035,4059.1719252,1660.6115119],
+    [1543586400000,4059.1,4076.6,4014.1,4060,1070.09946267],
+    [1543590000000,4060.5,4060.5,3987.2,4049.2,1530.46774287],
+    [1543593600000,4049.2,4092.7,4035,4089.6691106,922.84509291]
+  ]
+}
+
+// minimal config
+const config = {
+  id: "TradeX_test",
+  title: "BTC/USDT",
+  width: 1000,
+  height: 800,
+  utils: {none: true},
+  tools: {none: true},
+  talib: talib,
+  // see configuration.md#config regarding talib.wasm
+  // `${window.location.origin}/talib.wasm`
+  rangeLimit: 30,
+}
+
+const mount = document.getElementById('myChartDiv')
+const chart = document.createElement("tradex-chart")
+
+mount.appendChild(chart)
+chart.start(config)
+
+</script>
+```
 
 ## Documentation
 
-Full documentation including API can be found under [docs](/docs/documentation.md).
+Documentation can be found under:
+[Documentation](/docs/documentation.md)
+[API](https://tradex-app.github.io/TradeX-chart/api/)
 
 ## Features
 
 * Plain JavaScript with no framework dependencies
-* WIP: All chart features and functions accessible via API
+* All chart features and functions accessible via API
 * Built in a modular manner
-* Build your own modular plugins
 * Provides message, emit and subscribe methods
-* State object defines chart configuration, on and off chart indicators, drawing tool overlays and can be imported or exported.
-* Chart implements a multi-layer canvas class which makes overlays easy. It also supports interaction through hit detection.
+* State object defines chart configuration, on and off chart indicators
+* Drawing tool overlays and can be imported or exported.
 * Export chart to png, jpg, webp.
 * Indicator calculation provided by [talib-web](https://https://anchegt.github.io/talib-web/) as a WebAssembly module.
 * Supports multiple candle types:
@@ -77,5 +117,25 @@ Full documentation including API can be found under [docs](/docs/documentation.m
   * solid up, hollow down
   * hollow up, solid down
   * OHLC
-  * TODO: area
+  * area
+  * line
 * Chart pan / scroll via mouse or cursor keys
+
+## Support
+
+For the latest news on TradeX-chart, feedback, feature requests, and community, join us over on Discord.
+
+[TradeX Discord](https://discord.gg/XnfZudwpfg)
+
+## Contributing
+
+* Fork the Project
+* Create your Feature Branch (git checkout -b feature/AmazingFeature)
+* Commit your Changes (git commit -m 'Add some AmazingFeature)
+* Push to the Branch (git push origin feature/AmazingFeature)
+* Open a Pull Request
+
+Testing, bug reports and feature requests welcome
+
+You can help speed up development by contributing with crypto or PayPal.
+

@@ -4,21 +4,21 @@
 
 import DOM from "../utils/DOM"
 import Timeline from './timeline'
-import CEL from "../components/primitives/canvas"
+import Graph from "./views/classes/graph"
+import renderLoop from "./views/classes/renderLoop"
 import Chart from "./chart"
-import OffChart from "./offChart"
-import Overlays from "./overlays"
 import chartGrid from "./overlays/chart-grid"
-import stateMachineConfig from "../state/state-mainPane"
-import { InputController, Keys } from "../input/controller"
-
+import Indicator from "./overlays/indicator"
+// import chartCompositor from "./overlays/chart-compositor"
+import StateMachine from "../scaleX/stateMachne"
+import stateMachineConfig from "../state/state-main"
+import Input from "../input"
+import { isArray, isBoolean, isNumber, isObject, isString } from "../utils/typeChecks"
+import { copyDeep, valuesInArray, xMap } from "../utils/utilities"
 
 import {
-  CLASS_TIME,
-  CLASS_ROWS,
-  CLASS_ROW,
-  CLASS_GRID,
-  CLASS_CHART,
+  STREAM_FIRSTVALUE,
+  STREAM_NEWVALUE,
 } from '../definitions/core'
 
 import {
@@ -28,81 +28,115 @@ import {
   ROWMINHEIGHT,
   OFFCHARTDEFAULTHEIGHT,
 } from "../definitions/chart"
-import { isNumber } from "../utils/typeChecks"
 
-const STYLE_ROWS = "width:100%; min-width:100%;"
-const STYLE_ROW = "position: relative; overflow: hidden;"
-const STYLE_TIME = "border-top: 1px solid; width:100%; min-width:100%;"
-const STYLE_SCALE = "border-left: 1px solid;"
+import {
+  STYLE_ROW,
+  TIMESCALEH
+} from "../definitions/style"
+
+const defaultOverlays = [
+  ["grid", {class: chartGrid, fixed: false, required: true, params: {axes: "x"}}],
+  // ["chartCompositor", {class: chartCompositor, fixed: true, required: true}]
+]
+const nonIndicators = ["candles", "trades", "events"]
 
 
+/**
+ * Provides chart main pane that hosts, chart, off charts (indicators), timeline, widgets
+ * @export
+ * @class MainPane
+ */
 export default class MainPane {
 
-  #name = "Utilities"
+  #name = "MainPane"
   #shortName = "Main"
-  #mediator
   #options
   #parent
   #core
+  #stateMachine
+  #destruction = false
+
+  #elYAxis
   #elMain
   #elRows
   #elTime
-  #elChart
-  #elOffCharts = []
+  #elPrimary
+  #elScale
+  #elSecondarys = {}
   #elGrid
   #elCanvas
   #elViewport
+  #elements
 
-  #viewport
+  #Graph
   #layerGrid
-  #layerLabels
-  #OffCharts = new Map()
+  #layerWatermark
+  #ChartPanes = new xMap()
   #Chart
   #Time
   #chartGrid
+  #chartDeleteList = []
 
-  #offChartDefaultH = OFFCHARTDEFAULTHEIGHT // %
-  #offChartDefaultWpx = 120
+  #viewDefaultH = OFFCHARTDEFAULTHEIGHT // %
   #rowMinH = ROWMINHEIGHT // px
 
+  #position = {}
   #cursorPos = [0, 0]
+  #drag = {
+    active: false,
+    start: [0,0],
+    prev: [0,0],
+    delta: [0,0]
+  }
   #buffer
   
   #indicators
   #controller
+  #input
 
-  constructor (mediator, options) {
+  constructor (core, options) {
 
-    this.#mediator = mediator
+    this.#core = core
     this.#options = options
-    this.#elMain = mediator.api.elements.elMain
-    this.#parent = {...this.#mediator.api.parent}
-    this.#core = this.#mediator.api.core
+    this.#parent = core
+    this.#elMain = this.#core.elMain
+    this.#elYAxis = this.#core.elYAxis
     this.init(options)
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warn(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
+  get id() { return `${this.#core.id}-${this.#name}` }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
-  get mediator() { return this.#mediator }
+  get core() { return this.#core }
   get chart() { return this.#Chart }
+  get chartPanes() { return this.#ChartPanes }
+  get chartDeleteList() { return this.#chartDeleteList }
   get time() { return this.#Time }
   get options() { return this.#options }
-  get width() { return this.#elMain.clientWidth }
-  get height() { return this.#elMain.clientHeight }
-  get chartW() { return this.#elChart.clientWidth }
-  get chartH() { return this.#elChart.clientHeight }
-  get rowsW() { return this.#elRows.clientWidth }
-  get rowsH() { return this.#elRows.clientHeight }
+  get element() { return this.#elMain }
+  get elRows() { return this.#elMain.rows }
+  get elPrimary() { return this.#elMain.rows.primary }
+  get elSecondary() { return this.#elMain.rows.secondary }
+  get elPanes() { return this.#elMain.rows.chartPanes }
+  get elPaneSlot() { return this.#elMain.rows.chartPaneSlot }
+  get width() { return this.#elMain.getBoundingClientRect().width }
+  get height() { return this.#elMain.getBoundingClientRect().height }
+  get chartW() { return this.elPrimary.getBoundingClientRect().width }
+  get chartH() { return this.elPrimary.getBoundingClientRect().height }
+  get rowsW() { return this.#elRows.getBoundingClientRect().width }
+  get rowsH() { return this.#elRows.getBoundingClientRect().height }
   get rowMinH() { return this.#rowMinH }
   set rowMinH(h) { if (isNumber(h)) this.#rowMinH = Math.abs(h) }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elMain) }
   get range() { return this.#core.range }
+  set cursor(c) { this.element.style.cursor = c }
+  get cursor() { return this.element.style.cursor }
   get cursorPos() { return this.#cursorPos }
   get candleW() { return this.#Time.candleW }
   get theme() { return this.#core.theme }
@@ -110,275 +144,408 @@ export default class MainPane {
   get buffer() { return this.#buffer }
   get bufferPx() { return this.getBufferPx() }
   get scrollPos() { return this.#core.scrollPos }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
+  get graph() { return this.#Graph }
+  get views() { return this.#core.state.data.views }
+  get indicators() { return this.getIndicators() }
+  get elements() {
+    return {
+      elRows: this.elRows,
+      elPrimary: this.elPrimary,
+      elSecondarys: this.elSecondarys,
+      elTime: this.#elTime,
+      elScale: this.#elScale
+    }
+  }
 
 
   init(options) {
-    this.mount(this.#elMain)
+    const core = this.#core
 
-    this.#indicators = this.#core.indicators
+    this.#indicators = this.#core.indicatorClasses
+    this.#elRows = this.#elMain.rows
+    this.#elTime = this.#elMain.time
+    this.#elGrid = this.#elMain.rows.grid
+    this.#elViewport = this.#elMain.viewport  // this.#elMain.rows.grid.viewport
+    this.#elScale = this.#core.elBody.scale
 
-    const api = this.#mediator.api
+    options.name = "Chart"
+    options.shortName = "Chart"
+    options.parent = this
+    options.chartData = this.#core.chartData
+    options.primaryPane = this.#core.primaryPane
+    options.secondaryPane = this.#core.secondaryPane
 
-    this.#elRows = DOM.findBySelector(`#${api.id} .${CLASS_ROWS}`)
-    this.#elTime = DOM.findBySelector(`#${api.id} .${CLASS_TIME}`)
-    this.#elChart = DOM.findBySelector(`#${api.id} .${CLASS_CHART}`)
-    this.#elGrid = DOM.findBySelector(`#${api.id} .${CLASS_GRID}`)
-    this.#elViewport = DOM.findBySelector(`#${api.id} .${CLASS_GRID} .viewport`)
-
-    api.parent = this
-    api.chartData = this.mediator.api.chartData
-    api.onChart = this.#mediator.api.onChart
-    api.offChart = this.#mediator.api.offChart
-    api.rangeLimit = this.#mediator.api.rangeLimit
-    api.settings = this.#mediator.api.settings
+    options.rangeLimit = this.#core.rangeLimit
+    options.settings = this.#core.settings
 
     // api - functions / methods, calculated properties provided by this module
-    api.elements = 
-      {...api.elements, 
-        ...{
-          elChart: this.#elChart,
-          elTime: this.#elTime,
-          elRows: this.#elRows,
-          elOffCharts: this.#elOffCharts
-        }
+    options.elements = 
+      {...options.elements, 
+        ...this.elements
       }
 
+    if ( this.#core.theme?.time?.navigation === false ) {
+      const timeHeight = { height: TIMESCALEH }
+      this.#core.theme.time = {...this.#core.theme?.time, ...timeHeight}
+      this.#elRows.style.height = `calc(100% - ${TIMESCALEH}px)`
+    }
+
     // register timeline - xAxis
-    this.#Time = this.#mediator.register("Timeline", Timeline, options, api)
-    // register offChart
-    this.registerOffCharts(options, api)
-    // register chart
-    this.#Chart = this.#mediator.register("Chart", Chart, options, api)
+    this.#Time = new Timeline(this.#core, options)
+
+    // register chart views
+    this.registerChartViews(options)
 
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE
     this.#rowMinH = isNumber(this.config.rowMinH)? this.config.rowMinH : ROWMINHEIGHT
-    this.#offChartDefaultH = isNumber(this.config.offChartDefaultH)? this.config.offChartDefaultH : OFFCHARTDEFAULTHEIGHT
+    this.#viewDefaultH = isNumber(this.config.secondaryPaneDefaultH)? this.config.secondaryPaneDefaultH : OFFCHARTDEFAULTHEIGHT
+
+    this.rowsOldH = this.rowsH
 
     this.log(`${this.#name} instantiated`)
   }
 
   start() {
-    this.#Time.start()
-    this.#Chart.start()
-
     let i = 0
-    this.#OffCharts.forEach((offChart, key) => {
-      offChart.start(i++)
+
+    // start timeline, chart, secondaryPane
+    this.#elMain.start(this.theme)
+    this.#Time.start()
+    
+    // start each view / chart pane 
+    this.#ChartPanes.forEach((view, key) => {
+      view.start(i++)
+      // suppress divider of first chart pane as no preceding pane
+      if (i === 1) view.Divider.hide()
     })
 
-    // prepare layered canvas
-    this.createViewport()
-    // draw the chart - grid, candles, volume
-    this.initXGrid()
+    this.rowsOldH = this.rowsH
+
+    // create and start overlays
+    this.createGraph()
+    this.draw(this.range, true)
+
+    renderLoop.init({
+      graphs: [this.#Graph],
+      range: this.range
+    })
+    renderLoop.start()
+    renderLoop.queueFrame(this.range, [this.#Graph], false)
 
     // set up event listeners
     this.eventsListen()
 
     // start State Machine 
-    stateMachineConfig.context.origin = this
-    this.#mediator.stateMachine = stateMachineConfig
-    this.#mediator.stateMachine.start()
+    stateMachineConfig.id = this.id
+    stateMachineConfig.context = this;
+    this.stateMachine = stateMachineConfig
+    this.stateMachine.start()
   }
 
-  end() {
-    this.#controller.removeEventListener("mousewheel", this.onMouseWheel);
-    this.#controller.removeEventListener("mousemove", this.onMouseMove);
-    this.#controller.removeEventListener("drag", this.onChartDrag);
-    this.#controller.removeEventListener("enddrag", this.onChartDragDone);
-    this.#controller.removeEventListener("keydown", this.onChartKeyDown)
-    this.#controller.removeEventListener("keyup", this.onChartKeyDown)
+  destroy() {
+    this.#destruction = true
+    this.stateMachine.destroy()
+    this.#Time.destroy()
+    this.#ChartPanes.forEach((chartPane, key) => {
+      this.#chartDeleteList[key] = true
+      chartPane.destroy()
+      delete this.#chartDeleteList[key]
+    })
+    this.#Graph.destroy();
+    this.#input.destroy()
+
+    this.off(STREAM_FIRSTVALUE, this.onFirstStreamValue)
+    this.off(STREAM_NEWVALUE, this.onNewStreamValue)
+    this.off("setRange", this.draw)
+    this.off("scrollUpdate", this.draw)
+    this.off("chart_render", this.draw)
+    this.off("destroyChartView", this.removeChartPane)
+
+    // this.element.remove
   }
 
+  reset() {
+    for (let p in this.#core.Indicators) {
+      for (let i in this.#core.Indicators[p]) {
+        this.#core.Indicators[p][i].instance.remove()
+      }
+    }
+  }
+
+  restart() {
+    this.chart.scale.restart()
+
+    this.validateIndicators()
+
+    for (let [k,v] of this.views) {
+      for (let i of v) {
+        if (k === "primary" && i.type === "candles") continue
+        this.addIndicator(i.type, i.name, {data: i.data, settings: i.settings})
+      }
+    }
+
+    this.draw(this.range, true)
+  }
 
   eventsListen() {
     // Give Main focus so it can receive keyboard input
-    this.#elMain.tabIndex = 0
-    this.#elMain.focus()
+    this.#elRows.tabIndex = 0
+    this.#elRows.focus()
 
-    // create controller and use 'on' method to receive input events 
-    this.#controller = new InputController(this.#elMain);
-    this.#controller.on("mousewheel", this.onMouseWheel.bind(this))
-    this.#controller.on("mousemove", this.onMouseMove.bind(this));
-    this.#controller.on("drag", this.onChartDrag.bind(this));
-    this.#controller.on("enddrag", this.onChartDragDone.bind(this));
-    this.#controller.on("keydown", this.onChartKeyDown.bind(this))
-    this.#controller.on("keyup", this.onChartKeyUp.bind(this))
+    this.#input = new Input(this.#elRows, {disableContextMenu: false});
 
-    this.#controller.on("mouseup", this.onMouseUp.bind(this))
+    this.#input.on("keydown", this.onChartKeyDown.bind(this))
+    this.#input.on("keyup", this.onChartKeyUp.bind(this))
 
-    // listen/subscribe/watch for parent notifications
+    this.#input.on("wheel", this.onMouseWheel.bind(this))
+    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
+    this.#input.on("pointerout", this.onMouseOut.bind(this));
+    this.#input.on("pointerup", this.onChartDragDone.bind(this))
+    this.#input.on("pointermove", this.onMouseMove.bind(this))
+
+    // this.pointermove = this.onMouseMove.bind(this)
+    // this.#elRows.addEventListener("pointermove", this.pointermove)
+
+    // listen/subscribe/watch for notifications
+    this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue, this)
+    this.on(STREAM_NEWVALUE, this.onNewStreamValue, this)
+    this.on("setRange", this.draw, this)
+    this.on("scrollUpdate", this.draw, this)
+    this.on("chart_render", this.draw, this)
+    this.on("destroyChartView", this.removeChartPane, this)
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onMouseWheel(e) {
+    const direction = Math.sign(e.wheeldelta) * -1
     e.domEvent.preventDefault()
 
-    const direction = Math.sign(e.wheeldelta)
+    // a dirty hack to handle touch pad 
+    // confusion over pan and zoom events
+    if (this.#core.pointerButtons[0]) {
+      e.dragstart.x = this.#cursorPos[0]
+      e.dragstart.y = this.#cursorPos[1]
+      e.position.x = this.#cursorPos[0] + direction
+      e.position.y = this.#cursorPos[1]
+      this.onChartDrag(e)
+      return
+    }
     const range = this.range
     const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length)
-    const newEnd = range.indexEnd + Math.floor(direction * XAXIS_ZOOM * range.Length)
-    const oldStart = range.indexStart
-    const oldEnd = range.indexEnd
-    const inOut = (range)? "out" : "in"
+    const newEnd = range.indexEnd + Math.ceil(direction * XAXIS_ZOOM * range.Length)
 
-    this.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
-    this.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
-    this.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
-
-    this.draw()
+    this.#core.setRange(newStart, newEnd)
+    this.draw(this.range, true)
   }
   
   onMouseMove(e) {
+    const p = this.#position
+    p.d2x = p?.d1x || null
+    p.d2y = p?.d1y || null
+    p.d1x = e.movement.x
+    p.d1y = e.movement.y
+    p.dx = Math.floor((p.d1x + p.d2x) / 2)
+    p.dy = Math.floor((p.d1y + p.d2y) / 2)
+    p.ts2 = p?.ts1 || null
+    p.ts1 = Date.now()
+
     this.#cursorPos = [
       e.position.x, e.position.y, 
       e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
+      p.dx, p.dy,
+      p.ts1, p.ts1 - p.ts2
     ]
+
+    this.core.Timeline.showCursorTime()
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
+
+    for (let [key, secondaryPane] of this.chartPanes) {
+      secondaryPane.graph.overlays.list.get("cursor").layer.visible = true
+    }
 
     this.emit("main_mousemove", this.#cursorPos)
   }
 
-  onMouseUp(e) {
-    this.emit("main_mouseup", e)
-    // console.log("Main Pane: mouse up")
+  onMouseEnter(e) {
+    this.core.Timeline.showCursorTime()
+
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = true
+    this.core.Chart.graph.render()
+
+    for (let [key, secondaryPane] of this.chartPanes) {
+      secondaryPane.graph.overlays.list.get("cursor").layer.visible = true
+      secondaryPane.graph.render()
+    }
+  }
+
+  onMouseOut(e) {
+    this.onPointerActive(false)
+
+    this.core.Timeline.hideCursorTime()
+    this.core.Chart.graph.overlays.list.get("cursor").layer.visible = false
+    this.core.Chart.graph.render()
+
+    for (let [key, secondaryPane] of this.chartPanes) {
+      secondaryPane.graph.overlays.list.get("cursor").layer.visible = false
+      secondaryPane.graph.render()
+    }
+    this.draw()
   }
 
   onChartDrag(e) {
-    this.#cursorPos = [
+    const d = this.#drag
+    if (!d.active) {
+      d.active = true
+      d.start = [e.dragstart.x, e.dragstart.y]
+      d.prev = d.start
+      d.delta = [0, 0] //[e.movement.x, e.movement.y]
+    }
+    else {
+    // d.delta = [e.movement.x, e.movement.y]
+      d.delta = [
+        e.position.x - d.prev[0], 
+        e.position.y - d.prev[1]
+      ]
+      d.prev = [
+        e.position.x, 
+        e.position.y
+      ]
+    }
+    this.#cursorPos = ("n",[
       e.position.x, e.position.y, 
-      e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
-    ]
+      ...d.start,
+      ...d.delta
+    ])
+
     this.emit("chart_pan", this.#cursorPos)
-    this.draw()
-    // console.log("what a drag!")
   }
 
   onChartDragDone(e) {
+    const d = this.#drag
+    d.active = false
+    d.delta = [ 0, 0 ]
     this.#cursorPos = [
-      e.position.x, e.position.y, 
-      e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
+      ...d.prev,
+      ...d.start,
+      ...d.delta
     ]
     this.emit("chart_panDone", this.#cursorPos)
-    this.draw()
-    // console.log("drag done")
   }
 
   onChartKeyDown(e) {
-    let step = this.candleW || 1
+    let step = (this.candleW > 1) ? this.candleW : 1
 
-    switch (e.keyCode) {
-      case Keys.Left:
-        // console.log("keydown: cursor Left")
-
-        this.emit("chart_pan", [0,null,step,null,step * -1])
+    // [x2, y2, x1, y1, xdelta, ydelta]
+    switch (e.key) {
+      case "ArrowLeft":
+        this.emit("chart_pan", [0,null,step,null,step * -1,null])
         break;
-      case Keys.Right:
-        // console.log("keydown: cursor Right")
-
-        this.emit("chart_pan", [step,null,0,null,step])
+      case "ArrowRight":
+        this.emit("chart_pan", [step,null,0,null,step,null])
+        break;
+      case "ArrowUp":
+        e.wheeldelta = -1
+        e.domEvent = e.srcEvent
+        this.onMouseWheel(e)
+        break;
+      case "ArrowDown":
+        e.wheeldelta = 1
+        e.domEvent = e.srcEvent
+        this.onMouseWheel(e)
         break;
     }
-    this.draw()
   }
 
   onChartKeyUp(e) {
-    let step = this.candleW || 1
+    let step = (this.candleW > 1) ? this.candleW : 1
 
-    switch (e.keyCode) {
-      case Keys.Left:
-        // console.log("keyup: cursor Left")
-        
-        this.emit("chart_panDone", [0,null,step,null,step * -1])
+    switch (e.key) {
+      case "ArrowLeft":
+        this.emit("chart_panDone", [0,null,step,null,step * -1,null])
         break;
-      case Keys.Right:
-        // console.log("keyup: cursor Right")
-
-        this.emit("chart_panDone", [step,null,0,null,step])
+      case "ArrowRight":
+        this.emit("chart_panDone", [step,null,0,null,step,null])
         break;
     }
-    this.draw()
+    // this.draw()
   }
 
-  mount(el) {
-    el.innerHTML = this.defaultNode()
+  onFirstStreamValue(value) {
+    this.chart.scale.xAxis.calcXAxisGrads(this.range,)
+    this.draw(this.range, true)
   }
 
-  setWidth(w) {
-    const resize = this.rowsW / w
-    const rows = this.#elRows.children
-    /*
-    for (let row of rows) {
-      row.style.width = `${Math.round(row.clientWidth * resize)}px`
+  onNewStreamValue(value) {
+  }
+
+  onPointerActive(chart) {
+    if (chart) {
+      chart.cursorActive = true
+      chart.scale.layerCursor.visible = true
     }
-    */
-    this.#elRows.style.width = `${Math.round(w * resize)}px`
-  }
 
-  setHeight(h) {
-    const api = this.#mediator.api
-    const resize = this.rowsH / (h - api.timeH)
-    const rows = this.#elRows.children
-    /*
-    for (let row of rows) {
-      row.style.height = `${Math.round(row.style.height * resize)}px`
+    if (chart !== this.chart) {
+      this.chart.cursorActive = false
+      this.chart.scale.layerCursor.visible = false
+      this.chart.scale.layerCursor.erase()
     }
-    */
-    this.#elRows.style.height = `${Math.round(this.#elRows.style.height * resize)}px`
+
+    this.#ChartPanes.forEach((secondaryPane, key) => {
+      if (chart !== secondaryPane) {
+        secondaryPane.cursorActive = false
+        secondaryPane.scale.layerCursor.visible = false
+        secondaryPane.scale.layerCursor.erase()
+      }
+    }) 
   }
 
-  setDimensions(dimensions) {
+  setDimensions() {
+    this.#elRows.previousDimensions()
 
-    let height = dimensions.mainH - this.#Time.height
-    let oldHeight = this.height
-    let chartW = dimensions.mainW // this.#Chart.width
-    let chartH = Math.round(this.#Chart.height * dimensions.resizeH) - this.time.height
-    let width = chartW - this.#Chart.scale.width
-
-    this.setWidth(dimensions.mainW)
-    this.setHeight(dimensions.mainH)
+    let resizeH = this.#elRows.heightDeltaR
+    let chartH = Math.round(this.chartH * resizeH)
+    let width = this.rowsW
+    let height = this.rowsH
+    let layerWidth = Math.round(width * ((100 + this.#buffer) * 0.01))
+    let dimensions = {
+      resizeH: resizeH,
+      mainH: this.element.height,
+      mainW: this.element.width,
+      rowsH: this.rowsH,
+      rowsW: this.rowsW,
+    }
 
     this.#core.scrollPos = -1
 
-    this.#Time.setDimensions({w: dimensions.mainW})
-    this.#Time.draw()
+    this.#Time.setDimensions({w: width})
+    this.#Graph.setSize(width, height, layerWidth)
 
-    this.#elGrid.style.height = `${height}px`
-    this.#elGrid.style.width = `${width}px`
-    this.#elViewport.style.height = `${height}px`
-    this.#elViewport.style.width = `${width}px`
-    this.#viewport.setSize(width, height)
+    // set on Chart dimensions
+    if (this.#ChartPanes.size == 1 && chartH != this.#elRows.height) {
+      this.#Chart.setDimensions({w: width, h: this.#elRows.height})
+    }
+    else {
+      this.#ChartPanes.forEach((chartPane, key) => {
+        chartH = Math.round(chartPane.viewport.height * resizeH)
+        chartPane.setDimensions({w: width, h: chartH})
+      })
+    }
 
-    const buffer = this.buffer
-    width = Math.round(width * ((100 + buffer) * 0.01))
-    this.#layerGrid.setSize(width, height)
-    this.#chartGrid.draw("x")
-    this.#viewport.render();
-
-    this.#Chart.resize(chartW, chartH)
-
-    this.#OffCharts.forEach((offChart, key) => {
-      chartH = Math.round(offChart.height * dimensions.resizeH) //- this.time.height
-      offChart.resize(chartW, chartH)
-      offChart.Divider.setDividerPos()
-    })
-
-    this.#core.range
-
-    dimensions.rowsW = this.rowsW
-    dimensions.rowsH = this.rowsH
+    this.rowsOldH = this.rowsH
+    this.draw(this.range, true)
 
     this.emit("rowsResize", dimensions)
   }
@@ -386,196 +553,375 @@ export default class MainPane {
   getBufferPx() { 
     let w = Math.round(this.width * this.buffer / 100) 
     let r = w % this.candleW
-    return w - Math.round(r)
+    return w - r
   }
 
-  registerOffCharts(options, api) {
-    
-    let a = this.#offChartDefaultH * this.#mediator.api.offChart.length,
-        offChartsH = Math.round( a / Math.log10( a * 2 ) ) / 100,
-        rowsH = this.rowsH * offChartsH;
+  registerChartViews(options) {
+    this.#elRows.previousDimensions()
 
-    if (this.#mediator.api.offChart.length === 1) {
-      // adjust chart size for first offChart
-      options.rowH = this.rowsH * this.#offChartDefaultH / 100
-      options.chartH = this.rowsH - options.rowH
+    const primaryPane = this.validateIndicators()
 
+    // set the primary chart
+    let primary = primaryPane[0]
+    for (let o of primaryPane) {
+      if (o?.primary === true) primary = o
+      else o.primary = false
     }
-    else {
-      // adjust chart size for subsequent offCharts
-      options.rowH = rowsH / this.#OffCharts.size
-      options.chartH = this.rowsH - rowsH
+    primary.primary = true
+    options.rowY = 0
+    // add chart views
+    for (let [k,v] of this.views) {
+      options.type = k
+      options.view = v
+      this.addChartPane(options)
     }
-
-    for (let o of this.#mediator.api.offChart) {
-      this.addOffChart(o, options, api)
-    }
-    // this.emit("resizeChart", {w: this.rowsW, h: options.chartH})
-    // this.#Chart.setDimensions({w: this.rowsW, h: options.chartH})
   }
 
   /**
-   * add off chart indicator below chart and any other off charts
-   * @param {object} offChart - data for the indicator
-   * @param {object} options 
-   * @param {object} api 
+   * add chart pane - provides primaryPane and secondaryPane indicators
+   * @param {Object} options 
    */
-  addOffChart(offChart, options, api) {
+  addChartPane(options) {
+    // insert a row to mount the indicator on
+    const heights = this.calcChartPaneHeights()
+    let h
 
-    this.#elRows.lastElementChild.insertAdjacentHTML("afterend", this.rowNode(offChart.type))
-    this.#elOffCharts.push(this.#elRows.lastElementChild)
+    // resize charts panes to accommodate the new addition
+    for (h in heights) {
+      if (this.#ChartPanes.has(h))
+        this.#ChartPanes.get(h).setDimensions({w: this.rowsW, h: heights[h]})
+      // else break
+    }
+    h = heights[h]
 
-    api.elements.elOffChart = this.#elRows.lastElementChild
-    options.offChart = offChart
+    // insert a row for the new indicator
+    let row
+    this.#elRows.insertAdjacentHTML("beforeend", 
+      this.#elMain.rowNode(options.type, this.#core))
+    row = this.#elRows.chartPaneSlot.assignedElements().slice(-1)[0]
+    row.style.height = `${h}px`
+    row.style.width = `100%`
 
-    let o = this.#mediator.register("OffChart", OffChart, options, api)
+    // insert a YAxis for the new indicator
+    let axis
+    this.#elYAxis.insertAdjacentHTML("beforeend", 
+      this.scaleNode(options.type))
+    axis = this.#elYAxis.chartPaneSlot.assignedElements().slice(-1)[0]
+    axis.style.height = `${h}px`
+    axis.style.width = `100%`
+
+    options.elements.elTarget = row
+    options.elements.elScale = axis
+
+    // instantiate the indicator
+    let o
+    if (options.type == "primary") {
+      // options.id
+      o = new Chart(this.#core, options)
+      this.#Chart = o
+    }
+    else {
+      options.name = options.view[0].name || "Secondary"
+      options.shortName = options.view[0].type || "Secondary"
+      o = new Chart(this.#core, options);
+    }
     
-    this.#OffCharts.set(o.ID, o)
+    this.#ChartPanes.set(o.id, o)
+    this.emit("addChartView", o)
 
-    this.emit("addOffChart", o)
+    return o
   }
 
-  addIndicator(ind) {
-    console.log(`Add the ${ind} indicator`)
+  /**
+   * remove chart pane from the Main Pane
+   * @param {string} paneID 
+   * @returns 
+   */
+  removeChartPane(paneID) {
+    if (!isString(paneID) ||
+        !this.#ChartPanes.has(paneID) 
+    ) return false
 
-    // final indicator object
-    const indicator = this.#indicators[ind].ind
-    console.log("indicator:",indicator)
-    // check if we already have indicator data in the chart state
-    // generate indicator data
-    // let instance = new indicator(target, overlay, xAxis, yAxis, config)
-    // instance.calcIndicator(...)
-    // this.addOffChart(instance.overlay.data, options, api)
-    // 
-
-    this.emit("addIndicatorDone", indicator)
-  }
-
-  defaultNode() {
-    const api = this.#mediator.api
-    const styleRows = STYLE_ROWS + `height: calc(100% - ${api.timeH}px)`
-    const styleTime = STYLE_TIME + ` height: ${api.timeH}px; border-color: ${api.chartBorderColour};`
-    const defaultRow = this.defaultRowNode()
-
-    const node = `
-    <div class="${CLASS_ROWS}" style="${styleRows}">
-      ${defaultRow}
-    </div>
-    <div class="${CLASS_TIME}" style="${styleTime}">
-      <canvas id=""><canvas/>
-    </div>
-    `
-    return node
-  }
-
-  defaultRowNode() {
-    const api = this.#mediator.api
-    const width = api.width - api.toolsW - api.scaleW
-    const height = api.height - api.utilsH - api.timeH
-    const styleGrid = ` width: ${width}px; height: ${height}px; overflow: hidden`
-      let node = `<div class="${CLASS_GRID}" style="position: absolute;">
-                      <div class="viewport" style="${styleGrid}"></div>
-                  </div>`
-          node += this.rowNode(CLASS_CHART)
-    return node
-  }
-
-  rowNode(type) {
-    const api = this.#mediator.api
-    const styleRow = STYLE_ROW + ` border-top: 1px solid ${api.chartBorderColour};`
-    const styleScale = STYLE_SCALE + ` border-color: ${api.chartBorderColour};`
-
-    const node = `
-      <div class="${CLASS_ROW} ${type}" style="${styleRow}">
-        <canvas><canvas/>
-        <div class="${styleScale}">
-          <canvas id=""><canvas/>
-        </div>
-      </div>
-    `
-    return node
-  }
-
-  createViewport() {
-    const buffer = this.buffer
-    const width = this.width
-    const height = this.rowsH
-    const layerConfig = { 
-      width: Math.round(width * ((100 + buffer) * 0.01)), 
-      height: height
+    const chartPane = this.#ChartPanes.get(paneID)
+    if (chartPane.isPrimary) {
+      this.#core.error(`Cannot remove primary chart pane! ${paneID}`)
+      return false
     }
 
-    // create viewport
-    this.#viewport = new CEL.Viewport({
-      width: width,
-      height: height,
-      container: this.#elViewport
-    });
-    this.#elCanvas = this.#viewport.scene.canvas
+    // enable deletion
+    this.#chartDeleteList[paneID] = true
 
-    this.#layerLabels = new CEL.Layer(layerConfig);
-    this.#layerGrid = new CEL.Layer(layerConfig);
-    // add layers
-    this.#viewport
-          .addLayer(this.#layerLabels)
-          .addLayer(this.#layerGrid)
+      let w = this.rowsW
+      let h = chartPane.viewport.height
+      let x = Math.floor(h / (this.#ChartPanes.size - 1))
+      let r = h % x
 
-    const config = {...this.theme, ...{ axes: "x" }}
-    this.#chartGrid =
-      new chartGrid(
-        this.#layerGrid, 
-        this.#Time, 
-        null, 
-        config)
+    if (chartPane.status !== "destroyed")
+      chartPane.destroy()
+
+    this.#ChartPanes.delete(paneID)
+    delete this.#chartDeleteList[paneID]
+
+    // resize remaining chart panes
+    this.#ChartPanes.forEach((chartPane, key) => {
+      h = chartPane.viewport.height
+      chartPane.setDimensions({w: w, h: h + x + r})
+      r = 0
+    })
+    this.draw(this.range, true)
+    return true
   }
 
-  initXGrid() {
-    this.#layerGrid.setPosition(this.scrollPos, 0)
-    this.#chartGrid.draw("x")
-    this.#viewport.render();
-    this.#Time.draw()
+  validateIndicators() {
+    const primaryPane = []
+    // iterate over chart panes and remove invalid indicators
+    for (let [k,oc] of this.views) {
+
+      if (k === "primary") primaryPane.push(oc)
+      // validate entry - are there any indicators to add?
+      if (oc.length === 0 && k !== "primary") {
+        this.views.delete(k)
+        continue
+      }
+
+      // remove any indicators that are not supported
+      for (const [i, o] of oc.entries()) {
+        // is valid?
+        if (isObject(o) &&
+            ( o.type in this.core.indicatorClasses ||
+              nonIndicators.includes(o.type))) 
+            continue
+        // remove invalid
+        this.#core.log(`indicator ${oc.type} not added: not supported.`)
+        oc.splice(i, 1)
+      }
+    }
+    return primaryPane
   }
 
-  draw() {
-    this.#layerGrid.setPosition(this.scrollPos, 0)
-    this.#chartGrid.draw("x")
-    this.#viewport.render();
-    this.#Time.draw()
+  /**
+   * add an indicator after the chart has started
+   * @param {string} i - indicator type eg. EMA, DMI, RSI
+   * @param {string} name - identifier
+   * @param {Object} params - {settings, data}
+   * @returns 
+   */
+  addIndicator(i, name=i, params={})  {
+    if (
+      !isString(i) &&
+      !(i in this.#indicators) &&
+      !isString(name) &&
+      !isObject(params)
+    ) return false
+
+    this.log(`Adding the ${name} : ${i} indicator`)
+
+    if (!isArray(params?.data)) params.data = []
+    if (!isObject(params?.settings)) params.settings = {}
+
+    let instance
+
+    // add primary chart indicator
+    if (this.#indicators[i].ind.primaryPane) {
+      const indicator = {
+        type: i,
+        name: name,
+        ...params
+      }
+        instance = this.#Chart.addIndicator(indicator);
+    }
+    // add secondary chart indicator
+    else {
+      const indicator = this.core.indicatorClasses[i].ind
+      const indType = (
+        indicator.primaryPane === "both" && 
+        isBoolean(i.primaryPane)) ? 
+        i.primaryPane : false;
+        
+      if (!isArray(params.view)) params.view = [{name, type: i, ...params}]
+      // check all views are valid
+      for (let v = 0; v < params.view.length; v++) {
+        if (!isObject(params.view[v]) || !valuesInArray(["name", "type"], Object.keys(params.view[v])))
+            params.view.splice(v,1)
+      }
+      if (params.view.length == 0) return false
+        
+      params.parent = this
+      params.title = name
+      params.elements = { ...this.elements }
+
+      instance = this.addChartPane(params)
+      instance.start()
+    }
+    this.#core.refresh()
+    this.emit("addIndicatorDone", instance)
+    console.log(`Added indicator:`, instance.id)
+
+    return instance
   }
 
-  updateRange() {
-    // draw the grid
-    this.draw()
+  /**
+   * return indicators grouped by Chart Pane
+   * @param {string} i - indicator ID
+   */
+  getIndicators() {
+    const ind = {}
+
+    this.#ChartPanes.forEach(
+      (value, key) => {
+        ind[key] = value.indicators
+      }
+    )
+    return ind
+  }
+
+  /**
+   * retrieve indicator by ID
+   * @param {string} i - indicator ID
+   */
+  getIndicator(i) {
+    if (!isString(i)) return false
+    for (const p of this.#ChartPanes.values()) {
+      if (i in p.indicators) {
+        return p.indicators[i].instance
+      }
+    }
+  }
+
+  /**
+   * remove an indicator - default or registered user defined
+   * @param {string|Indicator} i - indicator id or Indicator instance
+   * @returns {boolean} - success / failure
+   */
+  removeIndicator(i) {
+    // remove by ID
+    if (isString(i)) {
+      for (const p of this.#ChartPanes.values()) {
+        if (i in p.indicators) {
+          p.indicators[i].instance.remove()
+          return true
+        }
+      }
+    }
+    // remove by instance
+    else if (i instanceof Indicator) {
+      i.remove()
+      return true
+    }
+    else return false
+  }
+
+  /**
+   * set or get indicator settings
+   * @param {string|Indicator} i - indicator id or Indicator instance
+   * @param {Object} s - settings
+   * @returns {boolean} - success / failure
+   */
+  indicatorSettings(i, s) {
+    // find by ID
+    if (isString(i)) {
+      for (const p of this.#ChartPanes.values()) {
+        if (i in p.indicators) {
+          return p.indicators[i].instance.settings(s)
+        }
+      }
+    }
+    // find by instance
+    else if (i instanceof Indicator) {
+      return i.settings(s)
+    }
+    else return false
+  }
+
+  calcChartPaneHeights() {
+    const cnt = this.#ChartPanes.size + 1
+    const a = this.#viewDefaultH * (cnt - 1),
+          ratio = ( a / Math.log10( a * 2 ) ) / 100,
+          rowsH = Math.round(this.rowsH * ratio),
+          sizes = {};
+
+    if (cnt === 1) {
+      // only adding the primary (price) chart
+      sizes.new = this.rowsH
+    }
+    else if (cnt === 2) {
+      // adjust chart size for first secondary chart pane
+      const first = this.#ChartPanes.firstKey()
+      const newPane = Math.round(this.rowsH * this.#viewDefaultH / 100)
+      sizes[first] = this.rowsH - newPane
+      sizes.new = newPane
+    }
+    else if (cnt === 3) {
+      const first = this.#ChartPanes.firstEntry()
+      const second = this.#ChartPanes.lastEntry()
+      const newPane = Math.round(this.rowsH * this.#viewDefaultH / 100)
+
+      let ratio = this.rowsH / (this.rowsH + newPane)
+      // adjust all to fit
+      sizes[first[0]] = Math.floor(first[1].viewport.height * ratio)
+      sizes[second[0]] = Math.floor(second[1].viewport.height * ratio)
+      sizes.new = Math.floor(newPane * ratio)
+      // account for remainder
+      sizes.new += this.rowsH - (sizes[first[0]] + sizes[second[0]] + sizes.new)
+    }
+    else {
+      let total = 0
+      for (let p of this.#ChartPanes) {
+        sizes[p[0]] = p[1].viewport.height
+        total += p[1].viewport.height
+      }
+      sizes.new = Math.floor(total / (this.#ChartPanes.size + 1))
+
+      let ratio = this.rowsH / (this.rowsH + sizes.new)
+          total = 0
+      for (let s in sizes) {
+        sizes[s] = Math.floor(sizes[s] * ratio)
+        total += sizes[s]
+      }
+      // account for remainder
+      sizes.new += this.rowsH - total
+    }
+    return sizes
+  }
+
+  scaleNode(type) {
+    const styleRow = STYLE_ROW + ` width: 100%; border-top: 1px solid ${this.theme.secondaryPane.separator};`
+    const node = `
+    <div slot="chartpane" class="viewport scale ${type}" style="$${styleRow}"></div>
+  `
+    return node
+  }
+
+  createGraph() {
+    let overlays = copyDeep(defaultOverlays)
+
+    this.#Graph = new Graph(this, this.#elViewport, overlays)
+  }
+
+  draw(range=this.range, update=false) {
+    const graphs = [
+      this.#Graph,
+      this.#Time,
+      this.#Chart
+    ]
+    this.time.xAxis.doCalcXAxisGrads(range)
+    this.#ChartPanes.forEach((chartPane, key) => {
+      graphs.push(chartPane)
+    })
+
+    renderLoop.queueFrame(
+      this.range, 
+      graphs, 
+      update)
+  }
+
+  updateRange(pos) {
+    this.#core.updateRange(pos)
+    // this.draw()
   }
 
   zoomRange() {
-    // draw the gird
-    this.draw()
-  }
-
-  resizeRowPair(divider, pos) {
-    let active = divider.offChart
-    let ID = active.ID
-    let offCharts = Object.keys(this.#OffCharts)
-    let i = offCharts.indexOf(ID) - 1
-    let prev = (i > 0) ? 
-      this.#OffCharts.get(offCharts[i]) :
-      this.#Chart;
-    let activeH = active.height - pos[5]
-    let prevH  = prev.height + pos[5]
-    
-    if ( activeH >= this.#rowMinH
-        && prevH >= this.#rowMinH) {
-          divider.offChart.Divider.updateDividerPos(pos)
-          active.resize(undefined, activeH)
-          prev.resize(undefined, prevH)
-    }
-    active.element.style.userSelect = 'none';
-    // active.element.style.pointerEvents = 'none';
-    prev.element.style.userSelect = 'none';
-    // prev.element.style.pointerEvents = 'none';
-
-    return {active, prev}
+    this.draw(this.range, true)
   }
 
 }

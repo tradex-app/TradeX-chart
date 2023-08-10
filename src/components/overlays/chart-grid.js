@@ -1,63 +1,68 @@
 // chart-grid.js
+// provides X and Y axis grid lines
 
+import Overlay from "./overlay"
 import { GridStyle } from "../../definitions/style"
-import { BUFFERSIZE } from "../../definitions/chart"
+import { bRound } from "../../utils/number"
 
 
-export default class chartGrid {
+export default class chartGrid extends Overlay{
 
-  #target
-  #scene
-  #config
-  #xAxis
-  #yAxis
-  #core
 
-  constructor(target, xAxis, yAxis, config) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    this.#target = target
-    this.#scene = target.scene
-    this.#config = config
-    this.#xAxis = xAxis
-    this.#yAxis = yAxis
-    this.#core = xAxis.mediator.api.core
-    this.#config.axes = config.axes || "both"
+    super(target, xAxis, yAxis, theme, parent, params)
+
+    this.params.axes = params?.axes || "both"
   }
 
+  set position(p) { this.target.setPosition(p[0], p[1]) }
+
   draw(axes) {
-    axes = axes || this.#config.axes
-    this.#scene.clear()
+
+    axes = axes || this.params.axes
+
+    this.scene.clear()
+
+    if (axes == "none") return
     
-    const xGrads = this.#xAxis.xAxisGrads.values
-    const ctx = this.#scene.context
+    const ctx = this.scene.context
     ctx.save();
-    ctx.strokeStyle = GridStyle.COLOUR_GRID
+    ctx.strokeStyle = this.core.theme.chart.GridColour || GridStyle.COLOUR_GRID
 
     // X Axis
     if (axes != "y") {
-      const offset = this.#xAxis.smoothScrollOffset || 0
+      const offset = 0 // this.xAxis.smoothScrollOffset || 0
+      const xGrads = this.xAxis.xAxisGrads.values
 
       for (let tick of xGrads) {
+        let x = bRound(tick[1])
         ctx.beginPath()
-        ctx.moveTo(tick[1] + offset, 0)
-        ctx.lineTo(tick[1] + offset, this.#scene.height)
+        ctx.moveTo(x + offset, 0)
+        ctx.lineTo(x + offset, this.scene.height)
         ctx.stroke()
       }
     }
 
     // Y Axis
     if (axes != "x") {
-      const yGrads = this.#yAxis.yAxisGrads
+      const yGrads = this.yAxis.yAxisGrads
       for (let tick of yGrads) {
+        let y = this.yAxis.$2Pixel(tick[0])
         ctx.beginPath()
-        ctx.moveTo(0, tick[1])
-        ctx.lineTo(this.#scene.width, tick[1])
+        ctx.moveTo(0, y)
+        ctx.lineTo(this.scene.width, y)
         ctx.stroke()
       }
     }
-
     ctx.restore();
+    this.doDraw = false
   }
 
+  drawX() {
+    this.draw("x")
+    return
+  }
+  
 }
 

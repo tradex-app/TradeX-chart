@@ -1,69 +1,95 @@
 // chart-candles.js
 
+import Overlay from "./overlay"
 import Candle from "../primitives/candle";
-import { CandleStyle } from "../../definitions/style"
-import { round } from "../../utils/number";
-import { getTextRectWidth } from "../../utils/canvas";
-import { BUFFERSIZE } from "../../definitions/chart"
+import { CandleType } from "../../definitions/style"
 
 
-export default class chartCandles extends Candle {
+export default class chartCandles extends Overlay {
 
-  #target
-  #scene
-  #config
-  #xAxis
-  #yAxis
-  #core
+  #candle
 
-  constructor(target, xAxis, yAxis, config) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent) {
 
-    super(target.scene, config)
+    super(target, xAxis, yAxis, theme, parent)
 
-    this.#target = target
-    this.#scene = target.scene
-    this.#config = config
-    this.#xAxis = xAxis
-    this.#yAxis = yAxis
-    this.#core = xAxis.mediator.api.core
+    this.#candle = new Candle(target.scene, theme)
   }
 
-  get target() { return this.#target }
+  set position(p) { this.target.setPosition(p[0], p[1]) }
 
-  draw(range=this.#core.range) {
-    this.#scene.clear()
+  draw(range=this.core.range) {
 
-    const render = (this.#config.CandleType === "AREA") ?
-      (candle) => {} :
-      (candle) => {super.draw(candle)}
-    const offset = this.#xAxis.smoothScrollOffset || 0
-    const candle = {
-      x: 2 + offset - this.#xAxis.candleW,
-      w: this.#xAxis.candleW
+    this.scene.clear()
+
+    let render
+    let type = this.theme.candle.Type
+
+    switch (type) {
+      case CandleType.AREA:
+      case CandleType.LINE:
+        render = (candle) => {this.#candle.area({...candle})}
+        break;
+      default:
+        render = (candle) => {this.#candle.draw(candle)}
+        break;
     }
+    const offset = this.xAxis.smoothScrollOffset || 0
+    const candle = {
+      x: offset - this.xAxis.candleW,
+      w: this.xAxis.candleW
+    }
+    // const candles = {
+    //   in: {},
+    //   ts: {},
+    //   px: {},
+    //   list: []
+    // }
 
-    let o = this.#xAxis.rangeScrollOffset;
+    let o = this.core.rangeScrollOffset;
     let c = range.indexStart - o
-    let i = range.Length + o + 2
+    let i = range.Length + (o * 2)
     let x
+
+    if (this.core.stream) {
+      this.core.stream.lastPriceMax = range.valueMax
+      this.core.stream.lastPriceMin = range.valueMin
+    }
 
     while(i) {
       x = range.value( c )
+      candle.x = this.xAxis.xPos(x[0])
+      if (x?.[7]) {
+        this.core.stream.lastXPos = candle.x
+        this.core.stream.lastYPos = {
+          o: candle.o,
+          h: candle.h,
+          l: candle.l,
+          c: candle.c,
+        }
+        break
+      }
       if (x[4] !== null) {
-        candle.o = this.#yAxis.yPos(x[1])
-        candle.h = this.#yAxis.yPos(x[2])
-        candle.l = this.#yAxis.yPos(x[3])
-        candle.c = this.#yAxis.yPos(x[4])
+        candle.o = this.yAxis.yPos(x[1])
+        candle.h = this.yAxis.yPos(x[2])
+        candle.l = this.yAxis.yPos(x[3])
+        candle.c = this.yAxis.yPos(x[4])
         candle.raw = x
-        // super.draw(candle)
         render(candle)
       }
+      // candles.list.unshift({} = {...candle})
+      // candles.in[c] = i - 1
+      // candles.ts[x[0]] = i - 1
+      // candles.px[candle.x] = i - 1
+      // this.core.candles = candles
       c++
       i--
-      candle.x = candle.x + candle.w
     }
 
-    if (this.#config.CandleType === "AREA") super.areaRender()
+    if (type === CandleType.AREA ||
+        type === CandleType.LINE
+      ) 
+      this.#candle.areaRender()
   }
 
 }

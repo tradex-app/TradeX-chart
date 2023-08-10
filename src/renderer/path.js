@@ -1,29 +1,37 @@
 // path.js
+
+import { isArray } from "../utils/typeChecks"
+import { fillStroke } from "./canvas";
+
+
 /**
  * Draw a path
- * @param ctx
- * @param coordinates
- * @param strokeFill
+ * @param {Object} ctx - canvas reference
+ * @param {Array} coords - array of x y coords [{x:x, y:y}, ...]
+ * @param {Object} style - {width, stroke, fill, dash}
+ * @param {function} strokeFill
  */
-export function renderPath (ctx, coordinates, style, strokeFill) {
+export function renderPath (ctx, coords, style, strokeFill) {
   ctx.save()
-  ctx.lineWidth = style.lineWidth || 1
-  if (ctx.lineWidth % 2) {
+  const w = style.width || 1
+  ctx.lineWidth = w
+  if (w % 2) {
     ctx.translate(0.5, 0.5)
   }
-  ctx.strokeStyle = style.strokeStyle
+  ctx.strokeStyle = style.stroke
 
-  if ("dash" in style) ctx.setLineDash(style.dash)
+  if (isArray(style.dash)) 
+    ctx.setLineDash(style.dash)
   
   ctx.beginPath()
   let move = true
-  coordinates.forEach(coordinate => {
-    if (coordinate && coordinate.x !== null) {
+  coords.forEach(coord => {
+    if (coord && coord.x !== null) {
       if (move) {
-        ctx.moveTo(coordinate.x, coordinate.y)
+        ctx.moveTo(coord.x, coord.y)
         move = false
       } else {
-        ctx.lineTo(coordinate.x, coordinate.y)
+        ctx.lineTo(coord.x, coord.y)
       }
     }
   })
@@ -31,21 +39,55 @@ export function renderPath (ctx, coordinates, style, strokeFill) {
   ctx.restore()
 }
 
-export function renderCloseStrokePath (ctx, coordinates) {
-  renderPath(ctx, coordinates, () => {
-    ctx.closePath()
+/**
+ * Render an open path of multiple points
+ * @param {Object} ctx - canvas reference
+ * @param {Array} coords - array of x y coords [{x:x, y:y}, ...]
+ * @param {Object} style - {width, stroke, dash}
+ */
+export function renderPathStroke (ctx, coords, style) {
+  renderPath(ctx, coords, style, () => {
     ctx.stroke()
   })
 }
 
 /**
- * 渲染填充路径
- * @param ctx
- * @param coordinates
+ * Render unfilled closed path of multiple points
+ * @param {Object} ctx - canvas reference
+ * @param {Array} coords - array of x y coords [{x:x, y:y}, ...]
+ * @param {Object} style - {width, stroke, fill, dash}
  */
-export function renderCloseFillPath (ctx, coordinates) {
-  renderPath(ctx, coordinates, () => {
+export function renderPathClosed (ctx, coords, style) {
+  renderPath(ctx, coords, style, () => {
     ctx.closePath()
-    ctx.fill()
   })
+  fillStroke(ctx, opts?.fill, opts?.stroke, opts?.size)
+}
+
+/**
+ * Draw Spline of multiple points
+ * @param {canvas} ctx - HTML Canvas
+ * @param {Array} points - array of points [{x, y}, {x, y}...]
+ * @param {number} tension
+ */
+export function renderSpline(ctx, points, tension) {
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+
+  var t = (tension != null) ? tension : 1;
+  for (var i = 0; i < points.length - 1; i++) {
+      var p0 = (i > 0) ? points[i - 1] : points[0];
+      var p1 = points[i];
+      var p2 = points[i + 1];
+      var p3 = (i != points.length - 2) ? points[i + 2] : p2;
+
+      var cp1x = p1.x + (p2.x - p0.x) / 6 * t;
+      var cp1y = p1.y + (p2.y - p0.y) / 6 * t;
+
+      var cp2x = p2.x - (p3.x - p1.x) / 6 * t;
+      var cp2y = p2.y - (p3.y - p1.y) / 6 * t;
+
+      ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+  }
+  ctx.stroke();
 }

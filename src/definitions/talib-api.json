@@ -1,0 +1,2883 @@
+[
+  {
+    "name": "ACCBANDS",
+    "camelCaseName": "accBands",
+    "group": "Overlap Studies",
+    "description": "Acceleration Bands",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 20,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [
+      { "name": "upperBand", "type": "number", "plotHint": "limit_upper" },
+      { "name": "middleBand", "type": "number", "plotHint": "line" },
+      { "name": "lowerBand", "type": "number", "plotHint": "limit_lower" }
+    ]
+  },
+  {
+    "name": "ACOS",
+    "camelCaseName": "acos",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric ACos",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "AD",
+    "camelCaseName": "ad",
+    "group": "Volume Indicators",
+    "description": "Chaikin A/D Line",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" },
+      { "name": "volume", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "ADD",
+    "camelCaseName": "add",
+    "group": "Math Operators",
+    "description": "Vector Arithmetic Add",
+    "inputs": [
+      { "name": "inReal0", "type": "number" },
+      { "name": "inReal1", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "ADOSC",
+    "camelCaseName": "adOsc",
+    "group": "Volume Indicators",
+    "description": "Chaikin A/D Oscillator",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" },
+      { "name": "volume", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "fastPeriod",
+        "displayName": "Fast Period",
+        "defaultValue": 3,
+        "hint": "Number of period for the fast MA",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      {
+        "name": "slowPeriod",
+        "displayName": "Slow Period",
+        "defaultValue": 10,
+        "hint": "Number of period for the slow MA",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "ADX",
+    "camelCaseName": "adx",
+    "group": "Momentum Indicators",
+    "description": "Average Directional Movement Index",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "ADXR",
+    "camelCaseName": "adxr",
+    "group": "Momentum Indicators",
+    "description": "Average Directional Movement Index Rating",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "APO",
+    "camelCaseName": "apo",
+    "group": "Momentum Indicators",
+    "description": "Absolute Price Oscillator",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "fastPeriod",
+        "displayName": "Fast Period",
+        "defaultValue": 12,
+        "hint": "Number of period for the fast MA",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      {
+        "name": "slowPeriod",
+        "displayName": "Slow Period",
+        "defaultValue": 26,
+        "hint": "Number of period for the slow MA",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      { "name": "MAType", "displayName": "MA Type", "defaultValue": 0, "hint": "Type of Moving Average", "type": "MAType" }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "AROON",
+    "camelCaseName": "aroon",
+    "group": "Momentum Indicators",
+    "description": "Aroon",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [
+      { "name": "aroonDown", "type": "number", "plotHint": "line_dash" },
+      { "name": "aroonUp", "type": "number", "plotHint": "line" }
+    ]
+  },
+  {
+    "name": "AROONOSC",
+    "camelCaseName": "aroonOsc",
+    "group": "Momentum Indicators",
+    "description": "Aroon Oscillator",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "ASIN",
+    "camelCaseName": "asin",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric ASin",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "ATAN",
+    "camelCaseName": "atan",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric ATan",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "ATR",
+    "camelCaseName": "atr",
+    "group": "Volatility Indicators",
+    "description": "Average True Range",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "AVGDEV",
+    "camelCaseName": "avgDev",
+    "group": "Price Transform",
+    "description": "Average Deviation",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "AVGPRICE",
+    "camelCaseName": "avgPrice",
+    "group": "Price Transform",
+    "description": "Average Price",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "BBANDS",
+    "camelCaseName": "bbands",
+    "group": "Overlap Studies",
+    "description": "Bollinger Bands",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 5,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      {
+        "name": "nbDevUp",
+        "displayName": "Deviations up",
+        "defaultValue": 2,
+        "hint": "Deviation multiplier for upper band",
+        "type": "Double",
+        "range": { "min": -3e37, "max": 3e37 }
+      },
+      {
+        "name": "nbDevDn",
+        "displayName": "Deviations down",
+        "defaultValue": 2,
+        "hint": "Deviation multiplier for lower band",
+        "type": "Double",
+        "range": { "min": -3e37, "max": 3e37 }
+      },
+      { "name": "MAType", "displayName": "MA Type", "defaultValue": 0, "hint": "Type of Moving Average", "type": "MAType" }
+    ],
+    "outputs": [
+      { "name": "upperBand", "type": "number", "plotHint": "limit_upper" },
+      { "name": "middleBand", "type": "number", "plotHint": "line" },
+      { "name": "lowerBand", "type": "number", "plotHint": "limit_lower" }
+    ]
+  },
+  {
+    "name": "BETA",
+    "camelCaseName": "beta",
+    "group": "Statistic Functions",
+    "description": "Beta",
+    "inputs": [
+      { "name": "inReal0", "type": "number" },
+      { "name": "inReal1", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 5,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "BOP",
+    "camelCaseName": "bop",
+    "group": "Momentum Indicators",
+    "description": "Balance Of Power",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CCI",
+    "camelCaseName": "cci",
+    "group": "Momentum Indicators",
+    "description": "Commodity Channel Index",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDL2CROWS",
+    "camelCaseName": "cdl2Crows",
+    "group": "Pattern Recognition",
+    "description": "Two Crows",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDL3BLACKCROWS",
+    "camelCaseName": "cdl3BlackCrows",
+    "group": "Pattern Recognition",
+    "description": "Three Black Crows",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDL3INSIDE",
+    "camelCaseName": "cdl3Inside",
+    "group": "Pattern Recognition",
+    "description": "Three Inside Up/Down",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDL3LINESTRIKE",
+    "camelCaseName": "cdl3LineStrike",
+    "group": "Pattern Recognition",
+    "description": "Three-Line Strike ",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDL3OUTSIDE",
+    "camelCaseName": "cdl3Outside",
+    "group": "Pattern Recognition",
+    "description": "Three Outside Up/Down",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDL3STARSINSOUTH",
+    "camelCaseName": "cdl3StarsInSouth",
+    "group": "Pattern Recognition",
+    "description": "Three Stars In The South",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDL3WHITESOLDIERS",
+    "camelCaseName": "cdl3WhiteSoldiers",
+    "group": "Pattern Recognition",
+    "description": "Three Advancing White Soldiers",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLABANDONEDBABY",
+    "camelCaseName": "cdlAbandonedBaby",
+    "group": "Pattern Recognition",
+    "description": "Abandoned Baby",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "penetration",
+        "displayName": "Penetration",
+        "defaultValue": 0.3,
+        "hint": "Percentage of penetration of a candle within another candle",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLADVANCEBLOCK",
+    "camelCaseName": "cdlAdvanceBlock",
+    "group": "Pattern Recognition",
+    "description": "Advance Block",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLBELTHOLD",
+    "camelCaseName": "cdlBeltHold",
+    "group": "Pattern Recognition",
+    "description": "Belt-hold",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLBREAKAWAY",
+    "camelCaseName": "cdlBreakaway",
+    "group": "Pattern Recognition",
+    "description": "Breakaway",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLCLOSINGMARUBOZU",
+    "camelCaseName": "cdlClosingMarubozu",
+    "group": "Pattern Recognition",
+    "description": "Closing Marubozu",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLCONCEALBABYSWALL",
+    "camelCaseName": "cdlConcealBabysWall",
+    "group": "Pattern Recognition",
+    "description": "Concealing Baby Swallow",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLCOUNTERATTACK",
+    "camelCaseName": "cdlCounterAttack",
+    "group": "Pattern Recognition",
+    "description": "Counterattack",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLDARKCLOUDCOVER",
+    "camelCaseName": "cdlDarkCloudCover",
+    "group": "Pattern Recognition",
+    "description": "Dark Cloud Cover",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "penetration",
+        "displayName": "Penetration",
+        "defaultValue": 0.5,
+        "hint": "Percentage of penetration of a candle within another candle",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLDOJI",
+    "camelCaseName": "cdlDoji",
+    "group": "Pattern Recognition",
+    "description": "Doji",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLDOJISTAR",
+    "camelCaseName": "cdlDojiStar",
+    "group": "Pattern Recognition",
+    "description": "Doji Star",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLDRAGONFLYDOJI",
+    "camelCaseName": "cdlDragonflyDoji",
+    "group": "Pattern Recognition",
+    "description": "Dragonfly Doji",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLENGULFING",
+    "camelCaseName": "cdlEngulfing",
+    "group": "Pattern Recognition",
+    "description": "Engulfing Pattern",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLEVENINGDOJISTAR",
+    "camelCaseName": "cdlEveningDojiStar",
+    "group": "Pattern Recognition",
+    "description": "Evening Doji Star",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "penetration",
+        "displayName": "Penetration",
+        "defaultValue": 0.3,
+        "hint": "Percentage of penetration of a candle within another candle",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLEVENINGSTAR",
+    "camelCaseName": "cdlEveningStar",
+    "group": "Pattern Recognition",
+    "description": "Evening Star",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "penetration",
+        "displayName": "Penetration",
+        "defaultValue": 0.3,
+        "hint": "Percentage of penetration of a candle within another candle",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLGAPSIDESIDEWHITE",
+    "camelCaseName": "cdlGapSideSideWhite",
+    "group": "Pattern Recognition",
+    "description": "Up/Down-gap side-by-side white lines",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLGRAVESTONEDOJI",
+    "camelCaseName": "cdlGravestoneDoji",
+    "group": "Pattern Recognition",
+    "description": "Gravestone Doji",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLHAMMER",
+    "camelCaseName": "cdlHammer",
+    "group": "Pattern Recognition",
+    "description": "Hammer",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLHANGINGMAN",
+    "camelCaseName": "cdlHangingMan",
+    "group": "Pattern Recognition",
+    "description": "Hanging Man",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLHARAMI",
+    "camelCaseName": "cdlHarami",
+    "group": "Pattern Recognition",
+    "description": "Harami Pattern",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLHARAMICROSS",
+    "camelCaseName": "cdlHaramiCross",
+    "group": "Pattern Recognition",
+    "description": "Harami Cross Pattern",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLHIGHWAVE",
+    "camelCaseName": "cdlHignWave",
+    "group": "Pattern Recognition",
+    "description": "High-Wave Candle",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLHIKKAKE",
+    "camelCaseName": "cdlHikkake",
+    "group": "Pattern Recognition",
+    "description": "Hikkake Pattern",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLHIKKAKEMOD",
+    "camelCaseName": "cdlHikkakeMod",
+    "group": "Pattern Recognition",
+    "description": "Modified Hikkake Pattern",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLHOMINGPIGEON",
+    "camelCaseName": "cdlHomingPigeon",
+    "group": "Pattern Recognition",
+    "description": "Homing Pigeon",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLIDENTICAL3CROWS",
+    "camelCaseName": "cdlIdentical3Crows",
+    "group": "Pattern Recognition",
+    "description": "Identical Three Crows",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLINNECK",
+    "camelCaseName": "cdlInNeck",
+    "group": "Pattern Recognition",
+    "description": "In-Neck Pattern",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLINVERTEDHAMMER",
+    "camelCaseName": "cdlInvertedHammer",
+    "group": "Pattern Recognition",
+    "description": "Inverted Hammer",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLKICKING",
+    "camelCaseName": "cdlKicking",
+    "group": "Pattern Recognition",
+    "description": "Kicking",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLKICKINGBYLENGTH",
+    "camelCaseName": "cdlKickingByLength",
+    "group": "Pattern Recognition",
+    "description": "Kicking - bull/bear determined by the longer marubozu",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLLADDERBOTTOM",
+    "camelCaseName": "cdlLadderBottom",
+    "group": "Pattern Recognition",
+    "description": "Ladder Bottom",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLLONGLEGGEDDOJI",
+    "camelCaseName": "cdlLongLeggedDoji",
+    "group": "Pattern Recognition",
+    "description": "Long Legged Doji",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLLONGLINE",
+    "camelCaseName": "cdlLongLine",
+    "group": "Pattern Recognition",
+    "description": "Long Line Candle",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLMARUBOZU",
+    "camelCaseName": "cdlMarubozu",
+    "group": "Pattern Recognition",
+    "description": "Marubozu",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLMATCHINGLOW",
+    "camelCaseName": "cdlMatchingLow",
+    "group": "Pattern Recognition",
+    "description": "Matching Low",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLMATHOLD",
+    "camelCaseName": "cdlMatHold",
+    "group": "Pattern Recognition",
+    "description": "Mat Hold",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "penetration",
+        "displayName": "Penetration",
+        "defaultValue": 0.5,
+        "hint": "Percentage of penetration of a candle within another candle",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLMORNINGDOJISTAR",
+    "camelCaseName": "cdlMorningDojiStar",
+    "group": "Pattern Recognition",
+    "description": "Morning Doji Star",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "penetration",
+        "displayName": "Penetration",
+        "defaultValue": 0.3,
+        "hint": "Percentage of penetration of a candle within another candle",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLMORNINGSTAR",
+    "camelCaseName": "cdlMorningStar",
+    "group": "Pattern Recognition",
+    "description": "Morning Star",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "penetration",
+        "displayName": "Penetration",
+        "defaultValue": 0.3,
+        "hint": "Percentage of penetration of a candle within another candle",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLONNECK",
+    "camelCaseName": "cdlOnNeck",
+    "group": "Pattern Recognition",
+    "description": "On-Neck Pattern",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLPIERCING",
+    "camelCaseName": "cdlPiercing",
+    "group": "Pattern Recognition",
+    "description": "Piercing Pattern",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLRICKSHAWMAN",
+    "camelCaseName": "cdlRickshawMan",
+    "group": "Pattern Recognition",
+    "description": "Rickshaw Man",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLRISEFALL3METHODS",
+    "camelCaseName": "cdlRiseFall3Methods",
+    "group": "Pattern Recognition",
+    "description": "Rising/Falling Three Methods",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLSEPARATINGLINES",
+    "camelCaseName": "cdlSeperatingLines",
+    "group": "Pattern Recognition",
+    "description": "Separating Lines",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLSHOOTINGSTAR",
+    "camelCaseName": "cdlShootingStar",
+    "group": "Pattern Recognition",
+    "description": "Shooting Star",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLSHORTLINE",
+    "camelCaseName": "cdlShortLine",
+    "group": "Pattern Recognition",
+    "description": "Short Line Candle",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLSPINNINGTOP",
+    "camelCaseName": "cdlSpinningTop",
+    "group": "Pattern Recognition",
+    "description": "Spinning Top",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLSTALLEDPATTERN",
+    "camelCaseName": "cdlStalledPattern",
+    "group": "Pattern Recognition",
+    "description": "Stalled Pattern",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLSTICKSANDWICH",
+    "camelCaseName": "cdlStickSandwhich",
+    "group": "Pattern Recognition",
+    "description": "Stick Sandwich",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLTAKURI",
+    "camelCaseName": "cdlTakuri",
+    "group": "Pattern Recognition",
+    "description": "Takuri (Dragonfly Doji with very long lower shadow)",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLTASUKIGAP",
+    "camelCaseName": "cdlTasukiGap",
+    "group": "Pattern Recognition",
+    "description": "Tasuki Gap",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLTHRUSTING",
+    "camelCaseName": "cdlThrusting",
+    "group": "Pattern Recognition",
+    "description": "Thrusting Pattern",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLTRISTAR",
+    "camelCaseName": "cdlTristar",
+    "group": "Pattern Recognition",
+    "description": "Tristar Pattern",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLUNIQUE3RIVER",
+    "camelCaseName": "cdlUnique3River",
+    "group": "Pattern Recognition",
+    "description": "Unique 3 River",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLUPSIDEGAP2CROWS",
+    "camelCaseName": "cdlUpsideGap2Crows",
+    "group": "Pattern Recognition",
+    "description": "Upside Gap Two Crows",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CDLXSIDEGAP3METHODS",
+    "camelCaseName": "cdlXSideGap3Methods",
+    "group": "Pattern Recognition",
+    "description": "Upside/Downside Gap Three Methods",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CEIL",
+    "camelCaseName": "ceil",
+    "group": "Math Transform",
+    "description": "Vector Ceil",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CMO",
+    "camelCaseName": "cmo",
+    "group": "Momentum Indicators",
+    "description": "Chande Momentum Oscillator",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "CORREL",
+    "camelCaseName": "correl",
+    "group": "Statistic Functions",
+    "description": "Pearson's Correlation Coefficient (r)",
+    "inputs": [
+      { "name": "inReal0", "type": "number" },
+      { "name": "inReal1", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "COS",
+    "camelCaseName": "cos",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric Cos",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "COSH",
+    "camelCaseName": "cosh",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric Cosh",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "DEMA",
+    "camelCaseName": "dema",
+    "group": "Overlap Studies",
+    "description": "Double Exponential Moving Average",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "DIV",
+    "camelCaseName": "div",
+    "group": "Math Operators",
+    "description": "Vector Arithmetic Div",
+    "inputs": [
+      { "name": "inReal0", "type": "number" },
+      { "name": "inReal1", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "DX",
+    "camelCaseName": "dx",
+    "group": "Momentum Indicators",
+    "description": "Directional Movement Index",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "EMA",
+    "camelCaseName": "ema",
+    "group": "Overlap Studies",
+    "description": "Exponential Moving Average",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "EXP",
+    "camelCaseName": "exp",
+    "group": "Math Transform",
+    "description": "Vector Arithmetic Exp",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "FLOOR",
+    "camelCaseName": "floor",
+    "group": "Math Transform",
+    "description": "Vector Floor",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "HT_DCPERIOD",
+    "camelCaseName": "htDcPeriod",
+    "group": "Cycle Indicators",
+    "description": "Hilbert Transform - Dominant Cycle Period",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "HT_DCPHASE",
+    "camelCaseName": "htDcPhase",
+    "group": "Cycle Indicators",
+    "description": "Hilbert Transform - Dominant Cycle Phase",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "HT_PHASOR",
+    "camelCaseName": "htPhasor",
+    "group": "Cycle Indicators",
+    "description": "Hilbert Transform - Phasor Components",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [
+      { "name": "inPhase", "type": "number", "plotHint": "line" },
+      { "name": "quadrature", "type": "number", "plotHint": "line_dash" }
+    ]
+  },
+  {
+    "name": "HT_SINE",
+    "camelCaseName": "htSine",
+    "group": "Cycle Indicators",
+    "description": "Hilbert Transform - SineWave",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [
+      { "name": "sine", "type": "number", "plotHint": "line" },
+      { "name": "leadSine", "type": "number", "plotHint": "line_dash" }
+    ]
+  },
+  {
+    "name": "HT_TRENDLINE",
+    "camelCaseName": "htTrendline",
+    "group": "Overlap Studies",
+    "description": "Hilbert Transform - Instantaneous Trendline",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "HT_TRENDMODE",
+    "camelCaseName": "htTrendMode",
+    "group": "Cycle Indicators",
+    "description": "Hilbert Transform - Trend vs Cycle Mode",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "IMI",
+    "camelCaseName": "imi",
+    "group": "Momentum Indicators",
+    "description": "Intraday Momentum Index",
+    "inputs": [
+      { "name": "open", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "KAMA",
+    "camelCaseName": "kama",
+    "group": "Overlap Studies",
+    "description": "Kaufman Adaptive Moving Average",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "LINEARREG",
+    "camelCaseName": "linearReg",
+    "group": "Statistic Functions",
+    "description": "Linear Regression",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "LINEARREG_ANGLE",
+    "camelCaseName": "linearRegAngle",
+    "group": "Statistic Functions",
+    "description": "Linear Regression Angle",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "LINEARREG_INTERCEPT",
+    "camelCaseName": "linearRegIntercept",
+    "group": "Statistic Functions",
+    "description": "Linear Regression Intercept",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "LINEARREG_SLOPE",
+    "camelCaseName": "linearRegSlope",
+    "group": "Statistic Functions",
+    "description": "Linear Regression Slope",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "LN",
+    "camelCaseName": "ln",
+    "group": "Math Transform",
+    "description": "Vector Log Natural",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "LOG10",
+    "camelCaseName": "log10",
+    "group": "Math Transform",
+    "description": "Vector Log10",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MA",
+    "camelCaseName": "movingAverage",
+    "group": "Overlap Studies",
+    "description": "Moving average",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      },
+      { "name": "MAType", "displayName": "MA Type", "defaultValue": 0, "hint": "Type of Moving Average", "type": "MAType" }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MACD",
+    "camelCaseName": "macd",
+    "group": "Momentum Indicators",
+    "description": "Moving Average Convergence/Divergence",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "fastPeriod",
+        "displayName": "Fast Period",
+        "defaultValue": 12,
+        "hint": "Number of period for the fast MA",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      {
+        "name": "slowPeriod",
+        "displayName": "Slow Period",
+        "defaultValue": 26,
+        "hint": "Number of period for the slow MA",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      {
+        "name": "signalPeriod",
+        "displayName": "Signal Period",
+        "defaultValue": 9,
+        "hint": "Smoothing for the signal line (nb of period)",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [
+      { "name": "MACD", "type": "number", "plotHint": "line" },
+      { "name": "MACDSignal", "type": "number", "plotHint": "line_dash" },
+      { "name": "MACDHist", "type": "number", "plotHint": "histogram" }
+    ]
+  },
+  {
+    "name": "MACDEXT",
+    "camelCaseName": "macdExt",
+    "group": "Momentum Indicators",
+    "description": "MACD with controllable MA type",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "fastPeriod",
+        "displayName": "Fast Period",
+        "defaultValue": 12,
+        "hint": "Number of period for the fast MA",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      { "name": "fastMAType", "displayName": "Fast MA", "defaultValue": 0, "hint": "Type of Moving Average for fast MA", "type": "MAType" },
+      {
+        "name": "slowPeriod",
+        "displayName": "Slow Period",
+        "defaultValue": 26,
+        "hint": "Number of period for the slow MA",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      { "name": "slowMAType", "displayName": "Slow MA", "defaultValue": 0, "hint": "Type of Moving Average for slow MA", "type": "MAType" },
+      {
+        "name": "signalPeriod",
+        "displayName": "Signal Period",
+        "defaultValue": 9,
+        "hint": "Smoothing for the signal line (nb of period)",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      },
+      {
+        "name": "signalMAType",
+        "displayName": "Signal MA",
+        "defaultValue": 0,
+        "hint": "Type of Moving Average for signal line",
+        "type": "MAType"
+      }
+    ],
+    "outputs": [
+      { "name": "MACD", "type": "number", "plotHint": "line" },
+      { "name": "MACDSignal", "type": "number", "plotHint": "line_dash" },
+      { "name": "MACDHist", "type": "number", "plotHint": "histogram" }
+    ]
+  },
+  {
+    "name": "MACDFIX",
+    "camelCaseName": "macdFix",
+    "group": "Momentum Indicators",
+    "description": "Moving Average Convergence/Divergence Fix 12/26",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "signalPeriod",
+        "displayName": "Signal Period",
+        "defaultValue": 9,
+        "hint": "Smoothing for the signal line (nb of period)",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [
+      { "name": "MACD", "type": "number", "plotHint": "line" },
+      { "name": "MACDSignal", "type": "number", "plotHint": "line_dash" },
+      { "name": "MACDHist", "type": "number", "plotHint": "histogram" }
+    ]
+  },
+  {
+    "name": "MAMA",
+    "camelCaseName": "mama",
+    "group": "Overlap Studies",
+    "description": "MESA Adaptive Moving Average",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "fastLimit",
+        "displayName": "Fast Limit",
+        "defaultValue": 0.5,
+        "hint": "Upper limit use in the adaptive algorithm",
+        "type": "Double",
+        "range": { "min": 0.01, "max": 0.99 }
+      },
+      {
+        "name": "slowLimit",
+        "displayName": "Slow Limit",
+        "defaultValue": 0.05,
+        "hint": "Lower limit use in the adaptive algorithm",
+        "type": "Double",
+        "range": { "min": 0.01, "max": 0.99 }
+      }
+    ],
+    "outputs": [
+      { "name": "MAMA", "type": "number", "plotHint": "line" },
+      { "name": "FAMA", "type": "number", "plotHint": "line_dash" }
+    ]
+  },
+  {
+    "name": "MAVP",
+    "camelCaseName": "movingAverageVariablePeriod",
+    "group": "Overlap Studies",
+    "description": "Moving average with variable period",
+    "inputs": [
+      { "name": "inReal", "type": "number" },
+      { "name": "inPeriods", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "minPeriod",
+        "displayName": "Minimum Period",
+        "defaultValue": 2,
+        "hint": "Value less than minimum will be changed to Minimum period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      {
+        "name": "maxPeriod",
+        "displayName": "Maximum Period",
+        "defaultValue": 30,
+        "hint": "Value higher than maximum will be changed to Maximum period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      { "name": "MAType", "displayName": "MA Type", "defaultValue": 0, "hint": "Type of Moving Average", "type": "MAType" }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MAX",
+    "camelCaseName": "max",
+    "group": "Math Operators",
+    "description": "Highest value over a specified period",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MAXINDEX",
+    "camelCaseName": "maxIndex",
+    "group": "Math Operators",
+    "description": "Index of highest value over a specified period",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MEDPRICE",
+    "camelCaseName": "medPrice",
+    "group": "Price Transform",
+    "description": "Median Price",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MFI",
+    "camelCaseName": "mfi",
+    "group": "Momentum Indicators",
+    "description": "Money Flow Index",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" },
+      { "name": "volume", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MIDPOINT",
+    "camelCaseName": "midPoint",
+    "group": "Overlap Studies",
+    "description": "MidPoint over period",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MIDPRICE",
+    "camelCaseName": "midPrice",
+    "group": "Overlap Studies",
+    "description": "Midpoint Price over period",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MIN",
+    "camelCaseName": "min",
+    "group": "Math Operators",
+    "description": "Lowest value over a specified period",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MININDEX",
+    "camelCaseName": "minIndex",
+    "group": "Math Operators",
+    "description": "Index of lowest value over a specified period",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MINMAX",
+    "camelCaseName": "minMax",
+    "group": "Math Operators",
+    "description": "Lowest and highest values over a specified period",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [
+      { "name": "min", "type": "number", "plotHint": "line" },
+      { "name": "max", "type": "number", "plotHint": "line" }
+    ]
+  },
+  {
+    "name": "MINMAXINDEX",
+    "camelCaseName": "minMaxIndex",
+    "group": "Math Operators",
+    "description": "Indexes of lowest and highest values over a specified period",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [
+      { "name": "minIdx", "type": "number", "plotHint": "line" },
+      { "name": "maxIdx", "type": "number", "plotHint": "line" }
+    ]
+  },
+  {
+    "name": "MINUS_DI",
+    "camelCaseName": "minusDI",
+    "group": "Momentum Indicators",
+    "description": "Minus Directional Indicator",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MINUS_DM",
+    "camelCaseName": "minusDM",
+    "group": "Momentum Indicators",
+    "description": "Minus Directional Movement",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MOM",
+    "camelCaseName": "mom",
+    "group": "Momentum Indicators",
+    "description": "Momentum",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 10,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "MULT",
+    "camelCaseName": "mult",
+    "group": "Math Operators",
+    "description": "Vector Arithmetic Mult",
+    "inputs": [
+      { "name": "inReal0", "type": "number" },
+      { "name": "inReal1", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "NATR",
+    "camelCaseName": "natr",
+    "group": "Volatility Indicators",
+    "description": "Normalized Average True Range",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "OBV",
+    "camelCaseName": "obv",
+    "group": "Volume Indicators",
+    "description": "On Balance Volume",
+    "inputs": [
+      { "name": "inReal", "type": "number" },
+      { "name": "volume", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "PLUS_DI",
+    "camelCaseName": "plusDI",
+    "group": "Momentum Indicators",
+    "description": "Plus Directional Indicator",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "PLUS_DM",
+    "camelCaseName": "plusDM",
+    "group": "Momentum Indicators",
+    "description": "Plus Directional Movement",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "PPO",
+    "camelCaseName": "ppo",
+    "group": "Momentum Indicators",
+    "description": "Percentage Price Oscillator",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "fastPeriod",
+        "displayName": "Fast Period",
+        "defaultValue": 12,
+        "hint": "Number of period for the fast MA",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      {
+        "name": "slowPeriod",
+        "displayName": "Slow Period",
+        "defaultValue": 26,
+        "hint": "Number of period for the slow MA",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      { "name": "MAType", "displayName": "MA Type", "defaultValue": 0, "hint": "Type of Moving Average", "type": "MAType" }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "ROC",
+    "camelCaseName": "roc",
+    "group": "Momentum Indicators",
+    "description": "Rate of change : ((price/prevPrice)-1)*100",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 10,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "ROCP",
+    "camelCaseName": "rocP",
+    "group": "Momentum Indicators",
+    "description": "Rate of change Percentage: (price-prevPrice)/prevPrice",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 10,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "ROCR",
+    "camelCaseName": "rocR",
+    "group": "Momentum Indicators",
+    "description": "Rate of change ratio: (price/prevPrice)",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 10,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "ROCR100",
+    "camelCaseName": "rocR100",
+    "group": "Momentum Indicators",
+    "description": "Rate of change ratio 100 scale: (price/prevPrice)*100",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 10,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "RSI",
+    "camelCaseName": "rsi",
+    "group": "Momentum Indicators",
+    "description": "Relative Strength Index",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "SAR",
+    "camelCaseName": "sar",
+    "group": "Overlap Studies",
+    "description": "Parabolic SAR",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "acceleration",
+        "displayName": "Acceleration Factor",
+        "defaultValue": 0.02,
+        "hint": "Acceleration Factor used up to the Maximum value",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      },
+      {
+        "name": "maximum",
+        "displayName": "AF Maximum",
+        "defaultValue": 0.2,
+        "hint": "Acceleration Factor Maximum value",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "SAREXT",
+    "camelCaseName": "sarExt",
+    "group": "Overlap Studies",
+    "description": "Parabolic SAR - Extended",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "startValue",
+        "displayName": "Start Value",
+        "defaultValue": 0,
+        "hint": "Start value and direction. 0 for Auto, >0 for Long, <0 for Short",
+        "type": "Double",
+        "range": { "min": -3e37, "max": 3e37 }
+      },
+      {
+        "name": "offsetOnReverse",
+        "displayName": "Offset on Reverse",
+        "defaultValue": 0,
+        "hint": "Percent offset added/removed to initial stop on short/long reversal",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      },
+      {
+        "name": "accelerationInitLong",
+        "displayName": "AF Init Long",
+        "defaultValue": 0.02,
+        "hint": "Acceleration Factor initial value for the Long direction",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      },
+      {
+        "name": "accelerationLong",
+        "displayName": "AF Long",
+        "defaultValue": 0.02,
+        "hint": "Acceleration Factor for the Long direction",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      },
+      {
+        "name": "accelerationMaxLong",
+        "displayName": "AF Max Long",
+        "defaultValue": 0.2,
+        "hint": "Acceleration Factor maximum value for the Long direction",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      },
+      {
+        "name": "accelerationInitShort",
+        "displayName": "AF Init Short",
+        "defaultValue": 0.02,
+        "hint": "Acceleration Factor initial value for the Short direction",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      },
+      {
+        "name": "accelerationShort",
+        "displayName": "AF Short",
+        "defaultValue": 0.02,
+        "hint": "Acceleration Factor for the Short direction",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      },
+      {
+        "name": "accelerationMaxShort",
+        "displayName": "AF Max Short",
+        "defaultValue": 0.2,
+        "hint": "Acceleration Factor maximum value for the Short direction",
+        "type": "Double",
+        "range": { "min": 0, "max": 3e37 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "SIN",
+    "camelCaseName": "sin",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric Sin",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "SINH",
+    "camelCaseName": "sinh",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric Sinh",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "SMA",
+    "camelCaseName": "sma",
+    "group": "Overlap Studies",
+    "description": "Simple Moving Average",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "SQRT",
+    "camelCaseName": "sqrt",
+    "group": "Math Transform",
+    "description": "Vector Square Root",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "STDDEV",
+    "camelCaseName": "stdDev",
+    "group": "Statistic Functions",
+    "description": "Standard Deviation",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 5,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      {
+        "name": "nbDev",
+        "displayName": "Deviations",
+        "defaultValue": 1,
+        "hint": "Nb of deviations",
+        "type": "Double",
+        "range": { "min": -3e37, "max": 3e37 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "STOCH",
+    "camelCaseName": "stoch",
+    "group": "Momentum Indicators",
+    "description": "Stochastic",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "fastK_Period",
+        "displayName": "Fast-K Period",
+        "defaultValue": 5,
+        "hint": "Time period for building the Fast-K line",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      },
+      {
+        "name": "slowK_Period",
+        "displayName": "Slow-K Period",
+        "defaultValue": 3,
+        "hint": "Smoothing for making the Slow-K line. Usually set to 3",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      },
+      {
+        "name": "slowK_MAType",
+        "displayName": "Slow-K MA",
+        "defaultValue": 0,
+        "hint": "Type of Moving Average for Slow-K",
+        "type": "MAType"
+      },
+      {
+        "name": "slowD_Period",
+        "displayName": "Slow-D Period",
+        "defaultValue": 3,
+        "hint": "Smoothing for making the Slow-D line",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      },
+      {
+        "name": "slowD_MAType",
+        "displayName": "Slow-D MA",
+        "defaultValue": 0,
+        "hint": "Type of Moving Average for Slow-D",
+        "type": "MAType"
+      }
+    ],
+    "outputs": [
+      { "name": "slowK", "type": "number", "plotHint": "line_dash" },
+      { "name": "slowD", "type": "number", "plotHint": "line_dash" }
+    ]
+  },
+  {
+    "name": "STOCHF",
+    "camelCaseName": "stochF",
+    "group": "Momentum Indicators",
+    "description": "Stochastic Fast",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "fastK_Period",
+        "displayName": "Fast-K Period",
+        "defaultValue": 5,
+        "hint": "Time period for building the Fast-K line",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      },
+      {
+        "name": "fastD_Period",
+        "displayName": "Fast-D Period",
+        "defaultValue": 3,
+        "hint": "Smoothing for making the Fast-D line. Usually set to 3",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      },
+      {
+        "name": "fastD_MAType",
+        "displayName": "Fast-D MA",
+        "defaultValue": 0,
+        "hint": "Type of Moving Average for Fast-D",
+        "type": "MAType"
+      }
+    ],
+    "outputs": [
+      { "name": "fastK", "type": "number", "plotHint": "line" },
+      { "name": "fastD", "type": "number", "plotHint": "line" }
+    ]
+  },
+  {
+    "name": "STOCHRSI",
+    "camelCaseName": "stochRsi",
+    "group": "Momentum Indicators",
+    "description": "Stochastic Relative Strength Index",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      {
+        "name": "fastK_Period",
+        "displayName": "Fast-K Period",
+        "defaultValue": 5,
+        "hint": "Time period for building the Fast-K line",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      },
+      {
+        "name": "fastD_Period",
+        "displayName": "Fast-D Period",
+        "defaultValue": 3,
+        "hint": "Smoothing for making the Fast-D line. Usually set to 3",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      },
+      {
+        "name": "fastD_MAType",
+        "displayName": "Fast-D MA",
+        "defaultValue": 0,
+        "hint": "Type of Moving Average for Fast-D",
+        "type": "MAType"
+      }
+    ],
+    "outputs": [
+      { "name": "fastK", "type": "number", "plotHint": "line" },
+      { "name": "fastD", "type": "number", "plotHint": "line" }
+    ]
+  },
+  {
+    "name": "SUB",
+    "camelCaseName": "sub",
+    "group": "Math Operators",
+    "description": "Vector Arithmetic Substraction",
+    "inputs": [
+      { "name": "inReal0", "type": "number" },
+      { "name": "inReal1", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "SUM",
+    "camelCaseName": "sum",
+    "group": "Math Operators",
+    "description": "Summation",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "T3",
+    "camelCaseName": "t3",
+    "group": "Overlap Studies",
+    "description": "Triple Exponential Moving Average (T3)",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 5,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      },
+      {
+        "name": "VFactor",
+        "displayName": "Volume Factor",
+        "defaultValue": 0.7,
+        "hint": "Volume Factor",
+        "type": "Double",
+        "range": { "min": 0, "max": 1 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "TAN",
+    "camelCaseName": "tan",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric Tan",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "TANH",
+    "camelCaseName": "tanh",
+    "group": "Math Transform",
+    "description": "Vector Trigonometric Tanh",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "TEMA",
+    "camelCaseName": "tema",
+    "group": "Overlap Studies",
+    "description": "Triple Exponential Moving Average",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "TRANGE",
+    "camelCaseName": "trueRange",
+    "group": "Volatility Indicators",
+    "description": "True Range",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "TRIMA",
+    "camelCaseName": "trima",
+    "group": "Overlap Studies",
+    "description": "Triangular Moving Average",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "TRIX",
+    "camelCaseName": "trix",
+    "group": "Momentum Indicators",
+    "description": "1-day Rate-Of-Change (ROC) of a Triple Smooth EMA",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "TSF",
+    "camelCaseName": "tsf",
+    "group": "Statistic Functions",
+    "description": "Time Series Forecast",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "TYPPRICE",
+    "camelCaseName": "typPrice",
+    "group": "Price Transform",
+    "description": "Typical Price",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "ULTOSC",
+    "camelCaseName": "ultOsc",
+    "group": "Momentum Indicators",
+    "description": "Ultimate Oscillator",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod1",
+        "displayName": "First Period",
+        "defaultValue": 7,
+        "hint": "Number of bars for 1st period.",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      },
+      {
+        "name": "timePeriod2",
+        "displayName": "Second Period",
+        "defaultValue": 14,
+        "hint": "Number of bars fro 2nd period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      },
+      {
+        "name": "timePeriod3",
+        "displayName": "Third Period",
+        "defaultValue": 28,
+        "hint": "Number of bars for 3rd period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "VAR",
+    "camelCaseName": "variance",
+    "group": "Statistic Functions",
+    "description": "Variance",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 5,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 1, "max": 100000 }
+      },
+      {
+        "name": "nbDev",
+        "displayName": "Deviations",
+        "defaultValue": 1,
+        "hint": "Nb of deviations",
+        "type": "Double",
+        "range": { "min": -3e37, "max": 3e37 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "WCLPRICE",
+    "camelCaseName": "wclPrice",
+    "group": "Price Transform",
+    "description": "Weighted Close Price",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "WILLR",
+    "camelCaseName": "willR",
+    "group": "Momentum Indicators",
+    "description": "Williams' %R",
+    "inputs": [
+      { "name": "high", "type": "number" },
+      { "name": "low", "type": "number" },
+      { "name": "close", "type": "number" }
+    ],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 14,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  },
+  {
+    "name": "WMA",
+    "camelCaseName": "wma",
+    "group": "Overlap Studies",
+    "description": "Weighted Moving Average",
+    "inputs": [{ "name": "inReal", "type": "number" }],
+    "options": [
+      {
+        "name": "timePeriod",
+        "displayName": "Time Period",
+        "defaultValue": 30,
+        "hint": "Number of period",
+        "type": "Integer",
+        "range": { "min": 2, "max": 100000 }
+      }
+    ],
+    "outputs": [{ "name": "output", "type": "number", "plotHint": "line" }]
+  }
+]

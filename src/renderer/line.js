@@ -1,45 +1,47 @@
+// line.js
 
 import { renderPath } from './path'
 
 /**
  * Draw a horizontal straight line
- * @param ctx
- * @param y
- * @param left
- * @param right
+ * @param {Object} ctx - canvas reference
+ * @param {number} y - canvas pixel position
+ * @param {number} left - canvas pixel position
+ * @param {number} right - canvas pixel position
+ * @param {Object} opts 
  */
-export function renderHorizontalLine (ctx, y, left, right) {
-  ctx.beginPath()
-  const correction = (ctx.lineWidth % 2) ? 0.5 : 0
-  ctx.moveTo(left, y + correction)
-  ctx.lineTo(right, y + correction)
-  ctx.stroke()
-  ctx.closePath()
+export function renderLineHorizontal (ctx, y, left, right, opts) {
+  const coords = [{x:left, y:y}, {x:right, y:y}]
+  renderPath(ctx, coords, opts, () => {
+    ctx.stroke()
+    ctx.closePath()
+  })
 }
 
 /**
  * Draw a vertical straight line
- * @param ctx
- * @param x
- * @param top
- * @param bottom
+ * @param {Object} ctx - canvas reference
+ * @param {number} x - canvas pixel position
+ * @param {number} top - canvas pixel position
+ * @param {number} bottom - canvas pixel position
+ * @param {Object} opts 
  */
-export function renderVerticalLine (ctx, x, top, bottom) {
-  ctx.beginPath()
-  const correction = (ctx.lineWidth % 2) ? 0.5 : 0
-  ctx.moveTo(x + correction, top)
-  ctx.lineTo(x + correction, bottom)
-  ctx.stroke()
-  ctx.closePath()
+export function renderLineVertical (ctx, x, top, bottom, opts) {
+  coords = [{x:x, y:top}, {x:x, y,bottom}]
+  renderPath(ctx, coords, opts, () => {
+    ctx.stroke()
+    ctx.closePath()
+  })
 }
 
 /**
  * Render line - open path
- * @param ctx
- * @param coordinates
+ * @param {Object} ctx - canvas reference
+ * @param {Array} coords - array of x y coords [{x:x, y:y}, ...]
+ * @param {Object} opts 
  */
-export function renderLine (ctx, coordinates, style) {
-  renderPath(ctx, coordinates, style, () => {
+export function renderLine (ctx, coords, opts) {
+  renderPath(ctx, coords, opts, () => {
     ctx.stroke()
     ctx.closePath()
   })

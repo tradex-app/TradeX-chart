@@ -5,73 +5,63 @@ import DOM from "../utils/DOM"
 import Menu from "./widgets/menu"
 import Dialogue from "./widgets/dialogue"
 import Divider from "./widgets/divider"
+import Progress from "./widgets/progress"
 import Window from "./widgets/window"
+import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-widgets"
+import { isObject } from "../utils/typeChecks"
 
 export default class Widgets {
 
+  #id
   #name = "Widgets"
   #shortName = "widgets"
-  #mediator
+  #core
   #options
-  #parent
+  #stateMachine
+
   #widgets
-  #widgetsList = { Dialogue, Divider, Menu, Window }
+  #widgetsList = { Divider, Progress, Menu, Window, Dialogue }
   #widgetsInstances = {}
   #elements = {}
   #elWidgetsG
-  #elMenus
-  #elDividers
 
   #width
   #height
 
+  constructor (core, options) {
 
-  constructor (mediator, options) {
-
-    this.#mediator = mediator
+    this.#core = core
     this.#options = options
-    this.#widgets = options.widgets || this.#widgetsList
-    this.#elWidgetsG = this.#mediator.api.core.elWidgetsG
-    this.#parent = this.#mediator.api.parent
+    this.#widgets = {...this.#widgetsList, ...options.widgets}
+    this.#elWidgetsG = core.elWidgetsG
     this.init()
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warn(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
+  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
-  get mediator() { return this.#mediator }
+  get core() { return this.#core }
   get options() { return this.#options }
   get elements() { return this.#elements }
   get instances() { return this.#widgetsInstances }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
+  get types() { return this.#widgets }
 
   init() {
     this.mount(this.#elWidgetsG)
 
-    // api - functions / methods, calculated properties provided by this module
-    const api = this.#mediator.api
-    api.parent = this.#mediator
-    // api.elements = this.#elements
-
-    // this.#elements = {
-    //   elWidgetsG: this.#elWidgetsG,
-    // }
-
-    api.elements = 
-    {...api.elements, 
-      ...{
-        elWidgetsG: this.#elWidgetsG
-      }
-    }
-
     for (let i in this.#widgets) {
       let widget = this.#widgets[i]
       let entry = `el${widget.name}`
-      this.#elements[entry] = DOM.findBySelector(`#${api.id} .${widget.class}`)
+      this.#elements[entry] = this.#elWidgetsG.querySelector(`.${widget.class}`)
     }
   }
 
@@ -80,37 +70,49 @@ export default class Widgets {
     this.eventsListen()
 
     // start State Machine 
-    stateMachineConfig.context.origin = this
-    this.#mediator.stateMachine = stateMachineConfig
-    this.#mediator.stateMachine.start()
+    stateMachineConfig.id = this.id
+    stateMachineConfig.context = this
+    this.stateMachine = stateMachineConfig
+    this.stateMachine.start()
   }
 
-  end() {
-    // Stop and clean up the module to prevent memory leaks.
-    // It should remove: event listeners, timers, ect.
-    // Put your toys away or it will end in tears.
+  destroy() {
+    this.off("menu_open", this.onOpenMenu)
+    this.off("menu_close", this.onCloseMenu)
+    this.off("menu_off", this.onCloseMenu)
+    this.off("menuItem_selected", this.onMenuItemSelected)
+    
+    this.stateMachine.destroy()
+
+    for (let i in this.#widgetsInstances) {
+      this.delete(i)
+    }
+
+    for (let t in this.#widgets) {
+      this.#widgets[t].destroy(id)
+    }
   }
 
   // listen/subscribe/watch for parent notifications
   eventsListen() {
-    // this.on("resize", (dimensions) => this.onResize.bind(this))
+    // this.on("resize", (dimensions) => this.onResize, this)
 
-    this.on("openMenu", this.onOpenMenu.bind(this))
-    this.on("closeMenu", this.onCloseMenu.bind(this))
-    this.on("offMenu", this.onCloseMenu.bind(this))
-    this.on("menuItemSelected", this.onMenuItemSelected.bind(this))
+    this.on("menu_open", this.onOpenMenu, this)
+    this.on("menu_close", this.onCloseMenu, this)
+    this.on("menu_off", this.onCloseMenu, this)
+    this.on("menuItem_selected", this.onMenuItemSelected, this)
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onResize(dimensions) {
@@ -118,12 +120,12 @@ export default class Widgets {
   }
 
   onOpenMenu(data) {
-    console.log("onOpenMenu:", data)
+    // console.log("onOpenMenu:", data)
 
     this.#widgetsInstances[data.menu].open()
   }
   onCloseMenu(data) {
-    console.log("onCloseMenu:", data)
+    // console.log("onCloseMenu:", data)
 
     this.#widgetsInstances[data.menu].close()
   }
@@ -170,15 +172,19 @@ export default class Widgets {
   }
 
   insert(type, config) {
-    config.mediator = this.mediator
+    if (!(type in this.#widgets) || !isObject(config)) return false
+
+    config.core = this.core
     const widget = this.#widgets[type].create(this, config)
     this.#widgetsInstances[widget.id] = widget
     return widget
   }
 
-  remove(type, id) {
-    delete(this.#widgetsInstances[id])
+  delete(id) {
+    if (!isString(id)) return false
+
     this.#widgets[type].destroy(id)
+    return true
   }
 
 }

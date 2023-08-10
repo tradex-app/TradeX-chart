@@ -1,119 +1,130 @@
-/**
- * EMA
- */
- import indicator from "../components/overlays/inidcator"
- import { 
-   YAXIS_TYPES
- } from "../definitions/chart";
-import { round } from "../utils/number";
- 
- export default class EMA extends indicator {
-  name ='Exponential Moving Average'
-  shortName = 'EMA'
-  onChart = true
-  series = 'price'
-  calcParams = [6, 12, 20]
-  precision = 2
-  shouldCheckParamCount = false
-  shouldOhlc = true
-  plots = [
-    { key: 'ema6', title: 'EMA6: ', type: 'line' },
-    { key: 'ema12', title: 'EMA12: ', type: 'line' },
-    { key: 'ema20', title: 'EMA20: ', type: 'line' }
-  ]
-  defaultStyle = {
-    strokeStyle: "#C80",
-    lineWidth: '1'
-  }
-  style = {}
-  overlay
-  TALib
+// EMA.js
+// https://hackape.github.io/talib.js/modules/_index_.html#ema
 
-  // YAXIS_TYPES - default
-  static scale = YAXIS_TYPES[0]
+import Indicator from "../components/overlays/indicator"
+import { EMA as talibAPI } from "../definitions/talib-api";
+import { YAXIS_TYPES } from "../definitions/chart";
+import { bRound, limit, round } from "../utils/number";
+import { uid } from "../utils/utilities"
+
+ 
+ export default class EMA extends Indicator {
+
+  name = 'Exponential Moving Average'
+  shortName = 'EMA'
+  libName = 'EMA'
+  definition = {
+    input: {
+      inReal: [], 
+      timePeriod: 20 // 30
+    },
+    output: {
+      output: [],
+    },
+  }
+  #defaultStyle = {
+    stroke: "#C80",
+    width: '1'
+  }
+  precision = 2
+  checkParamCount = false
+  scaleOverlay = false
+  plots = [
+    { key: 'EMA_1', title: 'EMA: ', type: 'line' },
+  ]
+
+
+  static inCnt = 0
+  static primaryPane = true
+  // static scale = YAXIS_TYPES[0] // defualt
+  static colours = [
+    "#9C27B0",
+    "#9C27B0",
+    "#66BB6A",
+    "#66BB6A"
+  ]
 
 
   /**
-   * Creates an instance of RSI.
-   * @param {object} target - canvas scene
-   * @param {object} overlay - data for the overlay
-   * @param {instance} xAxis - timeline axis
-   * @param {instance} yAxis - scale axis
-   * @param {object} config - theme / styling
-   * @memberof RSI
+   * Creates an instance of EMA.
+   * @param {Object} target - canvas scene
+   * @param {Object} xAxis - timeline axis instance
+   * @param {Object} yAxis - scale axis instance
+   * @param {Object} config - theme / styling
+   * @param {Object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {Object} params - contains minimum of overlay instance
+   * @memberof EMA
    */
-  constructor(target, overlay, xAxis, yAxis, config) {
-    super(target, xAxis, yAxis, config)
+  constructor(target, xAxis=false, yAxis=false, config, parent, params) {
+    
+    super(target, xAxis, yAxis, config, parent, params) 
 
-    this.overlay = overlay
-    this.style = config.style || this.defaultStyle
-    this.TALib = xAxis.mediator.api.core.TALib
+    EMA.inCnt++
+    const overlay = params.overlay
+
+    this.id = params.overlay?.id || uid(this.shortName)
+    this.defineIndicator(overlay?.settings, talibAPI)
+    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
+    // calculate back history if missing
+    this.calcIndicatorHistory()
+    // enable processing of price stream
+    this.setNewValue = (value) => { this.newValue(value) }
+    this.setUpdateValue = (value) => { this.updateValue(value) }
+    this.addLegend()
   }
 
-  calcIndicator(input) {
-    this.overlay.data = this.TALib.EMA(input)
+  get primaryPane() { return EMA.primaryPane }
+  get defaultStyle() { return this.#defaultStyle }
+
+
+  updateLegend() {
+    this.parent.legend.update()
+  }
+  
+  legendInputs(pos=this.chart.cursorPos) {
+    if (this.overlay.data.length == 0) return false
+
+    const inputs = {}
+    const {c, colours} = super.legendInputs(pos)
+    inputs.EMA_1 = this.scale.nicePrice(this.overlay.data[c][1])
+
+    return {inputs, colours}
   }
 
+  /**
+   * Draw the current indicator range on its canvas layer and render it.
+   * @param {Object} range 
+   */
+  draw(range=this.range) {
+    if (this.overlay.data.length < 2 ) return false
 
-
-
-
-
-  regeneratePlots (params) {
-    return params.map(p => {
-      return { key: `ema${p}`, title: `EMA${p}: `, type: 'line' }
-    })
-  }
-
-  calcTechnicalIndicator (dataList, { params, plots }) {
-    let closeSum = 0
-    const emaValues = []
-    return dataList.map((kLineData, i) => {
-      const ema = {}
-      const close = kLineData.close
-      closeSum += close
-      params.forEach((p, index) => {
-        if (i >= p - 1) {
-          if (i > p - 1) {
-            emaValues[index] = (2 * close + (p - 1) * emaValues[index]) / (p + 1)
-          } else {
-            emaValues[index] = closeSum / p
-          }
-          ema[plots[index].key] = emaValues[index]
-        }
-      })
-      return ema
-    })
-  }
-
-  draw(range) {
     this.scene.clear()
 
     const data = this.overlay.data
-    const width = round(this.scene.width / range.Length, 1)
+    const width = this.xAxis.candleW
     const plots = []
     const offset = this.xAxis.smoothScrollOffset || 0
     const plot = {
-      x: (width * 0.5) + 2 + offset - (width * 2),
       w: width,
     }
 
     // account for "missing" entries because of indicator calculation
-    let o = (range.indexStart - 1 < 0) ? 0 : 2
-    let c = range.indexStart - (range.data.length - this.overlay.data.length) - o
-    let i = range.Length + o + 1
+    let o = this.Timeline.rangeScrollOffset
+    let d = range.data.length - this.overlay.data.length
+    let c = range.indexStart - d - 2
+    let i = range.Length + (o * 2) + 2
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
-        plots[range.Length + o + 1 - i] = {x: null, y: null}
+        plots.push({x: null, y: null})
       }
       else {
-        plot.y = this.yAxis.yPos(100 - data[c][1])
-        plots[range.Length + o + 1 - i] = {...plot}
+        plot.x = this.xAxis.xPos(data[c][0])
+        plot.y = this.yAxis.yPos(data[c][1])
+        plots.push({...plot})
       }
       c++
       i--
-      plot.x = plot.x + plot.w
     }
 
     this.plot(plots, "renderLine", this.style)

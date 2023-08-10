@@ -5,43 +5,41 @@
 // CANDLE_UP_HOLLOW: 'candle_up_hollow',
 // CANDLE_DOWN_HOLLOW: 'candle_down_hollow',
 // OHLC: 'ohlc',
+// AREA: 'area',
+// LINE: 'line'
 
-import { CandleStyle } from "../../definitions/style"
+import { CandleType, defaultTheme } from "../../definitions/style"
+import { isArray, isString } from "../../utils/typeChecks"
 
 export default class Candle {
 
-  areaCoordinates
+  areaCoordinates = []
 
-  constructor(scene, config) {
+  constructor(scene, theme) {
     this.scene = scene
     this.ctx = this.scene.context
     this.width = this.scene.width
-    this.cfg = config
-    this.cfg.candleType = this.cfg?.candleType || "CANDLE_SOLID"
-    this.cfg.colourCandleUp = this.cfg?.colourCandleUp || CandleStyle.COLOUR_CANDLE_UP
-    this.cfg.colourCandleDn = this.cfg?.colourCandleDn || CandleStyle.COLOUR_CANDLE_DN
-    this.cfg.colourWickUp = this.cfg?.colourWickUp || CandleStyle.COLOUR_WICK_UP
-    this.cfg.colourWickDn = this.cfg?.colourWickDn || CandleStyle.COLOUR_WICK_DN
+    this.cfg = theme
   }
 
   draw(data) {
     const ctx = this.ctx
     const hilo = data.raw[4] >= data.raw[1]
-    const bodyColour = hilo ? this.cfg.colourCandleUp : this.cfg.colourCandleDn
-    const wickColour = hilo ? this.cfg.colourWickUp : this.cfg.colourWickDn
+    const bodyColour = hilo ? this.cfg.candle.UpBodyColour : this.cfg.candle.DnBodyColour
+    const wickColour = hilo ? this.cfg.candle.UpWickColour : this.cfg.candle.DnWickColour
 
-    switch(this.cfg?.candleType) {
-      case "CANDLE_SOLID": 
+    switch(this.cfg.candle.Type) {
+      case CandleType.CANDLE_SOLID :
       this.fill = true
       break;
-      case "CANDLE_HOLLOW":
-      case "OHLC":
+      case CandleType.CANDLE_HOLLOW :
+      case CandleType.OHLC:
         this.fill = false
         break;
-      case "CANDLE_UP_HOLLOW":
+      case CandleType.CANDLE_UP_HOLLOW :
         this.fill = false || !hilo
         break;
-      case "CANDLE_DOWN_HOLLOW":
+      case CandleType.CANDLE_DOWN_HOLLOW :
         this.fill = false || hilo
       // default:
       //   this.fill = true
@@ -49,10 +47,15 @@ export default class Candle {
     }
 
     let w = Math.max(data.w -1, 1)
+    
+    if (w < 3) w = 1
+    else if (w < 5) w = 3
+    else if (w > 5) w = Math.ceil(w * 0.8)
+
     let hw = Math.max(Math.floor(w * 0.5), 1)
     let h = Math.abs(data.o - data.c)
     let max_h = data.c === data.o ? 1 : 2
-    let x = data.x + hw
+    let x = data.x // + hw
     let x05 = Math.floor(x) - 0.5
 
     ctx.save();
@@ -62,7 +65,7 @@ export default class Candle {
     ctx.moveTo(x05, Math.floor(data.h))
 
     // Wicks
-    if (this.cfg.candleType === "OHLC") {
+    if (this.cfg.candle.Type === CandleType.OHLC) {
       ctx.lineTo(x05, Math.floor(data.l))
     }
     else {
@@ -78,32 +81,47 @@ export default class Candle {
     ctx.lineTo(x05, Math.floor(data.l))
     ctx.stroke()
 
-    // Body
-    if (data.w > 1.5 && this.fill) {
 
+
+    // Body
+    if (w == 3) {
+      ctx.fillStyle = wickColour
+
+      let s = hilo ? 1 : -1
+      ctx.rect(
+        Math.floor(x - hw),
+        data.c,
+        Math.floor(hw * 2),
+        s * Math.max(h, max_h),
+      )
+      // if (!this.fill && this.cfg.candle.Type !== CandleType.OHLC) 
+        ctx.fill()
+      ctx.stroke()
+    }
+    else if (w > 3 && this.fill) {
       ctx.fillStyle = bodyColour
 
       let s = hilo ? 1 : -1
       ctx.rect(
-        Math.floor(x - hw -1),
+        Math.floor(x - hw),
         data.c,
-        Math.floor(hw * 2 + 1),
+        Math.floor(hw * 2),
         s * Math.max(h, max_h),
       )
       ctx.fill()
       ctx.stroke()
     } 
-    else if (data.w > 1.5 && !this.fill && this.cfg.candleType !== "OHLC") {
+    else if (w > 3 && !this.fill && this.cfg.candle.Type !== CandleType.OHLC) {
       let s = hilo ? 1 : -1
       ctx.rect(
-        Math.floor(x - hw -1),
+        Math.floor(x - hw),
         data.c,
-        Math.floor(hw * 2 + 1),
+        Math.floor(hw * 2),
         s * Math.max(h, max_h),
       )
       ctx.stroke()
     } 
-    else if (this.cfg.candleType === "OHLC") {
+    else if (this.cfg.candle.Type === CandleType.OHLC) {
       // ctx.strokeStyle = wickColour
       ctx.beginPath()
       ctx.moveTo(x05 - hw, data.o)
@@ -114,8 +132,8 @@ export default class Candle {
       ctx.stroke()
     }
     else {
-        // candle to thin for fill, just draw paths
-        ctx.strokeStyle = bodyColour
+        // candle too thin for fill, just draw paths
+        ctx.strokeStyle = wickColour
 
         ctx.beginPath()
         ctx.moveTo(
@@ -141,86 +159,61 @@ export default class Candle {
   }
 
   areaRender() {
+    const coords = this.areaCoordinates
+
+    // Nothing to process
+    if ( !isArray(coords) || coords.length == 0) return
+
+    let ctx = this.ctx
+    let cfg = this.cfg.candle
+    let fill
+    let w = Math.max(coords[0].w -1, 1)
+        w = (w > 5) ? Math.ceil(w * 0.8) : w
+    let hw = Math.max(Math.floor(w * 0.5), 1)
+    let x = coords[0].x // + hw
+    let x05 = Math.floor(x) - 0.5
+    let start = [coords[0].x, coords[0].h]
+
     ctx.save();
+    ctx.strokeStyle = cfg.AreaLineColour || cfg.UpBodyColour || cfg.DnBodyColour
+    ctx.lineWidth = 1;
     ctx.beginPath()
+    ctx.moveTo(coords[0].x, coords[0].h);
 
-    let coords = this.areaCoordinates
-    for (let i = 0; i < coords.length; i++) {
-      const ctx = this.ctx
-      const hilo = coords[i].raw[4] >= data[i+1].raw[4]
+    let i = 0
+    while ( i < coords.length) {
+      ctx.lineTo(coords[i].x, coords[i].h);
+      i++
+    }
 
+    if (cfg?.Type == "area") {
+      fill= ctx.createLinearGradient(0, 0, 0, this.scene.height);
+
+      if (isArray(cfg.AreaFillColour)) {
+        for (let [index, value] of cfg.AreaFillColour.entries()) {
+          fill.addColorStop(index, value)
+        }
+      }
+      else if (isString())
+        fill = cfg.AreaFillColour
+      else
+        fill = cfg.UpBodyColour || cfg.DnBodyColour
+
+      // render line
+      ctx.stroke();
+
+      ctx.lineTo(coords[i-1].x, this.scene.height)
+      ctx.lineTo(start[0], this.scene.height)
       
+      ctx.fillStyle = fill
+      ctx.closePath();
+      ctx.fill();
     }
+    else
+      ctx.stroke();
+  
     ctx.restore();
+    coords.length = 0
   }
 }
-
-
-// Convert to layout
-// Calculates positions and sizes for candlestick
-// and volume bars for the given subset of data
-
-export function layout_cnv(self) {
-  var $p = self.$props;
-  var sub = $p.data;
-  var t2screen = $p.layout.t2screen;
-  var layout = $p.layout;
-  var candles = [];
-  var volume = []; // The volume bar height is determined as a percentage of
-  // the chart's height (VOLSCALE)
-
-  var maxv = Math.max.apply(Math, _toConsumableArray(sub.map(function (x) {
-    return x[5];
-  })));
-  var vs = $p.config.VOLSCALE * layout.height / maxv;
-  var x1,
-      x2,
-      w,
-      avg_w,
-      mid,
-      prev = undefined; // Subset interval against main interval
-
-  var _new_interval = new_interval(layout, $p, sub),
-      _new_interval2 = _slicedToArray(_new_interval, 2),
-      interval2 = _new_interval2[0],
-      ratio = _new_interval2[1];
-
-  var px_step2 = layout.px_step * ratio;
-  var splitter = px_step2 > 5 ? 1 : 0; // A & B are current chart tranformations:
-  // A === scale,  B === Y-axis shift
-
-  for (var i = 0; i < sub.length; i++) {
-    var p = sub[i];
-    mid = t2screen(p[0]) + 1; // Clear volume bar if there is a time gap
-
-    if (sub[i - 1] && p[0] - sub[i - 1][0] > interval2) {
-      prev = null;
-    }
-
-    x1 = prev || Math.floor(mid - px_step2 * 0.5);
-    x2 = Math.floor(mid + px_step2 * 0.5) - 0.5; // TODO: add log scale support
-
-    candles.push({
-      x: mid,
-      w: layout.px_step * $p.config.CANDLEW * ratio,
-      o: Math.floor(p[1] * layout.A + layout.B),
-      h: Math.floor(p[2] * layout.A + layout.B),
-      l: Math.floor(p[3] * layout.A + layout.B),
-      c: Math.floor(p[4] * layout.A + layout.B),
-      raw: p
-    });
-    volume.push({
-      x1: x1,
-      x2: x2,
-      h: p[5] * vs,
-      green: p[4] >= p[1],
-      raw: p
-    });
-    prev = x2 + splitter;
-  }
-
-  return {
-    candles: candles,
-    volume: volume
-  };
-}
+  

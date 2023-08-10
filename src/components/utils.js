@@ -6,132 +6,173 @@ import DOM from "../utils/DOM"
 import { UtilsStyle } from "../definitions/style"
 import { CLASS_UTILS } from "../definitions/core"
 import utilsList from "../definitions/utils"
-import indicators from "../definitions/indicators"
+import Indicators from "../definitions/indicators"
+import { debounce } from "../utils/utilities"
+import { isObject } from "../utils/typeChecks"
+import StateMachine from "../scaleX/stateMachne"
+import stateMachineConfig from "../state/state-utils"
 
 
 export default class UtilsBar {
 
   #name = "Utilities"
   #shortName = "utils"
-  #mediator
+  #core
   #options
   #elUtils
   #utils
-  #core
   #widgets
   #indicators
   #menus = {}
+  #utilsEvents = {}
+  #stateMachine
+  #timers = {}
 
-  constructor (mediator, options) {
+  constructor (core, options) {
 
-    this.#mediator = mediator
+    this.#core = core
     this.#options = options
-    this.#elUtils = mediator.api.elements.elUtils
-    this.#utils = utilsList || options.utilsBar
-    this.#core = this.#mediator.api.core
-    this.#widgets = this.#mediator.api.core.WidgetsG
-    this.#indicators = this.options.indicators || indicators
+    this.#elUtils = core.elUtils
+    this.#utils = core.config?.utilsBar || utilsList
+    this.#widgets = core.WidgetsG
+    this.#indicators = core.indicatorClasses || Indicators
     this.init()
   }
 
-  log(l) { this.#mediator.log(l) }
-  info(i) { this.#mediator.info(i) }
-  warning(w) { this.#mediator.warn(w) }
-  error(e) { this.#mediator.error(e) }
+  log(l) { this.#core.log(l) }
+  info(i) { this.#core.info(i) }
+  warn(w) { this.#core.warn(w) }
+  error(e) { this.#core.error(e) }
 
   get name() {return this.#name}
   get shortName() {return this.#shortName}
-  get mediator() {return this.#mediator}
+  get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elUtils) }
+  get stateMachine() { return this.#stateMachine }
 
   init() {
-    this.mount(this.#elUtils)
+    // mount the default or custom utils bar definition
+    this.#elUtils.innerHTML = this.#elUtils.defaultNode(this.#utils)
 
     this.log(`${this.#name} instantiated`)
   }
 
   start() {
+    // activate utils icons and menus
     this.initAllUtils()
-
     // set up event listeners
     this.eventsListen()
+    // start state machine
+    // this.#stateMachine = new StateMachine(stateMachineConfig, this)
   }
 
-  end() {
+  destroy() {
+    // this.stateMachine.destroy()
     // remove event listeners
-    const api = this.#mediator.api
+    const api = this.#core
     const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
 
     for (let util of utils) {
+      let id = util.id.replace('TX_', '')
       for (let u of this.#utils) {
         if (u.id === id)
-          util.removeEventListener("click", this.onIconClick)
+          util.removeEventListener("click", this.#utilsEvents[id].click)
+          util.removeEventListener("pointerover", this.#utilsEvents[id].pointerover)
+          util.removeEventListener("pointerout", this.#utilsEvents[id].pointerout)
       }
     }
+
+    this.off("utils_indicators", this.onIndicators)
+    this.off("utils_timezone", this.onTimezone)
+    this.off("utils_settings", this.onSettings)
+    this.off("utils_screenshot", this.onScreenshot)
   }
 
   eventsListen() {
-    this.on("utils_indicators", (e) => { this.onIndicators(e) })
-    this.on("utils_timezone", (e) => { this.onTimezone(e) })
-    this.on("utils_settings", (e) => { this.onSettings(e) })
-    this.on("utils_screenshot", (e) => { this.onScreenshot(e) })
-    // this.on("resize", (dimensions) => this.onResize.bind(this))
-
+    this.on("utils_indicators", this.onIndicators, this)
+    this.on("utils_timezone", this.onTimezone, this)
+    this.on("utils_settings", this.onSettings, this)
+    this.on("utils_screenshot", this.onScreenshot, this)
+    // this.on("resize", (dimensions) => this.onResize, this)
   }
   
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onIconClick(e) {
-    let evt = e.currentTarget.dataset.event,
-        menu = e.currentTarget.dataset.menu || false,
+    // if (!isObject(e.originalTarget)) return false
+
+    const target = DOM.findTargetParentWithClass(e.target, "icon-wrapper")
+    if (!isObject(target)) return false
+    const now = Date.now()
+    if (now - this.#timers[target.id] < 1000) return false
+    this.#timers[target.id] = now
+
+    let evt = target.dataset.event;
+    let menu = target.dataset.menu || false,
         data = {
-          target: e.currentTarget.id,
+          target: target.id,
           menu: menu,
-          evt: e.currentTarget.dataset.event
+          evt: evt
         };
-        
+    let action = target.dataset.action
+    
     this.emit(evt, data)
 
-    if (menu) this.emit("openMenu", data)
+    if (menu) this.emit("menu_open", data)
     else {
-      this.emit("menuItemSelected", data)
-      this.emit("utilSelected", data)
+      // this.emit("menuItem_selected", data)
+      this.emit("util_selected", data)
     }
+
+    if (action) action(data, this.#core)
   }
 
-  mount(el) {
-    el.innerHTML = this.defaultNode()
+  onIconOver(e) {
+    const svg = e.currentTarget.querySelector('svg');
+          svg.style.fill = UtilsStyle.COLOUR_ICONHOVER
+  }
+
+  onIconOut(e) {
+    const svg = e.currentTarget.querySelector('svg');
+          svg.style.fill = UtilsStyle.COLOUR_ICON
   }
 
   initAllUtils() {
-    const api = this.#mediator.api
-    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
+    const utils = this.#elUtils.querySelectorAll(`.icon-wrapper`)
 
     for (let util of utils) {
+
+      this.#timers[util.id] = 0
 
       let id = util.id.replace('TX_', ''),
           svg = util.querySelector('svg');
           svg.style.fill = UtilsStyle.COLOUR_ICON
           svg.style.height = "90%"
 
-
+      // iterate over default or custom utils bar definition
       for (let u of this.#utils) {
         if (u.id === id) {
-          util.addEventListener("click", this.onIconClick.bind(this))
+          this.#utilsEvents[id] = {}
+          this.#utilsEvents[id].click = this.onIconClick.bind(this) // debounce(this.onIconClick, 50, this) // this.onIconClick.bind(this)
+          this.#utilsEvents[id].pointerover = this.onIconOver.bind(this)
+          this.#utilsEvents[id].pointerout = this.onIconOut.bind(this)
+          util.addEventListener("click", this.#utilsEvents[id].click)
+          util.addEventListener("pointerover", this.#utilsEvents[id].pointerover)
+          util.addEventListener("pointerout", this.#utilsEvents[id].pointerout)
 
-          if (u.id === "indicators") u.sub = Object.values(this.#indicators)
+          if (id === "indicators") u.sub = Object.values(this.#indicators)
 
           if (u?.sub) {
             let config = {
@@ -147,41 +188,22 @@ export default class UtilsBar {
     }
   }
 
-  defaultNode() {
-    let utilsBar = ""
-    for (const util of this.#utils) {
-      utilsBar += this.iconNode(util)
-    }
-
-    return utilsBar
-  }
-
-  iconNode(util) {
-    const iconStyle = `display: inline-block; height: ${this.#elUtils.clientHeight}px; padding-top: 2px`
-    const menu = ("sub" in util) ? `data-menu="true"` : ""
-    return  `
-      <div id="TX_${util.id}" data-event="${util.event}" ${menu} class="icon-wrapper" style="${iconStyle}">${util.icon}</div>\n
-    `
-  }
-
-
   onIndicators(data) {
-    console.log(`Indicator:`,data)
+    // console.log(`Indicator:`,data)
   }
 
   onTimezone(data) {
-    console.log(`Timezone:`,data)
+    // console.log(`Timezone:`,data)
     this.#core.notImplemented()
   }
 
   onSettings(data) {
-    console.log(`Settings:`,data)
+    // console.log(`Settings:`,data)
     this.#core.notImplemented()
   }
 
   onScreenshot(data) {
-    console.log(`Screenshot:`,data)
-    this.#core.notImplemented()
+    this.#core.downloadImage()
   }
 
 

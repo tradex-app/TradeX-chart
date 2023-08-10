@@ -5,7 +5,7 @@ import Window from "./window";
 
 export default class Modal extends Window {
 
-  static type = "window"
+  static type = "Modal"
 
   constructor(widgets, config) {
     super()
@@ -15,4 +15,6 @@ export default class Modal extends Window {
     this.config = config
   }
   
+  get type() { return Modal.type }
+
 }

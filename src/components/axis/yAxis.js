@@ -1,42 +1,69 @@
 // yAxis.js
 
 import Axis from "./axis";
-import { log10, power, precision, round } from "../../utils/number";
+import { bRound, limit, log10, power, precision, round } from "../../utils/number";
 import { isNumber } from "../../utils/typeChecks";
 
 import { 
   PRICEDIGITS, 
   YAXIS_STEP,
+  YAXIS_GRID,
   YAXIS_TYPES
 } from "../../definitions/chart";
-import { YAxisStyle } from "../../definitions/style";
+import { time_start } from "../../utils/time";
 
 export default class yAxis extends Axis {
 
+  #source
   #parent
   #chart
+  #core
 
   #yAxisType = YAXIS_TYPES[0]  // default, log, percent
+  #mode = "automatic"
+  #transform = {
+    automatic: {
+      get max() { return this.range?.valueMax },
+      get min() { return this.range?.valueMin },
+      get mid() { return this.range?.valueMin + (this.range?.valueDiff * 0.5) },
+      get diff() { return this.range?.valueDiff },
+      get zoom() { return 1 },
+      get offset() { return 0 },
+      range: null
+    },
+    manual: {
+      max: 1,
+      min: 0,
+      mid: 0.5,
+      diff: 1,
+      zoom: 1,
+      offset: 0
+    }
+  }
   #yAxisPadding = 1.04
   #yAxisStep = YAXIS_STEP
   #yAxisDigits = PRICEDIGITS
-  #yAxisRound = 3
   #yAxisTicks = 3
   #yAxisGrads
 
-  constructor(parent, chart, yAxisType=YAXIS_TYPES[0]) {
-    super()
+  #range
+
+  constructor(parent, chart, yAxisType=YAXIS_TYPES[0], range) {
+    super(parent)
     this.#chart = chart
-    this.#parent = parent 
+    this.#parent = parent
+    this.#source = parent.parent
     this.yAxisType = yAxisType
+
+    range = (range) ? range : this.core.range
+    this.setRange(range)
   }
 
-  get chart() { return this.#chart } //this.#parent.mediator.api.core.Chart }
-  get data() { return this.chart.data }
-  get range() { return this.#parent.mediator.api.core.range }
+  get chart() { return this.#chart }
+  get range() { return this.#range }
   get height() { return this.chart.height }
-  get rangeH() { return this.range.height * this.yAxisPadding }
-  get yAxisRatio() { return this.height / this.range.height }
+  get rangeH() { return this.#range.diff * this.yAxisPadding }
+  get yAxisRatio() { return this.getYAxisRatio() }
   get yAxisPrecision() { return this.yAxisCalcPrecision }
   set yAxisPadding(p) { this.#yAxisPadding = p }
   get yAxisPadding() { return this.#yAxisPadding }
@@ -47,10 +74,16 @@ export default class yAxis extends Axis {
   set yAxisTicks(t) { this.#yAxisTicks = isNumber(t) ? t : 0 }
   get yAxisTicks() { return this.#yAxisTicks }
   get yAxisGrads() { return this.#yAxisGrads }
+  set mode(m) { this.setMode(m) }
+  get mode() { return this.#mode }
+  set offset(o) { this.setOffset(o) }
+  get offset() { return this.#range.offset }
+  set zoom(z) { this.setZoom(z) }
+  get zoom() { return this.#range.zoom }
 
-  calcHeight() {
-    let api = this.#chart.mediator.api
-    return api.height - api.utilsW - api.scaleW
+  getYAxisRatio() {
+    // const diff = (this.#mode == "automatic") ? this.#range.diff : this.#transform.diff
+    return this.height / this.#range.diff
   }
 
   yAxisRangeBounds() {
@@ -66,8 +99,8 @@ export default class yAxis extends Axis {
   }
 
   yAxisCalcPrecision() {
-    let integerCnt = this.numDigits(this.range.priceMax)
-    // let decimalCnt = this.precision(this.range.priceMax)
+    let integerCnt = this.numDigits(this.#range.max)
+    // let decimalCnt = this.precision(this.#range.max)
     return this.yDigits - integerCnt
   }
 
@@ -78,113 +111,249 @@ export default class yAxis extends Axis {
   /**
    * return canvas y co-ordinate
    * handles Y Axis modes: default, log, percentate
-   * @param {number} yData - chart price or offchart indicator y data
-   * @return {number}  
+   * @param {number} y - chart price or secondary indicator y data
+   * @returns {number}  
    * @memberof yAxis
    */
-  yPos(yData) {
+  yPos(y) {
     switch(this.yAxisType) {
-      case "percent" :
-        return this.p100toPixel(yData)
-        break;
-      case "log" :
-        return this.$2Pixel(log10(yData))
-        break;
-      default :
-        return this.$2Pixel(yData)
+      case "percent" : return bRound(this.p100toPixel(y))
+      case "log" : return bRound(this.$2Pixel(log10(y)))
+      default : return bRound(this.$2Pixel(y))
     }
   }
 
   /**
    * return chart price
-   * handles Y Axis modes: default, log, percentate
+   * handles Y Axis modes: default, log, percentage
    * @param {number} y
+   * @returns {number}
    * @memberof yAxis
    */
   yPos2Price(y) {
     return this.pixel2$(y)
   }
 
-  $2Pixel(yData) {
-    let height = yData - this.range.priceMin
+  /**
+   * convert price (YAxis value) to y pixel position relative top left (0,0)
+   * @param {number} y - price
+   * @returns {number} - y pixel position
+   * @memberof yAxis
+   */
+  $2Pixel(y) {
+    const height = y - this.#range.min
+    const yPos = this.height - (height * this.yAxisRatio)
+    return yPos
+  }
+
+  /**
+   * convert last stream value to y pixel position relative top left (0,0)
+   * @param {number} y - last stream value 
+   * @returns {number} - y pixel position
+   * @memberof yAxis
+   */
+  lastYData2Pixel(y) {
+    let height = y - this.core.stream.lastPriceMin
     let yPos = this.height - (height * this.yAxisRatio)
     return yPos
   }
 
+  /**
+   * convert pixel position to price (YAxis value)
+   * @param {number} y - pixel position relative top left (0,0)
+   * @returns {number} - price (YAxis value)
+   * @memberof yAxis
+   */
   pixel2$(y) {
     let ratio = (this.height - y) / this.height
-    let adjust = this.range.height * ratio
-    return this.range.priceMin + adjust
+    let adjust = this.#range.diff * ratio
+    return this.#range.min + adjust
   }
 
-  p100toPixel(yData) {
-    return this.height * yData / 100
+  /**
+   * convert percentage scale to y pixel position relative top left (0,0)
+   * @param {number} y - percentage
+   * @returns {number} - y pixel position
+   * @memberof yAxis
+   */
+  p100toPixel(y) {
+      let ratio = this.height / this.#range.diff
+      return (y - this.#range.max) * -1 * ratio
+  }
+
+  yAxisTransform() {
+
+  }
+
+  /**
+   * set YAxis mode - automatic or manual positioning and scaling
+   * @param {string} m - "automatic" or "manual"
+   * @returns {boolean} - success or failure
+   * @memberof yAxis
+   */
+  setMode(m) {
+    if (!["automatic","manual"].includes(m)) return false
+
+    const t = this.#transform
+    if (this.mode == "automatic" && m == "manual") {
+      t.manual.zoom = 0
+      t.manual.max = this.#range.valueMax
+      t.manual.min = this.#range.valueMin
+      this.#mode = m
+    }
+    else if (this.mode == "manual" && m == "automatic") {
+      t.manual.zoom = 0
+      this.#mode = m
+    }
+    return true
+  }
+
+  setOffset(o) {
+    if (!isNumber(o) || o == 0 || this.#mode !== "manual") return false
+
+    const t = this.#transform
+    let max = this.pixel2$(o * -1)
+    let min = this.pixel2$(this.height - o)
+    let delta = max - min;
+    t.manual.min = min
+    t.manual.max = max
+    t.manual.mid = (delta) / 2
+    t.manual.diff = delta
+    t.manual.zoom = 0
+  }
+
+  setZoom(z) {
+    if (!isNumber(z) || this.#mode !== "manual") return false
+
+    const t = this.#transform
+    // const r = (z == 0) ? 0 : z / this.height
+
+      let min = t.manual.min
+      let max = t.manual.max
+    const delta = max - min;
+    const delta10P = delta * 0.01;
+    const change = z * delta10P;
+          min -= change;
+          max += change;
+    
+    // if (max < min || min <= delta)  return
+    if (max < min || min <= Infinity * -1 || max >= Infinity)  return
+
+    t.manual.max =  max
+    t.manual.min = min // (min >= 0.001)? min : 0.001
+    t.manual.mid = (delta) / 2
+    t.manual.diff = delta
+    t.manual.zoom = change
+
+    this.calcGradations()
+  }
+
+  setRange(range) {
+    this.#transform.automatic.range = range
+    this.#range = new Proxy(range, {
+      get: (obj, prop) => {
+        const m = this.#mode
+        const t = this.#transform
+        switch (prop) {
+          case "max": return t[m][prop] // "valueMax"
+          case "min":  return t[m][prop] // "valueMin"
+          case "mid": return t[m][prop] // "priceMid"
+          case "diff": return t[m][prop] // "valueDiff"
+          case "zoom": return t[m][prop]
+          case "offset": return t[m][prop]
+          default: return obj[prop]
+        }
+      }
+    })
   }
 
   calcGradations() {
-
+    let max, min, off;
     switch (this.yAxisType) {
       case "percent":
-        this.#yAxisGrads = this.gradations(100, 0, false)
+        max = (this.#range.max > 0) ? this.#range.max : 100
+        min = (this.#range.min > 0) ? this.#range.min : 0
+        off = this.#range.offset
+        this.#yAxisGrads = this.gradations(max + off, min + off)
         break;
       default:
-        this.#yAxisGrads = this.gradations(this.range.priceMax, this.range.priceMin)
+        max = (this.#range.max > 0) ? this.#range.max : 1
+        min = (this.#range.min > 0) ? this.#range.min : 0
+        off = this.#range.offset
+        this.#yAxisGrads = this.gradations(max + off, min + off)
         break;
     }
+    return this.#yAxisGrads
   }
 
-  gradations(max, min, decimals=true) {
-    const rangeMid = (max + min) * 0.5
-    const midH = this.height * 0.5
-    let digits = this.countDigits(rangeMid)
-    const scaleMid = this.niceValue(digits, decimals)
+  gradations(max, min, decimals=true, fixed=false) {
+      let digits,
+          rangeH,
+          yGridSize;
+    const scaleGrads = [];
 
-    const scaleGrads = [[scaleMid, round(midH), digits]]
+    // roughly divide the yRange into cells
+    rangeH = max - min
+    rangeH = (this.rangeH > 0) ? this.rangeH : 1
+    yGridSize = (rangeH)/(this.height / (this.core.theme.yAxis.fontSize * 1.75));
 
-    let grad = round(power(log10(midH), 2) - 1),
-        step$ = (max - scaleMid) / grad,
-        stepP = midH / grad,
-        upper = scaleMid + step$,
-        pos = midH - stepP,
-        nice, 
-        entry;
-    while (upper <= max) {
-      digits = this.countDigits(upper)
-      nice = this.niceValue(digits, decimals)
-      entry = [nice, round(pos), digits]
-      scaleGrads.unshift(entry)
-      upper += step$
+    // try to find a nice number to round to
+    let niceNumber = Math.pow( 10 , Math.ceil( Math.log10( yGridSize ) ) );
+    if ( yGridSize < 0.25 * niceNumber ) niceNumber = 0.25 * niceNumber;
+    else if ( yGridSize < 0.5 * niceNumber ) niceNumber = 0.5 * niceNumber;
+
+    // find next largest nice number above yStart
+    var yStartRoundNumber = Math.ceil( min/niceNumber ) * niceNumber;
+    // find next lowest nice number below yEnd
+    var yEndRoundNumber = Math.floor( max/niceNumber ) * niceNumber;
+
+    let pos = this.height,
+        step$ = (yEndRoundNumber - yStartRoundNumber) / niceNumber,
+        stepP = this.height / step$,
+        step = this.countDigits(step$),
+        nice;
+
+    for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
+    {
+      digits = this.countDigits(y)
+      nice = this.niceValue(digits, decimals, step)
+      scaleGrads.push([nice, round(pos), digits])
+
       pos -= stepP
     }
-    let lower = scaleMid - step$
-        pos = midH + stepP
-    while (lower >= min) {
-      digits = this.countDigits(lower)
-      nice = this.niceValue(digits, decimals)
-      entry = [nice, round(pos), digits]
-      scaleGrads.push(entry)
-      lower -= step$
-      pos += stepP
-    }
+
+    // remove first or last grads if too close to the edge
+    // if (this.#mode !== "manual" && scaleGrads.length !== 0) {
+
+    //   const theme = this.core.theme.yAxis
+    //   if (scaleGrads.slice(-1)[0][1] <= theme.fontSize * 0.1) {
+    //     scaleGrads.pop()
+    //   }
+
+    //   if (scaleGrads[0][1] >= this.height - (theme.fontSize * 0.1)) {
+    //     scaleGrads.shift()
+    //   }
+    // }
+
     return scaleGrads
   }
 
-  niceValue(digits, decimals=true) {
+  niceValue(digits, decimals=true, step) {
     if (digits.integers) {
-      let x = digits.integers - this.#yAxisRound
-      if (x > 0) {
-        let factor = power(10, x)
+      let x = step.integers
+      if (x - 2 > 0) {
+        let factor = power(10, x - 2)
         return Math.floor(digits.value / factor) * factor
       }
       else {
         if (!decimals) return Math.floor(digits.value)
-        x = (x -1) * -1
+        x = (x > 0)? x : x * -1
         return round(digits.value, x)
       }
     }
     else {
-      let y = digits.decimals - this.#yAxisRound
-      y = (y -1) * -1
+      let y = digits.decimals - step.decimals
+      y = (y > 0)? y : y * -1
       return round(digits.value, y)
     }
   }
@@ -195,7 +364,7 @@ export default class yAxis extends Axis {
         cnt2 = 4 - digits.integers
 
     if (cnt < 1) {
-      let decimals = digits.decimals + cnt
+      let decimals = limit(digits.decimals + cnt, 0, 100)
       value = Number.parseFloat(value).toFixed(decimals)
     }
     else if (cnt2 < 1) {
@@ -205,45 +374,5 @@ export default class yAxis extends Axis {
 
     return value
   }
-
-  draw() {
-    // calculate Y Axis gradations for labels and overlays
-    this.calcGradations()
-    this.drawLabels()
-    this.drawOverlays()
-  }
-
-  drawLabels() {
-    this.#parent.layerLabels.scene.clear()
-
-    const grads = this.#yAxisGrads
-    const ctx = this.#parent.layerLabels.scene.context
-    ctx.save();
-    ctx.strokeStyle = YAxisStyle.COLOUR_TICK
-    ctx.fillStyle = YAxisStyle.COLOUR_TICK
-    ctx.font = YAxisStyle.FONT_LABEL
-    for (let tick of grads) {
-      ctx.fillText(tick[0], this.yAxisTicks + 5, tick[1] + 4)
-
-      ctx.beginPath()
-      ctx.moveTo(0, tick[1])
-      ctx.lineTo(this.yAxisTicks, tick[1])
-      ctx.stroke()
-    }
-    ctx.restore();
-  }
-
-  drawOverlays() {
-    this.#parent.layerOverlays.scene.clear()
-
-    const grads = this.#yAxisGrads
-    const ctx = this.#parent.layerOverlays.scene.context
-    ctx.save();
-
-// draw overlays
-
-    ctx.restore();
-  }
-
 
 }

@@ -1,4 +1,4 @@
-// state-chart.js
+// state-scale.js
 
 export default 
 {
@@ -8,6 +8,8 @@ export default
   states: {
     idle: {
       onEnter(data) {
+        this.context.origin.cursor = "ns-resize"
+
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
       onExit(data) {
@@ -44,16 +46,10 @@ export default
             // console.log('transition action for "yAxis_100" in "idle" state')
           },
         },
-        chart_pan: {
-          target: 'chart_pan',
+        setRange: {
+          target: 'setRange',
           action (data) {
-            // console.log('Scale: from "idle" to "chart_pan" state')
-          },
-        },
-        chart_zoom: {
-          target: 'chart_zoom',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "chart_zoom"`)
+            // console.log(`${this.id}: transition from "${this.state}" to  "setRange"`)
           },
         },
       }
@@ -74,31 +70,7 @@ export default
         },
       }
     },
-    chart_pan: {
-      onEnter(data) {
-        // console.log('Scale: chart_pan: onEnter')
-      },
-      onExit(data) {
-        // console.log('Scale: chart_pan: onExit')
-      },
-      on: {
-        chart_pan: {
-          target: 'chart_pan',
-          action (data) {
-            // console.log('Scale: transition action for "chart_panDone" in "chart_pan" state')
-            this.context.origin.draw()
-          },
-        },
-        chart_panDone: {
-          target: 'idle',
-          action (data) {
-            // console.log('Scale: transition action for "chart_panDone" in "chart_pan" state')
-            this.context.origin.draw() 
-          },
-        },
-      }
-    },
-    chart_zoom: {
+    setRange: {
       onEnter(data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
@@ -110,7 +82,7 @@ export default
           target: 'idle',
           condition: 'zoomDone',
           action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to "chart_zoom"`)
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
             this.context.origin.draw()
           },
         },
@@ -118,6 +90,7 @@ export default
     },
   },
   guards: {
+    receiver () { return (this.eventData.scale.id == this.context.origin.id) },
     zoomDone () { return true },
   }
 }

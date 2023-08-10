@@ -1,56 +1,37 @@
 // divider.js
-// dragable divider to resize off chart indicators
+// dragable divider to resize chart panes
 
 import DOM from "../../utils/DOM"
-import {
-  CLASS_DIVIDERS
-} from "../../definitions/core"
-import {
-  DIVIDERHEIGHT
-} from "../../definitions/chart"
-import {
-  InputController,
-  Keys
-} from "../../input/controller"
 import { isNumber } from "../../utils/typeChecks"
+import Input from "../../input"
+import { CLASS_DIVIDERS } from "../../definitions/core"
+import { DIVIDERHEIGHT } from "../../definitions/chart"
 
 
 export default class Divider {
 
   #id
-  #widgets
-  #offChart
-  #mediator
   #core
+  #config
+  #theme
+  #widgets
+  #chartPane
 
   #elDividers
   #elDivider
-  #elOffChart
 
   #cursorPos
-  #controller
+  #input
 
   static dividerList = {}
   static divideCnt = 0
   static class = CLASS_DIVIDERS
   static name = "Dividers"
-  static type = "divider"
-
-
-  constructor(widgets, config) {
-    this.#widgets = widgets
-    this.#offChart = config.offChart
-    this.#mediator = config.mediator
-    this.#core = this.#mediator.api.core
-    this.#id = config.id
-    this.#elDividers = widgets.elements.elDividers
-    this.#elOffChart = config.offChart.elOffChart
-    this.init()
-  }
+  static type = "Divider"
 
   static create(widgets, config) {
 
-    const id = `divider${++Divider.divideCnt}`
+    const id = `${config.core.id}_divider_${++Divider.divideCnt}`
     config.id = id
 
     // add entry
@@ -59,20 +40,48 @@ export default class Divider {
     return Divider.dividerList[id]
   }
 
-  static destroy(id) {
-    Divider.dividerList[id].end()
-
+  static destroy() {
+    // destroy all dividers
+    for (let id in Divider.dividerList) {
+      Divider.dividerList[id].destroy()
+    }
     // remove entry
     delete Divider.dividerList[id]
   }
 
+  static defaultNode() {
+    const dividersStyle = `position: absolute;`
+    const node = `
+  <div slot="widget" class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
+  `
+    return node
+  }
+
+  constructor(widgets, config) {
+
+    const cfg = {...config}
+
+    this.#widgets = widgets
+    this.#core = cfg.core
+    this.#config = cfg
+    this.#theme = cfg.core.theme
+    this.#id = cfg.id
+    this.#chartPane = cfg.chartPane
+    this.#elDividers = widgets.elements.elDividers
+    this.init()
+  }
+
   get el() { return this.#elDivider }
-  get ID() { return this.#id }
-  get offChart() { return this.#offChart }
+  get id() { return this.#id }
+  get chartPane() { return this.#chartPane }
   get config() { return this.#core.config }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elDivider) }
-  get height() { return this.#elDivider.clientHeight }
+  get height() { return this.#elDivider.getBoundingClientRect().height }
+  set cursor(c) { this.#elDivider.style.cursor = c }
+  get cursor() { return this.#elDivider.style.cursor }
+  get type() { return Divider.type }
+
 
   init() {
     // insert element
@@ -81,149 +90,123 @@ export default class Divider {
 
   start() {
     // set mouse pointer
-    this.setCursor("n-resize")
+    this.cursor = "row-resize"
 
     // set up event listeners
     this.eventsListen()
   }
 
-  end() {
-    // remove event listners
-    this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
-    this.#controller.removeEventListener("mouseout", this.onMouseOut);
-    this.#controller.removeEventListener("drag", this.onDividerDrag);
-    this.#controller.removeEventListener("enddrag", this.onDividerDragDone);
-
+  destroy() {
+    // remove event listeners
+    this.#input.destroy()
     // remove element
     this.el.remove()
+    // remove entry from list
+    delete Divider.dividerList[this.id]
   }
 
   eventsListen() {
-    // create controller and use 'on' method to receive input events
-    this.#controller = new InputController(this.#elDivider);
-    this.#controller.on("mouseenter", this.onMouseEnter.bind(this))
-    this.#controller.on("mouseout", this.onMouseOut.bind(this))
-    this.#controller.on("drag", this.onDividerDrag.bind(this));
-    this.#controller.on("enddrag", this.onDividerDragDone.bind(this));
-    this.#controller.on("mousedown", this.onMouseDown.bind(this));
-    this.#controller.on("mouseup", this.onMouseUp.bind(this));
+    this.#input = new Input(this.#elDivider, {disableContextMenu: false});
+
+    this.#input.on("pointerover", this.onMouseEnter.bind(this));
+    this.#input.on("pointerout", this.onMouseOut.bind(this));
+    this.#input.on("pointerdrag", this.onPointerDrag.bind(this));
+    this.#input.on("pointerdragend", this.onPointerDragEnd.bind(this));
   }
 
   on(topic, handler, context) {
-    this.#mediator.on(topic, handler, context)
+    this.#core.on(topic, handler, context)
   }
 
   off(topic, handler) {
-    this.#mediator.off(topic, handler)
+    this.#core.off(topic, handler)
   }
 
   emit(topic, data) {
-    this.#mediator.emit(topic, data)
+    this.#core.emit(topic, data)
   }
 
   onMouseEnter() {
-    this.#elDivider.style.background = "#888888C0"
+    this.#elDivider.style.background = this.#theme.divider.active
+    this.#core.MainPane.onMouseEnter()
   }
 
   onMouseOut() {
-    this.#elDivider.style.background = "#FFFFFF00"
+    this.#elDivider.style.background = this.#theme.divider.idle
+    this.#core.MainPane.onMouseEnter()
   }
 
-  onDividerDrag(e) {
-    this.#cursorPos = [
-      Math.floor(e.position.x), Math.floor(e.position.y),
-      e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
-    ]
-    const dragEvent = {
-      divider: this,
-      cursorPos: this.#cursorPos
-    }
-    this.emit("divider_drag", dragEvent)
-  }
-
-  onDividerDragDone(e) {
-    this.#cursorPos = [
-      Math.floor(e.position.x), Math.floor(e.position.y),
-      e.dragstart.x, e.dragstart.y,
-      e.movement.x, e.movement.y
-    ]
-    const dragEvent = {
-      divider: this,
-      cursorPos: this.#cursorPos
-    }
-    this.emit("divider_dragDone", dragEvent)
-  }
-
-  onMouseDown(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
-    this.emit(`${this.ID}_mousedown`, this.#cursorPos)
-    this.emit(`divider_mousedown`, {
-      id: this.ID,
+  onPointerDrag(e) {
+    this.#cursorPos = this.#core.MainPane.cursorPos // [e.position.x, e.position.y]
+    this.#elDivider.style.background = this.#theme.divider.active
+    this.emit(`${this.id}_pointerdrag`, this.#cursorPos)
+    this.emit(`divider_pointerdrag`, {
+      id: this.id,
       e: e,
       pos: this.#cursorPos,
-      offChart: this.offChart
+      chartPane: this.chartPane
     })
+    this.chartPane.resize()
   }
 
-  onMouseUp(e) {
-    this.#cursorPos = [Math.floor(e.position.x), Math.floor(e.position.y)]
-    this.emit(`${this.ID}_mouseup`, this.#cursorPos)
-    this.emit(`divider_mouseup`, {
-      id: this.ID,
+  onPointerDragEnd(e) {
+    if ("position" in e)
+    this.#elDivider.style.background = this.#theme.divider.idle
+    this.#cursorPos = this.#core.MainPane.cursorPos // [e.position.x, e.position.y]
+    this.emit(`${this.id}_pointerdragend`, this.#cursorPos)
+    this.emit(`divider_pointerdragend`, {
+      id: this.id,
       e: e,
       pos: this.#cursorPos,
-      offChart: this.offChart
+      chartPane: this.chartPane
     })
+    this.chartPane.resize()
   }
 
   mount() {
     if (this.#elDividers.lastElementChild == null)
       this.#elDividers.innerHTML = this.dividerNode()
     else
-      this.#elDividers.lastElementChild.insertAdjacentHTML("afterend", this.defaultNode())
+      this.#elDividers.lastElementChild.insertAdjacentHTML("afterend", this.dividerNode())
 
-    this.#elDivider = DOM.findBySelector(`#${this.#id}`)
-  }
-
-  setCursor(cursor) {
-    this.#elDivider.style.cursor = cursor
-  }
-
-  static defaultNode() {
-    const dividersStyle = `position: absolute;`
-
-    const node = `
-  <div class="${CLASS_DIVIDERS}" style="${dividersStyle}"></div>
-  `
-    return node
+    this.#elDivider = DOM.findBySelector(`#${this.#id}`, this.#elDividers)
   }
 
   dividerNode() {
-    let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top,
-      width = this.#core.MainPane.rowsW,
+    let top = this.#chartPane.pos.top - DOM.elementDimPos(this.#elDividers).top,
+      width = this.#core.MainPane.rowsW + this.#core.scaleW,
       height = (isNumber(this.config.dividerHeight)) ? 
         this.config.dividerHeight : DIVIDERHEIGHT,
-      left = this.#core.toolsW;
+      left = this.#core.theme.tools.width // this.#core.toolsW;
       top -= height / 2
 
-    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: #FFFFFF00;`
+    switch(this.#core.theme.tools.location) {
+      case "left": break;
+      case false:
+      case "none":
+      case "right": left *= -1; break;
+      default: break
+    }
+
+    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: ${this.#theme.divider.idle};`
 
     const node = `
-  <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
-  `
+      <div id="${this.#id}" class="divider" style="${styleDivider}"></div>
+    `
     return node
   }
 
-  updateDividerPos(pos) {
-    let dividerY = this.#elDivider.offsetTop;
-        dividerY += pos[5]
-    this.#elDivider.style.top = `${dividerY}px`
-  }
-
-  setDividerPos() {
-    let top = this.#offChart.pos.top - DOM.elementDimPos(this.#elDividers).top;
+  setPos() {
+    let top = this.#chartPane.pos.top - DOM.elementDimPos(this.#elDividers).top;
         top = top - (this.height / 2)
     this.#elDivider.style.top = `${top}px`
+  }
+
+  hide() {
+    this.#elDivider.style.display = `none`
+  }
+
+  show() {
+    this.#elDivider.style.display = `block`
   }
 }

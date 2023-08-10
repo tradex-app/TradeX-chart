@@ -45,7 +45,7 @@ export default class Core {
 
   log(l) { if (this.logs) console.log(l) }
   info(i) { if (this.infos) console.info(i) }
-  warning(w) { if (this.warnings) console.warn(w) }
+  warn(w) { if (this.warnings) console.warn(w) }
   error(e) { if (this.errors) console.error(e) }
   time(n) { if(this.timer) console.time(n) }
   timeLog(n) { if(this.timer) console.timeLog(n) }
@@ -71,14 +71,14 @@ export default class Core {
    * @param {Class} newModule
    * @param {Object} options - initial provided configuration
    * @param {Object} api - functions / methods, calculated properties
-   * @return {Instance}  
+   * @returns {Instance}  
    * @memberof Core
    */
   register(id, newModule, options, api) {
     ++this.#modCnt
     let instance = new Mediator(this, api, newModule, options)
-    if (instance.constructor.name === "Mediator") {
-      throw new Error("module failed")
+    if (instance instanceof Mediator) {
+      throw new Error(`module failed: ${id}`)
     }
     aspect.before(instance, "start").add(this, "beforeModStart", false, id)
     

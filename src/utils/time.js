@@ -5,9 +5,11 @@ export const TIMEUNITSLONG = ['years','months','days','hours','minutes','seconds
 export const dayCntInc = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
 export const dayCntLeapInc = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
 export const monthDayCnt = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]
+export const MONTHMAP = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; // Grid time steps
 
 // BTC Genesis Block: 03/01/2009, 19:15:05
 export const BTCGENESIS = 1231006505000
+export const MILLISECOND = 1
 export const SECOND_MS = 1000
 export const MINUTE_MS = SECOND_MS*60
 export const HOUR_MS = MINUTE_MS*60
@@ -28,6 +30,7 @@ export const TIMEUNITSVALUESSHORT = {
   h: HOUR_MS,
   m: MINUTE_MS,
   s: SECOND_MS,
+  u: MILLISECOND
 }
 export const TIMEUNITSVALUESLONG = {
   years: YEAR_MS,
@@ -37,8 +40,112 @@ export const TIMEUNITSVALUESLONG = {
   hours: HOUR_MS,
   minutes: MINUTE_MS,
   seconds: SECOND_MS,
+  milliseconds: MILLISECOND
 }
 export const TIMEUNITSVALUES = { ...TIMEUNITSVALUESSHORT, ...TIMEUNITSVALUESLONG }
+export const TIMESCALESVALUES = {
+  YEARS10: [ YEAR_MS * 10, "years" ],
+  YEARS5: [ YEAR_MS * 5, "years" ],
+  YEARS3: [ YEAR_MS * 3, "years" ],
+  YEARS2: [ YEAR_MS * 2, "years" ],
+  YEARS: [ YEAR_MS, "years" ],
+  MONTH6: [ MONTHR_MS * 6, "months" ],
+  MONTH4: [ MONTHR_MS * 4, "months" ],
+  MONTH3: [ MONTHR_MS * 3, "months" ],
+  MONTH2: [ MONTHR_MS * 2, "months" ],
+  MONTH: [ MONTHR_MS, "months" ],
+  DAY15: [ DAY_MS * 15, "years" ],
+  DAY10: [ DAY_MS * 10, "days" ],
+  DAY7: [ DAY_MS * 7, "days" ],
+  DAY5: [ DAY_MS * 5, "days" ],
+  DAY3: [ DAY_MS * 3, "days" ],
+  DAY2: [ DAY_MS * 2, "days" ],
+  DAY: [ DAY_MS, "days" ],
+  HOUR12: [ HOUR_MS * 12, "hours" ],
+  HOUR6: [ HOUR_MS * 6, "hours" ],
+  HOUR4: [ HOUR_MS * 4, "hours" ],
+  HOUR2: [ HOUR_MS * 2, "hours" ],
+  HOUR: [ HOUR_MS, "hours" ],
+  MINUTE30: [ MINUTE_MS * 30, "minutes" ],
+  MINUTE15: [ MINUTE_MS * 15, "minutes" ],
+  MINUTE10: [ MINUTE_MS * 10, "minutes" ],
+  MINUTE5: [ MINUTE_MS * 5, "minutes" ],
+  MINUTE2: [ MINUTE_MS * 2, "minutes" ],
+  MINUTE: [ MINUTE_MS, "minutes" ],
+  SECOND30: [ SECOND_MS * 30, "seconds" ],
+  SECOND15: [ SECOND_MS * 15, "seconds" ],
+  SECOND10: [ SECOND_MS * 10, "seconds" ],
+  SECOND5: [ SECOND_MS * 5, "seconds" ],
+  SECOND2: [ SECOND_MS * 2, "seconds" ],
+  SECOND: [ SECOND_MS, "seconds" ],
+  MILLISECOND500: [ MILLISECOND * 500, "milliseconds" ],
+  MILLISECOND250: [ MILLISECOND * 250, "milliseconds" ],
+  MILLISECOND100: [ MILLISECOND * 100, "milliseconds" ],
+  MILLISECOND50: [ MILLISECOND * 50, "milliseconds" ],
+  MILLISECOND: [ MILLISECOND, "milliseconds" ],
+}
+const timeScales = () => {
+  const values = Object.values(TIMESCALESVALUES)
+  const vals = []
+  for (let v = values.length; --v; v > 0) vals[v] = values[v][0]
+  return vals
+}
+export const TIMESCALES = timeScales();
+const timeRanks = () => {
+  const values = Object.values(TIMESCALESVALUES)
+  const vals = []
+  for (let v = values.length; --v; v > 0) vals[v] = values[v][1]
+  return vals
+}
+export const TIMESCALESRANK = timeRanks()
+export const TIMESCALESKEYS = Object.keys(TIMESCALESVALUES);
+
+const timeScalesValues = () => {
+  const values = {}
+  for (const [key, value] of Object.entries(TIMESCALESVALUES)) {
+    values[key] = value[0]
+  }
+  return values
+}
+export const TIMESCALESVALUESKEYS = timeScalesValues()
+export const timezones = {
+  0: 'Europe/London',
+  '-120': 'Europe/Tallinn',
+  '-60': 'Europe/Zurich',
+  180: 'America/Santiago',
+  300: 'America/Toronto',
+  240: 'America/Caracas',
+  360: 'America/Mexico_City',
+  540: 'America/Juneau',
+  480: 'America/Vancouver',
+  420: 'US/Mountain',
+  120: 'America/Sao_Paulo',
+  '-360': 'Asia/Almaty',
+  '-300': 'Asia/Ashkhabad',
+  '-180': 'Europe/Moscow',
+  '-420': 'Asia/Jakarta',
+  '-480': 'Asia/Taipei',
+  '-240': 'Asia/Muscat',
+  '-345': 'Asia/Kathmandu',
+  '-330': 'Asia/Kolkata',
+  '-540': 'Asia/Tokyo',
+  '-210': 'Asia/Tehran',
+  '-660': 'Pacific/Norfolk',
+  '-630': 'Australia/Adelaide',
+  '-600': 'Australia/Brisbane',
+  '-780': 'Pacific/Fakaofo',
+  '-825': 'Pacific/Chatham',
+  600: 'Pacific/Honolulu',
+};
+
+export function getTimezone() {
+  const offset = new Date().getTimezoneOffset();
+
+  if (Object.prototype.hasOwnProperty.call(timezones, offset)) {
+    return timezones[offset.toString()];
+  }
+  return 'Etc/UTC';
+}
 
 export function buildSubGrads() {
   const grads = {}
@@ -135,7 +242,7 @@ export const timestampDiff = {
  *
  * @param {timestamp} date1 - milliseconds
  * @param {timestamp} date2 - milliseconds
- * @return {object}  
+ * @returns {Object}  
  */
 export function timestampDifference(date1,date2) {
   let years = timestampDiff.inYears(date1,date2)
@@ -168,13 +275,43 @@ export function timestampDifference(date1,date2) {
   }
 }
 
+export function isTimeFrame(tf) {
+  let ms = SECOND_MS
+  if (isString(tf)) {
+    ms = interval2MS(tf)
+    if (ms) tf = tf
+    else {
+      ms = SECOND_MS
+      tf = "1s"
+    }
+  }
+  else tf = "1s"
+  return {tf, ms}
+}
+
+/**
+ * convert interval (timeframe) string to milliseconds
+ * @export
+ * @param {string} tf
+ * @returns {number}
+ */
+export function interval2MS(tf) {
+  if (!isString(tf)) return false
+
+  const regex = /([0-9]{1,2})([s|m|h|d|w|M|y])/gm;
+  let m
+  if ((m = regex.exec(tf)) !== null) {
+    return TIMEUNITSVALUESSHORT[m[2]] * m[1]
+  }
+  else return false
+}
 
 /**
  * Milliseconds broken down into major unit and remainders
  *
  * @export
  * @param {number} milliseconds
- * @return {object}  
+ * @returns {Object}  
  */
 export function ms2TimeUnits( milliseconds ) {
   // let years, months, _weeks, weeks, days, hours, minutes, seconds;
@@ -221,6 +358,15 @@ export function ms2Interval( milliseconds ) {
   }
 }
 
+export function get_second(t) {
+  return t ? new Date(t).getUTCSeconds() : null
+}
+
+export function second_start(t) {
+  let start = new Date(t)
+  return start.setUTCMilliseconds(0,0)
+}
+
 export function get_minute(t) {
   return t ? new Date(t).getUTCMinutes() : null
 }
@@ -243,7 +389,7 @@ export function hour_start(t) {
  * day number of the month
  *
  * @param {timestamp} t - timestamp ms
- * @return {number} - day number of the month
+ * @returns {number} - day number of the month
  */
  export function get_day(t) {
   return t ? new Date(t).getUTCDate() : null
@@ -257,7 +403,7 @@ export function get_dayName(t, locale="en-GB", len="short") {
  * Start of the day (zero millisecond)
  *
  * @param {timestamp} t - timestamp ms
- * @return {timestamp} - timestamp ms
+ * @returns {timestamp} - timestamp ms
  */
  export function day_start(t) {
   return new Date(t).setUTCHours(0,0,0,0)
@@ -267,7 +413,7 @@ export function get_dayName(t, locale="en-GB", len="short") {
  * month number of the year
  *
  * @param {timestamp} t - timestamp ms
- * @return {number} - month number of the year
+ * @returns {number} - month number of the year
  */
  export function get_month(t) {
   if (!t) return undefined
@@ -282,7 +428,7 @@ export function get_monthName(t, locale="en-GB", len="short") {
  * Start of the month (zero millisecond)
  *
  * @param {timestamp} t - timestamp ms
- * @return {timestamp} - timestamp ms
+ * @returns {timestamp} - timestamp ms
  */
  export function month_start(t) {
   let date = new Date(t)
@@ -302,7 +448,7 @@ export function nextMonth(t) {
  * the year
  *
  * @param {timestamp} t - timestamp ms
- * @return {number} - the year
+ * @returns {number} - the year
  */
  export function get_year(t) {
   if (!t) return undefined
@@ -313,7 +459,7 @@ export function nextMonth(t) {
  * Start of the year (zero millisecond)
  *
  * @param {timestamp} t - timestamp ms
- * @return {timestamp} - timestamp ms
+ * @returns {timestamp} - timestamp ms
  */
  export function year_start(t) {
   return Date.UTC(new Date(t).getUTCFullYear())
@@ -339,4 +485,103 @@ export function dayOfYear(t) {
   let dayOfYear = dayCount[mn] + dn;
   if(mn > 1 && isLeapYear()) dayOfYear++;
   return dayOfYear;
+}
+
+export function time_start (t, unit) {
+
+  // if (!isValidTimestamp(t)) return false
+  // if (Object.keys(TIMEUNITSVALUESLONG).indexOf(unit) == -1) return false
+
+  const findStart = {
+    years: (t) => year_start(t),
+    months: (t) => month_start(t),
+    weeks: (t) => day_start(t),
+    days: (t) => day_start(t),
+    hours: (t) => hour_start(t),
+    minutes: (t) => minute_start(t),
+    seconds: (t) => second_start(t),
+  }
+  return findStart[unit](t)
+}
+
+export function unitRange (ts, tf) {
+  let start, end;
+  switch(tf) {
+    case "years" :
+      start = year_start(ts)
+      end = nextYear(ts)
+      break;
+    case "months" :
+      start = month_start(ts)
+      end = nextMonth(ts)
+      break;
+    case "weeks" :
+      start = day_start(ts)
+      end = start + DAY_MS
+      break;
+    case "days" :
+      start = day_start(ts)
+      end = start + DAY_MS
+      break;
+    case "hours" :
+      start = hour_start(ts)
+      end = start + HOUR_MS
+      break;
+    case "minutes" :
+      start = minute_start(ts)
+      end = start + MINUTE_MS
+      break;
+    case "seconds" :
+      start = second_start(ts)
+      end = start + SECOND_MS
+  }
+  return {start, end}
+}
+
+/* Time String Formatting */
+
+export function DM (t) {
+  let d = String(get_day(t)).padStart(2, '0');
+}
+
+export function HM (t) {
+  let h = String(get_hour(t)).padStart(2, '0');
+  let m = String(get_minute(t)).padStart(2, '0');
+  return `${h}:${m}`
+}
+
+export function HMS (t) {
+  let h = String(get_hour(t)).padStart(2, '0');
+  let m = String(get_minute(t)).padStart(2, '0');
+  let s = String(get_second(t)).padStart(2, '0');
+  return `${h}:${m}:${s}`
+}
+
+export function MS (t) {
+  let m = String(get_minute(t)).padStart(2, '0');
+  let s = String(get_second(t)).padStart(2, '0');
+  return `${m}:${s}`
+}
+
+
+/**
+ * Nearest value by time (in timeseries)
+ * @export
+ * @param {number} t - timestamp
+ * @param {Array} ts - [[ts,x,y,z...], ....]
+ * @returns {Array} - [index, val]
+ */
+export function nearestTs(t, ts) {
+    let dist = Infinity
+    let val = null
+    let index = -1
+    for (let i = 0; i < ts.length; i++) {
+        let ti = ts[i][0]
+        if (Math.abs(ti - t) < dist) {
+            dist = Math.abs(ti - t)
+            val = ts[i]
+            index = i
+        }
+    }
+    return [index, val]
 }

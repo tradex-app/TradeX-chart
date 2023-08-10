@@ -1,125 +1,121 @@
 // RSI.js
+// https://hackape.github.io/talib.js/modules/_index_.html#rsi
 /**
  * RSI
  * RSI = SUM(MAX(CLOSE - REF(CLOSE,1),0),N) / SUM(ABS(CLOSE - REF(CLOSE,1)),N) × 100
  */
-import indicator from "../components/overlays/inidcator"
-import { 
-  YAXIS_TYPES
-} from "../definitions/chart";
-import { round } from "../utils/number";
+import Indicator from "../components/overlays/indicator"
+import {RSI as talibAPI } from "../definitions/talib-api";
+import { YAXIS_TYPES } from "../definitions/chart";
+import { uid } from "../utils/utilities"
 
-export default class RSI extends indicator {
+
+/**
+ * Indicator - Relative Strength Index
+ * @export
+ * @class RSI
+ * @extends {indicator}
+ */
+export default class RSI extends Indicator {
+
   name = 'Relative Strength Index'
   shortName = 'RSI'
-  onChart = false
-  calcParams = [20]
-  checkParamCount = false
-  plots = [
-    { key: 'RSI_1', title: ' ', type: 'line' },
-  ]
-  defaultStyle = {
-    strokeStyle: "#C80",
-    lineWidth: '1',
+  libName = 'RSI'
+  definition = {
+    input: {
+      inReal: [], 
+      timePeriod: 20 // 5
+    },
+    output: {
+      output: [],
+    },
+  }
+  #defaultStyle = {
+    stroke: "#C80",
+    width: '1',
     defaultHigh: 75,
     defaultLow: 25,
     highLowLineWidth: 1,
     highLowStyle: "dashed",
-    highStrokeStyle: "#848",
-    lowStrokeStyle: "#848",
+    highStroke: "#848",
+    lowStroke: "#848",
     highLowRangeStyle: "#22002220"
   }
-  style = {}
-  overlay
-  TALib
+  checkParamCount = false
+  plots = [
+    { key: 'RSI_1', title: ' ', type: 'line' },
+  ]
 
-  // YAXIS_TYPES - percent
-  static scale = YAXIS_TYPES[1]
+  static inCnt = 0
+  static primaryPane = false
+  static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
 
   /**
    * Creates an instance of RSI.
-   * @param {object} target - canvas scene
-   * @param {object} overlay - data for the overlay
-   * @param {instance} xAxis - timeline axis
-   * @param {instance} yAxis - scale axis
-   * @param {object} config - theme / styling
+   * @param {Object} target - canvas scene
+   * @param {Object} xAxis - timeline axis instance
+   * @param {Object} yAxis - scale axis instance
+   * @param {Object} config - theme / styling
+   * @param {Object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {Object} params - contains minimum of overlay instance
    * @memberof RSI
    */
-  constructor(target, overlay, xAxis, yAxis, config) {
-    super(target, xAxis, yAxis, config)
+  constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
 
-    this.overlay = overlay
-    this.style = {...this.defaultStyle, ...config.style}
-    this.TALib = xAxis.mediator.api.core.TALib
+    super (target, xAxis, yAxis, config, parent, params)
+
+    const overlay = params.overlay
+
+    this.id = params.overlay?.id || uid(this.shortName)
+    this.defineIndicator(overlay?.settings, talibAPI)
+    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
+    // calculate back history if missing
+    this.calcIndicatorHistory()
+    // enable processing of price stream
+    this.setNewValue = (value) => { this.newValue(value) }
+    this.setUpdateValue = (value) => { this.updateValue(value) }
+    this.addLegend()
   }
 
-  calcIndicator(input) {
-    this.overlay.data = this.TALib.EMA(input)
+  get primaryPane() { return RSI.primaryPane }
+  get defaultStyle() { return this.#defaultStyle }
+
+
+  legendInputs(pos=this.chart.cursorPos) {
+    if (this.overlay.data.length == 0) return false
+
+    const inputs = {}
+    const {c, colours} = super.legendInputs(pos)
+    inputs.RSI_1 = this.scale.nicePrice(this.overlay.data[c][1])
+
+    return {inputs, colours}
   }
 
-  regeneratePlots (params) {
-    return params.map((_, index) => {
-      const num = index + 1
-      return { key: `rsi${num}`, title: `RSI${num}: `, type: 'line' }
-    })
-  }
-
-  calcTechnicalIndicator (dataList, { params, plots }) {
-    const sumCloseAs = []
-    const sumCloseBs = []
-    return dataList.map((kLineData, i) => {
-      const rsi = {}
-      const preClose = (dataList[i - 1] || kLineData).close
-      const tmp = kLineData.close - preClose
-      params.forEach((p, index) => {
-        if (tmp > 0) {
-          sumCloseAs[index] = (sumCloseAs[index] || 0) + tmp
-        } else {
-          sumCloseBs[index] = (sumCloseBs[index] || 0) + Math.abs(tmp)
-        }
-        if (i >= p - 1) {
-          if (sumCloseBs[index] !== 0) {
-            rsi[plots[index].key] = 100 - (100.0 / (1 + sumCloseAs[index] / sumCloseBs[index]))
-          } else {
-            rsi[plots[index].key] = 0
-          }
-          const agoData = dataList[i - (p - 1)]
-          const agoPreData = dataList[i - p] || agoData
-          const agoTmp = agoData.close - agoPreData.close
-          if (agoTmp > 0) {
-            sumCloseAs[index] -= agoTmp
-          } else {
-            sumCloseBs[index] -= Math.abs(agoTmp)
-          }
-        }
-      })
-      return rsi
-    })
-  }
-
-  draw(range) {
+  /**
+   * Draw the current indicator range on its canvas layer and render it.
+   * @param {Object} range 
+   */
+  draw(range=this.range) {
     this.scene.clear()
 
-    const data = this.overlay.data
-    const width = this.xAxis.candleW
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2)
-    const y1 = this.yAxis.yPos(100 - this.style.defaultHigh)
-    const y2 = this.yAxis.yPos(100 - this.style.defaultLow)
+    const y1 = this.yAxis.yPos(this.style.defaultHigh)
+    const y2 = this.yAxis.yPos(this.style.defaultLow)
 
     // Fill the range between high and low
     const plots = [0, y1, this.scene.width, y2 - y1]
-    let style = this.style.highLowRangeStyle
-    this.plot(plots, "renderFillRect", style)
+    let style = {fill: this.style.highLowRangeStyle}
+    this.plot(plots, "renderRect", style)
 
     // High RSI Range marker
     plots.length = 0
     plots[0] = {x: 0, y: y1}
     plots[1] = {x: x2, y: y1}
     style = {
-      lineWidth: this.style.highLowLineWidth,
-      strokeStyle: this.style.highStrokeStyle,
-      dash: [5, 5]
+      width: this.style.highLowLineWidth,
+      stroke: this.style.highStroke,
+      dash: [1, 1]
     }
     this.plot(plots, "renderLine", style)
 
@@ -128,36 +124,46 @@ export default class RSI extends indicator {
     plots[0] = {x: 0, y: y2}
     plots[1] = {x: x2, y: y2}
     style = {
-      lineWidth: this.style.highLowLineWidth,
-      strokeStyle: this.style.lowStrokeStyle,
-      dash: [5, 5]
+      width: this.style.highLowLineWidth,
+      stroke: this.style.lowStroke,
+      dash: [1, 1]
     }
     this.plot(plots, "renderLine", style)
 
+    // exit if no data to render
+    if (this.overlay.data.length < 2 ) {
+      this.target.viewport.render();
+      return false
+    }
+
+    // we have data, draw something
+    const data = this.overlay.data
+    const width = this.xAxis.candleW
+
     // RSI plot
     plots.length = 0
-    const offset = this.xAxis.smoothScrollOffset || 0
+    const offset = this.Timeline.smoothScrollOffset || 0
     const plot = {
-      x: (width * 0.5) + 2 + offset - (width * 2),
       w: width,
     }
 
     // account for "missing" entries because of indicator calculation
-    let o = this.xAxis.rangeScrollOffset;
-    let c = range.indexStart - (range.data.length - this.overlay.data.length) - o - 1
-    let i = range.Length + o + 3
+    let o = this.Timeline.rangeScrollOffset;
+    let d = range.data.length - this.overlay.data.length
+    let c = range.indexStart - d - 2
+    let i = range.Length + (o * 2) + 2
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
-        plots[range.Length + o + 1 - i] = {x: null, y: null}
+        plots.push({x: null, y: null})
       }
       else {
-        plot.y = this.yAxis.yPos(100 - data[c][1])
-        plots[range.Length + o + 1 - i] = {...plot}
+        plot.x = this.xAxis.xPos(data[c][0])
+        plot.y = this.yAxis.yPos(data[c][1])
+        plots.push({...plot})
       }
       c++
       i--
-      plot.x = plot.x + plot.w
     }
 
     this.plot(plots, "renderLine", this.style)
@@ -165,3 +171,4 @@ export default class RSI extends indicator {
     this.target.viewport.render();
   }
 }
+

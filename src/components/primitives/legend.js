@@ -1,72 +1,168 @@
 // legend.js
 
-import { isObject } from "../../utils/typeChecks"
+import { isObject, isString } from "../../utils/typeChecks"
 import { uid } from "../../utils/utilities"
-import DOM from "../../utils/DOM"
+import Input from "../../input"
+
+const userSelect = [
+  "-webkit-touch-callout",
+  "-webkit-user-select",
+  "-khtml-user-select",
+  "-moz-user-select",
+  "-ms-user-select",
+  "user-select",
+]
 
 export default class Legends {
 
-  #targetEl
-  #list
+  #elTarget
+  #parent
+  #core
+  #theme
+  #input
+  #controls
+  #collapse
+  #collapseList = []
+  #controlsList
+  #list = {}
+  #show
+  #hide
+  #toggle = null
 
-  constructor(target) {
-    this.#targetEl = target
-    this.#list = {}
 
-    this.mount(target)
+  constructor(target, parent) {
+    this.#elTarget = target
+    this.#parent = parent
+    this.#core = parent.core
+    this.#theme = parent.core.theme.legend
+    this.init()
+    this.eventsListen()
   }
 
+  get elTarget() { return this.#elTarget }
   get list() { return this.#list }
+  set collapse(c) { this.setCollapse(c) }
+  get collapse() { return this.#collapse }
 
-  mount(el) {
-    // el.innerHTML = this.defaultNode()
-  }
+  destroy() {
+    this.#core.off("chart_pan", this.primaryPanePan)
+    this.#core.off("chart_panDone", this.primaryPanePanDone)
 
-  defaultNode() {
-    const node = `
-    `
-  }
-
-  buildLegend(o) {
-    const styleLegend = "margin: .5em 0 1em 1em; font-size: 12px;"
-      let styleLegendTitle = "margin-right: 1em; white-space: nowrap;"
-    const styleInputs = "display: inline; margin-left: -1em;"
-
-    styleLegendTitle += (o?.type === "chart")? "font-size: 1.5em;" : "font-size: 1.2em;"
-
-    const node = `
-      <div id="${o.id}" class="legend" style="${styleLegend}">
-        <span class="title" style="${styleLegendTitle}">${o.title}</span>
-        <dl style="${styleInputs}">${this.buildInputs(o)}</dl>
-      </div>
-    `
-    return node
-  }
-
-  buildInputs(o) {
-    let inp = "",
-        input,
-        styleDT = "display: inline; margin-left: 1em;",
-        styleDD = "display: inline; margin-left: .25em;";
-    for (input in o.inputs) {
-      inp +=
-      `<dt style="${styleDT}">${input}:</dt>
-      <dd style="${styleDD}">${o.inputs[input]}</dd>`
+    for (let l in this.#list) {
+      if (l === "collapse") continue
+      this.remove(l)
     }
-    return inp
+    // TODO: remove collapse listeners
+    this.#elTarget.remove()
+  }
+
+  eventsListen() {
+
+    // this.#input = new Input(this.#elTarget, { disableContextMenu: false, });
+
+    this.#core.on("chart_pan", this.primaryPanePan.bind(this))
+    this.#core.on("chart_panDone", this.primaryPanePanDone.bind(this))
+  }
+
+  init() {
+    const legends = this.#elTarget.legends
+    this.#controls = legends.querySelector(`.controls`)
+    this.#collapse = legends.querySelectorAll(`.control`)
+    this.#show = legends.querySelector("#showLegends")
+    this.#hide = legends.querySelector("#hideLegends")
+    this.#controls.style.display = "none"
+    this.icons(this.#collapse, {id: "collapse", parent: this})
+    this.#elTarget.legends.classList.add("hide")
+    this.#toggle = "hide"
+    this.collapse = "show"
+  }
+
+  /**
+   * process legend actions
+   * @param {Object} e - pointer event
+   * @memberof Legends
+   */
+  onMouseClick(e) {
+    const which = (s) => {
+      if (isString(s.dataset.icon)) 
+        return {id: s.id, icon: s.dataset.icon}
+      else if (s.parentElement.className !== "controls") 
+        return which(s.parentElement)
+      else
+        return false
+    }
+    return which(e)
+  }
+
+  onMouseOver(e) {
+
+  }
+
+  onLegendAction(e) {
+    const which = this.onMouseClick(e.currentTarget)
+    this.setCollapse(which.icon)
+  }
+
+  setCollapse(c) {
+    // collapse the legends
+    if (c === "show" && this.#toggle !== "show") {
+      this.#toggle = c
+      this.#show.style.display = "none"
+      this.#hide.style.display = "inline-block"
+      this.#elTarget.legends.classList.toggle("hide")
+    }
+    // expand the legends
+    else if (c === "hide" && this.#toggle !== "hide") {
+      this.#toggle = c
+      this.#show.style.display = "inline-block"
+      this.#hide.style.display = "none"
+      this.#elTarget.legends.classList.toggle("hide")
+    }
+  }
+
+  primaryPanePan() {
+    for (let property of userSelect) {
+      this.#elTarget.style.setProperty(property, "none");
+    }
+  }
+
+  primaryPanePanDone() {
+    for (let property of userSelect) {
+      this.#elTarget.style.removeProperty(property);
+    }
   }
 
   add(options) {
     if (!isObject(options) || !("title" in options)) return false
 
-    options.id = uid(options?.id || "legend")
+    const parentError = () => {this.#core.error("ERROR: Legend parent missing!")}
+    options.id = options?.id || uid("legend")
     options.type = options?.type || "overlay"
+    options.parent = options?.parent || parentError
 
-    const html = this.buildLegend(options)
-    const elem = DOM.htmlToElement(html)
+    const html = this.elTarget.buildLegend(options, this.#core.theme)
 
-    this.#targetEl.appendChild(elem) 
-    this.#list[options.id] = {el: DOM.findByID(options.id), type: options.type}
+    this.#elTarget.legends.insertAdjacentHTML('beforeend', html)
+    const legendEl = this.#elTarget.legends.querySelector(`#legend_${options.id}`)
+    this.#controlsList = legendEl.querySelectorAll(`.control`)
+
+    this.#list[options.id] = {
+      el: legendEl, 
+      type: options.type, 
+      source: options?.source,
+      click: []
+    }
+    // style and add event listeners
+    this.icons(this.#controlsList, options)
+
+    // only display the collapse control if indicator legend
+    if (options.type == "indicator") {
+      this.#controls.style.display = "block"
+      // do not display collapse control if a singular secondary pane indicator
+      if (!options.parent.primaryPane &&
+        Object.keys(this.#list).length < 3)
+        this.#controls.style.display = "none"
+    }
 
     return options.id
   }
@@ -76,17 +172,53 @@ export default class Legends {
     || this.#list[id].type === "chart") return false
     
     this.#list[id].el.remove()
+
+    for (let c of this.#list[id].click) {
+      c.el.removeEventListener('click', c.click)
+    }
+
     delete this.#list[id]
+
+    // hide the collapse control if no indicator legends
+    if (Object.keys(this.#list).length < 2)
+      this.#controls.style.display = "none"
 
     return true
   }
 
+  // remove "data" as callback will provide this
   update(id, data) {
-    if (!(isObject(data)) 
-    || !(id in this.#list)) return false
+    if (!(isObject(data)) ||
+        !(id in this.#list) ||
+        this.#core.range.data.length == 0) return false
 
-    const html = this.buildInputs(data)
-    const el = DOM.findBySelector(`#${id} dl`)
-    el.innerHTML = html
+    let source = this.#list[id].source(data.pos)
+    const html = this.#elTarget.buildInputs(source)
+    this.#elTarget.legends.querySelector(`#legend_${id} dl`).innerHTML = html
+  }
+
+  icons(icons, options) {
+    let click
+
+    for (let el of icons) {
+      let svg = el.querySelector('svg');
+
+// TODO: set values dynamically via CSS variables
+// https://stackoverflow.com/a/60357706/15109215
+
+      svg.style.width = `${this.#theme.controlsW}px`
+      svg.style.height = `${this.#theme.controlsH}px`
+      svg.style.fill = `${this.#theme.controlsColour}`
+      svg.onpointerover = (e) => e.currentTarget.style.fill = this.#theme.controlsOver
+      svg.onpointerout = (e) => e.currentTarget.style.fill = this.#theme.controlsColour
+
+      click = options.parent.onLegendAction.bind(options.parent)
+      if (options.id === "collapse")
+        this.#collapseList.push({el, click})
+      else
+        this.#list[options.id].click.push({el, click})
+      el.addEventListener('click', click)
+    }
   }
 }
+
