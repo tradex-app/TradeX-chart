@@ -3,7 +3,8 @@
 
 import element from "./classes/element"
 import MainPane from "../main"
-import { debounce } from "../../utils/utilities"
+import ToolsBar from "../tools"
+import { debounce, idSanitize } from "../../utils/utilities"
 import { isNumber, isObject, isString } from "../../utils/typeChecks"
 
 import tradeXBody from "./body"
@@ -135,7 +136,7 @@ export default class tradeXChart extends element {
   }
 
   get id() { return this.getAttribute('id'); }
-  set id(id) { this.setAttribute('id', String(id).replace(/ |,|;|:|\.|#/g, "_")); }
+  set id(id) { this.setAttribute('id', idSanitize(id)); }
 
   get disabled() { return this.hasAttribute('disabled'); }
   set disabled(d) {
@@ -170,10 +171,13 @@ export default class tradeXChart extends element {
 
   onResized(entries) {
       this.log(`onResize w: ${this.offsetWidth}, h: ${this.offsetHeight}`)
+      this.emit("global_resize", {w: this.offsetWidth, h: this.offsetHeight}) 
 
-      if (isObject(this.MainPane) && this.MainPane instanceof MainPane) {
+      if (this.MainPane instanceof MainPane) {
         this.previousDimensions()
-        this.emit("global_resize", {w: this.offsetWidth, h: this.offsetHeight}) 
+      }
+      if (this.ToolsBar instanceof ToolsBar) {
+        this.ToolsBar.onResized()
       }
   }
 

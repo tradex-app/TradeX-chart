@@ -30,16 +30,6 @@ export default class Menu {
   static type = "Menu"
   static currentActive
 
-  constructor(widgets, config) {
-    this.#widgets = widgets
-    this.#core = config.core
-    this.#config = config
-    this.#id = config.id
-    this.#elMenus = widgets.elements.elMenus
-    this.#elWidgetsG = this.#core.elWidgetsG
-    this.init()
-  }
-
   static create(widgets, config) {
 
     const id = `menu_${++Menu.menuCnt}`
@@ -58,12 +48,21 @@ export default class Menu {
     delete Menu.menuList[id]
   }
 
+  constructor(widgets, config) {
+    this.#widgets = widgets
+    this.#core = config.core
+    this.#config = config
+    this.#id = config.id
+    this.#elMenus = widgets.elements.elMenus
+    this.#elWidgetsG = this.#core.elWidgetsG
+    this.init()
+  }
+
   get el() { return this.#elMenu }
   get id() { return this.#id }
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elMenu) }
   get type() { return Menu.type }
-
 
   init() {
     // insert element
@@ -72,7 +71,7 @@ export default class Menu {
 
   start() {
     // position menus next to primary (icon)
-    this.position(this.#config.primary)
+    this.position()
     // set up event listeners
     this.eventsListen()
   }
@@ -184,9 +183,9 @@ export default class Menu {
     return content
   }
 
-  position(target) {
+  position() {
     let wPos = this.#elWidgetsG.getBoundingClientRect()
-    let iPos = target.getBoundingClientRect()
+    let iPos = this.#config.primary.getBoundingClientRect()
 
     this.#elMenu.style.left = Math.round(iPos.left - wPos.left) + "px"
     this.#elMenu.style.top = Math.round(iPos.bottom - wPos.top) + "px"

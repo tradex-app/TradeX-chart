@@ -6,127 +6,134 @@ import { arrayMove } from "../../utils/utilities";
 const composition = ["source-over","source-atop","source-in","source-out","destination-over","destination-atop","destination-in","destination-out","lighter","copy","xor","multiply","screen","overlay","darken","lighten","color-dodge","color-burn","hard-light","soft-light","difference","exclusion","hue","saturation","color","luminosity"]
 
 class Node {
+
+  #key = 0
+
   /**
    * Viewport constructor
    * @param {Object} cfg - {width, height}
    */
-    constructor(cfg={}) {
-  
-      this.container = cfg.container;
-      this.layers = [];
-      this.id = CEL.idCnt++;
-      this.scene = new CEL.Scene();
-  
-      this.setSize(cfg.width || 0, cfg.height || 0);
-    }
-  
-    /**
-     * set viewport size in pixels and all layers in the stack which are composited into the viewport.
-     * @param {number} width - viewport width in pixels
-     * @param {number} height - viewport height in pixels
-     * @returns {Viewport}
-     */
-    setSize(width, height) {
-      this.width = width;
-      this.height = height;
-      this.scene.setSize(width, height);
-  
-      this.layers.forEach(function (layer) {
-        layer.setSize(width, height);
-      });
-  
-      return this;
-    }
+  constructor(cfg={}) {
 
-    /**
-     * add layer a layer to the viewport
-     * @param {CEL.Layer} layer
-     * @returns {Viewport}
-     */
-    addLayer(layer) {
-      this.layers.push(layer);
-      layer.setSize(layer.width || this.width, layer.height || this.height);
-      layer.viewport = this;
-      return this;
-    }
-    /**
-     * return associated hit id for coordinates - utilized for pointer events.
-     * @param {number} x
-     * @param {number} y
-     * @returns {Integer} integer - returns -1 if transparent
-     */
-    getIntersection(x, y) {
-      var layers = this.layers,
-          n = layers.length - 1,
-          layer,
-          key;
-  
-      while (n >= 0) {
-        layer = layers[n];
-        key = layer.hit.getIntersection(x, y);
-        if (key >= 0) {
-          return key;
-        }
-        n--;
+    this.container = cfg.container;
+    this.layers = [];
+    this.id = CEL.idCnt++;
+    this.scene = new CEL.Scene();
+
+    this.setSize(cfg.width || 0, cfg.height || 0);
+  }
+
+  generateKey() {
+    return this.#key++
+  }
+
+  /**
+   * set viewport size in pixels and all layers in the stack which are composited into the viewport.
+   * @param {number} width - viewport width in pixels
+   * @param {number} height - viewport height in pixels
+   * @returns {Viewport}
+   */
+  setSize(width, height) {
+    this.width = width;
+    this.height = height;
+    this.scene.setSize(width, height);
+
+    this.layers.forEach(function (layer) {
+      layer.setSize(width, height);
+    });
+
+    return this;
+  }
+
+  /**
+   * add layer a layer to the viewport
+   * @param {CEL.Layer} layer
+   * @returns {Viewport}
+   */
+  addLayer(layer) {
+    this.layers.push(layer);
+    layer.setSize(layer.width || this.width, layer.height || this.height);
+    layer.viewport = this;
+    return this;
+  }
+  /**
+   * return associated hit id for coordinates - utilized for pointer events.
+   * @param {number} x
+   * @param {number} y
+   * @returns {Integer} integer - returns -1 if transparent
+   */
+  getIntersection(x, y) {
+    var layers = this.layers,
+        n = layers.length - 1,
+        layer,
+        key;
+
+    while (n >= 0) {
+      layer = layers[n];
+      key = layer.hit.getIntersection(x, y);
+      if (key >= 0) {
+        return key;
       }
-  
-      return -1;
+      n--;
     }
 
-    /**
-     * get viewport index in all CEL viewports
-     * @returns {Integer}
-     */
-    get index() {
-      let viewports = CEL.viewports,
-        viewport,
-        n = 0;
-  
-      for (viewport of viewports) {
-        if (this.id === viewport.id) return n;
-        n++;
-      }
-  
-      return null;
+    return -1;
+  }
+
+  /**
+   * get viewport index in all CEL viewports
+   * @returns {Integer}
+   */
+  get index() {
+    let viewports = CEL.viewports,
+      viewport,
+      n = 0;
+
+    for (viewport of viewports) {
+      if (this.id === viewport.id) return n;
+      n++;
     }
 
-    /**
-     * destroy viewport
-     */
-    destroy() {
-      // remove layers
-      for (let layer of this.layers) {
-        layer.remove();
-      }
-    }
+    return null;
+  }
 
-    /**
-     * composite all layers onto canvas
-     */
-    render(all=false) {
-      let {scene, layers} = this,
-          layer;
-  
-      scene.clear();
-  
-      for (layer of layers) {
-
-        if (all && layer.layers.length > 0) layer.render(all)
-
-        if (composition.includes(layer?.composition))
-          scene.context.globalCompositeOperation = layer.composition
-
-        if (layer.visible && layer.width > 0 && layer.height > 0)
-          scene.context.drawImage(
-            layer.scene.canvas,
-            layer.x,
-            layer.y,
-            layer.width,
-            layer.height
-          );
-      }
+  /**
+   * destroy viewport
+   */
+  destroy() {
+    // remove layers
+    for (let layer of this.layers) {
+      layer.remove();
     }
   }
+
+  /**
+   * composite all layers onto canvas
+   */
+  render(all=false) {
+    let {scene, layers} = this,
+        layer;
+
+    scene.clear();
+
+    for (layer of layers) {
+
+      if (all && layer.layers.length > 0) layer.render(all)
+
+      if (composition.includes(layer?.composition))
+        scene.context.globalCompositeOperation = layer.composition
+
+      if (layer.visible && layer.width > 0 && layer.height > 0)
+        scene.context.drawImage(
+          layer.scene.canvas,
+          layer.x,
+          layer.y,
+          layer.width,
+          layer.height
+        );
+    }
+  }
+}
 
 /**
  * Create multi-layered canvas

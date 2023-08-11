@@ -355,12 +355,16 @@ export function uid(tag="ID") {
   // sanitize tag - make it HTML and CSS friendly
   if (isNumber(tag)) tag = tag.toString()
   else if (!isString(tag)) tag = "ID"
-  tag = tag.replace(/ |,|;|:|\.|#/g, "_");
+  tag = idSanitize(tag)
 
   // add "randomness" to make id unique
   const dateString = Date.now().toString(36);
   const randomness = Math.random().toString(36).substring(2,5);
   return `${tag}_${dateString}_${randomness}`
+}
+
+export function idSanitize(tag) {
+  return String(tag).replace(/ |,|;|:|\.|#/g, "_");
 }
 
 // https://stackoverflow.com/a/20151856/15109215

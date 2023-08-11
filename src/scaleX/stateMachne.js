@@ -2,7 +2,7 @@
 // a simple Finite State Machine
 
 import { isArray, isFunction, isObject, isString } from "../utils/typeChecks"
-import { valuesInArray } from "../utils/utilities"
+import { idSanitize, valuesInArray } from "../utils/utilities"
 
 /**
  * Finite State Machine
@@ -45,7 +45,7 @@ export default class StateMachine {
   }
 
   /** @type {string} */
-  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  set id(id) { this.#id = idSanitize(id) }
   get id() { return this.#id }
   get state() { return this.#state }
   get previousSate() { return this.#statePrev }

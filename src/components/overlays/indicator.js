@@ -6,6 +6,7 @@ import { Range } from "../../model/range"
 import canvas from "../../renderer/canvas"
 import { limit } from "../../utils/number"
 import { isBoolean, isFunction, isObject, isString } from "../../utils/typeChecks"
+import { idSanitize } from "../../utils/utilities"
 import {
   STREAM_NEWVALUE,
   STREAM_UPDATE
@@ -67,7 +68,7 @@ export default class Indicator extends Overlay {
   }
 
   get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
-  set id(id) { this.#ID = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  set id(id) { this.#ID = idSanitize(id) }
   get name() { return this.#name }
   set name(n) { this.#name = n }
   get shortName() { return this.#shortName }

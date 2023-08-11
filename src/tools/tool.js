@@ -1,7 +1,7 @@
 // tool.js
 // base class for chart drawing tools
 
-import { uid } from "../utils/utilities"
+import { idSanitize, uid } from "../utils/utilities"
 import Input from "../input"
 
 
@@ -71,7 +71,7 @@ export default class Tool {
     this.#cursorClick = config.pos
   }
 
-  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  set id(id) { this.#id = idSanitize(id) }
   get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}_${this.#inCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
   get inCnt() { return this.#inCnt }
   get name() {return this.#name}

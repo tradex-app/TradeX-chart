@@ -1,5 +1,5 @@
 // tools.js
-// Tools bar that lives at the top of the chart
+// Tools bar
 // Providing: chart drawing tools
 
 import DOM from "../utils/DOM"
@@ -8,6 +8,7 @@ import Tool from '../tools/tool'
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-tools"
 import { ToolsStyle } from "../definitions/style"
+import { idSanitize } from "../utils/utilities"
 
 
 /**
@@ -34,6 +35,7 @@ export default class ToolsBar {
   #toolTarget
   #toolEvents = {click:[], pointerover:[]}
 
+  #menus = []
 
   constructor (core, options) {
 
@@ -50,7 +52,7 @@ export default class ToolsBar {
   warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
-  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  set id(id) { this.#id = idSanitize(id) }
   get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() {return this.#name}
   get shortName() {return this.#shortName}
@@ -115,6 +117,12 @@ export default class ToolsBar {
 
   emit(topic, data) {
     this.#core.emit(topic, data)
+  }
+
+  onResized() {
+    for (let menu of this.#menus) {
+      menu.position()
+    }
   }
 
   onIconClick(e) {
@@ -194,6 +202,7 @@ export default class ToolsBar {
             let menu = this.#widgets.insert("Menu", config)
             tool.dataset.menu = menu.id
             menu.start()
+            this.#menus.push(menu)
 
             for (let s of t.sub) {
               this.#toolClasses[s.id] = s.class
@@ -237,7 +246,7 @@ export default class ToolsBar {
     // add tool entry to Data State
   }
 
-  // add all on and off chart tools
+  // add all tools to the chart panes
   addAllTools() {
     // iterate over Data State to add all tools
   }

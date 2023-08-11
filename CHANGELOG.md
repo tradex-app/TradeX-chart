@@ -1,6 +1,13 @@
 # Change Log
 
-## [0.137.3] - 2023-08-10
+## [0.137.4](https://github.com/tradex-app/TradeX-chart/commit/f4b1a381dd7c0f24b521bac3b33756852ac79a14) - 2023-08-10
+
+Fixed
+
+* Chart-Events - variables
+* Chart-Events & Chart-Trades - using wrong hit layer
+
+## [0.137.3](https://github.com/tradex-app/TradeX-chart/commit/b2c3d0a506becaa9c9b0f24c5b67efe5e57f918e) - 2023-08-10
 
 Fixed
 

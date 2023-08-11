@@ -20,7 +20,7 @@ export default [
     name: "Line",
     icon: line,
     event: "tool_activated",
-/*  class: Line,
+    class: Line,
     sub: [
       {
         id: "ray",
@@ -43,7 +43,7 @@ export default [
         event: "tool_activated",
         class: Line,
       },
-    ] */
+    ] 
   },
   {
     id: "fibonacci",

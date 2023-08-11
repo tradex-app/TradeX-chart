@@ -3,6 +3,7 @@
 
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-chart"
+import { idSanitize } from "../utils/utilities"
 
 export default class _template {
 
@@ -34,7 +35,7 @@ export default class _template {
   warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
-  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  set id(id) { this.#id = idSanitize(id) }
   get id() { return this.#id }
   get name() {return this.#name}
   get shortName() {return this.#shortName}

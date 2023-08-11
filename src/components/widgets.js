@@ -10,6 +10,7 @@ import Window from "./widgets/window"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-widgets"
 import { isObject } from "../utils/typeChecks"
+import { idSanitize } from "../utils/utilities"
 
 export default class Widgets {
 
@@ -43,7 +44,7 @@ export default class Widgets {
   warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
-  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  set id(id) { this.#id = idSanitize(id) }
   get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }

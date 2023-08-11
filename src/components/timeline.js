@@ -6,7 +6,7 @@ import xAxis from "./axis/xAxis"
 import Input from "../input"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-time"
-import { copyDeep, debounce, throttle, xMap } from "../utils/utilities"
+import { copyDeep, debounce, idSanitize, throttle, xMap } from "../utils/utilities"
 import Slider from "./widgets/slider"
 import { BUFFERSIZE } from "../definitions/chart"
 
@@ -85,7 +85,7 @@ export default class Timeline {
   warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
-  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  set id(id) { this.#id = idSanitize(id) }
   get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }

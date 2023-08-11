@@ -172,52 +172,32 @@ export function isValidTimeInRange( time, start=BTCGENESIS,end=Date.now() ) {
   return (time > start && time < end) ? true : false
 }
 
+function parseTSDiff(d1, d2, unit) {
+  d1 = new Date(d1)
+  d2 = new Date(d2)
+  var t2 = d2.getTime();
+  var t1 = d1.getTime();
+
+  return parseInt((t2-t1)/unit);
+}
+
 export const timestampDiff = {
 
   inSeconds: function(d1, d2) {
-        d1 = new Date(d1)
-        d2 = new Date(d2)
-    var t2 = d2.getTime();
-    var t1 = d1.getTime();
-
-    return parseInt((t2-t1)/SECOND_MS);
+    return parseTSDiff(d1, d2, SECOND_MS);
   },
   inMinutes: function(d1, d2) {
-        d1 = new Date(d1)
-        d2 = new Date(d2)
-    let t2 = d2.getTime();
-    let t1 = d1.getTime();
-
-    return parseInt((t2-t1)/MINUTE_MS);
+    return parseTSDiff(d1, d2, MINUTE_MS);
   },
-
   inHours: function(d1, d2) {
-        d1 = new Date(d1)
-        d2 = new Date(d2)
-    let t2 = d2.getTime();
-    let t1 = d1.getTime();
-
-    return parseInt((t2-t1)/HOUR_MS);
+    return parseTSDiff(d1, d2, HOUR_MS);
   },
-
   inDays: function(d1, d2) {
-        d1 = new Date(d1)
-        d2 = new Date(d2)
-    let t2 = d2.getTime();
-    let t1 = d1.getTime();
-
-    return parseInt((t2-t1)/DAY_MS);
+    return parseTSDiff(d1, d2, DAY_MS);
   },
-
   inWeeks: function(d1, d2) {
-        d1 = new Date(d1)
-        d2 = new Date(d2)
-    let t2 = d2.getTime();
-    let t1 = d1.getTime();
-
-    return parseInt((t2-t1)/WEEK_MS);
+    return parseTSDiff(d1, d2, WEEK_MS);
   },
-
   inMonths: function(d1, d2) {
          d1 = new Date(d1)
          d2 = new Date(d2)
@@ -228,13 +208,11 @@ export const timestampDiff = {
 
     return (d2M+12*d2Y)-(d1M+12*d1Y);
   },
-
   inYears: function(d1, d2) {
     let d1Y = new Date(d1)
     let d2Y = new Date(d2)
     return d2Y.getUTCFullYear()-d1Y.getUTCFullYear();
   }
-  
 }
 
 /**

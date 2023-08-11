@@ -7,7 +7,7 @@ import yAxis from "./axis/yAxis"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
 import Input from "../input"
-import { copyDeep, throttle, uid, xMap } from '../utils/utilities'
+import { copyDeep, idSanitize, throttle, uid, xMap } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
 
 import Graph from "./views/classes/graph"
@@ -73,7 +73,7 @@ export default class ScaleBar {
   warn(w) { this.#core.warn(w) }
   error(e) { this.#core.error(e) }
 
-  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  set id(id) { this.#id = idSanitize(id) }
   get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }

@@ -7,7 +7,7 @@
 import DOM from "../utils/DOM";
 import { limit } from "../utils/number"
 import { isArray, isNumber, isObject, isString } from "../utils/typeChecks";
-import { copyDeep, xMap } from "../utils/utilities";
+import { copyDeep, idSanitize, xMap } from "../utils/utilities";
 import CEL from "./primitives/canvas";
 import Legends from "./primitives/legend"
 import Graph from "./views/classes/graph"
@@ -175,7 +175,7 @@ export default class Chart {
   warn(w) { this.core.warn(w) }
   error(e) { this.core.error(e) }
 
-  set id(id) { this.#id = String(id).replace(/ |,|;|:|\.|#/g, "_") }
+  set id(id) { this.#id = idSanitize(id) }
   get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#name}_${this.#chartCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
   get name() { return this.#name }
   get shortName() { return this.#shortName }

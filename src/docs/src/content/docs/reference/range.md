@@ -109,13 +109,10 @@ Merge any of the following data into the chart data:
 * Price history (candles)
 * Indicator data
 
-``merge`` is the same format as the initial [chart config state object](../state#state-config-object).  
-``newRange`` will position the chart display range on the newly imported data.  
-``calc`` will automatically calculate any (missing) indicator data. If you are supply indicator data in the ``merge`` this is not necessary.  
-
 ```javascript
 chart.mergeData(merge, newRange=false, calc=false)
 ```
+Refer to [Merging Data Into the State](../state/#merging-data-into-the-state) for further information.
 
 # Range Instance
 

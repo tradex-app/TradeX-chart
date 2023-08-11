@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr" data-has-toc data-has-sidebar class="astro-NYFQ2LET">
   <head>
-    <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>State</title><link rel="canonical"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v2.7.0"/><meta name="generator" content="Starlight v0.3.0"/><meta property="og:title" content="State"/><meta property="og:type" content="article"/><meta property="og:url"/><meta property="og:locale" content="en"/><meta property="og:description"/><meta property="og:site_name" content="TradeX Chart"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="State"/><meta name="twitter:description"/>
+    <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>State</title><link rel="canonical"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v2.7.0"/><meta name="generator" content="Starlight v0.3.0"/><meta property="og:title" content="State"/><meta property="og:type" content="article"/><meta property="og:url"/><meta property="og:locale" content="en"/><meta property="og:description" content="The chart data state defines what information the chart displays."/><meta property="og:site_name" content="TradeX Chart"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="State"/><meta name="twitter:description" content="The chart data state defines what information the chart displays."/><meta name="description" content="The chart data state defines what information the chart displays."/>
     
   <link rel="stylesheet" href="/_astro/404.f2fdefd3.css" />
 <link rel="stylesheet" href="/_astro/Icon.astro_astro_type_style_index_0_lang.93b311ba.css" /><script type="module" src="/_astro/hoisted.1c9463d4.js"></script></head>
@@ -519,13 +519,53 @@
 <p>Blocks of back history can be merged into the chart via the following method.</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart</span><span style="color: #B392F0">.mergeData(data)</span></span></code></pre>
 <p>The data must be formatted as a valid <a href="#state-config-object">state config object</a>.</p>
-<p>A data merge into the state does the following:</p>
+<p>Any of the following data can be merged into the chart data:</p>
+<ul>
+<li>Price history (candles)</li>
+<li>Indicator data</li>
+</ul>
+<p>A price history data merge into the state does the following:</p>
 <ul>
 <li>checking that time frames match between current (if any) chart data and the incoming, otherwise will fail the merge returning false</li>
 <li>merging the data when there is an overlap, incoming will overwrite current</li>
 <li>filling (null) any potential gap between between current (if any) chart data and the incoming</li>
-<li>calculate indicator data for incoming data if missing</li>
+<li><strong>optionally</strong> calculate indicator data for incoming data if missing</li>
 </ul>
+<p><code>mergeData(merge, newRange, calc)</code> takes the following parameters:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td>merge</td><td>object</td><td>yes</td><td>none</td><td>An object same format as the initial<a href="../state#state-config-object">chart config state object</a>.</td></tr><tr><td>newRange</td><td>boolean</td><td>no</td><td>false</td><td>Position the chart display range on the newly imported data.</td></tr><tr><td>calc</td><td>boolean</td><td>no</td><td>false</td><td>Calculate any (missing) indicator data. If you are supply indicator data in the<code>merge</code> this is not necessary.</td></tr></tbody></table>
 <h2 id="delete">Delete</h2>
 <p>Depending upon the size of the datasets the state contains, it may be beneficial to conserve memory and delete those that are no longer needed, as the chart by default retains a library of states in memory.</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart</span><span style="color: #B392F0">.deleteState(key)</span></span></code></pre>
@@ -545,7 +585,7 @@
 <p>The following data state config object example demonstrates the possible options that can be submitted to the chart on initial <code>chart.start(config)</code> as the <code>config.state</code> property, or at a later time as a <a href="#merging-data-into-the-state">merge of data</a> into the existing chart state. Usually such a merge is done when the chart scrolls to the left / past boundary, and more back history needs to be loaded into the chart. <code>chart.mergeData(data)</code></p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #B392F0">{</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// [timestamp, open, hight, low, close, volume]​​</span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// [timestamp, open, hight, low, close, volume]</span></span>
 <span class="line"><span style="color: #B392F0">  ohlcv</span><span style="color: #BBBBBB">:</span><span style="color: #B392F0"> []</span><span style="color: #BBBBBB">,</span></span>
 <span class="line"></span>
 <span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// list of indicators and overlays for the primary chart pane (price history)</span></span>
@@ -586,7 +626,7 @@
 <span class="line"><span style="color: #B392F0">      data</span><span style="color: #F97583">:</span><span style="color: #B392F0"> {}</span></span>
 <span class="line"><span style="color: #B392F0">    }</span></span>
 <span class="line"><span style="color: #B392F0">  ]</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">​​</span></span>
+<span class="line"></span>
 <span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// list of indicators and overlays not displayed on the primary chart pane</span></span>
 <span class="line"><span style="color: #B392F0">  secondary</span><span style="color: #BBBBBB">:</span><span style="color: #B392F0"> [</span></span>
 <span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// indicator</span></span>
