@@ -164,11 +164,11 @@ export default class ToolsBar {
   }
 
   onToolSelect(e) {
-
+    console.log("Tool selected:", e)
   }
 
   onToolDeselect(e) {
-
+    console.log("Tool deselected:", e)
   }
 
   mount(el) {

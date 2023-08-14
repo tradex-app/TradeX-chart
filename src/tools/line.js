@@ -41,6 +41,14 @@ export default class Line extends Tool {
     // // progress state from idle to active
     // this.#core.stateMachine.notify(`tool_${this.#name}_start`, this.id)
 
+
+  }
+
+  destroy() {
+    this.stateMachine.destroy()
+  }
+
+  draw() {
     let [x1, y1] = this.cursorClick
 
     const scene = this.layerTool.scene
@@ -62,9 +70,4 @@ export default class Line extends Tool {
 
     this.elViewport.render()
   }
-
-  destroy() {
-    this.stateMachine.destroy()
-  }
-
 }

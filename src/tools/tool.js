@@ -102,11 +102,11 @@ export default class Tool {
   end() { this.stop() }
 
   stop() {
-    this.#input.off("mousemove", this.onMouseMove);
+    this.#input.off("mousemove", this.onPointerMove);
     // this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
     // this.#controller.removeEventListener("mouseout", this.onMouseOut);
 
-    // this.off("main_mousemove", this.onMouseMove)
+    // this.off("main_mousemove", this.onPointerMove)
 
     // progress state from active to idle
   }
@@ -114,7 +114,7 @@ export default class Tool {
   eventsListen() {
     this.#input = new Input(this.#elCanvas, {disableContextMenu: false});
 
-    this.#input.on("mousemove", this.onMouseMove.bind(this));
+    this.#input.on("pointermove", this.onPointerMove.bind(this));
     // // enter event
     // this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
     // // out event
@@ -136,11 +136,11 @@ export default class Tool {
     this.#core.emit(topic, data)
   }
 
-  onMouseMove(e) {
+  onPointerMove(e) {
     // this.#cursorPos = [e.layerX, e.layerY]
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
 
-    this.emit("tool_mousemove", this.#cursorPos)
+    this.emit("tool_pointermove", this.#cursorPos)
 
   }
 

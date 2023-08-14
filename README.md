@@ -97,35 +97,41 @@ chart.start(config)
 
 ## Documentation
 
-Documentation can be found under:
-[Documentation](/docs/documentation.md)
-[API](https://tradex-app.github.io/TradeX-chart/api/)
+Documentation can be found here:
+[API](https://tradex-chart.guildmedia.net/reference/)
+
+or built and run locally from the repository by running:
+```shell
+git clone https://github.com/tradex-app/TradeX-chart
+cd ./tradex-chart
+npm run build
+cd ./src/docs
+npm run dev
+```
+
+## Editable Live Sandbox Examples
+
+Editable sandbox examples can found on [CodeSandbox.io](https://codesandbox.io/u/tradex-app)
 
 ## Features
 
 * Plain JavaScript with no framework dependencies
 * All chart features and functions accessible via API
-* Built in a modular manner
-* Provides message, emit and subscribe methods
-* State object defines chart configuration, on and off chart indicators
-* Drawing tool overlays and can be imported or exported.
+* State object defines chart configuration, indicators and tools
+* State can be imported or exported for storage and retrieval
 * Export chart to png, jpg, webp.
 * Indicator calculation provided by [talib-web](https://https://anchegt.github.io/talib-web/) as a WebAssembly module.
-* Supports multiple candle types:
-  * solid
-  * hollow
-  * solid up, hollow down
-  * hollow up, solid down
-  * OHLC
-  * area
-  * line
-* Chart pan / scroll via mouse or cursor keys
+* Custom themes
+* Custom indicators
+* Custom Overlays
+* Event hub - subscribe to chart events
 
 ## Support
 
-For the latest news on TradeX-chart, feedback, feature requests, and community, join us over on Discord.
+For the latest news on TradeX-chart, feedback, feature requests, and community, join us over on Discord or GitHub.
 
-[TradeX Discord](https://discord.gg/XnfZudwpfg)
+[TradeX Discord](https://discord.gg/dMegsSQDe)
+[GitHub](https://github.com/tradex-app/TradeX-chart/discussions)
 
 ## Contributing
 
