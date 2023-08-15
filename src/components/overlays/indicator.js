@@ -7,10 +7,8 @@ import canvas from "../../renderer/canvas"
 import { limit } from "../../utils/number"
 import { isBoolean, isFunction, isObject, isString } from "../../utils/typeChecks"
 import { idSanitize } from "../../utils/utilities"
-import {
-  STREAM_NEWVALUE,
-  STREAM_UPDATE
-} from "../../definitions/core"
+import { STREAM_UPDATE } from "../../definitions/core"
+import { OHLCV } from "../../definitions/chart"
 
 // const plotTypes = {
 //   area,
@@ -18,8 +16,6 @@ import {
 //   channel,
 //   line,
 // }
-
-const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
 
 /**
  * Base class for on and off chart indicators
@@ -106,11 +102,11 @@ export default class Indicator extends Overlay {
   set value(data) {
     // round time to nearest current time unit
     const tfms = this.core.time.timeFrameMS
-    let roundedTime = Math.floor(new Date(data[T]) / tfms) * tfms
-    data[T] = roundedTime
+    let roundedTime = Math.floor(new Date(data[OHLCV.t]) / tfms) * tfms
+    data[OHLCV.t] = roundedTime
 
-    if (this.#value[T] !== data[T]) {
-      this.#value[T] = data[T]
+    if (this.#value[OHLCV.t] !== data[OHLCV.t]) {
+      this.#value[OHLCV.t] = data[OHLCV.t]
       this.#newValueCB(data)
     }
     else {
@@ -311,9 +307,21 @@ export default class Indicator extends Overlay {
   }
 
   indicatorInput(start, end) {
-    let input = []
+    let input = {
+      inReal: [],
+      open: [],
+      high: [],
+      low: [],
+      close: [],
+      volume: []
+    }
     do {
-      input.push(this.range.value(start)[C])
+      input.inReal.push(this.range.value(start)[OHLCV.c])
+      input.open.push(this.range.value(start)[OHLCV.o])
+      input.high.push(this.range.value(start)[OHLCV.h])
+      input.low.push(this.range.value(start)[OHLCV.l])
+      input.close.push(this.range.value(start)[OHLCV.c])
+      input.volume.push(this.range.value(start)[OHLCV.v])
     }
     while (start++ < end)
     return input
@@ -335,9 +343,9 @@ export default class Indicator extends Overlay {
     let step = this.definition.input.timePeriod
     let start = end - step //+ 1
     let input = this.indicatorInput(start, end)
-    let hasNull = input.find(element => element === null)
+    let hasNull = input.inReal.find(element => element === null)
     if (hasNull) return false
-    else return { inReal: input, timePeriod: step }
+    else return { timePeriod: step, ...input }
   }
 
   /**
@@ -375,12 +383,13 @@ export default class Indicator extends Overlay {
         if ( end - start < p ) return false
     
         let data = [];
-        let i, v, entry;
+        let i, v, entry, input;
     
     
         while (start < end) {
     
-          params.inReal = this.indicatorInput(start, start + p)
+          input = this.indicatorInput(start, start + p)
+          params = {...params, ...input}
           // let hasNull = params.inReal.find(element => element === null)
           // if (hasNull) return false
     

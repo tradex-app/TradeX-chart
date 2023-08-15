@@ -1,6 +1,7 @@
 // BB.js
 // Bollinger Bands
 // https://hackape.github.io/talib.js/modules/_index_.html#bbands
+// https://www.investopedia.com/terms/b/bollingerbands.asp
 
 import Indicator from "../components/overlays/indicator"
 import { BBANDS as talibAPI } from "../definitions/talib-api";

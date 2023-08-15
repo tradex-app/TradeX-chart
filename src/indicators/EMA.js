@@ -1,5 +1,7 @@
 // EMA.js
+// Exponential Moving Average
 // https://hackape.github.io/talib.js/modules/_index_.html#ema
+// https://www.investopedia.com/terms/e/ema.asp
 
 import Indicator from "../components/overlays/indicator"
 import { EMA as talibAPI } from "../definitions/talib-api";

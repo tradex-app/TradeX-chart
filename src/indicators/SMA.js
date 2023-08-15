@@ -1,9 +1,8 @@
 // SMA.js
+// Simple Moving Average
 // https://hackape.github.io/talib.js/modules/_index_.html#sma
-/**
- * SMA
- * Simple Moving Average
- */
+// https://www.investopedia.com/terms/s/sma.asp
+
 import Indicator from "../components/overlays/indicator"
 import { SMA as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";

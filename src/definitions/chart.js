@@ -30,3 +30,12 @@ export const ROWMINHEIGHT = 50 // px
 export const OFFCHARTDEFAULTHEIGHT = 30 // %
 export const DIVIDERHEIGHT = 8 // px
 
+// OHLCV enum
+export class OHLCV {
+  static t = 0
+  static o = 1
+  static h = 2
+  static l = 3
+  static c = 4
+  static v = 5
+}

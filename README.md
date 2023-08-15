@@ -98,15 +98,13 @@ chart.start(config)
 ## Documentation
 
 Documentation can be found here:
-[API](https://tradex-chart.guildmedia.net/reference/)
+[Documentation](https://tradex-chart.guildmedia.net/reference/)
 
 or built and run locally from the repository by running:
 ```shell
 git clone https://github.com/tradex-app/TradeX-chart
-cd ./tradex-chart
+cd ./tradex-chart/src/docs
 npm run build
-cd ./src/docs
-npm run dev
 ```
 
 ## Editable Live Sandbox Examples

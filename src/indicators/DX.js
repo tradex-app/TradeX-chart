@@ -1,4 +1,7 @@
 // DX.js
+// Directional Movement Indicator
+// https://hackape.github.io/talib.js/modules/_index_.html#dx
+// 
 
 import Indicator from "../components/overlays/indicator"
 import { DX as talibAPI } from "../definitions/talib-api";

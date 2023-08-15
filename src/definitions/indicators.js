@@ -4,6 +4,7 @@
 // Docs - https://hackape.github.io/talib.js/modules/_index_.html
 
 
+import AROON from "../indicators/AROON";
 import BB from "../indicators/BB"
 // import DX from "../indicators/DX"
 import EMA from "../indicators/EMA"
@@ -13,6 +14,7 @@ import Volume from "../indicators/Volume"
 
 export default {
   // ADX: {id: "ADX", name: "Average Direction", event: "addIndicator"},
+  AROON: {id: "AROON", name: "Aroon", event: "addIndicator", ind: AROON},
   BB: {id: "BB", name: "Bollinger Bands", event: "addIndicator", ind: BB},
   // DX: {id: "DX", name: "Directional Movement", event: "addIndicator", ind: DX},
   EMA: {id: "EMA", name: "Exponential Moving Average", event: "addIndicator", ind: EMA},

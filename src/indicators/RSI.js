@@ -1,9 +1,8 @@
 // RSI.js
+// Relative Strength Index
 // https://hackape.github.io/talib.js/modules/_index_.html#rsi
-/**
- * RSI
- * RSI = SUM(MAX(CLOSE - REF(CLOSE,1),0),N) / SUM(ABS(CLOSE - REF(CLOSE,1)),N) × 100
- */
+// https://www.investopedia.com/terms/r/rsi.asp
+
 import Indicator from "../components/overlays/indicator"
 import {RSI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
