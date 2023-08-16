@@ -851,25 +851,34 @@ export default class Chart {
   resize(height) {
     const active = this
     const prev = this.sibling()
+
     if (prev === null) return {active: null, prev: null}
 
-    let yDelta, activeH, prevH;
+    const rowMinH = this.core.MainPane.rowMinH
+    const activeHeight = this.element.clientHeight
+    const prevHeight = prev.element.clientHeight
+    let yDelta, activeH, prevH, total;
 
-    if (isNumber(height) && height > this.core.MainPane.rowMinH) {
+    if (isNumber(height) && height > rowMinH) {
 
     }
+    // height is undefined
     else {
+      total = activeHeight + prevHeight
       yDelta = this.core.MainPane.cursorPos[5]
-      activeH = this.height - yDelta - 1
-      prevH  = prev.height + yDelta
+      activeH = activeHeight - yDelta
+      prevH  = prevHeight + yDelta
     }
 
+    if ( activeH < rowMinH
+      || prevH < rowMinH
+      || total !== activeH + prevH) {
 
-    if ( activeH >= this.core.MainPane.rowMinH
-      && prevH >= this.core.MainPane.rowMinH) {
-        active.setDimensions({w:undefined, h:activeH})
-        prev.setDimensions({w:undefined, h:prevH})
-        active.Divider.setPos()
+      }
+    else {
+      active.setDimensions({w:undefined, h:activeH})
+      prev.setDimensions({w:undefined, h:prevH})
+      active.Divider.setPos()
     }
 
     active.element.style.userSelect = 'none';

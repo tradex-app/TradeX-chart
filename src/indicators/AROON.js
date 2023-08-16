@@ -89,8 +89,8 @@ export default class AROON extends Indicator {
     const inputs = {}
       let labels = [false, false]
       let {c, colours} = super.legendInputs(pos)
-    inputs.Dn = this.overlay.data[c][1][0]
-    inputs.Up = this.overlay.data[c][1][1]
+    inputs.Dn = this.scale.nicePrice(this.overlay.data[c][1][0])
+    inputs.Up = this.scale.nicePrice(this.overlay.data[c][1][1])
     colours = [
       this.style.downStroke,
       this.style.upStroke
