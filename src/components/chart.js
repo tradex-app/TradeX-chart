@@ -114,9 +114,9 @@ export default class Chart {
 
   // localRange required by secondaryPane scale
   #localRange = {
-    valueMax: 100,
-    valueMin: 0,
-    valueDiff: 100
+    valueMax: 110,
+    valueMin: -10,
+    valueDiff: 120
   }
 
   #indicatorDeleteList = {}
@@ -197,6 +197,7 @@ export default class Chart {
   get height() { return this.#elTarget.getBoundingClientRect().height }
   get data() {}
   get range() { return this.#core.range }
+  set localRange(r) { this.setLocalRange(r) }
   get localRange() { return this.#localRange }
   get stream() { return this.#Stream }
   get streamCandle() { return this.#streamCandle }
@@ -505,6 +506,29 @@ export default class Chart {
     }
   }
 
+  /**
+   * set the local range max min y values
+   * used for secondary panes
+   * @param {number} min - range min y value
+   * @param {number} max - range max y value
+   */
+  setLocalRange(min, max) {
+    if (!isNumber(max) ||
+        !isNumber(min))
+        return false
+    if (min > max) [min, max] = [max, min]
+    this.#localRange = {
+      valueMax: max,
+      valueMin: min,
+      valueDiff: max - min
+    }
+  }
+
+  /**
+   * set the type of Y-Axis
+   * @param {string} t - ["default", "percent", "log"]
+   * @returns {boolean}
+   */
   setYAxisType(t) {
     if (
       !isString(t) ||
@@ -512,6 +536,7 @@ export default class Chart {
       (this.type == "primaryPane" && t == "percent")
     ) return false
     this.#yAxisType = t
+    return true
   }
 
   /**

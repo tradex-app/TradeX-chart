@@ -2,11 +2,9 @@
 // ray, horizontal ray, vertical ray
 
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
-import Tool from "./tool";
+import Tool from "../components/overlays/chart-tools"
 import { lineConfig } from "../definitions/tools";
 import StateMachine from '../scaleX/stateMachne';
-
-// import tinycolor from 'tinycolor2';
 
 
 export default class Line extends Tool {

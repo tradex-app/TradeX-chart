@@ -1,11 +1,14 @@
-// tool.js
-// base class for chart drawing tools
+// tools.js
+// base class for chart tools
 
-import { idSanitize, uid } from "../utils/utilities"
-import Input from "../input"
+import Node from "../primitives/node"
+import StateMachine from "../../scaleX/stateMachne"
+import Overlay from "./overlay"
+import Input from "../../input"
+import { idSanitize, uid } from "../../utils/utilities"
 
 
-export default class Tool {
+export default class Tool extends Overlay {
 
   static #cnt = 0
   static #instances = {}
@@ -35,8 +38,8 @@ export default class Tool {
 
   #id
   #inCnt = null
-  #name = "Line Tool"
-  #shortName = "TX_Tool"
+  #name = ""
+  #shortName = ""
   #options
   #config
   #core
@@ -56,7 +59,10 @@ export default class Tool {
 
   #boundingBox = {TL: [0,0], BR: [0,0]}
 
-  constructor(config) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
+
+    super(target, xAxis, yAxis, theme, parent, params)
+
     this.#config = config
     this.#inCnt = config.cnt
     this.#id = this.#config.ID || uid("TX_Tool_")
@@ -98,6 +104,7 @@ export default class Tool {
   get bufferPx() { return this.#core.bufferPx }
 
   get visible() { return this.isVisible() }
+  set position(p) { this.target.setPosition(p[0], p[1]) }
 
   end() { this.stop() }
 
@@ -148,18 +155,8 @@ export default class Tool {
     // convert #boundingBox to pixel co-ordinates
   }
 
-  createViewport() {
-    const buffer = this.config.buffer || BUFFERSIZE
-    const width = this.#elViewport.getBoundingClientRect().width
-    const height = this.#options.chartH || this.#parent.rowsH - 1
-    const layerConfig = { 
-      width: Math.round(width * ((100 + buffer) * 0.01)), 
-      height: height
-    }
-  }
-
   draw() {
-
+    
   }
 
 }

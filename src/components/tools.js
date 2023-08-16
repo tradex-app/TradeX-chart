@@ -4,7 +4,7 @@
 
 import DOM from "../utils/DOM"
 import tools from "../definitions/tools"
-import Tool from '../tools/tool'
+import Tool from "./overlays/chart-tools"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-tools"
 import { ToolsStyle } from "../definitions/style"

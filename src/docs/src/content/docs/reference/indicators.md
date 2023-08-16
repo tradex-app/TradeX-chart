@@ -64,6 +64,16 @@ const secondaryPaneIndicators = chart.Indicators.secondary.entries()
 
 ### Indicator Definitions
 
+#### Local Y-Axis Range
+
+If the indicator is not overlaid on the Primary Chart Pane, and instead on a Secondary Chart Pane, there is the option to set the local Y-Axis range, min and max values which will be used for the scale and plotting the indicator.
+
+```javascript
+this.chart.setLocalRange(0, 150)
+```
+
+#### Legend
+
 Indicators must provide a ``legendInputs(pos)`` method. The chart will pass the current mouse position to the indicator in an array, ``[x, y]``.
 
 Legends can display multiple values if formatted correctly.
@@ -92,7 +102,7 @@ where the three entries are defined as the following:
 */
 ```
 
-#### inputs
+##### inputs
 
 is an object that provides the legend labels and values.
 For example the Bollinger Band indicator has three values. It's returned ``inputs`` object would look like the following:
@@ -110,16 +120,16 @@ The Bollinger Band indicator legend would look like this on the chart:
 
 If you wanted a label with spaces, then the object property name would have to be quoted. ``"some value": 12345``
 
-#### colours
+##### colours
 
 is an array of ``"#rrggbb(aa)"`` string values corresponding to the legend values
 
-#### lables
+##### lables
 
 is an array that specifies which of the legend labels are displayed.
 In the Bollinger Band example, if you wanted to silence all labels, use an array of ``[false, false, false]``.
 
-### Canvas Drawing Methods
+#### Canvas Drawing Methods
 
 The base ``Indicator`` class which all others, including custom indicators are built atop, offers the ``plot()`` method for drawing to the canvas.
 
@@ -138,7 +148,7 @@ this.plot (plots, type, opts )
 | type       | string | [Canvas Methods documentation](../canvas_mehtods) |
 | opts       | object | [Canvas Methods documentation](../canvas_mehtods) |
 
-### Minimal Custom Indicator Definition
+#### Minimal Custom Indicator Definition
 
 ```javascript
 // custom-indicator.js
@@ -175,7 +185,7 @@ export default class Test extends Indicator {
    * @param {Object} xAxis - timeline axis instance
    * @param {Object} yAxis - scale axis instance
    * @param {Object} config - theme / styling
-   * @param {Object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {Object} parent - chart pane instance that hosts the indicator
    * @param {Object} params - contains minimum of overlay instance
    * @memberof Test
    */
@@ -197,6 +207,8 @@ export default class Test extends Indicator {
     }
     // add the indicator legend to the chart pane
     this.addLegend()
+    // set the local range max min Y-Axis values if required
+    // this.chart.setLocalRange(0, 150)
   }
 
   /**

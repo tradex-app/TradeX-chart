@@ -2,9 +2,9 @@
 // control point for drawing tools
 
 import { renderCircle } from "../../renderer/circle"
-import { defaultTheme } from "../../definitions/style"
+import { defaultTheme as globalTheme } from "../../definitions/style"
 
-defaultTheme = {
+const defaultTheme = {
   passive: {
     stroke: "#000",
     fill: "#ccc",
@@ -36,7 +36,7 @@ class State {
   }
 }
 
-class Node {
+export default class Node {
 
   #state = State.passive
 
@@ -56,6 +56,11 @@ class Node {
   get state() { return this.#state }
   get isActive() { return (this.#state == State.active) ? true : false }
   get theme() { return defaultTheme[this.#state] }
+
+  setState(s) {
+    if (!Object.keys(State).includes(s)) return
+    this.#state = s
+  }
 
   draw() {
     const t = this.theme

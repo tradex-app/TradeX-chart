@@ -10,7 +10,8 @@ import {
   YAXIS_GRID,
   YAXIS_TYPES
 } from "../../definitions/chart";
-import { time_start } from "../../utils/time";
+
+const p100Padding = 1.2
 
 export default class yAxis extends Axis {
 
@@ -55,6 +56,7 @@ export default class yAxis extends Axis {
     this.#source = parent.parent
     this.yAxisType = yAxisType
 
+    // use either chart.localRange or core.range
     range = (range) ? range : this.core.range
     this.setRange(range)
   }
@@ -177,8 +179,10 @@ export default class yAxis extends Axis {
    * @memberof yAxis
    */
   p100toPixel(y) {
-      let ratio = this.height / this.#range.diff
-      return (y - this.#range.max) * -1 * ratio
+      let max = this.#range.max //* p100Padding
+      let ratio = this.height / (max - this.#range.min)
+      let padding = Math.floor((max - this.#range.max) ) //* 0.5 )
+      return ((y - max) * -1 * ratio) // - padding
   }
 
   yAxisTransform() {
@@ -208,6 +212,7 @@ export default class yAxis extends Axis {
     return true
   }
 
+  // manual Y axis positioning
   setOffset(o) {
     if (!isNumber(o) || o == 0 || this.#mode !== "manual") return false
 
@@ -248,6 +253,12 @@ export default class yAxis extends Axis {
     this.calcGradations()
   }
 
+  /**
+   * set Y-Axis range
+   * use either chart.localRange or core.range
+   * @param {Object} range
+   * @memberof yAxis
+   */
   setRange(range) {
     this.#transform.automatic.range = range
     this.#range = new Proxy(range, {
@@ -271,8 +282,8 @@ export default class yAxis extends Axis {
     let max, min, off;
     switch (this.yAxisType) {
       case "percent":
-        max = (this.#range.max > 0) ? this.#range.max : 100
-        min = (this.#range.min > 0) ? this.#range.min : 0
+        max = (this.#range.max > -10) ? this.#range.max : 110
+        min = (this.#range.min > -10) ? this.#range.min : -10
         off = this.#range.offset
         this.#yAxisGrads = this.gradations(max + off, min + off)
         break;
@@ -286,7 +297,7 @@ export default class yAxis extends Axis {
     return this.#yAxisGrads
   }
 
-  gradations(max, min, decimals=true, fixed=false) {
+  gradations(max, min, decimals=true) {
       let digits,
           rangeH,
           yGridSize;
@@ -317,9 +328,8 @@ export default class yAxis extends Axis {
     {
       digits = this.countDigits(y)
       nice = this.niceValue(digits, decimals, step)
-      scaleGrads.push([nice, round(pos), digits])
-
-      pos -= stepP
+      pos = this.yPos(nice)
+      scaleGrads.push([nice, pos, digits])
     }
 
     // remove first or last grads if too close to the edge
@@ -338,6 +348,13 @@ export default class yAxis extends Axis {
     return scaleGrads
   }
 
+  /**
+   * format Y axis labels (values)
+   * @param {*} digits - {digits, decimals}
+   * @param {boolean} [decimals=true] - using decimals
+   * @param {*} step - {digits, decimals}
+   * @return {number}  
+   */
   niceValue(digits, decimals=true, step) {
     if (digits.integers) {
       let x = step.integers

@@ -7,7 +7,7 @@ import yAxis from "./axis/yAxis"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
 import Input from "../input"
-import { copyDeep, idSanitize, throttle, uid, xMap } from '../utils/utilities'
+import { copyDeep, idSanitize, xMap } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
 
 import Graph from "./views/classes/graph"

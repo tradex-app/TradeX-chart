@@ -56,7 +56,7 @@ export default class RSI extends Indicator {
    * @param {Object} xAxis - timeline axis instance
    * @param {Object} yAxis - scale axis instance
    * @param {Object} config - theme / styling
-   * @param {Object} parent - (on/off)chart pane instance that hosts the indicator
+   * @param {Object} parent - chart pane instance that hosts the indicator
    * @param {Object} params - contains minimum of overlay instance
    * @memberof RSI
    */
