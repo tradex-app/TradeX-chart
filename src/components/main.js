@@ -76,6 +76,12 @@ export default class MainPane {
   #Time
   #chartGrid
   #chartDeleteList = []
+  #ChartPaneMaximized = {
+    instance: null, 
+    main: {},
+    panes: {}
+  }
+
 
   #viewDefaultH = OFFCHARTDEFAULTHEIGHT // %
   #rowMinH = ROWMINHEIGHT // px
@@ -115,6 +121,7 @@ export default class MainPane {
   get core() { return this.#core }
   get chart() { return this.#Chart }
   get chartPanes() { return this.#ChartPanes }
+  get chartPaneMaximized() { return this.#ChartPaneMaximized }
   get chartDeleteList() { return this.#chartDeleteList }
   get time() { return this.#Time }
   get options() { return this.#options }
@@ -922,6 +929,66 @@ export default class MainPane {
 
   zoomRange() {
     this.draw(this.range, true)
+  }
+
+  /**
+   * Toggles chart pane maximization
+   * needs to account for possible chart resizing
+   * @param {Chart} p - Chart instance
+   * @returns 
+   */
+  paneMaximize (p) {
+
+    if (!(p instanceof Chart)) return false
+
+    const maxMin = this.#ChartPaneMaximized
+    let style;
+    // chart pane is already maximized and so restore all
+    if (p === maxMin.instance) {
+      this.panesRestore()
+      maxMin.instance = null
+      maxMin.panes = {}
+    }
+    // maximize pane, minimize the rest
+    else {
+      // set all panes to default state
+      this.panesRestore()
+      // store maximized pane
+      maxMin.instance = p
+      // store MainPane dimensions in case chart is resized
+      maxMin.rowsH = this.rowsH
+      for (let [k, v] of this.#ChartPanes.entries()) {
+        // store height for restore
+        maxMin.panes[k] = v.element.clientHeight
+        style = v.element.style
+        if (p === v) {
+          style.display = "block"
+          v.setDimensions({w: undefined, h: this.rowsH})
+        }
+        else {
+          style.display = "none"
+        }
+      }
+    }
+  }
+
+  /**
+   * Iterate over chart panes and restore them to default state
+   * needs to account for possible chart resizing
+   */
+  panesRestore() {
+    const maxMin = this.#ChartPaneMaximized
+    let style;
+
+    // are Chart Pane dimensions the same?
+    if (this.dimensions.height == maxMin.height) {}
+
+    for (let [k, v] of this.#ChartPanes.entries()) {
+      style = v.element.style
+      style.display = "block"
+      if (k in maxMin.panes)
+        v.setDimensions({w: undefined, h: maxMin.panes[k]})
+    }
   }
 
 }

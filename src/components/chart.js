@@ -754,8 +754,8 @@ export default class Chart {
       case "up": this.reorderUp(); return;
       case "down": this.reorderDown(); return;
       case "visible": return;
-      case "maximize": return;
-      case "restore": return;
+      case "maximize": this.#core.MainPane.paneMaximize(this); return;
+      case "restore": this.#core.MainPane.panesRestore(); return;
       case "remove": this.remove(); return;
       case "config": return;
       default: return;

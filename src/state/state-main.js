@@ -16,16 +16,14 @@ export default
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
+        chart_paneMaximize: {
+          target: 'chart_paneMaximize',
+          action (data) {}
+        },
         chart_pan: {
           target: 'chart_pan',
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to  "chart_pan"`)
-          },
-        },
-        setRange: {
-          target: 'setRange',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "setRange"`)
           },
         },
         chart_scrollTo: {
@@ -34,18 +32,18 @@ export default
             // console.log(`${this.id}: transition from "${this.state}" to  "chart_scrollTo"`)
           },
         },
+        setRange: {
+          target: 'setRange',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to  "setRange"`)
+          },
+        },
         addIndicator: {
           target: 'addIndicator',
           action (data) {
             // console.log('secondaryPane: transition from "idle" to "addIndicator" state')
           },
         },
-        // divider_mousedown: {
-        //   target: 'divider_mousedown',
-        //   action (data) {
-        //     // console.log('secondaryPane: transition from "idle" to "addIndicator" state')
-        //   },
-        // },
         divider_pointerdrag: {
           target: 'divider_pointerdrag',
           action (data) {
@@ -58,6 +56,20 @@ export default
           target: 'global_resize',
           action (data) {
             // console.log('secondaryPane: transition from "idle" to "addIndicator" state')
+          },
+        },
+      }
+    },
+    chart_paneMaximize: {
+      onEnter (data) {},
+      onExit (data) {},
+      on: {
+        always: {
+          target: 'idle',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+            this.context.maximize = "some pane pointer"
+            // this.context.origin.updateRange(data) 
           },
         },
       }
@@ -139,58 +151,6 @@ export default
           action (data) {
             // console.log('transition action for "onIdle" in "addIndicator" state')
 
-          },
-        }
-      }
-    },
-    divider_mousedown: {
-      onEnter(data) {
-        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
-        this.context.divider = data
-      },
-      onExit(data) {
-        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
-      },
-      on: {
-        main_mousemove: {
-          target: "divider_mousemove",
-          action (data) {
-            console.log(`${this.id}: transition from "${this.state}" to "divider_mousemove"`)
-          },
-        },
-      }
-    },
-    divider_mousemove: {
-      onEnter(data) {
-        console.log(`${this.id}: state: "${this.state}" - onEnter`)
-
-        let divider = this.context.divider
-        this.context.pair = this.context.origin.resizeRowPair(divider, data) 
-      },
-      onExit(data) {
-        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
-      },
-      on: {
-        main_mousemove: {
-          target: "divider_mousemove",
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
-          },
-        },
-        main_mouseup: {
-          target: "idle",
-          action (data) {
-            this.actions.removeProperty.call(this)
-
-            // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
-          },
-        },
-        divider_mouseup: {
-          target: "idle",
-          action (data) {
-            this.actions.removeProperty.call(this)
-
-            console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         }
       }
