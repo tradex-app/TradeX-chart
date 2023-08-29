@@ -14,7 +14,7 @@ function Vo(r, e) {
   }
   return Object.freeze(Object.defineProperty(r, Symbol.toStringTag, { value: "Module" }));
 }
-const Go = "0.138.0";
+const Go = "0.138.2";
 function P(r) {
   return Array.isArray(r);
 }
@@ -36,15 +36,15 @@ function S(r) {
 function od(r) {
   return !!r && (E(r) || U(r)) && U(r.then);
 }
-const Yo = ["y", "M", "d", "h", "m", "s", "ms"], qo = ["years", "months", "days", "hours", "minutes", "seconds", "milliseconds"], Xo = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334], jo = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335], sr = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], Zo = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], nr = 1231006505e3, Vt = 1, W = 1e3, F = W * 60, X = F * 60, D = X * 24, ue = D * 7, nt = D * 30;
+const Yo = ["y", "M", "d", "h", "m", "s", "ms"], qo = ["years", "months", "days", "hours", "minutes", "seconds", "milliseconds"], Xo = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334], jo = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335], sr = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], Zo = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], nr = 1231006505e3, Vt = 1, W = 1e3, F = W * 60, X = F * 60, D = X * 24, fe = D * 7, nt = D * 30;
 function rr(r = 3, e = !1) {
   let i = sr[r % 12] * D;
   return e && r > 0 && (i += D), i;
 }
-const ut = D * 365, _e = {
+const ut = D * 365, Ne = {
   y: ut,
   M: nt,
-  w: ue,
+  w: fe,
   d: D,
   h: X,
   m: F,
@@ -53,13 +53,13 @@ const ut = D * 365, _e = {
 }, or = {
   years: ut,
   months: nt,
-  weeks: ue,
+  weeks: fe,
   days: D,
   hours: X,
   minutes: F,
   seconds: W,
   milliseconds: Vt
-}, Ko = { ..._e, ...or }, Ve = {
+}, Ko = { ...Ne, ...or }, Ve = {
   YEARS10: [ut * 10, "years"],
   YEARS5: [ut * 5, "years"],
   YEARS3: [ut * 3, "years"],
@@ -104,7 +104,7 @@ const ut = D * 365, _e = {
   for (let i = r.length; --i; i > 0)
     e[i] = r[i][0];
   return e;
-}, Ae = Qo(), Jo = () => {
+}, Oe = Qo(), Jo = () => {
   const r = Object.values(Ve), e = [];
   for (let i = r.length; --i; i > 0)
     e[i] = r[i][1];
@@ -149,11 +149,11 @@ function sa() {
 }
 function na() {
   const r = {};
-  for (let e in _e) {
+  for (let e in Ne) {
     let i = 0;
     r[e] = [];
     do
-      r[e].push(Math.round(_e[e] * i)), i += 0.125;
+      r[e].push(Math.round(Ne[e] * i)), i += 0.125;
     while (i < 1);
   }
   return r;
@@ -165,26 +165,26 @@ function ar(r) {
 function hr(r, e = nr, i = Date.now()) {
   return ar(r) ? r > e && r < i : !1;
 }
-function Pe(r, e, i) {
+function Le(r, e, i) {
   r = new Date(r), e = new Date(e);
   var s = e.getTime(), n = r.getTime();
   return parseInt((s - n) / i);
 }
 const Wt = {
   inSeconds: function(r, e) {
-    return Pe(r, e, W);
+    return Le(r, e, W);
   },
   inMinutes: function(r, e) {
-    return Pe(r, e, F);
+    return Le(r, e, F);
   },
   inHours: function(r, e) {
-    return Pe(r, e, X);
+    return Le(r, e, X);
   },
   inDays: function(r, e) {
-    return Pe(r, e, D);
+    return Le(r, e, D);
   },
   inWeeks: function(r, e) {
-    return Pe(r, e, ue);
+    return Le(r, e, fe);
   },
   inMonths: function(r, e) {
     r = new Date(r), e = new Date(e);
@@ -226,9 +226,9 @@ function lr(r) {
     return !1;
   const e = /([0-9]{1,2})([s|m|h|d|w|M|y])/gm;
   let i;
-  return (i = e.exec(r)) !== null ? _e[i[2]] * i[1] : !1;
+  return (i = e.exec(r)) !== null ? Ne[i[2]] * i[1] : !1;
 }
-function ys(r) {
+function vs(r) {
   let e = Math.floor(r / 1e3), i = Math.floor(e / 60);
   e = e % 60;
   let s = Math.floor(i / 60);
@@ -255,8 +255,8 @@ function ys(r) {
     seconds: e
   };
 }
-function ke(r) {
-  const e = ys(r);
+function Re(r) {
+  const e = vs(r);
   for (const i in e)
     if (e[i])
       return `${e[i]}${i}`;
@@ -285,7 +285,7 @@ function bs(r) {
 function oa(r, e = "en-GB", i = "short") {
   return new Date(r).toLocaleDateString(e, { weekday: i });
 }
-function Ne(r) {
+function $e(r) {
   return new Date(r).setUTCHours(0, 0, 0, 0);
 }
 function Cs(r) {
@@ -329,8 +329,8 @@ function ui(r, e) {
   return {
     years: (s) => Ps(s),
     months: (s) => Ms(s),
-    weeks: (s) => Ne(s),
-    days: (s) => Ne(s),
+    weeks: (s) => $e(s),
+    days: (s) => $e(s),
     hours: (s) => Ss(s),
     minutes: (s) => Ts(s),
     seconds: (s) => xs(s)
@@ -346,10 +346,10 @@ function ha(r, e) {
       i = Ms(r), s = dr(r);
       break;
     case "weeks":
-      i = Ne(r), s = i + D;
+      i = $e(r), s = i + D;
       break;
     case "days":
-      i = Ne(r), s = i + D;
+      i = $e(r), s = i + D;
       break;
     case "hours":
       i = Ss(r), s = i + X;
@@ -400,7 +400,7 @@ const ua = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   MONTH_MS: rr,
   MS: as,
   SECOND_MS: W,
-  TIMESCALES: Ae,
+  TIMESCALES: Oe,
   TIMESCALESKEYS: ta,
   TIMESCALESRANK: rs,
   TIMESCALESVALUES: Ve,
@@ -409,14 +409,14 @@ const ua = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   TIMEUNITSLONG: qo,
   TIMEUNITSVALUES: Ko,
   TIMEUNITSVALUESLONG: or,
-  TIMEUNITSVALUESSHORT: _e,
-  WEEK_MS: ue,
+  TIMEUNITSVALUESSHORT: Ne,
+  WEEK_MS: fe,
   YEAR_MS: ut,
   buildSubGrads: na,
   dayCntInc: Xo,
   dayCntLeapInc: jo,
   dayOfYear: aa,
-  day_start: Ne,
+  day_start: $e,
   getTimezone: sa,
   get_day: bs,
   get_dayName: oa,
@@ -435,8 +435,8 @@ const ua = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   minute_start: Ts,
   monthDayCnt: sr,
   month_start: Ms,
-  ms2Interval: ke,
-  ms2TimeUnits: ys,
+  ms2Interval: Re,
+  ms2TimeUnits: vs,
   nearestTs: da,
   nextMonth: dr,
   nextYear: fr,
@@ -480,16 +480,16 @@ function pr(r) {
 function pa(r) {
   return Math.log(r) / Math.log(10);
 }
-function va(r, e) {
+function ya(r, e) {
   return Math.pow(r, e);
 }
 function H(r, e, i) {
   return Math.min(i, Math.max(e, r));
 }
-function $e(r, e) {
+function He(r, e) {
   return !E(r) || !E(e) ? e : (Object.keys(e).forEach((i) => {
     const s = r[i], n = e[i];
-    Array.isArray(s) && Array.isArray(n) ? r[i] = $e(s.concat([]), n) : E(s) && E(n) ? r[i] = $e(Object.assign({}, s), n) : r[i] = n;
+    Array.isArray(s) && Array.isArray(n) ? r[i] = He(s.concat([]), n) : E(s) && E(n) ? r[i] = He(Object.assign({}, s), n) : r[i] = n;
   }), r);
 }
 function rt(r) {
@@ -503,11 +503,11 @@ function rt(r) {
     Object.prototype.hasOwnProperty.call(r, i) && (r.isActiveClone = null, e[i] = rt(r[i]), delete r.isActiveClone);
   return e;
 }
-function vr(r, e, i) {
+function yr(r, e, i) {
   const [s, ...n] = e.split(".");
   return {
     ...r,
-    [s]: n.length ? vr(r[s], n.join("."), i) : i
+    [s]: n.length ? yr(r[s], n.join("."), i) : i
   };
 }
 function hn(r, e) {
@@ -533,14 +533,14 @@ function xi(r, e) {
   }
   return !0;
 }
-function ya(r, e, i) {
+function va(r, e, i) {
   var s = r[e];
   r.splice(e, 1), r.splice(i, 0, s);
 }
 function wa(r, e, i) {
   [myArray[e], myArray[i]] = [myArray[i], myArray[e]];
 }
-function yr(r, e) {
+function vr(r, e) {
   return P(e) ? P(r) ? r.every((i) => e.includes(i)) : e.includes(r) : !1;
 }
 function wr(r, e) {
@@ -709,7 +709,7 @@ function Oa(r) {
       e.length = 6, e[i] *= 1;
   return r;
 }
-const Ia = F, ka = "1m", Ti = Ia, Ra = 6, ln = 0.05, Da = 100, cn = 100, ee = ["default", "percent", "log"], dn = 0.3, un = 30, ri = 200, fn = 200, gn = 20, mn = 4096, ki = 5, pn = 50, vn = 30, _a = 8;
+const Ia = F, ka = "1m", Ti = Ia, Ra = 6, ln = 0.05, Da = 100, cn = 100, ee = ["default", "percent", "log"], dn = 0.3, un = 30, ri = 200, fn = 200, gn = 20, mn = 4096, ki = 5, pn = 50, yn = 30, _a = 8;
 class ct {
   static t = 0;
   static o = 1;
@@ -752,9 +752,9 @@ class hs {
     const n = s?.interval || Ti;
     if (this.data.length == 0) {
       let o = Date.now();
-      e = 0, i = this.rangeLimit, this.#t = n, this.#e = ke(this.interval), this.anchor = o - o % n;
+      e = 0, i = this.rangeLimit, this.#t = n, this.#e = Re(this.interval), this.anchor = o - o % n;
     } else
-      this.data.length < 2 ? (this.#t = n, this.#e = ke(this.interval)) : (this.#t = ls(this.data), this.#e = ke(this.interval));
+      this.data.length < 2 ? (this.#t = n, this.#e = Re(this.interval)) : (this.#t = ls(this.data), this.#e = Re(this.interval));
     i == 0 && this.data.length >= this.rangeLimit ? i = this.rangeLimit : i == 0 && (i = this.data.length), this.set(e, i);
   }
   get allData() {
@@ -975,7 +975,7 @@ function cs(r, e) {
   let i, s = r.timeFrameMS;
   return e = e - e % s, e === r.range.data[0][0] ? i = 0 : e < r.range.data[0][0] ? i = (r.range.data[0][0] - e) / s * -1 : i = (e - r.range.data[0][0]) / s, i;
 }
-const Le = "TradeX-Chart", Re = "TX", Na = "tradeXutils", yn = "tradeXmenus", $a = "tradeXmenu", wn = "tradeXdividers", xn = "tradeXwindows", Ha = "tradeXwindow", Tn = "tradeXprogress", Ba = 500, Ua = "stream_None", De = "stream_Listening", En = "stream_Started", za = "stream_Stopped", Wa = "stream_Error", He = "stream_candleFirst", Lt = "stream_candleUpdate", Be = "stream_candleNew", Fa = 250, Va = 8, Ga = 2, Ya = 2, qa = "defaultState", Xa = {
+const Ae = "TradeX-Chart", De = "TX", Na = "tradeXutils", vn = "tradeXmenus", $a = "tradeXmenu", wn = "tradeXdividers", xn = "tradeXwindows", Ha = "tradeXwindow", Tn = "tradeXprogress", Ba = 500, Ua = "stream_None", _e = "stream_Listening", En = "stream_Started", za = "stream_Stopped", Wa = "stream_Error", Be = "stream_candleFirst", Lt = "stream_candleUpdate", Ue = "stream_candleNew", Fa = 250, Va = 8, Ga = 2, Ya = 2, qa = "defaultState", Xa = {
   id: qa,
   key: "",
   status: "default",
@@ -1030,11 +1030,11 @@ let qi = class $ {
   }
   static validate(e, i = !1, s = !1) {
     const n = this.default;
-    if (E(e) || (e = {}), E(e.chart) || (e.chart = n.chart, e.chart.isEmpty = !0, e.chart.data = P(e.ohlcv) ? e.ohlcv : [], delete e.ohlcv), e = $e(n, e), i ? e.chart.data = Aa(e.chart.data, s) ? e.chart.data : [] : e.chart.data = La(e.chart.data, s) ? e.chart.data : [], e.chart.isEmpty = e.chart.data.length == 0, !T(e.chart?.tf) || i) {
+    if (E(e) || (e = {}), E(e.chart) || (e.chart = n.chart, e.chart.isEmpty = !0, e.chart.data = P(e.ohlcv) ? e.ohlcv : [], delete e.ohlcv), e = He(n, e), i ? e.chart.data = Aa(e.chart.data, s) ? e.chart.data : [] : e.chart.data = La(e.chart.data, s) ? e.chart.data : [], e.chart.isEmpty = e.chart.data.length == 0, !T(e.chart?.tf) || i) {
       let h = ls(e.chart.data);
       h < W && (h = Ti), e.chart.tfms = h;
     }
-    if ((!S(e.chart?.tfms) || i) && (e.chart.tf = ke(e.chart.tfms)), P(e.views) || (e.views = n.views), P(e.primary) || (e.primary = n.primary), P(e.secondary) || (e.secondary = n.secondary), E(e.chart.settings) || (e.chart.settings = n.chart.settings), P(e.datasets) || (e.datasets = []), e.views.length == 0) {
+    if ((!S(e.chart?.tfms) || i) && (e.chart.tf = Re(e.chart.tfms)), P(e.views) || (e.views = n.views), P(e.primary) || (e.primary = n.primary), P(e.secondary) || (e.secondary = n.secondary), E(e.chart.settings) || (e.chart.settings = n.chart.settings), P(e.datasets) || (e.datasets = []), e.views.length == 0) {
       e.views.push(["primary", e.primary]);
       for (let h in e)
         h.indexOf("secondary") == 0 && e.views.push([h, e[h]]);
@@ -1088,7 +1088,7 @@ let qi = class $ {
   #h = !0;
   #l = [];
   constructor(e, i = !1, s = !1) {
-    E(e) ? (this.#n = $.validate(e, i, s), this.#o = "valid", this.#h = !!this.#n.chart?.isEmpty, this.#s = e?.core instanceof O ? e.core : void 0) : (this.#n = $.default, this.#o = "default", this.#h = !0), this.#e = e?.id || "", this.#r = J(`${Re}_state`);
+    E(e) ? (this.#n = $.validate(e, i, s), this.#o = "valid", this.#h = !!this.#n.chart?.isEmpty, this.#s = e?.core instanceof O ? e.core : void 0) : (this.#n = $.default, this.#o = "default", this.#h = !0), this.#e = e?.id || "", this.#r = J(`${De}_state`);
   }
   get id() {
     return this.#e;
@@ -1372,7 +1372,7 @@ class $t {
       return !1;
     const i = ["id", "initial", "context", "states"];
     let s = Object.keys(e);
-    if (!yr(i, s) || !(e.initial in e.states))
+    if (!vr(i, s) || !(e.initial in e.states))
       return !1;
     for (let n in e.states) {
       if (!E(e.states[n]) || "onEnter" in e.states[n] && !U(e.states[n].onEnter) || "onExit" in e.states[n] && !U(e.states[n].onExit))
@@ -1466,7 +1466,7 @@ const Ka = 0, Qa = 1, Ja = 2, th = 3, eh = 4, ih = 5, oi = [null, null, null, nu
   tfCountDown: !0,
   alerts: []
 };
-class ae {
+class he {
   #t;
   #e;
   #r;
@@ -1482,17 +1482,17 @@ class ae {
   #d;
   #f;
   #m = oi;
-  #x;
+  #w;
   static validateConfig(e) {
     if (E(e)) {
       let i = rt(ai);
-      e = $e(i, e), e.tfCountDown = Q(e.tfCountDown) ? e.tfCountDown : ai.tfCountDown, e.alerts = P(e.alerts) ? e.alerts : ai.alerts;
+      e = He(i, e), e.tfCountDown = Q(e.tfCountDown) ? e.tfCountDown : ai.tfCountDown, e.alerts = P(e.alerts) ? e.alerts : ai.alerts;
     } else
       return ai;
     return e;
   }
   constructor(e) {
-    this.#t = e, this.#n = e.time, this.status = { status: Ua }, this.#e = ae.validateConfig(e.config?.stream), this.#i = T(e.config?.maxCandleUpdate) ? e.config.maxCandleUpdate : Fa, this.#o = T(e.config?.streamPrecision) ? e.config.streamPrecision : Va;
+    this.#t = e, this.#n = e.time, this.status = { status: Ua }, this.#e = he.validateConfig(e.config?.stream), this.#i = T(e.config?.maxCandleUpdate) ? e.config.maxCandleUpdate : Fa, this.#o = T(e.config?.streamPrecision) ? e.config.streamPrecision : Va;
   }
   get config() {
     return this.#e;
@@ -1513,10 +1513,10 @@ class ae {
     this.#r = e, this.emit(e, i);
   }
   set dataReceived(e) {
-    this.#u || (this.#u = !0, this.status = { status: He, data: e });
+    this.#u || (this.#u = !0, this.status = { status: Be, data: e });
   }
   get alerts() {
-    return this.#x;
+    return this.#w;
   }
   get lastPriceMin() {
     return this.#f;
@@ -1538,16 +1538,16 @@ class ae {
   }
   set candle(e) {
     const i = [...this.#h];
-    e.t = this.roundTime(new Date(e.t)), e.o = e.o * 1, e.h = e.h * 1, e.l = e.l * 1, e.c = e.c * 1, e.v = e.v * 1, this.#h[Ka] !== e.t ? this.newCandle(e) : this.updateCandle(e), this.status = { status: De, data: this.#h }, this.lastTick = i;
+    e.t = this.roundTime(new Date(e.t)), e.o = e.o * 1, e.h = e.h * 1, e.l = e.l * 1, e.c = e.c * 1, e.v = e.v * 1, this.#h[Ka] !== e.t ? this.newCandle(e) : this.updateCandle(e), this.status = { status: _e, data: this.#h }, this.lastTick = i;
   }
   get candle() {
     return this.#h !== oi ? this.#h : null;
   }
   start() {
-    this.#x = new Za(this.#e.alerts), this.status = { status: En }, this.#s = setInterval(this.onUpdate.bind(this), this.#i);
+    this.#w = new Za(this.#e.alerts), this.status = { status: En }, this.#s = setInterval(this.onUpdate.bind(this), this.#i);
   }
   stop() {
-    this.#x.destroy(), this.status = { status: za };
+    this.#w.destroy(), this.status = { status: za };
   }
   emit(e, i) {
     this.#t.emit(e, i);
@@ -1556,10 +1556,10 @@ class ae {
     this.status = { status: Wa };
   }
   onTick(e) {
-    (this.#r == En || this.#r == De) && E(e) && (this.candle = e);
+    (this.#r == En || this.#r == _e) && E(e) && (this.candle = e);
   }
   onUpdate() {
-    this.#h !== oi && (this.status = { status: Lt, data: this.candle }, this.status = { status: De, data: this.#h });
+    this.#h !== oi && (this.status = { status: Lt, data: this.candle }, this.status = { status: _e, data: this.#h });
   }
   newCandle(e) {
     this.prevCandle(), this.#h = [
@@ -1571,7 +1571,7 @@ class ae {
       e.v,
       null,
       !0
-    ], this.#t.state.mergeData({ ohlcv: [this.#h] }, !0, !1), this.status = { status: Be, data: { data: e, candle: this.#h } }, this.#a = this.#n.timeFrameMS, this.#l = this.roundTime(Date.now());
+    ], this.#t.state.mergeData({ ohlcv: [this.#h] }, !0, !1), this.status = { status: Ue, data: { data: e, candle: this.#h } }, this.#a = this.#n.timeFrameMS, this.#l = this.roundTime(Date.now());
   }
   prevCandle() {
     const e = this.#t.allData.data;
@@ -1587,7 +1587,7 @@ class ae {
     let e, i, s, n, o, a, c;
     this.#n.timeFrameMS;
     let h = this.#n.timeFrameMS - (Date.now() - this.#l);
-    return h < 0 && (h = 0), this.#a = h, h > ut ? (e = String(Math.floor(h / ut)), i = String(Math.floor(h % ut / nt)).padStart(2, "0"), this.#c = `${e}Y ${i}M`) : h > nt ? (i = String(Math.floor(h / nt)).padStart(2, "0"), n = String(Math.floor(h % nt / D)).padStart(2, "0"), this.#c = `${i}M ${n}D`) : h > ue ? (s = String(Math.floor(h / ue)).padStart(2, "0"), n = String(Math.floor(h % nt / D)).padStart(2, "0"), this.#c = `${s}W ${n}D`) : h > D ? (n = String(Math.floor(h / D)).padStart(2, "0"), o = String(Math.floor(h % D / X)).padStart(2, "0"), a = String(Math.floor(h % X / F)).padStart(2, "0"), this.#c = `${n}D ${o}:${a}`) : h > X ? (o = String(Math.floor(h / X)).padStart(2, "0"), a = String(Math.floor(h % X / F)).padStart(2, "0"), c = String(Math.floor(h % F / W)).padStart(2, "0"), this.#c = `${o}:${a}:${c}`) : h > F ? (a = String(Math.floor(h / F)).padStart(2, "0"), c = String(Math.floor(h % F / W)).padStart(2, "0"), this.#c = `00:${a}:${c}`) : (c = String(Math.floor(h / W)).padStart(2, "0"), String(h % W).padStart(4, "0"), this.#c = `00:00:${c}`), this.#c;
+    return h < 0 && (h = 0), this.#a = h, h > ut ? (e = String(Math.floor(h / ut)), i = String(Math.floor(h % ut / nt)).padStart(2, "0"), this.#c = `${e}Y ${i}M`) : h > nt ? (i = String(Math.floor(h / nt)).padStart(2, "0"), n = String(Math.floor(h % nt / D)).padStart(2, "0"), this.#c = `${i}M ${n}D`) : h > fe ? (s = String(Math.floor(h / fe)).padStart(2, "0"), n = String(Math.floor(h % nt / D)).padStart(2, "0"), this.#c = `${s}W ${n}D`) : h > D ? (n = String(Math.floor(h / D)).padStart(2, "0"), o = String(Math.floor(h % D / X)).padStart(2, "0"), a = String(Math.floor(h % X / F)).padStart(2, "0"), this.#c = `${n}D ${o}:${a}`) : h > X ? (o = String(Math.floor(h / X)).padStart(2, "0"), a = String(Math.floor(h % X / F)).padStart(2, "0"), c = String(Math.floor(h % F / W)).padStart(2, "0"), this.#c = `${o}:${a}:${c}`) : h > F ? (a = String(Math.floor(h / F)).padStart(2, "0"), c = String(Math.floor(h % F / W)).padStart(2, "0"), this.#c = `00:${a}:${c}`) : (c = String(Math.floor(h / W)).padStart(2, "0"), String(h % W).padStart(4, "0"), this.#c = `00:00:${c}`), this.#c;
   }
   roundTime(e) {
     return e - e % this.#t.time.timeFrameMS;
@@ -1875,12 +1875,12 @@ var Tr = { exports: {} };
       return l === n ? u : l;
     }
     function Ut(l, u, f) {
-      L(se(u), function(m) {
+      L(ne(u), function(m) {
         l.addEventListener(m, f, !1);
       });
     }
     function It(l, u, f) {
-      L(se(u), function(m) {
+      L(ne(u), function(m) {
         l.removeEventListener(m, f, !1);
       });
     }
@@ -1895,10 +1895,10 @@ var Tr = { exports: {} };
     function kt(l, u) {
       return l.indexOf(u) > -1;
     }
-    function se(l) {
+    function ne(l) {
       return l.trim().split(/\s+/g);
     }
-    function ne(l, u, f) {
+    function re(l, u, f) {
       if (l.indexOf && !f)
         return l.indexOf(u);
       for (var m = 0; m < l.length; ) {
@@ -1914,7 +1914,7 @@ var Tr = { exports: {} };
     function Hs(l, u, f) {
       for (var m = [], x = [], b = 0; b < l.length; ) {
         var A = u ? l[b][u] : l[b];
-        ne(x, A) < 0 && m.push(l[b]), x[b] = A, b++;
+        re(x, A) < 0 && m.push(l[b]), x[b] = A, b++;
       }
       return f && (u ? m = m.sort(function(q, K) {
         return q[u] > K[u];
@@ -1936,7 +1936,7 @@ var Tr = { exports: {} };
       var u = l.ownerDocument || l;
       return u.defaultView || u.parentWindow || e;
     }
-    var co = /mobile|tablet|ip(ad|hone|od)|android/i, Us = "ontouchstart" in e, uo = Xe(e, "PointerEvent") !== n, fo = Us && co.test(navigator.userAgent), we = "touch", go = "pen", Ni = "mouse", mo = "kinect", po = 25, Z = 1, jt = 2, z = 4, tt = 8, je = 1, xe = 2, Te = 4, Ee = 8, Se = 16, bt = xe | Te, Zt = Ee | Se, zs = bt | Zt, Ws = ["x", "y"], Ze = ["clientX", "clientY"];
+    var co = /mobile|tablet|ip(ad|hone|od)|android/i, Us = "ontouchstart" in e, uo = Xe(e, "PointerEvent") !== n, fo = Us && co.test(navigator.userAgent), xe = "touch", go = "pen", Ni = "mouse", mo = "kinect", po = 25, Z = 1, jt = 2, z = 4, tt = 8, je = 1, Te = 2, Ee = 4, Se = 8, be = 16, bt = Te | Ee, Zt = Se | be, zs = bt | Zt, Ws = ["x", "y"], Ze = ["clientX", "clientY"];
     function ht(l, u) {
       var f = this;
       this.manager = l, this.callback = u, this.element = l.element, this.target = l.options.inputTarget, this.domHandler = function(m) {
@@ -1953,11 +1953,11 @@ var Tr = { exports: {} };
         this.evEl && It(this.element, this.evEl, this.domHandler), this.evTarget && It(this.target, this.evTarget, this.domHandler), this.evWin && It(Bs(this.element), this.evWin, this.domHandler);
       }
     };
-    function vo(l) {
+    function yo(l) {
       var u, f = l.options.inputClass;
-      return f ? u = f : uo ? u = Hi : fo ? u = Je : Us ? u = Bi : u = Qe, new u(l, yo);
+      return f ? u = f : uo ? u = Hi : fo ? u = Je : Us ? u = Bi : u = Qe, new u(l, vo);
     }
-    function yo(l, u, f) {
+    function vo(l, u, f) {
       var m = f.pointers.length, x = f.changedPointers.length, b = u & Z && m - x === 0, A = u & (z | tt) && m - x === 0;
       f.isFirst = !!b, f.isFinal = !!A, b && (l.session = {}), f.eventType = u, wo(l, f), l.emit("hammer.input", f), l.recognize(f), l.session.prevInput = f;
     }
@@ -2025,7 +2025,7 @@ var Tr = { exports: {} };
       };
     }
     function Ys(l, u) {
-      return l === u ? je : g(l) >= g(u) ? l < 0 ? xe : Te : u < 0 ? Ee : Se;
+      return l === u ? je : g(l) >= g(u) ? l < 0 ? Te : Ee : u < 0 ? Se : be;
     }
     function Ke(l, u, f) {
       f || (f = Ws);
@@ -2069,7 +2069,7 @@ var Tr = { exports: {} };
       pointercancel: tt,
       pointerout: tt
     }, Lo = {
-      2: we,
+      2: xe,
       3: go,
       4: Ni,
       5: mo
@@ -2080,7 +2080,7 @@ var Tr = { exports: {} };
     }
     R(Hi, ht, {
       handler: function(u) {
-        var f = this.store, m = !1, x = u.type.toLowerCase().replace("ms", ""), b = Po[x], A = Lo[u.pointerType] || u.pointerType, Y = A == we, q = ne(f, u.pointerId, "pointerId");
+        var f = this.store, m = !1, x = u.type.toLowerCase().replace("ms", ""), b = Po[x], A = Lo[u.pointerType] || u.pointerType, Y = A == xe, q = re(f, u.pointerId, "pointerId");
         b & Z && (u.button === 0 || Y) ? q < 0 && (f.push(u), q = f.length - 1) : b & (z | tt) && (m = !0), !(q < 0) && (f[q] = u, this.callback(this.manager, b, {
           pointers: f,
           changedPointers: [u],
@@ -2106,7 +2106,7 @@ var Tr = { exports: {} };
           f & (z | tt) && m[0].length - m[1].length === 0 && (this.started = !1), this.callback(this.manager, f, {
             pointers: m[0],
             changedPointers: m[1],
-            pointerType: we,
+            pointerType: xe,
             srcEvent: u
           });
         }
@@ -2131,7 +2131,7 @@ var Tr = { exports: {} };
         m && this.callback(this.manager, f, {
           pointers: m[0],
           changedPointers: m[1],
-          pointerType: we,
+          pointerType: xe,
           srcEvent: u
         });
       }
@@ -2162,7 +2162,7 @@ var Tr = { exports: {} };
     }
     R(Bi, ht, {
       handler: function(u, f, m) {
-        var x = m.pointerType == we, b = m.pointerType == Ni;
+        var x = m.pointerType == xe, b = m.pointerType == Ni;
         if (!(b && m.sourceCapabilities && m.sourceCapabilities.firesTouchEvents)) {
           if (x)
             $o.call(this, f, m);
@@ -2198,7 +2198,7 @@ var Tr = { exports: {} };
       }
       return !1;
     }
-    var Qs = Xe(a.style, "touchAction"), Js = Qs !== n, tn = "compute", en = "auto", Ui = "manipulation", Kt = "none", be = "pan-x", Ce = "pan-y", ti = Uo();
+    var Qs = Xe(a.style, "touchAction"), Js = Qs !== n, tn = "compute", en = "auto", Ui = "manipulation", Kt = "none", Ce = "pan-x", Me = "pan-y", ti = Uo();
     function zi(l, u) {
       this.manager = l, this.set(u);
     }
@@ -2221,7 +2221,7 @@ var Tr = { exports: {} };
           u.preventDefault();
           return;
         }
-        var m = this.actions, x = kt(m, Kt) && !ti[Kt], b = kt(m, Ce) && !ti[Ce], A = kt(m, be) && !ti[be];
+        var m = this.actions, x = kt(m, Kt) && !ti[Kt], b = kt(m, Me) && !ti[Me], A = kt(m, Ce) && !ti[Ce];
         if (x) {
           var Y = l.pointers.length === 1, q = l.distance < 2, K = l.deltaTime < 250;
           if (Y && q && K)
@@ -2237,8 +2237,8 @@ var Tr = { exports: {} };
     function Bo(l) {
       if (kt(l, Kt))
         return Kt;
-      var u = kt(l, be), f = kt(l, Ce);
-      return u && f ? Kt : u || f ? u ? be : Ce : kt(l, Ui) ? Ui : en;
+      var u = kt(l, Ce), f = kt(l, Me);
+      return u && f ? Kt : u || f ? u ? Ce : Me : kt(l, Ui) ? Ui : en;
     }
     function Uo() {
       if (!Js)
@@ -2248,7 +2248,7 @@ var Tr = { exports: {} };
         l[f] = u ? e.CSS.supports("touch-action", f) : !0;
       }), l;
     }
-    var ei = 1, lt = 2, re = 4, zt = 8, Rt = zt, Me = 16, Ct = 32;
+    var ei = 1, lt = 2, oe = 4, zt = 8, Rt = zt, Pe = 16, Ct = 32;
     function Dt(l) {
       this.options = N({}, this.defaults, l || {}), this.id = lo(), this.manager = null, this.options.enable = Bt(this.options.enable, !0), this.state = ei, this.simultaneous = {}, this.requireFail = [];
     }
@@ -2270,13 +2270,13 @@ var Tr = { exports: {} };
         if (M(l, "requireFailure", this))
           return this;
         var u = this.requireFail;
-        return l = ii(l, this), ne(u, l) === -1 && (u.push(l), l.requireFailure(this)), this;
+        return l = ii(l, this), re(u, l) === -1 && (u.push(l), l.requireFailure(this)), this;
       },
       dropRequireFailure: function(l) {
         if (M(l, "dropRequireFailure", this))
           return this;
         l = ii(l, this);
-        var u = ne(this.requireFail, l);
+        var u = re(this.requireFail, l);
         return u > -1 && this.requireFail.splice(u, 1), this;
       },
       hasRequireFailures: function() {
@@ -2311,7 +2311,7 @@ var Tr = { exports: {} };
           this.reset(), this.state = Ct;
           return;
         }
-        this.state & (Rt | Me | Ct) && (this.state = ei), this.state = this.process(u), this.state & (lt | re | zt | Me) && this.tryEmit(u);
+        this.state & (Rt | Pe | Ct) && (this.state = ei), this.state = this.process(u), this.state & (lt | oe | zt | Pe) && this.tryEmit(u);
       },
       process: function(l) {
       },
@@ -2321,10 +2321,10 @@ var Tr = { exports: {} };
       }
     };
     function sn(l) {
-      return l & Me ? "cancel" : l & zt ? "end" : l & re ? "move" : l & lt ? "start" : "";
+      return l & Pe ? "cancel" : l & zt ? "end" : l & oe ? "move" : l & lt ? "start" : "";
     }
     function nn(l) {
-      return l == Se ? "down" : l == Ee ? "up" : l == xe ? "left" : l == Te ? "right" : "";
+      return l == be ? "down" : l == Se ? "up" : l == Te ? "left" : l == Ee ? "right" : "";
     }
     function ii(l, u) {
       var f = u.manager;
@@ -2342,8 +2342,8 @@ var Tr = { exports: {} };
         return u === 0 || l.pointers.length === u;
       },
       process: function(l) {
-        var u = this.state, f = l.eventType, m = u & (lt | re), x = this.attrTest(l);
-        return m && (f & tt || !x) ? u | Me : m || x ? f & z ? u | zt : u & lt ? u | re : lt : Ct;
+        var u = this.state, f = l.eventType, m = u & (lt | oe), x = this.attrTest(l);
+        return m && (f & tt || !x) ? u | Pe : m || x ? f & z ? u | zt : u & lt ? u | oe : lt : Ct;
       }
     });
     function si() {
@@ -2358,11 +2358,11 @@ var Tr = { exports: {} };
       },
       getTouchAction: function() {
         var l = this.options.direction, u = [];
-        return l & bt && u.push(Ce), l & Zt && u.push(be), u;
+        return l & bt && u.push(Me), l & Zt && u.push(Ce), u;
       },
       directionTest: function(l) {
         var u = this.options, f = !0, m = l.distance, x = l.direction, b = l.deltaX, A = l.deltaY;
-        return x & u.direction || (u.direction & bt ? (x = b === 0 ? je : b < 0 ? xe : Te, f = b != this.pX, m = Math.abs(l.deltaX)) : (x = A === 0 ? je : A < 0 ? Ee : Se, f = A != this.pY, m = Math.abs(l.deltaY))), l.direction = x, f && m > u.threshold && x & u.direction;
+        return x & u.direction || (u.direction & bt ? (x = b === 0 ? je : b < 0 ? Te : Ee, f = b != this.pX, m = Math.abs(l.deltaX)) : (x = A === 0 ? je : A < 0 ? Se : be, f = A != this.pY, m = Math.abs(l.deltaY))), l.direction = x, f && m > u.threshold && x & u.direction;
       },
       attrTest: function(l) {
         return pt.prototype.attrTest.call(this, l) && (this.state & lt || !(this.state & lt) && this.directionTest(l));
@@ -2541,7 +2541,7 @@ var Tr = { exports: {} };
     };
     var zo = 1, rn = 2;
     function Yi(l, u) {
-      this.options = N({}, _t.defaults, u || {}), this.options.inputTarget = this.options.inputTarget || l, this.handlers = {}, this.session = {}, this.recognizers = [], this.oldCssProps = {}, this.element = l, this.input = vo(this), this.touchAction = new zi(this, this.options.touchAction), on(this, !0), L(this.options.recognizers, function(f) {
+      this.options = N({}, _t.defaults, u || {}), this.options.inputTarget = this.options.inputTarget || l, this.handlers = {}, this.session = {}, this.recognizers = [], this.oldCssProps = {}, this.element = l, this.input = yo(this), this.touchAction = new zi(this, this.options.touchAction), on(this, !0), L(this.options.recognizers, function(f) {
         var m = this.add(new f[0](f[1]));
         f[2] && m.recognizeWith(f[2]), f[3] && m.requireFailure(f[3]);
       }, this);
@@ -2560,7 +2560,7 @@ var Tr = { exports: {} };
           var f, m = this.recognizers, x = u.curRecognizer;
           (!x || x && x.state & Rt) && (x = u.curRecognizer = null);
           for (var b = 0; b < m.length; )
-            f = m[b], u.stopped !== rn && (!x || f == x || f.canRecognizeWith(x)) ? f.recognize(l) : f.reset(), !x && f.state & (lt | re | zt) && (x = u.curRecognizer = f), b++;
+            f = m[b], u.stopped !== rn && (!x || f == x || f.canRecognizeWith(x)) ? f.recognize(l) : f.reset(), !x && f.state & (lt | oe | zt) && (x = u.curRecognizer = f), b++;
         }
       },
       get: function(l) {
@@ -2581,7 +2581,7 @@ var Tr = { exports: {} };
         if (M(l, "remove", this))
           return this;
         if (l = this.get(l), l) {
-          var u = this.recognizers, f = ne(u, l);
+          var u = this.recognizers, f = re(u, l);
           f !== -1 && (u.splice(f, 1), this.touchAction.update());
         }
         return this;
@@ -2589,7 +2589,7 @@ var Tr = { exports: {} };
       on: function(l, u) {
         if (l !== n && u !== n) {
           var f = this.handlers;
-          return L(se(l), function(m) {
+          return L(ne(l), function(m) {
             f[m] = f[m] || [], f[m].push(u);
           }), this;
         }
@@ -2597,8 +2597,8 @@ var Tr = { exports: {} };
       off: function(l, u) {
         if (l !== n) {
           var f = this.handlers;
-          return L(se(l), function(m) {
-            u ? f[m] && f[m].splice(ne(f[m], u), 1) : delete f[m];
+          return L(ne(l), function(m) {
+            u ? f[m] && f[m].splice(re(f[m], u), 1) : delete f[m];
           }), this;
         }
       },
@@ -2637,16 +2637,16 @@ var Tr = { exports: {} };
       INPUT_CANCEL: tt,
       STATE_POSSIBLE: ei,
       STATE_BEGAN: lt,
-      STATE_CHANGED: re,
+      STATE_CHANGED: oe,
       STATE_ENDED: zt,
       STATE_RECOGNIZED: Rt,
-      STATE_CANCELLED: Me,
+      STATE_CANCELLED: Pe,
       STATE_FAILED: Ct,
       DIRECTION_NONE: je,
-      DIRECTION_LEFT: xe,
-      DIRECTION_RIGHT: Te,
-      DIRECTION_UP: Ee,
-      DIRECTION_DOWN: Se,
+      DIRECTION_LEFT: Te,
+      DIRECTION_RIGHT: Ee,
+      DIRECTION_UP: Se,
+      DIRECTION_DOWN: be,
       DIRECTION_HORIZONTAL: bt,
       DIRECTION_VERTICAL: Zt,
       DIRECTION_ALL: zs,
@@ -2809,7 +2809,7 @@ const fh = Pt ? [
   mouseover: "pointerover",
   mouseout: "pointerout",
   mouseleave: "pointerleave"
-}, vh = typeof navigator < "u" && navigator.userAgent ? navigator.userAgent.toLowerCase() : "", oe = typeof window < "u" ? window : global;
+}, yh = typeof navigator < "u" && navigator.userAgent ? navigator.userAgent.toLowerCase() : "", ae = typeof window < "u" ? window : global;
 let us = !1;
 try {
   const r = {
@@ -2817,18 +2817,18 @@ try {
       return us = !0, !0;
     }
   };
-  oe.addEventListener("test", null, r), oe.removeEventListener("test", null);
+  ae.addEventListener("test", null, r), ae.removeEventListener("test", null);
 } catch {
   us = !1;
 }
-const yh = vh.indexOf("firefox") !== -1, { WHEEL_EVENTS: wh } = Ls, Pn = "wheel", Ln = 4.000244140625, xh = 40, Th = 0.25;
+const vh = yh.indexOf("firefox") !== -1, { WHEEL_EVENTS: wh } = Ls, Pn = "wheel", Ln = 4.000244140625, xh = 40, Th = 0.25;
 class Eh extends Ri {
   constructor(e, i, s) {
     super(e, i, s), this.handleEvent = (n) => {
       if (!this.options.enable)
         return;
       let o = n.deltaY;
-      oe.WheelEvent && (yh && n.deltaMode === oe.WheelEvent.DOM_DELTA_PIXEL && (o /= oe.devicePixelRatio), n.deltaMode === oe.WheelEvent.DOM_DELTA_LINE && (o *= xh)), o !== 0 && o % Ln === 0 && (o = Math.floor(o / Ln)), n.shiftKey && o && (o = o * Th), this.callback({
+      ae.WheelEvent && (vh && n.deltaMode === ae.WheelEvent.DOM_DELTA_PIXEL && (o /= ae.devicePixelRatio), n.deltaMode === ae.WheelEvent.DOM_DELTA_LINE && (o *= xh)), o !== 0 && o % Ln === 0 && (o = Math.floor(o / Ln)), n.shiftKey && o && (o = o * Th), this.callback({
         type: Pn,
         center: {
           x: n.clientX,
@@ -3485,7 +3485,7 @@ class At {
     this.#l = !1;
   }
 }
-class yt {
+class vt {
   #t;
   #e;
   #r;
@@ -3502,13 +3502,13 @@ class yt {
   static name = "Dividers";
   static type = "Divider";
   static create(e, i) {
-    const s = `${i.core.id}_divider_${++yt.divideCnt}`;
-    return i.id = s, yt.dividerList[s] = new yt(e, i), yt.dividerList[s];
+    const s = `${i.core.id}_divider_${++vt.divideCnt}`;
+    return i.id = s, vt.dividerList[s] = new vt(e, i), vt.dividerList[s];
   }
   static destroy() {
-    for (let e in yt.dividerList)
-      yt.dividerList[e].destroy();
-    delete yt.dividerList[id];
+    for (let e in vt.dividerList)
+      vt.dividerList[e].destroy();
+    delete vt.dividerList[id];
   }
   static defaultNode() {
     return `
@@ -3547,7 +3547,7 @@ class yt {
     return this.#h.style.cursor;
   }
   get type() {
-    return yt.type;
+    return vt.type;
   }
   init() {
     this.mount();
@@ -3556,7 +3556,7 @@ class yt {
     this.cursor = "row-resize", this.eventsListen();
   }
   destroy() {
-    this.#a.destroy(), this.el.remove(), delete yt.dividerList[this.id];
+    this.#a.destroy(), this.el.remove(), delete vt.dividerList[this.id];
   }
   eventsListen() {
     this.#a = new At(this.#h, { disableContextMenu: !1 }), this.#a.on("pointerover", this.onMouseEnter.bind(this)), this.#a.on("pointerout", this.onMouseOut.bind(this)), this.#a.on("pointerdrag", this.onPointerDrag.bind(this)), this.#a.on("pointerdragend", this.onPointerDragEnd.bind(this));
@@ -3622,23 +3622,23 @@ class yt {
     this.#h.style.display = "block";
   }
 }
-const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" ><path d="M471.993 112h-89.2l-16.242-46.75a32.023 32.023 0 00-30.229-21.5H175.241a31.991 31.991 0 00-30.294 21.691L129.1 112H40a24.027 24.027 0 00-24 24v312a24.027 24.027 0 0024 24h431.993a24.027 24.027 0 0024-24V136a24.027 24.027 0 00-24-24zm-8 328H48.007V144h104.01l23.224-68.25h161.081l23.71 68.25h103.961z" class="ci-primary"></path><path d="M256 168a114 114 0 10114 114 114.13 114.13 0 00-114-114zm0 196a82 82 0 1182-82 82.093 82.093 0 01-82 82z"></path></svg>', Gh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M376 160v32h65.372L252 381.373l-72-72L76.686 412.686l22.628 22.628L180 354.627l72 72 212-211.999V280h32V160H376z"></path><path d="M48 104H16v392h480v-32H48V104z"></path></svg>', Yh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M271.514 95.5h-32v178.111l115.613 54.948 13.737-28.902-97.35-46.268V95.5z"></path><path d="M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208z"></path></svg>', br = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M245.151 168a88 88 0 1088 88 88.1 88.1 0 00-88-88zm0 144a56 56 0 1156-56 56.063 56.063 0 01-56 56z"></path><path d="M464.7 322.319l-31.77-26.153a193.081 193.081 0 000-80.332l31.77-26.153a19.941 19.941 0 004.606-25.439l-32.612-56.483a19.936 19.936 0 00-24.337-8.73l-38.561 14.447a192.038 192.038 0 00-69.54-40.192l-6.766-40.571A19.936 19.936 0 00277.762 16H212.54a19.937 19.937 0 00-19.728 16.712l-6.762 40.572a192.03 192.03 0 00-69.54 40.192L77.945 99.027a19.937 19.937 0 00-24.334 8.731L21 164.245a19.94 19.94 0 004.61 25.438l31.767 26.151a193.081 193.081 0 000 80.332l-31.77 26.153A19.942 19.942 0 0021 347.758l32.612 56.483a19.937 19.937 0 0024.337 8.73l38.562-14.447a192.03 192.03 0 0069.54 40.192l6.762 40.571A19.937 19.937 0 00212.54 496h65.222a19.936 19.936 0 0019.728-16.712l6.763-40.572a192.038 192.038 0 0069.54-40.192l38.564 14.449a19.938 19.938 0 0024.334-8.731l32.609-56.487a19.939 19.939 0 00-4.6-25.436zm-50.636 57.12l-48.109-18.024-7.285 7.334a159.955 159.955 0 01-72.625 41.973l-10 2.636L267.6 464h-44.89l-8.442-50.642-10-2.636a159.955 159.955 0 01-72.625-41.973l-7.285-7.334-48.117 18.024L53.8 340.562l39.629-32.624-2.7-9.973a160.9 160.9 0 010-83.93l2.7-9.972L53.8 171.439l22.446-38.878 48.109 18.024 7.285-7.334a159.955 159.955 0 0172.625-41.973l10-2.636L222.706 48H267.6l8.442 50.642 10 2.636a159.955 159.955 0 0172.625 41.973l7.285 7.334 48.109-18.024 22.447 38.877-39.629 32.625 2.7 9.972a160.9 160.9 0 010 83.93l-2.7 9.973 39.629 32.623z"></path></svg>', qh = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><rect x="16" y="240.18" width="188.84" height="31.635"/><g transform="translate(-3.3234e-7 -112.18)"><rect x="307.16" y="352.37" width="188.84" height="31.635"/></g><rect transform="rotate(-90)" x="-496" y="240.18" width="188.84" height="31.635"/><rect transform="rotate(-90)" x="-204.84" y="240.18" width="188.84" height="31.635"/></svg>', Xh = '<svg width="46.08" height="46.08" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"></path><path d="M6.535 3H21a1 1 0 011 1v16a1 1 0 01-1 1H6.535a1 1 0 01-.832-.445l-5.333-8a1 1 0 010-1.11l5.333-8A1 1 0 016.535 3zm.535 2l-4.666 7 4.666 7H20V5H7.07zM13 10.586l2.828-2.829 1.415 1.415L14.414 12l2.829 2.828-1.415 1.415L13 13.414l-2.828 2.829-1.415-1.415L11.586 12 8.757 9.172l1.415-1.415L13 10.586z"></path></svg>', jh = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g stroke-width="30.155"><rect x="14.757" y="240.92" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="147" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="334.84" width="482.49" height="30.155" rx="15.078"/></g ><g transform="translate(5.937 -288.34)"><path d="m23.904 712.34c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h173.93c-0.65295-3.3651-2.0312-6.4697-2.0312-10.026 0-7.1393 1.5573-13.888 4.0625-20.13zm276.35 0c2.5051 6.2423 4.0365 12.991 4.0365 20.13 0 3.5554-1.3526 6.6618-2.0052 10.026h173.93c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078z"/><path d="m250.06 759.97c17.965 0 32.545-14.58 32.545-32.545 0-17.965-14.58-32.545-32.545-32.545-17.965 0-32.545 14.58-32.545 32.545 0 17.965 14.58 32.545 32.545 32.545zm0 21.697c-29.964 0-54.242-24.279-54.242-54.242 0-29.964 24.279-54.242 54.242-54.242 29.964 0 54.242 24.279 54.242 54.242 0 29.964-24.279 54.242-54.242 54.242z" stroke-width="21.697"/></g ><path d="m144.05 18.672c-24.694 0-45.285 16.595-51.849 39.167h-62.37c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h62.37c6.5639 22.572 27.155 39.167 51.849 39.167s45.285-16.595 51.849-39.167h120.03c6.5639 22.572 27.155 39.167 51.849 39.167 24.694 0 45.285-16.595 51.849-39.167h62.552c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078h-62.552c-6.5639-22.572-27.155-39.167-51.849-39.167-24.694 0-45.285 16.595-51.849 39.167h-120.03c-6.5639-22.572-27.155-39.167-51.849-39.167zm0 21.693c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 1e-5 -32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552zm223.72 0c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 0-32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552z" stroke-width="30.155"/></svg>', Qt = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g transform="matrix(21.697 0 0 21.697 -47.758 -47.758)"><path d="m7.354 21.354 14-14-0.707-0.707-14 14z"/><path d="m22.5 7c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5zm-17 16c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z"/></g></svg>', Zh = '<svg width="46.08" height="46.08" viewBox="0 0 32 32"><path d="M 3.2758709,20.241377 11.758622,28.72413 28.72413,11.758622 20.241377,3.2758709 Z m 2.1206881,0 1.5905161,-1.590515 3.7112049,3.711203 1.060342,-1.060345 -3.7112027,-3.711204 1.0603441,-1.060344 2.1206876,2.12069 1.060346,-1.060346 -2.120689,-2.120688 1.060343,-1.060344 3.711203,3.711203 L 16,17.060346 l -3.711203,-3.711208 1.060341,-1.060341 2.12069,2.120687 1.060344,-1.060346 -2.120688,-2.120687 1.060344,-1.060343 3.711204,3.711205 1.060345,-1.060345 -3.711205,-3.7112046 1.060344,-1.0603441 2.120687,2.1206887 1.060346,-1.0603446 -2.120687,-2.1206883 1.590515,-1.5905161 6.362065,6.362063 -14.84482,14.84482 z" style="stroke-width:0.749776" /></svg>', Kh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><g id="g930" transform="matrix(21.128963,0,0,21.128963,-29.235597,-50.369964)"><path clip-rule="evenodd" d="m 4.5,5 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,6.5 A 2.5,2.5 0 0 1 6.95,6 H 24 V 7 H 6.95 A 2.5,2.5 0 0 1 2,6.5 Z M 4.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,16.5 A 2.5,2.5 0 0 1 6.95,16 h 13.1 a 2.5,2.5 0 1 1 0,1 H 6.95 A 2.5,2.5 0 0 1 2,16.5 Z M 22.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z m -18,6 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,22.5 A 2.5,2.5 0 0 1 6.95,22 H 24 v 1 H 6.95 A 2.5,2.5 0 0 1 2,22.5 Z" id="path908" /><path clip-rule="evenodd" d="M 22.4,8.94 21.01,9.57 20.6,8.66 21.99,8.03 Z m -4,1.8 -1.39,0.63 -0.41,-0.91 1.39,-0.63 z m -4,1.8 -1.4,0.63 -0.4,-0.91 1.39,-0.63 z m -4,1.8 L 9,14.97 8.6,14.06 9.99,13.43 Z" id="path910" /></g></svg>', Qh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M231.359 147l-80.921 205h45.155l15.593-39.5h89.628l15.593 39.5h45.155l-80.921-205zm-3.594 123.5L256 198.967l28.235 71.533z"></path><path d="M384 56H128V16H16v112h40v256H16v112h112v-40h256v40h112V384h-40V128h40V16H384zM48 96V48h48v48zm48 368H48v-48h48zm288-40H128v-40H88V128h40V88h256v40h40v256h-40zm80-8v48h-48v-48zM416 48h48v48h-48z"></path></svg>', Jh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g718" transform="translate(0,1.2499996)"><path d="M 7.5010125,7.9560661 5.355012,10.103066 c -0.472,0.472 -1.18,-0.2360003 -0.708,-0.7080003 L 7.6470125,6.3950659 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999998 c 0.472,0.472 -0.236,1.1800003 -0.708,0.7080003 L 8.5010125,7.9560661 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m 7.4989873,5.5439348 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>', tl = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,7.7026182 -2.1460003,2.147 c -0.472,0.4719998 -1.18,-0.236 -0.708,-0.708 l 3.0000003,-3 c 0.1953639,-0.1958581 0.5126361,-0.1958581 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.1799998 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6-3" /></svg>', el = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,8.2973819 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.1958581 0.5126361,0.1958581 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></svg>', il = '<svg width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="m1 14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-12a1 1 0 0 0-1-1h-12a1 1 0 0 0-1 1zm15 0a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2zm-8.5-2.5a0.5 0.5 0 0 0 1 0v-5.793l2.146 2.147a0.50063 0.50063 0 1 0 0.708-0.708l-3-3a0.5 0.5 0 0 0-0.708 0l-3 3a0.50063 0.50063 0 0 0 0.708 0.708l2.146-2.147z" fill-rule="evenodd"/></svg>', sl = '<svg width="46.08" height="46.08" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M 15,2 A 1,-1 0 0 0 14,1 H 2 A 1,-1 0 0 0 1,2 v 12 a 1,-1 0 0 0 1,1 h 12 a 1,-1 0 0 0 1,-1 z M 0,2 A 2,-2 0 0 1 2,0 h 12 a 2,-2 0 0 1 2,2 v 12 a 2,-2 0 0 1 -2,2 H 2 A 2,-2 0 0 1 0,14 Z m 8.5,2.5 a 0.5,-0.5 0 0 0 -1,0 v 5.793 L 5.354,8.146 A 0.5006316,-0.5006316 0 1 0 4.646,8.854 l 3,3 a 0.5,-0.5 0 0 0 0.708,0 l 3,-3 A 0.5006316,-0.5006316 0 0 0 10.646,8.146 L 8.5,10.293 Z" id="path2" /></svg>', nl = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g687" transform="translate(15.647255,-0.0288128)"><path d="m -8.1462425,10.484879 -2.1460005,2.146999 c -0.472,0.472 -1.18,-0.236 -0.708,-0.708 l 3.0000005,-2.9999994 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999994 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1460005,-2.146999 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m -8.1482677,5.5727476 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>', rl = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g611" transform="translate(0.2050748,-0.8829888)"><path d="m 7.2959375,11.933818 -2.146,-2.1469999 c -0.472,-0.4719998 -1.18,0.2359999 -0.708,0.7079999 l 3,3 c 0.195364,0.195858 0.512636,0.195858 0.708,0 l 3.0000005,-3 c 0.472,-0.472 -0.236,-1.1799997 -0.708,-0.7079999 L 8.2959375,11.933818 c -0.431103,0.417289 -0.523896,0.423024 -1,0 z" style="" id="path566" /><path d="m 7.2939123,5.8321596 -2.146,2.147 c -0.4719998,0.472 -1.1799998,-0.236 -0.708,-0.708 l 3,-3 c 0.1953639,-0.195858 0.5126361,-0.195858 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6" /></g></svg>', ol = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 11.500447,8.5 c 0.666666,0 0.666666,-1 0,-1 H 4.444275 c -0.1571231,0 -0.224029,0.07336 -0.2978281,0.1459999 -0.1958579,0.195364 -0.1958579,0.5126361 0,0.7080001 0,0 0.113806,0.146 0.320186,0.146 z" style="" id="path887" /></svg>', al = '<svg class="ov-icon" width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m14 15c0.55228 0 1-0.44772 1-1v-12c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1zm0-15c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2v-12c0-1.1046 0.89543-2 2-2z" fill-rule="evenodd"/><g transform="translate(-1.1585)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>', hl = '<svg class="ov-icon" width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m2 15c-0.55228 0-1-0.44772-1-1v-12c0-0.55228 0.44772-1 1-1h12c0.55228 0 1 0.44772 1 1v12c0 0.55228-0.44772 1-1 1zm0-15c-1.1046 0-2 0.89543-2 2v12c0 1.1046 0.89543 2 2 2h12c1.1046 0 2-0.89543 2-2v-12c0-1.1046-0.89543-2-2-2z" fill-rule="evenodd"/><g transform="matrix(-1 0 0 1 17.159 0)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>', ll = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 336.96 336.36" xmlns="http://www.w3.org/2000/svg"><path d="m0 0 168.48 336.36 168.48-336.36z"/></svg>', cl = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 336.96 336.36" xmlns="http://www.w3.org/2000/svg"><path d="m0 336.36 168.48-336.36 168.48 336.36z"/></svg>', dl = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0 70.67-28.66 134.68-74.99 181.01s-110.34 74.99-181.01 74.99c-70.68 0-134.69-28.66-181.01-74.99-46.33-46.33-74.99-110.34-74.99-181.01 0-70.68 28.66-134.69 74.99-181.01 46.32-46.33 110.33-74.99 181.01-74.99 70.67 0 134.68 28.66 181.01 74.99 46.33 46.32 74.99 110.33 74.99 181.01zm-204.29-21.97v-67.04c0-7.53-6.19-13.72-13.73-13.72h-75.96c-7.53 0-13.72 6.17-13.72 13.72v67.03h-42.84c-16.5 0-24.78 19.64-13.86 31.54l94.74 110.57c7.44 9 21.03 9.01 28.66 0.37l93.71-111.31c10.69-12.27 1.64-31.14-14.19-31.16h-42.81zm105.52 179.2c40.22-40.24 65.11-95.84 65.11-157.23 0-61.4-24.89-117-65.11-157.23-40.24-40.23-95.84-65.11-157.23-65.11-61.4 0-117 24.88-157.23 65.11s-65.11 95.83-65.11 157.23c0 61.39 24.88 116.99 65.11 157.23 40.23 40.22 95.83 65.11 157.23 65.11 61.39 0 116.99-24.89 157.23-65.11z" fill-rule="nonzero"/></svg>', ul = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0-70.67-28.66-134.68-74.99-181.01s-110.34-74.99-181.01-74.99c-70.68 0-134.69 28.66-181.01 74.99-46.33 46.33-74.99 110.34-74.99 181.01 0 70.68 28.66 134.69 74.99 181.01 46.32 46.33 110.33 74.99 181.01 74.99 70.67 0 134.68-28.66 181.01-74.99 46.33-46.32 74.99-110.33 74.99-181.01zm-204.29 21.97v67.04c0 7.53-6.19 13.72-13.73 13.72h-75.96c-7.53 0-13.72-6.17-13.72-13.72v-67.03h-42.84c-16.5 0-24.78-19.64-13.86-31.54l94.74-110.57c7.44-9 21.03-9.01 28.66-0.37l93.71 111.31c10.69 12.27 1.64 31.14-14.19 31.16zm105.52-179.2c40.22 40.24 65.11 95.84 65.11 157.23 0 61.4-24.89 117-65.11 157.23-40.24 40.23-95.84 65.11-157.23 65.11-61.4 0-117-24.88-157.23-65.11s-65.11-95.83-65.11-157.23c0-61.39 24.88-116.99 65.11-157.23 40.23-40.22 95.83-65.11 157.23-65.11 61.39 0 116.99 24.89 157.23 65.11z" fill-rule="nonzero"/></svg>', fl = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M512 256c0-70.67-28.66-134.68-74.98-181.02C390.69 28.66 326.68 0 256 0S121.31 28.66 74.98 74.98C28.66 121.32 0 185.33 0 256c0 70.68 28.66 134.69 74.98 181.02C121.31 483.34 185.32 512 256 512c70.67 0 134.69-28.66 181.02-74.98C483.34 390.69 512 326.68 512 256zm-160.23-21.5h-43.38v-67.93c0-7.63-6.27-13.9-13.91-13.9H217.5c-7.62 0-13.9 6.25-13.9 13.9v67.92h-43.41c-16.71 0-25.11 19.9-14.05 31.96l96.01 112.05c7.54 9.12 21.31 9.12 29.04.37l94.96-112.8c10.83-12.43 1.66-31.55-14.38-31.57z"/></svg>', gl = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0 70.67-28.66 134.68-74.98 181.02-46.33 46.32-110.34 74.98-181.02 74.98s-134.69-28.66-181.02-74.98c-46.32-46.34-74.98-110.35-74.98-181.02 0-70.68 28.66-134.69 74.98-181.02 46.33-46.32 110.34-74.98 181.02-74.98 70.67 0 134.69 28.66 181.02 74.98 46.32 46.33 74.98 110.34 74.98 181.02zm-160.23 21.5h-43.38v67.93c0 7.63-6.27 13.9-13.91 13.9h-76.98c-7.62 0-13.9-6.25-13.9-13.9v-67.92h-43.41c-16.71 0-25.11-19.9-14.05-31.96l96.01-112.05c7.54-9.12 21.31-9.12 29.04-0.37l94.96 112.8c10.83 12.43 1.66 31.55-14.38 31.57z"/></svg>', ml = '<svg width="800px" height="800px" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">  <defs>   <clipPath id="clipPath1">    <path d="m6.1885 15.281v-9.0209h3.1721q1.0764 0 1.6765 0.65299 0.63822 0.71345 0.63822 1.7171 0 0.58043-0.22862 1.0158-0.21909 0.42323-0.743 0.84646 1.1812 0.87065 1.1812 2.1887 0 0.53206-0.19051 1.0762-0.19051 0.53206-0.51439 0.87065-0.60964 0.65299-1.7908 0.65299zm1.467-7.4731v2.0315h1.5813q1.0383 0 1.0383-1.0158 0-1.0158-1.0383-1.0158zm0 3.5793v2.3459h1.7432q1.0859 0 1.0859-1.1609 0-1.185-1.0859-1.185zm9.6876-5.1271h1.467v6.1066q0 1.4874-0.69538 2.2854-0.80016 0.91902-2.1242 0.91902t-2.1242-0.91902q-0.69538-0.79809-0.69538-2.2854v-6.1066h1.4574v6.1066q0 1.6083 1.3622 1.6083 1.3526 0 1.3526-1.6083zm6.2108 5.6834v3.3375h-1.467v-3.3375l-2.3528-5.6834h1.6289l1.4479 3.9784 1.3622-3.9784h1.6384z" display="none" stroke-width=".041213" style="white-space:pre" aria-label="BUY"/>    <path class="powerclip" d="m-5-5h42v42.001h-42zm11.189 20.281h3.2006q1.1812 0 1.7908-0.65299 0.32387-0.33859 0.51439-0.87065 0.19051-0.54416 0.19051-1.0762 0-1.3181-1.1812-2.1887 0.52391-0.42323 0.743-0.84646 0.22862-0.43532 0.22862-1.0158 0-1.0037-0.63822-1.7171-0.60012-0.65299-1.6765-0.65299h-3.1721zm1.467-7.4731v2.0315h1.5813q1.0383 0 1.0383-1.0158 0-1.0158-1.0383-1.0158zm0 3.5793v2.3459h1.7432q1.0859 0 1.0859-1.1609 0-1.185-1.0859-1.185zm9.6876-5.1271v6.1066q0 1.6083-1.3526 1.6083-1.3622 0-1.3622-1.6083v-6.1066h-1.4574v6.1066q0 1.4874 0.69538 2.2854 0.80016 0.91902 2.1242 0.91902t2.1242-0.91902q0.69538-0.79809 0.69538-2.2854v-6.1066zm6.2108 5.6834 2.2576-5.6834h-1.6384l-1.3622 3.9784-1.4479-3.9784h-1.6289l2.3528 5.6834v3.3375h1.467z" stroke-width=".041213" style="white-space:pre"/>   </clipPath>  </defs>  <g clip-path="url(#clipPath1)" fill="none" fill-rule="evenodd">   <g id="Icon-Set" transform="translate(-360 -255)" fill="#000">    <path d="m386.67 255h-21.334c-2.945 0-5.333 2.371-5.333 5.297v12.33c0 2.924 2.055 4.813 5 4.813h6.639l4.361 9.561 4.361-9.561h6.639c2.945 0 5-1.889 5-4.813v-12.33c0-2.926-2.388-5.297-5.333-5.297z"/>   </g>  </g> </svg>', pl = '<svg width="800px" height="800px" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">  <defs>   <clipPath id="clipPath4">    <path d="m10.026 8.6238h-1.2531q-0.06962-1.4148-1.3576-1.4148-0.51344 0-0.81803 0.30231-0.30458 0.30231-0.30458 0.81019 0 0.49579 0.25237 0.74972 0.26107 0.24185 0.97467 0.43532l1.0182 0.26603q0.90505 0.24185 1.3054 0.83437 0.40901 0.59252 0.40901 1.6566 0 1.3785-0.7049 2.1524-0.69619 0.77391-1.958 0.77391-1.2444 0-1.9406-0.76182-0.68749-0.77391-0.74841-2.225h1.2967q0.03481 0.72554 0.40901 1.1125t1.053 0.38696q0.60917 0 0.95727-0.32649 0.3568-0.32649 0.3568-0.89483 0-0.54416-0.27848-0.83437-0.27848-0.30231-0.94856-0.4716l-0.90505-0.25394q-0.99208-0.26603-1.4098-0.81019-0.41772-0.55625-0.41772-1.6083 0-1.3181 0.64398-2.0436 0.65268-0.73763 1.8188-0.73763 1.4185 0 2.0886 1.0278 0.46123 0.71345 0.46123 1.8743zm2.5672 2.3822v2.3459h3.5245v1.5478h-4.8559v-9.0209h4.6993v1.5478h-3.3678v2.0315h3.1155v1.5478zm5.9612-5.1271v7.4731h3.1068v1.5478h-4.4469v-9.0209zm5.439 0v7.4731h3.1068v1.5478h-4.4469v-9.0209z" display="none" stroke-width=".039392" style="white-space:pre" aria-label="SELL"/>    <path class="powerclip" d="m-5-5h42v42.001h-42zm15.026 13.624q0-1.1609-0.46123-1.8743-0.67009-1.0278-2.0886-1.0278-1.1661 0-1.8188 0.73763-0.64398 0.72554-0.64398 2.0436 0 1.052 0.41772 1.6083 0.41772 0.54416 1.4098 0.81019l0.90505 0.25394q0.67009 0.16929 0.94856 0.4716 0.27848 0.29022 0.27848 0.83437 0 0.56834-0.3568 0.89483-0.3481 0.32649-0.95727 0.32649-0.67879 0-1.053-0.38696-0.3742-0.38695-0.40901-1.1125h-1.2967q0.060917 1.4511 0.74841 2.225 0.69619 0.76182 1.9406 0.76182 1.2619 0 1.958-0.77391 0.7049-0.77391 0.7049-2.1524 0-1.0641-0.40901-1.6566-0.40031-0.59252-1.3054-0.83437l-1.0182-0.26603q-0.7136-0.19348-0.97467-0.43532-0.25237-0.25394-0.25237-0.74972 0-0.50788 0.30458-0.81019t0.81803-0.30231q1.288 0 1.3576 1.4148zm2.5672 2.3822h3.1155v-1.5478h-3.1155v-2.0315h3.3678v-1.5478h-4.6993v9.0209h4.8559v-1.5478h-3.5245zm5.9612-5.1271h-1.3402v9.0209h4.4469v-1.5478h-3.1068zm5.439 0h-1.3402v9.0209h4.4469v-1.5478h-3.1068z" stroke-width=".039392" style="white-space:pre"/>   </clipPath>  </defs>  <path d="m26.667 0h-21.334c-2.945 0-5.333 2.371-5.333 5.297v12.33c0 2.924 2.055 4.813 5 4.813h6.639l4.361 9.561 4.361-9.561h6.639c2.945 0 5-1.889 5-4.813v-12.33c0-2.926-2.388-5.297-5.333-5.297z" clip-path="url(#clipPath4)" fill-rule="evenodd"/> </svg>', vl = '<svg width="493px" height="512px" clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 493 511.77" xmlns="http://www.w3.org/2000/svg"><path d="m33.11 458.2 104.5-79.1c3.09-3 7.08-4.47 11.08-4.45l302.6-0.08c2.67 0 5.09-1.08 6.78-2.77 1.74-1.81 2.84-4.24 2.84-6.87v-323.2c0-2.59-1.12-5-2.86-6.74-1.78-1.78-4.2-2.9-6.76-2.9h-409.56c-2.54 0-4.94 1.14-6.72 2.92s-2.92 4.18-2.92 6.72c0 793.72 1.02 39.329 1.02 416.47zm90.6-229.77c10.9 0 19.74 8.85 19.74 19.74s-8.84 19.73-19.74 19.73c-10.89 0-19.73-8.84-19.73-19.73s8.84-19.74 19.73-19.74zm0-101.14c10.9 0 19.74 8.85 19.74 19.74s-8.84 19.74-19.74 19.74c-10.89 0-19.73-8.85-19.73-19.74s8.84-19.74 19.73-19.74zm61.72 138.89c-9.95 0-18.02-8.07-18.02-18.01 0-9.95 8.07-18.02 18.02-18.02h185.56c9.95 0 18.01 8.07 18.01 18.02 0 9.94-8.06 18.01-18.01 18.01zm0-101.13c-9.95 0-18.02-8.07-18.02-18.02 0-9.94 8.07-18.01 18.02-18.01h185.56c9.95 0 18.01 8.07 18.01 18.01 0 9.95-8.06 18.02-18.01 18.02zm-30.38 241.61-125.97 99.69c-2.96 3.32-7.24 5.42-12.01 5.42-8.85 0-17.07-7.1228-17.07-15.963v-454.08c0-11.4 4.77-21.88 12.31-29.42s18.02-12.31 29.42-12.31h409.56c11.4 0 21.9 4.74 29.45 12.29 7.5 7.51 12.26 17.96 12.26 29.44v323.2c0 11.48-4.7 21.95-12.24 29.49-7.61 7.54-18.05 12.24-29.47 12.24z" fill-rule="nonzero"/></svg>', yl = '<svg width="800px" height="800px" fill="none" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m15.746 2.7281c-5.1207-2.0689-10.949 0.40512-13.018 5.5258-2.0689 5.1207 0.40512 10.949 5.5258 13.018 5.1207 2.0689 10.949-0.40508 13.018-5.5258 2.0689-5.1207-0.40508-10.949-5.5258-13.018zm-1.3378 8.3035-1.2703-0.51325c-0.21854-0.08829-0.32785-0.13246-0.3683-0.22775-0.04045-0.09529 0.0037-0.20461 0.09201-0.42314l1.6595-4.1073c0.33362-0.82575 0.50047-1.2387 0.33474-1.3523-0.16582-0.11359-0.49058 0.19103-1.1403 0.8003l-4.7426 4.4469c-1.0274 0.96338-1.541 1.445-1.4405 1.9835 0.10054 0.53837 0.75347 0.80216 2.0594 1.3298l1.2703 0.51325c0.21854 0.08829 0.32785 0.13246 0.3683 0.22775 0.04045 0.09529-0.0037 0.20461-0.09201 0.42314l-1.6595 4.1073c-0.33365 0.82582-0.50047 1.2387-0.33475 1.3523 0.16582 0.1136 0.49059-0.19104 1.1403-0.80025l4.7425-4.4469c1.0275-0.96346 1.5411-1.4451 1.4406-1.9836-0.10057-0.53838-0.75352-0.80218-2.0594-1.3298z" clip-rule="evenodd" fill-rule="evenodd"/></svg>', wl = '<svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">  <g>   <rect transform="scale(-1)" x="-15" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-36.25" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-57.5" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.3s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-78.75" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.5s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-100" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>  </g> </svg>', xl = '<svg version="1.1" id="L7" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"  viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">   <path fill="#fff" d="M42.3,39.6c5.7-4.3,13.9-3.1,18.1,2.7c4.3,5.7,3.1,13.9-2.7,18.1l4.1,5.5c8.8-6.5,10.6-19,4.1-27.7  c-6.5-8.8-19-10.6-27.7-4.1L42.3,39.6z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="3s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path> <path fill="#fff" d="M82,35.7C74.1,18,53.4,10.1,35.7,18S10.1,46.6,18,64.3l7.6-3.4c-6-13.5,0-29.3,13.5-35.3s29.3,0,35.3,13.5  L82,35.7z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="2s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path>   <path fill="#fff" d="M31.6,3.5C5.9,13.6-6.6,42.7,3.5,68.4c10.1,25.7,39.2,38.3,64.9,28.1l-3.1-7.9c-21.3,8.4-45.4-2-53.8-23.3  c-8.4-21.3,2-45.4,23.3-53.8L31.6,3.5z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="1s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path></svg>', ie = 300, Si = 400, Tl = `${Si}px`, Cr = `${ie}px`, El = "100%", Sl = "100%", qt = 30, Gt = 35, bi = 25, Mr = 25, Ci = bi + Mr, fe = 60, he = "normal", le = 12, ji = "normal", ce = "Avenir, Helvetica, Arial, sans-serif", As = "#141414", Os = "#666666", Is = "#cccccc", Ue = "#888888", ge = "#cccccc", Pr = "25px", bl = "position: relative;", _ = {
+const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" ><path d="M471.993 112h-89.2l-16.242-46.75a32.023 32.023 0 00-30.229-21.5H175.241a31.991 31.991 0 00-30.294 21.691L129.1 112H40a24.027 24.027 0 00-24 24v312a24.027 24.027 0 0024 24h431.993a24.027 24.027 0 0024-24V136a24.027 24.027 0 00-24-24zm-8 328H48.007V144h104.01l23.224-68.25h161.081l23.71 68.25h103.961z" class="ci-primary"></path><path d="M256 168a114 114 0 10114 114 114.13 114.13 0 00-114-114zm0 196a82 82 0 1182-82 82.093 82.093 0 01-82 82z"></path></svg>', Gh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M376 160v32h65.372L252 381.373l-72-72L76.686 412.686l22.628 22.628L180 354.627l72 72 212-211.999V280h32V160H376z"></path><path d="M48 104H16v392h480v-32H48V104z"></path></svg>', Yh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M271.514 95.5h-32v178.111l115.613 54.948 13.737-28.902-97.35-46.268V95.5z"></path><path d="M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208z"></path></svg>', br = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M245.151 168a88 88 0 1088 88 88.1 88.1 0 00-88-88zm0 144a56 56 0 1156-56 56.063 56.063 0 01-56 56z"></path><path d="M464.7 322.319l-31.77-26.153a193.081 193.081 0 000-80.332l31.77-26.153a19.941 19.941 0 004.606-25.439l-32.612-56.483a19.936 19.936 0 00-24.337-8.73l-38.561 14.447a192.038 192.038 0 00-69.54-40.192l-6.766-40.571A19.936 19.936 0 00277.762 16H212.54a19.937 19.937 0 00-19.728 16.712l-6.762 40.572a192.03 192.03 0 00-69.54 40.192L77.945 99.027a19.937 19.937 0 00-24.334 8.731L21 164.245a19.94 19.94 0 004.61 25.438l31.767 26.151a193.081 193.081 0 000 80.332l-31.77 26.153A19.942 19.942 0 0021 347.758l32.612 56.483a19.937 19.937 0 0024.337 8.73l38.562-14.447a192.03 192.03 0 0069.54 40.192l6.762 40.571A19.937 19.937 0 00212.54 496h65.222a19.936 19.936 0 0019.728-16.712l6.763-40.572a192.038 192.038 0 0069.54-40.192l38.564 14.449a19.938 19.938 0 0024.334-8.731l32.609-56.487a19.939 19.939 0 00-4.6-25.436zm-50.636 57.12l-48.109-18.024-7.285 7.334a159.955 159.955 0 01-72.625 41.973l-10 2.636L267.6 464h-44.89l-8.442-50.642-10-2.636a159.955 159.955 0 01-72.625-41.973l-7.285-7.334-48.117 18.024L53.8 340.562l39.629-32.624-2.7-9.973a160.9 160.9 0 010-83.93l2.7-9.972L53.8 171.439l22.446-38.878 48.109 18.024 7.285-7.334a159.955 159.955 0 0172.625-41.973l10-2.636L222.706 48H267.6l8.442 50.642 10 2.636a159.955 159.955 0 0172.625 41.973l7.285 7.334 48.109-18.024 22.447 38.877-39.629 32.625 2.7 9.972a160.9 160.9 0 010 83.93l-2.7 9.973 39.629 32.623z"></path></svg>', qh = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><rect x="16" y="240.18" width="188.84" height="31.635"/><g transform="translate(-3.3234e-7 -112.18)"><rect x="307.16" y="352.37" width="188.84" height="31.635"/></g><rect transform="rotate(-90)" x="-496" y="240.18" width="188.84" height="31.635"/><rect transform="rotate(-90)" x="-204.84" y="240.18" width="188.84" height="31.635"/></svg>', Xh = '<svg width="46.08" height="46.08" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"></path><path d="M6.535 3H21a1 1 0 011 1v16a1 1 0 01-1 1H6.535a1 1 0 01-.832-.445l-5.333-8a1 1 0 010-1.11l5.333-8A1 1 0 016.535 3zm.535 2l-4.666 7 4.666 7H20V5H7.07zM13 10.586l2.828-2.829 1.415 1.415L14.414 12l2.829 2.828-1.415 1.415L13 13.414l-2.828 2.829-1.415-1.415L11.586 12 8.757 9.172l1.415-1.415L13 10.586z"></path></svg>', jh = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g stroke-width="30.155"><rect x="14.757" y="240.92" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="147" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="334.84" width="482.49" height="30.155" rx="15.078"/></g ><g transform="translate(5.937 -288.34)"><path d="m23.904 712.34c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h173.93c-0.65295-3.3651-2.0312-6.4697-2.0312-10.026 0-7.1393 1.5573-13.888 4.0625-20.13zm276.35 0c2.5051 6.2423 4.0365 12.991 4.0365 20.13 0 3.5554-1.3526 6.6618-2.0052 10.026h173.93c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078z"/><path d="m250.06 759.97c17.965 0 32.545-14.58 32.545-32.545 0-17.965-14.58-32.545-32.545-32.545-17.965 0-32.545 14.58-32.545 32.545 0 17.965 14.58 32.545 32.545 32.545zm0 21.697c-29.964 0-54.242-24.279-54.242-54.242 0-29.964 24.279-54.242 54.242-54.242 29.964 0 54.242 24.279 54.242 54.242 0 29.964-24.279 54.242-54.242 54.242z" stroke-width="21.697"/></g ><path d="m144.05 18.672c-24.694 0-45.285 16.595-51.849 39.167h-62.37c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h62.37c6.5639 22.572 27.155 39.167 51.849 39.167s45.285-16.595 51.849-39.167h120.03c6.5639 22.572 27.155 39.167 51.849 39.167 24.694 0 45.285-16.595 51.849-39.167h62.552c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078h-62.552c-6.5639-22.572-27.155-39.167-51.849-39.167-24.694 0-45.285 16.595-51.849 39.167h-120.03c-6.5639-22.572-27.155-39.167-51.849-39.167zm0 21.693c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 1e-5 -32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552zm223.72 0c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 0-32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552z" stroke-width="30.155"/></svg>', Qt = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g transform="matrix(21.697 0 0 21.697 -47.758 -47.758)"><path d="m7.354 21.354 14-14-0.707-0.707-14 14z"/><path d="m22.5 7c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5zm-17 16c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z"/></g></svg>', Zh = '<svg width="46.08" height="46.08" viewBox="0 0 32 32"><path d="M 3.2758709,20.241377 11.758622,28.72413 28.72413,11.758622 20.241377,3.2758709 Z m 2.1206881,0 1.5905161,-1.590515 3.7112049,3.711203 1.060342,-1.060345 -3.7112027,-3.711204 1.0603441,-1.060344 2.1206876,2.12069 1.060346,-1.060346 -2.120689,-2.120688 1.060343,-1.060344 3.711203,3.711203 L 16,17.060346 l -3.711203,-3.711208 1.060341,-1.060341 2.12069,2.120687 1.060344,-1.060346 -2.120688,-2.120687 1.060344,-1.060343 3.711204,3.711205 1.060345,-1.060345 -3.711205,-3.7112046 1.060344,-1.0603441 2.120687,2.1206887 1.060346,-1.0603446 -2.120687,-2.1206883 1.590515,-1.5905161 6.362065,6.362063 -14.84482,14.84482 z" style="stroke-width:0.749776" /></svg>', Kh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><g id="g930" transform="matrix(21.128963,0,0,21.128963,-29.235597,-50.369964)"><path clip-rule="evenodd" d="m 4.5,5 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,6.5 A 2.5,2.5 0 0 1 6.95,6 H 24 V 7 H 6.95 A 2.5,2.5 0 0 1 2,6.5 Z M 4.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,16.5 A 2.5,2.5 0 0 1 6.95,16 h 13.1 a 2.5,2.5 0 1 1 0,1 H 6.95 A 2.5,2.5 0 0 1 2,16.5 Z M 22.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z m -18,6 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,22.5 A 2.5,2.5 0 0 1 6.95,22 H 24 v 1 H 6.95 A 2.5,2.5 0 0 1 2,22.5 Z" id="path908" /><path clip-rule="evenodd" d="M 22.4,8.94 21.01,9.57 20.6,8.66 21.99,8.03 Z m -4,1.8 -1.39,0.63 -0.41,-0.91 1.39,-0.63 z m -4,1.8 -1.4,0.63 -0.4,-0.91 1.39,-0.63 z m -4,1.8 L 9,14.97 8.6,14.06 9.99,13.43 Z" id="path910" /></g></svg>', Qh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M231.359 147l-80.921 205h45.155l15.593-39.5h89.628l15.593 39.5h45.155l-80.921-205zm-3.594 123.5L256 198.967l28.235 71.533z"></path><path d="M384 56H128V16H16v112h40v256H16v112h112v-40h256v40h112V384h-40V128h40V16H384zM48 96V48h48v48zm48 368H48v-48h48zm288-40H128v-40H88V128h40V88h256v40h40v256h-40zm80-8v48h-48v-48zM416 48h48v48h-48z"></path></svg>', Jh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g718" transform="translate(0,1.2499996)"><path d="M 7.5010125,7.9560661 5.355012,10.103066 c -0.472,0.472 -1.18,-0.2360003 -0.708,-0.7080003 L 7.6470125,6.3950659 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999998 c 0.472,0.472 -0.236,1.1800003 -0.708,0.7080003 L 8.5010125,7.9560661 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m 7.4989873,5.5439348 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>', tl = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,7.7026182 -2.1460003,2.147 c -0.472,0.4719998 -1.18,-0.236 -0.708,-0.708 l 3.0000003,-3 c 0.1953639,-0.1958581 0.5126361,-0.1958581 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.1799998 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6-3" /></svg>', el = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,8.2973819 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.1958581 0.5126361,0.1958581 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></svg>', il = '<svg width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="m1 14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-12a1 1 0 0 0-1-1h-12a1 1 0 0 0-1 1zm15 0a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2zm-8.5-2.5a0.5 0.5 0 0 0 1 0v-5.793l2.146 2.147a0.50063 0.50063 0 1 0 0.708-0.708l-3-3a0.5 0.5 0 0 0-0.708 0l-3 3a0.50063 0.50063 0 0 0 0.708 0.708l2.146-2.147z" fill-rule="evenodd"/></svg>', sl = '<svg width="46.08" height="46.08" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M 15,2 A 1,-1 0 0 0 14,1 H 2 A 1,-1 0 0 0 1,2 v 12 a 1,-1 0 0 0 1,1 h 12 a 1,-1 0 0 0 1,-1 z M 0,2 A 2,-2 0 0 1 2,0 h 12 a 2,-2 0 0 1 2,2 v 12 a 2,-2 0 0 1 -2,2 H 2 A 2,-2 0 0 1 0,14 Z m 8.5,2.5 a 0.5,-0.5 0 0 0 -1,0 v 5.793 L 5.354,8.146 A 0.5006316,-0.5006316 0 1 0 4.646,8.854 l 3,3 a 0.5,-0.5 0 0 0 0.708,0 l 3,-3 A 0.5006316,-0.5006316 0 0 0 10.646,8.146 L 8.5,10.293 Z" id="path2" /></svg>', nl = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g687" transform="translate(15.647255,-0.0288128)"><path d="m -8.1462425,10.484879 -2.1460005,2.146999 c -0.472,0.472 -1.18,-0.236 -0.708,-0.708 l 3.0000005,-2.9999994 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999994 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1460005,-2.146999 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m -8.1482677,5.5727476 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>', rl = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g611" transform="translate(0.2050748,-0.8829888)"><path d="m 7.2959375,11.933818 -2.146,-2.1469999 c -0.472,-0.4719998 -1.18,0.2359999 -0.708,0.7079999 l 3,3 c 0.195364,0.195858 0.512636,0.195858 0.708,0 l 3.0000005,-3 c 0.472,-0.472 -0.236,-1.1799997 -0.708,-0.7079999 L 8.2959375,11.933818 c -0.431103,0.417289 -0.523896,0.423024 -1,0 z" style="" id="path566" /><path d="m 7.2939123,5.8321596 -2.146,2.147 c -0.4719998,0.472 -1.1799998,-0.236 -0.708,-0.708 l 3,-3 c 0.1953639,-0.195858 0.5126361,-0.195858 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6" /></g></svg>', ol = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 11.500447,8.5 c 0.666666,0 0.666666,-1 0,-1 H 4.444275 c -0.1571231,0 -0.224029,0.07336 -0.2978281,0.1459999 -0.1958579,0.195364 -0.1958579,0.5126361 0,0.7080001 0,0 0.113806,0.146 0.320186,0.146 z" style="" id="path887" /></svg>', al = '<svg class="ov-icon" width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m14 15c0.55228 0 1-0.44772 1-1v-12c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1zm0-15c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2v-12c0-1.1046 0.89543-2 2-2z" fill-rule="evenodd"/><g transform="translate(-1.1585)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>', hl = '<svg class="ov-icon" width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m2 15c-0.55228 0-1-0.44772-1-1v-12c0-0.55228 0.44772-1 1-1h12c0.55228 0 1 0.44772 1 1v12c0 0.55228-0.44772 1-1 1zm0-15c-1.1046 0-2 0.89543-2 2v12c0 1.1046 0.89543 2 2 2h12c1.1046 0 2-0.89543 2-2v-12c0-1.1046-0.89543-2-2-2z" fill-rule="evenodd"/><g transform="matrix(-1 0 0 1 17.159 0)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>', ll = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 336.96 336.36" xmlns="http://www.w3.org/2000/svg"><path d="m0 0 168.48 336.36 168.48-336.36z"/></svg>', cl = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 336.96 336.36" xmlns="http://www.w3.org/2000/svg"><path d="m0 336.36 168.48-336.36 168.48 336.36z"/></svg>', dl = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0 70.67-28.66 134.68-74.99 181.01s-110.34 74.99-181.01 74.99c-70.68 0-134.69-28.66-181.01-74.99-46.33-46.33-74.99-110.34-74.99-181.01 0-70.68 28.66-134.69 74.99-181.01 46.32-46.33 110.33-74.99 181.01-74.99 70.67 0 134.68 28.66 181.01 74.99 46.33 46.32 74.99 110.33 74.99 181.01zm-204.29-21.97v-67.04c0-7.53-6.19-13.72-13.73-13.72h-75.96c-7.53 0-13.72 6.17-13.72 13.72v67.03h-42.84c-16.5 0-24.78 19.64-13.86 31.54l94.74 110.57c7.44 9 21.03 9.01 28.66 0.37l93.71-111.31c10.69-12.27 1.64-31.14-14.19-31.16h-42.81zm105.52 179.2c40.22-40.24 65.11-95.84 65.11-157.23 0-61.4-24.89-117-65.11-157.23-40.24-40.23-95.84-65.11-157.23-65.11-61.4 0-117 24.88-157.23 65.11s-65.11 95.83-65.11 157.23c0 61.39 24.88 116.99 65.11 157.23 40.23 40.22 95.83 65.11 157.23 65.11 61.39 0 116.99-24.89 157.23-65.11z" fill-rule="nonzero"/></svg>', ul = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0-70.67-28.66-134.68-74.99-181.01s-110.34-74.99-181.01-74.99c-70.68 0-134.69 28.66-181.01 74.99-46.33 46.33-74.99 110.34-74.99 181.01 0 70.68 28.66 134.69 74.99 181.01 46.32 46.33 110.33 74.99 181.01 74.99 70.67 0 134.68-28.66 181.01-74.99 46.33-46.32 74.99-110.33 74.99-181.01zm-204.29 21.97v67.04c0 7.53-6.19 13.72-13.73 13.72h-75.96c-7.53 0-13.72-6.17-13.72-13.72v-67.03h-42.84c-16.5 0-24.78-19.64-13.86-31.54l94.74-110.57c7.44-9 21.03-9.01 28.66-0.37l93.71 111.31c10.69 12.27 1.64 31.14-14.19 31.16zm105.52-179.2c40.22 40.24 65.11 95.84 65.11 157.23 0 61.4-24.89 117-65.11 157.23-40.24 40.23-95.84 65.11-157.23 65.11-61.4 0-117-24.88-157.23-65.11s-65.11-95.83-65.11-157.23c0-61.39 24.88-116.99 65.11-157.23 40.23-40.22 95.83-65.11 157.23-65.11 61.39 0 116.99 24.89 157.23 65.11z" fill-rule="nonzero"/></svg>', fl = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M512 256c0-70.67-28.66-134.68-74.98-181.02C390.69 28.66 326.68 0 256 0S121.31 28.66 74.98 74.98C28.66 121.32 0 185.33 0 256c0 70.68 28.66 134.69 74.98 181.02C121.31 483.34 185.32 512 256 512c70.67 0 134.69-28.66 181.02-74.98C483.34 390.69 512 326.68 512 256zm-160.23-21.5h-43.38v-67.93c0-7.63-6.27-13.9-13.91-13.9H217.5c-7.62 0-13.9 6.25-13.9 13.9v67.92h-43.41c-16.71 0-25.11 19.9-14.05 31.96l96.01 112.05c7.54 9.12 21.31 9.12 29.04.37l94.96-112.8c10.83-12.43 1.66-31.55-14.38-31.57z"/></svg>', gl = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0 70.67-28.66 134.68-74.98 181.02-46.33 46.32-110.34 74.98-181.02 74.98s-134.69-28.66-181.02-74.98c-46.32-46.34-74.98-110.35-74.98-181.02 0-70.68 28.66-134.69 74.98-181.02 46.33-46.32 110.34-74.98 181.02-74.98 70.67 0 134.69 28.66 181.02 74.98 46.32 46.33 74.98 110.34 74.98 181.02zm-160.23 21.5h-43.38v67.93c0 7.63-6.27 13.9-13.91 13.9h-76.98c-7.62 0-13.9-6.25-13.9-13.9v-67.92h-43.41c-16.71 0-25.11-19.9-14.05-31.96l96.01-112.05c7.54-9.12 21.31-9.12 29.04-0.37l94.96 112.8c10.83 12.43 1.66 31.55-14.38 31.57z"/></svg>', ml = '<svg width="800px" height="800px" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">  <defs>   <clipPath id="clipPath1">    <path d="m6.1885 15.281v-9.0209h3.1721q1.0764 0 1.6765 0.65299 0.63822 0.71345 0.63822 1.7171 0 0.58043-0.22862 1.0158-0.21909 0.42323-0.743 0.84646 1.1812 0.87065 1.1812 2.1887 0 0.53206-0.19051 1.0762-0.19051 0.53206-0.51439 0.87065-0.60964 0.65299-1.7908 0.65299zm1.467-7.4731v2.0315h1.5813q1.0383 0 1.0383-1.0158 0-1.0158-1.0383-1.0158zm0 3.5793v2.3459h1.7432q1.0859 0 1.0859-1.1609 0-1.185-1.0859-1.185zm9.6876-5.1271h1.467v6.1066q0 1.4874-0.69538 2.2854-0.80016 0.91902-2.1242 0.91902t-2.1242-0.91902q-0.69538-0.79809-0.69538-2.2854v-6.1066h1.4574v6.1066q0 1.6083 1.3622 1.6083 1.3526 0 1.3526-1.6083zm6.2108 5.6834v3.3375h-1.467v-3.3375l-2.3528-5.6834h1.6289l1.4479 3.9784 1.3622-3.9784h1.6384z" display="none" stroke-width=".041213" style="white-space:pre" aria-label="BUY"/>    <path class="powerclip" d="m-5-5h42v42.001h-42zm11.189 20.281h3.2006q1.1812 0 1.7908-0.65299 0.32387-0.33859 0.51439-0.87065 0.19051-0.54416 0.19051-1.0762 0-1.3181-1.1812-2.1887 0.52391-0.42323 0.743-0.84646 0.22862-0.43532 0.22862-1.0158 0-1.0037-0.63822-1.7171-0.60012-0.65299-1.6765-0.65299h-3.1721zm1.467-7.4731v2.0315h1.5813q1.0383 0 1.0383-1.0158 0-1.0158-1.0383-1.0158zm0 3.5793v2.3459h1.7432q1.0859 0 1.0859-1.1609 0-1.185-1.0859-1.185zm9.6876-5.1271v6.1066q0 1.6083-1.3526 1.6083-1.3622 0-1.3622-1.6083v-6.1066h-1.4574v6.1066q0 1.4874 0.69538 2.2854 0.80016 0.91902 2.1242 0.91902t2.1242-0.91902q0.69538-0.79809 0.69538-2.2854v-6.1066zm6.2108 5.6834 2.2576-5.6834h-1.6384l-1.3622 3.9784-1.4479-3.9784h-1.6289l2.3528 5.6834v3.3375h1.467z" stroke-width=".041213" style="white-space:pre"/>   </clipPath>  </defs>  <g clip-path="url(#clipPath1)" fill="none" fill-rule="evenodd">   <g id="Icon-Set" transform="translate(-360 -255)" fill="#000">    <path d="m386.67 255h-21.334c-2.945 0-5.333 2.371-5.333 5.297v12.33c0 2.924 2.055 4.813 5 4.813h6.639l4.361 9.561 4.361-9.561h6.639c2.945 0 5-1.889 5-4.813v-12.33c0-2.926-2.388-5.297-5.333-5.297z"/>   </g>  </g> </svg>', pl = '<svg width="800px" height="800px" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">  <defs>   <clipPath id="clipPath4">    <path d="m10.026 8.6238h-1.2531q-0.06962-1.4148-1.3576-1.4148-0.51344 0-0.81803 0.30231-0.30458 0.30231-0.30458 0.81019 0 0.49579 0.25237 0.74972 0.26107 0.24185 0.97467 0.43532l1.0182 0.26603q0.90505 0.24185 1.3054 0.83437 0.40901 0.59252 0.40901 1.6566 0 1.3785-0.7049 2.1524-0.69619 0.77391-1.958 0.77391-1.2444 0-1.9406-0.76182-0.68749-0.77391-0.74841-2.225h1.2967q0.03481 0.72554 0.40901 1.1125t1.053 0.38696q0.60917 0 0.95727-0.32649 0.3568-0.32649 0.3568-0.89483 0-0.54416-0.27848-0.83437-0.27848-0.30231-0.94856-0.4716l-0.90505-0.25394q-0.99208-0.26603-1.4098-0.81019-0.41772-0.55625-0.41772-1.6083 0-1.3181 0.64398-2.0436 0.65268-0.73763 1.8188-0.73763 1.4185 0 2.0886 1.0278 0.46123 0.71345 0.46123 1.8743zm2.5672 2.3822v2.3459h3.5245v1.5478h-4.8559v-9.0209h4.6993v1.5478h-3.3678v2.0315h3.1155v1.5478zm5.9612-5.1271v7.4731h3.1068v1.5478h-4.4469v-9.0209zm5.439 0v7.4731h3.1068v1.5478h-4.4469v-9.0209z" display="none" stroke-width=".039392" style="white-space:pre" aria-label="SELL"/>    <path class="powerclip" d="m-5-5h42v42.001h-42zm15.026 13.624q0-1.1609-0.46123-1.8743-0.67009-1.0278-2.0886-1.0278-1.1661 0-1.8188 0.73763-0.64398 0.72554-0.64398 2.0436 0 1.052 0.41772 1.6083 0.41772 0.54416 1.4098 0.81019l0.90505 0.25394q0.67009 0.16929 0.94856 0.4716 0.27848 0.29022 0.27848 0.83437 0 0.56834-0.3568 0.89483-0.3481 0.32649-0.95727 0.32649-0.67879 0-1.053-0.38696-0.3742-0.38695-0.40901-1.1125h-1.2967q0.060917 1.4511 0.74841 2.225 0.69619 0.76182 1.9406 0.76182 1.2619 0 1.958-0.77391 0.7049-0.77391 0.7049-2.1524 0-1.0641-0.40901-1.6566-0.40031-0.59252-1.3054-0.83437l-1.0182-0.26603q-0.7136-0.19348-0.97467-0.43532-0.25237-0.25394-0.25237-0.74972 0-0.50788 0.30458-0.81019t0.81803-0.30231q1.288 0 1.3576 1.4148zm2.5672 2.3822h3.1155v-1.5478h-3.1155v-2.0315h3.3678v-1.5478h-4.6993v9.0209h4.8559v-1.5478h-3.5245zm5.9612-5.1271h-1.3402v9.0209h4.4469v-1.5478h-3.1068zm5.439 0h-1.3402v9.0209h4.4469v-1.5478h-3.1068z" stroke-width=".039392" style="white-space:pre"/>   </clipPath>  </defs>  <path d="m26.667 0h-21.334c-2.945 0-5.333 2.371-5.333 5.297v12.33c0 2.924 2.055 4.813 5 4.813h6.639l4.361 9.561 4.361-9.561h6.639c2.945 0 5-1.889 5-4.813v-12.33c0-2.926-2.388-5.297-5.333-5.297z" clip-path="url(#clipPath4)" fill-rule="evenodd"/> </svg>', yl = '<svg width="493px" height="512px" clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 493 511.77" xmlns="http://www.w3.org/2000/svg"><path d="m33.11 458.2 104.5-79.1c3.09-3 7.08-4.47 11.08-4.45l302.6-0.08c2.67 0 5.09-1.08 6.78-2.77 1.74-1.81 2.84-4.24 2.84-6.87v-323.2c0-2.59-1.12-5-2.86-6.74-1.78-1.78-4.2-2.9-6.76-2.9h-409.56c-2.54 0-4.94 1.14-6.72 2.92s-2.92 4.18-2.92 6.72c0 793.72 1.02 39.329 1.02 416.47zm90.6-229.77c10.9 0 19.74 8.85 19.74 19.74s-8.84 19.73-19.74 19.73c-10.89 0-19.73-8.84-19.73-19.73s8.84-19.74 19.73-19.74zm0-101.14c10.9 0 19.74 8.85 19.74 19.74s-8.84 19.74-19.74 19.74c-10.89 0-19.73-8.85-19.73-19.74s8.84-19.74 19.73-19.74zm61.72 138.89c-9.95 0-18.02-8.07-18.02-18.01 0-9.95 8.07-18.02 18.02-18.02h185.56c9.95 0 18.01 8.07 18.01 18.02 0 9.94-8.06 18.01-18.01 18.01zm0-101.13c-9.95 0-18.02-8.07-18.02-18.02 0-9.94 8.07-18.01 18.02-18.01h185.56c9.95 0 18.01 8.07 18.01 18.01 0 9.95-8.06 18.02-18.01 18.02zm-30.38 241.61-125.97 99.69c-2.96 3.32-7.24 5.42-12.01 5.42-8.85 0-17.07-7.1228-17.07-15.963v-454.08c0-11.4 4.77-21.88 12.31-29.42s18.02-12.31 29.42-12.31h409.56c11.4 0 21.9 4.74 29.45 12.29 7.5 7.51 12.26 17.96 12.26 29.44v323.2c0 11.48-4.7 21.95-12.24 29.49-7.61 7.54-18.05 12.24-29.47 12.24z" fill-rule="nonzero"/></svg>', vl = '<svg width="800px" height="800px" fill="none" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m15.746 2.7281c-5.1207-2.0689-10.949 0.40512-13.018 5.5258-2.0689 5.1207 0.40512 10.949 5.5258 13.018 5.1207 2.0689 10.949-0.40508 13.018-5.5258 2.0689-5.1207-0.40508-10.949-5.5258-13.018zm-1.3378 8.3035-1.2703-0.51325c-0.21854-0.08829-0.32785-0.13246-0.3683-0.22775-0.04045-0.09529 0.0037-0.20461 0.09201-0.42314l1.6595-4.1073c0.33362-0.82575 0.50047-1.2387 0.33474-1.3523-0.16582-0.11359-0.49058 0.19103-1.1403 0.8003l-4.7426 4.4469c-1.0274 0.96338-1.541 1.445-1.4405 1.9835 0.10054 0.53837 0.75347 0.80216 2.0594 1.3298l1.2703 0.51325c0.21854 0.08829 0.32785 0.13246 0.3683 0.22775 0.04045 0.09529-0.0037 0.20461-0.09201 0.42314l-1.6595 4.1073c-0.33365 0.82582-0.50047 1.2387-0.33475 1.3523 0.16582 0.1136 0.49059-0.19104 1.1403-0.80025l4.7425-4.4469c1.0275-0.96346 1.5411-1.4451 1.4406-1.9836-0.10057-0.53838-0.75352-0.80218-2.0594-1.3298z" clip-rule="evenodd" fill-rule="evenodd"/></svg>', wl = '<svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">  <g>   <rect transform="scale(-1)" x="-15" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-36.25" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-57.5" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.3s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-78.75" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.5s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-100" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>  </g> </svg>', xl = '<svg version="1.1" id="L7" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"  viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">   <path fill="#fff" d="M42.3,39.6c5.7-4.3,13.9-3.1,18.1,2.7c4.3,5.7,3.1,13.9-2.7,18.1l4.1,5.5c8.8-6.5,10.6-19,4.1-27.7  c-6.5-8.8-19-10.6-27.7-4.1L42.3,39.6z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="3s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path> <path fill="#fff" d="M82,35.7C74.1,18,53.4,10.1,35.7,18S10.1,46.6,18,64.3l7.6-3.4c-6-13.5,0-29.3,13.5-35.3s29.3,0,35.3,13.5  L82,35.7z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="2s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path>   <path fill="#fff" d="M31.6,3.5C5.9,13.6-6.6,42.7,3.5,68.4c10.1,25.7,39.2,38.3,64.9,28.1l-3.1-7.9c-21.3,8.4-45.4-2-53.8-23.3  c-8.4-21.3,2-45.4,23.3-53.8L31.6,3.5z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="1s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path></svg>', ie = 300, Si = 400, Tl = `${Si}px`, Cr = `${ie}px`, El = "100%", Sl = "100%", qt = 30, Gt = 35, bi = 25, Mr = 25, Ci = bi + Mr, ge = 60, le = "normal", ce = 12, ji = "normal", de = "Avenir, Helvetica, Arial, sans-serif", As = "#141414", Os = "#666666", Is = "#cccccc", ze = "#888888", me = "#cccccc", Pr = "25px", bl = "position: relative;", _ = {
   COLOUR_BG: As,
   COLOUR_BORDER: Os,
   COLOUR_TXT: Is,
-  COLOUR_ICON: Ue,
-  COLOUR_ICONHOVER: ge,
+  COLOUR_ICON: ze,
+  COLOUR_ICONHOVER: me,
   BORDER_THICKNESS: 0,
-  FONTWEIGHT: he,
-  FONTSIZE: le,
+  FONTWEIGHT: le,
+  FONTSIZE: ce,
   FONTSTYLE: ji,
-  FONTFAMILY: ce,
-  FONT: `${ji} ${le}px ${he} ${ce}`,
-  FONTSTRING: `font-style: ${ji}; font-size: ${le}px; font-weight: ${he}; font-family: ${ce};`
+  FONTFAMILY: de,
+  FONT: `${ji} ${ce}px ${le} ${de}`,
+  FONTSTRING: `font-style: ${ji}; font-size: ${ce}px; font-weight: ${le}; font-family: ${de};`
 }, gt = {
-  fontSize: le,
-  fontWeight: he,
-  fontFamily: ce,
+  fontSize: ce,
+  fontWeight: le,
+  fontFamily: de,
   paddingLeft: 3,
   paddingRight: 3,
   paddingTop: 2,
@@ -3649,12 +3649,12 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   stroke: "#ffffff",
   fill: "#888888"
 }, Yt = {
-  COLOUR_ICON: Ue,
-  COLOUR_ICONHOVER: ge,
+  COLOUR_ICON: ze,
+  COLOUR_ICONHOVER: me,
   ICONSIZE: Pr
-}, de = {
-  COLOUR_ICON: Ue,
-  COLOUR_ICONHOVER: ge,
+}, ue = {
+  COLOUR_ICON: ze,
+  COLOUR_ICONHOVER: me,
   ICONSIZE: Pr
 }, Zi = {
   COLOUR_BG: As,
@@ -3665,7 +3665,7 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   COLOUR_BORDER: Os,
   COLOUR_TXT: Is
 }, Cl = {
-  FILL: ge + "88"
+  FILL: me + "88"
 }, j = {
   CANDLE_SOLID: "candle_solid",
   CANDLE_HOLLOW: "candle_hollow",
@@ -3683,7 +3683,7 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   COLOUR_VOLUME_UP: "#00F04044",
   COLOUR_VOLUME_DN: "#F0004044",
   ONCHART_VOLUME_HEIGHT: 15
-}, Un = he, mi = le, pi = ce, Tt = {
+}, Un = le, mi = ce, pi = de, Tt = {
   COLOUR_TICK: "#888",
   COLOUR_LABEL: "888",
   COLOUR_CURSOR: "#000",
@@ -3693,7 +3693,7 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   FONTWEIGHT: Un,
   FONT_LABEL: `${Un} ${mi}px ${pi}`,
   FONT_LABEL_BOLD: `bold ${mi}px ${pi}`
-}, zn = he, Wn = le, Fn = ce, Jt = {
+}, zn = le, Wn = ce, Fn = de, Jt = {
   COLOUR_TICK: "#888",
   COLOUR_LABEL: "888",
   COLOUR_CURSOR: "#000",
@@ -3723,7 +3723,7 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   COLOUR: "#181818",
   IMGWIDTH: "200",
   IMGHEIGHT: "200"
-}, Ji = { arrowDown: ll, arrowUp: cl, arrowDownRound: dl, arrowUpRound: ul, arrowDownRoundSolid: fl, arrowUpRoundSolid: gl, buySolid: ml, sellSolid: pl }, Gn = { noteSolid: vl, lightning: yl }, Ll = {
+}, Ji = { arrowDown: ll, arrowUp: cl, arrowDownRound: dl, arrowUpRound: ul, arrowDownRoundSolid: fl, arrowUpRoundSolid: gl, buySolid: ml, sellSolid: pl }, Gn = { noteSolid: yl, lightning: vl }, Ll = {
   candle: {
     Type: j.CANDLE_SOLID,
     UpBodyColour: hi.COLOUR_CANDLE_UP,
@@ -3747,8 +3747,8 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
     line: "#656565",
     slider: "#555555",
     handle: "#55555588",
-    icon: Ue,
-    iconHover: ge
+    icon: ze,
+    iconHover: me
   },
   yAxis: {
     colourTick: Tt.COLOUR_TICK,
@@ -3795,8 +3795,8 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
     controlsH: 18
   },
   icon: {
-    colour: Ue,
-    hover: ge
+    colour: ze,
+    hover: me
   },
   divider: {
     active: Vn.ACTIVE,
@@ -3897,7 +3897,7 @@ class xt {
   }
   setCurrent(e = {}) {
     e = E(e) ? e : {};
-    const i = rt(Ll), s = rt(e), n = $e(i, s);
+    const i = rt(Ll), s = rt(e), n = He(i, s);
     for (let o in n)
       Yn.includes(o) || (this[o] = n[o]);
     this.#e.refresh();
@@ -3917,7 +3917,7 @@ class xt {
       this[n[0]] = i;
     else {
       let o = n.shift();
-      this[o] = vr(this[o], n.join("."), i);
+      this[o] = yr(this[o], n.join("."), i);
     }
     return this.#e.refresh(), s;
   }
@@ -4032,7 +4032,7 @@ let Ar = class Ft {
 class ot extends HTMLElement {
   shadowRoot;
   template;
-  id = J(Re);
+  id = J(De);
   doInit = !0;
   constructor(e, i = "open") {
     super(), this.template = e, this.shadowRoot = this.attachShadow({ mode: i });
@@ -4113,7 +4113,7 @@ class Or {
     return pr(e);
   }
 }
-class vi extends Or {
+class yi extends Or {
   #t = 4;
   #e;
   #r = !0;
@@ -4227,7 +4227,7 @@ class vi extends Or {
       values: [],
       major: [],
       minor: []
-    }, s = ys(e.rangeDuration);
+    }, s = vs(e.rangeDuration);
     i.units = s;
     for (let p in s)
       if (s[p] > 0) {
@@ -4243,10 +4243,10 @@ class vi extends Or {
     return i.values = Object.values(i.entries), i;
   }
   xStep(e) {
-    let i = Da, s = this.#r ? e.interval : 1, n = Ae[0], o = st(this.width / e.Length), a = rs[0], c = Ae.indexOf(s);
-    for (; c-- >= 0 && !(o * (Ae[c] / s) >= i); )
+    let i = Da, s = this.#r ? e.interval : 1, n = Oe[0], o = st(this.width / e.Length), a = rs[0], c = Oe.indexOf(s);
+    for (; c-- >= 0 && !(o * (Oe[c] / s) >= i); )
       ;
-    return n = Ae[c], a = rs[c], { xStep: n, rank: a };
+    return n = Oe[c], a = rs[c], { xStep: n, rank: a };
   }
   dateTimeValue(e, i) {
     if (e / D % 1 === 0) {
@@ -4675,7 +4675,7 @@ class Dl {
         n.splice(i, 1), n.unshift(this);
         break;
       case "order":
-        ya(n, this.index, o);
+        va(n, this.index, o);
         break;
     }
     return this;
@@ -4797,7 +4797,7 @@ const G = {
   Layer: Dl,
   Scene: _l,
   Hit: Nl
-}, ze = G;
+}, We = G;
 class $l {
   #t;
   #e;
@@ -4869,7 +4869,7 @@ class $l {
   }
   addOverlay(e, i) {
     try {
-      const s = new ze.Layer(this.layerConfig);
+      const s = new We.Layer(this.layerConfig);
       return this.parent.viewport.addLayer(s), i.layer = s, i.instance = new i.class(
         s,
         this.#r.TimeLine,
@@ -4886,7 +4886,7 @@ class $l {
     this.#n.has(e) && (this.#n.get(e).layer.remove(), this.#n.delete(e));
   }
 }
-class yi extends Or {
+class vi extends Or {
   #t;
   #e;
   #r;
@@ -5117,7 +5117,7 @@ class yi extends Or {
     if (e.integers) {
       let n = s.integers;
       if (n - 2 > 0) {
-        let o = va(10, n - 2);
+        let o = ya(10, n - 2);
         return Math.floor(e.value / o) * o;
       } else
         return i ? (n = n > 0 ? n : n * -1, an(e.value, n)) : Math.floor(e.value);
@@ -5214,13 +5214,13 @@ class V {
     this.core.emit(e, i);
   }
   getXAxis() {
-    return this.#i instanceof vi ? this.#i : this.core.Chart.time.xAxis instanceof vi ? this.core.Chart.time.xAxis : "time" in this.#t ? this.#t.time.xAxis : !1;
+    return this.#i instanceof yi ? this.#i : this.core.Chart.time.xAxis instanceof yi ? this.core.Chart.time.xAxis : "time" in this.#t ? this.#t.time.xAxis : !1;
   }
   getYAxis() {
-    return this.#s instanceof yi ? this.#s : this.chart.yAxis instanceof yi ? this.chart.yAxis : "scale" in this.#t ? this.#t.scale.yAxis : !1;
+    return this.#s instanceof vi ? this.#s : this.chart.yAxis instanceof vi ? this.chart.yAxis : "scale" in this.#t ? this.#t.scale.yAxis : !1;
   }
   contextIs() {
-    return !this.#i && !this.#s ? "chart" : this.#i instanceof vi ? "timeline" : this.#s instanceof yi ? "scale" : !1;
+    return !this.#i && !this.#s ? "chart" : this.#i instanceof yi ? "timeline" : this.#s instanceof vi ? "scale" : !1;
   }
 }
 class Mi extends V {
@@ -5296,7 +5296,7 @@ const Hl = [
   ["grid", { class: Mi, fixed: !0 }],
   ["cursor", { class: ps, fixed: !0 }]
 ];
-class me {
+class pe {
   #t;
   #e;
   #r;
@@ -5388,7 +5388,7 @@ class me {
   createViewport(e = [], i = !1) {
     e = e.length == 0 ? rt(Hl) : e;
     const { width: s, height: n } = this.layerConfig();
-    let o = i ? ze.Node : ze.Viewport;
+    let o = i ? We.Node : We.Viewport;
     this.#i = new o({
       width: s,
       height: n,
@@ -5477,7 +5477,7 @@ function _i(r) {
 function $r(r, e, i, s) {
   r.fillStyle = s?.colour, r.font = Ye(s?.fontSize, s?.fontWeight, s?.fontFamily), r.textAlign = s?.textAlign || "start", r.textBaseline = s?.textBaseLine || "alphabetic", r.direction = s?.direction || "inherit", r.lineWidth = s?.width, r.strokeStyle = s?.border, s?.stroke ? r.strokeText(s?.text, e, i, s?.max) : r.fillText(s?.text, e, i, s?.max);
 }
-function pe(r, e, i, s, n) {
+function ye(r, e, i, s, n) {
   r.save(), r.font = Ye(n?.fontSize, n?.fontWeight, n?.fontFamily), r.textBaseline = "top", r.fillStyle = n?.bakCol || gt.bakCol;
   let o = n?.width || Di(r, e, n), a = n?.height || _i(n);
   r.fillRect(i, s, o, a), r.fillStyle = n?.txtCol || gt.txtCol, i = i + n?.paddingLeft, s = s + n?.paddingTop, r.fillText(`${e}`, i, s), r.restore();
@@ -5503,7 +5503,7 @@ class zl extends V {
       paddingLeft: 4,
       paddingRight: 4
     }, h = Di(e, a, c), g = s + this.core.bufferPx;
-    g = this.xAxis.xPosSnap2CandlePos(g), g = g - Math.round(h * 0.5) - this.core.scrollPos - this.core.bufferPx, this.scene.clear(), e.save(), pe(e, a, g, 1, c), e.restore();
+    g = this.xAxis.xPosSnap2CandlePos(g), g = g - Math.round(h * 0.5) - this.core.scrollPos - this.core.bufferPx, this.scene.clear(), e.save(), ye(e, a, g, 1, c), e.restore();
   }
 }
 const Wl = [
@@ -5527,27 +5527,27 @@ class Fl {
   #d = new mt();
   #f = [];
   #m;
-  #x;
-  #v;
+  #w;
+  #y;
   #E;
   #p;
-  #w;
-  #O;
+  #v;
+  #I;
   #g;
-  #P;
-  #b;
   #L;
-  #T;
-  #S;
   #M;
-  #C = {
+  #O;
+  #x;
+  #b;
+  #A;
+  #S = {
     width: 20,
     height: 20,
     fill: "#aaa"
   };
-  #y = { end: !1, start: !1 };
+  #T = { end: !1, start: !1 };
   constructor(e, i) {
-    this.#s = e, this.#n = i, this.#i = i.elements.elTime, this.#o = e.Chart, this.#h = new vi(this, this.#o), this.init();
+    this.#s = e, this.#n = i, this.#i = i.elements.elTime, this.#o = e.Chart, this.#h = new yi(this, this.#o), this.init();
   }
   log(e) {
     this.#s.log(e);
@@ -5604,7 +5604,7 @@ class Fl {
     return this.#h.xAxisRatio;
   }
   get layerLabels() {
-    return this.#O;
+    return this.#I;
   }
   get layerOverlays() {
     return this.#g;
@@ -5665,14 +5665,14 @@ class Fl {
   }
   init() {
     const e = this.#i;
-    this.#a = e.viewport, this.#c = e.overview, this.#x = e.overview.icons, this.#v = e.overview.scrollBar, this.#E = e.overview.handle, this.#p = e.overview.rwdStart, this.#w = e.overview.fwdEnd;
+    this.#a = e.viewport, this.#c = e.overview, this.#w = e.overview.icons, this.#y = e.overview.scrollBar, this.#E = e.overview.handle, this.#p = e.overview.rwdStart, this.#v = e.overview.fwdEnd;
     const i = {
       core: this.#s,
-      elContainer: this.#v,
+      elContainer: this.#y,
       elHandle: this.#E,
       callback: null
     };
-    this.#M = new ks(i), this.#s.theme?.time?.navigation === !1 && this.navigationDisplay(!1);
+    this.#A = new ks(i), this.#s.theme?.time?.navigation === !1 && this.navigationDisplay(!1);
   }
   setWidth(e) {
     this.#i.style.width = `${e}px`, this.#a.style.width = `${e}px`;
@@ -5683,20 +5683,20 @@ class Fl {
   }
   navigationDisplay(e) {
     if (e)
-      this.#w.style["margin-top"] = 0, this.#p.style["margin-top"] = 0;
+      this.#v.style["margin-top"] = 0, this.#p.style["margin-top"] = 0;
     else {
       const i = this.core.theme.xAxis?.background ? this.core.theme.xAxis.Background : this.core.theme.chart.Background;
-      this.#c.style.visibility = "hidden", this.#w.style["margin-top"] = `${this.#a.clientHeight * -1}px`, this.#p.style["margin-top"] = `${this.#a.clientHeight * -1}px`, this.#w.style.background = this.core.theme.chart.Background, this.#p.style.background = i;
+      this.#c.style.visibility = "hidden", this.#v.style["margin-top"] = `${this.#a.clientHeight * -1}px`, this.#p.style["margin-top"] = `${this.#a.clientHeight * -1}px`, this.#v.style.background = this.core.theme.chart.Background, this.#p.style.background = i;
     }
   }
   start() {
     this.createGraph(), this.onSetRange(), this.#h.initXAxisGrads(), this.draw(), this.eventsListen(), ts.id = this.id, ts.context = this, this.stateMachine = ts, this.stateMachine.start();
   }
   destroy() {
-    this.stateMachine.destroy(), this.#b.destroy(), this.#L.destroy(), this.#T.destroy(), this.off("main_mousemove", this.drawCursorTime), this.off("setRange", this.onSetRange), this.#w.removeEventListener("click", ft), this.#p.removeEventListener("click", ft), this.#u.destroy(), this.element.remove();
+    this.stateMachine.destroy(), this.#M.destroy(), this.#O.destroy(), this.#x.destroy(), this.off("main_mousemove", this.drawCursorTime), this.off("setRange", this.onSetRange), this.#v.removeEventListener("click", ft), this.#p.removeEventListener("click", ft), this.#u.destroy(), this.element.remove();
   }
   eventsListen() {
-    this.#b = new At(this.#a, { disableContextMenu: !1 }), this.#b.on("dblclick", this.onDoubleClick.bind(this)), this.#b.on("pointerover", this.onPointerEnter.bind(this)), this.#b.on("pointerout", this.onPointerLeave.bind(this)), this.#b.on("pointerdrag", this.onPointerDrag.bind(this)), this.#L = new At(this.#w, { disableContextMenu: !1 }), this.#L.on("pointerover", () => this.showJump(this.#y.end)), this.#L.on("pointerleave", () => this.hideJump(this.#y.end)), this.#T = new At(this.#p, { disableContextMenu: !1 }), this.#T.on("pointerover", () => this.showJump(this.#y.start)), this.#T.on("pointerleave", () => this.hideJump(this.#y.start)), this.on("main_mousemove", this.#P.draw, this.#P), this.on("setRange", this.onSetRange, this), this.#w.addEventListener("click", ft(this.onMouseClick, 1e3, this, !0)), this.#p.addEventListener("click", ft(this.onMouseClick, 1e3, this, !0));
+    this.#M = new At(this.#a, { disableContextMenu: !1 }), this.#M.on("dblclick", this.onDoubleClick.bind(this)), this.#M.on("pointerover", this.onPointerEnter.bind(this)), this.#M.on("pointerout", this.onPointerLeave.bind(this)), this.#M.on("pointerdrag", this.onPointerDrag.bind(this)), this.#O = new At(this.#v, { disableContextMenu: !1 }), this.#O.on("pointerover", () => this.showJump(this.#T.end)), this.#O.on("pointerleave", () => this.hideJump(this.#T.end)), this.#x = new At(this.#p, { disableContextMenu: !1 }), this.#x.on("pointerover", () => this.showJump(this.#T.start)), this.#x.on("pointerleave", () => this.hideJump(this.#T.start)), this.on("main_mousemove", this.#L.draw, this.#L), this.on("setRange", this.onSetRange, this), this.#v.addEventListener("click", ft(this.onMouseClick, 1e3, this, !0)), this.#p.addEventListener("click", ft(this.onMouseClick, 1e3, this, !0));
   }
   on(e, i, s) {
     this.#s.on(e, i, s);
@@ -5721,7 +5721,7 @@ class Fl {
     e.domEvent.target.style.cursor = "ew-resize", this.#c.style.visibility = "visible", this.hideCursorTime();
   }
   onPointerLeave(e) {
-    this.#s.theme?.time?.navigation === !1 && !(this.#y.end && this.#y.start) && (this.#c.style.visibility = "hidden");
+    this.#s.theme?.time?.navigation === !1 && !(this.#T.end && this.#T.start) && (this.#c.style.visibility = "hidden");
   }
   onPointerDrag(e) {
     let i = this.range, s = i.indexStart - e.movement.x, n = i.indexEnd;
@@ -5739,8 +5739,8 @@ class Fl {
   onSetRange() {
     let e = this.range, i = e.indexStart;
     e.indexEnd;
-    let s = this.#v.getBoundingClientRect().width, n = e.dataLength + e.limitFuture + e.limitPast, o = s / n, a = e.Length * o, c = (i + e.limitPast) * o;
-    this.#M.setHandleDims(c, a);
+    let s = this.#y.getBoundingClientRect().width, n = e.dataLength + e.limitFuture + e.limitPast, o = s / n, a = e.Length * o, c = (i + e.limitPast) * o;
+    this.#A.setHandleDims(c, a);
   }
   t2Index(e) {
     return this.#h.t2Index(e);
@@ -5762,7 +5762,7 @@ class Fl {
   }
   createGraph() {
     let e = rt(Wl);
-    this.#u = new me(this, this.#a, e, !1), this.#P = this.graph.overlays.get("cursor").instance, this.#O = this.graph.overlays.get("labels").instance, this.#g = this.graph.overlays.get("overlay").instance, this.graph.addOverlays(this.#f);
+    this.#u = new pe(this, this.#a, e, !1), this.#L = this.graph.overlays.get("cursor").instance, this.#I = this.graph.overlays.get("labels").instance, this.#g = this.graph.overlays.get("overlay").instance, this.graph.addOverlays(this.#f);
   }
   addOverlays(e) {
     if (!isArray(e))
@@ -6149,7 +6149,7 @@ class ql extends V {
       width: this.viewport.width
     }, a = o.fontSize + o.paddingTop + o.paddingBottom, c = i - a * 0.5;
     const h = this.scene.context;
-    this.scene.clear(), h.save(), h.fillStyle = o.bakCol, h.fillRect(1, c, this.width, a), pe(h, `${n}`, 1, c, o), h.restore();
+    this.scene.clear(), h.save(), h.fillStyle = o.bakCol, h.fillRect(1, c, this.width, a), ye(h, `${n}`, 1, c, o), h.restore();
   }
   erase() {
     this.scene.clear(), this.target.viewport.render();
@@ -6202,7 +6202,7 @@ class Zl extends V {
   draw(e) {
     if (e === void 0)
       return;
-    const i = this.scene.context, s = this.core.stream instanceof ae && this.config.stream.tfCountDown;
+    const i = this.scene.context, s = this.core.stream instanceof he && this.config.stream.tfCountDown;
     let n = e[4], o = this.parent.nicePrice(n), a = {
       fontSize: Tt.FONTSIZE * 1.05,
       fontWeight: Tt.FONTWEIGHT,
@@ -6215,7 +6215,7 @@ class Zl extends V {
       paddingRight: 3,
       width: this.viewport.width
     }, c = 0, h = _i(a), g = this.parent.yPos(n) - h * 0.5;
-    this.scene.clear(), i.save(), e[4] >= e[1] ? a.bakCol = this.theme.candle.UpBodyColour : a.bakCol = this.theme.candle.DnBodyColour, pe(i, o, c, g, a), s && (o = this.core.stream.countDownUpdate(), a.fontSize = a?.fontSize / 1.1, pe(i, o, c, g + h, a)), i.restore(), this.viewport.render();
+    this.scene.clear(), i.save(), e[4] >= e[1] ? a.bakCol = this.theme.candle.UpBodyColour : a.bakCol = this.theme.candle.DnBodyColour, ye(i, o, c, g, a), s && (o = this.core.stream.countDownUpdate(), a.fontSize = a?.fontSize / 1.1, ye(i, o, c, g + h, a)), i.restore(), this.viewport.render();
   }
 }
 const Kl = [
@@ -6240,14 +6240,14 @@ class Ql {
   #d;
   #f;
   #m;
-  #x;
-  #v = new mt();
+  #w;
+  #y = new mt();
   #E = [];
   #p;
-  #w;
-  #O;
+  #v;
+  #I;
   #g;
-  #P = {};
+  #L = {};
   constructor(e, i) {
     this.#n = e, this.#i = { ...i }, this.#c = this.#i.elScale, this.#h = this.#i.chart, this.#s = this.#i.parent, this.id = `${this.#s.id}_scale`, this.init();
   }
@@ -6303,7 +6303,7 @@ class Ql {
     return this.#c.style.cursor;
   }
   get layerCursor() {
-    return this.#x;
+    return this.#w;
   }
   get layerLabels() {
     return this.#d;
@@ -6382,7 +6382,7 @@ class Ql {
   }
   start() {
     const e = this.#s.name == "Chart" ? void 0 : this.#s.localRange;
-    this.#a = new yi(this, this, this.options.yAxisType, e), this.createGraph(), this.#a.calcGradations(), this.draw(), this.eventsListen();
+    this.#a = new vi(this, this, this.options.yAxisType, e), this.createGraph(), this.#a.calcGradations(), this.draw(), this.eventsListen();
     const i = rt(Yl);
     i.id = this.id, i.context = this, this.stateMachine = i, this.stateMachine.start();
   }
@@ -6390,11 +6390,11 @@ class Ql {
     this.#a.setRange(this.#n.range), this.draw();
   }
   destroy() {
-    this.stateMachine.destroy(), this.#p.destroy(), this.#w.destroy(), this.off(`${this.#s.id}_mousemove`, this.onMouseMove), this.off(`${this.#s.id}_mouseout`, this.#x.erase), this.off(Lt, this.onStreamUpdate), this.element.remove();
+    this.stateMachine.destroy(), this.#p.destroy(), this.#v.destroy(), this.off(`${this.#s.id}_mousemove`, this.onMouseMove), this.off(`${this.#s.id}_mouseout`, this.#w.erase), this.off(Lt, this.onStreamUpdate), this.element.remove();
   }
   eventsListen() {
     let e = this.#p.viewport.scene.canvas;
-    this.#w = new At(e, { disableContextMenu: !1 }), this.#w.setCursor("ns-resize"), this.#w.on("pointerdrag", this.onDrag.bind(this)), this.#w.on("pointerdragend", this.onDragDone.bind(this)), this.#w.on("wheel", this.onMouseWheel.bind(this)), this.#w.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.#s.id}_mousemove`, this.onMouseMove, this), this.on(`${this.#s.id}_mouseout`, this.#x.erase, this.#x), this.on(Lt, this.#m.draw, this.#m);
+    this.#v = new At(e, { disableContextMenu: !1 }), this.#v.setCursor("ns-resize"), this.#v.on("pointerdrag", this.onDrag.bind(this)), this.#v.on("pointerdragend", this.onDragDone.bind(this)), this.#v.on("wheel", this.onMouseWheel.bind(this)), this.#v.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.#s.id}_mousemove`, this.onMouseMove, this), this.on(`${this.#s.id}_mouseout`, this.#w.erase, this.#w), this.on(Lt, this.#m.draw, this.#m);
   }
   on(e, i, s) {
     this.core.on(e, i, s);
@@ -6409,7 +6409,7 @@ class Ql {
     this.setDimensions(e);
   }
   onMouseMove(e) {
-    this.#g = P(e) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)], this.#x.draw(this.#g);
+    this.#g = P(e) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)], this.#w.draw(this.#g);
   }
   onDrag(e) {
     this.#g = [
@@ -6436,7 +6436,7 @@ class Ql {
   }
   setDimensions(e) {
     const i = this.#c.getBoundingClientRect().width;
-    this.setHeight(e.h), this.graph instanceof me && (this.#p.setSize(i, e.h, i), this.draw());
+    this.setHeight(e.h), this.graph instanceof pe && (this.#p.setSize(i, e.h, i), this.draw());
   }
   setScaleRange(e = 0) {
     this.#a.mode == "automatic" && (this.#a.mode = "manual"), this.#a.zoom = e, this.parent.draw(this.range, !0), this.draw();
@@ -6459,7 +6459,7 @@ class Ql {
   }
   createGraph() {
     let e = rt(Kl);
-    this.graph = new me(this, this.#u, e, !1), this.#x = this.graph.overlays.get("cursor").instance, this.#d = this.graph.overlays.get("labels").instance, this.#f = this.graph.overlays.get("overlay").instance, this.#m = this.graph.overlays.get("price").instance, this.graph.addOverlays(this.#E), this.#m.target.moveTop(), this.#x.target.moveTop();
+    this.graph = new pe(this, this.#u, e, !1), this.#w = this.graph.overlays.get("cursor").instance, this.#d = this.graph.overlays.get("labels").instance, this.#f = this.graph.overlays.get("overlay").instance, this.#m = this.graph.overlays.get("price").instance, this.graph.addOverlays(this.#E), this.#m.target.moveTop(), this.#w.target.moveTop();
   }
   addOverlays(e) {
     if (!P(e))
@@ -6473,7 +6473,7 @@ class Ql {
       this.#E.push([e, i]);
     else {
       let s = this.graph.addOverlay(e, i);
-      return this.#m.target.moveTop(), this.#x.target.moveTop(), s;
+      return this.#m.target.moveTop(), this.#w.target.moveTop(), s;
     }
   }
   render() {
@@ -6726,16 +6726,16 @@ const hc = {
   blue: "#0000FFFF",
   alpa: "#000000FF"
 };
-function Oe(r, e) {
+function Ie(r, e) {
   const i = Yr(e), s = i.ctx;
   return s.fillStyle = hc[r], s.globalCompositeOperation = "multiply", s.fillRect(0, 0, s.canvas.width, s.canvas.height), s.globalCompositeOperation = "destination-in", s.drawImage(e, 0, 0), s.globalCompositeOperation = "source-over", i;
 }
 function lc(r) {
   return {
-    red: Oe("red", r),
-    green: Oe("green", r),
-    blue: Oe("blue", r),
-    alpha: Oe("alpha", r)
+    red: Ie("red", r),
+    green: Ie("green", r),
+    blue: Ie("blue", r),
+    alpha: Ie("alpha", r)
   };
 }
 function qr(r, e) {
@@ -6746,7 +6746,7 @@ const et = {
   createCanvas: qr,
   imageToCanvs: Yr,
   seperateRGB: lc,
-  getChannel: Oe,
+  getChannel: Ie,
   getPixelRatio: ac,
   fillStroke: ve,
   calcTextWidth: Nr,
@@ -6755,13 +6755,13 @@ const et = {
   getTextRectWidth: Di,
   renderImage: Gr,
   renderText: $r,
-  renderTextBG: pe,
-  renderPath: ye,
+  renderTextBG: ye,
+  renderPath: we,
   renderPathStroke: cc,
   renderPathClosed: dc,
   renderSpline: uc,
   renderLine: gc,
-  renderLineHorizontal: We,
+  renderLineHorizontal: Fe,
   renderLineVertical: fc,
   renderCircle: oc,
   renderRect: ec,
@@ -6775,7 +6775,7 @@ const et = {
   renderDiamond: rc,
   renderTriangle: nc
 };
-function ye(r, e, i, s) {
+function we(r, e, i, s) {
   r.save();
   const n = i.width || 1;
   r.lineWidth = n, n % 2 && r.translate(0.5, 0.5), r.strokeStyle = i.stroke, P(i.dash) && r.setLineDash(i.dash), r.beginPath();
@@ -6785,12 +6785,12 @@ function ye(r, e, i, s) {
   }), s(), r.restore();
 }
 function cc(r, e, i) {
-  ye(r, e, i, () => {
+  we(r, e, i, () => {
     r.stroke();
   });
 }
 function dc(r, e, i) {
-  ye(r, e, i, () => {
+  we(r, e, i, () => {
     r.closePath();
   }), ve(r, opts?.fill, opts?.stroke, opts?.size);
 }
@@ -6802,18 +6802,18 @@ function uc(r, e, i) {
   }
   r.stroke();
 }
-function We(r, e, i, s, n) {
-  ye(r, [{ x: i, y: e }, { x: s, y: e }], n, () => {
+function Fe(r, e, i, s, n) {
+  we(r, [{ x: i, y: e }, { x: s, y: e }], n, () => {
     r.stroke(), r.closePath();
   });
 }
 function fc(r, e, i, s, n) {
-  coords = [{ x: e, y: i }, { x: e, y, bottom: s }], ye(r, coords, n, () => {
+  coords = [{ x: e, y: i }, { x: e, y, bottom: s }], we(r, coords, n, () => {
     r.stroke(), r.closePath();
   });
 }
 function gc(r, e, i) {
-  ye(r, e, i, () => {
+  we(r, e, i, () => {
     r.stroke(), r.closePath();
   });
 }
@@ -6842,7 +6842,7 @@ class mc extends V {
       x: this.core.stream.lastXPos,
       w: this.xAxis.candleW
     };
-    o.o = this.yAxis.yPos(i[1]), o.h = this.yAxis.yPos(i[2]), o.l = this.yAxis.yPos(i[3]), o.c = this.yAxis.yPos(i[4]), o.raw = i, e.inRenderRange(i[0]) && s(o), i[4] >= i[1] ? this.theme.priceLineStyle.stroke = this.core.theme.candle.UpBodyColour : this.theme.priceLineStyle.stroke = this.core.theme.candle.DnBodyColour, We(
+    o.o = this.yAxis.yPos(i[1]), o.h = this.yAxis.yPos(i[2]), o.l = this.yAxis.yPos(i[3]), o.c = this.yAxis.yPos(i[4]), o.raw = i, e.inRenderRange(i[0]) && s(o), i[4] >= i[1] ? this.theme.priceLineStyle.stroke = this.core.theme.candle.UpBodyColour : this.theme.priceLineStyle.stroke = this.core.theme.candle.DnBodyColour, Fe(
       this.scene.context,
       o.c,
       0,
@@ -6875,7 +6875,7 @@ class mc extends V {
     o.restore();
   }
 }
-const Ie = {
+const ke = {
   colour: "#4444cc88",
   wdith: 1,
   dash: [1, 0]
@@ -6883,7 +6883,7 @@ const Ie = {
 class pc extends V {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a);
-    const c = { class: vc, fixed: !0, required: !1 };
+    const c = { class: yc, fixed: !0, required: !1 };
     this.core.config?.highLow === !0 && (this.scaleOverly = this.chart.scale.addOverlay("hiLo", c));
   }
   set position(e) {
@@ -6895,10 +6895,10 @@ class pc extends V {
     this.scene.clear();
     let i, s, n, o = this.scene.width, a = 35, c = {};
     const h = e.valueHi, g = e.valueLo, p = { ...this.theme.yAxis }, v = this.scene.context;
-    p.colourCursorBG = this.theme?.hilo?.colour || Ie.colour, v.save(), v.strokeStyle = this.theme?.highLow?.colour || Ie.colour, v.strokeWidth = this.theme?.highLow?.width || Ie.width, v.setLineDash(this.theme?.highLow?.dash || Ie.dash), n = this.yAxis.yPos(h), We(v, n, 0, o, c), i = "High", s = this.theme.yAxis.location == "left" ? 0 : o - (a + 25), Pi(v, i, s, n, a, p), n = this.yAxis.yPos(g), We(v, n, 0, o, c), i = "Low", Pi(v, i, s, n, a, p), v.restore();
+    p.colourCursorBG = this.theme?.hilo?.colour || ke.colour, v.save(), v.strokeStyle = this.theme?.highLow?.colour || ke.colour, v.strokeWidth = this.theme?.highLow?.width || ke.width, v.setLineDash(this.theme?.highLow?.dash || ke.dash), n = this.yAxis.yPos(h), Fe(v, n, 0, o, c), i = "High", s = this.theme.yAxis.location == "left" ? 0 : o - (a + 25), Pi(v, i, s, n, a, p), n = this.yAxis.yPos(g), Fe(v, n, 0, o, c), i = "Low", Pi(v, i, s, n, a, p), v.restore();
   }
 }
-class vc extends V {
+class yc extends V {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
@@ -6909,7 +6909,7 @@ class vc extends V {
     this.scene.clear();
     let i, s, n, o;
     const a = e.valueHi, c = e.valueLo, h = { ...this.theme.yAxis }, g = this.scene.context;
-    h.colourCursorBG = this.theme?.hilo?.colour || Ie.colour, i = this.chart.Scale.nicePrice(a), s = 1, n = this.yAxis.yPos(a) + 1, o = this.viewport.width, Pi(g, i, s, n, o, h), i = this.chart.Scale.nicePrice(c), n = this.yAxis.yPos(c) + 1, Pi(g, i, s, n, o, h);
+    h.colourCursorBG = this.theme?.hilo?.colour || ke.colour, i = this.chart.Scale.nicePrice(a), s = 1, n = this.yAxis.yPos(a) + 1, o = this.viewport.width, Pi(g, i, s, n, o, h), i = this.chart.Scale.nicePrice(c), n = this.yAxis.yPos(c) + 1, Pi(g, i, s, n, o, h);
   }
 }
 function Pi(r, e, i, s, n, o) {
@@ -6925,9 +6925,9 @@ function Pi(r, e, i, s, n, o) {
     paddingRight: 3,
     width: n
   }, c = a.fontSize + a.paddingTop + a.paddingBottom, h = s - c * 0.5;
-  r.save(), r.fillStyle = a.bakCol, r.fillRect(i, h, n, c), pe(r, `${e}`, i, h, a), r.restore();
+  r.save(), r.fillStyle = a.bakCol, r.fillRect(i, h, n, c), ye(r, `${e}`, i, h, a), r.restore();
 }
-class yc {
+class vc {
   data;
   icon;
   constructor(e, i) {
@@ -6960,7 +6960,7 @@ class xc extends V {
   #r;
   #n = (e) => ft(this.isNewsEventSelected, 100, this);
   constructor(e, i = !1, s = !1, n, o, a) {
-    super(e, i, s, n, o, a), this.#t = new yc(e, n), this.emit(), this.core.on("primary_pointerdown", ft(this.isNewsEventSelected, 200, this), this), this.#r = this.core.WidgetsG.insert("Dialogue", wc), this.#r.start();
+    super(e, i, s, n, o, a), this.#t = new vc(e, n), this.emit(), this.core.on("primary_pointerdown", ft(this.isNewsEventSelected, 200, this), this), this.#r = this.core.WidgetsG.insert("Dialogue", wc), this.#r.start();
   }
   destroy() {
     this.core.off("primary_pointerdown", this.#n);
@@ -7160,17 +7160,17 @@ const Cc = {
   secondaryPane: {
     candles: { class: Br, fixed: !1, required: !0 }
   }
-}, vt = {
+}, yt = {
   id: "chart",
   title: "",
   type: "chart",
   source: () => {
   }
 };
-class Fe {
+class se {
   static #t = 0;
   static get cnt() {
-    return Fe.#t++;
+    return se.#t++;
   }
   #e;
   #r;
@@ -7186,31 +7186,31 @@ class Fe {
   #d;
   #f;
   #m;
-  #x;
-  #v;
+  #w;
+  #y;
   #E;
   #p;
-  #w;
-  #O;
+  #v;
+  #I;
   #g;
-  #P;
-  #b = new mt();
-  #L = new mt();
-  #T = [0, 0];
-  #S = !1;
-  #M;
-  #C;
-  #y;
-  #R = {
+  #L;
+  #M = new mt();
+  #O = new mt();
+  #x = [0, 0];
+  #b = !1;
+  #A;
+  #S;
+  #T;
+  #k = {
     valueMax: 110,
     valueMin: -10,
     valueDiff: 120
   };
-  #k = {};
+  #P = {};
   constructor(e, i) {
-    if (this.#s = e, this.#a = Fe.cnt, !E(i))
+    if (this.#s = e, this.#a = se.cnt, !E(i))
       return;
-    this.#o = { ...i }, this.#r = this.#o.name, this.#n = this.#o.shortName, this.#i = this.#o.title, this.#c = this.#o.type == "primary" ? "primaryPane" : "secondaryPane", this.#g = this.#o.view, this.#f = this.#o.elements.elScale, this.#h = this.#o.parent, this.#d = this.#o.elements.elTarget, this.#d.id = this.id, this.legend = new Gl(this.elLegend, this), this.isPrimary ? (vt.type = "chart", vt.title = this.title, vt.parent = this, vt.source = this.legendInputs.bind(this), this.legend.add(vt), this.yAxisType = "default") : (vt.type = "secondary", vt.title = "", vt.parent = this, vt.source = () => ({ inputs: {}, colours: [], labels: [] }), this.legend.add(vt), this.yAxisType = this.core.indicatorClasses[i.view[0].type].ind.scale);
+    this.#o = { ...i }, this.#r = this.#o.name, this.#n = this.#o.shortName, this.#i = this.#o.title, this.#c = this.#o.type == "primary" ? "primaryPane" : "secondaryPane", this.#g = this.#o.view, this.#f = this.#o.elements.elScale, this.#h = this.#o.parent, this.#d = this.#o.elements.elTarget, this.#d.id = this.id, this.legend = new Gl(this.elLegend, this), this.isPrimary ? (yt.type = "chart", yt.title = this.title, yt.parent = this, yt.source = this.legendInputs.bind(this), this.legend.add(yt), this.yAxisType = "default") : (yt.type = "secondary", yt.title = "", yt.parent = this, yt.source = () => ({ inputs: {}, colours: [], labels: [] }), this.legend.add(yt), this.yAxisType = this.core.indicatorClasses[i.view[0].type].ind.scale);
     const s = { ...i };
     s.parent = this, s.chart = this, s.elScale = this.elScale, s.yAxisType = this.yAxisType, this.scale = new Ql(this.core, s), this.#u = "init", this.log(`${this.name} instantiated`);
   }
@@ -7295,13 +7295,13 @@ class Fe {
     this.setLocalRange(e);
   }
   get localRange() {
-    return this.#R;
+    return this.#k;
   }
   get stream() {
-    return this.#w;
+    return this.#v;
   }
   get streamCandle() {
-    return this.#O;
+    return this.#I;
   }
   set cursor(e) {
     this.element.style.cursor = e;
@@ -7310,16 +7310,16 @@ class Fe {
     return this.element.style.cursor;
   }
   get cursorPos() {
-    return this.#T;
+    return this.#x;
   }
   set cursorActive(e) {
-    this.#S = e;
+    this.#b = e;
   }
   get cursorActive() {
-    return this.#S;
+    return this.#b;
   }
   get cursorClick() {
-    return this.#M;
+    return this.#A;
   }
   get candleW() {
     return this.#s.Timeline.candleW;
@@ -7337,7 +7337,7 @@ class Fe {
     return this.#s.bufferPx;
   }
   get elCanvas() {
-    return this.#v.viewport.scene.canvas;
+    return this.#y.viewport.scene.canvas;
   }
   get elScale() {
     return this.#f;
@@ -7349,10 +7349,10 @@ class Fe {
     return this.#d.viewport;
   }
   set layerWidth(e) {
-    this.#v.layerWidth = e;
+    this.#y.layerWidth = e;
   }
   get layerWidth() {
-    return this.#v.layerWidth;
+    return this.#y.layerWidth;
   }
   set legend(e) {
     this.#E = e;
@@ -7361,10 +7361,10 @@ class Fe {
     return this.#E;
   }
   set time(e) {
-    this.#x = e;
+    this.#w = e;
   }
   get time() {
-    return this.#x;
+    return this.#w;
   }
   set scale(e) {
     this.#m = e;
@@ -7376,34 +7376,34 @@ class Fe {
     this.setYAxisType(e);
   }
   get yAxisType() {
-    return this.#y;
+    return this.#T;
   }
   get axes() {
     return "x";
   }
   set graph(e) {
-    this.#v = e;
+    this.#y = e;
   }
   get graph() {
-    return this.#v;
+    return this.#y;
   }
   get view() {
     return this.#g;
   }
   get viewport() {
-    return this.#v.viewport;
+    return this.#y.viewport;
   }
   get layerGrid() {
-    return this.#v.overlays.get("grid").layer;
+    return this.#y.overlays.get("grid").layer;
   }
   get overlays() {
     return this.getOverlays();
   }
   get overlayGrid() {
-    return this.#v.overlays.get("grid").instance;
+    return this.#y.overlays.get("grid").instance;
   }
   get overlayTools() {
-    return this.#L;
+    return this.#O;
   }
   get overlaysDefault() {
     return Cc[this.type];
@@ -7412,7 +7412,7 @@ class Fe {
     return this.getIndicators();
   }
   get indicatorDeleteList() {
-    return this.#k;
+    return this.#P;
   }
   set stateMachine(e) {
     this.#l = new $t(e, this);
@@ -7430,7 +7430,7 @@ class Fe {
     return this.sibling("next");
   }
   start() {
-    this.#x = this.#s.Timeline, this.createGraph(), this.#m.start(), this.draw(this.range), this.cursor = "crosshair", es.id = this.id, es.context = this, this.stateMachine = es, this.stateMachine.start(), this.eventsListen();
+    this.#w = this.#s.Timeline, this.createGraph(), this.#m.start(), this.draw(this.range), this.cursor = "crosshair", es.id = this.id, es.context = this, this.stateMachine = es, this.stateMachine.start(), this.eventsListen();
     const e = { chartPane: this };
     this.#p = this.core.WidgetsG.insert("Divider", e), this.#p.start(), this.#u = "running";
   }
@@ -7440,14 +7440,14 @@ class Fe {
         this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartPane()" instead.`);
         return;
       }
-      this.stateMachine.destroy(), this.Divider.destroy(), this.#m.destroy(), this.#v.destroy(), this.#C.destroy(), this.legend.destroy(), this.off("main_mousemove", this.onMouseMove), this.off(De, this.onStreamListening), this.off(Be, this.onStreamNewValue), this.off(Lt, this.onStreamUpdate), this.off(He, this.onStreamNewValue), this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.off("chart_yAxisRedraw", this.onYAxisRedraw), this.element.remove(), this.#u = "destroyed";
+      this.stateMachine.destroy(), this.Divider.destroy(), this.#m.destroy(), this.#y.destroy(), this.#S.destroy(), this.legend.destroy(), this.off("main_mousemove", this.onMouseMove), this.off(_e, this.onStreamListening), this.off(Ue, this.onStreamNewValue), this.off(Lt, this.onStreamUpdate), this.off(Be, this.onStreamNewValue), this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.off("chart_yAxisRedraw", this.onYAxisRedraw), this.element.remove(), this.#u = "destroyed";
     }
   }
   remove() {
     this.core.log(`Deleting chart pane: ${this.id}`), this.emit("destroyChartView", this.id);
   }
   eventsListen() {
-    this.#C = new At(this.#d, { disableContextMenu: !1 }), this.#C.on("pointerdrag", this.onChartDrag.bind(this)), this.#C.on("pointerdragend", this.onChartDragDone.bind(this)), this.#C.on("pointermove", this.onMouseMove.bind(this)), this.#C.on("pointerenter", this.onMouseEnter.bind(this)), this.#C.on("pointerout", this.onMouseOut.bind(this)), this.#C.on("pointerdown", this.onMouseDown.bind(this)), this.#C.on("pointerup", this.onMouseUp.bind(this)), this.on("main_mousemove", this.updateLegends, this), this.on(De, this.onStreamListening, this), this.on(Be, this.onStreamNewValue, this), this.on(Lt, this.onStreamUpdate, this), this.on(He, this.onStreamNewValue, this), this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.on("chart_yAxisRedraw", this.onYAxisRedraw, this);
+    this.#S = new At(this.#d, { disableContextMenu: !1 }), this.#S.on("pointerdrag", this.onChartDrag.bind(this)), this.#S.on("pointerdragend", this.onChartDragDone.bind(this)), this.#S.on("pointermove", this.onMouseMove.bind(this)), this.#S.on("pointerenter", this.onMouseEnter.bind(this)), this.#S.on("pointerout", this.onMouseOut.bind(this)), this.#S.on("pointerdown", this.onMouseDown.bind(this)), this.#S.on("pointerup", this.onMouseUp.bind(this)), this.on("main_mousemove", this.updateLegends, this), this.on(_e, this.onStreamListening, this), this.on(Ue, this.onStreamNewValue, this), this.on(Lt, this.onStreamUpdate, this), this.on(Be, this.onStreamNewValue, this), this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.on("chart_yAxisRedraw", this.onYAxisRedraw, this);
   }
   on(e, i, s) {
     this.#s.on(e, i, s);
@@ -7465,28 +7465,28 @@ class Fe {
     this.cursor = "crosshair", this.core.MainPane.onChartDragDone(e);
   }
   onMouseMove(e) {
-    this.core.MainPane.onPointerActive(this), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.#T = [Math.round(e.position.x), Math.round(e.position.y)], this.#m.onMouseMove(this.#T), this.emit(`${this.id}_mousemove`, this.#T);
+    this.core.MainPane.onPointerActive(this), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.#x = [Math.round(e.position.x), Math.round(e.position.y)], this.#m.onMouseMove(this.#x), this.emit(`${this.id}_mousemove`, this.#x);
   }
   onMouseEnter(e) {
-    this.core.MainPane.onPointerActive(this), this.#T = [Math.round(e.position.x), Math.round(e.position.y)], this.core.MainPane.onMouseEnter(), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.emit(`${this.id}_mouseenter`, this.#T);
+    this.core.MainPane.onPointerActive(this), this.#x = [Math.round(e.position.x), Math.round(e.position.y)], this.core.MainPane.onMouseEnter(), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.emit(`${this.id}_mouseenter`, this.#x);
   }
   onMouseOut(e) {
-    this.#S = !1, this.#T = [Math.round(e.position.x), Math.round(e.position.y)], this.scale.layerCursor.visible = !1, this.emit(`${this.id}_mouseout`, this.#T);
+    this.#b = !1, this.#x = [Math.round(e.position.x), Math.round(e.position.y)], this.scale.layerCursor.visible = !1, this.emit(`${this.id}_mouseout`, this.#x);
   }
   onMouseDown(e) {
-    this.#s.pointerButtons[e.domEvent.srcEvent.button] = !0, this.#M = [Math.floor(e.position.x), Math.floor(e.position.y)], this.stateMachine.state === "tool_activated" ? this.emit("tool_targetSelected", { target: this, position: e }) : this.isPrimary && this.emit("primary_pointerdown", this.#M);
+    this.#s.pointerButtons[e.domEvent.srcEvent.button] = !0, this.#A = [Math.floor(e.position.x), Math.floor(e.position.y)], this.stateMachine.state === "tool_activated" ? this.emit("tool_targetSelected", { target: this, position: e }) : this.isPrimary && this.emit("primary_pointerdown", this.#A);
   }
   onMouseUp(e) {
     this.#s.pointerButtons[e.domEvent.srcEvent.button] = !1;
   }
   onStreamListening(e) {
-    this.#w !== e && (this.#w = e);
+    this.#v !== e && (this.#v = e);
   }
   onStreamNewValue(e) {
     this.draw(this.range, !0);
   }
   onStreamUpdate(e) {
-    this.isPrimary ? (this.#O = e, this.chartStreamCandle.draw(), this.layerStream.setPosition(this.core.stream.lastScrollPos, 0), this.updateLegends(this.cursorPos, e)) : this.updateLegends(), this.graph.render();
+    this.isPrimary ? (this.#I = e, this.chartStreamCandle.draw(), this.layerStream.setPosition(this.core.stream.lastScrollPos, 0), this.updateLegends(this.cursorPos, e)) : this.updateLegends(), this.graph.render();
   }
   onYAxisRedraw() {
     this.isPrimary && this.refresh();
@@ -7497,7 +7497,7 @@ class Fe {
   setTitle(e) {
     if (!S(e))
       return !1;
-    this.#i = e, vt.title = e;
+    this.#i = e, yt.title = e;
     const i = this.legend.list.chart.el.querySelectorAll(".title");
     for (let s of i)
       s.innerHTML = e;
@@ -7512,19 +7512,19 @@ class Fe {
   setDimensions(e) {
     const i = this.config.buffer || ki;
     let { w: s, h: n } = e;
-    s = this.width, n = n || this.height, this.setHeight(n), this.graph instanceof me && (this.layerWidth = Math.round(s * ((100 + i) * 0.01)), this.graph.setSize(s, n, this.layerWidth), this.draw(void 0, !0), this.core.MainPane.draw(void 0, !1), this.draw(void 0, !0), this.Divider.setPos());
+    s = this.width, n = n || this.height, this.setHeight(n), this.graph instanceof pe && (this.layerWidth = Math.round(s * ((100 + i) * 0.01)), this.graph.setSize(s, n, this.layerWidth), this.draw(void 0, !0), this.core.MainPane.draw(void 0, !1), this.draw(void 0, !0), this.Divider.setPos());
   }
   setLocalRange(e, i) {
     if (!T(i) || !T(e))
       return !1;
-    e > i && ([e, i] = [i, e]), this.#R = {
+    e > i && ([e, i] = [i, e]), this.#k = {
       valueMax: i,
       valueMin: e,
       valueDiff: i - e
     };
   }
   setYAxisType(e) {
-    return !S(e) || !ee.includes(e) || this.type == "primaryPane" && e == "percent" ? !1 : (this.#y = e, !0);
+    return !S(e) || !ee.includes(e) || this.type == "primaryPane" && e == "percent" ? !1 : (this.#T = e, !0);
   }
   addOverlays(e) {
     if (!P(e) || e.length < 1)
@@ -7543,7 +7543,7 @@ class Fe {
     return this.graph.addOverlays(i), !0;
   }
   getOverlays() {
-    return Object.fromEntries([...this.#v.overlays.list]);
+    return Object.fromEntries([...this.#y.overlays.list]);
   }
   addIndicator(e) {
     const i = this.type === "primaryPane", s = this.core.indicatorClasses[e.type].ind, n = s.constructor.type === "both" ? i : s.prototype.primaryPane;
@@ -7569,7 +7569,7 @@ class Fe {
   removeIndicator(e) {
     if (!S(e) || !(e in this.indicators))
       return !1;
-    this.#k[e] = !0, this.indicators[e].instance.destroy(), this.graph.removeOverlay(e), this.draw(), Object.keys(this.indicators).length === 0 && !this.isPrimary && this.emit("destroyChartView", this.id), delete this.#k[e];
+    this.#P[e] = !0, this.indicators[e].instance.destroy(), this.graph.removeOverlay(e), this.draw(), Object.keys(this.indicators).length === 0 && !this.isPrimary && this.emit("destroyChartView", this.id), delete this.#P[e];
   }
   indicatorVisible(e, i) {
     return !S(e) || !(e in this.indicators) ? !1 : this.indicators[e].instance.visible(i);
@@ -7578,21 +7578,21 @@ class Fe {
     return !S(e) || !(e in this.indicators) ? !1 : this.indicators[e].instance.settings(i);
   }
   addTool(e) {
-    let { layerConfig: i } = this.layerConfig(), s = new ze.Layer(i);
-    this.#b.set(e.id, s), this.#P.addLayer(s), e.layerTool = s, this.#L.set(e.id, e);
+    let { layerConfig: i } = this.layerConfig(), s = new We.Layer(i);
+    this.#M.set(e.id, s), this.#L.addLayer(s), e.layerTool = s, this.#O.set(e.id, e);
   }
   addTools(e) {
   }
   overlayTools() {
   }
   overlayToolAdd(e) {
-    this.#L.set(e.id, e);
+    this.#O.set(e.id, e);
   }
   overlayToolDelete(e) {
-    this.#L.delete(e);
+    this.#O.delete(e);
   }
   drawGrid() {
-    this.layerGrid.setPosition(this.#s.scrollPos, 0), this.overlayGrid.draw("y"), this.#v.render();
+    this.layerGrid.setPosition(this.#s.scrollPos, 0), this.overlayGrid.draw("y"), this.#y.render();
   }
   refresh() {
     this.scale.draw(), this.draw(void 0, this.isPrimary);
@@ -7600,7 +7600,7 @@ class Fe {
   legendsVisibility(e) {
     this.legend.setCollapse(e);
   }
-  updateLegends(e = this.#T, i = !1) {
+  updateLegends(e = this.#x, i = !1) {
     if (!(this.#s.isEmpty || !E(this.#E)))
       for (const s in this.#E.list)
         this.#E.update(s, { pos: e, candle: i });
@@ -7623,8 +7623,10 @@ class Fe {
       case "visible":
         return;
       case "maximize":
+        this.#s.MainPane.paneMaximize(this);
         return;
       case "restore":
+        this.#s.MainPane.paneMaximize(this);
         return;
       case "remove":
         this.remove();
@@ -7661,23 +7663,24 @@ class Fe {
   }
   createGraph() {
     let e = rt(this.overlaysDefault);
-    this.graph = new me(this, this.elViewport, e, !1), this.isPrimary && (this.layerStream = this.graph.overlays.get("stream")?.layer, this.chartStreamCandle = this.graph.overlays.get("stream")?.instance), this.addOverlays(this.view);
+    this.graph = new pe(this, this.elViewport, e, !1), this.isPrimary && (this.layerStream = this.graph.overlays.get("stream")?.layer, this.chartStreamCandle = this.graph.overlays.get("stream")?.instance), this.addOverlays(this.view);
   }
   render() {
-    this.#v.render(), this.#m.render();
+    this.#y.render(), this.#m.render();
   }
   draw(e = this.range, i = !1) {
-    this.#v.draw(e, i);
+    this.#y.draw(e, i);
   }
   drawGrid() {
-    this.layerGrid.setPosition(this.core.scrollPos, 0), this.overlayGrid.draw("y"), this.#v.render();
+    this.layerGrid.setPosition(this.core.scrollPos, 0), this.overlayGrid.draw("y"), this.#y.render();
   }
   resize(e) {
     const i = this, s = this.sibling();
     if (s === null)
       return { active: null, prev: null };
-    let n, o, a;
-    return T(e) && e > this.core.MainPane.rowMinH || (n = this.core.MainPane.cursorPos[5], o = this.height - n - 1, a = s.height + n), o >= this.core.MainPane.rowMinH && a >= this.core.MainPane.rowMinH && (i.setDimensions({ w: void 0, h: o }), s.setDimensions({ w: void 0, h: a }), i.Divider.setPos()), i.element.style.userSelect = "none", s.element.style.userSelect = "none", { active: i, prev: s };
+    const n = this.core.MainPane.rowMinH, o = this.element.clientHeight, a = s.element.clientHeight;
+    let c, h, g, p;
+    return T(e) && e > n || (p = o + a, c = this.core.MainPane.cursorPos[5], h = o - c, g = a + c), h < n || g < n || p !== h + g || (i.setDimensions({ w: void 0, h }), s.setDimensions({ w: void 0, h: g }), i.Divider.setPos()), i.element.style.userSelect = "none", s.element.style.userSelect = "none", { active: i, prev: s };
   }
   zoomRange() {
     this.draw(this.range, !0), this.emit("zoomDone");
@@ -7728,12 +7731,12 @@ class Nt extends V {
   #d;
   #f;
   #m = [0, 0];
-  #x;
-  #v;
+  #w;
+  #y;
   #E = 2;
   #p = {};
-  #w;
-  #O;
+  #v;
+  #I;
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, void 0, o, a), this.#r = V.cnt, this.#l = a, this.#a = a.overlay, this.#u = n.type, this.#c = n.indicator, this.#d = this.core.TALib, this.#f = this.xAxis.range, this.eventsListen();
   }
@@ -7795,7 +7798,7 @@ class Nt extends V {
     return this.#a;
   }
   get legendID() {
-    return this.#w;
+    return this.#v;
   }
   get indicator() {
     return this.#c;
@@ -7807,10 +7810,10 @@ class Nt extends V {
     return this.core.range;
   }
   set setNewValue(e) {
-    this.#x = e;
+    this.#w = e;
   }
   set setUpdateValue(e) {
-    this.#v = e;
+    this.#y = e;
   }
   set precision(e) {
     this.#E = e;
@@ -7830,19 +7833,19 @@ class Nt extends V {
   set value(e) {
     const i = this.core.time.timeFrameMS;
     let s = Math.floor(new Date(e[ct.t]) / i) * i;
-    e[ct.t] = s, this.#m[ct.t] !== e[ct.t] ? (this.#m[ct.t] = e[ct.t], this.#x(e)) : this.#v(e);
+    e[ct.t] = s, this.#m[ct.t] !== e[ct.t] ? (this.#m[ct.t] = e[ct.t], this.#w(e)) : this.#y(e);
   }
   get value() {
     return this.#m;
   }
   destroy() {
-    if (this.#O === "destroyed")
+    if (this.#I === "destroyed")
       return;
     if (!this.core.ChartPanes.get(this.chartPaneID).indicatorDeleteList[this.id]) {
       this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeIndicator()" instead.`);
       return;
     }
-    this.off(Lt, this.onStreamUpdate), this.chart.legend.remove(this.#w), this.#O = "destroyed";
+    this.off(Lt, this.onStreamUpdate), this.chart.legend.remove(this.#v), this.#I = "destroyed";
   }
   remove() {
     this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPaneID}`), this.emit(`${this.chartPaneID}_removeIndicator`, { id: this.id, paneID: this.chartPaneID });
@@ -7935,7 +7938,7 @@ class Nt extends V {
       parent: this,
       source: this.legendInputs.bind(this)
     };
-    this.#w = this.chart.legend.add(e);
+    this.#v = this.chart.legend.add(e);
   }
   legendInputs(e = this.chart.cursorPos) {
     const i = [this.style.stroke];
@@ -8086,18 +8089,23 @@ const is = {
       onExit(r) {
       },
       on: {
+        chart_paneMaximize: {
+          target: "chart_paneMaximize",
+          action(r) {
+          }
+        },
         chart_pan: {
           target: "chart_pan",
           action(r) {
           }
         },
-        setRange: {
-          target: "setRange",
+        chart_scrollTo: {
+          target: "chart_scrollTo",
           action(r) {
           }
         },
-        chart_scrollTo: {
-          target: "chart_scrollTo",
+        setRange: {
+          target: "setRange",
           action(r) {
           }
         },
@@ -8115,6 +8123,20 @@ const is = {
         global_resize: {
           target: "global_resize",
           action(r) {
+          }
+        }
+      }
+    },
+    chart_paneMaximize: {
+      onEnter(r) {
+      },
+      onExit(r) {
+      },
+      on: {
+        always: {
+          target: "idle",
+          action(r) {
+            this.context.maximize = "some pane pointer";
           }
         }
       }
@@ -8179,49 +8201,6 @@ const is = {
         addIndicatorDone: {
           target: "idle",
           action(r) {
-          }
-        }
-      }
-    },
-    divider_mousedown: {
-      onEnter(r) {
-        this.context.divider = r;
-      },
-      onExit(r) {
-      },
-      on: {
-        main_mousemove: {
-          target: "divider_mousemove",
-          action(r) {
-            console.log(`${this.id}: transition from "${this.state}" to "divider_mousemove"`);
-          }
-        }
-      }
-    },
-    divider_mousemove: {
-      onEnter(r) {
-        console.log(`${this.id}: state: "${this.state}" - onEnter`);
-        let e = this.context.divider;
-        this.context.pair = this.context.origin.resizeRowPair(e, r);
-      },
-      onExit(r) {
-      },
-      on: {
-        main_mousemove: {
-          target: "divider_mousemove",
-          action(r) {
-          }
-        },
-        main_mouseup: {
-          target: "idle",
-          action(r) {
-            this.actions.removeProperty.call(this);
-          }
-        },
-        divider_mouseup: {
-          target: "idle",
-          action(r) {
-            this.actions.removeProperty.call(this), console.log(`${this.id}: transition from "${this.state}" to "ilde"`);
           }
         }
       }
@@ -8294,31 +8273,41 @@ class Xr {
   #d;
   #f = {};
   #m;
-  #x;
-  #v;
+  #w;
+  #y;
   #E;
   #p;
-  #w;
-  #O;
+  #v;
+  #I;
   #g = new mt();
-  #P;
-  #b;
   #L;
-  #T = [];
-  #S = vn;
-  #M = pn;
-  #C = {};
-  #y = [0, 0];
+  #M;
+  #O;
+  #x = [];
+  #b = {
+    instance: null,
+    rowsH: 0,
+    panes: {}
+  };
+  #A = {
+    instances: {},
+    rowsH: 0,
+    panes: {}
+  };
+  #S = yn;
+  #T = pn;
+  #k = {};
+  #P = [0, 0];
   #R = {
     active: !1,
     start: [0, 0],
     prev: [0, 0],
     delta: [0, 0]
   };
-  #k;
+  #N;
   #D;
-  #U;
-  #A;
+  #B;
+  #C;
   constructor(e, i) {
     this.#i = e, this.#r = i, this.#n = e, this.#l = this.#i.elMain, this.#h = this.#i.elYAxis, this.init(i);
   }
@@ -8347,16 +8336,19 @@ class Xr {
     return this.#i;
   }
   get chart() {
-    return this.#P;
+    return this.#L;
   }
   get chartPanes() {
     return this.#g;
   }
+  get chartPaneMaximized() {
+    return this.#b;
+  }
   get chartDeleteList() {
-    return this.#T;
+    return this.#x;
   }
   get time() {
-    return this.#b;
+    return this.#M;
   }
   get options() {
     return this.#r;
@@ -8398,10 +8390,10 @@ class Xr {
     return this.#a.getBoundingClientRect().height;
   }
   get rowMinH() {
-    return this.#M;
+    return this.#T;
   }
   set rowMinH(e) {
-    T(e) && (this.#M = Math.abs(e));
+    T(e) && (this.#T = Math.abs(e));
   }
   get pos() {
     return this.dimensions;
@@ -8419,10 +8411,10 @@ class Xr {
     return this.element.style.cursor;
   }
   get cursorPos() {
-    return this.#y;
+    return this.#P;
   }
   get candleW() {
-    return this.#b.candleW;
+    return this.#M.candleW;
   }
   get theme() {
     return this.#i.theme;
@@ -8431,7 +8423,7 @@ class Xr {
     return this.#i.config;
   }
   get buffer() {
-    return this.#k;
+    return this.#N;
   }
   get bufferPx() {
     return this.getBufferPx();
@@ -8464,18 +8456,18 @@ class Xr {
     };
   }
   init(e) {
-    if (this.#i, this.#D = this.#i.indicatorClasses, this.#a = this.#l.rows, this.#c = this.#l.time, this.#m = this.#l.rows.grid, this.#v = this.#l.viewport, this.#d = this.#i.elBody.scale, e.name = "Chart", e.shortName = "Chart", e.parent = this, e.chartData = this.#i.chartData, e.primaryPane = this.#i.primaryPane, e.secondaryPane = this.#i.secondaryPane, e.rangeLimit = this.#i.rangeLimit, e.settings = this.#i.settings, e.elements = {
+    if (this.#i, this.#D = this.#i.indicatorClasses, this.#a = this.#l.rows, this.#c = this.#l.time, this.#m = this.#l.rows.grid, this.#y = this.#l.viewport, this.#d = this.#i.elBody.scale, e.name = "Chart", e.shortName = "Chart", e.parent = this, e.chartData = this.#i.chartData, e.primaryPane = this.#i.primaryPane, e.secondaryPane = this.#i.secondaryPane, e.rangeLimit = this.#i.rangeLimit, e.settings = this.#i.settings, e.elements = {
       ...e.elements,
       ...this.elements
     }, this.#i.theme?.time?.navigation === !1) {
       const i = { height: bi };
       this.#i.theme.time = { ...this.#i.theme?.time, ...i }, this.#a.style.height = `calc(100% - ${bi}px)`;
     }
-    this.#b = new Fl(this.#i, e), this.registerChartViews(e), this.#k = T(this.config.buffer) ? this.config.buffer : ki, this.#M = T(this.config.rowMinH) ? this.config.rowMinH : pn, this.#S = T(this.config.secondaryPaneDefaultH) ? this.config.secondaryPaneDefaultH : vn, this.rowsOldH = this.rowsH, this.log(`${this.#t} instantiated`);
+    this.#M = new Fl(this.#i, e), this.registerChartViews(e), this.#N = T(this.config.buffer) ? this.config.buffer : ki, this.#T = T(this.config.rowMinH) ? this.config.rowMinH : pn, this.#S = T(this.config.secondaryPaneDefaultH) ? this.config.secondaryPaneDefaultH : yn, this.rowsOldH = this.rowsH, this.log(`${this.#t} instantiated`);
   }
   start() {
     let e = 0;
-    this.#l.start(this.theme), this.#b.start(), this.#g.forEach((i, s) => {
+    this.#l.start(this.theme), this.#M.start(), this.#g.forEach((i, s) => {
       i.start(e++), e === 1 && i.Divider.hide();
     }), this.rowsOldH = this.rowsH, this.createGraph(), this.draw(this.range, !0), li.init({
       graphs: [this.#p],
@@ -8483,9 +8475,9 @@ class Xr {
     }), li.start(), li.queueFrame(this.range, [this.#p], !1), this.eventsListen(), is.id = this.id, is.context = this, this.stateMachine = is, this.stateMachine.start();
   }
   destroy() {
-    this.#o = !0, this.stateMachine.destroy(), this.#b.destroy(), this.#g.forEach((e, i) => {
-      this.#T[i] = !0, e.destroy(), delete this.#T[i];
-    }), this.#p.destroy(), this.#A.destroy(), this.off(He, this.onFirstStreamValue), this.off(Be, this.onNewStreamValue), this.off("setRange", this.draw), this.off("scrollUpdate", this.draw), this.off("chart_render", this.draw), this.off("destroyChartView", this.removeChartPane);
+    this.#o = !0, this.stateMachine.destroy(), this.#M.destroy(), this.#g.forEach((e, i) => {
+      this.#x[i] = !0, e.destroy(), delete this.#x[i];
+    }), this.#p.destroy(), this.#C.destroy(), this.off(Be, this.onFirstStreamValue), this.off(Ue, this.onNewStreamValue), this.off("setRange", this.draw), this.off("scrollUpdate", this.draw), this.off("chart_render", this.draw), this.off("destroyChartView", this.removeChartPane);
   }
   reset() {
     for (let e in this.#i.Indicators)
@@ -8500,7 +8492,7 @@ class Xr {
     this.draw(this.range, !0);
   }
   eventsListen() {
-    this.#a.tabIndex = 0, this.#a.focus(), this.#A = new At(this.#a, { disableContextMenu: !1 }), this.#A.on("keydown", this.onChartKeyDown.bind(this)), this.#A.on("keyup", this.onChartKeyUp.bind(this)), this.#A.on("wheel", this.onMouseWheel.bind(this)), this.#A.on("pointerenter", this.onMouseEnter.bind(this)), this.#A.on("pointerout", this.onMouseOut.bind(this)), this.#A.on("pointerup", this.onChartDragDone.bind(this)), this.#A.on("pointermove", this.onMouseMove.bind(this)), this.on(He, this.onFirstStreamValue, this), this.on(Be, this.onNewStreamValue, this), this.on("setRange", this.draw, this), this.on("scrollUpdate", this.draw, this), this.on("chart_render", this.draw, this), this.on("destroyChartView", this.removeChartPane, this);
+    this.#a.tabIndex = 0, this.#a.focus(), this.#C = new At(this.#a, { disableContextMenu: !1 }), this.#C.on("keydown", this.onChartKeyDown.bind(this)), this.#C.on("keyup", this.onChartKeyUp.bind(this)), this.#C.on("wheel", this.onMouseWheel.bind(this)), this.#C.on("pointerenter", this.onMouseEnter.bind(this)), this.#C.on("pointerout", this.onMouseOut.bind(this)), this.#C.on("pointerup", this.onChartDragDone.bind(this)), this.#C.on("pointermove", this.onMouseMove.bind(this)), this.on(Be, this.onFirstStreamValue, this), this.on(Ue, this.onNewStreamValue, this), this.on("setRange", this.draw, this), this.on("scrollUpdate", this.draw, this), this.on("chart_render", this.draw, this), this.on("destroyChartView", this.removeChartPane, this);
   }
   on(e, i, s) {
     this.#i.on(e, i, s);
@@ -8514,15 +8506,15 @@ class Xr {
   onMouseWheel(e) {
     const i = Math.sign(e.wheeldelta) * -1;
     if (e.domEvent.preventDefault(), this.#i.pointerButtons[0]) {
-      e.dragstart.x = this.#y[0], e.dragstart.y = this.#y[1], e.position.x = this.#y[0] + i, e.position.y = this.#y[1], this.onChartDrag(e);
+      e.dragstart.x = this.#P[0], e.dragstart.y = this.#P[1], e.position.x = this.#P[0] + i, e.position.y = this.#P[1], this.onChartDrag(e);
       return;
     }
     const s = this.range, n = s.indexStart - Math.floor(i * ln * s.Length), o = s.indexEnd + Math.ceil(i * ln * s.Length);
     this.#i.setRange(n, o), this.draw(this.range, !0);
   }
   onMouseMove(e) {
-    const i = this.#C;
-    i.d2x = i?.d1x || null, i.d2y = i?.d1y || null, i.d1x = e.movement.x, i.d1y = e.movement.y, i.dx = Math.floor((i.d1x + i.d2x) / 2), i.dy = Math.floor((i.d1y + i.d2y) / 2), i.ts2 = i?.ts1 || null, i.ts1 = Date.now(), this.#y = [
+    const i = this.#k;
+    i.d2x = i?.d1x || null, i.d2y = i?.d1y || null, i.d1x = e.movement.x, i.d1y = e.movement.y, i.dx = Math.floor((i.d1x + i.d2x) / 2), i.dy = Math.floor((i.d1y + i.d2y) / 2), i.ts2 = i?.ts1 || null, i.ts1 = Date.now(), this.#P = [
       e.position.x,
       e.position.y,
       e.dragstart.x,
@@ -8534,7 +8526,7 @@ class Xr {
     ], this.core.Timeline.showCursorTime(), this.core.Chart.graph.overlays.list.get("cursor").layer.visible = !0;
     for (let [s, n] of this.chartPanes)
       n.graph.overlays.list.get("cursor").layer.visible = !0;
-    this.emit("main_mousemove", this.#y);
+    this.emit("main_mousemove", this.#P);
   }
   onMouseEnter(e) {
     this.core.Timeline.showCursorTime(), this.core.Chart.graph.overlays.list.get("cursor").layer.visible = !0, this.core.Chart.graph.render();
@@ -8555,20 +8547,20 @@ class Xr {
     ], i.prev = [
       e.position.x,
       e.position.y
-    ]) : (i.active = !0, i.start = [e.dragstart.x, e.dragstart.y], i.prev = i.start, i.delta = [0, 0]), this.#y = [
+    ]) : (i.active = !0, i.start = [e.dragstart.x, e.dragstart.y], i.prev = i.start, i.delta = [0, 0]), this.#P = [
       e.position.x,
       e.position.y,
       ...i.start,
       ...i.delta
-    ], this.emit("chart_pan", this.#y);
+    ], this.emit("chart_pan", this.#P);
   }
   onChartDragDone(e) {
     const i = this.#R;
-    i.active = !1, i.delta = [0, 0], this.#y = [
+    i.active = !1, i.delta = [0, 0], this.#P = [
       ...i.prev,
       ...i.start,
       ...i.delta
-    ], this.emit("chart_panDone", this.#y);
+    ], this.emit("chart_panDone", this.#P);
   }
   onChartKeyDown(e) {
     let i = this.candleW > 1 ? this.candleW : 1;
@@ -8610,14 +8602,14 @@ class Xr {
   }
   setDimensions() {
     this.#a.previousDimensions();
-    let e = this.#a.heightDeltaR, i = Math.round(this.chartH * e), s = this.rowsW, n = this.rowsH, o = Math.round(s * ((100 + this.#k) * 0.01)), a = {
+    let e = this.#a.heightDeltaR, i = Math.round(this.chartH * e), s = this.rowsW, n = this.rowsH, o = Math.round(s * ((100 + this.#N) * 0.01)), a = {
       resizeH: e,
       mainH: this.element.height,
       mainW: this.element.width,
       rowsH: this.rowsH,
       rowsW: this.rowsW
     };
-    this.#i.scrollPos = -1, this.#b.setDimensions({ w: s }), this.#p.setSize(s, n, o), this.#g.size == 1 && i != this.#a.height ? this.#P.setDimensions({ w: s, h: this.#a.height }) : this.#g.forEach((c, h) => {
+    this.#i.scrollPos = -1, this.#M.setDimensions({ w: s }), this.#p.setSize(s, n, o), this.#g.size == 1 && i != this.#a.height ? this.#L.setDimensions({ w: s, h: this.#a.height }) : this.#g.forEach((c, h) => {
       i = Math.round(c.viewport.height * e), c.setDimensions({ w: s, h: i });
     }), this.rowsOldH = this.rowsH, this.draw(this.range, !0), this.emit("rowsResize", a);
   }
@@ -8652,7 +8644,7 @@ class Xr {
       this.scaleNode(e.type)
     ), o = this.#h.chartPaneSlot.assignedElements().slice(-1)[0], o.style.height = `${s}px`, o.style.width = "100%", e.elements.elTarget = n, e.elements.elScale = o;
     let a;
-    return e.type == "primary" ? (a = new Fe(this.#i, e), this.#P = a) : (e.name = e.view[0].name || "Secondary", e.shortName = e.view[0].type || "Secondary", a = new Fe(this.#i, e)), this.#g.set(a.id, a), this.emit("addChartView", a), a;
+    return e.type == "primary" ? (a = new se(this.#i, e), this.#L = a) : (e.name = e.view[0].name || "Secondary", e.shortName = e.view[0].type || "Secondary", a = new se(this.#i, e)), this.#g.set(a.id, a), this.emit("addChartView", a), a;
   }
   removeChartPane(e) {
     if (!S(e) || !this.#g.has(e))
@@ -8660,9 +8652,9 @@ class Xr {
     const i = this.#g.get(e);
     if (i.isPrimary)
       return this.#i.error(`Cannot remove primary chart pane! ${e}`), !1;
-    this.#T[e] = !0;
+    this.#x[e] = !0;
     let s = this.rowsW, n = i.viewport.height, o = Math.floor(n / (this.#g.size - 1)), a = n % o;
-    return i.status !== "destroyed" && i.destroy(), this.#g.delete(e), delete this.#T[e], this.#g.forEach((c, h) => {
+    return i.status !== "destroyed" && i.destroy(), this.#g.delete(e), delete this.#x[e], this.#g.forEach((c, h) => {
       n = c.viewport.height, c.setDimensions({ w: s, h: n + o + a }), a = 0;
     }), this.draw(this.range, !0), !0;
   }
@@ -8689,11 +8681,11 @@ class Xr {
         name: i,
         ...s
       };
-      n = this.#P.addIndicator(o);
+      n = this.#L.addIndicator(o);
     } else {
       this.core.indicatorClasses[e].ind.primaryPane === "both" && Q(e.primaryPane) && e.primaryPane, P(s.view) || (s.view = [{ name: i, type: e, ...s }]);
       for (let a = 0; a < s.view.length; a++)
-        (!E(s.view[a]) || !yr(["name", "type"], Object.keys(s.view[a]))) && s.view.splice(a, 1);
+        (!E(s.view[a]) || !vr(["name", "type"], Object.keys(s.view[a]))) && s.view.splice(a, 1);
       if (s.view.length == 0)
         return !1;
       s.parent = this, s.title = i, s.elements = { ...this.elements }, n = this.addChartPane(s), n.start();
@@ -8765,13 +8757,13 @@ class Xr {
   }
   createGraph() {
     let e = rt(Mc);
-    this.#p = new me(this, this.#v, e);
+    this.#p = new pe(this, this.#y, e);
   }
   draw(e = this.range, i = !1) {
     const s = [
       this.#p,
-      this.#b,
-      this.#P
+      this.#M,
+      this.#L
     ];
     this.time.xAxis.doCalcXAxisGrads(e), this.#g.forEach((n, o) => {
       s.push(n);
@@ -8786,6 +8778,47 @@ class Xr {
   }
   zoomRange() {
     this.draw(this.range, !0);
+  }
+  paneMaximize(e) {
+    if (!(e instanceof se))
+      return !1;
+    const i = this.#b, s = e.legend.list.chart.el.querySelector(".controls");
+    let n;
+    if (s.classList.toggle("maximized"), s.classList.toggle("restored"), e === i.instance)
+      this.panesRestore(), i.instance = null, i.panes = {};
+    else {
+      this.panesRestore(), i.instance = e, i.rowsH = this.rowsH;
+      for (let [o, a] of this.#g.entries())
+        i.panes[o] = a.element.clientHeight, n = a.element.style, e === a ? (n.display = "block", a.setDimensions({ w: void 0, h: this.rowsH })) : n.display = "none";
+    }
+    return !0;
+  }
+  panesRestore() {
+    const e = this.#b;
+    let i;
+    this.dimensions.height == e.height;
+    for (let [s, n] of this.#g.entries())
+      i = n.element.style, i.display = "block", s in e.panes && n.setDimensions({ w: void 0, h: e.panes[s] });
+  }
+  paneCollapse(e) {
+    if (!(e instanceof se))
+      return !1;
+    const i = this.#g, s = this.#A, n = e.id, o = e.element.clientHeight;
+    let a;
+    if (e.id in s.instances)
+      s.panes[e.id];
+    else {
+      s.panes[e.id] = o, i.keys(), Object.keys(s.instances), a = (h, g) => h.filter((p) => !g.includes(p));
+      let c = o / (a.length - 2);
+      for (let h of a) {
+        let g = i.get(h);
+        g.id !== n && g.setDimensions({ w: void 0, h: g.element.clientHeight + c });
+      }
+      e.setDimensions({ w: void 0, h: 30 });
+    }
+    return !0;
+  }
+  paneExpand(e) {
   }
 }
 class wi {
@@ -8824,13 +8857,13 @@ class Et extends V {
   #d;
   #f;
   #m;
-  #x;
-  #v = [0, 0];
+  #w;
+  #y = [0, 0];
   #E = !1;
   #p;
-  #w = { TL: [0, 0], BR: [0, 0] };
+  #v = { TL: [0, 0], BR: [0, 0] };
   constructor(e, i = !1, s = !1, n, o, a) {
-    super(e, i, s, n, o, a), this.#h = config, this.#n = config.cnt, this.#r = this.#h.ID || J("TX_Tool_"), this.#i = config.name, this.#l = config.core, this.#u = config.elements.elChart, this.#a = { ...config.parent }, this.#x = config.target, this.#x.addTool(this), this.#f = this.#m.viewport, this.#d = this.#f.scene.canvas, this.#p = config.pos;
+    super(e, i, s, n, o, a), this.#h = config, this.#n = config.cnt, this.#r = this.#h.ID || J("TX_Tool_"), this.#i = config.name, this.#l = config.core, this.#u = config.elements.elChart, this.#a = { ...config.parent }, this.#w = config.target, this.#w.addTool(this), this.#f = this.#m.viewport, this.#d = this.#f.scene.canvas, this.#p = config.pos;
   }
   set id(e) {
     this.#r = Ot(e);
@@ -8863,7 +8896,7 @@ class Et extends V {
     return this.#l.range;
   }
   get target() {
-    return this.#x;
+    return this.#w;
   }
   set layerTool(e) {
     this.#m = e;
@@ -8875,7 +8908,7 @@ class Et extends V {
     return this.#f;
   }
   get cursorPos() {
-    return this.#v;
+    return this.#y;
   }
   get cursorActive() {
     return this.#E;
@@ -8923,7 +8956,7 @@ class Et extends V {
     this.#l.emit(e, i);
   }
   onPointerMove(e) {
-    this.#v = [Math.round(e.position.x), Math.round(e.position.y)], this.emit("tool_pointermove", this.#v);
+    this.#y = [Math.round(e.position.x), Math.round(e.position.y)], this.emit("tool_pointermove", this.#y);
   }
   isVisible() {
   }
@@ -9337,8 +9370,8 @@ class jr {
   addAllTools() {
   }
 }
-const er = 20, Rc = 20, Dc = new Ir(_.COLOUR_BORDER), vs = document.createElement("template");
-vs.innerHTML = `
+const er = 20, Rc = 20, Dc = new Ir(_.COLOUR_BORDER), ys = document.createElement("template");
+ys.innerHTML = `
 <style>
   .scrollBarWidget {
     display: flex;
@@ -9510,7 +9543,7 @@ vs.innerHTML = `
 class _c extends ot {
   #t;
   constructor() {
-    super(vs), this.#t = vs;
+    super(ys), this.#t = ys;
   }
   destroy() {
   }
@@ -9696,6 +9729,24 @@ Qr.innerHTML = `
   display:none;
 }
 
+
+.controls.maximized .up,
+.controls.maximized .down,
+.controls.maximized .visible,
+.controls.maximized .collapse,
+.controls.maximized .maximize,
+.controls.maximized .remove
+{
+  display: none;
+}
+
+.controls.restored .restore
+{
+  display: none;
+}
+
+
+
 .chart .upper {
   right: 0;
   z-index:1;
@@ -9715,7 +9766,7 @@ Qr.innerHTML = `
 </style>
 <div class="legends">
   <slot name="legend"></slot>
-  <div class="controls collapse">
+  <div class="controls collapse restored">
     <span id="hideLegends" class="control" data-icon="hide" style="display:none">${tl}</span>
     <span id="showLegends" class="control" data-icon="show" style="display:none">${el}</span>
   </div>
@@ -9772,7 +9823,7 @@ class Hc extends ot {
   buildLegend(e, i) {
     let s = "", n = `${i.legend.font}; color: ${i.legend.colour}; text-align: left;`, o = "";
     const a = "", c = i.legend.controls ? `
-      <div class="controls" style="${a}">
+      <div class="controls restored" style="${a}">
         ${this.buildControls(e)}
       </div>
     ` : "";
@@ -9811,7 +9862,7 @@ class Hc extends ot {
   }
   buildControls(e) {
     let i = "", s = e.id;
-    return i += `<span id="${s}_up" class="control" data-icon="up">${il}</span>`, i += `<span id="${s}_down" class="control" data-icon="down">${sl}</span>`, i += `<span id="${s}_collapse" class="control" data-icon="visible">${ol}</span>`, i += `<span id="${s}_maximize" class="control" data-icon="maximize">${rl}</span>`, i += `<span id="${s}_restore" class="control" data-icon="restore">${nl}</span>`, i += e?.type !== "chart" ? `<span id="${s}_remove" class="control" data-icon="remove">${Jh}</span>` : "", i += e?.type !== "secondary" ? `<span id="${s}_config" class="control" data-icon="config">${br}</span>` : "", i;
+    return i += `<span id="${s}_up" class="control up" data-icon="up">${il}</span>`, i += `<span id="${s}_down" class="control down" data-icon="down">${sl}</span>`, i += `<span id="${s}_collapse" class="control visible" data-icon="visible">${ol}</span>`, i += `<span id="${s}_maximize" class="control maximize" data-icon="maximize">${rl}</span>`, i += `<span id="${s}_restore" class="control restore" data-icon="restore">${nl}</span>`, i += e?.type !== "chart" ? `<span id="${s}_remove" class="control remove" data-icon="remove">${Jh}</span>` : "", i += e?.type !== "secondary" ? `<span id="${s}_config" class="control config" data-icon="config">${br}</span>` : "", i;
   }
 }
 customElements.get("tradex-legends") || window.customElements.define("tradex-legends", Hc);
@@ -9962,14 +10013,14 @@ eo.innerHTML = `
   tradex-rows {
     position:relative;
     overflow: hidden;
-    width: calc(100% - ${fe}px);
+    width: calc(100% - ${ge}px);
     height: calc(100% - ${Ci}px);
     border: 1px solid;
     border-color: var(--txc-border-color, ${_.COLOUR_BORDER}); 
   }
   tradex-time {
     position: relative;
-    width: calc(100% - ${fe}px);
+    width: calc(100% - ${ge}px);
     height: ${Ci}px;
     overflow: hidden;
     margin-left: 1px;
@@ -10123,7 +10174,7 @@ const Vc = `
     position: absolute; 
     top: 1px;
     right: 0; 
-    width: ${fe}px; 
+    width: ${ge}px; 
     height: 100%;
   }
 </style>
@@ -10157,12 +10208,12 @@ class Gc extends ot {
     let i = T(this.#t?.tools?.width) ? this.#t.tools.width : Gt, s;
     switch (e) {
       case "left":
-        s = i == 0 ? 0 : fe, this.scale.style.left = `${i}px`, this.scale.style.right = void 0, this.main.style.left = void 0, this.main.style.right = `-${s}px`, this.main.style.width = `calc(100% - ${i}px)`;
+        s = i == 0 ? 0 : ge, this.scale.style.left = `${i}px`, this.scale.style.right = void 0, this.main.style.left = void 0, this.main.style.right = `-${s}px`, this.main.style.width = `calc(100% - ${i}px)`;
         break;
       case "both":
       case "right":
       default:
-        s = i == 0 ? fe : 0, this.scale.style.left = void 0, this.scale.style.right = 0, this.main.style.left = void 0, this.main.style.right = `${s}px`, this.main.style.width = `calc(100% - ${i}px)`;
+        s = i == 0 ? ge : 0, this.scale.style.left = void 0, this.scale.style.right = 0, this.main.style.left = void 0, this.main.style.right = `${s}px`, this.main.style.width = `calc(100% - ${i}px)`;
         break;
     }
   }
@@ -10211,8 +10262,8 @@ class Yc extends ot {
     <div style="display: inline-block; float: right;">
     <style>
       svg {
-        height: ${de.ICONSIZE};
-        fill: ${de.COLOUR_ICON};
+        height: ${ue.ICONSIZE};
+        fill: ${ue.COLOUR_ICON};
       }
     </style>
     `;
@@ -10221,7 +10272,7 @@ class Yc extends ot {
     return s + "</div>";
   }
   iconNode(e) {
-    const i = `display: inline-block; height: ${de.ICONSIZE}; padding-top: 2px`, s = "sub" in e ? 'data-menu="true"' : "";
+    const i = `display: inline-block; height: ${ue.ICONSIZE}; padding-top: 2px`, s = "sub" in e ? 'data-menu="true"' : "";
     return `
       <div id="TX_${e.id}" data-event="${e.event}" ${s} class="icon-wrapper" style="${i}">${e.icon}</div>
 
@@ -10667,7 +10718,7 @@ class Ds extends Nt {
       return !1;
     const i = {};
     let s = [!1, !1], { c: n, colours: o } = super.legendInputs(e);
-    return i.Dn = this.overlay.data[n][1][0], i.Up = this.overlay.data[n][1][1], o = [
+    return i.Dn = this.scale.nicePrice(this.overlay.data[n][1][0]), i.Up = this.scale.nicePrice(this.overlay.data[n][1][1]), o = [
       this.style.downStroke,
       this.style.upStroke
     ], { inputs: i, colours: o, labels: s };
@@ -11097,18 +11148,18 @@ class sd {
   }
   onIconOver(e) {
     const i = e.currentTarget.querySelector("svg");
-    i.style.fill = de.COLOUR_ICONHOVER;
+    i.style.fill = ue.COLOUR_ICONHOVER;
   }
   onIconOut(e) {
     const i = e.currentTarget.querySelector("svg");
-    i.style.fill = de.COLOUR_ICON;
+    i.style.fill = ue.COLOUR_ICON;
   }
   initAllUtils() {
     const e = this.#i.querySelectorAll(".icon-wrapper");
     for (let i of e) {
       this.#u[i.id] = 0;
       let s = i.id.replace("TX_", ""), n = i.querySelector("svg");
-      n.style.fill = de.COLOUR_ICON, n.style.height = "90%";
+      n.style.fill = ue.COLOUR_ICON, n.style.height = "90%";
       for (let o of this.#s)
         if (o.id === s && (this.#a[s] = {}, this.#a[s].click = this.onIconClick.bind(this), this.#a[s].pointerover = this.onIconOver.bind(this), this.#a[s].pointerout = this.onIconOut.bind(this), i.addEventListener("click", this.#a[s].click), i.addEventListener("pointerover", this.#a[s].pointerover), i.addEventListener("pointerout", this.#a[s].pointerout), s === "indicators" && (o.sub = Object.values(this.#h)), o?.sub)) {
           let a = {
@@ -11145,7 +11196,7 @@ class dt {
   #a = {};
   static menuList = {};
   static menuCnt = 0;
-  static class = yn;
+  static class = vn;
   static name = "Menus";
   static type = "Menu";
   static currentActive;
@@ -11223,7 +11274,7 @@ class dt {
   }
   static defaultNode() {
     return `
-      <div slot="widget" class="${yn}" style=""></div>
+      <div slot="widget" class="${vn}" style=""></div>
     `;
   }
   menuNode() {
@@ -11613,7 +11664,7 @@ class rd {
   #i;
   #s;
   #o;
-  #h = { Divider: yt, Progress: wt, Menu: dt, Window: it, Dialogue: $s };
+  #h = { Divider: vt, Progress: wt, Menu: dt, Window: it, Dialogue: $s };
   #l = {};
   #a = {};
   #c;
@@ -11740,7 +11791,7 @@ class rd {
   }
 }
 function ir(r, e, i, s, n) {
-  const o = r.theme, a = document.createElement("template"), c = r.Timeline.graph.viewport.scene, h = r.MainPane, g = h.graph.viewport.scene, p = h.width, v = h.height, M = new ze.Viewport({
+  const o = r.theme, a = document.createElement("template"), c = r.Timeline.graph.viewport.scene, h = r.MainPane, g = h.graph.viewport.scene, p = h.width, v = h.height, M = new We.Viewport({
     width: p,
     height: v,
     container: a
@@ -11750,8 +11801,8 @@ function ir(r, e, i, s, n) {
   o?.yAxis?.location == "left" && (N = r.Chart.scale.width, at = 0);
   let B;
   for (const [Ht, St] of r.ChartPanes) {
-    let Bt = St.graph.viewport.scene, { width: Ut, height: It } = Bt, Xt = St.scale.graph.viewport.scene, { width: kt, height: se } = Xt;
-    k > 0 && (B = { stroke: "#ccc" }, We(L, k, 0, h.width, B)), L.drawImage(Bt.canvas, N, k, Ut, It), L.drawImage(Xt.canvas, at, k - 1, kt, se), k += It;
+    let Bt = St.graph.viewport.scene, { width: Ut, height: It } = Bt, Xt = St.scale.graph.viewport.scene, { width: kt, height: ne } = Xt;
+    k > 0 && (B = { stroke: "#ccc" }, Fe(L, k, 0, h.width, B)), L.drawImage(Bt.canvas, N, k, Ut, It), L.drawImage(Xt.canvas, at, k - 1, kt, ne), k += It;
   }
   L.drawImage(c.canvas, 0, k, c.width, c.height), B = {
     text: r.config.title,
@@ -11801,7 +11852,7 @@ class O extends jc {
   static get talibError() {
     return O.#h;
   }
-  static #l = `${Le} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`;
+  static #l = `${Ae} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`;
   static #a = [
     "TradeXchart",
     "Chart",
@@ -11814,30 +11865,30 @@ class O extends jc {
     "UtilsBar",
     "Widgets"
   ];
-  #c = Le;
-  #u = Re;
+  #c = Ae;
+  #u = De;
   #d;
   #f;
   #m;
-  #x;
-  #v;
+  #w;
+  #y;
   #E;
   #p;
-  #w;
-  #O;
+  #v;
+  #I;
   #g;
+  #L;
+  #M;
+  #O = !1;
+  #x = null;
+  #b = {};
+  #A = qi;
+  #S;
+  #T;
+  #k = ao;
   #P;
-  #b;
-  #L = !1;
-  #T = null;
-  #S = {};
-  #M = qi;
-  #C;
-  #y;
-  #R = ao;
-  #k;
-  #D;
-  #U;
+  #R;
+  #N;
   chartWMin = Si;
   chartHMin = ie;
   chartW_Reactive = !0;
@@ -11848,18 +11899,18 @@ class O extends jc {
   utilsH = qt;
   toolsW = Gt;
   timeH = Ci;
-  scaleW = fe;
-  #A;
-  #z;
-  #I = {
+  scaleW = ge;
+  #D;
+  #B;
+  #C = {
     chart: {},
     time: {}
   };
   #W;
   panes = {
-    utils: this.#A,
-    tools: this.#z,
-    main: this.#I
+    utils: this.#D,
+    tools: this.#B,
+    main: this.#C
   };
   #_ = {
     range: {},
@@ -11873,18 +11924,18 @@ class O extends jc {
   warnings = !1;
   errors = !1;
   timer = !1;
-  #N = 0;
+  #$ = 0;
   #Z = 0;
   #F = { x: 0, y: 0 };
   #j = [!1, !1, !1];
   #V;
   #G;
-  #$;
+  #H;
   #Y;
   #q;
   #X;
-  #H = !1;
-  #B = !1;
+  #U = !1;
+  #z = !1;
   static create(e = {}) {
     O.#e == 0 && (O.#r.CPUCores = navigator.hardwareConcurrency, O.#r.api = {
       permittedClassNames: O.#a
@@ -11910,7 +11961,7 @@ class O extends jc {
     return O.#e++;
   }
   constructor() {
-    super(), this.#T = O.cnt(), console.warn(`!WARNING!: ${Le} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`), this.log(`${Re} instance count: ${this.inCnt}`), this.oncontextmenu = window.oncontextmenu, this.#G = Ar;
+    super(), this.#x = O.cnt(), console.warn(`!WARNING!: ${Ae} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`), this.log(`${De} instance count: ${this.inCnt}`), this.oncontextmenu = window.oncontextmenu, this.#G = Ar;
   }
   log(e) {
     this.logs && console.log(e);
@@ -11949,13 +12000,13 @@ class O extends jc {
     return this.#d;
   }
   get inCnt() {
-    return this.#T;
+    return this.#x;
   }
   set elUtils(e) {
-    this.#v = e;
+    this.#y = e;
   }
   get elUtils() {
-    return this.#v;
+    return this.#y;
   }
   set elTools(e) {
     this.#p = e;
@@ -11970,10 +12021,10 @@ class O extends jc {
     return this.#E;
   }
   set elMain(e) {
-    this.#w = e;
+    this.#v = e;
   }
   get elMain() {
-    return this.#w;
+    return this.#v;
   }
   set elTime(e) {
     this.#g = e;
@@ -11982,46 +12033,46 @@ class O extends jc {
     return this.#g;
   }
   set elYAxis(e) {
-    this.#P = e;
+    this.#L = e;
   }
   get elYAxis() {
-    return this.#P;
+    return this.#L;
   }
   set elWidgetsG(e) {
-    this.#b = e;
+    this.#M = e;
   }
   get elWidgetsG() {
-    return this.#b;
+    return this.#M;
   }
   get UtilsBar() {
-    return this.#A;
+    return this.#D;
   }
   get ToolsBar() {
-    return this.#z;
+    return this.#B;
   }
   get MainPane() {
-    return this.#I;
+    return this.#C;
   }
   get Timeline() {
-    return this.#I.time;
+    return this.#C.time;
   }
   get WidgetsG() {
     return this.#W;
   }
   get Chart() {
-    return this.#I.chart;
+    return this.#C.chart;
   }
   get ChartPanes() {
-    return this.#I.chartPanes;
+    return this.#C.chartPanes;
   }
   get Indicators() {
-    return this.#I.indicators;
+    return this.#C.indicators;
   }
   get ready() {
-    return this.#L;
+    return this.#O;
   }
   get state() {
-    return this.#C;
+    return this.#S;
   }
   get allData() {
     return {
@@ -12032,10 +12083,10 @@ class O extends jc {
     };
   }
   get rangeLimit() {
-    return T(this.#y.initialCnt) ? this.#y.initialCnt : Ba;
+    return T(this.#T.initialCnt) ? this.#T.initialCnt : Ba;
   }
   get range() {
-    return this.#y;
+    return this.#T;
   }
   get time() {
     return this.#_;
@@ -12044,16 +12095,16 @@ class O extends jc {
     return ua;
   }
   get theme() {
-    return this.#D;
+    return this.#R;
   }
   get settings() {
     return this.state.data.chart.settings;
   }
   get indicatorClasses() {
-    return this.#R;
+    return this.#k;
   }
   get TALib() {
-    return this.#k;
+    return this.#P;
   }
   get TALibReady() {
     return O.talibReady;
@@ -12068,7 +12119,7 @@ class O extends jc {
     return O.talibPromise;
   }
   get hub() {
-    return this.#S;
+    return this.#b;
   }
   get candleW() {
     return this.Timeline.candleW;
@@ -12086,7 +12137,7 @@ class O extends jc {
     this.setScrollPos(e);
   }
   get scrollPos() {
-    return this.#N;
+    return this.#$;
   }
   get smoothScrollOffset() {
     return 0;
@@ -12110,13 +12161,13 @@ class O extends jc {
     return this.setStream(e);
   }
   get stream() {
-    return this.#$;
+    return this.#H;
   }
   get worker() {
     return this.#G;
   }
   get isEmpty() {
-    return this.#C.IsEmpty;
+    return this.#S.IsEmpty;
   }
   set candles(e) {
     E(e) && (this.#Y = e);
@@ -12128,47 +12179,47 @@ class O extends jc {
     return this.#V;
   }
   start(e) {
-    this.log(`${Le} configuring...`), O.create(e);
+    this.log(`${Ae} configuring...`), O.create(e);
     const i = { ...e };
-    this.logs = i?.logs ? i.logs : !1, this.infos = i?.infos ? i.infos : !1, this.warnings = i?.warnings ? i.warnings : !1, this.errors = i?.errors ? i.errors : !1, this.timer = i?.timer ? i.timer : !1, this.#f = i, this.#T = i.cnt || this.#T, this.#k = i.talib, this.#x = this, this.#d = this;
+    this.logs = i?.logs ? i.logs : !1, this.infos = i?.infos ? i.infos : !1, this.warnings = i?.warnings ? i.warnings : !1, this.errors = i?.errors ? i.errors : !1, this.timer = i?.timer ? i.timer : !1, this.#f = i, this.#x = i.cnt || this.#x, this.#P = i.talib, this.#w = this, this.#d = this;
     const s = S(i?.id) ? i.id : null;
     this.setID(s), this.classList.add(this.id), this.log("processing state...");
     let n = rt(i?.state) || {};
     n.id = this.id, n.core = this;
     let o = i?.deepValidate || !1, a = i?.isCrypto || !1;
-    this.#C = this.#M.create(n, o, a), delete i.state, this.log(`${this.name} id: ${this.id} : created with a ${this.state.status} state`);
+    this.#S = this.#A.create(n, o, a), delete i.state, this.log(`${this.name} id: ${this.id} : created with a ${this.state.status} state`);
     let c = "1s", h = W;
-    if (!E(i?.stream) && this.state.data.chart.data.length < 2 ? (this.warn(`${Le} has no chart data or streaming provided.`), { tf: c, ms: h } = di(i?.timeFrame)) : E(i?.stream) && this.state.data.chart.data.length < 2 ? ({ tf: c, ms: h } = di(i?.timeFrame), this.#H = !0) : (c = this.state.data.chart.tf, h = this.state.data.chart.tfms), this.log(`tf: ${c} ms: ${h}`), this.#f.callbacks = this.#f.callbacks || {}, E(i))
+    if (!E(i?.stream) && this.state.data.chart.data.length < 2 ? (this.warn(`${Ae} has no chart data or streaming provided.`), { tf: c, ms: h } = di(i?.timeFrame)) : E(i?.stream) && this.state.data.chart.data.length < 2 ? ({ tf: c, ms: h } = di(i?.timeFrame), this.#U = !0) : (c = this.state.data.chart.tf, h = this.state.data.chart.tfms), this.log(`tf: ${c} ms: ${h}`), this.#f.callbacks = this.#f.callbacks || {}, E(i))
       for (const p in i)
         p in this.props() && this.props()[p](i[p]);
     const g = E(i?.range) ? i.range : {};
-    if (g.interval = h, g.core = this, this.getRange(null, null, g), this.#y.Length > 1) {
-      const p = cs(this.#_, this.#f?.range?.startTS), v = T(p) ? p + this.#y.initialCnt : this.allData.data.length - 1, M = T(p) ? p : v - this.#y.initialCnt;
-      this.#y.initialCnt = v - M, this.setRange(M, v), i.range?.center && this.jumpToIndex(M, !0, !0);
+    if (g.interval = h, g.core = this, this.getRange(null, null, g), this.#T.Length > 1) {
+      const p = cs(this.#_, this.#f?.range?.startTS), v = T(p) ? p + this.#T.initialCnt : this.allData.data.length - 1, M = T(p) ? p : v - this.#T.initialCnt;
+      this.#T.initialCnt = v - M, this.setRange(M, v), i.range?.center && this.jumpToIndex(M, !0, !0);
     }
-    this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.#W = new rd(this, { widgets: i?.widgets }), this.#A = new sd(this, i), this.#z = new jr(this, i), this.#I = new Xr(this, i), this.setTheme(this.#U.id), this.log(`${this.#c} V${O.version} configured and running...`), this.#N = this.bufferPx * -1, this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#V = this.WidgetsG.insert("Progress", {}), this.stream = this.#f.stream, this.#H && this.on(Lt, this.delayedSetRange, this), this.#L = !0, this.refresh();
+    this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.#W = new rd(this, { widgets: i?.widgets }), this.#D = new sd(this, i), this.#B = new jr(this, i), this.#C = new Xr(this, i), this.setTheme(this.#N.id), this.log(`${this.#c} V${O.version} configured and running...`), this.#$ = this.bufferPx * -1, this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#V = this.WidgetsG.insert("Progress", {}), this.stream = this.#f.stream, this.#U && this.on(Lt, this.delayedSetRange, this), this.#O = !0, this.refresh();
   }
   destroy() {
-    this.log("...cleanup the mess"), this.removeEventListener("mousemove", this.onMouseMove), this.#S = null, this.UtilsBar.destroy(), this.ToolsBar.destroy(), this.MainPane.destroy(), this.WidgetsG.destroy(), this.#G.end(), this.#M = null;
+    this.log("...cleanup the mess"), this.removeEventListener("mousemove", this.onMouseMove), this.#b = null, this.UtilsBar.destroy(), this.ToolsBar.destroy(), this.MainPane.destroy(), this.WidgetsG.destroy(), this.#G.end(), this.#A = null;
   }
   eventsListen() {
     this.addEventListener("mousemove", this.onMouseMove.bind(this)), this.on(Lt, this.onStreamUpdate, this), this.on("state_mergeComplete", () => this.#V.stop());
   }
   on(e, i, s) {
-    return !S(e) || !U(i) ? !1 : (this.#S[e] || (this.#S[e] = []), this.#S[e].push({ handler: i, context: s }), !0);
+    return !S(e) || !U(i) ? !1 : (this.#b[e] || (this.#b[e] = []), this.#b[e].push({ handler: i, context: s }), !0);
   }
   off(e, i) {
-    if (!S(e) || !U(i) || !(e in this.#S))
+    if (!S(e) || !U(i) || !(e in this.#b))
       return !1;
-    for (let s = 0; s < this.#S[e].length; s++)
-      if (this.#S[e][s].handler === i && (this.#S[e].splice(s, 1), this.#S[e].length === 0)) {
-        delete this.#S[e];
+    for (let s = 0; s < this.#b[e].length; s++)
+      if (this.#b[e][s].handler === i && (this.#b[e].splice(s, 1), this.#b[e].length === 0)) {
+        delete this.#b[e];
         break;
       }
     return !0;
   }
   emit(e, i) {
-    S(e) && (this.#S[e] || []).forEach((s) => s.handler.call(s.context, i));
+    S(e) && (this.#b[e] || []).forEach((s) => s.handler.call(s.context, i));
   }
   execute(e, i, s) {
   }
@@ -12196,18 +12247,18 @@ class O extends jc {
       errors: (e) => this.errors = Q(e) ? e : !1,
       indicators: (e) => this.setIndicators(e),
       theme: (e) => {
-        this.#U = this.addTheme(e);
+        this.#N = this.addTheme(e);
       },
-      stream: (e) => this.#$ = E(e) ? e : {},
+      stream: (e) => this.#H = E(e) ? e : {},
       pricePrecision: (e) => this.setPricePrecision(e),
       volumePrecision: (e) => this.setVolumePrecision(e)
     };
   }
   getInCnt() {
-    return this.#T;
+    return this.#x;
   }
   setID(e) {
-    S(e) ? this.id = e : this.id = `${J(Re)}_${this.#T}`;
+    S(e) ? this.id = e : this.id = `${J(De)}_${this.#x}`;
   }
   setTitle(e) {
     this.Chart.setTitle(e);
@@ -12220,7 +12271,7 @@ class O extends jc {
     this.emit("global_resize", s);
   }
   setUtilsH(e) {
-    this.utilsH = e, this.#v.style.height = `${e}px`;
+    this.utilsH = e, this.#y.style.height = `${e}px`;
   }
   setToolsW(e) {
     this.toolsW = e, this.#p.style.width = `${e}px`;
@@ -12233,38 +12284,38 @@ class O extends jc {
   }
   addTheme(e) {
     const i = xt.create(e, this);
-    return this.#D instanceof xt || (this.#D = i), i;
+    return this.#R instanceof xt || (this.#R = i), i;
   }
   setTheme(e) {
     if (!this.theme.list.has(e))
       return !1;
-    this.#D.setTheme(e, this);
-    const i = this.#D, s = document.querySelector(`style[title=${this.id}_style]`), n = `var(--txc-border-color, ${i.chart.BorderColour}`;
+    this.#R.setTheme(e, this);
+    const i = this.#R, s = document.querySelector(`style[title=${this.id}_style]`), n = `var(--txc-border-color, ${i.chart.BorderColour}`;
     let o = `.${this.id} { `;
-    o += `--txc-background: ${i.chart.Background}; `, this.style.background = `var(--txc-background, ${i.chart.Background})`, this.style.border = `${i.chart.BorderThickness}px solid`, this.style.borderColor = n, o += `--txc-border-color:  ${i.chart.BorderColour}; `, this.#w.rows.style.borderColor = n, o += `--txc-time-scrollbar-color: ${i.chart.BorderColour}; `, o += `--txc-time-handle-color: ${i.xAxis.handle}; `, o += `--txc-time-slider-color: ${i.xAxis.slider}; `, o += `--txc-time-cursor-fore: ${i.xAxis.colourCursor}; `, o += `--txc-time-cursor-back: ${i.xAxis.colourCursorBG}; `, o += `--txc-time-icon-color: ${i.icon.colour}; `, o += `--txc-time-icon-hover-color: ${i.icon.hover}; `, this.#g.overview.scrollBar.style.borderColor = n, this.#g.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${i.xAxis.handle})`, this.#g.overview.style.setProperty("--txc-time-slider-color", i.xAxis.slider), this.#g.overview.style.setProperty("--txc-time-icon-color", i.icon.colour), this.#g.overview.style.setProperty("--txc-time-icon-hover-color", i.icon.hover);
+    o += `--txc-background: ${i.chart.Background}; `, this.style.background = `var(--txc-background, ${i.chart.Background})`, this.style.border = `${i.chart.BorderThickness}px solid`, this.style.borderColor = n, o += `--txc-border-color:  ${i.chart.BorderColour}; `, this.#v.rows.style.borderColor = n, o += `--txc-time-scrollbar-color: ${i.chart.BorderColour}; `, o += `--txc-time-handle-color: ${i.xAxis.handle}; `, o += `--txc-time-slider-color: ${i.xAxis.slider}; `, o += `--txc-time-cursor-fore: ${i.xAxis.colourCursor}; `, o += `--txc-time-cursor-back: ${i.xAxis.colourCursorBG}; `, o += `--txc-time-icon-color: ${i.icon.colour}; `, o += `--txc-time-icon-hover-color: ${i.icon.hover}; `, this.#g.overview.scrollBar.style.borderColor = n, this.#g.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${i.xAxis.handle})`, this.#g.overview.style.setProperty("--txc-time-slider-color", i.xAxis.slider), this.#g.overview.style.setProperty("--txc-time-icon-color", i.icon.colour), this.#g.overview.style.setProperty("--txc-time-icon-hover-color", i.icon.hover);
     for (let [a, c] of Object.entries(this.Chart.legend.list))
       c.el.style.color = `var(--txc-legend-color, ${i.legend.colour})`, c.el.style.font = `var(--txc-legend-font, ${i.legend.font})`;
-    for (let a of this.#v.icons)
+    for (let a of this.#y.icons)
       a.className == "icon-wrapper" && (a.children[0].style.fill = i.icon.colour);
     for (let a of this.#p.icons)
       a.className == "icon-wrapper" && (a.children[0].style.fill = i.icon.colour);
     return o += " }", s.innerHTML = o, !0;
   }
   setScrollPos(e) {
-    e = Math.round(e), T(e) && e <= 0 && e >= this.bufferPx * -1 ? this.#N = e : this.emit("Error", "setScrollPos: not a valid value");
+    e = Math.round(e), T(e) && e <= 0 && e >= this.bufferPx * -1 ? this.#$ = e : this.emit("Error", "setScrollPos: not a valid value");
   }
   setState(e) {
     if (!qi.has(e))
       return this.warn(`${this.name} id: ${this.id} : Specified state does not exist`), !1;
     if (e === this.key)
       return !0;
-    this.stream.stop(), this.MainPane.reset(), this.#C = qi.get(e);
+    this.stream.stop(), this.MainPane.reset(), this.#S = qi.get(e);
     const i = {
-      interval: this.#C.data.chart.tfms,
+      interval: this.#S.data.chart.tfms,
       core: this
     };
     if (this.getRange(null, null, i), this.range.Length > 1) {
-      const s = cs(this.time, void 0), n = s ? s + this.range.initialCnt : this.#C.data.chart.data.length - 1, o = s || n - this.range.initialCnt;
+      const s = cs(this.time, void 0), n = s ? s + this.range.initialCnt : this.#S.data.chart.data.length - 1, o = s || n - this.range.initialCnt;
       this.range.initialCnt = n - o, this.setRange(o, n);
     }
     this.MainPane.restart(), this.refresh();
@@ -12279,36 +12330,36 @@ class O extends jc {
     return this.state.export(e = this.key, i = {});
   }
   setStream(e) {
-    if (this.stream instanceof ae)
+    if (this.stream instanceof he)
       return this.error("Error: Invoke stopStream() before starting a new one."), !1;
     if (E(e))
-      return this.allData.data.length == 0 && S(e.timeFrame) && ({ tf, ms } = di(e?.timeFrame), this.range.interval = ms, this.range.intervalStr = tf, this.#_.timeFrameMS = ms, this.#_.timeFrame = tf), this.#$ = new ae(this), this.#f.stream = this.#$.config, this.#$;
+      return this.allData.data.length == 0 && S(e.timeFrame) && ({ tf, ms } = di(e?.timeFrame), this.range.interval = ms, this.range.intervalStr = tf, this.#_.timeFrameMS = ms, this.#_.timeFrame = tf), this.#H = new he(this), this.#f.stream = this.#H.config, this.#H;
   }
   stopStream() {
-    this.stream instanceof ae && this.stream.stop();
+    this.stream instanceof he && this.stream.stop();
   }
   delayedSetRange() {
-    for (; this.#H; ) {
+    for (; this.#U; ) {
       let e = this.range.Length * 0.5;
-      this.setRange(e * -1, e), this.off(Lt, this.delayedSetRange), this.#H = !1;
+      this.setRange(e * -1, e), this.off(Lt, this.delayedSetRange), this.#U = !1;
     }
   }
   updateRange(e) {
     if (!P(e) || !T(e[4]) || e[4] == 0)
       return;
     let i, s;
-    i = e[4], s = this.#N + i, s % this.candleW, s < this.bufferPx * -1 ? (s = 0, this.offsetRange(this.rangeScrollOffset * -1)) : s > 0 && (s = this.bufferPx * -1, this.offsetRange(this.rangeScrollOffset)), this.#N = s, this.emit("scrollUpdate", s);
+    i = e[4], s = this.#$ + i, s % this.candleW, s < this.bufferPx * -1 ? (s = 0, this.offsetRange(this.rangeScrollOffset * -1)) : s > 0 && (s = this.bufferPx * -1, this.offsetRange(this.rangeScrollOffset)), this.#$ = s, this.emit("scrollUpdate", s);
   }
   offsetRange(e) {
     let i = this.range.indexStart - e, s = this.range.indexEnd - e;
     this.setRange(i, s);
   }
   getRange(e = 0, i = 0, s = {}) {
-    this.#y = new hs(e, i, s), this.#_.range = this.#y, this.#_.timeFrameMS = this.#y.interval, this.#_.timeFrame = this.#y.intervalStr;
+    this.#T = new hs(e, i, s), this.#_.range = this.#T, this.#_.timeFrameMS = this.#T.interval, this.#_.timeFrame = this.#T.intervalStr;
   }
   setRange(e = 0, i = this.rangeLimit) {
     const s = this.config?.maxCandles ? this.config.maxCandles : this.Chart?.layerWidth ? this.Chart.layerWidth : this.Chart.width;
-    this.#y.set(e, i, s), e < 0 && !this.#B ? this.emit("range_limitPast", { chart: this, start: e, end: i }) : i > this.range.dataLength && !this.#B && this.emit("range_limitFuture", { chart: this, start: e, end: i });
+    this.#T.set(e, i, s), e < 0 && !this.#z ? this.emit("range_limitPast", { chart: this, start: e, end: i }) : i > this.range.dataLength && !this.#z && this.emit("range_limitFuture", { chart: this, start: e, end: i });
   }
   jumpToIndex(e, i = !0, s = !0) {
     i && (e = H(e, 0, this.range.dataLength));
@@ -12327,9 +12378,9 @@ class O extends jc {
     e && (i += this.range.Length / 2), this.jumpToIndex(i, !0, !1);
   }
   mergeData(e, i = !1, s = !1) {
-    this.#B = !0;
+    this.#z = !0;
     let n = this.state.mergeData(e, i, s);
-    return Q(n) && (this.#B = !1), n;
+    return Q(n) && (this.#z = !1), n;
   }
   isIndicator(e) {
     return !!(typeof e == "function" && "primaryPane" in e.prototype && U(e.prototype?.draw));
@@ -12337,22 +12388,22 @@ class O extends jc {
   setIndicators(e, i = !1) {
     if (!E(e))
       return !1;
-    i && (console.warn("Expunging all default indicators!"), this.#R = {});
+    i && (console.warn("Expunging all default indicators!"), this.#k = {});
     for (const [s, n] of Object.entries(e))
-      S(n?.id) && S(n?.name) && S(n?.event) && this.isIndicator(n?.ind) && (this.#R[s] = n);
+      S(n?.id) && S(n?.name) && S(n?.event) && this.isIndicator(n?.ind) && (this.#k[s] = n);
     return !0;
   }
   addIndicator(e, i = e, s = {}) {
-    return this.#I.addIndicator(e, i, s);
+    return this.#C.addIndicator(e, i, s);
   }
   getIndicator(e) {
-    return this.#I.getIndicator(e);
+    return this.#C.getIndicator(e);
   }
   removeIndicator(e) {
-    return this.#I.removeIndicator(e);
+    return this.#C.removeIndicator(e);
   }
   indicatorSettings(e, i) {
-    return this.#I.indicatorSettings(e, i);
+    return this.#C.indicatorSettings(e, i);
   }
   hasStateIndicator(e, i = "searchAll") {
     if (!S(e) || !S(i))
@@ -12375,16 +12426,16 @@ class O extends jc {
         n.instance.calcIndicatorHistory();
   }
   addTrade(e) {
-    return this.#M.addTrade(e);
+    return this.#A.addTrade(e);
   }
   removeTrade(e) {
-    return this.#M.removeTrade(e);
+    return this.#A.removeTrade(e);
   }
   addEvent(e) {
-    return this.#M.addEvent(e);
+    return this.#A.addEvent(e);
   }
   removeEvent(e) {
-    return this.#M.removeEvent(e);
+    return this.#A.removeEvent(e);
   }
   resize(e, i) {
     return !T(e) && !T(i) ? !1 : (this.setDimensions(e, i), !0);
@@ -12428,6 +12479,6 @@ export {
   et as canvas,
   rt as copyDeep,
   od as isPromise,
-  $e as mergeDeep,
+  He as mergeDeep,
   J as uid
 };

@@ -91,6 +91,24 @@ template.innerHTML = `
   display:none;
 }
 
+
+.controls.maximized .up,
+.controls.maximized .down,
+.controls.maximized .visible,
+.controls.maximized .collapse,
+.controls.maximized .maximize,
+.controls.maximized .remove
+{
+  display: none;
+}
+
+.controls.restored .restore
+{
+  display: none;
+}
+
+
+
 .chart .upper {
   right: 0;
   z-index:1;
@@ -110,7 +128,7 @@ template.innerHTML = `
 </style>
 <div class="legends">
   <slot name="legend"></slot>
-  <div class="controls collapse">
+  <div class="controls collapse restored">
     <span id="hideLegends" class="control" data-icon="hide" style="display:none">${up}</span>
     <span id="showLegends" class="control" data-icon="show" style="display:none">${down}</span>
   </div>
@@ -190,7 +208,7 @@ export default class tradeXLegends extends element {
 
     const controls = (!theme.legend.controls) ? "" :
     `
-      <div class="controls" style="${styleControls}">
+      <div class="controls restored" style="${styleControls}">
         ${this.buildControls(o)}
       </div>
     `;
@@ -251,20 +269,20 @@ export default class tradeXLegends extends element {
     // visibility
     // if (o?.type !== "chart") {
       // move up
-      inp += `<span id="${id}_up" class="control" data-icon="up">${up2}</span>`
+      inp += `<span id="${id}_up" class="control up" data-icon="up">${up2}</span>`
       // move down
-      inp += `<span id="${id}_down" class="control" data-icon="down">${down2}</span>`
+      inp += `<span id="${id}_down" class="control down" data-icon="down">${down2}</span>`
     // }
     // collapse
-    inp += `<span id="${id}_collapse" class="control" data-icon="visible">${collapse}</span>`
+    inp += `<span id="${id}_collapse" class="control visible" data-icon="visible">${collapse}</span>`
     // maximize
-    inp += `<span id="${id}_maximize" class="control" data-icon="maximize">${maximize}</span>`
+    inp += `<span id="${id}_maximize" class="control maximize" data-icon="maximize">${maximize}</span>`
     // restore
-    inp += `<span id="${id}_restore" class="control" data-icon="restore">${restore}</span>`
+    inp += `<span id="${id}_restore" class="control restore" data-icon="restore">${restore}</span>`
     // remove
-    inp += (o?.type !== "chart") ? `<span id="${id}_remove" class="control" data-icon="remove">${close}</span>` : ``
+    inp += (o?.type !== "chart") ? `<span id="${id}_remove" class="control remove" data-icon="remove">${close}</span>` : ``
     // config
-    inp += (o?.type !== "secondary") ? `<span id="${id}_config" class="control" data-icon="config">${config}</span>` : ``
+    inp += (o?.type !== "secondary") ? `<span id="${id}_config" class="control config" data-icon="config">${config}</span>` : ``
 
     return inp
   }

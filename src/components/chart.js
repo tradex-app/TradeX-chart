@@ -755,7 +755,7 @@ export default class Chart {
       case "down": this.reorderDown(); return;
       case "visible": return;
       case "maximize": this.#core.MainPane.paneMaximize(this); return;
-      case "restore": this.#core.MainPane.panesRestore(); return;
+      case "restore": this.#core.MainPane.paneMaximize(this); return;
       case "remove": this.remove(); return;
       case "config": return;
       default: return;
@@ -916,6 +916,10 @@ export default class Chart {
     return this.scale.yPos(price)
   }
 
+  /**
+   * return previous, current, next chart panes
+   * @returns {object} - previous, current, next chart panes
+   */
   currPrevNext() {
     const el = this.element
     const prevEl = el.previousElementSibling

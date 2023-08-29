@@ -78,7 +78,12 @@ export default class MainPane {
   #chartDeleteList = []
   #ChartPaneMaximized = {
     instance: null, 
-    main: {},
+    rowsH: 0,
+    panes: {}
+  }
+  #chartPaneCollapsed = {
+    instances: {},
+    rowsH: 0,
     panes: {}
   }
 
@@ -934,15 +939,19 @@ export default class MainPane {
   /**
    * Toggles chart pane maximization
    * needs to account for possible chart resizing
-   * @param {Chart} p - Chart instance
-   * @returns 
+   * @param {Chart} p - Chart pane instance
+   * @returns {boolean}
    */
   paneMaximize (p) {
 
     if (!(p instanceof Chart)) return false
 
     const maxMin = this.#ChartPaneMaximized
+    const controls = p.legend.list.chart.el.querySelector(".controls")
     let style;
+
+    controls.classList.toggle("maximized")
+    controls.classList.toggle("restored")
     // chart pane is already maximized and so restore all
     if (p === maxMin.instance) {
       this.panesRestore()
@@ -970,6 +979,7 @@ export default class MainPane {
         }
       }
     }
+    return true
   }
 
   /**
@@ -989,6 +999,62 @@ export default class MainPane {
       if (k in maxMin.panes)
         v.setDimensions({w: undefined, h: maxMin.panes[k]})
     }
+  }
+
+  /**
+   * Toggles chart pane collapsed state
+   * needs to account for possible chart resizing
+   * @param {Chart} p - Chart pane instance
+   * @returns {boolean}
+   */
+  paneCollapse(p) {
+    if (!(p instanceof Chart)) return false
+
+    const panes = this.#ChartPanes
+    const col = this.#chartPaneCollapsed
+    const id = p.id
+    const h = p.element.clientHeight
+    let exp
+    let style
+
+    // chart pane is already collapsed, so restore it
+    if (p.id in col.instances) {
+      let h = col.panes[p.id]
+      // check if new or deleted panes
+    }
+    // collapse the chart pane
+    else {
+      col.panes[p.id] = h
+
+      // chart panes not collapsed
+      let [k] = panes.keys()
+      let i = Object.keys(col.instances)
+      exp = (k, i) => k.filter((v) => !i.includes(v));
+      let d = h / (exp.length - 2)
+
+      // share collapsed height across remaining panes
+      for (let e of exp) {
+        let o = panes.get(e)
+        if (o.id === id) continue
+
+        o.setDimensions({w: undefined, h: o.element.clientHeight + d})
+      }
+
+      // set collapsed pane height
+      p.setDimensions({w: undefined, h: 30})
+    }
+
+    return true
+  }
+
+  /**
+   * expand collapsed chart pane to original height
+   * or as close to depending upon chart resize
+   * or the addition or removal of other panes
+   * @param {Chart} p - Chart pane instance
+   */
+  paneExpand(p) {
+
   }
 
 }
