@@ -753,7 +753,6 @@ export default class Chart {
     switch(action.icon) {
       case "up": this.reorderUp(); return;
       case "down": this.reorderDown(); return;
-      case "visible": return;
       case "maximize": this.#core.MainPane.paneMaximize(this); return;
       case "restore": this.#core.MainPane.paneMaximize(this); return;
       case "remove": this.remove(); return;

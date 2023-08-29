@@ -3,7 +3,9 @@
 
 import element from "./classes/element"
 import { isString } from "../../utils/typeChecks"
-import { close, up, up2, down, down2, restore, maximize, collapse, config } from "../../definitions/icons"
+import { close, up, up2, down, down2, restore, 
+          maximize, collapse, expand, config,
+          notVisible, visible } from "../../definitions/icons"
 
 
 const mouseOver = "onmouseover='this.style.opacity=1'"
@@ -82,8 +84,10 @@ template.innerHTML = `
 .legend dl {
   display: inline;
 }
-.legend .control {
-  margin-right:2px;
+.legend .control,
+.legend .control.collapse {
+  margin-right: 2px;
+  padding-left: 0;
 }
 
 
@@ -99,7 +103,7 @@ template.innerHTML = `
 
 .controls.maximized .up,
 .controls.maximized .down,
-.controls.maximized .visible,
+.controls.maximized .expand,
 .controls.maximized .collapse,
 .controls.maximized .maximize,
 .controls.maximized .remove
@@ -112,7 +116,27 @@ template.innerHTML = `
   display: none;
 }
 
+.controls.collapsed .collapse {
+  display: none;
+}
 
+.controls.expanded .expand {
+  display: none;
+}
+
+.controls.visible .visible {
+  display: none;
+}
+.controls.visible .notvisible {
+  display: inline;
+}
+
+.controls.notvisible .notvisible {
+  display: none;
+}
+.controls.notvisible .visible {
+  display: inline;
+}
 
 .chart .upper {
   right: 0;
@@ -209,11 +233,12 @@ export default class tradeXLegends extends element {
       let styleInputs = "" //"display: inline; margin: 0 0 0 -1em;"
       let styleLegend = `${theme.legend.font}; color: ${theme.legend.colour}; text-align: left;`
       let styleLegendTitle = "" //"margin-right: 1em; white-space: nowrap;"
+      let visibility = (o?.type !== "chart") ? `visible` : `notvisible`
     const styleControls = ""
 
     const controls = (!theme.legend.controls) ? "" :
     `
-      <div class="controls restored" style="${styleControls}">
+      <div class="controls restored expanded ${visibility}" style="${styleControls}">
         ${this.buildControls(o)}
       </div>
     `;
@@ -271,19 +296,26 @@ export default class tradeXLegends extends element {
     let inp = "";
     let id = o.id
 
-    // visibility
-    // if (o?.type !== "chart") {
-      // move up
-      inp += `<span id="${id}_up" class="control up" data-icon="up">${up2}</span>`
-      // move down
-      inp += `<span id="${id}_down" class="control down" data-icon="down">${down2}</span>`
-    // }
-    // collapse
-    inp += `<span id="${id}_collapse" class="control visible" data-icon="visible">${collapse}</span>`
-    // maximize
-    inp += `<span id="${id}_maximize" class="control maximize" data-icon="maximize">${maximize}</span>`
-    // restore
-    inp += `<span id="${id}_restore" class="control restore" data-icon="restore">${restore}</span>`
+    // move up
+    inp += `<span id="${id}_up" class="control up" data-icon="up">${up2}</span>`
+    // move down
+    inp += `<span id="${id}_down" class="control down" data-icon="down">${down2}</span>`
+    if (o?.type !== "chart") {
+      // visible
+      inp += `<span id="${id}_visible" class="control visible" data-icon="visible">${visible}</span>`
+      // not visible
+      inp += `<span id="${id}_notVisible" class="control notvisible" data-icon="notVisible">${notVisible}</span>`
+    }
+    if (o?.type === "chart") {
+      // collapse
+      inp += `<span id="${id}_collapse" class="control collapse" data-icon="collapse">${collapse}</span>`
+      // expand
+      inp += `<span id="${id}_expand" class="control expand" data-icon="expand">${expand}</span>`
+      // maximize
+      inp += `<span id="${id}_maximize" class="control maximize" data-icon="maximize">${maximize}</span>`
+      // restore
+      inp += `<span id="${id}_restore" class="control restore" data-icon="restore">${restore}</span>`
+    }
     // remove
     inp += (o?.type !== "chart") ? `<span id="${id}_remove" class="control remove" data-icon="remove">${close}</span>` : ``
     // config

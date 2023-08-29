@@ -85,7 +85,7 @@ export default class Legends {
   onMouseClick(e) {
     const which = (s) => {
       if (isString(s.dataset.icon)) 
-        return {id: s.id, icon: s.dataset.icon}
+        return {id: s.id, icon: s.dataset.icon, parent: s.parentElement}
       else if (s.parentElement.className !== "controls") 
         return which(s.parentElement)
       else

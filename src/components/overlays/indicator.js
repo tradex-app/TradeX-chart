@@ -219,13 +219,22 @@ export default class Indicator extends Overlay {
     switch(action.icon) {
       case "up": return;
       case "down": return;
-      case "visible": this.visible(!this.visible()); return;
-      case "maximize": return;
-      case "restore": return;
+      case "visible": this.onVisibility(action); return;
+      case "notVisible": this.onVisibility(action); return;
       case "remove": this.remove(); return;
       case "config": this.invokeSettings(); return;
       default: return;
     }
+  }
+
+  /**
+   * toggle indicator visibility
+   * @param {boolean} v - toggle visibility
+   */
+  onVisibility(action) {
+    this.visible(!this.visible())
+    action.parent.classList.toggle("visible")
+    action.parent.classList.toggle("notvisible")
   }
 
   /**
