@@ -1,5 +1,49 @@
 # Change Log
 
+## [0.138.3]()
+
+Updated
+
+* Chart Pane - Legend - controls - icons hover highlight
+
+
+## [0.138.2]()
+
+Updated
+
+* Chart Pane - Legend - controls - icons display
+
+
+## [0.138.1]()
+
+Fixed
+
+* Indicator AROON - legends - nicePrice()
+* Chart Pane Pairs - resize (divider)
+
+## [0.138.0](https://github.com/tradex-app/TradeX-chart/commit/bfb9039ec8be89fbb05801e2c7c0997f49e21f2a)
+
+Added
+
+* Indicator - AROON
+
+Updated
+
+* Documentation
+
+
+## [0.137.5](https://github.com/tradex-app/TradeX-chart/commit/88dcc06796889f6c6ee854c69a45190039c9943c)
+
+Fixed
+
+* Menu positioning on chart resize
+
+Added
+
+* Tools - node
+* idSanitize()
+
+
 ## [0.137.4](https://github.com/tradex-app/TradeX-chart/commit/f4b1a381dd7c0f24b521bac3b33756852ac79a14) - 2023-08-10
 
 Fixed

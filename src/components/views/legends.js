@@ -92,6 +92,11 @@ template.innerHTML = `
 }
 
 
+.controls .control:hover {
+  background: #889;
+  border-radius: 3px;
+}
+
 .controls.maximized .up,
 .controls.maximized .down,
 .controls.maximized .visible,
