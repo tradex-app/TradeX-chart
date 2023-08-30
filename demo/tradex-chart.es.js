@@ -14,11 +14,11 @@ function Vo(r, e) {
   }
   return Object.freeze(Object.defineProperty(r, Symbol.toStringTag, { value: "Module" }));
 }
-const Go = "0.138.2";
+const Go = "0.138.4";
 function P(r) {
   return Array.isArray(r);
 }
-function U(r) {
+function z(r) {
   return r && typeof r == "function";
 }
 function E(r) {
@@ -33,8 +33,8 @@ function Q(r) {
 function S(r) {
   return typeof r == "string";
 }
-function od(r) {
-  return !!r && (E(r) || U(r)) && U(r.then);
+function hd(r) {
+  return !!r && (E(r) || z(r)) && z(r.then);
 }
 const Yo = ["y", "M", "d", "h", "m", "s", "ms"], qo = ["years", "months", "days", "hours", "minutes", "seconds", "milliseconds"], Xo = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334], jo = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335], sr = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], Zo = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], nr = 1231006505e3, Vt = 1, W = 1e3, F = W * 60, X = F * 60, D = X * 24, fe = D * 7, nt = D * 30;
 function rr(r = 3, e = !1) {
@@ -162,7 +162,7 @@ function ar(r) {
   const e = new Date(r).getTime();
   return T(e);
 }
-function hr(r, e = nr, i = Date.now()) {
+function lr(r, e = nr, i = Date.now()) {
   return ar(r) ? r > e && r < i : !1;
 }
 function Le(r, e, i) {
@@ -197,7 +197,7 @@ const Wt = {
   }
 };
 function ra(r, e) {
-  let i = Wt.inYears(r, e), s = Wt.inMonths(r, e), n = Wt.inWeeks(r, e), o = Wt.inDays(r, e), a = Wt.inHours(r, e), c = Wt.inMinutes(r, e), h = Wt.inSeconds(r, e), g = new Date(e).getTime() - new Date(r).getTime();
+  let i = Wt.inYears(r, e), s = Wt.inMonths(r, e), n = Wt.inWeeks(r, e), o = Wt.inDays(r, e), a = Wt.inHours(r, e), c = Wt.inMinutes(r, e), l = Wt.inSeconds(r, e), g = new Date(e).getTime() - new Date(r).getTime();
   return {
     y: i,
     M: s,
@@ -205,7 +205,7 @@ function ra(r, e) {
     d: o,
     h: a,
     m: c,
-    s: h,
+    s: l,
     ms: g,
     years: i,
     months: s,
@@ -213,22 +213,22 @@ function ra(r, e) {
     days: o,
     hours: a,
     minutes: c,
-    seconds: h,
+    seconds: l,
     milliseconds: g
   };
 }
 function di(r) {
   let e = W;
-  return S(r) ? (e = lr(r), e ? r = r : (e = W, r = "1s")) : r = "1s", { tf: r, ms: e };
+  return S(r) ? (e = hr(r), e ? r = r : (e = W, r = "1s")) : r = "1s", { tf: r, ms: e };
 }
-function lr(r) {
+function hr(r) {
   if (!S(r))
     return !1;
   const e = /([0-9]{1,2})([s|m|h|d|w|M|y])/gm;
   let i;
   return (i = e.exec(r)) !== null ? Ne[i[2]] * i[1] : !1;
 }
-function vs(r) {
+function ys(r) {
   let e = Math.floor(r / 1e3), i = Math.floor(e / 60);
   e = e % 60;
   let s = Math.floor(i / 60);
@@ -237,18 +237,18 @@ function vs(r) {
   s = s % 24;
   let o = Math.floor(n / 7);
   n = n % 7;
-  let a = Math.floor(o / 4), c = Math.floor(o / 52), h = o % 4;
+  let a = Math.floor(o / 4), c = Math.floor(o / 52), l = o % 4;
   return a = a % 13, {
     y: c,
     M: a,
-    w: h,
+    w: l,
     d: n,
     h: s,
     m: i,
     s: e,
     years: c,
     months: a,
-    weeks: h,
+    weeks: l,
     days: n,
     hours: s,
     minutes: i,
@@ -256,7 +256,7 @@ function vs(r) {
   };
 }
 function Re(r) {
-  const e = vs(r);
+  const e = ys(r);
   for (const i in e)
     if (e[i])
       return `${e[i]}${i}`;
@@ -336,7 +336,7 @@ function ui(r, e) {
     seconds: (s) => xs(s)
   }[e](r);
 }
-function ha(r, e) {
+function la(r, e) {
   let i, s;
   switch (e) {
     case "years":
@@ -362,7 +362,7 @@ function ha(r, e) {
   }
   return { start: i, end: s };
 }
-function la(r) {
+function ha(r) {
   String(bs(r)).padStart(2, "0");
 }
 function gr(r) {
@@ -389,7 +389,7 @@ const ua = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   BTCGENESIS: nr,
   DAY_MS: D,
-  DM: la,
+  DM: ha,
   HM: gr,
   HMS: ca,
   HOUR_MS: X,
@@ -427,16 +427,16 @@ const ua = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   get_second: ws,
   get_year: ur,
   hour_start: Ss,
-  interval2MS: lr,
+  interval2MS: hr,
   isLeapYear: Ii,
   isTimeFrame: di,
-  isValidTimeInRange: hr,
+  isValidTimeInRange: lr,
   isValidTimestamp: ar,
   minute_start: Ts,
   monthDayCnt: sr,
   month_start: Ms,
   ms2Interval: Re,
-  ms2TimeUnits: vs,
+  ms2TimeUnits: ys,
   nearestTs: da,
   nextMonth: dr,
   nextYear: fr,
@@ -445,7 +445,7 @@ const ua = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   timestampDiff: Wt,
   timestampDifference: ra,
   timezones: os,
-  unitRange: ha,
+  unitRange: la,
   year_start: Ps
 }, Symbol.toStringTag, { value: "Module" }));
 function fa(r, e) {
@@ -480,7 +480,7 @@ function pr(r) {
 function pa(r) {
   return Math.log(r) / Math.log(10);
 }
-function ya(r, e) {
+function va(r, e) {
   return Math.pow(r, e);
 }
 function H(r, e, i) {
@@ -503,14 +503,14 @@ function rt(r) {
     Object.prototype.hasOwnProperty.call(r, i) && (r.isActiveClone = null, e[i] = rt(r[i]), delete r.isActiveClone);
   return e;
 }
-function yr(r, e, i) {
+function vr(r, e, i) {
   const [s, ...n] = e.split(".");
   return {
     ...r,
-    [s]: n.length ? yr(r[s], n.join("."), i) : i
+    [s]: n.length ? vr(r[s], n.join("."), i) : i
   };
 }
-function hn(r, e) {
+function ln(r, e) {
   return e.split(".").reduce((s, n) => s && s[n] !== "undefined" ? s[n] : void 0, r);
 }
 function xi(r, e) {
@@ -533,14 +533,14 @@ function xi(r, e) {
   }
   return !0;
 }
-function va(r, e, i) {
+function ya(r, e, i) {
   var s = r[e];
   r.splice(e, 1), r.splice(i, 0, s);
 }
 function wa(r, e, i) {
   [myArray[e], myArray[i]] = [myArray[i], myArray[e]];
 }
-function vr(r, e) {
+function yr(r, e) {
   return P(e) ? P(r) ? r.every((i) => e.includes(i)) : e.includes(r) : !1;
 }
 function wr(r, e) {
@@ -548,8 +548,8 @@ function wr(r, e) {
     return !1;
   const i = Object.keys(r).sort(), s = Object.keys(e).sort();
   return i.length !== s.length ? !1 : i.every((o, a) => {
-    const c = r[o], h = e[s[a]];
-    return P(c) || P(h) ? xi(c, h) : E(c) || E(h) ? wr(c, h) : c === h;
+    const c = r[o], l = e[s[a]];
+    return P(c) || P(l) ? xi(c, l) : E(c) || E(l) ? wr(c, l) : c === l;
   });
 }
 function J(r = "ID") {
@@ -650,19 +650,19 @@ class mt extends Map {
 }
 function ft(r, e = 100, i, s = !1) {
   var n, o = function() {
-    var a = i || this, c = arguments, h = function() {
+    var a = i || this, c = arguments, l = function() {
       n = null, s || r.apply(a, c);
     }, g = s && !n;
-    clearTimeout(n), n = setTimeout(h, e), g && r.apply(a, c);
+    clearTimeout(n), n = setTimeout(l, e), g && r.apply(a, c);
   };
   return o;
 }
 function Ma(r, e = 250, i) {
   var s, n, o = function() {
-    var c = i || this, h = +/* @__PURE__ */ new Date(), g = arguments;
-    s && h < s + e ? (clearTimeout(n), n = setTimeout(function() {
-      s = h, r.apply(c, g);
-    }, e)) : (s = h, r.apply(c, g));
+    var c = i || this, l = +/* @__PURE__ */ new Date(), g = arguments;
+    s && l < s + e ? (clearTimeout(n), n = setTimeout(function() {
+      s = l, r.apply(c, g);
+    }, e)) : (s = l, r.apply(c, g));
   };
   function a() {
     timeout && (clearTimeout(n), timeout = void 0);
@@ -701,7 +701,7 @@ function Aa(r, e = !1) {
   return !0;
 }
 function fi(r, e = !1) {
-  return !(!P(r) || r.length !== 6 || e && !hr(r[0]) || !T(r[1]) || !T(r[2]) || !T(r[3]) || !T(r[4]) || !T(r[5]));
+  return !(!P(r) || r.length !== 6 || e && !lr(r[0]) || !T(r[1]) || !T(r[2]) || !T(r[3]) || !T(r[4]) || !T(r[5]));
 }
 function Oa(r) {
   for (let e of r)
@@ -709,7 +709,7 @@ function Oa(r) {
       e.length = 6, e[i] *= 1;
   return r;
 }
-const Ia = F, ka = "1m", Ti = Ia, Ra = 6, ln = 0.05, Da = 100, cn = 100, ee = ["default", "percent", "log"], dn = 0.3, un = 30, ri = 200, fn = 200, gn = 20, mn = 4096, ki = 5, pn = 50, yn = 30, _a = 8;
+const Ia = F, ka = "1m", Ti = Ia, Ra = 6, hn = 0.05, Da = 100, cn = 100, ee = ["default", "percent", "log"], dn = 0.3, un = 30, ri = 200, fn = 200, gn = 20, mn = 4096, ki = 5, pn = 50, vn = 30, _a = 8;
 class ct {
   static t = 0;
   static o = 1;
@@ -718,7 +718,7 @@ class ct {
   static c = 4;
   static v = 5;
 }
-class hs {
+class ls {
   #t = Ti;
   #e = "1s";
   indexStart = 0;
@@ -754,7 +754,7 @@ class hs {
       let o = Date.now();
       e = 0, i = this.rangeLimit, this.#t = n, this.#e = Re(this.interval), this.anchor = o - o % n;
     } else
-      this.data.length < 2 ? (this.#t = n, this.#e = Re(this.interval)) : (this.#t = ls(this.data), this.#e = Re(this.interval));
+      this.data.length < 2 ? (this.#t = n, this.#e = Re(this.interval)) : (this.#t = hs(this.data), this.#e = Re(this.interval));
     i == 0 && this.data.length >= this.rangeLimit ? i = this.rangeLimit : i == 0 && (i = this.data.length), this.set(e, i);
   }
   get allData() {
@@ -808,11 +808,11 @@ class hs {
     e = e | 0, i = i | 0, s = s | 0, s = H(s, this.minCandles, this.maxCandles), e > i && ([e, i] = [i, e]), i = H(i, e + this.minCandles, e + s);
     let o = i - e;
     e = H(e, this.limitPast * -1, this.dataLength + this.limitFuture - this.minCandles - 1), i = H(i, e + this.minCandles, this.dataLength + this.limitFuture - 1), e = i - e < o ? e - (o - (i - e)) : e;
-    const a = e, c = i, h = this.indexStart, g = this.indexEnd;
+    const a = e, c = i, l = this.indexStart, g = this.indexEnd;
     let p = this.Length;
     this.indexStart = e, this.indexEnd = i, p -= this.Length;
     let v = this.maxMinPriceVol({ data: this.data, start: this.indexStart, end: this.indexEnd, that: this });
-    return this.setMaxMin(v), this.setConfig(n), this.#r.emit("setRange", [a, c, h, g]), !0;
+    return this.setMaxMin(v), this.setConfig(n), this.#r.emit("setRange", [a, c, l, g]), !0;
   }
   setConfig(e) {
     if (!E(e))
@@ -922,9 +922,9 @@ class hs {
         volumeMinIdx: 0,
         volumeMaxIdx: 0
       };
-    let c = i.length - 1, h = Bt(s, 0, c), g = Bt(n, 0, c), p = i[h][3], v = i[h][2], M = i[h][5], L = i[h][5], k = h, N = h, at = h, B = h;
-    for (; h++ < g; )
-      i[h][3] < p && (p = i[h][3], k = h), i[h][2] > v && (v = i[h][2], N = h), i[h][5] < M && (M = i[h][5], at = h), i[h][5] > L && (L = i[h][5], B = h);
+    let c = i.length - 1, l = Bt(s, 0, c), g = Bt(n, 0, c), p = i[l][3], v = i[l][2], M = i[l][5], L = i[l][5], k = l, N = l, at = l, B = l;
+    for (; l++ < g; )
+      i[l][3] < p && (p = i[l][3], k = l), i[l][2] > v && (v = i[l][2], N = l), i[l][5] < M && (M = i[l][5], at = l), i[l][5] > L && (L = i[l][5], B = l);
     let R = v - p, Ht = p, St = v;
     return p -= R * o.yAxisBounds, p = p > 0 ? p : 0, v += R * o.yAxisBounds, R = v - p, {
       valueLo: Ht,
@@ -940,8 +940,8 @@ class hs {
       volumeMinIdx: at,
       volumeMaxIdx: B
     };
-    function Bt(Ut, It, Xt) {
-      return Math.min(Xt, Math.max(It, Ut));
+    function Bt(zt, It, Xt) {
+      return Math.min(Xt, Math.max(It, zt));
     }
   }
   snapshot(e, i) {
@@ -962,7 +962,7 @@ class hs {
     };
   }
 }
-function ls(r) {
+function hs(r) {
   let e = Math.min(r.length - 1, 99), i = 1 / 0;
   return r.slice(0, e).forEach((s, n) => {
     let o = r[n + 1][0] - s[0];
@@ -975,7 +975,7 @@ function cs(r, e) {
   let i, s = r.timeFrameMS;
   return e = e - e % s, e === r.range.data[0][0] ? i = 0 : e < r.range.data[0][0] ? i = (r.range.data[0][0] - e) / s * -1 : i = (e - r.range.data[0][0]) / s, i;
 }
-const Ae = "TradeX-Chart", De = "TX", Na = "tradeXutils", vn = "tradeXmenus", $a = "tradeXmenu", wn = "tradeXdividers", xn = "tradeXwindows", Ha = "tradeXwindow", Tn = "tradeXprogress", Ba = 500, Ua = "stream_None", _e = "stream_Listening", En = "stream_Started", za = "stream_Stopped", Wa = "stream_Error", Be = "stream_candleFirst", Lt = "stream_candleUpdate", Ue = "stream_candleNew", Fa = 250, Va = 8, Ga = 2, Ya = 2, qa = "defaultState", Xa = {
+const Ae = "TradeX-Chart", De = "TX", Na = "tradeXutils", yn = "tradeXmenus", $a = "tradeXmenu", wn = "tradeXdividers", xn = "tradeXwindows", Ha = "tradeXwindow", Tn = "tradeXprogress", Ba = 500, za = "stream_None", _e = "stream_Listening", En = "stream_Started", Ua = "stream_Stopped", Wa = "stream_Error", Be = "stream_candleFirst", Lt = "stream_candleUpdate", ze = "stream_candleNew", Fa = 250, Va = 8, Ga = 2, Ya = 2, qa = "defaultState", Xa = {
   id: qa,
   key: "",
   status: "default",
@@ -1031,22 +1031,22 @@ let qi = class $ {
   static validate(e, i = !1, s = !1) {
     const n = this.default;
     if (E(e) || (e = {}), E(e.chart) || (e.chart = n.chart, e.chart.isEmpty = !0, e.chart.data = P(e.ohlcv) ? e.ohlcv : [], delete e.ohlcv), e = He(n, e), i ? e.chart.data = Aa(e.chart.data, s) ? e.chart.data : [] : e.chart.data = La(e.chart.data, s) ? e.chart.data : [], e.chart.isEmpty = e.chart.data.length == 0, !T(e.chart?.tf) || i) {
-      let h = ls(e.chart.data);
-      h < W && (h = Ti), e.chart.tfms = h;
+      let l = hs(e.chart.data);
+      l < W && (l = Ti), e.chart.tfms = l;
     }
     if ((!S(e.chart?.tfms) || i) && (e.chart.tf = Re(e.chart.tfms)), P(e.views) || (e.views = n.views), P(e.primary) || (e.primary = n.primary), P(e.secondary) || (e.secondary = n.secondary), E(e.chart.settings) || (e.chart.settings = n.chart.settings), P(e.datasets) || (e.datasets = []), e.views.length == 0) {
       e.views.push(["primary", e.primary]);
-      for (let h in e)
-        h.indexOf("secondary") == 0 && e.views.push([h, e[h]]);
+      for (let l in e)
+        l.indexOf("secondary") == 0 && e.views.push([l, e[l]]);
     }
     let o = e.views, a = o.length;
     for (; a--; )
       if (!P(o[a]) || o[a].length == 0)
         o.splice(a, 1);
       else {
-        let h = e.views[a][1], g = h.length;
+        let l = e.views[a][1], g = l.length;
         for (; g--; )
-          !E(h[g]) || !S(h[g].name) || !S(h[g].type) ? h.splice(g, 1) : E(h[g].settings) || (h[g].settings = {});
+          !E(l[g]) || !S(l[g].name) || !S(l[g].type) ? l.splice(g, 1) : E(l[g].settings) || (l[g].settings = {});
         o[a].length == 0 && o.splice(a, 1);
       }
     e.views.length == 0 && (e.views[0] = ["primary", n.primary]), e.views = new mt(e.views), e.views.has("primary") || e.views.insert("primary", n.primary, 0), e.views.get("primary").push(e.chart);
@@ -1074,8 +1074,8 @@ let qi = class $ {
     switch (a.length > 0 && a[a.length - 1].length > 6 && (a.length = a.length - 1), o.views.get("primary").pop(), o.views = Array.from(o.views), n) {
       case "json":
       default:
-        const { replacer: h, space: g } = { ...i };
-        c = JSON.stringify(o, h, g);
+        const { replacer: l, space: g } = { ...i };
+        c = JSON.stringify(o, l, g);
     }
     return c;
   }
@@ -1085,10 +1085,10 @@ let qi = class $ {
   #i = {};
   #s;
   #o = !1;
-  #h = !0;
-  #l = [];
+  #l = !0;
+  #h = [];
   constructor(e, i = !1, s = !1) {
-    E(e) ? (this.#n = $.validate(e, i, s), this.#o = "valid", this.#h = !!this.#n.chart?.isEmpty, this.#s = e?.core instanceof O ? e.core : void 0) : (this.#n = $.default, this.#o = "default", this.#h = !0), this.#e = e?.id || "", this.#r = J(`${De}_state`);
+    E(e) ? (this.#n = $.validate(e, i, s), this.#o = "valid", this.#l = !!this.#n.chart?.isEmpty, this.#s = e?.core instanceof O ? e.core : void 0) : (this.#n = $.default, this.#o = "default", this.#l = !0), this.#e = e?.id || "", this.#r = J(`${De}_state`);
   }
   get id() {
     return this.#e;
@@ -1100,7 +1100,7 @@ let qi = class $ {
     return this.#o;
   }
   get isEmpty() {
-    return this.#h;
+    return this.#l;
   }
   get allData() {
     return {
@@ -1156,7 +1156,7 @@ let qi = class $ {
       return !0;
     i.stream.stop(), i.MainPane.reset();
     let s = $.get(e);
-    this.#e = s.id, this.#o = s.status, this.#h = s.isEmpty, this.#n = s.data;
+    this.#e = s.id, this.#o = s.status, this.#l = s.isEmpty, this.#n = s.data;
     const n = {
       interval: s.data.chart.tfms,
       core: i
@@ -1174,11 +1174,11 @@ let qi = class $ {
     if (!E(e))
       return this.error(`ERROR: ${this.id}: merge data must be type Object!`), !1;
     let n = P(e?.ohlcv) ? e.ohlcv.length - 1 : 0;
-    if (n > 1 && this.time.timeFrameMS !== ls(e?.ohlcv))
+    if (n > 1 && this.time.timeFrameMS !== hs(e?.ohlcv))
       return this.error(`ERROR: ${this.core.id}: merge data time frame does not match existing time frame!`), !1;
-    (this.#h || !T(this.time.timeFrameMS)) && (!E(i) || !T(i.start) || !T(i.end)) && n > 1 && (i = { start: n - this.range.initialCnt, end: n }), E(i) ? (T(i?.startTS) ? i.start = i.startTS : i.start = T(i.start) ? this.range.value(i.start)[0] : this.range.timeMin, T(i?.endTS) ? i.end = i.endTS : i.end = T(i.end) ? this.range.value(i.end)[0] : this.range.timeMax) : (i = {}, i.start = this.range.timeMin, i.end = this.range.timeMax);
+    (this.#l || !T(this.time.timeFrameMS)) && (!E(i) || !T(i.start) || !T(i.end)) && n > 1 && (i = { start: n - this.range.initialCnt, end: n }), E(i) ? (T(i?.startTS) ? i.start = i.startTS : i.start = T(i.start) ? this.range.value(i.start)[0] : this.range.timeMin, T(i?.endTS) ? i.end = i.endTS : i.end = T(i.end) ? this.range.value(i.end)[0] : this.range.timeMax) : (i = {}, i.start = this.range.timeMin, i.end = this.range.timeMax);
     let o, a, c = e?.ohlcv || !1;
-    const h = this.allData.data, g = this.allData?.primaryPane, p = e?.primary || !1;
+    const l = this.allData.data, g = this.allData?.primaryPane, p = e?.primary || !1;
     this.allData?.secondaryPane;
     const v = e?.secondary || !1;
     this.allData?.dataset?.data;
@@ -1186,10 +1186,10 @@ let qi = class $ {
     this.allData?.trades, e?.trades, this.allData?.events, e?.events;
     const L = P(c) && this.range.inRange(c[0][0]) ? 1 : 0, k = {};
     if (P(c) && c.length > 0) {
-      if (o = c.length - 1, h.length - 1, k.mData = this.range.inRange(c[0][0]) && this.range.inRange(c[0][o]), !Q(c[o][7]) && c[o].length !== 8 && c[o][6] !== null && c[o][7] !== !0 ? c = Oa(c) : i.end >= this.range.timeFinish && i.start <= this.range.timeFinish && (i.start += this.range.interval, i.end += this.range.interval), h.length == 0 ? this.allData.data.push(...c) : (i = i || {
+      if (o = c.length - 1, l.length - 1, k.mData = this.range.inRange(c[0][0]) && this.range.inRange(c[0][o]), !Q(c[o][7]) && c[o].length !== 8 && c[o][6] !== null && c[o][7] !== !0 ? c = Oa(c) : i.end >= this.range.timeFinish && i.start <= this.range.timeFinish && (i.start += this.range.interval, i.end += this.range.interval), l.length == 0 ? this.allData.data.push(...c) : (i = i || {
         start: this.range.timeMin,
         end: this.range.timeMax
-      }, this.data.chart.data = this.merge(h, c)), s)
+      }, this.data.chart.data = this.merge(l, c)), s)
         this.#s.calcAllIndicators();
       else {
         if (P(p) && p.length > 0) {
@@ -1209,7 +1209,7 @@ let qi = class $ {
       let N, at = !1;
       for (N in k)
         at = at || N;
-      return e.ohlcv.length > 1 && this.#s.emit("state_mergeComplete"), at && this.#s.refresh(), this.#h = !1, !0;
+      return e.ohlcv.length > 1 && this.#s.emit("state_mergeComplete"), at && this.#s.refresh(), this.#l = !1, !0;
     }
   }
   merge(e, i) {
@@ -1229,8 +1229,8 @@ let qi = class $ {
       s = n;
       let a = n[n.length - 1][0], c = Math.floor((o[0][0] - a) / this.range.interval);
       for (c; c > 0; c--) {
-        let h = Array(o[0].length).fill(null);
-        h[0] = a, s.push(h), s = s.concat(o);
+        let l = Array(o[0].length).fill(null);
+        l[0] = a, s.push(l), s = s.concat(o);
       }
     } else
       s = n.concat(o);
@@ -1271,8 +1271,8 @@ class $t {
   #i;
   #s;
   #o = "stopped";
-  #h;
   #l;
+  #h;
   #a;
   #c;
   #u = ["await", "idle", "running", "stopped"];
@@ -1304,10 +1304,10 @@ class $t {
     return this.#o;
   }
   get event() {
-    return this.#l;
+    return this.#h;
   }
   get events() {
-    return this.#h;
+    return this.#l;
   }
   get eventData() {
     return this.#a;
@@ -1316,25 +1316,25 @@ class $t {
     return this.#c;
   }
   notify(e, i) {
-    this.#l = e, this.#a = i;
+    this.#h = e, this.#a = i;
     const s = this.#i.states[this.#e];
     let n = s.on[e];
-    if (!n || !U(n.action) || this.#o !== "running")
+    if (!n || !z(n.action) || this.#o !== "running")
       return !1;
     let o = n?.condition?.type || n?.condition || !1;
     if (o && !this.condition.call(this, o, n.condition))
       return !1;
     const a = n.target, c = this.#i.states[a];
     if (s?.onExit.call(this, i), n.action.call(this, i), this.#r = this.#e, this.#e = a, c?.onEnter.call(this, i), this.#i.states[a]?.on && (this.#i.states[a].on[""] || this.#i.states[a].on?.always)) {
-      const h = this.#i.states[a].on[""] || this.#i.states[a].on.always;
-      if (P(h))
-        for (let g of h) {
+      const l = this.#i.states[a].on[""] || this.#i.states[a].on.always;
+      if (P(l))
+        for (let g of l) {
           let p = g?.condition?.type || g?.condition || !1;
           this.condition.call(this, p, g.condition) && S(g.target) && (g?.action.call(this, i), this.#r = this.#e, this.#e = g?.target, this.notify(null, null));
         }
-      else if (E(h) && S(h.target)) {
-        let g = h?.condition?.type || h?.condition || !1;
-        this.condition.call(this, g, h.condition) && S(h.target) && (h?.action.call(this, i), this.#r = this.#e, this.#e = h.target, this.notify(null, null));
+      else if (E(l) && S(l.target)) {
+        let g = l?.condition?.type || l?.condition || !1;
+        this.condition.call(this, g, l.condition) && S(l.target) && (l?.action.call(this, i), this.#r = this.#e, this.#e = l.target, this.notify(null, null));
       }
     }
     return this.#e;
@@ -1356,15 +1356,15 @@ class $t {
     this.#f(), this.#i = null;
   }
   #d() {
-    this.#h = /* @__PURE__ */ new Set();
+    this.#l = /* @__PURE__ */ new Set();
     for (let e in this.#i.states)
       for (let i in this.#i.states[e].on) {
         let s = this.notify.bind(this, i);
-        this.#h.add({ topic: i, cb: s }), this.#s.on(i, s, this.context);
+        this.#l.add({ topic: i, cb: s }), this.#s.on(i, s, this.context);
       }
   }
   #f() {
-    for (let e of this.#h)
+    for (let e of this.#l)
       this.#s.off(e.topic, e.cb);
   }
   static validateConfig(e) {
@@ -1372,15 +1372,15 @@ class $t {
       return !1;
     const i = ["id", "initial", "context", "states"];
     let s = Object.keys(e);
-    if (!vr(i, s) || !(e.initial in e.states))
+    if (!yr(i, s) || !(e.initial in e.states))
       return !1;
     for (let n in e.states) {
-      if (!E(e.states[n]) || "onEnter" in e.states[n] && !U(e.states[n].onEnter) || "onExit" in e.states[n] && !U(e.states[n].onExit))
+      if (!E(e.states[n]) || "onEnter" in e.states[n] && !z(e.states[n].onEnter) || "onExit" in e.states[n] && !z(e.states[n].onExit))
         return !1;
       if ("on" in e.states[n])
         for (let o in e.states[n].on) {
           let a = e.states[n].on[o];
-          if (!S(a.target) || "action" in a && !U(a.action))
+          if (!S(a.target) || "action" in a && !z(a.action))
             return !1;
         }
     }
@@ -1415,7 +1415,7 @@ class Za {
       return !1;
   }
   add(e, i, s) {
-    if (isNaN(e) || !U(s))
+    if (isNaN(e) || !z(s))
       return !1;
     const n = J(ja), o = { price: e, condition: i };
     if (this.list.has(o)) {
@@ -1462,11 +1462,11 @@ class Za {
     }
   }
 }
-const Ka = 0, Qa = 1, Ja = 2, th = 3, eh = 4, ih = 5, oi = [null, null, null, null, null], ai = {
+const Ka = 0, Qa = 1, Ja = 2, tl = 3, el = 4, il = 5, oi = [null, null, null, null, null], ai = {
   tfCountDown: !0,
   alerts: []
 };
-class he {
+class le {
   #t;
   #e;
   #r;
@@ -1474,8 +1474,8 @@ class he {
   #i;
   #s;
   #o;
-  #h = oi;
-  #l = 0;
+  #l = oi;
+  #h = 0;
   #a = 0;
   #c = "";
   #u = !1;
@@ -1492,7 +1492,7 @@ class he {
     return e;
   }
   constructor(e) {
-    this.#t = e, this.#n = e.time, this.status = { status: Ua }, this.#e = he.validateConfig(e.config?.stream), this.#i = T(e.config?.maxCandleUpdate) ? e.config.maxCandleUpdate : Fa, this.#o = T(e.config?.streamPrecision) ? e.config.streamPrecision : Va;
+    this.#t = e, this.#n = e.time, this.status = { status: za }, this.#e = le.validateConfig(e.config?.stream), this.#i = T(e.config?.maxCandleUpdate) ? e.config.maxCandleUpdate : Fa, this.#o = T(e.config?.streamPrecision) ? e.config.streamPrecision : Va;
   }
   get config() {
     return this.#e;
@@ -1534,20 +1534,20 @@ class he {
     return this.#m;
   }
   set lastTick(e) {
-    P(e) && (this.#m, this.#m = e, this.alerts.check(e, this.#h));
+    P(e) && (this.#m, this.#m = e, this.alerts.check(e, this.#l));
   }
   set candle(e) {
-    const i = [...this.#h];
-    e.t = this.roundTime(new Date(e.t)), e.o = e.o * 1, e.h = e.h * 1, e.l = e.l * 1, e.c = e.c * 1, e.v = e.v * 1, this.#h[Ka] !== e.t ? this.newCandle(e) : this.updateCandle(e), this.status = { status: _e, data: this.#h }, this.lastTick = i;
+    const i = [...this.#l];
+    e.t = this.roundTime(new Date(e.t)), e.o = e.o * 1, e.h = e.h * 1, e.l = e.l * 1, e.c = e.c * 1, e.v = e.v * 1, this.#l[Ka] !== e.t ? this.newCandle(e) : this.updateCandle(e), this.status = { status: _e, data: this.#l }, this.lastTick = i;
   }
   get candle() {
-    return this.#h !== oi ? this.#h : null;
+    return this.#l !== oi ? this.#l : null;
   }
   start() {
     this.#w = new Za(this.#e.alerts), this.status = { status: En }, this.#s = setInterval(this.onUpdate.bind(this), this.#i);
   }
   stop() {
-    this.#w.destroy(), this.status = { status: za };
+    this.#w.destroy(), this.status = { status: Ua };
   }
   emit(e, i) {
     this.#t.emit(e, i);
@@ -1559,10 +1559,10 @@ class he {
     (this.#r == En || this.#r == _e) && E(e) && (this.candle = e);
   }
   onUpdate() {
-    this.#h !== oi && (this.status = { status: Lt, data: this.candle }, this.status = { status: _e, data: this.#h });
+    this.#l !== oi && (this.status = { status: Lt, data: this.candle }, this.status = { status: _e, data: this.#l });
   }
   newCandle(e) {
-    this.prevCandle(), this.#h = [
+    this.prevCandle(), this.#l = [
       e.t,
       e.o,
       e.h,
@@ -1571,23 +1571,23 @@ class he {
       e.v,
       null,
       !0
-    ], this.#t.state.mergeData({ ohlcv: [this.#h] }, !0, !1), this.status = { status: Ue, data: { data: e, candle: this.#h } }, this.#a = this.#n.timeFrameMS, this.#l = this.roundTime(Date.now());
+    ], this.#t.state.mergeData({ ohlcv: [this.#l] }, !0, !1), this.status = { status: ze, data: { data: e, candle: this.#l } }, this.#a = this.#n.timeFrameMS, this.#h = this.roundTime(Date.now());
   }
   prevCandle() {
     const e = this.#t.allData.data;
     e.length > 0 && e[e.length - 1][7] && (e[e.length - 1].length = 6);
   }
   updateCandle(e) {
-    let i = this.#h;
-    i[Qa] = e.o, i[Ja] = e.h, i[th] = e.l, i[eh] = e.c, i[ih] = e.v, this.#h = i;
+    let i = this.#l;
+    i[Qa] = e.o, i[Ja] = e.h, i[tl] = e.l, i[el] = e.c, i[il] = e.v, this.#l = i;
     const s = this.#t.allData.data, n = s.length > 0 ? s.length - 1 : 0;
-    s[n] = this.#h, this.countDownUpdate();
+    s[n] = this.#l, this.countDownUpdate();
   }
   countDownUpdate() {
     let e, i, s, n, o, a, c;
     this.#n.timeFrameMS;
-    let h = this.#n.timeFrameMS - (Date.now() - this.#l);
-    return h < 0 && (h = 0), this.#a = h, h > ut ? (e = String(Math.floor(h / ut)), i = String(Math.floor(h % ut / nt)).padStart(2, "0"), this.#c = `${e}Y ${i}M`) : h > nt ? (i = String(Math.floor(h / nt)).padStart(2, "0"), n = String(Math.floor(h % nt / D)).padStart(2, "0"), this.#c = `${i}M ${n}D`) : h > fe ? (s = String(Math.floor(h / fe)).padStart(2, "0"), n = String(Math.floor(h % nt / D)).padStart(2, "0"), this.#c = `${s}W ${n}D`) : h > D ? (n = String(Math.floor(h / D)).padStart(2, "0"), o = String(Math.floor(h % D / X)).padStart(2, "0"), a = String(Math.floor(h % X / F)).padStart(2, "0"), this.#c = `${n}D ${o}:${a}`) : h > X ? (o = String(Math.floor(h / X)).padStart(2, "0"), a = String(Math.floor(h % X / F)).padStart(2, "0"), c = String(Math.floor(h % F / W)).padStart(2, "0"), this.#c = `${o}:${a}:${c}`) : h > F ? (a = String(Math.floor(h / F)).padStart(2, "0"), c = String(Math.floor(h % F / W)).padStart(2, "0"), this.#c = `00:${a}:${c}`) : (c = String(Math.floor(h / W)).padStart(2, "0"), String(h % W).padStart(4, "0"), this.#c = `00:00:${c}`), this.#c;
+    let l = this.#n.timeFrameMS - (Date.now() - this.#h);
+    return l < 0 && (l = 0), this.#a = l, l > ut ? (e = String(Math.floor(l / ut)), i = String(Math.floor(l % ut / nt)).padStart(2, "0"), this.#c = `${e}Y ${i}M`) : l > nt ? (i = String(Math.floor(l / nt)).padStart(2, "0"), n = String(Math.floor(l % nt / D)).padStart(2, "0"), this.#c = `${i}M ${n}D`) : l > fe ? (s = String(Math.floor(l / fe)).padStart(2, "0"), n = String(Math.floor(l % nt / D)).padStart(2, "0"), this.#c = `${s}W ${n}D`) : l > D ? (n = String(Math.floor(l / D)).padStart(2, "0"), o = String(Math.floor(l % D / X)).padStart(2, "0"), a = String(Math.floor(l % X / F)).padStart(2, "0"), this.#c = `${n}D ${o}:${a}`) : l > X ? (o = String(Math.floor(l / X)).padStart(2, "0"), a = String(Math.floor(l % X / F)).padStart(2, "0"), c = String(Math.floor(l % F / W)).padStart(2, "0"), this.#c = `${o}:${a}:${c}`) : l > F ? (a = String(Math.floor(l / F)).padStart(2, "0"), c = String(Math.floor(l % F / W)).padStart(2, "0"), this.#c = `00:${a}:${c}`) : (c = String(Math.floor(l / W)).padStart(2, "0"), String(l % W).padStart(4, "0"), this.#c = `00:00:${c}`), this.#c;
   }
   roundTime(e) {
     return e - e % this.#t.time.timeFrameMS;
@@ -1662,8 +1662,8 @@ const xr = {
     for (; s && s.tagName.toLowerCase() != "body" && !isNaN(s.offsetLeft) && !isNaN(s.offsetTop); )
       e += s.offsetLeft - s.scrollLeft, i += s.offsetTop - s.scrollTop, s = s.offsetParent;
     const n = r.getBoundingClientRect();
-    let o = n.right - n.left, a = n.bottom - n.top, c = this.isVisible(r), h = this.isInViewport(r);
-    return { top: i, left: e, width: o, height: a, visible: c, viewport: h };
+    let o = n.right - n.left, a = n.bottom - n.top, c = this.isVisible(r), l = this.isInViewport(r);
+    return { top: i, left: e, width: o, height: a, visible: c, viewport: l };
   },
   elementsDistance(r, e) {
     return !this.isElement(r) || !this.isElement(r) ? !1 : (el1Location = this.elementDimPos(r), el2Location = this.elementDimPos(e), {
@@ -1765,10 +1765,10 @@ const xr = {
   findTargetParentWithClass(r, e) {
     return !this.isElement(r) || !S(e) ? null : r.classList.contains(e) ? r : this.findTargetParentWithClass(r.parentElement, e);
   }
-}, I = xr, sh = typeof window < "u" && typeof window.document < "u";
+}, I = xr, sl = typeof window < "u" && typeof window.document < "u";
 typeof process < "u" && process.versions != null && process.versions.node != null;
 typeof window < "u" && window.name === "nodejs" || navigator.userAgent.includes("Node.js") || navigator.userAgent.includes("jsdom");
-const nh = ((r) => "onorientationchange" in r || r.matchMedia("(any-pointer:coarse)").matches || !!navigator.maxTouchPoints || !!navigator.msMaxTouchPoints || "ontouchstart" in r || r.DocumentTouch && document instanceof r.DocumentTouch)(typeof window < "u" ? window : {}), rh = {
+const nl = ((r) => "onorientationchange" in r || r.matchMedia("(any-pointer:coarse)").matches || !!navigator.maxTouchPoints || !!navigator.msMaxTouchPoints || "ontouchstart" in r || r.DocumentTouch && document instanceof r.DocumentTouch)(typeof window < "u" ? window : {}), rl = {
   idle: 0,
   dragStart: 1,
   dragging: 2
@@ -1801,7 +1801,7 @@ class te {
     return new te(this.x, this.y);
   }
 }
-function oh(r) {
+function ol(r) {
   return r && r.__esModule && Object.prototype.hasOwnProperty.call(r, "default") ? r.default : r;
 }
 var Tr = { exports: {} };
@@ -1812,32 +1812,32 @@ var Tr = { exports: {} };
  * Licensed under the MIT license */
 (function(r) {
   (function(e, i, s, n) {
-    var o = ["", "webkit", "Moz", "MS", "ms", "o"], a = i.createElement("div"), c = "function", h = Math.round, g = Math.abs, p = Date.now;
-    function v(l, u, f) {
-      return setTimeout(Ht(l, f), u);
+    var o = ["", "webkit", "Moz", "MS", "ms", "o"], a = i.createElement("div"), c = "function", l = Math.round, g = Math.abs, p = Date.now;
+    function v(h, u, f) {
+      return setTimeout(Ht(h, f), u);
     }
-    function M(l, u, f) {
-      return Array.isArray(l) ? (L(l, f[u], f), !0) : !1;
+    function M(h, u, f) {
+      return Array.isArray(h) ? (L(h, f[u], f), !0) : !1;
     }
-    function L(l, u, f) {
+    function L(h, u, f) {
       var m;
-      if (l)
-        if (l.forEach)
-          l.forEach(u, f);
-        else if (l.length !== n)
-          for (m = 0; m < l.length; )
-            u.call(f, l[m], m, l), m++;
+      if (h)
+        if (h.forEach)
+          h.forEach(u, f);
+        else if (h.length !== n)
+          for (m = 0; m < h.length; )
+            u.call(f, h[m], m, h), m++;
         else
-          for (m in l)
-            l.hasOwnProperty(m) && u.call(f, l[m], m, l);
+          for (m in h)
+            h.hasOwnProperty(m) && u.call(f, h[m], m, h);
     }
-    function k(l, u, f) {
+    function k(h, u, f) {
       var m = "DEPRECATED METHOD: " + u + `
 ` + f + ` AT 
 `;
       return function() {
         var x = new Error("get-stack-trace"), b = x && x.stack ? x.stack.replace(/^[^\(]+?[\n$]/gm, "").replace(/^\s+at\s+/gm, "").replace(/^Object.<anonymous>\s*\(/gm, "{anonymous}()@") : "Unknown Stack Trace", A = e.console && (e.console.warn || e.console.log);
-        return A && A.call(e.console, m, b), l.apply(this, arguments);
+        return A && A.call(e.console, m, b), h.apply(this, arguments);
       };
     }
     var N;
@@ -1859,202 +1859,202 @@ var Tr = { exports: {} };
     }, "extend", "Use `assign`."), B = k(function(u, f) {
       return at(u, f, !0);
     }, "merge", "Use `assign`.");
-    function R(l, u, f) {
+    function R(h, u, f) {
       var m = u.prototype, x;
-      x = l.prototype = Object.create(m), x.constructor = l, x._super = m, f && N(x, f);
+      x = h.prototype = Object.create(m), x.constructor = h, x._super = m, f && N(x, f);
     }
-    function Ht(l, u) {
+    function Ht(h, u) {
       return function() {
-        return l.apply(u, arguments);
+        return h.apply(u, arguments);
       };
     }
-    function St(l, u) {
-      return typeof l == c ? l.apply(u && u[0] || n, u) : l;
+    function St(h, u) {
+      return typeof h == c ? h.apply(u && u[0] || n, u) : h;
     }
-    function Bt(l, u) {
-      return l === n ? u : l;
+    function Bt(h, u) {
+      return h === n ? u : h;
     }
-    function Ut(l, u, f) {
+    function zt(h, u, f) {
       L(ne(u), function(m) {
-        l.addEventListener(m, f, !1);
+        h.addEventListener(m, f, !1);
       });
     }
-    function It(l, u, f) {
+    function It(h, u, f) {
       L(ne(u), function(m) {
-        l.removeEventListener(m, f, !1);
+        h.removeEventListener(m, f, !1);
       });
     }
-    function Xt(l, u) {
-      for (; l; ) {
-        if (l == u)
+    function Xt(h, u) {
+      for (; h; ) {
+        if (h == u)
           return !0;
-        l = l.parentNode;
+        h = h.parentNode;
       }
       return !1;
     }
-    function kt(l, u) {
-      return l.indexOf(u) > -1;
+    function kt(h, u) {
+      return h.indexOf(u) > -1;
     }
-    function ne(l) {
-      return l.trim().split(/\s+/g);
+    function ne(h) {
+      return h.trim().split(/\s+/g);
     }
-    function re(l, u, f) {
-      if (l.indexOf && !f)
-        return l.indexOf(u);
-      for (var m = 0; m < l.length; ) {
-        if (f && l[m][f] == u || !f && l[m] === u)
+    function re(h, u, f) {
+      if (h.indexOf && !f)
+        return h.indexOf(u);
+      for (var m = 0; m < h.length; ) {
+        if (f && h[m][f] == u || !f && h[m] === u)
           return m;
         m++;
       }
       return -1;
     }
-    function qe(l) {
-      return Array.prototype.slice.call(l, 0);
+    function qe(h) {
+      return Array.prototype.slice.call(h, 0);
     }
-    function Hs(l, u, f) {
-      for (var m = [], x = [], b = 0; b < l.length; ) {
-        var A = u ? l[b][u] : l[b];
-        re(x, A) < 0 && m.push(l[b]), x[b] = A, b++;
+    function Hs(h, u, f) {
+      for (var m = [], x = [], b = 0; b < h.length; ) {
+        var A = u ? h[b][u] : h[b];
+        re(x, A) < 0 && m.push(h[b]), x[b] = A, b++;
       }
       return f && (u ? m = m.sort(function(q, K) {
         return q[u] > K[u];
       }) : m = m.sort()), m;
     }
-    function Xe(l, u) {
+    function Xe(h, u) {
       for (var f, m, x = u[0].toUpperCase() + u.slice(1), b = 0; b < o.length; ) {
-        if (f = o[b], m = f ? f + x : u, m in l)
+        if (f = o[b], m = f ? f + x : u, m in h)
           return m;
         b++;
       }
       return n;
     }
-    var ho = 1;
-    function lo() {
-      return ho++;
+    var lo = 1;
+    function ho() {
+      return lo++;
     }
-    function Bs(l) {
-      var u = l.ownerDocument || l;
+    function Bs(h) {
+      var u = h.ownerDocument || h;
       return u.defaultView || u.parentWindow || e;
     }
-    var co = /mobile|tablet|ip(ad|hone|od)|android/i, Us = "ontouchstart" in e, uo = Xe(e, "PointerEvent") !== n, fo = Us && co.test(navigator.userAgent), xe = "touch", go = "pen", Ni = "mouse", mo = "kinect", po = 25, Z = 1, jt = 2, z = 4, tt = 8, je = 1, Te = 2, Ee = 4, Se = 8, be = 16, bt = Te | Ee, Zt = Se | be, zs = bt | Zt, Ws = ["x", "y"], Ze = ["clientX", "clientY"];
-    function ht(l, u) {
+    var co = /mobile|tablet|ip(ad|hone|od)|android/i, zs = "ontouchstart" in e, uo = Xe(e, "PointerEvent") !== n, fo = zs && co.test(navigator.userAgent), xe = "touch", go = "pen", Ni = "mouse", mo = "kinect", po = 25, Z = 1, jt = 2, U = 4, tt = 8, je = 1, Te = 2, Ee = 4, Se = 8, be = 16, bt = Te | Ee, Zt = Se | be, Us = bt | Zt, Ws = ["x", "y"], Ze = ["clientX", "clientY"];
+    function lt(h, u) {
       var f = this;
-      this.manager = l, this.callback = u, this.element = l.element, this.target = l.options.inputTarget, this.domHandler = function(m) {
-        St(l.options.enable, [l]) && f.handler(m);
+      this.manager = h, this.callback = u, this.element = h.element, this.target = h.options.inputTarget, this.domHandler = function(m) {
+        St(h.options.enable, [h]) && f.handler(m);
       }, this.init();
     }
-    ht.prototype = {
+    lt.prototype = {
       handler: function() {
       },
       init: function() {
-        this.evEl && Ut(this.element, this.evEl, this.domHandler), this.evTarget && Ut(this.target, this.evTarget, this.domHandler), this.evWin && Ut(Bs(this.element), this.evWin, this.domHandler);
+        this.evEl && zt(this.element, this.evEl, this.domHandler), this.evTarget && zt(this.target, this.evTarget, this.domHandler), this.evWin && zt(Bs(this.element), this.evWin, this.domHandler);
       },
       destroy: function() {
         this.evEl && It(this.element, this.evEl, this.domHandler), this.evTarget && It(this.target, this.evTarget, this.domHandler), this.evWin && It(Bs(this.element), this.evWin, this.domHandler);
       }
     };
-    function yo(l) {
-      var u, f = l.options.inputClass;
-      return f ? u = f : uo ? u = Hi : fo ? u = Je : Us ? u = Bi : u = Qe, new u(l, vo);
+    function vo(h) {
+      var u, f = h.options.inputClass;
+      return f ? u = f : uo ? u = Hi : fo ? u = Je : zs ? u = Bi : u = Qe, new u(h, yo);
     }
-    function vo(l, u, f) {
-      var m = f.pointers.length, x = f.changedPointers.length, b = u & Z && m - x === 0, A = u & (z | tt) && m - x === 0;
-      f.isFirst = !!b, f.isFinal = !!A, b && (l.session = {}), f.eventType = u, wo(l, f), l.emit("hammer.input", f), l.recognize(f), l.session.prevInput = f;
+    function yo(h, u, f) {
+      var m = f.pointers.length, x = f.changedPointers.length, b = u & Z && m - x === 0, A = u & (U | tt) && m - x === 0;
+      f.isFirst = !!b, f.isFinal = !!A, b && (h.session = {}), f.eventType = u, wo(h, f), h.emit("hammer.input", f), h.recognize(f), h.session.prevInput = f;
     }
-    function wo(l, u) {
-      var f = l.session, m = u.pointers, x = m.length;
+    function wo(h, u) {
+      var f = h.session, m = u.pointers, x = m.length;
       f.firstInput || (f.firstInput = Fs(u)), x > 1 && !f.firstMultiple ? f.firstMultiple = Fs(u) : x === 1 && (f.firstMultiple = !1);
       var b = f.firstInput, A = f.firstMultiple, Y = A ? A.center : b.center, q = u.center = Vs(m);
       u.timeStamp = p(), u.deltaTime = u.timeStamp - b.timeStamp, u.angle = $i(Y, q), u.distance = Ke(Y, q), xo(f, u), u.offsetDirection = Ys(u.deltaX, u.deltaY);
       var K = Gs(u.deltaTime, u.deltaX, u.deltaY);
       u.overallVelocityX = K.x, u.overallVelocityY = K.y, u.overallVelocity = g(K.x) > g(K.y) ? K.x : K.y, u.scale = A ? So(A.pointers, m) : 1, u.rotation = A ? Eo(A.pointers, m) : 0, u.maxPointers = f.prevInput ? u.pointers.length > f.prevInput.maxPointers ? u.pointers.length : f.prevInput.maxPointers : u.pointers.length, To(f, u);
-      var Mt = l.element;
+      var Mt = h.element;
       Xt(u.srcEvent.target, Mt) && (Mt = u.srcEvent.target), u.target = Mt;
     }
-    function xo(l, u) {
-      var f = u.center, m = l.offsetDelta || {}, x = l.prevDelta || {}, b = l.prevInput || {};
-      (u.eventType === Z || b.eventType === z) && (x = l.prevDelta = {
+    function xo(h, u) {
+      var f = u.center, m = h.offsetDelta || {}, x = h.prevDelta || {}, b = h.prevInput || {};
+      (u.eventType === Z || b.eventType === U) && (x = h.prevDelta = {
         x: b.deltaX || 0,
         y: b.deltaY || 0
-      }, m = l.offsetDelta = {
+      }, m = h.offsetDelta = {
         x: f.x,
         y: f.y
       }), u.deltaX = x.x + (f.x - m.x), u.deltaY = x.y + (f.y - m.y);
     }
-    function To(l, u) {
-      var f = l.lastInterval || u, m = u.timeStamp - f.timeStamp, x, b, A, Y;
+    function To(h, u) {
+      var f = h.lastInterval || u, m = u.timeStamp - f.timeStamp, x, b, A, Y;
       if (u.eventType != tt && (m > po || f.velocity === n)) {
         var q = u.deltaX - f.deltaX, K = u.deltaY - f.deltaY, Mt = Gs(m, q, K);
-        b = Mt.x, A = Mt.y, x = g(Mt.x) > g(Mt.y) ? Mt.x : Mt.y, Y = Ys(q, K), l.lastInterval = u;
+        b = Mt.x, A = Mt.y, x = g(Mt.x) > g(Mt.y) ? Mt.x : Mt.y, Y = Ys(q, K), h.lastInterval = u;
       } else
         x = f.velocity, b = f.velocityX, A = f.velocityY, Y = f.direction;
       u.velocity = x, u.velocityX = b, u.velocityY = A, u.direction = Y;
     }
-    function Fs(l) {
-      for (var u = [], f = 0; f < l.pointers.length; )
+    function Fs(h) {
+      for (var u = [], f = 0; f < h.pointers.length; )
         u[f] = {
-          clientX: h(l.pointers[f].clientX),
-          clientY: h(l.pointers[f].clientY)
+          clientX: l(h.pointers[f].clientX),
+          clientY: l(h.pointers[f].clientY)
         }, f++;
       return {
         timeStamp: p(),
         pointers: u,
         center: Vs(u),
-        deltaX: l.deltaX,
-        deltaY: l.deltaY
+        deltaX: h.deltaX,
+        deltaY: h.deltaY
       };
     }
-    function Vs(l) {
-      var u = l.length;
+    function Vs(h) {
+      var u = h.length;
       if (u === 1)
         return {
-          x: h(l[0].clientX),
-          y: h(l[0].clientY)
+          x: l(h[0].clientX),
+          y: l(h[0].clientY)
         };
       for (var f = 0, m = 0, x = 0; x < u; )
-        f += l[x].clientX, m += l[x].clientY, x++;
+        f += h[x].clientX, m += h[x].clientY, x++;
       return {
-        x: h(f / u),
-        y: h(m / u)
+        x: l(f / u),
+        y: l(m / u)
       };
     }
-    function Gs(l, u, f) {
+    function Gs(h, u, f) {
       return {
-        x: u / l || 0,
-        y: f / l || 0
+        x: u / h || 0,
+        y: f / h || 0
       };
     }
-    function Ys(l, u) {
-      return l === u ? je : g(l) >= g(u) ? l < 0 ? Te : Ee : u < 0 ? Se : be;
+    function Ys(h, u) {
+      return h === u ? je : g(h) >= g(u) ? h < 0 ? Te : Ee : u < 0 ? Se : be;
     }
-    function Ke(l, u, f) {
+    function Ke(h, u, f) {
       f || (f = Ws);
-      var m = u[f[0]] - l[f[0]], x = u[f[1]] - l[f[1]];
+      var m = u[f[0]] - h[f[0]], x = u[f[1]] - h[f[1]];
       return Math.sqrt(m * m + x * x);
     }
-    function $i(l, u, f) {
+    function $i(h, u, f) {
       f || (f = Ws);
-      var m = u[f[0]] - l[f[0]], x = u[f[1]] - l[f[1]];
+      var m = u[f[0]] - h[f[0]], x = u[f[1]] - h[f[1]];
       return Math.atan2(x, m) * 180 / Math.PI;
     }
-    function Eo(l, u) {
-      return $i(u[1], u[0], Ze) + $i(l[1], l[0], Ze);
+    function Eo(h, u) {
+      return $i(u[1], u[0], Ze) + $i(h[1], h[0], Ze);
     }
-    function So(l, u) {
-      return Ke(u[0], u[1], Ze) / Ke(l[0], l[1], Ze);
+    function So(h, u) {
+      return Ke(u[0], u[1], Ze) / Ke(h[0], h[1], Ze);
     }
     var bo = {
       mousedown: Z,
       mousemove: jt,
-      mouseup: z
+      mouseup: U
     }, Co = "mousedown", Mo = "mousemove mouseup";
     function Qe() {
-      this.evEl = Co, this.evWin = Mo, this.pressed = !1, ht.apply(this, arguments);
+      this.evEl = Co, this.evWin = Mo, this.pressed = !1, lt.apply(this, arguments);
     }
-    R(Qe, ht, {
+    R(Qe, lt, {
       handler: function(u) {
         var f = bo[u.type];
-        f & Z && u.button === 0 && (this.pressed = !0), f & jt && u.which !== 1 && (f = z), this.pressed && (f & z && (this.pressed = !1), this.callback(this.manager, f, {
+        f & Z && u.button === 0 && (this.pressed = !0), f & jt && u.which !== 1 && (f = U), this.pressed && (f & U && (this.pressed = !1), this.callback(this.manager, f, {
           pointers: [u],
           changedPointers: [u],
           pointerType: Ni,
@@ -2065,7 +2065,7 @@ var Tr = { exports: {} };
     var Po = {
       pointerdown: Z,
       pointermove: jt,
-      pointerup: z,
+      pointerup: U,
       pointercancel: tt,
       pointerout: tt
     }, Lo = {
@@ -2076,12 +2076,12 @@ var Tr = { exports: {} };
     }, qs = "pointerdown", Xs = "pointermove pointerup pointercancel";
     e.MSPointerEvent && !e.PointerEvent && (qs = "MSPointerDown", Xs = "MSPointerMove MSPointerUp MSPointerCancel");
     function Hi() {
-      this.evEl = qs, this.evWin = Xs, ht.apply(this, arguments), this.store = this.manager.session.pointerEvents = [];
+      this.evEl = qs, this.evWin = Xs, lt.apply(this, arguments), this.store = this.manager.session.pointerEvents = [];
     }
-    R(Hi, ht, {
+    R(Hi, lt, {
       handler: function(u) {
         var f = this.store, m = !1, x = u.type.toLowerCase().replace("ms", ""), b = Po[x], A = Lo[u.pointerType] || u.pointerType, Y = A == xe, q = re(f, u.pointerId, "pointerId");
-        b & Z && (u.button === 0 || Y) ? q < 0 && (f.push(u), q = f.length - 1) : b & (z | tt) && (m = !0), !(q < 0) && (f[q] = u, this.callback(this.manager, b, {
+        b & Z && (u.button === 0 || Y) ? q < 0 && (f.push(u), q = f.length - 1) : b & (U | tt) && (m = !0), !(q < 0) && (f[q] = u, this.callback(this.manager, b, {
           pointers: f,
           changedPointers: [u],
           pointerType: A,
@@ -2092,18 +2092,18 @@ var Tr = { exports: {} };
     var Ao = {
       touchstart: Z,
       touchmove: jt,
-      touchend: z,
+      touchend: U,
       touchcancel: tt
     }, Oo = "touchstart", Io = "touchstart touchmove touchend touchcancel";
     function js() {
-      this.evTarget = Oo, this.evWin = Io, this.started = !1, ht.apply(this, arguments);
+      this.evTarget = Oo, this.evWin = Io, this.started = !1, lt.apply(this, arguments);
     }
-    R(js, ht, {
+    R(js, lt, {
       handler: function(u) {
         var f = Ao[u.type];
         if (f === Z && (this.started = !0), !!this.started) {
           var m = ko.call(this, u, f);
-          f & (z | tt) && m[0].length - m[1].length === 0 && (this.started = !1), this.callback(this.manager, f, {
+          f & (U | tt) && m[0].length - m[1].length === 0 && (this.started = !1), this.callback(this.manager, f, {
             pointers: m[0],
             changedPointers: m[1],
             pointerType: xe,
@@ -2112,20 +2112,20 @@ var Tr = { exports: {} };
         }
       }
     });
-    function ko(l, u) {
-      var f = qe(l.touches), m = qe(l.changedTouches);
-      return u & (z | tt) && (f = Hs(f.concat(m), "identifier", !0)), [f, m];
+    function ko(h, u) {
+      var f = qe(h.touches), m = qe(h.changedTouches);
+      return u & (U | tt) && (f = Hs(f.concat(m), "identifier", !0)), [f, m];
     }
     var Ro = {
       touchstart: Z,
       touchmove: jt,
-      touchend: z,
+      touchend: U,
       touchcancel: tt
     }, Do = "touchstart touchmove touchend touchcancel";
     function Je() {
-      this.evTarget = Do, this.targetIds = {}, ht.apply(this, arguments);
+      this.evTarget = Do, this.targetIds = {}, lt.apply(this, arguments);
     }
-    R(Je, ht, {
+    R(Je, lt, {
       handler: function(u) {
         var f = Ro[u.type], m = _o.call(this, u, f);
         m && this.callback(this.manager, f, {
@@ -2136,18 +2136,18 @@ var Tr = { exports: {} };
         });
       }
     });
-    function _o(l, u) {
-      var f = qe(l.touches), m = this.targetIds;
+    function _o(h, u) {
+      var f = qe(h.touches), m = this.targetIds;
       if (u & (Z | jt) && f.length === 1)
         return m[f[0].identifier] = !0, [f, f];
-      var x, b, A = qe(l.changedTouches), Y = [], q = this.target;
+      var x, b, A = qe(h.changedTouches), Y = [], q = this.target;
       if (b = f.filter(function(K) {
         return Xt(K.target, q);
       }), u === Z)
         for (x = 0; x < b.length; )
           m[b[x].identifier] = !0, x++;
       for (x = 0; x < A.length; )
-        m[A[x].identifier] && Y.push(A[x]), u & (z | tt) && delete m[A[x].identifier], x++;
+        m[A[x].identifier] && Y.push(A[x]), u & (U | tt) && delete m[A[x].identifier], x++;
       if (Y.length)
         return [
           Hs(b.concat(Y), "identifier", !0),
@@ -2156,11 +2156,11 @@ var Tr = { exports: {} };
     }
     var No = 2500, Zs = 25;
     function Bi() {
-      ht.apply(this, arguments);
-      var l = Ht(this.handler, this);
-      this.touch = new Je(this.manager, l), this.mouse = new Qe(this.manager, l), this.primaryTouch = null, this.lastTouches = [];
+      lt.apply(this, arguments);
+      var h = Ht(this.handler, this);
+      this.touch = new Je(this.manager, h), this.mouse = new Qe(this.manager, h), this.primaryTouch = null, this.lastTouches = [];
     }
-    R(Bi, ht, {
+    R(Bi, lt, {
       handler: function(u, f, m) {
         var x = m.pointerType == xe, b = m.pointerType == Ni;
         if (!(b && m.sourceCapabilities && m.sourceCapabilities.firesTouchEvents)) {
@@ -2175,11 +2175,11 @@ var Tr = { exports: {} };
         this.touch.destroy(), this.mouse.destroy();
       }
     });
-    function $o(l, u) {
-      l & Z ? (this.primaryTouch = u.changedPointers[0].identifier, Ks.call(this, u)) : l & (z | tt) && Ks.call(this, u);
+    function $o(h, u) {
+      h & Z ? (this.primaryTouch = u.changedPointers[0].identifier, Ks.call(this, u)) : h & (U | tt) && Ks.call(this, u);
     }
-    function Ks(l) {
-      var u = l.changedPointers[0];
+    function Ks(h) {
+      var u = h.changedPointers[0];
       if (u.identifier === this.primaryTouch) {
         var f = { x: u.clientX, y: u.clientY };
         this.lastTouches.push(f);
@@ -2190,145 +2190,145 @@ var Tr = { exports: {} };
         setTimeout(x, No);
       }
     }
-    function Ho(l) {
-      for (var u = l.srcEvent.clientX, f = l.srcEvent.clientY, m = 0; m < this.lastTouches.length; m++) {
+    function Ho(h) {
+      for (var u = h.srcEvent.clientX, f = h.srcEvent.clientY, m = 0; m < this.lastTouches.length; m++) {
         var x = this.lastTouches[m], b = Math.abs(u - x.x), A = Math.abs(f - x.y);
         if (b <= Zs && A <= Zs)
           return !0;
       }
       return !1;
     }
-    var Qs = Xe(a.style, "touchAction"), Js = Qs !== n, tn = "compute", en = "auto", Ui = "manipulation", Kt = "none", Ce = "pan-x", Me = "pan-y", ti = Uo();
-    function zi(l, u) {
-      this.manager = l, this.set(u);
+    var Qs = Xe(a.style, "touchAction"), Js = Qs !== n, tn = "compute", en = "auto", zi = "manipulation", Kt = "none", Ce = "pan-x", Me = "pan-y", ti = zo();
+    function Ui(h, u) {
+      this.manager = h, this.set(u);
     }
-    zi.prototype = {
-      set: function(l) {
-        l == tn && (l = this.compute()), Js && this.manager.element.style && ti[l] && (this.manager.element.style[Qs] = l), this.actions = l.toLowerCase().trim();
+    Ui.prototype = {
+      set: function(h) {
+        h == tn && (h = this.compute()), Js && this.manager.element.style && ti[h] && (this.manager.element.style[Qs] = h), this.actions = h.toLowerCase().trim();
       },
       update: function() {
         this.set(this.manager.options.touchAction);
       },
       compute: function() {
-        var l = [];
+        var h = [];
         return L(this.manager.recognizers, function(u) {
-          St(u.options.enable, [u]) && (l = l.concat(u.getTouchAction()));
-        }), Bo(l.join(" "));
+          St(u.options.enable, [u]) && (h = h.concat(u.getTouchAction()));
+        }), Bo(h.join(" "));
       },
-      preventDefaults: function(l) {
-        var u = l.srcEvent, f = l.offsetDirection;
+      preventDefaults: function(h) {
+        var u = h.srcEvent, f = h.offsetDirection;
         if (this.manager.session.prevented) {
           u.preventDefault();
           return;
         }
         var m = this.actions, x = kt(m, Kt) && !ti[Kt], b = kt(m, Me) && !ti[Me], A = kt(m, Ce) && !ti[Ce];
         if (x) {
-          var Y = l.pointers.length === 1, q = l.distance < 2, K = l.deltaTime < 250;
+          var Y = h.pointers.length === 1, q = h.distance < 2, K = h.deltaTime < 250;
           if (Y && q && K)
             return;
         }
         if (!(A && b) && (x || b && f & bt || A && f & Zt))
           return this.preventSrc(u);
       },
-      preventSrc: function(l) {
-        this.manager.session.prevented = !0, l.preventDefault();
+      preventSrc: function(h) {
+        this.manager.session.prevented = !0, h.preventDefault();
       }
     };
-    function Bo(l) {
-      if (kt(l, Kt))
+    function Bo(h) {
+      if (kt(h, Kt))
         return Kt;
-      var u = kt(l, Ce), f = kt(l, Me);
-      return u && f ? Kt : u || f ? u ? Ce : Me : kt(l, Ui) ? Ui : en;
+      var u = kt(h, Ce), f = kt(h, Me);
+      return u && f ? Kt : u || f ? u ? Ce : Me : kt(h, zi) ? zi : en;
     }
-    function Uo() {
+    function zo() {
       if (!Js)
         return !1;
-      var l = {}, u = e.CSS && e.CSS.supports;
+      var h = {}, u = e.CSS && e.CSS.supports;
       return ["auto", "manipulation", "pan-y", "pan-x", "pan-x pan-y", "none"].forEach(function(f) {
-        l[f] = u ? e.CSS.supports("touch-action", f) : !0;
-      }), l;
+        h[f] = u ? e.CSS.supports("touch-action", f) : !0;
+      }), h;
     }
-    var ei = 1, lt = 2, oe = 4, zt = 8, Rt = zt, Pe = 16, Ct = 32;
-    function Dt(l) {
-      this.options = N({}, this.defaults, l || {}), this.id = lo(), this.manager = null, this.options.enable = Bt(this.options.enable, !0), this.state = ei, this.simultaneous = {}, this.requireFail = [];
+    var ei = 1, ht = 2, oe = 4, Ut = 8, Rt = Ut, Pe = 16, Ct = 32;
+    function Dt(h) {
+      this.options = N({}, this.defaults, h || {}), this.id = ho(), this.manager = null, this.options.enable = Bt(this.options.enable, !0), this.state = ei, this.simultaneous = {}, this.requireFail = [];
     }
     Dt.prototype = {
       defaults: {},
-      set: function(l) {
-        return N(this.options, l), this.manager && this.manager.touchAction.update(), this;
+      set: function(h) {
+        return N(this.options, h), this.manager && this.manager.touchAction.update(), this;
       },
-      recognizeWith: function(l) {
-        if (M(l, "recognizeWith", this))
+      recognizeWith: function(h) {
+        if (M(h, "recognizeWith", this))
           return this;
         var u = this.simultaneous;
-        return l = ii(l, this), u[l.id] || (u[l.id] = l, l.recognizeWith(this)), this;
+        return h = ii(h, this), u[h.id] || (u[h.id] = h, h.recognizeWith(this)), this;
       },
-      dropRecognizeWith: function(l) {
-        return M(l, "dropRecognizeWith", this) ? this : (l = ii(l, this), delete this.simultaneous[l.id], this);
+      dropRecognizeWith: function(h) {
+        return M(h, "dropRecognizeWith", this) ? this : (h = ii(h, this), delete this.simultaneous[h.id], this);
       },
-      requireFailure: function(l) {
-        if (M(l, "requireFailure", this))
+      requireFailure: function(h) {
+        if (M(h, "requireFailure", this))
           return this;
         var u = this.requireFail;
-        return l = ii(l, this), re(u, l) === -1 && (u.push(l), l.requireFailure(this)), this;
+        return h = ii(h, this), re(u, h) === -1 && (u.push(h), h.requireFailure(this)), this;
       },
-      dropRequireFailure: function(l) {
-        if (M(l, "dropRequireFailure", this))
+      dropRequireFailure: function(h) {
+        if (M(h, "dropRequireFailure", this))
           return this;
-        l = ii(l, this);
-        var u = re(this.requireFail, l);
+        h = ii(h, this);
+        var u = re(this.requireFail, h);
         return u > -1 && this.requireFail.splice(u, 1), this;
       },
       hasRequireFailures: function() {
         return this.requireFail.length > 0;
       },
-      canRecognizeWith: function(l) {
-        return !!this.simultaneous[l.id];
+      canRecognizeWith: function(h) {
+        return !!this.simultaneous[h.id];
       },
-      emit: function(l) {
+      emit: function(h) {
         var u = this, f = this.state;
         function m(x) {
-          u.manager.emit(x, l);
+          u.manager.emit(x, h);
         }
-        f < zt && m(u.options.event + sn(f)), m(u.options.event), l.additionalEvent && m(l.additionalEvent), f >= zt && m(u.options.event + sn(f));
+        f < Ut && m(u.options.event + sn(f)), m(u.options.event), h.additionalEvent && m(h.additionalEvent), f >= Ut && m(u.options.event + sn(f));
       },
-      tryEmit: function(l) {
+      tryEmit: function(h) {
         if (this.canEmit())
-          return this.emit(l);
+          return this.emit(h);
         this.state = Ct;
       },
       canEmit: function() {
-        for (var l = 0; l < this.requireFail.length; ) {
-          if (!(this.requireFail[l].state & (Ct | ei)))
+        for (var h = 0; h < this.requireFail.length; ) {
+          if (!(this.requireFail[h].state & (Ct | ei)))
             return !1;
-          l++;
+          h++;
         }
         return !0;
       },
-      recognize: function(l) {
-        var u = N({}, l);
+      recognize: function(h) {
+        var u = N({}, h);
         if (!St(this.options.enable, [this, u])) {
           this.reset(), this.state = Ct;
           return;
         }
-        this.state & (Rt | Pe | Ct) && (this.state = ei), this.state = this.process(u), this.state & (lt | oe | zt | Pe) && this.tryEmit(u);
+        this.state & (Rt | Pe | Ct) && (this.state = ei), this.state = this.process(u), this.state & (ht | oe | Ut | Pe) && this.tryEmit(u);
       },
-      process: function(l) {
+      process: function(h) {
       },
       getTouchAction: function() {
       },
       reset: function() {
       }
     };
-    function sn(l) {
-      return l & Pe ? "cancel" : l & zt ? "end" : l & oe ? "move" : l & lt ? "start" : "";
+    function sn(h) {
+      return h & Pe ? "cancel" : h & Ut ? "end" : h & oe ? "move" : h & ht ? "start" : "";
     }
-    function nn(l) {
-      return l == be ? "down" : l == Se ? "up" : l == Te ? "left" : l == Ee ? "right" : "";
+    function nn(h) {
+      return h == be ? "down" : h == Se ? "up" : h == Te ? "left" : h == Ee ? "right" : "";
     }
-    function ii(l, u) {
+    function ii(h, u) {
       var f = u.manager;
-      return f ? f.get(l) : l;
+      return f ? f.get(h) : h;
     }
     function pt() {
       Dt.apply(this, arguments);
@@ -2337,13 +2337,13 @@ var Tr = { exports: {} };
       defaults: {
         pointers: 1
       },
-      attrTest: function(l) {
+      attrTest: function(h) {
         var u = this.options.pointers;
-        return u === 0 || l.pointers.length === u;
+        return u === 0 || h.pointers.length === u;
       },
-      process: function(l) {
-        var u = this.state, f = l.eventType, m = u & (lt | oe), x = this.attrTest(l);
-        return m && (f & tt || !x) ? u | Pe : m || x ? f & z ? u | zt : u & lt ? u | oe : lt : Ct;
+      process: function(h) {
+        var u = this.state, f = h.eventType, m = u & (ht | oe), x = this.attrTest(h);
+        return m && (f & tt || !x) ? u | Pe : m || x ? f & U ? u | Ut : u & ht ? u | oe : ht : Ct;
       }
     });
     function si() {
@@ -2354,23 +2354,23 @@ var Tr = { exports: {} };
         event: "pan",
         threshold: 10,
         pointers: 1,
-        direction: zs
+        direction: Us
       },
       getTouchAction: function() {
-        var l = this.options.direction, u = [];
-        return l & bt && u.push(Me), l & Zt && u.push(Ce), u;
+        var h = this.options.direction, u = [];
+        return h & bt && u.push(Me), h & Zt && u.push(Ce), u;
       },
-      directionTest: function(l) {
-        var u = this.options, f = !0, m = l.distance, x = l.direction, b = l.deltaX, A = l.deltaY;
-        return x & u.direction || (u.direction & bt ? (x = b === 0 ? je : b < 0 ? Te : Ee, f = b != this.pX, m = Math.abs(l.deltaX)) : (x = A === 0 ? je : A < 0 ? Se : be, f = A != this.pY, m = Math.abs(l.deltaY))), l.direction = x, f && m > u.threshold && x & u.direction;
+      directionTest: function(h) {
+        var u = this.options, f = !0, m = h.distance, x = h.direction, b = h.deltaX, A = h.deltaY;
+        return x & u.direction || (u.direction & bt ? (x = b === 0 ? je : b < 0 ? Te : Ee, f = b != this.pX, m = Math.abs(h.deltaX)) : (x = A === 0 ? je : A < 0 ? Se : be, f = A != this.pY, m = Math.abs(h.deltaY))), h.direction = x, f && m > u.threshold && x & u.direction;
       },
-      attrTest: function(l) {
-        return pt.prototype.attrTest.call(this, l) && (this.state & lt || !(this.state & lt) && this.directionTest(l));
+      attrTest: function(h) {
+        return pt.prototype.attrTest.call(this, h) && (this.state & ht || !(this.state & ht) && this.directionTest(h));
       },
-      emit: function(l) {
-        this.pX = l.deltaX, this.pY = l.deltaY;
-        var u = nn(l.direction);
-        u && (l.additionalEvent = this.options.event + u), this._super.emit.call(this, l);
+      emit: function(h) {
+        this.pX = h.deltaX, this.pY = h.deltaY;
+        var u = nn(h.direction);
+        u && (h.additionalEvent = this.options.event + u), this._super.emit.call(this, h);
       }
     });
     function Wi() {
@@ -2385,15 +2385,15 @@ var Tr = { exports: {} };
       getTouchAction: function() {
         return [Kt];
       },
-      attrTest: function(l) {
-        return this._super.attrTest.call(this, l) && (Math.abs(l.scale - 1) > this.options.threshold || this.state & lt);
+      attrTest: function(h) {
+        return this._super.attrTest.call(this, h) && (Math.abs(h.scale - 1) > this.options.threshold || this.state & ht);
       },
-      emit: function(l) {
-        if (l.scale !== 1) {
-          var u = l.scale < 1 ? "in" : "out";
-          l.additionalEvent = this.options.event + u;
+      emit: function(h) {
+        if (h.scale !== 1) {
+          var u = h.scale < 1 ? "in" : "out";
+          h.additionalEvent = this.options.event + u;
         }
-        this._super.emit.call(this, l);
+        this._super.emit.call(this, h);
       }
     });
     function Fi() {
@@ -2409,23 +2409,23 @@ var Tr = { exports: {} };
       getTouchAction: function() {
         return [en];
       },
-      process: function(l) {
-        var u = this.options, f = l.pointers.length === u.pointers, m = l.distance < u.threshold, x = l.deltaTime > u.time;
-        if (this._input = l, !m || !f || l.eventType & (z | tt) && !x)
+      process: function(h) {
+        var u = this.options, f = h.pointers.length === u.pointers, m = h.distance < u.threshold, x = h.deltaTime > u.time;
+        if (this._input = h, !m || !f || h.eventType & (U | tt) && !x)
           this.reset();
-        else if (l.eventType & Z)
+        else if (h.eventType & Z)
           this.reset(), this._timer = v(function() {
             this.state = Rt, this.tryEmit();
           }, u.time, this);
-        else if (l.eventType & z)
+        else if (h.eventType & U)
           return Rt;
         return Ct;
       },
       reset: function() {
         clearTimeout(this._timer);
       },
-      emit: function(l) {
-        this.state === Rt && (l && l.eventType & z ? this.manager.emit(this.options.event + "up", l) : (this._input.timeStamp = p(), this.manager.emit(this.options.event, this._input)));
+      emit: function(h) {
+        this.state === Rt && (h && h.eventType & U ? this.manager.emit(this.options.event + "up", h) : (this._input.timeStamp = p(), this.manager.emit(this.options.event, this._input)));
       }
     });
     function Vi() {
@@ -2440,8 +2440,8 @@ var Tr = { exports: {} };
       getTouchAction: function() {
         return [Kt];
       },
-      attrTest: function(l) {
-        return this._super.attrTest.call(this, l) && (Math.abs(l.rotation) > this.options.threshold || this.state & lt);
+      attrTest: function(h) {
+        return this._super.attrTest.call(this, h) && (Math.abs(h.rotation) > this.options.threshold || this.state & ht);
       }
     });
     function Gi() {
@@ -2458,13 +2458,13 @@ var Tr = { exports: {} };
       getTouchAction: function() {
         return si.prototype.getTouchAction.call(this);
       },
-      attrTest: function(l) {
+      attrTest: function(h) {
         var u = this.options.direction, f;
-        return u & (bt | Zt) ? f = l.overallVelocity : u & bt ? f = l.overallVelocityX : u & Zt && (f = l.overallVelocityY), this._super.attrTest.call(this, l) && u & l.offsetDirection && l.distance > this.options.threshold && l.maxPointers == this.options.pointers && g(f) > this.options.velocity && l.eventType & z;
+        return u & (bt | Zt) ? f = h.overallVelocity : u & bt ? f = h.overallVelocityX : u & Zt && (f = h.overallVelocityY), this._super.attrTest.call(this, h) && u & h.offsetDirection && h.distance > this.options.threshold && h.maxPointers == this.options.pointers && g(f) > this.options.velocity && h.eventType & U;
       },
-      emit: function(l) {
-        var u = nn(l.offsetDirection);
-        u && this.manager.emit(this.options.event + u, l), this.manager.emit(this.options.event, l);
+      emit: function(h) {
+        var u = nn(h.offsetDirection);
+        u && this.manager.emit(this.options.event + u, h), this.manager.emit(this.options.event, h);
       }
     });
     function ni() {
@@ -2481,22 +2481,22 @@ var Tr = { exports: {} };
         posThreshold: 10
       },
       getTouchAction: function() {
-        return [Ui];
+        return [zi];
       },
-      process: function(l) {
-        var u = this.options, f = l.pointers.length === u.pointers, m = l.distance < u.threshold, x = l.deltaTime < u.time;
-        if (this.reset(), l.eventType & Z && this.count === 0)
+      process: function(h) {
+        var u = this.options, f = h.pointers.length === u.pointers, m = h.distance < u.threshold, x = h.deltaTime < u.time;
+        if (this.reset(), h.eventType & Z && this.count === 0)
           return this.failTimeout();
         if (m && x && f) {
-          if (l.eventType != z)
+          if (h.eventType != U)
             return this.failTimeout();
-          var b = this.pTime ? l.timeStamp - this.pTime < u.interval : !0, A = !this.pCenter || Ke(this.pCenter, l.center) < u.posThreshold;
-          this.pTime = l.timeStamp, this.pCenter = l.center, !A || !b ? this.count = 1 : this.count += 1, this._input = l;
+          var b = this.pTime ? h.timeStamp - this.pTime < u.interval : !0, A = !this.pCenter || Ke(this.pCenter, h.center) < u.posThreshold;
+          this.pTime = h.timeStamp, this.pCenter = h.center, !A || !b ? this.count = 1 : this.count += 1, this._input = h;
           var Y = this.count % u.taps;
           if (Y === 0)
             return this.hasRequireFailures() ? (this._timer = v(function() {
               this.state = Rt, this.tryEmit();
-            }, u.interval, this), lt) : Rt;
+            }, u.interval, this), ht) : Rt;
         }
         return Ct;
       },
@@ -2512,8 +2512,8 @@ var Tr = { exports: {} };
         this.state == Rt && (this._input.tapCount = this.count, this.manager.emit(this.options.event, this._input));
       }
     });
-    function _t(l, u) {
-      return u = u || {}, u.recognizers = Bt(u.recognizers, _t.defaults.preset), new Yi(l, u);
+    function _t(h, u) {
+      return u = u || {}, u.recognizers = Bt(u.recognizers, _t.defaults.preset), new Yi(h, u);
     }
     _t.VERSION = "2.0.7", _t.defaults = {
       domEvents: !1,
@@ -2539,74 +2539,74 @@ var Tr = { exports: {} };
         tapHighlightColor: "rgba(0,0,0,0)"
       }
     };
-    var zo = 1, rn = 2;
-    function Yi(l, u) {
-      this.options = N({}, _t.defaults, u || {}), this.options.inputTarget = this.options.inputTarget || l, this.handlers = {}, this.session = {}, this.recognizers = [], this.oldCssProps = {}, this.element = l, this.input = yo(this), this.touchAction = new zi(this, this.options.touchAction), on(this, !0), L(this.options.recognizers, function(f) {
+    var Uo = 1, rn = 2;
+    function Yi(h, u) {
+      this.options = N({}, _t.defaults, u || {}), this.options.inputTarget = this.options.inputTarget || h, this.handlers = {}, this.session = {}, this.recognizers = [], this.oldCssProps = {}, this.element = h, this.input = vo(this), this.touchAction = new Ui(this, this.options.touchAction), on(this, !0), L(this.options.recognizers, function(f) {
         var m = this.add(new f[0](f[1]));
         f[2] && m.recognizeWith(f[2]), f[3] && m.requireFailure(f[3]);
       }, this);
     }
     Yi.prototype = {
-      set: function(l) {
-        return N(this.options, l), l.touchAction && this.touchAction.update(), l.inputTarget && (this.input.destroy(), this.input.target = l.inputTarget, this.input.init()), this;
+      set: function(h) {
+        return N(this.options, h), h.touchAction && this.touchAction.update(), h.inputTarget && (this.input.destroy(), this.input.target = h.inputTarget, this.input.init()), this;
       },
-      stop: function(l) {
-        this.session.stopped = l ? rn : zo;
+      stop: function(h) {
+        this.session.stopped = h ? rn : Uo;
       },
-      recognize: function(l) {
+      recognize: function(h) {
         var u = this.session;
         if (!u.stopped) {
-          this.touchAction.preventDefaults(l);
+          this.touchAction.preventDefaults(h);
           var f, m = this.recognizers, x = u.curRecognizer;
           (!x || x && x.state & Rt) && (x = u.curRecognizer = null);
           for (var b = 0; b < m.length; )
-            f = m[b], u.stopped !== rn && (!x || f == x || f.canRecognizeWith(x)) ? f.recognize(l) : f.reset(), !x && f.state & (lt | oe | zt) && (x = u.curRecognizer = f), b++;
+            f = m[b], u.stopped !== rn && (!x || f == x || f.canRecognizeWith(x)) ? f.recognize(h) : f.reset(), !x && f.state & (ht | oe | Ut) && (x = u.curRecognizer = f), b++;
         }
       },
-      get: function(l) {
-        if (l instanceof Dt)
-          return l;
+      get: function(h) {
+        if (h instanceof Dt)
+          return h;
         for (var u = this.recognizers, f = 0; f < u.length; f++)
-          if (u[f].options.event == l)
+          if (u[f].options.event == h)
             return u[f];
         return null;
       },
-      add: function(l) {
-        if (M(l, "add", this))
+      add: function(h) {
+        if (M(h, "add", this))
           return this;
-        var u = this.get(l.options.event);
-        return u && this.remove(u), this.recognizers.push(l), l.manager = this, this.touchAction.update(), l;
+        var u = this.get(h.options.event);
+        return u && this.remove(u), this.recognizers.push(h), h.manager = this, this.touchAction.update(), h;
       },
-      remove: function(l) {
-        if (M(l, "remove", this))
+      remove: function(h) {
+        if (M(h, "remove", this))
           return this;
-        if (l = this.get(l), l) {
-          var u = this.recognizers, f = re(u, l);
+        if (h = this.get(h), h) {
+          var u = this.recognizers, f = re(u, h);
           f !== -1 && (u.splice(f, 1), this.touchAction.update());
         }
         return this;
       },
-      on: function(l, u) {
-        if (l !== n && u !== n) {
+      on: function(h, u) {
+        if (h !== n && u !== n) {
           var f = this.handlers;
-          return L(ne(l), function(m) {
+          return L(ne(h), function(m) {
             f[m] = f[m] || [], f[m].push(u);
           }), this;
         }
       },
-      off: function(l, u) {
-        if (l !== n) {
+      off: function(h, u) {
+        if (h !== n) {
           var f = this.handlers;
-          return L(ne(l), function(m) {
+          return L(ne(h), function(m) {
             u ? f[m] && f[m].splice(re(f[m], u), 1) : delete f[m];
           }), this;
         }
       },
-      emit: function(l, u) {
-        this.options.domEvents && Wo(l, u);
-        var f = this.handlers[l] && this.handlers[l].slice();
+      emit: function(h, u) {
+        this.options.domEvents && Wo(h, u);
+        var f = this.handlers[h] && this.handlers[h].slice();
         if (!(!f || !f.length)) {
-          u.type = l, u.preventDefault = function() {
+          u.type = h, u.preventDefault = function() {
             u.srcEvent.preventDefault();
           };
           for (var m = 0; m < f.length; )
@@ -2617,28 +2617,28 @@ var Tr = { exports: {} };
         this.element && on(this, !1), this.handlers = {}, this.session = {}, this.input.destroy(), this.element = null;
       }
     };
-    function on(l, u) {
-      var f = l.element;
+    function on(h, u) {
+      var f = h.element;
       if (f.style) {
         var m;
-        L(l.options.cssProps, function(x, b) {
-          m = Xe(f.style, b), u ? (l.oldCssProps[m] = f.style[m], f.style[m] = x) : f.style[m] = l.oldCssProps[m] || "";
-        }), u || (l.oldCssProps = {});
+        L(h.options.cssProps, function(x, b) {
+          m = Xe(f.style, b), u ? (h.oldCssProps[m] = f.style[m], f.style[m] = x) : f.style[m] = h.oldCssProps[m] || "";
+        }), u || (h.oldCssProps = {});
       }
     }
-    function Wo(l, u) {
+    function Wo(h, u) {
       var f = i.createEvent("Event");
-      f.initEvent(l, !0, !0), f.gesture = u, u.target.dispatchEvent(f);
+      f.initEvent(h, !0, !0), f.gesture = u, u.target.dispatchEvent(f);
     }
     N(_t, {
       INPUT_START: Z,
       INPUT_MOVE: jt,
-      INPUT_END: z,
+      INPUT_END: U,
       INPUT_CANCEL: tt,
       STATE_POSSIBLE: ei,
-      STATE_BEGAN: lt,
+      STATE_BEGAN: ht,
       STATE_CHANGED: oe,
-      STATE_ENDED: zt,
+      STATE_ENDED: Ut,
       STATE_RECOGNIZED: Rt,
       STATE_CANCELLED: Pe,
       STATE_FAILED: Ct,
@@ -2649,10 +2649,10 @@ var Tr = { exports: {} };
       DIRECTION_DOWN: be,
       DIRECTION_HORIZONTAL: bt,
       DIRECTION_VERTICAL: Zt,
-      DIRECTION_ALL: zs,
+      DIRECTION_ALL: Us,
       Manager: Yi,
-      Input: ht,
-      TouchAction: zi,
+      Input: lt,
+      TouchAction: Ui,
       TouchInput: Je,
       MouseInput: Qe,
       PointerEventInput: Hi,
@@ -2666,7 +2666,7 @@ var Tr = { exports: {} };
       Pinch: Wi,
       Rotate: Vi,
       Press: Fi,
-      on: Ut,
+      on: zt,
       off: It,
       each: L,
       merge: B,
@@ -2683,30 +2683,30 @@ var Tr = { exports: {} };
   })(window, document, "Hammer");
 })(Tr);
 var Ge = Tr.exports;
-const ah = oh(Ge), Pt = /* @__PURE__ */ Vo({
+const al = ol(Ge), Pt = /* @__PURE__ */ Vo({
   __proto__: null,
-  default: ah
-}, [Ge]), Er = 1, Sr = 2, ds = 4, hh = {
+  default: al
+}, [Ge]), Er = 1, Sr = 2, ds = 4, ll = {
   mousedown: Er,
   mousemove: Sr,
   mouseup: ds
 };
-function lh(r, e) {
+function hl(r, e) {
   for (let i = 0; i < r.length; i++)
     if (e(r[i]))
       return !0;
   return !1;
 }
-function ch(r) {
+function cl(r) {
   const e = r.prototype.handler;
   r.prototype.handler = function(s) {
     const n = this.store;
-    s.button > 0 && s.type === "pointerdown" && (lh(n, (o) => o.pointerId === s.pointerId) || n.push(s)), e.call(this, s);
+    s.button > 0 && s.type === "pointerdown" && (hl(n, (o) => o.pointerId === s.pointerId) || n.push(s)), e.call(this, s);
   };
 }
-function dh(r) {
+function dl(r) {
   r.prototype.handler = function(i) {
-    let s = hh[i.type];
+    let s = ll[i.type];
     s & Er && i.button >= 0 && (this.pressed = !0), s & Sr && i.which === 0 && (s = ds), this.pressed && (s & ds && (this.pressed = !1), this.callback(this.manager, s, {
       pointers: [i],
       changedPointers: [i],
@@ -2715,15 +2715,15 @@ function dh(r) {
     }));
   };
 }
-ch(Ge.PointerEventInput);
-dh(Ge.MouseInput);
-const uh = Ge.Manager;
+cl(Ge.PointerEventInput);
+dl(Ge.MouseInput);
+const ul = Ge.Manager;
 let Ri = class {
   constructor(e, i, s) {
     this.element = e, this.callback = i, this.options = { enable: !0, ...s };
   }
 };
-const fh = Pt ? [
+const fl = Pt ? [
   [Pt.Pan, { event: "tripan", pointers: 3, threshold: 0, enable: !1 }],
   [Pt.Rotate, { enable: !1 }],
   [Pt.Pinch, { enable: !1 }],
@@ -2740,9 +2740,9 @@ const fh = Pt ? [
   pan: ["press", "doubletap", "anytap", "tap"],
   doubletap: ["anytap"],
   anytap: ["tap"]
-}, gh = {
+}, gl = {
   doubletap: ["tap"]
-}, mh = {
+}, ml = {
   pointerdown: "pointerdown",
   pointermove: "pointermove",
   pointerup: "pointerup",
@@ -2759,7 +2759,7 @@ const fh = Pt ? [
     "wheel",
     "mousewheel"
   ]
-}, ph = {
+}, pl = {
   tap: "tap",
   anytap: "anytap",
   doubletap: "doubletap",
@@ -2809,7 +2809,7 @@ const fh = Pt ? [
   mouseover: "pointerover",
   mouseout: "pointerout",
   mouseleave: "pointerleave"
-}, yh = typeof navigator < "u" && navigator.userAgent ? navigator.userAgent.toLowerCase() : "", ae = typeof window < "u" ? window : global;
+}, vl = typeof navigator < "u" && navigator.userAgent ? navigator.userAgent.toLowerCase() : "", ae = typeof window < "u" ? window : global;
 let us = !1;
 try {
   const r = {
@@ -2821,14 +2821,14 @@ try {
 } catch {
   us = !1;
 }
-const vh = yh.indexOf("firefox") !== -1, { WHEEL_EVENTS: wh } = Ls, Pn = "wheel", Ln = 4.000244140625, xh = 40, Th = 0.25;
-class Eh extends Ri {
+const yl = vl.indexOf("firefox") !== -1, { WHEEL_EVENTS: wl } = Ls, Pn = "wheel", Ln = 4.000244140625, xl = 40, Tl = 0.25;
+class El extends Ri {
   constructor(e, i, s) {
     super(e, i, s), this.handleEvent = (n) => {
       if (!this.options.enable)
         return;
       let o = n.deltaY;
-      ae.WheelEvent && (vh && n.deltaMode === ae.WheelEvent.DOM_DELTA_PIXEL && (o /= ae.devicePixelRatio), n.deltaMode === ae.WheelEvent.DOM_DELTA_LINE && (o *= xh)), o !== 0 && o % Ln === 0 && (o = Math.floor(o / Ln)), n.shiftKey && o && (o = o * Th), this.callback({
+      ae.WheelEvent && (yl && n.deltaMode === ae.WheelEvent.DOM_DELTA_PIXEL && (o /= ae.devicePixelRatio), n.deltaMode === ae.WheelEvent.DOM_DELTA_LINE && (o *= xl)), o !== 0 && o % Ln === 0 && (o = Math.floor(o / Ln)), n.shiftKey && o && (o = o * Tl), this.callback({
         type: Pn,
         center: {
           x: n.clientX,
@@ -2839,7 +2839,7 @@ class Eh extends Ri {
         pointerType: "mouse",
         target: n.target
       });
-    }, this.events = (this.options.events || []).concat(wh), this.events.forEach((n) => e.addEventListener(n, this.handleEvent, us ? { passive: !1 } : !1));
+    }, this.events = (this.options.events || []).concat(wl), this.events.forEach((n) => e.addEventListener(n, this.handleEvent, us ? { passive: !1 } : !1));
   }
   destroy() {
     this.events.forEach((e) => this.element.removeEventListener(e, this.handleEvent));
@@ -2848,14 +2848,14 @@ class Eh extends Ri {
     e === Pn && (this.options.enable = i);
   }
 }
-const { MOUSE_EVENTS: Sh } = Ls, An = "pointermove", On = "pointerover", In = "pointerout", kn = "pointerenter", Rn = "pointerleave";
-class bh extends Ri {
+const { MOUSE_EVENTS: Sl } = Ls, An = "pointermove", On = "pointerover", In = "pointerout", kn = "pointerenter", Rn = "pointerleave";
+class bl extends Ri {
   constructor(e, i, s) {
     super(e, i, s), this.handleEvent = (o) => {
       this.handleOverEvent(o), this.handleOutEvent(o), this.handleEnterEvent(o), this.handleLeaveEvent(o), this.handleMoveEvent(o);
     }, this.pressed = !1;
     const { enable: n } = this.options;
-    this.enableMoveEvent = n, this.enableLeaveEvent = n, this.enableEnterEvent = n, this.enableOutEvent = n, this.enableOverEvent = n, this.events = (this.options.events || []).concat(Sh), this.events.forEach((o) => e.addEventListener(o, this.handleEvent));
+    this.enableMoveEvent = n, this.enableLeaveEvent = n, this.enableEnterEvent = n, this.enableOutEvent = n, this.enableOverEvent = n, this.events = (this.options.events || []).concat(Sl), this.events.forEach((o) => e.addEventListener(o, this.handleEvent));
   }
   destroy() {
     this.events.forEach((e) => this.element.removeEventListener(e, this.handleEvent));
@@ -2902,8 +2902,8 @@ class bh extends Ri {
     });
   }
 }
-const { KEY_EVENTS: Ch } = Ls, Dn = "keydown", _n = "keyup";
-class Mh extends Ri {
+const { KEY_EVENTS: Cl } = Ls, Dn = "keydown", _n = "keyup";
+class Ml extends Ri {
   constructor(e, i, s) {
     super(e, i, s), this.handleEvent = (n) => {
       const o = n.target || n.srcElement;
@@ -2918,7 +2918,7 @@ class Mh extends Ri {
         key: n.key,
         target: n.target
       }));
-    }, this.enableDownEvent = this.options.enable, this.enableUpEvent = this.options.enable, this.events = (this.options.events || []).concat(Ch), e.tabIndex = this.options.tabIndex || 0, e.style.outline = "none", this.events.forEach((n) => e.addEventListener(n, this.handleEvent));
+    }, this.enableDownEvent = this.options.enable, this.enableUpEvent = this.options.enable, this.events = (this.options.events || []).concat(Cl), e.tabIndex = this.options.tabIndex || 0, e.style.outline = "none", this.events.forEach((n) => e.addEventListener(n, this.handleEvent));
   }
   destroy() {
     this.events.forEach((e) => this.element.removeEventListener(e, this.handleEvent));
@@ -2928,7 +2928,7 @@ class Mh extends Ri {
   }
 }
 const Nn = "contextmenu";
-class Ph extends Ri {
+class Pl extends Ri {
   constructor(e, i, s) {
     super(e, i, s), this.handleEvent = (n) => {
       this.options.enable && this.callback({
@@ -2950,23 +2950,23 @@ class Ph extends Ri {
     e === Nn && (this.options.enable = i);
   }
 }
-const fs = 1, Ei = 2, gs = 4, Lh = {
+const fs = 1, Ei = 2, gs = 4, Ll = {
   pointerdown: fs,
   pointermove: Ei,
   pointerup: gs,
   mousedown: fs,
   mousemove: Ei,
   mouseup: gs
-}, Ah = 1, Oh = 2, Ih = 3, kh = 0, Rh = 1, Dh = 2, _h = 1, Nh = 2, $h = 4;
-function Hh(r) {
-  const e = Lh[r.srcEvent.type];
+}, Al = 1, Ol = 2, Il = 3, kl = 0, Rl = 1, Dl = 2, _l = 1, Nl = 2, $l = 4;
+function Hl(r) {
+  const e = Ll[r.srcEvent.type];
   if (!e)
     return null;
   const { buttons: i, button: s, which: n } = r.srcEvent;
   let o = !1, a = !1, c = !1;
-  return e === gs || e === Ei && !Number.isFinite(i) ? (o = n === Ah, a = n === Oh, c = n === Ih) : e === Ei ? (o = !!(i & _h), a = !!(i & $h), c = !!(i & Nh)) : e === fs && (o = s === kh, a = s === Rh, c = s === Dh), { leftButton: o, middleButton: a, rightButton: c };
+  return e === gs || e === Ei && !Number.isFinite(i) ? (o = n === Al, a = n === Ol, c = n === Il) : e === Ei ? (o = !!(i & _l), a = !!(i & $l), c = !!(i & Nl)) : e === fs && (o = s === kl, a = s === Rl, c = s === Dl), { leftButton: o, middleButton: a, rightButton: c };
 }
-function Bh(r, e) {
+function Bl(r, e) {
   const i = r.center;
   if (!i)
     return null;
@@ -2980,7 +2980,7 @@ const Xi = {
   srcElement: "root",
   priority: 0
 };
-class Uh {
+class zl {
   constructor(e) {
     this.handleEvent = (i) => {
       if (this.isEmpty())
@@ -3000,15 +3000,15 @@ class Uh {
   }
   add(e, i, s, n = !1, o = !1) {
     const { handlers: a, handlersByElement: c } = this;
-    let h = Xi;
-    typeof s == "string" || s && s.addEventListener ? h = { ...Xi, srcElement: s } : s && (h = { ...Xi, ...s });
-    let g = c.get(h.srcElement);
-    g || (g = [], c.set(h.srcElement, g));
+    let l = Xi;
+    typeof s == "string" || s && s.addEventListener ? l = { ...Xi, srcElement: s } : s && (l = { ...Xi, ...s });
+    let g = c.get(l.srcElement);
+    g || (g = [], c.set(l.srcElement, g));
     const p = {
       type: e,
       handler: i,
-      srcElement: h.srcElement,
-      priority: h.priority
+      srcElement: l.srcElement,
+      priority: l.priority
     };
     n && (p.once = !0), o && (p.passive = !0), a.push(p), this._active = this._active || !p.passive;
     let v = g.length - 1;
@@ -3037,18 +3037,18 @@ class Uh {
       }, a = () => {
         e.handled = !0, n = !0;
       }, c = [];
-      for (let h = 0; h < s.length; h++) {
-        const { type: g, handler: p, once: v } = s[h];
+      for (let l = 0; l < s.length; l++) {
+        const { type: g, handler: p, once: v } = s[l];
         if (p({
           ...e,
           type: g,
           stopPropagation: o,
           stopImmediatePropagation: a
-        }), v && c.push(s[h]), n)
+        }), v && c.push(s[l]), n)
           break;
       }
-      for (let h = 0; h < c.length; h++) {
-        const { type: g, handler: p } = c[h];
+      for (let l = 0; l < c.length; l++) {
+        const { type: g, handler: p } = c[l];
         this.remove(g, p);
       }
     }
@@ -3057,8 +3057,8 @@ class Uh {
     const i = this.eventManager.getElement();
     return {
       ...e,
-      ...Hh(e),
-      ...Bh(e, i),
+      ...Hl(e),
+      ...Bl(e, i),
       preventDefault: () => {
         e.srcEvent.preventDefault();
       },
@@ -3069,22 +3069,22 @@ class Uh {
     };
   }
 }
-const zh = {
+const Ul = {
   events: null,
   recognizers: null,
   recognizerOptions: {},
-  Manager: uh,
+  Manager: ul,
   touchAction: "none",
   tabIndex: 0
 };
-class Wh {
+class Wl {
   constructor(e = null, i) {
     this._onBasicInput = (n) => {
-      const { srcEvent: o } = n, a = mh[o.type];
+      const { srcEvent: o } = n, a = ml[o.type];
       a && this.manager.emit(a, n);
     }, this._onOtherEvent = (n) => {
       this.manager.emit(n.type, n);
-    }, this.options = { ...zh, ...i }, this.events = /* @__PURE__ */ new Map(), this.setElement(e);
+    }, this.options = { ...Ul, ...i }, this.events = /* @__PURE__ */ new Map(), this.setElement(e);
     const { events: s } = this.options;
     s && this.on(s);
   }
@@ -3097,7 +3097,7 @@ class Wh {
     const { options: i } = this, s = i.Manager;
     this.manager = new s(e, {
       touchAction: i.touchAction,
-      recognizers: i.recognizers || fh
+      recognizers: i.recognizers || fl
     }).on("hammer.input", this._onBasicInput), i.recognizers || Object.keys(Cn).forEach((n) => {
       const o = this.manager.get(n);
       o && Cn[n].forEach((a) => {
@@ -3111,14 +3111,14 @@ class Wh {
         delete a.enable, o.set(a);
       }
     }
-    this.wheelInput = new Eh(e, this._onOtherEvent, {
+    this.wheelInput = new El(e, this._onOtherEvent, {
       enable: !1
-    }), this.moveInput = new bh(e, this._onOtherEvent, {
+    }), this.moveInput = new bl(e, this._onOtherEvent, {
       enable: !1
-    }), this.keyInput = new Mh(e, this._onOtherEvent, {
+    }), this.keyInput = new Ml(e, this._onOtherEvent, {
       enable: !1,
       tabIndex: i.tabIndex
-    }), this.contextmenuInput = new Ph(e, this._onOtherEvent, {
+    }), this.contextmenuInput = new Pl(e, this._onOtherEvent, {
       enable: !1
     });
     for (const [n, o] of this.events)
@@ -3146,7 +3146,7 @@ class Wh {
     const n = s.get(e);
     if (n && n.options.enable !== i) {
       n.set({ enable: i });
-      const o = gh[e];
+      const o = gl[e];
       o && !this.options.recognizers && o.forEach((a) => {
         const c = s.get(a);
         i ? (c.requireFailure(e), n.dropRequireFailure(a)) : c.dropRequireFailure(e);
@@ -3161,9 +3161,9 @@ class Wh {
         this._addEventHandler(p, e[p], s, n, o);
       return;
     }
-    const { manager: a, events: c } = this, h = Mn[e] || e;
-    let g = c.get(h);
-    g || (g = new Uh(this), c.set(h, g), g.recognizerName = ph[h] || h, a && a.on(h, g.handleEvent)), g.add(e, i, s, n, o), g.isEmpty() || this._toggleRecognizer(g.recognizerName, !0);
+    const { manager: a, events: c } = this, l = Mn[e] || e;
+    let g = c.get(l);
+    g || (g = new zl(this), c.set(l, g), g.recognizerName = pl[l] || l, a && a.on(l, g.handleEvent)), g.add(e, i, s, n, o), g.isEmpty() || this._toggleRecognizer(g.recognizerName, !0);
   }
   _removeEventHandler(e, i) {
     if (typeof e != "string") {
@@ -3175,8 +3175,8 @@ class Wh {
     if (o && (o.remove(e, i), o.isEmpty())) {
       const { recognizerName: a } = o;
       let c = !1;
-      for (const h of s.values())
-        if (h.recognizerName === a && !h.isEmpty()) {
+      for (const l of s.values())
+        if (l.recognizerName === a && !l.isEmpty()) {
           c = !0;
           break;
         }
@@ -3347,7 +3347,7 @@ class Bn {
     this.#e.agent.off(e, i, s);
   }
 }
-const Fh = {
+const Fl = {
   element: void 0,
   contextMenu: !0,
   panX: !0,
@@ -3361,14 +3361,14 @@ class At {
   #i = null;
   #s = null;
   #o;
-  #h;
-  #l = !1;
+  #l;
+  #h = !1;
   #a;
   #c;
   #u;
   pad = { left: !1 };
   constructor(e, i) {
-    if (this.#t = { ...Fh, ...i }, this.#h = rh.idle, this.#o = nh, this.#e = e, !this.#e && this.#t.elementId && (this.#e = document.getElementById(this.#t.elementId)), !I.isElement(this.#e))
+    if (this.#t = { ...Fl, ...i }, this.#l = rl.idle, this.#o = nl, this.#e = e, !this.#e && this.#t.elementId && (this.#e = document.getElementById(this.#t.elementId)), !I.isElement(this.#e))
       throw "Must specify an element to receive user input.";
     this.#t.contextMenu || (window.oncontextmenu = (o) => (o.preventDefault(), !1));
     const n = {
@@ -3377,7 +3377,7 @@ class At {
         pinch: { threshold: 0 }
       }
     };
-    this.#r = new Wh(this.#e, n), this.pointerInit();
+    this.#r = new Wl(this.#e, n), this.pointerInit();
   }
   get agent() {
     return this.#r;
@@ -3392,7 +3392,7 @@ class At {
     return this.#i instanceof Bn ? this.#i : (this.#i = new Bn(this), this.#i);
   }
   get status() {
-    return this.#h;
+    return this.#l;
   }
   get element() {
     return this.#e;
@@ -3401,7 +3401,7 @@ class At {
     return this.#o;
   }
   get isPan() {
-    return this.#l;
+    return this.#h;
   }
   set panX(e) {
     Q(e) && (this.#a = e);
@@ -3419,7 +3419,7 @@ class At {
     this.#r.destroy(), this.#n = void 0, this.#i = void 0, this.#s = void 0;
   }
   isValid(e, i) {
-    return !!(S(e) || U(i));
+    return !!(S(e) || z(i));
   }
   validOptions(e) {
     return E(e) && Q(e) ? e : void 0;
@@ -3479,13 +3479,13 @@ class At {
     this.location(e), this.pointerButtons[e.srcEvent.button] = !1;
   }
   startPointerDrag(e) {
-    this.#l = !0, this.onPointerDown(e);
+    this.#h = !0, this.onPointerDown(e);
   }
   endPointerDrag(e) {
-    this.#l = !1;
+    this.#h = !1;
   }
 }
-class vt {
+class yt {
   #t;
   #e;
   #r;
@@ -3493,8 +3493,8 @@ class vt {
   #i;
   #s;
   #o;
-  #h;
   #l;
+  #h;
   #a;
   static dividerList = {};
   static divideCnt = 0;
@@ -3502,13 +3502,13 @@ class vt {
   static name = "Dividers";
   static type = "Divider";
   static create(e, i) {
-    const s = `${i.core.id}_divider_${++vt.divideCnt}`;
-    return i.id = s, vt.dividerList[s] = new vt(e, i), vt.dividerList[s];
+    const s = `${i.core.id}_divider_${++yt.divideCnt}`;
+    return i.id = s, yt.dividerList[s] = new yt(e, i), yt.dividerList[s];
   }
   static destroy() {
-    for (let e in vt.dividerList)
-      vt.dividerList[e].destroy();
-    delete vt.dividerList[id];
+    for (let e in yt.dividerList)
+      yt.dividerList[e].destroy();
+    delete yt.dividerList[id];
   }
   static defaultNode() {
     return `
@@ -3520,7 +3520,7 @@ class vt {
     this.#i = e, this.#e = s.core, this.#r = s, this.#n = s.core.theme, this.#t = s.id, this.#s = s.chartPane, this.#o = e.elements.elDividers, this.init();
   }
   get el() {
-    return this.#h;
+    return this.#l;
   }
   get id() {
     return this.#t;
@@ -3535,19 +3535,19 @@ class vt {
     return this.dimensions;
   }
   get dimensions() {
-    return I.elementDimPos(this.#h);
+    return I.elementDimPos(this.#l);
   }
   get height() {
-    return this.#h.getBoundingClientRect().height;
+    return this.#l.getBoundingClientRect().height;
   }
   set cursor(e) {
-    this.#h.style.cursor = e;
+    this.#l.style.cursor = e;
   }
   get cursor() {
-    return this.#h.style.cursor;
+    return this.#l.style.cursor;
   }
   get type() {
-    return vt.type;
+    return yt.type;
   }
   init() {
     this.mount();
@@ -3556,10 +3556,10 @@ class vt {
     this.cursor = "row-resize", this.eventsListen();
   }
   destroy() {
-    this.#a.destroy(), this.el.remove(), delete vt.dividerList[this.id];
+    this.#a.destroy(), this.el.remove(), delete yt.dividerList[this.id];
   }
   eventsListen() {
-    this.#a = new At(this.#h, { disableContextMenu: !1 }), this.#a.on("pointerover", this.onMouseEnter.bind(this)), this.#a.on("pointerout", this.onMouseOut.bind(this)), this.#a.on("pointerdrag", this.onPointerDrag.bind(this)), this.#a.on("pointerdragend", this.onPointerDragEnd.bind(this));
+    this.#a = new At(this.#l, { disableContextMenu: !1 }), this.#a.on("pointerover", this.onMouseEnter.bind(this)), this.#a.on("pointerout", this.onMouseOut.bind(this)), this.#a.on("pointerdrag", this.onPointerDrag.bind(this)), this.#a.on("pointerdragend", this.onPointerDragEnd.bind(this));
   }
   on(e, i, s) {
     this.#e.on(e, i, s);
@@ -3571,29 +3571,29 @@ class vt {
     this.#e.emit(e, i);
   }
   onMouseEnter() {
-    this.#h.style.background = this.#n.divider.active, this.#e.MainPane.onMouseEnter();
+    this.#l.style.background = this.#n.divider.active, this.#e.MainPane.onMouseEnter();
   }
   onMouseOut() {
-    this.#h.style.background = this.#n.divider.idle, this.#e.MainPane.onMouseEnter();
+    this.#l.style.background = this.#n.divider.idle, this.#e.MainPane.onMouseEnter();
   }
   onPointerDrag(e) {
-    this.#l = this.#e.MainPane.cursorPos, this.#h.style.background = this.#n.divider.active, this.emit(`${this.id}_pointerdrag`, this.#l), this.emit("divider_pointerdrag", {
+    this.#h = this.#e.MainPane.cursorPos, this.#l.style.background = this.#n.divider.active, this.emit(`${this.id}_pointerdrag`, this.#h), this.emit("divider_pointerdrag", {
       id: this.id,
       e,
-      pos: this.#l,
+      pos: this.#h,
       chartPane: this.chartPane
     }), this.chartPane.resize();
   }
   onPointerDragEnd(e) {
-    "position" in e && (this.#h.style.background = this.#n.divider.idle), this.#l = this.#e.MainPane.cursorPos, this.emit(`${this.id}_pointerdragend`, this.#l), this.emit("divider_pointerdragend", {
+    "position" in e && (this.#l.style.background = this.#n.divider.idle), this.#h = this.#e.MainPane.cursorPos, this.emit(`${this.id}_pointerdragend`, this.#h), this.emit("divider_pointerdragend", {
       id: this.id,
       e,
-      pos: this.#l,
+      pos: this.#h,
       chartPane: this.chartPane
     }), this.chartPane.resize();
   }
   mount() {
-    this.#o.lastElementChild == null ? this.#o.innerHTML = this.dividerNode() : this.#o.lastElementChild.insertAdjacentHTML("afterend", this.dividerNode()), this.#h = I.findBySelector(`#${this.#t}`, this.#o);
+    this.#o.lastElementChild == null ? this.#o.innerHTML = this.dividerNode() : this.#o.lastElementChild.insertAdjacentHTML("afterend", this.dividerNode()), this.#l = I.findBySelector(`#${this.#t}`, this.#o);
   }
   dividerNode() {
     let e = this.#s.pos.top - I.elementDimPos(this.#o).top, i = this.#e.MainPane.rowsW + this.#e.scaleW, s = T(this.config.dividerHeight) ? this.config.dividerHeight : _a, n = this.#e.theme.tools.width;
@@ -3613,31 +3613,31 @@ class vt {
   }
   setPos() {
     let e = this.#s.pos.top - I.elementDimPos(this.#o).top;
-    e = e - this.height / 2, this.#h.style.top = `${e}px`;
+    e = e - this.height / 2, this.#l.style.top = `${e}px`;
   }
   hide() {
-    this.#h.style.display = "none";
+    this.#l.style.display = "none";
   }
   show() {
-    this.#h.style.display = "block";
+    this.#l.style.display = "block";
   }
 }
-const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" ><path d="M471.993 112h-89.2l-16.242-46.75a32.023 32.023 0 00-30.229-21.5H175.241a31.991 31.991 0 00-30.294 21.691L129.1 112H40a24.027 24.027 0 00-24 24v312a24.027 24.027 0 0024 24h431.993a24.027 24.027 0 0024-24V136a24.027 24.027 0 00-24-24zm-8 328H48.007V144h104.01l23.224-68.25h161.081l23.71 68.25h103.961z" class="ci-primary"></path><path d="M256 168a114 114 0 10114 114 114.13 114.13 0 00-114-114zm0 196a82 82 0 1182-82 82.093 82.093 0 01-82 82z"></path></svg>', Gh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M376 160v32h65.372L252 381.373l-72-72L76.686 412.686l22.628 22.628L180 354.627l72 72 212-211.999V280h32V160H376z"></path><path d="M48 104H16v392h480v-32H48V104z"></path></svg>', Yh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M271.514 95.5h-32v178.111l115.613 54.948 13.737-28.902-97.35-46.268V95.5z"></path><path d="M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208z"></path></svg>', br = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M245.151 168a88 88 0 1088 88 88.1 88.1 0 00-88-88zm0 144a56 56 0 1156-56 56.063 56.063 0 01-56 56z"></path><path d="M464.7 322.319l-31.77-26.153a193.081 193.081 0 000-80.332l31.77-26.153a19.941 19.941 0 004.606-25.439l-32.612-56.483a19.936 19.936 0 00-24.337-8.73l-38.561 14.447a192.038 192.038 0 00-69.54-40.192l-6.766-40.571A19.936 19.936 0 00277.762 16H212.54a19.937 19.937 0 00-19.728 16.712l-6.762 40.572a192.03 192.03 0 00-69.54 40.192L77.945 99.027a19.937 19.937 0 00-24.334 8.731L21 164.245a19.94 19.94 0 004.61 25.438l31.767 26.151a193.081 193.081 0 000 80.332l-31.77 26.153A19.942 19.942 0 0021 347.758l32.612 56.483a19.937 19.937 0 0024.337 8.73l38.562-14.447a192.03 192.03 0 0069.54 40.192l6.762 40.571A19.937 19.937 0 00212.54 496h65.222a19.936 19.936 0 0019.728-16.712l6.763-40.572a192.038 192.038 0 0069.54-40.192l38.564 14.449a19.938 19.938 0 0024.334-8.731l32.609-56.487a19.939 19.939 0 00-4.6-25.436zm-50.636 57.12l-48.109-18.024-7.285 7.334a159.955 159.955 0 01-72.625 41.973l-10 2.636L267.6 464h-44.89l-8.442-50.642-10-2.636a159.955 159.955 0 01-72.625-41.973l-7.285-7.334-48.117 18.024L53.8 340.562l39.629-32.624-2.7-9.973a160.9 160.9 0 010-83.93l2.7-9.972L53.8 171.439l22.446-38.878 48.109 18.024 7.285-7.334a159.955 159.955 0 0172.625-41.973l10-2.636L222.706 48H267.6l8.442 50.642 10 2.636a159.955 159.955 0 0172.625 41.973l7.285 7.334 48.109-18.024 22.447 38.877-39.629 32.625 2.7 9.972a160.9 160.9 0 010 83.93l-2.7 9.973 39.629 32.623z"></path></svg>', qh = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><rect x="16" y="240.18" width="188.84" height="31.635"/><g transform="translate(-3.3234e-7 -112.18)"><rect x="307.16" y="352.37" width="188.84" height="31.635"/></g><rect transform="rotate(-90)" x="-496" y="240.18" width="188.84" height="31.635"/><rect transform="rotate(-90)" x="-204.84" y="240.18" width="188.84" height="31.635"/></svg>', Xh = '<svg width="46.08" height="46.08" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"></path><path d="M6.535 3H21a1 1 0 011 1v16a1 1 0 01-1 1H6.535a1 1 0 01-.832-.445l-5.333-8a1 1 0 010-1.11l5.333-8A1 1 0 016.535 3zm.535 2l-4.666 7 4.666 7H20V5H7.07zM13 10.586l2.828-2.829 1.415 1.415L14.414 12l2.829 2.828-1.415 1.415L13 13.414l-2.828 2.829-1.415-1.415L11.586 12 8.757 9.172l1.415-1.415L13 10.586z"></path></svg>', jh = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g stroke-width="30.155"><rect x="14.757" y="240.92" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="147" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="334.84" width="482.49" height="30.155" rx="15.078"/></g ><g transform="translate(5.937 -288.34)"><path d="m23.904 712.34c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h173.93c-0.65295-3.3651-2.0312-6.4697-2.0312-10.026 0-7.1393 1.5573-13.888 4.0625-20.13zm276.35 0c2.5051 6.2423 4.0365 12.991 4.0365 20.13 0 3.5554-1.3526 6.6618-2.0052 10.026h173.93c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078z"/><path d="m250.06 759.97c17.965 0 32.545-14.58 32.545-32.545 0-17.965-14.58-32.545-32.545-32.545-17.965 0-32.545 14.58-32.545 32.545 0 17.965 14.58 32.545 32.545 32.545zm0 21.697c-29.964 0-54.242-24.279-54.242-54.242 0-29.964 24.279-54.242 54.242-54.242 29.964 0 54.242 24.279 54.242 54.242 0 29.964-24.279 54.242-54.242 54.242z" stroke-width="21.697"/></g ><path d="m144.05 18.672c-24.694 0-45.285 16.595-51.849 39.167h-62.37c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h62.37c6.5639 22.572 27.155 39.167 51.849 39.167s45.285-16.595 51.849-39.167h120.03c6.5639 22.572 27.155 39.167 51.849 39.167 24.694 0 45.285-16.595 51.849-39.167h62.552c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078h-62.552c-6.5639-22.572-27.155-39.167-51.849-39.167-24.694 0-45.285 16.595-51.849 39.167h-120.03c-6.5639-22.572-27.155-39.167-51.849-39.167zm0 21.693c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 1e-5 -32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552zm223.72 0c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 0-32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552z" stroke-width="30.155"/></svg>', Qt = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g transform="matrix(21.697 0 0 21.697 -47.758 -47.758)"><path d="m7.354 21.354 14-14-0.707-0.707-14 14z"/><path d="m22.5 7c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5zm-17 16c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z"/></g></svg>', Zh = '<svg width="46.08" height="46.08" viewBox="0 0 32 32"><path d="M 3.2758709,20.241377 11.758622,28.72413 28.72413,11.758622 20.241377,3.2758709 Z m 2.1206881,0 1.5905161,-1.590515 3.7112049,3.711203 1.060342,-1.060345 -3.7112027,-3.711204 1.0603441,-1.060344 2.1206876,2.12069 1.060346,-1.060346 -2.120689,-2.120688 1.060343,-1.060344 3.711203,3.711203 L 16,17.060346 l -3.711203,-3.711208 1.060341,-1.060341 2.12069,2.120687 1.060344,-1.060346 -2.120688,-2.120687 1.060344,-1.060343 3.711204,3.711205 1.060345,-1.060345 -3.711205,-3.7112046 1.060344,-1.0603441 2.120687,2.1206887 1.060346,-1.0603446 -2.120687,-2.1206883 1.590515,-1.5905161 6.362065,6.362063 -14.84482,14.84482 z" style="stroke-width:0.749776" /></svg>', Kh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><g id="g930" transform="matrix(21.128963,0,0,21.128963,-29.235597,-50.369964)"><path clip-rule="evenodd" d="m 4.5,5 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,6.5 A 2.5,2.5 0 0 1 6.95,6 H 24 V 7 H 6.95 A 2.5,2.5 0 0 1 2,6.5 Z M 4.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,16.5 A 2.5,2.5 0 0 1 6.95,16 h 13.1 a 2.5,2.5 0 1 1 0,1 H 6.95 A 2.5,2.5 0 0 1 2,16.5 Z M 22.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z m -18,6 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,22.5 A 2.5,2.5 0 0 1 6.95,22 H 24 v 1 H 6.95 A 2.5,2.5 0 0 1 2,22.5 Z" id="path908" /><path clip-rule="evenodd" d="M 22.4,8.94 21.01,9.57 20.6,8.66 21.99,8.03 Z m -4,1.8 -1.39,0.63 -0.41,-0.91 1.39,-0.63 z m -4,1.8 -1.4,0.63 -0.4,-0.91 1.39,-0.63 z m -4,1.8 L 9,14.97 8.6,14.06 9.99,13.43 Z" id="path910" /></g></svg>', Qh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M231.359 147l-80.921 205h45.155l15.593-39.5h89.628l15.593 39.5h45.155l-80.921-205zm-3.594 123.5L256 198.967l28.235 71.533z"></path><path d="M384 56H128V16H16v112h40v256H16v112h112v-40h256v40h112V384h-40V128h40V16H384zM48 96V48h48v48zm48 368H48v-48h48zm288-40H128v-40H88V128h40V88h256v40h40v256h-40zm80-8v48h-48v-48zM416 48h48v48h-48z"></path></svg>', Jh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g718" transform="translate(0,1.2499996)"><path d="M 7.5010125,7.9560661 5.355012,10.103066 c -0.472,0.472 -1.18,-0.2360003 -0.708,-0.7080003 L 7.6470125,6.3950659 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999998 c 0.472,0.472 -0.236,1.1800003 -0.708,0.7080003 L 8.5010125,7.9560661 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m 7.4989873,5.5439348 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>', tl = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,7.7026182 -2.1460003,2.147 c -0.472,0.4719998 -1.18,-0.236 -0.708,-0.708 l 3.0000003,-3 c 0.1953639,-0.1958581 0.5126361,-0.1958581 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.1799998 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6-3" /></svg>', el = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,8.2973819 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.1958581 0.5126361,0.1958581 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></svg>', il = '<svg width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="m1 14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-12a1 1 0 0 0-1-1h-12a1 1 0 0 0-1 1zm15 0a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2zm-8.5-2.5a0.5 0.5 0 0 0 1 0v-5.793l2.146 2.147a0.50063 0.50063 0 1 0 0.708-0.708l-3-3a0.5 0.5 0 0 0-0.708 0l-3 3a0.50063 0.50063 0 0 0 0.708 0.708l2.146-2.147z" fill-rule="evenodd"/></svg>', sl = '<svg width="46.08" height="46.08" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M 15,2 A 1,-1 0 0 0 14,1 H 2 A 1,-1 0 0 0 1,2 v 12 a 1,-1 0 0 0 1,1 h 12 a 1,-1 0 0 0 1,-1 z M 0,2 A 2,-2 0 0 1 2,0 h 12 a 2,-2 0 0 1 2,2 v 12 a 2,-2 0 0 1 -2,2 H 2 A 2,-2 0 0 1 0,14 Z m 8.5,2.5 a 0.5,-0.5 0 0 0 -1,0 v 5.793 L 5.354,8.146 A 0.5006316,-0.5006316 0 1 0 4.646,8.854 l 3,3 a 0.5,-0.5 0 0 0 0.708,0 l 3,-3 A 0.5006316,-0.5006316 0 0 0 10.646,8.146 L 8.5,10.293 Z" id="path2" /></svg>', nl = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g687" transform="translate(15.647255,-0.0288128)"><path d="m -8.1462425,10.484879 -2.1460005,2.146999 c -0.472,0.472 -1.18,-0.236 -0.708,-0.708 l 3.0000005,-2.9999994 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999994 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1460005,-2.146999 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m -8.1482677,5.5727476 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>', rl = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g611" transform="translate(0.2050748,-0.8829888)"><path d="m 7.2959375,11.933818 -2.146,-2.1469999 c -0.472,-0.4719998 -1.18,0.2359999 -0.708,0.7079999 l 3,3 c 0.195364,0.195858 0.512636,0.195858 0.708,0 l 3.0000005,-3 c 0.472,-0.472 -0.236,-1.1799997 -0.708,-0.7079999 L 8.2959375,11.933818 c -0.431103,0.417289 -0.523896,0.423024 -1,0 z" style="" id="path566" /><path d="m 7.2939123,5.8321596 -2.146,2.147 c -0.4719998,0.472 -1.1799998,-0.236 -0.708,-0.708 l 3,-3 c 0.1953639,-0.195858 0.5126361,-0.195858 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6" /></g></svg>', ol = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 11.500447,8.5 c 0.666666,0 0.666666,-1 0,-1 H 4.444275 c -0.1571231,0 -0.224029,0.07336 -0.2978281,0.1459999 -0.1958579,0.195364 -0.1958579,0.5126361 0,0.7080001 0,0 0.113806,0.146 0.320186,0.146 z" style="" id="path887" /></svg>', al = '<svg class="ov-icon" width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m14 15c0.55228 0 1-0.44772 1-1v-12c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1zm0-15c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2v-12c0-1.1046 0.89543-2 2-2z" fill-rule="evenodd"/><g transform="translate(-1.1585)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>', hl = '<svg class="ov-icon" width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m2 15c-0.55228 0-1-0.44772-1-1v-12c0-0.55228 0.44772-1 1-1h12c0.55228 0 1 0.44772 1 1v12c0 0.55228-0.44772 1-1 1zm0-15c-1.1046 0-2 0.89543-2 2v12c0 1.1046 0.89543 2 2 2h12c1.1046 0 2-0.89543 2-2v-12c0-1.1046-0.89543-2-2-2z" fill-rule="evenodd"/><g transform="matrix(-1 0 0 1 17.159 0)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>', ll = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 336.96 336.36" xmlns="http://www.w3.org/2000/svg"><path d="m0 0 168.48 336.36 168.48-336.36z"/></svg>', cl = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 336.96 336.36" xmlns="http://www.w3.org/2000/svg"><path d="m0 336.36 168.48-336.36 168.48 336.36z"/></svg>', dl = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0 70.67-28.66 134.68-74.99 181.01s-110.34 74.99-181.01 74.99c-70.68 0-134.69-28.66-181.01-74.99-46.33-46.33-74.99-110.34-74.99-181.01 0-70.68 28.66-134.69 74.99-181.01 46.32-46.33 110.33-74.99 181.01-74.99 70.67 0 134.68 28.66 181.01 74.99 46.33 46.32 74.99 110.33 74.99 181.01zm-204.29-21.97v-67.04c0-7.53-6.19-13.72-13.73-13.72h-75.96c-7.53 0-13.72 6.17-13.72 13.72v67.03h-42.84c-16.5 0-24.78 19.64-13.86 31.54l94.74 110.57c7.44 9 21.03 9.01 28.66 0.37l93.71-111.31c10.69-12.27 1.64-31.14-14.19-31.16h-42.81zm105.52 179.2c40.22-40.24 65.11-95.84 65.11-157.23 0-61.4-24.89-117-65.11-157.23-40.24-40.23-95.84-65.11-157.23-65.11-61.4 0-117 24.88-157.23 65.11s-65.11 95.83-65.11 157.23c0 61.39 24.88 116.99 65.11 157.23 40.23 40.22 95.83 65.11 157.23 65.11 61.39 0 116.99-24.89 157.23-65.11z" fill-rule="nonzero"/></svg>', ul = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0-70.67-28.66-134.68-74.99-181.01s-110.34-74.99-181.01-74.99c-70.68 0-134.69 28.66-181.01 74.99-46.33 46.33-74.99 110.34-74.99 181.01 0 70.68 28.66 134.69 74.99 181.01 46.32 46.33 110.33 74.99 181.01 74.99 70.67 0 134.68-28.66 181.01-74.99 46.33-46.32 74.99-110.33 74.99-181.01zm-204.29 21.97v67.04c0 7.53-6.19 13.72-13.73 13.72h-75.96c-7.53 0-13.72-6.17-13.72-13.72v-67.03h-42.84c-16.5 0-24.78-19.64-13.86-31.54l94.74-110.57c7.44-9 21.03-9.01 28.66-0.37l93.71 111.31c10.69 12.27 1.64 31.14-14.19 31.16zm105.52-179.2c40.22 40.24 65.11 95.84 65.11 157.23 0 61.4-24.89 117-65.11 157.23-40.24 40.23-95.84 65.11-157.23 65.11-61.4 0-117-24.88-157.23-65.11s-65.11-95.83-65.11-157.23c0-61.39 24.88-116.99 65.11-157.23 40.23-40.22 95.83-65.11 157.23-65.11 61.39 0 116.99 24.89 157.23 65.11z" fill-rule="nonzero"/></svg>', fl = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M512 256c0-70.67-28.66-134.68-74.98-181.02C390.69 28.66 326.68 0 256 0S121.31 28.66 74.98 74.98C28.66 121.32 0 185.33 0 256c0 70.68 28.66 134.69 74.98 181.02C121.31 483.34 185.32 512 256 512c70.67 0 134.69-28.66 181.02-74.98C483.34 390.69 512 326.68 512 256zm-160.23-21.5h-43.38v-67.93c0-7.63-6.27-13.9-13.91-13.9H217.5c-7.62 0-13.9 6.25-13.9 13.9v67.92h-43.41c-16.71 0-25.11 19.9-14.05 31.96l96.01 112.05c7.54 9.12 21.31 9.12 29.04.37l94.96-112.8c10.83-12.43 1.66-31.55-14.38-31.57z"/></svg>', gl = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0 70.67-28.66 134.68-74.98 181.02-46.33 46.32-110.34 74.98-181.02 74.98s-134.69-28.66-181.02-74.98c-46.32-46.34-74.98-110.35-74.98-181.02 0-70.68 28.66-134.69 74.98-181.02 46.33-46.32 110.34-74.98 181.02-74.98 70.67 0 134.69 28.66 181.02 74.98 46.32 46.33 74.98 110.34 74.98 181.02zm-160.23 21.5h-43.38v67.93c0 7.63-6.27 13.9-13.91 13.9h-76.98c-7.62 0-13.9-6.25-13.9-13.9v-67.92h-43.41c-16.71 0-25.11-19.9-14.05-31.96l96.01-112.05c7.54-9.12 21.31-9.12 29.04-0.37l94.96 112.8c10.83 12.43 1.66 31.55-14.38 31.57z"/></svg>', ml = '<svg width="800px" height="800px" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">  <defs>   <clipPath id="clipPath1">    <path d="m6.1885 15.281v-9.0209h3.1721q1.0764 0 1.6765 0.65299 0.63822 0.71345 0.63822 1.7171 0 0.58043-0.22862 1.0158-0.21909 0.42323-0.743 0.84646 1.1812 0.87065 1.1812 2.1887 0 0.53206-0.19051 1.0762-0.19051 0.53206-0.51439 0.87065-0.60964 0.65299-1.7908 0.65299zm1.467-7.4731v2.0315h1.5813q1.0383 0 1.0383-1.0158 0-1.0158-1.0383-1.0158zm0 3.5793v2.3459h1.7432q1.0859 0 1.0859-1.1609 0-1.185-1.0859-1.185zm9.6876-5.1271h1.467v6.1066q0 1.4874-0.69538 2.2854-0.80016 0.91902-2.1242 0.91902t-2.1242-0.91902q-0.69538-0.79809-0.69538-2.2854v-6.1066h1.4574v6.1066q0 1.6083 1.3622 1.6083 1.3526 0 1.3526-1.6083zm6.2108 5.6834v3.3375h-1.467v-3.3375l-2.3528-5.6834h1.6289l1.4479 3.9784 1.3622-3.9784h1.6384z" display="none" stroke-width=".041213" style="white-space:pre" aria-label="BUY"/>    <path class="powerclip" d="m-5-5h42v42.001h-42zm11.189 20.281h3.2006q1.1812 0 1.7908-0.65299 0.32387-0.33859 0.51439-0.87065 0.19051-0.54416 0.19051-1.0762 0-1.3181-1.1812-2.1887 0.52391-0.42323 0.743-0.84646 0.22862-0.43532 0.22862-1.0158 0-1.0037-0.63822-1.7171-0.60012-0.65299-1.6765-0.65299h-3.1721zm1.467-7.4731v2.0315h1.5813q1.0383 0 1.0383-1.0158 0-1.0158-1.0383-1.0158zm0 3.5793v2.3459h1.7432q1.0859 0 1.0859-1.1609 0-1.185-1.0859-1.185zm9.6876-5.1271v6.1066q0 1.6083-1.3526 1.6083-1.3622 0-1.3622-1.6083v-6.1066h-1.4574v6.1066q0 1.4874 0.69538 2.2854 0.80016 0.91902 2.1242 0.91902t2.1242-0.91902q0.69538-0.79809 0.69538-2.2854v-6.1066zm6.2108 5.6834 2.2576-5.6834h-1.6384l-1.3622 3.9784-1.4479-3.9784h-1.6289l2.3528 5.6834v3.3375h1.467z" stroke-width=".041213" style="white-space:pre"/>   </clipPath>  </defs>  <g clip-path="url(#clipPath1)" fill="none" fill-rule="evenodd">   <g id="Icon-Set" transform="translate(-360 -255)" fill="#000">    <path d="m386.67 255h-21.334c-2.945 0-5.333 2.371-5.333 5.297v12.33c0 2.924 2.055 4.813 5 4.813h6.639l4.361 9.561 4.361-9.561h6.639c2.945 0 5-1.889 5-4.813v-12.33c0-2.926-2.388-5.297-5.333-5.297z"/>   </g>  </g> </svg>', pl = '<svg width="800px" height="800px" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">  <defs>   <clipPath id="clipPath4">    <path d="m10.026 8.6238h-1.2531q-0.06962-1.4148-1.3576-1.4148-0.51344 0-0.81803 0.30231-0.30458 0.30231-0.30458 0.81019 0 0.49579 0.25237 0.74972 0.26107 0.24185 0.97467 0.43532l1.0182 0.26603q0.90505 0.24185 1.3054 0.83437 0.40901 0.59252 0.40901 1.6566 0 1.3785-0.7049 2.1524-0.69619 0.77391-1.958 0.77391-1.2444 0-1.9406-0.76182-0.68749-0.77391-0.74841-2.225h1.2967q0.03481 0.72554 0.40901 1.1125t1.053 0.38696q0.60917 0 0.95727-0.32649 0.3568-0.32649 0.3568-0.89483 0-0.54416-0.27848-0.83437-0.27848-0.30231-0.94856-0.4716l-0.90505-0.25394q-0.99208-0.26603-1.4098-0.81019-0.41772-0.55625-0.41772-1.6083 0-1.3181 0.64398-2.0436 0.65268-0.73763 1.8188-0.73763 1.4185 0 2.0886 1.0278 0.46123 0.71345 0.46123 1.8743zm2.5672 2.3822v2.3459h3.5245v1.5478h-4.8559v-9.0209h4.6993v1.5478h-3.3678v2.0315h3.1155v1.5478zm5.9612-5.1271v7.4731h3.1068v1.5478h-4.4469v-9.0209zm5.439 0v7.4731h3.1068v1.5478h-4.4469v-9.0209z" display="none" stroke-width=".039392" style="white-space:pre" aria-label="SELL"/>    <path class="powerclip" d="m-5-5h42v42.001h-42zm15.026 13.624q0-1.1609-0.46123-1.8743-0.67009-1.0278-2.0886-1.0278-1.1661 0-1.8188 0.73763-0.64398 0.72554-0.64398 2.0436 0 1.052 0.41772 1.6083 0.41772 0.54416 1.4098 0.81019l0.90505 0.25394q0.67009 0.16929 0.94856 0.4716 0.27848 0.29022 0.27848 0.83437 0 0.56834-0.3568 0.89483-0.3481 0.32649-0.95727 0.32649-0.67879 0-1.053-0.38696-0.3742-0.38695-0.40901-1.1125h-1.2967q0.060917 1.4511 0.74841 2.225 0.69619 0.76182 1.9406 0.76182 1.2619 0 1.958-0.77391 0.7049-0.77391 0.7049-2.1524 0-1.0641-0.40901-1.6566-0.40031-0.59252-1.3054-0.83437l-1.0182-0.26603q-0.7136-0.19348-0.97467-0.43532-0.25237-0.25394-0.25237-0.74972 0-0.50788 0.30458-0.81019t0.81803-0.30231q1.288 0 1.3576 1.4148zm2.5672 2.3822h3.1155v-1.5478h-3.1155v-2.0315h3.3678v-1.5478h-4.6993v9.0209h4.8559v-1.5478h-3.5245zm5.9612-5.1271h-1.3402v9.0209h4.4469v-1.5478h-3.1068zm5.439 0h-1.3402v9.0209h4.4469v-1.5478h-3.1068z" stroke-width=".039392" style="white-space:pre"/>   </clipPath>  </defs>  <path d="m26.667 0h-21.334c-2.945 0-5.333 2.371-5.333 5.297v12.33c0 2.924 2.055 4.813 5 4.813h6.639l4.361 9.561 4.361-9.561h6.639c2.945 0 5-1.889 5-4.813v-12.33c0-2.926-2.388-5.297-5.333-5.297z" clip-path="url(#clipPath4)" fill-rule="evenodd"/> </svg>', yl = '<svg width="493px" height="512px" clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 493 511.77" xmlns="http://www.w3.org/2000/svg"><path d="m33.11 458.2 104.5-79.1c3.09-3 7.08-4.47 11.08-4.45l302.6-0.08c2.67 0 5.09-1.08 6.78-2.77 1.74-1.81 2.84-4.24 2.84-6.87v-323.2c0-2.59-1.12-5-2.86-6.74-1.78-1.78-4.2-2.9-6.76-2.9h-409.56c-2.54 0-4.94 1.14-6.72 2.92s-2.92 4.18-2.92 6.72c0 793.72 1.02 39.329 1.02 416.47zm90.6-229.77c10.9 0 19.74 8.85 19.74 19.74s-8.84 19.73-19.74 19.73c-10.89 0-19.73-8.84-19.73-19.73s8.84-19.74 19.73-19.74zm0-101.14c10.9 0 19.74 8.85 19.74 19.74s-8.84 19.74-19.74 19.74c-10.89 0-19.73-8.85-19.73-19.74s8.84-19.74 19.73-19.74zm61.72 138.89c-9.95 0-18.02-8.07-18.02-18.01 0-9.95 8.07-18.02 18.02-18.02h185.56c9.95 0 18.01 8.07 18.01 18.02 0 9.94-8.06 18.01-18.01 18.01zm0-101.13c-9.95 0-18.02-8.07-18.02-18.02 0-9.94 8.07-18.01 18.02-18.01h185.56c9.95 0 18.01 8.07 18.01 18.01 0 9.95-8.06 18.02-18.01 18.02zm-30.38 241.61-125.97 99.69c-2.96 3.32-7.24 5.42-12.01 5.42-8.85 0-17.07-7.1228-17.07-15.963v-454.08c0-11.4 4.77-21.88 12.31-29.42s18.02-12.31 29.42-12.31h409.56c11.4 0 21.9 4.74 29.45 12.29 7.5 7.51 12.26 17.96 12.26 29.44v323.2c0 11.48-4.7 21.95-12.24 29.49-7.61 7.54-18.05 12.24-29.47 12.24z" fill-rule="nonzero"/></svg>', vl = '<svg width="800px" height="800px" fill="none" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m15.746 2.7281c-5.1207-2.0689-10.949 0.40512-13.018 5.5258-2.0689 5.1207 0.40512 10.949 5.5258 13.018 5.1207 2.0689 10.949-0.40508 13.018-5.5258 2.0689-5.1207-0.40508-10.949-5.5258-13.018zm-1.3378 8.3035-1.2703-0.51325c-0.21854-0.08829-0.32785-0.13246-0.3683-0.22775-0.04045-0.09529 0.0037-0.20461 0.09201-0.42314l1.6595-4.1073c0.33362-0.82575 0.50047-1.2387 0.33474-1.3523-0.16582-0.11359-0.49058 0.19103-1.1403 0.8003l-4.7426 4.4469c-1.0274 0.96338-1.541 1.445-1.4405 1.9835 0.10054 0.53837 0.75347 0.80216 2.0594 1.3298l1.2703 0.51325c0.21854 0.08829 0.32785 0.13246 0.3683 0.22775 0.04045 0.09529-0.0037 0.20461-0.09201 0.42314l-1.6595 4.1073c-0.33365 0.82582-0.50047 1.2387-0.33475 1.3523 0.16582 0.1136 0.49059-0.19104 1.1403-0.80025l4.7425-4.4469c1.0275-0.96346 1.5411-1.4451 1.4406-1.9836-0.10057-0.53838-0.75352-0.80218-2.0594-1.3298z" clip-rule="evenodd" fill-rule="evenodd"/></svg>', wl = '<svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">  <g>   <rect transform="scale(-1)" x="-15" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-36.25" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-57.5" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.3s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-78.75" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.5s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-100" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>  </g> </svg>', xl = '<svg version="1.1" id="L7" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"  viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">   <path fill="#fff" d="M42.3,39.6c5.7-4.3,13.9-3.1,18.1,2.7c4.3,5.7,3.1,13.9-2.7,18.1l4.1,5.5c8.8-6.5,10.6-19,4.1-27.7  c-6.5-8.8-19-10.6-27.7-4.1L42.3,39.6z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="3s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path> <path fill="#fff" d="M82,35.7C74.1,18,53.4,10.1,35.7,18S10.1,46.6,18,64.3l7.6-3.4c-6-13.5,0-29.3,13.5-35.3s29.3,0,35.3,13.5  L82,35.7z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="2s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path>   <path fill="#fff" d="M31.6,3.5C5.9,13.6-6.6,42.7,3.5,68.4c10.1,25.7,39.2,38.3,64.9,28.1l-3.1-7.9c-21.3,8.4-45.4-2-53.8-23.3  c-8.4-21.3,2-45.4,23.3-53.8L31.6,3.5z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="1s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path></svg>', ie = 300, Si = 400, Tl = `${Si}px`, Cr = `${ie}px`, El = "100%", Sl = "100%", qt = 30, Gt = 35, bi = 25, Mr = 25, Ci = bi + Mr, ge = 60, le = "normal", ce = 12, ji = "normal", de = "Avenir, Helvetica, Arial, sans-serif", As = "#141414", Os = "#666666", Is = "#cccccc", ze = "#888888", me = "#cccccc", Pr = "25px", bl = "position: relative;", _ = {
+const Vl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" ><path d="M471.993 112h-89.2l-16.242-46.75a32.023 32.023 0 00-30.229-21.5H175.241a31.991 31.991 0 00-30.294 21.691L129.1 112H40a24.027 24.027 0 00-24 24v312a24.027 24.027 0 0024 24h431.993a24.027 24.027 0 0024-24V136a24.027 24.027 0 00-24-24zm-8 328H48.007V144h104.01l23.224-68.25h161.081l23.71 68.25h103.961z" class="ci-primary"></path><path d="M256 168a114 114 0 10114 114 114.13 114.13 0 00-114-114zm0 196a82 82 0 1182-82 82.093 82.093 0 01-82 82z"></path></svg>', Gl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M376 160v32h65.372L252 381.373l-72-72L76.686 412.686l22.628 22.628L180 354.627l72 72 212-211.999V280h32V160H376z"></path><path d="M48 104H16v392h480v-32H48V104z"></path></svg>', Yl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M271.514 95.5h-32v178.111l115.613 54.948 13.737-28.902-97.35-46.268V95.5z"></path><path d="M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208z"></path></svg>', br = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M245.151 168a88 88 0 1088 88 88.1 88.1 0 00-88-88zm0 144a56 56 0 1156-56 56.063 56.063 0 01-56 56z"></path><path d="M464.7 322.319l-31.77-26.153a193.081 193.081 0 000-80.332l31.77-26.153a19.941 19.941 0 004.606-25.439l-32.612-56.483a19.936 19.936 0 00-24.337-8.73l-38.561 14.447a192.038 192.038 0 00-69.54-40.192l-6.766-40.571A19.936 19.936 0 00277.762 16H212.54a19.937 19.937 0 00-19.728 16.712l-6.762 40.572a192.03 192.03 0 00-69.54 40.192L77.945 99.027a19.937 19.937 0 00-24.334 8.731L21 164.245a19.94 19.94 0 004.61 25.438l31.767 26.151a193.081 193.081 0 000 80.332l-31.77 26.153A19.942 19.942 0 0021 347.758l32.612 56.483a19.937 19.937 0 0024.337 8.73l38.562-14.447a192.03 192.03 0 0069.54 40.192l6.762 40.571A19.937 19.937 0 00212.54 496h65.222a19.936 19.936 0 0019.728-16.712l6.763-40.572a192.038 192.038 0 0069.54-40.192l38.564 14.449a19.938 19.938 0 0024.334-8.731l32.609-56.487a19.939 19.939 0 00-4.6-25.436zm-50.636 57.12l-48.109-18.024-7.285 7.334a159.955 159.955 0 01-72.625 41.973l-10 2.636L267.6 464h-44.89l-8.442-50.642-10-2.636a159.955 159.955 0 01-72.625-41.973l-7.285-7.334-48.117 18.024L53.8 340.562l39.629-32.624-2.7-9.973a160.9 160.9 0 010-83.93l2.7-9.972L53.8 171.439l22.446-38.878 48.109 18.024 7.285-7.334a159.955 159.955 0 0172.625-41.973l10-2.636L222.706 48H267.6l8.442 50.642 10 2.636a159.955 159.955 0 0172.625 41.973l7.285 7.334 48.109-18.024 22.447 38.877-39.629 32.625 2.7 9.972a160.9 160.9 0 010 83.93l-2.7 9.973 39.629 32.623z"></path></svg>', ql = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><rect x="16" y="240.18" width="188.84" height="31.635"/><g transform="translate(-3.3234e-7 -112.18)"><rect x="307.16" y="352.37" width="188.84" height="31.635"/></g><rect transform="rotate(-90)" x="-496" y="240.18" width="188.84" height="31.635"/><rect transform="rotate(-90)" x="-204.84" y="240.18" width="188.84" height="31.635"/></svg>', Xl = '<svg width="46.08" height="46.08" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"></path><path d="M6.535 3H21a1 1 0 011 1v16a1 1 0 01-1 1H6.535a1 1 0 01-.832-.445l-5.333-8a1 1 0 010-1.11l5.333-8A1 1 0 016.535 3zm.535 2l-4.666 7 4.666 7H20V5H7.07zM13 10.586l2.828-2.829 1.415 1.415L14.414 12l2.829 2.828-1.415 1.415L13 13.414l-2.828 2.829-1.415-1.415L11.586 12 8.757 9.172l1.415-1.415L13 10.586z"></path></svg>', jl = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g stroke-width="30.155"><rect x="14.757" y="240.92" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="147" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="334.84" width="482.49" height="30.155" rx="15.078"/></g ><g transform="translate(5.937 -288.34)"><path d="m23.904 712.34c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h173.93c-0.65295-3.3651-2.0312-6.4697-2.0312-10.026 0-7.1393 1.5573-13.888 4.0625-20.13zm276.35 0c2.5051 6.2423 4.0365 12.991 4.0365 20.13 0 3.5554-1.3526 6.6618-2.0052 10.026h173.93c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078z"/><path d="m250.06 759.97c17.965 0 32.545-14.58 32.545-32.545 0-17.965-14.58-32.545-32.545-32.545-17.965 0-32.545 14.58-32.545 32.545 0 17.965 14.58 32.545 32.545 32.545zm0 21.697c-29.964 0-54.242-24.279-54.242-54.242 0-29.964 24.279-54.242 54.242-54.242 29.964 0 54.242 24.279 54.242 54.242 0 29.964-24.279 54.242-54.242 54.242z" stroke-width="21.697"/></g ><path d="m144.05 18.672c-24.694 0-45.285 16.595-51.849 39.167h-62.37c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h62.37c6.5639 22.572 27.155 39.167 51.849 39.167s45.285-16.595 51.849-39.167h120.03c6.5639 22.572 27.155 39.167 51.849 39.167 24.694 0 45.285-16.595 51.849-39.167h62.552c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078h-62.552c-6.5639-22.572-27.155-39.167-51.849-39.167-24.694 0-45.285 16.595-51.849 39.167h-120.03c-6.5639-22.572-27.155-39.167-51.849-39.167zm0 21.693c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 1e-5 -32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552zm223.72 0c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 0-32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552z" stroke-width="30.155"/></svg>', Qt = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g transform="matrix(21.697 0 0 21.697 -47.758 -47.758)"><path d="m7.354 21.354 14-14-0.707-0.707-14 14z"/><path d="m22.5 7c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5zm-17 16c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z"/></g></svg>', Zl = '<svg width="46.08" height="46.08" viewBox="0 0 32 32"><path d="M 3.2758709,20.241377 11.758622,28.72413 28.72413,11.758622 20.241377,3.2758709 Z m 2.1206881,0 1.5905161,-1.590515 3.7112049,3.711203 1.060342,-1.060345 -3.7112027,-3.711204 1.0603441,-1.060344 2.1206876,2.12069 1.060346,-1.060346 -2.120689,-2.120688 1.060343,-1.060344 3.711203,3.711203 L 16,17.060346 l -3.711203,-3.711208 1.060341,-1.060341 2.12069,2.120687 1.060344,-1.060346 -2.120688,-2.120687 1.060344,-1.060343 3.711204,3.711205 1.060345,-1.060345 -3.711205,-3.7112046 1.060344,-1.0603441 2.120687,2.1206887 1.060346,-1.0603446 -2.120687,-2.1206883 1.590515,-1.5905161 6.362065,6.362063 -14.84482,14.84482 z" style="stroke-width:0.749776" /></svg>', Kl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><g id="g930" transform="matrix(21.128963,0,0,21.128963,-29.235597,-50.369964)"><path clip-rule="evenodd" d="m 4.5,5 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,6.5 A 2.5,2.5 0 0 1 6.95,6 H 24 V 7 H 6.95 A 2.5,2.5 0 0 1 2,6.5 Z M 4.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,16.5 A 2.5,2.5 0 0 1 6.95,16 h 13.1 a 2.5,2.5 0 1 1 0,1 H 6.95 A 2.5,2.5 0 0 1 2,16.5 Z M 22.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z m -18,6 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,22.5 A 2.5,2.5 0 0 1 6.95,22 H 24 v 1 H 6.95 A 2.5,2.5 0 0 1 2,22.5 Z" id="path908" /><path clip-rule="evenodd" d="M 22.4,8.94 21.01,9.57 20.6,8.66 21.99,8.03 Z m -4,1.8 -1.39,0.63 -0.41,-0.91 1.39,-0.63 z m -4,1.8 -1.4,0.63 -0.4,-0.91 1.39,-0.63 z m -4,1.8 L 9,14.97 8.6,14.06 9.99,13.43 Z" id="path910" /></g></svg>', Ql = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M231.359 147l-80.921 205h45.155l15.593-39.5h89.628l15.593 39.5h45.155l-80.921-205zm-3.594 123.5L256 198.967l28.235 71.533z"></path><path d="M384 56H128V16H16v112h40v256H16v112h112v-40h256v40h112V384h-40V128h40V16H384zM48 96V48h48v48zm48 368H48v-48h48zm288-40H128v-40H88V128h40V88h256v40h40v256h-40zm80-8v48h-48v-48zM416 48h48v48h-48z"></path></svg>', Jl = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g718" transform="translate(0,1.2499996)"><path d="M 7.5010125,7.9560661 5.355012,10.103066 c -0.472,0.472 -1.18,-0.2360003 -0.708,-0.7080003 L 7.6470125,6.3950659 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999998 c 0.472,0.472 -0.236,1.1800003 -0.708,0.7080003 L 8.5010125,7.9560661 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m 7.4989873,5.5439348 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>', th = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,7.7026182 -2.1460003,2.147 c -0.472,0.4719998 -1.18,-0.236 -0.708,-0.708 l 3.0000003,-3 c 0.1953639,-0.1958581 0.5126361,-0.1958581 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.1799998 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6-3" /></svg>', eh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,8.2973819 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.1958581 0.5126361,0.1958581 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></svg>', ih = '<svg width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="m1 14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-12a1 1 0 0 0-1-1h-12a1 1 0 0 0-1 1zm15 0a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2zm-8.5-2.5a0.5 0.5 0 0 0 1 0v-5.793l2.146 2.147a0.50063 0.50063 0 1 0 0.708-0.708l-3-3a0.5 0.5 0 0 0-0.708 0l-3 3a0.50063 0.50063 0 0 0 0.708 0.708l2.146-2.147z" fill-rule="evenodd"/></svg>', sh = '<svg width="46.08" height="46.08" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M 15,2 A 1,-1 0 0 0 14,1 H 2 A 1,-1 0 0 0 1,2 v 12 a 1,-1 0 0 0 1,1 h 12 a 1,-1 0 0 0 1,-1 z M 0,2 A 2,-2 0 0 1 2,0 h 12 a 2,-2 0 0 1 2,2 v 12 a 2,-2 0 0 1 -2,2 H 2 A 2,-2 0 0 1 0,14 Z m 8.5,2.5 a 0.5,-0.5 0 0 0 -1,0 v 5.793 L 5.354,8.146 A 0.5006316,-0.5006316 0 1 0 4.646,8.854 l 3,3 a 0.5,-0.5 0 0 0 0.708,0 l 3,-3 A 0.5006316,-0.5006316 0 0 0 10.646,8.146 L 8.5,10.293 Z" id="path2" /></svg>', nh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g687" transform="translate(15.647255,-0.0288128)"><path d="m -8.1462425,10.484879 -2.1460005,2.146999 c -0.472,0.472 -1.18,-0.236 -0.708,-0.708 l 3.0000005,-2.9999994 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999994 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1460005,-2.146999 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m -8.1482677,5.5727476 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>', rh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g611" transform="translate(0.2050748,-0.8829888)"><path d="m 7.2959375,11.933818 -2.146,-2.1469999 c -0.472,-0.4719998 -1.18,0.2359999 -0.708,0.7079999 l 3,3 c 0.195364,0.195858 0.512636,0.195858 0.708,0 l 3.0000005,-3 c 0.472,-0.472 -0.236,-1.1799997 -0.708,-0.7079999 L 8.2959375,11.933818 c -0.431103,0.417289 -0.523896,0.423024 -1,0 z" style="" id="path566" /><path d="m 7.2939123,5.8321596 -2.146,2.147 c -0.4719998,0.472 -1.1799998,-0.236 -0.708,-0.708 l 3,-3 c 0.1953639,-0.195858 0.5126361,-0.195858 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6" /></g></svg>', oh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 11.500447,8.5 c 0.666666,0 0.666666,-1 0,-1 H 4.444275 c -0.1571231,0 -0.224029,0.07336 -0.2978281,0.1459999 -0.1958579,0.195364 -0.1958579,0.5126361 0,0.7080001 0,0 0.113806,0.146 0.320186,0.146 z" style="" id="path887" /></svg>', ah = '<svg style="height:46px;width:46px" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <g fill-rule="evenodd">  <path d="m15 2c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1h12c0.55228 0 1-0.44772 1-1zm-15 0c0-1.1046 0.89543-2 2-2h12c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2z"/>  <path d="m4.4449 4.097c-0.01964 0-0.037678 0.0018-0.054687 0.0039-0.017011 0.0022-0.034068 0.0058-0.048828 0.0098-0.014761 4e-3 -0.028126 0.0081-0.041016 0.01367-0.012889 0.0056-0.025711 0.01268-0.037109 0.01953-0.022796 0.01371-0.041442 0.02783-0.060547 0.04492s-0.038191 0.03653-0.056641 0.05469c-0.024482 0.02442-0.046092 0.05037-0.064453 0.07813-0.018362 0.02775-0.032681 0.05776-0.044922 0.08789s-0.021223 0.06023-0.027344 0.0918c-0.00612 0.03156-0.00977 0.06366-0.00977 0.0957 0 8e-3 -4.378e-4 0.01543 0 0.02344v1.2988c0 0.02083 6.41e-5 0.04102 0.00195 0.06055 0.00189 0.01953 0.0061 0.03841 0.00977 0.05664 0.00366 0.01823 0.00836 0.03581 0.013672 0.05273 0.00531 0.01693 0.010742 0.0332 0.017578 0.04883 0.013672 0.03125 0.029785 0.0599 0.048828 0.08594s0.041016 0.04948 0.064453 0.07031 0.049316 0.03906 0.076172 0.05469c0.026855 0.01563 0.054687 0.02865 0.083984 0.03906 0.029297 0.01042 0.059082 0.01823 0.089844 0.02344 0.030762 0.0052 0.0625 0.0078 0.09375 0.0078s0.062988-0.0026 0.09375-0.0078 0.060547-0.01302 0.089844-0.02344 0.057129-0.02344 0.083984-0.03906c0.026855-0.01563 0.052734-0.03385 0.076172-0.05469 0.023437-0.02083 0.04541-0.04427 0.064453-0.07031s0.035156-0.05469 0.048828-0.08594c0.00684-0.01563 0.012268-0.0319 0.017578-0.04883s0.01001-0.0345 0.013672-0.05273c0.00366-0.01823 0.00787-0.03711 0.00977-0.05664 0.00189-0.01953 0.00195-0.03971 0.00195-0.06055v-0.82227h6v0.98633c0 0.02083 2e-3 0.04102 0.0039 0.06055s0.0042 0.03841 0.0078 0.05664c0.0037 0.01823 0.0084 0.03581 0.01367 0.05273 0.0053 0.01693 0.01074 0.0332 0.01758 0.04883 0.01367 0.03125 0.03174 0.0599 0.05078 0.08594s0.03906 0.04948 0.0625 0.07031 0.04932 0.03906 0.07617 0.05469c0.02686 0.01563 0.05469 0.02865 0.08399 0.03906 0.0293 0.01042 0.06104 0.01823 0.0918 0.02344 0.03076 0.0052 0.06055 0.0078 0.0918 0.0078s0.06299-0.0026 0.09375-0.0078 0.06055-0.01302 0.08984-0.02344c0.0293-0.01042 0.05908-0.02344 0.08594-0.03906 0.02686-0.01563 0.05078-0.03385 0.07422-0.05469 0.02344-0.02083 0.04541-0.04427 0.06445-0.07031s0.03516-0.05469 0.04883-0.08594c0.0068-0.01563 0.01422-0.0319 0.01953-0.04883 0.0053-0.01693 0.01001-0.0345 0.01367-0.05273 0.0037-0.01823 0.0059-0.03711 0.0078-0.05664s2e-3 -0.03971 2e-3 -0.06055v-1.4629c3.25e-4 -0.0078 0-0.01563 0-0.02344 0-0.03125-0.0026-0.06299-0.0078-0.09375s-0.01302-0.06055-0.02344-0.08984c-0.01042-0.0293-0.02344-0.05713-0.03906-0.08398-0.01563-0.02685-0.03385-0.05273-0.05469-0.07617-0.02083-0.02344-0.04427-0.04541-0.07031-0.06445s-0.05469-0.03516-0.08594-0.04883c-0.01563-0.0068-0.0319-0.01227-0.04883-0.01758-0.01693-0.0053-0.0345-0.01001-0.05273-0.01367-0.01823-0.0037-0.03711-0.0059-0.05664-0.0078s-0.03971-0.0039-0.06055-0.0039h-6.5z"/>  <path d="m11.555 11.903c0.01964 0 0.03768-0.0018 0.05469-0.0039 0.01701-0.0022 0.03407-0.0058 0.04883-0.0098s0.02813-0.0081 0.04102-0.01367c0.01289-0.0056 0.02571-0.01268 0.03711-0.01953 0.0228-0.01371 0.04144-0.02783 0.06055-0.04492 0.0191-0.01709 0.03819-0.03653 0.05664-0.05469 0.02448-0.02442 0.04609-0.05037 0.06445-0.07813 0.01836-0.02775 0.03268-0.05776 0.04492-0.08789s0.02122-0.06023 0.02734-0.0918c0.0061-0.03156 0.0098-0.06366 0.0098-0.0957 0-8e-3 4.38e-4 -0.01543 0-0.02344v-1.2988c0-0.02083-6.4e-5 -0.04102-2e-3 -0.06055-0.0019-0.01953-0.0061-0.03841-0.0098-0.05664s-0.0084-0.03581-0.01367-0.05273c-0.0053-0.01693-0.01074-0.0332-0.01758-0.04883-0.01367-0.03125-0.02979-0.0599-0.04883-0.08594s-0.04102-0.04948-0.06445-0.07031c-0.02344-0.02083-0.04932-0.03906-0.07617-0.05469s-0.05469-0.02865-0.08398-0.03906c-0.0293-0.01042-0.05908-0.01823-0.08984-0.02344-0.03076-0.0052-0.0625-0.0078-0.09375-0.0078s-0.06299 0.0026-0.09375 0.0078-0.06055 0.01302-0.08984 0.02344c-0.0293 0.01042-0.05713 0.02344-0.08398 0.03906-0.02685 0.01563-0.05273 0.03385-0.07617 0.05469-0.02344 0.02083-0.04541 0.04427-0.06445 0.07031s-0.03516 0.05469-0.04883 0.08594c-0.0068 0.01563-0.01227 0.0319-0.01758 0.04883-0.0053 0.01693-0.01001 0.0345-0.01367 0.05273-0.0037 0.01823-0.0079 0.03711-0.0098 0.05664s-0.0019 0.03971-0.0019 0.06055v0.82227h-6v-0.98633c0-0.02083-2e-3 -0.04102-0.0039-0.06055s-0.0042-0.03841-0.0078-0.05664c-0.0037-0.01823-0.0084-0.03581-0.01367-0.05273-0.0053-0.01693-0.01074-0.0332-0.01758-0.04883-0.01367-0.03125-0.03174-0.0599-0.05078-0.08594s-0.03906-0.04948-0.0625-0.07031-0.04932-0.03906-0.07617-0.05469c-0.02686-0.01563-0.05469-0.02865-0.08399-0.03906-0.0293-0.01042-0.06104-0.01823-0.0918-0.02344-0.03076-0.0052-0.06055-0.0078-0.0918-0.0078s-0.06299 0.0026-0.09375 0.0078-0.06055 0.01302-0.08984 0.02344c-0.0293 0.01042-0.05908 0.02344-0.08594 0.03906-0.02686 0.01563-0.05078 0.03385-0.07422 0.05469-0.02344 0.02083-0.04541 0.04427-0.06445 0.07031s-0.03516 0.05469-0.04883 0.08594c-0.0068 0.01563-0.01422 0.0319-0.01953 0.04883-0.0053 0.01693-0.01001 0.03451-0.01367 0.05273-0.0037 0.01823-0.0059 0.03711-0.0078 0.05664s-2e-3 0.03971-2e-3 0.06055v1.4629c-3.25e-4 0.0078 0 0.01563 0 0.02344 0 0.03125 0.0026 0.06299 0.0078 0.09375s0.01302 0.06055 0.02344 0.08984c0.01042 0.0293 0.02344 0.05713 0.03906 0.08398 0.01563 0.02685 0.03385 0.05273 0.05469 0.07617 0.02083 0.02344 0.04427 0.04541 0.07031 0.06445s0.05469 0.03516 0.08594 0.04883c0.01563 0.0068 0.0319 0.01227 0.04883 0.01758 0.01693 0.0053 0.0345 0.01001 0.05273 0.01367 0.01823 0.0037 0.03711 0.0059 0.05664 0.0078s0.03971 0.0039 0.06055 0.0039h6.5z"/></g></svg>', lh = '<svg style="height:46px;width:46px" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="m15 2c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1h12c0.55228 0 1-0.44772 1-1zm-15 0c0-1.1046 0.89543-2 2-2h12c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2z" fill-rule="evenodd"/> <path d="m13.291 7.7876c-1.0729-2.491-3.0911-4.0365-5.2687-4.0365-2.1776 0-4.1958 1.5456-5.2687 4.0365a0.53112 0.53112 0 0 0 0 0.4249c1.0729 2.491 3.0911 4.0365 5.2687 4.0365 2.1776 0 4.1959-1.5456 5.2687-4.0365a0.53112 0.53112 0 0 0 0-0.4249zm-5.2687 3.3992c-1.6836 0-3.277-1.2163-4.1958-3.1867 0.91884-1.9705 2.5122-3.1867 4.1958-3.1867 1.6837 0 3.277 1.2163 4.1959 3.1867-0.91884 1.9705-2.5122 3.1867-4.1959 3.1867zm0-5.3112a2.1245 2.1245 0 1 0 2.1245 2.1245 2.1245 2.1245 0 0 0-2.1245-2.1245zm0 3.1867a1.0622 1.0622 0 1 1 1.0622-1.0622 1.0622 1.0622 0 0 1-1.0622 1.0622z" stroke-width=".53112"/></svg>', hh = '<svg style="height:46px;width:46px" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="m15 2c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1h12c0.55228 0 1-0.44772 1-1zm-15 0c0-1.1046 0.89543-2 2-2h12c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2z" fill-rule="evenodd"/> <path d="m13.291 7.7876c-1.0729-2.491-3.0911-4.0365-5.2687-4.0365-2.1776 0-4.1958 1.5456-5.2687 4.0365a0.53112 0.53112 0 0 0 0 0.4249c1.0729 2.491 3.0911 4.0365 5.2687 4.0365 2.1776 0 4.1959-1.5456 5.2687-4.0365a0.53112 0.53112 0 0 0 0-0.4249zm-5.2687 3.3992c-1.6836 0-3.277-1.2163-4.1958-3.1867 0.91884-1.9705 2.5122-3.1867 4.1958-3.1867 1.6837 0 3.277 1.2163 4.1959 3.1867-0.91884 1.9705-2.5122 3.1867-4.1959 3.1867zm0-5.3112a2.1245 2.1245 0 1 0 2.1245 2.1245 2.1245 2.1245 0 0 0-2.1245-2.1245zm0 3.1867a1.0622 1.0622 0 1 1 1.0622-1.0622 1.0622 1.0622 0 0 1-1.0622 1.0622z" stroke-width=".53112"/> <path d="m12.757 3.0055c-0.11087 0.0051358-0.22696 0.051177-0.33008 0.1543l-4.9883 4.9902c-0.061946 0.061947-0.086644 0.12038-0.097656 0.17773l-4.8184 4.8164c-0.1111 0.1111-0.1066 0.2109-0.10742 0.31445-3.5e-4 0.27663 0.22337 0.50035 0.5 0.5 0 0 0.18415 0.022881 0.33008-0.12305l4.9746-4.9727c0.06758-0.06758 0.10951-0.13979 0.13281-0.21289l4.7832-4.7832c0.36828-0.36828 0.017071-0.87967-0.37891-0.86133z" fill-rule="evenodd"/></svg>', ch = '<svg class="ov-icon" width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m14 15c0.55228 0 1-0.44772 1-1v-12c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1zm0-15c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2v-12c0-1.1046 0.89543-2 2-2z" fill-rule="evenodd"/><g transform="translate(-1.1585)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>', dh = '<svg class="ov-icon" width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m2 15c-0.55228 0-1-0.44772-1-1v-12c0-0.55228 0.44772-1 1-1h12c0.55228 0 1 0.44772 1 1v12c0 0.55228-0.44772 1-1 1zm0-15c-1.1046 0-2 0.89543-2 2v12c0 1.1046 0.89543 2 2 2h12c1.1046 0 2-0.89543 2-2v-12c0-1.1046-0.89543-2-2-2z" fill-rule="evenodd"/><g transform="matrix(-1 0 0 1 17.159 0)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>', uh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 336.96 336.36" xmlns="http://www.w3.org/2000/svg"><path d="m0 0 168.48 336.36 168.48-336.36z"/></svg>', fh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 336.96 336.36" xmlns="http://www.w3.org/2000/svg"><path d="m0 336.36 168.48-336.36 168.48 336.36z"/></svg>', gh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0 70.67-28.66 134.68-74.99 181.01s-110.34 74.99-181.01 74.99c-70.68 0-134.69-28.66-181.01-74.99-46.33-46.33-74.99-110.34-74.99-181.01 0-70.68 28.66-134.69 74.99-181.01 46.32-46.33 110.33-74.99 181.01-74.99 70.67 0 134.68 28.66 181.01 74.99 46.33 46.32 74.99 110.33 74.99 181.01zm-204.29-21.97v-67.04c0-7.53-6.19-13.72-13.73-13.72h-75.96c-7.53 0-13.72 6.17-13.72 13.72v67.03h-42.84c-16.5 0-24.78 19.64-13.86 31.54l94.74 110.57c7.44 9 21.03 9.01 28.66 0.37l93.71-111.31c10.69-12.27 1.64-31.14-14.19-31.16h-42.81zm105.52 179.2c40.22-40.24 65.11-95.84 65.11-157.23 0-61.4-24.89-117-65.11-157.23-40.24-40.23-95.84-65.11-157.23-65.11-61.4 0-117 24.88-157.23 65.11s-65.11 95.83-65.11 157.23c0 61.39 24.88 116.99 65.11 157.23 40.23 40.22 95.83 65.11 157.23 65.11 61.39 0 116.99-24.89 157.23-65.11z" fill-rule="nonzero"/></svg>', mh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0-70.67-28.66-134.68-74.99-181.01s-110.34-74.99-181.01-74.99c-70.68 0-134.69 28.66-181.01 74.99-46.33 46.33-74.99 110.34-74.99 181.01 0 70.68 28.66 134.69 74.99 181.01 46.32 46.33 110.33 74.99 181.01 74.99 70.67 0 134.68-28.66 181.01-74.99 46.33-46.32 74.99-110.33 74.99-181.01zm-204.29 21.97v67.04c0 7.53-6.19 13.72-13.73 13.72h-75.96c-7.53 0-13.72-6.17-13.72-13.72v-67.03h-42.84c-16.5 0-24.78-19.64-13.86-31.54l94.74-110.57c7.44-9 21.03-9.01 28.66-0.37l93.71 111.31c10.69 12.27 1.64 31.14-14.19 31.16zm105.52-179.2c40.22 40.24 65.11 95.84 65.11 157.23 0 61.4-24.89 117-65.11 157.23-40.24 40.23-95.84 65.11-157.23 65.11-61.4 0-117-24.88-157.23-65.11s-65.11-95.83-65.11-157.23c0-61.39 24.88-116.99 65.11-157.23 40.23-40.22 95.83-65.11 157.23-65.11 61.39 0 116.99 24.89 157.23 65.11z" fill-rule="nonzero"/></svg>', ph = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M512 256c0-70.67-28.66-134.68-74.98-181.02C390.69 28.66 326.68 0 256 0S121.31 28.66 74.98 74.98C28.66 121.32 0 185.33 0 256c0 70.68 28.66 134.69 74.98 181.02C121.31 483.34 185.32 512 256 512c70.67 0 134.69-28.66 181.02-74.98C483.34 390.69 512 326.68 512 256zm-160.23-21.5h-43.38v-67.93c0-7.63-6.27-13.9-13.91-13.9H217.5c-7.62 0-13.9 6.25-13.9 13.9v67.92h-43.41c-16.71 0-25.11 19.9-14.05 31.96l96.01 112.05c7.54 9.12 21.31 9.12 29.04.37l94.96-112.8c10.83-12.43 1.66-31.55-14.38-31.57z"/></svg>', vh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0 70.67-28.66 134.68-74.98 181.02-46.33 46.32-110.34 74.98-181.02 74.98s-134.69-28.66-181.02-74.98c-46.32-46.34-74.98-110.35-74.98-181.02 0-70.68 28.66-134.69 74.98-181.02 46.33-46.32 110.34-74.98 181.02-74.98 70.67 0 134.69 28.66 181.02 74.98 46.32 46.33 74.98 110.34 74.98 181.02zm-160.23 21.5h-43.38v67.93c0 7.63-6.27 13.9-13.91 13.9h-76.98c-7.62 0-13.9-6.25-13.9-13.9v-67.92h-43.41c-16.71 0-25.11-19.9-14.05-31.96l96.01-112.05c7.54-9.12 21.31-9.12 29.04-0.37l94.96 112.8c10.83 12.43 1.66 31.55-14.38 31.57z"/></svg>', yh = '<svg width="800px" height="800px" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">  <defs>   <clipPath id="clipPath1">    <path d="m6.1885 15.281v-9.0209h3.1721q1.0764 0 1.6765 0.65299 0.63822 0.71345 0.63822 1.7171 0 0.58043-0.22862 1.0158-0.21909 0.42323-0.743 0.84646 1.1812 0.87065 1.1812 2.1887 0 0.53206-0.19051 1.0762-0.19051 0.53206-0.51439 0.87065-0.60964 0.65299-1.7908 0.65299zm1.467-7.4731v2.0315h1.5813q1.0383 0 1.0383-1.0158 0-1.0158-1.0383-1.0158zm0 3.5793v2.3459h1.7432q1.0859 0 1.0859-1.1609 0-1.185-1.0859-1.185zm9.6876-5.1271h1.467v6.1066q0 1.4874-0.69538 2.2854-0.80016 0.91902-2.1242 0.91902t-2.1242-0.91902q-0.69538-0.79809-0.69538-2.2854v-6.1066h1.4574v6.1066q0 1.6083 1.3622 1.6083 1.3526 0 1.3526-1.6083zm6.2108 5.6834v3.3375h-1.467v-3.3375l-2.3528-5.6834h1.6289l1.4479 3.9784 1.3622-3.9784h1.6384z" display="none" stroke-width=".041213" style="white-space:pre" aria-label="BUY"/>    <path class="powerclip" d="m-5-5h42v42.001h-42zm11.189 20.281h3.2006q1.1812 0 1.7908-0.65299 0.32387-0.33859 0.51439-0.87065 0.19051-0.54416 0.19051-1.0762 0-1.3181-1.1812-2.1887 0.52391-0.42323 0.743-0.84646 0.22862-0.43532 0.22862-1.0158 0-1.0037-0.63822-1.7171-0.60012-0.65299-1.6765-0.65299h-3.1721zm1.467-7.4731v2.0315h1.5813q1.0383 0 1.0383-1.0158 0-1.0158-1.0383-1.0158zm0 3.5793v2.3459h1.7432q1.0859 0 1.0859-1.1609 0-1.185-1.0859-1.185zm9.6876-5.1271v6.1066q0 1.6083-1.3526 1.6083-1.3622 0-1.3622-1.6083v-6.1066h-1.4574v6.1066q0 1.4874 0.69538 2.2854 0.80016 0.91902 2.1242 0.91902t2.1242-0.91902q0.69538-0.79809 0.69538-2.2854v-6.1066zm6.2108 5.6834 2.2576-5.6834h-1.6384l-1.3622 3.9784-1.4479-3.9784h-1.6289l2.3528 5.6834v3.3375h1.467z" stroke-width=".041213" style="white-space:pre"/>   </clipPath>  </defs>  <g clip-path="url(#clipPath1)" fill="none" fill-rule="evenodd">   <g id="Icon-Set" transform="translate(-360 -255)" fill="#000">    <path d="m386.67 255h-21.334c-2.945 0-5.333 2.371-5.333 5.297v12.33c0 2.924 2.055 4.813 5 4.813h6.639l4.361 9.561 4.361-9.561h6.639c2.945 0 5-1.889 5-4.813v-12.33c0-2.926-2.388-5.297-5.333-5.297z"/>   </g>  </g> </svg>', wh = '<svg width="800px" height="800px" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">  <defs>   <clipPath id="clipPath4">    <path d="m10.026 8.6238h-1.2531q-0.06962-1.4148-1.3576-1.4148-0.51344 0-0.81803 0.30231-0.30458 0.30231-0.30458 0.81019 0 0.49579 0.25237 0.74972 0.26107 0.24185 0.97467 0.43532l1.0182 0.26603q0.90505 0.24185 1.3054 0.83437 0.40901 0.59252 0.40901 1.6566 0 1.3785-0.7049 2.1524-0.69619 0.77391-1.958 0.77391-1.2444 0-1.9406-0.76182-0.68749-0.77391-0.74841-2.225h1.2967q0.03481 0.72554 0.40901 1.1125t1.053 0.38696q0.60917 0 0.95727-0.32649 0.3568-0.32649 0.3568-0.89483 0-0.54416-0.27848-0.83437-0.27848-0.30231-0.94856-0.4716l-0.90505-0.25394q-0.99208-0.26603-1.4098-0.81019-0.41772-0.55625-0.41772-1.6083 0-1.3181 0.64398-2.0436 0.65268-0.73763 1.8188-0.73763 1.4185 0 2.0886 1.0278 0.46123 0.71345 0.46123 1.8743zm2.5672 2.3822v2.3459h3.5245v1.5478h-4.8559v-9.0209h4.6993v1.5478h-3.3678v2.0315h3.1155v1.5478zm5.9612-5.1271v7.4731h3.1068v1.5478h-4.4469v-9.0209zm5.439 0v7.4731h3.1068v1.5478h-4.4469v-9.0209z" display="none" stroke-width=".039392" style="white-space:pre" aria-label="SELL"/>    <path class="powerclip" d="m-5-5h42v42.001h-42zm15.026 13.624q0-1.1609-0.46123-1.8743-0.67009-1.0278-2.0886-1.0278-1.1661 0-1.8188 0.73763-0.64398 0.72554-0.64398 2.0436 0 1.052 0.41772 1.6083 0.41772 0.54416 1.4098 0.81019l0.90505 0.25394q0.67009 0.16929 0.94856 0.4716 0.27848 0.29022 0.27848 0.83437 0 0.56834-0.3568 0.89483-0.3481 0.32649-0.95727 0.32649-0.67879 0-1.053-0.38696-0.3742-0.38695-0.40901-1.1125h-1.2967q0.060917 1.4511 0.74841 2.225 0.69619 0.76182 1.9406 0.76182 1.2619 0 1.958-0.77391 0.7049-0.77391 0.7049-2.1524 0-1.0641-0.40901-1.6566-0.40031-0.59252-1.3054-0.83437l-1.0182-0.26603q-0.7136-0.19348-0.97467-0.43532-0.25237-0.25394-0.25237-0.74972 0-0.50788 0.30458-0.81019t0.81803-0.30231q1.288 0 1.3576 1.4148zm2.5672 2.3822h3.1155v-1.5478h-3.1155v-2.0315h3.3678v-1.5478h-4.6993v9.0209h4.8559v-1.5478h-3.5245zm5.9612-5.1271h-1.3402v9.0209h4.4469v-1.5478h-3.1068zm5.439 0h-1.3402v9.0209h4.4469v-1.5478h-3.1068z" stroke-width=".039392" style="white-space:pre"/>   </clipPath>  </defs>  <path d="m26.667 0h-21.334c-2.945 0-5.333 2.371-5.333 5.297v12.33c0 2.924 2.055 4.813 5 4.813h6.639l4.361 9.561 4.361-9.561h6.639c2.945 0 5-1.889 5-4.813v-12.33c0-2.926-2.388-5.297-5.333-5.297z" clip-path="url(#clipPath4)" fill-rule="evenodd"/> </svg>', xh = '<svg width="493px" height="512px" clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 493 511.77" xmlns="http://www.w3.org/2000/svg"><path d="m33.11 458.2 104.5-79.1c3.09-3 7.08-4.47 11.08-4.45l302.6-0.08c2.67 0 5.09-1.08 6.78-2.77 1.74-1.81 2.84-4.24 2.84-6.87v-323.2c0-2.59-1.12-5-2.86-6.74-1.78-1.78-4.2-2.9-6.76-2.9h-409.56c-2.54 0-4.94 1.14-6.72 2.92s-2.92 4.18-2.92 6.72c0 793.72 1.02 39.329 1.02 416.47zm90.6-229.77c10.9 0 19.74 8.85 19.74 19.74s-8.84 19.73-19.74 19.73c-10.89 0-19.73-8.84-19.73-19.73s8.84-19.74 19.73-19.74zm0-101.14c10.9 0 19.74 8.85 19.74 19.74s-8.84 19.74-19.74 19.74c-10.89 0-19.73-8.85-19.73-19.74s8.84-19.74 19.73-19.74zm61.72 138.89c-9.95 0-18.02-8.07-18.02-18.01 0-9.95 8.07-18.02 18.02-18.02h185.56c9.95 0 18.01 8.07 18.01 18.02 0 9.94-8.06 18.01-18.01 18.01zm0-101.13c-9.95 0-18.02-8.07-18.02-18.02 0-9.94 8.07-18.01 18.02-18.01h185.56c9.95 0 18.01 8.07 18.01 18.01 0 9.95-8.06 18.02-18.01 18.02zm-30.38 241.61-125.97 99.69c-2.96 3.32-7.24 5.42-12.01 5.42-8.85 0-17.07-7.1228-17.07-15.963v-454.08c0-11.4 4.77-21.88 12.31-29.42s18.02-12.31 29.42-12.31h409.56c11.4 0 21.9 4.74 29.45 12.29 7.5 7.51 12.26 17.96 12.26 29.44v323.2c0 11.48-4.7 21.95-12.24 29.49-7.61 7.54-18.05 12.24-29.47 12.24z" fill-rule="nonzero"/></svg>', Th = '<svg width="800px" height="800px" fill="none" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m15.746 2.7281c-5.1207-2.0689-10.949 0.40512-13.018 5.5258-2.0689 5.1207 0.40512 10.949 5.5258 13.018 5.1207 2.0689 10.949-0.40508 13.018-5.5258 2.0689-5.1207-0.40508-10.949-5.5258-13.018zm-1.3378 8.3035-1.2703-0.51325c-0.21854-0.08829-0.32785-0.13246-0.3683-0.22775-0.04045-0.09529 0.0037-0.20461 0.09201-0.42314l1.6595-4.1073c0.33362-0.82575 0.50047-1.2387 0.33474-1.3523-0.16582-0.11359-0.49058 0.19103-1.1403 0.8003l-4.7426 4.4469c-1.0274 0.96338-1.541 1.445-1.4405 1.9835 0.10054 0.53837 0.75347 0.80216 2.0594 1.3298l1.2703 0.51325c0.21854 0.08829 0.32785 0.13246 0.3683 0.22775 0.04045 0.09529-0.0037 0.20461-0.09201 0.42314l-1.6595 4.1073c-0.33365 0.82582-0.50047 1.2387-0.33475 1.3523 0.16582 0.1136 0.49059-0.19104 1.1403-0.80025l4.7425-4.4469c1.0275-0.96346 1.5411-1.4451 1.4406-1.9836-0.10057-0.53838-0.75352-0.80218-2.0594-1.3298z" clip-rule="evenodd" fill-rule="evenodd"/></svg>', Eh = '<svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">  <g>   <rect transform="scale(-1)" x="-15" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-36.25" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-57.5" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.3s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-78.75" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.5s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-100" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>  </g> </svg>', Sh = '<svg version="1.1" id="L7" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"  viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">   <path fill="#fff" d="M42.3,39.6c5.7-4.3,13.9-3.1,18.1,2.7c4.3,5.7,3.1,13.9-2.7,18.1l4.1,5.5c8.8-6.5,10.6-19,4.1-27.7  c-6.5-8.8-19-10.6-27.7-4.1L42.3,39.6z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="3s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path> <path fill="#fff" d="M82,35.7C74.1,18,53.4,10.1,35.7,18S10.1,46.6,18,64.3l7.6-3.4c-6-13.5,0-29.3,13.5-35.3s29.3,0,35.3,13.5  L82,35.7z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="2s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path>   <path fill="#fff" d="M31.6,3.5C5.9,13.6-6.6,42.7,3.5,68.4c10.1,25.7,39.2,38.3,64.9,28.1l-3.1-7.9c-21.3,8.4-45.4-2-53.8-23.3  c-8.4-21.3,2-45.4,23.3-53.8L31.6,3.5z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="1s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path></svg>', ie = 300, Si = 400, bh = `${Si}px`, Cr = `${ie}px`, Ch = "100%", Mh = "100%", qt = 30, Gt = 35, bi = 25, Mr = 25, Ci = bi + Mr, ge = 60, he = "normal", ce = 12, ji = "normal", de = "Avenir, Helvetica, Arial, sans-serif", As = "#141414", Os = "#666666", Is = "#cccccc", Ue = "#888888", me = "#cccccc", Pr = "25px", Ph = "position: relative;", _ = {
   COLOUR_BG: As,
   COLOUR_BORDER: Os,
   COLOUR_TXT: Is,
-  COLOUR_ICON: ze,
+  COLOUR_ICON: Ue,
   COLOUR_ICONHOVER: me,
   BORDER_THICKNESS: 0,
-  FONTWEIGHT: le,
+  FONTWEIGHT: he,
   FONTSIZE: ce,
   FONTSTYLE: ji,
   FONTFAMILY: de,
-  FONT: `${ji} ${ce}px ${le} ${de}`,
-  FONTSTRING: `font-style: ${ji}; font-size: ${ce}px; font-weight: ${le}; font-family: ${de};`
+  FONT: `${ji} ${ce}px ${he} ${de}`,
+  FONTSTRING: `font-style: ${ji}; font-size: ${ce}px; font-weight: ${he}; font-family: ${de};`
 }, gt = {
   fontSize: ce,
-  fontWeight: le,
+  fontWeight: he,
   fontFamily: de,
   paddingLeft: 3,
   paddingRight: 3,
@@ -3649,11 +3649,11 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   stroke: "#ffffff",
   fill: "#888888"
 }, Yt = {
-  COLOUR_ICON: ze,
+  COLOUR_ICON: Ue,
   COLOUR_ICONHOVER: me,
   ICONSIZE: Pr
 }, ue = {
-  COLOUR_ICON: ze,
+  COLOUR_ICON: Ue,
   COLOUR_ICONHOVER: me,
   ICONSIZE: Pr
 }, Zi = {
@@ -3664,7 +3664,7 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   COLOUR_BG: As,
   COLOUR_BORDER: Os,
   COLOUR_TXT: Is
-}, Cl = {
+}, Lh = {
   FILL: me + "88"
 }, j = {
   CANDLE_SOLID: "candle_solid",
@@ -3674,7 +3674,7 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   OHLC: "ohlc",
   AREA: "area",
   LINE: "line"
-}, hi = {
+}, li = {
   COLOUR_CANDLE_UP: "#00F04088",
   COLOUR_CANDLE_DN: "#F0004088",
   COLOUR_WICK_UP: "#0F4",
@@ -3683,29 +3683,29 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   COLOUR_VOLUME_UP: "#00F04044",
   COLOUR_VOLUME_DN: "#F0004044",
   ONCHART_VOLUME_HEIGHT: 15
-}, Un = le, mi = ce, pi = de, Tt = {
+}, zn = he, mi = ce, pi = de, Tt = {
   COLOUR_TICK: "#888",
   COLOUR_LABEL: "888",
   COLOUR_CURSOR: "#000",
   COLOUR_CURSOR_BG: "#CCC",
   FONTFAMILY: pi,
   FONTSIZE: mi,
-  FONTWEIGHT: Un,
-  FONT_LABEL: `${Un} ${mi}px ${pi}`,
+  FONTWEIGHT: zn,
+  FONT_LABEL: `${zn} ${mi}px ${pi}`,
   FONT_LABEL_BOLD: `bold ${mi}px ${pi}`
-}, zn = le, Wn = ce, Fn = de, Jt = {
+}, Un = he, Wn = ce, Fn = de, Jt = {
   COLOUR_TICK: "#888",
   COLOUR_LABEL: "888",
   COLOUR_CURSOR: "#000",
   COLOUR_CURSOR_BG: "#CCC",
   FONTFAMILY: Fn,
   FONTSIZE: Wn,
-  FONTWEIGHT: zn,
-  FONT_LABEL: `${zn} ${Wn}px ${Fn}`,
+  FONTWEIGHT: Un,
+  FONT_LABEL: `${Un} ${Wn}px ${Fn}`,
   FONT_LABEL_BOLD: `bold ${mi}px ${pi}`
 }, Lr = {
   COLOUR_GRID: "#333"
-}, Ml = {
+}, Ah = {
   width: 1,
   stroke: "#ccc",
   dash: [1, 1]
@@ -3716,20 +3716,20 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
 }, Vn = {
   ACTIVE: "#888888C0",
   IDLE: "#FFFFFF00"
-}, Pl = {
+}, Oh = {
   FONTSIZE: 50,
   FONTWEIGHT: "bold",
   FONTFAMILY: _.FONTFAMILY,
   COLOUR: "#181818",
   IMGWIDTH: "200",
   IMGHEIGHT: "200"
-}, Ji = { arrowDown: ll, arrowUp: cl, arrowDownRound: dl, arrowUpRound: ul, arrowDownRoundSolid: fl, arrowUpRoundSolid: gl, buySolid: ml, sellSolid: pl }, Gn = { noteSolid: yl, lightning: vl }, Ll = {
+}, Ji = { arrowDown: uh, arrowUp: fh, arrowDownRound: gh, arrowUpRound: mh, arrowDownRoundSolid: ph, arrowUpRoundSolid: vh, buySolid: yh, sellSolid: wh }, Gn = { noteSolid: xh, lightning: Th }, Ih = {
   candle: {
     Type: j.CANDLE_SOLID,
-    UpBodyColour: hi.COLOUR_CANDLE_UP,
-    UpWickColour: hi.COLOUR_WICK_UP,
-    DnBodyColour: hi.COLOUR_CANDLE_DN,
-    DnWickColour: hi.COLOUR_WICK_DN
+    UpBodyColour: li.COLOUR_CANDLE_UP,
+    UpWickColour: li.COLOUR_WICK_UP,
+    DnBodyColour: li.COLOUR_CANDLE_DN,
+    DnWickColour: li.COLOUR_WICK_DN
   },
   volume: {
     Height: gi.ONCHART_VOLUME_HEIGHT,
@@ -3747,7 +3747,7 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
     line: "#656565",
     slider: "#555555",
     handle: "#55555588",
-    icon: ze,
+    icon: Ue,
     iconHover: me
   },
   yAxis: {
@@ -3795,14 +3795,14 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
     controlsH: 18
   },
   icon: {
-    colour: ze,
+    colour: Ue,
     hover: me
   },
   divider: {
     active: Vn.ACTIVE,
     idle: Vn.IDLE
   },
-  watermark: Pl,
+  watermark: Oh,
   trades: {
     iconBuy: Ji.arrowUp,
     iconSell: Ji.arrowDown,
@@ -3823,7 +3823,7 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
     defaultIcons: Gn,
     offset: 10
   }
-}, Al = `
+}, kh = `
 <style title="txc_CSSVars">
   --txc-background: #141414:
   --txc-border-color: #888;
@@ -3834,16 +3834,16 @@ const Vh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   --txc-time-cursor-back: #ccc;
   --txc-time-icon-color: #888;
   --txc-time-icon-hover-color: #888;
-</style>`, Ol = `
+</style>`, Rh = `
 <style>
   tradex-chart {
     display: flex;
     width: var(--txc-width, 100%);
     height: var(--txc-height, 100%);
-    min-width: var(--txc-min-width, ${Tl});
+    min-width: var(--txc-min-width, ${bh});
     min-height: var(--txc-min-height, ${Cr});
-    max-width: var(--txc-max-width, ${El});
-    max-height: var(--txc-max-height, ${Sl});
+    max-width: var(--txc-max-width, ${Ch});
+    max-height: var(--txc-max-height, ${Mh});
     overflow: hidden;
     background: var(--txc-background, ${_.COLOUR_BG});
     font: var(--txc-font, ${_.FONT});
@@ -3897,7 +3897,7 @@ class xt {
   }
   setCurrent(e = {}) {
     e = E(e) ? e : {};
-    const i = rt(Ll), s = rt(e), n = He(i, s);
+    const i = rt(Ih), s = rt(e), n = He(i, s);
     for (let o in n)
       Yn.includes(o) || (this[o] = n[o]);
     this.#e.refresh();
@@ -3912,17 +3912,17 @@ class xt {
   setProperty(e, i) {
     if (!S(e))
       return;
-    const s = hn(this, e), n = e.split(".");
+    const s = ln(this, e), n = e.split(".");
     if (n.length == 1)
       this[n[0]] = i;
     else {
       let o = n.shift();
-      this[o] = yr(this[o], n.join("."), i);
+      this[o] = vr(this[o], n.join("."), i);
     }
     return this.#e.refresh(), s;
   }
   getProperty(e) {
-    return hn(this, e);
+    return ln(this, e);
   }
   deleteTheme(e) {
     return S(e) && xt.list.has(e) ? (xt.list.delete(e), !0) : !1;
@@ -3942,7 +3942,7 @@ class xt {
     return n;
   }
 }
-class Il {
+class Dh {
   #t;
   constructor(e) {
     this.#t = e, self.onmessage = (i) => this._onmessage(i.data);
@@ -3955,7 +3955,7 @@ class Il {
     self.close();
   }
 }
-class kl {
+class _h {
   #t;
   #e;
   #r;
@@ -3978,10 +3978,10 @@ class kl {
     return `r_${this.#n}`;
   }
   onmessage(e) {
-    return U(this.#e) ? this.#e(e) : e;
+    return z(this.#e) ? this.#e(e) : e;
   }
   onerror(e) {
-    return U(this.#r) ? this.#r(e) : e;
+    return z(this.#r) ? this.#r(e) : e;
   }
   postMessage(e) {
     return new Promise((i, s) => {
@@ -3990,8 +3990,8 @@ class kl {
         this.#i[n] = { resolve: i, reject: s }, this.#s.postMessage({ r: n, data: e }), this.#s.onmessage = (o) => {
           const { r: a, result: c } = o.data;
           if (a in this.#i) {
-            const { resolve: h, reject: g } = this.#i[a];
-            delete this.#i[a], h(this.onmessage(c));
+            const { resolve: l, reject: g } = this.#i[a];
+            delete this.#i[a], l(this.onmessage(c));
           }
         }, this.#s.onerror = (o) => {
           s(this.onerror(o));
@@ -4007,12 +4007,12 @@ class kl {
 }
 let Ar = class Ft {
   static #t = /* @__PURE__ */ new Map();
-  static ThreadWorker = Il;
-  static Thread = kl;
+  static ThreadWorker = Dh;
+  static Thread = _h;
   static create(e = "worker", i, s, n) {
     if (typeof window.Worker > "u")
       return !1;
-    if (U(i))
+    if (z(i))
       i = i.toString();
     else if (!S(i))
       return !1;
@@ -4113,7 +4113,7 @@ class Or {
     return pr(e);
   }
 }
-class yi extends Or {
+class vi extends Or {
   #t = 4;
   #e;
   #r = !0;
@@ -4227,7 +4227,7 @@ class yi extends Or {
       values: [],
       major: [],
       minor: []
-    }, s = vs(e.rangeDuration);
+    }, s = ys(e.rangeDuration);
     i.units = s;
     for (let p in s)
       if (s[p] > 0) {
@@ -4235,10 +4235,10 @@ class yi extends Or {
         break;
       }
     const n = e.interval, { xStep: o, rank: a } = this.xStep(e), c = this.pixel2T(this.width) + o;
-    let h = e.timeMin - e.timeMin % o - o, g = h;
-    for (; h < c; ) {
-      let p = ui(h, "years"), v = ui(h, "months"), M = ui(h, "days");
-      !(p in i.entries) && p >= g ? i.entries[p] = [this.dateTimeValue(p, n), this.t2Pixel(p), p, "major"] : !(v in i.entries) && v >= g ? i.entries[v] = [this.dateTimeValue(v, n), this.t2Pixel(v), v, "major"] : !(M in i.entries) && M >= g && (i.entries[M] = [this.dateTimeValue(M, n), this.t2Pixel(M), M, "major"]), i.entries[h] = [this.dateTimeValue(h, n), this.t2Pixel(h), h, "minor"], h += o;
+    let l = e.timeMin - e.timeMin % o - o, g = l;
+    for (; l < c; ) {
+      let p = ui(l, "years"), v = ui(l, "months"), M = ui(l, "days");
+      !(p in i.entries) && p >= g ? i.entries[p] = [this.dateTimeValue(p, n), this.t2Pixel(p), p, "major"] : !(v in i.entries) && v >= g ? i.entries[v] = [this.dateTimeValue(v, n), this.t2Pixel(v), v, "major"] : !(M in i.entries) && M >= g && (i.entries[M] = [this.dateTimeValue(M, n), this.t2Pixel(M), M, "major"]), i.entries[l] = [this.dateTimeValue(l, n), this.t2Pixel(l), l, "minor"], l += o;
     }
     return i.values = Object.values(i.entries), i;
   }
@@ -4370,7 +4370,7 @@ class Ir {
     return this.#t.hex;
   }
   #e(e) {
-    if (sh) {
+    if (sl) {
       let i = document.getElementById("divValidColourTest");
       i || (i = document.createElement("div"), i.id = "divValidColourTest"), i.style.backgroundColor = "", i.style.backgroundColor = e, this.#t.isValid = !!i.style.backgroundColor.length;
     } else
@@ -4431,16 +4431,16 @@ class Ir {
   #o(e) {
     this.#t.rgba = e, this.#m(e);
   }
-  #h(e) {
+  #l(e) {
     let { r: i, g: s, b: n, a: o } = this.#f(e);
     return i.length == 1 && (i = "0" + i), s.length == 1 && (s = "0" + s), n.length == 1 && (n = "0" + n), o.length == 1 && (o = "0" + o), this.value.r = i, this.value.g = s, this.value.b = n, this.value.a = o, this.setHex([i, s, n, o]), this;
   }
-  #l(e) {
+  #h(e) {
     let { r: i, g: s, b: n, a: o } = this.#f(e);
     i = parseInt(i, 16) / 255, s = parseInt(s, 16) / 255, n = parseInt(n, 16) / 255, o = parseInt(o, 16) / 255;
-    const a = Math.max(i, s, n), c = a - Math.min(i, s, n), h = c ? a === i ? (s - n) / c : a === s ? 2 + (n - i) / c : 4 + (i - s) / c : 0;
+    const a = Math.max(i, s, n), c = a - Math.min(i, s, n), l = c ? a === i ? (s - n) / c : a === s ? 2 + (n - i) / c : 4 + (i - s) / c : 0;
     let g = [
-      (60 * h < 0 ? 60 * h + 360 : 60 * h).toString(),
+      (60 * l < 0 ? 60 * l + 360 : 60 * l).toString(),
       (100 * (c ? a <= 0.5 ? c / (2 * a - c) : c / (2 - (2 * a - c)) : 0)).toString(),
       (100 * (2 * a - c) / 2).toString(),
       o.toString()
@@ -4455,8 +4455,8 @@ class Ir {
   #c(e, i, s) {
     s /= 100;
     const n = i * Math.min(s, 1 - s) / 100, o = (a) => {
-      const c = (a + e / 30) % 12, h = s - n * Math.max(Math.min(c - 3, 9 - c, 1), -1);
-      return Math.round(255 * h).toString(16).padStart(2, "0");
+      const c = (a + e / 30) % 12, l = s - n * Math.max(Math.min(c - 3, 9 - c, 1), -1);
+      return Math.round(255 * l).toString(16).padStart(2, "0");
     };
     return `#${o(0)}${o(8)}${o(4)}`;
   }
@@ -4496,8 +4496,8 @@ class Ir {
   #m(e) {
     let i, s, n = 0, o = [], a = [], c = e.replace(/\s/g, "").match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i);
     c.shift();
-    for (let h of c)
-      s = h.indexOf("%") > -1, i = parseFloat(h), n < 3 && s ? i = Math.round(255 * i / 100) : n == 3 && (!s && i >= 0 && i <= 1 ? i = Math.round(255 * i) : s && i >= 0 && i <= 100 ? i = Math.round(255 * i / 100) : i = ""), o[n] = (i | 256).toString(16).slice(1), a[n++] = i;
+    for (let l of c)
+      s = l.indexOf("%") > -1, i = parseFloat(l), n < 3 && s ? i = Math.round(255 * i / 100) : n == 3 && (!s && i >= 0 && i <= 1 ? i = Math.round(255 * i) : s && i >= 0 && i <= 100 ? i = Math.round(255 * i / 100) : i = ""), o[n] = (i | 256).toString(16).slice(1), a[n++] = i;
     this.setHex(o), this.setRGBA(a), this.#d(this.#t.hex);
   }
 }
@@ -4509,13 +4509,13 @@ class ks {
   #i;
   #s = { w: 0, h: 0 };
   #o = { w: 0, h: 0, x: 0, y: 0 };
-  #h = { x: !1, y: !0 };
-  #l;
+  #l = { x: !1, y: !0 };
+  #h;
   #a = { x: 0, drag: !1 };
   #c;
   #u;
   constructor(e) {
-    this.#e = ks.#t++, this.#r = e.core, this.#n = I.isElement(e.elContainer) ? e.elContainer : !1, this.#i = I.isElement(e.elHandle) ? e.elHandle : !1, this.#u = U(e.callback) ? e.callback : !1, I.isElement(this.#n) && I.isElement(this.#i) && (this.mount(), this.eventsListen());
+    this.#e = ks.#t++, this.#r = e.core, this.#n = I.isElement(e.elContainer) ? e.elContainer : !1, this.#i = I.isElement(e.elHandle) ? e.elHandle : !1, this.#u = z(e.callback) ? e.callback : !1, I.isElement(this.#n) && I.isElement(this.#i) && (this.mount(), this.eventsListen());
   }
   set cursor(e) {
     this.#i.style.cursor = e;
@@ -4557,8 +4557,8 @@ class ks {
     this.#s.w = this.#n.getBoundingClientRect().width, this.#s.h = this.#n.getBoundingClientRect().height, this.#n.style.overflow = "hidden", this.#o.w = this.#i.getBoundingClientRect().width, this.#o.h = this.#i.getBoundingClientRect().height, this.#i.style.marginRight = 0, this.#i.style.position = "absolute";
   }
   handlePos(e) {
-    let i = this.#r.range, s = parseInt(this.#i.style.marginLeft), n = this.#n.getBoundingClientRect().width, o = this.#i.getBoundingClientRect().width, a = n - o, c = e.position.x - this.#a.x, h = H(s + c, 0, a), g = (i.dataLength + i.limitFuture + i.limitPast) / n, p = Math.floor(h * g);
-    this.setHandleDims(h, o), this.#r.jumpToIndex(p);
+    let i = this.#r.range, s = parseInt(this.#i.style.marginLeft), n = this.#n.getBoundingClientRect().width, o = this.#i.getBoundingClientRect().width, a = n - o, c = e.position.x - this.#a.x, l = H(s + c, 0, a), g = (i.dataLength + i.limitFuture + i.limitPast) / n, p = Math.floor(l * g);
+    this.setHandleDims(l, o), this.#r.jumpToIndex(p);
   }
   setHandleDims(e, i) {
     let s = this.#n.getBoundingClientRect().width;
@@ -4616,7 +4616,7 @@ let Rr = class {
       );
   }
 };
-class Rl extends Rr {
+class Nh extends Rr {
   constructor(e = {}) {
     super(e), e.container.innerHTML = "", e.container.appendChild(this.scene.canvas), G.viewports.push(this);
   }
@@ -4624,7 +4624,7 @@ class Rl extends Rr {
     super.destroy(), this.container.innerHTML = "", G.viewports.splice(this.index, 1);
   }
 }
-class Dl {
+class $h {
   x = 0;
   y = 0;
   width = 0;
@@ -4675,7 +4675,7 @@ class Dl {
         n.splice(i, 1), n.unshift(this);
         break;
       case "order":
-        va(n, this.index, o);
+        ya(n, this.index, o);
         break;
     }
     return this;
@@ -4696,7 +4696,7 @@ class Dl {
     this.viewport.layers.splice(this.index, 1);
   }
 }
-class _l {
+class Hh {
   width = 0;
   height = 0;
   constructor(e) {
@@ -4729,7 +4729,7 @@ class _l {
     }).click() : i.click && i.click();
   }
 }
-class Nl {
+class Bh {
   width = 0;
   height = 0;
   constructor(e) {
@@ -4793,12 +4793,12 @@ const G = {
   viewports: [],
   pixelRatio: window && window.devicePixelRatio || 1,
   Node: Rr,
-  Viewport: Rl,
-  Layer: Dl,
-  Scene: _l,
-  Hit: Nl
+  Viewport: Nh,
+  Layer: $h,
+  Scene: Hh,
+  Hit: Bh
 }, We = G;
-class $l {
+class zh {
   #t;
   #e;
   #r;
@@ -4886,7 +4886,7 @@ class $l {
     this.#n.has(e) && (this.#n.get(e).layer.remove(), this.#n.delete(e));
   }
 }
-class vi extends Or {
+class yi extends Or {
   #t;
   #e;
   #r;
@@ -4924,8 +4924,8 @@ class vi extends Or {
       offset: 0
     }
   };
-  #h = 1.04;
-  #l = cn;
+  #l = 1.04;
+  #h = cn;
   #a = Ra;
   #c = 3;
   #u;
@@ -4952,10 +4952,10 @@ class vi extends Or {
     return this.yAxisCalcPrecision;
   }
   set yAxisPadding(e) {
-    this.#h = e;
+    this.#l = e;
   }
   get yAxisPadding() {
-    return this.#h;
+    return this.#l;
   }
   set yAxisType(e) {
     this.#i = ee.includes(e) ? e : ee[0];
@@ -4964,10 +4964,10 @@ class vi extends Or {
     return this.#i;
   }
   set yAxisStep(e) {
-    this.#l = T(e) ? e : cn;
+    this.#h = T(e) ? e : cn;
   }
   get yAxisStep() {
-    return this.#l;
+    return this.#h;
   }
   set yAxisTicks(e) {
     this.#c = T(e) ? e : 0;
@@ -5103,13 +5103,13 @@ class vi extends Or {
     let n, o, a;
     const c = [];
     o = e - i, o = this.rangeH > 0 ? this.rangeH : 1, a = o / (this.height / (this.core.theme.yAxis.fontSize * 1.75));
-    let h = Math.pow(10, Math.ceil(Math.log10(a)));
-    a < 0.25 * h ? h = 0.25 * h : a < 0.5 * h && (h = 0.5 * h);
-    var g = Math.ceil(i / h) * h, p = Math.floor(e / h) * h;
-    let v = this.height, M = (p - g) / h;
+    let l = Math.pow(10, Math.ceil(Math.log10(a)));
+    a < 0.25 * l ? l = 0.25 * l : a < 0.5 * l && (l = 0.5 * l);
+    var g = Math.ceil(i / l) * l, p = Math.floor(e / l) * l;
+    let v = this.height, M = (p - g) / l;
     this.height / M;
     let L = this.countDigits(M), k;
-    for (var N = g; N <= p; N += h)
+    for (var N = g; N <= p; N += l)
       n = this.countDigits(N), k = this.niceValue(n, s, L), v = this.yPos(k), c.push([k, v, n]);
     return c;
   }
@@ -5117,7 +5117,7 @@ class vi extends Or {
     if (e.integers) {
       let n = s.integers;
       if (n - 2 > 0) {
-        let o = ya(10, n - 2);
+        let o = va(10, n - 2);
         return Math.floor(e.value / o) * o;
       } else
         return i ? (n = n > 0 ? n : n * -1, an(e.value, n)) : Math.floor(e.value);
@@ -5146,13 +5146,13 @@ class V {
   #i;
   #s;
   #o;
-  #h;
   #l;
+  #h;
   #a;
   #c = !0;
   id;
   constructor(e, i = !1, s = !1, n, o, a = {}) {
-    this.#e = o.core, this.#t = o, this.#r = o.core.config, this.#o = e, this.#h = e.scene, this.#l = e.hit, this.#n = n, this.#i = i, this.#s = s, this.#a = a;
+    this.#e = o.core, this.#t = o, this.#r = o.core.config, this.#o = e, this.#l = e.scene, this.#h = e.hit, this.#n = n, this.#i = i, this.#s = s, this.#a = a;
   }
   get core() {
     return this.#e;
@@ -5170,10 +5170,10 @@ class V {
     return this.#a;
   }
   get scene() {
-    return this.#h;
+    return this.#l;
   }
   get hit() {
-    return this.#l;
+    return this.#h;
   }
   get theme() {
     return this.#n;
@@ -5214,13 +5214,13 @@ class V {
     this.core.emit(e, i);
   }
   getXAxis() {
-    return this.#i instanceof yi ? this.#i : this.core.Chart.time.xAxis instanceof yi ? this.core.Chart.time.xAxis : "time" in this.#t ? this.#t.time.xAxis : !1;
+    return this.#i instanceof vi ? this.#i : this.core.Chart.time.xAxis instanceof vi ? this.core.Chart.time.xAxis : "time" in this.#t ? this.#t.time.xAxis : !1;
   }
   getYAxis() {
-    return this.#s instanceof vi ? this.#s : this.chart.yAxis instanceof vi ? this.chart.yAxis : "scale" in this.#t ? this.#t.scale.yAxis : !1;
+    return this.#s instanceof yi ? this.#s : this.chart.yAxis instanceof yi ? this.chart.yAxis : "scale" in this.#t ? this.#t.scale.yAxis : !1;
   }
   contextIs() {
-    return !this.#i && !this.#s ? "chart" : this.#i instanceof yi ? "timeline" : this.#s instanceof vi ? "scale" : !1;
+    return !this.#i && !this.#s ? "chart" : this.#i instanceof vi ? "timeline" : this.#s instanceof yi ? "scale" : !1;
   }
 }
 class Mi extends V {
@@ -5292,7 +5292,7 @@ class ps extends V {
     o.strokeStyle = "#666", o.beginPath(), o.moveTo(n + a, 0), o.lineTo(n + a, this.scene.height), o.stroke(), this.chart.cursorActive && (o.beginPath(), o.moveTo(0, s), o.lineTo(this.scene.width, s), o.stroke()), o.restore();
   }
 }
-const Hl = [
+const Uh = [
   ["grid", { class: Mi, fixed: !0 }],
   ["cursor", { class: ps, fixed: !0 }]
 ];
@@ -5304,11 +5304,11 @@ class pe {
   #i;
   #s;
   #o;
-  #h;
   #l;
+  #h;
   #a;
   constructor(e, i, s, n = !1) {
-    this.#n = e, this.#t = e.core, this.#e = this.core.config, this.#r = this.core.theme, this.#o = this.#n.element, this.#l = i, this.createViewport(s, n);
+    this.#n = e, this.#t = e.core, this.#e = this.core.config, this.#r = this.core.theme, this.#o = this.#n.element, this.#h = i, this.createViewport(s, n);
   }
   get parent() {
     return this.#n;
@@ -5386,17 +5386,17 @@ class pe {
       a.layer.setSize(s, i);
   }
   createViewport(e = [], i = !1) {
-    e = e.length == 0 ? rt(Hl) : e;
+    e = e.length == 0 ? rt(Uh) : e;
     const { width: s, height: n } = this.layerConfig();
     let o = i ? We.Node : We.Viewport;
     this.#i = new o({
       width: s,
       height: n,
-      container: this.#l
-    }), this.#h = this.#i.scene.canvas, this.#s = new $l(this, e);
+      container: this.#h
+    }), this.#l = this.#i.scene.canvas, this.#s = new zh(this, e);
   }
   layerConfig() {
-    const e = this.config?.buffer || ki, i = this.#l.getBoundingClientRect().width, s = this.#l.getBoundingClientRect().height;
+    const e = this.config?.buffer || ki, i = this.#h.getBoundingClientRect().width, s = this.#h.getBoundingClientRect().height;
     this.layerWidth = Math.round(i * ((100 + e) * 0.01));
     const n = {
       width: this.layerWidth,
@@ -5418,13 +5418,13 @@ class pe {
     if (!(s instanceof mt))
       return !1;
     for (let [n, o] of s)
-      !E(o) || !U(o?.instance?.draw) || (o.instance.draw(), o.fixed || (o.instance.position = [this.#t.scrollPos, 0]));
+      !E(o) || !z(o?.instance?.draw) || (o.instance.draw(), o.fixed || (o.instance.position = [this.#t.scrollPos, 0]));
   }
   render() {
     this.#i.render();
   }
 }
-class Bl extends V {
+class Wh extends V {
   #t = [0, 0];
   #e;
   constructor(e, i = !1, s = !1, n, o, a) {
@@ -5438,13 +5438,13 @@ class Bl extends V {
     const i = this.scene.context, s = this.xAxis.xAxisGrads.values, n = 0, o = this.theme.xAxis, a = Q(o.tickMarker) ? o.tickMarker : !0;
     i.save(), i.strokeStyle = o.colourTick, i.fillStyle = o.colourTick, i.font = `${o.fontWeight} ${o.fontSize}px ${o.fontFamily}`;
     for (let c of s) {
-      let h = st(c[1]), g = Math.floor(i.measureText(`${c[0]}`).width * 0.5);
-      i.fillText(c[0], h - g + n, this.xAxis.xAxisTicks + 12), a && (i.beginPath(), i.moveTo(h + n, 0), i.lineTo(h + n, this.xAxis.xAxisTicks), i.stroke());
+      let l = st(c[1]), g = Math.floor(i.measureText(`${c[0]}`).width * 0.5);
+      i.fillText(c[0], l - g + n, this.xAxis.xAxisTicks + 12), a && (i.beginPath(), i.moveTo(l + n, 0), i.lineTo(l + n, this.xAxis.xAxisTicks), i.stroke());
     }
     i.restore();
   }
 }
-class Ul extends V {
+class Fh extends V {
   #t = [0, 0];
   #e;
   constructor(e, i = !1, s = !1, n, o, a) {
@@ -5477,12 +5477,12 @@ function _i(r) {
 function $r(r, e, i, s) {
   r.fillStyle = s?.colour, r.font = Ye(s?.fontSize, s?.fontWeight, s?.fontFamily), r.textAlign = s?.textAlign || "start", r.textBaseline = s?.textBaseLine || "alphabetic", r.direction = s?.direction || "inherit", r.lineWidth = s?.width, r.strokeStyle = s?.border, s?.stroke ? r.strokeText(s?.text, e, i, s?.max) : r.fillText(s?.text, e, i, s?.max);
 }
-function ye(r, e, i, s, n) {
+function ve(r, e, i, s, n) {
   r.save(), r.font = Ye(n?.fontSize, n?.fontWeight, n?.fontFamily), r.textBaseline = "top", r.fillStyle = n?.bakCol || gt.bakCol;
   let o = n?.width || Di(r, e, n), a = n?.height || _i(n);
   r.fillRect(i, s, o, a), r.fillStyle = n?.txtCol || gt.txtCol, i = i + n?.paddingLeft, s = s + n?.paddingTop, r.fillText(`${e}`, i, s), r.restore();
 }
-class zl extends V {
+class Vh extends V {
   #t = [0, 0];
   constructor(e, i = !1, s = !1, n, o) {
     i = o.time.xAxis, super(e, i, s, n, o), this.viewport = e.viewport;
@@ -5502,16 +5502,16 @@ class zl extends V {
       paddingBottom: 3,
       paddingLeft: 4,
       paddingRight: 4
-    }, h = Di(e, a, c), g = s + this.core.bufferPx;
-    g = this.xAxis.xPosSnap2CandlePos(g), g = g - Math.round(h * 0.5) - this.core.scrollPos - this.core.bufferPx, this.scene.clear(), e.save(), ye(e, a, g, 1, c), e.restore();
+    }, l = Di(e, a, c), g = s + this.core.bufferPx;
+    g = this.xAxis.xPosSnap2CandlePos(g), g = g - Math.round(l * 0.5) - this.core.scrollPos - this.core.bufferPx, this.scene.clear(), e.save(), ve(e, a, g, 1, c), e.restore();
   }
 }
-const Wl = [
-  ["labels", { class: Bl, fixed: !1, required: !0 }],
-  ["overlay", { class: Ul, fixed: !1, required: !0 }],
-  ["cursor", { class: zl, fixed: !1, required: !0 }]
+const Gh = [
+  ["labels", { class: Wh, fixed: !1, required: !0 }],
+  ["overlay", { class: Fh, fixed: !1, required: !0 }],
+  ["cursor", { class: Vh, fixed: !1, required: !0 }]
 ];
-class Fl {
+class Yh {
   #t;
   #e = "Timeline";
   #r = "time";
@@ -5519,8 +5519,8 @@ class Fl {
   #i;
   #s;
   #o;
-  #h;
   #l;
+  #h;
   #a;
   #c;
   #u;
@@ -5528,10 +5528,10 @@ class Fl {
   #f = [];
   #m;
   #w;
-  #y;
+  #v;
   #E;
   #p;
-  #v;
+  #y;
   #I;
   #g;
   #L;
@@ -5547,7 +5547,7 @@ class Fl {
   };
   #T = { end: !1, start: !1 };
   constructor(e, i) {
-    this.#s = e, this.#n = i, this.#i = i.elements.elTime, this.#o = e.Chart, this.#h = new yi(this, this.#o), this.init();
+    this.#s = e, this.#n = i, this.#i = i.elements.elTime, this.#o = e.Chart, this.#l = new vi(this, this.#o), this.init();
   }
   log(e) {
     this.#s.log(e);
@@ -5595,13 +5595,13 @@ class Fl {
     return this.#i.getBoundingClientRect().width;
   }
   get xAxis() {
-    return this.#h;
+    return this.#l;
   }
   get xAxisWidth() {
-    return this.#h.width;
+    return this.#l.width;
   }
   get xAxisRatio() {
-    return this.#h.xAxisRatio;
+    return this.#l.xAxisRatio;
   }
   get layerLabels() {
     return this.#I;
@@ -5610,13 +5610,13 @@ class Fl {
     return this.#g;
   }
   get xAxisGrads() {
-    return this.#h.xAxisGrads;
+    return this.#l.xAxisGrads;
   }
   get candleW() {
-    return this.#h.candleW;
+    return this.#l.candleW;
   }
   get candlesOnLayer() {
-    return this.#h.candlesOnLayer;
+    return this.#l.candlesOnLayer;
   }
   get theme() {
     return this.#s.theme;
@@ -5655,20 +5655,20 @@ class Fl {
     return this.#s.rangeScrollOffset;
   }
   set stateMachine(e) {
-    this.#l = new $t(e, this);
+    this.#h = new $t(e, this);
   }
   get stateMachine() {
-    return this.#l;
+    return this.#h;
   }
   get time() {
     return this;
   }
   init() {
     const e = this.#i;
-    this.#a = e.viewport, this.#c = e.overview, this.#w = e.overview.icons, this.#y = e.overview.scrollBar, this.#E = e.overview.handle, this.#p = e.overview.rwdStart, this.#v = e.overview.fwdEnd;
+    this.#a = e.viewport, this.#c = e.overview, this.#w = e.overview.icons, this.#v = e.overview.scrollBar, this.#E = e.overview.handle, this.#p = e.overview.rwdStart, this.#y = e.overview.fwdEnd;
     const i = {
       core: this.#s,
-      elContainer: this.#y,
+      elContainer: this.#v,
       elHandle: this.#E,
       callback: null
     };
@@ -5683,20 +5683,20 @@ class Fl {
   }
   navigationDisplay(e) {
     if (e)
-      this.#v.style["margin-top"] = 0, this.#p.style["margin-top"] = 0;
+      this.#y.style["margin-top"] = 0, this.#p.style["margin-top"] = 0;
     else {
       const i = this.core.theme.xAxis?.background ? this.core.theme.xAxis.Background : this.core.theme.chart.Background;
-      this.#c.style.visibility = "hidden", this.#v.style["margin-top"] = `${this.#a.clientHeight * -1}px`, this.#p.style["margin-top"] = `${this.#a.clientHeight * -1}px`, this.#v.style.background = this.core.theme.chart.Background, this.#p.style.background = i;
+      this.#c.style.visibility = "hidden", this.#y.style["margin-top"] = `${this.#a.clientHeight * -1}px`, this.#p.style["margin-top"] = `${this.#a.clientHeight * -1}px`, this.#y.style.background = this.core.theme.chart.Background, this.#p.style.background = i;
     }
   }
   start() {
-    this.createGraph(), this.onSetRange(), this.#h.initXAxisGrads(), this.draw(), this.eventsListen(), ts.id = this.id, ts.context = this, this.stateMachine = ts, this.stateMachine.start();
+    this.createGraph(), this.onSetRange(), this.#l.initXAxisGrads(), this.draw(), this.eventsListen(), ts.id = this.id, ts.context = this, this.stateMachine = ts, this.stateMachine.start();
   }
   destroy() {
-    this.stateMachine.destroy(), this.#M.destroy(), this.#O.destroy(), this.#x.destroy(), this.off("main_mousemove", this.drawCursorTime), this.off("setRange", this.onSetRange), this.#v.removeEventListener("click", ft), this.#p.removeEventListener("click", ft), this.#u.destroy(), this.element.remove();
+    this.stateMachine.destroy(), this.#M.destroy(), this.#O.destroy(), this.#x.destroy(), this.off("main_mousemove", this.drawCursorTime), this.off("setRange", this.onSetRange), this.#y.removeEventListener("click", ft), this.#p.removeEventListener("click", ft), this.#u.destroy(), this.element.remove();
   }
   eventsListen() {
-    this.#M = new At(this.#a, { disableContextMenu: !1 }), this.#M.on("dblclick", this.onDoubleClick.bind(this)), this.#M.on("pointerover", this.onPointerEnter.bind(this)), this.#M.on("pointerout", this.onPointerLeave.bind(this)), this.#M.on("pointerdrag", this.onPointerDrag.bind(this)), this.#O = new At(this.#v, { disableContextMenu: !1 }), this.#O.on("pointerover", () => this.showJump(this.#T.end)), this.#O.on("pointerleave", () => this.hideJump(this.#T.end)), this.#x = new At(this.#p, { disableContextMenu: !1 }), this.#x.on("pointerover", () => this.showJump(this.#T.start)), this.#x.on("pointerleave", () => this.hideJump(this.#T.start)), this.on("main_mousemove", this.#L.draw, this.#L), this.on("setRange", this.onSetRange, this), this.#v.addEventListener("click", ft(this.onMouseClick, 1e3, this, !0)), this.#p.addEventListener("click", ft(this.onMouseClick, 1e3, this, !0));
+    this.#M = new At(this.#a, { disableContextMenu: !1 }), this.#M.on("dblclick", this.onDoubleClick.bind(this)), this.#M.on("pointerover", this.onPointerEnter.bind(this)), this.#M.on("pointerout", this.onPointerLeave.bind(this)), this.#M.on("pointerdrag", this.onPointerDrag.bind(this)), this.#O = new At(this.#y, { disableContextMenu: !1 }), this.#O.on("pointerover", () => this.showJump(this.#T.end)), this.#O.on("pointerleave", () => this.hideJump(this.#T.end)), this.#x = new At(this.#p, { disableContextMenu: !1 }), this.#x.on("pointerover", () => this.showJump(this.#T.start)), this.#x.on("pointerleave", () => this.hideJump(this.#T.start)), this.on("main_mousemove", this.#L.draw, this.#L), this.on("setRange", this.onSetRange, this), this.#y.addEventListener("click", ft(this.onMouseClick, 1e3, this, !0)), this.#p.addEventListener("click", ft(this.onMouseClick, 1e3, this, !0));
   }
   on(e, i, s) {
     this.#s.on(e, i, s);
@@ -5739,29 +5739,29 @@ class Fl {
   onSetRange() {
     let e = this.range, i = e.indexStart;
     e.indexEnd;
-    let s = this.#y.getBoundingClientRect().width, n = e.dataLength + e.limitFuture + e.limitPast, o = s / n, a = e.Length * o, c = (i + e.limitPast) * o;
+    let s = this.#v.getBoundingClientRect().width, n = e.dataLength + e.limitFuture + e.limitPast, o = s / n, a = e.Length * o, c = (i + e.limitPast) * o;
     this.#A.setHandleDims(c, a);
   }
   t2Index(e) {
-    return this.#h.t2Index(e);
+    return this.#l.t2Index(e);
   }
   xPos(e) {
-    return this.#h.xPos(e);
+    return this.#l.xPos(e);
   }
   xPosSnap2CandlePos(e) {
-    return this.#h.xPosSnap2CandlePos(e);
+    return this.#l.xPosSnap2CandlePos(e);
   }
   xPos2Time(e) {
-    return this.#h.xPos2Time(e);
+    return this.#l.xPos2Time(e);
   }
   xPos2Index(e) {
-    return this.#h.xPos2Index(e);
+    return this.#l.xPos2Index(e);
   }
   xPosOHLCV(e) {
-    return this.#h.xPosOHLCV(e);
+    return this.#l.xPosOHLCV(e);
   }
   createGraph() {
-    let e = rt(Wl);
+    let e = rt(Gh);
     this.#u = new pe(this, this.#a, e, !1), this.#L = this.graph.overlays.get("cursor").instance, this.#I = this.graph.overlays.get("labels").instance, this.#g = this.graph.overlays.get("overlay").instance, this.graph.addOverlays(this.#f);
   }
   addOverlays(e) {
@@ -5796,7 +5796,7 @@ class Fl {
     this.#c.style.visibility = "visible", this.hideCursorTime();
   }
 }
-const Vl = {
+const qh = {
   renderQ: new mt(),
   rendered: [],
   renderLog: !1,
@@ -5832,13 +5832,13 @@ const Vl = {
     const [r, e] = this.renderQ.firstEntry();
     if (e.range?.snapshot) {
       for (let i of e.graphs)
-        U(i.draw) && i.draw(e.range, e.update);
+        z(i.draw) && i.draw(e.range, e.update);
       for (let i of e.graphs)
-        U(i.render) && i.render();
+        z(i.render) && i.render();
       this.frameDone();
     }
   }
-}, li = Vl, Qn = [
+}, hi = qh, Qn = [
   "-webkit-touch-callout",
   "-webkit-user-select",
   "-khtml-user-select",
@@ -5846,7 +5846,7 @@ const Vl = {
   "-ms-user-select",
   "user-select"
 ];
-class Gl {
+class Xh {
   #t;
   #e;
   #r;
@@ -5854,8 +5854,8 @@ class Gl {
   #i;
   #s;
   #o;
-  #h = [];
-  #l;
+  #l = [];
+  #h;
   #a = {};
   #c;
   #u;
@@ -5889,7 +5889,7 @@ class Gl {
     this.#s = e.querySelector(".controls"), this.#o = e.querySelectorAll(".control"), this.#c = e.querySelector("#showLegends"), this.#u = e.querySelector("#hideLegends"), this.#s.style.display = "none", this.icons(this.#o, { id: "collapse", parent: this }), this.#t.legends.classList.add("hide"), this.#d = "hide", this.collapse = "show";
   }
   onMouseClick(e) {
-    const i = (s) => S(s.dataset.icon) ? { id: s.id, icon: s.dataset.icon } : s.parentElement.className !== "controls" ? i(s.parentElement) : !1;
+    const i = (s) => S(s.dataset.icon) ? { id: s.id, icon: s.dataset.icon, parent: s.parentElement } : s.parentElement.className !== "controls" ? i(s.parentElement) : !1;
     return i(e);
   }
   onMouseOver(e) {
@@ -5919,12 +5919,12 @@ class Gl {
     const s = this.elTarget.buildLegend(e, this.#r.theme);
     this.#t.legends.insertAdjacentHTML("beforeend", s);
     const n = this.#t.legends.querySelector(`#legend_${e.id}`);
-    return this.#l = n.querySelectorAll(".control"), this.#a[e.id] = {
+    return this.#h = n.querySelectorAll(".control"), this.#a[e.id] = {
       el: n,
       type: e.type,
       source: e?.source,
       click: []
-    }, this.icons(this.#l, e), e.type == "indicator" && (this.#s.style.display = "block", !e.parent.primaryPane && Object.keys(this.#a).length < 3 && (this.#s.style.display = "none")), e.id;
+    }, this.icons(this.#h, e), e.type == "indicator" && (this.#s.style.display = "block", !e.parent.primaryPane && Object.keys(this.#a).length < 3 && (this.#s.style.display = "none")), e.id;
   }
   remove(e) {
     if (!(e in this.#a) || this.#a[e].type === "chart")
@@ -5945,7 +5945,7 @@ class Gl {
     let s;
     for (let n of e) {
       let o = n.querySelector("svg");
-      o.style.width = `${this.#n.controlsW}px`, o.style.height = `${this.#n.controlsH}px`, o.style.fill = `${this.#n.controlsColour}`, o.onpointerover = (a) => a.currentTarget.style.fill = this.#n.controlsOver, o.onpointerout = (a) => a.currentTarget.style.fill = this.#n.controlsColour, s = i.parent.onLegendAction.bind(i.parent), i.id === "collapse" ? this.#h.push({ el: n, click: s }) : this.#a[i.id].click.push({ el: n, click: s }), n.addEventListener("click", s);
+      o.style.width = `${this.#n.controlsW}px`, o.style.height = `${this.#n.controlsH}px`, o.style.fill = `${this.#n.controlsColour}`, o.onpointerover = (a) => a.currentTarget.style.fill = this.#n.controlsOver, o.onpointerout = (a) => a.currentTarget.style.fill = this.#n.controlsColour, s = i.parent.onLegendAction.bind(i.parent), i.id === "collapse" ? this.#l.push({ el: n, click: s }) : this.#a[i.id].click.push({ el: n, click: s }), n.addEventListener("click", s);
     }
   }
 }
@@ -6042,7 +6042,7 @@ const es = {
       return !0;
     }
   }
-}, Yl = {
+}, jh = {
   id: "scale",
   initial: "idle",
   context: {},
@@ -6124,7 +6124,7 @@ const es = {
     }
   }
 };
-class ql extends V {
+class Zh extends V {
   #t = [0, 0];
   constructor(e, i, s, n, o, a) {
     o = s, s = s.yAxis, super(e, i, s, n, o, a), this.viewport = e.viewport;
@@ -6148,14 +6148,14 @@ class ql extends V {
       paddingRight: 3,
       width: this.viewport.width
     }, a = o.fontSize + o.paddingTop + o.paddingBottom, c = i - a * 0.5;
-    const h = this.scene.context;
-    this.scene.clear(), h.save(), h.fillStyle = o.bakCol, h.fillRect(1, c, this.width, a), ye(h, `${n}`, 1, c, o), h.restore();
+    const l = this.scene.context;
+    this.scene.clear(), l.save(), l.fillStyle = o.bakCol, l.fillRect(1, c, this.width, a), ve(l, `${n}`, 1, c, o), l.restore();
   }
   erase() {
     this.scene.clear(), this.target.viewport.render();
   }
 }
-class Xl extends V {
+class Kh extends V {
   constructor(e, i, s, n, o, a) {
     o = s, s = s.yAxis, super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
@@ -6175,12 +6175,12 @@ class Xl extends V {
         break;
     }
     this.scene.clear(), e.save(), e.strokeStyle = n.colourTick, e.fillStyle = n.colourTick, e.font = `${n.fontWeight} ${n.fontSize}px ${n.fontFamily}`;
-    for (let h of s)
-      c = i.$2Pixel(h[0]), e.fillText(h[0], i.yAxisTicks + 5, c + n.fontSize * 0.3), o && (e.beginPath(), e.moveTo(a[0], c), e.lineTo(a[1], c), e.stroke());
+    for (let l of s)
+      c = i.$2Pixel(l[0]), e.fillText(l[0], i.yAxisTicks + 5, c + n.fontSize * 0.3), o && (e.beginPath(), e.moveTo(a[0], c), e.lineTo(a[1], c), e.stroke());
     e.restore();
   }
 }
-class jl extends V {
+class Qh extends V {
   constructor(e, i, s, n, o, a) {
     o = s, s = s.yAxis, super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
@@ -6192,7 +6192,7 @@ class jl extends V {
     this.yAxis.yAxis, this.scene.clear(), e.save(), e.restore();
   }
 }
-class Zl extends V {
+class Jh extends V {
   constructor(e, i, s, n, o, a) {
     o = s, s = s.yAxis, super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
@@ -6202,7 +6202,7 @@ class Zl extends V {
   draw(e) {
     if (e === void 0)
       return;
-    const i = this.scene.context, s = this.core.stream instanceof he && this.config.stream.tfCountDown;
+    const i = this.scene.context, s = this.core.stream instanceof le && this.config.stream.tfCountDown;
     let n = e[4], o = this.parent.nicePrice(n), a = {
       fontSize: Tt.FONTSIZE * 1.05,
       fontWeight: Tt.FONTWEIGHT,
@@ -6214,17 +6214,17 @@ class Zl extends V {
       paddingLeft: 5,
       paddingRight: 3,
       width: this.viewport.width
-    }, c = 0, h = _i(a), g = this.parent.yPos(n) - h * 0.5;
-    this.scene.clear(), i.save(), e[4] >= e[1] ? a.bakCol = this.theme.candle.UpBodyColour : a.bakCol = this.theme.candle.DnBodyColour, ye(i, o, c, g, a), s && (o = this.core.stream.countDownUpdate(), a.fontSize = a?.fontSize / 1.1, ye(i, o, c, g + h, a)), i.restore(), this.viewport.render();
+    }, c = 0, l = _i(a), g = this.parent.yPos(n) - l * 0.5;
+    this.scene.clear(), i.save(), e[4] >= e[1] ? a.bakCol = this.theme.candle.UpBodyColour : a.bakCol = this.theme.candle.DnBodyColour, ve(i, o, c, g, a), s && (o = this.core.stream.countDownUpdate(), a.fontSize = a?.fontSize / 1.1, ve(i, o, c, g + l, a)), i.restore(), this.viewport.render();
   }
 }
-const Kl = [
-  ["labels", { class: Xl, fixed: !0, required: !0 }],
-  ["overlay", { class: jl, fixed: !0, required: !0 }],
-  ["price", { class: Zl, fixed: !0, required: !0 }],
-  ["cursor", { class: ql, fixed: !0, required: !0 }]
+const tc = [
+  ["labels", { class: Kh, fixed: !0, required: !0 }],
+  ["overlay", { class: Qh, fixed: !0, required: !0 }],
+  ["price", { class: Jh, fixed: !0, required: !0 }],
+  ["cursor", { class: Zh, fixed: !0, required: !0 }]
 ];
-class Ql {
+class ec {
   #t;
   #e = "Y Scale Axis";
   #r = "scale";
@@ -6232,8 +6232,8 @@ class Ql {
   #i;
   #s;
   #o;
-  #h;
   #l;
+  #h;
   #a;
   #c;
   #u;
@@ -6241,15 +6241,15 @@ class Ql {
   #f;
   #m;
   #w;
-  #y = new mt();
+  #v = new mt();
   #E = [];
   #p;
-  #v;
+  #y;
   #I;
   #g;
   #L = {};
   constructor(e, i) {
-    this.#n = e, this.#i = { ...i }, this.#c = this.#i.elScale, this.#h = this.#i.chart, this.#s = this.#i.parent, this.id = `${this.#s.id}_scale`, this.init();
+    this.#n = e, this.#i = { ...i }, this.#c = this.#i.elScale, this.#l = this.#i.chart, this.#s = this.#i.parent, this.id = `${this.#s.id}_scale`, this.init();
   }
   log(e) {
     this.#n.log(e);
@@ -6382,19 +6382,19 @@ class Ql {
   }
   start() {
     const e = this.#s.name == "Chart" ? void 0 : this.#s.localRange;
-    this.#a = new vi(this, this, this.options.yAxisType, e), this.createGraph(), this.#a.calcGradations(), this.draw(), this.eventsListen();
-    const i = rt(Yl);
+    this.#a = new yi(this, this, this.options.yAxisType, e), this.createGraph(), this.#a.calcGradations(), this.draw(), this.eventsListen();
+    const i = rt(jh);
     i.id = this.id, i.context = this, this.stateMachine = i, this.stateMachine.start();
   }
   restart() {
     this.#a.setRange(this.#n.range), this.draw();
   }
   destroy() {
-    this.stateMachine.destroy(), this.#p.destroy(), this.#v.destroy(), this.off(`${this.#s.id}_mousemove`, this.onMouseMove), this.off(`${this.#s.id}_mouseout`, this.#w.erase), this.off(Lt, this.onStreamUpdate), this.element.remove();
+    this.stateMachine.destroy(), this.#p.destroy(), this.#y.destroy(), this.off(`${this.#s.id}_mousemove`, this.onMouseMove), this.off(`${this.#s.id}_mouseout`, this.#w.erase), this.off(Lt, this.onStreamUpdate), this.element.remove();
   }
   eventsListen() {
     let e = this.#p.viewport.scene.canvas;
-    this.#v = new At(e, { disableContextMenu: !1 }), this.#v.setCursor("ns-resize"), this.#v.on("pointerdrag", this.onDrag.bind(this)), this.#v.on("pointerdragend", this.onDragDone.bind(this)), this.#v.on("wheel", this.onMouseWheel.bind(this)), this.#v.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.#s.id}_mousemove`, this.onMouseMove, this), this.on(`${this.#s.id}_mouseout`, this.#w.erase, this.#w), this.on(Lt, this.#m.draw, this.#m);
+    this.#y = new At(e, { disableContextMenu: !1 }), this.#y.setCursor("ns-resize"), this.#y.on("pointerdrag", this.onDrag.bind(this)), this.#y.on("pointerdragend", this.onDragDone.bind(this)), this.#y.on("wheel", this.onMouseWheel.bind(this)), this.#y.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.#s.id}_mousemove`, this.onMouseMove, this), this.on(`${this.#s.id}_mouseout`, this.#w.erase, this.#w), this.on(Lt, this.#m.draw, this.#m);
   }
   on(e, i, s) {
     this.core.on(e, i, s);
@@ -6458,7 +6458,7 @@ class Ql {
     return this.#a.limitPrecision(i);
   }
   createGraph() {
-    let e = rt(Kl);
+    let e = rt(tc);
     this.graph = new pe(this, this.#u, e, !1), this.#w = this.graph.overlays.get("cursor").instance, this.#d = this.graph.overlays.get("labels").instance, this.#f = this.graph.overlays.get("overlay").instance, this.#m = this.graph.overlays.get("price").instance, this.graph.addOverlays(this.#E), this.#m.target.moveTop(), this.#w.target.moveTop();
   }
   addOverlays(e) {
@@ -6486,7 +6486,7 @@ class Ql {
     this.setDimensions({ w: e, h: i });
   }
 }
-class Jl {
+class ic {
   constructor(e, i) {
     this.scene = e, this.ctx = this.scene.context, this.width = this.scene.width, this.cfg = i;
   }
@@ -6500,11 +6500,11 @@ class Jl {
     ), i.restore();
   }
 }
-class tc extends V {
+class sc extends V {
   #t;
   #e;
   constructor(e, i = !1, s = !1, n, o, a) {
-    super(e, i, s, n, o, a), this.#t = new Jl(e.scene, n), this.theme.volume.Height = H(n?.volume?.Height, 0, 100) || 100;
+    super(e, i, s, n, o, a), this.#t = new ic(e.scene, n), this.theme.volume.Height = H(n?.volume?.Height, 0, 100) || 100;
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
@@ -6519,7 +6519,7 @@ class tc extends V {
       w: o,
       z: s
     }, c = Math.floor(s * this.theme.volume.Height / 100);
-    let h = this.core.rangeScrollOffset, g = e.indexStart - h, p = e.Length + h * 2, v = p, M = g, L, k = 0;
+    let l = this.core.rangeScrollOffset, g = e.indexStart - l, p = e.Length + l * 2, v = p, M = g, L, k = 0;
     for (; v--; )
       L = e.value(M), L[4] !== null && (k = L[5] > k ? L[5] : k), M++;
     for (; p--; )
@@ -6549,7 +6549,7 @@ class Hr {
     }
     let a = Math.max(e.w - 1, 1);
     a < 3 ? a = 1 : a < 5 ? a = 3 : a > 5 && (a = Math.ceil(a * 0.8));
-    let c = Math.max(Math.floor(a * 0.5), 1), h = Math.abs(e.o - e.c), g = e.c === e.o ? 1 : 2, p = e.x, v = Math.floor(p) - 0.5;
+    let c = Math.max(Math.floor(a * 0.5), 1), l = Math.abs(e.o - e.c), g = e.c === e.o ? 1 : 2, p = e.x, v = Math.floor(p) - 0.5;
     if (i.save(), i.strokeStyle = o, i.beginPath(), i.moveTo(v, Math.floor(e.h)), this.cfg.candle.Type === j.OHLC ? i.lineTo(v, Math.floor(e.l)) : s ? (i.lineTo(v, Math.floor(e.c)), i.moveTo(v, Math.floor(e.o))) : (i.lineTo(v, Math.floor(e.o)), i.moveTo(v, Math.floor(e.c))), i.lineTo(v, Math.floor(e.l)), i.stroke(), a == 3) {
       i.fillStyle = o;
       let M = s ? 1 : -1;
@@ -6557,7 +6557,7 @@ class Hr {
         Math.floor(p - c),
         e.c,
         Math.floor(c * 2),
-        M * Math.max(h, g)
+        M * Math.max(l, g)
       ), i.fill(), i.stroke();
     } else if (a > 3 && this.fill) {
       i.fillStyle = n;
@@ -6566,7 +6566,7 @@ class Hr {
         Math.floor(p - c),
         e.c,
         Math.floor(c * 2),
-        M * Math.max(h, g)
+        M * Math.max(l, g)
       ), i.fill(), i.stroke();
     } else if (a > 3 && !this.fill && this.cfg.candle.Type !== j.OHLC) {
       let M = s ? 1 : -1;
@@ -6574,7 +6574,7 @@ class Hr {
         Math.floor(p - c),
         e.c,
         Math.floor(c * 2),
-        M * Math.max(h, g)
+        M * Math.max(l, g)
       ), i.stroke();
     } else
       this.cfg.candle.Type === j.OHLC ? (i.beginPath(), i.moveTo(v - c, e.o), i.lineTo(v, e.o), i.moveTo(v, e.c), i.lineTo(v + c, e.c), i.stroke()) : (i.strokeStyle = o, i.beginPath(), i.moveTo(
@@ -6604,8 +6604,8 @@ class Hr {
       i.lineTo(e[a].x, e[a].h), a++;
     if (s?.Type == "area") {
       if (n = i.createLinearGradient(0, 0, 0, this.scene.height), P(s.AreaFillColour))
-        for (let [c, h] of s.AreaFillColour.entries())
-          n.addColorStop(c, h);
+        for (let [c, l] of s.AreaFillColour.entries())
+          n.addColorStop(c, l);
       else
         S() ? n = s.AreaFillColour : n = s.UpBodyColour || s.DnBodyColour;
       i.stroke(), i.lineTo(e[a - 1].x, this.scene.height), i.lineTo(o[0], this.scene.height), i.fillStyle = n, i.closePath(), i.fill();
@@ -6642,8 +6642,8 @@ class Br extends V {
       x: (this.xAxis.smoothScrollOffset || 0) - this.xAxis.candleW,
       w: this.xAxis.candleW
     };
-    let a = this.core.rangeScrollOffset, c = e.indexStart - a, h = e.Length + a * 2, g;
-    for (this.core.stream && (this.core.stream.lastPriceMax = e.valueMax, this.core.stream.lastPriceMin = e.valueMin); h; ) {
+    let a = this.core.rangeScrollOffset, c = e.indexStart - a, l = e.Length + a * 2, g;
+    for (this.core.stream && (this.core.stream.lastPriceMax = e.valueMax, this.core.stream.lastPriceMin = e.valueMin); l; ) {
       if (g = e.value(c), o.x = this.xAxis.xPos(g[0]), g?.[7]) {
         this.core.stream.lastXPos = o.x, this.core.stream.lastYPos = {
           o: o.o,
@@ -6653,21 +6653,21 @@ class Br extends V {
         };
         break;
       }
-      g[4] !== null && (o.o = this.yAxis.yPos(g[1]), o.h = this.yAxis.yPos(g[2]), o.l = this.yAxis.yPos(g[3]), o.c = this.yAxis.yPos(g[4]), o.raw = g, i(o)), c++, h--;
+      g[4] !== null && (o.o = this.yAxis.yPos(g[1]), o.h = this.yAxis.yPos(g[2]), o.l = this.yAxis.yPos(g[3]), o.c = this.yAxis.yPos(g[4]), o.raw = g, i(o)), c++, l--;
     }
     (s === j.AREA || s === j.LINE) && this.#t.areaRender();
   }
 }
-function Ur(r, e, i, s, n, o) {
+function zr(r, e, i, s, n, o) {
   r.lineWidth = o?.width || gt.borderWidth, r.strokeStyle = o?.border || gt.stroke, r.beginPath(), r.rect(e, i, s, n), r.stroke();
 }
 function Rs(r, e, i, s, n, o) {
   r.fillStyle = o?.fill || gt.fill, r.fillRect(e, i, s, n);
 }
-function ec(r, e, i, s, n, o) {
-  S(o.fill) && Rs(r, e, i, s, n, o), T(o.width) && o.width > 0 && Ur(r, e, i, s, n, o);
+function nc(r, e, i, s, n, o) {
+  S(o.fill) && Rs(r, e, i, s, n, o), T(o.width) && o.width > 0 && zr(r, e, i, s, n, o);
 }
-function zr(r, e, i, s, n, o, a) {
+function Ur(r, e, i, s, n, o, a) {
   r.lineWidth = a?.width || gt.borderWidth, r.strokeStyle = a?.border || gt.stroke, Fr(r, e, i, s, n, o), r.stroke();
 }
 function Wr(r, e, i, s, n, o, a) {
@@ -6676,51 +6676,51 @@ function Wr(r, e, i, s, n, o, a) {
 function Fr(r, e, i, s, n, o) {
   r.beginPath(), r.moveTo(e + o, i), r.arcTo(e + s, i, e + s, i + n, o), r.arcTo(e + s, i + n, e, i + n, o), r.arcTo(e, i + n, e, i, o), r.arcTo(e, i, e + s, i, o), r.closePath();
 }
-function ic(r, e, i, s, n, o, a) {
-  S(a.fill) && Wr(r, e, i, s, n, o, a?.fill), T(a.width) && a.width > 0 && zr(r, e, i, s, n, o, a?.border, a?.width);
+function rc(r, e, i, s, n, o, a) {
+  S(a.fill) && Wr(r, e, i, s, n, o, a?.fill), T(a.width) && a.width > 0 && Ur(r, e, i, s, n, o, a?.border, a?.width);
 }
 function Vr(r, e, i, s, n, o, a) {
   if (!(n < 3)) {
     var c = Math.PI * 2 / n;
     r.beginPath(), r.translate(e, i), r.rotate(o * Math.PI / 180), r.moveTo(s, 0);
-    for (var h = 1; h < n; h++)
-      r.lineTo(s * Math.cos(c * h), s * Math.sin(c * h));
-    r.closePath(), ve(r, a?.fill, a?.stroke, a?.width);
+    for (var l = 1; l < n; l++)
+      r.lineTo(s * Math.cos(c * l), s * Math.sin(c * l));
+    r.closePath(), ye(r, a?.fill, a?.stroke, a?.width);
   }
 }
-function sc(r, e, i) {
+function oc(r, e, i) {
   if (e.length > 0) {
     r.beginPath();
     var s = e[0];
     r.moveTo(s.x, s.y);
     for (var n = 1; n < e.length; ++n)
       s = e[n], r.lineTo(s.x, s.y);
-    r.closePath(), ve(r, i?.fill, i?.stroke, i?.width);
+    r.closePath(), ye(r, i?.fill, i?.stroke, i?.width);
   }
 }
-function nc(r, e, i, s, n) {
-  Vr(r, e, i, s, 3, n?.rotate || 0, n), ve(r, n?.fill, n?.stroke, n?.width);
+function ac(r, e, i, s, n) {
+  Vr(r, e, i, s, 3, n?.rotate || 0, n), ye(r, n?.fill, n?.stroke, n?.width);
 }
-function rc(r, e, i, s, n, o) {
-  r.beginPath(), r.moveTo(e - s / 2, i), r.lineTo(e, i - n / 2), r.lineTo(e + s / 2, i), r.lineTo(e, i + n / 2), r.closePath(), ve(r, o?.fill, o?.stroke, o?.width);
+function lc(r, e, i, s, n, o) {
+  r.beginPath(), r.moveTo(e - s / 2, i), r.lineTo(e, i - n / 2), r.lineTo(e + s / 2, i), r.lineTo(e, i + n / 2), r.closePath(), ye(r, o?.fill, o?.stroke, o?.width);
 }
-function oc(r, e, i, s, n) {
+function hc(r, e, i, s, n) {
   r.beginPath(), r.arc(e, i, s, 0, Math.PI * 2), r.closePath(), fillStroke(r, n?.fill, n?.stroke, n?.width);
 }
-function ac(r) {
+function cc(r) {
   return r.ownerDocument && r.ownerDocument.defaultView && r.ownerDocument.defaultView.devicePixelRatio || 2;
 }
-function ve(r, e, i, s) {
+function ye(r, e, i, s) {
   S(e) && (r.fillStyle = e, r.fill()), T(s) && s > 0 && (r.lineWidth = s, r.strokeStyle = i || gt.stroke, r.stroke());
 }
-function Gr(r, e, i, s, n, o, a, c, h, g) {
-  r.drawImage(e, i, s, n, o, a, c, h, g);
+function Gr(r, e, i, s, n, o, a, c, l, g) {
+  r.drawImage(e, i, s, n, o, a, c, l, g);
 }
 function Yr(r, e) {
   let i = r.naturalWidth || r.width, s = r.naturalHeight || r.height;
   return e === void 0 && (e = qr(i, s)), e.ctx.drawImage(r, 0, 0), e;
 }
-const hc = {
+const dc = {
   red: "#FF0000FF",
   green: "#00FF00FF",
   blue: "#0000FFFF",
@@ -6728,9 +6728,9 @@ const hc = {
 };
 function Ie(r, e) {
   const i = Yr(e), s = i.ctx;
-  return s.fillStyle = hc[r], s.globalCompositeOperation = "multiply", s.fillRect(0, 0, s.canvas.width, s.canvas.height), s.globalCompositeOperation = "destination-in", s.drawImage(e, 0, 0), s.globalCompositeOperation = "source-over", i;
+  return s.fillStyle = dc[r], s.globalCompositeOperation = "multiply", s.fillRect(0, 0, s.canvas.width, s.canvas.height), s.globalCompositeOperation = "destination-in", s.drawImage(e, 0, 0), s.globalCompositeOperation = "source-over", i;
 }
-function lc(r) {
+function uc(r) {
   return {
     red: Ie("red", r),
     green: Ie("green", r),
@@ -6745,35 +6745,35 @@ function qr(r, e) {
 const et = {
   createCanvas: qr,
   imageToCanvs: Yr,
-  seperateRGB: lc,
+  seperateRGB: uc,
   getChannel: Ie,
-  getPixelRatio: ac,
-  fillStroke: ve,
+  getPixelRatio: cc,
+  fillStroke: ye,
   calcTextWidth: Nr,
   createFont: Ye,
   getTextRectHeight: _i,
   getTextRectWidth: Di,
   renderImage: Gr,
   renderText: $r,
-  renderTextBG: ye,
+  renderTextBG: ve,
   renderPath: we,
-  renderPathStroke: cc,
-  renderPathClosed: dc,
-  renderSpline: uc,
-  renderLine: gc,
+  renderPathStroke: fc,
+  renderPathClosed: gc,
+  renderSpline: mc,
+  renderLine: vc,
   renderLineHorizontal: Fe,
-  renderLineVertical: fc,
-  renderCircle: oc,
-  renderRect: ec,
+  renderLineVertical: pc,
+  renderCircle: hc,
+  renderRect: nc,
   renderRectFill: Rs,
-  renderRectStroke: Ur,
-  renderRectRound: ic,
+  renderRectStroke: zr,
+  renderRectRound: rc,
   renderRectRoundFill: Wr,
-  renderRectRoundStroke: zr,
+  renderRectRoundStroke: Ur,
   renderPolygonRegular: Vr,
-  renderPolygonIrregular: sc,
-  renderDiamond: rc,
-  renderTriangle: nc
+  renderPolygonIrregular: oc,
+  renderDiamond: lc,
+  renderTriangle: ac
 };
 function we(r, e, i, s) {
   r.save();
@@ -6784,20 +6784,20 @@ function we(r, e, i, s) {
     a && a.x !== null && (o ? (r.moveTo(a.x, a.y), o = !1) : r.lineTo(a.x, a.y));
   }), s(), r.restore();
 }
-function cc(r, e, i) {
+function fc(r, e, i) {
   we(r, e, i, () => {
     r.stroke();
   });
 }
-function dc(r, e, i) {
+function gc(r, e, i) {
   we(r, e, i, () => {
     r.closePath();
-  }), ve(r, opts?.fill, opts?.stroke, opts?.size);
+  }), ye(r, opts?.fill, opts?.stroke, opts?.size);
 }
-function uc(r, e, i) {
+function mc(r, e, i) {
   r.beginPath(), r.moveTo(e[0].x, e[0].y);
   for (var s = i ?? 1, n = 0; n < e.length - 1; n++) {
-    var o = n > 0 ? e[n - 1] : e[0], a = e[n], c = e[n + 1], h = n != e.length - 2 ? e[n + 2] : c, g = a.x + (c.x - o.x) / 6 * s, p = a.y + (c.y - o.y) / 6 * s, v = c.x - (h.x - a.x) / 6 * s, M = c.y - (h.y - a.y) / 6 * s;
+    var o = n > 0 ? e[n - 1] : e[0], a = e[n], c = e[n + 1], l = n != e.length - 2 ? e[n + 2] : c, g = a.x + (c.x - o.x) / 6 * s, p = a.y + (c.y - o.y) / 6 * s, v = c.x - (l.x - a.x) / 6 * s, M = c.y - (l.y - a.y) / 6 * s;
     r.bezierCurveTo(g, p, v, M, c.x, c.y);
   }
   r.stroke();
@@ -6807,20 +6807,20 @@ function Fe(r, e, i, s, n) {
     r.stroke(), r.closePath();
   });
 }
-function fc(r, e, i, s, n) {
+function pc(r, e, i, s, n) {
   coords = [{ x: e, y: i }, { x: e, y, bottom: s }], we(r, coords, n, () => {
     r.stroke(), r.closePath();
   });
 }
-function gc(r, e, i) {
+function vc(r, e, i) {
   we(r, e, i, () => {
     r.stroke(), r.closePath();
   });
 }
-class mc extends V {
+class yc extends V {
   #t;
   constructor(e, i = !1, s = !1, n, o, a) {
-    super(e, i, s, n, o, a), this.#t = new Hr(e.scene, n), this.theme.priceLineStyle = this.theme?.priceLineStyle || Ml;
+    super(e, i, s, n, o, a), this.#t = new Hr(e.scene, n), this.theme.priceLineStyle = this.theme?.priceLineStyle || Ah;
   }
   set position(e) {
     this.setPosition(e[0], e[1]);
@@ -6862,14 +6862,14 @@ class mc extends V {
       c: this.yAxis.yPos(s[4])
     }, o = this.scene.context, a = this.theme, c = a.candle.UpBodyColour || a.candle.DnBodyColour;
     Math.max(e.w - 1, 1), e.x;
-    let h;
+    let l;
     if (o.save(), o.fillStyle = c, o.strokeStyle = c, o.lineWidth = 1, o.beginPath(), o.moveTo(e.x, e.c), o.lineTo(n.x, n.h), a.candle.Type === j.AREA) {
-      if (h = o.createLinearGradient(0, 0, 0, this.scene.height), P(a.candle.AreaFillColour))
+      if (l = o.createLinearGradient(0, 0, 0, this.scene.height), P(a.candle.AreaFillColour))
         for (let [g, p] of a.candle.AreaFillColour.entries())
-          h.addColorStop(g, p);
+          l.addColorStop(g, p);
       else
-        isString() ? h = a.candle.AreaFillColour : h = a.candle.UpBodyColour || a.candle.DnBodyColour;
-      o.stroke(), o.lineTo(n.x, this.scene.height), o.lineTo(e.x, this.scene.height), o.fillStyle = h, o.closePath(), o.fill();
+        isString() ? l = a.candle.AreaFillColour : l = a.candle.UpBodyColour || a.candle.DnBodyColour;
+      o.stroke(), o.lineTo(n.x, this.scene.height), o.lineTo(e.x, this.scene.height), o.fillStyle = l, o.closePath(), o.fill();
     } else
       o.stroke();
     o.restore();
@@ -6880,10 +6880,10 @@ const ke = {
   wdith: 1,
   dash: [1, 0]
 };
-class pc extends V {
+class wc extends V {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a);
-    const c = { class: yc, fixed: !0, required: !1 };
+    const c = { class: xc, fixed: !0, required: !1 };
     this.core.config?.highLow === !0 && (this.scaleOverly = this.chart.scale.addOverlay("hiLo", c));
   }
   set position(e) {
@@ -6894,11 +6894,11 @@ class pc extends V {
       return;
     this.scene.clear();
     let i, s, n, o = this.scene.width, a = 35, c = {};
-    const h = e.valueHi, g = e.valueLo, p = { ...this.theme.yAxis }, v = this.scene.context;
-    p.colourCursorBG = this.theme?.hilo?.colour || ke.colour, v.save(), v.strokeStyle = this.theme?.highLow?.colour || ke.colour, v.strokeWidth = this.theme?.highLow?.width || ke.width, v.setLineDash(this.theme?.highLow?.dash || ke.dash), n = this.yAxis.yPos(h), Fe(v, n, 0, o, c), i = "High", s = this.theme.yAxis.location == "left" ? 0 : o - (a + 25), Pi(v, i, s, n, a, p), n = this.yAxis.yPos(g), Fe(v, n, 0, o, c), i = "Low", Pi(v, i, s, n, a, p), v.restore();
+    const l = e.valueHi, g = e.valueLo, p = { ...this.theme.yAxis }, v = this.scene.context;
+    p.colourCursorBG = this.theme?.hilo?.colour || ke.colour, v.save(), v.strokeStyle = this.theme?.highLow?.colour || ke.colour, v.strokeWidth = this.theme?.highLow?.width || ke.width, v.setLineDash(this.theme?.highLow?.dash || ke.dash), n = this.yAxis.yPos(l), Fe(v, n, 0, o, c), i = "High", s = this.theme.yAxis.location == "left" ? 0 : o - (a + 25), Pi(v, i, s, n, a, p), n = this.yAxis.yPos(g), Fe(v, n, 0, o, c), i = "Low", Pi(v, i, s, n, a, p), v.restore();
   }
 }
-class yc extends V {
+class xc extends V {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
@@ -6908,8 +6908,8 @@ class yc extends V {
   draw(e = this.core.range) {
     this.scene.clear();
     let i, s, n, o;
-    const a = e.valueHi, c = e.valueLo, h = { ...this.theme.yAxis }, g = this.scene.context;
-    h.colourCursorBG = this.theme?.hilo?.colour || ke.colour, i = this.chart.Scale.nicePrice(a), s = 1, n = this.yAxis.yPos(a) + 1, o = this.viewport.width, Pi(g, i, s, n, o, h), i = this.chart.Scale.nicePrice(c), n = this.yAxis.yPos(c) + 1, Pi(g, i, s, n, o, h);
+    const a = e.valueHi, c = e.valueLo, l = { ...this.theme.yAxis }, g = this.scene.context;
+    l.colourCursorBG = this.theme?.hilo?.colour || ke.colour, i = this.chart.Scale.nicePrice(a), s = 1, n = this.yAxis.yPos(a) + 1, o = this.viewport.width, Pi(g, i, s, n, o, l), i = this.chart.Scale.nicePrice(c), n = this.yAxis.yPos(c) + 1, Pi(g, i, s, n, o, l);
   }
 }
 function Pi(r, e, i, s, n, o) {
@@ -6924,10 +6924,10 @@ function Pi(r, e, i, s, n, o) {
     paddingLeft: 3,
     paddingRight: 3,
     width: n
-  }, c = a.fontSize + a.paddingTop + a.paddingBottom, h = s - c * 0.5;
-  r.save(), r.fillStyle = a.bakCol, r.fillRect(i, h, n, c), ye(r, `${e}`, i, h, a), r.restore();
+  }, c = a.fontSize + a.paddingTop + a.paddingBottom, l = s - c * 0.5;
+  r.save(), r.fillStyle = a.bakCol, r.fillRect(i, l, n, c), ve(r, `${e}`, i, l, a), r.restore();
 }
-class vc {
+class Tc {
   data;
   icon;
   constructor(e, i) {
@@ -6935,93 +6935,8 @@ class vc {
   }
   draw(e) {
     this.data = e;
-    const i = this.icon, s = this.cfg, n = this.hit.getIndexValue(e.key), o = I.svgToImage(s.iconEvent, n, this.dims), a = H(e.w, s.iconMinDim, s.iconHeight), c = H(e.w, s.iconMinDim, s.iconWidth), h = this.data.x, g = this.data.y, p = this.ctx, v = this.ctxH;
-    return p.save(), p.drawImage(i, h, g, c, a), p.restore(), v.save(), v.drawImage(o, h, g, c, a), v.restore(), { x: h, y: g, w: c, h: a, k: n };
-  }
-}
-const wc = {
-  dragBar: !1,
-  closeIcon: !1,
-  content: "",
-  styles: {
-    window: {
-      width: "15em",
-      zindex: "10"
-    },
-    content: {
-      overflow: "hidden",
-      padding: "0 1em"
-    }
-  }
-};
-class xc extends V {
-  #t;
-  #e = [];
-  #r;
-  #n = (e) => ft(this.isNewsEventSelected, 100, this);
-  constructor(e, i = !1, s = !1, n, o, a) {
-    super(e, i, s, n, o, a), this.#t = new vc(e, n), this.emit(), this.core.on("primary_pointerdown", ft(this.isNewsEventSelected, 200, this), this), this.#r = this.core.WidgetsG.insert("Dialogue", wc), this.#r.start();
-  }
-  destroy() {
-    this.core.off("primary_pointerdown", this.#n);
-  }
-  set position(e) {
-    this.target.setPosition(e[0], e[1]);
-  }
-  get data() {
-    return this.overlay.data;
-  }
-  isNewsEventSelected(e) {
-    if (this.core.config?.events?.display === !1 || this.core.config?.events?.displayInfo === !1)
-      return;
-    const i = e[0], s = e[1], n = this.theme.events, o = H(this.xAxis.candleW, n.iconMinDim, n.iconHeight), a = this.xAxis.pixel2T(i), c = this.hit.getIntersection(i, s);
-    if (c == -1)
-      return;
-    let h = Object.keys(this.data)[c] * 1, g = this.xAxis.xPos(a), p = this.scene.height - H(this.xAxis.candleW, n.iconMinDim, n.iconHeight) * 1.5, v = "";
-    for (let L of this.data[h])
-      v += this.buildNewsEventHTML(L);
-    const M = {
-      dimensions: { h: 150, w: 150 },
-      position: { x: g + o / 2 + 1, y: p, relativeY: "bottom" },
-      content: v
-    };
-    this.core.emit("event_selected", h), this.#r.open(M);
-  }
-  buildNewsEventHTML(e) {
-    let i = e?.title, s = `<style>
-    h1, p {display: inline-block; font-size: 0.9em;
-    max-width: 98%;
-    </style>`;
-    return S(e?.url) && (i = `<a href="${e?.url}" target="${e?.target}">${i}</a>`), s += `<h1>${i}</h1>`, s += `<p>${e?.content}</p>`, s;
-  }
-  draw(e = this.core.range) {
-    if (this.core.config?.events?.display === !1)
-      return;
-    this.hit.clear(), this.scene.clear(), this.#e.length = 0;
-    const s = {
-      x: (this.xAxis.smoothScrollOffset || 0) - this.xAxis.candleW,
-      w: this.xAxis.candleW
-    };
-    let n = this.theme.events, o = this.core.rangeScrollOffset, a = e.indexStart - o, c = e.Length + o * 2, h, g, p;
-    for (; c; ) {
-      if (h = e.value(a), g = `${h[0]}`, p = Object.keys(this.data).indexOf(g), p >= 0)
-        for (let v of this.data[g])
-          s.x = this.xAxis.xPos(h[0]) - this.xAxis.candleW / 2, s.y = this.scene.height - H(this.xAxis.candleW, n.iconMinDim, n.iconHeight) * 1.5, s.key = p, this.#e.push(this.#t.draw(s));
-      a++, c--;
-    }
-  }
-}
-class Tc {
-  data;
-  buy;
-  sell;
-  constructor(e, i) {
-    this.scene = e.scene, this.hit = e.hit, this.ctx = this.scene.context, this.ctxH = this.hit.context, this.width = this.scene.width, this.cfg = i.trades, this.dims = { w: this.cfg.iconWidth, h: this.cfg.iconHeight }, this.buy = I.svgToImage(this.cfg.iconBuy, this.cfg.buyColour, this.dims), this.sell = I.svgToImage(this.cfg.iconSell, this.cfg.sellColour, this.dims);
-  }
-  draw(e) {
-    this.data = e;
-    const i = this.cfg, s = e.side === "buy" ? this.buy : this.sell, n = e.side === "buy" ? i.iconBuy : i.iconSell, o = this.hit.getIndexValue(e.key), a = I.svgToImage(n, o, this.dims), c = H(e.w, i.iconMinDim, i.iconHeight), h = H(e.w, i.iconMinDim, i.iconWidth), g = this.data.x, p = this.data.y, v = this.ctx, M = this.ctxH;
-    return v.save(), v.drawImage(s, g, p, h, c), v.restore(), M.save(), M.drawImage(a, g, p, h, c), M.restore(), { x: g, y: p, w: h, h: c, k: o };
+    const i = this.icon, s = this.cfg, n = this.hit.getIndexValue(e.key), o = I.svgToImage(s.iconEvent, n, this.dims), a = H(e.w, s.iconMinDim, s.iconHeight), c = H(e.w, s.iconMinDim, s.iconWidth), l = this.data.x, g = this.data.y, p = this.ctx, v = this.ctxH;
+    return p.save(), p.drawImage(i, l, g, c, a), p.restore(), v.save(), v.drawImage(o, l, g, c, a), v.restore(), { x: l, y: g, w: c, h: a, k: n };
   }
 }
 const Ec = {
@@ -7043,10 +6958,95 @@ class Sc extends V {
   #t;
   #e = [];
   #r;
+  #n = (e) => ft(this.isNewsEventSelected, 100, this);
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a), this.#t = new Tc(e, n), this.emit(), this.core.on("primary_pointerdown", ft(this.isNewsEventSelected, 200, this), this), this.#r = this.core.WidgetsG.insert("Dialogue", Ec), this.#r.start();
+  }
+  destroy() {
+    this.core.off("primary_pointerdown", this.#n);
+  }
+  set position(e) {
+    this.target.setPosition(e[0], e[1]);
+  }
+  get data() {
+    return this.overlay.data;
+  }
+  isNewsEventSelected(e) {
+    if (this.core.config?.events?.display === !1 || this.core.config?.events?.displayInfo === !1)
+      return;
+    const i = e[0], s = e[1], n = this.theme.events, o = H(this.xAxis.candleW, n.iconMinDim, n.iconHeight), a = this.xAxis.pixel2T(i), c = this.hit.getIntersection(i, s);
+    if (c == -1)
+      return;
+    let l = Object.keys(this.data)[c] * 1, g = this.xAxis.xPos(a), p = this.scene.height - H(this.xAxis.candleW, n.iconMinDim, n.iconHeight) * 1.5, v = "";
+    for (let L of this.data[l])
+      v += this.buildNewsEventHTML(L);
+    const M = {
+      dimensions: { h: 150, w: 150 },
+      position: { x: g + o / 2 + 1, y: p, relativeY: "bottom" },
+      content: v
+    };
+    this.core.emit("event_selected", l), this.#r.open(M);
+  }
+  buildNewsEventHTML(e) {
+    let i = e?.title, s = `<style>
+    h1, p {display: inline-block; font-size: 0.9em;
+    max-width: 98%;
+    </style>`;
+    return S(e?.url) && (i = `<a href="${e?.url}" target="${e?.target}">${i}</a>`), s += `<h1>${i}</h1>`, s += `<p>${e?.content}</p>`, s;
+  }
+  draw(e = this.core.range) {
+    if (this.core.config?.events?.display === !1)
+      return;
+    this.hit.clear(), this.scene.clear(), this.#e.length = 0;
+    const s = {
+      x: (this.xAxis.smoothScrollOffset || 0) - this.xAxis.candleW,
+      w: this.xAxis.candleW
+    };
+    let n = this.theme.events, o = this.core.rangeScrollOffset, a = e.indexStart - o, c = e.Length + o * 2, l, g, p;
+    for (; c; ) {
+      if (l = e.value(a), g = `${l[0]}`, p = Object.keys(this.data).indexOf(g), p >= 0)
+        for (let v of this.data[g])
+          s.x = this.xAxis.xPos(l[0]) - this.xAxis.candleW / 2, s.y = this.scene.height - H(this.xAxis.candleW, n.iconMinDim, n.iconHeight) * 1.5, s.key = p, this.#e.push(this.#t.draw(s));
+      a++, c--;
+    }
+  }
+}
+class bc {
+  data;
+  buy;
+  sell;
+  constructor(e, i) {
+    this.scene = e.scene, this.hit = e.hit, this.ctx = this.scene.context, this.ctxH = this.hit.context, this.width = this.scene.width, this.cfg = i.trades, this.dims = { w: this.cfg.iconWidth, h: this.cfg.iconHeight }, this.buy = I.svgToImage(this.cfg.iconBuy, this.cfg.buyColour, this.dims), this.sell = I.svgToImage(this.cfg.iconSell, this.cfg.sellColour, this.dims);
+  }
+  draw(e) {
+    this.data = e;
+    const i = this.cfg, s = e.side === "buy" ? this.buy : this.sell, n = e.side === "buy" ? i.iconBuy : i.iconSell, o = this.hit.getIndexValue(e.key), a = I.svgToImage(n, o, this.dims), c = H(e.w, i.iconMinDim, i.iconHeight), l = H(e.w, i.iconMinDim, i.iconWidth), g = this.data.x, p = this.data.y, v = this.ctx, M = this.ctxH;
+    return v.save(), v.drawImage(s, g, p, l, c), v.restore(), M.save(), M.drawImage(a, g, p, l, c), M.restore(), { x: g, y: p, w: l, h: c, k: o };
+  }
+}
+const Cc = {
+  dragBar: !1,
+  closeIcon: !1,
+  content: "",
+  styles: {
+    window: {
+      width: "15em",
+      zindex: "10"
+    },
+    content: {
+      overflow: "hidden",
+      padding: "0 1em"
+    }
+  }
+};
+class Mc extends V {
+  #t;
+  #e = [];
+  #r;
   #n;
   #i = (e) => ft(this.isTradeSelected, 100, this);
   constructor(e, i = !1, s = !1, n, o, a) {
-    super(e, i, s, n, o, a), this.#t = new Tc(e, n), this.emit(), this.core.on("primary_pointerdown", ft(this.isTradeSelected, 200, this), this), this.#n = this.core.WidgetsG.insert("Dialogue", Ec), this.#n.start();
+    super(e, i, s, n, o, a), this.#t = new bc(e, n), this.emit(), this.core.on("primary_pointerdown", ft(this.isTradeSelected, 200, this), this), this.#n = this.core.WidgetsG.insert("Dialogue", Cc), this.#n.start();
   }
   destroy() {
     this.core.off("primary_pointerdown", this.#i);
@@ -7060,10 +7060,10 @@ class Sc extends V {
   isTradeSelected(e) {
     if (this.core.config?.trades?.display === !1 || this.core.config?.trades?.displayInfo === !1)
       return;
-    const i = e[0], s = e[1], n = this.theme.trades, o = H(this.xAxis.candleW, n.iconMinDim, n.iconHeight), a = this.xAxis.pixel2T(i), c = this.core.range.valueByTS(a), h = this.hit.getIntersection(i, s);
-    if (h == -1)
+    const i = e[0], s = e[1], n = this.theme.trades, o = H(this.xAxis.candleW, n.iconMinDim, n.iconHeight), a = this.xAxis.pixel2T(i), c = this.core.range.valueByTS(a), l = this.hit.getIntersection(i, s);
+    if (l == -1)
       return;
-    let g = Object.keys(this.data)[h] * 1, p = this.xAxis.xPos(g), v = this.yAxis.yPos(c[2]) - o * 1.5, M = "";
+    let g = Object.keys(this.data)[l] * 1, p = this.xAxis.xPos(g), v = this.yAxis.yPos(c[2]) - o * 1.5, M = "";
     for (let k of this.data[g])
       M += this.buildTradeHTML(k);
     const L = {
@@ -7092,16 +7092,16 @@ class Sc extends V {
       x: (this.xAxis.smoothScrollOffset || 0) - this.xAxis.candleW,
       w: this.xAxis.candleW
     };
-    let n = this.theme.trades, o = this.core.rangeScrollOffset, a = e.indexStart - o, c = e.Length + o * 2, h, g, p;
+    let n = this.theme.trades, o = this.core.rangeScrollOffset, a = e.indexStart - o, c = e.Length + o * 2, l, g, p;
     for (; c; ) {
-      if (h = e.value(a), g = `${h[0]}`, p = Object.keys(this.data).indexOf(g), p >= 0)
+      if (l = e.value(a), g = `${l[0]}`, p = Object.keys(this.data).indexOf(g), p >= 0)
         for (let v of this.data[g])
-          s.x = this.xAxis.xPos(h[0]) - this.xAxis.candleW / 2, s.y = this.yAxis.yPos(h[2]) - H(this.xAxis.candleW, n.iconMinDim, n.iconHeight) * 1.5, s.side = v.side, s.key = p, this.#e.push(this.#t.draw(s));
+          s.x = this.xAxis.xPos(l[0]) - this.xAxis.candleW / 2, s.y = this.yAxis.yPos(l[2]) - H(this.xAxis.candleW, n.iconMinDim, n.iconHeight) * 1.5, s.side = v.side, s.key = p, this.#e.push(this.#t.draw(s));
       a++, c--;
     }
   }
 }
-class bc extends V {
+class Pc extends V {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a), this.params.content = a?.content || "";
   }
@@ -7126,7 +7126,7 @@ class bc extends V {
       txtCol: n || this.theme.watermark.COLOUR
     }, a = this.config.watermark.text, c = this.scene.context;
     c.font = Ye(o?.fontSize, o?.fontWeight, o?.fontFamily), c.textBaseline = "top", c.fillStyle = o.txtCol;
-    const h = _i(o), g = Di(c, a, o), p = (this.scene.width - g) / 2, v = (this.scene.height - h) / 2;
+    const l = _i(o), g = Di(c, a, o), p = (this.scene.width - g) / 2, v = (this.scene.height - l) / 2;
     c.fillText(a, p, v);
   }
   renderImage(e) {
@@ -7138,14 +7138,14 @@ class bc extends V {
     a.save(), Gr(a, e, n, o, i, s), a.restore();
   }
 }
-const Cc = {
+const Lc = {
   primaryPane: [
-    ["watermark", { class: bc, fixed: !0, required: !0, params: { content: null } }],
+    ["watermark", { class: Pc, fixed: !0, required: !0, params: { content: null } }],
     ["grid", { class: Mi, fixed: !0, required: !0, params: { axes: "y" } }],
-    ["volume", { class: tc, fixed: !1, required: !0, params: { maxVolumeH: gi.ONCHART_VOLUME_HEIGHT } }],
+    ["volume", { class: sc, fixed: !1, required: !0, params: { maxVolumeH: gi.ONCHART_VOLUME_HEIGHT } }],
     ["candles", { class: Br, fixed: !1, required: !0 }],
-    ["hiLo", { class: pc, fixed: !0, required: !1 }],
-    ["stream", { class: mc, fixed: !1, required: !0 }],
+    ["hiLo", { class: wc, fixed: !0, required: !1 }],
+    ["stream", { class: yc, fixed: !1, required: !0 }],
     ["cursor", { class: ps, fixed: !0, required: !0 }]
   ],
   secondaryPane: [
@@ -7154,13 +7154,13 @@ const Cc = {
   ]
 }, Jn = {
   primaryPane: {
-    trades: { class: Sc, fixed: !1, required: !1 },
-    events: { class: xc, fixed: !1, required: !1 }
+    trades: { class: Mc, fixed: !1, required: !1 },
+    events: { class: Sc, fixed: !1, required: !1 }
   },
   secondaryPane: {
     candles: { class: Br, fixed: !1, required: !0 }
   }
-}, yt = {
+}, vt = {
   id: "chart",
   title: "",
   type: "chart",
@@ -7178,8 +7178,8 @@ class se {
   #i;
   #s;
   #o;
-  #h;
   #l;
+  #h;
   #a;
   #c;
   #u = "idle";
@@ -7187,10 +7187,10 @@ class se {
   #f;
   #m;
   #w;
-  #y;
+  #v;
   #E;
   #p;
-  #v;
+  #y;
   #I;
   #g;
   #L;
@@ -7210,9 +7210,9 @@ class se {
   constructor(e, i) {
     if (this.#s = e, this.#a = se.cnt, !E(i))
       return;
-    this.#o = { ...i }, this.#r = this.#o.name, this.#n = this.#o.shortName, this.#i = this.#o.title, this.#c = this.#o.type == "primary" ? "primaryPane" : "secondaryPane", this.#g = this.#o.view, this.#f = this.#o.elements.elScale, this.#h = this.#o.parent, this.#d = this.#o.elements.elTarget, this.#d.id = this.id, this.legend = new Gl(this.elLegend, this), this.isPrimary ? (yt.type = "chart", yt.title = this.title, yt.parent = this, yt.source = this.legendInputs.bind(this), this.legend.add(yt), this.yAxisType = "default") : (yt.type = "secondary", yt.title = "", yt.parent = this, yt.source = () => ({ inputs: {}, colours: [], labels: [] }), this.legend.add(yt), this.yAxisType = this.core.indicatorClasses[i.view[0].type].ind.scale);
+    this.#o = { ...i }, this.#r = this.#o.name, this.#n = this.#o.shortName, this.#i = this.#o.title, this.#c = this.#o.type == "primary" ? "primaryPane" : "secondaryPane", this.#g = this.#o.view, this.#f = this.#o.elements.elScale, this.#l = this.#o.parent, this.#d = this.#o.elements.elTarget, this.#d.id = this.id, this.legend = new Xh(this.elLegend, this), this.isPrimary ? (vt.type = "chart", vt.title = this.title, vt.parent = this, vt.source = this.legendInputs.bind(this), this.legend.add(vt), this.yAxisType = "default") : (vt.type = "secondary", vt.title = "", vt.parent = this, vt.source = () => ({ inputs: {}, colours: [], labels: [] }), this.legend.add(vt), this.yAxisType = this.core.indicatorClasses[i.view[0].type].ind.scale);
     const s = { ...i };
-    s.parent = this, s.chart = this, s.elScale = this.elScale, s.yAxisType = this.yAxisType, this.scale = new Ql(this.core, s), this.#u = "init", this.log(`${this.name} instantiated`);
+    s.parent = this, s.chart = this, s.elScale = this.elScale, s.yAxisType = this.yAxisType, this.scale = new ec(this.core, s), this.#u = "init", this.log(`${this.name} instantiated`);
   }
   log(e) {
     this.core.log(e);
@@ -7245,7 +7245,7 @@ class se {
     return this.#i;
   }
   get parent() {
-    return this.#h;
+    return this.#l;
   }
   get core() {
     return this.#s;
@@ -7298,7 +7298,7 @@ class se {
     return this.#k;
   }
   get stream() {
-    return this.#v;
+    return this.#y;
   }
   get streamCandle() {
     return this.#I;
@@ -7337,7 +7337,7 @@ class se {
     return this.#s.bufferPx;
   }
   get elCanvas() {
-    return this.#y.viewport.scene.canvas;
+    return this.#v.viewport.scene.canvas;
   }
   get elScale() {
     return this.#f;
@@ -7349,10 +7349,10 @@ class se {
     return this.#d.viewport;
   }
   set layerWidth(e) {
-    this.#y.layerWidth = e;
+    this.#v.layerWidth = e;
   }
   get layerWidth() {
-    return this.#y.layerWidth;
+    return this.#v.layerWidth;
   }
   set legend(e) {
     this.#E = e;
@@ -7382,31 +7382,31 @@ class se {
     return "x";
   }
   set graph(e) {
-    this.#y = e;
+    this.#v = e;
   }
   get graph() {
-    return this.#y;
+    return this.#v;
   }
   get view() {
     return this.#g;
   }
   get viewport() {
-    return this.#y.viewport;
+    return this.#v.viewport;
   }
   get layerGrid() {
-    return this.#y.overlays.get("grid").layer;
+    return this.#v.overlays.get("grid").layer;
   }
   get overlays() {
     return this.getOverlays();
   }
   get overlayGrid() {
-    return this.#y.overlays.get("grid").instance;
+    return this.#v.overlays.get("grid").instance;
   }
   get overlayTools() {
     return this.#O;
   }
   get overlaysDefault() {
-    return Cc[this.type];
+    return Lc[this.type];
   }
   get indicators() {
     return this.getIndicators();
@@ -7415,10 +7415,10 @@ class se {
     return this.#P;
   }
   set stateMachine(e) {
-    this.#l = new $t(e, this);
+    this.#h = new $t(e, this);
   }
   get stateMachine() {
-    return this.#l;
+    return this.#h;
   }
   get Divider() {
     return this.#p;
@@ -7440,14 +7440,14 @@ class se {
         this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartPane()" instead.`);
         return;
       }
-      this.stateMachine.destroy(), this.Divider.destroy(), this.#m.destroy(), this.#y.destroy(), this.#S.destroy(), this.legend.destroy(), this.off("main_mousemove", this.onMouseMove), this.off(_e, this.onStreamListening), this.off(Ue, this.onStreamNewValue), this.off(Lt, this.onStreamUpdate), this.off(Be, this.onStreamNewValue), this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.off("chart_yAxisRedraw", this.onYAxisRedraw), this.element.remove(), this.#u = "destroyed";
+      this.stateMachine.destroy(), this.Divider.destroy(), this.#m.destroy(), this.#v.destroy(), this.#S.destroy(), this.legend.destroy(), this.off("main_mousemove", this.onMouseMove), this.off(_e, this.onStreamListening), this.off(ze, this.onStreamNewValue), this.off(Lt, this.onStreamUpdate), this.off(Be, this.onStreamNewValue), this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.off("chart_yAxisRedraw", this.onYAxisRedraw), this.element.remove(), this.#u = "destroyed";
     }
   }
   remove() {
     this.core.log(`Deleting chart pane: ${this.id}`), this.emit("destroyChartView", this.id);
   }
   eventsListen() {
-    this.#S = new At(this.#d, { disableContextMenu: !1 }), this.#S.on("pointerdrag", this.onChartDrag.bind(this)), this.#S.on("pointerdragend", this.onChartDragDone.bind(this)), this.#S.on("pointermove", this.onMouseMove.bind(this)), this.#S.on("pointerenter", this.onMouseEnter.bind(this)), this.#S.on("pointerout", this.onMouseOut.bind(this)), this.#S.on("pointerdown", this.onMouseDown.bind(this)), this.#S.on("pointerup", this.onMouseUp.bind(this)), this.on("main_mousemove", this.updateLegends, this), this.on(_e, this.onStreamListening, this), this.on(Ue, this.onStreamNewValue, this), this.on(Lt, this.onStreamUpdate, this), this.on(Be, this.onStreamNewValue, this), this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.on("chart_yAxisRedraw", this.onYAxisRedraw, this);
+    this.#S = new At(this.#d, { disableContextMenu: !1 }), this.#S.on("pointerdrag", this.onChartDrag.bind(this)), this.#S.on("pointerdragend", this.onChartDragDone.bind(this)), this.#S.on("pointermove", this.onMouseMove.bind(this)), this.#S.on("pointerenter", this.onMouseEnter.bind(this)), this.#S.on("pointerout", this.onMouseOut.bind(this)), this.#S.on("pointerdown", this.onMouseDown.bind(this)), this.#S.on("pointerup", this.onMouseUp.bind(this)), this.on("main_mousemove", this.updateLegends, this), this.on(_e, this.onStreamListening, this), this.on(ze, this.onStreamNewValue, this), this.on(Lt, this.onStreamUpdate, this), this.on(Be, this.onStreamNewValue, this), this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.on("chart_yAxisRedraw", this.onYAxisRedraw, this);
   }
   on(e, i, s) {
     this.#s.on(e, i, s);
@@ -7480,7 +7480,7 @@ class se {
     this.#s.pointerButtons[e.domEvent.srcEvent.button] = !1;
   }
   onStreamListening(e) {
-    this.#v !== e && (this.#v = e);
+    this.#y !== e && (this.#y = e);
   }
   onStreamNewValue(e) {
     this.draw(this.range, !0);
@@ -7497,7 +7497,7 @@ class se {
   setTitle(e) {
     if (!S(e))
       return !1;
-    this.#i = e, yt.title = e;
+    this.#i = e, vt.title = e;
     const i = this.legend.list.chart.el.querySelectorAll(".title");
     for (let s of i)
       s.innerHTML = e;
@@ -7507,7 +7507,7 @@ class se {
     S(e.text) || S(e) ? this.core.config.watermark.text = e : "imgURL" in e && (this.core.config.watermark.imgURL = e);
   }
   setHeight(e) {
-    T(e) || (e = this.height || this.#h.height), this.#d.style.height = `${e}px`, this.#f.style.height = `${e}px`, this.elViewport.style.height = `${e}px`, this.#m.setDimensions({ w: null, h: e });
+    T(e) || (e = this.height || this.#l.height), this.#d.style.height = `${e}px`, this.#f.style.height = `${e}px`, this.elViewport.style.height = `${e}px`, this.#m.setDimensions({ w: null, h: e });
   }
   setDimensions(e) {
     const i = this.config.buffer || ki;
@@ -7543,7 +7543,7 @@ class se {
     return this.graph.addOverlays(i), !0;
   }
   getOverlays() {
-    return Object.fromEntries([...this.#y.overlays.list]);
+    return Object.fromEntries([...this.#v.overlays.list]);
   }
   addIndicator(e) {
     const i = this.type === "primaryPane", s = this.core.indicatorClasses[e.type].ind, n = s.constructor.type === "both" ? i : s.prototype.primaryPane;
@@ -7592,7 +7592,7 @@ class se {
     this.#O.delete(e);
   }
   drawGrid() {
-    this.layerGrid.setPosition(this.#s.scrollPos, 0), this.overlayGrid.draw("y"), this.#y.render();
+    this.layerGrid.setPosition(this.#s.scrollPos, 0), this.overlayGrid.draw("y"), this.#v.render();
   }
   refresh() {
     this.scale.draw(), this.draw(void 0, this.isPrimary);
@@ -7619,8 +7619,6 @@ class se {
         return;
       case "down":
         this.reorderDown();
-        return;
-      case "visible":
         return;
       case "maximize":
         this.#s.MainPane.paneMaximize(this);
@@ -7666,21 +7664,21 @@ class se {
     this.graph = new pe(this, this.elViewport, e, !1), this.isPrimary && (this.layerStream = this.graph.overlays.get("stream")?.layer, this.chartStreamCandle = this.graph.overlays.get("stream")?.instance), this.addOverlays(this.view);
   }
   render() {
-    this.#y.render(), this.#m.render();
+    this.#v.render(), this.#m.render();
   }
   draw(e = this.range, i = !1) {
-    this.#y.draw(e, i);
+    this.#v.draw(e, i);
   }
   drawGrid() {
-    this.layerGrid.setPosition(this.core.scrollPos, 0), this.overlayGrid.draw("y"), this.#y.render();
+    this.layerGrid.setPosition(this.core.scrollPos, 0), this.overlayGrid.draw("y"), this.#v.render();
   }
   resize(e) {
     const i = this, s = this.sibling();
     if (s === null)
       return { active: null, prev: null };
     const n = this.core.MainPane.rowMinH, o = this.element.clientHeight, a = s.element.clientHeight;
-    let c, h, g, p;
-    return T(e) && e > n || (p = o + a, c = this.core.MainPane.cursorPos[5], h = o - c, g = a + c), h < n || g < n || p !== h + g || (i.setDimensions({ w: void 0, h }), s.setDimensions({ w: void 0, h: g }), i.Divider.setPos()), i.element.style.userSelect = "none", s.element.style.userSelect = "none", { active: i, prev: s };
+    let c, l, g, p;
+    return T(e) && e > n || (p = o + a, c = this.core.MainPane.cursorPos[5], l = o - c, g = a + c), l < n || g < n || p !== l + g || (i.setDimensions({ w: void 0, h: l }), s.setDimensions({ w: void 0, h: g }), i.Divider.setPos()), i.element.style.userSelect = "none", s.element.style.userSelect = "none", { active: i, prev: s };
   }
   zoomRange() {
     this.draw(this.range, !0), this.emit("zoomDone");
@@ -7692,7 +7690,7 @@ class se {
     return this.scale.yPos(e);
   }
   currPrevNext() {
-    const e = this.element, i = e.previousElementSibling, s = e.nextElementSibling, n = e.parentNode, o = this.scale.element, a = o.previousElementSibling, c = o.nextElementSibling, h = o.parentNode, g = i !== null ? this.core.ChartPanes.get(i.id) : null, p = s !== null ? this.core.ChartPanes.get(s.id) : null;
+    const e = this.element, i = e.previousElementSibling, s = e.nextElementSibling, n = e.parentNode, o = this.scale.element, a = o.previousElementSibling, c = o.nextElementSibling, l = o.parentNode, g = i !== null ? this.core.ChartPanes.get(i.id) : null, p = s !== null ? this.core.ChartPanes.get(s.id) : null;
     return {
       el: e,
       prevEl: i,
@@ -7701,7 +7699,7 @@ class se {
       scaleEl: o,
       prevScaleEl: a,
       nextScaleEl: c,
-      parentScaleEl: h,
+      parentScaleEl: l,
       prevPane: g,
       nextPane: p
     };
@@ -7723,8 +7721,8 @@ class Nt extends V {
   #i;
   #s;
   #o;
-  #h;
   #l;
+  #h;
   #a;
   #c;
   #u;
@@ -7732,13 +7730,13 @@ class Nt extends V {
   #f;
   #m = [0, 0];
   #w;
-  #y;
+  #v;
   #E = 2;
   #p = {};
-  #v;
+  #y;
   #I;
   constructor(e, i = !1, s = !1, n, o, a) {
-    super(e, i, s, void 0, o, a), this.#r = V.cnt, this.#l = a, this.#a = a.overlay, this.#u = n.type, this.#c = n.indicator, this.#d = this.core.TALib, this.#f = this.xAxis.range, this.eventsListen();
+    super(e, i, s, void 0, o, a), this.#r = V.cnt, this.#h = a, this.#a = a.overlay, this.#u = n.type, this.#c = n.indicator, this.#d = this.core.TALib, this.#f = this.xAxis.range, this.eventsListen();
   }
   get id() {
     return this.#e || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#r}`;
@@ -7762,7 +7760,7 @@ class Nt extends V {
     return this.core.ChartPanes.get(this.chartPaneID);
   }
   get chartPaneID() {
-    return this.#l.overlay.paneID;
+    return this.#h.overlay.paneID;
   }
   get primaryPane() {
     return this.#s;
@@ -7777,13 +7775,13 @@ class Nt extends V {
     this.#o = e;
   }
   get plots() {
-    return this.#h;
+    return this.#l;
   }
   set plots(e) {
-    this.#h = e;
+    this.#l = e;
   }
   get params() {
-    return this.#l;
+    return this.#h;
   }
   get Timeline() {
     return this.core.Timeline;
@@ -7798,7 +7796,7 @@ class Nt extends V {
     return this.#a;
   }
   get legendID() {
-    return this.#v;
+    return this.#y;
   }
   get indicator() {
     return this.#c;
@@ -7813,7 +7811,7 @@ class Nt extends V {
     this.#w = e;
   }
   set setUpdateValue(e) {
-    this.#y = e;
+    this.#v = e;
   }
   set precision(e) {
     this.#E = e;
@@ -7833,7 +7831,7 @@ class Nt extends V {
   set value(e) {
     const i = this.core.time.timeFrameMS;
     let s = Math.floor(new Date(e[ct.t]) / i) * i;
-    e[ct.t] = s, this.#m[ct.t] !== e[ct.t] ? (this.#m[ct.t] = e[ct.t], this.#w(e)) : this.#y(e);
+    e[ct.t] = s, this.#m[ct.t] !== e[ct.t] ? (this.#m[ct.t] = e[ct.t], this.#w(e)) : this.#v(e);
   }
   get value() {
     return this.#m;
@@ -7845,7 +7843,7 @@ class Nt extends V {
       this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeIndicator()" instead.`);
       return;
     }
-    this.off(Lt, this.onStreamUpdate), this.chart.legend.remove(this.#v), this.#I = "destroyed";
+    this.off(Lt, this.onStreamUpdate), this.chart.legend.remove(this.#y), this.#I = "destroyed";
   }
   remove() {
     this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPaneID}`), this.emit(`${this.chartPaneID}_removeIndicator`, { id: this.id, paneID: this.chartPaneID });
@@ -7881,17 +7879,17 @@ class Nt extends V {
     this.value = e;
   }
   onLegendAction(e) {
-    switch (this.chart.legend.onMouseClick(e.currentTarget).icon) {
+    const i = this.chart.legend.onMouseClick(e.currentTarget);
+    switch (i.icon) {
       case "up":
         return;
       case "down":
         return;
       case "visible":
-        this.visible(!this.visible());
+        this.onVisibility(i);
         return;
-      case "maximize":
-        return;
-      case "restore":
+      case "notVisible":
+        this.onVisibility(i);
         return;
       case "remove":
         this.remove();
@@ -7903,12 +7901,15 @@ class Nt extends V {
         return;
     }
   }
+  onVisibility(e) {
+    this.visible(!this.visible()), e.parent.classList.toggle("visible"), e.parent.classList.toggle("notvisible");
+  }
   invokeSettings(e) {
-    if (U(e?.fn)) {
+    if (z(e?.fn)) {
       let i = C.fn(this);
       if (e?.own)
         return i;
-    } else if (U(this.core.config.callbacks?.indicatorSettings?.fn)) {
+    } else if (z(this.core.config.callbacks?.indicatorSettings?.fn)) {
       let i = this.core.config.callbacks.indicatorSettings.fn(this);
       if (this.core.config.callbacks?.indicatorSettings?.own)
         return i;
@@ -7938,7 +7939,7 @@ class Nt extends V {
       parent: this,
       source: this.legendInputs.bind(this)
     };
-    this.#v = this.chart.legend.add(e);
+    this.#y = this.chart.legend.add(e);
   }
   legendInputs(e = this.chart.cursorPos) {
     const i = [this.style.stroke];
@@ -7978,7 +7979,7 @@ class Nt extends V {
       return !1;
     i.timePeriod = i.timePeriod || this.definition.input.timePeriod;
     let n, o, a = i.timePeriod;
-    if (s instanceof hs)
+    if (s instanceof ls)
       n = 0, o = s.dataLength - a + 1;
     else if ("indexStart" in s || "indexEnd" in s || "tsStart" in s || "tsEnd" in s)
       n = s.indexStart || this.Timeline.t2Index(s.tsStart || 0) || 0, o = s.indexEnd || this.Timeline.t2Index(s.tsEnd) || this.range.Length - 1;
@@ -7986,11 +7987,11 @@ class Nt extends V {
       return !1;
     if (o - n < a)
       return !1;
-    let c = [], h, g, p, v;
+    let c = [], l, g, p, v;
     for (; n < o; ) {
-      v = this.indicatorInput(n, n + a), i = { ...i, ...v }, p = this.TALib[e](i), g = [], h = 0;
+      v = this.indicatorInput(n, n + a), i = { ...i, ...v }, p = this.TALib[e](i), g = [], l = 0;
       for (let M of this.definition.output)
-        g[h++] = p[M.name][0];
+        g[l++] = p[M.name][0];
       c.push([this.range.value(n + a - 1)[0], g]), n++;
     }
     return c;
@@ -8003,11 +8004,11 @@ class Nt extends V {
     this.core.TALibReady ? e() : this.core.talibAwait.push(e.bind(this));
   }
   calcIndicatorStream(e, i, s = this.range) {
-    if (!this.core.TALibReady || !S(e) || !(e in this.TALib) || !(s instanceof hs) || s.dataLength < this.definition.input.timePeriod)
+    if (!this.core.TALibReady || !S(e) || !(e in this.TALib) || !(s instanceof ls) || s.dataLength < this.definition.input.timePeriod)
       return !1;
-    let n = this.TALib[e](i), o = s.dataLength, a = s.value(o)[0], c = [], h = 0;
+    let n = this.TALib[e](i), o = s.dataLength, a = s.value(o)[0], c = [], l = 0;
     for (let g of this.definition.output)
-      c[h++] = n[g.name][0];
+      c[l++] = n[g.name][0];
     return [a, c];
   }
   newValue(e) {
@@ -8254,9 +8255,9 @@ const is = {
       E(r) && r.element.style.removeProperty("user-select"), E(e) && e.element.style.removeProperty("user-select");
     }
   }
-}, Mc = [
+}, Ac = [
   ["grid", { class: Mi, fixed: !1, required: !0, params: { axes: "x" } }]
-], Pc = ["candles", "trades", "events"];
+], Oc = ["candles", "trades", "events"];
 class Xr {
   #t = "MainPane";
   #e = "Main";
@@ -8265,8 +8266,8 @@ class Xr {
   #i;
   #s;
   #o = !1;
-  #h;
   #l;
+  #h;
   #a;
   #c;
   #u;
@@ -8274,10 +8275,10 @@ class Xr {
   #f = {};
   #m;
   #w;
-  #y;
+  #v;
   #E;
   #p;
-  #v;
+  #y;
   #I;
   #g = new mt();
   #L;
@@ -8294,7 +8295,7 @@ class Xr {
     rowsH: 0,
     panes: {}
   };
-  #S = yn;
+  #S = vn;
   #T = pn;
   #k = {};
   #P = [0, 0];
@@ -8309,7 +8310,7 @@ class Xr {
   #B;
   #C;
   constructor(e, i) {
-    this.#i = e, this.#r = i, this.#n = e, this.#l = this.#i.elMain, this.#h = this.#i.elYAxis, this.init(i);
+    this.#i = e, this.#r = i, this.#n = e, this.#h = this.#i.elMain, this.#l = this.#i.elYAxis, this.init(i);
   }
   log(e) {
     this.#i.log(e);
@@ -8354,28 +8355,28 @@ class Xr {
     return this.#r;
   }
   get element() {
-    return this.#l;
+    return this.#h;
   }
   get elRows() {
-    return this.#l.rows;
+    return this.#h.rows;
   }
   get elPrimary() {
-    return this.#l.rows.primary;
+    return this.#h.rows.primary;
   }
   get elSecondary() {
-    return this.#l.rows.secondary;
+    return this.#h.rows.secondary;
   }
   get elPanes() {
-    return this.#l.rows.chartPanes;
+    return this.#h.rows.chartPanes;
   }
   get elPaneSlot() {
-    return this.#l.rows.chartPaneSlot;
+    return this.#h.rows.chartPaneSlot;
   }
   get width() {
-    return this.#l.getBoundingClientRect().width;
+    return this.#h.getBoundingClientRect().width;
   }
   get height() {
-    return this.#l.getBoundingClientRect().height;
+    return this.#h.getBoundingClientRect().height;
   }
   get chartW() {
     return this.elPrimary.getBoundingClientRect().width;
@@ -8399,7 +8400,7 @@ class Xr {
     return this.dimensions;
   }
   get dimensions() {
-    return I.elementDimPos(this.#l);
+    return I.elementDimPos(this.#h);
   }
   get range() {
     return this.#i.range;
@@ -8456,28 +8457,28 @@ class Xr {
     };
   }
   init(e) {
-    if (this.#i, this.#D = this.#i.indicatorClasses, this.#a = this.#l.rows, this.#c = this.#l.time, this.#m = this.#l.rows.grid, this.#y = this.#l.viewport, this.#d = this.#i.elBody.scale, e.name = "Chart", e.shortName = "Chart", e.parent = this, e.chartData = this.#i.chartData, e.primaryPane = this.#i.primaryPane, e.secondaryPane = this.#i.secondaryPane, e.rangeLimit = this.#i.rangeLimit, e.settings = this.#i.settings, e.elements = {
+    if (this.#i, this.#D = this.#i.indicatorClasses, this.#a = this.#h.rows, this.#c = this.#h.time, this.#m = this.#h.rows.grid, this.#v = this.#h.viewport, this.#d = this.#i.elBody.scale, e.name = "Chart", e.shortName = "Chart", e.parent = this, e.chartData = this.#i.chartData, e.primaryPane = this.#i.primaryPane, e.secondaryPane = this.#i.secondaryPane, e.rangeLimit = this.#i.rangeLimit, e.settings = this.#i.settings, e.elements = {
       ...e.elements,
       ...this.elements
     }, this.#i.theme?.time?.navigation === !1) {
       const i = { height: bi };
       this.#i.theme.time = { ...this.#i.theme?.time, ...i }, this.#a.style.height = `calc(100% - ${bi}px)`;
     }
-    this.#M = new Fl(this.#i, e), this.registerChartViews(e), this.#N = T(this.config.buffer) ? this.config.buffer : ki, this.#T = T(this.config.rowMinH) ? this.config.rowMinH : pn, this.#S = T(this.config.secondaryPaneDefaultH) ? this.config.secondaryPaneDefaultH : yn, this.rowsOldH = this.rowsH, this.log(`${this.#t} instantiated`);
+    this.#M = new Yh(this.#i, e), this.registerChartViews(e), this.#N = T(this.config.buffer) ? this.config.buffer : ki, this.#T = T(this.config.rowMinH) ? this.config.rowMinH : pn, this.#S = T(this.config.secondaryPaneDefaultH) ? this.config.secondaryPaneDefaultH : vn, this.rowsOldH = this.rowsH, this.log(`${this.#t} instantiated`);
   }
   start() {
     let e = 0;
-    this.#l.start(this.theme), this.#M.start(), this.#g.forEach((i, s) => {
+    this.#h.start(this.theme), this.#M.start(), this.#g.forEach((i, s) => {
       i.start(e++), e === 1 && i.Divider.hide();
-    }), this.rowsOldH = this.rowsH, this.createGraph(), this.draw(this.range, !0), li.init({
+    }), this.rowsOldH = this.rowsH, this.createGraph(), this.draw(this.range, !0), hi.init({
       graphs: [this.#p],
       range: this.range
-    }), li.start(), li.queueFrame(this.range, [this.#p], !1), this.eventsListen(), is.id = this.id, is.context = this, this.stateMachine = is, this.stateMachine.start();
+    }), hi.start(), hi.queueFrame(this.range, [this.#p], !1), this.eventsListen(), is.id = this.id, is.context = this, this.stateMachine = is, this.stateMachine.start();
   }
   destroy() {
     this.#o = !0, this.stateMachine.destroy(), this.#M.destroy(), this.#g.forEach((e, i) => {
       this.#x[i] = !0, e.destroy(), delete this.#x[i];
-    }), this.#p.destroy(), this.#C.destroy(), this.off(Be, this.onFirstStreamValue), this.off(Ue, this.onNewStreamValue), this.off("setRange", this.draw), this.off("scrollUpdate", this.draw), this.off("chart_render", this.draw), this.off("destroyChartView", this.removeChartPane);
+    }), this.#p.destroy(), this.#C.destroy(), this.off(Be, this.onFirstStreamValue), this.off(ze, this.onNewStreamValue), this.off("setRange", this.draw), this.off("scrollUpdate", this.draw), this.off("chart_render", this.draw), this.off("destroyChartView", this.removeChartPane);
   }
   reset() {
     for (let e in this.#i.Indicators)
@@ -8492,7 +8493,7 @@ class Xr {
     this.draw(this.range, !0);
   }
   eventsListen() {
-    this.#a.tabIndex = 0, this.#a.focus(), this.#C = new At(this.#a, { disableContextMenu: !1 }), this.#C.on("keydown", this.onChartKeyDown.bind(this)), this.#C.on("keyup", this.onChartKeyUp.bind(this)), this.#C.on("wheel", this.onMouseWheel.bind(this)), this.#C.on("pointerenter", this.onMouseEnter.bind(this)), this.#C.on("pointerout", this.onMouseOut.bind(this)), this.#C.on("pointerup", this.onChartDragDone.bind(this)), this.#C.on("pointermove", this.onMouseMove.bind(this)), this.on(Be, this.onFirstStreamValue, this), this.on(Ue, this.onNewStreamValue, this), this.on("setRange", this.draw, this), this.on("scrollUpdate", this.draw, this), this.on("chart_render", this.draw, this), this.on("destroyChartView", this.removeChartPane, this);
+    this.#a.tabIndex = 0, this.#a.focus(), this.#C = new At(this.#a, { disableContextMenu: !1 }), this.#C.on("keydown", this.onChartKeyDown.bind(this)), this.#C.on("keyup", this.onChartKeyUp.bind(this)), this.#C.on("wheel", this.onMouseWheel.bind(this)), this.#C.on("pointerenter", this.onMouseEnter.bind(this)), this.#C.on("pointerout", this.onMouseOut.bind(this)), this.#C.on("pointerup", this.onChartDragDone.bind(this)), this.#C.on("pointermove", this.onMouseMove.bind(this)), this.on(Be, this.onFirstStreamValue, this), this.on(ze, this.onNewStreamValue, this), this.on("setRange", this.draw, this), this.on("scrollUpdate", this.draw, this), this.on("chart_render", this.draw, this), this.on("destroyChartView", this.removeChartPane, this);
   }
   on(e, i, s) {
     this.#i.on(e, i, s);
@@ -8509,7 +8510,7 @@ class Xr {
       e.dragstart.x = this.#P[0], e.dragstart.y = this.#P[1], e.position.x = this.#P[0] + i, e.position.y = this.#P[1], this.onChartDrag(e);
       return;
     }
-    const s = this.range, n = s.indexStart - Math.floor(i * ln * s.Length), o = s.indexEnd + Math.ceil(i * ln * s.Length);
+    const s = this.range, n = s.indexStart - Math.floor(i * hn * s.Length), o = s.indexEnd + Math.ceil(i * hn * s.Length);
     this.#i.setRange(n, o), this.draw(this.range, !0);
   }
   onMouseMove(e) {
@@ -8609,7 +8610,7 @@ class Xr {
       rowsH: this.rowsH,
       rowsW: this.rowsW
     };
-    this.#i.scrollPos = -1, this.#M.setDimensions({ w: s }), this.#p.setSize(s, n, o), this.#g.size == 1 && i != this.#a.height ? this.#L.setDimensions({ w: s, h: this.#a.height }) : this.#g.forEach((c, h) => {
+    this.#i.scrollPos = -1, this.#M.setDimensions({ w: s }), this.#p.setSize(s, n, o), this.#g.size == 1 && i != this.#a.height ? this.#L.setDimensions({ w: s, h: this.#a.height }) : this.#g.forEach((c, l) => {
       i = Math.round(c.viewport.height * e), c.setDimensions({ w: s, h: i });
     }), this.rowsOldH = this.rowsH, this.draw(this.range, !0), this.emit("rowsResize", a);
   }
@@ -8636,13 +8637,13 @@ class Xr {
     let n;
     this.#a.insertAdjacentHTML(
       "beforeend",
-      this.#l.rowNode(e.type, this.#i)
+      this.#h.rowNode(e.type, this.#i)
     ), n = this.#a.chartPaneSlot.assignedElements().slice(-1)[0], n.style.height = `${s}px`, n.style.width = "100%";
     let o;
-    this.#h.insertAdjacentHTML(
+    this.#l.insertAdjacentHTML(
       "beforeend",
       this.scaleNode(e.type)
-    ), o = this.#h.chartPaneSlot.assignedElements().slice(-1)[0], o.style.height = `${s}px`, o.style.width = "100%", e.elements.elTarget = n, e.elements.elScale = o;
+    ), o = this.#l.chartPaneSlot.assignedElements().slice(-1)[0], o.style.height = `${s}px`, o.style.width = "100%", e.elements.elTarget = n, e.elements.elScale = o;
     let a;
     return e.type == "primary" ? (a = new se(this.#i, e), this.#L = a) : (e.name = e.view[0].name || "Secondary", e.shortName = e.view[0].type || "Secondary", a = new se(this.#i, e)), this.#g.set(a.id, a), this.emit("addChartView", a), a;
   }
@@ -8654,7 +8655,7 @@ class Xr {
       return this.#i.error(`Cannot remove primary chart pane! ${e}`), !1;
     this.#x[e] = !0;
     let s = this.rowsW, n = i.viewport.height, o = Math.floor(n / (this.#g.size - 1)), a = n % o;
-    return i.status !== "destroyed" && i.destroy(), this.#g.delete(e), delete this.#x[e], this.#g.forEach((c, h) => {
+    return i.status !== "destroyed" && i.destroy(), this.#g.delete(e), delete this.#x[e], this.#g.forEach((c, l) => {
       n = c.viewport.height, c.setDimensions({ w: s, h: n + o + a }), a = 0;
     }), this.draw(this.range, !0), !0;
   }
@@ -8666,7 +8667,7 @@ class Xr {
         continue;
       }
       for (const [n, o] of s.entries())
-        E(o) && (o.type in this.core.indicatorClasses || Pc.includes(o.type)) || (this.#i.log(`indicator ${s.type} not added: not supported.`), s.splice(n, 1));
+        E(o) && (o.type in this.core.indicatorClasses || Oc.includes(o.type)) || (this.#i.log(`indicator ${s.type} not added: not supported.`), s.splice(n, 1));
     }
     return e;
   }
@@ -8685,7 +8686,7 @@ class Xr {
     } else {
       this.core.indicatorClasses[e].ind.primaryPane === "both" && Q(e.primaryPane) && e.primaryPane, P(s.view) || (s.view = [{ name: i, type: e, ...s }]);
       for (let a = 0; a < s.view.length; a++)
-        (!E(s.view[a]) || !vr(["name", "type"], Object.keys(s.view[a]))) && s.view.splice(a, 1);
+        (!E(s.view[a]) || !yr(["name", "type"], Object.keys(s.view[a]))) && s.view.splice(a, 1);
       if (s.view.length == 0)
         return !1;
       s.parent = this, s.title = i, s.elements = { ...this.elements }, n = this.addChartPane(s), n.start();
@@ -8734,8 +8735,8 @@ class Xr {
       n[o] = this.rowsH - a, n.new = a;
     } else if (e === 3) {
       const o = this.#g.firstEntry(), a = this.#g.lastEntry(), c = Math.round(this.rowsH * this.#S / 100);
-      let h = this.rowsH / (this.rowsH + c);
-      n[o[0]] = Math.floor(o[1].viewport.height * h), n[a[0]] = Math.floor(a[1].viewport.height * h), n.new = Math.floor(c * h), n.new += this.rowsH - (n[o[0]] + n[a[0]] + n.new);
+      let l = this.rowsH / (this.rowsH + c);
+      n[o[0]] = Math.floor(o[1].viewport.height * l), n[a[0]] = Math.floor(a[1].viewport.height * l), n.new = Math.floor(c * l), n.new += this.rowsH - (n[o[0]] + n[a[0]] + n.new);
     } else {
       let o = 0;
       for (let c of this.#g)
@@ -8750,14 +8751,14 @@ class Xr {
     return n;
   }
   scaleNode(e) {
-    const i = bl + ` width: 100%; border-top: 1px solid ${this.theme.secondaryPane.separator};`;
+    const i = Ph + ` width: 100%; border-top: 1px solid ${this.theme.secondaryPane.separator};`;
     return `
     <div slot="chartpane" class="viewport scale ${e}" style="$${i}"></div>
   `;
   }
   createGraph() {
-    let e = rt(Mc);
-    this.#p = new pe(this, this.#y, e);
+    let e = rt(Ac);
+    this.#p = new pe(this, this.#v, e);
   }
   draw(e = this.range, i = !1) {
     const s = [
@@ -8767,7 +8768,7 @@ class Xr {
     ];
     this.time.xAxis.doCalcXAxisGrads(e), this.#g.forEach((n, o) => {
       s.push(n);
-    }), li.queueFrame(
+    }), hi.queueFrame(
       this.range,
       s,
       i
@@ -8808,10 +8809,10 @@ class Xr {
     if (e.id in s.instances)
       s.panes[e.id];
     else {
-      s.panes[e.id] = o, i.keys(), Object.keys(s.instances), a = (h, g) => h.filter((p) => !g.includes(p));
+      s.panes[e.id] = o, i.keys(), Object.keys(s.instances), a = (l, g) => l.filter((p) => !g.includes(p));
       let c = o / (a.length - 2);
-      for (let h of a) {
-        let g = i.get(h);
+      for (let l of a) {
+        let g = i.get(l);
         g.id !== n && g.setDimensions({ w: void 0, h: g.element.clientHeight + c });
       }
       e.setDimensions({ w: void 0, h: 30 });
@@ -8849,8 +8850,8 @@ class Et extends V {
   #i = "";
   #s = "";
   #o;
-  #h;
   #l;
+  #h;
   #a;
   #c;
   #u;
@@ -8858,18 +8859,18 @@ class Et extends V {
   #f;
   #m;
   #w;
-  #y = [0, 0];
+  #v = [0, 0];
   #E = !1;
   #p;
-  #v = { TL: [0, 0], BR: [0, 0] };
+  #y = { TL: [0, 0], BR: [0, 0] };
   constructor(e, i = !1, s = !1, n, o, a) {
-    super(e, i, s, n, o, a), this.#h = config, this.#n = config.cnt, this.#r = this.#h.ID || J("TX_Tool_"), this.#i = config.name, this.#l = config.core, this.#u = config.elements.elChart, this.#a = { ...config.parent }, this.#w = config.target, this.#w.addTool(this), this.#f = this.#m.viewport, this.#d = this.#f.scene.canvas, this.#p = config.pos;
+    super(e, i, s, n, o, a), this.#l = config, this.#n = config.cnt, this.#r = this.#l.ID || J("TX_Tool_"), this.#i = config.name, this.#h = config.core, this.#u = config.elements.elChart, this.#a = { ...config.parent }, this.#w = config.target, this.#w.addTool(this), this.#f = this.#m.viewport, this.#d = this.#f.scene.canvas, this.#p = config.pos;
   }
   set id(e) {
     this.#r = Ot(e);
   }
   get id() {
-    return this.#r ? `${this.#r}` : `${this.#l.id}-${this.#s}_${this.#n}`.replace(/ |,|;|:|\.|#/g, "_");
+    return this.#r ? `${this.#r}` : `${this.#h.id}-${this.#s}_${this.#n}`.replace(/ |,|;|:|\.|#/g, "_");
   }
   get inCnt() {
     return this.#n;
@@ -8881,19 +8882,19 @@ class Et extends V {
     return this.#s;
   }
   get core() {
-    return this.#l;
+    return this.#h;
   }
   get stateMachine() {
-    return this.#l.stateMachine;
+    return this.#h.stateMachine;
   }
   get state() {
-    return this.#l.getState();
+    return this.#h.getState();
   }
   get data() {
-    return this.#l.chartData;
+    return this.#h.chartData;
   }
   get range() {
-    return this.#l.range;
+    return this.#h.range;
   }
   get target() {
     return this.#w;
@@ -8908,7 +8909,7 @@ class Et extends V {
     return this.#f;
   }
   get cursorPos() {
-    return this.#y;
+    return this.#v;
   }
   get cursorActive() {
     return this.#E;
@@ -8917,19 +8918,19 @@ class Et extends V {
     return this.#p;
   }
   get candleW() {
-    return this.#l.Timeline.candleW;
+    return this.#h.Timeline.candleW;
   }
   get theme() {
-    return this.#l.theme;
+    return this.#h.theme;
   }
   get config() {
-    return this.#l.config;
+    return this.#h.config;
   }
   get scrollPos() {
-    return this.#l.scrollPos;
+    return this.#h.scrollPos;
   }
   get bufferPx() {
-    return this.#l.bufferPx;
+    return this.#h.bufferPx;
   }
   get visible() {
     return this.isVisible();
@@ -8947,23 +8948,23 @@ class Et extends V {
     this.#c = new At(this.#d, { disableContextMenu: !1 }), this.#c.on("pointermove", this.onPointerMove.bind(this));
   }
   on(e, i, s) {
-    this.#l.on(e, i, s);
+    this.#h.on(e, i, s);
   }
   off(e, i) {
-    this.#l.off(e, i);
+    this.#h.off(e, i);
   }
   emit(e, i) {
-    this.#l.emit(e, i);
+    this.#h.emit(e, i);
   }
   onPointerMove(e) {
-    this.#y = [Math.round(e.position.x), Math.round(e.position.y)], this.emit("tool_pointermove", this.#y);
+    this.#v = [Math.round(e.position.x), Math.round(e.position.y)], this.emit("tool_pointermove", this.#v);
   }
   isVisible() {
   }
   draw() {
   }
 }
-class Lc extends Et {
+class Ic extends Et {
   constructor(e) {
     super(e);
   }
@@ -9006,26 +9007,26 @@ class ci extends Et {
     n.save(), n.lineWidth = this.lineWidth, n.strokeStyle = this.colour, n.beginPath(), n.moveTo(e, i), n.lineTo(300, 150), n.stroke(), n.closePath(), n.restore(), this.elViewport.render();
   }
 }
-class Ac extends Et {
+class kc extends Et {
   constructor(e) {
     super(e);
   }
 }
-class Oc extends Et {
+class Rc extends Et {
   constructor(e) {
     super(e);
   }
 }
-class Ic extends Et {
+class Dc extends Et {
   constructor(e) {
     super(e);
   }
 }
-const kc = [
+const _c = [
   {
     id: "cursor",
     name: "Cursor",
-    icon: qh,
+    icon: ql,
     event: "tool_activated"
   },
   {
@@ -9061,9 +9062,9 @@ const kc = [
   {
     id: "fibonacci",
     name: "Fibonacci",
-    icon: jh,
+    icon: jl,
     event: "tool_activated",
-    class: Lc,
+    class: Ic,
     sub: [
       {
         id: "fib",
@@ -9075,9 +9076,9 @@ const kc = [
   {
     id: "range",
     name: "Range",
-    icon: Kh,
+    icon: Kl,
     event: "tool_activated",
-    class: Oc,
+    class: Rc,
     sub: [
       {
         id: "rng",
@@ -9089,9 +9090,9 @@ const kc = [
   {
     id: "text",
     name: "Text",
-    icon: Qh,
+    icon: Ql,
     event: "tool_activated",
-    class: Ic,
+    class: Dc,
     sub: [
       {
         id: "txt",
@@ -9103,14 +9104,14 @@ const kc = [
   {
     id: "measure",
     name: "Measure",
-    icon: Zh,
+    icon: Zl,
     event: "tool_activated",
-    class: Ac
+    class: kc
   },
   {
     id: "delete",
     name: "Delete",
-    icon: Xh,
+    icon: Xl,
     event: "tool_activated",
     class: void 0
   }
@@ -9220,8 +9221,8 @@ class jr {
   #i;
   #s;
   #o;
-  #h;
-  #l = Et;
+  #l;
+  #h = Et;
   #a;
   #c = {};
   #u = void 0;
@@ -9229,7 +9230,7 @@ class jr {
   #f = { click: [], pointerover: [] };
   #m = [];
   constructor(e, i) {
-    this.#n = e, this.#i = i, this.#o = e.elTools, this.#a = kc || e.config.tools, this.#h = e.WidgetsG, this.init();
+    this.#n = e, this.#i = i, this.#o = e.elTools, this.#a = _c || e.config.tools, this.#l = e.WidgetsG, this.init();
   }
   log(e) {
     this.#n.log(e);
@@ -9347,10 +9348,10 @@ class jr {
             let a = {
               content: o.sub,
               primary: i
-            }, c = this.#h.insert("Menu", a);
+            }, c = this.#l.insert("Menu", a);
             i.dataset.menu = c.id, c.start(), this.#m.push(c);
-            for (let h of o.sub)
-              this.#c[h.id] = h.class;
+            for (let l of o.sub)
+              this.#c[l.id] = l.class;
           } else
             this.#c[o.id] = o.class;
     }
@@ -9360,7 +9361,7 @@ class jr {
       name: e,
       tool: this.#c[e],
       pos: i.cursorClick
-    }, n = this.#l.create(i, s);
+    }, n = this.#h.create(i, s);
     return n.start(), console.log(n), n;
   }
   addNewTool(e, i) {
@@ -9370,8 +9371,8 @@ class jr {
   addAllTools() {
   }
 }
-const er = 20, Rc = 20, Dc = new Ir(_.COLOUR_BORDER), ys = document.createElement("template");
-ys.innerHTML = `
+const er = 20, Nc = 20, $c = new Ir(_.COLOUR_BORDER), vs = document.createElement("template");
+vs.innerHTML = `
 <style>
   .scrollBarWidget {
     display: flex;
@@ -9508,7 +9509,7 @@ ys.innerHTML = `
   }
 
   .handle {
-    background-color: var(--txc-time-handle-color, ${Dc.hex}44); 
+    background-color: var(--txc-time-handle-color, ${$c.hex}44); 
     width: 2px;
     height: 18px;
     margin: 1px;
@@ -9522,7 +9523,7 @@ ys.innerHTML = `
   .icon svg {
     fill: var(--txc-time-icon-color, ${_.COLOUR_ICON});
     width: ${er}px;
-    height: ${Rc}px;
+    height: ${Nc}px;
     margin-top: 1px;
   }
   .icon svg:hover {
@@ -9530,20 +9531,20 @@ ys.innerHTML = `
   }
 </style>
 <div class="scrollBarWidget">
-  <span id="rwdStart" class="icon rwdStart">${hl}</span>
+  <span id="rwdStart" class="icon rwdStart">${dh}</span>
   <span class="scrollBar">
     <div class="viewport"></div>
     <input id="min" class="min" name="min" type="range" step="1" min="0" max="3000" />
     <input id="max" class="max" name="max" type="range" step="1" min="0" max="3000" />
     <div class="handle"></div>
   </span>
-  <span id="fwdEnd" class="icon fwdEnd">${al}</span>
+  <span id="fwdEnd" class="icon fwdEnd">${ch}</span>
 </div>
 `;
-class _c extends ot {
+class Hc extends ot {
   #t;
   constructor() {
-    super(ys), this.#t = ys;
+    super(vs), this.#t = vs;
   }
   destroy() {
   }
@@ -9589,7 +9590,7 @@ class _c extends ot {
     console.log(`${this.input.value}, ${this.input.getAttribute("max")}`);
   }
 }
-customElements.get("tradex-overview") || window.customElements.define("tradex-overview", _c);
+customElements.get("tradex-overview") || window.customElements.define("tradex-overview", Hc);
 const Zr = document.createElement("template");
 Zr.innerHTML = `
 <style>
@@ -9604,7 +9605,7 @@ Zr.innerHTML = `
 <div class="viewport"></div>
 <tradex-overview></tradex-overview>
 `;
-class Nc extends ot {
+class Bc extends ot {
   constructor() {
     super(Zr);
   }
@@ -9621,7 +9622,7 @@ class Nc extends ot {
     return this.shadowRoot.querySelector("tradex-overview");
   }
 }
-customElements.get("tradex-time") || window.customElements.define("tradex-time", Nc);
+customElements.get("tradex-time") || window.customElements.define("tradex-time", Bc);
 const Kr = document.createElement("template");
 Kr.innerHTML = `
 <style>
@@ -9633,7 +9634,7 @@ Kr.innerHTML = `
 </style>
   <div class="viewport"></div>
 `;
-class $c extends ot {
+class zc extends ot {
   constructor() {
     super(Kr);
   }
@@ -9645,7 +9646,7 @@ class $c extends ot {
     return this.shadowRoot.querySelector(".viewport");
   }
 }
-customElements.get("tradex-grid") || window.customElements.define("tradex-grid", $c);
+customElements.get("tradex-grid") || window.customElements.define("tradex-grid", zc);
 const Qr = document.createElement("template");
 Qr.innerHTML = `
 <style>
@@ -9720,8 +9721,10 @@ Qr.innerHTML = `
 .legend dl {
   display: inline;
 }
-.legend .control {
-  margin-right:2px;
+.legend .control,
+.legend .control.collapse {
+  margin-right: 2px;
+  padding-left: 0;
 }
 
 
@@ -9730,9 +9733,14 @@ Qr.innerHTML = `
 }
 
 
+.controls .control:hover {
+  background: #889;
+  border-radius: 3px;
+}
+
 .controls.maximized .up,
 .controls.maximized .down,
-.controls.maximized .visible,
+.controls.maximized .expand,
 .controls.maximized .collapse,
 .controls.maximized .maximize,
 .controls.maximized .remove
@@ -9745,7 +9753,27 @@ Qr.innerHTML = `
   display: none;
 }
 
+.controls.collapsed .collapse {
+  display: none;
+}
 
+.controls.expanded .expand {
+  display: none;
+}
+
+.controls.visible .visible {
+  display: none;
+}
+.controls.visible .notvisible {
+  display: inline;
+}
+
+.controls.notvisible .notvisible {
+  display: none;
+}
+.controls.notvisible .visible {
+  display: inline;
+}
 
 .chart .upper {
   right: 0;
@@ -9767,12 +9795,12 @@ Qr.innerHTML = `
 <div class="legends">
   <slot name="legend"></slot>
   <div class="controls collapse restored">
-    <span id="hideLegends" class="control" data-icon="hide" style="display:none">${tl}</span>
-    <span id="showLegends" class="control" data-icon="show" style="display:none">${el}</span>
+    <span id="hideLegends" class="control" data-icon="hide" style="display:none">${th}</span>
+    <span id="showLegends" class="control" data-icon="show" style="display:none">${eh}</span>
   </div>
 </div>
 `;
-class Hc extends ot {
+class Uc extends ot {
   #t;
   #e;
   #r;
@@ -9821,9 +9849,9 @@ class Hc extends ot {
     S && (this.#t = e, this.elTitle.innerHTML = e);
   }
   buildLegend(e, i) {
-    let s = "", n = `${i.legend.font}; color: ${i.legend.colour}; text-align: left;`, o = "";
-    const a = "", c = i.legend.controls ? `
-      <div class="controls restored" style="${a}">
+    let s = "", n = `${i.legend.font}; color: ${i.legend.colour}; text-align: left;`, o = "", a = e?.type !== "chart" ? "visible" : "notvisible";
+    const c = "", l = i.legend.controls ? `
+      <div class="controls restored expanded ${a}" style="${c}">
         ${this.buildControls(e)}
       </div>
     ` : "";
@@ -9846,7 +9874,7 @@ class Hc extends ot {
         </div>
         <div class="upper">
             <span class="title" style="${o}">${e.title}</span>
-            ${c}
+            ${l}
       </div>
      </div>
     `;
@@ -9854,18 +9882,18 @@ class Hc extends ot {
   buildInputs(e) {
     let i = 0, s = "", n, o = "", a = "", c = "";
     for (n in e.inputs) {
-      let h = e?.colours?.[i] ? ` color: ${e.colours[i]};` : "", g = e?.inputs?.[n] !== void 0 ? e.inputs[n] : o, p = e?.labels?.[i] ? `${n}:` : o;
+      let l = e?.colours?.[i] ? ` color: ${e.colours[i]};` : "", g = e?.inputs?.[n] !== void 0 ? e.inputs[n] : o, p = e?.labels?.[i] ? `${n}:` : o;
       a += e?.labels?.[i] ? "1em;" : ".25em", s += `<dt style="${a}">${p}</dt>
-      <dd style="${c}${h}">${g}</dd>`, ++i;
+      <dd style="${c}${l}">${g}</dd>`, ++i;
     }
     return s;
   }
   buildControls(e) {
     let i = "", s = e.id;
-    return i += `<span id="${s}_up" class="control up" data-icon="up">${il}</span>`, i += `<span id="${s}_down" class="control down" data-icon="down">${sl}</span>`, i += `<span id="${s}_collapse" class="control visible" data-icon="visible">${ol}</span>`, i += `<span id="${s}_maximize" class="control maximize" data-icon="maximize">${rl}</span>`, i += `<span id="${s}_restore" class="control restore" data-icon="restore">${nl}</span>`, i += e?.type !== "chart" ? `<span id="${s}_remove" class="control remove" data-icon="remove">${Jh}</span>` : "", i += e?.type !== "secondary" ? `<span id="${s}_config" class="control config" data-icon="config">${br}</span>` : "", i;
+    return i += `<span id="${s}_up" class="control up" data-icon="up">${ih}</span>`, i += `<span id="${s}_down" class="control down" data-icon="down">${sh}</span>`, e?.type === "indicator" && (i += `<span id="${s}_visible" class="control visible" data-icon="visible">${lh}</span>`, i += `<span id="${s}_notVisible" class="control notvisible" data-icon="notVisible">${hh}</span>`), e?.type !== "indicator" && (i += `<span id="${s}_collapse" class="control collapse" data-icon="collapse">${oh}</span>`, i += `<span id="${s}_expand" class="control expand" data-icon="expand">${ah}</span>`, i += `<span id="${s}_maximize" class="control maximize" data-icon="maximize">${rh}</span>`, i += `<span id="${s}_restore" class="control restore" data-icon="restore">${nh}</span>`), i += e?.type !== "chart" ? `<span id="${s}_remove" class="control remove" data-icon="remove">${Jl}</span>` : "", i += e?.type !== "secondary" ? `<span id="${s}_config" class="control config" data-icon="config">${br}</span>` : "", i;
   }
 }
-customElements.get("tradex-legends") || window.customElements.define("tradex-legends", Hc);
+customElements.get("tradex-legends") || window.customElements.define("tradex-legends", Uc);
 const Jr = document.createElement("template");
 Jr.innerHTML = `
 <style>
@@ -9894,7 +9922,7 @@ Jr.innerHTML = `
 <div class="viewport"></div>
 <tradex-legends></tradex-legends>
 `;
-class Bc extends ot {
+class Wc extends ot {
   #t;
   #e;
   constructor() {
@@ -9914,7 +9942,7 @@ class Bc extends ot {
     return this.#e;
   }
 }
-customElements.get("tradex-chartpane") || window.customElements.define("tradex-chartpane", Bc);
+customElements.get("tradex-chartpane") || window.customElements.define("tradex-chartpane", Wc);
 const to = document.createElement("template");
 to.innerHTML = `
 <style>
@@ -9943,7 +9971,7 @@ to.innerHTML = `
 <tradex-grid></tradex-grid>
 <slot name="chartpane" id="chartpane"></slot>
 `;
-class Uc extends ot {
+class Fc extends ot {
   #t;
   #e;
   #r;
@@ -9995,7 +10023,7 @@ class Uc extends ot {
     this.#t = this.#r ? this.#r : this.clientWidth, this.#e = this.#n ? this.#n : this.clientHeight, this.#r = this.clientWidth, this.#n = this.clientHeight;
   }
 }
-customElements.get("tradex-rows") || window.customElements.define("tradex-rows", Uc);
+customElements.get("tradex-rows") || window.customElements.define("tradex-rows", Fc);
 const eo = document.createElement("template");
 eo.innerHTML = `
 <style>
@@ -10031,7 +10059,7 @@ eo.innerHTML = `
 <tradex-rows></tradex-rows>
 <tradex-time></tradex-time>
 `;
-class zc extends ot {
+class Vc extends ot {
   #t;
   #e;
   constructor() {
@@ -10065,12 +10093,12 @@ class zc extends ot {
     this.rows.style.height = `calc(100% - ${e}px)`, this.rows.style.left = `${i}px`, this.time.style.left = `${i}px`, this.viewport.style.left = `${i}px`;
   }
 }
-customElements.get("tradex-main") || window.customElements.define("tradex-main", zc);
+customElements.get("tradex-main") || window.customElements.define("tradex-main", Vc);
 const io = document.createElement("template");
 io.innerHTML = `
   <slot></slot>
 `;
-class Wc extends ot {
+class Gc extends ot {
   constructor() {
     super(io);
   }
@@ -10110,7 +10138,7 @@ class Wc extends ot {
     `;
   }
 }
-customElements.get("tradex-tools") || window.customElements.define("tradex-tools", Wc);
+customElements.get("tradex-tools") || window.customElements.define("tradex-tools", Gc);
 const so = document.createElement("template");
 so.innerHTML = `
 <style>
@@ -10132,7 +10160,7 @@ so.innerHTML = `
 <div class="viewport"></div>
 <slot name="chartpane" id="chartPane"></slot>
 `;
-class Fc extends ot {
+class Yc extends ot {
   constructor() {
     super(so);
   }
@@ -10153,8 +10181,8 @@ class Fc extends ot {
     return this.shadowRoot.querySelector('slot[name="chartpane"]');
   }
 }
-customElements.get("tradex-scale") || window.customElements.define("tradex-scale", Fc);
-const Vc = `
+customElements.get("tradex-scale") || window.customElements.define("tradex-scale", Yc);
+const qc = `
 <style>
   tradex-tools {
     position: absolute; 
@@ -10182,8 +10210,8 @@ const Vc = `
 <tradex-main></tradex-main>
 <tradex-scale></tradex-scale>
 `, no = document.createElement("template");
-no.innerHTML = Vc;
-class Gc extends ot {
+no.innerHTML = qc;
+class Xc extends ot {
   #t;
   constructor() {
     super(no);
@@ -10234,7 +10262,7 @@ class Gc extends ot {
     this.setYAxisLocation();
   }
 }
-customElements.get("tradex-body") || window.customElements.define("tradex-body", Gc);
+customElements.get("tradex-body") || window.customElements.define("tradex-body", Xc);
 const ro = document.createElement("template");
 ro.innerHTML = `
   <style>
@@ -10246,7 +10274,7 @@ ro.innerHTML = `
   <div class="utilsOptions">
   </div>
 `;
-class Yc extends ot {
+class jc extends ot {
   constructor() {
     super(ro);
   }
@@ -10279,12 +10307,12 @@ class Yc extends ot {
     `;
   }
 }
-customElements.get("tradex-utils") || window.customElements.define("tradex-utils", Yc);
+customElements.get("tradex-utils") || window.customElements.define("tradex-utils", jc);
 const oo = document.createElement("template");
 oo.innerHTML = `
   <slot name="widget"></slot>
 `;
-class qc extends ot {
+class Zc extends ot {
   constructor() {
     super(oo);
   }
@@ -10293,8 +10321,8 @@ class qc extends ot {
   disconnectedCallback() {
   }
 }
-customElements.get("tradex-widgets") || window.customElements.define("tradex-widgets", qc);
-const Xc = `
+customElements.get("tradex-widgets") || window.customElements.define("tradex-widgets", Zc);
+const Kc = `
   <style title="core">
     :host {
       position: relative;
@@ -10321,7 +10349,7 @@ const Xc = `
   <tradex-body></tradex-body>
   <tradex-widgets></tradex-widgets>
 `;
-class jc extends ot {
+class Qc extends ot {
   #t;
   #e;
   #r;
@@ -10329,13 +10357,13 @@ class jc extends ot {
   #i = Si;
   #s = ie;
   #o;
-  #h;
   #l;
+  #h;
   #a;
   #c;
   constructor() {
     const e = document.createElement("template");
-    e.innerHTML = Xc, super(e, "closed"), this.#n = e;
+    e.innerHTML = Kc, super(e, "closed"), this.#n = e;
   }
   destroy() {
     this.resizeObserver.disconnect();
@@ -10398,13 +10426,13 @@ class jc extends ot {
     return this.#o;
   }
   get oHeight() {
-    return this.#h;
+    return this.#l;
   }
   get widthDeltaR() {
     return this.offsetWidth / this.#o;
   }
   get heightDeltaR() {
-    return this.offsetHeight / this.#h;
+    return this.offsetHeight / this.#l;
   }
   get stream() {
   }
@@ -10426,7 +10454,7 @@ class jc extends ot {
     this.log(`onResize w: ${this.offsetWidth}, h: ${this.offsetHeight}`), this.emit("global_resize", { w: this.offsetWidth, h: this.offsetHeight }), this.MainPane instanceof Xr && this.previousDimensions(), this.ToolsBar instanceof jr && this.ToolsBar.onResized();
   }
   previousDimensions() {
-    this.#o = this.#l ? this.#l : this.offsetWidth, this.#h = this.#a ? this.#a : this.offsetHeight, this.#l = this.offsetWidth, this.#a = this.offsetHeight;
+    this.#o = this.#h ? this.#h : this.offsetWidth, this.#l = this.#a ? this.#a : this.offsetHeight, this.#h = this.offsetWidth, this.#a = this.offsetHeight;
   }
   setWidth(e) {
     T(e) ? (this.#i = e, e += "px") : S(e) || (this.#i = this.parentElement.getBoundingClientRect().width, e = this.#i + "px"), this.style.width = e;
@@ -10473,24 +10501,24 @@ class jc extends ot {
     }
   }
 }
-const Zc = [
+const Jc = [
   {
     id: "indicators",
     name: "Indicators",
-    icon: Gh,
+    icon: Gl,
     event: "utils_indicators",
     sub: []
   },
   {
     id: "timezone",
     name: "Timezone",
-    icon: Yh,
+    icon: Yl,
     event: "utils_timezone"
   },
   {
     id: "screenshot",
     name: "Screenshot",
-    icon: Vh,
+    icon: Vl,
     event: "utils_screenshot"
   },
   {
@@ -10499,7 +10527,7 @@ const Zc = [
     icon: br,
     event: "utils_settings"
   }
-], Kc = {
+], td = {
   name: "AROON",
   camelCaseName: "aroon",
   group: "Momentum Indicators",
@@ -10531,7 +10559,7 @@ const Zc = [
     type: "number",
     plot: "line"
   }]
-}, Qc = {
+}, ed = {
   name: "BBANDS",
   camelCaseName: "bbands",
   group: "Overlap Studies",
@@ -10590,7 +10618,7 @@ const Zc = [
     type: "number",
     plot: "limit_lower"
   }]
-}, Jc = {
+}, sd = {
   name: "EMA",
   camelCaseName: "ema",
   group: "Overlap Studies",
@@ -10615,7 +10643,7 @@ const Zc = [
     type: "number",
     plot: "line"
   }]
-}, td = {
+}, nd = {
   name: "RSI",
   camelCaseName: "rsi",
   group: "Momentum Indicators",
@@ -10640,7 +10668,7 @@ const Zc = [
     type: "number",
     plot: "line"
   }]
-}, ed = {
+}, rd = {
   name: "SMA",
   camelCaseName: "sma",
   group: "Overlap Studies",
@@ -10701,10 +10729,10 @@ class Ds extends Nt {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a);
     const c = a.overlay;
-    this.id = a.overlay?.id || J(this.shortName), this.defineIndicator(c?.settings, Kc), this.style = c?.settings?.style ? { ...this.#t, ...c.settings.style } : { ...this.#t, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (h) => {
-      this.newValue(h);
-    }, this.setUpdateValue = (h) => {
-      this.updateValue(h);
+    this.id = a.overlay?.id || J(this.shortName), this.defineIndicator(c?.settings, td), this.style = c?.settings?.style ? { ...this.#t, ...c.settings.style } : { ...this.#t, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (l) => {
+      this.newValue(l);
+    }, this.setUpdateValue = (l) => {
+      this.updateValue(l);
     }, this.addLegend();
   }
   get primaryPane() {
@@ -10730,9 +10758,9 @@ class Ds extends Nt {
     const i = { down: [], up: [] }, s = this.overlay.data, o = {
       w: this.xAxis.candleW
     };
-    let a = e.value(e.indexStart)[0], c = this.overlay.data[0][0], h = (a - c) / e.interval, g = this.Timeline.rangeScrollOffset, p = e.Length + g + 2, v = {};
+    let a = e.value(e.indexStart)[0], c = this.overlay.data[0][0], l = (a - c) / e.interval, g = this.Timeline.rangeScrollOffset, p = e.Length + g + 2, v = {};
     for (; p; )
-      h < 0 || h >= this.overlay.data.length ? (i.down.push({ x: null, y: null }), i.up.push({ x: null, y: null })) : (o.x = this.xAxis.xPos(s[h][0]), o.y = this.yAxis.yPos(s[h][1][0]), i.down.push({ ...o }), o.x = this.xAxis.xPos(s[h][0]), o.y = this.yAxis.yPos(s[h][1][1]), i.up.push({ ...o })), h++, p--;
+      l < 0 || l >= this.overlay.data.length ? (i.down.push({ x: null, y: null }), i.up.push({ x: null, y: null })) : (o.x = this.xAxis.xPos(s[l][0]), o.y = this.yAxis.yPos(s[l][1][0]), i.down.push({ ...o }), o.x = this.xAxis.xPos(s[l][0]), o.y = this.yAxis.yPos(s[l][1][1]), i.up.push({ ...o })), l++, p--;
     v = {
       width: this.style.LineWidth,
       stroke: this.style.downStroke,
@@ -10783,10 +10811,10 @@ class _s extends Nt {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a);
     const c = a.overlay;
-    this.id = a.overlay?.id || J(this.shortName), this.defineIndicator(c?.settings, Qc), this.style = c?.settings?.style ? { ...this.#t, ...c.settings.style } : { ...this.#t, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (h) => {
-      this.newValue(h);
-    }, this.setUpdateValue = (h) => {
-      this.updateValue(h);
+    this.id = a.overlay?.id || J(this.shortName), this.defineIndicator(c?.settings, ed), this.style = c?.settings?.style ? { ...this.#t, ...c.settings.style } : { ...this.#t, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (l) => {
+      this.newValue(l);
+    }, this.setUpdateValue = (l) => {
+      this.updateValue(l);
     }, this.addLegend();
   }
   get primaryPane() {
@@ -10813,9 +10841,9 @@ class _s extends Nt {
     const i = { lower: [], middle: [], upper: [] }, s = this.overlay.data, o = {
       w: this.xAxis.candleW
     };
-    let a = e.value(e.indexStart)[0], c = this.overlay.data[0][0], h = (a - c) / e.interval, g = this.Timeline.rangeScrollOffset, p = e.Length + g + 2, v = {};
+    let a = e.value(e.indexStart)[0], c = this.overlay.data[0][0], l = (a - c) / e.interval, g = this.Timeline.rangeScrollOffset, p = e.Length + g + 2, v = {};
     for (; p; )
-      h < 0 || h >= this.overlay.data.length ? (i.lower.push({ x: null, y: null }), i.middle.push({ x: null, y: null }), i.upper.push({ x: null, y: null })) : (o.x = this.xAxis.xPos(s[h][0]), o.y = this.yAxis.yPos(s[h][1][0]), i.lower.push({ ...o }), o.x = this.xAxis.xPos(s[h][0]), o.y = this.yAxis.yPos(s[h][1][1]), i.middle.push({ ...o }), o.x = this.xAxis.xPos(s[h][0]), o.y = this.yAxis.yPos(s[h][1][2]), i.upper.push({ ...o })), h++, p--;
+      l < 0 || l >= this.overlay.data.length ? (i.lower.push({ x: null, y: null }), i.middle.push({ x: null, y: null }), i.upper.push({ x: null, y: null })) : (o.x = this.xAxis.xPos(s[l][0]), o.y = this.yAxis.yPos(s[l][1][0]), i.lower.push({ ...o }), o.x = this.xAxis.xPos(s[l][0]), o.y = this.yAxis.yPos(s[l][1][1]), i.middle.push({ ...o }), o.x = this.xAxis.xPos(s[l][0]), o.y = this.yAxis.yPos(s[l][1][2]), i.upper.push({ ...o })), l++, p--;
     v = {
       width: this.style.lowerLineWidth,
       stroke: this.style.lowerStroke,
@@ -10865,10 +10893,10 @@ class Li extends Nt {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a), Li.inCnt++;
     const c = a.overlay;
-    this.id = a.overlay?.id || J(this.shortName), this.defineIndicator(c?.settings, Jc), this.style = c?.settings?.style ? { ...this.#t, ...c.settings.style } : { ...this.#t, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (h) => {
-      this.newValue(h);
-    }, this.setUpdateValue = (h) => {
-      this.updateValue(h);
+    this.id = a.overlay?.id || J(this.shortName), this.defineIndicator(c?.settings, sd), this.style = c?.settings?.style ? { ...this.#t, ...c.settings.style } : { ...this.#t, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (l) => {
+      this.newValue(l);
+    }, this.setUpdateValue = (l) => {
+      this.updateValue(l);
     }, this.addLegend();
   }
   get primaryPane() {
@@ -10895,9 +10923,9 @@ class Li extends Nt {
     const o = {
       w: s
     };
-    let a = this.Timeline.rangeScrollOffset, c = e.data.length - this.overlay.data.length, h = e.indexStart - c - 2, g = e.Length + a * 2 + 2;
+    let a = this.Timeline.rangeScrollOffset, c = e.data.length - this.overlay.data.length, l = e.indexStart - c - 2, g = e.Length + a * 2 + 2;
     for (; g; )
-      h < 0 || h >= this.overlay.data.length ? n.push({ x: null, y: null }) : (o.x = this.xAxis.xPos(i[h][0]), o.y = this.yAxis.yPos(i[h][1]), n.push({ ...o })), h++, g--;
+      l < 0 || l >= this.overlay.data.length ? n.push({ x: null, y: null }) : (o.x = this.xAxis.xPos(i[l][0]), o.y = this.yAxis.yPos(i[l][1]), n.push({ ...o })), l++, g--;
     this.plot(n, "renderLine", this.style), this.target.viewport.render();
   }
 }
@@ -10935,10 +10963,10 @@ class Ns extends Nt {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a);
     const c = a.overlay;
-    this.id = a.overlay?.id || J(this.shortName), this.defineIndicator(c?.settings, td), this.style = c?.settings?.style ? { ...this.#t, ...c.settings.style } : { ...this.#t, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (h) => {
-      this.newValue(h);
-    }, this.setUpdateValue = (h) => {
-      this.updateValue(h);
+    this.id = a.overlay?.id || J(this.shortName), this.defineIndicator(c?.settings, nd), this.style = c?.settings?.style ? { ...this.#t, ...c.settings.style } : { ...this.#t, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (l) => {
+      this.newValue(l);
+    }, this.setUpdateValue = (l) => {
+      this.updateValue(l);
     }, this.addLegend();
   }
   get primaryPane() {
@@ -10967,10 +10995,10 @@ class Ns extends Nt {
       dash: [1, 1]
     }, this.plot(o, "renderLine", a), this.overlay.data.length < 2)
       return this.target.viewport.render(), !1;
-    const c = this.overlay.data, h = this.xAxis.candleW;
+    const c = this.overlay.data, l = this.xAxis.candleW;
     o.length = 0, this.Timeline.smoothScrollOffset;
     const g = {
-      w: h
+      w: l
     };
     let p = this.Timeline.rangeScrollOffset, v = e.data.length - this.overlay.data.length, M = e.indexStart - v - 2, L = e.Length + p * 2 + 2;
     for (; L; )
@@ -11012,10 +11040,10 @@ class Ai extends Nt {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a), Ai.inCnt++;
     const c = a.overlay;
-    this.id = a.overlay?.id || J(this.shortName), this.defineIndicator(c?.settings, ed), this.style = c?.settings?.style ? { ...this.#t, ...c.settings.style } : { ...this.#t, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (h) => {
-      this.newValue(h);
-    }, this.setUpdateValue = (h) => {
-      this.updateValue(h);
+    this.id = a.overlay?.id || J(this.shortName), this.defineIndicator(c?.settings, rd), this.style = c?.settings?.style ? { ...this.#t, ...c.settings.style } : { ...this.#t, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (l) => {
+      this.newValue(l);
+    }, this.setUpdateValue = (l) => {
+      this.updateValue(l);
     }, this.addLegend();
   }
   get primaryPane() {
@@ -11042,9 +11070,9 @@ class Ai extends Nt {
     const o = {
       w: s
     };
-    let a = this.Timeline.rangeScrollOffset, c = e.data.length - this.overlay.data.length, h = e.indexStart - c - 2, g = e.Length + a * 2 + 2;
+    let a = this.Timeline.rangeScrollOffset, c = e.data.length - this.overlay.data.length, l = e.indexStart - c - 2, g = e.Length + a * 2 + 2;
     for (; g; )
-      h < 0 || h >= this.overlay.data.length ? n.push({ x: null, y: null }) : (o.x = this.xAxis.xPos(i[h][0]), o.y = this.yAxis.yPos(i[h][1]), n.push({ ...o })), h++, g--;
+      l < 0 || l >= this.overlay.data.length ? n.push({ x: null, y: null }) : (o.x = this.xAxis.xPos(i[l][0]), o.y = this.yAxis.yPos(i[l][1]), n.push({ ...o })), l++, g--;
     this.plot(n, "renderLine", this.style), this.target.viewport.render();
   }
 }
@@ -11055,7 +11083,7 @@ const ao = {
   RSI: { id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: Ns },
   SMA: { id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: Ai }
 };
-class sd {
+class od {
   #t = "Utilities";
   #e = "utils";
   #r;
@@ -11063,13 +11091,13 @@ class sd {
   #i;
   #s;
   #o;
-  #h;
-  #l = {};
+  #l;
+  #h = {};
   #a = {};
   #c;
   #u = {};
   constructor(e, i) {
-    this.#r = e, this.#n = i, this.#i = e.elUtils, this.#s = e.config?.utilsBar || Zc, this.#o = e.WidgetsG, this.#h = e.indicatorClasses || ao, this.init();
+    this.#r = e, this.#n = i, this.#i = e.elUtils, this.#s = e.config?.utilsBar || Jc, this.#o = e.WidgetsG, this.#l = e.indicatorClasses || ao, this.init();
   }
   log(e) {
     this.#r.log(e);
@@ -11161,7 +11189,7 @@ class sd {
       let s = i.id.replace("TX_", ""), n = i.querySelector("svg");
       n.style.fill = ue.COLOUR_ICON, n.style.height = "90%";
       for (let o of this.#s)
-        if (o.id === s && (this.#a[s] = {}, this.#a[s].click = this.onIconClick.bind(this), this.#a[s].pointerover = this.onIconOver.bind(this), this.#a[s].pointerout = this.onIconOut.bind(this), i.addEventListener("click", this.#a[s].click), i.addEventListener("pointerover", this.#a[s].pointerover), i.addEventListener("pointerout", this.#a[s].pointerout), s === "indicators" && (o.sub = Object.values(this.#h)), o?.sub)) {
+        if (o.id === s && (this.#a[s] = {}, this.#a[s].click = this.onIconClick.bind(this), this.#a[s].pointerover = this.onIconOver.bind(this), this.#a[s].pointerout = this.onIconOut.bind(this), i.addEventListener("click", this.#a[s].click), i.addEventListener("pointerover", this.#a[s].pointerover), i.addEventListener("pointerout", this.#a[s].pointerout), s === "indicators" && (o.sub = Object.values(this.#l)), o?.sub)) {
           let a = {
             content: o.sub,
             primary: i
@@ -11182,7 +11210,7 @@ class sd {
     this.#r.downloadImage();
   }
 }
-const nd = 150;
+const ad = 150;
 class dt {
   #t;
   #e;
@@ -11191,12 +11219,12 @@ class dt {
   #i;
   #s;
   #o;
-  #h;
   #l;
+  #h;
   #a = {};
   static menuList = {};
   static menuCnt = 0;
-  static class = vn;
+  static class = yn;
   static name = "Menus";
   static type = "Menu";
   static currentActive;
@@ -11274,7 +11302,7 @@ class dt {
   }
   static defaultNode() {
     return `
-      <div slot="widget" class="${vn}" style=""></div>
+      <div slot="widget" class="${yn}" style=""></div>
     `;
   }
   menuNode() {
@@ -11287,12 +11315,12 @@ class dt {
     `;
   }
   content(e) {
-    const i = `list-style: none; text-align: left; margin:1em 1em 1em -2.5em; min-width: ${nd}px`, s = "padding: .25em 1em .25em 1em; white-space: nowrap;", n = "display: inline-block; width: 4em;", o = "cursor: pointer;", a = `onmouseover="this.style.background ='#222'"`, c = `onmouseout="this.style.background ='none'"`;
-    let h = `<ul style="${i}">`;
+    const i = `list-style: none; text-align: left; margin:1em 1em 1em -2.5em; min-width: ${ad}px`, s = "padding: .25em 1em .25em 1em; white-space: nowrap;", n = "display: inline-block; width: 4em;", o = "cursor: pointer;", a = `onmouseover="this.style.background ='#222'"`, c = `onmouseout="this.style.background ='none'"`;
+    let l = `<ul style="${i}">`;
     if (e?.content)
       for (let g of e.content)
-        h += `<li id="${g.id}" data-event="${g.event}" style="${s} ${o}" ${a} ${c}><a style="${o}"><span style="${n}">${g.id}</span><span>${g.name}</span></li></a>`;
-    return h += "</ul>", h;
+        l += `<li id="${g.id}" data-event="${g.event}" style="${s} ${o}" ${a} ${c}><a style="${o}"><span style="${n}">${g.id}</span><span>${g.name}</span></li></a>`;
+    return l += "</ul>", l;
   }
   position() {
     let e = this.#i.getBoundingClientRect(), i = this.#n.primary.getBoundingClientRect();
@@ -11325,8 +11353,8 @@ class it {
   #i;
   #s;
   #o;
-  #h;
   #l;
+  #h;
   #a;
   #c;
   #u;
@@ -11373,10 +11401,10 @@ class it {
     return this.#o;
   }
   get elDragBar() {
-    return this.#h;
+    return this.#l;
   }
   get elTitle() {
-    return this.#l;
+    return this.#h;
   }
   get elCloseIcon() {
     return this.#a;
@@ -11418,7 +11446,7 @@ class it {
     e.window === this.#t && this.close();
   }
   mount(e) {
-    e.lastElementChild == null ? e.innerHTML = this.windowNode() : e.lastElementChild.insertAdjacentHTML("afterend", this.windowNode()), this.#o = this.#s.querySelector(`#${this.#n.id}`), this.#h = this.#o.querySelector(".dragBar"), this.#l = this.#o.querySelector(".title"), this.#a = this.#o.querySelector(".closeIcon"), this.#c = this.#o.querySelector(".content");
+    e.lastElementChild == null ? e.innerHTML = this.windowNode() : e.lastElementChild.insertAdjacentHTML("afterend", this.windowNode()), this.#o = this.#s.querySelector(`#${this.#n.id}`), this.#l = this.#o.querySelector(".dragBar"), this.#h = this.#o.querySelector(".title"), this.#a = this.#o.querySelector(".closeIcon"), this.#c = this.#o.querySelector(".content");
     let i, s;
     if (E(this.#n.position))
       i = this.#n.x, s = this.#n.y;
@@ -11463,8 +11491,8 @@ class it {
   dragBar(e) {
     const i = "cursor: grab;", s = `onmouseover="this.style.background ='#222'"`, n = `onmouseout="this.style.background ='none'"`;
     let o = `${i} `, a = this.config?.styles?.dragBar;
-    for (let h in a)
-      o += `${h}: ${a[h]}; `;
+    for (let l in a)
+      o += `${l}: ${a[l]}; `;
     let c = "";
     return e.dragBar && (c += `
       <div class="dragBar" style="${o}" ${s} ${n}>
@@ -11485,18 +11513,18 @@ class it {
     let o = `${i} `, a = this.config?.styles?.closeIcon, c = "";
     for (let g in a)
       c += `${g}: ${a[g]}; `;
-    let h = "";
-    return e.closeIcon && (h += `
+    let l = "";
+    return e.closeIcon && (l += `
       <div class="closeIcon" style="${o}" ${s} ${n}>
         <span>X</span>
       </div>
-    `), h;
+    `), l;
   }
   position(e) {
     let i = this.dimensions, s = this.#r.dimensions, n = Math.round((s.width - i.width) / 2), o = s.height - Math.round((s.height - i.height) / 2), a = I.getStyle(this.#o, "z-index");
     if (E(e)) {
-      let { x: c, y: h, z: g } = { ...e };
-      T(c) && (n = c), T(h) && (o = s.height - (h + i.height)), T(g) && (a = g);
+      let { x: c, y: l, z: g } = { ...e };
+      T(c) && (n = c), T(l) && (o = s.height - (l + i.height)), T(g) && (a = g);
     }
     e?.relativeY == "bottom" && (o += i.height), this.#o.style.left = `${n}px`, this.#o.style.bottom = `${o}px`, this.#o.style["z-index"] = `${a}`;
   }
@@ -11506,7 +11534,7 @@ class it {
   setProperties(e) {
     if (!E(e))
       return !1;
-    if (S(e?.title) && (this.#l.innerHTML = e.title), S(e?.content) && (this.#c.innerHTML = e.content), this.setDimensions(e?.dimensions), this.position(e?.position), E(e?.styles)) {
+    if (S(e?.title) && (this.#h.innerHTML = e.title), S(e?.content) && (this.#c.innerHTML = e.content), this.setDimensions(e?.dimensions), this.position(e?.position), E(e?.styles)) {
       const i = (s, n) => {
         if (!E(n))
           return !1;
@@ -11550,8 +11578,8 @@ class wt {
   static type = "progress";
   static name = "Progress";
   static icons = {
-    loadingBars: wl,
-    loadingSpin: xl
+    loadingBars: Eh,
+    loadingSpin: Sh
   };
   static defaultNode() {
     return `
@@ -11572,7 +11600,7 @@ class wt {
   #i;
   #s;
   #o;
-  #h;
+  #l;
   constructor(e, i) {
     this.#e = e, this.#r = i.core, this.#n = i, this.#t = i.id, this.#s = e.elements.elProgress, this.#i = this.#r.elWidgetsG, this.init();
   }
@@ -11602,7 +11630,7 @@ class wt {
     let i = "loadingBars";
     this.#n?.type in wt.icons && (i = this.#n?.type);
     const s = { type: i, icon: wt.icons[i] };
-    e.lastElementChild == null ? e.innerHTML = this.progressNode(s) : e.lastElementChild.insertAdjacentHTML("afterend", this.progressNode(s)), this.#o = this.#s.querySelector(`#${this.#n.id}`), this.#h = this.#o.querySelector("svg"), this.#h.style.fill = `${Cl.COLOUR_ICONHOVER};`;
+    e.lastElementChild == null ? e.innerHTML = this.progressNode(s) : e.lastElementChild.insertAdjacentHTML("afterend", this.progressNode(s)), this.#o = this.#s.querySelector(`#${this.#n.id}`), this.#l = this.#o.querySelector("svg"), this.#l.style.fill = `${Lh.COLOUR_ICONHOVER};`;
   }
 }
 const ns = {
@@ -11656,7 +11684,7 @@ const ns = {
     }
   }
 };
-class rd {
+class ld {
   #t;
   #e = "Widgets";
   #r = "widgets";
@@ -11664,14 +11692,14 @@ class rd {
   #i;
   #s;
   #o;
-  #h = { Divider: vt, Progress: wt, Menu: dt, Window: it, Dialogue: $s };
-  #l = {};
+  #l = { Divider: yt, Progress: wt, Menu: dt, Window: it, Dialogue: $s };
+  #h = {};
   #a = {};
   #c;
   #u;
   #d;
   constructor(e, i) {
-    this.#n = e, this.#i = i, this.#o = { ...this.#h, ...i.widgets }, this.#c = e.elWidgetsG, this.init();
+    this.#n = e, this.#i = i, this.#o = { ...this.#l, ...i.widgets }, this.#c = e.elWidgetsG, this.init();
   }
   log(e) {
     this.#n.log(e);
@@ -11707,7 +11735,7 @@ class rd {
     return this.#a;
   }
   get instances() {
-    return this.#l;
+    return this.#h;
   }
   set stateMachine(e) {
     this.#s = new $t(e, this);
@@ -11730,7 +11758,7 @@ class rd {
   }
   destroy() {
     this.off("menu_open", this.onOpenMenu), this.off("menu_close", this.onCloseMenu), this.off("menu_off", this.onCloseMenu), this.off("menuItem_selected", this.onMenuItemSelected), this.stateMachine.destroy();
-    for (let e in this.#l)
+    for (let e in this.#h)
       this.delete(e);
     for (let e in this.#o)
       this.#o[e].destroy(id);
@@ -11751,10 +11779,10 @@ class rd {
     this.setDimensions(e);
   }
   onOpenMenu(e) {
-    this.#l[e.menu].open();
+    this.#h[e.menu].open();
   }
   onCloseMenu(e) {
-    this.#l[e.menu].close();
+    this.#h[e.menu].close();
   }
   onMenuItemSelected(e) {
     this.emit(e.evt, e.target);
@@ -11784,14 +11812,14 @@ class rd {
       return !1;
     i.core = this.core;
     const s = this.#o[e].create(this, i);
-    return this.#l[s.id] = s, s;
+    return this.#h[s.id] = s, s;
   }
   delete(e) {
     return isString(e) ? (this.#o[type].destroy(e), !0) : !1;
   }
 }
 function ir(r, e, i, s, n) {
-  const o = r.theme, a = document.createElement("template"), c = r.Timeline.graph.viewport.scene, h = r.MainPane, g = h.graph.viewport.scene, p = h.width, v = h.height, M = new We.Viewport({
+  const o = r.theme, a = document.createElement("template"), c = r.Timeline.graph.viewport.scene, l = r.MainPane, g = l.graph.viewport.scene, p = l.width, v = l.height, M = new We.Viewport({
     width: p,
     height: v,
     container: a
@@ -11801,8 +11829,8 @@ function ir(r, e, i, s, n) {
   o?.yAxis?.location == "left" && (N = r.Chart.scale.width, at = 0);
   let B;
   for (const [Ht, St] of r.ChartPanes) {
-    let Bt = St.graph.viewport.scene, { width: Ut, height: It } = Bt, Xt = St.scale.graph.viewport.scene, { width: kt, height: ne } = Xt;
-    k > 0 && (B = { stroke: "#ccc" }, Fe(L, k, 0, h.width, B)), L.drawImage(Bt.canvas, N, k, Ut, It), L.drawImage(Xt.canvas, at, k - 1, kt, ne), k += It;
+    let Bt = St.graph.viewport.scene, { width: zt, height: It } = Bt, Xt = St.scale.graph.viewport.scene, { width: kt, height: ne } = Xt;
+    k > 0 && (B = { stroke: "#ccc" }, Fe(L, k, 0, l.width, B)), L.drawImage(Bt.canvas, N, k, zt, It), L.drawImage(Xt.canvas, at, k - 1, kt, ne), k += It;
   }
   L.drawImage(c.canvas, 0, k, c.width, c.height), B = {
     text: r.config.title,
@@ -11828,7 +11856,7 @@ function ir(r, e, i, s, n) {
       break;
   }
 }
-class O extends jc {
+class O extends Qc {
   static #t = Go;
   static #e = 0;
   static #r = {};
@@ -11836,7 +11864,7 @@ class O extends jc {
   static #i = null;
   static #s = !1;
   static #o = [];
-  static #h = null;
+  static #l = null;
   static get version() {
     return O.#t;
   }
@@ -11850,9 +11878,9 @@ class O extends jc {
     return O.#o;
   }
   static get talibError() {
-    return O.#h;
+    return O.#l;
   }
-  static #l = `${Ae} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`;
+  static #h = `${Ae} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`;
   static #a = [
     "TradeXchart",
     "Chart",
@@ -11871,10 +11899,10 @@ class O extends jc {
   #f;
   #m;
   #w;
-  #y;
+  #v;
   #E;
   #p;
-  #v;
+  #y;
   #I;
   #g;
   #L;
@@ -11934,16 +11962,16 @@ class O extends jc {
   #Y;
   #q;
   #X;
-  #U = !1;
   #z = !1;
+  #U = !1;
   static create(e = {}) {
     O.#e == 0 && (O.#r.CPUCores = navigator.hardwareConcurrency, O.#r.api = {
       permittedClassNames: O.#a
-    }), (typeof e.talib != "object" || typeof e.talib.init != "function") && (O.#s = !1, O.#h = new Error(`${O.#l}`)), !O.#s && O.#h === null && (O.#i = e.talib.init(e.wasm)), O.#i.then(
+    }), (typeof e.talib != "object" || typeof e.talib.init != "function") && (O.#s = !1, O.#l = new Error(`${O.#h}`)), !O.#s && O.#l === null && (O.#i = e.talib.init(e.wasm)), O.#i.then(
       () => {
         O.#s = !0;
         for (let i of O.#o)
-          U(i) && i();
+          z(i) && i();
       },
       () => {
         O.#s = !1;
@@ -12003,10 +12031,10 @@ class O extends jc {
     return this.#x;
   }
   set elUtils(e) {
-    this.#y = e;
+    this.#v = e;
   }
   get elUtils() {
-    return this.#y;
+    return this.#v;
   }
   set elTools(e) {
     this.#p = e;
@@ -12021,10 +12049,10 @@ class O extends jc {
     return this.#E;
   }
   set elMain(e) {
-    this.#v = e;
+    this.#y = e;
   }
   get elMain() {
-    return this.#v;
+    return this.#y;
   }
   set elTime(e) {
     this.#g = e;
@@ -12188,16 +12216,16 @@ class O extends jc {
     n.id = this.id, n.core = this;
     let o = i?.deepValidate || !1, a = i?.isCrypto || !1;
     this.#S = this.#A.create(n, o, a), delete i.state, this.log(`${this.name} id: ${this.id} : created with a ${this.state.status} state`);
-    let c = "1s", h = W;
-    if (!E(i?.stream) && this.state.data.chart.data.length < 2 ? (this.warn(`${Ae} has no chart data or streaming provided.`), { tf: c, ms: h } = di(i?.timeFrame)) : E(i?.stream) && this.state.data.chart.data.length < 2 ? ({ tf: c, ms: h } = di(i?.timeFrame), this.#U = !0) : (c = this.state.data.chart.tf, h = this.state.data.chart.tfms), this.log(`tf: ${c} ms: ${h}`), this.#f.callbacks = this.#f.callbacks || {}, E(i))
+    let c = "1s", l = W;
+    if (!E(i?.stream) && this.state.data.chart.data.length < 2 ? (this.warn(`${Ae} has no chart data or streaming provided.`), { tf: c, ms: l } = di(i?.timeFrame)) : E(i?.stream) && this.state.data.chart.data.length < 2 ? ({ tf: c, ms: l } = di(i?.timeFrame), this.#z = !0) : (c = this.state.data.chart.tf, l = this.state.data.chart.tfms), this.log(`tf: ${c} ms: ${l}`), this.#f.callbacks = this.#f.callbacks || {}, E(i))
       for (const p in i)
         p in this.props() && this.props()[p](i[p]);
     const g = E(i?.range) ? i.range : {};
-    if (g.interval = h, g.core = this, this.getRange(null, null, g), this.#T.Length > 1) {
+    if (g.interval = l, g.core = this, this.getRange(null, null, g), this.#T.Length > 1) {
       const p = cs(this.#_, this.#f?.range?.startTS), v = T(p) ? p + this.#T.initialCnt : this.allData.data.length - 1, M = T(p) ? p : v - this.#T.initialCnt;
       this.#T.initialCnt = v - M, this.setRange(M, v), i.range?.center && this.jumpToIndex(M, !0, !0);
     }
-    this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.#W = new rd(this, { widgets: i?.widgets }), this.#D = new sd(this, i), this.#B = new jr(this, i), this.#C = new Xr(this, i), this.setTheme(this.#N.id), this.log(`${this.#c} V${O.version} configured and running...`), this.#$ = this.bufferPx * -1, this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#V = this.WidgetsG.insert("Progress", {}), this.stream = this.#f.stream, this.#U && this.on(Lt, this.delayedSetRange, this), this.#O = !0, this.refresh();
+    this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.#W = new ld(this, { widgets: i?.widgets }), this.#D = new od(this, i), this.#B = new jr(this, i), this.#C = new Xr(this, i), this.setTheme(this.#N.id), this.log(`${this.#c} V${O.version} configured and running...`), this.#$ = this.bufferPx * -1, this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#V = this.WidgetsG.insert("Progress", {}), this.stream = this.#f.stream, this.#z && this.on(Lt, this.delayedSetRange, this), this.#O = !0, this.refresh();
   }
   destroy() {
     this.log("...cleanup the mess"), this.removeEventListener("mousemove", this.onMouseMove), this.#b = null, this.UtilsBar.destroy(), this.ToolsBar.destroy(), this.MainPane.destroy(), this.WidgetsG.destroy(), this.#G.end(), this.#A = null;
@@ -12206,10 +12234,10 @@ class O extends jc {
     this.addEventListener("mousemove", this.onMouseMove.bind(this)), this.on(Lt, this.onStreamUpdate, this), this.on("state_mergeComplete", () => this.#V.stop());
   }
   on(e, i, s) {
-    return !S(e) || !U(i) ? !1 : (this.#b[e] || (this.#b[e] = []), this.#b[e].push({ handler: i, context: s }), !0);
+    return !S(e) || !z(i) ? !1 : (this.#b[e] || (this.#b[e] = []), this.#b[e].push({ handler: i, context: s }), !0);
   }
   off(e, i) {
-    if (!S(e) || !U(i) || !(e in this.#b))
+    if (!S(e) || !z(i) || !(e in this.#b))
       return !1;
     for (let s = 0; s < this.#b[e].length; s++)
       if (this.#b[e][s].handler === i && (this.#b[e].splice(s, 1), this.#b[e].length === 0)) {
@@ -12271,7 +12299,7 @@ class O extends jc {
     this.emit("global_resize", s);
   }
   setUtilsH(e) {
-    this.utilsH = e, this.#y.style.height = `${e}px`;
+    this.utilsH = e, this.#v.style.height = `${e}px`;
   }
   setToolsW(e) {
     this.toolsW = e, this.#p.style.width = `${e}px`;
@@ -12292,10 +12320,10 @@ class O extends jc {
     this.#R.setTheme(e, this);
     const i = this.#R, s = document.querySelector(`style[title=${this.id}_style]`), n = `var(--txc-border-color, ${i.chart.BorderColour}`;
     let o = `.${this.id} { `;
-    o += `--txc-background: ${i.chart.Background}; `, this.style.background = `var(--txc-background, ${i.chart.Background})`, this.style.border = `${i.chart.BorderThickness}px solid`, this.style.borderColor = n, o += `--txc-border-color:  ${i.chart.BorderColour}; `, this.#v.rows.style.borderColor = n, o += `--txc-time-scrollbar-color: ${i.chart.BorderColour}; `, o += `--txc-time-handle-color: ${i.xAxis.handle}; `, o += `--txc-time-slider-color: ${i.xAxis.slider}; `, o += `--txc-time-cursor-fore: ${i.xAxis.colourCursor}; `, o += `--txc-time-cursor-back: ${i.xAxis.colourCursorBG}; `, o += `--txc-time-icon-color: ${i.icon.colour}; `, o += `--txc-time-icon-hover-color: ${i.icon.hover}; `, this.#g.overview.scrollBar.style.borderColor = n, this.#g.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${i.xAxis.handle})`, this.#g.overview.style.setProperty("--txc-time-slider-color", i.xAxis.slider), this.#g.overview.style.setProperty("--txc-time-icon-color", i.icon.colour), this.#g.overview.style.setProperty("--txc-time-icon-hover-color", i.icon.hover);
+    o += `--txc-background: ${i.chart.Background}; `, this.style.background = `var(--txc-background, ${i.chart.Background})`, this.style.border = `${i.chart.BorderThickness}px solid`, this.style.borderColor = n, o += `--txc-border-color:  ${i.chart.BorderColour}; `, this.#y.rows.style.borderColor = n, o += `--txc-time-scrollbar-color: ${i.chart.BorderColour}; `, o += `--txc-time-handle-color: ${i.xAxis.handle}; `, o += `--txc-time-slider-color: ${i.xAxis.slider}; `, o += `--txc-time-cursor-fore: ${i.xAxis.colourCursor}; `, o += `--txc-time-cursor-back: ${i.xAxis.colourCursorBG}; `, o += `--txc-time-icon-color: ${i.icon.colour}; `, o += `--txc-time-icon-hover-color: ${i.icon.hover}; `, this.#g.overview.scrollBar.style.borderColor = n, this.#g.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${i.xAxis.handle})`, this.#g.overview.style.setProperty("--txc-time-slider-color", i.xAxis.slider), this.#g.overview.style.setProperty("--txc-time-icon-color", i.icon.colour), this.#g.overview.style.setProperty("--txc-time-icon-hover-color", i.icon.hover);
     for (let [a, c] of Object.entries(this.Chart.legend.list))
       c.el.style.color = `var(--txc-legend-color, ${i.legend.colour})`, c.el.style.font = `var(--txc-legend-font, ${i.legend.font})`;
-    for (let a of this.#y.icons)
+    for (let a of this.#v.icons)
       a.className == "icon-wrapper" && (a.children[0].style.fill = i.icon.colour);
     for (let a of this.#p.icons)
       a.className == "icon-wrapper" && (a.children[0].style.fill = i.icon.colour);
@@ -12330,18 +12358,18 @@ class O extends jc {
     return this.state.export(e = this.key, i = {});
   }
   setStream(e) {
-    if (this.stream instanceof he)
+    if (this.stream instanceof le)
       return this.error("Error: Invoke stopStream() before starting a new one."), !1;
     if (E(e))
-      return this.allData.data.length == 0 && S(e.timeFrame) && ({ tf, ms } = di(e?.timeFrame), this.range.interval = ms, this.range.intervalStr = tf, this.#_.timeFrameMS = ms, this.#_.timeFrame = tf), this.#H = new he(this), this.#f.stream = this.#H.config, this.#H;
+      return this.allData.data.length == 0 && S(e.timeFrame) && ({ tf, ms } = di(e?.timeFrame), this.range.interval = ms, this.range.intervalStr = tf, this.#_.timeFrameMS = ms, this.#_.timeFrame = tf), this.#H = new le(this), this.#f.stream = this.#H.config, this.#H;
   }
   stopStream() {
-    this.stream instanceof he && this.stream.stop();
+    this.stream instanceof le && this.stream.stop();
   }
   delayedSetRange() {
-    for (; this.#U; ) {
+    for (; this.#z; ) {
       let e = this.range.Length * 0.5;
-      this.setRange(e * -1, e), this.off(Lt, this.delayedSetRange), this.#U = !1;
+      this.setRange(e * -1, e), this.off(Lt, this.delayedSetRange), this.#z = !1;
     }
   }
   updateRange(e) {
@@ -12355,11 +12383,11 @@ class O extends jc {
     this.setRange(i, s);
   }
   getRange(e = 0, i = 0, s = {}) {
-    this.#T = new hs(e, i, s), this.#_.range = this.#T, this.#_.timeFrameMS = this.#T.interval, this.#_.timeFrame = this.#T.intervalStr;
+    this.#T = new ls(e, i, s), this.#_.range = this.#T, this.#_.timeFrameMS = this.#T.interval, this.#_.timeFrame = this.#T.intervalStr;
   }
   setRange(e = 0, i = this.rangeLimit) {
     const s = this.config?.maxCandles ? this.config.maxCandles : this.Chart?.layerWidth ? this.Chart.layerWidth : this.Chart.width;
-    this.#T.set(e, i, s), e < 0 && !this.#z ? this.emit("range_limitPast", { chart: this, start: e, end: i }) : i > this.range.dataLength && !this.#z && this.emit("range_limitFuture", { chart: this, start: e, end: i });
+    this.#T.set(e, i, s), e < 0 && !this.#U ? this.emit("range_limitPast", { chart: this, start: e, end: i }) : i > this.range.dataLength && !this.#U && this.emit("range_limitFuture", { chart: this, start: e, end: i });
   }
   jumpToIndex(e, i = !0, s = !0) {
     i && (e = H(e, 0, this.range.dataLength));
@@ -12378,12 +12406,12 @@ class O extends jc {
     e && (i += this.range.Length / 2), this.jumpToIndex(i, !0, !1);
   }
   mergeData(e, i = !1, s = !1) {
-    this.#z = !0;
+    this.#U = !0;
     let n = this.state.mergeData(e, i, s);
-    return Q(n) && (this.#z = !1), n;
+    return Q(n) && (this.#U = !1), n;
   }
   isIndicator(e) {
-    return !!(typeof e == "function" && "primaryPane" in e.prototype && U(e.prototype?.draw));
+    return !!(typeof e == "function" && "primaryPane" in e.prototype && z(e.prototype?.draw));
   }
   setIndicators(e, i = !1) {
     if (!E(e))
@@ -12468,17 +12496,17 @@ class O extends jc {
     }
   }
 }
-window.customElements.get("tradex-chart") || (document.head.insertAdjacentHTML("beforeend", Al), document.head.insertAdjacentHTML("beforeend", Ol), customElements.get("tradex-chart") || customElements.define("tradex-chart", O));
+window.customElements.get("tradex-chart") || (document.head.insertAdjacentHTML("beforeend", kh), document.head.insertAdjacentHTML("beforeend", Rh), customElements.get("tradex-chart") || customElements.define("tradex-chart", O));
 export {
   O as Chart,
   I as DOM,
   Nt as Indicator,
   V as Overlay,
-  hs as Range,
+  ls as Range,
   $t as StateMachine,
   et as canvas,
   rt as copyDeep,
-  od as isPromise,
+  hd as isPromise,
   He as mergeDeep,
   J as uid
 };

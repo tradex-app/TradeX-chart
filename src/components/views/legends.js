@@ -300,13 +300,13 @@ export default class tradeXLegends extends element {
     inp += `<span id="${id}_up" class="control up" data-icon="up">${up2}</span>`
     // move down
     inp += `<span id="${id}_down" class="control down" data-icon="down">${down2}</span>`
-    if (o?.type !== "chart") {
+    if (o?.type === "indicator") {
       // visible
       inp += `<span id="${id}_visible" class="control visible" data-icon="visible">${visible}</span>`
       // not visible
       inp += `<span id="${id}_notVisible" class="control notvisible" data-icon="notVisible">${notVisible}</span>`
     }
-    if (o?.type === "chart") {
+    if (o?.type !== "indicator") {
       // collapse
       inp += `<span id="${id}_collapse" class="control collapse" data-icon="collapse">${collapse}</span>`
       // expand
