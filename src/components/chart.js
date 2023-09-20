@@ -33,7 +33,11 @@ import {
   STREAM_NEWVALUE,
   STREAM_UPDATE,
 } from "../definitions/core";
-import { BUFFERSIZE, YAXIS_TYPES } from "../definitions/chart";
+import { 
+  BUFFERSIZE, 
+  YAXIS_TYPES, 
+  COLLAPSEDHEIGHT 
+} from "../definitions/chart";
 import { VolumeStyle } from "../definitions/style"
 
 const defaultOverlays = {
@@ -86,6 +90,12 @@ export default class Chart {
   #chartCnt
   #type
   #status = "idle"
+  #collapsed = {
+    state: false,
+    height: null,
+    rowsHeight: null,
+    rowsCnt: 1
+  }
 
   #elTarget;
   #elScale;
@@ -185,6 +195,7 @@ export default class Chart {
   get core() { return this.#core }
   get type() { return this.#type }
   get status() { return this.#status }
+  get collapsed() { return this.#collapsed }
   get isPrimary() { return this.#type === "primaryPane" }
   get isPrimary() { return this.#options.view.primary || false }
   get options() { return this.#options }
@@ -755,6 +766,8 @@ export default class Chart {
       case "down": this.reorderDown(); return;
       case "maximize": this.#core.MainPane.paneMaximize(this); return;
       case "restore": this.#core.MainPane.paneMaximize(this); return;
+      case "collapse": this.#core.MainPane.paneCollapse(this); return;
+      case "expand": this.#core.MainPane.paneCollapse(this); return;
       case "remove": this.remove(); return;
       case "config": return;
       default: return;
@@ -886,6 +899,34 @@ export default class Chart {
     // prev.element.style.pointerEvents = 'none';
 
     return {active, prev}
+  }
+
+  /**
+   * Collapse pane to title and legend
+   */
+  collapse(h) {
+    const vis = this.graph.viewport.scene.canvas.style
+    const col = this.#collapsed
+    const scale = this.#Scale.graph.viewport.scene.canvas.style
+    // pane is collapsed, expand it
+    if (col.state) {
+      // display pane content
+      this.setDimensions({w: undefined, h})
+      scale.visibility = "visible"
+      vis.display = "block"
+      col.state = false
+    }
+    // pane is expanded, collapse it
+    else {
+      // hide pane content
+      scale.visibility = "hidden"
+      vis.display = "none"
+      col.state = true
+      col.height = this.element.clientHeight
+      col.rowsHeight = this.core.MainPane.rowsH
+      col.rowsCnt = this.core.ChartPanes.size
+      this.setDimensions({W: undefined, h: COLLAPSEDHEIGHT})
+    }
   }
 
   /**

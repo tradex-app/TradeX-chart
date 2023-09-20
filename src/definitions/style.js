@@ -186,7 +186,9 @@ export const LegendStyle = {
 
 export const DividerStyle = {
   ACTIVE: "#888888C0",
-  IDLE: "#FFFFFF00"
+  IDLE: "#FFFFFF00",
+  LINE: GlobalStyle.COLOUR_BORDER,
+  STYLE: "1px solid"
 }
 
 export const watermark = {
@@ -278,7 +280,9 @@ export const defaultTheme = {
   },
   divider: {
     active: DividerStyle.ACTIVE,
-    idle: DividerStyle.IDLE
+    idle: DividerStyle.IDLE,
+    line: DividerStyle.LINE,
+    style: DividerStyle.STYLE
   },
   watermark: watermark,
   trades: {

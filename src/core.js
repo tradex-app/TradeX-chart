@@ -608,6 +608,14 @@ export default class TradeXchart extends Tradex_chart {
   setDimensions(w, h) {
     const dims = super.setDimensions(w, h) 
 
+    // reposition menus
+    if (this.#WidgetsG instanceof WidgetsG) {
+      for (let i in this.#WidgetsG.instances) {
+        if (i.type === "Menu") 
+          i.position()
+      }
+    }
+
     this.emit("global_resize", dims)
   }
 

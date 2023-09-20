@@ -1,5 +1,6 @@
 // definitions/chart.js
 
+import { exp } from "talib-web"
 import { MINUTE_MS } from "../utils/time"
 
 export const DEFAULT_TIMEVALUE = 1
@@ -27,8 +28,9 @@ export const MAXGRADSPER = 75
 export const BUFFERSIZE = 5  // %
 
 export const ROWMINHEIGHT = 50 // px
-export const OFFCHARTDEFAULTHEIGHT = 30 // %
+export const SECONDARYDEFAULTHEIGHT = 30 // %
 export const DIVIDERHEIGHT = 8 // px
+export const COLLAPSEDHEIGHT = 30 // px
 
 // OHLCV enum
 export class OHLCV {

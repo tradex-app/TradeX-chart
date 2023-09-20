@@ -123,7 +123,7 @@ export default class BB extends Indicator {
     let s = this.overlay.data[0][0]
     let c = (t - s) / range.interval
     let o = this.Timeline.rangeScrollOffset;
-    let i = range.Length + o + 2
+    let i = range.Length + (o * 2) + 2
     let style = {}
 
     while(i) {

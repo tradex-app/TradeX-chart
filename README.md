@@ -1,7 +1,5 @@
 # README
 
-## WIP - under heavy development - NOT production ready
-
 TradeX-chart is a highly customizable stock trade chart with **one** dependency written in plain JavaScript; use it with any framework or backend.
 
 <div align="center">
@@ -143,3 +141,9 @@ Testing, bug reports and feature requests welcome
 
 You can help speed up development by contributing with crypto or PayPal.
 
+---
+```javascript
+if (youEnjoyed) {
+    starThisRepository();
+}
+```

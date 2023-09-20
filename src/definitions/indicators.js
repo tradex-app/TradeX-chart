@@ -10,6 +10,7 @@ import BB from "../indicators/BB"
 import EMA from "../indicators/EMA"
 import RSI from "../indicators/RSI";
 import SMA from "../indicators/SMA"
+import STOCH from "../indicators/STOCH";
 import Volume from "../indicators/Volume"
 
 export default {
@@ -20,5 +21,6 @@ export default {
   EMA: {id: "EMA", name: "Exponential Moving Average", event: "addIndicator", ind: EMA},
   RSI: {id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: RSI},
   SMA: {id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: SMA},
+  STOCH: {id: "STOCH", name: "Stochastic Oscillator", event: "addIndicator", ind: STOCH}
   // Vol: {id: "Vol", name: "Volume", event: "addIndicator", ind: Volume},
 }

@@ -1,0 +1,23 @@
+{
+  "hash": "29719f3b",
+  "browserHash": "38d63c9a",
+  "optimized": {
+    "talib-web": {
+      "src": "../../node_modules/talib-web/lib/index.esm.js",
+      "file": "talib-web.js",
+      "fileHash": "c7213bb5",
+      "needsInterop": false
+    },
+    "mjolnir.js": {
+      "src": "../../node_modules/mjolnir.js/dist/esm/index.js",
+      "file": "mjolnir__js.js",
+      "fileHash": "c1be0596",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-DFKQJ226": {
+      "file": "chunk-DFKQJ226.js"
+    }
+  }
+}

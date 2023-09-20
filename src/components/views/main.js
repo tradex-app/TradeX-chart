@@ -80,7 +80,7 @@ export default class tradeXMain extends element {
   }
 
   rowNode(type, api) {
-    const styleRow = ` border-top: 1px solid ${api.theme.secondaryPane.separator};`
+    const styleRow = `` //` border-top: 1px solid ${api.theme.secondaryPane.separator};`
     const node = `
       <tradex-chartpane slot="chartpane" class="${type}" style="${styleRow}">
       </tradex-chartpane>

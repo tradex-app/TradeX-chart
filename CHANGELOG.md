@@ -1,20 +1,33 @@
 # Change Log
 
-## [0.138.3]()
+## [0.139.0]()
+
+Added
+
+* Chart Pane - collapse, expand
+
+## [0.138.4](https://github.com/tradex-app/TradeX-chart/commit/c808d41ea00375d69d3d8a96e5e26bcfd579c752)
+
+Updated
+
+* Indicator - Legend - controls
+
+
+## [0.138.3](https://github.com/tradex-app/TradeX-chart/commit/880365f923b2b4f7d0577f16fd03cfc3aa9ac420)
 
 Updated
 
 * Chart Pane - Legend - controls - icons hover highlight
 
 
-## [0.138.2]()
+## [0.138.2](https://github.com/tradex-app/TradeX-chart/commit/755f7d3eca65108afbbf5112a957077913d5d27a)
 
 Updated
 
 * Chart Pane - Legend - controls - icons display
 
 
-## [0.138.1]()
+## [0.138.1](https://github.com/tradex-app/TradeX-chart/commit/793ffb7693552b6480ba6341f58da34361f64558)
 
 Fixed
 
