@@ -1,6 +1,5 @@
 // definitions/chart.js
 
-import { exp } from "talib-web"
 import { MINUTE_MS } from "../utils/time"
 
 export const DEFAULT_TIMEVALUE = 1

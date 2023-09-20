@@ -1,4 +1,3 @@
-import "talib-web";
 function qo(r, e) {
   for (var i = 0; i < e.length; i++) {
     const s = e[i];
@@ -15,7 +14,7 @@ function qo(r, e) {
   }
   return Object.freeze(Object.defineProperty(r, Symbol.toStringTag, { value: "Module" }));
 }
-const Xo = "0.139.0";
+const Xo = "0.139.1";
 function M(r) {
   return Array.isArray(r);
 }
@@ -34,7 +33,7 @@ function J(r) {
 function S(r) {
   return typeof r == "string";
 }
-function fd(r) {
+function ud(r) {
   return !!r && (E(r) || z(r)) && z(r.then);
 }
 const jo = ["y", "M", "d", "h", "m", "s", "ms"], Ko = ["years", "months", "days", "hours", "minutes", "seconds", "milliseconds"], Zo = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334], Qo = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335], or = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], Jo = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], ar = 1231006505e3, Vt = 1, W = 1e3, F = W * 60, X = F * 60, _ = X * 24, fe = _ * 7, rt = _ * 30;
@@ -12728,7 +12727,7 @@ export {
   $t as StateMachine,
   et as canvas,
   ot as copyDeep,
-  fd as isPromise,
+  ud as isPromise,
   He as mergeDeep,
   K as uid
 };
