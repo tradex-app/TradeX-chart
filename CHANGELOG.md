@@ -1,6 +1,18 @@
 # Change Log
 
-## [0.139.0]()
+## [0.139.2]()
+
+Fixed
+
+* Divider styling
+
+## [0.139.1](https://github.com/tradex-app/TradeX-chart/commit/3a0fb48b06543eb58510543aff01f62149e33137)
+
+Fixed
+
+* Spurious import causing failure
+
+## [0.139.0](https://github.com/tradex-app/TradeX-chart/commit/824ebf646c510dac986eca3c85bc3d7b8186f8ec)
 
 Added
 

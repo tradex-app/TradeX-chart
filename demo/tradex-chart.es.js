@@ -14,7 +14,7 @@ function qo(r, e) {
   }
   return Object.freeze(Object.defineProperty(r, Symbol.toStringTag, { value: "Module" }));
 }
-const Xo = "0.139.1";
+const Xo = "0.139.2";
 function M(r) {
   return Array.isArray(r);
 }
@@ -3606,14 +3606,14 @@ class st {
         o *= -1;
         break;
     }
-    const a = `position: absolute; top: ${i}px; left: ${o}px; z-index:100; width: ${s}px; height: ${n}px; background: ${e.divider.idle};`, h = `width: 100%; margin: 4px 0; border-top: ${e.divider.style} ${e.divider.line}`;
+    const a = `position: absolute; top: ${i}px; left: ${o}px; z-index:100; width: ${s}px; height: ${n}px; background: ${e.divider.idle};`, h = `width: 100%; margin: 3.5px 0; border: 0; border-top: ${e.divider.style} ${e.divider.line};`;
     return `
       <div id="${this.#t}" class="divider" style="${a}"><hr style="${h}"></div>
     `;
   }
   setPos() {
     let e = this.#s.pos.top - I.elementDimPos(this.#o).top;
-    e = e - this.height / 2, this.#l.style.top = `${e}px`;
+    e = e - this.height / 2 + 1, this.#l.style.top = `${e}px`;
   }
   hide() {
     this.#l.style.display = "none";

@@ -179,7 +179,7 @@ export default class Divider {
       height = (isNumber(this.config.dividerHeight)) ? 
         this.config.dividerHeight : DIVIDERHEIGHT,
       left = theme.tools.width // this.#core.toolsW;
-      top -= height / 2
+      top -= (height / 2)
 
     switch(theme.tools.location) {
       case "left": break;
@@ -190,7 +190,7 @@ export default class Divider {
     }
 
     const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: ${theme.divider.idle};`
-    const styleLine = `width: 100%; margin: 4px 0; border-top: ${theme.divider.style} ${theme.divider.line}`
+    const styleLine = `width: 100%; margin: 3.5px 0; border: 0; border-top: ${theme.divider.style} ${theme.divider.line};`
 
     const node = `
       <div id="${this.#id}" class="divider" style="${styleDivider}"><hr style="${styleLine}"></div>
@@ -200,7 +200,7 @@ export default class Divider {
 
   setPos() {
     let top = this.#chartPane.pos.top - DOM.elementDimPos(this.#elDividers).top;
-        top = top - (this.height / 2)
+        top = top - (this.height / 2) + 1
     this.#elDivider.style.top = `${top}px`
   }
 
