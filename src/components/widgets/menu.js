@@ -193,22 +193,30 @@ export default class Menu {
   position() {
     let wPos = this.#elWidgetsG.getBoundingClientRect()
     let iPos = this.#config.primary.getBoundingClientRect()
+    let left = Math.round(iPos.left - wPos.left)
+    let top  = Math.round(iPos.bottom - wPos.top)
 
-    this.#elMenu.style.left = Math.round(iPos.left - wPos.left) + "px"
-    this.#elMenu.style.top = Math.round(iPos.bottom - wPos.top) + "px"
+    this.#elMenu.style.left = left + "px"
+    this.#elMenu.style.top = top + "px"
 
     // adjust positioning if clipped
     let pos = DOM.elementDimPos(this.#elMenu)
-    let posR = pos.left + pos.width
     // adjust horizontal positioning if clipped
-    if (posR > this.#elWidgetsG.offsetWidth) {
+    if (pos.right > this.#elWidgetsG.offsetWidth) {
       let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width)
           o = limit(o, 0, this.#elWidgetsG.offsetWidth)
       this.#elMenu.style.left = `${o}px`
     }
-    // TODO: adjust height if clipped
-    // TODO: adjust vertical position on clipped
+    // adjust vertical position on clipped
+    let bottom = this.#core.MainPane.rowsH + top + pos.height
+
+    if (bottom > this.#core.MainPane.rowsH) {
+      let o = Math.floor(pos.height * -1)
+          o = limit(o, this.#core.MainPane.rowsH * -1, 0)
+      this.#elMenu.style.top = `${o}px`
+    }
     // TODO: adjust width if clipped
+    // TODO: adjust height if clipped
   }
 
   remove() {

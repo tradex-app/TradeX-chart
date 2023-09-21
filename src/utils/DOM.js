@@ -146,7 +146,7 @@ const DOM = {
     let _h = dim.bottom - dim.top
     let _v = this.isVisible(el)
     let _vp = this.isInViewport(el)
-    return { top: _y, left: _x, width: _w, height: _h, visible: _v, viewport: _vp };
+    return { top: _y, bottom: _y + _h, left: _x, right: _x + _w, width: _w, height: _h, visible: _v, viewport: _vp };
   },
 
   elementsDistance(el1, el2) {

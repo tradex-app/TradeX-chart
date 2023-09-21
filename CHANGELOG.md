@@ -1,10 +1,17 @@
 # Change Log
 
-## [0.139.3]()
+## [0.139.4]()
 
 Fixed
 
-* Menu positioning on global_resize
+* Divider width on global_resize
+* Menu y positioning on global_resize
+
+## [0.139.3](https://github.com/tradex-app/TradeX-chart/commit/084145492fe236f669137c4c3247bad513fe7d69)
+
+Fixed
+
+* Menu x positioning on global_resize
 
 
 ## [0.139.2](https://github.com/tradex-app/TradeX-chart/commit/cf3d2da9672fdd5b62f3d580e3a298405bc383fb)

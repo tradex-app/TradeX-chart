@@ -82,6 +82,7 @@ export default class Widgets {
     this.off("menu_close", this.onCloseMenu)
     this.off("menu_off", this.onCloseMenu)
     this.off("menuItem_selected", this.onMenuItemSelected)
+    this.off("global_resize", this.onResize)
     
     this.stateMachine.destroy()
 
@@ -102,6 +103,7 @@ export default class Widgets {
     this.on("menu_close", this.onCloseMenu, this)
     this.on("menu_off", this.onCloseMenu, this)
     this.on("menuItem_selected", this.onMenuItemSelected, this)
+    this.on("global_resize", this.onResize, this)
   }
 
   on(topic, handler, context) {
@@ -135,6 +137,10 @@ export default class Widgets {
     // console.log("onMenuItemSelected:",e)
 
     this.emit(e.evt, e.target)
+  }
+
+  onResize() {
+    this.elements.elDividers.style.width = `${this.core.width}px`
   }
 
   mount(el) {
