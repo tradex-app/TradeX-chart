@@ -14,11 +14,11 @@ function qo(r, e) {
   }
   return Object.freeze(Object.defineProperty(r, Symbol.toStringTag, { value: "Module" }));
 }
-const Xo = "0.139.2";
+const Xo = "0.139.3";
 function M(r) {
   return Array.isArray(r);
 }
-function z(r) {
+function B(r) {
   return r && typeof r == "function";
 }
 function E(r) {
@@ -34,7 +34,7 @@ function S(r) {
   return typeof r == "string";
 }
 function ud(r) {
-  return !!r && (E(r) || z(r)) && z(r.then);
+  return !!r && (E(r) || B(r)) && B(r.then);
 }
 const jo = ["y", "M", "d", "h", "m", "s", "ms"], Ko = ["years", "months", "days", "hours", "minutes", "seconds", "milliseconds"], Zo = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334], Qo = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335], or = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], Jo = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], ar = 1231006505e3, Vt = 1, W = 1e3, F = W * 60, X = F * 60, _ = X * 24, fe = _ * 7, rt = _ * 30;
 function lr(r = 3, e = !1) {
@@ -922,9 +922,9 @@ class cs {
         volumeMinIdx: 0,
         volumeMaxIdx: 0
       };
-    let h = i.length - 1, l = Bt(s, 0, h), g = Bt(n, 0, h), p = i[l][3], v = i[l][2], b = i[l][5], L = i[l][5], k = l, N = l, lt = l, B = l;
+    let h = i.length - 1, l = zt(s, 0, h), g = zt(n, 0, h), p = i[l][3], v = i[l][2], b = i[l][5], L = i[l][5], k = l, N = l, lt = l, z = l;
     for (; l++ < g; )
-      i[l][3] < p && (p = i[l][3], k = l), i[l][2] > v && (v = i[l][2], N = l), i[l][5] < b && (b = i[l][5], lt = l), i[l][5] > L && (L = i[l][5], B = l);
+      i[l][3] < p && (p = i[l][3], k = l), i[l][2] > v && (v = i[l][2], N = l), i[l][5] < b && (b = i[l][5], lt = l), i[l][5] > L && (L = i[l][5], z = l);
     let D = v - p, Ht = p, St = v;
     return p -= D * o.yAxisBounds, p = p > 0 ? p : 0, v += D * o.yAxisBounds, D = v - p, {
       valueLo: Ht,
@@ -938,10 +938,10 @@ class cs {
       valueMinIdx: k,
       valueMaxIdx: N,
       volumeMinIdx: lt,
-      volumeMaxIdx: B
+      volumeMaxIdx: z
     };
-    function Bt(zt, kt, jt) {
-      return Math.min(jt, Math.max(kt, zt));
+    function zt(Bt, kt, jt) {
+      return Math.min(jt, Math.max(kt, Bt));
     }
   }
   snapshot(e, i) {
@@ -975,7 +975,7 @@ function us(r, e) {
   let i, s = r.timeFrameMS;
   return e = e - e % s, e === r.range.data[0][0] ? i = 0 : e < r.range.data[0][0] ? i = (r.range.data[0][0] - e) / s * -1 : i = (e - r.range.data[0][0]) / s, i;
 }
-const Ae = "TradeX-Chart", Re = "TX", Ba = "tradeXutils", Tn = "tradeXmenus", za = "tradeXmenu", En = "tradeXdividers", Sn = "tradeXwindows", Ua = "tradeXwindow", bn = "tradeXprogress", Wa = 500, Fa = "stream_None", _e = "stream_Listening", Cn = "stream_Started", Va = "stream_Stopped", Ga = "stream_Error", Be = "stream_candleFirst", Lt = "stream_candleUpdate", ze = "stream_candleNew", Ya = 250, qa = 8, Xa = 2, ja = 2, Ka = "defaultState", Za = {
+const Ae = "TradeX-Chart", Re = "TX", za = "tradeXutils", Tn = "tradeXmenus", Ba = "tradeXmenu", En = "tradeXdividers", Sn = "tradeXwindows", Ua = "tradeXwindow", bn = "tradeXprogress", Wa = 500, Fa = "stream_None", _e = "stream_Listening", Cn = "stream_Started", Va = "stream_Stopped", Ga = "stream_Error", ze = "stream_candleFirst", Lt = "stream_candleUpdate", Be = "stream_candleNew", Ya = 250, qa = 8, Xa = 2, ja = 2, Ka = "defaultState", Za = {
   id: Ka,
   key: "",
   status: "default",
@@ -1193,18 +1193,18 @@ let Xi = class $ {
         this.#s.calcAllIndicators();
       else {
         if (M(p) && p.length > 0) {
-          for (let B of p)
-            if (M(B?.data) && B?.data.length > 0)
+          for (let z of p)
+            if (M(z?.data) && z?.data.length > 0)
               for (let D of g)
-                D.name === B.name && D.type === B.type && Er(D.settings, B.settings) && (D.data = this.merge(D.data, B.data));
+                D.name === z.name && D.type === z.type && Er(D.settings, z.settings) && (D.data = this.merge(D.data, z.data));
         }
         if (M(v) && v.length > 0)
-          for (let B of v)
-            M(B?.data) && B?.data.length > 0;
+          for (let z of v)
+            M(z?.data) && z?.data.length > 0;
       }
       if (M(b) && b.length > 0)
-        for (let B of b)
-          M(B?.data) && B?.data.length > 0;
+        for (let z of b)
+          M(z?.data) && z?.data.length > 0;
       i && (E(i) ? (a = T(i.start) ? this.range.getTimeIndex(i.start) : this.range.indexStart, n = T(i.end) ? this.range.getTimeIndex(i.end) : this.range.indexEnd) : (h[0][0] && (a = this.range.indexStart + L), n = this.range.indexEnd + L), this.#s.setRange(a, n));
       let N, lt = !1;
       for (N in k)
@@ -1319,7 +1319,7 @@ class $t {
     this.#h = e, this.#a = i;
     const s = this.#i.states[this.#e];
     let n = s.on[e];
-    if (!n || !z(n.action) || this.#o !== "running")
+    if (!n || !B(n.action) || this.#o !== "running")
       return !1;
     let o = n?.condition?.type || n?.condition || !1;
     if (o && !this.condition.call(this, o, n.condition))
@@ -1375,12 +1375,12 @@ class $t {
     if (!Tr(i, s) || !(e.initial in e.states))
       return !1;
     for (let n in e.states) {
-      if (!E(e.states[n]) || "onEnter" in e.states[n] && !z(e.states[n].onEnter) || "onExit" in e.states[n] && !z(e.states[n].onExit))
+      if (!E(e.states[n]) || "onEnter" in e.states[n] && !B(e.states[n].onEnter) || "onExit" in e.states[n] && !B(e.states[n].onExit))
         return !1;
       if ("on" in e.states[n])
         for (let o in e.states[n].on) {
           let a = e.states[n].on[o];
-          if (!S(a.target) || "action" in a && !z(a.action))
+          if (!S(a.target) || "action" in a && !B(a.action))
             return !1;
         }
     }
@@ -1415,7 +1415,7 @@ class Ja {
       return !1;
   }
   add(e, i, s) {
-    if (isNaN(e) || !z(s))
+    if (isNaN(e) || !B(s))
       return !1;
     const n = K(Qa), o = { price: e, condition: i };
     if (this.list.has(o)) {
@@ -1513,7 +1513,7 @@ class le {
     this.#r = e, this.emit(e, i);
   }
   set dataReceived(e) {
-    this.#u || (this.#u = !0, this.status = { status: Be, data: e });
+    this.#u || (this.#u = !0, this.status = { status: ze, data: e });
   }
   get alerts() {
     return this.#y;
@@ -1571,7 +1571,7 @@ class le {
       e.v,
       null,
       !0
-    ], this.#t.state.mergeData({ ohlcv: [this.#l] }, !0, !1), this.status = { status: ze, data: { data: e, candle: this.#l } }, this.#a = this.#n.timeFrameMS, this.#h = this.roundTime(Date.now());
+    ], this.#t.state.mergeData({ ohlcv: [this.#l] }, !0, !1), this.status = { status: Be, data: { data: e, candle: this.#l } }, this.#a = this.#n.timeFrameMS, this.#h = this.roundTime(Date.now());
   }
   prevCandle() {
     const e = this.#t.allData.data;
@@ -1856,7 +1856,7 @@ var br = { exports: {} };
       for (var x = Object.keys(f), P = 0; P < x.length; )
         (!m || m && u[x[P]] === n) && (u[x[P]] = f[x[P]]), P++;
       return u;
-    }, "extend", "Use `assign`."), B = k(function(u, f) {
+    }, "extend", "Use `assign`."), z = k(function(u, f) {
       return lt(u, f, !0);
     }, "merge", "Use `assign`.");
     function D(c, u, f) {
@@ -1871,10 +1871,10 @@ var br = { exports: {} };
     function St(c, u) {
       return typeof c == h ? c.apply(u && u[0] || n, u) : c;
     }
-    function Bt(c, u) {
+    function zt(c, u) {
       return c === n ? u : c;
     }
-    function zt(c, u, f) {
+    function Bt(c, u, f) {
       L(ne(u), function(m) {
         c.addEventListener(m, f, !1);
       });
@@ -1947,7 +1947,7 @@ var br = { exports: {} };
       handler: function() {
       },
       init: function() {
-        this.evEl && zt(this.element, this.evEl, this.domHandler), this.evTarget && zt(this.target, this.evTarget, this.domHandler), this.evWin && zt(Ws(this.element), this.evWin, this.domHandler);
+        this.evEl && Bt(this.element, this.evEl, this.domHandler), this.evTarget && Bt(this.target, this.evTarget, this.domHandler), this.evWin && Bt(Ws(this.element), this.evWin, this.domHandler);
       },
       destroy: function() {
         this.evEl && kt(this.element, this.evEl, this.domHandler), this.evTarget && kt(this.target, this.evTarget, this.domHandler), this.evWin && kt(Ws(this.element), this.evWin, this.domHandler);
@@ -1955,7 +1955,7 @@ var br = { exports: {} };
     };
     function xo(c) {
       var u, f = c.options.inputClass;
-      return f ? u = f : po ? u = Bi : mo ? u = Je : Fs ? u = zi : u = Qe, new u(c, To);
+      return f ? u = f : po ? u = zi : mo ? u = Je : Fs ? u = Bi : u = Qe, new u(c, To);
     }
     function To(c, u, f) {
       var m = f.pointers.length, x = f.changedPointers.length, P = u & Z && m - x === 0, A = u & (U | tt) && m - x === 0;
@@ -2075,10 +2075,10 @@ var br = { exports: {} };
       5: vo
     }, Ks = "pointerdown", Zs = "pointermove pointerup pointercancel";
     e.MSPointerEvent && !e.PointerEvent && (Ks = "MSPointerDown", Zs = "MSPointerMove MSPointerUp MSPointerCancel");
-    function Bi() {
+    function zi() {
       this.evEl = Ks, this.evWin = Zs, ht.apply(this, arguments), this.store = this.manager.session.pointerEvents = [];
     }
-    D(Bi, ht, {
+    D(zi, ht, {
       handler: function(u) {
         var f = this.store, m = !1, x = u.type.toLowerCase().replace("ms", ""), P = Oo[x], A = Io[u.pointerType] || u.pointerType, Y = A == xe, q = re(f, u.pointerId, "pointerId");
         P & Z && (u.button === 0 || Y) ? q < 0 && (f.push(u), q = f.length - 1) : P & (U | tt) && (m = !0), !(q < 0) && (f[q] = u, this.callback(this.manager, P, {
@@ -2154,18 +2154,18 @@ var br = { exports: {} };
           Y
         ];
     }
-    var Bo = 2500, Js = 25;
-    function zi() {
+    var zo = 2500, Js = 25;
+    function Bi() {
       ht.apply(this, arguments);
       var c = Ht(this.handler, this);
       this.touch = new Je(this.manager, c), this.mouse = new Qe(this.manager, c), this.primaryTouch = null, this.lastTouches = [];
     }
-    D(zi, ht, {
+    D(Bi, ht, {
       handler: function(u, f, m) {
         var x = m.pointerType == xe, P = m.pointerType == $i;
         if (!(P && m.sourceCapabilities && m.sourceCapabilities.firesTouchEvents)) {
           if (x)
-            zo.call(this, f, m);
+            Bo.call(this, f, m);
           else if (P && Uo.call(this, m))
             return;
           this.callback(u, f, m);
@@ -2175,7 +2175,7 @@ var br = { exports: {} };
         this.touch.destroy(), this.mouse.destroy();
       }
     });
-    function zo(c, u) {
+    function Bo(c, u) {
       c & Z ? (this.primaryTouch = u.changedPointers[0].identifier, tn.call(this, u)) : c & (U | tt) && tn.call(this, u);
     }
     function tn(c) {
@@ -2187,7 +2187,7 @@ var br = { exports: {} };
           var P = m.indexOf(f);
           P > -1 && m.splice(P, 1);
         };
-        setTimeout(x, Bo);
+        setTimeout(x, zo);
       }
     }
     function Uo(c) {
@@ -2250,7 +2250,7 @@ var br = { exports: {} };
     }
     var ei = 1, ct = 2, oe = 4, Ut = 8, Rt = Ut, Me = 16, Ct = 32;
     function _t(c) {
-      this.options = N({}, this.defaults, c || {}), this.id = fo(), this.manager = null, this.options.enable = Bt(this.options.enable, !0), this.state = ei, this.simultaneous = {}, this.requireFail = [];
+      this.options = N({}, this.defaults, c || {}), this.id = fo(), this.manager = null, this.options.enable = zt(this.options.enable, !0), this.state = ei, this.simultaneous = {}, this.requireFail = [];
     }
     _t.prototype = {
       defaults: {},
@@ -2513,7 +2513,7 @@ var br = { exports: {} };
       }
     });
     function Nt(c, u) {
-      return u = u || {}, u.recognizers = Bt(u.recognizers, Nt.defaults.preset), new qi(c, u);
+      return u = u || {}, u.recognizers = zt(u.recognizers, Nt.defaults.preset), new qi(c, u);
     }
     Nt.VERSION = "2.0.7", Nt.defaults = {
       domEvents: !1,
@@ -2655,8 +2655,8 @@ var br = { exports: {} };
       TouchAction: Wi,
       TouchInput: Je,
       MouseInput: Qe,
-      PointerEventInput: Bi,
-      TouchMouseInput: zi,
+      PointerEventInput: zi,
+      TouchMouseInput: Bi,
       SingleTouchInput: Qs,
       Recognizer: _t,
       AttrRecognizer: yt,
@@ -2666,10 +2666,10 @@ var br = { exports: {} };
       Pinch: Fi,
       Rotate: Gi,
       Press: Vi,
-      on: zt,
+      on: Bt,
       off: kt,
       each: L,
-      merge: B,
+      merge: z,
       extend: lt,
       assign: N,
       inherit: D,
@@ -2927,12 +2927,12 @@ class Al extends Ri {
     e === $n && (this.enableDownEvent = i), e === Hn && (this.enableUpEvent = i);
   }
 }
-const Bn = "contextmenu";
+const zn = "contextmenu";
 class Ol extends Ri {
   constructor(e, i, s) {
     super(e, i, s), this.handleEvent = (n) => {
       this.options.enable && this.callback({
-        type: Bn,
+        type: zn,
         center: {
           x: n.clientX,
           y: n.clientY
@@ -2947,7 +2947,7 @@ class Ol extends Ri {
     this.element.removeEventListener("contextmenu", this.handleEvent);
   }
   enableEventType(e, i) {
-    e === Bn && (this.options.enable = i);
+    e === zn && (this.options.enable = i);
   }
 }
 const ps = 1, Si = 2, ys = 4, Il = {
@@ -2957,14 +2957,14 @@ const ps = 1, Si = 2, ys = 4, Il = {
   mousedown: ps,
   mousemove: Si,
   mouseup: ys
-}, kl = 1, Dl = 2, Rl = 3, _l = 0, Nl = 1, $l = 2, Hl = 1, Bl = 2, zl = 4;
+}, kl = 1, Dl = 2, Rl = 3, _l = 0, Nl = 1, $l = 2, Hl = 1, zl = 2, Bl = 4;
 function Ul(r) {
   const e = Il[r.srcEvent.type];
   if (!e)
     return null;
   const { buttons: i, button: s, which: n } = r.srcEvent;
   let o = !1, a = !1, h = !1;
-  return e === ys || e === Si && !Number.isFinite(i) ? (o = n === kl, a = n === Dl, h = n === Rl) : e === Si ? (o = !!(i & Hl), a = !!(i & zl), h = !!(i & Bl)) : e === ps && (o = s === _l, a = s === Nl, h = s === $l), { leftButton: o, middleButton: a, rightButton: h };
+  return e === ys || e === Si && !Number.isFinite(i) ? (o = n === kl, a = n === Dl, h = n === Rl) : e === Si ? (o = !!(i & Hl), a = !!(i & Bl), h = !!(i & zl)) : e === ps && (o = s === _l, a = s === Nl, h = s === $l), { leftButton: o, middleButton: a, rightButton: h };
 }
 function Wl(r, e) {
   const i = r.center;
@@ -3184,7 +3184,7 @@ class Gl {
     }
   }
 }
-class zn {
+class Bn {
   #t = [
     "pointerdown",
     "pointerup",
@@ -3383,7 +3383,7 @@ class At {
     return this.#r;
   }
   get pointer() {
-    return this.#n instanceof zn ? this.#n : (this.#n = new zn(this), this.#n);
+    return this.#n instanceof Bn ? this.#n : (this.#n = new Bn(this), this.#n);
   }
   get touch() {
     return this.#s instanceof Un ? this.#s : (this.#s = new Un(this), this.#s);
@@ -3419,7 +3419,7 @@ class At {
     this.#r.destroy(), this.#n = void 0, this.#i = void 0, this.#s = void 0;
   }
   isValid(e, i) {
-    return !!(S(e) || z(i));
+    return !!(S(e) || B(i));
   }
   validOptions(e) {
     return E(e) && J(e) ? e : void 0;
@@ -3982,10 +3982,10 @@ class Hh {
     return `r_${this.#n}`;
   }
   onmessage(e) {
-    return z(this.#e) ? this.#e(e) : e;
+    return B(this.#e) ? this.#e(e) : e;
   }
   onerror(e) {
-    return z(this.#r) ? this.#r(e) : e;
+    return B(this.#r) ? this.#r(e) : e;
   }
   postMessage(e) {
     return new Promise((i, s) => {
@@ -4016,7 +4016,7 @@ let kr = class Ft {
   static create(e = "worker", i, s, n) {
     if (typeof window.Worker > "u")
       return !1;
-    if (z(i))
+    if (B(i))
       i = i.toString();
     else if (!S(i))
       return !1;
@@ -4519,7 +4519,7 @@ class Rs {
   #c;
   #u;
   constructor(e) {
-    this.#e = Rs.#t++, this.#r = e.core, this.#n = I.isElement(e.elContainer) ? e.elContainer : !1, this.#i = I.isElement(e.elHandle) ? e.elHandle : !1, this.#u = z(e.callback) ? e.callback : !1, I.isElement(this.#n) && I.isElement(this.#i) && (this.mount(), this.eventsListen());
+    this.#e = Rs.#t++, this.#r = e.core, this.#n = I.isElement(e.elContainer) ? e.elContainer : !1, this.#i = I.isElement(e.elHandle) ? e.elHandle : !1, this.#u = B(e.callback) ? e.callback : !1, I.isElement(this.#n) && I.isElement(this.#i) && (this.mount(), this.eventsListen());
   }
   set cursor(e) {
     this.#i.style.cursor = e;
@@ -4620,7 +4620,7 @@ let Nr = class {
       );
   }
 };
-class Bh extends Nr {
+class zh extends Nr {
   constructor(e = {}) {
     super(e), e.container.innerHTML = "", e.container.appendChild(this.scene.canvas), G.viewports.push(this);
   }
@@ -4628,7 +4628,7 @@ class Bh extends Nr {
     super.destroy(), this.container.innerHTML = "", G.viewports.splice(this.index, 1);
   }
 }
-class zh {
+class Bh {
   x = 0;
   y = 0;
   width = 0;
@@ -4797,8 +4797,8 @@ const G = {
   viewports: [],
   pixelRatio: window && window.devicePixelRatio || 1,
   Node: Nr,
-  Viewport: Bh,
-  Layer: zh,
+  Viewport: zh,
+  Layer: Bh,
   Scene: Uh,
   Hit: Wh
 }, We = G;
@@ -5422,7 +5422,7 @@ class me {
     if (!(s instanceof mt))
       return !1;
     for (let [n, o] of s)
-      !E(o) || !z(o?.instance?.draw) || (o.instance.draw(), o.fixed || (o.instance.position = [this.#t.scrollPos, 0]));
+      !E(o) || !B(o?.instance?.draw) || (o.instance.draw(), o.fixed || (o.instance.position = [this.#t.scrollPos, 0]));
   }
   render() {
     this.#i.render();
@@ -5463,7 +5463,7 @@ class Yh extends V {
     this.xAxis.xAxisGrads.values, this.theme.xAxis, e.save(), e.restore();
   }
 }
-function Br(r, e) {
+function zr(r, e) {
   return Math.round(r.measureText(e).width);
 }
 function Ye(r = pt.fontSize, e = pt.fontWeight, i = pt.fontFamily) {
@@ -5471,14 +5471,14 @@ function Ye(r = pt.fontSize, e = pt.fontWeight, i = pt.fontFamily) {
 }
 function _i(r, e, i) {
   r.font = Ye(i?.fontSize, i?.fontWeight, i?.fontFamily);
-  const s = Br(r, e), n = i?.paddingLeft || 0, o = i?.paddingRight || 0, a = i?.borderWidth || 0;
+  const s = zr(r, e), n = i?.paddingLeft || 0, o = i?.paddingRight || 0, a = i?.borderWidth || 0;
   return n + o + s + a * 2;
 }
 function Ni(r) {
   const e = r?.paddingTop || 0, i = r?.paddingBottom || 0, s = r?.borderWidth || 0, n = r?.fontSize || 0;
   return e + i + n + s * 2;
 }
-function zr(r, e, i, s) {
+function Br(r, e, i, s) {
   r.fillStyle = s?.colour, r.font = Ye(s?.fontSize, s?.fontWeight, s?.fontFamily), r.textAlign = s?.textAlign || "start", r.textBaseline = s?.textBaseLine || "alphabetic", r.direction = s?.direction || "inherit", r.lineWidth = s?.width, r.strokeStyle = s?.border, s?.stroke ? r.strokeText(s?.text, e, i, s?.max) : r.fillText(s?.text, e, i, s?.max);
 }
 function ye(r, e, i, s, n) {
@@ -5836,9 +5836,9 @@ const Kh = {
     const [r, e] = this.renderQ.firstEntry();
     if (e.range?.snapshot) {
       for (let i of e.graphs)
-        z(i.draw) && i.draw(e.range, e.update);
+        B(i.draw) && i.draw(e.range, e.update);
       for (let i of e.graphs)
-        z(i.render) && i.render();
+        B(i.render) && i.render();
       this.frameDone();
     }
   }
@@ -6753,12 +6753,12 @@ const et = {
   getChannel: Ie,
   getPixelRatio: fc,
   fillStroke: ve,
-  calcTextWidth: Br,
+  calcTextWidth: zr,
   createFont: Ye,
   getTextRectHeight: Ni,
   getTextRectWidth: _i,
   renderImage: Xr,
-  renderText: zr,
+  renderText: Br,
   renderTextBG: ye,
   renderPath: we,
   renderPathStroke: mc,
@@ -7453,14 +7453,14 @@ class se {
         this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartPane()" instead.`);
         return;
       }
-      this.stateMachine.destroy(), this.Divider.destroy(), this.#y.destroy(), this.#w.destroy(), this.#v.destroy(), this.legend.destroy(), this.off("main_mousemove", this.onMouseMove), this.off(_e, this.onStreamListening), this.off(ze, this.onStreamNewValue), this.off(Lt, this.onStreamUpdate), this.off(Be, this.onStreamNewValue), this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.off("chart_yAxisRedraw", this.onYAxisRedraw), this.element.remove(), this.#u = "destroyed";
+      this.stateMachine.destroy(), this.Divider.destroy(), this.#y.destroy(), this.#w.destroy(), this.#v.destroy(), this.legend.destroy(), this.off("main_mousemove", this.onMouseMove), this.off(_e, this.onStreamListening), this.off(Be, this.onStreamNewValue), this.off(Lt, this.onStreamUpdate), this.off(ze, this.onStreamNewValue), this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.off("chart_yAxisRedraw", this.onYAxisRedraw), this.element.remove(), this.#u = "destroyed";
     }
   }
   remove() {
     this.core.log(`Deleting chart pane: ${this.id}`), this.emit("destroyChartView", this.id);
   }
   eventsListen() {
-    this.#v = new At(this.#f, { disableContextMenu: !1 }), this.#v.on("pointerdrag", this.onChartDrag.bind(this)), this.#v.on("pointerdragend", this.onChartDragDone.bind(this)), this.#v.on("pointermove", this.onMouseMove.bind(this)), this.#v.on("pointerenter", this.onMouseEnter.bind(this)), this.#v.on("pointerout", this.onMouseOut.bind(this)), this.#v.on("pointerdown", this.onMouseDown.bind(this)), this.#v.on("pointerup", this.onMouseUp.bind(this)), this.on("main_mousemove", this.updateLegends, this), this.on(_e, this.onStreamListening, this), this.on(ze, this.onStreamNewValue, this), this.on(Lt, this.onStreamUpdate, this), this.on(Be, this.onStreamNewValue, this), this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.on("chart_yAxisRedraw", this.onYAxisRedraw, this);
+    this.#v = new At(this.#f, { disableContextMenu: !1 }), this.#v.on("pointerdrag", this.onChartDrag.bind(this)), this.#v.on("pointerdragend", this.onChartDragDone.bind(this)), this.#v.on("pointermove", this.onMouseMove.bind(this)), this.#v.on("pointerenter", this.onMouseEnter.bind(this)), this.#v.on("pointerout", this.onMouseOut.bind(this)), this.#v.on("pointerdown", this.onMouseDown.bind(this)), this.#v.on("pointerup", this.onMouseUp.bind(this)), this.on("main_mousemove", this.updateLegends, this), this.on(_e, this.onStreamListening, this), this.on(Be, this.onStreamNewValue, this), this.on(Lt, this.onStreamUpdate, this), this.on(ze, this.onStreamNewValue, this), this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.on("chart_yAxisRedraw", this.onYAxisRedraw, this);
   }
   on(e, i, s) {
     this.#s.on(e, i, s);
@@ -7928,11 +7928,11 @@ class Ot extends V {
     this.visible(!this.visible()), e.parent.classList.toggle("visible"), e.parent.classList.toggle("notvisible");
   }
   invokeSettings(e) {
-    if (z(e?.fn)) {
+    if (B(e?.fn)) {
       let i = C.fn(this);
       if (e?.own)
         return i;
-    } else if (z(this.core.config.callbacks?.indicatorSettings?.fn)) {
+    } else if (B(this.core.config.callbacks?.indicatorSettings?.fn)) {
       let i = this.core.config.callbacks.indicatorSettings.fn(this);
       if (this.core.config.callbacks?.indicatorSettings?.own)
         return i;
@@ -8325,7 +8325,7 @@ class Zr {
   };
   #A;
   #N;
-  #z;
+  #B;
   #O;
   constructor(e, i) {
     this.#i = e, this.#r = i, this.#n = e, this.#h = this.#i.elMain, this.#l = this.#i.elYAxis, this.init(i);
@@ -8496,7 +8496,7 @@ class Zr {
   destroy() {
     this.#o = !0, this.stateMachine.destroy(), this.#b.destroy(), this.#p.forEach((e, i) => {
       this.#S[i] = !0, e.destroy(), delete this.#S[i];
-    }), this.#g.destroy(), this.#O.destroy(), this.off(Be, this.onFirstStreamValue), this.off(ze, this.onNewStreamValue), this.off("setRange", this.draw), this.off("scrollUpdate", this.draw), this.off("chart_render", this.draw), this.off("destroyChartView", this.removeChartPane);
+    }), this.#g.destroy(), this.#O.destroy(), this.off(ze, this.onFirstStreamValue), this.off(Be, this.onNewStreamValue), this.off("setRange", this.draw), this.off("scrollUpdate", this.draw), this.off("chart_render", this.draw), this.off("destroyChartView", this.removeChartPane);
   }
   reset() {
     for (let e in this.#i.Indicators)
@@ -8511,7 +8511,7 @@ class Zr {
     this.draw(this.range, !0);
   }
   eventsListen() {
-    this.#a.tabIndex = 0, this.#a.focus(), this.#O = new At(this.#a, { disableContextMenu: !1 }), this.#O.on("keydown", this.onChartKeyDown.bind(this)), this.#O.on("keyup", this.onChartKeyUp.bind(this)), this.#O.on("wheel", this.onMouseWheel.bind(this)), this.#O.on("pointerenter", this.onMouseEnter.bind(this)), this.#O.on("pointerout", this.onMouseOut.bind(this)), this.#O.on("pointerup", this.onChartDragDone.bind(this)), this.#O.on("pointermove", this.onMouseMove.bind(this)), this.on(Be, this.onFirstStreamValue, this), this.on(ze, this.onNewStreamValue, this), this.on("setRange", this.draw, this), this.on("scrollUpdate", this.draw, this), this.on("chart_render", this.draw, this), this.on("destroyChartView", this.removeChartPane, this);
+    this.#a.tabIndex = 0, this.#a.focus(), this.#O = new At(this.#a, { disableContextMenu: !1 }), this.#O.on("keydown", this.onChartKeyDown.bind(this)), this.#O.on("keyup", this.onChartKeyUp.bind(this)), this.#O.on("wheel", this.onMouseWheel.bind(this)), this.#O.on("pointerenter", this.onMouseEnter.bind(this)), this.#O.on("pointerout", this.onMouseOut.bind(this)), this.#O.on("pointerup", this.onChartDragDone.bind(this)), this.#O.on("pointermove", this.onMouseMove.bind(this)), this.on(ze, this.onFirstStreamValue, this), this.on(Be, this.onNewStreamValue, this), this.on("setRange", this.draw, this), this.on("scrollUpdate", this.draw, this), this.on("chart_render", this.draw, this), this.on("destroyChartView", this.removeChartPane, this);
   }
   on(e, i, s) {
     this.#i.on(e, i, s);
@@ -9425,7 +9425,7 @@ class Qr {
   addAllTools() {
   }
 }
-const sr = 20, Bc = 20, zc = new Rr(R.COLOUR_BORDER), ws = document.createElement("template");
+const sr = 20, zc = 20, Bc = new Rr(R.COLOUR_BORDER), ws = document.createElement("template");
 ws.innerHTML = `
 <style>
   .scrollBarWidget {
@@ -9563,7 +9563,7 @@ ws.innerHTML = `
   }
 
   .handle {
-    background-color: var(--txc-time-handle-color, ${zc.hex}44); 
+    background-color: var(--txc-time-handle-color, ${Bc.hex}44); 
     width: 2px;
     height: 18px;
     margin: 1px;
@@ -9577,7 +9577,7 @@ ws.innerHTML = `
   .icon svg {
     fill: var(--txc-time-icon-color, ${R.COLOUR_ICON});
     width: ${sr}px;
-    height: ${Bc}px;
+    height: ${zc}px;
     margin-top: 1px;
   }
   .icon svg:hover {
@@ -11196,7 +11196,7 @@ class Oi extends Ot {
     this.plot(n, "renderLine", this.style), this.target.viewport.render();
   }
 }
-class Bs extends Ot {
+class zs extends Ot {
   name = "Stochastic Oscillator";
   shortName = "STOCH";
   libName = "STOCH";
@@ -11246,7 +11246,7 @@ class Bs extends Ot {
     }, this.addLegend();
   }
   get primaryPane() {
-    return Bs.primaryPane;
+    return zs.primaryPane;
   }
   get defaultStyle() {
     return this.#t;
@@ -11299,7 +11299,7 @@ const co = {
   EMA: { id: "EMA", name: "Exponential Moving Average", event: "addIndicator", ind: Ai },
   RSI: { id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: Hs },
   SMA: { id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: Oi },
-  STOCH: { id: "STOCH", name: "Stochastic Oscillator", event: "addIndicator", ind: Bs }
+  STOCH: { id: "STOCH", name: "Stochastic Oscillator", event: "addIndicator", ind: zs }
 };
 class cd {
   #t = "Utilities";
@@ -11357,7 +11357,7 @@ class cd {
     this.initAllUtils(), this.eventsListen();
   }
   destroy() {
-    const e = this.#r, i = I.findBySelectorAll(`#${e.id} .${Ba} .icon-wrapper`);
+    const e = this.#r, i = I.findBySelectorAll(`#${e.id} .${za} .icon-wrapper`);
     for (let s of i) {
       let n = s.id.replace("TX_", "");
       for (let o of this.#s)
@@ -11480,13 +11480,13 @@ class ut {
   end() {
     this.#s.querySelectorAll(`#${this.id} li`).forEach((i) => {
       i.removeEventListener("click", this.#a[this.id][i.id]);
-    }), document.removeEventListener("click", this.#a[this.id].outside);
+    }), document.removeEventListener("click", this.#a[this.id].outside), this.off("global_resize", this.onResize);
   }
   eventsListen() {
     const e = this.#s.querySelectorAll(`#${this.id} li`);
     this.#a[this.id] = {}, e.forEach((i) => {
       this.#a[this.id][i.id] = this.onMenuSelect.bind(this), i.addEventListener("click", this.#a[this.id][i.id]);
-    });
+    }), this.on("global_resize", this.onResize, this);
   }
   on(e, i, s) {
     this.#r.on(e, i, s);
@@ -11515,6 +11515,9 @@ class ut {
     }
     document.removeEventListener("click", this.#a[this.id].outside);
   }
+  onResize() {
+    this.position();
+  }
   mount(e) {
     e.lastElementChild == null ? e.innerHTML = this.menuNode() : e.lastElementChild.insertAdjacentHTML("afterend", this.menuNode()), this.#o = this.#s.querySelector(`#${this.id}`);
   }
@@ -11527,7 +11530,7 @@ class ut {
     const e = this.#n, i = `position: absolute; z-index: 1000; display: none; border: 1px solid ${Zi.COLOUR_BORDER}; background: ${Zi.COLOUR_BG}; color: ${Zi.COLOUR_TXT};`;
     let s = this.content(e);
     return `
-      <div id="${e.id}" class="${za}" style="${i}">
+      <div id="${e.id}" class="${Ba}" style="${i}">
         ${s}
       </div>
     `;
@@ -11543,19 +11546,18 @@ class ut {
   position() {
     let e = this.#i.getBoundingClientRect(), i = this.#n.primary.getBoundingClientRect();
     this.#o.style.left = Math.round(i.left - e.left) + "px", this.#o.style.top = Math.round(i.bottom - e.top) + "px";
+    let s = I.elementDimPos(this.#o);
+    if (s.left + s.width > this.#i.offsetWidth) {
+      let o = Math.floor(this.#i.offsetWidth - s.width);
+      o = H(o, 0, this.#i.offsetWidth), this.#o.style.left = `${o}px`;
+    }
   }
   remove() {
   }
   open() {
     if (ut.currentActive === this)
       return !0;
-    ut.currentActive = this, this.#o.style.display = "block";
-    let e = I.elementDimPos(this.#o);
-    if (e.left + e.width > this.#i.offsetWidth) {
-      let s = Math.floor(this.#i.offsetWidth - e.width);
-      s = H(s, 0, this.#i.offsetWidth), this.#o.style.left = `${s}px`;
-    }
-    setTimeout(() => {
+    ut.currentActive = this, this.#o.style.display = "block", this.position(), setTimeout(() => {
       this.#a[this.id].outside = this.onOutsideClickListener.bind(this), document.addEventListener("click", this.#a[this.id].outside);
     }, 250);
   }
@@ -11780,13 +11782,13 @@ class it {
     it.currentActive = null, this.#o.style.display = "none", this.emit("window_closed", this.id);
   }
 }
-class zs extends it {
+class Bs extends it {
   static type = "Dialogue";
   constructor(e, i) {
     super(), i.dragbar = !0, i.close = !0, this.config = i;
   }
   get type() {
-    return zs.type;
+    return Bs.type;
   }
 }
 class wt {
@@ -11910,7 +11912,7 @@ class nr {
   #i;
   #s;
   #o;
-  #l = { Divider: st, Progress: wt, Menu: ut, Window: it, Dialogue: zs };
+  #l = { Divider: st, Progress: wt, Menu: ut, Window: it, Dialogue: Bs };
   #h = {};
   #a = {};
   #c;
@@ -12045,19 +12047,19 @@ function rr(r, e, i, s, n) {
   L.save(), _s(L, 0, 0, p, v, { fill: o.chart.Background }), L.drawImage(g.canvas, 0, 0, g.width, g.height);
   let k = 0, N = 0, lt = p - r.Chart.scale.width;
   o?.yAxis?.location == "left" && (N = r.Chart.scale.width, lt = 0);
-  let B;
+  let z;
   for (const [Ht, St] of r.ChartPanes) {
-    let Bt = St.graph.viewport.scene, { width: zt, height: kt } = Bt, jt = St.scale.graph.viewport.scene, { width: Dt, height: ne } = jt;
-    k > 0 && (B = { stroke: "#ccc" }, Fe(L, k, 0, l.width, B)), L.drawImage(Bt.canvas, N, k, zt, kt), L.drawImage(jt.canvas, lt, k - 1, Dt, ne), k += kt;
+    let zt = St.graph.viewport.scene, { width: Bt, height: kt } = zt, jt = St.scale.graph.viewport.scene, { width: Dt, height: ne } = jt;
+    k > 0 && (z = { stroke: "#ccc" }, Fe(L, k, 0, l.width, z)), L.drawImage(zt.canvas, N, k, Bt, kt), L.drawImage(jt.canvas, lt, k - 1, Dt, ne), k += kt;
   }
-  L.drawImage(h.canvas, 0, k, h.width, h.height), B = {
+  L.drawImage(h.canvas, 0, k, h.width, h.height), z = {
     text: r.config.title,
     colour: o.chart.TextColour,
     fontSize: o.chart.FontSize * 1.5,
     fontWeight: "normal",
     fontFamily: o.chart.FontFamily,
     textBaseLine: "top"
-  }, zr(L, 6, 6, B), L.restore();
+  }, Br(L, 6, 6, z), L.restore();
   const D = () => {
     b.destroy(), a.remove();
   };
@@ -12146,7 +12148,7 @@ class O extends ed {
   toolsW = Gt;
   timeH = Pi;
   scaleW = ge;
-  #z;
+  #B;
   #O;
   #k = {
     chart: {},
@@ -12154,7 +12156,7 @@ class O extends ed {
   };
   #$;
   panes = {
-    utils: this.#z,
+    utils: this.#B,
     tools: this.#O,
     main: this.#k
   };
@@ -12176,7 +12178,7 @@ class O extends ed {
   #j = [!1, !1, !1];
   #V;
   #G;
-  #B;
+  #z;
   #Y;
   #q;
   #X;
@@ -12189,7 +12191,7 @@ class O extends ed {
       () => {
         O.#s = !0;
         for (let i of O.#o)
-          z(i) && i();
+          B(i) && i();
       },
       () => {
         O.#s = !1;
@@ -12291,7 +12293,7 @@ class O extends ed {
     return this.#b;
   }
   get UtilsBar() {
-    return this.#z;
+    return this.#B;
   }
   get ToolsBar() {
     return this.#O;
@@ -12407,7 +12409,7 @@ class O extends ed {
     return this.setStream(e);
   }
   get stream() {
-    return this.#B;
+    return this.#z;
   }
   get worker() {
     return this.#G;
@@ -12443,7 +12445,7 @@ class O extends ed {
       const p = us(this.#_, this.#f?.range?.startTS), v = T(p) ? p + this.#v.initialCnt : this.allData.data.length - 1, b = T(p) ? p : v - this.#v.initialCnt;
       this.#v.initialCnt = v - b, this.setRange(b, v), i.range?.center && this.jumpToIndex(b, !0, !0);
     }
-    this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.#$ = new nr(this, { widgets: i?.widgets }), this.#z = new cd(this, i), this.#O = new Qr(this, i), this.#k = new Zr(this, i), this.setTheme(this.#N.id), this.log(`${this.#c} V${O.version} configured and running...`), this.#H = this.bufferPx * -1, this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#V = this.WidgetsG.insert("Progress", {}), this.stream = this.#f.stream, this.#U && this.on(Lt, this.delayedSetRange, this), this.#D = !0, this.refresh();
+    this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.#$ = new nr(this, { widgets: i?.widgets }), this.#B = new cd(this, i), this.#O = new Qr(this, i), this.#k = new Zr(this, i), this.setTheme(this.#N.id), this.log(`${this.#c} V${O.version} configured and running...`), this.#H = this.bufferPx * -1, this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#V = this.WidgetsG.insert("Progress", {}), this.stream = this.#f.stream, this.#U && this.on(Lt, this.delayedSetRange, this), this.#D = !0, this.refresh();
   }
   destroy() {
     this.log("...cleanup the mess"), this.removeEventListener("mousemove", this.onMouseMove), this.#T = null, this.UtilsBar.destroy(), this.ToolsBar.destroy(), this.MainPane.destroy(), this.WidgetsG.destroy(), this.#G.end(), this.#C = null;
@@ -12452,10 +12454,10 @@ class O extends ed {
     this.addEventListener("mousemove", this.onMouseMove.bind(this)), this.on(Lt, this.onStreamUpdate, this), this.on("state_mergeComplete", () => this.#V.stop());
   }
   on(e, i, s) {
-    return !S(e) || !z(i) ? !1 : (this.#T[e] || (this.#T[e] = []), this.#T[e].push({ handler: i, context: s }), !0);
+    return !S(e) || !B(i) ? !1 : (this.#T[e] || (this.#T[e] = []), this.#T[e].push({ handler: i, context: s }), !0);
   }
   off(e, i) {
-    if (!S(e) || !z(i) || !(e in this.#T))
+    if (!S(e) || !B(i) || !(e in this.#T))
       return !1;
     for (let s = 0; s < this.#T[e].length; s++)
       if (this.#T[e][s].handler === i && (this.#T[e].splice(s, 1), this.#T[e].length === 0)) {
@@ -12495,7 +12497,7 @@ class O extends ed {
       theme: (e) => {
         this.#N = this.addTheme(e);
       },
-      stream: (e) => this.#B = E(e) ? e : {},
+      stream: (e) => this.#z = E(e) ? e : {},
       pricePrecision: (e) => this.setPricePrecision(e),
       volumePrecision: (e) => this.setVolumePrecision(e)
     };
@@ -12582,7 +12584,7 @@ class O extends ed {
     if (this.stream instanceof le)
       return this.error("Error: Invoke stopStream() before starting a new one."), !1;
     if (E(e))
-      return this.allData.data.length == 0 && S(e.timeFrame) && ({ tf, ms } = ui(e?.timeFrame), this.range.interval = ms, this.range.intervalStr = tf, this.#_.timeFrameMS = ms, this.#_.timeFrame = tf), this.#B = new le(this), this.#f.stream = this.#B.config, this.#B;
+      return this.allData.data.length == 0 && S(e.timeFrame) && ({ tf, ms } = ui(e?.timeFrame), this.range.interval = ms, this.range.intervalStr = tf, this.#_.timeFrameMS = ms, this.#_.timeFrame = tf), this.#z = new le(this), this.#f.stream = this.#z.config, this.#z;
   }
   stopStream() {
     this.stream instanceof le && this.stream.stop();
@@ -12632,7 +12634,7 @@ class O extends ed {
     return J(n) && (this.#W = !1), n;
   }
   isIndicator(e) {
-    return !!(typeof e == "function" && "primaryPane" in e.prototype && z(e.prototype?.draw));
+    return !!(typeof e == "function" && "primaryPane" in e.prototype && B(e.prototype?.draw));
   }
   setIndicators(e, i = !1) {
     if (!E(e))

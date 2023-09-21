@@ -95,7 +95,7 @@ export default class UtilsBar {
     this.on("utils_timezone", this.onTimezone, this)
     this.on("utils_settings", this.onSettings, this)
     this.on("utils_screenshot", this.onScreenshot, this)
-    // this.on("resize", (dimensions) => this.onResize, this)
+    // this.on("global_resize", this.onResize, this)
   }
   
   on(topic, handler, context) {

@@ -84,6 +84,8 @@ export default class Menu {
     })
 
     document.removeEventListener('click', this.#menuEvents[this.id].outside)
+    
+    this.off("global_resize", this.onResize)
     // remove element
     // this.el.remove()
   }
@@ -95,6 +97,7 @@ export default class Menu {
       this.#menuEvents[this.id][item.id] = this.onMenuSelect.bind(this)
       item.addEventListener('click', this.#menuEvents[this.id][item.id])
     })
+    this.on("global_resize", this.onResize, this)
   }
 
   on(topic, handler, context) {
@@ -133,6 +136,10 @@ export default class Menu {
       this.emit("menu_close", data)
     }
     document.removeEventListener('click', this.#menuEvents[this.id].outside)
+  }
+
+  onResize() {
+    this.position()
   }
 
   mount(el) {
@@ -189,6 +196,19 @@ export default class Menu {
 
     this.#elMenu.style.left = Math.round(iPos.left - wPos.left) + "px"
     this.#elMenu.style.top = Math.round(iPos.bottom - wPos.top) + "px"
+
+    // adjust positioning if clipped
+    let pos = DOM.elementDimPos(this.#elMenu)
+    let posR = pos.left + pos.width
+    // adjust horizontal positioning if clipped
+    if (posR > this.#elWidgetsG.offsetWidth) {
+      let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width)
+          o = limit(o, 0, this.#elWidgetsG.offsetWidth)
+      this.#elMenu.style.left = `${o}px`
+    }
+    // TODO: adjust height if clipped
+    // TODO: adjust vertical position on clipped
+    // TODO: adjust width if clipped
   }
 
   remove() {
@@ -201,14 +221,7 @@ export default class Menu {
 
     Menu.currentActive = this
     this.#elMenu.style.display = "block"
-
-    let pos = DOM.elementDimPos(this.#elMenu)
-    let posR = pos.left + pos.width
-    if (posR > this.#elWidgetsG.offsetWidth) {
-      let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width)
-          o = limit(o, 0, this.#elWidgetsG.offsetWidth)
-      this.#elMenu.style.left = `${o}px`
-    }
+    this.position()
 
     setTimeout(() => {
       // click event outside of menu
