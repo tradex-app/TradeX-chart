@@ -229,7 +229,7 @@ export default class Indicator extends Overlay {
 
   /**
    * toggle indicator visibility
-   * @param {boolean} v - toggle visibility
+   * @param {Object} action - 
    */
   onVisibility(action) {
     this.visible(!this.visible())

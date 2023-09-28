@@ -1,7 +1,7 @@
 // DOM.js
 // DOM utilities
 
-import { isNumber, isObject, isString } from "./typeChecks"
+import { isFunction, isNumber, isObject, isString } from "./typeChecks"
 
 
 const DOM = {
@@ -98,6 +98,7 @@ const DOM = {
    * test if image, return image object or false
    * @param {*} img - image resource, URL, data:URL, svg
    * @param {function} cb - callback to return image or false
+   * @returns {Promise} - if no callback function is provided, a Promise will be returned
    */
   isImage(img, cb) {
     if (this.isSVG(img)) { 
@@ -112,11 +113,26 @@ const DOM = {
     const i = new Image()
     i.src = img
 
-    if (i.complete) cb(i)
-    else {
-      i.onload = () => cb(i)
-      i.onerror = () => cb(false)
+    // valid callback function?
+    if (isFunction(cb)) {
+      if (i.complete) cb(i)
+      else {
+        i.onload = () => cb(i)
+        i.onerror = () => cb(false)
+      }
     }
+    // return a Promise instead
+    else {
+      return new Promise( function(resolve, reject) {
+        if (i.complete) resolve(i)
+        else {
+          i.onload = () => resolve(i)
+          i.onerror = () => reject(false)
+        }
+      })
+    }
+
+
   },
 
   /**

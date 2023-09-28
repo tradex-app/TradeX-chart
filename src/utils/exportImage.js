@@ -4,15 +4,19 @@ import CEL from "../components/primitives/canvas"
 import { renderLineHorizontal } from "../renderer/line"
 import { renderRectFill } from "../renderer/rect"
 import { renderText } from "../renderer/text"
+import { isObject } from "./typeChecks"
+import DOM from "./DOM"
 
 /**
  * 
  * @param {tradeXChart} core - root API
+ * @param {function|string} dest - callback function or filename
  * @param {string} type - image type "img/png"|"img/jpg"|"img/webp"
  * @param {number} quality - image quality 0 - 1
  * @param {sting} output - generate a data URL or file download "url"|"download"
+ * @param {Object} watermark - watermark definition {imgURL, x, y, width, height}
  */
-export default function exportImage(core, dest, type, quality, output) {
+export default function exportImage(core, dest, type, quality, output, watermark) {
   const theme = core.theme
   const container = document.createElement("template")
   const time = core.Timeline.graph.viewport.scene
@@ -70,26 +74,49 @@ export default function exportImage(core, dest, type, quality, output) {
   }
   renderText(ctx, 6, 6, opts)
 
-  ctx.restore()
+  const outputImage = (wm) => {
 
-  const cleanUp = () => {
-    imgViewport.destroy()
-    container.remove()
+    if (wm) {
+      const x = watermark?.x || 0
+      const y = watermark?.y || 0
+      const w = watermark?.width || width * 0.25
+      const h = watermark?.height || height * 0.25
+      ctx.drawImage(wm, x, y, w, h)
+    }
+
+    ctx.restore()
+
+    const cleanUp = () => {
+      imgViewport.destroy()
+      container.remove()
+    }
+  
+    switch(output) {
+      case "url": 
+        const cb = (r) => {
+          dest(r)
+          cleanUp()
+        }
+        imgViewport.scene.toImage(type, quality, cb); 
+        break;
+      case "download":
+      default:
+        // trigger file download
+        imgViewport.scene.export({fileName: dest}, null, type, quality);
+        cleanUp();
+        break;
+    }
   }
 
-  switch(output) {
-    case "url": 
-      const cb = (r) => {
-        dest(r)
-        cleanUp()
-      }
-      imgViewport.scene.toImage(type, quality, cb); 
-      break;
-    case "download":
-    default:
-      // trigger file download
-      imgViewport.scene.export({fileName: dest}, null, type, quality);
-      cleanUp;
-      break;
+  // apply watermark if any
+  if (isObject(watermark)) {
+    DOM.isImage(watermark?.imgURL).then((r) => {
+      outputImage(r)
+    }).catch((e) => {
+      console.error(e)
+    })
+  }
+  else {
+    outputImage()
   }
 }

@@ -489,14 +489,19 @@
 <p>TradeX-chart may or may not implement all of the indicators provided by TA-Lib.</p>
 <p>Indicators are grouped as:</p>
 <ul>
-<li><strong>On Chart</strong> - those displayed atop the price history (candles)</li>
-<li><strong>Off Chart</strong> - those displayed in their own pane.</li>
+<li><strong>Primary Chart Pane</strong> - those displayed atop the price history (candles)</li>
+<li><strong>Secondary Chart Panes</strong> - those displayed in their own pane.</li>
 </ul>
 <p>Indicators can be added via the following methods:</p>
 <ul>
 <li>API - programmatically <code>chart.addIndicator()</code></li>
 <li>State - <a href="state.md">a valid chart state</a></li>
 <li>Utils Bar - through the chart GUI using the Indicators option in the Utils Bar</li>
+</ul>
+<p>Removal of Indicators can be done via:</p>
+<ul>
+<li>API - programmatically <code>chart.removeIndicator("TradeX_test-Chart_2-BB_4")</code></li>
+<li>GUI - indicator legend bar controls</li>
 </ul>
 <h2 id="default-indicators">Default Indicators</h2>
 <p><a href="indicators_default.md">The current list of implemented indicators.</a></p>

@@ -105,7 +105,7 @@ The chart pane IDs are used as the ``Map()`` keys.
 
 ```javascript
 chart0.ChartPanes.removeChartPane("TX_lixi72el_tc8_0-RSI__20_1")
-
+// or alternatively
 chart0.ChartPanes.get("TX_lixi72el_tc8_0-RSI__20_1").remove() 
 ```
 
@@ -122,6 +122,25 @@ chart0.ChartPanes.get("TX_lj4rpog3_ujm_0-RSI__20_1").reorderUp()
 chart0.ChartPanes.get("TX_lj4rpog3_ujm_0-RSI__20_1").reorderDown()
 ```
 
+### Maximize Minimize
+
+Toggle the chart pane maximize and minimize state.
+
+```javascript
+const pane = chart0.ChartPanes.get("TradeX_test-RSI__20_1")
+chart0.MainPane.paneMaximize(pane)
+
+```
+
+### Collapse Expand
+
+Toggle the chart pane collapse and expand state.
+
+```javascript
+const pane = chart0.ChartPanes.get("TradeX_test-RSI__20_1")
+chart0.MainPane.paneCollapse(pane)
+```
+
 ## Primary Chart Pane
 
 The primary chart pane that displays the price history (candles) can be accessed like so:
@@ -134,9 +153,8 @@ This exposes the following methods.
 
 ### Set Visibility for Legends on Primary
 
-´´´javascript
+```javascript
 chart0.Chart.legendsVisibility("hide")
-
 ```
 Accepts either ``show`` or ``hide`` to toggle the visibility of all indicator legends on the Primary pane.
 
@@ -187,4 +205,18 @@ chart1.removeIndicator("TradeX_test-Chart_2-BB_4")
 chart1.ChartPanes.get("TradeX_test-Chart_2").removeIndicator("TradeX_test-Chart_2-BB_4")
 
 chart1.ChartPanes.get("TradeX_test-RSI__20_3").indicators["TradeX_test-RSI__20_3-RSI_5"].instance.remove()
+```
+
+### Visible
+
+Set or get the indicator visibility. The method accepts a boolean to set the indicator visibility and also returns a boolean of the current state.
+
+``true`` visible  
+``false`` not visible
+
+```javascript
+const visible = chart1.ChartPanes.get("TradeX_test-RSI__20_3").indicators["TradeX_test-RSI__20_3-RSI_5"].instance.visible()
+
+// set indicator visibility to not visible (false)
+chart1.ChartPanes.get("TradeX_test-RSI__20_3").indicators["TradeX_test-RSI__20_3-RSI_5"].instance.visible(false)
 ```

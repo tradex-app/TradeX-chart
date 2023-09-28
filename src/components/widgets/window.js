@@ -10,12 +10,24 @@ import { WindowStyle } from "../../definitions/style"
 import { decimalPlaces } from "../../utils/number"
 import { isArray, isNumber, isObject, isString } from "../../utils/typeChecks"
 
+// State enum
+class State {
+  static opened = new State("opened")
+  static closed = new State("closed")
+
+  constructor(name) {
+    this.name = name
+  }
+}
+
+
 export default class Window {
 
   #id
   #widgets
   #core
   #config
+  #state = State.closed
   
   #elWidgetsG
   #elWindows
@@ -69,6 +81,7 @@ export default class Window {
   get pos() { return this.dimensions }
   get config() { return this.#config }
   set config(c) { this.#config = c }
+  get state() { return this.#state }
   get dimensions() { return DOM.elementDimPos(this.#elWindow) }
   set dimensions(d) { this.setDimensions(d) }
   get type() { return Window.type }
@@ -120,19 +133,6 @@ export default class Window {
     this.#core.emit(topic, data)
   }
 
-  // onWindowSelect(e) {
-  //   let evt = e.currentTarget.dataset.event,
-  //       data = {
-  //         target: e.currentTarget.id, 
-  //         window: this.#id,
-  //         evt: evt
-  //       };
-        
-  //   this.emit(evt, data)
-  //   this.emit("windowItemSelected", data)
-  //   this.emit("closeWindow", data)
-  // }
-
   onOutsideClickListener(e) {
     if (!this.#elWindow.contains(e.target) 
     // && (!this.#config.primary.contains(e.target)) 
@@ -150,6 +150,16 @@ export default class Window {
     if (e.window === this.#id) this.close()
   }
 
+  onWindow(e) {
+    e.stopPropagation()
+    console.log("window")
+  }
+
+  onDragBar(e) {
+    e.stopPropagation()
+    console.log("dragBar")
+  }
+
   mount(el) {
     if (el.lastElementChild == null) 
       el.innerHTML = this.windowNode()
@@ -161,6 +171,10 @@ export default class Window {
     this.#elTitle = this.#elWindow.querySelector(".title")
     this.#elCloseIcon = this.#elWindow.querySelector(".closeIcon")
     this.#elContent = this.#elWindow.querySelector(".content")
+
+    this.#elWindow.addEventListener("click", this.onWindow.bind(this))
+    if (DOM.isElement(this.#elDragBar))
+      this.#elDragBar.addEventListener("click", this.onDragBar.bind(this))
     
     let x, y;
     if (isObject(this.#config.position)) {
@@ -246,18 +260,21 @@ export default class Window {
     return node
   }
 
-    // get your drag on
-    title(window) {
-      let titleStyle = ``
-      let cfg = this.config?.styles?.title
-      for (let k in cfg) {
-        titleStyle += `${k}: ${cfg[k]}; `
-      }
-      let node = `
-          <div class="title" style="${titleStyle}"></div>
-      `
-      return node
+  // build the title
+  title(window) {
+    const cfg = this.config
+    const styles = cfg?.styles?.title
+    const title = (isString(cfg?.title)) ? cfg.title : ""
+    let titleStyle = ``
+
+    for (let k in styles) {
+      titleStyle += `${k}: ${styles[k]}; `
     }
+    let node = `
+        <div class="title" style="${titleStyle}">${title}</div>
+    `
+    return node
+  }
 
   closeIcon(window) {
     const cPointer = "cursor: pointer;"
@@ -339,8 +356,11 @@ export default class Window {
 
   // display the window
   open(data) {
-    if (Window.currentActive === this) return true
+    if (Window.currentActive === this &&
+        this.state === State.opened) return true
+
     Window.currentActive = this
+    this.#state = State.opened
     this.#elWindow.style.display = "block"
     this.#elWindow.style.zindex = "10"
     this.setProperties(data)
@@ -356,6 +376,7 @@ export default class Window {
   // hide the window
   close() {
     Window.currentActive = null
+    this.#state = State.closed
     this.#elWindow.style.display = "none"
     this.emit("window_closed", this.id)
   }

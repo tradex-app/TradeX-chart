@@ -6,14 +6,8 @@ import tradeXTime from './time'
 import tradeXRows from './rows'
 
 import {
-  UTILSH,
-  TOOLSW,
   TIMEH,
   SCALEW,
-  STYLE_ROWS,
-  STYLE_ROW,
-  STYLE_TIME,
-  STYLE_SCALE,
   GlobalStyle
 } from "../../definitions/style"
 import { isNumber } from "../../utils/typeChecks"

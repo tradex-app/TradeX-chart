@@ -4,6 +4,7 @@
 import DOM from "../utils/DOM"
 import Menu from "./widgets/menu"
 import Dialogue from "./widgets/dialogue"
+import ConfigDialogue from "./widgets/configDialogue"
 import Divider from "./widgets/divider"
 import Progress from "./widgets/progress"
 import Window from "./widgets/window"
@@ -22,7 +23,7 @@ export default class Widgets {
   #stateMachine
 
   #widgets
-  #widgetsList = { Divider, Progress, Menu, Window, Dialogue }
+  #widgetsList = { Divider, Progress, Menu, Window, Dialogue, ConfigDialogue }
   #widgetsInstances = {}
   #elements = {}
   #elWidgetsG

@@ -380,6 +380,16 @@
           <span class="astro-G2BYWC46" style="--depth: 1;">Re-order</span>
         </a>
         
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#maximize-minimize" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Maximize Minimize</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#collapse-expand" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Collapse Expand</span>
+        </a>
+        
       </li>
 </ul>
       </li><li class="astro-G2BYWC46" style="--depth: 0;">
@@ -392,9 +402,26 @@
           <span class="astro-G2BYWC46" style="--depth: 1;">Set Visibility for Legends on Primary</span>
         </a>
         
+      </li>
+</ul>
+      </li><li class="astro-G2BYWC46" style="--depth: 0;">
+        <a href="#indicators" class="astro-G2BYWC46" style="--depth: 0;">
+          <span class="astro-G2BYWC46" style="--depth: 0;">Indicators</span>
+        </a>
+        <ul class="isMobile astro-G2BYWC46" style="--depth: 1;">
+  <li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#add" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Add</span>
+        </a>
+        
       </li><li class="astro-G2BYWC46" style="--depth: 1;">
         <a href="#remove-1" class="astro-G2BYWC46" style="--depth: 1;">
           <span class="astro-G2BYWC46" style="--depth: 1;">Remove</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#visible" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Visible</span>
         </a>
         
       </li>
@@ -464,6 +491,16 @@
           <span class="astro-G2BYWC46" style="--depth: 1;">Re-order</span>
         </a>
         
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#maximize-minimize" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Maximize Minimize</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#collapse-expand" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Collapse Expand</span>
+        </a>
+        
       </li>
 </ul>
       </li><li class="astro-G2BYWC46" style="--depth: 0;">
@@ -476,9 +513,26 @@
           <span class="astro-G2BYWC46" style="--depth: 1;">Set Visibility for Legends on Primary</span>
         </a>
         
+      </li>
+</ul>
+      </li><li class="astro-G2BYWC46" style="--depth: 0;">
+        <a href="#indicators" class="astro-G2BYWC46" style="--depth: 0;">
+          <span class="astro-G2BYWC46" style="--depth: 0;">Indicators</span>
+        </a>
+        <ul class="astro-G2BYWC46" style="--depth: 1;">
+  <li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#add" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Add</span>
+        </a>
+        
       </li><li class="astro-G2BYWC46" style="--depth: 1;">
         <a href="#remove-1" class="astro-G2BYWC46" style="--depth: 1;">
           <span class="astro-G2BYWC46" style="--depth: 1;">Remove</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#visible" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Visible</span>
         </a>
         
       </li>
@@ -613,7 +667,7 @@ select the new state chart.state = NewState</p>
 <h2 id="chart-panes">Chart Panes</h2>
 <h3 id="remove">Remove</h3>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.removeChartPane(</span><span style="color: #FFAB70">"TX_lixi72el_tc8_0-RSI__20_1"</span><span style="color: #B392F0">)</span></span>
-<span class="line"></span>
+<span class="line"><span style="color: #6B737C">// or alternatively</span></span>
 <span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.get(</span><span style="color: #FFAB70">"TX_lixi72el_tc8_0-RSI__20_1"</span><span style="color: #B392F0">).remove() </span></span></code></pre>
 <p>The primary chart pane (price history) cannot be deleted as it provides the main data state for the chart.</p>
 <p>However, loading a new data state will of course remove and replace it.</p>
@@ -621,23 +675,26 @@ select the new state chart.state = NewState</p>
 <p>The visual stacking of chart panes can be changed by raising or lowering them above their neighbours.</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.get(</span><span style="color: #FFAB70">"TX_lj4rpog3_ujm_0-RSI__20_1"</span><span style="color: #B392F0">).reorderUp()</span></span>
 <span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.get(</span><span style="color: #FFAB70">"TX_lj4rpog3_ujm_0-RSI__20_1"</span><span style="color: #B392F0">).reorderDown()</span></span></code></pre>
+<h3 id="maximize-minimize">Maximize Minimize</h3>
+<p>Toggle the chart pane maximize and minimize state.</p>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">pane</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.get(</span><span style="color: #FFAB70">"TradeX_test-RSI__20_1"</span><span style="color: #B392F0">)</span></span>
+<span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">MainPane</span><span style="color: #B392F0">.paneMaximize(pane)</span></span>
+<span class="line"></span></code></pre>
+<h3 id="collapse-expand">Collapse Expand</h3>
+<p>Toggle the chart pane collapse and expand state.</p>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">pane</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.get(</span><span style="color: #FFAB70">"TradeX_test-RSI__20_1"</span><span style="color: #B392F0">)</span></span>
+<span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">MainPane</span><span style="color: #B392F0">.paneCollapse(pane)</span></span></code></pre>
 <h2 id="primary-chart-pane">Primary Chart Pane</h2>
 <p>The primary chart pane that displays the price history (candles) can be accessed like so:</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.Chart</span></span></code></pre>
 <p>This exposes the following methods.</p>
 <h3 id="set-visibility-for-legends-on-primary">Set Visibility for Legends on Primary</h3>
-<p>´´´javascript
-chart0.Chart.legendsVisibility(“hide”)</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #b392f0">Accepts either ``show`` or ``hide`` to toggle the visibility of all indicator legends on the Primary pane.</span></span>
-<span class="line"><span style="color: #b392f0"></span></span>
-<span class="line"><span style="color: #b392f0">## Indicators</span></span>
-<span class="line"><span style="color: #b392f0"></span></span>
-<span class="line"><span style="color: #b392f0">### Add</span></span>
-<span class="line"><span style="color: #b392f0"></span></span>
-<span class="line"><span style="color: #b392f0">To add an "empty" indicator is as simple as:</span></span>
-<span class="line"><span style="color: #b392f0"></span></span>
-<span class="line"><span style="color: #b392f0">```javascript</span></span>
-<span class="line"><span style="color: #b392f0">chart0.addIndicator("RSI", "RSI")</span></span></code></pre>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">Chart</span><span style="color: #B392F0">.legendsVisibility(</span><span style="color: #FFAB70">"hide"</span><span style="color: #B392F0">)</span></span></code></pre>
+<p>Accepts either <code>show</code> or <code>hide</code> to toggle the visibility of all indicator legends on the Primary pane.</p>
+<h2 id="indicators">Indicators</h2>
+<h3 id="add">Add</h3>
+<p>To add an “empty” indicator is as simple as:</p>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.addIndicator(</span><span style="color: #FFAB70">"RSI"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"RSI"</span><span style="color: #B392F0">)</span></span></code></pre>
 <p>If the chart has price history data, the indicator will automatically calculate it’s values with it’s defaults.</p>
 <p>However, indicators can also be added with data and or with custom settings.</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.addIndicator(</span><span style="color: #FFAB70">"EMA"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"EMA"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> {data</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> settings})</span></span></code></pre>
@@ -659,7 +716,15 @@ chart0.Chart.legendsVisibility(“hide”)</p>
 </ol>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart1</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.get(</span><span style="color: #FFAB70">"TradeX_test-Chart_2"</span><span style="color: #B392F0">).removeIndicator(</span><span style="color: #FFAB70">"TradeX_test-Chart_2-BB_4"</span><span style="color: #B392F0">)</span></span>
 <span class="line"></span>
-<span class="line"><span style="color: #79B8FF">chart1</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.get(</span><span style="color: #FFAB70">"TradeX_test-RSI__20_3"</span><span style="color: #B392F0">).indicators[</span><span style="color: #FFAB70">"TradeX_test-RSI__20_3-RSI_5"</span><span style="color: #B392F0">].</span><span style="color: #79B8FF">instance</span><span style="color: #B392F0">.remove()</span></span></code></pre></div>
+<span class="line"><span style="color: #79B8FF">chart1</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.get(</span><span style="color: #FFAB70">"TradeX_test-RSI__20_3"</span><span style="color: #B392F0">).indicators[</span><span style="color: #FFAB70">"TradeX_test-RSI__20_3-RSI_5"</span><span style="color: #B392F0">].</span><span style="color: #79B8FF">instance</span><span style="color: #B392F0">.remove()</span></span></code></pre>
+<h3 id="visible">Visible</h3>
+<p>Set or get the indicator visibility. The method accepts a boolean to set the indicator visibility and also returns a boolean of the current state.</p>
+<p><code>true</code> visible<br>
+<code>false</code> not visible</p>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">visible</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">chart1</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.get(</span><span style="color: #FFAB70">"TradeX_test-RSI__20_3"</span><span style="color: #B392F0">).indicators[</span><span style="color: #FFAB70">"TradeX_test-RSI__20_3-RSI_5"</span><span style="color: #B392F0">].</span><span style="color: #79B8FF">instance</span><span style="color: #B392F0">.visible()</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #6B737C">// set indicator visibility to not visible (false)</span></span>
+<span class="line"><span style="color: #79B8FF">chart1</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.get(</span><span style="color: #FFAB70">"TradeX_test-RSI__20_3"</span><span style="color: #B392F0">).indicators[</span><span style="color: #FFAB70">"TradeX_test-RSI__20_3-RSI_5"</span><span style="color: #B392F0">].</span><span style="color: #79B8FF">instance</span><span style="color: #B392F0">.visible(</span><span style="color: #79B8FF">false</span><span style="color: #B392F0">)</span></span></code></pre></div>
               <footer class="astro-3YYAFB3N">
   <div class="meta flex astro-3YYAFB3N">
     

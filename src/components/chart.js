@@ -40,6 +40,7 @@ import {
 } from "../definitions/chart";
 import { VolumeStyle } from "../definitions/style"
 
+
 const defaultOverlays = {
   primaryPane: [
     ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
@@ -106,6 +107,7 @@ export default class Chart {
   #Legends;
   #Divider;
   #Stream;
+  #ConfigDialogue;
 
   #streamCandle
 
@@ -286,9 +288,14 @@ export default class Chart {
     this.eventsListen()
 
     // add divider to allow manual resize of the chart pane
-    const cfg = { chartPane: this }
+    let cfg = { chartPane: this }
     this.#Divider = this.core.WidgetsG.insert("Divider", cfg)
     this.#Divider.start()
+    // cfg = {dragBar, closeIcon, title, content, position, styles}
+    const content = `config the chart`
+    cfg = { title: "Chart Config", content }
+    this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
+    this.#ConfigDialogue.start()
     this.#status = "running"
   }
 
@@ -725,28 +732,25 @@ export default class Chart {
   }
 
   /**
-   * 
-   * @param {Array} pos - cursor pos [x, y]
+   * return legend data
    * @returns {object} - legend data 
    */
-  legendInputs(pos=this.cursorPos) {
-    pos = this.cursorPos
-    let inputs = {}
-    let colours = []
-    let labels = [true, true, true, true, true]
-    let index = this.time.xPos2Index(pos[0] - this.core.scrollPos)
-        index = limit(index, 0, this.range.data.length - 1)
-    let ohlcv = this.range.data[index]
+  legendInputs() {
+    const labels = [true, true, true, true, true]
+    const pos = this.cursorPos
+    const idx = this.time.xPos2Index(pos[0] - this.core.scrollPos)
+    const index = limit(idx, 0, this.range.data.length - 1)
+    const ohlcv = this.range.data[index]
+    const theme = this.theme.candle
+    const colours = (ohlcv[4] >= ohlcv[1]) ?
+      new Array(5).fill(theme.UpWickColour) :
+      new Array(5).fill(theme.DnWickColour);
+    const inputs = {}
+    const keys = ["T","O","H","L","C","V"]
 
-    // get candle colours from config / theme
-    if (ohlcv[4] >= ohlcv[1]) colours = new Array(5).fill(this.theme.candle.UpWickColour)
-    else colours = new Array(5).fill(this.theme.candle.DnWickColour)
-
-    inputs.O = this.scale.nicePrice(ohlcv[1])
-    inputs.H = this.scale.nicePrice(ohlcv[2])
-    inputs.L = this.scale.nicePrice(ohlcv[3])
-    inputs.C = this.scale.nicePrice(ohlcv[4])
-    inputs.V = this.scale.nicePrice(ohlcv[5])
+    for (let i=1; i<6; i++ ) {
+      inputs[keys[i]] = this.scale.nicePrice(ohlcv[i])
+    }
 
     return {inputs, colours, labels}
   }
@@ -769,7 +773,7 @@ export default class Chart {
       case "collapse": this.#core.MainPane.paneCollapse(this); return;
       case "expand": this.#core.MainPane.paneCollapse(this); return;
       case "remove": this.remove(); return;
-      case "config": return;
+      case "config": this.configDialogue(); return;
       default: return;
     }
   }
@@ -998,6 +1002,11 @@ export default class Chart {
     else ++i
 
     return this.#core.ChartPanes.get(chartPanes[i]) || null
+  }
+
+  configDialogue() {
+    const cd = this.#ConfigDialogue
+    if (cd.state.name === "closed" ) cd.open()
   }
   
 }
