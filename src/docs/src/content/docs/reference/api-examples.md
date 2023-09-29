@@ -57,12 +57,15 @@ select the new state chart.state = NewState
 | fileName  | string | file name                                                    | false    |
 | type      | string | image type, "image/png" (default), "image/jpg", "image/webp" | false    |
 | quality   | number | image quality                                                | false    |
+| watermark | Object | {imgURL, x, y, width, height}                                | false    |
 
 ```javascript
 chart0.downloadImage("mychart.png")
 ```
 
-By default, ``downloadImage()`` will export a ``.png`` image for download. If no file name is supplied, it will use the chart id by default.
+By default, ``downloadImage()`` will export a ``.png`` image for download. If no ``filename`` is supplied, it will use the chart id by default.
+
+``downloadImage()`` can export a watermarked image. The ``watermark`` object accepts a relative path to an image of type ``"image/png" (default), "image/jpg", "image/webp", "image/svg"``.
 
 ### Data URL Export
 
@@ -71,9 +74,10 @@ By default, ``downloadImage()`` will export a ``.png`` image for download. If no
 
 | Parameter | Type     | Description                                                  | Required |
 | ----------- | ---------- | :------------------------------------------------------------- | ---------- |
-| cb        | function | callback to receive the data URL                             | true     |
+| cb        | function | callback to receive the data URL                             | false    |
 | type      | string   | image type, "image/png" (default), "image/jpg", "image/webp" | false    |
 | quality   | number   | image quality                                                | false    |
+| watermark | Object   | {imgURL, x, y, width, height}                                | false    |
 
 ```javascript
 const cb = (dataURL) => {
@@ -83,7 +87,11 @@ const cb = (dataURL) => {
 chart0.toImageURL(cb)
 ```
 
-A callback function is **required** to receive the data URL. ``toImage`` will export a ``.png`` image by default.
+A callback function is optional to receive the data URL, if none is provided, a ``Promise`` will be returned instead.
+
+``toImageURL()`` will export a ``.png`` image by default.
+
+``toImageURL()`` can export a watermarked image. The ``watermark`` object accepts a relative path to an image of type ``"image/png" (default), "image/jpg", "image/webp", "image/svg"``.
 
 ## Main Pane
 
@@ -156,6 +164,7 @@ This exposes the following methods.
 ```javascript
 chart0.Chart.legendsVisibility("hide")
 ```
+
 Accepts either ``show`` or ``hide`` to toggle the visibility of all indicator legends on the Primary pane.
 
 ## Indicators
@@ -211,7 +220,7 @@ chart1.ChartPanes.get("TradeX_test-RSI__20_3").indicators["TradeX_test-RSI__20_3
 
 Set or get the indicator visibility. The method accepts a boolean to set the indicator visibility and also returns a boolean of the current state.
 
-``true`` visible  
+``true`` visible
 ``false`` not visible
 
 ```javascript

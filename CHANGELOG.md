@@ -1,6 +1,19 @@
 # Change Log
 
-## [0.139.4]()
+
+## [0.139.6]()
+
+Fixed
+
+* Export chart snapshot - main pane position, divider line colour
+
+## [0.139.5](https://github.com/tradex-app/TradeX-chart/commit/7e3c6305456dfcc7b8a0ea82628b75c3d19875dc)
+
+Added
+
+* Export chart snapshot with watermark
+
+## [0.139.4](https://github.com/tradex-app/TradeX-chart/commit/90bd0dc3e0475c2ace2f81e84087b7b0a0c72698)
 
 Fixed
 

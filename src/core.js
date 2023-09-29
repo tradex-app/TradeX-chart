@@ -1191,14 +1191,21 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * Create a chart image snapshot as a data URL to use as an image source
    * @param {function} cb - callback function to receive the generated data URL
+   * @param {string} type - image type "img/png"|"img/jpg"|"img/webp"
+   * @param {number} quality - image quality 0 - 1
+   * @param {Object} watermark - watermark definition {imgURL, x, y, width, height}
+   * @returns {imageURL|Promise} - returns imageURL or Promise if no callback was specified
    */
   toImageURL(cb, type, quality, watermark) {
-    exportImage(this, cb, type, quality, "url", watermark)
+    return exportImage(this, cb, type, quality, "url", watermark)
   }
 
   /**
    * download image snapshot of the chart
-   * 
+   * @param {string} fileName - name to save the image as
+   * @param {string} type - image type "img/png"|"img/jpg"|"img/webp"
+   * @param {number} quality - image quality 0 - 1
+   * @param {Object} watermark - watermark definition {imgURL, x, y, width, height}
    */
   downloadImage(fileName=`${this.id}.png`, type, quality, watermark) {
     exportImage(this, fileName, type, quality, "download", watermark)

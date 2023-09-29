@@ -4,7 +4,7 @@ import CEL from "../components/primitives/canvas"
 import { renderLineHorizontal } from "../renderer/line"
 import { renderRectFill } from "../renderer/rect"
 import { renderText } from "../renderer/text"
-import { isObject } from "./typeChecks"
+import { isFunction, isObject } from "./typeChecks"
 import DOM from "./DOM"
 
 /**
@@ -30,15 +30,6 @@ export default function exportImage(core, dest, type, quality, output, watermark
     container: container
   })
   const ctx = imgViewport.scene.context
-  // const chartScene = core.Chart.graph.viewport.scene
-
-  ctx.save()
-
-  // fill background
-  renderRectFill(ctx, 0, 0, width, height, {fill: theme.chart.Background})
-  // underlying grid
-  ctx.drawImage(mainScene.canvas, 0, 0, mainScene.width, mainScene.height)
-  // iterate over chart panes and y axes
   let y = 0
   let x1 = 0 
   let x2 = width - core.Chart.scale.width
@@ -47,6 +38,14 @@ export default function exportImage(core, dest, type, quality, output, watermark
     x2 = 0
   }
   let opts
+
+  ctx.save()
+  // fill background
+  renderRectFill(ctx, 0, 0, width, height, {fill: theme.chart.Background})
+  // underlying grid
+  ctx.drawImage(mainScene.canvas, x1, 0, mainScene.width, mainScene.height)
+  // iterate over chart panes and y axes
+
   for (const [key, value] of core.ChartPanes) {
     let scene = value.graph.viewport.scene
     let {width, height} = scene
@@ -54,7 +53,7 @@ export default function exportImage(core, dest, type, quality, output, watermark
     let {width: w, height: h} = scale
     // draw divider
     if (y > 0) {
-      opts = { stroke: "#ccc"} // theme.chart.BorderColour}
+      opts = { stroke: theme.divider.line }
       renderLineHorizontal(ctx, y, 0, main.width, opts)
     }
     ctx.drawImage(scene.canvas, x1, y, width, height)
@@ -74,8 +73,9 @@ export default function exportImage(core, dest, type, quality, output, watermark
   }
   renderText(ctx, 6, 6, opts)
 
+  // @param {Object} watermark
   const outputImage = (wm) => {
-
+    // watermark the output
     if (wm) {
       const x = watermark?.x || 0
       const y = watermark?.y || 0
@@ -93,11 +93,23 @@ export default function exportImage(core, dest, type, quality, output, watermark
   
     switch(output) {
       case "url": 
-        const cb = (r) => {
-          dest(r)
-          cleanUp()
+        if (isFunction(dest)) {
+          const cb = (r) => {
+            dest(r)
+            cleanUp()
+          }
+          imgViewport.scene.toImage(type, quality, cb);
         }
-        imgViewport.scene.toImage(type, quality, cb); 
+        // return a Promise instead
+        else {
+          new Promise( function (resolve, reject) {
+            const url = imgViewport.scene.toImage(type, quality);
+            if (url) resolve (url)
+            else reject (false)
+            cleanUp()
+          })
+        }
+
         break;
       case "download":
       default:
@@ -116,6 +128,7 @@ export default function exportImage(core, dest, type, quality, output, watermark
       console.error(e)
     })
   }
+  // no watermark
   else {
     outputImage()
   }

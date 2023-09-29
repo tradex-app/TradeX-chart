@@ -618,9 +618,16 @@ select the new state chart.state = NewState</p>
 
 
 
-<table><thead><tr><th align="left">Parameter</th><th>Type</th><th align="left">Description</th><th>Required</th></tr></thead><tbody><tr><td align="left">fileName</td><td>string</td><td align="left">file name</td><td>false</td></tr><tr><td align="left">type</td><td>string</td><td align="left">image type, “image/png” (default), “image/jpg”, “image/webp”</td><td>false</td></tr><tr><td align="left">quality</td><td>number</td><td align="left">image quality</td><td>false</td></tr></tbody></table>
+
+
+
+
+
+
+<table><thead><tr><th align="left">Parameter</th><th>Type</th><th align="left">Description</th><th>Required</th></tr></thead><tbody><tr><td align="left">fileName</td><td>string</td><td align="left">file name</td><td>false</td></tr><tr><td align="left">type</td><td>string</td><td align="left">image type, “image/png” (default), “image/jpg”, “image/webp”</td><td>false</td></tr><tr><td align="left">quality</td><td>number</td><td align="left">image quality</td><td>false</td></tr><tr><td align="left">watermark</td><td>Object</td><td align="left">{imgURL, x, y, width, height}</td><td>false</td></tr></tbody></table>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.downloadImage(</span><span style="color: #FFAB70">"mychart.png"</span><span style="color: #B392F0">)</span></span></code></pre>
-<p>By default, <code>downloadImage()</code> will export a <code>.png</code> image for download. If no file name is supplied, it will use the chart id by default.</p>
+<p>By default, <code>downloadImage()</code> will export a <code>.png</code> image for download. If no <code>filename</code> is supplied, it will use the chart id by default.</p>
+<p><code>downloadImage()</code> can export a watermarked image. The <code>watermark</code> object accepts a relative path to an image of type <code>"image/png" (default), "image/jpg", "image/webp", "image/svg"</code>.</p>
 <h3 id="data-url-export">Data URL Export</h3>
 <p><code>toImageURL()</code> will create a chart image snapshot as a data URL to use as an image source.</p>
 
@@ -652,13 +659,21 @@ select the new state chart.state = NewState</p>
 
 
 
-<table><thead><tr><th>Parameter</th><th>Type</th><th align="left">Description</th><th>Required</th></tr></thead><tbody><tr><td>cb</td><td>function</td><td align="left">callback to receive the data URL</td><td>true</td></tr><tr><td>type</td><td>string</td><td align="left">image type, “image/png” (default), “image/jpg”, “image/webp”</td><td>false</td></tr><tr><td>quality</td><td>number</td><td align="left">image quality</td><td>false</td></tr></tbody></table>
+
+
+
+
+
+
+<table><thead><tr><th>Parameter</th><th>Type</th><th align="left">Description</th><th>Required</th></tr></thead><tbody><tr><td>cb</td><td>function</td><td align="left">callback to receive the data URL</td><td>false</td></tr><tr><td>type</td><td>string</td><td align="left">image type, “image/png” (default), “image/jpg”, “image/webp”</td><td>false</td></tr><tr><td>quality</td><td>number</td><td align="left">image quality</td><td>false</td></tr><tr><td>watermark</td><td>Object</td><td align="left">{imgURL, x, y, width, height}</td><td>false</td></tr></tbody></table>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> cb </span><span style="color: #F97583">=</span><span style="color: #B392F0"> (dataURL) </span><span style="color: #F97583">=></span><span style="color: #B392F0"> {</span></span>
 <span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// do something with the dataURL</span></span>
 <span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// examples: save to server, attach to email, send to an API</span></span>
 <span class="line"><span style="color: #B392F0">}</span></span>
 <span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.toImageURL(cb)</span></span></code></pre>
-<p>A callback function is <strong>required</strong> to receive the data URL. <code>toImage</code> will export a <code>.png</code> image by default.</p>
+<p>A callback function is optional to receive the data URL, if none is provided, a <code>Promise</code> will be returned instead.</p>
+<p><code>toImageURL()</code> will export a <code>.png</code> image by default.</p>
+<p><code>toImageURL()</code> can export a watermarked image. The <code>watermark</code> object accepts a relative path to an image of type <code>"image/png" (default), "image/jpg", "image/webp", "image/svg"</code>.</p>
 <h2 id="main-pane">Main Pane</h2>
 <p><code>MainPane.chartPanes</code> returns a <code>Map()</code> of all existing chart panes.</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart1</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">MainPane</span><span style="color: #B392F0">.chartPanes</span></span></code></pre>
@@ -719,7 +734,7 @@ select the new state chart.state = NewState</p>
 <span class="line"><span style="color: #79B8FF">chart1</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.get(</span><span style="color: #FFAB70">"TradeX_test-RSI__20_3"</span><span style="color: #B392F0">).indicators[</span><span style="color: #FFAB70">"TradeX_test-RSI__20_3-RSI_5"</span><span style="color: #B392F0">].</span><span style="color: #79B8FF">instance</span><span style="color: #B392F0">.remove()</span></span></code></pre>
 <h3 id="visible">Visible</h3>
 <p>Set or get the indicator visibility. The method accepts a boolean to set the indicator visibility and also returns a boolean of the current state.</p>
-<p><code>true</code> visible<br>
+<p><code>true</code> visible
 <code>false</code> not visible</p>
 <pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">visible</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">chart1</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">ChartPanes</span><span style="color: #B392F0">.get(</span><span style="color: #FFAB70">"TradeX_test-RSI__20_3"</span><span style="color: #B392F0">).indicators[</span><span style="color: #FFAB70">"TradeX_test-RSI__20_3-RSI_5"</span><span style="color: #B392F0">].</span><span style="color: #79B8FF">instance</span><span style="color: #B392F0">.visible()</span></span>
 <span class="line"></span>
@@ -730,8 +745,8 @@ select the new state chart.state = NewState</p>
     
     <p>
       Last updated:
-      <time datetime="2023-08-08T18:15:40.000Z">
-        Aug 8, 2023
+      <time datetime="2023-09-28T19:53:04.000Z">
+        Sep 28, 2023
       </time>
     </p>
   </div>
