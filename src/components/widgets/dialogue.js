@@ -5,7 +5,7 @@ import Window from "./window";
 
 export default class Dialogue extends Window {
 
-  static type = "Dialogue"
+  static type = "Window"
 
   static create(widgets, config) {
 
@@ -18,6 +18,7 @@ export default class Dialogue extends Window {
     config.dragbar = (isBoolean(config.dragbar)) ? config.dragbar : true
     config.close = (isBoolean(config.close)) ? config.close : true
     config.styles = {...styles, ...config.styles}
+    config.class = "dialogue"
 
     return super.create(widgets, config)
   }

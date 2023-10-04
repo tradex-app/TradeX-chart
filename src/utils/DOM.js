@@ -174,7 +174,7 @@ const DOM = {
 
     return {
       x: el1Location.top - el2Location.top,
-      y: el1Location.left . el2Location.left,
+      y: el1Location.left - el2Location.left,
       el1Location: el1Location,
       el2Location: el2Location,
     }

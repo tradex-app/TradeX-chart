@@ -607,15 +607,6 @@ export default class TradeXchart extends Tradex_chart {
    */
   setDimensions(w, h) {
     const dims = super.setDimensions(w, h) 
-
-    // reposition menus
-    if (this.#WidgetsG instanceof WidgetsG) {
-      for (let i in this.#WidgetsG.instances) {
-        if (i.type === "Menu") 
-          i.position()
-      }
-    }
-
     this.emit("global_resize", dims)
   }
 
@@ -1117,6 +1108,23 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * calculate all indicators currently in use
    */
+  // calcAllIndicators() {
+  //   for (const [key, value] of Object.entries(this.Indicators)) {
+  //     const indicators = []
+  //     for (const [k, ind] of Object.entries(value)) {
+  //       const executeInd = (i) => {
+  //         return new Promise(resolve => setTimeout(() => {
+  //           resolve( i[0]() )
+  //         }, 0))
+  //       }
+  //       indicators.push(ind.instance.calcIndicatorHistory)
+  //     }
+  //     (async () => {
+  //       await Promise.all( indicators.map( async i => { executeInd(i) }))
+  //     })();
+  //   }
+  // }
+
   calcAllIndicators() {
     for (const [key, value] of Object.entries(this.Indicators)) {
       for (const [k, ind] of Object.entries(value)) {

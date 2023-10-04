@@ -7,8 +7,19 @@
 import DOM from "../../utils/DOM"
 import { CLASS_WINDOWS, CLASS_WINDOW } from "../../definitions/core"
 import { WindowStyle } from "../../definitions/style"
-import { decimalPlaces } from "../../utils/number"
 import { isArray, isNumber, isObject, isString } from "../../utils/typeChecks"
+import Input from "../../input"
+
+// State enum
+class State {
+  static opened = new State("opened")
+  static closed = new State("closed")
+
+  constructor(name) {
+    this.name = name
+  }
+}
+
 
 // State enum
 class State {
@@ -37,8 +48,12 @@ export default class Window {
   #elCloseIcon
   #elContent
 
+  #pos
+  #dims
   #cursorPos
   #controller
+  #dragBar
+  #dragging = false
 
   #windowEvents = {}
 
@@ -104,8 +119,8 @@ export default class Window {
 
   destroy() {
     // remove event listners
-    // document.removeEventListener('click', this.onOutsideClickListener)
     this.off("closeWindow", this.onCloseWindow)
+    this.off("global_resize", this.onGlobalResize)
 
     // remove element
     this.el.remove()
@@ -119,6 +134,7 @@ export default class Window {
     // })
 
     this.on("closeWindow", this.onCloseWindow, this)
+    this.on("global_resize", this.onGlobalResize, this)
   }
 
   on(topic, handler, context) {
@@ -133,10 +149,46 @@ export default class Window {
     this.#core.emit(topic, data)
   }
 
+  onGlobalResize(e) {
+
+    // e = {
+    //   width: this.width,
+    //   height: this.height,
+    //   resizeW: w / width,
+    //   resizeH: h / height,
+    //   resizeWDiff: w - width,
+    //   resizeHDiff: h - height
+    // }
+    // { top: _y, bottom: _y + _h, left: _x, right: _x + _w, width: _w, height: _h, visible: _v, viewport: _vp };
+
+    const dims = this.dimensions
+    const data = { 
+      position: { x: dims.left, y: dims.top}, 
+      dimensions: { w: dims.w, h: dims.h } 
+    }
+    let right, bottom
+
+    // determine if dimensions need to change
+    if (dims.w > e.width)
+      data.position.x = e.width
+    if (dims.h > e.height)
+      data.position.y = e.height
+    // determine if position needs to change
+    right = dims.left + data.dimensions.w
+    bottom = dims.bottom + data.dimensions.h
+    if (dims.x < 0)
+      data.position.x = 0
+    else if (dims.x + data.dimensions.w > e.width)
+      data.position.x -= e.width
+
+    this.setProperties(data)
+  }
+
   onOutsideClickListener(e) {
     if (!this.#elWindow.contains(e.target) 
     // && (!this.#config.primary.contains(e.target)) 
-    && DOM.isVisible(this.#elWindow)) {
+    && DOM.isVisible(this.#elWindow)
+    && !this.#dragging) {
       let data = {
         target: e.currentTarget.id, 
         window: this.#id,
@@ -152,12 +204,23 @@ export default class Window {
 
   onWindow(e) {
     e.stopPropagation()
-    console.log("window")
   }
 
   onDragBar(e) {
-    e.stopPropagation()
-    console.log("dragBar")
+    // e.stopPropagation()
+    this.#dragging = true
+
+    // let {left: x, top: y} = this.dimensions
+    let x = this.#elWindow.offsetLeft + e.movement.x
+    let y = this.#elWindow.offsetTop + e.movement.y
+
+    this.position({x,y})
+  }
+
+  onDragBarEnd(e) {
+    setTimeout(() => {
+      this.#dragging = false
+    }, 250)
   }
 
   mount(el) {
@@ -173,23 +236,19 @@ export default class Window {
     this.#elContent = this.#elWindow.querySelector(".content")
 
     this.#elWindow.addEventListener("click", this.onWindow.bind(this))
-    if (DOM.isElement(this.#elDragBar))
-      this.#elDragBar.addEventListener("click", this.onDragBar.bind(this))
-    
-    let x, y;
-    if (isObject(this.#config.position)) {
-      x = this.#config.x
-      y = this.#config.y
+    if (DOM.isElement(this.#elDragBar)) {
+      this.#dragBar = new Input(this.#elDragBar, {disableContextMenu: false});
+      this.#dragBar.on("pointerdrag", this.onDragBar.bind(this))
+      this.#dragBar.on("pointerdragend", this.onDragBarEnd.bind(this))
     }
-    // if x,y position not provided calculate default
-    else {
-      let dims = DOM.elementDimPos(this.#elWindow)
-      x = (this.#core.width - dims.width) / 2
-      y = (this.#core.height - dims.height) / 2
-    }
-  
-    this.#elWindow.style.bottom = `${y}px`
-    this.#elWindow.style.left = `${x}px`
+
+    // set dimensions and position
+    const d = this.dimensions
+    const w = this.#config?.w || d.w
+    const h = this.#config?.h || d.h
+
+    this.setDimensions({w, h})
+    this.position()
   }
 
   static defaultNode() {
@@ -212,7 +271,7 @@ export default class Window {
     let content = this.content(window)
     let closeIcon = this.closeIcon(window)
     let node = `
-      <div id="${window.id}" class="${CLASS_WINDOW}" style="${windowStyle}">
+      <div id="${window.id}" class="${CLASS_WINDOW} ${this.#config.class}" style="${windowStyle}">
           ${dragBar}
           ${title}
           ${closeIcon}
@@ -265,7 +324,7 @@ export default class Window {
     const cfg = this.config
     const styles = cfg?.styles?.title
     const title = (isString(cfg?.title)) ? cfg.title : ""
-    let titleStyle = ``
+    let titleStyle = `white-space: nowrap; `
 
     for (let k in styles) {
       titleStyle += `${k}: ${styles[k]}; `
@@ -300,24 +359,28 @@ export default class Window {
     let wPos = this.dimensions
     let iPos = this.#core.dimensions
     let px = Math.round((iPos.width - wPos.width) / 2)
-    let py = iPos.height - Math.round((iPos.height - wPos.height) / 2)
+    let py = Math.round((iPos.height - wPos.height) / 2) * -1
     let pz = DOM.getStyle(this.#elWindow, "z-index")
 
     if (isObject(p)) {
       let {x,y,z} = {...p}
       if (isNumber(x)) px = x
-      if (isNumber(y)) py = iPos.height - (y + wPos.height)
+      if (isNumber(y)) py = y
       if (isNumber(z)) pz = z
+      this.#pos = {x: x, y: y, z: pz}
     }
-    if (p?.relativeY == "bottom") py += wPos.height
+    // if (p?.relativeY == "bottom") py += wPos.height
     this.#elWindow.style.left = `${px}px`
-    this.#elWindow.style.bottom = `${py}px`
+    this.#elWindow.style.top = `${py}px`
     this.#elWindow.style["z-index"] = `${pz}`
   }
 
   setDimensions(d) {
-    if (isNumber(d.x)) this.#elWindow.style.width = `${d.x}px`
-    if (isNumber(d.y)) this.#elWindow.style.width = `${d.y}px`
+    if (!isObject(d)) return false
+    if (isNumber(d?.w)) this.#elWindow.style.width = `${d.w}px`
+    if (isNumber(d?.h)) this.#elWindow.style.height = `${d.h}px`
+
+    this.#dims = {w: d.x, h: d.y}
   }
 
   setProperties(data) {
@@ -329,8 +392,8 @@ export default class Window {
       this.#elContent.innerHTML = data.content
     }
 
-    this.setDimensions(data?.dimensions)
-    this.position(data?.position)
+    this.setDimensions({w: data?.w, h: data?.h})
+    this.position({x: data?.x, y: data?.y})
 
     if (isObject(data?.styles)) {
 

@@ -6,12 +6,13 @@ import Dialogue from "./dialogue";
 
 export default class ConfigDialogue extends Dialogue {
 
-  static type = "ConfigDialogue"
+  static type = "Window"
 
   static create(widgets, config) {
 
     config.dragBar = true
     config.close = true
+    config.class = "config"
 
     return super.create(widgets, config)
   }

@@ -115,12 +115,15 @@ Editable sandbox examples can found on [CodeSandbox.io](https://codesandbox.io/u
 * All chart features and functions accessible via API
 * State object defines chart configuration, indicators and tools
 * State can be imported or exported for storage and retrieval
-* Export chart to png, jpg, webp.
 * Indicator calculation provided by [talib-web](https://https://anchegt.github.io/talib-web/) as a WebAssembly module.
 * Custom themes
 * Custom indicators
 * Custom Overlays
+* Custom drawing tools (to be implemented)
 * Event hub - subscribe to chart events
+* Rendering optimization - smooth performance
+* High frequency chart candles updates
+* Export chart to png, jpg, webp, with optional watermarking
 
 ## Support
 
