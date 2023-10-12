@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseApiFeUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+const baseApiFeUrl = "";
 
 const apiFe = axios.create({
   baseURL: baseApiFeUrl,
