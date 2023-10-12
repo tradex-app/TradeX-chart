@@ -1,6 +1,16 @@
-import Head from 'next/head';
-import styles from '../styles/Home.module.css';
-import TokenChart from '../components/tradeX/Wrapper';
+import Head from "next/head";
+import styles from "../styles/Home.module.css";
+// import TokenChart from '../components/tradeX/Wrapper';
+
+import dynamic from "next/dynamic";
+import { sampleOHLCVFromPrice } from "../components/tradeX/15min_btc";
+
+const TokenChart = dynamic(() => import("../components/tradeX/Wrapper"), {
+  ssr: false,
+});
+
+const chartConfig = {};
+const tradeData = [];
 
 export default function Home() {
   return (
@@ -11,27 +21,47 @@ export default function Home() {
       </Head>
 
       <main>
-        <h1 className={styles.title}>
-          Trade-X on Next.js!
-        </h1>
+        <h1 className={styles.title}>Trade-X on Next.js!</h1>
         <div id="badges">
-        <a href="https://www.npmjs.com/package/tradex-chart" title="Version"><img src="https://badgen.net/npm/v/tradex-chart" alt="Version"/></a>
-        <a href="https://bundlephobia.com/result?p=tradex-chart" title="Size"><img src="https://badgen.net/bundlephobia/minzip/tradex-chart" alt="Size"/></a>
-        <a href="https://github.com/tradex-app/TradeX-chart/blob/master/LICENSE" title="License"><img src="https://badgen.net/github/license/tradex-app/tradex-chart" alt="License"/></a>
-        <a href="https://github.com/tradex-app/TradeX-chart" title="GitHub"><img src="https://badgen.net/badge/icon/github?icon=github&label" alt="GitHub"/></a>
-        <a href="https://www.npmjs.com/package/tradex-chart" title="NPM"><img src="https://badgen.net/badge/icon/npm?icon=npm&label" alt="NPM"/></a>
-      </div>
-        <ul>
-        </ul>
-    
+          <a href="https://www.npmjs.com/package/tradex-chart" title="Version">
+            <img src="https://badgen.net/npm/v/tradex-chart" alt="Version" />
+          </a>
+          <a href="https://bundlephobia.com/result?p=tradex-chart" title="Size">
+            <img
+              src="https://badgen.net/bundlephobia/minzip/tradex-chart"
+              alt="Size"
+            />
+          </a>
+          <a
+            href="https://github.com/tradex-app/TradeX-chart/blob/master/LICENSE"
+            title="License"
+          >
+            <img
+              src="https://badgen.net/github/license/tradex-app/tradex-chart"
+              alt="License"
+            />
+          </a>
+          <a href="https://github.com/tradex-app/TradeX-chart" title="GitHub">
+            <img
+              src="https://badgen.net/badge/icon/github?icon=github&label"
+              alt="GitHub"
+            />
+          </a>
+          <a href="https://www.npmjs.com/package/tradex-chart" title="NPM">
+            <img
+              src="https://badgen.net/badge/icon/npm?icon=npm&label"
+              alt="NPM"
+            />
+          </a>
+        </div>
+        <ul></ul>
+
         <div className={styles.grid}>
-
-        <TokenChart
-                  config={chartConfig}
-                  chartData={sampleOHLCVFromPrice}
-                  tradeData={tradeData}
-        />
-
+          <TokenChart
+            config={chartConfig}
+            chartData={sampleOHLCVFromPrice}
+            tradeData={tradeData}
+          />
         </div>
       </main>
 
@@ -41,7 +71,7 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
+          Powered by{" "}
           <img src="/vercel.svg" alt="Vercel" className={styles.logo} />
         </a>
       </footer>
@@ -78,15 +108,8 @@ export default function Home() {
           border-radius: 5px;
           padding: 0.75rem;
           font-size: 1.1rem;
-          font-family:
-            Menlo,
-            Monaco,
-            Lucida Console,
-            Liberation Mono,
-            DejaVu Sans Mono,
-            Bitstream Vera Sans Mono,
-            Courier New,
-            monospace;
+          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
+            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
         }
       `}</style>
 
@@ -95,25 +118,15 @@ export default function Home() {
         body {
           padding: 0;
           margin: 0;
-          font-family:
-            -apple-system,
-            BlinkMacSystemFont,
-            Segoe UI,
-            Roboto,
-            Oxygen,
-            Ubuntu,
-            Cantarell,
-            Fira Sans,
-            Droid Sans,
-            Helvetica Neue,
+          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
             sans-serif;
         }
         * {
           box-sizing: border-box;
         }
       `}</style>
-          <script type="module" src="../index.js"></script>
-
+      <script type="module" src="../index.js"></script>
     </div>
   );
 }

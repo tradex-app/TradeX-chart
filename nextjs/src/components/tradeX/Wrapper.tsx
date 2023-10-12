@@ -16,7 +16,6 @@ import Chart from "./Chart";
 import { CUSTOM_INDICATORS } from "./indicators/customIndicators";
 import { AVAILABLE_INDICATORS } from "./indicators/availbleIndicators";
 
-
 type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<
   T,
   Exclude<keyof T, Keys>
@@ -30,8 +29,8 @@ interface IPropsBase {
   symbol?: string;
   chartData?: any;
   tradeData?: any;
-  level?: any;//TODO
-  ranges?: any;//TODO
+  level?: any; //TODO
+  ranges?: any; //TODO
   config?: {
     toolbar?: {
       timeframe?: boolean;
@@ -106,17 +105,25 @@ const TokenChart = memo(
         {
           pair_id: undefined,
           target: undefined,
-            base: "USD",
-          timeframes: ["1m", "5m", "10m", "15m", "30m", "1h", "4h", "12h", "1d"],
-        }
+          base: "USD",
+          timeframes: [
+            "1m",
+            "5m",
+            "10m",
+            "15m",
+            "30m",
+            "1h",
+            "4h",
+            "12h",
+            "1d",
+          ],
+        },
       ];
-      if (tokenId){
-      availableTimeframes = await fetchAvailableTimeframes({
-        tokenId: +tokenId,
-      });
-    }
-
-
+      if (tokenId) {
+        availableTimeframes = await fetchAvailableTimeframes({
+          tokenId: +tokenId,
+        });
+      }
 
       setAvailability(
         availableTimeframes.find((pair) => pair.base === "USDT") ||
@@ -155,14 +162,14 @@ const TokenChart = memo(
         console.log("FETCH CHART DATA");
         let newData = chartData;
         setIsLoading(true);
-   if (tokenId){
+        if (tokenId) {
           newData = await fetchOHLCVData({
-          end: endDate,
-          resolution,
-          tokenId,
-          first: firstLoad,
-        });
-      }
+            end: endDate,
+            resolution,
+            tokenId,
+            first: firstLoad,
+          });
+        }
 
         end = newData[0][0];
         setFirstLoad(false);
