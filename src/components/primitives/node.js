@@ -2,7 +2,7 @@
 // control point for drawing tools
 
 import { renderCircle } from "../../renderer/circle"
-import { defaultTheme as globalTheme } from "../../definitions/style"
+//import { defaultTheme as globalTheme } from "../../definitions/style"
 
 const defaultTheme = {
   passive: {
@@ -22,14 +22,14 @@ const defaultTheme = {
     fill: "#fff",
     width: 1,
     radius: 6,
-  }
-}
+  },
+};
 
 // State enum
-class State {
-  static passive = new State("passive")
-  static hover = new State("hover")
-  static active = new State("active")
+class NodeState {
+  static passive = new NodeState("passive")
+  static hover = new NodeState("hover")
+  static active = new NodeState("active")
 
   constructor(name) {
     this.name = name
@@ -38,7 +38,7 @@ class State {
 
 export default class Node {
 
-  #state = State.passive
+  #state = NodeState.passive;
 
   constructor(id, x, y, layer) {
     this.id = id
@@ -48,26 +48,26 @@ export default class Node {
     this.scene = this.layer.scene
     this.hit = this.layer.hit
     this.ctx = this.layer.scene.canvas.context
-    this.ctxH = this.layer.hit.canvas.
+    this.ctxH = this.layer.hit.canvas
     this.hitV = this.hit.getIndexValue(id)
   }
 
-  set state(s) { this.setState(s) }
-  get state() { return this.#state }
-  get isActive() { return (this.#state == State.active) ? true : false }
-  get theme() { return defaultTheme[this.#state] }
+  set state(s) { this.setState(s); }
+  get state() { return this.#state; }
+  get isActive() { return this.#state === NodeState.active; }
+  get theme() { return defaultTheme[this.#state.name] }
 
   setState(s) {
-    if (!Object.keys(State).includes(s)) return
-    this.#state = s
+    if (!(s in NodeState)) return
+    this.#state = NodeState[s]
   }
 
   draw() {
     const t = this.theme
     const ctx = this.ctx
-    const ctxH = this.ctxHx
-    const opts = {border: t.stroke, size: t.width, fill: t.fill}
-    const optsH = {size: t.width, fill: this.hitV}
+    const ctxH = this.ctxH
+    const opts = { border: t.stroke, size: t.width, fill: t.fill }
+    const optsH = { size: t.width, fill: this.hitV }
 
     // draw node
     ctx.save()
@@ -79,5 +79,4 @@ export default class Node {
     renderCircle(ctx, this.x, this.y, t.radius + t.width, optsH)
     ctxH.restore()
   }
-
 }
