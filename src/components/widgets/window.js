@@ -10,16 +10,6 @@ import { WindowStyle } from "../../definitions/style"
 import { isArray, isNumber, isObject, isString } from "../../utils/typeChecks"
 import Input from "../../input"
 
-// State enum
-class State {
-  static opened = new State("opened")
-  static closed = new State("closed")
-
-  constructor(name) {
-    this.name = name
-  }
-}
-
 
 // State enum
 class State {
