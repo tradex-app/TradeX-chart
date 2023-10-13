@@ -1,4 +1,4 @@
-function Xo(r, e) {
+function qo(r, e) {
   for (var i = 0; i < e.length; i++) {
     const s = e[i];
     if (typeof s != "string" && !Array.isArray(s)) {
@@ -148,10 +148,6 @@ function oa() {
   return Object.prototype.hasOwnProperty.call(hs, r) ? hs[r.toString()] : "Etc/UTC";
 }
 function aa() {
-  const r = (/* @__PURE__ */ new Date()).getTimezoneOffset();
-  return Object.prototype.hasOwnProperty.call(hs, r) ? hs[r.toString()] : "Etc/UTC";
-}
-function la() {
   const r = {};
   for (let e in $e) {
     let i = 0;
@@ -162,12 +158,12 @@ function la() {
   }
   return r;
 }
-function dr(r) {
+function cr(r) {
   const e = new Date(r).getTime();
   return T(e);
 }
-function ur(r, e = lr, i = Date.now()) {
-  return dr(r) ? r > e && r < i : !1;
+function dr(r, e = ar, i = Date.now()) {
+  return cr(r) ? r > e && r < i : !1;
 }
 function Ae(r, e, i) {
   r = new Date(r), e = new Date(e);
@@ -223,9 +219,9 @@ function la(r, e) {
 }
 function fi(r) {
   let e = W;
-  return S(r) ? (e = fr(r), e ? r = r : (e = W, r = "1s")) : r = "1s", { tf: r, ms: e };
+  return S(r) ? (e = ur(r), e ? r = r : (e = W, r = "1s")) : r = "1s", { tf: r, ms: e };
 }
-function fr(r) {
+function ur(r) {
   if (!S(r))
     return !1;
   const e = /([0-9]{1,2})([s|m|h|d|w|M|y])/gm;
@@ -286,7 +282,7 @@ function Ps(r) {
 function Ls(r) {
   return r ? new Date(r).getUTCDate() : null;
 }
-function ca(r, e = "en-GB", i = "short") {
+function ha(r, e = "en-GB", i = "short") {
   return new Date(r).toLocaleDateString(e, { weekday: i });
 }
 function He(r) {
@@ -296,7 +292,7 @@ function As(r) {
   if (r)
     return new Date(r).getUTCMonth();
 }
-function gr(r, e = "en-GB", i = "short") {
+function fr(r, e = "en-GB", i = "short") {
   return new Date(r).toLocaleDateString(e, { month: i });
 }
 function Os(r) {
@@ -312,10 +308,6 @@ function gr(r) {
   return r += lr(e, ki(r)), r;
 }
 function pr(r) {
-  let e = (As(r) + 1) % 12;
-  return r += hr(e, ki(r)), r;
-}
-function mr(r) {
   if (r)
     return new Date(r).getUTCFullYear();
 }
@@ -329,7 +321,7 @@ function ki(r) {
   let i = new Date(r).getUTCFullYear();
   return i & 3 ? !1 : i % 100 != 0 || i % 400 == 0;
 }
-function da(r) {
+function ca(r) {
   let e = new Date(r), i = e.getUTCMonth(), s = e.getUTCDate(), n = dayCount[i] + s;
   return i > 1 && ki() && n++, n;
 }
@@ -344,7 +336,7 @@ function gi(r, e) {
     seconds: (s) => bs(s)
   }[e](r);
 }
-function ua(r, e) {
+function da(r, e) {
   let i, s;
   switch (e) {
     case "years":
@@ -385,7 +377,7 @@ function cs(r) {
   let e = String(Di(r)).padStart(2, "0"), i = String(Ss(r)).padStart(2, "0");
   return `${e}:${i}`;
 }
-function pa(r, e) {
+function ga(r, e) {
   let i = 1 / 0, s = null, n = -1;
   for (let o = 0; o < e.length; o++) {
     let a = e[o][0];
@@ -393,7 +385,7 @@ function pa(r, e) {
   }
   return [n, s];
 }
-const ma = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+const pa = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   BTCGENESIS: ar,
   DAY_MS: N,
@@ -456,17 +448,17 @@ const ma = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   unitRange: da,
   year_start: Is
 }, Symbol.toStringTag, { value: "Module" }));
-function ya(r, e) {
+function ma(r, e) {
   return r = Math.ceil(r) + 1, e = Math.floor(e), Math.floor(Math.random() * (e - r) + r);
 }
-function va(r) {
+function ya(r) {
   const e = {};
-  return e.value = r, e.sign = !!r, e.integers = wr(r), e.decimals = xr(r), e.total = e.integers + e.decimals, e;
+  return e.value = r, e.sign = !!r, e.integers = vr(r), e.decimals = wr(r), e.total = e.integers + e.decimals, e;
 }
-function wr(r) {
+function vr(r) {
   return (Math.log10((r ^ r >> 31) - (r >> 31)) | 0) + 1;
 }
-function wa(r) {
+function va(r) {
   return r | 0;
 }
 function dn(r, e) {
@@ -478,17 +470,17 @@ function lt(r, e = 0) {
   var i = r * Math.pow(10, e), s = Math.round(i), n = (i > 0 ? i : -i) % 1 === 0.5 ? s % 2 === 0 ? s : s - 1 : s;
   return n / Math.pow(10, e);
 }
-function xr(r) {
+function wr(r) {
   if (typeof r != "number" && (r = parseFloat(r)), isNaN(r) || !isFinite(r))
     return 0;
   for (var e = 1, i = 0; Math.round(r * e) / e !== r && (e *= 10, e !== 1 / 0); )
     i++;
   return i;
 }
-function xa(r) {
+function wa(r) {
   return Math.log(r) / Math.log(10);
 }
-function Ta(r, e) {
+function xa(r, e) {
   return Math.pow(r, e);
 }
 function $(r, e, i) {
@@ -511,11 +503,11 @@ function ct(r) {
     Object.prototype.hasOwnProperty.call(r, i) && (r.isActiveClone = null, e[i] = ct(r[i]), delete r.isActiveClone);
   return e;
 }
-function Tr(r, e, i) {
+function xr(r, e, i) {
   const [s, ...n] = e.split(".");
   return {
     ...r,
-    [s]: n.length ? Tr(r[s], n.join("."), i) : i
+    [s]: n.length ? xr(r[s], n.join("."), i) : i
   };
 }
 function un(r, e) {
@@ -541,20 +533,17 @@ function Ei(r, e) {
   }
   return !0;
 }
-function Ea(r, e, i) {
+function Ta(r, e, i) {
   var s = r[e];
   r.splice(e, 1), r.splice(i, 0, s);
 }
-function Sa(r, e, i) {
+function Ea(r, e, i) {
   [myArray[e], myArray[i]] = [myArray[i], myArray[e]];
 }
 function Tr(r, e) {
   return P(e) ? P(r) ? r.every((i) => e.includes(i)) : e.includes(r) : !1;
 }
 function Er(r, e) {
-  return P(e) ? P(r) ? r.every((i) => e.includes(i)) : e.includes(r) : !1;
-}
-function Sr(r, e) {
   if (!E(r) || !E(e))
     return !1;
   const i = Object.keys(r).sort(), s = Object.keys(e).sort();
@@ -598,13 +587,13 @@ class Et extends Map {
     return removeMapIndex(e, this);
   }
   firstEntry() {
-    return ba(this);
+    return Sa(this);
   }
   firstKey() {
-    return Ca(this);
+    return ba(this);
   }
   firstValue() {
-    return Ma(this);
+    return Ca(this);
   }
   lastEntry() {
     return Ma(this);
@@ -613,7 +602,7 @@ class Et extends Map {
     return Pa(this);
   }
   lastValue() {
-    return Aa(this);
+    return La(this);
   }
   prevCurrNext(e) {
     let i = curr = next = null;
@@ -652,7 +641,7 @@ class Et extends Map {
     if (!T(e) || !T(i))
       return !1;
     const s = [...this];
-    return Sa(s, e, i), this.populate(s), !0;
+    return Ea(s, e, i), this.populate(s), !0;
   }
   swapKeys(e, i) {
     const s = [...this], n = s.findIndex(([a]) => a === e), o = s.findIndex(([a]) => a === i);
@@ -668,7 +657,7 @@ function xt(r, e = 100, i, s = !1) {
   };
   return o;
 }
-function Oa(r, e = 250, i) {
+function Aa(r, e = 250, i) {
   var s, n, o = function() {
     var h = i || this, l = +/* @__PURE__ */ new Date(), g = arguments;
     s && l < s + e ? (clearTimeout(n), n = setTimeout(function() {
@@ -682,7 +671,7 @@ function Oa(r, e = 250, i) {
     a(), s = 0;
   }, o;
 }
-class Ia {
+class Oa {
   #t;
   #e;
   #r;
@@ -1062,7 +1051,7 @@ let Ki = class H {
       }
     e.views.length == 0 && (e.views[0] = ["primary", n.primary]), e.views = new Et(e.views), e.views.has("primary") || e.views.insert("primary", n.primary, 0), e.views.get("primary").push(e.chart);
     for (var h of e.datasets)
-      this.#i || (this.#i = {}), this.dss[h.id] = new Ia(this, h);
+      this.#i || (this.#i = {}), this.dss[h.id] = new Oa(this, h);
     return e;
   }
   static delete(e) {
@@ -1383,7 +1372,7 @@ class Bt {
       return !1;
     const i = ["id", "initial", "context", "states"];
     let s = Object.keys(e);
-    if (!Er(i, s) || !(e.initial in e.states))
+    if (!Tr(i, s) || !(e.initial in e.states))
       return !1;
     for (let n in e.states) {
       if (!E(e.states[n]) || "onEnter" in e.states[n] && !z(e.states[n].onEnter) || "onExit" in e.states[n] && !z(e.states[n].onExit))
@@ -1558,13 +1547,13 @@ class he {
     this.#y = new Ja(this.#e.alerts), this.status = { status: Mn }, this.#s = setInterval(this.onUpdate.bind(this), this.#i);
   }
   stop() {
-    this.#y.destroy(), this.status = { status: Ga };
+    this.#y.destroy(), this.status = { status: Va };
   }
   emit(e, i) {
     this.#t.emit(e, i);
   }
   error() {
-    this.status = { status: Ya };
+    this.status = { status: Ga };
   }
   onTick(e) {
     (this.#r == Mn || this.#r == Ne) && E(e) && (this.candle = e);
@@ -1604,7 +1593,7 @@ class he {
     return e - e % this.#t.time.timeFrameMS;
   }
 }
-const br = {
+const Sr = {
   findByID(r, e = document) {
     return e.getElementById(r);
   },
@@ -1727,7 +1716,7 @@ const br = {
     if (!this.isElement(r))
       return !1;
     const i = (n) => {
-      !r.contains(n.target) && br.isVisible(r) && (e(), s());
+      !r.contains(n.target) && Sr.isVisible(r) && (e(), s());
     }, s = () => {
       document.removeEventListener("click", i);
     };
@@ -1784,7 +1773,7 @@ const br = {
 }, D = Sr, ol = typeof window < "u" && typeof window.document < "u";
 typeof process < "u" && process.versions != null && process.versions.node != null;
 typeof window < "u" && window.name === "nodejs" || navigator.userAgent.includes("Node.js") || navigator.userAgent.includes("jsdom");
-const ll = ((r) => "onorientationchange" in r || r.matchMedia("(any-pointer:coarse)").matches || !!navigator.maxTouchPoints || !!navigator.msMaxTouchPoints || "ontouchstart" in r || r.DocumentTouch && document instanceof r.DocumentTouch)(typeof window < "u" ? window : {}), hl = {
+const al = ((r) => "onorientationchange" in r || r.matchMedia("(any-pointer:coarse)").matches || !!navigator.maxTouchPoints || !!navigator.msMaxTouchPoints || "ontouchstart" in r || r.DocumentTouch && document instanceof r.DocumentTouch)(typeof window < "u" ? window : {}), ll = {
   idle: 0,
   dragStart: 1,
   dragging: 2
@@ -1817,10 +1806,10 @@ class ie {
     return new ie(this.x, this.y);
   }
 }
-function cl(r) {
+function hl(r) {
   return r && r.__esModule && Object.prototype.hasOwnProperty.call(r, "default") ? r.default : r;
 }
-var Cr = { exports: {} };
+var br = { exports: {} };
 /*! Hammer.JS - v2.0.7 - 2016-04-22
  * http://hammerjs.github.io/
  *
@@ -1944,9 +1933,9 @@ var Cr = { exports: {} };
       }
       return n;
     }
-    var fo = 1;
-    function go() {
-      return fo++;
+    var uo = 1;
+    function fo() {
+      return uo++;
     }
     function Fs(c) {
       var u = c.ownerDocument || c;
@@ -1969,7 +1958,7 @@ var Cr = { exports: {} };
         this.evEl && et(this.element, this.evEl, this.domHandler), this.evTarget && et(this.target, this.evTarget, this.domHandler), this.evWin && et(Fs(this.element), this.evWin, this.domHandler);
       }
     };
-    function To(c) {
+    function xo(c) {
       var u, f = c.options.inputClass;
       return f ? u = f : po ? u = Ui : mo ? u = ti : Vs ? u = Wi : u = Je, new u(c, To);
     }
@@ -2143,7 +2132,7 @@ var Cr = { exports: {} };
     }
     k(ti, pt, {
       handler: function(u) {
-        var f = $o[u.type], m = zo.call(this, u, f);
+        var f = No[u.type], m = Ho.call(this, u, f);
         m && this.callback(this.manager, f, {
           pointers: m[0],
           changedPointers: m[1],
@@ -2203,10 +2192,10 @@ var Cr = { exports: {} };
           var M = m.indexOf(f);
           M > -1 && m.splice(M, 1);
         };
-        setTimeout(x, Bo);
+        setTimeout(x, zo);
       }
     }
-    function Wo(c) {
+    function Uo(c) {
       for (var u = c.srcEvent.clientX, f = c.srcEvent.clientY, m = 0; m < this.lastTouches.length; m++) {
         var x = this.lastTouches[m], M = Math.abs(u - x.x), A = Math.abs(f - x.y);
         if (M <= tn && A <= tn)
@@ -2619,7 +2608,7 @@ var Cr = { exports: {} };
         }
       },
       emit: function(c, u) {
-        this.options.domEvents && Yo(c, u);
+        this.options.domEvents && Go(c, u);
         var f = this.handlers[c] && this.handlers[c].slice();
         if (!(!f || !f.length)) {
           u.type = c, u.preventDefault = function() {
@@ -2642,7 +2631,7 @@ var Cr = { exports: {} };
         }), u || (c.oldCssProps = {});
       }
     }
-    function Yo(c, u) {
+    function Go(c, u) {
       var f = i.createEvent("Event");
       f.initEvent(c, !0, !0), f.gesture = u, u.target.dispatchEvent(f);
     }
@@ -2707,20 +2696,20 @@ const cl = hl(Ye), kt = /* @__PURE__ */ qo({
   mousemove: Mr,
   mouseup: ps
 };
-function fl(r, e) {
+function ul(r, e) {
   for (let i = 0; i < r.length; i++)
     if (e(r[i]))
       return !0;
   return !1;
 }
-function gl(r) {
+function fl(r) {
   const e = r.prototype.handler;
   r.prototype.handler = function(s) {
     const n = this.store;
-    s.button > 0 && s.type === "pointerdown" && (fl(n, (o) => o.pointerId === s.pointerId) || n.push(s)), e.call(this, s);
+    s.button > 0 && s.type === "pointerdown" && (ul(n, (o) => o.pointerId === s.pointerId) || n.push(s)), e.call(this, s);
   };
 }
-function pl(r) {
+function gl(r) {
   r.prototype.handler = function(i) {
     let s = dl[i.type];
     s & Cr && i.button >= 0 && (this.pressed = !0), s & Mr && i.which === 0 && (s = ps), this.pressed && (s & ps && (this.pressed = !1), this.callback(this.manager, s, {
@@ -2756,9 +2745,9 @@ const ml = kt ? [
   pan: ["press", "doubletap", "anytap", "tap"],
   doubletap: ["anytap"],
   anytap: ["tap"]
-}, vl = {
+}, yl = {
   doubletap: ["tap"]
-}, wl = {
+}, vl = {
   pointerdown: "pointerdown",
   pointermove: "pointermove",
   pointerup: "pointerup",
@@ -2775,7 +2764,7 @@ const ml = kt ? [
     "wheel",
     "mousewheel"
   ]
-}, xl = {
+}, wl = {
   tap: "tap",
   anytap: "anytap",
   doubletap: "doubletap",
@@ -2933,13 +2922,8 @@ class Al extends _i {
         srcEvent: n,
         key: n.key,
         target: n.target
-      }), this.enableUpEvent && n.type === "keyup" && this.callback({
-        type: zn,
-        srcEvent: n,
-        key: n.key,
-        target: n.target
       }));
-    }, this.enableDownEvent = this.options.enable, this.enableUpEvent = this.options.enable, this.events = (this.options.events || []).concat(Al), e.tabIndex = this.options.tabIndex || 0, e.style.outline = "none", this.events.forEach((n) => e.addEventListener(n, this.handleEvent));
+    }, this.enableDownEvent = this.options.enable, this.enableUpEvent = this.options.enable, this.events = (this.options.events || []).concat(Ll), e.tabIndex = this.options.tabIndex || 0, e.style.outline = "none", this.events.forEach((n) => e.addEventListener(n, this.handleEvent));
   }
   destroy() {
     this.events.forEach((e) => this.element.removeEventListener(e, this.handleEvent));
@@ -2987,7 +2971,7 @@ function Ul(r) {
   let o = !1, a = !1, h = !1;
   return e === ws || e === bi && !Number.isFinite(i) ? (o = n === Dl, a = n === kl, h = n === Rl) : e === bi ? (o = !!(i & Hl), a = !!(i & Bl), h = !!(i & zl)) : e === vs && (o = s === _l, a = s === Nl, h = s === $l), { leftButton: o, middleButton: a, rightButton: h };
 }
-function Fl(r, e) {
+function Wl(r, e) {
   const i = r.center;
   if (!i)
     return null;
@@ -3001,7 +2985,7 @@ const Zi = {
   srcElement: "root",
   priority: 0
 };
-class Vl {
+class Fl {
   constructor(e) {
     this.handleEvent = (i) => {
       if (this.isEmpty())
@@ -3078,8 +3062,8 @@ class Vl {
     const i = this.eventManager.getElement();
     return {
       ...e,
-      ...Wl(e),
-      ...Fl(e, i),
+      ...Ul(e),
+      ...Wl(e, i),
       preventDefault: () => {
         e.srcEvent.preventDefault();
       },
@@ -3090,22 +3074,22 @@ class Vl {
     };
   }
 }
-const Gl = {
+const Vl = {
   events: null,
   recognizers: null,
   recognizerOptions: {},
-  Manager: ml,
+  Manager: pl,
   touchAction: "none",
   tabIndex: 0
 };
-class Yl {
+class Gl {
   constructor(e = null, i) {
     this._onBasicInput = (n) => {
-      const { srcEvent: o } = n, a = wl[o.type];
+      const { srcEvent: o } = n, a = vl[o.type];
       a && this.manager.emit(a, n);
     }, this._onOtherEvent = (n) => {
       this.manager.emit(n.type, n);
-    }, this.options = { ...Gl, ...i }, this.events = /* @__PURE__ */ new Map(), this.setElement(e);
+    }, this.options = { ...Vl, ...i }, this.events = /* @__PURE__ */ new Map(), this.setElement(e);
     const { events: s } = this.options;
     s && this.on(s);
   }
@@ -3132,14 +3116,14 @@ class Yl {
         delete a.enable, o.set(a);
       }
     }
-    this.wheelInput = new Ml(e, this._onOtherEvent, {
+    this.wheelInput = new Cl(e, this._onOtherEvent, {
       enable: !1
     }), this.moveInput = new Pl(e, this._onOtherEvent, {
       enable: !1
-    }), this.keyInput = new Ol(e, this._onOtherEvent, {
+    }), this.keyInput = new Al(e, this._onOtherEvent, {
       enable: !1,
       tabIndex: i.tabIndex
-    }), this.contextmenuInput = new Il(e, this._onOtherEvent, {
+    }), this.contextmenuInput = new Ol(e, this._onOtherEvent, {
       enable: !1
     });
     for (const [n, o] of this.events)
@@ -3167,7 +3151,7 @@ class Yl {
     const n = s.get(e);
     if (n && n.options.enable !== i) {
       n.set({ enable: i });
-      const o = vl[e];
+      const o = yl[e];
       o && !this.options.recognizers && o.forEach((a) => {
         const h = s.get(a);
         i ? (h.requireFailure(e), n.dropRequireFailure(a)) : h.dropRequireFailure(e);
@@ -3184,7 +3168,7 @@ class Yl {
     }
     const { manager: a, events: h } = this, l = On[e] || e;
     let g = h.get(l);
-    g || (g = new Vl(this), h.set(l, g), g.recognizerName = xl[l] || l, a && a.on(l, g.handleEvent)), g.add(e, i, s, n, o), g.isEmpty() || this._toggleRecognizer(g.recognizerName, !0);
+    g || (g = new Fl(this), h.set(l, g), g.recognizerName = wl[l] || l, a && a.on(l, g.handleEvent)), g.add(e, i, s, n, o), g.isEmpty() || this._toggleRecognizer(g.recognizerName, !0);
   }
   _removeEventHandler(e, i) {
     if (typeof e != "string") {
@@ -3368,13 +3352,13 @@ class Fn {
     this.#e.agent.off(e, i, s);
   }
 }
-const ql = {
+const Yl = {
   element: void 0,
   contextMenu: !0,
   panX: !0,
   panY: !0
 };
-class Rt {
+class At {
   #t;
   #e;
   #r;
@@ -3848,7 +3832,7 @@ const ql = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
     defaultIcons: Xn,
     offset: 10
   }
-}, Nh = `
+}, _h = `
 <style title="txc_CSSVars">
   --txc-background: #141414:
   --txc-border-color: #888;
@@ -3859,7 +3843,7 @@ const ql = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   --txc-time-cursor-back: #ccc;
   --txc-time-icon-color: #888;
   --txc-time-icon-hover-color: #888;
-</style>`, $h = `
+</style>`, Nh = `
 <style>
   tradex-chart {
     display: flex;
@@ -3942,7 +3926,7 @@ class Mt {
       this[n[0]] = i;
     else {
       let o = n.shift();
-      this[o] = Tr(this[o], n.join("."), i);
+      this[o] = xr(this[o], n.join("."), i);
     }
     return this.#e.refresh(), s;
   }
@@ -3967,7 +3951,7 @@ class Mt {
     return n;
   }
 }
-class Hh {
+class $h {
   #t;
   constructor(e) {
     this.#t = e, self.onmessage = (i) => this._onmessage(i.data);
@@ -3980,7 +3964,7 @@ class Hh {
     self.close();
   }
 }
-class zh {
+class Hh {
   #t;
   #e;
   #r;
@@ -4032,8 +4016,8 @@ class zh {
 }
 let Dr = class Gt {
   static #t = /* @__PURE__ */ new Map();
-  static ThreadWorker = Hh;
-  static Thread = zh;
+  static ThreadWorker = $h;
+  static Thread = Hh;
   static create(e = "worker", i, s, n) {
     if (typeof window.Worker > "u")
       return !1;
@@ -4126,16 +4110,16 @@ class kr {
     return this.#r.yAxisDigits;
   }
   float2Int(e) {
-    return wa(e);
-  }
-  numDigits(e) {
-    return wr(e);
-  }
-  countDigits(e) {
     return va(e);
   }
+  numDigits(e) {
+    return vr(e);
+  }
+  countDigits(e) {
+    return ya(e);
+  }
   precision(e) {
-    return xr(e);
+    return wr(e);
   }
 }
 class wi extends kr {
@@ -4395,7 +4379,7 @@ class Rr {
     return this.#t.hex;
   }
   #e(e) {
-    if (al) {
+    if (ol) {
       let i = document.getElementById("divValidColourTest");
       i || (i = document.createElement("div"), i.id = "divValidColourTest"), i.style.backgroundColor = "", i.style.backgroundColor = e, this.#t.isValid = !!i.style.backgroundColor.length;
     } else
@@ -4562,7 +4546,7 @@ class Ns {
   }
   onMouseEnter() {
     const e = getComputedStyle(this.#i).backgroundColor;
-    e && (this.colour = new _r(e), this.#i.style.backgroundColor = this.colour.hex);
+    e && (this.colour = new Rr(e), this.#i.style.backgroundColor = this.colour.hex);
   }
   onMouseOut() {
     this.#i.style.backgroundColor = this.colour.hexa;
@@ -4590,8 +4574,8 @@ class Ns {
     i = i || this.#i.getBoundingClientRect().width, e = e / s * 100, this.#i.style.marginLeft = `${e}%`, i = i / s * 100, this.#i.style.width = `${i}%`;
   }
 }
-const Nr = ["source-over", "source-atop", "source-in", "source-out", "destination-over", "destination-atop", "destination-in", "destination-out", "lighter", "copy", "xor", "multiply", "screen", "overlay", "darken", "lighten", "color-dodge", "color-burn", "hard-light", "soft-light", "difference", "exclusion", "hue", "saturation", "color", "luminosity"];
-let $r = class {
+const _r = ["source-over", "source-atop", "source-in", "source-out", "destination-over", "destination-atop", "destination-in", "destination-out", "lighter", "copy", "xor", "multiply", "screen", "overlay", "darken", "lighten", "color-dodge", "color-burn", "hard-light", "soft-light", "difference", "exclusion", "hue", "saturation", "color", "luminosity"];
+let Nr = class {
   #t = 0;
   constructor(e = {}) {
     this.container = e.container, this.layers = [], this.id = G.idCnt++, this.scene = new G.Scene(), this.setSize(e.width || 0, e.height || 0);
@@ -4632,7 +4616,7 @@ let $r = class {
     let { scene: i, layers: s } = this, n;
     i.clear();
     for (n of s)
-      e && n.layers.length > 0 && n.render(e), Nr.includes(n?.composition) && (i.context.globalCompositeOperation = n.composition), n.visible && n.width > 0 && n.height > 0 && i.context.drawImage(
+      e && n.layers.length > 0 && n.render(e), _r.includes(n?.composition) && (i.context.globalCompositeOperation = n.composition), n.visible && n.width > 0 && n.height > 0 && i.context.drawImage(
         n.scene.canvas,
         n.x,
         n.y,
@@ -4641,7 +4625,7 @@ let $r = class {
       );
   }
 };
-class Bh extends $r {
+class zh extends Nr {
   constructor(e = {}) {
     super(e), e.container.innerHTML = "", e.container.appendChild(this.scene.canvas), G.viewports.push(this);
   }
@@ -4649,7 +4633,7 @@ class Bh extends $r {
     super.destroy(), this.container.innerHTML = "", G.viewports.splice(this.index, 1);
   }
 }
-class Uh {
+class Bh {
   x = 0;
   y = 0;
   width = 0;
@@ -4681,7 +4665,7 @@ class Uh {
     return this.width = e, this.height = i, this.scene.setSize(e, i), this.hit.setSize(e, i), this;
   }
   setComposition(e) {
-    if (Nr.includes(e))
+    if (_r.includes(e))
       return this.composition = e, this;
   }
   move(e) {
@@ -4700,7 +4684,7 @@ class Uh {
         n.splice(i, 1), n.unshift(this);
         break;
       case "order":
-        Ea(n, this.index, o);
+        Ta(n, this.index, o);
         break;
     }
     return this;
@@ -4721,17 +4705,17 @@ class Uh {
     this.viewport.layers.splice(this.index, 1);
   }
 }
-class Wh {
+class Uh {
   width = 0;
   height = 0;
   constructor(e) {
     e || (e = {}), this.id = G.idCnt++, this.layer = e.layer, this.contextType = e.contextType || "2d", this.canvas = document.createElement("canvas"), this.canvas.className = "scene-canvas", this.canvas.style.display = "block", this.context = this.canvas.getContext(this.contextType), e.width && e.height && this.setSize(e.width, e.height);
   }
   setSize(e, i) {
-    return zr(e, i, this);
+    return Hr(e, i, this);
   }
   clear() {
-    return Hr(this);
+    return $r(this);
   }
   toImage(e = "image/png", i, s) {
     let n = this, o = new Image(), a = this.canvas.toDataURL(e, i);
@@ -4754,7 +4738,7 @@ class Wh {
     }).click() : i.click && i.click();
   }
 }
-class Fh {
+class Wh {
   width = 0;
   height = 0;
   constructor(e) {
@@ -4764,10 +4748,10 @@ class Fh {
     }), e.width && e.height && this.setSize(e.width, e.height);
   }
   setSize(e, i) {
-    return zr(e, i, this);
+    return Hr(e, i, this);
   }
   clear() {
-    return Hr(this);
+    return $r(this);
   }
   getIntersection(e, i) {
     let s = this.context, n;
@@ -4801,7 +4785,7 @@ class Fh {
     return [i, s, n];
   }
 }
-function Hr(r) {
+function $r(r) {
   let e = r.context;
   return r.contextType === "2d" ? e.clearRect(
     0,
@@ -4810,7 +4794,7 @@ function Hr(r) {
     r.height * G.pixelRatio
   ) : e.clear(e.COLOR_BUFFER_BIT | e.DEPTH_BUFFER_BIT), r;
 }
-function zr(r, e, i) {
+function Hr(r, e, i) {
   return i.width = r, i.height = e, i.canvas.width = r * G.pixelRatio, i.canvas.style.width = `${r}px`, i.canvas.height = e * G.pixelRatio, i.canvas.style.height = `${e}px`, i.contextType === "2d" && G.pixelRatio !== 1 && i.context.scale(G.pixelRatio, G.pixelRatio), i;
 }
 const G = {
@@ -5142,7 +5126,7 @@ class xi extends kr {
     if (e.integers) {
       let n = s.integers;
       if (n - 2 > 0) {
-        let o = Ta(10, n - 2);
+        let o = xa(10, n - 2);
         return Math.floor(e.value / o) * o;
       } else
         return i ? (n = n > 0 ? n : n * -1, dn(e.value, n)) : Math.floor(e.value);
@@ -5259,7 +5243,7 @@ class Li extends V {
     if (e = e || this.params.axes, this.scene.clear(), e == "none")
       return;
     const i = this.scene.context;
-    if (i.save(), i.strokeStyle = this.core.theme.chart.GridColour || Dr.COLOUR_GRID, e != "y") {
+    if (i.save(), i.strokeStyle = this.core.theme.chart.GridColour || Ir.COLOUR_GRID, e != "y") {
       const n = this.xAxis.xAxisGrads.values;
       for (let o of n) {
         let a = lt(o[1]);
@@ -5449,7 +5433,7 @@ class ye {
     this.#i.render();
   }
 }
-class Yh extends V {
+class Gh extends V {
   #t = [0, 0];
   #e;
   constructor(e, i = !1, s = !1, n, o, a) {
@@ -5469,7 +5453,7 @@ class Yh extends V {
     i.restore();
   }
 }
-class qh extends V {
+class Yh extends V {
   #t = [0, 0];
   #e;
   constructor(e, i = !1, s = !1, n, o, a) {
@@ -5484,7 +5468,7 @@ class qh extends V {
     this.xAxis.xAxisGrads.values, this.theme.xAxis, e.save(), e.restore();
   }
 }
-function Br(r, e) {
+function zr(r, e) {
   return Math.round(r.measureText(e).width);
 }
 function qe(r = Tt.fontSize, e = Tt.fontWeight, i = Tt.fontFamily) {
@@ -5507,7 +5491,7 @@ function ve(r, e, i, s, n) {
   let o = n?.width || Ni(r, e, n), a = n?.height || $i(n);
   r.fillRect(i, s, o, a), r.fillStyle = n?.txtCol || Tt.txtCol, i = i + n?.paddingLeft, s = s + n?.paddingTop, r.fillText(`${e}`, i, s), r.restore();
 }
-class Xh extends V {
+class qh extends V {
   #t = [0, 0];
   constructor(e, i = !1, s = !1, n, o) {
     i = o.time.xAxis, super(e, i, s, n, o), this.viewport = e.viewport;
@@ -5531,12 +5515,12 @@ class Xh extends V {
     g = this.xAxis.xPosSnap2CandlePos(g), g = g - Math.round(l * 0.5) - this.core.scrollPos - this.core.bufferPx, this.scene.clear(), e.save(), ve(e, a, g, 1, h), e.restore();
   }
 }
-const jh = [
-  ["labels", { class: Yh, fixed: !1, required: !0 }],
-  ["overlay", { class: qh, fixed: !1, required: !0 }],
-  ["cursor", { class: Xh, fixed: !1, required: !0 }]
+const Xh = [
+  ["labels", { class: Gh, fixed: !1, required: !0 }],
+  ["overlay", { class: Yh, fixed: !1, required: !0 }],
+  ["cursor", { class: qh, fixed: !1, required: !0 }]
 ];
-class Kh {
+class jh {
   #t;
   #e = "Timeline";
   #r = "time";
@@ -5632,7 +5616,7 @@ class Kh {
     return this.#O;
   }
   get layerOverlays() {
-    return this.#g;
+    return this.#p;
   }
   get xAxisGrads() {
     return this.#a.xAxisGrads;
@@ -5871,7 +5855,7 @@ const Kh = {
   "-ms-user-select",
   "user-select"
 ];
-class Qh {
+class Zh {
   #t;
   #e;
   #r;
@@ -6067,7 +6051,7 @@ const ns = {
       return !0;
     }
   }
-}, Jh = {
+}, Qh = {
   id: "scale",
   initial: "idle",
   context: {},
@@ -6149,7 +6133,7 @@ const ns = {
     }
   }
 };
-class tc extends V {
+class Jh extends V {
   #t = [0, 0];
   constructor(e, i, s, n, o, a) {
     o = s, s = s.yAxis, super(e, i, s, n, o, a), this.viewport = e.viewport;
@@ -6180,7 +6164,7 @@ class tc extends V {
     this.scene.clear(), this.target.viewport.render();
   }
 }
-class ec extends V {
+class tc extends V {
   constructor(e, i, s, n, o, a) {
     o = s, s = s.yAxis, super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
@@ -6205,7 +6189,7 @@ class ec extends V {
     e.restore();
   }
 }
-class ic extends V {
+class ec extends V {
   constructor(e, i, s, n, o, a) {
     o = s, s = s.yAxis, super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
@@ -6217,7 +6201,7 @@ class ic extends V {
     this.yAxis.yAxis, this.scene.clear(), e.save(), e.restore();
   }
 }
-class sc extends V {
+class ic extends V {
   constructor(e, i, s, n, o, a) {
     o = s, s = s.yAxis, super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
@@ -6243,13 +6227,13 @@ class sc extends V {
     this.scene.clear(), i.save(), e[4] >= e[1] ? a.bakCol = this.theme.candle.UpBodyColour : a.bakCol = this.theme.candle.DnBodyColour, ve(i, o, h, g, a), s && (o = this.core.stream.countDownUpdate(), a.fontSize = a?.fontSize / 1.1, ve(i, o, h, g + l, a)), i.restore(), this.viewport.render();
   }
 }
-const nc = [
-  ["labels", { class: ec, fixed: !0, required: !0 }],
-  ["overlay", { class: ic, fixed: !0, required: !0 }],
-  ["price", { class: sc, fixed: !0, required: !0 }],
-  ["cursor", { class: tc, fixed: !0, required: !0 }]
+const sc = [
+  ["labels", { class: tc, fixed: !0, required: !0 }],
+  ["overlay", { class: ec, fixed: !0, required: !0 }],
+  ["price", { class: ic, fixed: !0, required: !0 }],
+  ["cursor", { class: Jh, fixed: !0, required: !0 }]
 ];
-class rc {
+class nc {
   #t;
   #e = "Y Scale Axis";
   #r = "scale";
@@ -6358,10 +6342,10 @@ class rc {
     return this.#o.yAxisGrads;
   }
   set graph(e) {
-    this.#p = e;
+    this.#g = e;
   }
   get graph() {
-    return this.#p;
+    return this.#g;
   }
   get pos() {
     return this.dimensions;
@@ -6437,7 +6421,7 @@ class rc {
     this.#p = P(e) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)], this.#y.draw(this.#p);
   }
   onDrag(e) {
-    this.#g = [
+    this.#p = [
       Math.floor(e.position.x),
       Math.floor(e.position.y),
       e.dragstart.x,
@@ -6502,16 +6486,16 @@ class rc {
     }
   }
   render() {
-    this.#p.render();
+    this.#g.render();
   }
   draw(e = this.range, i = !0) {
-    this.#p.draw(e, i), this.#s.drawGrid();
+    this.#g.draw(e, i), this.#s.drawGrid();
   }
   resize(e = this.width, i = this.height) {
     this.setDimensions({ w: e, h: i });
   }
 }
-class oc {
+class rc {
   constructor(e, i) {
     this.scene = e, this.ctx = this.scene.context, this.width = this.scene.width, this.cfg = i;
   }
@@ -6525,7 +6509,7 @@ class oc {
     ), i.restore();
   }
 }
-class ac extends V {
+class oc extends V {
   #t;
   #e;
   constructor(e, i = !1, s = !1, n, o, a) {
@@ -6551,7 +6535,7 @@ class ac extends V {
       L = e.value(g), a.x = lt(this.xAxis.xPos(L[0]) - o / 2), L[4] !== null && (a.h = h - h * ((O - L[5]) / O), a.raw = i[g], this.#t.draw(a)), g++;
   }
 }
-class Wr {
+class Ur {
   areaCoordinates = [];
   constructor(e, i) {
     this.scene = e, this.ctx = this.scene.context, this.width = this.scene.width, this.cfg = i;
@@ -6639,10 +6623,10 @@ class Wr {
     i.restore(), e.length = 0;
   }
 }
-class Fr extends V {
+class Wr extends V {
   #t;
   constructor(e, i = !1, s = !1, n, o) {
-    super(e, i, s, n, o), this.#t = new Wr(e.scene, n);
+    super(e, i, s, n, o), this.#t = new Ur(e.scene, n);
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
@@ -6698,16 +6682,13 @@ function Vr(r, e, i, s, n, o, a) {
 function Gr(r, e, i, s, n, o, a) {
   r.fillStyle = a?.fill || Tt.fill, Yr(r, e, i, s, n, o), r.fill();
 }
-function Yr(r, e, i, s, n, o, a) {
-  r.fillStyle = a?.fill || Tt.fill, qr(r, e, i, s, n, o), r.fill();
-}
-function qr(r, e, i, s, n, o) {
+function Yr(r, e, i, s, n, o) {
   r.beginPath(), r.moveTo(e + o, i), r.arcTo(e + s, i, e + s, i + n, o), r.arcTo(e + s, i + n, e, i + n, o), r.arcTo(e, i + n, e, i, o), r.arcTo(e, i, e + s, i, o), r.closePath();
 }
-function hc(r, e, i, s, n, o, a) {
-  S(a.fill) && Yr(r, e, i, s, n, o, a?.fill), T(a.width) && a.width > 0 && Gr(r, e, i, s, n, o, a?.border, a?.width);
+function lc(r, e, i, s, n, o, a) {
+  S(a.fill) && Gr(r, e, i, s, n, o, a?.fill), T(a.width) && a.width > 0 && Vr(r, e, i, s, n, o, a?.border, a?.width);
 }
-function Xr(r, e, i, s, n, o, a) {
+function qr(r, e, i, s, n, o, a) {
   if (!(n < 3)) {
     var h = Math.PI * 2 / n;
     r.beginPath(), r.translate(e, i), r.rotate(o * Math.PI / 180), r.moveTo(s, 0);
@@ -6716,7 +6697,7 @@ function Xr(r, e, i, s, n, o, a) {
     r.closePath(), we(r, a?.fill, a?.stroke, a?.width);
   }
 }
-function cc(r, e, i) {
+function hc(r, e, i) {
   if (e.length > 0) {
     r.beginPath();
     var s = e[0];
@@ -6732,23 +6713,23 @@ function cc(r, e, i, s, n) {
 function dc(r, e, i, s, n, o) {
   r.beginPath(), r.moveTo(e - s / 2, i), r.lineTo(e, i - n / 2), r.lineTo(e + s / 2, i), r.lineTo(e, i + n / 2), r.closePath(), we(r, o?.fill, o?.stroke, o?.width);
 }
-function fc(r, e, i, s, n) {
+function uc(r, e, i, s, n) {
   r.beginPath(), r.arc(e, i, s, 0, Math.PI * 2), r.closePath(), fillStroke(r, n?.fill, n?.stroke, n?.width);
 }
-function gc(r) {
+function fc(r) {
   return r.ownerDocument && r.ownerDocument.defaultView && r.ownerDocument.defaultView.devicePixelRatio || 2;
 }
 function we(r, e, i, s) {
   S(e) && (r.fillStyle = e, r.fill()), T(s) && s > 0 && (r.lineWidth = s, r.strokeStyle = i || Tt.stroke, r.stroke());
 }
-function jr(r, e, i, s, n, o, a, h, l, g) {
+function Xr(r, e, i, s, n, o, a, h, l, g) {
   r.drawImage(e, i, s, n, o, a, h, l, g);
 }
-function Kr(r, e) {
+function jr(r, e) {
   let i = r.naturalWidth || r.width, s = r.naturalHeight || r.height;
-  return e === void 0 && (e = Zr(i, s)), e.ctx.drawImage(r, 0, 0), e;
+  return e === void 0 && (e = Kr(i, s)), e.ctx.drawImage(r, 0, 0), e;
 }
-const pc = {
+const gc = {
   red: "#FF0000FF",
   green: "#00FF00FF",
   blue: "#0000FFFF",
@@ -6758,7 +6739,7 @@ function De(r, e) {
   const i = jr(e), s = i.ctx;
   return s.fillStyle = gc[r], s.globalCompositeOperation = "multiply", s.fillRect(0, 0, s.canvas.width, s.canvas.height), s.globalCompositeOperation = "destination-in", s.drawImage(e, 0, 0), s.globalCompositeOperation = "source-over", i;
 }
-function mc(r) {
+function pc(r) {
   return {
     red: De("red", r),
     green: De("green", r),
@@ -6766,7 +6747,7 @@ function mc(r) {
     alpha: De("alpha", r)
   };
 }
-function Zr(r, e) {
+function Kr(r, e) {
   const i = document.createElement("canvas");
   return i.ctx = i.getContext("2d"), i.width = r || i.ctx.canvas.width, i.height = e || i.ctx.canvas.height, i;
 }
@@ -6823,11 +6804,6 @@ function yc(r, e, i) {
   }), we(r, opts?.fill, opts?.stroke, opts?.size);
 }
 function vc(r, e, i) {
-  xe(r, e, i, () => {
-    r.closePath();
-  }), we(r, opts?.fill, opts?.stroke, opts?.size);
-}
-function wc(r, e, i) {
   r.beginPath(), r.moveTo(e[0].x, e[0].y);
   for (var s = i ?? 1, n = 0; n < e.length - 1; n++) {
     var o = n > 0 ? e[n - 1] : e[0], a = e[n], h = e[n + 1], l = n != e.length - 2 ? e[n + 2] : h, g = a.x + (h.x - o.x) / 6 * s, p = a.y + (h.y - o.y) / 6 * s, v = h.x - (l.x - a.x) / 6 * s, b = h.y - (l.y - a.y) / 6 * s;
@@ -6850,7 +6826,7 @@ function xc(r, e, i) {
     r.stroke(), r.closePath();
   });
 }
-class Ec extends V {
+class Tc extends V {
   #t;
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a), this.#t = new Ur(e.scene, n), this.theme.priceLineStyle = this.theme?.priceLineStyle || Dh;
@@ -6913,10 +6889,10 @@ const ke = {
   wdith: 1,
   dash: [1, 0]
 };
-class Sc extends V {
+class Ec extends V {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a);
-    const h = { class: bc, fixed: !0, required: !1 };
+    const h = { class: Sc, fixed: !0, required: !1 };
     this.core.config?.highLow === !0 && (this.scaleOverly = this.chart.scale.addOverlay("hiLo", h));
   }
   set position(e) {
@@ -6931,7 +6907,7 @@ class Sc extends V {
     p.colourCursorBG = this.theme?.hilo?.colour || ke.colour, v.save(), v.strokeStyle = this.theme?.highLow?.colour || ke.colour, v.strokeWidth = this.theme?.highLow?.width || ke.width, v.setLineDash(this.theme?.highLow?.dash || ke.dash), n = this.yAxis.yPos(l), Ve(v, n, 0, o, h), i = "High", s = this.theme.yAxis.location == "left" ? 0 : o - (a + 25), Ai(v, i, s, n, a, p), n = this.yAxis.yPos(g), Ve(v, n, 0, o, h), i = "Low", Ai(v, i, s, n, a, p), v.restore();
   }
 }
-class bc extends V {
+class Sc extends V {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
@@ -6960,7 +6936,7 @@ function Ai(r, e, i, s, n, o) {
   }, h = a.fontSize + a.paddingTop + a.paddingBottom, l = s - h * 0.5;
   r.save(), r.fillStyle = a.bakCol, r.fillRect(i, l, n, h), ve(r, `${e}`, i, l, a), r.restore();
 }
-class Cc {
+class bc {
   data;
   icon;
   constructor(e, i) {
@@ -6972,7 +6948,7 @@ class Cc {
     return p.save(), p.drawImage(i, l, g, h, a), p.restore(), v.save(), v.drawImage(o, l, g, h, a), v.restore(), { x: l, y: g, w: h, h: a, k: n };
   }
 }
-const Mc = {
+const Cc = {
   dragBar: !1,
   closeIcon: !1,
   content: "",
@@ -7057,7 +7033,7 @@ class Pc {
     return v.save(), v.drawImage(s, g, p, l, h), v.restore(), b.save(), b.drawImage(a, g, p, l, h), b.restore(), { x: g, y: p, w: l, h, k: o };
   }
 }
-const Ac = {
+const Lc = {
   dragBar: !1,
   closeIcon: !1,
   content: "",
@@ -7072,7 +7048,7 @@ const Ac = {
     }
   }
 };
-class Oc extends V {
+class Ac extends V {
   #t;
   #e = [];
   #r;
@@ -7134,7 +7110,7 @@ class Oc extends V {
     }
   }
 }
-class Ic extends V {
+class Oc extends V {
   constructor(e, i = !1, s = !1, n, o, a) {
     super(e, i, s, n, o, a), this.params.content = a?.content || "";
   }
@@ -7168,10 +7144,10 @@ class Ic extends V {
     const i = this.core.config?.watermark?.imgHeight || this.theme.watermark.IMGHEIGHT, s = this.core.config?.watermark?.imgWidth || this.theme.watermark.IMGWIDTH, n = (this.scene.width - s) / 2, o = (this.scene.height - i) / 2;
     this.scene.clear();
     const a = this.scene.context;
-    a.save(), jr(a, e, n, o, i, s), a.restore();
+    a.save(), Xr(a, e, n, o, i, s), a.restore();
   }
 }
-const Dc = {
+const Ic = {
   primaryPane: [
     ["watermark", { class: Oc, fixed: !0, required: !0, params: { content: null } }],
     ["grid", { class: Li, fixed: !0, required: !0, params: { axes: "y" } }],
@@ -7191,7 +7167,7 @@ const Dc = {
     events: { class: Mc, fixed: !1, required: !1 }
   },
   secondaryPane: {
-    candles: { class: Fr, fixed: !1, required: !0 }
+    candles: { class: Wr, fixed: !1, required: !0 }
   }
 }, bt = {
   id: "chart",
@@ -7252,7 +7228,7 @@ class ne {
       return;
     this.#l = { ...i }, this.#r = this.#l.name, this.#n = this.#l.shortName, this.#i = this.#l.title, this.#c = this.#l.type == "primary" ? "primaryPane" : "secondaryPane", this.#C = this.#l.view, this.#m = this.#l.elements.elScale, this.#a = this.#l.parent, this.#f = this.#l.elements.elTarget, this.#f.id = this.id, this.legend = new Zh(this.elLegend, this), this.isPrimary ? (bt.type = "chart", bt.title = this.title, bt.parent = this, bt.source = this.legendInputs.bind(this), this.legend.add(bt), this.yAxisType = "default") : (bt.type = "secondary", bt.title = "", bt.parent = this, bt.source = () => ({ inputs: {}, colours: [], labels: [] }), this.legend.add(bt), this.yAxisType = this.core.indicatorClasses[i.view[0].type].ind.scale);
     const s = { ...i };
-    s.parent = this, s.chart = this, s.elScale = this.elScale, s.yAxisType = this.yAxisType, this.scale = new rc(this.core, s), this.#u = "init", this.log(`${this.name} instantiated`);
+    s.parent = this, s.chart = this, s.elScale = this.elScale, s.yAxisType = this.yAxisType, this.scale = new nc(this.core, s), this.#u = "init", this.log(`${this.name} instantiated`);
   }
   log(e) {
     this.core.log(e);
@@ -7398,10 +7374,10 @@ class ne {
     return this.#v.layerWidth;
   }
   set legend(e) {
-    this.#p = e;
+    this.#g = e;
   }
   get legend() {
-    return this.#p;
+    return this.#g;
   }
   set time(e) {
     this.#x = e;
@@ -7449,7 +7425,7 @@ class ne {
     return this.#b;
   }
   get overlaysDefault() {
-    return Dc[this.type];
+    return Ic[this.type];
   }
   get indicators() {
     return this.getIndicators();
@@ -7655,7 +7631,7 @@ class ne {
     return { inputs: l, colours: h, labels: e };
   }
   onLegendAction(e) {
-    switch (this.#p.onMouseClick(e.currentTarget).icon) {
+    switch (this.#g.onMouseClick(e.currentTarget).icon) {
       case "up":
         this.reorderUp();
         return;
@@ -7877,10 +7853,10 @@ class _t extends V {
     return this.#v;
   }
   set style(e) {
-    this.#p = e;
+    this.#g = e;
   }
   get style() {
-    return this.#p;
+    return this.#g;
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
@@ -8392,7 +8368,7 @@ class Zr {
     return this.#P;
   }
   get chartPanes() {
-    return this.#g;
+    return this.#p;
   }
   get chartPaneMaximized() {
     return this.#b;
@@ -8491,7 +8467,7 @@ class Zr {
     return this.#s;
   }
   get graph() {
-    return this.#p;
+    return this.#g;
   }
   get views() {
     return this.#i.state.data.views;
@@ -8649,7 +8625,7 @@ class Zr {
   onNewStreamValue(e) {
   }
   onPointerActive(e) {
-    e && (e.cursorActive = !0, e.scale.layerCursor.visible = !0), e !== this.chart && (this.chart.cursorActive = !1, this.chart.scale.layerCursor.visible = !1, this.chart.scale.layerCursor.erase()), this.#g.forEach((i, s) => {
+    e && (e.cursorActive = !0, e.scale.layerCursor.visible = !0), e !== this.chart && (this.chart.cursorActive = !1, this.chart.scale.layerCursor.visible = !1, this.chart.scale.layerCursor.erase()), this.#p.forEach((i, s) => {
       e !== i && (i.cursorActive = !1, i.scale.layerCursor.visible = !1, i.scale.layerCursor.erase());
     });
   }
@@ -8682,7 +8658,7 @@ class Zr {
   }
   chartPanesState() {
     const e = {
-      list: [...this.#g.values()],
+      list: [...this.#p.values()],
       collapsed: [],
       expanded: [],
       maximized: this.#b.instance
@@ -8695,8 +8671,8 @@ class Zr {
     const { expanded: i } = this.chartPanesState(), s = this.calcChartPaneHeights(), n = s.new;
     let o;
     for (o in s)
-      if (this.#g.has(o)) {
-        let g = this.#g.get(o);
+      if (this.#p.has(o)) {
+        let g = this.#p.get(o);
         i.indexOf(g) > -1 && g.setDimensions({ w: this.rowsW, h: s[o] });
       }
     let a;
@@ -8713,9 +8689,9 @@ class Zr {
     return e.type == "primary" ? (l = new ne(this.#i, e), this.#P = l) : (e.name = e.view[0].name || "Secondary", e.shortName = e.view[0].type || "Secondary", l = new ne(this.#i, e)), this.setPaneDividers(), this.#p.set(l.id, l), this.emit("addChartView", l), l;
   }
   removeChartPane(e) {
-    if (!S(e) || !this.#g.has(e))
+    if (!S(e) || !this.#p.has(e))
       return !1;
-    const i = this.#g.get(e);
+    const i = this.#p.get(e);
     if (i.isPrimary)
       return this.#i.error(`Cannot remove primary chart pane! ${e}`), !1;
     this.#M[e] = !0;
@@ -8758,7 +8734,7 @@ class Zr {
     } else {
       this.core.indicatorClasses[e].ind.primaryPane === "both" && X(e.primaryPane) && e.primaryPane, P(s.view) || (s.view = [{ name: i, type: e, ...s }]);
       for (let a = 0; a < s.view.length; a++)
-        (!E(s.view[a]) || !Er(["name", "type"], Object.keys(s.view[a]))) && s.view.splice(a, 1);
+        (!E(s.view[a]) || !Tr(["name", "type"], Object.keys(s.view[a]))) && s.view.splice(a, 1);
       if (s.view.length == 0)
         return !1;
       s.parent = this, s.title = i, s.elements = { ...this.elements }, n = this.addChartPane(s), n.start();
@@ -8767,7 +8743,7 @@ class Zr {
   }
   getIndicators() {
     const e = {};
-    return this.#g.forEach(
+    return this.#p.forEach(
       (i, s) => {
         e[s] = i.indicators;
       }
@@ -8776,13 +8752,13 @@ class Zr {
   getIndicator(e) {
     if (!S(e))
       return !1;
-    for (const i of this.#g.values())
+    for (const i of this.#p.values())
       if (e in i.indicators)
         return i.indicators[e].instance;
   }
   removeIndicator(e) {
     if (S(e)) {
-      for (const i of this.#g.values())
+      for (const i of this.#p.values())
         if (e in i.indicators)
           return i.indicators[e].instance.remove(), !0;
     } else
@@ -8790,7 +8766,7 @@ class Zr {
   }
   indicatorSettings(e, i) {
     if (S(e)) {
-      for (const s of this.#g.values())
+      for (const s of this.#p.values())
         if (e in s.indicators)
           return s.indicators[e].instance.settings(i);
     } else
@@ -8826,7 +8802,7 @@ class Zr {
     return a;
   }
   scaleNode(e) {
-    const i = Ih + " width: 100%;";
+    const i = Oh + " width: 100%;";
     return `
     <div slot="chartpane" class="viewport scale ${e}" style="$${i}"></div>
   `;
@@ -8841,7 +8817,7 @@ class Zr {
       this.#C,
       this.#P
     ];
-    this.time.xAxis.doCalcXAxisGrads(e), this.#g.forEach((n, o) => {
+    this.time.xAxis.doCalcXAxisGrads(e), this.#p.forEach((n, o) => {
       s.push(n);
     }), di.queueFrame(
       this.range,
@@ -8864,7 +8840,7 @@ class Zr {
       this.panesRestore(), i.instance = null, i.panes = {}, e.collapsed.state && (e.graph.viewport.scene.canvas.style.display = "none", e.scale.graph.viewport.scene.canvas.style.visibility = "hidden");
     else {
       this.panesRestore(), i.instance = e, i.rowsH = this.rowsH;
-      for (let [o, a] of this.#g.entries())
+      for (let [o, a] of this.#p.entries())
         i.panes[o] = a.element.clientHeight, n = a.element.style, e === a ? (n.display = "block", a.setDimensions({ w: void 0, h: this.rowsH }), a.Divider.setPos(), a.graph.viewport.scene.canvas.style.display = "block", a.scale.graph.viewport.scene.canvas.style.visibility = "visible") : n.display = "none";
       this.hidePaneDividers();
     }
@@ -8874,7 +8850,7 @@ class Zr {
     const e = this.#b;
     let i, s = 0;
     this.dimensions.height == e.height;
-    for (let [n, o] of this.#g.entries())
+    for (let [n, o] of this.#p.entries())
       i = o.element.style, i.display = "block", n in e.panes && s++ > 0 && o.Divider.show(), o.setDimensions({ w: void 0, h: e.panes[n] }), o.Divider.setPos();
   }
   paneCollapse(e) {
@@ -8910,14 +8886,14 @@ class Zr {
       i.Divider instanceof at && i.Divider.hide();
   }
 }
-let yd = class Ti {
+class Ti {
   static passive = new Ti("passive");
   static hover = new Ti("hover");
   static active = new Ti("active");
   constructor(e) {
     this.name = e;
   }
-};
+}
 class Lt extends V {
   static #t = 0;
   static #e = {};
@@ -9003,7 +8979,7 @@ class Lt extends V {
     return this.#v;
   }
   get cursorClick() {
-    return this.#p;
+    return this.#g;
   }
   get candleW() {
     return this.#h.Timeline.candleW;
@@ -9033,7 +9009,7 @@ class Lt extends V {
     this.#c.off("mousemove", this.onPointerMove);
   }
   eventsListen() {
-    this.#c = new Rt(this.#d, { disableContextMenu: !1 }), this.#c.on("pointermove", this.onPointerMove.bind(this));
+    this.#c = new At(this.#d, { disableContextMenu: !1 }), this.#c.on("pointermove", this.onPointerMove.bind(this));
   }
   on(e, i, s) {
     this.#h.on(e, i, s);
@@ -9110,11 +9086,11 @@ class $c extends Lt {
     super(e);
   }
 }
-const zc = [
+const Hc = [
   {
     id: "cursor",
     name: "Cursor",
-    icon: Zl,
+    icon: Kl,
     event: "tool_activated"
   },
   {
@@ -9150,9 +9126,9 @@ const zc = [
   {
     id: "fibonacci",
     name: "Fibonacci",
-    icon: Jl,
+    icon: Ql,
     event: "tool_activated",
-    class: _c,
+    class: Rc,
     sub: [
       {
         id: "fib",
@@ -9164,9 +9140,9 @@ const zc = [
   {
     id: "range",
     name: "Range",
-    icon: eh,
+    icon: th,
     event: "tool_activated",
-    class: $c,
+    class: Nc,
     sub: [
       {
         id: "rng",
@@ -9178,9 +9154,9 @@ const zc = [
   {
     id: "text",
     name: "Text",
-    icon: ih,
+    icon: eh,
     event: "tool_activated",
-    class: Hc,
+    class: $c,
     sub: [
       {
         id: "txt",
@@ -9192,14 +9168,14 @@ const zc = [
   {
     id: "measure",
     name: "Measure",
-    icon: th,
+    icon: Jl,
     event: "tool_activated",
-    class: Nc
+    class: _c
   },
   {
     id: "delete",
     name: "Delete",
-    icon: Ql,
+    icon: Zl,
     event: "tool_activated",
     class: void 0
   }
@@ -9301,7 +9277,7 @@ const zc = [
     }
   }
 };
-class Jr {
+class Qr {
   #t;
   #e = "Toolbar";
   #r = "tools";
@@ -9597,7 +9573,7 @@ Ts.innerHTML = `
   }
 
   .handle {
-    background-color: var(--txc-time-handle-color, ${Uc.hex}44); 
+    background-color: var(--txc-time-handle-color, ${Bc.hex}44); 
     width: 2px;
     height: 18px;
     margin: 1px;
@@ -9619,14 +9595,14 @@ Ts.innerHTML = `
   }
 </style>
 <div class="scrollBarWidget">
-  <span id="rwdStart" class="icon rwdStart">${ph}</span>
+  <span id="rwdStart" class="icon rwdStart">${gh}</span>
   <span class="scrollBar">
     <div class="viewport"></div>
     <input id="min" class="min" name="min" type="range" step="1" min="0" max="3000" />
     <input id="max" class="max" name="max" type="range" step="1" min="0" max="3000" />
     <div class="handle"></div>
   </span>
-  <span id="fwdEnd" class="icon fwdEnd">${gh}</span>
+  <span id="fwdEnd" class="icon fwdEnd">${fh}</span>
 </div>
 `;
 class Uc extends dt {
@@ -9678,16 +9654,16 @@ class Uc extends dt {
     console.log(`${this.input.value}, ${this.input.getAttribute("max")}`);
   }
 }
-customElements.get("tradex-overview") || window.customElements.define("tradex-overview", Wc);
-const to = document.createElement("template");
-to.innerHTML = `
+customElements.get("tradex-overview") || window.customElements.define("tradex-overview", Uc);
+const Jr = document.createElement("template");
+Jr.innerHTML = `
 <style>
   .viewport {
     width: 100%;
     height: ${Mi}px;
   }
   tradex-overview {
-    height: ${Or}px;
+    height: ${Ar}px;
   }
 </style>
 <div class="viewport"></div>
@@ -9695,7 +9671,7 @@ to.innerHTML = `
 `;
 class Wc extends dt {
   constructor() {
-    super(to);
+    super(Jr);
   }
   destroy() {
   }
@@ -9710,9 +9686,9 @@ class Wc extends dt {
     return this.shadowRoot.querySelector("tradex-overview");
   }
 }
-customElements.get("tradex-time") || window.customElements.define("tradex-time", Fc);
-const eo = document.createElement("template");
-eo.innerHTML = `
+customElements.get("tradex-time") || window.customElements.define("tradex-time", Wc);
+const to = document.createElement("template");
+to.innerHTML = `
 <style>
   .viewport {
     position: relative;
@@ -9724,7 +9700,7 @@ eo.innerHTML = `
 `;
 class Fc extends dt {
   constructor() {
-    super(eo);
+    super(to);
   }
   destroy() {
   }
@@ -9734,9 +9710,9 @@ class Fc extends dt {
     return this.shadowRoot.querySelector(".viewport");
   }
 }
-customElements.get("tradex-grid") || window.customElements.define("tradex-grid", Vc);
-const io = document.createElement("template");
-io.innerHTML = `
+customElements.get("tradex-grid") || window.customElements.define("tradex-grid", Fc);
+const eo = document.createElement("template");
+eo.innerHTML = `
 <style>
 
 .legends {
@@ -9883,8 +9859,8 @@ io.innerHTML = `
 <div class="legends">
   <slot name="legend"></slot>
   <div class="controls collapse restored">
-    <span id="hideLegends" class="control" data-icon="hide" style="display:none">${nh}</span>
-    <span id="showLegends" class="control" data-icon="show" style="display:none">${rh}</span>
+    <span id="hideLegends" class="control" data-icon="hide" style="display:none">${sh}</span>
+    <span id="showLegends" class="control" data-icon="show" style="display:none">${nh}</span>
   </div>
 </div>
 `;
@@ -9897,7 +9873,7 @@ class Vc extends dt {
   #s;
   #l = [];
   constructor() {
-    super(io);
+    super(eo);
   }
   destroy() {
   }
@@ -9981,9 +9957,9 @@ class Vc extends dt {
     return i += `<span id="${s}_up" class="control up" data-icon="up">${rh}</span>`, i += `<span id="${s}_down" class="control down" data-icon="down">${oh}</span>`, e?.type === "indicator" && (i += `<span id="${s}_visible" class="control visible" data-icon="visible">${dh}</span>`, i += `<span id="${s}_notVisible" class="control notvisible" data-icon="notVisible">${uh}</span>`), e?.type !== "indicator" && (i += `<span id="${s}_collapse" class="control collapse" data-icon="collapse">${hh}</span>`, i += `<span id="${s}_expand" class="control expand" data-icon="expand">${ch}</span>`, i += `<span id="${s}_maximize" class="control maximize" data-icon="maximize">${lh}</span>`, i += `<span id="${s}_restore" class="control restore" data-icon="restore">${ah}</span>`), i += e?.type !== "chart" ? `<span id="${s}_remove" class="control remove" data-icon="remove">${ih}</span>` : "", i += e?.type !== "secondary" ? `<span id="${s}_config" class="control config" data-icon="config">${Pr}</span>` : "", i;
   }
 }
-customElements.get("tradex-legends") || window.customElements.define("tradex-legends", Gc);
-const so = document.createElement("template");
-so.innerHTML = `
+customElements.get("tradex-legends") || window.customElements.define("tradex-legends", Vc);
+const io = document.createElement("template");
+io.innerHTML = `
 <style>
   :host {
     overflow: hidden;
@@ -10014,7 +9990,7 @@ class Gc extends dt {
   #t;
   #e;
   constructor() {
-    super(so);
+    super(io);
   }
   destroy() {
   }
@@ -10030,9 +10006,9 @@ class Gc extends dt {
     return this.#e;
   }
 }
-customElements.get("tradex-chartpane") || window.customElements.define("tradex-chartpane", Yc);
-const no = document.createElement("template");
-no.innerHTML = `
+customElements.get("tradex-chartpane") || window.customElements.define("tradex-chartpane", Gc);
+const so = document.createElement("template");
+so.innerHTML = `
 <style>
   tradex-grid {
     position: absolute;
@@ -10065,7 +10041,7 @@ class Yc extends dt {
   #r;
   #n;
   constructor() {
-    super(no);
+    super(so);
   }
   destroy() {
   }
@@ -10111,9 +10087,9 @@ class Yc extends dt {
     this.#t = this.#r ? this.#r : this.clientWidth, this.#e = this.#n ? this.#n : this.clientHeight, this.#r = this.clientWidth, this.#n = this.clientHeight;
   }
 }
-customElements.get("tradex-rows") || window.customElements.define("tradex-rows", qc);
-const ro = document.createElement("template");
-ro.innerHTML = `
+customElements.get("tradex-rows") || window.customElements.define("tradex-rows", Yc);
+const no = document.createElement("template");
+no.innerHTML = `
 <style>
   #viewport {
     position: absolute;
@@ -10151,7 +10127,7 @@ class qc extends dt {
   #t;
   #e;
   constructor() {
-    super(ro);
+    super(no);
   }
   destroy() {
   }
@@ -10180,14 +10156,14 @@ class qc extends dt {
     this.rows.style.height = `calc(100% - ${e}px)`, this.rows.style.left = `${i}px`, this.time.style.left = `${i}px`, this.viewport.style.left = `${i}px`;
   }
 }
-customElements.get("tradex-main") || window.customElements.define("tradex-main", Xc);
-const oo = document.createElement("template");
-oo.innerHTML = `
+customElements.get("tradex-main") || window.customElements.define("tradex-main", qc);
+const ro = document.createElement("template");
+ro.innerHTML = `
   <slot></slot>
 `;
 class Xc extends dt {
   constructor() {
-    super(oo);
+    super(ro);
   }
   destroy() {
   }
@@ -10225,9 +10201,9 @@ class Xc extends dt {
     `;
   }
 }
-customElements.get("tradex-tools") || window.customElements.define("tradex-tools", jc);
-const ao = document.createElement("template");
-ao.innerHTML = `
+customElements.get("tradex-tools") || window.customElements.define("tradex-tools", Xc);
+const oo = document.createElement("template");
+oo.innerHTML = `
 <style>
   .viewport {
     width: 100%;
@@ -10249,7 +10225,7 @@ ao.innerHTML = `
 `;
 class jc extends dt {
   constructor() {
-    super(ao);
+    super(oo);
   }
   destroy() {
   }
@@ -10268,8 +10244,8 @@ class jc extends dt {
     return this.shadowRoot.querySelector('slot[name="chartpane"]');
   }
 }
-customElements.get("tradex-scale") || window.customElements.define("tradex-scale", Kc);
-const Zc = `
+customElements.get("tradex-scale") || window.customElements.define("tradex-scale", jc);
+const Kc = `
 <style>
   tradex-tools {
     position: absolute; 
@@ -10301,7 +10277,7 @@ ao.innerHTML = Kc;
 class Zc extends dt {
   #t;
   constructor() {
-    super(lo);
+    super(ao);
   }
   destroy() {
   }
@@ -10349,9 +10325,9 @@ class Zc extends dt {
     this.setYAxisLocation();
   }
 }
-customElements.get("tradex-body") || window.customElements.define("tradex-body", Qc);
-const ho = document.createElement("template");
-ho.innerHTML = `
+customElements.get("tradex-body") || window.customElements.define("tradex-body", Zc);
+const lo = document.createElement("template");
+lo.innerHTML = `
   <style>
     .utilsOptions {
       display: inline-block; float: right;
@@ -10363,7 +10339,7 @@ ho.innerHTML = `
 `;
 class Qc extends dt {
   constructor() {
-    super(ho);
+    super(lo);
   }
   destroy() {
   }
@@ -10394,22 +10370,22 @@ class Qc extends dt {
     `;
   }
 }
-customElements.get("tradex-utils") || window.customElements.define("tradex-utils", Jc);
-const co = document.createElement("template");
-co.innerHTML = `
+customElements.get("tradex-utils") || window.customElements.define("tradex-utils", Qc);
+const ho = document.createElement("template");
+ho.innerHTML = `
   <slot name="widget"></slot>
 `;
 class Jc extends dt {
   constructor() {
-    super(co);
+    super(ho);
   }
   destroy() {
   }
   disconnectedCallback() {
   }
 }
-customElements.get("tradex-widgets") || window.customElements.define("tradex-widgets", td);
-const ed = `
+customElements.get("tradex-widgets") || window.customElements.define("tradex-widgets", Jc);
+const td = `
   <style title="core">
     :host {
       position: relative;
@@ -10538,7 +10514,7 @@ class ed extends dt {
     this.#c = e, this.setUtilsLocation();
   }
   onResized(e) {
-    this.log(`onResize w: ${this.offsetWidth}, h: ${this.offsetHeight}`), this.emit("global_resize", { w: this.offsetWidth, h: this.offsetHeight }), this.MainPane instanceof Qr && this.previousDimensions(), this.ToolsBar instanceof Jr && this.ToolsBar.onResized();
+    this.log(`onResize w: ${this.offsetWidth}, h: ${this.offsetHeight}`), this.emit("global_resize", { w: this.offsetWidth, h: this.offsetHeight }), this.MainPane instanceof Zr && this.previousDimensions(), this.ToolsBar instanceof Qr && this.ToolsBar.onResized();
   }
   previousDimensions() {
     this.#l = this.#h ? this.#h : this.offsetWidth, this.#a = this.#o ? this.#o : this.offsetHeight, this.#h = this.offsetWidth, this.#o = this.offsetHeight;
@@ -10588,24 +10564,24 @@ class ed extends dt {
     }
   }
 }
-const nd = [
+const sd = [
   {
     id: "indicators",
     name: "Indicators",
-    icon: jl,
+    icon: Xl,
     event: "utils_indicators",
     sub: []
   },
   {
     id: "timezone",
     name: "Timezone",
-    icon: Kl,
+    icon: jl,
     event: "utils_timezone"
   },
   {
     id: "screenshot",
     name: "Screenshot",
-    icon: Xl,
+    icon: ql,
     event: "utils_screenshot"
   },
   {
@@ -10614,7 +10590,7 @@ const nd = [
     icon: Pr,
     event: "utils_settings"
   }
-], rd = {
+], nd = {
   name: "AROON",
   camelCaseName: "aroon",
   group: "Momentum Indicators",
@@ -10646,7 +10622,7 @@ const nd = [
     type: "number",
     plot: "line"
   }]
-}, od = {
+}, rd = {
   name: "BBANDS",
   camelCaseName: "bbands",
   group: "Overlap Studies",
@@ -10705,7 +10681,7 @@ const nd = [
     type: "number",
     plot: "limit_lower"
   }]
-}, ad = {
+}, od = {
   name: "EMA",
   camelCaseName: "ema",
   group: "Overlap Studies",
@@ -10730,7 +10706,7 @@ const nd = [
     type: "number",
     plot: "line"
   }]
-}, ld = {
+}, ad = {
   name: "RSI",
   camelCaseName: "rsi",
   group: "Momentum Indicators",
@@ -10755,7 +10731,7 @@ const nd = [
     type: "number",
     plot: "line"
   }]
-}, hd = {
+}, ld = {
   name: "SMA",
   camelCaseName: "sma",
   group: "Overlap Studies",
@@ -10780,7 +10756,7 @@ const nd = [
     type: "number",
     plot: "line"
   }]
-}, cd = {
+}, hd = {
   name: "STOCH",
   camelCaseName: "stoch",
   group: "Momentum Indicators",
@@ -11335,7 +11311,7 @@ const co = {
   SMA: { id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: Ii },
   STOCH: { id: "STOCH", name: "Stochastic Oscillator", event: "addIndicator", ind: Us }
 };
-class dd {
+class cd {
   #t = "Utilities";
   #e = "utils";
   #r;
@@ -11564,13 +11540,13 @@ class vt {
     const e = this.#n, i = `position: absolute; z-index: 1000; display: none; border: 1px solid ${Ji.COLOUR_BORDER}; background: ${Ji.COLOUR_BG}; color: ${Ji.COLOUR_TXT}; box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;`;
     let s = this.content(e);
     return `
-      <div id="${e.id}" class="${Ua}" style="${i}">
+      <div id="${e.id}" class="${Ba}" style="${i}">
         ${s}
       </div>
     `;
   }
   content(e) {
-    const i = `list-style: none; text-align: left; margin:1em 1em 1em -2.5em; min-width: ${ud}px`, s = "padding: .25em 1em .25em 1em; white-space: nowrap;", n = "display: inline-block; width: 4em;", o = "cursor: pointer;", a = `onmouseover="this.style.background ='#222'"`, h = `onmouseout="this.style.background ='none'"`;
+    const i = `list-style: none; text-align: left; margin:1em 1em 1em -2.5em; min-width: ${dd}px`, s = "padding: .25em 1em .25em 1em; white-space: nowrap;", n = "display: inline-block; width: 4em;", o = "cursor: pointer;", a = `onmouseover="this.style.background ='#222'"`, h = `onmouseout="this.style.background ='none'"`;
     let l = `<ul style="${i}">`;
     if (e?.content)
       for (let g of e.content)
@@ -11657,9 +11633,6 @@ class nt {
   }
   set config(e) {
     this.#n = e;
-  }
-  get state() {
-    return this.#i;
   }
   get state() {
     return this.#i;
@@ -12397,42 +12370,6 @@ class I extends ed {
   get elYAxis() {
     return this.#P;
   }
-  set elUtils(e) {
-    this.#S = e;
-  }
-  get elUtils() {
-    return this.#S;
-  }
-  set elTools(e) {
-    this.#p = e;
-  }
-  get elTools() {
-    return this.#p;
-  }
-  set elBody(e) {
-    this.#v = e;
-  }
-  get elBody() {
-    return this.#v;
-  }
-  set elMain(e) {
-    this.#w = e;
-  }
-  get elMain() {
-    return this.#w;
-  }
-  set elTime(e) {
-    this.#g = e;
-  }
-  get elTime() {
-    return this.#g;
-  }
-  set elYAxis(e) {
-    this.#P = e;
-  }
-  get elYAxis() {
-    return this.#P;
-  }
   set elWidgetsG(e) {
     this.#C = e;
   }
@@ -12487,7 +12424,7 @@ class I extends ed {
     return this.#N;
   }
   get TimeUtils() {
-    return ma;
+    return pa;
   }
   get theme() {
     return this.#I;
@@ -12669,13 +12606,13 @@ class I extends ed {
     this.utilsH = e, this.#x.style.height = `${e}px`;
   }
   setToolsW(e) {
-    this.toolsW = e, this.#p.style.width = `${e}px`;
+    this.toolsW = e, this.#g.style.width = `${e}px`;
   }
   setPricePrecision(e) {
-    (!T(e) || e < 0) && (e = ja), this.#q = e;
+    (!T(e) || e < 0) && (e = Xa), this.#q = e;
   }
   setVolumePrecision(e) {
-    (!T(e) || e < 0) && (e = Ka), this.#X = e;
+    (!T(e) || e < 0) && (e = ja), this.#X = e;
   }
   addTheme(e) {
     const i = Mt.create(e, this);
@@ -12692,7 +12629,7 @@ class I extends ed {
       h.el.style.color = `var(--txc-legend-color, ${i.legend.colour})`, h.el.style.font = `var(--txc-legend-font, ${i.legend.font})`;
     for (let a of this.#x.icons)
       a.className == "icon-wrapper" && (a.children[0].style.fill = i.icon.colour);
-    for (let a of this.#p.icons)
+    for (let a of this.#g.icons)
       a.className == "icon-wrapper" && (a.children[0].style.fill = i.icon.colour);
     return o += " }", s.innerHTML = o, !0;
   }
