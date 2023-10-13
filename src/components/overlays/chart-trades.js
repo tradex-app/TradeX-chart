@@ -5,6 +5,7 @@ import Overlay from "./overlay"
 import Trade from "../primitives/trade"
 import { limit } from "../../utils/number"
 import { debounce } from "../../utils/utilities"
+import { isObject } from "../../utils/typeChecks"
 
 const config = {
   dragBar: false,
@@ -35,8 +36,8 @@ export default class chartTrades extends Overlay {
 
     super(target, xAxis, yAxis, theme, parent, params)
 
+    this.settings = params.settings
     this.#trade = new Trade(target, theme)
-    this.emit()
     this.core.on("primary_pointerdown", debounce(this.isTradeSelected, 200, this), this)
     this.#dialogue = this.core.WidgetsG.insert("Dialogue", config)
     this.#dialogue.start()
@@ -48,6 +49,18 @@ export default class chartTrades extends Overlay {
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
   get data() { return this.overlay.data }
+  get settings() { return this.params.settings }
+  set settings(s) { this.doSettings(s) }
+
+  doSettings(s) {
+    if (!isObject(s)) return false
+
+    let t = this.theme.trades
+    for (let e in s) {
+      if (s[e] === undefined) continue
+      t[e] = s[e]
+    }
+  }
 
   isTradeSelected(e) {
     if (this.core.config?.trades?.display === false ||

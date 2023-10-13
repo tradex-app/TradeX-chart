@@ -396,7 +396,7 @@ export default class Indicator extends Overlay {
     
     
         while (start < end) {
-    
+          // fetch the data required to calculate the indicator
           input = this.indicatorInput(start, start + p)
           params = {...params, ...input}
           // let hasNull = params.inReal.find(element => element === null)

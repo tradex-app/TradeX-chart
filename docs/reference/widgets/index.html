@@ -217,6 +217,10 @@
             Indicators
           </a>
       </li><li class="astro-3II7XXMS">
+        <a href="/reference/indicators_custom/" class="astro-3II7XXMS">
+            Custom Indicators
+          </a>
+      </li><li class="astro-3II7XXMS">
         <a href="/reference/indicators_default/" class="astro-3II7XXMS">
             Default Indicators
           </a>
@@ -225,12 +229,20 @@
             TA-Lib Functions
           </a>
       </li><li class="astro-3II7XXMS">
-        <a href="/reference/news_events/" class="astro-3II7XXMS">
-            News Events
+        <a href="/reference/legends/" class="astro-3II7XXMS">
+            Legends
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/overlays/" class="astro-3II7XXMS">
             Overlays
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/overlays_news_events/" class="astro-3II7XXMS">
+            Overlay News Events
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/overlays_trades/" class="astro-3II7XXMS">
+            Overlay Trades
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/range/" class="astro-3II7XXMS">
@@ -253,8 +265,8 @@
             Themes
           </a>
       </li><li class="astro-3II7XXMS">
-        <a href="/reference/trades/" class="astro-3II7XXMS">
-            Trades
+        <a href="/reference/web_workers/" class="astro-3II7XXMS">
+            Web Workers
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/widgets/" aria-current="page" class="astro-3II7XXMS">
@@ -334,6 +346,11 @@
         </a>
         
       </li><li class="astro-G2BYWC46" style="--depth: 0;">
+        <a href="#window" class="astro-G2BYWC46" style="--depth: 0;">
+          <span class="astro-G2BYWC46" style="--depth: 0;">Window</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 0;">
         <a href="#dialogue" class="astro-G2BYWC46" style="--depth: 0;">
           <span class="astro-G2BYWC46" style="--depth: 0;">Dialogue</span>
         </a>
@@ -386,6 +403,11 @@
   <li class="astro-G2BYWC46" style="--depth: 0;">
         <a href="#_top" aria-current="true" class="astro-G2BYWC46" style="--depth: 0;">
           <span class="astro-G2BYWC46" style="--depth: 0;">Overview</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 0;">
+        <a href="#window" class="astro-G2BYWC46" style="--depth: 0;">
+          <span class="astro-G2BYWC46" style="--depth: 0;">Window</span>
         </a>
         
       </li><li class="astro-G2BYWC46" style="--depth: 0;">
@@ -448,12 +470,26 @@
 </div><div class="content-panel astro-7NKWCW3Z">
   <div class="container astro-7NKWCW3Z">
               <div class="content astro-ML6NTD6L"><p>TradeX Chart has a number of widgets, but only a select number are exposed to the developer to make use of. The others are used by default with certain chart components.</p>
+<p>Widgets accessible via the API:</p>
 <ul>
+<li>Config Dialogue</li>
 <li><a href="#dialogue">Dialogue</a></li>
 <li>Progress</li>
+<li>Window</li>
 </ul>
+<p>Widgets are not <a href="../overlays">chart overlays</a>. They are their own special component type that float above all of the other chart components.</p>
+<p>Widgets iterates through the registered widget classes and adding the ones required immediately. eg. Chart pane divider</p>
+<p>Those widgets not immediately required, such as Dialogue, can be added later via the API.</p>
+<h1 id="config-dialogue-window">Config, Dialogue, Window</h1>
+<p><a href="#Window">Window class</a> <code>./src/components/widgets/window.js</code> is the parent for Dialogue and Config.</p>
+<p><a href="#Dialogue">Dialogue</a> (modal) <code>./src/components/widgets/dialogue.js</code> extends Window. It provides an optional title bar, drag bar, close icon.</p>
+<p><a href="#Config">Config Dialogues</a> <code>./src/components/widgets/configDialouge.js</code> then further extend the Dialogue class (to be implemented), by offering special content formatting and positioning for form elements.</p>
+<h2 id="window">Window</h2>
+<p>Window provides a basic floating box with Event Listener that will close the it if you click anywhere outside of it. (TODO: close on key stroke) Windows accept HTML content. Windows will automatically reposition if a chart resize crops or hides them.</p>
+<p>TODO: Window API documentation</p>
 <h2 id="dialogue">Dialogue</h2>
-<p>A dialogue in essence is floating box layer which presents information over the chart content. Dialogues have the following three configurable properties with some being optional.</p>
+<p>A dialogue in essence is floating box layer which presents information over the chart content. By default, the dialogue will also inherit the click outside of behavior from Window that closes it.</p>
+<p>Dialogues have the following configurable properties with some being optional.</p>
 <h3 id="dialogue-config">Dialogue Config</h3>
 
 
@@ -566,7 +602,12 @@
 <span class="line"><span style="color: #B392F0">    dragBar</span><span style="color: #F97583">:</span><span style="color: #B392F0"> { background</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"#888"</span><span style="color: #B392F0"> }</span></span>
 <span class="line"><span style="color: #B392F0">    title: { color</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"#ccc"</span><span style="color: #B392F0"> }</span></span>
 <span class="line"><span style="color: #B392F0">  }</span></span>
-<span class="line"><span style="color: #B392F0">}</span></span></code></pre></div>
+<span class="line"><span style="color: #B392F0">}</span></span></code></pre>
+<h1 id="config-dialogue">Config Dialogue</h1>
+<p><strong>TO BE IMPLEMENTED</strong></p>
+<p>Building upon the ancestor classes of Window and Dialogue, Config offers special formatting and content handling, specifically for forms.</p>
+<p>The class allows for overriding the default handling of the form via a custom callback.</p>
+<p>Config events can also be subscribed for further customization of the Config behaviour.</p></div>
               <footer class="astro-3YYAFB3N">
   <div class="meta flex astro-3YYAFB3N">
     
@@ -578,12 +619,12 @@
     </p>
   </div>
   <div class="pagination-links flex astro-WI2SPLHG" dir="ltr">
-  <a href="/reference/trades/" rel="prev" class="astro-WI2SPLHG">
+  <a href="/reference/web_workers/" rel="prev" class="astro-WI2SPLHG">
         <svg aria-hidden="true" class="astro-WI2SPLHG astro-HURVU4DH" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41002L12.71 7.71C12.8983 7.5217 13.0041 7.2663 13.0041 7C13.0041 6.7337 12.8983 6.47831 12.71 6.29C12.5217 6.1017 12.2663 5.99591 12 5.99591C11.7337 5.99591 11.4783 6.1017 11.29 6.29L6.29002 11.29C6.19898 11.3851 6.12761 11.4973 6.08002 11.62C5.98 11.8635 5.98 12.1365 6.08002 12.38C6.12761 12.5028 6.19898 12.6149 6.29002 12.71L11.29 17.71C11.383 17.8037 11.4936 17.8781 11.6154 17.9289C11.7373 17.9797 11.868 18.0058 12 18.0058C12.132 18.0058 12.2627 17.9797 12.3846 17.9289C12.5065 17.8781 12.6171 17.8037 12.71 17.71C12.8037 17.617 12.8781 17.5064 12.9289 17.3846C12.9797 17.2627 13.0058 17.132 13.0058 17C13.0058 16.868 12.9797 16.7373 12.9289 16.6154C12.8781 16.4936 12.8037 16.383 12.71 16.29L9.41002 13H17C17.2652 13 17.5196 12.8946 17.7071 12.7071C17.8947 12.5196 18 12.2652 18 12C18 11.7348 17.8947 11.4804 17.7071 11.2929C17.5196 11.1054 17.2652 11 17 11Z"/></svg>
         <span class="astro-WI2SPLHG">
           Previous
           <br class="astro-WI2SPLHG">
-          <span class="link-title astro-WI2SPLHG">Trades</span>
+          <span class="link-title astro-WI2SPLHG">Web Workers</span>
         </span>
       </a>
   <a href="/api/core/" rel="next" class="astro-WI2SPLHG">

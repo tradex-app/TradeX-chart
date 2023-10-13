@@ -367,6 +367,13 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
+"reference/indicators_custom.md": {
+	id: "reference/indicators_custom.md";
+  slug: "reference/indicators_custom";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "reference/indicators_default.md": {
 	id: "reference/indicators_default.md";
   slug: "reference/indicators_default";
@@ -381,9 +388,9 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
-"reference/news_events.md": {
-	id: "reference/news_events.md";
-  slug: "reference/news_events";
+"reference/legends.md": {
+	id: "reference/legends.md";
+  slug: "reference/legends";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
@@ -391,6 +398,20 @@ declare module 'astro:content' {
 "reference/overlays.md": {
 	id: "reference/overlays.md";
   slug: "reference/overlays";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/overlays_news_events.md": {
+	id: "reference/overlays_news_events.md";
+  slug: "reference/overlays_news_events";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/overlays_trades.md": {
+	id: "reference/overlays_trades.md";
+  slug: "reference/overlays_trades";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
@@ -430,9 +451,9 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
-"reference/trades.md": {
-	id: "reference/trades.md";
-  slug: "reference/trades";
+"reference/web_workers.md": {
+	id: "reference/web_workers.md";
+  slug: "reference/web_workers";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">

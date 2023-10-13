@@ -4,10 +4,21 @@
 
   </head>
   <body>
-    <script type="module" src="../src/helpers/webWorkers.js"></script>
-    <script>
-      // const test = new window.WebWorker()
-      // console.log(test)
+    <script type="module">
+      import WebWorker from "../src/helpers/webWorkers.js"
+
+      function doSomething(x) { 
+        console.log(x)
+        return `I did something. ${x}`
+      }
+      // const test = new window.WebWorker(doSomething)
+      const test = WebWorker.create(doSomething)
+      const result = test.postMessage("bla")
+      console.log(result)
+      result.then(
+        (r) => {console.log(`main thread: ${r}`)}
+      )
+
     </script>
   </body>
 </html>

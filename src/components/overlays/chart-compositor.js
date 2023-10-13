@@ -24,7 +24,7 @@ export default class chartCompositor extends Overlay{
     ctx.save();
 
     const chart = this.core.MainPane.chart
-    this.scene.context.drawImage(
+    ctx.drawImage(
       chart.graph.viewport.scene.canvas,
       0,
       0,
@@ -36,7 +36,7 @@ export default class chartCompositor extends Overlay{
     for (let oc of this.core.MainPane.secondaryPanes.values()) {
       x = 0
       h = oc.graph.viewport.scene.height
-      this.scene.context.drawImage(
+      ctx.drawImage(
         oc.graph.viewport.scene.canvas,
         x,
         y,
@@ -50,7 +50,7 @@ export default class chartCompositor extends Overlay{
     const rowsH = this.core.MainPane.rowsH
     x = 0
     y = rowsH
-    this.scene.context.drawImage(
+    ctx.drawImage(
       time.graph.viewport.scene.canvas,
       x,
       y,

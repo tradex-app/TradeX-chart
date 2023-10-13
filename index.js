@@ -5,12 +5,13 @@ import * as talib from './node_modules/talib-web/lib/index.esm'
 // let state = undefined
 import state1 from './data/1hour.js'
 import state2 from './data/data_btc_1m.js'
+import state3 from './data/ohlcv_15m_BTC.js'
+import decimals from './data/ohlcv_1d_IMPT'
+import btcusdt_15min from './data/btcusdt_15min'
 // import state4 from './data/seconds.js'
 // import state from './data/seconds-indicator'
 import TEST from './custom-indicator'
 import DMI from './DMI'
-
-import data from "./data/data"
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
@@ -610,14 +611,315 @@ const config6 = {
   wasm: wasm,
   state: state1_5b
 }
+const config7 = {
+  // id: "TradeX_test",
+  title: "BTC/USDT",
+  symbol: "btcusdt",
+  // width: 600,
+  // height: 500,
+  utils: {},
+  tools: {},
+  timeFrame: "15m",
+  range: {
+    startTS: rangeStartTS, // state1.ohlcv.slice(-1)[0][0],
+    initialCnt: 30,
+    limitFuture: LIMITFUTURE,
+    limitPast: LIMITPAST,
+    minCandles: MINCANDLES,
+    maxCandles: MAXCANDLES,
+    yAxisBounds: 0.3,
+    center: true
+  },
+  theme: {
+    candle: {
+      Type: "candle_down_hollow",
+      UpBodyColour: "#FAEB2488",
+      UpWickColour: "#FAEB24",
+      DnBodyColour: "#F900FE88",
+      DnWickColour: "#F900FE",
+    },
+    volume: {
+      Height: 15,
+      UpColour: "#FAEB2444",
+      DnColour: "#F900FE44",
+    },
+    xAxis: {
+      tickMarker: false,
+    },
+    yAxis: {
+      tickMarker: false,
+    },
+    chart: {
+      Background: "#141414",
+      BorderColour: "#141414",
+      GridColour: "#303030",
+      TextColour: "#c0c0c0"
+    },
+    primaryPane: {
+
+    },
+    tools: {
+      location: false
+    },
+    utils: {
+      location: false
+    },
+    time: {
+      navigation: false
+    },
+    legend: {
+       controls: true
+    }
+  },
+  watermark: {
+    text: "BTC/USDT"
+  },
+  highLow: true,
+  isCrypto: true,
+  logs: true,
+  infos: true,
+  warnings: true,
+  errors: true,
+  stream: streamVal,
+  maxCandleUpdate: 250,
+  talib: talib,
+  wasm: wasm,
+  state: state3,
+  callbacks: {
+    indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
+  }
+}
+const config8 = {
+  // id: "TradeX_test",
+  title: "IMPT/USDT",
+  symbol: "imptusdt",
+  // width: 600,
+  // height: 500,
+  utils: {},
+  tools: {},
+  timeFrame: "1d",
+  range: {
+    startTS: rangeStartTS, // state1.ohlcv.slice(-1)[0][0],
+    initialCnt: 30,
+    limitFuture: LIMITFUTURE,
+    limitPast: LIMITPAST,
+    minCandles: MINCANDLES,
+    maxCandles: MAXCANDLES,
+    yAxisBounds: 0.3,
+    center: true
+  },
+  theme: {
+    candle: {
+      Type: "candle_down_hollow",
+      UpBodyColour: "#FAEB2488",
+      UpWickColour: "#FAEB24",
+      DnBodyColour: "#F900FE88",
+      DnWickColour: "#F900FE",
+    },
+    volume: {
+      Height: 15,
+      UpColour: "#FAEB2444",
+      DnColour: "#F900FE44",
+    },
+    xAxis: {
+      tickMarker: false,
+    },
+    yAxis: {
+      tickMarker: false,
+    },
+    chart: {
+      Background: "#141414",
+      BorderColour: "#141414",
+      GridColour: "#303030",
+      TextColour: "#c0c0c0"
+    },
+    primaryPane: {
+
+    },
+    tools: {
+      location: false
+    },
+    utils: {
+      location: false
+    },
+    time: {
+      navigation: false
+    },
+    legend: {
+       controls: true
+    }
+  },
+  watermark: {
+    text: "BTC/USDT"
+  },
+  highLow: true,
+  isCrypto: true,
+  logs: true,
+  infos: true,
+  warnings: true,
+  errors: true,
+  stream: streamVal,
+  maxCandleUpdate: 250,
+  talib: talib,
+  wasm: wasm,
+  state: decimals,
+  callbacks: {
+    indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
+  }
+}
+const dre =   {
+  id: "Midnight",
+  title: "BTC/USDT",
+  symbol: "btcusdt",
+    utils: {},
+    tools: {},
+    range: {
+      initialCnt: 30,
+      limitPast: 96 / 12,
+      limitFuture: 96,
+    },
+    theme: {
+    candle: {
+      Type: "candle_solid",
+      AreaLineColour: "#4c5fe7",
+      AreaFillColour: ["#4c5fe780", "#4c5fe700"],
+
+      UpBodyColour: "#4c5fe7",
+      UpWickColour: "#4c5fe7",
+      DnBodyColour: "#2e384f88",
+      DnWickColour: "#2e384f",
+    },
+      volume: {
+        Height: 15,
+        UpColour: "#4bc67c",
+        DnColour: "#2e384f",
+      },
+      xAxis: {
+        colourTick: "#6a6f80",
+        colourLabel: "#6a6f80",
+        colourCursor: "#2A2B3A",
+        colourCursorBG: "#aac0f7",
+        slider: "#586ea6",
+        handle: "#586ea688",
+        tickMarker: false,
+      },
+      yAxis: {
+        colourTick: "#6a6f80",
+        colourLabel: "#6a6f80",
+        colourCursor: "#2A2B3A",
+        colourCursorBG: "#aac0f7",
+        tickMarker: false,
+        location: "right",
+      },
+    chart: {
+      Background: "#0f1213",
+      BorderColour: "#00000000",
+      BorderThickness: 1,
+      GridColour: "#191e26",
+      TextColour: "#6a6f80"
+    },
+      onChart: {},
+      offChart: {},
+      time: {
+        navigation: false,
+        colour: "#96a9db",
+        handleColour: "#586ea6",
+      },
+      legend: {
+        colour: "#96a9db",
+        controls: true,
+      },
+      icon: {
+        colour: "#748bc7",
+        hover: "#96a9db",
+      },
+      tools: {
+        location: false,
+      },
+      utils: {
+        location: false,
+      }
+    },
+    // trades: { 
+    //   display: true,
+    //   displayInfo: true 
+    // },
+    deepValidate: false,
+  isCrypto: true,
+  logs: false,
+  infos: true,
+  warnings: true,
+    errors: true,
+    maxCandleUpdate: 250,
+    talib,
+    wasm: wasm,
+    state: {
+      ohlcv: btcusdt_15min,
+      primary: [
+        {
+          "name": "Trades",
+          "type": "trades",
+          "settings": {
+              "z-index": 5,
+              "legend": false
+          },
+          data: {
+            1695906000000: [
+                {
+                  timestamp: 1695906000000,
+                  id: "012336352",
+                  side: "buy",
+                  price: 27032,
+                  amount: 0.25,
+                  filled: 0.25,
+                  average: 27032,
+                  total: 27032,
+                  tag: "Bot ABC - BTC/USDT"
+                }
+              ],
+              1695945600000: [
+                {
+                  timestamp: 1695945600000,
+                  id: "012335353",
+                  side: "sell",
+                  price: 27032,
+                  amount: 0.25,
+                  filled: 0.25,
+                  average: 27032,
+                  total: 27032,
+                  tag: "Bot ABC - BTC/USDT"
+                }
+              ],
+              1696327200000: [
+                {
+                  timestamp: 1696327200000,
+                  id: "012335354",
+                  side: "sell",
+                  price: 27550.6,
+                  amount: 0.25,
+                  filled: 0.25,
+                  average: 27550.6,
+                  total: 27550.6,
+                  tag: "Bot ABC - BTC/USDT"
+                }
+              ]
+            }
+        }
+      ]
+    }
+  };
 
 const configs = [
+  {config: dre, stream: null},
+
   {config: config1, stream: null},
-  {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
-  {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
-  {config: config6, stream: null},
+  // {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  // {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
+  // {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  // {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
+  // {config: config6, stream: null},
+  // {config: config8, stream: null},
+  // {config: config7, stream: null},
 ]
 
 const main = DOM.findBySelector('main')
@@ -847,11 +1149,13 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
-addChart()
-addChart()
-addChart()
-addChart()
-addChart()
+// addChart()
+// addChart()
+// addChart()
+// addChart()
+// addChart()
+// addChart()
+
 
 // add custom indicator definition
 chart0.setIndicators({

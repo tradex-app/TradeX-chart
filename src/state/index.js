@@ -1,6 +1,7 @@
 // state.js
 // Data state management for the entire chart component library thingy
 
+import * as packageJSON from '../../package.json'
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import Dataset from '../model/dataset'
 import { validateDeep, validateShallow, sanitizeCandles } from '../model/validateData'
@@ -13,6 +14,7 @@ import TradeXchart from '../core'
 
 const DEFAULTSTATEID = "defaultState"
 const DEFAULT_STATE = {
+  version: packageJSON.version,
   id: DEFAULTSTATEID,
   key: "",
   status: "default",
@@ -33,7 +35,10 @@ const DEFAULT_STATE = {
   secondary: [],
   datasets: [],
   tools: {},
-  trades: {},
+  trades: {
+    display: true,
+    displayInfo: true
+  },
   events: {},
   annotations: {}
 }
@@ -61,6 +66,7 @@ const EVENT = {
 export default class State {
 
   static #stateList = new xMap()
+  static #dss = {}
   
   static get default() { return copyDeep(DEFAULT_STATE) }
   static get list() { return State.#stateList }
@@ -219,6 +225,7 @@ export default class State {
     data.views.get("primary").pop()
     // convert Map/() to array
     data.views = Array.from(data.views)
+    data.version = packageJSON.version
 
     switch(type) {
       case "json":
@@ -232,7 +239,6 @@ export default class State {
   #id = ""
   #key = ""
   #data = {}
-  #dss = {}
   #core
   #status = false
   #isEmpty = true

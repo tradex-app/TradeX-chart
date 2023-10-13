@@ -7,6 +7,7 @@ import Indicator from './components/overlays/indicator'
 import { Range, detectInterval } from './model/range'
 import { copyDeep, mergeDeep, uid } from './utils/utilities'
 import { isPromise } from './utils/typeChecks'
+import { talibAPI } from './definitions/talib-api'
 
 // export default Chart
 export { 
@@ -15,7 +16,8 @@ export {
   copyDeep, 
   DOM, 
   StateMachine,
-  Indicator, 
+  Indicator,
+  talibAPI,
   isPromise,
   mergeDeep, 
   Overlay, 

@@ -10,6 +10,15 @@ Assign the chart instance to a global variable and explore via the console.
 
 ## Chart Root
 
+### Chart Version
+
+return TradeX-chart version number.
+
+```javascript
+chart0.version
+// 0.139.8
+```
+
 ### Chart ID
 
 if no ID is provided in the chart config, a unique one will be auto-generated.

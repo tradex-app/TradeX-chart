@@ -6,19 +6,35 @@ import { uid } from "../utils/utilities";
 import { isFunction, isString } from '../utils/typeChecks'
 // import { timestampDiff } from "../utils/time";
 
+
+// executes a function on a worker
 class ThreadWorker {
 
   #fn
 
+  /**
+   * Creates an instance of ThreadWorker.
+   * @param {function} fn
+   * @memberof ThreadWorker
+   */
   constructor (fn) {
     this.#fn = fn
     self.onmessage = m => this._onmessage(m.data)
   }
 
+ /**
+  * passes data to worker function and returns the result
+  * @param {object} m - message object {r, data}
+  */
   _onmessage (m) {
     const {r, data} = m
-    const result = this.#fn(data)
-    self.postMessage({r, result})
+    try{
+      const result = this.#fn(data, r)
+      self.postMessage({r, status: true, result})
+    }
+    catch (e) {
+      self.postMessage({r, status: false, result: e})
+    }
   }
 
   end() {
@@ -44,15 +60,23 @@ class Thread {
       const fn = ${fn}
       const worker = new ThreadWorker(fn)
     `
-    const blob = new Blob([`;(() => {${workerFn}})()`], { type: 'text/javascript' })
+    const blob = new Blob([`;(async () => {${workerFn}})().catch(e => {console.error(e)})`], { type: 'text/javascript' })
     const blobURL = URL.createObjectURL(blob)
     this.#worker = new Worker(blobURL);
-    URL.revokeObjectURL(blobURL);
+    // FireFox throws error when this is executed
+    // URL.revokeObjectURL(blobURL);
   }
 
   get id() { return this.#id }
-  get req() { return `r_${this.#req}` }
+  get req() { return `r_${this.#req++}` }
+  get cb() { return this.#cb }
+  set cb(cb) { this.#cb = cb }
 
+  /**
+   * handle return message
+   * @param {*} m - result from worker thread
+   * @returns {*} - either pure result or callback modified result. If callback returns nothing, no result is returned in the promise (undefined).
+   */
   onmessage(m) {
     return (isFunction(this.#cb))? this.#cb(m) : m
   }
@@ -67,15 +91,24 @@ class Thread {
         let r = this.req
         this.#reqList[r] = {resolve, reject}
 
-        this.#worker.postMessage({r: r, data: m})
+        this.#worker.postMessage({r, data: m})
 
         this.#worker.onmessage = m => {
-          const {r, result} = m.data
+          const {r, status, result} = m.data
           if (r in this.#reqList) {
             const {resolve, reject} = this.#reqList[r]
             delete this.#reqList[r]
-            resolve(this.onmessage(result))
+            if (status) {
+              resolve(this.onmessage(result))
+            }
+            else {
+              reject(this.onerror({r, result}))
+            }
           }
+          else if (status == "resolved")
+            this.onmessage(result)
+          else
+            throw new Error("Orphaned thread request ${r}")
         }
 
         this.#worker.onerror = e => {
@@ -106,7 +139,7 @@ export default class WebWorker {
 
   static Thread = Thread
 
-  static create(ID="worker", worker, cb, core) {
+  static create(worker, ID="worker", cb) {
     if (typeof window.Worker === "undefined") return false
     if (isFunction(worker)) {
       worker = worker.toString()
@@ -141,12 +174,11 @@ export default class WebWorker {
 
 
 
-// const doSomethingStr = doSomething.toString()
 // function doSomething(x) { 
 //   return `I did something. ${x}`
 // }
 
-// const test = WebWorker.create("WT", doSomethingStr)
+// const test = WebWorker.create(doSomethingStr)
 // // const result = await test.postMessage("bla")
 // // console.log(result)
 

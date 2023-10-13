@@ -86,22 +86,42 @@ export function getPrototypeAt(level, obj) {
  * @returns {Object}  
  */
 export function copyDeep(obj) {
-  if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
-      return obj;
-
-  if (obj instanceof Date)
-      var temp = new obj.constructor(); //or new Date(obj);
-  else
-      var temp = Array.isArray(obj) ? [] : {}  // obj.constructor();
-
-  for (var key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-          obj['isActiveClone'] = null;
-          temp[key] = copyDeep(obj[key]);
-          delete obj['isActiveClone'];
-      }
+  try {
+    if (window.structuredClone) return structuredClone(obj)
   }
-  return temp;
+  catch (e) {
+    if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
+    return obj;
+
+    let temp;
+    if (obj instanceof Date)
+        temp = new obj.constructor(); //or new Date(obj);
+    else
+        temp = Array.isArray(obj) ? [] : {}  // obj.constructor();
+
+    for (let key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            obj['isActiveClone'] = null;
+            temp[key] = copyDeep(obj[key]);
+            delete obj['isActiveClone'];
+        }
+    }
+    return temp;
+  }
+}
+
+export function objToString(obj, ndeep) {
+  if(obj == null){ return String(obj); }
+  switch(typeof obj){
+    case "string": return '"'+obj+'"';
+    case "function": return obj.toString();
+    case "object":
+      var indent = Array(ndeep||1).join('\t'), isArray = Array.isArray(obj);
+      return '{['[+isArray] + Object.keys(obj).map(function(key){
+           return '\n\t' + indent + key + ': ' + objToString(obj[key], (ndeep||1)+1);
+         }).join(',') + '\n' + indent + '}]'[+isArray];
+    default: return obj.toString();
+  }
 }
 
 /**
@@ -675,12 +695,84 @@ export const extender = (baseClass, ...mixins) => {
 /**
  * return promise state: fulfilled, rejected, pending
  * @export
- * @param {*} p
- * @returns {*}  
+ * @param {Promise} p - Promise
+ * @returns {string} - pending, fulfilled, rejected
  */
 export function promiseState(p) {
   const t = {};
   return Promise.race([p, t])
     .then(v => (v === t)? "pending" : "fulfilled", () => "rejected");
+}
+
+/**
+ * array buffer to string (UTF-16)
+ * @param {ArrayBuffer} buf - TypedArray
+ * @return {string} 
+ */
+export function ab2str(buf) {
+  return String.fromCharCode.apply(null, new Uint16Array(buf));
+}
+
+/**
+ * convert string to ArrayBuffer (TypedArray)
+ * @param {string} str
+ * @return {ArrayBuffer}  
+ */
+export function str2ab(str) {
+  var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+  var bufView = new Uint16Array(buf);
+  for (var i=0, strLen=str.length; i<strLen; i++) {
+    bufView[i] = str.charCodeAt(i);
+  }
+  return buf;
+}
+
+/**
+ * encode an ArrayBuffer or string as PNG for storage
+ * @export
+ * @param {ArrayBuffer|string} src - data to encode
+ * @return {dataURL|base64} - PNG image resource
+ */
+export function encodePNGDataStore(src) {
+  const canvas = document.createElement('canvas')
+  // canvas width and height
+  const ctx = canvas.getContext('2d');
+  let buffer;
+  
+  if (src.isView(src)) buffer = src
+  else if (typeof src === "string") buffer = str2ab(src);
+
+  // typed array represents an array of 8-bit unsigned integers clamped to 0–255
+  const imgData = new Uint8ClampedArray.from(buffer)
+  const len = imgData.length
+  // set canvas size to imgData length
+  canvas.height = 1
+  canvas.width = len
+
+  ctx.putImageData(imgData)
+  // Convert canvas to DataURL
+  // data:image/png;base64,wL2dvYWwgbW9yZ...
+  const dataURL = ctx.toDataURL();
+  // Convert to Base64 string
+  // wL2dvYWwgbW9yZ...
+  const base64 = getBase64StringFromDataURL(dataURL);
+
+  return {dataURL, base64}
+}
+
+export function decodePNGDataStore(src, cb, type="string") {
+  const img = new Image();
+  const ctx = document.createElement('canvas').getContext('2d');
+  img.src = src;
+  return img.decode().then(() => {
+      // Draw image to canvas
+      ctx.width = img.width;
+      ctx.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      // Retrieve RGBA data
+      const data = ctx.getImageData(0, 0, img.width, img.height).data;
+      const result = (type === "string") ? ab2str(data) : data
+      cb(result)
+  });
 }
 

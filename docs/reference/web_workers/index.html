@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr" data-has-toc data-has-sidebar class="astro-NYFQ2LET">
   <head>
-    <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Trades</title><link rel="canonical"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v2.7.0"/><meta name="generator" content="Starlight v0.3.0"/><meta property="og:title" content="Trades"/><meta property="og:type" content="article"/><meta property="og:url"/><meta property="og:locale" content="en"/><meta property="og:description" content="Trade data and markers"/><meta property="og:site_name" content="TradeX Chart"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Trades"/><meta name="twitter:description" content="Trade data and markers"/><meta name="description" content="Trade data and markers"/>
+    <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Web Workers</title><link rel="canonical"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v2.7.0"/><meta name="generator" content="Starlight v0.3.0"/><meta property="og:title" content="Web Workers"/><meta property="og:type" content="article"/><meta property="og:url"/><meta property="og:locale" content="en"/><meta property="og:description" content="Web workers for parallel processing of functions"/><meta property="og:site_name" content="TradeX Chart"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Web Workers"/><meta name="twitter:description" content="Web workers for parallel processing of functions"/><meta name="description" content="Web workers for parallel processing of functions"/>
     
   <link rel="stylesheet" href="/_astro/404.f2fdefd3.css" />
 <link rel="stylesheet" href="/_astro/Icon.astro_astro_type_style_index_0_lang.93b311ba.css" /><script type="module" src="/_astro/hoisted.1c9463d4.js"></script></head>
@@ -217,6 +217,10 @@
             Indicators
           </a>
       </li><li class="astro-3II7XXMS">
+        <a href="/reference/indicators_custom/" class="astro-3II7XXMS">
+            Custom Indicators
+          </a>
+      </li><li class="astro-3II7XXMS">
         <a href="/reference/indicators_default/" class="astro-3II7XXMS">
             Default Indicators
           </a>
@@ -225,12 +229,20 @@
             TA-Lib Functions
           </a>
       </li><li class="astro-3II7XXMS">
-        <a href="/reference/news_events/" class="astro-3II7XXMS">
-            News Events
+        <a href="/reference/legends/" class="astro-3II7XXMS">
+            Legends
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/overlays/" class="astro-3II7XXMS">
             Overlays
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/overlays_news_events/" class="astro-3II7XXMS">
+            Overlay News Events
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/overlays_trades/" class="astro-3II7XXMS">
+            Overlay Trades
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/range/" class="astro-3II7XXMS">
@@ -253,8 +265,8 @@
             Themes
           </a>
       </li><li class="astro-3II7XXMS">
-        <a href="/reference/trades/" aria-current="page" class="astro-3II7XXMS">
-            Trades
+        <a href="/reference/web_workers/" aria-current="page" class="astro-3II7XXMS">
+            Web Workers
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/widgets/" class="astro-3II7XXMS">
@@ -333,36 +345,6 @@
           <span class="astro-G2BYWC46" style="--depth: 0;">Overview</span>
         </a>
         
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#trade-markers" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Trade Markers</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#trade-entry" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Trade Entry</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#add-trade" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Add Trade</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#remove-trade" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Remove Trade</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#trade-state-data" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Trade State Data</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#trade-marker-event" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Trade Marker Event</span>
-        </a>
-        
       </li>
 </ul>
       </div>
@@ -379,36 +361,6 @@
   <li class="astro-G2BYWC46" style="--depth: 0;">
         <a href="#_top" aria-current="true" class="astro-G2BYWC46" style="--depth: 0;">
           <span class="astro-G2BYWC46" style="--depth: 0;">Overview</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#trade-markers" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Trade Markers</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#trade-entry" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Trade Entry</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#add-trade" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Add Trade</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#remove-trade" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Remove Trade</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#trade-state-data" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Trade State Data</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#trade-marker-event" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Trade Marker Event</span>
         </a>
         
       </li>
@@ -428,87 +380,35 @@
           <div class="content-panel astro-7NKWCW3Z">
   <div class="container astro-7NKWCW3Z">
               <h1 id="_top" data-page-title style="font-size: var(--sl-text-h1); line-height: var(--sl-line-height-headings); font-weight: 600; color: var(--sl-color-white); margin-top: 1rem;" class="astro-NYFQ2LET">
-                Trades
+                Web Workers
               </h1>
               </div>
 </div><div class="content-panel astro-7NKWCW3Z">
   <div class="container astro-7NKWCW3Z">
-              <div class="content astro-ML6NTD6L"><p>Currently trade data can only be added to the chart via the <a href="../state">initial data state provide via the config</a>. It will be in the near future be possible to add trades via the API.</p>
-<h2 id="trade-markers">Trade Markers</h2>
-<p>Trade makers representing buy or sell, are placed on the primary chart pane, above the individual price history intervals (candles) they are associated with via their timestamp.</p>
-<p>TradeX Chart provides a number of marker icon options. Their size and colour is also configurable. The <a href="../themes#trades">theming configuration</a> has more details.</p>
-<h2 id="trade-entry">Trade Entry</h2>
-<p>An individual trade entry has the following format:</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">trade</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {</span></span>
-<span class="line"><span style="color: #B392F0">  timestamp</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">1558605600000</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #6B737C">// number - time stamp</span></span>
-<span class="line"><span style="color: #B392F0">  id</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"012336352"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0">          </span><span style="color: #6B737C">// string - trade id</span></span>
-<span class="line"><span style="color: #B392F0">  side</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"buy"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0">              </span><span style="color: #6B737C">// string - buy or sell</span></span>
-<span class="line"><span style="color: #B392F0">  price</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">7590</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0">              </span><span style="color: #6B737C">// number</span></span>
-<span class="line"><span style="color: #B392F0">  amount</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0.25</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0">             </span><span style="color: #6B737C">// number</span></span>
-<span class="line"><span style="color: #B392F0">  filled</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0.25</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0">             </span><span style="color: #6B737C">// number</span></span>
-<span class="line"><span style="color: #B392F0">  average</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">7845</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0">            </span><span style="color: #6B737C">// number</span></span>
-<span class="line"><span style="color: #B392F0">  total</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">1961</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0">              </span><span style="color: #6B737C">// number</span></span>
-<span class="line"><span style="color: #B392F0">  tag</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"Bot ABC - BTC/USDT"</span><span style="color: #B392F0"> </span><span style="color: #6B737C">// string - user defined identifier</span></span>
-<span class="line"><span style="color: #B392F0">}</span></span></code></pre>
-<h2 id="add-trade">Add Trade</h2>
-<p>A single trade can be added to the chart data state via the following:</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart</span><span style="color: #B392F0">.addTrade(trade)</span></span></code></pre>
-<p>Where the <a href="#trade-entry">trade entry object format</a> is defined in the previous section. <code>addTrade()</code> will validate the trade entry and return a boolean as the result.</p>
-<h2 id="remove-trade">Remove Trade</h2>
-<p>Not implemented yet.</p>
-<h2 id="trade-state-data">Trade State Data</h2>
-<p>The <a href="../state">chart State Data</a> provides a collection of all of the trades that can be displayed on the chart. <a href="#trade-entry">Trade entries (objects)</a> are grouped by timestamp in an array as it may be possible that multiple trades may be executed on the same time interval (candle).</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">config</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {</span></span>
-<span class="line"><span style="color: #B392F0">ohlcv</span><span style="color: #F97583">:</span><span style="color: #B392F0"> []</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">primary</span><span style="color: #F97583">:</span><span style="color: #B392F0"> []</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">secondary</span><span style="color: #F97583">:</span><span style="color: #B392F0"> []</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">trades</span><span style="color: #F97583">:</span><span style="color: #B392F0"> {</span></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #F8F8F8">1558605600000</span><span style="color: #F97583">:</span><span style="color: #B392F0"> [</span></span>
-<span class="line"><span style="color: #B392F0">    {</span></span>
-<span class="line"><span style="color: #B392F0">      timestamp</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">1558605600000</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      id</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"012336352"</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      side</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"buy"</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      price</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">7590</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      amount</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0.25</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      filled</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0.25</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      average</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">7845</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      total</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">1961</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      tag</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"Bot ABC - BTC/USDT"</span></span>
-<span class="line"><span style="color: #B392F0">    }</span></span>
-<span class="line"><span style="color: #B392F0">  ]</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #F8F8F8">1558670400000</span><span style="color: #F97583">:</span><span style="color: #B392F0"> [</span></span>
-<span class="line"><span style="color: #B392F0">    {</span></span>
-<span class="line"><span style="color: #B392F0">      timestamp</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">1558670400000</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      id</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"012335353"</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      side</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"sell"</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      price</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">7844</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      amount</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0.25</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      filled</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0.25</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      average</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">7845</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      total</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">1961</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">      tag</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"Bot ABC - BTC/USDT"</span></span>
-<span class="line"><span style="color: #B392F0">    }</span></span>
-<span class="line"><span style="color: #B392F0">  ]</span></span>
+              <div class="content astro-ML6NTD6L"><p>TradeX provides an API for the implementation of Web Workers and promises to run sync heavy functions in a worker (process) and get the result in a promise.</p>
+<p>Currently the API only makes provision for inline Web Workers, which means a function has to be passed to the <code>WebWorker.create()</code> static method, either as a defined function object or as text (JavaScript source code).</p>
+<p><code>WebWorker.create()</code> returns an instance.</p>
+<p>Data can then be passed to the worker via <code>worker.postMessage()</code>. Workers accept data of the JavaScript types listed in the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">MDN documentation</a>.</p>
+<p><code>worker.postMessage()</code> returns a promise which when resolved will contain the result from the Web Worker.</p>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">function</span><span style="color: #B392F0"> doSomething(x) { </span></span>
+<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">return</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">`I did something. </span><span style="color: #F97583">${</span><span style="color: #B392F0">x</span><span style="color: #F97583">}</span><span style="color: #FFAB70">`</span></span>
 <span class="line"><span style="color: #B392F0">}</span></span>
-<span class="line"><span style="color: #B392F0">}</span></span></code></pre>
-<h2 id="trade-marker-event">Trade Marker Event</h2>
-<p>By default, if a trade marker is clicked, it will invoke the trades overlay method which will display the trade data over the chart.</p>
-<p>This can be disabled via the <a href="../../02_configuration">chart config</a>.</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">config</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {</span></span>
-<span class="line"><span style="color: #B392F0">  trades</span><span style="color: #F97583">:</span><span style="color: #B392F0"> { </span></span>
-<span class="line"><span style="color: #B392F0">    display</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">true</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">    displayInfo</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">false</span><span style="color: #B392F0"> </span></span>
-<span class="line"><span style="color: #B392F0">  }</span></span>
-<span class="line"><span style="color: #B392F0">}</span></span></code></pre>
-<p>The chart emits a <code>trade_selected</code> <a href="../../events">event</a> which you can subscribe to and invoke your own method.</p>
-<p>The event will pass the information for that <a href="#trade-entry">trade entry</a> to the subscribed event listener.</p></div>
+<span class="line"></span>
+<span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">test</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">WebWorker</span><span style="color: #B392F0">.create(doSomethingStr)</span></span>
+<span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">result</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #F97583">await</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">test</span><span style="color: #B392F0">.postMessage(</span><span style="color: #FFAB70">"bla"</span><span style="color: #B392F0">)</span></span>
+<span class="line"><span style="color: #79B8FF">console</span><span style="color: #B392F0">.log(result)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #6B737C">// or </span></span>
+<span class="line"></span>
+<span class="line"><span style="color: #79B8FF">test</span><span style="color: #B392F0">.postMessage(</span><span style="color: #FFAB70">"bla"</span><span style="color: #B392F0">)</span></span>
+<span class="line"><span style="color: #B392F0">.then(r </span><span style="color: #F97583">=></span><span style="color: #B392F0"> </span><span style="color: #79B8FF">console</span><span style="color: #B392F0">.log(r))</span></span></code></pre></div>
               <footer class="astro-3YYAFB3N">
   <div class="meta flex astro-3YYAFB3N">
     
     <p>
       Last updated:
-      <time datetime="2023-07-31T18:26:05.000Z">
-        Jul 31, 2023
+      <time datetime="2023-10-06T23:29:43.000Z">
+        Oct 7, 2023
       </time>
     </p>
   </div>

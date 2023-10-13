@@ -217,6 +217,10 @@
             Indicators
           </a>
       </li><li class="astro-3II7XXMS">
+        <a href="/reference/indicators_custom/" class="astro-3II7XXMS">
+            Custom Indicators
+          </a>
+      </li><li class="astro-3II7XXMS">
         <a href="/reference/indicators_default/" class="astro-3II7XXMS">
             Default Indicators
           </a>
@@ -225,12 +229,20 @@
             TA-Lib Functions
           </a>
       </li><li class="astro-3II7XXMS">
-        <a href="/reference/news_events/" class="astro-3II7XXMS">
-            News Events
+        <a href="/reference/legends/" class="astro-3II7XXMS">
+            Legends
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/overlays/" class="astro-3II7XXMS">
             Overlays
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/overlays_news_events/" class="astro-3II7XXMS">
+            Overlay News Events
+          </a>
+      </li><li class="astro-3II7XXMS">
+        <a href="/reference/overlays_trades/" class="astro-3II7XXMS">
+            Overlay Trades
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/range/" class="astro-3II7XXMS">
@@ -253,8 +265,8 @@
             Themes
           </a>
       </li><li class="astro-3II7XXMS">
-        <a href="/reference/trades/" class="astro-3II7XXMS">
-            Trades
+        <a href="/reference/web_workers/" class="astro-3II7XXMS">
+            Web Workers
           </a>
       </li><li class="astro-3II7XXMS">
         <a href="/reference/widgets/" class="astro-3II7XXMS">
@@ -334,6 +346,33 @@
         </a>
         
       </li><li class="astro-G2BYWC46" style="--depth: 0;">
+        <a href="#adding-indicators-to-the-chart" class="astro-G2BYWC46" style="--depth: 0;">
+          <span class="astro-G2BYWC46" style="--depth: 0;">Adding Indicators to the Chart</span>
+        </a>
+        <ul class="isMobile astro-G2BYWC46" style="--depth: 1;">
+  <li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#adding-indicators-via-api" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Adding Indicators Via API</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#adding-indicators-via-the-data-state" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Adding Indicators Via the Data State</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#adding-indicators-via-the-utils-bar" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Adding Indicators Via the Utils Bar</span>
+        </a>
+        
+      </li>
+</ul>
+      </li><li class="astro-G2BYWC46" style="--depth: 0;">
+        <a href="#indicator-removal" class="astro-G2BYWC46" style="--depth: 0;">
+          <span class="astro-G2BYWC46" style="--depth: 0;">Indicator Removal</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 0;">
         <a href="#default-indicators" class="astro-G2BYWC46" style="--depth: 0;">
           <span class="astro-G2BYWC46" style="--depth: 0;">Default Indicators</span>
         </a>
@@ -342,53 +381,7 @@
         <a href="#custom-indicators" class="astro-G2BYWC46" style="--depth: 0;">
           <span class="astro-G2BYWC46" style="--depth: 0;">Custom Indicators</span>
         </a>
-        <ul class="isMobile astro-G2BYWC46" style="--depth: 1;">
-  <li class="astro-G2BYWC46" style="--depth: 1;">
-        <a href="#registering-custom-indicators" class="astro-G2BYWC46" style="--depth: 1;">
-          <span class="astro-G2BYWC46" style="--depth: 1;">Registering Custom Indicators</span>
-        </a>
         
-      </li><li class="astro-G2BYWC46" style="--depth: 1;">
-        <a href="#indicator-definitions" class="astro-G2BYWC46" style="--depth: 1;">
-          <span class="astro-G2BYWC46" style="--depth: 1;">Indicator Definitions</span>
-        </a>
-        <ul class="isMobile astro-G2BYWC46" style="--depth: 2;">
-  <li class="astro-G2BYWC46" style="--depth: 2;">
-        <a href="#local-y-axis-range" class="astro-G2BYWC46" style="--depth: 2;">
-          <span class="astro-G2BYWC46" style="--depth: 2;">Local Y-Axis Range</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 2;">
-        <a href="#legend" class="astro-G2BYWC46" style="--depth: 2;">
-          <span class="astro-G2BYWC46" style="--depth: 2;">Legend</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 2;">
-        <a href="#canvas-drawing-methods" class="astro-G2BYWC46" style="--depth: 2;">
-          <span class="astro-G2BYWC46" style="--depth: 2;">Canvas Drawing Methods</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 2;">
-        <a href="#minimal-custom-indicator-definition" class="astro-G2BYWC46" style="--depth: 2;">
-          <span class="astro-G2BYWC46" style="--depth: 2;">Minimal Custom Indicator Definition</span>
-        </a>
-        
-      </li>
-</ul>
-      </li>
-</ul>
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#settings" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Settings</span>
-        </a>
-        <ul class="isMobile astro-G2BYWC46" style="--depth: 1;">
-  <li class="astro-G2BYWC46" style="--depth: 1;">
-        <a href="#invokeing-the-settings-dialogue" class="astro-G2BYWC46" style="--depth: 1;">
-          <span class="astro-G2BYWC46" style="--depth: 1;">Invokeing the Settings Dialogue</span>
-        </a>
-        
-      </li>
-</ul>
       </li>
 </ul>
       </div>
@@ -408,6 +401,33 @@
         </a>
         
       </li><li class="astro-G2BYWC46" style="--depth: 0;">
+        <a href="#adding-indicators-to-the-chart" class="astro-G2BYWC46" style="--depth: 0;">
+          <span class="astro-G2BYWC46" style="--depth: 0;">Adding Indicators to the Chart</span>
+        </a>
+        <ul class="astro-G2BYWC46" style="--depth: 1;">
+  <li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#adding-indicators-via-api" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Adding Indicators Via API</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#adding-indicators-via-the-data-state" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Adding Indicators Via the Data State</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 1;">
+        <a href="#adding-indicators-via-the-utils-bar" class="astro-G2BYWC46" style="--depth: 1;">
+          <span class="astro-G2BYWC46" style="--depth: 1;">Adding Indicators Via the Utils Bar</span>
+        </a>
+        
+      </li>
+</ul>
+      </li><li class="astro-G2BYWC46" style="--depth: 0;">
+        <a href="#indicator-removal" class="astro-G2BYWC46" style="--depth: 0;">
+          <span class="astro-G2BYWC46" style="--depth: 0;">Indicator Removal</span>
+        </a>
+        
+      </li><li class="astro-G2BYWC46" style="--depth: 0;">
         <a href="#default-indicators" class="astro-G2BYWC46" style="--depth: 0;">
           <span class="astro-G2BYWC46" style="--depth: 0;">Default Indicators</span>
         </a>
@@ -416,53 +436,7 @@
         <a href="#custom-indicators" class="astro-G2BYWC46" style="--depth: 0;">
           <span class="astro-G2BYWC46" style="--depth: 0;">Custom Indicators</span>
         </a>
-        <ul class="astro-G2BYWC46" style="--depth: 1;">
-  <li class="astro-G2BYWC46" style="--depth: 1;">
-        <a href="#registering-custom-indicators" class="astro-G2BYWC46" style="--depth: 1;">
-          <span class="astro-G2BYWC46" style="--depth: 1;">Registering Custom Indicators</span>
-        </a>
         
-      </li><li class="astro-G2BYWC46" style="--depth: 1;">
-        <a href="#indicator-definitions" class="astro-G2BYWC46" style="--depth: 1;">
-          <span class="astro-G2BYWC46" style="--depth: 1;">Indicator Definitions</span>
-        </a>
-        <ul class="astro-G2BYWC46" style="--depth: 2;">
-  <li class="astro-G2BYWC46" style="--depth: 2;">
-        <a href="#local-y-axis-range" class="astro-G2BYWC46" style="--depth: 2;">
-          <span class="astro-G2BYWC46" style="--depth: 2;">Local Y-Axis Range</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 2;">
-        <a href="#legend" class="astro-G2BYWC46" style="--depth: 2;">
-          <span class="astro-G2BYWC46" style="--depth: 2;">Legend</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 2;">
-        <a href="#canvas-drawing-methods" class="astro-G2BYWC46" style="--depth: 2;">
-          <span class="astro-G2BYWC46" style="--depth: 2;">Canvas Drawing Methods</span>
-        </a>
-        
-      </li><li class="astro-G2BYWC46" style="--depth: 2;">
-        <a href="#minimal-custom-indicator-definition" class="astro-G2BYWC46" style="--depth: 2;">
-          <span class="astro-G2BYWC46" style="--depth: 2;">Minimal Custom Indicator Definition</span>
-        </a>
-        
-      </li>
-</ul>
-      </li>
-</ul>
-      </li><li class="astro-G2BYWC46" style="--depth: 0;">
-        <a href="#settings" class="astro-G2BYWC46" style="--depth: 0;">
-          <span class="astro-G2BYWC46" style="--depth: 0;">Settings</span>
-        </a>
-        <ul class="astro-G2BYWC46" style="--depth: 1;">
-  <li class="astro-G2BYWC46" style="--depth: 1;">
-        <a href="#invokeing-the-settings-dialogue" class="astro-G2BYWC46" style="--depth: 1;">
-          <span class="astro-G2BYWC46" style="--depth: 1;">Invokeing the Settings Dialogue</span>
-        </a>
-        
-      </li>
-</ul>
       </li>
 </ul>
   </nav>
@@ -485,332 +459,96 @@
               </div>
 </div><div class="content-panel astro-7NKWCW3Z">
   <div class="container astro-7NKWCW3Z">
-              <div class="content astro-ML6NTD6L"><p>TradeX-chart provides a set of <a href="#default-indicators">default indicators</a> based upon TA-Lib. The chart uses a Web Assembly version of the library, <a href="https://github.com/newproplus/talib-web">talib-web</a>.</p>
-<p>TradeX-chart may or may not implement all of the indicators provided by TA-Lib.</p>
+              <div class="content astro-ML6NTD6L"><p>TradeX-chart provides a set of <a href="../indicators_default">default indicators</a> based upon TA-Lib. The chart uses a Web Assembly version of the library, <a href="https://github.com/newproplus/talib-web">talib-web</a>.</p>
+<p>It is also possible to build and add your own <a href="../indicators_custom">custom indicators</a> to the chart also.</p>
 <p>Indicators are grouped as:</p>
 <ul>
 <li><strong>Primary Chart Pane</strong> - those displayed atop the price history (candles)</li>
 <li><strong>Secondary Chart Panes</strong> - those displayed in their own pane.</li>
 </ul>
+<h2 id="adding-indicators-to-the-chart">Adding Indicators to the Chart</h2>
 <p>Indicators can be added via the following methods:</p>
 <ul>
-<li>API - programmatically <code>chart.addIndicator()</code></li>
-<li>State - <a href="state.md">a valid chart state</a></li>
-<li>Utils Bar - through the chart GUI using the Indicators option in the Utils Bar</li>
+<li><a href="#adding-indicators-via-api">API</a></li>
+<li><a href="#adding-indicators-via-the-data-state">State</a></li>
+<li><a href="#adding-indicators-via-the-utils-bar">Utils Bar</a></li>
 </ul>
+<h3 id="adding-indicators-via-api">Adding Indicators Via API</h3>
+<p>To add an “empty” indicator is as simple as:</p>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">i</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"RSI"</span></span>
+<span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">name</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"RSI_1"</span></span>
+<span class="line"><span style="color: #B392F0">myInd </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.addIndicator(i</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> name)</span></span></code></pre>
+<p>If the chart has price history data, the indicator will automatically calculate it’s values with it’s defaults.</p>
+<p>However, indicators can also be added with data and or with custom settings.</p>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">data</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> [ [</span><span style="color: #F8F8F8">1543572000000</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">4079.63478779</span><span style="color: #B392F0">] ]</span></span>
+<span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">settings</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {style</span><span style="color: #F97583">:</span><span style="color: #B392F0">{}}</span></span>
+<span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">params</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {data</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> settings}</span></span>
+<span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">myInd</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.addIndicator(</span><span style="color: #FFAB70">"EMA"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"EMA_1"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> params)</span></span></code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Parameters</th><th>Type</th><th>Required</th><th>Description</th></tr></thead><tbody><tr><td>indicator</td><td>string</td><td>yes</td><td>identifier the chart is registered with</td></tr><tr><td>name</td><td>string</td><td>yes</td><td>text label used in legends</td></tr><tr><td>params</td><td>object</td><td>no</td><td>optional indicator configuration</td></tr></tbody></table>
+<p>The third argument <strong>params</strong> is an object that can optionally contain array <code>data</code> and or an object <code>settings</code>.</p>
+<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">settings</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {</span></span>
+<span class="line"><span style="color: #B392F0">  timePeriod</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">20</span><span style="color: #BBBBBB">,</span></span>
+<span class="line"><span style="color: #B392F0">  style</span><span style="color: #F97583">:</span><span style="color: #B392F0"> {</span></span>
+<span class="line"><span style="color: #B392F0">    stroke</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"#C80"</span><span style="color: #BBBBBB">,</span></span>
+<span class="line"><span style="color: #B392F0">    width</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">'1'</span><span style="color: #BBBBBB">,</span></span>
+<span class="line"><span style="color: #B392F0">  }</span></span>
+<span class="line"><span style="color: #B392F0">}</span></span></code></pre>
+<p>Each entry in the <code>data</code> array requires an array with minimum of [timestamp, value] depending upon the indicator.</p>
+<p>The <code>settings</code> object can contain an object <code>style</code> and or individual input settings specific to the indicator.</p>
+<p>The <code>params.settings.style</code> object is how indicator an indicator can have it’s default style (theme) modified.</p>
+<h3 id="adding-indicators-via-the-data-state">Adding Indicators Via the Data State</h3>
+<p>Indicators can be added via <a href="state">a valid chart state</a>.</p>
+<h3 id="adding-indicators-via-the-utils-bar">Adding Indicators Via the Utils Bar</h3>
+<p>The chart GUI can add indicators via the Utils Bar with Indicators icon. Firstly the Utils bar needs to be enabled in the chart config.</p>
+<p>Clicking on the Indicators icon will open a menu listing all of the indicators currently registered with the chart, including any custom indicators. Simply selecting the indicator from the list with the pointer will add it to the chart.</p>
+<p>TODO: add screenshot</p>
+<h2 id="indicator-removal">Indicator Removal</h2>
 <p>Removal of Indicators can be done via:</p>
 <ul>
 <li>API - programmatically <code>chart.removeIndicator("TradeX_test-Chart_2-BB_4")</code></li>
 <li>GUI - indicator legend bar controls</li>
 </ul>
 <h2 id="default-indicators">Default Indicators</h2>
-<p><a href="indicators_default.md">The current list of implemented indicators.</a></p>
+<p>The <a href="../indicators_default">Default Indicators documentation</a> lists all of the currently available indicators.</p>
+<p>TradeX-chart may or may not implement all of the indicators provided by TA-Lib.</p>
+<p>More will be implemented soon.</p>
 <h2 id="custom-indicators">Custom Indicators</h2>
-<p>Developers are not restricted to using only the <a href="indicators_default.md">default indicators</a> provided by TradeX-chart. After all, everybody has their own secret methods for finding signals in the market.</p>
-<p>Of course the <a href="indicators_talib.md">functions provided by the TA-Lib</a> can still be leveraged for custom indicators via the chart API. The chart will take care of initializing the TA-Lib wasm component and return a promise.</p>
-<p>All indicators relying upon TA-Lib functions should defer any data processing until the promise is fulfilled.</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #B392F0">      </span><span style="color: #F97583">if</span><span style="color: #B392F0"> (</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">core</span><span style="color: #B392F0">.TALibReady) calc()</span></span>
-<span class="line"><span style="color: #B392F0">      </span><span style="color: #F97583">else</span><span style="color: #B392F0">  </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">core</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">talibAwait</span><span style="color: #B392F0">.push(</span><span style="color: #79B8FF">calc</span><span style="color: #B392F0">.bind(</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">))</span></span></code></pre>
-<h3 id="registering-custom-indicators">Registering Custom Indicators</h3>
-<p>Before any custom indicator can be used, it first must be registered with the chart.</p>
-<p>During the registration of custom indicators, there is the option to expunge all of the default indicators, thereby allowing the developer to replace them all, or select which to keep.</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #6B737C">// custom indicator class</span></span>
-<span class="line"><span style="color: #F97583">import</span><span style="color: #B392F0"> TEST </span><span style="color: #F97583">from</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"testIndicator"</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #6B737C">/**</span></span>
-<span class="line"><span style="color: #6B737C"> * set indicators</span></span>
-<span class="line"><span style="color: #6B737C"> * </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Object}</span><span style="color: #6B737C"> i - indicators {id, name, event, ind}</span></span>
-<span class="line"><span style="color: #6B737C"> * </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{boolean}</span><span style="color: #6B737C"> flush - expunge default indicators</span></span>
-<span class="line"><span style="color: #6B737C"> * </span><span style="color: #F97583">@returns</span><span style="color: #6B737C"> boolean</span></span>
-<span class="line"><span style="color: #6B737C"> */</span></span>
-<span class="line"><span style="color: #79B8FF">chart</span><span style="color: #B392F0">.setIndicators({</span></span>
-<span class="line"><span style="color: #B392F0">  TEST</span><span style="color: #F97583">:</span><span style="color: #B392F0"> {id</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"TEST"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> name</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"Custom Indicator"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> event</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"addIndicator"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> ind</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">TEST</span><span style="color: #B392F0">}</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> false</span></span>
-<span class="line"><span style="color: #B392F0">})</span></span></code></pre>
-<p>The list of registered indicators, both default and custom can be accessed via the chart API.</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #6B737C">// returns a Map() iterator of indicators</span></span>
-<span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">primaryPaneIndicators</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">chart</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">Indicators</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">primary</span><span style="color: #B392F0">.entries()</span></span>
-<span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">secondaryPaneIndicators</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">chart</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">Indicators</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">secondary</span><span style="color: #B392F0">.entries()</span></span></code></pre>
-<h3 id="indicator-definitions">Indicator Definitions</h3>
-<h4 id="local-y-axis-range">Local Y-Axis Range</h4>
-<p>If the indicator is not overlaid on the Primary Chart Pane, and instead on a Secondary Chart Pane, there is the option to set the local Y-Axis range, min and max values which will be used for the scale and plotting the indicator.</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">chart</span><span style="color: #B392F0">.setLocalRange(</span><span style="color: #F8F8F8">0</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">150</span><span style="color: #B392F0">)</span></span></code></pre>
-<h4 id="legend">Legend</h4>
-<p>Indicators must provide a <code>legendInputs(pos)</code> method. The chart will pass the current mouse position to the indicator in an array, <code>[x, y]</code>.</p>
-<p>Legends can display multiple values if formatted correctly.</p>
-<p>If the indicator provides no values for it’s legend then simply return false.</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #B392F0">legendInputs() {</span></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">return</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">false</span><span style="color: #B392F0">;</span></span>
-<span class="line"><span style="color: #B392F0">}</span></span></code></pre>
-<p>When the indicator does provide values for it’s legend, then the <code>legendInputs()</code> method must return an object with three entries.</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #B392F0"> </span><span style="color: #F97583">return</span><span style="color: #B392F0"> {inputs</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> colours</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> labels}</span></span></code></pre>
-<p>where the three entries are defined as the following:</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #6B737C">/**</span></span>
-<span class="line"><span style="color: #6B737C">  </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Object}</span><span style="color: #6B737C"> inputs - property names are used as labels</span></span>
-<span class="line"><span style="color: #6B737C">  </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Array}</span><span style="color: #6B737C"> colours - array of #rrggbb(aa) values</span></span>
-<span class="line"><span style="color: #6B737C">  </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Array}</span><span style="color: #6B737C"> labels - array of which input labels to dispaly [true, false, ...]</span></span>
-<span class="line"><span style="color: #6B737C">*/</span></span></code></pre>
-<h5 id="inputs">inputs</h5>
-<p>is an object that provides the legend labels and values.
-For example the Bollinger Band indicator has three values. It’s returned <code>inputs</code> object would look like the following:</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #B392F0">{ Hi</span><span style="color: #BBBBBB">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"13016.1"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> Mid</span><span style="color: #BBBBBB">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"13011.2"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> Lo</span><span style="color: #BBBBBB">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"13006.2"</span><span style="color: #B392F0"> }</span></span></code></pre>
-<p>The object property names are used as the labels for the indicator.
-The Bollinger Band indicator legend would look like this on the chart:</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #B392F0"> Hi</span><span style="color: #BBBBBB">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">13016.1</span><span style="color: #B392F0">  Mid</span><span style="color: #BBBBBB">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">13011.2</span><span style="color: #B392F0">  Lo</span><span style="color: #BBBBBB">:</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">13006.2</span></span></code></pre>
-<p>If you wanted a label with spaces, then the object property name would have to be quoted. <code>"some value": 12345</code></p>
-<h5 id="colours">colours</h5>
-<p>is an array of <code>"#rrggbb(aa)"</code> string values corresponding to the legend values</p>
-<h5 id="lables">lables</h5>
-<p>is an array that specifies which of the legend labels are displayed.
-In the Bollinger Band example, if you wanted to silence all labels, use an array of <code>[false, false, false]</code>.</p>
-<h4 id="canvas-drawing-methods">Canvas Drawing Methods</h4>
-<p>The base <code>Indicator</code> class which all others, including custom indicators are built atop, offers the <code>plot()</code> method for drawing to the canvas.</p>
-<p>The <code>Indicator</code> class also exposes a pointer to the canvas directly, so you could also use your own functions instead.</p>
-<p>Refer to the <a href="../canvas_mehtods">Canvas Methods documentation</a> for the available functions.</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">this</span><span style="color: #B392F0">.plot (plots</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> type</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> opts )</span></span></code></pre>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<table><thead><tr><th>Parameters</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>plots</td><td>Array</td><td>array of x y coords [ { x, y }, …]</td></tr><tr><td>type</td><td>string</td><td><a href="../canvas_mehtods">Canvas Methods documentation</a></td></tr><tr><td>opts</td><td>object</td><td><a href="../canvas_mehtods">Canvas Methods documentation</a></td></tr></tbody></table>
-<h4 id="minimal-custom-indicator-definition">Minimal Custom Indicator Definition</h4>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #6B737C">// custom-indicator.js</span></span>
-<span class="line"><span style="color: #6B737C">// proof of concept for user defined indicators</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #6B737C">// import { Indicator } from "tradex-chart"</span></span>
-<span class="line"><span style="color: #F97583">import</span><span style="color: #B392F0"> { Indicator</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> Range</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> uid } </span><span style="color: #F97583">from</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"./src"</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #F97583">export</span><span style="color: #B392F0"> </span><span style="color: #F97583">default</span><span style="color: #B392F0"> </span><span style="color: #F97583">class</span><span style="color: #B392F0"> Test </span><span style="color: #F97583">extends</span><span style="color: #B392F0"> Indicator {</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">  name </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"Test Custom Inicator"</span></span>
-<span class="line"><span style="color: #B392F0">  shortName </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"Test"</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">  timePeriod </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">20</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">  #defaultStyle </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {</span></span>
-<span class="line"><span style="color: #B392F0">    stroke</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"#0088cc"</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">    width</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"1"</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">    dash</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">undefined</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">  }</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">  style </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {}</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">static</span><span style="color: #B392F0"> inCnt </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0</span></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">static</span><span style="color: #B392F0"> primaryPane </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">true</span></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// static scale is required for off chart indicators</span></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">// static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default</span></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">static</span><span style="color: #B392F0"> colours </span><span style="color: #F97583">=</span><span style="color: #B392F0"> []</span></span>
-<span class="line"></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">/**</span></span>
-<span class="line"><span style="color: #6B737C">   * Creates an instance of Test.</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Object}</span><span style="color: #6B737C"> target - canvas scene</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Object}</span><span style="color: #6B737C"> xAxis - timeline axis instance</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Object}</span><span style="color: #6B737C"> yAxis - scale axis instance</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Object}</span><span style="color: #6B737C"> config - theme / styling</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Object}</span><span style="color: #6B737C"> parent - chart pane instance that hosts the indicator</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Object}</span><span style="color: #6B737C"> params - contains minimum of overlay instance</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@memberof</span><span style="color: #6B737C"> </span><span style="color: #B392F0">Test</span></span>
-<span class="line"><span style="color: #6B737C">   */</span></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">constructor</span><span style="color: #B392F0">(target</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> xAxis</span><span style="color: #F97583">=</span><span style="color: #79B8FF">false</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> yAxis</span><span style="color: #F97583">=</span><span style="color: #79B8FF">false</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> config</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> parent</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> params) {</span></span>
-<span class="line"><span style="color: #B392F0">    super(target</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> xAxis</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> yAxis</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> config</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> parent</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> params)</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">overlay</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">params</span><span style="color: #B392F0">.overlay</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// initialize indicator values</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.id </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">params</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">overlay</span><span style="color: #B392F0">?.id </span><span style="color: #F97583">||</span><span style="color: #B392F0"> uid(</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.shortName)</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// merge user defined settings (if any) with defaults</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.style </span><span style="color: #F97583">=</span><span style="color: #B392F0"> (</span><span style="color: #79B8FF">overlay</span><span style="color: #B392F0">?.</span><span style="color: #79B8FF">settings</span><span style="color: #B392F0">?.style) </span></span>
-<span class="line"><span style="color: #B392F0">      </span><span style="color: #F97583">?</span><span style="color: #B392F0"> { </span><span style="color: #F97583">...</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.#defaultStyle</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #F97583">...</span><span style="color: #79B8FF">overlay</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">settings</span><span style="color: #B392F0">.style } </span></span>
-<span class="line"><span style="color: #B392F0">      </span><span style="color: #F97583">:</span><span style="color: #B392F0"> { </span><span style="color: #F97583">...</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.#defaultStyle</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #F97583">...</span><span style="color: #79B8FF">config</span><span style="color: #B392F0">.style }</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// calculate back history if missing</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.calcIndicatorHistory()</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// enable processing of price stream</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.setUpdateValue </span><span style="color: #F97583">=</span><span style="color: #B392F0"> (value) </span><span style="color: #F97583">=></span><span style="color: #B392F0"> { </span></span>
-<span class="line"><span style="color: #B392F0">      </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.updateValue(value) </span></span>
-<span class="line"><span style="color: #B392F0">    }</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// add the indicator legend to the chart pane</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.addLegend()</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// set the local range max min Y-Axis values if required</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// this.chart.setLocalRange(0, 150)</span></span>
-<span class="line"><span style="color: #B392F0">  }</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">/**</span></span>
-<span class="line"><span style="color: #6B737C">   * define where indicator should be displayed</span></span>
-<span class="line"><span style="color: #6B737C">   * valid returned values can be: true, false (boolean), both (string)</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@readonly</span></span>
-<span class="line"><span style="color: #6B737C">   */</span></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">get</span><span style="color: #B392F0"> primaryPane() { </span><span style="color: #F97583">return</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">Test</span><span style="color: #B392F0">.primaryPane }</span></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #F97583">get</span><span style="color: #B392F0"> defaultStyle() { </span><span style="color: #F97583">return</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.#defaultStyle }</span></span>
-<span class="line"></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">/**</span></span>
-<span class="line"><span style="color: #6B737C">   * return inputs required to display indicator legend on chart pane</span></span>
-<span class="line"><span style="color: #6B737C">   * legends can display multiple values</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Array}</span><span style="color: #6B737C"> [pos</span><span style="color: #F97583">=</span><span style="color: #6B737C">this.chart.cursorPos] - optional</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@returns</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Object}</span><span style="color: #6B737C"> - {inputs, colours, labels}</span></span>
-<span class="line"><span style="color: #6B737C">   */</span></span>
-<span class="line"><span style="color: #B392F0">  legendInputs(pos</span><span style="color: #F97583">=</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">chart</span><span style="color: #B392F0">.cursorPos) {</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">if</span><span style="color: #B392F0"> (</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">overlay</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">data</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">length</span><span style="color: #B392F0"> </span><span style="color: #F97583">==</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0</span><span style="color: #B392F0">) </span><span style="color: #F97583">return</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">false</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// determine which legend labels to display</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> labels </span><span style="color: #F97583">=</span><span style="color: #B392F0"> [</span><span style="color: #79B8FF">false</span><span style="color: #B392F0">]</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// c - retrieve data index</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> {c</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> colours} </span><span style="color: #F97583">=</span><span style="color: #B392F0"> super.legendInputs(pos)</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// build an object of input keys (labels) and values</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> inputs </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {x</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">scale</span><span style="color: #B392F0">.nicePrice(</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">overlay</span><span style="color: #B392F0">.data[c][</span><span style="color: #F8F8F8">1</span><span style="color: #B392F0">])}</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">/**</span></span>
-<span class="line"><span style="color: #6B737C">      </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Object}</span><span style="color: #6B737C"> inputs - property names are used as labels</span></span>
-<span class="line"><span style="color: #6B737C">      </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Array}</span><span style="color: #6B737C"> colours - array of #rrggbb(aa) values</span></span>
-<span class="line"><span style="color: #6B737C">      </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Array}</span><span style="color: #6B737C"> labels - array of which input labels to dispaly [true, false, ...]</span></span>
-<span class="line"><span style="color: #6B737C">    */</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">return</span><span style="color: #B392F0"> {inputs</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> colours</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> labels}</span></span>
-<span class="line"><span style="color: #B392F0">  }</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">/**</span></span>
-<span class="line"><span style="color: #6B737C">   * process new candle stream value</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Array}</span><span style="color: #6B737C"> candle - [timestamp, open, high, low, close, volume]</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@memberof</span><span style="color: #6B737C"> </span><span style="color: #B392F0">Test</span></span>
-<span class="line"><span style="color: #6B737C">   */</span></span>
-<span class="line"><span style="color: #B392F0">  updateValue(candle) {</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.value </span><span style="color: #F97583">=</span><span style="color: #B392F0"> candle</span></span>
-<span class="line"><span style="color: #B392F0">  }</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">  calcIndicator(range</span><span style="color: #F97583">=</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.range) {</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> start</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> end;</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// number of values to use in indicator calculation</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> p </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.timePeriod</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// is it a Range instance?</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">if</span><span style="color: #B392F0">(range </span><span style="color: #F97583">instanceof</span><span style="color: #B392F0"> Range) {</span></span>
-<span class="line"><span style="color: #B392F0">      </span><span style="color: #6B737C">// if not calculate entire history</span></span>
-<span class="line"><span style="color: #B392F0">      start </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0</span></span>
-<span class="line"><span style="color: #B392F0">      end </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">range</span><span style="color: #B392F0">.dataLength </span><span style="color: #F97583">-</span><span style="color: #B392F0"> p </span><span style="color: #F97583">+</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">1</span></span>
-<span class="line"><span style="color: #B392F0">    }</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">else</span><span style="color: #B392F0"> </span><span style="color: #F97583">if</span><span style="color: #B392F0"> ( </span><span style="color: #FFAB70">"indexStart"</span><span style="color: #B392F0"> </span><span style="color: #F97583">in</span><span style="color: #B392F0"> range </span><span style="color: #F97583">||</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"indexEnd"</span><span style="color: #B392F0"> </span><span style="color: #F97583">in</span><span style="color: #B392F0"> range </span><span style="color: #F97583">||</span></span>
-<span class="line"><span style="color: #B392F0">              </span><span style="color: #FFAB70">"tsStart"</span><span style="color: #B392F0"> </span><span style="color: #F97583">in</span><span style="color: #B392F0"> range </span><span style="color: #F97583">||</span><span style="color: #B392F0">  </span><span style="color: #FFAB70">"tsEnd"</span><span style="color: #B392F0"> </span><span style="color: #F97583">in</span><span style="color: #B392F0"> range ) {</span></span>
-<span class="line"><span style="color: #B392F0">      start </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">range</span><span style="color: #B392F0">.indexStart </span><span style="color: #F97583">||</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">Timeline</span><span style="color: #B392F0">.t2Index(</span><span style="color: #79B8FF">range</span><span style="color: #B392F0">.tsStart </span><span style="color: #F97583">||</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0</span><span style="color: #B392F0">) </span><span style="color: #F97583">||</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0</span></span>
-<span class="line"><span style="color: #B392F0">      end </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">range</span><span style="color: #B392F0">.indexEnd </span><span style="color: #F97583">||</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">Timeline</span><span style="color: #B392F0">.t2Index(</span><span style="color: #79B8FF">range</span><span style="color: #B392F0">.tsEnd) </span><span style="color: #F97583">||</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">range</span><span style="color: #B392F0">.Length </span><span style="color: #F97583">-</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">1</span></span>
-<span class="line"><span style="color: #B392F0">      end </span><span style="color: #F97583">-</span><span style="color: #B392F0"> p</span></span>
-<span class="line"><span style="color: #B392F0">    }</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">else</span><span style="color: #B392F0"> </span><span style="color: #F97583">return</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">false</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// if not enough data for calculation fail</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">if</span><span style="color: #B392F0"> ( end </span><span style="color: #F97583">-</span><span style="color: #B392F0"> start </span><span style="color: #F97583">&#x3C;</span><span style="color: #B392F0"> p ) </span><span style="color: #F97583">return</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">false</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> data </span><span style="color: #F97583">=</span><span style="color: #B392F0"> [];</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> i</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> v</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> entry;</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">while</span><span style="color: #B392F0"> (start </span><span style="color: #F97583">&#x3C;</span><span style="color: #B392F0"> end) {</span></span>
-<span class="line"><span style="color: #B392F0">      v </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0</span></span>
-<span class="line"><span style="color: #B392F0">      </span><span style="color: #F97583">for</span><span style="color: #B392F0"> (i</span><span style="color: #F97583">=</span><span style="color: #F8F8F8">0</span><span style="color: #B392F0">; i</span><span style="color: #F97583">&#x3C;</span><span style="color: #B392F0">p; i</span><span style="color: #F97583">++</span><span style="color: #B392F0">) {</span></span>
-<span class="line"><span style="color: #B392F0">        v </span><span style="color: #F97583">+=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">range</span><span style="color: #B392F0">.value(start)[</span><span style="color: #F8F8F8">4</span><span style="color: #B392F0">]</span></span>
-<span class="line"><span style="color: #B392F0">      }</span></span>
-<span class="line"><span style="color: #B392F0">      v </span><span style="color: #F97583">/=</span><span style="color: #B392F0"> p</span></span>
-<span class="line"><span style="color: #B392F0">      </span><span style="color: #79B8FF">data</span><span style="color: #B392F0">.push([</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">range</span><span style="color: #B392F0">.value(start </span><span style="color: #F97583">+</span><span style="color: #B392F0"> p </span><span style="color: #F97583">-</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">1</span><span style="color: #B392F0">)[</span><span style="color: #F8F8F8">0</span><span style="color: #B392F0">]</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> v])</span></span>
-<span class="line"><span style="color: #B392F0">      start</span><span style="color: #F97583">++</span></span>
-<span class="line"><span style="color: #B392F0">    }</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">return</span><span style="color: #B392F0"> data</span></span>
-<span class="line"><span style="color: #B392F0">  }</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">  calcIndicatorHistory() {</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// if overlay history is missing, calculate it</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">if</span><span style="color: #B392F0"> (</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">overlay</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">data</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">length</span><span style="color: #B392F0"> </span><span style="color: #F97583">&#x3C;</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.timePeriod) {</span></span>
-<span class="line"><span style="color: #B392F0">      </span><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">data</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.calcIndicator()</span></span>
-<span class="line"><span style="color: #B392F0">      </span><span style="color: #F97583">if</span><span style="color: #B392F0"> (data) </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">overlay</span><span style="color: #B392F0">.data </span><span style="color: #F97583">=</span><span style="color: #B392F0"> data</span></span>
-<span class="line"><span style="color: #B392F0">    }</span></span>
-<span class="line"><span style="color: #B392F0">  }</span></span>
-<span class="line"><span style="color: #B392F0">  </span></span>
-<span class="line"><span style="color: #B392F0">  </span><span style="color: #6B737C">/**</span></span>
-<span class="line"><span style="color: #6B737C">   * draw the indicator</span></span>
-<span class="line"><span style="color: #6B737C">   * </span><span style="color: #F97583">@param</span><span style="color: #6B737C"> </span><span style="color: #B392F0">{Object}</span><span style="color: #6B737C"> range - current displayed range of candles</span></span>
-<span class="line"><span style="color: #6B737C">   */</span></span>
-<span class="line"><span style="color: #B392F0">  draw(range</span><span style="color: #F97583">=</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.range) {</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// minimum of two candles are required for this indicator</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">if</span><span style="color: #B392F0"> (</span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">overlay</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">data</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">length</span><span style="color: #B392F0"> </span><span style="color: #F97583">&#x3C;</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">2</span><span style="color: #B392F0"> ) </span><span style="color: #F97583">return</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">false</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// clear the indicator overlay (chart layer)</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">scene</span><span style="color: #B392F0">.clear()</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// draw your indicator...</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// array to hold sequence points to draw</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">plots</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> []</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// indicator data</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">data</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">overlay</span><span style="color: #B392F0">.data</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// current candle width, chart zoom modifies this</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">width</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">xAxis</span><span style="color: #B392F0">.candleW</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// basic plot entry</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">plot</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {</span></span>
-<span class="line"><span style="color: #B392F0">      w</span><span style="color: #F97583">:</span><span style="color: #B392F0"> width</span><span style="color: #BBBBBB">,</span></span>
-<span class="line"><span style="color: #B392F0">    }</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// first timestamp in current range</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> t </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">range</span><span style="color: #B392F0">.value(</span><span style="color: #79B8FF">range</span><span style="color: #B392F0">.indexStart)[</span><span style="color: #F8F8F8">0</span><span style="color: #B392F0">]</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> s </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">overlay</span><span style="color: #B392F0">.data[</span><span style="color: #F8F8F8">0</span><span style="color: #B392F0">][</span><span style="color: #F8F8F8">0</span><span style="color: #B392F0">]</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> c </span><span style="color: #F97583">=</span><span style="color: #B392F0"> (t </span><span style="color: #F97583">-</span><span style="color: #B392F0"> s) </span><span style="color: #F97583">/</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">range</span><span style="color: #B392F0">.interval</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> o </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">Timeline</span><span style="color: #B392F0">.rangeScrollOffset;</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> i </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">range</span><span style="color: #B392F0">.Length </span><span style="color: #F97583">+</span><span style="color: #B392F0"> o </span><span style="color: #F97583">+</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">2</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">let</span><span style="color: #B392F0"> style </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {}</span></span>
-<span class="line"></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #F97583">while</span><span style="color: #B392F0">(i) {</span></span>
-<span class="line"><span style="color: #B392F0">      </span><span style="color: #F97583">if</span><span style="color: #B392F0"> (c </span><span style="color: #F97583">&#x3C;</span><span style="color: #B392F0"> </span><span style="color: #F8F8F8">0</span><span style="color: #B392F0"> </span><span style="color: #F97583">||</span><span style="color: #B392F0"> c </span><span style="color: #F97583">>=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">overlay</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">data</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">length</span><span style="color: #B392F0">) {</span></span>
-<span class="line"><span style="color: #B392F0">        </span><span style="color: #79B8FF">plots</span><span style="color: #B392F0">.push({x</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">null</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> y</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">null</span><span style="color: #B392F0">})</span></span>
-<span class="line"><span style="color: #B392F0">      }</span></span>
-<span class="line"><span style="color: #B392F0">      </span><span style="color: #F97583">else</span><span style="color: #B392F0"> {</span></span>
-<span class="line"><span style="color: #B392F0">        </span><span style="color: #79B8FF">plot</span><span style="color: #B392F0">.x </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">xAxis</span><span style="color: #B392F0">.xPos(data[c][</span><span style="color: #F8F8F8">0</span><span style="color: #B392F0">])</span></span>
-<span class="line"><span style="color: #B392F0">        </span><span style="color: #79B8FF">plot</span><span style="color: #B392F0">.y </span><span style="color: #F97583">=</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">yAxis</span><span style="color: #B392F0">.yPos(data[c][</span><span style="color: #F8F8F8">1</span><span style="color: #B392F0">])</span></span>
-<span class="line"><span style="color: #B392F0">        </span><span style="color: #79B8FF">plots</span><span style="color: #B392F0">.push({</span><span style="color: #F97583">...</span><span style="color: #B392F0">plot})</span></span>
-<span class="line"><span style="color: #B392F0">      }</span></span>
-<span class="line"><span style="color: #B392F0">      c</span><span style="color: #F97583">++</span></span>
-<span class="line"><span style="color: #B392F0">      i</span><span style="color: #F97583">--</span></span>
-<span class="line"><span style="color: #B392F0">    }</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// process the plots</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.plot(plots</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #FFAB70">"renderLine"</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.style)</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #6B737C">// render the indicator</span></span>
-<span class="line"><span style="color: #B392F0">    </span><span style="color: #79B8FF">this</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">target</span><span style="color: #B392F0">.</span><span style="color: #79B8FF">viewport</span><span style="color: #B392F0">.render();</span></span>
-<span class="line"><span style="color: #B392F0">  }</span></span>
-<span class="line"><span style="color: #B392F0">}</span></span></code></pre>
-<h2 id="settings">Settings</h2>
-<p>Current indicator settings can be retrieved with the following call:</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.getIndicator(</span><span style="color: #FFAB70">"TX_lj7216mu_vq6_0-Chart_0-EMA_1"</span><span style="color: #B392F0">).settings()</span></span></code></pre>
-<p>Indicator settings can also modified with the same call by passing an object:</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">newSettings</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {}</span></span>
-<span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.getIndicator(</span><span style="color: #FFAB70">"TX_lj7216mu_vq6_0-Chart_0-EMA_1"</span><span style="color: #B392F0">).settings(newSettings)</span></span></code></pre>
-<h3 id="invokeing-the-settings-dialogue">Invokeing the Settings Dialogue</h3>
-<p>The indicator Settings Dialogue can be invoked with the following:</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.getIndicator(</span><span style="color: #FFAB70">"TX_lj7216mu_vq6_0-Chart_0-EMA_1"</span><span style="color: #B392F0">).invokeSettings()</span></span></code></pre>
-<p>Invocation of the Settings Dialogue can be modified or replaced with a user defined function, either by passing an object to the method:</p>
-<pre is:raw="" class="astro-code min-dark" style="background-color: #1f1f1f; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color: #F97583">const</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">callback</span><span style="color: #B392F0"> </span><span style="color: #F97583">=</span><span style="color: #B392F0"> {</span></span>
-<span class="line"><span style="color: #B392F0">    indicatorSettings</span><span style="color: #F97583">:</span><span style="color: #B392F0"> {fn</span><span style="color: #F97583">:</span><span style="color: #B392F0"> (c)</span><span style="color: #F97583">=></span><span style="color: #B392F0">{ alert(</span><span style="color: #79B8FF">c</span><span style="color: #B392F0">.id) }</span><span style="color: #BBBBBB">,</span><span style="color: #B392F0"> own</span><span style="color: #F97583">:</span><span style="color: #B392F0"> </span><span style="color: #79B8FF">true</span><span style="color: #B392F0">}</span></span>
-<span class="line"><span style="color: #B392F0">  }</span></span>
-<span class="line"><span style="color: #79B8FF">chart0</span><span style="color: #B392F0">.getIndicator(</span><span style="color: #FFAB70">"TX_lj7216mu_vq6_0-Chart_0-EMA_1"</span><span style="color: #B392F0">).invokeSettings(callback)</span></span></code></pre>
-<p>Setting <code>own: true</code> will cause the default dialogue not to be invoked.</p>
-<p>Alternatively, if in the initial chart configuration, the <code>config.callbacks.indicatorSettings</code> is given a callback object, this will make the change permanent.</p></div>
+<p><a href="../indicators_custom">Custom Idicators</a> are in important feature of TradeX-chart. They are an extension of the default indicator class and thus inherit all of their methods and properties. The documentation will show you how to <a href="../indicators_custom#minimal-custom-indicator-definition">define</a>, <a href="../indicators_custom#registering-custom-indicators">register</a> and <a href="../indicators_custom#how-the-indicator-updates">how data is passed to them</a>.</p></div>
               <footer class="astro-3YYAFB3N">
   <div class="meta flex astro-3YYAFB3N">
     
     <p>
       Last updated:
-      <time datetime="2023-09-28T19:53:04.000Z">
+      <time datetime="2023-09-28T20:00:37.000Z">
         Sep 28, 2023
       </time>
     </p>
@@ -824,12 +562,12 @@ In the Bollinger Band example, if you wanted to silence all labels, use an array
           <span class="link-title astro-WI2SPLHG">Hit Detection</span>
         </span>
       </a>
-  <a href="/reference/indicators_default/" rel="next" class="astro-WI2SPLHG">
+  <a href="/reference/indicators_custom/" rel="next" class="astro-WI2SPLHG">
         <svg aria-hidden="true" class="astro-WI2SPLHG astro-HURVU4DH" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62C17.8724 11.4973 17.801 11.3851 17.71 11.29L12.71 6.29C12.6168 6.19676 12.5061 6.1228 12.3842 6.07234C12.2624 6.02188 12.1319 5.99591 12 5.99591C11.7337 5.99591 11.4783 6.1017 11.29 6.29C11.1968 6.38324 11.1228 6.49393 11.0723 6.61575C11.0219 6.73758 10.9959 6.86814 10.9959 7C10.9959 7.2663 11.1017 7.5217 11.29 7.71L14.59 11H7C6.73478 11 6.48043 11.1054 6.29289 11.2929C6.10536 11.4804 6 11.7348 6 12C6 12.2652 6.10536 12.5196 6.29289 12.7071C6.48043 12.8946 6.73478 13 7 13H14.59L11.29 16.29C11.1963 16.383 11.1219 16.4936 11.0711 16.6154C11.0203 16.7373 10.9942 16.868 10.9942 17C10.9942 17.132 11.0203 17.2627 11.0711 17.3846C11.1219 17.5064 11.1963 17.617 11.29 17.71C11.383 17.8037 11.4936 17.8781 11.6154 17.9289C11.7373 17.9797 11.868 18.0058 12 18.0058C12.132 18.0058 12.2627 17.9797 12.3846 17.9289C12.5064 17.8781 12.617 17.8037 12.71 17.71L17.71 12.71C17.801 12.6149 17.8724 12.5028 17.92 12.38C18.02 12.1365 18.02 11.8635 17.92 11.62Z" /></svg>
         <span class="astro-WI2SPLHG">
           Next
           <br class="astro-WI2SPLHG">
-          <span class="link-title astro-WI2SPLHG">Default Indicators</span>
+          <span class="link-title astro-WI2SPLHG">Custom Indicators</span>
         </span>
       </a>
 </div>

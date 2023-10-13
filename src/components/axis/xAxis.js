@@ -149,22 +149,22 @@ export default class xAxis extends Axis {
       let d = time_start(t1, "days")
 
       if (!(y in grads.entries) && y >= start) {
-        grads.entries[y] = [this.dateTimeValue(y, tf), this.t2Pixel(y), y, "major"]
+        grads.entries[y] = [this.dateTimeValue(y, tf, rank), this.t2Pixel(y), y, "major"]
         prev = y
       }
 
       else if (!(m in grads.entries) && m >= start) {
-        grads.entries[m] = [this.dateTimeValue(m, tf), this.t2Pixel(m), m, "major"]
+        grads.entries[m] = [this.dateTimeValue(m, tf, rank), this.t2Pixel(m), m, "major"]
         prev = m
       }
 
       else if (!(d in grads.entries) && d >= start) {
-        grads.entries[d] = [this.dateTimeValue(d, tf), this.t2Pixel(d), d, "major"]
+        grads.entries[d] = [this.dateTimeValue(d, tf, rank), this.t2Pixel(d), d, "major"]
         prev = d
       }
 
       // else if (!(t1 in grads.entries)) {
-        grads.entries[t1] = [this.dateTimeValue(t1, tf), this.t2Pixel(t1), t1, "minor"]
+        grads.entries[t1] = [this.dateTimeValue(t1, tf, rank), this.t2Pixel(t1), t1, "minor"]
         prev = t1
       // }      
 
@@ -197,7 +197,7 @@ export default class xAxis extends Axis {
     return {xStep, rank}
   }
 
-  dateTimeValue(ts, tf) {
+  dateTimeValue(ts, tf, r) {
     let value
     if ((ts / DAY_MS) % 1 === 0) {
       const date = get_day(ts)
@@ -209,10 +209,12 @@ export default class xAxis extends Axis {
       else return date
     }
     else {
-      // TODO: SECONDS_MS
-      if (tf < MINUTE_MS) return MS(ts)
-      else if (tf < HOUR_MS) return MS(ts)
-      else return HM(ts)
+      switch (r) {
+        case "milliseconds": return MS(ts);
+        case "seconds": return MS(ts);
+        case "minutes": return HM(ts);
+        case "hours": return HM(ts);
+      }
     }
   }
 

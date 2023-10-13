@@ -9,6 +9,7 @@ import stateMachineConfig from "../state/state-scale"
 import Input from "../input"
 import { copyDeep, idSanitize, xMap } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
+import { calcTextWidth, createFont } from '../renderer/text'
 
 import Graph from "./views/classes/graph"
 import ScaleCursor from './overlays/scale-cursor'
@@ -51,6 +52,7 @@ export default class ScaleBar {
   #scaleOverlays = new xMap()
   #additionalOverlays = []
   #Graph
+  #digitCnt
 
   #input
   #priceLine
@@ -102,6 +104,7 @@ export default class ScaleBar {
   get dimensions() { return DOM.elementDimPos(this.#element) }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
+  get digitCnt() { return this.#digitCnt }
   set scaleRange(r) { this.setScaleRange(r) }
   set rangeMode(m) { this.#yAxis.mode = m }
   get rangeMode() { return this.#yAxis.mode }
@@ -232,6 +235,8 @@ export default class ScaleBar {
       this.#Graph.setSize(width, dim.h, width)
       this.draw()
     }
+    if (this.#layerCursor instanceof ScaleCursor) 
+      this.calcPriceDigits()
   }
 
   /**
@@ -282,6 +287,15 @@ export default class ScaleBar {
     this.graph.addOverlays(this.#additionalOverlays)
     this.#layerPriceLine.target.moveTop()
     this.#layerCursor.target.moveTop()
+    this.calcPriceDigits()
+  }
+
+  calcPriceDigits() {
+    const ctx = this.#layerCursor.viewport.scene.context
+    const t = this.theme.yAxis
+    ctx.font = createFont(t.fontSize, t.fontWeight, t.fontFamily)
+    const w = calcTextWidth(ctx, "0")
+    this.#digitCnt = Math.floor(this.width / w)
   }
 
   /**

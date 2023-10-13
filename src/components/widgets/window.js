@@ -11,17 +11,6 @@ import { isArray, isNumber, isObject, isString } from "../../utils/typeChecks"
 import Input from "../../input"
 
 
-// State enum
-class State {
-  static opened = new State("opened")
-  static closed = new State("closed")
-
-  constructor(name) {
-    this.name = name
-  }
-}
-
-
 export default class Window {
 
   #id
