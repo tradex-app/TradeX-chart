@@ -3,8 +3,8 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://tradex-app.github.io/TradeX-chart/',
-  base: '/docs',
+  site: 'https://tradex-app.github.io',
+  base: '/TradeX-chart',
   outDir: '../../docs',
   publicDir: './public',
   assets: '../../docs/_astro',
