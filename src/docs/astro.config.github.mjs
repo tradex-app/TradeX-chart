@@ -6,8 +6,9 @@ export default defineConfig({
   site: 'https://tradex-app.github.io',
   base: '/TradeX-chart',
   outDir: 'dist2',
-  // publicDir: './public',
-  // assets: '../../docs/_astro',
+  build: {
+    assets: 'astro'
+  },
   integrations: [
     starlight({
       title: 'TradeX Chart',
