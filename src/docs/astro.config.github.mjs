@@ -5,9 +5,9 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
   site: 'https://tradex-app.github.io',
   base: '/TradeX-chart',
-  outDir: '../../docs',
-  publicDir: './public',
-  assets: '../../docs/_astro',
+  outDir: 'dist2',
+  // publicDir: './public',
+  // assets: '../../docs/_astro',
   integrations: [
     starlight({
       title: 'TradeX Chart',
