@@ -11,13 +11,23 @@ import { isArray, isNumber, isObject, isString } from "../../utils/typeChecks"
 import Input from "../../input"
 
 
+class WinState {
+  static opened = new WinState("opened")
+  static closed = new WinState("closed")
+
+  constructor(name) {
+    this.name = name
+  }
+}
+
+
 export default class Window {
 
   #id
   #widgets
   #core
   #config
-  #state = State.closed
+  #state = WinState.closed
   
   #elWidgetsG
   #elWindows
@@ -399,10 +409,10 @@ export default class Window {
   // display the window
   open(data) {
     if (Window.currentActive === this &&
-        this.state === State.opened) return true
+        this.state === WinState.opened) return true
 
     Window.currentActive = this
-    this.#state = State.opened
+    this.#state = WinState.opened
     this.#elWindow.style.display = "block"
     this.#elWindow.style.zindex = "10"
     this.setProperties(data)
@@ -418,7 +428,7 @@ export default class Window {
   // hide the window
   close() {
     Window.currentActive = null
-    this.#state = State.closed
+    this.#state = WinState.closed
     this.#elWindow.style.display = "none"
     this.emit("window_closed", this.id)
   }
