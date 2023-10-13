@@ -1,3 +1,5 @@
+import React from "react";
+
 export const GraphSvg = ({ color = "#BDBDBD" }) => (
   <svg
     width="36"

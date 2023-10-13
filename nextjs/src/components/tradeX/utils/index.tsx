@@ -2,6 +2,7 @@ import { differenceInCalendarDays } from "date-fns";
 import { ChartSwitchSvg } from "../../theme/svg";
 import { ChartResolutionEnum, ColumnAccessorEnumReversed } from "./enums";
 import { IChartOption, IIndicatorOption } from "./types";
+import React from "react";
 
 export const LIMIT = 250;
 export const DEFAULT_RANGE_LIMIT = 96;

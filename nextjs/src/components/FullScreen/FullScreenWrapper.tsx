@@ -14,7 +14,7 @@ const FullScreenWrapper = ({ children, ...props }) => {
   }, []);
 
   return (
-    <FullScreen handle={handle} className="h-full w-full">
+    <FullScreen handle={handle} className="full-size">
       {children({ handle, isIOS, ...props })}
     </FullScreen>
   );

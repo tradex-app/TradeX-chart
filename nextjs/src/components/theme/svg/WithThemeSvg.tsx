@@ -1,5 +1,6 @@
 import { CandleStickSvg, GraphSvg } from "./ChartSwicthSvg";
 import withThemeSvg from "../withThemeSvg";
+import React from "react";
 
 const TokenSpecificGraph = ({ color = "#7A7F93" }) => (
   <svg

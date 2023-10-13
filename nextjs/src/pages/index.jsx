@@ -1,19 +1,40 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-// import TokenChart from '../components/tradeX/Wrapper';
-
 import dynamic from "next/dynamic";
-import { sampleOHLCVFromPrice } from "../components/tradeX/15min_btc";
+import { sampleOHLCV, tradeData } from "../components/tradeX/15min_btc";
+import { CHART_OPTIONS } from "../components/tradeX/utils";
+import ThemeContextProvider from "../components/theme/ThemeContext";
+import useTheme from '../components/hooks/useTheme';
 
 const TokenChart = dynamic(() => import("../components/tradeX/Wrapper"), {
   ssr: false,
 });
 
-const chartConfig = {};
-const tradeData = [];
+
+const chartConfig = {
+  toolbar: {
+  timeframe: true,
+  indicators: true,
+  typeSelector: true,
+  fullscreenButton: true,
+},
+generalTokenChart: true,
+defaults: {
+  timeframe: "1h",
+  chartType: CHART_OPTIONS[0],
+}
+};
 
 export default function Home() {
+  const { isLightTheme, theme, switchTheme } = useTheme();
+  const handleSwitch = () => {
+    const swap = isLightTheme ? "dark" : "light";
+    localStorage.setItem("theme", swap );
+    switchTheme();
+  }
+
   return (
+  <ThemeContextProvider>
     <div className={styles.container}>
       <Head>
         <title>Next App</title>
@@ -54,14 +75,18 @@ export default function Home() {
             />
           </a>
         </div>
-        <ul></ul>
-
         <div className={styles.grid}>
           <TokenChart
+            symbol={"BTC"}
             config={chartConfig}
-            chartData={sampleOHLCVFromPrice}
+            chartData={sampleOHLCV}
             tradeData={tradeData}
           />
+        </div>
+        <div className={styles.themeSwitch}>
+          <button onClick={handleSwitch}>
+            {!isLightTheme ? "🌞" : "🌙"}
+          </button>
         </div>
       </main>
 
@@ -72,12 +97,13 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           Powered by{" "}
-          <img src="/vercel.svg" alt="Vercel" className={styles.logo} />
+          <img src="/vercel.svg" alt="Vercel" className={theme === 'dark' ? styles.invertedLogo : styles.logo} />
         </a>
       </footer>
 
       <style jsx>{`
         main {
+          width: 100%;
           padding: 5rem 0;
           flex: 1;
           display: flex;
@@ -87,8 +113,7 @@ export default function Home() {
         }
         footer {
           width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
+          height: 50px;
           display: flex;
           justify-content: center;
           align-items: center;
@@ -128,5 +153,6 @@ export default function Home() {
       `}</style>
       <script type="module" src="../index.js"></script>
     </div>
+    </ThemeContextProvider>
   );
 }
