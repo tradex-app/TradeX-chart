@@ -1,0 +1,12 @@
+const id = "reference/events.md";
+						const collection = "docs";
+						const slug = "reference/events";
+						const body = "\nTradeX-chart provides a publish and subscribe messaging model. The chart supports multiple subscriptions to an event.\n\nIt is also possible to use the chart to generate your on events.\n\n## Subscribing\n\nOnce the chart is initialized with the ``chart.start()`` method, any event the chart generates can be subscribed to with the ``chart.on(topic, handler)`` method.\n\n* @param {string}   topic   - event name\n* @param {function} handler - function or method\n* @param {Object}   context - Optional context the function belongs to\n\n```javascript\nchart.on(\"stream_candleUpdate\", onSomeEven, this)\n```\n\nThe handler will be passed one parameter if any dependent upon the event.\n\n```javascript\nfunction onSomeEvent(data) { console.log(data) }\n```\nEvent handlers will be executed in first in last out order.\n\n## Unsubscribing\n\nUnsubscribing from the event uses the ``chart.off(string, function)`` method.\n\n* @param {string}   topic   - event name\n* @param {function} handler - function or method\n\n```javascript\nchart.off(\"stream_candleUpdate\", onSomeEven)\n```\n\n## Event Publishing\n\nThe same method that the chart uses internally is also exposed on the public API. Developers can take advantage of this for their own purposes and generate their own events and use the same subscribe and unsubscribe methods detailed above.\n\n* @param {String} topic - The topic name\n* @param {Object} data  - The data to publish\n\n```javascript\nchart.emit(\"some_event\", {value: \"foo\"})\n```\n\n## Event List\n\nThe following list of events is not exhaustive as the chart is still under heavy development and subject to change until the release of version 1.0.\n\n* addIndicatorDone\n* addSecondary\n* chart_pan\n* chart_panDone\n* chart_render\n* chart_yAxisRedraw\n* divider_pointerdrag\n* divider_pointerdragend\n* Error\n* event_selected\n* global_resize\n* main_mousemove\n* scrollUpdate\n* setRange\n* trade_selected\n* zoomDone\n";
+						const data = {title:"Events",editUrl:true,head:[],template:"doc"};
+						const _internal = {
+							type: 'content',
+							filePath: "/mnt/ext4/Home/neoarttec/Archives/Linux/Crypto/Trading/Mercury/MercuryTrader/component-module-tests/TradeX/tradex-chart/src/docs/src/content/docs/reference/events.md",
+							rawData: "\ntitle: Events",
+						};
+
+export { _internal, body, collection, data, id, slug };

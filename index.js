@@ -911,7 +911,6 @@ const dre =   {
 
 const configs = [
   {config: dre, stream: null},
-
   {config: config1, stream: null},
   // {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
   // {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
