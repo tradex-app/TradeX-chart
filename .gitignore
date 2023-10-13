@@ -47,3 +47,4 @@ dist-ssr
 # macOS-specific files
 ./src/docs/.DS_Store
 
+demo/tradex-chart.es.js
