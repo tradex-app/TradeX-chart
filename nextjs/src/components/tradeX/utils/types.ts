@@ -1,7 +1,7 @@
 import { Indicator } from "tradex-chart";
 import { ReactNode } from "react";
 import { ChartResolutionEnum } from "./enums";
-import { ColorsEnum } from "../../../../theme";
+import { ColorsEnum } from "../../theme/";
 
 export type ChartType = "area" | "candle_solid";
 

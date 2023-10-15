@@ -46,4 +46,3 @@ dist-ssr
 
 # macOS-specific files
 ./src/docs/.DS_Store
-

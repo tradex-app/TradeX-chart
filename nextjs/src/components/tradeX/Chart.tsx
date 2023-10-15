@@ -64,17 +64,19 @@ const Chart: FC<IProps> = ({
         document.querySelector(`#${chartAccessor} tradex-chart`).remove();
       }
 
-      const combinedPrimary = tradeData 
-      ? onchart.map((indicator) => ({
-          name: indicator.name,
-          type: indicator.value,
-          data: indicator.data || [],
-        })).concat(tradeData) 
-      : onchart.map((indicator) => ({
-          name: indicator.name,
-          type: indicator.value,
-          data: indicator.data || [],
-        }));
+      const combinedPrimary = tradeData
+        ? onchart
+            .map((indicator) => ({
+              name: indicator.name,
+              type: indicator.value,
+              data: indicator.data || [],
+            }))
+            .concat(tradeData)
+        : onchart.map((indicator) => ({
+            name: indicator.name,
+            type: indicator.value,
+            data: indicator.data || [],
+          }));
 
       const mount = document.querySelector(`#${chartAccessor}`);
       const chart: ITradeX = document.createElement("tradex-chart");
@@ -82,7 +84,7 @@ const Chart: FC<IProps> = ({
       console.log(tradeData);
       const state: {
         ohlcv: number[][];
-        trades: any,
+        trades: any;
         primary?: { name: string; type: string; data: number[] }[];
       } = {
         ohlcv: data,
