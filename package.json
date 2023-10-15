@@ -16,7 +16,7 @@
   "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp ./dist/tradex-chart.es.js ./demo && cd ./src/docs/ && npm run build",
+    "build": "./bin/build.sh",
     "serve": "vite serve",
     "demo": "vite build && vite serve --open /demo.html"
   },

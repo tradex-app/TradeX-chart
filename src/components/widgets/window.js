@@ -8,6 +8,7 @@ import DOM from "../../utils/DOM"
 import { CLASS_WINDOWS, CLASS_WINDOW } from "../../definitions/core"
 import { WindowStyle } from "../../definitions/style"
 import { isArray, isNumber, isObject, isString } from "../../utils/typeChecks"
+import { limit } from "../../utils/number"
 import Input from "../../input"
 
 
@@ -57,7 +58,12 @@ export default class Window {
 
     const id = `window_${++Window.windowCnt}`
     config.id = id
-
+    const styles = {
+      window: {"box-shadow": "rgb(0,0,0) 0px 20px 30px -10px"},
+      content: {padding: "1em"},
+    }
+    config.styles = (isObject(config?.styles)) ? {...styles, ...config.styles} : styles
+    config.class = config?.class || "window"
     // add entry
     Window.windowList[id] = new Window(widgets, config)
 
@@ -250,7 +256,7 @@ export default class Window {
 
   windowNode() {
     const window = this.#config
-    let windowStyle = `position: absolute; z-index: 10; display: block; border: 1px solid ${WindowStyle.COLOUR_BORDER}; background: ${WindowStyle.COLOUR_BG}; color: ${WindowStyle.COLOUR_TXT};`
+    let windowStyle = `position: absolute; z-index: 100; display: block; border: 1px solid ${WindowStyle.COLOUR_BORDER}; background: ${WindowStyle.COLOUR_BG}; color: ${WindowStyle.COLOUR_TXT}; box-shadow: rgb(0,0,0) 0px 20px 30px -10px;`
     let cfg = this.config?.styles?.window
     for (let k in cfg) {
       windowStyle += `${k}: ${cfg[k]}; `
@@ -347,6 +353,8 @@ export default class Window {
   position(p) {
     let wPos = this.dimensions
     let iPos = this.#core.dimensions
+    let left = Math.round(iPos.left - wPos.left)
+    let top  = Math.round(iPos.bottom - wPos.top)
     let px = Math.round((iPos.width - wPos.width) / 2)
     let py = Math.round((iPos.height - wPos.height) / 2) * -1
     let pz = DOM.getStyle(this.#elWindow, "z-index")
@@ -362,14 +370,30 @@ export default class Window {
     this.#elWindow.style.left = `${px}px`
     this.#elWindow.style.top = `${py}px`
     this.#elWindow.style["z-index"] = `${pz}`
+
+    // keep window visible on chart
+    if (this.config?.bounded) {
+      // adjust positioning if clipped
+      let pos = DOM.elementDimPos(this.#elWindow)
+      // adjust horizontal positioning if clipped
+      if (pos.right > this.#elWidgetsG.offsetWidth) {
+        let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width)
+            o = limit(o, 0, this.#elWidgetsG.offsetWidth)
+        this.#elWindow.style.left = `${o}px`
+      }
+      // adjust vertical position on clipped
+      if (pos.bottom > this.#core.MainPane.rowsH) {
+        let o = Math.floor(pos.height * -1)
+            o = limit(o, this.#core.MainPane.rowsH * -1, 0)
+        this.#elWindow.style.top = `${o}px`
+      }
+    }
   }
 
   setDimensions(d) {
     if (!isObject(d)) return false
     if (isNumber(d?.w)) this.#elWindow.style.width = `${d.w}px`
     if (isNumber(d?.h)) this.#elWindow.style.height = `${d.h}px`
-
-    this.#dims = {w: d.x, h: d.y}
   }
 
   setProperties(data) {
@@ -381,8 +405,8 @@ export default class Window {
       this.#elContent.innerHTML = data.content
     }
 
-    this.setDimensions({w: data?.w, h: data?.h})
-    this.position({x: data?.x, y: data?.y})
+    this.setDimensions({...data?.dimensions})
+    this.position({...data?.position})
 
     if (isObject(data?.styles)) {
 
@@ -407,7 +431,7 @@ export default class Window {
   }
 
   // display the window
-  open(data) {
+  open(data={}) {
     if (Window.currentActive === this &&
         this.state === WinState.opened) return true
 

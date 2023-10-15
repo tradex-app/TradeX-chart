@@ -7,7 +7,8 @@ import { limit } from "../../utils/number"
 import { debounce } from "../../utils/utilities"
 import { isString } from "../../utils/typeChecks"
 
-const config = {
+const newsConfig = {
+  bounded: true,
   dragBar: false,
   closeIcon: false,
   content: "",
@@ -38,7 +39,7 @@ export default class chartNewsEvents extends Overlay {
     this.#event = new NewsEvent(target, theme)
     this.emit()
     this.core.on("primary_pointerdown", debounce(this.isNewsEventSelected, 200, this), this)
-    this.#dialogue = this.core.WidgetsG.insert("Dialogue", config)
+    this.#dialogue = this.core.WidgetsG.insert("Dialogue", newsConfig)
     this.#dialogue.start()
   }
 
@@ -50,27 +51,28 @@ export default class chartNewsEvents extends Overlay {
   get data() { return this.overlay.data }
 
   isNewsEventSelected(e) {
-    if (this.core.config?.events?.display === false ||
-        this.core.config?.events?.displayInfo === false) return
-
     const x = e[0]
     const y = e[1]
+    const k = this.hit.getIntersection(x,y)
+
+    if (this.core.config?.events?.display === false ||
+        this.core.config?.events?.displayInfo === false ||
+        k == -1)  return
+
     const d = this.theme.events
     const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight)
     const ts = this.xAxis.pixel2T(x)
-    const k = this.hit.getIntersection(x,y)
-
-    if (k == -1) return
+    const o = this.xAxis.scrollOffsetPx
 
     let tr = Object.keys(this.data)[k] * 1
-    let tx = this.xAxis.xPos(ts)
+    let tx = this.xAxis.xPos(ts) + o
     let ty = this.scene.height - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
     let content = ``
     for (let t of this.data[tr]) {
       content += this.buildNewsEventHTML(t)
     }
     const config = {
-      dimensions: {h: 150, w: 150},
+      dimensions: {h: undefined, w: 150},
       position: {x: tx + (w / 2) + 1, y: ty, relativeY: "bottom"},
       content: content,
     }

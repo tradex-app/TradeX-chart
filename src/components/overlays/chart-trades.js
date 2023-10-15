@@ -7,7 +7,8 @@ import { limit } from "../../utils/number"
 import { debounce } from "../../utils/utilities"
 import { isObject } from "../../utils/typeChecks"
 
-const config = {
+const tradeConfig = {
+  bounded: true,
   dragBar: false,
   closeIcon: false,
   content: "",
@@ -39,7 +40,7 @@ export default class chartTrades extends Overlay {
     this.settings = params.settings
     this.#trade = new Trade(target, theme)
     this.core.on("primary_pointerdown", debounce(this.isTradeSelected, 200, this), this)
-    this.#dialogue = this.core.WidgetsG.insert("Dialogue", config)
+    this.#dialogue = this.core.WidgetsG.insert("Dialogue", tradeConfig)
     this.#dialogue.start()
   }
 
@@ -62,29 +63,38 @@ export default class chartTrades extends Overlay {
     }
   }
 
+  /**
+   * Display trade info if makrer selected
+   * @param {array} e - pointer event [x, y]
+   * @memberof chartTrades
+   */
   isTradeSelected(e) {
-    if (this.core.config?.trades?.display === false ||
-        this.core.config?.trades?.displayInfo === false) return
-
     const x = e[0]
     const y = e[1]
+    const k = this.hit.getIntersection(x,y)
+    // do not display if...
+    if (this.core.config?.trades?.display === false ||
+        this.core.config?.trades?.displayInfo === false ||
+        k == -1)  return
+
     const d = this.theme.trades
-    const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight)
+    const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconWidth)
     const ts = this.xAxis.pixel2T(x)
     const c = this.core.range.valueByTS(ts)
-    const k = this.hit.getIntersection(x,y)
-
-    if (k == -1) return
+    const o = this.xAxis.scrollOffsetPx
+    const iPos = this.core.dimensions
 
     let tr = Object.keys(this.data)[k] * 1
-    let tx = this.xAxis.xPos(tr)
-    let ty = this.yAxis.yPos(c[2]) - (w * 1.5)
+    // adjust position to scroll position
+    let tx = this.xAxis.xPos(tr) + o
+    // negative values required as widgets start positioned below chart content
+    let ty = (this.yAxis.yPos(c[2]) - (w * 1.5)) - iPos.height
     let content = ``
     for (let t of this.data[tr]) {
       content += this.buildTradeHTML(t)
     }
     const config = {
-      dimensions: {h: 150, w: 150},
+      dimensions: {h: undefined, w: 150},
       position: {x: tx + (w / 2) + 1, y: ty},
       content: content,
     }

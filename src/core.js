@@ -9,6 +9,7 @@ import { isTimeFrame, SECOND_MS } from "./utils/time"
 import { copyDeep, objToString, uid } from './utils/utilities'
 import State from './state'
 import { Range, calcTimeIndex } from "./model/range"
+import { defaultTheme } from './definitions/style'
 import StateMachine from './scaleX/stateMachne'
 import Stream from './helpers/stream'
 import Theme from "./helpers/theme"
@@ -392,6 +393,8 @@ export default class TradeXchart extends Tradex_chart {
     this.#TALib = txCfg.talib
     this.#el = this
     this.#core = this
+
+    if (!("theme" in txCfg)) txCfg.theme = defaultTheme
 
     const id = (isString(txCfg?.id)) ? txCfg.id : null
     this.setID(id)
