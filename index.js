@@ -911,12 +911,12 @@ const dre =   {
 
 const configs = [
   {config: config1, stream: null},
-  // {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  // {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
-  // {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  // {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
-  // {config: config6, stream: null},
-  // {config: config8, stream: null},
+  {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
+  {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
+  {config: config6, stream: null},
+  {config: config8, stream: null},
   // {config: config7, stream: null},
   // {config: dre, stream: null},
 ]
@@ -1148,12 +1148,8 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
-// addChart()
-// addChart()
-// addChart()
-// addChart()
-// addChart()
-// addChart()
+addChart()
+
 
 
 // add custom indicator definition

@@ -63,17 +63,18 @@ export default class chartNewsEvents extends Overlay {
     const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight)
     const ts = this.xAxis.pixel2T(x)
     const o = this.xAxis.scrollOffsetPx
+    const iPos = this.core.dimensions
 
     let tr = Object.keys(this.data)[k] * 1
     let tx = this.xAxis.xPos(ts) + o
-    let ty = this.scene.height - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
+    let ty = (y - (w * 1.5)) - iPos.height
     let content = ``
     for (let t of this.data[tr]) {
       content += this.buildNewsEventHTML(t)
     }
     const config = {
       dimensions: {h: undefined, w: 150},
-      position: {x: tx + (w / 2) + 1, y: ty, relativeY: "bottom"},
+      position: {x: tx + (w / 2) + 1, y: ty},
       content: content,
     }
     this.core.emit("event_selected", tr)

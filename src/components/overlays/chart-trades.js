@@ -86,9 +86,9 @@ export default class chartTrades extends Overlay {
 
     let tr = Object.keys(this.data)[k] * 1
     // adjust position to scroll position
-    let tx = this.xAxis.xPos(tr) + o
+    let tx = this.xAxis.xPos(ts) + o
     // negative values required as widgets start positioned below chart content
-    let ty = (this.yAxis.yPos(c[2]) - (w * 1.5)) - iPos.height
+    let ty = (y - (w * 1.5)) - iPos.height
     let content = ``
     for (let t of this.data[tr]) {
       content += this.buildTradeHTML(t)

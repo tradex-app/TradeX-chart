@@ -373,18 +373,18 @@ export default class Window {
 
     // keep window visible on chart
     if (this.config?.bounded) {
-      // adjust positioning if clipped
-      let pos = DOM.elementDimPos(this.#elWindow)
       // adjust horizontal positioning if clipped
-      if (pos.right > this.#elWidgetsG.offsetWidth) {
-        let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width)
+      const width = this.#elWindow.clientWidth
+      if (px + width > this.#elWidgetsG.offsetWidth) {
+        let o = Math.floor(this.#elWidgetsG.offsetWidth - width)
             o = limit(o, 0, this.#elWidgetsG.offsetWidth)
         this.#elWindow.style.left = `${o}px`
       }
       // adjust vertical position on clipped
-      if (pos.bottom > this.#core.MainPane.rowsH) {
-        let o = Math.floor(pos.height * -1)
-            o = limit(o, this.#core.MainPane.rowsH * -1, 0)
+      const height = this.#elWindow.clientHeight
+      if (py +  iPos.height + height > iPos.height) {
+        let o = Math.floor(height * -1)
+            o = limit(o, iPos.height * -1, 0)
         this.#elWindow.style.top = `${o}px`
       }
     }
