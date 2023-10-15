@@ -46,6 +46,7 @@ export default class yAxis extends Axis {
   #yAxisDigits = PRICEDIGITS
   #yAxisTicks = 3
   #yAxisGrads
+  #step
 
   #range
 
@@ -76,6 +77,8 @@ export default class yAxis extends Axis {
   set yAxisTicks(t) { this.#yAxisTicks = isNumber(t) ? t : 0 }
   get yAxisTicks() { return this.#yAxisTicks }
   get yAxisGrads() { return this.#yAxisGrads }
+  get yAxisDigits() { return this.parent.digitCnt }
+  get step() { return this.#step }
   set mode(m) { this.setMode(m) }
   get mode() { return this.#mode }
   set offset(o) { this.setOffset(o) }
@@ -321,13 +324,14 @@ export default class yAxis extends Axis {
     let pos = this.height,
         step$ = (yEndRoundNumber - yStartRoundNumber) / niceNumber,
         stepP = this.height / step$,
-        step = this.countDigits(step$),
+        step = this.countDigits(niceNumber),
         nice;
+    this.#step = step
 
     for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
     {
       digits = this.countDigits(y)
-      nice = this.niceValue(digits, decimals, step)
+      nice = this.limitPrecision(digits, step)
       pos = this.yPos(nice)
       scaleGrads.push([nice, pos, digits])
     }
@@ -349,47 +353,68 @@ export default class yAxis extends Axis {
   }
 
   /**
+   * 
+   * REMOVE??? Obsolete
+   * 
    * format Y axis labels (values)
-   * @param {*} digits - {digits, decimals}
-   * @param {boolean} [decimals=true] - using decimals
-   * @param {*} step - {digits, decimals}
+   * @param {object} digits - {digits, decimals}
+   * @param {object} step - {digits, decimals}
    * @return {number}  
    */
-  niceValue(digits, decimals=true, step) {
-    if (digits.integers) {
-      let x = step.integers
+  niceValue(digits, step=this.#step) {
+    let x = step.integers,
+        d = step.decimals,
+        v = digits.value;
+    if (digits.integers > 1) {
       if (x - 2 > 0) {
         let factor = power(10, x - 2)
-        return Math.floor(digits.value / factor) * factor
+        return Math.floor(v / factor) * factor
       }
       else {
-        if (!decimals) return Math.floor(digits.value)
-        x = (x > 0)? x : x * -1
-        return round(digits.value, x)
+        return (d == 0) ? Math.floor(v) : round(v, d)
       }
     }
     else {
-      let y = digits.decimals - step.decimals
-      y = (y > 0)? y : y * -1
-      return round(digits.value, y)
+      return (d == 0) ? 0 : round(v, d)
     }
   }
 
+  /**
+   * truncate price to fit on Scale
+   * @param {object} digits
+   * @return {number}  
+   * @memberof yAxis
+   */
   limitPrecision(digits) {
-    let value = digits.value,
-        cnt = this.#yAxisDigits - digits.total,
-        cnt2 = 4 - digits.integers
-
-    if (cnt < 1) {
-      let decimals = limit(digits.decimals + cnt, 0, 100)
-      value = Number.parseFloat(value).toFixed(decimals)
+    let {sign: s, integers: i, decimals: d, value: v} = digits
+    let n = this.yAxisDigits - 1,
+        x = `${v}`,
+        r = "",
+        c = 0,
+        f = 0;
+    // sign
+    s = (s) ? 0 : 1
+    if (s > 0) {
+      r += "-"
+      c++
     }
-    else if (cnt2 < 1) {
-      let decimals = 2 - cnt2
-      value = Number.parseFloat(value).toFixed(decimals)
+    // integers
+    if (i == 0) {
+      r += "0"
+      c++
     }
-
-    return value
+    else {
+      r += x.slice(c,i)
+      c += i
+    }
+    // decimals
+    if (c + 1 < n && d > 0) {
+      r += `${x.slice(c)}`
+      f = n - ( c + 1)
+      f = (d < f) ? d : f
+      r = Number.parseFloat(r).toFixed(f)
+    }
+    return r
   }
 
 }

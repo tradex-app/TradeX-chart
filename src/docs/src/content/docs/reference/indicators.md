@@ -1,20 +1,82 @@
 ---
 title: Indicators
 ---
-TradeX-chart provides a set of [default indicators](#default-indicators) based upon TA-Lib. The chart uses a Web Assembly version of the library, [talib-web](https://github.com/newproplus/talib-web).
+TradeX-chart provides a set of [default indicators](../indicators_default) based upon TA-Lib. The chart uses a Web Assembly version of the library, [talib-web](https://github.com/newproplus/talib-web).
 
-TradeX-chart may or may not implement all of the indicators provided by TA-Lib.
+It is also possible to build and add your own [custom indicators](../indicators_custom) to the chart also.
 
 Indicators are grouped as:
 
 * **Primary Chart Pane** - those displayed atop the price history (candles)
 * **Secondary Chart Panes** - those displayed in their own pane.
 
+## Adding Indicators to the Chart
+
 Indicators can be added via the following methods:
 
-* API - programmatically ``chart.addIndicator()``
-* State - [a valid chart state](state.md)
-* Utils Bar - through the chart GUI using the Indicators option in the Utils Bar
+* [API](#adding-indicators-via-api)
+* [State](#adding-indicators-via-the-data-state)
+* [Utils Bar](#adding-indicators-via-the-utils-bar)
+
+### Adding Indicators Via API
+
+To add an "empty" indicator is as simple as:
+
+```javascript
+const i = "RSI"
+const name = "RSI_1"
+myInd = chart0.addIndicator(i, name)
+```
+
+If the chart has price history data, the indicator will automatically calculate it's values with it's defaults.
+
+However, indicators can also be added with data and or with custom settings.
+
+```javascript
+const data = [ [1543572000000, 4079.63478779] ]
+const settings = {style:{}}
+const params = {data, settings}
+const myInd = chart0.addIndicator("EMA", "EMA_1", params)
+```
+
+
+| Parameters | Type   | Required | Description                             |
+| ------------ | -------- | ---------- | ----------------------------------------- |
+| indicator  | string | yes      | identifier the chart is registered with |
+| name       | string | yes      | text label used in legends              |
+| params     | object | no       | optional indicator configuration        |
+
+The third argument **params** is an object that can optionally contain array ``data`` and or an object ``settings``.
+
+```javascript
+const settings = {
+  timePeriod: 20,
+  style: {
+    stroke: "#C80",
+    width: '1',
+  }
+}
+```
+
+Each entry in the ``data`` array requires an array with minimum of [timestamp, value] depending upon the indicator.
+
+The ``settings`` object can contain an object ``style`` and or individual input settings specific to the indicator.
+
+The ``params.settings.style`` object is how indicator an indicator can have it's default style (theme) modified. 
+
+### Adding Indicators Via the Data State
+
+Indicators can be added via [a valid chart state](state).
+
+### Adding Indicators Via the Utils Bar
+
+The chart GUI can add indicators via the Utils Bar with Indicators icon. Firstly the Utils bar needs to be enabled in the chart config.
+
+Clicking on the Indicators icon will open a menu listing all of the indicators currently registered with the chart, including any custom indicators. Simply selecting the indicator from the list with the pointer will add it to the chart.
+
+TODO: add screenshot
+
+## Indicator Removal
 
 Removal of Indicators can be done via:
 
@@ -23,368 +85,12 @@ Removal of Indicators can be done via:
 
 ## Default Indicators
 
-[The current list of implemented indicators.](indicators_default.md)
+The [Default Indicators documentation](../indicators_default) lists all of the currently available indicators.
+
+TradeX-chart may or may not implement all of the indicators provided by TA-Lib.
+
+More will be implemented soon.
 
 ## Custom Indicators
 
-Developers are not restricted to using only the [default indicators](indicators_default.md) provided by TradeX-chart. After all, everybody has their own secret methods for finding signals in the market.
-
-Of course the [functions provided by the TA-Lib](indicators_talib.md) can still be leveraged for custom indicators via the chart API. The chart will take care of initializing the TA-Lib wasm component and return a promise.
-
-All indicators relying upon TA-Lib functions should defer any data processing until the promise is fulfilled.
-
-```javascript
-      if (this.core.TALibReady) calc()
-      else  this.core.talibAwait.push(calc.bind(this))
-```
-
-### Registering Custom Indicators
-
-Before any custom indicator can be used, it first must be registered with the chart.
-
-During the registration of custom indicators, there is the option to expunge all of the default indicators, thereby allowing the developer to replace them all, or select which to keep.
-
-```javascript
-// custom indicator class
-import TEST from "testIndicator"
-
-/**
- * set indicators
- * @param {Object} i - indicators {id, name, event, ind}
- * @param {boolean} flush - expunge default indicators
- * @returns boolean
- */
-chart.setIndicators({
-  TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST}, false
-})
-```
-
-The list of registered indicators, both default and custom can be accessed via the chart API.
-
-```javascript
-// returns a Map() iterator of indicators
-const primaryPaneIndicators = chart.Indicators.primary.entries()
-const secondaryPaneIndicators = chart.Indicators.secondary.entries()
-```
-
-### Indicator Definitions
-
-#### Local Y-Axis Range
-
-If the indicator is not overlaid on the Primary Chart Pane, and instead on a Secondary Chart Pane, there is the option to set the local Y-Axis range, min and max values which will be used for the scale and plotting the indicator.
-
-```javascript
-this.chart.setLocalRange(0, 150)
-```
-
-#### Legend
-
-Indicators must provide a ``legendInputs(pos)`` method. The chart will pass the current mouse position to the indicator in an array, ``[x, y]``.
-
-Legends can display multiple values if formatted correctly.
-
-If the indicator provides no values for it's legend then simply return false.
-
-```javascript
-legendInputs() {
-  return false;
-}
-```
-
-When the indicator does provide values for it's legend, then the `legendInputs()` method must return an object with three entries.
-
-```javascript
- return {inputs, colours, labels}
-```
-
-where the three entries are defined as the following:
-
-```javascript
-/**
-  @param {Object} inputs - property names are used as labels
-  @param {Array} colours - array of #rrggbb(aa) values
-  @param {Array} labels - array of which input labels to dispaly [true, false, ...]
-*/
-```
-
-##### inputs
-
-is an object that provides the legend labels and values.
-For example the Bollinger Band indicator has three values. It's returned ``inputs`` object would look like the following:
-
-```javascript
-{ Hi: "13016.1", Mid: "13011.2", Lo: "13006.2" }
-```
-
-The object property names are used as the labels for the indicator.
-The Bollinger Band indicator legend would look like this on the chart:
-
-```javascript
- Hi: 13016.1  Mid: 13011.2  Lo: 13006.2
-```
-
-If you wanted a label with spaces, then the object property name would have to be quoted. ``"some value": 12345``
-
-##### colours
-
-is an array of ``"#rrggbb(aa)"`` string values corresponding to the legend values
-
-##### lables
-
-is an array that specifies which of the legend labels are displayed.
-In the Bollinger Band example, if you wanted to silence all labels, use an array of ``[false, false, false]``.
-
-#### Canvas Drawing Methods
-
-The base ``Indicator`` class which all others, including custom indicators are built atop, offers the ``plot()`` method for drawing to the canvas.
-
-The ``Indicator`` class also exposes a pointer to the canvas directly, so you could also use your own functions instead.
-
-Refer to the [Canvas Methods documentation](../canvas_mehtods) for the available functions.
-
-```javascript
-this.plot (plots, type, opts )
-```
-
-
-| Parameters | Type   | Description                                       |
-| ------------ | -------- | --------------------------------------------------- |
-| plots      | Array  | array of x y coords [ { x, y }, ...]             |
-| type       | string | [Canvas Methods documentation](../canvas_mehtods) |
-| opts       | object | [Canvas Methods documentation](../canvas_mehtods) |
-
-#### Minimal Custom Indicator Definition
-
-```javascript
-// custom-indicator.js
-// proof of concept for user defined indicators
-
-// import { Indicator } from "tradex-chart"
-import { Indicator, Range, uid } from "./src"
-
-export default class Test extends Indicator {
-
-  name = "Test Custom Inicator"
-  shortName = "Test"
-
-  timePeriod = 20
-
-  #defaultStyle = {
-    stroke: "#0088cc",
-    width: "1",
-    dash: undefined,
-  }
-
-  style = {}
-
-  static inCnt = 0
-  static primaryPane = true
-  // static scale is required for off chart indicators
-  // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
-  static colours = []
-
-
-  /**
-   * Creates an instance of Test.
-   * @param {Object} target - canvas scene
-   * @param {Object} xAxis - timeline axis instance
-   * @param {Object} yAxis - scale axis instance
-   * @param {Object} config - theme / styling
-   * @param {Object} parent - chart pane instance that hosts the indicator
-   * @param {Object} params - contains minimum of overlay instance
-   * @memberof Test
-   */
-  constructor(target, xAxis=false, yAxis=false, config, parent, params) {
-    super(target, xAxis, yAxis, config, parent, params)
-
-    const overlay = params.overlay
-    // initialize indicator values
-    this.id = params.overlay?.id || uid(this.shortName)
-    // merge user defined settings (if any) with defaults
-    this.style = (overlay?.settings?.style) 
-      ? { ...this.#defaultStyle, ...overlay.settings.style } 
-      : { ...this.#defaultStyle, ...config.style }
-    // calculate back history if missing
-    this.calcIndicatorHistory()
-    // enable processing of price stream
-    this.setUpdateValue = (value) => { 
-      this.updateValue(value) 
-    }
-    // add the indicator legend to the chart pane
-    this.addLegend()
-    // set the local range max min Y-Axis values if required
-    // this.chart.setLocalRange(0, 150)
-  }
-
-  /**
-   * define where indicator should be displayed
-   * valid returned values can be: true, false (boolean), both (string)
-   * @readonly
-   */
-  get primaryPane() { return Test.primaryPane }
-  get defaultStyle() { return this.#defaultStyle }
-
-
-  /**
-   * return inputs required to display indicator legend on chart pane
-   * legends can display multiple values
-   * @param {Array} [pos=this.chart.cursorPos] - optional
-   * @returns {Object} - {inputs, colours, labels}
-   */
-  legendInputs(pos=this.chart.cursorPos) {
-    if (this.overlay.data.length == 0) return false
-
-    // determine which legend labels to display
-    let labels = [false]
-    // c - retrieve data index
-    let {c, colours} = super.legendInputs(pos)
-    // build an object of input keys (labels) and values
-    let inputs = {x: this.scale.nicePrice(this.overlay.data[c][1])}
-
-    /**
-      @param {Object} inputs - property names are used as labels
-      @param {Array} colours - array of #rrggbb(aa) values
-      @param {Array} labels - array of which input labels to dispaly [true, false, ...]
-    */
-    return {inputs, colours, labels}
-  }
-
-  /**
-   * process new candle stream value
-   * @param {Array} candle - [timestamp, open, high, low, close, volume]
-   * @memberof Test
-   */
-  updateValue(candle) {
-    this.value = candle
-  }
-
-  calcIndicator(range=this.range) {
-    let start, end;
-    // number of values to use in indicator calculation
-    let p = this.timePeriod
-
-    // is it a Range instance?
-    if(range instanceof Range) {
-      // if not calculate entire history
-      start = 0
-      end = range.dataLength - p + 1
-    }
-    else if ( "indexStart" in range || "indexEnd" in range ||
-              "tsStart" in range ||  "tsEnd" in range ) {
-      start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0
-      end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1
-      end - p
-    }
-    else return false
-
-    // if not enough data for calculation fail
-    if ( end - start < p ) return false
-
-    let data = [];
-    let i, v, entry;
-
-    while (start < end) {
-      v = 0
-      for (i=0; i<p; i++) {
-        v += this.range.value(start)[4]
-      }
-      v /= p
-      data.push([this.range.value(start + p - 1)[0], v])
-      start++
-    }
-    return data
-  }
-
-  calcIndicatorHistory() {
-    // if overlay history is missing, calculate it
-    if (this.overlay.data.length < this.timePeriod) {
-      const data = this.calcIndicator()
-      if (data) this.overlay.data = data
-    }
-  }
-  
-  /**
-   * draw the indicator
-   * @param {Object} range - current displayed range of candles
-   */
-  draw(range=this.range) {
-    // minimum of two candles are required for this indicator
-    if (this.overlay.data.length < 2 ) return false
-    // clear the indicator overlay (chart layer)
-    this.scene.clear()
-
-    // draw your indicator...
-
-    // array to hold sequence points to draw
-    const plots = []
-    // indicator data
-    const data = this.overlay.data
-    // current candle width, chart zoom modifies this
-    const width = this.xAxis.candleW
-    // basic plot entry
-    const plot = {
-      w: width,
-    }
-    // first timestamp in current range
-    let t = range.value(range.indexStart)[0]
-    let s = this.overlay.data[0][0]
-    let c = (t - s) / range.interval
-    let o = this.Timeline.rangeScrollOffset;
-    let i = range.Length + o + 2
-    let style = {}
-
-    while(i) {
-      if (c < 0 || c >= this.overlay.data.length) {
-        plots.push({x: null, y: null})
-      }
-      else {
-        plot.x = this.xAxis.xPos(data[c][0])
-        plot.y = this.yAxis.yPos(data[c][1])
-        plots.push({...plot})
-      }
-      c++
-      i--
-    }
-    // process the plots
-    this.plot(plots, "renderLine", this.style)
-    // render the indicator
-    this.target.viewport.render();
-  }
-}
-```
-
-## Settings
-
-Current indicator settings can be retrieved with the following call:
-
-```javascript
-chart0.getIndicator("TX_lj7216mu_vq6_0-Chart_0-EMA_1").settings()
-```
-
-Indicator settings can also modified with the same call by passing an object:
-
-```javascript
-const newSettings = {}
-chart0.getIndicator("TX_lj7216mu_vq6_0-Chart_0-EMA_1").settings(newSettings)
-```
-
-### Invokeing the Settings Dialogue
-
-The indicator Settings Dialogue can be invoked with the following:
-
-```javascript
-chart0.getIndicator("TX_lj7216mu_vq6_0-Chart_0-EMA_1").invokeSettings()
-```
-
-Invocation of the Settings Dialogue can be modified or replaced with a user defined function, either by passing an object to the method:
-
-```javascript
-const callback = {
-    indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
-  }
-chart0.getIndicator("TX_lj7216mu_vq6_0-Chart_0-EMA_1").invokeSettings(callback)
-```
-
-Setting ``own: true`` will cause the default dialogue not to be invoked.
-
-Alternatively, if in the initial chart configuration, the ``config.callbacks.indicatorSettings`` is given a callback object, this will make the change permanent.
+[Custom Idicators](../indicators_custom) are in important feature of TradeX-chart. They are an extension of the default indicator class and thus inherit all of their methods and properties. The documentation will show you how to [define](../indicators_custom#minimal-custom-indicator-definition), [register](../indicators_custom#registering-custom-indicators) and [how data is passed to them](../indicators_custom#how-the-indicator-updates).

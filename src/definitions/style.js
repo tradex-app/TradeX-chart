@@ -23,7 +23,7 @@ const FONTSIZE = 12
 const FONTSTYLE = "normal"
 const FONTFAMILY = "Avenir, Helvetica, Arial, sans-serif"
 const COLOUR_BG = "#141414"
-const COLOUR_BORDER = "#666666"
+const COLOUR_BORDER = "#333"
 const COLOUR_TXT = "#cccccc"
 const COLOUR_ICON = "#888888"
 const COLOUR_ICONHOVER = "#cccccc"
@@ -169,7 +169,7 @@ export const XAxisStyle = {
 }
 
 export const GridStyle = {
-  COLOUR_GRID: "#333"
+  COLOUR_GRID: "#222"
 }
 
 export const PriceLineStyle = {

@@ -518,29 +518,32 @@ export function unitRange (ts, tf) {
 
 /* Time String Formatting */
 
-export function DM (t) {
-  let d = String(get_day(t)).padStart(2, '0');
-}
-
 export function HM (t) {
-  let h = String(get_hour(t)).padStart(2, '0');
-  let m = String(get_minute(t)).padStart(2, '0');
-  return `${h}:${m}`
+  let {h, m} = DHMS(t)
+  if (h == 0 && m == 0) return `${d}`
+  else return `${h}:${m}`
 }
 
 export function HMS (t) {
-  let h = String(get_hour(t)).padStart(2, '0');
-  let m = String(get_minute(t)).padStart(2, '0');
-  let s = String(get_second(t)).padStart(2, '0');
+  let {h, m, s} = DHMS(t)
+  if (h == 0 && m == 0 && s == 0) return `${d}`
   return `${h}:${m}:${s}`
 }
 
 export function MS (t) {
-  let m = String(get_minute(t)).padStart(2, '0');
-  let s = String(get_second(t)).padStart(2, '0');
+  let {h, m, s} = DHMS(t);
+  if (h == 0 && m == 0 && s == 0) return `${d}`
   return `${m}:${s}`
 }
 
+function DHMS (t) {
+  let d, h, m, s;
+  d = String(get_day(t))
+  h = String(get_hour(t)).padStart(2, '0');
+  m = String(get_minute(t)).padStart(2, '0');
+  s = String(get_second(t)).padStart(2, '0');
+  return {d,h,m,s}
+}
 
 /**
  * Nearest value by time (in timeseries)

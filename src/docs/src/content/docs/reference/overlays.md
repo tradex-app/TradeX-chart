@@ -41,9 +41,9 @@ Overlays (layers) have the following features:
 | Chart Cursor                           |        |          |
 | Chart Grid                             |        |          |
 | Chart High Low                         |        | optional |
-| [Chart News Events](../../news_events) | events | optional |
+| [Chart News Events](../overlays_news_events) | events | optional |
 | Chart Streaming Candle                 |        |          |
-| [Chart Trades](../../trades)           | trades | optional |
+| [Chart Trades](../overlays_trades)           | trades | optional |
 | Chart Volume                           |        |          |
 | Chart Watermark                        |        | optional |
 | [Indicators](../../indicators)         |        | optional |

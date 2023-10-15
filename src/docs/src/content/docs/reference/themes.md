@@ -99,30 +99,3 @@ export const CandleType = {
 ![LINE](../../../assets/CANDLE_LINE.png)
 
 
-### Trades
-
-Default trade configuration
-
-:::note
-Changing the icon image option is currently in development and uses the default.
-:::
-
-Icons will be expected to be in SVG format.
-
-```javascript
-const config = {
-  theme: {
-    trades: {
-      iconBuy: tradeIcons.arrowUp,
-      iconSell: tradeIcons.arrowDown,
-      iconHeight: 30,
-      iconWidth: 30,
-      iconMinDim: 10,
-      buyColour: "#0f0",
-      sellColour: "#f00",
-      defaultIcons: tradeIcons,
-      offset: 10
-    },
-  }
-}
-```

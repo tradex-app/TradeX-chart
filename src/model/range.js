@@ -60,7 +60,7 @@ export class Range {
     }
     function ${this.maxMinPriceVol.toString()}
   `
-    // this.#worker = this.#core.worker.create("range", MaxMinPriceVolStr, undefined, this.#core)
+    // this.#worker = this.#core.worker.create(MaxMinPriceVolStr, "range")
 
     const tf = config?.interval || DEFAULT_TIMEFRAMEMS
 
@@ -108,7 +108,7 @@ export class Range {
   get intervalStr () { return this.#intervalStr }
 
   end() {
-    WebWorker.destroy(this.#worker.id)
+    // WebWorker.destroy(this.#worker.id)
   }
 
   /**

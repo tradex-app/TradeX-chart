@@ -1,0 +1,40 @@
+<script>
+  import { Chart } from "../../../public/tradex-chart.es"
+  import state from "../../../public/1hour"
+
+  const title = "BTC/USDT"
+  const config = {
+    title: title,
+    symbol: "btcusdt",
+    utils: {},
+    tools: {},
+    theme: {
+      tools: {
+        location: false,
+      },
+      utils: {
+        location: false,
+      }
+    },
+    watermark: {
+      text: title
+    },
+    highLow: true,
+    isCrypto: true,
+    state: state,
+  }
+
+  const chart = document.createElement("tradex-chart")
+  const chartDiv = document.getElementById("chart")
+        chartDiv?.appendChild(chart)
+        chart.start(config)
+</script>
+<style>
+  #chart {
+    min-height: 60vh;
+    height: calc(100vh - 400px);
+    position: relative;
+  }
+</style>
+
+<div id="chart"></div>

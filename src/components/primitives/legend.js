@@ -132,6 +132,12 @@ export default class Legends {
     }
   }
 
+  /**
+   * add a legend to the chart pane
+   * @param {object} options - {id, type, parent, source}
+   * @return {string} id 
+   * @memberof Legends
+   */
   add(options) {
     if (!isObject(options) || !("title" in options)) return false
 

@@ -1,13 +1,13 @@
 // dialogue.js
 
-import { isBoolean } from "../../utils/typeChecks";
+import { isBoolean, isObject } from "../../utils/typeChecks";
 import Window from "./window";
 
 export default class Dialogue extends Window {
 
   static type = "Window"
 
-  static create(widgets, config) {
+  static create(widgets, cfg) {
 
     const styles = {
       window: {"box-shadow": "rgb(0,0,0) 0px 20px 30px -10px"},
@@ -15,12 +15,12 @@ export default class Dialogue extends Window {
       title: {padding: "0 1em", background: "#333"}
     }
 
-    config.dragbar = (isBoolean(config.dragbar)) ? config.dragbar : true
-    config.close = (isBoolean(config.close)) ? config.close : true
-    config.styles = {...styles, ...config.styles}
-    config.class = "dialogue"
+    cfg.dragBar = (isBoolean(cfg?.dragBar)) ? cfg.dragBar : true
+    cfg.close = (isBoolean(cfg?.close)) ? cfg.close : true
+    cfg.styles = (isObject(cfg?.styles)) ? {...styles, ...cfg.styles} : styles
+    cfg.class = "dialogue"
 
-    return super.create(widgets, config)
+    return super.create(widgets, cfg)
   }
 
   constructor(widgets, config) {

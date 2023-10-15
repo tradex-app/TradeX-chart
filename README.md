@@ -96,7 +96,7 @@ chart.start(config)
 ## Documentation
 
 Documentation can be found here:
-[Documentation](https://tradex-chart.guildmedia.net/reference/)
+[Documentation](https://tradex-app.github.io/TradeX-chart/)
 
 or built and run locally from the repository by running:
 ```shell

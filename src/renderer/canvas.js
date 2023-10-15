@@ -131,7 +131,7 @@ export function seperateRGB(image) {
 
 export function createCanvas(w, h) {
   const can = document.createElement("canvas");
-  can.ctx = can.getContext("2d");
+  can.ctx = can.getContext("2d", {willReadFrequently: true});
   can.width = w || can.ctx.canvas.width;
   can.height = h || can.ctx.canvas.height;
   return can;

@@ -8,13 +8,13 @@ import DOM from "../../utils/DOM"
 import { CLASS_WINDOWS, CLASS_WINDOW } from "../../definitions/core"
 import { WindowStyle } from "../../definitions/style"
 import { isArray, isNumber, isObject, isString } from "../../utils/typeChecks"
+import { limit } from "../../utils/number"
 import Input from "../../input"
 
 
-// State enum
-class State {
-  static opened = new State("opened")
-  static closed = new State("closed")
+class WinState {
+  static opened = new WinState("opened")
+  static closed = new WinState("closed")
 
   constructor(name) {
     this.name = name
@@ -28,7 +28,7 @@ export default class Window {
   #widgets
   #core
   #config
-  #state = State.closed
+  #state = WinState.closed
   
   #elWidgetsG
   #elWindows
@@ -58,7 +58,12 @@ export default class Window {
 
     const id = `window_${++Window.windowCnt}`
     config.id = id
-
+    const styles = {
+      window: {"box-shadow": "rgb(0,0,0) 0px 20px 30px -10px"},
+      content: {padding: "1em"},
+    }
+    config.styles = (isObject(config?.styles)) ? {...styles, ...config.styles} : styles
+    config.class = config?.class || "window"
     // add entry
     Window.windowList[id] = new Window(widgets, config)
 
@@ -251,7 +256,7 @@ export default class Window {
 
   windowNode() {
     const window = this.#config
-    let windowStyle = `position: absolute; z-index: 10; display: block; border: 1px solid ${WindowStyle.COLOUR_BORDER}; background: ${WindowStyle.COLOUR_BG}; color: ${WindowStyle.COLOUR_TXT};`
+    let windowStyle = `position: absolute; z-index: 100; display: block; border: 1px solid ${WindowStyle.COLOUR_BORDER}; background: ${WindowStyle.COLOUR_BG}; color: ${WindowStyle.COLOUR_TXT}; box-shadow: rgb(0,0,0) 0px 20px 30px -10px;`
     let cfg = this.config?.styles?.window
     for (let k in cfg) {
       windowStyle += `${k}: ${cfg[k]}; `
@@ -348,6 +353,8 @@ export default class Window {
   position(p) {
     let wPos = this.dimensions
     let iPos = this.#core.dimensions
+    let left = Math.round(iPos.left - wPos.left)
+    let top  = Math.round(iPos.bottom - wPos.top)
     let px = Math.round((iPos.width - wPos.width) / 2)
     let py = Math.round((iPos.height - wPos.height) / 2) * -1
     let pz = DOM.getStyle(this.#elWindow, "z-index")
@@ -363,14 +370,30 @@ export default class Window {
     this.#elWindow.style.left = `${px}px`
     this.#elWindow.style.top = `${py}px`
     this.#elWindow.style["z-index"] = `${pz}`
+
+    // keep window visible on chart
+    if (this.config?.bounded) {
+      // adjust horizontal positioning if clipped
+      const width = this.#elWindow.clientWidth
+      if (px + width > this.#elWidgetsG.offsetWidth) {
+        let o = Math.floor(this.#elWidgetsG.offsetWidth - width)
+            o = limit(o, 0, this.#elWidgetsG.offsetWidth)
+        this.#elWindow.style.left = `${o}px`
+      }
+      // adjust vertical position on clipped
+      const height = this.#elWindow.clientHeight
+      if (py +  iPos.height + height > iPos.height) {
+        let o = Math.floor(height * -1)
+            o = limit(o, iPos.height * -1, 0)
+        this.#elWindow.style.top = `${o}px`
+      }
+    }
   }
 
   setDimensions(d) {
     if (!isObject(d)) return false
     if (isNumber(d?.w)) this.#elWindow.style.width = `${d.w}px`
     if (isNumber(d?.h)) this.#elWindow.style.height = `${d.h}px`
-
-    this.#dims = {w: d.x, h: d.y}
   }
 
   setProperties(data) {
@@ -382,8 +405,8 @@ export default class Window {
       this.#elContent.innerHTML = data.content
     }
 
-    this.setDimensions({w: data?.w, h: data?.h})
-    this.position({x: data?.x, y: data?.y})
+    this.setDimensions({...data?.dimensions})
+    this.position({...data?.position})
 
     if (isObject(data?.styles)) {
 
@@ -408,12 +431,12 @@ export default class Window {
   }
 
   // display the window
-  open(data) {
+  open(data={}) {
     if (Window.currentActive === this &&
-        this.state === State.opened) return true
+        this.state === WinState.opened) return true
 
     Window.currentActive = this
-    this.#state = State.opened
+    this.#state = WinState.opened
     this.#elWindow.style.display = "block"
     this.#elWindow.style.zindex = "10"
     this.setProperties(data)
@@ -429,7 +452,7 @@ export default class Window {
   // hide the window
   close() {
     Window.currentActive = null
-    this.#state = State.closed
+    this.#state = WinState.closed
     this.#elWindow.style.display = "none"
     this.emit("window_closed", this.id)
   }

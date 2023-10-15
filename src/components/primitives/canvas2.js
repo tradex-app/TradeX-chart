@@ -362,9 +362,9 @@ class Scene {
    * @param {Function} cb - callback
    */
   toImage(type = "image/png", quality, cb) {
-    let that = this,
-      imageObj = new Image(),
-      dataURL = this.canvas.toDataURL(type, quality);
+    const that = this,
+          imageObj = new Image(),
+          dataURL = this.canvas.toDataURL(type, quality);
 
     imageObj.onload = function () {
       imageObj.width = that.width;

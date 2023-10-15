@@ -189,7 +189,7 @@ export default class Divider {
       default: break
     }
 
-    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: ${theme.divider.idle};`
+    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:10; width: ${width}px; height: ${height}px; background: ${theme.divider.idle};`
     const styleLine = `width: 100%; margin: 3.5px 0; border: 0; border-top: ${theme.divider.style} ${theme.divider.line};`
 
     const node = `

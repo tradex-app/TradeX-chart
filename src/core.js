@@ -6,9 +6,10 @@ import { isArray, isBoolean, isFunction, isNumber, isObject, isString, isError, 
 import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { isTimeFrame, SECOND_MS } from "./utils/time"
-import { copyDeep, uid } from './utils/utilities'
+import { copyDeep, objToString, uid } from './utils/utilities'
 import State from './state'
 import { Range, calcTimeIndex } from "./model/range"
+import { defaultTheme } from './definitions/style'
 import StateMachine from './scaleX/stateMachne'
 import Stream from './helpers/stream'
 import Theme from "./helpers/theme"
@@ -24,6 +25,8 @@ import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOO
 import Indicators from './definitions/indicators'
 import Indicator from './components/overlays/indicator'
 import exportImage from './utils/exportImage'
+import talib from './wasm/index.esm.str.js'
+import wasm from './wasm/talib.wasm.dataURI'
 
 /**
  * The root class for the entire chart
@@ -40,12 +43,16 @@ export default class TradeXchart extends Tradex_chart {
   static #talibReady = false
   static #talibAwait = []
   static #talibError = null
+  static #TALibWorker = null
+  static #TALibWorkerReady = false
   /** @returns {string} - return TradeX Chart version number */
   static get version() { return TradeXchart.#version }
   static get talibPromise() { return TradeXchart.#talibPromise }
   static get talibReady() { return TradeXchart.#talibReady }
   static get talibAwait() { return TradeXchart.#talibAwait }
   static get talibError() { return TradeXchart.#talibError }
+  static get webWorkers() { return WebWorker }
+  static get TALibWorker() { return TradeXchart.#TALibWorker }
   static #initErrMsg = `${NAME} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`
   static #permittedClassNames = 
   ["TradeXchart","Chart","MainPane","Secondary","Primary",
@@ -159,11 +166,61 @@ export default class TradeXchart extends Tradex_chart {
             TradeXchart.#talibReady = false
             TradeXchart.#talibError = new Error(`${TradeXchart.#initErrMsg}`)
           }
-
+/*
       // init TALib
-      if (!TradeXchart.#talibReady && TradeXchart.#talibError === null)
-      TradeXchart.#talibPromise = txCfg.talib.init(txCfg.wasm)
-      TradeXchart.#talibPromise.then(
+      if (!TradeXchart.#TALibWorkerReady) {
+        TradeXchart.#TALibWorkerReady = "initializig"
+        const talibWWStr = `
+        (input, r) => {
+          if (typeof input === "object") {
+            if (input.func === "init") {
+              lib.promise = init(wasm)
+              lib.promise.then(
+                (p) => { lib.ready = true; self.postMessage({r, status: "resolved", result:"ready"}); },
+                (e) => { lib.ready = false; console.error(e); self.postMessage({r, status: false, result:e}); }
+              )
+              // return lib.promise
+              // promises cannot be cloned to return from worker
+              return "initializing"
+            }
+            else if (input.func === "test") {
+              return "testing"
+            }
+            else if (lib.ready && input.func in lib.talib) {
+              return lib.talib[input.func](input.params);
+            }
+          }
+          else return false
+        }
+        const lib = {ready: false};
+        const wasm = "${wasm}";
+        ` + talib;
+        function callback (r) {
+          if (r === "ready") {
+            TradeXchart.#TALibWorker.cb = undefined
+            TradeXchart.#TALibWorkerReady = r; 
+            console.log(`TALibWebWorker 1: ${r}`); 
+            console.log("#TALibWorkerReady",TradeXchart.#TALibWorkerReady)
+          }
+          return r;
+        }
+        TradeXchart.#TALibWorker = TradeXchart.webWorkers.create(talibWWStr, "", callback)
+        TradeXchart.#TALibWorker.postMessage({
+          func: "init",
+        })
+        .catch(e => console.error(e))
+        .then(r => {
+          TradeXchart.#TALibWorkerReady = r; 
+          console.log("#TALibWorkerReady",TradeXchart.#TALibWorkerReady)
+          console.log(`TALibWebWorker 2: ${r}`)
+
+        })
+      }
+*/
+
+      if (!TradeXchart.#talibReady && TradeXchart.#talibError === null) {
+        TradeXchart.#talibPromise = txCfg.talib.init(txCfg.wasm)
+        TradeXchart.#talibPromise.then(
           () => { 
             TradeXchart.#talibReady = true;
             // process functions waiting for talibReady
@@ -173,6 +230,7 @@ export default class TradeXchart extends Tradex_chart {
           },
           () => { TradeXchart.#talibReady = false }
         )
+      }
     }
   
     /**
@@ -221,9 +279,9 @@ export default class TradeXchart extends Tradex_chart {
   timeLog(n) { if (this.timer) console.timeLog(n) }
   timeEnd(n) { if (this.timer) console.timeEnd(n) }
 
+  get version() { return TradeXchart.version }
   /** @returns {string} - user defined chart name */
   get name() { return this.#name }
-
   /** @returns {string} - user defined short chart name */
   get shortName() { return this.#shortName }
 
@@ -335,6 +393,8 @@ export default class TradeXchart extends Tradex_chart {
     this.#TALib = txCfg.talib
     this.#el = this
     this.#core = this
+
+    if (!("theme" in txCfg)) txCfg.theme = defaultTheme
 
     const id = (isString(txCfg?.id)) ? txCfg.id : null
     this.setID(id)

@@ -2,26 +2,10 @@
 title: TradeX Chart
 description: Flexible and unique, because your market view is unique.
 template: splash
-hero:
-  tagline: Flexible and unique, because your market view is unique.
-  image:
-    file: ../../assets/tx.svg
-  actions:
-    - text: Examples
-      link: /examples/custom_indicator/
-      icon: right-arrow
-      variant: primary
-    - text: Read the TradeX docs
-      link: /reference/
-      icon: right-arrow
 ---
+import TradeXChart from './chartx.astro'
 
-<iframe src="https://codesandbox.io/embed/tradex-chart-static-price-history-lx92vj?autoresize=1&fontsize=14&hidenavigation=1&theme=dark&view=preview"
-     style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;"
-     title="TradeX-chart - static price history"
-     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-     sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-   ></iframe>
+<TradeXChart />
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
@@ -29,10 +13,10 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 <CardGrid>
   <Card title="Live Examples" icon="pencil">
-    [Explore more examples](examples/static_chart/).
+    [Explore editable examples](examples/static_chart/) using CodeSandbox.
   </Card>
     <Card title="Read the docs" icon="open-book">
-    Learn more in [TradeX Referenc](reference/).
+    Learn more in [TradeX Reference](reference/).
   </Card>
   <Card title="Quick How To" icon="add-document">
     [How To](guides/howto) will give you quick and practical solutions.

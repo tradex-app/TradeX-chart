@@ -13,7 +13,7 @@ const wasm = "../node_modules/talib-web/lib/talib.wasm"
 
 const inReal = []
 
-for (let v in data) {
+for (let v in data.ohlcv) {
   inReal.push(v[4])
 }
 

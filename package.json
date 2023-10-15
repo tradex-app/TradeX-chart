@@ -12,11 +12,12 @@
     }
   },
   "private": false,
-  "version": "0.139.7",
+  "version": "0.139.11",
   "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp ./dist/tradex-chart.es.js ./demo && cd ./src/docs/ && npm run build",
+    "buildall": "./bin/buildall.sh",
+    "build": "./bin/build.sh",
     "serve": "vite serve",
     "demo": "vite build && vite serve --open /demo.html"
   },
