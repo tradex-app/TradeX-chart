@@ -16,6 +16,7 @@
   "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",
+    "buildall": "./bin/buildall.sh",
     "build": "./bin/build.sh",
     "serve": "vite serve",
     "demo": "vite build && vite serve --open /demo.html"

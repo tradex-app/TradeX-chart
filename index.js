@@ -242,7 +242,7 @@ const config2 = {
     },
     chart: {
       Background: "#141414",
-      BorderColour: "#666",
+      BorderColour: "#444",
       GridColour: "#333",
       TextColour: "#ccc"
     },
@@ -1149,7 +1149,10 @@ function alertTest ($, p, c) {
 
 addChart()
 addChart()
-
+addChart()
+addChart()
+addChart()
+addChart()
 
 
 // add custom indicator definition
