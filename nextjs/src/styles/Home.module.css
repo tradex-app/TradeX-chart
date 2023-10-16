@@ -95,3 +95,7 @@
     flex-direction: column;
   }
 }
+
+.themeSwitch {
+  margin-top: 3rem;
+}

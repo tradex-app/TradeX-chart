@@ -27,13 +27,6 @@ const chartConfig = {
 };
 
 export default function Home({ Component }) {
-  const { isLightTheme, theme, switchTheme } = useTheme();
-  const handleSwitch = () => {
-    const swap = isLightTheme ? "dark" : "light";
-    localStorage.setItem("theme", swap);
-    switchTheme();
-  };
-
   return (
     <ThemeContextProvider>
       <>

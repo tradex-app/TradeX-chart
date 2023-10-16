@@ -32,7 +32,7 @@ export default function Home() {
 
   return (
     <>
-      <div className={`${styles.grid} ${styles["full-size"]}`}>
+      <div className={`${styles.grid} ${styles["full-size"]} ${theme}`}>
         <TokenChart
           symbol={"BTC"}
           config={chartConfig}
@@ -41,7 +41,7 @@ export default function Home() {
         />
       </div>
       <div className={styles.themeSwitch}>
-        {/* <button onClick={handleSwitch}>{!isLightTheme ? "🌞" : "🌙"}</button> */}
+        <button onClick={handleSwitch}>{!isLightTheme ? "🌞" : "🌙"}</button>
       </div>
     </>
   );
