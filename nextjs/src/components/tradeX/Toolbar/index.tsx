@@ -15,8 +15,8 @@ const Toolbar = ({
   onSelectIndicators,
 }) => {
   return (
-    <div className="flex items-center gap-2 flex-wrap grow justify-between">
-      <div className="flex flex-wrap gap-[inherit]">
+    <div className="toolbar">
+      <div className="toolbar">
         {config.toolbar?.timeframe && (
           <IntervalsFilter
             interval={selectedInterval}
@@ -27,7 +27,11 @@ const Toolbar = ({
         )}
 
         {config.toolbar?.indicators && (
-          <IndicatorDropdown indicators={config.availableIndicators} value={indicators} onChange={onSelectIndicators} />
+          <IndicatorDropdown
+            indicators={config.availableIndicators}
+            value={indicators}
+            onChange={onSelectIndicators}
+          />
         )}
       </div>
 
