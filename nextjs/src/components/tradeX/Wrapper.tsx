@@ -112,16 +112,7 @@ const TokenChart: React.FC<IProps> = (props) => {
           pair_id: undefined,
           target: undefined,
           base: "USD",
-          timeframes: [
-            "1m",
-            "5m",
-            "15m",
-            "30m",
-            "1h",
-            "4h",
-            "12h",
-            "1d",
-          ],
+          timeframes: ["1m", "5m", "15m", "30m", "1h", "4h", "12h", "1d"],
         },
       ];
       if (tokenId) {
@@ -246,7 +237,7 @@ const TokenChart: React.FC<IProps> = (props) => {
       <FullScreenWrapper>
         {({ handle, isIOS }) => (
           <>
-            <div className="flex gap-2 items-center">
+            <div className="toolbar">
               {mergedConfig.toolbar?.timeframe ||
               mergedConfig.toolbar?.indicators ||
               mergedConfig.toolbar?.typeSelector ? (
@@ -272,7 +263,7 @@ const TokenChart: React.FC<IProps> = (props) => {
                 <FullScreenButton handle={handle} isIOS={isIOS} />
               ) : null}
             </div>
-            <div className="relative h-full">
+            <div className="relative full-size">
               {(mergedConfig.generalTokenChart
                 ? data.length > 0
                 : chartData) && (
