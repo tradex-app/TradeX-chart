@@ -1,4 +1,4 @@
-import { Indicator } from "../../../../../demo/tradex-chart.es";
+import { Indicator } from "tradex-chart";
 import { ReactNode } from "react";
 import { ChartResolutionEnum } from "./enums";
 import { ColorsEnum } from "../../theme/";
