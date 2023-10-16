@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ColorsEnum } from "../../../../theme";
 
 interface IIndicator {
   name: string;

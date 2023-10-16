@@ -1,7 +1,7 @@
 import { memo } from "react";
 
 import useChart from "./hooks/useChart";
-import useTheme from "../../../hooks/useTheme";
+import useTheme from "../hooks/useTheme";
 import { CHART_OPTIONS } from './utils';
 import Chart from "./Chart";
 
