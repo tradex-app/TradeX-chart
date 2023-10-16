@@ -77,7 +77,7 @@ export default function Home({ Component }) {
           </div>
         </header>
 
-        <main className={"full-size"}>
+        <main className={"full-size main"}>
           <Component />
         </main>
 

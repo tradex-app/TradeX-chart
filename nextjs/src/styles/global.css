@@ -7,11 +7,17 @@ body {
     Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
+
 body > div {
   height: 80%;
   padding: 0 1rem;
 }
 
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .toolbar {
   display: flex;
   flex-direction: row;
