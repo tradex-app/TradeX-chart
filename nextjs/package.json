@@ -16,10 +16,13 @@
     "react-dom": "18.2.0",
     "react-full-screen": "^1.1.1",
     "talib-web": "^0.1.3",
-    "tradex-chart": "file:src/tradex-chart.es.js"
+    "tradex-chart": "file:../demo/tradex-chart.es.js"
   },
   "devDependencies": {
-    "jsdoc-to-markdown": "^8.0.0"
+    "@types/node": "20.8.6",
+    "@types/react": "18.2.28",
+    "jsdoc-to-markdown": "^8.0.0",
+    "typescript": "5.2.2"
   },
   "engines": {
     "node": ">=18"

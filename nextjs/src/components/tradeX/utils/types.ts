@@ -1,4 +1,4 @@
-import { Indicator } from "tradex-chart";
+import { Indicator } from "../../../../../demo/tradex-chart.es";
 import { ReactNode } from "react";
 import { ChartResolutionEnum } from "./enums";
 import { ColorsEnum } from "../../theme/";
@@ -32,6 +32,7 @@ export interface ITradeX extends HTMLElement {
 export interface IIndicatorOption {
   id: number;
   name: string;
+  value: string;
   isD2T?: boolean;
   data?: number[];
 }
@@ -55,7 +56,7 @@ export interface ICustomIndicators {
     id: string;
     name: string;
     event: "addIndicator";
-    ind: unknown;
+    ind: any;
     offChart?: boolean;
     customSettings?: {
       selectLabel?: string;

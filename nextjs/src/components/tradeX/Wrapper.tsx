@@ -67,11 +67,17 @@ const defaultConfig = {
 
 let end;
 
-const TokenChart = memo(
-  ({ tokenId, symbol, config = defaultConfig, chartData, tradeData }) => {
-    const [availability, setAvailability] = useState();
-    const [title, setTitle] = useState(`${symbol}/${availability?.base || ""}`);
-    const [firstLoad, setFirstLoad] = useState(true);
+
+interface AvailabilityType {
+  base: string;
+  timeframes?: string[];
+}
+
+const TokenChart: React.FC<IProps> = (props) => {
+  const { tokenId, symbol, config = defaultConfig, chartData, tradeData } = props;
+  const [availability, setAvailability] = useState<AvailabilityType | null>(null);
+  const [title, setTitle] = useState(`${symbol}/${availability?.base || ""}`);
+  const [firstLoad, setFirstLoad] = useState(true);
     const [isEnd, setIsEnd] = useState(false);
     const [endDate, setEndDate] = useState(new Date());
     const [indicators, setIndicators] = useState([]);
@@ -237,7 +243,7 @@ const TokenChart = memo(
     }
 
     return (
-      <FullScreenWrapper children={undefined}>
+      <FullScreenWrapper>
         {({ handle, isIOS }) => (
           <>
             <div className="flex gap-2 items-center">
@@ -290,7 +296,6 @@ const TokenChart = memo(
         )}
       </FullScreenWrapper>
     );
-  }
-);
+};
 
-export default TokenChart;
+export default memo(TokenChart);
