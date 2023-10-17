@@ -193,8 +193,6 @@ export default class graph {
   drawAll() {
     const fn = (k, o) => {
       o.instance.doDraw = true
-      o.instance.draw()
-      o.instance.doDraw = false
     }
     this.executeOverlayList(fn)
   }
