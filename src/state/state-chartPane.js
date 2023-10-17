@@ -25,7 +25,7 @@ export default
         chart_yAxisRedraw: {
           target: 'chart_yAxisRedraw',
           action (data) {
-            // console.log('Scale: from "idle" to "chart_pan" state')
+            // console.log('Scale: from "idle" to "chart_yAxisRedraw" state')
           },
         },
         chart_tool: {
@@ -62,10 +62,10 @@ export default
     },
     chart_yAxisRedraw: {
       onEnter(data) {
-        // console.log('${this.id}: chart_pan: onEnter')
+        // console.log('${this.id}: chart_yAxisRedraw: onEnter')
       },
       onExit(data) {
-        // console.log('${this.id}: chart_pan: onExit')
+        // console.log('${this.id}: chart_yAxisRedraw: onExit')
       },
       on: {
         always: {

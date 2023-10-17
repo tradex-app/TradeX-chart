@@ -108,7 +108,8 @@ export default class BB extends Indicator {
   }
 
   draw(range=this.range) {
-    if (this.overlay.data.length < 2 ) return false
+    // no update required
+    if (this.overlay.data.length < 2) return
 
     this.scene.clear()
 

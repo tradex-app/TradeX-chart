@@ -9,6 +9,7 @@ import renderLoop from "./views/classes/renderLoop"
 import Chart from "./chart"
 import chartGrid from "./overlays/chart-grid"
 import Indicator from "./overlays/indicator"
+import watermark from "./overlays/chart-watermark"
 // import chartCompositor from "./overlays/chart-compositor"
 import Divider from "./widgets/divider"
 import StateMachine from "../scaleX/stateMachne"
@@ -37,6 +38,7 @@ import {
 } from "../definitions/style"
 
 const defaultOverlays = [
+  ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
   ["grid", {class: chartGrid, fixed: false, required: true, params: {axes: "x"}}],
   // ["chartCompositor", {class: chartCompositor, fixed: true, required: true}]
 ]
@@ -554,9 +556,8 @@ export default class MainPane {
     }
 
     this.rowsOldH = this.rowsH
-    this.draw(this.range, true)
-
     this.emit("rowsResize", dimensions)
+    this.draw(this.range, true)
   }
 
   getBufferPx() { 
@@ -764,6 +765,7 @@ export default class MainPane {
     ) return false
 
     this.log(`Adding the ${name} : ${i} indicator`)
+    this.emit("pane_refresh", this)
 
     if (!isArray(params?.data)) params.data = []
     if (!isObject(params?.settings)) params.settings = {}
@@ -843,6 +845,7 @@ export default class MainPane {
    * @returns {boolean} - success / failure
    */
   removeIndicator(i) {
+    this.emit("pane_refresh", this)
     // remove by ID
     if (isString(i)) {
       for (const p of this.#ChartPanes.values()) {
@@ -992,7 +995,7 @@ export default class MainPane {
     const maxMin = this.#ChartPaneMaximized
     const controls = p.legend.list.chart.el.querySelector(".controls")
     let style;
-
+    
     controls.classList.toggle("maximized")
     controls.classList.toggle("restored")
     // chart pane is already maximized and so restore all
@@ -1030,6 +1033,9 @@ export default class MainPane {
       }
     this.hidePaneDividers()
     }
+
+    this.emit("pane_refresh", this)
+
     return true
   }
 
@@ -1040,6 +1046,8 @@ export default class MainPane {
   panesRestore() {
     const maxMin = this.#ChartPaneMaximized
     let style, i = 0;
+
+    this.emit("pane_refresh", this)
 
     // are Chart Pane dimensions the same?
     if (this.dimensions.height == maxMin.height) {}
@@ -1062,6 +1070,8 @@ export default class MainPane {
    */
   paneCollapse(p) {
     if (!(p instanceof Chart)) return false
+
+    this.emit("pane_refresh", this)
 
     const controls = p.legend.list.chart.el.querySelector(".controls")
     const pc = p.collapsed

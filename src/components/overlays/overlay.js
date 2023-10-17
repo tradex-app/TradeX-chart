@@ -33,6 +33,12 @@ export default class Overlay {
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#params = params
+
+    this.on("setRange", this.drawUpdate, this)
+    this.on("rowsResize", this.drawUpdate, this)
+    this.on("divider_pointerdrag", this.drawUpdate, this)
+    this.on("divider_pointerdragend", this.drawUpdate, this)
+    this.on("pane_refresh", this.drawUpdate, this)
   }
 
   get core() { return this.#core }
@@ -53,6 +59,11 @@ export default class Overlay {
   set position(p) { this.target.setPosition(p[0], p[1]) }
 
   destroy() {
+    this.off("setRange", this.drawUpdate)
+    this.off("rowsResize", this.drawUpdate)
+    this.off("divider_pointerdrag", this.drawUpdate)
+    this.off("divider_pointerdragend", this.drawUpdate)
+    this.off("pane_refresh", this.drawUpdate)
   }
 
   /**
@@ -105,5 +116,12 @@ export default class Overlay {
     else if (this.#xAxis instanceof xAxis) return "timeline"
     else if (this.#yAxis instanceof yAxis) return "scale"
     else return false
+  }
+
+  drawUpdate() {
+    this.doDraw = true
+  }
+
+  draw() {
   }
 }

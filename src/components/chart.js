@@ -23,7 +23,6 @@ import chartCandleStream from "./overlays/chart-candleStream"
 import chartHighLow from "./overlays/chart-highLow";
 import chartNewsEvents from "./overlays/chart-newsEvents";
 import chartTrades from "./overlays/chart-trades"
-import watermark from "./overlays/chart-watermark"
 import {
   STREAM_ERROR,
   STREAM_NONE,
@@ -43,7 +42,6 @@ import { VolumeStyle } from "../definitions/style"
 
 const defaultOverlays = {
   primaryPane: [
-    ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
     ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
     ["candles", {class: chartCandles, fixed: false, required: true}],
@@ -390,9 +388,11 @@ export default class Chart {
 
   onChartDrag(e) {
     this.cursor = "grab"
+    if (this.scale.yAxis.mode == "manual") {
+      this.#Graph.drawAll()
+    }
     this.core.MainPane.onChartDrag(e)
     this.scale.onChartDrag(e)
-    // console.log(e)
   }
 
   onChartDragDone(e) {
@@ -519,7 +519,6 @@ export default class Chart {
       this.graph.setSize(w, h, this.layerWidth)
       this.draw(undefined, true)
       this.core.MainPane.draw(undefined, false)
-      this.draw(undefined, true)
       this.Divider.setPos()
     }
   }
@@ -706,6 +705,7 @@ export default class Chart {
    * Refresh secondaryPane - overlays, grid, scale, indicators
    */
   refresh() {
+    this.emit("pane_refresh", this)
     this.scale.draw()
     this.draw(undefined, this.isPrimary)
   }

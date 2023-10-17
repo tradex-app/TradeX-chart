@@ -14,17 +14,25 @@ export default class chartCursor extends Overlay{
 
     super(target, xAxis, yAxis, theme, parent, params)
 
-    this.core.on("chart_pan", (e) => { this.onMouseDragX(e) })
-    this.core.on("chart_panDone", (e) => { this.onMouseDragX(e) })
-    this.core.on("main_mousemove", (e) => { this.onMouseMoveX(e) })
+    this.core.on("chart_pan", this.onMouseDragX, this)
+    this.core.on("chart_panDone", this.onMouseDragX, this)
+    this.core.on("main_mousemove", this.onMouseMoveX, this)
 
     this.#input = new Input(this.target.viewport.container, {disableContextMenu: false});
     this.#input.on("pointermove", this.onMouseMove.bind(this))
     this.#input.on("pointerenter", this.onMouseMove.bind(this));
   }
 
+  destroy() {
+    this.core.off("chart_pan", this.onMouseDragX)
+    this.core.off("chart_panDone", this.onMouseDragX)
+    this.core.off("main_mousemove", this.onMouseMoveX)
+    super.destroy()
+  }
+
   set position(p) { return }
   get update() { return this.#update }
+  get always() { return true }
 
   onMouseDragX(e) {
     this.#cursorPos[0] = e[0]

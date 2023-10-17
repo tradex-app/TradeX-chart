@@ -17,6 +17,7 @@ export default class ScaleLabels extends Overlay {
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
+  get always() { return true }
 
   draw() {
     const ctx = this.scene.context

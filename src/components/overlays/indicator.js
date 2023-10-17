@@ -472,6 +472,7 @@ export default class Indicator extends Overlay {
     this.overlay.data.push(v)
 
     this.target.setPosition(this.core.scrollPos, 0)
+    this.doDraw = true
     this.draw(this.range)
   }
 
@@ -491,6 +492,7 @@ export default class Indicator extends Overlay {
     this.overlay.data[l] = [v[0], v[1]]
 
     this.target.setPosition(this.core.scrollPos, 0)
+    this.doDraw = true
     this.draw(this.range)
   }
 

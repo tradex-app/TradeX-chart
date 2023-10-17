@@ -25,7 +25,9 @@ export default class chartHighLow extends Overlay {
   // Overlay position is fixed and won't pan / scroll with the chart
   set position(p) { this.target.setPosition(0, 0) }
 
-  draw(range=this.core.range) {
+  draw() {}
+
+  scaleDraw(range=this.core.range) {
     if (this.core.config?.highLow !== true) return 
 
     this.scene.clear()
@@ -78,6 +80,11 @@ class scaleHighLow extends Overlay {
   set position(p) { this.target.setPosition(0, 0) }
 
   draw(range=this.core.range) {
+
+    if ("hiLo" in this.chart.parent.overlays) {
+      this.chart.parent.overlays.hiLo.instance.scaleDraw(range)
+    }
+
     this.scene.clear()
 
     let txt, x, y, w;
@@ -98,7 +105,6 @@ class scaleHighLow extends Overlay {
     txt = this.chart.Scale.nicePrice(lo)
     y = this.yAxis.yPos(lo) + 1
     drawText(ctx, txt, x, y, w, theme)
-
   }
 
 }

@@ -111,6 +111,9 @@ export default class STOCH extends Indicator {
    * @param {Object} range 
    */
   draw(range=this.range) {
+    // no update required
+    if (!this.overlay.data.length < 2) return
+
     this.scene.clear()
 
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2)

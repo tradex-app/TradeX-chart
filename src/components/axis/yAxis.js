@@ -18,7 +18,6 @@ export default class yAxis extends Axis {
   #source
   #parent
   #chart
-  #core
 
   #yAxisType = YAXIS_TYPES[0]  // default, log, percent
   #mode = "automatic"
@@ -207,10 +206,12 @@ export default class yAxis extends Axis {
       t.manual.max = this.#range.valueMax
       t.manual.min = this.#range.valueMin
       this.#mode = m
+      this.core.emit("yaxis_setmode", {mode: m, axis: this})
     }
     else if (this.mode == "manual" && m == "automatic") {
       t.manual.zoom = 0
       this.#mode = m
+      this.core.emit("yaxis_setmode", {mode: m, axis: this})
     }
     return true
   }

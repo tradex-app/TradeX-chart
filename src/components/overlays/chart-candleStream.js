@@ -41,6 +41,7 @@ export default class chartCandleStream extends Overlay {
       (candle) => {this.#candle.draw(candle)}
     const offset = this.xAxis.smoothScrollOffset || 0
     const pos = this.core.stream.lastXPos
+
     const candle = {
       x: pos,
       w: this.xAxis.candleW

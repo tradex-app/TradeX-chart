@@ -56,7 +56,6 @@ export default class chartGrid extends Overlay{
       }
     }
     ctx.restore();
-    this.doDraw = false
   }
 
   drawX() {

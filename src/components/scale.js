@@ -201,16 +201,17 @@ export default class ScaleBar {
     ]
     this.setScaleRange(Math.sign(e.movement.y))
     this.render()
+    this.core.emit("yaxis_manual", this.#yAxis)
   }
 
   onDragDone(e) {
-
   }
 
   onMouseWheel(e) {
     e.domEvent.preventDefault()
     this.setScaleRange(Math.sign(e.wheeldelta) * -1)
     this.render()
+    this.core.emit("yaxis_manual", this.#yAxis)
   }
 
   onStreamUpdate(e) {
@@ -220,7 +221,7 @@ export default class ScaleBar {
   onChartDrag(e) {
     if (this.#yAxis.mode !== "manual") return
     this.#yAxis.offset = e.domEvent.srcEvent.movementY // this.#core.MainPane.cursorPos[5] // e[5]
-    this.parent.draw(this.range, true)
+    this.#Graph.drawAll()
     this.draw()
   }
 
@@ -247,8 +248,9 @@ export default class ScaleBar {
     if (this.#yAxis.mode == "automatic") this.#yAxis.mode = "manual"
 
     this.#yAxis.zoom = r
-    this.parent.draw(this.range, true)
+    this.#Graph.drawAll()
     this.draw()
+    this.parentUpdate()
   }
 
   /**
@@ -257,8 +259,18 @@ export default class ScaleBar {
    */
   resetScaleRange() {
     this.#yAxis.mode = "automatic"
-    this.parent.draw(this.range, true)
+    this.#Graph.drawAll()
     this.draw()
+    this.parentUpdate()
+  }
+
+  /**
+   * force parent pane to update
+   */
+  parentUpdate() {
+    this.parent.graph.drawAll()
+    this.parent.graph.render()
+    this.#core.MainPane.draw()
   }
 
   // convert chart price or secondary indicator y data to pixel pos
