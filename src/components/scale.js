@@ -268,9 +268,10 @@ export default class ScaleBar {
    * force parent pane to update
    */
   parentUpdate() {
-    this.parent.graph.drawAll()
-    this.parent.graph.render()
-    this.#core.MainPane.draw()
+    if (this.#core.MainPane.renderLoop.renderQ.size == 0) {
+      this.parent.graph.drawAll()
+      this.#core.MainPane.draw()
+    }
   }
 
   // convert chart price or secondary indicator y data to pixel pos

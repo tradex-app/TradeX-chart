@@ -156,6 +156,7 @@ export default class MainPane {
   get scrollPos() { return this.#core.scrollPos }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
+  get renderLoop() { return renderLoop }
   get graph() { return this.#Graph }
   get views() { return this.#core.state.data.views }
   get indicators() { return this.getIndicators() }
@@ -237,12 +238,12 @@ export default class MainPane {
     this.createGraph()
     this.draw(this.range, true)
 
-    renderLoop.init({
+    this.renderLoop.init({
       graphs: [this.#Graph],
       range: this.range
     })
-    renderLoop.start()
-    renderLoop.queueFrame(this.range, [this.#Graph], false)
+    this.renderLoop.start()
+    this.renderLoop.queueFrame(this.range, [this.#Graph], false)
 
     // set up event listeners
     this.eventsListen()
@@ -967,7 +968,7 @@ export default class MainPane {
       graphs.push(chartPane)
     })
 
-    renderLoop.queueFrame(
+    this.renderLoop.queueFrame(
       this.range, 
       graphs, 
       update)
