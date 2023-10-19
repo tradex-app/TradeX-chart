@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { Indicator, Range, uid } from "tradex-chart";
-
 export default class DCA extends Indicator {
   static primaryPane = true;
 
