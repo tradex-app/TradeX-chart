@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/default-param-last */
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { Indicator, Range, uid } from "tradex-chart";
 
-export default class SNR extends Indicator {
+export default class LINES extends Indicator {
   static inCnt = 0;
 
   static primaryPane = true;
@@ -26,6 +24,8 @@ export default class SNR extends Indicator {
 
   customSettings;
 
+  customValues;
+
   constructor(target, xAxis = false, yAxis = false, config, parent, params) {
     super(target, xAxis, yAxis, config, parent, params);
 
@@ -33,6 +33,8 @@ export default class SNR extends Indicator {
     this.shortName = params.overlay?.name;
 
     this.customSettings = params.overlay?.settings?.custom;
+
+    this.customValues = params.overlay?.settings?.custom?.values || [];
 
     this.id = params.overlay?.id || uid(this.shortName);
 
@@ -49,9 +51,8 @@ export default class SNR extends Indicator {
     this.addLegend();
   }
 
-  // eslint-disable-next-line class-methods-use-this
   get primaryPane() {
-    return SNR.primaryPane;
+    return LINES.primaryPane;
   }
 
   get defaultStyle() {
@@ -63,14 +64,13 @@ export default class SNR extends Indicator {
 
     const labels = [false];
     const { c, colours } = super.legendInputs(pos);
+
     const inputs = {};
 
-    if (this.customSettings?.legendInputs?.length) {
+    if (this.customSettings?.legendInputs?.length && this.customValues.length) {
       this.customSettings?.legendInputs.forEach(
         (legendInput: string, index: number) => {
-          inputs[legendInput] = this.scale.nicePrice(
-            this.overlay.data[c][index + 1]
-          );
+          inputs[legendInput] = this.customValues[index];
         }
       );
     } else {
@@ -109,7 +109,6 @@ export default class SNR extends Indicator {
         range.indexEnd ||
         this.Timeline.t2Index(range.tsEnd) ||
         this.range.Length - 1;
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       end - p;
     } else return false;
     if (end - start < p) return false;
@@ -141,61 +140,26 @@ export default class SNR extends Indicator {
   draw(range = this.range) {
     if (this.overlay.data.length < 2) return false;
 
-    const plots = this.customSettings?.legendInputs?.length
-      ? this.customSettings.legendInputs.reduce(
-          (accumulator, value) => ({ ...accumulator, [value]: [] }),
-          {}
-        )
-      : [];
-
     this.scene.clear();
+
+    const plots =
+      this.customSettings?.legendInputs?.reduce(
+        (accumulator, value) => ({ ...accumulator, [value]: [] }),
+        {}
+      ) || {};
 
     const data = this.overlay.data;
 
-    const plot = {
-      w: this.xAxis.candleW,
-    };
+    if (this.customValues.length && this.customSettings?.legendInputs?.length) {
+      this.customSettings.legendInputs.forEach((legendInput, index) => {
+        const yValue = this.customValues[index];
+        const startY = this.yAxis.yPos(yValue);
+        const endY = this.yAxis.yPos(yValue);
 
-    if (Array.isArray(plots)) {
-      const t = range.value(range.indexStart)[0];
-      const s = this.overlay.data[0][0];
-      let c = (t - s) / range.interval;
-      const o = this.Timeline.rangeScrollOffset;
-      let i = range.Length + o + 2;
+        const startX = this.xAxis.xPos(range.data[0][0]);
+        const endX = this.xAxis.xPos(range.data[range.data.length - 1][0]);
 
-      const style = {
-        stroke:
-          this.customSettings?.inputsBaseProps?.colours[0] || this.style.stroke,
-      };
-
-      while (i) {
-        if (c < 0 || c >= this.overlay.data.length) {
-          plots.push({ x: null, y: null });
-        } else {
-          plot.x = this.xAxis.xPos(data[c][0]);
-          plot.y = this.yAxis.yPos(data[c][1]);
-          plots.push({ ...plot });
-        }
-        c++;
-        i--;
-      }
-
-      this.plot(plots, "renderLine", style);
-    } else {
-      Object.keys(plots).forEach((plotName, index) => {
-        const start = {
-          x: this.xAxis.xPos(range.data[0][0]),
-          y: this.yAxis.yPos(data[0][index + 1]),
-        };
-
-        plots[plotName].push({ ...plot, ...start });
-
-        const end = {
-          x: this.xAxis.xPos(range.data[range.data.length - 1][0]),
-          y: this.yAxis.yPos(data[0][index + 1]),
-        };
-
-        plots[plotName].push({ ...plot, ...end });
+        plots[legendInput].push({ x: startX, y: startY }, { x: endX, y: endY });
       });
 
       Object.keys(plots).forEach((plotName, index) => {
