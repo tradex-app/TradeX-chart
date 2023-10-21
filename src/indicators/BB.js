@@ -111,6 +111,8 @@ export default class BB extends Indicator {
     // no update required
     if (this.overlay.data.length < 2) return
 
+    if (!super.mustUpdate()) return false
+
     this.scene.clear()
 
     const plots = {lower: [], middle: [], upper: []}
@@ -170,5 +172,7 @@ export default class BB extends Indicator {
     this.plot(plots.upper, "renderLine", style)
 
     this.target.viewport.render();
+
+    super.updated()
   }
 }

@@ -30,6 +30,8 @@ export default class chartHighLow extends Overlay {
   scaleDraw(range=this.core.range) {
     if (this.core.config?.highLow !== true) return 
 
+    if (!super.mustUpdate()) return
+
     this.scene.clear()
 
     let txt, x, y;
@@ -64,6 +66,8 @@ export default class chartHighLow extends Overlay {
     drawText(ctx, txt, x, y, w, theme)
 
     ctx.restore()
+
+    super.updated()
   }
 }
 
@@ -80,10 +84,7 @@ class scaleHighLow extends Overlay {
   set position(p) { this.target.setPosition(0, 0) }
 
   draw(range=this.core.range) {
-
-    if ("hiLo" in this.chart.parent.overlays) {
-      this.chart.parent.overlays.hiLo.instance.scaleDraw(range)
-    }
+    if (!super.mustUpdate()) return
 
     this.scene.clear()
 
@@ -105,6 +106,8 @@ class scaleHighLow extends Overlay {
     txt = this.chart.Scale.nicePrice(lo)
     y = this.yAxis.yPos(lo) + 1
     drawText(ctx, txt, x, y, w, theme)
+
+    super.updated()
   }
 
 }

@@ -165,7 +165,7 @@ export default class UtilsBar {
       for (let u of this.#utils) {
         if (u.id === id) {
           this.#utilsEvents[id] = {}
-          this.#utilsEvents[id].click = this.onIconClick.bind(this) // debounce(this.onIconClick, 50, this) // this.onIconClick.bind(this)
+          this.#utilsEvents[id].click = this.onIconClick.bind(this) // debounce(this.onIconClick, 500, this) // this.onIconClick.bind(this)
           this.#utilsEvents[id].pointerover = this.onIconOver.bind(this)
           this.#utilsEvents[id].pointerout = this.onIconOut.bind(this)
           util.addEventListener("click", this.#utilsEvents[id].click)

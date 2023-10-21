@@ -42,3 +42,4 @@ export const STREAM_PRECISION = 8
 export const PRICE_PRECISION  = 2
 export const VOLUME_PRECISION = 2
 
+export const HIT_DEBOUNCE = 1000

@@ -22,6 +22,9 @@ export default class chartWatermark extends Overlay {
 
   draw() {
 
+    const update = super.mustUpdate()
+    if (!update.resize) return
+
     if ( this.config?.watermark?.imgURL )
       DOM.isImage(this.config?.watermark?.imgURL, this.renderImage.bind(this))
 
@@ -58,6 +61,8 @@ export default class chartWatermark extends Overlay {
     const y = (this.scene.height - height) / 2
 
     ctx.fillText(txt, x, y);
+
+    super.updated()
   }
 
   renderImage(i) {

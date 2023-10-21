@@ -20,6 +20,8 @@ export default class chartGrid extends Overlay{
 
   draw(axes) {
 
+    if (!super.mustUpdate()) return
+
     axes = axes || this.params.axes
 
     this.scene.clear()
@@ -56,6 +58,8 @@ export default class chartGrid extends Overlay{
       }
     }
     ctx.restore();
+
+    super.updated()
   }
 
   drawX() {

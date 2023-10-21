@@ -79,8 +79,11 @@ export default class graph {
     this.#viewport.setSize(w, h)
 
     for (let [key, overlay] of oList) {
-      overlay.layer.setSize(lw, h)
+      overlay.instance.setSize(lw, h)
     }
+    // must redraw because resizing canvas clears it
+    this.draw()
+    this.render()
   }
 
   createViewport(overlays=[], node=false) {
@@ -176,13 +179,10 @@ export default class graph {
       if (!isObject(overlay) || 
       !isFunction(overlay?.instance?.draw)) return
 
-      if (   overlay.instance.doDraw
-          || overlay.instance?.always
-          // || overlay.instance.yAxis.mode == "manual"
-      ) {
-        overlay.instance.draw()
-        overlay.instance.doDraw = false
-      }
+      if (update)
+        overlay.instance.setRefresh()
+      
+      overlay.instance.draw()
 
       if (!overlay.fixed)
         overlay.instance.position = [this.#core.scrollPos, 0]
@@ -225,6 +225,11 @@ export default class graph {
 
   render() {
     this.#viewport.render()
+  }
+
+  refresh() {
+    this.draw(undefined, true)
+    this.render()
   }
 
 }

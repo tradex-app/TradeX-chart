@@ -285,7 +285,7 @@ export default class Test extends Indicator {
    */
   draw(range=this.range) {
     // minimum of two candles are required for this indicator
-    if (!this.overlay.data.length < 2) return
+    if ( this.overlay.data.length < 2 ) return false
     // clear the indicator overlay (chart layer)
     this.scene.clear()
 

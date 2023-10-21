@@ -17,7 +17,15 @@ export default class Overlay {
   #scene
   #hit
   #params
-  #doDraw = true
+  #mustUpdate = {
+    valueMax: null,
+    valueMin: null,
+    indexStart: null,
+    Length: null,
+    rowsW: null,
+    rowsH: null,
+    refresh: false
+  }
 
   id
 
@@ -53,8 +61,6 @@ export default class Overlay {
   get xAxis() { return this.getXAxis() }
   get yAxis() { return this.getYAxis() }
   get overlay() { return this.#params.overlay }
-  set doDraw(d) { this.#doDraw = (isBoolean(d)) ? d : false }
-  get doDraw() { return this.#doDraw }
   get context() { return this.contextIs() }
   set position(p) { this.target.setPosition(p[0], p[1]) }
 
@@ -97,6 +103,15 @@ export default class Overlay {
     this.core.emit(topic, data)
   }
 
+  setSize(w, h) {
+    this.#target.setSize(w, h)
+    this.#mustUpdate.refresh = true
+  }
+
+  setRefresh() {
+    this.#mustUpdate.refresh = true
+  }
+
   getXAxis() {
     if (this.#xAxis instanceof xAxis) return this.#xAxis
     else if (this.core.Chart.time.xAxis instanceof xAxis) return this.core.Chart.time.xAxis
@@ -118,10 +133,32 @@ export default class Overlay {
     else return false
   }
 
-  drawUpdate() {
-    this.doDraw = true
+  mustUpdate() {
+    const r = this.#core.range
+    const l = this.#mustUpdate
+    const d = this.#core.MainPane.elRows
+    return (
+      // test range change
+      l.valueMax !== r.valueMax ||
+      l.valueMin !== r.valueMin ||
+      l.indexStart !== r.indexStart ||
+      l.Length !== r.Length ||
+      l.refresh
+    ) ? this.#mustUpdate : false
   }
 
-  draw() {
+  updated() {
+    const r = this.#core.range
+    const l = this.#mustUpdate
+    const d = this.#core.MainPane.elRows
+    l.valueMax = r.valueMax
+    l.valueMin = r.valueMin
+    l.indexStart = r.indexStart
+    l.Length = r.Length
+    l.rowsW = d.width
+    l.rowsH = d.height
+    l.rowsW = d.width
+    l.rowsH = d.height
+    l.refresh = false
   }
 }

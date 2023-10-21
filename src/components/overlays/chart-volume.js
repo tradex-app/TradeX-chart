@@ -22,12 +22,13 @@ export default class chartVolume extends Overlay {
 
   draw(range=this.core.range) {
 
+    if (!super.mustUpdate()) return
+
     this.scene.clear()
 
     const data = range.data
     const zeroPos = this.scene.height
     const offset = this.xAxis.smoothScrollOffset || 0
-    // const width = this.xAxis.candleW
 
     let w = Math.max(this.xAxis.candleW -1, 1)
     
@@ -35,9 +36,6 @@ export default class chartVolume extends Overlay {
     else if (w < 5) w = 3
     else if (w > 5) w = Math.ceil(w * 0.8)
 
-      // let w = (width > 5) ? Math.ceil(width * 0.8) : width
-      //     w = (w < 4)
-      //     w = (w < 3) ? 1 : w
     const volume = {
       x: 0 + offset - this.xAxis.candleW,
       w: w,
@@ -71,6 +69,8 @@ export default class chartVolume extends Overlay {
       }
       v++
     }
+
+    super.updated()
   }
 
 }

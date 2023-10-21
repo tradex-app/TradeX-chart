@@ -53,7 +53,6 @@ The trades are represented by an object in the ``primary`` chart pane of the dat
 
 The trades object requires the following to be valid:
 
-
 | Property | Type   | Description                                |
 | ---------- | -------- | -------------------------------------------- |
 | name     | string | "Trades"                                   |

@@ -187,7 +187,7 @@ export default class ToolsBar {
       for (let t of this.#tools) {
         if (t.id === id) {
           this.#toolEvents[id] = {}
-          this.#toolEvents[id].click = this.onIconClick.bind(this)
+          this.#toolEvents[id].click = this.onIconClick.bind(this) // debounce(this.onIconClick, 500, this) // this.onIconClick.bind(this)
           this.#toolEvents[id].pointerover = this.onIconOver.bind(this)
           this.#toolEvents[id].pointerout = this.onIconOut.bind(this)
           tool.addEventListener("click", this.#toolEvents[id].click)
