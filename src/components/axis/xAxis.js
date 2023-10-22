@@ -38,7 +38,7 @@ export default class xAxis extends Axis {
   get indexEnd() { return this.range.indexEnd }
   get timeMax() { return this.range.timeMax }
   get timeMin() { return this.range.timeMin }
-  get candleW() { return bRound(this.width / this.range.Length) }
+  get candleW() { return this.width / this.range.Length }
   get candlesOnLayer() { return bRound(this.core.Chart.layerWidth / this.candleW )}
   get xAxisRatio() { return this.width / this.range.rangeDuration }
   set xAxisTicks(t) { this.#xAxisTicks = isNumber(t) ? t : 0 }

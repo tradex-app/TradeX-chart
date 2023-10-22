@@ -271,9 +271,9 @@ export default class TradeXchart extends Tradex_chart {
     this.#workers = WebWorker
   }
 
-  log(l) { if (this.logs) console.log(l) }
-  info(i) { if (this.infos) console.info(i) }
-  warn(w) { if (this.warnings) console.warn(w) }
+  log(...l) { if (this.logs) console.log(...l) }
+  info(...i) { if (this.infos) console.info(...i) }
+  warn(...w) { if (this.warnings) console.warn(...w) }
   error(e) { if (this.errors) console.error(e) }
   time(n) { if (this.timer) console.time(n) }
   timeLog(n) { if (this.timer) console.timeLog(n) }
@@ -1253,7 +1253,7 @@ export default class TradeXchart extends Tradex_chart {
     let start = this.range.indexStart
     let end = this.range.indexEnd
     this.setRange(start, end)
-    this.MainPane.draw(undefined, true)
+    this.#MainPane.draw(undefined, true)
   }
 
   /**

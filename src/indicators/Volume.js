@@ -55,5 +55,10 @@ export default class Volume extends Indicator {
   get primaryPane() { return "both" }
   get defaultStyle() { return this.#defaultStyle }
 
+  draw() {
+    if (this.overlay.data.length < 2 ) return false
+    if (!super.mustUpdate()) return false
 
+    super.updated()
+  }
 }

@@ -67,11 +67,17 @@ const defaultConfig = {
 
 let end;
 
-const TokenChart = memo(
-  ({ tokenId, symbol, config = defaultConfig, chartData, tradeData }) => {
-    const [availability, setAvailability] = useState();
-    const [title, setTitle] = useState(`${symbol}/${availability?.base || ""}`);
-    const [firstLoad, setFirstLoad] = useState(true);
+
+interface AvailabilityType {
+  base: string;
+  timeframes?: string[];
+}
+
+const TokenChart: React.FC<IProps> = (props) => {
+  const { tokenId, symbol, config = defaultConfig, chartData, tradeData } = props;
+  const [availability, setAvailability] = useState<AvailabilityType | null>(null);
+  const [title, setTitle] = useState(`${symbol}/${availability?.base || ""}`);
+  const [firstLoad, setFirstLoad] = useState(true);
     const [isEnd, setIsEnd] = useState(false);
     const [endDate, setEndDate] = useState(new Date());
     const [indicators, setIndicators] = useState([]);
@@ -106,16 +112,7 @@ const TokenChart = memo(
           pair_id: undefined,
           target: undefined,
           base: "USD",
-          timeframes: [
-            "1m",
-            "5m",
-            "15m",
-            "30m",
-            "1h",
-            "4h",
-            "12h",
-            "1d",
-          ],
+          timeframes: ["1m", "5m", "15m", "30m", "1h", "4h", "12h", "1d"],
         },
       ];
       if (tokenId) {
@@ -237,10 +234,10 @@ const TokenChart = memo(
     }
 
     return (
-      <FullScreenWrapper children={undefined}>
+      <FullScreenWrapper>
         {({ handle, isIOS }) => (
           <>
-            <div className="flex gap-2 items-center">
+            <div className="toolbar">
               {mergedConfig.toolbar?.timeframe ||
               mergedConfig.toolbar?.indicators ||
               mergedConfig.toolbar?.typeSelector ? (
@@ -266,7 +263,7 @@ const TokenChart = memo(
                 <FullScreenButton handle={handle} isIOS={isIOS} />
               ) : null}
             </div>
-            <div className="relative h-full">
+            <div className="relative full-size">
               {(mergedConfig.generalTokenChart
                 ? data.length > 0
                 : chartData) && (
@@ -290,7 +287,6 @@ const TokenChart = memo(
         )}
       </FullScreenWrapper>
     );
-  }
-);
+};
 
-export default TokenChart;
+export default memo(TokenChart);

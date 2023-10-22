@@ -148,7 +148,7 @@ const config1 = {
   timeFrame: "1m",
   range: {
     startTS: rangeStartTS, // state1.ohlcv.slice(-1)[0][0],
-    initialCnt: 30,
+    initialCnt: 40,
     limitFuture: LIMITFUTURE,
     limitPast: LIMITPAST,
     minCandles: MINCANDLES,
@@ -1149,10 +1149,10 @@ function alertTest ($, p, c) {
 
 addChart()
 addChart()
-addChart()
-addChart()
-addChart()
-addChart()
+// addChart()
+// addChart()
+// addChart()
+// addChart()
 
 
 // add custom indicator definition

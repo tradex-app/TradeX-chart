@@ -105,7 +105,6 @@ export default class customOverlay extends Overlay {
 
   // draw your overlay
   draw(range=this.core.range) {
-  
     // clear the layer provided to your overlay
     this.scene.clear()
     // HTML canvas context

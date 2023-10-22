@@ -23,7 +23,6 @@ import chartCandleStream from "./overlays/chart-candleStream"
 import chartHighLow from "./overlays/chart-highLow";
 import chartNewsEvents from "./overlays/chart-newsEvents";
 import chartTrades from "./overlays/chart-trades"
-import watermark from "./overlays/chart-watermark"
 import {
   STREAM_ERROR,
   STREAM_NONE,
@@ -43,7 +42,6 @@ import { VolumeStyle } from "../definitions/style"
 
 const defaultOverlays = {
   primaryPane: [
-    ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
     ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
     ["candles", {class: chartCandles, fixed: false, required: true}],
@@ -245,7 +243,7 @@ export default class Chart {
   get view() { return this.#view }
   get viewport() { return this.#Graph.viewport }
   get layerGrid() { return this.#Graph.overlays.get("grid").layer }
-  get overlays() { return this.getOverlays() }
+  get overlays() { return Object.fromEntries([...this.#Graph.overlays.list]) }
   get overlayGrid() { return this.#Graph.overlays.get("grid").instance }
   get overlayTools() { return this.#overlayTools }
   get overlaysDefault() { return defaultOverlays[this.type] }
@@ -390,9 +388,11 @@ export default class Chart {
 
   onChartDrag(e) {
     this.cursor = "grab"
+    if (this.scale.yAxis.mode == "manual") {
+      this.#Graph.drawAll()
+    }
     this.core.MainPane.onChartDrag(e)
     this.scale.onChartDrag(e)
-    // console.log(e)
   }
 
   onChartDragDone(e) {
@@ -456,7 +456,7 @@ export default class Chart {
       this.updateLegends(this.cursorPos, candle)
     }
     else this.updateLegends()
-    this.graph.render()
+    this.#core.MainPane.draw()
   }
 
   /**
@@ -499,6 +499,8 @@ export default class Chart {
     this.#elScale.style.height = `${h}px`;
     this.elViewport.style.height = `${h}px`;
     this.#Scale.setDimensions({ w: null, h: h });
+    this.Divider?.setPos()
+    this.Divider?.setWidth()
   }
 
   /**
@@ -519,8 +521,8 @@ export default class Chart {
       this.graph.setSize(w, h, this.layerWidth)
       this.draw(undefined, true)
       this.core.MainPane.draw(undefined, false)
-      this.draw(undefined, true)
       this.Divider.setPos()
+      this.Divider.setWidth()
     }
   }
 
@@ -594,10 +596,6 @@ export default class Chart {
     this.graph.addOverlays(overlayList)
     
     return true
-  }
-
-  getOverlays() {
-    return Object.fromEntries([...this.#Graph.overlays.list])
   }
 
   /**
@@ -698,14 +696,16 @@ export default class Chart {
 
   drawGrid() {
     this.layerGrid.setPosition(this.#core.scrollPos, 0);
+    this.overlayGrid.setRefresh()
     this.overlayGrid.draw("y");
-    this.#Graph.render();
+    this.#core.MainPane.draw()
   }
 
   /**
    * Refresh secondaryPane - overlays, grid, scale, indicators
    */
   refresh() {
+    this.emit("pane_refresh", this)
     this.scale.draw()
     this.draw(undefined, this.isPrimary)
   }
@@ -854,10 +854,9 @@ export default class Chart {
       this.#Graph.draw(range, update)
   }
 
-  drawGrid() {
+  drawGrid(update) {
     this.layerGrid.setPosition(this.core.scrollPos, 0)
     this.overlayGrid.draw("y")
-    this.#Graph.render();
   }
 
   /**

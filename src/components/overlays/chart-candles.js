@@ -20,6 +20,8 @@ export default class chartCandles extends Overlay {
 
   draw(range=this.core.range) {
 
+    if (!super.mustUpdate()) return
+
     this.scene.clear()
 
     let render
@@ -57,31 +59,30 @@ export default class chartCandles extends Overlay {
     }
 
     while(i) {
-      x = range.value( c )
-      candle.x = this.xAxis.xPos(x[0])
-      if (x?.[7]) {
-        this.core.stream.lastXPos = candle.x
-        this.core.stream.lastYPos = {
-          o: candle.o,
-          h: candle.h,
-          l: candle.l,
-          c: candle.c,
+      if (c >= 0) {
+        x = range.value( c )
+        candle.x = this.xAxis.xPos(x[0])
+        // if Stream candle store
+        if (x?.[7]) {
+          this.core.stream.lastXPos = candle.x
+          this.core.stream.lastYPos = {...candle}
+          break
         }
-        break
+        // if candle has not yet closed
+        if (x[4] !== null) {
+          candle.o = this.yAxis.yPos(x[1])
+          candle.h = this.yAxis.yPos(x[2])
+          candle.l = this.yAxis.yPos(x[3])
+          candle.c = this.yAxis.yPos(x[4])
+          candle.raw = x
+          render(candle)
+        }
+        // candles.list.unshift({} = {...candle})
+        // candles.in[c] = i - 1
+        // candles.ts[x[0]] = i - 1
+        // candles.px[candle.x] = i - 1
+        // this.core.candles = candles
       }
-      if (x[4] !== null) {
-        candle.o = this.yAxis.yPos(x[1])
-        candle.h = this.yAxis.yPos(x[2])
-        candle.l = this.yAxis.yPos(x[3])
-        candle.c = this.yAxis.yPos(x[4])
-        candle.raw = x
-        render(candle)
-      }
-      // candles.list.unshift({} = {...candle})
-      // candles.in[c] = i - 1
-      // candles.ts[x[0]] = i - 1
-      // candles.px[candle.x] = i - 1
-      // this.core.candles = candles
       c++
       i--
     }
@@ -90,6 +91,8 @@ export default class chartCandles extends Overlay {
         type === CandleType.LINE
       ) 
       this.#candle.areaRender()
+
+    super.updated()
   }
 
 }

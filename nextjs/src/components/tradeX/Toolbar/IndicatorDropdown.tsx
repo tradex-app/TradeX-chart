@@ -23,7 +23,7 @@ const IndicatorDropdown = ({ onChange, value, indicators }) => {
         variant="inactive"
         onClick={() => {
           setIsOpened(!isOpened);
-        } } children={undefined}      >
+        } } >
         Indicators
         <span
           className={`${

@@ -27,6 +27,8 @@ dist-ssr
 
 # build output
 ./src/docs/dist/
+./src/docs/dist2/
+./src/docs/tradex-chart.es.js
 # generated types
 ./src/docs/.astro/
 

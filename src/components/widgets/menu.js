@@ -122,7 +122,7 @@ export default class Menu {
 
     this.emit("menuItem_selected", data)
     this.emit("menu_close", data)
-    console.log("menu_close")
+    this.#core.log(`menu_close: ${this.#id}`)
   }
 
   onOutsideClickListener(e) {

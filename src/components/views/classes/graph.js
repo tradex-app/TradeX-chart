@@ -79,8 +79,11 @@ export default class graph {
     this.#viewport.setSize(w, h)
 
     for (let [key, overlay] of oList) {
-      overlay.layer.setSize(lw, h)
+      overlay.instance.setSize(lw, h)
     }
+    // must redraw because resizing canvas clears it
+    this.draw()
+    this.render()
   }
 
   createViewport(overlays=[], node=false) {
@@ -150,24 +153,62 @@ export default class graph {
    */
   draw(range=this.range, update=false) {
 
-    const oList = this.#overlays.list
-    // guard against overlays host (chart pane) deletion
-    if (!(oList instanceof xMap)) return false
-
-    for (let [key, overlay] of oList) {
+    const fn = (k, overlay) => {
       // is it a valid overlay?
       if (!isObject(overlay) || 
-          !isFunction(overlay?.instance?.draw)) continue
+      !isFunction(overlay?.instance?.draw)) return
 
+      if (update)
+        overlay.instance.setRefresh()
+      
       overlay.instance.draw()
 
       if (!overlay.fixed)
         overlay.instance.position = [this.#core.scrollPos, 0]
     }
+    this.executeOverlayList(fn)
+  }
+
+  drawAll() {
+    const fn = (k, o) => {
+      o.instance.mustUpdate()
+    }
+    this.executeOverlayList(fn)
+  }
+
+  /**
+   * execute a function on the overlay list
+   * @param {function} fn
+   * @return {boolean|array} - true (no errors), array of errors
+   * @memberof graph
+   */
+  executeOverlayList(fn) {
+    const oList = this.#overlays.list
+    // guard against overlays host (chart pane) deletion
+    if (!(oList instanceof xMap)) return false
+
+    let result = []
+
+    for (let [key, overlay] of oList) {
+      try {
+        fn(key, overlay)
+      }
+      catch (e) {
+        result.push(e)
+      }
+    }
+    if (result.length > 0) this.#core.error(result)
+    else result = true
+    return result
   }
 
   render() {
     this.#viewport.render()
+  }
+
+  refresh() {
+    this.draw(undefined, true)
+    this.render()
   }
 
 }

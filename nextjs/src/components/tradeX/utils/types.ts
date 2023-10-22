@@ -28,10 +28,10 @@ export interface ITradeX extends HTMLElement {
   on?: (eventName: string, callback: (e: unknown) => void) => void;
 }
 
-
 export interface IIndicatorOption {
   id: number;
   name: string;
+  value: string;
   isD2T?: boolean;
   data?: number[];
 }
@@ -50,7 +50,7 @@ export interface ILevelIndicator extends ITechnicalIndicator {
   sup_or_res: "S" | "R";
 }
 
-export interface ICustomIndicators {
+export interface IIndicators {
   [key: string]: {
     id: string;
     name: string;
@@ -64,6 +64,7 @@ export interface ICustomIndicators {
         labels?: boolean[];
       };
       legendInputs?: string[];
+      values?: any;
     };
   };
 }

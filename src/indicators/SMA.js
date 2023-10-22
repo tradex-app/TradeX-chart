@@ -94,7 +94,10 @@ import { uid } from "../utils/utilities"
   }
 
   draw(range=this.range) {
-    if (this.overlay.data.length < 2 ) return false
+    // no update required
+    if (this.overlay.data.length < 2) return
+
+    if (!super.mustUpdate()) return
 
     this.scene.clear()
 
@@ -128,6 +131,8 @@ import { uid } from "../utils/utilities"
     this.plot(plots, "renderLine", this.style)
 
     this.target.viewport.render();
+
+    super.updated()
   }
 
 }

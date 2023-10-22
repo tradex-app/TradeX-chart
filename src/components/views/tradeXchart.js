@@ -104,7 +104,7 @@ export default class tradeXChart extends element {
 
       this.setDimensions(width, height)
 
-      this.resizeObserver = new ResizeObserver(debounce(this.onResized, 50, this))
+      this.resizeObserver = new ResizeObserver(debounce(this.onResized, 100, this))
       this.resizeObserver.observe(this)      
     }
   }

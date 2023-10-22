@@ -96,6 +96,11 @@ export default class RSI extends Indicator {
    * @param {Object} range 
    */
   draw(range=this.range) {
+
+    if (this.overlay.data.length < 2 ) return false
+
+    if (!super.mustUpdate()) return false
+
     this.scene.clear()
 
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2)
@@ -154,7 +159,7 @@ export default class RSI extends Indicator {
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
-        plots.push({x: null, y: null})
+        // plots.push({x: null, y: null})
       }
       else {
         plot.x = this.xAxis.xPos(data[c][0])
@@ -168,6 +173,8 @@ export default class RSI extends Indicator {
     this.plot(plots, "renderLine", this.style)
 
     this.target.viewport.render();
+
+    super.updated()
   }
 }
 

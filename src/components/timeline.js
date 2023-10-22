@@ -99,8 +99,10 @@ export default class Timeline {
   get xAxis() { return this.#xAxis }
   get xAxisWidth() { return this.#xAxis.width }
   get xAxisRatio() { return this.#xAxis.xAxisRatio }
+  get layerCursor() { return this.#layerCursor }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
+  get overlays() { return Object.fromEntries([...this.#Graph.overlays.list]) }
   get xAxisGrads() { return this.#xAxis.xAxisGrads }
   get candleW() { return this.#xAxis.candleW }
   get candlesOnLayer() { return this.#xAxis.candlesOnLayer }
@@ -378,12 +380,12 @@ export default class Timeline {
 
   hideCursorTime() {
     this.#Graph.overlays.list.get("cursor").layer.visible = false
-    this.render()
+    this.#core.MainPane.draw()
   }
 
   showCursorTime() {
     this.#Graph.overlays.list.get("cursor").layer.visible = true
-    this.render()
+    this.#core.MainPane.draw()
   }
 
   hideJump(j) {

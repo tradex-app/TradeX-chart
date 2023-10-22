@@ -99,7 +99,10 @@ export default class AROON extends Indicator {
   }
 
   draw(range=this.range) {
-    if (this.overlay.data.length < 2 ) return false
+    // no update required
+    if (this.overlay.data.length < 2) return
+
+    if (!super.mustUpdate()) return false
 
     this.scene.clear()
 
@@ -149,5 +152,7 @@ export default class AROON extends Indicator {
     this.plot(plots.up, "renderLine", style)
 
     this.target.viewport.render();
+
+    super.updated()
   }
 }

@@ -141,8 +141,11 @@ const Chart: FC<IProps> = ({
   }, [chartType]);
 
   return (
-    <div className="flex flex-col gap-4 p-4 h-full">
-      <div id={chartAccessor} className="w-full flex justify-center h-full" />
+    <div className="flex flex-col gap-4 p-4 full-size">
+      <div
+        id={chartAccessor}
+        className="w-full flex justify-center full-size"
+      />
     </div>
   );
 };

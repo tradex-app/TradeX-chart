@@ -111,6 +111,10 @@ export default class STOCH extends Indicator {
    * @param {Object} range 
    */
   draw(range=this.range) {
+    if (this.overlay.data.length < 2 ) return false
+
+    if (!super.mustUpdate()) return false
+
     this.scene.clear()
 
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2)
@@ -198,6 +202,8 @@ export default class STOCH extends Indicator {
     this.plot(plots.slowD, "renderLine", style)
 
     this.target.viewport.render();
+
+    super.updated()
   }
 }
 

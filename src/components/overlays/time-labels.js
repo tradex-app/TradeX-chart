@@ -20,6 +20,8 @@ export default class TimeLabels extends Overlay {
   set position(p) { this.target.setPosition(p[0], p[1]) }
 
   draw(range) {
+    if (!super.mustUpdate()) return
+
     this.scene.clear()
     // this.xAxis.calcXAxisGrads(range)
 
@@ -47,5 +49,7 @@ export default class TimeLabels extends Overlay {
       }
     }
     ctx.restore();
+
+    super.updated()
   }
 }

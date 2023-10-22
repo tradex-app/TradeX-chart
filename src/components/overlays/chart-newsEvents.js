@@ -6,6 +6,7 @@ import NewsEvent from "../primitives/newsEvent"
 import { limit } from "../../utils/number"
 import { debounce } from "../../utils/utilities"
 import { isString } from "../../utils/typeChecks"
+import { HIT_DEBOUNCE } from "../../definitions/core"
 
 const newsConfig = {
   bounded: true,
@@ -30,7 +31,6 @@ export default class chartNewsEvents extends Overlay {
   #event
   #events = []
   #dialogue
-  #debounce = (e) => debounce(this.isNewsEventSelected, 100, this)
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
@@ -38,17 +38,22 @@ export default class chartNewsEvents extends Overlay {
 
     this.#event = new NewsEvent(target, theme)
     this.emit()
-    this.core.on("primary_pointerdown", debounce(this.isNewsEventSelected, 200, this), this)
+    this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this)
     this.#dialogue = this.core.WidgetsG.insert("Dialogue", newsConfig)
     this.#dialogue.start()
   }
 
   destroy() {
-    this.core.off("primary_pointerdown", this.#debounce)
+    this.core.off("primary_pointerdown", this.onPrimaryPointerDown)
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
   get data() { return this.overlay.data }
+
+  onPrimaryPointerDown(e) {
+    if (this.core.MainPane.stateMachine.state !== "chart_pan") 
+      debounce(this.isNewsEventSelected, HIT_DEBOUNCE, this)(e)
+  }
 
   isNewsEventSelected(e) {
     const x = e[0]
@@ -76,6 +81,7 @@ export default class chartNewsEvents extends Overlay {
       dimensions: {h: undefined, w: 150},
       position: {x: tx + (w / 2) + 1, y: ty},
       content: content,
+      offFocus: HIT_DEBOUNCE + 1
     }
     this.core.emit("event_selected", tr)
     this.#dialogue.open(config)
@@ -97,6 +103,8 @@ export default class chartNewsEvents extends Overlay {
 
   draw(range=this.core.range) {
     if (this.core.config?.events?.display === false) return
+
+    if (!super.mustUpdate()) return
 
     this.hit.clear()
     this.scene.clear()
@@ -132,5 +140,6 @@ export default class chartNewsEvents extends Overlay {
     }
     // draw mask to hit layer
 
+    super.updated()
   }
 }

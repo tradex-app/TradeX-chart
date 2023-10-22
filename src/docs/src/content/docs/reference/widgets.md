@@ -49,6 +49,7 @@ Dialogues have the following configurable properties with some being optional.
 | dimensions | Object  | yes      | {w, h} object specifying width and height in pixels                                                         |
 | position   | Object  | yes      | ``{x, y, z}`` object specifying position in pixels                                                          |
 | styles     | Object  | no       | ``{window, dragBar, closeIcon, title, content}`` object of [styleable dialogue features](#dialogue-styling) |
+| offFocus   | number  | no       | timeout before close on click outside is active.                                                            |
 
 If no ``position`` is specified, then the dialogue will default to positioning in the center of the chart.
 

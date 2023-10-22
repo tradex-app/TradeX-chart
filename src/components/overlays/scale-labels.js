@@ -17,8 +17,11 @@ export default class ScaleLabels extends Overlay {
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
+  get always() { return true }
 
   draw() {
+    if (!super.mustUpdate()) return
+
     const ctx = this.scene.context
     const yAxis = this.yAxis
     const grads = this.yAxis.calcGradations() || []
@@ -50,6 +53,8 @@ export default class ScaleLabels extends Overlay {
       }
     }
     ctx.restore()
+
+    super.updated()
   }
 }
 
