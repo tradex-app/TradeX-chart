@@ -1253,7 +1253,7 @@ export default class TradeXchart extends Tradex_chart {
     let start = this.range.indexStart
     let end = this.range.indexEnd
     this.setRange(start, end)
-    this.MainPane.draw(undefined, true)
+    this.#MainPane.draw(undefined, true)
   }
 
   /**

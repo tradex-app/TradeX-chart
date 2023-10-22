@@ -25,9 +25,7 @@ export default class chartHighLow extends Overlay {
   // Overlay position is fixed and won't pan / scroll with the chart
   set position(p) { this.target.setPosition(0, 0) }
 
-  draw() {}
-
-  scaleDraw(range=this.core.range) {
+  draw(range=this.core.range) {
     if (this.core.config?.highLow !== true) return 
 
     if (!super.mustUpdate()) return
@@ -68,6 +66,12 @@ export default class chartHighLow extends Overlay {
     ctx.restore()
 
     super.updated()
+
+    if ("hiLo" in this.chart.scale.overlays) {
+      this.chart.scale.overlays.hiLo.instance.setRefresh()
+      this.chart.scale.overlays.hiLo.instance.scaleDraw()
+    }
+
   }
 }
 
@@ -83,7 +87,9 @@ class scaleHighLow extends Overlay {
   // Overlay position is fixed and won't pan / scroll with the chart
   set position(p) { this.target.setPosition(0, 0) }
 
-  draw(range=this.core.range) {
+  draw() {}
+
+  scaleDraw(range=this.core.range) {
     if (!super.mustUpdate()) return
 
     this.scene.clear()

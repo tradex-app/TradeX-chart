@@ -153,27 +153,6 @@ export default class graph {
    */
   draw(range=this.range, update=false) {
 
-    // const oList = this.#overlays.list
-    // // guard against overlays host (chart pane) deletion
-    // if (!(oList instanceof xMap)) return false
-
-    // for (let [key, overlay] of oList) {
-    //   // is it a valid overlay?
-    //   if (!isObject(overlay) || 
-    //       !isFunction(overlay?.instance?.draw)) continue
-
-    //   if (   overlay.instance.doDraw
-    //       || overlay.instance?.always
-    //       // || overlay.instance.yAxis.mode == "manual"
-    //   ) {
-    //     overlay.instance.draw()
-    //     overlay.instance.doDraw = false
-    //   }
-
-    //   if (!overlay.fixed)
-    //     overlay.instance.position = [this.#core.scrollPos, 0]
-    // }
-
     const fn = (k, overlay) => {
       // is it a valid overlay?
       if (!isObject(overlay) || 
@@ -192,7 +171,7 @@ export default class graph {
 
   drawAll() {
     const fn = (k, o) => {
-      o.instance.doDraw = true
+      o.instance.mustUpdate()
     }
     this.executeOverlayList(fn)
   }

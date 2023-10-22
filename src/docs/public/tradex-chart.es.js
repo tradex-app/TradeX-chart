@@ -14,7 +14,7 @@ function ta(r, e) {
   }
   return Object.freeze(Object.defineProperty(r, Symbol.toStringTag, { value: "Module" }));
 }
-const bs = "0.139.13";
+const bs = "0.139.14";
 function M(r) {
   return Array.isArray(r);
 }
@@ -5537,7 +5537,7 @@ class vt {
   }
   drawAll() {
     const e = (i, s) => {
-      s.instance.doDraw = !0;
+      s.instance.mustUpdate();
     };
     this.executeOverlayList(e);
   }
@@ -7001,15 +7001,13 @@ class Mc extends W {
   set position(e) {
     this.target.setPosition(0, 0);
   }
-  draw() {
-  }
-  scaleDraw(e = this.core.range) {
+  draw(e = this.core.range) {
     if (this.core.config?.highLow !== !0 || !super.mustUpdate())
       return;
     this.scene.clear();
     let i, s, n, o = this.scene.width, a = 35, h = {};
     const l = e.valueHi, m = e.valueLo, g = { ...this.theme.yAxis }, v = this.scene.context;
-    g.colourCursorBG = this.theme?.hilo?.colour || Ot.colour, v.save(), v.strokeStyle = this.theme?.highLow?.colour || Ot.colour, v.strokeWidth = this.theme?.highLow?.width || Ot.width, v.setLineDash(this.theme?.highLow?.dash || Ot.dash), n = this.yAxis.yPos(l), Gt(v, n, 0, o, h), i = "High", s = this.theme.yAxis.location == "left" ? 0 : o - (a + 25), Li(v, i, s, n, a, g), n = this.yAxis.yPos(m), Gt(v, n, 0, o, h), i = "Low", Li(v, i, s, n, a, g), v.restore(), super.updated();
+    g.colourCursorBG = this.theme?.hilo?.colour || Ot.colour, v.save(), v.strokeStyle = this.theme?.highLow?.colour || Ot.colour, v.strokeWidth = this.theme?.highLow?.width || Ot.width, v.setLineDash(this.theme?.highLow?.dash || Ot.dash), n = this.yAxis.yPos(l), Gt(v, n, 0, o, h), i = "High", s = this.theme.yAxis.location == "left" ? 0 : o - (a + 25), Li(v, i, s, n, a, g), n = this.yAxis.yPos(m), Gt(v, n, 0, o, h), i = "Low", Li(v, i, s, n, a, g), v.restore(), super.updated(), "hiLo" in this.chart.scale.overlays && (this.chart.scale.overlays.hiLo.instance.setRefresh(), this.chart.scale.overlays.hiLo.instance.scaleDraw());
   }
 }
 class Ac extends W {
@@ -7019,7 +7017,9 @@ class Ac extends W {
   set position(e) {
     this.target.setPosition(0, 0);
   }
-  draw(e = this.core.range) {
+  draw() {
+  }
+  scaleDraw(e = this.core.range) {
     if (!super.mustUpdate())
       return;
     this.scene.clear();
@@ -17210,7 +17210,7 @@ class I extends ou {
     if (!this.ready)
       return;
     let e = this.range.indexStart, i = this.range.indexEnd;
-    this.setRange(e, i), this.MainPane.draw(void 0, !0);
+    this.setRange(e, i), this.#D.draw(void 0, !0);
   }
   toImageURL(e, i, s, n) {
     return rr(this, e, i, s, "url", n);
