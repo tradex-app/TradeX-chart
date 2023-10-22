@@ -1,0 +1,913 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-has-toc data-has-sidebar class="astro-bguv2lll"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>core | TradeX Chart</title><link rel="canonical" href="https://tradex-app.github.io/TradeX-chart/api/core/"/><link rel="sitemap" href="/TradeX-chart/sitemap-index.xml"/><link rel="shortcut icon" href="/TradeX-chart/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v3.3.0"/><meta name="generator" content="Starlight v0.11.1"/><meta property="og:title" content="core"/><meta property="og:type" content="article"/><meta property="og:url" content="https://tradex-app.github.io/TradeX-chart/api/core/"/><meta property="og:locale" content="en"/><meta property="og:description"/><meta property="og:site_name" content="TradeX Chart"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="core"/><meta name="twitter:description"/><script>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/TradeX-chart/astro/index.88731c60.css" />
+<style>svg:where(.astro-c6vsoqas){color:var(--sl-icon-color);font-size:var(--sl-icon-size, 1em);width:1em;height:1em}
+</style><script type="module" src="/TradeX-chart/astro/hoisted.5a2d23d0.js"></script></head><body class="astro-bguv2lll"><a href="#_top" class="astro-7q3lir66">Skip to content</a><div class="page sl-flex astro-vrdttmbt"><header class="header astro-vrdttmbt"><div class="header sl-flex astro-kmkmnagf"><div class="sl-flex astro-kmkmnagf"><a href="/TradeX-chart/" class="site-title sl-flex astro-m46x6ez3"><img class="astro-m46x6ez3" alt="" src="/TradeX-chart/astro/tx.82979636.svg" width="48" height="48"><span class="astro-m46x6ez3">TradeX Chart</span></a></div><div class="sl-flex astro-kmkmnagf"><site-search data-translations="{&#34;placeholder&#34;:&#34;Search&#34;}" class="astro-v37mnknz"><button data-open-modal disabled class="astro-v37mnknz"><svg aria-label="Search" class="astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg><span class="sl-hidden md:sl-block astro-v37mnknz" aria-hidden="true">Search</span><svg aria-label="(Press / to Search)" class="sl-hidden md:sl-block astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 2H7a5 5 0 0 0-5 5v10a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5V7a5 5 0 0 0-5-5Zm3 15a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v10Z"/><path d="M15.293 6.707a1 1 0 1 1 1.414 1.414l-8.485 8.486a1 1 0 0 1-1.414-1.415l8.485-8.485Z"/></svg></button><dialog style="padding:0" aria-label="Search" class="astro-v37mnknz"><div class="dialog-frame sl-flex astro-v37mnknz"><button data-close-modal class="sl-flex md:sl-hidden astro-v37mnknz">Cancel</button><div class="search-container astro-v37mnknz"><div id="starlight__search" class="astro-v37mnknz"></div></div></div></dialog></site-search></div><div class="sl-hidden md:sl-flex right-group astro-kmkmnagf"><div class="sl-flex social-icons astro-kmkmnagf"><a href="https://github.com/tradex-app/TradeX-chart" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">GitHub</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a><a href="https://discord.gg/hhfvuhJJY" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Discord</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M20.32 4.37a19.8 19.8 0 0 0-4.93-1.51 13.78 13.78 0 0 0-.64 1.28 18.27 18.27 0 0 0-5.5 0 12.64 12.64 0 0 0-.64-1.28h-.05A19.74 19.74 0 0 0 3.64 4.4 20.26 20.26 0 0 0 .11 18.09l.02.02a19.9 19.9 0 0 0 6.04 3.03l.04-.02a14.24 14.24 0 0 0 1.23-2.03.08.08 0 0 0-.05-.07 13.1 13.1 0 0 1-1.9-.92.08.08 0 0 1 .02-.1 10.2 10.2 0 0 0 .41-.31h.04a14.2 14.2 0 0 0 12.1 0l.04.01a9.63 9.63 0 0 0 .4.32.08.08 0 0 1-.03.1 12.29 12.29 0 0 1-1.9.91.08.08 0 0 0-.02.1 15.97 15.97 0 0 0 1.27 2.01h.04a19.84 19.84 0 0 0 6.03-3.05v-.03a20.12 20.12 0 0 0-3.57-13.69ZM8.02 15.33c-1.18 0-2.16-1.08-2.16-2.42 0-1.33.96-2.42 2.16-2.42 1.21 0 2.18 1.1 2.16 2.42 0 1.34-.96 2.42-2.16 2.42Zm7.97 0c-1.18 0-2.15-1.08-2.15-2.42 0-1.33.95-2.42 2.15-2.42 1.22 0 2.18 1.1 2.16 2.42 0 1.34-.94 2.42-2.16 2.42Z"/></svg></a></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-4yphtoen"><span class="sr-only astro-4yphtoen">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select value="auto" class="astro-4yphtoen"><option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected="true" class="astro-4yphtoen">Auto</option></select><svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script></div></div></header><nav class="sidebar astro-vrdttmbt" aria-label="Main"><starlight-menu-button class="astro-jif73yzw"><button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-jif73yzw"><svg aria-hidden="true" class="astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg></button></starlight-menu-button><div id="starlight__sidebar" class="sidebar-pane astro-vrdttmbt"><div class="sidebar-content sl-flex astro-vrdttmbt"><ul class="top-level astro-3ii7xxms"><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">Examples</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/TradeX-chart/examples/01_static_chart/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Static Price History</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/examples/02_live_history_chart/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Pice History with Live Price Feed</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/examples/custom_indicator/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Indicator</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/examples/static_chart/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Static Price History</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">Guides</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/TradeX-chart/guides/custom_indicator/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Indicator - How to Build and Use</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/guides/howto/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">How To</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/guides/test/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Test</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">Reference</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Introduction</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/01_getting_started/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Getting Started</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/02_configuration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Configuration</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/annotations/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Annotations</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/api-examples/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">API Examples</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/architecture/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Architecture</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/canvas_extension_layers/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Canvas Extension Layers</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/canvas_methods/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Canvas Methods</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/events/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Events</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/example/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Example Reference</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/hit_detection/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Hit Detection</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/indicators/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/indicators_custom/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/indicators_default/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Default Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/indicators_talib/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">TA-Lib Functions</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/legends/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Legends</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/overlays/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Overlays</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/overlays_custom/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Overlays</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/overlays_news_events/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Overlay News Events</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/overlays_trades/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Overlay Trades</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/range/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Range</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/state/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">State</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/state_machine/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">State Machine</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/streaming_price_data/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Streaming Price Data to the Chart</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/themes/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Themes</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/web_workers/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Web Workers</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/widgets/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Widgets</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">API</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/TradeX-chart/api/core/" aria-current="page" class="astro-3ii7xxms"><span class="astro-3ii7xxms">core</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/api/core-old/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">core - documentation.js</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/api/core2/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">core</span></a></li></ul></details></li></ul><div class="md:sl-hidden"><div class="mobile-preferences sl-flex astro-wu23bvmt"><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-4yphtoen"><span class="sr-only astro-4yphtoen">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select value="auto" class="astro-4yphtoen"><option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected="true" class="astro-4yphtoen">Auto</option></select><svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script></div></div></div></div></nav><div class="main-frame astro-vrdttmbt"><div class="lg:sl-flex astro-67yu43on"><aside class="right-sidebar-container astro-67yu43on"><div class="right-sidebar astro-67yu43on"><div class="lg:sl-hidden astro-pb3aqygn"><mobile-starlight-toc data-min-h="2" data-max-h="4" class="astro-doynk5tl"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-doynk5tl"><details id="starlight__mobile-toc" class="astro-doynk5tl"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-doynk5tl"><div class="toggle sl-flex astro-doynk5tl">On this page<svg aria-hidden="true" class="caret astro-doynk5tl astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></div><span class="display-current astro-doynk5tl"></span></summary><div class="dropdown astro-doynk5tl"><ul class="isMobile astro-g2bywc46" style="--depth: 0;"><li class="astro-g2bywc46" style="--depth: 0;"><a href="#_top" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Overview</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#classes" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Classes</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#members" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Members</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#functions" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Functions</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#tradexchart--tradex_chart" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">TradeXchart ⇐ Tradex_chart</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#new-tradexchart" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">new TradeXchart()</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartcreatecontainer-txcfg-state--instance" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.create(container, [txCfg], state) ⇒ instance</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartdestroychart" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.destroy(chart)</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartdestroy" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.destroy()</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartsetdimensionsw-h" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.setDimensions(w, h)</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartsetpriceprecisionpriceprecision" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.setPricePrecision(pricePrecision)</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartsetvolumeprecisionvolumeprecision" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.setVolumePrecision(volumePrecision)</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartaddthemetheme--instance" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.addTheme(theme) ⇒ instance</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartsetthemetheme--boolean" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.setTheme(theme) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartsetstreamstream--instance" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.setStream(stream) ⇒ instance</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartgetrangestart-end" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.getRange(start, end)</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartsetrangestart-end" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.setRange(start, end)</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartresizewidth-height--boolean" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.resize(width, height) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartrefresh" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.refresh()</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#version--string" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">version ⇒ string</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#name--string" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">name ⇒ string</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#shortname--string" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">shortName ⇒ string</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#config--object" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">config ⇒ object</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#chart--object" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Chart ⇒ object</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#chartpanes--map" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">ChartPanes ⇒ Map</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#indicators--object" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Indicators ⇒ object</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#state--state" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">state ⇒ State</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#alldata--object" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">allData ⇒ object</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#startcfg" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">start(cfg)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#ontopic-handler-context--boolean" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">on(topic, handler, context) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#offtopic-handler--boolean" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">off(topic, handler) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#emittopic-data--boolean" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">emit(topic, data) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#executetopic-data-cb" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">execute(topic, data, cb)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#stopstream" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">stopStream()</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#jumptoindexstart-nearest-centre" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">jumpToIndex(start, nearest, centre)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#jumptotsts-nearest-centre" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">jumpToTS(ts, nearest, centre)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#jumptostartcentre" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">jumpToStart(centre)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#jumptoendcentre" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">jumpToEnd(centre)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#mergedatamerge-newrange" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">mergeData(merge, newRange)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#isindicatori--boolean" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">isIndicator(i) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#setindicatorsi-flush--boolean" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">setIndicators(i, flush) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#addindicatori-name-params--indicator--false" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">addIndicator(i, name, params) ⇒ Indicator | false</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#getindicatori--indicator--false" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">getIndicator(i) ⇒ Indicator | false</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#removeindicatori--boolean" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">removeIndicator(i) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#indicatorsettingsi-s--object" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">indicatorSettings(i, s) ⇒ Object</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#hasstateindicatori-dataset--indicator--false" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">hasStateIndicator(i, dataset) ⇒ Indicator | false</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#calcallindicators" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">calcAllIndicators()</span></a></li></ul></div></details></nav></mobile-starlight-toc></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-pb3aqygn"><div class="sl-container astro-pb3aqygn"><starlight-toc data-min-h="2" data-max-h="4"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-g2bywc46" style="--depth: 0;"><li class="astro-g2bywc46" style="--depth: 0;"><a href="#_top" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Overview</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#classes" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Classes</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#members" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Members</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#functions" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Functions</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#tradexchart--tradex_chart" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">TradeXchart ⇐ Tradex_chart</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#new-tradexchart" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">new TradeXchart()</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartcreatecontainer-txcfg-state--instance" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.create(container, [txCfg], state) ⇒ instance</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartdestroychart" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.destroy(chart)</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartdestroy" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.destroy()</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartsetdimensionsw-h" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.setDimensions(w, h)</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartsetpriceprecisionpriceprecision" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.setPricePrecision(pricePrecision)</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartsetvolumeprecisionvolumeprecision" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.setVolumePrecision(volumePrecision)</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartaddthemetheme--instance" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.addTheme(theme) ⇒ instance</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartsetthemetheme--boolean" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.setTheme(theme) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartsetstreamstream--instance" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.setStream(stream) ⇒ instance</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartgetrangestart-end" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.getRange(start, end)</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartsetrangestart-end" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.setRange(start, end)</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartresizewidth-height--boolean" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.resize(width, height) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradexchartrefresh" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeXchart.refresh()</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#version--string" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">version ⇒ string</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#name--string" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">name ⇒ string</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#shortname--string" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">shortName ⇒ string</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#config--object" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">config ⇒ object</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#chart--object" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Chart ⇒ object</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#chartpanes--map" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">ChartPanes ⇒ Map</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#indicators--object" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Indicators ⇒ object</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#state--state" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">state ⇒ State</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#alldata--object" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">allData ⇒ object</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#startcfg" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">start(cfg)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#ontopic-handler-context--boolean" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">on(topic, handler, context) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#offtopic-handler--boolean" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">off(topic, handler) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#emittopic-data--boolean" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">emit(topic, data) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#executetopic-data-cb" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">execute(topic, data, cb)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#stopstream" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">stopStream()</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#jumptoindexstart-nearest-centre" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">jumpToIndex(start, nearest, centre)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#jumptotsts-nearest-centre" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">jumpToTS(ts, nearest, centre)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#jumptostartcentre" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">jumpToStart(centre)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#jumptoendcentre" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">jumpToEnd(centre)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#mergedatamerge-newrange" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">mergeData(merge, newRange)</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#isindicatori--boolean" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">isIndicator(i) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#setindicatorsi-flush--boolean" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">setIndicators(i, flush) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#addindicatori-name-params--indicator--false" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">addIndicator(i, name, params) ⇒ Indicator | false</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#getindicatori--indicator--false" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">getIndicator(i) ⇒ Indicator | false</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#removeindicatori--boolean" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">removeIndicator(i) ⇒ boolean</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#indicatorsettingsi-s--object" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">indicatorSettings(i, s) ⇒ Object</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#hasstateindicatori-dataset--indicator--false" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">hasStateIndicator(i, dataset) ⇒ Indicator | false</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#calcallindicators" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">calcAllIndicators()</span></a></li></ul></nav></starlight-toc></div></div></div></aside><div class="main-pane astro-67yu43on"><main data-pagefind-body lang="en" dir="ltr" class="astro-bguv2lll"><div class="content-panel astro-7nkwcw3z"><div class="sl-container astro-7nkwcw3z"><h1 id="_top" class="astro-j6tvhyss">core</h1></div></div><div class="content-panel astro-7nkwcw3z"><div class="sl-container astro-7nkwcw3z"><div class="content astro-ml6ntd6l"><h2 id="classes">Classes</h2>
+<dl>
+<dt><a href="#TradeXchart">TradeXchart</a> ⇐ <code>Tradex_chart</code></dt>
+<dd></dd>
+</dl>
+<h2 id="members">Members</h2>
+<dl>
+<dt><a href="#version">version</a> ⇒ <code>string</code></dt>
+<dd></dd>
+<dt><a href="#name">name</a> ⇒ <code>string</code></dt>
+<dd></dd>
+<dt><a href="#shortName">shortName</a> ⇒ <code>string</code></dt>
+<dd></dd>
+<dt><a href="#config">config</a> ⇒ <code>object</code></dt>
+<dd></dd>
+<dt><a href="#Chart">Chart</a> ⇒ <code>object</code></dt>
+<dd></dd>
+<dt><a href="#ChartPanes">ChartPanes</a> ⇒ <code>Map</code></dt>
+<dd></dd>
+<dt><a href="#Indicators">Indicators</a> ⇒ <code>object</code></dt>
+<dd></dd>
+<dt><a href="#state">state</a> ⇒ <code>State</code></dt>
+<dd></dd>
+<dt><a href="#allData">allData</a> ⇒ <code>object</code></dt>
+<dd></dd>
+</dl>
+<h2 id="functions">Functions</h2>
+<dl>
+<dt><a href="#start">start(cfg)</a></dt>
+<dd><p>Target element has been validated as a mount point, 
+let's start building</p>
+</dd>
+<dt><a href="#on">on(topic, handler, context)</a> ⇒ <code>boolean</code></dt>
+<dd><p>Subscribe to a topic</p>
+</dd>
+<dt><a href="#off">off(topic, handler)</a> ⇒ <code>boolean</code></dt>
+<dd><p>Unsubscribe from a topic</p>
+</dd>
+<dt><a href="#emit">emit(topic, data)</a> ⇒ <code>boolean</code></dt>
+<dd><p>Publish a topic</p>
+</dd>
+<dt><a href="#execute">execute(topic, data, cb)</a></dt>
+<dd><p>Execute a task</p>
+</dd>
+<dt><a href="#stopStream">stopStream()</a></dt>
+<dd><p>stop a chart stream
+will halt any updates to price or indicators</p>
+</dd>
+<dt><a href="#jumpToIndex">jumpToIndex(start, nearest, centre)</a></dt>
+<dd><p>set Range start index</p>
+</dd>
+<dt><a href="#jumpToTS">jumpToTS(ts, nearest, centre)</a></dt>
+<dd><p>set Range start to time stamp</p>
+</dd>
+<dt><a href="#jumpToStart">jumpToStart(centre)</a></dt>
+<dd><p>set Range start to state data start</p>
+</dd>
+<dt><a href="#jumpToEnd">jumpToEnd(centre)</a></dt>
+<dd><p>set Range start to state data end</p>
+</dd>
+<dt><a href="#mergeData">mergeData(merge, newRange)</a></dt>
+<dd><p>Merge a block of data into the chart state.
+Used for populating a chart with back history.
+Merge data must be formatted to a Chart State.
+Optionally set a new range upon merge.</p>
+</dd>
+<dt><a href="#isIndicator">isIndicator(i)</a> ⇒ <code>boolean</code></dt>
+<dd><p>validate indicator</p>
+</dd>
+<dt><a href="#setIndicators">setIndicators(i, flush)</a> ⇒ <code>boolean</code></dt>
+<dd><p>import Indicators</p>
+</dd>
+<dt><a href="#addIndicator">addIndicator(i, name, params)</a> ⇒ <code>Indicator</code> | <code>false</code></dt>
+<dd><p>add an indicator - default or registered user defined</p>
+</dd>
+<dt><a href="#getIndicator">getIndicator(i)</a> ⇒ <code>Indicator</code> | <code>false</code></dt>
+<dd><p>retrieve indicator by ID</p>
+</dd>
+<dt><a href="#removeIndicator">removeIndicator(i)</a> ⇒ <code>boolean</code></dt>
+<dd><p>remove an indicator - default or registered user defined</p>
+</dd>
+<dt><a href="#indicatorSettings">indicatorSettings(i, s)</a> ⇒ <code>Object</code></dt>
+<dd><p>set or get indicator settings</p>
+</dd>
+<dt><a href="#hasStateIndicator">hasStateIndicator(i, dataset)</a> ⇒ <code>Indicator</code> | <code>false</code></dt>
+<dd><p>Does current chart state have indicator</p>
+</dd>
+<dt><a href="#calcAllIndicators">calcAllIndicators()</a></dt>
+<dd><p>calculate all indicators currently in use</p>
+</dd>
+</dl>
+<p><a name="TradeXchart"></a></p>
+<h2 id="tradexchart--tradex_chart">TradeXchart ⇐ <code>Tradex_chart</code></h2>
+<p><strong>Kind</strong>: global class<br>
+<strong>Extends</strong>: <code>Tradex_chart</code></p>
+<ul>
+<li><a href="#TradeXchart">TradeXchart</a> ⇐ <code>Tradex_chart</code>
+<ul>
+<li><a href="#new_TradeXchart_new">new TradeXchart()</a></li>
+<li><a href="#TradeXchart.create">.create(container, [txCfg], state)</a> ⇒ <code>instance</code></li>
+<li><a href="#TradeXchart.destroy">.destroy(chart)</a></li>
+<li><a href="#TradeXchart.destroy">.destroy()</a></li>
+<li><a href="#TradeXchart.setDimensions">.setDimensions(w, h)</a></li>
+<li><a href="#TradeXchart.setPricePrecision">.setPricePrecision(pricePrecision)</a></li>
+<li><a href="#TradeXchart.setVolumePrecision">.setVolumePrecision(volumePrecision)</a></li>
+<li><a href="#TradeXchart.addTheme">.addTheme(theme)</a> ⇒ <code>instance</code></li>
+<li><a href="#TradeXchart.setTheme">.setTheme(theme)</a> ⇒ <code>boolean</code></li>
+<li><a href="#TradeXchart.setStream">.setStream(stream)</a> ⇒ <code>instance</code></li>
+<li><a href="#TradeXchart.getRange">.getRange(start, end)</a></li>
+<li><a href="#TradeXchart.setRange">.setRange(start, end)</a></li>
+<li><a href="#TradeXchart.resize">.resize(width, height)</a> ⇒ <code>boolean</code></li>
+<li><a href="#TradeXchart.refresh">.refresh()</a></li>
+</ul>
+</li>
+</ul>
+<p><a name="new_TradeXchart_new"></a></p>
+<h3 id="new-tradexchart">new TradeXchart()</h3>
+<p>The root class for the entire chart</p>
+<p><a name="TradeXchart.create"></a></p>
+<h3 id="tradexchartcreatecontainer-txcfg-state--instance">TradeXchart.create(container, [txCfg], state) ⇒ <code>instance</code></h3>
+<p>Create a new TradeXchart instance</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a><br>
+<strong>Returns</strong>: <code>instance</code> - TradeXchart</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td>container</td><td><code>DOM_element</code></td><td></td><td>HTML element to mount the chart on</td></tr><tr><td>[txCfg]</td><td><code>Object</code></td><td><code>{}</code></td><td>chart config</td></tr><tr><td>state</td><td><code>Object</code></td><td></td><td>chart state</td></tr></tbody></table>
+<p><a name="TradeXchart.destroy"></a></p>
+<h3 id="tradexchartdestroychart">TradeXchart.destroy(chart)</h3>
+<p>Destroy a chart instance, clean up and remove data</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th></tr></thead><tbody><tr><td>chart</td><td><code>instance</code></td></tr></tbody></table>
+<p><a name="TradeXchart.destroy"></a></p>
+<h3 id="tradexchartdestroy">TradeXchart.destroy()</h3>
+<p>Stop all chart event processing and remove the chart from DOM.
+In other words, destroy the chart.</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a><br>
+<a name="TradeXchart.setDimensions"></a></p>
+<h3 id="tradexchartsetdimensionsw-h">TradeXchart.setDimensions(w, h)</h3>
+<p>Set chart width and height</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>w</td><td><code>number</code></td><td>width in pixels</td></tr><tr><td>h</td><td><code>number</code></td><td>height in pixels</td></tr></tbody></table>
+<p><a name="TradeXchart.setPricePrecision"></a></p>
+<h3 id="tradexchartsetpriceprecisionpriceprecision">TradeXchart.setPricePrecision(pricePrecision)</h3>
+<p>Set the price accuracy</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>pricePrecision</td><td><code>number</code></td><td>Price accuracy</td></tr></tbody></table>
+<p><a name="TradeXchart.setVolumePrecision"></a></p>
+<h3 id="tradexchartsetvolumeprecisionvolumeprecision">TradeXchart.setVolumePrecision(volumePrecision)</h3>
+<p>Set the volume accuracy</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>volumePrecision</td><td><code>number</code></td><td>Volume accuracy</td></tr></tbody></table>
+<p><a name="TradeXchart.addTheme"></a></p>
+<h3 id="tradexchartaddthemetheme--instance">TradeXchart.addTheme(theme) ⇒ <code>instance</code></h3>
+<p>Add a theme to the chart,
+if no current theme is set, make this the current one.</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a><br>
+<strong>Returns</strong>: <code>instance</code> - - theme instance</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>theme</td><td><code>Object</code></td><td>Volume accuracy</td></tr></tbody></table>
+<p><a name="TradeXchart.setTheme"></a></p>
+<h3 id="tradexchartsetthemetheme--boolean">TradeXchart.setTheme(theme) ⇒ <code>boolean</code></h3>
+<p>Set the chart theme</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>theme</td><td><code>string</code></td><td>theme identifier</td></tr></tbody></table>
+<p><a name="TradeXchart.setStream"></a></p>
+<h3 id="tradexchartsetstreamstream--instance">TradeXchart.setStream(stream) ⇒ <code>instance</code></h3>
+<p>specify a chart stream</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th></tr></thead><tbody><tr><td>stream</td><td><code>Object</code></td></tr></tbody></table>
+<p><a name="TradeXchart.getRange"></a></p>
+<h3 id="tradexchartgetrangestart-end">TradeXchart.getRange(start, end)</h3>
+<p>initialize range</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td>start</td><td><code>number</code></td><td><code>0</code></td><td>index</td></tr><tr><td>end</td><td><code>number</code></td><td><code>0</code></td><td>index</td></tr></tbody></table>
+<p><a name="TradeXchart.setRange"></a></p>
+<h3 id="tradexchartsetrangestart-end">TradeXchart.setRange(start, end)</h3>
+<p>set start and end of range</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td>start</td><td><code>number</code></td><td><code>0</code></td><td>index</td></tr><tr><td>end</td><td><code>number</code></td><td></td><td>index</td></tr></tbody></table>
+<p><a name="TradeXchart.resize"></a></p>
+<h3 id="tradexchartresizewidth-height--boolean">TradeXchart.resize(width, height) ⇒ <code>boolean</code></h3>
+<p>Resize the chart</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a><br>
+<strong>Returns</strong>: <code>boolean</code> - - success or failure</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>width</td><td><code>number</code></td><td>pixels</td></tr><tr><td>height</td><td><code>number</code></td><td>pixels</td></tr></tbody></table>
+<p><a name="TradeXchart.refresh"></a></p>
+<h3 id="tradexchartrefresh">TradeXchart.refresh()</h3>
+<p>refresh / redraw the chart</p>
+<p><strong>Kind</strong>: static method of <a href="#TradeXchart"><code>TradeXchart</code></a><br>
+<a name="version"></a></p>
+<h2 id="version--string">version ⇒ <code>string</code></h2>
+<p><strong>Kind</strong>: global variable<br>
+<strong>Returns</strong>: <code>string</code> - - return TradeX Chart version number<br>
+<a name="name"></a></p>
+<h2 id="name--string">name ⇒ <code>string</code></h2>
+<p><strong>Kind</strong>: global variable<br>
+<strong>Returns</strong>: <code>string</code> - - user defined chart name<br>
+<a name="shortName"></a></p>
+<h2 id="shortname--string">shortName ⇒ <code>string</code></h2>
+<p><strong>Kind</strong>: global variable<br>
+<strong>Returns</strong>: <code>string</code> - - user defined short chart name<br>
+<a name="config"></a></p>
+<h2 id="config--object">config ⇒ <code>object</code></h2>
+<p><strong>Kind</strong>: global variable<br>
+<strong>Returns</strong>: <code>object</code> - - current chart configuration including defaults<br>
+<a name="Chart"></a></p>
+<h2 id="chart--object">Chart ⇒ <code>object</code></h2>
+<p><strong>Kind</strong>: global variable<br>
+<strong>Returns</strong>: <code>object</code> - - primary chart pane - displays price history (candles)<br>
+<a name="ChartPanes"></a></p>
+<h2 id="chartpanes--map">ChartPanes ⇒ <code>Map</code></h2>
+<p><strong>Kind</strong>: global variable<br>
+<strong>Returns</strong>: <code>Map</code> - - all chart panes, primary and secondary<br>
+<a name="Indicators"></a></p>
+<h2 id="indicators--object">Indicators ⇒ <code>object</code></h2>
+<p><strong>Kind</strong>: global variable<br>
+<strong>Returns</strong>: <code>object</code> - - all chart indicators in use, grouped by chart panes<br>
+<a name="state"></a></p>
+<h2 id="state--state">state ⇒ <code>State</code></h2>
+<p><strong>Kind</strong>: global variable<br>
+<strong>Returns</strong>: <code>State</code> - - current state instance<br>
+<a name="allData"></a></p>
+<h2 id="alldata--object">allData ⇒ <code>object</code></h2>
+<p><strong>Kind</strong>: global variable<br>
+<strong>Returns</strong>: <code>object</code> - - all state datasets<br>
+<a name="start"></a></p>
+<h2 id="startcfg">start(cfg)</h2>
+<p>Target element has been validated as a mount point,
+let’s start building</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>cfg</td><td><code>Object</code></td><td>chart configuration</td></tr></tbody></table>
+<p><a name="on"></a></p>
+<h2 id="ontopic-handler-context--boolean">on(topic, handler, context) ⇒ <code>boolean</code></h2>
+<p>Subscribe to a topic</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>topic</td><td><code>string</code></td><td>The topic name</td></tr><tr><td>handler</td><td><code>function</code></td><td>The function or method that is called</td></tr><tr><td>context</td><td><code>Object</code></td><td>The context the function(s) belongs to</td></tr></tbody></table>
+<p><a name="off"></a></p>
+<h2 id="offtopic-handler--boolean">off(topic, handler) ⇒ <code>boolean</code></h2>
+<p>Unsubscribe from a topic</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>topic</td><td><code>string</code></td><td>The topic name</td></tr><tr><td>handler</td><td><code>function</code></td><td>function to remove</td></tr></tbody></table>
+<p><a name="emit"></a></p>
+<h2 id="emittopic-data--boolean">emit(topic, data) ⇒ <code>boolean</code></h2>
+<p>Publish a topic</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>topic</td><td><code>string</code></td><td>The topic name</td></tr><tr><td>data</td><td><code>Object</code></td><td>The data to publish</td></tr></tbody></table>
+<p><a name="execute"></a></p>
+<h2 id="executetopic-data-cb">execute(topic, data, cb)</h2>
+<p>Execute a task</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>topic</td><td><code>string</code></td><td>The topic name</td></tr><tr><td>data</td><td><code>Object</code></td><td>The data that gets published</td></tr><tr><td>cb</td><td><code>function</code></td><td>callback method</td></tr></tbody></table>
+<p><a name="stopStream"></a></p>
+<h2 id="stopstream">stopStream()</h2>
+<p>stop a chart stream
+will halt any updates to price or indicators</p>
+<p><strong>Kind</strong>: global function<br>
+<a name="jumpToIndex"></a></p>
+<h2 id="jumptoindexstart-nearest-centre">jumpToIndex(start, nearest, centre)</h2>
+<p>set Range start index</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td>start</td><td><code>number</code></td><td></td><td>starting index of state data</td></tr><tr><td>nearest</td><td><code>boolean</code></td><td><code>true</code></td><td>limit range start - no out of range values</td></tr><tr><td>centre</td><td><code>boolean</code></td><td><code>true</code></td><td>center the range on the start value</td></tr></tbody></table>
+<p><a name="jumpToTS"></a></p>
+<h2 id="jumptotsts-nearest-centre">jumpToTS(ts, nearest, centre)</h2>
+<p>set Range start to time stamp</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td>ts</td><td><code>number</code></td><td></td><td>timestamp</td></tr><tr><td>nearest</td><td><code>boolean</code></td><td><code>true</code></td><td>limit range start - no out of range values</td></tr><tr><td>centre</td><td><code>boolean</code></td><td><code>true</code></td><td>center the range on the start value</td></tr></tbody></table>
+<p><a name="jumpToStart"></a></p>
+<h2 id="jumptostartcentre">jumpToStart(centre)</h2>
+<p>set Range start to state data start</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td>centre</td><td><code>boolean</code></td><td><code>true</code></td><td>center the range on the start value</td></tr></tbody></table>
+<p><a name="jumpToEnd"></a></p>
+<h2 id="jumptoendcentre">jumpToEnd(centre)</h2>
+<p>set Range start to state data end</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td>centre</td><td><code>boolean</code></td><td><code>true</code></td><td>center the range on the end value</td></tr></tbody></table>
+<p><a name="mergeData"></a></p>
+<h2 id="mergedatamerge-newrange">mergeData(merge, newRange)</h2>
+<p>Merge a block of data into the chart state.
+Used for populating a chart with back history.
+Merge data must be formatted to a Chart State.
+Optionally set a new range upon merge.</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td>merge</td><td><code>Object</code></td><td></td><td>merge data must be formatted to a Chart State</td></tr><tr><td>newRange</td><td><code>boolean</code> | <code>object</code></td><td><code>false</code></td><td>false</td></tr></tbody></table>
+<p><a name="isIndicator"></a></p>
+<h2 id="isindicatori--boolean">isIndicator(i) ⇒ <code>boolean</code></h2>
+<p>validate indicator</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>i</td><td><code>class</code></td><td>indicator class</td></tr></tbody></table>
+<p><a name="setIndicators"></a></p>
+<h2 id="setindicatorsi-flush--boolean">setIndicators(i, flush) ⇒ <code>boolean</code></h2>
+<p>import Indicators</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td>i</td><td><code>Object</code></td><td></td><td>indicators {id, name, event, ind}</td></tr><tr><td>flush</td><td><code>boolean</code></td><td><code>false</code></td><td>expunge default indicators</td></tr></tbody></table>
+<p><a name="addIndicator"></a></p>
+<h2 id="addindicatori-name-params--indicator--false">addIndicator(i, name, params) ⇒ <code>Indicator</code> | <code>false</code></h2>
+<p>add an indicator - default or registered user defined</p>
+<p><strong>Kind</strong>: global function<br>
+<strong>Returns</strong>: <code>Indicator</code> | <code>false</code> - - indicator instance or false</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>i</td><td><code>string</code></td><td>indicator</td></tr><tr><td>name</td><td><code>string</code></td><td>identifier</td></tr><tr><td>params</td><td><code>Object</code></td><td>{settings, data}</td></tr></tbody></table>
+<p><a name="getIndicator"></a></p>
+<h2 id="getindicatori--indicator--false">getIndicator(i) ⇒ <code>Indicator</code> | <code>false</code></h2>
+<p>retrieve indicator by ID</p>
+<p><strong>Kind</strong>: global function<br>
+<strong>Returns</strong>: <code>Indicator</code> | <code>false</code> - - indicator instance or false</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>i</td><td><code>string</code></td><td>indicator ID</td></tr></tbody></table>
+<p><a name="removeIndicator"></a></p>
+<h2 id="removeindicatori--boolean">removeIndicator(i) ⇒ <code>boolean</code></h2>
+<p>remove an indicator - default or registered user defined</p>
+<p><strong>Kind</strong>: global function<br>
+<strong>Returns</strong>: <code>boolean</code> - - success / failure</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>i</td><td><code>string</code> | <code>Indicator</code></td><td>indicator id or Indicator instance</td></tr></tbody></table>
+<p><a name="indicatorSettings"></a></p>
+<h2 id="indicatorsettingsi-s--object">indicatorSettings(i, s) ⇒ <code>Object</code></h2>
+<p>set or get indicator settings</p>
+<p><strong>Kind</strong>: global function<br>
+<strong>Returns</strong>: <code>Object</code> - - settings</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td>i</td><td><code>string</code> | <code>Indicator</code></td><td>indicator id or Indicator instance</td></tr><tr><td>s</td><td><code>Object</code></td><td>settings</td></tr></tbody></table>
+<p><a name="hasStateIndicator"></a></p>
+<h2 id="hasstateindicatori-dataset--indicator--false">hasStateIndicator(i, dataset) ⇒ <code>Indicator</code> | <code>false</code></h2>
+<p>Does current chart state have indicator</p>
+<p><strong>Kind</strong>: global function</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td>i</td><td><code>string</code></td><td></td><td>indicator id or name</td></tr><tr><td>dataset</td><td><code>string</code></td><td><code>“searchAll”</code></td><td></td></tr></tbody></table>
+<p><a name="calcAllIndicators"></a></p>
+<h2 id="calcallindicators">calcAllIndicators()</h2>
+<p>calculate all indicators currently in use</p>
+<p><strong>Kind</strong>: global function</p></div><footer class="astro-3yyafb3n"><div class="meta sl-flex astro-3yyafb3n"></div><div class="pagination-links sl-flex astro-u2l5gyhi" dir="ltr"><a href="/TradeX-chart/reference/widgets/" rel="prev" class="astro-u2l5gyhi"><svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-u2l5gyhi">Previous<br class="astro-u2l5gyhi"><span class="link-title astro-u2l5gyhi">Widgets</span></span></a><a href="/TradeX-chart/api/core-old/" rel="next" class="astro-u2l5gyhi"><svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-u2l5gyhi">Next<br class="astro-u2l5gyhi"><span class="link-title astro-u2l5gyhi">core - documentation.js</span></span></a></div></footer></div></div></main></div></div></div></div></body></html>

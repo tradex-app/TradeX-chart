@@ -1,0 +1,253 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-has-toc data-has-sidebar class="astro-bguv2lll"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Architecture | TradeX Chart</title><link rel="canonical" href="https://tradex-app.github.io/TradeX-chart/reference/architecture/"/><link rel="sitemap" href="/TradeX-chart/sitemap-index.xml"/><link rel="shortcut icon" href="/TradeX-chart/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v3.3.0"/><meta name="generator" content="Starlight v0.11.1"/><meta property="og:title" content="Architecture"/><meta property="og:type" content="article"/><meta property="og:url" content="https://tradex-app.github.io/TradeX-chart/reference/architecture/"/><meta property="og:locale" content="en"/><meta property="og:description"/><meta property="og:site_name" content="TradeX Chart"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Architecture"/><meta name="twitter:description"/><script>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/TradeX-chart/astro/index.88731c60.css" />
+<style>svg:where(.astro-c6vsoqas){color:var(--sl-icon-color);font-size:var(--sl-icon-size, 1em);width:1em;height:1em}
+</style><script type="module" src="/TradeX-chart/astro/hoisted.5a2d23d0.js"></script></head><body class="astro-bguv2lll"><a href="#_top" class="astro-7q3lir66">Skip to content</a><div class="page sl-flex astro-vrdttmbt"><header class="header astro-vrdttmbt"><div class="header sl-flex astro-kmkmnagf"><div class="sl-flex astro-kmkmnagf"><a href="/TradeX-chart/" class="site-title sl-flex astro-m46x6ez3"><img class="astro-m46x6ez3" alt="" src="/TradeX-chart/astro/tx.82979636.svg" width="48" height="48"><span class="astro-m46x6ez3">TradeX Chart</span></a></div><div class="sl-flex astro-kmkmnagf"><site-search data-translations="{&#34;placeholder&#34;:&#34;Search&#34;}" class="astro-v37mnknz"><button data-open-modal disabled class="astro-v37mnknz"><svg aria-label="Search" class="astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg><span class="sl-hidden md:sl-block astro-v37mnknz" aria-hidden="true">Search</span><svg aria-label="(Press / to Search)" class="sl-hidden md:sl-block astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 2H7a5 5 0 0 0-5 5v10a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5V7a5 5 0 0 0-5-5Zm3 15a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v10Z"/><path d="M15.293 6.707a1 1 0 1 1 1.414 1.414l-8.485 8.486a1 1 0 0 1-1.414-1.415l8.485-8.485Z"/></svg></button><dialog style="padding:0" aria-label="Search" class="astro-v37mnknz"><div class="dialog-frame sl-flex astro-v37mnknz"><button data-close-modal class="sl-flex md:sl-hidden astro-v37mnknz">Cancel</button><div class="search-container astro-v37mnknz"><div id="starlight__search" class="astro-v37mnknz"></div></div></div></dialog></site-search></div><div class="sl-hidden md:sl-flex right-group astro-kmkmnagf"><div class="sl-flex social-icons astro-kmkmnagf"><a href="https://github.com/tradex-app/TradeX-chart" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">GitHub</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a><a href="https://discord.gg/hhfvuhJJY" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Discord</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M20.32 4.37a19.8 19.8 0 0 0-4.93-1.51 13.78 13.78 0 0 0-.64 1.28 18.27 18.27 0 0 0-5.5 0 12.64 12.64 0 0 0-.64-1.28h-.05A19.74 19.74 0 0 0 3.64 4.4 20.26 20.26 0 0 0 .11 18.09l.02.02a19.9 19.9 0 0 0 6.04 3.03l.04-.02a14.24 14.24 0 0 0 1.23-2.03.08.08 0 0 0-.05-.07 13.1 13.1 0 0 1-1.9-.92.08.08 0 0 1 .02-.1 10.2 10.2 0 0 0 .41-.31h.04a14.2 14.2 0 0 0 12.1 0l.04.01a9.63 9.63 0 0 0 .4.32.08.08 0 0 1-.03.1 12.29 12.29 0 0 1-1.9.91.08.08 0 0 0-.02.1 15.97 15.97 0 0 0 1.27 2.01h.04a19.84 19.84 0 0 0 6.03-3.05v-.03a20.12 20.12 0 0 0-3.57-13.69ZM8.02 15.33c-1.18 0-2.16-1.08-2.16-2.42 0-1.33.96-2.42 2.16-2.42 1.21 0 2.18 1.1 2.16 2.42 0 1.34-.96 2.42-2.16 2.42Zm7.97 0c-1.18 0-2.15-1.08-2.15-2.42 0-1.33.95-2.42 2.15-2.42 1.22 0 2.18 1.1 2.16 2.42 0 1.34-.94 2.42-2.16 2.42Z"/></svg></a></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-4yphtoen"><span class="sr-only astro-4yphtoen">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select value="auto" class="astro-4yphtoen"><option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected="true" class="astro-4yphtoen">Auto</option></select><svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script></div></div></header><nav class="sidebar astro-vrdttmbt" aria-label="Main"><starlight-menu-button class="astro-jif73yzw"><button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-jif73yzw"><svg aria-hidden="true" class="astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg></button></starlight-menu-button><div id="starlight__sidebar" class="sidebar-pane astro-vrdttmbt"><div class="sidebar-content sl-flex astro-vrdttmbt"><ul class="top-level astro-3ii7xxms"><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">Examples</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/TradeX-chart/examples/01_static_chart/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Static Price History</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/examples/02_live_history_chart/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Pice History with Live Price Feed</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/examples/custom_indicator/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Indicator</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/examples/static_chart/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Static Price History</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">Guides</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/TradeX-chart/guides/custom_indicator/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Indicator - How to Build and Use</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/guides/howto/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">How To</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/guides/test/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Test</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">Reference</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Introduction</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/01_getting_started/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Getting Started</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/02_configuration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Configuration</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/annotations/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Annotations</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/api-examples/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">API Examples</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/architecture/" aria-current="page" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Architecture</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/canvas_extension_layers/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Canvas Extension Layers</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/canvas_methods/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Canvas Methods</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/events/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Events</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/example/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Example Reference</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/hit_detection/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Hit Detection</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/indicators/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/indicators_custom/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/indicators_default/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Default Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/indicators_talib/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">TA-Lib Functions</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/legends/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Legends</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/overlays/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Overlays</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/overlays_custom/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Overlays</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/overlays_news_events/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Overlay News Events</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/overlays_trades/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Overlay Trades</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/range/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Range</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/state/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">State</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/state_machine/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">State Machine</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/streaming_price_data/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Streaming Price Data to the Chart</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/themes/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Themes</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/web_workers/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Web Workers</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/reference/widgets/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Widgets</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">API</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/TradeX-chart/api/core/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">core</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/api/core-old/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">core - documentation.js</span></a></li><li class="astro-3ii7xxms"><a href="/TradeX-chart/api/core2/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">core</span></a></li></ul></details></li></ul><div class="md:sl-hidden"><div class="mobile-preferences sl-flex astro-wu23bvmt"><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-4yphtoen"><span class="sr-only astro-4yphtoen">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select value="auto" class="astro-4yphtoen"><option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected="true" class="astro-4yphtoen">Auto</option></select><svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script></div></div></div></div></nav><div class="main-frame astro-vrdttmbt"><div class="lg:sl-flex astro-67yu43on"><aside class="right-sidebar-container astro-67yu43on"><div class="right-sidebar astro-67yu43on"><div class="lg:sl-hidden astro-pb3aqygn"><mobile-starlight-toc data-min-h="2" data-max-h="4" class="astro-doynk5tl"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-doynk5tl"><details id="starlight__mobile-toc" class="astro-doynk5tl"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-doynk5tl"><div class="toggle sl-flex astro-doynk5tl">On this page<svg aria-hidden="true" class="caret astro-doynk5tl astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></div><span class="display-current astro-doynk5tl"></span></summary><div class="dropdown astro-doynk5tl"><ul class="isMobile astro-g2bywc46" style="--depth: 0;"><li class="astro-g2bywc46" style="--depth: 0;"><a href="#_top" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Overview</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#factory" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Factory</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#core" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Core</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#aspect-oriented-programming" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Aspect-Oriented Programming</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#meld" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Meld</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#state-machine" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">State Machine</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#scalable-javascript-applicaton-architecture" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Scalable Javascript Applicaton Architecture</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#module" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Module</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#sandbox" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Sandbox</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#mediator" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Mediator</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#core-1" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Core</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#plugins" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Plugins</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#design-patterns" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Design Patterns</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 2;"><li class="astro-g2bywc46" style="--depth: 2;"><a href="#facade" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">Facade</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#mediator-1" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">Mediator</span></a></li></ul></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#module-template" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Module Template</span></a></li></ul></div></details></nav></mobile-starlight-toc></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-pb3aqygn"><div class="sl-container astro-pb3aqygn"><starlight-toc data-min-h="2" data-max-h="4"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-g2bywc46" style="--depth: 0;"><li class="astro-g2bywc46" style="--depth: 0;"><a href="#_top" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Overview</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#factory" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Factory</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#core" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Core</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#aspect-oriented-programming" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Aspect-Oriented Programming</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#meld" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Meld</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#state-machine" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">State Machine</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#scalable-javascript-applicaton-architecture" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Scalable Javascript Applicaton Architecture</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#module" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Module</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#sandbox" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Sandbox</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#mediator" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Mediator</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#core-1" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Core</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#plugins" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Plugins</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#design-patterns" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Design Patterns</span></a><ul class="astro-g2bywc46" style="--depth: 2;"><li class="astro-g2bywc46" style="--depth: 2;"><a href="#facade" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">Facade</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#mediator-1" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">Mediator</span></a></li></ul></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#module-template" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Module Template</span></a></li></ul></nav></starlight-toc></div></div></div></aside><div class="main-pane astro-67yu43on"><main data-pagefind-body lang="en" dir="ltr" class="astro-bguv2lll"><div class="content-panel astro-7nkwcw3z"><div class="sl-container astro-7nkwcw3z"><h1 id="_top" class="astro-j6tvhyss">Architecture</h1></div></div><div class="content-panel astro-7nkwcw3z"><div class="sl-container astro-7nkwcw3z"><div class="content astro-ml6ntd6l"><h1 id="architectural-organization">Architectural Organization</h1>
+<ul>
+<li>Factory
+<ul>
+<li>Core
+<ul>
+<li>Utils</li>
+<li>Widgets</li>
+<li>Body
+<ul>
+<li>Tools</li>
+<li>Main Pane
+<ul>
+<li>Timeline (X Axis)</li>
+<li>Rows
+<ul>
+<li>Row
+<ul>
+<li>Chart Panes - Primary (price / candles), Secondary (indicators)
+<ul>
+<li>Price Scale (Y Axis)</li>
+<li>Graph
+<ul>
+<li>Overlays
+<ul>
+<li>Grid</li>
+<li>Cursor</li>
+<li>Price Line</li>
+<li>Candles</li>
+<li>Volume</li>
+<li>Technical Indicators</li>
+<li>User Defined</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Most of these features can be accessed externally eg.</p>
+<p><code dir="auto">chart.secondaryPane.entries().next().value[1]</code></p>
+<p>Although it is recommended that use the API to modify the chart or respond to events.</p>
+<h2 id="factory">Factory</h2>
+<p>The static factory class is used to instantiate (multiple) chart instances. It registers the chart WebComponent.</p>
+<h2 id="core">Core</h2>
+<p>The core starts the cascade of chart component creation. It provides:</p>
+<ul>
+<li>Internal and external API</li>
+<li>State management</li>
+<li>Event messaging</li>
+<li>Chart Data State
+<ul>
+<li>Validation</li>
+<li>Export</li>
+<li>Range handling - data subset</li>
+</ul>
+</li>
+<li>Configuration</li>
+<li>Themes</li>
+</ul>
+<h1 id="patterns">Patterns</h1>
+<p><strong>Hook Observer Pattern</strong>
+An extensible API like WordPress
+making it easy for third party programmers to write extensions to the core</p>
+<p><strong>Aspect-Oriented Programming</strong>
+Code injection
+into existing functions or objects, without modifying the target logic.</p>
+<p><strong>State Machine</strong>
+Logical state management
+providing a behaviour model describing the states the system can be in and the conditions by which one transitions to another.</p>
+<p><strong>Global Store</strong></p>
+<p><strong>Event Hub</strong></p>
+<p><strong>Scalable Application Architecture</strong>
+Decoupled, event-driven architecture</p>
+<p><strong>Model Contoler View</strong></p>
+<h2 id="aspect-oriented-programming">Aspect-Oriented Programming</h2>
+<p>Code injection</p>
+<p><a href="https://en.wikipedia.org/wiki/Aspect-oriented_programming">https://en.wikipedia.org/wiki/Aspect-oriented_programming</a></p>
+<h3 id="meld">Meld</h3>
+<p><a href="https://github.com/cujojs/meld">https://github.com/cujojs/meld</a></p>
+<h2 id="state-machine">State Machine</h2>
+<p>Logical finite state management</p>
+<p><img alt="State Machine"  src="/TradeX-chart/astro/quick_ref_sct_overview.2a31f3e0_lvcd8.webp" width="1410" height="542" loading="lazy" decoding="async"></p>
+<p><a href="state_machine.md">State Machine documentation</a></p>
+<h2 id="scalable-javascript-applicaton-architecture">Scalable Javascript Applicaton Architecture</h2>
+<p>decoupled, event-driven architecture</p>
+<p>The features of the architecture are decoupled, allowing for flexible and extensible applications. The application is broken down into the following parts:</p>
+<ul>
+<li>Modules (sandboxed)</li>
+<li>Mediator (API)</li>
+<li>Application Core (Plugins, Base Libraries)</li>
+</ul>
+<p>![Scalable Javascript Applicaton Architecture]../../../assets/architecture.png)</p>
+<h4 id="module">Module</h4>
+<p>Modules are single-purpose parts of a larger system that are interchangeable. They are classes which will be instantiated with a Mediator which will sand box them.</p>
+<p>References: [1]</p>
+<h4 id="sandbox">Sandbox</h4>
+<p>A Sandbox is a module instance created with the Mediator, which presents a siloed API of the Core for the Module. None of the modules can directly mutate each other or the Core.</p>
+<p>The Sandbox uses a <a href="#facade">Facade</a> [2] and [Mediator](#mediator<a id="application-core"></a>) [3] pattern.</p>
+<p>Modules can interact with the Core and each other via the Mediator which has inheirited a specific methods and properties (<a href="#facade">Facade</a>) from the Core.</p>
+<h4 id="mediator">Mediator</h4>
+<p>The Mediator can be thought of as a customized API for the Core (Facade).</p>
+<h4 id="core-1"><a id="application-core"></a>Core</h4>
+<p>The Core is responsible for starting and stopping the modules. It also handles the messages by using the <a href="https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern">Publish/Subscribe (Mediator) pattern</a>.</p>
+<h4 id="plugins">Plugins</h4>
+<p>Plugins extend or mofify the functionality of the Core.</p>
+<h3 id="design-patterns">Design Patterns</h3>
+<h4 id="facade"><a id="facade"></a>Facade</h4>
+<p>The Facace is a unifying (simplified) API for the <a href="#application-core">Application Core</a>.</p>
+<p>It serves as an <strong>abstraction</strong> of the application core which sits between the mediator and our modules - it should ideally be the <strong>only</strong> other part of the system modules are aware of.</p>
+<p>In that way you can hide the features provided by the core and only show a well defined custom static long term API to your modules.</p>
+<p>References: [2]</p>
+<h4 id="mediator-1"><a id="mediator"></a>Mediator</h4>
+<p>A mediator <strong>encapsulates</strong> how disparate modules <strong>interact</strong>
+with each other by acting as an intermediary. The pattern also promotes
+loose coupling by preventing objects from referring to each other
+explicitly - in our system, this helps to solve our module
+inter-dependency issues.</p>
+<p>It provides the Facade to Module, by extending the Module class.</p>
+<p>Refrences: [3]</p>
+<h1 id="modules">Modules</h1>
+<h2 id="module-template">Module Template</h2>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#6B737C">// optional State Machine</span></span>
+<span class="line"><span style="color:#6B737C">// import stateMachineConfig from "../state/state-chart"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">export</span><span style="color:#F97583"> default</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> UtilsBar {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  #modID                 </span><span style="color:#6B737C">// required - set by the Core</span></span>
+<span class="line"><span style="color:#B392F0">  #name </span><span style="color:#F97583">=</span><span style="color:#FFAB70"> "Utilities"</span><span style="color:#6B737C">    // required</span></span>
+<span class="line"><span style="color:#B392F0">  #shortName </span><span style="color:#F97583">=</span><span style="color:#FFAB70"> "utils"</span><span style="color:#6B737C">   // required</span></span>
+<span class="line"><span style="color:#B392F0">  #mediator              </span><span style="color:#6B737C">// required</span></span>
+<span class="line"><span style="color:#B392F0">  #options               </span><span style="color:#6B737C">// required</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">  // user defined properties follow...</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">  // required - can be empty</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#B392F0"> (mediator</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> options) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.#mediator </span><span style="color:#F97583">=</span><span style="color:#B392F0"> mediator</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.#options </span><span style="color:#F97583">=</span><span style="color:#B392F0"> options</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.init()</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">  // suggested</span></span>
+<span class="line"><span style="color:#B392F0">  log(l) { </span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">#mediator</span><span style="color:#B392F0">.log(l) }</span></span>
+<span class="line"><span style="color:#B392F0">  info(i) { </span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">#mediator</span><span style="color:#B392F0">.info(i) }</span></span>
+<span class="line"><span style="color:#B392F0">  warn(w) { </span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">#mediator</span><span style="color:#B392F0">.warn(w) }</span></span>
+<span class="line"><span style="color:#B392F0">  error(e) { </span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">#mediator</span><span style="color:#B392F0">.error(e) }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">  // required</span></span>
+<span class="line"><span style="color:#F97583">  get</span><span style="color:#B392F0"> name() {</span><span style="color:#F97583">return</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.#name}</span></span>
+<span class="line"><span style="color:#6B737C">  // required</span></span>
+<span class="line"><span style="color:#F97583">  get</span><span style="color:#B392F0"> shortName() {</span><span style="color:#F97583">return</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.#shortName}</span></span>
+<span class="line"><span style="color:#6B737C">  // required</span></span>
+<span class="line"><span style="color:#F97583">  get</span><span style="color:#B392F0"> mediator() {</span><span style="color:#F97583">return</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.#mediator}</span></span>
+<span class="line"><span style="color:#6B737C">  // required</span></span>
+<span class="line"><span style="color:#F97583">  get</span><span style="color:#B392F0"> options() {</span><span style="color:#F97583">return</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.#options}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  init() {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.mount(</span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.#elUtils)</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">  // required</span></span>
+<span class="line"><span style="color:#B392F0">  start() {</span></span>
+<span class="line"><span style="color:#6B737C">    // Start the module's activities.</span></span>
+<span class="line"><span style="color:#6B737C">    // Play time!</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">    // set up event listeners</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.eventsListen()</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">    // start State Machine </span></span>
+<span class="line"><span style="color:#6B737C">    // stateMachineConfig.context = this</span></span>
+<span class="line"><span style="color:#6B737C">    // this.#mediator.stateMachine = stateMachineConfig</span></span>
+<span class="line"><span style="color:#6B737C">    // this.#mediator.stateMachine.start()</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">  // required</span></span>
+<span class="line"><span style="color:#B392F0">  end() {</span></span>
+<span class="line"><span style="color:#6B737C">    // Stop and clean up the module to prevent memory leaks.</span></span>
+<span class="line"><span style="color:#6B737C">    // It should remove: event listeners, timers, ect.</span></span>
+<span class="line"><span style="color:#6B737C">    // Put your toys away or it will end in tears.</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">  // recommended</span></span>
+<span class="line"><span style="color:#B392F0">  on(topic</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> handler</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> context) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">#mediator</span><span style="color:#B392F0">.on(topic</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> handler</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> context)</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">  // recommended</span></span>
+<span class="line"><span style="color:#B392F0">  off(topic</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> handler) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">#mediator</span><span style="color:#B392F0">.off(topic</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> handler)</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">  // recommended</span></span>
+<span class="line"><span style="color:#B392F0">  emit(topic</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> data) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">#mediator</span><span style="color:#B392F0">.emit(topic</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> data)</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span>
+<span class="line"></span></code></pre>
+<h1 id="references">References</h1>
+<ol>
+<li><a href="https://addyosmani.com/largescalejavascript/#modpattern">Modlule - https://addyosmani.com/largescalejavascript/#modpattern</a></li>
+<li><a href="https://addyosmani.com/largescalejavascript/#facadepattern">Facade - https://addyosmani.com/largescalejavascript/#facadepattern</a></li>
+<li><a href="https://addyosmani.com/largescalejavascript/#mediatorpatternhttps:/">Mediator - https://addyosmani.com/largescalejavascript/#mediatorpattern</a></li>
+<li></li>
+</ol>
+<hr></div><footer class="astro-3yyafb3n"><div class="meta sl-flex astro-3yyafb3n"></div><div class="pagination-links sl-flex astro-u2l5gyhi" dir="ltr"><a href="/TradeX-chart/reference/api-examples/" rel="prev" class="astro-u2l5gyhi"><svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-u2l5gyhi">Previous<br class="astro-u2l5gyhi"><span class="link-title astro-u2l5gyhi">API Examples</span></span></a><a href="/TradeX-chart/reference/canvas_extension_layers/" rel="next" class="astro-u2l5gyhi"><svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-u2l5gyhi">Next<br class="astro-u2l5gyhi"><span class="link-title astro-u2l5gyhi">Canvas Extension Layers</span></span></a></div></footer></div></div></main></div></div></div></div></body></html>
