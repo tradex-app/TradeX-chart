@@ -102,6 +102,8 @@ import { uid } from "../utils/utilities"
     // no update required
     if (this.overlay.data.length < 2) return
 
+    if (!super.mustUpdate()) return false
+
     this.scene.clear()
 
     const data = this.overlay.data
@@ -134,6 +136,8 @@ import { uid } from "../utils/utilities"
     this.plot(plots, "renderLine", this.style)
 
     this.target.viewport.render();
+
+    super.updated()
   }
 }
 

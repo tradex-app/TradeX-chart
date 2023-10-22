@@ -105,7 +105,13 @@
 
 
 
-<table><thead><tr><th align="left">Name</th><th>Type</th><th align="left">Required</th><th>Description</th></tr></thead><tbody><tr><td align="left">dragBar</td><td>boolean</td><td align="left">no</td><td>Enables the user to click and drag the dialogue, positioning it where they see fit</td></tr><tr><td align="left">closeIcon</td><td>boolean</td><td align="left">no</td><td>Close / remove the dialogue from the chart</td></tr><tr><td align="left">title</td><td>string</td><td align="left">no</td><td>Title displayed the top of the dialoge</td></tr><tr><td align="left">content</td><td>string</td><td align="left">yes</td><td>Without HTML content, a dialogue is pointless so it is required that you provide some. =)</td></tr><tr><td align="left">dimensions</td><td>Object</td><td align="left">yes</td><td>{w, h} object specifying width and height in pixels</td></tr><tr><td align="left">position</td><td>Object</td><td align="left">yes</td><td><code dir="auto">{x, y, z}</code> object specifying position in pixels</td></tr><tr><td align="left">styles</td><td>Object</td><td align="left">no</td><td><code dir="auto">{window, dragBar, closeIcon, title, content}</code> object of <a href="#dialogue-styling">styleable dialogue features</a></td></tr></tbody></table>
+
+
+
+
+
+
+<table><thead><tr><th align="left">Name</th><th>Type</th><th align="left">Required</th><th>Description</th></tr></thead><tbody><tr><td align="left">dragBar</td><td>boolean</td><td align="left">no</td><td>Enables the user to click and drag the dialogue, positioning it where they see fit</td></tr><tr><td align="left">closeIcon</td><td>boolean</td><td align="left">no</td><td>Close / remove the dialogue from the chart</td></tr><tr><td align="left">title</td><td>string</td><td align="left">no</td><td>Title displayed the top of the dialoge</td></tr><tr><td align="left">content</td><td>string</td><td align="left">yes</td><td>Without HTML content, a dialogue is pointless so it is required that you provide some. =)</td></tr><tr><td align="left">dimensions</td><td>Object</td><td align="left">yes</td><td>{w, h} object specifying width and height in pixels</td></tr><tr><td align="left">position</td><td>Object</td><td align="left">yes</td><td><code dir="auto">{x, y, z}</code> object specifying position in pixels</td></tr><tr><td align="left">styles</td><td>Object</td><td align="left">no</td><td><code dir="auto">{window, dragBar, closeIcon, title, content}</code> object of <a href="#dialogue-styling">styleable dialogue features</a></td></tr><tr><td align="left">offFocus</td><td>number</td><td align="left">no</td><td>timeout before close on click outside is active.</td></tr></tbody></table>
 <p>If no <code dir="auto">position</code> is specified, then the dialogue will default to positioning in the center of the chart.</p>
 <h3 id="initialize-and-start-dialogue">Initialize and Start Dialogue</h3>
 <p>The dialogue can be initialized with a config before it is displayed</p>

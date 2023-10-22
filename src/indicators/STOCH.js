@@ -111,8 +111,9 @@ export default class STOCH extends Indicator {
    * @param {Object} range 
    */
   draw(range=this.range) {
-    // no update required
-    if (!this.overlay.data.length < 2) return
+    if (this.overlay.data.length < 2 ) return false
+
+    if (!super.mustUpdate()) return false
 
     this.scene.clear()
 
@@ -201,6 +202,8 @@ export default class STOCH extends Indicator {
     this.plot(plots.slowD, "renderLine", style)
 
     this.target.viewport.render();
+
+    super.updated()
   }
 }
 

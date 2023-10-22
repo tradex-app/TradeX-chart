@@ -190,6 +190,7 @@ export default class Window {
       };
       this.emit("closeWindow", data)
       document.removeEventListener('click', this.#windowEvents.click)
+      delete this.#windowEvents.click
     }
   }
 
@@ -446,7 +447,7 @@ export default class Window {
       // click event outside of window
       this.#windowEvents.click = this.onOutsideClickListener.bind(this)
       document.addEventListener('click', this.#windowEvents.click)
-    }, 250)
+    }, data?.offFocus || 250)
   }
 
   // hide the window

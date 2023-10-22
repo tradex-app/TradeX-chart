@@ -20,6 +20,8 @@ export default class chartCandles extends Overlay {
 
   draw(range=this.core.range) {
 
+    if (!super.mustUpdate()) return
+
     this.scene.clear()
 
     let render
@@ -89,6 +91,8 @@ export default class chartCandles extends Overlay {
         type === CandleType.LINE
       ) 
       this.#candle.areaRender()
+
+    super.updated()
   }
 
 }

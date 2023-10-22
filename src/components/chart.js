@@ -243,7 +243,7 @@ export default class Chart {
   get view() { return this.#view }
   get viewport() { return this.#Graph.viewport }
   get layerGrid() { return this.#Graph.overlays.get("grid").layer }
-  get overlays() { return this.getOverlays() }
+  get overlays() { return Object.fromEntries([...this.#Graph.overlays.list]) }
   get overlayGrid() { return this.#Graph.overlays.get("grid").instance }
   get overlayTools() { return this.#overlayTools }
   get overlaysDefault() { return defaultOverlays[this.type] }
@@ -456,7 +456,7 @@ export default class Chart {
       this.updateLegends(this.cursorPos, candle)
     }
     else this.updateLegends()
-    this.graph.render()
+    this.#core.MainPane.draw()
   }
 
   /**
@@ -499,6 +499,8 @@ export default class Chart {
     this.#elScale.style.height = `${h}px`;
     this.elViewport.style.height = `${h}px`;
     this.#Scale.setDimensions({ w: null, h: h });
+    this.Divider?.setPos()
+    this.Divider?.setWidth()
   }
 
   /**
@@ -520,6 +522,7 @@ export default class Chart {
       this.draw(undefined, true)
       this.core.MainPane.draw(undefined, false)
       this.Divider.setPos()
+      this.Divider.setWidth()
     }
   }
 
@@ -593,10 +596,6 @@ export default class Chart {
     this.graph.addOverlays(overlayList)
     
     return true
-  }
-
-  getOverlays() {
-    return Object.fromEntries([...this.#Graph.overlays.list])
   }
 
   /**
@@ -697,8 +696,9 @@ export default class Chart {
 
   drawGrid() {
     this.layerGrid.setPosition(this.#core.scrollPos, 0);
+    this.overlayGrid.setRefresh()
     this.overlayGrid.draw("y");
-    this.#Graph.render();
+    this.#core.MainPane.draw()
   }
 
   /**
@@ -854,10 +854,9 @@ export default class Chart {
       this.#Graph.draw(range, update)
   }
 
-  drawGrid() {
+  drawGrid(update) {
     this.layerGrid.setPosition(this.core.scrollPos, 0)
     this.overlayGrid.draw("y")
-    this.#Graph.render();
   }
 
   /**

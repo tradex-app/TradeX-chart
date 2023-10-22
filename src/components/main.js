@@ -156,6 +156,7 @@ export default class MainPane {
   get scrollPos() { return this.#core.scrollPos }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
+  get renderLoop() { return renderLoop }
   get graph() { return this.#Graph }
   get views() { return this.#core.state.data.views }
   get indicators() { return this.getIndicators() }
@@ -237,12 +238,12 @@ export default class MainPane {
     this.createGraph()
     this.draw(this.range, true)
 
-    renderLoop.init({
+    this.renderLoop.init({
       graphs: [this.#Graph],
       range: this.range
     })
-    renderLoop.start()
-    renderLoop.queueFrame(this.range, [this.#Graph], false)
+    this.renderLoop.start()
+    this.renderLoop.queueFrame(this.range, [this.#Graph], false)
 
     // set up event listeners
     this.eventsListen()
@@ -551,7 +552,6 @@ export default class MainPane {
       this.#ChartPanes.forEach((chartPane, key) => {
         chartH = Math.round(chartPane.viewport.height * resizeH)
         chartPane.setDimensions({w: width, h: chartH})
-        chartPane.Divider.setPos()
       })
     }
 
@@ -806,7 +806,7 @@ export default class MainPane {
     }
     this.#core.refresh()
     this.emit("addIndicatorDone", instance)
-    console.log(`Added indicator:`, instance.id)
+    this.#core.log(`Added indicator:`, instance.id)
 
     return instance
   }
@@ -967,7 +967,7 @@ export default class MainPane {
       graphs.push(chartPane)
     })
 
-    renderLoop.queueFrame(
+    this.renderLoop.queueFrame(
       this.range, 
       graphs, 
       update)
@@ -1023,12 +1023,12 @@ export default class MainPane {
         if (p === v) {
           style.display = "block"
           v.setDimensions({w: undefined, h: this.rowsH})
-          v.Divider.setPos()
           v.graph.viewport.scene.canvas.style.display = "block"
           v.scale.graph.viewport.scene.canvas.style.visibility = "visible"
         }
         else {
           style.display = "none"
+          v.scale.element.style.display = "none"
         }
       }
     this.hidePaneDividers()
@@ -1053,12 +1053,11 @@ export default class MainPane {
     if (this.dimensions.height == maxMin.height) {}
 
     for (let [k, v] of this.#ChartPanes.entries()) {
-      style = v.element.style
-      style.display = "block"
+      v.element.style.display = "block"
+      v.scale.element.style.display = "block"
       if (k in maxMin.panes)
         if (i++ > 0) v.Divider.show()
         v.setDimensions({w: undefined, h: maxMin.panes[k]})
-        v.Divider.setPos()
     }
   }
 
@@ -1140,6 +1139,7 @@ export default class MainPane {
     for (let o of v) {
       if (o.Divider instanceof Divider &&
           i++ > 0) {
+        o.Divider.setWidth()
         o.Divider.setPos()
         o.Divider.show()
       }
@@ -1154,15 +1154,5 @@ export default class MainPane {
       }
     }
   }
-
-  /**
-   * expand collapsed chart pane to original height
-   * or as close to depending upon chart resize
-   * or the addition or removal of other panes
-   * @param {Chart} p - Chart pane instance
-   */
-  // paneExpand(p) {
-
-  // }
 
 }

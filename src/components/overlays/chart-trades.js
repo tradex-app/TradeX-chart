@@ -6,6 +6,8 @@ import Trade from "../primitives/trade"
 import { limit } from "../../utils/number"
 import { debounce } from "../../utils/utilities"
 import { isObject } from "../../utils/typeChecks"
+import { HIT_DEBOUNCE } from "../../definitions/core"
+
 
 const tradeConfig = {
   bounded: true,
@@ -31,7 +33,7 @@ export default class chartTrades extends Overlay {
   #trades = []
   #data
   #dialogue
-  #debounce = (e) => debounce(this.isTradeSelected, 100, this)
+
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
@@ -39,13 +41,13 @@ export default class chartTrades extends Overlay {
 
     this.settings = params.settings
     this.#trade = new Trade(target, theme)
-    this.core.on("primary_pointerdown", debounce(this.isTradeSelected, 200, this), this)
+    this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this)
     this.#dialogue = this.core.WidgetsG.insert("Dialogue", tradeConfig)
     this.#dialogue.start()
   }
 
   destroy() {
-    this.core.off("primary_pointerdown", this.#debounce)
+    this.core.off("primary_pointerdown", this.onPrimaryPointerDown)
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
@@ -61,6 +63,11 @@ export default class chartTrades extends Overlay {
       if (s[e] === undefined) continue
       t[e] = s[e]
     }
+  }
+
+  onPrimaryPointerDown(e) {
+    if (this.core.MainPane.stateMachine.state !== "chart_pan") 
+      debounce(this.isTradeSelected, HIT_DEBOUNCE, this)(e)
   }
 
   /**
@@ -97,6 +104,7 @@ export default class chartTrades extends Overlay {
       dimensions: {h: undefined, w: 150},
       position: {x: tx + (w / 2) + 1, y: ty},
       content: content,
+      offFocus: HIT_DEBOUNCE + 1
     }
     this.core.emit("trade_selected", tr)
     this.#dialogue.open(config)
@@ -119,6 +127,8 @@ export default class chartTrades extends Overlay {
   }
 
   draw(range=this.core.range) {
+    if (!super.mustUpdate()) return
+
     if (this.core.config?.trades?.display === false) return
 
     this.hit.clear()
@@ -154,5 +164,7 @@ export default class chartTrades extends Overlay {
       c++
       i--
     }
+
+    super.updated()
   }
 }

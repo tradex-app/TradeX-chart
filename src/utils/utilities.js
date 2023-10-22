@@ -604,16 +604,19 @@ export class xMap extends Map {
  */
  export function debounce(fn, wait=100, scope, immediate=false) {
   var timeout;
-  var core = function() {
+  var core = async function() {
     var context = scope || this
     var args = arguments;
     var later = function() {
-        timeout = null;
-        if (!immediate) fn.apply(context, args);
+      timeout = null;
+      if (!immediate) fn.apply(context, args);
     };
     var callNow = immediate && !timeout;
     clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
+
+    await new Promise(resolve => {
+      timeout = setTimeout( resolve(later()), wait );
+    })
     if (callNow) fn.apply(context, args);
   };
   return core

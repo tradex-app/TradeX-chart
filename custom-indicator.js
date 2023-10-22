@@ -158,6 +158,8 @@ export default class Test extends Indicator {
   draw(range=this.range) {
     // minimum of two candles are required for this indicator
     if (this.overlay.data.length < 2 ) return false
+    // only draw if update conditions are met
+    if (!super.mustUpdate()) return false
     // clear the indicator overlay (chart layer)
     this.scene.clear()
 
@@ -197,5 +199,7 @@ export default class Test extends Indicator {
     this.plot(plots, "renderLine", this.style)
     // render the indicator
     this.target.viewport.render();
+
+    super.updated()
   }
 }

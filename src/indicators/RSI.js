@@ -96,8 +96,10 @@ export default class RSI extends Indicator {
    * @param {Object} range 
    */
   draw(range=this.range) {
-    // no update required
-    if (this.overlay.data.length < 2) return
+
+    if (this.overlay.data.length < 2 ) return false
+
+    if (!super.mustUpdate()) return false
 
     this.scene.clear()
 
@@ -171,6 +173,8 @@ export default class RSI extends Indicator {
     this.plot(plots, "renderLine", this.style)
 
     this.target.viewport.render();
+
+    super.updated()
   }
 }
 

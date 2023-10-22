@@ -12,7 +12,7 @@ import { STREAM_UPDATE } from "../definitions/core"
 import { calcTextWidth, createFont } from '../renderer/text'
 
 import Graph from "./views/classes/graph"
-import ScaleCursor from './overlays/scale-cursor'
+import { ScaleCursor } from './overlays/chart-cursor'
 import ScaleLabels from './overlays/scale-labels'
 import ScaleOverly from './overlays/scale-overlays'
 import ScalePriceLine from './overlays/scale-priceLine'
@@ -92,6 +92,7 @@ export default class ScaleBar {
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
   get layerPriceLine() { return this.#layerPriceLine }
+  get overlays() { return Object.fromEntries([...this.#Graph.overlays.list]) }
   get yAxis() { return this.#yAxis }
   set yAxisType(t) { this.#yAxis.yAxisType = YAXIS_TYPES.includes(t) ? t : YAXIS_TYPES[0] }
   get yAxisType() { return this.#yAxis.yAxisType }
@@ -200,8 +201,6 @@ export default class ScaleBar {
       e.movement.x, e.movement.y
     ]
     this.setScaleRange(Math.sign(e.movement.y))
-    this.render()
-    this.core.emit("yaxis_manual", this.#yAxis)
   }
 
   onDragDone(e) {
@@ -210,8 +209,6 @@ export default class ScaleBar {
   onMouseWheel(e) {
     e.domEvent.preventDefault()
     this.setScaleRange(Math.sign(e.wheeldelta) * -1)
-    this.render()
-    this.core.emit("yaxis_manual", this.#yAxis)
   }
 
   onStreamUpdate(e) {
@@ -221,7 +218,6 @@ export default class ScaleBar {
   onChartDrag(e) {
     if (this.#yAxis.mode !== "manual") return
     this.#yAxis.offset = e.domEvent.srcEvent.movementY // this.#core.MainPane.cursorPos[5] // e[5]
-    this.#Graph.drawAll()
     this.draw()
   }
 
@@ -248,9 +244,8 @@ export default class ScaleBar {
     if (this.#yAxis.mode == "automatic") this.#yAxis.mode = "manual"
 
     this.#yAxis.zoom = r
-    this.#Graph.drawAll()
-    this.draw()
-    this.parentUpdate()
+    this.draw(this.range, true)
+    this.#core.MainPane.draw()
   }
 
   /**
@@ -259,17 +254,7 @@ export default class ScaleBar {
    */
   resetScaleRange() {
     this.#yAxis.mode = "automatic"
-    this.#Graph.drawAll()
-    this.draw()
-    this.parentUpdate()
-  }
-
-  /**
-   * force parent pane to update
-   */
-  parentUpdate() {
-    this.parent.graph.drawAll()
-    this.parent.graph.render()
+    this.draw(this.range, true)
     this.#core.MainPane.draw()
   }
 
@@ -342,7 +327,8 @@ export default class ScaleBar {
 
   draw(range=this.range, update=true) {
     this.#Graph.draw(range, update)
-    this.#parent.drawGrid()
+    this.#parent.drawGrid(update)
+    this.parent.draw(this.range, true)
   }
 
   resize(width=this.width, height=this.height) {
