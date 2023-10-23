@@ -80,7 +80,7 @@ export default class RSI14 extends Indicator {
   }
 
   get primaryPane() {
-    return RSI.primaryPane;
+    return RSI14.primaryPane;
   }
   get defaultStyle() {
     return this.#defaultStyle;
