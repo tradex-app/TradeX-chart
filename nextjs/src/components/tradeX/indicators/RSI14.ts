@@ -6,7 +6,7 @@
 // https://hackape.github.io/talib.js/modules/_index_.html#rsi
 // https://www.investopedia.com/terms/r/rsi.asp
 // @ts-nocheck
-import { Indicator, Range, uid } from "tradex-chart";
+import { Indicator, Range, talibAPI, uid } from "tradex-chart";
 // import { RSI as talibAPI } from "talib";
 
 /**
@@ -63,7 +63,7 @@ export default class RSI14 extends Indicator {
     const overlay = params.overlay;
 
     this.id = params.overlay?.id || uid(this.shortName);
-    this.defineIndicator(overlay?.settings, talibAPI);
+    this.defineIndicator(overlay?.settings, talibAPI[this.libName]);
     this.style = overlay?.settings?.style
       ? { ...this.#defaultStyle, ...overlay.settings.style }
       : { ...this.#defaultStyle, ...config.style };
@@ -95,6 +95,75 @@ export default class RSI14 extends Indicator {
 
     return { inputs, colours };
   }
+
+  /**
+   * process new candle stream value
+   * @param {Array.<number>} candle - [timestamp, open, high, low, close, volume]
+   * @memberof Test
+   */
+  updateValue(candle) {
+    this.value = candle
+  }
+
+  /**
+   * calculate indicator values
+   * @param {Object} range - instance of Range
+   * @returns {boolean|array}
+   */
+  calcIndicator (indicator, params={}, range=this.range) {
+    let start, end;
+    // number of values to use in indicator calculation
+    let p = this.definition.input.timePeriod
+
+    // is it a Range instance?
+    if(range instanceof Range) {
+      // if not calculate entire history
+      start = 0
+      end = range.dataLength - p + 1
+    }
+    else if ( "indexStart" in range || "indexEnd" in range ||
+              "tsStart" in range ||  "tsEnd" in range ) {
+      start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0
+      end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1
+      end - p
+    }
+    else return false
+
+    // if not enough data for calculation fail
+    if ( end - start < p ) return false
+
+    let data = [];
+    let i, v, entry, input;
+
+    while (start < end) {
+      // fetch the data required to calculate the indicator
+      input = this.indicatorInput(start, start + p)
+      params = {...params, ...input}
+      // let hasNull = params.inReal.find(element => element === null)
+      // if (hasNull) return false
+
+      entry = this.TALib[this.libName](params)
+
+      v = []
+      i = 0
+      for (let o of this.definition.output) {
+        v[i++] = entry[o.name][0]
+      }
+      // store entry with timestamp
+      data.push([this.range.value(start + p - 1)[0], v])
+      start++
+    }
+    return data
+  }
+
+  calcIndicatorHistory() {
+    // if overlay history is missing, calculate it
+    if (this.overlay.data.length < this.definition.input.timePeriod) {
+      const data = this.calcIndicator()
+      if (data) this.overlay.data = data
+    }
+  }
+
 
   /**
    * Draw the current indicator range on its canvas layer and render it.
