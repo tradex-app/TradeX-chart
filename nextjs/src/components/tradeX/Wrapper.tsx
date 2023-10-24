@@ -13,8 +13,7 @@ import FullScreenWrapper from "../FullScreen/FullScreenWrapper";
 import FullScreenButton from "../FullScreen/FullScreenButton";
 import Toolbar from "./Toolbar";
 import Chart from "./Chart";
-import { CUSTOM_INDICATORS } from "./indicators/customIndicators";
-import { AVAILABLE_INDICATORS } from "./indicators/availbleIndicators";
+import AVAILABLE_INDICATORS from "./indicators/availbleIndicators";
 
 type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Pick<
   T,
@@ -61,12 +60,10 @@ const defaultConfig = {
     timeframe: "1h",
     chartType: CHART_OPTIONS[0],
   },
-  //availableIndicators: AVAILABLE_INDICATORS,
-  availableIndicators: CUSTOM_INDICATORS,
+  availableIndicators: AVAILABLE_INDICATORS,
 };
 
 let end;
-
 
 interface AvailabilityType {
   base: string;
@@ -74,219 +71,225 @@ interface AvailabilityType {
 }
 
 const TokenChart: React.FC<IProps> = (props) => {
-  const { tokenId, symbol, config = defaultConfig, chartData, tradeData } = props;
-  const [availability, setAvailability] = useState<AvailabilityType | null>(null);
+  const {
+    tokenId,
+    symbol,
+    config = defaultConfig,
+    chartData,
+    tradeData,
+  } = props;
+  const [availability, setAvailability] = useState<AvailabilityType | null>(
+    null
+  );
   const [title, setTitle] = useState(`${symbol}/${availability?.base || ""}`);
   const [firstLoad, setFirstLoad] = useState(true);
-    const [isEnd, setIsEnd] = useState(false);
-    const [endDate, setEndDate] = useState(new Date());
-    const [indicators, setIndicators] = useState([]);
-    const [selectedInterval, setSelectedInterval] = useState(
-      config?.defaults?.timeframe || "1h"
+  const [isEnd, setIsEnd] = useState(false);
+  const [endDate, setEndDate] = useState(new Date());
+  const [indicators, setIndicators] = useState([]);
+  const [selectedInterval, setSelectedInterval] = useState(
+    config?.defaults?.timeframe || "1h"
+  );
+  const [intervals, setIntervals] = useState([]);
+  const [showPlaceHolder, setShowPlaceHolder] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const mergedConfig = { ...defaultConfig, ...config };
+
+  const {
+    chartX,
+    setChartX: setChart,
+    data,
+    setData,
+    handleMergeData,
+    //
+    handleRemoveIndicator,
+    handleAddIndicator,
+    getIndicatorId,
+  } = useChart();
+
+  const [selectedChartType, setSelectedChartType] = useState(
+    mergedConfig?.defaults?.chartType || CHART_OPTIONS[0]
+  );
+
+  const fetchTimeframes = async () => {
+    let availableTimeframes = [
+      {
+        pair_id: undefined,
+        target: undefined,
+        base: "USD",
+        timeframes: ["1m", "5m", "15m", "30m", "1h", "4h", "12h", "1d"],
+      },
+    ];
+    if (tokenId) {
+      availableTimeframes = await fetchAvailableTimeframes({
+        tokenId: +tokenId,
+      });
+    }
+
+    setAvailability(
+      availableTimeframes.find((pair) => pair.base === "USDT") ||
+        availableTimeframes[0]
     );
-    const [intervals, setIntervals] = useState([]);
-    const [showPlaceHolder, setShowPlaceHolder] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+  };
 
-    const mergedConfig = { ...defaultConfig, ...config };
+  const handleSelectIndicator = (indicator) => {
+    if (indicators.find((element) => element.value === indicator.value)) {
+      const indicatorId = getIndicatorId(indicator.value);
 
-    const {
-      chartX,
-      setChartX: setChart,
-      data,
-      setData,
-      handleMergeData,
-      //
-      handleRemoveIndicator,
-      handleAddIndicator,
-      getIndicatorId,
-    } = useChart();
+      if (!indicatorId) return;
 
-    const [selectedChartType, setSelectedChartType] = useState(
-      mergedConfig?.defaults?.chartType || CHART_OPTIONS[0]
-    );
+      setIndicators(
+        indicators.filter((element) => element.value !== indicator.value)
+      );
 
-    const fetchTimeframes = async () => {
-      let availableTimeframes = [
-        {
-          pair_id: undefined,
-          target: undefined,
-          base: "USD",
-          timeframes: ["1m", "5m", "15m", "30m", "1h", "4h", "12h", "1d"],
-        },
-      ];
+      handleRemoveIndicator(indicatorId);
+      return;
+    }
+
+    setIndicators([...indicators, indicator]);
+    handleAddIndicator(indicator);
+  };
+
+  const handleRangeChange = () => {
+    setEndDate(new Date(end - 1));
+  };
+
+  const requestData = async () => {
+    if (isLoading || isEnd) return;
+
+    const resolution = selectedInterval;
+
+    try {
+      console.log("FETCH CHART DATA");
+      let newData = chartData;
+      setIsLoading(true);
       if (tokenId) {
-        availableTimeframes = await fetchAvailableTimeframes({
-          tokenId: +tokenId,
+        newData = await fetchOHLCVData({
+          end: endDate,
+          resolution,
+          tokenId,
+          first: firstLoad,
         });
       }
 
-      setAvailability(
-        availableTimeframes.find((pair) => pair.base === "USDT") ||
-          availableTimeframes[0]
-      );
-    };
+      end = newData[0][0];
+      setFirstLoad(false);
 
-    const handleSelectIndicator = (indicator) => {
-      if (indicators.find((element) => element.value === indicator.value)) {
-        const indicatorId = getIndicatorId(indicator.value);
-
-        if (!indicatorId) return;
-
-        setIndicators(
-          indicators.filter((element) => element.value !== indicator.value)
-        );
-
-        handleRemoveIndicator(indicatorId);
-        return;
+      if (data.length) {
+        setData([...newData, ...data]);
+      } else {
+        setData(newData);
       }
 
-      setIndicators([...indicators, indicator]);
-      handleAddIndicator(indicator);
-    };
+      // update onchart
+      setIndicators([...indicators.filter((indicator) => !indicator.isD2T)]);
 
-    const handleRangeChange = () => {
-      setEndDate(new Date(end - 1));
-    };
+      handleMergeData(newData);
+    } catch (error) {
+      setIsEnd(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const requestData = async () => {
-      if (isLoading || isEnd) return;
+  useEffect(() => {
+    setTitle(`${symbol}/${availability?.base || ""}`);
+  }, [availability, symbol]);
 
-      const resolution = selectedInterval;
+  useEffect(() => {
+    setData([]);
+    setFirstLoad(true);
+    setIsEnd(false);
 
-      try {
-        console.log("FETCH CHART DATA");
-        let newData = chartData;
-        setIsLoading(true);
-        if (tokenId) {
-          newData = await fetchOHLCVData({
-            end: endDate,
-            resolution,
-            tokenId,
-            first: firstLoad,
-          });
-        }
+    setSelectedInterval(mergedConfig?.defaults?.timeframe);
+    setEndDate(new Date());
+  }, [tokenId]);
 
-        end = newData[0][0];
-        setFirstLoad(false);
+  useEffect(() => {
+    if (!availability) return;
 
-        if (data.length) {
-          setData([...newData, ...data]);
-        } else {
-          setData(newData);
-        }
+    setIntervals(availability.timeframes);
+  }, [availability]);
 
-        // update onchart
-        setIndicators([...indicators.filter((indicator) => !indicator.isD2T)]);
+  useEffect(() => {
+    fetchTimeframes();
+  }, [tokenId]);
 
-        handleMergeData(newData);
-      } catch (error) {
-        setIsEnd(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    useEffect(() => {
-      setTitle(`${symbol}/${availability?.base || ""}`);
-    }, [availability, symbol]);
-
-    useEffect(() => {
-      setData([]);
-      setFirstLoad(true);
-      setIsEnd(false);
-
-      setSelectedInterval(mergedConfig?.defaults?.timeframe);
-      setEndDate(new Date());
-    }, [tokenId]);
-
-    useEffect(() => {
-      if (!availability) return;
-
-      setIntervals(availability.timeframes);
-    }, [availability]);
-
-    useEffect(() => {
-      fetchTimeframes();
-    }, [tokenId]);
-
-    useEffect(() => {
-      if (!endDate || !selectedInterval || isLoading) {
-        return;
-      }
-
-      requestData();
-    }, [endDate, selectedInterval]);
-
-    useEffect(() => {
-      if (!data.length && !isLoading) {
-        const timeoutId = setTimeout(() => {
-          setShowPlaceHolder(true);
-        }, 200);
-
-        return () => clearTimeout(timeoutId);
-      }
-      setShowPlaceHolder(false);
-    }, [data.length, isLoading]);
-
-    if (!availability) {
-      return <div />;
+  useEffect(() => {
+    if (!endDate || !selectedInterval || isLoading) {
+      return;
     }
 
-    return (
-      <FullScreenWrapper>
-        {({ handle, isIOS }) => (
-          <>
-            <div className="toolbar">
-              {mergedConfig.toolbar?.timeframe ||
-              mergedConfig.toolbar?.indicators ||
-              mergedConfig.toolbar?.typeSelector ? (
-                <Toolbar
-                  config={mergedConfig}
-                  intervals={intervals}
-                  onSelectInterval={(value) => {
-                    setFirstLoad(true);
-                    setEndDate(new Date());
-                    setData([]);
-                    setSelectedInterval(value);
-                    setIsEnd(false);
-                  }}
-                  selectedInterval={selectedInterval}
-                  selectedChart={selectedChartType}
-                  onSelectChart={setSelectedChartType}
-                  hasChartTypeSelection
-                  indicators={indicators}
-                  onSelectIndicators={handleSelectIndicator}
-                />
-              ) : null}
-              {mergedConfig.toolbar?.fullscreenButton ? (
-                <FullScreenButton handle={handle} isIOS={isIOS} />
-              ) : null}
-            </div>
-            <div className="relative full-size">
-              {(mergedConfig.generalTokenChart
-                ? data.length > 0
-                : chartData) && (
-                <Chart
-                  title={title}
-                  data={data || chartData}
-                  tradeData={tradeData}
-                  chartType={selectedChartType}
-                  onRangeChange={handleRangeChange}
-                  rangeLimit={
-                    RangeLimitEnum[selectedInterval] || DEFAULT_RANGE_LIMIT
-                  }
-                  chartX={chartX}
-                  setChart={setChart}
-                  onchart={indicators}
-                  customIndicators={CUSTOM_INDICATORS}
-                />
-              )}
-            </div>
-          </>
-        )}
-      </FullScreenWrapper>
-    );
+    requestData();
+  }, [endDate, selectedInterval]);
+
+  useEffect(() => {
+    if (!data.length && !isLoading) {
+      const timeoutId = setTimeout(() => {
+        setShowPlaceHolder(true);
+      }, 200);
+
+      return () => clearTimeout(timeoutId);
+    }
+    setShowPlaceHolder(false);
+  }, [data.length, isLoading]);
+
+  if (!availability) {
+    return <div />;
+  }
+
+  return (
+    <FullScreenWrapper>
+      {({ handle, isIOS }) => (
+        <>
+          <div className="toolbar">
+            {mergedConfig.toolbar?.timeframe ||
+            mergedConfig.toolbar?.indicators ||
+            mergedConfig.toolbar?.typeSelector ? (
+              <Toolbar
+                config={mergedConfig}
+                intervals={intervals}
+                onSelectInterval={(value) => {
+                  setFirstLoad(true);
+                  setEndDate(new Date());
+                  setData([]);
+                  setSelectedInterval(value);
+                  setIsEnd(false);
+                }}
+                selectedInterval={selectedInterval}
+                selectedChart={selectedChartType}
+                onSelectChart={setSelectedChartType}
+                hasChartTypeSelection
+                indicators={indicators}
+                onSelectIndicators={handleSelectIndicator}
+              />
+            ) : null}
+            {mergedConfig.toolbar?.fullscreenButton ? (
+              <FullScreenButton handle={handle} isIOS={isIOS} />
+            ) : null}
+          </div>
+          <div className="relative full-size">
+            {(mergedConfig.generalTokenChart ? data.length > 0 : chartData) && (
+              <Chart
+                title={title}
+                data={data || chartData}
+                tradeData={tradeData}
+                chartType={selectedChartType}
+                onRangeChange={handleRangeChange}
+                rangeLimit={
+                  RangeLimitEnum[selectedInterval] || DEFAULT_RANGE_LIMIT
+                }
+                chartX={chartX}
+                setChart={setChart}
+                onchart={indicators}
+                customIndicators={AVAILABLE_INDICATORS}
+              />
+            )}
+          </div>
+        </>
+      )}
+    </FullScreenWrapper>
+  );
 };
 
 export default memo(TokenChart);
