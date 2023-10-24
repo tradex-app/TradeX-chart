@@ -7,18 +7,20 @@
 // https://www.investopedia.com/terms/r/rsi.asp
 // @ts-nocheck
 import { Indicator, Range, talibAPI, uid } from "tradex-chart";
-// import { RSI as talibAPI } from "talib";
 
 /**
  * Indicator - Relative Strength Index
  * @export
- * @class RSI
+ * @class CustomRSI
  * @extends {indicator}
  */
 
-export default class RSI14 extends Indicator {
+export default class CustomRSI extends Indicator {
   name = "Relative Strength Index";
   shortName = "RSI";
+
+
+/* these properties are only required if using TALib */
   libName = "RSI";
   definition = {
     input: {
@@ -29,6 +31,12 @@ export default class RSI14 extends Indicator {
       output: [],
     },
   };
+/* end of TALib properties */
+
+// default canvas drawing styles
+// these can and will be overwritten by any 
+// matching values passed into constructor via 
+// params.overlay.settings.style
   #defaultStyle = {
     stroke: "#C80",
     width: "1",
@@ -73,33 +81,65 @@ export default class RSI14 extends Indicator {
     this.setNewValue = (value) => {
       this.newValue(value);
     };
+    // handles updates to the current streaming candle that has not yet closed
     this.setUpdateValue = (value) => {
       this.updateValue(value);
     };
+    // add the indicator legend to the chart pane
+    // this includes the indicator control icons
     this.addLegend();
+    // set the max min Y-Axis values if required
+    // this.chart.setLocalRange(0, 150)
   }
 
+  /** 
+   * Where can this indicator be displayed?
+   * true - on the primary pane that displays the price history (candles) (eg. EMA)
+   * false - on secondary panes as a stand alone indicator (eg. RSI)
+   * "both" - on any chart pane
+   * @readonly
+   * @returns {boolean|string} - true, false, "both"
+  */
   get primaryPane() {
     return RSI14.primaryPane;
   }
+
+  /**
+   * return default drawing styling for indicator's canvas
+   * @readonly
+   * @returns {object}
+   */
   get defaultStyle() {
     return this.#defaultStyle;
   }
 
+  /**
+   * return inputs required to display indicator legend on chart pane
+   * legends can display multiple values
+   * https://tradex-app.github.io/TradeX-chart/reference/legends/
+   * @param {Array} [pos=this.chart.cursorPos] - optional
+   * @returns {Object} - {inputs, colours, labels}
+   */
   legendInputs(pos = this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false;
 
-    const inputs = {};
+    // determine which legend labels to display
+    // let labels = [false]
+    // c = data index
+    // colours = array of colours ["#f00"]
     const { c, colours } = super.legendInputs(pos);
-    inputs.RSI_1 = this.scale.nicePrice(this.overlay.data[c][1]);
+    // value/s to display
+    // build an object of input keys (labels) and values
+    const inputs = {
+      "RSI 1": this.scale.nicePrice(this.overlay.data[c][1])
+    }
 
-    return { inputs, colours };
+    return {inputs, colours, labels}
   }
 
   /**
    * process new candle stream value
    * @param {Array.<number>} candle - [timestamp, open, high, low, close, volume]
-   * @memberof Test
    */
   updateValue(candle) {
     this.value = candle
@@ -107,6 +147,9 @@ export default class RSI14 extends Indicator {
 
   /**
    * calculate indicator values
+   * these will be passed to the draw() method
+   * @param {string} - ignored for custom indicators
+   * @param {params} - indicator parameters - this.definition.input
    * @param {Object} range - instance of Range
    * @returns {boolean|array}
    */
@@ -135,20 +178,24 @@ export default class RSI14 extends Indicator {
     let data = [];
     let i, v, entry, input;
 
+    // loop over range data and calculate the indicator data
     while (start < end) {
       // fetch the data required to calculate the indicator
       input = this.indicatorInput(start, start + p)
       params = {...params, ...input}
-      // let hasNull = params.inReal.find(element => element === null)
-      // if (hasNull) return false
 
+/* replace this with your own indicator calculation */
+      // calculate the indicator data
       entry = this.TALib[this.libName](params)
 
       v = []
       i = 0
+      // store the return value/s in array
       for (let o of this.definition.output) {
         v[i++] = entry[o.name][0]
       }
+/* value has been calculated */
+
       // store entry with timestamp
       data.push([this.range.value(start + p - 1)[0], v])
       start++
@@ -156,6 +203,9 @@ export default class RSI14 extends Indicator {
     return data
   }
 
+  /**
+   * calculate entire indicator history
+   */
   calcIndicatorHistory() {
     // if overlay history is missing, calculate it
     if (this.overlay.data.length < this.definition.input.timePeriod) {
@@ -170,10 +220,11 @@ export default class RSI14 extends Indicator {
    * @param {Object} range
    */
   draw(range = this.range) {
+    // minimum of two candles are required for this indicator
     if (this.overlay.data.length < 2) return false;
-
+    // skip drawing if no visual update is required
     if (!super.mustUpdate()) return false;
-
+    // clear the indicator overlay (chart layer)
     this.scene.clear();
 
     const x2 = this.scene.width + this.xAxis.bufferPx * 2;
@@ -213,13 +264,15 @@ export default class RSI14 extends Indicator {
       return false;
     }
 
-    // we have data, draw something
+    // we have indicator data, draw something
     const data = this.overlay.data;
+    // current candle width, chart zoom modifies this
     const width = this.xAxis.candleW;
 
     // RSI plot
     plots.length = 0;
     const offset = this.Timeline.smoothScrollOffset || 0;
+    // basic plot entry
     const plot = {
       w: width,
     };
@@ -241,11 +294,11 @@ export default class RSI14 extends Indicator {
       c++;
       i--;
     }
-
+    // process the plots
     this.plot(plots, "renderLine", this.style);
-
+    // render the indicator
     this.target.viewport.render();
-
+    // mark the indicator drawing as complete and ready to render
     super.updated();
   }
 }
