@@ -148,9 +148,13 @@ class Viewport extends Node {
 
     super(cfg)
 
+    const canvas = this.scene.canvas
+    const c = cfg.container
+    if (c?.hasCanvasSlot)
+      canvas.slot = "viewportCanvas"
     // clear container
-    cfg.container.innerHTML = "";
-    cfg.container.appendChild(this.scene.canvas);
+    c.innerHTML = "";
+    c.appendChild(canvas);
 
     CEL.viewports.push(this);
   }
