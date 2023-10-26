@@ -27,13 +27,6 @@ export default class tradeXLegend extends element {
     this.style.display = "block"
   }
 
-  connectedCallback() {
-    // element building must be done here
-    // https://stackoverflow.com/a/43837330/15109215
-    if (this.doInit) {
-
-    }
-  }
 }
 
 customElements.get('tradex-legend') || window.customElements.define('tradex-legend', tradeXLegend)

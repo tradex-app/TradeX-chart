@@ -64,12 +64,12 @@ const renderLoop = {
     const [ID, frame] = this.renderQ.firstEntry()
 
     if (!frame.range?.snapshot) return
-    for (let entry of frame.graphs) {
-      if (isFunction(entry.draw)) entry.draw(frame.range, frame.update)
+    for (let graph of frame.graphs) {
+      if (isFunction(graph.draw)) graph.draw(frame.range, frame.update)
     }
 
-    for (let entry of frame.graphs) {
-      if (isFunction(entry.render)) entry.render()
+    for (let graph of frame.graphs) {
+      if (isFunction(graph.render)) graph.render()
     }
 
     this.frameDone()

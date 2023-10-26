@@ -209,8 +209,6 @@ export default class tradeXOverview extends element {
     }
   }
 
-  disconnectedCallback() {
-  }
 
   get scrollBarWidget() { return this.shadowRoot.querySelector('.scrollBarWidget') }
   get rwdStart() { return this.shadowRoot.querySelector('.rwdStart') }
