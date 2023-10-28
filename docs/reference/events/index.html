@@ -37,19 +37,20 @@
 <ul>
 <li>@param {string}   topic   - event name</li>
 <li>@param {function} handler - function or method</li>
-<li>@param {Object}   context - Optional context the function belongs to</li>
+<li>@param {Object}   context - context the function belongs to</li>
 </ul>
 <pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.on(</span><span style="color:#FFAB70">"stream_candleUpdate"</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> onSomeEven</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">)</span></span></code></pre>
 <p>The handler will be passed one parameter if any dependent upon the event.</p>
 <pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">function</span><span style="color:#B392F0"> onSomeEvent(data) { </span><span style="color:#79B8FF">console</span><span style="color:#B392F0">.log(data) }</span></span></code></pre>
 <p>Event handlers will be executed in first in last out order.</p>
 <h2 id="unsubscribing">Unsubscribing</h2>
-<p>Unsubscribing from the event uses the <code dir="auto">chart.off(string, function)</code> method.</p>
+<p>Unsubscribing from the event uses the <code dir="auto">chart.off(string, function, this)</code> method.</p>
 <ul>
 <li>@param {string}   topic   - event name</li>
 <li>@param {function} handler - function or method</li>
+<li>@param {Object}   context - context the function belongs to</li>
 </ul>
-<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.off(</span><span style="color:#FFAB70">"stream_candleUpdate"</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> onSomeEven)</span></span></code></pre>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.off(</span><span style="color:#FFAB70">"stream_candleUpdate"</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> onSomeEvent</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">)</span></span></code></pre>
 <h2 id="event-publishing">Event Publishing</h2>
 <p>The same method that the chart uses internally is also exposed on the public API. Developers can take advantage of this for their own purposes and generate their own events and use the same subscribe and unsubscribe methods detailed above.</p>
 <ul>

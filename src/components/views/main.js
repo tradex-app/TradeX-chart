@@ -24,7 +24,7 @@ template.innerHTML = `
   }
   #viewport canvas {
     position: absolute;
-    top: 1px;
+    // top: 1px;
   }
   tradex-rows {
     position:relative;

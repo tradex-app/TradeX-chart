@@ -114,8 +114,8 @@ export default class Window {
 
   destroy() {
     // remove event listners
-    this.off("closeWindow", this.onCloseWindow)
-    this.off("global_resize", this.onGlobalResize)
+    this.off("closeWindow", this.onCloseWindow, this)
+    this.off("global_resize", this.onGlobalResize, this)
 
     // remove element
     this.el.remove()

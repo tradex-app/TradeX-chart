@@ -23,7 +23,7 @@ You can use `jsDelivr`, `unpkg` or others.
 <script src="https://cdn.jsdelivr.net/npm/tradex-chart/dist/tradex-chart.umd.min.js"></script>
 
 <!-- unpkg -->
-<script src=" https://cdn.jsdelivr.net/npm/tradex-chart@0.128.1/dist/tradex-chart.umd.min.js "></script>
+<script src="https://unpkg.com/tradex-chart/dist/tradex-chart.umd.js"></script>
 ```
 
 ## Step 1.  Creating the Chart

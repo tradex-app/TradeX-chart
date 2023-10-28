@@ -48,10 +48,10 @@ export default class Overlays {
   }
 
   destroy() {
+    if (this.#list.size == 0) return
     for (let k of this.#list.keys()) {
       this.removeOverlay(k)
     }
-    this.#list = null
   }
 
   eventsListen() {
@@ -113,8 +113,12 @@ export default class Overlays {
 
   removeOverlay(key) {
     if (this.#list.has(key)) {
-      this.#list.get(key).layer.remove()
+      const o = this.#list.get(key)
+      if (!o.instance?.isIndicator) 
+        o.instance.destroy()
+      o.layer.remove()
       this.#list.delete(key)
     }
   }
+
 }

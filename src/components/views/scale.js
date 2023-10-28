@@ -2,11 +2,13 @@
 // <tradex-scale></tradex-scale>
 
 import element from "./classes/element"
+import tradeXViewport from "./viewport"
+
 
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
-  .viewport {
+  tradex-viewport {
     width: 100%;
     height: 100%;
     display: block;
@@ -21,11 +23,15 @@ template.innerHTML = `
     border-top: none !important;
   }
 </style>
-<div class="viewport"></div>
+<tradex-viewport></tradex-viewport>
 <slot name="chartpane" id="chartPane"></slot>
 `
 
 export default class tradeXScale extends element {
+
+  #elViewport
+  #elChartPanes
+  #elChartPaneSlot
 
   constructor () {
     super(template)
@@ -36,15 +42,18 @@ export default class tradeXScale extends element {
   }
 
   connectedCallback() {
-    super.connectedCallback()
+    super.connectedCallback(
+      () => {
+        this.#elViewport = this.shadowRoot.querySelector('tradex-viewport')
+        this.#elChartPaneSlot = this.shadowRoot.querySelector('slot[name="chartpane"]')
+        this.#elChartPanes = this.chartPaneSlot.assignedElements()
+  }
+    )
   }
 
-  disconnectedCallback() {
-  }
-
-  get viewport() { return this.shadowRoot.querySelector('.viewport') }
-  get chartPanes() { return this.chartPaneSlot.assignedElements() } 
-  get chartPaneSlot() { return this.shadowRoot.querySelector('slot[name="chartpane"]') }
+  get viewport() { return this.#elViewport }
+  get chartPanes() { return this.#elChartPanes } 
+  get chartPaneSlot() { return this.#elChartPaneSlot }
 }
 
 customElements.get('tradex-scale') || window.customElements.define('tradex-scale', tradeXScale)

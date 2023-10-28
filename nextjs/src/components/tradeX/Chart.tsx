@@ -3,7 +3,7 @@ import { FC, useEffect } from "react";
 import config from "./utils/config";
 import { ColorsEnum, THEMES } from "../theme";
 
-import { ChartType, ICustomIndicators, ITradeX } from "./utils/types";
+import { ChartType, IIndicators, ITradeX } from "./utils/types";
 import useTheme from "../hooks/useTheme";
 
 interface IProps {
@@ -14,7 +14,7 @@ interface IProps {
   rangeLimit?: number;
   onchart: { name: string; value: string; data?: number[] }[];
   chartAccessor?: string;
-  customIndicators?: ICustomIndicators;
+  customIndicators?: IIndicators;
   chartX: ITradeX;
   setChart: (chart: ITradeX) => void;
   onRangeChange?: () => void;

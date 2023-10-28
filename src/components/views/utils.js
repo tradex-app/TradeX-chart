@@ -26,9 +26,6 @@ export default class tradeXUtils extends element {
 
   }
 
-  disconnectedCallback() {
-  }
-
   get icons() { return this.shadowRoot.querySelector('slot').assignedElements()[0].children }
 
   defaultNode(utils) {

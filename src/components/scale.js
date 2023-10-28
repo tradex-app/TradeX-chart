@@ -150,9 +150,9 @@ export default class ScaleBar {
     this.#Graph.destroy()
     this.#input.destroy()
 
-    this.off(`${this.#parent.id}_mousemove`, this.onMouseMove)
-    this.off(`${this.#parent.id}_mouseout`, this.#layerCursor.erase)
-    this.off(STREAM_UPDATE, this.onStreamUpdate)
+    this.off(`${this.#parent.id}_mousemove`, this.onMouseMove, this)
+    this.off(`${this.#parent.id}_mouseout`, this.#layerCursor.erase, this.#layerCursor)
+    this.off(STREAM_UPDATE, this.onStreamUpdate, this.#layerPriceLine)
 
     this.element.remove()
   }

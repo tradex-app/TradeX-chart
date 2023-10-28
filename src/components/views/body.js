@@ -112,6 +112,9 @@ template.innerHTML = right
 export default class tradeXBody extends element {
 
   #theme
+  #elTools
+  #elMain
+  #elScale
 
   constructor () {
     super(template)
@@ -121,12 +124,19 @@ export default class tradeXBody extends element {
 
   }
 
-  disconnectedCallback() {
+  connectedCallback() {
+    super.connectedCallback (
+      () => {
+        this.#elTools = this.shadowRoot.querySelector('tradex-tools')
+        this.#elMain = this.shadowRoot.querySelector('tradex-main')
+        this.#elScale = this.shadowRoot.querySelector('tradex-scale')
+      }
+    )
   }
 
-  get tools() { return this.shadowRoot.querySelector('tradex-tools') }
-  get main() { return this.shadowRoot.querySelector('tradex-main') }
-  get scale() { return this.shadowRoot.querySelector('tradex-scale') }
+  get tools() { return this.#elTools }
+  get main() { return this.#elMain }
+  get scale() { return this.#elScale }
 
   start(theme) {
     this.#theme = theme

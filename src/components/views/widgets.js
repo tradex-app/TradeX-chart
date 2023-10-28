@@ -17,8 +17,6 @@ export default class tradeXWidgets extends element {
   destroy() {
   }
 
-  disconnectedCallback() {
-  }
 }
 
 customElements.get('tradex-widgets') || window.customElements.define('tradex-widgets', tradeXWidgets)

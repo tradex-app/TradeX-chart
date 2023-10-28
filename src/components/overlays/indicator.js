@@ -32,6 +32,7 @@ export default class Indicator extends Overlay {
   #name
   #shortName
   #primaryPane
+  #chartPane
   #scaleOverlay
   #plots
   #params
@@ -55,8 +56,6 @@ export default class Indicator extends Overlay {
     this.#cnt_ = Overlay.cnt
     this.#params = params
     this.#overlay = params.overlay
-    this.#type = config.type  // remove?
-    this.#indicator = config.indicator
     this.#TALib = this.core.TALib
     this.#range = this.xAxis.range
 
@@ -93,6 +92,8 @@ export default class Indicator extends Overlay {
   set style(s) { this.#style = s }
   get style() { return this.#style }
   set position(p) { this.target.setPosition(p[0], p[1]) }
+  get isIndicator() { return true }
+  get status() { return this.#status }
 
   /**
    * process candle value
@@ -120,17 +121,21 @@ export default class Indicator extends Overlay {
   destroy() {
     if ( this.#status === "destroyed") return
     // has this been invoked from removeIndicator() ?
-    const chartPane = this.core.ChartPanes.get(this.chartPaneID)
-    if ( !chartPane.indicatorDeleteList[this.id] ) {
-      this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeIndicator()" instead.`)
+    // const chartPane = this.core.ChartPanes.get(this.chartPaneID)
+    if ( !this.chartPane.indicatorDeleteList[this.id] ) {
+      this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "indicator.remove()" or "chart.removeIndicator()" instead.`)
       return
     }
+    // execute parent class
+    super.destroy()
 
-    // this.off(STREAM_NEWVALUE, this.onStreamNewValue)
     this.off(STREAM_UPDATE, this.onStreamUpdate)
-
+    // remove overlay from parent chart pane's graph
+    this.chartPane.graph.removeOverlay(this.id)
     this.chart.legend.remove(this.#legendID)
+
     // TODO: remove state data
+
     this.#status = "destroyed"
   }
 
@@ -176,7 +181,6 @@ export default class Indicator extends Overlay {
   }
 
   eventsListen() {
-    // this.on(STREAM_NEWVALUE, this.onStreamNewValue, this)
     this.on(STREAM_UPDATE, this.onStreamUpdate, this)
   }
 
