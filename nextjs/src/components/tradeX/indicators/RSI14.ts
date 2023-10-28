@@ -11,11 +11,11 @@ import { Indicator, Range, talibAPI, uid } from "tradex-chart";
 /**
  * Indicator - Relative Strength Index
  * @export
- * @class CustomRSI
+ * @class RSI
  * @extends {indicator}
  */
 
-export default class CustomRSI extends Indicator {
+export default class RSI14 extends Indicator {
   name = "Relative Strength Index";
   shortName = "RSI";
 
