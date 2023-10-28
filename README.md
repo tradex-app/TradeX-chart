@@ -99,6 +99,7 @@ Documentation can be found here:
 [Documentation](https://tradex-app.github.io/TradeX-chart/)
 
 or built and run locally from the repository by running:
+
 ```shell
 git clone https://github.com/tradex-app/TradeX-chart
 cd ./tradex-chart/src/docs
@@ -109,6 +110,13 @@ npm run build
 
 Editable sandbox examples can found on [CodeSandbox.io](https://codesandbox.io/u/tradex-app)
 
+## Framework Integration Examples
+
+[* React / NextJS](nextjs)
+
+* Vue (TODO:)
+* Svelte (TODO:)
+
 ## Features
 
 * Plain JavaScript with no framework dependencies
@@ -116,12 +124,12 @@ Editable sandbox examples can found on [CodeSandbox.io](https://codesandbox.io/u
 * State object defines chart configuration, indicators and tools
 * State can be imported or exported for storage and retrieval
 * Indicator calculation provided by [talib-web](https://https://anchegt.github.io/talib-web/) as a WebAssembly module.
-* Custom themes
-* Custom indicators
-* Custom Overlays
-* Custom drawing tools (to be implemented)
-* Event hub - subscribe to chart events
-* Rendering optimization - smooth performance
+* [Custom Themes](https://tradex-app.github.io/TradeX-chart/reference/themes/)
+* [Custom Indicators](https://tradex-app.github.io/TradeX-chart/reference/indicators_default/https:/)
+* [Custom Overlays](https://tradex-app.github.io/TradeX-chart/reference/overlays_custom/https:/)
+* Custom Drawing Tools (to be implemented)
+* [Event Hub](https://tradex-app.github.io/TradeX-chart/reference/events/) - subscribe to chart events
+* Rendering Optimization - smooth performance
 * High frequency chart candles updates
 * Export chart to png, jpg, webp, with optional watermarking
 
@@ -145,6 +153,7 @@ Testing, bug reports and feature requests welcome
 You can help speed up development by contributing with crypto or PayPal.
 
 ---
+
 ```javascript
 if (youEnjoyed) {
     starThisRepository();

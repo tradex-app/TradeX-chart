@@ -134,7 +134,8 @@ export default class Indicator extends Overlay {
     this.chartPane.graph.removeOverlay(this.id)
     this.chart.legend.remove(this.#legendID)
 
-    // TODO: remove state data
+    // remove indicator state data
+    this.core.state.removeIndicator(this.id)
 
     this.#status = "destroyed"
   }

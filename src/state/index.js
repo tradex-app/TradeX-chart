@@ -268,7 +268,7 @@ export default class State {
   get allData() {
     return {
       data: this.#data.chart.data,
-      primaryPane: this.#data.secondary,
+      primaryPane: this.#data.primary,
       secondaryPane: this.#data.secondary,
       datasets: this.#data.datasets
     }
@@ -641,6 +641,25 @@ export default class State {
     }
 
     return merged
+  }
+
+  removeIndicator(i) {
+    if (!isString(i)) return false
+
+    const seekAndDestroy = (p, i) => {
+      const a = this.data[p]
+      for (let d=0; d<a.length; d++) {
+        if (a[d].id == i) {
+          a.splice(d, 1)
+          return true
+        }
+      }
+      return false
+    }
+
+    if (seekAndDestroy("primary", i)) return true
+    if (seekAndDestroy("secondary", i)) return true
+    return false
   }
 
   addTrade(t) {
