@@ -308,18 +308,19 @@ export default class Chart {
       return
     }
 
-    this.stateMachine.destroy();
+    this.removeAllIndicators()
+    this.stateMachine.destroy()
     this.Divider.destroy()
-    this.#Scale.destroy();
-    this.#Graph.destroy();
+    this.#Scale.destroy()
+    this.#Graph.destroy()
     this.#input.destroy()
     this.legend.destroy()
 
-    this.off("main_mousemove", this.onMouseMove);
-    this.off(STREAM_LISTENING, this.onStreamListening);
-    this.off(STREAM_NEWVALUE, this.onStreamNewValue);
-    this.off(STREAM_UPDATE, this.onStreamUpdate);
-    this.off(STREAM_FIRSTVALUE, this.onStreamNewValue)
+    this.off("main_mousemove", this.onMouseMove, this);
+    this.off(STREAM_LISTENING, this.onStreamListening, this);
+    this.off(STREAM_NEWVALUE, this.onStreamNewValue, this);
+    this.off(STREAM_UPDATE, this.onStreamUpdate, this);
+    this.off(STREAM_FIRSTVALUE, this.onStreamNewValue, this)
     this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this)
 
     if (this.isPrimary)
@@ -610,7 +611,6 @@ export default class Chart {
         i?.type in this.core.indicatorClasses &&
         primaryPane === indType
       ) {
-      i.paneID = this.id
       const config = {
         class: indClass,
         params: {overlay: i}
@@ -638,7 +638,6 @@ export default class Chart {
 
     // enable deletion
     this.#indicatorDeleteList[id] = true
-
     this.indicators[id].instance.destroy()
     this.graph.removeOverlay(id)
     this.draw()
@@ -647,6 +646,13 @@ export default class Chart {
       this.emit("destroyChartView", this.id)
 
     delete this.#indicatorDeleteList[id]
+  }
+
+  removeAllIndicators() {
+    const all = this.getIndicators()
+    for (let id in all) {
+      this.removeIndicator(id)
+    }
   }
 
   indicatorVisible(id, v) {

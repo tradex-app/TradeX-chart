@@ -25,10 +25,10 @@ export default class chartCursor extends Overlay{
   }
 
   destroy() {
-    this.core.off("chart_pan", this.onMouseDragX)
-    this.core.off("chart_panDone", this.onMouseDragX)
-    this.core.off("main_mousemove", this.onMouseMoveX)
     super.destroy()
+    this.core.off("chart_pan", this.onMouseDragX, this)
+    this.core.off("chart_panDone", this.onMouseDragX, this)
+    this.core.off("main_mousemove", this.onMouseMoveX, this)
   }
 
   set position(p) { return }

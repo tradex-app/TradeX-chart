@@ -47,7 +47,7 @@ export default class chartTrades extends Overlay {
   }
 
   destroy() {
-    this.core.off("primary_pointerdown", this.onPrimaryPointerDown)
+    this.core.off("primary_pointerdown", this.onPrimaryPointerDown, this)
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }

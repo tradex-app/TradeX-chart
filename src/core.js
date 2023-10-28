@@ -550,18 +550,24 @@ export default class TradeXchart extends Tradex_chart {
   * Unsubscribe from a topic
   * @param {string} topic - The topic name
   * @param {function} handler  - function to remove
+  * @param {Object}  context   - The context the function(s) belongs to
   * @returns {boolean}
   */
-  off(topic, handler) {
+  off(topic, handler, context) {
     if (!isString(topic) || 
         !isFunction(handler) ||
         !(topic in this.#hub)
         ) return false
 
-    for (let i=0; i<this.#hub[topic].length; i++) {
-      if (this.#hub[topic][i].handler === handler) {
-        this.#hub[topic].splice(i, 1);
-        if (this.#hub[topic].length === 0) {
+    const t = this.#hub[topic]
+    for (let i=0; i<t.length; i++) {
+      if (t[i].handler === handler) {
+        if (context !== undefined) {
+          if (t[i].context !== context) 
+            continue
+        }
+        t.splice(i, 1);
+        if (t.length === 0) {
           delete this.#hub[topic];
           break
         }

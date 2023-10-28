@@ -60,8 +60,8 @@ export default class Legends {
 
     // this.#input = new Input(this.#elTarget, { disableContextMenu: false, });
 
-    this.#core.on("chart_pan", this.primaryPanePan.bind(this))
-    this.#core.on("chart_panDone", this.primaryPanePanDone.bind(this))
+    this.#core.on("chart_pan", this.primaryPanePan, this)
+    this.#core.on("chart_panDone", this.primaryPanePanDone, this)
   }
 
   init() {
