@@ -2,21 +2,23 @@
 // <tradex-grid></tradex-grid>
 
 import element from "./classes/element"
-import graph from "./classes/graph"
+import tradeXViewport from "./viewport"
 
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
-  .viewport {
+  tradex-viewport {
     position: relative;
     width: 100%;
     height: 100%;
   }
 </style>
-  <div class="viewport"></div>
+  <tradex-viewport></tradex-viewport>
 `
 
 export default class tradeXGrid extends element {
+
+  #elViewport
 
   constructor () {
     super(template)
@@ -26,10 +28,13 @@ export default class tradeXGrid extends element {
 
   }
 
-  disconnectedCallback() {
+  connectedCallback() {
+    super.connectedCallback(
+      () => this.#elViewport = this.shadowRoot.querySelector('tradex-viewport')
+    )
   }
 
-  get viewport() { return this.shadowRoot.querySelector('.viewport') }
+  get viewport() { return this.#elViewport }
 
 }
 

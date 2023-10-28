@@ -65,11 +65,11 @@ export default class Overlay {
   set position(p) { this.target.setPosition(p[0], p[1]) }
 
   destroy() {
-    this.off("setRange", this.drawUpdate)
-    this.off("rowsResize", this.drawUpdate)
-    this.off("divider_pointerdrag", this.drawUpdate)
-    this.off("divider_pointerdragend", this.drawUpdate)
-    this.off("pane_refresh", this.drawUpdate)
+    this.off("setRange", this.drawUpdate, this)
+    this.off("rowsResize", this.drawUpdate, this)
+    this.off("divider_pointerdrag", this.drawUpdate, this)
+    this.off("divider_pointerdragend", this.drawUpdate, this)
+    this.off("pane_refresh", this.drawUpdate, this)
   }
 
   /**

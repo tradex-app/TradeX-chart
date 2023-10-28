@@ -12,7 +12,7 @@ Once the chart is initialized with the ``chart.start()`` method, any event the c
 
 * @param {string}   topic   - event name
 * @param {function} handler - function or method
-* @param {Object}   context - Optional context the function belongs to
+* @param {Object}   context - context the function belongs to
 
 ```javascript
 chart.on("stream_candleUpdate", onSomeEven, this)
@@ -27,13 +27,14 @@ Event handlers will be executed in first in last out order.
 
 ## Unsubscribing
 
-Unsubscribing from the event uses the ``chart.off(string, function)`` method.
+Unsubscribing from the event uses the ``chart.off(string, function, this)`` method.
 
 * @param {string}   topic   - event name
 * @param {function} handler - function or method
+* @param {Object}   context - context the function belongs to
 
 ```javascript
-chart.off("stream_candleUpdate", onSomeEven)
+chart.off("stream_candleUpdate", onSomeEvent, this)
 ```
 
 ## Event Publishing

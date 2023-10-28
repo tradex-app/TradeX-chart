@@ -26,6 +26,9 @@ template.innerHTML = `
 
 export default class tradeXTime extends element {
 
+  #elViewport
+  #elOverview
+
   constructor () {
     super(template)
   }
@@ -34,15 +37,17 @@ export default class tradeXTime extends element {
 
   }
 
-  disconnectedCallback() {
+  connectedCallback() {
+    super.connectedCallback(
+      () => {
+        this.#elViewport = this.shadowRoot.querySelector('.viewport')
+        this.#elOverview = this.shadowRoot.querySelector('tradex-overview')        
+      }
+    )
   }
 
-  createGraph() {
-    
-  }
-
-  get viewport() { return this.shadowRoot.querySelector('.viewport') }
-  get overview() { return this.shadowRoot.querySelector('tradex-overview') }
+  get viewport() { return this.#elViewport }
+  get overview() { return this.#elOverview }
 
 }
 

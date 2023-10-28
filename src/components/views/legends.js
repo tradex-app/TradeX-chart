@@ -176,6 +176,8 @@ export default class tradeXLegends extends element {
   #slot
   #hub = []
 
+  #onSlotChange
+
   constructor () {
     super(template)
   }
@@ -185,25 +187,22 @@ export default class tradeXLegends extends element {
   }
 
   connectedCallback() {
-    // element building must be done here
-    // https://stackoverflow.com/a/43837330/15109215
-    if (this.doInit) {
-      this.doInit = false
-      this.shadowRoot.appendChild(this.template.content.cloneNode(true))
-      this.style.display = "block"
-
+    super.connectedCallback(
+      () => {
       this.#slot = this.shadowRoot.querySelector('slot')
       this.#elLegends = this.shadowRoot.querySelector('.legends')
 
       this.#elTitle = this.shadowRoot.querySelector('.title')
       this.#elInputs = this.shadowRoot.querySelector('dl')
       this.#elControls = this.shadowRoot.querySelector('.controls')
-
-      this.#slot.addEventListener('slotchange', this.onSlotChange.bind(this))
+        this.#onSlotChange = this.onSlotChange.bind(this)
+        this.#slot.addEventListener('slotchange', this.#onSlotChange)
     }
+    )
   }
 
   disconnectedCallback() {
+    this.#slot.removeEventListener('slotchange', this.#onSlotChange)
   }
 
   get slot() { return this.#slot }
