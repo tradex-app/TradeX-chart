@@ -5,7 +5,7 @@ import Overlay from "./overlay"
 import { Range } from "../../model/range"
 import canvas from "../../renderer/canvas"
 import { limit } from "../../utils/number"
-import { isBoolean, isFunction, isObject, isString } from "../../utils/typeChecks"
+import { isArray, isBoolean, isFunction, isObject, isString } from "../../utils/typeChecks"
 import { idSanitize } from "../../utils/utilities"
 import { STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
@@ -363,7 +363,7 @@ export default class Indicator extends Overlay {
   }
 
   /**
- * Calculate indicator values for entire chart history
+ * Calculate indicator values for chart history - partial or entire
  * @param {string} indicator - the TALib function to call
  * @param {Object} params - parameters for the TALib function
  * @param {Object} [range=this.range] - range instance or definition
@@ -379,6 +379,7 @@ export default class Indicator extends Overlay {
         params.timePeriod = params.timePeriod || this.definition.input.timePeriod;
         let start, end;
         let p = params.timePeriod
+        let od = this.overlay.data
     
         // is it a Range instance?
         if (range instanceof Range) {
@@ -393,12 +394,34 @@ export default class Indicator extends Overlay {
         }
         else return false
     
+        // check if a full or only partial calculation is required
+        // full calculation required
+        if (od.length == 0) { }
+        // partial calculation required
+        else if (od.length + p !== range.dataLength) {
+          // new data in the past?
+          if (od[0][0] > range.value(p)[0]) {
+            start = 0
+            end = range.getTimeIndex(od[0][0]) - p
+            end = limit(end, p, range.dataLength - 1)
+          }
+          // new data in the future ?
+          else if (od[ od.length - 1 ][0] < range.value( range.dataLength - 1 )[0]) {
+            start = od.length - 1 + p
+            start = limit(start, 0, range.dataLength)
+            end = range.dataLength - 1
+          }
+          // something is wrong
+          else return false
+        }
+        // up to date, no need to calculate
+        else return false
+
         // if not enough data for calculation fail
         if ( end - start < p ) return false
-    
+  
         let data = [];
         let i, v, entry, input;
-    
     
         while (start < end) {
           // fetch the data required to calculate the indicator
@@ -415,7 +438,9 @@ export default class Indicator extends Overlay {
             v[i++] = entry[o.name][0]
           }
           // store entry with timestamp
-          data.push([this.range.value(start + p - 1)[0], v])
+          data.push([range.value(start + p - 1)[0], ...v])
+          // data.push([range.value(start - 1)[0], ...v])
+
           start++
         }
         return data
@@ -427,8 +452,38 @@ export default class Indicator extends Overlay {
    */
   calcIndicatorHistory () {
     const calc = () => {
-      let data = this.calcIndicator(this.libName, this.definition.input, this.range);
-      if (data) this.overlay.data = data;
+      const data = this.calcIndicator(this.libName, this.definition.input, this.range);
+      if (data) {
+        const od = this.overlay.data
+        const d = new Set(data)
+        const o = new Set(od)
+        let a, p, r = {};
+        if (!isArray(od) ||
+            od.length == 0 ) {
+            this.overlay.data = data
+            return
+        }
+        else if (data[0][0] < od[0][0]) {
+          let s = new Set([...d, ...o])
+          this.overlay.data = Array.from(s)
+          a = data
+          p = od
+        }
+        else if (data[data.length-1][0] > od[od.length-1][0]) {
+          let s = new Set([...o, ...d])
+          this.overlay.data = Array.from(s)
+          a = od
+          p = data
+        }
+        // for (let v of p) {
+        //   r[v[0]] = v
+        // }
+        // for (let v of a) {
+        //   r[v[0]] = v
+        // }
+        // this.overlay.data = Object.values(r)
+        // // console.log(this.range)
+      }
     }
     if (this.core.TALibReady) calc()
     else  this.core.talibAwait.push(calc.bind(this))
@@ -459,7 +514,7 @@ export default class Indicator extends Overlay {
       v[i++] = entry[o.name][0]
     }
 
-    return [time, v]
+    return [time, ...v]
   }
 
   /**
@@ -494,7 +549,7 @@ export default class Indicator extends Overlay {
     let v = this.calcIndicatorStream(this.libName, p)
     if (!v) return false
 
-    this.overlay.data[l] = [v[0], v[1]]
+    this.overlay.data[l] = v
 
     this.target.setPosition(this.core.scrollPos, 0)
     this.doDraw = true

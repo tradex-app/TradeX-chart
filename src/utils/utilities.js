@@ -602,21 +602,38 @@ export class xMap extends Map {
  * @param {boolean} immediate
  * @returns {Function}
  */
- export function debounce(fn, wait=100, scope, immediate=false) {
+//  export function debounce(fn, wait=100, scope, immediate=false) {
+//   var timeout;
+//   var core = async function() {
+//     var context = scope || this
+//     var args = arguments;
+//     var later = function() {
+//       timeout = null;
+//       if (!immediate) fn.apply(context, args);
+//     };
+//     var callNow = immediate && !timeout;
+//     clearTimeout(timeout);
+
+//     await new Promise(resolve => {
+//       timeout = setTimeout( resolve(later()), wait );
+//     })
+//     if (callNow) fn.apply(context, args);
+//   };
+//   return core
+// };
+
+export function debounce(fn, wait=100, scope, immediate=false) {
   var timeout;
-  var core = async function() {
+  var core = function() {
     var context = scope || this
     var args = arguments;
     var later = function() {
-      timeout = null;
-      if (!immediate) fn.apply(context, args);
+        timeout = null;
+        if (!immediate) fn.apply(context, args);
     };
     var callNow = immediate && !timeout;
     clearTimeout(timeout);
-
-    await new Promise(resolve => {
-      timeout = setTimeout( resolve(later()), wait );
-    })
+    timeout = setTimeout(later, wait);
     if (callNow) fn.apply(context, args);
   };
   return core

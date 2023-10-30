@@ -401,7 +401,7 @@ export default class State {
       return false
     }
     let end = (isArray(merge?.ohlcv)) ? merge.ohlcv.length -1 : 0
-    // timeframes don't match
+    // time frames don't match
     if (end > 1 &&
         this.time.timeFrameMS !== detectInterval(merge?.ohlcv)) {
       this.error(`ERROR: ${this.core.id}: merge data time frame does not match existing time frame!`)
@@ -501,8 +501,21 @@ export default class State {
         this.data.chart.data = this.merge(data, mData)
       }
 
+      if (newRange) {
+        if (isObject(newRange)) {
+          start = (isNumber(newRange.start)) ? this.range.getTimeIndex(newRange.start) : this.range.indexStart
+          end = (isNumber(newRange.end)) ? this.range.getTimeIndex(newRange.end) : this.range.indexEnd
+        }
+        else {
+          if (mData[0][0] )
+          start = this.range.indexStart + inc
+          end = this.range.indexEnd + inc
+        }
+        this.#core.setRange(start, end)
+      }
+
       // calculate all indicators if required
-      // and ignore and overwrite any existing data
+      // and update existing data
       if (calc) this.#core.calcAllIndicators()
 
       // otherwise merge the new indicator data
@@ -553,19 +566,6 @@ export default class State {
         for (let d in trades) {
           
         }
-      }
-
-      if (newRange) {
-        if (isObject(newRange)) {
-          start = (isNumber(newRange.start)) ? this.range.getTimeIndex(newRange.start) : this.range.indexStart
-          end = (isNumber(newRange.end)) ? this.range.getTimeIndex(newRange.end) : this.range.indexEnd
-        }
-        else {
-          if (mData[0][0] )
-          start = this.range.indexStart + inc
-          end = this.range.indexEnd + inc
-        }
-        this.#core.setRange(start, end)
       }
 
       let r, u = false;

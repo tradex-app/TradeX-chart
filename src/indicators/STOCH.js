@@ -96,8 +96,8 @@ export default class STOCH extends Indicator {
     const inputs = {}
     let labels = [false, false, false]
     let {c, colours} = super.legendInputs(pos)
-    inputs.SlowK = this.scale.nicePrice(this.overlay.data[c][1][0])
-    inputs.SlowD = this.scale.nicePrice(this.overlay.data[c][1][1])
+    inputs.SlowK = this.scale.nicePrice(this.overlay.data[c][1])
+    inputs.SlowD = this.scale.nicePrice(this.overlay.data[c][1])
     colours = [
       this.style.slowD,
       this.style.slowK
@@ -177,11 +177,11 @@ export default class STOCH extends Indicator {
       }
       else {
         plot.x = this.xAxis.xPos(data[c][0])
-        plot.y = this.yAxis.yPos(data[c][1][0])
+        plot.y = this.yAxis.yPos(data[c][1])
         plots.slowK.push({...plot})
 
         plot.x = this.xAxis.xPos(data[c][0])
-        plot.y = this.yAxis.yPos(data[c][1][1])
+        plot.y = this.yAxis.yPos(data[c][2])
         plots.slowD.push({...plot})
       }
       c++

@@ -104,8 +104,8 @@ export default class RSI extends Indicator {
     this.scene.clear()
 
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2)
-    const y1 = this.yAxis.yPos(this.style.defaultHigh)
-    const y2 = this.yAxis.yPos(this.style.defaultLow)
+    const y1 = this.yAxis.yPos(this.style?.high || this.style.defaultHigh)
+    const y2 = this.yAxis.yPos(this.style?.low || this.style.defaultLow)
 
     // Fill the range between high and low
     const plots = [0, y1, this.scene.width, y2 - y1]

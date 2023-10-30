@@ -96,9 +96,9 @@ export default class BB extends Indicator {
     const inputs = {}
       let labels = [false, false, false]
       let {c, colours} = super.legendInputs(pos)
-    inputs.Hi = this.scale.nicePrice(this.overlay.data[c][1][0])
-    inputs.Mid = this.scale.nicePrice(this.overlay.data[c][1][1])
-    inputs.Lo = this.scale.nicePrice(this.overlay.data[c][1][2])
+    inputs.Hi = this.scale.nicePrice(this.overlay.data[c][1])
+    inputs.Mid = this.scale.nicePrice(this.overlay.data[c][2])
+    inputs.Lo = this.scale.nicePrice(this.overlay.data[c][3])
     colours = [
       this.style.upperStroke,
       this.style.middleStroke,
@@ -137,15 +137,15 @@ export default class BB extends Indicator {
       }
       else {
         plot.x = this.xAxis.xPos(data[c][0])
-        plot.y = this.yAxis.yPos(data[c][1][0])
+        plot.y = this.yAxis.yPos(data[c][1])
         plots.lower.push({...plot})
 
         plot.x = this.xAxis.xPos(data[c][0])
-        plot.y = this.yAxis.yPos(data[c][1][1])
+        plot.y = this.yAxis.yPos(data[c][2])
         plots.middle.push({...plot})
 
         plot.x = this.xAxis.xPos(data[c][0])
-        plot.y = this.yAxis.yPos(data[c][1][2])
+        plot.y = this.yAxis.yPos(data[c][3])
         plots.upper.push({...plot})
       }
       c++

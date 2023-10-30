@@ -84002,8 +84002,8 @@ export default {
             ],
             "settings": {
                 "timePeriod": 20,
-                "upper": 70,
-                "lower": 30,
+                "high": 70,
+                "low": 30,
                 "backColor": "#9b9ba316",
                 "bandColor": "#666"
             }

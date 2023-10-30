@@ -1174,30 +1174,32 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * calculate all indicators currently in use
    */
-  // calcAllIndicators() {
-  //   for (const [key, value] of Object.entries(this.Indicators)) {
-  //     const indicators = []
-  //     for (const [k, ind] of Object.entries(value)) {
-  //       const executeInd = (i) => {
-  //         return new Promise(resolve => setTimeout(() => {
-  //           resolve( i[0]() )
-  //         }, 0))
-  //       }
-  //       indicators.push(ind.instance.calcIndicatorHistory)
-  //     }
-  //     (async () => {
-  //       await Promise.all( indicators.map( async i => { executeInd(i) }))
-  //     })();
-  //   }
-  // }
-
-  calcAllIndicators() {
+  async calcAllIndicators() {
+    const indicators = []
+    const executeInd = (i) => {
+      return new Promise(resolve => setTimeout(() => {
+        resolve( i() )
+      }, 0))
+    }
     for (const [key, value] of Object.entries(this.Indicators)) {
       for (const [k, ind] of Object.entries(value)) {
-        ind.instance.calcIndicatorHistory()
+        indicators.push(ind.instance.calcIndicatorHistory.bind(ind.instance))
       }
     }
+    // (async () => {
+      await Promise.all( indicators.map( async i => { 
+        executeInd(i) }))
+        this.refresh()
+    // })();
   }
+
+  // calcAllIndicators() {
+  //   for (const [key, value] of Object.entries(this.Indicators)) {
+  //     for (const [k, ind] of Object.entries(value)) {
+  //       ind.instance.calcIndicatorHistory()
+  //     }
+  //   }
+  // }
 
   /**
    * Add a trade entry to the chat
