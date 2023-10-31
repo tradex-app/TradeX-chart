@@ -8,7 +8,7 @@ export const fetchAvailableTimeframes = async ({
 }) => {
   try {
     const { data } = await apiFe.get(
-      `/ohlcv/available-timeframes?coin_id=${tokenId}`
+      `/ohlcv/available-timeframes?coin_id=${tokenId}`,
     );
 
     return data;
@@ -44,7 +44,7 @@ export const fetchOHLCVData = async ({
   const start = Math.floor((end.getTime() - factor) / 1000);
 
   let url = `/ohlcv?target_cc_id=${tokenId}&start=${start}&end=${Math.floor(
-    end.getTime() / 1000
+    end.getTime() / 1000,
   )}&resolution=${resolution}&source=1&limit=${LIMIT}&response_format=array`;
 
   if (base) url += `&base_cc_id=${base}`;
@@ -64,7 +64,7 @@ export const fetchOHLCVData = async ({
             volume,
           ])
           .reverse() ?? [];
-      console.log(data)
+      console.log(data);
       return data;
     }
   } catch (error) {

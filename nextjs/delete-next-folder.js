@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const folderPath = path.join(__dirname, '.next');
+const folderPath = path.join(__dirname, ".next");
 
 function deleteFolderRecursive(directory) {
   if (fs.existsSync(directory)) {

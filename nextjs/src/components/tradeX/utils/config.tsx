@@ -84,11 +84,11 @@ const getConfig = ({
       },
       utils: {
         location: false,
-      }
+      },
     },
-    trades: { 
+    trades: {
       display: true,
-      displayInfo: true 
+      displayInfo: true,
     },
     deepValidate: false,
     isCrypto: true,

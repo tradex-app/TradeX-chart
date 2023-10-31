@@ -2,7 +2,6 @@ import { useTheme as useThemeLib } from "next-themes";
 
 import { THEMES } from "../theme";
 
-
 const useTheme = (): {
   theme: string;
   setTheme: (newTheme: string) => void;
@@ -11,7 +10,7 @@ const useTheme = (): {
 } => {
   const { theme: libTheme, setTheme } = useThemeLib();
   const theme = libTheme || THEMES.DARK;
-  
+
   const switchTheme = () => {
     const newTheme = theme === THEMES.LIGHT ? THEMES.DARK : THEMES.LIGHT;
     setTheme(newTheme);
