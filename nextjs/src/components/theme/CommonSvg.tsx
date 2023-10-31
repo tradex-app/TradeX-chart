@@ -1,8 +1,6 @@
 import React from "react";
 import ColorsEnum from "../theme/colors";
 
-
-
 export const DownloadSvg = () => (
   <svg
     version="1.1"
