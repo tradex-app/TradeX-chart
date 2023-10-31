@@ -30,7 +30,7 @@ export default class DCA extends Indicator {
 
   legendInputs(pos = this.chart.cursorPos) {
     const roundedEntryPoints = this.calculatedEntryPoints.map((point) =>
-      parseFloat(point.toPrecision(4))
+      parseFloat(point.toPrecision(4)),
     );
     const inputs = {
       "Entry Points": roundedEntryPoints,
@@ -111,7 +111,7 @@ export default class DCA extends Indicator {
           { x: xEnd, y },
         ],
         "renderLine",
-        style
+        style,
       );
     });
 

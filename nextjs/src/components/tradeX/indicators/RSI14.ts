@@ -19,8 +19,7 @@ export default class RSI14 extends Indicator {
   name = "Relative Strength Index";
   shortName = "RSI";
 
-
-/* these properties are only required if using TALib */
+  /* these properties are only required if using TALib */
   libName = "RSI";
   definition = {
     input: {
@@ -31,12 +30,12 @@ export default class RSI14 extends Indicator {
       output: [],
     },
   };
-/* end of TALib properties */
+  /* end of TALib properties */
 
-// default canvas drawing styles
-// these can and will be overwritten by any 
-// matching values passed into constructor via 
-// params.overlay.settings.style
+  // default canvas drawing styles
+  // these can and will be overwritten by any
+  // matching values passed into constructor via
+  // params.overlay.settings.style
   #defaultStyle = {
     stroke: "#C80",
     width: "1",
@@ -92,14 +91,14 @@ export default class RSI14 extends Indicator {
     // this.chart.setLocalRange(0, 150)
   }
 
-  /** 
+  /**
    * Where can this indicator be displayed?
    * true - on the primary pane that displays the price history (candles) (eg. EMA)
    * false - on secondary panes as a stand alone indicator (eg. RSI)
    * "both" - on any chart pane
    * @readonly
    * @returns {boolean|string} - true, false, "both"
-  */
+   */
   get primaryPane() {
     return RSI14.primaryPane;
   }
@@ -131,10 +130,10 @@ export default class RSI14 extends Indicator {
     // value/s to display
     // build an object of input keys (labels) and values
     const inputs = {
-      "RSI 1": this.scale.nicePrice(this.overlay.data[c][1])
-    }
+      "RSI 1": this.scale.nicePrice(this.overlay.data[c][1]),
+    };
 
-    return {inputs, colours, labels}
+    return { inputs, colours, labels };
   }
 
   /**
@@ -142,7 +141,7 @@ export default class RSI14 extends Indicator {
    * @param {Array.<number>} candle - [timestamp, open, high, low, close, volume]
    */
   updateValue(candle) {
-    this.value = candle
+    this.value = candle;
   }
 
   /**
@@ -153,27 +152,33 @@ export default class RSI14 extends Indicator {
    * @param {Object} range - instance of Range
    * @returns {boolean|array}
    */
-  calcIndicator (indicator, params={}, range=this.range) {
+  calcIndicator(indicator, params = {}, range = this.range) {
     let start, end;
     // number of values to use in indicator calculation
-    let p = this.definition.input.timePeriod
+    let p = this.definition.input.timePeriod;
 
     // is it a Range instance?
-    if(range instanceof Range) {
+    if (range instanceof Range) {
       // if not calculate entire history
-      start = 0
-      end = range.dataLength - p + 1
-    }
-    else if ( "indexStart" in range || "indexEnd" in range ||
-              "tsStart" in range ||  "tsEnd" in range ) {
-      start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0
-      end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1
-      end - p
-    }
-    else return false
+      start = 0;
+      end = range.dataLength - p + 1;
+    } else if (
+      "indexStart" in range ||
+      "indexEnd" in range ||
+      "tsStart" in range ||
+      "tsEnd" in range
+    ) {
+      start =
+        range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0;
+      end =
+        range.indexEnd ||
+        this.Timeline.t2Index(range.tsEnd) ||
+        this.range.Length - 1;
+      end - p;
+    } else return false;
 
     // if not enough data for calculation fail
-    if ( end - start < p ) return false
+    if (end - start < p) return false;
 
     let data = [];
     let i, v, entry, input;
@@ -181,26 +186,26 @@ export default class RSI14 extends Indicator {
     // loop over range data and calculate the indicator data
     while (start < end) {
       // fetch the data required to calculate the indicator
-      input = this.indicatorInput(start, start + p)
-      params = {...params, ...input}
+      input = this.indicatorInput(start, start + p);
+      params = { ...params, ...input };
 
-/* replace this with your own indicator calculation */
+      /* replace this with your own indicator calculation */
       // calculate the indicator data
-      entry = this.TALib[this.libName](params)
+      entry = this.TALib[this.libName](params);
 
-      v = []
-      i = 0
+      v = [];
+      i = 0;
       // store the return value/s in array
       for (let o of this.definition.output) {
-        v[i++] = entry[o.name][0]
+        v[i++] = entry[o.name][0];
       }
-/* value has been calculated */
+      /* value has been calculated */
 
       // store entry with timestamp
-      data.push([this.range.value(start + p - 1)[0], v])
-      start++
+      data.push([this.range.value(start + p - 1)[0], v]);
+      start++;
     }
-    return data
+    return data;
   }
 
   /**
@@ -209,11 +214,10 @@ export default class RSI14 extends Indicator {
   calcIndicatorHistory() {
     // if overlay history is missing, calculate it
     if (this.overlay.data.length < this.definition.input.timePeriod) {
-      const data = this.calcIndicator()
-      if (data) this.overlay.data = data
+      const data = this.calcIndicator();
+      if (data) this.overlay.data = data;
     }
   }
-
 
   /**
    * Draw the current indicator range on its canvas layer and render it.

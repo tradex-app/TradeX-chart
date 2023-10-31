@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 
 function iOS() {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes("Mac") && "ontouchend" in document);
+  return (
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+  );
 }
 
 const FullScreenWrapper = ({ children, ...props }) => {
