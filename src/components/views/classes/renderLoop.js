@@ -22,7 +22,8 @@ const renderLoop = {
   },
 
   queueFrame: function (range=this.range, graphs=this.graphs, update=false) {
-    if (this.renderQ.size > 1 && this.dropFrames) this.dropFrame()
+    if (this.renderQ.size > 1 && this.dropFrames) 
+      update = this.dropFrame() || update
 
     const frameID = Date.now()
     range = range.snapshot()
@@ -32,10 +33,13 @@ const renderLoop = {
   },
 
   dropFrame: function (frame=-1) {
+    let update = false
     if (frame === -1) frame = this.renderQ.lastKey()
     if (this.renderQ.size > 1 && this.renderQ.has(frame)) {
+      update = frame.update
       this.renderQ.delete(frame)
     }
+    return update
   },
 
   getFrame: function (frame=0) {

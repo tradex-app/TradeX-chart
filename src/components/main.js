@@ -957,12 +957,11 @@ export default class MainPane {
   }
 
   draw(range=this.range, update=false) {
+    this.time.xAxis.doCalcXAxisGrads(range)
     const graphs = [
       this.#Graph,
       this.#Time,
-      this.#Chart
     ]
-    this.time.xAxis.doCalcXAxisGrads(range)
     this.#ChartPanes.forEach((chartPane, key) => {
       graphs.push(chartPane)
     })

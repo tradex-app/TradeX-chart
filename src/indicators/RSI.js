@@ -157,11 +157,16 @@ export default class RSI extends Indicator {
     let c = range.indexStart - d - 2
     let i = range.Length + (o * 2) + 2
 
+    let t = 0
+
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
         // plots.push({x: null, y: null})
       }
       else {
+        if (t > data[c][0]) console.log(c, t, data[c][0])
+        t = data[c][0]
+
         plot.x = this.xAxis.xPos(data[c][0])
         plot.y = this.yAxis.yPos(data[c][1])
         plots.push({...plot})
