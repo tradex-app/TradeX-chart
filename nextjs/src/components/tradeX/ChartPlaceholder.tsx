@@ -2,7 +2,7 @@ import { memo } from "react";
 
 import useChart from "./hooks/useChart";
 import useTheme from "../hooks/useTheme";
-import { CHART_OPTIONS } from './utils';
+import { CHART_OPTIONS } from "./utils";
 import Chart from "./Chart";
 
 interface IProps {
@@ -11,7 +11,6 @@ interface IProps {
   data?: number[][];
 }
 type Status = "loading" | "nodata";
-
 
 const DUMMY_DATA = [
   [1674097200000, 20763.32, 20817.85, 20742.3, 20748.04, 9613.77],
@@ -217,7 +216,6 @@ const DUMMY_DATA = [
 ];
 
 const ChartPlaceholder = memo<IProps>(({ title, status, data }) => {
-  
   const { chartX, setChartX: setChart } = useChart();
   const { isLightTheme } = useTheme();
 
@@ -236,9 +234,8 @@ const ChartPlaceholder = memo<IProps>(({ title, status, data }) => {
       </>
     );
   }
-  
-  const outputData = data || DUMMY_DATA;
 
+  const outputData = data || DUMMY_DATA;
 
   return (
     <>

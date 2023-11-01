@@ -79,7 +79,7 @@ const TokenChart: React.FC<IProps> = (props) => {
     tradeData,
   } = props;
   const [availability, setAvailability] = useState<AvailabilityType | null>(
-    null
+    null,
   );
   const [title, setTitle] = useState(`${symbol}/${availability?.base || ""}`);
   const [firstLoad, setFirstLoad] = useState(true);
@@ -87,7 +87,7 @@ const TokenChart: React.FC<IProps> = (props) => {
   const [endDate, setEndDate] = useState(new Date());
   const [indicators, setIndicators] = useState([]);
   const [selectedInterval, setSelectedInterval] = useState(
-    config?.defaults?.timeframe || "1h"
+    config?.defaults?.timeframe || "1h",
   );
   const [intervals, setIntervals] = useState([]);
   const [showPlaceHolder, setShowPlaceHolder] = useState(false);
@@ -108,7 +108,7 @@ const TokenChart: React.FC<IProps> = (props) => {
   } = useChart();
 
   const [selectedChartType, setSelectedChartType] = useState(
-    mergedConfig?.defaults?.chartType || CHART_OPTIONS[0]
+    mergedConfig?.defaults?.chartType || CHART_OPTIONS[0],
   );
 
   const fetchTimeframes = async () => {
@@ -128,7 +128,7 @@ const TokenChart: React.FC<IProps> = (props) => {
 
     setAvailability(
       availableTimeframes.find((pair) => pair.base === "USDT") ||
-        availableTimeframes[0]
+        availableTimeframes[0],
     );
   };
 
@@ -139,7 +139,7 @@ const TokenChart: React.FC<IProps> = (props) => {
       if (!indicatorId) return;
 
       setIndicators(
-        indicators.filter((element) => element.value !== indicator.value)
+        indicators.filter((element) => element.value !== indicator.value),
       );
 
       handleRemoveIndicator(indicatorId);

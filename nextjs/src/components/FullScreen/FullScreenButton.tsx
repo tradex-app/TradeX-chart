@@ -1,7 +1,7 @@
 import { FullScreenSvgTheme } from "../theme/svg";
 import Button from "../Button";
 import React from "react";
-import { CloseSvg } from '../theme/svg/CloseSvg';
+import { CloseSvg } from "../theme/svg/CloseSvg";
 const FullScreenButton = ({ handle, isIOS }) => {
   if (isIOS) return null;
 
@@ -12,7 +12,8 @@ const FullScreenButton = ({ handle, isIOS }) => {
           variant="neutral"
           size="small"
           type="button"
-          onClick={handle.exit} >
+          onClick={handle.exit}
+        >
           <CloseSvg />
         </Button>
       ) : (
@@ -20,7 +21,8 @@ const FullScreenButton = ({ handle, isIOS }) => {
           variant="inactive"
           size="small"
           type="button"
-          onClick={handle.enter} >
+          onClick={handle.enter}
+        >
           <FullScreenSvgTheme />
         </Button>
       )}

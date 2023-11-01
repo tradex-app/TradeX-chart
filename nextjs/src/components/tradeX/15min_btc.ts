@@ -260,12 +260,12 @@ function onlyPrice(ohlcvData) {
 }
 
 function createOHLCVFromPrice(priceData) {
-    return priceData.map((entry) => {
-      const timestamp = entry[0];
-      const price = entry[1];
-      return [timestamp, price, price, price, price, 0];
-    });
-  }
+  return priceData.map((entry) => {
+    const timestamp = entry[0];
+    const price = entry[1];
+    return [timestamp, price, price, price, price, 0];
+  });
+}
 
 export const sampleOHLC = removeVolume(sampleOHLCV);
 
@@ -275,52 +275,52 @@ export const sampleOHLCVFromPrice = createOHLCVFromPrice(samplePriceData);
 
 export const tradeData = [
   {
-    "name": "Trades",
-    "type": "trades",
-    "settings": {
-        "z-index": 5,
-        "legend": false
+    name: "Trades",
+    type: "trades",
+    settings: {
+      "z-index": 5,
+      legend: false,
     },
     data: {
       1695906000000: [
-          {
-            timestamp: 1695906000000,
-            id: "012336352",
-            side: "buy",
-            price: 27032,
-            amount: 0.25,
-            filled: 0.25,
-            average: 27032,
-            total: 27032,
-            tag: "Bot ABC - BTC/USDT"
-          }
-        ],
-        1695945600000: [
-          {
-            timestamp: 1695945600000,
-            id: "012335353",
-            side: "sell",
-            price: 27032,
-            amount: 0.25,
-            filled: 0.25,
-            average: 27032,
-            total: 27032,
-            tag: "Bot ABC - BTC/USDT"
-          }
-        ],
-        1696327200000: [
-          {
-            timestamp: 1696327200000,
-            id: "012335354",
-            side: "sell",
-            price: 27550.6,
-            amount: 0.25,
-            filled: 0.25,
-            average: 27550.6,
-            total: 27550.6,
-            tag: "Bot ABC - BTC/USDT"
-          }
-        ]
-      }
-  }
+        {
+          timestamp: 1695906000000,
+          id: "012336352",
+          side: "buy",
+          price: 27032,
+          amount: 0.25,
+          filled: 0.25,
+          average: 27032,
+          total: 27032,
+          tag: "Bot ABC - BTC/USDT",
+        },
+      ],
+      1695945600000: [
+        {
+          timestamp: 1695945600000,
+          id: "012335353",
+          side: "sell",
+          price: 27032,
+          amount: 0.25,
+          filled: 0.25,
+          average: 27032,
+          total: 27032,
+          tag: "Bot ABC - BTC/USDT",
+        },
+      ],
+      1696327200000: [
+        {
+          timestamp: 1696327200000,
+          id: "012335354",
+          side: "sell",
+          price: 27550.6,
+          amount: 0.25,
+          filled: 0.25,
+          average: 27550.6,
+          total: 27550.6,
+          tag: "Bot ABC - BTC/USDT",
+        },
+      ],
+    },
+  },
 ];
