@@ -2,6 +2,7 @@ import { IIndicators } from "../utils/types";
 import LINES from "./LINES";
 import DCA from "./DCA";
 import RSI14 from "./RSI14";
+import { ColorsEnum } from "../../theme";
 
 const AVAILABLE_INDICATORS: IIndicators = {
   AROON: {
@@ -43,7 +44,7 @@ const AVAILABLE_INDICATORS: IIndicators = {
     ind: LINES,
     customSettings: {
       inputsBaseProps: {
-        colours: ["#3f8f29", "#de1a24"],
+        colours: [ColorsEnum.Green, ColorsEnum.Red],
         labels: [true, true],
       },
       legendInputs: ["support", "resistance"],
@@ -57,7 +58,7 @@ const AVAILABLE_INDICATORS: IIndicators = {
     ind: DCA,
     customSettings: {
       inputsBaseProps: {
-        colours: ["#3f8f29"],
+        colours: [ColorsEnum.Green],
         labels: [true],
       },
       legendInputs: ["Entry Points"],
@@ -82,7 +83,7 @@ const AVAILABLE_INDICATORS: IIndicators = {
 };
 
 export const SelectedIndicators = (
-  selectedIndicators: string[]
+  selectedIndicators: string[],
 ): IIndicators => {
   const filteredIndicators: IIndicators = {};
 

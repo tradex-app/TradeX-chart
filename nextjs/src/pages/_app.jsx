@@ -1,30 +1,10 @@
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import dynamic from "next/dynamic";
-import { sampleOHLCV, tradeData } from "../components/tradeX/15min_btc";
-import { CHART_OPTIONS } from "../components/tradeX/utils";
+import Link from "next/link";
 import ThemeContextProvider from "../components/theme/ThemeContext";
-import useTheme from "../components/hooks/useTheme";
+import ColorsEnum from "../components/theme/colors";
 
 import "../styles/global.css";
-
-const TokenChart = dynamic(() => import("../components/tradeX/Wrapper"), {
-  ssr: false,
-});
-
-const chartConfig = {
-  toolbar: {
-    timeframe: true,
-    indicators: true,
-    typeSelector: true,
-    fullscreenButton: true,
-  },
-  generalTokenChart: true,
-  defaults: {
-    timeframe: "1h",
-    chartType: CHART_OPTIONS[0],
-  },
-};
 
 export default function Home({ Component }) {
   return (
@@ -35,8 +15,30 @@ export default function Home({ Component }) {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <header className="toolbar">
+    <header className="toolbar">
           <h1 className={styles.title}>Trade-X on Next.js!</h1>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <Link href="/"
+              style={{
+                backgroundColor: ColorsEnum.BrandBlue,
+                color: 'white',
+                padding: '10px 20px',
+                borderRadius: '12px',
+                textDecoration: 'none'
+              }}>
+                Chart
+            </Link>
+            <Link href="/info"
+           style={{
+                backgroundColor: ColorsEnum.BrandBlue,
+                color: 'white',
+                padding: '10px 20px',
+                borderRadius: '12px',
+                textDecoration: 'none'
+              }}>
+                Info
+            </Link>
+            </div>
           <div id="badges">
             <a
               href="https://www.npmjs.com/package/tradex-chart"

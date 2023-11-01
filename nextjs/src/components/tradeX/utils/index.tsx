@@ -30,7 +30,6 @@ export const CHART_OPTIONS: IChartOption[] = [
   },
 ];
 
-
 const TIME = {
   sec: 1000,
   min: 60 * 1000,
@@ -59,7 +58,7 @@ export const getIndicatorsData = (
   indicatorsData,
   data: number[],
   indicator: IIndicatorOption,
-  interval: string
+  interval: string,
 ) => {
   let name = indicatorsData[0].indicator;
   let indType = "RANGE";
@@ -141,7 +140,7 @@ const MONTHS_INTERVAL = [
 export const calculateResolution = (
   start: Date,
   end: Date,
-  resolution: ChartResolutionEnum
+  resolution: ChartResolutionEnum,
 ) => {
   if (start === null || end === null) {
     return resolution;

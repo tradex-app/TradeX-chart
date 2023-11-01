@@ -36,7 +36,7 @@ const useChart = () => {
     const chartIndicators = getIndicators();
 
     return Object.keys(chartIndicators[0]).find((key) =>
-      key.toLowerCase().includes(indicatorType.toLowerCase())
+      key.toLowerCase().includes(indicatorType.toLowerCase()),
     );
   };
 

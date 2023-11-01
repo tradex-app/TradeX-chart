@@ -71,7 +71,7 @@ export default class LINES extends Indicator {
       this.customSettings?.legendInputs.forEach(
         (legendInput: string, index: number) => {
           inputs[legendInput] = this.customValues[index];
-        }
+        },
       );
     } else {
       inputs.x = this.scale.nicePrice(this.overlay.data[c][1]);
@@ -145,7 +145,7 @@ export default class LINES extends Indicator {
     const plots =
       this.customSettings?.legendInputs?.reduce(
         (accumulator, value) => ({ ...accumulator, [value]: [] }),
-        {}
+        {},
       ) || {};
 
     const data = this.overlay.data;
