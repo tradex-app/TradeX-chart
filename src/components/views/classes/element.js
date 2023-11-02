@@ -4,6 +4,7 @@
 import { SHORTNAME } from "../../../definitions/core"
 import { uid } from "../../../utils/utilities"
 import { isFunction, isNumber, isString } from "../../../utils/typeChecks"
+import EventHub from "../../../utils/eventHub"
 
 export default class element extends HTMLElement {
 
@@ -25,12 +26,14 @@ export default class element extends HTMLElement {
     mutation: [],
     intersection: []
   }
+  #hub
 
   constructor (template, mode="open") {
     super()
 
     this.template = template
     this.shadowRoot = this.attachShadow({mode: mode})
+    this.#hub = new EventHub()
   }
 
   destroy() {
@@ -45,6 +48,10 @@ export default class element extends HTMLElement {
       this.shadowRoot.appendChild(this.template.content.cloneNode(true))
       this.style.display = "block"
 
+      this.DOM.width = this.clientWidth
+      this.DOM.height = this.clientHeight
+      this.oldDOM.width = this.clientWidth
+      this.oldDOM.height = this.clientHeight
 //    this.intersectionObserver = new IntersectionObserver(this.onIntersection.bind(this))
 //    this.intersectionObserver.observe(this)
 /*    this.mutationObserver = new MutationObserver(this.onMutation.bind(this))
@@ -67,6 +74,7 @@ export default class element extends HTMLElement {
 //    this.mutationObserver.disconnect()
     this.resizeObserver.disconnect()
 //    this.intersectionObserver.disconnect()
+    this.#hub = undefined
   }
 
   get width() { return this.DOM.width }
@@ -123,42 +131,44 @@ export default class element extends HTMLElement {
     // this.DOM = Object.assign(this.DOM, r[0].contentRect)
     for (let k in r[0].contentRect) {
       const v = r[0].contentRect[k]
-      if (isFunction(v)) continue
-      this.DOM[k] = v
+      if (!isFunction(v))
+        this.DOM[k] = v
     }
-    this.emit("resize")
+    this.emit("resize", this.DOM)
+    // console.log(r)
   }
 
-  on(event, callback) {
-    if (
-      !isFunction(callback) ||
-      !Object.keys(this.subscribers).includes(event)
-    ) 
-    return false
 
-    this.subscribers[event] = callback
+  /** 
+  * Subscribe to a topic
+  * @param {string} topic      - The topic name
+  * @param {function} handler - The function or method that is called
+  * @param {Object}  context   - The context the function(s) belongs to
+  * @returns {boolean}
+  */
+  on(topic, handler, context) {
+    this.#hub.on(topic, handler, context)
   }
 
-  off(event, callback) {
-    if (
-      !isFunction(callback) ||
-      !Object.keys(this.subscribers).includes(event)
-    ) 
-    return false
-
-    const index = this.subscribers[event].indexOf(callback)
-          index.splice(index, 1)
-  }
-
-  emit(event) {
-    if ( !Object.keys(this.subscribers).includes(event) ) 
-      return false
-    for (let s of this.subscribers[event]) {
-      s({
-        curr: this.DOM,
-        old: this.oldDOM
-      })
+  /** 
+  * Unsubscribe from a topic
+  * @param {string} topic - The topic name
+  * @param {function} handler  - function to remove
+  * @param {Object}  context   - The context the function(s) belongs to
+  * @returns {boolean}
+  */
+  off(topic, handler, context) {
+    this.#hub.off(topic, handler, context)
     }
+
+  /**
+  * Publish a topic
+  * @param {string} topic - The topic name
+  * @param {Object}  data - The data to publish
+  * @returns {boolean}
+  */
+  emit(topic, data) {
+    this.#hub.emit(topic, data)
   }
 
 }

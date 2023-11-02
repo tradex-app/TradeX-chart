@@ -42,11 +42,10 @@ export default class Overlay {
     this.#yAxis = yAxis
     this.#params = params
 
-    this.on("setRange", this.drawUpdate, this)
-    this.on("rowsResize", this.drawUpdate, this)
-    this.on("divider_pointerdrag", this.drawUpdate, this)
-    this.on("divider_pointerdragend", this.drawUpdate, this)
-    this.on("pane_refresh", this.drawUpdate, this)
+    // this.on("setRange", this.drawUpdate, this)
+    // this.on("rowsResize", this.drawUpdate, this)
+    // this.on("divider_pointerdrag", this.drawUpdate, this)
+    // this.on("divider_pointerdragend", this.drawUpdate, this)
   }
 
   get core() { return this.#core }
@@ -65,11 +64,10 @@ export default class Overlay {
   set position(p) { this.target.setPosition(p[0], p[1]) }
 
   destroy() {
-    this.off("setRange", this.drawUpdate, this)
-    this.off("rowsResize", this.drawUpdate, this)
-    this.off("divider_pointerdrag", this.drawUpdate, this)
-    this.off("divider_pointerdragend", this.drawUpdate, this)
-    this.off("pane_refresh", this.drawUpdate, this)
+    // this.off("setRange", this.drawUpdate, this)
+    // this.off("rowsResize", this.drawUpdate, this)
+    // this.off("divider_pointerdrag", this.drawUpdate, this)
+    // this.off("divider_pointerdragend", this.drawUpdate, this)
   }
 
   /**
