@@ -557,7 +557,7 @@ export default class MainPane {
 
     this.rowsOldH = this.rowsH
     this.emit("rowsResize", dimensions)
-    this.draw(this.range, true)
+    this.draw(undefined, true)
   }
 
   getBufferPx() { 
@@ -960,7 +960,6 @@ export default class MainPane {
     const graphs = [
       this.#Graph,
       this.#Time,
-      this.#Chart
     ]
     this.time.xAxis.doCalcXAxisGrads(range)
     this.#ChartPanes.forEach((chartPane, key) => {

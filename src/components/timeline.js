@@ -179,8 +179,8 @@ export default class Timeline {
 
       // this.#elNavigation.style.display = "none"
       this.#elNavigation.style.visibility = "hidden"
-      this.#elFwdEnd.style['margin-top'] = `${this.#elViewport.height * -1}px`
-      this.#elRwdStart.style['margin-top'] = `${this.#elViewport.height * -1}px`
+      this.#elFwdEnd.style['margin-top'] = `${this.#elViewport.clientHeight * -1}px`
+      this.#elRwdStart.style['margin-top'] = `${this.#elViewport.clientHeight * -1}px`
       this.#elFwdEnd.style.background = this.core.theme.chart.Background
       this.#elRwdStart.style.background = background
     }

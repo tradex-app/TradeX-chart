@@ -63,6 +63,7 @@ export default class tradeXChart extends element {
   #widthCache
   #heightCache
   #theme
+  #resizeEntries
 
   constructor () {
     const template = document.createElement('template')
@@ -95,8 +96,6 @@ export default class tradeXChart extends element {
       this.elTime = this.elBody.main.time
       this.elTools = this.elBody.tools 
       this.elYAxis = this.elBody.scale
-
-      this.previousDimensions()
 
       // set the width and height
       let height = this.getAttribute('height') || "100%"
@@ -147,22 +146,15 @@ export default class tradeXChart extends element {
     }
   }
   
-  get dimensions() { return this.getBoundingClientRect() }
-  get width() { return this.offsetWidth }
-  set width(w) { this.setWidth(w) } 
-  get height() { return this.offsetHeight }
-  set height(h) { this.setHeight(h) }
-  get oWidth() { return this.#oWidth }
-  get oHeight() { return this.#oHeight }
-  get widthDeltaR() { return this.offsetWidth / this.#oWidth }
-  get heightDeltaR() { return this.offsetHeight / this.#oHeight }
-
   get stream() {  }
   set stream(s) {  }
 
   get body() { return this.#elBody }
   get utils() { return this.#elUtils }
   get widgets() { return this.#elWidgets }
+  get width() { return this.#chartW }
+  get height() { return this.#chartH }
+  get resizeEntries() { return this.#resizeEntries }
 
   elStart(theme) {
     this.#theme = theme
@@ -170,22 +162,20 @@ export default class tradeXChart extends element {
   }
 
   onResized(entries) {
-      this.log(`onResize w: ${this.offsetWidth}, h: ${this.offsetHeight}`)
-      this.emit("global_resize", {w: this.offsetWidth, h: this.offsetHeight}) 
+      const {width, height} = entries[0].contentRect
+      this.#chartW = width
+      this.#chartH = height
+      this.#resizeEntries = entries[0]
+
+      this.log(`onResize w: ${width}, h: ${height}`)
+      this.emit("global_resize", {w: width, h: height}) 
 
       if (this.MainPane instanceof MainPane) {
-        this.previousDimensions()
+        // this.previousDimensions()
       }
       if (this.ToolsBar instanceof ToolsBar) {
         this.ToolsBar.onResized()
       }
-  }
-
-  previousDimensions() {
-    this.#oWidth = (this.#widthCache) ? this.#widthCache : this.offsetWidth
-    this.#oHeight = (this.#heightCache) ? this.#heightCache : this.offsetHeight
-    this.#widthCache = this.offsetWidth
-    this.#heightCache = this.offsetHeight
   }
 
   setWidth(w) {
