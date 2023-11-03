@@ -73,6 +73,13 @@ export default class graph {
     this.#viewport.destroy()
   }
 
+  /**
+   * set dimensions
+   * @param {nunber} w - viewport width
+   * @param {number} h - viewport height
+   * @param {number} lw - layer width, independent width to allow for scroll buffer
+   * @memberof graph
+   */
   setSize(w, h, lw) {
     const oList = this.#overlays.list
 

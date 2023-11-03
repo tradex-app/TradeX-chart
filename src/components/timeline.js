@@ -93,9 +93,9 @@ export default class Timeline {
   get core() { return this.#core }
   get element() { return this.#element }
   get elViewport() { return this.#elViewport }
-  get height() { return this.#element.getBoundingClientRect().height }
+  get height() { return this.#element.height }
   set width(w) { this.setWidth(w) }
-  get width() { return this.#element.getBoundingClientRect().width }
+  get width() { return this.#element.width }
   get xAxis() { return this.#xAxis }
   get xAxisWidth() { return this.#xAxis.width }
   get xAxisRatio() { return this.#xAxis.xAxisRatio }

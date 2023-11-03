@@ -63,12 +63,12 @@ export default class tradeXRows extends element {
   get secondary() { return Array.from( this.chartPaneSlot.assignedElements() ).find( i => i.classList.contains("secondary") ); }
   get chartPanes() { return this.chartPaneSlot.assignedElements() } 
   get chartPaneSlot() { return this.shadowRoot.querySelector('slot[name="chartpane"]') }
-  get width() { return this.clientWidth }
-  get height() { return this.clientHeight }
+  get width() { return this.#widthCache }
+  get height() { return this.#heightCache }
   get oWidth() { return this.#oWidth }
   get oHeight() { return this.#oHeight }
-  get widthDeltaR() { return this.clientWidth / this.#oWidth }
-  get heightDeltaR() { return this.clientHeight / this.#oHeight }
+  get widthDeltaR() { return this.#widthCache / this.#oWidth }
+  get heightDeltaR() { return this.#heightCache / this.#oHeight }
 
   previousDimensions() {
     this.#oWidth = (this.#widthCache) ? this.#widthCache : this.clientWidth

@@ -2,7 +2,7 @@
 // dragable divider to resize chart panes
 
 import DOM from "../../utils/DOM"
-import { isNumber } from "../../utils/typeChecks"
+import { isNumber, isString } from "../../utils/typeChecks"
 import Input from "../../input"
 import { CLASS_DIVIDERS } from "../../definitions/core"
 import { DIVIDERHEIGHT } from "../../definitions/chart"
@@ -21,6 +21,7 @@ export default class Divider {
   #elDivider
 
   #cursorPos
+  #cursorStyle
   #input
 
   static dividerList = {}
@@ -78,8 +79,8 @@ export default class Divider {
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elDivider) }
   get height() { return this.#elDivider.getBoundingClientRect().height }
-  set cursor(c) { this.#elDivider.style.cursor = c }
-  get cursor() { return this.#elDivider.style.cursor }
+  set cursor(c) { this.setCursorStyle(c) }
+  get cursor() { return this.#cursorStyle }
   get type() { return Divider.type }
 
 
@@ -206,6 +207,12 @@ export default class Divider {
 
   setWidth() {
     this.#elDivider.style.width = `${this.#core.MainPane.width}px`
+  }
+
+  setCursorStyle(c) {
+    if (!isString(c)) return
+    this.#cursorStyle = c
+    this.#elDivider.style.cursor = c
   }
 
   hide() {

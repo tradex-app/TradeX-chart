@@ -557,7 +557,7 @@ export default class MainPane {
 
     this.rowsOldH = this.rowsH
     this.emit("rowsResize", dimensions)
-    this.draw(this.range, true)
+    this.draw(undefined, true)
   }
 
   getBufferPx() { 

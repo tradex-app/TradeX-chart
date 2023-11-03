@@ -50,15 +50,12 @@ export default class tradeXChartPane extends element {
   }
 
   connectedCallback() {
-    // element building must be done here
-    // https://stackoverflow.com/a/43837330/15109215
-    if (this.doInit) {
-      this.doInit = false
-      this.style.display = "block"
-      this.shadowRoot.appendChild(this.template.content.cloneNode(true))
+    super.connectedCallback(
+      () => {
       this.#elViewport = this.shadowRoot.querySelector('.viewport')
       this.#elLegend = this.shadowRoot.querySelector('tradex-legends')
     }
+    )
   }
 
   disconnectedCallback() {

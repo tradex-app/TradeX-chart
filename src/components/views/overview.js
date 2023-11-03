@@ -185,6 +185,17 @@ template.innerHTML = `
 export default class tradeXOverview extends element {
 
   #template
+  #scrollBarWidget
+  #rwdStart
+  #fwdEnd
+  #scrollBar
+  #viewport
+  #handle
+  #icons
+  #max
+  #min
+  #sliders
+  #overviewCSS
 
   constructor () {
     super(template)
@@ -196,31 +207,38 @@ export default class tradeXOverview extends element {
   }
 
   connectedCallback() {
-    // element building must be done here
-    // https://stackoverflow.com/a/43837330/15109215
-    if (this.doInit) {
-      this.doInit = false
-      this.shadowRoot.appendChild(this.#template.content.cloneNode(true))
-
-
+    super.connectedCallback(
+      () => {
       const bar = document.getElementById('slider-bar')
+        this.#scrollBarWidget = this.shadowRoot.querySelector('.scrollBarWidget')
+        this.#rwdStart = this.shadowRoot.querySelector('.rwdStart')
+        this.#fwdEnd = this.shadowRoot.querySelector('.fwdEnd')
+        this.#scrollBar = this.shadowRoot.querySelector('.scrollBar')
+        this.#viewport = this.shadowRoot.querySelector('.viewport')
+        this.#handle = this.shadowRoot.querySelector('.handle')
+        this.#icons = this.shadowRoot.querySelectorAll('svg')
+        this.#max = this.shadowRoot.querySelector('#max')
+        this.#min = this.shadowRoot.querySelector('#min')
+        this.#sliders = this.shadowRoot.querySelectorAll('input')
+        this.#overviewCSS = this.shadowRoot.querySelector('style[title=overview]')
       this.max.addEventListener('input', this.onChangeSliderHandler.bind({self: this, input: this.max}))
       this.min.addEventListener('input', this.onChangeSliderHandler.bind({self: this, input: this.min}))
     }
+    )
   }
 
 
-  get scrollBarWidget() { return this.shadowRoot.querySelector('.scrollBarWidget') }
-  get rwdStart() { return this.shadowRoot.querySelector('.rwdStart') }
-  get fwdEnd() { return this.shadowRoot.querySelector('.fwdEnd') }
-  get scrollBar() { return this.shadowRoot.querySelector('.scrollBar') }
-  get viewport() { return this.shadowRoot.querySelector('.viewport') }
-  get handle() { return this.shadowRoot.querySelector('.handle') }
-  get icons() { return this.shadowRoot.querySelectorAll('svg') }
-  get max() { return this.shadowRoot.querySelector('#max') }
-  get min() { return this.shadowRoot.querySelector('#min') }
-  get sliders() { return this.shadowRoot.querySelectorAll('input') }
-  get overviewCSS() { return this.shadowRoot.querySelector('style[title=overview]') }
+  get scrollBarWidget() { return this.#scrollBarWidget }
+  get rwdStart() { return this.#rwdStart }
+  get fwdEnd() { return this.#fwdEnd }
+  get scrollBar() { return this.#scrollBar }
+  get viewport() { return this.#viewport }
+  get handle() { return this.#handle }
+  get icons() { return this.#icons }
+  get max() { return this.#max }
+  get min() { return this.#min }
+  get sliders() { return this.#sliders }
+  get overviewCSS() { return this.#overviewCSS }
 
   onChangeSliderHandler() {
     console.log(`${this.input.value}, ${this.input.getAttribute('max')}`)

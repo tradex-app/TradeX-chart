@@ -191,7 +191,6 @@ export default class tradeXLegends extends element {
       () => {
       this.#slot = this.shadowRoot.querySelector('slot')
       this.#elLegends = this.shadowRoot.querySelector('.legends')
-
       this.#elTitle = this.shadowRoot.querySelector('.title')
       this.#elInputs = this.shadowRoot.querySelector('dl')
       this.#elControls = this.shadowRoot.querySelector('.controls')
@@ -207,7 +206,6 @@ export default class tradeXLegends extends element {
 
   get slot() { return this.#slot }
   get legends() { return this.#elLegends }
-
   get elTitle() { return this.#elTitle }
   get elInputs() { return this.#elInputs }
   get elControls() { return this.#elControls }
@@ -234,7 +232,6 @@ export default class tradeXLegends extends element {
       let styleLegendTitle = "" //"margin-right: 1em; white-space: nowrap;"
       let visibility = (o?.type !== "chart") ? `visible` : `notvisible`
     const styleControls = ""
-
     const controls = (!theme.legend.controls) ? "" :
     `
       <div class="controls restored expanded ${visibility}" style="${styleControls}">

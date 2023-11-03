@@ -1,6 +1,7 @@
 import Chart from './core'
 import canvas from './renderer/canvas'
 import DOM from './utils/DOM'
+import EventHub from './utils/eventHub'
 import StateMachine from './scaleX/stateMachne'
 import Overlay from './components/overlays/overlay'
 import Indicator from './components/overlays/indicator'
@@ -15,6 +16,7 @@ export {
   canvas,
   copyDeep, 
   DOM, 
+  EventHub,
   StateMachine,
   Indicator,
   talibAPI,
