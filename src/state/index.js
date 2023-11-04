@@ -516,7 +516,7 @@ export default class State {
 
       // calculate all indicators if required
       // and update existing data
-      if (calc) this.#core.calcAllIndicators()
+      if (calc) this.#core.calcAllIndicators(calc)
 
       // otherwise merge the new indicator data
       else {
@@ -543,6 +543,9 @@ export default class State {
             }
           }
         }
+
+        // calculate any missing indicator data if required
+        this.#core.calcAllIndicators()
       }
 
       // Do we have datasets?

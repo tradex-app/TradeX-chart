@@ -1106,8 +1106,9 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * calculate all indicators currently in use
+   * @param {boolean} recalc - overwrite all existing data
    */
-  async calcAllIndicators() {
+  async calcAllIndicators(recalc) {
     const indicators = []
     const executeInd = (i) => {
       return new Promise(resolve => setTimeout(() => {
@@ -1116,7 +1117,7 @@ export default class TradeXchart extends Tradex_chart {
     }
     for (const [key, value] of Object.entries(this.Indicators)) {
       for (const [k, ind] of Object.entries(value)) {
-        indicators.push(ind.instance.calcIndicatorHistory.bind(ind.instance))
+        indicators.push(ind.instance.calcIndicatorHistory.bind(ind.instance, recalc))
       }
     }
     // (async () => {

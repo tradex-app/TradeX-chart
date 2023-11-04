@@ -611,6 +611,7 @@ export default class Chart {
         i?.type in this.core.indicatorClasses &&
         primaryPane === indType
       ) {
+      i.paneID = this.id
       const config = {
         class: indClass,
         params: {overlay: i}
