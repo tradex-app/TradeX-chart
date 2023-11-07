@@ -56,6 +56,41 @@ export function validateDeep(data, isCrypto=false) {
 }
 
 /**
+ * Fill any gaps in a price history array
+ *
+ * @export
+ * @param {Array} data - array of candles [timestamp, open, high, low, close, volume]
+ * @param {number} timeFrameMS - time frame increment in milliseconds
+ * @return {Array} - array of candles [timestamp, open, high, low, close, volume] 
+ */
+export function fillGaps(data, timeFrameMS) {
+  if (!isArray(data) ||
+      data.length == 1) return false
+
+  let a, b, c, e,
+      r = [],
+      i = 0,
+      l = (data[data.length - 1][0] - data[i][0]) / timeFrameMS;
+  while (i < l) {
+    a = data[i][0]
+    b = data[i+1][0]
+    c = b - a
+    if ( c == timeFrameMS ) {
+      r.push(data[i])
+    }
+    else if ( c > timeFrameMS) {
+      e = [a + timeFrameMS, null, null, null, null, null]
+      r.push(e)
+      data.splice(i + 1, 0, e)
+    }
+    i++
+  }
+  // r.push(data[i])
+  // return r
+  return data
+}
+
+/**
  * Validate Candle
  *
  * @export

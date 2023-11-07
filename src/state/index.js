@@ -4,7 +4,7 @@
 import * as packageJSON from '../../package.json'
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
 import Dataset from '../model/dataset'
-import { validateDeep, validateShallow, sanitizeCandles } from '../model/validateData'
+import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
 import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual } from '../utils/utilities'
 import { calcTimeIndex, detectInterval } from '../model/range'
 import { ms2Interval, SECOND_MS } from '../utils/time'
@@ -491,27 +491,20 @@ export default class State {
       if (data.length == 0) {
         this.allData.data.push(...mData)
       }
-      // chart has data, check for overlap
+      // chart has data, check for gaps and overlap and then merge
       else {
-        newRange = (newRange) ? newRange :
-        {
-          start: this.range.timeMin,
-          end: this.range.timeMax
-        }
-        this.data.chart.data = this.merge(data, mData)
-      }
+        // are there gaps in the merge data?
+        let tfMS = this.time.timeFrameMS
+        let mStart = mData[0][0]
+        let mEnd = mData[mData.length - 1][0]
+        let mDataMS = (mData.length - 1) * tfMS
 
-      if (newRange) {
-        if (isObject(newRange)) {
-          start = (isNumber(newRange.start)) ? this.range.getTimeIndex(newRange.start) : this.range.indexStart
-          end = (isNumber(newRange.end)) ? this.range.getTimeIndex(newRange.end) : this.range.indexEnd
-        }
-        else {
-          if (mData[0][0] )
-          start = this.range.indexStart + inc
-          end = this.range.indexEnd + inc
-        }
-        this.#core.setRange(start, end)
+        // fill the gaps
+        if (mEnd > mStart + mDataMS)
+          mData = fillGaps(mData, tfMS)
+
+        // merge the new data
+        this.data.chart.data = this.merge(data, mData)
       }
 
       // calculate all indicators if required
@@ -569,6 +562,20 @@ export default class State {
         for (let d in trades) {
           
         }
+      }
+
+      // set new Range if required
+      if (newRange) {
+        if (isObject(newRange)) {
+          start = (isNumber(newRange.start)) ? this.range.getTimeIndex(newRange.start) : this.range.indexStart
+          end = (isNumber(newRange.end)) ? this.range.getTimeIndex(newRange.end) : this.range.indexEnd
+        }
+        else {
+          if (mData[0][0] )
+          start = this.range.indexStart + inc
+          end = this.range.indexEnd + inc
+        }
+        this.#core.setRange(start, end)
       }
 
       let r, u = false;
@@ -633,6 +640,7 @@ export default class State {
       for(gap; gap > 0; gap--) {
         let arr = Array(newer[0].length).fill(null)
             arr[0] = fill
+            fill =+ this.range.interval
         merged.push(arr)
         merged = merged.concat(newer)
       }

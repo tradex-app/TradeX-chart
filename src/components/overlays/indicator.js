@@ -48,6 +48,7 @@ export default class Indicator extends Overlay {
   #style = {}
   #legendID
   #status
+  #drawOnUpdate = false
 
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
 
@@ -94,6 +95,7 @@ export default class Indicator extends Overlay {
   set position(p) { this.target.setPosition(p[0], p[1]) }
   get isIndicator() { return true }
   get status() { return this.#status }
+  get drawOnUpdate() { return this.#drawOnUpdate }
 
   /**
    * process candle value
@@ -464,25 +466,27 @@ export default class Indicator extends Overlay {
             return
         }
         else if (data[0][0] < od[0][0]) {
-          let s = new Set([...d, ...o])
-          this.overlay.data = Array.from(s)
+          // let s = new Set([...d, ...o])
+          // this.overlay.data = Array.from(s)
           a = data
           p = od
         }
         else if (data[data.length-1][0] > od[od.length-1][0]) {
-          let s = new Set([...o, ...d])
-          this.overlay.data = Array.from(s)
+          // let s = new Set([...o, ...d])
+          // this.overlay.data = Array.from(s)
           a = od
           p = data
         }
-        // for (let v of p) {
-        //   r[v[0]] = v
-        // }
-        // for (let v of a) {
-        //   r[v[0]] = v
-        // }
-        // this.overlay.data = Object.values(r)
-        // // console.log(this.range)
+        
+        for (let v of a) {
+          r[v[0]] = v
+        }
+        for (let v of p) {
+          r[v[0]] = v
+        }
+        this.overlay.data = Object.values(r)
+
+        this.#drawOnUpdate = true
       }
     }
     if (this.core.TALibReady) calc()
@@ -591,6 +595,14 @@ export default class Indicator extends Overlay {
   }
 
   draw() {
+  }
 
+  mustUpdate() {
+    return (this.#drawOnUpdate) ? this.#drawOnUpdate : super.mustUpdate()
+  }
+
+  updated() {
+    this.#drawOnUpdate = false
+    super.updated()
   }
 }

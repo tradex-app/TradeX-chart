@@ -1,6 +1,6 @@
 import { isArray, isBoolean, isMap, isNumber, isObject, isString } from './typeChecks'
 
-var _hasOwnProperty = Object.prototype.hasOwnProperty;
+let _hasOwnProperty = Object.prototype.hasOwnProperty;
 
 // https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_get
 export function _get (obj, path, defaultValue = undefined) {
@@ -18,16 +18,16 @@ export function _set(obj, path, value) {
     if (path.length === 0) {
         return undefined;
     }
-    var res = obj;
-    var last = path[path.length - 1];
+    let res = obj;
+    let last = path[path.length - 1];
     if (path.length === 1) {
         if (isObject(res)) {
             return res[last] = value;
         }
         return undefined;
     }
-    for (var i = 0; i < path.length - 1; i++) {
-        var key = path[i];
+    for (let i = 0; i < path.length - 1; i++) {
+        let key = path[i];
         if (!_hasOwnProperty.call(res, key) || !isObject(res[key])) {
             res[key] = {};
         }
@@ -116,7 +116,7 @@ export function objToString(obj, ndeep) {
     case "string": return '"'+obj+'"';
     case "function": return obj.toString();
     case "object":
-      var indent = Array(ndeep||1).join('\t'), isArray = Array.isArray(obj);
+      let indent = Array(ndeep||1).join('\t'), isArray = Array.isArray(obj);
       return '{['[+isArray] + Object.keys(obj).map(function(key){
            return '\n\t' + indent + key + ': ' + objToString(obj[key], (ndeep||1)+1);
          }).join(',') + '\n' + indent + '}]'[+isArray];
@@ -132,7 +132,7 @@ export function objToString(obj, ndeep) {
  */
 export function objRecurse (obj, propExec) {
   if (!isObject(obj)) return
-  for (var k in obj) {
+  for (let k in obj) {
     if (typeof obj[k] === 'object' && obj[k] !== null) {
       objRecurs(obj[k], propExec)
     } else if (obj.hasOwnProperty(k)) {
@@ -148,7 +148,7 @@ export const findInObjectById = (obj, id, updateFn) => {
   }
   else {
     // iterate over the properties
-    for (var propertyName in obj) {
+    for (let propertyName in obj) {
       // any object that is not a simple value
       if (obj[propertyName] !== null && typeof obj[propertyName] === 'object') {
         // recurse into the object and write back the result to the object graph
@@ -314,7 +314,7 @@ export function nearestArrayValue(x, array) {
  * @param {number} toIndex
  */
 export function arrayMove(arr, fromIndex, toIndex) {
-  var element = arr[fromIndex];
+  let element = arr[fromIndex];
   arr.splice(fromIndex, 1);
   arr.splice(toIndex, 0, element);
 }
@@ -400,23 +400,23 @@ export function b64toBlob(b64Data, contentType, sliceSize) {
   contentType = contentType || '';
   sliceSize = sliceSize || 512;
 
-  var byteCharacters = atob(b64Data);
-  var byteArrays = [];
+  let byteCharacters = atob(b64Data);
+  let byteArrays = [];
 
-  for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-    var slice = byteCharacters.slice(offset, offset + sliceSize);
+  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    let slice = byteCharacters.slice(offset, offset + sliceSize);
 
-    var byteNumbers = new Array(slice.length);
-    for (var i = 0; i < slice.length; i++) {
+    let byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
       byteNumbers[i] = slice.charCodeAt(i);
     }
 
-    var byteArray = new Uint8Array(byteNumbers);
+    let byteArray = new Uint8Array(byteNumbers);
 
     byteArrays.push(byteArray);
   }
     
-  var blob = new Blob(byteArrays, {type: contentType});
+  let blob = new Blob(byteArrays, {type: contentType});
   return blob;
 }
 
@@ -596,72 +596,82 @@ export class xMap extends Map {
  * debouncing, executes the function if there was no new event in $wait milliseconds
  * If `immediate` is passed, trigger the function on the leading edge, 
  * instead of the trailing.
- * @param {function} fn
- * @param {number} wait
- * @param {*} scope
- * @param {boolean} immediate
+ * @param {function} fn - The function to be called after a certain amount of time has passed without any further calls to the debounced function.
+ * @param {number} wait - The amount of time, in milliseconds, that must pass before calling the original function again.
+ * @param {*} scope - The context in which the original function will be called.
+ * @param {boolean} immediate - whether the original function should be called immediately (if set to `true`) or after the wait period has passed (if set to `false`).
  * @returns {Function}
  */
 //  export function debounce(fn, wait=100, scope, immediate=false) {
-//   var timeout;
-//   var core = async function() {
-//     var context = scope || this
-//     var args = arguments;
-//     var later = function() {
+//   let timeout;
+//   return async function() {
+//     let context = scope || this
+//     let args = arguments;
+//     let later = function() {
 //       timeout = null;
 //       if (!immediate) fn.apply(context, args);
 //     };
-//     var callNow = immediate && !timeout;
 //     clearTimeout(timeout);
-
 //     await new Promise(resolve => {
 //       timeout = setTimeout( resolve(later()), wait );
 //     })
-//     if (callNow) fn.apply(context, args);
+//     if (immediate && !timeout) fn.apply(context, args);
 //   };
-//   return core
+// };
+
+// export function debounce(fn, wait=100, scope, immediate=false) {
+//   let timeout;
+//   return function() {
+//     let context = scope || this
+//     let args = arguments;
+//     let later = function() {
+//         timeout = null;
+//         if (!immediate) fn.apply(context, args);
+//     };
+//     clearTimeout(timeout);
+//     timeout = setTimeout(later, wait);
+//     if (immediate && !timeout) fn.apply(context, args);
+//   };
 // };
 
 export function debounce(fn, wait=100, scope, immediate=false) {
-  var timeout;
-  var core = function() {
-    var context = scope || this
-    var args = arguments;
-    var later = function() {
+  let timeout;
+  return function() {
+    let context = scope || this
+    let args = arguments;
+    let later = function() {
         timeout = null;
         if (!immediate) fn.apply(context, args);
     };
-    var callNow = immediate && !timeout;
+    let callNow = immediate && !timeout;
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
     if (callNow) fn.apply(context, args);
   };
-  return core
 };
 
 /**
  * Throttle: the original function will be called 
  * at most once per specified period.
  * in case of a "storm of events", this executes once every $threshold
- * @param {function} fn
- * @param {number} threshhold
- * @param {*} scope
+ * @param {function} fn - The function to be called after a certain amount of time has passed without any further calls to the debounced function.
+ * @param {number} threshold - The amount of time, in milliseconds, that must pass before the original function is called.
+ * @param {*} scope - The context in which the original function will be called.
  * @returns {Function}
  */
-export function throttle(fn, threshhold=250, scope) {
-  var last, deferTimer;
-  var core = function () {
-    var context = scope || this;
-
-    var now = +new Date(),
-      args = arguments;
-    if (last && now < last + threshhold) {
+export function throttle(fn, threshold=250, scope) {
+  let last, deferTimer;
+  let core = function () {
+  let context = scope || this;
+    let now = new Date(),
+        args = arguments;
+    if (last && now < last + threshold) {
       // hold on to it
       clearTimeout(deferTimer);
       deferTimer = setTimeout(function () {
         last = now;
         fn.apply(context, args);
-      }, threshhold);
+      }, threshold);
     } else {
       last = now;
       fn.apply(context, args);
@@ -739,9 +749,9 @@ export function ab2str(buf) {
  * @return {ArrayBuffer}  
  */
 export function str2ab(str) {
-  var buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
-  var bufView = new Uint16Array(buf);
-  for (var i=0, strLen=str.length; i<strLen; i++) {
+  let buf = new ArrayBuffer(str.length*2); // 2 bytes for each char
+  let bufView = new Uint16Array(buf);
+  for (let i=0, strLen=str.length; i<strLen; i++) {
     bufView[i] = str.charCodeAt(i);
   }
   return buf;

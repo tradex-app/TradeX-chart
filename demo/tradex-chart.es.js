@@ -1,45 +1,45 @@
-function ia(o, e) {
+function ia(r, e) {
   for (var i = 0; i < e.length; i++) {
     const s = e[i];
     if (typeof s != "string" && !Array.isArray(s)) {
       for (const n in s)
-        if (n !== "default" && !(n in o)) {
-          const r = Object.getOwnPropertyDescriptor(s, n);
-          r && Object.defineProperty(o, n, r.get ? r : {
+        if (n !== "default" && !(n in r)) {
+          const o = Object.getOwnPropertyDescriptor(s, n);
+          o && Object.defineProperty(r, n, o.get ? o : {
             enumerable: !0,
             get: () => s[n]
           });
         }
     }
   }
-  return Object.freeze(Object.defineProperty(o, Symbol.toStringTag, { value: "Module" }));
+  return Object.freeze(Object.defineProperty(r, Symbol.toStringTag, { value: "Module" }));
 }
-const bs = "0.139.18";
-function M(o) {
-  return Array.isArray(o);
+const bs = "0.139.19";
+function M(r) {
+  return Array.isArray(r);
 }
-function B(o) {
-  return o && typeof o == "function";
+function U(r) {
+  return r && typeof r == "function";
 }
-function b(o) {
-  return typeof o == "object" && !Array.isArray(o) && o !== null;
+function b(r) {
+  return typeof r == "object" && !Array.isArray(r) && r !== null;
 }
-function T(o) {
-  return typeof o == "number" && !isNaN(o);
+function T(r) {
+  return typeof r == "number" && !isNaN(r);
 }
-function K(o) {
-  return typeof o == "boolean";
+function K(r) {
+  return typeof r == "boolean";
 }
-function S(o) {
-  return typeof o == "string";
+function E(r) {
+  return typeof r == "string";
 }
-function hm(o) {
-  return !!o && (b(o) || B(o)) && B(o.then);
+function cm(r) {
+  return !!r && (b(r) || U(r)) && U(r.then);
 }
 const sa = ["y", "M", "d", "h", "m", "s", "ms"], na = ["years", "months", "days", "hours", "minutes", "seconds", "milliseconds"], ra = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334], oa = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335], or = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], aa = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], ar = 1231006505e3, Ye = 1, z = 1e3, F = z * 60, j = F * 60, $ = j * 24, pt = $ * 7, he = $ * 30;
-function lr(o = 3, e = !1) {
-  let i = or[o % 12] * $;
-  return e && o > 0 && (i += $), i;
+function lr(r = 3, e = !1) {
+  let i = or[r % 12] * $;
+  return e && r > 0 && (i += $), i;
 }
 const ve = $ * 365, $t = {
   y: ve,
@@ -100,20 +100,20 @@ const ve = $ * 365, $t = {
   MILLISECOND50: [Ye * 50, "milliseconds"],
   MILLISECOND: [Ye, "milliseconds"]
 }, ha = () => {
-  const o = Object.values(Yt), e = [];
-  for (let i = o.length; --i; i > 0)
-    e[i] = o[i][0];
+  const r = Object.values(Yt), e = [];
+  for (let i = r.length; --i; i > 0)
+    e[i] = r[i][0];
   return e;
 }, Dt = ha(), ca = () => {
-  const o = Object.values(Yt), e = [];
-  for (let i = o.length; --i; i > 0)
-    e[i] = o[i][1];
+  const r = Object.values(Yt), e = [];
+  for (let i = r.length; --i; i > 0)
+    e[i] = r[i][1];
   return e;
 }, os = ca(), ua = Object.keys(Yt), da = () => {
-  const o = {};
+  const r = {};
   for (const [e, i] of Object.entries(Yt))
-    o[e] = i[0];
-  return o;
+    r[e] = i[0];
+  return r;
 }, ma = da(), as = {
   0: "Europe/London",
   "-120": "Europe/Tallinn",
@@ -144,245 +144,245 @@ const ve = $ * 365, $t = {
   600: "Pacific/Honolulu"
 };
 function pa() {
-  const o = (/* @__PURE__ */ new Date()).getTimezoneOffset();
-  return Object.prototype.hasOwnProperty.call(as, o) ? as[o.toString()] : "Etc/UTC";
+  const r = (/* @__PURE__ */ new Date()).getTimezoneOffset();
+  return Object.prototype.hasOwnProperty.call(as, r) ? as[r.toString()] : "Etc/UTC";
 }
 function ga() {
-  const o = {};
+  const r = {};
   for (let e in $t) {
     let i = 0;
-    o[e] = [];
+    r[e] = [];
     do
-      o[e].push(Math.round($t[e] * i)), i += 0.125;
+      r[e].push(Math.round($t[e] * i)), i += 0.125;
     while (i < 1);
   }
-  return o;
+  return r;
 }
-function cr(o) {
-  const e = new Date(o).getTime();
+function cr(r) {
+  const e = new Date(r).getTime();
   return T(e);
 }
-function ur(o, e = ar, i = Date.now()) {
-  return cr(o) ? o > e && o < i : !1;
+function ur(r, e = ar, i = Date.now()) {
+  return cr(r) ? r > e && r < i : !1;
 }
-function Nt(o, e, i) {
-  o = new Date(o), e = new Date(e);
-  var s = e.getTime(), n = o.getTime();
+function Nt(r, e, i) {
+  r = new Date(r), e = new Date(e);
+  var s = e.getTime(), n = r.getTime();
   return parseInt((s - n) / i);
 }
 const Ge = {
-  inSeconds: function(o, e) {
-    return Nt(o, e, z);
+  inSeconds: function(r, e) {
+    return Nt(r, e, z);
   },
-  inMinutes: function(o, e) {
-    return Nt(o, e, F);
+  inMinutes: function(r, e) {
+    return Nt(r, e, F);
   },
-  inHours: function(o, e) {
-    return Nt(o, e, j);
+  inHours: function(r, e) {
+    return Nt(r, e, j);
   },
-  inDays: function(o, e) {
-    return Nt(o, e, $);
+  inDays: function(r, e) {
+    return Nt(r, e, $);
   },
-  inWeeks: function(o, e) {
-    return Nt(o, e, pt);
+  inWeeks: function(r, e) {
+    return Nt(r, e, pt);
   },
-  inMonths: function(o, e) {
-    o = new Date(o), e = new Date(e);
-    let i = o.getUTCFullYear(), s = e.getUTCFullYear(), n = o.getUTCMonth();
+  inMonths: function(r, e) {
+    r = new Date(r), e = new Date(e);
+    let i = r.getUTCFullYear(), s = e.getUTCFullYear(), n = r.getUTCMonth();
     return e.getUTCMonth() + 12 * s - (n + 12 * i);
   },
-  inYears: function(o, e) {
-    let i = new Date(o);
+  inYears: function(r, e) {
+    let i = new Date(r);
     return new Date(e).getUTCFullYear() - i.getUTCFullYear();
   }
 };
-function fa(o, e) {
-  let i = Ge.inYears(o, e), s = Ge.inMonths(o, e), n = Ge.inWeeks(o, e), r = Ge.inDays(o, e), a = Ge.inHours(o, e), h = Ge.inMinutes(o, e), l = Ge.inSeconds(o, e), m = new Date(e).getTime() - new Date(o).getTime();
+function fa(r, e) {
+  let i = Ge.inYears(r, e), s = Ge.inMonths(r, e), n = Ge.inWeeks(r, e), o = Ge.inDays(r, e), a = Ge.inHours(r, e), l = Ge.inMinutes(r, e), h = Ge.inSeconds(r, e), m = new Date(e).getTime() - new Date(r).getTime();
   return {
     y: i,
     M: s,
     w: n,
-    d: r,
+    d: o,
     h: a,
-    m: h,
-    s: l,
+    m: l,
+    s: h,
     ms: m,
     years: i,
     months: s,
     weeks: n,
-    days: r,
+    days: o,
     hours: a,
-    minutes: h,
-    seconds: l,
+    minutes: l,
+    seconds: h,
     milliseconds: m
   };
 }
-function di(o) {
+function di(r) {
   let e = z;
-  return S(o) ? (e = dr(o), e ? o = o : (e = z, o = "1s")) : o = "1s", { tf: o, ms: e };
+  return E(r) ? (e = dr(r), e ? r = r : (e = z, r = "1s")) : r = "1s", { tf: r, ms: e };
 }
-function dr(o) {
-  if (!S(o))
+function dr(r) {
+  if (!E(r))
     return !1;
   const e = /([0-9]{1,2})([s|m|h|d|w|M|y])/gm;
   let i;
-  return (i = e.exec(o)) !== null ? $t[i[2]] * i[1] : !1;
+  return (i = e.exec(r)) !== null ? $t[i[2]] * i[1] : !1;
 }
-function Cs(o) {
-  let e = Math.floor(o / 1e3), i = Math.floor(e / 60);
+function Cs(r) {
+  let e = Math.floor(r / 1e3), i = Math.floor(e / 60);
   e = e % 60;
   let s = Math.floor(i / 60);
   i = i % 60;
   let n = Math.floor(s / 24);
   s = s % 24;
-  let r = Math.floor(n / 7);
+  let o = Math.floor(n / 7);
   n = n % 7;
-  let a = Math.floor(r / 4), h = Math.floor(r / 52), l = r % 4;
+  let a = Math.floor(o / 4), l = Math.floor(o / 52), h = o % 4;
   return a = a % 13, {
-    y: h,
+    y: l,
     M: a,
-    w: l,
+    w: h,
     d: n,
     h: s,
     m: i,
     s: e,
-    years: h,
+    years: l,
     months: a,
-    weeks: l,
+    weeks: h,
     days: n,
     hours: s,
     minutes: i,
     seconds: e
   };
 }
-function kt(o) {
-  const e = Cs(o);
+function kt(r) {
+  const e = Cs(r);
   for (const i in e)
     if (e[i])
       return `${e[i]}${i}`;
 }
-function mr(o) {
-  return o ? new Date(o).getUTCSeconds() : null;
+function mr(r) {
+  return r ? new Date(r).getUTCSeconds() : null;
 }
-function Ts(o) {
-  return new Date(o).setUTCMilliseconds(0, 0);
+function Ts(r) {
+  return new Date(r).setUTCMilliseconds(0, 0);
 }
-function pr(o) {
-  return o ? new Date(o).getUTCMinutes() : null;
+function pr(r) {
+  return r ? new Date(r).getUTCMinutes() : null;
 }
-function Ss(o) {
-  return new Date(o).setUTCSeconds(0, 0);
+function Es(r) {
+  return new Date(r).setUTCSeconds(0, 0);
 }
-function gr(o) {
-  return o ? new Date(o).getUTCHours() : null;
+function gr(r) {
+  return r ? new Date(r).getUTCHours() : null;
 }
-function Es(o) {
-  return new Date(o).setUTCMinutes(0, 0, 0);
+function Ss(r) {
+  return new Date(r).setUTCMinutes(0, 0, 0);
 }
-function Ps(o) {
-  return o ? new Date(o).getUTCDate() : null;
+function Ps(r) {
+  return r ? new Date(r).getUTCDate() : null;
 }
-function ya(o, e = "en-GB", i = "short") {
-  return new Date(o).toLocaleDateString(e, { weekday: i });
+function ya(r, e = "en-GB", i = "short") {
+  return new Date(r).toLocaleDateString(e, { weekday: i });
 }
-function Bt(o) {
-  return new Date(o).setUTCHours(0, 0, 0, 0);
+function Ut(r) {
+  return new Date(r).setUTCHours(0, 0, 0, 0);
 }
-function Ms(o) {
-  if (o)
-    return new Date(o).getUTCMonth();
+function Ms(r) {
+  if (r)
+    return new Date(r).getUTCMonth();
 }
-function fr(o, e = "en-GB", i = "short") {
-  return new Date(o).toLocaleDateString(e, { month: i });
+function fr(r, e = "en-GB", i = "short") {
+  return new Date(r).toLocaleDateString(e, { month: i });
 }
-function As(o) {
-  let e = new Date(o);
+function As(r) {
+  let e = new Date(r);
   return Date.UTC(
     e.getUTCFullYear(),
     e.getUTCMonth(),
     1
   );
 }
-function yr(o) {
-  let e = (Ms(o) + 1) % 12;
-  return o += lr(e, Di(o)), o;
+function yr(r) {
+  let e = (Ms(r) + 1) % 12;
+  return r += lr(e, Di(r)), r;
 }
-function vr(o) {
-  if (o)
-    return new Date(o).getUTCFullYear();
+function vr(r) {
+  if (r)
+    return new Date(r).getUTCFullYear();
 }
-function Ls(o) {
-  return Date.UTC(new Date(o).getUTCFullYear());
+function Ls(r) {
+  return Date.UTC(new Date(r).getUTCFullYear());
 }
-function wr(o) {
-  return o = o + ve + $, Di(o), o;
+function wr(r) {
+  return r = r + ve + $, Di(r), r;
 }
-function Di(o) {
-  let i = new Date(o).getUTCFullYear();
+function Di(r) {
+  let i = new Date(r).getUTCFullYear();
   return i & 3 ? !1 : i % 100 != 0 || i % 400 == 0;
 }
-function va(o) {
-  let e = new Date(o), i = e.getUTCMonth(), s = e.getUTCDate(), n = dayCount[i] + s;
+function va(r) {
+  let e = new Date(r), i = e.getUTCMonth(), s = e.getUTCDate(), n = dayCount[i] + s;
   return i > 1 && Di() && n++, n;
 }
-function mi(o, e) {
+function mi(r, e) {
   return {
     years: (s) => Ls(s),
     months: (s) => As(s),
-    weeks: (s) => Bt(s),
-    days: (s) => Bt(s),
-    hours: (s) => Es(s),
-    minutes: (s) => Ss(s),
+    weeks: (s) => Ut(s),
+    days: (s) => Ut(s),
+    hours: (s) => Ss(s),
+    minutes: (s) => Es(s),
     seconds: (s) => Ts(s)
-  }[e](o);
+  }[e](r);
 }
-function wa(o, e) {
+function wa(r, e) {
   let i, s;
   switch (e) {
     case "years":
-      i = Ls(o), s = wr(o);
+      i = Ls(r), s = wr(r);
       break;
     case "months":
-      i = As(o), s = yr(o);
+      i = As(r), s = yr(r);
       break;
     case "weeks":
-      i = Bt(o), s = i + $;
+      i = Ut(r), s = i + $;
       break;
     case "days":
-      i = Bt(o), s = i + $;
+      i = Ut(r), s = i + $;
       break;
     case "hours":
-      i = Es(o), s = i + j;
+      i = Ss(r), s = i + j;
       break;
     case "minutes":
-      i = Ss(o), s = i + F;
+      i = Es(r), s = i + F;
       break;
     case "seconds":
-      i = Ts(o), s = i + z;
+      i = Ts(r), s = i + z;
   }
   return { start: i, end: s };
 }
-function ls(o) {
-  let { h: e, m: i } = Ns(o);
+function ls(r) {
+  let { h: e, m: i } = Ns(r);
   return e == 0 && i == 0 ? `${d}` : `${e}:${i}`;
 }
-function xa(o) {
-  let { h: e, m: i, s } = Ns(o);
+function xa(r) {
+  let { h: e, m: i, s } = Ns(r);
   return e == 0 && i == 0 && s == 0 ? `${d}` : `${e}:${i}:${s}`;
 }
-function hs(o) {
-  let { h: e, m: i, s } = Ns(o);
+function hs(r) {
+  let { h: e, m: i, s } = Ns(r);
   return e == 0 && i == 0 && s == 0 ? `${d}` : `${i}:${s}`;
 }
-function Ns(o) {
+function Ns(r) {
   let e, i, s, n;
-  return e = String(Ps(o)), i = String(gr(o)).padStart(2, "0"), s = String(pr(o)).padStart(2, "0"), n = String(mr(o)).padStart(2, "0"), { d: e, h: i, m: s, s: n };
+  return e = String(Ps(r)), i = String(gr(r)).padStart(2, "0"), s = String(pr(r)).padStart(2, "0"), n = String(mr(r)).padStart(2, "0"), { d: e, h: i, m: s, s: n };
 }
-function ba(o, e) {
+function ba(r, e) {
   let i = 1 / 0, s = null, n = -1;
-  for (let r = 0; r < e.length; r++) {
-    let a = e[r][0];
-    Math.abs(a - o) < i && (i = Math.abs(a - o), s = e[r], n = r);
+  for (let o = 0; o < e.length; o++) {
+    let a = e[o][0];
+    Math.abs(a - r) < i && (i = Math.abs(a - r), s = e[o], n = o);
   }
   return [n, s];
 }
@@ -416,7 +416,7 @@ const Ca = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   dayCntInc: ra,
   dayCntLeapInc: oa,
   dayOfYear: va,
-  day_start: Bt,
+  day_start: Ut,
   getTimezone: pa,
   get_day: Ps,
   get_dayName: ya,
@@ -426,13 +426,13 @@ const Ca = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   get_monthName: fr,
   get_second: mr,
   get_year: vr,
-  hour_start: Es,
+  hour_start: Ss,
   interval2MS: dr,
   isLeapYear: Di,
   isTimeFrame: di,
   isValidTimeInRange: ur,
   isValidTimestamp: cr,
-  minute_start: Ss,
+  minute_start: Es,
   monthDayCnt: or,
   month_start: As,
   ms2Interval: kt,
@@ -448,122 +448,122 @@ const Ca = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   unitRange: wa,
   year_start: Ls
 }, Symbol.toStringTag, { value: "Module" }));
-function Ta(o, e) {
-  return o = Math.ceil(o) + 1, e = Math.floor(e), Math.floor(Math.random() * (e - o) + o);
+function Ta(r, e) {
+  return r = Math.ceil(r) + 1, e = Math.floor(e), Math.floor(Math.random() * (e - r) + r);
 }
-function Sa(o) {
+function Ea(r) {
   const e = {};
-  return e.value = o, e.sign = !!o, e.integers = xr(o), e.decimals = br(o), e.total = e.integers + e.decimals, e;
+  return e.value = r, e.sign = !!r, e.integers = xr(r), e.decimals = br(r), e.total = e.integers + e.decimals, e;
 }
-function xr(o) {
-  return (Math.log10((o ^ o >> 31) - (o >> 31)) | 0) + 1;
+function xr(r) {
+  return (Math.log10((r ^ r >> 31) - (r >> 31)) | 0) + 1;
 }
-function Ea(o) {
-  return o | 0;
+function Sa(r) {
+  return r | 0;
 }
-function un(o, e) {
+function un(r, e) {
   e = e || 100;
   const i = Math.pow(10, e);
-  return Math.round((o + Number.EPSILON) * i) / i;
+  return Math.round((r + Number.EPSILON) * i) / i;
 }
-function we(o, e = 0) {
-  var i = o * Math.pow(10, e), s = Math.round(i), n = (i > 0 ? i : -i) % 1 === 0.5 ? s % 2 === 0 ? s : s - 1 : s;
+function we(r, e = 0) {
+  var i = r * Math.pow(10, e), s = Math.round(i), n = (i > 0 ? i : -i) % 1 === 0.5 ? s % 2 === 0 ? s : s - 1 : s;
   return n / Math.pow(10, e);
 }
-function br(o) {
-  if (typeof o != "number" && (o = parseFloat(o)), isNaN(o) || !isFinite(o))
+function br(r) {
+  if (typeof r != "number" && (r = parseFloat(r)), isNaN(r) || !isFinite(r))
     return 0;
-  for (var e = 1, i = 0; Math.round(o * e) / e !== o && (e *= 10, e !== 1 / 0); )
+  for (var e = 1, i = 0; Math.round(r * e) / e !== r && (e *= 10, e !== 1 / 0); )
     i++;
   return i;
 }
-function Pa(o) {
-  return Math.log(o) / Math.log(10);
+function Pa(r) {
+  return Math.log(r) / Math.log(10);
 }
-function Ma(o, e) {
-  return Math.pow(o, e);
+function Ma(r, e) {
+  return Math.pow(r, e);
 }
-function _(o, e, i) {
-  return Math.min(i, Math.max(e, o));
+function _(r, e, i) {
+  return Math.min(i, Math.max(e, r));
 }
-function Ut(o, e) {
-  return !b(o) || !b(e) ? e : (Object.keys(e).forEach((i) => {
-    const s = o[i], n = e[i];
-    Array.isArray(s) && Array.isArray(n) ? o[i] = Ut(s.concat([]), n) : b(s) && b(n) ? o[i] = Ut(Object.assign({}, s), n) : o[i] = n;
-  }), o);
+function Bt(r, e) {
+  return !b(r) || !b(e) ? e : (Object.keys(e).forEach((i) => {
+    const s = r[i], n = e[i];
+    Array.isArray(s) && Array.isArray(n) ? r[i] = Bt(s.concat([]), n) : b(s) && b(n) ? r[i] = Bt(Object.assign({}, s), n) : r[i] = n;
+  }), r);
 }
-function ce(o) {
+function ce(r) {
   try {
     if (window.structuredClone)
-      return structuredClone(o);
+      return structuredClone(r);
   } catch {
-    if (o === null || typeof o != "object" || "isActiveClone" in o)
-      return o;
+    if (r === null || typeof r != "object" || "isActiveClone" in r)
+      return r;
     let i;
-    o instanceof Date ? i = new o.constructor() : i = Array.isArray(o) ? [] : {};
-    for (let s in o)
-      Object.prototype.hasOwnProperty.call(o, s) && (o.isActiveClone = null, i[s] = ce(o[s]), delete o.isActiveClone);
+    r instanceof Date ? i = new r.constructor() : i = Array.isArray(r) ? [] : {};
+    for (let s in r)
+      Object.prototype.hasOwnProperty.call(r, s) && (r.isActiveClone = null, i[s] = ce(r[s]), delete r.isActiveClone);
     return i;
   }
 }
-function Cr(o, e, i) {
+function Cr(r, e, i) {
   const [s, ...n] = e.split(".");
   return {
-    ...o,
-    [s]: n.length ? Cr(o[s], n.join("."), i) : i
+    ...r,
+    [s]: n.length ? Cr(r[s], n.join("."), i) : i
   };
 }
-function dn(o, e) {
-  return e.split(".").reduce((s, n) => s && s[n] !== "undefined" ? s[n] : void 0, o);
+function dn(r, e) {
+  return e.split(".").reduce((s, n) => s && s[n] !== "undefined" ? s[n] : void 0, r);
 }
-function bi(o, e) {
-  if (!M(o) || !M(e) || o.length !== e.length)
+function bi(r, e) {
+  if (!M(r) || !M(e) || r.length !== e.length)
     return !1;
-  let i = o.length;
+  let i = r.length;
   for (; i--; ) {
-    if (M(o[i]) || M(e[i])) {
-      if (!bi(o[i], e[i]))
+    if (M(r[i]) || M(e[i])) {
+      if (!bi(r[i], e[i]))
         return !1;
       continue;
     }
-    if (b(o[i]) || b(o[i])) {
-      if (!b(o[i], e[i]))
+    if (b(r[i]) || b(r[i])) {
+      if (!b(r[i], e[i]))
         return !1;
       continue;
     }
-    if (o[i] !== e[i])
+    if (r[i] !== e[i])
       return !1;
   }
   return !0;
 }
-function Aa(o, e, i) {
-  var s = o[e];
-  o.splice(e, 1), o.splice(i, 0, s);
+function Aa(r, e, i) {
+  let s = r[e];
+  r.splice(e, 1), r.splice(i, 0, s);
 }
-function La(o, e, i) {
+function La(r, e, i) {
   [myArray[e], myArray[i]] = [myArray[i], myArray[e]];
 }
-function Tr(o, e) {
-  return M(e) ? M(o) ? o.every((i) => e.includes(i)) : e.includes(o) : !1;
+function Tr(r, e) {
+  return M(e) ? M(r) ? r.every((i) => e.includes(i)) : e.includes(r) : !1;
 }
-function Sr(o, e) {
-  if (!b(o) || !b(e))
+function Er(r, e) {
+  if (!b(r) || !b(e))
     return !1;
-  const i = Object.keys(o).sort(), s = Object.keys(e).sort();
-  return i.length !== s.length ? !1 : i.every((r, a) => {
-    const h = o[r], l = e[s[a]];
-    return M(h) || M(l) ? bi(h, l) : b(h) || b(l) ? Sr(h, l) : h === l;
+  const i = Object.keys(r).sort(), s = Object.keys(e).sort();
+  return i.length !== s.length ? !1 : i.every((o, a) => {
+    const l = r[o], h = e[s[a]];
+    return M(l) || M(h) ? bi(l, h) : b(l) || b(h) ? Er(l, h) : l === h;
   });
 }
-function Z(o = "ID") {
-  T(o) ? o = o.toString() : S(o) || (o = "ID"), o = He(o);
+function Z(r = "ID") {
+  T(r) ? r = r.toString() : E(r) || (r = "ID"), r = $e(r);
   const e = Date.now().toString(36), i = Math.random().toString(36).substring(2, 5);
-  return `${o}_${e}_${i}`;
+  return `${r}_${e}_${i}`;
 }
-function He(o) {
-  return String(o).replace(/ |,|;|:|\.|#/g, "_");
+function $e(r) {
+  return String(r).replace(/ |,|;|:|\.|#/g, "_");
 }
-const Na = (o) => o.entries().next().value, Ia = (o) => o.entries().next().value[0], Da = (o) => o.entries().next().value[1], Oa = (o) => [...o].pop(), Ra = (o) => [...o.keys()].pop(), ka = (o) => [...o.values()].pop();
+const Na = (r) => r.entries().next().value, Ia = (r) => r.entries().next().value[0], Da = (r) => r.entries().next().value[1], Oa = (r) => [...r].pop(), Ra = (r) => [...r.keys()].pop(), ka = (r) => [...r.values()].pop();
 class be extends Map {
   constructor(e) {
     super(e);
@@ -647,32 +647,32 @@ class be extends Map {
     return La(s, e, i), this.populate(s), !0;
   }
   swapKeys(e, i) {
-    const s = [...this], n = s.findIndex(([a]) => a === e), r = s.findIndex(([a]) => a === i);
-    return [s[n], s[r]] = [s[r], s[n]], this.clear(), s.forEach(([a, h]) => this.set(a, h)), !0;
+    const s = [...this], n = s.findIndex(([a]) => a === e), o = s.findIndex(([a]) => a === i);
+    return [s[n], s[o]] = [s[o], s[n]], this.clear(), s.forEach(([a, l]) => this.set(a, l)), !0;
   }
 }
-function Re(o, e = 100, i, s = !1) {
-  var n, r = function() {
-    var a = i || this, h = arguments, l = function() {
-      n = null, s || o.apply(a, h);
-    }, m = s && !n;
-    clearTimeout(n), n = setTimeout(l, e), m && o.apply(a, h);
+function ke(r, e = 100, i, s = !1) {
+  let n;
+  return function() {
+    let o = i || this, a = arguments, l = function() {
+      n = null, s || r.apply(o, a);
+    }, h = s && !n;
+    clearTimeout(n), n = setTimeout(l, e), h && r.apply(o, a);
   };
-  return r;
 }
-function _a(o, e = 250, i) {
-  var s, n, r = function() {
-    var h = i || this, l = +/* @__PURE__ */ new Date(), m = arguments;
-    s && l < s + e ? (clearTimeout(n), n = setTimeout(function() {
-      s = l, o.apply(h, m);
-    }, e)) : (s = l, o.apply(h, m));
+function _a(r, e = 250, i) {
+  let s, n, o = function() {
+    let l = i || this, h = /* @__PURE__ */ new Date(), m = arguments;
+    s && h < s + e ? (clearTimeout(n), n = setTimeout(function() {
+      s = h, r.apply(l, m);
+    }, e)) : (s = h, r.apply(l, m));
   };
   function a() {
     timeout && (clearTimeout(n), timeout = void 0);
   }
-  return r.reset = function() {
+  return o.reset = function() {
     a(), s = 0;
-  }, r;
+  }, o;
 }
 class Ha {
   #e;
@@ -680,39 +680,47 @@ class Ha {
   #n;
   #r = [];
   constructor(e, i) {
-    this.#e = e, this.#t = S(i.id) ? i.id : Z, this.#n = S(i.type) ? i.type : "default", this.#r = M(i.data) ? i.data : [];
+    this.#e = e, this.#t = E(i.id) ? i.id : Z, this.#n = E(i.type) ? i.type : "default", this.#r = M(i.data) ? i.data : [];
   }
 }
-function $a(o, e = !1) {
-  if (!M(o))
+function $a(r, e = !1) {
+  if (!M(r))
     return !1;
-  let i = Ta(0, o.length);
-  if (!pi(o[0], e) || !pi(o[i], e) || !pi(o[o.length - 1], e))
+  let i = Ta(0, r.length);
+  if (!pi(r[0], e) || !pi(r[i], e) || !pi(r[r.length - 1], e))
     return !1;
-  let s = o[0][0], n = o[1][0], r = o[2][0];
-  return !(s > n && n > r);
+  let s = r[0][0], n = r[1][0], o = r[2][0];
+  return !(s > n && n > o);
 }
-function Ba(o, e = !1) {
-  if (!M(o))
+function Ua(r, e = !1) {
+  if (!M(r))
     return !1;
   let i = 0, s = 0;
-  for (; i < o.length; ) {
-    if (!pi(o[i], e) || o[i][0] < s)
+  for (; i < r.length; ) {
+    if (!pi(r[i], e) || r[i][0] < s)
       return !1;
-    s = o[i][0], i++;
+    s = r[i][0], i++;
   }
   return !0;
 }
-function pi(o, e = !1) {
-  return !(!M(o) || o.length !== 6 || e && !ur(o[0]) || !T(o[1]) || !T(o[2]) || !T(o[3]) || !T(o[4]) || !T(o[5]));
+function Ba(r, e) {
+  if (!M(r) || r.length == 1)
+    return !1;
+  let i, s, n, o, a = [], l = 0, h = (r[r.length - 1][0] - r[l][0]) / e;
+  for (; l < h; )
+    i = r[l][0], s = r[l + 1][0], n = s - i, n == e ? a.push(r[l]) : n > e && (o = [i + e, null, null, null, null, null], a.push(o), r.splice(l + 1, 0, o)), l++;
+  return r;
 }
-function Ua(o) {
-  for (let e of o)
+function pi(r, e = !1) {
+  return !(!M(r) || r.length !== 6 || e && !ur(r[0]) || !T(r[1]) || !T(r[2]) || !T(r[3]) || !T(r[4]) || !T(r[5]));
+}
+function Va(r) {
+  for (let e of r)
     for (let i = 0; i < 6; i++)
       e.length = 6, e[i] *= 1;
-  return o;
+  return r;
 }
-const Va = F, za = "1m", Ci = Va, Wa = 6, mn = 0.05, Fa = 100, pn = 100, Ke = ["default", "percent", "log"], gn = 0.3, fn = 30, oi = 200, yn = 200, vn = 20, wn = 4096, Oi = 5, xn = 50, bn = 30, Ga = 8, cs = 30;
+const za = F, Wa = "1m", Ci = za, Fa = 6, mn = 0.05, Ga = 100, pn = 100, Ke = ["default", "percent", "log"], gn = 0.3, fn = 30, oi = 200, yn = 200, vn = 20, wn = 4096, Oi = 5, xn = 50, bn = 30, Ya = 8, cs = 30;
 class fe {
   static t = 0;
   static o = 1;
@@ -754,8 +762,8 @@ class us {
     this.#i = !0, this.setConfig(s), this.#n = s.core, e = T(e) ? e : 0, i = T(i) ? i : this.data.length - 1, `${this.maxMinPriceVol.toString()}`;
     const n = s?.interval || Ci;
     if (this.data.length == 0) {
-      let r = Date.now();
-      e = 0, i = this.rangeLimit, this.#e = n, this.#t = kt(this.interval), this.anchor = r - r % n;
+      let o = Date.now();
+      e = 0, i = this.rangeLimit, this.#e = n, this.#t = kt(this.interval), this.anchor = o - o % n;
     } else
       this.data.length < 2 ? (this.#e = n, this.#t = kt(this.interval)) : (this.#e = ds(this.data), this.#t = kt(this.interval));
     i == 0 && this.data.length >= this.rangeLimit ? i = this.rangeLimit : i == 0 && (i = this.data.length), this.set(e, i);
@@ -808,13 +816,13 @@ class us {
     if (!T(e) || !T(i) || !T(s))
       return !1;
     e = e | 0, i = i | 0, s = s | 0, s = _(s, this.minCandles, this.maxCandles), e > i && ([e, i] = [i, e]), i = _(i, e + this.minCandles, e + s);
-    let r = i - e;
-    e = _(e, this.limitPast * -1, this.dataLength + this.limitFuture - this.minCandles - 1), i = _(i, e + this.minCandles, this.dataLength + this.limitFuture - 1), e = i - e < r ? e - (r - (i - e)) : e;
-    const a = e, h = i, l = this.indexStart, m = this.indexEnd;
+    let o = i - e;
+    e = _(e, this.limitPast * -1, this.dataLength + this.limitFuture - this.minCandles - 1), i = _(i, e + this.minCandles, this.dataLength + this.limitFuture - 1), e = i - e < o ? e - (o - (i - e)) : e;
+    const a = e, l = i, h = this.indexStart, m = this.indexEnd;
     let g = this.Length;
     this.indexStart = e, this.indexEnd = i, g -= this.Length;
     let v = this.maxMinPriceVol({ data: this.data, start: this.indexStart, end: this.indexEnd, that: this });
-    return this.setMaxMin(v), this.setConfig(n), this.#n.emit("setRange", [a, h, l, m]), !0;
+    return this.setMaxMin(v), this.setConfig(n), this.#n.emit("setRange", [a, l, h, m]), !0;
   }
   setConfig(e) {
     if (!b(e))
@@ -837,12 +845,12 @@ class us {
     if (n !== void 0)
       return n;
     {
-      const r = s.length - 1;
-      return n = [null, null, null, null, null, null], s.length < 1 ? (n[0] = Date.now() + this.interval * e, n) : e < 0 ? (n[0] = s[0][0] + this.interval * e, n) : e > r ? (n[0] = s[r][0] + this.interval * (e - r), n) : null;
+      const o = s.length - 1;
+      return n = [null, null, null, null, null, null], s.length < 1 ? (n[0] = Date.now() + this.interval * e, n) : e < 0 ? (n[0] = s[0][0] + this.interval * e, n) : e > o ? (n[0] = s[o][0] + this.interval * (e - o), n) : null;
     }
   }
   valueByTS(e, i = "") {
-    if (!T(e) || !S(i))
+    if (!T(e) || !E(i))
       return !1;
     const s = this.getTimeIndex(e);
     switch (i) {
@@ -864,7 +872,7 @@ class us {
     }
   }
   getDataById(e) {
-    if (!S(e))
+    if (!E(e))
       return !1;
     const i = e.split("_");
     switch (i[1]) {
@@ -910,7 +918,7 @@ class us {
     return this.getTimeIndex(e) - this.indexStart;
   }
   maxMinPriceVol(e) {
-    let { data: i, start: s, end: n, that: r } = { ...e }, a = we(this.#n.bufferPx / this.#n.candleW);
+    let { data: i, start: s, end: n, that: o } = { ...e }, a = we(this.#n.bufferPx / this.#n.candleW);
     if (a = T(a) ? a : 0, s = T(s) ? s - a : 0, s = s > 0 ? s : 0, n = typeof n == "number" ? n : i?.length - 1, i.length == 0)
       return {
         valueLo: 0,
@@ -924,26 +932,26 @@ class us {
         volumeMinIdx: 0,
         volumeMaxIdx: 0
       };
-    let h = i.length - 1, l = ue(s, 0, h), m = ue(n, 0, h), g = i[l][3], v = i[l][2], E = i[l][5], A = i[l][5], L = l, O = l, oe = l, U = l;
-    for (; l++ < m; )
-      i[l][3] < g && (g = i[l][3], L = l), i[l][2] > v && (v = i[l][2], O = l), i[l][5] < E && (E = i[l][5], oe = l), i[l][5] > A && (A = i[l][5], U = l);
-    let R = v - g, ze = g, ae = v;
-    return g -= R * r.yAxisBounds, g = g > 0 ? g : 0, v += R * r.yAxisBounds, R = v - g, {
-      valueLo: ze,
-      valueHi: ae,
+    let l = i.length - 1, h = ue(s, 0, l), m = ue(n, 0, l), g = i[h][3], v = i[h][2], S = i[h][5], A = i[h][5], L = h, O = h, ae = h, B = h;
+    for (; h++ < m; )
+      i[h][3] < g && (g = i[h][3], L = h), i[h][2] > v && (v = i[h][2], O = h), i[h][5] < S && (S = i[h][5], ae = h), i[h][5] > A && (A = i[h][5], B = h);
+    let R = v - g, Ne = g, J = v;
+    return g -= R * o.yAxisBounds, g = g > 0 ? g : 0, v += R * o.yAxisBounds, R = v - g, {
+      valueLo: Ne,
+      valueHi: J,
       valueMin: g,
       valueMax: v,
       valueDiff: v - g,
-      volumeMin: E,
+      volumeMin: S,
       volumeMax: A,
-      volumeDiff: A - E,
+      volumeDiff: A - S,
       valueMinIdx: L,
       valueMaxIdx: O,
-      volumeMinIdx: oe,
-      volumeMaxIdx: U
+      volumeMinIdx: ae,
+      volumeMaxIdx: B
     };
-    function ue(J, te, de) {
-      return Math.min(de, Math.max(te, J));
+    function ue(Q, ie, de) {
+      return Math.min(de, Math.max(ie, Q));
     }
   }
   snapshot(e, i) {
@@ -964,22 +972,22 @@ class us {
     };
   }
 }
-function ds(o) {
-  let e = Math.min(o.length - 1, 99), i = 1 / 0;
-  return o.slice(0, e).forEach((s, n) => {
-    let r = o[n + 1][0] - s[0];
-    r === r && r < i && (i = r);
+function ds(r) {
+  let e = Math.min(r.length - 1, 99), i = 1 / 0;
+  return r.slice(0, e).forEach((s, n) => {
+    let o = r[n + 1][0] - s[0];
+    o === o && o < i && (i = o);
   }), i;
 }
-function ps(o, e) {
+function ps(r, e) {
   if (!T(e))
     return !1;
-  let i, s = o.timeFrameMS;
-  return e = e - e % s, e === o.range.data[0][0] ? i = 0 : e < o.range.data[0][0] ? i = (o.range.data[0][0] - e) / s * -1 : i = (e - o.range.data[0][0]) / s, i;
+  let i, s = r.timeFrameMS;
+  return e = e - e % s, e === r.range.data[0][0] ? i = 0 : e < r.range.data[0][0] ? i = (r.range.data[0][0] - e) / s * -1 : i = (e - r.range.data[0][0]) / s, i;
 }
-const It = "TradeX-Chart", _t = "TX", Ya = "tradeXutils", Cn = "tradeXmenus", qa = "tradeXmenu", Tn = "tradeXdividers", Sn = "tradeXwindows", Xa = "tradeXwindow", En = "tradeXprogress", Ka = 500, ja = "stream_None", Ht = "stream_Listening", Pn = "stream_Started", Za = "stream_Stopped", Ja = "stream_Error", Vt = "stream_candleFirst", ke = "stream_candleUpdate", zt = "stream_candleNew", Qa = 250, el = 8, tl = 2, il = 2, Ti = 1e3, sl = "defaultState", nl = {
+const It = "TradeX-Chart", _t = "TX", qa = "tradeXutils", Cn = "tradeXmenus", Xa = "tradeXmenu", Tn = "tradeXdividers", En = "tradeXwindows", Ka = "tradeXwindow", Sn = "tradeXprogress", ja = 500, Za = "stream_None", Ht = "stream_Listening", Pn = "stream_Started", Ja = "stream_Stopped", Qa = "stream_Error", Vt = "stream_candleFirst", _e = "stream_candleUpdate", zt = "stream_candleNew", el = 250, tl = 8, il = 2, sl = 2, Ti = 1e3, nl = "defaultState", rl = {
   version: bs,
-  id: sl,
+  id: nl,
   key: "",
   status: "default",
   isEmpty: !0,
@@ -990,7 +998,7 @@ const It = "TradeX-Chart", _t = "TX", Ya = "tradeXutils", Cn = "tradeXmenus", qa
     indexed: !1,
     data: [],
     settings: {},
-    tf: za,
+    tf: Wa,
     tfms: Ci
   },
   ohlcv: [],
@@ -1026,43 +1034,43 @@ class k {
   static #e = new be();
   static #t = {};
   static get default() {
-    return ce(nl);
+    return ce(rl);
   }
   static get list() {
     return k.#e;
   }
   static create(e, i = !1, s = !1) {
-    const n = new k(e, i, s), r = n.key;
-    return k.#e.set(r, n), n;
+    const n = new k(e, i, s), o = n.key;
+    return k.#e.set(o, n), n;
   }
   static validate(e, i = !1, s = !1) {
     const n = this.default;
-    if (b(e) || (e = {}), b(e.chart) || (e.chart = n.chart, e.chart.isEmpty = !0, e.chart.data = M(e.ohlcv) ? e.ohlcv : [], delete e.ohlcv), e = Ut(n, e), i ? e.chart.data = Ba(e.chart.data, s) ? e.chart.data : [] : e.chart.data = $a(e.chart.data, s) ? e.chart.data : [], e.chart.isEmpty = e.chart.data.length == 0, !T(e.chart?.tf) || i) {
-      let l = ds(e.chart.data);
-      l < z && (l = Ci), e.chart.tfms = l;
+    if (b(e) || (e = {}), b(e.chart) || (e.chart = n.chart, e.chart.isEmpty = !0, e.chart.data = M(e.ohlcv) ? e.ohlcv : [], delete e.ohlcv), e = Bt(n, e), i ? e.chart.data = Ua(e.chart.data, s) ? e.chart.data : [] : e.chart.data = $a(e.chart.data, s) ? e.chart.data : [], e.chart.isEmpty = e.chart.data.length == 0, !T(e.chart?.tf) || i) {
+      let h = ds(e.chart.data);
+      h < z && (h = Ci), e.chart.tfms = h;
     }
-    if ((!S(e.chart?.tfms) || i) && (e.chart.tf = kt(e.chart.tfms)), M(e.views) || (e.views = n.views), M(e.primary) || (e.primary = n.primary), M(e.secondary) || (e.secondary = n.secondary), b(e.chart.settings) || (e.chart.settings = n.chart.settings), M(e.datasets) || (e.datasets = []), e.views.length == 0) {
+    if ((!E(e.chart?.tfms) || i) && (e.chart.tf = kt(e.chart.tfms)), M(e.views) || (e.views = n.views), M(e.primary) || (e.primary = n.primary), M(e.secondary) || (e.secondary = n.secondary), b(e.chart.settings) || (e.chart.settings = n.chart.settings), M(e.datasets) || (e.datasets = []), e.views.length == 0) {
       e.views.push(["primary", e.primary]);
-      for (let l in e)
-        l.indexOf("secondary") == 0 && e.views.push([l, e[l]]);
+      for (let h in e)
+        h.indexOf("secondary") == 0 && e.views.push([h, e[h]]);
     }
-    let r = e.views, a = r.length;
+    let o = e.views, a = o.length;
     for (; a--; )
-      if (!M(r[a]) || r[a].length == 0)
-        r.splice(a, 1);
+      if (!M(o[a]) || o[a].length == 0)
+        o.splice(a, 1);
       else {
-        let l = e.views[a][1], m = l.length;
+        let h = e.views[a][1], m = h.length;
         for (; m--; )
-          !b(l[m]) || !S(l[m].name) || !S(l[m].type) ? l.splice(m, 1) : b(l[m].settings) || (l[m].settings = {});
-        r[a].length == 0 && r.splice(a, 1);
+          !b(h[m]) || !E(h[m].name) || !E(h[m].type) ? h.splice(m, 1) : b(h[m].settings) || (h[m].settings = {});
+        o[a].length == 0 && o.splice(a, 1);
       }
     e.views.length == 0 && (e.views[0] = ["primary", n.primary]), e.views = new be(e.views), e.views.has("primary") || e.views.insert("primary", n.primary, 0), e.views.get("primary").push(e.chart);
-    for (var h of e.datasets)
-      this.#t || (this.#t = {}), this.dss[h.id] = new Ha(this, h);
+    for (var l of e.datasets)
+      this.#t || (this.#t = {}), this.dss[l.id] = new Ha(this, l);
     return e;
   }
   static delete(e) {
-    if (!S(e) || !k.has(e))
+    if (!E(e) || !k.has(e))
       return !1;
     k.#e.delete(e);
   }
@@ -1076,15 +1084,15 @@ class k {
     if (!k.has(e))
       return !1;
     b(i) || (i = {});
-    const s = k.get(e), n = i?.type, r = ce(s.data), a = r.chart.data;
-    let h;
-    switch (a.length > 0 && a[a.length - 1].length > 6 && (a.length = a.length - 1), r.views.get("primary").pop(), r.views = Array.from(r.views), r.version = bs, n) {
+    const s = k.get(e), n = i?.type, o = ce(s.data), a = o.chart.data;
+    let l;
+    switch (a.length > 0 && a[a.length - 1].length > 6 && (a.length = a.length - 1), o.views.get("primary").pop(), o.views = Array.from(o.views), o.version = bs, n) {
       case "json":
       default:
-        const { replacer: l, space: m } = { ...i };
-        h = JSON.stringify(r, l, m);
+        const { replacer: h, space: m } = { ...i };
+        l = JSON.stringify(o, h, m);
     }
-    return h;
+    return l;
   }
   #n = "";
   #r = "";
@@ -1135,7 +1143,7 @@ class k {
     return k.create(e, i, s);
   }
   delete(e) {
-    if (!S(e))
+    if (!E(e))
       return !1;
     if (e !== this.key)
       k.delete(e);
@@ -1168,8 +1176,8 @@ class k {
       core: i
     };
     if (i.getRange(null, null, n), this.range.Length > 1) {
-      const r = ps(i.time, void 0), a = r ? r + this.range.initialCnt : s.data.length - 1, h = r || a - this.range.initialCnt;
-      this.range.initialCnt = a - h, i.setRange(h, a);
+      const o = ps(i.time, void 0), a = o ? o + this.range.initialCnt : s.data.length - 1, l = o || a - this.range.initialCnt;
+      this.range.initialCnt = a - l, i.setRange(l, a);
     }
     i.MainPane.restart(), i.refresh();
   }
@@ -1183,73 +1191,77 @@ class k {
     if (n > 1 && this.time.timeFrameMS !== ds(e?.ohlcv))
       return this.error(`ERROR: ${this.core.id}: merge data time frame does not match existing time frame!`), !1;
     (this.#o || !T(this.time.timeFrameMS)) && (!b(i) || !T(i.start) || !T(i.end)) && n > 1 && (i = { start: n - this.range.initialCnt, end: n }), b(i) ? (T(i?.startTS) ? i.start = i.startTS : i.start = T(i.start) ? this.range.value(i.start)[0] : this.range.timeMin, T(i?.endTS) ? i.end = i.endTS : i.end = T(i.end) ? this.range.value(i.end)[0] : this.range.timeMax) : (i = {}, i.start = this.range.timeMin, i.end = this.range.timeMax);
-    let r, a, h = e?.ohlcv || !1;
-    const l = this.allData.data, m = this.allData?.primaryPane, g = e?.primary || !1;
+    let o, a, l = e?.ohlcv || !1;
+    const h = this.allData.data, m = this.allData?.primaryPane, g = e?.primary || !1;
     this.allData?.secondaryPane;
     const v = e?.secondary || !1;
     this.allData?.dataset?.data;
-    const E = e?.dataset?.data || !1;
+    const S = e?.dataset?.data || !1;
     this.allData?.trades, e?.trades, this.allData?.events, e?.events;
-    const A = M(h) && this.range.inRange(h[0][0]) ? 1 : 0, L = {};
-    if (M(h) && h.length > 0) {
-      if (r = h.length - 1, l.length - 1, L.mData = this.range.inRange(h[0][0]) && this.range.inRange(h[0][r]), !K(h[r][7]) && h[r].length !== 8 && h[r][6] !== null && h[r][7] !== !0 ? h = Ua(h) : i.end >= this.range.timeFinish && i.start <= this.range.timeFinish && (i.start += this.range.interval, i.end += this.range.interval), l.length == 0 ? this.allData.data.push(...h) : (i = i || {
-        start: this.range.timeMin,
-        end: this.range.timeMax
-      }, this.data.chart.data = this.merge(l, h)), i && (b(i) ? (a = T(i.start) ? this.range.getTimeIndex(i.start) : this.range.indexStart, n = T(i.end) ? this.range.getTimeIndex(i.end) : this.range.indexEnd) : (h[0][0] && (a = this.range.indexStart + A), n = this.range.indexEnd + A), this.#s.setRange(a, n)), s)
+    const A = M(l) && this.range.inRange(l[0][0]) ? 1 : 0, L = {};
+    if (M(l) && l.length > 0) {
+      if (o = l.length - 1, h.length - 1, L.mData = this.range.inRange(l[0][0]) && this.range.inRange(l[0][o]), !K(l[o][7]) && l[o].length !== 8 && l[o][6] !== null && l[o][7] !== !0 ? l = Va(l) : i.end >= this.range.timeFinish && i.start <= this.range.timeFinish && (i.start += this.range.interval, i.end += this.range.interval), h.length == 0)
+        this.allData.data.push(...l);
+      else {
+        let B = this.time.timeFrameMS, R = l[0][0], Ne = l[l.length - 1][0], J = (l.length - 1) * B;
+        Ne > R + J && (l = Ba(l, B)), this.data.chart.data = this.merge(h, l);
+      }
+      if (s)
         this.#s.calcAllIndicators(s);
       else {
         if (M(g) && g.length > 0) {
-          for (let U of g)
-            if (M(U?.data) && U?.data.length > 0)
+          for (let B of g)
+            if (M(B?.data) && B?.data.length > 0)
               for (let R of m)
-                R.name === U.name && R.type === U.type && Sr(R.settings, U.settings) && (R.data = this.merge(R.data, U.data));
+                R.name === B.name && R.type === B.type && Er(R.settings, B.settings) && (R.data = this.merge(R.data, B.data));
         }
         if (M(v) && v.length > 0)
-          for (let U of v)
-            M(U?.data) && U?.data.length > 0;
+          for (let B of v)
+            M(B?.data) && B?.data.length > 0;
         this.#s.calcAllIndicators();
       }
-      if (M(E) && E.length > 0)
-        for (let U of E)
-          M(U?.data) && U?.data.length > 0;
-      let O, oe = !1;
+      if (M(S) && S.length > 0)
+        for (let B of S)
+          M(B?.data) && B?.data.length > 0;
+      i && (b(i) ? (a = T(i.start) ? this.range.getTimeIndex(i.start) : this.range.indexStart, n = T(i.end) ? this.range.getTimeIndex(i.end) : this.range.indexEnd) : (l[0][0] && (a = this.range.indexStart + A), n = this.range.indexEnd + A), this.#s.setRange(a, n));
+      let O, ae = !1;
       for (O in L)
-        oe = oe || O;
-      return e.ohlcv.length > 1 && this.#s.emit("state_mergeComplete"), oe && this.#s.refresh(), this.#o = !1, !0;
+        ae = ae || O;
+      return e.ohlcv.length > 1 && this.#s.emit("state_mergeComplete"), ae && this.#s.refresh(), this.#o = !1, !0;
     }
   }
   merge(e, i) {
-    let s = [], n, r;
-    if (e[0][0] < i[0][0] ? (n = e, r = i) : (n = i, r = e), r.length == 1 && r[0][0] == n[n.length - 1][0])
-      n[n.length - 1] = r[0], s = n;
-    else if (r.length == 1 && r[0][0] == n[n.length - 1][0] + this.range.interval)
-      s = n.concat(r);
-    else if (n[n.length - 1][0] >= r[0][0]) {
+    let s = [], n, o;
+    if (e[0][0] < i[0][0] ? (n = e, o = i) : (n = i, o = e), o.length == 1 && o[0][0] == n[n.length - 1][0])
+      n[n.length - 1] = o[0], s = n;
+    else if (o.length == 1 && o[0][0] == n[n.length - 1][0] + this.range.interval)
+      s = n.concat(o);
+    else if (n[n.length - 1][0] >= o[0][0]) {
       let a = 0;
-      for (; n[a][0] < r[0][0]; )
+      for (; n[a][0] < o[0][0]; )
         s.push(n[a]), a++;
-      s = s.concat(r);
-      let h = a + r.length;
-      h < n.length && (s = s.concat(n.slice(h)));
-    } else if (r[0][0] - n[n.length - 1][0] > this.range.interval) {
+      s = s.concat(o);
+      let l = a + o.length;
+      l < n.length && (s = s.concat(n.slice(l)));
+    } else if (o[0][0] - n[n.length - 1][0] > this.range.interval) {
       s = n;
-      let a = n[n.length - 1][0], h = Math.floor((r[0][0] - a) / this.range.interval);
-      for (h; h > 0; h--) {
-        let l = Array(r[0].length).fill(null);
-        l[0] = a, s.push(l), s = s.concat(r);
+      let a = n[n.length - 1][0], l = Math.floor((o[0][0] - a) / this.range.interval);
+      for (l; l > 0; l--) {
+        let h = Array(o[0].length).fill(null);
+        h[0] = a, a = +this.range.interval, s.push(h), s = s.concat(o);
       }
     } else
-      s = n.concat(r);
+      s = n.concat(o);
     return s;
   }
   removeIndicator(e) {
-    if (!S(e))
+    if (!E(e))
       return !1;
     const i = (s, n) => {
-      const r = this.data[s];
-      for (let a = 0; a < r.length; a++)
-        if (r[a].id == n)
-          return r.splice(a, 1), !0;
+      const o = this.data[s];
+      for (let a = 0; a < o.length; a++)
+        if (o[a].id == n)
+          return o.splice(a, 1), !0;
       return !1;
     };
     return !!(i("primary", e) || i("secondary", e));
@@ -1261,8 +1273,8 @@ class k {
     for (let a of s)
       if (typeof e[a] !== Mn[a])
         return !1;
-    const n = e.timestamp - e.timestamp % this.time.timeFrameMS, r = new Date(n);
-    return e.dateStr = `${r.getFullYear()}/${r.getMonth() + 1}/${r.getDate()} ${r.getHours()}:${r.getMinutes()}`, M(this.allData.trades[n]) || (this.allData.trades[n] = []), this.allData.trades[n].push(e), !0;
+    const n = e.timestamp - e.timestamp % this.time.timeFrameMS, o = new Date(n);
+    return e.dateStr = `${o.getFullYear()}/${o.getMonth() + 1}/${o.getDate()} ${o.getHours()}:${o.getMinutes()}`, M(this.allData.trades[n]) || (this.allData.trades[n] = []), this.allData.trades[n].push(e), !0;
   }
   removeTrade(e) {
     console.log("TODO: state.removeTrade()");
@@ -1274,56 +1286,56 @@ class k {
     for (let a of s)
       if (typeof t[a] !== An[a])
         return !1;
-    const n = t.timestamp - t.timestamp % this.time.timeFrameMS, r = new Date(n);
-    return e.dateStr = `${r.getFullYear()}/${r.getMonth() + 1}/${r.getDate()} ${r.getHours()}:${r.getMinutes()}`, M(this.allData.events[n]) || (this.allData.events[n] = []), this.allData.events[n].push(e), !0;
+    const n = t.timestamp - t.timestamp % this.time.timeFrameMS, o = new Date(n);
+    return e.dateStr = `${o.getFullYear()}/${o.getMonth() + 1}/${o.getDate()} ${o.getHours()}:${o.getMinutes()}`, M(this.allData.events[n]) || (this.allData.events[n] = []), this.allData.events[n].push(e), !0;
   }
   removeEvent(e) {
     console.log("TODO: state.removeEvent()");
   }
 }
-const Er = {
-  findByID(o, e = document) {
-    return e.getElementById(o);
+const Sr = {
+  findByID(r, e = document) {
+    return e.getElementById(r);
   },
-  findByClass(o, e = document) {
-    return e.getElementsByClassName(o);
+  findByClass(r, e = document) {
+    return e.getElementsByClassName(r);
   },
-  findByName(o, e = document) {
-    return e.getElementsByName(o);
+  findByName(r, e = document) {
+    return e.getElementsByName(r);
   },
-  fndByTag(o, e = document) {
-    return e.getElementsByTagName(o);
+  fndByTag(r, e = document) {
+    return e.getElementsByTagName(r);
   },
-  findBySelector(o, e = document) {
-    return e.querySelector(o);
+  findBySelector(r, e = document) {
+    return e.querySelector(r);
   },
-  findBySelectorAll(o, e = document) {
-    return e.querySelectorAll(o);
+  findBySelectorAll(r, e = document) {
+    return e.querySelectorAll(r);
   },
-  isNode(o) {
-    return typeof Node == "object" ? o instanceof Node : o && typeof o == "object" && typeof o.nodeType == "number" && typeof o.nodeName == "string";
+  isNode(r) {
+    return typeof Node == "object" ? r instanceof Node : r && typeof r == "object" && typeof r.nodeType == "number" && typeof r.nodeName == "string";
   },
-  isElement(o) {
-    return typeof HTMLElement == "object" ? o instanceof HTMLElement : o && typeof o == "object" && o !== null && o.nodeType === 1 && typeof o.nodeName == "string";
+  isElement(r) {
+    return typeof HTMLElement == "object" ? r instanceof HTMLElement : r && typeof r == "object" && r !== null && r.nodeType === 1 && typeof r.nodeName == "string";
   },
-  isVisible(o) {
-    return this.isElement(o) ? !!o && !!(o.offsetWidth || o.offsetHeight || o.getClientRects().length) : !1;
+  isVisible(r) {
+    return this.isElement(r) ? !!r && !!(r.offsetWidth || r.offsetHeight || r.getClientRects().length) : !1;
   },
-  isInViewport(o) {
-    if (!this.isElement(o))
+  isInViewport(r) {
+    if (!this.isElement(r))
       return !1;
-    const e = o.getBoundingClientRect();
+    const e = r.getBoundingClientRect();
     return e.top >= 0 && e.left >= 0 && e.bottom <= (window.innerHeight || document.documentElement.clientHeight) && e.right <= (window.innerWidth || document.documentElement.clientWidth);
   },
-  isVisibleToUser(o) {
-    if (!this.isElement(o))
+  isVisibleToUser(r) {
+    if (!this.isElement(r))
       return !1;
     const e = getComputedStyle(elem);
-    if (e.display === "none" || e.visibility !== "visible" || e.opacity < 0.1 || o.offsetWidth + o.offsetHeight + o.getBoundingClientRect().height + o.getBoundingClientRect().width === 0)
+    if (e.display === "none" || e.visibility !== "visible" || e.opacity < 0.1 || r.offsetWidth + r.offsetHeight + r.getBoundingClientRect().height + r.getBoundingClientRect().width === 0)
       return !1;
     const i = {
-      x: o.getBoundingClientRect().left + o.offsetWidth / 2,
-      y: o.getBoundingClientRect().top + o.offsetHeight / 2
+      x: r.getBoundingClientRect().left + r.offsetWidth / 2,
+      y: r.getBoundingClientRect().top + r.offsetHeight / 2
     };
     if (i.x < 0 || i.x > (document.documentElement.clientWidth || window.innerWidth) || i.y < 0 || i.y > (document.documentElement.clientHeight || window.innerHeight))
       return !1;
@@ -1334,134 +1346,134 @@ const Er = {
     while (s = s.parentNode);
     return !1;
   },
-  isImage(o, e) {
-    if (this.isSVG(o))
-      var i = window.URL || window.webkitURL || window, o = new Blob([o], { type: "image/svg+xml" }), o = i.createObjectURL(o);
+  isImage(r, e) {
+    if (this.isSVG(r))
+      var i = window.URL || window.webkitURL || window, r = new Blob([r], { type: "image/svg+xml" }), r = i.createObjectURL(r);
     const s = new Image();
-    if (s.src = o, B(e))
+    if (s.src = r, U(e))
       s.complete ? e(s) : (s.onload = () => e(s), s.onerror = () => e(!1));
     else
-      return new Promise(function(n, r) {
-        s.complete ? n(s) : (s.onload = () => n(s), s.onerror = () => r(!1));
+      return new Promise(function(n, o) {
+        s.complete ? n(s) : (s.onload = () => n(s), s.onerror = () => o(!1));
       });
   },
-  isSVG(o) {
-    return S(o) ? /<\s*svg[^>]*>(.*?)<\s*\/\s*svg>/.test(o) : !1;
+  isSVG(r) {
+    return E(r) ? /<\s*svg[^>]*>(.*?)<\s*\/\s*svg>/.test(r) : !1;
   },
-  elementDimPos(o) {
-    if (!this.isElement(o))
+  elementDimPos(r) {
+    if (!this.isElement(r))
       return !1;
-    let e = 0, i = 0, s = o;
+    let e = 0, i = 0, s = r;
     for (; s && s.tagName.toLowerCase() != "body" && !isNaN(s.offsetLeft) && !isNaN(s.offsetTop); )
       e += s.offsetLeft - s.scrollLeft, i += s.offsetTop - s.scrollTop, s = s.offsetParent;
-    const n = o.getBoundingClientRect();
-    let r = n.right - n.left, a = n.bottom - n.top, h = this.isVisible(o), l = this.isInViewport(o);
-    return { top: i, bottom: i + a, left: e, right: e + r, width: r, height: a, visible: h, viewport: l };
+    const n = r.getBoundingClientRect();
+    let o = n.right - n.left, a = n.bottom - n.top, l = this.isVisible(r), h = this.isInViewport(r);
+    return { top: i, bottom: i + a, left: e, right: e + o, width: o, height: a, visible: l, viewport: h };
   },
-  elementsDistance(o, e) {
-    return !this.isElement(o) || !this.isElement(o) ? !1 : (el1Location = this.elementDimPos(o), el2Location = this.elementDimPos(e), {
+  elementsDistance(r, e) {
+    return !this.isElement(r) || !this.isElement(r) ? !1 : (el1Location = this.elementDimPos(r), el2Location = this.elementDimPos(e), {
       x: el1Location.top - el2Location.top,
       y: el1Location.left - el2Location.left,
       el1Location,
       el2Location
     });
   },
-  htmlToElement(o) {
-    if (!S(o))
+  htmlToElement(r) {
+    if (!E(r))
       return !1;
     const e = document.createElement("template");
-    return o = o.trim(), e.innerHTML = o, e.content.firstChild;
+    return r = r.trim(), e.innerHTML = r, e.content.firstChild;
   },
-  htmlToElements(o) {
-    if (!S(o))
+  htmlToElements(r) {
+    if (!E(r))
       return !1;
     const e = document.createElement("template");
-    return e.innerHTML = o, e.content.childNodes;
+    return e.innerHTML = r, e.content.childNodes;
   },
-  svgToImage(o, e, i) {
-    if (!this.isSVG(o) || !T(i?.w) || !T(i?.h))
+  svgToImage(r, e, i) {
+    if (!this.isSVG(r) || !T(i?.w) || !T(i?.h))
       return !1;
-    let s = i.w, n = i.h, r = document.createElement("canvas");
-    r.width = s, r.height = n;
-    let a = this.htmlToElement(o);
+    let s = i.w, n = i.h, o = document.createElement("canvas");
+    o.width = s, o.height = n;
+    let a = this.htmlToElement(r);
     a.style.fill = e, a.setAttribute("width", s), a.setAttribute("height", n), a.xmlns = "http://www.w3.org/2000/svg";
-    let h = new XMLSerializer().serializeToString(a), g = "data:image/svg+xml;base64," + btoa(h), v = new Image();
+    let l = new XMLSerializer().serializeToString(a), g = "data:image/svg+xml;base64," + btoa(l), v = new Image();
     return v.setAttribute("width", s), v.setAttribute("height", n), v.onload = () => {
-      r.getContext("2d").drawImage(v, 0, 0, s, n);
+      o.getContext("2d").drawImage(v, 0, 0, s, n);
     }, v.src = g, v;
   },
-  hideOnClickOutside(o) {
-    if (!this.isElement(o))
+  hideOnClickOutside(r) {
+    if (!this.isElement(r))
       return !1;
     const e = (s) => {
-      !o.contains(s.target) && this.isVisible(o) && (o.style.display = "none", i());
+      !r.contains(s.target) && this.isVisible(r) && (r.style.display = "none", i());
     }, i = () => {
       document.removeEventListener("click", e);
     };
     document.addEventListener("click", e);
   },
-  onClickOutside(o, e) {
-    if (!this.isElement(o))
+  onClickOutside(r, e) {
+    if (!this.isElement(r))
       return !1;
     const i = (n) => {
-      !o.contains(n.target) && Er.isVisible(o) && (e(), s());
+      !r.contains(n.target) && Sr.isVisible(r) && (e(), s());
     }, s = () => {
       document.removeEventListener("click", i);
     };
     document.addEventListener("click", i);
   },
-  getStyle(o, e) {
+  getStyle(r, e) {
     let i, s;
-    if (S(o))
-      i = document.getElementById(o);
-    else if (this.isElement(o))
-      i = o;
+    if (E(r))
+      i = document.getElementById(r);
+    else if (this.isElement(r))
+      i = r;
     else
       return !1;
-    return S(e) ? (window.getComputedStyle ? s = document.defaultView.getComputedStyle(i, null).getPropertyValue(e) : i.currentStyle && (s = i.currentStyle[e]), s) : !1;
+    return E(e) ? (window.getComputedStyle ? s = document.defaultView.getComputedStyle(i, null).getPropertyValue(e) : i.currentStyle && (s = i.currentStyle[e]), s) : !1;
   },
-  addStyleRule(o, e, i, s) {
-    let n = this.findStyleRule(o, e, i, s);
+  addStyleRule(r, e, i, s) {
+    let n = this.findStyleRule(r, e, i, s);
     if (n)
       n.i >= 0 ? n.rules[n.i].style[n.property] = n.value : this.addCSSRule(n.styleSheet, n.selector, n.rules, n.index);
     else
       return;
   },
-  deleteStyleRule(o, e, i) {
-    let s = this.findStyleRule(o, e, i, "");
+  deleteStyleRule(r, e, i) {
+    let s = this.findStyleRule(r, e, i, "");
     (s.styleSheet.deleteRule || s.styleSheet.removeRule)(s.i);
   },
-  findStyleRule(o, e, i, s) {
-    if (!o || !b(o))
+  findStyleRule(r, e, i, s) {
+    if (!r || !b(r))
       return null;
-    if (o.constructor.name == "HTMLStyleElement")
-      o = o.sheet;
-    else if (o.constructor.name != "CSSStyleSheet")
+    if (r.constructor.name == "HTMLStyleElement")
+      r = r.sheet;
+    else if (r.constructor.name != "CSSStyleSheet")
       return null;
     let n = this.styleRuleSanitize(e, i, s);
     e = n[0], i = n[1], s = n[2];
-    const r = o.cssRules || o.rules;
-    for (var a = r.length - 1; a > 0 && r[a].selectorText !== e; --a)
+    const o = r.cssRules || r.rules;
+    for (var a = o.length - 1; a > 0 && o[a].selectorText !== e; --a)
       ;
-    return { styleSheet: o, rules: r, selector: e, property: i, value: s, i: a };
+    return { styleSheet: r, rules: o, selector: e, property: i, value: s, i: a };
   },
-  styleRuleSanitize(o, e, i) {
+  styleRuleSanitize(r, e, i) {
     return [
-      o = o.toLowerCase().replace(/\s+/g, " "),
+      r = r.toLowerCase().replace(/\s+/g, " "),
       e = e.toLowerCase(),
       i = i.toLowerCase()
     ];
   },
-  addCSSRule(o, e, i, s) {
-    o.insertRule ? o.insertRule(e + "{" + i + "}", s) : o.addRule(e, i, s);
+  addCSSRule(r, e, i, s) {
+    r.insertRule ? r.insertRule(e + "{" + i + "}", s) : r.addRule(e, i, s);
   },
-  findTargetParentWithClass(o, e) {
-    return !this.isElement(o) || !S(e) ? null : o.classList.contains(e) ? o : this.findTargetParentWithClass(o.parentElement, e);
+  findTargetParentWithClass(r, e) {
+    return !this.isElement(r) || !E(e) ? null : r.classList.contains(e) ? r : this.findTargetParentWithClass(r.parentElement, e);
   }
-}, D = Er, rl = typeof window < "u" && typeof window.document < "u";
+}, D = Sr, ol = typeof window < "u" && typeof window.document < "u";
 typeof process < "u" && process.versions != null && process.versions.node != null;
 typeof window < "u" && window.name === "nodejs" || navigator.userAgent.includes("Node.js") || navigator.userAgent.includes("jsdom");
-const ol = ((o) => "onorientationchange" in o || o.matchMedia("(any-pointer:coarse)").matches || !!navigator.maxTouchPoints || !!navigator.msMaxTouchPoints || "ontouchstart" in o || o.DocumentTouch && document instanceof o.DocumentTouch)(typeof window < "u" ? window : {}), al = {
+const al = ((r) => "onorientationchange" in r || r.matchMedia("(any-pointer:coarse)").matches || !!navigator.maxTouchPoints || !!navigator.msMaxTouchPoints || "ontouchstart" in r || r.DocumentTouch && document instanceof r.DocumentTouch)(typeof window < "u" ? window : {}), ll = {
   idle: 0,
   dragStart: 1,
   dragging: 2
@@ -1494,8 +1506,8 @@ class it {
     return new it(this.x, this.y);
   }
 }
-function ll(o) {
-  return o && o.__esModule && Object.prototype.hasOwnProperty.call(o, "default") ? o.default : o;
+function hl(r) {
+  return r && r.__esModule && Object.prototype.hasOwnProperty.call(r, "default") ? r.default : r;
 }
 var Pr = { exports: {} };
 /*! Hammer.JS - v2.0.7 - 2016-04-22
@@ -1503,13 +1515,13 @@ var Pr = { exports: {} };
  *
  * Copyright (c) 2016 Jorik Tangelder;
  * Licensed under the MIT license */
-(function(o) {
+(function(r) {
   (function(e, i, s, n) {
-    var r = ["", "webkit", "Moz", "MS", "ms", "o"], a = i.createElement("div"), h = "function", l = Math.round, m = Math.abs, g = Date.now;
+    var o = ["", "webkit", "Moz", "MS", "ms", "o"], a = i.createElement("div"), l = "function", h = Math.round, m = Math.abs, g = Date.now;
     function v(c, u, p) {
-      return setTimeout(ze(c, p), u);
+      return setTimeout(Ne(c, p), u);
     }
-    function E(c, u, p) {
+    function S(c, u, p) {
       return Array.isArray(c) ? (A(c, p[u], p), !0) : !1;
     }
     function A(c, u, p) {
@@ -1545,34 +1557,34 @@ var Pr = { exports: {} };
       }
       return p;
     } : O = Object.assign;
-    var oe = L(function(u, p, f) {
+    var ae = L(function(u, p, f) {
       for (var x = Object.keys(p), P = 0; P < x.length; )
         (!f || f && u[x[P]] === n) && (u[x[P]] = p[x[P]]), P++;
       return u;
-    }, "extend", "Use `assign`."), U = L(function(u, p) {
-      return oe(u, p, !0);
+    }, "extend", "Use `assign`."), B = L(function(u, p) {
+      return ae(u, p, !0);
     }, "merge", "Use `assign`.");
     function R(c, u, p) {
       var f = u.prototype, x;
       x = c.prototype = Object.create(f), x.constructor = c, x._super = f, p && O(x, p);
     }
-    function ze(c, u) {
+    function Ne(c, u) {
       return function() {
         return c.apply(u, arguments);
       };
     }
-    function ae(c, u) {
-      return typeof c == h ? c.apply(u && u[0] || n, u) : c;
+    function J(c, u) {
+      return typeof c == l ? c.apply(u && u[0] || n, u) : c;
     }
     function ue(c, u) {
       return c === n ? u : c;
     }
-    function J(c, u, p) {
+    function Q(c, u, p) {
       A(ot(u), function(f) {
         c.addEventListener(f, p, !1);
       });
     }
-    function te(c, u, p) {
+    function ie(c, u, p) {
       A(ot(u), function(f) {
         c.removeEventListener(f, p, !1);
       });
@@ -1609,13 +1621,13 @@ var Pr = { exports: {} };
         var N = u ? c[P][u] : c[P];
         We(x, N) < 0 && f.push(c[P]), x[P] = N, P++;
       }
-      return p && (u ? f = f.sort(function(q, ee) {
-        return q[u] > ee[u];
+      return p && (u ? f = f.sort(function(q, te) {
+        return q[u] > te[u];
       }) : f = f.sort()), f;
     }
     function Kt(c, u) {
-      for (var p, f, x = u[0].toUpperCase() + u.slice(1), P = 0; P < r.length; ) {
-        if (p = r[P], f = p ? p + x : u, f in c)
+      for (var p, f, x = u[0].toUpperCase() + u.slice(1), P = 0; P < o.length; ) {
+        if (p = o[P], f = p ? p + x : u, f in c)
           return f;
         P++;
       }
@@ -1629,44 +1641,44 @@ var Pr = { exports: {} };
       var u = c.ownerDocument || c;
       return u.defaultView || u.parentWindow || e;
     }
-    var To = /mobile|tablet|ip(ad|hone|od)|android/i, Fs = "ontouchstart" in e, So = Kt(e, "PointerEvent") !== n, Eo = Fs && To.test(navigator.userAgent), Ct = "touch", Po = "pen", $i = "mouse", Mo = "kinect", Ao = 25, Q = 1, Ze = 2, V = 4, ie = 8, jt = 1, Tt = 2, St = 4, Et = 8, Pt = 16, Ne = Tt | St, Je = Et | Pt, Gs = Ne | Je, Ys = ["x", "y"], Zt = ["clientX", "clientY"];
+    var To = /mobile|tablet|ip(ad|hone|od)|android/i, Fs = "ontouchstart" in e, Eo = Kt(e, "PointerEvent") !== n, So = Fs && To.test(navigator.userAgent), Ct = "touch", Po = "pen", $i = "mouse", Mo = "kinect", Ao = 25, ee = 1, Ze = 2, V = 4, se = 8, jt = 1, Tt = 2, Et = 4, St = 8, Pt = 16, Ie = Tt | Et, Je = St | Pt, Gs = Ie | Je, Ys = ["x", "y"], Zt = ["clientX", "clientY"];
     function pe(c, u) {
       var p = this;
       this.manager = c, this.callback = u, this.element = c.element, this.target = c.options.inputTarget, this.domHandler = function(f) {
-        ae(c.options.enable, [c]) && p.handler(f);
+        J(c.options.enable, [c]) && p.handler(f);
       }, this.init();
     }
     pe.prototype = {
       handler: function() {
       },
       init: function() {
-        this.evEl && J(this.element, this.evEl, this.domHandler), this.evTarget && J(this.target, this.evTarget, this.domHandler), this.evWin && J(Ws(this.element), this.evWin, this.domHandler);
+        this.evEl && Q(this.element, this.evEl, this.domHandler), this.evTarget && Q(this.target, this.evTarget, this.domHandler), this.evWin && Q(Ws(this.element), this.evWin, this.domHandler);
       },
       destroy: function() {
-        this.evEl && te(this.element, this.evEl, this.domHandler), this.evTarget && te(this.target, this.evTarget, this.domHandler), this.evWin && te(Ws(this.element), this.evWin, this.domHandler);
+        this.evEl && ie(this.element, this.evEl, this.domHandler), this.evTarget && ie(this.target, this.evTarget, this.domHandler), this.evWin && ie(Ws(this.element), this.evWin, this.domHandler);
       }
     };
     function Lo(c) {
       var u, p = c.options.inputClass;
-      return p ? u = p : So ? u = Ui : Eo ? u = ei : Fs ? u = Vi : u = Qt, new u(c, No);
+      return p ? u = p : Eo ? u = Bi : So ? u = ei : Fs ? u = Vi : u = Qt, new u(c, No);
     }
     function No(c, u, p) {
-      var f = p.pointers.length, x = p.changedPointers.length, P = u & Q && f - x === 0, N = u & (V | ie) && f - x === 0;
+      var f = p.pointers.length, x = p.changedPointers.length, P = u & ee && f - x === 0, N = u & (V | se) && f - x === 0;
       p.isFirst = !!P, p.isFinal = !!N, P && (c.session = {}), p.eventType = u, Io(c, p), c.emit("hammer.input", p), c.recognize(p), c.session.prevInput = p;
     }
     function Io(c, u) {
       var p = c.session, f = u.pointers, x = f.length;
       p.firstInput || (p.firstInput = qs(u)), x > 1 && !p.firstMultiple ? p.firstMultiple = qs(u) : x === 1 && (p.firstMultiple = !1);
       var P = p.firstInput, N = p.firstMultiple, Y = N ? N.center : P.center, q = u.center = Xs(f);
-      u.timeStamp = g(), u.deltaTime = u.timeStamp - P.timeStamp, u.angle = Bi(Y, q), u.distance = Jt(Y, q), Do(p, u), u.offsetDirection = js(u.deltaX, u.deltaY);
-      var ee = Ks(u.deltaTime, u.deltaX, u.deltaY);
-      u.overallVelocityX = ee.x, u.overallVelocityY = ee.y, u.overallVelocity = m(ee.x) > m(ee.y) ? ee.x : ee.y, u.scale = N ? ko(N.pointers, f) : 1, u.rotation = N ? Ro(N.pointers, f) : 0, u.maxPointers = p.prevInput ? u.pointers.length > p.prevInput.maxPointers ? u.pointers.length : p.prevInput.maxPointers : u.pointers.length, Oo(p, u);
-      var De = c.element;
-      de(u.srcEvent.target, De) && (De = u.srcEvent.target), u.target = De;
+      u.timeStamp = g(), u.deltaTime = u.timeStamp - P.timeStamp, u.angle = Ui(Y, q), u.distance = Jt(Y, q), Do(p, u), u.offsetDirection = js(u.deltaX, u.deltaY);
+      var te = Ks(u.deltaTime, u.deltaX, u.deltaY);
+      u.overallVelocityX = te.x, u.overallVelocityY = te.y, u.overallVelocity = m(te.x) > m(te.y) ? te.x : te.y, u.scale = N ? ko(N.pointers, f) : 1, u.rotation = N ? Ro(N.pointers, f) : 0, u.maxPointers = p.prevInput ? u.pointers.length > p.prevInput.maxPointers ? u.pointers.length : p.prevInput.maxPointers : u.pointers.length, Oo(p, u);
+      var Oe = c.element;
+      de(u.srcEvent.target, Oe) && (Oe = u.srcEvent.target), u.target = Oe;
     }
     function Do(c, u) {
       var p = u.center, f = c.offsetDelta || {}, x = c.prevDelta || {}, P = c.prevInput || {};
-      (u.eventType === Q || P.eventType === V) && (x = c.prevDelta = {
+      (u.eventType === ee || P.eventType === V) && (x = c.prevDelta = {
         x: P.deltaX || 0,
         y: P.deltaY || 0
       }, f = c.offsetDelta = {
@@ -1676,9 +1688,9 @@ var Pr = { exports: {} };
     }
     function Oo(c, u) {
       var p = c.lastInterval || u, f = u.timeStamp - p.timeStamp, x, P, N, Y;
-      if (u.eventType != ie && (f > Ao || p.velocity === n)) {
-        var q = u.deltaX - p.deltaX, ee = u.deltaY - p.deltaY, De = Ks(f, q, ee);
-        P = De.x, N = De.y, x = m(De.x) > m(De.y) ? De.x : De.y, Y = js(q, ee), c.lastInterval = u;
+      if (u.eventType != se && (f > Ao || p.velocity === n)) {
+        var q = u.deltaX - p.deltaX, te = u.deltaY - p.deltaY, Oe = Ks(f, q, te);
+        P = Oe.x, N = Oe.y, x = m(Oe.x) > m(Oe.y) ? Oe.x : Oe.y, Y = js(q, te), c.lastInterval = u;
       } else
         x = p.velocity, P = p.velocityX, N = p.velocityY, Y = p.direction;
       u.velocity = x, u.velocityX = P, u.velocityY = N, u.direction = Y;
@@ -1686,8 +1698,8 @@ var Pr = { exports: {} };
     function qs(c) {
       for (var u = [], p = 0; p < c.pointers.length; )
         u[p] = {
-          clientX: l(c.pointers[p].clientX),
-          clientY: l(c.pointers[p].clientY)
+          clientX: h(c.pointers[p].clientX),
+          clientY: h(c.pointers[p].clientY)
         }, p++;
       return {
         timeStamp: g(),
@@ -1701,14 +1713,14 @@ var Pr = { exports: {} };
       var u = c.length;
       if (u === 1)
         return {
-          x: l(c[0].clientX),
-          y: l(c[0].clientY)
+          x: h(c[0].clientX),
+          y: h(c[0].clientY)
         };
       for (var p = 0, f = 0, x = 0; x < u; )
         p += c[x].clientX, f += c[x].clientY, x++;
       return {
-        x: l(p / u),
-        y: l(f / u)
+        x: h(p / u),
+        y: h(f / u)
       };
     }
     function Ks(c, u, p) {
@@ -1718,26 +1730,26 @@ var Pr = { exports: {} };
       };
     }
     function js(c, u) {
-      return c === u ? jt : m(c) >= m(u) ? c < 0 ? Tt : St : u < 0 ? Et : Pt;
+      return c === u ? jt : m(c) >= m(u) ? c < 0 ? Tt : Et : u < 0 ? St : Pt;
     }
     function Jt(c, u, p) {
       p || (p = Ys);
       var f = u[p[0]] - c[p[0]], x = u[p[1]] - c[p[1]];
       return Math.sqrt(f * f + x * x);
     }
-    function Bi(c, u, p) {
+    function Ui(c, u, p) {
       p || (p = Ys);
       var f = u[p[0]] - c[p[0]], x = u[p[1]] - c[p[1]];
       return Math.atan2(x, f) * 180 / Math.PI;
     }
     function Ro(c, u) {
-      return Bi(u[1], u[0], Zt) + Bi(c[1], c[0], Zt);
+      return Ui(u[1], u[0], Zt) + Ui(c[1], c[0], Zt);
     }
     function ko(c, u) {
       return Jt(u[0], u[1], Zt) / Jt(c[0], c[1], Zt);
     }
     var _o = {
-      mousedown: Q,
+      mousedown: ee,
       mousemove: Ze,
       mouseup: V
     }, Ho = "mousedown", $o = "mousemove mouseup";
@@ -1747,7 +1759,7 @@ var Pr = { exports: {} };
     R(Qt, pe, {
       handler: function(u) {
         var p = _o[u.type];
-        p & Q && u.button === 0 && (this.pressed = !0), p & Ze && u.which !== 1 && (p = V), this.pressed && (p & V && (this.pressed = !1), this.callback(this.manager, p, {
+        p & ee && u.button === 0 && (this.pressed = !0), p & Ze && u.which !== 1 && (p = V), this.pressed && (p & V && (this.pressed = !1), this.callback(this.manager, p, {
           pointers: [u],
           changedPointers: [u],
           pointerType: $i,
@@ -1755,26 +1767,26 @@ var Pr = { exports: {} };
         }));
       }
     });
-    var Bo = {
-      pointerdown: Q,
+    var Uo = {
+      pointerdown: ee,
       pointermove: Ze,
       pointerup: V,
-      pointercancel: ie,
-      pointerout: ie
-    }, Uo = {
+      pointercancel: se,
+      pointerout: se
+    }, Bo = {
       2: Ct,
       3: Po,
       4: $i,
       5: Mo
     }, Zs = "pointerdown", Js = "pointermove pointerup pointercancel";
     e.MSPointerEvent && !e.PointerEvent && (Zs = "MSPointerDown", Js = "MSPointerMove MSPointerUp MSPointerCancel");
-    function Ui() {
+    function Bi() {
       this.evEl = Zs, this.evWin = Js, pe.apply(this, arguments), this.store = this.manager.session.pointerEvents = [];
     }
-    R(Ui, pe, {
+    R(Bi, pe, {
       handler: function(u) {
-        var p = this.store, f = !1, x = u.type.toLowerCase().replace("ms", ""), P = Bo[x], N = Uo[u.pointerType] || u.pointerType, Y = N == Ct, q = We(p, u.pointerId, "pointerId");
-        P & Q && (u.button === 0 || Y) ? q < 0 && (p.push(u), q = p.length - 1) : P & (V | ie) && (f = !0), !(q < 0) && (p[q] = u, this.callback(this.manager, P, {
+        var p = this.store, f = !1, x = u.type.toLowerCase().replace("ms", ""), P = Uo[x], N = Bo[u.pointerType] || u.pointerType, Y = N == Ct, q = We(p, u.pointerId, "pointerId");
+        P & ee && (u.button === 0 || Y) ? q < 0 && (p.push(u), q = p.length - 1) : P & (V | se) && (f = !0), !(q < 0) && (p[q] = u, this.callback(this.manager, P, {
           pointers: p,
           changedPointers: [u],
           pointerType: N,
@@ -1783,10 +1795,10 @@ var Pr = { exports: {} };
       }
     });
     var Vo = {
-      touchstart: Q,
+      touchstart: ee,
       touchmove: Ze,
       touchend: V,
-      touchcancel: ie
+      touchcancel: se
     }, zo = "touchstart", Wo = "touchstart touchmove touchend touchcancel";
     function Qs() {
       this.evTarget = zo, this.evWin = Wo, this.started = !1, pe.apply(this, arguments);
@@ -1794,9 +1806,9 @@ var Pr = { exports: {} };
     R(Qs, pe, {
       handler: function(u) {
         var p = Vo[u.type];
-        if (p === Q && (this.started = !0), !!this.started) {
+        if (p === ee && (this.started = !0), !!this.started) {
           var f = Fo.call(this, u, p);
-          p & (V | ie) && f[0].length - f[1].length === 0 && (this.started = !1), this.callback(this.manager, p, {
+          p & (V | se) && f[0].length - f[1].length === 0 && (this.started = !1), this.callback(this.manager, p, {
             pointers: f[0],
             changedPointers: f[1],
             pointerType: Ct,
@@ -1807,13 +1819,13 @@ var Pr = { exports: {} };
     });
     function Fo(c, u) {
       var p = Xt(c.touches), f = Xt(c.changedTouches);
-      return u & (V | ie) && (p = zs(p.concat(f), "identifier", !0)), [p, f];
+      return u & (V | se) && (p = zs(p.concat(f), "identifier", !0)), [p, f];
     }
     var Go = {
-      touchstart: Q,
+      touchstart: ee,
       touchmove: Ze,
       touchend: V,
-      touchcancel: ie
+      touchcancel: se
     }, Yo = "touchstart touchmove touchend touchcancel";
     function ei() {
       this.evTarget = Yo, this.targetIds = {}, pe.apply(this, arguments);
@@ -1831,16 +1843,16 @@ var Pr = { exports: {} };
     });
     function qo(c, u) {
       var p = Xt(c.touches), f = this.targetIds;
-      if (u & (Q | Ze) && p.length === 1)
+      if (u & (ee | Ze) && p.length === 1)
         return f[p[0].identifier] = !0, [p, p];
       var x, P, N = Xt(c.changedTouches), Y = [], q = this.target;
-      if (P = p.filter(function(ee) {
-        return de(ee.target, q);
-      }), u === Q)
+      if (P = p.filter(function(te) {
+        return de(te.target, q);
+      }), u === ee)
         for (x = 0; x < P.length; )
           f[P[x].identifier] = !0, x++;
       for (x = 0; x < N.length; )
-        f[N[x].identifier] && Y.push(N[x]), u & (V | ie) && delete f[N[x].identifier], x++;
+        f[N[x].identifier] && Y.push(N[x]), u & (V | se) && delete f[N[x].identifier], x++;
       if (Y.length)
         return [
           zs(P.concat(Y), "identifier", !0),
@@ -1850,7 +1862,7 @@ var Pr = { exports: {} };
     var Xo = 2500, en = 25;
     function Vi() {
       pe.apply(this, arguments);
-      var c = ze(this.handler, this);
+      var c = Ne(this.handler, this);
       this.touch = new ei(this.manager, c), this.mouse = new Qt(this.manager, c), this.primaryTouch = null, this.lastTouches = [];
     }
     R(Vi, pe, {
@@ -1869,7 +1881,7 @@ var Pr = { exports: {} };
       }
     });
     function Ko(c, u) {
-      c & Q ? (this.primaryTouch = u.changedPointers[0].identifier, tn.call(this, u)) : c & (V | ie) && tn.call(this, u);
+      c & ee ? (this.primaryTouch = u.changedPointers[0].identifier, tn.call(this, u)) : c & (V | se) && tn.call(this, u);
     }
     function tn(c) {
       var u = c.changedPointers[0];
@@ -1905,7 +1917,7 @@ var Pr = { exports: {} };
       compute: function() {
         var c = [];
         return A(this.manager.recognizers, function(u) {
-          ae(u.options.enable, [u]) && (c = c.concat(u.getTouchAction()));
+          J(u.options.enable, [u]) && (c = c.concat(u.getTouchAction()));
         }), Zo(c.join(" "));
       },
       preventDefaults: function(c) {
@@ -1916,11 +1928,11 @@ var Pr = { exports: {} };
         }
         var f = this.actions, x = me(f, Qe) && !ti[Qe], P = me(f, At) && !ti[At], N = me(f, Mt) && !ti[Mt];
         if (x) {
-          var Y = c.pointers.length === 1, q = c.distance < 2, ee = c.deltaTime < 250;
-          if (Y && q && ee)
+          var Y = c.pointers.length === 1, q = c.distance < 2, te = c.deltaTime < 250;
+          if (Y && q && te)
             return;
         }
-        if (!(N && P) && (x || P && p & Ne || N && p & Je))
+        if (!(N && P) && (x || P && p & Ie || N && p & Je))
           return this.preventSrc(u);
       },
       preventSrc: function(c) {
@@ -1941,7 +1953,7 @@ var Pr = { exports: {} };
         c[p] = u ? e.CSS.supports("touch-action", p) : !0;
       }), c;
     }
-    var ii = 1, ge = 2, at = 4, Fe = 8, $e = Fe, Lt = 16, Ie = 32;
+    var ii = 1, ge = 2, at = 4, Fe = 8, Ue = Fe, Lt = 16, De = 32;
     function Be(c) {
       this.options = O({}, this.defaults, c || {}), this.id = Co(), this.manager = null, this.options.enable = ue(this.options.enable, !0), this.state = ii, this.simultaneous = {}, this.requireFail = [];
     }
@@ -1951,22 +1963,22 @@ var Pr = { exports: {} };
         return O(this.options, c), this.manager && this.manager.touchAction.update(), this;
       },
       recognizeWith: function(c) {
-        if (E(c, "recognizeWith", this))
+        if (S(c, "recognizeWith", this))
           return this;
         var u = this.simultaneous;
         return c = si(c, this), u[c.id] || (u[c.id] = c, c.recognizeWith(this)), this;
       },
       dropRecognizeWith: function(c) {
-        return E(c, "dropRecognizeWith", this) ? this : (c = si(c, this), delete this.simultaneous[c.id], this);
+        return S(c, "dropRecognizeWith", this) ? this : (c = si(c, this), delete this.simultaneous[c.id], this);
       },
       requireFailure: function(c) {
-        if (E(c, "requireFailure", this))
+        if (S(c, "requireFailure", this))
           return this;
         var u = this.requireFail;
         return c = si(c, this), We(u, c) === -1 && (u.push(c), c.requireFailure(this)), this;
       },
       dropRequireFailure: function(c) {
-        if (E(c, "dropRequireFailure", this))
+        if (S(c, "dropRequireFailure", this))
           return this;
         c = si(c, this);
         var u = We(this.requireFail, c);
@@ -1988,11 +2000,11 @@ var Pr = { exports: {} };
       tryEmit: function(c) {
         if (this.canEmit())
           return this.emit(c);
-        this.state = Ie;
+        this.state = De;
       },
       canEmit: function() {
         for (var c = 0; c < this.requireFail.length; ) {
-          if (!(this.requireFail[c].state & (Ie | ii)))
+          if (!(this.requireFail[c].state & (De | ii)))
             return !1;
           c++;
         }
@@ -2000,11 +2012,11 @@ var Pr = { exports: {} };
       },
       recognize: function(c) {
         var u = O({}, c);
-        if (!ae(this.options.enable, [this, u])) {
-          this.reset(), this.state = Ie;
+        if (!J(this.options.enable, [this, u])) {
+          this.reset(), this.state = De;
           return;
         }
-        this.state & ($e | Lt | Ie) && (this.state = ii), this.state = this.process(u), this.state & (ge | at | Fe | Lt) && this.tryEmit(u);
+        this.state & (Ue | Lt | De) && (this.state = ii), this.state = this.process(u), this.state & (ge | at | Fe | Lt) && this.tryEmit(u);
       },
       process: function(c) {
       },
@@ -2017,7 +2029,7 @@ var Pr = { exports: {} };
       return c & Lt ? "cancel" : c & Fe ? "end" : c & at ? "move" : c & ge ? "start" : "";
     }
     function ln(c) {
-      return c == Pt ? "down" : c == Et ? "up" : c == Tt ? "left" : c == St ? "right" : "";
+      return c == Pt ? "down" : c == St ? "up" : c == Tt ? "left" : c == Et ? "right" : "";
     }
     function si(c, u) {
       var p = u.manager;
@@ -2036,7 +2048,7 @@ var Pr = { exports: {} };
       },
       process: function(c) {
         var u = this.state, p = c.eventType, f = u & (ge | at), x = this.attrTest(c);
-        return f && (p & ie || !x) ? u | Lt : f || x ? p & V ? u | Fe : u & ge ? u | at : ge : Ie;
+        return f && (p & se || !x) ? u | Lt : f || x ? p & V ? u | Fe : u & ge ? u | at : ge : De;
       }
     });
     function ni() {
@@ -2051,11 +2063,11 @@ var Pr = { exports: {} };
       },
       getTouchAction: function() {
         var c = this.options.direction, u = [];
-        return c & Ne && u.push(At), c & Je && u.push(Mt), u;
+        return c & Ie && u.push(At), c & Je && u.push(Mt), u;
       },
       directionTest: function(c) {
         var u = this.options, p = !0, f = c.distance, x = c.direction, P = c.deltaX, N = c.deltaY;
-        return x & u.direction || (u.direction & Ne ? (x = P === 0 ? jt : P < 0 ? Tt : St, p = P != this.pX, f = Math.abs(c.deltaX)) : (x = N === 0 ? jt : N < 0 ? Et : Pt, p = N != this.pY, f = Math.abs(c.deltaY))), c.direction = x, p && f > u.threshold && x & u.direction;
+        return x & u.direction || (u.direction & Ie ? (x = P === 0 ? jt : P < 0 ? Tt : Et, p = P != this.pX, f = Math.abs(c.deltaX)) : (x = N === 0 ? jt : N < 0 ? St : Pt, p = N != this.pY, f = Math.abs(c.deltaY))), c.direction = x, p && f > u.threshold && x & u.direction;
       },
       attrTest: function(c) {
         return Ce.prototype.attrTest.call(this, c) && (this.state & ge || !(this.state & ge) && this.directionTest(c));
@@ -2104,21 +2116,21 @@ var Pr = { exports: {} };
       },
       process: function(c) {
         var u = this.options, p = c.pointers.length === u.pointers, f = c.distance < u.threshold, x = c.deltaTime > u.time;
-        if (this._input = c, !f || !p || c.eventType & (V | ie) && !x)
+        if (this._input = c, !f || !p || c.eventType & (V | se) && !x)
           this.reset();
-        else if (c.eventType & Q)
+        else if (c.eventType & ee)
           this.reset(), this._timer = v(function() {
-            this.state = $e, this.tryEmit();
+            this.state = Ue, this.tryEmit();
           }, u.time, this);
         else if (c.eventType & V)
-          return $e;
-        return Ie;
+          return Ue;
+        return De;
       },
       reset: function() {
         clearTimeout(this._timer);
       },
       emit: function(c) {
-        this.state === $e && (c && c.eventType & V ? this.manager.emit(this.options.event + "up", c) : (this._input.timeStamp = g(), this.manager.emit(this.options.event, this._input)));
+        this.state === Ue && (c && c.eventType & V ? this.manager.emit(this.options.event + "up", c) : (this._input.timeStamp = g(), this.manager.emit(this.options.event, this._input)));
       }
     });
     function Yi() {
@@ -2145,7 +2157,7 @@ var Pr = { exports: {} };
         event: "swipe",
         threshold: 10,
         velocity: 0.3,
-        direction: Ne | Je,
+        direction: Ie | Je,
         pointers: 1
       },
       getTouchAction: function() {
@@ -2153,7 +2165,7 @@ var Pr = { exports: {} };
       },
       attrTest: function(c) {
         var u = this.options.direction, p;
-        return u & (Ne | Je) ? p = c.overallVelocity : u & Ne ? p = c.overallVelocityX : u & Je && (p = c.overallVelocityY), this._super.attrTest.call(this, c) && u & c.offsetDirection && c.distance > this.options.threshold && c.maxPointers == this.options.pointers && m(p) > this.options.velocity && c.eventType & V;
+        return u & (Ie | Je) ? p = c.overallVelocity : u & Ie ? p = c.overallVelocityX : u & Je && (p = c.overallVelocityY), this._super.attrTest.call(this, c) && u & c.offsetDirection && c.distance > this.options.threshold && c.maxPointers == this.options.pointers && m(p) > this.options.velocity && c.eventType & V;
       },
       emit: function(c) {
         var u = ln(c.offsetDirection);
@@ -2178,7 +2190,7 @@ var Pr = { exports: {} };
       },
       process: function(c) {
         var u = this.options, p = c.pointers.length === u.pointers, f = c.distance < u.threshold, x = c.deltaTime < u.time;
-        if (this.reset(), c.eventType & Q && this.count === 0)
+        if (this.reset(), c.eventType & ee && this.count === 0)
           return this.failTimeout();
         if (f && x && p) {
           if (c.eventType != V)
@@ -2188,27 +2200,27 @@ var Pr = { exports: {} };
           var Y = this.count % u.taps;
           if (Y === 0)
             return this.hasRequireFailures() ? (this._timer = v(function() {
-              this.state = $e, this.tryEmit();
-            }, u.interval, this), ge) : $e;
+              this.state = Ue, this.tryEmit();
+            }, u.interval, this), ge) : Ue;
         }
-        return Ie;
+        return De;
       },
       failTimeout: function() {
         return this._timer = v(function() {
-          this.state = Ie;
-        }, this.options.interval, this), Ie;
+          this.state = De;
+        }, this.options.interval, this), De;
       },
       reset: function() {
         clearTimeout(this._timer);
       },
       emit: function() {
-        this.state == $e && (this._input.tapCount = this.count, this.manager.emit(this.options.event, this._input));
+        this.state == Ue && (this._input.tapCount = this.count, this.manager.emit(this.options.event, this._input));
       }
     });
-    function Ue(c, u) {
-      return u = u || {}, u.recognizers = ue(u.recognizers, Ue.defaults.preset), new Xi(c, u);
+    function Ve(c, u) {
+      return u = u || {}, u.recognizers = ue(u.recognizers, Ve.defaults.preset), new Xi(c, u);
     }
-    Ue.VERSION = "2.0.7", Ue.defaults = {
+    Ve.VERSION = "2.0.7", Ve.defaults = {
       domEvents: !1,
       touchAction: rn,
       enable: !0,
@@ -2217,8 +2229,8 @@ var Pr = { exports: {} };
       preset: [
         [Yi, { enable: !1 }],
         [Fi, { enable: !1 }, ["rotate"]],
-        [qi, { direction: Ne }],
-        [ni, { direction: Ne }, ["swipe"]],
+        [qi, { direction: Ie }],
+        [ni, { direction: Ie }, ["swipe"]],
         [ri],
         [ri, { event: "doubletap", taps: 2 }, ["tap"]],
         [Gi]
@@ -2234,7 +2246,7 @@ var Pr = { exports: {} };
     };
     var Qo = 1, hn = 2;
     function Xi(c, u) {
-      this.options = O({}, Ue.defaults, u || {}), this.options.inputTarget = this.options.inputTarget || c, this.handlers = {}, this.session = {}, this.recognizers = [], this.oldCssProps = {}, this.element = c, this.input = Lo(this), this.touchAction = new Wi(this, this.options.touchAction), cn(this, !0), A(this.options.recognizers, function(p) {
+      this.options = O({}, Ve.defaults, u || {}), this.options.inputTarget = this.options.inputTarget || c, this.handlers = {}, this.session = {}, this.recognizers = [], this.oldCssProps = {}, this.element = c, this.input = Lo(this), this.touchAction = new Wi(this, this.options.touchAction), cn(this, !0), A(this.options.recognizers, function(p) {
         var f = this.add(new p[0](p[1]));
         p[2] && f.recognizeWith(p[2]), p[3] && f.requireFailure(p[3]);
       }, this);
@@ -2251,7 +2263,7 @@ var Pr = { exports: {} };
         if (!u.stopped) {
           this.touchAction.preventDefaults(c);
           var p, f = this.recognizers, x = u.curRecognizer;
-          (!x || x && x.state & $e) && (x = u.curRecognizer = null);
+          (!x || x && x.state & Ue) && (x = u.curRecognizer = null);
           for (var P = 0; P < f.length; )
             p = f[P], u.stopped !== hn && (!x || p == x || p.canRecognizeWith(x)) ? p.recognize(c) : p.reset(), !x && p.state & (ge | at | Fe) && (x = u.curRecognizer = p), P++;
         }
@@ -2265,13 +2277,13 @@ var Pr = { exports: {} };
         return null;
       },
       add: function(c) {
-        if (E(c, "add", this))
+        if (S(c, "add", this))
           return this;
         var u = this.get(c.options.event);
         return u && this.remove(u), this.recognizers.push(c), c.manager = this, this.touchAction.update(), c;
       },
       remove: function(c) {
-        if (E(c, "remove", this))
+        if (S(c, "remove", this))
           return this;
         if (c = this.get(c), c) {
           var u = this.recognizers, p = We(u, c);
@@ -2323,24 +2335,24 @@ var Pr = { exports: {} };
       var p = i.createEvent("Event");
       p.initEvent(c, !0, !0), p.gesture = u, u.target.dispatchEvent(p);
     }
-    O(Ue, {
-      INPUT_START: Q,
+    O(Ve, {
+      INPUT_START: ee,
       INPUT_MOVE: Ze,
       INPUT_END: V,
-      INPUT_CANCEL: ie,
+      INPUT_CANCEL: se,
       STATE_POSSIBLE: ii,
       STATE_BEGAN: ge,
       STATE_CHANGED: at,
       STATE_ENDED: Fe,
-      STATE_RECOGNIZED: $e,
+      STATE_RECOGNIZED: Ue,
       STATE_CANCELLED: Lt,
-      STATE_FAILED: Ie,
+      STATE_FAILED: De,
       DIRECTION_NONE: jt,
       DIRECTION_LEFT: Tt,
-      DIRECTION_RIGHT: St,
-      DIRECTION_UP: Et,
+      DIRECTION_RIGHT: Et,
+      DIRECTION_UP: St,
       DIRECTION_DOWN: Pt,
-      DIRECTION_HORIZONTAL: Ne,
+      DIRECTION_HORIZONTAL: Ie,
       DIRECTION_VERTICAL: Je,
       DIRECTION_ALL: Gs,
       Manager: Xi,
@@ -2348,7 +2360,7 @@ var Pr = { exports: {} };
       TouchAction: Wi,
       TouchInput: ei,
       MouseInput: Qt,
-      PointerEventInput: Ui,
+      PointerEventInput: Bi,
       TouchMouseInput: Vi,
       SingleTouchInput: Qs,
       Recognizer: Be,
@@ -2359,47 +2371,47 @@ var Pr = { exports: {} };
       Pinch: Fi,
       Rotate: Yi,
       Press: Gi,
-      on: J,
-      off: te,
+      on: Q,
+      off: ie,
       each: A,
-      merge: U,
-      extend: oe,
+      merge: B,
+      extend: ae,
       assign: O,
       inherit: R,
-      bindFn: ze,
+      bindFn: Ne,
       prefixed: Kt
     });
     var ta = typeof e < "u" ? e : typeof self < "u" ? self : {};
-    ta.Hammer = Ue, typeof n == "function" && n.amd ? n(function() {
-      return Ue;
-    }) : o.exports ? o.exports = Ue : e[s] = Ue;
+    ta.Hammer = Ve, typeof n == "function" && n.amd ? n(function() {
+      return Ve;
+    }) : r.exports ? r.exports = Ve : e[s] = Ve;
   })(window, document, "Hammer");
 })(Pr);
 var qt = Pr.exports;
-const hl = ll(qt), Oe = /* @__PURE__ */ ia({
+const cl = hl(qt), Re = /* @__PURE__ */ ia({
   __proto__: null,
-  default: hl
-}, [qt]), Mr = 1, Ar = 2, gs = 4, cl = {
+  default: cl
+}, [qt]), Mr = 1, Ar = 2, gs = 4, ul = {
   mousedown: Mr,
   mousemove: Ar,
   mouseup: gs
 };
-function ul(o, e) {
-  for (let i = 0; i < o.length; i++)
-    if (e(o[i]))
+function dl(r, e) {
+  for (let i = 0; i < r.length; i++)
+    if (e(r[i]))
       return !0;
   return !1;
 }
-function dl(o) {
-  const e = o.prototype.handler;
-  o.prototype.handler = function(s) {
+function ml(r) {
+  const e = r.prototype.handler;
+  r.prototype.handler = function(s) {
     const n = this.store;
-    s.button > 0 && s.type === "pointerdown" && (ul(n, (r) => r.pointerId === s.pointerId) || n.push(s)), e.call(this, s);
+    s.button > 0 && s.type === "pointerdown" && (dl(n, (o) => o.pointerId === s.pointerId) || n.push(s)), e.call(this, s);
   };
 }
-function ml(o) {
-  o.prototype.handler = function(i) {
-    let s = cl[i.type];
+function pl(r) {
+  r.prototype.handler = function(i) {
+    let s = ul[i.type];
     s & Mr && i.button >= 0 && (this.pressed = !0), s & Ar && i.which === 0 && (s = gs), this.pressed && (s & gs && (this.pressed = !1), this.callback(this.manager, s, {
       pointers: [i],
       changedPointers: [i],
@@ -2408,24 +2420,24 @@ function ml(o) {
     }));
   };
 }
-dl(qt.PointerEventInput);
-ml(qt.MouseInput);
-const pl = qt.Manager;
+ml(qt.PointerEventInput);
+pl(qt.MouseInput);
+const gl = qt.Manager;
 let Ri = class {
   constructor(e, i, s) {
     this.element = e, this.callback = i, this.options = { enable: !0, ...s };
   }
 };
-const gl = Oe ? [
-  [Oe.Pan, { event: "tripan", pointers: 3, threshold: 0, enable: !1 }],
-  [Oe.Rotate, { enable: !1 }],
-  [Oe.Pinch, { enable: !1 }],
-  [Oe.Swipe, { enable: !1 }],
-  [Oe.Pan, { threshold: 0, enable: !1 }],
-  [Oe.Press, { enable: !1 }],
-  [Oe.Tap, { event: "doubletap", taps: 2, enable: !1 }],
-  [Oe.Tap, { event: "anytap", enable: !1 }],
-  [Oe.Tap, { enable: !1 }]
+const fl = Re ? [
+  [Re.Pan, { event: "tripan", pointers: 3, threshold: 0, enable: !1 }],
+  [Re.Rotate, { enable: !1 }],
+  [Re.Pinch, { enable: !1 }],
+  [Re.Swipe, { enable: !1 }],
+  [Re.Pan, { threshold: 0, enable: !1 }],
+  [Re.Press, { enable: !1 }],
+  [Re.Tap, { event: "doubletap", taps: 2, enable: !1 }],
+  [Re.Tap, { event: "anytap", enable: !1 }],
+  [Re.Tap, { enable: !1 }]
 ] : null, Ln = {
   tripan: ["rotate", "pinch", "pan"],
   rotate: ["pinch"],
@@ -2433,9 +2445,9 @@ const gl = Oe ? [
   pan: ["press", "doubletap", "anytap", "tap"],
   doubletap: ["anytap"],
   anytap: ["tap"]
-}, fl = {
-  doubletap: ["tap"]
 }, yl = {
+  doubletap: ["tap"]
+}, vl = {
   pointerdown: "pointerdown",
   pointermove: "pointermove",
   pointerup: "pointerup",
@@ -2452,7 +2464,7 @@ const gl = Oe ? [
     "wheel",
     "mousewheel"
   ]
-}, vl = {
+}, wl = {
   tap: "tap",
   anytap: "anytap",
   doubletap: "doubletap",
@@ -2502,37 +2514,37 @@ const gl = Oe ? [
   mouseover: "pointerover",
   mouseout: "pointerout",
   mouseleave: "pointerleave"
-}, wl = typeof navigator < "u" && navigator.userAgent ? navigator.userAgent.toLowerCase() : "", lt = typeof window < "u" ? window : global;
+}, xl = typeof navigator < "u" && navigator.userAgent ? navigator.userAgent.toLowerCase() : "", lt = typeof window < "u" ? window : global;
 let fs = !1;
 try {
-  const o = {
+  const r = {
     get passive() {
       return fs = !0, !0;
     }
   };
-  lt.addEventListener("test", null, o), lt.removeEventListener("test", null);
+  lt.addEventListener("test", null, r), lt.removeEventListener("test", null);
 } catch {
   fs = !1;
 }
-const xl = wl.indexOf("firefox") !== -1, { WHEEL_EVENTS: bl } = Is, In = "wheel", Dn = 4.000244140625, Cl = 40, Tl = 0.25;
+const bl = xl.indexOf("firefox") !== -1, { WHEEL_EVENTS: Cl } = Is, In = "wheel", Dn = 4.000244140625, Tl = 40, El = 0.25;
 class Sl extends Ri {
   constructor(e, i, s) {
     super(e, i, s), this.handleEvent = (n) => {
       if (!this.options.enable)
         return;
-      let r = n.deltaY;
-      lt.WheelEvent && (xl && n.deltaMode === lt.WheelEvent.DOM_DELTA_PIXEL && (r /= lt.devicePixelRatio), n.deltaMode === lt.WheelEvent.DOM_DELTA_LINE && (r *= Cl)), r !== 0 && r % Dn === 0 && (r = Math.floor(r / Dn)), n.shiftKey && r && (r = r * Tl), this.callback({
+      let o = n.deltaY;
+      lt.WheelEvent && (bl && n.deltaMode === lt.WheelEvent.DOM_DELTA_PIXEL && (o /= lt.devicePixelRatio), n.deltaMode === lt.WheelEvent.DOM_DELTA_LINE && (o *= Tl)), o !== 0 && o % Dn === 0 && (o = Math.floor(o / Dn)), n.shiftKey && o && (o = o * El), this.callback({
         type: In,
         center: {
           x: n.clientX,
           y: n.clientY
         },
-        delta: -r,
+        delta: -o,
         srcEvent: n,
         pointerType: "mouse",
         target: n.target
       });
-    }, this.events = (this.options.events || []).concat(bl), this.events.forEach((n) => e.addEventListener(n, this.handleEvent, fs ? { passive: !1 } : !1));
+    }, this.events = (this.options.events || []).concat(Cl), this.events.forEach((n) => e.addEventListener(n, this.handleEvent, fs ? { passive: !1 } : !1));
   }
   destroy() {
     this.events.forEach((e) => this.element.removeEventListener(e, this.handleEvent));
@@ -2541,14 +2553,14 @@ class Sl extends Ri {
     e === In && (this.options.enable = i);
   }
 }
-const { MOUSE_EVENTS: El } = Is, On = "pointermove", Rn = "pointerover", kn = "pointerout", _n = "pointerenter", Hn = "pointerleave";
-class Pl extends Ri {
+const { MOUSE_EVENTS: Pl } = Is, On = "pointermove", Rn = "pointerover", kn = "pointerout", _n = "pointerenter", Hn = "pointerleave";
+class Ml extends Ri {
   constructor(e, i, s) {
-    super(e, i, s), this.handleEvent = (r) => {
-      this.handleOverEvent(r), this.handleOutEvent(r), this.handleEnterEvent(r), this.handleLeaveEvent(r), this.handleMoveEvent(r);
+    super(e, i, s), this.handleEvent = (o) => {
+      this.handleOverEvent(o), this.handleOutEvent(o), this.handleEnterEvent(o), this.handleLeaveEvent(o), this.handleMoveEvent(o);
     }, this.pressed = !1;
     const { enable: n } = this.options;
-    this.enableMoveEvent = n, this.enableLeaveEvent = n, this.enableEnterEvent = n, this.enableOutEvent = n, this.enableOverEvent = n, this.events = (this.options.events || []).concat(El), this.events.forEach((r) => e.addEventListener(r, this.handleEvent));
+    this.enableMoveEvent = n, this.enableLeaveEvent = n, this.enableEnterEvent = n, this.enableOutEvent = n, this.enableOverEvent = n, this.events = (this.options.events || []).concat(Pl), this.events.forEach((o) => e.addEventListener(o, this.handleEvent));
   }
   destroy() {
     this.events.forEach((e) => this.element.removeEventListener(e, this.handleEvent));
@@ -2595,37 +2607,37 @@ class Pl extends Ri {
     });
   }
 }
-const { KEY_EVENTS: Ml } = Is, $n = "keydown", Bn = "keyup";
-class Al extends Ri {
+const { KEY_EVENTS: Al } = Is, $n = "keydown", Un = "keyup";
+class Ll extends Ri {
   constructor(e, i, s) {
     super(e, i, s), this.handleEvent = (n) => {
-      const r = n.target || n.srcElement;
-      r.tagName === "INPUT" && r.type === "text" || r.tagName === "TEXTAREA" || (this.enableDownEvent && n.type === "keydown" && this.callback({
+      const o = n.target || n.srcElement;
+      o.tagName === "INPUT" && o.type === "text" || o.tagName === "TEXTAREA" || (this.enableDownEvent && n.type === "keydown" && this.callback({
         type: $n,
         srcEvent: n,
         key: n.key,
         target: n.target
       }), this.enableUpEvent && n.type === "keyup" && this.callback({
-        type: Bn,
+        type: Un,
         srcEvent: n,
         key: n.key,
         target: n.target
       }));
-    }, this.enableDownEvent = this.options.enable, this.enableUpEvent = this.options.enable, this.events = (this.options.events || []).concat(Ml), e.tabIndex = this.options.tabIndex || 0, e.style.outline = "none", this.events.forEach((n) => e.addEventListener(n, this.handleEvent));
+    }, this.enableDownEvent = this.options.enable, this.enableUpEvent = this.options.enable, this.events = (this.options.events || []).concat(Al), e.tabIndex = this.options.tabIndex || 0, e.style.outline = "none", this.events.forEach((n) => e.addEventListener(n, this.handleEvent));
   }
   destroy() {
     this.events.forEach((e) => this.element.removeEventListener(e, this.handleEvent));
   }
   enableEventType(e, i) {
-    e === $n && (this.enableDownEvent = i), e === Bn && (this.enableUpEvent = i);
+    e === $n && (this.enableDownEvent = i), e === Un && (this.enableUpEvent = i);
   }
 }
-const Un = "contextmenu";
-class Ll extends Ri {
+const Bn = "contextmenu";
+class Nl extends Ri {
   constructor(e, i, s) {
     super(e, i, s), this.handleEvent = (n) => {
       this.options.enable && this.callback({
-        type: Un,
+        type: Bn,
         center: {
           x: n.clientX,
           y: n.clientY
@@ -2640,32 +2652,32 @@ class Ll extends Ri {
     this.element.removeEventListener("contextmenu", this.handleEvent);
   }
   enableEventType(e, i) {
-    e === Un && (this.options.enable = i);
+    e === Bn && (this.options.enable = i);
   }
 }
-const ys = 1, Si = 2, vs = 4, Nl = {
+const ys = 1, Ei = 2, vs = 4, Il = {
   pointerdown: ys,
-  pointermove: Si,
+  pointermove: Ei,
   pointerup: vs,
   mousedown: ys,
-  mousemove: Si,
+  mousemove: Ei,
   mouseup: vs
-}, Il = 1, Dl = 2, Ol = 3, Rl = 0, kl = 1, _l = 2, Hl = 1, $l = 2, Bl = 4;
-function Ul(o) {
-  const e = Nl[o.srcEvent.type];
+}, Dl = 1, Ol = 2, Rl = 3, kl = 0, _l = 1, Hl = 2, $l = 1, Ul = 2, Bl = 4;
+function Vl(r) {
+  const e = Il[r.srcEvent.type];
   if (!e)
     return null;
-  const { buttons: i, button: s, which: n } = o.srcEvent;
-  let r = !1, a = !1, h = !1;
-  return e === vs || e === Si && !Number.isFinite(i) ? (r = n === Il, a = n === Dl, h = n === Ol) : e === Si ? (r = !!(i & Hl), a = !!(i & Bl), h = !!(i & $l)) : e === ys && (r = s === Rl, a = s === kl, h = s === _l), { leftButton: r, middleButton: a, rightButton: h };
+  const { buttons: i, button: s, which: n } = r.srcEvent;
+  let o = !1, a = !1, l = !1;
+  return e === vs || e === Ei && !Number.isFinite(i) ? (o = n === Dl, a = n === Ol, l = n === Rl) : e === Ei ? (o = !!(i & $l), a = !!(i & Bl), l = !!(i & Ul)) : e === ys && (o = s === kl, a = s === _l, l = s === Hl), { leftButton: o, middleButton: a, rightButton: l };
 }
-function Vl(o, e) {
-  const i = o.center;
+function zl(r, e) {
+  const i = r.center;
   if (!i)
     return null;
-  const s = e.getBoundingClientRect(), n = s.width / e.offsetWidth || 1, r = s.height / e.offsetHeight || 1, a = {
+  const s = e.getBoundingClientRect(), n = s.width / e.offsetWidth || 1, o = s.height / e.offsetHeight || 1, a = {
     x: (i.x - s.left - e.clientLeft) / n,
-    y: (i.y - s.top - e.clientTop) / r
+    y: (i.y - s.top - e.clientTop) / o
   };
   return { center: i, offsetCenter: a };
 }
@@ -2673,7 +2685,7 @@ const Ki = {
   srcElement: "root",
   priority: 0
 };
-class zl {
+class Wl {
   constructor(e) {
     this.handleEvent = (i) => {
       if (this.isEmpty())
@@ -2691,19 +2703,19 @@ class zl {
   isEmpty() {
     return !this._active;
   }
-  add(e, i, s, n = !1, r = !1) {
-    const { handlers: a, handlersByElement: h } = this;
-    let l = Ki;
-    typeof s == "string" || s && s.addEventListener ? l = { ...Ki, srcElement: s } : s && (l = { ...Ki, ...s });
-    let m = h.get(l.srcElement);
-    m || (m = [], h.set(l.srcElement, m));
+  add(e, i, s, n = !1, o = !1) {
+    const { handlers: a, handlersByElement: l } = this;
+    let h = Ki;
+    typeof s == "string" || s && s.addEventListener ? h = { ...Ki, srcElement: s } : s && (h = { ...Ki, ...s });
+    let m = l.get(h.srcElement);
+    m || (m = [], l.set(h.srcElement, m));
     const g = {
       type: e,
       handler: i,
-      srcElement: l.srcElement,
-      priority: l.priority
+      srcElement: h.srcElement,
+      priority: h.priority
     };
-    n && (g.once = !0), r && (g.passive = !0), a.push(g), this._active = this._active || !g.passive;
+    n && (g.once = !0), o && (g.passive = !0), a.push(g), this._active = this._active || !g.passive;
     let v = m.length - 1;
     for (; v >= 0 && !(m[v].priority >= g.priority); )
       v--;
@@ -2711,37 +2723,37 @@ class zl {
   }
   remove(e, i) {
     const { handlers: s, handlersByElement: n } = this;
-    for (let r = s.length - 1; r >= 0; r--) {
-      const a = s[r];
+    for (let o = s.length - 1; o >= 0; o--) {
+      const a = s[o];
       if (a.type === e && a.handler === i) {
-        s.splice(r, 1);
-        const h = n.get(a.srcElement);
-        h.splice(h.indexOf(a), 1), h.length === 0 && n.delete(a.srcElement);
+        s.splice(o, 1);
+        const l = n.get(a.srcElement);
+        l.splice(l.indexOf(a), 1), l.length === 0 && n.delete(a.srcElement);
       }
     }
-    this._active = s.some((r) => !r.passive);
+    this._active = s.some((o) => !o.passive);
   }
   _emit(e, i) {
     const s = this.handlersByElement.get(i);
     if (s) {
       let n = !1;
-      const r = () => {
+      const o = () => {
         e.handled = !0;
       }, a = () => {
         e.handled = !0, n = !0;
-      }, h = [];
-      for (let l = 0; l < s.length; l++) {
-        const { type: m, handler: g, once: v } = s[l];
+      }, l = [];
+      for (let h = 0; h < s.length; h++) {
+        const { type: m, handler: g, once: v } = s[h];
         if (g({
           ...e,
           type: m,
-          stopPropagation: r,
+          stopPropagation: o,
           stopImmediatePropagation: a
-        }), v && h.push(s[l]), n)
+        }), v && l.push(s[h]), n)
           break;
       }
-      for (let l = 0; l < h.length; l++) {
-        const { type: m, handler: g } = h[l];
+      for (let h = 0; h < l.length; h++) {
+        const { type: m, handler: g } = l[h];
         this.remove(m, g);
       }
     }
@@ -2750,8 +2762,8 @@ class zl {
     const i = this.eventManager.getElement();
     return {
       ...e,
-      ...Ul(e),
-      ...Vl(e, i),
+      ...Vl(e),
+      ...zl(e, i),
       preventDefault: () => {
         e.srcEvent.preventDefault();
       },
@@ -2762,22 +2774,22 @@ class zl {
     };
   }
 }
-const Wl = {
+const Fl = {
   events: null,
   recognizers: null,
   recognizerOptions: {},
-  Manager: pl,
+  Manager: gl,
   touchAction: "none",
   tabIndex: 0
 };
-class Fl {
+class Gl {
   constructor(e = null, i) {
     this._onBasicInput = (n) => {
-      const { srcEvent: r } = n, a = yl[r.type];
+      const { srcEvent: o } = n, a = vl[o.type];
       a && this.manager.emit(a, n);
     }, this._onOtherEvent = (n) => {
       this.manager.emit(n.type, n);
-    }, this.options = { ...Wl, ...i }, this.events = /* @__PURE__ */ new Map(), this.setElement(e);
+    }, this.options = { ...Fl, ...i }, this.events = /* @__PURE__ */ new Map(), this.setElement(e);
     const { events: s } = this.options;
     s && this.on(s);
   }
@@ -2790,32 +2802,32 @@ class Fl {
     const { options: i } = this, s = i.Manager;
     this.manager = new s(e, {
       touchAction: i.touchAction,
-      recognizers: i.recognizers || gl
+      recognizers: i.recognizers || fl
     }).on("hammer.input", this._onBasicInput), i.recognizers || Object.keys(Ln).forEach((n) => {
-      const r = this.manager.get(n);
-      r && Ln[n].forEach((a) => {
-        r.recognizeWith(a);
+      const o = this.manager.get(n);
+      o && Ln[n].forEach((a) => {
+        o.recognizeWith(a);
       });
     });
     for (const n in i.recognizerOptions) {
-      const r = this.manager.get(n);
-      if (r) {
+      const o = this.manager.get(n);
+      if (o) {
         const a = i.recognizerOptions[n];
-        delete a.enable, r.set(a);
+        delete a.enable, o.set(a);
       }
     }
     this.wheelInput = new Sl(e, this._onOtherEvent, {
       enable: !1
-    }), this.moveInput = new Pl(e, this._onOtherEvent, {
+    }), this.moveInput = new Ml(e, this._onOtherEvent, {
       enable: !1
-    }), this.keyInput = new Al(e, this._onOtherEvent, {
+    }), this.keyInput = new Ll(e, this._onOtherEvent, {
       enable: !1,
       tabIndex: i.tabIndex
-    }), this.contextmenuInput = new Ll(e, this._onOtherEvent, {
+    }), this.contextmenuInput = new Nl(e, this._onOtherEvent, {
       enable: !1
     });
-    for (const [n, r] of this.events)
-      r.isEmpty() || (this._toggleRecognizer(r.recognizerName, !0), this.manager.on(n, r.handleEvent));
+    for (const [n, o] of this.events)
+      o.isEmpty() || (this._toggleRecognizer(o.recognizerName, !0), this.manager.on(n, o.handleEvent));
   }
   destroy() {
     this.element && (this.wheelInput.destroy(), this.moveInput.destroy(), this.keyInput.destroy(), this.contextmenuInput.destroy(), this.manager.destroy(), this.wheelInput = null, this.moveInput = null, this.keyInput = null, this.contextmenuInput = null, this.manager = null, this.element = null);
@@ -2839,24 +2851,24 @@ class Fl {
     const n = s.get(e);
     if (n && n.options.enable !== i) {
       n.set({ enable: i });
-      const r = fl[e];
-      r && !this.options.recognizers && r.forEach((a) => {
-        const h = s.get(a);
-        i ? (h.requireFailure(e), n.dropRequireFailure(a)) : h.dropRequireFailure(e);
+      const o = yl[e];
+      o && !this.options.recognizers && o.forEach((a) => {
+        const l = s.get(a);
+        i ? (l.requireFailure(e), n.dropRequireFailure(a)) : l.dropRequireFailure(e);
       });
     }
     this.wheelInput.enableEventType(e, i), this.moveInput.enableEventType(e, i), this.keyInput.enableEventType(e, i), this.contextmenuInput.enableEventType(e, i);
   }
-  _addEventHandler(e, i, s, n, r) {
+  _addEventHandler(e, i, s, n, o) {
     if (typeof e != "string") {
       s = i;
       for (const g in e)
-        this._addEventHandler(g, e[g], s, n, r);
+        this._addEventHandler(g, e[g], s, n, o);
       return;
     }
-    const { manager: a, events: h } = this, l = Nn[e] || e;
-    let m = h.get(l);
-    m || (m = new zl(this), h.set(l, m), m.recognizerName = vl[l] || l, a && a.on(l, m.handleEvent)), m.add(e, i, s, n, r), m.isEmpty() || this._toggleRecognizer(m.recognizerName, !0);
+    const { manager: a, events: l } = this, h = Nn[e] || e;
+    let m = l.get(h);
+    m || (m = new Wl(this), l.set(h, m), m.recognizerName = wl[h] || h, a && a.on(h, m.handleEvent)), m.add(e, i, s, n, o), m.isEmpty() || this._toggleRecognizer(m.recognizerName, !0);
   }
   _removeEventHandler(e, i) {
     if (typeof e != "string") {
@@ -2864,16 +2876,16 @@ class Fl {
         this._removeEventHandler(a, e[a]);
       return;
     }
-    const { events: s } = this, n = Nn[e] || e, r = s.get(n);
-    if (r && (r.remove(e, i), r.isEmpty())) {
-      const { recognizerName: a } = r;
-      let h = !1;
-      for (const l of s.values())
-        if (l.recognizerName === a && !l.isEmpty()) {
-          h = !0;
+    const { events: s } = this, n = Nn[e] || e, o = s.get(n);
+    if (o && (o.remove(e, i), o.isEmpty())) {
+      const { recognizerName: a } = o;
+      let l = !1;
+      for (const h of s.values())
+        if (h.recognizerName === a && !h.isEmpty()) {
+          l = !0;
           break;
         }
-      h || this._toggleRecognizer(a, !1);
+      l || this._toggleRecognizer(a, !1);
     }
   }
 }
@@ -2917,20 +2929,20 @@ class Vn {
     return this.#e.indexOf(e) != -1;
   }
   on(e, i, s, n) {
-    let r = i;
+    let o = i;
     switch (e) {
       case "pointerdown":
-        r = function(a) {
+        o = function(a) {
           this.logit(a), a.leftButton && (this.#t.pad.left = !0), this.#t.onPointerDown(a), i(this.#t.pointerEventData(a));
         };
         break;
       case "pointerup":
-        r = function(a) {
+        o = function(a) {
           this.logit(a), this.#t.onPointerUp(a), i(this.#t.pointerEventData(a));
         };
         break;
       case "pointermove":
-        r = function(a) {
+        o = function(a) {
           this.#t.motion(a), i(this.#t.pointerEventData(a));
         };
         break;
@@ -2941,34 +2953,34 @@ class Vn {
       case "pointerout":
       case "pointerover":
       case "contextmenu":
-        r = function(a) {
+        o = function(a) {
           this.logit(a), this.#t.location(a), i(this.#t.pointerEventData(a));
         };
         break;
       case "wheel":
-        r = function(a) {
+        o = function(a) {
           this.logit(a), this.#t.wheeldelta = a, i(this.#t.pointerEventData(a));
         };
         break;
       case "pointercancel":
       case "gotpointercapture":
       case "lostpointercapture":
-        r = function(a) {
+        o = function(a) {
           i(a);
         };
         break;
       case "pointerdrag":
-        r = function(a) {
+        o = function(a) {
           this.logit(a), this.#t.motion(a), i(this.#t.pointerEventData(a));
         }, this.#t.agent.on("panstart", this.#t.startPointerDrag.bind(this.#t)), e = "panmove";
         break;
       case "pointerdragend":
-        r = function(a) {
+        o = function(a) {
           this.logit(a), this.#t.motion(a), this.#t.endPointerDrag(a), i(this.#t.pointerEventData(a));
         }, e = "panend";
         break;
     }
-    return n ? this.#t.agent.once(e, r.bind(this), s) : this.#t.agent.on(e, r.bind(this), s), r;
+    return n ? this.#t.agent.once(e, o.bind(this), s) : this.#t.agent.on(e, o.bind(this), s), o;
   }
   off(e, i, s) {
     this.#t.agent.off(e, i, s);
@@ -3013,8 +3025,8 @@ class zn {
     return this.#e.indexOf(e) != -1;
   }
   on(e, i, s, n) {
-    let r = i;
-    return n ? this.#t.agent.once(e, r.bind(this), s) : this.#t.agent.on(e, r.bind(this), s), r;
+    let o = i;
+    return n ? this.#t.agent.once(e, o.bind(this), s) : this.#t.agent.on(e, o.bind(this), s), o;
   }
   off(e, i, s) {
     this.#t.agent.off(e, i, s);
@@ -3033,14 +3045,14 @@ class Wn {
     return this.#e.indexOf(e) != -1;
   }
   on(e, i, s, n) {
-    let r = i;
-    return n ? this.#t.agent.once(e, r.bind(this), s) : this.#t.agent.on(e, r.bind(this), s), r;
+    let o = i;
+    return n ? this.#t.agent.once(e, o.bind(this), s) : this.#t.agent.on(e, o.bind(this), s), o;
   }
   off(e, i, s) {
     this.#t.agent.off(e, i, s);
   }
 }
-const Gl = {
+const Yl = {
   element: void 0,
   contextMenu: !0,
   panX: !0,
@@ -3061,16 +3073,16 @@ class Le {
   #d;
   pad = { left: !1 };
   constructor(e, i) {
-    if (this.#e = { ...Gl, ...i }, this.#o = al.idle, this.#l = ol, this.#t = e, !this.#t && this.#e.elementId && (this.#t = document.getElementById(this.#e.elementId)), !D.isElement(this.#t))
+    if (this.#e = { ...Yl, ...i }, this.#o = ll.idle, this.#l = al, this.#t = e, !this.#t && this.#e.elementId && (this.#t = document.getElementById(this.#e.elementId)), !D.isElement(this.#t))
       throw "Must specify an element to receive user input.";
-    this.#e.contextMenu || (window.oncontextmenu = (r) => (r.preventDefault(), !1));
+    this.#e.contextMenu || (window.oncontextmenu = (o) => (o.preventDefault(), !1));
     const n = {
       recognizerOptions: {
         pan: { threshold: this.#l ? 10 : 0 },
         pinch: { threshold: 0 }
       }
     };
-    this.#n = new Fl(this.#t, n), this.pointerInit();
+    this.#n = new Gl(this.#t, n), this.pointerInit();
   }
   get agent() {
     return this.#n;
@@ -3112,7 +3124,7 @@ class Le {
     this.#n.destroy(), this.#r = void 0, this.#i = void 0, this.#s = void 0;
   }
   isValid(e, i) {
-    return !!(S(e) || B(i));
+    return !!(E(e) || U(i));
   }
   validOptions(e) {
     return b(e) && K(e) ? e : void 0;
@@ -3290,19 +3302,19 @@ class le {
     this.#l.lastElementChild == null ? this.#l.innerHTML = this.dividerNode() : this.#l.lastElementChild.insertAdjacentHTML("afterend", this.dividerNode()), this.#o = D.findBySelector(`#${this.#e}`, this.#l);
   }
   dividerNode() {
-    let e = this.#t.theme, i = this.#s.pos.top - D.elementDimPos(this.#l).top, s = this.#t.MainPane.rowsW + this.#t.scaleW, n = T(this.config.dividerHeight) ? this.config.dividerHeight : Ga, r = e.tools.width;
+    let e = this.#t.theme, i = this.#s.pos.top - D.elementDimPos(this.#l).top, s = this.#t.MainPane.rowsW + this.#t.scaleW, n = T(this.config.dividerHeight) ? this.config.dividerHeight : Ya, o = e.tools.width;
     switch (i -= n / 2, e.tools.location) {
       case "left":
         break;
       case !1:
       case "none":
       case "right":
-        r *= -1;
+        o *= -1;
         break;
     }
-    const a = `position: absolute; top: ${i}px; left: ${r}px; z-index:100; width: ${s}px; height: ${n}px; background: ${e.divider.idle};`, h = `width: 100%; margin: 3.5px 0; border: 0; border-top: ${e.divider.style} ${e.divider.line};`;
+    const a = `position: absolute; top: ${i}px; left: ${o}px; z-index:100; width: ${s}px; height: ${n}px; background: ${e.divider.idle};`, l = `width: 100%; margin: 3.5px 0; border: 0; border-top: ${e.divider.style} ${e.divider.line};`;
     return `
-      <div id="${this.#e}" class="divider" style="${a}"><hr style="${h}"></div>
+      <div id="${this.#e}" class="divider" style="${a}"><hr style="${l}"></div>
     `;
   }
   setPos() {
@@ -3313,7 +3325,7 @@ class le {
     this.#o.style.width = `${this.#t.MainPane.width}px`;
   }
   setCursorStyle(e) {
-    S(e) && (this.#a = e, this.#o.style.cursor = e);
+    E(e) && (this.#a = e, this.#o.style.cursor = e);
   }
   hide() {
     this.#o.style.display = "none";
@@ -3322,7 +3334,7 @@ class le {
     this.#o.style.display = "block";
   }
 }
-const Yl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" ><path d="M471.993 112h-89.2l-16.242-46.75a32.023 32.023 0 00-30.229-21.5H175.241a31.991 31.991 0 00-30.294 21.691L129.1 112H40a24.027 24.027 0 00-24 24v312a24.027 24.027 0 0024 24h431.993a24.027 24.027 0 0024-24V136a24.027 24.027 0 00-24-24zm-8 328H48.007V144h104.01l23.224-68.25h161.081l23.71 68.25h103.961z" class="ci-primary"></path><path d="M256 168a114 114 0 10114 114 114.13 114.13 0 00-114-114zm0 196a82 82 0 1182-82 82.093 82.093 0 01-82 82z"></path></svg>', ql = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M376 160v32h65.372L252 381.373l-72-72L76.686 412.686l22.628 22.628L180 354.627l72 72 212-211.999V280h32V160H376z"></path><path d="M48 104H16v392h480v-32H48V104z"></path></svg>', Xl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M271.514 95.5h-32v178.111l115.613 54.948 13.737-28.902-97.35-46.268V95.5z"></path><path d="M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208z"></path></svg>', Lr = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M245.151 168a88 88 0 1088 88 88.1 88.1 0 00-88-88zm0 144a56 56 0 1156-56 56.063 56.063 0 01-56 56z"></path><path d="M464.7 322.319l-31.77-26.153a193.081 193.081 0 000-80.332l31.77-26.153a19.941 19.941 0 004.606-25.439l-32.612-56.483a19.936 19.936 0 00-24.337-8.73l-38.561 14.447a192.038 192.038 0 00-69.54-40.192l-6.766-40.571A19.936 19.936 0 00277.762 16H212.54a19.937 19.937 0 00-19.728 16.712l-6.762 40.572a192.03 192.03 0 00-69.54 40.192L77.945 99.027a19.937 19.937 0 00-24.334 8.731L21 164.245a19.94 19.94 0 004.61 25.438l31.767 26.151a193.081 193.081 0 000 80.332l-31.77 26.153A19.942 19.942 0 0021 347.758l32.612 56.483a19.937 19.937 0 0024.337 8.73l38.562-14.447a192.03 192.03 0 0069.54 40.192l6.762 40.571A19.937 19.937 0 00212.54 496h65.222a19.936 19.936 0 0019.728-16.712l6.763-40.572a192.038 192.038 0 0069.54-40.192l38.564 14.449a19.938 19.938 0 0024.334-8.731l32.609-56.487a19.939 19.939 0 00-4.6-25.436zm-50.636 57.12l-48.109-18.024-7.285 7.334a159.955 159.955 0 01-72.625 41.973l-10 2.636L267.6 464h-44.89l-8.442-50.642-10-2.636a159.955 159.955 0 01-72.625-41.973l-7.285-7.334-48.117 18.024L53.8 340.562l39.629-32.624-2.7-9.973a160.9 160.9 0 010-83.93l2.7-9.972L53.8 171.439l22.446-38.878 48.109 18.024 7.285-7.334a159.955 159.955 0 0172.625-41.973l10-2.636L222.706 48H267.6l8.442 50.642 10 2.636a159.955 159.955 0 0172.625 41.973l7.285 7.334 48.109-18.024 22.447 38.877-39.629 32.625 2.7 9.972a160.9 160.9 0 010 83.93l-2.7 9.973 39.629 32.623z"></path></svg>', Kl = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><rect x="16" y="240.18" width="188.84" height="31.635"/><g transform="translate(-3.3234e-7 -112.18)"><rect x="307.16" y="352.37" width="188.84" height="31.635"/></g><rect transform="rotate(-90)" x="-496" y="240.18" width="188.84" height="31.635"/><rect transform="rotate(-90)" x="-204.84" y="240.18" width="188.84" height="31.635"/></svg>', jl = '<svg width="46.08" height="46.08" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"></path><path d="M6.535 3H21a1 1 0 011 1v16a1 1 0 01-1 1H6.535a1 1 0 01-.832-.445l-5.333-8a1 1 0 010-1.11l5.333-8A1 1 0 016.535 3zm.535 2l-4.666 7 4.666 7H20V5H7.07zM13 10.586l2.828-2.829 1.415 1.415L14.414 12l2.829 2.828-1.415 1.415L13 13.414l-2.828 2.829-1.415-1.415L11.586 12 8.757 9.172l1.415-1.415L13 10.586z"></path></svg>', Zl = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g stroke-width="30.155"><rect x="14.757" y="240.92" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="147" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="334.84" width="482.49" height="30.155" rx="15.078"/></g ><g transform="translate(5.937 -288.34)"><path d="m23.904 712.34c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h173.93c-0.65295-3.3651-2.0312-6.4697-2.0312-10.026 0-7.1393 1.5573-13.888 4.0625-20.13zm276.35 0c2.5051 6.2423 4.0365 12.991 4.0365 20.13 0 3.5554-1.3526 6.6618-2.0052 10.026h173.93c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078z"/><path d="m250.06 759.97c17.965 0 32.545-14.58 32.545-32.545 0-17.965-14.58-32.545-32.545-32.545-17.965 0-32.545 14.58-32.545 32.545 0 17.965 14.58 32.545 32.545 32.545zm0 21.697c-29.964 0-54.242-24.279-54.242-54.242 0-29.964 24.279-54.242 54.242-54.242 29.964 0 54.242 24.279 54.242 54.242 0 29.964-24.279 54.242-54.242 54.242z" stroke-width="21.697"/></g ><path d="m144.05 18.672c-24.694 0-45.285 16.595-51.849 39.167h-62.37c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h62.37c6.5639 22.572 27.155 39.167 51.849 39.167s45.285-16.595 51.849-39.167h120.03c6.5639 22.572 27.155 39.167 51.849 39.167 24.694 0 45.285-16.595 51.849-39.167h62.552c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078h-62.552c-6.5639-22.572-27.155-39.167-51.849-39.167-24.694 0-45.285 16.595-51.849 39.167h-120.03c-6.5639-22.572-27.155-39.167-51.849-39.167zm0 21.693c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 1e-5 -32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552zm223.72 0c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 0-32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552z" stroke-width="30.155"/></svg>', et = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g transform="matrix(21.697 0 0 21.697 -47.758 -47.758)"><path d="m7.354 21.354 14-14-0.707-0.707-14 14z"/><path d="m22.5 7c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5zm-17 16c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z"/></g></svg>', Jl = '<svg width="46.08" height="46.08" viewBox="0 0 32 32"><path d="M 3.2758709,20.241377 11.758622,28.72413 28.72413,11.758622 20.241377,3.2758709 Z m 2.1206881,0 1.5905161,-1.590515 3.7112049,3.711203 1.060342,-1.060345 -3.7112027,-3.711204 1.0603441,-1.060344 2.1206876,2.12069 1.060346,-1.060346 -2.120689,-2.120688 1.060343,-1.060344 3.711203,3.711203 L 16,17.060346 l -3.711203,-3.711208 1.060341,-1.060341 2.12069,2.120687 1.060344,-1.060346 -2.120688,-2.120687 1.060344,-1.060343 3.711204,3.711205 1.060345,-1.060345 -3.711205,-3.7112046 1.060344,-1.0603441 2.120687,2.1206887 1.060346,-1.0603446 -2.120687,-2.1206883 1.590515,-1.5905161 6.362065,6.362063 -14.84482,14.84482 z" style="stroke-width:0.749776" /></svg>', Ql = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><g id="g930" transform="matrix(21.128963,0,0,21.128963,-29.235597,-50.369964)"><path clip-rule="evenodd" d="m 4.5,5 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,6.5 A 2.5,2.5 0 0 1 6.95,6 H 24 V 7 H 6.95 A 2.5,2.5 0 0 1 2,6.5 Z M 4.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,16.5 A 2.5,2.5 0 0 1 6.95,16 h 13.1 a 2.5,2.5 0 1 1 0,1 H 6.95 A 2.5,2.5 0 0 1 2,16.5 Z M 22.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z m -18,6 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,22.5 A 2.5,2.5 0 0 1 6.95,22 H 24 v 1 H 6.95 A 2.5,2.5 0 0 1 2,22.5 Z" id="path908" /><path clip-rule="evenodd" d="M 22.4,8.94 21.01,9.57 20.6,8.66 21.99,8.03 Z m -4,1.8 -1.39,0.63 -0.41,-0.91 1.39,-0.63 z m -4,1.8 -1.4,0.63 -0.4,-0.91 1.39,-0.63 z m -4,1.8 L 9,14.97 8.6,14.06 9.99,13.43 Z" id="path910" /></g></svg>', eh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M231.359 147l-80.921 205h45.155l15.593-39.5h89.628l15.593 39.5h45.155l-80.921-205zm-3.594 123.5L256 198.967l28.235 71.533z"></path><path d="M384 56H128V16H16v112h40v256H16v112h112v-40h256v40h112V384h-40V128h40V16H384zM48 96V48h48v48zm48 368H48v-48h48zm288-40H128v-40H88V128h40V88h256v40h40v256h-40zm80-8v48h-48v-48zM416 48h48v48h-48z"></path></svg>', th = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g718" transform="translate(0,1.2499996)"><path d="M 7.5010125,7.9560661 5.355012,10.103066 c -0.472,0.472 -1.18,-0.2360003 -0.708,-0.7080003 L 7.6470125,6.3950659 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999998 c 0.472,0.472 -0.236,1.1800003 -0.708,0.7080003 L 8.5010125,7.9560661 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m 7.4989873,5.5439348 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>', ih = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,7.7026182 -2.1460003,2.147 c -0.472,0.4719998 -1.18,-0.236 -0.708,-0.708 l 3.0000003,-3 c 0.1953639,-0.1958581 0.5126361,-0.1958581 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.1799998 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6-3" /></svg>', sh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,8.2973819 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.1958581 0.5126361,0.1958581 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></svg>', nh = '<svg width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="m1 14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-12a1 1 0 0 0-1-1h-12a1 1 0 0 0-1 1zm15 0a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2zm-8.5-2.5a0.5 0.5 0 0 0 1 0v-5.793l2.146 2.147a0.50063 0.50063 0 1 0 0.708-0.708l-3-3a0.5 0.5 0 0 0-0.708 0l-3 3a0.50063 0.50063 0 0 0 0.708 0.708l2.146-2.147z" fill-rule="evenodd"/></svg>', rh = '<svg width="46.08" height="46.08" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M 15,2 A 1,-1 0 0 0 14,1 H 2 A 1,-1 0 0 0 1,2 v 12 a 1,-1 0 0 0 1,1 h 12 a 1,-1 0 0 0 1,-1 z M 0,2 A 2,-2 0 0 1 2,0 h 12 a 2,-2 0 0 1 2,2 v 12 a 2,-2 0 0 1 -2,2 H 2 A 2,-2 0 0 1 0,14 Z m 8.5,2.5 a 0.5,-0.5 0 0 0 -1,0 v 5.793 L 5.354,8.146 A 0.5006316,-0.5006316 0 1 0 4.646,8.854 l 3,3 a 0.5,-0.5 0 0 0 0.708,0 l 3,-3 A 0.5006316,-0.5006316 0 0 0 10.646,8.146 L 8.5,10.293 Z" id="path2" /></svg>', oh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g687" transform="translate(15.647255,-0.0288128)"><path d="m -8.1462425,10.484879 -2.1460005,2.146999 c -0.472,0.472 -1.18,-0.236 -0.708,-0.708 l 3.0000005,-2.9999994 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999994 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1460005,-2.146999 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m -8.1482677,5.5727476 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>', ah = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g611" transform="translate(0.2050748,-0.8829888)"><path d="m 7.2959375,11.933818 -2.146,-2.1469999 c -0.472,-0.4719998 -1.18,0.2359999 -0.708,0.7079999 l 3,3 c 0.195364,0.195858 0.512636,0.195858 0.708,0 l 3.0000005,-3 c 0.472,-0.472 -0.236,-1.1799997 -0.708,-0.7079999 L 8.2959375,11.933818 c -0.431103,0.417289 -0.523896,0.423024 -1,0 z" style="" id="path566" /><path d="m 7.2939123,5.8321596 -2.146,2.147 c -0.4719998,0.472 -1.1799998,-0.236 -0.708,-0.708 l 3,-3 c 0.1953639,-0.195858 0.5126361,-0.195858 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6" /></g></svg>', lh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 11.500447,8.5 c 0.666666,0 0.666666,-1 0,-1 H 4.444275 c -0.1571231,0 -0.224029,0.07336 -0.2978281,0.1459999 -0.1958579,0.195364 -0.1958579,0.5126361 0,0.7080001 0,0 0.113806,0.146 0.320186,0.146 z" style="" id="path887" /></svg>', hh = '<svg style="height:46px;width:46px" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <g fill-rule="evenodd">  <path d="m15 2c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1h12c0.55228 0 1-0.44772 1-1zm-15 0c0-1.1046 0.89543-2 2-2h12c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2z"/>  <path d="m4.4449 4.097c-0.01964 0-0.037678 0.0018-0.054687 0.0039-0.017011 0.0022-0.034068 0.0058-0.048828 0.0098-0.014761 4e-3 -0.028126 0.0081-0.041016 0.01367-0.012889 0.0056-0.025711 0.01268-0.037109 0.01953-0.022796 0.01371-0.041442 0.02783-0.060547 0.04492s-0.038191 0.03653-0.056641 0.05469c-0.024482 0.02442-0.046092 0.05037-0.064453 0.07813-0.018362 0.02775-0.032681 0.05776-0.044922 0.08789s-0.021223 0.06023-0.027344 0.0918c-0.00612 0.03156-0.00977 0.06366-0.00977 0.0957 0 8e-3 -4.378e-4 0.01543 0 0.02344v1.2988c0 0.02083 6.41e-5 0.04102 0.00195 0.06055 0.00189 0.01953 0.0061 0.03841 0.00977 0.05664 0.00366 0.01823 0.00836 0.03581 0.013672 0.05273 0.00531 0.01693 0.010742 0.0332 0.017578 0.04883 0.013672 0.03125 0.029785 0.0599 0.048828 0.08594s0.041016 0.04948 0.064453 0.07031 0.049316 0.03906 0.076172 0.05469c0.026855 0.01563 0.054687 0.02865 0.083984 0.03906 0.029297 0.01042 0.059082 0.01823 0.089844 0.02344 0.030762 0.0052 0.0625 0.0078 0.09375 0.0078s0.062988-0.0026 0.09375-0.0078 0.060547-0.01302 0.089844-0.02344 0.057129-0.02344 0.083984-0.03906c0.026855-0.01563 0.052734-0.03385 0.076172-0.05469 0.023437-0.02083 0.04541-0.04427 0.064453-0.07031s0.035156-0.05469 0.048828-0.08594c0.00684-0.01563 0.012268-0.0319 0.017578-0.04883s0.01001-0.0345 0.013672-0.05273c0.00366-0.01823 0.00787-0.03711 0.00977-0.05664 0.00189-0.01953 0.00195-0.03971 0.00195-0.06055v-0.82227h6v0.98633c0 0.02083 2e-3 0.04102 0.0039 0.06055s0.0042 0.03841 0.0078 0.05664c0.0037 0.01823 0.0084 0.03581 0.01367 0.05273 0.0053 0.01693 0.01074 0.0332 0.01758 0.04883 0.01367 0.03125 0.03174 0.0599 0.05078 0.08594s0.03906 0.04948 0.0625 0.07031 0.04932 0.03906 0.07617 0.05469c0.02686 0.01563 0.05469 0.02865 0.08399 0.03906 0.0293 0.01042 0.06104 0.01823 0.0918 0.02344 0.03076 0.0052 0.06055 0.0078 0.0918 0.0078s0.06299-0.0026 0.09375-0.0078 0.06055-0.01302 0.08984-0.02344c0.0293-0.01042 0.05908-0.02344 0.08594-0.03906 0.02686-0.01563 0.05078-0.03385 0.07422-0.05469 0.02344-0.02083 0.04541-0.04427 0.06445-0.07031s0.03516-0.05469 0.04883-0.08594c0.0068-0.01563 0.01422-0.0319 0.01953-0.04883 0.0053-0.01693 0.01001-0.0345 0.01367-0.05273 0.0037-0.01823 0.0059-0.03711 0.0078-0.05664s2e-3 -0.03971 2e-3 -0.06055v-1.4629c3.25e-4 -0.0078 0-0.01563 0-0.02344 0-0.03125-0.0026-0.06299-0.0078-0.09375s-0.01302-0.06055-0.02344-0.08984c-0.01042-0.0293-0.02344-0.05713-0.03906-0.08398-0.01563-0.02685-0.03385-0.05273-0.05469-0.07617-0.02083-0.02344-0.04427-0.04541-0.07031-0.06445s-0.05469-0.03516-0.08594-0.04883c-0.01563-0.0068-0.0319-0.01227-0.04883-0.01758-0.01693-0.0053-0.0345-0.01001-0.05273-0.01367-0.01823-0.0037-0.03711-0.0059-0.05664-0.0078s-0.03971-0.0039-0.06055-0.0039h-6.5z"/>  <path d="m11.555 11.903c0.01964 0 0.03768-0.0018 0.05469-0.0039 0.01701-0.0022 0.03407-0.0058 0.04883-0.0098s0.02813-0.0081 0.04102-0.01367c0.01289-0.0056 0.02571-0.01268 0.03711-0.01953 0.0228-0.01371 0.04144-0.02783 0.06055-0.04492 0.0191-0.01709 0.03819-0.03653 0.05664-0.05469 0.02448-0.02442 0.04609-0.05037 0.06445-0.07813 0.01836-0.02775 0.03268-0.05776 0.04492-0.08789s0.02122-0.06023 0.02734-0.0918c0.0061-0.03156 0.0098-0.06366 0.0098-0.0957 0-8e-3 4.38e-4 -0.01543 0-0.02344v-1.2988c0-0.02083-6.4e-5 -0.04102-2e-3 -0.06055-0.0019-0.01953-0.0061-0.03841-0.0098-0.05664s-0.0084-0.03581-0.01367-0.05273c-0.0053-0.01693-0.01074-0.0332-0.01758-0.04883-0.01367-0.03125-0.02979-0.0599-0.04883-0.08594s-0.04102-0.04948-0.06445-0.07031c-0.02344-0.02083-0.04932-0.03906-0.07617-0.05469s-0.05469-0.02865-0.08398-0.03906c-0.0293-0.01042-0.05908-0.01823-0.08984-0.02344-0.03076-0.0052-0.0625-0.0078-0.09375-0.0078s-0.06299 0.0026-0.09375 0.0078-0.06055 0.01302-0.08984 0.02344c-0.0293 0.01042-0.05713 0.02344-0.08398 0.03906-0.02685 0.01563-0.05273 0.03385-0.07617 0.05469-0.02344 0.02083-0.04541 0.04427-0.06445 0.07031s-0.03516 0.05469-0.04883 0.08594c-0.0068 0.01563-0.01227 0.0319-0.01758 0.04883-0.0053 0.01693-0.01001 0.0345-0.01367 0.05273-0.0037 0.01823-0.0079 0.03711-0.0098 0.05664s-0.0019 0.03971-0.0019 0.06055v0.82227h-6v-0.98633c0-0.02083-2e-3 -0.04102-0.0039-0.06055s-0.0042-0.03841-0.0078-0.05664c-0.0037-0.01823-0.0084-0.03581-0.01367-0.05273-0.0053-0.01693-0.01074-0.0332-0.01758-0.04883-0.01367-0.03125-0.03174-0.0599-0.05078-0.08594s-0.03906-0.04948-0.0625-0.07031-0.04932-0.03906-0.07617-0.05469c-0.02686-0.01563-0.05469-0.02865-0.08399-0.03906-0.0293-0.01042-0.06104-0.01823-0.0918-0.02344-0.03076-0.0052-0.06055-0.0078-0.0918-0.0078s-0.06299 0.0026-0.09375 0.0078-0.06055 0.01302-0.08984 0.02344c-0.0293 0.01042-0.05908 0.02344-0.08594 0.03906-0.02686 0.01563-0.05078 0.03385-0.07422 0.05469-0.02344 0.02083-0.04541 0.04427-0.06445 0.07031s-0.03516 0.05469-0.04883 0.08594c-0.0068 0.01563-0.01422 0.0319-0.01953 0.04883-0.0053 0.01693-0.01001 0.03451-0.01367 0.05273-0.0037 0.01823-0.0059 0.03711-0.0078 0.05664s-2e-3 0.03971-2e-3 0.06055v1.4629c-3.25e-4 0.0078 0 0.01563 0 0.02344 0 0.03125 0.0026 0.06299 0.0078 0.09375s0.01302 0.06055 0.02344 0.08984c0.01042 0.0293 0.02344 0.05713 0.03906 0.08398 0.01563 0.02685 0.03385 0.05273 0.05469 0.07617 0.02083 0.02344 0.04427 0.04541 0.07031 0.06445s0.05469 0.03516 0.08594 0.04883c0.01563 0.0068 0.0319 0.01227 0.04883 0.01758 0.01693 0.0053 0.0345 0.01001 0.05273 0.01367 0.01823 0.0037 0.03711 0.0059 0.05664 0.0078s0.03971 0.0039 0.06055 0.0039h6.5z"/></g></svg>', ch = '<svg style="height:46px;width:46px" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="m15 2c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1h12c0.55228 0 1-0.44772 1-1zm-15 0c0-1.1046 0.89543-2 2-2h12c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2z" fill-rule="evenodd"/> <path d="m13.291 7.7876c-1.0729-2.491-3.0911-4.0365-5.2687-4.0365-2.1776 0-4.1958 1.5456-5.2687 4.0365a0.53112 0.53112 0 0 0 0 0.4249c1.0729 2.491 3.0911 4.0365 5.2687 4.0365 2.1776 0 4.1959-1.5456 5.2687-4.0365a0.53112 0.53112 0 0 0 0-0.4249zm-5.2687 3.3992c-1.6836 0-3.277-1.2163-4.1958-3.1867 0.91884-1.9705 2.5122-3.1867 4.1958-3.1867 1.6837 0 3.277 1.2163 4.1959 3.1867-0.91884 1.9705-2.5122 3.1867-4.1959 3.1867zm0-5.3112a2.1245 2.1245 0 1 0 2.1245 2.1245 2.1245 2.1245 0 0 0-2.1245-2.1245zm0 3.1867a1.0622 1.0622 0 1 1 1.0622-1.0622 1.0622 1.0622 0 0 1-1.0622 1.0622z" stroke-width=".53112"/></svg>', uh = '<svg style="height:46px;width:46px" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="m15 2c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1h12c0.55228 0 1-0.44772 1-1zm-15 0c0-1.1046 0.89543-2 2-2h12c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2z" fill-rule="evenodd"/> <path d="m13.291 7.7876c-1.0729-2.491-3.0911-4.0365-5.2687-4.0365-2.1776 0-4.1958 1.5456-5.2687 4.0365a0.53112 0.53112 0 0 0 0 0.4249c1.0729 2.491 3.0911 4.0365 5.2687 4.0365 2.1776 0 4.1959-1.5456 5.2687-4.0365a0.53112 0.53112 0 0 0 0-0.4249zm-5.2687 3.3992c-1.6836 0-3.277-1.2163-4.1958-3.1867 0.91884-1.9705 2.5122-3.1867 4.1958-3.1867 1.6837 0 3.277 1.2163 4.1959 3.1867-0.91884 1.9705-2.5122 3.1867-4.1959 3.1867zm0-5.3112a2.1245 2.1245 0 1 0 2.1245 2.1245 2.1245 2.1245 0 0 0-2.1245-2.1245zm0 3.1867a1.0622 1.0622 0 1 1 1.0622-1.0622 1.0622 1.0622 0 0 1-1.0622 1.0622z" stroke-width=".53112"/> <path d="m12.757 3.0055c-0.11087 0.0051358-0.22696 0.051177-0.33008 0.1543l-4.9883 4.9902c-0.061946 0.061947-0.086644 0.12038-0.097656 0.17773l-4.8184 4.8164c-0.1111 0.1111-0.1066 0.2109-0.10742 0.31445-3.5e-4 0.27663 0.22337 0.50035 0.5 0.5 0 0 0.18415 0.022881 0.33008-0.12305l4.9746-4.9727c0.06758-0.06758 0.10951-0.13979 0.13281-0.21289l4.7832-4.7832c0.36828-0.36828 0.017071-0.87967-0.37891-0.86133z" fill-rule="evenodd"/></svg>', dh = '<svg class="ov-icon" width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m14 15c0.55228 0 1-0.44772 1-1v-12c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1zm0-15c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2v-12c0-1.1046 0.89543-2 2-2z" fill-rule="evenodd"/><g transform="translate(-1.1585)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>', mh = '<svg class="ov-icon" width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m2 15c-0.55228 0-1-0.44772-1-1v-12c0-0.55228 0.44772-1 1-1h12c0.55228 0 1 0.44772 1 1v12c0 0.55228-0.44772 1-1 1zm0-15c-1.1046 0-2 0.89543-2 2v12c0 1.1046 0.89543 2 2 2h12c1.1046 0 2-0.89543 2-2v-12c0-1.1046-0.89543-2-2-2z" fill-rule="evenodd"/><g transform="matrix(-1 0 0 1 17.159 0)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>', ph = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 336.96 336.36" xmlns="http://www.w3.org/2000/svg"><path d="m0 0 168.48 336.36 168.48-336.36z"/></svg>', gh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 336.96 336.36" xmlns="http://www.w3.org/2000/svg"><path d="m0 336.36 168.48-336.36 168.48 336.36z"/></svg>', fh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0 70.67-28.66 134.68-74.99 181.01s-110.34 74.99-181.01 74.99c-70.68 0-134.69-28.66-181.01-74.99-46.33-46.33-74.99-110.34-74.99-181.01 0-70.68 28.66-134.69 74.99-181.01 46.32-46.33 110.33-74.99 181.01-74.99 70.67 0 134.68 28.66 181.01 74.99 46.33 46.32 74.99 110.33 74.99 181.01zm-204.29-21.97v-67.04c0-7.53-6.19-13.72-13.73-13.72h-75.96c-7.53 0-13.72 6.17-13.72 13.72v67.03h-42.84c-16.5 0-24.78 19.64-13.86 31.54l94.74 110.57c7.44 9 21.03 9.01 28.66 0.37l93.71-111.31c10.69-12.27 1.64-31.14-14.19-31.16h-42.81zm105.52 179.2c40.22-40.24 65.11-95.84 65.11-157.23 0-61.4-24.89-117-65.11-157.23-40.24-40.23-95.84-65.11-157.23-65.11-61.4 0-117 24.88-157.23 65.11s-65.11 95.83-65.11 157.23c0 61.39 24.88 116.99 65.11 157.23 40.23 40.22 95.83 65.11 157.23 65.11 61.39 0 116.99-24.89 157.23-65.11z" fill-rule="nonzero"/></svg>', yh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0-70.67-28.66-134.68-74.99-181.01s-110.34-74.99-181.01-74.99c-70.68 0-134.69 28.66-181.01 74.99-46.33 46.33-74.99 110.34-74.99 181.01 0 70.68 28.66 134.69 74.99 181.01 46.32 46.33 110.33 74.99 181.01 74.99 70.67 0 134.68-28.66 181.01-74.99 46.33-46.32 74.99-110.33 74.99-181.01zm-204.29 21.97v67.04c0 7.53-6.19 13.72-13.73 13.72h-75.96c-7.53 0-13.72-6.17-13.72-13.72v-67.03h-42.84c-16.5 0-24.78-19.64-13.86-31.54l94.74-110.57c7.44-9 21.03-9.01 28.66-0.37l93.71 111.31c10.69 12.27 1.64 31.14-14.19 31.16zm105.52-179.2c40.22 40.24 65.11 95.84 65.11 157.23 0 61.4-24.89 117-65.11 157.23-40.24 40.23-95.84 65.11-157.23 65.11-61.4 0-117-24.88-157.23-65.11s-65.11-95.83-65.11-157.23c0-61.39 24.88-116.99 65.11-157.23 40.23-40.22 95.83-65.11 157.23-65.11 61.39 0 116.99 24.89 157.23 65.11z" fill-rule="nonzero"/></svg>', vh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M512 256c0-70.67-28.66-134.68-74.98-181.02C390.69 28.66 326.68 0 256 0S121.31 28.66 74.98 74.98C28.66 121.32 0 185.33 0 256c0 70.68 28.66 134.69 74.98 181.02C121.31 483.34 185.32 512 256 512c70.67 0 134.69-28.66 181.02-74.98C483.34 390.69 512 326.68 512 256zm-160.23-21.5h-43.38v-67.93c0-7.63-6.27-13.9-13.91-13.9H217.5c-7.62 0-13.9 6.25-13.9 13.9v67.92h-43.41c-16.71 0-25.11 19.9-14.05 31.96l96.01 112.05c7.54 9.12 21.31 9.12 29.04.37l94.96-112.8c10.83-12.43 1.66-31.55-14.38-31.57z"/></svg>', wh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0 70.67-28.66 134.68-74.98 181.02-46.33 46.32-110.34 74.98-181.02 74.98s-134.69-28.66-181.02-74.98c-46.32-46.34-74.98-110.35-74.98-181.02 0-70.68 28.66-134.69 74.98-181.02 46.33-46.32 110.34-74.98 181.02-74.98 70.67 0 134.69 28.66 181.02 74.98 46.32 46.33 74.98 110.34 74.98 181.02zm-160.23 21.5h-43.38v67.93c0 7.63-6.27 13.9-13.91 13.9h-76.98c-7.62 0-13.9-6.25-13.9-13.9v-67.92h-43.41c-16.71 0-25.11-19.9-14.05-31.96l96.01-112.05c7.54-9.12 21.31-9.12 29.04-0.37l94.96 112.8c10.83 12.43 1.66 31.55-14.38 31.57z"/></svg>', xh = '<svg width="800px" height="800px" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">  <defs>   <clipPath id="clipPath1">    <path d="m6.1885 15.281v-9.0209h3.1721q1.0764 0 1.6765 0.65299 0.63822 0.71345 0.63822 1.7171 0 0.58043-0.22862 1.0158-0.21909 0.42323-0.743 0.84646 1.1812 0.87065 1.1812 2.1887 0 0.53206-0.19051 1.0762-0.19051 0.53206-0.51439 0.87065-0.60964 0.65299-1.7908 0.65299zm1.467-7.4731v2.0315h1.5813q1.0383 0 1.0383-1.0158 0-1.0158-1.0383-1.0158zm0 3.5793v2.3459h1.7432q1.0859 0 1.0859-1.1609 0-1.185-1.0859-1.185zm9.6876-5.1271h1.467v6.1066q0 1.4874-0.69538 2.2854-0.80016 0.91902-2.1242 0.91902t-2.1242-0.91902q-0.69538-0.79809-0.69538-2.2854v-6.1066h1.4574v6.1066q0 1.6083 1.3622 1.6083 1.3526 0 1.3526-1.6083zm6.2108 5.6834v3.3375h-1.467v-3.3375l-2.3528-5.6834h1.6289l1.4479 3.9784 1.3622-3.9784h1.6384z" display="none" stroke-width=".041213" style="white-space:pre" aria-label="BUY"/>    <path class="powerclip" d="m-5-5h42v42.001h-42zm11.189 20.281h3.2006q1.1812 0 1.7908-0.65299 0.32387-0.33859 0.51439-0.87065 0.19051-0.54416 0.19051-1.0762 0-1.3181-1.1812-2.1887 0.52391-0.42323 0.743-0.84646 0.22862-0.43532 0.22862-1.0158 0-1.0037-0.63822-1.7171-0.60012-0.65299-1.6765-0.65299h-3.1721zm1.467-7.4731v2.0315h1.5813q1.0383 0 1.0383-1.0158 0-1.0158-1.0383-1.0158zm0 3.5793v2.3459h1.7432q1.0859 0 1.0859-1.1609 0-1.185-1.0859-1.185zm9.6876-5.1271v6.1066q0 1.6083-1.3526 1.6083-1.3622 0-1.3622-1.6083v-6.1066h-1.4574v6.1066q0 1.4874 0.69538 2.2854 0.80016 0.91902 2.1242 0.91902t2.1242-0.91902q0.69538-0.79809 0.69538-2.2854v-6.1066zm6.2108 5.6834 2.2576-5.6834h-1.6384l-1.3622 3.9784-1.4479-3.9784h-1.6289l2.3528 5.6834v3.3375h1.467z" stroke-width=".041213" style="white-space:pre"/>   </clipPath>  </defs>  <g clip-path="url(#clipPath1)" fill="none" fill-rule="evenodd">   <g id="Icon-Set" transform="translate(-360 -255)" fill="#000">    <path d="m386.67 255h-21.334c-2.945 0-5.333 2.371-5.333 5.297v12.33c0 2.924 2.055 4.813 5 4.813h6.639l4.361 9.561 4.361-9.561h6.639c2.945 0 5-1.889 5-4.813v-12.33c0-2.926-2.388-5.297-5.333-5.297z"/>   </g>  </g> </svg>', bh = '<svg width="800px" height="800px" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">  <defs>   <clipPath id="clipPath4">    <path d="m10.026 8.6238h-1.2531q-0.06962-1.4148-1.3576-1.4148-0.51344 0-0.81803 0.30231-0.30458 0.30231-0.30458 0.81019 0 0.49579 0.25237 0.74972 0.26107 0.24185 0.97467 0.43532l1.0182 0.26603q0.90505 0.24185 1.3054 0.83437 0.40901 0.59252 0.40901 1.6566 0 1.3785-0.7049 2.1524-0.69619 0.77391-1.958 0.77391-1.2444 0-1.9406-0.76182-0.68749-0.77391-0.74841-2.225h1.2967q0.03481 0.72554 0.40901 1.1125t1.053 0.38696q0.60917 0 0.95727-0.32649 0.3568-0.32649 0.3568-0.89483 0-0.54416-0.27848-0.83437-0.27848-0.30231-0.94856-0.4716l-0.90505-0.25394q-0.99208-0.26603-1.4098-0.81019-0.41772-0.55625-0.41772-1.6083 0-1.3181 0.64398-2.0436 0.65268-0.73763 1.8188-0.73763 1.4185 0 2.0886 1.0278 0.46123 0.71345 0.46123 1.8743zm2.5672 2.3822v2.3459h3.5245v1.5478h-4.8559v-9.0209h4.6993v1.5478h-3.3678v2.0315h3.1155v1.5478zm5.9612-5.1271v7.4731h3.1068v1.5478h-4.4469v-9.0209zm5.439 0v7.4731h3.1068v1.5478h-4.4469v-9.0209z" display="none" stroke-width=".039392" style="white-space:pre" aria-label="SELL"/>    <path class="powerclip" d="m-5-5h42v42.001h-42zm15.026 13.624q0-1.1609-0.46123-1.8743-0.67009-1.0278-2.0886-1.0278-1.1661 0-1.8188 0.73763-0.64398 0.72554-0.64398 2.0436 0 1.052 0.41772 1.6083 0.41772 0.54416 1.4098 0.81019l0.90505 0.25394q0.67009 0.16929 0.94856 0.4716 0.27848 0.29022 0.27848 0.83437 0 0.56834-0.3568 0.89483-0.3481 0.32649-0.95727 0.32649-0.67879 0-1.053-0.38696-0.3742-0.38695-0.40901-1.1125h-1.2967q0.060917 1.4511 0.74841 2.225 0.69619 0.76182 1.9406 0.76182 1.2619 0 1.958-0.77391 0.7049-0.77391 0.7049-2.1524 0-1.0641-0.40901-1.6566-0.40031-0.59252-1.3054-0.83437l-1.0182-0.26603q-0.7136-0.19348-0.97467-0.43532-0.25237-0.25394-0.25237-0.74972 0-0.50788 0.30458-0.81019t0.81803-0.30231q1.288 0 1.3576 1.4148zm2.5672 2.3822h3.1155v-1.5478h-3.1155v-2.0315h3.3678v-1.5478h-4.6993v9.0209h4.8559v-1.5478h-3.5245zm5.9612-5.1271h-1.3402v9.0209h4.4469v-1.5478h-3.1068zm5.439 0h-1.3402v9.0209h4.4469v-1.5478h-3.1068z" stroke-width=".039392" style="white-space:pre"/>   </clipPath>  </defs>  <path d="m26.667 0h-21.334c-2.945 0-5.333 2.371-5.333 5.297v12.33c0 2.924 2.055 4.813 5 4.813h6.639l4.361 9.561 4.361-9.561h6.639c2.945 0 5-1.889 5-4.813v-12.33c0-2.926-2.388-5.297-5.333-5.297z" clip-path="url(#clipPath4)" fill-rule="evenodd"/> </svg>', Ch = '<svg width="493px" height="512px" clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 493 511.77" xmlns="http://www.w3.org/2000/svg"><path d="m33.11 458.2 104.5-79.1c3.09-3 7.08-4.47 11.08-4.45l302.6-0.08c2.67 0 5.09-1.08 6.78-2.77 1.74-1.81 2.84-4.24 2.84-6.87v-323.2c0-2.59-1.12-5-2.86-6.74-1.78-1.78-4.2-2.9-6.76-2.9h-409.56c-2.54 0-4.94 1.14-6.72 2.92s-2.92 4.18-2.92 6.72c0 793.72 1.02 39.329 1.02 416.47zm90.6-229.77c10.9 0 19.74 8.85 19.74 19.74s-8.84 19.73-19.74 19.73c-10.89 0-19.73-8.84-19.73-19.73s8.84-19.74 19.73-19.74zm0-101.14c10.9 0 19.74 8.85 19.74 19.74s-8.84 19.74-19.74 19.74c-10.89 0-19.73-8.85-19.73-19.74s8.84-19.74 19.73-19.74zm61.72 138.89c-9.95 0-18.02-8.07-18.02-18.01 0-9.95 8.07-18.02 18.02-18.02h185.56c9.95 0 18.01 8.07 18.01 18.02 0 9.94-8.06 18.01-18.01 18.01zm0-101.13c-9.95 0-18.02-8.07-18.02-18.02 0-9.94 8.07-18.01 18.02-18.01h185.56c9.95 0 18.01 8.07 18.01 18.01 0 9.95-8.06 18.02-18.01 18.02zm-30.38 241.61-125.97 99.69c-2.96 3.32-7.24 5.42-12.01 5.42-8.85 0-17.07-7.1228-17.07-15.963v-454.08c0-11.4 4.77-21.88 12.31-29.42s18.02-12.31 29.42-12.31h409.56c11.4 0 21.9 4.74 29.45 12.29 7.5 7.51 12.26 17.96 12.26 29.44v323.2c0 11.48-4.7 21.95-12.24 29.49-7.61 7.54-18.05 12.24-29.47 12.24z" fill-rule="nonzero"/></svg>', Th = '<svg width="800px" height="800px" fill="none" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m15.746 2.7281c-5.1207-2.0689-10.949 0.40512-13.018 5.5258-2.0689 5.1207 0.40512 10.949 5.5258 13.018 5.1207 2.0689 10.949-0.40508 13.018-5.5258 2.0689-5.1207-0.40508-10.949-5.5258-13.018zm-1.3378 8.3035-1.2703-0.51325c-0.21854-0.08829-0.32785-0.13246-0.3683-0.22775-0.04045-0.09529 0.0037-0.20461 0.09201-0.42314l1.6595-4.1073c0.33362-0.82575 0.50047-1.2387 0.33474-1.3523-0.16582-0.11359-0.49058 0.19103-1.1403 0.8003l-4.7426 4.4469c-1.0274 0.96338-1.541 1.445-1.4405 1.9835 0.10054 0.53837 0.75347 0.80216 2.0594 1.3298l1.2703 0.51325c0.21854 0.08829 0.32785 0.13246 0.3683 0.22775 0.04045 0.09529-0.0037 0.20461-0.09201 0.42314l-1.6595 4.1073c-0.33365 0.82582-0.50047 1.2387-0.33475 1.3523 0.16582 0.1136 0.49059-0.19104 1.1403-0.80025l4.7425-4.4469c1.0275-0.96346 1.5411-1.4451 1.4406-1.9836-0.10057-0.53838-0.75352-0.80218-2.0594-1.3298z" clip-rule="evenodd" fill-rule="evenodd"/></svg>', Sh = '<svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">  <g>   <rect transform="scale(-1)" x="-15" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-36.25" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-57.5" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.3s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-78.75" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.5s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-100" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>  </g> </svg>', Eh = '<svg version="1.1" id="L7" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"  viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">   <path fill="#fff" d="M42.3,39.6c5.7-4.3,13.9-3.1,18.1,2.7c4.3,5.7,3.1,13.9-2.7,18.1l4.1,5.5c8.8-6.5,10.6-19,4.1-27.7  c-6.5-8.8-19-10.6-27.7-4.1L42.3,39.6z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="3s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path> <path fill="#fff" d="M82,35.7C74.1,18,53.4,10.1,35.7,18S10.1,46.6,18,64.3l7.6-3.4c-6-13.5,0-29.3,13.5-35.3s29.3,0,35.3,13.5  L82,35.7z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="2s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path>   <path fill="#fff" d="M31.6,3.5C5.9,13.6-6.6,42.7,3.5,68.4c10.1,25.7,39.2,38.3,64.9,28.1l-3.1-7.9c-21.3,8.4-45.4-2-53.8-23.3  c-8.4-21.3,2-45.4,23.3-53.8L31.6,3.5z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="1s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path></svg>', st = 300, Ei = 400, Ph = `${Ei}px`, Nr = `${st}px`, Mh = "100%", Ah = "100%", je = 30, qe = 35, Pi = 25, Ir = 25, Mi = Pi + Ir, gt = 60, ht = "normal", ct = 12, ji = "normal", ut = "Avenir, Helvetica, Arial, sans-serif", Ds = "#141414", Os = "#333", Rs = "#cccccc", Wt = "#888888", ft = "#cccccc", Dr = "25px", Lh = "position: relative;", H = {
+const ql = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" ><path d="M471.993 112h-89.2l-16.242-46.75a32.023 32.023 0 00-30.229-21.5H175.241a31.991 31.991 0 00-30.294 21.691L129.1 112H40a24.027 24.027 0 00-24 24v312a24.027 24.027 0 0024 24h431.993a24.027 24.027 0 0024-24V136a24.027 24.027 0 00-24-24zm-8 328H48.007V144h104.01l23.224-68.25h161.081l23.71 68.25h103.961z" class="ci-primary"></path><path d="M256 168a114 114 0 10114 114 114.13 114.13 0 00-114-114zm0 196a82 82 0 1182-82 82.093 82.093 0 01-82 82z"></path></svg>', Xl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M376 160v32h65.372L252 381.373l-72-72L76.686 412.686l22.628 22.628L180 354.627l72 72 212-211.999V280h32V160H376z"></path><path d="M48 104H16v392h480v-32H48V104z"></path></svg>', Kl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M271.514 95.5h-32v178.111l115.613 54.948 13.737-28.902-97.35-46.268V95.5z"></path><path d="M256 16C123.452 16 16 123.452 16 256s107.452 240 240 240 240-107.452 240-240S388.548 16 256 16zm0 448c-114.875 0-208-93.125-208-208S141.125 48 256 48s208 93.125 208 208-93.125 208-208 208z"></path></svg>', Lr = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M245.151 168a88 88 0 1088 88 88.1 88.1 0 00-88-88zm0 144a56 56 0 1156-56 56.063 56.063 0 01-56 56z"></path><path d="M464.7 322.319l-31.77-26.153a193.081 193.081 0 000-80.332l31.77-26.153a19.941 19.941 0 004.606-25.439l-32.612-56.483a19.936 19.936 0 00-24.337-8.73l-38.561 14.447a192.038 192.038 0 00-69.54-40.192l-6.766-40.571A19.936 19.936 0 00277.762 16H212.54a19.937 19.937 0 00-19.728 16.712l-6.762 40.572a192.03 192.03 0 00-69.54 40.192L77.945 99.027a19.937 19.937 0 00-24.334 8.731L21 164.245a19.94 19.94 0 004.61 25.438l31.767 26.151a193.081 193.081 0 000 80.332l-31.77 26.153A19.942 19.942 0 0021 347.758l32.612 56.483a19.937 19.937 0 0024.337 8.73l38.562-14.447a192.03 192.03 0 0069.54 40.192l6.762 40.571A19.937 19.937 0 00212.54 496h65.222a19.936 19.936 0 0019.728-16.712l6.763-40.572a192.038 192.038 0 0069.54-40.192l38.564 14.449a19.938 19.938 0 0024.334-8.731l32.609-56.487a19.939 19.939 0 00-4.6-25.436zm-50.636 57.12l-48.109-18.024-7.285 7.334a159.955 159.955 0 01-72.625 41.973l-10 2.636L267.6 464h-44.89l-8.442-50.642-10-2.636a159.955 159.955 0 01-72.625-41.973l-7.285-7.334-48.117 18.024L53.8 340.562l39.629-32.624-2.7-9.973a160.9 160.9 0 010-83.93l2.7-9.972L53.8 171.439l22.446-38.878 48.109 18.024 7.285-7.334a159.955 159.955 0 0172.625-41.973l10-2.636L222.706 48H267.6l8.442 50.642 10 2.636a159.955 159.955 0 0172.625 41.973l7.285 7.334 48.109-18.024 22.447 38.877-39.629 32.625 2.7 9.972a160.9 160.9 0 010 83.93l-2.7 9.973 39.629 32.623z"></path></svg>', jl = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><rect x="16" y="240.18" width="188.84" height="31.635"/><g transform="translate(-3.3234e-7 -112.18)"><rect x="307.16" y="352.37" width="188.84" height="31.635"/></g><rect transform="rotate(-90)" x="-496" y="240.18" width="188.84" height="31.635"/><rect transform="rotate(-90)" x="-204.84" y="240.18" width="188.84" height="31.635"/></svg>', Zl = '<svg width="46.08" height="46.08" viewBox="0 0 24 24"><path fill="none" d="M0 0h24v24H0z"></path><path d="M6.535 3H21a1 1 0 011 1v16a1 1 0 01-1 1H6.535a1 1 0 01-.832-.445l-5.333-8a1 1 0 010-1.11l5.333-8A1 1 0 016.535 3zm.535 2l-4.666 7 4.666 7H20V5H7.07zM13 10.586l2.828-2.829 1.415 1.415L14.414 12l2.829 2.828-1.415 1.415L13 13.414l-2.828 2.829-1.415-1.415L11.586 12 8.757 9.172l1.415-1.415L13 10.586z"></path></svg>', Jl = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g stroke-width="30.155"><rect x="14.757" y="240.92" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="147" width="482.49" height="30.155" rx="15.078"/><rect x="14.757" y="334.84" width="482.49" height="30.155" rx="15.078"/></g ><g transform="translate(5.937 -288.34)"><path d="m23.904 712.34c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h173.93c-0.65295-3.3651-2.0312-6.4697-2.0312-10.026 0-7.1393 1.5573-13.888 4.0625-20.13zm276.35 0c2.5051 6.2423 4.0365 12.991 4.0365 20.13 0 3.5554-1.3526 6.6618-2.0052 10.026h173.93c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078z"/><path d="m250.06 759.97c17.965 0 32.545-14.58 32.545-32.545 0-17.965-14.58-32.545-32.545-32.545-17.965 0-32.545 14.58-32.545 32.545 0 17.965 14.58 32.545 32.545 32.545zm0 21.697c-29.964 0-54.242-24.279-54.242-54.242 0-29.964 24.279-54.242 54.242-54.242 29.964 0 54.242 24.279 54.242 54.242 0 29.964-24.279 54.242-54.242 54.242z" stroke-width="21.697"/></g ><path d="m144.05 18.672c-24.694 0-45.285 16.595-51.849 39.167h-62.37c-8.3532 0-15.078 6.7252-15.078 15.078s6.7249 15.078 15.078 15.078h62.37c6.5639 22.572 27.155 39.167 51.849 39.167s45.285-16.595 51.849-39.167h120.03c6.5639 22.572 27.155 39.167 51.849 39.167 24.694 0 45.285-16.595 51.849-39.167h62.552c8.3532 0 15.078-6.7252 15.078-15.078s-6.7249-15.078-15.078-15.078h-62.552c-6.5639-22.572-27.155-39.167-51.849-39.167-24.694 0-45.285 16.595-51.849 39.167h-120.03c-6.5639-22.572-27.155-39.167-51.849-39.167zm0 21.693c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 1e-5 -32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552zm223.72 0c17.965 0 32.552 14.587 32.552 32.552 0 17.965-14.587 32.552-32.552 32.552-17.965 0-32.552-14.587-32.552-32.552 0-17.965 14.587-32.552 32.552-32.552z" stroke-width="30.155"/></svg>', et = '<svg width="46.08" height="46.08" version="1.1" viewBox="-51.2 -51.2 614.4 614.4"><g transform="matrix(21.697 0 0 21.697 -47.758 -47.758)"><path d="m7.354 21.354 14-14-0.707-0.707-14 14z"/><path d="m22.5 7c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5zm-17 16c0.828 0 1.5-0.672 1.5-1.5s-0.672-1.5-1.5-1.5-1.5 0.672-1.5 1.5 0.672 1.5 1.5 1.5zm0 1c-1.381 0-2.5-1.119-2.5-2.5s1.119-2.5 2.5-2.5 2.5 1.119 2.5 2.5-1.119 2.5-2.5 2.5z"/></g></svg>', Ql = '<svg width="46.08" height="46.08" viewBox="0 0 32 32"><path d="M 3.2758709,20.241377 11.758622,28.72413 28.72413,11.758622 20.241377,3.2758709 Z m 2.1206881,0 1.5905161,-1.590515 3.7112049,3.711203 1.060342,-1.060345 -3.7112027,-3.711204 1.0603441,-1.060344 2.1206876,2.12069 1.060346,-1.060346 -2.120689,-2.120688 1.060343,-1.060344 3.711203,3.711203 L 16,17.060346 l -3.711203,-3.711208 1.060341,-1.060341 2.12069,2.120687 1.060344,-1.060346 -2.120688,-2.120687 1.060344,-1.060343 3.711204,3.711205 1.060345,-1.060345 -3.711205,-3.7112046 1.060344,-1.0603441 2.120687,2.1206887 1.060346,-1.0603446 -2.120687,-2.1206883 1.590515,-1.5905161 6.362065,6.362063 -14.84482,14.84482 z" style="stroke-width:0.749776" /></svg>', eh = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><g id="g930" transform="matrix(21.128963,0,0,21.128963,-29.235597,-50.369964)"><path clip-rule="evenodd" d="m 4.5,5 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,6.5 A 2.5,2.5 0 0 1 6.95,6 H 24 V 7 H 6.95 A 2.5,2.5 0 0 1 2,6.5 Z M 4.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,16.5 A 2.5,2.5 0 0 1 6.95,16 h 13.1 a 2.5,2.5 0 1 1 0,1 H 6.95 A 2.5,2.5 0 0 1 2,16.5 Z M 22.5,15 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z m -18,6 a 1.5,1.5 0 1 0 0,3 1.5,1.5 0 0 0 0,-3 z M 2,22.5 A 2.5,2.5 0 0 1 6.95,22 H 24 v 1 H 6.95 A 2.5,2.5 0 0 1 2,22.5 Z" id="path908" /><path clip-rule="evenodd" d="M 22.4,8.94 21.01,9.57 20.6,8.66 21.99,8.03 Z m -4,1.8 -1.39,0.63 -0.41,-0.91 1.39,-0.63 z m -4,1.8 -1.4,0.63 -0.4,-0.91 1.39,-0.63 z m -4,1.8 L 9,14.97 8.6,14.06 9.99,13.43 Z" id="path910" /></g></svg>', th = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4"><path d="M231.359 147l-80.921 205h45.155l15.593-39.5h89.628l15.593 39.5h45.155l-80.921-205zm-3.594 123.5L256 198.967l28.235 71.533z"></path><path d="M384 56H128V16H16v112h40v256H16v112h112v-40h256v40h112V384h-40V128h40V16H384zM48 96V48h48v48zm48 368H48v-48h48zm288-40H128v-40H88V128h40V88h256v40h40v256h-40zm80-8v48h-48v-48zM416 48h48v48h-48z"></path></svg>', ih = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g718" transform="translate(0,1.2499996)"><path d="M 7.5010125,7.9560661 5.355012,10.103066 c -0.472,0.472 -1.18,-0.2360003 -0.708,-0.7080003 L 7.6470125,6.3950659 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999998 c 0.472,0.472 -0.236,1.1800003 -0.708,0.7080003 L 8.5010125,7.9560661 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m 7.4989873,5.5439348 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>', sh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,7.7026182 -2.1460003,2.147 c -0.472,0.4719998 -1.18,-0.236 -0.708,-0.708 l 3.0000003,-3 c 0.1953639,-0.1958581 0.5126361,-0.1958581 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.1799998 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6-3" /></svg>', nh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 7.4989873,8.2973819 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.1958581 0.5126361,0.1958581 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></svg>', rh = '<svg width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="m1 14a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-12a1 1 0 0 0-1-1h-12a1 1 0 0 0-1 1zm15 0a2 2 0 0 1-2 2h-12a2 2 0 0 1-2-2v-12a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2zm-8.5-2.5a0.5 0.5 0 0 0 1 0v-5.793l2.146 2.147a0.50063 0.50063 0 1 0 0.708-0.708l-3-3a0.5 0.5 0 0 0-0.708 0l-3 3a0.50063 0.50063 0 0 0 0.708 0.708l2.146-2.147z" fill-rule="evenodd"/></svg>', oh = '<svg width="46.08" height="46.08" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M 15,2 A 1,-1 0 0 0 14,1 H 2 A 1,-1 0 0 0 1,2 v 12 a 1,-1 0 0 0 1,1 h 12 a 1,-1 0 0 0 1,-1 z M 0,2 A 2,-2 0 0 1 2,0 h 12 a 2,-2 0 0 1 2,2 v 12 a 2,-2 0 0 1 -2,2 H 2 A 2,-2 0 0 1 0,14 Z m 8.5,2.5 a 0.5,-0.5 0 0 0 -1,0 v 5.793 L 5.354,8.146 A 0.5006316,-0.5006316 0 1 0 4.646,8.854 l 3,3 a 0.5,-0.5 0 0 0 0.708,0 l 3,-3 A 0.5006316,-0.5006316 0 0 0 10.646,8.146 L 8.5,10.293 Z" id="path2" /></svg>', ah = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g687" transform="translate(15.647255,-0.0288128)"><path d="m -8.1462425,10.484879 -2.1460005,2.146999 c -0.472,0.472 -1.18,-0.236 -0.708,-0.708 l 3.0000005,-2.9999994 c 0.195364,-0.195858 0.512636,-0.195858 0.708,0 l 3.0000005,2.9999994 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1460005,-2.146999 c -0.431103,-0.417289 -0.523896,-0.423024 -1,0 z" style="" id="path566-5" /><path d="m -8.1482677,5.5727476 -2.1460003,-2.147 c -0.472,-0.472 -1.18,0.236 -0.708,0.708 l 3.0000003,3 c 0.1953639,0.195858 0.5126361,0.195858 0.708,0 l 2.9999997,-3 c 0.472,-0.472 -0.236,-1.18 -0.708,-0.708 l -2.1459997,2.147 c -0.4311027,0.417289 -0.5238956,0.423024 -1,0 z" style="" id="path566-6-3" /></g></svg>', lh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><g id="g611" transform="translate(0.2050748,-0.8829888)"><path d="m 7.2959375,11.933818 -2.146,-2.1469999 c -0.472,-0.4719998 -1.18,0.2359999 -0.708,0.7079999 l 3,3 c 0.195364,0.195858 0.512636,0.195858 0.708,0 l 3.0000005,-3 c 0.472,-0.472 -0.236,-1.1799997 -0.708,-0.7079999 L 8.2959375,11.933818 c -0.431103,0.417289 -0.523896,0.423024 -1,0 z" style="" id="path566" /><path d="m 7.2939123,5.8321596 -2.146,2.147 c -0.4719998,0.472 -1.1799998,-0.236 -0.708,-0.708 l 3,-3 c 0.1953639,-0.195858 0.5126361,-0.195858 0.708,0 l 2.9999997,3 c 0.472,0.472 -0.236,1.18 -0.708,0.708 l -2.1459997,-2.147 c -0.4311027,-0.417289 -0.5238956,-0.423024 -1,0 z" style="" id="path566-6" /></g></svg>', hh = '<svg style="width: 46px; height: 46px" viewBox="-1.6 -1.6 19.2 19.2"><path d="M 15,2 C 15,1.4477153 14.552285,1 14,1 H 2 C 1.4477153,1 1,1.4477153 1,2 v 12 c 0,0.552285 0.4477153,1 1,1 h 12 c 0.552285,0 1,-0.447715 1,-1 z M 0,2 C 0,0.8954305 0.8954305,0 2,0 h 12 c 1.104569,0 2,0.8954305 2,2 v 12 c 0,1.104569 -0.895431,2 -2,2 H 2 C 0.8954305,16 0,15.104569 0,14 Z" id="path2" /><path d="m 11.500447,8.5 c 0.666666,0 0.666666,-1 0,-1 H 4.444275 c -0.1571231,0 -0.224029,0.07336 -0.2978281,0.1459999 -0.1958579,0.195364 -0.1958579,0.5126361 0,0.7080001 0,0 0.113806,0.146 0.320186,0.146 z" style="" id="path887" /></svg>', ch = '<svg style="height:46px;width:46px" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <g fill-rule="evenodd">  <path d="m15 2c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1h12c0.55228 0 1-0.44772 1-1zm-15 0c0-1.1046 0.89543-2 2-2h12c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2z"/>  <path d="m4.4449 4.097c-0.01964 0-0.037678 0.0018-0.054687 0.0039-0.017011 0.0022-0.034068 0.0058-0.048828 0.0098-0.014761 4e-3 -0.028126 0.0081-0.041016 0.01367-0.012889 0.0056-0.025711 0.01268-0.037109 0.01953-0.022796 0.01371-0.041442 0.02783-0.060547 0.04492s-0.038191 0.03653-0.056641 0.05469c-0.024482 0.02442-0.046092 0.05037-0.064453 0.07813-0.018362 0.02775-0.032681 0.05776-0.044922 0.08789s-0.021223 0.06023-0.027344 0.0918c-0.00612 0.03156-0.00977 0.06366-0.00977 0.0957 0 8e-3 -4.378e-4 0.01543 0 0.02344v1.2988c0 0.02083 6.41e-5 0.04102 0.00195 0.06055 0.00189 0.01953 0.0061 0.03841 0.00977 0.05664 0.00366 0.01823 0.00836 0.03581 0.013672 0.05273 0.00531 0.01693 0.010742 0.0332 0.017578 0.04883 0.013672 0.03125 0.029785 0.0599 0.048828 0.08594s0.041016 0.04948 0.064453 0.07031 0.049316 0.03906 0.076172 0.05469c0.026855 0.01563 0.054687 0.02865 0.083984 0.03906 0.029297 0.01042 0.059082 0.01823 0.089844 0.02344 0.030762 0.0052 0.0625 0.0078 0.09375 0.0078s0.062988-0.0026 0.09375-0.0078 0.060547-0.01302 0.089844-0.02344 0.057129-0.02344 0.083984-0.03906c0.026855-0.01563 0.052734-0.03385 0.076172-0.05469 0.023437-0.02083 0.04541-0.04427 0.064453-0.07031s0.035156-0.05469 0.048828-0.08594c0.00684-0.01563 0.012268-0.0319 0.017578-0.04883s0.01001-0.0345 0.013672-0.05273c0.00366-0.01823 0.00787-0.03711 0.00977-0.05664 0.00189-0.01953 0.00195-0.03971 0.00195-0.06055v-0.82227h6v0.98633c0 0.02083 2e-3 0.04102 0.0039 0.06055s0.0042 0.03841 0.0078 0.05664c0.0037 0.01823 0.0084 0.03581 0.01367 0.05273 0.0053 0.01693 0.01074 0.0332 0.01758 0.04883 0.01367 0.03125 0.03174 0.0599 0.05078 0.08594s0.03906 0.04948 0.0625 0.07031 0.04932 0.03906 0.07617 0.05469c0.02686 0.01563 0.05469 0.02865 0.08399 0.03906 0.0293 0.01042 0.06104 0.01823 0.0918 0.02344 0.03076 0.0052 0.06055 0.0078 0.0918 0.0078s0.06299-0.0026 0.09375-0.0078 0.06055-0.01302 0.08984-0.02344c0.0293-0.01042 0.05908-0.02344 0.08594-0.03906 0.02686-0.01563 0.05078-0.03385 0.07422-0.05469 0.02344-0.02083 0.04541-0.04427 0.06445-0.07031s0.03516-0.05469 0.04883-0.08594c0.0068-0.01563 0.01422-0.0319 0.01953-0.04883 0.0053-0.01693 0.01001-0.0345 0.01367-0.05273 0.0037-0.01823 0.0059-0.03711 0.0078-0.05664s2e-3 -0.03971 2e-3 -0.06055v-1.4629c3.25e-4 -0.0078 0-0.01563 0-0.02344 0-0.03125-0.0026-0.06299-0.0078-0.09375s-0.01302-0.06055-0.02344-0.08984c-0.01042-0.0293-0.02344-0.05713-0.03906-0.08398-0.01563-0.02685-0.03385-0.05273-0.05469-0.07617-0.02083-0.02344-0.04427-0.04541-0.07031-0.06445s-0.05469-0.03516-0.08594-0.04883c-0.01563-0.0068-0.0319-0.01227-0.04883-0.01758-0.01693-0.0053-0.0345-0.01001-0.05273-0.01367-0.01823-0.0037-0.03711-0.0059-0.05664-0.0078s-0.03971-0.0039-0.06055-0.0039h-6.5z"/>  <path d="m11.555 11.903c0.01964 0 0.03768-0.0018 0.05469-0.0039 0.01701-0.0022 0.03407-0.0058 0.04883-0.0098s0.02813-0.0081 0.04102-0.01367c0.01289-0.0056 0.02571-0.01268 0.03711-0.01953 0.0228-0.01371 0.04144-0.02783 0.06055-0.04492 0.0191-0.01709 0.03819-0.03653 0.05664-0.05469 0.02448-0.02442 0.04609-0.05037 0.06445-0.07813 0.01836-0.02775 0.03268-0.05776 0.04492-0.08789s0.02122-0.06023 0.02734-0.0918c0.0061-0.03156 0.0098-0.06366 0.0098-0.0957 0-8e-3 4.38e-4 -0.01543 0-0.02344v-1.2988c0-0.02083-6.4e-5 -0.04102-2e-3 -0.06055-0.0019-0.01953-0.0061-0.03841-0.0098-0.05664s-0.0084-0.03581-0.01367-0.05273c-0.0053-0.01693-0.01074-0.0332-0.01758-0.04883-0.01367-0.03125-0.02979-0.0599-0.04883-0.08594s-0.04102-0.04948-0.06445-0.07031c-0.02344-0.02083-0.04932-0.03906-0.07617-0.05469s-0.05469-0.02865-0.08398-0.03906c-0.0293-0.01042-0.05908-0.01823-0.08984-0.02344-0.03076-0.0052-0.0625-0.0078-0.09375-0.0078s-0.06299 0.0026-0.09375 0.0078-0.06055 0.01302-0.08984 0.02344c-0.0293 0.01042-0.05713 0.02344-0.08398 0.03906-0.02685 0.01563-0.05273 0.03385-0.07617 0.05469-0.02344 0.02083-0.04541 0.04427-0.06445 0.07031s-0.03516 0.05469-0.04883 0.08594c-0.0068 0.01563-0.01227 0.0319-0.01758 0.04883-0.0053 0.01693-0.01001 0.0345-0.01367 0.05273-0.0037 0.01823-0.0079 0.03711-0.0098 0.05664s-0.0019 0.03971-0.0019 0.06055v0.82227h-6v-0.98633c0-0.02083-2e-3 -0.04102-0.0039-0.06055s-0.0042-0.03841-0.0078-0.05664c-0.0037-0.01823-0.0084-0.03581-0.01367-0.05273-0.0053-0.01693-0.01074-0.0332-0.01758-0.04883-0.01367-0.03125-0.03174-0.0599-0.05078-0.08594s-0.03906-0.04948-0.0625-0.07031-0.04932-0.03906-0.07617-0.05469c-0.02686-0.01563-0.05469-0.02865-0.08399-0.03906-0.0293-0.01042-0.06104-0.01823-0.0918-0.02344-0.03076-0.0052-0.06055-0.0078-0.0918-0.0078s-0.06299 0.0026-0.09375 0.0078-0.06055 0.01302-0.08984 0.02344c-0.0293 0.01042-0.05908 0.02344-0.08594 0.03906-0.02686 0.01563-0.05078 0.03385-0.07422 0.05469-0.02344 0.02083-0.04541 0.04427-0.06445 0.07031s-0.03516 0.05469-0.04883 0.08594c-0.0068 0.01563-0.01422 0.0319-0.01953 0.04883-0.0053 0.01693-0.01001 0.03451-0.01367 0.05273-0.0037 0.01823-0.0059 0.03711-0.0078 0.05664s-2e-3 0.03971-2e-3 0.06055v1.4629c-3.25e-4 0.0078 0 0.01563 0 0.02344 0 0.03125 0.0026 0.06299 0.0078 0.09375s0.01302 0.06055 0.02344 0.08984c0.01042 0.0293 0.02344 0.05713 0.03906 0.08398 0.01563 0.02685 0.03385 0.05273 0.05469 0.07617 0.02083 0.02344 0.04427 0.04541 0.07031 0.06445s0.05469 0.03516 0.08594 0.04883c0.01563 0.0068 0.0319 0.01227 0.04883 0.01758 0.01693 0.0053 0.0345 0.01001 0.05273 0.01367 0.01823 0.0037 0.03711 0.0059 0.05664 0.0078s0.03971 0.0039 0.06055 0.0039h6.5z"/></g></svg>', uh = '<svg style="height:46px;width:46px" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="m15 2c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1h12c0.55228 0 1-0.44772 1-1zm-15 0c0-1.1046 0.89543-2 2-2h12c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2z" fill-rule="evenodd"/> <path d="m13.291 7.7876c-1.0729-2.491-3.0911-4.0365-5.2687-4.0365-2.1776 0-4.1958 1.5456-5.2687 4.0365a0.53112 0.53112 0 0 0 0 0.4249c1.0729 2.491 3.0911 4.0365 5.2687 4.0365 2.1776 0 4.1959-1.5456 5.2687-4.0365a0.53112 0.53112 0 0 0 0-0.4249zm-5.2687 3.3992c-1.6836 0-3.277-1.2163-4.1958-3.1867 0.91884-1.9705 2.5122-3.1867 4.1958-3.1867 1.6837 0 3.277 1.2163 4.1959 3.1867-0.91884 1.9705-2.5122 3.1867-4.1959 3.1867zm0-5.3112a2.1245 2.1245 0 1 0 2.1245 2.1245 2.1245 2.1245 0 0 0-2.1245-2.1245zm0 3.1867a1.0622 1.0622 0 1 1 1.0622-1.0622 1.0622 1.0622 0 0 1-1.0622 1.0622z" stroke-width=".53112"/></svg>', dh = '<svg style="height:46px;width:46px" version="1.1" viewBox="-1.6 -1.6 19.2 19.2" xmlns="http://www.w3.org/2000/svg"> <path d="m15 2c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1h12c0.55228 0 1-0.44772 1-1zm-15 0c0-1.1046 0.89543-2 2-2h12c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2z" fill-rule="evenodd"/> <path d="m13.291 7.7876c-1.0729-2.491-3.0911-4.0365-5.2687-4.0365-2.1776 0-4.1958 1.5456-5.2687 4.0365a0.53112 0.53112 0 0 0 0 0.4249c1.0729 2.491 3.0911 4.0365 5.2687 4.0365 2.1776 0 4.1959-1.5456 5.2687-4.0365a0.53112 0.53112 0 0 0 0-0.4249zm-5.2687 3.3992c-1.6836 0-3.277-1.2163-4.1958-3.1867 0.91884-1.9705 2.5122-3.1867 4.1958-3.1867 1.6837 0 3.277 1.2163 4.1959 3.1867-0.91884 1.9705-2.5122 3.1867-4.1959 3.1867zm0-5.3112a2.1245 2.1245 0 1 0 2.1245 2.1245 2.1245 2.1245 0 0 0-2.1245-2.1245zm0 3.1867a1.0622 1.0622 0 1 1 1.0622-1.0622 1.0622 1.0622 0 0 1-1.0622 1.0622z" stroke-width=".53112"/> <path d="m12.757 3.0055c-0.11087 0.0051358-0.22696 0.051177-0.33008 0.1543l-4.9883 4.9902c-0.061946 0.061947-0.086644 0.12038-0.097656 0.17773l-4.8184 4.8164c-0.1111 0.1111-0.1066 0.2109-0.10742 0.31445-3.5e-4 0.27663 0.22337 0.50035 0.5 0.5 0 0 0.18415 0.022881 0.33008-0.12305l4.9746-4.9727c0.06758-0.06758 0.10951-0.13979 0.13281-0.21289l4.7832-4.7832c0.36828-0.36828 0.017071-0.87967-0.37891-0.86133z" fill-rule="evenodd"/></svg>', mh = '<svg class="ov-icon" width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m14 15c0.55228 0 1-0.44772 1-1v-12c0-0.55228-0.44772-1-1-1h-12c-0.55228 0-1 0.44772-1 1v12c0 0.55228 0.44772 1 1 1zm0-15c1.1046 0 2 0.89543 2 2v12c0 1.1046-0.89543 2-2 2h-12c-1.1046 0-2-0.89543-2-2v-12c0-1.1046 0.89543-2 2-2z" fill-rule="evenodd"/><g transform="translate(-1.1585)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>', ph = '<svg class="ov-icon" width="46.08" height="46.08" version="1.1" viewBox="-1.6 -1.6 19.2 19.2"><path d="m2 15c-0.55228 0-1-0.44772-1-1v-12c0-0.55228 0.44772-1 1-1h12c0.55228 0 1 0.44772 1 1v12c0 0.55228-0.44772 1-1 1zm0-15c-1.1046 0-2 0.89543-2 2v12c0 1.1046 0.89543 2 2 2h12c1.1046 0 2-0.89543 2-2v-12c0-1.1046-0.89543-2-2-2z" fill-rule="evenodd"/><g transform="matrix(-1 0 0 1 17.159 0)" fill-rule="evenodd">  <path d="m8.2964 7.5-2.147-2.146c-0.472-0.472 0.236-1.18 0.708-0.708l3 3c0.19586 0.19536 0.19586 0.51264 0 0.708l-3 3c-0.472 0.472-1.18-0.236-0.708-0.708l2.147-2.146c0.41729-0.4311 0.42302-0.5239 0-1z"/>  <path d="m12.323 4.4996c0-0.66667-1-0.66667-1 0v7.0562c0 0.15712 0.07336 0.22403 0.146 0.29783 0.19536 0.19586 0.51264 0.19586 0.708 0 0 0 0.146-0.11381 0.146-0.32019z"/></g></svg>', gh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 336.96 336.36" xmlns="http://www.w3.org/2000/svg"><path d="m0 0 168.48 336.36 168.48-336.36z"/></svg>', fh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 336.96 336.36" xmlns="http://www.w3.org/2000/svg"><path d="m0 336.36 168.48-336.36 168.48 336.36z"/></svg>', yh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0 70.67-28.66 134.68-74.99 181.01s-110.34 74.99-181.01 74.99c-70.68 0-134.69-28.66-181.01-74.99-46.33-46.33-74.99-110.34-74.99-181.01 0-70.68 28.66-134.69 74.99-181.01 46.32-46.33 110.33-74.99 181.01-74.99 70.67 0 134.68 28.66 181.01 74.99 46.33 46.32 74.99 110.33 74.99 181.01zm-204.29-21.97v-67.04c0-7.53-6.19-13.72-13.73-13.72h-75.96c-7.53 0-13.72 6.17-13.72 13.72v67.03h-42.84c-16.5 0-24.78 19.64-13.86 31.54l94.74 110.57c7.44 9 21.03 9.01 28.66 0.37l93.71-111.31c10.69-12.27 1.64-31.14-14.19-31.16h-42.81zm105.52 179.2c40.22-40.24 65.11-95.84 65.11-157.23 0-61.4-24.89-117-65.11-157.23-40.24-40.23-95.84-65.11-157.23-65.11-61.4 0-117 24.88-157.23 65.11s-65.11 95.83-65.11 157.23c0 61.39 24.88 116.99 65.11 157.23 40.23 40.22 95.83 65.11 157.23 65.11 61.39 0 116.99-24.89 157.23-65.11z" fill-rule="nonzero"/></svg>', vh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0-70.67-28.66-134.68-74.99-181.01s-110.34-74.99-181.01-74.99c-70.68 0-134.69 28.66-181.01 74.99-46.33 46.33-74.99 110.34-74.99 181.01 0 70.68 28.66 134.69 74.99 181.01 46.32 46.33 110.33 74.99 181.01 74.99 70.67 0 134.68-28.66 181.01-74.99 46.33-46.32 74.99-110.33 74.99-181.01zm-204.29 21.97v67.04c0 7.53-6.19 13.72-13.73 13.72h-75.96c-7.53 0-13.72-6.17-13.72-13.72v-67.03h-42.84c-16.5 0-24.78-19.64-13.86-31.54l94.74-110.57c7.44-9 21.03-9.01 28.66-0.37l93.71 111.31c10.69 12.27 1.64 31.14-14.19 31.16zm105.52-179.2c40.22 40.24 65.11 95.84 65.11 157.23 0 61.4-24.89 117-65.11 157.23-40.24 40.23-95.84 65.11-157.23 65.11-61.4 0-117-24.88-157.23-65.11s-65.11-95.83-65.11-157.23c0-61.39 24.88-116.99 65.11-157.23 40.23-40.22 95.83-65.11 157.23-65.11 61.39 0 116.99 24.89 157.23 65.11z" fill-rule="nonzero"/></svg>', wh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M512 256c0-70.67-28.66-134.68-74.98-181.02C390.69 28.66 326.68 0 256 0S121.31 28.66 74.98 74.98C28.66 121.32 0 185.33 0 256c0 70.68 28.66 134.69 74.98 181.02C121.31 483.34 185.32 512 256 512c70.67 0 134.69-28.66 181.02-74.98C483.34 390.69 512 326.68 512 256zm-160.23-21.5h-43.38v-67.93c0-7.63-6.27-13.9-13.91-13.9H217.5c-7.62 0-13.9 6.25-13.9 13.9v67.92h-43.41c-16.71 0-25.11 19.9-14.05 31.96l96.01 112.05c7.54 9.12 21.31 9.12 29.04.37l94.96-112.8c10.83-12.43 1.66-31.55-14.38-31.57z"/></svg>', xh = '<svg clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="m512 256c0 70.67-28.66 134.68-74.98 181.02-46.33 46.32-110.34 74.98-181.02 74.98s-134.69-28.66-181.02-74.98c-46.32-46.34-74.98-110.35-74.98-181.02 0-70.68 28.66-134.69 74.98-181.02 46.33-46.32 110.34-74.98 181.02-74.98 70.67 0 134.69 28.66 181.02 74.98 46.32 46.33 74.98 110.34 74.98 181.02zm-160.23 21.5h-43.38v67.93c0 7.63-6.27 13.9-13.91 13.9h-76.98c-7.62 0-13.9-6.25-13.9-13.9v-67.92h-43.41c-16.71 0-25.11-19.9-14.05-31.96l96.01-112.05c7.54-9.12 21.31-9.12 29.04-0.37l94.96 112.8c10.83 12.43 1.66 31.55-14.38 31.57z"/></svg>', bh = '<svg width="800px" height="800px" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">  <defs>   <clipPath id="clipPath1">    <path d="m6.1885 15.281v-9.0209h3.1721q1.0764 0 1.6765 0.65299 0.63822 0.71345 0.63822 1.7171 0 0.58043-0.22862 1.0158-0.21909 0.42323-0.743 0.84646 1.1812 0.87065 1.1812 2.1887 0 0.53206-0.19051 1.0762-0.19051 0.53206-0.51439 0.87065-0.60964 0.65299-1.7908 0.65299zm1.467-7.4731v2.0315h1.5813q1.0383 0 1.0383-1.0158 0-1.0158-1.0383-1.0158zm0 3.5793v2.3459h1.7432q1.0859 0 1.0859-1.1609 0-1.185-1.0859-1.185zm9.6876-5.1271h1.467v6.1066q0 1.4874-0.69538 2.2854-0.80016 0.91902-2.1242 0.91902t-2.1242-0.91902q-0.69538-0.79809-0.69538-2.2854v-6.1066h1.4574v6.1066q0 1.6083 1.3622 1.6083 1.3526 0 1.3526-1.6083zm6.2108 5.6834v3.3375h-1.467v-3.3375l-2.3528-5.6834h1.6289l1.4479 3.9784 1.3622-3.9784h1.6384z" display="none" stroke-width=".041213" style="white-space:pre" aria-label="BUY"/>    <path class="powerclip" d="m-5-5h42v42.001h-42zm11.189 20.281h3.2006q1.1812 0 1.7908-0.65299 0.32387-0.33859 0.51439-0.87065 0.19051-0.54416 0.19051-1.0762 0-1.3181-1.1812-2.1887 0.52391-0.42323 0.743-0.84646 0.22862-0.43532 0.22862-1.0158 0-1.0037-0.63822-1.7171-0.60012-0.65299-1.6765-0.65299h-3.1721zm1.467-7.4731v2.0315h1.5813q1.0383 0 1.0383-1.0158 0-1.0158-1.0383-1.0158zm0 3.5793v2.3459h1.7432q1.0859 0 1.0859-1.1609 0-1.185-1.0859-1.185zm9.6876-5.1271v6.1066q0 1.6083-1.3526 1.6083-1.3622 0-1.3622-1.6083v-6.1066h-1.4574v6.1066q0 1.4874 0.69538 2.2854 0.80016 0.91902 2.1242 0.91902t2.1242-0.91902q0.69538-0.79809 0.69538-2.2854v-6.1066zm6.2108 5.6834 2.2576-5.6834h-1.6384l-1.3622 3.9784-1.4479-3.9784h-1.6289l2.3528 5.6834v3.3375h1.467z" stroke-width=".041213" style="white-space:pre"/>   </clipPath>  </defs>  <g clip-path="url(#clipPath1)" fill="none" fill-rule="evenodd">   <g id="Icon-Set" transform="translate(-360 -255)" fill="#000">    <path d="m386.67 255h-21.334c-2.945 0-5.333 2.371-5.333 5.297v12.33c0 2.924 2.055 4.813 5 4.813h6.639l4.361 9.561 4.361-9.561h6.639c2.945 0 5-1.889 5-4.813v-12.33c0-2.926-2.388-5.297-5.333-5.297z"/>   </g>  </g> </svg>', Ch = '<svg width="800px" height="800px" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">  <defs>   <clipPath id="clipPath4">    <path d="m10.026 8.6238h-1.2531q-0.06962-1.4148-1.3576-1.4148-0.51344 0-0.81803 0.30231-0.30458 0.30231-0.30458 0.81019 0 0.49579 0.25237 0.74972 0.26107 0.24185 0.97467 0.43532l1.0182 0.26603q0.90505 0.24185 1.3054 0.83437 0.40901 0.59252 0.40901 1.6566 0 1.3785-0.7049 2.1524-0.69619 0.77391-1.958 0.77391-1.2444 0-1.9406-0.76182-0.68749-0.77391-0.74841-2.225h1.2967q0.03481 0.72554 0.40901 1.1125t1.053 0.38696q0.60917 0 0.95727-0.32649 0.3568-0.32649 0.3568-0.89483 0-0.54416-0.27848-0.83437-0.27848-0.30231-0.94856-0.4716l-0.90505-0.25394q-0.99208-0.26603-1.4098-0.81019-0.41772-0.55625-0.41772-1.6083 0-1.3181 0.64398-2.0436 0.65268-0.73763 1.8188-0.73763 1.4185 0 2.0886 1.0278 0.46123 0.71345 0.46123 1.8743zm2.5672 2.3822v2.3459h3.5245v1.5478h-4.8559v-9.0209h4.6993v1.5478h-3.3678v2.0315h3.1155v1.5478zm5.9612-5.1271v7.4731h3.1068v1.5478h-4.4469v-9.0209zm5.439 0v7.4731h3.1068v1.5478h-4.4469v-9.0209z" display="none" stroke-width=".039392" style="white-space:pre" aria-label="SELL"/>    <path class="powerclip" d="m-5-5h42v42.001h-42zm15.026 13.624q0-1.1609-0.46123-1.8743-0.67009-1.0278-2.0886-1.0278-1.1661 0-1.8188 0.73763-0.64398 0.72554-0.64398 2.0436 0 1.052 0.41772 1.6083 0.41772 0.54416 1.4098 0.81019l0.90505 0.25394q0.67009 0.16929 0.94856 0.4716 0.27848 0.29022 0.27848 0.83437 0 0.56834-0.3568 0.89483-0.3481 0.32649-0.95727 0.32649-0.67879 0-1.053-0.38696-0.3742-0.38695-0.40901-1.1125h-1.2967q0.060917 1.4511 0.74841 2.225 0.69619 0.76182 1.9406 0.76182 1.2619 0 1.958-0.77391 0.7049-0.77391 0.7049-2.1524 0-1.0641-0.40901-1.6566-0.40031-0.59252-1.3054-0.83437l-1.0182-0.26603q-0.7136-0.19348-0.97467-0.43532-0.25237-0.25394-0.25237-0.74972 0-0.50788 0.30458-0.81019t0.81803-0.30231q1.288 0 1.3576 1.4148zm2.5672 2.3822h3.1155v-1.5478h-3.1155v-2.0315h3.3678v-1.5478h-4.6993v9.0209h4.8559v-1.5478h-3.5245zm5.9612-5.1271h-1.3402v9.0209h4.4469v-1.5478h-3.1068zm5.439 0h-1.3402v9.0209h4.4469v-1.5478h-3.1068z" stroke-width=".039392" style="white-space:pre"/>   </clipPath>  </defs>  <path d="m26.667 0h-21.334c-2.945 0-5.333 2.371-5.333 5.297v12.33c0 2.924 2.055 4.813 5 4.813h6.639l4.361 9.561 4.361-9.561h6.639c2.945 0 5-1.889 5-4.813v-12.33c0-2.926-2.388-5.297-5.333-5.297z" clip-path="url(#clipPath4)" fill-rule="evenodd"/> </svg>', Th = '<svg width="493px" height="512px" clip-rule="evenodd" fill-rule="evenodd" image-rendering="optimizeQuality" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" version="1.1" viewBox="0 0 493 511.77" xmlns="http://www.w3.org/2000/svg"><path d="m33.11 458.2 104.5-79.1c3.09-3 7.08-4.47 11.08-4.45l302.6-0.08c2.67 0 5.09-1.08 6.78-2.77 1.74-1.81 2.84-4.24 2.84-6.87v-323.2c0-2.59-1.12-5-2.86-6.74-1.78-1.78-4.2-2.9-6.76-2.9h-409.56c-2.54 0-4.94 1.14-6.72 2.92s-2.92 4.18-2.92 6.72c0 793.72 1.02 39.329 1.02 416.47zm90.6-229.77c10.9 0 19.74 8.85 19.74 19.74s-8.84 19.73-19.74 19.73c-10.89 0-19.73-8.84-19.73-19.73s8.84-19.74 19.73-19.74zm0-101.14c10.9 0 19.74 8.85 19.74 19.74s-8.84 19.74-19.74 19.74c-10.89 0-19.73-8.85-19.73-19.74s8.84-19.74 19.73-19.74zm61.72 138.89c-9.95 0-18.02-8.07-18.02-18.01 0-9.95 8.07-18.02 18.02-18.02h185.56c9.95 0 18.01 8.07 18.01 18.02 0 9.94-8.06 18.01-18.01 18.01zm0-101.13c-9.95 0-18.02-8.07-18.02-18.02 0-9.94 8.07-18.01 18.02-18.01h185.56c9.95 0 18.01 8.07 18.01 18.01 0 9.95-8.06 18.02-18.01 18.02zm-30.38 241.61-125.97 99.69c-2.96 3.32-7.24 5.42-12.01 5.42-8.85 0-17.07-7.1228-17.07-15.963v-454.08c0-11.4 4.77-21.88 12.31-29.42s18.02-12.31 29.42-12.31h409.56c11.4 0 21.9 4.74 29.45 12.29 7.5 7.51 12.26 17.96 12.26 29.44v323.2c0 11.48-4.7 21.95-12.24 29.49-7.61 7.54-18.05 12.24-29.47 12.24z" fill-rule="nonzero"/></svg>', Eh = '<svg width="800px" height="800px" fill="none" version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m15.746 2.7281c-5.1207-2.0689-10.949 0.40512-13.018 5.5258-2.0689 5.1207 0.40512 10.949 5.5258 13.018 5.1207 2.0689 10.949-0.40508 13.018-5.5258 2.0689-5.1207-0.40508-10.949-5.5258-13.018zm-1.3378 8.3035-1.2703-0.51325c-0.21854-0.08829-0.32785-0.13246-0.3683-0.22775-0.04045-0.09529 0.0037-0.20461 0.09201-0.42314l1.6595-4.1073c0.33362-0.82575 0.50047-1.2387 0.33474-1.3523-0.16582-0.11359-0.49058 0.19103-1.1403 0.8003l-4.7426 4.4469c-1.0274 0.96338-1.541 1.445-1.4405 1.9835 0.10054 0.53837 0.75347 0.80216 2.0594 1.3298l1.2703 0.51325c0.21854 0.08829 0.32785 0.13246 0.3683 0.22775 0.04045 0.09529-0.0037 0.20461-0.09201 0.42314l-1.6595 4.1073c-0.33365 0.82582-0.50047 1.2387-0.33475 1.3523 0.16582 0.1136 0.49059-0.19104 1.1403-0.80025l4.7425-4.4469c1.0275-0.96346 1.5411-1.4451 1.4406-1.9836-0.10057-0.53838-0.75352-0.80218-2.0594-1.3298z" clip-rule="evenodd" fill-rule="evenodd"/></svg>', Sh = '<svg enable-background="new 0 0 100 100" version="1.1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">  <g>   <rect transform="scale(-1)" x="-15" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-36.25" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-57.5" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.3s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-78.75" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.5s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>   <rect transform="scale(-1)" x="-100" y="-100" width="15" height="100">    <animate attributeName="height" attributeType="XML" begin="0.1s" dur="1s" repeatCount="indefinite" values="30; 100; 30"/>   </rect>  </g> </svg>', Ph = '<svg version="1.1" id="L7" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"  viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">   <path fill="#fff" d="M42.3,39.6c5.7-4.3,13.9-3.1,18.1,2.7c4.3,5.7,3.1,13.9-2.7,18.1l4.1,5.5c8.8-6.5,10.6-19,4.1-27.7  c-6.5-8.8-19-10.6-27.7-4.1L42.3,39.6z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="3s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path> <path fill="#fff" d="M82,35.7C74.1,18,53.4,10.1,35.7,18S10.1,46.6,18,64.3l7.6-3.4c-6-13.5,0-29.3,13.5-35.3s29.3,0,35.3,13.5  L82,35.7z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="2s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path>   <path fill="#fff" d="M31.6,3.5C5.9,13.6-6.6,42.7,3.5,68.4c10.1,25.7,39.2,38.3,64.9,28.1l-3.1-7.9c-21.3,8.4-45.4-2-53.8-23.3  c-8.4-21.3,2-45.4,23.3-53.8L31.6,3.5z">      <animateTransform         attributeName="transform"         attributeType="XML"         type="rotate"         dur="1s"         from="0 50 50"         to="360 50 50"         repeatCount="indefinite" />  </path></svg>', st = 300, Si = 400, Mh = `${Si}px`, Nr = `${st}px`, Ah = "100%", Lh = "100%", je = 30, qe = 35, Pi = 25, Ir = 25, Mi = Pi + Ir, gt = 60, ht = "normal", ct = 12, ji = "normal", ut = "Avenir, Helvetica, Arial, sans-serif", Ds = "#141414", Os = "#333", Rs = "#cccccc", Wt = "#888888", ft = "#cccccc", Dr = "25px", Nh = "position: relative;", H = {
   COLOUR_BG: Ds,
   COLOUR_BORDER: Os,
   COLOUR_TXT: Rs,
@@ -3364,7 +3376,7 @@ const Yl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   COLOUR_BG: Ds,
   COLOUR_BORDER: Os,
   COLOUR_TXT: Rs
-}, Nh = {
+}, Ih = {
   FILL: ft + "88"
 }, X = {
   CANDLE_SOLID: "candle_solid",
@@ -3405,7 +3417,7 @@ const Yl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   FONT_LABEL_BOLD: `bold ${fi}px ${yi}`
 }, Or = {
   COLOUR_GRID: "#222"
-}, Ih = {
+}, Dh = {
   width: 1,
   stroke: "#ccc",
   dash: [1, 1]
@@ -3418,14 +3430,14 @@ const Yl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   IDLE: "#FFFFFF00",
   LINE: H.COLOUR_BORDER,
   STYLE: "1px solid"
-}, Dh = {
+}, Oh = {
   FONTSIZE: 50,
   FONTWEIGHT: "bold",
   FONTFAMILY: H.FONTFAMILY,
   COLOUR: "#181818",
   IMGWIDTH: "200",
   IMGHEIGHT: "200"
-}, es = { arrowDown: ph, arrowUp: gh, arrowDownRound: fh, arrowUpRound: yh, arrowDownRoundSolid: vh, arrowUpRoundSolid: wh, buySolid: xh, sellSolid: bh }, Xn = { noteSolid: Ch, lightning: Th }, Rr = {
+}, es = { arrowDown: gh, arrowUp: fh, arrowDownRound: yh, arrowUpRound: vh, arrowDownRoundSolid: wh, arrowUpRoundSolid: xh, buySolid: bh, sellSolid: Ch }, Xn = { noteSolid: Th, lightning: Eh }, Rr = {
   candle: {
     Type: X.CANDLE_SOLID,
     UpBodyColour: ai.COLOUR_CANDLE_UP,
@@ -3506,7 +3518,7 @@ const Yl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
     line: li.LINE,
     style: li.STYLE
   },
-  watermark: Dh,
+  watermark: Oh,
   trades: {
     iconBuy: es.arrowUp,
     iconSell: es.arrowDown,
@@ -3527,7 +3539,7 @@ const Yl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
     defaultIcons: Xn,
     offset: 10
   }
-}, Oh = `
+}, Rh = `
 <style title="txc_CSSVars">
   --txc-background: #141414:
   --txc-border-color: #888;
@@ -3538,16 +3550,16 @@ const Yl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   --txc-time-cursor-back: #ccc;
   --txc-time-icon-color: #888;
   --txc-time-icon-hover-color: #888;
-</style>`, Rh = `
+</style>`, kh = `
 <style>
   tradex-chart {
     display: flex;
     width: var(--txc-width, 100%);
     height: var(--txc-height, 100%);
-    min-width: var(--txc-min-width, ${Ph});
+    min-width: var(--txc-min-width, ${Mh});
     min-height: var(--txc-min-height, ${Nr});
-    max-width: var(--txc-max-width, ${Mh});
-    max-height: var(--txc-max-height, ${Ah});
+    max-width: var(--txc-max-width, ${Ah});
+    max-height: var(--txc-max-height, ${Lh});
     overflow: hidden;
     background: var(--txc-background, ${H.COLOUR_BG});
     font: var(--txc-font, ${H.FONT});
@@ -3580,7 +3592,7 @@ const Yl = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   }
 </style>
 `;
-class Ve {
+class ze {
   #e;
   #t;
   #n;
@@ -3594,13 +3606,13 @@ class Ve {
   #h;
   #d = ["await", "idle", "running", "stopped"];
   constructor(e, i) {
-    if (!Ve.validateConfig(e))
+    if (!ze.validateConfig(e))
       return !1;
     const s = { ...e };
     this.id = s.id, this.#i = s, this.#t = s.initial, this.#r.origin = i, this.#h = s.actions, this.#s = i.core, this.#u();
   }
   set id(e) {
-    this.#e = He(e);
+    this.#e = $e(e);
   }
   get id() {
     return this.#e;
@@ -3636,22 +3648,22 @@ class Ve {
     this.#c = e, this.#a = i;
     const s = this.#i.states[this.#t];
     let n = s.on[e];
-    if (!n || !B(n.action) || this.#l !== "running")
+    if (!n || !U(n.action) || this.#l !== "running")
       return !1;
-    let r = n?.condition?.type || n?.condition || !1;
-    if (r && !this.condition.call(this, r, n.condition))
+    let o = n?.condition?.type || n?.condition || !1;
+    if (o && !this.condition.call(this, o, n.condition))
       return !1;
-    const a = n.target, h = this.#i.states[a];
-    if (s?.onExit.call(this, i), n.action.call(this, i), this.#n = this.#t, this.#t = a, h?.onEnter.call(this, i), this.#i.states[a]?.on && (this.#i.states[a].on[""] || this.#i.states[a].on?.always)) {
-      const l = this.#i.states[a].on[""] || this.#i.states[a].on.always;
-      if (M(l))
-        for (let m of l) {
+    const a = n.target, l = this.#i.states[a];
+    if (s?.onExit.call(this, i), n.action.call(this, i), this.#n = this.#t, this.#t = a, l?.onEnter.call(this, i), this.#i.states[a]?.on && (this.#i.states[a].on[""] || this.#i.states[a].on?.always)) {
+      const h = this.#i.states[a].on[""] || this.#i.states[a].on.always;
+      if (M(h))
+        for (let m of h) {
           let g = m?.condition?.type || m?.condition || !1;
-          this.condition.call(this, g, m.condition) && S(m.target) && (m?.action.call(this, i), this.#n = this.#t, this.#t = m?.target, this.notify(null, null));
+          this.condition.call(this, g, m.condition) && E(m.target) && (m?.action.call(this, i), this.#n = this.#t, this.#t = m?.target, this.notify(null, null));
         }
-      else if (b(l) && S(l.target)) {
-        let m = l?.condition?.type || l?.condition || !1;
-        this.condition.call(this, m, l.condition) && S(l.target) && (l?.action.call(this, i), this.#n = this.#t, this.#t = l.target, this.notify(null, null));
+      else if (b(h) && E(h.target)) {
+        let m = h?.condition?.type || h?.condition || !1;
+        this.condition.call(this, m, h.condition) && E(h.target) && (h?.action.call(this, i), this.#n = this.#t, this.#t = h.target, this.notify(null, null));
       }
     }
     return this.#t;
@@ -3692,20 +3704,20 @@ class Ve {
     if (!Tr(i, s) || !(e.initial in e.states))
       return !1;
     for (let n in e.states) {
-      if (!b(e.states[n]) || "onEnter" in e.states[n] && !B(e.states[n].onEnter) || "onExit" in e.states[n] && !B(e.states[n].onExit))
+      if (!b(e.states[n]) || "onEnter" in e.states[n] && !U(e.states[n].onEnter) || "onExit" in e.states[n] && !U(e.states[n].onExit))
         return !1;
       if ("on" in e.states[n])
-        for (let r in e.states[n].on) {
-          let a = e.states[n].on[r];
-          if (!S(a.target) || "action" in a && !B(a.action))
+        for (let o in e.states[n].on) {
+          let a = e.states[n].on[o];
+          if (!E(a.target) || "action" in a && !U(a.action))
             return !1;
         }
     }
     return !0;
   }
 }
-const kh = "alert";
-class _h {
+const _h = "alert";
+class Hh {
   #e = new be();
   #t = {};
   constructor(e) {
@@ -3732,17 +3744,17 @@ class _h {
       return !1;
   }
   add(e, i, s) {
-    if (isNaN(e) || !B(s))
+    if (isNaN(e) || !U(s))
       return !1;
-    const n = Z(kh), r = { price: e, condition: i };
-    if (this.list.has(r)) {
-      let a = this.list.get(r);
+    const n = Z(_h), o = { price: e, condition: i };
+    if (this.list.has(o)) {
+      let a = this.list.get(o);
       a[n] = s;
     } else {
       const a = {};
-      a[n] = s, this.list.set(r, a);
+      a[n] = s, this.list.set(o, a);
     }
-    return this.#t[n] = { alert: r, handler: s }, n;
+    return this.#t[n] = { alert: o, handler: s }, n;
   }
   remove(e) {
     if (!(e in this.#t))
@@ -3770,16 +3782,16 @@ class _h {
     if (!(!M(e) || !M(i))) {
       for (let [s, n] of this.list)
         if (s.condition(s.price, e, i))
-          for (let r in n)
+          for (let o in n)
             try {
-              n[r](s.price, e, i);
+              n[o](s.price, e, i);
             } catch (a) {
               console.error(a);
             }
     }
   }
 }
-const Hh = 0, $h = 1, Bh = 2, Uh = 3, Vh = 4, zh = 5, hi = [null, null, null, null, null], ci = {
+const $h = 0, Uh = 1, Bh = 2, Vh = 3, zh = 4, Wh = 5, hi = [null, null, null, null, null], ci = {
   tfCountDown: !0,
   alerts: []
 };
@@ -3803,13 +3815,13 @@ class mt {
   static validateConfig(e) {
     if (b(e)) {
       let i = ce(ci);
-      e = Ut(i, e), e.tfCountDown = K(e.tfCountDown) ? e.tfCountDown : ci.tfCountDown, e.alerts = M(e.alerts) ? e.alerts : ci.alerts;
+      e = Bt(i, e), e.tfCountDown = K(e.tfCountDown) ? e.tfCountDown : ci.tfCountDown, e.alerts = M(e.alerts) ? e.alerts : ci.alerts;
     } else
       return ci;
     return e;
   }
   constructor(e) {
-    this.#e = e, this.#r = e.time, this.status = { status: ja }, this.#t = mt.validateConfig(e.config?.stream), this.#i = T(e.config?.maxCandleUpdate) ? e.config.maxCandleUpdate : Qa, this.#l = T(e.config?.streamPrecision) ? e.config.streamPrecision : el;
+    this.#e = e, this.#r = e.time, this.status = { status: Za }, this.#t = mt.validateConfig(e.config?.stream), this.#i = T(e.config?.maxCandleUpdate) ? e.config.maxCandleUpdate : el, this.#l = T(e.config?.streamPrecision) ? e.config.streamPrecision : tl;
   }
   get config() {
     return this.#t;
@@ -3855,28 +3867,28 @@ class mt {
   }
   set candle(e) {
     const i = [...this.#o];
-    e.t = this.roundTime(new Date(e.t)), e.o = e.o * 1, e.h = e.h * 1, e.l = e.l * 1, e.c = e.c * 1, e.v = e.v * 1, this.#o[Hh] !== e.t ? this.newCandle(e) : this.updateCandle(e), this.status = { status: Ht, data: this.#o }, this.lastTick = i;
+    e.t = this.roundTime(new Date(e.t)), e.o = e.o * 1, e.h = e.h * 1, e.l = e.l * 1, e.c = e.c * 1, e.v = e.v * 1, this.#o[$h] !== e.t ? this.newCandle(e) : this.updateCandle(e), this.status = { status: Ht, data: this.#o }, this.lastTick = i;
   }
   get candle() {
     return this.#o !== hi ? this.#o : null;
   }
   start() {
-    this.#g = new _h(this.#t.alerts), this.status = { status: Pn }, this.#s = setInterval(this.onUpdate.bind(this), this.#i);
+    this.#g = new Hh(this.#t.alerts), this.status = { status: Pn }, this.#s = setInterval(this.onUpdate.bind(this), this.#i);
   }
   stop() {
-    this.#g.destroy(), this.status = { status: Za };
+    this.#g.destroy(), this.status = { status: Ja };
   }
   emit(e, i) {
     this.#e.emit(e, i);
   }
   error() {
-    this.status = { status: Ja };
+    this.status = { status: Qa };
   }
   onTick(e) {
     (this.#n == Pn || this.#n == Ht) && b(e) && (this.candle = e);
   }
   onUpdate() {
-    this.#o !== hi && (this.status = { status: ke, data: this.candle }, this.status = { status: Ht, data: this.#o });
+    this.#o !== hi && (this.status = { status: _e, data: this.candle }, this.status = { status: Ht, data: this.#o });
   }
   newCandle(e) {
     this.prevCandle(), this.#o = [
@@ -3896,63 +3908,63 @@ class mt {
   }
   updateCandle(e) {
     let i = this.#o;
-    i[$h] = e.o, i[Bh] = e.h, i[Uh] = e.l, i[Vh] = e.c, i[zh] = e.v, this.#o = i;
+    i[Uh] = e.o, i[Bh] = e.h, i[Vh] = e.l, i[zh] = e.c, i[Wh] = e.v, this.#o = i;
     const s = this.#e.allData.data, n = s.length > 0 ? s.length - 1 : 0;
     s[n] = this.#o, this.countDownUpdate();
   }
   countDownUpdate() {
-    let e, i, s, n, r, a, h;
+    let e, i, s, n, o, a, l;
     this.#r.timeFrameMS;
-    let l = this.#r.timeFrameMS - (Date.now() - this.#c);
-    return l < 0 && (l = 0), this.#a = l, l > ve ? (e = String(Math.floor(l / ve)), i = String(Math.floor(l % ve / he)).padStart(2, "0"), this.#h = `${e}Y ${i}M`) : l > he ? (i = String(Math.floor(l / he)).padStart(2, "0"), n = String(Math.floor(l % he / $)).padStart(2, "0"), this.#h = `${i}M ${n}D`) : l > pt ? (s = String(Math.floor(l / pt)).padStart(2, "0"), n = String(Math.floor(l % he / $)).padStart(2, "0"), this.#h = `${s}W ${n}D`) : l > $ ? (n = String(Math.floor(l / $)).padStart(2, "0"), r = String(Math.floor(l % $ / j)).padStart(2, "0"), a = String(Math.floor(l % j / F)).padStart(2, "0"), this.#h = `${n}D ${r}:${a}`) : l > j ? (r = String(Math.floor(l / j)).padStart(2, "0"), a = String(Math.floor(l % j / F)).padStart(2, "0"), h = String(Math.floor(l % F / z)).padStart(2, "0"), this.#h = `${r}:${a}:${h}`) : l > F ? (a = String(Math.floor(l / F)).padStart(2, "0"), h = String(Math.floor(l % F / z)).padStart(2, "0"), this.#h = `00:${a}:${h}`) : (h = String(Math.floor(l / z)).padStart(2, "0"), String(l % z).padStart(4, "0"), this.#h = `00:00:${h}`), this.#h;
+    let h = this.#r.timeFrameMS - (Date.now() - this.#c);
+    return h < 0 && (h = 0), this.#a = h, h > ve ? (e = String(Math.floor(h / ve)), i = String(Math.floor(h % ve / he)).padStart(2, "0"), this.#h = `${e}Y ${i}M`) : h > he ? (i = String(Math.floor(h / he)).padStart(2, "0"), n = String(Math.floor(h % he / $)).padStart(2, "0"), this.#h = `${i}M ${n}D`) : h > pt ? (s = String(Math.floor(h / pt)).padStart(2, "0"), n = String(Math.floor(h % he / $)).padStart(2, "0"), this.#h = `${s}W ${n}D`) : h > $ ? (n = String(Math.floor(h / $)).padStart(2, "0"), o = String(Math.floor(h % $ / j)).padStart(2, "0"), a = String(Math.floor(h % j / F)).padStart(2, "0"), this.#h = `${n}D ${o}:${a}`) : h > j ? (o = String(Math.floor(h / j)).padStart(2, "0"), a = String(Math.floor(h % j / F)).padStart(2, "0"), l = String(Math.floor(h % F / z)).padStart(2, "0"), this.#h = `${o}:${a}:${l}`) : h > F ? (a = String(Math.floor(h / F)).padStart(2, "0"), l = String(Math.floor(h % F / z)).padStart(2, "0"), this.#h = `00:${a}:${l}`) : (l = String(Math.floor(h / z)).padStart(2, "0"), String(h % z).padStart(4, "0"), this.#h = `00:00:${l}`), this.#h;
   }
   roundTime(e) {
     return e - e % this.#e.time.timeFrameMS;
   }
 }
 const Kn = ["constructor", "list", "setCurrent", "setTheme", "setValue"];
-class Ee {
+class Se {
   static #e = new be();
   static get list() {
-    return Ee.#e;
+    return Se.#e;
   }
   #t;
   static create(e, i) {
     if (!b(e))
       return !1;
-    e.id = S(e.name) ? Z(e.name) : `${i.id}.theme`;
-    const s = new Ee(e, i);
-    return Ee.list.set(e.id, s), s;
+    e.id = E(e.name) ? Z(e.name) : `${i.id}.theme`;
+    const s = new Se(e, i);
+    return Se.list.set(e.id, s), s;
   }
   constructor(e, i) {
     this.#t = i, this.setCurrent(e);
   }
   get list() {
-    return Ee.list;
+    return Se.list;
   }
   setCurrent(e = {}) {
     e = b(e) ? e : {};
-    const i = ce(Rr), s = ce(e), n = Ut(i, s);
-    for (let r in n)
-      Kn.includes(r) || (this[r] = n[r]);
+    const i = ce(Rr), s = ce(e), n = Bt(i, s);
+    for (let o in n)
+      Kn.includes(o) || (this[o] = n[o]);
     this.#t.refresh();
   }
   setTheme(e) {
-    if (S(e) && Ee.list.has(e)) {
-      const i = Ee.list.get(e);
+    if (E(e) && Se.list.has(e)) {
+      const i = Se.list.get(e);
       return this.setCurrent(i), !0;
     }
     return !1;
   }
   setProperty(e, i) {
-    if (!S(e))
+    if (!E(e))
       return;
     const s = dn(this, e), n = e.split(".");
     if (n.length == 1)
       this[n[0]] = i;
     else {
-      let r = n.shift();
-      this[r] = Cr(this[r], n.join("."), i);
+      let o = n.shift();
+      this[o] = Cr(this[o], n.join("."), i);
     }
     return this.#t.refresh(), s;
   }
@@ -3960,24 +3972,24 @@ class Ee {
     return dn(this, e);
   }
   deleteTheme(e) {
-    return S(e) && Ee.list.has(e) ? (Ee.list.delete(e), !0) : !1;
+    return E(e) && Se.list.has(e) ? (Se.list.delete(e), !0) : !1;
   }
   exportTheme(e = {}) {
     b || (e = {});
     const i = e?.type, s = {};
     let n;
-    for (let r in this)
-      Kn.includes(r) || (s[r] = this[r]);
+    for (let o in this)
+      Kn.includes(o) || (s[o] = this[o]);
     switch (i) {
       case "json":
       default:
-        const { replacer: r, space: a } = { ...e };
-        n = JSON.stringify(s, r, a);
+        const { replacer: o, space: a } = { ...e };
+        n = JSON.stringify(s, o, a);
     }
     return n;
   }
 }
-class Wh {
+class Fh {
   #e;
   constructor(e) {
     this.#e = e, self.onmessage = (i) => this._onmessage(i.data);
@@ -3995,7 +4007,7 @@ class Wh {
     self.close();
   }
 }
-class Fh {
+class Gh {
   #e;
   #t;
   #n;
@@ -4004,12 +4016,12 @@ class Fh {
   #s;
   constructor(e, i, s, n) {
     this.#e = e, this.#t = s, this.#n = n;
-    const r = `
+    const o = `
       ${Me.ThreadWorker.toString()};
       const fn = ${i}
       const worker = new ThreadWorker(fn)
-    `, a = new Blob([`;(async () => {${r}})().catch(e => {console.error(e)})`], { type: "text/javascript" }), h = URL.createObjectURL(a);
-    this.#s = new Worker(h);
+    `, a = new Blob([`;(async () => {${o}})().catch(e => {console.error(e)})`], { type: "text/javascript" }), l = URL.createObjectURL(a);
+    this.#s = new Worker(l);
   }
   get id() {
     return this.#e;
@@ -4024,26 +4036,26 @@ class Fh {
     this.#t = e;
   }
   onmessage(e) {
-    return B(this.#t) ? this.#t(e) : e;
+    return U(this.#t) ? this.#t(e) : e;
   }
   onerror(e) {
-    return B(this.#n) ? this.#n(e) : e;
+    return U(this.#n) ? this.#n(e) : e;
   }
   postMessage(e) {
     return new Promise((i, s) => {
       try {
         let n = this.req;
-        this.#i[n] = { resolve: i, reject: s }, this.#s.postMessage({ r: n, data: e }), this.#s.onmessage = (r) => {
-          const { r: a, status: h, result: l } = r.data;
+        this.#i[n] = { resolve: i, reject: s }, this.#s.postMessage({ r: n, data: e }), this.#s.onmessage = (o) => {
+          const { r: a, status: l, result: h } = o.data;
           if (a in this.#i) {
             const { resolve: m, reject: g } = this.#i[a];
-            delete this.#i[a], h ? m(this.onmessage(l)) : g(this.onerror({ r: a, result: l }));
-          } else if (h == "resolved")
-            this.onmessage(l);
+            delete this.#i[a], l ? m(this.onmessage(h)) : g(this.onerror({ r: a, result: h }));
+          } else if (l == "resolved")
+            this.onmessage(h);
           else
             throw new Error("Orphaned thread request ${r}");
-        }, this.#s.onerror = (r) => {
-          s(this.onerror(r));
+        }, this.#s.onerror = (o) => {
+          s(this.onerror(o));
         };
       } catch (n) {
         s(n);
@@ -4056,19 +4068,19 @@ class Fh {
 }
 class Me {
   static #e = /* @__PURE__ */ new Map();
-  static ThreadWorker = Wh;
-  static Thread = Fh;
+  static ThreadWorker = Fh;
+  static Thread = Gh;
   static create(e, i = "worker", s) {
     if (typeof window.Worker > "u")
       return !1;
-    if (B(e))
+    if (U(e))
       e = e.toString();
-    else if (!S(e))
+    else if (!E(e))
       return !1;
-    return i = S(i) ? Z(i) : Z("worker"), Me.#e.set(i, new Me.Thread(i, e, s)), Me.#e.get(i);
+    return i = E(i) ? Z(i) : Z("worker"), Me.#e.set(i, new Me.Thread(i, e, s)), Me.#e.get(i);
   }
   static destroy(e) {
-    if (!S(e))
+    if (!E(e))
       return !1;
     Me.#e.get(e).terminate(), Me.#e.delete(e);
   }
@@ -4078,22 +4090,22 @@ class Me {
     });
   }
 }
-class Gh {
+class Yh {
   #e = {};
   constructor() {
   }
   on(e, i, s) {
-    return !S(e) || !B(i) ? !1 : (this.#e[e] || (this.#e[e] = []), this.#e[e].push({ handler: i, context: s }), !0);
+    return !E(e) || !U(i) ? !1 : (this.#e[e] || (this.#e[e] = []), this.#e[e].push({ handler: i, context: s }), !0);
   }
   off(e, i, s) {
-    if (!S(e) || !B(i) || !(e in this.#e))
+    if (!E(e) || !U(i) || !(e in this.#e))
       return !1;
     const n = this.#e[e];
-    for (let r = 0; r < n.length; r++)
-      if (n[r].handler === i) {
-        if (s !== void 0 && n[r].context !== s)
+    for (let o = 0; o < n.length; o++)
+      if (n[o].handler === i) {
+        if (s !== void 0 && n[o].context !== s)
           continue;
-        if (n.splice(r, 1), n.length === 0) {
+        if (n.splice(o, 1), n.length === 0) {
           delete this.#e[e];
           break;
         }
@@ -4101,12 +4113,12 @@ class Gh {
     return !0;
   }
   emit(e, i) {
-    S(e) && (this.#e[e] || []).forEach((s) => s.handler.call(s.context, i));
+    E(e) && (this.#e[e] || []).forEach((s) => s.handler.call(s.context, i));
   }
   execute(e, i, s) {
   }
 }
-class re extends HTMLElement {
+class oe extends HTMLElement {
   shadowRoot;
   template;
   id = Z(_t);
@@ -4127,12 +4139,12 @@ class re extends HTMLElement {
   };
   #e;
   constructor(e, i = "open") {
-    super(), this.template = e, this.shadowRoot = this.attachShadow({ mode: i }), this.#e = new Gh();
+    super(), this.template = e, this.shadowRoot = this.attachShadow({ mode: i }), this.#e = new Yh();
   }
   destroy() {
   }
   connectedCallback(e) {
-    this.doInit && (this.doInit = !1, this.shadowRoot.appendChild(this.template.content.cloneNode(!0)), this.style.display = "block", this.DOM.width = this.clientWidth, this.DOM.height = this.clientHeight, this.oldDOM.width = this.clientWidth, this.oldDOM.height = this.clientHeight, this.resizeObserver = new ResizeObserver(this.onResize.bind(this)), this.resizeObserver.observe(this), B(e) && e());
+    this.doInit && (this.doInit = !1, this.shadowRoot.appendChild(this.template.content.cloneNode(!0)), this.style.display = "block", this.DOM.width = this.clientWidth, this.DOM.height = this.clientHeight, this.oldDOM.width = this.clientWidth, this.oldDOM.height = this.clientHeight, this.resizeObserver = new ResizeObserver(this.onResize.bind(this)), this.resizeObserver.observe(this), U(e) && e());
   }
   disconnectedCallback() {
     this.resizeObserver.disconnect(), this.#e = void 0;
@@ -4189,7 +4201,7 @@ class re extends HTMLElement {
     return this.style.cursor;
   }
   setDim(e, i) {
-    !["width", "height"].includes(i) || !S(e) || (T(e) ? (this.DOM[i] = e, e += "px") : S(e) || (this.DOM[i] = this.parentElement.getBoundingClientRect().width, e = this.DOM[i] + "px"), this.style[i] = e);
+    !["width", "height"].includes(i) || !E(e) || (T(e) ? (this.DOM[i] = e, e += "px") : E(e) || (this.DOM[i] = this.parentElement.getBoundingClientRect().width, e = this.DOM[i] + "px"), this.style[i] = e);
   }
   onIntersection(e) {
     this.emit("intersection");
@@ -4201,7 +4213,7 @@ class re extends HTMLElement {
     this.oldDOM = { ...this.DOM };
     for (let i in e[0].contentRect) {
       const s = e[0].contentRect[i];
-      B(s) || (this.DOM[i] = s);
+      U(s) || (this.DOM[i] = s);
     }
     this.emit("resize", this.DOM);
   }
@@ -4250,13 +4262,13 @@ class kr {
     return this.#n.yAxisDigits;
   }
   float2Int(e) {
-    return Ea(e);
+    return Sa(e);
   }
   numDigits(e) {
     return xr(e);
   }
   countDigits(e) {
-    return Sa(e);
+    return Ea(e);
   }
   precision(e) {
     return br(e);
@@ -4383,19 +4395,19 @@ class vi extends kr {
         i.units = [g, g], i.timeSpan = `${s[g]} ${g}`;
         break;
       }
-    const n = e.interval, { xStep: r, rank: a } = this.xStep(e), h = this.pixel2T(this.width) + r;
-    let l = e.timeMin - e.timeMin % r - r, m = l;
-    for (; l < h; ) {
-      let g = mi(l, "years"), v = mi(l, "months"), E = mi(l, "days");
-      !(g in i.entries) && g >= m ? i.entries[g] = [this.dateTimeValue(g, n, a), this.t2Pixel(g), g, "major"] : !(v in i.entries) && v >= m ? i.entries[v] = [this.dateTimeValue(v, n, a), this.t2Pixel(v), v, "major"] : !(E in i.entries) && E >= m && (i.entries[E] = [this.dateTimeValue(E, n, a), this.t2Pixel(E), E, "major"]), i.entries[l] = [this.dateTimeValue(l, n, a), this.t2Pixel(l), l, "minor"], l += r;
+    const n = e.interval, { xStep: o, rank: a } = this.xStep(e), l = this.pixel2T(this.width) + o;
+    let h = e.timeMin - e.timeMin % o - o, m = h;
+    for (; h < l; ) {
+      let g = mi(h, "years"), v = mi(h, "months"), S = mi(h, "days");
+      !(g in i.entries) && g >= m ? i.entries[g] = [this.dateTimeValue(g, n, a), this.t2Pixel(g), g, "major"] : !(v in i.entries) && v >= m ? i.entries[v] = [this.dateTimeValue(v, n, a), this.t2Pixel(v), v, "major"] : !(S in i.entries) && S >= m && (i.entries[S] = [this.dateTimeValue(S, n, a), this.t2Pixel(S), S, "major"]), i.entries[h] = [this.dateTimeValue(h, n, a), this.t2Pixel(h), h, "minor"], h += o;
     }
     return i.values = Object.values(i.entries), i;
   }
   xStep(e) {
-    let i = Fa, s = this.#n ? e.interval : 1, n = Dt[0], r = we(this.width / e.Length), a = os[0], h = Dt.indexOf(s);
-    for (; h-- >= 0 && !(r * (Dt[h] / s) >= i); )
+    let i = Ga, s = this.#n ? e.interval : 1, n = Dt[0], o = we(this.width / e.Length), a = os[0], l = Dt.indexOf(s);
+    for (; l-- >= 0 && !(o * (Dt[l] / s) >= i); )
       ;
-    return n = Dt[h], a = os[h], { xStep: n, rank: a };
+    return n = Dt[l], a = os[l], { xStep: n, rank: a };
   }
   dateTimeValue(e, i, s) {
     if (e / $ % 1 === 0) {
@@ -4420,70 +4432,70 @@ const ts = {
   context: {},
   states: {
     idle: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         resize: {
           target: "resize",
-          action(o) {
+          action(r) {
           }
         },
         xAxis_scale: {
           target: "scale",
-          action(o) {
+          action(r) {
           }
         },
         xAxis_inc: {
           target: "incremental",
-          action(o) {
+          action(r) {
           }
         },
         xAxis_log: {
           target: "logarithmic",
-          action(o) {
+          action(r) {
           }
         },
         xAxis_100: {
           target: "percentual",
-          action(o) {
+          action(r) {
           }
         },
         chart_pan: {
           target: "chart_pan",
-          action(o) {
+          action(r) {
           }
         }
       }
     },
     resize: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         someEvent: {
           target: "",
-          action(o) {
+          action(r) {
           }
         }
       }
     },
     chart_pan: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         chart_pan: {
           target: "chart_pan",
-          action(o) {
+          action(r) {
           }
         },
         chart_panDone: {
           target: "idle",
-          action(o) {
+          action(r) {
           }
         }
       }
@@ -4528,7 +4540,7 @@ class _r {
     return this.#e.hex;
   }
   #t(e) {
-    if (rl) {
+    if (ol) {
       let i = document.getElementById("divValidColourTest");
       i || (i = document.createElement("div"), i.id = "divValidColourTest"), i.style.backgroundColor = "", i.style.backgroundColor = e, this.#e.isValid = !!i.style.backgroundColor.length;
     } else
@@ -4590,36 +4602,36 @@ class _r {
     this.#e.rgba = e, this.#y(e);
   }
   #o(e) {
-    let { r: i, g: s, b: n, a: r } = this.#m(e);
-    return i.length == 1 && (i = "0" + i), s.length == 1 && (s = "0" + s), n.length == 1 && (n = "0" + n), r.length == 1 && (r = "0" + r), this.value.r = i, this.value.g = s, this.value.b = n, this.value.a = r, this.setHex([i, s, n, r]), this;
+    let { r: i, g: s, b: n, a: o } = this.#m(e);
+    return i.length == 1 && (i = "0" + i), s.length == 1 && (s = "0" + s), n.length == 1 && (n = "0" + n), o.length == 1 && (o = "0" + o), this.value.r = i, this.value.g = s, this.value.b = n, this.value.a = o, this.setHex([i, s, n, o]), this;
   }
   #c(e) {
-    let { r: i, g: s, b: n, a: r } = this.#m(e);
-    i = parseInt(i, 16) / 255, s = parseInt(s, 16) / 255, n = parseInt(n, 16) / 255, r = parseInt(r, 16) / 255;
-    const a = Math.max(i, s, n), h = a - Math.min(i, s, n), l = h ? a === i ? (s - n) / h : a === s ? 2 + (n - i) / h : 4 + (i - s) / h : 0;
+    let { r: i, g: s, b: n, a: o } = this.#m(e);
+    i = parseInt(i, 16) / 255, s = parseInt(s, 16) / 255, n = parseInt(n, 16) / 255, o = parseInt(o, 16) / 255;
+    const a = Math.max(i, s, n), l = a - Math.min(i, s, n), h = l ? a === i ? (s - n) / l : a === s ? 2 + (n - i) / l : 4 + (i - s) / l : 0;
     let m = [
-      (60 * l < 0 ? 60 * l + 360 : 60 * l).toString(),
-      (100 * (h ? a <= 0.5 ? h / (2 * a - h) : h / (2 - (2 * a - h)) : 0)).toString(),
-      (100 * (2 * a - h) / 2).toString(),
-      r.toString()
+      (60 * h < 0 ? 60 * h + 360 : 60 * h).toString(),
+      (100 * (l ? a <= 0.5 ? l / (2 * a - l) : l / (2 - (2 * a - l)) : 0)).toString(),
+      (100 * (2 * a - l) / 2).toString(),
+      o.toString()
     ];
     return this.setHSLA(m), this;
   }
   #a(e, i, s) {
     i /= 100, s /= 100;
-    const n = (h) => (h + e / 30) % 12, r = i * Math.min(s, 1 - s), a = (h) => s - r * Math.max(-1, Math.min(n(h) - 3, Math.min(9 - n(h), 1)));
+    const n = (l) => (l + e / 30) % 12, o = i * Math.min(s, 1 - s), a = (l) => s - o * Math.max(-1, Math.min(n(l) - 3, Math.min(9 - n(l), 1)));
     return [255 * a(0), 255 * a(8), 255 * a(4)];
   }
   #h(e, i, s) {
     s /= 100;
-    const n = i * Math.min(s, 1 - s) / 100, r = (a) => {
-      const h = (a + e / 30) % 12, l = s - n * Math.max(Math.min(h - 3, 9 - h, 1), -1);
-      return Math.round(255 * l).toString(16).padStart(2, "0");
+    const n = i * Math.min(s, 1 - s) / 100, o = (a) => {
+      const l = (a + e / 30) % 12, h = s - n * Math.max(Math.min(l - 3, 9 - l, 1), -1);
+      return Math.round(255 * h).toString(16).padStart(2, "0");
     };
-    return `#${r(0)}${r(8)}${r(4)}`;
+    return `#${o(0)}${o(8)}${o(4)}`;
   }
   #d(e) {
-    S(e) && (e = /([a-f\d]{2})/ig.exec(e));
+    E(e) && (e = /([a-f\d]{2})/ig.exec(e));
     var i = [
       parseInt(e[0], 16),
       parseInt(e[1], 16),
@@ -4629,34 +4641,34 @@ class _r {
     this.setRGBA(i);
   }
   #u(e) {
-    S(e) && (e = /([a-f\d]{2})/ig.exec(e));
-    let i = parseInt(e[0], 16), s = parseInt(e[1], 16), n = parseInt(e[2], 16), r = parseInt(e[3], 16);
-    i /= 255, s /= 255, n /= 255, r /= 255, this.setHSLA([i, s, n, r]);
+    E(e) && (e = /([a-f\d]{2})/ig.exec(e));
+    let i = parseInt(e[0], 16), s = parseInt(e[1], 16), n = parseInt(e[2], 16), o = parseInt(e[3], 16);
+    i /= 255, s /= 255, n /= 255, o /= 255, this.setHSLA([i, s, n, o]);
   }
   #m(e) {
-    let i, s, n, r, a = this.#e;
+    let i, s, n, o, a = this.#e;
     if (a.r && a.g && a.b && a.a)
-      return { r: i, g: s, b: n, a: r } = { ...a };
-    if (S(e)) {
-      let h = e.indexOf(",") > -1 ? "," : " ";
-      e = e.substr(4).split(")")[0].split(h);
+      return { r: i, g: s, b: n, a: o } = { ...a };
+    if (E(e)) {
+      let l = e.indexOf(",") > -1 ? "," : " ";
+      e = e.substr(4).split(")")[0].split(l);
     }
     if (M(e)) {
       if (e.length < 3 || e.length > 4)
         return !1;
-      i = e[0], s = e[1], n = e[2], r = S(e[3]) ? e[3] : "";
+      i = e[0], s = e[1], n = e[2], o = E(e[3]) ? e[3] : "";
     } else if (b(e))
-      i = e.r, s = e.g, n = e.b, r = "a" in e ? e.a : "";
+      i = e.r, s = e.g, n = e.b, o = "a" in e ? e.a : "";
     else
       return !1;
-    return { r: i, g: s, b: n, a: r };
+    return { r: i, g: s, b: n, a: o };
   }
   #y(e) {
-    let i, s, n = 0, r = [], a = [], h = e.replace(/\s/g, "").match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i);
-    h.shift();
-    for (let l of h)
-      s = l.indexOf("%") > -1, i = parseFloat(l), n < 3 && s ? i = Math.round(255 * i / 100) : n == 3 && (!s && i >= 0 && i <= 1 ? i = Math.round(255 * i) : s && i >= 0 && i <= 100 ? i = Math.round(255 * i / 100) : i = ""), r[n] = (i | 256).toString(16).slice(1), a[n++] = i;
-    this.setHex(r), this.setRGBA(a), this.#u(this.#e.hex);
+    let i, s, n = 0, o = [], a = [], l = e.replace(/\s/g, "").match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i);
+    l.shift();
+    for (let h of l)
+      s = h.indexOf("%") > -1, i = parseFloat(h), n < 3 && s ? i = Math.round(255 * i / 100) : n == 3 && (!s && i >= 0 && i <= 1 ? i = Math.round(255 * i) : s && i >= 0 && i <= 100 ? i = Math.round(255 * i / 100) : i = ""), o[n] = (i | 256).toString(16).slice(1), a[n++] = i;
+    this.setHex(o), this.setRGBA(a), this.#u(this.#e.hex);
   }
 }
 class ks {
@@ -4673,7 +4685,7 @@ class ks {
   #h;
   #d;
   constructor(e) {
-    this.#t = ks.#e++, this.#n = e.core, this.#r = D.isElement(e.elContainer) ? e.elContainer : !1, this.#i = D.isElement(e.elHandle) ? e.elHandle : !1, this.#d = B(e.callback) ? e.callback : !1, D.isElement(this.#r) && D.isElement(this.#i) && (this.mount(), this.eventsListen());
+    this.#t = ks.#e++, this.#n = e.core, this.#r = D.isElement(e.elContainer) ? e.elContainer : !1, this.#i = D.isElement(e.elHandle) ? e.elHandle : !1, this.#d = U(e.callback) ? e.callback : !1, D.isElement(this.#r) && D.isElement(this.#i) && (this.mount(), this.eventsListen());
   }
   set cursor(e) {
     this.#i.style.cursor = e;
@@ -4682,7 +4694,7 @@ class ks {
     return this.#i.style.cursor;
   }
   eventsListen() {
-    this.#h = new Le(this.#i, { disableContextMenu: !1 }), this.#h.on("mouseenter", Re(this.onMouseEnter, 1, this, !0)), this.#h.on("mouseout", Re(this.onMouseOut, 1, this, !0)), this.#h.on("drag", _a(this.onHandleDrag, 100, this)), this.#h.on("enddrag", this.onHandleDragDone.bind(this)), this.#h.on("mousedown", Re(this.onMouseDown, 100, this, !0)), this.#h.on("mouseup", this.onMouseUp.bind(this));
+    this.#h = new Le(this.#i, { disableContextMenu: !1 }), this.#h.on("mouseenter", ke(this.onMouseEnter, 1, this, !0)), this.#h.on("mouseout", ke(this.onMouseOut, 1, this, !0)), this.#h.on("drag", _a(this.onHandleDrag, 100, this)), this.#h.on("enddrag", this.onHandleDragDone.bind(this)), this.#h.on("mousedown", ke(this.onMouseDown, 100, this, !0)), this.#h.on("mouseup", this.onMouseUp.bind(this));
   }
   on(e, i, s) {
     this.#n.on(e, i, s);
@@ -4715,8 +4727,8 @@ class ks {
     this.#s.w = this.#r.getBoundingClientRect().width, this.#s.h = this.#r.getBoundingClientRect().height, this.#r.style.overflow = "hidden", this.#l.w = this.#i.getBoundingClientRect().width, this.#l.h = this.#i.getBoundingClientRect().height, this.#i.style.marginRight = 0, this.#i.style.position = "absolute";
   }
   handlePos(e) {
-    let i = this.#n.range, s = parseInt(this.#i.style.marginLeft), n = this.#r.getBoundingClientRect().width, r = this.#i.getBoundingClientRect().width, a = n - r, h = e.position.x - this.#a.x, l = _(s + h, 0, a), m = (i.dataLength + i.limitFuture + i.limitPast) / n, g = Math.floor(l * m);
-    this.setHandleDims(l, r), this.#n.jumpToIndex(g);
+    let i = this.#n.range, s = parseInt(this.#i.style.marginLeft), n = this.#r.getBoundingClientRect().width, o = this.#i.getBoundingClientRect().width, a = n - o, l = e.position.x - this.#a.x, h = _(s + l, 0, a), m = (i.dataLength + i.limitFuture + i.limitPast) / n, g = Math.floor(h * m);
+    this.setHandleDims(h, o), this.#n.jumpToIndex(g);
   }
   setHandleDims(e, i) {
     let s = this.#r.getBoundingClientRect().width;
@@ -4741,8 +4753,8 @@ let $r = class {
     return this.layers.push(e), e.setSize(e.width || this.width, e.height || this.height), e.viewport = this, this;
   }
   getIntersection(e, i) {
-    for (var s = this.layers, n = s.length - 1, r, a; n >= 0; ) {
-      if (r = s[n], a = r.hit.getIntersection(e, i), a >= 0)
+    for (var s = this.layers, n = s.length - 1, o, a; n >= 0; ) {
+      if (o = s[n], a = o.hit.getIntersection(e, i), a >= 0)
         return a;
       n--;
     }
@@ -4774,7 +4786,7 @@ let $r = class {
       );
   }
 };
-class Yh extends $r {
+class qh extends $r {
   constructor(e = {}) {
     super(e);
     const i = this.scene.canvas, s = e.container;
@@ -4784,7 +4796,7 @@ class Yh extends $r {
     super.destroy(), this.container.innerHTML = "", G.viewports.splice(this.index, 1);
   }
 }
-class qh {
+class Xh {
   x = 0;
   y = 0;
   width = 0;
@@ -4820,8 +4832,8 @@ class qh {
       return this.composition = e, this;
   }
   move(e) {
-    let { index: i, viewport: s } = this, n = s.layers, r;
-    switch (typeof e == "number" && (r = _(Math.floor(e), (n.length - 1) * -1, n.length - 1), e = "order"), e) {
+    let { index: i, viewport: s } = this, n = s.layers, o;
+    switch (typeof e == "number" && (o = _(Math.floor(e), (n.length - 1) * -1, n.length - 1), e = "order"), e) {
       case "up":
         i < n.length - 1 && (n[i] = n[i + 1], n[i + 1] = this);
         break;
@@ -4835,7 +4847,7 @@ class qh {
         n.splice(i, 1), n.unshift(this);
         break;
       case "order":
-        Aa(n, this.index, r);
+        Aa(n, this.index, o);
         break;
     }
     return this;
@@ -4856,23 +4868,23 @@ class qh {
     this.viewport.layers.splice(this.index, 1);
   }
 }
-class Xh {
+class Kh {
   width = 0;
   height = 0;
   constructor(e) {
     e || (e = {}), this.id = G.idCnt++, this.layer = e.layer, this.contextType = e.contextType || "2d", this.canvas = document.createElement("canvas"), this.canvas.className = "scene-canvas", this.canvas.style.display = "block", this.context = this.canvas.getContext(this.contextType), e.width && e.height && this.setSize(e.width, e.height);
   }
   setSize(e, i) {
-    return Ur(e, i, this);
+    return Br(e, i, this);
   }
   clear() {
-    return Br(this);
+    return Ur(this);
   }
   toImage(e = "image/png", i, s) {
-    let n = this, r = new Image(), a = this.canvas.toDataURL(e, i);
-    r.onload = function() {
-      r.width = n.width, r.height = n.height, s(r);
-    }, r.src = a;
+    let n = this, o = new Image(), a = this.canvas.toDataURL(e, i);
+    o.onload = function() {
+      o.width = n.width, o.height = n.height, s(o);
+    }, o.src = a;
   }
   export(e, i, s = "image/png", n) {
     typeof i != "function" && (i = this.blobCallback.bind({ cfg: e })), this.canvas.toBlob(i, s, n);
@@ -4889,7 +4901,7 @@ class Xh {
     }).click() : i.click && i.click();
   }
 }
-class Kh {
+class jh {
   width = 0;
   height = 0;
   constructor(e) {
@@ -4899,10 +4911,10 @@ class Kh {
     }), e.width && e.height && this.setSize(e.width, e.height);
   }
   setSize(e, i) {
-    return Ur(e, i, this);
+    return Br(e, i, this);
   }
   clear() {
-    return Br(this);
+    return Ur(this);
   }
   getIntersection(e, i) {
     let s = this.context, n;
@@ -4936,29 +4948,29 @@ class Kh {
     return [i, s, n];
   }
 }
-function Br(o) {
-  let e = o.context;
-  return o.contextType === "2d" ? e.clearRect(
+function Ur(r) {
+  let e = r.context;
+  return r.contextType === "2d" ? e.clearRect(
     0,
     0,
-    o.width * G.pixelRatio,
-    o.height * G.pixelRatio
-  ) : e.clear(e.COLOR_BUFFER_BIT | e.DEPTH_BUFFER_BIT), o;
+    r.width * G.pixelRatio,
+    r.height * G.pixelRatio
+  ) : e.clear(e.COLOR_BUFFER_BIT | e.DEPTH_BUFFER_BIT), r;
 }
-function Ur(o, e, i) {
-  return i.width = o, i.height = e, i.canvas.width = o * G.pixelRatio, i.canvas.style.width = `${o}px`, i.canvas.height = e * G.pixelRatio, i.canvas.style.height = `${e}px`, i.contextType === "2d" && G.pixelRatio !== 1 && i.context.scale(G.pixelRatio, G.pixelRatio), i;
+function Br(r, e, i) {
+  return i.width = r, i.height = e, i.canvas.width = r * G.pixelRatio, i.canvas.style.width = `${r}px`, i.canvas.height = e * G.pixelRatio, i.canvas.style.height = `${e}px`, i.contextType === "2d" && G.pixelRatio !== 1 && i.context.scale(G.pixelRatio, G.pixelRatio), i;
 }
 const G = {
   idCnt: 0,
   viewports: [],
   pixelRatio: window && window.devicePixelRatio || 1,
   Node: $r,
-  Viewport: Yh,
-  Layer: qh,
-  Scene: Xh,
-  Hit: Kh
+  Viewport: qh,
+  Layer: Xh,
+  Scene: Kh,
+  Hit: jh
 }, Ft = G;
-class jh {
+class Zh {
   #e;
   #t;
   #n;
@@ -5023,8 +5035,8 @@ class jh {
   }
   addOverlays(e) {
     let i = [], s, n;
-    for (let r of e)
-      n = this.addOverlay(r[0], r[1]), s = n.instance?.id || r[0], i.push([s, n]);
+    for (let o of e)
+      n = this.addOverlay(o[0], o[1]), s = n.instance?.id || o[0], i.push([s, n]);
     return i;
   }
   addOverlay(e, i) {
@@ -5037,7 +5049,7 @@ class jh {
         this.#e.theme,
         this,
         i.params
-      ), S(i.instance?.id) || (i.instance.id = e), this.#r.set(i.instance.id, i), !0;
+      ), E(i.instance?.id) || (i.instance.id = e), this.#r.set(i.instance.id, i), !0;
     } catch (s) {
       return console.error(`Error: Cannot instantiate ${e} overlay / indicator`), console.error(s), !1;
     }
@@ -5088,7 +5100,7 @@ class wi extends kr {
   };
   #l = 1.04;
   #o = pn;
-  #c = Wa;
+  #c = Fa;
   #a = 3;
   #h;
   #d;
@@ -5222,34 +5234,34 @@ class wi extends kr {
     if (!T(e) || e == 0 || this.#i !== "manual")
       return !1;
     const i = this.#s;
-    let s = this.pixel2$(e * -1), n = this.pixel2$(this.height - e), r = s - n;
-    i.manual.min = n, i.manual.max = s, i.manual.mid = r / 2, i.manual.diff = r, i.manual.zoom = 0;
+    let s = this.pixel2$(e * -1), n = this.pixel2$(this.height - e), o = s - n;
+    i.manual.min = n, i.manual.max = s, i.manual.mid = o / 2, i.manual.diff = o, i.manual.zoom = 0;
   }
   setZoom(e) {
     if (!T(e) || this.#i !== "manual")
       return !1;
     const i = this.#s;
     let s = i.manual.min, n = i.manual.max;
-    const r = n - s, a = r * 0.01, h = e * a;
-    s -= h, n += h, !(n < s || s <= 1 / 0 * -1 || n >= 1 / 0) && (i.manual.max = n, i.manual.min = s, i.manual.mid = r / 2, i.manual.diff = r, i.manual.zoom = h, this.calcGradations());
+    const o = n - s, a = o * 0.01, l = e * a;
+    s -= l, n += l, !(n < s || s <= 1 / 0 * -1 || n >= 1 / 0) && (i.manual.max = n, i.manual.min = s, i.manual.mid = o / 2, i.manual.diff = o, i.manual.zoom = l, this.calcGradations());
   }
   setRange(e) {
     this.#s.automatic.range = e, this.#u = new Proxy(e, {
       get: (i, s) => {
-        const n = this.#i, r = this.#s;
+        const n = this.#i, o = this.#s;
         switch (s) {
           case "max":
-            return r[n][s];
+            return o[n][s];
           case "min":
-            return r[n][s];
+            return o[n][s];
           case "mid":
-            return r[n][s];
+            return o[n][s];
           case "diff":
-            return r[n][s];
+            return o[n][s];
           case "zoom":
-            return r[n][s];
+            return o[n][s];
           case "offset":
-            return r[n][s];
+            return o[n][s];
           default:
             return i[s];
         }
@@ -5269,34 +5281,34 @@ class wi extends kr {
     return this.#h;
   }
   gradations(e, i, s = !0) {
-    let n, r, a;
-    const h = [];
-    r = e - i, r = this.rangeH > 0 ? this.rangeH : 1, a = r / (this.height / (this.core.theme.yAxis.fontSize * 1.75));
-    let l = Math.pow(10, Math.ceil(Math.log10(a)));
-    a < 0.25 * l ? l = 0.25 * l : a < 0.5 * l && (l = 0.5 * l);
-    var m = Math.ceil(i / l) * l, g = Math.floor(e / l) * l;
-    let v = this.height, E = (g - m) / l;
-    this.height / E;
-    let A = this.countDigits(l), L;
+    let n, o, a;
+    const l = [];
+    o = e - i, o = this.rangeH > 0 ? this.rangeH : 1, a = o / (this.height / (this.core.theme.yAxis.fontSize * 1.75));
+    let h = Math.pow(10, Math.ceil(Math.log10(a)));
+    a < 0.25 * h ? h = 0.25 * h : a < 0.5 * h && (h = 0.5 * h);
+    var m = Math.ceil(i / h) * h, g = Math.floor(e / h) * h;
+    let v = this.height, S = (g - m) / h;
+    this.height / S;
+    let A = this.countDigits(h), L;
     this.#d = A;
-    for (var O = m; O <= g; O += l)
-      n = this.countDigits(O), L = this.limitPrecision(n, A), v = this.yPos(L), h.push([L, v, n]);
-    return h;
+    for (var O = m; O <= g; O += h)
+      n = this.countDigits(O), L = this.limitPrecision(n, A), v = this.yPos(L), l.push([L, v, n]);
+    return l;
   }
   niceValue(e, i = this.#d) {
-    let s = i.integers, n = i.decimals, r = e.value;
+    let s = i.integers, n = i.decimals, o = e.value;
     if (e.integers > 1)
       if (s - 2 > 0) {
         let a = Ma(10, s - 2);
-        return Math.floor(r / a) * a;
+        return Math.floor(o / a) * a;
       } else
-        return n == 0 ? Math.floor(r) : un(r, n);
+        return n == 0 ? Math.floor(o) : un(o, n);
     else
-      return n == 0 ? 0 : un(r, n);
+      return n == 0 ? 0 : un(o, n);
   }
   limitPrecision(e) {
-    let { sign: i, integers: s, decimals: n, value: r } = e, a = this.yAxisDigits - 1, h = `${r}`, l = "", m = 0, g = 0;
-    return i = i ? 0 : 1, i > 0 && (l += "-", m++), s == 0 ? (l += "0", m++) : (l += h.slice(m, s), m += s), m + 1 < a && n > 0 && (l += `${h.slice(m)}`, g = a - (m + 1), g = n < g ? n : g, l = Number.parseFloat(l).toFixed(g)), l;
+    let { sign: i, integers: s, decimals: n, value: o } = e, a = this.yAxisDigits - 1, l = `${o}`, h = "", m = 0, g = 0;
+    return i = i ? 0 : 1, i > 0 && (h += "-", m++), s == 0 ? (h += "0", m++) : (h += l.slice(m, s), m += s), m + 1 < a && n > 0 && (h += `${l.slice(m)}`, g = a - (m + 1), g = n < g ? n : g, h = Number.parseFloat(h).toFixed(g)), h;
   }
 }
 class W {
@@ -5320,8 +5332,8 @@ class W {
     refresh: !1
   };
   id;
-  constructor(e, i = !1, s = !1, n, r, a = {}) {
-    this.#t = r.core, this.#e = r, this.#n = r.core.config, this.#l = e, this.#o = e.scene, this.#c = e.hit, this.#r = n, this.#i = i, this.#s = s, this.#a = a;
+  constructor(e, i = !1, s = !1, n, o, a = {}) {
+    this.#t = o.core, this.#e = o, this.#n = o.core.config, this.#l = e, this.#o = e.scene, this.#c = e.hit, this.#r = n, this.#i = i, this.#s = s, this.#a = a;
   }
   get core() {
     return this.#t;
@@ -5401,8 +5413,8 @@ class W {
   }
 }
 class Ai extends W {
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a), this.params.axes = a?.axes || "both";
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a), this.params.axes = a?.axes || "both";
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
@@ -5413,16 +5425,16 @@ class Ai extends W {
     const i = this.scene.context;
     if (i.save(), i.strokeStyle = this.core.theme.chart.GridColour || Or.COLOUR_GRID, e != "y") {
       const n = this.xAxis.xAxisGrads.values;
-      for (let r of n) {
-        let a = we(r[1]);
+      for (let o of n) {
+        let a = we(o[1]);
         i.beginPath(), i.moveTo(a + 0, 0), i.lineTo(a + 0, this.scene.height), i.stroke();
       }
     }
     if (e != "x") {
       const s = this.yAxis.yAxisGrads;
       for (let n of s) {
-        let r = this.yAxis.$2Pixel(n[0]);
-        i.beginPath(), i.moveTo(0, r), i.lineTo(this.scene.width, r), i.stroke();
+        let o = this.yAxis.$2Pixel(n[0]);
+        i.beginPath(), i.moveTo(0, o), i.lineTo(this.scene.width, o), i.stroke();
       }
     }
     i.restore(), super.updated();
@@ -5431,35 +5443,35 @@ class Ai extends W {
     this.draw("x");
   }
 }
-function _s(o, e) {
-  return Math.round(o.measureText(e).width);
+function _s(r, e) {
+  return Math.round(r.measureText(e).width);
 }
-function wt(o = xe.fontSize, e = xe.fontWeight, i = xe.fontFamily) {
-  return `${e} ${o}px ${i}`;
+function wt(r = xe.fontSize, e = xe.fontWeight, i = xe.fontFamily) {
+  return `${e} ${r}px ${i}`;
 }
-function ki(o, e, i) {
-  o.font = wt(i?.fontSize, i?.fontWeight, i?.fontFamily);
-  const s = _s(o, e), n = i?.paddingLeft || 0, r = i?.paddingRight || 0, a = i?.borderWidth || 0;
-  return n + r + s + a * 2;
+function ki(r, e, i) {
+  r.font = wt(i?.fontSize, i?.fontWeight, i?.fontFamily);
+  const s = _s(r, e), n = i?.paddingLeft || 0, o = i?.paddingRight || 0, a = i?.borderWidth || 0;
+  return n + o + s + a * 2;
 }
-function _i(o) {
-  const e = o?.paddingTop || 0, i = o?.paddingBottom || 0, s = o?.borderWidth || 0, n = o?.fontSize || 0;
+function _i(r) {
+  const e = r?.paddingTop || 0, i = r?.paddingBottom || 0, s = r?.borderWidth || 0, n = r?.fontSize || 0;
   return e + i + n + s * 2;
 }
-function Vr(o, e, i, s) {
-  o.fillStyle = s?.colour, o.font = wt(s?.fontSize, s?.fontWeight, s?.fontFamily), o.textAlign = s?.textAlign || "start", o.textBaseline = s?.textBaseLine || "alphabetic", o.direction = s?.direction || "inherit", o.lineWidth = s?.width, o.strokeStyle = s?.border, s?.stroke ? o.strokeText(s?.text, e, i, s?.max) : o.fillText(s?.text, e, i, s?.max);
+function Vr(r, e, i, s) {
+  r.fillStyle = s?.colour, r.font = wt(s?.fontSize, s?.fontWeight, s?.fontFamily), r.textAlign = s?.textAlign || "start", r.textBaseline = s?.textBaseLine || "alphabetic", r.direction = s?.direction || "inherit", r.lineWidth = s?.width, r.strokeStyle = s?.border, s?.stroke ? r.strokeText(s?.text, e, i, s?.max) : r.fillText(s?.text, e, i, s?.max);
 }
-function yt(o, e, i, s, n) {
-  o.save(), o.font = wt(n?.fontSize, n?.fontWeight, n?.fontFamily), o.textBaseline = "top", o.fillStyle = n?.bakCol || xe.bakCol;
-  let r = n?.width || ki(o, e, n), a = n?.height || _i(n);
-  o.fillRect(i, s, r, a), o.fillStyle = n?.txtCol || xe.txtCol, i = i + n?.paddingLeft, s = s + n?.paddingTop, o.fillText(`${e}`, i, s), o.restore();
+function yt(r, e, i, s, n) {
+  r.save(), r.font = wt(n?.fontSize, n?.fontWeight, n?.fontFamily), r.textBaseline = "top", r.fillStyle = n?.bakCol || xe.bakCol;
+  let o = n?.width || ki(r, e, n), a = n?.height || _i(n);
+  r.fillRect(i, s, o, a), r.fillStyle = n?.txtCol || xe.txtCol, i = i + n?.paddingLeft, s = s + n?.paddingTop, r.fillText(`${e}`, i, s), r.restore();
 }
 class ws extends W {
   #e = [0, 0];
   #t = !0;
   #n;
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a), this.core.on("chart_pan", this.onMouseDragX, this), this.core.on("chart_panDone", this.onMouseDragX, this), this.core.on("main_mousemove", this.onMouseMoveX, this), this.#n = new Le(this.target.viewport.container, { disableContextMenu: !1 }), this.#n.on("pointermove", this.onMouseMove.bind(this)), this.#n.on("pointerenter", this.onMouseMove.bind(this));
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a), this.core.on("chart_pan", this.onMouseDragX, this), this.core.on("chart_panDone", this.onMouseDragX, this), this.core.on("main_mousemove", this.onMouseMoveX, this), this.#n = new Le(this.target.viewport.container, { disableContextMenu: !1 }), this.#n.on("pointermove", this.onMouseMove.bind(this)), this.#n.on("pointerenter", this.onMouseMove.bind(this));
   }
   destroy() {
     super.destroy(), this.core.off("chart_pan", this.onMouseDragX, this), this.core.off("chart_panDone", this.onMouseDragX, this), this.core.off("main_mousemove", this.onMouseMoveX, this);
@@ -5486,16 +5498,16 @@ class ws extends W {
     const i = this.target.viewport.container.getBoundingClientRect();
     let s = this.core.mousePos.y - i.top, n = this.core.mousePos.x - i.left;
     e || (n = this.xAxis.xPosSnap2CandlePos(n) + this.xAxis.scrollOffsetPx), this.scene.clear();
-    const r = this.scene.context;
-    r.save(), r.setLineDash([5, 5]);
+    const o = this.scene.context;
+    o.save(), o.setLineDash([5, 5]);
     const a = this.xAxis.smoothScrollOffset || 0;
-    r.strokeStyle = "#666", r.beginPath(), r.moveTo(n + a, 0), r.lineTo(n + a, this.scene.height), r.stroke(), this.chart.cursorActive && (r.beginPath(), r.moveTo(0, s), r.lineTo(this.scene.width, s), r.stroke()), r.restore(), this.chart.scale.overlays.cursor.instance.scaleDraw();
+    o.strokeStyle = "#666", o.beginPath(), o.moveTo(n + a, 0), o.lineTo(n + a, this.scene.height), o.stroke(), this.chart.cursorActive && (o.beginPath(), o.moveTo(0, s), o.lineTo(this.scene.width, s), o.stroke()), o.restore(), this.chart.scale.overlays.cursor.instance.scaleDraw();
   }
 }
 class zr extends W {
   #e = [0, 0];
-  constructor(e, i, s, n, r, a) {
-    r = s, s = s.yAxis, super(e, i, s, n, r, a), this.viewport = e.viewport;
+  constructor(e, i, s, n, o, a) {
+    o = s, s = s.yAxis, super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
@@ -5506,7 +5518,7 @@ class zr extends W {
     if (!this.parent.parent.cursorActive)
       return;
     const e = this.target.viewport.container.getBoundingClientRect();
-    let i = this.core.mousePos.y - e.top, s = this.parent.yPos2Price(i), n = this.parent.nicePrice(s), r = {
+    let i = this.core.mousePos.y - e.top, s = this.parent.yPos2Price(i), n = this.parent.nicePrice(s), o = {
       fontSize: this.theme.yAxis.fontSize * 1.05,
       fontWeight: this.theme.yAxis.fontWeight,
       fontFamily: this.theme.yAxis.fontFamily,
@@ -5517,15 +5529,15 @@ class zr extends W {
       paddingLeft: 3,
       paddingRight: 3,
       width: this.viewport.width
-    }, a = r.fontSize + r.paddingTop + r.paddingBottom, h = i - a * 0.5;
-    const l = this.scene.context;
-    this.scene.clear(), l.save(), l.fillStyle = r.bakCol, l.fillRect(1, h, this.width, a), yt(l, `${n}`, 1, h, r), l.restore();
+    }, a = o.fontSize + o.paddingTop + o.paddingBottom, l = i - a * 0.5;
+    const h = this.scene.context;
+    this.scene.clear(), h.save(), h.fillStyle = o.bakCol, h.fillRect(1, l, this.width, a), yt(h, `${n}`, 1, l, o), h.restore();
   }
   erase() {
     this.scene.clear(), this.target.viewport.render();
   }
 }
-const Zh = [
+const Jh = [
   ["grid", { class: Ai, fixed: !0 }],
   ["cursor", { class: ws, fixed: !0 }]
 ];
@@ -5615,19 +5627,19 @@ class vt {
   setSize(e, i, s) {
     const n = this.#s.list;
     this.#i.setSize(e, i);
-    for (let [r, a] of n)
+    for (let [o, a] of n)
       a.instance.setSize(s, i);
     this.draw(), this.render();
   }
   createViewport(e = [], i = !1) {
-    e = e.length == 0 ? ce(Zh) : e;
+    e = e.length == 0 ? ce(Jh) : e;
     const { width: s, height: n } = this.layerConfig();
-    let r = i ? Ft.Node : Ft.Viewport;
-    this.#i = new r({
+    let o = i ? Ft.Node : Ft.Viewport;
+    this.#i = new o({
       width: s,
       height: n,
       container: this.#c
-    }), this.#o = this.#i.scene.canvas, this.#s = new jh(this, e);
+    }), this.#o = this.#i.scene.canvas, this.#s = new Zh(this, e);
   }
   layerConfig() {
     const e = this.config?.buffer || Oi, i = this.#c.getBoundingClientRect().width, s = this.#c.getBoundingClientRect().height;
@@ -5648,8 +5660,8 @@ class vt {
     return this.#s.removeOverlay(e);
   }
   draw(e = this.range, i = !1) {
-    const s = (n, r) => {
-      !b(r) || !B(r?.instance?.draw) || (i && r.instance.setRefresh(), r.instance.draw(), r.fixed || (r.instance.position = [this.#e.scrollPos, 0]));
+    const s = (n, o) => {
+      !b(o) || !U(o?.instance?.draw) || (i && o.instance.setRefresh(), o.instance.draw(), o.fixed || (o.instance.position = [this.#e.scrollPos, 0]));
     };
     this.executeOverlayList(s);
   }
@@ -5664,9 +5676,9 @@ class vt {
     if (!(i instanceof be))
       return !1;
     let s = [];
-    for (let [n, r] of i)
+    for (let [n, o] of i)
       try {
-        e(n, r);
+        e(n, o);
       } catch (a) {
         s.push(a);
       }
@@ -5679,11 +5691,11 @@ class vt {
     this.draw(void 0, !0), this.render();
   }
 }
-class Jh extends W {
+class Qh extends W {
   #e = [0, 0];
   #t;
-  constructor(e, i = !1, s = !1, n, r, a) {
-    i = r.time.xAxis, super(e, i, s, n, r);
+  constructor(e, i = !1, s = !1, n, o, a) {
+    i = o.time.xAxis, super(e, i, s, n, o);
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
@@ -5692,20 +5704,20 @@ class Jh extends W {
     if (!super.mustUpdate())
       return;
     this.scene.clear();
-    const i = this.scene.context, s = this.xAxis.xAxisGrads.values, n = 0, r = this.theme.xAxis, a = K(r.tickMarker) ? r.tickMarker : !0;
-    i.save(), i.strokeStyle = r.colourTick, i.fillStyle = r.colourTick, i.font = `${r.fontWeight} ${r.fontSize}px ${r.fontFamily}`;
-    for (let h of s) {
-      let l = we(h[1]), m = Math.floor(i.measureText(`${h[0]}`).width * 0.5);
-      i.fillText(h[0], l - m + n, this.xAxis.xAxisTicks + 12), a && (i.beginPath(), i.moveTo(l + n, 0), i.lineTo(l + n, this.xAxis.xAxisTicks), i.stroke());
+    const i = this.scene.context, s = this.xAxis.xAxisGrads.values, n = 0, o = this.theme.xAxis, a = K(o.tickMarker) ? o.tickMarker : !0;
+    i.save(), i.strokeStyle = o.colourTick, i.fillStyle = o.colourTick, i.font = `${o.fontWeight} ${o.fontSize}px ${o.fontFamily}`;
+    for (let l of s) {
+      let h = we(l[1]), m = Math.floor(i.measureText(`${l[0]}`).width * 0.5);
+      i.fillText(l[0], h - m + n, this.xAxis.xAxisTicks + 12), a && (i.beginPath(), i.moveTo(h + n, 0), i.lineTo(h + n, this.xAxis.xAxisTicks), i.stroke());
     }
     i.restore(), super.updated();
   }
 }
-class Qh extends W {
+class ec extends W {
   #e = [0, 0];
   #t;
-  constructor(e, i = !1, s = !1, n, r, a) {
-    i = r.time.xAxis, super(e, i, s, n, r);
+  constructor(e, i = !1, s = !1, n, o, a) {
+    i = o.time.xAxis, super(e, i, s, n, o);
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
@@ -5716,17 +5728,17 @@ class Qh extends W {
     this.xAxis.xAxisGrads.values, this.theme.xAxis, e.save(), e.restore();
   }
 }
-class ec extends W {
+class tc extends W {
   #e = [0, 0];
-  constructor(e, i = !1, s = !1, n, r) {
-    i = r.time.xAxis, super(e, i, s, n, r), this.viewport = e.viewport;
+  constructor(e, i = !1, s = !1, n, o) {
+    i = o.time.xAxis, super(e, i, s, n, o), this.viewport = e.viewport;
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
   }
   draw() {
     const e = this.scene.context, i = this.target.viewport.container.getBoundingClientRect(), s = this.core.mousePos.x - i.left;
-    let n = this.xAxis.xPos2Time(s), r = new Date(n), a = r.toUTCString(), h = {
+    let n = this.xAxis.xPos2Time(s), o = new Date(n), a = o.toUTCString(), l = {
       fontSize: this.theme.xAxis.fontSize * 1.05,
       fontWeight: this.theme.xAxis.fontWeight,
       fontFamily: this.theme.xAxis.fontFamily,
@@ -5736,16 +5748,16 @@ class ec extends W {
       paddingBottom: 3,
       paddingLeft: 4,
       paddingRight: 4
-    }, l = ki(e, a, h), m = s + this.core.bufferPx;
-    m = this.xAxis.xPosSnap2CandlePos(m), m = m - Math.round(l * 0.5) - this.core.scrollPos - this.core.bufferPx, this.scene.clear(), e.save(), yt(e, a, m, 1, h), e.restore();
+    }, h = ki(e, a, l), m = s + this.core.bufferPx;
+    m = this.xAxis.xPosSnap2CandlePos(m), m = m - Math.round(h * 0.5) - this.core.scrollPos - this.core.bufferPx, this.scene.clear(), e.save(), yt(e, a, m, 1, l), e.restore();
   }
 }
-const tc = [
-  ["labels", { class: Jh, fixed: !1, required: !0 }],
-  ["overlay", { class: Qh, fixed: !1, required: !0 }],
-  ["cursor", { class: ec, fixed: !1, required: !0 }]
+const ic = [
+  ["labels", { class: Qh, fixed: !1, required: !0 }],
+  ["overlay", { class: ec, fixed: !1, required: !0 }],
+  ["cursor", { class: tc, fixed: !1, required: !0 }]
 ];
-class ic {
+class sc {
   #e;
   #t = "Timeline";
   #n = "time";
@@ -5768,7 +5780,7 @@ class ic {
   #S;
   #C;
   #f;
-  #P;
+  #E;
   #x;
   #O;
   #M;
@@ -5779,7 +5791,7 @@ class ic {
     height: 20,
     fill: "#aaa"
   };
-  #E = { end: !1, start: !1 };
+  #P = { end: !1, start: !1 };
   constructor(e, i) {
     this.#s = e, this.#r = i, this.#i = i.elements.elTime, this.#l = e.Chart, this.#o = new vi(this, this.#l), this.init();
   }
@@ -5796,7 +5808,7 @@ class ic {
     this.#s.error(e);
   }
   set id(e) {
-    this.#e = He(e);
+    this.#e = $e(e);
   }
   get id() {
     return this.#e ? `${this.#e}` : `${this.#s.id}-${this.#n}`.replace(/ |,|;|:|\.|#/g, "_");
@@ -5838,7 +5850,7 @@ class ic {
     return this.#o.xAxisRatio;
   }
   get layerCursor() {
-    return this.#P;
+    return this.#E;
   }
   get layerLabels() {
     return this.#C;
@@ -5895,7 +5907,7 @@ class ic {
     return this.#s.rangeScrollOffset;
   }
   set stateMachine(e) {
-    this.#c = new Ve(e, this);
+    this.#c = new ze(e, this);
   }
   get stateMachine() {
     return this.#c;
@@ -5918,8 +5930,8 @@ class ic {
     this.#i.style.width = `${e}px`, this.#a.style.width = `${e}px`;
   }
   setDimensions(e) {
-    const i = this.config.buffer || Oi, s = e.w, n = this.height, r = Math.round(s * ((100 + i) * 0.01));
-    this.#d.setSize(s, n, r), this.draw();
+    const i = this.config.buffer || Oi, s = e.w, n = this.height, o = Math.round(s * ((100 + i) * 0.01));
+    this.#d.setSize(s, n, o), this.draw();
   }
   navigationDisplay(e) {
     if (e)
@@ -5933,10 +5945,10 @@ class ic {
     this.createGraph(), this.onSetRange(), this.#o.initXAxisGrads(), this.draw(), this.eventsListen(), ts.id = this.id, ts.context = this, this.stateMachine = ts, this.stateMachine.start();
   }
   destroy() {
-    this.stateMachine.destroy(), this.#x.destroy(), this.#O.destroy(), this.#M.destroy(), this.off("main_mousemove", this.drawCursorTime), this.off("setRange", this.onSetRange), this.#S.removeEventListener("click", Re), this.#p.removeEventListener("click", Re), this.#d.destroy(), this.element.remove();
+    this.stateMachine.destroy(), this.#x.destroy(), this.#O.destroy(), this.#M.destroy(), this.off("main_mousemove", this.drawCursorTime), this.off("setRange", this.onSetRange), this.#S.removeEventListener("click", ke), this.#p.removeEventListener("click", ke), this.#d.destroy(), this.element.remove();
   }
   eventsListen() {
-    this.#x = new Le(this.#a, { disableContextMenu: !1 }), this.#x.on("dblclick", this.onDoubleClick.bind(this)), this.#x.on("pointerover", this.onPointerEnter.bind(this)), this.#x.on("pointerout", this.onPointerLeave.bind(this)), this.#x.on("pointerdrag", this.onPointerDrag.bind(this)), this.#O = new Le(this.#S, { disableContextMenu: !1 }), this.#O.on("pointerover", () => this.showJump(this.#E.end)), this.#O.on("pointerleave", () => this.hideJump(this.#E.end)), this.#M = new Le(this.#p, { disableContextMenu: !1 }), this.#M.on("pointerover", () => this.showJump(this.#E.start)), this.#M.on("pointerleave", () => this.hideJump(this.#E.start)), this.on("main_mousemove", this.#P.draw, this.#P), this.on("setRange", this.onSetRange, this), this.#S.addEventListener("click", Re(this.onMouseClick, 1e3, this, !0)), this.#p.addEventListener("click", Re(this.onMouseClick, 1e3, this, !0));
+    this.#x = new Le(this.#a, { disableContextMenu: !1 }), this.#x.on("dblclick", this.onDoubleClick.bind(this)), this.#x.on("pointerover", this.onPointerEnter.bind(this)), this.#x.on("pointerout", this.onPointerLeave.bind(this)), this.#x.on("pointerdrag", this.onPointerDrag.bind(this)), this.#O = new Le(this.#S, { disableContextMenu: !1 }), this.#O.on("pointerover", () => this.showJump(this.#P.end)), this.#O.on("pointerleave", () => this.hideJump(this.#P.end)), this.#M = new Le(this.#p, { disableContextMenu: !1 }), this.#M.on("pointerover", () => this.showJump(this.#P.start)), this.#M.on("pointerleave", () => this.hideJump(this.#P.start)), this.on("main_mousemove", this.#E.draw, this.#E), this.on("setRange", this.onSetRange, this), this.#S.addEventListener("click", ke(this.onMouseClick, 1e3, this, !0)), this.#p.addEventListener("click", ke(this.onMouseClick, 1e3, this, !0));
   }
   on(e, i, s) {
     this.#s.on(e, i, s);
@@ -5961,7 +5973,7 @@ class ic {
     e.domEvent.target.style.cursor = "ew-resize", this.#h.style.visibility = "visible", this.hideCursorTime();
   }
   onPointerLeave(e) {
-    this.#s.theme?.time?.navigation === !1 && !(this.#E.end && this.#E.start) && (this.#h.style.visibility = "hidden");
+    this.#s.theme?.time?.navigation === !1 && !(this.#P.end && this.#P.start) && (this.#h.style.visibility = "hidden");
   }
   onPointerDrag(e) {
     let i = this.range, s = i.indexStart - e.movement.x, n = i.indexEnd;
@@ -5979,8 +5991,8 @@ class ic {
   onSetRange() {
     let e = this.range, i = e.indexStart;
     e.indexEnd;
-    let s = this.#b.getBoundingClientRect().width, n = e.dataLength + e.limitFuture + e.limitPast, r = s / n, a = e.Length * r, h = (i + e.limitPast) * r;
-    this.#T.setHandleDims(h, a);
+    let s = this.#b.getBoundingClientRect().width, n = e.dataLength + e.limitFuture + e.limitPast, o = s / n, a = e.Length * o, l = (i + e.limitPast) * o;
+    this.#T.setHandleDims(l, a);
   }
   t2Index(e) {
     return this.#o.t2Index(e);
@@ -6001,8 +6013,8 @@ class ic {
     return this.#o.xPosOHLCV(e);
   }
   createGraph() {
-    let e = ce(tc);
-    this.#d = new vt(this, this.#a, e, !1), this.#P = this.graph.overlays.get("cursor").instance, this.#C = this.graph.overlays.get("labels").instance, this.#f = this.graph.overlays.get("overlay").instance, this.graph.addOverlays(this.#m);
+    let e = ce(ic);
+    this.#d = new vt(this, this.#a, e, !1), this.#E = this.graph.overlays.get("cursor").instance, this.#C = this.graph.overlays.get("labels").instance, this.#f = this.graph.overlays.get("overlay").instance, this.graph.addOverlays(this.#m);
   }
   addOverlays(e) {
     if (!isArray(e))
@@ -6036,33 +6048,33 @@ class ic {
     this.#h.style.visibility = "visible", this.hideCursorTime();
   }
 }
-const sc = {
+const nc = {
   renderQ: new be(),
   rendered: [],
   renderLog: !1,
   dropFrames: !0,
   graphs: [],
   range: {},
-  init: function(o) {
-    b(o) && (this.renderLog = o?.renderLog || !1, this.dropFrames = o?.dropFrames || !0, this.graphs = M(o?.graphs) ? [...o.graphs] : [], this.range = b(o?.range) ? o.range : {});
+  init: function(r) {
+    b(r) && (this.renderLog = r?.renderLog || !1, this.dropFrames = r?.dropFrames || !0, this.graphs = M(r?.graphs) ? [...r.graphs] : [], this.range = b(r?.range) ? r.range : {});
   },
-  queueFrame: function(o = this.range, e = this.graphs, i = !1) {
+  queueFrame: function(r = this.range, e = this.graphs, i = !1) {
     this.renderQ.size > 1 && this.dropFrames && (i = this.dropFrame() || i);
     const s = Date.now();
-    return o = o.snapshot(), this.renderQ.set(s, { graphs: e, range: o, update: i }), s;
+    return r = r.snapshot(), this.renderQ.set(s, { graphs: e, range: r, update: i }), s;
   },
-  dropFrame: function(o = -1) {
+  dropFrame: function(r = -1) {
     let e = !1;
-    return o === -1 && (o = this.renderQ.lastKey()), this.renderQ.size > 1 && this.renderQ.has(o) && (e = o.update, this.renderQ.delete(o)), e;
+    return r === -1 && (r = this.renderQ.lastKey()), this.renderQ.size > 1 && this.renderQ.has(r) && (e = r.update, this.renderQ.delete(r)), e;
   },
-  getFrame: function(o = 0) {
-    return this.renderQ.has(o) ? this.renderQ.get(o) : this.renderQ.firstValue();
+  getFrame: function(r = 0) {
+    return this.renderQ.has(r) ? this.renderQ.get(r) : this.renderQ.firstValue();
   },
   frameDone: function() {
     if (this.renderQ.size === 0)
       return;
-    const o = this.renderQ.firstKey();
-    this.renderLog && this.rendered.push([o, Date.now()]), this.renderQ.delete(o);
+    const r = this.renderQ.firstKey();
+    this.renderLog && this.rendered.push([r, Date.now()]), this.renderQ.delete(r);
   },
   start: function() {
     requestAnimationFrame(this.execute.bind(this));
@@ -6070,16 +6082,16 @@ const sc = {
   execute: function() {
     if (requestAnimationFrame(this.execute.bind(this)), this.renderQ.size === 0)
       return;
-    const [o, e] = this.renderQ.firstEntry();
+    const [r, e] = this.renderQ.firstEntry();
     if (e.range?.snapshot) {
       for (let i of e.graphs)
-        B(i.draw) && i.draw(e.range, e.update);
+        U(i.draw) && i.draw(e.range, e.update);
       for (let i of e.graphs)
-        B(i.render) && i.render();
+        U(i.render) && i.render();
       this.frameDone();
     }
   }
-}, nc = sc, tr = [
+}, rc = nc, tr = [
   "-webkit-touch-callout",
   "-webkit-user-select",
   "-khtml-user-select",
@@ -6087,7 +6099,7 @@ const sc = {
   "-ms-user-select",
   "user-select"
 ];
-class rc {
+class oc {
   #e;
   #t;
   #n;
@@ -6130,7 +6142,7 @@ class rc {
     this.#s = e.querySelector(".controls"), this.#l = e.querySelectorAll(".control"), this.#h = e.querySelector("#showLegends"), this.#d = e.querySelector("#hideLegends"), this.#s.style.display = "none", this.icons(this.#l, { id: "collapse", parent: this }), this.#e.legends.classList.add("hide"), this.#u = "hide", this.collapse = "show";
   }
   onMouseClick(e) {
-    const i = (s) => S(s.dataset.icon) ? { id: s.id, icon: s.dataset.icon, parent: s.parentElement } : s.parentElement.className !== "controls" ? i(s.parentElement) : !1;
+    const i = (s) => E(s.dataset.icon) ? { id: s.id, icon: s.dataset.icon, parent: s.parentElement } : s.parentElement.className !== "controls" ? i(s.parentElement) : !1;
     return i(e);
   }
   onMouseOver(e) {
@@ -6185,8 +6197,8 @@ class rc {
   icons(e, i) {
     let s;
     for (let n of e) {
-      let r = n.querySelector("svg");
-      r.style.width = `${this.#r.controlsW}px`, r.style.height = `${this.#r.controlsH}px`, r.style.fill = `${this.#r.controlsColour}`, r.onpointerover = (a) => a.currentTarget.style.fill = this.#r.controlsOver, r.onpointerout = (a) => a.currentTarget.style.fill = this.#r.controlsColour, s = i.parent.onLegendAction.bind(i.parent), i.id === "collapse" ? this.#o.push({ el: n, click: s }) : this.#a[i.id].click.push({ el: n, click: s }), n.addEventListener("click", s);
+      let o = n.querySelector("svg");
+      o.style.width = `${this.#r.controlsW}px`, o.style.height = `${this.#r.controlsH}px`, o.style.fill = `${this.#r.controlsColour}`, o.onpointerover = (a) => a.currentTarget.style.fill = this.#r.controlsOver, o.onpointerout = (a) => a.currentTarget.style.fill = this.#r.controlsColour, s = i.parent.onLegendAction.bind(i.parent), i.id === "collapse" ? this.#o.push({ el: n, click: s }) : this.#a[i.id].click.push({ el: n, click: s }), n.addEventListener("click", s);
     }
   }
 }
@@ -6196,74 +6208,74 @@ const is = {
   context: {},
   states: {
     idle: {
-      onEnter(o) {
+      onEnter(r) {
         this.context.origin.cursor = "crosshair";
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         xAxis_scale: {
           target: "xAxis_scale",
-          action(o) {
+          action(r) {
           }
         },
         chart_yAxisRedraw: {
           target: "chart_yAxisRedraw",
-          action(o) {
+          action(r) {
           }
         },
         chart_tool: {
           target: "chart_tool",
-          action(o) {
+          action(r) {
           }
         },
         tool_activated: {
           target: "tool_activated",
-          action(o) {
+          action(r) {
             this.context.origin.cursor = "default";
           }
         }
       }
     },
     xAxis_scale: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         Idle: {
           target: "idle",
-          action(o) {
+          action(r) {
           }
         }
       }
     },
     chart_yAxisRedraw: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         always: {
           target: "idle",
           condition: "yAxisRedraw",
-          action(o) {
+          action(r) {
             this.context.origin.drawGrid();
           }
         }
       }
     },
     tool_activated: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         tool_targetSelected: {
           target: "idle",
           condition: "toolSelectedThis",
-          action(o) {
-            console.log("tool_targetSelected:", o);
+          action(r) {
+            console.log("tool_targetSelected:", r);
           }
         }
       }
@@ -6273,7 +6285,7 @@ const is = {
     priceMaxMin() {
       return !0;
     },
-    toolSelectedThis(o, e) {
+    toolSelectedThis(r, e) {
       return this.eventData === this.context;
     },
     yAxisRedraw() {
@@ -6283,73 +6295,73 @@ const is = {
       return !0;
     }
   }
-}, oc = {
+}, ac = {
   id: "scale",
   initial: "idle",
   context: {},
   states: {
     idle: {
-      onEnter(o) {
+      onEnter(r) {
         this.context.origin.cursor = "ns-resize";
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         resize: {
           target: "resize",
-          action(o) {
+          action(r) {
           }
         },
         yAxis_scale: {
           target: "scale",
-          action(o) {
+          action(r) {
           }
         },
         yAxis_inc: {
           target: "incremental",
-          action(o) {
+          action(r) {
           }
         },
         yAxis_log: {
           target: "logarithmic",
-          action(o) {
+          action(r) {
           }
         },
         yAxis_100: {
           target: "percentual",
-          action(o) {
+          action(r) {
           }
         },
         setRange: {
           target: "setRange",
-          action(o) {
+          action(r) {
           }
         }
       }
     },
     resize: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         someEvent: {
           target: "",
-          action(o) {
+          action(r) {
           }
         }
       }
     },
     setRange: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         always: {
           target: "idle",
           condition: "zoomDone",
-          action(o) {
+          action(r) {
             this.context.origin.draw();
           }
         }
@@ -6365,9 +6377,9 @@ const is = {
     }
   }
 };
-class ac extends W {
-  constructor(e, i, s, n, r, a) {
-    r = s, s = s.yAxis, super(e, i, s, n, r, a), this.viewport = e.viewport;
+class lc extends W {
+  constructor(e, i, s, n, o, a) {
+    o = s, s = s.yAxis, super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
@@ -6378,8 +6390,8 @@ class ac extends W {
   draw() {
     if (!super.mustUpdate())
       return;
-    const e = this.scene.context, i = this.yAxis, s = this.yAxis.calcGradations() || [], n = this.theme.yAxis, r = K(n.tickMarker) ? n.tickMarker : !0;
-    let a = [], h;
+    const e = this.scene.context, i = this.yAxis, s = this.yAxis.calcGradations() || [], n = this.theme.yAxis, o = K(n.tickMarker) ? n.tickMarker : !0;
+    let a = [], l;
     switch (n?.location) {
       case "left":
         a = [this.width, this.width - i.yAxisTicks];
@@ -6390,14 +6402,14 @@ class ac extends W {
         break;
     }
     this.scene.clear(), e.save(), e.strokeStyle = n.colourTick, e.fillStyle = n.colourTick, e.font = `${n.fontWeight} ${n.fontSize}px ${n.fontFamily}`;
-    for (let l of s)
-      h = i.$2Pixel(l[0]), e.fillText(l[0], i.yAxisTicks + 5, h + n.fontSize * 0.3), r && (e.beginPath(), e.moveTo(a[0], h), e.lineTo(a[1], h), e.stroke());
+    for (let h of s)
+      l = i.$2Pixel(h[0]), e.fillText(h[0], i.yAxisTicks + 5, l + n.fontSize * 0.3), o && (e.beginPath(), e.moveTo(a[0], l), e.lineTo(a[1], l), e.stroke());
     e.restore(), super.updated();
   }
 }
-class lc extends W {
-  constructor(e, i, s, n, r, a) {
-    r = s, s = s.yAxis, super(e, i, s, n, r, a), this.viewport = e.viewport;
+class hc extends W {
+  constructor(e, i, s, n, o, a) {
+    o = s, s = s.yAxis, super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
@@ -6407,9 +6419,9 @@ class lc extends W {
     this.yAxis.yAxis, this.scene.clear(), e.save(), e.restore();
   }
 }
-class hc extends W {
-  constructor(e, i, s, n, r, a) {
-    r = s, s = s.yAxis, super(e, i, s, n, r, a), this.viewport = e.viewport;
+class cc extends W {
+  constructor(e, i, s, n, o, a) {
+    o = s, s = s.yAxis, super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
@@ -6418,7 +6430,7 @@ class hc extends W {
     if (e === void 0)
       return;
     const i = this.scene.context, s = this.core.stream instanceof mt && this.config.stream.tfCountDown;
-    let n = e[4], r = this.parent.nicePrice(n), a = {
+    let n = e[4], o = this.parent.nicePrice(n), a = {
       fontSize: Pe.FONTSIZE * 1.05,
       fontWeight: Pe.FONTWEIGHT,
       fontFamily: Pe.FONTFAMILY,
@@ -6429,17 +6441,17 @@ class hc extends W {
       paddingLeft: 5,
       paddingRight: 3,
       width: this.viewport.width
-    }, h = 0, l = _i(a), m = this.parent.yPos(n) - l * 0.5;
-    this.scene.clear(), i.save(), e[4] >= e[1] ? a.bakCol = this.theme.candle.UpBodyColour : a.bakCol = this.theme.candle.DnBodyColour, yt(i, r, h, m, a), s && (r = this.core.stream.countDownUpdate(), a.fontSize = a?.fontSize / 1.1, yt(i, r, h, m + l, a)), i.restore(), this.viewport.render();
+    }, l = 0, h = _i(a), m = this.parent.yPos(n) - h * 0.5;
+    this.scene.clear(), i.save(), e[4] >= e[1] ? a.bakCol = this.theme.candle.UpBodyColour : a.bakCol = this.theme.candle.DnBodyColour, yt(i, o, l, m, a), s && (o = this.core.stream.countDownUpdate(), a.fontSize = a?.fontSize / 1.1, yt(i, o, l, m + h, a)), i.restore(), this.viewport.render();
   }
 }
-const cc = [
-  ["labels", { class: ac, fixed: !0, required: !0 }],
-  ["overlay", { class: lc, fixed: !0, required: !0 }],
-  ["price", { class: hc, fixed: !0, required: !0 }],
+const uc = [
+  ["labels", { class: lc, fixed: !0, required: !0 }],
+  ["overlay", { class: hc, fixed: !0, required: !0 }],
+  ["price", { class: cc, fixed: !0, required: !0 }],
   ["cursor", { class: zr, fixed: !0, required: !0 }]
 ];
-class uc {
+class dc {
   #e;
   #t = "Y Scale Axis";
   #n = "scale";
@@ -6462,7 +6474,7 @@ class uc {
   #S;
   #C;
   #f;
-  #P;
+  #E;
   #x = {};
   constructor(e, i) {
     this.#r = e, this.#i = { ...i }, this.#h = this.#i.elScale, this.#o = this.#i.chart, this.#s = this.#i.parent, this.id = `${this.#s.id}_scale`, this.init();
@@ -6480,7 +6492,7 @@ class uc {
     this.#r.error(e);
   }
   set id(e) {
-    this.#e = He(e);
+    this.#e = $e(e);
   }
   get id() {
     return this.#e ? `${this.#e}` : `${this.#r.id}-${this.#n}`.replace(/ |,|;|:|\.|#/g, "_");
@@ -6591,7 +6603,7 @@ class uc {
     return this.#a.offset;
   }
   set stateMachine(e) {
-    this.#l = new Ve(e, this);
+    this.#l = new ze(e, this);
   }
   get stateMachine() {
     return this.#l;
@@ -6605,18 +6617,18 @@ class uc {
   start() {
     const e = this.#s.name == "Chart" ? void 0 : this.#s.localRange;
     this.#a = new wi(this, this, this.options.yAxisType, e), this.createGraph(), this.#a.calcGradations(), this.draw(), this.eventsListen();
-    const i = ce(oc);
+    const i = ce(ac);
     i.id = this.id, i.context = this, this.stateMachine = i, this.stateMachine.start();
   }
   restart() {
     this.#a.setRange(this.#r.range), this.draw();
   }
   destroy() {
-    this.stateMachine.destroy(), this.#p.destroy(), this.#C.destroy(), this.off(`${this.#s.id}_mousemove`, this.onMouseMove, this), this.off(`${this.#s.id}_mouseout`, this.#g.erase, this.#g), this.off(ke, this.onStreamUpdate, this.#y), this.element.remove();
+    this.stateMachine.destroy(), this.#p.destroy(), this.#C.destroy(), this.off(`${this.#s.id}_mousemove`, this.onMouseMove, this), this.off(`${this.#s.id}_mouseout`, this.#g.erase, this.#g), this.off(_e, this.onStreamUpdate, this.#y), this.element.remove();
   }
   eventsListen() {
     let e = this.#p.viewport.scene.canvas;
-    this.#C = new Le(e, { disableContextMenu: !1 }), this.#C.setCursor("ns-resize"), this.#C.on("pointerdrag", this.onDrag.bind(this)), this.#C.on("pointerdragend", this.onDragDone.bind(this)), this.#C.on("wheel", this.onMouseWheel.bind(this)), this.#C.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.#s.id}_mousemove`, this.onMouseMove, this), this.on(`${this.#s.id}_mouseout`, this.#g.erase, this.#g), this.on(ke, this.#y.draw, this.#y);
+    this.#C = new Le(e, { disableContextMenu: !1 }), this.#C.setCursor("ns-resize"), this.#C.on("pointerdrag", this.onDrag.bind(this)), this.#C.on("pointerdragend", this.onDragDone.bind(this)), this.#C.on("wheel", this.onMouseWheel.bind(this)), this.#C.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.#s.id}_mousemove`, this.onMouseMove, this), this.on(`${this.#s.id}_mouseout`, this.#g.erase, this.#g), this.on(_e, this.#y.draw, this.#y);
   }
   on(e, i, s) {
     this.core.on(e, i, s);
@@ -6631,10 +6643,10 @@ class uc {
     this.setDimensions(e);
   }
   onMouseMove(e) {
-    this.#P = M(e) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)], this.#g.draw(this.#P);
+    this.#E = M(e) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)], this.#g.draw(this.#E);
   }
   onDrag(e) {
-    this.#P = [
+    this.#E = [
       Math.floor(e.position.x),
       Math.floor(e.position.y),
       e.dragstart.x,
@@ -6680,7 +6692,7 @@ class uc {
     return this.#a.limitPrecision(i);
   }
   createGraph() {
-    let e = ce(cc);
+    let e = ce(uc);
     this.graph = new vt(this, this.#d, e, !1), this.#g = this.graph.overlays.get("cursor").instance, this.#u = this.graph.overlays.get("labels").instance, this.#m = this.graph.overlays.get("overlay").instance, this.#y = this.graph.overlays.get("price").instance, this.graph.addOverlays(this.#w), this.#y.target.moveTop(), this.#g.target.moveTop(), this.calcPriceDigits();
   }
   calcPriceDigits() {
@@ -6714,7 +6726,7 @@ class uc {
     this.setDimensions({ w: e, h: i });
   }
 }
-class dc {
+class mc {
   constructor(e, i) {
     this.scene = e, this.ctx = this.scene.context, this.width = this.scene.width, this.cfg = i;
   }
@@ -6728,11 +6740,11 @@ class dc {
     ), i.restore();
   }
 }
-class mc extends W {
+class pc extends W {
   #e;
   #t;
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a), this.#e = new dc(e.scene, n), this.theme.volume.Height = _(n?.volume?.Height, 0, 100) || 100;
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a), this.#e = new mc(e.scene, n), this.theme.volume.Height = _(n?.volume?.Height, 0, 100) || 100;
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
@@ -6742,18 +6754,18 @@ class mc extends W {
       return;
     this.scene.clear();
     const i = e.data, s = this.scene.height, n = this.xAxis.smoothScrollOffset || 0;
-    let r = Math.max(this.xAxis.candleW - 1, 1);
-    r < 3 ? r = 1 : r < 5 ? r = 3 : r > 5 && (r = Math.ceil(r * 0.8));
+    let o = Math.max(this.xAxis.candleW - 1, 1);
+    o < 3 ? o = 1 : o < 5 ? o = 3 : o > 5 && (o = Math.ceil(o * 0.8));
     const a = {
       x: 0 + n - this.xAxis.candleW,
-      w: r,
+      w: o,
       z: s
-    }, h = Math.floor(s * this.theme.volume.Height / 100);
-    let l = this.core.rangeScrollOffset, m = e.indexStart - l, g = e.Length + l * 2, v = g, E = m, A, L = 0;
+    }, l = Math.floor(s * this.theme.volume.Height / 100);
+    let h = this.core.rangeScrollOffset, m = e.indexStart - h, g = e.Length + h * 2, v = g, S = m, A, L = 0;
     for (; v--; )
-      A = e.value(E), A[4] !== null && (L = A[5] > L ? A[5] : L), E++;
+      A = e.value(S), A[4] !== null && (L = A[5] > L ? A[5] : L), S++;
     for (; g--; )
-      A = e.value(m), a.x = we(this.xAxis.xPos(A[0]) - r / 2), A[4] !== null && (a.h = h - h * ((L - A[5]) / L), a.raw = i[m], this.#e.draw(a)), m++;
+      A = e.value(m), a.x = we(this.xAxis.xPos(A[0]) - o / 2), A[4] !== null && (a.h = l - l * ((L - A[5]) / L), a.raw = i[m], this.#e.draw(a)), m++;
     super.updated();
   }
 }
@@ -6763,7 +6775,7 @@ class Wr {
     this.scene = e, this.ctx = this.scene.context, this.width = this.scene.width, this.cfg = i;
   }
   draw(e) {
-    const i = this.ctx, s = e.raw[4] >= e.raw[1], n = s ? this.cfg.candle.UpBodyColour : this.cfg.candle.DnBodyColour, r = s ? this.cfg.candle.UpWickColour : this.cfg.candle.DnWickColour;
+    const i = this.ctx, s = e.raw[4] >= e.raw[1], n = s ? this.cfg.candle.UpBodyColour : this.cfg.candle.DnBodyColour, o = s ? this.cfg.candle.UpWickColour : this.cfg.candle.DnWickColour;
     switch (this.cfg.candle.Type) {
       case X.CANDLE_SOLID:
         this.fill = !0;
@@ -6780,35 +6792,35 @@ class Wr {
     }
     let a = Math.max(e.w - 1, 1);
     a < 3 ? a = 1 : a < 5 ? a = 3 : a > 5 && (a = Math.ceil(a * 0.8));
-    let h = Math.max(Math.floor(a * 0.5), 1), l = Math.abs(e.o - e.c), m = e.c === e.o ? 1 : 2, g = e.x, v = Math.floor(g) - 0.5;
-    if (i.save(), i.strokeStyle = r, i.beginPath(), i.moveTo(v, Math.floor(e.h)), this.cfg.candle.Type === X.OHLC ? i.lineTo(v, Math.floor(e.l)) : s ? (i.lineTo(v, Math.floor(e.c)), i.moveTo(v, Math.floor(e.o))) : (i.lineTo(v, Math.floor(e.o)), i.moveTo(v, Math.floor(e.c))), i.lineTo(v, Math.floor(e.l)), i.stroke(), a == 3) {
-      i.fillStyle = r;
-      let E = s ? 1 : -1;
+    let l = Math.max(Math.floor(a * 0.5), 1), h = Math.abs(e.o - e.c), m = e.c === e.o ? 1 : 2, g = e.x, v = Math.floor(g) - 0.5;
+    if (i.save(), i.strokeStyle = o, i.beginPath(), i.moveTo(v, Math.floor(e.h)), this.cfg.candle.Type === X.OHLC ? i.lineTo(v, Math.floor(e.l)) : s ? (i.lineTo(v, Math.floor(e.c)), i.moveTo(v, Math.floor(e.o))) : (i.lineTo(v, Math.floor(e.o)), i.moveTo(v, Math.floor(e.c))), i.lineTo(v, Math.floor(e.l)), i.stroke(), a == 3) {
+      i.fillStyle = o;
+      let S = s ? 1 : -1;
       i.rect(
-        Math.floor(g - h),
+        Math.floor(g - l),
         e.c,
-        Math.floor(h * 2),
-        E * Math.max(l, m)
+        Math.floor(l * 2),
+        S * Math.max(h, m)
       ), i.fill(), i.stroke();
     } else if (a > 3 && this.fill) {
       i.fillStyle = n;
-      let E = s ? 1 : -1;
+      let S = s ? 1 : -1;
       i.rect(
-        Math.floor(g - h),
+        Math.floor(g - l),
         e.c,
-        Math.floor(h * 2),
-        E * Math.max(l, m)
+        Math.floor(l * 2),
+        S * Math.max(h, m)
       ), i.fill(), i.stroke();
     } else if (a > 3 && !this.fill && this.cfg.candle.Type !== X.OHLC) {
-      let E = s ? 1 : -1;
+      let S = s ? 1 : -1;
       i.rect(
-        Math.floor(g - h),
+        Math.floor(g - l),
         e.c,
-        Math.floor(h * 2),
-        E * Math.max(l, m)
+        Math.floor(l * 2),
+        S * Math.max(h, m)
       ), i.stroke();
     } else
-      this.cfg.candle.Type === X.OHLC ? (i.beginPath(), i.moveTo(v - h, e.o), i.lineTo(v, e.o), i.moveTo(v, e.c), i.lineTo(v + h, e.c), i.stroke()) : (i.strokeStyle = r, i.beginPath(), i.moveTo(
+      this.cfg.candle.Type === X.OHLC ? (i.beginPath(), i.moveTo(v - l, e.o), i.lineTo(v, e.o), i.moveTo(v, e.c), i.lineTo(v + l, e.c), i.stroke()) : (i.strokeStyle = o, i.beginPath(), i.moveTo(
         v,
         Math.floor(Math.min(e.o, e.c))
       ), i.lineTo(
@@ -6828,18 +6840,18 @@ class Wr {
       return;
     let i = this.ctx, s = this.cfg.candle, n;
     Math.max(e[0].w - 1, 1), e[0].x;
-    let r = [e[0].x, e[0].h];
+    let o = [e[0].x, e[0].h];
     i.save(), i.strokeStyle = s.AreaLineColour || s.UpBodyColour || s.DnBodyColour, i.lineWidth = 1, i.beginPath(), i.moveTo(e[0].x, e[0].h);
     let a = 0;
     for (; a < e.length; )
       i.lineTo(e[a].x, e[a].h), a++;
     if (s?.Type == "area") {
       if (n = i.createLinearGradient(0, 0, 0, this.scene.height), M(s.AreaFillColour))
-        for (let [h, l] of s.AreaFillColour.entries())
-          n.addColorStop(h, l);
+        for (let [l, h] of s.AreaFillColour.entries())
+          n.addColorStop(l, h);
       else
-        S() ? n = s.AreaFillColour : n = s.UpBodyColour || s.DnBodyColour;
-      i.stroke(), i.lineTo(e[a - 1].x, this.scene.height), i.lineTo(r[0], this.scene.height), i.fillStyle = n, i.closePath(), i.fill();
+        E() ? n = s.AreaFillColour : n = s.UpBodyColour || s.DnBodyColour;
+      i.stroke(), i.lineTo(e[a - 1].x, this.scene.height), i.lineTo(o[0], this.scene.height), i.fillStyle = n, i.closePath(), i.fill();
     } else
       i.stroke();
     i.restore(), e.length = 0;
@@ -6847,8 +6859,8 @@ class Wr {
 }
 class Fr extends W {
   #e;
-  constructor(e, i = !1, s = !1, n, r) {
-    super(e, i, s, n, r), this.#e = new Wr(e.scene, n);
+  constructor(e, i = !1, s = !1, n, o) {
+    super(e, i, s, n, o), this.#e = new Wr(e.scene, n);
   }
   set position(e) {
     this.target.setPosition(e[0], e[1]);
@@ -6871,114 +6883,114 @@ class Fr extends W {
         };
         break;
     }
-    const r = {
+    const o = {
       x: (this.xAxis.smoothScrollOffset || 0) - this.xAxis.candleW,
       w: this.xAxis.candleW
     };
-    let a = this.core.rangeScrollOffset, h = e.indexStart - a, l = e.Length + a * 2, m;
-    for (this.core.stream && (this.core.stream.lastPriceMax = e.valueMax, this.core.stream.lastPriceMin = e.valueMin); l; ) {
-      if (h >= 0) {
-        if (m = e.value(h), r.x = this.xAxis.xPos(m[0]), m?.[7]) {
-          this.core.stream.lastXPos = r.x, this.core.stream.lastYPos = { ...r };
+    let a = this.core.rangeScrollOffset, l = e.indexStart - a, h = e.Length + a * 2, m;
+    for (this.core.stream && (this.core.stream.lastPriceMax = e.valueMax, this.core.stream.lastPriceMin = e.valueMin); h; ) {
+      if (l >= 0) {
+        if (m = e.value(l), o.x = this.xAxis.xPos(m[0]), m?.[7]) {
+          this.core.stream.lastXPos = o.x, this.core.stream.lastYPos = { ...o };
           break;
         }
-        m[4] !== null && (r.o = this.yAxis.yPos(m[1]), r.h = this.yAxis.yPos(m[2]), r.l = this.yAxis.yPos(m[3]), r.c = this.yAxis.yPos(m[4]), r.raw = m, i(r));
+        m[4] !== null && (o.o = this.yAxis.yPos(m[1]), o.h = this.yAxis.yPos(m[2]), o.l = this.yAxis.yPos(m[3]), o.c = this.yAxis.yPos(m[4]), o.raw = m, i(o));
       }
-      h++, l--;
+      l++, h--;
     }
     (s === X.AREA || s === X.LINE) && this.#e.areaRender(), super.updated();
   }
 }
-function Gr(o, e, i, s, n, r) {
-  o.lineWidth = r?.width || xe.borderWidth, o.strokeStyle = r?.border || xe.stroke, o.beginPath(), o.rect(e, i, s, n), o.stroke();
+function Gr(r, e, i, s, n, o) {
+  r.lineWidth = o?.width || xe.borderWidth, r.strokeStyle = o?.border || xe.stroke, r.beginPath(), r.rect(e, i, s, n), r.stroke();
 }
-function Hs(o, e, i, s, n, r) {
-  o.fillStyle = r?.fill || xe.fill, o.fillRect(e, i, s, n);
+function Hs(r, e, i, s, n, o) {
+  r.fillStyle = o?.fill || xe.fill, r.fillRect(e, i, s, n);
 }
-function pc(o, e, i, s, n, r) {
-  S(r.fill) && Hs(o, e, i, s, n, r), T(r.width) && r.width > 0 && Gr(o, e, i, s, n, r);
+function gc(r, e, i, s, n, o) {
+  E(o.fill) && Hs(r, e, i, s, n, o), T(o.width) && o.width > 0 && Gr(r, e, i, s, n, o);
 }
-function Yr(o, e, i, s, n, r, a) {
-  o.lineWidth = a?.width || xe.borderWidth, o.strokeStyle = a?.border || xe.stroke, Xr(o, e, i, s, n, r), o.stroke();
+function Yr(r, e, i, s, n, o, a) {
+  r.lineWidth = a?.width || xe.borderWidth, r.strokeStyle = a?.border || xe.stroke, Xr(r, e, i, s, n, o), r.stroke();
 }
-function qr(o, e, i, s, n, r, a) {
-  o.fillStyle = a?.fill || xe.fill, Xr(o, e, i, s, n, r), o.fill();
+function qr(r, e, i, s, n, o, a) {
+  r.fillStyle = a?.fill || xe.fill, Xr(r, e, i, s, n, o), r.fill();
 }
-function Xr(o, e, i, s, n, r) {
-  o.beginPath(), o.moveTo(e + r, i), o.arcTo(e + s, i, e + s, i + n, r), o.arcTo(e + s, i + n, e, i + n, r), o.arcTo(e, i + n, e, i, r), o.arcTo(e, i, e + s, i, r), o.closePath();
+function Xr(r, e, i, s, n, o) {
+  r.beginPath(), r.moveTo(e + o, i), r.arcTo(e + s, i, e + s, i + n, o), r.arcTo(e + s, i + n, e, i + n, o), r.arcTo(e, i + n, e, i, o), r.arcTo(e, i, e + s, i, o), r.closePath();
 }
-function gc(o, e, i, s, n, r, a) {
-  S(a.fill) && qr(o, e, i, s, n, r, a?.fill), T(a.width) && a.width > 0 && Yr(o, e, i, s, n, r, a?.border, a?.width);
+function fc(r, e, i, s, n, o, a) {
+  E(a.fill) && qr(r, e, i, s, n, o, a?.fill), T(a.width) && a.width > 0 && Yr(r, e, i, s, n, o, a?.border, a?.width);
 }
-function Kr(o, e, i, s, n, r, a) {
+function Kr(r, e, i, s, n, o, a) {
   if (!(n < 3)) {
-    var h = Math.PI * 2 / n;
-    o.beginPath(), o.translate(e, i), o.rotate(r * Math.PI / 180), o.moveTo(s, 0);
-    for (var l = 1; l < n; l++)
-      o.lineTo(s * Math.cos(h * l), s * Math.sin(h * l));
-    o.closePath(), xt(o, a?.fill, a?.stroke, a?.width);
+    var l = Math.PI * 2 / n;
+    r.beginPath(), r.translate(e, i), r.rotate(o * Math.PI / 180), r.moveTo(s, 0);
+    for (var h = 1; h < n; h++)
+      r.lineTo(s * Math.cos(l * h), s * Math.sin(l * h));
+    r.closePath(), xt(r, a?.fill, a?.stroke, a?.width);
   }
 }
-function fc(o, e, i) {
+function yc(r, e, i) {
   if (e.length > 0) {
-    o.beginPath();
+    r.beginPath();
     var s = e[0];
-    o.moveTo(s.x, s.y);
+    r.moveTo(s.x, s.y);
     for (var n = 1; n < e.length; ++n)
-      s = e[n], o.lineTo(s.x, s.y);
-    o.closePath(), xt(o, i?.fill, i?.stroke, i?.width);
+      s = e[n], r.lineTo(s.x, s.y);
+    r.closePath(), xt(r, i?.fill, i?.stroke, i?.width);
   }
 }
-function yc(o, e, i, s, n) {
-  Kr(o, e, i, s, 3, n?.rotate || 0, n), xt(o, n?.fill, n?.stroke, n?.width);
+function vc(r, e, i, s, n) {
+  Kr(r, e, i, s, 3, n?.rotate || 0, n), xt(r, n?.fill, n?.stroke, n?.width);
 }
-function vc(o, e, i, s, n, r) {
-  o.beginPath(), o.moveTo(e - s / 2, i), o.lineTo(e, i - n / 2), o.lineTo(e + s / 2, i), o.lineTo(e, i + n / 2), o.closePath(), xt(o, r?.fill, r?.stroke, r?.width);
+function wc(r, e, i, s, n, o) {
+  r.beginPath(), r.moveTo(e - s / 2, i), r.lineTo(e, i - n / 2), r.lineTo(e + s / 2, i), r.lineTo(e, i + n / 2), r.closePath(), xt(r, o?.fill, o?.stroke, o?.width);
 }
-function wc(o, e, i, s, n) {
-  o.beginPath(), o.arc(e, i, s, 0, Math.PI * 2), o.closePath(), fillStroke(o, n?.fill, n?.stroke, n?.width);
+function xc(r, e, i, s, n) {
+  r.beginPath(), r.arc(e, i, s, 0, Math.PI * 2), r.closePath(), fillStroke(r, n?.fill, n?.stroke, n?.width);
 }
-function xc(o) {
-  return o.ownerDocument && o.ownerDocument.defaultView && o.ownerDocument.defaultView.devicePixelRatio || 2;
+function bc(r) {
+  return r.ownerDocument && r.ownerDocument.defaultView && r.ownerDocument.defaultView.devicePixelRatio || 2;
 }
-function xt(o, e, i, s) {
-  S(e) && (o.fillStyle = e, o.fill()), T(s) && s > 0 && (o.lineWidth = s, o.strokeStyle = i || xe.stroke, o.stroke());
+function xt(r, e, i, s) {
+  E(e) && (r.fillStyle = e, r.fill()), T(s) && s > 0 && (r.lineWidth = s, r.strokeStyle = i || xe.stroke, r.stroke());
 }
-function jr(o, e, i, s, n, r, a, h, l, m) {
-  o.drawImage(e, i, s, n, r, a, h, l, m);
+function jr(r, e, i, s, n, o, a, l, h, m) {
+  r.drawImage(e, i, s, n, o, a, l, h, m);
 }
-function Zr(o, e) {
-  let i = o.naturalWidth || o.width, s = o.naturalHeight || o.height;
-  return e === void 0 && (e = Jr(i, s)), e.ctx.drawImage(o, 0, 0), e;
+function Zr(r, e) {
+  let i = r.naturalWidth || r.width, s = r.naturalHeight || r.height;
+  return e === void 0 && (e = Jr(i, s)), e.ctx.drawImage(r, 0, 0), e;
 }
-const bc = {
+const Cc = {
   red: "#FF0000FF",
   green: "#00FF00FF",
   blue: "#0000FFFF",
   alpa: "#000000FF"
 };
-function Ot(o, e) {
+function Ot(r, e) {
   const i = Zr(e), s = i.ctx;
-  return s.fillStyle = bc[o], s.globalCompositeOperation = "multiply", s.fillRect(0, 0, s.canvas.width, s.canvas.height), s.globalCompositeOperation = "destination-in", s.drawImage(e, 0, 0), s.globalCompositeOperation = "source-over", i;
+  return s.fillStyle = Cc[r], s.globalCompositeOperation = "multiply", s.fillRect(0, 0, s.canvas.width, s.canvas.height), s.globalCompositeOperation = "destination-in", s.drawImage(e, 0, 0), s.globalCompositeOperation = "source-over", i;
 }
-function Cc(o) {
+function Tc(r) {
   return {
-    red: Ot("red", o),
-    green: Ot("green", o),
-    blue: Ot("blue", o),
-    alpha: Ot("alpha", o)
+    red: Ot("red", r),
+    green: Ot("green", r),
+    blue: Ot("blue", r),
+    alpha: Ot("alpha", r)
   };
 }
-function Jr(o, e) {
+function Jr(r, e) {
   const i = document.createElement("canvas");
-  return i.ctx = i.getContext("2d", { willReadFrequently: !0 }), i.width = o || i.ctx.canvas.width, i.height = e || i.ctx.canvas.height, i;
+  return i.ctx = i.getContext("2d", { willReadFrequently: !0 }), i.width = r || i.ctx.canvas.width, i.height = e || i.ctx.canvas.height, i;
 }
-const se = {
+const ne = {
   createCanvas: Jr,
   imageToCanvs: Zr,
-  seperateRGB: Cc,
+  seperateRGB: Tc,
   getChannel: Ot,
-  getPixelRatio: xc,
+  getPixelRatio: bc,
   fillStroke: xt,
   calcTextWidth: _s,
   createFont: wt,
@@ -6988,70 +7000,70 @@ const se = {
   renderText: Vr,
   renderTextBG: yt,
   renderPath: bt,
-  renderPathStroke: Tc,
+  renderPathStroke: Ec,
   renderPathClosed: Sc,
-  renderSpline: Ec,
-  renderLine: Mc,
+  renderSpline: Pc,
+  renderLine: Ac,
   renderLineHorizontal: Gt,
-  renderLineVertical: Pc,
-  renderCircle: wc,
-  renderRect: pc,
+  renderLineVertical: Mc,
+  renderCircle: xc,
+  renderRect: gc,
   renderRectFill: Hs,
   renderRectStroke: Gr,
-  renderRectRound: gc,
+  renderRectRound: fc,
   renderRectRoundFill: qr,
   renderRectRoundStroke: Yr,
   renderPolygonRegular: Kr,
-  renderPolygonIrregular: fc,
-  renderDiamond: vc,
-  renderTriangle: yc
+  renderPolygonIrregular: yc,
+  renderDiamond: wc,
+  renderTriangle: vc
 };
-function bt(o, e, i, s) {
-  o.save();
+function bt(r, e, i, s) {
+  r.save();
   const n = i.width || 1;
-  o.lineWidth = n, n % 2 && o.translate(0.5, 0.5), o.strokeStyle = i.stroke, M(i.dash) && o.setLineDash(i.dash), o.beginPath();
-  let r = !0;
+  r.lineWidth = n, n % 2 && r.translate(0.5, 0.5), r.strokeStyle = i.stroke, M(i.dash) && r.setLineDash(i.dash), r.beginPath();
+  let o = !0;
   e.forEach((a) => {
-    a && a.x !== null && (r ? (o.moveTo(a.x, a.y), r = !1) : o.lineTo(a.x, a.y));
-  }), s(), o.restore();
+    a && a.x !== null && (o ? (r.moveTo(a.x, a.y), o = !1) : r.lineTo(a.x, a.y));
+  }), s(), r.restore();
 }
-function Tc(o, e, i) {
-  bt(o, e, i, () => {
-    o.stroke();
+function Ec(r, e, i) {
+  bt(r, e, i, () => {
+    r.stroke();
   });
 }
-function Sc(o, e, i) {
-  bt(o, e, i, () => {
-    o.closePath();
-  }), xt(o, opts?.fill, opts?.stroke, opts?.size);
+function Sc(r, e, i) {
+  bt(r, e, i, () => {
+    r.closePath();
+  }), xt(r, opts?.fill, opts?.stroke, opts?.size);
 }
-function Ec(o, e, i) {
-  o.beginPath(), o.moveTo(e[0].x, e[0].y);
+function Pc(r, e, i) {
+  r.beginPath(), r.moveTo(e[0].x, e[0].y);
   for (var s = i ?? 1, n = 0; n < e.length - 1; n++) {
-    var r = n > 0 ? e[n - 1] : e[0], a = e[n], h = e[n + 1], l = n != e.length - 2 ? e[n + 2] : h, m = a.x + (h.x - r.x) / 6 * s, g = a.y + (h.y - r.y) / 6 * s, v = h.x - (l.x - a.x) / 6 * s, E = h.y - (l.y - a.y) / 6 * s;
-    o.bezierCurveTo(m, g, v, E, h.x, h.y);
+    var o = n > 0 ? e[n - 1] : e[0], a = e[n], l = e[n + 1], h = n != e.length - 2 ? e[n + 2] : l, m = a.x + (l.x - o.x) / 6 * s, g = a.y + (l.y - o.y) / 6 * s, v = l.x - (h.x - a.x) / 6 * s, S = l.y - (h.y - a.y) / 6 * s;
+    r.bezierCurveTo(m, g, v, S, l.x, l.y);
   }
-  o.stroke();
+  r.stroke();
 }
-function Gt(o, e, i, s, n) {
-  bt(o, [{ x: i, y: e }, { x: s, y: e }], n, () => {
-    o.stroke(), o.closePath();
+function Gt(r, e, i, s, n) {
+  bt(r, [{ x: i, y: e }, { x: s, y: e }], n, () => {
+    r.stroke(), r.closePath();
   });
 }
-function Pc(o, e, i, s, n) {
-  coords = [{ x: e, y: i }, { x: e, y, bottom: s }], bt(o, coords, n, () => {
-    o.stroke(), o.closePath();
+function Mc(r, e, i, s, n) {
+  coords = [{ x: e, y: i }, { x: e, y, bottom: s }], bt(r, coords, n, () => {
+    r.stroke(), r.closePath();
   });
 }
-function Mc(o, e, i) {
-  bt(o, e, i, () => {
-    o.stroke(), o.closePath();
+function Ac(r, e, i) {
+  bt(r, e, i, () => {
+    r.stroke(), r.closePath();
   });
 }
-class Ac extends W {
+class Lc extends W {
   #e;
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a), this.#e = new Wr(e.scene, n), this.theme.priceLineStyle = this.theme?.priceLineStyle || Ih;
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a), this.#e = new Wr(e.scene, n), this.theme.priceLineStyle = this.theme?.priceLineStyle || Dh;
   }
   set position(e) {
     this.setPosition(e[0], e[1]);
@@ -7069,13 +7081,13 @@ class Ac extends W {
       this.#e.draw(a);
     };
     this.xAxis.smoothScrollOffset;
-    const r = {
+    const o = {
       x: this.core.stream.lastXPos,
       w: this.xAxis.candleW
     };
-    r.o = this.yAxis.yPos(i[1]), r.h = this.yAxis.yPos(i[2]), r.l = this.yAxis.yPos(i[3]), r.c = this.yAxis.yPos(i[4]), r.raw = i, e.inRenderRange(i[0]) && s(r), i[4] >= i[1] ? this.theme.priceLineStyle.stroke = this.core.theme.candle.UpBodyColour : this.theme.priceLineStyle.stroke = this.core.theme.candle.DnBodyColour, Gt(
+    o.o = this.yAxis.yPos(i[1]), o.h = this.yAxis.yPos(i[2]), o.l = this.yAxis.yPos(i[3]), o.c = this.yAxis.yPos(i[4]), o.raw = i, e.inRenderRange(i[0]) && s(o), i[4] >= i[1] ? this.theme.priceLineStyle.stroke = this.core.theme.candle.UpBodyColour : this.theme.priceLineStyle.stroke = this.core.theme.candle.DnBodyColour, Gt(
       this.scene.context,
-      r.c,
+      o.c,
       0,
       this.target.width,
       this.theme.priceLineStyle
@@ -7091,19 +7103,19 @@ class Ac extends W {
       h: this.yAxis.yPos(s[2]),
       l: this.yAxis.yPos(s[3]),
       c: this.yAxis.yPos(s[4])
-    }, r = this.scene.context, a = this.theme, h = a.candle.UpBodyColour || a.candle.DnBodyColour;
+    }, o = this.scene.context, a = this.theme, l = a.candle.UpBodyColour || a.candle.DnBodyColour;
     Math.max(e.w - 1, 1), e.x;
-    let l;
-    if (r.save(), r.fillStyle = h, r.strokeStyle = h, r.lineWidth = 1, r.beginPath(), r.moveTo(e.x, e.c), r.lineTo(n.x, n.h), a.candle.Type === X.AREA) {
-      if (l = r.createLinearGradient(0, 0, 0, this.scene.height), M(a.candle.AreaFillColour))
+    let h;
+    if (o.save(), o.fillStyle = l, o.strokeStyle = l, o.lineWidth = 1, o.beginPath(), o.moveTo(e.x, e.c), o.lineTo(n.x, n.h), a.candle.Type === X.AREA) {
+      if (h = o.createLinearGradient(0, 0, 0, this.scene.height), M(a.candle.AreaFillColour))
         for (let [m, g] of a.candle.AreaFillColour.entries())
-          l.addColorStop(m, g);
+          h.addColorStop(m, g);
       else
-        isString() ? l = a.candle.AreaFillColour : l = a.candle.UpBodyColour || a.candle.DnBodyColour;
-      r.stroke(), r.lineTo(n.x, this.scene.height), r.lineTo(e.x, this.scene.height), r.fillStyle = l, r.closePath(), r.fill();
+        isString() ? h = a.candle.AreaFillColour : h = a.candle.UpBodyColour || a.candle.DnBodyColour;
+      o.stroke(), o.lineTo(n.x, this.scene.height), o.lineTo(e.x, this.scene.height), o.fillStyle = h, o.closePath(), o.fill();
     } else
-      r.stroke();
-    r.restore();
+      o.stroke();
+    o.restore();
   }
 }
 const Rt = {
@@ -7111,11 +7123,11 @@ const Rt = {
   wdith: 1,
   dash: [1, 0]
 };
-class Lc extends W {
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a);
-    const h = { class: Nc, fixed: !0, required: !1 };
-    this.core.config?.highLow === !0 && (this.scaleOverly = this.chart.scale.addOverlay("hiLo", h));
+class Nc extends W {
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a);
+    const l = { class: Ic, fixed: !0, required: !1 };
+    this.core.config?.highLow === !0 && (this.scaleOverly = this.chart.scale.addOverlay("hiLo", l));
   }
   set position(e) {
     this.target.setPosition(0, 0);
@@ -7124,14 +7136,14 @@ class Lc extends W {
     if (this.core.config?.highLow !== !0 || !super.mustUpdate())
       return;
     this.scene.clear();
-    let i, s, n, r = this.scene.width, a = 35, h = {};
-    const l = e.valueHi, m = e.valueLo, g = { ...this.theme.yAxis }, v = this.scene.context;
-    g.colourCursorBG = this.theme?.hilo?.colour || Rt.colour, v.save(), v.strokeStyle = this.theme?.highLow?.colour || Rt.colour, v.strokeWidth = this.theme?.highLow?.width || Rt.width, v.setLineDash(this.theme?.highLow?.dash || Rt.dash), n = this.yAxis.yPos(l), Gt(v, n, 0, r, h), i = "High", s = this.theme.yAxis.location == "left" ? 0 : r - (a + 25), Li(v, i, s, n, a, g), n = this.yAxis.yPos(m), Gt(v, n, 0, r, h), i = "Low", Li(v, i, s, n, a, g), v.restore(), super.updated(), "hiLo" in this.chart.scale.overlays && (this.chart.scale.overlays.hiLo.instance.setRefresh(), this.chart.scale.overlays.hiLo.instance.scaleDraw());
+    let i, s, n, o = this.scene.width, a = 35, l = {};
+    const h = e.valueHi, m = e.valueLo, g = { ...this.theme.yAxis }, v = this.scene.context;
+    g.colourCursorBG = this.theme?.hilo?.colour || Rt.colour, v.save(), v.strokeStyle = this.theme?.highLow?.colour || Rt.colour, v.strokeWidth = this.theme?.highLow?.width || Rt.width, v.setLineDash(this.theme?.highLow?.dash || Rt.dash), n = this.yAxis.yPos(h), Gt(v, n, 0, o, l), i = "High", s = this.theme.yAxis.location == "left" ? 0 : o - (a + 25), Li(v, i, s, n, a, g), n = this.yAxis.yPos(m), Gt(v, n, 0, o, l), i = "Low", Li(v, i, s, n, a, g), v.restore(), super.updated(), "hiLo" in this.chart.scale.overlays && (this.chart.scale.overlays.hiLo.instance.setRefresh(), this.chart.scale.overlays.hiLo.instance.scaleDraw());
   }
 }
-class Nc extends W {
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a), this.viewport = e.viewport;
+class Ic extends W {
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a), this.viewport = e.viewport;
   }
   set position(e) {
     this.target.setPosition(0, 0);
@@ -7142,27 +7154,27 @@ class Nc extends W {
     if (!super.mustUpdate())
       return;
     this.scene.clear();
-    let i, s, n, r;
-    const a = e.valueHi, h = e.valueLo, l = { ...this.theme.yAxis }, m = this.scene.context;
-    l.colourCursorBG = this.theme?.hilo?.colour || Rt.colour, i = this.chart.Scale.nicePrice(a), s = 1, n = this.yAxis.yPos(a) + 1, r = this.viewport.width, Li(m, i, s, n, r, l), i = this.chart.Scale.nicePrice(h), n = this.yAxis.yPos(h) + 1, Li(m, i, s, n, r, l), super.updated();
+    let i, s, n, o;
+    const a = e.valueHi, l = e.valueLo, h = { ...this.theme.yAxis }, m = this.scene.context;
+    h.colourCursorBG = this.theme?.hilo?.colour || Rt.colour, i = this.chart.Scale.nicePrice(a), s = 1, n = this.yAxis.yPos(a) + 1, o = this.viewport.width, Li(m, i, s, n, o, h), i = this.chart.Scale.nicePrice(l), n = this.yAxis.yPos(l) + 1, Li(m, i, s, n, o, h), super.updated();
   }
 }
-function Li(o, e, i, s, n, r) {
+function Li(r, e, i, s, n, o) {
   let a = {
-    fontSize: r.fontSize * 1.05,
-    fontWeight: r.fontWeight,
-    fontFamily: r.fontFamily,
-    txtCol: r.colourCursor,
-    bakCol: r.colourCursorBG,
+    fontSize: o.fontSize * 1.05,
+    fontWeight: o.fontWeight,
+    fontFamily: o.fontFamily,
+    txtCol: o.colourCursor,
+    bakCol: o.colourCursorBG,
     paddingTop: 2,
     paddingBottom: 2,
     paddingLeft: 3,
     paddingRight: 3,
     width: n
-  }, h = a.fontSize + a.paddingTop + a.paddingBottom, l = s - h * 0.5;
-  o.save(), o.fillStyle = a.bakCol, o.fillRect(i, l, n, h), yt(o, `${e}`, i, l, a), o.restore();
+  }, l = a.fontSize + a.paddingTop + a.paddingBottom, h = s - l * 0.5;
+  r.save(), r.fillStyle = a.bakCol, r.fillRect(i, h, n, l), yt(r, `${e}`, i, h, a), r.restore();
 }
-class Ic {
+class Dc {
   data;
   icon;
   constructor(e, i) {
@@ -7170,11 +7182,11 @@ class Ic {
   }
   draw(e) {
     this.data = e;
-    const i = this.icon, s = this.cfg, n = this.hit.getIndexValue(e.key), r = D.svgToImage(s.iconEvent, n, this.dims), a = _(e.w, s.iconMinDim, s.iconHeight), h = _(e.w, s.iconMinDim, s.iconWidth), l = this.data.x, m = this.data.y, g = this.ctx, v = this.ctxH;
-    return g.save(), g.drawImage(i, l, m, h, a), g.restore(), v.save(), v.drawImage(r, l, m, h, a), v.restore(), { x: l, y: m, w: h, h: a, k: n };
+    const i = this.icon, s = this.cfg, n = this.hit.getIndexValue(e.key), o = D.svgToImage(s.iconEvent, n, this.dims), a = _(e.w, s.iconMinDim, s.iconHeight), l = _(e.w, s.iconMinDim, s.iconWidth), h = this.data.x, m = this.data.y, g = this.ctx, v = this.ctxH;
+    return g.save(), g.drawImage(i, h, m, l, a), g.restore(), v.save(), v.drawImage(o, h, m, l, a), v.restore(), { x: h, y: m, w: l, h: a, k: n };
   }
 }
-const Dc = {
+const Oc = {
   bounded: !0,
   dragBar: !1,
   closeIcon: !1,
@@ -7190,12 +7202,12 @@ const Dc = {
     }
   }
 };
-class Oc extends W {
+class Rc extends W {
   #e;
   #t = [];
   #n;
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a), this.#e = new Ic(e, n), this.emit(), this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this), this.#n = this.core.WidgetsG.insert("Dialogue", Dc), this.#n.start();
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a), this.#e = new Dc(e, n), this.emit(), this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this), this.#n = this.core.WidgetsG.insert("Dialogue", Oc), this.#n.start();
   }
   destroy() {
     this.core.off("primary_pointerdown", this.onPrimaryPointerDown, this);
@@ -7207,19 +7219,19 @@ class Oc extends W {
     return this.overlay.data;
   }
   onPrimaryPointerDown(e) {
-    this.core.MainPane.stateMachine.state !== "chart_pan" && Re(this.isNewsEventSelected, Ti, this)(e);
+    this.core.MainPane.stateMachine.state !== "chart_pan" && ke(this.isNewsEventSelected, Ti, this)(e);
   }
   isNewsEventSelected(e) {
     const i = e[0], s = e[1], n = this.hit.getIntersection(i, s);
     if (this.core.config?.events?.display === !1 || this.core.config?.events?.displayInfo === !1 || n == -1)
       return;
-    const r = this.theme.events, a = _(this.xAxis.candleW, r.iconMinDim, r.iconHeight), h = this.xAxis.pixel2T(i), l = this.xAxis.scrollOffsetPx, m = this.core.dimensions;
-    let g = Object.keys(this.data)[n] * 1, v = this.xAxis.xPos(h) + l, E = s - a * 1.5 - m.height, A = "";
+    const o = this.theme.events, a = _(this.xAxis.candleW, o.iconMinDim, o.iconHeight), l = this.xAxis.pixel2T(i), h = this.xAxis.scrollOffsetPx, m = this.core.dimensions;
+    let g = Object.keys(this.data)[n] * 1, v = this.xAxis.xPos(l) + h, S = s - a * 1.5 - m.height, A = "";
     for (let O of this.data[g])
       A += this.buildNewsEventHTML(O);
     const L = {
       dimensions: { h: void 0, w: 150 },
-      position: { x: v + a / 2 + 1, y: E },
+      position: { x: v + a / 2 + 1, y: S },
       content: A,
       offFocus: Ti + 1
     };
@@ -7230,7 +7242,7 @@ class Oc extends W {
     h1, p {display: inline-block; font-size: 0.9em;
     max-width: 98%;
     </style>`;
-    return S(e?.url) && (i = `<a href="${e?.url}" target="${e?.target}">${i}</a>`), s += `<h1>${i}</h1>`, s += `<p>${e?.content}</p>`, s;
+    return E(e?.url) && (i = `<a href="${e?.url}" target="${e?.target}">${i}</a>`), s += `<h1>${i}</h1>`, s += `<p>${e?.content}</p>`, s;
   }
   draw(e = this.core.range) {
     if (this.core.config?.events?.display === !1 || !super.mustUpdate())
@@ -7240,17 +7252,17 @@ class Oc extends W {
       x: (this.xAxis.smoothScrollOffset || 0) - this.xAxis.candleW,
       w: this.xAxis.candleW
     };
-    let n = this.theme.events, r = this.core.rangeScrollOffset, a = e.indexStart - r, h = e.Length + r * 2, l, m, g;
-    for (; h; ) {
-      if (l = e.value(a), m = `${l[0]}`, g = Object.keys(this.data).indexOf(m), g >= 0)
+    let n = this.theme.events, o = this.core.rangeScrollOffset, a = e.indexStart - o, l = e.Length + o * 2, h, m, g;
+    for (; l; ) {
+      if (h = e.value(a), m = `${h[0]}`, g = Object.keys(this.data).indexOf(m), g >= 0)
         for (let v of this.data[m])
-          s.x = this.xAxis.xPos(l[0]) - this.xAxis.candleW / 2, s.y = this.scene.height - _(this.xAxis.candleW, n.iconMinDim, n.iconHeight) * 1.5, s.key = g, this.#t.push(this.#e.draw(s));
-      a++, h--;
+          s.x = this.xAxis.xPos(h[0]) - this.xAxis.candleW / 2, s.y = this.scene.height - _(this.xAxis.candleW, n.iconMinDim, n.iconHeight) * 1.5, s.key = g, this.#t.push(this.#e.draw(s));
+      a++, l--;
     }
     super.updated();
   }
 }
-class Rc {
+class kc {
   data;
   buy;
   sell;
@@ -7259,11 +7271,11 @@ class Rc {
   }
   draw(e) {
     this.data = e;
-    const i = this.cfg, s = e.side === "buy" ? this.buy : this.sell, n = e.side === "buy" ? i.iconBuy : i.iconSell, r = this.hit.getIndexValue(e.key), a = D.svgToImage(n, r, this.dims), h = _(e.w, i.iconMinDim, i.iconHeight), l = _(e.w, i.iconMinDim, i.iconWidth), m = this.data.x, g = this.data.y, v = this.ctx, E = this.ctxH;
-    return v.save(), v.drawImage(s, m, g, l, h), v.restore(), E.save(), E.drawImage(a, m, g, l, h), E.restore(), { x: m, y: g, w: l, h, k: r };
+    const i = this.cfg, s = e.side === "buy" ? this.buy : this.sell, n = e.side === "buy" ? i.iconBuy : i.iconSell, o = this.hit.getIndexValue(e.key), a = D.svgToImage(n, o, this.dims), l = _(e.w, i.iconMinDim, i.iconHeight), h = _(e.w, i.iconMinDim, i.iconWidth), m = this.data.x, g = this.data.y, v = this.ctx, S = this.ctxH;
+    return v.save(), v.drawImage(s, m, g, h, l), v.restore(), S.save(), S.drawImage(a, m, g, h, l), S.restore(), { x: m, y: g, w: h, h: l, k: o };
   }
 }
-const kc = {
+const _c = {
   bounded: !0,
   dragBar: !1,
   closeIcon: !1,
@@ -7279,13 +7291,13 @@ const kc = {
     }
   }
 };
-class _c extends W {
+class Hc extends W {
   #e;
   #t = [];
   #n;
   #r;
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a), this.settings = a.settings, this.#e = new Rc(e, n), this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this), this.#r = this.core.WidgetsG.insert("Dialogue", kc), this.#r.start();
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a), this.settings = a.settings, this.#e = new kc(e, n), this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this), this.#r = this.core.WidgetsG.insert("Dialogue", _c), this.#r.start();
   }
   destroy() {
     this.core.off("primary_pointerdown", this.onPrimaryPointerDown, this);
@@ -7310,21 +7322,21 @@ class _c extends W {
       e[s] !== void 0 && (i[s] = e[s]);
   }
   onPrimaryPointerDown(e) {
-    this.core.MainPane.stateMachine.state !== "chart_pan" && Re(this.isTradeSelected, Ti, this)(e);
+    this.core.MainPane.stateMachine.state !== "chart_pan" && ke(this.isTradeSelected, Ti, this)(e);
   }
   isTradeSelected(e) {
     const i = e[0], s = e[1], n = this.hit.getIntersection(i, s);
     if (this.core.config?.trades?.display === !1 || this.core.config?.trades?.displayInfo === !1 || n == -1)
       return;
-    const r = this.theme.trades, a = _(this.xAxis.candleW, r.iconMinDim, r.iconWidth), h = this.xAxis.pixel2T(i);
-    this.core.range.valueByTS(h);
-    const l = this.xAxis.scrollOffsetPx, m = this.core.dimensions;
-    let g = Object.keys(this.data)[n] * 1, v = this.xAxis.xPos(h) + l, E = s - a * 1.5 - m.height, A = "";
+    const o = this.theme.trades, a = _(this.xAxis.candleW, o.iconMinDim, o.iconWidth), l = this.xAxis.pixel2T(i);
+    this.core.range.valueByTS(l);
+    const h = this.xAxis.scrollOffsetPx, m = this.core.dimensions;
+    let g = Object.keys(this.data)[n] * 1, v = this.xAxis.xPos(l) + h, S = s - a * 1.5 - m.height, A = "";
     for (let O of this.data[g])
       A += this.buildTradeHTML(O);
     const L = {
       dimensions: { h: void 0, w: 150 },
-      position: { x: v + a / 2 + 1, y: E },
+      position: { x: v + a / 2 + 1, y: S },
       content: A,
       offFocus: Ti + 1
     };
@@ -7349,23 +7361,23 @@ class _c extends W {
       x: (this.xAxis.smoothScrollOffset || 0) - this.xAxis.candleW,
       w: this.xAxis.candleW
     };
-    let n = this.theme.trades, r = this.core.rangeScrollOffset, a = e.indexStart - r, h = e.Length + r * 2, l, m, g;
-    for (; h; ) {
-      if (l = e.value(a), m = `${l[0]}`, g = Object.keys(this.data).indexOf(m), g >= 0)
+    let n = this.theme.trades, o = this.core.rangeScrollOffset, a = e.indexStart - o, l = e.Length + o * 2, h, m, g;
+    for (; l; ) {
+      if (h = e.value(a), m = `${h[0]}`, g = Object.keys(this.data).indexOf(m), g >= 0)
         for (let v of this.data[m])
-          s.x = this.xAxis.xPos(l[0]) - this.xAxis.candleW / 2, s.y = this.yAxis.yPos(l[2]) - _(this.xAxis.candleW, n.iconMinDim, n.iconHeight) * 1.5, s.side = v.side, s.key = g, this.#t.push(this.#e.draw(s));
-      a++, h--;
+          s.x = this.xAxis.xPos(h[0]) - this.xAxis.candleW / 2, s.y = this.yAxis.yPos(h[2]) - _(this.xAxis.candleW, n.iconMinDim, n.iconHeight) * 1.5, s.side = v.side, s.key = g, this.#t.push(this.#e.draw(s));
+      a++, l--;
     }
     super.updated();
   }
 }
-const Hc = {
+const $c = {
   primaryPane: [
     ["grid", { class: Ai, fixed: !0, required: !0, params: { axes: "y" } }],
-    ["volume", { class: mc, fixed: !1, required: !0, params: { maxVolumeH: gi.ONCHART_VOLUME_HEIGHT } }],
+    ["volume", { class: pc, fixed: !1, required: !0, params: { maxVolumeH: gi.ONCHART_VOLUME_HEIGHT } }],
     ["candles", { class: Fr, fixed: !1, required: !0 }],
-    ["hiLo", { class: Lc, fixed: !0, required: !1 }],
-    ["stream", { class: Ac, fixed: !1, required: !0 }],
+    ["hiLo", { class: Nc, fixed: !0, required: !1 }],
+    ["stream", { class: Lc, fixed: !1, required: !0 }],
     ["cursor", { class: ws, fixed: !0, required: !0 }]
   ],
   secondaryPane: [
@@ -7374,8 +7386,8 @@ const Hc = {
   ]
 }, ir = {
   primaryPane: {
-    trades: { class: _c, fixed: !1, required: !1 },
-    events: { class: Oc, fixed: !1, required: !1 }
+    trades: { class: Hc, fixed: !1, required: !1 },
+    events: { class: Rc, fixed: !1, required: !1 }
   },
   secondaryPane: {
     candles: { class: Fr, fixed: !1, required: !0 }
@@ -7418,14 +7430,14 @@ class nt {
   #S;
   #C;
   #f;
-  #P;
+  #E;
   #x;
   #O;
   #M = new be();
   #L = new be();
   #T = [0, 0];
   #A = !1;
-  #E;
+  #P;
   #v;
   #R;
   #k = {
@@ -7437,9 +7449,9 @@ class nt {
   constructor(e, i) {
     if (this.#s = e, this.#a = nt.cnt, !b(i))
       return;
-    this.#l = { ...i }, this.#n = this.#l.name, this.#r = this.#l.shortName, this.#i = this.#l.title, this.#h = this.#l.type == "primary" ? "primaryPane" : "secondaryPane", this.#x = this.#l.view, this.#y = this.#l.elements.elScale, this.#o = this.#l.parent, this.#m = this.#l.elements.elTarget, this.#m.id = this.id, this.legend = new rc(this.elLegend, this), this.isPrimary ? (Te.type = "chart", Te.title = this.title, Te.parent = this, Te.source = this.legendInputs.bind(this), this.legend.add(Te), this.yAxisType = "default") : (Te.type = "secondary", Te.title = "", Te.parent = this, Te.source = () => ({ inputs: {}, colours: [], labels: [] }), this.legend.add(Te), this.yAxisType = this.core.indicatorClasses[i.view[0].type].ind.scale);
+    this.#l = { ...i }, this.#n = this.#l.name, this.#r = this.#l.shortName, this.#i = this.#l.title, this.#h = this.#l.type == "primary" ? "primaryPane" : "secondaryPane", this.#x = this.#l.view, this.#y = this.#l.elements.elScale, this.#o = this.#l.parent, this.#m = this.#l.elements.elTarget, this.#m.id = this.id, this.legend = new oc(this.elLegend, this), this.isPrimary ? (Te.type = "chart", Te.title = this.title, Te.parent = this, Te.source = this.legendInputs.bind(this), this.legend.add(Te), this.yAxisType = "default") : (Te.type = "secondary", Te.title = "", Te.parent = this, Te.source = () => ({ inputs: {}, colours: [], labels: [] }), this.legend.add(Te), this.yAxisType = this.core.indicatorClasses[i.view[0].type].ind.scale);
     const s = { ...i };
-    s.parent = this, s.chart = this, s.elScale = this.elScale, s.yAxisType = this.yAxisType, this.scale = new uc(this.core, s), this.#d = "init", this.log(`${this.name} instantiated`);
+    s.parent = this, s.chart = this, s.elScale = this.elScale, s.yAxisType = this.yAxisType, this.scale = new dc(this.core, s), this.#d = "init", this.log(`${this.name} instantiated`);
   }
   log(e) {
     this.core.log(e);
@@ -7454,7 +7466,7 @@ class nt {
     this.core.error(e);
   }
   set id(e) {
-    this.#t = He(e);
+    this.#t = $e(e);
   }
   get id() {
     return this.#t ? `${this.#t}` : `${this.#s.id}-${this.#n}_${this.#a}`.replace(/ |,|;|:|\.|#/g, "_");
@@ -7531,7 +7543,7 @@ class nt {
     return this.#C;
   }
   get streamCandle() {
-    return this.#P;
+    return this.#E;
   }
   set cursor(e) {
     this.element.style.cursor = e;
@@ -7549,7 +7561,7 @@ class nt {
     return this.#A;
   }
   get cursorClick() {
-    return this.#E;
+    return this.#P;
   }
   get candleW() {
     return this.#s.Timeline.candleW;
@@ -7636,7 +7648,7 @@ class nt {
     return this.#L;
   }
   get overlaysDefault() {
-    return Hc[this.type];
+    return $c[this.type];
   }
   get indicators() {
     return this.getIndicators();
@@ -7645,7 +7657,7 @@ class nt {
     return this.#N;
   }
   set stateMachine(e) {
-    this.#c = new Ve(e, this);
+    this.#c = new ze(e, this);
   }
   get stateMachine() {
     return this.#c;
@@ -7670,14 +7682,14 @@ class nt {
         this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartPane()" instead.`);
         return;
       }
-      this.removeAllIndicators(), this.stateMachine.destroy(), this.Divider.destroy(), this.#g.destroy(), this.#w.destroy(), this.#v.destroy(), this.legend.destroy(), this.off("main_mousemove", this.onMouseMove, this), this.off(Ht, this.onStreamListening, this), this.off(zt, this.onStreamNewValue, this), this.off(ke, this.onStreamUpdate, this), this.off(Vt, this.onStreamNewValue, this), this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.off("chart_yAxisRedraw", this.onYAxisRedraw), this.element.remove(), this.#d = "destroyed";
+      this.removeAllIndicators(), this.stateMachine.destroy(), this.Divider.destroy(), this.#g.destroy(), this.#w.destroy(), this.#v.destroy(), this.legend.destroy(), this.off("main_mousemove", this.onMouseMove, this), this.off(Ht, this.onStreamListening, this), this.off(zt, this.onStreamNewValue, this), this.off(_e, this.onStreamUpdate, this), this.off(Vt, this.onStreamNewValue, this), this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.off("chart_yAxisRedraw", this.onYAxisRedraw), this.element.remove(), this.#d = "destroyed";
     }
   }
   remove() {
     this.core.log(`Deleting chart pane: ${this.id}`), this.emit("destroyChartView", this.id);
   }
   eventsListen() {
-    this.#v = new Le(this.#m, { disableContextMenu: !1 }), this.#v.on("pointerdrag", this.onChartDrag.bind(this)), this.#v.on("pointerdragend", this.onChartDragDone.bind(this)), this.#v.on("pointermove", this.onMouseMove.bind(this)), this.#v.on("pointerenter", this.onMouseEnter.bind(this)), this.#v.on("pointerout", this.onMouseOut.bind(this)), this.#v.on("pointerdown", this.onMouseDown.bind(this)), this.#v.on("pointerup", this.onMouseUp.bind(this)), this.on("main_mousemove", this.updateLegends, this), this.on(Ht, this.onStreamListening, this), this.on(zt, this.onStreamNewValue, this), this.on(ke, this.onStreamUpdate, this), this.on(Vt, this.onStreamNewValue, this), this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.on("chart_yAxisRedraw", this.onYAxisRedraw, this);
+    this.#v = new Le(this.#m, { disableContextMenu: !1 }), this.#v.on("pointerdrag", this.onChartDrag.bind(this)), this.#v.on("pointerdragend", this.onChartDragDone.bind(this)), this.#v.on("pointermove", this.onMouseMove.bind(this)), this.#v.on("pointerenter", this.onMouseEnter.bind(this)), this.#v.on("pointerout", this.onMouseOut.bind(this)), this.#v.on("pointerdown", this.onMouseDown.bind(this)), this.#v.on("pointerup", this.onMouseUp.bind(this)), this.on("main_mousemove", this.updateLegends, this), this.on(Ht, this.onStreamListening, this), this.on(zt, this.onStreamNewValue, this), this.on(_e, this.onStreamUpdate, this), this.on(Vt, this.onStreamNewValue, this), this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this), this.isPrimary && this.on("chart_yAxisRedraw", this.onYAxisRedraw, this);
   }
   on(e, i, s) {
     this.#s.on(e, i, s);
@@ -7704,7 +7716,7 @@ class nt {
     this.#A = !1, this.#T = [Math.round(e.position.x), Math.round(e.position.y)], this.scale.layerCursor.visible = !1, this.emit(`${this.id}_mouseout`, this.#T);
   }
   onMouseDown(e) {
-    this.#s.pointerButtons[e.domEvent.srcEvent.button] = !0, this.#E = [Math.floor(e.position.x), Math.floor(e.position.y)], this.stateMachine.state === "tool_activated" ? this.emit("tool_targetSelected", { target: this, position: e }) : this.isPrimary && this.emit("primary_pointerdown", this.#E);
+    this.#s.pointerButtons[e.domEvent.srcEvent.button] = !0, this.#P = [Math.floor(e.position.x), Math.floor(e.position.y)], this.stateMachine.state === "tool_activated" ? this.emit("tool_targetSelected", { target: this, position: e }) : this.isPrimary && this.emit("primary_pointerdown", this.#P);
   }
   onMouseUp(e) {
     this.#s.pointerButtons[e.domEvent.srcEvent.button] = !1;
@@ -7716,7 +7728,7 @@ class nt {
     this.draw(this.range, !0);
   }
   onStreamUpdate(e) {
-    this.isPrimary ? (this.#P = e, this.chartStreamCandle.draw(), this.layerStream.setPosition(this.core.stream.lastScrollPos, 0), this.updateLegends(this.cursorPos, e)) : this.updateLegends(), this.#s.MainPane.draw();
+    this.isPrimary ? (this.#E = e, this.chartStreamCandle.draw(), this.layerStream.setPosition(this.core.stream.lastScrollPos, 0), this.updateLegends(this.cursorPos, e)) : this.updateLegends(), this.#s.MainPane.draw();
   }
   onYAxisRedraw() {
     this.isPrimary && this.refresh();
@@ -7725,7 +7737,7 @@ class nt {
     this.removeIndicator(e.id);
   }
   setTitle(e) {
-    if (!S(e))
+    if (!E(e))
       return !1;
     this.#i = e, Te.title = e;
     const i = this.legend.list.chart.el.querySelectorAll(".title");
@@ -7734,7 +7746,7 @@ class nt {
     return !0;
   }
   setWatermark(e) {
-    S(e.text) || S(e) ? this.core.config.watermark.text = e : "imgURL" in e && (this.core.config.watermark.imgURL = e);
+    E(e.text) || E(e) ? this.core.config.watermark.text = e : "imgURL" in e && (this.core.config.watermark.imgURL = e);
   }
   setHeight(e) {
     T(e) || (e = this.height || this.#o.height), this.#m.style.height = `${e}px`, this.#y.style.height = `${e}px`, this.elViewport.style.height = `${e}px`, this.#g.setDimensions({ w: null, h: e }), this.Divider?.setPos(), this.Divider?.setWidth();
@@ -7754,7 +7766,7 @@ class nt {
     };
   }
   setYAxisType(e) {
-    return !S(e) || !Ke.includes(e) || this.type == "primaryPane" && e == "percent" ? !1 : (this.#R = e, !0);
+    return !E(e) || !Ke.includes(e) || this.type == "primaryPane" && e == "percent" ? !1 : (this.#R = e, !0);
   }
   addOverlays(e) {
     if (!M(e) || e.length < 1)
@@ -7776,11 +7788,11 @@ class nt {
     const i = this.type === "primaryPane", s = this.core.indicatorClasses[e.type].ind, n = s.constructor.type === "both" ? i : s.prototype.primaryPane;
     if (e?.type in this.core.indicatorClasses && i === n) {
       e.paneID = this.id;
-      const r = {
+      const o = {
         class: s,
         params: { overlay: e }
       };
-      return this.graph.addOverlay(e.name, r);
+      return this.graph.addOverlay(e.name, o);
     } else
       return !1;
   }
@@ -7788,13 +7800,13 @@ class nt {
     const e = Object.keys(this.core.indicatorClasses), i = {};
     for (let [s, n] of Object.entries(this.overlays))
       if (e.includes(n.params?.overlay?.type)) {
-        let r = n.id || n.instance.id;
-        i[r] = n;
+        let o = n.id || n.instance.id;
+        i[o] = n;
       }
     return i;
   }
   removeIndicator(e) {
-    if (!S(e) || !(e in this.indicators))
+    if (!E(e) || !(e in this.indicators))
       return !1;
     this.#N[e] = !0, this.indicators[e].instance.destroy(), this.graph.removeOverlay(e), this.draw(), Object.keys(this.indicators).length === 0 && !this.isPrimary && this.emit("destroyChartView", this.id), delete this.#N[e];
   }
@@ -7804,10 +7816,10 @@ class nt {
       this.removeIndicator(i);
   }
   indicatorVisible(e, i) {
-    return !S(e) || !(e in this.indicators) ? !1 : this.indicators[e].instance.visible(i);
+    return !E(e) || !(e in this.indicators) ? !1 : this.indicators[e].instance.visible(i);
   }
   indicatorSettings(e, i) {
-    return !S(e) || !(e in this.indicators) ? !1 : this.indicators[e].instance.settings(i);
+    return !E(e) || !(e in this.indicators) ? !1 : this.indicators[e].instance.settings(i);
   }
   addTool(e) {
     let { layerConfig: i } = this.layerConfig(), s = new Ft.Layer(i);
@@ -7838,10 +7850,10 @@ class nt {
         this.#p.update(s, { pos: e, candle: i });
   }
   legendInputs() {
-    const e = [!0, !0, !0, !0, !0], i = this.cursorPos, s = this.time.xPos2Index(i[0] - this.core.scrollPos), n = _(s, 0, this.range.data.length - 1), r = this.range.data[n], a = this.theme.candle, h = r[4] >= r[1] ? new Array(5).fill(a.UpWickColour) : new Array(5).fill(a.DnWickColour), l = {}, m = ["T", "O", "H", "L", "C", "V"];
+    const e = [!0, !0, !0, !0, !0], i = this.cursorPos, s = this.time.xPos2Index(i[0] - this.core.scrollPos), n = _(s, 0, this.range.data.length - 1), o = this.range.data[n], a = this.theme.candle, l = o[4] >= o[1] ? new Array(5).fill(a.UpWickColour) : new Array(5).fill(a.DnWickColour), h = {}, m = ["T", "O", "H", "L", "C", "V"];
     for (let g = 1; g < 6; g++)
-      l[m[g]] = this.scale.nicePrice(r[g]);
-    return { inputs: l, colours: h, labels: e };
+      h[m[g]] = this.scale.nicePrice(o[g]);
+    return { inputs: h, colours: l, labels: e };
   }
   onLegendAction(e) {
     switch (this.#p.onMouseClick(e.currentTarget).icon) {
@@ -7879,11 +7891,11 @@ class nt {
       prevEl: i,
       parentEl: s,
       scaleEl: n,
-      prevScaleEl: r,
+      prevScaleEl: o,
       parentScaleEl: a,
-      prevPane: h
+      prevPane: l
     } = { ...this.currPrevNext() };
-    return !b(i) || !b(r) ? !1 : (s.insertBefore(e, i), a.insertBefore(n, r), this.Divider.setPos(), h !== null && (h.Divider.setPos(), h.Divider.show(), this.core.ChartPanes.swapKeys(this.id, i.id)), e.previousElementSibling === null && this.Divider.hide(), !0);
+    return !b(i) || !b(o) ? !1 : (s.insertBefore(e, i), a.insertBefore(n, o), this.Divider.setPos(), l !== null && (l.Divider.setPos(), l.Divider.show(), this.core.ChartPanes.swapKeys(this.id, i.id)), e.previousElementSibling === null && this.Divider.hide(), !0);
   }
   reorderDown() {
     const {
@@ -7891,11 +7903,11 @@ class nt {
       nextEl: i,
       parentEl: s,
       scaleEl: n,
-      nextScaleEl: r,
+      nextScaleEl: o,
       parentScaleEl: a,
-      nextPane: h
+      nextPane: l
     } = { ...this.currPrevNext() };
-    return !b(i) || !b(r) ? !1 : (s.insertBefore(i, e), a.insertBefore(r, n), this.Divider.setPos(), h !== null && (h.Divider.setPos(), this.Divider.show(), this.core.ChartPanes.swapKeys(this.id, i.id)), i.previousElementSibling === null && h.Divider.hide(), !0);
+    return !b(i) || !b(o) ? !1 : (s.insertBefore(i, e), a.insertBefore(o, n), this.Divider.setPos(), l !== null && (l.Divider.setPos(), this.Divider.show(), this.core.ChartPanes.swapKeys(this.id, i.id)), i.previousElementSibling === null && l.Divider.hide(), !0);
   }
   createGraph() {
     let e = ce(this.overlaysDefault);
@@ -7914,9 +7926,9 @@ class nt {
     const i = this, s = this.sibling();
     if (s === null)
       return { active: null, prev: null };
-    const n = this.core.MainPane.rowMinH, r = this.element.clientHeight, a = s.element.clientHeight;
-    let h, l, m, g;
-    return T(e) && e > n || (g = r + a, h = this.core.MainPane.cursorPos[5], l = r - h, m = a + h), l < n || m < n || g !== l + m || (i.setDimensions({ w: void 0, h: l }), s.setDimensions({ w: void 0, h: m }), i.Divider.setPos()), i.element.style.userSelect = "none", s.element.style.userSelect = "none", { active: i, prev: s };
+    const n = this.core.MainPane.rowMinH, o = this.element.clientHeight, a = s.element.clientHeight;
+    let l, h, m, g;
+    return T(e) && e > n || (g = o + a, l = this.core.MainPane.cursorPos[5], h = o - l, m = a + l), h < n || m < n || g !== h + m || (i.setDimensions({ w: void 0, h }), s.setDimensions({ w: void 0, h: m }), i.Divider.setPos()), i.element.style.userSelect = "none", s.element.style.userSelect = "none", { active: i, prev: s };
   }
   collapse(e) {
     const i = this.graph.viewport.scene.canvas.style, s = this.#u, n = this.#g.graph.viewport.scene.canvas.style;
@@ -7932,16 +7944,16 @@ class nt {
     return this.scale.yPos(e);
   }
   currPrevNext() {
-    const e = this.element, i = e.previousElementSibling, s = e.nextElementSibling, n = e.parentNode, r = this.scale.element, a = r.previousElementSibling, h = r.nextElementSibling, l = r.parentNode, m = i !== null ? this.core.ChartPanes.get(i.id) : null, g = s !== null ? this.core.ChartPanes.get(s.id) : null;
+    const e = this.element, i = e.previousElementSibling, s = e.nextElementSibling, n = e.parentNode, o = this.scale.element, a = o.previousElementSibling, l = o.nextElementSibling, h = o.parentNode, m = i !== null ? this.core.ChartPanes.get(i.id) : null, g = s !== null ? this.core.ChartPanes.get(s.id) : null;
     return {
       el: e,
       prevEl: i,
       nextEl: s,
       parentEl: n,
-      scaleEl: r,
+      scaleEl: o,
       prevScaleEl: a,
-      nextScaleEl: h,
-      parentScaleEl: l,
+      nextScaleEl: l,
+      parentScaleEl: h,
       prevPane: m,
       nextPane: g
     };
@@ -7956,10 +7968,10 @@ class nt {
     e.state.name === "closed" && e.open();
   }
 }
-class _e extends W {
+class He extends W {
   static #e = 0;
   static get cnt() {
-    return ++_e.#e;
+    return ++He.#e;
   }
   #t;
   #n;
@@ -7982,14 +7994,15 @@ class _e extends W {
   #S = {};
   #C;
   #f;
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, void 0, r, a), this.#n = W.cnt, this.#a = a, this.#h = a.overlay, this.#m = this.core.TALib, this.#y = this.xAxis.range, this.eventsListen();
+  #E = !1;
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, void 0, o, a), this.#n = W.cnt, this.#a = a, this.#h = a.overlay, this.#m = this.core.TALib, this.#y = this.xAxis.range, this.eventsListen();
   }
   get id() {
     return this.#t || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#n}`;
   }
   set id(e) {
-    this.#t = He(e);
+    this.#t = $e(e);
   }
   get name() {
     return this.#r;
@@ -8081,6 +8094,9 @@ class _e extends W {
   get status() {
     return this.#f;
   }
+  get drawOnUpdate() {
+    return this.#E;
+  }
   set value(e) {
     const i = this.core.time.timeFrameMS;
     let s = Math.floor(new Date(e[fe.t]) / i) * i;
@@ -8095,7 +8111,7 @@ class _e extends W {
         this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "indicator.remove()" or "chart.removeIndicator()" instead.`);
         return;
       }
-      super.destroy(), this.off(ke, this.onStreamUpdate), this.chartPane.graph.removeOverlay(this.id), this.chart.legend.remove(this.#C), this.core.state.removeIndicator(this.id), this.#f = "destroyed";
+      super.destroy(), this.off(_e, this.onStreamUpdate), this.chartPane.graph.removeOverlay(this.id), this.chart.legend.remove(this.#C), this.core.state.removeIndicator(this.id), this.#f = "destroyed";
     }
   }
   remove() {
@@ -8115,7 +8131,7 @@ class _e extends W {
     };
   }
   eventsListen() {
-    this.on(ke, this.onStreamUpdate, this);
+    this.on(_e, this.onStreamUpdate, this);
   }
   on(e, i, s) {
     this.core.on(e, i, s);
@@ -8158,11 +8174,11 @@ class _e extends W {
     this.visible(!this.visible()), e.parent.classList.toggle("visible"), e.parent.classList.toggle("notvisible");
   }
   invokeSettings(e) {
-    if (B(e?.fn)) {
+    if (U(e?.fn)) {
       let i = C.fn(this);
       if (e?.own)
         return i;
-    } else if (B(this.core.config.callbacks?.indicatorSettings?.fn)) {
+    } else if (U(this.core.config.callbacks?.indicatorSettings?.fn)) {
       let i = this.core.config.callbacks.indicatorSettings.fn(this);
       if (this.core.config.callbacks?.indicatorSettings?.own)
         return i;
@@ -8196,8 +8212,8 @@ class _e extends W {
   }
   legendInputs(e = this.chart.cursorPos) {
     const i = [this.style.stroke];
-    let n = this.Timeline.xPos2Index(e[0]) - (this.range.data.length - this.overlay.data.length), r = _(this.overlay.data.length - 1, 0, 1 / 0);
-    return n = _(n, 0, r), { c: n, colours: i };
+    let n = this.Timeline.xPos2Index(e[0]) - (this.range.data.length - this.overlay.data.length), o = _(this.overlay.data.length - 1, 0, 1 / 0);
+    return n = _(n, 0, o), { c: n, colours: i };
   }
   indicatorInput(e, i) {
     let s = {
@@ -8228,63 +8244,65 @@ class _e extends W {
     return n.inReal.find((a) => a === null) ? !1 : { timePeriod: i, ...n };
   }
   calcIndicator(e, i = {}, s = this.range) {
-    if (!S(e) || !(e in this.TALib) || !b(s) || !this.core.TALibReady)
+    if (!E(e) || !(e in this.TALib) || !b(s) || !this.core.TALibReady)
       return !1;
     i.timePeriod = i.timePeriod || this.definition.input.timePeriod;
-    let n, r, a = i.timePeriod, h = this.overlay.data;
+    let n, o, a = i.timePeriod, l = this.overlay.data;
     if (s instanceof us)
-      n = 0, r = s.dataLength - a + 1;
+      n = 0, o = s.dataLength - a + 1;
     else if ("indexStart" in s || "indexEnd" in s || "tsStart" in s || "tsEnd" in s)
-      n = s.indexStart || this.Timeline.t2Index(s.tsStart || 0) || 0, r = s.indexEnd || this.Timeline.t2Index(s.tsEnd) || this.range.Length - 1;
+      n = s.indexStart || this.Timeline.t2Index(s.tsStart || 0) || 0, o = s.indexEnd || this.Timeline.t2Index(s.tsEnd) || this.range.Length - 1;
     else
       return !1;
-    if (h.length != 0)
-      if (h.length + a !== s.dataLength)
-        if (h[0][0] > s.value(a)[0])
-          n = 0, r = s.getTimeIndex(h[0][0]) - a, r = _(r, a, s.dataLength - 1);
-        else if (h[h.length - 1][0] < s.value(s.dataLength - 1)[0])
-          n = h.length - 1 + a, n = _(n, 0, s.dataLength), r = s.dataLength - 1;
+    if (l.length != 0)
+      if (l.length + a !== s.dataLength)
+        if (l[0][0] > s.value(a)[0])
+          n = 0, o = s.getTimeIndex(l[0][0]) - a, o = _(o, a, s.dataLength - 1);
+        else if (l[l.length - 1][0] < s.value(s.dataLength - 1)[0])
+          n = l.length - 1 + a, n = _(n, 0, s.dataLength), o = s.dataLength - 1;
         else
           return !1;
       else
         return !1;
-    if (r - n < a)
+    if (o - n < a)
       return !1;
-    let l = [], m, g, v, E;
-    for (; n < r; ) {
-      E = this.indicatorInput(n, n + a), i = { ...i, ...E }, v = this.TALib[e](i), g = [], m = 0;
+    let h = [], m, g, v, S;
+    for (; n < o; ) {
+      S = this.indicatorInput(n, n + a), i = { ...i, ...S }, v = this.TALib[e](i), g = [], m = 0;
       for (let A of this.definition.output)
         g[m++] = v[A.name][0];
-      l.push([s.value(n + a - 1)[0], ...g]), n++;
+      h.push([s.value(n + a - 1)[0], ...g]), n++;
     }
-    return l;
+    return h;
   }
   calcIndicatorHistory() {
     const e = () => {
       const i = this.calcIndicator(this.libName, this.definition.input, this.range);
       if (i) {
-        const s = this.overlay.data, n = new Set(i), r = new Set(s);
+        const s = this.overlay.data;
+        new Set(i), new Set(s);
+        let n, o, a = {};
         if (!M(s) || s.length == 0) {
           this.overlay.data = i;
           return;
-        } else if (i[0][0] < s[0][0]) {
-          let a = /* @__PURE__ */ new Set([...n, ...r]);
-          this.overlay.data = Array.from(a);
-        } else if (i[i.length - 1][0] > s[s.length - 1][0]) {
-          let a = /* @__PURE__ */ new Set([...r, ...n]);
-          this.overlay.data = Array.from(a);
-        }
+        } else
+          i[0][0] < s[0][0] ? (n = i, o = s) : i[i.length - 1][0] > s[s.length - 1][0] && (n = s, o = i);
+        for (let l of n)
+          a[l[0]] = l;
+        for (let l of o)
+          a[l[0]] = l;
+        this.overlay.data = Object.values(a), this.#E = !0;
       }
     };
     this.core.TALibReady ? e() : this.core.talibAwait.push(e.bind(this));
   }
   calcIndicatorStream(e, i, s = this.range) {
-    if (!this.core.TALibReady || !S(e) || !(e in this.TALib) || !(s instanceof us) || s.dataLength < this.definition.input.timePeriod)
+    if (!this.core.TALibReady || !E(e) || !(e in this.TALib) || !(s instanceof us) || s.dataLength < this.definition.input.timePeriod)
       return !1;
-    let n = this.TALib[e](i), r = s.dataLength, a = s.value(r)[0], h = [], l = 0;
+    let n = this.TALib[e](i), o = s.dataLength, a = s.value(o)[0], l = [], h = 0;
     for (let m of this.definition.output)
-      h[l++] = n[m.name][0];
-    return [a, ...h];
+      l[h++] = n[m.name][0];
+    return [a, ...l];
   }
   newValue(e) {
     let i = this.TALibParams();
@@ -8305,58 +8323,64 @@ class _e extends W {
     this.overlay.data[i] = n, this.target.setPosition(this.core.scrollPos, 0), this.doDraw = !0, this.draw(this.range);
   }
   plot(e, i, s) {
-    const n = this.scene.context, r = e;
+    const n = this.scene.context, o = e;
     switch (n.save(), i) {
       case "renderLine":
-        se[i](n, r, s);
+        ne[i](n, o, s);
         break;
       case "renderLineHorizontal":
-        se[i](n, r[0], r[1], r[2], s);
+        ne[i](n, o[0], o[1], o[2], s);
         break;
       case "renderLineVertical":
-        se[i](n, r[0], r[1], r[2], s);
+        ne[i](n, o[0], o[1], o[2], s);
         break;
       case "renderPathStroke":
-        se[i](n, r, s.style, s);
+        ne[i](n, o, s.style, s);
         break;
       case "renderPathClosed":
-        se[i](n, r, s);
+        ne[i](n, o, s);
         break;
       case "renderSpline":
-        se[i](n, r, s);
+        ne[i](n, o, s);
         break;
       case "renderRect":
-        se[i](n, r[0], r[1], r[2], r[3], s);
+        ne[i](n, o[0], o[1], o[2], o[3], s);
         break;
       case "renderRectRound":
-        se[i](n, r[0], r[1], r[2], r[3], r[4], s);
+        ne[i](n, o[0], o[1], o[2], o[3], o[4], s);
         break;
       case "renderPolygonRegular":
-        se[i](n, r[0], r[1], r[2], r[3], r[4], s);
+        ne[i](n, o[0], o[1], o[2], o[3], o[4], s);
         break;
       case "renderPolygonIrregular":
-        se[i](n, r, s);
+        ne[i](n, o, s);
         break;
       case "renderTriangle":
-        se[i](n, r[0], r[1], r[2], s);
+        ne[i](n, o[0], o[1], o[2], s);
         break;
       case "renderDiamond":
-        se[i](n, r[0], r[1], r[2], r[3], s);
+        ne[i](n, o[0], o[1], o[2], o[3], s);
         break;
       case "renderCircle":
-        se[i](n, r[0], r[1], r[2], s);
+        ne[i](n, o[0], o[1], o[2], s);
         break;
       case "renderImage":
-        se[i](n, s.src, r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7]);
+        ne[i](n, s.src, o[0], o[1], o[2], o[3], o[4], o[5], o[6], o[7]);
     }
     n.restore();
   }
   draw() {
   }
+  mustUpdate() {
+    return this.#E ? this.#E : super.mustUpdate();
+  }
+  updated() {
+    this.#E = !1, super.updated();
+  }
 }
-class $c extends W {
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a), this.params.content = a?.content || "";
+class Uc extends W {
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a), this.params.content = a?.content || "";
   }
   set position(e) {
     this.target.setPosition(0, 0);
@@ -8365,7 +8389,7 @@ class $c extends W {
     if (super.mustUpdate().resize)
       if (this.config?.watermark?.imgURL)
         D.isImage(this.config?.watermark?.imgURL, this.renderImage.bind(this));
-      else if (S(this.config?.watermark?.text)) {
+      else if (E(this.config?.watermark?.text)) {
         this.scene.clear();
         const i = this.scene.context;
         i.save(), this.renderText(), i.restore();
@@ -8373,23 +8397,23 @@ class $c extends W {
         return;
   }
   renderText() {
-    const e = this.core.config?.watermark?.fontSize, i = this.core.config?.watermark?.fontWeight, s = this.core.config?.watermark?.fontFamily, n = this.core.config?.watermark?.textColour, r = {
+    const e = this.core.config?.watermark?.fontSize, i = this.core.config?.watermark?.fontWeight, s = this.core.config?.watermark?.fontFamily, n = this.core.config?.watermark?.textColour, o = {
       fontSize: e || this.theme.watermark.FONTSIZE,
       fontWeight: i || this.theme.watermark.FONTWEIGHT,
       fontFamily: s || this.theme.watermark.FONTFAMILY,
       txtCol: n || this.theme.watermark.COLOUR
-    }, a = this.config.watermark.text, h = this.scene.context;
-    h.font = wt(r?.fontSize, r?.fontWeight, r?.fontFamily), h.textBaseline = "top", h.fillStyle = r.txtCol;
-    const l = _i(r), m = ki(h, a, r), g = (this.scene.width - m) / 2, v = (this.scene.height - l) / 2;
-    h.fillText(a, g, v), super.updated();
+    }, a = this.config.watermark.text, l = this.scene.context;
+    l.font = wt(o?.fontSize, o?.fontWeight, o?.fontFamily), l.textBaseline = "top", l.fillStyle = o.txtCol;
+    const h = _i(o), m = ki(l, a, o), g = (this.scene.width - m) / 2, v = (this.scene.height - h) / 2;
+    l.fillText(a, g, v), super.updated();
   }
   renderImage(e) {
     if (!e)
       return;
-    const i = this.core.config?.watermark?.imgHeight || this.theme.watermark.IMGHEIGHT, s = this.core.config?.watermark?.imgWidth || this.theme.watermark.IMGWIDTH, n = (this.scene.width - s) / 2, r = (this.scene.height - i) / 2;
+    const i = this.core.config?.watermark?.imgHeight || this.theme.watermark.IMGHEIGHT, s = this.core.config?.watermark?.imgWidth || this.theme.watermark.IMGWIDTH, n = (this.scene.width - s) / 2, o = (this.scene.height - i) / 2;
     this.scene.clear();
     const a = this.scene.context;
-    a.save(), jr(a, e, n, r, i, s), a.restore();
+    a.save(), jr(a, e, n, o, i, s), a.restore();
   }
 }
 const ss = {
@@ -8398,157 +8422,157 @@ const ss = {
   context: {},
   states: {
     idle: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         chart_paneMaximize: {
           target: "chart_paneMaximize",
-          action(o) {
+          action(r) {
           }
         },
         chart_pan: {
           target: "chart_pan",
-          action(o) {
+          action(r) {
           }
         },
         chart_scrollTo: {
           target: "chart_scrollTo",
-          action(o) {
+          action(r) {
           }
         },
         setRange: {
           target: "setRange",
-          action(o) {
+          action(r) {
           }
         },
         addIndicator: {
           target: "addIndicator",
-          action(o) {
+          action(r) {
           }
         },
         divider_pointerdrag: {
           target: "divider_pointerdrag",
-          action(o) {
+          action(r) {
             this.context.currCursor = this.context.origin.cursor, this.context.origin.cursor = "row-resize";
           }
         },
         global_resize: {
           target: "global_resize",
-          action(o) {
+          action(r) {
           }
         }
       }
     },
     chart_paneMaximize: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         always: {
           target: "idle",
-          action(o) {
+          action(r) {
             this.context.maximize = "some pane pointer";
           }
         }
       }
     },
     chart_pan: {
-      onEnter(o) {
+      onEnter(r) {
         this.context.origin.cursor = "grab";
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         chart_pan: {
           target: "chart_pan",
-          action(o) {
-            this.context.origin.updateRange(o), this.context.origin.cursor = "grab";
+          action(r) {
+            this.context.origin.updateRange(r), this.context.origin.cursor = "grab";
           }
         },
         chart_panDone: {
           target: "idle",
-          action(o) {
-            this.context.origin.updateRange(o), this.context.origin.cursor = "default";
+          action(r) {
+            this.context.origin.updateRange(r), this.context.origin.cursor = "default";
           }
         }
       }
     },
     setRange: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         always: {
           target: "idle",
           condition: "zoomDone",
-          action(o) {
-            this.context.origin.zoomRange(o);
+          action(r) {
+            this.context.origin.zoomRange(r);
           }
         }
       }
     },
     chart_scrollTo: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         always: {
           target: "idle",
-          action(o) {
-            this.context.origin.updateRange(o);
+          action(r) {
+            this.context.origin.updateRange(r);
           }
         }
       }
     },
     addIndicator: {
-      onEnter(o) {
-        this.context.origin.addIndicator(o);
+      onEnter(r) {
+        this.context.origin.addIndicator(r);
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         addIndicatorDone: {
           target: "idle",
-          action(o) {
+          action(r) {
           }
         }
       }
     },
     divider_pointerdrag: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         divider_pointerdrag: {
           target: "divider_pointerdrag",
-          action(o) {
+          action(r) {
           }
         },
         divider_pointerdragend: {
           target: "idle",
-          action(o) {
+          action(r) {
             this.context.origin.cursor = this.context.currCursor;
           }
         }
       }
     },
     global_resize: {
-      onEnter(o) {
+      onEnter(r) {
         this.context.origin.setDimensions();
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         always: {
           target: "idle",
           condition: "resizeDone",
-          action(o) {
+          action(r) {
           }
         }
       }
@@ -8564,14 +8588,14 @@ const ss = {
   },
   actions: {
     removeProperty() {
-      let o = this.context.pair.active, e = this.context.pair.prev;
-      b(o) && o.element.style.removeProperty("user-select"), b(e) && e.element.style.removeProperty("user-select");
+      let r = this.context.pair.active, e = this.context.pair.prev;
+      b(r) && r.element.style.removeProperty("user-select"), b(e) && e.element.style.removeProperty("user-select");
     }
   }
 }, Bc = [
-  ["watermark", { class: $c, fixed: !0, required: !0, params: { content: null } }],
+  ["watermark", { class: Uc, fixed: !0, required: !0, params: { content: null } }],
   ["grid", { class: Ai, fixed: !1, required: !0, params: { axes: "x" } }]
-], Uc = ["candles", "trades", "events"];
+], Vc = ["candles", "trades", "events"];
 class Qr {
   #e = "MainPane";
   #t = "Main";
@@ -8595,7 +8619,7 @@ class Qr {
   #S;
   #C;
   #f = new be();
-  #P;
+  #E;
   #x;
   #O;
   #M = [];
@@ -8606,7 +8630,7 @@ class Qr {
   };
   #T = bn;
   #A = xn;
-  #E = {};
+  #P = {};
   #v = [0, 0];
   #R = {
     active: !1,
@@ -8646,7 +8670,7 @@ class Qr {
     return this.#i;
   }
   get chart() {
-    return this.#P;
+    return this.#E;
   }
   get chartPanes() {
     return this.#f;
@@ -8742,13 +8766,13 @@ class Qr {
     return this.#i.scrollPos;
   }
   set stateMachine(e) {
-    this.#s = new Ve(e, this);
+    this.#s = new ze(e, this);
   }
   get stateMachine() {
     return this.#s;
   }
   get renderLoop() {
-    return nc;
+    return rc;
   }
   get graph() {
     return this.#p;
@@ -8776,7 +8800,7 @@ class Qr {
       const i = { height: Pi };
       this.#i.theme.time = { ...this.#i.theme?.time, ...i }, this.#a.style.height = `calc(100% - ${Pi}px)`;
     }
-    this.#x = new ic(this.#i, e), this.registerChartViews(e), this.#k = T(this.config.buffer) ? this.config.buffer : Oi, this.#A = T(this.config.rowMinH) ? this.config.rowMinH : xn, this.#T = T(this.config.secondaryPaneDefaultH) ? this.config.secondaryPaneDefaultH : bn, this.rowsOldH = this.rowsH, this.log(`${this.#e} instantiated`);
+    this.#x = new sc(this.#i, e), this.registerChartViews(e), this.#k = T(this.config.buffer) ? this.config.buffer : Oi, this.#A = T(this.config.rowMinH) ? this.config.rowMinH : xn, this.#T = T(this.config.secondaryPaneDefaultH) ? this.config.secondaryPaneDefaultH : bn, this.rowsOldH = this.rowsH, this.log(`${this.#e} instantiated`);
   }
   start() {
     let e = 0;
@@ -8822,11 +8846,11 @@ class Qr {
       e.dragstart.x = this.#v[0], e.dragstart.y = this.#v[1], e.position.x = this.#v[0] + i, e.position.y = this.#v[1], this.onChartDrag(e);
       return;
     }
-    const s = this.range, n = s.indexStart - Math.floor(i * mn * s.Length), r = s.indexEnd + Math.ceil(i * mn * s.Length);
-    this.#i.setRange(n, r), this.draw(this.range, !0);
+    const s = this.range, n = s.indexStart - Math.floor(i * mn * s.Length), o = s.indexEnd + Math.ceil(i * mn * s.Length);
+    this.#i.setRange(n, o), this.draw(this.range, !0);
   }
   onMouseMove(e) {
-    const i = this.#E;
+    const i = this.#P;
     i.d2x = i?.d1x || null, i.d2y = i?.d1y || null, i.d1x = e.movement.x, i.d1y = e.movement.y, i.dx = Math.floor((i.d1x + i.d2x) / 2), i.dy = Math.floor((i.d1y + i.d2y) / 2), i.ts2 = i?.ts1 || null, i.ts1 = Date.now(), this.#v = [
       e.position.x,
       e.position.y,
@@ -8915,15 +8939,15 @@ class Qr {
   }
   setDimensions() {
     this.#a.previousDimensions();
-    let e = this.#a.heightDeltaR, i = Math.round(this.chartH * e), s = this.rowsW, n = this.rowsH, r = Math.round(s * ((100 + this.#k) * 0.01)), a = {
+    let e = this.#a.heightDeltaR, i = Math.round(this.chartH * e), s = this.rowsW, n = this.rowsH, o = Math.round(s * ((100 + this.#k) * 0.01)), a = {
       resizeH: e,
       mainH: this.element.height,
       mainW: this.element.width,
       rowsH: this.rowsH,
       rowsW: this.rowsW
     };
-    this.#i.scrollPos = -1, this.#x.setDimensions({ w: s }), this.#p.setSize(s, n, r), this.#f.size == 1 && i != this.#a.height ? this.#P.setDimensions({ w: s, h: this.#a.height }) : this.#f.forEach((h, l) => {
-      i = Math.round(h.viewport.height * e), h.setDimensions({ w: s, h: i });
+    this.#i.scrollPos = -1, this.#x.setDimensions({ w: s }), this.#p.setSize(s, n, o), this.#f.size == 1 && i != this.#a.height ? this.#E.setDimensions({ w: s, h: this.#a.height }) : this.#f.forEach((l, h) => {
+      i = Math.round(l.viewport.height * e), l.setDimensions({ w: s, h: i });
     }), this.rowsOldH = this.rowsH, this.emit("rowsResize", a), this.draw(void 0, !0);
   }
   getBufferPx() {
@@ -8937,8 +8961,8 @@ class Qr {
     for (let n of i)
       n?.primary === !0 ? s = n : n.primary = !1;
     s.primary = !0, e.rowY = 0;
-    for (let [n, r] of this.views)
-      e.type = n, e.view = r, this.addChartPane(e);
+    for (let [n, o] of this.views)
+      e.type = n, e.view = o, this.addChartPane(e);
   }
   chartPanesState() {
     const e = {
@@ -8953,27 +8977,27 @@ class Qr {
   }
   addChartPane(e) {
     const { expanded: i } = this.chartPanesState(), s = this.calcChartPaneHeights(), n = s.new;
-    let r;
-    for (r in s)
-      if (this.#f.has(r)) {
-        let m = this.#f.get(r);
-        i.indexOf(m) > -1 && m.setDimensions({ w: this.rowsW, h: s[r] });
+    let o;
+    for (o in s)
+      if (this.#f.has(o)) {
+        let m = this.#f.get(o);
+        i.indexOf(m) > -1 && m.setDimensions({ w: this.rowsW, h: s[o] });
       }
     let a;
     this.#a.insertAdjacentHTML(
       "beforeend",
       this.#c.rowNode(e.type, this.#i)
     ), a = this.#a.chartPaneSlot.assignedElements().slice(-1)[0], a.style.height = `${n}px`, a.style.width = "100%";
-    let h;
+    let l;
     this.#o.insertAdjacentHTML(
       "beforeend",
       this.scaleNode(e.type)
-    ), h = this.#o.chartPaneSlot.assignedElements().slice(-1)[0], h.style.height = `${n}px`, h.style.width = "100%", e.elements.elTarget = a, e.elements.elScale = h;
-    let l;
-    return e.type == "primary" ? (l = new nt(this.#i, e), this.#P = l) : (e.name = e.view[0].name || "Secondary", e.shortName = e.view[0].type || "Secondary", l = new nt(this.#i, e)), this.setPaneDividers(), this.#f.set(l.id, l), this.emit("addChartView", l), l;
+    ), l = this.#o.chartPaneSlot.assignedElements().slice(-1)[0], l.style.height = `${n}px`, l.style.width = "100%", e.elements.elTarget = a, e.elements.elScale = l;
+    let h;
+    return e.type == "primary" ? (h = new nt(this.#i, e), this.#E = h) : (e.name = e.view[0].name || "Secondary", e.shortName = e.view[0].type || "Secondary", h = new nt(this.#i, e)), this.setPaneDividers(), this.#f.set(h.id, h), this.emit("addChartView", h), h;
   }
   removeChartPane(e) {
-    if (!S(e) || !this.#f.has(e))
+    if (!E(e) || !this.#f.has(e))
       return !1;
     const i = this.#f.get(e);
     if (i.isPrimary)
@@ -8982,13 +9006,13 @@ class Qr {
     const { expanded: s } = this.chartPanesState();
     let n = s.indexOf(i);
     n > -1 && s.splice(n, 1);
-    let r = i.viewport.height, a = Math.floor(r / s.length), h = r % a;
+    let o = i.viewport.height, a = Math.floor(o / s.length), l = o % a;
     if (i.status !== "destroyed" && i.destroy(), this.#f.delete(e), delete this.#M[e], this.#f.size === 1) {
-      let l = this.#f.values().next().value;
-      l.collapsed && (l.collapsed.state = !1), l.setDimensions({ w: void 0, h: this.rowsH });
+      let h = this.#f.values().next().value;
+      h.collapsed && (h.collapsed.state = !1), h.setDimensions({ w: void 0, h: this.rowsH });
     } else
-      for (let l of s)
-        r = l.viewport.height, l.setDimensions({ w: void 0, h: r + a + h }), h = 0;
+      for (let h of s)
+        o = h.viewport.height, h.setDimensions({ w: void 0, h: o + a + l }), l = 0;
     return this.setPaneDividers(), this.draw(this.range, !0), !0;
   }
   validateIndicators() {
@@ -8998,23 +9022,23 @@ class Qr {
         this.views.delete(i);
         continue;
       }
-      for (const [n, r] of s.entries())
-        b(r) && (r.type in this.core.indicatorClasses || Uc.includes(r.type)) || (this.#i.log(`indicator ${s.type} not added: not supported.`), s.splice(n, 1));
+      for (const [n, o] of s.entries())
+        b(o) && (o.type in this.core.indicatorClasses || Vc.includes(o.type)) || (this.#i.log(`indicator ${s.type} not added: not supported.`), s.splice(n, 1));
     }
     return e;
   }
   addIndicator(e, i = e, s = {}) {
-    if (!S(e) && !(e in this.#N) && !S(i) && !b(s))
+    if (!E(e) && !(e in this.#N) && !E(i) && !b(s))
       return !1;
     this.log(`Adding the ${i} : ${e} indicator`), this.emit("pane_refresh", this), M(s?.data) || (s.data = []), b(s?.settings) || (s.settings = {});
     let n;
     if (this.#N[e].ind.primaryPane) {
-      const r = {
+      const o = {
         type: e,
         name: i,
         ...s
       };
-      n = this.#P.addIndicator(r);
+      n = this.#E.addIndicator(o);
     } else {
       this.core.indicatorClasses[e].ind.primaryPane === "both" && K(e.primaryPane) && e.primaryPane, M(s.view) || (s.view = [{ name: i, type: e, ...s }]);
       for (let a = 0; a < s.view.length; a++)
@@ -9034,59 +9058,59 @@ class Qr {
     ), e;
   }
   getIndicator(e) {
-    if (!S(e))
+    if (!E(e))
       return !1;
     for (const i of this.#f.values())
       if (e in i.indicators)
         return i.indicators[e].instance;
   }
   removeIndicator(e) {
-    if (this.emit("pane_refresh", this), S(e)) {
+    if (this.emit("pane_refresh", this), E(e)) {
       for (const i of this.#f.values())
         if (e in i.indicators)
           return i.indicators[e].instance.remove(), !0;
     } else
-      return e instanceof _e ? (e.remove(), !0) : !1;
+      return e instanceof He ? (e.remove(), !0) : !1;
   }
   indicatorSettings(e, i) {
-    if (S(e)) {
+    if (E(e)) {
       for (const s of this.#f.values())
         if (e in s.indicators)
           return s.indicators[e].instance.settings(i);
     } else
-      return e instanceof _e ? e.settings(i) : !1;
+      return e instanceof He ? e.settings(i) : !1;
   }
   calcChartPaneHeights() {
-    const { collapsed: e, expanded: i } = this.chartPanesState(), s = this.#f.size + 1, n = this.#T * (s - 1), r = n / Math.log10(n * 2) / 100;
-    Math.round(this.rowsH * r);
+    const { collapsed: e, expanded: i } = this.chartPanesState(), s = this.#f.size + 1, n = this.#T * (s - 1), o = n / Math.log10(n * 2) / 100;
+    Math.round(this.rowsH * o);
     const a = {};
     if (s === 1)
       a.new = this.rowsH;
     else if (s === 2 || i.length === 1) {
-      let h;
+      let l;
       try {
-        h = i[0].viewport.height;
+        l = i[0].viewport.height;
       } catch {
-        h = this.rowsH;
+        l = this.rowsH;
       }
-      const l = Math.round(h * this.#T / 100);
-      a[i[0].id] = h - l, a.new = l;
+      const h = Math.round(l * this.#T / 100);
+      a[i[0].id] = l - h, a.new = h;
     } else if (i.length === 2) {
-      const h = i[0].viewport.height, l = i[1].viewport.height, m = h + l, g = Math.round(m * this.#T / 100), v = m / (m + g);
-      a[i[0].id] = Math.floor(h * v), a[i[1].id] = Math.floor(l * v), a.new = Math.floor(g * v), a.new += m - (a[i[0].id] + a[i[1].id] + a.new);
+      const l = i[0].viewport.height, h = i[1].viewport.height, m = l + h, g = Math.round(m * this.#T / 100), v = m / (m + g);
+      a[i[0].id] = Math.floor(l * v), a[i[1].id] = Math.floor(h * v), a.new = Math.floor(g * v), a.new += m - (a[i[0].id] + a[i[1].id] + a.new);
     } else if (i.length >= 3) {
-      let h = this.rowsH, l = 0, m;
+      let l = this.rowsH, h = 0, m;
       for (let g of e)
-        h -= g.viewport.height;
-      a.new = Math.floor(h / (i.length + 1)), h / (h + a.new), m = h - a.new;
+        l -= g.viewport.height;
+      a.new = Math.floor(l / (i.length + 1)), l / (l + a.new), m = l - a.new;
       for (let g of i)
-        a[g.id] = m * (g.viewport.height / h), l += a[g.id];
-      a.new += h - l;
+        a[g.id] = m * (g.viewport.height / l), h += a[g.id];
+      a.new += l - h;
     }
     return a;
   }
   scaleNode(e) {
-    const i = Lh + " width: 100%;";
+    const i = Nh + " width: 100%;";
     return `
     <div slot="chartpane" class="viewport scale ${e}" style="$${i}"></div>
   `;
@@ -9101,7 +9125,7 @@ class Qr {
       this.#p,
       this.#x
     ];
-    this.#f.forEach((n, r) => {
+    this.#f.forEach((n, o) => {
       s.push(n);
     }), this.renderLoop.queueFrame(
       this.range,
@@ -9124,8 +9148,8 @@ class Qr {
       this.panesRestore(), i.instance = null, i.panes = {}, e.collapsed.state && (e.graph.viewport.scene.canvas.style.display = "none", e.scale.graph.viewport.scene.canvas.style.visibility = "hidden");
     else {
       this.panesRestore(), i.instance = e, i.rowsH = this.rowsH;
-      for (let [r, a] of this.#f.entries())
-        i.panes[r] = a.element.clientHeight, n = a.element.style, e === a ? (n.display = "block", a.setDimensions({ w: void 0, h: this.rowsH }), a.graph.viewport.scene.canvas.style.display = "block", a.scale.graph.viewport.scene.canvas.style.visibility = "visible") : (n.display = "none", a.scale.element.style.display = "none");
+      for (let [o, a] of this.#f.entries())
+        i.panes[o] = a.element.clientHeight, n = a.element.style, e === a ? (n.display = "block", a.setDimensions({ w: void 0, h: this.rowsH }), a.graph.viewport.scene.canvas.style.display = "block", a.scale.graph.viewport.scene.canvas.style.visibility = "visible") : (n.display = "none", a.scale.element.style.display = "none");
       this.hidePaneDividers();
     }
     return this.emit("pane_refresh", this), !0;
@@ -9142,19 +9166,19 @@ class Qr {
       return !1;
     this.emit("pane_refresh", this);
     const i = e.legend.list.chart.el.querySelector(".controls"), s = e.collapsed;
-    let n = e.element.clientHeight, r, a, h;
-    const { list: l, collapsed: m, expanded: g } = this.chartPanesState();
-    if (r = m.indexOf(e), r > -1 && m.splice(r, 1), r = g.indexOf(e), r > -1 && g.splice(r, 1), e.collapsed.state) {
-      i.classList.remove("collapsed"), i.classList.add("expanded"), s.rowsCnt !== l.length ? n = s.height * (s.rowsCnt / l.length) : s.rowsHeight !== this.rowsH ? n = s.height * (s.rowsHeight / this.rowsH) : n = s.height, a = (n - cs) / g.length;
+    let n = e.element.clientHeight, o, a, l;
+    const { list: h, collapsed: m, expanded: g } = this.chartPanesState();
+    if (o = m.indexOf(e), o > -1 && m.splice(o, 1), o = g.indexOf(e), o > -1 && g.splice(o, 1), e.collapsed.state) {
+      i.classList.remove("collapsed"), i.classList.add("expanded"), s.rowsCnt !== h.length ? n = s.height * (s.rowsCnt / h.length) : s.rowsHeight !== this.rowsH ? n = s.height * (s.rowsHeight / this.rowsH) : n = s.height, a = (n - cs) / g.length;
       for (let v of g)
-        h = v.element.clientHeight - a, v.setDimensions({ w: void 0, h });
+        l = v.element.clientHeight - a, v.setDimensions({ w: void 0, h: l });
       e.collapse(n);
     } else {
-      if (i.classList.add("collapsed"), i.classList.remove("expanded"), l.length < 2 || g.length < 1)
+      if (i.classList.add("collapsed"), i.classList.remove("expanded"), h.length < 2 || g.length < 1)
         return !1;
       n = (e.element.clientHeight - cs) / g.length;
       for (let v of g)
-        h = v.element.clientHeight + n, v.setDimensions({ w: void 0, h });
+        l = v.element.clientHeight + n, v.setDimensions({ w: void 0, h: l });
       e.collapse();
     }
     return this.setPaneDividers(), !0;
@@ -9212,11 +9236,11 @@ class Ae extends W {
   #w = !1;
   #p;
   #S = { TL: [0, 0], BR: [0, 0] };
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a), this.#o = config, this.#r = config.cnt, this.#n = this.#o.ID || Z("TX_Tool_"), this.#i = config.name, this.#c = config.core, this.#d = config.elements.elChart, this.#a = { ...config.parent }, this.#g = config.target, this.#g.addTool(this), this.#m = this.#y.viewport, this.#u = this.#m.scene.canvas, this.#p = config.pos;
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a), this.#o = config, this.#r = config.cnt, this.#n = this.#o.ID || Z("TX_Tool_"), this.#i = config.name, this.#c = config.core, this.#d = config.elements.elChart, this.#a = { ...config.parent }, this.#g = config.target, this.#g.addTool(this), this.#m = this.#y.viewport, this.#u = this.#m.scene.canvas, this.#p = config.pos;
   }
   set id(e) {
-    this.#n = He(e);
+    this.#n = $e(e);
   }
   get id() {
     return this.#n ? `${this.#n}` : `${this.#c.id}-${this.#s}_${this.#r}`.replace(/ |,|;|:|\.|#/g, "_");
@@ -9313,7 +9337,7 @@ class Ae extends W {
   draw() {
   }
 }
-class Vc extends Ae {
+class zc extends Ae {
   constructor(e) {
     super(e);
   }
@@ -9338,7 +9362,7 @@ class ui extends Ae {
     return this.#t;
   }
   set stateMachine(e) {
-    this.#n = new Ve(e, this);
+    this.#n = new ze(e, this);
   }
   get stateMachine() {
     return this.#n;
@@ -9356,11 +9380,6 @@ class ui extends Ae {
     n.save(), n.lineWidth = this.lineWidth, n.strokeStyle = this.colour, n.beginPath(), n.moveTo(e, i), n.lineTo(300, 150), n.stroke(), n.closePath(), n.restore(), this.elViewport.render();
   }
 }
-class zc extends Ae {
-  constructor(e) {
-    super(e);
-  }
-}
 class Wc extends Ae {
   constructor(e) {
     super(e);
@@ -9371,11 +9390,16 @@ class Fc extends Ae {
     super(e);
   }
 }
-const Gc = [
+class Gc extends Ae {
+  constructor(e) {
+    super(e);
+  }
+}
+const Yc = [
   {
     id: "cursor",
     name: "Cursor",
-    icon: Kl,
+    icon: jl,
     event: "tool_activated"
   },
   {
@@ -9411,9 +9435,9 @@ const Gc = [
   {
     id: "fibonacci",
     name: "Fibonacci",
-    icon: Zl,
+    icon: Jl,
     event: "tool_activated",
-    class: Vc,
+    class: zc,
     sub: [
       {
         id: "fib",
@@ -9425,9 +9449,9 @@ const Gc = [
   {
     id: "range",
     name: "Range",
-    icon: Ql,
+    icon: eh,
     event: "tool_activated",
-    class: Wc,
+    class: Fc,
     sub: [
       {
         id: "rng",
@@ -9439,9 +9463,9 @@ const Gc = [
   {
     id: "text",
     name: "Text",
-    icon: eh,
+    icon: th,
     event: "tool_activated",
-    class: Fc,
+    class: Gc,
     sub: [
       {
         id: "txt",
@@ -9453,14 +9477,14 @@ const Gc = [
   {
     id: "measure",
     name: "Measure",
-    icon: Jl,
+    icon: Ql,
     event: "tool_activated",
-    class: zc
+    class: Wc
   },
   {
     id: "delete",
     name: "Delete",
-    icon: jl,
+    icon: Zl,
     event: "tool_activated",
     class: void 0
   }
@@ -9473,84 +9497,84 @@ const Gc = [
   context: {},
   states: {
     idle: {
-      onEnter(o) {
+      onEnter(r) {
         console.log("idle: onEnter");
       },
-      onExit(o) {
+      onExit(r) {
         console.log("idle: onExit");
       },
       on: {
         tool_activated: {
           target: "tool_activated",
-          action(o) {
-            this.context.origin.onToolActivated(o);
+          action(r) {
+            this.context.origin.onToolActivated(r);
           }
         },
         tool_selected: {
           target: "tool_selected",
-          action(o) {
-            this.context.origin.onToolSelected(o);
+          action(r) {
+            this.context.origin.onToolSelected(r);
           }
         },
         tool_deselected: {
           target: "tool_deselected",
-          action(o) {
-            this.context.origin.onToolDeselected(o);
+          action(r) {
+            this.context.origin.onToolDeselected(r);
           }
         },
         tool_deleted: {
           target: "tool_deleted",
-          action(o) {
-            this.context.origin.onToolDeleted(o);
+          action(r) {
+            this.context.origin.onToolDeleted(r);
           }
         }
       }
     },
     tool_activated: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         tool_selected: {
           target: "tool_addToTarget",
-          action(o) {
-            this.context.origin.onToolTargetSelected(o);
+          action(r) {
+            this.context.origin.onToolTargetSelected(r);
           }
         }
       }
     },
     tool_selected: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {}
     },
     tool_deselected: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         always: {
           target: "idle",
           condition: "toolTarget",
-          action(o) {
+          action(r) {
           }
         }
       }
     },
     tool_deleted: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         always: {
           target: "idle",
           condition: "toolTarget",
-          action(o) {
+          action(r) {
           }
         }
       }
@@ -9579,7 +9603,7 @@ class eo {
   #m = { click: [], pointerover: [] };
   #y = [];
   constructor(e, i) {
-    this.#r = e, this.#i = i, this.#l = e.elTools, this.#a = Gc || e.config.tools, this.#o = e.WidgetsG, this.init();
+    this.#r = e, this.#i = i, this.#l = e.elTools, this.#a = Yc || e.config.tools, this.#o = e.WidgetsG, this.init();
   }
   log(e) {
     this.#r.log(e);
@@ -9594,7 +9618,7 @@ class eo {
     this.#r.error(e);
   }
   set id(e) {
-    this.#e = He(e);
+    this.#e = $e(e);
   }
   get id() {
     return this.#e ? `${this.#e}` : `${this.#r.id}-${this.#n}`.replace(/ |,|;|:|\.|#/g, "_");
@@ -9618,7 +9642,7 @@ class eo {
     return D.elementDimPos(this.#l);
   }
   set stateMachine(e) {
-    this.#s = new Ve(e, this);
+    this.#s = new ze(e, this);
   }
   get stateMachine() {
     return this.#s;
@@ -9691,18 +9715,18 @@ class eo {
     for (let i of e) {
       let s = i.id, n = i.querySelector("svg");
       n.style.fill = Xe.COLOUR_ICON, n.style.width = "90%";
-      for (let r of this.#a)
-        if (r.id === s)
-          if (this.#m[s] = {}, this.#m[s].click = this.onIconClick.bind(this), this.#m[s].pointerover = this.onIconOver.bind(this), this.#m[s].pointerout = this.onIconOut.bind(this), i.addEventListener("click", this.#m[s].click), i.addEventListener("pointerover", this.#m[s].pointerover), i.addEventListener("pointerout", this.#m[s].pointerout), r?.sub) {
+      for (let o of this.#a)
+        if (o.id === s)
+          if (this.#m[s] = {}, this.#m[s].click = this.onIconClick.bind(this), this.#m[s].pointerover = this.onIconOver.bind(this), this.#m[s].pointerout = this.onIconOut.bind(this), i.addEventListener("click", this.#m[s].click), i.addEventListener("pointerover", this.#m[s].pointerover), i.addEventListener("pointerout", this.#m[s].pointerout), o?.sub) {
             let a = {
-              content: r.sub,
+              content: o.sub,
               primary: i
-            }, h = this.#o.insert("Menu", a);
-            i.dataset.menu = h.id, h.start(), this.#y.push(h);
-            for (let l of r.sub)
-              this.#h[l.id] = l.class;
+            }, l = this.#o.insert("Menu", a);
+            i.dataset.menu = l.id, l.start(), this.#y.push(l);
+            for (let h of o.sub)
+              this.#h[h.id] = h.class;
           } else
-            this.#h[r.id] = r.class;
+            this.#h[o.id] = o.class;
     }
   }
   addTool(e = this.#d, i = this.#u) {
@@ -9720,7 +9744,7 @@ class eo {
   addAllTools() {
   }
 }
-const nr = 20, Yc = 20, qc = new _r(H.COLOUR_BORDER), xs = document.createElement("template");
+const nr = 20, qc = 20, Xc = new _r(H.COLOUR_BORDER), xs = document.createElement("template");
 xs.innerHTML = `
 <style>
   .scrollBarWidget {
@@ -9858,7 +9882,7 @@ xs.innerHTML = `
   }
 
   .handle {
-    background-color: var(--txc-time-handle-color, ${qc.hex}44); 
+    background-color: var(--txc-time-handle-color, ${Xc.hex}44); 
     width: 2px;
     height: 18px;
     margin: 1px;
@@ -9872,7 +9896,7 @@ xs.innerHTML = `
   .icon svg {
     fill: var(--txc-time-icon-color, ${H.COLOUR_ICON});
     width: ${nr}px;
-    height: ${Yc}px;
+    height: ${qc}px;
     margin-top: 1px;
   }
   .icon svg:hover {
@@ -9880,17 +9904,17 @@ xs.innerHTML = `
   }
 </style>
 <div class="scrollBarWidget">
-  <span id="rwdStart" class="icon rwdStart">${mh}</span>
+  <span id="rwdStart" class="icon rwdStart">${ph}</span>
   <span class="scrollBar">
     <div class="viewport"></div>
     <input id="min" class="min" name="min" type="range" step="1" min="0" max="3000" />
     <input id="max" class="max" name="max" type="range" step="1" min="0" max="3000" />
     <div class="handle"></div>
   </span>
-  <span id="fwdEnd" class="icon fwdEnd">${dh}</span>
+  <span id="fwdEnd" class="icon fwdEnd">${mh}</span>
 </div>
 `;
-class Xc extends re {
+class Kc extends oe {
   #e;
   #t;
   #n;
@@ -9952,7 +9976,7 @@ class Xc extends re {
     console.log(`${this.input.value}, ${this.input.getAttribute("max")}`);
   }
 }
-customElements.get("tradex-overview") || window.customElements.define("tradex-overview", Xc);
+customElements.get("tradex-overview") || window.customElements.define("tradex-overview", Kc);
 const to = document.createElement("template");
 to.innerHTML = `
 <style>
@@ -9967,7 +9991,7 @@ to.innerHTML = `
 <div class="viewport"></div>
 <tradex-overview></tradex-overview>
 `;
-class Kc extends re {
+class jc extends oe {
   #e;
   #t;
   constructor() {
@@ -9989,7 +10013,7 @@ class Kc extends re {
     return this.#t;
   }
 }
-customElements.get("tradex-time") || window.customElements.define("tradex-time", Kc);
+customElements.get("tradex-time") || window.customElements.define("tradex-time", jc);
 const io = document.createElement("template");
 io.innerHTML = `
 <style>
@@ -10000,7 +10024,7 @@ io.innerHTML = `
 <slot name="viewportCanvas"></slot>
 <canvas class="scene-canvas"></canvas>
 `;
-class jc extends re {
+class Zc extends oe {
   #e;
   #t;
   #n = this.onSlotChange.bind(this);
@@ -10032,7 +10056,7 @@ class jc extends re {
     this.#t = Array.from(this.canvasSlot.assignedElements()).find((e) => e.localName === "canvas")[0];
   }
 }
-customElements.get("tradex-viewport") || window.customElements.define("tradex-viewport", jc);
+customElements.get("tradex-viewport") || window.customElements.define("tradex-viewport", Zc);
 const so = document.createElement("template");
 so.innerHTML = `
 <style>
@@ -10044,7 +10068,7 @@ so.innerHTML = `
 </style>
   <tradex-viewport></tradex-viewport>
 `;
-class Zc extends re {
+class Jc extends oe {
   #e;
   constructor() {
     super(so);
@@ -10060,7 +10084,7 @@ class Zc extends re {
     return this.#e;
   }
 }
-customElements.get("tradex-grid") || window.customElements.define("tradex-grid", Zc);
+customElements.get("tradex-grid") || window.customElements.define("tradex-grid", Jc);
 const no = document.createElement("template");
 no.innerHTML = `
 <style>
@@ -10209,12 +10233,12 @@ no.innerHTML = `
 <div class="legends">
   <slot name="legend"></slot>
   <div class="controls collapse restored">
-    <span id="hideLegends" class="control" data-icon="hide" style="display:none">${ih}</span>
-    <span id="showLegends" class="control" data-icon="show" style="display:none">${sh}</span>
+    <span id="hideLegends" class="control" data-icon="hide" style="display:none">${sh}</span>
+    <span id="showLegends" class="control" data-icon="show" style="display:none">${nh}</span>
   </div>
 </div>
 `;
-class Jc extends re {
+class Qc extends oe {
   #e;
   #t;
   #n;
@@ -10266,54 +10290,54 @@ class Jc extends re {
     this.legends.insertAdjacentHTML("beforeend", e);
   }
   setTittle(e) {
-    S && (this.#e = e, this.elTitle.innerHTML = e);
+    E && (this.#e = e, this.elTitle.innerHTML = e);
   }
   buildLegend(e, i) {
-    let s = "", n = `${i.legend.font}; color: ${i.legend.colour}; text-align: left;`, r = "", a = e?.type !== "chart" ? "visible" : "notvisible";
-    const h = "", l = i.legend.controls ? `
-      <div class="controls restored expanded ${a}" style="${h}">
+    let s = "", n = `${i.legend.font}; color: ${i.legend.colour}; text-align: left;`, o = "", a = e?.type !== "chart" ? "visible" : "notvisible";
+    const l = "", h = i.legend.controls ? `
+      <div class="controls restored expanded ${a}" style="${l}">
         ${this.buildControls(e)}
       </div>
     ` : "";
     switch (e?.type) {
       case "chart":
-        r += "font-size: 1.5em;";
+        o += "font-size: 1.5em;";
         break;
       case "secondary":
-        n += " margin-bottom: -1.5em;", r += "", e.title = "";
+        n += " margin-bottom: -1.5em;", o += "", e.title = "";
         break;
       default:
-        r += "font-size: 1.2em;";
+        o += "font-size: 1.2em;";
         break;
     }
     return `
       <div id="legend_${e.id}" class="legend ${e.type}" style="${n}" data-type="${e.type}" data-id="${e.id}" data-parent="${e.parent.id}">
         <div class="lower">
-          <span class="title" style="${r}">${e.title}</span>
+          <span class="title" style="${o}">${e.title}</span>
           <dl style="${s}">${this.buildInputs(e)}</dl>
         </div>
         <div class="upper">
-            <span class="title" style="${r}">${e.title}</span>
-            ${l}
+            <span class="title" style="${o}">${e.title}</span>
+            ${h}
       </div>
      </div>
     `;
   }
   buildInputs(e) {
-    let i = 0, s = "", n, r = "", a = "", h = "";
+    let i = 0, s = "", n, o = "", a = "", l = "";
     for (n in e.inputs) {
-      let l = e?.colours?.[i] ? ` color: ${e.colours[i]};` : "", m = e?.inputs?.[n] !== void 0 ? e.inputs[n] : r, g = e?.labels?.[i] ? `${n}:` : r;
+      let h = e?.colours?.[i] ? ` color: ${e.colours[i]};` : "", m = e?.inputs?.[n] !== void 0 ? e.inputs[n] : o, g = e?.labels?.[i] ? `${n}:` : o;
       a += e?.labels?.[i] ? "1em;" : ".25em", s += `<dt style="${a}">${g}</dt>
-      <dd style="${h}${l}">${m}</dd>`, ++i;
+      <dd style="${l}${h}">${m}</dd>`, ++i;
     }
     return s;
   }
   buildControls(e) {
     let i = "", s = e.id;
-    return i += `<span id="${s}_up" class="control up" data-icon="up">${nh}</span>`, i += `<span id="${s}_down" class="control down" data-icon="down">${rh}</span>`, e?.type === "indicator" && (i += `<span id="${s}_visible" class="control visible" data-icon="visible">${ch}</span>`, i += `<span id="${s}_notVisible" class="control notvisible" data-icon="notVisible">${uh}</span>`), e?.type !== "indicator" && (i += `<span id="${s}_collapse" class="control collapse" data-icon="collapse">${lh}</span>`, i += `<span id="${s}_expand" class="control expand" data-icon="expand">${hh}</span>`, i += `<span id="${s}_maximize" class="control maximize" data-icon="maximize">${ah}</span>`, i += `<span id="${s}_restore" class="control restore" data-icon="restore">${oh}</span>`), i += e?.type !== "chart" ? `<span id="${s}_remove" class="control remove" data-icon="remove">${th}</span>` : "", i += e?.type !== "secondary" ? `<span id="${s}_config" class="control config" data-icon="config">${Lr}</span>` : "", i;
+    return i += `<span id="${s}_up" class="control up" data-icon="up">${rh}</span>`, i += `<span id="${s}_down" class="control down" data-icon="down">${oh}</span>`, e?.type === "indicator" && (i += `<span id="${s}_visible" class="control visible" data-icon="visible">${uh}</span>`, i += `<span id="${s}_notVisible" class="control notvisible" data-icon="notVisible">${dh}</span>`), e?.type !== "indicator" && (i += `<span id="${s}_collapse" class="control collapse" data-icon="collapse">${hh}</span>`, i += `<span id="${s}_expand" class="control expand" data-icon="expand">${ch}</span>`, i += `<span id="${s}_maximize" class="control maximize" data-icon="maximize">${lh}</span>`, i += `<span id="${s}_restore" class="control restore" data-icon="restore">${ah}</span>`), i += e?.type !== "chart" ? `<span id="${s}_remove" class="control remove" data-icon="remove">${ih}</span>` : "", i += e?.type !== "secondary" ? `<span id="${s}_config" class="control config" data-icon="config">${Lr}</span>` : "", i;
   }
 }
-customElements.get("tradex-legends") || window.customElements.define("tradex-legends", Jc);
+customElements.get("tradex-legends") || window.customElements.define("tradex-legends", Qc);
 const ro = document.createElement("template");
 ro.innerHTML = `
 <style>
@@ -10342,7 +10366,7 @@ ro.innerHTML = `
 <div class="viewport"></div>
 <tradex-legends></tradex-legends>
 `;
-class Qc extends re {
+class eu extends oe {
   #e;
   #t;
   constructor() {
@@ -10366,7 +10390,7 @@ class Qc extends re {
     return this.#t;
   }
 }
-customElements.get("tradex-chartpane") || window.customElements.define("tradex-chartpane", Qc);
+customElements.get("tradex-chartpane") || window.customElements.define("tradex-chartpane", eu);
 const oo = document.createElement("template");
 oo.innerHTML = `
 <style>
@@ -10395,7 +10419,7 @@ oo.innerHTML = `
 <tradex-grid></tradex-grid>
 <slot name="chartpane" id="chartpane"></slot>
 `;
-class eu extends re {
+class tu extends oe {
   #e;
   #t;
   #n;
@@ -10447,7 +10471,7 @@ class eu extends re {
     this.#e = this.#n ? this.#n : this.clientWidth, this.#t = this.#r ? this.#r : this.clientHeight, this.#n = this.clientWidth, this.#r = this.clientHeight;
   }
 }
-customElements.get("tradex-rows") || window.customElements.define("tradex-rows", eu);
+customElements.get("tradex-rows") || window.customElements.define("tradex-rows", tu);
 const ao = document.createElement("template");
 ao.innerHTML = `
 <style>
@@ -10483,7 +10507,7 @@ ao.innerHTML = `
 <tradex-rows></tradex-rows>
 <tradex-time></tradex-time>
 `;
-class tu extends re {
+class iu extends oe {
   #e;
   #t;
   constructor() {
@@ -10516,12 +10540,12 @@ class tu extends re {
     this.rows.style.height = `calc(100% - ${e}px)`, this.rows.style.left = `${i}px`, this.time.style.left = `${i}px`, this.viewport.style.left = `${i}px`;
   }
 }
-customElements.get("tradex-main") || window.customElements.define("tradex-main", tu);
+customElements.get("tradex-main") || window.customElements.define("tradex-main", iu);
 const lo = document.createElement("template");
 lo.innerHTML = `
   <slot></slot>
 `;
-class iu extends re {
+class su extends oe {
   constructor() {
     super(lo);
   }
@@ -10559,7 +10583,7 @@ class iu extends re {
     `;
   }
 }
-customElements.get("tradex-tools") || window.customElements.define("tradex-tools", iu);
+customElements.get("tradex-tools") || window.customElements.define("tradex-tools", su);
 const ho = document.createElement("template");
 ho.innerHTML = `
 <style>
@@ -10581,7 +10605,7 @@ ho.innerHTML = `
 <tradex-viewport></tradex-viewport>
 <slot name="chartpane" id="chartPane"></slot>
 `;
-class su extends re {
+class nu extends oe {
   #e;
   #t;
   #n;
@@ -10607,8 +10631,8 @@ class su extends re {
     return this.#n;
   }
 }
-customElements.get("tradex-scale") || window.customElements.define("tradex-scale", su);
-const nu = `
+customElements.get("tradex-scale") || window.customElements.define("tradex-scale", nu);
+const ru = `
 <style>
   tradex-tools {
     position: absolute; 
@@ -10636,8 +10660,8 @@ const nu = `
 <tradex-main></tradex-main>
 <tradex-scale></tradex-scale>
 `, co = document.createElement("template");
-co.innerHTML = nu;
-class ru extends re {
+co.innerHTML = ru;
+class ou extends oe {
   #e;
   #t;
   #n;
@@ -10696,7 +10720,7 @@ class ru extends re {
     this.setYAxisLocation();
   }
 }
-customElements.get("tradex-body") || window.customElements.define("tradex-body", ru);
+customElements.get("tradex-body") || window.customElements.define("tradex-body", ou);
 const uo = document.createElement("template");
 uo.innerHTML = `
   <style>
@@ -10708,7 +10732,7 @@ uo.innerHTML = `
   <div class="utilsOptions">
   </div>
 `;
-class ou extends re {
+class au extends oe {
   constructor() {
     super(uo);
   }
@@ -10739,20 +10763,20 @@ class ou extends re {
     `;
   }
 }
-customElements.get("tradex-utils") || window.customElements.define("tradex-utils", ou);
+customElements.get("tradex-utils") || window.customElements.define("tradex-utils", au);
 const mo = document.createElement("template");
 mo.innerHTML = `
   <slot name="widget"></slot>
 `;
-class au extends re {
+class lu extends oe {
   constructor() {
     super(mo);
   }
   destroy() {
   }
 }
-customElements.get("tradex-widgets") || window.customElements.define("tradex-widgets", au);
-const lu = `
+customElements.get("tradex-widgets") || window.customElements.define("tradex-widgets", lu);
+const hu = `
   <style title="core">
     :host {
       position: relative;
@@ -10779,12 +10803,12 @@ const lu = `
   <tradex-body></tradex-body>
   <tradex-widgets></tradex-widgets>
 `;
-class hu extends re {
+class cu extends oe {
   #e;
   #t;
   #n;
   #r;
-  #i = Ei;
+  #i = Si;
   #s = st;
   #l;
   #o;
@@ -10794,7 +10818,7 @@ class hu extends re {
   #d;
   constructor() {
     const e = document.createElement("template");
-    e.innerHTML = lu, super(e, "closed"), this.#r = e;
+    e.innerHTML = hu, super(e, "closed"), this.#r = e;
   }
   destroy() {
     this.resizeObserver.disconnect();
@@ -10806,7 +10830,7 @@ class hu extends re {
     if (this.doInit) {
       this.doInit = !1, this.shadowRoot.appendChild(this.#r.content.cloneNode(!0)), this.style.display = "block", this.style.minHeight = Nr, this.elWidgetsG = this.shadowRoot.querySelector("tradex-widgets"), this.elUtils = this.shadowRoot.querySelector("tradex-utils"), this.elBody = this.shadowRoot.querySelector("tradex-body"), this.elMain = this.elBody.main, this.elTime = this.elBody.main.time, this.elTools = this.elBody.tools, this.elYAxis = this.elBody.scale;
       let e = this.getAttribute("height") || "100%", i = this.getAttribute("width") || "100%";
-      this.setDimensions(i, e), this.resizeObserver = new ResizeObserver(Re(this.onResized, 100, this)), this.resizeObserver.observe(this);
+      this.setDimensions(i, e), this.resizeObserver = new ResizeObserver(ke(this.onResized, 100, this)), this.resizeObserver.observe(this);
     }
   }
   disconnectedCallback() {
@@ -10830,7 +10854,7 @@ class hu extends re {
     return this.getAttribute("id");
   }
   set id(e) {
-    this.setAttribute("id", He(e));
+    this.setAttribute("id", $e(e));
   }
   get disabled() {
     return this.hasAttribute("disabled");
@@ -10868,10 +10892,10 @@ class hu extends re {
     this.#i = i, this.#s = s, this.#d = e[0], this.log(`onResize w: ${i}, h: ${s}`), this.emit("global_resize", { w: i, h: s }), this.MainPane instanceof Qr, this.ToolsBar instanceof eo && this.ToolsBar.onResized();
   }
   setWidth(e) {
-    T(e) ? (this.#i = e, e += "px") : S(e) || (this.#i = this.parentElement.getBoundingClientRect().width, e = this.#i + "px"), this.style.width = e;
+    T(e) ? (this.#i = e, e += "px") : E(e) || (this.#i = this.parentElement.getBoundingClientRect().width, e = this.#i + "px"), this.style.width = e;
   }
   setHeight(e) {
-    T(e) ? (this.#s = e, e += "px") : S(e) || (this.#s = this.parentElement.getBoundingClientRect().height, w = this.#s + "px"), this.style.height = e;
+    T(e) ? (this.#s = e, e += "px") : E(e) || (this.#s = this.parentElement.getBoundingClientRect().height, w = this.#s + "px"), this.style.height = e;
   }
   setWidthMin(e) {
     this.style.minWidth = `var(--txc-min-width, ${e})`;
@@ -10886,18 +10910,18 @@ class hu extends re {
     this.style.minHeight = `var(--txc-max-height, ${w})`;
   }
   setDimensions(e, i) {
-    let s, n = this.width, r = this.height;
+    let s, n = this.width, o = this.height;
     if (!e || !i) {
-      const a = this.getBoundingClientRect(), h = this.parentElement.getBoundingClientRect();
-      i = a.height ? a.height : h.height ? h.height : st, e = a.width ? a.width : h.width ? h.width : Ei;
+      const a = this.getBoundingClientRect(), l = this.parentElement.getBoundingClientRect();
+      i = a.height ? a.height : l.height ? l.height : st, e = a.width ? a.width : l.width ? l.width : Si;
     }
     return s = {
       width: this.width,
       height: this.height,
       resizeW: e / n,
-      resizeH: i / r,
+      resizeH: i / o,
       resizeWDiff: e - n,
-      resizeHDiff: i - r
+      resizeHDiff: i - o
     }, this.setWidth(e), this.setHeight(i), s;
   }
   setUtilsLocation(e = this.#h?.utils?.location) {
@@ -10912,24 +10936,24 @@ class hu extends re {
     }
   }
 }
-const cu = [
+const uu = [
   {
     id: "indicators",
     name: "Indicators",
-    icon: ql,
+    icon: Xl,
     event: "utils_indicators",
     sub: []
   },
   {
     id: "timezone",
     name: "Timezone",
-    icon: Xl,
+    icon: Kl,
     event: "utils_timezone"
   },
   {
     id: "screenshot",
     name: "Screenshot",
-    icon: Yl,
+    icon: ql,
     event: "utils_screenshot"
   },
   {
@@ -10938,7 +10962,7 @@ const cu = [
     icon: Lr,
     event: "utils_settings"
   }
-], uu = {
+], du = {
   name: "ACCBANDS",
   camelCaseName: "accBands",
   group: "Overlap Studies",
@@ -10977,7 +11001,7 @@ const cu = [
     type: "number",
     plot: "limit_lower"
   }]
-}, du = {
+}, mu = {
   name: "ACOS",
   camelCaseName: "acos",
   group: "Math Transform",
@@ -10992,7 +11016,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, mu = {
+}, pu = {
   name: "AD",
   camelCaseName: "ad",
   group: "Volume Indicators",
@@ -11016,7 +11040,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, pu = {
+}, gu = {
   name: "ADD",
   camelCaseName: "add",
   group: "Math Operators",
@@ -11034,7 +11058,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, gu = {
+}, fu = {
   name: "ADOSC",
   camelCaseName: "adOsc",
   group: "Volume Indicators",
@@ -11078,7 +11102,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, fu = {
+}, yu = {
   name: "ADX",
   camelCaseName: "adx",
   group: "Momentum Indicators",
@@ -11109,7 +11133,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, yu = {
+}, vu = {
   name: "ADXR",
   camelCaseName: "adxr",
   group: "Momentum Indicators",
@@ -11140,7 +11164,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, vu = {
+}, wu = {
   name: "APO",
   camelCaseName: "apo",
   group: "Momentum Indicators",
@@ -11213,7 +11237,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, wu = {
+}, xu = {
   name: "AROONOSC",
   camelCaseName: "aroonOsc",
   group: "Momentum Indicators",
@@ -11241,7 +11265,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, xu = {
+}, bu = {
   name: "ASIN",
   camelCaseName: "asin",
   group: "Math Transform",
@@ -11256,7 +11280,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, bu = {
+}, Cu = {
   name: "ATAN",
   camelCaseName: "atan",
   group: "Math Transform",
@@ -11271,7 +11295,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Cu = {
+}, Tu = {
   name: "ATR",
   camelCaseName: "atr",
   group: "Volatility Indicators",
@@ -11302,7 +11326,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Tu = {
+}, Eu = {
   name: "AVGDEV",
   camelCaseName: "avgDev",
   group: "Price Transform",
@@ -11410,7 +11434,7 @@ const cu = [
     type: "number",
     plot: "limit_lower"
   }]
-}, Eu = {
+}, Pu = {
   name: "BETA",
   camelCaseName: "beta",
   group: "Statistic Functions",
@@ -11438,7 +11462,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Pu = {
+}, Mu = {
   name: "BOP",
   camelCaseName: "bop",
   group: "Momentum Indicators",
@@ -11462,7 +11486,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Mu = {
+}, Au = {
   name: "CCI",
   camelCaseName: "cci",
   group: "Momentum Indicators",
@@ -11493,7 +11517,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Au = {
+}, Lu = {
   name: "CDL2CROWS",
   camelCaseName: "cdl2Crows",
   group: "Pattern Recognition",
@@ -11517,7 +11541,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Lu = {
+}, Nu = {
   name: "CDL3BLACKCROWS",
   camelCaseName: "cdl3BlackCrows",
   group: "Pattern Recognition",
@@ -11541,7 +11565,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Nu = {
+}, Iu = {
   name: "CDL3INSIDE",
   camelCaseName: "cdl3Inside",
   group: "Pattern Recognition",
@@ -11565,7 +11589,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Iu = {
+}, Du = {
   name: "CDL3LINESTRIKE",
   camelCaseName: "cdl3LineStrike",
   group: "Pattern Recognition",
@@ -11589,7 +11613,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Du = {
+}, Ou = {
   name: "CDL3OUTSIDE",
   camelCaseName: "cdl3Outside",
   group: "Pattern Recognition",
@@ -11613,7 +11637,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Ou = {
+}, Ru = {
   name: "CDL3STARSINSOUTH",
   camelCaseName: "cdl3StarsInSouth",
   group: "Pattern Recognition",
@@ -11637,7 +11661,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Ru = {
+}, ku = {
   name: "CDL3WHITESOLDIERS",
   camelCaseName: "cdl3WhiteSoldiers",
   group: "Pattern Recognition",
@@ -11661,7 +11685,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, ku = {
+}, _u = {
   name: "CDLABANDONEDBABY",
   camelCaseName: "cdlAbandonedBaby",
   group: "Pattern Recognition",
@@ -11695,7 +11719,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, _u = {
+}, Hu = {
   name: "CDLADVANCEBLOCK",
   camelCaseName: "cdlAdvanceBlock",
   group: "Pattern Recognition",
@@ -11719,7 +11743,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Hu = {
+}, $u = {
   name: "CDLBELTHOLD",
   camelCaseName: "cdlBeltHold",
   group: "Pattern Recognition",
@@ -11743,7 +11767,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, $u = {
+}, Uu = {
   name: "CDLBREAKAWAY",
   camelCaseName: "cdlBreakaway",
   group: "Pattern Recognition",
@@ -11791,7 +11815,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Uu = {
+}, Vu = {
   name: "CDLCONCEALBABYSWALL",
   camelCaseName: "cdlConcealBabysWall",
   group: "Pattern Recognition",
@@ -11815,7 +11839,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Vu = {
+}, zu = {
   name: "CDLCOUNTERATTACK",
   camelCaseName: "cdlCounterAttack",
   group: "Pattern Recognition",
@@ -11839,7 +11863,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, zu = {
+}, Wu = {
   name: "CDLDARKCLOUDCOVER",
   camelCaseName: "cdlDarkCloudCover",
   group: "Pattern Recognition",
@@ -11873,7 +11897,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Wu = {
+}, Fu = {
   name: "CDLDOJI",
   camelCaseName: "cdlDoji",
   group: "Pattern Recognition",
@@ -11897,7 +11921,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Fu = {
+}, Gu = {
   name: "CDLDOJISTAR",
   camelCaseName: "cdlDojiStar",
   group: "Pattern Recognition",
@@ -11921,7 +11945,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Gu = {
+}, Yu = {
   name: "CDLDRAGONFLYDOJI",
   camelCaseName: "cdlDragonflyDoji",
   group: "Pattern Recognition",
@@ -11945,7 +11969,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Yu = {
+}, qu = {
   name: "CDLENGULFING",
   camelCaseName: "cdlEngulfing",
   group: "Pattern Recognition",
@@ -11969,7 +11993,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, qu = {
+}, Xu = {
   name: "CDLEVENINGDOJISTAR",
   camelCaseName: "cdlEveningDojiStar",
   group: "Pattern Recognition",
@@ -12003,7 +12027,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Xu = {
+}, Ku = {
   name: "CDLEVENINGSTAR",
   camelCaseName: "cdlEveningStar",
   group: "Pattern Recognition",
@@ -12037,7 +12061,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Ku = {
+}, ju = {
   name: "CDLGAPSIDESIDEWHITE",
   camelCaseName: "cdlGapSideSideWhite",
   group: "Pattern Recognition",
@@ -12061,7 +12085,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, ju = {
+}, Zu = {
   name: "CDLGRAVESTONEDOJI",
   camelCaseName: "cdlGravestoneDoji",
   group: "Pattern Recognition",
@@ -12085,7 +12109,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Zu = {
+}, Ju = {
   name: "CDLHAMMER",
   camelCaseName: "cdlHammer",
   group: "Pattern Recognition",
@@ -12109,7 +12133,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Ju = {
+}, Qu = {
   name: "CDLHANGINGMAN",
   camelCaseName: "cdlHangingMan",
   group: "Pattern Recognition",
@@ -12133,7 +12157,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Qu = {
+}, ed = {
   name: "CDLHARAMI",
   camelCaseName: "cdlHarami",
   group: "Pattern Recognition",
@@ -12157,7 +12181,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, ed = {
+}, td = {
   name: "CDLHARAMICROSS",
   camelCaseName: "cdlHaramiCross",
   group: "Pattern Recognition",
@@ -12181,7 +12205,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, td = {
+}, sd = {
   name: "CDLHIGHWAVE",
   camelCaseName: "cdlHignWave",
   group: "Pattern Recognition",
@@ -12205,7 +12229,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, sd = {
+}, nd = {
   name: "CDLHIKKAKE",
   camelCaseName: "cdlHikkake",
   group: "Pattern Recognition",
@@ -12229,7 +12253,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, nd = {
+}, rd = {
   name: "CDLHIKKAKEMOD",
   camelCaseName: "cdlHikkakeMod",
   group: "Pattern Recognition",
@@ -12253,7 +12277,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, rd = {
+}, od = {
   name: "CDLHOMINGPIGEON",
   camelCaseName: "cdlHomingPigeon",
   group: "Pattern Recognition",
@@ -12277,7 +12301,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, od = {
+}, ad = {
   name: "CDLIDENTICAL3CROWS",
   camelCaseName: "cdlIdentical3Crows",
   group: "Pattern Recognition",
@@ -12301,7 +12325,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, ad = {
+}, ld = {
   name: "CDLINNECK",
   camelCaseName: "cdlInNeck",
   group: "Pattern Recognition",
@@ -12325,7 +12349,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, ld = {
+}, hd = {
   name: "CDLINVERTEDHAMMER",
   camelCaseName: "cdlInvertedHammer",
   group: "Pattern Recognition",
@@ -12349,7 +12373,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, hd = {
+}, cd = {
   name: "CDLKICKING",
   camelCaseName: "cdlKicking",
   group: "Pattern Recognition",
@@ -12373,7 +12397,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, cd = {
+}, ud = {
   name: "CDLKICKINGBYLENGTH",
   camelCaseName: "cdlKickingByLength",
   group: "Pattern Recognition",
@@ -12397,7 +12421,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, ud = {
+}, dd = {
   name: "CDLLADDERBOTTOM",
   camelCaseName: "cdlLadderBottom",
   group: "Pattern Recognition",
@@ -12421,7 +12445,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, dd = {
+}, md = {
   name: "CDLLONGLEGGEDDOJI",
   camelCaseName: "cdlLongLeggedDoji",
   group: "Pattern Recognition",
@@ -12445,7 +12469,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, md = {
+}, pd = {
   name: "CDLLONGLINE",
   camelCaseName: "cdlLongLine",
   group: "Pattern Recognition",
@@ -12469,7 +12493,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, pd = {
+}, gd = {
   name: "CDLMARUBOZU",
   camelCaseName: "cdlMarubozu",
   group: "Pattern Recognition",
@@ -12493,7 +12517,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, gd = {
+}, fd = {
   name: "CDLMATCHINGLOW",
   camelCaseName: "cdlMatchingLow",
   group: "Pattern Recognition",
@@ -12517,7 +12541,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, fd = {
+}, yd = {
   name: "CDLMATHOLD",
   camelCaseName: "cdlMatHold",
   group: "Pattern Recognition",
@@ -12551,7 +12575,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, yd = {
+}, vd = {
   name: "CDLMORNINGDOJISTAR",
   camelCaseName: "cdlMorningDojiStar",
   group: "Pattern Recognition",
@@ -12585,7 +12609,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, vd = {
+}, wd = {
   name: "CDLMORNINGSTAR",
   camelCaseName: "cdlMorningStar",
   group: "Pattern Recognition",
@@ -12619,7 +12643,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, wd = {
+}, xd = {
   name: "CDLONNECK",
   camelCaseName: "cdlOnNeck",
   group: "Pattern Recognition",
@@ -12643,7 +12667,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, xd = {
+}, bd = {
   name: "CDLPIERCING",
   camelCaseName: "cdlPiercing",
   group: "Pattern Recognition",
@@ -12667,7 +12691,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, bd = {
+}, Cd = {
   name: "CDLRICKSHAWMAN",
   camelCaseName: "cdlRickshawMan",
   group: "Pattern Recognition",
@@ -12691,7 +12715,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Cd = {
+}, Td = {
   name: "CDLRISEFALL3METHODS",
   camelCaseName: "cdlRiseFall3Methods",
   group: "Pattern Recognition",
@@ -12715,7 +12739,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Td = {
+}, Ed = {
   name: "CDLSEPARATINGLINES",
   camelCaseName: "cdlSeperatingLines",
   group: "Pattern Recognition",
@@ -12763,7 +12787,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Ed = {
+}, Pd = {
   name: "CDLSHORTLINE",
   camelCaseName: "cdlShortLine",
   group: "Pattern Recognition",
@@ -12787,7 +12811,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Pd = {
+}, Md = {
   name: "CDLSPINNINGTOP",
   camelCaseName: "cdlSpinningTop",
   group: "Pattern Recognition",
@@ -12811,7 +12835,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Md = {
+}, Ad = {
   name: "CDLSTALLEDPATTERN",
   camelCaseName: "cdlStalledPattern",
   group: "Pattern Recognition",
@@ -12835,7 +12859,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Ad = {
+}, Ld = {
   name: "CDLSTICKSANDWICH",
   camelCaseName: "cdlStickSandwhich",
   group: "Pattern Recognition",
@@ -12859,7 +12883,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Ld = {
+}, Nd = {
   name: "CDLTAKURI",
   camelCaseName: "cdlTakuri",
   group: "Pattern Recognition",
@@ -12883,7 +12907,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Nd = {
+}, Id = {
   name: "CDLTASUKIGAP",
   camelCaseName: "cdlTasukiGap",
   group: "Pattern Recognition",
@@ -12907,7 +12931,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Id = {
+}, Dd = {
   name: "CDLTHRUSTING",
   camelCaseName: "cdlThrusting",
   group: "Pattern Recognition",
@@ -12931,7 +12955,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Dd = {
+}, Od = {
   name: "CDLTRISTAR",
   camelCaseName: "cdlTristar",
   group: "Pattern Recognition",
@@ -12955,7 +12979,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Od = {
+}, Rd = {
   name: "CDLUNIQUE3RIVER",
   camelCaseName: "cdlUnique3River",
   group: "Pattern Recognition",
@@ -12979,7 +13003,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Rd = {
+}, kd = {
   name: "CDLUPSIDEGAP2CROWS",
   camelCaseName: "cdlUpsideGap2Crows",
   group: "Pattern Recognition",
@@ -13003,7 +13027,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, kd = {
+}, _d = {
   name: "CDLXSIDEGAP3METHODS",
   camelCaseName: "cdlXSideGap3Methods",
   group: "Pattern Recognition",
@@ -13027,7 +13051,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, _d = {
+}, Hd = {
   name: "CEIL",
   camelCaseName: "ceil",
   group: "Math Transform",
@@ -13042,7 +13066,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Hd = {
+}, $d = {
   name: "CMO",
   camelCaseName: "cmo",
   group: "Momentum Indicators",
@@ -13067,7 +13091,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, $d = {
+}, Ud = {
   name: "CORREL",
   camelCaseName: "correl",
   group: "Statistic Functions",
@@ -13110,7 +13134,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Ud = {
+}, Vd = {
   name: "COSH",
   camelCaseName: "cosh",
   group: "Math Transform",
@@ -13125,7 +13149,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Vd = {
+}, zd = {
   name: "DEMA",
   camelCaseName: "dema",
   group: "Overlap Studies",
@@ -13150,7 +13174,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, zd = {
+}, Wd = {
   name: "DIV",
   camelCaseName: "div",
   group: "Math Operators",
@@ -13168,7 +13192,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Wd = {
+}, Fd = {
   name: "DX",
   camelCaseName: "dx",
   group: "Momentum Indicators",
@@ -13224,7 +13248,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Fd = {
+}, Gd = {
   name: "EXP",
   camelCaseName: "exp",
   group: "Math Transform",
@@ -13239,7 +13263,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Gd = {
+}, Yd = {
   name: "FLOOR",
   camelCaseName: "floor",
   group: "Math Transform",
@@ -13254,7 +13278,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Yd = {
+}, qd = {
   name: "HT_DCPERIOD",
   camelCaseName: "htDcPeriod",
   group: "Cycle Indicators",
@@ -13269,7 +13293,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, qd = {
+}, Xd = {
   name: "HT_DCPHASE",
   camelCaseName: "htDcPhase",
   group: "Cycle Indicators",
@@ -13284,7 +13308,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Xd = {
+}, Kd = {
   name: "HT_PHASOR",
   camelCaseName: "htPhasor",
   group: "Cycle Indicators",
@@ -13303,7 +13327,7 @@ const cu = [
     type: "number",
     plot: "line_dash"
   }]
-}, Kd = {
+}, jd = {
   name: "HT_SINE",
   camelCaseName: "htSine",
   group: "Cycle Indicators",
@@ -13322,7 +13346,7 @@ const cu = [
     type: "number",
     plot: "line_dash"
   }]
-}, jd = {
+}, Zd = {
   name: "HT_TRENDLINE",
   camelCaseName: "htTrendline",
   group: "Overlap Studies",
@@ -13337,7 +13361,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Zd = {
+}, Jd = {
   name: "HT_TRENDMODE",
   camelCaseName: "htTrendMode",
   group: "Cycle Indicators",
@@ -13352,7 +13376,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Jd = {
+}, Qd = {
   name: "IMI",
   camelCaseName: "imi",
   group: "Momentum Indicators",
@@ -13380,7 +13404,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Qd = {
+}, e0 = {
   name: "KAMA",
   camelCaseName: "kama",
   group: "Overlap Studies",
@@ -13405,7 +13429,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, e0 = {
+}, t0 = {
   name: "LINEARREG",
   camelCaseName: "linearReg",
   group: "Statistic Functions",
@@ -13430,7 +13454,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, t0 = {
+}, i0 = {
   name: "LINEARREG_ANGLE",
   camelCaseName: "linearRegAngle",
   group: "Statistic Functions",
@@ -13455,7 +13479,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, i0 = {
+}, s0 = {
   name: "LINEARREG_INTERCEPT",
   camelCaseName: "linearRegIntercept",
   group: "Statistic Functions",
@@ -13480,7 +13504,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, s0 = {
+}, n0 = {
   name: "LINEARREG_SLOPE",
   camelCaseName: "linearRegSlope",
   group: "Statistic Functions",
@@ -13505,7 +13529,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, n0 = {
+}, r0 = {
   name: "LN",
   camelCaseName: "ln",
   group: "Math Transform",
@@ -13520,7 +13544,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, r0 = {
+}, o0 = {
   name: "LOG10",
   camelCaseName: "log10",
   group: "Math Transform",
@@ -13535,7 +13559,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, o0 = {
+}, a0 = {
   name: "MA",
   camelCaseName: "movingAverage",
   group: "Overlap Studies",
@@ -13566,7 +13590,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, a0 = {
+}, l0 = {
   name: "MACD",
   camelCaseName: "macd",
   group: "Momentum Indicators",
@@ -13619,7 +13643,7 @@ const cu = [
     type: "number",
     plot: "histogram"
   }]
-}, l0 = {
+}, h0 = {
   name: "MACDEXT",
   camelCaseName: "macdExt",
   group: "Momentum Indicators",
@@ -13690,7 +13714,7 @@ const cu = [
     type: "number",
     plot: "histogram"
   }]
-}, h0 = {
+}, c0 = {
   name: "MACDFIX",
   camelCaseName: "macdFix",
   group: "Momentum Indicators",
@@ -13723,7 +13747,7 @@ const cu = [
     type: "number",
     plot: "histogram"
   }]
-}, c0 = {
+}, u0 = {
   name: "MAMA",
   camelCaseName: "mama",
   group: "Overlap Studies",
@@ -13762,7 +13786,7 @@ const cu = [
     type: "number",
     plot: "line_dash"
   }]
-}, u0 = {
+}, d0 = {
   name: "MAVP",
   camelCaseName: "movingAverageVariablePeriod",
   group: "Overlap Studies",
@@ -13806,7 +13830,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, d0 = {
+}, m0 = {
   name: "MAX",
   camelCaseName: "max",
   group: "Math Operators",
@@ -13831,7 +13855,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, m0 = {
+}, p0 = {
   name: "MAXINDEX",
   camelCaseName: "maxIndex",
   group: "Math Operators",
@@ -13856,7 +13880,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, p0 = {
+}, g0 = {
   name: "MEDPRICE",
   camelCaseName: "medPrice",
   group: "Price Transform",
@@ -13874,7 +13898,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, g0 = {
+}, f0 = {
   name: "MFI",
   camelCaseName: "mfi",
   group: "Momentum Indicators",
@@ -13908,7 +13932,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, f0 = {
+}, y0 = {
   name: "MIDPOINT",
   camelCaseName: "midPoint",
   group: "Overlap Studies",
@@ -13933,7 +13957,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, y0 = {
+}, v0 = {
   name: "MIDPRICE",
   camelCaseName: "midPrice",
   group: "Overlap Studies",
@@ -13961,7 +13985,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, v0 = {
+}, w0 = {
   name: "MIN",
   camelCaseName: "min",
   group: "Math Operators",
@@ -13986,7 +14010,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, w0 = {
+}, x0 = {
   name: "MININDEX",
   camelCaseName: "minIndex",
   group: "Math Operators",
@@ -14011,7 +14035,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, x0 = {
+}, b0 = {
   name: "MINMAX",
   camelCaseName: "minMax",
   group: "Math Operators",
@@ -14040,7 +14064,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, b0 = {
+}, C0 = {
   name: "MINMAXINDEX",
   camelCaseName: "minMaxIndex",
   group: "Math Operators",
@@ -14069,7 +14093,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, C0 = {
+}, T0 = {
   name: "MINUS_DI",
   camelCaseName: "minusDI",
   group: "Momentum Indicators",
@@ -14100,7 +14124,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, T0 = {
+}, E0 = {
   name: "MINUS_DM",
   camelCaseName: "minusDM",
   group: "Momentum Indicators",
@@ -14153,7 +14177,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, E0 = {
+}, P0 = {
   name: "MULT",
   camelCaseName: "mult",
   group: "Math Operators",
@@ -14171,7 +14195,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, P0 = {
+}, M0 = {
   name: "NATR",
   camelCaseName: "natr",
   group: "Volatility Indicators",
@@ -14202,7 +14226,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, M0 = {
+}, A0 = {
   name: "OBV",
   camelCaseName: "obv",
   group: "Volume Indicators",
@@ -14220,7 +14244,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, A0 = {
+}, L0 = {
   name: "PLUS_DI",
   camelCaseName: "plusDI",
   group: "Momentum Indicators",
@@ -14251,7 +14275,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, L0 = {
+}, N0 = {
   name: "PLUS_DM",
   camelCaseName: "plusDM",
   group: "Momentum Indicators",
@@ -14279,7 +14303,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, N0 = {
+}, I0 = {
   name: "PPO",
   camelCaseName: "ppo",
   group: "Momentum Indicators",
@@ -14320,7 +14344,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, I0 = {
+}, D0 = {
   name: "ROC",
   camelCaseName: "roc",
   group: "Momentum Indicators",
@@ -14345,7 +14369,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, D0 = {
+}, O0 = {
   name: "ROCP",
   camelCaseName: "rocP",
   group: "Momentum Indicators",
@@ -14370,7 +14394,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, O0 = {
+}, R0 = {
   name: "ROCR",
   camelCaseName: "rocR",
   group: "Momentum Indicators",
@@ -14395,7 +14419,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, R0 = {
+}, k0 = {
   name: "ROCR100",
   camelCaseName: "rocR100",
   group: "Momentum Indicators",
@@ -14445,7 +14469,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, k0 = {
+}, _0 = {
   name: "SAR",
   camelCaseName: "sar",
   group: "Overlap Studies",
@@ -14483,7 +14507,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, _0 = {
+}, H0 = {
   name: "SAREXT",
   camelCaseName: "sarExt",
   group: "Overlap Studies",
@@ -14581,7 +14605,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, H0 = {
+}, $0 = {
   name: "SIN",
   camelCaseName: "sin",
   group: "Math Transform",
@@ -14596,7 +14620,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, $0 = {
+}, U0 = {
   name: "SINH",
   camelCaseName: "sinh",
   group: "Math Transform",
@@ -14651,7 +14675,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, U0 = {
+}, V0 = {
   name: "STDDEV",
   camelCaseName: "stdDev",
   group: "Statistic Functions",
@@ -14753,7 +14777,7 @@ const cu = [
     type: "number",
     plot: "line_dash"
   }]
-}, V0 = {
+}, z0 = {
   name: "STOCHF",
   camelCaseName: "stochF",
   group: "Momentum Indicators",
@@ -14804,7 +14828,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, z0 = {
+}, W0 = {
   name: "STOCHRSI",
   camelCaseName: "stochRsi",
   group: "Momentum Indicators",
@@ -14859,7 +14883,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, W0 = {
+}, F0 = {
   name: "SUB",
   camelCaseName: "sub",
   group: "Math Operators",
@@ -14877,7 +14901,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, F0 = {
+}, G0 = {
   name: "SUM",
   camelCaseName: "sum",
   group: "Math Operators",
@@ -14902,7 +14926,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, G0 = {
+}, Y0 = {
   name: "T3",
   camelCaseName: "t3",
   group: "Overlap Studies",
@@ -14937,7 +14961,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Y0 = {
+}, q0 = {
   name: "TAN",
   camelCaseName: "tan",
   group: "Math Transform",
@@ -14952,7 +14976,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, q0 = {
+}, X0 = {
   name: "TANH",
   camelCaseName: "tanh",
   group: "Math Transform",
@@ -14967,7 +14991,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, X0 = {
+}, K0 = {
   name: "TEMA",
   camelCaseName: "tema",
   group: "Overlap Studies",
@@ -14992,7 +15016,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, K0 = {
+}, j0 = {
   name: "TRANGE",
   camelCaseName: "trueRange",
   group: "Volatility Indicators",
@@ -15013,7 +15037,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, j0 = {
+}, Z0 = {
   name: "TRIMA",
   camelCaseName: "trima",
   group: "Overlap Studies",
@@ -15038,7 +15062,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Z0 = {
+}, J0 = {
   name: "TRIX",
   camelCaseName: "trix",
   group: "Momentum Indicators",
@@ -15063,7 +15087,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, J0 = {
+}, Q0 = {
   name: "TSF",
   camelCaseName: "tsf",
   group: "Statistic Functions",
@@ -15088,7 +15112,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, Q0 = {
+}, em = {
   name: "TYPPRICE",
   camelCaseName: "typPrice",
   group: "Price Transform",
@@ -15109,7 +15133,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, em = {
+}, tm = {
   name: "ULTOSC",
   camelCaseName: "ultOsc",
   group: "Momentum Indicators",
@@ -15160,7 +15184,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, tm = {
+}, im = {
   name: "VAR",
   camelCaseName: "variance",
   group: "Statistic Functions",
@@ -15195,7 +15219,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, im = {
+}, sm = {
   name: "WCLPRICE",
   camelCaseName: "wclPrice",
   group: "Price Transform",
@@ -15216,7 +15240,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, sm = {
+}, nm = {
   name: "WILLR",
   camelCaseName: "willR",
   group: "Momentum Indicators",
@@ -15247,7 +15271,7 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, nm = {
+}, rm = {
   name: "WMA",
   camelCaseName: "wma",
   group: "Overlap Studies",
@@ -15272,170 +15296,170 @@ const cu = [
     type: "number",
     plot: "line"
   }]
-}, dm = {
-  ACCBANDS: uu,
-  ACOS: du,
-  AD: mu,
-  ADD: pu,
-  ADOSC: gu,
-  ADX: fu,
-  ADXR: yu,
-  APO: vu,
+}, mm = {
+  ACCBANDS: du,
+  ACOS: mu,
+  AD: pu,
+  ADD: gu,
+  ADOSC: fu,
+  ADX: yu,
+  ADXR: vu,
+  APO: wu,
   AROON: po,
-  AROONOSC: wu,
-  ASIN: xu,
-  ATAN: bu,
-  ATR: Cu,
-  AVGDEV: Tu,
+  AROONOSC: xu,
+  ASIN: bu,
+  ATAN: Cu,
+  ATR: Tu,
+  AVGDEV: Eu,
   AVGPRICE: Su,
   BBANDS: go,
-  BETA: Eu,
-  BOP: Pu,
-  CCI: Mu,
-  CDL2CROWS: Au,
-  CDL3BLACKCROWS: Lu,
-  CDL3INSIDE: Nu,
-  CDL3LINESTRIKE: Iu,
-  CDL3OUTSIDE: Du,
-  CDL3STARSINSOUTH: Ou,
-  CDL3WHITESOLDIERS: Ru,
-  CDLABANDONEDBABY: ku,
-  CDLADVANCEBLOCK: _u,
-  CDLBELTHOLD: Hu,
-  CDLBREAKAWAY: $u,
+  BETA: Pu,
+  BOP: Mu,
+  CCI: Au,
+  CDL2CROWS: Lu,
+  CDL3BLACKCROWS: Nu,
+  CDL3INSIDE: Iu,
+  CDL3LINESTRIKE: Du,
+  CDL3OUTSIDE: Ou,
+  CDL3STARSINSOUTH: Ru,
+  CDL3WHITESOLDIERS: ku,
+  CDLABANDONEDBABY: _u,
+  CDLADVANCEBLOCK: Hu,
+  CDLBELTHOLD: $u,
+  CDLBREAKAWAY: Uu,
   CDLCLOSINGMARUBOZU: Bu,
-  CDLCONCEALBABYSWALL: Uu,
-  CDLCOUNTERATTACK: Vu,
-  CDLDARKCLOUDCOVER: zu,
-  CDLDOJI: Wu,
-  CDLDOJISTAR: Fu,
-  CDLDRAGONFLYDOJI: Gu,
-  CDLENGULFING: Yu,
-  CDLEVENINGDOJISTAR: qu,
-  CDLEVENINGSTAR: Xu,
-  CDLGAPSIDESIDEWHITE: Ku,
-  CDLGRAVESTONEDOJI: ju,
-  CDLHAMMER: Zu,
-  CDLHANGINGMAN: Ju,
-  CDLHARAMI: Qu,
-  CDLHARAMICROSS: ed,
-  CDLHIGHWAVE: td,
-  CDLHIKKAKE: sd,
-  CDLHIKKAKEMOD: nd,
-  CDLHOMINGPIGEON: rd,
-  CDLIDENTICAL3CROWS: od,
-  CDLINNECK: ad,
-  CDLINVERTEDHAMMER: ld,
-  CDLKICKING: hd,
-  CDLKICKINGBYLENGTH: cd,
-  CDLLADDERBOTTOM: ud,
-  CDLLONGLEGGEDDOJI: dd,
-  CDLLONGLINE: md,
-  CDLMARUBOZU: pd,
-  CDLMATCHINGLOW: gd,
-  CDLMATHOLD: fd,
-  CDLMORNINGDOJISTAR: yd,
-  CDLMORNINGSTAR: vd,
-  CDLONNECK: wd,
-  CDLPIERCING: xd,
-  CDLRICKSHAWMAN: bd,
-  CDLRISEFALL3METHODS: Cd,
-  CDLSEPARATINGLINES: Td,
+  CDLCONCEALBABYSWALL: Vu,
+  CDLCOUNTERATTACK: zu,
+  CDLDARKCLOUDCOVER: Wu,
+  CDLDOJI: Fu,
+  CDLDOJISTAR: Gu,
+  CDLDRAGONFLYDOJI: Yu,
+  CDLENGULFING: qu,
+  CDLEVENINGDOJISTAR: Xu,
+  CDLEVENINGSTAR: Ku,
+  CDLGAPSIDESIDEWHITE: ju,
+  CDLGRAVESTONEDOJI: Zu,
+  CDLHAMMER: Ju,
+  CDLHANGINGMAN: Qu,
+  CDLHARAMI: ed,
+  CDLHARAMICROSS: td,
+  CDLHIGHWAVE: sd,
+  CDLHIKKAKE: nd,
+  CDLHIKKAKEMOD: rd,
+  CDLHOMINGPIGEON: od,
+  CDLIDENTICAL3CROWS: ad,
+  CDLINNECK: ld,
+  CDLINVERTEDHAMMER: hd,
+  CDLKICKING: cd,
+  CDLKICKINGBYLENGTH: ud,
+  CDLLADDERBOTTOM: dd,
+  CDLLONGLEGGEDDOJI: md,
+  CDLLONGLINE: pd,
+  CDLMARUBOZU: gd,
+  CDLMATCHINGLOW: fd,
+  CDLMATHOLD: yd,
+  CDLMORNINGDOJISTAR: vd,
+  CDLMORNINGSTAR: wd,
+  CDLONNECK: xd,
+  CDLPIERCING: bd,
+  CDLRICKSHAWMAN: Cd,
+  CDLRISEFALL3METHODS: Td,
+  CDLSEPARATINGLINES: Ed,
   CDLSHOOTINGSTAR: Sd,
-  CDLSHORTLINE: Ed,
-  CDLSPINNINGTOP: Pd,
-  CDLSTALLEDPATTERN: Md,
-  CDLSTICKSANDWICH: Ad,
-  CDLTAKURI: Ld,
-  CDLTASUKIGAP: Nd,
-  CDLTHRUSTING: Id,
-  CDLTRISTAR: Dd,
-  CDLUNIQUE3RIVER: Od,
-  CDLUPSIDEGAP2CROWS: Rd,
-  CDLXSIDEGAP3METHODS: kd,
-  CEIL: _d,
-  CMO: Hd,
-  CORREL: $d,
+  CDLSHORTLINE: Pd,
+  CDLSPINNINGTOP: Md,
+  CDLSTALLEDPATTERN: Ad,
+  CDLSTICKSANDWICH: Ld,
+  CDLTAKURI: Nd,
+  CDLTASUKIGAP: Id,
+  CDLTHRUSTING: Dd,
+  CDLTRISTAR: Od,
+  CDLUNIQUE3RIVER: Rd,
+  CDLUPSIDEGAP2CROWS: kd,
+  CDLXSIDEGAP3METHODS: _d,
+  CEIL: Hd,
+  CMO: $d,
+  CORREL: Ud,
   COS: Bd,
-  COSH: Ud,
-  DEMA: Vd,
-  DIV: zd,
-  DX: Wd,
+  COSH: Vd,
+  DEMA: zd,
+  DIV: Wd,
+  DX: Fd,
   EMA: fo,
-  EXP: Fd,
-  FLOOR: Gd,
-  HT_DCPERIOD: Yd,
-  HT_DCPHASE: qd,
-  HT_PHASOR: Xd,
-  HT_SINE: Kd,
-  HT_TRENDLINE: jd,
-  HT_TRENDMODE: Zd,
-  IMI: Jd,
-  KAMA: Qd,
-  LINEARREG: e0,
-  LINEARREG_ANGLE: t0,
-  LINEARREG_INTERCEPT: i0,
-  LINEARREG_SLOPE: s0,
-  LN: n0,
-  LOG10: r0,
-  MA: o0,
-  MACD: a0,
-  MACDEXT: l0,
-  MACDFIX: h0,
-  MAMA: c0,
-  MAVP: u0,
-  MAX: d0,
-  MAXINDEX: m0,
-  MEDPRICE: p0,
-  MFI: g0,
-  MIDPOINT: f0,
-  MIDPRICE: y0,
-  MIN: v0,
-  MININDEX: w0,
-  MINMAX: x0,
-  MINMAXINDEX: b0,
-  MINUS_DI: C0,
-  MINUS_DM: T0,
+  EXP: Gd,
+  FLOOR: Yd,
+  HT_DCPERIOD: qd,
+  HT_DCPHASE: Xd,
+  HT_PHASOR: Kd,
+  HT_SINE: jd,
+  HT_TRENDLINE: Zd,
+  HT_TRENDMODE: Jd,
+  IMI: Qd,
+  KAMA: e0,
+  LINEARREG: t0,
+  LINEARREG_ANGLE: i0,
+  LINEARREG_INTERCEPT: s0,
+  LINEARREG_SLOPE: n0,
+  LN: r0,
+  LOG10: o0,
+  MA: a0,
+  MACD: l0,
+  MACDEXT: h0,
+  MACDFIX: c0,
+  MAMA: u0,
+  MAVP: d0,
+  MAX: m0,
+  MAXINDEX: p0,
+  MEDPRICE: g0,
+  MFI: f0,
+  MIDPOINT: y0,
+  MIDPRICE: v0,
+  MIN: w0,
+  MININDEX: x0,
+  MINMAX: b0,
+  MINMAXINDEX: C0,
+  MINUS_DI: T0,
+  MINUS_DM: E0,
   MOM: S0,
-  MULT: E0,
-  NATR: P0,
-  OBV: M0,
-  PLUS_DI: A0,
-  PLUS_DM: L0,
-  PPO: N0,
-  ROC: I0,
-  ROCP: D0,
-  ROCR: O0,
-  ROCR100: R0,
+  MULT: P0,
+  NATR: M0,
+  OBV: A0,
+  PLUS_DI: L0,
+  PLUS_DM: N0,
+  PPO: I0,
+  ROC: D0,
+  ROCP: O0,
+  ROCR: R0,
+  ROCR100: k0,
   RSI: yo,
-  SAR: k0,
-  SAREXT: _0,
-  SIN: H0,
-  SINH: $0,
+  SAR: _0,
+  SAREXT: H0,
+  SIN: $0,
+  SINH: U0,
   SMA: vo,
   SQRT: B0,
-  STDDEV: U0,
+  STDDEV: V0,
   STOCH: wo,
-  STOCHF: V0,
-  STOCHRSI: z0,
-  SUB: W0,
-  SUM: F0,
-  T3: G0,
-  TAN: Y0,
-  TANH: q0,
-  TEMA: X0,
-  TRANGE: K0,
-  TRIMA: j0,
-  TRIX: Z0,
-  TSF: J0,
-  TYPPRICE: Q0,
-  ULTOSC: em,
-  VAR: tm,
-  WCLPRICE: im,
-  WILLR: sm,
-  WMA: nm
+  STOCHF: z0,
+  STOCHRSI: W0,
+  SUB: F0,
+  SUM: G0,
+  T3: Y0,
+  TAN: q0,
+  TANH: X0,
+  TEMA: K0,
+  TRANGE: j0,
+  TRIMA: Z0,
+  TRIX: J0,
+  TSF: Q0,
+  TYPPRICE: em,
+  ULTOSC: tm,
+  VAR: im,
+  WCLPRICE: sm,
+  WILLR: nm,
+  WMA: rm
 };
-class $s extends _e {
+class $s extends He {
   name = "Aroon";
   shortName = "AROON";
   libName = "AROON";
@@ -15467,13 +15491,13 @@ class $s extends _e {
   static inCnt = 0;
   static primaryPane = !1;
   static scale = Ke[1];
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a);
-    const h = a.overlay;
-    this.id = a.overlay?.id || Z(this.shortName), this.defineIndicator(h?.settings, po), this.style = h?.settings?.style ? { ...this.#e, ...h.settings.style } : { ...this.#e, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (l) => {
-      this.newValue(l);
-    }, this.setUpdateValue = (l) => {
-      this.updateValue(l);
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a);
+    const l = a.overlay;
+    this.id = a.overlay?.id || Z(this.shortName), this.defineIndicator(l?.settings, po), this.style = l?.settings?.style ? { ...this.#e, ...l.settings.style } : { ...this.#e, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (h) => {
+      this.newValue(h);
+    }, this.setUpdateValue = (h) => {
+      this.updateValue(h);
     }, this.addLegend();
   }
   get primaryPane() {
@@ -15486,11 +15510,11 @@ class $s extends _e {
     if (this.overlay.data.length == 0)
       return !1;
     const i = {};
-    let s = [!1, !1], { c: n, colours: r } = super.legendInputs(e);
-    return i.Dn = this.scale.nicePrice(this.overlay.data[n][1]), i.Up = this.scale.nicePrice(this.overlay.data[n][2]), r = [
+    let s = [!1, !1], { c: n, colours: o } = super.legendInputs(e);
+    return i.Dn = this.scale.nicePrice(this.overlay.data[n][1]), i.Up = this.scale.nicePrice(this.overlay.data[n][2]), o = [
       this.style.downStroke,
       this.style.upStroke
-    ], { inputs: i, colours: r, labels: s };
+    ], { inputs: i, colours: o, labels: s };
   }
   draw(e = this.range) {
     if (this.overlay.data.length < 2)
@@ -15498,12 +15522,12 @@ class $s extends _e {
     if (!super.mustUpdate())
       return !1;
     this.scene.clear();
-    const i = { down: [], up: [] }, s = this.overlay.data, r = {
+    const i = { down: [], up: [] }, s = this.overlay.data, o = {
       w: this.xAxis.candleW
     };
-    let a = e.value(e.indexStart)[0], h = this.overlay.data[0][0], l = (a - h) / e.interval, m = this.Timeline.rangeScrollOffset, g = e.Length + m + 2, v = {};
+    let a = e.value(e.indexStart)[0], l = this.overlay.data[0][0], h = (a - l) / e.interval, m = this.Timeline.rangeScrollOffset, g = e.Length + m + 2, v = {};
     for (; g; )
-      l < 0 || l >= this.overlay.data.length ? (i.down.push({ x: null, y: null }), i.up.push({ x: null, y: null })) : (r.x = this.xAxis.xPos(s[l][0]), r.y = this.yAxis.yPos(s[l][1]), i.down.push({ ...r }), r.x = this.xAxis.xPos(s[l][0]), r.y = this.yAxis.yPos(s[l][2]), i.up.push({ ...r })), l++, g--;
+      h < 0 || h >= this.overlay.data.length ? (i.down.push({ x: null, y: null }), i.up.push({ x: null, y: null })) : (o.x = this.xAxis.xPos(s[h][0]), o.y = this.yAxis.yPos(s[h][1]), i.down.push({ ...o }), o.x = this.xAxis.xPos(s[h][0]), o.y = this.yAxis.yPos(s[h][2]), i.up.push({ ...o })), h++, g--;
     v = {
       width: this.style.LineWidth,
       stroke: this.style.downStroke,
@@ -15515,7 +15539,7 @@ class $s extends _e {
     }, this.plot(i.up, "renderLine", v), this.target.viewport.render(), super.updated();
   }
 }
-class Bs extends _e {
+class Us extends He {
   name = "Bollinger Bands";
   shortName = "BB";
   libName = "BBANDS";
@@ -15551,17 +15575,17 @@ class Bs extends _e {
   ];
   static inCnt = 0;
   static primaryPane = !0;
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a);
-    const h = a.overlay;
-    this.id = a.overlay?.id || Z(this.shortName), this.defineIndicator(h?.settings, go), this.style = h?.settings?.style ? { ...this.#e, ...h.settings.style } : { ...this.#e, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (l) => {
-      this.newValue(l);
-    }, this.setUpdateValue = (l) => {
-      this.updateValue(l);
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a);
+    const l = a.overlay;
+    this.id = a.overlay?.id || Z(this.shortName), this.defineIndicator(l?.settings, go), this.style = l?.settings?.style ? { ...this.#e, ...l.settings.style } : { ...this.#e, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (h) => {
+      this.newValue(h);
+    }, this.setUpdateValue = (h) => {
+      this.updateValue(h);
     }, this.addLegend();
   }
   get primaryPane() {
-    return Bs.primaryPane;
+    return Us.primaryPane;
   }
   get defaultStyle() {
     return this.#e;
@@ -15570,12 +15594,12 @@ class Bs extends _e {
     if (this.overlay.data.length == 0)
       return !1;
     const i = {};
-    let s = [!1, !1, !1], { c: n, colours: r } = super.legendInputs(e);
-    return i.Hi = this.scale.nicePrice(this.overlay.data[n][1]), i.Mid = this.scale.nicePrice(this.overlay.data[n][2]), i.Lo = this.scale.nicePrice(this.overlay.data[n][3]), r = [
+    let s = [!1, !1, !1], { c: n, colours: o } = super.legendInputs(e);
+    return i.Hi = this.scale.nicePrice(this.overlay.data[n][1]), i.Mid = this.scale.nicePrice(this.overlay.data[n][2]), i.Lo = this.scale.nicePrice(this.overlay.data[n][3]), o = [
       this.style.upperStroke,
       this.style.middleStroke,
       this.style.lowerStroke
-    ], { inputs: i, colours: r, labels: s };
+    ], { inputs: i, colours: o, labels: s };
   }
   draw(e = this.range) {
     if (this.overlay.data.length < 2)
@@ -15583,12 +15607,12 @@ class Bs extends _e {
     if (!super.mustUpdate())
       return !1;
     this.scene.clear();
-    const i = { lower: [], middle: [], upper: [] }, s = this.overlay.data, r = {
+    const i = { lower: [], middle: [], upper: [] }, s = this.overlay.data, o = {
       w: this.xAxis.candleW
     };
-    let a = e.value(e.indexStart)[0], h = this.overlay.data[0][0], l = (a - h) / e.interval, m = this.Timeline.rangeScrollOffset, g = e.Length + m * 2 + 2, v = {};
+    let a = e.value(e.indexStart)[0], l = this.overlay.data[0][0], h = (a - l) / e.interval, m = this.Timeline.rangeScrollOffset, g = e.Length + m * 2 + 2, v = {};
     for (; g; )
-      l < 0 || l >= this.overlay.data.length ? (i.lower.push({ x: null, y: null }), i.middle.push({ x: null, y: null }), i.upper.push({ x: null, y: null })) : (r.x = this.xAxis.xPos(s[l][0]), r.y = this.yAxis.yPos(s[l][1]), i.lower.push({ ...r }), r.x = this.xAxis.xPos(s[l][0]), r.y = this.yAxis.yPos(s[l][2]), i.middle.push({ ...r }), r.x = this.xAxis.xPos(s[l][0]), r.y = this.yAxis.yPos(s[l][3]), i.upper.push({ ...r })), l++, g--;
+      h < 0 || h >= this.overlay.data.length ? (i.lower.push({ x: null, y: null }), i.middle.push({ x: null, y: null }), i.upper.push({ x: null, y: null })) : (o.x = this.xAxis.xPos(s[h][0]), o.y = this.yAxis.yPos(s[h][1]), i.lower.push({ ...o }), o.x = this.xAxis.xPos(s[h][0]), o.y = this.yAxis.yPos(s[h][2]), i.middle.push({ ...o }), o.x = this.xAxis.xPos(s[h][0]), o.y = this.yAxis.yPos(s[h][3]), i.upper.push({ ...o })), h++, g--;
     v = {
       width: this.style.lowerLineWidth,
       stroke: this.style.lowerStroke,
@@ -15604,7 +15628,7 @@ class Bs extends _e {
     }, this.plot(i.upper, "renderLine", v), this.target.viewport.render(), super.updated();
   }
 }
-class Ni extends _e {
+class Ni extends He {
   name = "Exponential Moving Average";
   shortName = "EMA";
   libName = "EMA";
@@ -15635,13 +15659,13 @@ class Ni extends _e {
     "#66BB6A",
     "#66BB6A"
   ];
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a), Ni.inCnt++;
-    const h = a.overlay;
-    this.id = a.overlay?.id || Z(this.shortName), this.defineIndicator(h?.settings, fo), this.style = h?.settings?.style ? { ...this.#e, ...h.settings.style } : { ...this.#e, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (l) => {
-      this.newValue(l);
-    }, this.setUpdateValue = (l) => {
-      this.updateValue(l);
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a), Ni.inCnt++;
+    const l = a.overlay;
+    this.id = a.overlay?.id || Z(this.shortName), this.defineIndicator(l?.settings, fo), this.style = l?.settings?.style ? { ...this.#e, ...l.settings.style } : { ...this.#e, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (h) => {
+      this.newValue(h);
+    }, this.setUpdateValue = (h) => {
+      this.updateValue(h);
     }, this.addLegend();
   }
   get primaryPane() {
@@ -15667,16 +15691,16 @@ class Ni extends _e {
     this.scene.clear();
     const i = this.overlay.data, s = this.xAxis.candleW, n = [];
     this.xAxis.smoothScrollOffset;
-    const r = {
+    const o = {
       w: s
     };
-    let a = this.Timeline.rangeScrollOffset, h = e.data.length - this.overlay.data.length, l = e.indexStart - h - 2, m = e.Length + a * 2 + 2;
+    let a = this.Timeline.rangeScrollOffset, l = e.data.length - this.overlay.data.length, h = e.indexStart - l - 2, m = e.Length + a * 2 + 2;
     for (; m; )
-      l < 0 || l >= this.overlay.data.length ? n.push({ x: null, y: null }) : (r.x = this.xAxis.xPos(i[l][0]), r.y = this.yAxis.yPos(i[l][1]), n.push({ ...r })), l++, m--;
+      h < 0 || h >= this.overlay.data.length ? n.push({ x: null, y: null }) : (o.x = this.xAxis.xPos(i[h][0]), o.y = this.yAxis.yPos(i[h][1]), n.push({ ...o })), h++, m--;
     this.plot(n, "renderLine", this.style), this.target.viewport.render(), super.updated();
   }
 }
-class Us extends _e {
+class Bs extends He {
   name = "Relative Strength Index";
   shortName = "RSI";
   libName = "RSI";
@@ -15707,17 +15731,17 @@ class Us extends _e {
   static inCnt = 0;
   static primaryPane = !1;
   static scale = Ke[1];
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a);
-    const h = a.overlay;
-    this.id = a.overlay?.id || Z(this.shortName), this.defineIndicator(h?.settings, yo), this.style = h?.settings?.style ? { ...this.#e, ...h.settings.style } : { ...this.#e, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (l) => {
-      this.newValue(l);
-    }, this.setUpdateValue = (l) => {
-      this.updateValue(l);
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a);
+    const l = a.overlay;
+    this.id = a.overlay?.id || Z(this.shortName), this.defineIndicator(l?.settings, yo), this.style = l?.settings?.style ? { ...this.#e, ...l.settings.style } : { ...this.#e, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (h) => {
+      this.newValue(h);
+    }, this.setUpdateValue = (h) => {
+      this.updateValue(h);
     }, this.addLegend();
   }
   get primaryPane() {
-    return Us.primaryPane;
+    return Bs.primaryPane;
   }
   get defaultStyle() {
     return this.#e;
@@ -15732,30 +15756,30 @@ class Us extends _e {
     if (this.overlay.data.length < 2 || !super.mustUpdate())
       return !1;
     this.scene.clear();
-    const i = this.scene.width + this.xAxis.bufferPx * 2, s = this.yAxis.yPos(this.style?.high || this.style.defaultHigh), n = this.yAxis.yPos(this.style?.low || this.style.defaultLow), r = [0, s, this.scene.width, n - s];
+    const i = this.scene.width + this.xAxis.bufferPx * 2, s = this.yAxis.yPos(this.style?.high || this.style.defaultHigh), n = this.yAxis.yPos(this.style?.low || this.style.defaultLow), o = [0, s, this.scene.width, n - s];
     let a = { fill: this.style.highLowRangeStyle };
-    if (this.plot(r, "renderRect", a), r.length = 0, r[0] = { x: 0, y: s }, r[1] = { x: i, y: s }, a = {
+    if (this.plot(o, "renderRect", a), o.length = 0, o[0] = { x: 0, y: s }, o[1] = { x: i, y: s }, a = {
       width: this.style.highLowLineWidth,
       stroke: this.style.highStroke,
       dash: [1, 1]
-    }, this.plot(r, "renderLine", a), r.length = 0, r[0] = { x: 0, y: n }, r[1] = { x: i, y: n }, a = {
+    }, this.plot(o, "renderLine", a), o.length = 0, o[0] = { x: 0, y: n }, o[1] = { x: i, y: n }, a = {
       width: this.style.highLowLineWidth,
       stroke: this.style.lowStroke,
       dash: [1, 1]
-    }, this.plot(r, "renderLine", a), this.overlay.data.length < 2)
+    }, this.plot(o, "renderLine", a), this.overlay.data.length < 2)
       return this.target.viewport.render(), !1;
-    const h = this.overlay.data, l = this.xAxis.candleW;
-    r.length = 0, this.Timeline.smoothScrollOffset;
+    const l = this.overlay.data, h = this.xAxis.candleW;
+    o.length = 0, this.Timeline.smoothScrollOffset;
     const m = {
-      w: l
+      w: h
     };
-    let g = this.Timeline.rangeScrollOffset, v = e.data.length - this.overlay.data.length, E = e.indexStart - v - 2, A = e.Length + g * 2 + 2, L = 0;
+    let g = this.Timeline.rangeScrollOffset, v = e.data.length - this.overlay.data.length, S = e.indexStart - v - 2, A = e.Length + g * 2 + 2, L = 0;
     for (; A; )
-      E < 0 || E >= this.overlay.data.length || (L > h[E][0] && console.log(E, L, h[E][0]), L = h[E][0], m.x = this.xAxis.xPos(h[E][0]), m.y = this.yAxis.yPos(h[E][1]), r.push({ ...m })), E++, A--;
-    this.plot(r, "renderLine", this.style), this.target.viewport.render(), super.updated();
+      S < 0 || S >= this.overlay.data.length || (L > l[S][0] && console.log(S, L, l[S][0]), L = l[S][0], m.x = this.xAxis.xPos(l[S][0]), m.y = this.yAxis.yPos(l[S][1]), o.push({ ...m })), S++, A--;
+    this.plot(o, "renderLine", this.style), this.target.viewport.render(), super.updated();
   }
 }
-class Ii extends _e {
+class Ii extends He {
   name = "Simple Moving Average";
   shortName = "SMA";
   libName = "SMA";
@@ -15786,13 +15810,13 @@ class Ii extends _e {
     "#66BB6A",
     "#66BB6A"
   ];
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a), Ii.inCnt++;
-    const h = a.overlay;
-    this.id = a.overlay?.id || Z(this.shortName), this.defineIndicator(h?.settings, vo), this.style = h?.settings?.style ? { ...this.#e, ...h.settings.style } : { ...this.#e, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (l) => {
-      this.newValue(l);
-    }, this.setUpdateValue = (l) => {
-      this.updateValue(l);
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a), Ii.inCnt++;
+    const l = a.overlay;
+    this.id = a.overlay?.id || Z(this.shortName), this.defineIndicator(l?.settings, vo), this.style = l?.settings?.style ? { ...this.#e, ...l.settings.style } : { ...this.#e, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (h) => {
+      this.newValue(h);
+    }, this.setUpdateValue = (h) => {
+      this.updateValue(h);
     }, this.addLegend();
   }
   get primaryPane() {
@@ -15816,16 +15840,16 @@ class Ii extends _e {
     this.scene.clear();
     const i = this.overlay.data, s = this.xAxis.candleW, n = [];
     this.xAxis.smoothScrollOffset;
-    const r = {
+    const o = {
       w: s
     };
-    let a = this.Timeline.rangeScrollOffset, h = e.data.length - this.overlay.data.length, l = e.indexStart - h - 2, m = e.Length + a * 2 + 2;
+    let a = this.Timeline.rangeScrollOffset, l = e.data.length - this.overlay.data.length, h = e.indexStart - l - 2, m = e.Length + a * 2 + 2;
     for (; m; )
-      l < 0 || l >= this.overlay.data.length ? n.push({ x: null, y: null }) : (r.x = this.xAxis.xPos(i[l][0]), r.y = this.yAxis.yPos(i[l][1]), n.push({ ...r })), l++, m--;
+      h < 0 || h >= this.overlay.data.length ? n.push({ x: null, y: null }) : (o.x = this.xAxis.xPos(i[h][0]), o.y = this.yAxis.yPos(i[h][1]), n.push({ ...o })), h++, m--;
     this.plot(n, "renderLine", this.style), this.target.viewport.render(), super.updated();
   }
 }
-class Vs extends _e {
+class Vs extends He {
   name = "Stochastic Oscillator";
   shortName = "STOCH";
   libName = "STOCH";
@@ -15865,13 +15889,13 @@ class Vs extends _e {
   static inCnt = 0;
   static primaryPane = !1;
   static scale = Ke[1];
-  constructor(e, i = !1, s = !1, n, r, a) {
-    super(e, i, s, n, r, a);
-    const h = a.overlay;
-    this.id = a.overlay?.id || Z(this.shortName), this.defineIndicator(h?.settings, wo), this.style = h?.settings?.style ? { ...this.#e, ...h.settings.style } : { ...this.#e, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (l) => {
-      this.newValue(l);
-    }, this.setUpdateValue = (l) => {
-      this.updateValue(l);
+  constructor(e, i = !1, s = !1, n, o, a) {
+    super(e, i, s, n, o, a);
+    const l = a.overlay;
+    this.id = a.overlay?.id || Z(this.shortName), this.defineIndicator(l?.settings, wo), this.style = l?.settings?.style ? { ...this.#e, ...l.settings.style } : { ...this.#e, ...n.style }, this.calcIndicatorHistory(), this.setNewValue = (h) => {
+      this.newValue(h);
+    }, this.setUpdateValue = (h) => {
+      this.updateValue(h);
     }, this.addLegend();
   }
   get primaryPane() {
@@ -15884,55 +15908,55 @@ class Vs extends _e {
     if (this.overlay.data.length == 0)
       return !1;
     const i = {};
-    let s = [!1, !1, !1], { c: n, colours: r } = super.legendInputs(e);
-    return i.SlowK = this.scale.nicePrice(this.overlay.data[n][1]), i.SlowD = this.scale.nicePrice(this.overlay.data[n][1]), r = [
+    let s = [!1, !1, !1], { c: n, colours: o } = super.legendInputs(e);
+    return i.SlowK = this.scale.nicePrice(this.overlay.data[n][1]), i.SlowD = this.scale.nicePrice(this.overlay.data[n][1]), o = [
       this.style.slowD,
       this.style.slowK
-    ], { inputs: i, colours: r, labels: s };
+    ], { inputs: i, colours: o, labels: s };
   }
   draw(e = this.range) {
     if (this.overlay.data.length < 2 || !super.mustUpdate())
       return !1;
     this.scene.clear();
     const i = this.scene.width + this.xAxis.bufferPx * 2, s = this.yAxis.yPos(this.style.defaultHigh), n = this.yAxis.yPos(this.style.defaultLow);
-    let r = [0, s, this.scene.width, n - s], a = { fill: this.style.highLowRangeStyle };
-    if (this.plot(r, "renderRect", a), r.length = 0, r[0] = { x: 0, y: s }, r[1] = { x: i, y: s }, a = {
+    let o = [0, s, this.scene.width, n - s], a = { fill: this.style.highLowRangeStyle };
+    if (this.plot(o, "renderRect", a), o.length = 0, o[0] = { x: 0, y: s }, o[1] = { x: i, y: s }, a = {
       width: this.style.highLowLineWidth,
       stroke: this.style.highStroke,
       dash: [1, 1]
-    }, this.plot(r, "renderLine", a), r.length = 0, r[0] = { x: 0, y: n }, r[1] = { x: i, y: n }, a = {
+    }, this.plot(o, "renderLine", a), o.length = 0, o[0] = { x: 0, y: n }, o[1] = { x: i, y: n }, a = {
       width: this.style.highLowLineWidth,
       stroke: this.style.lowStroke,
       dash: [1, 1]
-    }, this.plot(r, "renderLine", a), this.overlay.data.length < 2)
+    }, this.plot(o, "renderLine", a), this.overlay.data.length < 2)
       return this.target.viewport.render(), !1;
-    r = { slowD: [], slowK: [] };
-    const h = this.overlay.data, m = {
+    o = { slowD: [], slowK: [] };
+    const l = this.overlay.data, m = {
       w: this.xAxis.candleW
     };
-    let g = e.value(e.indexStart)[0], v = this.overlay.data[0][0], E = (g - v) / e.interval, A = this.Timeline.rangeScrollOffset, L = e.Length + A * 2 + 2;
+    let g = e.value(e.indexStart)[0], v = this.overlay.data[0][0], S = (g - v) / e.interval, A = this.Timeline.rangeScrollOffset, L = e.Length + A * 2 + 2;
     for (; L; )
-      E < 0 || E >= this.overlay.data.length ? (r.slowD.push({ x: null, y: null }), r.slowK.push({ x: null, y: null })) : (m.x = this.xAxis.xPos(h[E][0]), m.y = this.yAxis.yPos(h[E][1]), r.slowK.push({ ...m }), m.x = this.xAxis.xPos(h[E][0]), m.y = this.yAxis.yPos(h[E][2]), r.slowD.push({ ...m })), E++, L--;
+      S < 0 || S >= this.overlay.data.length ? (o.slowD.push({ x: null, y: null }), o.slowK.push({ x: null, y: null })) : (m.x = this.xAxis.xPos(l[S][0]), m.y = this.yAxis.yPos(l[S][1]), o.slowK.push({ ...m }), m.x = this.xAxis.xPos(l[S][0]), m.y = this.yAxis.yPos(l[S][2]), o.slowD.push({ ...m })), S++, L--;
     a = {
       width: this.style.slowKLineWidth,
       stroke: this.style.slowKStroke,
       dash: this.style.slowKLineDash
-    }, this.plot(r.slowK, "renderLine", a), a = {
+    }, this.plot(o.slowK, "renderLine", a), a = {
       width: this.style.slowDLineWidth,
       stroke: this.style.slowDStroke,
       dash: this.style.slowDLineDash
-    }, this.plot(r.slowD, "renderLine", a), this.target.viewport.render(), super.updated();
+    }, this.plot(o.slowD, "renderLine", a), this.target.viewport.render(), super.updated();
   }
 }
 const xo = {
   AROON: { id: "AROON", name: "Aroon", event: "addIndicator", ind: $s },
-  BB: { id: "BB", name: "Bollinger Bands", event: "addIndicator", ind: Bs },
+  BB: { id: "BB", name: "Bollinger Bands", event: "addIndicator", ind: Us },
   EMA: { id: "EMA", name: "Exponential Moving Average", event: "addIndicator", ind: Ni },
-  RSI: { id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: Us },
+  RSI: { id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: Bs },
   SMA: { id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: Ii },
   STOCH: { id: "STOCH", name: "Stochastic Oscillator", event: "addIndicator", ind: Vs }
 };
-class rm {
+class om {
   #e = "Utilities";
   #t = "utils";
   #n;
@@ -15946,7 +15970,7 @@ class rm {
   #h;
   #d = {};
   constructor(e, i) {
-    this.#n = e, this.#r = i, this.#i = e.elUtils, this.#s = e.config?.utilsBar || cu, this.#l = e.WidgetsG, this.#o = e.indicatorClasses || xo, this.init();
+    this.#n = e, this.#r = i, this.#i = e.elUtils, this.#s = e.config?.utilsBar || uu, this.#l = e.WidgetsG, this.#o = e.indicatorClasses || xo, this.init();
   }
   log(e) {
     this.#n.log(e);
@@ -15988,11 +16012,11 @@ class rm {
     this.initAllUtils(), this.eventsListen();
   }
   destroy() {
-    const e = this.#n, i = D.findBySelectorAll(`#${e.id} .${Ya} .icon-wrapper`);
+    const e = this.#n, i = D.findBySelectorAll(`#${e.id} .${qa} .icon-wrapper`);
     for (let s of i) {
       let n = s.id.replace("TX_", "");
-      for (let r of this.#s)
-        r.id === n && s.removeEventListener("click", this.#a[n].click), s.removeEventListener("pointerover", this.#a[n].pointerover), s.removeEventListener("pointerout", this.#a[n].pointerout);
+      for (let o of this.#s)
+        o.id === n && s.removeEventListener("click", this.#a[n].click), s.removeEventListener("pointerover", this.#a[n].pointerover), s.removeEventListener("pointerout", this.#a[n].pointerout);
     }
     this.off("utils_indicators", this.onIndicators), this.off("utils_timezone", this.onTimezone), this.off("utils_settings", this.onSettings), this.off("utils_screenshot", this.onScreenshot);
   }
@@ -16016,12 +16040,12 @@ class rm {
     if (s - this.#d[i.id] < 1e3)
       return !1;
     this.#d[i.id] = s;
-    let n = i.dataset.event, r = i.dataset.menu || !1, a = {
+    let n = i.dataset.event, o = i.dataset.menu || !1, a = {
       target: i.id,
-      menu: r,
+      menu: o,
       evt: n
-    }, h = i.dataset.action;
-    this.emit(n, a), r ? this.emit("menu_open", a) : this.emit("util_selected", a), h && h(a, this.#n);
+    }, l = i.dataset.action;
+    this.emit(n, a), o ? this.emit("menu_open", a) : this.emit("util_selected", a), l && l(a, this.#n);
   }
   onIconOver(e) {
     const i = e.currentTarget.querySelector("svg");
@@ -16037,13 +16061,13 @@ class rm {
       this.#d[i.id] = 0;
       let s = i.id.replace("TX_", ""), n = i.querySelector("svg");
       n.style.fill = dt.COLOUR_ICON, n.style.height = "90%";
-      for (let r of this.#s)
-        if (r.id === s && (this.#a[s] = {}, this.#a[s].click = this.onIconClick.bind(this), this.#a[s].pointerover = this.onIconOver.bind(this), this.#a[s].pointerout = this.onIconOut.bind(this), i.addEventListener("click", this.#a[s].click), i.addEventListener("pointerover", this.#a[s].pointerover), i.addEventListener("pointerout", this.#a[s].pointerout), s === "indicators" && (r.sub = Object.values(this.#o)), r?.sub)) {
+      for (let o of this.#s)
+        if (o.id === s && (this.#a[s] = {}, this.#a[s].click = this.onIconClick.bind(this), this.#a[s].pointerover = this.onIconOver.bind(this), this.#a[s].pointerout = this.onIconOut.bind(this), i.addEventListener("click", this.#a[s].click), i.addEventListener("pointerover", this.#a[s].pointerover), i.addEventListener("pointerout", this.#a[s].pointerout), s === "indicators" && (o.sub = Object.values(this.#o)), o?.sub)) {
           let a = {
-            content: r.sub,
+            content: o.sub,
             primary: i
-          }, h = this.#l.insert("Menu", a);
-          i.dataset.menu = h.id, h.start();
+          }, l = this.#l.insert("Menu", a);
+          i.dataset.menu = l.id, l.start();
         }
     }
   }
@@ -16059,7 +16083,7 @@ class rm {
     this.#n.downloadImage();
   }
 }
-const om = 150;
+const am = 150;
 class ye {
   #e;
   #t;
@@ -16161,30 +16185,30 @@ class ye {
     const e = this.#r, i = `position: absolute; z-index: 1000; display: none; border: 1px solid ${Zi.COLOUR_BORDER}; background: ${Zi.COLOUR_BG}; color: ${Zi.COLOUR_TXT}; box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;`;
     let s = this.content(e);
     return `
-      <div id="${e.id}" class="${qa}" style="${i}">
+      <div id="${e.id}" class="${Xa}" style="${i}">
         ${s}
       </div>
     `;
   }
   content(e) {
-    const i = `list-style: none; text-align: left; margin:1em 1em 1em -2.5em; min-width: ${om}px`, s = "padding: .25em 1em .25em 1em; white-space: nowrap;", n = "display: inline-block; width: 4em;", r = "cursor: pointer;", a = `onmouseover="this.style.background ='#222'"`, h = `onmouseout="this.style.background ='none'"`;
-    let l = `<ul style="${i}">`;
+    const i = `list-style: none; text-align: left; margin:1em 1em 1em -2.5em; min-width: ${am}px`, s = "padding: .25em 1em .25em 1em; white-space: nowrap;", n = "display: inline-block; width: 4em;", o = "cursor: pointer;", a = `onmouseover="this.style.background ='#222'"`, l = `onmouseout="this.style.background ='none'"`;
+    let h = `<ul style="${i}">`;
     if (e?.content)
       for (let m of e.content)
-        l += `<li id="${m.id}" data-event="${m.event}" style="${s} ${r}" ${a} ${h}><a style="${r}"><span style="${n}">${m.id}</span><span>${m.name}</span></li></a>`;
-    return l += "</ul>", l;
+        h += `<li id="${m.id}" data-event="${m.event}" style="${s} ${o}" ${a} ${l}><a style="${o}"><span style="${n}">${m.id}</span><span>${m.name}</span></li></a>`;
+    return h += "</ul>", h;
   }
   position() {
     let e = this.#i.getBoundingClientRect(), i = this.#r.primary.getBoundingClientRect(), s = Math.round(i.left - e.left), n = Math.round(i.bottom - e.top);
     this.#l.style.left = s + "px", this.#l.style.top = n + "px";
-    let r = D.elementDimPos(this.#l);
-    if (r.right > this.#i.offsetWidth) {
-      let h = Math.floor(this.#i.offsetWidth - r.width);
-      h = _(h, 0, this.#i.offsetWidth), this.#l.style.left = `${h}px`;
+    let o = D.elementDimPos(this.#l);
+    if (o.right > this.#i.offsetWidth) {
+      let l = Math.floor(this.#i.offsetWidth - o.width);
+      l = _(l, 0, this.#i.offsetWidth), this.#l.style.left = `${l}px`;
     }
-    if (this.#n.MainPane.rowsH + n + r.height > this.#n.MainPane.rowsH) {
-      let h = Math.floor(r.height * -1);
-      h = _(h, this.#n.MainPane.rowsH * -1, 0), this.#l.style.top = `${h}px`;
+    if (this.#n.MainPane.rowsH + n + o.height > this.#n.MainPane.rowsH) {
+      let l = Math.floor(o.height * -1);
+      l = _(l, this.#n.MainPane.rowsH * -1, 0), this.#l.style.top = `${l}px`;
     }
   }
   remove() {
@@ -16207,7 +16231,7 @@ class rt {
     this.name = e;
   }
 }
-class ne {
+class re {
   #e;
   #t;
   #n;
@@ -16229,21 +16253,21 @@ class ne {
   #p = {};
   static windowList = {};
   static windowCnt = 0;
-  static class = Sn;
+  static class = En;
   static name = "Windows";
   static type = "Window";
   static currentActive = null;
   static create(e, i) {
-    const s = `window_${++ne.windowCnt}`;
+    const s = `window_${++re.windowCnt}`;
     i.id = s;
     const n = {
       window: { "box-shadow": "rgb(0,0,0) 0px 20px 30px -10px" },
       content: { padding: "1em" }
     };
-    return i.styles = b(i?.styles) ? { ...n, ...i.styles } : n, i.class = i?.class || "window", ne.windowList[s] = new ne(e, i), ne.windowList[s];
+    return i.styles = b(i?.styles) ? { ...n, ...i.styles } : n, i.class = i?.class || "window", re.windowList[s] = new re(e, i), re.windowList[s];
   }
   static destroy(e) {
-    ne.windowList[e].destroy(), delete ne.windowList[e];
+    re.windowList[e].destroy(), delete re.windowList[e];
   }
   constructor(e, i) {
     this.#t = e, this.#n = i.core, this.#r = i, this.#e = i.id, this.#l = e.elements.elWindows, this.#s = this.#n.elWidgetsG, this.init();
@@ -16270,7 +16294,7 @@ class ne {
     this.setDimensions(e);
   }
   get type() {
-    return ne.type;
+    return re.type;
   }
   get el() {
     return this.#o;
@@ -16347,7 +16371,7 @@ class ne {
   }
   static defaultNode() {
     return `
-      <div slot="widget" class="${Sn}" style=""></div>
+      <div slot="widget" class="${En}" style=""></div>
     `;
   }
   windowNode() {
@@ -16355,12 +16379,12 @@ class ne {
     let i = `position: absolute; z-index: 100; display: block; border: 1px solid ${Ji.COLOUR_BORDER}; background: ${Ji.COLOUR_BG}; color: ${Ji.COLOUR_TXT}; box-shadow: rgb(0,0,0) 0px 20px 30px -10px;`, s = this.config?.styles?.window;
     for (let m in s)
       i += `${m}: ${s[m]}; `;
-    let n = e.dragBar ? this.dragBar(e) : "", r = !e.dragBar && e.title ? this.title(e) : "", a = this.content(e), h = this.closeIcon(e);
+    let n = e.dragBar ? this.dragBar(e) : "", o = !e.dragBar && e.title ? this.title(e) : "", a = this.content(e), l = this.closeIcon(e);
     return `
-      <div id="${e.id}" class="${Xa} ${this.#r.class}" style="${i}">
+      <div id="${e.id}" class="${Ka} ${this.#r.class}" style="${i}">
           ${n}
-          ${r}
-          ${h}
+          ${o}
+          ${l}
           ${a}
         </div>
       </div>
@@ -16379,54 +16403,54 @@ class ne {
   }
   dragBar(e) {
     const i = "cursor: grab;", s = `onmouseover="this.style.background ='#222'"`, n = `onmouseout="this.style.background ='none'"`;
-    let r = `${i} `, a = this.config?.styles?.dragBar;
-    for (let l in a)
-      r += `${l}: ${a[l]}; `;
-    let h = "";
-    return e.dragBar && (h += `
-      <div class="dragBar" style="${r}" ${s} ${n}>
+    let o = `${i} `, a = this.config?.styles?.dragBar;
+    for (let h in a)
+      o += `${h}: ${a[h]}; `;
+    let l = "";
+    return e.dragBar && (l += `
+      <div class="dragBar" style="${o}" ${s} ${n}>
         ${this.title(e)}
       </div>
-    `), h;
+    `), l;
   }
   title(e) {
-    const i = this.config, s = i?.styles?.title, n = S(i?.title) ? i.title : "";
-    let r = "white-space: nowrap; ";
-    for (let h in s)
-      r += `${h}: ${s[h]}; `;
+    const i = this.config, s = i?.styles?.title, n = E(i?.title) ? i.title : "";
+    let o = "white-space: nowrap; ";
+    for (let l in s)
+      o += `${l}: ${s[l]}; `;
     return `
-        <div class="title" style="${r}">${n}</div>
+        <div class="title" style="${o}">${n}</div>
     `;
   }
   closeIcon(e) {
     const i = "cursor: pointer;", s = `onmouseover="this.style.background ='#222'"`, n = `onmouseout="this.style.background ='none'"`;
-    let r = `${i} `, a = this.config?.styles?.closeIcon, h = "";
+    let o = `${i} `, a = this.config?.styles?.closeIcon, l = "";
     for (let m in a)
-      h += `${m}: ${a[m]}; `;
-    let l = "";
-    return e.closeIcon && (l += `
-      <div class="closeIcon" style="${r}" ${s} ${n}>
+      l += `${m}: ${a[m]}; `;
+    let h = "";
+    return e.closeIcon && (h += `
+      <div class="closeIcon" style="${o}" ${s} ${n}>
         <span>X</span>
       </div>
-    `), l;
+    `), h;
   }
   position(e) {
     let i = this.dimensions, s = this.#n.dimensions;
     Math.round(s.left - i.left), Math.round(s.bottom - i.top);
-    let n = Math.round((s.width - i.width) / 2), r = Math.round((s.height - i.height) / 2) * -1, a = D.getStyle(this.#o, "z-index");
+    let n = Math.round((s.width - i.width) / 2), o = Math.round((s.height - i.height) / 2) * -1, a = D.getStyle(this.#o, "z-index");
     if (b(e)) {
-      let { x: h, y: l, z: m } = { ...e };
-      T(h) && (n = h), T(l) && (r = l), T(m) && (a = m), this.#u = { x: h, y: l, z: a };
+      let { x: l, y: h, z: m } = { ...e };
+      T(l) && (n = l), T(h) && (o = h), T(m) && (a = m), this.#u = { x: l, y: h, z: a };
     }
-    if (this.#o.style.left = `${n}px`, this.#o.style.top = `${r}px`, this.#o.style["z-index"] = `${a}`, this.config?.bounded) {
-      const h = this.#o.clientWidth;
-      if (n + h > this.#s.offsetWidth) {
-        let m = Math.floor(this.#s.offsetWidth - h);
+    if (this.#o.style.left = `${n}px`, this.#o.style.top = `${o}px`, this.#o.style["z-index"] = `${a}`, this.config?.bounded) {
+      const l = this.#o.clientWidth;
+      if (n + l > this.#s.offsetWidth) {
+        let m = Math.floor(this.#s.offsetWidth - l);
         m = _(m, 0, this.#s.offsetWidth), this.#o.style.left = `${m}px`;
       }
-      const l = this.#o.clientHeight;
-      if (r + s.height + l > s.height) {
-        let m = Math.floor(l * -1);
+      const h = this.#o.clientHeight;
+      if (o + s.height + h > s.height) {
+        let m = Math.floor(h * -1);
         m = _(m, s.height * -1, 0), this.#o.style.top = `${m}px`;
       }
     }
@@ -16439,14 +16463,14 @@ class ne {
   setProperties(e) {
     if (!b(e))
       return !1;
-    if (S(e?.title) && (this.#a.innerHTML = e.title), S(e?.content) && (this.#d.innerHTML = e.content), this.setDimensions({ ...e?.dimensions }), this.position({ ...e?.position }), b(e?.styles)) {
+    if (E(e?.title) && (this.#a.innerHTML = e.title), E(e?.content) && (this.#d.innerHTML = e.content), this.setDimensions({ ...e?.dimensions }), this.position({ ...e?.position }), b(e?.styles)) {
       const i = (s, n) => {
         if (!b(n))
           return !1;
-        const r = "el" + s.charAt(0).toUpperCase() + s.slice(1);
-        if (b(this[r]))
+        const o = "el" + s.charAt(0).toUpperCase() + s.slice(1);
+        if (b(this[o]))
           for (let a in n)
-            this[r].style.p = n[a];
+            this[o].style.p = n[a];
       };
       for (let s of Object.keys(e.styles))
         i(s, e.styles[s]);
@@ -16454,20 +16478,20 @@ class ne {
     return e;
   }
   remove() {
-    return ne.destroy(this.id);
+    return re.destroy(this.id);
   }
   open(e = {}) {
-    if (ne.currentActive === this && this.state === rt.opened)
+    if (re.currentActive === this && this.state === rt.opened)
       return !0;
-    ne.currentActive = this, this.#i = rt.opened, this.#o.style.display = "block", this.#o.style.zindex = "10", this.setProperties(e), this.emit("window_opened", this.id), setTimeout(() => {
+    re.currentActive = this, this.#i = rt.opened, this.#o.style.display = "block", this.#o.style.zindex = "10", this.setProperties(e), this.emit("window_opened", this.id), setTimeout(() => {
       this.#p.click = this.onOutsideClickListener.bind(this), document.addEventListener("click", this.#p.click);
     }, e?.offFocus || 250);
   }
   close() {
-    ne.currentActive = null, this.#i = rt.closed, this.#o.style.display = "none", this.emit("window_closed", this.id);
+    re.currentActive = null, this.#i = rt.closed, this.#o.style.display = "none", this.emit("window_closed", this.id);
   }
 }
-class Hi extends ne {
+class Hi extends re {
   static type = "Window";
   static create(e, i) {
     const s = {
@@ -16484,7 +16508,7 @@ class Hi extends ne {
     return Hi.type;
   }
 }
-class am extends Hi {
+class lm extends Hi {
   static type = "Window";
   static create(e, i) {
     return i.dragBar = !0, i.close = !0, i.class = "config", super.create(e, i);
@@ -16493,27 +16517,27 @@ class am extends Hi {
     super(e, i);
   }
 }
-class Se {
+class Ee {
   static progressList = {};
   static progressCnt = 0;
-  static class = En;
+  static class = Sn;
   static type = "progress";
   static name = "Progress";
   static icons = {
     loadingBars: Sh,
-    loadingSpin: Eh
+    loadingSpin: Ph
   };
   static defaultNode() {
     return `
-      <div slot="widget" class="${En}" style=""></div>
+      <div slot="widget" class="${Sn}" style=""></div>
     `;
   }
   static create(e, i) {
-    const s = `progress_${++Se.progressCnt}`;
-    return i.id = s, Se.progressList[s] = new Se(e, i), Se.progressList[s];
+    const s = `progress_${++Ee.progressCnt}`;
+    return i.id = s, Ee.progressList[s] = new Ee(e, i), Ee.progressList[s];
   }
   static destroy(e) {
-    Se.progressList[e].destroy(), delete Se.progressList[e];
+    Ee.progressList[e].destroy(), delete Ee.progressList[e];
   }
   #e;
   #t;
@@ -16527,7 +16551,7 @@ class Se {
     this.#t = e, this.#n = i.core, this.#r = i, this.#e = i.id, this.#s = e.elements.elProgress, this.#i = this.#n.elWidgetsG, this.init();
   }
   get type() {
-    return Se.type;
+    return Ee.type;
   }
   init() {
     this.mount(this.#s);
@@ -16550,9 +16574,9 @@ class Se {
   }
   mount(e) {
     let i = "loadingBars";
-    this.#r?.type in Se.icons && (i = this.#r?.type);
-    const s = { type: i, icon: Se.icons[i] };
-    e.lastElementChild == null ? e.innerHTML = this.progressNode(s) : e.lastElementChild.insertAdjacentHTML("afterend", this.progressNode(s)), this.#l = this.#s.querySelector(`#${this.#r.id}`), this.#o = this.#l.querySelector("svg"), this.#o.style.fill = `${Nh.COLOUR_ICONHOVER};`;
+    this.#r?.type in Ee.icons && (i = this.#r?.type);
+    const s = { type: i, icon: Ee.icons[i] };
+    e.lastElementChild == null ? e.innerHTML = this.progressNode(s) : e.lastElementChild.insertAdjacentHTML("afterend", this.progressNode(s)), this.#l = this.#s.querySelector(`#${this.#r.id}`), this.#o = this.#l.querySelector("svg"), this.#o.style.fill = `${Ih.COLOUR_ICONHOVER};`;
   }
 }
 const rs = {
@@ -16561,52 +16585,52 @@ const rs = {
   context: {},
   states: {
     idle: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         menu_open: {
           target: "menu_open",
-          action(o) {
+          action(r) {
           }
         },
         window_open: {
           target: "window_open",
-          action(o) {
+          action(r) {
           }
         }
       }
     },
     menu_open: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         menu_close: {
           target: "idle",
-          action(o) {
+          action(r) {
           }
         }
       }
     },
     window_open: {
-      onEnter(o) {
+      onEnter(r) {
       },
-      onExit(o) {
+      onExit(r) {
       },
       on: {
         window_close: {
           target: "idle",
-          action(o) {
+          action(r) {
           }
         }
       }
     }
   }
 };
-class lm {
+class hm {
   #e;
   #t = "Widgets";
   #n = "widgets";
@@ -16614,7 +16638,7 @@ class lm {
   #i;
   #s;
   #l;
-  #o = { Divider: le, Progress: Se, Menu: ye, Window: ne, Dialogue: Hi, ConfigDialogue: am };
+  #o = { Divider: le, Progress: Ee, Menu: ye, Window: re, Dialogue: Hi, ConfigDialogue: lm };
   #c = {};
   #a = {};
   #h;
@@ -16636,7 +16660,7 @@ class lm {
     this.#r.error(e);
   }
   set id(e) {
-    this.#e = He(e);
+    this.#e = $e(e);
   }
   get id() {
     return this.#e ? `${this.#e}` : `${this.#r.id}-${this.#n}`.replace(/ |,|;|:|\.|#/g, "_");
@@ -16660,7 +16684,7 @@ class lm {
     return this.#c;
   }
   set stateMachine(e) {
-    this.#s = new Ve(e, this);
+    this.#s = new ze(e, this);
   }
   get stateMachine() {
     return this.#s;
@@ -16743,48 +16767,48 @@ class lm {
     return isString(e) ? (this.#l[type].destroy(e), !0) : !1;
   }
 }
-function rr(o, e, i, s, n, r) {
-  const a = o.theme, h = document.createElement("template"), l = o.Timeline.graph.viewport.scene, m = o.MainPane, g = m.graph.viewport.scene, v = m.width, E = m.height, A = new Ft.Viewport({
+function rr(r, e, i, s, n, o) {
+  const a = r.theme, l = document.createElement("template"), h = r.Timeline.graph.viewport.scene, m = r.MainPane, g = m.graph.viewport.scene, v = m.width, S = m.height, A = new Ft.Viewport({
     width: v,
-    height: E,
-    container: h
+    height: S,
+    container: l
   }), L = A.scene.context;
-  let O = 0, oe = 0, U = v - o.Chart.scale.width;
-  a?.yAxis?.location == "left" && (oe = o.Chart.scale.width, U = 0);
+  let O = 0, ae = 0, B = v - r.Chart.scale.width;
+  a?.yAxis?.location == "left" && (ae = r.Chart.scale.width, B = 0);
   let R;
-  L.save(), Hs(L, 0, 0, v, E, { fill: a.chart.Background }), L.drawImage(g.canvas, oe, 0, g.width, g.height);
-  for (const [ae, ue] of o.ChartPanes) {
-    let J = ue.graph.viewport.scene, { width: te, height: de } = J, me = ue.scale.graph.viewport.scene, { width: ot, height: We } = me;
-    O > 0 && (R = { stroke: a.divider.line }, Gt(L, O, 0, m.width, R)), L.drawImage(J.canvas, oe, O, te, de), L.drawImage(me.canvas, U, O - 1, ot, We), O += de;
+  L.save(), Hs(L, 0, 0, v, S, { fill: a.chart.Background }), L.drawImage(g.canvas, ae, 0, g.width, g.height);
+  for (const [J, ue] of r.ChartPanes) {
+    let Q = ue.graph.viewport.scene, { width: ie, height: de } = Q, me = ue.scale.graph.viewport.scene, { width: ot, height: We } = me;
+    O > 0 && (R = { stroke: a.divider.line }, Gt(L, O, 0, m.width, R)), L.drawImage(Q.canvas, ae, O, ie, de), L.drawImage(me.canvas, B, O - 1, ot, We), O += de;
   }
-  L.drawImage(l.canvas, 0, O, l.width, l.height), R = {
-    text: o.config.title,
+  L.drawImage(h.canvas, 0, O, h.width, h.height), R = {
+    text: r.config.title,
     colour: a.chart.TextColour,
     fontSize: a.chart.FontSize * 1.5,
     fontWeight: "normal",
     fontFamily: a.chart.FontFamily,
     textBaseLine: "top"
   }, Vr(L, 6, 6, R);
-  const ze = (ae) => {
-    if (ae) {
-      const J = r?.x || 0, te = r?.y || 0, de = r?.width || v * 0.25, me = r?.height || E * 0.25;
-      L.drawImage(ae, J, te, de, me);
+  const Ne = (J) => {
+    if (J) {
+      const Q = o?.x || 0, ie = o?.y || 0, de = o?.width || v * 0.25, me = o?.height || S * 0.25;
+      L.drawImage(J, Q, ie, de, me);
     }
     L.restore();
     const ue = () => {
-      A.destroy(), h.remove();
+      A.destroy(), l.remove();
     };
     switch (n) {
       case "url":
-        if (B(e)) {
-          const J = (te) => {
-            e(te), ue();
+        if (U(e)) {
+          const Q = (ie) => {
+            e(ie), ue();
           };
-          A.scene.toImage(i, s, J);
+          A.scene.toImage(i, s, Q);
         } else
-          new Promise(function(J, te) {
+          new Promise(function(Q, ie) {
             const de = A.scene.toImage(i, s);
-            de ? J(de) : te(!1), ue();
+            de ? Q(de) : ie(!1), ue();
           });
         break;
       case "download":
@@ -16793,13 +16817,13 @@ function rr(o, e, i, s, n, r) {
         break;
     }
   };
-  b(r) ? D.isImage(r?.imgURL).then((ae) => {
-    ze(ae);
-  }).catch((ae) => {
-    console.error(ae);
-  }) : ze();
+  b(o) ? D.isImage(o?.imgURL).then((J) => {
+    Ne(J);
+  }).catch((J) => {
+    console.error(J);
+  }) : Ne();
 }
-class I extends hu {
+class I extends cu {
   static #e = bs;
   static #t = 0;
   static #n = {};
@@ -16854,20 +16878,20 @@ class I extends hu {
   #S;
   #C;
   #f;
-  #P;
+  #E;
   #x;
   #O;
   #M;
   #L = !1;
   #T = null;
   #A = k;
-  #E;
+  #P;
   #v;
   #R = xo;
   #k;
   #N;
   #V;
-  chartWMin = Ei;
+  chartWMin = Si;
   chartHMin = st;
   chartW_Reactive = !0;
   chartH_Reactive = !0;
@@ -16912,8 +16936,8 @@ class I extends hu {
   #q;
   #X;
   #K;
-  #B = !1;
   #U = !1;
+  #B = !1;
   static create(e = {}) {
     I.#t == 0 && (I.#n.CPUCores = navigator.hardwareConcurrency, I.#n.api = {
       permittedClassNames: I.#d
@@ -16921,7 +16945,7 @@ class I extends hu {
       () => {
         I.#s = !0;
         for (let i of I.#l)
-          B(i) && i();
+          U(i) && i();
       },
       () => {
         I.#s = !1;
@@ -17053,7 +17077,7 @@ class I extends hu {
     return this.#L;
   }
   get state() {
-    return this.#E;
+    return this.#P;
   }
   get allData() {
     return {
@@ -17064,7 +17088,7 @@ class I extends hu {
     };
   }
   get rangeLimit() {
-    return T(this.#v.initialCnt) ? this.#v.initialCnt : Ka;
+    return T(this.#v.initialCnt) ? this.#v.initialCnt : ja;
   }
   get range() {
     return this.#v;
@@ -17145,7 +17169,7 @@ class I extends hu {
     return this.#Y;
   }
   get isEmpty() {
-    return this.#E.IsEmpty;
+    return this.#P.IsEmpty;
   }
   set candles(e) {
     b(e) && (this.#q = e);
@@ -17160,28 +17184,28 @@ class I extends hu {
     this.log(`${It} configuring...`), I.create(e);
     const i = { ...e };
     this.logs = i?.logs ? i.logs : !1, this.infos = i?.infos ? i.infos : !1, this.warnings = i?.warnings ? i.warnings : !1, this.errors = i?.errors ? i.errors : !1, this.timer = i?.timer ? i.timer : !1, this.#g = i, this.#T = i.cnt || this.#T, this.#k = i.talib, this.#w = this, this.#y = this, "theme" in i || (i.theme = Rr);
-    const s = S(i?.id) ? i.id : null;
+    const s = E(i?.id) ? i.id : null;
     this.setID(s), this.classList.add(this.id), this.log("processing state...");
     let n = ce(i?.state) || {};
     n.id = this.id, n.core = this;
-    let r = i?.deepValidate || !1, a = i?.isCrypto || !1;
-    this.#E = this.#A.create(n, r, a), delete i.state, this.log(`${this.name} id: ${this.id} : created with a ${this.state.status} state`);
-    let h = "1s", l = z;
-    if (!b(i?.stream) && this.state.data.chart.data.length < 2 ? (this.warn(`${It} has no chart data or streaming provided.`), { tf: h, ms: l } = di(i?.timeFrame)) : b(i?.stream) && this.state.data.chart.data.length < 2 ? ({ tf: h, ms: l } = di(i?.timeFrame), this.#B = !0) : (h = this.state.data.chart.tf, l = this.state.data.chart.tfms), this.log(`tf: ${h} ms: ${l}`), this.#g.callbacks = this.#g.callbacks || {}, b(i))
+    let o = i?.deepValidate || !1, a = i?.isCrypto || !1;
+    this.#P = this.#A.create(n, o, a), delete i.state, this.log(`${this.name} id: ${this.id} : created with a ${this.state.status} state`);
+    let l = "1s", h = z;
+    if (!b(i?.stream) && this.state.data.chart.data.length < 2 ? (this.warn(`${It} has no chart data or streaming provided.`), { tf: l, ms: h } = di(i?.timeFrame)) : b(i?.stream) && this.state.data.chart.data.length < 2 ? ({ tf: l, ms: h } = di(i?.timeFrame), this.#U = !0) : (l = this.state.data.chart.tf, h = this.state.data.chart.tfms), this.log(`tf: ${l} ms: ${h}`), this.#g.callbacks = this.#g.callbacks || {}, b(i))
       for (const g in i)
         g in this.props() && this.props()[g](i[g]);
     const m = b(i?.range) ? i.range : {};
-    if (m.interval = l, m.core = this, this.getRange(null, null, m), this.#v.Length > 1) {
-      const g = ps(this.#_, this.#g?.range?.startTS), v = T(g) ? g + this.#v.initialCnt : this.allData.data.length - 1, E = T(g) ? g : v - this.#v.initialCnt;
-      this.#v.initialCnt = v - E, this.setRange(E, v), i.range?.center && this.jumpToIndex(E, !0, !0);
+    if (m.interval = h, m.core = this, this.getRange(null, null, m), this.#v.Length > 1) {
+      const g = ps(this.#_, this.#g?.range?.startTS), v = T(g) ? g + this.#v.initialCnt : this.allData.data.length - 1, S = T(g) ? g : v - this.#v.initialCnt;
+      this.#v.initialCnt = v - S, this.setRange(S, v), i.range?.center && this.jumpToIndex(S, !0, !0);
     }
-    this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.#W = new lm(this, { widgets: i?.widgets }), this.#I = new rm(this, i), this.#z = new eo(this, i), this.#D = new Qr(this, i), this.setTheme(this.#V.id), this.log(`${this.#u} V${I.version} configured and running...`), this.#H = this.bufferPx * -1, this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#G = this.WidgetsG.insert("Progress", {}), this.stream = this.#g.stream, this.#B && this.on(ke, this.delayedSetRange, this), this.#L = !0, this.refresh();
+    this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.#W = new hm(this, { widgets: i?.widgets }), this.#I = new om(this, i), this.#z = new eo(this, i), this.#D = new Qr(this, i), this.setTheme(this.#V.id), this.log(`${this.#u} V${I.version} configured and running...`), this.#H = this.bufferPx * -1, this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#G = this.WidgetsG.insert("Progress", {}), this.stream = this.#g.stream, this.#U && this.on(_e, this.delayedSetRange, this), this.#L = !0, this.refresh();
   }
   destroy() {
     this.log("...cleanup the mess"), this.removeEventListener("mousemove", this.onMouseMove), this.UtilsBar.destroy(), this.ToolsBar.destroy(), this.MainPane.destroy(), this.WidgetsG.destroy(), this.#Y.end(), this.#A = null;
   }
   eventsListen() {
-    this.addEventListener("mousemove", this.onMouseMove.bind(this)), this.on(ke, this.onStreamUpdate, this), this.on("state_mergeComplete", () => this.#G.stop());
+    this.addEventListener("mousemove", this.onMouseMove.bind(this)), this.on(_e, this.onStreamUpdate, this), this.on("state_mergeComplete", () => this.#G.stop());
   }
   onMouseMove(e) {
     this.#F.x = e.clientX, this.#F.y = e.clientY;
@@ -17218,7 +17242,7 @@ class I extends hu {
     return this.#T;
   }
   setID(e) {
-    S(e) ? this.id = e : this.id = `${Z(_t)}_${this.#T}`;
+    E(e) ? this.id = e : this.id = `${Z(_t)}_${this.#T}`;
   }
   setTitle(e) {
     this.Chart.setTitle(e);
@@ -17237,29 +17261,29 @@ class I extends hu {
     this.toolsW = e, this.#C.style.width = `${e}px`;
   }
   setPricePrecision(e) {
-    (!T(e) || e < 0) && (e = tl), this.#X = e;
+    (!T(e) || e < 0) && (e = il), this.#X = e;
   }
   setVolumePrecision(e) {
-    (!T(e) || e < 0) && (e = il), this.#K = e;
+    (!T(e) || e < 0) && (e = sl), this.#K = e;
   }
   addTheme(e) {
-    const i = Ee.create(e, this);
-    return this.#N instanceof Ee || (this.#N = i), i;
+    const i = Se.create(e, this);
+    return this.#N instanceof Se || (this.#N = i), i;
   }
   setTheme(e) {
     if (!this.theme.list.has(e))
       return !1;
     this.#N.setTheme(e, this);
     const i = this.#N, s = document.querySelector(`style[title=${this.id}_style]`), n = `var(--txc-border-color, ${i.chart.BorderColour}`;
-    let r = `.${this.id} { `;
-    r += `--txc-background: ${i.chart.Background}; `, this.style.background = `var(--txc-background, ${i.chart.Background})`, this.style.border = `${i.chart.BorderThickness}px solid`, this.style.borderColor = n, r += `--txc-border-color:  ${i.chart.BorderColour}; `, this.#f.rows.style.borderColor = n, r += `--txc-time-scrollbar-color: ${i.chart.BorderColour}; `, r += `--txc-time-handle-color: ${i.xAxis.handle}; `, r += `--txc-time-slider-color: ${i.xAxis.slider}; `, r += `--txc-time-cursor-fore: ${i.xAxis.colourCursor}; `, r += `--txc-time-cursor-back: ${i.xAxis.colourCursorBG}; `, r += `--txc-time-icon-color: ${i.icon.colour}; `, r += `--txc-time-icon-hover-color: ${i.icon.hover}; `, this.#x.overview.scrollBar.style.borderColor = n, this.#x.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${i.xAxis.handle})`, this.#x.overview.style.setProperty("--txc-time-slider-color", i.xAxis.slider), this.#x.overview.style.setProperty("--txc-time-icon-color", i.icon.colour), this.#x.overview.style.setProperty("--txc-time-icon-hover-color", i.icon.hover);
-    for (let [a, h] of Object.entries(this.Chart.legend.list))
-      h.el.style.color = `var(--txc-legend-color, ${i.legend.colour})`, h.el.style.font = `var(--txc-legend-font, ${i.legend.font})`;
+    let o = `.${this.id} { `;
+    o += `--txc-background: ${i.chart.Background}; `, this.style.background = `var(--txc-background, ${i.chart.Background})`, this.style.border = `${i.chart.BorderThickness}px solid`, this.style.borderColor = n, o += `--txc-border-color:  ${i.chart.BorderColour}; `, this.#f.rows.style.borderColor = n, o += `--txc-time-scrollbar-color: ${i.chart.BorderColour}; `, o += `--txc-time-handle-color: ${i.xAxis.handle}; `, o += `--txc-time-slider-color: ${i.xAxis.slider}; `, o += `--txc-time-cursor-fore: ${i.xAxis.colourCursor}; `, o += `--txc-time-cursor-back: ${i.xAxis.colourCursorBG}; `, o += `--txc-time-icon-color: ${i.icon.colour}; `, o += `--txc-time-icon-hover-color: ${i.icon.hover}; `, this.#x.overview.scrollBar.style.borderColor = n, this.#x.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${i.xAxis.handle})`, this.#x.overview.style.setProperty("--txc-time-slider-color", i.xAxis.slider), this.#x.overview.style.setProperty("--txc-time-icon-color", i.icon.colour), this.#x.overview.style.setProperty("--txc-time-icon-hover-color", i.icon.hover);
+    for (let [a, l] of Object.entries(this.Chart.legend.list))
+      l.el.style.color = `var(--txc-legend-color, ${i.legend.colour})`, l.el.style.font = `var(--txc-legend-font, ${i.legend.font})`;
     for (let a of this.#p.icons)
       a.className == "icon-wrapper" && (a.children[0].style.fill = i.icon.colour);
     for (let a of this.#C.icons)
       a.className == "icon-wrapper" && (a.children[0].style.fill = i.icon.colour);
-    return r += " }", s.innerHTML = r, !0;
+    return o += " }", s.innerHTML = o, !0;
   }
   setScrollPos(e) {
     e = Math.round(e), T(e) && e <= 0 && e >= this.bufferPx * -1 ? this.#H = e : this.emit("Error", "setScrollPos: not a valid value");
@@ -17269,14 +17293,14 @@ class I extends hu {
       return this.warn(`${this.name} id: ${this.id} : Specified state does not exist`), !1;
     if (e === this.key)
       return !0;
-    this.stream.stop(), this.MainPane.reset(), this.#E = k.get(e);
+    this.stream.stop(), this.MainPane.reset(), this.#P = k.get(e);
     const i = {
-      interval: this.#E.data.chart.tfms,
+      interval: this.#P.data.chart.tfms,
       core: this
     };
     if (this.getRange(null, null, i), this.range.Length > 1) {
-      const s = ps(this.time, void 0), n = s ? s + this.range.initialCnt : this.#E.data.chart.data.length - 1, r = s || n - this.range.initialCnt;
-      this.range.initialCnt = n - r, this.setRange(r, n);
+      const s = ps(this.time, void 0), n = s ? s + this.range.initialCnt : this.#P.data.chart.data.length - 1, o = s || n - this.range.initialCnt;
+      this.range.initialCnt = n - o, this.setRange(o, n);
     }
     this.MainPane.restart(), this.refresh();
   }
@@ -17293,15 +17317,15 @@ class I extends hu {
     if (this.stream instanceof mt)
       return this.error("Error: Invoke stopStream() before starting a new one."), !1;
     if (b(e))
-      return this.allData.data.length == 0 && S(e.timeFrame) && ({ tf, ms } = di(e?.timeFrame), this.range.interval = ms, this.range.intervalStr = tf, this.#_.timeFrameMS = ms, this.#_.timeFrame = tf), this.#$ = new mt(this), this.#g.stream = this.#$.config, this.#$;
+      return this.allData.data.length == 0 && E(e.timeFrame) && ({ tf, ms } = di(e?.timeFrame), this.range.interval = ms, this.range.intervalStr = tf, this.#_.timeFrameMS = ms, this.#_.timeFrame = tf), this.#$ = new mt(this), this.#g.stream = this.#$.config, this.#$;
   }
   stopStream() {
     this.stream instanceof mt && this.stream.stop();
   }
   delayedSetRange() {
-    for (; this.#B; ) {
+    for (; this.#U; ) {
       let e = this.range.Length * 0.5;
-      this.setRange(e * -1, e), this.off(ke, this.delayedSetRange), this.#B = !1;
+      this.setRange(e * -1, e), this.off(_e, this.delayedSetRange), this.#U = !1;
     }
   }
   updateRange(e) {
@@ -17319,12 +17343,12 @@ class I extends hu {
   }
   setRange(e = 0, i = this.rangeLimit) {
     const s = this.config?.maxCandles ? this.config.maxCandles : this.Chart?.layerWidth ? this.Chart.layerWidth : this.Chart.width;
-    this.#v.set(e, i, s), e < 0 && !this.#U ? this.emit("range_limitPast", { chart: this, start: e, end: i }) : i > this.range.dataLength && !this.#U && this.emit("range_limitFuture", { chart: this, start: e, end: i });
+    this.#v.set(e, i, s), e < 0 && !this.#B ? this.emit("range_limitPast", { chart: this, start: e, end: i }) : i > this.range.dataLength && !this.#B && this.emit("range_limitFuture", { chart: this, start: e, end: i });
   }
   jumpToIndex(e, i = !0, s = !0) {
     i && (e = _(e, 0, this.range.dataLength));
-    let n = this.range.Length, r = e + n;
-    s && (e -= n / 2, r -= n / 2), this.setRange(e, r);
+    let n = this.range.Length, o = e + n;
+    s && (e -= n / 2, o -= n / 2), this.setRange(e, o);
   }
   jumpToTS(e, i = !0, s = !0) {
     let n = this.Timeline.xAxis.t2Index(e);
@@ -17338,19 +17362,19 @@ class I extends hu {
     e && (i += this.range.Length / 2), this.jumpToIndex(i, !0, !1);
   }
   mergeData(e, i = !1, s = !1) {
-    this.#U = !0;
+    this.#B = !0;
     let n = this.state.mergeData(e, i, s);
-    return K(n) && (this.#U = !1), n;
+    return K(n) && (this.#B = !1), n;
   }
   isIndicator(e) {
-    return !!(typeof e == "function" && "primaryPane" in e.prototype && B(e.prototype?.draw));
+    return !!(typeof e == "function" && "primaryPane" in e.prototype && U(e.prototype?.draw));
   }
   setIndicators(e, i = !1) {
     if (!b(e))
       return !1;
     i && (console.warn("Expunging all default indicators!"), this.#R = {});
     for (const [s, n] of Object.entries(e))
-      S(n?.id) && S(n?.name) && S(n?.event) && this.isIndicator(n?.ind) && (this.#R[s] = n);
+      E(n?.id) && E(n?.name) && E(n?.event) && this.isIndicator(n?.ind) && (this.#R[s] = n);
     return !0;
   }
   addIndicator(e, i = e, s = {}) {
@@ -17366,10 +17390,10 @@ class I extends hu {
     return this.#D.indicatorSettings(e, i);
   }
   hasStateIndicator(e, i = "searchAll") {
-    if (!S(e) || !S(i))
+    if (!E(e) || !E(i))
       return !1;
-    const s = function(n, r) {
-      for (let a of r)
+    const s = function(n, o) {
+      for (let a of o)
         return a?.id == n || a?.name == n;
     };
     if (i == "searchAll") {
@@ -17381,12 +17405,12 @@ class I extends hu {
       return s(e, d);
   }
   async calcAllIndicators(e) {
-    const i = [], s = (n) => new Promise((r) => setTimeout(() => {
-      r(n());
+    const i = [], s = (n) => new Promise((o) => setTimeout(() => {
+      o(n());
     }, 0));
-    for (const [n, r] of Object.entries(this.Indicators))
-      for (const [a, h] of Object.entries(r))
-        i.push(h.instance.calcIndicatorHistory.bind(h.instance, e));
+    for (const [n, o] of Object.entries(this.Indicators))
+      for (const [a, l] of Object.entries(o))
+        i.push(l.instance.calcIndicatorHistory.bind(l.instance, e));
     await Promise.all(i.map(async (n) => {
       s(n);
     })), this.refresh();
@@ -17434,19 +17458,19 @@ class I extends hu {
     }
   }
 }
-window.customElements.get("tradex-chart") || (document.head.insertAdjacentHTML("beforeend", Oh), document.head.insertAdjacentHTML("beforeend", Rh), customElements.get("tradex-chart") || customElements.define("tradex-chart", I));
+window.customElements.get("tradex-chart") || (document.head.insertAdjacentHTML("beforeend", Rh), document.head.insertAdjacentHTML("beforeend", kh), customElements.get("tradex-chart") || customElements.define("tradex-chart", I));
 export {
   I as Chart,
   D as DOM,
-  Gh as EventHub,
-  _e as Indicator,
+  Yh as EventHub,
+  He as Indicator,
   W as Overlay,
   us as Range,
-  Ve as StateMachine,
-  se as canvas,
+  ze as StateMachine,
+  ne as canvas,
   ce as copyDeep,
-  hm as isPromise,
-  Ut as mergeDeep,
-  dm as talibAPI,
+  cm as isPromise,
+  Bt as mergeDeep,
+  mm as talibAPI,
   Z as uid
 };
