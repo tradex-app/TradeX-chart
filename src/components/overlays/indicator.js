@@ -96,6 +96,7 @@ export default class Indicator extends Overlay {
   get isIndicator() { return true }
   get status() { return this.#status }
   get drawOnUpdate() { return this.#drawOnUpdate }
+  set drawOnUpdate(u) { if (u === true) this.#drawOnUpdate = true }
 
   /**
    * process candle value

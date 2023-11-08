@@ -522,7 +522,8 @@ export default class State {
                     p.type === o.type &&
                     isObjectEqual(p.settings, o.settings)) {
                       p.data = this.merge(p.data, o.data)
-                    }
+                      o.instance.drawOnUpdate = true
+                }
               }
             }
           }
@@ -532,7 +533,14 @@ export default class State {
         if (isArray(mSecondary) && mSecondary.length > 0) {
           for (let o of mSecondary) {
             if (isArray(o?.data) && o?.data.length > 0) {
-
+              for (let p of secondaryPane) {
+                if (p.name === o.name &&
+                    p.type === o.type &&
+                    isObjectEqual(p.settings, o.settings)) {
+                      p.data = this.merge(p.data, o.data)
+                      o.instance.drawOnUpdate = true
+                }
+              }
             }
           }
         }
@@ -545,21 +553,27 @@ export default class State {
       if (isArray(mDataset) && mDataset.length > 0) {
         for (let o of mDataset) {
           if (isArray(o?.data) && o?.data.length > 0) {
-
+            for (let p of dataset) {
+              if (p.name === o.name &&
+                  p.type === o.type &&
+                  isObjectEqual(p.settings, o.settings)) {
+                    p.data = this.merge(p.data, o.data)
+              }
+            }
           }
         }
       }
 
       // Do we have events?
-      if (isObject(events)) {
-        for (let e in events) {
+      if (isObject(mEvents)) {
+        for (let e in mEvents) {
           
         }
       }
 
       // Do we have trades?
-      if (isObject(trades)) {
-        for (let d in trades) {
+      if (isObject(mtrades)) {
+        for (let d in mTrades) {
           
         }
       }
