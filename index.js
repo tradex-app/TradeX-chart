@@ -200,7 +200,8 @@ const config1 = {
   watermark: {
     text: "BTC/USDT"
   },
-  dca: true,
+  dca: false,
+  highLow: true,
   isCrypto: true,
   logs: true,
   infos: true,
