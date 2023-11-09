@@ -135,10 +135,41 @@ The parent ``Overlay`` class provides everything needed to draw on the chart.
 | xAxis   | methods and properties for the timeline                |
 | yAxis   | methods and properties for the (price) scale           |
 | context | "chart", "xAxis", "yAxis" - where the overlay is added |
+| plots   | methods to draw on the overlay or any other canvas     |
 
 ### Drawing on the Overlay
 
 TODO:
+
+#### Using plot() to Draw on the Overlay
+
+TODO:
+
+The ``plot()`` method provides the following functions to draw on the overlay or any other canvas:
+
+* [``createCanvas``](../canvas_methods#createcanvas)
+* [``fillStroke``](../canvas_methods#fillstroke)
+* [``renderLine``](../canvas_methods#renderline)
+* [``renderLineHorizontal``](../canvas_methods#renderlinehorizontal)
+* [``renderLineVertical``](../canvas_methods#renderlinevertical)
+* [``renderPathStroke``](../canvas_methods#renderpathstroke)
+* [``renderPathClosed``](../canvas_methods#renderpathclosed)
+* [``renderSpline``](../canvas_methods#renderspline)
+* [``renderRect``](../canvas_methods#renderrect)
+* [``renderRectFill``](../canvas_methods#renderrectfill)
+* [``renderRectStroke``](../canvas_methods#renderrectstroke)
+* [``renderRectRound``](../canvas_methods#renderrectround)
+* [``renderRectRoundFill``](../canvas_methods#renderrectroundfill)
+* [``renderRectRoundStroke``](../canvas_methods#renderrectroundstroke)
+* [``renderPolygonRegular``](../canvas_methods#renderpolygonregular)
+* [``renderPolygonIrregular``](../canvas_methods#renderpolygonirregular)
+* [``renderTriangle``](../canvas_methods#rendertriangle)
+* [``renderDiamond``](../canvas_methods#renderdiamond)
+* [``renderCircle``](../canvas_methods#rendercircle)
+* [``renderImage``](../canvas_methods#renderimage)
+* [``renderText``](../canvas_methods#rendertext)
+* [``renderTextBG``](../canvas_methods#rendertextbg)
+
 
 ### Adding a Custom Overlay to the Chart
 

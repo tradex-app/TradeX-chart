@@ -9,7 +9,11 @@ Developers are not restricted to using only the [default indicators](../indicato
 Please first read the [Indicators](../indicators) documentation before proceeding with custom indicators, as the later extends the former and inherits the bulk of it's properties, methods and functionality from it.
 :::
 
-If you examine the repo for the ``Indicator`` class ``./src/components/overlays/indicator.js`` you will note that the Indicator class itself extends the ``Overlay`` class ``./src/components/overlays/overlay.js`` which provides all of the methods for it to be rendered to the chart pane in the render loop. It also provides the canvas for your indicator to draw on.
+If you examine the repo for the ``Indicator`` class ``./src/components/overlays/indicator.js`` you will note that the Indicator class itself **extends** the ``Overlay`` class ``./src/components/overlays/overlay.js`` which provides all of the methods for it to be rendered to the chart pane in the render loop. It also provides the canvas for your indicator to draw on.
+
+:::note
+Please refer to the [Overlays](../overlays) documentation to learn what methods and properties that each indicator inherits.
+:::
 
 ### Registering Custom Indicators
 

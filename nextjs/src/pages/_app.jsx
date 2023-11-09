@@ -16,7 +16,7 @@ export default function Home({ Component }) {
         </Head>
 
     <header className="toolbar">
-          <h1 className={styles.title}>Trade-X on Next.js!</h1>
+          <h1 className={styles.title}>TradeX-chart - React Next.js</h1>
           <div style={{ display: 'flex', gap: '10px' }}>
             <Link href="/"
               style={{
@@ -74,6 +74,12 @@ export default function Home({ Component }) {
               <img
                 src="https://badgen.net/badge/icon/npm?icon=npm&label"
                 alt="NPM"
+              />
+            </a>
+            <a href="https://discord.com/channels/1039287962510311434/1039288750913634405" title="Discord">
+              <img
+                src="https://badgen.net/badge/icon/discord?icon=discord&label"
+                alt="discord"
               />
             </a>
           </div>
