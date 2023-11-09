@@ -91,7 +91,7 @@ export function renderImage (ctx, image, sx, sy, sWidth, sHeight, dx, dy, dWidth
  * @param {canvas} canvas - HTML canvas
  * @returns {canvas}
  */
-export function imageToCanvs(image, canvas) {
+export function imageToCanvas(image, canvas) {
   let w = image.naturalWidth || image.width;
   let h = image.naturalHeight || image.height;
 
@@ -120,7 +120,13 @@ export function getChannel(channelName, image) {
   return copy;
 }
 
-export function seperateRGB(image) {
+/**
+ * Spit an image into RGBA channels
+ *
+ * @param {*} image - image resource
+ * @return {object}  
+ */
+export function separateRGB(image) {
   return {
     red: getChannel("red", image),
     green: getChannel("green", image),
@@ -129,6 +135,13 @@ export function seperateRGB(image) {
   };
 }
 
+/**
+ * Create a HTML canvas element
+ *
+ * @param {number} w - width in pixels
+ * @param {number} h - height in pixels
+ * @return {canvas}  - HTML canvas element
+ */
 export function createCanvas(w, h) {
   const can = document.createElement("canvas");
   can.ctx = can.getContext("2d", {willReadFrequently: true});
@@ -140,8 +153,8 @@ export function createCanvas(w, h) {
 
 export default {
   createCanvas,
-  imageToCanvs,
-  seperateRGB,
+  imageToCanvas,
+  separateRGB,
   getChannel,
   getPixelRatio,
   fillStroke,

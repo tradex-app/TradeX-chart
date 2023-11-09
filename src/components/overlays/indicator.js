@@ -3,7 +3,6 @@
 
 import Overlay from "./overlay"
 import { Range } from "../../model/range"
-import canvas from "../../renderer/canvas"
 import { limit } from "../../utils/number"
 import { isArray, isBoolean, isFunction, isObject, isString } from "../../utils/typeChecks"
 import { idSanitize } from "../../utils/utilities"
@@ -96,6 +95,7 @@ export default class Indicator extends Overlay {
   get isIndicator() { return true }
   get status() { return this.#status }
   get drawOnUpdate() { return this.#drawOnUpdate }
+  set drawOnUpdate(u) { if (u === true) this.#drawOnUpdate = true }
 
   /**
    * process candle value
@@ -563,35 +563,13 @@ export default class Indicator extends Overlay {
   /**
    * plot 
    *
-   * @param {Array} plots - array of x y coords [{x:x, y:y}, ...]
+   * @param {Array} plots - array of inputs, eg. x y coords [{x:x, y:y}, ...]
    * @param {string} type
    * @param {Object} opts
-   * @memberof indicator
+   * @memberof Indicator
    */
   plot(plots, type, opts ) {
-
-    const ctx = this.scene.context
-    const p = plots
-    ctx.save();
-
-    switch(type) {
-      case "renderLine": canvas[type]( ctx, p, opts ); break;
-      case "renderLineHorizontal": canvas[type]( ctx, p[0], p[1], p[2], opts ); break;
-      case "renderLineVertical": canvas[type]( ctx, p[0], p[1], p[2], opts ); break;
-      case "renderPathStroke": canvas[type]( ctx, p, opts.style, opts ); break;
-      case "renderPathClosed": canvas[type]( ctx, p, opts ); break;
-      case "renderSpline": canvas[type]( ctx, p, opts ); break;
-      case "renderRect": canvas[type]( ctx, p[0], p[1], p[2], p[3], opts ); break;
-      case "renderRectRound": canvas[type]( ctx, p[0], p[1], p[2], p[3], p[4], opts ); break;
-      case "renderPolygonRegular": canvas[type]( ctx, p[0], p[1], p[2], p[3], p[4], opts ); break;
-      case "renderPolygonIrregular": canvas[type]( ctx, p, opts ); break;
-      case "renderTriangle": canvas[type]( ctx, p[0], p[1], p[2], opts); break;
-      case "renderDiamond": canvas[type]( ctx, p[0], p[1], p[2], p[3], opts); break;
-      case "renderCircle": canvas[type]( ctx, p[0], p[1], p[2], opts ); break;
-      case "renderImage": canvas[type]( ctx, opts.src, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7] )
-    }
-
-    ctx.restore();
+    super.plot(plots, type, opts )
   }
 
   draw() {

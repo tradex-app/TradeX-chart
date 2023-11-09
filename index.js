@@ -154,7 +154,7 @@ const config1 = {
     minCandles: MINCANDLES,
     maxCandles: MAXCANDLES,
     yAxisBounds: 0.3,
-    center: true
+    center: false
   },
   theme: {
     candle: {

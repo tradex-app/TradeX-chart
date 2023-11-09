@@ -4,6 +4,8 @@
 import { isBoolean } from "../../utils/typeChecks"
 import xAxis from "../axis/xAxis"
 import yAxis from "../axis/yAxis"
+import canvas from "../../renderer/canvas"
+
 
 export default class Overlay {
 
@@ -159,4 +161,47 @@ export default class Overlay {
     l.rowsH = d.height
     l.refresh = false
   }
+
+  /**
+   * plot 
+   *
+   * @param {Array} plots - array of inputs, eg. x y coords [{x:x, y:y}, ...]
+   * @param {string} type - the canvas drawing function to invoke
+   * @param {Object} params - parameters to pass to the drawing function
+   * @memberof Overlay
+   */
+    plot(plots, type, params ) {
+
+      const ctx = this.scene.context
+      const p = plots
+      ctx.save();
+  
+      switch(type) {
+        case "createCanvas": canvas[type]( p[0], p[1] ); break;
+        case "fillStroke": canvas[type]( ctx, p[0], p[1], p[2] ); break;
+        case "renderLine": canvas[type]( ctx, p, params ); break;
+        case "renderLineHorizontal": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
+        case "renderLineVertical": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
+        case "renderPath": canvas[type]( ctx, p, params.style, params ); break;
+        case "renderPathStroke": canvas[type]( ctx, p, params.style, params ); break;
+        case "renderPathClosed": canvas[type]( ctx, p, params ); break;
+        case "renderSpline": canvas[type]( ctx, p, params ); break;
+        case "renderRect": canvas[type]( ctx, p[0], p[1], p[2], p[3], params ); break;
+        case "renderRectFill": canvas[type]( ctx, p[0], p[1], p[2], p[3], params ); break;
+        case "renderRectStroke": canvas[type]( ctx, p[0], p[1], p[2], p[3], params ); break;
+        case "renderRectRound": canvas[type]( ctx, p[0], p[1], p[2], p[3], p[4], params ); break;
+        case "renderRectRoundFill": canvas[type]( ctx, p[0], p[1], p[2], p[3], p[4], params ); break;
+        case "renderRectRoundStroke": canvas[type]( ctx, p[0], p[1], p[2], p[3], p[4], params ); break;
+        case "renderPolygonRegular": canvas[type]( ctx, p[0], p[1], p[2], p[3], p[4], params ); break;
+        case "renderPolygonIrregular": canvas[type]( ctx, p, params ); break;
+        case "renderTriangle": canvas[type]( ctx, p[0], p[1], p[2], params); break;
+        case "renderDiamond": canvas[type]( ctx, p[0], p[1], p[2], p[3], params); break;
+        case "renderCircle": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
+        case "renderImage": canvas[type]( ctx, params.src, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7] )
+        case "renderText": canvas[type]( ctx, p[0], p[1], params ); break;
+        case "renderTextBG": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
+      }
+  
+      ctx.restore();
+    }
 }

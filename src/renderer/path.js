@@ -1,6 +1,6 @@
 // path.js
 
-import { isArray } from "../utils/typeChecks"
+import { isArray, isFunction } from "../utils/typeChecks"
 import { fillStroke } from "./canvas";
 
 
@@ -11,7 +11,7 @@ import { fillStroke } from "./canvas";
  * @param {Object} style - {width, stroke, fill, dash}
  * @param {function} strokeFill
  */
-export function renderPath (ctx, coords, style, strokeFill) {
+export function renderPath (ctx, coords, style, strokeFill=()=>{}) {
   ctx.save()
   const w = style.width || 1
   ctx.lineWidth = w
@@ -35,7 +35,7 @@ export function renderPath (ctx, coords, style, strokeFill) {
       }
     }
   })
-  strokeFill()
+  if (isFunction(strokeFill)) strokeFill()
   ctx.restore()
 }
 

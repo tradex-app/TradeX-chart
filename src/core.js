@@ -456,7 +456,7 @@ export default class TradeXchart extends Tradex_chart {
       const rangeStart = calcTimeIndex(this.#time, this.#config?.range?.startTS)
       const end = (isNumber(rangeStart)) ? 
         rangeStart + this.#range.initialCnt :
-        this.allData.data.length - 1
+        this.allData.data.length
       const start = (isNumber(rangeStart)) ? rangeStart : end - this.#range.initialCnt
       this.#range.initialCnt = end - start
       this.setRange(start, end)
