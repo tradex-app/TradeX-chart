@@ -4,10 +4,11 @@ description: Overlays in the simplest form are a chart pane layer
 ---
 Overlays in the simplest form are a layer, that exist either on:
 
-* Primary chart (candlestick price view)
-* Secondary chart panes (indicators that don't live on the primary chart)
+* Primary Chart Pane (candlestick price view)
+* Secondary Chart Panes (indicators that don't live on the primary chart)
 * Y Axis price scale
 * X Axis time line
+* Main Pane, which lives below all other panes
 
 ![Chart Overlay Regions](../../../assets/Overly-Regions.png)
 
@@ -63,7 +64,12 @@ Indicators draw a visual interpretation (calculation) of either the price histor
 
 To add indicators to the chart, refer to the [indicator documentation](../indicators).
 
-Optional overlays are always present, but must be enabled via the [chart config](../02_configuration).
+Optional overlays are always present, and can be enabled via: 
+
+* [chart config](../02_configuration)
+* [addOverlay()](../overlays_custom#addinganoverlay) API method
+
+The current list of optional overlays is as follows:
 
 * Scale Price Line - ``stream: {}`` see: [Streaming Price Data](../streaming_price_data)
 * Chart High Low - ``hightLow: true``
@@ -76,101 +82,7 @@ The following ovelays are an exception and are added via the [initial chart stat
 
 ## Custom Overlays
 
-TradeX-chart exports the ``Overlay`` class for you extend to build your own custom overlays.
-
-```javascript
-import { overlays } from "tradex-chart"
-```
-
-The [TradeX-chart GitHub repository](https://github.com/tradex-app/TradeX-chart/tree/master/src/components/overlays) is a good starting point for examples of how to build overlays.
-
-### Basic Custom Overlay
-
-The foundation of an overlay looks like the following:
-
-```javascript
-import { overlays } from "tradex-chart"
-
-export default class customOverlay extends Overlay {
-
-  constructor(target, xAxis=false, yAxis=false, theme, parent) {
-    // instantiate parent class Overlay
-    super(target, xAxis, yAxis, theme, parent)
-  }
-
-  // position() will pan / scroll your overlay with the rest of the chart
-  set position(p) { this.target.setPosition(p[0], p[1]) }
-  // if you want your overlay NOT to pan / scroll, then replace the above with:
-  // set position(p) { this.target.setPosition(0, 0) }
-
-  // draw your overlay
-  draw(range=this.core.range) {
-    // clear the layer provided to your overlay
-    this.scene.clear()
-    // HTML canvas context
-    const ctx = this.scene.context
-    ctx.save();
-
-    // draw something on the canvas
-
-    ctx.restore()
-  }
-}
-```
-
-### What the Parent Overlay Class Provides
-
-The parent ``Overlay`` class provides everything needed to draw on the chart.
-
-| Name    | Description                                            |
-| --------- | -------------------------------------------------------- |
-| core    | [chart root API](../../api/core)                       |
-| parent  | pane that overlay is applied to                        |
-| config  | [chart config](../02_configuration)                    |
-| theme   | [chart theme](../themes)                               |
-| params  | parameters that the overlay was created with           |
-| target  | layer methods and properties                           |
-| scene   | layer canvas provided to the overlay                   |
-| chart   | chart pane                                             |
-| xAxis   | methods and properties for the timeline                |
-| yAxis   | methods and properties for the (price) scale           |
-| context | "chart", "xAxis", "yAxis" - where the overlay is added |
-| plots   | methods to draw on the overlay or any other canvas     |
-
-### Drawing on the Overlay
-
-TODO:
-
-#### Using plot() to Draw on the Overlay
-
-TODO:
-
-The ``plot()`` method provides the following functions to draw on the overlay or any other canvas:
-
-* [``createCanvas``](../canvas_methods#createcanvas)
-* [``fillStroke``](../canvas_methods#fillstroke)
-* [``renderLine``](../canvas_methods#renderline)
-* [``renderLineHorizontal``](../canvas_methods#renderlinehorizontal)
-* [``renderLineVertical``](../canvas_methods#renderlinevertical)
-* [``renderPathStroke``](../canvas_methods#renderpathstroke)
-* [``renderPathClosed``](../canvas_methods#renderpathclosed)
-* [``renderSpline``](../canvas_methods#renderspline)
-* [``renderRect``](../canvas_methods#renderrect)
-* [``renderRectFill``](../canvas_methods#renderrectfill)
-* [``renderRectStroke``](../canvas_methods#renderrectstroke)
-* [``renderRectRound``](../canvas_methods#renderrectround)
-* [``renderRectRoundFill``](../canvas_methods#renderrectroundfill)
-* [``renderRectRoundStroke``](../canvas_methods#renderrectroundstroke)
-* [``renderPolygonRegular``](../canvas_methods#renderpolygonregular)
-* [``renderPolygonIrregular``](../canvas_methods#renderpolygonirregular)
-* [``renderTriangle``](../canvas_methods#rendertriangle)
-* [``renderDiamond``](../canvas_methods#renderdiamond)
-* [``renderCircle``](../canvas_methods#rendercircle)
-* [``renderImage``](../canvas_methods#renderimage)
-* [``renderText``](../canvas_methods#rendertext)
-* [``renderTextBG``](../canvas_methods#rendertextbg)
+Please refer to the [Custom Overlays](../overlays_custom) documentation to find out how to [define](../overlays_custom/#definingacustomoverlay), [register](../overlays_custom#registeringanoverlay), [add](../overlays_custom#addinganoverlay) and [remove](../overlays_custom#removinganoverlay) overlays via the API.
 
 
-### Adding a Custom Overlay to the Chart
 
-TODO:

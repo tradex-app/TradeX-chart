@@ -102,7 +102,7 @@ export default class Overlays {
       if (!isString(overlay.instance?.id)) overlay.instance.id = key
 
       this.#list.set(overlay.instance.id, overlay)
-      return true
+      return overlay
     }
     catch (e) {
       console.error(`Error: Cannot instantiate ${key} overlay / indicator`)

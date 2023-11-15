@@ -40,3 +40,12 @@ export class OHLCV {
   static c = 4
   static v = 5
 }
+
+export const OVERLAYPANES = {
+  mainPane: {},
+  primaryPane: {},
+  secondaryPane: {},
+  scale: {},
+  timeline: {}
+}
+export const OVERLAYLOCATIONS = Array.from(Object.keys(OVERLAYPANES))
