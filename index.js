@@ -12,6 +12,7 @@ import btcusdt_15min from './data/btcusdt_15min'
 // import state from './data/seconds-indicator'
 import TEST from './custom-indicator'
 import DMI from './DMI'
+import CustomOverlay from './custom-overlay'
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
@@ -1166,6 +1167,16 @@ chart0.setIndicators({
 chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
 chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 
+// register custom overlay
+chart0.setCustomOverlays({
+  custom: {
+    class: CustomOverlay,
+    location: "primaryPane"
+  }
+})
+// add custom overlay
+chart0.addOverlay("custom", "chartPane")
+
 // add an alert
 if (typeof chart1 === "object") {
   chart1.stream.alerts.add(13010, alertTest, h)
@@ -1174,4 +1185,5 @@ if (typeof chart1 === "object") {
 }
 
 // test merging indicator data
-chart5.mergeData(state1_5a, false)
+if (typeof chart5 === "object")
+  chart5.mergeData(state1_5a, false)

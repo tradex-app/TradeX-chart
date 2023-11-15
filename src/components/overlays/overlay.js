@@ -26,7 +26,8 @@ export default class Overlay {
     Length: null,
     rowsW: null,
     rowsH: null,
-    refresh: false
+    refresh: false,
+    resize: false
   }
 
   id
@@ -48,6 +49,7 @@ export default class Overlay {
     // this.on("rowsResize", this.drawUpdate, this)
     // this.on("divider_pointerdrag", this.drawUpdate, this)
     // this.on("divider_pointerdragend", this.drawUpdate, this)
+    this.on("global_resize", this.onResize, this)
   }
 
   get core() { return this.#core }
@@ -70,6 +72,7 @@ export default class Overlay {
     // this.off("rowsResize", this.drawUpdate, this)
     // this.off("divider_pointerdrag", this.drawUpdate, this)
     // this.off("divider_pointerdragend", this.drawUpdate, this)
+    this.off("global_resize", this.onResize, this)
   }
 
   /**
@@ -101,6 +104,10 @@ export default class Overlay {
    */
   emit(topic, data) {
     this.core.emit(topic, data)
+  }
+
+  onResize() {
+    this.#mustUpdate.resize = true
   }
 
   setSize(w, h) {
@@ -143,7 +150,8 @@ export default class Overlay {
       l.valueMin !== r.valueMin ||
       l.indexStart !== r.indexStart ||
       l.Length !== r.Length ||
-      l.refresh
+      l.refresh ||
+      l.resize
     ) ? this.#mustUpdate : false
   }
 
@@ -160,6 +168,7 @@ export default class Overlay {
     l.rowsW = d.width
     l.rowsH = d.height
     l.refresh = false
+    l.resize = false
   }
 
   /**

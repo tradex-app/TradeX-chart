@@ -112,17 +112,16 @@ Editable sandbox examples can found on [CodeSandbox.io](https://codesandbox.io/u
 
 ## Framework Integration Examples
 
-[* React / NextJS](nextjs)
-
+* [React / NextJS](nextjs)
 * Vue (TODO:)
 * Svelte (TODO:)
 
 ## Features
 
 * Plain JavaScript with no framework dependencies
-* All chart features and functions accessible via API
-* State object defines chart configuration, indicators and tools
-* State can be imported or exported for storage and retrieval
+* All chart features and functions accessible via [API](https://tradex-app.github.io/TradeX-chart/api/core/)
+* [State object](https://tradex-app.github.io/TradeX-chart/reference/state/) defines [chart configuration](https://tradex-app.github.io/TradeX-chart/reference/02_configuration/), [indicators](https://tradex-app.github.io/TradeX-chart/reference/indicators_default/) and tools
+* State can be [imported](https://https://tradex-app.github.io/TradeX-chart/reference/state/#create-and-use-a-state) or [exported](https://tradex-app.github.io/TradeX-chart/reference/state/#export) for storage and retrieval
 * Indicator calculation provided by [talib-web](https://https://anchegt.github.io/talib-web/) as a WebAssembly module.
 * [Custom Themes](https://tradex-app.github.io/TradeX-chart/reference/themes/)
 * [Custom Indicators](https://tradex-app.github.io/TradeX-chart/reference/indicators_default/https:/)
@@ -131,24 +130,24 @@ Editable sandbox examples can found on [CodeSandbox.io](https://codesandbox.io/u
 * [Event Hub](https://tradex-app.github.io/TradeX-chart/reference/events/) - subscribe to chart events
 * Rendering Optimization - smooth performance
 * High frequency chart candles updates
-* Export chart to png, jpg, webp, with optional watermarking
+* [Export chart to png, jpg](https://tradex-app.github.io/TradeX-chart/reference/api-examples/#download-image), webp, with optional watermarking
 
 ## Support
 
 For the latest news on TradeX-chart, feedback, feature requests, and community, join us over on Discord or GitHub.
 
-[TradeX Discord](https://discord.gg/dMegsSQDe)
-[GitHub](https://github.com/tradex-app/TradeX-chart/discussions)
+* [TradeX Discord](https://discord.gg/dMegsSQDe)
+* [GitHub](https://github.com/tradex-app/TradeX-chart/discussions)
 
 ## Contributing
 
-* Fork the Project
-* Create your Feature Branch (git checkout -b feature/AmazingFeature)
-* Commit your Changes (git commit -m 'Add some AmazingFeature)
-* Push to the Branch (git push origin feature/AmazingFeature)
-* Open a Pull Request
+* [Fork the chart repostitory](https://github.com/tradex-app/TradeX-chart/fork)
+* Create your Feature Branch ``git checkout -b feature/AmazingFeature``
+* Commit your Changes ``git commit -m 'Add some AmazingFeature'``
+* Push to the Branch ``git push origin feature/AmazingFeature``
+* Open a [Pull Request](https://github.com/tradex-app/TradeX-chart/pulls)
 
-Testing, bug reports and feature requests welcome
+Testing, [bug reports and feature requests](https://github.com/tradex-app/TradeX-chart/discussions) welcome
 
 You can help speed up development by contributing with crypto or PayPal.
 

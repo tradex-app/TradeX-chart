@@ -15,13 +15,14 @@ import StateMachine from "../scaleX/stateMachne";
 import stateMachineConfig from "../state/state-chartPane"
 import Input from "../input"
 import ScaleBar from "./scale"
+// import watermark from "./overlays/chart-watermark"
 import chartGrid from "./overlays/chart-grid"
 import chartCursor from "./overlays/chart-cursor"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartCandleStream from "./overlays/chart-candleStream"
 import chartHighLow from "./overlays/chart-highLow";
-import chartDCA from "./overlays/chart-dca";
+// import chartDCA from "./overlays/chart-dca";
 import chartNewsEvents from "./overlays/chart-newsEvents";
 import chartTrades from "./overlays/chart-trades"
 import {
@@ -41,12 +42,14 @@ import {
 import { VolumeStyle } from "../definitions/style"
 
 
-const defaultOverlays = {
+export const defaultOverlays = {
   primaryPane: [
+    // ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
     ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
     ["candles", {class: chartCandles, fixed: false, required: true}],
-    ["dca", {class: chartDCA, fixed: true, required: false}],
+    ["hiLo", {class: chartHighLow, fixed: true, required: false}],
+    // ["dca", {class: chartDCA, fixed: true, required: false}],
     ["stream", {class: chartCandleStream, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ],
@@ -55,7 +58,7 @@ const defaultOverlays = {
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ]
 }
-const optionalOverlays = {
+export const optionalOverlays = {
   primaryPane: {
     "trades": {class: chartTrades, fixed: false, required: false},
     "events": {class: chartNewsEvents, fixed: false, required: false},
@@ -587,6 +590,12 @@ export default class Chart {
         config.cnt = 1
         config.id = `${this.id}-${o.type}`
         config.class = optionalOverlays[this.type][o.type].class
+      }
+      // custom overlay types
+      else if (o.type in this.#core.customOverlays[this.type]) {
+        config.cnt = 1
+        config.id = `${this.id}-${o.type}`
+        config.class = this.#core.customOverlays[this.type][o.type].class
       }
       else continue
 

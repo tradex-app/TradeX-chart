@@ -1,14 +1,13 @@
 // chart-watermark.js
 
-import { createFont, getTextRectHeight, getTextRectWidth } from "../../renderer/text"
-import { renderImage } from "../../renderer/canvas"
-import { isObject, isString } from "../../utils/typeChecks"
-import DOM from "../../utils/DOM"
-import Overlay from "./overlay"
-import { CHART_MINH } from "../../definitions/style"
+import { createFont, getTextRectHeight, getTextRectWidth } from "./src/renderer/text"
+import { renderImage } from "./src/renderer/canvas"
+import { isObject, isString } from "./src/utils/typeChecks"
+import DOM from "./src/utils/DOM"
+import Overlay from "./src/components/overlays/overlay"
 
 
-export default class chartWatermark extends Overlay {
+export default class CustomOverlay extends Overlay {
 
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
@@ -22,43 +21,32 @@ export default class chartWatermark extends Overlay {
   set position(p) { this.target.setPosition(0, 0) }
 
   draw() {
-    const watermark = this.config?.watermark
-    const update = super.mustUpdate()
-
-    if ( this.watermark === watermark?.imgURL ||
-         this.watermark === watermark?.text) {
-          if (!update.resize) return
+    if (this.txt === "Custom Overlay") {
+      const update = super.mustUpdate()
+      if (!update.resize) return  
     }
 
-    if ( watermark?.imgURL ) {
-      this.watermark = watermark.imgURL
-      DOM.isImage(watermark?.imgURL, this.renderImage.bind(this))
-      super.updated()
-    }
-    else if ( isString(watermark?.text) ) {
-      this.watermark = watermark.text
-      this.scene.clear()
-      const ctx = this.scene.context
-      ctx.save();
-      this.renderText(watermark.text)
-      ctx.restore()
-      super.updated()
-    }
-    else return
+    this.txt = "Custom Overlay"
+    this.scene.clear()
+    const ctx = this.scene.context
+    ctx.save();
+    this.renderText()
+    ctx.restore()
+    super.updated()
   }
 
-  renderText(txt) {
-    const ratio = Math.floor(this.core.height / CHART_MINH)
+  renderText() {
     const size = this.core.config?.watermark?.fontSize
     const weight = this.core.config?.watermark?.fontWeight
     const family = this.core.config?.watermark?.fontFamily
     const colour = this.core.config?.watermark?.textColour
     const options = {
-      fontSize: (size || this.theme.watermark.FONTSIZE) * ratio,
+      fontSize: size || this.theme.watermark.FONTSIZE,
       fontWeight: weight || this.theme.watermark.FONTWEIGHT,
       fontFamily: family || this.theme.watermark.FONTFAMILY,
-      txtCol: colour || this.theme.watermark.COLOUR,
+      txtCol: "#666" //colour || this.theme.watermark.COLOUR,
     }
+    const txt = this.txt // this.config.watermark.text
     const ctx = this.scene.context
     ctx.font = createFont(options?.fontSize, options?.fontWeight, options?.fontFamily)
     ctx.textBaseline = 'top';
@@ -67,7 +55,7 @@ export default class chartWatermark extends Overlay {
     const height = getTextRectHeight(options)
     const width = getTextRectWidth(ctx, txt, options)
     const x = (this.scene.width - width) / 2
-    const y = (this.core.Chart.height - height) / 2 // (this.scene.height - height) / 2
+    const y = (this.scene.height - height) / 2
 
     ctx.fillText(txt, x, y);
   }

@@ -2,11 +2,11 @@
 // it all begins here...
 
 import * as packageJSON from '../package.json'
-import { isArray, isBoolean, isFunction, isNumber, isObject, isString, isError, isPromise } from './utils/typeChecks'
+import { isArray, isBoolean, isFunction, isNumber, isObject, isString, isError, isPromise, isClass } from './utils/typeChecks'
 import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { isTimeFrame, SECOND_MS } from "./utils/time"
-import { copyDeep, objToString, uid } from './utils/utilities'
+import { copyDeep, mergeDeep, objToString, uid } from './utils/utilities'
 import State from './state'
 import { Range, calcTimeIndex } from "./model/range"
 import { defaultTheme } from './definitions/style'
@@ -22,11 +22,14 @@ import WidgetsG from './components/widgets'
 
 import { NAME, SHORTNAME, ID, RANGELIMIT, PRICE_PRECISION, VOLUME_PRECISION, STREAM_UPDATE } from './definitions/core'
 import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH } from './definitions/style'
+import { OVERLAYPANES } from './definitions/chart'
 import Indicators from './definitions/indicators'
 import Indicator from './components/overlays/indicator'
 import exportImage from './utils/exportImage'
 import talib from './wasm/index.esm.str.js'
 import wasm from './wasm/talib.wasm.dataURI'
+import { defaultOverlays, optionalOverlays } from './components/chart'
+
 
 /**
  * The root class for the entire chart
@@ -79,6 +82,10 @@ export default class TradeXchart extends Tradex_chart {
   #state
   #range
   #indicators = Indicators
+  #standardOverlays = {...OVERLAYPANES}
+  #optionalOverlays = {...OVERLAYPANES}
+  #customOverlays = {...OVERLAYPANES}
+
   #TALib
   #theme
   #themeTemp
@@ -268,6 +275,10 @@ export default class TradeXchart extends Tradex_chart {
 
     this.oncontextmenu = window.oncontextmenu
     this.#workers = WebWorker
+
+    const so = this.#standardOverlays
+    so.primaryPane = {...so.primaryPane, ...defaultOverlays.primaryPane}
+    this.#optionalOverlays = {...optionalOverlays}
   }
 
   log(...l) { if (this.logs) console.log(...l) }
@@ -321,6 +332,8 @@ export default class TradeXchart extends Tradex_chart {
   /** @returns {object} - all chart indicators in use, grouped by chart panes */
   get Indicators() { return this.#MainPane.indicators }
 
+  get CustomOverlays() { return this.#customOverlays }
+
   get ready() { return this.#ready }
 
   /** @returns {State} - current state instance */
@@ -370,6 +383,8 @@ export default class TradeXchart extends Tradex_chart {
   set candles(c) { if (isObject(c)) this.#candles = c }
   get candles() { return this.#candles }
   get progress() { return this.#progress }
+  get customOverlays() { return this.#customOverlays }
+  get optionalOverlays() { return mergeDeep({...this.#optionalOverlays}, this.#customOverlays) } 
 
   /**
    * let's start building the chart
@@ -736,6 +751,10 @@ export default class TradeXchart extends Tradex_chart {
     }
   }
 
+  /*============================*/
+  /*---------- STATE -----------*/
+  /*============================*/
+
   /**
    * 
    * @param {string} key - state id
@@ -811,6 +830,10 @@ export default class TradeXchart extends Tradex_chart {
     return this.state.export(key=this.key, config={})
   }
 
+  /*============================*/
+  /*---------- STREAM ----------*/
+  /*============================*/
+
   /**
    * specify a chart stream
    * @memberof TradeXchart
@@ -848,6 +871,9 @@ export default class TradeXchart extends Tradex_chart {
     }
   }
 
+  /*============================*/
+  /*----------- RANGE ----------*/
+  /*============================*/
   /**
    * When chart is empty postpone range setting
    * until first candle, then position on last
@@ -985,7 +1011,7 @@ export default class TradeXchart extends Tradex_chart {
    * @param {boolean|object} newRange - false | {start: number, end: number}
    * @param {boolean} calc - automatically calculate indicator data (ignore any existing)
    */
-  // TODO: merge dataset?
+  
   mergeData(merge, newRange=false, calc=false) {
     this.#mergingData = true
     let m = this.state.mergeData(merge, newRange, calc)
@@ -1001,28 +1027,200 @@ export default class TradeXchart extends Tradex_chart {
     return m
   }
 
+  /*============================*/
+  /*--------- OVERLAYS ---------*/
+  /*============================*/
+  /**
+   * validate Overlay
+   * @param {class} o- overlay class
+   * @returns {boolean}
+   */
+  isOverlay(o) {
+    return (
+      isClass(o) &&
+      isFunction(o.prototype?.draw) &&
+      !this.isIndicator(o) &&
+      Object.getPrototypeOf(o.prototype).constructor.name === "Overlay"
+    )
+  }
+
+  /**
+   * check if there is a registered custom overlay matching the ID
+   * @param {string} o 
+   * @returns {object|boolean} - pointer to overlay or false
+   */
+  hasOverlay(o) {
+    const e = this.overlayEntries()
+    if (!Object.keys(e).includes(o)) return false
+    return e[o]
+  }
+
+  /**
+   * list of optional overlays, inclusive of custom overlays by ID
+   * @returns {Array} - array of optional overlay keys
+   */
+  overlayKeys() {
+    return Object.keys(this.overlayEntries())
+  }
+
+  /**
+   * list of optional overlays, inclusive of custom overlays by key, value pair
+   * @returns {Object} - object of optional overlay key value pairs
+   */
+  overlayEntries() {
+    const c = this.optionalOverlays
+      let e = {}
+    for (let p in c) {
+      e = {...e, ...c[p]}
+    }
+    return e
+  }
+
+  /**
+   * Register Custom Overlays
+   * @param {Object} o - overlays {myOverlay: {class: MyOverlayClass, location: "chartPane"}}
+   * @returns {object|boolean} - false failure, object of success or failures
+   */
+  setCustomOverlays(o) {
+    if (!isObject(o)) return false
+    const result = {}
+    for (const [k, v] of Object.entries(o)) {
+      if (
+        isObject(v) &&
+        this.isOverlay(v?.class) &&
+        Object.keys(this.#customOverlays).includes(v?.location)
+      ) {
+        this.#customOverlays[v.location][k] = v
+        result[k] = true
+        this.log(`Custom overlay "${k}" registered`)
+      }
+      else result[k] = false
+    }
+    return result
+  }
+
+  /**
+   * Add an overlay from target graph (pane)
+   * @param {string} key - overlay ID
+   * @param {string} targetID - target pane ID - mainPane, chartPane, chartScale, timeline, ID
+   * @returns {boolean}
+   */
+  addOverlay(key, targetID) {
+    let result;
+    const target = this.findOverlayInGraph(key, targetID)
+    if (!target) result = target
+    else {
+      const {overlay, graph} = {...target}
+      result = graph.addOverlay(key, overlay)
+    }
+    if (!result) {
+      this.error(`Error attempting to add overlay "${key}" to ${targetID}`)
+      return false
+    }
+    else {
+      this.log(`Added overlay "${key}" to ${targetID}`)
+      return true
+    }
+  }
+
+  /**
+   * Remove an overlay from target graph (pane)
+   * @param {string} key - overlay ID
+   * @param {string} targetID - target pane ID - mainPane, chartPane, chartScale, timeline, ID
+   * @returns {boolean}
+   */
+  removeOverlay(key, targetID) {
+    let result;
+    const target = this.findOverlayInGraph(key, targetID)
+    if (!target) result = target
+    else {
+      const {overlay, graph} = {...target}
+      result = graph.removeOverlay(key)
+    }
+    if (!result) {
+      this.error(`Error attempting to remove overlay "${key}" from ${targetID}`)
+      return false
+    }
+    else {
+      this.log(`Removed overlay "${key}" from ${targetID}`)
+      return true
+    }
+  }
+
+  /**
+   * Find target (pane) graph
+   * @param {string} targetID - target pane ID - mainPane, chartPane, chartScale, timeline, ID
+   * @returns {Graph|boolean}
+   */
+  findGraph(targetID) {
+    switch (targetID) {
+      case "mainPane": return this.MainPane.graph;
+      case "chartPane": return this.Chart.graph;
+      case "chartScale": return this.Chart.scale.graph;
+      case "timeLine": return this.Chart.time.graph;
+      default:
+        const panes = Array.from(this.ChartPanes.keys())
+          // check primary and secondary chart panes
+          if (panes.includes(targetID)) {
+            return this.ChartPanes.get(targetID).graph
+          }
+          // check if a primary or secondary chart scale
+          else {
+            for (let p of panes) {
+              let scale = this.ChartPanes.get(targetID).scale
+              if (scale.id == targetID) {
+                return scale.graph
+              }
+            }
+            return false
+          }
+        break;
+    }
+  }
+
+  /**
+   * Find specified overlay in target (pane) graph
+   * @param {string} key - overlay ID
+   * @param {string} targetID - target pane ID - mainPane, chartPane, chartScale, timeline, ID
+   * @returns {Overlay|boolean}
+   */
+  findOverlayInGraph(key, targetID) {
+    if (!isString(key) ||
+    !isString(targetID)) return false
+
+    // is overlay ID valid?
+    const overlay = this.hasOverlay(key)
+    if (!overlay) return false
+
+    // is targetID valid?
+    const graph = this.findGraph(targetID)
+    if (!graph) return false
+
+    return {overlay, graph}
+  }
+
+  /*============================*/
+  /*-------- INDICATORS --------*/
+  /*============================*/
   /**
    * validate indicator
    * @param {class} i - indicator class
    * @returns {boolean}
    */
   isIndicator(i) {
-    if (
-      typeof i === "function" &&
-      // ("ID" in i) &&
-      // isString(i?.name) &&
-      // isString(i?.shortName) &&
-      ("primaryPane" in i.prototype) &&
-      isFunction(i.prototype?.draw)
-    ) return true
-    else return false
+    return (
+      isClass(i) &&
+      isFunction(i.prototype?.draw) &&
+      "primaryPane" in i.prototype &&
+      Object.getPrototypeOf(i.prototype).constructor.name === "Indicator"
+    )
   }
 
   /**
    * import Indicators
    * @param {Object} i - indicators {id, name, event, ind}
    * @param {boolean} flush - expunge default indicators
-   * @returns {boolean}
+   * @returns {boolean|object} - false failure, object of success or failures
    */
   setIndicators(i, flush=false) {
     if (!isObject(i)) return false
@@ -1030,6 +1228,7 @@ export default class TradeXchart extends Tradex_chart {
       console.warn(`Expunging all default indicators!`)
       this.#indicators = {}
     }
+    const result = {}
     for (const [k, v] of Object.entries(i)) {
       if (
         isString(v?.id) && 
@@ -1038,9 +1237,11 @@ export default class TradeXchart extends Tradex_chart {
         this.isIndicator(v?.ind)
       ) {
         this.#indicators[k] = v
+        result[k] = true
       }
+      else result[k] = false
     }
-    return true
+    return result
   }
 
   /**
@@ -1143,6 +1344,9 @@ export default class TradeXchart extends Tradex_chart {
   //   }
   // }
 
+  /*============================*/
+  /*---------- TRADES ----------*/
+  /*============================*/
   /**
    * Add a trade entry to the chat
    * @param {Object} t - trade entry
@@ -1161,6 +1365,9 @@ export default class TradeXchart extends Tradex_chart {
     return this.#State.removeTrade(t)
   }
 
+  /*============================*/
+  /*---------- EVENTS ----------*/
+  /*============================*/
   /**
    * Add a event entry to the chat
    * @param {Object} e - event entry
