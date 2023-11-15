@@ -14,7 +14,7 @@ function na(o, e) {
   }
   return Object.freeze(Object.defineProperty(o, Symbol.toStringTag, { value: "Module" }));
 }
-const Es = "0.140.0";
+const Es = "0.140.1";
 function M(o) {
   return Array.isArray(o);
 }
@@ -768,7 +768,7 @@ class ps {
   #r;
   #i = !0;
   constructor(e, i, s = {}) {
-    if (!b(s) || !(s?.core instanceof I))
+    if (!b(s) || !(s?.core instanceof N))
       return !1;
     this.#i = !0, this.setConfig(s), this.#n = s.core, e = T(e) ? e : 0, i = T(i) ? i : this.data.length - 1, `${this.maxMinPriceVol.toString()}`;
     const n = s?.interval || Ei;
@@ -946,9 +946,9 @@ class ps {
     let l = i.length - 1, h = se(s, 0, l), m = se(n, 0, l), g = i[h][3], v = i[h][2], S = i[h][5], A = i[h][5], L = h, k = h, ue = h, Oe = h;
     for (; h++ < m; )
       i[h][3] < g && (g = i[h][3], L = h), i[h][2] > v && (v = i[h][2], k = h), i[h][5] < S && (S = i[h][5], ue = h), i[h][5] > A && (A = i[h][5], Oe = h);
-    let H = v - g, N = g, D = v;
+    let H = v - g, I = g, D = v;
     return g -= H * r.yAxisBounds, g = g > 0 ? g : 0, v += H * r.yAxisBounds, H = v - g, {
-      valueLo: N,
+      valueLo: I,
       valueHi: D,
       valueMin: g,
       valueMax: v,
@@ -1113,7 +1113,7 @@ class $ {
   #o = !0;
   #c = [];
   constructor(e, i = !1, s = !1) {
-    b(e) ? (this.#i = $.validate(e, i, s), this.#l = "valid", this.#o = !!this.#i.chart?.isEmpty, this.#s = e?.core instanceof I ? e.core : void 0) : (this.#i = $.default, this.#l = "default", this.#o = !0), this.#n = e?.id || "", this.#r = ee(`${Ht}_state`);
+    b(e) ? (this.#i = $.validate(e, i, s), this.#l = "valid", this.#o = !!this.#i.chart?.isEmpty, this.#s = e?.core instanceof N ? e.core : void 0) : (this.#i = $.default, this.#l = "default", this.#o = !0), this.#n = e?.id || "", this.#r = ee(`${Ht}_state`);
   }
   get id() {
     return this.#n;
@@ -1210,36 +1210,33 @@ class $ {
       if (r = l.length - 1, h.length - 1, ue.mData = this.range.inRange(l[0][0]) && this.range.inRange(l[0][r]), !J(l[r][7]) && l[r].length !== 8 && l[r][6] !== null && l[r][7] !== !0 ? l = Wa(l) : i.end >= this.range.timeFinish && i.start <= this.range.timeFinish && (i.start += this.range.interval, i.end += this.range.interval), h.length == 0)
         this.allData.data.push(...l);
       else {
-        let N = this.time.timeFrameMS, D = l[0][0], se = l[l.length - 1][0], K = (l.length - 1) * N;
-        se > D + K && (l = za(l, N)), this.data.chart.data = this.merge(h, l);
+        let I = this.time.timeFrameMS, D = l[0][0], se = l[l.length - 1][0], K = (l.length - 1) * I;
+        se > D + K && (l = za(l, I)), this.data.chart.data = this.merge(h, l);
       }
       if (s)
         this.#s.calcAllIndicators(s);
       else {
         if (M(g) && g.length > 0) {
-          for (let N of g)
-            if (M(N?.data) && N?.data.length > 0)
+          for (let I of g)
+            if (M(I?.data) && I?.data.length > 0)
               for (let D of m)
-                D.name === N.name && D.type === N.type && pi(D.settings, N.settings) && (D.data = this.merge(D.data, N.data), N.instance.drawOnUpdate = !0);
+                D.name === I.name && D.type === I.type && pi(D.settings, I.settings) && (D.data = this.merge(D.data, I.data), I.instance.drawOnUpdate = !0);
         }
         if (M(S) && S.length > 0) {
-          for (let N of S)
-            if (M(N?.data) && N?.data.length > 0)
+          for (let I of S)
+            if (M(I?.data) && I?.data.length > 0)
               for (let D of v)
-                D.name === N.name && D.type === N.type && pi(D.settings, N.settings) && (D.data = this.merge(D.data, N.data), N.instance.drawOnUpdate = !0);
+                D.name === I.name && D.type === I.type && pi(D.settings, I.settings) && (D.data = this.merge(D.data, I.data), I.instance.drawOnUpdate = !0);
         }
         this.#s.calcAllIndicators();
       }
       if (M(L) && L.length > 0) {
-        for (let N of L)
-          if (M(N?.data) && N?.data.length > 0)
+        for (let I of L)
+          if (M(I?.data) && I?.data.length > 0)
             for (let D of A)
-              D.name === N.name && D.type === N.type && pi(D.settings, N.settings) && (D.data = this.merge(D.data, N.data));
+              D.name === I.name && D.type === I.type && pi(D.settings, I.settings) && (D.data = this.merge(D.data, I.data));
       }
-      if (b(mEvents))
-        for (let N in mEvents)
-          ;
-      b(mtrades), i && (b(i) ? (a = T(i.start) ? this.range.getTimeIndex(i.start) : this.range.indexStart, n = T(i.end) ? this.range.getTimeIndex(i.end) : this.range.indexEnd) : (l[0][0] && (a = this.range.indexStart + k), n = this.range.indexEnd + k), this.#s.setRange(a, n));
+      i && (b(i) ? (a = T(i.start) ? this.range.getTimeIndex(i.start) : this.range.indexStart, n = T(i.end) ? this.range.getTimeIndex(i.end) : this.range.indexEnd) : (l[0][0] && (a = this.range.indexStart + k), n = this.range.indexEnd + k), this.#s.setRange(a, n));
       let Oe, H = !1;
       for (Oe in ue)
         H = H || Oe;
@@ -1535,7 +1532,7 @@ var Ar = { exports: {} };
   (function(e, i, s, n) {
     var r = ["", "webkit", "Moz", "MS", "ms", "o"], a = i.createElement("div"), l = "function", h = Math.round, m = Math.abs, g = Date.now;
     function v(c, u, p) {
-      return setTimeout(N(c, p), u);
+      return setTimeout(I(c, p), u);
     }
     function S(c, u, p) {
       return Array.isArray(c) ? (A(c, p[u], p), !0) : !1;
@@ -1584,7 +1581,7 @@ var Ar = { exports: {} };
       var f = u.prototype, x;
       x = c.prototype = Object.create(f), x.constructor = c, x._super = f, p && k(x, p);
     }
-    function N(c, u) {
+    function I(c, u) {
       return function() {
         return c.apply(u, arguments);
       };
@@ -1878,7 +1875,7 @@ var Ar = { exports: {} };
     var jo = 2500, nn = 25;
     function Wi() {
       pe.apply(this, arguments);
-      var c = N(this.handler, this);
+      var c = I(this.handler, this);
       this.touch = new ei(this.manager, c), this.mouse = new Qt(this.manager, c), this.primaryTouch = null, this.lastTouches = [];
     }
     H(Wi, pe, {
@@ -2394,7 +2391,7 @@ var Ar = { exports: {} };
       extend: ue,
       assign: k,
       inherit: H,
-      bindFn: N,
+      bindFn: I,
       prefixed: Kt
     });
     var sa = typeof e < "u" ? e : typeof self < "u" ? self : {};
@@ -16847,7 +16844,7 @@ function lr(o, e, i, s, n, r) {
     fontFamily: a.chart.FontFamily,
     textBaseLine: "top"
   }, Wr(L, 6, 6, H);
-  const N = (D) => {
+  const I = (D) => {
     if (D) {
       const K = r?.x || 0, ne = r?.y || 0, de = r?.width || v * 0.25, me = r?.height || S * 0.25;
       L.drawImage(D, K, ne, de, me);
@@ -16876,12 +16873,12 @@ function lr(o, e, i, s, n, r) {
     }
   };
   b(r) ? R.isImage(r?.imgURL).then((D) => {
-    N(D);
+    I(D);
   }).catch((D) => {
     console.error(D);
-  }) : N();
+  }) : I();
 }
-class I extends du {
+class N extends du {
   static #e = Es;
   static #t = 0;
   static #n = {};
@@ -16893,25 +16890,25 @@ class I extends du {
   static #c = null;
   static #a = !1;
   static get version() {
-    return I.#e;
+    return N.#e;
   }
   static get talibPromise() {
-    return I.#i;
+    return N.#i;
   }
   static get talibReady() {
-    return I.#s;
+    return N.#s;
   }
   static get talibAwait() {
-    return I.#l;
+    return N.#l;
   }
   static get talibError() {
-    return I.#o;
+    return N.#o;
   }
   static get webWorkers() {
     return Me;
   }
   static get TALibWorker() {
-    return I.#c;
+    return N.#c;
   }
   static #h = `${It} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`;
   static #d = [
@@ -17000,31 +16997,31 @@ class I extends du {
   #V = !1;
   #z = !1;
   static create(e = {}) {
-    I.#t == 0 && (I.#n.CPUCores = navigator.hardwareConcurrency, I.#n.api = {
-      permittedClassNames: I.#d
-    }), (typeof e.talib != "object" || typeof e.talib.init != "function") && (I.#s = !1, I.#o = new Error(`${I.#h}`)), !I.#s && I.#o === null && (I.#i = e.talib.init(e.wasm), I.#i.then(
+    N.#t == 0 && (N.#n.CPUCores = navigator.hardwareConcurrency, N.#n.api = {
+      permittedClassNames: N.#d
+    }), (typeof e.talib != "object" || typeof e.talib.init != "function") && (N.#s = !1, N.#o = new Error(`${N.#h}`)), !N.#s && N.#o === null && (N.#i = e.talib.init(e.wasm), N.#i.then(
       () => {
-        I.#s = !0;
-        for (let i of I.#l)
+        N.#s = !0;
+        for (let i of N.#l)
           _(i) && i();
       },
       () => {
-        I.#s = !1;
+        N.#s = !1;
       }
     ));
   }
   static destroy(e) {
-    if (e instanceof I) {
+    if (e instanceof N) {
       e.end();
       const i = e.inCnt;
-      delete I.#r[i];
+      delete N.#r[i];
     }
   }
   static cnt() {
-    return I.#t++;
+    return N.#t++;
   }
   constructor() {
-    super(), this.#E = I.cnt(), console.warn(`!WARNING!: ${It} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`), this.log(`${Ht} instance count: ${this.inCnt}`), this.oncontextmenu = window.oncontextmenu, this.#X = Me;
+    super(), this.#E = N.cnt(), console.warn(`!WARNING!: ${It} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`), this.log(`${Ht} instance count: ${this.inCnt}`), this.oncontextmenu = window.oncontextmenu, this.#X = Me;
     const e = this.#k;
     e.primaryPane = { ...e.primaryPane, ...eo.primaryPane }, this.#D = { ...Cs };
   }
@@ -17050,7 +17047,7 @@ class I extends du {
     this.timer && console.timeEnd(e);
   }
   get version() {
-    return I.version;
+    return N.version;
   }
   get name() {
     return this.#u;
@@ -17178,16 +17175,16 @@ class I extends du {
     return this.#O;
   }
   get TALibReady() {
-    return I.talibReady;
+    return N.talibReady;
   }
   get TALibError() {
-    return I.talibError;
+    return N.talibError;
   }
   get talibAwait() {
-    return I.talibAwait;
+    return N.talibAwait;
   }
   get TALibPromise() {
-    return I.talibPromise;
+    return N.talibPromise;
   }
   get candleW() {
     return this.Timeline.candleW;
@@ -17253,7 +17250,7 @@ class I extends du {
     return gt({ ...this.#D }, this.#H);
   }
   start(e) {
-    this.log(`${It} configuring...`), I.create(e);
+    this.log(`${It} configuring...`), N.create(e);
     const i = { ...e };
     this.logs = i?.logs ? i.logs : !1, this.infos = i?.infos ? i.infos : !1, this.warnings = i?.warnings ? i.warnings : !1, this.errors = i?.errors ? i.errors : !1, this.timer = i?.timer ? i.timer : !1, this.#g = i, this.#E = i.cnt || this.#E, this.#O = i.talib, this.#w = this, this.#y = this, "theme" in i || (i.theme = _r);
     const s = E(i?.id) ? i.id : null;
@@ -17271,7 +17268,7 @@ class I extends du {
       const g = fs(this.#_, this.#g?.range?.startTS), v = T(g) ? g + this.#v.initialCnt : this.allData.data.length, S = T(g) ? g : v - this.#v.initialCnt;
       this.#v.initialCnt = v - S, this.setRange(S, v), i.range?.center && this.jumpToIndex(S, !0, !0);
     }
-    this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.#G = new um(this, { widgets: i?.widgets }), this.#W = new lm(this, i), this.#F = new io(this, i), this.#N = new to(this, i), this.setTheme(this.#K.id), this.log(`${this.#u} V${I.version} configured and running...`), this.#U = this.bufferPx * -1, this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#q = this.WidgetsG.insert("Progress", {}), this.stream = this.#g.stream, this.#V && this.on(_e, this.delayedSetRange, this), this.#L = !0, this.refresh();
+    this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.#G = new um(this, { widgets: i?.widgets }), this.#W = new lm(this, i), this.#F = new io(this, i), this.#N = new to(this, i), this.setTheme(this.#K.id), this.log(`${this.#u} V${N.version} configured and running...`), this.#U = this.bufferPx * -1, this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#q = this.WidgetsG.insert("Progress", {}), this.stream = this.#g.stream, this.#V && this.on(_e, this.delayedSetRange, this), this.#L = !0, this.refresh();
   }
   destroy() {
     this.log("...cleanup the mess"), this.removeEventListener("mousemove", this.onMouseMove), this.UtilsBar.destroy(), this.ToolsBar.destroy(), this.MainPane.destroy(), this.WidgetsG.destroy(), this.#X.end(), this.#A = null;
@@ -17609,9 +17606,9 @@ class I extends du {
     }
   }
 }
-window.customElements.get("tradex-chart") || (document.head.insertAdjacentHTML("beforeend", _h), document.head.insertAdjacentHTML("beforeend", Hh), customElements.get("tradex-chart") || customElements.define("tradex-chart", I));
+window.customElements.get("tradex-chart") || (document.head.insertAdjacentHTML("beforeend", _h), document.head.insertAdjacentHTML("beforeend", Hh), customElements.get("tradex-chart") || customElements.define("tradex-chart", N));
 export {
-  I as Chart,
+  N as Chart,
   R as DOM,
   Xh as EventHub,
   He as Indicator,

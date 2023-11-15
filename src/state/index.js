@@ -454,7 +454,7 @@ export default class State {
     const trades = this.allData?.trades
     const mTrades = merge?.trades || false
     const events = this.allData?.events
-    const mEventss = merge?.events || false    
+    const mEvents = merge?.events || false    
     const inc = (!isArray(mData)) ? 0 : (this.range.inRange(mData[0][0])) ? 1 : 0
     const refresh = {}
 
@@ -572,7 +572,7 @@ export default class State {
       }
 
       // Do we have trades?
-      if (isObject(mtrades)) {
+      if (isObject(mTrades)) {
         for (let d in mTrades) {
           
         }
