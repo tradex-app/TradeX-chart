@@ -1,37 +1,35 @@
 import { FC } from "react";
+import DropdownWithCheck from "../../dropdown/DropdownWithCheck";
 import { ChartResolutionEnum } from "../utils/enums";
 
 interface IProps {
-  interval: ChartResolutionEnum;
-  onChangeInterval: (value) => void;
-  styles?: string;
-  intervals?: string[];
+  active: ChartResolutionEnum;
+  onChangeInterval: (value: ChartResolutionEnum) => void;
+  intervals?: ChartResolutionEnum[];
+  icon?: any;
 }
 
 const IntervalsFilter: FC<IProps> = ({
-  interval,
+  active,
   onChangeInterval,
-  styles = "",
   intervals,
+  icon,
 }) => {
+  const items = intervals?.map((intv) => ({
+    name: intv,
+    value: intv,
+  }));
+
   return (
-    <div
-      className={`rounded px-2 py-2 bg-foreground dark:bg-state-inactive flex flex-row flex-wrap text-text-secondary text-xs font-normal ${styles}`}
-    >
-      {intervals.map((item) => (
-        <button
-          key={item}
-          className={`px-2 py-1 mx-1${
-            interval && item === interval
-              ? " rounded text-white bg-iris-base"
-              : ""
-          } `}
-          onClick={() => onChangeInterval(item)}
-        >
-          {item}
-        </button>
-      ))}
-    </div>
+    <DropdownWithCheck
+      items={items || []}
+      onChange={(selectedInterval) => onChangeInterval(selectedInterval.value)}
+      icon={icon}
+      displaySelected
+      active={items?.filter((item) => item.value === active)}
+      selectedItem={active}
+      checkBoxes
+    />
   );
 };
 

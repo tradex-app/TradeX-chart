@@ -1,11 +1,6 @@
 /* eslint-disable prefer-const */
 /* eslint-disable one-var */
 /* eslint-disable default-param-last */
-// chart-highLow.js
-
-// import Overlay from "./overlay";
-// import { renderLineHorizontal } from "../../renderer/line";
-// import { renderTextBG } from "../../renderer/text";
 import { Overlay, renderLineHorizontal, renderTextBG } from "tradex-chart";
 
 
@@ -84,14 +79,13 @@ class scaleHighLow extends Overlay {
   }
 }
 
-export default class chartHighLow extends Overlay {
+export default class TEST extends Overlay {
   constructor(target, xAxis = false, yAxis = false, theme, parent, params) {
     super(target, xAxis, yAxis, theme, parent, params);
 
     // add the overlay to the Scale (yAxis)
     const hiLo = { class: scaleHighLow, fixed: true, required: false };
-    if (this.core.config?.highLow === true)
-      this.scaleOverly = this.chart.scale.addOverlay("hiLo", hiLo);
+    this.scaleOverly = this.chart.scale.addOverlay("hiLo", hiLo);
   }
 
   // Overlay position is fixed and won't pan / scroll with the chart
@@ -100,7 +94,6 @@ export default class chartHighLow extends Overlay {
   }
 
   draw(range = this.core.range) {
-    if (this.core.config?.highLow !== true) return;
 
     if (!super.mustUpdate()) return;
 
