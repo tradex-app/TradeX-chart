@@ -65,5 +65,30 @@ export enum LevelResolutionEnum {
 }
 
 export enum RangeLimitEnum {
-  "1w" = 148,
+  "1d" = 96,
+  "1w" = 168,
+  "15d" = 90,
+  "1M" = 60,
+  "1Y" = 365,
+}
+
+export enum RangeFromTimeframe {
+  "1d" = "15m",
+  "1w" = "1h",
+  "15d" = "4h",
+  "1M" = "12h",
+  "1Y" = "1d",
+}
+
+export enum SecondsFromTimeframe {
+  "1m" = 60,
+  "5m" = 300,
+  "10m" = 600,
+  "30m" = 1800,
+  "1h" = 3600,
+  "4h" = 14400,
+  "12h" = 43200,
+  "1d" = 86400,
+  "1w" = 604800,
+  "1M" = 2629746,
 }

@@ -1,58 +1,68 @@
 import { FC, useEffect } from "react";
 
 import config from "./utils/config";
-import { ColorsEnum, THEMES } from "../theme";
-
-import { ChartType, IIndicators, ITradeX } from "./utils/types";
+import { ChartType, IIndicators, IOverlay, ITradeX } from "./utils/types";
 import useTheme from "../hooks/useTheme";
+import { ColorsEnum, THEMES } from "../theme";
 
 interface IProps {
   title: string;
   data: number[][];
-  tradeData?: any;
+  paddingTS?: number;
+  markers?: any;
   chartType?: { value: ChartType };
   rangeLimit?: number;
   onchart: { name: string; value: string; data?: number[] }[];
   chartAccessor?: string;
-  customIndicators?: IIndicators;
+  indicatorsList?: IIndicators;
+  overlaysList?: IOverlay[];
   chartX: ITradeX;
   setChart: (chart: ITradeX) => void;
   onRangeChange?: () => void;
 }
 
-let isInitiated = 0;
-
 const Chart: FC<IProps> = ({
-  // visual
   title,
+  paddingTS,
   chartType = null,
   rangeLimit = 96,
-  // data
   data,
   onchart = [],
-  tradeData,
-  // config
+  markers,
   chartAccessor = "tradexChartContainer",
-  customIndicators,
+  indicatorsList,
+  overlaysList,
   onRangeChange,
-  // chart instantiation
   chartX,
   setChart,
 }) => {
   const { theme, isLightTheme } = useTheme();
 
   const registerIndicators = (chart: ITradeX) => {
-    chart.setIndicators(customIndicators);
+    if (indicatorsList) {
+      console.log("REGISTERED INDICATORS LIST", indicatorsList);
+      chart.setIndicators(indicatorsList);
+    }
+  };
+
+  const registerOverlays = (chart: ITradeX) => {
+    if (overlaysList) {
+      console.log("REGISTERED OVERLAYS LIST", overlaysList);
+      chart.setCustomOverlays(overlaysList);
+    }
   };
 
   const registerRangeChangeEvent = (chart: ITradeX) => {
+    if (!chart || typeof chart.on !== "function") {
+      console.warn(
+        "Chart object is either undefined or missing the on method."
+      );
+      return;
+    }
     chart.on("setRange", (e) => {
-      if (!isInitiated) {
-        isInitiated++;
-        return;
-      }
+      if (!e) return;
 
-      if (e[0] <= 0) {
+      if (e[0] <= 0 && onRangeChange) {
         onRangeChange();
       }
     });
@@ -60,60 +70,55 @@ const Chart: FC<IProps> = ({
 
   const renderChart = async () => {
     try {
-      if (document.querySelector(`#${chartAccessor} tradex-chart`)) {
-        document.querySelector(`#${chartAccessor} tradex-chart`).remove();
+      const existingChartElement = document.querySelector(
+        `#${chartAccessor} tradex-chart`
+      );
+      if (existingChartElement) {
+        existingChartElement.remove();
       }
 
-      const combinedPrimary = tradeData
-        ? onchart
-            .map((indicator) => ({
-              name: indicator.name,
-              type: indicator.value,
-              data: indicator.data || [],
-            }))
-            .concat(tradeData)
-        : onchart.map((indicator) => ({
-            name: indicator.name,
-            type: indicator.value,
-            data: indicator.data || [],
-          }));
+      const combinedPrimary = markers ? [...onchart, ...markers] : onchart;
 
       const mount = document.querySelector(`#${chartAccessor}`);
       const chart: ITradeX = document.createElement("tradex-chart");
-      mount.appendChild(chart);
-      console.log(tradeData);
-      const state: {
-        ohlcv: number[][];
-        trades: any;
-        primary?: { name: string; type: string; data: number[] }[];
-      } = {
+
+      if (mount) {
+        mount.appendChild(chart);
+      }
+
+      const state = {
         ohlcv: data,
         primary: combinedPrimary,
-        trades: tradeData,
       };
 
       if (onRangeChange) {
         registerRangeChangeEvent(chart);
       }
 
-      chart.start({
-        ...config({
-          title,
-          symbol: title,
-          type: chartType?.value || "area",
-          rangeLimit,
-          isLightTheme,
-        }),
-        state,
-      });
+      if (typeof chart.start === "function") {
+        chart.start({
+          ...config({
+            title,
+            symbol: title,
+            type: chartType?.value || "area",
+            rangeLimit,
+            isLightTheme,
+            // paddingTS,
+          }),
+          state,
+        });
+      }
 
-      if (customIndicators) {
+      if (indicatorsList) {
         registerIndicators(chart);
+      }
+      if (overlaysList) {
+        registerOverlays(chart);
       }
 
       setChart(chart);
     } catch (err) {
-      console.log(title, err);
+      console.error(`Failed to render chart: ${title}`, err);
     }
   };
 
@@ -124,28 +129,27 @@ const Chart: FC<IProps> = ({
       chartX.theme.setProperty("chart.GridColour", ColorsEnum.SelectorLight);
       return;
     }
-
-    chartX.theme.setProperty("chart.GridColour", ColorsEnum.Selector);
   }, [theme]);
 
   useEffect(() => {
-    isInitiated = 0;
-
     renderChart();
   }, []);
 
   useEffect(() => {
-    if (!chartX) return;
-
-    chartX.theme.setProperty("candle.Type", chartType?.value);
+    if (chartX && chartType) {
+      chartX.theme.setProperty("candle.Type", chartType.value);
+    }
   }, [chartType]);
 
+  useEffect(() => {
+    if (chartX) {
+      chartX.setTitle(title);
+    }
+  }, [title]);
+
   return (
-    <div className="flex flex-col gap-4 p-4 full-size">
-      <div
-        id={chartAccessor}
-        className="w-full flex justify-center full-size"
-      />
+    <div className="flex flex-col gap-4 pt-4 h-full">
+      <div id={chartAccessor} className="w-full flex justify-center h-full" />
     </div>
   );
 };

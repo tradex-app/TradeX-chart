@@ -21,7 +21,6 @@ interface IState {
 
 const useChart = () => {
   const [chartX, setChartX] = useState(null);
-
   const [data, setData] = useState([]);
 
   const getIndicators = () => {
@@ -36,7 +35,7 @@ const useChart = () => {
     const chartIndicators = getIndicators();
 
     return Object.keys(chartIndicators[0]).find((key) =>
-      key.toLowerCase().includes(indicatorType.toLowerCase()),
+      key.toLowerCase().includes(indicatorType.toLowerCase())
     );
   };
 
@@ -50,6 +49,13 @@ const useChart = () => {
       },
     });
 
+    chartX.refresh();
+  };
+
+  const handleAddOverlay = (overlay) => {
+    if (!chartX) return;
+    chartX.addOverlay(overlay);
+    console.log("ADDING OVERLAY", overlay);
     chartX.refresh();
   };
 
@@ -84,6 +90,7 @@ const useChart = () => {
     getIndicatorId,
     getIndicators,
     handleAddIndicator,
+    handleAddOverlay,
     handleRemoveIndicator,
     // state
     handleCreateState,
