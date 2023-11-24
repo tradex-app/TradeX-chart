@@ -14,7 +14,7 @@ function na(o, e) {
   }
   return Object.freeze(Object.defineProperty(o, Symbol.toStringTag, { value: "Module" }));
 }
-const Es = "0.140.1";
+const Es = "0.140.2";
 function M(o) {
   return Array.isArray(o);
 }
@@ -5508,6 +5508,7 @@ const z = {
   renderTriangle: sc
 };
 class G {
+  static isOverlay = !0;
   #e;
   #t;
   #n = {};
@@ -17436,7 +17437,7 @@ class N extends du {
     return J(n) && (this.#z = !1), n;
   }
   isOverlay(e) {
-    return pn(e) && _(e.prototype?.draw) && !this.isIndicator(e) && Object.getPrototypeOf(e.prototype).constructor.name === "Overlay";
+    return pn(e) && _(e.prototype?.draw) && !this.isIndicator(e) && Object.getPrototypeOf(e.prototype).constructor.isOverlay;
   }
   hasOverlay(e) {
     const i = this.overlayEntries();
