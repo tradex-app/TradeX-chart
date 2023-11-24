@@ -9,6 +9,8 @@ import canvas from "../../renderer/canvas"
 
 export default class Overlay {
 
+  static isOverlay = true
+
   #parent
   #core
   #config = {}

@@ -1040,7 +1040,7 @@ export default class TradeXchart extends Tradex_chart {
       isClass(o) &&
       isFunction(o.prototype?.draw) &&
       !this.isIndicator(o) &&
-      Object.getPrototypeOf(o.prototype).constructor.name === "Overlay"
+      Object.getPrototypeOf(o.prototype).constructor.isOverlay
     )
   }
 
