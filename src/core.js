@@ -1092,7 +1092,7 @@ export default class TradeXchart extends Tradex_chart {
       ) {
         this.#customOverlays[v.location][k] = v
         result[k] = true
-        this.log(`Custom overlay "${k}" registered`)
+        this.log(`Custom Overlay: ${k} - Registered`)
       }
       else result[k] = false
     }
@@ -1118,7 +1118,7 @@ export default class TradeXchart extends Tradex_chart {
       return false
     }
     else {
-      this.log(`Added overlay "${key}" to ${targetID}`)
+      this.log(`Overlay: ${key} - Added to ${targetID}`)
       return true
     }
   }
@@ -1238,8 +1238,12 @@ export default class TradeXchart extends Tradex_chart {
       ) {
         this.#indicators[k] = v
         result[k] = true
+        this.log(`Custom Indicator: ${k} - Registered`)
       }
-      else result[k] = false
+      else { 
+        result[k] = false
+        this.warn(`Custom Indicator: ${k} - Rejected: Not a valid indicator`)
+      }
     }
     return result
   }
