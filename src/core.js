@@ -1094,7 +1094,10 @@ export default class TradeXchart extends Tradex_chart {
         result[k] = true
         this.log(`Custom Overlay: ${k} - Registered`)
       }
-      else result[k] = false
+      else { 
+        result[k] = false
+        this.log(`Custom Overlay: ${k} - Rejected: Not a valid Overlay`)
+      }
     }
     return result
   }
@@ -1114,7 +1117,7 @@ export default class TradeXchart extends Tradex_chart {
       result = graph.addOverlay(key, overlay)
     }
     if (!result) {
-      this.error(`Error attempting to add overlay "${key}" to ${targetID}`)
+      this.error(`Overlay: ${key} - Error attempting to add overlay to ${targetID}`)
       return false
     }
     else {
@@ -1138,11 +1141,11 @@ export default class TradeXchart extends Tradex_chart {
       result = graph.removeOverlay(key)
     }
     if (!result) {
-      this.error(`Error attempting to remove overlay "${key}" from ${targetID}`)
+      this.error(`Overlay: ${key} - Error attempting to remove overlay from ${targetID}`)
       return false
     }
     else {
-      this.log(`Removed overlay "${key}" from ${targetID}`)
+      this.log(`Overlay: ${key} - Removed from ${targetID}`)
       return true
     }
   }
@@ -1256,7 +1259,9 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {Indicator|false} - indicator instance or false
    */
   addIndicator(i, name=i, params={}) {
-    return this.#MainPane.addIndicator(i, name, params)
+    const r = this.#MainPane.addIndicator(i, name, params)
+    if (!r) this.error(`Indicator: ${i} - Error failed to add indicator`)
+    return i
   }
 
   /**
@@ -1274,7 +1279,9 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {boolean} - success / failure
    */
   removeIndicator(i) {
-    return this.#MainPane.removeIndicator(i)
+    const r = this.#MainPane.removeIndicator(i)
+    if (!r) this.error(`Indicator: ${i} - Error failed to remove indicator`)
+    return i
   }
 
   /**
