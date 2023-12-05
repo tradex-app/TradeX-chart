@@ -262,7 +262,9 @@ export default class TradeXchart extends Tradex_chart {
     }
 
   /**
-   * Creates an instance of TradeXchart.
+   * Creates an instance of TradeXchart
+   * extends tradex-chart element
+   * with a public API to control and modify the chart
    * @private
    */
   constructor () {

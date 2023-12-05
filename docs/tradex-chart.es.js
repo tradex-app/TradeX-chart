@@ -14,7 +14,7 @@ function na(o, e) {
   }
   return Object.freeze(Object.defineProperty(o, Symbol.toStringTag, { value: "Module" }));
 }
-const Es = "0.140.4";
+const Es = "0.140.5";
 function M(o) {
   return Array.isArray(o);
 }
@@ -1384,12 +1384,15 @@ const Mr = {
     return { top: i, bottom: i + a, left: e, right: e + r, width: r, height: a, visible: l, viewport: h };
   },
   elementsDistance(o, e) {
-    return !this.isElement(o) || !this.isElement(o) ? !1 : (el1Location = this.elementDimPos(o), el2Location = this.elementDimPos(e), {
-      x: el1Location.top - el2Location.top,
-      y: el1Location.left - el2Location.left,
-      el1Location,
-      el2Location
-    });
+    if (!this.isElement(o) || !this.isElement(o))
+      return !1;
+    const i = this.elementDimPos(o), s = this.elementDimPos(e);
+    return {
+      x: i.top - s.top,
+      y: i.left - s.left,
+      el1Location: i,
+      el2Location: s
+    };
   },
   htmlToElement(o) {
     if (!E(o))
@@ -6733,7 +6736,7 @@ class Lc {
   #T;
   #x = {};
   constructor(e, i) {
-    this.#r = e, this.#i = { ...i }, this.#h = this.#i.elScale, this.#a = this.#i.chart, this.#s = this.#i.parent, this.id = `${this.#s.id}_scale`, this.init();
+    this.#r = e, this.#i = { ...i }, this.#h = this.#i.elScale, this.#a = this.#i.chart, this.#s = this.#i.parent, this.id = `${this.#s.id}_scale`, this.#d = this.#h.viewport || this.#h;
   }
   log(e) {
     this.#r.log(e);
@@ -6843,6 +6846,9 @@ class Lc {
   set scaleRange(e) {
     this.setScaleRange(e);
   }
+  get range() {
+    return this.#o.range;
+  }
   set rangeMode(e) {
     this.#o.mode = e;
   }
@@ -6867,9 +6873,6 @@ class Lc {
   get Scale() {
     return this;
   }
-  init() {
-    this.#d = this.#h.viewport || this.#h;
-  }
   start() {
     const e = this.#s.name == "Chart" ? void 0 : this.#s.localRange;
     this.#o = new bi(this, this, this.options.yAxisType, e), this.createGraph(), this.#o.calcGradations(), this.draw(), this.eventsListen();
@@ -6884,7 +6887,7 @@ class Lc {
   }
   eventsListen() {
     let e = this.#p.viewport.scene.canvas;
-    this.#C = new Oe(e, { disableContextMenu: !1 }), this.#C.setCursor("ns-resize"), this.#C.on("pointerdrag", this.onDrag.bind(this)), this.#C.on("pointerdragend", this.onDragDone.bind(this)), this.#C.on("wheel", this.onMouseWheel.bind(this)), this.#C.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.#s.id}_mousemove`, this.onMouseMove, this), this.on(`${this.#s.id}_mouseout`, this.#g.erase, this.#g), this.on(_e, this.#y.draw, this.#y);
+    this.#C = new Oe(e, { disableContextMenu: !1 }), this.#C.setCursor("ns-resize"), this.#C.on("pointerdrag", this.onDrag.bind(this)), this.#C.on("pointerdragend", this.onDragDone.bind(this)), this.#C.on("wheel", this.onMouseWheel.bind(this)), this.#C.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.#s.id}_mousemove`, this.onMouseMove, this), this.on(`${this.#s.id}_mouseout`, this.#g.erase, this.#g), this.on(_e, this.#y.draw, this.#y), this.on("setRange", this.draw, this);
   }
   on(e, i, s) {
     this.core.on(e, i, s);

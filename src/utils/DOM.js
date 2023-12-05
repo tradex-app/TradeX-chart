@@ -169,8 +169,8 @@ const DOM = {
     // fail if either are not elements
     if (!this.isElement(el1) || !this.isElement(el1)) return false
 
-    el1Location = this.elementDimPos(el1)
-    el2Location = this.elementDimPos(el2)
+    const el1Location = this.elementDimPos(el1)
+    const el2Location = this.elementDimPos(el2)
 
     return {
       x: el1Location.top - el2Location.top,

@@ -67,7 +67,7 @@ export default class ScaleBar {
     this.#chart = this.#options.chart
     this.#parent = this.#options.parent
     this.id = `${this.#parent.id}_scale`
-    this.init()
+    this.#elViewport = this.#element.viewport || this.#element
   }
 
   log(l) { this.#core.log(l) }
@@ -107,6 +107,7 @@ export default class ScaleBar {
   get config() { return this.#core.config }
   get digitCnt() { return this.#digitCnt }
   set scaleRange(r) { this.setScaleRange(r) }
+  get range() { return this.#yAxis.range }
   set rangeMode(m) { this.#yAxis.mode = m }
   get rangeMode() { return this.#yAxis.mode }
   set rangeYFactor(f) { this.core.range.yFactor(f) }
@@ -115,10 +116,6 @@ export default class ScaleBar {
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
   get Scale() { return this }
-
-  init() {
-    this.#elViewport = this.#element.viewport || this.#element
-  }
 
   start() {
     const range = (this.#parent.name == "Chart" ) ? 
@@ -171,6 +168,7 @@ export default class ScaleBar {
     this.on(`${this.#parent.id}_mousemove`, this.onMouseMove, this)
     this.on(`${this.#parent.id}_mouseout`, this.#layerCursor.erase, this.#layerCursor)
     this.on(STREAM_UPDATE, this.#layerPriceLine.draw, this.#layerPriceLine)
+    this.on(`setRange`, this.draw, this)
   }
 
   on(topic, handler, context) {
