@@ -52,19 +52,19 @@ export default class element extends HTMLElement {
       this.DOM.height = this.clientHeight
       this.oldDOM.width = this.clientWidth
       this.oldDOM.height = this.clientHeight
-//    this.intersectionObserver = new IntersectionObserver(this.onIntersection.bind(this))
-//    this.intersectionObserver.observe(this)
+      this.intersectionObserver = new IntersectionObserver(this.onResize.bind(this))
+      this.intersectionObserver.observe(this)
 /*    this.mutationObserver = new MutationObserver(this.onMutation.bind(this))
-    this.mutationObserver.observe(
-      this,
-      {
-        attributes: true,
-        attributeOldValue: true,
-        characterData: true,
-      })
+      this.mutationObserver.observe(
+        this,
+        {
+          attributes: true,
+          attributeOldValue: true,
+          characterData: true,
+        })
 */
-    this.resizeObserver = new ResizeObserver(this.onResize.bind(this))
-    this.resizeObserver.observe(this)
+      this.resizeObserver = new ResizeObserver(this.onResize.bind(this))
+      this.resizeObserver.observe(this)
 
       if (isFunction(fn)) fn()
     }
@@ -129,8 +129,15 @@ export default class element extends HTMLElement {
     this.oldDOM = {...this.DOM}
     // this.DOM = {...this.DOM, ...r[0].contentRect}
     // this.DOM = Object.assign(this.DOM, r[0].contentRect)
-    for (let k in r[0].contentRect) {
-      const v = r[0].contentRect[k]
+    // for (let k in r[0].contentRect) {
+    //   const v = r[0].contentRect[k]
+    //   if (!isFunction(v))
+    //     this.DOM[k] = v
+    // }
+    // this.DOM = this.getBoundingClientRect()
+    const rect = this.getBoundingClientRect()
+    for (let k in rect) {
+      const v = rect[k]
       if (!isFunction(v))
         this.DOM[k] = v
     }

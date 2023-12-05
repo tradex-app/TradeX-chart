@@ -1,10 +1,134 @@
-// canvas.js
+//import "./styles.css";
+//import CEL from "./CEL";
+// import Concrete from "./concrete.js";
+//import { throttle } from "./throttle";
 
-import { limit } from "../../utils/number";
-import { arrayMove } from "../../utils/utilities";
-import DOM from "../../utils/DOM";
 
-const composition = ["source-over","source-atop","source-in","source-out","destination-over","destination-atop","destination-in","destination-out","lighter","copy","xor","multiply","screen","overlay","darken","lighten","color-dodge","color-burn","hard-light","soft-light","difference","exclusion","hue","saturation","color","luminosity"]
+
+
+function pathStart(canvas, x0, y0, x1, y1, width) {
+  canvas.mainSceneContext.beginPath();
+  canvas.mainSceneContext.moveTo(x0, y0);
+  canvas.mainSceneContext.lineTo(x1, y1);
+  canvas.mainSceneContext.lineWidth = width;
+  canvas.mainSceneContext.stroke();
+
+  canvas.mainHitContext.beginPath();
+  canvas.mainHitContext.moveTo(x0, y0);
+  canvas.mainHitContext.lineTo(x1, y1);
+  canvas.mainHitContext.lineWidth = width + 5;
+  canvas.mainHitContext.stroke();
+
+  canvas.hoveredSceneContext.beginPath();
+  canvas.hoveredSceneContext.moveTo(x0, y0);
+  canvas.hoveredSceneContext.lineTo(x1, y1);
+  canvas.hoveredSceneContext.lineWidth = width + 5;
+  canvas.hoveredSceneContext.stroke();
+}
+
+function drawBranch(x0, y0, width, level, canvas) {
+  var x1 = (Math.random() - 0.5) * 30 + x0,
+      y1 = y0 - Math.random() * y0 * 0.1;
+
+  for (let c in canvas) {
+    pathStart(canvas[c], x0, y0, x1, y1, width)
+  }
+
+  if (y1 > 30 && level < 40) {
+    drawBranch(x1, y1, width * 0.9, level + 1, canvas);
+
+    // randomly branch
+    if (Math.random() < 0.1) {
+      drawBranch(x1, y1, width * 0.9, level + 1, canvas);
+    }
+  }
+}
+
+// listen for mousemove events
+function onMouseMove(canvas) {
+  canvas.viewport.container.addEventListener(
+    "mousemove",
+    throttle(function (evt) {
+      var boundingRect = canvas.viewport.container.getBoundingClientRect(),
+        x = evt.clientX - boundingRect.left,
+        y = evt.clientY - boundingRect.top,
+        key = canvas.viewport.getIntersection(x, y);
+  
+      console.log(`x: ${x}, y: ${y}`);
+  
+      if (key >= 0) {
+        canvas.hoveredLayer.visible = true;
+        canvas.viewport.render();
+        //mainLayer.scene.export({fileName:"image.png"})
+        //mainLayer.scene.exportHit({fileName:"hit.png"})
+      } else {
+        canvas.hoveredLayer.visible = false;
+        canvas.viewport.render();
+      }
+    }),
+  );
+}
+
+/**
+ * Limit number to a range between max and min
+ * @export
+ * @param {number} val - value to be bounded
+ * @param {number} min - lower bound
+ * @param {number} max - upper bound
+ * @returns {number}
+ */
+function limit(val, min, max) {
+  return Math.min(max, Math.max(min, val));
+}
+
+/**
+ * Move an array element from one position to another
+ * @param {Array} arr
+ * @param {number} fromIndex
+ * @param {number} toIndex
+ */
+function arrayMove(arr, fromIndex, toIndex) {
+  var element = arr[fromIndex];
+  arr.splice(fromIndex, 1);
+  arr.splice(toIndex, 0, element);
+}
+
+// returns true if it is a DOM element    
+function isElement(o) {
+  return (
+    typeof HTMLElement === "object" ? o instanceof HTMLElement : //DOM2
+    o && typeof o === "object" && o !== null && o.nodeType === 1 && typeof o.nodeName==="string"
+  );
+}
+
+const composition = [
+  "source-over",
+  "source-atop",
+  "source-in",
+  "source-out",
+  "destination-over",
+  "destination-atop",
+  "destination-in",
+  "destination-out",
+  "lighter",
+  "copy",
+  "xor",
+  "multiply",
+  "screen",
+  "overlay",
+  "darken",
+  "lighten",
+  "color-dodge",
+  "color-burn",
+  "hard-light",
+  "soft-light",
+  "difference",
+  "exclusion",
+  "hue",
+  "saturation",
+  "color",
+  "luminosity",
+];
 
 class Node {
 
@@ -16,7 +140,7 @@ class Node {
    */
   constructor(cfg={}) {
 
-    if (!DOM.isElement(cfg.container)) throw new Error("Viewport container is not a valid HTML element.")
+    if (!isElement(cfg.container)) throw new Error("Viewport container is not a valid HTML element.")
 
     this.container = cfg.container;
     this.layers = [];
@@ -513,8 +637,8 @@ class Hit {
     let context = this.context,
         data;
 
-    x = Math.round(x - this.layer.x);
-    y = Math.round(y - this.layer.y);
+    x = Math.round(x);
+    y = Math.round(y);
 
     // if x or y are out of bounds return -1
     if (x < 0 || y < 0 || x > this.width || y > this.height) {
@@ -626,4 +750,112 @@ const CEL = {
   Hit,
 };
 
-export default CEL
+//export default CEL
+
+function throttle(fn, threshhold=250, scope) {
+  var last, deferTimer;
+  var core = function () {
+    var context = scope || this;
+
+    var now = +new Date(),
+      args = arguments;
+    if (last && now < last + threshhold) {
+      // hold on to it
+      clearTimeout(deferTimer);
+      deferTimer = setTimeout(function () {
+        last = now;
+        fn.apply(context, args);
+      }, threshhold);
+    } else {
+      last = now;
+      fn.apply(context, args);
+    }
+  };
+  function cancelTimer() {
+    if (timeout) {
+       clearTimeout(deferTimer);
+       timeout = undefined;
+    }
+  }
+  core.reset = function() {
+    cancelTimer();
+    last = 0;
+  }
+  return core
+}
+
+
+const content = `
+<div>
+  <h2>%{}</h2>
+  Mouse over the tree.
+</div>
+<div class="container"></div>
+`;
+
+document.getElementById("CEL").innerHTML = content.replace("%{}", "CEL");
+document.getElementById("Concrete").innerHTML = content.replace("%{}", "Concrete");
+
+const container = document.querySelectorAll(".container");
+const canvas = {CEL: {lib: CEL}, Concrete:{lib: Concrete}}
+const width = 400, height = 400;
+const def = {
+  container,
+  width,
+  height,
+}
+let n = 0;
+
+for (let c in canvas) {
+  def.container = container[n++]
+  canvas[c].viewport = new canvas[c].lib.Viewport(def)
+  canvas[c].mainLayer = new canvas[c].lib.Layer();
+  canvas[c].hoveredLayer = new canvas[c].lib.Layer();
+  canvas[c].hoveredLayer.visible = false;
+
+  if (canvas[c].lib === CEL) {
+    canvas[c].viewport.addLayer(canvas[c].hoveredLayer).addLayer(canvas[c].mainLayer);
+  } else {
+    canvas[c].viewport.add(canvas[c].hoveredLayer).add(canvas[c].mainLayer);
+  }
+
+  canvas[c].mainSceneContext = canvas[c].mainLayer.scene.context;
+  canvas[c].mainHitContext = canvas[c].mainLayer.hit.context;
+  canvas[c].hoveredSceneContext = canvas[c].hoveredLayer.scene.context;
+
+  canvas[c].mainSceneContext.strokeStyle = "red";
+  canvas[c].mainSceneContext.lineCap = "round";
+
+  if (canvas[c].lib === CEL) {
+    canvas[c].mainHitContext.strokeStyle = canvas[c].mainLayer.hit.getIndexValue(0);
+  } else {
+    canvas[c].mainHitContext.strokeStyle = canvas[c].mainLayer.hit.getColorFromIndex(0);
+  }
+  canvas[c].mainHitContext.lineCap = "round";
+
+  canvas[c].hoveredSceneContext.strokeStyle = "black";
+  canvas[c].hoveredSceneContext.lineCap = "round";
+
+
+  canvas[c].mainSceneContext.beginPath()
+  canvas[c].mainSceneContext.rect(0,0,30,30)
+  canvas[c].mainSceneContext.rect(width-60,0,width-30,30)
+  canvas[c].mainSceneContext.fill()
+
+  canvas[c].mainHitContext.beginPath();
+  canvas[c].mainHitContext.rect(0,0,30,30)
+  canvas[c].mainHitContext.rect(width-60,0,width-30,30)
+  canvas[c].mainHitContext.fill();
+
+  canvas[c].hoveredSceneContext.beginPath();
+  canvas[c].hoveredSceneContext.rect(0,0,30,30)
+  canvas[c].hoveredSceneContext.rect(width-60,0,width-30,30)
+  canvas[c].hoveredSceneContext.fill();
+}
+// start drawing
+drawBranch(width / 2, height, 30, 0, canvas);
+// render it
+for (let c in canvas) {
+  canvas[c].viewport.render();
+  onMouseMove(canvas[c])
+}

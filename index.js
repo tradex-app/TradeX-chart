@@ -13,6 +13,7 @@ import btcusdt_15min from './data/btcusdt_15min'
 import TEST from './custom-indicator'
 import DMI from './DMI'
 import CustomOverlay from './custom-overlay'
+import chartDCA from './src/components/overlays/chart-dca'
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
@@ -201,7 +202,11 @@ const config1 = {
   watermark: {
     text: "BTC/USDT"
   },
-  dca: false,
+  trades: { 
+      display: true,
+      displayInfo: true 
+    },
+  dca: true,
   highLow: true,
   isCrypto: true,
   logs: true,
@@ -1169,13 +1174,18 @@ chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 
 // register custom overlay
 chart0.setCustomOverlays({
-  custom: {
-    class: CustomOverlay,
+  // custom: {
+  //   class: CustomOverlay,
+  //   location: "primaryPane"
+  // },
+  dca: {
+    class: chartDCA,
     location: "primaryPane"
   }
 })
-// add custom overlay
-chart0.addOverlay("custom", "chartPane")
+// add custom overlays
+// chart0.addOverlay("custom", "chartPane")
+chart0.addOverlay("dca", "chartPane")
 
 // add an alert
 if (typeof chart1 === "object") {

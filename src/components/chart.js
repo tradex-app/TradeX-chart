@@ -433,7 +433,7 @@ export default class Chart {
 
   onMouseDown(e) {
     this.#core.pointerButtons[e.domEvent.srcEvent.button] = true
-    this.#cursorClick = [Math.floor(e.position.x), Math.floor(e.position.y)];
+    this.#cursorClick = [Math.floor(e.position.x), Math.floor(e.position.y), e];
 
     if (this.stateMachine.state === "tool_activated")
       this.emit("tool_targetSelected", { target: this, position: e });

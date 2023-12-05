@@ -367,9 +367,7 @@ export default class Window {
       if (isNumber(z)) pz = z
       this.#pos = {x: x, y: y, z: pz}
     }
-    // if (p?.relativeY == "bottom") py += wPos.height
-    this.#elWindow.style.left = `${px}px`
-    this.#elWindow.style.top = `${py}px`
+    
     this.#elWindow.style["z-index"] = `${pz}`
 
     // keep window visible on chart
@@ -379,16 +377,21 @@ export default class Window {
       if (px + width > this.#elWidgetsG.offsetWidth) {
         let o = Math.floor(this.#elWidgetsG.offsetWidth - width)
             o = limit(o, 0, this.#elWidgetsG.offsetWidth)
-        this.#elWindow.style.left = `${o}px`
+        // this.#elWindow.style.left = `${o}px`
+        px = o
       }
       // adjust vertical position on clipped
       const height = this.#elWindow.clientHeight
       if (py +  iPos.height + height > iPos.height) {
         let o = Math.floor(height * -1)
             o = limit(o, iPos.height * -1, 0)
-        this.#elWindow.style.top = `${o}px`
+        // this.#elWindow.style.top = `${o}px`
+        py = o
       }
     }
+    // if (p?.relativeY == "bottom") py += wPos.height
+    this.#elWindow.style.left = `${px}px`
+    this.#elWindow.style.top = `${py}px`
   }
 
   setDimensions(d) {

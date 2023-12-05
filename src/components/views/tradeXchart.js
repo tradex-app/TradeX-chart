@@ -162,6 +162,8 @@ export default class tradeXChart extends element {
   }
 
   onResized(entries) {
+      super.onResize(entries)
+
       const {width, height} = entries[0].contentRect
       this.#chartW = width
       this.#chartH = height
