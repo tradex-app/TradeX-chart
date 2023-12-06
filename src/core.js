@@ -246,11 +246,13 @@ export default class TradeXchart extends Tradex_chart {
      * @memberof TradeXchart
      */
     static destroy(chart) {
-      if (chart instanceof TradeXchart) {
-        chart.end()
-        const inCnt = chart.inCnt;
-        delete TradeXchart.#instances[inCnt];
-      }
+      if (!(chart instanceof TradeXchart)) return false
+
+      const inCnt = chart.inCnt;
+      chart.destuction = true
+      chart.destroy()
+      delete TradeXchart.#instances[inCnt];
+      return true
     }
  
     /**
@@ -521,6 +523,12 @@ export default class TradeXchart extends Tradex_chart {
    * @memberof TradeXchart
    */
   destroy() {
+    // invoked from static parent class?
+    if (this?.destuction !== true) {
+      TradeXchart.destroy(this)
+      return true
+    }
+
     this.log("...cleanup the mess")
     this.removeEventListener('mousemove', this.onMouseMove)
 

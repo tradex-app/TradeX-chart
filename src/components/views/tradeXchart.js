@@ -6,6 +6,7 @@ import MainPane from "../main"
 import ToolsBar from "../tools"
 import { debounce, idSanitize } from "../../utils/utilities"
 import { isNumber, isObject, isString } from "../../utils/typeChecks"
+import { CSSUNITS } from "../../definitions/core"
 
 import tradeXBody from "./body"
 import tradeXUtils from "./utils"
@@ -182,34 +183,32 @@ export default class tradeXChart extends element {
 
   setWidth(w) {
     if (isNumber(w)) {
-      this.#chartW = w
       w += "px"
     }
-    else if (isString(w)) {
-      // TODO: regex guard
-      // TODO: fallback w = "100%"
+    else if (isString(w) && w.match(CSSUNITS)) {
+      // w = w
     }
     else {
-      this.#chartW = this.parentElement.getBoundingClientRect().width
-      w = this.#chartW + "px"
+      w = "100%"
     }
     this.style.width = w
+    this.#chartW = Math.round(this.getBoundingClientRect().width)
   }
 
   setHeight(h) {
     if (isNumber(h)) {
-      this.#chartH = h
       h += "px"
     }
-    else if (isString(h)) {
-      // TODO: regex guard
-      // TODO: fallback w = "100%"
+    else if (isString(h) && h.match(CSSUNITS)) {
+      // h = h
     }
     else {
       this.#chartH = this.parentElement.getBoundingClientRect().height
       w = this.#chartH + "px"
+      // h = "100%"
     }
     this.style.height = h
+    this.#chartH = Math.round(this.getBoundingClientRect().height)
   }
 
   setWidthMin(w) { this.style.minWidth = `var(--txc-min-width, ${w})` }
