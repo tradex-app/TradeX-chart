@@ -1,6 +1,10 @@
 // core.js
 // it all begins here...
 
+import { NAME, SHORTNAME, ID, RANGELIMIT, PRICE_PRECISION, VOLUME_PRECISION, STREAM_UPDATE } from './definitions/core'
+import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH } from './definitions/style'
+import { OVERLAYPANES } from './definitions/chart'
+import Indicators from './definitions/indicators'
 import * as packageJSON from '../package.json'
 import { isArray, isBoolean, isFunction, isNumber, isObject, isString, isError, isPromise, isClass } from './utils/typeChecks'
 import * as Time from './utils/time'
@@ -19,11 +23,6 @@ import UtilsBar from './components/utils'
 import ToolsBar from './components/tools'
 import MainPane from './components/main'
 import WidgetsG from './components/widgets'
-
-import { NAME, SHORTNAME, ID, RANGELIMIT, PRICE_PRECISION, VOLUME_PRECISION, STREAM_UPDATE } from './definitions/core'
-import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH } from './definitions/style'
-import { OVERLAYPANES } from './definitions/chart'
-import Indicators from './definitions/indicators'
 import Indicator from './components/overlays/indicator'
 import exportImage from './utils/exportImage'
 import talib from './wasm/index.esm.str.js'
@@ -67,14 +66,6 @@ export default class TradeXchart extends Tradex_chart {
   #config
   #options
   #el
-  #elUtils
-  #elBody
-  #elTools
-  #elMain
-  #elRows
-  #elTime
-  #elYAxis
-  #elWidgetsG
 
   #ready = false
   #inCnt = null
@@ -150,102 +141,49 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * Create a new TradeXchart instance
    * @static
-   * @param {DOM_element} container - HTML element to mount the chart on
    * @param {Object} [txCfg={}] - chart config
-   * @param {Object} state - chart state
    * @returns {instance} TradeXchart
    * @memberof TradeXchart
    */
-    static create(txCfg={}) {
+  static create(txCfg={}) {
 
-      // global init for all TradeX charts
-      if (TradeXchart.#cnt == 0) {
-        TradeXchart.#cfg.CPUCores = navigator.hardwareConcurrency
-        TradeXchart.#cfg.api = {
-          permittedClassNames:TradeXchart.#permittedClassNames,
-        }
-      }
-
-      if ((typeof txCfg.talib !== "object") || 
-          // (txCfg.talib[Symbol.toStringTag] !== "Module") ||
-          (typeof txCfg.talib.init !== "function")) {
-            TradeXchart.#talibReady = false
-            TradeXchart.#talibError = new Error(`${TradeXchart.#initErrMsg}`)
-          }
-/*
-      // init TALib
-      if (!TradeXchart.#TALibWorkerReady) {
-        TradeXchart.#TALibWorkerReady = "initializig"
-        const talibWWStr = `
-        (input, r) => {
-          if (typeof input === "object") {
-            if (input.func === "init") {
-              lib.promise = init(wasm)
-              lib.promise.then(
-                (p) => { lib.ready = true; self.postMessage({r, status: "resolved", result:"ready"}); },
-                (e) => { lib.ready = false; console.error(e); self.postMessage({r, status: false, result:e}); }
-              )
-              // return lib.promise
-              // promises cannot be cloned to return from worker
-              return "initializing"
-            }
-            else if (input.func === "test") {
-              return "testing"
-            }
-            else if (lib.ready && input.func in lib.talib) {
-              return lib.talib[input.func](input.params);
-            }
-          }
-          else return false
-        }
-        const lib = {ready: false};
-        const wasm = "${wasm}";
-        ` + talib;
-        function callback (r) {
-          if (r === "ready") {
-            TradeXchart.#TALibWorker.cb = undefined
-            TradeXchart.#TALibWorkerReady = r; 
-            console.log(`TALibWebWorker 1: ${r}`); 
-            console.log("#TALibWorkerReady",TradeXchart.#TALibWorkerReady)
-          }
-          return r;
-        }
-        TradeXchart.#TALibWorker = TradeXchart.webWorkers.create(talibWWStr, "", callback)
-        TradeXchart.#TALibWorker.postMessage({
-          func: "init",
-        })
-        .catch(e => console.error(e))
-        .then(r => {
-          TradeXchart.#TALibWorkerReady = r; 
-          console.log("#TALibWorkerReady",TradeXchart.#TALibWorkerReady)
-          console.log(`TALibWebWorker 2: ${r}`)
-
-        })
-      }
-*/
-
-      if (!TradeXchart.#talibReady && TradeXchart.#talibError === null) {
-        TradeXchart.#talibPromise = txCfg.talib.init(txCfg.wasm)
-        TradeXchart.#talibPromise.then(
-          () => { 
-            TradeXchart.#talibReady = true;
-            // process functions waiting for talibReady
-            for (let c of TradeXchart.#talibAwait) {
-              if (isFunction(c)) c()
-            }
-          },
-          () => { TradeXchart.#talibReady = false }
-        )
+    // global init for all TradeX charts
+    if (TradeXchart.#cnt == 0) {
+      TradeXchart.#cfg.CPUCores = navigator.hardwareConcurrency
+      TradeXchart.#cfg.api = {
+        permittedClassNames:TradeXchart.#permittedClassNames,
       }
     }
+
+    if ((typeof txCfg.talib !== "object") || 
+        // (txCfg.talib[Symbol.toStringTag] !== "Module") ||
+        (typeof txCfg.talib.init !== "function")) {
+          TradeXchart.#talibReady = false
+          TradeXchart.#talibError = new Error(`${TradeXchart.#initErrMsg}`)
+        }
+
+    if (!TradeXchart.#talibReady && TradeXchart.#talibError === null) {
+      TradeXchart.#talibPromise = txCfg.talib.init(txCfg.wasm)
+      TradeXchart.#talibPromise.then(
+        () => { 
+          TradeXchart.#talibReady = true;
+          // process functions waiting for talibReady
+          for (let c of TradeXchart.#talibAwait) {
+            if (isFunction(c)) c()
+          }
+        },
+        () => { TradeXchart.#talibReady = false }
+      )
+    }
+  }
   
-    /**
-     * Destroy a chart instance, clean up and remove data
-     * @static
-     * @param {instance} chart 
-     * @memberof TradeXchart
-     */
-    static destroy(chart) {
+  /**
+   * Destroy a chart instance, clean up and remove data
+   * @static
+   * @param {instance} chart 
+   * @memberof TradeXchart
+   */
+  static destroy(chart) {
       if (!(chart instanceof TradeXchart)) return false
 
       const inCnt = chart.inCnt;
@@ -253,16 +191,16 @@ export default class TradeXchart extends Tradex_chart {
       chart.destroy()
       delete TradeXchart.#instances[inCnt];
       return true
-    }
- 
-    /**
-     * @private
-     * @returns {number}
-     */
-    static cnt() {
-      return TradeXchart.#cnt++
-    }
+  }
 
+  /**
+   * @private
+   * @returns {number}
+   */
+  static cnt() {
+    return TradeXchart.#cnt++
+  }
+ 
   /**
    * Creates an instance of TradeXchart
    * extends tradex-chart element
@@ -272,7 +210,6 @@ export default class TradeXchart extends Tradex_chart {
   constructor () {
     super()
     this.#inCnt = TradeXchart.cnt()
-    // this.#id = `${ID}_${this.#inCnt}`
 
     console.warn(`!WARNING!: ${NAME} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`)
     this.log(`${SHORTNAME} instance count: ${this.inCnt}`)
@@ -306,20 +243,13 @@ export default class TradeXchart extends Tradex_chart {
   get core() { return this.#core }
   get inCnt() { return this.#inCnt }
 
-  set elUtils(el) { this.#elUtils = el }
-  get elUtils() { return this.#elUtils }
-  set elTools(el) { this.#elTools = el }
-  get elTools() { return this.#elTools }
-  set elBody(el) { this.#elBody = el }
-  get elBody() { return this.#elBody }
-  set elMain(el) { this.#elMain = el }
-  get elMain() { return this.#elMain }
-  set elTime(el) { this.#elTime = el }
-  get elTime() { return this.#elTime }
-  set elYAxis(el) { this.#elYAxis = el }
-  get elYAxis() { return this.#elYAxis }
-  set elWidgetsG(el) { this.#elWidgetsG = el }
-  get elWidgetsG() { return this.#elWidgetsG }
+  get elUtils() { return super.elUtils }
+  get elTools() { return super.elTools }
+  get elBody() { return super.elBody }
+  get elMain() { return super.elMain }
+  get elTime() { return super.elTime }
+  get elYAxis() { return super.elYAxis }
+  get elWidgetsG() { return super.elWidgets }
 
   get UtilsBar() { return this.#UtilsBar }
   get ToolsBar() { return this.#ToolsBar }
@@ -411,6 +341,7 @@ export default class TradeXchart extends Tradex_chart {
     this.#el = this
     this.#core = this
 
+    // if no theme use the default
     if (!("theme" in txCfg)) txCfg.theme = defaultTheme
 
     const id = (isString(txCfg?.id)) ? txCfg.id : null
@@ -419,12 +350,13 @@ export default class TradeXchart extends Tradex_chart {
 
     this.log("processing state...")
 
+    // if no state, default to empty
     let state = copyDeep(txCfg?.state) || {}
         state.id = this.id
         state.core = this
     let deepValidate = txCfg?.deepValidate || false
     let isCrypto = txCfg?.isCrypto || false
-    // create default state
+    // create a state
     this.#state = this.#State.create(state, deepValidate, isCrypto)
     delete txCfg.state
     this.log(`${this.name} id: ${this.id} : created with a ${this.state.status} state`)
@@ -470,8 +402,8 @@ export default class TradeXchart extends Tradex_chart {
           rangeConfig.core = this
     this.getRange(null, null, rangeConfig)
 
+    // now set user defined (if any) range
     if (this.#range.Length > 1) {
-      // now set user defined (if any) range
       const rangeStart = calcTimeIndex(this.#time, this.#config?.range?.startTS)
       const end = (isNumber(rangeStart)) ? 
         rangeStart + this.#range.initialCnt :
@@ -484,8 +416,10 @@ export default class TradeXchart extends Tradex_chart {
         this.jumpToIndex(start, true, true)
     }
 
+    // inject chart style rules
     this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`)
 
+    // setup main chart features
     this.#WidgetsG = new WidgetsG(this, {widgets: txCfg?.widgets})
     this.#UtilsBar = new UtilsBar(this, txCfg)
     this.#ToolsBar = new ToolsBar(this, txCfg)
@@ -631,17 +565,16 @@ export default class TradeXchart extends Tradex_chart {
    */
   setDimensions(w, h) {
     const dims = super.setDimensions(w, h) 
-    this.emit("global_resize", dims)
   }
 
   setUtilsH(h) {
     this.utilsH = h
-    this.#elUtils.style.height = `${h}px`
+    this.elUtils.style.height = `${h}px`
   }
 
   setToolsW(w) {
     this.toolsW = w
-    this.#elTools.style.width = `${w}px`
+    this.elTools.style.width = `${w}px`
   }
 
   /**
@@ -694,7 +627,7 @@ export default class TradeXchart extends Tradex_chart {
     this.#theme.setTheme(ID, this)
     const theme = this.#theme
     const style = document.querySelector(`style[title=${this.id}_style]`)
-    const borderColour = `var(--txc-border-color, ${theme.chart.BorderColour}`
+    const borderColour = `var(--txc-border-color, ${theme.chart.BorderColour})`
 
     let innerHTML = `.${this.id} { `
 
@@ -703,12 +636,21 @@ export default class TradeXchart extends Tradex_chart {
 
     // Chart component
     this.style.background = `var(--txc-background, ${theme.chart.Background})`
-    this.style.border = `${theme.chart.BorderThickness}px solid`
+    this.style.border = `${theme.chart.BorderThickness || 0}px solid`
     this.style.borderColor = borderColour
 
     // Main Pane
     innerHTML +=`--txc-border-color:  ${theme.chart.BorderColour}; `
-    this.#elMain.rows.style.borderColor = borderColour
+
+    // Rows
+    if (theme.chart.BorderThickness > 0) {
+      this.elMain.rows.style.border = `1px solid ${borderColour}`
+      this.elMain.rows.style.height = `calc(100% - 4px)`
+    }
+    else {
+      this.elMain.rows.style.border = `none`
+      this.elMain.rows.style.height = `100%`
+    }
 
     // Timeline
     innerHTML += `--txc-time-scrollbar-color: ${theme.chart.BorderColour}; `
@@ -719,12 +661,12 @@ export default class TradeXchart extends Tradex_chart {
     innerHTML += `--txc-time-icon-color: ${theme.icon.colour}; `
     innerHTML += `--txc-time-icon-hover-color: ${theme.icon.hover}; `
 
-    this.#elTime.overview.scrollBar.style.borderColor = borderColour;
-    this.#elTime.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${theme.xAxis.handle})`;
+    this.elTime.overview.scrollBar.style.borderColor = borderColour;
+    this.elTime.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${theme.xAxis.handle})`;
 
-    this.#elTime.overview.style.setProperty("--txc-time-slider-color", theme.xAxis.slider);
-    this.#elTime.overview.style.setProperty("--txc-time-icon-color", theme.icon.colour);
-    this.#elTime.overview.style.setProperty("--txc-time-icon-hover-color", theme.icon.hover);
+    this.elTime.overview.style.setProperty("--txc-time-slider-color", theme.xAxis.slider);
+    this.elTime.overview.style.setProperty("--txc-time-icon-color", theme.icon.colour);
+    this.elTime.overview.style.setProperty("--txc-time-icon-hover-color", theme.icon.hover);
 
     // Legends
     for (let [key, legend] of Object.entries(this.Chart.legend.list)) {
@@ -734,14 +676,14 @@ export default class TradeXchart extends Tradex_chart {
     }
 
     // Utils
-    for (let t of this.#elUtils.icons) {
+    for (let t of this.elUtils.icons) {
       if (t.className != "icon-wrapper") continue
 
       t.children[0].style.fill = theme.icon.colour
     }
 
     // Tools
-    for (let t of this.#elTools.icons) {
+    for (let t of this.elTools.icons) {
       if (t.className != "icon-wrapper") continue
 
       t.children[0].style.fill = theme.icon.colour

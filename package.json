@@ -12,7 +12,7 @@
     }
   },
   "private": false,
-  "version": "0.140.6",
+  "version": "0.140.7",
   "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",
@@ -24,7 +24,7 @@
   "devDependencies": {
     "jsdoc-to-markdown": "^8.0.0",
     "rollup-plugin-cleanup": "^3.2.1",
-    "vite": "^4.3.9"
+    "vite": "^5.0.0"
   },
   "dependencies": {
     "mjolnir.js": "^2.7.1",

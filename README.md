@@ -137,17 +137,25 @@ Editable sandbox examples can found on [CodeSandbox.io](https://codesandbox.io/u
 For the latest news on TradeX-chart, feedback, feature requests, and community, join us over on Discord or GitHub.
 
 * [TradeX Discord](https://discord.gg/dMegsSQDe)
+* [Issue Tracker](https://github.com/tradex-app/TradeX-chart/issues)
 * [GitHub](https://github.com/tradex-app/TradeX-chart/discussions)
 
 ## Contributing
 
+Testing, [bug reports and feature requests](https://github.com/tradex-app/TradeX-chart/issues) welcome
+
+If anybody you have any bugs/issues/feature requests, please, before making a submission, first:
+* check the GitHub issue tracker: https://github.com/tradex-app/TradeX-chart/issues
+* documentation: https://tradex-app.github.io/TradeX-chart/
+* live examples: https://tradex-chart.guildmedia.net/examples/static_chart/
+* development roadmap: https://github.com/tradex-app/TradeX-chart/blob/master/docs/TradeX-chart-Development-Roadmap.pdf
+
+To submit an issue:
 * [Fork the chart repostitory](https://github.com/tradex-app/TradeX-chart/fork)
 * Create your Feature Branch ``git checkout -b feature/AmazingFeature``
 * Commit your Changes ``git commit -m 'Add some AmazingFeature'``
 * Push to the Branch ``git push origin feature/AmazingFeature``
 * Open a [Pull Request](https://github.com/tradex-app/TradeX-chart/pulls)
-
-Testing, [bug reports and feature requests](https://github.com/tradex-app/TradeX-chart/discussions) welcome
 
 You can help speed up development by contributing with crypto or PayPal.
 

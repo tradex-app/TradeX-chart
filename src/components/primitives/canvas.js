@@ -5,6 +5,7 @@ import { arrayMove } from "../../utils/utilities";
 import DOM from "../../utils/DOM";
 
 const composition = ["source-over","source-atop","source-in","source-out","destination-over","destination-atop","destination-in","destination-out","lighter","copy","xor","multiply","screen","overlay","darken","lighten","color-dodge","color-burn","hard-light","soft-light","difference","exclusion","hue","saturation","color","luminosity"]
+const _OffscreenCanvas = (typeof OffscreenCanvas !== "undefined") ? true : false
 
 class Node {
 
@@ -25,6 +26,9 @@ class Node {
 
     this.setSize(cfg.width || 0, cfg.height || 0);
   }
+
+  // does the browser support OffscreenCanvas ?
+  get OffscreenCanvas() { return _OffscreenCanvas }
 
   generateKey() {
     return this.#key++
@@ -196,10 +200,12 @@ class Layer {
     this.hit = new CEL.Hit({
       layer: this,
       contextType: cfg.contextType,
+      offscreen: true
     });
     this.scene = new CEL.Scene({
       layer: this,
       contextType: cfg.contextType,
+      offscreen: true
     });
 
     if (cfg.x && cfg.y) {
@@ -355,24 +361,29 @@ class Scene {
    * Scene constructor
    * @param {Object} cfg - {width, height}
    */
-  constructor(cfg) {
-    if (!cfg) cfg = {};
+  constructor(cfg={offscreen: false}) {
 
     this.id = CEL.idCnt++;
     this.layer = cfg.layer
     this.contextType = cfg.contextType || "2d";
 
-    this.canvas = document.createElement("canvas");
-    this.canvas.className = "scene-canvas";
-    this.canvas.style.display = "block";
-    this.context = this.canvas.getContext(this.contextType);
-
+    const canvas = document.createElement("canvas");
+          canvas.className = "scene-canvas";
+          canvas.style.display = "block";
     if (cfg.width && cfg.height) {
       this.setSize(cfg.width, cfg.height);
     }
+    if (_OffscreenCanvas && cfg?.offscreen) {
+      this.canvas = canvas.transferControlToOffscreen()
+      this.offscreen = true
+    }
+    else 
+      this.canvas = canvas
+
+    this.context = this.canvas.getContext(this.contextType);
   }
 
-  /**
+ /**
    * set scene size
    * @param {number} width
    * @param {number} height
@@ -465,8 +476,7 @@ class Hit {
    * Hit constructor
    * @param {Object} cfg - {width, height}
    */
-  constructor(cfg) {
-    if (!cfg) cfg = {};
+  constructor(cfg={}) {
     this.layer = cfg.layer
     this.contextType = cfg.contextType || "2d";
     this.canvas = document.createElement("canvas");
@@ -603,9 +613,12 @@ function setSize(width, height, that, ratio=true) {
   that.width = width;
   that.height = height;
   that.canvas.width = width * CEL.pixelRatio;
-  that.canvas.style.width = `${width}px`
   that.canvas.height = height * CEL.pixelRatio;
-  that.canvas.style.height = `${height}px`
+
+  if (!that.offscreen) {
+    that.canvas.style.width = `${width}px`
+    that.canvas.style.height = `${height}px`
+  }
 
   if (ratio && that.contextType === "2d" && CEL.pixelRatio !== 1) {
     that.context.scale(CEL.pixelRatio, CEL.pixelRatio);

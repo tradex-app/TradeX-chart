@@ -5,6 +5,7 @@
 import DOM from "../utils/DOM"
 import { UtilsStyle } from "../definitions/style"
 import { CLASS_UTILS } from "../definitions/core"
+import { UTILSLOCATIONS } from "../definitions/chart"
 import utilsList from "../definitions/utils"
 import Indicators from "../definitions/indicators"
 import { debounce } from "../utils/utilities"
@@ -21,6 +22,7 @@ export default class UtilsBar {
   #options
   #elUtils
   #utils
+  #location
   #widgets
   #indicators
   #menus = {}
@@ -36,7 +38,18 @@ export default class UtilsBar {
     this.#utils = core.config?.utilsBar || utilsList
     this.#widgets = core.WidgetsG
     this.#indicators = core.indicatorClasses || Indicators
-    this.init()
+    this.#location = core.config.theme?.utils?.location || "none"
+    if (!!this.#location ||
+          this.#location == "none" ||
+          !UTILSLOCATIONS.includes(this.#location)
+      ) {
+      this.#elUtils.style.height = 0
+      this.core.elBody.style.height = "100%"
+    }
+    // mount the default or custom utils bar definition
+    this.#elUtils.innerHTML = this.#elUtils.defaultNode(this.#utils)
+
+    this.log(`${this.#name} instantiated`)
   }
 
   log(l) { this.#core.log(l) }
@@ -49,15 +62,9 @@ export default class UtilsBar {
   get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elUtils) }
+  get dimensions() { return this.#elUtils.dimensions }
   get stateMachine() { return this.#stateMachine }
-
-  init() {
-    // mount the default or custom utils bar definition
-    this.#elUtils.innerHTML = this.#elUtils.defaultNode(this.#utils)
-
-    this.log(`${this.#name} instantiated`)
-  }
+  get location() { return this.#location }
 
   start() {
     // activate utils icons and menus

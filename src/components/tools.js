@@ -59,7 +59,7 @@ export default class ToolsBar {
   get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elTools) }
+  get dimensions() { return this.#elTools.dimensions }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
 

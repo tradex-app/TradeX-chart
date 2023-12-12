@@ -1,13 +1,14 @@
 // tradeXchart.js
 // <tradex-chart></tradex-chart>
 
-import element from "./classes/element"
-import MainPane from "../main"
-import ToolsBar from "../tools"
 import { debounce, idSanitize } from "../../utils/utilities"
 import { isNumber, isObject, isString } from "../../utils/typeChecks"
 import { CSSUNITS } from "../../definitions/core"
+import { UTILSLOCATIONS } from "../../definitions/chart"
 
+import element from "./classes/element"
+import MainPane from "../main"
+import ToolsBar from "../tools"
 import tradeXBody from "./body"
 import tradeXUtils from "./utils"
 import tradeXwidgets from "./widgets"
@@ -23,7 +24,7 @@ import {
 } from "../../definitions/style"
 
 const HTML = `
-  <style title="core">
+<style title="core">
     :host {
       position: relative;
       z-index: 0;
@@ -33,6 +34,7 @@ const HTML = `
       width: 100%; 
     }
     tradex-body {
+      display: flex;
       position: relative;
       height: calc(100% - ${UTILSH}px); 
       min-height: ${CHART_MINH - UTILSH}px;
@@ -42,9 +44,6 @@ const HTML = `
       position: relative;
     }
   </style>
-  <div style="display: none;">
-    <slot></slot>
-  </div>
   <tradex-utils></tradex-utils>
   <tradex-body></tradex-body>
   <tradex-widgets></tradex-widgets>
@@ -90,14 +89,12 @@ export default class tradeXChart extends element {
       this.style.display = "block"
       this.style.minHeight = TX_MINH
 
-      this.elWidgetsG = this.shadowRoot.querySelector('tradex-widgets')
-      this.elUtils = this.shadowRoot.querySelector('tradex-utils')
-      this.elBody = this.shadowRoot.querySelector('tradex-body')
-      this.elMain = this.elBody.main
-      this.elTime = this.elBody.main.time
-      this.elTools = this.elBody.tools 
-      this.elYAxis = this.elBody.scale
-
+      this.#elWidgets = this.shadowRoot.querySelector('tradex-widgets')
+      this.#elUtils = this.shadowRoot.querySelector('tradex-utils')
+      this.#elBody = this.shadowRoot.querySelector('tradex-body')
+      // set the "old" values from parent element
+      this.#chartH = this.parentElement.clientHeight || CHART_MINH
+      this.#chartW = this.parentElement.clientWidth || CHART_MINW
       // set the width and height
       let height = this.getAttribute('height') || "100%"
       let width = this.getAttribute('width') || "100%"
@@ -150,9 +147,13 @@ export default class tradeXChart extends element {
   get stream() {  }
   set stream(s) {  }
 
-  get body() { return this.#elBody }
-  get utils() { return this.#elUtils }
-  get widgets() { return this.#elWidgets }
+  get elBody() { return this.#elBody }
+  get elUtils() { return this.#elUtils }
+  get elWidgets() { return this.#elWidgets }
+  get elMain() { return this.#elBody.main }
+  get elTime() { return this.#elBody.main.time }
+  get elTools() { return this.#elBody.tools }
+  get elYAxis() { return this.#elBody.scale }
   get width() { return this.#chartW }
   get height() { return this.#chartH }
   get resizeEntries() { return this.#resizeEntries }
@@ -165,13 +166,13 @@ export default class tradeXChart extends element {
   onResized(entries) {
       super.onResize(entries)
 
+      const utilsH = (UTILSLOCATIONS.includes(this.theme?.utils?.location)) ? UTILSH : 0
       const {width, height} = entries[0].contentRect
-      this.#chartW = width
-      this.#chartH = height
+      this.#chartW = Math.floor(width)
+      this.#chartH = Math.floor(height)
       this.#resizeEntries = entries[0]
 
-      this.log(`onResize w: ${width}, h: ${height}`)
-      this.emit("global_resize", {w: width, h: height}) 
+      this.elBody.style.height = `calc(100% - ${utilsH}px)`
 
       if (this.MainPane instanceof MainPane) {
         // this.previousDimensions()
@@ -179,6 +180,8 @@ export default class tradeXChart extends element {
       if (this.ToolsBar instanceof ToolsBar) {
         this.ToolsBar.onResized()
       }
+      this.log(`onResize w: ${this.#chartW}}, h: ${this.#chartH}`)
+      this.emit("global_resize", {w: this.#chartW, h: this.#chartH}) 
   }
 
   setWidth(w) {
@@ -203,9 +206,7 @@ export default class tradeXChart extends element {
       // h = h
     }
     else {
-      this.#chartH = this.parentElement.getBoundingClientRect().height
-      w = this.#chartH + "px"
-      // h = "100%"
+      h = "100%"
     }
     this.style.height = h
     this.#chartH = Math.round(this.getBoundingClientRect().height)
@@ -233,45 +234,56 @@ export default class tradeXChart extends element {
       const dims = this.getBoundingClientRect()
       const parent = this.parentElement.getBoundingClientRect()
 
-      h = (!dims.height) ? (!parent.height) ? CHART_MINH : parent.height : dims.height;
       w = (!dims.width) ? (!parent.width) ? CHART_MINW : parent.width : dims.width;
+      h = (!dims.height) ? (!parent.height) ? CHART_MINH : parent.height : dims.height;
     }
+    else if (!isNumber(w) || !isNumber(h)) {
 
-    dims = {
-      width: this.width,
-      height: this.height,
-      resizeW: w / width,
-      resizeH: h / height,
-      resizeWDiff: w - width,
-      resizeHDiff: h - height
+      if (!isString(w) || !w.match(CSSUNITS)) {
+        w = "100%"
+      }
+
+      if (!isString(h) || !h.match(CSSUNITS)) {
+        h = "100%"
+      }
     }
 
     this.setWidth(w)
     this.setHeight(h)
 
+    dims = {
+      width: this.width,
+      height: this.height,
+      resizeW: this.width / width,
+      resizeH: this.height / height,
+      resizeWDiff: this.width - width,
+      resizeHDiff: this.height - height
+    }
+
     return dims
   }
 
-  setUtilsLocation(pos=this.#theme?.utils?.location) {
-    this.#theme.utils = this.#theme.utils || {}
+  setUtilsLocation(pos=this.theme?.utils?.location) {
     switch(pos) {
+      case "top":
+      case true:
+        this.theme.setProperty("utils.location", "top")
+        this.theme.setProperty("utils.height", UTILSH)
+        this.elUtils.style.display = "block"
+        this.elUtils.style.height =`${UTILSH}px`;
+        this.elBody.style.height = `calc(100% - ${UTILSH}px)`
+        this.elBody.style.minHeight = `${CHART_MINH - UTILSH}px`
+        break;
       case "none":
       case false:
-        this.#theme.utils.location = "none"
-        this.#theme.utils.height = 0
+      default:
+        this.theme.setProperty("utils.location", "none")
+        this.theme.setProperty("utils.height", 0)
         this.elUtils.style.display = "none"
         this.elUtils.style.height =`0px`;
         this.elBody.style.height = `100%`
         this.elBody.style.minHeight = `${CHART_MINH}px`
         break;
-      case "top":
-      default:
-        this.#theme.utils.location = "top"
-        this.#theme.utils.height = UTILSH
-        this.elUtils.style.display = "block"
-        this.elUtils.style.height =`${UTILSH}px`;
-        this.elBody.style.height = `calc(100% - ${UTILSH}px)`
-        this.elBody.style.minHeight = `${CHART_MINH - UTILSH}px`
     }
   }
 }

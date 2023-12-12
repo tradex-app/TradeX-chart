@@ -1,10 +1,11 @@
 // element.js
 // base class for views to build upon
 
-import { SHORTNAME } from "../../../definitions/core"
+import { SHORTNAME, CSSUNITS } from "../../../definitions/core"
 import { uid } from "../../../utils/utilities"
 import { isFunction, isNumber, isString } from "../../../utils/typeChecks"
 import EventHub from "../../../utils/eventHub"
+import DOM from "../../../utils/DOM"
 
 export default class element extends HTMLElement {
 
@@ -89,8 +90,8 @@ export default class element extends HTMLElement {
   get left() { return this.DOM.left }
   get bottom() { return this.DOM.bottom }
   get right() { return this.DOM.right }
-  get x() { return this.x }
-  get y() { return this.y }
+  // get x() { return this.x }
+  // get y() { return this.y }
   get dimensions() { return this.DOM }
   set cursor(c) { this.style.cursor = c }
   get cursor() { return this.style.cursor }
@@ -102,14 +103,27 @@ export default class element extends HTMLElement {
       v += "px"
     }
     else if (isString(v)) {
-      // TODO: regex guard
-      // TODO: fallback w = "100%"
+      // is valid percentage
+      if (!v.match(CSSUNITS)) V = "100%"
     }
     else {
-      this.DOM[d] = this.parentElement.getBoundingClientRect().width
+      this.DOM[d] = this.parentElement.getBoundingClientRect()[d]
       v = this.DOM[d] + "px"
     }
     this.style[d] = v
+  }
+
+  getDims() {
+    const rect = this.getBoundingClientRect()
+    for (let k in rect) {
+      const v = rect[k]
+      if (!isFunction(v))
+        this.DOM[k] = v
+    }
+    this.DOM.visible = DOM.isVisible(this)
+    this.DOM.viewport = DOM.isInViewport(this)
+    
+    return this.DOM
   }
 
   onIntersection(i) {
@@ -134,15 +148,8 @@ export default class element extends HTMLElement {
     //   if (!isFunction(v))
     //     this.DOM[k] = v
     // }
-    // this.DOM = this.getBoundingClientRect()
-    const rect = this.getBoundingClientRect()
-    for (let k in rect) {
-      const v = rect[k]
-      if (!isFunction(v))
-        this.DOM[k] = v
-    }
+    this.getDims()
     this.emit("resize", this.DOM)
-    // console.log(r)
   }
 
 

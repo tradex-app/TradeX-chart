@@ -6,8 +6,9 @@ import tradeXTime from './time'
 import tradeXRows from './rows'
 
 import {
-  TIMEH,
   SCALEW,
+  TIMEH,
+  UTILSH,
   GlobalStyle
 } from "../../definitions/style"
 import { isNumber } from "../../utils/typeChecks"
@@ -15,29 +16,34 @@ import { isNumber } from "../../utils/typeChecks"
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
+:host {
+  display: grid;
+  height: 100%;
+  grid-template-rows: 1fr ${UTILSH}px;
+}
   #viewport {
     position: absolute;
-    width: 100%;
+    width: calc(100% - ${SCALEW}px);
     height: inherit;
     background: var(--txc-chartpane-background, none);
     z-index: 0;
   }
   #viewport canvas {
     position: absolute;
-    // top: 1px;
   }
   tradex-rows {
-    position:relative;
     overflow: hidden;
-    width: calc(100% - ${SCALEW}px);
-    height: calc(100% - ${TIMEH}px);
+    width: 100%;
+    height: calc(100% - 4px);
+    grid-row-start: 1;
+    grid-row-end: 2;
     border: 1px solid;
     border-color: var(--txc-border-color, ${GlobalStyle.COLOUR_BORDER}); 
   }
   tradex-time {
-    position: relative;
-    width: calc(100% - ${SCALEW}px);
+    width: 100%;
     height: ${TIMEH}px;
+    grid-row-start: 2;
     overflow: hidden;
     margin-left: 1px;
     z-index: 1;
@@ -50,7 +56,9 @@ template.innerHTML = `
 
 export default class tradeXMain extends element {
 
-  #elYAxis
+  #elRows
+  #elTime
+  #elViewPort
   #theme
 
   constructor () {
@@ -61,12 +69,22 @@ export default class tradeXMain extends element {
 
   }
 
+  connectedCallback() {
+    super.connectedCallback(
+      () => {
+        this.#elViewPort = this.shadowRoot.querySelector('#viewport')
+        this.#elRows = this.shadowRoot.querySelector('tradex-rows')
+        this.#elTime = this.shadowRoot.querySelector('tradex-time')
+        this.style.display = "grid"
+      })
+  }
+
   disconnectedCallback() {
   }
 
-  get viewport() { return this.shadowRoot.querySelector('#viewport') }
-  get rows() { return this.shadowRoot.querySelector('tradex-rows') }
-  get time() { return this.shadowRoot.querySelector('tradex-time') }
+  get viewport() { return this.#elViewPort }
+  get rows() { return this.#elRows }
+  get time() { return this.#elTime }
 
   start(theme) {
     this.#theme = theme
@@ -83,12 +101,8 @@ export default class tradeXMain extends element {
   }
 
   setMain() {
-    let timeH = (isNumber(this.#theme?.time?.height)) ? this.#theme.time.height : TIMEH
-    let offset = (this.#theme.tools.location == "none") ? 60 : 0
-    this.rows.style.height = `calc(100% - ${timeH}px)`
-    this.rows.style.left = `${offset}px`
-    this.time.style.left = `${offset}px`
-    this.viewport.style.left = `${offset}px`
+    // let offset = (this.#theme.tools.location == "none") ? 60 : 0
+    // this.viewport.style.left = `${offset}px`
   }
 
 }

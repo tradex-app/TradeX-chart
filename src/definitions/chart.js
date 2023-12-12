@@ -31,6 +31,8 @@ export const SECONDARYDEFAULTHEIGHT = 30 // %
 export const DIVIDERHEIGHT = 8 // px
 export const COLLAPSEDHEIGHT = 30 // px
 
+export const UTILSLOCATIONS = [true, "top"]
+
 // OHLCV enum
 export class OHLCV {
   static t = 0

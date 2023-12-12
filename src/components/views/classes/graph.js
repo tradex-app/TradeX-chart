@@ -25,7 +25,7 @@ export default class graph {
   #viewport
   #overlays
 
-  #elparent
+  #elParent
   #elCanvas
   #elViewport
 
@@ -38,7 +38,7 @@ export default class graph {
     this.#core = parent.core
     this.#config = this.core.config
     this.#theme = this.core.theme
-    this.#elparent = this.#parent.element
+    this.#elParent = this.#parent.element
     this.#elViewport = elViewport
     
     // create graph viewport with overlays
@@ -49,11 +49,11 @@ export default class graph {
   get core() { return this.#core }
   get config() { return this.#config }
   set width(w) { this.setWidth(w) }
-  get width() { return this.#elparent.getBoundingClientRect().width }
+  get width() { return this.#elParent.width }
   set height(h) { this.setHeight(h) }
-  get height() { return this.#elparent.getBoundingClientRect().height }
-  get dimensions() { return DOM.elementDimPos(this.#elparent) }
-  set layerWidth(w) { this.#layerWidth = w }
+  get height() { return this.#elParent.height }
+  get dimensions() { return DOM.this.#elParent.dimensions }
+  set layerWidth(w) { this.#layerWidth = w || this.#elParent.width }
   get layerWidth() { return this.#layerWidth }
   get stateMachine() { return this.#parent.stateMachine }
   set state(s) { this.#core.setState(s) }
@@ -114,8 +114,8 @@ export default class graph {
 
   layerConfig() {
     const buffer = this.config?.buffer || BUFFERSIZE
-    const width = this.#elViewport.getBoundingClientRect().width
-    const height = this.#elViewport.getBoundingClientRect().height // this.#parent.height || this.#parent.rowsH - 1
+    const width = this.#elViewport.width
+    const height = this.#elViewport.height // this.#parent.height || this.#parent.rowsH - 1
     this.layerWidth = Math.round(width * ((100 + buffer) * 0.01))
     const layerConfig = { 
       width: this.layerWidth, 
