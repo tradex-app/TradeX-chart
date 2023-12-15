@@ -17,6 +17,7 @@ import stateMachineConfig from "../state/state-main";
 import Input from "../input";
 import { isArray, isBoolean, isNumber, isObject, isString } from "../utils/typeChecks"
 import { copyDeep, valuesInArray, xMap } from "../utils/utilities"
+// import { createFont, calcTextWidth } from "../renderer/text";
 
 import { STREAM_FIRSTVALUE, STREAM_NEWVALUE } from "../definitions/core";
 
@@ -94,6 +95,9 @@ export default class MainPane {
   #indicators;
   #controller;
   #input;
+
+  #scaleW = 0
+  #scaleWOld = 0
 
   constructor(core, options) {
     this.#core = core;
@@ -218,8 +222,14 @@ export default class MainPane {
     maxMin.rowsH = this.#elRows.height;
 
     // start timeline, chart, secondaryPane
+    this.#elViewport.style.width = `${this.#elRows.width}px`
     this.#elMain.start(this.theme);
     this.#Time.start();
+    this.createGraph();
+
+    // set scale width
+    const scaleW = this.chart.scale.calcScaleWidth()
+    this.core.elBody.scale.style.width = `${scaleW}px`
 
     // start each view / chart pane
     this.#ChartPanes.forEach((view, key) => {
@@ -233,7 +243,6 @@ export default class MainPane {
     this.rowsOldH = this.#elRows.height;
 
     // create and start overlays
-    this.createGraph();
     this.draw(this.range, true);
 
     this.renderLoop.init({
@@ -323,7 +332,7 @@ export default class MainPane {
     // listen/subscribe/watch for notifications
     this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue, this);
     this.on(STREAM_NEWVALUE, this.onNewStreamValue, this);
-    this.on("setRange", this.draw, this);
+    this.on("setRange", this.onSetRange, this);
     this.on("scrollUpdate", this.draw, this);
     this.on("chart_render", this.draw, this);
     this.on("destroyChartView", this.removeChartPane, this);
@@ -339,6 +348,23 @@ export default class MainPane {
 
   emit(topic, data) {
     this.#core.emit(topic, data);
+  }
+
+  onSetRange() {
+    this.#scaleWOld = this.#scaleW
+    this.#scaleW = this.chart.scale.calcScaleWidth()
+    if (this.#scaleWOld < this.#scaleW)
+      this.setScaleWidth()
+
+    // // does the scale width have to adjusted?
+    // if (this.#scaleWOld < this.#scaleW) {
+    //   console.log(this.#scaleW)
+    //   this.core.elBody.scale.style.width = `${this.#scaleW}px`
+    //   this.setDimensions()
+    // }
+    // else this.draw()
+
+    this.draw()
   }
 
   onMouseWheel(e) {
@@ -535,6 +561,7 @@ export default class MainPane {
 
     this.#Time.setDimensions({ w: width });
     this.#Graph.setSize(width, height, layerWidth);
+    this.#elViewport.style.width =`${width}px`
 
     // set on Chart dimensions
     if (this.#ChartPanes.size == 1 && chartH != height) {
@@ -560,6 +587,21 @@ export default class MainPane {
     this.rowsOldH = height;
     this.emit("rowsResize", dimensions);
     this.draw(undefined, true);
+  }
+
+  setScaleWidth(s) {
+    this.core.elBody.scale.style.width = `${this.#scaleW}px`
+    this.#elViewport.style.width = `${this.#scaleW}px`
+// this.#elRows.width
+    let width = this.#elRows.width;
+    let height = this.#elRows.height;
+    let layerWidth = Math.round(width * ((100 + this.#buffer) * 0.01));
+    this.#Time.setDimensions({ w: width });
+    this.#Graph.setSize(width, height, layerWidth);
+    this.#elViewport.style.width =`${width}px`
+    this.#ChartPanes.forEach((chartPane, key) => {
+      chartPane.setDimensions({w: width, h: chartPane.height})
+    })
   }
 
   getBufferPx() {

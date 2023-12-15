@@ -1,7 +1,7 @@
 // yAxis.js
 
 import Axis from "./axis";
-import { bRound, limit, log10, power, precision, round } from "../../utils/number";
+import { bRound, limit, log10, power, precision, limitPrecision, round } from "../../utils/number";
 import { isNumber } from "../../utils/typeChecks";
 
 import { 
@@ -332,7 +332,7 @@ export default class yAxis extends Axis {
     for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
     {
       digits = this.countDigits(y)
-      nice = this.limitPrecision(digits, step)
+      nice = limitPrecision(digits, step)
       pos = this.yPos(nice)
       scaleGrads.push([nice, pos, digits])
     }
@@ -380,42 +380,5 @@ export default class yAxis extends Axis {
     }
   }
 
-  /**
-   * truncate price to fit on Scale
-   * @param {object} digits
-   * @return {number}  
-   * @memberof yAxis
-   */
-  limitPrecision(digits) {
-    let {sign: s, integers: i, decimals: d, value: v} = digits
-    let n = this.yAxisDigits - 1,
-        x = `${v}`,
-        r = "",
-        c = 0,
-        f = 0;
-    // sign
-    s = (s) ? 0 : 1
-    if (s > 0) {
-      r += "-"
-      c++
-    }
-    // integers
-    if (i == 0) {
-      r += "0"
-      c++
-    }
-    else {
-      r += x.slice(c,i)
-      c += i
-    }
-    // decimals
-    if (c + 1 < n && d > 0) {
-      r += `${x.slice(c)}`
-      f = n - ( c + 1)
-      f = (d < f) ? d : f
-      r = Number.parseFloat(r).toFixed(f)
-    }
-    return r
-  }
 
 }

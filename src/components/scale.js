@@ -7,6 +7,7 @@ import yAxis from "./axis/yAxis"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
 import Input from "../input"
+import { countDigits, limitPrecision } from '../utils/number'
 import { copyDeep, idSanitize, xMap } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
 import { calcTextWidth, createFont } from '../renderer/text'
@@ -265,8 +266,8 @@ export default class ScaleBar {
   yPos2Price(y) { return this.#yAxis.yPos2Price(y) }
 
   nicePrice($) {
-    let digits = this.#yAxis.countDigits($)
-    return this.#yAxis.limitPrecision(digits)
+    let digits = countDigits($)
+    return limitPrecision(digits)
   }
 
 
@@ -286,11 +287,27 @@ export default class ScaleBar {
   }
 
   calcPriceDigits() {
-    const ctx = this.#layerCursor.viewport.scene.context
+    let count = 8;
+    if (this.#core.range.dataLength > 0) {
+      const high = this.#core.range.valueMax
+      const digits = countDigits(high)
+      if (digits.precision > 4) {
+        console.log(digits)
+      }
+      const nice = limitPrecision(digits)
+     count = `${nice}`.length + 2
+    }
+    this.#digitCnt = count 
+    return this.#digitCnt
+  }
+
+  calcScaleWidth() {
+    const max = this.calcPriceDigits()
+    const ctx = this.#core.MainPane.graph.viewport.scene.context
     const t = this.theme.yAxis
     ctx.font = createFont(t.fontSize, t.fontWeight, t.fontFamily)
     const w = calcTextWidth(ctx, "0")
-    this.#digitCnt = Math.floor(this.width / w)
+    return max * w
   }
 
   /**
