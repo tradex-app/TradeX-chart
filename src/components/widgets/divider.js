@@ -201,9 +201,9 @@ export default class Divider {
 
   setPos() {
     let top =
-      this.#chartPane.element.getBoundingClientRect().top -
-      this.#core.elWidgetsG.getBoundingClientRect().top;
-    // top = top - this.height / 2 + 1;
+      ( this.#chartPane.element.getBoundingClientRect().top
+      - this.#core.elWidgetsG.getBoundingClientRect().top )
+      - (this.height / 2)
     this.#elDivider.style.top = `${top}px`;
 
     // let pos = this.#chartPane.height;

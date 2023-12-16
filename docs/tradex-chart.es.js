@@ -14,7 +14,7 @@ function ha(o, e) {
   }
   return Object.freeze(Object.defineProperty(o, Symbol.toStringTag, { value: "Module" }));
 }
-const Nt = "TradeX-Chart", Ht = "TX", ca = "tradeXutils", yn = "tradeXmenus", ua = "tradeXmenu", vn = "tradeXdividers", wn = "tradeXwindows", da = "tradeXwindow", xn = "tradeXprogress", ma = 500, pa = "stream_None", $t = "stream_Listening", bn = "stream_Started", ga = "stream_Stopped", fa = "stream_Error", Vt = "stream_candleFirst", $e = "stream_candleUpdate", zt = "stream_candleNew", ya = 250, va = 8, wa = 2, xa = 2, Pi = 1e3, Dt = /^(\d*\.?\d+)\s?(px|em|ex|%|in|cn|mm|pt|pc+)$/igm;
+const Nt = "TradeX-Chart", Ht = "TX", ca = "tradeXutils", yn = "tradeXmenus", ua = "tradeXmenu", vn = "tradeXdividers", wn = "tradeXwindows", da = "tradeXwindow", xn = "tradeXprogress", ma = 500, pa = "stream_None", $t = "stream_Listening", bn = "stream_Started", ga = "stream_Stopped", fa = "stream_Error", Vt = "stream_candleFirst", $e = "stream_candleUpdate", zt = "stream_candleNew", ya = 250, va = 8, wa = 2, xa = 2, Pi = 100, Dt = /^(\d*\.?\d+)\s?(px|em|ex|%|in|cn|mm|pt|pc+)$/igm;
 function M(o) {
   return Array.isArray(o);
 }
@@ -30,7 +30,7 @@ function T(o) {
 function Q(o) {
   return typeof o == "boolean";
 }
-function S(o) {
+function E(o) {
   return typeof o == "string";
 }
 function vm(o) {
@@ -106,7 +106,7 @@ const k = {
       });
   },
   isSVG(o) {
-    return S(o) ? /<\s*svg[^>]*>(.*?)<\s*\/\s*svg>/.test(o) : !1;
+    return E(o) ? /<\s*svg[^>]*>(.*?)<\s*\/\s*svg>/.test(o) : !1;
   },
   waitForElm(o) {
     return new Promise((e) => {
@@ -143,13 +143,13 @@ const k = {
     };
   },
   htmlToElement(o) {
-    if (!S(o))
+    if (!E(o))
       return !1;
     const e = document.createElement("template");
     return o = o.trim(), e.innerHTML = o, e.content.firstChild;
   },
   htmlToElements(o) {
-    if (!S(o))
+    if (!E(o))
       return !1;
     const e = document.createElement("template");
     return e.innerHTML = o, e.content.childNodes;
@@ -188,13 +188,13 @@ const k = {
   },
   getStyle(o, e) {
     let i, s;
-    if (S(o))
+    if (E(o))
       i = document.getElementById(o);
     else if (this.isElement(o))
       i = o;
     else
       return !1;
-    return S(e) ? (window.getComputedStyle ? s = document.defaultView.getComputedStyle(i, null).getPropertyValue(e) : i.currentStyle && (s = i.currentStyle[e]), s) : !1;
+    return E(e) ? (window.getComputedStyle ? s = document.defaultView.getComputedStyle(i, null).getPropertyValue(e) : i.currentStyle && (s = i.currentStyle[e]), s) : !1;
   },
   addStyleRule(o, e, i, s) {
     let n = this.findStyleRule(o, e, i, s);
@@ -232,7 +232,7 @@ const k = {
     o.insertRule ? o.insertRule(e + "{" + i + "}", s) : o.addRule(e, i, s);
   },
   findTargetParentWithClass(o, e) {
-    return !this.isElement(o) || !S(e) ? null : o.classList.contains(e) ? o : this.findTargetParentWithClass(o.parentElement, e);
+    return !this.isElement(o) || !E(e) ? null : o.classList.contains(e) ? o : this.findTargetParentWithClass(o.parentElement, e);
   }
 }, ba = typeof window < "u" && typeof window.document < "u";
 typeof process < "u" && process.versions != null && process.versions.node != null;
@@ -285,7 +285,7 @@ var dr = { exports: {} };
     function v(c, u, p) {
       return setTimeout(I(c, p), u);
     }
-    function E(c, u, p) {
+    function S(c, u, p) {
       return Array.isArray(c) ? (A(c, p[u], p), !0) : !1;
     }
     function A(c, u, p) {
@@ -727,7 +727,7 @@ var dr = { exports: {} };
         return R(this.options, c), this.manager && this.manager.touchAction.update(), this;
       },
       recognizeWith: function(c) {
-        if (E(c, "recognizeWith", this))
+        if (S(c, "recognizeWith", this))
           return this;
         var u = this.simultaneous;
         return c = oi(c, this), u[c.id] || (u[c.id] = c, c.recognizeWith(this)), this;
@@ -736,13 +736,13 @@ var dr = { exports: {} };
         return S(c, "dropRecognizeWith", this) ? this : (c = oi(c, this), delete this.simultaneous[c.id], this);
       },
       requireFailure: function(c) {
-        if (E(c, "requireFailure", this))
+        if (S(c, "requireFailure", this))
           return this;
         var u = this.requireFail;
         return c = oi(c, this), Ye(u, c) === -1 && (u.push(c), c.requireFailure(this)), this;
       },
       dropRequireFailure: function(c) {
-        if (E(c, "dropRequireFailure", this))
+        if (S(c, "dropRequireFailure", this))
           return this;
         c = oi(c, this);
         var u = Ye(this.requireFail, c);
@@ -1041,13 +1041,13 @@ var dr = { exports: {} };
         return null;
       },
       add: function(c) {
-        if (E(c, "add", this))
+        if (S(c, "add", this))
           return this;
         var u = this.get(c.options.event);
         return u && this.remove(u), this.recognizers.push(c), c.manager = this, this.touchAction.update(), c;
       },
       remove: function(c) {
-        if (E(c, "remove", this))
+        if (S(c, "remove", this))
           return this;
         if (c = this.get(c), c) {
           var u = this.recognizers, p = Ye(u, c);
@@ -1888,7 +1888,7 @@ class Ne {
     this.#n.destroy(), this.#r = void 0, this.#i = void 0, this.#s = void 0;
   }
   isValid(e, i) {
-    return !!(S(e) || _(i));
+    return !!(E(e) || _(i));
   }
   validOptions(e) {
     return b(e) && Q(e) ? e : void 0;
@@ -2510,7 +2510,7 @@ class ce {
     `;
   }
   setPos() {
-    let e = this.#s.element.getBoundingClientRect().top - this.#t.elWidgetsG.getBoundingClientRect().top;
+    let e = this.#s.element.getBoundingClientRect().top - this.#t.elWidgetsG.getBoundingClientRect().top - this.height / 2;
     this.#o.style.top = `${e}px`;
   }
   setWidth() {
@@ -2815,7 +2815,7 @@ function $r(o) {
 }
 function ws(o) {
   let { sign: e, integers: i, decimals: s, value: n } = o, r = `${n}`, a = "", l = 0, h = 0;
-  return e = e ? 0 : 1, e > 0 && (a += "-", l++), i == 0 ? (a += "0", l++) : (a += r.slice(l, i), l += i), s != 0 && (a += `${r.slice(l)}`, i <= 2 ? h = s : i > 3 ? h = 2 : i > 2 && (h = 4)), a = Number.parseFloat(a).toFixed(h), a;
+  return e = e ? 0 : 1, e > 0 && (a += "-", l++), i == 0 ? (a += "0", l++) : (a += r.slice(l, i), l += i), s != 0 && (a += `${r.slice(l)}`, i <= 1 ? h = s : i > 3 ? h = 2 : i >= 2 && (h = 4)), a = Number.parseFloat(a).toFixed(h), a;
 }
 function Sh(o) {
   return Math.log(o) / Math.log(10);
@@ -3251,8 +3251,8 @@ class Ci extends Ur {
     let h = Math.pow(10, Math.ceil(Math.log10(a)));
     a < 0.25 * h ? h = 0.25 * h : a < 0.5 * h && (h = 0.5 * h);
     var m = Math.ceil(i / h) * h, g = Math.floor(e / h) * h;
-    let v = this.height, E = (g - m) / h;
-    this.height / E;
+    let v = this.height, S = (g - m) / h;
+    this.height / S;
     let A = this.countDigits(h), L;
     this.#d = A;
     for (var R = m; R <= g; R += h)
@@ -3363,8 +3363,8 @@ function Ih(o, e, i) {
 function Dh(o, e, i) {
   o.beginPath(), o.moveTo(e[0].x, e[0].y);
   for (var s = i ?? 1, n = 0; n < e.length - 1; n++) {
-    var r = n > 0 ? e[n - 1] : e[0], a = e[n], l = e[n + 1], h = n != e.length - 2 ? e[n + 2] : l, m = a.x + (l.x - r.x) / 6 * s, g = a.y + (l.y - r.y) / 6 * s, v = l.x - (h.x - a.x) / 6 * s, E = l.y - (h.y - a.y) / 6 * s;
-    o.bezierCurveTo(m, g, v, E, l.x, l.y);
+    var r = n > 0 ? e[n - 1] : e[0], a = e[n], l = e[n + 1], h = n != e.length - 2 ? e[n + 2] : l, m = a.x + (l.x - r.x) / 6 * s, g = a.y + (l.y - r.y) / 6 * s, v = l.x - (h.x - a.x) / 6 * s, S = l.y - (h.y - a.y) / 6 * s;
+    o.bezierCurveTo(m, g, v, S, l.x, l.y);
   }
   o.stroke();
 }
@@ -9441,7 +9441,7 @@ const io = {
   RSI: { id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: Fs },
   SMA: { id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: Ni },
   STOCH: { id: "STOCH", name: "Stochastic Oscillator", event: "addIndicator", ind: Gs }
-}, Ys = "0.141.0";
+}, Ys = "0.141.1";
 class Fd {
   #e;
   #t;
@@ -11492,7 +11492,7 @@ class v0 {
     return this.#y;
   }
   get layerLabels() {
-    return this.#b;
+    return this.#C;
   }
   get layerOverlays() {
     return this.#g;
@@ -11781,7 +11781,7 @@ class b0 {
     this.#s = e.querySelector(".controls"), this.#l = e.querySelectorAll(".control"), this.#h = e.querySelector("#showLegends"), this.#d = e.querySelector("#hideLegends"), this.#s.style.display = "none", this.icons(this.#l, { id: "collapse", parent: this }), this.#e.legends.classList.add("hide"), this.#u = "hide", this.collapse = "show";
   }
   onMouseClick(e) {
-    const i = (s) => S(s.dataset.icon) ? { id: s.id, icon: s.dataset.icon, parent: s.parentElement } : s.parentElement.className !== "controls" ? i(s.parentElement) : !1;
+    const i = (s) => E(s.dataset.icon) ? { id: s.id, icon: s.dataset.icon, parent: s.parentElement } : s.parentElement.className !== "controls" ? i(s.parentElement) : !1;
     return i(e);
   }
   onMouseOver(e) {
@@ -12297,7 +12297,7 @@ class M0 {
   onDragDone(e) {
   }
   onMouseWheel(e) {
-    e.domEvent.preventDefault(), this.setScaleRange(Math.sign(e.wheeldelta) * -1);
+    e.domEvent.preventDefault(), this.setScaleRange(Math.sign(e.wheeldelta) * -2);
   }
   onStreamUpdate(e) {
   }
@@ -12408,9 +12408,9 @@ class L0 extends Y {
       w: r,
       z: s
     }, l = Math.floor(s * this.theme.volume.Height / 100);
-    let h = this.core.rangeScrollOffset, m = e.indexStart - h, g = e.Length + h * 2, v = g, E = m, A, L = 0;
+    let h = this.core.rangeScrollOffset, m = e.indexStart - h, g = e.Length + h * 2, v = g, S = m, A, L = 0;
     for (; v--; )
-      A = e.value(E), A[4] !== null && (L = A[5] > L ? A[5] : L), E++;
+      A = e.value(S), A[4] !== null && (L = A[5] > L ? A[5] : L), S++;
     for (; g--; )
       A = e.value(m), a.x = be(this.xAxis.xPos(A[0]) - r / 2), A[4] !== null && (a.h = l - l * ((L - A[5]) / L), a.raw = i[m], this.#e.draw(a)), m++;
     super.updated();
@@ -12442,21 +12442,21 @@ class co {
     let l = Math.max(Math.floor(a * 0.5), 1), h = Math.abs(e.o - e.c), m = e.c === e.o ? 1 : 2, g = e.x, v = Math.floor(g) - 0.5;
     if (i.save(), i.strokeStyle = r, i.beginPath(), i.moveTo(v, Math.floor(e.h)), this.cfg.candle.Type === J.OHLC ? i.lineTo(v, Math.floor(e.l)) : s ? (i.lineTo(v, Math.floor(e.c)), i.moveTo(v, Math.floor(e.o))) : (i.lineTo(v, Math.floor(e.o)), i.moveTo(v, Math.floor(e.c))), i.lineTo(v, Math.floor(e.l)), i.stroke(), a == 3) {
       i.fillStyle = r;
-      let E = s ? 1 : -1;
+      let S = s ? 1 : -1;
       i.rect(
         Math.floor(g - l),
         e.c,
         Math.floor(l * 2),
-        E * Math.max(h, m)
+        S * Math.max(h, m)
       ), i.fill(), i.stroke();
     } else if (a > 3 && this.fill) {
       i.fillStyle = n;
-      let E = s ? 1 : -1;
+      let S = s ? 1 : -1;
       i.rect(
         Math.floor(g - l),
         e.c,
         Math.floor(l * 2),
-        E * Math.max(h, m)
+        S * Math.max(h, m)
       ), i.fill(), i.stroke();
     } else if (a > 3 && !this.fill && this.cfg.candle.Type !== J.OHLC) {
       let S = s ? 1 : -1;
@@ -12464,7 +12464,7 @@ class co {
         Math.floor(g - l),
         e.c,
         Math.floor(l * 2),
-        E * Math.max(h, m)
+        S * Math.max(h, m)
       ), i.stroke();
     } else
       this.cfg.candle.Type === J.OHLC ? (i.beginPath(), i.moveTo(v - l, e.o), i.lineTo(v, e.o), i.moveTo(v, e.c), i.lineTo(v + l, e.c), i.stroke()) : (i.strokeStyle = r, i.beginPath(), i.moveTo(
@@ -12497,7 +12497,7 @@ class co {
         for (let [l, h] of s.AreaFillColour.entries())
           n.addColorStop(l, h);
       else
-        S() ? n = s.AreaFillColour : n = s.UpBodyColour || s.DnBodyColour;
+        E() ? n = s.AreaFillColour : n = s.UpBodyColour || s.DnBodyColour;
       i.stroke(), i.lineTo(e[a - 1].x, this.scene.height), i.lineTo(r[0], this.scene.height), i.fillStyle = n, i.closePath(), i.fill();
     } else
       i.stroke();
@@ -12719,7 +12719,7 @@ class k0 extends Y {
       A += this.buildNewsEventHTML(R);
     const L = {
       dimensions: { h: void 0, w: 150 },
-      position: { x: v + a / 2 + 1, y: E },
+      position: { x: v + a / 2 + 1, y: S },
       content: A,
       offFocus: Pi + 1
     };
@@ -12730,7 +12730,7 @@ class k0 extends Y {
     h1, p {display: inline-block; font-size: 0.9em;
     max-width: 98%;
     </style>`;
-    return S(e?.url) && (i = `<a href="${e?.url}" target="${e?.target}">${i}</a>`), s += `<h1>${i}</h1>`, s += `<p>${e?.content}</p>`, s;
+    return E(e?.url) && (i = `<a href="${e?.url}" target="${e?.target}">${i}</a>`), s += `<h1>${i}</h1>`, s += `<p>${e?.content}</p>`, s;
   }
   draw(e = this.core.range) {
     if (this.core.config?.events?.display === !1 || !super.mustUpdate())
@@ -12895,7 +12895,7 @@ const mo = {
   secondaryPane: {
     candles: { class: uo, fixed: !1, required: !0 }
   }
-}, Se = {
+}, Ee = {
   id: "chart",
   title: "",
   type: "chart",
@@ -13046,7 +13046,7 @@ class rt {
     return this.#P;
   }
   get stream() {
-    return this.#b;
+    return this.#C;
   }
   get streamCandle() {
     return this.#y;
@@ -13058,7 +13058,7 @@ class rt {
     return this.element.style.cursor;
   }
   get cursorPos() {
-    return this.#S;
+    return this.#E;
   }
   set cursorActive(e) {
     this.#N = e;
@@ -13218,7 +13218,7 @@ class rt {
     this.core.MainPane.onPointerActive(this), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.#E = [Math.round(e.position.x), Math.round(e.position.y)], this.#f.onMouseMove(this.#E), this.emit(`${this.id}_mousemove`, this.#E);
   }
   onMouseEnter(e) {
-    this.core.MainPane.onPointerActive(this), this.#S = [Math.round(e.position.x), Math.round(e.position.y)], this.core.MainPane.onMouseEnter(), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.emit(`${this.id}_mouseenter`, this.#S);
+    this.core.MainPane.onPointerActive(this), this.#E = [Math.round(e.position.x), Math.round(e.position.y)], this.core.MainPane.onMouseEnter(), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.emit(`${this.id}_mouseenter`, this.#E);
   }
   onMouseOut(e) {
     this.#N = !1, this.#E = [Math.round(e.position.x), Math.round(e.position.y)], this.scale.layerCursor.visible = !1, this.emit(`${this.id}_mouseout`, this.#E);
@@ -13230,7 +13230,7 @@ class rt {
     this.#s.pointerButtons[e.domEvent.srcEvent.button] = !1;
   }
   onStreamListening(e) {
-    this.#b !== e && (this.#b = e);
+    this.#C !== e && (this.#C = e);
   }
   onStreamNewValue(e) {
     this.draw(this.range, !0);
@@ -13245,16 +13245,16 @@ class rt {
     this.removeIndicator(e.id);
   }
   setTitle(e) {
-    if (!S(e))
+    if (!E(e))
       return !1;
-    this.#i = e, Se.title = e;
+    this.#i = e, Ee.title = e;
     const i = this.legend.list.chart.el.querySelectorAll(".title");
     for (let s of i)
       s.innerHTML = e;
     return !0;
   }
   setWatermark(e) {
-    S(e.text) || S(e) ? this.core.config.watermark.text = e : "imgURL" in e && (this.core.config.watermark.imgURL = e);
+    E(e.text) || E(e) ? this.core.config.watermark.text = e : "imgURL" in e && (this.core.config.watermark.imgURL = e);
   }
   setHeight(e) {
     T(e) || (e = this.height || this.#o.height), this.#m.style.height = `${e}px`, this.#v.style.height = `${e}px`, this.elViewport.style.height = `${e}px`, this.#f.setDimensions({ w: null, h: e }), this.Divider?.setPos(), this.Divider?.setWidth();
@@ -13316,7 +13316,7 @@ class rt {
     return i;
   }
   removeIndicator(e) {
-    if (!S(e) || !(e in this.indicators))
+    if (!E(e) || !(e in this.indicators))
       return !1;
     this.#I[e] = !0, this.indicators[e].instance.destroy(), this.graph.removeOverlay(e), this.draw(), Object.keys(this.indicators).length === 0 && !this.isPrimary && this.emit("destroyChartView", this.id), delete this.#I[e];
   }
@@ -13326,10 +13326,10 @@ class rt {
       this.removeIndicator(i);
   }
   indicatorVisible(e, i) {
-    return !S(e) || !(e in this.indicators) ? !1 : this.indicators[e].instance.visible(i);
+    return !E(e) || !(e in this.indicators) ? !1 : this.indicators[e].instance.visible(i);
   }
   indicatorSettings(e, i) {
-    return !S(e) || !(e in this.indicators) ? !1 : this.indicators[e].instance.settings(i);
+    return !E(e) || !(e in this.indicators) ? !1 : this.indicators[e].instance.settings(i);
   }
   addTool(e) {
     let { layerConfig: i } = this.layerConfig(), s = new Xt.Layer(i);
@@ -13354,7 +13354,7 @@ class rt {
   legendsVisibility(e) {
     this.legend.setCollapse(e);
   }
-  updateLegends(e = this.#S, i = !1) {
+  updateLegends(e = this.#E, i = !1) {
     if (!(this.#s.isEmpty || !b(this.#p)))
       for (const s in this.#p.list)
         this.#p.update(s, { pos: e, candle: i });
@@ -13505,8 +13505,8 @@ class U0 extends Y {
       txtCol: a || this.theme.watermark.COLOUR
     }, h = this.scene.context;
     h.font = xt(l?.fontSize, l?.fontWeight, l?.fontFamily), h.textBaseline = "top", h.fillStyle = l.txtCol;
-    const m = $i(l), g = Hi(h, e, l), v = (this.scene.width - g) / 2, E = (this.core.Chart.height - m) / 2;
-    h.fillText(e, v, E);
+    const m = $i(l), g = Hi(h, e, l), v = (this.scene.width - g) / 2, S = (this.core.Chart.height - m) / 2;
+    h.fillText(e, v, S);
   }
   renderImage(e) {
     if (!e)
@@ -14163,7 +14163,7 @@ class po {
     }), e;
   }
   getIndicator(e) {
-    if (!S(e))
+    if (!E(e))
       return !1;
     for (const i of this.#g.values())
       if (e in i.indicators)
@@ -15383,7 +15383,7 @@ class Q0 extends he {
     this.legends.insertAdjacentHTML("beforeend", e);
   }
   setTittle(e) {
-    S && (this.#e = e, this.elTitle.innerHTML = e);
+    E && (this.#e = e, this.elTitle.innerHTML = e);
   }
   buildLegend(e, i) {
     let s = "", n = `${i.legend.font}; color: ${i.legend.colour}; text-align: left;`, r = "", a = e?.type !== "chart" ? "visible" : "notvisible";
@@ -16533,7 +16533,7 @@ class le {
     `), l;
   }
   title(e) {
-    const i = this.config, s = i?.styles?.title, n = S(i?.title) ? i.title : "";
+    const i = this.config, s = i?.styles?.title, n = E(i?.title) ? i.title : "";
     let r = "white-space: nowrap; ";
     for (let l in s)
       r += `${l}: ${s[l]}; `;
@@ -16890,7 +16890,7 @@ class ym {
 function ur(o, e, i, s, n, r) {
   const a = o.theme, l = document.createElement("template"), h = o.Timeline.graph.viewport.scene, m = o.MainPane, g = m.graph.viewport.scene, v = m.width, S = m.height, A = new Xt.Viewport({
     width: v,
-    height: E,
+    height: S,
     container: l
   }), L = A.scene.context;
   let R = 0, ne = 0, me = v - o.Chart.scale.width;
@@ -17541,7 +17541,7 @@ class N extends dm {
     }
   }
   findOverlayInGraph(e, i) {
-    if (!S(e) || !S(i))
+    if (!E(e) || !E(i))
       return !1;
     const s = this.hasOverlay(e);
     if (!s)
@@ -17574,7 +17574,7 @@ class N extends dm {
     return this.#P.indicatorSettings(e, i);
   }
   hasStateIndicator(e, i = "searchAll") {
-    if (!S(e) || !S(i))
+    if (!E(e) || !E(i))
       return !1;
     const s = function(n, r) {
       for (let a of r)

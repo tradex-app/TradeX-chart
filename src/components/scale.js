@@ -207,7 +207,7 @@ export default class ScaleBar {
 
   onMouseWheel(e) {
     e.domEvent.preventDefault()
-    this.setScaleRange(Math.sign(e.wheeldelta) * -1)
+    this.setScaleRange(Math.sign(e.wheeldelta) * -2)
   }
 
   onStreamUpdate(e) {

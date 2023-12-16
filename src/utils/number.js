@@ -314,13 +314,13 @@ export function getPrecision (value) {
 //      a = b.map(function(itm) {
 //        return [itm.charAt(0), itm.length];
 //      });
-      if (i <= 2) {
+      if (i <= 1) {
         f = d
       }
       else if (i > 3) {
         f = 2
       }
-      else if (i > 2) {
+      else if (i >= 2) {
         f = 4
       }
     }
