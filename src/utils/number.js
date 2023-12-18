@@ -279,55 +279,54 @@ export function getPrecision (value) {
   }
 }
 
-  /**
-   * truncate price to fit on Scale
-   * @param {object} digits
-   * @return {number}  
-   */
-  export function limitPrecision (digits) {
-    let {sign: s, integers: i, decimals: d, value: v} = digits
-    // let n = this.yAxisDigits - 1,
-    let x = `${v}`,
-        r = "",
-        c = 0,
-        f = 0,
-        b, a;
-    // sign
-    s = (s) ? 0 : 1
-    if (s > 0) {
-      r += "-"
-      c++
-    }
-    // integers
-    if (i == 0) {
-      r += "0"
-      c++
-    }
-    else {
-      r += x.slice(c,i)
-      c += i
-    }
-    // decimals
-    if (d != 0) {
-      r += `${x.slice(c)}`
+/**
+ * truncate price to fit on Scale
+ * @param {object} digits - {sign: s, integers: i, decimals: d, value: v}
+ * @return {number}  
+ */
+export function limitPrecision (digits) {
+  let {sign: s, integers: i, decimals: d, value: v} = digits
+  // let n = this.yAxisDigits - 1,
+  let x = `${v}`,
+      r = "",
+      c = 0,
+      f = 0,
+      b, a;
+  // sign
+  s = (s) ? 0 : 1
+  if (s > 0) {
+    r += "-"
+    c++
+  }
+  // integers
+  if (i == 0) {
+    r += "0"
+    c++
+  }
+  else {
+    r += x.slice(c,i)
+    c += i
+  }
+  // decimals
+  if (d != 0) {
+    r += `${x.slice(c)}`
 //      b = `${d}`.match(/([0-9])\1*/g) || [];
 //      a = b.map(function(itm) {
 //        return [itm.charAt(0), itm.length];
 //      });
-      if (i <= 1) {
-        f = d
-      }
-      else if (i > 3) {
-        f = 2
-      }
-      else if (i >= 2) {
-        f = 4
-      }
+    if (i <= 1) {
+      f = d
     }
-    r = Number.parseFloat(r).toFixed(f)
-    return r
+    else if (i > 3) {
+      f = 2
+    }
+    else if (i >= 2) {
+      f = 4
+    }
   }
-
+  r = Number.parseFloat(r).toFixed(f)
+  return r
+}
 
 /**
  * log base 10

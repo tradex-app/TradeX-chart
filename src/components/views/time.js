@@ -1,3 +1,6 @@
+// time.js
+// <tradex-time></tradex-time>
+
 import element from "./classes/element"
 import graph from "./classes/graph"
 import tradeXOverview from "./overview"

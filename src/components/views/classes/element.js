@@ -141,13 +141,6 @@ export default class element extends HTMLElement {
    */
   onResize(r) {
     this.oldDOM = {...this.DOM}
-    // this.DOM = {...this.DOM, ...r[0].contentRect}
-    // this.DOM = Object.assign(this.DOM, r[0].contentRect)
-    // for (let k in r[0].contentRect) {
-    //   const v = r[0].contentRect[k]
-    //   if (!isFunction(v))
-    //     this.DOM[k] = v
-    // }
     this.getDims()
     this.emit("resize", this.DOM)
   }

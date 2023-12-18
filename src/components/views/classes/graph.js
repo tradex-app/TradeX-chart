@@ -114,8 +114,8 @@ export default class graph {
 
   layerConfig() {
     const buffer = this.config?.buffer || BUFFERSIZE
-    const width = this.#elViewport.width
-    const height = this.#elViewport.height // this.#parent.height || this.#parent.rowsH - 1
+    const width = this.#elViewport.getBoundingClientRect().width
+    const height = this.#elViewport.getBoundingClientRect().height // this.#parent.height || this.#parent.rowsH - 1
     this.layerWidth = Math.round(width * ((100 + buffer) * 0.01))
     const layerConfig = { 
       width: this.layerWidth, 

@@ -55,7 +55,8 @@ export default class Menu {
     this.#id = config.id
     this.#elMenus = widgets.elements.elMenus
     this.#elWidgetsG = this.#core.elWidgetsG
-    this.init()
+    // insert element
+    this.mount(this.#elMenus)
   }
 
   get el() { return this.#elMenu }
@@ -63,11 +64,6 @@ export default class Menu {
   get pos() { return this.dimensions }
   get dimensions() { return DOM.elementDimPos(this.#elMenu) }
   get type() { return Menu.type }
-
-  init() {
-    // insert element
-    this.mount(this.#elMenus)
-  }
 
   start() {
     // position menus next to primary (icon)

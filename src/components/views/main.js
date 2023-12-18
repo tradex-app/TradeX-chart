@@ -6,9 +6,9 @@ import tradeXTime from './time'
 import tradeXRows from './rows'
 
 import {
-  SCALEW,
+  TIMESCALEH,
   TIMEH,
-  UTILSH,
+  SCALEW,
   GlobalStyle
 } from "../../definitions/style"
 import { isNumber } from "../../utils/typeChecks"
@@ -16,34 +16,29 @@ import { isNumber } from "../../utils/typeChecks"
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
-:host {
-  display: grid;
-  height: 100%;
-  grid-template-rows: 1fr ${UTILSH}px;
-}
   #viewport {
     position: absolute;
-    width: calc(100% - ${SCALEW}px);
+    width: 100%;
     height: inherit;
     background: var(--txc-chartpane-background, none);
     z-index: 0;
   }
   #viewport canvas {
     position: absolute;
+    // top: 1px;
   }
   tradex-rows {
+    position:relative;
     overflow: hidden;
-    width: 100%;
-    height: calc(100% - 4px);
-    grid-row-start: 1;
-    grid-row-end: 2;
+    width: calc(100% - ${SCALEW}px);
+    height: calc(100% - ${TIMEH}px);
     border: 1px solid;
     border-color: var(--txc-border-color, ${GlobalStyle.COLOUR_BORDER}); 
   }
   tradex-time {
-    width: 100%;
+    position: relative;
+    width: calc(100% - ${SCALEW}px);
     height: ${TIMEH}px;
-    grid-row-start: 2;
     overflow: hidden;
     margin-left: 1px;
     z-index: 1;
@@ -75,13 +70,12 @@ export default class tradeXMain extends element {
         this.#elViewPort = this.shadowRoot.querySelector('#viewport')
         this.#elRows = this.shadowRoot.querySelector('tradex-rows')
         this.#elTime = this.shadowRoot.querySelector('tradex-time')
-        this.style.display = "grid"
+        // this.style.display = "grid"
       })
   }
 
   disconnectedCallback() {
   }
-
   get viewport() { return this.#elViewPort }
   get rows() { return this.#elRows }
   get time() { return this.#elTime }
@@ -101,8 +95,12 @@ export default class tradeXMain extends element {
   }
 
   setMain() {
-    // let offset = (this.#theme.tools.location == "none") ? 60 : 0
-    // this.viewport.style.left = `${offset}px`
+    let timeH = (isNumber(this.#theme?.time?.height)) ? this.#theme.time.height : TIMEH
+    let offset = (this.#theme.tools.location == "none") ? 60 : 0
+    this.rows.style.height = `calc(100% - ${timeH}px)`
+    this.rows.style.left = `${offset}px`
+    this.time.style.left = `${offset}px`
+    this.viewport.style.left = `${offset}px`
   }
 
 }

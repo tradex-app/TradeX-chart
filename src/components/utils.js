@@ -62,7 +62,7 @@ export default class UtilsBar {
   get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
-  get dimensions() { return this.#elUtils.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#elUtils) }
   get stateMachine() { return this.#stateMachine }
   get location() { return this.#location }
 

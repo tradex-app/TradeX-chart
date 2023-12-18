@@ -1,7 +1,11 @@
 {
   "name": "tradex-chart",
   "files": [
-    "dist"
+    "dist",
+    "LICENSE",
+    "README.md",
+    "CONTRIBUTING.md",
+    "CHANGELOG.md"
   ],
   "main": "./dist/tradex-chart.umd.js",
   "module": "./dist/tradex-chart.es.js",
@@ -12,7 +16,7 @@
     }
   },
   "private": false,
-  "version": "0.141.1",
+  "version": "0.141.2",
   "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",
@@ -24,7 +28,7 @@
   "devDependencies": {
     "jsdoc-to-markdown": "^8.0.0",
     "rollup-plugin-cleanup": "^3.2.1",
-    "vite": "^5.0.0"
+    "vite": "^5.0.10"
   },
   "dependencies": {
     "mjolnir.js": "^2.7.1",
@@ -42,8 +46,12 @@
     "stock chart",
     "finance",
     "stock",
+    "stockchart",
     "exchange",
-    "candlestick"
+    "candlestick",
+    "k-line",
+    "timeline",
+    "klinechart"
   ],
   "homepage": "https://tradex-app.github.io/TradeX-chart/",
   "repository": {
@@ -52,5 +60,8 @@
   },
   "bugs": {
     "url": "https://github.com/tradex-app/TradeX-chart/issues"
+  },
+  "documentation": {
+    "url": "https://tradex-app.github.io/TradeX-chart/"
   }
 }

@@ -112,7 +112,7 @@ export default class Timeline {
   get navigation() { return this.#navigation }
   get range() { return this.#core.range }
   get pos() { return this.dimensions }
-  get dimensions() { return this.#element.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#element) }
   get bufferPx() { return this.#core.bufferPx }
   get scrollPos() { return this.#core.scrollPos }
   get scrollOffsetPx() { return this.#core.scrollPos % this.candleW }

@@ -259,6 +259,12 @@ export const defaultTheme = {
   secondaryPane: {
     separator: "#666"
   },
+  tools: {
+    location: false
+  },
+  utils: {
+    location: false
+  },
   time: {
     navigation: false,
     font: LegendStyle.font,

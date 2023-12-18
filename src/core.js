@@ -4,6 +4,7 @@
 import { NAME, SHORTNAME, ID, RANGELIMIT, PRICE_PRECISION, VOLUME_PRECISION, STREAM_UPDATE } from './definitions/core'
 import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH } from './definitions/style'
 import { OVERLAYPANES } from './definitions/chart'
+import { defaultConfig } from './definitions/config'
 import Indicators from './definitions/indicators'
 import * as packageJSON from '../package.json'
 import { isArray, isBoolean, isFunction, isNumber, isObject, isString, isError, isPromise, isClass } from './utils/typeChecks'
@@ -24,10 +25,10 @@ import ToolsBar from './components/tools'
 import MainPane from './components/main'
 import WidgetsG from './components/widgets'
 import Indicator from './components/overlays/indicator'
+import { defaultOverlays, optionalOverlays } from './components/chart'
 import exportImage from './utils/exportImage'
 import talib from './wasm/index.esm.str.js'
 import wasm from './wasm/talib.wasm.dataURI'
-import { defaultOverlays, optionalOverlays } from './components/chart'
 
 
 /**
@@ -66,6 +67,14 @@ export default class TradeXchart extends Tradex_chart {
   #config
   #options
   #el
+  #elUtils
+  #elBody
+  #elTools
+  #elMain
+  #elRows
+  #elTime
+  #elYAxis
+  #elWidgetsG
 
   #ready = false
   #inCnt = null
@@ -88,11 +97,6 @@ export default class TradeXchart extends Tradex_chart {
   chartBGColour = GlobalStyle.COLOUR_BG
   chartTxtColour = GlobalStyle.COLOUR_TXT
   chartBorderColour = GlobalStyle.COLOUR_BORDER
-
-  utilsH = UTILSH
-  toolsW = TOOLSW
-  timeH  = TIMEH
-  scaleW = SCALEW
 
   #UtilsBar
   #ToolsBar
@@ -141,49 +145,108 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * Create a new TradeXchart instance
    * @static
+   * @param {DOM_element} container - HTML element to mount the chart on
    * @param {Object} [txCfg={}] - chart config
+   * @param {Object} state - chart state
    * @returns {instance} TradeXchart
    * @memberof TradeXchart
    */
-  static create(txCfg={}) {
+  static create(cfg) {
 
-    // global init for all TradeX charts
-    if (TradeXchart.#cnt == 0) {
-      TradeXchart.#cfg.CPUCores = navigator.hardwareConcurrency
-      TradeXchart.#cfg.api = {
-        permittedClassNames:TradeXchart.#permittedClassNames,
-      }
-    }
+    let txCfg = copyDeep(defaultConfig)
 
-    if ((typeof txCfg.talib !== "object") || 
-        // (txCfg.talib[Symbol.toStringTag] !== "Module") ||
-        (typeof txCfg.talib.init !== "function")) {
-          TradeXchart.#talibReady = false
-          TradeXchart.#talibError = new Error(`${TradeXchart.#initErrMsg}`)
+    if (isObject(cfg) && Object.keys(cfg).length > 0)
+      txCfg = mergeDeep(txCfg, cfg)
+
+      // global init for all TradeX charts
+      if (TradeXchart.#cnt == 0) {
+        TradeXchart.#cfg.CPUCores = navigator.hardwareConcurrency
+        TradeXchart.#cfg.api = {
+          permittedClassNames:TradeXchart.#permittedClassNames,
         }
+      }
 
-    if (!TradeXchart.#talibReady && TradeXchart.#talibError === null) {
-      TradeXchart.#talibPromise = txCfg.talib.init(txCfg.wasm)
-      TradeXchart.#talibPromise.then(
-        () => { 
-          TradeXchart.#talibReady = true;
-          // process functions waiting for talibReady
-          for (let c of TradeXchart.#talibAwait) {
-            if (isFunction(c)) c()
+      if ((typeof txCfg.talib !== "object") || 
+          // (txCfg.talib[Symbol.toStringTag] !== "Module") ||
+          (typeof txCfg.talib.init !== "function")) {
+            TradeXchart.#talibReady = false
+            TradeXchart.#talibError = new Error(`${TradeXchart.#initErrMsg}`)
           }
-        },
-        () => { TradeXchart.#talibReady = false }
-      )
+/*
+      // init TALib
+      if (!TradeXchart.#TALibWorkerReady) {
+        TradeXchart.#TALibWorkerReady = "initializig"
+        const talibWWStr = `
+        (input, r) => {
+          if (typeof input === "object") {
+            if (input.func === "init") {
+              lib.promise = init(wasm)
+              lib.promise.then(
+                (p) => { lib.ready = true; self.postMessage({r, status: "resolved", result:"ready"}); },
+                (e) => { lib.ready = false; console.error(e); self.postMessage({r, status: false, result:e}); }
+              )
+              // return lib.promise
+              // promises cannot be cloned to return from worker
+              return "initializing"
+            }
+            else if (input.func === "test") {
+              return "testing"
+            }
+            else if (lib.ready && input.func in lib.talib) {
+              return lib.talib[input.func](input.params);
+            }
+          }
+          else return false
+        }
+        const lib = {ready: false};
+        const wasm = "${wasm}";
+        ` + talib;
+        function callback (r) {
+          if (r === "ready") {
+            TradeXchart.#TALibWorker.cb = undefined
+            TradeXchart.#TALibWorkerReady = r; 
+            console.log(`TALibWebWorker 1: ${r}`); 
+            console.log("#TALibWorkerReady",TradeXchart.#TALibWorkerReady)
+          }
+          return r;
+        }
+        TradeXchart.#TALibWorker = TradeXchart.webWorkers.create(talibWWStr, "", callback)
+        TradeXchart.#TALibWorker.postMessage({
+          func: "init",
+        })
+        .catch(e => console.error(e))
+        .then(r => {
+          TradeXchart.#TALibWorkerReady = r; 
+          console.log("#TALibWorkerReady",TradeXchart.#TALibWorkerReady)
+          console.log(`TALibWebWorker 2: ${r}`)
+
+        })
+      }
+*/
+
+      if (!TradeXchart.#talibReady && TradeXchart.#talibError === null) {
+        TradeXchart.#talibPromise = txCfg.talib.init(txCfg.wasm)
+        TradeXchart.#talibPromise.then(
+          () => { 
+            TradeXchart.#talibReady = true;
+            // process functions waiting for talibReady
+            for (let c of TradeXchart.#talibAwait) {
+              if (isFunction(c)) c()
+            }
+          },
+          () => { TradeXchart.#talibReady = false }
+        )
+      }
+    return txCfg
     }
-  }
   
-  /**
-   * Destroy a chart instance, clean up and remove data
-   * @static
-   * @param {instance} chart 
-   * @memberof TradeXchart
-   */
-  static destroy(chart) {
+    /**
+     * Destroy a chart instance, clean up and remove data
+     * @static
+     * @param {instance} chart 
+     * @memberof TradeXchart
+     */
+    static destroy(chart) {
       if (!(chart instanceof TradeXchart)) return false
 
       const inCnt = chart.inCnt;
@@ -191,16 +254,16 @@ export default class TradeXchart extends Tradex_chart {
       chart.destroy()
       delete TradeXchart.#instances[inCnt];
       return true
-  }
-
-  /**
-   * @private
-   * @returns {number}
-   */
-  static cnt() {
-    return TradeXchart.#cnt++
-  }
+    }
  
+    /**
+     * @private
+     * @returns {number}
+     */
+    static cnt() {
+      return TradeXchart.#cnt++
+    }
+
   /**
    * Creates an instance of TradeXchart
    * extends tradex-chart element
@@ -209,7 +272,17 @@ export default class TradeXchart extends Tradex_chart {
    */
   constructor () {
     super()
+    this.#el = this
+    this.#core = this
     this.#inCnt = TradeXchart.cnt()
+    this.logs = false
+    this.infos = false
+    this.warnings = false
+    this.errors = false
+    this.timer = false
+    // this.#config = copyDeep(defaultConfig)
+    this.setID(null)
+    this.#state = this.#State.create({}, false, false)
 
     console.warn(`!WARNING!: ${NAME} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`)
     this.log(`${SHORTNAME} instance count: ${this.inCnt}`)
@@ -329,7 +402,7 @@ export default class TradeXchart extends Tradex_chart {
 
     TradeXchart.create(cfg)
 
-    const txCfg = {...cfg}
+    const txCfg = TradeXchart.create(cfg)
     this.logs = (txCfg?.logs) ? txCfg.logs : false
     this.infos = (txCfg?.infos) ? txCfg.infos : false
     this.warnings = (txCfg?.warnings) ? txCfg.warnings : false
@@ -338,11 +411,10 @@ export default class TradeXchart extends Tradex_chart {
     this.#config = txCfg
     this.#inCnt = txCfg.cnt || this.#inCnt
     this.#TALib = txCfg.talib
-    this.#el = this
-    this.#core = this
 
     // if no theme use the default
-    if (!("theme" in txCfg)) txCfg.theme = defaultTheme
+    if (!("theme" in txCfg) || !isObject(txCfg.theme)) 
+      txCfg.theme = defaultTheme
 
     const id = (isString(txCfg?.id)) ? txCfg.id : null
     this.setID(id)
@@ -356,7 +428,8 @@ export default class TradeXchart extends Tradex_chart {
         state.core = this
     let deepValidate = txCfg?.deepValidate || false
     let isCrypto = txCfg?.isCrypto || false
-    // create a state
+
+    // create state
     this.#state = this.#State.create(state, deepValidate, isCrypto)
     delete txCfg.state
     this.log(`${this.name} id: ${this.id} : created with a ${this.state.status} state`)
@@ -417,7 +490,8 @@ export default class TradeXchart extends Tradex_chart {
     }
 
     // inject chart style rules
-    this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`)
+    if (!!this.parentElement)
+      this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`)
 
     // setup main chart features
     this.#WidgetsG = new WidgetsG(this, {widgets: txCfg?.widgets})
@@ -565,15 +639,14 @@ export default class TradeXchart extends Tradex_chart {
    */
   setDimensions(w, h) {
     const dims = super.setDimensions(w, h) 
+    this.emit("global_resize", dims)
   }
 
   setUtilsH(h) {
-    this.utilsH = h
     this.elUtils.style.height = `${h}px`
   }
 
   setToolsW(w) {
-    this.toolsW = w
     this.elTools.style.width = `${w}px`
   }
 
@@ -627,7 +700,7 @@ export default class TradeXchart extends Tradex_chart {
     this.#theme.setTheme(ID, this)
     const theme = this.#theme
     const style = document.querySelector(`style[title=${this.id}_style]`)
-    const borderColour = `var(--txc-border-color, ${theme.chart.BorderColour})`
+    const borderColour = `var(--txc-border-color, ${theme.chart.BorderColour}`
 
     let innerHTML = `.${this.id} { `
 

@@ -84,8 +84,8 @@ export default class ScaleBar {
   get options() { return this.#options }
   get parent() { return this.#parent }
   set height(h) { this.setHeight(h) }
-  get height() { return this.#element.height || this.#element.getBoundingClientRect().height }
-  get width() { return this.#element.width }
+  get height() { return this.#element.getBoundingClientRect().height }
+  get width() { return this.#element.getBoundingClientRect().width }
   get element() { return this.#element }
   set cursor(c) { this.#element.style.cursor = c }
   get cursor() { return this.#element.style.cursor }
@@ -103,7 +103,7 @@ export default class ScaleBar {
   set graph(g) { this.#Graph = g }
   get graph() { return this.#Graph }
   get pos() { return this.dimensions }
-  get dimensions() { return this.#element.dimensions }
+  get dimensions() { return DOM.elementDimPos(this.#element) }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
   get digitCnt() { return this.#digitCnt }

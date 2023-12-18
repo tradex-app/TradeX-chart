@@ -18,65 +18,96 @@ import {
 } from "../../definitions/style"
 import { isNumber } from "../../utils/typeChecks"
 
-
-
 const right = `
-  tradex-main {
-    flex-grow: 1;
-    order: 2;
-  }
-  tradex-scale {
-    width: ${SCALEW}px; 
-    order: 3;
-  }
-`
-
-const left = `
-  tradex-main {
-    flex-grow: 1;
-    order: 3;
-  }
-  tradex-scale {
-    width: ${SCALEW}px; 
-    order: 2;
-  }
-`
-
-const both = `
-  tradex-main {
-    flex-grow: 1;
-    order: 3;
-  }
-  tradex-scale {
-    width: ${SCALEW}px; 
-    order: 2;
-  }
-`
-
-const template = document.createElement('template')
-const locations = { left, right, both }
-const pos = right
-const content = `
 <style>
-  :host {
-    display: flex;
-    -webkit-align-items: stretch;
-    align-items: stretch;
+  tradex-tools {
+    position: absolute; 
+    top: 0; left: 0;
+    width: ${TOOLSW}px;
+    height: 100%; 
+    min-height: 100%; 
   }
   tradex-main {
-    display: grid;
+    position: absolute; 
+    top: 0;
+    right: 0;
+    width: calc(100% - ${TOOLSW}px);
+    height: 100%;
   }
-  tradex-tools {
-    width: ${TOOLSW}px;
-    order: 1;
+  tradex-scale {
+    position: absolute; 
+    top: 1px;
+    right: 0; 
+    width: ${SCALEW}px; 
+    height: 100%;
   }
-${pos}
 </style>
 <tradex-tools></tradex-tools>
 <tradex-main></tradex-main>
 <tradex-scale></tradex-scale>
 `
-template.innerHTML = content
+
+const left = `
+<style>
+  tradex-tools {
+    position: absolute; 
+    top: 0; left: 0;
+    width: ${TOOLSW}px;
+    height: 100%; 
+    min-height: 100%; 
+  }
+  tradex-main {
+    position: absolute; 
+    top: 0;
+    right: 0;
+    width: calc(100% - ${TOOLSW}px);
+    height: 100%;
+  }
+  tradex-scale {
+    position: absolute; 
+    top: 1px; 
+    left: ${SCALEW}px; 
+    width: ${SCALEW}px; 
+    height: 100%;
+  }
+</style>
+<tradex-tools></tradex-tools>
+<tradex-scale></tradex-scale>
+<tradex-main></tradex-main>
+`
+
+const both = `
+<style>
+  tradex-tools {
+    position: absolute; 
+    top: 0; left: 0;
+    width: ${TOOLSW}px;
+    height: 100%; 
+    min-height: 100%; 
+  }
+  tradex-main {
+    position: absolute; 
+    top: 0;
+    right: 0;
+    width: calc(100% - ${TOOLSW}px);
+    height: 100%;
+  }
+  tradex-scale {
+    position: absolute; 
+    top: 1px;
+    right: 0; 
+    width: ${SCALEW}px; 
+    height: 100%;
+  }
+</style>
+<tradex-tools></tradex-tools>
+<tradex-main></tradex-main>
+<tradex-scale></tradex-scale>
+`
+
+const template = document.createElement('template')
+const locations = { left, right, both }
+template.innerHTML = right
 
 export default class tradeXBody extends element {
 
@@ -96,7 +127,6 @@ export default class tradeXBody extends element {
   connectedCallback() {
     super.connectedCallback (
       () => {
-        this.style.display = "flex"
         this.#elTools = this.shadowRoot.querySelector('tradex-tools')
         this.#elMain = this.shadowRoot.querySelector('tradex-main')
         this.#elScale = this.shadowRoot.querySelector('tradex-scale')

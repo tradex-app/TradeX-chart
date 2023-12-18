@@ -24,7 +24,7 @@ import {
 } from "../../definitions/style"
 
 const HTML = `
-<style title="core">
+  <style title="core">
     :host {
       position: relative;
       z-index: 0;
@@ -34,7 +34,6 @@ const HTML = `
       width: 100%; 
     }
     tradex-body {
-      display: flex;
       position: relative;
       height: calc(100% - ${UTILSH}px); 
       min-height: ${CHART_MINH - UTILSH}px;
@@ -44,6 +43,9 @@ const HTML = `
       position: relative;
     }
   </style>
+  <div style="display: none;">
+    <slot></slot>
+  </div>
   <tradex-utils></tradex-utils>
   <tradex-body></tradex-body>
   <tradex-widgets></tradex-widgets>
@@ -88,7 +90,6 @@ export default class tradeXChart extends element {
       this.shadowRoot.appendChild(this.#template.content.cloneNode(true))
       this.style.display = "block"
       this.style.minHeight = TX_MINH
-
       this.#elWidgets = this.shadowRoot.querySelector('tradex-widgets')
       this.#elUtils = this.shadowRoot.querySelector('tradex-utils')
       this.#elBody = this.shadowRoot.querySelector('tradex-body')
@@ -150,6 +151,7 @@ export default class tradeXChart extends element {
   get elBody() { return this.#elBody }
   get elUtils() { return this.#elUtils }
   get elWidgets() { return this.#elWidgets }
+  get elWidgetsG() { return this.#elWidgets }
   get elMain() { return this.#elBody.main }
   get elTime() { return this.#elBody.main.time }
   get elTools() { return this.#elBody.tools }
@@ -168,8 +170,8 @@ export default class tradeXChart extends element {
 
       const utilsH = (UTILSLOCATIONS.includes(this.theme?.utils?.location)) ? UTILSH : 0
       const {width, height} = entries[0].contentRect
-      this.#chartW = Math.floor(width)
-      this.#chartH = Math.floor(height)
+      this.#chartW = width
+      this.#chartH = height
       this.#resizeEntries = entries[0]
 
       this.elBody.style.height = `calc(100% - ${utilsH}px)`
@@ -180,8 +182,8 @@ export default class tradeXChart extends element {
       if (this.ToolsBar instanceof ToolsBar) {
         this.ToolsBar.onResized()
       }
-      this.log(`onResize w: ${this.#chartW}}, h: ${this.#chartH}`)
-      this.emit("global_resize", {w: this.#chartW, h: this.#chartH}) 
+      this.log(`onResize w: ${width}, h: ${height}`)
+      this.emit("global_resize", {w: width, h: height}) 
   }
 
   setWidth(w) {
@@ -206,7 +208,9 @@ export default class tradeXChart extends element {
       // h = h
     }
     else {
-      h = "100%"
+      this.#chartH = this.parentElement.getBoundingClientRect().height
+      w = this.#chartH + "px"
+      // h = "100%"
     }
     this.style.height = h
     this.#chartH = Math.round(this.getBoundingClientRect().height)
@@ -234,8 +238,8 @@ export default class tradeXChart extends element {
       const dims = this.getBoundingClientRect()
       const parent = this.parentElement.getBoundingClientRect()
 
-      w = (!dims.width) ? (!parent.width) ? CHART_MINW : parent.width : dims.width;
       h = (!dims.height) ? (!parent.height) ? CHART_MINH : parent.height : dims.height;
+      w = (!dims.width) ? (!parent.width) ? CHART_MINW : parent.width : dims.width;
     }
     else if (!isNumber(w) || !isNumber(h)) {
 
@@ -247,28 +251,30 @@ export default class tradeXChart extends element {
         h = "100%"
       }
     }
-
+    
     this.setWidth(w)
     this.setHeight(h)
 
     dims = {
       width: this.width,
       height: this.height,
-      resizeW: this.width / width,
-      resizeH: this.height / height,
-      resizeWDiff: this.width - width,
-      resizeHDiff: this.height - height
+      resizeW: w / width,
+      resizeH: h / height,
+      resizeWDiff: w - width,
+      resizeHDiff: h - height
     }
-
     return dims
   }
 
-  setUtilsLocation(pos=this.theme?.utils?.location) {
+  setUtilsLocation(pos=this.#theme?.utils?.location) {
+    this.#theme.utils = this.#theme.utils || {}
     switch(pos) {
       case "top":
       case true:
         this.theme.setProperty("utils.location", "top")
         this.theme.setProperty("utils.height", UTILSH)
+        this.#theme.utils.location = "top"
+        this.#theme.utils.height = UTILSH
         this.elUtils.style.display = "block"
         this.elUtils.style.height =`${UTILSH}px`;
         this.elBody.style.height = `calc(100% - ${UTILSH}px)`
@@ -279,6 +285,8 @@ export default class tradeXChart extends element {
       default:
         this.theme.setProperty("utils.location", "none")
         this.theme.setProperty("utils.height", 0)
+        this.#theme.utils.location = "none"
+        this.#theme.utils.height = 0
         this.elUtils.style.display = "none"
         this.elUtils.style.height =`0px`;
         this.elBody.style.height = `100%`
