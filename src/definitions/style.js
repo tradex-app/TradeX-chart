@@ -200,6 +200,27 @@ export const watermark = {
   IMGHEIGHT: "200"
 }
 
+export const drawingNode = {
+  passive: {
+    stroke: "#000",
+    fill: "#ccc",
+    width: 1,
+    radius: 6,
+  },
+  hover: {
+    stroke: "#800",
+    fill: "#fff",
+    width: 1,
+    radius: 6,
+  },
+  active: {
+    stroke: "#800",
+    fill: "#fff",
+    width: 1,
+    radius: 6,
+  },
+}
+
 const tradeIcons = { arrowDown, arrowUp, arrowDownRound, arrowUpRound, arrowDownRoundSolid, arrowUpRoundSolid, buySolid, sellSolid }
 const eventIcons = { noteSolid, lightning }
 
@@ -311,6 +332,9 @@ export const defaultTheme = {
     defaultIcons: eventIcons,
     offset: 10
   },
+  drawing: {
+    node: drawingNode
+  }
 }
 
 export const cssVars = `

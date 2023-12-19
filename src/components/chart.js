@@ -190,7 +190,7 @@ export default class Chart {
   error(e) { this.core.error(e) }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#name}_${this.#chartCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return this.#id || idSanitize(`${this.#core.id}-${this.#name}_${this.#chartCnt}`) }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   set title(t) { this.setTitle(t) }

@@ -78,7 +78,7 @@ export default class Tool extends Overlay {
   }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}_${this.#inCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return this.#id || `${this.#core.id}-${this.#shortName}_${this.#inCnt}` }
   get inCnt() { return this.#inCnt }
   get name() {return this.#name}
   get shortName() { return this.#shortName }

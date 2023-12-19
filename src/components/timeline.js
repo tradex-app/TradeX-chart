@@ -86,7 +86,7 @@ export default class Timeline {
   error(e) { this.#core.error(e) }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return this.#id || `${this.#core.id}-${this.#shortName}` }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get options() { return this.#options }
