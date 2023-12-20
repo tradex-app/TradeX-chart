@@ -85,28 +85,34 @@ export function getPrototypeAt(level, obj) {
  * @param {Object} obj
  * @returns {Object}  
  */
-export function copyDeep(obj) {
+export function copyDeep(obj, clone=true) {
+  // if ("structuredClone" in navigator && clone) return _structuredClone(obj)
+
+  if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
+  return obj;
+
+  let temp;
+  if (obj instanceof Date)
+      temp = new obj.constructor(); //or new Date(obj);
+  else
+      temp = Array.isArray(obj) ? [] : {}  // obj.constructor();
+
+  for (let key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          obj['isActiveClone'] = null;
+          temp[key] = copyDeep(obj[key], false);
+          delete obj['isActiveClone'];
+      }
+  }
+  return temp;
+}
+
+function _structuredClone(obj) {
   try {
-    if (window.structuredClone) return structuredClone(obj)
+    return structuredClone(obj)
   }
   catch (e) {
-    if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
-    return obj;
-
-    let temp;
-    if (obj instanceof Date)
-        temp = new obj.constructor(); //or new Date(obj);
-    else
-        temp = Array.isArray(obj) ? [] : {}  // obj.constructor();
-
-    for (let key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            obj['isActiveClone'] = null;
-            temp[key] = copyDeep(obj[key]);
-            delete obj['isActiveClone'];
-        }
-    }
-    return temp;
+    return copyDeep(obj, false)
   }
 }
 

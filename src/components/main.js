@@ -38,7 +38,7 @@ import {
 } from "../definitions/style"
 
 const defaultOverlays = [
-  ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
+  // ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
   ["grid", {class: chartGrid, fixed: false, required: true, params: {axes: "x"}}],
   // ["chartCompositor", {class: chartCompositor, fixed: true, required: true}]
 ]

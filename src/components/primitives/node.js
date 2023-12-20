@@ -3,8 +3,9 @@
 
 import { renderCircle } from "../../renderer/circle"
 import { isNumber, isObject } from "../../utils/typeChecks";
-import { copyDeep, idSanitize, mergeDeep } from "../../utils/utilities";
+import { copyDeep, debounce, idSanitize, mergeDeep } from "../../utils/utilities";
 import { drawingNode as defaultTheme } from "../../definitions/style";
+import { HIT_DEBOUNCE } from "../../definitions/core";
 
 // State enum
 class NodeState {
@@ -56,7 +57,9 @@ export default class Node {
   }
 
   destroy() {
-    chart.off(`${chart.id}_mousemove`, this.onPointerMove)
+    chart.off(`${chart.id}_pointermove`, this.onPointerMove)
+    chart.off(`${chart.id}_pointerdown`, this.onPointerDown)
+    chart.off(`${chart.id}_pointerup`, this.onPointerUp)
   }
 
   get id() { return this.#id }
@@ -84,10 +87,27 @@ export default class Node {
 
   eventsListen() {
     const chart = this.#chart
-    chart.on(`${chart.id}_mousemove`, this.onPointerMove, this)
+    chart.on(`${chart.id}_pointermove`, this.onPointerMove, this)
+    chart.on(`${chart.id}_pointerdown`, this.onPointerDown, this)
+    chart.on(`${chart.id}_pointerup`, this.onPointerUp, this)
   }
 
   onPointerMove(pos) {
+    if (this.#chart.stateMachine.state === "chart_pan") return
+    
+    
+  }
+
+  onPointerDown(pos) {
+    if (this.#chart.stateMachine.state === "chart_pan") return
+      debounce(this.isNodeSelected, HIT_DEBOUNCE, this)(e)
+  }
+
+  onPointerUp(pos) {
+
+  }
+
+  isNodeSelected(e) {
 
   }
 

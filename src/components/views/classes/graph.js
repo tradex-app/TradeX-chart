@@ -201,10 +201,15 @@ export default class graph {
         fn(key, overlay)
       }
       catch (e) {
-        result.push(e)
+        result.push({overlay: key, error: e})
       }
     }
-    if (result.length > 0) this.#core.error(result)
+    if (result.length > 0) {
+      for (let err of result) {
+        this.#core.error(`Error: executeOverlayLis() ${err.overlay}`)
+        this.#core.error(err.error)
+      }
+    }
     else result = true
     return result
   }

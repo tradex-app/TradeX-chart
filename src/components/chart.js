@@ -15,16 +15,16 @@ import StateMachine from "../scaleX/stateMachne";
 import stateMachineConfig from "../state/state-chartPane"
 import Input from "../input"
 import ScaleBar from "./scale"
-// import watermark from "./overlays/chart-watermark"
+import watermark from "./overlays/chart-watermark"
 import chartGrid from "./overlays/chart-grid"
 import chartCursor from "./overlays/chart-cursor"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartCandleStream from "./overlays/chart-candleStream"
 import chartHighLow from "./overlays/chart-highLow";
-// import chartDCA from "./overlays/chart-dca";
 import chartNewsEvents from "./overlays/chart-newsEvents";
 import chartTrades from "./overlays/chart-trades"
+import chartTools from "./overlays/chart-tools";
 import {
   STREAM_ERROR,
   STREAM_NONE,
@@ -44,17 +44,18 @@ import { VolumeStyle } from "../definitions/style"
 
 export const defaultOverlays = {
   primaryPane: [
-    // ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
+    ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
     ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
     ["candles", {class: chartCandles, fixed: false, required: true}],
     ["hiLo", {class: chartHighLow, fixed: true, required: false}],
-    // ["dca", {class: chartDCA, fixed: true, required: false}],
     ["stream", {class: chartCandleStream, fixed: false, required: true}],
+    // ["tools", {class: chartTools, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ],
   secondaryPane: [
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
+    // ["tools", {class: chartTools, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ]
 }
@@ -320,7 +321,7 @@ export default class Chart {
     this.#input.destroy()
     this.legend.destroy()
 
-    this.off("main_mousemove", this.onMouseMove, this);
+    this.off("main_mousemove", this.onPointerMove, this);
     this.off(STREAM_LISTENING, this.onStreamListening, this);
     this.off(STREAM_NEWVALUE, this.onStreamNewValue, this);
     this.off(STREAM_UPDATE, this.onStreamUpdate, this);
@@ -345,11 +346,11 @@ export default class Chart {
     this.#input = new Input(this.#elTarget, {disableContextMenu: false});
     this.#input.on("pointerdrag", this.onChartDrag.bind(this))
     this.#input.on("pointerdragend", this.onChartDragDone.bind(this))
-    this.#input.on("pointermove", this.onMouseMove.bind(this))
-    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
-    this.#input.on("pointerout", this.onMouseOut.bind(this));
-    this.#input.on("pointerdown", this.onMouseDown.bind(this));
-    this.#input.on("pointerup", this.onMouseUp.bind(this));
+    this.#input.on("pointermove", this.onPointerMove.bind(this))
+    this.#input.on("pointerenter", this.onPointerEnter.bind(this));
+    this.#input.on("pointerout", this.onPointerOut.bind(this));
+    this.#input.on("pointerdown", this.onPointerDown.bind(this));
+    this.#input.on("pointerup", this.onPointerUp.bind(this));
 
     // listen/subscribe/watch for parent notifications
     this.on("main_mousemove", this.updateLegends, this);
@@ -406,32 +407,32 @@ export default class Chart {
     // this.scale.onChartDragDone(e)
   }
 
-  onMouseMove(e) {
+  onPointerMove(e) {
     this.core.MainPane.onPointerActive(this)
     this.scale.layerCursor.visible = true
     this.graph.overlays.list.get("cursor").layer.visible = true
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.#Scale.onMouseMove(this.#cursorPos)
-    this.emit(`${this.id}_mousemove`, this.#cursorPos)
+    this.emit(`${this.id}_pointermove`, this.#cursorPos)
   }
 
-  onMouseEnter(e) {
+  onPointerEnter(e) {
     this.core.MainPane.onPointerActive(this)
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.core.MainPane.onMouseEnter()
     this.scale.layerCursor.visible = true
     this.graph.overlays.list.get("cursor").layer.visible = true
-    this.emit(`${this.id}_mouseenter`, this.#cursorPos);
+    this.emit(`${this.id}_pointerenter`, this.#cursorPos);
   }
 
-  onMouseOut(e) {
+  onPointerOut(e) {
     this.#cursorActive = false;
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.scale.layerCursor.visible = false
-    this.emit(`${this.id}_mouseout`, this.#cursorPos);
+    this.emit(`${this.id}_pointerout`, this.#cursorPos);
   }
 
-  onMouseDown(e) {
+  onPointerDown(e) {
     this.#core.pointerButtons[e.domEvent.srcEvent.button] = true
     this.#cursorClick = [Math.floor(e.position.x), Math.floor(e.position.y), e];
 
@@ -441,7 +442,7 @@ export default class Chart {
       this.emit("primary_pointerdown", this.#cursorClick)
   }
 
-  onMouseUp(e) {
+  onPointerUp(e) {
     this.#core.pointerButtons[e.domEvent.srcEvent.button] = false
   }
 

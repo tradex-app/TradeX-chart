@@ -80,7 +80,7 @@ export default class State {
 
   static validate(state, deepValidate=false, isCrypto=false) {
 
-    const defaultState = this.default
+    const defaultState = State.default
 
     if (!isObject(state)) {
       state = {}

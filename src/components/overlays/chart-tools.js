@@ -8,7 +8,7 @@ import Input from "../../input"
 import { idSanitize, uid } from "../../utils/utilities"
 
 
-export default class Tool extends Overlay {
+export default class chartTools extends Overlay {
 
   static #cnt = 0
   static #instances = {}
@@ -40,14 +40,9 @@ export default class Tool extends Overlay {
   #inCnt = null
   #name = ""
   #shortName = ""
-  #options
-  #config
-  #core
-  #parent
   #input
   #elChart
   #elCanvas
-  #elViewport
 
   #layerTool
 
@@ -63,45 +58,34 @@ export default class Tool extends Overlay {
 
     super(target, xAxis, yAxis, theme, parent, params)
 
-    this.#config = config
     this.#inCnt = config.cnt
-    this.#id = this.#config.ID || uid("TX_Tool_")
+    this.#id = this.config.ID || uid("TX_Tool_")
     this.#name = config.name
-    this.#core = config.core
-    this.#elChart = config.elements.elChart
-    this.#parent = {...config.parent}
-    this.#target = config.target
-    this.#target.addTool(this)
-    this.#elViewport = this.#layerTool.viewport
-    this.#elCanvas = this.#elViewport.scene.canvas
+    this.target.addTool(this)
+    
     this.#cursorClick = config.pos
   }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return this.#id || `${this.#core.id}-${this.#shortName}_${this.#inCnt}` }
+  get id() { return this.#id || `${this.core.id}-${this.#shortName}_${this.#inCnt}` }
   get inCnt() { return this.#inCnt }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
-  get core() { return this.#core }
 
-  get stateMachine() { return this.#core.stateMachine }
+  get stateMachine() { return this.core.stateMachine }
 
-  get state() { return this.#core.getState() }
-  get data() { return this.#core.chartData }
-  get range() { return this.#core.range }
-  get target() { return this.#target }
+  get state() { return this.core.getState() }
+  get data() { return this.core.chartData }
+  get range() { return this.core.range }
   set layerTool(layer) { this.#layerTool = layer }
   get layerTool() { return this.#layerTool }
-  get elViewport() { return this.#elViewport }
 
   get cursorPos() { return this.#cursorPos }
   get cursorActive() { return this.#cursorActive }
   get cursorClick() { return this.#cursorClick }
-  get candleW() { return this.#core.Timeline.candleW }
-  get theme() { return this.#core.theme }
-  get config() { return this.#core.config }
-  get scrollPos() { return this.#core.scrollPos }
-  get bufferPx() { return this.#core.bufferPx }
+  get candleW() { return this.core.Timeline.candleW }
+  get scrollPos() { return this.core.scrollPos }
+  get bufferPx() { return this.core.bufferPx }
 
   get visible() { return this.isVisible() }
   set position(p) { this.target.setPosition(p[0], p[1]) }
@@ -129,18 +113,6 @@ export default class Tool extends Overlay {
 
     // // listen/subscribe/watch for parent notifications
     // this.on("main_mousemove", (pos) => this.updateLegends(pos))
-  }
-
-  on(topic, handler, context) {
-    this.#core.on(topic, handler, context)
-  }
-
-  off(topic, handler) {
-    this.#core.off(topic, handler)
-  }
-
-  emit(topic, data) {
-    this.#core.emit(topic, data)
   }
 
   onPointerMove(e) {

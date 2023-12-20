@@ -345,7 +345,7 @@ const DOM = {
     else if (this.isElement(el)) x = el;
     else return false;
     if (!isString(styleProp)) return false;
-    if (window.getComputedStyle)
+    if ("getComputedStyle" in navigator)
       y = document.defaultView
         .getComputedStyle(x, null)
         .getPropertyValue(styleProp);

@@ -13,7 +13,7 @@ import btcusdt_15min from './data/btcusdt_15min'
 import TEST from './custom-indicator'
 import DMI from './DMI'
 import CustomOverlay from './custom-overlay'
-import chartDCA from './src/components/overlays/chart-dca'
+import chartDCA from './chart-dca'
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
