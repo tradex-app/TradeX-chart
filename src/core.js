@@ -2,7 +2,7 @@
 // it all begins here...
 
 import { NAME, SHORTNAME, ID, RANGELIMIT, PRICE_PRECISION, VOLUME_PRECISION, STREAM_UPDATE } from './definitions/core'
-import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH } from './definitions/style'
+import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH, watermark } from './definitions/style'
 import { OVERLAYPANES } from './definitions/chart'
 import { defaultConfig } from './definitions/config'
 import Indicators from './definitions/indicators'
@@ -155,8 +155,17 @@ export default class TradeXchart extends Tradex_chart {
 
     let txCfg = copyDeep(defaultConfig)
 
-    if (isObject(cfg) && Object.keys(cfg).length > 0)
+    if (isObject(cfg) && Object.keys(cfg).length > 0) {
+      // clear default watermark if none is specified
+      if (
+          !("watermark" in cfg) || 
+          (!isString(cfg?.watermark?.text) && 
+          !("imgURL" in cfg?.watermark))
+        )
+        txCfg.watermark = {display: false}
+
       txCfg = mergeDeep(txCfg, cfg)
+    }
 
       // global init for all TradeX charts
       if (TradeXchart.#cnt == 0) {
@@ -538,7 +547,9 @@ export default class TradeXchart extends Tradex_chart {
     }
 
     this.log("...cleanup the mess")
+
     this.removeEventListener('mousemove', this.onMouseMove)
+    this.hub.expunge(this)
 
     this.UtilsBar.destroy()
     this.ToolsBar.destroy()
@@ -867,7 +878,7 @@ export default class TradeXchart extends Tradex_chart {
    */
   setStream(stream) {
     if (this.stream instanceof Stream) {
-      this.error("Error: Invoke stopStream() before starting a new one.")
+      this.error("ERROR: Invoke stopStream() before starting a new one.")
       return false
     }
     else if (isObject(stream)) {
@@ -909,7 +920,7 @@ export default class TradeXchart extends Tradex_chart {
       let l = this.range.Length * 0.5
       this.setRange(l * -1, l)
       // this.jumpToTS(this.range.value)
-      this.off(STREAM_UPDATE, this.delayedSetRange)
+      this.off(STREAM_UPDATE, this.delayedSetRange, this)
       this.#delayedSetRange = false
     }
   }

@@ -6,7 +6,7 @@
 
 import DOM from "../utils/DOM";
 import { limit } from "../utils/number"
-import { isArray, isNumber, isObject, isString } from "../utils/typeChecks";
+import { isArray, isFunction, isNumber, isObject, isString } from "../utils/typeChecks";
 import { copyDeep, idSanitize, xMap } from "../utils/utilities";
 import CEL from "./primitives/canvas";
 import Legends from "./primitives/legend"
@@ -50,12 +50,12 @@ export const defaultOverlays = {
     ["candles", {class: chartCandles, fixed: false, required: true}],
     ["hiLo", {class: chartHighLow, fixed: true, required: false}],
     ["stream", {class: chartCandleStream, fixed: false, required: true}],
-    // ["tools", {class: chartTools, fixed: false, required: true}],
+    ["tools", {class: chartTools, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ],
   secondaryPane: [
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
-    // ["tools", {class: chartTools, fixed: false, required: true}],
+    ["tools", {class: chartTools, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ]
 }
@@ -312,33 +312,34 @@ export default class Chart {
       this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartPane()" instead.`)
       return
     }
+    this.core.log(`Deleting chart pane: ${this.id}`)
 
+
+    this.#core.hub.expunge(this)
+    
     this.removeAllIndicators()
-    this.stateMachine.destroy()
-    this.Divider.destroy()
+    this.#stateMachine.destroy()
+    this.#Divider.destroy()
     this.#Scale.destroy()
     this.#Graph.destroy()
     this.#input.destroy()
     this.legend.destroy()
 
-    this.off("main_mousemove", this.onPointerMove, this);
-    this.off(STREAM_LISTENING, this.onStreamListening, this);
-    this.off(STREAM_NEWVALUE, this.onStreamNewValue, this);
-    this.off(STREAM_UPDATE, this.onStreamUpdate, this);
-    this.off(STREAM_FIRSTVALUE, this.onStreamNewValue, this)
-    this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this)
-
-    if (this.isPrimary)
-      this.off("chart_yAxisRedraw", this.onYAxisRedraw)
+    this.#stateMachine = undefined
+    this.#Divider = undefined
+    this.#Legends = undefined
+    this.#Scale = undefined
+    this.#Graph = undefined
+    this.#input = undefined
 
     // TODO: remove state entry
+    this.core.warn(`Deleting chart pane ${this.id} destroys all of its data!`)
 
     this.element.remove()
     this.#status = "destroyed"
   }
 
   remove() {
-    this.core.log(`Deleting chart pane: ${this.id}`)
     this.emit("destroyChartView", this.id)
   }
 
@@ -370,7 +371,7 @@ export default class Chart {
    * @param {function} handler
    * @param {*} context
    */
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context);
   }
 
@@ -379,8 +380,17 @@ export default class Chart {
    * @param {string} topic
    * @param {function} handler
    */
-  off(topic, handler) {
-    this.#core.off(topic, handler);
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context);
+  }
+
+  /**
+   * Remove a custom event listener
+   * @param {string} topic
+   * @param {function} handler
+   */
+  expunge(context=this) {
+    this.#core.expunge(context);
   }
 
   /**
@@ -650,14 +660,15 @@ export default class Chart {
 
     // enable deletion
     this.#indicatorDeleteList[id] = true
-    this.indicators[id].instance.destroy()
-    this.graph.removeOverlay(id)
-    this.draw()
 
     if (Object.keys(this.indicators).length === 0 && !this.isPrimary)
       this.emit("destroyChartView", this.id)
-
-    delete this.#indicatorDeleteList[id]
+    else {
+      this.indicators[id].instance.destroy()
+      this.graph.removeOverlay(id)
+      this.draw()
+      delete this.#indicatorDeleteList[id]
+    }
   }
 
   removeAllIndicators() {

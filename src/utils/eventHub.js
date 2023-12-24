@@ -54,6 +54,29 @@ export default class EventHub {
     }
   
     /**
+     * unsubscribe all listeners for the specified context
+     * @param {*} context
+     * @memberof EventHub
+     */
+    expunge(context) {
+      let topic,
+          hub = this.#hub;
+
+      for (topic in hub) {
+        for (let i=0; i<hub[topic].length; i++) {
+          if (hub[topic][i].context === context) {
+            hub[topic].splice(i, 1);
+            if (hub[topic].length === 0) {
+              delete hub[topic];
+              break
+            }
+          }
+        }
+      }
+      return true;
+    }
+  
+    /**
     * Publish a topic
     * @param {string} topic - The topic name
     * @param {Object}  data - The data to publish

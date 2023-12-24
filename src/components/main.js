@@ -79,7 +79,7 @@ export default class MainPane {
   #Chart
   #Time
   #chartGrid
-  #chartDeleteList = []
+  #chartDeleteList = {}
   #ChartPaneMaximized = {
     instance: null, 
     rowsH: 0,
@@ -264,6 +264,10 @@ export default class MainPane {
   }
 
   destroy() {
+    // remove all listeners
+    this.#core.hub.expunge(this)
+    this.renderLoop.stop()
+
     this.#destruction = true
     this.stateMachine.destroy()
     this.#Time.destroy()
@@ -274,13 +278,6 @@ export default class MainPane {
     })
     this.#Graph.destroy();
     this.#input.destroy()
-
-    this.off(STREAM_FIRSTVALUE, this.onFirstStreamValue)
-    this.off(STREAM_NEWVALUE, this.onNewStreamValue)
-    this.off("setRange", this.draw)
-    this.off("scrollUpdate", this.draw)
-    this.off("chart_render", this.draw)
-    this.off("destroyChartView", this.removeChartPane)
 
     // this.element.remove
   }
@@ -336,12 +333,12 @@ export default class MainPane {
     this.on("destroyChartView", this.removeChartPane, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {
@@ -700,7 +697,8 @@ export default class MainPane {
    */
   removeChartPane(paneID) {
     if (!isString(paneID) ||
-        !this.#ChartPanes.has(paneID) 
+        !this.#ChartPanes.has(paneID) ||
+        this.#chartDeleteList[paneID]
     ) return false
 
     const chartPane = this.#ChartPanes.get(paneID)
@@ -722,11 +720,12 @@ export default class MainPane {
     let x = Math.floor(h / (exp.length))
     let r = h % x
 
-    if (chartPane.status !== "destroyed")
+    if (chartPane.status !== "destroyed") {
       chartPane.destroy()
+      this.#elMain.removeRow(chartPane.id)
+    }
 
     this.#ChartPanes.delete(paneID)
-    delete this.#chartDeleteList[paneID]
 
     // is there only one chart pane remaining?
     if (this.#ChartPanes.size === 1) {
@@ -873,12 +872,12 @@ export default class MainPane {
    * @returns {boolean} - success / failure
    */
   removeIndicator(i) {
-    this.emit("pane_refresh", this)
     // remove by ID
     if (isString(i)) {
       for (const p of this.#ChartPanes.values()) {
         if (i in p.indicators) {
           p.indicators[i].instance.remove()
+          this.emit("pane_refresh", this)
           return true
         }
       }
@@ -886,6 +885,7 @@ export default class MainPane {
     // remove by instance
     else if (i instanceof Indicator) {
       i.remove()
+      this.emit("pane_refresh", this)
       return true
     }
     else return false
@@ -991,7 +991,10 @@ export default class MainPane {
       this.#Time,
     ]
     this.#ChartPanes.forEach((chartPane, key) => {
-      graphs.push(chartPane)
+      if (chartPane.status !== "destroyed")
+        graphs.push(chartPane)
+      else
+        console.log("error destroyed pane")
     })
 
     this.renderLoop.queueFrame(

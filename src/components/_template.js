@@ -68,8 +68,8 @@ export default class _template {
   }
 
   destroy() {
+    this.#core.hub.expunge(this)
     // this.stateMachine.destroy()
-    // this.off("resize", this.onResize)
   }
 
 
@@ -78,12 +78,12 @@ export default class _template {
     this.on("resize", (dimensions) => this.onResize, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {

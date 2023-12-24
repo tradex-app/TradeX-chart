@@ -114,8 +114,7 @@ export default class Window {
 
   destroy() {
     // remove event listners
-    this.off("closeWindow", this.onCloseWindow, this)
-    this.off("global_resize", this.onGlobalResize, this)
+    this.#core.hub.expunge()
 
     // remove element
     this.el.remove()
@@ -132,12 +131,12 @@ export default class Window {
     this.on("global_resize", this.onGlobalResize, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {

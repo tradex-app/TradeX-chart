@@ -213,8 +213,9 @@ export default class Timeline {
     this.#input2.destroy()
     this.#input3.destroy()
 
-    this.off("main_mousemove", this.drawCursorTime)
-    this.off("setRange", this.onSetRange)
+    this.#core.hub.expunge(this)
+    this.off("main_mousemove", this.#layerCursor.draw, this.#layerCursor)
+    
     this.#elFwdEnd.removeEventListener('click', debounce)
     this.#elRwdStart.removeEventListener('click', debounce)
 
@@ -249,12 +250,12 @@ export default class Timeline {
     this.#elRwdStart.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {

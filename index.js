@@ -200,6 +200,7 @@ const config1 = {
     }
   },
   watermark: {
+    display: true,
     text: "BTC/USDT"
   },
   trades: { 
@@ -1197,7 +1198,7 @@ chart0.setCustomOverlays({
 })
 // add custom overlays
 // chart0.addOverlay("custom", "chartPane")
-chart0.addOverlay("dca", "chartPane")
+// chart0.addOverlay("dca", "chartPane")
 
 // add an alert
 if (typeof chart1 === "object") {

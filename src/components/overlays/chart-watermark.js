@@ -10,6 +10,7 @@ import { CHART_MINH } from "../../definitions/style"
 
 export default class chartWatermark extends Overlay {
 
+  watermark = {}
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
@@ -24,27 +25,25 @@ export default class chartWatermark extends Overlay {
   draw() {
     const watermark = this.config?.watermark
     const update = super.mustUpdate()
+    // const doImgURL = (this.watermark?.imgURL !== watermark?.imgURL) || update.resize
+    // const doText = (this.watermark?.text !== watermark?.text) || update.resize
 
-    if ( this.watermark === watermark?.imgURL ||
-         this.watermark === watermark?.text) {
-          if (!update.resize) return
-    }
+    if (watermark?.display === false) return
 
     if ( watermark?.imgURL ) {
-      this.watermark = watermark.imgURL
+      this.watermark.imgURL = watermark.imgURL
       DOM.isImage(watermark?.imgURL, this.renderImage.bind(this))
-      super.updated()
     }
     else if ( isString(watermark?.text) ) {
-      this.watermark = watermark.text
+      this.watermark.text = watermark.text
       this.scene.clear()
       const ctx = this.scene.context
       ctx.save();
       this.renderText(watermark.text)
       ctx.restore()
-      super.updated()
     }
     else return
+    super.updated()
   }
 
   renderText(txt) {

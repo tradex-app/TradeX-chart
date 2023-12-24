@@ -79,11 +79,7 @@ export default class Widgets {
   }
 
   destroy() {
-    this.off("menu_open", this.onOpenMenu)
-    this.off("menu_close", this.onCloseMenu)
-    this.off("menu_off", this.onCloseMenu)
-    this.off("menuItem_selected", this.onMenuItemSelected)
-    this.off("global_resize", this.onResize)
+    this.#core.hub.expunge(this)
     
     this.stateMachine.destroy()
 
@@ -107,12 +103,12 @@ export default class Widgets {
     this.on("global_resize", this.onResize, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {

@@ -206,7 +206,7 @@ export default class graph {
     }
     if (result.length > 0) {
       for (let err of result) {
-        this.#core.error(`Error: executeOverlayLis() ${err.overlay}`)
+        this.#core.error(`ERROR: executeOverlayList() ${err.overlay}`)
         this.#core.error(err.error)
       }
     }

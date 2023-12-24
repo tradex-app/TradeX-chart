@@ -9,7 +9,7 @@ import stateMachineConfig from "../state/state-scale"
 import Input from "../input"
 import { countDigits, limitPrecision } from '../utils/number'
 import { copyDeep, idSanitize, xMap } from '../utils/utilities'
-import { STREAM_UPDATE } from "../definitions/core"
+import { MAX_CRYPTO_PRECISION, STREAM_UPDATE } from "../definitions/core"
 import { calcTextWidth, createFont } from '../renderer/text'
 
 import Graph from "./views/classes/graph"
@@ -144,13 +144,13 @@ export default class ScaleBar {
   }
 
   destroy() {
+    this.#core.hub.expunge(this)
+    this.off(`${this.#parent.id}_pointerout`, this.#layerCursor.erase, this.#layerCursor)
+    this.off(STREAM_UPDATE, this.onStreamUpdate, this.#layerPriceLine)
+
     this.stateMachine.destroy()
     this.#Graph.destroy()
     this.#input.destroy()
-
-    this.off(`${this.#parent.id}_pointermove`, this.onMouseMove, this)
-    this.off(`${this.#parent.id}_pointerout`, this.#layerCursor.erase, this.#layerCursor)
-    this.off(STREAM_UPDATE, this.onStreamUpdate, this.#layerPriceLine)
 
     this.element.remove()
   }
@@ -172,12 +172,12 @@ export default class ScaleBar {
     this.on(`setRange`, this.draw, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.core.off(topic, handler, context)
   }
 
   emit(topic, data) {
@@ -267,7 +267,7 @@ export default class ScaleBar {
 
   nicePrice($) {
     let digits = countDigits($)
-    return limitPrecision(digits)
+    return limitPrecision(digits, this.config.precision)
   }
 
 
@@ -294,7 +294,7 @@ export default class ScaleBar {
       if (digits.precision > 4) {
         console.log(digits)
       }
-      const nice = limitPrecision(digits)
+      const nice = limitPrecision(digits, this.config.precision)
      count = `${nice}`.length + 2
     }
     this.#digitCnt = count 

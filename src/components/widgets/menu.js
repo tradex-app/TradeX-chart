@@ -81,7 +81,7 @@ export default class Menu {
 
     document.removeEventListener('click', this.#menuEvents[this.id].outside)
     
-    this.off("global_resize", this.onResize)
+    this.off("global_resize", this.onResize, this)
     // remove element
     // this.el.remove()
   }
@@ -96,12 +96,12 @@ export default class Menu {
     this.on("global_resize", this.onResize, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {

@@ -55,13 +55,27 @@ class Node {
   /**
    * add layer a layer to the viewport
    * @param {CEL.Layer} layer
-   * @returns {Viewport}
+   * @returns {Viewport|false}
    */
   addLayer(layer) {
+    if (!(layer instanceof Layer)) return false
+
     this.layers.push(layer);
     layer.setSize(layer.width || this.width, layer.height || this.height);
     layer.viewport = this;
     return this;
+  }
+
+  /**
+   * remove a layer from the viewport
+   * @param {CEL.layer} layer 
+   * @returns {boolean}
+   */
+  removeLayer(layer) {
+    if (!(layer instanceof Layer)) return false
+
+    this.layers.splice(layer.index, 1)
+    return true
   }
   /**
    * return associated hit id for coordinates - utilized for pointer events.
@@ -349,7 +363,7 @@ class Layer {
    */
   remove() {
     // remove this layer from layers array
-    this.viewport.layers.splice(this.index, 1);
+    return this.viewport.removeLayer(this)
   }
 }
 

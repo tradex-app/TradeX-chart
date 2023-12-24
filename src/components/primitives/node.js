@@ -39,7 +39,7 @@ export default class Node {
   #y
 
   constructor(id, x, y, layer, chart, theme=defaultTheme) {
-    this.#id = idSanitize(id) + `_${this.#inCnt}`
+    this.#id = idSanitize(id) || uid("TX_Node_") + `_${this.#inCnt}`
     this.x = x
     this.y = y
     this.#chart = chart
@@ -57,9 +57,7 @@ export default class Node {
   }
 
   destroy() {
-    chart.off(`${chart.id}_pointermove`, this.onPointerMove)
-    chart.off(`${chart.id}_pointerdown`, this.onPointerDown)
-    chart.off(`${chart.id}_pointerup`, this.onPointerUp)
+    this.#chart.expunge(this)
   }
 
   get id() { return this.#id }
@@ -67,6 +65,7 @@ export default class Node {
   set state(s) { this.setState(s); }
   get state() { return this.#state; }
   get isActive() { return this.#state === NodeState.active; }
+  get chart() { return this.#chart }
   get layer() { return this.#layer }
   get scene() { return this.#scene }
   get hit() { return this.#hit }
@@ -95,7 +94,7 @@ export default class Node {
   onPointerMove(pos) {
     if (this.#chart.stateMachine.state === "chart_pan") return
     
-    
+
   }
 
   onPointerDown(pos) {

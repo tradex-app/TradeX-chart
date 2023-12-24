@@ -522,7 +522,7 @@ export default class State {
                     p.type === o.type &&
                     isObjectEqual(p.settings, o.settings)) {
                       p.data = this.merge(p.data, o.data)
-                      o.instance.drawOnUpdate = true
+                      this.#core.getIndicator(p.id).drawOnUpdate = true
                 }
               }
             }
@@ -538,7 +538,7 @@ export default class State {
                     p.type === o.type &&
                     isObjectEqual(p.settings, o.settings)) {
                       p.data = this.merge(p.data, o.data)
-                      o.instance.drawOnUpdate = true
+                      this.#core.getIndicator(p.id).drawOnUpdate = true
                 }
               }
             }

@@ -91,10 +91,7 @@ export default class UtilsBar {
       }
     }
 
-    this.off("utils_indicators", this.onIndicators)
-    this.off("utils_timezone", this.onTimezone)
-    this.off("utils_settings", this.onSettings)
-    this.off("utils_screenshot", this.onScreenshot)
+    this.#core.hub.expunge(this)
   }
 
   eventsListen() {
@@ -105,12 +102,12 @@ export default class UtilsBar {
     // this.on("global_resize", this.onResize, this)
   }
   
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {

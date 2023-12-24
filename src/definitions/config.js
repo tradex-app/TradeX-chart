@@ -2,6 +2,7 @@
 // default chart config
 
 import { defaultTheme, TX_MAXH, TX_MAXW } from "./style"
+import { MAX_CRYPTO_PRECISION } from "./core"
 
 const title = "Empty"
 
@@ -19,17 +20,19 @@ export const defaultConfig = {
   },
   theme: defaultTheme,
   watermark: {
+    display: false,
     text: title
   },
   trades: { 
     display: true,
     displayInfo: true 
   },
+  precision: MAX_CRYPTO_PRECISION,
   isCrypto: true,
   logs: false,
   infos: true,
   warnings: true,
-  highLow: true,
+  highLow: false,
   errors: true,
   stream: {},
   maxCandleUpdate: 250,

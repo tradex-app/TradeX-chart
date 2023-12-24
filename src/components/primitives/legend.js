@@ -45,8 +45,7 @@ export default class Legends {
   get collapse() { return this.#collapse }
 
   destroy() {
-    this.#core.off("chart_pan", this.primaryPanePan)
-    this.#core.off("chart_panDone", this.primaryPanePanDone)
+    this.#core.hub.expunge(this)
 
     for (let l in this.#list) {
       if (l === "collapse") continue

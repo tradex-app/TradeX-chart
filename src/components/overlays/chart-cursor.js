@@ -24,13 +24,6 @@ export default class chartCursor extends Overlay{
     this.#input.on("pointerenter", this.onMouseMove.bind(this));
   }
 
-  destroy() {
-    super.destroy()
-    this.core.off("chart_pan", this.onMouseDragX, this)
-    this.core.off("chart_panDone", this.onMouseDragX, this)
-    this.core.off("main_mousemove", this.onMouseMoveX, this)
-  }
-
   set position(p) { return }
   get update() { return this.#update }
   get always() { return true }

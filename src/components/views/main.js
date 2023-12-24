@@ -94,6 +94,15 @@ export default class tradeXMain extends element {
     return node
   }
 
+  removeRow(id) {
+    const row = this.shadowRoot.querySelector(`#${id}`)
+    if (!!row) {
+      row.remove()
+      return true
+    }
+    else return false
+  }
+
   setMain() {
     let timeH = (isNumber(this.#theme?.time?.height)) ? this.#theme.time.height : TIMEH
     let offset = (this.#theme.tools.location == "none") ? 60 : 0

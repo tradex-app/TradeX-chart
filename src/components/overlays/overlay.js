@@ -59,22 +59,28 @@ export default class Overlay {
   get target() { return this.#target }
   get config() { return this.#config }
   get params() { return this.#params }
+  get range() { return this.#core.range }
+  get state() { return this.#core.state }
   get scene() { return this.#scene }
   get hit() { return this.#hit }
   get theme() { return this.#theme }
   get chart() { return this.#parent.parent.parent }
+  get chartData() { return this.#config.state.allData.data }
   get xAxis() { return this.getXAxis() }
   get yAxis() { return this.getYAxis() }
   get overlay() { return this.#params.overlay }
+  get overlayData() { return this.#params.overlay.data }
+  get data() { return this.#params.overlay.data }
+  get stateMachine() { return this.#core.stateMachine }
   get context() { return this.contextIs() }
-  set position(p) { this.target.setPosition(p[0], p[1]) }
+  set position(p) { this.#target.setPosition(p[0], p[1]) }
 
   destroy() {
-    // this.off("setRange", this.drawUpdate, this)
-    // this.off("rowsResize", this.drawUpdate, this)
-    // this.off("divider_pointerdrag", this.drawUpdate, this)
-    // this.off("divider_pointerdragend", this.drawUpdate, this)
-    this.off("global_resize", this.onResize, this)
+    this.#core.hub.expunge(this)
+
+    if ("overlay" in this.#params &&
+        "data" in this.#params.overlay)
+      delete this.#params.overlay.data
   }
 
   /**
@@ -84,7 +90,7 @@ export default class Overlay {
    * @param {*} context
    * @memberof Overlay
    */
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context);
   }
 
@@ -94,9 +100,18 @@ export default class Overlay {
    * @param {function} handler
    * @memberof Overlay
    */
-  off(topic, handler) {
-    this.#core.off(topic, handler);
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context);
   }
+
+  /**
+   * Remove all custom event listeners
+   * @param {*} context
+   * @memberof Overlay
+   */
+    expunge(context=this) {
+      this.#core.expunge(context);
+    }
 
   /**
    * Broadcast an event

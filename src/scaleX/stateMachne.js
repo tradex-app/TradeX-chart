@@ -141,6 +141,7 @@ export default class StateMachine {
   stop() { this.#status = "stopped" }
   /** Expunge state and event listeners, free memory */
   destroy() { 
+    this.stop()
     this.#unsubscribe()
     this.#config = null
   }
@@ -158,9 +159,8 @@ export default class StateMachine {
   }
 
   #unsubscribe() {
-    for (let event of this.#events) {
-      this.#core.off(event.topic, event.cb)
-    }
+    this.#core.hub.expunge(this.context)
+    this.#events.clear()
   }
 
   /**

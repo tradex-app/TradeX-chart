@@ -128,14 +128,17 @@ export default class Indicator extends Overlay {
       this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "indicator.remove()" or "chart.removeIndicator()" instead.`)
       return
     }
-    // execute parent class
-    super.destroy()
+    // terminate listeners
+    this.core.hub.expunge(this)
 
-    this.off(STREAM_UPDATE, this.onStreamUpdate)
     // remove overlay from parent chart pane's graph
-    this.chartPane.graph.removeOverlay(this.id)
     this.chart.legend.remove(this.#legendID)
+    this.chartPane.graph.removeOverlay(this.id)
 
+    // execute parent class
+    // delete data
+    // remove listeners
+    super.destroy()
     // remove indicator state data
     this.core.state.removeIndicator(this.id)
 
@@ -187,12 +190,12 @@ export default class Indicator extends Overlay {
     this.on(STREAM_UPDATE, this.onStreamUpdate, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.core.off(topic, handler, context)
   }
 
   emit(topic, data) {

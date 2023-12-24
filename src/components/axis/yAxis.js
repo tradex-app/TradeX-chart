@@ -10,6 +10,7 @@ import {
   YAXIS_GRID,
   YAXIS_TYPES
 } from "../../definitions/chart";
+import { MAX_CRYPTO_PRECISION } from "../../definitions/core";
 
 const p100Padding = 1.2
 
@@ -332,7 +333,7 @@ export default class yAxis extends Axis {
     for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
     {
       digits = this.countDigits(y)
-      nice = limitPrecision(digits, step)
+      nice = limitPrecision(digits, this.core.config)
       pos = this.yPos(nice)
       scaleGrads.push([nice, pos, digits])
     }
@@ -352,33 +353,5 @@ export default class yAxis extends Axis {
 
     return scaleGrads
   }
-
-  /**
-   * 
-   * REMOVE??? Obsolete
-   * 
-   * format Y axis labels (values)
-   * @param {object} digits - {digits, decimals}
-   * @param {object} step - {digits, decimals}
-   * @return {number}  
-   */
-  niceValue(digits, step=this.#step) {
-    let x = step.integers,
-        d = step.decimals,
-        v = digits.value;
-    if (digits.integers > 1) {
-      if (x - 2 > 0) {
-        let factor = power(10, x - 2)
-        return Math.floor(v / factor) * factor
-      }
-      else {
-        return (d == 0) ? Math.floor(v) : round(v, d)
-      }
-    }
-    else {
-      return (d == 0) ? 0 : round(v, d)
-    }
-  }
-
 
 }

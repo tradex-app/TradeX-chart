@@ -95,6 +95,7 @@ export default class element extends HTMLElement {
   get dimensions() { return this.DOM }
   set cursor(c) { this.style.cursor = c }
   get cursor() { return this.style.cursor }
+  get hub() { return this.#hub }
 
   setDim(v, d) {
     if (!["width", "height"].includes(d) || !isString(v)) return
@@ -153,8 +154,8 @@ export default class element extends HTMLElement {
   * @param {Object}  context   - The context the function(s) belongs to
   * @returns {boolean}
   */
-  on(topic, handler, context) {
-    this.#hub.on(topic, handler, context)
+  on(topic, handler, context=this) {
+    return this.#hub.on(topic, handler, context)
   }
 
   /** 
@@ -164,8 +165,17 @@ export default class element extends HTMLElement {
   * @param {Object}  context   - The context the function(s) belongs to
   * @returns {boolean}
   */
-  off(topic, handler, context) {
-    this.#hub.off(topic, handler, context)
+  off(topic, handler, context=this) {
+    return this.#hub.off(topic, handler, context)
+  }
+
+  /**
+   * unsubscribe all listeners for the specified context
+   * @param {*} context
+   * @memberof EventHub
+   */
+  expunge(context) {
+    return this.#hub.expunge(context)
     }
 
   /**
@@ -175,7 +185,7 @@ export default class element extends HTMLElement {
   * @returns {boolean}
   */
   emit(topic, data) {
-    this.#hub.emit(topic, data)
+    return this.#hub.emit(topic, data)
   }
 
 }

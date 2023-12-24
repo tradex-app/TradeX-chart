@@ -57,12 +57,12 @@ export default class Overlays {
   eventsListen() {
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {
@@ -85,11 +85,11 @@ export default class Overlays {
   }
 
   addOverlay(key, overlay) {
+    const layer = new CEL.Layer(this.layerConfig)
+
     // try / catch in case user defined custom overlays (indicator) errors
     try {
-      const layer = new CEL.Layer(this.layerConfig)
       this.parent.viewport.addLayer(layer)
-  
       overlay.layer = layer
       overlay.instance = new overlay.class(
         layer,
@@ -99,14 +99,20 @@ export default class Overlays {
         this,
         overlay.params
       )
-      if (!isString(overlay.instance?.id)) overlay.instance.id = key
+      if (!isString(overlay.instance?.id)) 
+        overlay.instance.id = key
 
       this.#list.set(overlay.instance.id, overlay)
       return overlay
     }
     catch (e) {
-      console.error(`Error: Cannot instantiate ${key} overlay / indicator`)
-      console.error(e)
+      // clean up
+      layer.remove()
+      overlay.instance = undefined
+      this.#list.delete(key)
+      // report error
+      this.#core.error(`ERROR: Cannot instantiate ${key} overlay / indicator : It will not be added to the chart.`)
+      this.#core.error(e)
       return false
     }
   }

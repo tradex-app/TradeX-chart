@@ -43,10 +43,6 @@ export default class chartNewsEvents extends Overlay {
     this.#dialogue.start()
   }
 
-  destroy() {
-    this.core.off("primary_pointerdown", this.onPrimaryPointerDown, this)
-  }
-
   set position(p) { this.target.setPosition(p[0], p[1]) }
   get data() { return this.overlay.data }
 

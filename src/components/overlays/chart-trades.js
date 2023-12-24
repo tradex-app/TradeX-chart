@@ -9,7 +9,7 @@ import { isObject } from "../../utils/typeChecks"
 import { HIT_DEBOUNCE } from "../../definitions/core"
 
 
-const tradeConfig = {
+const tradeDialogue = {
   bounded: true,
   dragBar: false,
   closeIcon: false,
@@ -42,7 +42,7 @@ export default class chartTrades extends Overlay {
     this.settings = params.settings
     this.#trade = new Trade(target, theme)
     this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this)
-    this.#dialogue = this.core.WidgetsG.insert("Dialogue", tradeConfig)
+    this.#dialogue = this.core.WidgetsG.insert("Dialogue", tradeDialogue)
     this.#dialogue.start()
   }
 

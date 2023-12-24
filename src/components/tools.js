@@ -86,7 +86,7 @@ export default class ToolsBar {
   }
 
   destroy() {
-    this.stateMachine.destroy()
+    this.off("setRange", this.onSetRange, this)
     // remove event listeners
     const tools = this.#elTools.querySelectorAll(`.icon-wrapper`)
     for (let tool of tools) {
@@ -98,8 +98,7 @@ export default class ToolsBar {
       }
     }
 
-    this.off("tool_selected", this.onToolSelect)
-    this.off("tool_deselected", this.onToolDeselect)
+    this.stateMachine.destroy()
   }
 
   eventsListen() {
@@ -107,12 +106,12 @@ export default class ToolsBar {
     this.on("tool_deselected", this.onToolDeselect, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {
