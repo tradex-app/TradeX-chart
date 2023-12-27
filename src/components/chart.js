@@ -669,13 +669,16 @@ export default class Chart {
       this.draw()
       delete this.#indicatorDeleteList[id]
     }
+    return true
   }
 
   removeAllIndicators() {
+    const result = {}
     const all = this.getIndicators()
     for (let id in all) {
-      this.removeIndicator(id)
+      result[id] = this.removeIndicator(id)
     }
+    return result
   }
 
   indicatorVisible(id, v) {
@@ -792,7 +795,7 @@ export default class Chart {
    */
   onLegendAction(e) {
 
-    const action = this.#Legends.onMouseClick(e.currentTarget)
+    const action = this.#Legends.onPointerClick(e.currentTarget)
 
     switch(action.icon) {
       case "up": this.reorderUp(); return;

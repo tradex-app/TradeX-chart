@@ -81,7 +81,7 @@ export default class Legends {
    * @param {Object} e - pointer event
    * @memberof Legends
    */
-  onMouseClick(e) {
+  onPointerClick(e) {
     const which = (s) => {
       if (isString(s.dataset.icon)) 
         return {id: s.id, icon: s.dataset.icon, parent: s.parentElement}
@@ -98,7 +98,7 @@ export default class Legends {
   }
 
   onLegendAction(e) {
-    const which = this.onMouseClick(e.currentTarget)
+    const which = this.onPointerClick(e.currentTarget)
     this.setCollapse(which.icon)
   }
 

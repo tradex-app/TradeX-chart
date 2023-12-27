@@ -190,7 +190,6 @@ export default class Overlay {
 
   /**
    * plot 
-   *
    * @param {Array} plots - array of inputs, eg. x y coords [{x:x, y:y}, ...]
    * @param {string} type - the canvas drawing function to invoke
    * @param {Object} params - parameters to pass to the drawing function
@@ -229,5 +228,12 @@ export default class Overlay {
       }
   
       ctx.restore();
+    }
+
+    /**
+     * clear the overlay canvas
+     */
+    clear() {
+      this.scene.clear()
     }
 }

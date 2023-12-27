@@ -43,6 +43,10 @@ const renderLoop = {
     return update
   },
 
+  expungeFrames() {
+    this.renderQ.clear()
+  },
+
   getFrame: function (frame=0) {
     if (this.renderQ.has(frame)) return this.renderQ.get(frame)
     // return first frame

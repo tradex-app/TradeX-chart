@@ -1454,10 +1454,12 @@ export default class TradeXchart extends Tradex_chart {
   refresh() {
     if (!this.ready) return
 
-    let start = this.range.indexStart
-    let end = this.range.indexEnd
-    this.setRange(start, end)
-    this.#MainPane.draw(undefined, true)
+    // let start = this.range.indexStart
+    // let end = this.range.indexEnd
+    // this.setRange(start, end)
+    // this.#MainPane.draw(undefined, true)
+    // this.#MainPane.element.dispatchEvent(new Event('pointermove', { 'bubbles': true }))
+    this.#MainPane.refresh()
   }
 
   /**

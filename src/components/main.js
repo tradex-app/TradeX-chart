@@ -831,7 +831,7 @@ export default class MainPane {
       instance = this.addChartPane(params)
       instance.start()
     }
-    this.#core.refresh()
+    this.refresh()
     this.emit("addIndicatorDone", instance)
     this.#core.log(`Added indicator:`, instance.id)
 
@@ -876,19 +876,25 @@ export default class MainPane {
     if (isString(i)) {
       for (const p of this.#ChartPanes.values()) {
         if (i in p.indicators) {
-          p.indicators[i].instance.remove()
-          this.emit("pane_refresh", this)
-          return true
+          i = p.indicators[i].instance
         }
       }
     }
     // remove by instance
-    else if (i instanceof Indicator) {
-      i.remove()
-      this.emit("pane_refresh", this)
-      return true
+    if (!(i instanceof Indicator)) 
+      return false
+
+    // Should the chart pane be removed also?
+    if (i.chart.type === "primaryPane" ||
+        Object.keys(i.chart.indicators).length > 1)
+    {
+        i.remove()
+        this.emit("pane_refresh", this)
     }
-    else return false
+    // Yes!
+    else i.chart.remove()
+
+    return true
   }
 
   /**
@@ -1001,6 +1007,16 @@ export default class MainPane {
       this.range, 
       graphs, 
       update)
+  }
+
+  refresh() {
+    this.renderLoop.expungeFrames()
+    this.core.Chart.graph.refresh()
+
+    for (let [key, secondaryPane] of this.chartPanes) {
+      secondaryPane.graph.refresh()
+    }
+    this.draw(this.range, true)
   }
 
   updateRange(pos) {

@@ -6,6 +6,7 @@ import { copyDeep, xMap } from '../../../utils/utilities'
 import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from '../../../utils/typeChecks'
 import CEL from "../../primitives/canvas"
 import Overlays from "../../overlays"
+import Overlay from "../../overlays/overlay"
 
 import grid from "../../overlays/chart-grid"
 import cursor from "../../overlays/chart-cursor"
@@ -162,8 +163,7 @@ export default class graph {
 
     const fn = (k, overlay) => {
       // is it a valid overlay?
-      if (!isObject(overlay) || 
-      !isFunction(overlay?.instance?.draw)) return
+      if (!(overlay.instance instanceof Overlay)) return
 
       if (update)
         overlay.instance.setRefresh()
@@ -178,7 +178,10 @@ export default class graph {
 
   drawAll() {
     const fn = (k, o) => {
-      o.instance.mustUpdate()
+      // is it a valid overlay?
+      if (!(o.instance instanceof Overlay)) return
+
+      const update = o.instance.mustUpdate()
     }
     this.executeOverlayList(fn)
   }
@@ -219,7 +222,7 @@ export default class graph {
   }
 
   refresh() {
-    this.draw(undefined, true)
+    this.draw(this.range, true)
     this.render()
   }
 

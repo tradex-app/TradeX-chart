@@ -236,18 +236,18 @@ export default class Timeline {
     this.#input2 = new Input(this.#elFwdEnd, {disableContextMenu: false});
     this.#input2.on("pointerover", () => this.showJump(this.#jump.end))
     this.#input2.on("pointerleave", () => this.hideJump(this.#jump.end))
-    // this.#input2.on("click", () => debounce(this.onMouseClick, 1000, this, true))
+    // this.#input2.on("click", () => debounce(this.onPointerClick, 1000, this, true))
 
     this.#input3 = new Input(this.#elRwdStart, {disableContextMenu: false});
     this.#input3.on("pointerover", () => this.showJump(this.#jump.start))
     this.#input3.on("pointerleave", () => this.hideJump(this.#jump.start))
-    // this.#input3.on('click', () => debounce(this.onMouseClick, 1000, this, true))
+    // this.#input3.on('click', () => debounce(this.onPointerClick, 1000, this, true))
 
     this.on("main_mousemove", this.#layerCursor.draw, this.#layerCursor)
     this.on("setRange", this.onSetRange, this)
 
-    this.#elFwdEnd.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
-    this.#elRwdStart.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
+    this.#elFwdEnd.addEventListener('click', debounce(this.onPointerClick, 1000, this, true))
+    this.#elRwdStart.addEventListener('click', debounce(this.onPointerClick, 1000, this, true))
   }
 
   on(topic, handler, context=this) {
@@ -262,7 +262,7 @@ export default class Timeline {
     this.#core.emit(topic, data)
   }
 
-  onMouseClick(e) {
+  onPointerClick(e) {
     const id = e?.currentTarget?.id || e.target.parentElement.id
     switch (id) {
       case "fwdEnd":

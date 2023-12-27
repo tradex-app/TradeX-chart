@@ -35,6 +35,7 @@ export default class Node {
   #hitV
   #theme
   #themeDefault = copyDeep(defaultTheme)
+  #constraint = {x: false, y: false}
   #x
   #y
 
@@ -64,7 +65,10 @@ export default class Node {
   get inCnt() { return this.#inCnt }
   set state(s) { this.setState(s); }
   get state() { return this.#state; }
-  get isActive() { return this.#state === NodeState.active; }
+  get isActive() { return this.#state === NodeState.active }
+  get isHover() { return this.#state === NodeState.hover }
+  get isPassive() { return this.#state === NodeState.passive }
+  get isConstrained() { return this.isNodeConstrained() }
   get chart() { return this.#chart }
   get layer() { return this.#layer }
   get scene() { return this.#scene }
@@ -106,8 +110,26 @@ export default class Node {
 
   }
 
-  isNodeSelected(e) {
+  onPointerDblClick(pos) {
+    // end the tool?
+  }
 
+  onNodeDrag(pos) {
+
+  }
+
+  onVisible() {
+
+  }
+
+  onActive(e) {
+
+  }
+
+  isNodeConstrained() {
+    const c = this.#constraint
+    if (!(c.x && c.y)) return false
+    else return c
   }
 
   draw() {

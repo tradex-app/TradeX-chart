@@ -133,6 +133,8 @@ export default class Indicator extends Overlay {
 
     // remove overlay from parent chart pane's graph
     this.chart.legend.remove(this.#legendID)
+    this.clear()
+    this.core.MainPane.draw(undefined, true)
     this.chartPane.graph.removeOverlay(this.id)
 
     // execute parent class
@@ -147,7 +149,16 @@ export default class Indicator extends Overlay {
 
   remove() {
     this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPaneID}`)
-    this.emit(`${this.chartPaneID}_removeIndicator`, {id: this.id, paneID: this.chartPaneID})
+
+    // Should the chart pane be removed also?
+    if (this.chart.type === "primaryPane" ||
+        Object.keys(this.chart.indicators).length > 1) 
+    {
+      this.emit(`${this.chartPaneID}_removeIndicator`, {id: this.id, paneID: this.chartPaneID})
+    }
+    // Yes!
+    else
+      this.chart.remove()
   }
 
   /**
@@ -224,7 +235,7 @@ export default class Indicator extends Overlay {
    */
   onLegendAction(e) {
 
-    const action = this.chart.legend.onMouseClick(e.currentTarget)
+    const action = this.chart.legend.onPointerClick(e.currentTarget)
 
     switch(action.icon) {
       case "up": return;
