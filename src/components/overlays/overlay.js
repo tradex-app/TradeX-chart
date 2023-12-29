@@ -42,7 +42,7 @@ export default class Overlay {
     this.#target = target
     this.#scene = target.scene
     this.#hit = target.hit
-    this.#theme = theme
+    this.#theme = {...this.#core.theme, ...theme}
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#params = params

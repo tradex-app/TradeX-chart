@@ -1,9 +1,11 @@
 // Volume.js
 
 import Indicator from "../components/overlays/indicator"
-import { 
-  YAXIS_TYPES
-} from "../definitions/chart";
+import VolumeBar from "../components/primitives/volume";
+import { bRound, limit } from "../utils/number";
+import { uid } from "../utils/utilities";
+import { YAXIS_TYPES } from "../definitions/chart";
+import { defaultTheme } from "../definitions/style";
 import { isBoolean } from "../utils/typeChecks";
 
 /**
@@ -13,24 +15,21 @@ import { isBoolean } from "../utils/typeChecks";
  * @extends {indicator}
  */
 export default class Volume extends Indicator {
-  #ID
-  #name = 'Relative Strength Index'
-  #shortName = 'RSI'
-  #params
-  #primaryPane = true
-  #checkParamCount = false
-  #scaleOverlay = true
-  #plots = [
-    { key: 'RSI_1', title: ' ', type: 'line' },
+
+  name = 'Volume'
+  shortName = 'VOL'
+  checkParamCount = false
+  scaleOverlay = true
+  plots = [
+    { key: 'VOL_1', title: ' ', type: 'bar' },
   ]
-  #defaultStyle = {
+  #defaultStyle = defaultTheme.volume
+  #volumeBar
+  #primaryPane = "both"
 
-  }
-  #style = {}
-
-  
-  // static primaryPane = "both"
-  // static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
+  static inCnt = 0
+  static primaryPane = "both"
+  static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
 
   /**
@@ -49,15 +48,104 @@ export default class Volume extends Indicator {
 
     super (target, xAxis, yAxis, config, parent, params) 
 
+    Volume.inCnt++
     const overlay = params.overlay
+
+    this.id = params.overlay?.id || uid(this.shortName)
+    this.#defaultStyle = {...this.defaultStyle, ...this.theme.volume}
+    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
+    if (this.chart.type === "primaryPane") {
+      this.style.Height = limit(this.style.Height, 0, 100) || 100;
+      this.#primaryPane = true
+    }
+    else {
+      this.style.Height = 100;
+      this.#primaryPane = false
+    }
+    this.#volumeBar = new VolumeBar(target.scene, this.style)
+    // enable processing of price stream
+    this.setNewValue = (value) => {  }
+    this.setUpdateValue = (value) => {  }
+    this.addLegend()
   }
 
-  get primaryPane() { return "both" }
+  get primaryPane() { return this.#primaryPane }
   get defaultStyle() { return this.#defaultStyle }
 
-  draw() {
-    if (this.overlay.data.length < 2 ) return false
+  /**
+ * return inputs required to display indicator legend on chart pane
+ * @param {Array} [pos=this.chart.cursorPos] - optional
+ * @returns {Object} - {inputs, colours, labels}
+ */
+  legendInputs(pos=this.chart.cursorPos) {
+    if (this.range.dataLength == 0) return false
+
+    const idx = super.Timeline.xPos2Index(pos[0])
+    const index = limit(idx, 0, this.range.data.length - 1)
+    const ohlcv = this.range.data[index]
+    const theme = this.chart.theme.candle
+    const colours = (ohlcv[4] >= ohlcv[1]) ?
+    [this.style.UpColour.slice(0,7)] :
+    [this.style.DnColour.slice(0,7)];
+    const inputs = {"V": this.scale.nicePrice(ohlcv[5])}
+    return {inputs, colours}
+  }
+
+  // nothing to calculate
+  calcIndicatorHistory() {
+
+  }
+
+  draw(range=this.range) {
+    // no update required
+    if (range.dataLength < 2 ) return false
     if (!super.mustUpdate()) return false
+
+    this.scene.clear()
+
+    const data = range.data
+    const zeroPos = this.scene.height
+    const offset = this.xAxis.smoothScrollOffset || 0
+
+    let w = Math.max(this.xAxis.candleW -1, 1)
+    
+    if (w < 3) w = 1
+    else if (w < 5) w = 3
+    else if (w > 5) w = Math.ceil(w * 0.8)
+
+    const volume = {
+      x: 0 + offset - this.xAxis.candleW,
+      w: w,
+      z: zeroPos
+    }
+    const volH = Math.floor(zeroPos * this.style.Height / 100)
+
+    let o = this.core.rangeScrollOffset
+    let v = range.indexStart - o
+    let i = range.Length + (o * 2)
+    let j = i
+    let u = v
+    let x
+    let maxVol = 0
+  
+    while(j--) {
+      x = range.value( u )
+      if (x[4] !== null) {
+        maxVol = (x[5] > maxVol) ? x[5] : maxVol
+      }
+      u++
+    }
+
+    while(i--) {
+      x = range.value( v )
+      volume.x = bRound(this.xAxis.xPos(x[0]) - (w / 2))
+      if (x[4] !== null) {
+        volume.h = volH - (volH * ((maxVol - x[5]) / maxVol))
+        volume.raw = data[v]
+        this.#volumeBar.draw(volume)
+      }
+      v++
+    }
 
     super.updated()
   }

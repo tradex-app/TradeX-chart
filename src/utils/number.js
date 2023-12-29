@@ -284,11 +284,12 @@ export function getPrecision (value) {
  * @param {object} digits - {sign: s, integers: i, decimals: d, value: v}
  * @return {number}  
  */
-export function limitPrecision (digits, precision) {
+export function limitPrecision (digits, precision=18) {
   let {sign: s, integers: i, decimals: d, value: v} = digits
 
-  precision = (!!precision) ? precision : 18
-  v = new Number(v).toFixed()
+  precision = (isNaN(precision)) ? 18 : precision
+  d = (d > precision) ? precision : d
+  v = new Number(v).toFixed(d)
   // let n = this.yAxisDigits - 1,
   let x = `${v}`,
       r = "",

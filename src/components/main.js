@@ -99,7 +99,6 @@ export default class MainPane {
   }
   #buffer
   
-  #indicators
   #controller
   #input
 
@@ -163,6 +162,7 @@ export default class MainPane {
   get graph() { return this.#Graph }
   get views() { return this.#core.state.data.views }
   get indicators() { return this.getIndicators() }
+  get indicatorClasses() { return this.#core.indicatorClasses }
   get elements() {
     return {
       elRows: this.elRows,
@@ -177,7 +177,6 @@ export default class MainPane {
   init(options) {
     const core = this.#core
 
-    this.#indicators = this.#core.indicatorClasses
     this.#elRows = this.#elMain.rows
     this.#elTime = this.#elMain.time
     this.#elGrid = this.#elMain.rows.grid
@@ -784,9 +783,12 @@ export default class MainPane {
    * @returns 
    */
   addIndicator(i, name=i, params={})  {
+    let instance;
+    let isPrimary = this.indicatorClasses[i].ind?.primaryPane;
+
     if (
       !isString(i) &&
-      !(i in this.#indicators) &&
+      !(i in this.indicatorClasses) &&
       !isString(name) &&
       !isObject(params)
     ) return false
@@ -797,10 +799,21 @@ export default class MainPane {
     if (!isArray(params?.data)) params.data = []
     if (!isObject(params?.settings)) params.settings = {}
 
-    let instance
+    // isPrimary must be a boolean
+    switch (isPrimary) {
+      case true:
+      case false:
+        break;
+      case undefined:
+      case "both":
+        isPrimary = (isBoolean(params.settings?.isPrimary)) ? 
+        params.settings.isPrimary : true
+    }
+
+    params.settings.isPrimary = isPrimary
 
     // add primary chart indicator
-    if (this.#indicators[i].ind.primaryPane) {
+    if (isPrimary) {
       const indicator = {
         type: i,
         name: name,
@@ -809,13 +822,7 @@ export default class MainPane {
         instance = this.#Chart.addIndicator(indicator);
     }
     // add secondary chart indicator
-    else {
-      const indicator = this.core.indicatorClasses[i].ind
-      const indType = (
-        indicator.primaryPane === "both" && 
-        isBoolean(i.primaryPane)) ? 
-        i.primaryPane : false;
-        
+    else {       
       if (!isArray(params.view)) params.view = [{name, type: i, ...params}]
       // check all views are valid
       for (let v = 0; v < params.view.length; v++) {
@@ -831,16 +838,18 @@ export default class MainPane {
       instance = this.addChartPane(params)
       instance.start()
     }
+    const id = ("instance" in instance) ? instance.instance.id : instance.id
     this.refresh()
     this.emit("addIndicatorDone", instance)
-    this.#core.log(`Added indicator:`, instance.id)
+    this.#core.log(`Added indicator:`, id)
 
     return instance
   }
 
   /**
-   * return indicators grouped by Chart Pane
+   * return active indicators grouped by Chart Pane
    * @param {string} i - indicator ID
+   * @returns {object}
    */
   getIndicators() {
     const ind = {}
@@ -854,8 +863,9 @@ export default class MainPane {
   }
 
   /**
-   * retrieve indicator by ID
+   * retrieve active indicator by ID
    * @param {string} i - indicator ID
+   * @returns {Indicator}
    */
   getIndicator(i) {
     if (!isString(i)) return false

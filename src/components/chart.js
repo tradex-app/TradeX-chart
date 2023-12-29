@@ -6,7 +6,7 @@
 
 import DOM from "../utils/DOM";
 import { limit } from "../utils/number"
-import { isArray, isFunction, isNumber, isObject, isString } from "../utils/typeChecks";
+import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks";
 import { copyDeep, idSanitize, xMap } from "../utils/utilities";
 import CEL from "./primitives/canvas";
 import Legends from "./primitives/legend"
@@ -46,7 +46,6 @@ export const defaultOverlays = {
   primaryPane: [
     ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
-    ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
     ["candles", {class: chartCandles, fixed: false, required: true}],
     ["hiLo", {class: chartHighLow, fixed: true, required: false}],
     ["stream", {class: chartCandleStream, fixed: false, required: true}],
@@ -63,6 +62,7 @@ export const optionalOverlays = {
   primaryPane: {
     "trades": {class: chartTrades, fixed: false, required: false},
     "events": {class: chartNewsEvents, fixed: false, required: false},
+    "volume": {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}},
   },
   secondaryPane: {
     "candles": {class: chartCandles, fixed: false, required: true},
@@ -627,10 +627,10 @@ export default class Chart {
   addIndicator(i) {
     const primaryPane = this.type === "primaryPane"
     const indClass = this.core.indicatorClasses[i.type].ind
-    const indType = (indClass.constructor.type === "both") ? primaryPane : indClass.prototype.primaryPane
+    const isPrimary = !!i.settings?.isPrimary
     if (
         i?.type in this.core.indicatorClasses &&
-        primaryPane === indType
+        primaryPane === isPrimary
       ) {
       i.paneID = this.id
       const config = {

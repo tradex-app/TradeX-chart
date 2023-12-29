@@ -291,9 +291,6 @@ export default class ScaleBar {
     if (this.#core.range.dataLength > 0) {
       const high = this.#core.range.valueMax
       const digits = countDigits(high)
-      if (digits.precision > 4) {
-        console.log(digits)
-      }
       const nice = limitPrecision(digits, this.config.precision)
      count = `${nice}`.length + 2
     }
