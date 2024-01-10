@@ -306,8 +306,8 @@ export default class MainPane {
 
   eventsListen() {
     // Give Main focus so it can receive keyboard input
-    this.#elRows.tabIndex = 0
-    this.#elRows.focus()
+    // this.#elRows.tabIndex = 0
+    // this.#elRows.focus()
 
     this.#input = new Input(this.#elRows, {disableContextMenu: false});
 

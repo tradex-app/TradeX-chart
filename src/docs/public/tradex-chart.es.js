@@ -1836,20 +1836,20 @@ class Ue {
   #r = null;
   #i = null;
   #s = null;
-  #l;
+  #a;
   #o;
   #c = !1;
-  #a;
+  #l;
   #h;
   #d;
   pad = { left: !1 };
   constructor(i, s) {
-    if (this.#e = { ...ml, ...s }, this.#o = Aa.idle, this.#l = La, this.#t = i, !this.#t && this.#e.elementId && (this.#t = document.getElementById(this.#e.elementId)), !D.isElement(this.#t))
+    if (this.#e = { ...ml, ...s }, this.#o = Aa.idle, this.#a = La, this.#t = i, !this.#t && this.#e.elementId && (this.#t = document.getElementById(this.#e.elementId)), !D.isElement(this.#t))
       throw "Must specify an element to receive user input.";
     this.#e.contextMenu || (window.oncontextmenu = (o) => (o.preventDefault(), !1));
     const r = {
       recognizerOptions: {
-        pan: { threshold: this.#l ? 10 : 0 },
+        pan: { threshold: this.#a ? 10 : 0 },
         pinch: { threshold: 0 }
       }
     };
@@ -1874,13 +1874,13 @@ class Ue {
     return this.#t;
   }
   get isTouch() {
-    return this.#l;
+    return this.#a;
   }
   get isPan() {
     return this.#c;
   }
   set panX(i) {
-    te(i) && (this.#a = i);
+    te(i) && (this.#l = i);
   }
   set panY(i) {
     te(y) && (this.#h = y);
@@ -2396,10 +2396,10 @@ class de {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o;
   #c;
-  #a;
+  #l;
   #h;
   static dividerList = {};
   static divideCnt = 0;
@@ -2422,7 +2422,7 @@ class de {
   }
   constructor(i, s) {
     const n = { ...s };
-    this.#i = i, this.#t = n.core, this.#n = n, this.#r = n.core.theme, this.#e = n.id, this.#s = n.chartPane, this.#l = i.elements.elDividers, this.init();
+    this.#i = i, this.#t = n.core, this.#n = n, this.#r = n.core.theme, this.#e = n.id, this.#s = n.chartPane, this.#a = i.elements.elDividers, this.init();
   }
   get el() {
     return this.#o;
@@ -2449,7 +2449,7 @@ class de {
     this.setCursorStyle(i);
   }
   get cursor() {
-    return this.#a;
+    return this.#l;
   }
   get type() {
     return de.type;
@@ -2498,10 +2498,10 @@ class de {
     }), this.chartPane.resize();
   }
   mount() {
-    this.#l.lastElementChild == null ? this.#l.innerHTML = this.dividerNode() : this.#l.lastElementChild.insertAdjacentHTML("afterend", this.dividerNode()), this.#o = D.findBySelector(`#${this.#e}`, this.#l);
+    this.#a.lastElementChild == null ? this.#a.innerHTML = this.dividerNode() : this.#a.lastElementChild.insertAdjacentHTML("afterend", this.dividerNode()), this.#o = D.findBySelector(`#${this.#e}`, this.#a);
   }
   dividerNode() {
-    let i = this.#t.theme, s = this.#s.pos.top - D.elementDimPos(this.#l).top, n = this.#t.elBody.width, r = S(this.config.dividerHeight) ? this.config.dividerHeight : $l, o = i.tools.width;
+    let i = this.#t.theme, s = this.#s.pos.top - D.elementDimPos(this.#a).top, n = this.#t.elBody.width, r = S(this.config.dividerHeight) ? this.config.dividerHeight : $l, o = i.tools.width;
     switch (s -= r / 2, i.tools.location) {
       case "left":
         break;
@@ -2517,14 +2517,14 @@ class de {
     `;
   }
   setPos() {
-    let i = this.#s.pos.top - D.elementDimPos(this.#l).top;
+    let i = this.#s.pos.top - D.elementDimPos(this.#a).top;
     i = i - this.height / 2 + 1, this.#o.style.top = `${i}px`;
   }
   setWidth() {
     this.#o.style.width = `${this.#t.MainPane.width}px`;
   }
   setCursorStyle(i) {
-    E(i) && (this.#a = i, this.#o.style.cursor = i);
+    E(i) && (this.#l = i, this.#o.style.cursor = i);
   }
   hide() {
     this.#o.style.display = "none";
@@ -3125,10 +3125,10 @@ class Ci extends Wr {
       offset: 0
     }
   };
-  #l = 1.04;
+  #a = 1.04;
   #o = Fn;
   #c = _l;
-  #a = 3;
+  #l = 3;
   #h;
   #d;
   #u;
@@ -3154,10 +3154,10 @@ class Ci extends Wr {
     return this.yAxisCalcPrecision;
   }
   set yAxisPadding(i) {
-    this.#l = i;
+    this.#a = i;
   }
   get yAxisPadding() {
-    return this.#l;
+    return this.#a;
   }
   set yAxisType(i) {
     this.#r = Ge.includes(i) ? i : Ge[0];
@@ -3172,10 +3172,10 @@ class Ci extends Wr {
     return this.#o;
   }
   set yAxisTicks(i) {
-    this.#a = S(i) ? i : 0;
+    this.#l = S(i) ? i : 0;
   }
   get yAxisTicks() {
-    return this.#a;
+    return this.#l;
   }
   get yAxisGrads() {
     return this.#h;
@@ -3514,10 +3514,10 @@ class G {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o;
   #c;
-  #a;
+  #l;
   #h = {
     valueMax: null,
     valueMin: null,
@@ -3530,7 +3530,7 @@ class G {
   };
   id;
   constructor(i, s = !1, n = !1, r, o, l = {}) {
-    this.#t = o.core, this.#e = o, this.#n = o.core.config, this.#l = i, this.#o = i.scene, this.#c = i.hit, this.#r = { ...this.#t.theme, ...r }, this.#i = s, this.#s = n, this.#a = l, this.on("global_resize", this.onResize, this);
+    this.#t = o.core, this.#e = o, this.#n = o.core.config, this.#a = i, this.#o = i.scene, this.#c = i.hit, this.#r = { ...this.#t.theme, ...r }, this.#i = s, this.#s = n, this.#l = l, this.on("global_resize", this.onResize, this);
   }
   get core() {
     return this.#t;
@@ -3539,13 +3539,13 @@ class G {
     return this.#e;
   }
   get target() {
-    return this.#l;
+    return this.#a;
   }
   get config() {
     return this.#n;
   }
   get params() {
-    return this.#a;
+    return this.#l;
   }
   get range() {
     return this.#t.range;
@@ -3575,13 +3575,13 @@ class G {
     return this.getYAxis();
   }
   get overlay() {
-    return this.#a.overlay;
+    return this.#l.overlay;
   }
   get overlayData() {
-    return this.#a.overlay.data;
+    return this.#l.overlay.data;
   }
   get data() {
-    return this.#a.overlay.data;
+    return this.#l.overlay.data;
   }
   get stateMachine() {
     return this.#t.stateMachine;
@@ -3590,10 +3590,10 @@ class G {
     return this.contextIs();
   }
   set position(i) {
-    this.#l.setPosition(i[0], i[1]);
+    this.#a.setPosition(i[0], i[1]);
   }
   destroy() {
-    this.#t.hub.expunge(this), "overlay" in this.#a && "data" in this.#a.overlay && delete this.#a.overlay.data;
+    this.#t.hub.expunge(this), "overlay" in this.#l && "data" in this.#l.overlay && delete this.#l.overlay.data;
   }
   on(i, s, n = this) {
     this.#t.on(i, s, n);
@@ -3611,7 +3611,7 @@ class G {
     this.#h.resize = !0;
   }
   setSize(i, s) {
-    this.#l.setSize(i, s), this.#h.refresh = !0;
+    this.#a.setSize(i, s), this.#h.refresh = !0;
   }
   setRefresh() {
     this.#h.refresh = !0;
@@ -4160,10 +4160,10 @@ class Re extends G {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o;
   #c;
-  #a;
+  #l;
   #h;
   #d;
   #u;
@@ -4178,7 +4178,7 @@ class Re extends G {
   #f;
   #x = !1;
   constructor(i, s = !1, n = !1, r, o, l) {
-    super(i, s, n, void 0, o, l), this.#n = G.cnt, this.#a = l, this.#h = l.overlay, this.#m = this.core.TALib, this.#v = this.xAxis.range, this.eventsListen();
+    super(i, s, n, void 0, o, l), this.#n = G.cnt, this.#l = l, this.#h = l.overlay, this.#m = this.core.TALib, this.#v = this.xAxis.range, this.eventsListen();
   }
   get id() {
     return this.#t || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#n}`;
@@ -4202,7 +4202,7 @@ class Re extends G {
     return this.core.ChartPanes.get(this.chartPaneID);
   }
   get chartPaneID() {
-    return this.#a.overlay.paneID;
+    return this.#l.overlay.paneID;
   }
   get primaryPane() {
     return this.#s;
@@ -4223,7 +4223,7 @@ class Re extends G {
     this.#c = i;
   }
   get params() {
-    return this.#a;
+    return this.#l;
   }
   get Timeline() {
     return this.core.Timeline;
@@ -9584,7 +9584,7 @@ const ao = {
   SMA: { id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: Oi },
   STOCH: { id: "STOCH", name: "Stochastic Oscillator", event: "addIndicator", ind: js },
   VOL: { id: "VOL", name: "Volume", event: "addIndicator", ind: Ks }
-}, Zs = "0.142.0";
+}, Zs = "0.142.1";
 class jd {
   #e;
   #t;
@@ -9744,11 +9744,11 @@ class $ {
   #r = "";
   #i = {};
   #s;
-  #l = !1;
+  #a = !1;
   #o = !0;
   #c = [];
   constructor(i, s = !1, n = !1) {
-    T(i) ? (this.#i = $.validate(i, s, n), this.#l = "valid", this.#o = !!this.#i.chart?.isEmpty, this.#s = i?.core instanceof I ? i.core : void 0) : (this.#i = $.default, this.#l = "default", this.#o = !0), this.#n = i?.id || "", this.#r = J(`${$t}_state`);
+    T(i) ? (this.#i = $.validate(i, s, n), this.#a = "valid", this.#o = !!this.#i.chart?.isEmpty, this.#s = i?.core instanceof I ? i.core : void 0) : (this.#i = $.default, this.#a = "default", this.#o = !0), this.#n = i?.id || "", this.#r = J(`${$t}_state`);
   }
   get id() {
     return this.#n;
@@ -9757,7 +9757,7 @@ class $ {
     return this.#r;
   }
   get status() {
-    return this.#l;
+    return this.#a;
   }
   get isEmpty() {
     return this.#o;
@@ -9816,7 +9816,7 @@ class $ {
       return !0;
     s.stream.stop(), s.MainPane.reset();
     let n = $.get(i);
-    this.#n = n.id, this.#l = n.status, this.#o = n.isEmpty, this.#i = n.data;
+    this.#n = n.id, this.#a = n.status, this.#o = n.isEmpty, this.#i = n.data;
     const r = {
       interval: n.data.chart.tfms,
       core: s
@@ -9948,10 +9948,10 @@ class Ye {
   #r = {};
   #i;
   #s;
-  #l = "stopped";
+  #a = "stopped";
   #o;
   #c;
-  #a;
+  #l;
   #h;
   #d = ["await", "idle", "running", "stopped"];
   constructor(i, s) {
@@ -9979,7 +9979,7 @@ class Ye {
     return this.#s;
   }
   get status() {
-    return this.#l;
+    return this.#a;
   }
   get event() {
     return this.#c;
@@ -9988,16 +9988,16 @@ class Ye {
     return this.#o;
   }
   get eventData() {
-    return this.#a;
+    return this.#l;
   }
   get actions() {
     return this.#h;
   }
   notify(i, s) {
-    this.#c = i, this.#a = s;
+    this.#c = i, this.#l = s;
     const n = this.#i.states[this.#t];
     let r = n.on[i];
-    if (!r || !B(r.action) || this.#l !== "running")
+    if (!r || !B(r.action) || this.#a !== "running")
       return !1;
     let o = r?.condition?.type || r?.condition || !1;
     if (o && !this.condition.call(this, o, r.condition))
@@ -10025,10 +10025,10 @@ class Ye {
     return i in s.on;
   }
   start() {
-    this.#l = "running";
+    this.#a = "running";
   }
   stop() {
-    this.#l = "stopped";
+    this.#a = "stopped";
   }
   destroy() {
     this.stop(), this.#m(), this.#i = null;
@@ -10150,10 +10150,10 @@ class ft {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o = ui;
   #c = 0;
-  #a = 0;
+  #l = 0;
   #h = "";
   #d = !1;
   #u;
@@ -10169,13 +10169,13 @@ class ft {
     return i;
   }
   constructor(i) {
-    this.#e = i, this.#r = i.time, this.status = { status: wa }, this.#t = ft.validateConfig(i.config?.stream), this.#i = S(i.config?.maxCandleUpdate) ? i.config.maxCandleUpdate : Ca, this.#l = S(i.config?.streamPrecision) ? i.config.streamPrecision : Ta;
+    this.#e = i, this.#r = i.time, this.status = { status: wa }, this.#t = ft.validateConfig(i.config?.stream), this.#i = S(i.config?.maxCandleUpdate) ? i.config.maxCandleUpdate : Ca, this.#a = S(i.config?.streamPrecision) ? i.config.streamPrecision : Ta;
   }
   get config() {
     return this.#t;
   }
   get countDownMS() {
-    return this.#a;
+    return this.#l;
   }
   get countDown() {
     return this.#h;
@@ -10248,7 +10248,7 @@ class ft {
       i.v,
       null,
       !0
-    ], this.#e.state.mergeData({ ohlcv: [this.#o] }, !0, !1), this.status = { status: Os, data: { data: i, candle: this.#o } }, this.#a = this.#r.timeFrameMS, this.#c = this.roundTime(Date.now());
+    ], this.#e.state.mergeData({ ohlcv: [this.#o] }, !0, !1), this.status = { status: Os, data: { data: i, candle: this.#o } }, this.#l = this.#r.timeFrameMS, this.#c = this.roundTime(Date.now());
   }
   prevCandle() {
     const i = this.#e.allData.data;
@@ -10264,7 +10264,7 @@ class ft {
     let i, s, n, r, o, l, h;
     this.#r.timeFrameMS;
     let c = this.#r.timeFrameMS - (Date.now() - this.#c);
-    return c < 0 && (c = 0), this.#a = c, c > Te ? (i = String(Math.floor(c / Te)), s = String(Math.floor(c % Te / me)).padStart(2, "0"), this.#h = `${i}Y ${s}M`) : c > me ? (s = String(Math.floor(c / me)).padStart(2, "0"), r = String(Math.floor(c % me / W)).padStart(2, "0"), this.#h = `${s}M ${r}D`) : c > yt ? (n = String(Math.floor(c / yt)).padStart(2, "0"), r = String(Math.floor(c % me / W)).padStart(2, "0"), this.#h = `${n}W ${r}D`) : c > W ? (r = String(Math.floor(c / W)).padStart(2, "0"), o = String(Math.floor(c % W / ie)).padStart(2, "0"), l = String(Math.floor(c % ie / X)).padStart(2, "0"), this.#h = `${r}D ${o}:${l}`) : c > ie ? (o = String(Math.floor(c / ie)).padStart(2, "0"), l = String(Math.floor(c % ie / X)).padStart(2, "0"), h = String(Math.floor(c % X / q)).padStart(2, "0"), this.#h = `${o}:${l}:${h}`) : c > X ? (l = String(Math.floor(c / X)).padStart(2, "0"), h = String(Math.floor(c % X / q)).padStart(2, "0"), this.#h = `00:${l}:${h}`) : (h = String(Math.floor(c / q)).padStart(2, "0"), String(c % q).padStart(4, "0"), this.#h = `00:00:${h}`), this.#h;
+    return c < 0 && (c = 0), this.#l = c, c > Te ? (i = String(Math.floor(c / Te)), s = String(Math.floor(c % Te / me)).padStart(2, "0"), this.#h = `${i}Y ${s}M`) : c > me ? (s = String(Math.floor(c / me)).padStart(2, "0"), r = String(Math.floor(c % me / W)).padStart(2, "0"), this.#h = `${s}M ${r}D`) : c > yt ? (n = String(Math.floor(c / yt)).padStart(2, "0"), r = String(Math.floor(c % me / W)).padStart(2, "0"), this.#h = `${n}W ${r}D`) : c > W ? (r = String(Math.floor(c / W)).padStart(2, "0"), o = String(Math.floor(c % W / ie)).padStart(2, "0"), l = String(Math.floor(c % ie / X)).padStart(2, "0"), this.#h = `${r}D ${o}:${l}`) : c > ie ? (o = String(Math.floor(c / ie)).padStart(2, "0"), l = String(Math.floor(c % ie / X)).padStart(2, "0"), h = String(Math.floor(c % X / q)).padStart(2, "0"), this.#h = `${o}:${l}:${h}`) : c > X ? (l = String(Math.floor(c / X)).padStart(2, "0"), h = String(Math.floor(c % X / q)).padStart(2, "0"), this.#h = `00:${l}:${h}`) : (h = String(Math.floor(c / q)).padStart(2, "0"), String(c % q).padStart(4, "0"), this.#h = `00:00:${h}`), this.#h;
   }
   roundTime(i) {
     return i - i % this.#e.time.timeFrameMS;
@@ -10687,7 +10687,7 @@ class lo {
     isValid: !1
   };
   constructor(i) {
-    this.#t(i), ar.test(i) && this.#n(i), lr.test(i) && this.#r(i), hr.test(i) && this.#i(i), cr.test(i) && this.#s(i), ur.test(i) && this.#l(i);
+    this.#t(i), ar.test(i) && this.#n(i), lr.test(i) && this.#r(i), hr.test(i) && this.#i(i), cr.test(i) && this.#s(i), ur.test(i) && this.#a(i);
   }
   get value() {
     return this.#e;
@@ -10760,7 +10760,7 @@ class lo {
   #s(i) {
     this.#e.rgb = i, this.#v(rgba);
   }
-  #l(i) {
+  #a(i) {
     this.#e.rgba = i, this.#v(i);
   }
   #o(i) {
@@ -10779,7 +10779,7 @@ class lo {
     ];
     return this.setHSLA(p), this;
   }
-  #a(i, s, n) {
+  #l(i, s, n) {
     s /= 100, n /= 100;
     const r = (h) => (h + i / 30) % 12, o = s * Math.min(n, 1 - n), l = (h) => n - o * Math.max(-1, Math.min(r(h) - 3, Math.min(9 - r(h), 1)));
     return [255 * l(0), 255 * l(8), 255 * l(4)];
@@ -10840,10 +10840,10 @@ class Qs {
   #r;
   #i;
   #s = { w: 0, h: 0 };
-  #l = { w: 0, h: 0, x: 0, y: 0 };
+  #a = { w: 0, h: 0, x: 0, y: 0 };
   #o = { x: !1, y: !0 };
   #c;
-  #a = { x: 0, drag: !1 };
+  #l = { x: 0, drag: !1 };
   #h;
   #d;
   constructor(i) {
@@ -10880,16 +10880,16 @@ class Qs {
     this.onHandleDragDone(i);
   }
   onHandleDrag(i) {
-    this.#a.drag || (this.#a.drag = !0, this.#a.x = i.position.x), this.handlePos(i);
+    this.#l.drag || (this.#l.drag = !0, this.#l.x = i.position.x), this.handlePos(i);
   }
   onHandleDragDone(i) {
-    this.handlePos(i), this.#a.drag = !1;
+    this.handlePos(i), this.#l.drag = !1;
   }
   mount() {
-    this.#s.w = this.#r.getBoundingClientRect().width, this.#s.h = this.#r.getBoundingClientRect().height, this.#r.style.overflow = "hidden", this.#l.w = this.#i.getBoundingClientRect().width, this.#l.h = this.#i.getBoundingClientRect().height, this.#i.style.marginRight = 0, this.#i.style.position = "absolute";
+    this.#s.w = this.#r.getBoundingClientRect().width, this.#s.h = this.#r.getBoundingClientRect().height, this.#r.style.overflow = "hidden", this.#a.w = this.#i.getBoundingClientRect().width, this.#a.h = this.#i.getBoundingClientRect().height, this.#i.style.marginRight = 0, this.#i.style.position = "absolute";
   }
   handlePos(i) {
-    let s = this.#n.range, n = parseInt(this.#i.style.marginLeft), r = this.#r.getBoundingClientRect().width, o = this.#i.getBoundingClientRect().width, l = r - o, h = i.position.x - this.#a.x, c = H(n + h, 0, l), p = (s.dataLength + s.limitFuture + s.limitPast) / r, f = Math.floor(c * p);
+    let s = this.#n.range, n = parseInt(this.#i.style.marginLeft), r = this.#r.getBoundingClientRect().width, o = this.#i.getBoundingClientRect().width, l = r - o, h = i.position.x - this.#l.x, c = H(n + h, 0, l), p = (s.dataLength + s.limitFuture + s.limitPast) / r, f = Math.floor(c * p);
     this.setHandleDims(c, o), this.#n.jumpToIndex(f);
   }
   setHandleDims(i, s) {
@@ -11345,12 +11345,12 @@ class xt {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o;
   #c;
-  #a;
+  #l;
   constructor(i, s, n, r = !1) {
-    this.#r = i, this.#e = i.core, this.#t = this.core.config, this.#n = this.core.theme, this.#l = this.#r.element, this.#c = s, this.createViewport(n, r);
+    this.#r = i, this.#e = i.core, this.#t = this.core.config, this.#n = this.core.theme, this.#a = this.#r.element, this.#c = s, this.createViewport(n, r);
   }
   get parent() {
     return this.#r;
@@ -11365,22 +11365,22 @@ class xt {
     this.setWidth(i);
   }
   get width() {
-    return this.#l.width;
+    return this.#a.width;
   }
   set height(i) {
     this.setHeight(i);
   }
   get height() {
-    return this.#l.height;
+    return this.#a.height;
   }
   get dimensions() {
-    return D.this.#l.dimensions;
+    return D.this.#a.dimensions;
   }
   set layerWidth(i) {
-    this.#a = i || this.#l.width;
+    this.#l = i || this.#a.width;
   }
   get layerWidth() {
-    return this.#a;
+    return this.#l;
   }
   get stateMachine() {
     return this.#r.stateMachine;
@@ -11566,10 +11566,10 @@ class C0 {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o;
   #c;
-  #a;
+  #l;
   #h;
   #d;
   #u = new Ee();
@@ -11595,7 +11595,7 @@ class C0 {
   };
   #E = { end: !1, start: !1 };
   constructor(i, s) {
-    this.#s = i, this.#r = s, this.#i = s.elements.elTime, this.#l = i.Chart, this.#o = new bi(this, this.#l), this.init();
+    this.#s = i, this.#r = s, this.#i = s.elements.elTime, this.#a = i.Chart, this.#o = new bi(this, this.#a), this.init();
   }
   log(i) {
     this.#s.log(i);
@@ -11631,7 +11631,7 @@ class C0 {
     return this.#i;
   }
   get elViewport() {
-    return this.#a;
+    return this.#l;
   }
   get height() {
     return this.#i.height;
@@ -11719,7 +11719,7 @@ class C0 {
   }
   init() {
     const i = this.#i;
-    this.#a = i.viewport, this.#h = i.overview, this.#g = i.overview.icons, this.#C = i.overview.scrollBar, this.#w = i.overview.handle, this.#p = i.overview.rwdStart, this.#T = i.overview.fwdEnd;
+    this.#l = i.viewport, this.#h = i.overview, this.#g = i.overview.icons, this.#C = i.overview.scrollBar, this.#w = i.overview.handle, this.#p = i.overview.rwdStart, this.#T = i.overview.fwdEnd;
     const s = {
       core: this.#s,
       elContainer: this.#C,
@@ -11729,7 +11729,7 @@ class C0 {
     this.#b = new Qs(s), this.#s.theme?.time?.navigation === !1 && this.navigationDisplay(!1);
   }
   setWidth(i) {
-    this.#i.style.width = `${i}px`, this.#a.style.width = `${i}px`;
+    this.#i.style.width = `${i}px`, this.#l.style.width = `${i}px`;
   }
   setDimensions(i) {
     const s = this.config.buffer || ki, n = i.w, r = this.height, o = Math.round(n * ((100 + s) * 0.01));
@@ -11740,7 +11740,7 @@ class C0 {
       this.#T.style["margin-top"] = 0, this.#p.style["margin-top"] = 0;
     else {
       const s = this.core.theme.xAxis?.background ? this.core.theme.xAxis.Background : this.core.theme.chart.Background;
-      this.#h.style.visibility = "hidden", this.#T.style["margin-top"] = `${this.#a.clientHeight * -1}px`, this.#p.style["margin-top"] = `${this.#a.clientHeight * -1}px`, this.#T.style.background = this.core.theme.chart.Background, this.#p.style.background = s;
+      this.#h.style.visibility = "hidden", this.#T.style["margin-top"] = `${this.#l.clientHeight * -1}px`, this.#p.style["margin-top"] = `${this.#l.clientHeight * -1}px`, this.#T.style.background = this.core.theme.chart.Background, this.#p.style.background = s;
     }
   }
   start() {
@@ -11750,7 +11750,7 @@ class C0 {
     this.stateMachine.destroy(), this.#P.destroy(), this.#R.destroy(), this.#A.destroy(), this.#s.hub.expunge(this), this.off("main_mousemove", this.#x.draw, this.#x), this.#T.removeEventListener("click", Ie), this.#p.removeEventListener("click", Ie), this.#d.destroy(), this.element.remove();
   }
   eventsListen() {
-    this.#P = new Ue(this.#a, { disableContextMenu: !1 }), this.#P.on("dblclick", this.onDoubleClick.bind(this)), this.#P.on("pointerover", this.onPointerEnter.bind(this)), this.#P.on("pointerout", this.onPointerLeave.bind(this)), this.#P.on("pointerdrag", this.onPointerDrag.bind(this)), this.#R = new Ue(this.#T, { disableContextMenu: !1 }), this.#R.on("pointerover", () => this.showJump(this.#E.end)), this.#R.on("pointerleave", () => this.hideJump(this.#E.end)), this.#A = new Ue(this.#p, { disableContextMenu: !1 }), this.#A.on("pointerover", () => this.showJump(this.#E.start)), this.#A.on("pointerleave", () => this.hideJump(this.#E.start)), this.on("main_mousemove", this.#x.draw, this.#x), this.on("setRange", this.onSetRange, this), this.#T.addEventListener("click", Ie(this.onPointerClick, 1e3, this, !0)), this.#p.addEventListener("click", Ie(this.onPointerClick, 1e3, this, !0));
+    this.#P = new Ue(this.#l, { disableContextMenu: !1 }), this.#P.on("dblclick", this.onDoubleClick.bind(this)), this.#P.on("pointerover", this.onPointerEnter.bind(this)), this.#P.on("pointerout", this.onPointerLeave.bind(this)), this.#P.on("pointerdrag", this.onPointerDrag.bind(this)), this.#R = new Ue(this.#T, { disableContextMenu: !1 }), this.#R.on("pointerover", () => this.showJump(this.#E.end)), this.#R.on("pointerleave", () => this.hideJump(this.#E.end)), this.#A = new Ue(this.#p, { disableContextMenu: !1 }), this.#A.on("pointerover", () => this.showJump(this.#E.start)), this.#A.on("pointerleave", () => this.hideJump(this.#E.start)), this.on("main_mousemove", this.#x.draw, this.#x), this.on("setRange", this.onSetRange, this), this.#T.addEventListener("click", Ie(this.onPointerClick, 1e3, this, !0)), this.#p.addEventListener("click", Ie(this.onPointerClick, 1e3, this, !0));
   }
   on(i, s, n = this) {
     this.#s.on(i, s, n);
@@ -11816,7 +11816,7 @@ class C0 {
   }
   createGraph() {
     let i = ce(b0);
-    this.#d = new xt(this, this.#a, i, !1), this.#x = this.graph.overlays.get("cursor").instance, this.#S = this.graph.overlays.get("labels").instance, this.#f = this.graph.overlays.get("overlay").instance, this.graph.addOverlays(this.#m);
+    this.#d = new xt(this, this.#l, i, !1), this.#x = this.graph.overlays.get("cursor").instance, this.#S = this.graph.overlays.get("labels").instance, this.#f = this.graph.overlays.get("overlay").instance, this.graph.addOverlays(this.#m);
   }
   addOverlays(i) {
     if (!isArray(i))
@@ -11915,10 +11915,10 @@ class E0 {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o = [];
   #c;
-  #a = {};
+  #l = {};
   #h;
   #d;
   #u = null;
@@ -11929,17 +11929,17 @@ class E0 {
     return this.#e;
   }
   get list() {
-    return this.#a;
+    return this.#l;
   }
   set collapse(i) {
     this.setCollapse(i);
   }
   get collapse() {
-    return this.#l;
+    return this.#a;
   }
   destroy() {
     this.#n.hub.expunge(this);
-    for (let i in this.#a)
+    for (let i in this.#l)
       i !== "collapse" && this.remove(i);
     this.#e.remove();
   }
@@ -11948,7 +11948,7 @@ class E0 {
   }
   init() {
     const i = this.#e.legends;
-    this.#s = i.querySelector(".controls"), this.#l = i.querySelectorAll(".control"), this.#h = i.querySelector("#showLegends"), this.#d = i.querySelector("#hideLegends"), this.#s.style.display = "none", this.icons(this.#l, { id: "collapse", parent: this }), this.#e.legends.classList.add("hide"), this.#u = "hide", this.collapse = "show";
+    this.#s = i.querySelector(".controls"), this.#a = i.querySelectorAll(".control"), this.#h = i.querySelector("#showLegends"), this.#d = i.querySelector("#hideLegends"), this.#s.style.display = "none", this.icons(this.#a, { id: "collapse", parent: this }), this.#e.legends.classList.add("hide"), this.#u = "hide", this.collapse = "show";
   }
   onPointerClick(i) {
     const s = (n) => E(n.dataset.icon) ? { id: n.id, icon: n.dataset.icon, parent: n.parentElement } : n.parentElement.className !== "controls" ? s(n.parentElement) : !1;
@@ -11981,25 +11981,25 @@ class E0 {
     const n = this.elTarget.buildLegend(i, this.#n.theme);
     this.#e.legends.insertAdjacentHTML("beforeend", n);
     const r = this.#e.legends.querySelector(`#legend_${i.id}`);
-    return this.#c = r.querySelectorAll(".control"), this.#a[i.id] = {
+    return this.#c = r.querySelectorAll(".control"), this.#l[i.id] = {
       el: r,
       type: i.type,
       source: i?.source,
       click: []
-    }, this.icons(this.#c, i), i.type == "indicator" && (this.#s.style.display = "block", !i.parent.primaryPane && Object.keys(this.#a).length < 3 && (this.#s.style.display = "none")), i.id;
+    }, this.icons(this.#c, i), i.type == "indicator" && (this.#s.style.display = "block", !i.parent.primaryPane && Object.keys(this.#l).length < 3 && (this.#s.style.display = "none")), i.id;
   }
   remove(i) {
-    if (!(i in this.#a) || this.#a[i].type === "chart")
+    if (!(i in this.#l) || this.#l[i].type === "chart")
       return !1;
-    this.#a[i].el.remove();
-    for (let s of this.#a[i].click)
+    this.#l[i].el.remove();
+    for (let s of this.#l[i].click)
       s.el.removeEventListener("click", s.click);
-    return delete this.#a[i], Object.keys(this.#a).length < 2 && (this.#s.style.display = "none"), !0;
+    return delete this.#l[i], Object.keys(this.#l).length < 2 && (this.#s.style.display = "none"), !0;
   }
   update(i, s) {
-    if (!T(s) || !(i in this.#a) || this.#n.range.data.length == 0)
+    if (!T(s) || !(i in this.#l) || this.#n.range.data.length == 0)
       return !1;
-    let n = this.#a[i].source(s.pos);
+    let n = this.#l[i].source(s.pos);
     const r = this.#e.buildInputs(n);
     this.#e.legends.querySelector(`#legend_${i} dl`).innerHTML = r;
   }
@@ -12007,7 +12007,7 @@ class E0 {
     let n;
     for (let r of i) {
       let o = r.querySelector("svg");
-      o.style.width = `${this.#r.controlsW}px`, o.style.height = `${this.#r.controlsH}px`, o.style.fill = `${this.#r.controlsColour}`, o.onpointerover = (l) => l.currentTarget.style.fill = this.#r.controlsOver, o.onpointerout = (l) => l.currentTarget.style.fill = this.#r.controlsColour, n = s.parent.onLegendAction.bind(s.parent), s.id === "collapse" ? this.#o.push({ el: r, click: n }) : this.#a[s.id].click.push({ el: r, click: n }), r.addEventListener("click", n);
+      o.style.width = `${this.#r.controlsW}px`, o.style.height = `${this.#r.controlsH}px`, o.style.fill = `${this.#r.controlsColour}`, o.onpointerover = (l) => l.currentTarget.style.fill = this.#r.controlsOver, o.onpointerout = (l) => l.currentTarget.style.fill = this.#r.controlsColour, n = s.parent.onLegendAction.bind(s.parent), s.id === "collapse" ? this.#o.push({ el: r, click: n }) : this.#l[s.id].click.push({ el: r, click: n }), r.addEventListener("click", n);
     }
   }
 }
@@ -12267,10 +12267,10 @@ class N0 {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o;
   #c;
-  #a;
+  #l;
   #h;
   #d;
   #u;
@@ -12355,22 +12355,22 @@ class N0 {
     return Object.fromEntries([...this.#p.overlays.list]);
   }
   get yAxis() {
-    return this.#a;
+    return this.#l;
   }
   set yAxisType(i) {
-    this.#a.yAxisType = YAXIS_TYPES.includes(i) ? i : YAXIS_TYPES[0];
+    this.#l.yAxisType = YAXIS_TYPES.includes(i) ? i : YAXIS_TYPES[0];
   }
   get yAxisType() {
-    return this.#a.yAxisType;
+    return this.#l.yAxisType;
   }
   get yAxisHeight() {
-    return this.#a.height;
+    return this.#l.height;
   }
   get yAxisRatio() {
-    return this.#a.yAxisRatio;
+    return this.#l.yAxisRatio;
   }
   get yAxisGrads() {
-    return this.#a.yAxisGrads;
+    return this.#l.yAxisGrads;
   }
   set graph(i) {
     this.#p = i;
@@ -12397,40 +12397,40 @@ class N0 {
     this.setScaleRange(i);
   }
   get range() {
-    return this.#a.range;
+    return this.#l.range;
   }
   set rangeMode(i) {
-    this.#a.mode = i;
+    this.#l.mode = i;
   }
   get rangeMode() {
-    return this.#a.mode;
+    return this.#l.mode;
   }
   set rangeYFactor(i) {
     this.core.range.yFactor(i);
   }
   set yOffset(i) {
-    this.#a.offset = i;
+    this.#l.offset = i;
   }
   get yOffset() {
-    return this.#a.offset;
+    return this.#l.offset;
   }
   set stateMachine(i) {
-    this.#l = new Ye(i, this);
+    this.#a = new Ye(i, this);
   }
   get stateMachine() {
-    return this.#l;
+    return this.#a;
   }
   get Scale() {
     return this;
   }
   start() {
     const i = this.#s.name == "Chart" ? void 0 : this.#s.localRange;
-    this.#a = new Ci(this, this, this.options.yAxisType, i), this.createGraph(), this.#a.calcGradations(), this.draw(), this.eventsListen();
+    this.#l = new Ci(this, this, this.options.yAxisType, i), this.createGraph(), this.#l.calcGradations(), this.draw(), this.eventsListen();
     const s = ce(P0);
     s.id = this.id, s.context = this, this.stateMachine = s, this.stateMachine.start();
   }
   restart() {
-    this.#a.setRange(this.#r.range), this.draw();
+    this.#l.setRange(this.#r.range), this.draw();
   }
   destroy() {
     this.#r.hub.expunge(this), this.off(`${this.#s.id}_pointerout`, this.#g.erase, this.#g), this.off(Qe, this.onStreamUpdate, this.#v), this.stateMachine.destroy(), this.#p.destroy(), this.#S.destroy(), this.element.remove();
@@ -12472,7 +12472,7 @@ class N0 {
   onStreamUpdate(i) {
   }
   onChartDrag(i) {
-    this.#a.mode === "manual" && (this.#a.offset = i.domEvent.srcEvent.movementY, this.draw());
+    this.#l.mode === "manual" && (this.#l.offset = i.domEvent.srcEvent.movementY, this.draw());
   }
   setHeight(i) {
     this.#h.style.height = `${i}px`;
@@ -12482,19 +12482,19 @@ class N0 {
     this.setHeight(i.h), this.graph instanceof xt && (this.#p.setSize(s, i.h, s), this.draw()), this.#g instanceof go && this.calcPriceDigits();
   }
   setScaleRange(i = 0) {
-    this.#a.mode == "automatic" && (this.#a.mode = "manual"), this.#a.zoom = i, this.draw(this.range, !0), this.#r.MainPane.draw();
+    this.#l.mode == "automatic" && (this.#l.mode = "manual"), this.#l.zoom = i, this.draw(this.range, !0), this.#r.MainPane.draw();
   }
   resetScaleRange() {
-    this.#a.mode = "automatic", this.draw(this.range, !0), this.#r.MainPane.draw();
+    this.#l.mode = "automatic", this.draw(this.range, !0), this.#r.MainPane.draw();
   }
   yPos(i) {
-    return this.#a.yPos(i);
+    return this.#l.yPos(i);
   }
   yPosStream(i) {
-    return this.#a.lastYData2Pixel(i);
+    return this.#l.lastYData2Pixel(i);
   }
   yPos2Price(i) {
-    return this.#a.yPos2Price(i);
+    return this.#l.yPos2Price(i);
   }
   nicePrice(i) {
     let s = xs(i);
@@ -13090,14 +13090,14 @@ class ge extends G {
   #r = null;
   #i = "";
   #s = "";
-  #l;
+  #a;
   #o;
   #c = [0, 0];
-  #a = !1;
+  #l = !1;
   #h;
   #d = { TL: [0, 0], BR: [0, 0] };
   constructor(i, s = !1, n = !1, r, o, l) {
-    super(i, s, n, r, o, l), this.#r = ge.inCnt, this.#n = this.config.ID || J("TX_Tool_") + `_${this.#r}`, this.settings = l?.settings || {}, this.#l = this.core.WidgetsG.insert("ConfigDialogue", W0), this.#l.start(), this.chart, this.eventsListen();
+    super(i, s, n, r, o, l), this.#r = ge.inCnt, this.#n = this.config.ID || J("TX_Tool_") + `_${this.#r}`, this.settings = l?.settings || {}, this.#a = this.core.WidgetsG.insert("ConfigDialogue", W0), this.#a.start(), this.chart, this.eventsListen();
   }
   set id(i) {
     this.#n = De(i);
@@ -13192,10 +13192,10 @@ class ot {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o;
   #c;
-  #a;
+  #l;
   #h;
   #d = "idle";
   #u = {
@@ -13230,9 +13230,9 @@ class ot {
   };
   #H = {};
   constructor(i, s) {
-    if (this.#s = i, this.#a = ot.cnt, !T(s))
+    if (this.#s = i, this.#l = ot.cnt, !T(s))
       return;
-    this.#l = { ...s }, this.#n = this.#l.name, this.#r = this.#l.shortName, this.#i = this.#l.title, this.#h = this.#l.type == "primary" ? "primaryPane" : "secondaryPane", this.#P = this.#l.view, this.#v = this.#l.elements.elScale, this.#o = this.#l.parent, this.#m = this.#l.elements.elTarget, this.#m.id = this.id, this.legend = new E0(this.elLegend, this), this.isPrimary ? (Me.type = "chart", Me.title = this.title, Me.parent = this, Me.source = this.legendInputs.bind(this), this.legend.add(Me), this.yAxisType = "default") : (Me.type = "secondary", Me.title = "", Me.parent = this, Me.source = () => ({ inputs: {}, colours: [], labels: [] }), this.legend.add(Me), this.yAxisType = this.core.indicatorClasses[s.view[0].type].ind.scale);
+    this.#a = { ...s }, this.#n = this.#a.name, this.#r = this.#a.shortName, this.#i = this.#a.title, this.#h = this.#a.type == "primary" ? "primaryPane" : "secondaryPane", this.#P = this.#a.view, this.#v = this.#a.elements.elScale, this.#o = this.#a.parent, this.#m = this.#a.elements.elTarget, this.#m.id = this.id, this.legend = new E0(this.elLegend, this), this.isPrimary ? (Me.type = "chart", Me.title = this.title, Me.parent = this, Me.source = this.legendInputs.bind(this), this.legend.add(Me), this.yAxisType = "default") : (Me.type = "secondary", Me.title = "", Me.parent = this, Me.source = () => ({ inputs: {}, colours: [], labels: [] }), this.legend.add(Me), this.yAxisType = this.core.indicatorClasses[s.view[0].type].ind.scale);
     const n = { ...s };
     n.parent = this, n.chart = this, n.elScale = this.elScale, n.yAxisType = this.yAxisType, this.scale = new N0(this.core, n), this.#d = "init", this.log(`${this.name} instantiated`);
   }
@@ -13252,7 +13252,7 @@ class ot {
     this.#t = De(i);
   }
   get id() {
-    return this.#t || De(`${this.#s.id}-${this.#n}_${this.#a}`);
+    return this.#t || De(`${this.#s.id}-${this.#n}_${this.#l}`);
   }
   get name() {
     return this.#n;
@@ -13285,10 +13285,10 @@ class ot {
     return this.#h === "primaryPane";
   }
   get isPrimary() {
-    return this.#l.view.primary || !1;
+    return this.#a.view.primary || !1;
   }
   get options() {
-    return this.#l;
+    return this.#a;
   }
   get element() {
     return this.#m;
@@ -13941,10 +13941,10 @@ class wo {
   #r;
   #i;
   #s;
-  #l = !1;
+  #a = !1;
   #o;
   #c;
-  #a;
+  #l;
   #h;
   #d;
   #u;
@@ -14057,10 +14057,10 @@ class wo {
     return this.elPrimary.getBoundingClientRect().height;
   }
   get rowsW() {
-    return this.#a.getBoundingClientRect().width;
+    return this.#l.getBoundingClientRect().width;
   }
   get rowsH() {
-    return this.#a.getBoundingClientRect().height;
+    return this.#l.getBoundingClientRect().height;
   }
   get rowMinH() {
     return this.#M;
@@ -14135,12 +14135,12 @@ class wo {
     };
   }
   init(i) {
-    if (this.#i, this.#a = this.#c.rows, this.#h = this.#c.time, this.#v = this.#c.rows.grid, this.#C = this.#c.viewport, this.#u = this.#i.elBody.scale, i.name = "Chart", i.shortName = "Chart", i.parent = this, i.chartData = this.#i.chartData, i.primaryPane = this.#i.primaryPane, i.secondaryPane = this.#i.secondaryPane, i.rangeLimit = this.#i.rangeLimit, i.settings = this.#i.settings, i.elements = {
+    if (this.#i, this.#l = this.#c.rows, this.#h = this.#c.time, this.#v = this.#c.rows.grid, this.#C = this.#c.viewport, this.#u = this.#i.elBody.scale, i.name = "Chart", i.shortName = "Chart", i.parent = this, i.chartData = this.#i.chartData, i.primaryPane = this.#i.primaryPane, i.secondaryPane = this.#i.secondaryPane, i.rangeLimit = this.#i.rangeLimit, i.settings = this.#i.settings, i.elements = {
       ...i.elements,
       ...this.elements
     }, this.#i.theme?.time?.navigation === !1) {
       const s = { height: Mi };
-      this.#i.theme.time = { ...this.#i.theme?.time, ...s }, this.#a.style.height = `calc(100% - ${Mi}px)`;
+      this.#i.theme.time = { ...this.#i.theme?.time, ...s }, this.#l.style.height = `calc(100% - ${Mi}px)`;
     }
     this.#P = new C0(this.#i, i), this.registerChartViews(i), this.#k = S(this.config.buffer) ? this.config.buffer : ki, this.#M = S(this.config.rowMinH) ? this.config.rowMinH : Kn, this.#b = S(this.config.secondaryPaneDefaultH) ? this.config.secondaryPaneDefaultH : Zn, this.rowsOldH = this.rowsH, this.log(`${this.#e} instantiated`);
   }
@@ -14148,7 +14148,7 @@ class wo {
     let i = 0;
     this.#c.start(this.theme), this.#P.start(), this.createGraph();
     const s = this.chart.scale.calcScaleWidth();
-    this.core.elBody.scale.style.width = `${s}px`, this.#C.style.width = `${this.#a.width}px`, this.#f.forEach((n, r) => {
+    this.core.elBody.scale.style.width = `${s}px`, this.#C.style.width = `${this.#l.width}px`, this.#f.forEach((n, r) => {
       n.start(i++), i === 1 && n.Divider.hide();
     }), this.rowsOldH = this.rowsH, this.draw(this.range, !0), this.renderLoop.init({
       graphs: [this.#p],
@@ -14156,7 +14156,7 @@ class wo {
     }), this.renderLoop.start(), this.renderLoop.queueFrame(this.range, [this.#p], !1), this.eventsListen(), os.id = this.id, os.context = this, this.stateMachine = os, this.stateMachine.start();
   }
   destroy() {
-    this.#i.hub.expunge(this), this.renderLoop.stop(), this.#l = !0, this.stateMachine.destroy(), this.#P.destroy(), this.#f.forEach((i, s) => {
+    this.#i.hub.expunge(this), this.renderLoop.stop(), this.#a = !0, this.stateMachine.destroy(), this.#P.destroy(), this.#f.forEach((i, s) => {
       this.#A[s] = !0, i.destroy(), delete this.#A[s];
     }), this.#p.destroy(), this.#L.destroy();
   }
@@ -14173,7 +14173,7 @@ class wo {
     this.draw(this.range, !0);
   }
   eventsListen() {
-    this.#a.tabIndex = 0, this.#a.focus(), this.#L = new Ue(this.#a, { disableContextMenu: !1 }), this.#L.on("keydown", this.onChartKeyDown.bind(this)), this.#L.on("keyup", this.onChartKeyUp.bind(this)), this.#L.on("wheel", this.onMouseWheel.bind(this)), this.#L.on("pointerenter", this.onMouseEnter.bind(this)), this.#L.on("pointerout", this.onMouseOut.bind(this)), this.#L.on("pointerup", this.onChartDragDone.bind(this)), this.#L.on("pointermove", this.onMouseMove.bind(this)), this.on(As, this.onFirstStreamValue, this), this.on(Os, this.onNewStreamValue, this), this.on("setRange", this.onSetRange, this), this.on("scrollUpdate", this.draw, this), this.on("chart_render", this.draw, this), this.on("destroyChartView", this.removeChartPane, this);
+    this.#L = new Ue(this.#l, { disableContextMenu: !1 }), this.#L.on("keydown", this.onChartKeyDown.bind(this)), this.#L.on("keyup", this.onChartKeyUp.bind(this)), this.#L.on("wheel", this.onMouseWheel.bind(this)), this.#L.on("pointerenter", this.onMouseEnter.bind(this)), this.#L.on("pointerout", this.onMouseOut.bind(this)), this.#L.on("pointerup", this.onChartDragDone.bind(this)), this.#L.on("pointermove", this.onMouseMove.bind(this)), this.on(As, this.onFirstStreamValue, this), this.on(Os, this.onNewStreamValue, this), this.on("setRange", this.onSetRange, this), this.on("scrollUpdate", this.draw, this), this.on("chart_render", this.draw, this), this.on("destroyChartView", this.removeChartPane, this);
   }
   on(i, s, n = this) {
     this.#i.on(i, s, n);
@@ -14187,7 +14187,7 @@ class wo {
   onSetRange() {
     if (this.#_ = this.#I, this.#I = this.chart.scale.calcScaleWidth(), this.#_ < this.#I) {
       const i = `${this.#I}px`;
-      this.core.elBody.scale.style.width = i, this.#C.style.width = `calc(100% - ${this.#I}px)`, this.#a.style.width = `calc(100% - ${this.#I}px)`, this.#h.style.width = `calc(100% - ${this.#I}px)`, this.setDimensions();
+      this.core.elBody.scale.style.width = i, this.#C.style.width = `calc(100% - ${this.#I}px)`, this.#l.style.width = `calc(100% - ${this.#I}px)`, this.#h.style.width = `calc(100% - ${this.#I}px)`, this.setDimensions();
     } else
       this.draw();
   }
@@ -14289,15 +14289,15 @@ class wo {
     });
   }
   setDimensions() {
-    this.#a.previousDimensions();
-    let i = this.#a.heightDeltaR, s = Math.round(this.chartH * i), n = this.rowsW, r = this.rowsH, o = Math.round(n * ((100 + this.#k) * 0.01)), l = {
+    this.#l.previousDimensions();
+    let i = this.#l.heightDeltaR, s = Math.round(this.chartH * i), n = this.rowsW, r = this.rowsH, o = Math.round(n * ((100 + this.#k) * 0.01)), l = {
       resizeH: i,
       mainH: this.element.height,
       mainW: this.element.width,
       rowsH: this.rowsH,
       rowsW: this.rowsW
     };
-    this.#i.scrollPos = -1, this.#P.setDimensions({ w: n }), this.#p.setSize(n, r, o), this.#C.style.width = `${n}px`, this.#f.size == 1 && s != this.#a.height ? this.#x.setDimensions({ w: n, h: this.#a.height }) : this.#f.forEach((h, c) => {
+    this.#i.scrollPos = -1, this.#P.setDimensions({ w: n }), this.#p.setSize(n, r, o), this.#C.style.width = `${n}px`, this.#f.size == 1 && s != this.#l.height ? this.#x.setDimensions({ w: n, h: this.#l.height }) : this.#f.forEach((h, c) => {
       s = Math.round(h.viewport.height * i), h.setDimensions({ w: n, h: s });
     }), this.rowsOldH = this.rowsH, this.emit("rowsResize", l), this.draw(void 0, !0);
   }
@@ -14306,7 +14306,7 @@ class wo {
     return i - s;
   }
   registerChartViews(i) {
-    this.#a.previousDimensions();
+    this.#l.previousDimensions();
     const s = this.validateIndicators();
     let n = s[0];
     for (let r of s)
@@ -14335,10 +14335,10 @@ class wo {
         s.indexOf(p) > -1 && p.setDimensions({ w: this.rowsW, h: n[o] });
       }
     let l;
-    this.#a.insertAdjacentHTML(
+    this.#l.insertAdjacentHTML(
       "beforeend",
       this.#c.rowNode(i.type, this.#i)
-    ), l = this.#a.chartPaneSlot.assignedElements().slice(-1)[0], l.style.height = `${r}px`, l.style.width = "100%";
+    ), l = this.#l.chartPaneSlot.assignedElements().slice(-1)[0], l.style.height = `${r}px`, l.style.width = "100%";
     let h;
     this.#o.insertAdjacentHTML(
       "beforeend",
@@ -14814,17 +14814,17 @@ class xo {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o;
   #c = ge;
-  #a;
+  #l;
   #h = {};
   #d = void 0;
   #u;
   #m = { click: [], pointerover: [] };
   #v = [];
   constructor(i, s) {
-    this.#r = i, this.#i = s, this.#l = i.elTools, this.#a = K0 || i.config.tools, this.#o = i.WidgetsG, this.init();
+    this.#r = i, this.#i = s, this.#a = i.elTools, this.#l = K0 || i.config.tools, this.#o = i.WidgetsG, this.init();
   }
   log(i) {
     this.#r.log(i);
@@ -14860,7 +14860,7 @@ class xo {
     return this.dimensions;
   }
   get dimensions() {
-    return D.elementDimPos(this.#l);
+    return D.elementDimPos(this.#a);
   }
   set stateMachine(i) {
     this.#s = new Ye(i, this);
@@ -14869,16 +14869,16 @@ class xo {
     return this.#s;
   }
   init() {
-    this.mount(this.#l), this.log(`${this.#t} instantiated`);
+    this.mount(this.#a), this.log(`${this.#t} instantiated`);
   }
   start() {
     this.initAllTools(), this.addAllTools(), this.eventsListen(), as.id = this.id, as.context = this, this.stateMachine = as, this.stateMachine.start();
   }
   destroy() {
     this.off("setRange", this.onSetRange, this);
-    const i = this.#l.querySelectorAll(".icon-wrapper");
+    const i = this.#a.querySelectorAll(".icon-wrapper");
     for (let s of i)
-      for (let n of this.#a)
+      for (let n of this.#l)
         n.id === id && s.removeEventListener("click", this.#m[id].click), s.removeEventListener("pointerover", this.#m[id].pointerover), s.removeEventListener("pointerout", this.#m[id].pointerout);
     this.stateMachine.destroy();
   }
@@ -14929,14 +14929,14 @@ class xo {
     console.log("Tool deselected:", i);
   }
   mount(i) {
-    i.innerHTML = this.#l.defaultNode(this.#a);
+    i.innerHTML = this.#a.defaultNode(this.#l);
   }
   initAllTools() {
-    const i = this.#l.querySelectorAll(".icon-wrapper");
+    const i = this.#a.querySelectorAll(".icon-wrapper");
     for (let s of i) {
       let n = s.id, r = s.querySelector("svg");
       r.style.fill = Ze.COLOUR_ICON, r.style.width = "90%";
-      for (let o of this.#a)
+      for (let o of this.#l)
         if (o.id === n)
           if (this.#m[n] = {}, this.#m[n].click = this.onIconClick.bind(this), this.#m[n].pointerover = this.onIconOver.bind(this), this.#m[n].pointerout = this.onIconOut.bind(this), s.addEventListener("click", this.#m[n].click), s.addEventListener("pointerover", this.#m[n].pointerover), s.addEventListener("pointerout", this.#m[n].pointerout), o?.sub) {
             let l = {
@@ -15142,10 +15142,10 @@ class J0 extends ue {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o;
   #c;
-  #a;
+  #l;
   #h;
   #d;
   constructor() {
@@ -15156,7 +15156,7 @@ class J0 extends ue {
   connectedCallback() {
     super.connectedCallback(
       () => {
-        document.getElementById("slider-bar"), this.#t = this.shadowRoot.querySelector(".scrollBarWidget"), this.#n = this.shadowRoot.querySelector(".rwdStart"), this.#r = this.shadowRoot.querySelector(".fwdEnd"), this.#i = this.shadowRoot.querySelector(".scrollBar"), this.#s = this.shadowRoot.querySelector(".viewport"), this.#l = this.shadowRoot.querySelector(".handle"), this.#o = this.shadowRoot.querySelectorAll("svg"), this.#c = this.shadowRoot.querySelector("#max"), this.#a = this.shadowRoot.querySelector("#min"), this.#h = this.shadowRoot.querySelectorAll("input"), this.#d = this.shadowRoot.querySelector("style[title=overview]"), this.max.addEventListener("input", this.onChangeSliderHandler.bind({ self: this, input: this.max })), this.min.addEventListener("input", this.onChangeSliderHandler.bind({ self: this, input: this.min }));
+        document.getElementById("slider-bar"), this.#t = this.shadowRoot.querySelector(".scrollBarWidget"), this.#n = this.shadowRoot.querySelector(".rwdStart"), this.#r = this.shadowRoot.querySelector(".fwdEnd"), this.#i = this.shadowRoot.querySelector(".scrollBar"), this.#s = this.shadowRoot.querySelector(".viewport"), this.#a = this.shadowRoot.querySelector(".handle"), this.#o = this.shadowRoot.querySelectorAll("svg"), this.#c = this.shadowRoot.querySelector("#max"), this.#l = this.shadowRoot.querySelector("#min"), this.#h = this.shadowRoot.querySelectorAll("input"), this.#d = this.shadowRoot.querySelector("style[title=overview]"), this.max.addEventListener("input", this.onChangeSliderHandler.bind({ self: this, input: this.max })), this.min.addEventListener("input", this.onChangeSliderHandler.bind({ self: this, input: this.min }));
       }
     );
   }
@@ -15176,7 +15176,7 @@ class J0 extends ue {
     return this.#s;
   }
   get handle() {
-    return this.#l;
+    return this.#a;
   }
   get icons() {
     return this.#o;
@@ -15185,7 +15185,7 @@ class J0 extends ue {
     return this.#c;
   }
   get min() {
-    return this.#a;
+    return this.#l;
   }
   get sliders() {
     return this.#h;
@@ -15466,7 +15466,7 @@ class sm extends ue {
   #r;
   #i;
   #s;
-  #l = [];
+  #a = [];
   #o;
   constructor() {
     super(So);
@@ -15505,7 +15505,7 @@ class sm extends ue {
     this.setTittle(i);
   }
   onSlotChange(i) {
-    this.#l.forEach((s) => s.handler.call(s.context, i));
+    this.#a.forEach((s) => s.handler.call(s.context, i));
   }
   insert(i) {
     this.legends.insertAdjacentHTML("beforeend", i);
@@ -16035,10 +16035,10 @@ class pm extends ue {
   #r;
   #i = Bt;
   #s = Fe;
-  #l;
+  #a;
   #o;
   #c;
-  #a;
+  #l;
   #h;
   #d;
   constructor() {
@@ -16214,15 +16214,15 @@ class fm {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o;
   #c;
-  #a = {};
+  #l = {};
   #h = {};
   #d;
   #u = {};
   constructor(i, s) {
-    this.#n = i, this.#r = s, this.#i = i.elUtils, this.#s = i.config?.utilsBar || gm, this.#o = i.WidgetsG, this.#c = i.indicatorClasses || ao, this.#l = i.config.theme?.utils?.location || "none", (this.#l || this.#l == "none" || !Dr.includes(this.#l)) && (this.#i.style.height = 0, this.core.elBody.style.height = "100%"), this.#i.innerHTML = this.#i.defaultNode(this.#s), this.log(`${this.#e} instantiated`);
+    this.#n = i, this.#r = s, this.#i = i.elUtils, this.#s = i.config?.utilsBar || gm, this.#o = i.WidgetsG, this.#c = i.indicatorClasses || ao, this.#a = i.config.theme?.utils?.location || "none", (this.#a || this.#a == "none" || !Dr.includes(this.#a)) && (this.#i.style.height = 0, this.core.elBody.style.height = "100%"), this.#i.innerHTML = this.#i.defaultNode(this.#s), this.log(`${this.#e} instantiated`);
   }
   log(i) {
     this.#n.log(i);
@@ -16258,7 +16258,7 @@ class fm {
     return this.#d;
   }
   get location() {
-    return this.#l;
+    return this.#a;
   }
   start() {
     this.initAllUtils(), this.eventsListen();
@@ -16343,10 +16343,10 @@ class Ce {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o;
   #c;
-  #a = {};
+  #l = {};
   static menuList = {};
   static menuCnt = 0;
   static class = Cn;
@@ -16364,7 +16364,7 @@ class Ce {
     this.#t = i, this.#n = s.core, this.#r = s, this.#e = s.id, this.#s = i.elements.elMenus, this.#i = this.#n.elWidgetsG, this.mount(this.#s);
   }
   get el() {
-    return this.#l;
+    return this.#a;
   }
   get id() {
     return this.#e;
@@ -16373,7 +16373,7 @@ class Ce {
     return this.dimensions;
   }
   get dimensions() {
-    return D.elementDimPos(this.#l);
+    return D.elementDimPos(this.#a);
   }
   get type() {
     return Ce.type;
@@ -16383,13 +16383,13 @@ class Ce {
   }
   end() {
     this.#s.querySelectorAll(`#${this.id} li`).forEach((s) => {
-      s.removeEventListener("click", this.#a[this.id][s.id]);
-    }), document.removeEventListener("click", this.#a[this.id].outside), this.off("global_resize", this.onResize, this);
+      s.removeEventListener("click", this.#l[this.id][s.id]);
+    }), document.removeEventListener("click", this.#l[this.id].outside), this.off("global_resize", this.onResize, this);
   }
   eventsListen() {
     const i = this.#s.querySelectorAll(`#${this.id} li`);
-    this.#a[this.id] = {}, i.forEach((s) => {
-      this.#a[this.id][s.id] = this.onMenuSelect.bind(this), s.addEventListener("click", this.#a[this.id][s.id]);
+    this.#l[this.id] = {}, i.forEach((s) => {
+      this.#l[this.id][s.id] = this.onMenuSelect.bind(this), s.addEventListener("click", this.#l[this.id][s.id]);
     }), this.on("global_resize", this.onResize, this);
   }
   on(i, s, n = this) {
@@ -16410,20 +16410,20 @@ class Ce {
     this.emit("menuItem_selected", n), this.emit("menu_close", n), this.#n.log(`menu_close: ${this.#e}`);
   }
   onOutsideClickListener(i) {
-    if (!this.#l.contains(i.target) && !this.#r.primary.contains(i.target) && D.isVisible(this.#l)) {
+    if (!this.#a.contains(i.target) && !this.#r.primary.contains(i.target) && D.isVisible(this.#a)) {
       let s = {
         target: i.currentTarget.id,
         menu: this.#e
       };
       this.emit("menu_close", s);
     }
-    document.removeEventListener("click", this.#a[this.id].outside);
+    document.removeEventListener("click", this.#l[this.id].outside);
   }
   onResize() {
     this.position();
   }
   mount(i) {
-    i.lastElementChild == null ? i.innerHTML = this.menuNode() : i.lastElementChild.insertAdjacentHTML("afterend", this.menuNode()), this.#l = this.#s.querySelector(`#${this.id}`);
+    i.lastElementChild == null ? i.innerHTML = this.menuNode() : i.lastElementChild.insertAdjacentHTML("afterend", this.menuNode()), this.#a = this.#s.querySelector(`#${this.id}`);
   }
   static defaultNode() {
     return `
@@ -16449,15 +16449,15 @@ class Ce {
   }
   position() {
     let i = this.#i.getBoundingClientRect(), s = this.#r.primary.getBoundingClientRect(), n = Math.round(s.left - i.left), r = Math.round(s.bottom - i.top);
-    this.#l.style.left = n + "px", this.#l.style.top = r + "px";
-    let o = D.elementDimPos(this.#l);
+    this.#a.style.left = n + "px", this.#a.style.top = r + "px";
+    let o = D.elementDimPos(this.#a);
     if (o.right > this.#i.offsetWidth) {
       let h = Math.floor(this.#i.offsetWidth - o.width);
-      h = H(h, 0, this.#i.offsetWidth), this.#l.style.left = `${h}px`;
+      h = H(h, 0, this.#i.offsetWidth), this.#a.style.left = `${h}px`;
     }
     if (this.#n.MainPane.rowsH + r + o.height > this.#n.MainPane.rowsH) {
       let h = Math.floor(o.height * -1);
-      h = H(h, this.#n.MainPane.rowsH * -1, 0), this.#l.style.top = `${h}px`;
+      h = H(h, this.#n.MainPane.rowsH * -1, 0), this.#a.style.top = `${h}px`;
     }
   }
   remove() {
@@ -16465,12 +16465,12 @@ class Ce {
   open() {
     if (Ce.currentActive === this)
       return !0;
-    Ce.currentActive = this, this.#l.style.display = "block", this.position(), setTimeout(() => {
-      this.#a[this.id].outside = this.onOutsideClickListener.bind(this), document.addEventListener("click", this.#a[this.id].outside);
+    Ce.currentActive = this, this.#a.style.display = "block", this.position(), setTimeout(() => {
+      this.#l[this.id].outside = this.onOutsideClickListener.bind(this), document.addEventListener("click", this.#l[this.id].outside);
     }, 250);
   }
   close() {
-    Ce.currentActive = null, this.#l.style.display = "none", this.emit("menuClosed", this.id);
+    Ce.currentActive = null, this.#a.style.display = "none", this.emit("menuClosed", this.id);
   }
 }
 class at {
@@ -16487,10 +16487,10 @@ class he {
   #r;
   #i = at.closed;
   #s;
-  #l;
+  #a;
   #o;
   #c;
-  #a;
+  #l;
   #h;
   #d;
   #u;
@@ -16519,7 +16519,7 @@ class he {
     he.windowList[i].destroy(), delete he.windowList[i];
   }
   constructor(i, s) {
-    this.#t = i, this.#n = s.core, this.#r = s, this.#e = s.id, this.#l = i.elements.elWindows, this.#s = this.#n.elWidgetsG, this.init();
+    this.#t = i, this.#n = s.core, this.#r = s, this.#e = s.id, this.#a = i.elements.elWindows, this.#s = this.#n.elWidgetsG, this.init();
   }
   get id() {
     return this.#e;
@@ -16552,7 +16552,7 @@ class he {
     return this.#c;
   }
   get elTitle() {
-    return this.#a;
+    return this.#l;
   }
   get elCloseIcon() {
     return this.#h;
@@ -16561,7 +16561,7 @@ class he {
     return this.#d;
   }
   init() {
-    this.mount(this.#l);
+    this.mount(this.#a);
   }
   start() {
     this.eventsListen(), this.close();
@@ -16614,7 +16614,7 @@ class he {
     }, 250);
   }
   mount(i) {
-    i.lastElementChild == null ? i.innerHTML = this.windowNode() : i.lastElementChild.insertAdjacentHTML("afterend", this.windowNode()), this.#o = this.#l.querySelector(`#${this.#r.id}`), this.#c = this.#o.querySelector(".dragBar"), this.#a = this.#o.querySelector(".title"), this.#h = this.#o.querySelector(".closeIcon"), this.#d = this.#o.querySelector(".content"), this.#o.addEventListener("click", this.onWindow.bind(this)), D.isElement(this.#c) && (this.#C = new Ue(this.#c, { disableContextMenu: !1 }), this.#C.on("pointerdrag", this.onDragBar.bind(this)), this.#C.on("pointerdragend", this.onDragBarEnd.bind(this)));
+    i.lastElementChild == null ? i.innerHTML = this.windowNode() : i.lastElementChild.insertAdjacentHTML("afterend", this.windowNode()), this.#o = this.#a.querySelector(`#${this.#r.id}`), this.#c = this.#o.querySelector(".dragBar"), this.#l = this.#o.querySelector(".title"), this.#h = this.#o.querySelector(".closeIcon"), this.#d = this.#o.querySelector(".content"), this.#o.addEventListener("click", this.onWindow.bind(this)), D.isElement(this.#c) && (this.#C = new Ue(this.#c, { disableContextMenu: !1 }), this.#C.on("pointerdrag", this.onDragBar.bind(this)), this.#C.on("pointerdragend", this.onDragBarEnd.bind(this)));
     const s = this.dimensions, n = this.#r?.w || s.w, r = this.#r?.h || s.h;
     this.setDimensions({ w: n, h: r }), this.position();
   }
@@ -16713,7 +16713,7 @@ class he {
   setProperties(i) {
     if (!T(i))
       return !1;
-    if (E(i?.title) && (this.#a.innerHTML = i.title), E(i?.content) && (this.#d.innerHTML = i.content), this.setDimensions({ ...i?.dimensions }), this.position({ ...i?.position }), T(i?.styles)) {
+    if (E(i?.title) && (this.#l.innerHTML = i.title), E(i?.content) && (this.#d.innerHTML = i.content), this.setDimensions({ ...i?.dimensions }), this.position({ ...i?.position }), T(i?.styles)) {
       const s = (n, r) => {
         if (!T(r))
           return !1;
@@ -16795,7 +16795,7 @@ class Le {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o;
   constructor(i, s) {
     this.#t = i, this.#n = s.core, this.#r = s, this.#e = s.id, this.#s = i.elements.elProgress, this.#i = this.#n.elWidgetsG, this.init();
@@ -16809,12 +16809,12 @@ class Le {
   start() {
     if (!T(this.#n.config?.progress) || !T(this.#n.config.progress?.loading))
       return !1;
-    this.#l.style.display = "block";
-    const i = this.#n.elBody.width / 2 - this.#l.clientWidth / 2, s = this.#n.elBody.height / -2 - this.#l.clientHeight / 2;
-    this.#l.style.top = `${s}px`, this.#l.style.left = `${i}px`;
+    this.#a.style.display = "block";
+    const i = this.#n.elBody.width / 2 - this.#a.clientWidth / 2, s = this.#n.elBody.height / -2 - this.#a.clientHeight / 2;
+    this.#a.style.top = `${s}px`, this.#a.style.left = `${i}px`;
   }
   stop() {
-    this.#l.style.display = "none";
+    this.#a.style.display = "none";
   }
   progressNode(i) {
     const s = "position: absolute; z-index: 1000; display: none; justify-content: center; align-items: center;", r = `<div class="content" style="">${i.icon}</div>`;
@@ -16826,7 +16826,7 @@ class Le {
     let s = "loadingBars";
     this.#r?.type in Le.icons && (s = this.#r?.type);
     const n = { type: s, icon: Le.icons[s] };
-    i.lastElementChild == null ? i.innerHTML = this.progressNode(n) : i.lastElementChild.insertAdjacentHTML("afterend", this.progressNode(n)), this.#l = this.#s.querySelector(`#${this.#r.id}`), this.#o = this.#l.querySelector("svg"), this.#o.style.fill = `${bh.COLOUR_ICONHOVER};`;
+    i.lastElementChild == null ? i.innerHTML = this.progressNode(n) : i.lastElementChild.insertAdjacentHTML("afterend", this.progressNode(n)), this.#a = this.#s.querySelector(`#${this.#r.id}`), this.#o = this.#a.querySelector("svg"), this.#o.style.fill = `${bh.COLOUR_ICONHOVER};`;
   }
 }
 const ls = {
@@ -16887,15 +16887,15 @@ class wm {
   #r;
   #i;
   #s;
-  #l;
+  #a;
   #o = { Divider: de, Progress: Le, Menu: Ce, Window: he, Dialogue: Ui, ConfigDialogue: vm };
   #c = {};
-  #a = {};
+  #l = {};
   #h;
   #d;
   #u;
   constructor(i, s) {
-    this.#r = i, this.#i = s, this.#l = { ...this.#o, ...s.widgets }, this.#h = i.elWidgetsG, this.init();
+    this.#r = i, this.#i = s, this.#a = { ...this.#o, ...s.widgets }, this.#h = i.elWidgetsG, this.init();
   }
   log(i) {
     this.#r.log(i);
@@ -16928,7 +16928,7 @@ class wm {
     return this.#i;
   }
   get elements() {
-    return this.#a;
+    return this.#l;
   }
   get instances() {
     return this.#c;
@@ -16940,13 +16940,13 @@ class wm {
     return this.#s;
   }
   get types() {
-    return this.#l;
+    return this.#a;
   }
   init() {
     this.mount(this.#h);
-    for (let i in this.#l) {
-      let s = this.#l[i], n = `el${s.name}`;
-      this.#a[n] = this.#h.querySelector(`.${s.class}`);
+    for (let i in this.#a) {
+      let s = this.#a[i], n = `el${s.name}`;
+      this.#l[n] = this.#h.querySelector(`.${s.class}`);
     }
   }
   start() {
@@ -16956,8 +16956,8 @@ class wm {
     this.#r.hub.expunge(this), this.stateMachine.destroy();
     for (let i in this.#c)
       this.delete(i);
-    for (let i in this.#l)
-      this.#l[i].destroy(id);
+    for (let i in this.#a)
+      this.#a[i].destroy(id);
   }
   eventsListen() {
     this.on("resize", this.onResize, this), this.on("menu_open", this.onOpenMenu, this), this.on("menu_close", this.onCloseMenu, this), this.on("menu_off", this.onCloseMenu, this), this.on("menuItem_selected", this.onMenuItemSelected, this), this.on("global_resize", this.onResize, this);
@@ -17000,21 +17000,21 @@ class wm {
   }
   defaultNode() {
     let i = "", s = [];
-    for (let n in this.#l) {
-      let r = this.#l[n];
+    for (let n in this.#a) {
+      let r = this.#a[n];
       s.indexOf(r.type) === -1 && (i += r.defaultNode(), s.push(r.type));
     }
     return i;
   }
   insert(i, s) {
-    if (!(i in this.#l) || !T(s))
+    if (!(i in this.#a) || !T(s))
       return !1;
     s.core = this.core;
-    const n = this.#l[i].create(this, s);
+    const n = this.#a[i].create(this, s);
     return this.#c[n.id] = n, n;
   }
   delete(i) {
-    return isString(i) ? (this.#l[type].destroy(i), !0) : !1;
+    return isString(i) ? (this.#a[type].destroy(i), !0) : !1;
   }
 }
 function gr(a, i, s, n, r, o) {
@@ -17080,10 +17080,10 @@ class I extends pm {
   static #r = {};
   static #i = null;
   static #s = !1;
-  static #l = [];
+  static #a = [];
   static #o = null;
   static #c = null;
-  static #a = !1;
+  static #l = !1;
   static get version() {
     return I.#e;
   }
@@ -17094,7 +17094,7 @@ class I extends pm {
     return I.#s;
   }
   static get talibAwait() {
-    return I.#l;
+    return I.#a;
   }
   static get talibError() {
     return I.#o;
@@ -17194,7 +17194,7 @@ class I extends pm {
     }), (typeof s.talib != "object" || typeof s.talib.init != "function") && (I.#s = !1, I.#o = new Error(`${I.#h}`)), !I.#s && I.#o === null && (I.#i = s.talib.init(s.wasm), I.#i.then(
       () => {
         I.#s = !0;
-        for (let n of I.#l)
+        for (let n of I.#a)
           B(n) && n();
       },
       () => {
