@@ -32,9 +32,9 @@ export default class element extends HTMLElement {
   constructor (template, mode="open") {
     super()
 
+    this.#hub = new EventHub()
     this.template = template
     this.shadowRoot = this.attachShadow({mode: mode})
-    this.#hub = new EventHub()
   }
 
   destroy() {
@@ -155,6 +155,7 @@ export default class element extends HTMLElement {
   * @returns {boolean}
   */
   on(topic, handler, context=this) {
+    if (!(this.#hub instanceof EventHub)) return false
     return this.#hub.on(topic, handler, context)
   }
 
@@ -166,6 +167,7 @@ export default class element extends HTMLElement {
   * @returns {boolean}
   */
   off(topic, handler, context=this) {
+    if (!(this.#hub instanceof EventHub)) return false
     return this.#hub.off(topic, handler, context)
   }
 
@@ -175,6 +177,7 @@ export default class element extends HTMLElement {
    * @memberof EventHub
    */
   expunge(context) {
+    if (!(this.#hub instanceof EventHub)) return false
     return this.#hub.expunge(context)
     }
 
@@ -185,6 +188,7 @@ export default class element extends HTMLElement {
   * @returns {boolean}
   */
   emit(topic, data) {
+    if (!(this.#hub instanceof EventHub)) return false
     return this.#hub.emit(topic, data)
   }
 
