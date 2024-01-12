@@ -25,6 +25,8 @@ export default class Indicator extends Overlay {
 
   static #cnt = 0
   static get cnt() { return ++Indicator.#cnt }
+  static get isIndicator() { return true }
+
 
   #ID
   #cnt_
@@ -92,7 +94,7 @@ export default class Indicator extends Overlay {
   set style(s) { this.#style = s }
   get style() { return this.#style }
   set position(p) { this.target.setPosition(p[0], p[1]) }
-  get isIndicator() { return true }
+  get isIndicator() { return Indicator.isIndicator }
   get status() { return this.#status }
   get drawOnUpdate() { return this.#drawOnUpdate }
   set drawOnUpdate(u) { if (u === true) this.#drawOnUpdate = true }

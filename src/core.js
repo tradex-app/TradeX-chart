@@ -1251,7 +1251,7 @@ export default class TradeXchart extends Tradex_chart {
       isClass(i) &&
       isFunction(i.prototype?.draw) &&
       "primaryPane" in i.prototype &&
-      Object.getPrototypeOf(i.prototype).constructor.name === "Indicator"
+      !!i?.isIndicator
     )
   }
 
