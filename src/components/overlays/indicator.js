@@ -5,7 +5,7 @@ import Overlay from "./overlay"
 import { Range } from "../../model/range"
 import { limit } from "../../utils/number"
 import { isArray, isBoolean, isFunction, isObject, isString } from "../../utils/typeChecks"
-import { idSanitize } from "../../utils/utilities"
+import { idSanitize, uid } from "../../utils/utilities"
 import { STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
 
@@ -49,7 +49,18 @@ export default class Indicator extends Overlay {
   #style = {}
   #legendID
   #status
-  #drawOnUpdate = false
+  #ConfigDialogue
+
+  definition = {
+    input: {},
+    output: {},
+    meta: {
+      input: {},
+      output: {}
+    }
+  }
+  style = {}
+
 
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
 
@@ -61,15 +72,24 @@ export default class Indicator extends Overlay {
     this.#TALib = this.core.TALib
     this.#range = this.xAxis.range
 
+    const overlay = params.overlay
+
+    this.id = params.overlay?.id || uid(this.shortName)
+    this.style = (overlay?.settings?.style) ? 
+    {...this.constructor.defaultStyle, ...overlay.settings.style} : 
+    {...this.constructor.defaultStyle, ...config.style};
+
+    const content = ""
+    const cfg = { title: `${this.shortName} Config`, content: "", params, parent: this }
+    // this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
+    // this.#ConfigDialogue.contentUpdate({content})
+    // this.#ConfigDialogue.start()
+
     this.eventsListen()
   }
 
   get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
   set id(id) { this.#ID = idSanitize(id) }
-  get name() { return this.#name }
-  set name(n) { this.#name = n }
-  get shortName() { return this.#shortName }
-  set shortName(n) { this.#shortName = n }
   get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
   get chartPaneID() { return this.#params.overlay.paneID }
   get primaryPane() { return this.#primaryPane }
@@ -96,8 +116,9 @@ export default class Indicator extends Overlay {
   set position(p) { this.target.setPosition(p[0], p[1]) }
   get isIndicator() { return Indicator.isIndicator }
   get status() { return this.#status }
-  get drawOnUpdate() { return this.#drawOnUpdate }
-  set drawOnUpdate(u) { if (u === true) this.#drawOnUpdate = true }
+  get primaryPane() { return this.constructor.primaryPane }
+  get configDialogue() { return this.#ConfigDialogue }
+
 
   /**
    * process candle value
@@ -502,7 +523,7 @@ export default class Indicator extends Overlay {
         }
         this.overlay.data = Object.values(r)
 
-        this.#drawOnUpdate = true
+        this.setRefresh()
       }
     }
     if (this.core.TALibReady) calc()
@@ -591,12 +612,8 @@ export default class Indicator extends Overlay {
   draw() {
   }
 
-  mustUpdate() {
-    return (this.#drawOnUpdate) ? this.#drawOnUpdate : super.mustUpdate()
-  }
-
   updated() {
-    this.#drawOnUpdate = false
+    this.setRefresh()
     super.updated()
   }
 }

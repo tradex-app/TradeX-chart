@@ -14,22 +14,15 @@ export default class Test extends Indicator {
   // static scale is required for off chart indicators
   // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
   static colours = []
-
-
-
-  name = "Test Custom Inicator"
-  shortName = "Test"
-
-  timePeriod = 20
-
-  #defaultStyle = {
+  static defaultStyle = {
     stroke: "#0088cc",
     lineWidth: "1",
     dash: undefined,
   }
 
-  style = {}
-
+  name = "Test Custom Inicator"
+  shortName = "Test"
+  timePeriod = 20
 
   /**
    * Creates an instance of Test.
@@ -44,13 +37,6 @@ export default class Test extends Indicator {
   constructor(target, xAxis=false, yAxis=false, config, parent, params) {
     super(target, xAxis, yAxis, config, parent, params)
 
-    const overlay = params.overlay
-    // initialize indicator values
-    this.id = params.overlay?.id || uid(this.shortName)
-    // merge user defined settings (if any) with defaults
-    this.style = (overlay?.settings?.style) 
-      ? { ...this.#defaultStyle, ...overlay.settings.style } 
-      : { ...this.#defaultStyle, ...config.style }
     // calculate back history if missing
     this.calcIndicatorHistory()
     // enable processing of price stream
@@ -58,15 +44,6 @@ export default class Test extends Indicator {
     // add the indicator legend to the chart pane
     this.addLegend()
   }
-
-  /**
-   * define where indicator should be displayed
-   * @returns {boolean|string} valid returned values can be: true, false (boolean), both (string)
-   */
-  get primaryPane() { return Test.primaryPane }
-  /** @returns {Object} */
-  get defaultStyle() { return this.#defaultStyle }
-
 
   /**
    * return inputs required to display indicator legend on chart pane

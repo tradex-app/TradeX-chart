@@ -2,6 +2,7 @@
 // <tradex-widgets></tradex-widgets>
 
 import element from "./classes/element"
+import tradeXColourPicker from "./colourPicker"
 
 const template = document.createElement('template')
 template.innerHTML = `

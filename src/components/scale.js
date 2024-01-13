@@ -2,7 +2,7 @@
 // Scale bar that lives on the side of the chart
 
 import { isArray, isObject } from '../utils/typeChecks'
-import DOM from "../utils/DOM"
+import { elementDimPos } from "../utils/DOM"
 import yAxis from "./axis/yAxis"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
@@ -103,7 +103,7 @@ export default class ScaleBar {
   set graph(g) { this.#Graph = g }
   get graph() { return this.#Graph }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#element) }
+  get dimensions() { return elementDimPos(this.#element) }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
   get digitCnt() { return this.#digitCnt }

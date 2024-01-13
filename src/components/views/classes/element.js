@@ -5,7 +5,7 @@ import { SHORTNAME, CSSUNITS } from "../../../definitions/core"
 import { uid } from "../../../utils/utilities"
 import { isFunction, isNumber, isString } from "../../../utils/typeChecks"
 import EventHub from "../../../utils/eventHub"
-import DOM from "../../../utils/DOM"
+import { isInViewport, isVisible } from "../../../utils/DOM"
 
 export default class element extends HTMLElement {
 
@@ -75,7 +75,7 @@ export default class element extends HTMLElement {
 //    this.mutationObserver.disconnect()
     this.resizeObserver.disconnect()
 //    this.intersectionObserver.disconnect()
-    this.#hub = undefined
+    // this.#hub = undefined
   }
 
   get width() { return this.DOM.width }
@@ -121,8 +121,8 @@ export default class element extends HTMLElement {
       if (!isFunction(v))
         this.DOM[k] = v
     }
-    this.DOM.visible = DOM.isVisible(this)
-    this.DOM.viewport = DOM.isInViewport(this)
+    this.DOM.visible = isVisible(this)
+    this.DOM.viewport = isInViewport(this)
     
     return this.DOM
   }

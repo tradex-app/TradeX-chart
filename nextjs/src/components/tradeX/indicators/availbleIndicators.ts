@@ -37,6 +37,12 @@ const AVAILABLE_INDICATORS: IIndicators = {
     event: "addIndicator",
     ind: undefined,
   },
+  VOL: {
+    id: "VOL",
+    name: "Volume",
+    event: "addIndicator",
+    ind: undefined,
+  },
   SR: {
     id: "SR",
     name: "SR",

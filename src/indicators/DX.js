@@ -6,7 +6,6 @@
 import Indicator from "../components/overlays/indicator"
 import { DX as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
-import { uid } from "../utils/utilities"
 
 
 export default class DX extends Indicator {
@@ -22,7 +21,16 @@ export default class DX extends Indicator {
 
     },
   }
-  #defaultStyle = {
+  precision = 2
+  scaleOverlay = true
+  plots = [
+    { key: 'DX_1', title: ' ', type: 'line' },
+  ]
+
+  static inCnt = 0
+  static primaryPane = false
+  static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
+  static defaultStyle = {
     stroke: "#C80",
     width: '1',
     defaultHigh: 75,
@@ -33,16 +41,6 @@ export default class DX extends Indicator {
     lowStroke: "#848",
     highLowRangeStyle: "#22002220"
   }
-  precision = 2
-  scaleOverlay = true
-  plots = [
-    { key: 'DX_1', title: ' ', type: 'line' },
-  ]
-
-  static inCnt = 0
-  static primaryPane = false
-  static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
-
 
   /**
  * Creates an instance of DX.
@@ -58,11 +56,7 @@ export default class DX extends Indicator {
 
     super(target, xAxis, yAxis, config, parent, params)
 
-    const overlay = params.overlay
-
-    this.id = params.overlay?.id || uid(this.shortName)
-    this.defineIndicator(overlay?.settings, talibAPI)
-    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
+    this.defineIndicator(params.overlay?.settings, talibAPI)
     // calculate back history if missing
     this.calcIndicatorHistory()
     // enable processing of price stream
@@ -70,10 +64,6 @@ export default class DX extends Indicator {
     this.setUpdateValue = (value) => { this.updateValue(value) }
     this.addLegend()
   }
-
-  get primaryPane() { return DX.primaryPane }
-  get defaultStyle() { return this.#defaultStyle }
-
 
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false

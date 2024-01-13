@@ -1,7 +1,7 @@
 // timeLine.js
 // Timeline bar that lives at the bottom of the chart
 
-import DOM from "../utils/DOM"
+import { elementDimPos } from "../utils/DOM"
 import xAxis from "./axis/xAxis"
 import Input from "../input"
 import StateMachine from "../scaleX/stateMachne"
@@ -112,7 +112,7 @@ export default class Timeline {
   get navigation() { return this.#navigation }
   get range() { return this.#core.range }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#element) }
+  get dimensions() { return elementDimPos(this.#element) }
   get bufferPx() { return this.#core.bufferPx }
   get scrollPos() { return this.#core.scrollPos }
   get scrollOffsetPx() { return this.#core.scrollPos % this.candleW }

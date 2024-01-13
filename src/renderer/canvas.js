@@ -36,8 +36,14 @@ import {
 import { 
   renderCircle,
 } from "./circle"
-import { isNumber, isString } from "../utils/typeChecks"
-import { CanvasStyle } from "../definitions/style"
+import { 
+  renderCheckerBoard 
+} from "./checkered"
+import { 
+  fillStroke,
+  linearGradient
+} from "./fill"
+
 
 /**
  * Get screen ratio
@@ -48,24 +54,7 @@ export function getPixelRatio (canvas) {
   return (canvas.ownerDocument && canvas.ownerDocument.defaultView && canvas.ownerDocument.defaultView.devicePixelRatio) || 2
 }
 
-/**
- * Fill and Stroke a Path
- * @param {canvas} ctx - HTML Canvas
- * @param {string} fill - colour #rrggbb(aa)
- * @param {string} stroke - colour #rrggbb(aa)
- * @param {number} with - pixel stroke width
- */
-export function fillStroke(ctx, fill, stroke, width) {
-  if (isString(fill)) {
-    ctx.fillStyle = fill
-    ctx.fill()
-  }
-  if (isNumber(width) && width > 0) {
-    ctx.lineWidth = width
-    ctx.strokeStyle = stroke || CanvasStyle.stroke
-    ctx.stroke()
-  }
-}
+
 
 /**
  * Draw image to canvas
@@ -158,6 +147,7 @@ export default {
   getChannel,
   getPixelRatio,
   fillStroke,
+  linearGradient,
   calcTextWidth,
   createFont,
   getTextRectHeight,
@@ -183,4 +173,5 @@ export default {
   renderPolygonIrregular,
   renderDiamond,
   renderTriangle,
+  renderCheckerBoard,
 }

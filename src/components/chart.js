@@ -4,7 +4,7 @@
 // Providing: the playground for price movements, indicators and drawing tools
 
 
-import DOM from "../utils/DOM";
+import { elementDimPos } from "../utils/DOM";
 import { limit } from "../utils/number"
 import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks";
 import { copyDeep, idSanitize, xMap } from "../utils/utilities";
@@ -206,7 +206,7 @@ export default class Chart {
   get options() { return this.#options }
   get element() { return this.#elTarget }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elTarget) }
+  get dimensions() { return elementDimPos(this.#elTarget) }
   set width(w) { this.setWidth(w) }
   get width() { return this.#elTarget.getBoundingClientRect().width }
   set height(h) { this.setHeight(h) }
@@ -295,8 +295,8 @@ export default class Chart {
     this.#Divider = this.core.WidgetsG.insert("Divider", cfg)
     this.#Divider.start()
     // cfg = {dragBar, closeIcon, title, content, position, styles}
-    const content = `config the chart`
-    cfg = { title: "Chart Config", content }
+    const content = `Configure chart ${this.id}`
+    cfg = { title: "Chart Config", content, parent: this }
     this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
     this.#ConfigDialogue.start()
     this.#status = "running"
@@ -404,9 +404,9 @@ export default class Chart {
 
   onChartDrag(e) {
     this.cursor = "grab"
-    if (this.scale.yAxis.mode == "manual") {
-      this.#Graph.drawAll()
-    }
+    // if (this.scale.yAxis.mode == "manual") {
+    //   this.#Graph.drawAll()
+    // }
     this.core.MainPane.onChartDrag(e)
     this.scale.onChartDrag(e)
   }

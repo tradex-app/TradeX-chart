@@ -5,9 +5,6 @@
 
 import Indicator from "../components/overlays/indicator"
 import { SMA as talibAPI } from "../definitions/talib-api";
-import { YAXIS_TYPES } from "../definitions/chart";
-import { bRound, limit, round } from "../utils/number";
-import { uid } from "../utils/utilities"
 
  
  export default class SMA extends Indicator {
@@ -24,10 +21,7 @@ import { uid } from "../utils/utilities"
       output: [],
     },
   }
-  #defaultStyle = {
-    stroke: "#C80",
-    width: '1'
-  }
+
   #precision = 2
   primaryPane = true
   scaleOverlay = false
@@ -45,7 +39,10 @@ import { uid } from "../utils/utilities"
     "#66BB6A",
     "#66BB6A"
   ]
-
+  static defaultStyle = {
+    stroke: "#C80",
+    width: '1'
+  }
 
   /**
    * Creates an instance of SMA.
@@ -62,11 +59,8 @@ import { uid } from "../utils/utilities"
     super(target, xAxis, yAxis, config, parent, params) 
 
     SMA.inCnt++
-    const overlay = params.overlay
 
-    this.id = params.overlay?.id || uid(this.shortName)
-    this.defineIndicator(overlay?.settings, talibAPI)
-    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
+    this.defineIndicator(params.overlay?.settings, talibAPI)
     // calculate back history if missing
     this.calcIndicatorHistory()
     // enable processing of price stream
@@ -74,10 +68,6 @@ import { uid } from "../utils/utilities"
     this.setUpdateValue = (value) => { this.updateValue(value) }
     this.addLegend()
   }
-
-  get primaryPane() { return SMA.primaryPane }
-  get defaultStyle() { return this.#defaultStyle }
-
 
   updateLegend() {
     this.parent.legend.update()

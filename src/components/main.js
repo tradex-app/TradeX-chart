@@ -2,7 +2,7 @@
 // Main Pane that holds the chart and off chart indicators
 // Providing: chart, off chart indicators
 
-import DOM from "../utils/DOM"
+import { elementDimPos } from "../utils/DOM"
 import Timeline from './timeline'
 import Graph from "./views/classes/graph"
 import renderLoop from "./views/classes/renderLoop"
@@ -15,7 +15,7 @@ import Divider from "./widgets/divider"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-main"
 import Input from "../input"
-import { isArray, isBoolean, isNumber, isObject, isString } from "../utils/typeChecks"
+import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks"
 import { copyDeep, valuesInArray, xMap } from "../utils/utilities"
 
 import {
@@ -105,6 +105,7 @@ export default class MainPane {
   #scaleW = 0
   #scaleWOld = 0
 
+
   constructor (core, options) {
 
     this.#core = core
@@ -145,7 +146,7 @@ export default class MainPane {
   get rowMinH() { return this.#rowMinH }
   set rowMinH(h) { if (isNumber(h)) this.#rowMinH = Math.abs(h) }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elMain) }
+  get dimensions() { return elementDimPos(this.#elMain) }
   get range() { return this.#core.range }
   set cursor(c) { this.element.style.cursor = c }
   get cursor() { return this.element.style.cursor }

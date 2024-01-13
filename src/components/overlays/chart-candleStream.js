@@ -4,7 +4,7 @@ import Overlay from "./overlay"
 import Candle from "../primitives/candle";
 import { renderLineHorizontal } from "../../renderer/line"
 import { CandleType, PriceLineStyle } from "../../definitions/style";
-import { isArray, isObject } from "../../utils/typeChecks";
+import { isArray, isString } from "../../utils/typeChecks";
 
 export default class chartCandleStream extends Overlay {
 
@@ -111,7 +111,7 @@ export default class chartCandleStream extends Overlay {
           fill.addColorStop(index, value)
         }
       }
-      else if (isString())
+      else if (isString(cfg.candle.AreaFillColour))
         fill = cfg.candle.AreaFillColour
       else
         fill = cfg.candle.UpBodyColour || cfg.candle.DnBodyColour

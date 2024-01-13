@@ -2,7 +2,7 @@
 // Utils bar that lives at the top of the chart
 // Providing: timeframes, indicators, config, refresh, save, load
 
-import DOM from "../utils/DOM"
+import { elementDimPos, findBySelectorAll, findTargetParentWithClass } from "../utils/DOM"
 import { UtilsStyle } from "../definitions/style"
 import { CLASS_UTILS } from "../definitions/core"
 import { UTILSLOCATIONS } from "../definitions/chart"
@@ -62,7 +62,7 @@ export default class UtilsBar {
   get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elUtils) }
+  get dimensions() { return elementDimPos(this.#elUtils) }
   get stateMachine() { return this.#stateMachine }
   get location() { return this.#location }
 
@@ -79,7 +79,7 @@ export default class UtilsBar {
     // this.stateMachine.destroy()
     // remove event listeners
     const api = this.#core
-    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
+    const utils = findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
 
     for (let util of utils) {
       let id = util.id.replace('TX_', '')
@@ -117,7 +117,7 @@ export default class UtilsBar {
   onIconClick(e) {
     // if (!isObject(e.originalTarget)) return false
 
-    const target = DOM.findTargetParentWithClass(e.target, "icon-wrapper")
+    const target = findTargetParentWithClass(e.target, "icon-wrapper")
     if (!isObject(target)) return false
     const now = Date.now()
     if (now - this.#timers[target.id] < 1000) return false

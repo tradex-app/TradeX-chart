@@ -1,7 +1,7 @@
 // path.js
 
 import { isArray, isFunction } from "../utils/typeChecks"
-import { fillStroke } from "./canvas";
+import { fillStroke } from "./fill";
 
 
 /**

@@ -32,6 +32,7 @@ export default class Overlay {
     resize: false
   }
 
+
   id
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params={}) {
@@ -42,7 +43,7 @@ export default class Overlay {
     this.#target = target
     this.#scene = target.scene
     this.#hit = target.hit
-    this.#theme = {...this.#core.theme, ...theme}
+    // this.#theme = {...this.#core.theme, ...theme}
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#params = params
@@ -63,7 +64,7 @@ export default class Overlay {
   get state() { return this.#core.state }
   get scene() { return this.#scene }
   get hit() { return this.#hit }
-  get theme() { return this.#theme }
+  get theme() { return this.#core.theme }
   get chart() { return this.#parent.parent.parent }
   get chartData() { return this.#config.state.allData.data }
   get xAxis() { return this.getXAxis() }

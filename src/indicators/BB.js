@@ -5,8 +5,6 @@
 
 import Indicator from "../components/overlays/indicator"
 import { BBANDS as talibAPI } from "../definitions/talib-api";
-import { YAXIS_TYPES } from "../definitions/chart";
-import { uid } from "../utils/utilities"
 
 
 export default class BB extends Indicator {
@@ -26,8 +24,22 @@ export default class BB extends Indicator {
       middleBand: [],
       upperBand: []
     },
+    meta: {
+      nbDevDn: 2,
+      nbDevUp: 2,
+      timePeriod: 5,
+    }
   }
-  #defaultStyle = {
+
+  precision = 2
+  scaleOverlay = false
+  plots = [
+    { key: 'BB_1', title: ' ', type: 'line' },
+  ]
+
+  static inCnt = 0
+  static primaryPane = true
+  static defaultStyle = {
     lowerStroke: "#08c",
     lowerLineWidth: '1',
     lowerLineDash: undefined,
@@ -39,15 +51,6 @@ export default class BB extends Indicator {
     upperLineDash: undefined,
     fillStyle: "#0080c044"
   }
-  precision = 2
-  scaleOverlay = false
-  plots = [
-    { key: 'BB_1', title: ' ', type: 'line' },
-  ]
-
-  static inCnt = 0
-  static primaryPane = true
-  // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
 
   /**
  * Creates an instance of BB.
@@ -62,12 +65,8 @@ export default class BB extends Indicator {
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
     super(target, xAxis, yAxis, config, parent, params)
 
-    const overlay = params.overlay
-    
     // initialize indicator values
-    this.id = params.overlay?.id || uid(this.shortName)
-    this.defineIndicator(overlay?.settings, talibAPI)
-    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
+    this.defineIndicator(params.overlay?.settings, talibAPI)
     // calculate back history if missing
     this.calcIndicatorHistory()
     // enable processing of price stream
@@ -75,14 +74,6 @@ export default class BB extends Indicator {
     this.setUpdateValue = (value) => { this.updateValue(value) }
     this.addLegend()
   }
-
-  /**
-   * define where indicator should be displayed
-   * valid returned values can be: true, false (boolean), both (string)
-   * @readonly
-   */
-  get primaryPane() { return BB.primaryPane }
-  get defaultStyle() { return this.#defaultStyle }
 
   /**
    * return inputs required to display indicator legend on chart pane

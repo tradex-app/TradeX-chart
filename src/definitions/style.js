@@ -86,6 +86,9 @@ export const WindowStyle = {
   COLOUR_BG: COLOUR_BG,
   COLOUR_BORDER: COLOUR_BORDER,
   COLOUR_TXT: COLOUR_TXT,
+  SHADOW: "rgb(0,0,0) 0px 20px 30px -10px",
+  CONTENT: "padding: 1em",
+  TITLE: "padding: 2px 1em 5px; background: #333; white-space: nowrap;"
 }
 
 export const ProgressStyle = {
@@ -311,6 +314,7 @@ export const defaultTheme = {
     line: DividerStyle.LINE,
     style: DividerStyle.STYLE
   },
+  window: WindowStyle,
   watermark: watermark,
   trades: {
     iconBuy: tradeIcons.arrowUp,

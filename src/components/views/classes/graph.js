@@ -53,7 +53,7 @@ export default class graph {
   get width() { return this.#elParent.width }
   set height(h) { this.setHeight(h) }
   get height() { return this.#elParent.height }
-  get dimensions() { return DOM.this.#elParent.dimensions }
+  get dimensions() { return this.#elParent.dimensions }
   set layerWidth(w) { this.#layerWidth = w || this.#elParent.width }
   get layerWidth() { return this.#layerWidth }
   get stateMachine() { return this.#parent.stateMachine }
@@ -176,12 +176,15 @@ export default class graph {
     this.executeOverlayList(fn)
   }
 
+  /**
+   * flag all overlays / indicators to be redrawn
+   */
   drawAll() {
     const fn = (k, o) => {
       // is it a valid overlay?
       if (!(o.instance instanceof Overlay)) return
 
-      const update = o.instance.mustUpdate()
+      o.instance.setRefresh()
     }
     this.executeOverlayList(fn)
   }

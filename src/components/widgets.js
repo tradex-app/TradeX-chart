@@ -10,7 +10,7 @@ import Progress from "./widgets/progress"
 import Window from "./widgets/window"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-widgets"
-import { isObject } from "../utils/typeChecks"
+import { isBoolean, isObject, isString } from "../utils/typeChecks"
 import { idSanitize } from "../utils/utilities"
 
 export default class Widgets {
@@ -22,7 +22,7 @@ export default class Widgets {
   #options
   #stateMachine
 
-  #widgets
+  #widgets = {}
   #widgetsList = { Divider, Progress, Menu, Window, Dialogue, ConfigDialogue }
   #widgetsInstances = {}
   #elements = {}
@@ -35,6 +35,7 @@ export default class Widgets {
 
     this.#core = core
     this.#options = options
+    // TODO: valiation of options.widgets
     this.#widgets = {...this.#widgetsList, ...options.widgets}
     this.#elWidgetsG = core.elWidgetsG
     this.init()
@@ -175,18 +176,32 @@ export default class Widgets {
     return nodes
   }
 
+  /**
+   * insert a widget into the list
+   * @param {string} type 
+   * @param {object} config 
+   * @returns {Widget} - widget instance
+   */
   insert(type, config) {
     if (!(type in this.#widgets) || !isObject(config)) return false
 
     config.core = this.core
+
+    // create the widget
     const widget = this.#widgets[type].create(this, config)
     this.#widgetsInstances[widget.id] = widget
     return widget
   }
 
+  /**
+   * delete a widget from the list
+   * @param {string} id 
+   * @returns {boolean}
+   */
   delete(id) {
-    if (!isString(id)) return false
+    if (!isString(id) || !(id in this.#widgetsInstances)) return false
 
+    const type = this.#widgetsInstances[id].type
     this.#widgets[type].destroy(id)
     return true
   }

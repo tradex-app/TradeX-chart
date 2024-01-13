@@ -3,7 +3,7 @@
 import { createFont, getTextRectHeight, getTextRectWidth } from "../../renderer/text"
 import { renderImage } from "../../renderer/canvas"
 import { isObject, isString } from "../../utils/typeChecks"
-import DOM from "../../utils/DOM"
+import { isImage } from "../../utils/DOM"
 import Overlay from "./overlay"
 import { CHART_MINH } from "../../definitions/style"
 
@@ -32,7 +32,7 @@ export default class chartWatermark extends Overlay {
 
     if ( watermark?.imgURL ) {
       this.watermark.imgURL = watermark.imgURL
-      DOM.isImage(watermark?.imgURL, this.renderImage.bind(this))
+      isImage(watermark?.imgURL, this.renderImage.bind(this))
     }
     else if ( isString(watermark?.text) ) {
       this.watermark.text = watermark.text

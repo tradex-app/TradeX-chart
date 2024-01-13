@@ -5,7 +5,7 @@ import { renderLineHorizontal } from "../renderer/line"
 import { renderRectFill } from "../renderer/rect"
 import { renderText } from "../renderer/text"
 import { isFunction, isObject } from "./typeChecks"
-import DOM from "./DOM"
+import { isImage } from "./DOM"
 
 /**
  * 
@@ -122,7 +122,7 @@ export default function exportImage(core, dest, type, quality, output, watermark
 
   // apply watermark if any
   if (isObject(watermark)) {
-    DOM.isImage(watermark?.imgURL).then((r) => {
+    isImage(watermark?.imgURL).then((r) => {
       outputImage(r)
     }).catch((e) => {
       console.error(e)

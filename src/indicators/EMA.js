@@ -5,9 +5,6 @@
 
 import Indicator from "../components/overlays/indicator"
 import { EMA as talibAPI } from "../definitions/talib-api";
-import { YAXIS_TYPES } from "../definitions/chart";
-import { bRound, limit, round } from "../utils/number";
-import { uid } from "../utils/utilities"
 
  
  export default class EMA extends Indicator {
@@ -23,11 +20,13 @@ import { uid } from "../utils/utilities"
     output: {
       output: [],
     },
+    meta: {
+      input: {
+        timePeriod: 30,
+      }
+    }
   }
-  #defaultStyle = {
-    stroke: "#C80",
-    width: '1'
-  }
+
   precision = 2
   checkParamCount = false
   scaleOverlay = false
@@ -38,13 +37,16 @@ import { uid } from "../utils/utilities"
 
   static inCnt = 0
   static primaryPane = true
-  // static scale = YAXIS_TYPES[0] // defualt
   static colours = [
     "#9C27B0",
     "#9C27B0",
     "#66BB6A",
     "#66BB6A"
   ]
+  static defaultStyle = {
+    stroke: "#C80",
+    width: '1'
+  }
 
 
   /**
@@ -59,14 +61,11 @@ import { uid } from "../utils/utilities"
    */
   constructor(target, xAxis=false, yAxis=false, config, parent, params) {
     
-    super(target, xAxis, yAxis, config, parent, params) 
+    super(target, xAxis, yAxis, config, parent, params)
 
     EMA.inCnt++
-    const overlay = params.overlay
 
-    this.id = params.overlay?.id || uid(this.shortName)
-    this.defineIndicator(overlay?.settings, talibAPI)
-    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
+    this.defineIndicator(params.overlay?.settings, talibAPI)
     // calculate back history if missing
     this.calcIndicatorHistory()
     // enable processing of price stream
@@ -74,10 +73,6 @@ import { uid } from "../utils/utilities"
     this.setUpdateValue = (value) => { this.updateValue(value) }
     this.addLegend()
   }
-
-  get primaryPane() { return EMA.primaryPane }
-  get defaultStyle() { return this.#defaultStyle }
-
 
   updateLegend() {
     this.parent.legend.update()
@@ -91,6 +86,31 @@ import { uid } from "../utils/utilities"
     inputs.EMA_1 = this.scale.nicePrice(this.overlay.data[c][1])
 
     return {inputs, colours}
+  }
+
+  configInputs() {
+    // id, label, type, value, default, placeholder, class, max, min, step, onchange, disabled, visible, description
+    const inputs = {
+      period: {
+        label: `Period`,
+        type: 'number',
+        value: this.definition.input.timePeriod,
+        "data-oldval": this.definition.input.timePeriod,
+        default: 30,
+        min: '3',
+        class: ``,
+        title: `Number of time units to use in calculation`,
+        $function: 
+          this.configDialogue.provideEventListener("#Period", "change", 
+          (e)=>{
+            console.log(`#Period = ${e.target.value}`)
+          })
+      }
+    }
+
+    const style = this.buildConfigStyleTab()
+
+    return {inputs, style}
   }
 
   /**

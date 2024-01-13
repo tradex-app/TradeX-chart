@@ -2,7 +2,7 @@
 // Tools bar
 // Providing: chart drawing tools
 
-import DOM from "../utils/DOM"
+import { elementDimPos } from "../utils/DOM"
 import tools from "../definitions/tools"
 import Tool from "./overlays/chart-tools"
 import StateMachine from "../scaleX/stateMachne"
@@ -59,7 +59,7 @@ export default class ToolsBar {
   get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elTools) }
+  get dimensions() { return elementDimPos(this.#elTools) }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
 

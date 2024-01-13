@@ -25,15 +25,6 @@ export default class AROON extends Indicator {
       aroonUp: []
     }
   }
-  #defaultStyle = {
-    downStroke: "#c80",
-    downLineWidth: '1',
-    downLineDash: undefined,
-    upStroke: "#08c",
-    upLineWidth: '1',
-    upLineDash: undefined,
-    fillStyle: "#0080c044"
-  }
   precision = 2
   scaleOverlay = true
   plots = [
@@ -43,6 +34,15 @@ export default class AROON extends Indicator {
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
+  static defaultStyle = {
+    downStroke: "#c80",
+    downLineWidth: '1',
+    downLineDash: undefined,
+    upStroke: "#08c",
+    upLineWidth: '1',
+    upLineDash: undefined,
+    fillStyle: "#0080c044"
+  }
 
   /**
     * Creates an instance of AROON.
@@ -56,12 +56,7 @@ export default class AROON extends Indicator {
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
     super(target, xAxis, yAxis, config, parent, params)
 
-    const overlay = params.overlay
-    
-    // initialize indicator values
-    this.id = params.overlay?.id || uid(this.shortName)
-    this.defineIndicator(overlay?.settings, talibAPI)
-    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
+    this.defineIndicator(params.overlay?.settings, talibAPI)
     // calculate back history if missing
     this.calcIndicatorHistory()
     // enable processing of price stream
@@ -69,14 +64,6 @@ export default class AROON extends Indicator {
     this.setUpdateValue = (value) => { this.updateValue(value) }
     this.addLegend()
   }
-
-  /**
-   * define where indicator should be displayed
-   * valid returned values can be: true, false (boolean), both (string)
-   * @readonly
-   */
-  get primaryPane() { return AROON.primaryPane }
-  get defaultStyle() { return this.#defaultStyle }
 
   /**
    * return inputs required to display indicator legend on chart pane
