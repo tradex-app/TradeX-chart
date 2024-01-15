@@ -1,6 +1,6 @@
 // menu.js
 
-import DOM from "../../utils/DOM"
+import { elementDimPos, isVisible } from "../../utils/DOM"
 import { CLASS_MENUS, CLASS_MENU } from "../../definitions/core"
 import { MenuStyle } from "../../definitions/style"
 import { limit } from "../../utils/number"
@@ -62,7 +62,7 @@ export default class Menu {
   get el() { return this.#elMenu }
   get id() { return this.#id }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elMenu) }
+  get dimensions() { return elementDimPos(this.#elMenu) }
   get type() { return Menu.type }
 
   start() {
@@ -124,7 +124,7 @@ export default class Menu {
   onOutsideClickListener(e) {
     if (!this.#elMenu.contains(e.target) 
     && (!this.#config.primary.contains(e.target)) 
-    && DOM.isVisible(this.#elMenu)) {
+    && isVisible(this.#elMenu)) {
       let data = {
         target: e.currentTarget.id, 
         menu: this.#id,
@@ -196,7 +196,7 @@ export default class Menu {
     this.#elMenu.style.top = top + "px"
 
     // adjust positioning if clipped
-    let pos = DOM.elementDimPos(this.#elMenu)
+    let pos = elementDimPos(this.#elMenu)
     // adjust horizontal positioning if clipped
     if (pos.right > this.#elWidgetsG.offsetWidth) {
       let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width)

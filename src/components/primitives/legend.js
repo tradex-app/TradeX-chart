@@ -1,7 +1,7 @@
 // legend.js
 
 import { isObject, isString } from "../../utils/typeChecks"
-import { uid } from "../../utils/utilities"
+import { debounce, uid } from "../../utils/utilities"
 import Input from "../../input"
 
 const userSelect = [
@@ -138,11 +138,12 @@ export default class Legends {
    * @memberof Legends
    */
   add(options) {
-    if (!isObject(options) || !("title" in options)) return false
+    if (!isObject(options)) return false
 
     const parentError = () => {this.#core.error("ERROR: Legend parent missing!")}
     options.id = options?.id || uid("legend")
     options.type = options?.type || "overlay"
+    options.title = options?.title || options?.parent.legendName
     options.parent = options?.parent || parentError
 
     const html = this.elTarget.buildLegend(options, this.#core.theme)

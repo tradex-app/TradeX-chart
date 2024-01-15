@@ -42,6 +42,7 @@ export default class chartTrades extends Overlay {
     this.settings = params.settings
     this.#trade = new Trade(target, theme)
     this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this)
+    tradeDialogue.parent = this
     this.#dialogue = this.core.WidgetsG.insert("Dialogue", tradeDialogue)
     this.#dialogue.start()
   }

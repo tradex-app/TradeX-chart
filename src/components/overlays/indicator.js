@@ -32,6 +32,7 @@ export default class Indicator extends Overlay {
   #cnt_
   #name
   #shortName
+  #legendName
   #primaryPane
   #chartPane
   #scaleOverlay
@@ -75,12 +76,14 @@ export default class Indicator extends Overlay {
     const overlay = params.overlay
 
     this.id = params.overlay?.id || uid(this.shortName)
+    this.legendName = params.overlay?.legendName
     this.style = (overlay?.settings?.style) ? 
     {...this.constructor.defaultStyle, ...overlay.settings.style} : 
     {...this.constructor.defaultStyle, ...config.style};
 
     const content = ""
     const cfg = { title: `${this.shortName} Config`, content: "", params, parent: this }
+    // this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
     // this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
     // this.#ConfigDialogue.contentUpdate({content})
     // this.#ConfigDialogue.start()
@@ -89,7 +92,9 @@ export default class Indicator extends Overlay {
   }
 
   get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
-  set id(id) { this.#ID = idSanitize(id) }
+  set id(id) { this.#ID = idSanitize(new String(id)) }
+  get legendName() { return this.#legendName ||  this.shortName || this.#ID }
+  set legendName(l) { this.#legendName = (isString(l)) ? l : this.shortName || this.#ID }
   get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
   get chartPaneID() { return this.#params.overlay.paneID }
   get primaryPane() { return this.#primaryPane }
@@ -333,7 +338,7 @@ export default class Indicator extends Overlay {
   addLegend() {
     let legend = {
       id: this.id,
-      title: this.shortName,
+      title: this.legendName,
       type: "indicator",
       parent: this,
       source: this.legendInputs.bind(this)

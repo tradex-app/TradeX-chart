@@ -109,6 +109,7 @@ export default class RSI extends Indicator {
         type: 'number',
         value: this.definition.input.timePeriod,
         "data-oldval": this.definition.input.timePeriod,
+        "data-default": this.definition.input.timePeriod,
         default: 5,
         min: '3',
         class: ``,

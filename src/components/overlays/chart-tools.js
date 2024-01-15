@@ -75,6 +75,7 @@ export default class chartTools extends Overlay {
     // this.#name = config.name
     this.settings = params?.settings || {}
     // this.target.addTool(this)
+    toolsDialogue.parent = this
     this.#configDialogue = this.core.WidgetsG.insert("ConfigDialogue", toolsDialogue)
     this.#configDialogue.start()
     this.chart
