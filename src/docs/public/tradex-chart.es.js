@@ -4261,12 +4261,6 @@ class Le extends F {
   set id(i) {
     this.#t = _e(new String(i));
   }
-  get legendName() {
-    return this.#i || this.shortName || this.#t;
-  }
-  set legendName(i) {
-    this.#i = E(i) ? i : this.shortName || this.#t;
-  }
   get chartPane() {
     return this.core.ChartPanes.get(this.chartPaneID);
   }
@@ -4306,8 +4300,17 @@ class Le extends F {
   get overlay() {
     return this.#d;
   }
+  get legend() {
+    return this.chart.legend.list[this.#f];
+  }
   get legendID() {
     return this.#f;
+  }
+  get legendName() {
+    return this.#i || this.shortName || this.#t;
+  }
+  set legendName(i) {
+    this.setLegendName(i);
   }
   get indicator() {
     return this.#u;
@@ -4358,6 +4361,9 @@ class Le extends F {
   }
   get value() {
     return this.#x;
+  }
+  setLegendName(i) {
+    this.#i = E(i) ? i : this.shortName || this.#t, this.chart.legend.modify(this.#f, { legendName: i });
   }
   destroy() {
     if (this.#C !== "destroyed") {
@@ -9840,7 +9846,7 @@ const Mo = {
   SMA: { id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: sn },
   STOCH: { id: "STOCH", name: "Stochastic Oscillator", event: "addIndicator", ind: R0 },
   VOL: { id: "VOL", name: "Volume", event: "addIndicator", ind: nn }
-}, rn = "0.142.5";
+}, rn = "0.142.6";
 class D0 {
   #e;
   #t;
@@ -12153,6 +12159,16 @@ class hm {
     let n = this.#l[i].source(s.pos);
     const r = this.#e.buildInputs(n);
     this.#e.legends.querySelector(`#legend_${i} dl`).innerHTML = r;
+  }
+  modify(i, s) {
+    if (!(i in this.#l) || !S(s))
+      return !1;
+    for (let n in s)
+      switch (n) {
+        case "legendName":
+          const o = this.#l[i].el.querySelectorAll(".title");
+          return o[0].innerHTML = s[n], o[1].innerHTML = s[n], !0;
+      }
   }
   icons(i, s) {
     let n;

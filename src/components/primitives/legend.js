@@ -203,6 +203,22 @@ export default class Legends {
     this.#elTarget.legends.querySelector(`#legend_${id} dl`).innerHTML = html
   }
 
+  modify(id, properties) {
+    if (!(id in this.#list) ||
+        !(isObject(properties))) return false
+
+    for (let p in properties) {
+      switch (p) {
+        case "legendName" :
+          const el = this.#list[id].el
+          const title = el.querySelectorAll(".title")
+          title[0].innerHTML = properties[p]
+          title[1].innerHTML = properties[p]
+          return true;
+      }
+    }
+  }
+
   icons(icons, options) {
     let click
 

@@ -93,8 +93,6 @@ export default class Indicator extends Overlay {
 
   get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
   set id(id) { this.#ID = idSanitize(new String(id)) }
-  get legendName() { return this.#legendName ||  this.shortName || this.#ID }
-  set legendName(l) { this.#legendName = (isString(l)) ? l : this.shortName || this.#ID }
   get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
   get chartPaneID() { return this.#params.overlay.paneID }
   get primaryPane() { return this.#primaryPane }
@@ -108,7 +106,10 @@ export default class Indicator extends Overlay {
   get scale() { return this.parent.scale }
   get type() { return this.#type }
   get overlay() { return this.#overlay }
+  get legend() { return this.chart.legend.list[this.#legendID] }
   get legendID() { return this.#legendID }
+  get legendName() { return this.#legendName ||  this.shortName || this.#ID }
+  set legendName(n) { this.setLegendName(n) }
   get indicator() { return this.#indicator }
   get TALib() { return this.#TALib }
   get range() { return this.core.range }
@@ -146,6 +147,11 @@ export default class Indicator extends Overlay {
   }
   get value() {
     return this.#value
+  }
+
+  setLegendName(name) {
+    this.#legendName = (isString(name)) ? name : this.shortName || this.#ID
+    this.chart.legend.modify(this.#legendID, { legendName: name })
   }
 
   destroy() {
