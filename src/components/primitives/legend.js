@@ -207,13 +207,18 @@ export default class Legends {
     if (!(id in this.#list) ||
         !(isObject(properties))) return false
 
+    const el = this.#list[id].el
+
     for (let p in properties) {
       switch (p) {
         case "legendName" :
-          const el = this.#list[id].el
           const title = el.querySelectorAll(".title")
           title[0].innerHTML = properties[p]
           title[1].innerHTML = properties[p]
+          return true;
+        case "legendVisibility" :
+          const display = (!!properties[p]) ? "block" : "none";
+          el.style.display = display
           return true;
       }
     }

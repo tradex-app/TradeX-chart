@@ -77,6 +77,7 @@ export default class Indicator extends Overlay {
 
     this.id = params.overlay?.id || uid(this.shortName)
     this.legendName = params.overlay?.legendName
+    this.legendVisibility = !!params.overlay?.legendVisibility || true
     this.style = (overlay?.settings?.style) ? 
     {...this.constructor.defaultStyle, ...overlay.settings.style} : 
     {...this.constructor.defaultStyle, ...config.style};
@@ -110,6 +111,7 @@ export default class Indicator extends Overlay {
   get legendID() { return this.#legendID }
   get legendName() { return this.#legendName ||  this.shortName || this.#ID }
   set legendName(n) { this.setLegendName(n) }
+  set legendVisibility(v) { this.setLegendVisibility(v) }
   get indicator() { return this.#indicator }
   get TALib() { return this.#TALib }
   get range() { return this.core.range }
@@ -152,6 +154,10 @@ export default class Indicator extends Overlay {
   setLegendName(name) {
     this.#legendName = (isString(name)) ? name : this.shortName || this.#ID
     this.chart.legend.modify(this.#legendID, { legendName: name })
+  }
+
+  setLegendVisibility(v) {
+    this.chart.legend.modify(this.#legendID, { legendVisibility: !!v })
   }
 
   destroy() {
