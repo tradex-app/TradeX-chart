@@ -67278,6 +67278,7 @@ export default {
         {
             "name": "RSI, 20",
             "type": "RSI",
+            "legendName": "Sepcial RSI",
             "data": [
                 [
                     1543644000000,

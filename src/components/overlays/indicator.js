@@ -33,6 +33,7 @@ export default class Indicator extends Overlay {
   #name
   #shortName
   #legendName
+  #legendVisibility
   #primaryPane
   #chartPane
   #scaleOverlay
@@ -77,13 +78,13 @@ export default class Indicator extends Overlay {
 
     this.id = params.overlay?.id || uid(this.shortName)
     this.legendName = params.overlay?.legendName
-    this.legendVisibility = !!params.overlay?.legendVisibility || true
+    this.#legendVisibility = (isBoolean(params.overlay?.legendVisibility)) ? params.overlay.legendVisibility : true
     this.style = (overlay?.settings?.style) ? 
     {...this.constructor.defaultStyle, ...overlay.settings.style} : 
     {...this.constructor.defaultStyle, ...config.style};
 
     const content = ""
-    const cfg = { title: `${this.shortName} Config`, content: "", params, parent: this }
+    const cfg = { title: `${this.legendName} Config`, content: "", params, parent: this }
     // this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
     // this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
     // this.#ConfigDialogue.contentUpdate({content})
@@ -157,6 +158,7 @@ export default class Indicator extends Overlay {
   }
 
   setLegendVisibility(v) {
+    this.#legendVisibility = !!v
     this.chart.legend.modify(this.#legendID, { legendVisibility: !!v })
   }
 
@@ -351,6 +353,7 @@ export default class Indicator extends Overlay {
     let legend = {
       id: this.id,
       title: this.legendName,
+      visible: this.#legendVisibility,
       type: "indicator",
       parent: this,
       source: this.legendInputs.bind(this)

@@ -27,7 +27,7 @@ function S(a) {
 function T(a) {
   return typeof a == "number" && !isNaN(a);
 }
-function Q(a) {
+function X(a) {
   return typeof a == "boolean";
 }
 function E(a) {
@@ -390,7 +390,7 @@ var Rr = { exports: {} };
     function oe(u, m) {
       return u === r ? m : u;
     }
-    function K(u, m, g) {
+    function Z(u, m, g) {
       L(ut(m), function(v) {
         u.addEventListener(v, g, !1);
       });
@@ -432,8 +432,8 @@ var Rr = { exports: {} };
         var I = m ? u[M][m] : u[M];
         je(b, I) < 0 && v.push(u[M]), b[M] = I, M++;
       }
-      return g && (m ? v = v.sort(function(Z, se) {
-        return Z[m] > se[m];
+      return g && (m ? v = v.sort(function(Q, se) {
+        return Q[m] > se[m];
       }) : v = v.sort()), v;
     }
     function ii(u, m) {
@@ -463,7 +463,7 @@ var Rr = { exports: {} };
       handler: function() {
       },
       init: function() {
-        this.evEl && K(this.element, this.evEl, this.domHandler), this.evTarget && K(this.target, this.evTarget, this.domHandler), this.evWin && K(ln(this.element), this.evWin, this.domHandler);
+        this.evEl && Z(this.element, this.evEl, this.domHandler), this.evTarget && Z(this.target, this.evTarget, this.domHandler), this.evWin && Z(ln(this.element), this.evWin, this.domHandler);
       },
       destroy: function() {
         this.evEl && ae(this.element, this.evEl, this.domHandler), this.evTarget && ae(this.target, this.evTarget, this.domHandler), this.evWin && ae(ln(this.element), this.evWin, this.domHandler);
@@ -480,8 +480,8 @@ var Rr = { exports: {} };
     function la(u, m) {
       var g = u.session, v = m.pointers, b = v.length;
       g.firstInput || (g.firstInput = dn(m)), b > 1 && !g.firstMultiple ? g.firstMultiple = dn(m) : b === 1 && (g.firstMultiple = !1);
-      var M = g.firstInput, I = g.firstMultiple, j = I ? I.center : M.center, Z = m.center = mn(v);
-      m.timeStamp = f(), m.deltaTime = m.timeStamp - M.timeStamp, m.angle = Yi(j, Z), m.distance = ri(j, Z), ha(g, m), m.offsetDirection = gn(m.deltaX, m.deltaY);
+      var M = g.firstInput, I = g.firstMultiple, K = I ? I.center : M.center, Q = m.center = mn(v);
+      m.timeStamp = f(), m.deltaTime = m.timeStamp - M.timeStamp, m.angle = Yi(K, Q), m.distance = ri(K, Q), ha(g, m), m.offsetDirection = gn(m.deltaX, m.deltaY);
       var se = pn(m.deltaTime, m.deltaX, m.deltaY);
       m.overallVelocityX = se.x, m.overallVelocityY = se.y, m.overallVelocity = p(se.x) > p(se.y) ? se.x : se.y, m.scale = I ? da(I.pointers, v) : 1, m.rotation = I ? ua(I.pointers, v) : 0, m.maxPointers = g.prevInput ? m.pointers.length > g.prevInput.maxPointers ? m.pointers.length : g.prevInput.maxPointers : m.pointers.length, ca(g, m);
       var Ue = u.element;
@@ -498,13 +498,13 @@ var Rr = { exports: {} };
       }), m.deltaX = b.x + (g.x - v.x), m.deltaY = b.y + (g.y - v.y);
     }
     function ca(u, m) {
-      var g = u.lastInterval || m, v = m.timeStamp - g.timeStamp, b, M, I, j;
+      var g = u.lastInterval || m, v = m.timeStamp - g.timeStamp, b, M, I, K;
       if (m.eventType != le && (v > ra || g.velocity === r)) {
-        var Z = m.deltaX - g.deltaX, se = m.deltaY - g.deltaY, Ue = pn(v, Z, se);
-        M = Ue.x, I = Ue.y, b = p(Ue.x) > p(Ue.y) ? Ue.x : Ue.y, j = gn(Z, se), u.lastInterval = m;
+        var Q = m.deltaX - g.deltaX, se = m.deltaY - g.deltaY, Ue = pn(v, Q, se);
+        M = Ue.x, I = Ue.y, b = p(Ue.x) > p(Ue.y) ? Ue.x : Ue.y, K = gn(Q, se), u.lastInterval = m;
       } else
-        b = g.velocity, M = g.velocityX, I = g.velocityY, j = g.direction;
-      m.velocity = b, m.velocityX = M, m.velocityY = I, m.direction = j;
+        b = g.velocity, M = g.velocityX, I = g.velocityY, K = g.direction;
+      m.velocity = b, m.velocityX = M, m.velocityY = I, m.direction = K;
     }
     function dn(u) {
       for (var m = [], g = 0; g < u.pointers.length; )
@@ -596,13 +596,13 @@ var Rr = { exports: {} };
     }
     $(qi, we, {
       handler: function(m) {
-        var g = this.store, v = !1, b = m.type.toLowerCase().replace("ms", ""), M = fa[b], I = ya[m.pointerType] || m.pointerType, j = I == At, Z = je(g, m.pointerId, "pointerId");
-        M & ie && (m.button === 0 || j) ? Z < 0 && (g.push(m), Z = g.length - 1) : M & (G | le) && (v = !0), !(Z < 0) && (g[Z] = m, this.callback(this.manager, M, {
+        var g = this.store, v = !1, b = m.type.toLowerCase().replace("ms", ""), M = fa[b], I = ya[m.pointerType] || m.pointerType, K = I == At, Q = je(g, m.pointerId, "pointerId");
+        M & ie && (m.button === 0 || K) ? Q < 0 && (g.push(m), Q = g.length - 1) : M & (G | le) && (v = !0), !(Q < 0) && (g[Q] = m, this.callback(this.manager, M, {
           pointers: g,
           changedPointers: [m],
           pointerType: I,
           srcEvent: m
-        }), v && g.splice(Z, 1));
+        }), v && g.splice(Q, 1));
       }
     });
     var va = {
@@ -656,18 +656,18 @@ var Rr = { exports: {} };
       var g = ti(u.touches), v = this.targetIds;
       if (m & (ie | tt) && g.length === 1)
         return v[g[0].identifier] = !0, [g, g];
-      var b, M, I = ti(u.changedTouches), j = [], Z = this.target;
+      var b, M, I = ti(u.changedTouches), K = [], Q = this.target;
       if (M = g.filter(function(se) {
-        return ye(se.target, Z);
+        return ye(se.target, Q);
       }), m === ie)
         for (b = 0; b < M.length; )
           v[M[b].identifier] = !0, b++;
       for (b = 0; b < I.length; )
-        v[I[b].identifier] && j.push(I[b]), m & (G | le) && delete v[I[b].identifier], b++;
-      if (j.length)
+        v[I[b].identifier] && K.push(I[b]), m & (G | le) && delete v[I[b].identifier], b++;
+      if (K.length)
         return [
-          an(M.concat(j), "identifier", !0),
-          j
+          an(M.concat(K), "identifier", !0),
+          K
         ];
     }
     var Ea = 2500, wn = 25;
@@ -739,8 +739,8 @@ var Rr = { exports: {} };
         }
         var v = this.actions, b = ve(v, st) && !li[st], M = ve(v, kt) && !li[kt], I = ve(v, Dt) && !li[Dt];
         if (b) {
-          var j = u.pointers.length === 1, Z = u.distance < 2, se = u.deltaTime < 250;
-          if (j && Z && se)
+          var K = u.pointers.length === 1, Q = u.distance < 2, se = u.deltaTime < 250;
+          if (K && Q && se)
             return;
         }
         if (!(I && M) && (b || M && g & He || I && g & it))
@@ -1008,8 +1008,8 @@ var Rr = { exports: {} };
             return this.failTimeout();
           var M = this.pTime ? u.timeStamp - this.pTime < m.interval : !0, I = !this.pCenter || ri(this.pCenter, u.center) < m.posThreshold;
           this.pTime = u.timeStamp, this.pCenter = u.center, !I || !M ? this.count = 1 : this.count += 1, this._input = u;
-          var j = this.count % m.taps;
-          if (j === 0)
+          var K = this.count % m.taps;
+          if (K === 0)
             return this.hasRequireFailures() ? (this._timer = x(function() {
               this.state = ze, this.tryEmit();
             }, m.interval, this), xe) : ze;
@@ -1182,7 +1182,7 @@ var Rr = { exports: {} };
       Pinch: Zi,
       Rotate: Ji,
       Press: Qi,
-      on: K,
+      on: Z,
       off: ae,
       each: L,
       merge: fe,
@@ -1920,10 +1920,10 @@ class Ve {
     return this.#c;
   }
   set panX(i) {
-    Q(i) && (this.#l = i);
+    X(i) && (this.#l = i);
   }
   set panY(i) {
-    Q(y) && (this.#h = y);
+    X(y) && (this.#h = y);
   }
   set wheeldelta(i) {
     this.#d = i.delta;
@@ -1938,7 +1938,7 @@ class Ve {
     return !!(E(i) || U(s));
   }
   validOptions(i) {
-    return S(i) && Q(i) ? i : void 0;
+    return S(i) && X(i) ? i : void 0;
   }
   on(i, s, n, r = !1) {
     if (!this.isValid(i, s))
@@ -3992,8 +3992,8 @@ class Ps {
       volumeMinIdx: re,
       volumeMaxIdx: fe
     };
-    function oe(K, ae, ye) {
-      return Math.min(ye, Math.max(ae, K));
+    function oe(Z, ae, ye) {
+      return Math.min(ye, Math.max(ae, Z));
     }
   }
   snapshot(i, s) {
@@ -4232,15 +4232,16 @@ class Le extends F {
   #u;
   #m;
   #v;
-  #f;
-  #x = [0, 0];
-  #w;
-  #p;
-  #T = 2;
-  #P = {};
   #g;
-  #C;
+  #T;
+  #w = [0, 0];
+  #p;
   #S;
+  #P = 2;
+  #f = {};
+  #x;
+  #C;
+  #I;
   definition = {
     input: {},
     output: {},
@@ -4251,9 +4252,9 @@ class Le extends F {
   };
   style = {};
   constructor(i, s = !1, n = !1, r, o, l) {
-    super(i, s, n, void 0, o, l), this.#s = F.cnt, this.#h = l, this.#d = l.overlay, this.#v = this.core.TALib, this.#f = this.xAxis.range;
+    super(i, s, n, void 0, o, l), this.#s = F.cnt, this.#d = l, this.#u = l.overlay, this.#g = this.core.TALib, this.#T = this.xAxis.range;
     const h = l.overlay;
-    this.id = l.overlay?.id || Pe(this.shortName), this.legendName = l.overlay?.legendName, this.legendVisibility = !!l.overlay?.legendVisibility || !0, this.style = h?.settings?.style ? { ...this.constructor.defaultStyle, ...h.settings.style } : { ...this.constructor.defaultStyle, ...r.style }, `${this.shortName}`, this.eventsListen();
+    this.id = l.overlay?.id || Pe(this.shortName), this.legendName = l.overlay?.legendName, this.#o = X(l.overlay?.legendVisibility) ? l.overlay.legendVisibility : !0, this.style = h?.settings?.style ? { ...this.constructor.defaultStyle, ...h.settings.style } : { ...this.constructor.defaultStyle, ...r.style }, `${this.legendName}`, this.eventsListen();
   }
   get id() {
     return this.#t || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#s}`;
@@ -4265,28 +4266,28 @@ class Le extends F {
     return this.core.ChartPanes.get(this.chartPaneID);
   }
   get chartPaneID() {
-    return this.#h.overlay.paneID;
+    return this.#d.overlay.paneID;
   }
   get primaryPane() {
-    return this.#o;
+    return this.#a;
   }
   set primaryPane(i) {
-    this.#o = i;
+    this.#a = i;
   }
   get scaleOverlay() {
-    return this.#c;
-  }
-  set scaleOverlay(i) {
-    this.#c = i;
-  }
-  get plots() {
     return this.#l;
   }
-  set plots(i) {
+  set scaleOverlay(i) {
     this.#l = i;
   }
-  get params() {
+  get plots() {
     return this.#h;
+  }
+  set plots(i) {
+    this.#h = i;
+  }
+  get params() {
+    return this.#d;
   }
   get Timeline() {
     return this.core.Timeline;
@@ -4295,16 +4296,16 @@ class Le extends F {
     return this.parent.scale;
   }
   get type() {
-    return this.#m;
+    return this.#v;
   }
   get overlay() {
-    return this.#d;
+    return this.#u;
   }
   get legend() {
-    return this.chart.legend.list[this.#g];
+    return this.chart.legend.list[this.#x];
   }
   get legendID() {
-    return this.#g;
+    return this.#x;
   }
   get legendName() {
     return this.#i || this.shortName || this.#t;
@@ -4316,31 +4317,31 @@ class Le extends F {
     this.setLegendVisibility(i);
   }
   get indicator() {
-    return this.#u;
+    return this.#m;
   }
   get TALib() {
-    return this.#v;
+    return this.#g;
   }
   get range() {
     return this.core.range;
   }
   set setNewValue(i) {
-    this.#w = i;
-  }
-  set setUpdateValue(i) {
     this.#p = i;
   }
+  set setUpdateValue(i) {
+    this.#S = i;
+  }
   set precision(i) {
-    this.#T = i;
-  }
-  get precision() {
-    return this.#T;
-  }
-  set style(i) {
     this.#P = i;
   }
-  get style() {
+  get precision() {
     return this.#P;
+  }
+  set style(i) {
+    this.#f = i;
+  }
+  get style() {
+    return this.#f;
   }
   set position(i) {
     this.target.setPosition(i[0], i[1]);
@@ -4355,21 +4356,21 @@ class Le extends F {
     return this.constructor.primaryPane;
   }
   get configDialogue() {
-    return this.#S;
+    return this.#I;
   }
   set value(i) {
     const s = this.core.time.timeFrameMS;
     let n = Math.floor(new Date(i[be.t]) / s) * s;
-    i[be.t] = n, this.#x[be.t] !== i[be.t] ? (this.#x[be.t] = i[be.t], this.#w(i)) : this.#p(i);
+    i[be.t] = n, this.#w[be.t] !== i[be.t] ? (this.#w[be.t] = i[be.t], this.#p(i)) : this.#S(i);
   }
   get value() {
-    return this.#x;
+    return this.#w;
   }
   setLegendName(i) {
-    this.#i = E(i) ? i : this.shortName || this.#t, this.chart.legend.modify(this.#g, { legendName: i });
+    this.#i = E(i) ? i : this.shortName || this.#t, this.chart.legend.modify(this.#x, { legendName: i });
   }
   setLegendVisibility(i) {
-    this.chart.legend.modify(this.#g, { legendVisibility: !!i });
+    this.#o = !!i, this.chart.legend.modify(this.#x, { legendVisibility: !!i });
   }
   destroy() {
     if (this.#C !== "destroyed") {
@@ -4377,14 +4378,14 @@ class Le extends F {
         this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "indicator.remove()" or "chart.removeIndicator()" instead.`);
         return;
       }
-      this.core.hub.expunge(this), this.chart.legend.remove(this.#g), this.clear(), this.core.MainPane.draw(void 0, !0), this.chartPane.graph.removeOverlay(this.id), super.destroy(), this.core.state.removeIndicator(this.id), this.#C = "destroyed";
+      this.core.hub.expunge(this), this.chart.legend.remove(this.#x), this.clear(), this.core.MainPane.draw(void 0, !0), this.chartPane.graph.removeOverlay(this.id), super.destroy(), this.core.state.removeIndicator(this.id), this.#C = "destroyed";
     }
   }
   remove() {
     this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPaneID}`), this.chart.type === "primaryPane" || Object.keys(this.chart.indicators).length > 1 ? this.emit(`${this.chartPaneID}_removeIndicator`, { id: this.id, paneID: this.chartPaneID }) : this.chart.remove();
   }
   visible(i) {
-    return Q(i) && (this.emit(`${this.chartPaneID}_visibleIndicator`, { id: this.id, paneID: this.chartPaneID, visible: i }), this.chartPane.indicators[this.id].layer.visible = i, this.draw()), this.chartPane.indicators[this.id].layer.visible;
+    return X(i) && (this.emit(`${this.chartPaneID}_visibleIndicator`, { id: this.id, paneID: this.chartPaneID, visible: i }), this.chartPane.indicators[this.id].layer.visible = i, this.draw()), this.chartPane.indicators[this.id].layer.visible;
   }
   settings(i) {
     return S(i) && (S(i?.config) && (this.params.overlay.settings = { ...this.params.overlay.settings, ...i.config }), S(i?.style) && (this.style = { ...this.style, ...i.style }), this.draw()), {
@@ -4470,11 +4471,12 @@ class Le extends F {
     let i = {
       id: this.id,
       title: this.legendName,
+      visible: this.#o,
       type: "indicator",
       parent: this,
       source: this.legendInputs.bind(this)
     };
-    this.#g = this.chart.legend.add(i);
+    this.#x = this.chart.legend.add(i);
   }
   legendInputs(i = this.chart.cursorPos) {
     const s = [this.style.stroke];
@@ -9852,7 +9854,7 @@ const Mo = {
   SMA: { id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: sn },
   STOCH: { id: "STOCH", name: "Stochastic Oscillator", event: "addIndicator", ind: R0 },
   VOL: { id: "VOL", name: "Volume", event: "addIndicator", ind: nn }
-}, rn = "0.142.8";
+}, rn = "0.142.9";
 class D0 {
   #e;
   #t;
@@ -10110,11 +10112,11 @@ class H {
     this.allData?.trades, i?.trades, this.allData?.events, i?.events;
     const D = A(h) && this.range.inRange(h[0][0]) ? 1 : 0, re = {};
     if (A(h) && h.length > 0) {
-      if (o = h.length - 1, c.length - 1, re.mData = this.range.inRange(h[0][0]) && this.range.inRange(h[0][o]), !Q(h[o][7]) && h[o].length !== 8 && h[o][6] !== null && h[o][7] !== !0 ? h = $0(h) : s.end >= this.range.timeFinish && s.start <= this.range.timeFinish && (s.start += this.range.interval, s.end += this.range.interval), c.length == 0)
+      if (o = h.length - 1, c.length - 1, re.mData = this.range.inRange(h[0][0]) && this.range.inRange(h[0][o]), !X(h[o][7]) && h[o].length !== 8 && h[o][6] !== null && h[o][7] !== !0 ? h = $0(h) : s.end >= this.range.timeFinish && s.start <= this.range.timeFinish && (s.start += this.range.interval, s.end += this.range.interval), c.length == 0)
         this.allData.data.push(...h);
       else {
-        let k = this.time.timeFrameMS, N = h[0][0], oe = h[h.length - 1][0], K = (h.length - 1) * k;
-        oe > N + K && (h = H0(h, k)), this.data.chart.data = this.merge(c, h);
+        let k = this.time.timeFrameMS, N = h[0][0], oe = h[h.length - 1][0], Z = (h.length - 1) * k;
+        oe > N + Z && (h = H0(h, k)), this.data.chart.data = this.merge(c, h);
       }
       if (n)
         this.#i.calcAllIndicators(n);
@@ -10427,11 +10429,11 @@ class xt {
   #u;
   #m;
   #v = yi;
-  #f;
+  #g;
   static validateConfig(i) {
     if (S(i)) {
       let s = ue(vi);
-      i = ct(s, i), i.tfCountDown = Q(i.tfCountDown) ? i.tfCountDown : vi.tfCountDown, i.alerts = A(i.alerts) ? i.alerts : vi.alerts;
+      i = ct(s, i), i.tfCountDown = X(i.tfCountDown) ? i.tfCountDown : vi.tfCountDown, i.alerts = A(i.alerts) ? i.alerts : vi.alerts;
     } else
       return vi;
     return i;
@@ -10461,7 +10463,7 @@ class xt {
     this.#d || (this.#d = !0, this.status = { status: Rs, data: i });
   }
   get alerts() {
-    return this.#f;
+    return this.#g;
   }
   get lastPriceMin() {
     return this.#m;
@@ -10489,10 +10491,10 @@ class xt {
     return this.#a !== yi ? this.#a : null;
   }
   start() {
-    this.#f = new z0(this.#t.alerts), this.status = { status: Rn }, this.#i = setInterval(this.onUpdate.bind(this), this.#n);
+    this.#g = new z0(this.#t.alerts), this.status = { status: Rn }, this.#i = setInterval(this.onUpdate.bind(this), this.#n);
   }
   stop() {
-    this.#f.destroy(), this.status = { status: Ua };
+    this.#g.destroy(), this.status = { status: Ua };
   }
   emit(i, s) {
     this.#e.emit(i, s);
@@ -11003,7 +11005,7 @@ let Oo = class {
   constructor(i = {}) {
     if (!J(i.container))
       throw new Error("Viewport container is not a valid HTML element.");
-    this.container = i.container, this.layers = [], this.id = X.idCnt++, this.scene = new X.Scene(), this.setSize(i.width || 0, i.height || 0);
+    this.container = i.container, this.layers = [], this.id = j.idCnt++, this.scene = new j.Scene(), this.setSize(i.width || 0, i.height || 0);
   }
   get OffscreenCanvas() {
     return Ao;
@@ -11031,7 +11033,7 @@ let Oo = class {
     return -1;
   }
   get index() {
-    let i = X.viewports, s, n = 0;
+    let i = j.viewports, s, n = 0;
     for (s of i) {
       if (this.id === s.id)
         return n;
@@ -11060,10 +11062,10 @@ class Z0 extends Oo {
   constructor(i = {}) {
     super(i);
     const s = this.scene.canvas, n = i.container;
-    n?.hasCanvasSlot && (s.slot = "viewportCanvas"), n.innerHTML = "", n.appendChild(s), X.viewports.push(this);
+    n?.hasCanvasSlot && (s.slot = "viewportCanvas"), n.innerHTML = "", n.appendChild(s), j.viewports.push(this);
   }
   destroy() {
-    super.destroy(), this.container.innerHTML = "", X.viewports.splice(this.index, 1);
+    super.destroy(), this.container.innerHTML = "", j.viewports.splice(this.index, 1);
   }
 }
 class As {
@@ -11075,11 +11077,11 @@ class As {
   #i = !0;
   #o = null;
   constructor(i = {}) {
-    this.id = X.idCnt++, this.hit = new X.Hit({
+    this.id = j.idCnt++, this.hit = new j.Hit({
       layer: this,
       contextType: i.contextType,
       offscreen: !0
-    }), this.scene = new X.Scene({
+    }), this.scene = new j.Scene({
       layer: this,
       contextType: i.contextType,
       offscreen: !0
@@ -11122,7 +11124,7 @@ class As {
     return this.#o;
   }
   set visible(i) {
-    Q(i) && (this.#i = i);
+    X(i) && (this.#i = i);
   }
   get visible() {
     return this.#i;
@@ -11183,7 +11185,7 @@ class Q0 {
   #e = 0;
   #t = 0;
   constructor(i = { offscreen: !1 }) {
-    this.id = X.idCnt++, this.layer = i.layer, this.contextType = i.contextType || "2d";
+    this.id = j.idCnt++, this.layer = i.layer, this.contextType = i.contextType || "2d";
     const s = document.createElement("canvas");
     s.className = "scene-canvas", s.style.display = "block", i.width && i.height && this.setSize(i.width, i.height), Ao && i?.offscreen ? (this.canvas = s.transferControlToOffscreen(), this.offscreen = !0) : this.canvas = s, this.context = this.canvas.getContext(this.contextType);
   }
@@ -11261,8 +11263,8 @@ class J0 {
       if (r = n.getImageData(i, s, 1, 1).data, r[3] < 255)
         return -1;
     } else if (r = new Uint8Array(4), n.readPixels(
-      i * X.pixelRatio,
-      (this.height - s - 1) * X.pixelRatio,
+      i * j.pixelRatio,
+      (this.height - s - 1) * j.pixelRatio,
       1,
       1,
       n.RGBA,
@@ -11290,14 +11292,14 @@ function No(a) {
   return a.contextType === "2d" ? i.clearRect(
     0,
     0,
-    a.width * X.pixelRatio,
-    a.height * X.pixelRatio
+    a.width * j.pixelRatio,
+    a.height * j.pixelRatio
   ) : i.clear(i.COLOR_BUFFER_BIT | i.DEPTH_BUFFER_BIT), a;
 }
 function Io(a, i, s, n = !0) {
-  return s.width = a, s.height = i, s.canvas.width = a * X.pixelRatio, s.canvas.height = i * X.pixelRatio, s.offscreen || (s.canvas.style.width = `${a}px`, s.canvas.style.height = `${i}px`), n && s.contextType === "2d" && X.pixelRatio !== 1 && s.context.scale(X.pixelRatio, X.pixelRatio), s;
+  return s.width = a, s.height = i, s.canvas.width = a * j.pixelRatio, s.canvas.height = i * j.pixelRatio, s.offscreen || (s.canvas.style.width = `${a}px`, s.canvas.style.height = `${i}px`), n && s.contextType === "2d" && j.pixelRatio !== 1 && s.context.scale(j.pixelRatio, j.pixelRatio), s;
 }
-const X = {
+const j = {
   idCnt: 0,
   viewports: [],
   pixelRatio: window && window.devicePixelRatio || 1,
@@ -11306,7 +11308,7 @@ const X = {
   Layer: As,
   Scene: Q0,
   Hit: J0
-}, Te = X;
+}, Te = j;
 class em {
   #e;
   #t;
@@ -11669,7 +11671,7 @@ class im extends F {
     if (!super.mustUpdate())
       return;
     this.scene.clear();
-    const s = this.scene.context, n = this.xAxis.xAxisGrads.values, r = 0, o = this.theme.xAxis, l = Q(o.tickMarker) ? o.tickMarker : !0;
+    const s = this.scene.context, n = this.xAxis.xAxisGrads.values, r = 0, o = this.theme.xAxis, l = X(o.tickMarker) ? o.tickMarker : !0;
     s.save(), s.strokeStyle = o.colourTick, s.fillStyle = o.colourTick, s.font = `${o.fontWeight} ${o.fontSize}px ${o.fontFamily}`;
     for (let h of n) {
       let c = pe(h[1]), p = Math.floor(s.measureText(`${h[0]}`).width * 0.5);
@@ -11738,16 +11740,16 @@ class om {
   #u = new Me();
   #m = [];
   #v;
-  #f;
-  #x;
+  #g;
+  #T;
   #w;
   #p;
-  #T;
-  #P;
-  #g;
-  #C;
   #S;
-  #D;
+  #P;
+  #f;
+  #x;
+  #C;
+  #I;
   #A;
   #O;
   #b;
@@ -11815,13 +11817,13 @@ class om {
     return this.#a.xAxisRatio;
   }
   get layerCursor() {
-    return this.#C;
+    return this.#x;
   }
   get layerLabels() {
     return this.#P;
   }
   get layerOverlays() {
-    return this.#g;
+    return this.#f;
   }
   get overlays() {
     return Object.fromEntries([...this.#d.overlays.list]);
@@ -11882,10 +11884,10 @@ class om {
   }
   init() {
     const i = this.#n;
-    this.#l = i.viewport, this.#h = i.overview, this.#f = i.overview.icons, this.#x = i.overview.scrollBar, this.#w = i.overview.handle, this.#p = i.overview.rwdStart, this.#T = i.overview.fwdEnd;
+    this.#l = i.viewport, this.#h = i.overview, this.#g = i.overview.icons, this.#T = i.overview.scrollBar, this.#w = i.overview.handle, this.#p = i.overview.rwdStart, this.#S = i.overview.fwdEnd;
     const s = {
       core: this.#i,
-      elContainer: this.#x,
+      elContainer: this.#T,
       elHandle: this.#w,
       callback: null
     };
@@ -11900,20 +11902,20 @@ class om {
   }
   navigationDisplay(i) {
     if (i)
-      this.#T.style["margin-top"] = 0, this.#p.style["margin-top"] = 0;
+      this.#S.style["margin-top"] = 0, this.#p.style["margin-top"] = 0;
     else {
       const s = this.core.theme.xAxis?.background ? this.core.theme.xAxis.Background : this.core.theme.chart.Background;
-      this.#h.style.visibility = "hidden", this.#T.style["margin-top"] = `${this.#l.clientHeight * -1}px`, this.#p.style["margin-top"] = `${this.#l.clientHeight * -1}px`, this.#T.style.background = this.core.theme.chart.Background, this.#p.style.background = s;
+      this.#h.style.visibility = "hidden", this.#S.style["margin-top"] = `${this.#l.clientHeight * -1}px`, this.#p.style["margin-top"] = `${this.#l.clientHeight * -1}px`, this.#S.style.background = this.core.theme.chart.Background, this.#p.style.background = s;
     }
   }
   start() {
     this.createGraph(), this.onSetRange(), this.#a.initXAxisGrads(), this.draw(), this.eventsListen(), ls.id = this.id, ls.context = this, this.stateMachine = ls, this.stateMachine.start();
   }
   destroy() {
-    this.stateMachine.destroy(), this.#S.destroy(), this.#D.destroy(), this.#A.destroy(), this.#i.hub.expunge(this), this.off("main_mousemove", this.#C.draw, this.#C), this.#T.removeEventListener("click", ke), this.#p.removeEventListener("click", ke), this.#d.destroy(), this.element.remove();
+    this.stateMachine.destroy(), this.#C.destroy(), this.#I.destroy(), this.#A.destroy(), this.#i.hub.expunge(this), this.off("main_mousemove", this.#x.draw, this.#x), this.#S.removeEventListener("click", ke), this.#p.removeEventListener("click", ke), this.#d.destroy(), this.element.remove();
   }
   eventsListen() {
-    this.#S = new Ve(this.#l, { disableContextMenu: !1 }), this.#S.on("dblclick", this.onDoubleClick.bind(this)), this.#S.on("pointerover", this.onPointerEnter.bind(this)), this.#S.on("pointerout", this.onPointerLeave.bind(this)), this.#S.on("pointerdrag", this.onPointerDrag.bind(this)), this.#D = new Ve(this.#T, { disableContextMenu: !1 }), this.#D.on("pointerover", () => this.showJump(this.#E.end)), this.#D.on("pointerleave", () => this.hideJump(this.#E.end)), this.#A = new Ve(this.#p, { disableContextMenu: !1 }), this.#A.on("pointerover", () => this.showJump(this.#E.start)), this.#A.on("pointerleave", () => this.hideJump(this.#E.start)), this.on("main_mousemove", this.#C.draw, this.#C), this.on("setRange", this.onSetRange, this), this.#T.addEventListener("click", ke(this.onPointerClick, 1e3, this, !0)), this.#p.addEventListener("click", ke(this.onPointerClick, 1e3, this, !0));
+    this.#C = new Ve(this.#l, { disableContextMenu: !1 }), this.#C.on("dblclick", this.onDoubleClick.bind(this)), this.#C.on("pointerover", this.onPointerEnter.bind(this)), this.#C.on("pointerout", this.onPointerLeave.bind(this)), this.#C.on("pointerdrag", this.onPointerDrag.bind(this)), this.#I = new Ve(this.#S, { disableContextMenu: !1 }), this.#I.on("pointerover", () => this.showJump(this.#E.end)), this.#I.on("pointerleave", () => this.hideJump(this.#E.end)), this.#A = new Ve(this.#p, { disableContextMenu: !1 }), this.#A.on("pointerover", () => this.showJump(this.#E.start)), this.#A.on("pointerleave", () => this.hideJump(this.#E.start)), this.on("main_mousemove", this.#x.draw, this.#x), this.on("setRange", this.onSetRange, this), this.#S.addEventListener("click", ke(this.onPointerClick, 1e3, this, !0)), this.#p.addEventListener("click", ke(this.onPointerClick, 1e3, this, !0));
   }
   on(i, s, n = this) {
     this.#i.on(i, s, n);
@@ -11956,7 +11958,7 @@ class om {
   onSetRange() {
     let i = this.range, s = i.indexStart;
     i.indexEnd;
-    let n = this.#x.getBoundingClientRect().width, r = i.dataLength + i.limitFuture + i.limitPast, o = n / r, l = i.Length * o, h = (s + i.limitPast) * o;
+    let n = this.#T.getBoundingClientRect().width, r = i.dataLength + i.limitFuture + i.limitPast, o = n / r, l = i.Length * o, h = (s + i.limitPast) * o;
     this.#b.setHandleDims(h, l);
   }
   t2Index(i) {
@@ -11979,7 +11981,7 @@ class om {
   }
   createGraph() {
     let i = ue(rm);
-    this.#d = new St(this, this.#l, i, !1), this.#C = this.graph.overlays.get("cursor").instance, this.#P = this.graph.overlays.get("labels").instance, this.#g = this.graph.overlays.get("overlay").instance, this.graph.addOverlays(this.#m);
+    this.#d = new St(this, this.#l, i, !1), this.#x = this.graph.overlays.get("cursor").instance, this.#P = this.graph.overlays.get("labels").instance, this.#f = this.graph.overlays.get("overlay").instance, this.graph.addOverlays(this.#m);
   }
   addOverlays(i) {
     if (!isArray(i))
@@ -12100,6 +12102,13 @@ class hm {
   get collapse() {
     return this.#o;
   }
+  get visible() {
+    return this.getVisible();
+  }
+  getVisible() {
+    const i = getComputedStyle(this.#e);
+    return i.display && i.visibility;
+  }
   destroy() {
     this.#s.hub.expunge(this);
     for (let i in this.#l)
@@ -12140,7 +12149,7 @@ class hm {
     const s = () => {
       this.#s.error("ERROR: Legend parent missing!");
     };
-    i.id = i?.id || Pe("legend"), i.type = i?.type || "overlay", i.title = i?.title || i?.parent.legendName, i.parent = i?.parent || s;
+    i.id = i?.id || Pe("legend"), i.type = i?.type || "overlay", i.title = i?.title || i?.parent.legendName, i.parent = i?.parent || s, i.visible = X(i?.visible) ? i.visible : !0;
     const n = this.elTarget.buildLegend(i, this.#s.theme);
     this.#e.legends.insertAdjacentHTML("beforeend", n);
     const r = this.#e.legends.querySelector(`#legend_${i.id}`);
@@ -12149,7 +12158,7 @@ class hm {
       type: i.type,
       source: i?.source,
       click: []
-    }, this.icons(this.#c, i), i.type == "indicator" && (this.#i.style.display = "block", !i.parent.primaryPane && Object.keys(this.#l).length < 3 && (this.#i.style.display = "none")), i.id;
+    }, this.icons(this.#c, i), i.type == "indicator" && (this.#i.style.display = "block", !i.parent.primaryPane && Object.keys(this.#l).length < 3 && (this.#i.style.display = "none")), r.style.display = i.visible ? "block" : "none", i.id;
   }
   remove(i) {
     if (!(i in this.#l) || this.#l[i].type === "chart")
@@ -12176,8 +12185,8 @@ class hm {
           const o = n.querySelectorAll(".title");
           return o[0].innerHTML = s[r], o[1].innerHTML = s[r], !0;
         case "legendVisibility":
-          const l = s[r] ? "block" : "none";
-          return n.style.display = l, !0;
+          const l = s[r] ? "block" : "none", h = s[r] ? "visible" : "hidden";
+          return n.style.display = l, n.style.visibility = h, !0;
       }
   }
   icons(i, s) {
@@ -12376,7 +12385,7 @@ class um extends F {
   draw() {
     if (!super.mustUpdate())
       return;
-    const i = this.scene.context, s = this.yAxis, n = this.yAxis.calcGradations() || [], r = this.theme.yAxis, o = Q(r.tickMarker) ? r.tickMarker : !0;
+    const i = this.scene.context, s = this.yAxis, n = this.yAxis.calcGradations() || [], r = this.theme.yAxis, o = X(r.tickMarker) ? r.tickMarker : !0;
     let l = [], h;
     switch (r?.location) {
       case "left":
@@ -12453,15 +12462,15 @@ class gm {
   #u;
   #m;
   #v;
-  #f;
-  #x = new Me();
+  #g;
+  #T = new Me();
   #w = [];
   #p;
-  #T;
+  #S;
   #P;
-  #g;
-  #C;
-  #S = {};
+  #f;
+  #x;
+  #C = {};
   constructor(i, s) {
     this.#r = i, this.#n = { ...s }, this.#h = this.#n.elScale, this.#a = this.#n.chart, this.#i = this.#n.parent, this.id = `${this.#i.id}_scale`, this.#d = this.#h.viewport || this.#h;
   }
@@ -12517,7 +12526,7 @@ class gm {
     return this.#h.style.cursor;
   }
   get layerCursor() {
-    return this.#f;
+    return this.#g;
   }
   get layerLabels() {
     return this.#u;
@@ -12568,7 +12577,7 @@ class gm {
     return this.#r.config;
   }
   get digitCnt() {
-    return this.#T;
+    return this.#S;
   }
   set scaleRange(i) {
     this.setScaleRange(i);
@@ -12610,11 +12619,11 @@ class gm {
     this.#l.setRange(this.#r.range), this.draw();
   }
   destroy() {
-    this.#r.hub.expunge(this), this.off(`${this.#i.id}_pointerout`, this.#f.erase, this.#f), this.off(et, this.onStreamUpdate, this.#v), this.stateMachine.destroy(), this.#p.destroy(), this.#P.destroy(), this.element.remove();
+    this.#r.hub.expunge(this), this.off(`${this.#i.id}_pointerout`, this.#g.erase, this.#g), this.off(et, this.onStreamUpdate, this.#v), this.stateMachine.destroy(), this.#p.destroy(), this.#P.destroy(), this.element.remove();
   }
   eventsListen() {
     let i = this.#p.viewport.scene.canvas;
-    this.#P = new Ve(i, { disableContextMenu: !1 }), this.#P.setCursor("ns-resize"), this.#P.on("pointerdrag", this.onDrag.bind(this)), this.#P.on("pointerdragend", this.onDragDone.bind(this)), this.#P.on("wheel", this.onMouseWheel.bind(this)), this.#P.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.#i.id}_pointermove`, this.onMouseMove, this), this.on(`${this.#i.id}_pointerout`, this.#f.erase, this.#f), this.on(et, this.#v.draw, this.#v), this.on("setRange", this.draw, this);
+    this.#P = new Ve(i, { disableContextMenu: !1 }), this.#P.setCursor("ns-resize"), this.#P.on("pointerdrag", this.onDrag.bind(this)), this.#P.on("pointerdragend", this.onDragDone.bind(this)), this.#P.on("wheel", this.onMouseWheel.bind(this)), this.#P.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.#i.id}_pointermove`, this.onMouseMove, this), this.on(`${this.#i.id}_pointerout`, this.#g.erase, this.#g), this.on(et, this.#v.draw, this.#v), this.on("setRange", this.draw, this);
   }
   on(i, s, n = this) {
     this.core.on(i, s, n);
@@ -12629,10 +12638,10 @@ class gm {
     this.setDimensions(i);
   }
   onMouseMove(i) {
-    this.#C = A(i) ? i : [Math.floor(i.position.x), Math.floor(i.position.y)], this.#f.draw(this.#C);
+    this.#x = A(i) ? i : [Math.floor(i.position.x), Math.floor(i.position.y)], this.#g.draw(this.#x);
   }
   onDrag(i) {
-    this.#C = [
+    this.#x = [
       Math.floor(i.position.x),
       Math.floor(i.position.y),
       i.dragstart.x,
@@ -12656,7 +12665,7 @@ class gm {
   }
   setDimensions(i) {
     const s = this.#h.getBoundingClientRect().width;
-    this.setHeight(i.h), this.graph instanceof St && (this.#p.setSize(s, i.h, s), this.draw()), this.#f instanceof Ro && this.calcPriceDigits();
+    this.setHeight(i.h), this.graph instanceof St && (this.#p.setSize(s, i.h, s), this.draw()), this.#g instanceof Ro && this.calcPriceDigits();
   }
   setScaleRange(i = 0) {
     this.#l.mode == "automatic" && (this.#l.mode = "manual"), this.#l.zoom = i, this.draw(this.range, !0), this.#r.MainPane.draw();
@@ -12679,7 +12688,7 @@ class gm {
   }
   createGraph() {
     let i = ue(pm);
-    this.graph = new St(this, this.#d, i, !1), this.#f = this.graph.overlays.get("cursor").instance, this.#u = this.graph.overlays.get("labels").instance, this.#m = this.graph.overlays.get("overlay").instance, this.#v = this.graph.overlays.get("price").instance, this.graph.addOverlays(this.#w), this.#v.target.moveTop(), this.#f.target.moveTop(), this.calcPriceDigits();
+    this.graph = new St(this, this.#d, i, !1), this.#g = this.graph.overlays.get("cursor").instance, this.#u = this.graph.overlays.get("labels").instance, this.#m = this.graph.overlays.get("overlay").instance, this.#v = this.graph.overlays.get("price").instance, this.graph.addOverlays(this.#w), this.#v.target.moveTop(), this.#g.target.moveTop(), this.calcPriceDigits();
   }
   calcPriceDigits() {
     let i = 8;
@@ -12687,7 +12696,7 @@ class gm {
       const s = this.#r.range.valueMax, n = Ss(s);
       i = `${Es(n, this.config.precision)}`.length + 2;
     }
-    return this.#T = i, this.#T;
+    return this.#S = i, this.#S;
   }
   calcScaleWidth() {
     const i = this.calcPriceDigits(), s = this.#r.MainPane.graph.viewport.scene.context, n = this.theme.yAxis;
@@ -12707,7 +12716,7 @@ class gm {
       this.#w.push([i, s]);
     else {
       let n = this.graph.addOverlay(i, s);
-      return this.#v.target.moveTop(), this.#f.target.moveTop(), n;
+      return this.#v.target.moveTop(), this.#g.target.moveTop(), n;
     }
   }
   render() {
@@ -13383,23 +13392,23 @@ class lt {
   };
   #m;
   #v;
-  #f;
-  #x;
+  #g;
+  #T;
   #w;
   #p;
-  #T;
-  #P;
-  #g;
-  #C;
   #S;
-  #D;
+  #P;
+  #f;
+  #x;
+  #C;
+  #I;
   #A = new Me();
   #O = new Me();
   #b = [0, 0];
   #M = !1;
   #E;
   #y;
-  #R;
+  #D;
   #k = {
     valueMax: 110,
     valueMin: -10,
@@ -13409,7 +13418,7 @@ class lt {
   constructor(i, s) {
     if (this.#i = i, this.#l = lt.cnt, !S(s))
       return;
-    this.#o = { ...s }, this.#s = this.#o.name, this.#r = this.#o.shortName, this.#n = this.#o.title, this.#h = this.#o.type == "primary" ? "primaryPane" : "secondaryPane", this.#S = this.#o.view, this.#v = this.#o.elements.elScale, this.#a = this.#o.parent, this.#m = this.#o.elements.elTarget, this.#m.id = this.id, this.legend = new hm(this.elLegend, this), this.isPrimary ? (Oe.type = "chart", Oe.title = this.title, Oe.parent = this, Oe.source = this.legendInputs.bind(this), this.legend.add(Oe), this.yAxisType = "default") : (Oe.type = "secondary", Oe.title = "", Oe.parent = this, Oe.source = () => ({ inputs: {}, colours: [], labels: [] }), this.legend.add(Oe), this.yAxisType = this.core.indicatorClasses[s.view[0].type].ind.scale);
+    this.#o = { ...s }, this.#s = this.#o.name, this.#r = this.#o.shortName, this.#n = this.#o.title, this.#h = this.#o.type == "primary" ? "primaryPane" : "secondaryPane", this.#C = this.#o.view, this.#v = this.#o.elements.elScale, this.#a = this.#o.parent, this.#m = this.#o.elements.elTarget, this.#m.id = this.id, this.legend = new hm(this.elLegend, this), this.isPrimary ? (Oe.type = "chart", Oe.title = this.title, Oe.parent = this, Oe.source = this.legendInputs.bind(this), this.legend.add(Oe), this.yAxisType = "default") : (Oe.type = "secondary", Oe.title = "", Oe.parent = this, Oe.source = () => ({ inputs: {}, colours: [], labels: [] }), this.legend.add(Oe), this.yAxisType = this.core.indicatorClasses[s.view[0].type].ind.scale);
     const n = { ...s };
     n.parent = this, n.chart = this, n.elScale = this.elScale, n.yAxisType = this.yAxisType, this.scale = new gm(this.core, n), this.#d = "init", this.log(`${this.name} instantiated`);
   }
@@ -13503,7 +13512,7 @@ class lt {
     return this.#P;
   }
   get streamCandle() {
-    return this.#C;
+    return this.#x;
   }
   set cursor(i) {
     this.element.style.cursor = i;
@@ -13563,22 +13572,22 @@ class lt {
     return this.#p;
   }
   set time(i) {
-    this.#x = i;
+    this.#T = i;
   }
   get time() {
-    return this.#x;
+    return this.#T;
   }
   set scale(i) {
-    this.#f = i;
+    this.#g = i;
   }
   get scale() {
-    return this.#f;
+    return this.#g;
   }
   set yAxisType(i) {
     this.setYAxisType(i);
   }
   get yAxisType() {
-    return this.#R;
+    return this.#D;
   }
   get axes() {
     return "x";
@@ -13590,7 +13599,7 @@ class lt {
     return this.#w;
   }
   get view() {
-    return this.#S;
+    return this.#C;
   }
   get viewport() {
     return this.#w.viewport;
@@ -13623,7 +13632,7 @@ class lt {
     return this.#c;
   }
   get Divider() {
-    return this.#T;
+    return this.#S;
   }
   get siblingPrev() {
     return this.sibling("prev");
@@ -13632,9 +13641,9 @@ class lt {
     return this.sibling("next");
   }
   start() {
-    this.#x = this.#i.Timeline, this.createGraph(), this.#f.start(), this.draw(this.range), this.cursor = "crosshair", hs.id = this.id, hs.context = this, this.stateMachine = hs, this.stateMachine.start(), this.eventsListen();
+    this.#T = this.#i.Timeline, this.createGraph(), this.#g.start(), this.draw(this.range), this.cursor = "crosshair", hs.id = this.id, hs.context = this, this.stateMachine = hs, this.stateMachine.start(), this.eventsListen();
     let i = { chartPane: this };
-    this.#T = this.core.WidgetsG.insert("Divider", i), this.#T.start(), i = { title: "Chart Config", content: `Configure chart ${this.id}`, parent: this }, this.#g = this.core.WidgetsG.insert("ConfigDialogue", i), this.#g.start(), this.#d = "running";
+    this.#S = this.core.WidgetsG.insert("Divider", i), this.#S.start(), i = { title: "Chart Config", content: `Configure chart ${this.id}`, parent: this }, this.#f = this.core.WidgetsG.insert("ConfigDialogue", i), this.#f.start(), this.#d = "running";
   }
   destroy() {
     if (this.#d !== "destroyed") {
@@ -13642,7 +13651,7 @@ class lt {
         this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartPane()" instead.`);
         return;
       }
-      this.core.log(`Deleting chart pane: ${this.id}`), this.#i.hub.expunge(this), this.removeAllIndicators(), this.#c.destroy(), this.#T.destroy(), this.#f.destroy(), this.#w.destroy(), this.#y.destroy(), this.legend.destroy(), this.#c = void 0, this.#T = void 0, this.#p = void 0, this.#f = void 0, this.#w = void 0, this.#y = void 0, this.core.warn(`Deleting chart pane ${this.id} destroys all of its data!`), this.element.remove(), this.#d = "destroyed";
+      this.core.log(`Deleting chart pane: ${this.id}`), this.#i.hub.expunge(this), this.removeAllIndicators(), this.#c.destroy(), this.#S.destroy(), this.#g.destroy(), this.#w.destroy(), this.#y.destroy(), this.legend.destroy(), this.#c = void 0, this.#S = void 0, this.#p = void 0, this.#g = void 0, this.#w = void 0, this.#y = void 0, this.core.warn(`Deleting chart pane ${this.id} destroys all of its data!`), this.element.remove(), this.#d = "destroyed";
     }
   }
   remove() {
@@ -13670,7 +13679,7 @@ class lt {
     this.cursor = "crosshair", this.core.MainPane.onChartDragDone(i);
   }
   onPointerMove(i) {
-    this.core.MainPane.onPointerActive(this), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.#b = [Math.round(i.position.x), Math.round(i.position.y)], this.#f.onMouseMove(this.#b), this.emit(`${this.id}_pointermove`, this.#b);
+    this.core.MainPane.onPointerActive(this), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.#b = [Math.round(i.position.x), Math.round(i.position.y)], this.#g.onMouseMove(this.#b), this.emit(`${this.id}_pointermove`, this.#b);
   }
   onPointerEnter(i) {
     this.core.MainPane.onPointerActive(this), this.#b = [Math.round(i.position.x), Math.round(i.position.y)], this.core.MainPane.onMouseEnter(), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.emit(`${this.id}_pointerenter`, this.#b);
@@ -13691,7 +13700,7 @@ class lt {
     this.draw(this.range, !0);
   }
   onStreamUpdate(i) {
-    this.isPrimary ? (this.#C = i, this.chartStreamCandle.draw(), this.layerStream.setPosition(this.core.stream.lastScrollPos, 0), this.updateLegends(this.cursorPos, i)) : this.updateLegends(), this.#i.MainPane.draw();
+    this.isPrimary ? (this.#x = i, this.chartStreamCandle.draw(), this.layerStream.setPosition(this.core.stream.lastScrollPos, 0), this.updateLegends(this.cursorPos, i)) : this.updateLegends(), this.#i.MainPane.draw();
   }
   onYAxisRedraw() {
     this.isPrimary && this.refresh();
@@ -13712,7 +13721,7 @@ class lt {
     E(i.text) || E(i) ? this.core.config.watermark.text = i : "imgURL" in i && (this.core.config.watermark.imgURL = i);
   }
   setHeight(i) {
-    T(i) || (i = this.height || this.#a.height), this.#m.style.height = `${i}px`, this.#v.style.height = `${i}px`, this.elViewport.style.height = `${i}px`, this.#f.setDimensions({ w: null, h: i }), this.Divider?.setPos(), this.Divider?.setWidth();
+    T(i) || (i = this.height || this.#a.height), this.#m.style.height = `${i}px`, this.#v.style.height = `${i}px`, this.elViewport.style.height = `${i}px`, this.#g.setDimensions({ w: null, h: i }), this.Divider?.setPos(), this.Divider?.setWidth();
   }
   setDimensions(i) {
     const s = this.config.buffer || Bi;
@@ -13729,7 +13738,7 @@ class lt {
     };
   }
   setYAxisType(i) {
-    return !E(i) || !qe.includes(i) || this.type == "primaryPane" && i == "percent" ? !1 : (this.#R = i, !0);
+    return !E(i) || !qe.includes(i) || this.type == "primaryPane" && i == "percent" ? !1 : (this.#D = i, !0);
   }
   addOverlays(i) {
     if (!A(i) || i.length < 1)
@@ -13787,7 +13796,7 @@ class lt {
   }
   addTool(i) {
     let { layerConfig: s } = this.layerConfig(), n = new Te.Layer(s);
-    this.#A.set(i.id, n), this.#D.addLayer(n), i.layerTool = n, this.#O.set(i.id, i);
+    this.#A.set(i.id, n), this.#I.addLayer(n), i.layerTool = n, this.#O.set(i.id, i);
   }
   addTools(i) {
   }
@@ -13878,7 +13887,7 @@ class lt {
     this.graph = new St(this, this.elViewport, i, !1), this.isPrimary && (this.layerStream = this.graph.overlays.get("stream")?.layer, this.chartStreamCandle = this.graph.overlays.get("stream")?.instance), this.addOverlays(this.view);
   }
   render() {
-    this.#w.render(), this.#f.render();
+    this.#w.render(), this.#g.render();
   }
   draw(i = this.range, s = !1) {
     this.#w.draw(i, s);
@@ -13895,7 +13904,7 @@ class lt {
     return T(i) && i > r || (f = o + l, h = this.core.MainPane.cursorPos[5], c = o - h, p = l + h), c < r || p < r || f !== c + p || (s.setDimensions({ w: void 0, h: c }), n.setDimensions({ w: void 0, h: p }), s.Divider.setPos()), s.element.style.userSelect = "none", n.element.style.userSelect = "none", { active: s, prev: n };
   }
   collapse(i) {
-    const s = this.graph.viewport.scene.canvas.style, n = this.#u, r = this.#f.graph.viewport.scene.canvas.style;
+    const s = this.graph.viewport.scene.canvas.style, n = this.#u, r = this.#g.graph.viewport.scene.canvas.style;
     n.state ? (this.setDimensions({ w: void 0, h: i }), r.visibility = "visible", s.display = "block", n.state = !1) : (r.visibility = "hidden", s.display = "none", n.state = !0, n.height = this.element.clientHeight, n.rowsHeight = this.core.MainPane.rowsH, n.rowsCnt = this.core.ChartPanes.size, this.setDimensions({ W: void 0, h: Cs }));
   }
   zoomRange() {
@@ -13928,7 +13937,7 @@ class lt {
     return i == "prev" ? --n : ++n, this.#i.ChartPanes.get(s[n]) || null;
   }
   configDialogue() {
-    const i = this.#g;
+    const i = this.#f;
     i.state.name === "closed" && i.open();
   }
 }
@@ -14127,16 +14136,16 @@ class Ho {
   #u;
   #m = {};
   #v;
-  #f;
-  #x;
+  #g;
+  #T;
   #w;
   #p;
-  #T;
-  #P;
-  #g = new Me();
-  #C;
   #S;
-  #D;
+  #P;
+  #f = new Me();
+  #x;
+  #C;
+  #I;
   #A = {};
   #O = {
     instance: null,
@@ -14147,7 +14156,7 @@ class Ho {
   #M = sr;
   #E = {};
   #y = [0, 0];
-  #R = {
+  #D = {
     active: !1,
     start: [0, 0],
     prev: [0, 0],
@@ -14156,7 +14165,7 @@ class Ho {
   #k;
   #H;
   #L;
-  #I = 0;
+  #R = 0;
   #_ = 0;
   constructor(i, s) {
     this.#n = i, this.#s = s, this.#r = i, this.#c = this.#n.elMain, this.#a = this.#n.elYAxis, this.init(s);
@@ -14186,10 +14195,10 @@ class Ho {
     return this.#n;
   }
   get chart() {
-    return this.#C;
+    return this.#x;
   }
   get chartPanes() {
-    return this.#g;
+    return this.#f;
   }
   get chartPaneMaximized() {
     return this.#O;
@@ -14198,7 +14207,7 @@ class Ho {
     return this.#A;
   }
   get time() {
-    return this.#S;
+    return this.#C;
   }
   get options() {
     return this.#s;
@@ -14264,7 +14273,7 @@ class Ho {
     return this.#y;
   }
   get candleW() {
-    return this.#S.candleW;
+    return this.#C.candleW;
   }
   get theme() {
     return this.#n.theme;
@@ -14312,20 +14321,20 @@ class Ho {
     };
   }
   init(i) {
-    if (this.#n, this.#l = this.#c.rows, this.#h = this.#c.time, this.#v = this.#c.rows.grid, this.#x = this.#c.viewport, this.#u = this.#n.elBody.scale, i.name = "Chart", i.shortName = "Chart", i.parent = this, i.chartData = this.#n.chartData, i.primaryPane = this.#n.primaryPane, i.secondaryPane = this.#n.secondaryPane, i.rangeLimit = this.#n.rangeLimit, i.settings = this.#n.settings, i.elements = {
+    if (this.#n, this.#l = this.#c.rows, this.#h = this.#c.time, this.#v = this.#c.rows.grid, this.#T = this.#c.viewport, this.#u = this.#n.elBody.scale, i.name = "Chart", i.shortName = "Chart", i.parent = this, i.chartData = this.#n.chartData, i.primaryPane = this.#n.primaryPane, i.secondaryPane = this.#n.secondaryPane, i.rangeLimit = this.#n.rangeLimit, i.settings = this.#n.settings, i.elements = {
       ...i.elements,
       ...this.elements
     }, this.#n.theme?.time?.navigation === !1) {
       const s = { height: Di };
       this.#n.theme.time = { ...this.#n.theme?.time, ...s }, this.#l.style.height = `calc(100% - ${Di}px)`;
     }
-    this.#S = new om(this.#n, i), this.registerChartViews(i), this.#k = T(this.config.buffer) ? this.config.buffer : Bi, this.#M = T(this.config.rowMinH) ? this.config.rowMinH : sr, this.#b = T(this.config.secondaryPaneDefaultH) ? this.config.secondaryPaneDefaultH : nr, this.rowsOldH = this.rowsH, this.log(`${this.#e} instantiated`);
+    this.#C = new om(this.#n, i), this.registerChartViews(i), this.#k = T(this.config.buffer) ? this.config.buffer : Bi, this.#M = T(this.config.rowMinH) ? this.config.rowMinH : sr, this.#b = T(this.config.secondaryPaneDefaultH) ? this.config.secondaryPaneDefaultH : nr, this.rowsOldH = this.rowsH, this.log(`${this.#e} instantiated`);
   }
   start() {
     let i = 0;
-    this.#c.start(this.theme), this.#S.start(), this.createGraph();
+    this.#c.start(this.theme), this.#C.start(), this.createGraph();
     const s = this.chart.scale.calcScaleWidth();
-    this.core.elBody.scale.style.width = `${s}px`, this.#x.style.width = `${this.#l.width}px`, this.#g.forEach((n, r) => {
+    this.core.elBody.scale.style.width = `${s}px`, this.#T.style.width = `${this.#l.width}px`, this.#f.forEach((n, r) => {
       n.start(i++), i === 1 && n.Divider.hide();
     }), this.rowsOldH = this.rowsH, this.draw(this.range, !0), this.renderLoop.init({
       graphs: [this.#p],
@@ -14333,7 +14342,7 @@ class Ho {
     }), this.renderLoop.start(), this.renderLoop.queueFrame(this.range, [this.#p], !1), this.eventsListen(), cs.id = this.id, cs.context = this, this.stateMachine = cs, this.stateMachine.start();
   }
   destroy() {
-    this.#n.hub.expunge(this), this.renderLoop.stop(), this.#o = !0, this.stateMachine.destroy(), this.#S.destroy(), this.#g.forEach((i, s) => {
+    this.#n.hub.expunge(this), this.renderLoop.stop(), this.#o = !0, this.stateMachine.destroy(), this.#C.destroy(), this.#f.forEach((i, s) => {
       this.#A[s] = !0, i.destroy(), delete this.#A[s];
     }), this.#p.destroy(), this.#L.destroy();
   }
@@ -14362,9 +14371,9 @@ class Ho {
     this.#n.emit(i, s);
   }
   onSetRange() {
-    if (this.#_ = this.#I, this.#I = this.chart.scale.calcScaleWidth(), this.#_ < this.#I) {
-      const i = `${this.#I}px`;
-      this.core.elBody.scale.style.width = i, this.#x.style.width = `calc(100% - ${this.#I}px)`, this.#l.style.width = `calc(100% - ${this.#I}px)`, this.#h.style.width = `calc(100% - ${this.#I}px)`, this.setDimensions();
+    if (this.#_ = this.#R, this.#R = this.chart.scale.calcScaleWidth(), this.#_ < this.#R) {
+      const i = `${this.#R}px`;
+      this.core.elBody.scale.style.width = i, this.#T.style.width = `calc(100% - ${this.#R}px)`, this.#l.style.width = `calc(100% - ${this.#R}px)`, this.#h.style.width = `calc(100% - ${this.#R}px)`, this.setDimensions();
     } else
       this.draw();
   }
@@ -14405,7 +14414,7 @@ class Ho {
     this.draw();
   }
   onChartDrag(i) {
-    const s = this.#R;
+    const s = this.#D;
     s.active ? (s.delta = [
       i.position.x - s.prev[0],
       i.position.y - s.prev[1]
@@ -14420,7 +14429,7 @@ class Ho {
     ], this.emit("chart_pan", this.#y);
   }
   onChartDragDone(i) {
-    const s = this.#R;
+    const s = this.#D;
     s.active = !1, s.delta = [0, 0], this.#y = [
       ...s.prev,
       ...s.start,
@@ -14461,7 +14470,7 @@ class Ho {
   onNewStreamValue(i) {
   }
   onPointerActive(i) {
-    i && (i.cursorActive = !0, i.scale.layerCursor.visible = !0), i !== this.chart && (this.chart.cursorActive = !1, this.chart.scale.layerCursor.visible = !1, this.chart.scale.layerCursor.erase()), this.#g.forEach((s, n) => {
+    i && (i.cursorActive = !0, i.scale.layerCursor.visible = !0), i !== this.chart && (this.chart.cursorActive = !1, this.chart.scale.layerCursor.visible = !1, this.chart.scale.layerCursor.erase()), this.#f.forEach((s, n) => {
       i !== s && (s.cursorActive = !1, s.scale.layerCursor.visible = !1, s.scale.layerCursor.erase());
     });
   }
@@ -14474,7 +14483,7 @@ class Ho {
       rowsH: this.rowsH,
       rowsW: this.rowsW
     };
-    this.#n.scrollPos = -1, this.#S.setDimensions({ w: n }), this.#p.setSize(n, r, o), this.#x.style.width = `${n}px`, this.#g.size == 1 && s != this.#l.height ? this.#C.setDimensions({ w: n, h: this.#l.height }) : this.#g.forEach((h, c) => {
+    this.#n.scrollPos = -1, this.#C.setDimensions({ w: n }), this.#p.setSize(n, r, o), this.#T.style.width = `${n}px`, this.#f.size == 1 && s != this.#l.height ? this.#x.setDimensions({ w: n, h: this.#l.height }) : this.#f.forEach((h, c) => {
       s = Math.round(h.viewport.height * i), h.setDimensions({ w: n, h: s });
     }), this.rowsOldH = this.rowsH, this.emit("rowsResize", l), this.draw(void 0, !0);
   }
@@ -14494,7 +14503,7 @@ class Ho {
   }
   chartPanesState() {
     const i = {
-      list: [...this.#g.values()],
+      list: [...this.#f.values()],
       collapsed: [],
       expanded: [],
       maximized: this.#O.instance
@@ -14507,8 +14516,8 @@ class Ho {
     const { expanded: s } = this.chartPanesState(), n = this.calcChartPaneHeights(), r = n.new;
     let o;
     for (o in n)
-      if (this.#g.has(o)) {
-        let p = this.#g.get(o);
+      if (this.#f.has(o)) {
+        let p = this.#f.get(o);
         s.indexOf(p) > -1 && p.setDimensions({ w: this.rowsW, h: n[o] });
       }
     let l;
@@ -14522,12 +14531,12 @@ class Ho {
       this.scaleNode(i.type)
     ), h = this.#a.chartPaneSlot.assignedElements().slice(-1)[0], h.style.height = `${r}px`, h.style.width = "100%", i.elements.elTarget = l, i.elements.elScale = h;
     let c;
-    return i.type == "primary" ? (c = new lt(this.#n, i), this.#C = c) : (i.name = i.view[0].name || "Secondary", i.shortName = i.view[0].type || "Secondary", c = new lt(this.#n, i)), this.setPaneDividers(), this.#g.set(c.id, c), this.emit("addChartView", c), c;
+    return i.type == "primary" ? (c = new lt(this.#n, i), this.#x = c) : (i.name = i.view[0].name || "Secondary", i.shortName = i.view[0].type || "Secondary", c = new lt(this.#n, i)), this.setPaneDividers(), this.#f.set(c.id, c), this.emit("addChartView", c), c;
   }
   removeChartPane(i) {
-    if (!E(i) || !this.#g.has(i) || this.#A[i])
+    if (!E(i) || !this.#f.has(i) || this.#A[i])
       return !1;
-    const s = this.#g.get(i);
+    const s = this.#f.get(i);
     if (s.isPrimary)
       return this.#n.error(`Cannot remove primary chart pane! ${i}`), !1;
     this.#A[i] = !0;
@@ -14535,8 +14544,8 @@ class Ho {
     let r = n.indexOf(s);
     r > -1 && n.splice(r, 1);
     let o = s.viewport.height, l = Math.floor(o / n.length), h = o % l;
-    if (s.status !== "destroyed" && (s.destroy(), this.#c.removeRow(s.id)), this.#g.delete(i), this.#g.size === 1) {
-      let c = this.#g.values().next().value;
+    if (s.status !== "destroyed" && (s.destroy(), this.#c.removeRow(s.id)), this.#f.delete(i), this.#f.size === 1) {
+      let c = this.#f.values().next().value;
       c.collapsed && (c.collapsed.state = !1), c.setDimensions({ w: void 0, h: this.rowsH });
     } else
       for (let c of n)
@@ -14565,7 +14574,7 @@ class Ho {
         break;
       case void 0:
       case "both":
-        o = Q(n.settings?.isPrimary) ? n.settings.isPrimary : !0;
+        o = X(n.settings?.isPrimary) ? n.settings.isPrimary : !0;
     }
     if (n.settings.isPrimary = o, o) {
       const h = {
@@ -14573,7 +14582,7 @@ class Ho {
         name: s,
         ...n
       };
-      r = this.#C.addIndicator(h);
+      r = this.#x.addIndicator(h);
     } else {
       A(n.view) || (n.view = [{ name: s, type: i, ...n }]);
       for (let h = 0; h < n.view.length; h++)
@@ -14587,7 +14596,7 @@ class Ho {
   }
   getIndicators() {
     const i = {};
-    return this.#g.forEach(
+    return this.#f.forEach(
       (s, n) => {
         i[n] = s.indicators;
       }
@@ -14596,26 +14605,26 @@ class Ho {
   getIndicator(i) {
     if (!E(i))
       return !1;
-    for (const s of this.#g.values())
+    for (const s of this.#f.values())
       if (i in s.indicators)
         return s.indicators[i].instance;
   }
   removeIndicator(i) {
     if (E(i))
-      for (const s of this.#g.values())
+      for (const s of this.#f.values())
         i in s.indicators && (i = s.indicators[i].instance);
     return i instanceof Le ? (i.chart.type === "primaryPane" || Object.keys(i.chart.indicators).length > 1 ? (i.remove(), this.emit("pane_refresh", this)) : i.chart.remove(), !0) : !1;
   }
   indicatorSettings(i, s) {
     if (E(i)) {
-      for (const n of this.#g.values())
+      for (const n of this.#f.values())
         if (i in n.indicators)
           return n.indicators[i].instance.settings(s);
     } else
       return i instanceof Le ? i.settings(s) : !1;
   }
   calcChartPaneHeights() {
-    const { collapsed: i, expanded: s } = this.chartPanesState(), n = this.#g.size + 1, r = this.#b * (n - 1), o = r / Math.log10(r * 2) / 100;
+    const { collapsed: i, expanded: s } = this.chartPanesState(), n = this.#f.size + 1, r = this.#b * (n - 1), o = r / Math.log10(r * 2) / 100;
     Math.round(this.rowsH * o);
     const l = {};
     if (n === 1)
@@ -14651,15 +14660,15 @@ class Ho {
   }
   createGraph() {
     let i = ue(Em);
-    this.#p = new St(this, this.#x, i);
+    this.#p = new St(this, this.#T, i);
   }
   draw(i = this.range, s = !1) {
     this.time.xAxis.doCalcXAxisGrads(i);
     const n = [
       this.#p,
-      this.#S
+      this.#C
     ];
-    this.#g.forEach((r, o) => {
+    this.#f.forEach((r, o) => {
       r.status !== "destroyed" ? n.push(r) : console.log("error destroyed pane");
     }), this.renderLoop.queueFrame(
       this.range,
@@ -14688,7 +14697,7 @@ class Ho {
       this.panesRestore(), s.instance = null, s.panes = {}, i.collapsed.state && (i.graph.viewport.scene.canvas.style.display = "none", i.scale.graph.viewport.scene.canvas.style.visibility = "hidden");
     else {
       this.panesRestore(), s.instance = i, s.rowsH = this.rowsH;
-      for (let [o, l] of this.#g.entries())
+      for (let [o, l] of this.#f.entries())
         s.panes[o] = l.element.clientHeight, r = l.element.style, i === l ? (r.display = "block", l.setDimensions({ w: void 0, h: this.rowsH }), l.graph.viewport.scene.canvas.style.display = "block", l.scale.graph.viewport.scene.canvas.style.visibility = "visible") : (r.display = "none", l.scale.element.style.display = "none");
       this.hidePaneDividers();
     }
@@ -14698,7 +14707,7 @@ class Ho {
     const i = this.#O;
     let s = 0;
     this.emit("pane_refresh", this), this.dimensions.height == i.height;
-    for (let [n, r] of this.#g.entries())
+    for (let [n, r] of this.#f.entries())
       r.element.style.display = "block", r.scale.element.style.display = "block", n in i.panes && s++ > 0 && r.Divider.show(), r.setDimensions({ w: void 0, h: i.panes[n] });
   }
   paneCollapse(i) {
@@ -16789,8 +16798,8 @@ class he {
   #u;
   #m;
   #v;
-  #f;
-  #x;
+  #g;
+  #T;
   #w = !1;
   #p = {};
   static windowList = {};
@@ -16907,7 +16916,7 @@ class he {
     }, 250);
   }
   mount(i) {
-    i.lastElementChild == null ? i.innerHTML = this.windowNode() : i.lastElementChild.insertAdjacentHTML("afterend", this.windowNode()), this.#a = this.#o.querySelector(`#${this.#r.id}`), this.#c = this.#a.querySelector(".dragBar"), this.#l = this.#a.querySelector(".title"), this.#h = this.#a.querySelector(".closeIcon"), this.#d = this.#a.querySelector(".content"), this.#a.addEventListener("click", this.onWindow.bind(this)), mi.isElement(this.#c) && (this.#x = new Ve(this.#c, { disableContextMenu: !1 }), this.#x.on("pointerdrag", this.onDragBar.bind(this)), this.#x.on("pointerdragend", this.onDragBarEnd.bind(this)));
+    i.lastElementChild == null ? i.innerHTML = this.windowNode() : i.lastElementChild.insertAdjacentHTML("afterend", this.windowNode()), this.#a = this.#o.querySelector(`#${this.#r.id}`), this.#c = this.#a.querySelector(".dragBar"), this.#l = this.#a.querySelector(".title"), this.#h = this.#a.querySelector(".closeIcon"), this.#d = this.#a.querySelector(".content"), this.#a.addEventListener("click", this.onWindow.bind(this)), mi.isElement(this.#c) && (this.#T = new Ve(this.#c, { disableContextMenu: !1 }), this.#T.on("pointerdrag", this.onDragBar.bind(this)), this.#T.on("pointerdragend", this.onDragBarEnd.bind(this)));
     const s = this.dimensions, n = this.#r?.w || s.w, r = this.#r?.h || s.h;
     this.setDimensions({ w: n, h: r }), this.position();
   }
@@ -17042,7 +17051,7 @@ class Fi extends he {
       content: { padding: "1em" },
       title: { padding: "0 1em", background: "#333" }
     };
-    return s.dragBar = Q(s?.dragBar) ? s.dragBar : !0, s.close = Q(s?.close) ? s.close : !0, s.styles = S(s?.styles) ? { ...n, ...s.styles } : n, s.class = "dialogue", super.create(i, s);
+    return s.dragBar = X(s?.dragBar) ? s.dragBar : !0, s.close = X(s?.close) ? s.close : !0, s.styles = S(s?.styles) ? { ...n, ...s.styles } : n, s.class = "dialogue", super.create(i, s);
   }
   constructor(i, s) {
     super(i, s);
@@ -17327,8 +17336,8 @@ function Er(a, i, s, n, r, o) {
   let $;
   O.save(), en(O, 0, 0, x, P, { fill: l.chart.Background }), O.drawImage(f.canvas, re, 0, f.width, f.height);
   for (const [N, oe] of a.ChartPanes) {
-    let K = oe.graph.viewport.scene, { width: ae, height: ye } = K, ve = oe.scale.graph.viewport.scene, { width: ut, height: je } = ve;
-    D > 0 && ($ = { stroke: l.divider.line }, Qt(O, D, 0, p.width, $)), O.drawImage(K.canvas, re, D, ae, ye), O.drawImage(ve.canvas, fe, D - 1, ut, je), D += ye;
+    let Z = oe.graph.viewport.scene, { width: ae, height: ye } = Z, ve = oe.scale.graph.viewport.scene, { width: ut, height: je } = ve;
+    D > 0 && ($ = { stroke: l.divider.line }, Qt(O, D, 0, p.width, $)), O.drawImage(Z.canvas, re, D, ae, ye), O.drawImage(ve.canvas, fe, D - 1, ut, je), D += ye;
   }
   O.drawImage(c.canvas, 0, D, c.width, c.height), $ = {
     text: a.config.title,
@@ -17340,8 +17349,8 @@ function Er(a, i, s, n, r, o) {
   }, ao(O, 6, 6, $);
   const k = (N) => {
     if (N) {
-      const K = o?.x || 0, ae = o?.y || 0, ye = o?.width || x * 0.25, ve = o?.height || P * 0.25;
-      O.drawImage(N, K, ae, ye, ve);
+      const Z = o?.x || 0, ae = o?.y || 0, ye = o?.width || x * 0.25, ve = o?.height || P * 0.25;
+      O.drawImage(N, Z, ae, ye, ve);
     }
     O.restore();
     const oe = () => {
@@ -17350,14 +17359,14 @@ function Er(a, i, s, n, r, o) {
     switch (r) {
       case "url":
         if (U(i)) {
-          const K = (ae) => {
+          const Z = (ae) => {
             i(ae), oe();
           };
-          L.scene.toImage(s, n, K);
+          L.scene.toImage(s, n, Z);
         } else
-          new Promise(function(K, ae) {
+          new Promise(function(Z, ae) {
             const ye = L.scene.toImage(s, n);
-            ye ? K(ye) : ae(!1), oe();
+            ye ? Z(ye) : ae(!1), oe();
           });
         break;
       case "download":
@@ -17420,27 +17429,27 @@ class R extends Km {
   #u = Ht;
   #m = Ft;
   #v;
-  #f;
-  #x;
+  #g;
+  #T;
   #w;
   #p;
-  #T;
-  #P;
-  #g;
-  #C;
   #S;
-  #D;
+  #P;
+  #f;
+  #x;
+  #C;
+  #I;
   #A;
   #O = !1;
   #b = null;
   #M = H;
   #E;
   #y;
-  #R = Mo;
+  #D = Mo;
   #k = { ...Ti };
   #H = { ...Ti };
   #L = { ...Ti };
-  #I;
+  #R;
   #_;
   #j;
   chartWMin = Yt;
@@ -17546,10 +17555,10 @@ class R extends Km {
     return this.#m;
   }
   get options() {
-    return this.#x;
+    return this.#T;
   }
   get config() {
-    return this.#f;
+    return this.#g;
   }
   get core() {
     return this.#v;
@@ -17638,10 +17647,10 @@ class R extends Km {
     return this.state.data.chart.settings;
   }
   get indicatorClasses() {
-    return this.#R;
+    return this.#D;
   }
   get TALib() {
-    return this.#I;
+    return this.#R;
   }
   get TALibReady() {
     return R.talibReady;
@@ -17721,7 +17730,7 @@ class R extends Km {
   start(i) {
     this.log(`${Ht} configuring...`), R.create(i);
     const s = R.create(i);
-    this.logs = s?.logs ? s.logs : !1, this.infos = s?.infos ? s.infos : !1, this.warnings = s?.warnings ? s.warnings : !1, this.errors = s?.errors ? s.errors : !1, this.timer = s?.timer ? s.timer : !1, this.#f = s, this.#b = s.cnt || this.#b, this.#I = s.talib, (!("theme" in s) || !S(s.theme)) && (s.theme = Vi);
+    this.logs = s?.logs ? s.logs : !1, this.infos = s?.infos ? s.infos : !1, this.warnings = s?.warnings ? s.warnings : !1, this.errors = s?.errors ? s.errors : !1, this.timer = s?.timer ? s.timer : !1, this.#g = s, this.#b = s.cnt || this.#b, this.#R = s.talib, (!("theme" in s) || !S(s.theme)) && (s.theme = Vi);
     const n = E(s?.id) ? s.id : null;
     this.setID(n), this.classList.add(this.id), this.log("processing state...");
     let r = ue(s?.state) || {};
@@ -17729,15 +17738,15 @@ class R extends Km {
     let o = s?.deepValidate || !1, l = s?.isCrypto || !1;
     this.#E = this.#M.create(r, o, l), delete s.state, this.log(`${this.name} id: ${this.id} : created with a ${this.state.status} state`);
     let h = "1s", c = Y;
-    if (!S(s?.stream) && this.state.data.chart.data.length < 2 ? (this.warn(`${Ht} has no chart data or streaming provided.`), { tf: h, ms: c } = bi(s?.timeFrame)) : S(s?.stream) && this.state.data.chart.data.length < 2 ? ({ tf: h, ms: c } = bi(s?.timeFrame), this.#V = !0) : (h = this.state.data.chart.tf, c = this.state.data.chart.tfms), this.log(`tf: ${h} ms: ${c}`), this.#f.callbacks = this.#f.callbacks || {}, S(s))
+    if (!S(s?.stream) && this.state.data.chart.data.length < 2 ? (this.warn(`${Ht} has no chart data or streaming provided.`), { tf: h, ms: c } = bi(s?.timeFrame)) : S(s?.stream) && this.state.data.chart.data.length < 2 ? ({ tf: h, ms: c } = bi(s?.timeFrame), this.#V = !0) : (h = this.state.data.chart.tf, c = this.state.data.chart.tfms), this.log(`tf: ${h} ms: ${c}`), this.#g.callbacks = this.#g.callbacks || {}, S(s))
       for (const f in s)
         f in this.props() && this.props()[f](s[f]);
     const p = S(s?.range) ? s.range : {};
     if (p.interval = c, p.core = this, this.getRange(null, null, p), this.#y.Length > 1) {
-      const f = Ls(this.#$, this.#f?.range?.startTS), x = T(f) ? f + this.#y.initialCnt : this.allData.data.length, P = T(f) ? f : x - this.#y.initialCnt;
+      const f = Ls(this.#$, this.#g?.range?.startTS), x = T(f) ? f + this.#y.initialCnt : this.allData.data.length, P = T(f) ? f : x - this.#y.initialCnt;
       this.#y.initialCnt = x - P, this.setRange(P, x), s.range?.center && this.jumpToIndex(P, !0, !0);
     }
-    this.parentElement && this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.#G = new tp(this, { widgets: s?.widgets }), this.#W = new Qm(this, s), this.#F = new $o(this, s), this.#N = new Ho(this, s), this.setTheme(this.#j.id), this.log(`${this.#u} V${R.version} configured and running...`), this.#U = this.bufferPx * -1, this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#q = this.WidgetsG.insert("Progress", {}), this.stream = this.#f.stream, this.#V && this.on(et, this.delayedSetRange, this), this.#O = !0, this.refresh();
+    this.parentElement && this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.#G = new tp(this, { widgets: s?.widgets }), this.#W = new Qm(this, s), this.#F = new $o(this, s), this.#N = new Ho(this, s), this.setTheme(this.#j.id), this.log(`${this.#u} V${R.version} configured and running...`), this.#U = this.bufferPx * -1, this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#q = this.WidgetsG.insert("Progress", {}), this.stream = this.#g.stream, this.#V && this.on(et, this.delayedSetRange, this), this.#O = !0, this.refresh();
   }
   destroy() {
     if (this?.destuction !== !0)
@@ -17765,10 +17774,10 @@ class R extends Km {
       heightMin: (i) => this.setHeightMin(i),
       widthMax: (i) => this.setWidthMax(i),
       heightMax: (i) => this.setHeightMax(i),
-      logs: (i) => this.logs = Q(i) ? i : !1,
-      infos: (i) => this.infos = Q(i) ? i : !1,
-      warnings: (i) => this.warnings = Q(i) ? i : !1,
-      errors: (i) => this.errors = Q(i) ? i : !1,
+      logs: (i) => this.logs = X(i) ? i : !1,
+      infos: (i) => this.infos = X(i) ? i : !1,
+      warnings: (i) => this.warnings = X(i) ? i : !1,
+      errors: (i) => this.errors = X(i) ? i : !1,
       indicators: (i) => this.setIndicators(i),
       theme: (i) => {
         this.#j = this.addTheme(i);
@@ -17857,7 +17866,7 @@ class R extends Km {
     if (this.stream instanceof xt)
       return this.error("ERROR: Invoke stopStream() before starting a new one."), !1;
     if (S(i))
-      return this.allData.data.length == 0 && E(i.timeFrame) && ({ tf, ms } = bi(i?.timeFrame), this.range.interval = ms, this.range.intervalStr = tf, this.#$.timeFrameMS = ms, this.#$.timeFrame = tf), this.#B = new xt(this), this.#f.stream = this.#B.config, this.#B;
+      return this.allData.data.length == 0 && E(i.timeFrame) && ({ tf, ms } = bi(i?.timeFrame), this.range.interval = ms, this.range.intervalStr = tf, this.#$.timeFrameMS = ms, this.#$.timeFrame = tf), this.#B = new xt(this), this.#g.stream = this.#B.config, this.#B;
   }
   stopStream() {
     this.stream instanceof xt && this.stream.stop();
@@ -17904,7 +17913,7 @@ class R extends Km {
   mergeData(i, s = !1, n = !1) {
     this.#z = !0;
     let r = this.state.mergeData(i, s, n);
-    return Q(r) && (this.#z = !1), r;
+    return X(r) && (this.#z = !1), r;
   }
   isOverlay(i) {
     return Dn(i) && U(i.prototype?.draw) && !this.isIndicator(i) && Object.getPrototypeOf(i.prototype).constructor.isOverlay;
@@ -17990,10 +17999,10 @@ class R extends Km {
   setIndicators(i, s = !1) {
     if (!S(i))
       return !1;
-    s && (console.warn("Expunging all default indicators!"), this.#R = {});
+    s && (console.warn("Expunging all default indicators!"), this.#D = {});
     const n = {};
     for (const [r, o] of Object.entries(i))
-      E(o?.id) && E(o?.name) && E(o?.event) && this.isIndicator(o?.ind) ? (this.#R[r] = o, n[r] = !0, this.log(`Custom Indicator: ${r} - Registered`)) : (n[r] = !1, this.warn(`Custom Indicator: ${r} - Rejected: Not a valid indicator`));
+      E(o?.id) && E(o?.name) && E(o?.event) && this.isIndicator(o?.ind) ? (this.#D[r] = o, n[r] = !0, this.log(`Custom Indicator: ${r} - Registered`)) : (n[r] = !1, this.warn(`Custom Indicator: ${r} - Rejected: Not a valid indicator`));
     return n;
   }
   addIndicator(i, s = i, n = {}) {

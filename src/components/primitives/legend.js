@@ -1,8 +1,9 @@
 // legend.js
 
-import { isObject, isString } from "../../utils/typeChecks"
+import { isBoolean, isObject, isString } from "../../utils/typeChecks"
 import { debounce, uid } from "../../utils/utilities"
 import Input from "../../input"
+
 
 const userSelect = [
   "-webkit-touch-callout",
@@ -43,6 +44,12 @@ export default class Legends {
   get list() { return this.#list }
   set collapse(c) { this.setCollapse(c) }
   get collapse() { return this.#collapse }
+  get visible() { return this.getVisible() }
+
+  getVisible() {
+    const style = getComputedStyle(this.#elTarget)
+    return style.display && style.visibility
+  }
 
   destroy() {
     this.#core.hub.expunge(this)
@@ -145,6 +152,7 @@ export default class Legends {
     options.type = options?.type || "overlay"
     options.title = options?.title || options?.parent.legendName
     options.parent = options?.parent || parentError
+    options.visible = (isBoolean(options?.visible)) ? options.visible : true
 
     const html = this.elTarget.buildLegend(options, this.#core.theme)
 
@@ -169,6 +177,8 @@ export default class Legends {
         Object.keys(this.#list).length < 3)
         this.#controls.style.display = "none"
     }
+
+    legendEl.style.display = (options.visible) ? "block" : "none"
 
     return options.id
   }
@@ -218,7 +228,9 @@ export default class Legends {
           return true;
         case "legendVisibility" :
           const display = (!!properties[p]) ? "block" : "none";
+          const visible = (!!properties[p]) ? "visible" : "hidden"
           el.style.display = display
+          el.style.visibility = visible
           return true;
       }
     }
