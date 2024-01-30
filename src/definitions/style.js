@@ -86,6 +86,9 @@ export const WindowStyle = {
   COLOUR_BG: COLOUR_BG,
   COLOUR_BORDER: COLOUR_BORDER,
   COLOUR_TXT: COLOUR_TXT,
+  SHADOW: "rgb(0,0,0) 0px 20px 30px -10px",
+  CONTENT: "padding: 1em",
+  TITLE: "padding: 2px 1em 5px; background: #333; white-space: nowrap;"
 }
 
 export const ProgressStyle = {
@@ -200,6 +203,27 @@ export const watermark = {
   IMGHEIGHT: "200"
 }
 
+export const drawingNode = {
+  passive: {
+    stroke: "#000",
+    fill: "#ccc",
+    width: 1,
+    radius: 6,
+  },
+  hover: {
+    stroke: "#800",
+    fill: "#fff",
+    width: 1,
+    radius: 6,
+  },
+  active: {
+    stroke: "#800",
+    fill: "#fff",
+    width: 1,
+    radius: 6,
+  },
+}
+
 const tradeIcons = { arrowDown, arrowUp, arrowDownRound, arrowUpRound, arrowDownRoundSolid, arrowUpRoundSolid, buySolid, sellSolid }
 const eventIcons = { noteSolid, lightning }
 
@@ -259,6 +283,12 @@ export const defaultTheme = {
   secondaryPane: {
     separator: "#666"
   },
+  tools: {
+    location: false
+  },
+  utils: {
+    location: false
+  },
   time: {
     navigation: false,
     font: LegendStyle.font,
@@ -284,6 +314,7 @@ export const defaultTheme = {
     line: DividerStyle.LINE,
     style: DividerStyle.STYLE
   },
+  window: WindowStyle,
   watermark: watermark,
   trades: {
     iconBuy: tradeIcons.arrowUp,
@@ -305,6 +336,9 @@ export const defaultTheme = {
     defaultIcons: eventIcons,
     offset: 10
   },
+  drawing: {
+    node: drawingNode
+  }
 }
 
 export const cssVars = `

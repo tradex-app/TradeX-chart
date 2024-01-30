@@ -93,7 +93,6 @@ export default class xAxis extends Axis {
    * return chart time
    * handles X Axis modes: default, indexed
    * @param {number} x
-   * @returns {timestamp}
    * @memberof xAxis
    */
   xPos2Time(x) {

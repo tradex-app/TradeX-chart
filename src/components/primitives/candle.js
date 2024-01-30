@@ -194,7 +194,7 @@ export default class Candle {
           fill.addColorStop(index, value)
         }
       }
-      else if (isString())
+      else if (isString(cfg.AreaFillColour))
         fill = cfg.AreaFillColour
       else
         fill = cfg.UpBodyColour || cfg.DnBodyColour

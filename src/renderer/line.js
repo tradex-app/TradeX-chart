@@ -27,7 +27,7 @@ export function renderLineHorizontal (ctx, y, left, right, opts) {
  * @param {Object} opts 
  */
 export function renderLineVertical (ctx, x, top, bottom, opts) {
-  coords = [{x:x, y:top}, {x:x, y,bottom}]
+  const coords = [{x:x, y:top}, {x:x, y,bottom}]
   renderPath(ctx, coords, opts, () => {
     ctx.stroke()
     ctx.closePath()

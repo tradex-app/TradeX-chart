@@ -8,7 +8,7 @@ export function ref(v) {
     if ("__observer__" in v) return new Error ("ref() target is already reactive")
     else {
       // iterate over properties and add getters and setters
-      for (p in v) {
+      for (let p in v) {
         let _ref = ref(p)
         _ref.__observer__ = (cb) => { subs.push(cb) }
         watch(_ref, (newVal, oldVal) => {
@@ -18,7 +18,7 @@ export function ref(v) {
       return v
     }
   }
-  else if (isArray) {
+  else if (isArray(v)) {
 
   }
   else {

@@ -54,14 +54,46 @@ export default class EventHub {
     }
   
     /**
+     * unsubscribe all listeners for the specified context
+     * @param {*} context
+     * @memberof EventHub
+     */
+    expunge(context) {
+      let topic,
+          hub = this.#hub;
+
+      for (topic in hub) {
+        for (let i=0; i<hub[topic].length; i++) {
+          if (hub[topic][i].context === context) {
+            hub[topic].splice(i, 1);
+            if (hub[topic].length === 0) {
+              delete hub[topic];
+              break
+            }
+          }
+        }
+      }
+      return true;
+    }
+  
+    /**
     * Publish a topic
     * @param {string} topic - The topic name
     * @param {Object}  data - The data to publish
-    * @returns {boolean}
     */
     emit(topic, data) {
       if (!isString(topic)) return
-      (this.#hub[topic] || []).forEach(cb => cb.handler.call(cb.context, data));
+      
+      (this.#hub[topic] || []).forEach(
+        cb => {
+          try {
+            cb.handler.call(cb.context, data)
+          }
+          catch (e) {
+            console.error(e)
+          }
+        }
+      );
     }
   
     /**
@@ -70,7 +102,7 @@ export default class EventHub {
     * @param {Object} data    - The data that gets published
     * @param {function} cb    - callback method
     */
-    execute(channel, data, cb) {
+    execute(topic, data, cb) {
   
     }
   

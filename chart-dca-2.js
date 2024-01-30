@@ -59,6 +59,7 @@ export default class chartDCA extends Overlay {
     // };
 
     // add the overlay to the Scale (yAxis)
+    console.log("DCA")
     const dca = {class: scaleDCA, fixed: true, required: false}
     if (this.core.config?.dca === true)
       this.scaleOverly = this.chart.scale.addOverlay("dca", dca)
@@ -68,13 +69,14 @@ export default class chartDCA extends Overlay {
   set position(p) { this.target.setPosition(0, 0) }
 
   draw(data = this.core.state.data.chart.data) {
+    
+    if (this.core.config?.dca !== true) return
+    if (!super.mustUpdate()) return
+
     // let firstPrice = data[0][4];
     let lastPrice = data[data.length - 1][4];
 
-    if (this.core.config?.dca !== true) return
-
-    if (!super.mustUpdate()) return
-
+    // clear the overlay canvas
     this.scene.clear()
 
     let txt, x, y;

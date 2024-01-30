@@ -1,16 +1,16 @@
 // widgets.js
 // A template file for Chart components
 
-import DOM from "../utils/DOM"
 import Menu from "./widgets/menu"
 import Dialogue from "./widgets/dialogue"
 import ConfigDialogue from "./widgets/configDialogue"
+import ColourPicker from "./widgets/colourPicker"
 import Divider from "./widgets/divider"
 import Progress from "./widgets/progress"
 import Window from "./widgets/window"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-widgets"
-import { isObject } from "../utils/typeChecks"
+import { isBoolean, isObject, isString } from "../utils/typeChecks"
 import { idSanitize } from "../utils/utilities"
 
 export default class Widgets {
@@ -22,8 +22,8 @@ export default class Widgets {
   #options
   #stateMachine
 
-  #widgets
-  #widgetsList = { Divider, Progress, Menu, Window, Dialogue, ConfigDialogue }
+  #widgets = {}
+  #widgetsList = { Divider, Progress, Menu, Window, Dialogue, ConfigDialogue, ColourPicker }
   #widgetsInstances = {}
   #elements = {}
   #elWidgetsG
@@ -35,9 +35,23 @@ export default class Widgets {
 
     this.#core = core
     this.#options = options
+    // TODO: valiation of options.widgets
     this.#widgets = {...this.#widgetsList, ...options.widgets}
     this.#elWidgetsG = core.elWidgetsG
-    this.init()
+
+    this.mount(this.#elWidgetsG)
+
+    for (let i in this.#widgets) {
+      let widget = this.#widgets[i]
+      let entry = `el${widget.name}`
+          this.#elements[entry] = this.#elWidgetsG.querySelector(`.${widget.class}`)
+          this.#elements[entry].innerHTML = `
+      <style title="${widget.name}">
+        ${widget?.defaultStyles || ""}
+      </style>
+      `
+      widget.stylesInstalled = true
+    }
   }
 
   log(l) { this.#core.log(l) }
@@ -46,7 +60,7 @@ export default class Widgets {
   error(e) { this.#core.error(e) }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return this.#id || `${this.#core.id}-${this.#shortName}` }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get core() { return this.#core }
@@ -56,16 +70,6 @@ export default class Widgets {
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
   get types() { return this.#widgets }
-
-  init() {
-    this.mount(this.#elWidgetsG)
-
-    for (let i in this.#widgets) {
-      let widget = this.#widgets[i]
-      let entry = `el${widget.name}`
-      this.#elements[entry] = this.#elWidgetsG.querySelector(`.${widget.class}`)
-    }
-  }
 
   start() {
     // set up event listeners
@@ -79,11 +83,7 @@ export default class Widgets {
   }
 
   destroy() {
-    this.off("menu_open", this.onOpenMenu)
-    this.off("menu_close", this.onCloseMenu)
-    this.off("menu_off", this.onCloseMenu)
-    this.off("menuItem_selected", this.onMenuItemSelected)
-    this.off("global_resize", this.onResize)
+    this.#core.hub.expunge(this)
     
     this.stateMachine.destroy()
 
@@ -92,7 +92,7 @@ export default class Widgets {
     }
 
     for (let t in this.#widgets) {
-      this.#widgets[t].destroy(id)
+      this.#widgets[t].destroy()
     }
   }
 
@@ -107,20 +107,16 @@ export default class Widgets {
     this.on("global_resize", this.onResize, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {
     this.#core.emit(topic, data)
-  }
-
-  onResize(dimensions) {
-    this.setDimensions(dimensions)
   }
 
   onOpenMenu(data) {
@@ -140,7 +136,8 @@ export default class Widgets {
     this.emit(e.evt, e.target)
   }
 
-  onResize() {
+  onResize(dimensions) {
+    this.setDimensions(dimensions)
     this.elements.elDividers.style.width = `${this.core.width}px`
   }
 
@@ -179,18 +176,32 @@ export default class Widgets {
     return nodes
   }
 
+  /**
+   * insert a widget into the list
+   * @param {string} type 
+   * @param {object} config 
+   * @returns {Widget} - widget instance
+   */
   insert(type, config) {
     if (!(type in this.#widgets) || !isObject(config)) return false
 
     config.core = this.core
+
+    // create the widget
     const widget = this.#widgets[type].create(this, config)
     this.#widgetsInstances[widget.id] = widget
     return widget
   }
 
+  /**
+   * delete a widget from the list
+   * @param {string} id 
+   * @returns {boolean}
+   */
   delete(id) {
-    if (!isString(id)) return false
+    if (!isString(id) || !(id in this.#widgetsInstances)) return false
 
+    const type = this.#widgetsInstances[id].type
     this.#widgets[type].destroy(id)
     return true
   }

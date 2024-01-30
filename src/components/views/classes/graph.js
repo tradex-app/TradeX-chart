@@ -6,6 +6,7 @@ import { copyDeep, xMap } from '../../../utils/utilities'
 import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from '../../../utils/typeChecks'
 import CEL from "../../primitives/canvas"
 import Overlays from "../../overlays"
+import Overlay from "../../overlays/overlay"
 
 import grid from "../../overlays/chart-grid"
 import cursor from "../../overlays/chart-cursor"
@@ -25,7 +26,7 @@ export default class graph {
   #viewport
   #overlays
 
-  #elparent
+  #elParent
   #elCanvas
   #elViewport
 
@@ -38,7 +39,7 @@ export default class graph {
     this.#core = parent.core
     this.#config = this.core.config
     this.#theme = this.core.theme
-    this.#elparent = this.#parent.element
+    this.#elParent = this.#parent.element
     this.#elViewport = elViewport
     
     // create graph viewport with overlays
@@ -49,11 +50,11 @@ export default class graph {
   get core() { return this.#core }
   get config() { return this.#config }
   set width(w) { this.setWidth(w) }
-  get width() { return this.#elparent.getBoundingClientRect().width }
+  get width() { return this.#elParent.width }
   set height(h) { this.setHeight(h) }
-  get height() { return this.#elparent.getBoundingClientRect().height }
-  get dimensions() { return DOM.elementDimPos(this.#elparent) }
-  set layerWidth(w) { this.#layerWidth = w }
+  get height() { return this.#elParent.height }
+  get dimensions() { return this.#elParent.dimensions }
+  set layerWidth(w) { this.#layerWidth = w || this.#elParent.width }
   get layerWidth() { return this.#layerWidth }
   get stateMachine() { return this.#parent.stateMachine }
   set state(s) { this.#core.setState(s) }
@@ -162,8 +163,7 @@ export default class graph {
 
     const fn = (k, overlay) => {
       // is it a valid overlay?
-      if (!isObject(overlay) || 
-      !isFunction(overlay?.instance?.draw)) return
+      if (!(overlay.instance instanceof Overlay)) return
 
       if (update)
         overlay.instance.setRefresh()
@@ -176,9 +176,15 @@ export default class graph {
     this.executeOverlayList(fn)
   }
 
+  /**
+   * flag all overlays / indicators to be redrawn
+   */
   drawAll() {
     const fn = (k, o) => {
-      o.instance.mustUpdate()
+      // is it a valid overlay?
+      if (!(o.instance instanceof Overlay)) return
+
+      o.instance.setRefresh()
     }
     this.executeOverlayList(fn)
   }
@@ -201,10 +207,15 @@ export default class graph {
         fn(key, overlay)
       }
       catch (e) {
-        result.push(e)
+        result.push({overlay: key, error: e})
       }
     }
-    if (result.length > 0) this.#core.error(result)
+    if (result.length > 0) {
+      for (let err of result) {
+        this.#core.error(`ERROR: executeOverlayList() ${err.overlay}`)
+        this.#core.error(err.error)
+      }
+    }
     else result = true
     return result
   }
@@ -214,7 +225,7 @@ export default class graph {
   }
 
   refresh() {
-    this.draw(undefined, true)
+    this.draw(this.range, true)
     this.render()
   }
 

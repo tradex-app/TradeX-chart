@@ -11,6 +11,7 @@ import { ms2Interval, SECOND_MS } from '../utils/time'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS } from '../definitions/chart'
 import { SHORTNAME } from '../definitions/core'
 import TradeXchart from '../core'
+import Indicator from '../components/overlays/indicator'
 
 const DEFAULTSTATEID = "defaultState"
 const DEFAULT_STATE = {
@@ -80,7 +81,7 @@ export default class State {
 
   static validate(state, deepValidate=false, isCrypto=false) {
 
-    const defaultState = this.default
+    const defaultState = State.default
 
     if (!isObject(state)) {
       state = {}
@@ -518,11 +519,12 @@ export default class State {
           for (let o of mPrimary) {
             if (isArray(o?.data) && o?.data.length > 0) {
               for (let p of primaryPane) {
-                if (p.name === o.name &&
+                if (isObject(p) &&
+                    p.name === o.name &&
                     p.type === o.type &&
                     isObjectEqual(p.settings, o.settings)) {
                       p.data = this.merge(p.data, o.data)
-                      o.instance.drawOnUpdate = true
+                      this.#core.getIndicator(p.id).drawOnUpdate = true
                 }
               }
             }
@@ -534,11 +536,12 @@ export default class State {
           for (let o of mSecondary) {
             if (isArray(o?.data) && o?.data.length > 0) {
               for (let p of secondaryPane) {
-                if (p.name === o.name &&
+                if (isObject(p) &&
+                    p.name === o.name &&
                     p.type === o.type &&
                     isObjectEqual(p.settings, o.settings)) {
                       p.data = this.merge(p.data, o.data)
-                      o.instance.drawOnUpdate = true
+                      this.#core.getIndicator(p.id).drawOnUpdate = true
                 }
               }
             }

@@ -1,14 +1,16 @@
 // scale.js
 // Scale bar that lives on the side of the chart
 
+import { YAXIS_TYPES } from '../definitions/chart'
 import { isArray, isObject } from '../utils/typeChecks'
-import DOM from "../utils/DOM"
+import { elementDimPos } from "../utils/DOM"
 import yAxis from "./axis/yAxis"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
 import Input from "../input"
+import { countDigits, limitPrecision } from '../utils/number'
 import { copyDeep, idSanitize, xMap } from '../utils/utilities'
-import { STREAM_UPDATE } from "../definitions/core"
+import { MAX_CRYPTO_PRECISION, STREAM_UPDATE } from "../definitions/core"
 import { calcTextWidth, createFont } from '../renderer/text'
 
 import Graph from "./views/classes/graph"
@@ -67,7 +69,7 @@ export default class ScaleBar {
     this.#chart = this.#options.chart
     this.#parent = this.#options.parent
     this.id = `${this.#parent.id}_scale`
-    this.init()
+    this.#elViewport = this.#element.viewport || this.#element
   }
 
   log(l) { this.#core.log(l) }
@@ -76,7 +78,7 @@ export default class ScaleBar {
   error(e) { this.#core.error(e) }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return this.#id || `${this.#core.id}-${this.#shortName}` }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get core() { return this.#core }
@@ -102,11 +104,12 @@ export default class ScaleBar {
   set graph(g) { this.#Graph = g }
   get graph() { return this.#Graph }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#element) }
+  get dimensions() { return elementDimPos(this.#element) }
   get theme() { return this.#core.theme }
   get config() { return this.#core.config }
   get digitCnt() { return this.#digitCnt }
   set scaleRange(r) { this.setScaleRange(r) }
+  get range() { return this.#yAxis.range }
   set rangeMode(m) { this.#yAxis.mode = m }
   get rangeMode() { return this.#yAxis.mode }
   set rangeYFactor(f) { this.core.range.yFactor(f) }
@@ -115,10 +118,6 @@ export default class ScaleBar {
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
   get Scale() { return this }
-
-  init() {
-    this.#elViewport = this.#element.viewport || this.#element
-  }
 
   start() {
     const range = (this.#parent.name == "Chart" ) ? 
@@ -146,13 +145,13 @@ export default class ScaleBar {
   }
 
   destroy() {
+    this.#core.hub.expunge(this)
+    this.off(`${this.#parent.id}_pointerout`, this.#layerCursor.erase, this.#layerCursor)
+    this.off(STREAM_UPDATE, this.onStreamUpdate, this.#layerPriceLine)
+
     this.stateMachine.destroy()
     this.#Graph.destroy()
     this.#input.destroy()
-
-    this.off(`${this.#parent.id}_mousemove`, this.onMouseMove, this)
-    this.off(`${this.#parent.id}_mouseout`, this.#layerCursor.erase, this.#layerCursor)
-    this.off(STREAM_UPDATE, this.onStreamUpdate, this.#layerPriceLine)
 
     this.element.remove()
   }
@@ -168,17 +167,18 @@ export default class ScaleBar {
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("dblclick", this.resetScaleRange.bind(this))
 
-    this.on(`${this.#parent.id}_mousemove`, this.onMouseMove, this)
-    this.on(`${this.#parent.id}_mouseout`, this.#layerCursor.erase, this.#layerCursor)
+    this.on(`${this.#parent.id}_pointermove`, this.onMouseMove, this)
+    this.on(`${this.#parent.id}_pointerout`, this.#layerCursor.erase, this.#layerCursor)
     this.on(STREAM_UPDATE, this.#layerPriceLine.draw, this.#layerPriceLine)
+    this.on(`setRange`, this.draw, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.core.off(topic, handler, context)
   }
 
   emit(topic, data) {
@@ -208,7 +208,7 @@ export default class ScaleBar {
 
   onMouseWheel(e) {
     e.domEvent.preventDefault()
-    this.setScaleRange(Math.sign(e.wheeldelta) * -1)
+    this.setScaleRange(Math.sign(e.wheeldelta) * -2)
   }
 
   onStreamUpdate(e) {
@@ -250,7 +250,6 @@ export default class ScaleBar {
 
   /**
    * Set price chart or off chart indicator to automatic scaling and positioning
-   * @param {number} r - scale adjustment value
    */
   resetScaleRange() {
     this.#yAxis.mode = "automatic"
@@ -267,8 +266,8 @@ export default class ScaleBar {
   yPos2Price(y) { return this.#yAxis.yPos2Price(y) }
 
   nicePrice($) {
-    let digits = this.#yAxis.countDigits($)
-    return this.#yAxis.limitPrecision(digits)
+    let digits = countDigits($)
+    return limitPrecision(digits, this.config.precision)
   }
 
 
@@ -288,11 +287,24 @@ export default class ScaleBar {
   }
 
   calcPriceDigits() {
-    const ctx = this.#layerCursor.viewport.scene.context
+    let count = 8;
+    if (this.#core.range.dataLength > 0) {
+      const high = this.#core.range.valueMax
+      const digits = countDigits(high)
+      const nice = limitPrecision(digits, this.config.precision)
+     count = `${nice}`.length + 2
+    }
+    this.#digitCnt = count 
+    return this.#digitCnt
+  }
+
+  calcScaleWidth() {
+    const max = this.calcPriceDigits()
+    const ctx = this.#core.MainPane.graph.viewport.scene.context
     const t = this.theme.yAxis
     ctx.font = createFont(t.fontSize, t.fontWeight, t.fontFamily)
     const w = calcTextWidth(ctx, "0")
-    this.#digitCnt = Math.floor(this.width / w)
+    return max * w
   }
 
   /**

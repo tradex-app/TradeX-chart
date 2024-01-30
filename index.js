@@ -13,6 +13,8 @@ import btcusdt_15min from './data/btcusdt_15min'
 import TEST from './custom-indicator'
 import DMI from './DMI'
 import CustomOverlay from './custom-overlay'
+import chartDCA from './chart-dca'
+
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
@@ -199,9 +201,14 @@ const config1 = {
     }
   },
   watermark: {
+    display: true,
     text: "BTC/USDT"
   },
-  dca: false,
+  trades: { 
+      display: true,
+      displayInfo: true 
+    },
+  dca: true,
   highLow: true,
   isCrypto: true,
   logs: true,
@@ -328,6 +335,12 @@ const config3 = {
     secondaryPane: {
 
     },
+    utils: {
+      location: true
+    },
+    tools: {
+      location: true
+    },
     time: {
       // font: LegendStyle.font,
       colour: "#96a9db",
@@ -398,6 +411,9 @@ const config4 = {
     },
     primaryPane: {
 
+    },
+    utils: {
+      location: true
     },
   },
   isCrypto: true,
@@ -1150,32 +1166,41 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
-// addChart()
-// addChart()
-// addChart()
-// addChart()
-// addChart()
+addChart()
+addChart()
+addChart()
+addChart()
+addChart()
 
+document.getElementById("fullscreen").addEventListener("click", (e) => {
+  chart0.requestFullscreen()
+})
 
 // add custom indicator definition
 chart0.setIndicators({
   TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST},
   DMI: {id: "DMI", name: "Directional Movement Indicator", event: "addIndicator", ind: DMI },
 })
-// chart0.addIndicator("TEST", "Test1", {data: [], settings: {}})
+chart0.addIndicator("VOL")
+chart0.addIndicator("TEST", "Test1", {data: [], settings: {}})
 // chart0.addIndicator("DMI", "DMI1", {data: []})
 chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
 chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 
 // register custom overlay
 chart0.setCustomOverlays({
-  custom: {
-    class: CustomOverlay,
+  // custom: {
+  //   class: CustomOverlay,
+  //   location: "primaryPane"
+  // },
+  dca: {
+    class: chartDCA,
     location: "primaryPane"
   }
 })
-// add custom overlay
-chart0.addOverlay("custom", "chartPane")
+// add custom overlays
+// chart0.addOverlay("custom", "chartPane")
+// chart0.addOverlay("dca", "chartPane")
 
 // add an alert
 if (typeof chart1 === "object") {
@@ -1183,6 +1208,8 @@ if (typeof chart1 === "object") {
   chart1.on("range_limitPast", (e) => onRangeLimit(e, "past"))
   chart1.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 }
+
+chart2.addIndicator("VOL", "VOL", {settings:{isPrimary: false}})
 
 // test merging indicator data
 if (typeof chart5 === "object")

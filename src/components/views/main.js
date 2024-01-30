@@ -6,6 +6,7 @@ import tradeXTime from './time'
 import tradeXRows from './rows'
 
 import {
+  TIMESCALEH,
   TIMEH,
   SCALEW,
   GlobalStyle
@@ -50,7 +51,9 @@ template.innerHTML = `
 
 export default class tradeXMain extends element {
 
-  #elYAxis
+  #elRows
+  #elTime
+  #elViewPort
   #theme
 
   constructor () {
@@ -61,12 +64,21 @@ export default class tradeXMain extends element {
 
   }
 
-  disconnectedCallback() {
+  connectedCallback() {
+    super.connectedCallback(
+      () => {
+        this.#elViewPort = this.shadowRoot.querySelector('#viewport')
+        this.#elRows = this.shadowRoot.querySelector('tradex-rows')
+        this.#elTime = this.shadowRoot.querySelector('tradex-time')
+        // this.style.display = "grid"
+      })
   }
 
-  get viewport() { return this.shadowRoot.querySelector('#viewport') }
-  get rows() { return this.shadowRoot.querySelector('tradex-rows') }
-  get time() { return this.shadowRoot.querySelector('tradex-time') }
+  disconnectedCallback() {
+  }
+  get viewport() { return this.#elViewPort }
+  get rows() { return this.#elRows }
+  get time() { return this.#elTime }
 
   start(theme) {
     this.#theme = theme
@@ -80,6 +92,15 @@ export default class tradeXMain extends element {
       </tradex-chartpane>
     `
     return node
+  }
+
+  removeRow(id) {
+    const row = this.shadowRoot.querySelector(`#${id}`)
+    if (!!row) {
+      row.remove()
+      return true
+    }
+    else return false
   }
 
   setMain() {

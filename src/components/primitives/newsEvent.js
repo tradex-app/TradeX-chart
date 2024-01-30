@@ -1,7 +1,7 @@
 // newsEvent.js
 // draw a single news event marker
 
-import DOM from "../../utils/DOM"
+import { svgToImage } from "../../utils/DOM"
 import { limit } from "../../utils/number"
 
 
@@ -18,7 +18,7 @@ export default class NewsEvent {
     this.width = this.scene.width
     this.cfg = theme.events
     this.dims = {w: this.cfg.iconWidth, h: this.cfg.iconHeight}
-    this.icon = DOM.svgToImage(this.cfg.iconEvent, this.cfg.iconColour, this.dims)
+    this.icon = svgToImage(this.cfg.iconEvent, this.cfg.iconColour, this.dims)
   }
 
   draw(data) {
@@ -26,7 +26,7 @@ export default class NewsEvent {
     const i = this.icon
     const c = this.cfg
     const k = this.hit.getIndexValue(data.key)
-    const hit = DOM.svgToImage(c.iconEvent, k, this.dims)
+    const hit = svgToImage(c.iconEvent, k, this.dims)
     const h = limit(data.w, c.iconMinDim, c.iconHeight)
     const w = limit(data.w, c.iconMinDim, c.iconWidth)
     const x = this.data.x

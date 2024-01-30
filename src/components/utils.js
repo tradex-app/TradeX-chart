@@ -2,9 +2,10 @@
 // Utils bar that lives at the top of the chart
 // Providing: timeframes, indicators, config, refresh, save, load
 
-import DOM from "../utils/DOM"
+import { elementDimPos, findBySelectorAll, findTargetParentWithClass } from "../utils/DOM"
 import { UtilsStyle } from "../definitions/style"
 import { CLASS_UTILS } from "../definitions/core"
+import { UTILSLOCATIONS } from "../definitions/chart"
 import utilsList from "../definitions/utils"
 import Indicators from "../definitions/indicators"
 import { debounce } from "../utils/utilities"
@@ -21,6 +22,7 @@ export default class UtilsBar {
   #options
   #elUtils
   #utils
+  #location
   #widgets
   #indicators
   #menus = {}
@@ -36,7 +38,18 @@ export default class UtilsBar {
     this.#utils = core.config?.utilsBar || utilsList
     this.#widgets = core.WidgetsG
     this.#indicators = core.indicatorClasses || Indicators
-    this.init()
+    this.#location = core.config.theme?.utils?.location || "none"
+    if (!!this.#location ||
+          this.#location == "none" ||
+          !UTILSLOCATIONS.includes(this.#location)
+      ) {
+      this.#elUtils.style.height = 0
+      this.core.elBody.style.height = "100%"
+    }
+    // mount the default or custom utils bar definition
+    this.#elUtils.innerHTML = this.#elUtils.defaultNode(this.#utils)
+
+    this.log(`${this.#name} instantiated`)
   }
 
   log(l) { this.#core.log(l) }
@@ -49,15 +62,9 @@ export default class UtilsBar {
   get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elUtils) }
+  get dimensions() { return elementDimPos(this.#elUtils) }
   get stateMachine() { return this.#stateMachine }
-
-  init() {
-    // mount the default or custom utils bar definition
-    this.#elUtils.innerHTML = this.#elUtils.defaultNode(this.#utils)
-
-    this.log(`${this.#name} instantiated`)
-  }
+  get location() { return this.#location }
 
   start() {
     // activate utils icons and menus
@@ -72,7 +79,7 @@ export default class UtilsBar {
     // this.stateMachine.destroy()
     // remove event listeners
     const api = this.#core
-    const utils = DOM.findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
+    const utils = findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
 
     for (let util of utils) {
       let id = util.id.replace('TX_', '')
@@ -84,10 +91,7 @@ export default class UtilsBar {
       }
     }
 
-    this.off("utils_indicators", this.onIndicators)
-    this.off("utils_timezone", this.onTimezone)
-    this.off("utils_settings", this.onSettings)
-    this.off("utils_screenshot", this.onScreenshot)
+    this.#core.hub.expunge(this)
   }
 
   eventsListen() {
@@ -98,12 +102,12 @@ export default class UtilsBar {
     // this.on("global_resize", this.onResize, this)
   }
   
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {
@@ -113,7 +117,7 @@ export default class UtilsBar {
   onIconClick(e) {
     // if (!isObject(e.originalTarget)) return false
 
-    const target = DOM.findTargetParentWithClass(e.target, "icon-wrapper")
+    const target = findTargetParentWithClass(e.target, "icon-wrapper")
     if (!isObject(target)) return false
     const now = Date.now()
     if (now - this.#timers[target.id] < 1000) return false

@@ -1,8 +1,9 @@
 // legend.js
 
-import { isObject, isString } from "../../utils/typeChecks"
-import { uid } from "../../utils/utilities"
+import { isBoolean, isObject, isString } from "../../utils/typeChecks"
+import { debounce, uid } from "../../utils/utilities"
 import Input from "../../input"
+
 
 const userSelect = [
   "-webkit-touch-callout",
@@ -43,10 +44,15 @@ export default class Legends {
   get list() { return this.#list }
   set collapse(c) { this.setCollapse(c) }
   get collapse() { return this.#collapse }
+  get visible() { return this.getVisible() }
+
+  getVisible() {
+    const style = getComputedStyle(this.#elTarget)
+    return style.display && style.visibility
+  }
 
   destroy() {
-    this.#core.off("chart_pan", this.primaryPanePan)
-    this.#core.off("chart_panDone", this.primaryPanePanDone)
+    this.#core.hub.expunge(this)
 
     for (let l in this.#list) {
       if (l === "collapse") continue
@@ -82,7 +88,7 @@ export default class Legends {
    * @param {Object} e - pointer event
    * @memberof Legends
    */
-  onMouseClick(e) {
+  onPointerClick(e) {
     const which = (s) => {
       if (isString(s.dataset.icon)) 
         return {id: s.id, icon: s.dataset.icon, parent: s.parentElement}
@@ -99,7 +105,7 @@ export default class Legends {
   }
 
   onLegendAction(e) {
-    const which = this.onMouseClick(e.currentTarget)
+    const which = this.onPointerClick(e.currentTarget)
     this.setCollapse(which.icon)
   }
 
@@ -139,12 +145,14 @@ export default class Legends {
    * @memberof Legends
    */
   add(options) {
-    if (!isObject(options) || !("title" in options)) return false
+    if (!isObject(options)) return false
 
     const parentError = () => {this.#core.error("ERROR: Legend parent missing!")}
     options.id = options?.id || uid("legend")
     options.type = options?.type || "overlay"
+    options.title = options?.title || options?.parent.legendName
     options.parent = options?.parent || parentError
+    options.visible = (isBoolean(options?.visible)) ? options.visible : true
 
     const html = this.elTarget.buildLegend(options, this.#core.theme)
 
@@ -169,6 +177,8 @@ export default class Legends {
         Object.keys(this.#list).length < 3)
         this.#controls.style.display = "none"
     }
+    // set visibility
+    legendEl.style.display = (options.visible) ? "block" : "none"
 
     return options.id
   }
@@ -201,6 +211,29 @@ export default class Legends {
     let source = this.#list[id].source(data.pos)
     const html = this.#elTarget.buildInputs(source)
     this.#elTarget.legends.querySelector(`#legend_${id} dl`).innerHTML = html
+  }
+
+  modify(id, properties) {
+    if (!(id in this.#list) ||
+        !(isObject(properties))) return false
+
+    const el = this.#list[id].el
+
+    for (let p in properties) {
+      switch (p) {
+        case "legendName" :
+          const title = el.querySelectorAll(".title")
+          title[0].innerHTML = properties[p]
+          title[1].innerHTML = properties[p]
+          return true;
+        case "legendVisibility" :
+          const display = (!!properties[p]) ? "block" : "none";
+          const visible = (!!properties[p]) ? "visible" : "hidden"
+          el.style.display = display
+          el.style.visibility = visible
+          return true;
+      }
+    }
   }
 
   icons(icons, options) {

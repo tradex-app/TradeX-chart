@@ -1,8 +1,10 @@
 // circle.js
 
+import { fillStroke } from "./fill"
+
 /**
  * Draw a solid circle with border
- * @param {Object} ctx - canvas reference
+ * @param {canvas} ctx - canvas reference
  * @param {number} x - canvas pixel position
  * @param {number} y - canvas pixel position
  * @param {number} r - radius pixel distance

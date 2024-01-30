@@ -32,6 +32,7 @@ export default class Overlay {
     resize: false
   }
 
+
   id
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params={}) {
@@ -42,7 +43,7 @@ export default class Overlay {
     this.#target = target
     this.#scene = target.scene
     this.#hit = target.hit
-    this.#theme = theme
+    // this.#theme = {...this.#core.theme, ...theme}
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#params = params
@@ -59,22 +60,28 @@ export default class Overlay {
   get target() { return this.#target }
   get config() { return this.#config }
   get params() { return this.#params }
+  get range() { return this.#core.range }
+  get state() { return this.#core.state }
   get scene() { return this.#scene }
   get hit() { return this.#hit }
-  get theme() { return this.#theme }
+  get theme() { return this.#core.theme }
   get chart() { return this.#parent.parent.parent }
+  get chartData() { return this.#config.state.allData.data }
   get xAxis() { return this.getXAxis() }
   get yAxis() { return this.getYAxis() }
   get overlay() { return this.#params.overlay }
+  get overlayData() { return this.#params.overlay.data }
+  get data() { return this.#params.overlay.data }
+  get stateMachine() { return this.#core.stateMachine }
   get context() { return this.contextIs() }
-  set position(p) { this.target.setPosition(p[0], p[1]) }
+  set position(p) { this.#target.setPosition(p[0], p[1]) }
 
   destroy() {
-    // this.off("setRange", this.drawUpdate, this)
-    // this.off("rowsResize", this.drawUpdate, this)
-    // this.off("divider_pointerdrag", this.drawUpdate, this)
-    // this.off("divider_pointerdragend", this.drawUpdate, this)
-    this.off("global_resize", this.onResize, this)
+    this.#core.hub.expunge(this)
+
+    if ("overlay" in this.#params &&
+        "data" in this.#params.overlay)
+      delete this.#params.overlay.data
   }
 
   /**
@@ -84,7 +91,7 @@ export default class Overlay {
    * @param {*} context
    * @memberof Overlay
    */
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context);
   }
 
@@ -94,9 +101,18 @@ export default class Overlay {
    * @param {function} handler
    * @memberof Overlay
    */
-  off(topic, handler) {
-    this.#core.off(topic, handler);
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context);
   }
+
+  /**
+   * Remove all custom event listeners
+   * @param {*} context
+   * @memberof Overlay
+   */
+    expunge(context=this) {
+      this.#core.expunge(context);
+    }
 
   /**
    * Broadcast an event
@@ -175,7 +191,6 @@ export default class Overlay {
 
   /**
    * plot 
-   *
    * @param {Array} plots - array of inputs, eg. x y coords [{x:x, y:y}, ...]
    * @param {string} type - the canvas drawing function to invoke
    * @param {Object} params - parameters to pass to the drawing function
@@ -194,8 +209,8 @@ export default class Overlay {
         case "renderLineHorizontal": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
         case "renderLineVertical": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
         case "renderPath": canvas[type]( ctx, p, params.style, params ); break;
-        case "renderPathStroke": canvas[type]( ctx, p, params.style, params ); break;
-        case "renderPathClosed": canvas[type]( ctx, p, params ); break;
+        case "renderPathStroke": canvas[type]( ctx, p, params.style ); break;
+        case "renderPathClosed": canvas[type]( ctx, p, params.style, params ); break;
         case "renderSpline": canvas[type]( ctx, p, params ); break;
         case "renderRect": canvas[type]( ctx, p[0], p[1], p[2], p[3], params ); break;
         case "renderRectFill": canvas[type]( ctx, p[0], p[1], p[2], p[3], params ); break;
@@ -214,5 +229,12 @@ export default class Overlay {
       }
   
       ctx.restore();
+    }
+
+    /**
+     * clear the overlay canvas
+     */
+    clear() {
+      this.scene.clear()
     }
 }

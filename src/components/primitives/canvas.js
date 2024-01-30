@@ -2,8 +2,11 @@
 
 import { limit } from "../../utils/number";
 import { arrayMove } from "../../utils/utilities";
+import { isElement } from "../../utils/DOM";
+import { isBoolean, isNumber } from "../../utils/typeChecks";
 
 const composition = ["source-over","source-atop","source-in","source-out","destination-over","destination-atop","destination-in","destination-out","lighter","copy","xor","multiply","screen","overlay","darken","lighten","color-dodge","color-burn","hard-light","soft-light","difference","exclusion","hue","saturation","color","luminosity"]
+const _OffscreenCanvas = (typeof OffscreenCanvas !== "undefined") ? true : false
 
 class Node {
 
@@ -15,6 +18,8 @@ class Node {
    */
   constructor(cfg={}) {
 
+    if (!isElement(cfg.container)) throw new Error("Viewport container is not a valid HTML element.")
+
     this.container = cfg.container;
     this.layers = [];
     this.id = CEL.idCnt++;
@@ -22,6 +27,9 @@ class Node {
 
     this.setSize(cfg.width || 0, cfg.height || 0);
   }
+
+  // does the browser support OffscreenCanvas ?
+  get OffscreenCanvas() { return _OffscreenCanvas }
 
   generateKey() {
     return this.#key++
@@ -48,19 +56,33 @@ class Node {
   /**
    * add layer a layer to the viewport
    * @param {CEL.Layer} layer
-   * @returns {Viewport}
+   * @returns {Viewport|false}
    */
   addLayer(layer) {
+    if (!(layer instanceof Layer)) return false
+
     this.layers.push(layer);
     layer.setSize(layer.width || this.width, layer.height || this.height);
     layer.viewport = this;
     return this;
   }
+
+  /**
+   * remove a layer from the viewport
+   * @param {CEL.layer} layer 
+   * @returns {boolean}
+   */
+  removeLayer(layer) {
+    if (!(layer instanceof Layer)) return false
+
+    this.layers.splice(layer.index, 1)
+    return true
+  }
   /**
    * return associated hit id for coordinates - utilized for pointer events.
    * @param {number} x
    * @param {number} y
-   * @returns {Integer} integer - returns -1 if transparent
+   * @returns {number} integer - returns -1 if transparent
    */
   getIntersection(x, y) {
     var layers = this.layers,
@@ -82,7 +104,7 @@ class Node {
 
   /**
    * get viewport index in all CEL viewports
-   * @returns {Integer}
+   * @returns {number|null}
    */
   get index() {
     let viewports = CEL.viewports,
@@ -120,10 +142,14 @@ class Node {
 
       if (all && layer.layers.length > 0) layer.render(all)
 
-      if (composition.includes(layer?.composition))
+      if (layer.visible && layer.width > 0 && layer.height > 0) {
+        const ctx = scene.context
+
+        if (composition.includes(layer?.composition))
         scene.context.globalCompositeOperation = layer.composition
 
-      if (layer.visible && layer.width > 0 && layer.height > 0)
+        scene.context.globalAlpha = layer.alpha
+
         scene.context.drawImage(
           layer.scene.canvas,
           layer.x,
@@ -131,6 +157,7 @@ class Node {
           layer.width,
           layer.height
         );
+      }
     }
   }
 }
@@ -177,12 +204,16 @@ class Viewport extends Node {
 
 class Layer {
 
-  x = 0;
-  y = 0;
-  width = 0;
-  height = 0;
-  visible = true;
-  composition = null
+  #x = 0;
+  #y = 0;
+  #width = 0;
+  #height = 0;
+  #alpha = 1
+  #visible = true;
+  #composition = null
+
+  viewport
+  
   /**
    * Layer constructor
    * @param {Object} cfg - {x, y, width, height}
@@ -193,10 +224,12 @@ class Layer {
     this.hit = new CEL.Hit({
       layer: this,
       contextType: cfg.contextType,
+      offscreen: true
     });
     this.scene = new CEL.Scene({
       layer: this,
       contextType: cfg.contextType,
+      offscreen: true
     });
 
     if (cfg.x && cfg.y) {
@@ -206,9 +239,30 @@ class Layer {
       this.setSize(cfg.width, cfg.height);
     }
     if (cfg.composition) {
-      this.setComposition(cfg.composition)
+      this.setComposition = cfg.composition
+    }
+    if (cfg.alpha) {
+      this.alpha = cfg.alpha
+    }
+    if (cfg.visible) {
+      this.visible = cfg.visible
     }
   }
+
+  set x(x) { if (isNumber(x)) this.#x = x }
+  get x() { return this.#x }
+  set y(y) { if (isNumber(y)) this.#y = y}
+  get y() { return this.#y }
+  set width(width) { if (isNumber(width)) this.#width = width }
+  get width() { return this.#width }
+  set height(height) { if (isNumber(height)) this.#height = height}
+  get height() { return this.#height }
+  set alpha(alpha) { this.#alpha = (isNumber(alpha))? limit(alpha, 0, 1) : 1 }
+  get alpha() { return this.#alpha }
+  set composition(c) { if (composition.includes(c)) this.#composition = c }
+  get composition() { return this.#composition }
+  set visible(v) { if (isBoolean(v)) this.#visible = v }
+  get visible() { return this.#visible }
 
   /**
    * get layer index from viewport layers
@@ -250,18 +304,6 @@ class Layer {
     this.scene.setSize(width, height);
     this.hit.setSize(width, height);
     return this;
-  }
-
-  /**
-   * set layer composition / blending mode
-   * @param {string} comp - composition type
-   * @returns 
-   */
-  setComposition(comp) {
-    if (composition.includes(comp)) {
-      this.composition = comp
-      return this
-    }
   }
 
   /**
@@ -340,36 +382,46 @@ class Layer {
    */
   remove() {
     // remove this layer from layers array
-    this.viewport.layers.splice(this.index, 1);
+    return this.viewport.removeLayer(this)
   }
 }
 
 class Scene {
 
-  width = 0;
-  height = 0;
+  #width = 0;
+  #height = 0;
   /**
    * Scene constructor
    * @param {Object} cfg - {width, height}
    */
-  constructor(cfg) {
-    if (!cfg) cfg = {};
+  constructor(cfg={offscreen: false}) {
 
     this.id = CEL.idCnt++;
     this.layer = cfg.layer
     this.contextType = cfg.contextType || "2d";
 
-    this.canvas = document.createElement("canvas");
-    this.canvas.className = "scene-canvas";
-    this.canvas.style.display = "block";
-    this.context = this.canvas.getContext(this.contextType);
-
+    const canvas = document.createElement("canvas");
+          canvas.className = "scene-canvas";
+          canvas.style.display = "block";
     if (cfg.width && cfg.height) {
       this.setSize(cfg.width, cfg.height);
     }
+    if (_OffscreenCanvas && cfg?.offscreen) {
+      this.canvas = canvas.transferControlToOffscreen()
+      this.offscreen = true
+    }
+    else 
+      this.canvas = canvas
+
+    this.context = this.canvas.getContext(this.contextType);
   }
 
-  /**
+  set width(width) { if (isNumber(width)) this.#width = width }
+  get width() { return this.#width }
+  set height(height) { if (isNumber(height)) this.#height = height}
+  get height() { return this.#height }
+
+ /**
    * set scene size
    * @param {number} width
    * @param {number} height
@@ -456,14 +508,13 @@ class Scene {
 
 class Hit {
 
-  width = 0;
-  height = 0;
+  #width = 0;
+  #height = 0;
   /**
    * Hit constructor
    * @param {Object} cfg - {width, height}
    */
-  constructor(cfg) {
-    if (!cfg) cfg = {};
+  constructor(cfg={}) {
     this.layer = cfg.layer
     this.contextType = cfg.contextType || "2d";
     this.canvas = document.createElement("canvas");
@@ -482,6 +533,11 @@ class Hit {
     }
   }
 
+  set width(width) { if (isNumber(width)) this.#width = width }
+  get width() { return this.#width }
+  set height(height) { if (isNumber(height)) this.#height = height}
+  get height() { return this.#height }
+
   /**
    * set hit size
    * @param {number} width
@@ -489,7 +545,7 @@ class Hit {
    * @returns {Hit}
    */
   setSize(width, height) {
-    return setSize(width, height, this);
+    return setSize(width, height, this, false);
   }
 
   /**
@@ -596,15 +652,18 @@ function clear(that) {
   return that;
 }
 
-function setSize(width, height, that) {
+function setSize(width, height, that, ratio=true) {
   that.width = width;
   that.height = height;
   that.canvas.width = width * CEL.pixelRatio;
-  that.canvas.style.width = `${width}px`
   that.canvas.height = height * CEL.pixelRatio;
-  that.canvas.style.height = `${height}px`
 
-  if (that.contextType === "2d" && CEL.pixelRatio !== 1) {
+  if (!that.offscreen) {
+    that.canvas.style.width = `${width}px`
+    that.canvas.style.height = `${height}px`
+  }
+
+  if (ratio && that.contextType === "2d" && CEL.pixelRatio !== 1) {
     that.context.scale(CEL.pixelRatio, CEL.pixelRatio);
   }
   return that;

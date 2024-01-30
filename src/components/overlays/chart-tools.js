@@ -1,20 +1,38 @@
-// tools.js
-// base class for chart tools
+// chart-drawingTools.js
+// display drawings and tools on the chart
 
-import Node from "../primitives/node"
-import StateMachine from "../../scaleX/stateMachne"
 import Overlay from "./overlay"
-import Input from "../../input"
-import { idSanitize, uid } from "../../utils/utilities"
+import { HIT_DEBOUNCE } from "../../definitions/core";
+import { isObject } from "../../utils/typeChecks";
+import { debounce, idSanitize, uid } from "../../utils/utilities"
 
 
-export default class Tool extends Overlay {
+const toolsDialogue = {
+  bounded: true,
+  dragBar: false,
+  closeIcon: false,
+  content: "",
+  styles: {
+    window: {
+      width: "15em",
+      zindex: "10"
+    },
+    content: {
+      overflow: "hidden",
+      padding: "0 1em"
+    }
+  }
+}
+
+export default class chartTools extends Overlay {
 
   static #cnt = 0
   static #instances = {}
+  
+  static get inCnt() { return chartTools.#cnt++ }
 
   static create(target, config) {
-    const cnt = ++Tool.#cnt
+    const cnt = ++chartTools.#cnt
     
     config.cnt = cnt
     config.modID = `${config.toolID}_${cnt}`
@@ -23,35 +41,24 @@ export default class Tool extends Overlay {
 
     const tool = new config.tool(config)
 
-    Tool.#instances[cnt] = tool
+    chartTools.#instances[cnt] = tool
     target.chartToolAdd(tool)
 
     return tool
   }
 
   static destroy(tool) {
-    if (tool instanceof Tool) {
-      const inCnt = tool.inCnt
-      delete Tool.#instances[inCnt]
+    if (tool instanceof chartTools) {
+      delete chartTools.#instances[tool.inCnt]
     }
   }
 
   #id
-  #inCnt = null
-  #name = ""
-  #shortName = ""
-  #options
-  #config
-  #core
-  #parent
-  #input
-  #elChart
-  #elCanvas
-  #elViewport
-
-  #layerTool
-
-  #target
+  #inCnt
+  #name = "Chart Tools"
+  #shortName = "TX_Tool"
+  #configDialogue
+  #chart
 
   #cursorPos = [0, 0]
   #cursorActive = false
@@ -63,100 +70,85 @@ export default class Tool extends Overlay {
 
     super(target, xAxis, yAxis, theme, parent, params)
 
-    this.#config = config
-    this.#inCnt = config.cnt
-    this.#id = this.#config.ID || uid("TX_Tool_")
-    this.#name = config.name
-    this.#core = config.core
-    this.#elChart = config.elements.elChart
-    this.#parent = {...config.parent}
-    this.#target = config.target
-    this.#target.addTool(this)
-    this.#elViewport = this.#layerTool.viewport
-    this.#elCanvas = this.#elViewport.scene.canvas
-    this.#cursorClick = config.pos
+    this.#inCnt = chartTools.inCnt
+    // FIXME: why is there a this.id = undefined ???
+    // delete this.id
+    if (!!this.config.ID) this.#id = idSanitize(this.config.ID)
+    // this.#name = config.name
+    this.settings = params?.settings || {}
+    // this.target.addTool(this)
+    toolsDialogue.parent = this
+    this.#configDialogue = this.core.WidgetsG.insert("ConfigDialogue", toolsDialogue)
+    this.#configDialogue.start()
+
+    this.eventsListen()
   }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}_${this.#inCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return this.#id || `${this.core.id}-${uid(this.#shortName)}_${this.#inCnt}` }
   get inCnt() { return this.#inCnt }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
-  get core() { return this.#core }
-
-  get stateMachine() { return this.#core.stateMachine }
-
-  get state() { return this.#core.getState() }
-  get data() { return this.#core.chartData }
-  get range() { return this.#core.range }
-  get target() { return this.#target }
-  set layerTool(layer) { this.#layerTool = layer }
-  get layerTool() { return this.#layerTool }
-  get elViewport() { return this.#elViewport }
-
-  get cursorPos() { return this.#cursorPos }
-  get cursorActive() { return this.#cursorActive }
-  get cursorClick() { return this.#cursorClick }
-  get candleW() { return this.#core.Timeline.candleW }
-  get theme() { return this.#core.theme }
-  get config() { return this.#core.config }
-  get scrollPos() { return this.#core.scrollPos }
-  get bufferPx() { return this.#core.bufferPx }
-
-  get visible() { return this.isVisible() }
-  set position(p) { this.target.setPosition(p[0], p[1]) }
-
-  end() { this.stop() }
-
-  stop() {
-    this.#input.off("mousemove", this.onPointerMove);
-    // this.#controller.removeEventListener("mouseenter", this.onMouseEnter);
-    // this.#controller.removeEventListener("mouseout", this.onMouseOut);
-
-    // this.off("main_mousemove", this.onPointerMove)
-
-    // progress state from active to idle
-  }
+  get settings() { return this.params.settings }
+  set settings(s) { this.doSettings(s) }
 
   eventsListen() {
-    this.#input = new Input(this.#elCanvas, {disableContextMenu: false});
-
-    this.#input.on("pointermove", this.onPointerMove.bind(this));
-    // // enter event
-    // this.#controller.on("mouseenter", this.onMouseEnter.bind(this));
-    // // out event
-    // this.#controller.on("mouseout", this.onMouseOut.bind(this));
-
-    // // listen/subscribe/watch for parent notifications
-    // this.on("main_mousemove", (pos) => this.updateLegends(pos))
+    const chart = this.chart
+    chart.on(`${chart.id}_pointermove`, this.onPointerMove, this)
+    chart.on(`${chart.id}_pointerdown`, this.onPointerDown, this)
+    chart.on(`${chart.id}_pointerup`, this.onPointerUp, this)
   }
 
-  on(topic, handler, context) {
-    this.#core.on(topic, handler, context)
+  onPointerMove(pos) {
+    if (this.chart.stateMachine.state === "chart_pan") return
+    
+    
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  onPointerDown(pos) {
+    if (this.chart.stateMachine.state === "chart_pan") return
+      debounce(this.isToolSelected, HIT_DEBOUNCE, this)(pos)
   }
 
-  emit(topic, data) {
-    this.#core.emit(topic, data)
+  onPointerUp(pos) {
+
   }
 
-  onPointerMove(e) {
-    // this.#cursorPos = [e.layerX, e.layerY]
-    this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
+  isToolSelected(e) {
 
-    this.emit("tool_pointermove", this.#cursorPos)
+  }
 
+
+  doSettings(s) {
+    if (!isObject(s)) return false
+
+    let t = this.theme.trades
+    for (let e in s) {
+      if (s[e] === undefined) continue
+      t[e] = s[e]
+    }
   }
 
   isVisible() {
     // convert #boundingBox to pixel co-ordinates
   }
 
-  draw() {
+  draw(range=this.core.range) {
+    if (!super.mustUpdate()) return
+
+    if (this.core.config?.tools?.display === false) return
+
+    this.hit.clear()
+    this.scene.clear()
+
+
+    let d = this.theme.tools
+    let o = this.core.rangeScrollOffset;
+    let c = range.indexStart - o
+    let i = range.Length + (o * 2)
+
     
+    super.updated()
   }
 
 }

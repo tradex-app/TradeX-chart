@@ -1,6 +1,6 @@
 // polygon.js
 
-import { fillStroke } from "./canvas";
+import { fillStroke } from "./fill";
 
 
 /**

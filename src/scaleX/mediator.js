@@ -88,7 +88,7 @@ export default class Mediator {
   *                              publishes to the specified topic
   * @param {Object}  context   - The context the function(s) belongs to
   */
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     if (!this.#hub[topic]) this.#hub[topic] = [];
     this.#hub[topic].push({handler, context});
   }
@@ -99,7 +99,7 @@ export default class Mediator {
   * @param {Function} cb  - The function that is called if an other module
   *                         publishes to the specified topic
   */
-  off(topic, handler) {
+  off(topic, handler, context=this) {
     const i = (this.#hub[topic] || []).findIndex(h => h === handler);
     if (i > -1) this.#hub[topic].splice(i, 1);
     if (this.#hub[topic].length === 0) delete this.#hub[topic];

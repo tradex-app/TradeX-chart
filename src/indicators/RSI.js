@@ -6,14 +6,14 @@
 import Indicator from "../components/overlays/indicator"
 import {RSI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
-import { uid } from "../utils/utilities"
+import Colour from "../utils/colour"
 
 
 /**
  * Indicator - Relative Strength Index
  * @export
  * @class RSI
- * @extends {indicator}
+ * @extends {Indicator}
  */
 export default class RSI extends Indicator {
 
@@ -28,18 +28,27 @@ export default class RSI extends Indicator {
     output: {
       output: [],
     },
+    meta: {
+      input : {
+        timePeriod: {
+          entry: 'timePeriod',
+          label: 'Period',
+          type: 'number',
+          value: 5,
+          // "data-oldval": 5,
+          default: 5,
+          min: '3',
+          title: `Number of time units to use in calculation`,
+          $function:
+            this.configDialogue.provideEventListener("#Period", "change", 
+            (e)=>{
+              console.log(`#Period = ${e.target.value}`)
+            })
+        }
+      }
+    }
   }
-  #defaultStyle = {
-    stroke: "#C80",
-    width: '1',
-    defaultHigh: 75,
-    defaultLow: 25,
-    highLowLineWidth: 1,
-    highLowStyle: "dashed",
-    highStroke: "#848",
-    lowStroke: "#848",
-    highLowRangeStyle: "#22002220"
-  }
+
   checkParamCount = false
   plots = [
     { key: 'RSI_1', title: ' ', type: 'line' },
@@ -48,6 +57,17 @@ export default class RSI extends Indicator {
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
+  static defaultStyle = {
+    stroke: "#C80",
+    width: 1,
+    defaultHigh: 75,
+    defaultLow: 25,
+    highLowLineWidth: 1,
+    highLowStyle: "dashed",
+    highStroke: "#848",
+    lowStroke: "#848",
+    highLowRangeStyle: "#22002220"
+  }
 
 
   /**
@@ -64,22 +84,8 @@ export default class RSI extends Indicator {
 
     super (target, xAxis, yAxis, config, parent, params)
 
-    const overlay = params.overlay
-
-    this.id = params.overlay?.id || uid(this.shortName)
-    this.defineIndicator(overlay?.settings, talibAPI)
-    this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
-    // calculate back history if missing
-    this.calcIndicatorHistory()
-    // enable processing of price stream
-    this.setNewValue = (value) => { this.newValue(value) }
-    this.setUpdateValue = (value) => { this.updateValue(value) }
-    this.addLegend()
+    this.init(talibAPI)
   }
-
-  get primaryPane() { return RSI.primaryPane }
-  get defaultStyle() { return this.#defaultStyle }
-
 
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
@@ -90,6 +96,7 @@ export default class RSI extends Indicator {
 
     return {inputs, colours}
   }
+
 
   /**
    * Draw the current indicator range on its canvas layer and render it.

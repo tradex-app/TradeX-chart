@@ -64,6 +64,10 @@ export default class Progress {
     this.init()
   }
 
+  destroy() {
+    this.#elProgress.remove()
+  }
+
   get type() { return Progress.type }
 
   init() {

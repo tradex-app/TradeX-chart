@@ -1,10 +1,11 @@
 // element.js
 // base class for views to build upon
 
-import { SHORTNAME } from "../../../definitions/core"
+import { SHORTNAME, CSSUNITS } from "../../../definitions/core"
 import { uid } from "../../../utils/utilities"
 import { isFunction, isNumber, isString } from "../../../utils/typeChecks"
 import EventHub from "../../../utils/eventHub"
+import { isInViewport, isVisible } from "../../../utils/DOM"
 
 export default class element extends HTMLElement {
 
@@ -31,9 +32,9 @@ export default class element extends HTMLElement {
   constructor (template, mode="open") {
     super()
 
+    this.#hub = new EventHub()
     this.template = template
     this.shadowRoot = this.attachShadow({mode: mode})
-    this.#hub = new EventHub()
   }
 
   destroy() {
@@ -52,19 +53,19 @@ export default class element extends HTMLElement {
       this.DOM.height = this.clientHeight
       this.oldDOM.width = this.clientWidth
       this.oldDOM.height = this.clientHeight
-//    this.intersectionObserver = new IntersectionObserver(this.onIntersection.bind(this))
-//    this.intersectionObserver.observe(this)
+      this.intersectionObserver = new IntersectionObserver(this.onResize.bind(this))
+      this.intersectionObserver.observe(this)
 /*    this.mutationObserver = new MutationObserver(this.onMutation.bind(this))
-    this.mutationObserver.observe(
-      this,
-      {
-        attributes: true,
-        attributeOldValue: true,
-        characterData: true,
-      })
+      this.mutationObserver.observe(
+        this,
+        {
+          attributes: true,
+          attributeOldValue: true,
+          characterData: true,
+        })
 */
-    this.resizeObserver = new ResizeObserver(this.onResize.bind(this))
-    this.resizeObserver.observe(this)
+      this.resizeObserver = new ResizeObserver(this.onResize.bind(this))
+      this.resizeObserver.observe(this)
 
       if (isFunction(fn)) fn()
     }
@@ -74,7 +75,7 @@ export default class element extends HTMLElement {
 //    this.mutationObserver.disconnect()
     this.resizeObserver.disconnect()
 //    this.intersectionObserver.disconnect()
-    this.#hub = undefined
+    // this.#hub = undefined
   }
 
   get width() { return this.DOM.width }
@@ -89,11 +90,12 @@ export default class element extends HTMLElement {
   get left() { return this.DOM.left }
   get bottom() { return this.DOM.bottom }
   get right() { return this.DOM.right }
-  get x() { return this.x }
-  get y() { return this.y }
+  // get x() { return this.x }
+  // get y() { return this.y }
   get dimensions() { return this.DOM }
   set cursor(c) { this.style.cursor = c }
   get cursor() { return this.style.cursor }
+  get hub() { return this.#hub }
 
   setDim(v, d) {
     if (!["width", "height"].includes(d) || !isString(v)) return
@@ -102,22 +104,35 @@ export default class element extends HTMLElement {
       v += "px"
     }
     else if (isString(v)) {
-      // TODO: regex guard
-      // TODO: fallback w = "100%"
+      // is valid percentage
+      if (!v.match(CSSUNITS)) v = "100%"
     }
     else {
-      this.DOM[d] = this.parentElement.getBoundingClientRect().width
+      this.DOM[d] = this.parentElement.getBoundingClientRect()[d]
       v = this.DOM[d] + "px"
     }
     this.style[d] = v
   }
 
+  getDims() {
+    const rect = this.getBoundingClientRect()
+    for (let k in rect) {
+      const v = rect[k]
+      if (!isFunction(v))
+        this.DOM[k] = v
+    }
+    this.DOM.visible = isVisible(this)
+    this.DOM.viewport = isInViewport(this)
+    
+    return this.DOM
+  }
+
   onIntersection(i) {
-    this.emit("intersection")
+    this.emit("intersection", this)
   }
 
   onMutation(m) {
-    this.emit("mutation")
+    this.emit("mutation", this)
   }
 
   /**
@@ -127,15 +142,8 @@ export default class element extends HTMLElement {
    */
   onResize(r) {
     this.oldDOM = {...this.DOM}
-    // this.DOM = {...this.DOM, ...r[0].contentRect}
-    // this.DOM = Object.assign(this.DOM, r[0].contentRect)
-    for (let k in r[0].contentRect) {
-      const v = r[0].contentRect[k]
-      if (!isFunction(v))
-        this.DOM[k] = v
-    }
+    this.getDims()
     this.emit("resize", this.DOM)
-    // console.log(r)
   }
 
 
@@ -146,8 +154,9 @@ export default class element extends HTMLElement {
   * @param {Object}  context   - The context the function(s) belongs to
   * @returns {boolean}
   */
-  on(topic, handler, context) {
-    this.#hub.on(topic, handler, context)
+  on(topic, handler, context=this) {
+    if (!(this.#hub instanceof EventHub)) return false
+    return this.#hub.on(topic, handler, context)
   }
 
   /** 
@@ -157,8 +166,19 @@ export default class element extends HTMLElement {
   * @param {Object}  context   - The context the function(s) belongs to
   * @returns {boolean}
   */
-  off(topic, handler, context) {
-    this.#hub.off(topic, handler, context)
+  off(topic, handler, context=this) {
+    if (!(this.#hub instanceof EventHub)) return false
+    return this.#hub.off(topic, handler, context)
+  }
+
+  /**
+   * unsubscribe all listeners for the specified context
+   * @param {*} context
+   * @memberof EventHub
+   */
+  expunge(context) {
+    if (!(this.#hub instanceof EventHub)) return false
+    return this.#hub.expunge(context)
     }
 
   /**
@@ -168,7 +188,8 @@ export default class element extends HTMLElement {
   * @returns {boolean}
   */
   emit(topic, data) {
-    this.#hub.emit(topic, data)
+    if (!(this.#hub instanceof EventHub)) return false
+    return this.#hub.emit(topic, data)
   }
 
 }

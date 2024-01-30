@@ -1,6 +1,6 @@
 // menu.js
 
-import DOM from "../../utils/DOM"
+import { elementDimPos, isVisible } from "../../utils/DOM"
 import { CLASS_MENUS, CLASS_MENU } from "../../definitions/core"
 import { MenuStyle } from "../../definitions/style"
 import { limit } from "../../utils/number"
@@ -55,19 +55,15 @@ export default class Menu {
     this.#id = config.id
     this.#elMenus = widgets.elements.elMenus
     this.#elWidgetsG = this.#core.elWidgetsG
-    this.init()
+    // insert element
+    this.mount(this.#elMenus)
   }
 
   get el() { return this.#elMenu }
   get id() { return this.#id }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elMenu) }
+  get dimensions() { return elementDimPos(this.#elMenu) }
   get type() { return Menu.type }
-
-  init() {
-    // insert element
-    this.mount(this.#elMenus)
-  }
 
   start() {
     // position menus next to primary (icon)
@@ -85,7 +81,7 @@ export default class Menu {
 
     document.removeEventListener('click', this.#menuEvents[this.id].outside)
     
-    this.off("global_resize", this.onResize)
+    this.off("global_resize", this.onResize, this)
     // remove element
     // this.el.remove()
   }
@@ -100,12 +96,12 @@ export default class Menu {
     this.on("global_resize", this.onResize, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {
@@ -128,7 +124,7 @@ export default class Menu {
   onOutsideClickListener(e) {
     if (!this.#elMenu.contains(e.target) 
     && (!this.#config.primary.contains(e.target)) 
-    && DOM.isVisible(this.#elMenu)) {
+    && isVisible(this.#elMenu)) {
       let data = {
         target: e.currentTarget.id, 
         menu: this.#id,
@@ -200,7 +196,7 @@ export default class Menu {
     this.#elMenu.style.top = top + "px"
 
     // adjust positioning if clipped
-    let pos = DOM.elementDimPos(this.#elMenu)
+    let pos = elementDimPos(this.#elMenu)
     // adjust horizontal positioning if clipped
     if (pos.right > this.#elWidgetsG.offsetWidth) {
       let o = Math.floor(this.#elWidgetsG.offsetWidth - pos.width)

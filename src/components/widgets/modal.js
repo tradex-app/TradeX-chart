@@ -11,7 +11,7 @@ export default class Modal extends Window {
     super()
 
     config.dragbar = true
-    config.close = tue
+    config.close = true
     this.config = config
   }
   

@@ -85,28 +85,34 @@ export function getPrototypeAt(level, obj) {
  * @param {Object} obj
  * @returns {Object}  
  */
-export function copyDeep(obj) {
+export function copyDeep(obj, clone=true) {
+  // if ("structuredClone" in navigator && clone) return _structuredClone(obj)
+
+  if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
+  return obj;
+
+  let temp;
+  if (obj instanceof Date)
+      temp = new obj.constructor(); //or new Date(obj);
+  else
+      temp = Array.isArray(obj) ? [] : {}  // obj.constructor();
+
+  for (let key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          obj['isActiveClone'] = null;
+          temp[key] = copyDeep(obj[key], false);
+          delete obj['isActiveClone'];
+      }
+  }
+  return temp;
+}
+
+function _structuredClone(obj) {
   try {
-    if (window.structuredClone) return structuredClone(obj)
+    return structuredClone(obj)
   }
   catch (e) {
-    if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
-    return obj;
-
-    let temp;
-    if (obj instanceof Date)
-        temp = new obj.constructor(); //or new Date(obj);
-    else
-        temp = Array.isArray(obj) ? [] : {}  // obj.constructor();
-
-    for (let key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-            obj['isActiveClone'] = null;
-            temp[key] = copyDeep(obj[key]);
-            delete obj['isActiveClone'];
-        }
-    }
-    return temp;
+    return copyDeep(obj, false)
   }
 }
 
@@ -134,7 +140,7 @@ export function objRecurse (obj, propExec) {
   if (!isObject(obj)) return
   for (let k in obj) {
     if (typeof obj[k] === 'object' && obj[k] !== null) {
-      objRecurs(obj[k], propExec)
+      objRecurse(obj[k], propExec)
     } else if (obj.hasOwnProperty(k)) {
       propExec(k, obj[k])
     }
@@ -272,6 +278,7 @@ export function isArrayEqual(a1, a2) {
       continue
     }
     if (isObject(a1[i]) || isObject(a1[i])) {
+      // FIXME
       if (!isObject(a1[i], a2[i])) return false
       continue
     }
@@ -321,11 +328,11 @@ export function arrayMove(arr, fromIndex, toIndex) {
 
 /**
  * Swap array element positions
- * @param {Array} array 
+ * @param {Array} myArray 
  * @param {number} index1 
  * @param {number} index2 
  */
-export function swapArrayElements(array, index1, index2) {
+export function swapArrayElements(myArray, index1, index2) {
   [myArray[index1], myArray[index2]] = [myArray[index2], myArray[index1]];
 }
 
@@ -487,10 +494,10 @@ export class xMap extends Map {
     return [...this.values()][index]
   }
   insert(key, value, index) {
-    return insertAtMapIndex(index, key, value, this)
+    return this.insertIndex(index, key, value)
   }
   remove(index) {
-    return removeMapIndex(index, this)
+    return this.removeIndex(index)
   }
   firstEntry() {
     return firstEntryInMap(this)
@@ -535,14 +542,14 @@ export class xMap extends Map {
 
   setMultiple(array) {
     if (!isArray(array)) return false
-    arr.forEach(([k,v]) => this.set(k,v));
+    array.forEach(([k,v]) => this.set(k,v));
     return true
   }
 
   populate(array) {
     if (!isArray(array)) return false
     this.clear()
-    arr.forEach(([k,v]) => this.set(k,v));
+    array.forEach(([k,v]) => this.set(k,v));
     return true
   }
 

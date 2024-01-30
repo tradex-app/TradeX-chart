@@ -12,6 +12,7 @@ const renderLoop = {
   dropFrames: true,
   graphs: [],
   range: {},
+  status: false,
 
   init: function (config) {
     if (!isObject(config)) return
@@ -42,6 +43,10 @@ const renderLoop = {
     return update
   },
 
+  expungeFrames() {
+    this.renderQ.clear()
+  },
+
   getFrame: function (frame=0) {
     if (this.renderQ.has(frame)) return this.renderQ.get(frame)
     // return first frame
@@ -56,10 +61,18 @@ const renderLoop = {
   },
 
   start: function () {
+    this.status = true
     requestAnimationFrame(this.execute.bind(this))
   },
 
+  stop: function () {
+    this.status = false
+    this.renderQ.clear()
+  },
+
   execute: function () {
+    if (!this.status) return
+
     requestAnimationFrame(this.execute.bind(this))
 
     // any frames to render?
@@ -69,11 +82,15 @@ const renderLoop = {
 
     if (!frame.range?.snapshot) return
     for (let graph of frame.graphs) {
-      if (isFunction(graph.draw)) graph.draw(frame.range, frame.update)
+      if (isFunction(graph.draw) &&
+          graph?.status !== "destroyed") 
+        graph.draw(frame.range, frame.update)
     }
 
     for (let graph of frame.graphs) {
-      if (isFunction(graph.render)) graph.render()
+      if (isFunction(graph.render) &&
+          graph?.status !== "destroyed") 
+        graph.render()
     }
 
     this.frameDone()

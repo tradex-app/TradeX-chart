@@ -54,7 +54,7 @@ class Quadtree {
     const y = item.y;
 
     const quadrant = this.getQuadrant(x, y);
-    const node = this.data[quadrant];
+      let node = this.data[quadrant];
 
     if (node) {
       if (y < node.bottom) {

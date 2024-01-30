@@ -4,10 +4,12 @@
 import Overlay from "./overlay"
 import { Range } from "../../model/range"
 import { limit } from "../../utils/number"
-import { isArray, isBoolean, isFunction, isObject, isString } from "../../utils/typeChecks"
-import { idSanitize } from "../../utils/utilities"
+import Colour from "../../utils/colour"
+import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from "../../utils/typeChecks"
+import { debounce, idSanitize, uid } from "../../utils/utilities"
 import { STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
+import { WinState } from "../widgets/window"
 
 // const plotTypes = {
 //   area,
@@ -25,11 +27,15 @@ export default class Indicator extends Overlay {
 
   static #cnt = 0
   static get cnt() { return ++Indicator.#cnt }
+  static get isIndicator() { return true }
+
 
   #ID
   #cnt_
   #name
   #shortName
+  #legendName
+  #legendVisibility
   #primaryPane
   #chartPane
   #scaleOverlay
@@ -37,7 +43,7 @@ export default class Indicator extends Overlay {
   #params
   #overlay
   #indicator
-  #type
+  #type = "indicator"
   #TALib
   #range
   #value = [0, 0]
@@ -47,30 +53,44 @@ export default class Indicator extends Overlay {
   #style = {}
   #legendID
   #status
-  #drawOnUpdate = false
+  #ConfigDialogue
+
+  definition = {
+    input: {},
+    output: {},
+    meta: {
+      input: {},
+      output: {}
+    }
+  }
+
 
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
 
     super(target, xAxis, yAxis, undefined, parent, params)
 
+    const overlay = params.overlay
+
     this.#cnt_ = Overlay.cnt
     this.#params = params
-    this.#overlay = params.overlay
+    this.#overlay = overlay
     this.#TALib = this.core.TALib
     this.#range = this.xAxis.range
-
-    this.eventsListen()
+    this.id = overlay?.id || uid(this.shortName)
+    this.legendName = overlay?.legendName
+    this.#legendVisibility = (isBoolean(overlay?.legendVisibility)) ? overlay.legendVisibility : true
+    this.style = (overlay?.settings?.style) ? 
+    {...this.constructor.defaultStyle, ...overlay.settings.style} : 
+    {...this.constructor.defaultStyle, ...config.style};
+    const cfg = { title: `${this.legendName} Config`, content: "", params: overlay, parent: this }
+    this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
   }
 
   get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
-  set id(id) { this.#ID = idSanitize(id) }
-  get name() { return this.#name }
-  set name(n) { this.#name = n }
-  get shortName() { return this.#shortName }
-  set shortName(n) { this.#shortName = n }
+  set id(id) { this.#ID = idSanitize(new String(id)) }
   get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
   get chartPaneID() { return this.#params.overlay.paneID }
-  get primaryPane() { return this.#primaryPane }
+  get primaryPane() { return this.#primaryPane || this.constructor.primaryPane }
   set primaryPane(c) { this.#primaryPane = c }
   get scaleOverlay() { return this.#scaleOverlay }
   set scaleOverlay(o) { this.#scaleOverlay = o }
@@ -81,7 +101,11 @@ export default class Indicator extends Overlay {
   get scale() { return this.parent.scale }
   get type() { return this.#type }
   get overlay() { return this.#overlay }
+  get legend() { return this.chart.legend.list[this.#legendID] }
   get legendID() { return this.#legendID }
+  get legendName() { return this.#legendName || this.shortName || this.#ID }
+  set legendName(n) { this.setLegendName(n) }
+  set legendVisibility(v) { this.setLegendVisibility(v) }
   get indicator() { return this.#indicator }
   get TALib() { return this.#TALib }
   get range() { return this.core.range }
@@ -89,13 +113,14 @@ export default class Indicator extends Overlay {
   set setUpdateValue(cb) { this.#updateValueCB = cb }
   set precision(p) { this.#precision = p }
   get precision() { return this.#precision }
-  set style(s) { this.#style = s }
+  set style(s) { if (isObject(s)) this.#style = s }
   get style() { return this.#style }
   set position(p) { this.target.setPosition(p[0], p[1]) }
-  get isIndicator() { return true }
+  get isIndicator() { return Indicator.isIndicator }
+  get isPrimary() { return this.chart.isPrimary }
   get status() { return this.#status }
-  get drawOnUpdate() { return this.#drawOnUpdate }
-  set drawOnUpdate(u) { if (u === true) this.#drawOnUpdate = true }
+  get configDialogue() { return this.#ConfigDialogue }
+
 
   /**
    * process candle value
@@ -120,6 +145,46 @@ export default class Indicator extends Overlay {
     return this.#value
   }
 
+  setLegendName(name) {
+    this.#legendName = (isString(name)) ? name : this.shortName || this.#ID
+    this.chart.legend.modify(this.#legendID, { legendName: name })
+  }
+
+  setLegendVisibility(v) {
+    this.#legendVisibility = !!v
+    this.chart.legend.modify(this.#legendID, { legendVisibility: !!v })
+  }
+
+  setDefinitionValue(d,v) {
+    let defs = Object.keys(this.definition.input)
+    if (defs.includes(d)) {
+      this.definition.input[d] = v * 1
+      return "input"
+    }
+    defs = Object.keys(this.style)
+    if (defs.includes(d)) {
+      this.style[d] = v
+      return "style"
+    }
+  }
+
+  init(api) {
+    const overlay = this.#params.overlay
+
+    this.defineIndicator(overlay?.settings, api)
+    // calculate back history if missing
+    this.calcIndicatorHistory()
+    // enable processing of price stream
+    this.setNewValue = (value) => { this.newValue(value) }
+    this.setUpdateValue = (value) => { this.updateValue(value) }
+    // indicator legend
+    this.addLegend()
+    // config dialogue
+    this.#ConfigDialogue.start()
+
+    this.eventsListen()
+  }
+
   destroy() {
     if ( this.#status === "destroyed") return
     // has this been invoked from removeIndicator() ?
@@ -128,14 +193,19 @@ export default class Indicator extends Overlay {
       this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "indicator.remove()" or "chart.removeIndicator()" instead.`)
       return
     }
-    // execute parent class
-    super.destroy()
+    // terminate listeners
+    this.core.hub.expunge(this)
 
-    this.off(STREAM_UPDATE, this.onStreamUpdate)
     // remove overlay from parent chart pane's graph
-    this.chartPane.graph.removeOverlay(this.id)
     this.chart.legend.remove(this.#legendID)
+    this.clear()
+    this.core.MainPane.draw(undefined, true)
+    this.chartPane.graph.removeOverlay(this.id)
 
+    // execute parent class
+    // delete data
+    // remove listeners
+    super.destroy()
     // remove indicator state data
     this.core.state.removeIndicator(this.id)
 
@@ -144,12 +214,21 @@ export default class Indicator extends Overlay {
 
   remove() {
     this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPaneID}`)
-    this.emit(`${this.chartPaneID}_removeIndicator`, {id: this.id, paneID: this.chartPaneID})
+
+    // Should the chart pane be removed also?
+    if (this.chart.type === "primaryPane" ||
+        Object.keys(this.chart.indicators).length > 1) 
+    {
+      this.emit(`${this.chartPaneID}_removeIndicator`, {id: this.id, paneID: this.chartPaneID})
+    }
+    // Yes!
+    else
+      this.chart.remove()
   }
 
   /**
    * set or get indicator visibility
-   * @param {boolean} v - visible
+   * @param {boolean} [v] - visible
    * @returns {boolean}
    */
   visible(v) {
@@ -163,7 +242,7 @@ export default class Indicator extends Overlay {
 
   /**
    * set or get indicator settings
-   * @param {Object} s - settings
+   * @param {Object} [s] - settings
    */
   settings(s) {
     if (isObject(s)) {
@@ -185,14 +264,19 @@ export default class Indicator extends Overlay {
 
   eventsListen() {
     this.on(STREAM_UPDATE, this.onStreamUpdate, this)
+    this.on(`window_opened_${this.id}`, this.onConfigDialogueOpen, this)
+    this.on(`window_closed_${this.id}`, this.onConfigDialogueCancel, this)
+    this.on(`window_submit_${this.id}`, this.onConfigDialogueSubmit, this)
+    this.on(`window_cancel_${this.id}`, this.onConfigDialogueCancel, this)
+    this.on(`window_default_${this.id}`, this.onConfigDialogueDefault, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.core.off(topic, handler, context)
   }
 
   emit(topic, data) {
@@ -221,7 +305,7 @@ export default class Indicator extends Overlay {
    */
   onLegendAction(e) {
 
-    const action = this.chart.legend.onMouseClick(e.currentTarget)
+    const action = this.chart.legend.onPointerClick(e.currentTarget)
 
     switch(action.icon) {
       case "up": return;
@@ -244,59 +328,327 @@ export default class Indicator extends Overlay {
     action.parent.classList.toggle("notvisible")
   }
 
+//--- Config Settings ---
+
+  onConfigDialogueOpen(d) {
+    console.log(`${this.id} Config Open`)
+
+    if (this.#ConfigDialogue.state === WinState.opened) return
+
+    this.#ConfigDialogue.setOpen()
+    // store current value as the old value
+    const fields = this.#ConfigDialogue.contentFields
+
+    for (let field in fields) {
+      for (let f of fields[field]) {
+        if (f.classList.contains("subject")) {
+          if (f.getAttribute("data-oldval") !== f.value) {
+          f.setAttribute("data-oldval", f.value)
+        }
+      }
+    }
+  }
+  }
+
+  onConfigDialogueSubmit(d) {
+    console.log(`${this.id} Config Submit`)
+
+    this.#ConfigDialogue.setClose()
+    let r, calc = false;
+    const fields = this.#ConfigDialogue.contentFields
+
+    for (let field in fields) {
+      for (let f of fields[field]) {
+        if (f.classList.contains("subject")) {
+          f.setAttribute("data-oldval", f.value)
+          r = this.setDefinitionValue(f.id, f.value)
+          calc = calc || (r == "input")
+        }
+      }
+    }
+    // clear indicator and recalculate
+    if (calc) {
+      this.overlay.data.length = 0
+      this.calcIndicatorHistory()
+    }
+    this.setRefresh()
+    this.draw()
+  }
+
+  onConfigDialogueCancel(d) {
+
+    this.#ConfigDialogue.setClose()
+    const fields = this.#ConfigDialogue.contentFields
+
+    for (let field in fields) {
+      for (let f of fields[field]) {
+        if (f.classList.contains("subject")) {
+          f.value = f.getAttribute("data-oldval")
+        }
+      }
+    }
+    this.setRefresh()
+    this.draw()
+
+    console.log(`${this.id} Config Cancel`)
+  }
+
+  onConfigDialogueDefault(d) {
+    console.log(`${this.id} Config Default`)
+
+    const fields = this.#ConfigDialogue.contentFields
+
+    for (let field in fields) {
+      for (let f of fields[field]) {
+        if (f.classList.contains("subject")) {
+          let dataDefault = f.getAttribute("data-default")
+          f.value = dataDefault
+          this.style[f.id] = dataDefault
+        }
+      }
+    }
+    this.calcIndicatorHistory()
+    this.setRefresh()
+    this.draw()
+  }
+
   /**
    * invoke indicator settings callback, user defined or default
    * @param {Object} c - {fn: function, own: boolean}, own flag will bypass default action
    * @returns 
    */
-  invokeSettings(c) {
+  invokeSettings(c={}) {
+    let r;
+    // execute provided settings function
     if (isFunction(c?.fn)) {
-      let r = C.fn(this)
+      r = c.fn(this)
+      // execute the default?
       if (c?.own) return r
     }
+    // execute configured settings function
     else if (isFunction(this.core.config.callbacks?.indicatorSettings?.fn)) {
-      let r = this.core.config.callbacks.indicatorSettings.fn(this)
+      r = this.core.config.callbacks.indicatorSettings.fn(this)
+      // execute the default?
       if (this.core.config.callbacks?.indicatorSettings?.own) return r
     }
+    // execute default settings action
     this.core.log(`invokeSettings: ${this.id}`)
+    console.log(`invokeSettings: ${this.id}`, r)
+
+    const cd = this.#ConfigDialogue
+    if (cd.update) {
+      // does indicator provide function to build tabbed config object?
+      if (!isFunction(this.configInputs)) {
+        this.core.error(`ERROR: Indicator ${this.name} does not provide configInputs() required for the settings dialogue`)
+        return false
+      }
+      // build the config dialogue
+      const {html, modifiers} = cd.configBuild(this.configInputs())
+      const title = `${this.shortName} Config`
+      cd.setTitle(title)
+      cd.setContent(html, modifiers)
+      cd.update = false
+    }
+    if (cd.state.name === "closed" ) cd.open()
+    else cd.setOpen()
+    return true
   }
 
-  /**
-   * validate indicator inputs and outputs
-   * @param {Object} i
-   * @param {Object} api
-   * @memberof indicator
-   */
-  defineIndicator(i, api) {
-    if (!isObject(i)) i = {}
+  // entry, id, label, type, value, default, placeholder, class, max, min, step, onchange, disabled, visible, description
 
-    this.definition.output = api.outputs
-    const input = {...this.definition.input, ...i}
-          delete input.style
-    // process options
-    for (let i of api.options) {
-      // validate input values against definition defaults
-      if (i.name in input) {
-        // if input value is type is incorrect, use the default
-        if (typeof input[i.name] !== i.type) {
-          input[i.name] = i.defaultValue
-          continue
-        }
-        else if ("range" in i) {
-          input[i.name] = limit(input[i.name], i.range.min, i.range.max)
+  configInputs() {
+    const name = this.name || this.shortName || this.#ID
+    const noConfig = `Indicator ${name} is not configurable.`
+    const noTabs = { "No Config": {tab1: noConfig} }
+      let tabs = {};
+      let meta = this?.definition?.meta
+
+    if (!isObject(meta) &&
+        !isObject(this?.style) &&
+        !isObject(this?.definition?.input)) 
+      return noTabs
+
+    // check if meta provides input definitions
+    // if not, attempt to build on from the main indicator definition
+    if (!isObject(meta?.input) &&
+        isObject(this.definition?.input) &&
+        Object.keys(this.definition?.input).length > 0) {
+
+        this.definition.meta = {}
+        meta = this.definition.meta
+        meta.input = this.buildConfigInputTab()
+    }
+
+    // process other tabs
+    for (let tab in meta) {
+      tabs[tab] = meta[tab]
+    }
+
+    // if style is missing from meta, attempt to build it
+    if (!isObject(meta?.style) &&
+        Object.keys(this.style).length > 0)
+
+      tabs.style = this.buildConfigStyleTab()
+
+    // if there are no tabs return no config message
+    if (Object.keys(tabs).length == 0)
+      tabs = noTabs
+    // ensure all tab fields provide data-oldval, data-default
+    else {
+      for (let tab in tabs) {
+        for (let field in tabs[tab]) {
+          let f = tabs[tab][field]
+          let keys = Object.keys(f)
+          if (!keys.includes("data-oldval"))
+            f["data-oldval"] = f.value
+          if (!keys.includes("data-default")) {
+            f["data-default"] = (!!f.default) ? 
+              f.default :
+              f.value
+          }
         }
       }
-      // input.timePeriod required to eliminate garbage values on stream start
-      else if (i.name == "timePeriod") 
-        input.timePeriod = i.defaultValue
     }
-    this.definition.input = input
+
+    return tabs
   }
+
+  buildConfigInputTab() {
+    const define = this.definition.input
+      let input = {}
+
+    for (let i in define) {
+      if (isNumber(define[i])) {
+        input[i] = {
+          entry: i,
+          label: i,
+          type: 'number',
+          value: define[i],
+          default: define[i],
+          "data-default": define[i],
+          "data-oldval": define[i],
+          $function:
+          this.configDialogue.provideEventListener("#Period", "change", 
+            (e)=>{
+              console.log(`#Period = ${e.target.value}`)
+            })
+        }
+      }
+    }
+    if (Object.keys(input).length == 0)
+      input = false
+
+    return input
+  }
+
+  buildConfigStyleTab() {
+    const style = {}
+    for (let i in this?.style) {
+      let d = ""
+      let v = this.style[i]
+      let min = ""
+      let type = typeof v
+      switch (type) {
+        case "number": 
+          min = `0`
+          break;
+        case "string":
+          let c = new Colour(v);
+          type = (c.isValid)? "color" : ""
+          v = (c.isValid)? c.hex : v
+          d = v
+          break;
+      }
+      const fn = this.configDialogue.provideEventListener( `#${i}`, "change",
+        (e)=>{
+          console.log(`${e.target.id} = ${e.target.value}`)
+
+          this.style[e.target.id] = e.target.value
+          this.setRefresh()
+          this.draw()
+        })
+
+      style[i] = {entry: i, label: i, type, value: v, "data-oldval": v, "data-default": d, default: d, min, $function: fn }
+    }
+    return style
+  }
+
+
+  //--- building the indicator
+
+  /**
+   * validate indicator inputs and outputs against expected types and values
+   * @param {Object} i - indicator inputs
+   * @param {Object} api - predefined parameters
+   * @memberof indicator
+   */
+  defineIndicator() {
+    const s = (isObject(this.#params.overlay?.settings)) ? this.#params.overlay?.settings : {}
+    const api = (isObject(this.#params?.api)) ? this.#params?.api : {outputs: [], options: []}
+    const d = (isObject(this.definition)) ? this.definition : {input: {}, output: {}, meta: {input: {}, style: {}}}
+    d.meta = (isObject(d.meta)) ? d.meta : {}
+    this.definition = d
+
+    // style already defined in constructor
+
+    // output
+    if (!isObject(d.output)) d.output = {}
+    if (Object.keys(d.output).length == 0) {
+      for (let o of api.outputs) {
+        d.output[o.name] = []
+      }
+    }
+    for (let o in d.output) {
+      if (typeof d.output[o] !== "array") 
+        d.output[o] = []
+    }
+
+    // input
+    d.input = (isObject(d.input)) ? d.input : {}
+    const input = {...d.input, ...s}
+    delete input.style
+
+    const validate = (src, def) => {
+      // if input value is type is incorrect, use the default
+      if (typeof src[def.name] !== def.type)
+        src[def.name] = def.defaultValue
+
+      if ("range" in def)
+        src[def.name] = limit(src[def.name], def.range.min, def.range.max)
+
+      const n = {
+        entry: def?.name,
+        label: def?.displayName,
+        type: def?.type,
+        value: src[def.name],
+        "data-oldval": src[def.name],
+        "data-default": def?.defaultValue,
+        default: def?.defaultValue,
+        max: def?.range?.max,
+        min: def?.range?.min,
+        title: def?.hint
+      }
+
+      d.meta.input[def.name] = {...n, ...d.meta.input[def.name]}
+    }
+
+    // process options
+    for (let def of api.options) {
+      if (def.name in input)
+        validate(input, api.options)
+      else if (def.name in input.definition.input)
+        validate(input.definition.input, api.options)
+    }
+
+    d.input = input
+  }
+
 
   addLegend() {
     let legend = {
       id: this.id,
-      title: this.shortName,
+      title: this.legendName,
+      visible: this.#legendVisibility,
       type: "indicator",
       parent: this,
       source: this.legendInputs.bind(this)
@@ -436,8 +788,8 @@ export default class Indicator extends Overlay {
     
           v = []
           i = 0
-          for (let o of this.definition.output) {
-            v[i++] = entry[o.name][0]
+          for (let o in this.definition.output) {
+            v[i++] = entry[o][0]
           }
           // store entry with timestamp
           data.push([range.value(start + p - 1)[0], ...v])
@@ -486,7 +838,7 @@ export default class Indicator extends Overlay {
         }
         this.overlay.data = Object.values(r)
 
-        this.#drawOnUpdate = true
+        this.setRefresh()
       }
     }
     if (this.core.TALibReady) calc()
@@ -514,8 +866,8 @@ export default class Indicator extends Overlay {
     let v = []
     let i = 0
 
-    for (let o of this.definition.output) {
-      v[i++] = entry[o.name][0]
+    for (let o in this.definition.output) {
+      v[i++] = entry[o][0]
     }
 
     return [time, ...v]
@@ -575,12 +927,8 @@ export default class Indicator extends Overlay {
   draw() {
   }
 
-  mustUpdate() {
-    return (this.#drawOnUpdate) ? this.#drawOnUpdate : super.mustUpdate()
-  }
-
   updated() {
-    this.#drawOnUpdate = false
+    this.setRefresh()
     super.updated()
   }
 }

@@ -2,7 +2,7 @@
 // Tools bar
 // Providing: chart drawing tools
 
-import DOM from "../utils/DOM"
+import { elementDimPos } from "../utils/DOM"
 import tools from "../definitions/tools"
 import Tool from "./overlays/chart-tools"
 import StateMachine from "../scaleX/stateMachne"
@@ -53,13 +53,13 @@ export default class ToolsBar {
   error(e) { this.#core.error(e) }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return this.#id || `${this.#core.id}-${this.#shortName}` }
   get name() {return this.#name}
   get shortName() {return this.#shortName}
   get core() {return this.#core}
   get options() {return this.#options}
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elTools) }
+  get dimensions() { return elementDimPos(this.#elTools) }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
 
@@ -86,8 +86,10 @@ export default class ToolsBar {
   }
 
   destroy() {
-    this.stateMachine.destroy()
+    this.#core.hub.expunge(this)
+
     // remove event listeners
+    const id = this.#id
     const tools = this.#elTools.querySelectorAll(`.icon-wrapper`)
     for (let tool of tools) {
       for (let t of this.#tools) {
@@ -98,8 +100,7 @@ export default class ToolsBar {
       }
     }
 
-    this.off("tool_selected", this.onToolSelect)
-    this.off("tool_deselected", this.onToolDeselect)
+    this.stateMachine.destroy()
   }
 
   eventsListen() {
@@ -107,12 +108,12 @@ export default class ToolsBar {
     this.on("tool_deselected", this.onToolDeselect, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {

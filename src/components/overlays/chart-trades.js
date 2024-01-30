@@ -9,7 +9,7 @@ import { isObject } from "../../utils/typeChecks"
 import { HIT_DEBOUNCE } from "../../definitions/core"
 
 
-const tradeConfig = {
+const tradeDialogue = {
   bounded: true,
   dragBar: false,
   closeIcon: false,
@@ -42,7 +42,8 @@ export default class chartTrades extends Overlay {
     this.settings = params.settings
     this.#trade = new Trade(target, theme)
     this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this)
-    this.#dialogue = this.core.WidgetsG.insert("Dialogue", tradeConfig)
+    tradeDialogue.parent = this
+    this.#dialogue = this.core.WidgetsG.insert("Dialogue", tradeDialogue)
     this.#dialogue.start()
   }
 
@@ -76,13 +77,18 @@ export default class chartTrades extends Overlay {
    * @memberof chartTrades
    */
   isTradeSelected(e) {
-    const x = e[0]
-    const y = e[1]
+    const evt = e[2].domEvent.srcEvent
+    // const DOM = this.chart.element.DOM
+    const DOM = (evt.target || evt.srcElement).getBoundingClientRect()
+    const x = evt.clientX - (DOM.right - DOM.width)
+    const y = evt.clientY - DOM.top
     const k = this.hit.getIntersection(x,y)
     // do not display if...
     if (this.core.config?.trades?.display === false ||
         this.core.config?.trades?.displayInfo === false ||
         k == -1)  return
+
+    console.log("isTradeSelected()")
 
     const d = this.theme.trades
     const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconWidth)
@@ -91,6 +97,7 @@ export default class chartTrades extends Overlay {
     const o = this.xAxis.scrollOffsetPx
     const iPos = this.core.dimensions
 
+    // retrieve trade
     let tr = Object.keys(this.data)[k] * 1
     // adjust position to scroll position
     let tx = this.xAxis.xPos(ts) + o

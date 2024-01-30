@@ -2,7 +2,7 @@
 // Main Pane that holds the chart and off chart indicators
 // Providing: chart, off chart indicators
 
-import DOM from "../utils/DOM"
+import { elementDimPos } from "../utils/DOM"
 import Timeline from './timeline'
 import Graph from "./views/classes/graph"
 import renderLoop from "./views/classes/renderLoop"
@@ -15,7 +15,7 @@ import Divider from "./widgets/divider"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-main"
 import Input from "../input"
-import { isArray, isBoolean, isNumber, isObject, isString } from "../utils/typeChecks"
+import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks"
 import { copyDeep, valuesInArray, xMap } from "../utils/utilities"
 
 import {
@@ -38,7 +38,7 @@ import {
 } from "../definitions/style"
 
 const defaultOverlays = [
-  ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
+  // ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
   ["grid", {class: chartGrid, fixed: false, required: true, params: {axes: "x"}}],
   // ["chartCompositor", {class: chartCompositor, fixed: true, required: true}]
 ]
@@ -79,7 +79,7 @@ export default class MainPane {
   #Chart
   #Time
   #chartGrid
-  #chartDeleteList = []
+  #chartDeleteList = {}
   #ChartPaneMaximized = {
     instance: null, 
     rowsH: 0,
@@ -99,9 +99,12 @@ export default class MainPane {
   }
   #buffer
   
-  #indicators
   #controller
   #input
+
+  #scaleW = 0
+  #scaleWOld = 0
+
 
   constructor (core, options) {
 
@@ -143,7 +146,7 @@ export default class MainPane {
   get rowMinH() { return this.#rowMinH }
   set rowMinH(h) { if (isNumber(h)) this.#rowMinH = Math.abs(h) }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elMain) }
+  get dimensions() { return elementDimPos(this.#elMain) }
   get range() { return this.#core.range }
   set cursor(c) { this.element.style.cursor = c }
   get cursor() { return this.element.style.cursor }
@@ -160,6 +163,7 @@ export default class MainPane {
   get graph() { return this.#Graph }
   get views() { return this.#core.state.data.views }
   get indicators() { return this.getIndicators() }
+  get indicatorClasses() { return this.#core.indicatorClasses }
   get elements() {
     return {
       elRows: this.elRows,
@@ -174,7 +178,6 @@ export default class MainPane {
   init(options) {
     const core = this.#core
 
-    this.#indicators = this.#core.indicatorClasses
     this.#elRows = this.#elMain.rows
     this.#elTime = this.#elMain.time
     this.#elGrid = this.#elMain.rows.grid
@@ -224,7 +227,13 @@ export default class MainPane {
     // start timeline, chart, secondaryPane
     this.#elMain.start(this.theme)
     this.#Time.start()
+    this.createGraph()
     
+    // set scale width
+    const scaleW = this.chart.scale.calcScaleWidth()
+    this.core.elBody.scale.style.width = `${scaleW}px`
+    this.#elViewport.style.width = `${this.#elRows.width}px`
+
     // start each view / chart pane 
     this.#ChartPanes.forEach((view, key) => {
       view.start(i++)
@@ -235,7 +244,6 @@ export default class MainPane {
     this.rowsOldH = this.rowsH
 
     // create and start overlays
-    this.createGraph()
     this.draw(this.range, true)
 
     this.renderLoop.init({
@@ -256,6 +264,10 @@ export default class MainPane {
   }
 
   destroy() {
+    // remove all listeners
+    this.#core.hub.expunge(this)
+    this.renderLoop.stop()
+
     this.#destruction = true
     this.stateMachine.destroy()
     this.#Time.destroy()
@@ -266,13 +278,6 @@ export default class MainPane {
     })
     this.#Graph.destroy();
     this.#input.destroy()
-
-    this.off(STREAM_FIRSTVALUE, this.onFirstStreamValue)
-    this.off(STREAM_NEWVALUE, this.onNewStreamValue)
-    this.off("setRange", this.draw)
-    this.off("scrollUpdate", this.draw)
-    this.off("chart_render", this.draw)
-    this.off("destroyChartView", this.removeChartPane)
 
     // this.element.remove
   }
@@ -302,8 +307,8 @@ export default class MainPane {
 
   eventsListen() {
     // Give Main focus so it can receive keyboard input
-    this.#elRows.tabIndex = 0
-    this.#elRows.focus()
+    // this.#elRows.tabIndex = 0
+    // this.#elRows.focus()
 
     this.#input = new Input(this.#elRows, {disableContextMenu: false});
 
@@ -322,22 +327,41 @@ export default class MainPane {
     // listen/subscribe/watch for notifications
     this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue, this)
     this.on(STREAM_NEWVALUE, this.onNewStreamValue, this)
-    this.on("setRange", this.draw, this)
+    this.on("setRange", this.onSetRange, this);
     this.on("scrollUpdate", this.draw, this)
     this.on("chart_render", this.draw, this)
     this.on("destroyChartView", this.removeChartPane, this)
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {
     this.#core.emit(topic, data)
+  }
+
+  onSetRange() {
+    this.#scaleWOld = this.#scaleW
+    this.#scaleW = this.chart.scale.calcScaleWidth()
+
+    // // does the scale width have to adjusted?
+    if (this.#scaleWOld < this.#scaleW) {
+      const width = `${this.#scaleW}px`
+      this.core.elBody.scale.style.width = width
+      this.#elViewport.style.width = `calc(100% - ${this.#scaleW}px)`
+      this.#elRows.style.width = `calc(100% - ${this.#scaleW}px)`
+      this.#elTime.style.width = `calc(100% - ${this.#scaleW}px)`
+
+      this.setDimensions()
+    }
+    else this.draw()
+
+    // this.draw()
   }
 
   onMouseWheel(e) {
@@ -543,6 +567,7 @@ export default class MainPane {
 
     this.#Time.setDimensions({w: width})
     this.#Graph.setSize(width, height, layerWidth)
+    this.#elViewport.style.width =`${width}px`
 
     // set on Chart dimensions
     if (this.#ChartPanes.size == 1 && chartH != this.#elRows.height) {
@@ -672,7 +697,8 @@ export default class MainPane {
    */
   removeChartPane(paneID) {
     if (!isString(paneID) ||
-        !this.#ChartPanes.has(paneID) 
+        !this.#ChartPanes.has(paneID) ||
+        this.#chartDeleteList[paneID]
     ) return false
 
     const chartPane = this.#ChartPanes.get(paneID)
@@ -694,11 +720,12 @@ export default class MainPane {
     let x = Math.floor(h / (exp.length))
     let r = h % x
 
-    if (chartPane.status !== "destroyed")
+    if (chartPane.status !== "destroyed") {
       chartPane.destroy()
+      this.#elMain.removeRow(chartPane.id)
+    }
 
     this.#ChartPanes.delete(paneID)
-    delete this.#chartDeleteList[paneID]
 
     // is there only one chart pane remaining?
     if (this.#ChartPanes.size === 1) {
@@ -758,22 +785,37 @@ export default class MainPane {
    */
   addIndicator(i, name=i, params={})  {
     if (
-      !isString(i) &&
-      !(i in this.#indicators) &&
-      !isString(name) &&
-      !isObject(params)
+      !isString(i) ||
+      !(i in this.indicatorClasses) ||
+      !isString(name)
     ) return false
 
     this.log(`Adding the ${name} : ${i} indicator`)
-    this.emit("pane_refresh", this)
+      
+    if (!isObject(params)) params = {data: [], settings: []}
+    else {
+      if (!isArray(params?.data)) params.data = []
+      if (!isObject(params?.settings)) params.settings = {}
+    }
 
-    if (!isArray(params?.data)) params.data = []
-    if (!isObject(params?.settings)) params.settings = {}
+    let instance;
+    let isPrimary = this.indicatorClasses[i].ind?.primaryPane;
 
-    let instance
+    // isPrimary must be a boolean
+    switch (isPrimary) {
+      case true:
+      case false:
+        break;
+      case undefined:
+      case "both":
+        isPrimary = (isBoolean(params.settings?.isPrimary)) ? 
+        params.settings.isPrimary : true
+    }
+
+    params.settings.isPrimary = isPrimary
 
     // add primary chart indicator
-    if (this.#indicators[i].ind.primaryPane) {
+    if (isPrimary) {
       const indicator = {
         type: i,
         name: name,
@@ -782,13 +824,7 @@ export default class MainPane {
         instance = this.#Chart.addIndicator(indicator);
     }
     // add secondary chart indicator
-    else {
-      const indicator = this.core.indicatorClasses[i].ind
-      const indType = (
-        indicator.primaryPane === "both" && 
-        isBoolean(i.primaryPane)) ? 
-        i.primaryPane : false;
-        
+    else {       
       if (!isArray(params.view)) params.view = [{name, type: i, ...params}]
       // check all views are valid
       for (let v = 0; v < params.view.length; v++) {
@@ -804,16 +840,18 @@ export default class MainPane {
       instance = this.addChartPane(params)
       instance.start()
     }
-    this.#core.refresh()
+    const id = ("instance" in instance) ? instance.instance.id : instance.id
+    this.refresh()
     this.emit("addIndicatorDone", instance)
-    this.#core.log(`Added indicator:`, instance.id)
+    this.#core.log(`Added indicator:`, id)
 
     return instance
   }
 
   /**
-   * return indicators grouped by Chart Pane
+   * return active indicators grouped by Chart Pane
    * @param {string} i - indicator ID
+   * @returns {object}
    */
   getIndicators() {
     const ind = {}
@@ -827,8 +865,9 @@ export default class MainPane {
   }
 
   /**
-   * retrieve indicator by ID
+   * retrieve active indicator by ID
    * @param {string} i - indicator ID
+   * @returns {Indicator}
    */
   getIndicator(i) {
     if (!isString(i)) return false
@@ -845,22 +884,29 @@ export default class MainPane {
    * @returns {boolean} - success / failure
    */
   removeIndicator(i) {
-    this.emit("pane_refresh", this)
     // remove by ID
     if (isString(i)) {
       for (const p of this.#ChartPanes.values()) {
         if (i in p.indicators) {
-          p.indicators[i].instance.remove()
-          return true
+          i = p.indicators[i].instance
         }
       }
     }
     // remove by instance
-    else if (i instanceof Indicator) {
-      i.remove()
-      return true
+    if (!(i instanceof Indicator)) 
+      return false
+
+    // Should the chart pane be removed also?
+    if (i.chart.type === "primaryPane" ||
+        Object.keys(i.chart.indicators).length > 1)
+    {
+        i.remove()
+        this.emit("pane_refresh", this)
     }
-    else return false
+    // Yes!
+    else i.chart.remove()
+
+    return true
   }
 
   /**
@@ -963,13 +1009,26 @@ export default class MainPane {
       this.#Time,
     ]
     this.#ChartPanes.forEach((chartPane, key) => {
-      graphs.push(chartPane)
+      if (chartPane.status !== "destroyed")
+        graphs.push(chartPane)
+      else
+        console.log("error destroyed pane")
     })
 
     this.renderLoop.queueFrame(
       this.range, 
       graphs, 
       update)
+  }
+
+  refresh() {
+    this.renderLoop.expungeFrames()
+    this.core.Chart.graph.refresh()
+
+    for (let [key, secondaryPane] of this.chartPanes) {
+      secondaryPane.graph.refresh()
+    }
+    this.draw(this.range, true)
   }
 
   updateRange(pos) {

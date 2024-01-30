@@ -1,7 +1,7 @@
 // divider.js
 // dragable divider to resize chart panes
 
-import DOM from "../../utils/DOM"
+import { elementDimPos, findBySelector } from "../../utils/DOM"
 import { isNumber, isString } from "../../utils/typeChecks"
 import Input from "../../input"
 import { CLASS_DIVIDERS } from "../../definitions/core"
@@ -45,9 +45,9 @@ export default class Divider {
     // destroy all dividers
     for (let id in Divider.dividerList) {
       Divider.dividerList[id].destroy()
+      // remove entry
+      delete Divider.dividerList[id]
     }
-    // remove entry
-    delete Divider.dividerList[id]
   }
 
   static defaultNode() {
@@ -77,7 +77,7 @@ export default class Divider {
   get chartPane() { return this.#chartPane }
   get config() { return this.#core.config }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elDivider) }
+  get dimensions() { return elementDimPos(this.#elDivider) }
   get height() { return this.#elDivider.getBoundingClientRect().height }
   set cursor(c) { this.setCursorStyle(c) }
   get cursor() { return this.#cursorStyle }
@@ -115,12 +115,12 @@ export default class Divider {
     this.#input.on("pointerdragend", this.onPointerDragEnd.bind(this));
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {
@@ -151,7 +151,7 @@ export default class Divider {
   }
 
   onPointerDragEnd(e) {
-    if ("position" in e)
+    
     this.#elDivider.style.background = this.#theme.divider.idle
     this.#cursorPos = this.#core.MainPane.cursorPos // [e.position.x, e.position.y]
     this.emit(`${this.id}_pointerdragend`, this.#cursorPos)
@@ -170,13 +170,13 @@ export default class Divider {
     else
       this.#elDividers.lastElementChild.insertAdjacentHTML("afterend", this.dividerNode())
 
-    this.#elDivider = DOM.findBySelector(`#${this.#id}`, this.#elDividers)
+    this.#elDivider = findBySelector(`#${this.#id}`, this.#elDividers)
   }
 
   dividerNode() {
     let theme = this.#core.theme,
-        top = this.#chartPane.pos.top - DOM.elementDimPos(this.#elDividers).top,
-      width = this.#core.MainPane.rowsW + this.#core.scaleW,
+        top = this.#chartPane.pos.top - elementDimPos(this.#elDividers).top,
+      width = this.#core.elBody.width,
       height = (isNumber(this.config.dividerHeight)) ? 
         this.config.dividerHeight : DIVIDERHEIGHT,
       left = theme.tools.width // this.#core.toolsW;
@@ -200,7 +200,7 @@ export default class Divider {
   }
 
   setPos() {
-    let top = this.#chartPane.pos.top - DOM.elementDimPos(this.#elDividers).top;
+    let top = this.#chartPane.pos.top - elementDimPos(this.#elDividers).top;
         top = top - (this.height / 2) + 1
     this.#elDivider.style.top = `${top}px`
   }

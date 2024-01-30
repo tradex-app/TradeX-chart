@@ -1,7 +1,7 @@
 // trade.js
 // draw a single trade marker
 
-import DOM from "../../utils/DOM"
+import { svgToImage } from "../../utils/DOM"
 import { limit } from "../../utils/number"
 
 
@@ -19,8 +19,8 @@ export default class Trade {
     this.width = this.scene.width
     this.cfg = theme.trades
     this.dims = {w: this.cfg.iconWidth, h: this.cfg.iconHeight}
-    this.buy = DOM.svgToImage(this.cfg.iconBuy, this.cfg.buyColour, this.dims)
-    this.sell = DOM.svgToImage(this.cfg.iconSell, this.cfg.sellColour, this.dims)
+    this.buy = svgToImage(this.cfg.iconBuy, this.cfg.buyColour, this.dims)
+    this.sell = svgToImage(this.cfg.iconSell, this.cfg.sellColour, this.dims)
   }
 
   draw(data) {
@@ -29,7 +29,7 @@ export default class Trade {
     const i = (data.side === "buy") ? this.buy : this.sell
     const j = (data.side === "buy") ? c.iconBuy : c.iconSell
     const k = this.hit.getIndexValue(data.key)
-    const hit = DOM.svgToImage(j, k, this.dims)
+    const hit = svgToImage(j, k, this.dims)
     const h = limit(data.w, c.iconMinDim, c.iconHeight)
     const w = limit(data.w, c.iconMinDim, c.iconWidth)
     const x = this.data.x

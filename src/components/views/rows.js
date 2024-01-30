@@ -9,14 +9,6 @@ import tradeXChartPane from "./chartPane"
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
-  tradex-grid {
-    position: absolute;
-    height: inherit;
-  }
-  tradex-grid {
-    display: block;
-    width: 100%;
-  }
   slot[name="chartpane"] {
     display: flex;
     flex-direction: column;
@@ -31,7 +23,6 @@ template.innerHTML = `
     border-top: none !important;
   }
 </style>
-<tradex-grid></tradex-grid>
 <slot name="chartpane" id="chartpane"></slot>
 `
 

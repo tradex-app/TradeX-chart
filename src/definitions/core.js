@@ -41,5 +41,9 @@ export const STREAM_PRECISION = 8
 
 export const PRICE_PRECISION  = 2
 export const VOLUME_PRECISION = 2
+export const MAX_CRYPTO_PRECISION = 18 // ETH has greatest precision of all cryptos
 
-export const HIT_DEBOUNCE = 1000
+export const HIT_DEBOUNCE = 100
+
+export const PERCENT = /^\d+%$/;
+export const CSSUNITS = /^(\d*\.?\d+)\s?(px|em|ex|%|in|cn|mm|pt|pc+)$/igm;

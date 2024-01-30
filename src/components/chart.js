@@ -4,9 +4,9 @@
 // Providing: the playground for price movements, indicators and drawing tools
 
 
-import DOM from "../utils/DOM";
+import { elementDimPos } from "../utils/DOM";
 import { limit } from "../utils/number"
-import { isArray, isNumber, isObject, isString } from "../utils/typeChecks";
+import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks";
 import { copyDeep, idSanitize, xMap } from "../utils/utilities";
 import CEL from "./primitives/canvas";
 import Legends from "./primitives/legend"
@@ -15,16 +15,16 @@ import StateMachine from "../scaleX/stateMachne";
 import stateMachineConfig from "../state/state-chartPane"
 import Input from "../input"
 import ScaleBar from "./scale"
-// import watermark from "./overlays/chart-watermark"
+import watermark from "./overlays/chart-watermark"
 import chartGrid from "./overlays/chart-grid"
 import chartCursor from "./overlays/chart-cursor"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartCandleStream from "./overlays/chart-candleStream"
 import chartHighLow from "./overlays/chart-highLow";
-// import chartDCA from "./overlays/chart-dca";
 import chartNewsEvents from "./overlays/chart-newsEvents";
 import chartTrades from "./overlays/chart-trades"
+import chartTools from "./overlays/chart-tools";
 import {
   STREAM_ERROR,
   STREAM_NONE,
@@ -44,17 +44,17 @@ import { VolumeStyle } from "../definitions/style"
 
 export const defaultOverlays = {
   primaryPane: [
-    // ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
+    ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
-    ["volume", {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}}],
     ["candles", {class: chartCandles, fixed: false, required: true}],
     ["hiLo", {class: chartHighLow, fixed: true, required: false}],
-    // ["dca", {class: chartDCA, fixed: true, required: false}],
     ["stream", {class: chartCandleStream, fixed: false, required: true}],
+    ["tools", {class: chartTools, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ],
   secondaryPane: [
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
+    ["tools", {class: chartTools, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ]
 }
@@ -62,6 +62,7 @@ export const optionalOverlays = {
   primaryPane: {
     "trades": {class: chartTrades, fixed: false, required: false},
     "events": {class: chartNewsEvents, fixed: false, required: false},
+    "volume": {class: chartVolume, fixed: false, required: true, params: {maxVolumeH: VolumeStyle.ONCHART_VOLUME_HEIGHT}},
   },
   secondaryPane: {
     "candles": {class: chartCandles, fixed: false, required: true},
@@ -190,7 +191,7 @@ export default class Chart {
   error(e) { this.core.error(e) }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#name}_${this.#chartCnt}`.replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return this.#id || idSanitize(`${this.#core.id}-${this.#name}_${this.#chartCnt}`) }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   set title(t) { this.setTitle(t) }
@@ -200,19 +201,16 @@ export default class Chart {
   get type() { return this.#type }
   get status() { return this.#status }
   get collapsed() { return this.#collapsed }
-  get isPrimary() { return this.#type === "primaryPane" }
-  get isPrimary() { return this.#options.view.primary || false }
+  get isPrimary() { return this.#options.view.primary || (this.#type === "primaryPane") || false }
   get options() { return this.#options }
   get element() { return this.#elTarget }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#elTarget) }
+  get dimensions() { return elementDimPos(this.#elTarget) }
   set width(w) { this.setWidth(w) }
   get width() { return this.#elTarget.getBoundingClientRect().width }
   set height(h) { this.setHeight(h) }
   get height() { return this.#elTarget.getBoundingClientRect().height }
-  get data() {}
   get range() { return this.#core.range }
-  set localRange(r) { this.setLocalRange(r) }
   get localRange() { return this.#localRange }
   get stream() { return this.#Stream }
   get streamCandle() { return this.#streamCandle }
@@ -294,9 +292,14 @@ export default class Chart {
     this.#Divider = this.core.WidgetsG.insert("Divider", cfg)
     this.#Divider.start()
     // cfg = {dragBar, closeIcon, title, content, position, styles}
-    const content = `config the chart`
-    cfg = { title: "Chart Config", content }
-    this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
+    const content = `Configure chart ${this.id}`
+    let cfg2 = { 
+      title: "Chart Config", 
+      content, 
+      parent: this,
+      openNow: false
+     }
+    this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg2)
     this.#ConfigDialogue.start()
     this.#status = "running"
   }
@@ -311,33 +314,34 @@ export default class Chart {
       this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartPane()" instead.`)
       return
     }
+    this.core.log(`Deleting chart pane: ${this.id}`)
 
+
+    this.#core.hub.expunge(this)
+    
     this.removeAllIndicators()
-    this.stateMachine.destroy()
-    this.Divider.destroy()
+    this.#stateMachine.destroy()
+    this.#Divider.destroy()
     this.#Scale.destroy()
     this.#Graph.destroy()
     this.#input.destroy()
     this.legend.destroy()
 
-    this.off("main_mousemove", this.onMouseMove, this);
-    this.off(STREAM_LISTENING, this.onStreamListening, this);
-    this.off(STREAM_NEWVALUE, this.onStreamNewValue, this);
-    this.off(STREAM_UPDATE, this.onStreamUpdate, this);
-    this.off(STREAM_FIRSTVALUE, this.onStreamNewValue, this)
-    this.off(`${this.id}_removeIndicator`, this.onDeleteIndicator, this)
-
-    if (this.isPrimary)
-      this.off("chart_yAxisRedraw", this.onYAxisRedraw)
+    this.#stateMachine = undefined
+    this.#Divider = undefined
+    this.#Legends = undefined
+    this.#Scale = undefined
+    this.#Graph = undefined
+    this.#input = undefined
 
     // TODO: remove state entry
+    this.core.warn(`Deleting chart pane ${this.id} destroys all of its data!`)
 
     this.element.remove()
     this.#status = "destroyed"
   }
 
   remove() {
-    this.core.log(`Deleting chart pane: ${this.id}`)
     this.emit("destroyChartView", this.id)
   }
 
@@ -345,11 +349,11 @@ export default class Chart {
     this.#input = new Input(this.#elTarget, {disableContextMenu: false});
     this.#input.on("pointerdrag", this.onChartDrag.bind(this))
     this.#input.on("pointerdragend", this.onChartDragDone.bind(this))
-    this.#input.on("pointermove", this.onMouseMove.bind(this))
-    this.#input.on("pointerenter", this.onMouseEnter.bind(this));
-    this.#input.on("pointerout", this.onMouseOut.bind(this));
-    this.#input.on("pointerdown", this.onMouseDown.bind(this));
-    this.#input.on("pointerup", this.onMouseUp.bind(this));
+    this.#input.on("pointermove", this.onPointerMove.bind(this))
+    this.#input.on("pointerenter", this.onPointerEnter.bind(this));
+    this.#input.on("pointerout", this.onPointerOut.bind(this));
+    this.#input.on("pointerdown", this.onPointerDown.bind(this));
+    this.#input.on("pointerup", this.onPointerUp.bind(this));
 
     // listen/subscribe/watch for parent notifications
     this.on("main_mousemove", this.updateLegends, this);
@@ -367,9 +371,9 @@ export default class Chart {
    * Set a custom event listener
    * @param {string} topic
    * @param {function} handler
-   * @param {*} context
+   * @param {*} [context]
    */
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context);
   }
 
@@ -377,9 +381,18 @@ export default class Chart {
    * Remove a custom event listener
    * @param {string} topic
    * @param {function} handler
+   * @param {*} [context]
    */
-  off(topic, handler) {
-    this.#core.off(topic, handler);
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context);
+  }
+
+  /**
+   * Remove a custom event listener
+   * @param {*} [context]
+   */
+  expunge(context=this) {
+    this.#core.expunge(context);
   }
 
   /**
@@ -393,9 +406,9 @@ export default class Chart {
 
   onChartDrag(e) {
     this.cursor = "grab"
-    if (this.scale.yAxis.mode == "manual") {
-      this.#Graph.drawAll()
-    }
+    // if (this.scale.yAxis.mode == "manual") {
+    //   this.#Graph.drawAll()
+    // }
     this.core.MainPane.onChartDrag(e)
     this.scale.onChartDrag(e)
   }
@@ -406,34 +419,34 @@ export default class Chart {
     // this.scale.onChartDragDone(e)
   }
 
-  onMouseMove(e) {
+  onPointerMove(e) {
     this.core.MainPane.onPointerActive(this)
     this.scale.layerCursor.visible = true
     this.graph.overlays.list.get("cursor").layer.visible = true
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.#Scale.onMouseMove(this.#cursorPos)
-    this.emit(`${this.id}_mousemove`, this.#cursorPos)
+    this.emit(`${this.id}_pointermove`, this.#cursorPos)
   }
 
-  onMouseEnter(e) {
+  onPointerEnter(e) {
     this.core.MainPane.onPointerActive(this)
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.core.MainPane.onMouseEnter()
     this.scale.layerCursor.visible = true
     this.graph.overlays.list.get("cursor").layer.visible = true
-    this.emit(`${this.id}_mouseenter`, this.#cursorPos);
+    this.emit(`${this.id}_pointerenter`, this.#cursorPos);
   }
 
-  onMouseOut(e) {
+  onPointerOut(e) {
     this.#cursorActive = false;
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.scale.layerCursor.visible = false
-    this.emit(`${this.id}_mouseout`, this.#cursorPos);
+    this.emit(`${this.id}_pointerout`, this.#cursorPos);
   }
 
-  onMouseDown(e) {
+  onPointerDown(e) {
     this.#core.pointerButtons[e.domEvent.srcEvent.button] = true
-    this.#cursorClick = [Math.floor(e.position.x), Math.floor(e.position.y)];
+    this.#cursorClick = [Math.floor(e.position.x), Math.floor(e.position.y), e];
 
     if (this.stateMachine.state === "tool_activated")
       this.emit("tool_targetSelected", { target: this, position: e });
@@ -441,7 +454,7 @@ export default class Chart {
       this.emit("primary_pointerdown", this.#cursorClick)
   }
 
-  onMouseUp(e) {
+  onPointerUp(e) {
     this.#core.pointerButtons[e.domEvent.srcEvent.button] = false
   }
 
@@ -506,6 +519,10 @@ export default class Chart {
     this.#Scale.setDimensions({ w: null, h: h });
     this.Divider?.setPos()
     this.Divider?.setWidth()
+  }
+
+  setWidth(w) {
+
   }
 
   /**
@@ -616,10 +633,10 @@ export default class Chart {
   addIndicator(i) {
     const primaryPane = this.type === "primaryPane"
     const indClass = this.core.indicatorClasses[i.type].ind
-    const indType = (indClass.constructor.type === "both") ? primaryPane : indClass.prototype.primaryPane
+    const isPrimary = !!i.settings?.isPrimary
     if (
         i?.type in this.core.indicatorClasses &&
-        primaryPane === indType
+        primaryPane === isPrimary
       ) {
       i.paneID = this.id
       const config = {
@@ -649,21 +666,25 @@ export default class Chart {
 
     // enable deletion
     this.#indicatorDeleteList[id] = true
-    this.indicators[id].instance.destroy()
-    this.graph.removeOverlay(id)
-    this.draw()
 
     if (Object.keys(this.indicators).length === 0 && !this.isPrimary)
       this.emit("destroyChartView", this.id)
-
-    delete this.#indicatorDeleteList[id]
+    else {
+      this.indicators[id].instance.destroy()
+      this.graph.removeOverlay(id)
+      this.draw()
+      delete this.#indicatorDeleteList[id]
+    }
+    return true
   }
 
   removeAllIndicators() {
+    const result = {}
     const all = this.getIndicators()
     for (let id in all) {
-      this.removeIndicator(id)
+      result[id] = this.removeIndicator(id)
     }
+    return result
   }
 
   indicatorVisible(id, v) {
@@ -677,6 +698,7 @@ export default class Chart {
   }
 
   addTool(tool) {
+    // FIXME: this.layerConfig - undefined
     let { layerConfig } = this.layerConfig();
     let layer = new CEL.Layer(layerConfig);
     this.#layersTools.set(tool.id, layer);
@@ -688,18 +710,19 @@ export default class Chart {
 
   addTools(tools) {}
 
-  overlayTools() {
-    const tools = [];
-    // for (let i = 0; i < this.#layersTools.length; i++) {
-    // tools[i] =
-    // new indicator(
-    //   this.#layersPrimary[i],
-    //   this.#Time,
-    //   this.#Scale,
-    //   this.config)
-    // }
-    // return tools
-  }
+  // duplicate get overlayTools()
+  // overlayTools() {
+  //   const tools = [];
+  //   // for (let i = 0; i < this.#layersTools.length; i++) {
+  //   // tools[i] =
+  //   // new indicator(
+  //   //   this.#layersPrimary[i],
+  //   //   this.#Time,
+  //   //   this.#Scale,
+  //   //   this.config)
+  //   // }
+  //   // return tools
+  // }
 
   overlayToolAdd(tool) {
     // create new tool layer
@@ -709,13 +732,6 @@ export default class Chart {
 
   overlayToolDelete(tool) {
     this.#overlayTools.delete(tool);
-  }
-
-  drawGrid() {
-    this.layerGrid.setPosition(this.#core.scrollPos, 0);
-    this.overlayGrid.setRefresh()
-    this.overlayGrid.draw("y");
-    this.#core.MainPane.draw()
   }
 
   /**
@@ -780,7 +796,7 @@ export default class Chart {
    */
   onLegendAction(e) {
 
-    const action = this.#Legends.onMouseClick(e.currentTarget)
+    const action = this.#Legends.onPointerClick(e.currentTarget)
 
     switch(action.icon) {
       case "up": this.reorderUp(); return;
@@ -871,9 +887,11 @@ export default class Chart {
       this.#Graph.draw(range, update)
   }
 
-  drawGrid(update) {
-    this.layerGrid.setPosition(this.core.scrollPos, 0)
-    this.overlayGrid.draw("y")
+  drawGrid() {
+    this.layerGrid.setPosition(this.#core.scrollPos, 0);
+    this.overlayGrid.setRefresh() //
+    this.overlayGrid.draw("y");
+    this.#core.MainPane.draw() //
   }
 
   /**
@@ -889,29 +907,24 @@ export default class Chart {
     const rowMinH = this.core.MainPane.rowMinH
     const activeHeight = this.element.clientHeight
     const prevHeight = prev.element.clientHeight
-    let yDelta, activeH, prevH, total;
+    const total = activeHeight + prevHeight
+    let yDelta, activeH, prevH;
 
     if (isNumber(height) && height > rowMinH) {
-
+      activeH = height
     }
     // height is undefined
     else {
-      total = activeHeight + prevHeight
       yDelta = this.core.MainPane.cursorPos[5]
+      if (activeHeight - yDelta < rowMinH)
+        yDelta = rowMinH - (activeHeight - yDelta)
+
       activeH = activeHeight - yDelta
       prevH  = prevHeight + yDelta
     }
-
-    if ( activeH < rowMinH
-      || prevH < rowMinH
-      || total !== activeH + prevH) {
-
-      }
-    else {
-      active.setDimensions({w:undefined, h:activeH})
-      prev.setDimensions({w:undefined, h:prevH})
-      active.Divider.setPos()
-    }
+    active.setDimensions({w:undefined, h:activeH})
+    prev.setDimensions({w:undefined, h:prevH})
+    active.Divider.setPos()
 
     active.element.style.userSelect = 'none';
     // active.element.style.pointerEvents = 'none';
@@ -955,7 +968,7 @@ export default class Chart {
   zoomRange() {
     // draw the chart - grid, candles, volume
     this.draw(this.range, true)
-    this.emit("zoomDone")
+    this.emit("zoomDone", true)
   }
 
 

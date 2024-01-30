@@ -142,6 +142,7 @@ export function nice (value) {
 }
 
 /**
+ * return sign, number of integers, decimals
  * @export
  * @param {number} value
  * @returns {number}  
@@ -263,7 +264,7 @@ export function precision(value) {
  * converting to string and splitting by . is only a solution for up to 7 decimals
  * slowest
  * @export
- * @param {number} - value
+ * @param {number} value
  * @returns {number}
  */
 export function getPrecision (value) {
@@ -276,6 +277,59 @@ export function getPrecision (value) {
     const dotIndex = str.indexOf('.')
     return dotIndex < 0 ? 0 : str.length - 1 - dotIndex
   }
+}
+
+/**
+ * truncate price to fit on Scale
+ * @param {object} digits - {sign: s, integers: i, decimals: d, value: v}
+ * @return {number}  
+ */
+export function limitPrecision (digits, precision=18) {
+  let {sign: s, integers: i, decimals: d, value: v} = digits
+
+  precision = (isNaN(precision)) ? 18 : precision
+  d = (d > precision) ? precision : d
+  v = new Number(v).toFixed(d)
+  // let n = this.yAxisDigits - 1,
+  let x = `${v}`,
+      r = "",
+      c = 0,
+      f = 0,
+      b, a;
+  // sign
+  s = (s) ? 0 : 1
+  if (s > 0) {
+    r += "-"
+    c++
+  }
+  // integers
+  if (i == 0) {
+    r += "0"
+    c++
+  }
+  else {
+    r += x.slice(c,i)
+    c += i
+  }
+  // decimals
+  if (d != 0) {
+    r += `${x.slice(c)}`
+//      b = `${d}`.match(/([0-9])\1*/g) || [];
+//      a = b.map(function(itm) {
+//        return [itm.charAt(0), itm.length];
+//      });
+    if (i <= 1) {
+      f = d
+    }
+    else if (i > 3) {
+      f = 2
+    }
+    else if (i >= 2) {
+      f = 4
+    }
+  }
+  r = Number.parseFloat(r).toFixed(f)
+  return r
 }
 
 /**
@@ -301,7 +355,8 @@ export function index10 (value) {
 /**
  * Exponential power
  * @export
- * @param {number} value
+ * @param {number} base
+ * @param {number} exponent
  * @returns {number}
  */
 export function power (base, exponent) {

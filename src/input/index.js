@@ -4,7 +4,7 @@
 
 import { isBoolean, isFunction, isObject, isString } from "../utils/typeChecks";
 import { isTouchDevice } from "../utils/browser-or-node";
-import DOM from "../utils/DOM";
+import { isElement } from "../utils/DOM";
 import { Point, status } from "./definitions"
 import { EventManager } from "mjolnir.js";
 import PointerAgent from "./pointer";
@@ -47,7 +47,7 @@ export default class Input  {
       this.#element = document.getElementById(this.#options.elementId);
     }
 
-    if (!DOM.isElement(this.#element)) {
+    if (!isElement(this.#element)) {
       throw "Must specify an element to receive user input.";
     }
 

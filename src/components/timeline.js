@@ -1,12 +1,13 @@
 // timeLine.js
 // Timeline bar that lives at the bottom of the chart
 
-import DOM from "../utils/DOM"
 import xAxis from "./axis/xAxis"
 import Input from "../input"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-time"
+import { elementDimPos } from "../utils/DOM"
 import { copyDeep, debounce, idSanitize, throttle, xMap } from "../utils/utilities"
+import { isArray, isObject } from "../utils/typeChecks"
 import Slider from "./widgets/slider"
 import { BUFFERSIZE } from "../definitions/chart"
 
@@ -76,7 +77,7 @@ export default class Timeline {
     this.#options = options
     this.#element = options.elements.elTime
     this.#chart = core.Chart
-    this.#xAxis = new xAxis(this, this.#chart)
+    this.#xAxis = new xAxis(this)
     this.init()
   }
   
@@ -86,7 +87,7 @@ export default class Timeline {
   error(e) { this.#core.error(e) }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return (this.#id) ? `${this.#id}` : `${this.#core.id}-${this.#shortName}`.replace(/ |,|;|:|\.|#/g, "_") }
+  get id() { return this.#id || `${this.#core.id}-${this.#shortName}` }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   get options() { return this.#options }
@@ -112,7 +113,7 @@ export default class Timeline {
   get navigation() { return this.#navigation }
   get range() { return this.#core.range }
   get pos() { return this.dimensions }
-  get dimensions() { return DOM.elementDimPos(this.#element) }
+  get dimensions() { return elementDimPos(this.#element) }
   get bufferPx() { return this.#core.bufferPx }
   get scrollPos() { return this.#core.scrollPos }
   get scrollOffsetPx() { return this.#core.scrollPos % this.candleW }
@@ -213,8 +214,9 @@ export default class Timeline {
     this.#input2.destroy()
     this.#input3.destroy()
 
-    this.off("main_mousemove", this.drawCursorTime)
-    this.off("setRange", this.onSetRange)
+    this.#core.hub.expunge(this)
+    this.off("main_mousemove", this.#layerCursor.draw, this.#layerCursor)
+    
     this.#elFwdEnd.removeEventListener('click', debounce)
     this.#elRwdStart.removeEventListener('click', debounce)
 
@@ -235,33 +237,33 @@ export default class Timeline {
     this.#input2 = new Input(this.#elFwdEnd, {disableContextMenu: false});
     this.#input2.on("pointerover", () => this.showJump(this.#jump.end))
     this.#input2.on("pointerleave", () => this.hideJump(this.#jump.end))
-    // this.#input2.on("click", () => debounce(this.onMouseClick, 1000, this, true))
+    // this.#input2.on("click", () => debounce(this.onPointerClick, 1000, this, true))
 
     this.#input3 = new Input(this.#elRwdStart, {disableContextMenu: false});
     this.#input3.on("pointerover", () => this.showJump(this.#jump.start))
     this.#input3.on("pointerleave", () => this.hideJump(this.#jump.start))
-    // this.#input3.on('click', () => debounce(this.onMouseClick, 1000, this, true))
+    // this.#input3.on('click', () => debounce(this.onPointerClick, 1000, this, true))
 
     this.on("main_mousemove", this.#layerCursor.draw, this.#layerCursor)
     this.on("setRange", this.onSetRange, this)
 
-    this.#elFwdEnd.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
-    this.#elRwdStart.addEventListener('click', debounce(this.onMouseClick, 1000, this, true))
+    this.#elFwdEnd.addEventListener('click', debounce(this.onPointerClick, 1000, this, true))
+    this.#elRwdStart.addEventListener('click', debounce(this.onPointerClick, 1000, this, true))
   }
 
-  on(topic, handler, context) {
+  on(topic, handler, context=this) {
     this.#core.on(topic, handler, context)
   }
 
-  off(topic, handler) {
-    this.#core.off(topic, handler)
+  off(topic, handler, context=this) {
+    this.#core.off(topic, handler, context)
   }
 
   emit(topic, data) {
     this.#core.emit(topic, data)
   }
 
-  onMouseClick(e) {
+  onPointerClick(e) {
     const id = e?.currentTarget?.id || e.target.parentElement.id
     switch (id) {
       case "fwdEnd":
