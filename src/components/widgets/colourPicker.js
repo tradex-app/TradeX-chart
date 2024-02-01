@@ -28,11 +28,11 @@ export default class ColourPicker extends Dialogue {
 
     config.dragBar = true
     config.close = true
-    config.type = ConfigDialogue.type
+    config.type = Dialogue.type
     config.class = "picker"
     config.id = uid("picker")
 
-    return new ConfigDialogue(widgets, config)
+    return new Dialogue(widgets, config)
   }
 
   static defaultNode() {

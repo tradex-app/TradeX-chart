@@ -13,7 +13,7 @@ import Colour from "../utils/colour"
  * Indicator - Relative Strength Index
  * @export
  * @class RSI
- * @extends {indicator}
+ * @extends {Indicator}
  */
 export default class RSI extends Indicator {
 
@@ -31,16 +31,19 @@ export default class RSI extends Indicator {
     meta: {
       input : {
         timePeriod: {
-          label: `Period`,
+          entry: 'timePeriod',
+          label: 'Period',
           type: 'number',
           value: 5,
           // "data-oldval": 5,
-          // default: 5,
+          default: 5,
           min: '3',
           title: `Number of time units to use in calculation`,
-          $function: (e)=>{
-            console.log(`#Period = ${e.target.value}`)
-          }
+          $function:
+            this.configDialogue.provideEventListener("#Period", "change", 
+            (e)=>{
+              console.log(`#Period = ${e.target.value}`)
+            })
         }
       }
     }
@@ -81,13 +84,7 @@ export default class RSI extends Indicator {
 
     super (target, xAxis, yAxis, config, parent, params)
 
-    this.defineIndicator(params.overlay?.settings, talibAPI)
-    // calculate back history if missing
-    this.calcIndicatorHistory()
-    // enable processing of price stream
-    this.setNewValue = (value) => { this.newValue(value) }
-    this.setUpdateValue = (value) => { this.updateValue(value) }
-    this.addLegend()
+    this.init(talibAPI)
   }
 
   legendInputs(pos=this.chart.cursorPos) {
@@ -100,32 +97,6 @@ export default class RSI extends Indicator {
     return {inputs, colours}
   }
 
-  
-  configInputs() {
-    // id, label, type, value, default, placeholder, class, max, min, step, onchange, disabled, visible, description
-    const inputs = {
-      period: {
-        label: `Period`,
-        type: 'number',
-        value: this.definition.input.timePeriod,
-        "data-oldval": this.definition.input.timePeriod,
-        "data-default": this.definition.input.timePeriod,
-        default: 5,
-        min: '3',
-        class: ``,
-        title: `Number of time units to use in calculation`,
-        $function: 
-          this.configDialogue.provideEventListener("#Period", "change", 
-          (e)=>{
-            console.log(`#Period = ${e.target.value}`)
-          })
-      }
-    }
-
-    const style = this.buildConfigStyleTab()
-
-    return {inputs, style}
-  }
 
   /**
    * Draw the current indicator range on its canvas layer and render it.

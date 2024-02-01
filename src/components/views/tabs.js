@@ -31,7 +31,7 @@ export const tabStyles = `
 }
 .tabbedContent .label {
   width: auto;
-  padding: .5em 1em;
+  padding: .4em 1em;
   background: #e5e5e588;
   cursor: pointer;
   font-weight: bold;
@@ -62,16 +62,42 @@ export const tabStyles = `
   width: 100%;
   grid-template-columns: [label] 1fr [input] 9em [end];
   grid-row-gap: 2px;
+  align-items: center;
 }
 .tabbedContent .panel label,
 .tabbedContent .panel input {
   ${GlobalStyle.FONTSTRING}
+  padding: 1px 2px;
 }
 .tabbedContent .panel label {
   grid-column-start: label;
   grid-column-end: input;
   color: #444;
   font-weight: bold;
+}
+.tabbedContent .panel input {
+  border: 1px solid #888;
+}
+.tabbedContent .panel input[type="color"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 3em;
+  height: 2em;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 0;
+  border: none;
+}
+.tabbedContent .panel input[type="color"]::-webkit-color-swatch,
+.tabbedContent .panel input[type="color"]::-moz-color-swatch {
+  border-radius: 0;
+  padding: 1px;
+  margin 0;
+  border-radius: 3px;
+  border: 1px solid #000;
+  height: 2em;
+  background: #fff;
 }
 `
 
@@ -141,7 +167,7 @@ export default class tradeXTabs extends element {
 
   removeTab(t) {
     if (isString(t)) {
-      let tab = this.#elTabs.querySelectorAll(`.tab-${id}`)
+      let tab = this.#elTabs.querySelectorAll(`.tab-${t}`)
       for (let d of tab) {
         d.remove()
       }
@@ -205,8 +231,9 @@ export function tabsElement(c={}) {
 }
 
 /**
- * 
+ * build tabs for config dialogue
  * @param {object} c - {tab1: "foo", tab2: "bar", tab3: "baz", ...}
+ * @param {function} [fn] - optional function to process tab
  */
 export function tabsBuild(c={}, fn) {
   if (!isObject(c)) c = {}

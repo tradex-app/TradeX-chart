@@ -104,16 +104,17 @@ export default class tradeXColourPicker extends element {
 
     const view = viewport.viewport
     const layers = {}
+    const cfg = {x: 0, y: 0, width: this.#canvas.size, height: this.#canvas.size}
     this.#canvas.layers = layers
     this.#canvas.view = view
 
-    layers.red = new CEL.Layer(0, 0, this.#canvas.size, this.#canvas.size)
-    layers.green = new CEL.Layer(0, 0, this.#canvas.size, this.#canvas.size)
-    layers.blue = new CEL.Layer(0, 0, this.#canvas.size, this.#canvas.size)
-    layers.value = new CEL.Layer(0, 0, this.#canvas.size, this.#canvas.size)
-    layers.composite = new CEL.Layer(0, 0, this.#canvas.size, this.#canvas.size)
+    layers.red = new CEL.Layer(cfg)
+    layers.green = new CEL.Layer(cfg)
+    layers.blue = new CEL.Layer(cfg)
+    layers.value = new CEL.Layer(cfg)
+    layers.composite = new CEL.Layer(cfg)
     view.addLayer(layers.composite)
-    layers.grid = new CEL.Layer(0, 0, this.#canvas.size, this.#canvas.size)
+    layers.grid = new CEL.Layer(cfg)
     view.addLayer(layers.grid)
 
     this.#canvas[type] = {element, viewport, layers}

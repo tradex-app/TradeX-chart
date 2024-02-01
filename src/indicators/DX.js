@@ -56,13 +56,7 @@ export default class DX extends Indicator {
 
     super(target, xAxis, yAxis, config, parent, params)
 
-    this.defineIndicator(params.overlay?.settings, talibAPI)
-    // calculate back history if missing
-    this.calcIndicatorHistory()
-    // enable processing of price stream
-    this.setNewValue = (value) => { this.newValue(value) }
-    this.setUpdateValue = (value) => { this.updateValue(value) }
-    this.addLegend()
+    this.init(talibAPI)
   }
 
   legendInputs(pos=this.chart.cursorPos) {

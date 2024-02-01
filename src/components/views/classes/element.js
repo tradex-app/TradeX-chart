@@ -105,7 +105,7 @@ export default class element extends HTMLElement {
     }
     else if (isString(v)) {
       // is valid percentage
-      if (!v.match(CSSUNITS)) V = "100%"
+      if (!v.match(CSSUNITS)) v = "100%"
     }
     else {
       this.DOM[d] = this.parentElement.getBoundingClientRect()[d]
@@ -128,11 +128,11 @@ export default class element extends HTMLElement {
   }
 
   onIntersection(i) {
-    this.emit("intersection")
+    this.emit("intersection", this)
   }
 
   onMutation(m) {
-    this.emit("mutation")
+    this.emit("mutation", this)
   }
 
   /**

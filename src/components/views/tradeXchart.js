@@ -110,8 +110,6 @@ export default class tradeXChart extends element {
   disconnectedCallback() {
 
     this.resizeObserver.disconnect()
-
-    this.removeEventListener('click', this.onClick)
   }
 
   attributeChangedCallback(prop, oldVal, newVal) {
@@ -145,7 +143,7 @@ export default class tradeXChart extends element {
     }
   }
   
-  get stream() {  }
+  get stream() { return true }
   set stream(s) {  }
 
   get elBody() { return this.#elBody }
@@ -209,7 +207,7 @@ export default class tradeXChart extends element {
     }
     else {
       this.#chartH = this.parentElement.getBoundingClientRect().height
-      w = this.#chartH + "px"
+      h = this.#chartH + "px"
       // h = "100%"
     }
     this.style.height = h
@@ -217,9 +215,9 @@ export default class tradeXChart extends element {
   }
 
   setWidthMin(w) { this.style.minWidth = `var(--txc-min-width, ${w})` }
-  setHeightMin(h) { this.style.minHeight = `var(--txc-min-height, ${w})` }
+  setHeightMin(h) { this.style.minHeight = `var(--txc-min-height, ${h})` }
   setWidthMax(w) { this.style.minWidth = `var(--txc-max-width, ${w})` }
-  setHeightMax(h) { this.style.minHeight = `var(--txc-max-height, ${w})` }
+  setHeightMax(h) { this.style.minHeight = `var(--txc-max-height, ${h})` }
 
   /**
    * Set chart width and height

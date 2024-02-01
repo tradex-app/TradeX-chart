@@ -177,6 +177,8 @@ export default class Legends {
         Object.keys(this.#list).length < 3)
         this.#controls.style.display = "none"
     }
+    // set visibility
+    legendEl.style.display = (options.visible) ? "block" : "none"
 
     legendEl.style.display = (options.visible) ? "block" : "none"
 

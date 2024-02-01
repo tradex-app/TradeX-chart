@@ -16,7 +16,7 @@ export default class Test extends Indicator {
   static colours = []
   static defaultStyle = {
     stroke: "#0088cc",
-    lineWidth: "1",
+    lineWidth: 1,
     dash: undefined,
   }
 
@@ -37,12 +37,7 @@ export default class Test extends Indicator {
   constructor(target, xAxis=false, yAxis=false, config, parent, params) {
     super(target, xAxis, yAxis, config, parent, params)
 
-    // calculate back history if missing
-    this.calcIndicatorHistory()
-    // enable processing of price stream
-    this.setUpdateValue = (value) => { this.updateValue(value) }
-    // add the indicator legend to the chart pane
-    this.addLegend()
+    this.init()
   }
 
   /**
@@ -67,15 +62,6 @@ export default class Test extends Indicator {
       @param {Array.<string>} labels - array of which input labels to dispaly [true, false, ...]
     */
     return {inputs, colours, labels}
-  }
-
-  /**
-   * process new candle stream value
-   * @param {Array.<number>} candle - [timestamp, open, high, low, close, volume]
-   * @memberof Test
-   */
-  updateValue(candle) {
-    this.value = candle
   }
 
   /**

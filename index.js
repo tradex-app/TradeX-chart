@@ -15,6 +15,7 @@ import DMI from './DMI'
 import CustomOverlay from './custom-overlay'
 import chartDCA from './chart-dca'
 
+
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
 // build a split state to test all merge features
@@ -927,7 +928,7 @@ const dre =   {
   };
 
 const configs = [
-  {config: config1, stream: null},
+  // {config: config1, stream: null},
   {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
   {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
   {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
@@ -1166,10 +1167,10 @@ function alertTest ($, p, c) {
 
 addChart()
 addChart()
-addChart()
-addChart()
-addChart()
-addChart()
+// addChart()
+// addChart()
+// addChart()
+// addChart()
 
 document.getElementById("fullscreen").addEventListener("click", (e) => {
   chart0.requestFullscreen()

@@ -45,9 +45,9 @@ export default class Divider {
     // destroy all dividers
     for (let id in Divider.dividerList) {
       Divider.dividerList[id].destroy()
+      // remove entry
+      delete Divider.dividerList[id]
     }
-    // remove entry
-    delete Divider.dividerList[id]
   }
 
   static defaultNode() {

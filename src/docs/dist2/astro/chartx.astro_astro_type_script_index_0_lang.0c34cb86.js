@@ -30,8 +30,8 @@ function a8(o,i){for(var s=0;s<i.length;s++){const n=i[s];if(typeof n!="string"&
     max-width: var(--txc-max-width, ${$6});
     max-height: var(--txc-max-height, ${z6});
     overflow: hidden;
-    background: var(--txc-background, ${B.COLOUR_BG});
-    font: var(--txc-font, ${B.FONT});
+    background: var(--txc-background, ${H.COLOUR_BG});
+    font: var(--txc-font, ${H.FONT});
   }
   .tradeXchart .tradeXtime .navigation { 
     display: flex;
@@ -84,7 +84,7 @@ function a8(o,i){for(var s=0;s<i.length;s++){const n=i[s];if(typeof n!="string"&
   }
   .scrollBar {
     position: relative;
-    border: 1px solid var(--txc-time-scrollbar-color, ${B.COLOUR_BORDER});
+    border: 1px solid var(--txc-time-scrollbar-color, ${H.COLOUR_BORDER});
     height: 20px;
     border-radius: 3px;
     flex-basis: 100%;
@@ -228,7 +228,7 @@ function a8(o,i){for(var s=0;s<i.length;s++){const n=i[s];if(typeof n!="string"&
     margin-top: 1px;
   }
   .icon svg:hover {
-    fill: var(--txc-time-icon-hover-color, ${B.COLOUR_ICONHOVER});
+    fill: var(--txc-time-icon-hover-color, ${H.COLOUR_ICONHOVER});
   }
 </style>
 <div class="scrollBarWidget">
@@ -499,7 +499,7 @@ function a8(o,i){for(var s=0;s<i.length;s++){const n=i[s];if(typeof n!="string"&
     width: calc(100% - ${V5}px);
     height: calc(100% - ${v4}px);
     border: 1px solid;
-    border-color: var(--txc-border-color, ${B.COLOUR_BORDER}); 
+    border-color: var(--txc-border-color, ${H.COLOUR_BORDER}); 
   }
   tradex-time {
     position: relative;

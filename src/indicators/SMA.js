@@ -60,17 +60,7 @@ import { SMA as talibAPI } from "../definitions/talib-api";
 
     SMA.inCnt++
 
-    this.defineIndicator(params.overlay?.settings, talibAPI)
-    // calculate back history if missing
-    this.calcIndicatorHistory()
-    // enable processing of price stream
-    this.setNewValue = (value) => { this.newValue(value) }
-    this.setUpdateValue = (value) => { this.updateValue(value) }
-    this.addLegend()
-  }
-
-  updateLegend() {
-    this.parent.legend.update()
+    this.init(talibAPI)
   }
   
   legendInputs(pos=this.chart.cursorPos) {

@@ -33,7 +33,7 @@ export function linearGradient(ctx, grad=[], rect=[], stops=[]) {
  * @param {canvas} ctx - HTML Canvas
  * @param {string} fill - colour #rrggbb(aa)
  * @param {string} stroke - colour #rrggbb(aa)
- * @param {number} with - pixel stroke width
+ * @param {number} width - pixel stroke width
  */
 export function fillStroke(ctx, fill, stroke, width) {
   if (isString(fill)) {

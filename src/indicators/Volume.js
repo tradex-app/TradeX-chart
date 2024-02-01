@@ -12,7 +12,7 @@ import { isBoolean } from "../utils/typeChecks";
  * Volume
  * @export
  * @class Volume
- * @extends {indicator}
+ * @extends {Indicator}
  */
 export default class Volume extends Indicator {
 
@@ -63,10 +63,8 @@ export default class Volume extends Indicator {
       this.#primaryPane = false
     }
     this.#volumeBar = new VolumeBar(target.scene, this.style)
-    // enable processing of price stream
-    this.setNewValue = (value) => {  }
-    this.setUpdateValue = (value) => {  }
-    this.addLegend()
+
+    this.init()
   }
 
   get primaryPane() { return this.#primaryPane }

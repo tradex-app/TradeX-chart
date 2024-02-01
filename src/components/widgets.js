@@ -1,10 +1,10 @@
 // widgets.js
 // A template file for Chart components
 
-import DOM from "../utils/DOM"
 import Menu from "./widgets/menu"
 import Dialogue from "./widgets/dialogue"
 import ConfigDialogue from "./widgets/configDialogue"
+import ColourPicker from "./widgets/colourPicker"
 import Divider from "./widgets/divider"
 import Progress from "./widgets/progress"
 import Window from "./widgets/window"
@@ -23,7 +23,7 @@ export default class Widgets {
   #stateMachine
 
   #widgets = {}
-  #widgetsList = { Divider, Progress, Menu, Window, Dialogue, ConfigDialogue }
+  #widgetsList = { Divider, Progress, Menu, Window, Dialogue, ConfigDialogue, ColourPicker }
   #widgetsInstances = {}
   #elements = {}
   #elWidgetsG
@@ -38,7 +38,20 @@ export default class Widgets {
     // TODO: valiation of options.widgets
     this.#widgets = {...this.#widgetsList, ...options.widgets}
     this.#elWidgetsG = core.elWidgetsG
-    this.init()
+
+    this.mount(this.#elWidgetsG)
+
+    for (let i in this.#widgets) {
+      let widget = this.#widgets[i]
+      let entry = `el${widget.name}`
+          this.#elements[entry] = this.#elWidgetsG.querySelector(`.${widget.class}`)
+          this.#elements[entry].innerHTML = `
+      <style title="${widget.name}">
+        ${widget?.defaultStyles || ""}
+      </style>
+      `
+      widget.stylesInstalled = true
+    }
   }
 
   log(l) { this.#core.log(l) }
@@ -57,16 +70,6 @@ export default class Widgets {
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
   get types() { return this.#widgets }
-
-  init() {
-    this.mount(this.#elWidgetsG)
-
-    for (let i in this.#widgets) {
-      let widget = this.#widgets[i]
-      let entry = `el${widget.name}`
-      this.#elements[entry] = this.#elWidgetsG.querySelector(`.${widget.class}`)
-    }
-  }
 
   start() {
     // set up event listeners
@@ -89,7 +92,7 @@ export default class Widgets {
     }
 
     for (let t in this.#widgets) {
-      this.#widgets[t].destroy(id)
+      this.#widgets[t].destroy()
     }
   }
 
@@ -116,10 +119,6 @@ export default class Widgets {
     this.#core.emit(topic, data)
   }
 
-  onResize(dimensions) {
-    this.setDimensions(dimensions)
-  }
-
   onOpenMenu(data) {
     // console.log("onOpenMenu:", data)
 
@@ -137,7 +136,8 @@ export default class Widgets {
     this.emit(e.evt, e.target)
   }
 
-  onResize() {
+  onResize(dimensions) {
+    this.setDimensions(dimensions)
     this.elements.elDividers.style.width = `${this.core.width}px`
   }
 

@@ -15,8 +15,6 @@ export default class chartCursor extends Overlay{
 
     super(target, xAxis, yAxis, theme, parent, params)
 
-    this.core.on("chart_pan", this.onMouseDragX, this)
-    this.core.on("chart_panDone", this.onMouseDragX, this)
     this.core.on("main_mousemove", this.onMouseMoveX, this)
 
     this.#input = new Input(this.target.viewport.container, {disableContextMenu: false});
@@ -28,25 +26,36 @@ export default class chartCursor extends Overlay{
   get update() { return this.#update }
   get always() { return true }
 
-  onMouseDragX(e) {
-    this.#cursorPos[0] = e[0]
-    this.#cursorPos[1] = e[1]
-    this.draw(true)
-    this.core.emit("chart_render")
-  }
   onMouseMoveX(e) {
-    this.#cursorPos[0] = e[0]
-    this.draw()
-    this.core.emit("chart_render")
+    this.onMouseMove(e, true)
   }
-  onMouseMove(e) {
-    const x = (isObject(e)) ? e.position.x : e[0]
-    const y = (isObject(e)) ? e.position.y : e[1]
 
-    this.#cursorPos[0] = x
-    this.#cursorPos[1] = y
+  onMouseMove(e, b=false) {
+    let t, x, y,
+        pos = this.#cursorPos;
+    if (isObject(e)) {
+      t = e.timeStamp
+      x = Math.round(e.position.x)
+      y = Math.round(e.position.y)
+    }
+    else {
+      t = e[6]
+      x = Math.round(e[0])
+      y = Math.round(e[1])
+    }
+
+    if (b && pos[1] == y) {
+      return
+    }
+    if (pos[0] == x &&
+        pos[1] == y) {
+      return
+    }
+
+    pos[0] = x
+    pos[1] = y
+    pos[6] = t
     this.draw()
-    this.core.emit("chart_render")
   }
 
   draw(drag = false) {

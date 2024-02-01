@@ -201,8 +201,7 @@ export default class Chart {
   get type() { return this.#type }
   get status() { return this.#status }
   get collapsed() { return this.#collapsed }
-  get isPrimary() { return this.#type === "primaryPane" }
-  get isPrimary() { return this.#options.view.primary || false }
+  get isPrimary() { return this.#options.view.primary || (this.#type === "primaryPane") || false }
   get options() { return this.#options }
   get element() { return this.#elTarget }
   get pos() { return this.dimensions }
@@ -211,9 +210,7 @@ export default class Chart {
   get width() { return this.#elTarget.getBoundingClientRect().width }
   set height(h) { this.setHeight(h) }
   get height() { return this.#elTarget.getBoundingClientRect().height }
-  get data() {}
   get range() { return this.#core.range }
-  set localRange(r) { this.setLocalRange(r) }
   get localRange() { return this.#localRange }
   get stream() { return this.#Stream }
   get streamCandle() { return this.#streamCandle }
@@ -296,8 +293,13 @@ export default class Chart {
     this.#Divider.start()
     // cfg = {dragBar, closeIcon, title, content, position, styles}
     const content = `Configure chart ${this.id}`
-    cfg = { title: "Chart Config", content, parent: this }
-    this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
+    let cfg2 = { 
+      title: "Chart Config", 
+      content, 
+      parent: this,
+      openNow: false
+     }
+    this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg2)
     this.#ConfigDialogue.start()
     this.#status = "running"
   }
@@ -369,7 +371,7 @@ export default class Chart {
    * Set a custom event listener
    * @param {string} topic
    * @param {function} handler
-   * @param {*} context
+   * @param {*} [context]
    */
   on(topic, handler, context=this) {
     this.#core.on(topic, handler, context);
@@ -379,6 +381,7 @@ export default class Chart {
    * Remove a custom event listener
    * @param {string} topic
    * @param {function} handler
+   * @param {*} [context]
    */
   off(topic, handler, context=this) {
     this.#core.off(topic, handler, context);
@@ -386,8 +389,7 @@ export default class Chart {
 
   /**
    * Remove a custom event listener
-   * @param {string} topic
-   * @param {function} handler
+   * @param {*} [context]
    */
   expunge(context=this) {
     this.#core.expunge(context);
@@ -517,6 +519,10 @@ export default class Chart {
     this.#Scale.setDimensions({ w: null, h: h });
     this.Divider?.setPos()
     this.Divider?.setWidth()
+  }
+
+  setWidth(w) {
+
   }
 
   /**
@@ -692,6 +698,7 @@ export default class Chart {
   }
 
   addTool(tool) {
+    // FIXME: this.layerConfig - undefined
     let { layerConfig } = this.layerConfig();
     let layer = new CEL.Layer(layerConfig);
     this.#layersTools.set(tool.id, layer);
@@ -703,18 +710,19 @@ export default class Chart {
 
   addTools(tools) {}
 
-  overlayTools() {
-    const tools = [];
-    // for (let i = 0; i < this.#layersTools.length; i++) {
-    // tools[i] =
-    // new indicator(
-    //   this.#layersPrimary[i],
-    //   this.#Time,
-    //   this.#Scale,
-    //   this.config)
-    // }
-    // return tools
-  }
+  // duplicate get overlayTools()
+  // overlayTools() {
+  //   const tools = [];
+  //   // for (let i = 0; i < this.#layersTools.length; i++) {
+  //   // tools[i] =
+  //   // new indicator(
+  //   //   this.#layersPrimary[i],
+  //   //   this.#Time,
+  //   //   this.#Scale,
+  //   //   this.config)
+  //   // }
+  //   // return tools
+  // }
 
   overlayToolAdd(tool) {
     // create new tool layer
@@ -724,13 +732,6 @@ export default class Chart {
 
   overlayToolDelete(tool) {
     this.#overlayTools.delete(tool);
-  }
-
-  drawGrid() {
-    this.layerGrid.setPosition(this.#core.scrollPos, 0);
-    this.overlayGrid.setRefresh()
-    this.overlayGrid.draw("y");
-    this.#core.MainPane.draw()
   }
 
   /**
@@ -886,9 +887,11 @@ export default class Chart {
       this.#Graph.draw(range, update)
   }
 
-  drawGrid(update) {
-    this.layerGrid.setPosition(this.core.scrollPos, 0)
-    this.overlayGrid.draw("y")
+  drawGrid() {
+    this.layerGrid.setPosition(this.#core.scrollPos, 0);
+    this.overlayGrid.setRefresh() //
+    this.overlayGrid.draw("y");
+    this.#core.MainPane.draw() //
   }
 
   /**
@@ -904,29 +907,24 @@ export default class Chart {
     const rowMinH = this.core.MainPane.rowMinH
     const activeHeight = this.element.clientHeight
     const prevHeight = prev.element.clientHeight
-    let yDelta, activeH, prevH, total;
+    const total = activeHeight + prevHeight
+    let yDelta, activeH, prevH;
 
     if (isNumber(height) && height > rowMinH) {
-
+      activeH = height
     }
     // height is undefined
     else {
-      total = activeHeight + prevHeight
       yDelta = this.core.MainPane.cursorPos[5]
+      if (activeHeight - yDelta < rowMinH)
+        yDelta = rowMinH - (activeHeight - yDelta)
+
       activeH = activeHeight - yDelta
       prevH  = prevHeight + yDelta
     }
-
-    if ( activeH < rowMinH
-      || prevH < rowMinH
-      || total !== activeH + prevH) {
-
-      }
-    else {
-      active.setDimensions({w:undefined, h:activeH})
-      prev.setDimensions({w:undefined, h:prevH})
-      active.Divider.setPos()
-    }
+    active.setDimensions({w:undefined, h:activeH})
+    prev.setDimensions({w:undefined, h:prevH})
+    active.Divider.setPos()
 
     active.element.style.userSelect = 'none';
     // active.element.style.pointerEvents = 'none';
@@ -970,7 +968,7 @@ export default class Chart {
   zoomRange() {
     // draw the chart - grid, candles, volume
     this.draw(this.range, true)
-    this.emit("zoomDone")
+    this.emit("zoomDone", true)
   }
 
 

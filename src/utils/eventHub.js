@@ -80,11 +80,20 @@ export default class EventHub {
     * Publish a topic
     * @param {string} topic - The topic name
     * @param {Object}  data - The data to publish
-    * @returns {boolean}
     */
     emit(topic, data) {
       if (!isString(topic)) return
-      (this.#hub[topic] || []).forEach(cb => cb.handler.call(cb.context, data));
+      
+      (this.#hub[topic] || []).forEach(
+        cb => {
+          try {
+            cb.handler.call(cb.context, data)
+          }
+          catch (e) {
+            console.error(e)
+          }
+        }
+      );
     }
   
     /**
@@ -93,7 +102,7 @@ export default class EventHub {
     * @param {Object} data    - The data that gets published
     * @param {function} cb    - callback method
     */
-    execute(channel, data, cb) {
+    execute(topic, data, cb) {
   
     }
   

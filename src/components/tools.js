@@ -86,8 +86,10 @@ export default class ToolsBar {
   }
 
   destroy() {
-    this.off("setRange", this.onSetRange, this)
+    this.#core.hub.expunge(this)
+
     // remove event listeners
+    const id = this.#id
     const tools = this.#elTools.querySelectorAll(`.icon-wrapper`)
     for (let tool of tools) {
       for (let t of this.#tools) {

@@ -82,10 +82,10 @@ export function isInViewport(el) {
 export function isVisibleToUser(el) {
   if (!isElement(el)) return false;
 
-  const style = getComputedStyle(elem);
+  const style = getComputedStyle(el);
   if (style.display === "none") return false;
   if (style.visibility !== "visible") return false;
-  if (style.opacity < 0.1) return false;
+  if (parseFloat(style.opacity) < 0.1) return false;
   if (
     el.offsetWidth +
       el.offsetHeight +
@@ -119,7 +119,7 @@ export function isVisibleToUser(el) {
 /**
  * test if image, return image object or false
  * @param {*} img - image resource, URL, data:URL, svg
- * @param {function} cb - callback to return image or false
+ * @param {function} [cb] - callback to return image or false
  * @returns {Promise} - if no callback function is provided, a Promise will be returned
  */
 export function isImage(img, cb) {
@@ -129,8 +129,8 @@ export function isImage(img, cb) {
     // img = `data:image/svg+xml;base64,${btoa(xml)}`
 
     var DOMURL = window.URL || window.webkitURL || window;
-    var img = new Blob([img], { type: "image/svg+xml" });
-    var img = DOMURL.createObjectURL(img);
+    img = new Blob([img], { type: "image/svg+xml" });
+    img = DOMURL.createObjectURL(img);
   }
   const i = new Image();
   i.src = img;
@@ -241,7 +241,7 @@ export function elementsDistance(el1, el2) {
 
 /**
  * Convert string into HTML element
- * @param {String} HTML representing a single element
+ * @param {String} html representing a single element
  * @returns {Element}
  */
 export function htmlToElement(html) {
@@ -254,7 +254,7 @@ export function htmlToElement(html) {
 
 /**
  * convert string into HTML element/s
- * @param {String} HTML representing any number of sibling elements
+ * @param {String} html representing any number of sibling elements
  * @returns {NodeList}
  */
 export function htmlToElements(html) {
@@ -348,11 +348,14 @@ export function getStyle(el, styleProp) {
   if (isString(el)) x = document.getElementById(el);
   else if (isElement(el)) x = el;
   else return false;
+  const defaultView = (x.ownerDocument || document).defaultView;
   if (!isString(styleProp)) return false;
-  if ("getComputedStyle" in navigator)
+  if (defaultView && defaultView.getComputedStyle) {
+    styleProp = styleProp.replace(/([A-Z])/g, "-$1").toLowerCase(); 
     y = document.defaultView
       .getComputedStyle(x, null)
       .getPropertyValue(styleProp);
+  }
   else if (x.currentStyle) y = x.currentStyle[styleProp];
   return y;
 }
@@ -430,8 +433,10 @@ export function findTargetParentWithClass(el, selector) {
 }
 
 export function htmlInput(i, o) {
-  let id = (isString(o?.label)) ? o?.label : ""
-  let input = `<label for="${id}">${id}</label><input id="${id}" `
+  let id = (isString(o?.entry)) ? o?.entry : ""
+  let label = (isString(o?.label)) ? o?.label : id || ""
+
+  let input = `<label for="${id}">${label}</label><input id="${id}" class="subject" `
 
   for (let p in o) {
     // add valid HTML element attributes

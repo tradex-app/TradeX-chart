@@ -109,16 +109,16 @@ export function isClass(v){
  */
 export function checkType(type, value) {
   switch(type) {
-    case 'array': isArray(value); break;
-    case 'function': isFunction(value); break;
-    case 'object': isObject(value); break;
-    case 'number': isNumber(value); break;
-    case 'valid': isValid(value); break;
-    case 'boolean': isBoolean(value); break;
-    case 'string': isString(value); break;
-    case 'promise': isPromise(value); break;
-    case 'Error': isError(value); break;
-    case 'class': isClass(value); break;
+    case 'array': return isArray(value);
+    case 'function': return isFunction(value);
+    case 'object': return isObject(value);
+    case 'number': return isNumber(value);
+    case 'valid': return isValid(value);
+    case 'boolean': return isBoolean(value);
+    case 'string': return isString(value);
+    case 'promise': return isPromise(value);
+    case 'Error': return isError(value);
+    case 'class': return isClass(value);
     default: throw new Error(`No known test for type: ${type}`)
   }
 };

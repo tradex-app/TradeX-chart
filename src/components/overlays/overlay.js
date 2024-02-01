@@ -209,8 +209,8 @@ export default class Overlay {
         case "renderLineHorizontal": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
         case "renderLineVertical": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
         case "renderPath": canvas[type]( ctx, p, params.style, params ); break;
-        case "renderPathStroke": canvas[type]( ctx, p, params.style, params ); break;
-        case "renderPathClosed": canvas[type]( ctx, p, params ); break;
+        case "renderPathStroke": canvas[type]( ctx, p, params.style ); break;
+        case "renderPathClosed": canvas[type]( ctx, p, params.style, params ); break;
         case "renderSpline": canvas[type]( ctx, p, params ); break;
         case "renderRect": canvas[type]( ctx, p[0], p[1], p[2], p[3], params ); break;
         case "renderRectFill": canvas[type]( ctx, p[0], p[1], p[2], p[3], params ); break;

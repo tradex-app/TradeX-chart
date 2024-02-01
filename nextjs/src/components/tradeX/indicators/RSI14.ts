@@ -70,10 +70,12 @@ export default class RSI14 extends Indicator {
     const overlay = params.overlay;
 
     this.id = params.overlay?.id || uid(this.shortName);
-    this.defineIndicator(overlay?.settings, talibAPI[this.libName]);
     this.style = overlay?.settings?.style
       ? { ...this.#defaultStyle, ...overlay.settings.style }
       : { ...this.#defaultStyle, ...config.style };
+
+/*
+    this.defineIndicator(overlay?.settings, talibAPI[this.libName]);
     // calculate back history if missing
     this.calcIndicatorHistory();
     // enable processing of price stream
@@ -89,6 +91,9 @@ export default class RSI14 extends Indicator {
     this.addLegend();
     // set the max min Y-Axis values if required
     // this.chart.setLocalRange(0, 150)
+*/
+
+    this.init(talibAPI[this.libName])
   }
 
   /**
@@ -123,7 +128,7 @@ export default class RSI14 extends Indicator {
     if (this.overlay.data.length == 0) return false;
 
     // determine which legend labels to display
-    // let labels = [false]
+    let labels = [false]
     // c = data index
     // colours = array of colours ["#f00"]
     const { c, colours } = super.legendInputs(pos);

@@ -27,7 +27,7 @@ export default class StateMachine {
   /**
    * Instantiate state machine
    * @param {Object} config - state definition
-   * @param {Object} core - module mediate provides event handling
+   * @param {Object} context
    */
   constructor(config, context) {
     if (!StateMachine.validateConfig(config)) return false

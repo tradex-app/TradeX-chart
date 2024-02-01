@@ -1,12 +1,13 @@
 // timeLine.js
 // Timeline bar that lives at the bottom of the chart
 
-import { elementDimPos } from "../utils/DOM"
 import xAxis from "./axis/xAxis"
 import Input from "../input"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-time"
+import { elementDimPos } from "../utils/DOM"
 import { copyDeep, debounce, idSanitize, throttle, xMap } from "../utils/utilities"
+import { isArray, isObject } from "../utils/typeChecks"
 import Slider from "./widgets/slider"
 import { BUFFERSIZE } from "../definitions/chart"
 
@@ -76,7 +77,7 @@ export default class Timeline {
     this.#options = options
     this.#element = options.elements.elTime
     this.#chart = core.Chart
-    this.#xAxis = new xAxis(this, this.#chart)
+    this.#xAxis = new xAxis(this)
     this.init()
   }
   

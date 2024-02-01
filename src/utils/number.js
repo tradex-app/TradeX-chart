@@ -264,7 +264,7 @@ export function precision(value) {
  * converting to string and splitting by . is only a solution for up to 7 decimals
  * slowest
  * @export
- * @param {number} - value
+ * @param {number} value
  * @returns {number}
  */
 export function getPrecision (value) {
@@ -355,7 +355,8 @@ export function index10 (value) {
 /**
  * Exponential power
  * @export
- * @param {number} value
+ * @param {number} base
+ * @param {number} exponent
  * @returns {number}
  */
 export function power (base, exponent) {

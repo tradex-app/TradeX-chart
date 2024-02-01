@@ -57,7 +57,7 @@ export function renderPathStroke (ctx, coords, style) {
  * @param {Array} coords - array of x y coords [{x:x, y:y}, ...]
  * @param {Object} style - {width, stroke, fill, dash}
  */
-export function renderPathClosed (ctx, coords, style) {
+export function renderPathClosed (ctx, coords, style, opts) {
   renderPath(ctx, coords, style, () => {
     ctx.closePath()
   })

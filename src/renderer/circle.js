@@ -1,5 +1,7 @@
 // circle.js
 
+import { fillStroke } from "./fill"
+
 /**
  * Draw a solid circle with border
  * @param {canvas} ctx - canvas reference

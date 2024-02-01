@@ -25,9 +25,7 @@ export default class BB extends Indicator {
       upperBand: []
     },
     meta: {
-      nbDevDn: 2,
-      nbDevUp: 2,
-      timePeriod: 5,
+
     }
   }
 
@@ -41,13 +39,13 @@ export default class BB extends Indicator {
   static primaryPane = true
   static defaultStyle = {
     lowerStroke: "#08c",
-    lowerLineWidth: '1',
+    lowerLineWidth: 1,
     lowerLineDash: undefined,
     middleStroke: "#0080c088",
-    middleLineWidth: '1',
+    middleLineWidth: 1,
     middleLineDash: undefined,
     upperStroke: "#08c",
-    upperLineWidth: '1',
+    upperLineWidth: 1,
     upperLineDash: undefined,
     fillStyle: "#0080c044"
   }
@@ -65,14 +63,7 @@ export default class BB extends Indicator {
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
     super(target, xAxis, yAxis, config, parent, params)
 
-    // initialize indicator values
-    this.defineIndicator(params.overlay?.settings, talibAPI)
-    // calculate back history if missing
-    this.calcIndicatorHistory()
-    // enable processing of price stream
-    this.setNewValue = (value) => { this.newValue(value) }
-    this.setUpdateValue = (value) => { this.updateValue(value) }
-    this.addLegend()
+    this.init(talibAPI)
   }
 
   /**

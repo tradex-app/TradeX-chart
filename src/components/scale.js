@@ -1,6 +1,7 @@
 // scale.js
 // Scale bar that lives on the side of the chart
 
+import { YAXIS_TYPES } from '../definitions/chart'
 import { isArray, isObject } from '../utils/typeChecks'
 import { elementDimPos } from "../utils/DOM"
 import yAxis from "./axis/yAxis"
@@ -249,7 +250,6 @@ export default class ScaleBar {
 
   /**
    * Set price chart or off chart indicator to automatic scaling and positioning
-   * @param {number} r - scale adjustment value
    */
   resetScaleRange() {
     this.#yAxis.mode = "automatic"

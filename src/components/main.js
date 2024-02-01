@@ -788,17 +788,21 @@ export default class MainPane {
     let isPrimary = this.indicatorClasses[i].ind?.primaryPane;
 
     if (
-      !isString(i) &&
-      !(i in this.indicatorClasses) &&
-      !isString(name) &&
-      !isObject(params)
+      !isString(i) ||
+      !(i in this.indicatorClasses) ||
+      !isString(name)
     ) return false
 
     this.log(`Adding the ${name} : ${i} indicator`)
-    this.emit("pane_refresh", this)
+      
+    if (!isObject(params)) params = {data: [], settings: []}
+    else {
+      if (!isArray(params?.data)) params.data = []
+      if (!isObject(params?.settings)) params.settings = {}
+    }
 
-    if (!isArray(params?.data)) params.data = []
-    if (!isObject(params?.settings)) params.settings = {}
+    let instance;
+    let isPrimary = this.indicatorClasses[i].ind?.primaryPane;
 
     // isPrimary must be a boolean
     switch (isPrimary) {

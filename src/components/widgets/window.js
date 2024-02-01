@@ -4,15 +4,15 @@
 
 // window.js
 
-import DOM from "../../utils/DOM"
+import { elementDimPos, findBySelectorAll, getStyle, isElement, isVisible,  } from "../../utils/DOM"
 import { CLASS_WINDOWS, CLASS_WINDOW } from "../../definitions/core"
 import { WindowStyle } from "../../definitions/style"
-import { isArray, isNumber, isObject, isString } from "../../utils/typeChecks"
+import { isArray, isFunction, isNumber, isObject, isString } from "../../utils/typeChecks"
+import { uid } from "../../utils/utilities"
 import { limit } from "../../utils/number"
 import Input from "../../input"
 
-
-class WinState {
+export class WinState {
   static opened = new WinState("opened")
   static closed = new WinState("closed")
 
@@ -29,6 +29,7 @@ export default class Window {
   #core
   #config
   #state = WinState.closed
+  #parent
   
   #elWidgetsG
   #elWindows
@@ -38,7 +39,7 @@ export default class Window {
   #elCloseIcon
   #elContent
 
-  #pos
+  #pos = {}
   #dims
   #cursorPos
   #controller
@@ -47,69 +48,84 @@ export default class Window {
 
   #windowEvents = {}
 
+  #title = ""
+  #content = ""
+  #contentFields = {}
+
   static windowList = {}
   static windowCnt = 0
   static class = CLASS_WINDOWS
   static name = "Windows"
   static type = "Window"
   static currentActive = null
+  static stylesInstalled = false
+  static defaultStyles = `
+  /** default Window widget styles */
+
+  .tradeXwindow {
+    border: 1px solid ${WindowStyle.COLOUR_BORDER};
+    border-radius: 5px;
+    box-shadow: ${WindowStyle.SHADOW};
+    background: ${WindowStyle.COLOUR_BG};
+    color: ${WindowStyle.COLOUR_TXT};
+  }
+
+  .tradeXwindow .dragBar {
+    cursor: grab;
+  }
+
+  .tradeXwindow .dragBar:hover {
+    background: #222;
+  }
+
+  .tradeXwindow .dragBar .title {
+    ${WindowStyle.TITLE}
+  }
+
+  .tradeXwindow .content {
+    ${WindowStyle.CONTENT}
+  }
+ 
+  `
 
   static create(widgets, config) {
 
-    const id = `window_${++Window.windowCnt}`
-    config.id = id
-    const styles = {
-      window: {"box-shadow": "rgb(0,0,0) 0px 20px 30px -10px"},
-      content: {padding: "1em"},
-    }
-    config.styles = (isObject(config?.styles)) ? {...styles, ...config.styles} : styles
+    config.id = config?.id || uid("window")
+    config.id = `${config.id}_${++Window.windowCnt}`
+    config.type = config?.type || Window.type
     config.class = config?.class || "window"
     // add entry
-    Window.windowList[id] = new Window(widgets, config)
+    Window.windowList[config.id] = new Window(widgets, config)
 
-    return Window.windowList[id]
+    return Window.windowList[config.id]
   }
 
   static destroy(id) {
-    Window.windowList[id].destroy()
+    if (!(id in Window.windowList)) return 
 
+    Window.windowList[id].destroy()
     // remove entry
     delete Window.windowList[id]
   }
 
+  static defaultNode() {
+    const windowStyle = ``
+    const node = `
+      <div slot="widget" class="${CLASS_WINDOWS}" style="${windowStyle}"></div>
+    `
+    return node
+  }
+
   constructor(widgets, config) {
     this.#widgets = widgets
-    this.#core = config.core
+    this.#core = config.core || config.parent.core
     this.#config = config
     this.#id = config.id
+    this.#parent = config.parent
     this.#elWindows = widgets.elements.elWindows
     this.#elWidgetsG = this.#core.elWidgetsG
-    this.init()
-  }
-
-  get id() { return this.#id }
-  get pos() { return this.dimensions }
-  get config() { return this.#config }
-  set config(c) { this.#config = c }
-  get state() { return this.#state }
-  get dimensions() { return DOM.elementDimPos(this.#elWindow) }
-  set dimensions(d) { this.setDimensions(d) }
-  get type() { return Window.type }
-  get el() { return this.#elWindow }
-  get elDragBar() { return this.#elDragBar }
-  get elTitle() { return this.#elTitle }
-  get elCloseIcon() { return this.#elCloseIcon }
-  get elContent() { return this.#elContent }
-
-  init() {
     // insert element
     this.mount(this.#elWindows)
-  }
-
-  start() {
-    // set up event listeners
-    this.eventsListen()
-    this.close()
   }
 
   destroy() {
@@ -120,14 +136,82 @@ export default class Window {
     this.el.remove()
   }
 
+  get id() { return this.#id }
+  get pos() { return this.dimensions }
+  get core() { return this.#core }
+  get parent() { return this.#parent }
+  get config() { return this.#config }
+  set config(c) { this.#config = c }
+  get theme() { return this.#core.theme }
+  get state() { return this.#state }
+  get dimensions() { return elementDimPos(this.#elWindow) }
+  set dimensions(d) { this.setDimensions(d) }
+  get type() { return Window.type }
+  get el() { return this.#elWindow }
+  get elDragBar() { return this.#elDragBar }
+  get elTitle() { return this.#elTitle }
+  get elCloseIcon() { return this.#elCloseIcon }
+  get elContent() { return this.#elContent }
+  get title() { return this.#title }
+  set title(t) { this.setTitle(t) }
+  get content() { return this.#content }
+  set content(c) { this.setContent(c) }
+  get contentFields() { return this.#contentFields }
+
+  /**
+   * set window title
+   * @param {string} t 
+   * @returns {HTMLElement}
+   */
+  setTitle(t) {
+    if (!isString(t)) return false
+
+    this.#config.title = t
+    this.#elTitle.innerHTML = t
+    return this.#elTitle
+  }
+
+  /**
+   * set window content
+   * @param {string} c - html content
+   * @param {object} [m={}] - keys represent selector queries, entries are functions to execute upon matching elements
+   * @returns {HTMLElement}
+   */
+  setContent(c, m={}) {
+    if (!isString(c) ||
+        !isObject(m)) return false
+
+    // insert the HTML into DOM
+    this.#config.content = c
+    this.#elContent.innerHTML = c
+
+    // execute functions on the content
+    for (let mod in m) {
+      if (!isFunction(m[mod])) continue
+
+      m[mod](this.#elContent)
+    }
+
+    this.#contentFields = this.allContentFields()
+
+    return this.#elContent
+  }
+
+  start() {
+    // set up event listeners
+    this.eventsListen()
+    // set to close unless otherwise specified
+    if (this.#config?.openNow !== true) this.setClose()
+  }
+
   eventsListen() {
     // add event listener to dragbar
-    // const windowItems = DOM.findBySelectorAll(`#${api.id} #${this.#config.id} li`)
+    // const windowItems = findBySelectorAll(`#${api.id} #${this.#config.id} li`)
     // windowItems.forEach((item) => {
     //   item.addEventListener('click', this.onWindowSelect.bind(this))
     // })
 
-    this.on("closeWindow", this.onCloseWindow, this)
+    this.on(`window_close_${this.parent.id}`, this.onCloseWindow, this)
     this.on("global_resize", this.onGlobalResize, this)
   }
 
@@ -181,13 +265,14 @@ export default class Window {
   onOutsideClickListener(e) {
     if (!this.#elWindow.contains(e.target) 
     // && (!this.#config.primary.contains(e.target)) 
-    && DOM.isVisible(this.#elWindow)
+    && isVisible(this.#elWindow)
     && !this.#dragging) {
       let data = {
         target: e.currentTarget.id, 
         window: this.#id,
       };
-      this.emit("closeWindow", data)
+      this.emit("window_close", data)
+      this.emit(`window_close_${this.parent.id}`, data)
       document.removeEventListener('click', this.#windowEvents.click)
       delete this.#windowEvents.click
     }
@@ -229,9 +314,10 @@ export default class Window {
     this.#elTitle = this.#elWindow.querySelector(".title")
     this.#elCloseIcon = this.#elWindow.querySelector(".closeIcon")
     this.#elContent = this.#elWindow.querySelector(".content")
+    this.#contentFields = this.allContentFields()
 
     this.#elWindow.addEventListener("click", this.onWindow.bind(this))
-    if (DOM.isElement(this.#elDragBar)) {
+    if (isElement(this.#elDragBar)) {
       this.#dragBar = new Input(this.#elDragBar, {disableContextMenu: false});
       this.#dragBar.on("pointerdrag", this.onDragBar.bind(this))
       this.#dragBar.on("pointerdragend", this.onDragBarEnd.bind(this))
@@ -246,27 +332,16 @@ export default class Window {
     this.position()
   }
 
-  static defaultNode() {
-    const windowStyle = ``
-    const node = `
-      <div slot="widget" class="${CLASS_WINDOWS}" style="${windowStyle}"></div>
-    `
-    return node
-  }
-
   windowNode() {
     const window = this.#config
-    let windowStyle = `position: absolute; z-index: 100; display: block; border: 1px solid ${WindowStyle.COLOUR_BORDER}; background: ${WindowStyle.COLOUR_BG}; color: ${WindowStyle.COLOUR_TXT}; box-shadow: rgb(0,0,0) 0px 20px 30px -10px;`
-    let cfg = this.config?.styles?.window
-    for (let k in cfg) {
-      windowStyle += `${k}: ${cfg[k]}; `
-    }
-    let dragBar = (window.dragBar) ? this.dragBar(window) : ''
-    let title = (!window.dragBar && window.title) ? this.title(window) : ''
-    let content = this.content(window)
-    let closeIcon = this.closeIcon(window)
+    let windowStyle = `position: absolute; z-index: 100; display: block;`
+    let dragBar = (window.dragBar) ? this.dragBar() : ''
+    let title = (!window.dragBar && window.title) ? this.titleNode() : ''
+    let content = this.contentNode()
+    let closeIcon = this.closeIcon()
     let node = `
-      <div id="${window.id}" class="${CLASS_WINDOW} ${this.#config.class}" style="${windowStyle}">
+      <!-- ${this.constructor.type} ${this.parent.id} -->
+      <div id="${window.id}" class="${CLASS_WINDOW} ${window.class}" style="${windowStyle}">
           ${dragBar}
           ${title}
           ${closeIcon}
@@ -277,13 +352,9 @@ export default class Window {
     return node
   }
 
-  content(window) {
-    let cfg = this.config?.styles?.content
+  contentNode() {
+    const window = this.#config
     let contentStyle = ``
-    for (let k in cfg) {
-      contentStyle += `${k}: ${cfg[k]}; `
-    }
-
     let content = (window?.content)? window.content : ''
     let node = `
       <div class="content" style="${contentStyle}">
@@ -294,52 +365,38 @@ export default class Window {
   }
 
   // get your drag on
-  dragBar(window) {
+  dragBar() {
+    const window = this.#config
     const cPointer = "cursor: grab;"
     const over = `onmouseover="this.style.background ='#222'"`
     const out = `onmouseout="this.style.background ='none'"`
     let dragBarStyle = `${cPointer} `
-    let cfg = this.config?.styles?.dragBar
-    for (let k in cfg) {
-      dragBarStyle += `${k}: ${cfg[k]}; `
-    }
-
     let node = ``
     if (window.dragBar) node +=
     `
-      <div class="dragBar" style="${dragBarStyle}" ${over} ${out}>
-        ${this.title(window)}
+    <div class="dragBar" style="${dragBarStyle}" ${over} ${out}>
+        ${this.titleNode()}
       </div>
     `
     return node
   }
 
   // build the title
-  title(window) {
+  titleNode() {
     const cfg = this.config
-    const styles = cfg?.styles?.title
     const title = (isString(cfg?.title)) ? cfg.title : ""
-    let titleStyle = `white-space: nowrap; `
-
-    for (let k in styles) {
-      titleStyle += `${k}: ${styles[k]}; `
-    }
     let node = `
-        <div class="title" style="${titleStyle}">${title}</div>
+        <div class="title">${title}</div>
     `
     return node
   }
 
-  closeIcon(window) {
+  closeIcon() {
     const cPointer = "cursor: pointer;"
     const over = `onmouseover="this.style.background ='#222'"`
     const out = `onmouseout="this.style.background ='none'"`
     let closeIconStyle = `${cPointer} `
-    let cfg = this.config?.styles?.closeIcon
-    let titleStyle = ``
-    for (let k in cfg) {
-      titleStyle += `${k}: ${cfg[k]}; `
-    }
+    let cfg = this.#config?.styles?.closeIcon
     let node = ``
     if (window.closeIcon) node +=
     `
@@ -350,14 +407,32 @@ export default class Window {
     return node
   }
 
+  allContentFields() {
+    const fields = {}
+    const c = this.#elContent
+
+    fields.input = c.querySelectorAll("input")
+    fields.select = c.querySelectorAll("select")
+    fields.textarea = c.querySelectorAll("textarea")
+    fields.button = c.querySelectorAll("button")
+
+    return fields
+  }
+
   position(p) {
+
+    let rebound = 0.1
     let wPos = this.dimensions
     let iPos = this.#core.dimensions
     let left = Math.round(iPos.left - wPos.left)
     let top  = Math.round(iPos.bottom - wPos.top)
-    let px = Math.round((iPos.width - wPos.width) / 2)
-    let py = Math.round((iPos.height - wPos.height) / 2) * -1
-    let pz = DOM.getStyle(this.#elWindow, "z-index")
+    let px = (this.#pos?.iPos?.width !== iPos.width || !!this.#pos.x100) ?
+      wPos.width * this.#pos.x100 :
+      Math.round((iPos.width - wPos.width) / 2)
+    let py = (this.#pos?.iPos?.height !== iPos.height || !!this.#pos.y100) ?
+      wPos.height * this.#pos.y100 :
+      Math.round((iPos.height + wPos.height) / -2)
+    let pz = getStyle(this.#elWindow, "z-index")
 
     if (isObject(p)) {
       let {x,y,z} = {...p}
@@ -370,27 +445,37 @@ export default class Window {
     this.#elWindow.style["z-index"] = `${pz}`
 
     // keep window visible on chart
-    if (this.config?.bounded) {
-      // adjust horizontal positioning if clipped
-      const width = this.#elWindow.clientWidth
-      if (px + width > this.#elWidgetsG.offsetWidth) {
-        let o = Math.floor(this.#elWidgetsG.offsetWidth - width)
-            o = limit(o, 0, this.#elWidgetsG.offsetWidth)
-        // this.#elWindow.style.left = `${o}px`
-        px = o
-      }
-      // adjust vertical position on clipped
-      const height = this.#elWindow.clientHeight
-      if (py +  iPos.height + height > iPos.height) {
-        let o = Math.floor(height * -1)
-            o = limit(o, iPos.height * -1, 0)
-        // this.#elWindow.style.top = `${o}px`
-        py = o
-      }
+    
+    // adjust horizontal positioning if clipped
+    const width = this.#elWindow.clientWidth
+    if (px + (width * rebound) > this.#elWidgetsG.offsetWidth) {
+      px = this.#elWidgetsG.offsetWidth -( width * rebound)
     }
+    else if(px < (width - (width * rebound)) * -1) {
+      px = (width - (width * rebound)) * -1
+    }
+    // adjust vertical position on clipped
+    const height = this.#elWindow.clientHeight
+    if (py < iPos.height * -1) {
+      py = iPos.height * -1
+    }
+    else if(py > height * rebound * -1) {
+      py = height * rebound * -1
+    }
+    
+    px = Math.floor(px)
+    py = Math.floor(py)
     // if (p?.relativeY == "bottom") py += wPos.height
     this.#elWindow.style.left = `${px}px`
     this.#elWindow.style.top = `${py}px`
+
+    const x100 = px / wPos.width
+    const y100 = py / wPos.height
+    this.#pos = {
+      px, py,
+      x100, y100,
+      iPos
+    }
   }
 
   setDimensions(d) {
@@ -429,34 +514,54 @@ export default class Window {
     return data
   }
 
+  setOpen() {
+    Window.currentActive = this
+    this.#state = WinState.opened
+    this.#elWindow.style.display = "block"
+    this.#elWindow.style.zindex = "10"
+    this.#elWindow.classList.add('active')
+  }
+
+  setClose() {
+    Window.currentActive = null
+    this.#state = WinState.closed
+    this.#elWindow.style.display = "none"
+    this.#elWindow.classList.remove('active')
+    document.removeEventListener('click', this.#windowEvents.click)
+  }
+
   remove() {
     return Window.destroy(this.id)
   }
 
   // display the window
   open(data={}) {
+    // if (!!this.isIndicator && !!this.#parent.isIndicator)
+
     if (Window.currentActive === this &&
         this.state === WinState.opened) return true
 
-    Window.currentActive = this
-    this.#state = WinState.opened
-    this.#elWindow.style.display = "block"
-    this.#elWindow.style.zindex = "10"
+    this.setOpen()
     this.setProperties(data)
     this.emit("window_opened", this.id)
+    this.emit(`window_opened_${this.parent.id}`, this.id)
 
     setTimeout(() => {
       // click event outside of window
       this.#windowEvents.click = this.onOutsideClickListener.bind(this)
       document.addEventListener('click', this.#windowEvents.click)
     }, data?.offFocus || 250)
+
+    return true
   }
 
   // hide the window
   close() {
-    Window.currentActive = null
-    this.#state = WinState.closed
-    this.#elWindow.style.display = "none"
-    this.emit("window_closed", this.id)
+    if (this.#state !== WinState.closed) {
+      this.setClose()
+      this.emit("window_closed", this.id)
+      this.emit(`window_closed_${this.parent.id}`, this.id)
+    }
+    return true
   }
 }

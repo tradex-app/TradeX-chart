@@ -141,7 +141,7 @@ The following is an example of a functioning custom `RSI` indicator using the TA
 // proof of concept for user defined indicators
 
 // importing talibAPI is only required if you intend to use the talib functions provided by the chart to calculate your indicator
-import { Indicator, Range, talibAPI, uid } from "tradex-chart";
+import { Indicator, Range, talibAPI } from "tradex-chart";
 
 /**
  * Indicator - Relative Strength Index
@@ -168,11 +168,20 @@ export default class CustomRSI extends Indicator {
   };
 /* end of TALib properties */
 
+
+  checkParamCount = false;
+  plots = [{ key: "RSI_1", title: " ", type: "line" }];
+
+  static inCnt = 0;
+  // is the indicator displayed on the primary pane with the price history (candles)?
+  static primaryPane = false;
+  // ["default", "percent", "log"]
+  static scale = "percent";
 // default canvas drawing styles
 // these can and will be overwritten by any 
 // matching values passed into constructor via 
 // params.overlay.settings.style
-  #defaultStyle = {
+  static defaultStyle = {
     stroke: "#C80",
     width: "1",
     defaultHigh: 75,
@@ -183,13 +192,6 @@ export default class CustomRSI extends Indicator {
     lowStroke: "#848",
     highLowRangeStyle: "#22002220",
   };
-  checkParamCount = false;
-  plots = [{ key: "RSI_1", title: " ", type: "line" }];
-
-  static inCnt = 0;
-  static primaryPane = false;
-  static scale = "percent";
-
   /**
    * Creates an instance of RSI.
    * @param {Object} target - canvas scene
@@ -203,13 +205,7 @@ export default class CustomRSI extends Indicator {
   constructor(target, xAxis = false, yAxis = false, config, parent, params) {
     super(target, xAxis, yAxis, config, parent, params);
 
-    const overlay = params.overlay;
-
-    this.id = params.overlay?.id || uid(this.shortName);
-    this.defineIndicator(overlay?.settings, talibAPI[this.libName]);
-    this.style = overlay?.settings?.style
-      ? { ...this.#defaultStyle, ...overlay.settings.style }
-      : { ...this.#defaultStyle, ...config.style };
+    this.defineIndicator(params.overlay?.settings, talibAPI[this.libName]);
     // calculate back history if missing
     this.calcIndicatorHistory();
     // enable processing of price stream
@@ -225,27 +221,6 @@ export default class CustomRSI extends Indicator {
     this.addLegend();
     // set the max min Y-Axis values if required
     // this.chart.setLocalRange(0, 150)
-  }
-
-  /** 
-   * Where can this indicator be displayed?
-   * true - on the primary pane that displays the price history (candles) (eg. EMA)
-   * false - on secondary panes as a stand alone indicator (eg. RSI)
-   * "both" - on any chart pane
-   * @readonly
-   * @returns {boolean|string} - true, false, "both"
-  */
-  get primaryPane() {
-    return RSI14.primaryPane;
-  }
-
-  /**
-   * return default drawing styling for indicator's canvas
-   * @readonly
-   * @returns {object}
-   */
-  get defaultStyle() {
-    return this.#defaultStyle;
   }
 
   /**

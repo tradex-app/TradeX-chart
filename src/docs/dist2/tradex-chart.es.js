@@ -1836,10 +1836,10 @@ class Ue {
   #r = null;
   #i = null;
   #s = null;
-  #a;
+  #l;
   #o;
   #c = !1;
-  #l;
+  #a;
   #h;
   #d;
   pad = { left: !1 };
@@ -1849,7 +1849,7 @@ class Ue {
     this.#e.contextMenu || (window.oncontextmenu = (o) => (o.preventDefault(), !1));
     const r = {
       recognizerOptions: {
-        pan: { threshold: this.#a ? 10 : 0 },
+        pan: { threshold: this.#l ? 10 : 0 },
         pinch: { threshold: 0 }
       }
     };
@@ -1874,7 +1874,7 @@ class Ue {
     return this.#t;
   }
   get isTouch() {
-    return this.#a;
+    return this.#l;
   }
   get isPan() {
     return this.#c;
@@ -2396,10 +2396,10 @@ class de {
   #r;
   #i;
   #s;
-  #a;
+  #l;
   #o;
   #c;
-  #l;
+  #a;
   #h;
   static dividerList = {};
   static divideCnt = 0;
@@ -2449,7 +2449,7 @@ class de {
     this.setCursorStyle(i);
   }
   get cursor() {
-    return this.#l;
+    return this.#a;
   }
   get type() {
     return de.type;
@@ -3157,7 +3157,7 @@ class Ci extends Wr {
     this.#a = i;
   }
   get yAxisPadding() {
-    return this.#a;
+    return this.#l;
   }
   set yAxisType(i) {
     this.#r = Ge.includes(i) ? i : Ge[0];
@@ -3175,7 +3175,7 @@ class Ci extends Wr {
     this.#l = S(i) ? i : 0;
   }
   get yAxisTicks() {
-    return this.#l;
+    return this.#a;
   }
   get yAxisGrads() {
     return this.#h;
@@ -3514,10 +3514,10 @@ class G {
   #r;
   #i;
   #s;
-  #a;
+  #l;
   #o;
   #c;
-  #l;
+  #a;
   #h = {
     valueMax: null,
     valueMin: null,
@@ -3539,13 +3539,25 @@ class G {
     return this.#e;
   }
   get target() {
-    return this.#a;
+    return this.#l;
   }
   get config() {
     return this.#n;
   }
   get params() {
-    return this.#l;
+    return this.#a;
+  }
+  get range() {
+    return this.#t.range;
+  }
+  get state() {
+    return this.#t.state;
+  }
+  get range() {
+    return this.#t.range;
+  }
+  get state() {
+    return this.#t.state;
   }
   get range() {
     return this.#t.range;
@@ -3575,7 +3587,25 @@ class G {
     return this.getYAxis();
   }
   get overlay() {
-    return this.#l.overlay;
+    return this.#a.overlay;
+  }
+  get overlayData() {
+    return this.#a.overlay.data;
+  }
+  get data() {
+    return this.#a.overlay.data;
+  }
+  get stateMachine() {
+    return this.#t.stateMachine;
+  }
+  get overlayData() {
+    return this.#l.overlay.data;
+  }
+  get data() {
+    return this.#l.overlay.data;
+  }
+  get stateMachine() {
+    return this.#t.stateMachine;
   }
   get overlayData() {
     return this.#l.overlay.data;
@@ -4160,10 +4190,10 @@ class Re extends G {
   #r;
   #i;
   #s;
-  #a;
+  #l;
   #o;
   #c;
-  #l;
+  #a;
   #h;
   #d;
   #u;
@@ -4174,7 +4204,7 @@ class Re extends G {
   #w;
   #p = 2;
   #T = {};
-  #S;
+  #E;
   #f;
   #x = !1;
   constructor(i, s = !1, n = !1, r, o, l) {
@@ -4202,7 +4232,7 @@ class Re extends G {
     return this.core.ChartPanes.get(this.chartPaneID);
   }
   get chartPaneID() {
-    return this.#l.overlay.paneID;
+    return this.#a.overlay.paneID;
   }
   get primaryPane() {
     return this.#s;
@@ -4223,7 +4253,7 @@ class Re extends G {
     this.#c = i;
   }
   get params() {
-    return this.#l;
+    return this.#a;
   }
   get Timeline() {
     return this.core.Timeline;
@@ -4238,7 +4268,7 @@ class Re extends G {
     return this.#h;
   }
   get legendID() {
-    return this.#S;
+    return this.#E;
   }
   get indicator() {
     return this.#d;
@@ -9683,7 +9713,7 @@ class $ {
     return ce(t0);
   }
   static get list() {
-    return $.#e;
+    return H.#e;
   }
   static create(i, s = !1, n = !1) {
     const r = new $(i, s, n), o = r.key;
@@ -9744,7 +9774,7 @@ class $ {
   #r = "";
   #i = {};
   #s;
-  #a = !1;
+  #l = !1;
   #o = !0;
   #c = [];
   constructor(i, s = !1, n = !1) {
@@ -9757,7 +9787,7 @@ class $ {
     return this.#r;
   }
   get status() {
-    return this.#a;
+    return this.#l;
   }
   get isEmpty() {
     return this.#o;
@@ -9800,7 +9830,7 @@ class $ {
     return !0;
   }
   list() {
-    return $.list;
+    return H.list;
   }
   has(i) {
     return $.has(i);
@@ -9948,10 +9978,10 @@ class Ye {
   #r = {};
   #i;
   #s;
-  #a = "stopped";
+  #l = "stopped";
   #o;
   #c;
-  #l;
+  #a;
   #h;
   #d = ["await", "idle", "running", "stopped"];
   constructor(i, s) {
@@ -9979,7 +10009,7 @@ class Ye {
     return this.#s;
   }
   get status() {
-    return this.#a;
+    return this.#l;
   }
   get event() {
     return this.#c;
@@ -9988,7 +10018,7 @@ class Ye {
     return this.#o;
   }
   get eventData() {
-    return this.#l;
+    return this.#a;
   }
   get actions() {
     return this.#h;
@@ -10025,10 +10055,10 @@ class Ye {
     return i in s.on;
   }
   start() {
-    this.#a = "running";
+    this.#l = "running";
   }
   stop() {
-    this.#a = "stopped";
+    this.#l = "stopped";
   }
   destroy() {
     this.stop(), this.#m(), this.#i = null;
@@ -10153,7 +10183,7 @@ class ft {
   #a;
   #o = ui;
   #c = 0;
-  #l = 0;
+  #a = 0;
   #h = "";
   #d = !1;
   #u;
@@ -10175,7 +10205,7 @@ class ft {
     return this.#t;
   }
   get countDownMS() {
-    return this.#l;
+    return this.#a;
   }
   get countDown() {
     return this.#h;
@@ -10840,10 +10870,10 @@ class Qs {
   #r;
   #i;
   #s = { w: 0, h: 0 };
-  #a = { w: 0, h: 0, x: 0, y: 0 };
+  #l = { w: 0, h: 0, x: 0, y: 0 };
   #o = { x: !1, y: !0 };
   #c;
-  #l = { x: 0, drag: !1 };
+  #a = { x: 0, drag: !1 };
   #h;
   #d;
   constructor(i) {
@@ -10886,7 +10916,7 @@ class Qs {
     this.handlePos(i), this.#l.drag = !1;
   }
   mount() {
-    this.#s.w = this.#r.getBoundingClientRect().width, this.#s.h = this.#r.getBoundingClientRect().height, this.#r.style.overflow = "hidden", this.#a.w = this.#i.getBoundingClientRect().width, this.#a.h = this.#i.getBoundingClientRect().height, this.#i.style.marginRight = 0, this.#i.style.position = "absolute";
+    this.#s.w = this.#r.getBoundingClientRect().width, this.#s.h = this.#r.getBoundingClientRect().height, this.#r.style.overflow = "hidden", this.#l.w = this.#i.getBoundingClientRect().width, this.#l.h = this.#i.getBoundingClientRect().height, this.#i.style.marginRight = 0, this.#i.style.position = "absolute";
   }
   handlePos(i) {
     let s = this.#n.range, n = parseInt(this.#i.style.marginLeft), r = this.#r.getBoundingClientRect().width, o = this.#i.getBoundingClientRect().width, l = r - o, h = i.position.x - this.#l.x, c = H(n + h, 0, l), p = (s.dataLength + s.limitFuture + s.limitPast) / r, f = Math.floor(c * p);
@@ -11345,7 +11375,7 @@ class xt {
   #r;
   #i;
   #s;
-  #a;
+  #l;
   #o;
   #c;
   #l;
@@ -11365,13 +11395,13 @@ class xt {
     this.setWidth(i);
   }
   get width() {
-    return this.#a.width;
+    return this.#l.width;
   }
   set height(i) {
     this.setHeight(i);
   }
   get height() {
-    return this.#a.height;
+    return this.#l.height;
   }
   get dimensions() {
     return D.this.#a.dimensions;
@@ -11380,7 +11410,7 @@ class xt {
     this.#l = i || this.#a.width;
   }
   get layerWidth() {
-    return this.#l;
+    return this.#a;
   }
   get stateMachine() {
     return this.#r.stateMachine;
@@ -11566,10 +11596,10 @@ class C0 {
   #r;
   #i;
   #s;
-  #a;
+  #l;
   #o;
   #c;
-  #l;
+  #a;
   #h;
   #d;
   #u = new Ee();
@@ -11580,7 +11610,7 @@ class C0 {
   #w;
   #p;
   #T;
-  #S;
+  #E;
   #f;
   #x;
   #P;
@@ -11631,7 +11661,7 @@ class C0 {
     return this.#i;
   }
   get elViewport() {
-    return this.#l;
+    return this.#a;
   }
   get height() {
     return this.#i.height;
@@ -11655,7 +11685,7 @@ class C0 {
     return this.#x;
   }
   get layerLabels() {
-    return this.#S;
+    return this.#E;
   }
   get layerOverlays() {
     return this.#f;
@@ -11915,10 +11945,10 @@ class E0 {
   #r;
   #i;
   #s;
-  #a;
+  #l;
   #o = [];
   #c;
-  #l = {};
+  #a = {};
   #h;
   #d;
   #u = null;
@@ -11936,6 +11966,12 @@ class E0 {
   }
   get collapse() {
     return this.#a;
+  }
+  set collapse(i) {
+    this.setCollapse(i);
+  }
+  get collapse() {
+    return this.#l;
   }
   destroy() {
     this.#n.hub.expunge(this);
@@ -12267,10 +12303,10 @@ class N0 {
   #r;
   #i;
   #s;
-  #a;
+  #l;
   #o;
   #c;
-  #l;
+  #a;
   #h;
   #d;
   #u;
@@ -12281,7 +12317,7 @@ class N0 {
   #w = [];
   #p;
   #T;
-  #S;
+  #E;
   #f;
   #x;
   #P = {};
@@ -12355,22 +12391,22 @@ class N0 {
     return Object.fromEntries([...this.#p.overlays.list]);
   }
   get yAxis() {
-    return this.#l;
+    return this.#a;
   }
   set yAxisType(i) {
     this.#l.yAxisType = YAXIS_TYPES.includes(i) ? i : YAXIS_TYPES[0];
   }
   get yAxisType() {
-    return this.#l.yAxisType;
+    return this.#a.yAxisType;
   }
   get yAxisHeight() {
-    return this.#l.height;
+    return this.#a.height;
   }
   get yAxisRatio() {
-    return this.#l.yAxisRatio;
+    return this.#a.yAxisRatio;
   }
   get yAxisGrads() {
-    return this.#l.yAxisGrads;
+    return this.#a.yAxisGrads;
   }
   set graph(i) {
     this.#p = i;
@@ -12397,13 +12433,13 @@ class N0 {
     this.setScaleRange(i);
   }
   get range() {
-    return this.#l.range;
+    return this.#a.range;
   }
   set rangeMode(i) {
     this.#l.mode = i;
   }
   get rangeMode() {
-    return this.#l.mode;
+    return this.#a.mode;
   }
   set rangeYFactor(i) {
     this.core.range.yFactor(i);
@@ -12412,13 +12448,13 @@ class N0 {
     this.#l.offset = i;
   }
   get yOffset() {
-    return this.#l.offset;
+    return this.#a.offset;
   }
   set stateMachine(i) {
     this.#a = new Ye(i, this);
   }
   get stateMachine() {
-    return this.#a;
+    return this.#l;
   }
   get Scale() {
     return this;
@@ -12430,7 +12466,7 @@ class N0 {
     s.id = this.id, s.context = this, this.stateMachine = s, this.stateMachine.start();
   }
   restart() {
-    this.#l.setRange(this.#r.range), this.draw();
+    this.#a.setRange(this.#r.range), this.draw();
   }
   destroy() {
     this.#r.hub.expunge(this), this.off(`${this.#s.id}_pointerout`, this.#g.erase, this.#g), this.off(Qe, this.onStreamUpdate, this.#v), this.stateMachine.destroy(), this.#p.destroy(), this.#S.destroy(), this.element.remove();
@@ -12485,7 +12521,7 @@ class N0 {
     this.#l.mode == "automatic" && (this.#l.mode = "manual"), this.#l.zoom = i, this.draw(this.range, !0), this.#r.MainPane.draw();
   }
   resetScaleRange() {
-    this.#l.mode = "automatic", this.draw(this.range, !0), this.#r.MainPane.draw();
+    this.#a.mode = "automatic", this.draw(this.range, !0), this.#r.MainPane.draw();
   }
   yPos(i) {
     return this.#l.yPos(i);
@@ -13166,7 +13202,7 @@ const vo = {
     ["tools", { class: ge, fixed: !1, required: !0 }],
     ["cursor", { class: Ps, fixed: !0, required: !0 }]
   ]
-}, Ms = {
+}, Ps = {
   primaryPane: {
     trades: { class: z0, fixed: !1, required: !1 },
     events: { class: U0, fixed: !1, required: !1 },
@@ -13192,10 +13228,10 @@ class ot {
   #r;
   #i;
   #s;
-  #a;
+  #l;
   #o;
   #c;
-  #l;
+  #a;
   #h;
   #d = "idle";
   #u = {
@@ -13211,7 +13247,7 @@ class ot {
   #w;
   #p;
   #T;
-  #S;
+  #E;
   #f;
   #x;
   #P;
@@ -13285,10 +13321,10 @@ class ot {
     return this.#h === "primaryPane";
   }
   get isPrimary() {
-    return this.#a.view.primary || !1;
+    return this.#l.view.primary || !1;
   }
   get options() {
-    return this.#a;
+    return this.#l;
   }
   get element() {
     return this.#m;
@@ -13323,7 +13359,7 @@ class ot {
     return this.#k;
   }
   get stream() {
-    return this.#S;
+    return this.#E;
   }
   get streamCandle() {
     return this.#x;
@@ -13344,7 +13380,7 @@ class ot {
     return this.#M;
   }
   get cursorClick() {
-    return this.#E;
+    return this.#S;
   }
   get candleW() {
     return this.#s.Timeline.candleW;
@@ -13941,10 +13977,10 @@ class wo {
   #r;
   #i;
   #s;
-  #a = !1;
+  #l = !1;
   #o;
   #c;
-  #l;
+  #a;
   #h;
   #d;
   #u;
@@ -14057,10 +14093,10 @@ class wo {
     return this.elPrimary.getBoundingClientRect().height;
   }
   get rowsW() {
-    return this.#l.getBoundingClientRect().width;
+    return this.#a.getBoundingClientRect().width;
   }
   get rowsH() {
-    return this.#l.getBoundingClientRect().height;
+    return this.#a.getBoundingClientRect().height;
   }
   get rowMinH() {
     return this.#M;
@@ -14818,6 +14854,9 @@ class xo {
   #o;
   #c = ge;
   #l;
+  #o;
+  #c = pe;
+  #a;
   #h = {};
   #d = void 0;
   #u;
@@ -14869,7 +14908,7 @@ class xo {
     return this.#s;
   }
   init() {
-    this.mount(this.#a), this.log(`${this.#t} instantiated`);
+    this.mount(this.#l), this.log(`${this.#t} instantiated`);
   }
   start() {
     this.initAllTools(), this.addAllTools(), this.eventsListen(), as.id = this.id, as.context = this, this.stateMachine = as, this.stateMachine.start();
@@ -15142,10 +15181,10 @@ class J0 extends ue {
   #r;
   #i;
   #s;
-  #a;
+  #l;
   #o;
   #c;
-  #l;
+  #a;
   #h;
   #d;
   constructor() {
@@ -15156,7 +15195,7 @@ class J0 extends ue {
   connectedCallback() {
     super.connectedCallback(
       () => {
-        document.getElementById("slider-bar"), this.#t = this.shadowRoot.querySelector(".scrollBarWidget"), this.#n = this.shadowRoot.querySelector(".rwdStart"), this.#r = this.shadowRoot.querySelector(".fwdEnd"), this.#i = this.shadowRoot.querySelector(".scrollBar"), this.#s = this.shadowRoot.querySelector(".viewport"), this.#a = this.shadowRoot.querySelector(".handle"), this.#o = this.shadowRoot.querySelectorAll("svg"), this.#c = this.shadowRoot.querySelector("#max"), this.#l = this.shadowRoot.querySelector("#min"), this.#h = this.shadowRoot.querySelectorAll("input"), this.#d = this.shadowRoot.querySelector("style[title=overview]"), this.max.addEventListener("input", this.onChangeSliderHandler.bind({ self: this, input: this.max })), this.min.addEventListener("input", this.onChangeSliderHandler.bind({ self: this, input: this.min }));
+        document.getElementById("slider-bar"), this.#t = this.shadowRoot.querySelector(".scrollBarWidget"), this.#n = this.shadowRoot.querySelector(".rwdStart"), this.#r = this.shadowRoot.querySelector(".fwdEnd"), this.#i = this.shadowRoot.querySelector(".scrollBar"), this.#s = this.shadowRoot.querySelector(".viewport"), this.#l = this.shadowRoot.querySelector(".handle"), this.#o = this.shadowRoot.querySelectorAll("svg"), this.#c = this.shadowRoot.querySelector("#max"), this.#a = this.shadowRoot.querySelector("#min"), this.#h = this.shadowRoot.querySelectorAll("input"), this.#d = this.shadowRoot.querySelector("style[title=overview]"), this.max.addEventListener("input", this.onChangeSliderHandler.bind({ self: this, input: this.max })), this.min.addEventListener("input", this.onChangeSliderHandler.bind({ self: this, input: this.min }));
       }
     );
   }
@@ -15176,7 +15215,7 @@ class J0 extends ue {
     return this.#s;
   }
   get handle() {
-    return this.#a;
+    return this.#l;
   }
   get icons() {
     return this.#o;
@@ -15185,7 +15224,7 @@ class J0 extends ue {
     return this.#c;
   }
   get min() {
-    return this.#l;
+    return this.#a;
   }
   get sliders() {
     return this.#h;
@@ -15466,7 +15505,7 @@ class sm extends ue {
   #r;
   #i;
   #s;
-  #a = [];
+  #l = [];
   #o;
   constructor() {
     super(So);
@@ -16035,10 +16074,10 @@ class pm extends ue {
   #r;
   #i = Bt;
   #s = Fe;
-  #a;
+  #l;
   #o;
   #c;
-  #l;
+  #a;
   #h;
   #d;
   constructor() {
@@ -16214,10 +16253,10 @@ class fm {
   #r;
   #i;
   #s;
-  #a;
+  #l;
   #o;
   #c;
-  #l = {};
+  #a = {};
   #h = {};
   #d;
   #u = {};
@@ -16258,7 +16297,7 @@ class fm {
     return this.#d;
   }
   get location() {
-    return this.#a;
+    return this.#l;
   }
   start() {
     this.initAllUtils(), this.eventsListen();
@@ -16343,10 +16382,10 @@ class Ce {
   #r;
   #i;
   #s;
-  #a;
+  #l;
   #o;
   #c;
-  #l = {};
+  #a = {};
   static menuList = {};
   static menuCnt = 0;
   static class = Cn;
@@ -16364,7 +16403,7 @@ class Ce {
     this.#t = i, this.#n = s.core, this.#r = s, this.#e = s.id, this.#s = i.elements.elMenus, this.#i = this.#n.elWidgetsG, this.mount(this.#s);
   }
   get el() {
-    return this.#a;
+    return this.#l;
   }
   get id() {
     return this.#e;
@@ -16417,7 +16456,7 @@ class Ce {
       };
       this.emit("menu_close", s);
     }
-    document.removeEventListener("click", this.#l[this.id].outside);
+    document.removeEventListener("click", this.#a[this.id].outside);
   }
   onResize() {
     this.position();
@@ -16487,10 +16526,10 @@ class he {
   #r;
   #i = at.closed;
   #s;
-  #a;
+  #l;
   #o;
   #c;
-  #l;
+  #a;
   #h;
   #d;
   #u;
@@ -16552,7 +16591,7 @@ class he {
     return this.#c;
   }
   get elTitle() {
-    return this.#l;
+    return this.#a;
   }
   get elCloseIcon() {
     return this.#h;
@@ -16561,7 +16600,7 @@ class he {
     return this.#d;
   }
   init() {
-    this.mount(this.#a);
+    this.mount(this.#l);
   }
   start() {
     this.eventsListen(), this.close();
@@ -16795,7 +16834,7 @@ class Le {
   #r;
   #i;
   #s;
-  #a;
+  #l;
   #o;
   constructor(i, s) {
     this.#t = i, this.#n = s.core, this.#r = s, this.#e = s.id, this.#s = i.elements.elProgress, this.#i = this.#n.elWidgetsG, this.init();
@@ -16814,7 +16853,7 @@ class Le {
     this.#a.style.top = `${s}px`, this.#a.style.left = `${i}px`;
   }
   stop() {
-    this.#a.style.display = "none";
+    this.#l.style.display = "none";
   }
   progressNode(i) {
     const s = "position: absolute; z-index: 1000; display: none; justify-content: center; align-items: center;", r = `<div class="content" style="">${i.icon}</div>`;
@@ -16890,7 +16929,7 @@ class wm {
   #a;
   #o = { Divider: de, Progress: Le, Menu: Ce, Window: he, Dialogue: Ui, ConfigDialogue: vm };
   #c = {};
-  #l = {};
+  #a = {};
   #h;
   #d;
   #u;
@@ -16928,7 +16967,7 @@ class wm {
     return this.#i;
   }
   get elements() {
-    return this.#l;
+    return this.#a;
   }
   get instances() {
     return this.#c;
@@ -16940,7 +16979,7 @@ class wm {
     return this.#s;
   }
   get types() {
-    return this.#a;
+    return this.#l;
   }
   init() {
     this.mount(this.#h);
@@ -17080,10 +17119,10 @@ class I extends pm {
   static #r = {};
   static #i = null;
   static #s = !1;
-  static #a = [];
+  static #l = [];
   static #o = null;
   static #c = null;
-  static #l = !1;
+  static #a = !1;
   static get version() {
     return I.#e;
   }
@@ -17126,7 +17165,7 @@ class I extends pm {
   #w;
   #p;
   #T;
-  #S;
+  #E;
   #f;
   #x;
   #P;
@@ -17310,7 +17349,7 @@ class I extends pm {
     return this.#O;
   }
   get state() {
-    return this.#E;
+    return this.#S;
   }
   get allData() {
     return {
@@ -17402,7 +17441,7 @@ class I extends pm {
     return this.#X;
   }
   get isEmpty() {
-    return this.#E.IsEmpty;
+    return this.#S.IsEmpty;
   }
   set candles(i) {
     T(i) && (this.#K = i);

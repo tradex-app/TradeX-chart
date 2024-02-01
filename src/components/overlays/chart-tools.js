@@ -48,15 +48,15 @@ export default class chartTools extends Overlay {
   }
 
   static destroy(tool) {
-    if (tool instanceof chartTool) {
-      delete chartTool.#instances[tool.inCnt]
+    if (tool instanceof chartTools) {
+      delete chartTools.#instances[tool.inCnt]
     }
   }
 
   #id
-  #inCnt = null
-  #name = ""
-  #shortName = ""
+  #inCnt
+  #name = "Chart Tools"
+  #shortName = "TX_Tool"
   #configDialogue
   #chart
 
@@ -71,20 +71,21 @@ export default class chartTools extends Overlay {
     super(target, xAxis, yAxis, theme, parent, params)
 
     this.#inCnt = chartTools.inCnt
-    this.#id = this.config.ID || uid("TX_Tool_")+`_${this.#inCnt}`
+    // FIXME: why is there a this.id = undefined ???
+    // delete this.id
+    if (!!this.config.ID) this.#id = idSanitize(this.config.ID)
     // this.#name = config.name
     this.settings = params?.settings || {}
     // this.target.addTool(this)
     toolsDialogue.parent = this
     this.#configDialogue = this.core.WidgetsG.insert("ConfigDialogue", toolsDialogue)
     this.#configDialogue.start()
-    this.chart
 
     this.eventsListen()
   }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return this.#id || `${this.core.id}-${this.#shortName}_${this.#inCnt}` }
+  get id() { return this.#id || `${this.core.id}-${uid(this.#shortName)}_${this.#inCnt}` }
   get inCnt() { return this.#inCnt }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
@@ -106,7 +107,7 @@ export default class chartTools extends Overlay {
 
   onPointerDown(pos) {
     if (this.chart.stateMachine.state === "chart_pan") return
-      debounce(this.isToolSelected, HIT_DEBOUNCE, this)(e)
+      debounce(this.isToolSelected, HIT_DEBOUNCE, this)(pos)
   }
 
   onPointerUp(pos) {

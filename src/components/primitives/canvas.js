@@ -82,7 +82,7 @@ class Node {
    * return associated hit id for coordinates - utilized for pointer events.
    * @param {number} x
    * @param {number} y
-   * @returns {Integer} integer - returns -1 if transparent
+   * @returns {number} integer - returns -1 if transparent
    */
   getIntersection(x, y) {
     var layers = this.layers,
@@ -104,7 +104,7 @@ class Node {
 
   /**
    * get viewport index in all CEL viewports
-   * @returns {Integer}
+   * @returns {number|null}
    */
   get index() {
     let viewports = CEL.viewports,
@@ -211,6 +211,9 @@ class Layer {
   #alpha = 1
   #visible = true;
   #composition = null
+
+  viewport
+  
   /**
    * Layer constructor
    * @param {Object} cfg - {x, y, width, height}
@@ -254,9 +257,9 @@ class Layer {
   get width() { return this.#width }
   set height(height) { if (isNumber(height)) this.#height = height}
   get height() { return this.#height }
-  set alpha(alpha) { this.#alpha = (isNumber(alpha))? limit(alpha) : 1 }
+  set alpha(alpha) { this.#alpha = (isNumber(alpha))? limit(alpha, 0, 1) : 1 }
   get alpha() { return this.#alpha }
-  set composition(c) { if (composition.includes(comp)) this.#composition = c }
+  set composition(c) { if (composition.includes(c)) this.#composition = c }
   get composition() { return this.#composition }
   set visible(v) { if (isBoolean(v)) this.#visible = v }
   get visible() { return this.#visible }
