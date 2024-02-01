@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.143.0]()
+
+Indicator config dialogue
+
 
 ## [0.139.6]()
 

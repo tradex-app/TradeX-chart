@@ -801,9 +801,6 @@ export default class MainPane {
       if (!isObject(params?.settings)) params.settings = {}
     }
 
-    let instance;
-    let isPrimary = this.indicatorClasses[i].ind?.primaryPane;
-
     // isPrimary must be a boolean
     switch (isPrimary) {
       case true:
