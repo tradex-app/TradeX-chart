@@ -267,7 +267,7 @@ export default class ScaleBar {
 
   nicePrice($) {
     let digits = countDigits($)
-    return limitPrecision(digits, this.config.precision)
+    return limitPrecision(digits, this.core.pricePrecision)
   }
 
 
@@ -291,7 +291,7 @@ export default class ScaleBar {
     if (this.#core.range.dataLength > 0) {
       const high = this.#core.range.valueMax
       const digits = countDigits(high)
-      const nice = limitPrecision(digits, this.config.precision)
+      const nice = limitPrecision(digits, this.core.pricePrecision)
      count = `${nice}`.length + 2
     }
     this.#digitCnt = count 

@@ -778,6 +778,7 @@ const config8 = {
   errors: true,
   stream: streamVal,
   maxCandleUpdate: 250,
+  pricePrecision: 3,
   talib: talib,
   wasm: wasm,
   state: decimals,
@@ -929,11 +930,11 @@ const dre =   {
 
 const configs = [
   // {config: config1, stream: null},
-  {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
-  {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
-  {config: config6, stream: null},
+  // {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  // {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
+  // {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  // {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
+  // {config: config6, stream: null},
   {config: config8, stream: null},
   // {config: config7, stream: null},
   // {config: dre, stream: null},
@@ -1166,7 +1167,7 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
-addChart()
+// addChart()
 // addChart()
 // addChart()
 // addChart()
@@ -1212,5 +1213,7 @@ if (typeof chart1 === "object") {
 chart2.addIndicator("VOL", "VOL", {settings:{isPrimary: false}})
 
 // test merging indicator data
-if (typeof chart5 === "object")
+if (typeof chart5 === "object") {
   chart5.mergeData(state1_5a, false)
+  chart5.setPricePrecision(3)
+}

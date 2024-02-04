@@ -333,7 +333,7 @@ export default class yAxis extends Axis {
     for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
     {
       digits = this.countDigits(y)
-      nice = limitPrecision(digits, this.core.config)
+      nice = limitPrecision(digits, this.core.core.pricePrecision)
       pos = this.yPos(nice)
       scaleGrads.push([nice, pos, digits])
     }

@@ -389,6 +389,7 @@ export default class TradeXchart extends Tradex_chart {
   get mousePos() { return this.#pointerPos }
   get pointerButtons() { return this.#pointerButtons }
 
+  set pricePrecision(p) { this.setPricePrecision(p) }
   get pricePrecision() { return this.#pricePrecision }
   get volumePrecision() { return this.#volumePrecision }
 
@@ -401,6 +402,7 @@ export default class TradeXchart extends Tradex_chart {
   get progress() { return this.#progress }
   get customOverlays() { return this.#customOverlays }
   get optionalOverlays() { return mergeDeep({...this.#optionalOverlays}, this.#customOverlays) } 
+
 
   /**
    * let's start building the chart
@@ -612,7 +614,7 @@ export default class TradeXchart extends Tradex_chart {
       indicators: (indicators) => this.setIndicators(indicators),
       theme: (theme) => { this.#themeTemp = this.addTheme(theme) },
       stream: (stream) => this.#stream = (isObject(stream)) ? stream : {},
-      pricePrecision: (precision) => this.setPricePrecision(precision),
+      pricePrecision: (pricePrecision) => this.setPricePrecision(pricePrecision),
       volumePrecision: (precision) => this.setVolumePrecision(precision),
     }
   }
