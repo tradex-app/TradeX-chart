@@ -180,8 +180,6 @@ export default class Legends {
     // set visibility
     legendEl.style.display = (options.visible) ? "block" : "none"
 
-    legendEl.style.display = (options.visible) ? "block" : "none"
-
     return options.id
   }
 

@@ -4,7 +4,6 @@
 
 import { isArray, isBoolean, isNumber, isObject, isString } from './typeChecks'
 import { isBrowser, isNode } from './browser-or-node'
-import { timestampDiff } from './time';
 
 export const isHex  = /^#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i; 
 export const isHSL  = /^hsla?((\d{1,3}?),\s*(\d{1,3}%),\s*(\d{1,3}%)(,\s*[01]?\.?\d*)?)$/; 
@@ -32,7 +31,8 @@ export default class Colour {
     g16: null,
     b16: null,
     a16: null,
-    hex: null,  //'#00000000',
+    hex: null,  //'#000000'
+    hexa: null,  //'#00000000',
     hsl: null,  //'hsl(0,0%,0%)',
     hsla: null,  //'hsla(0,0%,0%,1)',
     rgb: null,  //'rgb(0,0,0)',
@@ -41,7 +41,7 @@ export default class Colour {
   }
 
   /**
-   * @param {string} colour 
+   * @param {string} colour - #rgb, #rrggbb/aa, hsla(), rgba()
    */
   constructor (colour) {
 
@@ -66,14 +66,19 @@ export default class Colour {
   /** 
    * CSS RGB value
    * @type {string} */
-  get hex() { return this.#value.hex.slice(0, -2) }
+  get hex() { return this.#value.hex }
   /** 
    * CSS RGBA value
    * @type {string} 
    */
-  get hexa() { return this.#value.hex }
+  get hexa() { return this.#value.hexa }
   
   #validate(colour) {
+    if (!isString(colour)) {
+      this.#value.isValid = false
+      return
+    }
+
     if (isBrowser) {
       let el = document.getElementById('divValidColourTest')
       if (!el) {
@@ -83,6 +88,7 @@ export default class Colour {
       el.style.backgroundColor = "";
       el.style.backgroundColor = colour;
       this.#value.isValid = (el.style.backgroundColor.length) ? true : false;
+      el.remove()
     }
     else {
       // we have to use a regex, might be error prone
@@ -108,7 +114,8 @@ export default class Colour {
       val.b16,
       val.a16
     ] = hex)
-    val.hex = "#" + val.r16 +val.g16 + val.b16 + val.a16
+    val.hex = `#${val.r16}${val.g16}${val.b16}`
+    val.hexa = `#${val.r16}${val.g16}${val.b16}${val.a16}`
   }
 
   /**
@@ -142,7 +149,6 @@ export default class Colour {
   }
 
   #valueIsHex(hex) {
-    this.#value.hex = hex
     let l = hex.length,
         rgba, 
         hsla;
@@ -235,7 +241,7 @@ export default class Colour {
     return [255 * f(0), 255 * f(8), 255 * f(4)];
   };
 
-  #hslToHex(h, s, l) {
+  #HSLToHex(h, s, l) {
     l /= 100;
     const a = s * Math.min(l, 1 - l) / 100;
     const f = n => {
@@ -344,7 +350,7 @@ export default class Colour {
       }
       this.setHex(y)
       this.setRGBA(z)
-      this.#hexToHSL(this.#value.hex)
+      this.#hexToHSL(this.#value.hexa)
   }
   
 }

@@ -37,6 +37,14 @@ export function isNumber (v) {
  * @param {*} v
  * @returns {boolean}
  */
+export function isInteger (v) {
+  return (typeof v === 'number') && ((v % 1) === 0);
+}
+
+/**
+ * @param {*} v
+ * @returns {boolean}
+ */
 export function isValid (v) {
   return v !== null && v !== undefined
 }

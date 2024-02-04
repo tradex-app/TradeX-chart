@@ -130,7 +130,8 @@ class Node {
   }
 
   /**
-   * composite all layers onto canvas
+   * composite layers onto canvas
+   * @param {boolean} [all=false] - render all sub layers
    */
   render(all=false) {
     let {scene, layers} = this,
@@ -312,7 +313,7 @@ class Layer {
    * @returns 
    */
   move(pos) {
-    let {index, viewport} = this,
+    let { index = 0, viewport } = this,
         layers = viewport.layers,
         order;
 

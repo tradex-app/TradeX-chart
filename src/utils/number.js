@@ -1,5 +1,7 @@
 // number.js
 
+import { MAX_CRYPTO_PRECISION } from "../definitions/core";
+
 /**
  * Getting a random number between 0 (inclusive) and 1 (exclusive)
  * @export
@@ -87,7 +89,7 @@ export function getRandomIntInclusive(min, max) {
  * @export
  * @param {Array} list
  * @param {number} item
- * @returns {number} - array index
+ * @returns {number|null} - array index
  */
 export function binarySearch(list, item) {
   let low = 0
@@ -145,7 +147,7 @@ export function nice (value) {
  * return sign, number of integers, decimals
  * @export
  * @param {number} value
- * @returns {number}  
+ * @returns {object}  
  */
 export function countDigits(value) {
   const digits = {}
@@ -284,10 +286,10 @@ export function getPrecision (value) {
  * @param {object} digits - {sign: s, integers: i, decimals: d, value: v}
  * @return {number}  
  */
-export function limitPrecision (digits, precision=18) {
+export function limitPrecision (digits, precision=MAX_CRYPTO_PRECISION) {
   let {sign: s, integers: i, decimals: d, value: v} = digits
 
-  precision = (isNaN(precision)) ? 18 : precision
+  precision = (isNaN(precision)) ? MAX_CRYPTO_PRECISION : precision
   d = (d > precision) ? precision : d
   v = new Number(v).toFixed(d)
   // let n = this.yAxisDigits - 1,
