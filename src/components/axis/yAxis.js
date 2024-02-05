@@ -11,6 +11,7 @@ import {
   YAXIS_TYPES
 } from "../../definitions/chart";
 import { MAX_CRYPTO_PRECISION } from "../../definitions/core";
+import { YAxisFontSizeFactor } from "../../definitions/style";
 
 const p100Padding = 1.2
 
@@ -308,16 +309,7 @@ export default class yAxis extends Axis {
           yGridSize;
     const scaleGrads = [];
 
-    // roughly divide the yRange into cells
-    rangeH = max - min
-    rangeH = (this.rangeH > 0) ? this.rangeH : 1
-    yGridSize = (rangeH)/(this.height / (this.core.theme.yAxis.fontSize * 1.75));
-
-    // try to find a nice number to round to
-    let niceNumber = Math.pow( 10 , Math.ceil( Math.log10( yGridSize ) ) );
-    if ( yGridSize < 0.25 * niceNumber ) niceNumber = 0.25 * niceNumber;
-    else if ( yGridSize < 0.5 * niceNumber ) niceNumber = 0.5 * niceNumber;
-
+    let niceNumber = this.niceNumber()
     // find next largest nice number above yStart
     var yStartRoundNumber = Math.ceil( min/niceNumber ) * niceNumber;
     // find next lowest nice number below yEnd
@@ -333,7 +325,7 @@ export default class yAxis extends Axis {
     for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
     {
       digits = this.countDigits(y)
-      nice = limitPrecision(digits, this.core.core.pricePrecision)
+      nice = limitPrecision(digits, step.decimals)
       pos = this.yPos(nice)
       scaleGrads.push([nice, pos, digits])
     }
@@ -352,6 +344,19 @@ export default class yAxis extends Axis {
     // }
 
     return scaleGrads
+  }
+
+  // roughly divide the yRange into cells
+  niceNumber() {
+    const rangeH = this.rangeH
+    const yGridSize = (rangeH)/(this.height / (this.core.theme.yAxis.fontSize * YAxisFontSizeFactor));
+
+    // try to find a nice number to round to
+    let niceNumber = Math.pow( 10 , Math.ceil( Math.log10( yGridSize ) ) );
+    if ( yGridSize < 0.25 * niceNumber ) niceNumber = 0.25 * niceNumber;
+    else if ( yGridSize < 0.5 * niceNumber ) niceNumber = 0.5 * niceNumber;
+
+    return niceNumber
   }
 
 }

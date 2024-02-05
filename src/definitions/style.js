@@ -139,6 +139,8 @@ export const YAxisType = {
   LOG: 'log'
 }
 
+export const YAxisFontSizeFactor = 1.75
+
 const YAxisStyle_FONTWEIGHT = FONTWEIGHT
 const YAxisStyle_FONTSIZE = FONTSIZE
 const YAxisStyle_FONTFAMILY = FONTFAMILY

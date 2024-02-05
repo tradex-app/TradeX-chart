@@ -778,7 +778,7 @@ const config8 = {
   errors: true,
   stream: streamVal,
   maxCandleUpdate: 250,
-  pricePrecision: 3,
+  // pricePrecision: 3,
   talib: talib,
   wasm: wasm,
   state: decimals,

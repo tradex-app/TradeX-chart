@@ -8,7 +8,7 @@ import yAxis from "./axis/yAxis"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-scale"
 import Input from "../input"
-import { countDigits, limitPrecision } from '../utils/number'
+import { countDigits, limit, limitPrecision } from '../utils/number'
 import { copyDeep, idSanitize, xMap } from '../utils/utilities'
 import { MAX_CRYPTO_PRECISION, STREAM_UPDATE } from "../definitions/core"
 import { calcTextWidth, createFont } from '../renderer/text'
@@ -18,6 +18,7 @@ import { ScaleCursor } from './overlays/chart-cursor'
 import ScaleLabels from './overlays/scale-labels'
 import ScaleOverly from './overlays/scale-overlays'
 import ScalePriceLine from './overlays/scale-priceLine'
+import { YAxisFontSizeFactor } from '../definitions/style'
 
 const defaultOverlays = [
   ["labels", {class: ScaleLabels, fixed: true, required: true}],
@@ -288,9 +289,10 @@ export default class ScaleBar {
 
   calcPriceDigits() {
     let count = 8;
-    if (this.#core.range.dataLength > 0) {
-      const high = this.#core.range.valueMax
-      const digits = countDigits(high)
+    if (this.#core.range.dataLength > 0 &&
+        this.#yAxis instanceof yAxis) {
+      const step = this.#yAxis.niceNumber()
+      const digits = countDigits(step)
       const nice = limitPrecision(digits, this.core.pricePrecision)
      count = `${nice}`.length + 2
     }

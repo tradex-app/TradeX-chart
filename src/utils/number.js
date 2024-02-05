@@ -284,7 +284,7 @@ export function getPrecision (value) {
 /**
  * truncate price to fit on Scale
  * @param {object} digits - {sign: s, integers: i, decimals: d, value: v}
- * @return {number}  
+ * @return {string}  
  */
 export function limitPrecision (digits, precision=MAX_CRYPTO_PRECISION) {
   let {sign: s, integers: i, decimals: d, value: v} = digits

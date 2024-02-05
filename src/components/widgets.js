@@ -23,7 +23,7 @@ export default class Widgets {
   #stateMachine
 
   #widgets = {}
-  #widgetsList = { Divider, Progress, Menu, Window, Dialogue, ConfigDialogue, ColourPicker }
+  #widgetsList = { Divider, Progress, Menu, Window, Dialogue, ConfigDialogue} //, ColourPicker }
   #widgetsInstances = {}
   #elements = {}
   #elWidgetsG
