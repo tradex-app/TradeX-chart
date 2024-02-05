@@ -291,12 +291,12 @@ export default class ScaleBar {
     let count = 8;
     if (this.#core.range.dataLength > 0 &&
         this.#yAxis instanceof yAxis) {
-      const step = this.#yAxis.niceNumber()
+      const step = this.#yAxis.niceNumber(this.range.valueMax)
       const digits = countDigits(step)
       const nice = limitPrecision(digits, this.core.pricePrecision)
      count = `${nice}`.length + 2
     }
-    this.#digitCnt = count 
+    this.#digitCnt = (count < 8) ? 8 : count
     return this.#digitCnt
   }
 

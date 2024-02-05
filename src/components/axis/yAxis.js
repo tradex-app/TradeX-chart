@@ -347,8 +347,7 @@ export default class yAxis extends Axis {
   }
 
   // roughly divide the yRange into cells
-  niceNumber() {
-    const rangeH = this.rangeH
+  niceNumber(rangeH = this.rangeH) {
     const yGridSize = (rangeH)/(this.height / (this.core.theme.yAxis.fontSize * YAxisFontSizeFactor));
 
     // try to find a nice number to round to
