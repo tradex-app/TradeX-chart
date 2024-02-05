@@ -121,11 +121,13 @@ class Node {
 
   /**
    * destroy viewport
+   * free up resources
    */
   destroy() {
     // remove layers
     for (let layer of this.layers) {
-      layer.remove();
+      this.removeLayer(layer);
+      layer.destroy()
     }
   }
 
@@ -212,6 +214,7 @@ class Layer {
   #alpha = 1
   #visible = true;
   #composition = null
+  #offScreen = true && _OffscreenCanvas
 
   viewport
   
@@ -225,12 +228,12 @@ class Layer {
     this.hit = new CEL.Hit({
       layer: this,
       contextType: cfg.contextType,
-      offscreen: true
+      offscreen: this.#offScreen
     });
     this.scene = new CEL.Scene({
       layer: this,
       contextType: cfg.contextType,
-      offscreen: true
+      offscreen: this.#offScreen
     });
 
     if (cfg.x && cfg.y) {
@@ -264,6 +267,7 @@ class Layer {
   get composition() { return this.#composition }
   set visible(v) { if (isBoolean(v)) this.#visible = v }
   get visible() { return this.#visible }
+  get isOffScreen() { return this.#offScreen }
 
   /**
    * get layer index from viewport layers
@@ -384,6 +388,12 @@ class Layer {
   remove() {
     // remove this layer from layers array
     return this.viewport.removeLayer(this)
+  }
+
+  destroy() {
+    setSize(1,1)
+    this.scene.clear()
+    this.hit.clear()
   }
 }
 
