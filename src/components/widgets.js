@@ -1,6 +1,7 @@
 // widgets.js
 // A template file for Chart components
 
+import Component from "./component"
 import Menu from "./widgets/menu"
 import Dialogue from "./widgets/dialogue"
 import ConfigDialogue from "./widgets/configDialogue"
@@ -11,18 +12,12 @@ import Window from "./widgets/window"
 import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-widgets"
 import { isBoolean, isObject, isString } from "../utils/typeChecks"
-import { idSanitize } from "../utils/utilities"
 
-export default class Widgets {
+export default class Widgets extends Component {
 
-  #id
   #name = "Widgets"
   #shortName = "widgets"
-  #core
-  #options
-  #stateMachine
 
-  #widgets = {}
   #widgetsList = { Divider, Progress, Menu, Window, Dialogue, ConfigDialogue} //, ColourPicker }
   #widgetsInstances = {}
   #elements = {}
@@ -31,10 +26,12 @@ export default class Widgets {
   #width
   #height
 
+  #widgets
+
   constructor (core, options) {
 
-    this.#core = core
-    this.#options = options
+    super(core, options)
+
     // TODO: valiation of options.widgets
     this.#widgets = {...this.#widgetsList, ...options.widgets}
     this.#elWidgetsG = core.elWidgetsG
@@ -54,21 +51,10 @@ export default class Widgets {
     }
   }
 
-  log(l) { this.#core.log(l) }
-  info(i) { this.#core.info(i) }
-  warn(w) { this.#core.warn(w) }
-  error(e) { this.#core.error(e) }
-
-  set id(id) { this.#id = idSanitize(id) }
-  get id() { return this.#id || `${this.#core.id}-${this.#shortName}` }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
-  get core() { return this.#core }
-  get options() { return this.#options }
   get elements() { return this.#elements }
   get instances() { return this.#widgetsInstances }
-  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
-  get stateMachine() { return this.#stateMachine }
   get types() { return this.#widgets }
 
   start() {
@@ -83,7 +69,7 @@ export default class Widgets {
   }
 
   destroy() {
-    this.#core.hub.expunge(this)
+    this.core.hub.expunge(this)
     
     this.stateMachine.destroy()
 
@@ -99,24 +85,11 @@ export default class Widgets {
   // listen/subscribe/watch for parent notifications
   eventsListen() {
     this.on("resize", this.onResize, this)
-
+    this.on("global_resize", this.onResize, this)
     this.on("menu_open", this.onOpenMenu, this)
     this.on("menu_close", this.onCloseMenu, this)
     this.on("menu_off", this.onCloseMenu, this)
     this.on("menuItem_selected", this.onMenuItemSelected, this)
-    this.on("global_resize", this.onResize, this)
-  }
-
-  on(topic, handler, context=this) {
-    this.#core.on(topic, handler, context)
-  }
-
-  off(topic, handler, context=this) {
-    this.#core.off(topic, handler, context)
-  }
-
-  emit(topic, data) {
-    this.#core.emit(topic, data)
   }
 
   onOpenMenu(data) {
@@ -180,7 +153,7 @@ export default class Widgets {
    * insert a widget into the list
    * @param {string} type 
    * @param {object} config 
-   * @returns {Widget} - widget instance
+   * @returns {Widget|boolean} - widget instance
    */
   insert(type, config) {
     if (!(type in this.#widgets) || !isObject(config)) return false

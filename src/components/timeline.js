@@ -1,12 +1,12 @@
 // timeLine.js
 // Timeline bar that lives at the bottom of the chart
 
+import Component from "./component"
 import xAxis from "./axis/xAxis"
 import Input from "../input"
-import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-time"
 import { elementDimPos } from "../utils/DOM"
-import { copyDeep, debounce, idSanitize, throttle, xMap } from "../utils/utilities"
+import { copyDeep, debounce, xMap } from "../utils/utilities"
 import { isArray, isObject } from "../utils/typeChecks"
 import Slider from "./widgets/slider"
 import { BUFFERSIZE } from "../definitions/chart"
@@ -28,30 +28,27 @@ const defaultOverlays = [
  * @export
  * @class Timeline
  */
-export default class Timeline {
+export default class Timeline extends Component {
 
-  #id
   #name = "Timeline"
   #shortName = "time"
-  #options
-  #element
-  #core
   #chart
   #xAxis
   #stateMachine
 
+  #element
   #elViewport
   #elNavigation
-
-  #Graph
-  #timeOverlays = new xMap()
-  #additionalOverlays = []
-  #navigation
   #elNavList
   #elNavScrollBar
   #elNavScrollHandle
   #elRwdStart
   #elFwdEnd
+
+  #Graph
+  #timeOverlays = new xMap()
+  #additionalOverlays = []
+  #navigation
 
   #layerLabels
   #layerOverlays
@@ -73,25 +70,17 @@ export default class Timeline {
 
   constructor (core, options) {
 
-    this.#core = core
-    this.#options = options
+    super(core, options)
+
+
     this.#element = options.elements.elTime
     this.#chart = core.Chart
     this.#xAxis = new xAxis(this)
     this.init()
   }
-  
-  log(l) { this.#core.log(l) }
-  info(i) { this.#core.info(i) }
-  warn(w) { this.#core.warn(w) }
-  error(e) { this.#core.error(e) }
 
-  set id(id) { this.#id = idSanitize(id) }
-  get id() { return this.#id || `${this.#core.id}-${this.#shortName}` }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
-  get options() { return this.#options }
-  get core() { return this.#core }
   get element() { return this.#element }
   get elViewport() { return this.#elViewport }
   get height() { return this.#element.height }
@@ -103,24 +92,18 @@ export default class Timeline {
   get layerCursor() { return this.#layerCursor }
   get layerLabels() { return this.#layerLabels }
   get layerOverlays() { return this.#layerOverlays }
-  get overlays() { return Object.fromEntries([...this.#Graph.overlays.list]) }
+  get overlays() { return Object.fromEntries([...this.graph.overlays.list]) }
   get xAxisGrads() { return this.#xAxis.xAxisGrads }
   get candleW() { return this.#xAxis.candleW }
   get candlesOnLayer() { return this.#xAxis.candlesOnLayer }
-  get theme() { return this.#core.theme }
-  get config() { return this.#core.config }
-  get graph() { return this.#Graph }
   get navigation() { return this.#navigation }
-  get range() { return this.#core.range }
   get pos() { return this.dimensions }
   get dimensions() { return elementDimPos(this.#element) }
-  get bufferPx() { return this.#core.bufferPx }
-  get scrollPos() { return this.#core.scrollPos }
-  get scrollOffsetPx() { return this.#core.scrollPos % this.candleW }
-  get smoothScrollOffset() { return this.#core.smoothScrollOffset }
-  get rangeScrollOffset() { return this.#core.rangeScrollOffset }
-  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
-  get stateMachine() { return this.#stateMachine }
+  get bufferPx() { return this.core.bufferPx }
+  get scrollPos() { return this.core.scrollPos }
+  get scrollOffsetPx() { return this.core.scrollPos % this.candleW }
+  get smoothScrollOffset() { return this.core.smoothScrollOffset }
+  get rangeScrollOffset() { return this.core.rangeScrollOffset }
   get time() { return this }
  
   init() {
@@ -140,13 +123,13 @@ export default class Timeline {
     // }
 
     const sliderCfg = {
-      core: this.#core,
+      core: this.core,
       elContainer: this.#elNavScrollBar,
       elHandle: this.#elNavScrollHandle,
       callback: null
     }
     this.#slider = new Slider(sliderCfg)
-    if ( this.#core.theme?.time?.navigation === false )
+    if ( this.core.theme?.time?.navigation === false )
       this.navigationDisplay(false)
   }
 
@@ -161,7 +144,7 @@ export default class Timeline {
     const height = this.height
     const layerWidth = Math.round(width * ((100 + buffer) * 0.01))
 
-    this.#Graph.setSize(width, height, layerWidth)
+    this.graph.setSize(width, height, layerWidth)
 
     // this.setWidth(dim.w)
     this.draw()
@@ -214,18 +197,18 @@ export default class Timeline {
     this.#input2.destroy()
     this.#input3.destroy()
 
-    this.#core.hub.expunge(this)
+    this.core.hub.expunge(this)
     this.off("main_mousemove", this.#layerCursor.draw, this.#layerCursor)
     
     this.#elFwdEnd.removeEventListener('click', debounce)
     this.#elRwdStart.removeEventListener('click', debounce)
 
-    this.#Graph.destroy()
+    this.graph.destroy()
     this.element.remove()
   }
 
   eventsListen() {
-    // let canvas = this.#Graph.viewport.scene.canvas
+    // let canvas = this.graph.viewport.scene.canvas
 
     this.#input = new Input(this.#elViewport, {disableContextMenu: false});
     this.#input.on("dblclick", this.onDoubleClick.bind(this))
@@ -251,18 +234,6 @@ export default class Timeline {
     this.#elRwdStart.addEventListener('click', debounce(this.onPointerClick, 1000, this, true))
   }
 
-  on(topic, handler, context=this) {
-    this.#core.on(topic, handler, context)
-  }
-
-  off(topic, handler, context=this) {
-    this.#core.off(topic, handler, context)
-  }
-
-  emit(topic, data) {
-    this.#core.emit(topic, data)
-  }
-
   onPointerClick(e) {
     const id = e?.currentTarget?.id || e.target.parentElement.id
     switch (id) {
@@ -284,7 +255,7 @@ export default class Timeline {
   }
 
   onPointerLeave(e) {
-    if ( this.#core.theme?.time?.navigation === false &&
+    if ( this.core.theme?.time?.navigation === false &&
          !(this.#jump.end && this.#jump.start)) {
 
       this.#elNavigation.style.visibility = "hidden"
@@ -342,7 +313,7 @@ export default class Timeline {
   createGraph() {
     let overlays = copyDeep(defaultOverlays)
 
-    this.#Graph = new Graph(this, this.#elViewport, overlays, false)
+    this.graph = new Graph(this, this.#elViewport, overlays, false)
     this.#layerCursor = this.graph.overlays.get("cursor").instance
     this.#layerLabels = this.graph.overlays.get("labels").instance
     this.#layerOverlays = this.graph.overlays.get("overlay").instance
@@ -373,26 +344,26 @@ export default class Timeline {
   }
 
   render() {
-    this.#Graph.render()
+    this.graph.render()
   }
 
   draw(range=this.range, update=true) {
-    this.#Graph.draw(range, update)
+    this.graph.draw(range, update)
   }
 
   hideCursorTime() {
-    this.#Graph.overlays.list.get("cursor").layer.visible = false
-    this.#core.MainPane.draw()
+    this.graph.overlays.list.get("cursor").layer.visible = false
+    this.core.MainPane.draw()
   }
 
   showCursorTime() {
-    this.#Graph.overlays.list.get("cursor").layer.visible = true
-    this.#core.MainPane.draw()
+    this.graph.overlays.list.get("cursor").layer.visible = true
+    this.core.MainPane.draw()
   }
 
   hideJump(j) {
     j = false
-    if (this.#core.theme?.time?.navigation === false)
+    if (this.core.theme?.time?.navigation === false)
       this.#elNavigation.style.visibility = "hidden"
   }
 
