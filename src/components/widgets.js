@@ -18,6 +18,7 @@ export default class Widgets extends Component {
   #name = "Widgets"
   #shortName = "widgets"
 
+  #widgets
   #widgetsList = { Divider, Progress, Menu, Window, Dialogue, ConfigDialogue} //, ColourPicker }
   #widgetsInstances = {}
   #elements = {}
