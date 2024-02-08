@@ -1,16 +1,13 @@
 // yAxis.js
 
 import Axis from "./axis";
-import { bRound, limit, log10, power, precision, limitPrecision, round } from "../../utils/number";
+import { bRound, countDigits, log10, limitPrecision, numDigits } from "../../utils/number";
 import { isNumber } from "../../utils/typeChecks";
-
 import { 
   PRICEDIGITS, 
   YAXIS_STEP,
-  YAXIS_GRID,
   YAXIS_TYPES
 } from "../../definitions/chart";
-import { MAX_CRYPTO_PRECISION } from "../../definitions/core";
 import { YAxisFontSizeFactor } from "../../definitions/style";
 
 const p100Padding = 1.2
@@ -88,7 +85,6 @@ export default class yAxis extends Axis {
   get zoom() { return this.#range.zoom }
 
   getYAxisRatio() {
-    // const diff = (this.#mode == "automatic") ? this.#range.diff : this.#transform.diff
     return this.height / this.#range.diff
   }
 
@@ -101,12 +97,11 @@ export default class yAxis extends Axis {
   }
 
   yAxisCntDigits(value) {
-    return this.countDigits(value)
+    return countDigits(value)
   }
 
   yAxisCalcPrecision() {
-    let integerCnt = this.numDigits(this.#range.max)
-    // let decimalCnt = this.precision(this.#range.max)
+    let integerCnt = numDigits(this.#range.max)
     return this.yDigits - integerCnt
   }
 
@@ -318,14 +313,14 @@ export default class yAxis extends Axis {
     let pos = this.height,
         step$ = (yEndRoundNumber - yStartRoundNumber) / niceNumber,
         stepP = this.height / step$,
-        step = this.countDigits(niceNumber),
+        step = countDigits(niceNumber),
         nice;
     this.#step = step
 
     for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
     {
-      digits = this.countDigits(y)
-      nice = limitPrecision(digits, step.decimals)
+      digits = countDigits(y)
+      nice = limitPrecision(y, step.decimals)
       pos = this.yPos(nice)
       scaleGrads.push([nice, pos, digits])
     }
@@ -346,7 +341,12 @@ export default class yAxis extends Axis {
     return scaleGrads
   }
 
-  // roughly divide the yRange into cells
+  /**
+   * roughly divide the yRange into cells and provide rounded numbers
+   * @param {number} [rangeH=this.rangeH]
+   * @return {number}  
+   * @memberof yAxis
+   */
   niceNumber(rangeH = this.rangeH) {
     const yGridSize = (rangeH)/(this.height / (this.core.theme.yAxis.fontSize * YAxisFontSizeFactor));
 

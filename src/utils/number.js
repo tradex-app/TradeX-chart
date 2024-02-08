@@ -1,6 +1,7 @@
 // number.js
 
 import { MAX_CRYPTO_PRECISION } from "../definitions/core";
+import { isInteger } from "./typeChecks";
 
 /**
  * Getting a random number between 0 (inclusive) and 1 (exclusive)
@@ -109,8 +110,8 @@ export function binarySearch(list, item) {
       low = mid + 1
     }
   }
-
-  return null //if not found
+  //if not found
+  return null 
 }
 
 /**
@@ -283,14 +284,21 @@ export function getPrecision (value) {
 
 /**
  * truncate price to fit on Scale
- * @param {object} digits - {sign: s, integers: i, decimals: d, value: v}
+ * @param {number} value - typically a price
+ * @param {number} precision - integer number of decimal places
  * @return {string}  
  */
-export function limitPrecision (digits, precision=MAX_CRYPTO_PRECISION) {
+export function limitPrecision (value, precision) {
+
+  const digits = countDigits(value)
+
+  if (isInteger(precision))
+    return `${ new Number(digits.value).toFixed(precision) }`
+
   let {sign: s, integers: i, decimals: d, value: v} = digits
 
   precision = (isNaN(precision)) ? MAX_CRYPTO_PRECISION : precision
-  d = (d > precision) ? precision : d
+  d = limit(d, 0, precision )
   v = new Number(v).toFixed(d)
   // let n = this.yAxisDigits - 1,
   let x = `${v}`,
@@ -327,7 +335,7 @@ export function limitPrecision (digits, precision=MAX_CRYPTO_PRECISION) {
       f = 2
     }
     else if (i >= 2) {
-      f = 4
+      f = 3
     }
   }
   r = Number.parseFloat(r).toFixed(f)

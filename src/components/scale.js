@@ -8,17 +8,16 @@ import { elementDimPos } from "../utils/DOM"
 import yAxis from "./axis/yAxis"
 import stateMachineConfig from "../state/state-scale"
 import Input from "../input"
-import { countDigits, limitPrecision } from '../utils/number'
-import { copyDeep, idSanitize, xMap } from '../utils/utilities'
-import { MAX_CRYPTO_PRECISION, STREAM_UPDATE } from "../definitions/core"
+import {limitPrecision } from '../utils/number'
+import { copyDeep, xMap } from '../utils/utilities'
+import { STREAM_UPDATE } from "../definitions/core"
 import { calcTextWidth, createFont } from '../renderer/text'
-
 import Graph from "./views/classes/graph"
 import { ScaleCursor } from './overlays/chart-cursor'
 import ScaleLabels from './overlays/scale-labels'
 import ScaleOverly from './overlays/scale-overlays'
 import ScalePriceLine from './overlays/scale-priceLine'
-import { YAxisFontSizeFactor } from '../definitions/style'
+
 
 const defaultOverlays = [
   ["labels", {class: ScaleLabels, fixed: true, required: true}],
@@ -223,17 +222,39 @@ export default class ScaleBar extends Component {
     this.core.MainPane.draw()
   }
 
-  // convert chart price or secondary indicator y data to pixel pos
+  /**
+   * convert chart price or secondary indicator y data to pixel pos
+   * @param {number} yData
+   * @return {number}  
+   * @memberof ScaleBar
+   */
   yPos(yData) { return this.#yAxis.yPos(yData) }
 
-  yPosStream(yData) { return this.#yAxis.lastYData2Pixel(yData) }
+  /**
+   * convert last stream value to y pixel position relative top left (0,0)
+   * @param {number} y - last stream value 
+   * @returns {number} - y pixel position
+   * @memberof ScaleBar
+   */
+  yPosStream(yData) { return this.#yAxis.lastYData2Pixel(y) }
 
-  // convert pixel pos to chart price
+  /**
+   * convert pixel pos to chart price
+   * @param {number} y
+   * @return {number}  
+   * @memberof ScaleBar
+   */
   yPos2Price(y) { return this.#yAxis.yPos2Price(y) }
 
-  nicePrice($) {
-    let digits = countDigits($)
-    return limitPrecision(digits, this.core.pricePrecision)
+  /**
+   * format price to a string to a specific decimal precision
+   * @param {number} $ - typically a price
+   * @param {number} p - precision limit, number of decimal places
+   * @return {string}  
+   * @memberof ScaleBar
+   */
+  nicePrice($, p) {
+    return limitPrecision($, p)
   }
 
 
@@ -257,8 +278,7 @@ export default class ScaleBar extends Component {
     if (this.core.range.dataLength > 0 &&
         this.#yAxis instanceof yAxis) {
       const step = this.#yAxis.niceNumber(this.range.valueMax)
-      const digits = countDigits(step)
-      const nice = limitPrecision(digits, this.core.pricePrecision)
+      const nice = limitPrecision(step, this.core.pricePrecision)
      count = `${nice}`.length + 2
     }
     this.#digitCnt = (count < 8) ? 8 : count

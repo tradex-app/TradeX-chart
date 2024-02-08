@@ -26,7 +26,6 @@ export default class Widgets extends Component {
   #width
   #height
 
-  #widgets
 
   constructor (core, options) {
 
@@ -85,12 +84,13 @@ export default class Widgets extends Component {
   // listen/subscribe/watch for parent notifications
   eventsListen() {
     this.on("resize", this.onResize, this)
-    this.on("global_resize", this.onResize, this)
     this.on("menu_open", this.onOpenMenu, this)
     this.on("menu_close", this.onCloseMenu, this)
     this.on("menu_off", this.onCloseMenu, this)
     this.on("menuItem_selected", this.onMenuItemSelected, this)
+    this.on("global_resize", this.onResize, this)
   }
+
 
   onOpenMenu(data) {
     // console.log("onOpenMenu:", data)

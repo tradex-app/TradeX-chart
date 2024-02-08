@@ -44,6 +44,13 @@ template.innerHTML = `
   padding: 0 0.5em;
   white-space: nowrap;
 }
+.legend .lower {
+  background: #0002;
+  border-radius: 0 5px 5px 0;
+}
+.legend.secondary {
+  display: none !important;
+}
 .legend .controls {
   opacity: 0;
 }
