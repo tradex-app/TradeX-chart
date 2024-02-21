@@ -813,3 +813,163 @@ export function decodePNGDataStore(src, cb, type="string") {
   });
 }
 
+export class EventHandlers {
+
+  static #entries = new xMap()
+
+  static get entries() { return EventHandlers.#entries }
+
+  /**
+   * validate handler parameters
+   * @static
+   * @param {object} ctx - closure context
+   * @param {HTMLElement} el - HTML element
+   * @param {string} evt - event type
+   * @param {function} fn - function
+   * @return {boolean}  
+   * @memberof EventHandlers
+   */
+  static isValid(ctx, el, evt, fn) {
+    return (
+      !isObject(ctx) ||
+      !isElement(el) ||
+      !isString(evt) ||
+      !isFunction(fn)
+    )
+  }
+
+  /**
+   * add an event listener and track it
+   * @static
+   * @param {object} ctx - closure context
+   * @param {HTMLElement} el - HTML element
+   * @param {string} evt - event type
+   * @param {function} fn - function
+   * @return {boolean}  
+   * @memberof EventHandlers
+   */
+  static add(ctx, el, evt, fn) {
+
+    if (!this.isValid(ctx, el, evt, fn) ) return false
+
+    el.addEventListener(evt, fn)
+    if (!EventHandlers.#entries.has(ctx))
+      EventHandlers.#entries.set(ctx, new xMap())
+
+    const entry = EventHandlers.#entries.get(ctx)
+    if (!entry.has(el))
+      entry.set(el, {})
+
+    const elm = entry.get(el)
+    if (!isArray(elm[evt]))
+      elm[evt] = []
+
+    elm[evt].push(fn)
+
+    return true
+  }
+   
+  /**
+   * remove listener entry
+   * @static
+   * @param {object} ctx - closure context
+   * @param {HTMLElement} el - HTML element
+   * @param {string} evt - event type
+   * @param {function} fn - function
+   * @return {boolean}  
+   * @memberof EventHandlers
+   */
+  static remove(ctx, el, evt, fn) {
+
+    if (
+      !EventHandlers.isValid(ctx, el, evt, fn) ||
+      !EventHandlers.#entries.has(ctx)
+      ) return false
+
+    const entry = EventHandlers.#entries.get(ctx)
+    if (!entry.has(el)) return false
+
+    const elm = entry.get(el)
+    if (!(evt in elm)) return false
+
+    const i = elm[evt].indexOf(fn)
+    if (i < 0) return false
+
+    elm[evt].splice(i, 1)
+
+    // garbage collect - remove empty entries
+    if (elm[evt].length == 0)
+      delete elm[evt]
+    if (Object.keys(elm).length == 0)
+      entry.delete(el)
+    if (entry.size == 0)
+      EventHandlers.#entries.delete(ctx)
+    return true
+  }
+
+  static expungeEvent(ctx, el, evt) {
+    if (
+      !isObject(ctx) ||
+      !isElement(el) ||
+      !isString(evt)
+    )
+    return false
+    const entry = EventHandlers.#entries.get(ctx)
+    if (!entry.has(el)) return false
+
+    const elm = entry.get(el)
+    if ((evt in elm)) {
+      for (let fn of elm[evt]) {
+        el.removeEventListener(evt, fn)
+      }
+      delete elm[evt]
+    }
+    return true
+  }
+
+  static expungeElement(ctx, el) {
+    if (
+      !isObject(ctx) ||
+      !isElement(el)
+    )
+    return false
+    const entry = EventHandlers.#entries.get(ctx)
+    if (entry.has(el)) {
+      let elm = entry.get(el)
+      for (let evt in elm) {
+        EventHandlers.expungeEvent(ctx, el, evt)
+      }
+      entry.delete(el)
+    }
+    return true
+  }
+
+  static expungeContext(ctx) {
+    if (
+      !isObject(ctx)
+    )
+    return false
+    if (EventHandlers.#entries.has(ctx)) {
+      const entry = EventHandlers.#entries.get(ctx)
+      for (let el of entry) {
+        EventHandlers.expungeElement(ctx, el)
+      }
+      EventHandlers.#entries.delete(ctx)
+    }
+    return true
+  }
+
+  static expungeAll() {
+    
+  }
+
+  static destroy() {
+    for (let ctx of EventHandlers.#entries) {
+      EventHandlers.expungeContext(ctx)
+    }
+    EventHandlers.#entries = undefined
+    return true
+  }
+
+}
+

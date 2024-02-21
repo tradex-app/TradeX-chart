@@ -3,14 +3,20 @@
 
 import { SHORTNAME, CSSUNITS } from "../../../definitions/core"
 import { uid } from "../../../utils/utilities"
-import { isFunction, isNumber, isString } from "../../../utils/typeChecks"
+import { isArray, isFunction, isNumber, isString } from "../../../utils/typeChecks"
 import EventHub from "../../../utils/eventHub"
 import { isInViewport, isVisible } from "../../../utils/DOM"
 
 export default class element extends HTMLElement {
 
-  shadowRoot
-  template
+  static #observedAttr = []
+  static set observedAttributes(a) { if (isArray(a)) element.#observedAttr = a }
+  static get observedAttributes() { return element.#observedAttr }
+
+  #shadowRoot
+  #template
+  #hub
+
   id = uid( SHORTNAME )
   doInit = true
   intersectionObserver 
@@ -27,14 +33,13 @@ export default class element extends HTMLElement {
     mutation: [],
     intersection: []
   }
-  #hub
 
   constructor (template, mode="open") {
     super()
 
     this.#hub = new EventHub()
-    this.template = template
-    this.shadowRoot = this.attachShadow({mode: mode})
+    this.#template = template
+    this.#shadowRoot = this.attachShadow({mode: mode})
   }
 
   destroy() {
@@ -78,6 +83,10 @@ export default class element extends HTMLElement {
     // this.#hub = undefined
   }
 
+  get shadowRoot() { return this.#shadowRoot }
+  get template() { return this.#template }
+  get hub() { return this.#hub }
+
   get width() { return this.DOM.width }
   set width(w) { this.setDim(w, "width") }
   get oWidth() { return this.oldDOM.width }
@@ -86,19 +95,22 @@ export default class element extends HTMLElement {
   get oHeight() { return this.oldDOM.height }
   get widthDeltaR() { return this.DOM.width / this.oldDOM.width }
   get heightDeltaR() { return this.DOM.height / this.oldDOM.height }
+  set top(t) { this.setPos(t, "top") }
   get top() { return this.DOM.top }
+  set left(l) { this.setPos(l, "left") }
   get left() { return this.DOM.left }
+  set bottom(b) { this.setPos(b, "bottom") }
   get bottom() { return this.DOM.bottom }
+  set right(r) { this.setPos(r, "right") }
   get right() { return this.DOM.right }
   // get x() { return this.x }
   // get y() { return this.y }
   get dimensions() { return this.DOM }
   set cursor(c) { this.style.cursor = c }
   get cursor() { return this.style.cursor }
-  get hub() { return this.#hub }
 
   setDim(v, d) {
-    if (!["width", "height"].includes(d) || !isString(v)) return
+    if (!["width", "height", "top", "bottom", "left", "right"].includes(d) || !isString(v)) return
     if (isNumber(v)) {
       this.DOM[d] = v
       v += "px"
@@ -112,6 +124,10 @@ export default class element extends HTMLElement {
       v = this.DOM[d] + "px"
     }
     this.style[d] = v
+  }
+
+  setPos(v, d) {
+    this.setDim(v, d)
   }
 
   getDims() {
