@@ -49,7 +49,7 @@ template.innerHTML = `
   border-radius: 0 5px 5px 0;
 }
 .legend.secondary {
-  display: none !important;
+  // display: none !important;
 }
 .legend .controls {
   opacity: 0;
