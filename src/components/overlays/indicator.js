@@ -129,7 +129,7 @@ export default class Indicator extends Overlay {
    */
   set value(data) {
     // round time to nearest current time unit
-    const tfms = this.core.time.timeFrameMS
+    const tfms = this.core.timeData.timeFrameMS
     let roundedTime = Math.floor(new Date(data[OHLCV.t]) / tfms) * tfms
     data[OHLCV.t] = roundedTime
 

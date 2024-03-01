@@ -1,4 +1,5 @@
-import { isArray, isBoolean, isNumber, isObject, isString, checkType } from '../utils/typeChecks'
+import { isArray, isBoolean, isInteger, isNumber, isObject, isString, checkType } from '../utils/typeChecks'
+import { Range } from '../model/range';
 
 export const TIMEUNITS = ['y','M','d','h','m','s','ms']
 export const TIMEUNITSLONG = ['years','months','days','hours','minutes','seconds','milliseconds']
@@ -107,36 +108,9 @@ const timeScalesValues = () => {
   }
   return values
 }
+
 export const TIMESCALESVALUESKEYS = timeScalesValues()
-export const timezones = {
-  0: 'Europe/London',
-  '-120': 'Europe/Tallinn',
-  '-60': 'Europe/Zurich',
-  180: 'America/Santiago',
-  300: 'America/Toronto',
-  240: 'America/Caracas',
-  360: 'America/Mexico_City',
-  540: 'America/Juneau',
-  480: 'America/Vancouver',
-  420: 'US/Mountain',
-  120: 'America/Sao_Paulo',
-  '-360': 'Asia/Almaty',
-  '-300': 'Asia/Ashkhabad',
-  '-180': 'Europe/Moscow',
-  '-420': 'Asia/Jakarta',
-  '-480': 'Asia/Taipei',
-  '-240': 'Asia/Muscat',
-  '-345': 'Asia/Kathmandu',
-  '-330': 'Asia/Kolkata',
-  '-540': 'Asia/Tokyo',
-  '-210': 'Asia/Tehran',
-  '-660': 'Pacific/Norfolk',
-  '-630': 'Australia/Adelaide',
-  '-600': 'Australia/Brisbane',
-  '-780': 'Pacific/Fakaofo',
-  '-825': 'Pacific/Chatham',
-  600: 'Pacific/Honolulu',
-};
+
 
 export function getTimezone() {
   const offset = new Date().getTimezoneOffset();
@@ -253,6 +227,12 @@ export function timestampDifference(date1,date2) {
   }
 }
 
+/**
+ *
+ * @export
+ * @param {string} tf - eg '1h' = one hour
+ * @return {object} - {tf, ms} timeframe, milliseconds
+ */
 export function isTimeFrame(tf) {
   let ms = SECOND_MS
   if (isString(tf)) {
@@ -565,4 +545,64 @@ export function nearestTs(t, ts) {
         }
     }
     return [index, val]
+}
+
+export class TimeData {
+
+  #range = {}
+  #timeZoneOffset = getTimezoneOffset()
+  #timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+
+  constructor(range) {
+    if (range instanceof Range) this.#range = range
+    this.setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+  }
+
+  get range() { return this.#range }
+  get timeFrameMS() { return this.#range.interval }
+  get timeFrame() { return this.#range.intervalStr }
+  set timeZone(z) { this.setTimeZone(z) }
+  get timeZone() { return this.#timeZone }
+  set timeZoneOffset(z) { this.#timeZoneOffset = (isNumber(z)) ? z : new Date().getTimezoneOffset() }
+  get timeZoneOffset() { return this.#timeZoneOffset }
+  get indexed() { return this.#range.indexed }
+
+  setTimeZone(z) {
+    if (Intl.supportedValuesOf('timeZone').includes(z)) {
+      this.#timeZone = z
+      this.#timeZoneOffset = getTimezoneOffset(z)
+    }
+  }
+
+  getTimezoneOffset(timeZone, locale) {
+    getTimezoneOffset(timeZone, locale)
+  }
+
+  getIANATimeZones(locale) {
+    IANATimeZones(locale)
+  }
+}
+
+export function IANATimeZones(locale='en-US') {
+  const tz = {}
+  const date = new Date;
+  Intl.supportedValuesOf('timeZone').forEach((timeZone) =>
+  {
+    let offset = getTimezoneOffset(timeZone, locale)
+    tz[timeZone] = offset
+  });
+  return tz
+}
+
+export function getTimezoneOffset(timeZone=Intl.DateTimeFormat().resolvedOptions().timeZone, locale='en-US') {
+  const now = new Date();
+  const tzString = now.toLocaleString(locale, { timeZone });
+  const localString = now.toLocaleString(locale);
+  const diff = (Date.parse(localString) - Date.parse(tzString)) / 3600000;
+  const offset = diff + now.getTimezoneOffset() / 60;
+  
+  // error if locale other than 'en-US', why?
+  // if (-offset > 24) console.log(timeZone, tzString, localString, Date.parse(localString), Date.parse(tzString), diff, offset)
+  
+  return -offset;
 }

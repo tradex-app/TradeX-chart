@@ -3,7 +3,7 @@
 import TradeXchart from "../core"
 import { ms2Interval } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS, INTITIALCNT } from "../definitions/chart"
-import { isNumber, isObject, isString } from "../utils/typeChecks"
+import { isInteger, isNumber, isObject, isString } from "../utils/typeChecks"
 import { bRound, limit } from "../utils/number"
 // import WebWorker from "./webWorkers"
 // import WebWorker from "./webWorkers4"
@@ -36,6 +36,7 @@ export class Range {
   #core
   #worker
   #init = true
+  #indexed = false
 
   /**
    * Creates an instance of Range.
@@ -106,6 +107,7 @@ export class Range {
   get interval () { return this.#interval }
   set intervalStr (i) { this.#intervalStr = i }
   get intervalStr () { return this.#intervalStr }
+  get indexed () { return this.#indexed }
 
   end() {
     // WebWorker.destroy(this.#worker.id)
@@ -508,17 +510,19 @@ export function detectInterval(ohlcv) {
 /**
  * Calculate the index for a given time stamp
  * @param {Object} time - time object provided by core
- * @param {number} timeStamp 
+ * @param {number} [timeStamp=Date.now()] 
  * @returns {number}
  */
-export function calcTimeIndex(time, timeStamp) {
-  if (!isNumber(timeStamp)) return false
+export function calcTimeIndex(time, timeStamp=Date.now()) {
+  if (!isInteger(timeStamp)) timeStamp = Date.now()
 
   let index
   let timeFrameMS = time.timeFrameMS
   timeStamp = timeStamp - (timeStamp % timeFrameMS)
 
-  if (timeStamp === time.range.data[0][0])
+  if (time.range.data.length === 0)
+    index = false
+  else if (timeStamp === time.range.data[0][0])
     index = 0
   else if (timeStamp < time.range.data[0][0]) 
     index = ((time.range.data[0][0] - timeStamp) / timeFrameMS) * -1

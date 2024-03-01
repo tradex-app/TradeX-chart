@@ -77,7 +77,7 @@ export default class TradeXchart extends Tradex_chart {
   #elWidgetsG
 
   #ready = false
-  #inCnt = null
+  #inCnt
   #State = State
   #state
   #range
@@ -112,13 +112,7 @@ export default class TradeXchart extends Tradex_chart {
     main: this.#MainPane,
   }
 
-  #time = {
-    range: {},
-    timeFrameMS: 0,
-    timeFrame: `undefined`,
-    timeZone: '',
-    indexed: false
-  }
+  #timeData = new Time.TimeData()
 
   // console outputs
   logs = false
@@ -145,10 +139,8 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * Create a new TradeXchart instance
    * @static
-   * @param {DOM_element} container - HTML element to mount the chart on
-   * @param {Object} [txCfg={}] - chart config
-   * @param {Object} state - chart state
-   * @returns {instance} TradeXchart
+   * @param {Object} [cfg={}] - chart config
+   * @returns {TradeXchart} TradeXchart
    * @memberof TradeXchart
    */
   static create(cfg) {
@@ -366,7 +358,7 @@ export default class TradeXchart extends Tradex_chart {
   }
   get rangeLimit() { return (isNumber(this.#range.initialCnt)) ? this.#range.initialCnt : RANGELIMIT }
   get range() { return this.#range }
-  get time() { return this.#time }
+  get timeData() { return this.#timeData }
   get TimeUtils() { return Time }
 
   get theme() { return this.#theme }
@@ -488,7 +480,7 @@ export default class TradeXchart extends Tradex_chart {
 
     // now set user defined (if any) range
     if (this.#range.Length > 1) {
-      const rangeStart = calcTimeIndex(this.#time, this.#config?.range?.startTS)
+      const rangeStart = calcTimeIndex(this.#timeData, this.#config?.range?.startTS)
       const end = (isNumber(rangeStart)) ? 
         rangeStart + this.#range.initialCnt :
         this.allData.data.length
@@ -702,7 +694,7 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
  * Set the chart theme
- * @param {string} theme - theme identifier
+ * @param {string} ID - theme identifier
  * @returns {boolean}
  * @memberof TradeXchart
  */
@@ -806,7 +798,7 @@ export default class TradeXchart extends Tradex_chart {
     }
 
     // same as current state, nothing to do
-    if (key === this.key) return true
+    if (key === this.#state.key) return true
     
     // stop any streams
     this.stream.stop()
@@ -819,11 +811,11 @@ export default class TradeXchart extends Tradex_chart {
       interval: this.#state.data.chart.tfms,
       core: this
     }
-    this.getRange(null, null, rangeConfig)
+    this.getRange(undefined, undefined, rangeConfig)
 
     // set Range
     if (this.range.Length > 1) {
-      const rangeStart = calcTimeIndex(this.time, undefined)
+      const rangeStart = calcTimeIndex(this.time)
       const end = (rangeStart) ? 
         rangeStart + this.range.initialCnt :
         this.#state.data.chart.data.length - 1
@@ -864,8 +856,8 @@ export default class TradeXchart extends Tradex_chart {
    * @param {Object} config 
    * @returns {Object}
    */
-  exportState(key=this.key, config={}) {
-    return this.state.export(key=this.key, config={})
+  exportState(key=this.#state.key, config={}) {
+    return this.state.export(key, config)
   }
 
   /*============================*/
@@ -876,7 +868,7 @@ export default class TradeXchart extends Tradex_chart {
    * specify a chart stream
    * @memberof TradeXchart
    * @param {Object} stream 
-   * @returns {instance}
+   * @returns {Stream|false}
    */
   setStream(stream) {
     if (this.stream instanceof Stream) {
@@ -885,11 +877,10 @@ export default class TradeXchart extends Tradex_chart {
     }
     else if (isObject(stream)) {
       if (this.allData.data.length == 0 && isString(stream.timeFrame)) {
-        ;({tf, ms} = isTimeFrame(stream?.timeFrame))
+        const { tf, ms } = isTimeFrame(stream?.timeFrame)
         this.range.interval = ms
         this.range.intervalStr = tf
-        this.#time.timeFrameMS = ms
-        this.#time.timeFrame = tf
+        this.#timeData = new Time.TimeData(this.range)
       }
 
       this.#stream = new Stream(this)
@@ -970,9 +961,7 @@ export default class TradeXchart extends Tradex_chart {
    */
   getRange(start=0, end=0, config={}) {
     this.#range = new Range(start, end, config)
-    this.#time.range = this.#range
-    this.#time.timeFrameMS = this.#range.interval
-    this.#time.timeFrame = this.#range.intervalStr
+    this.#timeData = new Time.TimeData(this.#range)
   }
 
   /**

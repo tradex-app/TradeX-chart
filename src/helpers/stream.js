@@ -284,6 +284,6 @@ export default class Stream {
   }
 
   roundTime(ts) {
-    return ts - (ts % this.#core.time.timeFrameMS)
+    return ts - (ts % this.#core.timeData.timeFrameMS)
   }
 }
