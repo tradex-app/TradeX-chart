@@ -7,7 +7,7 @@ import { OVERLAYPANES } from './definitions/chart'
 import { defaultConfig } from './definitions/config'
 import Indicators from './definitions/indicators'
 import * as packageJSON from '../package.json'
-import { isArray, isBoolean, isFunction, isNumber, isObject, isString, isError, isPromise, isClass } from './utils/typeChecks'
+import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, isError, isPromise, isClass } from './utils/typeChecks'
 import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { isTimeFrame, SECOND_MS } from "./utils/time"
@@ -469,12 +469,15 @@ export default class TradeXchart extends Tradex_chart {
 
     // now set user defined (if any) range
     if (this.#range.Length > 1) {
-      const rangeStart = calcTimeIndex(this.#timeData, this.#config?.range?.startTS)
-      const end = (isNumber(rangeStart)) ? 
-        rangeStart + this.#range.initialCnt :
-        this.allData.data.length
-      const start = (isNumber(rangeStart)) ? rangeStart : end - this.#range.initialCnt
-      this.#range.initialCnt = end - start
+      let start, end;
+      if (isInteger(this.#config?.range?.startTS)) {
+        start = calcTimeIndex(this.#timeData, this.#config.range.startTS)
+        end = start + this.#range.initialCnt
+      }
+      else {
+        end = this.#timeData.range.data.length + 2
+        start = end - this.#range.initialCnt
+      }
       this.setRange(start, end)
 
       if (txCfg.range?.center)
@@ -805,12 +808,17 @@ export default class TradeXchart extends Tradex_chart {
     // set Range
     if (this.range.Length > 1) {
       const rangeStart = calcTimeIndex(this.time)
-      const end = (rangeStart) ? 
+      const end = (isInteger(rangeStart)) ? 
         rangeStart + this.range.initialCnt :
         this.#state.data.chart.data.length - 1
-      const start = (rangeStart) ? rangeStart : end - this.range.initialCnt
+      const start = (isInteger(rangeStart)) ? 
+        rangeStart : 
+        end - this.range.initialCnt
       this.range.initialCnt = end - start
       this.setRange(start, end)
+
+      if (this.config.range?.center)
+      this.jumpToIndex(start, true, true)
     }
 
     // rebuild chart

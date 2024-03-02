@@ -364,7 +364,9 @@ export default class State {
       const end = (rangeStart) ? 
         rangeStart + this.range.initialCnt :
         source.data.length - 1
-      const start = (rangeStart) ? rangeStart : end - this.range.initialCnt
+      const start = (rangeStart) ? 
+        rangeStart : 
+        end - this.range.initialCnt
       this.range.initialCnt = end - start
       core.setRange(start, end)
     }

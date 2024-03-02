@@ -5,6 +5,7 @@ import { ms2Interval } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS, INTITIALCNT } from "../definitions/chart"
 import { isInteger, isNumber, isObject, isString } from "../utils/typeChecks"
 import { bRound, limit } from "../utils/number"
+import { TimeData } from "../utils/time"
 // import WebWorker from "./webWorkers"
 // import WebWorker from "./webWorkers4"
 
@@ -514,25 +515,35 @@ export function detectInterval(ohlcv) {
 
 /**
  * Calculate the index for a given time stamp
- * @param {Object} time - time object provided by core
- * @param {number} [timeStamp=Date.now()] 
- * @returns {number}
+ * @param {TimeData} time - TimeData instance provided by core
+ * @param {number} timeStamp
+ * @returns {number|boolean}
  */
-export function calcTimeIndex(time, timeStamp=Date.now()) {
-  if (!isInteger(timeStamp)) timeStamp = Date.now()
+export function calcTimeIndex(time, timeStamp) {
+  if (!(time instanceof TimeData)) return false
+
+  const data = time.range.data
+  const len = data.length
+
+  if (!isInteger(timeStamp)) {
+    if (!isInteger(data[len-1][0]))
+      timeStamp = Date.now()
+    else
+      timeStamp = data[len-1][0]
+  }
 
   let index
   let timeFrameMS = time.timeFrameMS
   timeStamp = timeStamp - (timeStamp % timeFrameMS)
 
-  if (time.range.data.length === 0)
+  if (data.length === 0)
     index = false
-  else if (timeStamp === time.range.data[0][0])
+  else if (timeStamp === data[0][0])
     index = 0
-  else if (timeStamp < time.range.data[0][0]) 
-    index = ((time.range.data[0][0] - timeStamp) / timeFrameMS) * -1
+  else if (timeStamp < data[0][0]) 
+    index = Math.floor((data[0][0] - timeStamp) / timeFrameMS) * -1
   else 
-    index = (timeStamp - time.range.data[0][0]) / timeFrameMS
+    index = Math.floor((timeStamp - data[0][0]) / timeFrameMS)
 
   return index
 }
