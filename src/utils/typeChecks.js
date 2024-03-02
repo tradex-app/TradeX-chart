@@ -38,7 +38,7 @@ export function isNumber (v) {
  * @returns {boolean}
  */
 export function isInteger (v) {
-  return (typeof v === 'number') && ((v % 1) === 0);
+  return (typeof v === 'number') && (Math.abs(v % 1) === 0);
 }
 
 /**

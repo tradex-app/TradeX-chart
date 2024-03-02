@@ -346,8 +346,13 @@ export default class MainPane extends Component {
       return
     }
     const range = this.range
-    const newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length)
-    const newEnd = range.indexEnd + Math.ceil(direction * XAXIS_ZOOM * range.Length)
+      let newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length)
+      let newEnd = range.indexEnd + Math.ceil(direction * XAXIS_ZOOM * range.Length)
+
+    if (range.isPastLimit(newStart)) newStart = range.pastLimitIndex + 1
+    if (range.isFutureLimit(newEnd)) newEnd = range.futureLimitIndex - 1
+    if (newEnd - newStart > range.maxCandles ||
+        newEnd - newStart < range.minCandles) return
 
     this.core.setRange(newStart, newEnd)
     this.draw(this.range, true)
@@ -411,7 +416,7 @@ export default class MainPane extends Component {
     const d = this.#drag
     if (!d.active) {
       d.active = true
-      d.start = [e.dragstart.x, e.dragstart.y]
+      d.start = [e.position.x, e.position.y]
       d.prev = d.start
       d.delta = [0, 0] //[e.movement.x, e.movement.y]
     }
@@ -426,11 +431,11 @@ export default class MainPane extends Component {
         e.position.y
       ]
     }
-    this.#cursorPos = ("n",[
+    this.#cursorPos = [
       e.position.x, e.position.y, 
       ...d.start,
       ...d.delta
-    ])
+    ]
 
     this.emit("chart_pan", this.#cursorPos)
   }
@@ -978,7 +983,7 @@ export default class MainPane extends Component {
       if (chartPane.status !== "destroyed")
         graphs.push(chartPane)
       else
-        console.log("error destroyed pane")
+        this.log("error destroyed pane")
     })
 
     this.renderLoop.queueFrame(

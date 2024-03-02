@@ -286,6 +286,7 @@ const config3 = {
   timeFrame: "1m",
   range: {
     startTS: rangeStartTS,
+    limitFuture: 10,
   },
   theme: {
     candle: {
@@ -928,7 +929,7 @@ const dre =   {
   };
 
 const configs = [
-  // {config: config1, stream: null},
+  {config: config1, stream: null},
   {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
   {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
   {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},

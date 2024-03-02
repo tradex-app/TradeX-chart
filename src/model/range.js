@@ -25,13 +25,12 @@ export class Range {
   volumeMinIdx = 0
   volumeMaxIdx = 0
   old = {}
-  initialCnt = INTITIALCNT
-  limitFuture = LIMITFUTURE
-  limitPast = LIMITPAST
-  minCandles = MINCANDLES
-  maxCandles = MAXCANDLES
-  yAxisBounds = YAXIS_BOUNDS
-  rangeLimit = LIMITFUTURE
+  #initialCnt = INTITIALCNT
+  #limitFuture = LIMITFUTURE
+  #limitPast = LIMITPAST
+  #minCandles = MINCANDLES
+  #maxCandles = MAXCANDLES
+  #yAxisBounds = YAXIS_BOUNDS
   anchor
   #core
   #worker
@@ -52,8 +51,8 @@ export class Range {
     this.#init = true;
     this.setConfig(config)
     this.#core = config.core;
-    start = (isNumber(start)) ? start : 0
-    end = (isNumber(end)) ? end : this.data.length-1
+    start = (isInteger(start)) ? start : 0
+    end = (isInteger(end)) ? end : this.data.length-1
 
     const MaxMinPriceVolStr = `
     (input) => {
@@ -108,9 +107,29 @@ export class Range {
   set intervalStr (i) { this.#intervalStr = i }
   get intervalStr () { return this.#intervalStr }
   get indexed () { return this.#indexed }
+  get pastLimitIndex () { return this.limitPast * -1 }
+  get futureLimitIndex () { return this.dataLength + this.limitFuture - 1 }
+  set initialCnt (c) { if (isInteger(c)) this.#initialCnt = c }
+  get initialCnt () { return this.#initialCnt }
+  get limitFuture () { return this.#limitFuture }
+  get limitPast () { return this.#limitPast }
+  get minCandles () { return this.#minCandles }
+  get maxCandles () { return this.#maxCandles }
+  get yAxisBounds () { return this.#yAxisBounds }
+  get rangeLimit () { return this.#limitFuture }
 
   end() {
     // WebWorker.destroy(this.#worker.id)
+  }
+
+  isFutureLimit(idx=this.indexEnd) {
+    if (!isInteger(idx)) return
+    return (idx > this.futureLimitIndex)
+  }
+
+  isPastLimit(idx=this.indexStart) {
+    if (!isInteger(idx)) return
+    return (idx < this.pastLimitIndex)
   }
 
   /**
@@ -121,15 +140,15 @@ export class Range {
    * @returns {boolean} - success or failure
    * @memberof Range
    */
-  set (start=0, end=this.dataLength, max=this.maxCandles, config) {
-    if (!isNumber(start) || 
-        !isNumber(end) ||
-        !isNumber(max)) return false
+  set (start=0, end=this.dataLength, max=this.maxCandles) {
+    if (!isInteger(start) || 
+        !isInteger(end) ||
+        !isInteger(max)) return false
     // integer guard, prevent decimals
     start = start | 0
     end = end | 0
     max = max | 0
-    max = limit(max, this.minCandles, this.maxCandles)
+    max = limit( max, this.minCandles, MAXCANDLES )
 
     // check and correct start and end argument order
     if (start > end) [start, end] = [end, start]
@@ -156,7 +175,7 @@ export class Range {
     let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this})
     
     this.setMaxMin(maxMin)
-    this.setConfig(config)
+    this.setConfig({maxCandles: max})
 
     // if (this.#init || this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
     //   this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
@@ -188,12 +207,12 @@ export class Range {
   setConfig(config) {
     if (!isObject(config)) return false
 
-    this.initialCnt = (isNumber(config?.initialCnt)) ? config.initialCnt : INTITIALCNT;
-    this.limitFuture = (isNumber(config?.limitFuture)) ? config.limitFuture : LIMITFUTURE;
-    this.limitPast = (isNumber(config?.limitPast)) ? config.limitPast : LIMITPAST;
-    this.minCandles = (isNumber(config?.minCandles)) ? config.minCandles : MINCANDLES;
-    this.maxCandles = (isNumber(config?.maxCandles)) ? config.maxCandles : MAXCANDLES;
-    this.yAxisBounds = (isNumber(config?.yAxisBounds)) ? config.yAxisBounds : YAXIS_BOUNDS;
+    this.#initialCnt = (isInteger(config?.initialCnt)) ? config.initialCnt : INTITIALCNT;
+    this.#limitFuture = (isInteger(config?.limitFuture)) ? config.limitFuture : LIMITFUTURE;
+    this.#limitPast = (isInteger(config?.limitPast)) ? config.limitPast : LIMITPAST;
+    this.#minCandles = (isInteger(config?.minCandles)) ? config.minCandles : MINCANDLES;
+    this.#maxCandles = (isInteger(config?.maxCandles)) ? config.maxCandles : MAXCANDLES;
+    this.#yAxisBounds = (isNumber(config?.yAxisBounds)) ? config.yAxisBounds : YAXIS_BOUNDS;
   }
 
   setMaxMin ( maxMin ) {
@@ -220,7 +239,7 @@ export class Range {
       if (!data) return null
     }
     // return last value as default
-    if (!isNumber(index)) index = data.length - 1
+    if (!isInteger(index)) index = data.length - 1
   
     let v = data[index]
     if (v !== undefined) return v
@@ -253,7 +272,7 @@ export class Range {
    * @memberof Range
    */
   valueByTS ( ts, id="" ) {
-    if (!isNumber(ts) || !isString(id)) return false
+    if (!isInteger(ts) || !isString(id)) return false
 
     const idx = this.getTimeIndex(ts)
 
@@ -313,7 +332,7 @@ export class Range {
    * @returns {number}
    */
    getTimeIndex (ts) {
-    if (!isNumber(ts)) return false
+    if (!isInteger(ts)) return false
     ts = ts - (ts % this.interval)
   
     let x = (this.data.length > 0) ? this.data[0][0] : this.anchor
@@ -364,17 +383,15 @@ export class Range {
 
   /**
    * Find price maximum and minimum, volume maximum and minimum
-   * @param {Array} data
-   * @param {number} [start=0]
-   * @param {number} [end=data.length-1]
+   * @param {object} input
    * @returns {Object}  
    */
    maxMinPriceVol ( input ) {
     let {data, start, end, that} = {...input}
     let buffer = bRound(this.#core.bufferPx / this.#core.candleW)
 
-    buffer = (isNumber(buffer)) ? buffer : 0
-    start = (isNumber(start)) ? start - buffer : 0
+    buffer = (isInteger(buffer)) ? buffer : 0
+    start = (isInteger(start)) ? start - buffer : 0
     start = (start > 0) ? start : 0
 
     end = (typeof end === "number") ? end : data?.length-1
@@ -474,18 +491,6 @@ export class Range {
     }
   }
 } // end class
-
-
-export function rangeOnchartValue( range, indicator, index ) {
-  const len = range.primary[indicator].length - 1
-  const value = null
-}
-
-export function rangeOffchartValue( range, indicator, index ) {
-}
-
-export function rangeDatasetValue( range, indicator, index ) {
-}
 
 /**
  * Detects candles interval

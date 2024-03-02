@@ -66,16 +66,6 @@ export default class TradeXchart extends Tradex_chart {
   #core
   #config
   #options
-  #el
-  #elUtils
-  #elBody
-  #elTools
-  #elMain
-  #elRows
-  #elTime
-  #elYAxis
-  #elWidgetsG
-
   #ready = false
   #inCnt
   #State = State
@@ -113,6 +103,8 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   #timeData = new Time.TimeData()
+
+  destruction = false
 
   // console outputs
   logs = false
@@ -273,7 +265,6 @@ export default class TradeXchart extends Tradex_chart {
    */
   constructor () {
     super()
-    this.#el = this
     this.#core = this
     this.#inCnt = TradeXchart.cnt()
     this.logs = false
@@ -402,8 +393,6 @@ export default class TradeXchart extends Tradex_chart {
    */
   start(cfg) {
     this.log(`${NAME} configuring...`)
-
-    TradeXchart.create(cfg)
 
     const txCfg = TradeXchart.create(cfg)
     this.logs = (txCfg?.logs) ? txCfg.logs : false
@@ -683,7 +672,7 @@ export default class TradeXchart extends Tradex_chart {
    * Add a theme to the chart,
    * if no current theme is set, make this the current one.
    * @param {Object} theme - Volume accuracy
-   * @returns {instance} - theme instance
+   * @returns {Theme} - theme instance
    * @memberof TradeXchart
    */
   addTheme(theme) {
@@ -926,20 +915,26 @@ export default class TradeXchart extends Tradex_chart {
    */
   updateRange(pos) {
     if (!isArray(pos) || !isNumber(pos[4]) || pos[4] == 0) return
+    if (pos[4] < 0 && this.range.isPastLimit()) return
+    if (pos[4] > 0 && this.range.isFutureLimit()) return
 
-    let dist, offset, scrollPos, r;
+    let dist, scrollPos, r;
 
     dist = pos[4]
     scrollPos = this.#scrollPos + dist
     r = scrollPos % this.candleW
 
-    if (scrollPos < this.bufferPx * -1) {
+    if (scrollPos < this.bufferPx * -1 ) {
+      let r = this.offsetRange(this.rangeScrollOffset * -1)
+      if (!r) return
+
       scrollPos = 0
-      this.offsetRange(this.rangeScrollOffset * -1)
     }
     else if (scrollPos > 0) {
+      let r = this.offsetRange(this.rangeScrollOffset)
+      if (!r) return
+
       scrollPos = this.bufferPx * -1
-      this.offsetRange(this.rangeScrollOffset)
     }
 
     this.#scrollPos = scrollPos
@@ -950,7 +945,12 @@ export default class TradeXchart extends Tradex_chart {
     let start = this.range.indexStart - offset,
         end = this.range.indexEnd - offset;
 
+    if (this.range.isPastLimit(start) ||
+        this.range.isFutureLimit(end))
+        return false
+
     this.setRange(start, end)
+    return true
   }
 
   /**
@@ -973,6 +973,9 @@ export default class TradeXchart extends Tradex_chart {
   setRange(start=0, end=this.rangeLimit) {
     const max = (this.config?.maxCandles)? this.config.maxCandles : 
       (this.Chart?.layerWidth) ? this.Chart.layerWidth : this.Chart.width
+
+
+
     this.#range.set(start, end, max)
 
     if (start < 0 && !this.#mergingData) 
@@ -1025,7 +1028,7 @@ export default class TradeXchart extends Tradex_chart {
    */
   jumpToEnd(center=true) {
     let end = this.range.dataLength - this.range.Length
-    if (center) end += this.range.Length / 2
+    if (center) end += Math.round(this.range.Length / 2)
     this.jumpToIndex(end, true, false)
   }
 
