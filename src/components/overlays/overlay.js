@@ -47,11 +47,6 @@ export default class Overlay {
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#params = params
-
-    // this.on("setRange", this.drawUpdate, this)
-    // this.on("rowsResize", this.drawUpdate, this)
-    // this.on("divider_pointerdrag", this.drawUpdate, this)
-    // this.on("divider_pointerdragend", this.drawUpdate, this)
     this.on("global_resize", this.onResize, this)
   }
 

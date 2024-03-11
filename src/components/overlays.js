@@ -93,7 +93,7 @@ export default class Overlays {
       overlay.layer = layer
       overlay.instance = new overlay.class(
         layer,
-        this.#parent.TimeLine,
+        this.#parent.Timeline,
         this.#parent.Scale,
         this.#core.theme,
         this,

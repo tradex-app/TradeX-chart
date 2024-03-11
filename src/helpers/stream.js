@@ -45,7 +45,7 @@ export default class Stream {
   #status
   #time
   #maxUpdate
-  #updateTimer
+  #updateTimer = 0
   #precision
   #candle = empty
   #countDownStart = 0
@@ -116,6 +116,7 @@ export default class Stream {
    * @memberof Stream
    */
   set candle(data) {
+    const now = Date.now()
     // store last tick for alerts
     const lastTick = [...this.#candle]
     // round time to nearest current time unit
@@ -135,6 +136,11 @@ export default class Stream {
     }
     this.status = {status: STREAM_LISTENING, data: this.#candle}
     this.lastTick = lastTick
+
+    if (now - this.#updateTimer > this.#maxUpdate)
+      this.onUpdate()
+
+      this.#updateTimer = now
   }
   get candle() {
     return (this.#candle !== empty) ? this.#candle : null
@@ -143,11 +149,11 @@ export default class Stream {
   start() {
     this.#alerts = new Alerts(this.#config.alerts)
     this.status = {status: STREAM_STARTED}
-    this.#updateTimer = setInterval(this.onUpdate.bind(this), this.#maxUpdate)
   }
 
   stop() {
-    this.#alerts.destroy()
+    if (this.#alerts instanceof Alerts)
+      this.#alerts.destroy()
     this.status = {status: STREAM_STOPPED}
   }
   

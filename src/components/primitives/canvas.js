@@ -25,7 +25,8 @@ class Node {
     this.id = CEL.idCnt++;
     this.scene = new CEL.Scene();
 
-    this.setSize(cfg.width || 0, cfg.height || 0);
+    let {width: w, height: h} = sizeSanitize(cfg.width || 0, cfg.height || 0)
+    this.setSize(w, h);
   }
 
   // does the browser support OffscreenCanvas ?
@@ -42,12 +43,14 @@ class Node {
    * @returns {Viewport}
    */
   setSize(width, height) {
-    this.width = width;
-    this.height = height;
-    this.scene.setSize(width, height);
+    let {width: w, height: h} = sizeSanitize(width, height)
+    
+    this.width = w
+    this.height = h
+    this.scene.setSize(w, h);
 
     this.layers.forEach(function (layer) {
-      layer.setSize(width, height);
+      layer.setSize(w, h);
     });
 
     return this;
@@ -236,19 +239,19 @@ class Layer {
       offscreen: this.#offScreen
     });
 
-    if (cfg.x && cfg.y) {
+    if (cfg?.x && cfg?.y) {
       this.setPosition(cfg.x, cfg.y);
     }
-    if (cfg.width && cfg.height) {
+    if (cfg?.width && cfg?.height) {
       this.setSize(cfg.width, cfg.height);
     }
-    if (cfg.composition) {
+    if (cfg?.composition) {
       this.setComposition = cfg.composition
     }
-    if (cfg.alpha) {
+    if (cfg?.alpha) {
       this.alpha = cfg.alpha
     }
-    if (cfg.visible) {
+    if (cfg?.visible) {
       this.visible = cfg.visible
     }
   }
@@ -304,10 +307,12 @@ class Layer {
    * @returns {Layer}
    */
   setSize(width, height) {
-    this.width = width;
-    this.height = height;
-    this.scene.setSize(width, height);
-    this.hit.setSize(width, height);
+    let {width: w, height: h} = sizeSanitize(width, height)
+
+    this.width = w;
+    this.height = h;
+    this.scene.setSize(w, h);
+    this.hit.setSize(w, h);
     return this;
   }
 
@@ -391,6 +396,9 @@ class Layer {
   }
 
   destroy() {
+    // setting size to 0x0 will not release all of the memory
+    // however, 1x1 will ensure minimal amount of memory is consumed 
+    // until the browser disposes of the canvas
     setSize(1,1)
     this.scene.clear()
     this.hit.clear()
@@ -663,15 +671,23 @@ function clear(that) {
   return that;
 }
 
+function sizeSanitize(width, height) {
+  if (width < 0) width = 0
+  if (height < 0) height = 0
+  return {width, height}
+}
+
 function setSize(width, height, that, ratio=true) {
-  that.width = width;
-  that.height = height;
-  that.canvas.width = width * CEL.pixelRatio;
-  that.canvas.height = height * CEL.pixelRatio;
+  let {width: w, height: h} = sizeSanitize(width, height)
+
+  that.width = w;
+  that.height = h;
+  that.canvas.width =  w * CEL.pixelRatio;
+  that.canvas.height = h * CEL.pixelRatio;
 
   if (!that.offscreen) {
-    that.canvas.style.width = `${width}px`
-    that.canvas.style.height = `${height}px`
+    that.canvas.style.width = `${w}px`
+    that.canvas.style.height = `${h}px`
   }
 
   if (ratio && that.contextType === "2d" && CEL.pixelRatio !== 1) {

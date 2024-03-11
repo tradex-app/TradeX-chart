@@ -94,7 +94,9 @@ export default class ScaleBar extends Component {
   set rangeYFactor(f) { this.core.range.yFactor(f) }
   set yOffset(o) { this.#yAxis.offset = o }
   get yOffset() { return this.#yAxis.offset }
+  get scale() { return this }
   get Scale() { return this }
+
 
   start() {
     const range = (this.parent.name == "Chart" ) ? 

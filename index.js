@@ -224,6 +224,7 @@ const config1 = {
     indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
   }
 }
+window.config1 = config1
 const config2 = {
   id: "TradeX_test",
   title: "TEST/USDT",
@@ -275,6 +276,8 @@ const config2 = {
   state: state2,
   progress: {loading:{}}
 }
+window.config2 = config2
+
 const config3 = {
   id: "TradeX_Blue",
   title: "BTC/USDT",
@@ -369,6 +372,8 @@ const config3 = {
 
   }
 }
+window.config3 = config3
+
 const config4 = {
   id: "TradeX_test",
   title: "FUN/USDT",
@@ -432,6 +437,8 @@ const config4 = {
   wasm: wasm,
   state: state4
 }
+window.config4 = config4
+
 const config5 = {
   id: "Midnight",
   title: "ETH/USDT",
@@ -440,7 +447,7 @@ const config5 = {
   // height: 800,
   utils: {},
   tools: {},
-  timeFrame: "5m",
+  timeFrame: "1m",
   range: {
     startTS: rangeStartTS,
   },
@@ -532,6 +539,8 @@ const config5 = {
   talib: talib,
   wasm: wasm,
 }
+window.config5 = config5
+
 const config6 = {
   id: "Midnight",
   title: "BTC/USDT",
@@ -630,6 +639,8 @@ const config6 = {
   wasm: wasm,
   state: state1_5b
 }
+window.config6 = config6
+
 const config7 = {
   // id: "TradeX_test",
   title: "BTC/USDT",
@@ -708,6 +719,8 @@ const config7 = {
     indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
   }
 }
+window.config7 = config7
+
 const config8 = {
   // id: "TradeX_test",
   title: "IMPT/USDT",
@@ -786,6 +799,8 @@ const config8 = {
     indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
   }
 }
+window.config8 = config8
+
 const dre =   {
   id: "Midnight",
   title: "BTC/USDT",
@@ -930,9 +945,9 @@ const dre =   {
 
 const configs = [
   {config: config1, stream: null},
-  {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
   {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
-  {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
   {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
   {config: config6, stream: null},
   {config: config8, stream: null},

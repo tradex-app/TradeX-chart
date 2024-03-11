@@ -454,7 +454,8 @@ export default class Chart extends Component{
    * @param {number} h 
    */
   setHeight(h) {
-    if (!isNumber(h)) h = this.height || this.parent.height;
+    if (!isNumber(h)) h = this.height || this.core.MainPane.rowsH;
+    if (h > this.core.MainPane.rowsH) h = this.core.MainPane.rowsH
 
     this.#elTarget.style.height = `${h}px`;
     this.#elScale.style.height = `${h}px`;
@@ -464,9 +465,9 @@ export default class Chart extends Component{
     this.Divider?.setWidth()
   }
 
-  setWidth(w) {
+  // setWidth(w) {
 
-  }
+  // }
 
   /**
    * Set chart dimensions
@@ -847,24 +848,24 @@ export default class Chart extends Component{
 
     if (prev === null) return {active: null, prev: null}
 
+      let activeHeight = this.element.clientHeight
     const rowMinH = this.core.MainPane.rowMinH
-    const activeHeight = this.element.clientHeight
     const prevHeight = prev.element.clientHeight
     const total = activeHeight + prevHeight
-    let yDelta, activeH, prevH;
+      let yDelta, activeH, prevH;
 
+    // set bounds on pane height
     if (isNumber(height) && height > rowMinH) {
       activeH = height
     }
     // height is undefined
     else {
       yDelta = this.core.MainPane.cursorPos[5]
-      if (activeHeight - yDelta < rowMinH)
-        yDelta = rowMinH - (activeHeight - yDelta)
-
       activeH = activeHeight - yDelta
-      prevH  = prevHeight + yDelta
+      activeH = limit(activeH, rowMinH, total - rowMinH)
+      prevH  = total - activeH
     }
+
     active.setDimensions({w:undefined, h:activeH})
     prev.setDimensions({w:undefined, h:prevH})
     active.Divider.setPos()

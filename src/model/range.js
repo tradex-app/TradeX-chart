@@ -2,7 +2,7 @@
 
 import TradeXchart from "../core"
 import { ms2Interval } from "../utils/time"
-import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS, INTITIALCNT } from "../definitions/chart"
+import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS, INTITIALCNT, DEFAULT_TIMEFRAME } from "../definitions/chart"
 import { isInteger, isNumber, isObject, isString } from "../utils/typeChecks"
 import { bRound, limit } from "../utils/number"
 import { TimeData } from "../utils/time"
@@ -11,13 +11,17 @@ import { TimeData } from "../utils/time"
 
 export class Range {
 
+  #core
+  #worker
+  #init = true
+  #indexed = false
   #interval = DEFAULT_TIMEFRAMEMS
-  #intervalStr = "1s"
+  #intervalStr = DEFAULT_TIMEFRAME
   indexStart = 0
   indexEnd = LIMITFUTURE
   valueMin = 0
-  valueMax = 0
-  valueDiff = 0
+  valueMax = 1
+  valueDiff = 1
   volumeMin = 0
   volumeMax = 0
   volumeDiff = 0
@@ -30,13 +34,13 @@ export class Range {
   #limitFuture = LIMITFUTURE
   #limitPast = LIMITPAST
   #minCandles = MINCANDLES
-  #maxCandles = MAXCANDLES
+  #maxCandles = 
+      this.#core?.MainPane?.graph?.width || 
+      this.#core?.parentElement.clientWidth || 
+      MAXCANDLES;
   #yAxisBounds = YAXIS_BOUNDS
   anchor
-  #core
-  #worker
-  #init = true
-  #indexed = false
+
 
   /**
    * Creates an instance of Range.
@@ -52,8 +56,22 @@ export class Range {
     this.#init = true;
     this.setConfig(config)
     this.#core = config.core;
-    start = (isInteger(start)) ? start : 0
-    end = (isInteger(end)) ? end : this.data.length-1
+
+    // initial range length
+    this.#initialCnt = 
+      this.#core.config?.range?.initialCnt || 
+      config.data?.initialCnt ||
+      this.#initialCnt;
+
+    // start sanity check
+    if (!isInteger(start) || this.isPastLimit(start))
+      start = this.data.length - this.#initialCnt
+    // end sanity check
+    if (!isInteger(end) || this.isFutureLimit(end))
+      end = this.data.length
+    // range length sanity check
+    if (end - start > this.#maxCandles)
+      end = end - ((end - start) - this.#maxCandles)
 
     const MaxMinPriceVolStr = `
     (input) => {
@@ -67,9 +85,9 @@ export class Range {
 
     // no data - use provided time frame / interval
     if (this.data.length == 0) {
-      let ts = Date.now()
-      start = 0
-      end = this.rangeLimit
+      let ts = Date.now();
+      start = this.rangeLimit * -2
+      end = this.rangeLimit * 2
       this.#interval = tf
       this.#intervalStr = ms2Interval(this.interval)
       this.anchor = ts - (ts % tf) // - (this.limitPast * this.#interval)
@@ -93,9 +111,9 @@ export class Range {
     this.set(start, end)
   }
 
-  get allData () { return this.#core.allData }
+  get allData () { return this.#core?.allData }
   get data () { return this.allData?.data || [] }
-  get dataLength () { return (this.allData?.data.length == 0) ? 0 : this.allData.data.length - 1 }
+  get dataLength () { return (!!this.allData?.data.length) ? this.allData.data.length - 1 : 0 }
   get Length () { return this.indexEnd - this.indexStart }
   get timeDuration () { return this.timeFinish - this.timeStart }
   get timeMin () { return this.value(this.indexStart)[0] }
@@ -107,6 +125,8 @@ export class Range {
   get interval () { return this.#interval }
   set intervalStr (i) { this.#intervalStr = i }
   get intervalStr () { return this.#intervalStr }
+  get timeFrame () { return this.#intervalStr }
+  get timeFrameMS () { return this.#interval }
   get indexed () { return this.#indexed }
   get pastLimitIndex () { return this.limitPast * -1 }
   get futureLimitIndex () { return this.dataLength + this.limitFuture - 1 }
@@ -149,7 +169,7 @@ export class Range {
     start = start | 0
     end = end | 0
     max = max | 0
-    max = limit( max, this.minCandles, MAXCANDLES )
+    max = limit( max, this.minCandles, this.maxCandles )
 
     // check and correct start and end argument order
     if (start > end) [start, end] = [end, start]
@@ -522,7 +542,7 @@ export function detectInterval(ohlcv) {
 export function calcTimeIndex(time, timeStamp) {
   if (!(time instanceof TimeData)) return false
 
-  const data = time.range.data
+  const data = time.range.data || []
   const len = data.length
 
   if (!isInteger(timeStamp)) {

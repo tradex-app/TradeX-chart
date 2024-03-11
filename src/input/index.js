@@ -23,17 +23,14 @@ export default class Input  {
   #options
   #element
   #eventsAgent
+  #status
+  #listeners = []
   #pointer = null
   #key = null
   #touch = null
   #isTouch
-
-  #status
   #isPan = false
-  #panX
-  #panY
   #wheelDelta
-
   pad = {left: false}
 
   constructor (element, options) {
@@ -88,12 +85,14 @@ export default class Input  {
   get element() { return this.#element }
   get isTouch() { return this.#isTouch }
   get isPan() { return this.#isPan }
-  set panX(x) { if (isBoolean(x)) this.#panX = x }
-  set panY(x) { if (isBoolean(y)) this.#panY = y }
   set wheeldelta(w) { this.#wheelDelta = w.delta }
   get wheeldelta() { return this.#wheelDelta }
 
   destroy() {
+
+    for (let l of this.#listeners) {
+      this.off(l.event, l.handler, l.options)
+    }
     this.#eventsAgent.destroy()
     this.#pointer = undefined
     this.#key = undefined
@@ -116,19 +115,30 @@ export default class Input  {
     if (this.pointer.has(event)) this.#pointer.on(event, handler, options, once)
     else if (this.touch.has(event)) this.#touch.on(event, handler, options, once)
     else if (this.key.has(event)) this.#key.on(event, handler, options, once)
-    else this.element.addEventListener(event, handler, this.validOptions(options))
+    else this.#element.addEventListener(event, handler, this.validOptions(options))
+    this.#listeners.push({event, handler, options})
   }
 
   off (event, handler, options) {
     if (this.#pointer?.has(event)) this.#pointer.off(event, handler, options)
     else if (this.#touch?.has(event)) this.#touch.off(event, handler, options)
     else if (this.#key?.has(event)) this.#key.off(event, handler, options)
-    else this.element.removeEventListener(event, handler, this.validOptions(options))
+    else this.#element.removeEventListener(event, handler, this.validOptions(options))
+
+    for (let l of this.#listeners) {
+      if (l.event === event &&
+          l.handler === handler &&
+          l.options === options) {
+            let i = this.#listeners.indexOf(l)
+            this.#listeners.splice(i, 1)
+          }
+    }
   }
 
   once (event, handler, options) {
     this.on(event, handler, options, true)
   }
+
 /*
   invoke (agent, eventName, args) {
     this.currentAgent = agent;

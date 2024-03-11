@@ -189,7 +189,7 @@ export default class MainPane extends Component {
     this.#Time = new Timeline(this.core, options)
 
     // register chart views
-    this.registerChartViews(options)
+    this.registerChartPanes(options)
 
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE
     this.#rowMinH = isNumber(this.config.rowMinH)? this.config.rowMinH : ROWMINHEIGHT
@@ -243,45 +243,62 @@ export default class MainPane extends Component {
   }
 
   destroy() {
-    // remove all listeners
-    this.core.hub.expunge(this)
-    this.renderLoop.stop()
-
     this.#destruction = true
+    this.renderLoop.stop()
     this.stateMachine.destroy()
-    this.#Time.destroy()
     this.#ChartPanes.forEach((chartPane, key) => {
-      this.#chartDeleteList[key] = true
-      chartPane.destroy()
+      chartPane.remove()
       delete this.#chartDeleteList[key]
     })
     this.graph.destroy();
+    // remove all listeners
+    this.core.hub.expunge(this)
     this.#input.destroy()
 
-    // this.element.remove
+    this.stateMachine = null
+    this.graph = null
   }
 
+  /**
+   * Remove any indicators
+   */
   reset() {
-    for (let p in this.core.Indicators) {
-      for (let i in this.core.Indicators[p]) {
-        this.core.Indicators[p][i].instance.remove()
+    let panes = this.core.Indicators,
+        indicator;
+    for (let p in panes) {
+      indicator = panes[p]
+      for (let i in indicator) {
+        indicator[i].instance.remove()
       }
     }
+    // this.setDimensions()
   }
 
+  /**
+   * restart chart with current State
+   */
   restart() {
     this.chart.scale.restart()
 
-    this.validateIndicators()
+    // check if indicators need to be added
+    const ind = this.getIndicators()
+      let cnt = 0
+    for (let r in ind) {
+      if (isObject(ind[r]) && Object.keys(ind[r]).length > 0)
+      cnt += Object.keys(ind[r]).length
+    }
+    if (cnt == 0) {
+      this.validateIndicators()
 
-    for (let [k,v] of this.views) {
-      for (let i of v) {
-        if (k === "primary" && i.type === "candles") continue
-        this.addIndicator(i.type, i.name, {data: i.data, settings: i.settings})
+      for (let [k,v] of this.views) {
+        for (let i of v) {
+          if (Object.keys(this.core.indicatorClasses).includes(i.type))
+          this.addIndicator(i.type, i.name, {data: i.data, settings: i.settings})
+        }
       }
     }
 
-    this.draw(this.range, true)
+    // this.setDimensions()
   }
 
   eventsListen() {
@@ -547,7 +564,7 @@ export default class MainPane extends Component {
     }
     else {
       this.#ChartPanes.forEach((chartPane, key) => {
-        chartH = Math.round(chartPane.viewport.height * resizeH)
+        chartH = Math.round(chartPane.element.height * resizeH)
         chartPane.setDimensions({w: width, h: chartH})
       })
     }
@@ -563,7 +580,11 @@ export default class MainPane extends Component {
     return w - r
   }
 
-  registerChartViews(options) {
+  /**
+   * 
+   * @param {object} options 
+   */
+  registerChartPanes(options) {
     this.#elRows.previousDimensions()
 
     const primaryPane = this.validateIndicators()
@@ -642,7 +663,7 @@ export default class MainPane extends Component {
     options.elements.elTarget = row
     options.elements.elScale = axis
 
-    // instantiate the indicator
+    // instantiate the chart pane
     let o
     if (options.type == "primary") {
       // options.id
@@ -670,11 +691,11 @@ export default class MainPane extends Component {
   removeChartPane(paneID) {
     if (!isString(paneID) ||
         !this.#ChartPanes.has(paneID) ||
-        this.#chartDeleteList[paneID]
+        paneID in this.#chartDeleteList
     ) return false
 
     const chartPane = this.#ChartPanes.get(paneID)
-    if (chartPane.isPrimary) {
+    if (chartPane.isPrimary && !this.#destruction) {
       this.core.error(`Cannot remove primary chart pane! ${paneID}`)
       return false
     }

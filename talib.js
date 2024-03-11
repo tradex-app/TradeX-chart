@@ -7,7 +7,7 @@ const wasm = "./node_modules/talib-web/lib/talib.wasm"
  * main
  * @async
  */
-async function main() {
+async function main(talib, wasm, data) {
   try {
     await talib.init(wasm);
     const inReal = []
@@ -17,14 +17,20 @@ async function main() {
       if (i++ > 9)
        inReal.push(v[4])
     }
-
-    const result = talib.BBANDS({inReal: inReal, timePeriod: 20})
-
+    console.time()
+    const result = talib.BBANDS({inReal: inReal, timePeriod: 20, startIdx: 0, endIndex: 29})
+    console.timeEnd()
     document.write(JSON.stringify(result))
+    console.log(result)
 
   } catch (e) {
     console.error(e)
   }
 };
 
-await main()
+(async (talib, wasm, data) => {
+  await main(talib, wasm, data)
+})(talib, wasm, data)
+
+
+

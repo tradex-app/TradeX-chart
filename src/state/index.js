@@ -2,16 +2,18 @@
 // Data state management for the entire chart component library thingy
 
 import * as packageJSON from '../../package.json'
-import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
+import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString } from '../utils/typeChecks'
 import Dataset from '../model/dataset'
 import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
 import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual } from '../utils/utilities'
 import { calcTimeIndex, detectInterval } from '../model/range'
-import { ms2Interval, SECOND_MS } from '../utils/time'
-import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS } from '../definitions/chart'
+import { ms2Interval, interval2MS, SECOND_MS } from '../utils/time'
+import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT } from '../definitions/chart'
 import { SHORTNAME } from '../definitions/core'
 import TradeXchart from '../core'
 import Indicator from '../components/overlays/indicator'
+import Stream from '../helpers/stream'
+import MainPane from '../components/main'
 
 const DEFAULTSTATEID = "defaultState"
 const DEFAULT_STATE = {
@@ -27,8 +29,6 @@ const DEFAULT_STATE = {
     indexed: false,
     data: [],
     settings: {},
-    tf: DEFAULT_TIMEFRAME,
-    tfms: DEFAULT_TIMEFRAMEMS
   },
   ohlcv: [],
   views: [],
@@ -41,7 +41,12 @@ const DEFAULT_STATE = {
     displayInfo: true
   },
   events: {},
-  annotations: {}
+  annotations: {},
+  range: {
+    timeFrame: DEFAULT_TIMEFRAME,
+    timeFrameMS: DEFAULT_TIMEFRAMEMS,
+    initialCnt: INTITIALCNT
+  }
 }
 const TRADE = {
   timestamp: "number",
@@ -103,17 +108,35 @@ export default class State {
 
     state.chart.isEmpty = (state.chart.data.length == 0) ? true : false
 
-    if (!isNumber(state.chart?.tf) || deepValidate) {
-      let tfms = detectInterval(state.chart.data)
-      // this SHOULD never happen, 
-      // but there are limits to fixing broken data sent to chart
-      if (tfms < SECOND_MS) tfms = DEFAULT_TIMEFRAMEMS
-      state.chart.tfms = tfms
-    }
-    
-    if (!isString(state.chart?.tfms) || deepValidate)
-      state.chart.tf = ms2Interval(state.chart.tfms)
-    
+    // validate range
+    if (!isObject(state.range)) state.range = {}
+
+    let tfms = detectInterval(state.chart.data)
+
+    if (tfms < SECOND_MS || tfms === Infinity) tfms = DEFAULT_TIMEFRAMEMS
+
+    if ((state.chart.isEmpty ||
+        state.chart.data.length == 1) && 
+        !isInteger(state.range?.timeFrameMS) &&
+        !isString(state.range?.timeFrame))
+      state.range.timeFrameMS = tfms
+
+    else 
+    if ((state.chart.isEmpty ||
+        state.chart.data.length == 1) && 
+        !isInteger(state.range?.timeFrameMS) &&
+        isString(state.range?.timeFrame))
+      state.range.timeFrameMS = interval2MS(state.range.timeFrame)
+
+    else
+    if (!state.chart.isEmpty && 
+        state.chart.data.length > 1 &&
+        state.range?.timeFrameMS !== tfms)
+      state.range.timeFrameMS = tfms
+
+    state.range.timeFrame = ms2Interval(state.range.timeFrameMS)
+
+
     if (!isArray(state.views)) {
       state.views = defaultState.views
     }
@@ -182,7 +205,7 @@ export default class State {
     // Init dataset proxies
     for (var ds of state.datasets) {
       if (!this.#dss) this.#dss = {}
-      this.dss[ds.id] = new Dataset(this, ds)
+      this.#dss[ds.id] = new Dataset(this, ds)
     }
 
     return state
@@ -276,7 +299,7 @@ export default class State {
   }
   get data() { return this.#data }
   get core() { return (this.#core !== undefined) ? this.#core : false }
-  get time() { return this.#core.time }
+  get time() { return this.#core.timeData }
   get range() { return this.#core.range }
   
   error(e) { this.#core.error(e) }
@@ -340,9 +363,11 @@ export default class State {
     if (key === this.key) return true
     
     // stop any streams
-    core.stream.stop()
-    // clean up panes
-    core.MainPane.reset()
+    if (core.stream instanceof Stream)
+      core.stream.stop()
+    // clean up panes - remove indicators
+    // if (isFunction(core.MainPane.reset))
+      core.MainPane.reset()
     // set chart to use state
     let source = State.get(key)
     this.#id = source.id
@@ -352,27 +377,18 @@ export default class State {
     this.#data = source.data
 
     // create new Range
+    const chart = source.data.chart
     const rangeConfig = {
-      interval: source.data.chart.tfms,
+      interval: chart?.tfms,
       core
     }
-    core.getRange(null, null, rangeConfig)
+    const start = chart?.startTS
+    const end = chart?.endTS
+    core.getRange(start, end, rangeConfig)
 
-    // set Range
-    if (this.range.Length > 1) {
-      const rangeStart = calcTimeIndex(core.time, undefined)
-      const end = (rangeStart) ? 
-        rangeStart + this.range.initialCnt :
-        source.data.length - 1
-      const start = (rangeStart) ? 
-        rangeStart : 
-        end - this.range.initialCnt
-      this.range.initialCnt = end - start
-      core.setRange(start, end)
-    }
-
-    // rebuild chart
-    core.MainPane.restart()
+    // // rebuild chart - add any indicators found in the new state
+    // if (isFunction(core.MainPane.restart))
+    //   core.MainPane.restart()
 
     core.refresh()
   }

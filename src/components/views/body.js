@@ -195,6 +195,7 @@ export default class tradeXBody extends element {
         this.tools.style.left = 0;
         this.tools.style.right = undefined;
         this.tools.style.width =`${TOOLSW}px`;
+        this.main.rows.style.left = 0
         break;
     }
     this.setYAxisLocation()

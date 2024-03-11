@@ -741,7 +741,8 @@ export default class Indicator extends Overlay {
  * @returns {boolean} - success or failure
  */
   calcIndicator (indicator, params={}, range=this.range) {
-    if (!isString(indicator) ||
+    if (this.chart.status == 'destroyed' ||
+        !isString(indicator) ||
         !(indicator in this.TALib) ||
         !isObject(range) ||
         !this.core.TALibReady
@@ -870,7 +871,8 @@ export default class Indicator extends Overlay {
    * @returns {array} - indicator data entry
    */
   calcIndicatorStream (indicator, params, range=this.range) {
-    if (!this.core.TALibReady ||
+    if (this.chart.status == 'destroyed' ||
+        !this.core.TALibReady ||
         !isString(indicator) ||
         !(indicator in this.TALib) ||
         !(range instanceof Range) ||

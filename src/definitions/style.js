@@ -344,7 +344,7 @@ export const defaultTheme = {
 }
 
 export const cssVars = `
-<style title="txc_CSSVars">
+<style id="txc_CSSVars">
   --txc-background: #141414:
   --txc-border-color: #888;
   --txc-time-scrollbar-color: #888;
@@ -357,8 +357,9 @@ export const cssVars = `
 </style>`
 
 const style = `
-<style>
+<style id="txc_globalCSS">
   tradex-chart {
+    content-visibility: auto;
     display: flex;
     width: var(--txc-width, 100%);
     height: var(--txc-height, 100%);

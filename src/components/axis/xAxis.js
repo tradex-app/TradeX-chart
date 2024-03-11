@@ -27,7 +27,7 @@ export default class xAxis extends Axis {
   }
 
   get range() { return this.parent.range }
-  get width() { return this.parent.width }
+  get width() { return this.core.MainPane.width } // this.parent.width }
   get interval() { return this.range.interval }
   get intervalStr() { return this.range.intervalStr }
   get timeStart() { return this.range.timeStart }
