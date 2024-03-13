@@ -30,9 +30,10 @@ const right = `
   tradex-main {
     position: absolute; 
     top: 0;
-    right: 0;
+    right: ${SCALEW}px;
     width: calc(100% - ${TOOLSW}px);
     height: 100%;
+    min-height: 100%; 
   }
   tradex-scale {
     position: absolute; 
@@ -40,64 +41,7 @@ const right = `
     right: 0; 
     width: ${SCALEW}px; 
     height: 100%;
-  }
-</style>
-<tradex-tools></tradex-tools>
-<tradex-main></tradex-main>
-<tradex-scale></tradex-scale>
-`
-
-const left = `
-<style>
-  tradex-tools {
-    position: absolute; 
-    top: 0; left: 0;
-    width: ${TOOLSW}px;
-    height: 100%; 
     min-height: 100%; 
-  }
-  tradex-main {
-    position: absolute; 
-    top: 0;
-    right: 0;
-    width: calc(100% - ${TOOLSW}px);
-    height: 100%;
-  }
-  tradex-scale {
-    position: absolute; 
-    top: 1px; 
-    left: ${SCALEW}px; 
-    width: ${SCALEW}px; 
-    height: 100%;
-  }
-</style>
-<tradex-tools></tradex-tools>
-<tradex-scale></tradex-scale>
-<tradex-main></tradex-main>
-`
-
-const both = `
-<style>
-  tradex-tools {
-    position: absolute; 
-    top: 0; left: 0;
-    width: ${TOOLSW}px;
-    height: 100%; 
-    min-height: 100%; 
-  }
-  tradex-main {
-    position: absolute; 
-    top: 0;
-    right: 0;
-    width: calc(100% - ${TOOLSW}px);
-    height: 100%;
-  }
-  tradex-scale {
-    position: absolute; 
-    top: 1px;
-    right: 0; 
-    width: ${SCALEW}px; 
-    height: 100%;
   }
 </style>
 <tradex-tools></tradex-tools>
@@ -106,7 +50,7 @@ const both = `
 `
 
 const template = document.createElement('template')
-const locations = { left, right, both }
+// const locations = { left, right, both }
 template.innerHTML = right
 
 export default class tradeXBody extends element {
@@ -137,6 +81,9 @@ export default class tradeXBody extends element {
   get tools() { return this.#elTools }
   get main() { return this.#elMain }
   get scale() { return this.#elScale }
+  get scaleW() { return this.#elScale.width || this.#theme?.scale?.width || SCALEW }
+  get toolsW() { return this.#elTools.width || this.#theme?.tools?.width || TOOLSW }
+
 
   start(theme) {
     this.#theme = theme
@@ -144,32 +91,31 @@ export default class tradeXBody extends element {
   }
 
   setYAxisLocation(side=this.#theme?.yAxis?.location) {
-    let toolsW = (isNumber(this.#theme?.tools?.width)) ? this.#theme.tools.width : TOOLSW
-    let offset
+    let scaleW = this.scaleW
+    let toolsW = (this.#theme?.tools?.location == "none") ? 0 : this.toolsW
 
     switch (side) {
       case "left":
-        offset = (toolsW == 0) ? 0 : SCALEW
         this.scale.style.left = `${toolsW}px`
         this.scale.style.right = undefined
-        this.main.style.left = undefined
-        this.main.style.right = `-${offset}px`
-        this.main.style.width = `calc(100% - ${toolsW}px)`
+        this.main.style.left = `${scaleW + toolsW}px`
+        this.main.style.right = undefined
+        this.main.style.width = `calc(100% - ${scaleW + toolsW}px)`
         break;
       case "both":
       case "right":
       default:
-        offset = (toolsW == 0) ? SCALEW : 0
         this.scale.style.left = undefined
         this.scale.style.right = 0
-        this.main.style.left = undefined
-        this.main.style.right = `${offset}px`
-        this.main.style.width = `calc(100% - ${toolsW}px)`
+        this.main.style.left = `${toolsW}px`
+        this.main.style.right = undefined
+        this.main.style.width = `calc(100% - ${scaleW + toolsW}px)`
         break;
     }
   }
 
   setToolsLocation(side=this.#theme?.tools?.location) {
+    let toolsW = this.toolsW
     this.#theme.tools = this.#theme.tools || {}
     switch(side) {
       case "none":
@@ -181,21 +127,20 @@ export default class tradeXBody extends element {
         break;
       case "right":
         this.#theme.tools.location = "right"
-        this.#theme.tools.width = this.#theme?.tools?.width || TOOLSW
+        this.#theme.tools.width = toolsW
         this.tools.style.display = "block"
         this.tools.style.left = undefined;
         this.tools.style.right = 0;
-        this.tools.style.width =`${TOOLSW}px`;
+        this.tools.style.width =`${toolsW}px`;
         break;
       case "left":
       default:
         this.#theme.tools.location = "left"
-        this.#theme.tools.width = this.#theme?.tools?.width || TOOLSW
+        this.#theme.tools.width = toolsW
         this.tools.style.display = "block"
         this.tools.style.left = 0;
         this.tools.style.right = undefined;
-        this.tools.style.width =`${TOOLSW}px`;
-        this.main.rows.style.left = 0
+        this.tools.style.width =`${toolsW}px`;
         break;
     }
     this.setYAxisLocation()

@@ -182,7 +182,7 @@ export default class MainPane extends Component {
     if ( this.core.theme?.time?.navigation === false ) {
       const timeHeight = { height: TIMESCALEH }
       this.core.theme.time = {...this.core.theme?.time, ...timeHeight}
-      this.#elRows.style.height = `calc(100% - ${TIMESCALEH}px)`
+      // this.#elRows.style.height = `calc(100% - ${TIMESCALEH}px)`
     }
 
     // register timeline - xAxis
@@ -337,9 +337,9 @@ export default class MainPane extends Component {
     if (this.#scaleWOld < this.#scaleW) {
       const width = `${this.#scaleW}px`
       this.core.elBody.scale.style.width = width
-      this.#elViewport.style.width = `calc(100% - ${this.#scaleW}px)`
-      this.#elRows.style.width = `calc(100% - ${this.#scaleW}px)`
-      this.#elTime.style.width = `calc(100% - ${this.#scaleW}px)`
+      // this.#elViewport.style.width = `calc(100% - ${this.#scaleW}px)`
+      // this.#elRows.style.width = `calc(100% - ${this.#scaleW}px)`
+      // this.#elTime.style.width = `calc(100% - ${this.#scaleW}px)`
 
       this.setDimensions()
     }
@@ -675,9 +675,15 @@ export default class MainPane extends Component {
       options.shortName = options.view[0].type || "Secondary"
       o = new Chart(this.core, options);
     }
-    
-    this.setPaneDividers()
     this.#ChartPanes.set(o.id, o)
+
+    // check for sizing error
+    const tally = this.tallyChartHeights()
+    if (tally.height > this.#elMain.height) {
+      
+    }
+
+    this.setPaneDividers()
     this.emit("addChartView", o)
 
     return o
@@ -923,6 +929,16 @@ export default class MainPane extends Component {
     else return false
   }
 
+  tallyChartHeights() {
+    const panes = this.#ChartPanes.entries()
+    const heights = { panes: {}, tally: 0 }
+    for (let [key, value] of panes) {
+      heights.panes[key] = value
+      heights.tally += value.height
+    }
+    return heights
+  }
+
   calcChartPaneHeights() {
     // list of expanded panes excluding current
     const { collapsed: col, expanded: exp } = this.chartPanesState()
@@ -938,9 +954,7 @@ export default class MainPane extends Component {
     }
     else if (cnt === 2 || exp.length === 1) {
       // adjust chart size for first secondary chart pane
-      let height;
-      try { height = exp[0].viewport.height }
-      catch (e) { height = this.rowsH }
+      let height =  this.rowsH
       const newPane = Math.round(height * this.#viewDefaultH / 100)
       sizes[exp[0].id] = height - newPane
       sizes.new = newPane

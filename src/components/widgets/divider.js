@@ -176,10 +176,10 @@ export default class Divider {
   dividerNode() {
     let theme = this.#core.theme,
         top = this.#chartPane.pos.top - elementDimPos(this.#elDividers).top,
-      width = this.#core.elBody.width,
+      width = this.#core.elBody.width - this.#core.elBody.scale.width, //this.#core.elBody.width,
       height = (isNumber(this.config.dividerHeight)) ? 
         this.config.dividerHeight : DIVIDERHEIGHT,
-      left = theme.tools.width // this.#core.toolsW;
+      left = this.#core.elBody.tools.width; // theme.tools.width // 
       top -= (height / 2)
 
     switch(theme.tools.location) {
@@ -190,7 +190,7 @@ export default class Divider {
       default: break
     }
 
-    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: ${width}px; height: ${height}px; background: ${theme.divider.idle};`
+    const styleDivider = `position: absolute; top: ${top}px; left: ${left}px; z-index:100; width: 100%; height: ${height}px; background: ${theme.divider.idle};`
     const styleLine = `width: 100%; margin: 3.5px 0; border: 0; border-top: ${theme.divider.style} ${theme.divider.line};`
 
     const node = `
@@ -203,10 +203,12 @@ export default class Divider {
     let top = this.#chartPane.pos.top - elementDimPos(this.#elDividers).top;
         top = top - (this.height / 2) + 1
     this.#elDivider.style.top = `${top}px`
+    this.#elDivider.style.left = `${this.#core.elBody.tools.width}px`
   }
 
   setWidth() {
-    this.#elDivider.style.width = `${this.#core.MainPane.width}px`
+    this.#elDivider.style.width = `${this.#core.elMain.width + this.#core.elBody.scale.width}px`
+    this.#elDivider.style.left = `${this.#core.elBody.tools.width}px`
   }
 
   setCursorStyle(c) {

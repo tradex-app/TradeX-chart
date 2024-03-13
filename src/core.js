@@ -394,6 +394,8 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * let's start building the chart
+   * merges the provided config with a default 
+   * to fill in missing or required values
    * @param {Object} cfg - chart configuration
    */
   start(cfg) {
@@ -474,9 +476,6 @@ export default class TradeXchart extends Tradex_chart {
       this.#state.use( newState.key )
       delete txCfg.state
 
-      // this.#MainPane.element.style.right = "0px"
-      // this.#MainPane.element.style.width = "calc(100% - 0px)"
-      // this.#MainPane.elRows.style.left = "60px"
       this.#MainPane = new MainPane(this, txCfg)
       this.MainPane.start()
 
@@ -552,6 +551,14 @@ export default class TradeXchart extends Tradex_chart {
     this.refresh()
 
     this.log(`${this.#name} V${TradeXchart.version} configured and running...`)
+  }
+
+  /**
+   * alias of start()
+   * @param {Object} cfg - chart configuration
+   */
+  use(cfg) {
+    this.start(cfg)
   }
 
   /**

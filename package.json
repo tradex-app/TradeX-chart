@@ -16,7 +16,7 @@
     }
   },
   "private": false,
-  "version": "0.144.0",
+  "version": "0.145.0",
   "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",
