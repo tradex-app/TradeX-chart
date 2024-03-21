@@ -28,8 +28,11 @@ You can use `jsDelivr`, `unpkg` or others.
 
 ## Step 1.  Creating the Chart
 
-TradeX Chart is a custom HTML element. It must be created and inserted into the DOM.
-
+TradeX Chart is a custom HTML element, which can be used in your HTML like any other element.
+```html
+<tradex-chart></tradex-chart>
+```
+Or created and inserted into the DOM via JavaScript
 ```javascript
 import { Chart } from 'tradex-chart'
 
@@ -39,12 +42,13 @@ let mount = document.getElementByID("#mount")
     mount.appendChild(chart)
 ```
 
-## Step 2.  Configure and Start the Chart
 
-After the chart has mounted on the DOM, start it with a configuration object.
+## Step 2.  Configure the Chart
 
-```javascript
-chart.start(config)
-```
+When the chart has mounted on the DOM, will display as empty as it has no data.
 
 Without a configuration, the chart won't do anything useful, so you need define a few things. The [Configuration](../02_configuration) documentation will explain what options are available.
+
+```javascript
+chart.use(config)
+```

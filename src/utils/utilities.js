@@ -1,4 +1,5 @@
-import { isArray, isBoolean, isMap, isNumber, isObject, isString } from './typeChecks'
+import { isElement } from './DOM';
+import { isArray, isBoolean, isFunction, isMap, isNumber, isObject, isString } from './typeChecks'
 
 let _hasOwnProperty = Object.prototype.hasOwnProperty;
 

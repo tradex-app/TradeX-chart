@@ -40,10 +40,10 @@ export default class Widgets extends Component {
 
     for (let i in this.#widgets) {
       let widget = this.#widgets[i]
-      let entry = `el${widget.name}`
+      let entry = `${widget.type}`
           this.#elements[entry] = this.#elWidgetsG.querySelector(`.${widget.class}`)
           this.#elements[entry].innerHTML = `
-      <style title="${widget.name}">
+      <style title="${widget.type}">
         ${widget?.defaultStyles || ""}
       </style>
       `
@@ -112,7 +112,7 @@ export default class Widgets extends Component {
 
   onResize(dimensions) {
     this.setDimensions(dimensions)
-    this.elements.elDividers.style.width = `${this.core.width}px`
+    this.elements.divider.style.width = `${this.core.width}px`
   }
 
   mount(el) {

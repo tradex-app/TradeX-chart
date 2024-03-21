@@ -129,6 +129,27 @@ let state5 = {
     }
   ]
 }
+let state9 = {
+  "ohlcv": [
+
+  ],
+primary: [
+  {
+    "name": "SMA, 5",
+    "type": "SMA",
+    "data": [],
+    "settings": {timePeriod: 5}
+  }
+],
+"secondary": [
+  {
+    "name": "RSI, 20",
+    "type": "RSI",
+    "data": [],
+    "settings": {timePeriod: 20}
+  },
+]
+}
 
 // let rangeStartTS = 1558429200000 // 21/05/2019, 11:00:00 - 1 hour price
 // let rangeStartTS = 1663059600000 // seconds price
@@ -952,6 +973,9 @@ const configs = [
   {config: config6, stream: null},
   {config: config8, stream: null},
   // {config: config7, stream: null},
+  // {config: config9, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  // {config: config9, stream: (chart) => {livePrice_Binance(chart, "linkusdt", config9.timeFrame)}},
+  
   // {config: dre, stream: null},
 ]
 

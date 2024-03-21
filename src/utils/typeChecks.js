@@ -99,8 +99,16 @@ export function isError (v) {
  */
 export function isClass(v){
   // Class constructor is also a function
-  if(!(v && v.constructor === Function) || v.prototype === undefined)
+  if (!(v && v.constructor === Function) || v.prototype === undefined)
     return false;
+
+  // We have a function and not a class if arguments is a property name
+  if (Object.getOwnPropertyNames(v).includes('arguments'))
+    return false
+  
+  // This is a class that extends other class
+  if (Object.getOwnPropertyNames(v).includes('arguments'))
+    return false
   
   // This is a class that extends other class
   if (Object.getOwnPropertyNames(v).includes('arguments'))

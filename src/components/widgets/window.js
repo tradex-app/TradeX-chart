@@ -4,11 +4,11 @@
 
 // window.js
 
-import { elementDimPos, findBySelectorAll, getStyle, isElement, isVisible,  } from "../../utils/DOM"
+import { elementDimPos, getStyle, isElement, isVisible,  } from "../../utils/DOM"
 import { CLASS_WINDOWS, CLASS_WINDOW } from "../../definitions/core"
 import { WindowStyle } from "../../definitions/style"
 import { isArray, isFunction, isNumber, isObject, isString } from "../../utils/typeChecks"
-import { uid } from "../../utils/utilities"
+import { debounce, uid } from "../../utils/utilities"
 import { limit } from "../../utils/number"
 import Input from "../../input"
 
@@ -38,6 +38,7 @@ export default class Window {
   #elTitle
   #elCloseIcon
   #elContent
+  #elColourPicker
 
   #pos = {}
   #dims
@@ -51,12 +52,13 @@ export default class Window {
   #title = ""
   #content = ""
   #contentFields = {}
+  #params = {}
 
   static windowList = {}
   static windowCnt = 0
   static class = CLASS_WINDOWS
   static name = "Windows"
-  static type = "Window"
+  static type = "window"
   static currentActive = null
   static stylesInstalled = false
   static defaultStyles = `
@@ -122,10 +124,11 @@ export default class Window {
     this.#config = config
     this.#id = config.id
     this.#parent = config.parent
-    this.#elWindows = widgets.elements.elWindows
+    this.#elWindows = widgets.elements[config.type]
     this.#elWidgetsG = this.#core.elWidgetsG
     // insert element
-    this.mount(this.#elWindows)
+    const rootElement = widgets.elements[config.type]
+    this.mount(rootElement)
   }
 
   destroy() {
@@ -152,16 +155,19 @@ export default class Window {
   get elTitle() { return this.#elTitle }
   get elCloseIcon() { return this.#elCloseIcon }
   get elContent() { return this.#elContent }
+  get elColourPicker() { return this.#elColourPicker }
   get title() { return this.#title }
   set title(t) { this.setTitle(t) }
   get content() { return this.#content }
   set content(c) { this.setContent(c) }
   get contentFields() { return this.#contentFields }
+  set params(p) { if (isObject(p)) this.#params = {...this.#params, ...p} }
+  get params() { return this.#params }
 
   /**
    * set window title
    * @param {string} t 
-   * @returns {HTMLElement}
+   * @returns {string|boolean}
    */
   setTitle(t) {
     if (!isString(t)) return false
@@ -175,7 +181,7 @@ export default class Window {
    * set window content
    * @param {string} c - html content
    * @param {object} [m={}] - keys represent selector queries, entries are functions to execute upon matching elements
-   * @returns {HTMLElement}
+   * @returns {HTMLElement|boolean}
    */
   setContent(c, m={}) {
     if (!isString(c) ||
@@ -193,6 +199,7 @@ export default class Window {
     }
 
     this.#contentFields = this.allContentFields()
+    this.#elColourPicker = this.#elContent.querySelector("tradex-colourpicker")
 
     return this.#elContent
   }
@@ -264,9 +271,9 @@ export default class Window {
 
   onOutsideClickListener(e) {
     if (!this.#elWindow.contains(e.target) 
-    // && (!this.#config.primary.contains(e.target)) 
-    && isVisible(this.#elWindow)
-    && !this.#dragging) {
+        && isVisible(this.#elWindow)
+        && !this.#dragging) 
+    {
       let data = {
         target: e.currentTarget.id, 
         window: this.#id,
@@ -315,6 +322,7 @@ export default class Window {
     this.#elCloseIcon = this.#elWindow.querySelector(".closeIcon")
     this.#elContent = this.#elWindow.querySelector(".content")
     this.#contentFields = this.allContentFields()
+    this.#elColourPicker = this.#elContent.querySelector("tradex-colourpicker")
 
     this.#elWindow.addEventListener("click", this.onWindow.bind(this))
     if (isElement(this.#elDragBar)) {
@@ -534,12 +542,17 @@ export default class Window {
     return Window.destroy(this.id)
   }
 
-  // display the window
+  /**
+   * display the window
+   * @param {object} [data={}] - {title, content, dimensions, position, styles, params, offFocus}
+   */
   open(data={}) {
-    // if (!!this.isIndicator && !!this.#parent.isIndicator)
 
     if (Window.currentActive === this &&
         this.state === WinState.opened) return true
+    // pass in arbitrary data for child classes to use
+    if (isObject(data.params))
+      this.params = data.params
 
     this.setOpen()
     this.setProperties(data)
@@ -550,7 +563,16 @@ export default class Window {
       // click event outside of window
       this.#windowEvents.click = this.onOutsideClickListener.bind(this)
       document.addEventListener('click', this.#windowEvents.click)
-    }, data?.offFocus || 250)
+
+      if (!!this.#elColourPicker) {
+        // click event outside of window
+        // setTimeout(() => {
+        //   // this.#elWindow.addEventListener('click', this.#elColourPicker.onOutsideClickListener.bind(this.#elColourPicker))
+        //   this.#elWindow.addEventListener('click', debounce(this.#elColourPicker.onOutsideClickListener, 250, this.#elColourPicker, true))
+
+        // }, 250)
+      }
+    }, 250)
 
     return true
   }

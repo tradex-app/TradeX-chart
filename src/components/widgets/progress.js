@@ -59,7 +59,7 @@ export default class Progress {
     this.#core = config.core
     this.#config = config
     this.#id = config.id
-    this.#elProgress = widgets.elements.elProgress
+    this.#elProgress = widgets.elements[Progress.type]
     this.#elWidgetsG = this.#core.elWidgetsG
     this.init()
   }

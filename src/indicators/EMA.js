@@ -32,10 +32,14 @@ import { EMA as talibAPI } from "../definitions/talib-api";
           min: '3',
           title: `Number of time units to use in calculation`,
           $function:
-            this.configDialogue.provideEventListener("#Period", "change", 
-            (e)=>{
+            this.configDialogue.provideEventListeners("#Period", 
+            [{
+              event: "change", 
+              fn: (e)=>{
               console.log(`#Period = ${e.target.value}`)
-            })
+              }
+            }]
+          )
         }
       }
     }

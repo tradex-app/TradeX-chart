@@ -27,7 +27,7 @@ export default class Menu {
   static menuCnt = 0
   static class = CLASS_MENUS
   static name = "Menus"
-  static type = "Menu"
+  static type = "menu"
   static currentActive
 
   static create(widgets, config) {
@@ -53,7 +53,7 @@ export default class Menu {
     this.#core = config.core
     this.#config = config
     this.#id = config.id
-    this.#elMenus = widgets.elements.elMenus
+    this.#elMenus = widgets.elements[Menu.type]
     this.#elWidgetsG = this.#core.elWidgetsG
     // insert element
     this.mount(this.#elMenus)

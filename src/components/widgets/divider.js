@@ -28,7 +28,7 @@ export default class Divider {
   static divideCnt = 0
   static class = CLASS_DIVIDERS
   static name = "Dividers"
-  static type = "Divider"
+  static type = "divider"
 
   static create(widgets, config) {
 
@@ -68,7 +68,7 @@ export default class Divider {
     this.#theme = cfg.core.theme
     this.#id = cfg.id
     this.#chartPane = cfg.chartPane
-    this.#elDividers = widgets.elements.elDividers
+    this.#elDividers = widgets.elements[Divider.type]
     this.init()
   }
 

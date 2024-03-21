@@ -8,7 +8,7 @@ import { uid } from "../../utils/utilities";
 export default class ColourPicker extends Dialogue {
 
   static name = "ColourPicker"
-  static type = "ColourPicker"
+  static type = "colourPicker"
   static class = "tradeXcolourPicker"
 
   static defaultStyles = `
@@ -28,18 +28,17 @@ export default class ColourPicker extends Dialogue {
 
     config.dragBar = true
     config.close = true
-    config.type = Dialogue.type
+    config.type = ColourPicker.type
     config.class = "picker"
     config.id = uid("picker")
 
-    return new Dialogue(widgets, config)
+    return new ColourPicker(widgets, config)
   }
 
   static defaultNode() {
     const windowStyle = ``
     const node = `
       <div slot="widget" class="tradeXcolourPicker" style="${windowStyle}">
-        <tradex-colourpicker></tradex-colourpicker>
       </div>
     `
     
@@ -47,6 +46,7 @@ export default class ColourPicker extends Dialogue {
   }
 
   #update = true
+  #elColourPicker
 
   constructor(widgets, config) {
     super(widgets, config)
@@ -58,4 +58,20 @@ export default class ColourPicker extends Dialogue {
 
   set update(u) { this.#update = !!u }
   get update() { return this.#update }
+  get elColourPicker() { return this.#elColourPicker }
+
+  start() {
+    // this.elContent.innerHTML = `<tradex-colourpicker></tradex-colourpicker>`
+
+    const element = document.createElement("tradex-colourpicker")
+    // element.classList.add(type)
+    this.elContent.appendChild(element)
+    this.#elColourPicker = element
+  }
+
+  open(data={}) {
+    this.#elColourPicker.colour = data?.params?.colour
+    super.open(data)
+  }
+
 }

@@ -10,6 +10,7 @@ import { debounce, idSanitize, uid } from "../../utils/utilities"
 import { STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
 import { WinState } from "../widgets/window"
+import { onClickOutside } from "../../utils/DOM"
 
 // const plotTypes = {
 //   area,
@@ -54,6 +55,7 @@ export default class Indicator extends Overlay {
   #legendID
   #status
   #ConfigDialogue
+  #ColourPicker
 
   definition = {
     input: {},
@@ -71,7 +73,7 @@ export default class Indicator extends Overlay {
 
     const overlay = params.overlay
 
-    this.#cnt_ = Overlay.cnt
+    this.#cnt_ = Indicator.cnt
     this.#params = params
     this.#overlay = overlay
     this.#TALib = this.core.TALib
@@ -196,11 +198,15 @@ export default class Indicator extends Overlay {
     // terminate listeners
     this.core.hub.expunge(this)
 
-    // remove overlay from parent chart pane's graph
     this.chart.legend.remove(this.#legendID)
+
+    // remove overlay from parent chart pane's graph
     this.clear()
     this.core.MainPane.draw(undefined, true)
     this.chartPane.graph.removeOverlay(this.id)
+
+    // remove widgets
+    this.core.WidgetsG.delete(this.#ColourPicker.id)
 
     // execute parent class
     // delete data
@@ -331,7 +337,7 @@ export default class Indicator extends Overlay {
 //--- Config Settings ---
 
   onConfigDialogueOpen(d) {
-    console.log(`${this.id} Config Open`)
+    // console.log(`${this.id} Config Open`)
 
     if (this.#ConfigDialogue.state === WinState.opened) return
 
@@ -351,7 +357,7 @@ export default class Indicator extends Overlay {
   }
 
   onConfigDialogueSubmit(d) {
-    console.log(`${this.id} Config Submit`)
+    // console.log(`${this.id} Config Submit`)
 
     this.#ConfigDialogue.setClose()
     let r, calc = false;
@@ -390,11 +396,11 @@ export default class Indicator extends Overlay {
     this.setRefresh()
     this.draw()
 
-    console.log(`${this.id} Config Cancel`)
+    // console.log(`${this.id} Config Cancel`)
   }
 
   onConfigDialogueDefault(d) {
-    console.log(`${this.id} Config Default`)
+    // console.log(`${this.id} Config Default`)
 
     const fields = this.#ConfigDialogue.contentFields
 
@@ -433,7 +439,7 @@ export default class Indicator extends Overlay {
     }
     // execute default settings action
     this.core.log(`invokeSettings: ${this.id}`)
-    console.log(`invokeSettings: ${this.id}`, r)
+    // console.log(`invokeSettings: ${this.id}`, r)
 
     const cd = this.#ConfigDialogue
     if (cd.update) {
@@ -448,6 +454,8 @@ export default class Indicator extends Overlay {
       cd.setTitle(title)
       cd.setContent(html, modifiers)
       cd.update = false
+      // set up colour picker
+      this.#ColourPicker = cd.elContent.querySelector("tradex-colourpicker")
     }
     if (cd.state.name === "closed" ) cd.open()
     else cd.setOpen()
@@ -514,10 +522,14 @@ export default class Indicator extends Overlay {
           "data-default": define[i],
           "data-oldval": define[i],
           $function:
-          this.configDialogue.provideEventListener("#Period", "change", 
-            (e)=>{
-              console.log(`#Period = ${e.target.value}`)
-            })
+            this.configDialogue.provideEventListeners(`#${i}`, 
+            [{
+              event: "change", 
+              fn: (e)=>{
+                // console.log(`#${i} = ${e.target.value}`)
+              }
+            }]
+          )
         }
       }
     }
@@ -529,6 +541,47 @@ export default class Indicator extends Overlay {
 
   buildConfigStyleTab() {
     const style = {}
+    const change = {
+      event: "change", 
+      fn: (e)=>{
+        // console.log(`${e.target.id} = ${e.target.value}`)
+
+        this.style[e.target.id] = e.target.value
+        this.setRefresh()
+        this.draw()
+      }
+    }
+    const colour = {
+      event: "click", 
+      fn: (e)=>{
+        e.preventDefault()
+        // console.log(`Colour Picker: ${e.target.id} = ${e.target.value}`)
+        // if (this.core.MainPane.colourPicker.state === WinState.opened) return
+        // const picker = {params: {colour: e.target.value}}
+        // this.core.MainPane.colourPicker.open(picker)
+        // this.#ColourPicker.target = e.target
+        // this.#ColourPicker.colour = e.target.value
+        this.#ColourPicker.open(e.target.value, e.target) // .classList.toggle("active")
+        let x = e.target.offsetLeft - this.#ColourPicker.width // offsetWidth
+        let y = this.#ColourPicker.offsetTop - e.target.top // offsetTop
+        this.#ColourPicker.position(x, y, this.core)
+        // hide colour picker when pointer gives focus elsewhere
+
+      }
+    }
+    const over = {
+      event: "pointerover",
+      fn: (e) => {
+        e.target.style.border = "1px solid #f00;"
+      }
+    }
+    const out = {
+      event: "pointerout",
+      fn: (e) => {
+        e.target.style.border = "none;"
+      }
+    }
+    let listeners;
     for (let i in this?.style) {
       let d = ""
       let v = this.style[i]
@@ -538,24 +591,32 @@ export default class Indicator extends Overlay {
         case "number": 
           min = `0`
           d = v
+          listeners = [change]
           break;
         case "string":
           let c = new Colour(v);
-          type = (c.isValid)? "color" : ""
-          v = (c.isValid)? c.hex : v
+          type = (c.isValid)? "text" : ""
+          v = (c.isValid)? c.hexa : v
           d = v
+          listeners = [change, colour, over, out]
           break;
       }
-      const fn = this.configDialogue.provideEventListener( `#${i}`, "change",
-        (e)=>{
-          console.log(`${e.target.id} = ${e.target.value}`)
+      // element modifier function
+      const fn = (el) => {
+        this.configDialogue.provideInputColor(el, `#${i}`)
+        this.configDialogue.provideEventListeners(`#${i}`, listeners)(el)
+      }
 
-          this.style[e.target.id] = e.target.value
-          this.setRefresh()
-          this.draw()
-        })
-
-      style[i] = {entry: i, label: i, type, value: v, "data-oldval": v, "data-default": d, default: d, min, $function: fn }
+      style[i] = {
+        entry: i, 
+        label: i, 
+        type, 
+        value: v, 
+        "data-oldval": v, 
+        "data-default": 
+        d, default: 
+        d, min, 
+        $function: fn }
     }
     return style
   }

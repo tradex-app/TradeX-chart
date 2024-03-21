@@ -10,19 +10,20 @@ import { tabsBuild, tabStyles } from "../views/tabs";
 export default class ConfigDialogue extends Dialogue {
 
   static name = "ConfigDialogues"
-  static type = "ConfigDialogue"
+  static type = "configDialogue"
   static class = "tradeXconfig"
 
   static defaultStyles = `
   /** default Config Dialogue widget styles */
   
   .tradeXwindow.config {
-    overflow: hidden;
+    /* overflow: hidden; */
     background: none;
   }
 
   .tradeXwindow.config .content {
     padding: 0;
+    position: relative;
   }
 
   .tradeXwindow.config .buttons {
@@ -30,6 +31,7 @@ export default class ConfigDialogue extends Dialogue {
     display: flex;
     justify-content: flex-end;
     padding: 3px 1em;
+    border-radius: 0 0 5px 5px;
   }
 
   .tradeXwindow.config .buttons input {
@@ -39,6 +41,15 @@ export default class ConfigDialogue extends Dialogue {
   }
 
   ${tabStyles} 
+
+  .tradeXwindow.config .content tradex-colourpicker {
+    position: absolute;
+    display: none !important;
+  }
+
+  .tradeXwindow.config .content tradex-colourpicker.active {
+    display: block !important;
+  }
   `
 
   static create(widgets, config) {
@@ -69,6 +80,7 @@ export default class ConfigDialogue extends Dialogue {
 
   destroy() {
     super.destroy()
+    this.elColourPicker.destroy()
   }
 
   set update(u) { this.#update = !!u }
@@ -84,6 +96,7 @@ export default class ConfigDialogue extends Dialogue {
         ${tabsBuild(content)}
       </form>
     </div>
+    <tradex-colourpicker></tradex-colourpicker>
     `
     const {html, modifiers: mods} = super.dialogueBuild(tabsHTML)
     modifiers = {...modifiers, ...mods}
@@ -161,5 +174,12 @@ export default class ConfigDialogue extends Dialogue {
         })
     }
     return func
+  }
+
+  provideInputColor(el, selector) {
+    const input = el.querySelector(selector)
+    const colourInput = document.createElement("tradex-colourinput")
+    colourInput.setTarget(input)
+    colourInput.style.display = "inline-block"
   }
 }

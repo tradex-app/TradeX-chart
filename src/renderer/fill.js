@@ -7,7 +7,6 @@ import { CanvasStyle } from "../definitions/style"
  * 
  * @param {canvas} ctx 
  * @param {Array} grad
- * @param {Array} rect 
  * @param {Array} stops 
  */
 export function linearGradient(ctx, grad=[], stops=[]) {
@@ -17,8 +16,10 @@ export function linearGradient(ctx, grad=[], stops=[]) {
   const grd = ctx.createLinearGradient(x1, y1, x2, y2);
 
   let i = 0
+  let step = 1 / (stops.length - 1)
   for (let stop of stops) {
-    grd.addColorStop(i++, stop)
+    grd.addColorStop(i, stop)
+    i += step
   }
 
   // Fill with gradient

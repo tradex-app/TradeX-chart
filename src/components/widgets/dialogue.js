@@ -7,7 +7,7 @@ import { uid } from "../../utils/utilities";
 export default class Dialogue extends Window {
 
   static name = "Dialogues"
-  static type = "Dialogue"
+  static type = "dialogue"
   static class = "tradeXdialogue"
 
   static defaultStyles = `
@@ -50,6 +50,13 @@ export default class Dialogue extends Window {
   
   get type() { return Dialogue.type }
 
+  /**
+   * build dialogue widget
+   * @param {string} [content=""]
+   * @param {array} [buttons=[]]
+   * @return {object}  
+   * @memberof Dialogue
+   */
   dialogueBuild(content="", buttons=[]) {
 
     let modifiers = {buttons: {}}
@@ -68,23 +75,36 @@ export default class Dialogue extends Window {
     {
       // define callbacks for button click
       modifiers.submit =
-        this.provideEventListeners(`input.submit`, "click", 
-        (e) => {
+        this.provideEventListeners(`input.submit`, 
+        [{
+          event: "click", 
+          fn: (e) => {
           if (isFunction(this.parent.onConfigDialogueSubmit))
             this.parent.onConfigDialogueSubmit(this)
-        })
+          }
+        }]
+        )
       modifiers.cancel =
-        this.provideEventListeners(`input.cancel`, "click", 
-        (e) => {
+        this.provideEventListeners(`input.cancel`, 
+        [{
+          event: "click", 
+          fn: (e) => {
           if (isFunction(this.parent.onConfigDialogueCancel))
             this.parent.onConfigDialogueCancel(this)
-        })
+          }
+        }]
+        )
+
       modifiers.default =
-        this.provideEventListeners(`input.default`, "click", 
-        (e) => {
+        this.provideEventListeners(`input.default`, 
+        [{
+          event: "click", 
+          fn: (e) => {
           if (isFunction(this.parent.onConfigDialogueDefault))
             this.parent.onConfigDialogueDefault(this)
-        })
+          }
+        }]
+        )
     }
 
     const html = `
@@ -96,17 +116,28 @@ export default class Dialogue extends Window {
     return {html, modifiers}
   }
 
-  provideEventListeners(selector, event, fn) {
+  /**
+   * return a function which attaches an array of listeners to an element
+   * @param {string} selector
+   * @param {array} listeners - [{event, function}]
+   * @return {function}  
+   * @memberof Dialogue
+   */
+  provideEventListeners(selector, listeners) {
     // el - host root element for dialogue content
     const func = (el) => {
       const elm = el.querySelector(selector)
-      if (!!elm)
-        elm.addEventListener(event, 
-        (e) => {
-          fn(e)
-        })
+      if (!!elm) {
+        for (let l of listeners) {
+          elm.addEventListener(l.event, 
+            (e) => {
+              l.fn(e)
+            })
+        }
+      }
     }
     return func
   }
 
 }
+// end of class Dialogue
