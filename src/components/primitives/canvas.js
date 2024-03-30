@@ -3,32 +3,42 @@
 import { limit } from "../../utils/number";
 import { arrayMove } from "../../utils/utilities";
 import { isElement } from "../../utils/DOM";
-import { isBoolean, isNumber } from "../../utils/typeChecks";
+import { isArray, isBoolean, isNumber } from "../../utils/typeChecks";
+// import WebGLCanvas from "../../renderer/Canvas2DtoWebGL/Canvas2DtoWebGL"
 
 const composition = ["source-over","source-atop","source-in","source-out","destination-over","destination-atop","destination-in","destination-out","lighter","copy","xor","multiply","screen","overlay","darken","lighten","color-dodge","color-burn","hard-light","soft-light","difference","exclusion","hue","saturation","color","luminosity"]
 const _OffscreenCanvas = (typeof OffscreenCanvas !== "undefined") ? true : false
+const contextTypes = ["2d", "webgl", "webgl2d", "webgl2", "webgpu", "bitmaprenderer"]
 
 class Node {
 
   #key = 0
+  #id
+  #scene
+  #layers
+  #container
 
   /**
    * Viewport constructor
-   * @param {Object} cfg - {width, height}
+   * @param {Object} cfg - {width, height, container, contextType, offscreen, layer}
    */
   constructor(cfg={}) {
 
-    if (!isElement(cfg.container)) throw new Error("Viewport container is not a valid HTML element.")
+    if (!isElement(cfg?.container)) throw new Error("Viewport container is not a valid HTML element.")
 
-    this.container = cfg.container;
-    this.layers = [];
-    this.id = CEL.idCnt++;
-    this.scene = new CEL.Scene();
+    this.#container = cfg.container;
+    this.#layers = [];
+    this.#id = CEL.idCnt++;
+    this.#scene = new CEL.Scene(cfg);
 
-    let {width: w, height: h} = sizeSanitize(cfg.width || 0, cfg.height || 0)
+    let {width: w, height: h} = sizeSanitize(cfg?.width || 0, cfg?.height || 0)
     this.setSize(w, h);
   }
 
+  get id() { return this.#id }
+  get scene() { return this.#scene }
+  get layers() { return this.#layers }
+  get container() { return this.#container }
   // does the browser support OffscreenCanvas ?
   get OffscreenCanvas() { return _OffscreenCanvas }
 
@@ -146,7 +156,10 @@ class Node {
 
     for (layer of layers) {
 
-      if (all && layer.layers.length > 0) layer.render(all)
+      if (all &&
+          isArray(layer.layers) &&
+          layer.layers.length > 0) 
+          layer.render(all)
 
       if (layer.visible && layer.width > 0 && layer.height > 0) {
         const ctx = scene.context
@@ -175,11 +188,13 @@ class Node {
 class Viewport extends Node {
 /**
  * Viewport constructor
- * @param {Object} cfg - {width, height}
+ * @param {Object} cfg - {width, height, container, contextType, offscreen, layer}
  */
   constructor(cfg={}) {
 
-    super(cfg)
+    const cfg2 = {...cfg}
+    cfg2.offscreen = false
+    super(cfg2)
 
     const canvas = this.scene.canvas
     const c = cfg.container
@@ -223,21 +238,17 @@ class Layer {
   
   /**
    * Layer constructor
-   * @param {Object} cfg - {x, y, width, height}
+   * @param {Object} cfg - {x, y, width, height, contextType, offscreen}
    */
   constructor(cfg={}) {
 
+    const c = {...cfg}
     this.id = CEL.idCnt++;
-    this.hit = new CEL.Hit({
-      layer: this,
-      contextType: cfg.contextType,
-      offscreen: this.#offScreen
-    });
-    this.scene = new CEL.Scene({
-      layer: this,
-      contextType: cfg.contextType,
-      offscreen: this.#offScreen
-    });
+    this.#offScreen = (isBoolean(cfg?.offscreen)) ? cfg.offscreen : this.#offScreen
+    c.layer = this
+    c.offscreen = this.#offScreen
+    this.hit = new CEL.Hit(c);
+    this.scene = new CEL.Scene(c);
 
     if (cfg?.x && cfg?.y) {
       this.setPosition(cfg.x, cfg.y);
@@ -405,40 +416,63 @@ class Layer {
   }
 }
 
-class Scene {
+class Foundation {
 
+  #id
   #width = 0;
   #height = 0;
+  #canvas
+  #offscreen = true
+  #context
+  #contextType
+  #layer
+
   /**
-   * Scene constructor
-   * @param {Object} cfg - {width, height}
+   * Constructor
+   * @param {Object} cfg - {width, height, contextType, offscreen, layer}
    */
-  constructor(cfg={offscreen: false}) {
-
-    this.id = CEL.idCnt++;
-    this.layer = cfg.layer
-    this.contextType = cfg.contextType || "2d";
-
+  constructor(cfg={offscreen: true}) {
+    this.#id = CEL.idCnt++;
+    this.#layer = cfg?.layer
+    this.#contextType = (contextTypes.includes(cfg?.contextType)) ? cfg.contextType : "2d"
+    // canvas
     const canvas = document.createElement("canvas");
           canvas.className = "scene-canvas";
           canvas.style.display = "block";
-    if (cfg.width && cfg.height) {
+    // offscreenCanvas
+    cfg.offscreen = (isBoolean(cfg?.offscreen)) ? cfg.offscreen : true
+    if (_OffscreenCanvas && cfg.offscreen) {
+      this.#canvas = canvas.transferControlToOffscreen()
+      this.#offscreen = true
+    }
+    else {
+      this.#canvas = canvas
+      this.#offscreen = false
+    }
+    // context
+    if (this.#contextType == "webgl2d")
+      // this.#context = WebGLCanvas(this.canvas)
+      this.#context = this.getContext("2d");
+    else
+      // this.#context = this.canvas.getContext(this.contextType);
+      this.#context = this.getContext(this.contextType);
+    // size
+    if (!!cfg?.width && !!cfg?.height) {
       this.setSize(cfg.width, cfg.height);
-    }
-    if (_OffscreenCanvas && cfg?.offscreen) {
-      this.canvas = canvas.transferControlToOffscreen()
-      this.offscreen = true
-    }
-    else 
-      this.canvas = canvas
+    } 
 
-    this.context = this.canvas.getContext(this.contextType);
   }
 
+  get id() { return this.#id }
   set width(width) { if (isNumber(width)) this.#width = width }
   get width() { return this.#width }
   set height(height) { if (isNumber(height)) this.#height = height}
   get height() { return this.#height }
+  get canvas() { return this.#canvas }
+  get offscreen() { return this.#offscreen }
+  get contextType() { return this.#contextType }
+  get context() { return this.#context }
+  get layer() { return this.#layer }
 
  /**
    * set scene size
@@ -456,6 +490,22 @@ class Scene {
    */
   clear() {
     return clear(this);
+  }
+}
+
+class Scene extends Foundation {
+
+  /**
+   * Scene constructor
+   * @param {Object} cfg - {width, height, contextType, offscreen, layer}
+   */
+  constructor(cfg={offscreen: true}) {
+
+    super(cfg)
+  }
+
+  getContext(type) {
+    return this.canvas.getContext(type);
   }
 
   /**
@@ -525,54 +575,24 @@ class Scene {
   }
 }
 
-class Hit {
+class Hit extends Foundation {
 
-  #width = 0;
-  #height = 0;
   /**
    * Hit constructor
-   * @param {Object} cfg - {width, height}
+   * @param {Object} cfg - {width, height, contextType, layer, offscreen}
    */
   constructor(cfg={}) {
-    this.layer = cfg.layer
-    this.contextType = cfg.contextType || "2d";
-    this.canvas = document.createElement("canvas");
-    this.canvas.className = "hit-canvas";
-    this.canvas.style.display = "none";
-    this.canvas.style.position = "relative";
-    this.context = this.canvas.getContext(this.contextType, {
+
+    super(cfg)
+  }
+
+  getContext(type) {
+    return this.canvas.getContext(type, {
       // add preserveDrawingBuffer to pick colours with readPixels for hit detection
       preserveDrawingBuffer: true,
       // fix webgl antialiasing picking issue
       antialias: false,
     });
-
-    if (cfg.width && cfg.height) {
-      this.setSize(cfg.width, cfg.height);
-    }
-  }
-
-  set width(width) { if (isNumber(width)) this.#width = width }
-  get width() { return this.#width }
-  set height(height) { if (isNumber(height)) this.#height = height}
-  get height() { return this.#height }
-
-  /**
-   * set hit size
-   * @param {number} width
-   * @param {number} height
-   * @returns {Hit}
-   */
-  setSize(width, height) {
-    return setSize(width, height, this, false);
-  }
-
-  /**
-   * clear hit
-   * @returns {Hit}
-   */
-  clear() {
-    return clear(this);
   }
 
   /**
@@ -690,7 +710,15 @@ function setSize(width, height, that, ratio=true) {
     that.canvas.style.height = `${h}px`
   }
 
-  if (ratio && that.contextType === "2d" && CEL.pixelRatio !== 1) {
+  if (that.contextType !== "2d" &&
+      that.contextType !== "bitmaprenderer") {
+        that.context.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+      }
+
+  if (ratio && 
+    that.contextType === "2d" && 
+    CEL.pixelRatio !== 1 &&
+    !that.offscreen) {
     that.context.scale(CEL.pixelRatio, CEL.pixelRatio);
   }
   return that;
