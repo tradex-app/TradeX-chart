@@ -9,10 +9,23 @@ import BB from "../indicators/BB"
 // import DX from "../indicators/DX"
 import EMA from "../indicators/EMA"
 import MA from "../indicators/MA"
+import MA_Multi from "../indicators/MA_Multi"
 import RSI from "../indicators/RSI";
 import SMA from "../indicators/SMA"
 import STOCH from "../indicators/STOCH";
 import Volume from "../indicators/Volume"
+
+export const IndicatorClasses = {
+  AROON,
+  BB,
+  EMA,
+  MA,
+  MA_Multi,
+  RSI,
+  SMA,
+  STOCH,
+  VOL: Volume,
+}
 
 export default {
   // ADX: {id: "ADX", name: "Average Direction", event: "addIndicator"},
@@ -20,7 +33,7 @@ export default {
   BB: {id: "BB", name: "Bollinger Bands", event: "addIndicator", ind: BB},
   // DX: {id: "DX", name: "Directional Movement", event: "addIndicator", ind: DX},
   EMA: {id: "EMA", name: "Exponential Moving Average", event: "addIndicator", ind: EMA},
-  MA: {id: "MA", name: "Moving Average", event: "addIndicator", ind: MA},
+  MA_Multi: {id: "MA", name: "Moving Average", event: "addIndicator", ind: MA_Multi},
   RSI: {id: "RSI", name: "Relative Strength Index", event: "addIndicator", ind: RSI},
   SMA: {id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: SMA},
   STOCH: {id: "STOCH", name: "Stochastic Oscillator", event: "addIndicator", ind: STOCH},

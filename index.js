@@ -11,6 +11,8 @@ import btcusdt_15min from './data/btcusdt_15min'
 // import state4 from './data/seconds.js'
 // import state from './data/seconds-indicator'
 import TEST from './custom-indicator'
+import DblMA from './custom-dbl-ma.js'
+import DblMA2 from './custom-dbl-ma2.js'
 import DMI from './DMI'
 import CustomOverlay from './custom-overlay'
 import chartDCA from './chart-dca'
@@ -965,8 +967,10 @@ const dre =   {
   };
 
 const configs = [
-  {config: config1, stream: null},
-  {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
+  // {config: config1, stream: null},
+  // {config: config2, stream: null},
+
+  // {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
   {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
   {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
   {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
@@ -1206,10 +1210,10 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
-addChart()
-addChart()
-addChart()
-addChart()
+// addChart()
+// addChart()
+// addChart()
+// addChart()
 // addChart()
 
 document.getElementById("fullscreen").addEventListener("click", (e) => {
@@ -1220,9 +1224,14 @@ document.getElementById("fullscreen").addEventListener("click", (e) => {
 chart0.setIndicators({
   TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST},
   DMI: {id: "DMI", name: "Directional Movement Indicator", event: "addIndicator", ind: DMI },
+  DBLMA: {id: "DBLMA", name: "Double Moving Average", event: "addIndicator", ind: DblMA },
+  // DBLMA2: {id: "DBLMA2", name: "Double Moving Average", event: "addIndicator", ind: DblMA2 },
 })
 chart0.addIndicator("VOL")
-chart0.addIndicator("TEST", "Test1", {data: [], settings: {}})
+chart0.addIndicator("MA")
+chart0.addIndicator("TEST", "Test1", {data: [], settings: {test: true}})
+chart0.addIndicator("DBLMA", "DblMA", {data: [], settings: {}})
+
 // chart0.addIndicator("DMI", "DMI1", {data: []})
 chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
 chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))

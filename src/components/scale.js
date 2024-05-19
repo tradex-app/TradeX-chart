@@ -2,7 +2,7 @@
 // Scale bar that lives on the side of the chart
 
 import Component from "./component"
-import { YAXIS_TYPES } from '../definitions/chart'
+import { YAXIS_TYPE, YAXIS_TYPES } from '../definitions/chart'
 import { isArray, isObject } from '../utils/typeChecks'
 import { elementDimPos } from "../utils/DOM"
 import yAxis from "./axis/yAxis"
@@ -99,8 +99,11 @@ export default class ScaleBar extends Component {
 
 
   start() {
-    const range = (this.parent.name == "Chart" ) ? 
+    // const range = (this.parent.name == "Chart" ) ? 
+      // undefined : this.parent.localRange
+    const range = (this.options.yAxisType === "default") ? 
       undefined : this.parent.localRange
+    
     this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
 
     this.createGraph()

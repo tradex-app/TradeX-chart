@@ -2,8 +2,9 @@
 // colour manipulation
 // 
 
-import { isArray, isBoolean, isNumber, isObject, isString } from './typeChecks'
+import { isArray, isBoolean, isInteger, isNumber, isObject, isString } from './typeChecks'
 import { isBrowser, isNode } from './browser-or-node'
+import { colours2 } from '../components/views/colourPicker';
 
 export const isHex  = /^#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i; 
 export const isHSL  = /^hsla?((\d{1,3}?),\s*(\d{1,3}%),\s*(\d{1,3}%)(,\s*[01]?\.?\d*)?)$/; 
@@ -353,4 +354,51 @@ export default class Colour {
       this.#hexToHSL(this.#value.hexa)
   }
   
+}
+
+export class Palette {
+  
+  #matrix = [10,5]
+  #colours = colours2
+  #entries = []
+
+  constructor (matrix=[10,5], colours=[]) {
+    if (
+        this.validateMatrix(matrix) &&
+        this.validateColours(colours)
+      ) {
+        this.#matrix = matrix
+        this.#colours = colours
+      }
+  }
+
+  get matrix() { return this.#matrix }
+  get colours() { return this.#colours }
+  get entries() { return this.#entries }
+
+  validateMatrix(matrix) {
+    return (
+      isArray(matrix) &&
+      matrix.length == 2 &&
+      isInteger(matrix[0]) &&
+      isInteger(matrix[1])
+    )
+  }
+
+  validateColours(colours) {
+    if (
+        !isArray(colours) ||
+        colours.length != this.#matrix[0] * this.#matrix[1]
+        )
+        return false
+
+    const entries = []
+    for (let c of colours) {
+      let k = new Colour(c)
+      if (!k.isValid) return false
+      entries.push(k)
+    }
+    this.#entries = entries
+    return true
+  }
 }

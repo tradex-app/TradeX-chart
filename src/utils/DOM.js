@@ -434,9 +434,8 @@ export function findTargetParentWithClass(el, selector) {
 
 export function htmlInput(i, o) {
   let id = (isString(o?.entry)) ? o?.entry : ""
-  let label = (isString(o?.label)) ? o?.label : id || ""
-
-  let input = `<label for="${id}">${label}</label><input id="${id}" class="subject" `
+  let label = (isString(o?.label)) ? `<label for="${id}">${o.label}</label>` : ``
+  let input = `${label}<input id="${id}" class="subject" `
 
   for (let p in o) {
     // add valid HTML element attributes

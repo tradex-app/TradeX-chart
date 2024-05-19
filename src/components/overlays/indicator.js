@@ -5,8 +5,8 @@ import Overlay from "./overlay"
 import { Range } from "../../model/range"
 import { limit } from "../../utils/number"
 import Colour from "../../utils/colour"
-import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from "../../utils/typeChecks"
-import { debounce, idSanitize, uid } from "../../utils/utilities"
+import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from "../../utils/typeChecks"
+import { idSanitize, uid } from "../../utils/utilities"
 import { STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
 import { WinState } from "../widgets/window"
@@ -18,6 +18,35 @@ import { onClickOutside } from "../../utils/DOM"
 //   channel,
 //   line,
 // }
+
+const DEFAULT_PERIOD = 5
+
+// Context enum
+class Context {
+  static standard = new Context("standard")
+  static subcomponent = new Context("subcomponent")
+
+  constructor(name) {
+    this.name = name
+  }
+}
+
+export class InputPeriodEnable {
+
+  #enable = true
+  #period = DEFAULT_PERIOD
+
+  constructor (enable=true, period=5) {
+    this.enable = enable
+    this.period = (isInteger(period)) ? period : 5
+  }
+
+  set enable(e) { this.#enable = (isBoolean(e)) ? e : true }
+  get enable() { return this.#enable }
+  set period(p) { this.#period = (isInteger(p)) ? p : 5 }
+  get period() { return this.#period }
+
+}
 
 /**
  * Base class for on and off chart indicators
@@ -35,6 +64,7 @@ export default class Indicator extends Overlay {
   #cnt_
   #name
   #shortName
+  #context
   #legendName
   #legendVisibility
   #primaryPane
@@ -86,10 +116,16 @@ export default class Indicator extends Overlay {
     {...this.constructor.defaultStyle, ...config.style};
     const cfg = { title: `${this.legendName} Config`, content: "", params: overlay, parent: this }
     this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
+    switch(overlay.settings?.context) {
+      case "subcomponent": this.#context = Context.subcomponent;
+      case "standard":
+      default: this.#context = Context.standard;
+    }
   }
 
   get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
   set id(id) { this.#ID = idSanitize(new String(id)) }
+  get context() { return this.#context }
   get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
   get chartPaneID() { return this.#params.overlay.paneID }
   get primaryPane() { return this.#primaryPane || this.constructor.primaryPane }
@@ -179,12 +215,15 @@ export default class Indicator extends Overlay {
     // enable processing of price stream
     this.setNewValue = (value) => { this.newValue(value) }
     this.setUpdateValue = (value) => { this.updateValue(value) }
-    // indicator legend
-    this.addLegend()
-    // config dialogue
-    this.#ConfigDialogue.start()
 
-    this.eventsListen()
+    if (this.#context === Context.standard) {
+      // indicator legend
+      this.addLegend()
+      // config dialogue
+      this.#ConfigDialogue.start()
+
+      this.eventsListen()
+    }
   }
 
   destroy() {
@@ -512,25 +551,15 @@ export default class Indicator extends Overlay {
       let input = {}
 
     for (let i in define) {
-      if (isNumber(define[i])) {
-        input[i] = {
-          entry: i,
-          label: i,
-          type: 'number',
-          value: define[i],
-          default: define[i],
-          "data-default": define[i],
-          "data-oldval": define[i],
-          $function:
-            this.configDialogue.provideEventListeners(`#${i}`, 
-            [{
-              event: "change", 
-              fn: (e)=>{
-                // console.log(`#${i} = ${e.target.value}`)
-              }
-            }]
-          )
-        }
+      let v = define[i]
+      let type = typeOf(v)
+      switch(type) {
+        case "number":
+          this.configInputNumber(define, input, i)
+          break;
+        case "object":
+          this.configInputObject(define, input, i)
+          break;
       }
     }
     if (Object.keys(input).length == 0)
@@ -586,7 +615,7 @@ export default class Indicator extends Overlay {
       let d = ""
       let v = this.style[i]
       let min = ""
-      let type = typeof v
+      let type = typeOf(v)
       switch (type) {
         case "number": 
           min = `0`
@@ -621,6 +650,49 @@ export default class Indicator extends Overlay {
     return style
   }
 
+  configInputNumber(define, input, i) {
+    input[i] = {
+      entry: i,
+      label: i,
+      type: 'number',
+      value: define[i],
+      default: define[i],
+      "data-default": define[i],
+      "data-oldval": define[i],
+      $function:
+        this.configDialogue.provideEventListeners(`#${i}`, 
+        [{
+          event: "change", 
+          fn: (e)=>{
+            // console.log(`#${i} = ${e.target.value}`)
+          }
+        }]
+      )
+    }
+  }
+
+  configInputObject(define, input, i) {
+    if (i instanceof InputPeriodEnable) {
+      this.configInputNumber(define, input, i.period)
+      input.$function = function (el) {
+        const elm = el.querySelector(`#${i}`)
+        const checkBox = document.createElement("input")
+              checkBox.id = `"enable${i}`
+              checkBox.checked = i.enable
+              checkBox.addEventListener("change", (e) => {
+                if (e.currentTarget.checked) {
+                  console.log(`enable ${e.currentTarget.id}`)
+                }
+                else {
+                  console.log(`disable ${e.currentTarget.id}`)
+                }
+              })
+        if (!!elm) {
+          elm.insertAdjacentElement("beforebegin", checkBox)
+        }
+      }
+    }
+  }
 
   //--- building the indicator
 
@@ -711,7 +783,8 @@ export default class Indicator extends Overlay {
     for (let def of api.options) {
       if (def.name in input)
         validate(input, api.options)
-      else if (def.name in input.definition.input)
+      else if (isObject(input?.definition?.input) && 
+                def.name in input.definition.input)
         validate(input.definition.input, api.options)
     }
 
@@ -809,7 +882,7 @@ export default class Indicator extends Overlay {
         !this.core.TALibReady
         ) return false
 
-        params.timePeriod = params.timePeriod || this.definition.input.timePeriod;
+        params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
         let start, end;
         let p = params.timePeriod
         let od = this.overlay.data
@@ -885,9 +958,11 @@ export default class Indicator extends Overlay {
    */
   calcIndicatorHistory () {
     const calc = () => {
+      let od = this.overlay.data
+      if (isArray(od) && od.length > 0) return
+
       const data = this.calcIndicator(this.libName, this.definition.input, this.range);
       if (data) {
-        const od = this.overlay.data
         const d = new Set(data)
         const o = new Set(od)
         let a, p, r = {};

@@ -5,7 +5,7 @@ import { NAME, SHORTNAME, ID, RANGELIMIT, PRICE_PRECISION, VOLUME_PRECISION, STR
 import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH, watermark } from './definitions/style'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, OVERLAYPANES } from './definitions/chart'
 import { defaultConfig, defaultTitle } from './definitions/config'
-import Indicators from './definitions/indicators'
+import IndicatorsPublic, { IndicatorClasses } from './definitions/indicators'
 import * as packageJSON from '../package.json'
 import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, isError, isPromise, isClass } from './utils/typeChecks'
 import * as Time from './utils/time'
@@ -71,7 +71,8 @@ export default class TradeXchart extends Tradex_chart {
   #State = State
   #state
   #range
-  #indicators = Indicators
+  #indicators = IndicatorClasses
+  #indicatorsPublic = IndicatorsPublic
   #standardOverlays = {...OVERLAYPANES}
   #optionalOverlays = {...OVERLAYPANES}
   #customOverlays = {...OVERLAYPANES}
@@ -360,6 +361,7 @@ export default class TradeXchart extends Tradex_chart {
   get theme() { return this.#theme }
   get settings() { return this.state.data.chart.settings }
   get indicatorClasses() { return this.#indicators }
+  get indicatorsPublic() { return this.#indicatorsPublic }
   get TALib() { return this.#TALib }
   get TALibReady() { return TradeXchart.talibReady }
   get TALibError() { return TradeXchart.talibError }
@@ -1315,7 +1317,9 @@ export default class TradeXchart extends Tradex_chart {
         isString(v?.event) && 
         this.isIndicator(v?.ind)
       ) {
-        this.#indicators[k] = v
+        if (!!v?.public)
+        this.#indicatorsPublic[k] = v
+        this.#indicators[k] = v.ind
         result[k] = true
         this.log(`Custom Indicator: ${k} - Registered`)
       }

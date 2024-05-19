@@ -124,21 +124,24 @@ export default class ConfigDialogue extends Dialogue {
       // iterate over content rows
       for (let row in input[i]) {
         // standard input types
-        if (inputTypes.includes(input[i][row]?.type)) {
-          content[i] += htmlInput(i, input[i][row])
+        let r = input[i][row]
+        if (inputTypes.includes(r?.type)) {
+          let id = (isString(r?.entry)) ? r?.entry : ""
+          r.label = (isString(r?.label)) ? r?.label : id || ""
+          content[i] += htmlInput(i, r)
         }
         // other form element types
         // if...
 
         const modifiers = [ "$function" ]
         
-        for (let modifier in input[i][row]) {
+        for (let modifier in r) {
           if (modifiers.includes(modifier)) {
 
             switch (modifier) {
               case "$function":
-                if (isFunction(input[i][row][modifier]))
-                  modifierList[row] = input[i][row][modifier]
+                if (isFunction(r[modifier]))
+                  modifierList[row] = r[modifier]
                 break;
             }
           }

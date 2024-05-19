@@ -48,16 +48,6 @@ const myInd = chart0.addIndicator("EMA", "EMA_1", params)
 
 The third argument **params** is an object that can optionally contain array ``data`` and or an object ``settings``.
 
-```javascript
-const settings = {
-  timePeriod: 20,
-  style: {
-    stroke: "#C80",
-    width: '1',
-  }
-}
-```
-
 Each entry in the ``data`` array requires an array with minimum of [timestamp, value] depending upon the indicator.
 
 The ``settings`` object can contain an object ``style`` and or individual input settings specific to the indicator.

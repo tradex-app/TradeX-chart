@@ -132,13 +132,28 @@ export function checkType(type, value) {
     case 'array': return isArray(value);
     case 'function': return isFunction(value);
     case 'object': return isObject(value);
+    case 'integer': return isInteger(value);
     case 'number': return isNumber(value);
     case 'valid': return isValid(value);
     case 'boolean': return isBoolean(value);
     case 'string': return isString(value);
+    case 'map': return isMap(value);
     case 'promise': return isPromise(value);
-    case 'Error': return isError(value);
+    case 'error': return isError(value);
     case 'class': return isClass(value);
     default: throw new Error(`No known test for type: ${type}`)
   }
 };
+
+export function typeOf(value) {
+  const types = ["array", "error", "class", "function", "map", "promise", 
+                  "object", "integer", "number", "boolean", "string"]
+  for (let type of types) {
+    try {
+      if (checkType(type, value)) return type
+    }
+    catch (e) {
+      return typeof value
+    }
+  }
+}

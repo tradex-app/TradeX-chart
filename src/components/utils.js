@@ -8,7 +8,7 @@ import { UtilsStyle } from "../definitions/style"
 import { CLASS_UTILS } from "../definitions/core"
 import { UTILSLOCATIONS } from "../definitions/chart"
 import utilsList from "../definitions/utils"
-import Indicators from "../definitions/indicators"
+import IndicatorsPublic from "../definitions/indicators"
 import { debounce } from "../utils/utilities"
 import { isObject } from "../utils/typeChecks"
 import stateMachineConfig from "../state/state-utils"
@@ -34,7 +34,7 @@ export default class UtilsBar extends Component {
     this.#elUtils = core.elUtils
     this.#utils = core.config?.utilsBar || utilsList
     this.#widgets = core.WidgetsG
-    this.#indicators = core.indicatorClasses || Indicators
+    this.#indicators = core.indicatorsPublic || IndicatorsPublic
     this.#location = core.config.theme?.utils?.location || "none"
     if (!!this.#location ||
           this.#location == "none" ||

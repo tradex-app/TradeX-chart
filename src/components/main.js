@@ -625,9 +625,9 @@ export default class MainPane extends Component {
 
   /**
    * add chart pane - provides primaryPane and secondaryPane indicators
-   * @param {Object} options 
+   * @param {object} params 
    */
-  addChartPane(options) {
+  addChartPane(params) {
     // list of expanded panes
     const { expanded: exp } = this.chartPanesState()
     // insert a row to mount the indicator on
@@ -647,7 +647,7 @@ export default class MainPane extends Component {
     // insert a row for the new indicator
     let row
     this.#elRows.insertAdjacentHTML("beforeend", 
-      this.#elMain.rowNode(options.type, this.core))
+      this.#elMain.rowNode(params.type, this.core))
     row = this.#elRows.chartPaneSlot.assignedElements().slice(-1)[0]
     row.style.height = `${n}px`
     row.style.width = `100%`
@@ -655,25 +655,25 @@ export default class MainPane extends Component {
     // insert a YAxis for the new indicator
     let axis
     this.#elYAxis.insertAdjacentHTML("beforeend", 
-      this.scaleNode(options.type))
+      this.scaleNode(params.type))
     axis = this.#elYAxis.chartPaneSlot.assignedElements().slice(-1)[0]
     axis.style.height = `${n}px`
     axis.style.width = `100%`
 
-    options.elements.elTarget = row
-    options.elements.elScale = axis
+    params.elements.elTarget = row
+    params.elements.elScale = axis
 
     // instantiate the chart pane
     let o
-    if (options.type == "primary") {
-      // options.id
-      o = new Chart(this.core, options)
+    if (params.type == "primary") {
+      // params.id
+      o = new Chart(this.core, params)
       this.#Chart = o
     }
     else {
-      options.name = options.view[0].name || "Secondary"
-      options.shortName = options.view[0].type || "Secondary"
-      o = new Chart(this.core, options);
+      params.name = params.view[0].name || "Secondary"
+      params.shortName = params.view[0].type || "Secondary"
+      o = new Chart(this.core, params);
     }
     this.#ChartPanes.set(o.id, o)
 
@@ -784,7 +784,7 @@ export default class MainPane extends Component {
    */
   addIndicator(i, name=i, params={})  {
     let instance;
-    let isPrimary = this.indicatorClasses[i].ind?.primaryPane;
+    let isPrimary = this.indicatorClasses[i]?.primaryPane;
 
     if (
       !isString(i) ||

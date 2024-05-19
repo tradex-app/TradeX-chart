@@ -88,7 +88,7 @@ export default class Chart extends Component{
   #shortName
   #title;
   #chartCnt
-  #type
+  #type               // primary, secondary
   #status = "idle"
   #collapsed = {
     state: false,
@@ -131,13 +131,13 @@ export default class Chart extends Component{
 
   #indicatorDeleteList = {}
 
-  constructor(core, options) {
+  constructor(core, options={}) {
 
     super(core, options)
 
     this.#chartCnt = Chart.cnt
 
-    if (!isObject(options)) return
+    if (!isObject(options)) throw new Error(`Chart (pane) constructor failed: Expected options typeof object`)
 
     this.#name = this.options.name
     this.#shortName = this.options.shortName
@@ -160,12 +160,13 @@ export default class Chart extends Component{
       this.yAxisType = "default"
     }
     else {
+      let type = this.core.indicatorClasses[options.view[0].type].scale
       chartLegend.type = "secondary"
       chartLegend.title = ""
       chartLegend.parent = this
       chartLegend.source = () => { return {inputs:{}, colours:[], labels: []} }
       this.legend.add(chartLegend)
-      this.yAxisType = this.core.indicatorClasses[options.view[0].type].ind.scale
+      this.yAxisType = (YAXIS_TYPES.includes(type)) ? type : "default"
     }
 
     // set up Scale (Y Axis)
@@ -542,9 +543,9 @@ export default class Chart extends Component{
 
       // Indicators
       if (o.type in this.core.indicatorClasses) {
-        config.cnt = this.core.indicatorClasses[o.type].ind.cnt
+        config.cnt = this.core.indicatorClasses[o.type].cnt
         config.id = `${this.id}-${o.type}_${config.cnt}`
-        config.class = this.core.indicatorClasses[o.type].ind
+        config.class = this.core.indicatorClasses[o.type]
       }
       // other overlay types
       else if (o.type in optionalOverlays[this.type]) {
@@ -576,7 +577,7 @@ export default class Chart extends Component{
    */
   addIndicator(i) {
     const primaryPane = this.type === "primaryPane"
-    const indClass = this.core.indicatorClasses[i.type].ind
+    const indClass = this.core.indicatorClasses[i.type]
     const isPrimary = !!i.settings?.isPrimary
     if (
         i?.type in this.core.indicatorClasses &&

@@ -15,7 +15,7 @@ export default class Component {
   #stateMachine
   #Graph
 
-  constructor (core, options) {
+  constructor (core, options={}) {
 
     this.#core = core
     this.#options = {...options}

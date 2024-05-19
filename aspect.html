@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Aspect test</title>
+  <!-- <script type="module" src="/src/scaleX/aop.js"></script> -->
+
+</head>
+
+<body>
+  <script type="module">
+    import Aspect from "./src/scaleX/aspect.js"
+
+    class Test {
+      c = 0
+      method1() {
+        console.log("method executed")
+      }
+
+      add(a, b) {
+        return a + b + this.c
+      }
+    }
+
+    function beforeMethod() {
+      console.log("before method")
+    }
+    function afterMethod() {
+      console.log("after method")
+    }
+    function aroundMethod() {
+      console.log("around method")
+    }
+    function multi() {
+      this.c = 2
+    }
+
+    // const test = new Test()
+    const aspect1 = new Aspect()
+    aspect1.before("method1", beforeMethod)
+    aspect1.after("method1", afterMethod)
+    aspect1.around("method1", aroundMethod)
+    aspect1.before("add", multi)
+
+    let test = new Test()
+    let mod = Aspect.add(aspect1, test)
+
+    // Mod.method1()
+    mod.method1()
+    console.log(mod.add(2,2))
+  </script>
+</body>
+
+</html>
