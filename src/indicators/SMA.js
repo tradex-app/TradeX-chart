@@ -9,7 +9,7 @@ import { SMA as talibAPI } from "../definitions/talib-api";
  
  export default class SMA extends Indicator {
 
-  name = 'Simple Moving Average'
+  get name() { return 'Simple Moving Average' }
   shortName = 'SMA'
   libName = 'SMA'
   definition = {

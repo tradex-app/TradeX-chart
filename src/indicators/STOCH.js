@@ -16,7 +16,7 @@ import { YAXIS_TYPES } from "../definitions/chart";
  */
 export default class STOCH extends Indicator {
 
-  name = 'Stochastic Oscillator'
+  get name() { return 'Stochastic Oscillator' }
   shortName = 'STOCH'
   libName = 'STOCH'
   definition = {

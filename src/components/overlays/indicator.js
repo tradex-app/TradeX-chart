@@ -885,18 +885,19 @@ export default class Indicator extends Overlay {
         params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
         let start, end;
         let p = params.timePeriod
+        let t = p + (params?.padding * 2 || 0)
         let od = this.overlay.data
     
         // is it a Range instance?
         if (range instanceof Range) {
           start = 0
-          end = range.dataLength - p + 1
+          end = range.dataLength - t + 1
         }
         else if ( "indexStart" in range || "indexEnd" in range ||
                   "tsStart" in range ||  "tsEnd" in range ) {
           start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0
           end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1
-          end - p
+          end - t
         }
         else return false
     
@@ -904,16 +905,16 @@ export default class Indicator extends Overlay {
         // full calculation required
         if (od.length == 0) { }
         // partial calculation required
-        else if (od.length + p !== range.dataLength) {
+        else if (od.length + t !== range.dataLength) {
           // new data in the past?
-          if (od[0][0] > range.value(p)[0]) {
+          if (od[0][0] > range.value(t)[0]) {
             start = 0
-            end = range.getTimeIndex(od[0][0]) - p
-            end = limit(end, p, range.dataLength - 1)
+            end = range.getTimeIndex(od[0][0]) - t
+            end = limit(end, t, range.dataLength - 1)
           }
           // new data in the future ?
           else if (od[ od.length - 1 ][0] < range.value( range.dataLength - 1 )[0]) {
-            start = od.length - 1 + p
+            start = od.length - 1 + t
             start = limit(start, 0, range.dataLength)
             end = range.dataLength - 1
           }
@@ -924,14 +925,14 @@ export default class Indicator extends Overlay {
         else return false
 
         // if not enough data for calculation fail
-        if ( end - start < p ) return false
+        if ( end - start < t ) return false
   
         let data = [];
         let i, v, entry, input;
     
         while (start < end) {
           // fetch the data required to calculate the indicator
-          input = this.indicatorInput(start, start + p)
+          input = this.indicatorInput(start, start + t)
           params = {...params, ...input}
           // let hasNull = params.inReal.find(element => element === null)
           // if (hasNull) return false

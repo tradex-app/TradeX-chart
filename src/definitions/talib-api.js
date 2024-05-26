@@ -7,6 +7,7 @@
 // output.name = ['upperBand', 'middleBand', 'lowerBand', 'output', 'aroonDown', 'aroonUp', 'inPhase', 'quadrature', 'sine', 'leadSine', 'MACD', 'MACDSignal', 'MACDHist', 'MAMA', 'FAMA', 'min', 'max', 'minIdx', 'maxIdx', 'slowK', 'slowD', 'fastK', 'fastD']
 // type = number
 // inputs.name = "high", "low", "close", "inReal", "volume", "inReal0", "inReal1", "open", "inPeriods"
+// options types = timePeriod, MAType, fastK_Period, slowK_Period, slowK_MAType, fastD_period, slowD_period, slowD_MAType, fastPeriod, slowPeriod, nbDevUp, nbDevDn, penetration
 
 export const ACCBANDS = {
   name: "ACCBANDS",

@@ -11,7 +11,7 @@ import { uid } from "../utils/utilities"
 
 export default class AROON extends Indicator {
 
-  name = 'Aroon'
+  get name() { return 'Aroon' }
   shortName = 'AROON'
   libName = 'AROON'
   definition = {

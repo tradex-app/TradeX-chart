@@ -9,7 +9,7 @@ import { MA as talibAPI } from "../definitions/talib-api";
  
  export default class MA extends Indicator {
 
-  name = 'Moving Average'
+  get name() { return 'Moving Average' }
   shortName = 'MA'
   libName = 'MA'
   definition = {

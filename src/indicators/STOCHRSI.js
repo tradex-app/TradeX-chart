@@ -1,69 +1,51 @@
-// RSI.js
-// Relative Strength Index
-// https://hackape.github.io/talib.js/modules/_index_.html#rsi
-// https://www.investopedia.com/terms/r/rsi.asp
+// STOCHRSI.js
+// Stochastic RSI
+// https://hackape.github.io/talib.js/modules/_index_.html#stochrsi
+// https://www.investopedia.com/terms/s/stochrsi.asp
 
 import Indicator from "../components/overlays/indicator"
-import {RSI as talibAPI } from "../definitions/talib-api";
+import {STOCHRSI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
-import Colour from "../utils/colour"
 
 
 /**
- * Indicator - Relative Strength Index
+ * Indicator - Stochastic RSI
  * @export
- * @class RSI
- * @extends {Indicator}
+ * @class STOCHRSI
+ * @extends {indicator}
  */
-export default class RSI extends Indicator {
+export default class STOCHRSI extends Indicator {
 
-  get name() { return 'Relative Strength Index' }
-  shortName = 'RSI'
-  libName = 'RSI'
+  get name() { return 'Stochastic RSI' }
+  shortName = 'STOCHRSI'
+  libName = 'STOCHRSI'
   definition = {
     input: {
-      inReal: [], 
-      timePeriod: 20 // 5
+      inReal: [],
+      timePeriod: 14,
+      fastK_Period: 3,
+      fastD_Period: 3
     },
     output: {
-      output: [],
+      fastK: [],
+      fastD: []
     },
-    meta: {
-      input : {
-        timePeriod: {
-          entry: 'timePeriod',
-          label: 'Period',
-          type: 'number',
-          value: 5,
-          // "data-oldval": 5,
-          default: 5,
-          min: '3',
-          title: `Number of time units to use in calculation`,
-          $function:
-            this.configDialogue.provideEventListeners("#Period", 
-            [{
-              event: "change", 
-              fn: (e)=>{
-              console.log(`#Period = ${e.target.value}`)
-              }
-            }]
-          )
-        }
-      }
-    }
   }
-
   checkParamCount = false
   plots = [
-    { key: 'RSI_1', title: ' ', type: 'line' },
+    { key: 'STOCHRSI_1', title: ' ', type: 'line' },
   ]
 
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
   static defaultStyle = {
-    stroke: "#C80",
-    width: 1,
+    fastKStroke: "#8C0",
+    fastKLineWidth: '1',
+    fastKLineDash: undefined,
+    fastDStroke: "#00C",
+    fastDLineWidth: '1',
+    fastDLineDash: undefined,
     defaultHigh: 75,
     defaultLow: 25,
     highLowLineWidth: 1,
@@ -75,14 +57,14 @@ export default class RSI extends Indicator {
 
 
   /**
-   * Creates an instance of RSI.
+   * Creates an instance of STOCHRSI.
    * @param {Object} target - canvas scene
    * @param {Object} xAxis - timeline axis instance
    * @param {Object} yAxis - scale axis instance
    * @param {Object} config - theme / styling
    * @param {Object} parent - chart pane instance that hosts the indicator
    * @param {Object} params - contains minimum of overlay instance
-   * @memberof RSI
+   * @memberof STOCHRSI
    */
   constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
 
@@ -91,23 +73,39 @@ export default class RSI extends Indicator {
     this.init(talibAPI)
   }
 
+  calcIndicator (indicator, params={}, range=this.range) {
+    params.padding = params.fastK_Period + params.fastD_Period
+    return super.calcIndicator(indicator, params, range)
+
+//     const RSI = super.calcIndicator("RSI", params, range)
+// console.log(RSI)
+  }
+
+  calcIndicatorHistory() {
+    super.calcIndicatorHistory()
+  }
+
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
 
     const inputs = {}
-    const {c, colours} = super.legendInputs(pos)
-    inputs.RSI_1 = this.scale.nicePrice(this.overlay.data[c][1])
+    let labels = [false, false, false]
+    let {c, colours} = super.legendInputs(pos)
+    inputs.fastK = this.scale.nicePrice(this.overlay.data[c][1])
+    inputs.fastD = this.scale.nicePrice(this.overlay.data[c][1])
+    colours = [
+      this.style.fastD,
+      this.style.fastK
+    ]
 
-    return {inputs, colours}
+    return {inputs, colours, labels}
   }
-
 
   /**
    * Draw the current indicator range on its canvas layer and render it.
    * @param {Object} range 
    */
   draw(range=this.range) {
-
     if (this.overlay.data.length < 2 ) return false
 
     if (!super.mustUpdate()) return false
@@ -115,15 +113,15 @@ export default class RSI extends Indicator {
     this.scene.clear()
 
     const x2 = this.scene.width + (this.xAxis.bufferPx * 2)
-    const y1 = this.yAxis.yPos(this.style?.high || this.style.defaultHigh)
-    const y2 = this.yAxis.yPos(this.style?.low || this.style.defaultLow)
+    const y1 = this.yAxis.yPos(this.style.defaultHigh)
+    const y2 = this.yAxis.yPos(this.style.defaultLow)
 
     // Fill the range between high and low
-    const plots = [0, y1, this.scene.width, y2 - y1]
+    let plots = [0, y1, this.scene.width, y2 - y1]
     let style = {fill: this.style.highLowRangeStyle}
     this.plot(plots, "renderRect", style)
 
-    // High RSI Range marker
+    // High STOCHRSI Range marker
     plots.length = 0
     plots[0] = {x: 0, y: y1}
     plots[1] = {x: x2, y: y1}
@@ -134,7 +132,7 @@ export default class RSI extends Indicator {
     }
     this.plot(plots, "renderLine", style)
 
-    // Low RSI Range marker
+    // Low STOCHRSI Range marker
     plots.length = 0
     plots[0] = {x: 0, y: y2}
     plots[1] = {x: x2, y: y2}
@@ -152,41 +150,51 @@ export default class RSI extends Indicator {
     }
 
     // we have data, draw something
+    // STOCHRSI plot
+    plots = { fastD: [], fastK: [] }
     const data = this.overlay.data
     const width = this.xAxis.candleW
-
-    // RSI plot
-    plots.length = 0
-    const offset = this.Timeline.smoothScrollOffset || 0
     const plot = {
       w: width,
     }
 
     // account for "missing" entries because of indicator calculation
+    let t = range.value(range.indexStart)[0]
+    let s = this.overlay.data[0][0]
+    let c = (t - s) / range.interval
     let o = this.Timeline.rangeScrollOffset;
-    let d = range.data.length - this.overlay.data.length
-    let c = range.indexStart - d - 2
     let i = range.Length + (o * 2) + 2
-
-    let t = 0
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
-        // plots.push({x: null, y: null})
+        plots.fastD.push({x: null, y: null})
+        plots.fastK.push({x: null, y: null})
       }
       else {
-        if (t > data[c][0]) console.log(c, t, data[c][0])
-        t = data[c][0]
-
         plot.x = this.xAxis.xPos(data[c][0])
         plot.y = this.yAxis.yPos(data[c][1])
-        plots.push({...plot})
+        plots.fastK.push({...plot})
+
+        plot.x = this.xAxis.xPos(data[c][0])
+        plot.y = this.yAxis.yPos(data[c][2])
+        plots.fastD.push({...plot})
       }
       c++
       i--
     }
 
-    this.plot(plots, "renderLine", this.style)
+    style = {
+      width: this.style.fastKLineWidth, 
+      stroke: this.style.fastKStroke, 
+      dash: this.style.fastKLineDash
+    }
+    this.plot(plots.fastK, "renderLine", style)
+    style = {
+      width: this.style.fastDLineWidth, 
+      stroke: this.style.fastDStroke, 
+      dash: this.style.fastDLineDash
+    }
+    this.plot(plots.fastD, "renderLine", style)
 
     this.target.viewport.render();
 

@@ -9,7 +9,7 @@ import { EMA as talibAPI } from "../definitions/talib-api";
  
  export default class EMA extends Indicator {
 
-  name = 'Exponential Moving Average'
+  get name() { return 'Exponential Moving Average' }
   shortName = 'EMA'
   libName = 'EMA'
   definition = {
