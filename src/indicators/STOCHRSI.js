@@ -68,6 +68,7 @@ export default class STOCHRSI extends Indicator {
    */
   constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
 
+
     super (target, xAxis, yAxis, config, parent, params)
 
     this.init(talibAPI)
@@ -77,7 +78,10 @@ export default class STOCHRSI extends Indicator {
     params.padding = params.fastK_Period + params.fastD_Period
     return super.calcIndicator(indicator, params, range)
 
+//     const outOrig = {...this.definition.output}
+//     this.definition.output = { output: [] }
 //     const RSI = super.calcIndicator("RSI", params, range)
+//     this.definition.output = outOrig
 // console.log(RSI)
   }
 

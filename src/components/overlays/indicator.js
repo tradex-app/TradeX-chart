@@ -870,11 +870,12 @@ export default class Indicator extends Overlay {
   /**
  * Calculate indicator values for chart history - partial or entire
  * @param {string} indicator - the TALib function to call
- * @param {Object} params - parameters for the TALib function
- * @param {Object} [range=this.range] - range instance or definition
+ * @param {object} params - parameters for the TALib function
+ * @param {object} range - range instance or definition
+ * @param {object} output - output definition
  * @returns {boolean} - success or failure
  */
-  calcIndicator (indicator, params={}, range=this.range) {
+  calcIndicator (indicator, params={}, range, output) {
     if (this.chart.status == 'destroyed' ||
         !isString(indicator) ||
         !(indicator in this.TALib) ||
@@ -882,6 +883,8 @@ export default class Indicator extends Overlay {
         !this.core.TALibReady
         ) return false
 
+        range = range || this.range
+        output = output || this.definition.output
         params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
         let start, end;
         let p = params.timePeriod
@@ -941,7 +944,7 @@ export default class Indicator extends Overlay {
     
           v = []
           i = 0
-          for (let o in this.definition.output) {
+          for (let o in output) {
             v[i++] = entry[o][0]
           }
           // store entry with timestamp
