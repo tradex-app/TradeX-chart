@@ -6,6 +6,7 @@
 import Indicator from "../components/overlays/indicator"
 import {STOCHRSI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
+import { isArray } from "../utils/typeChecks";
 
 
 /**
@@ -23,8 +24,9 @@ export default class STOCHRSI extends Indicator {
     input: {
       inReal: [],
       timePeriod: 14,
-      fastK_Period: 3,
-      fastD_Period: 3
+      stochPeriod: 14,
+      KPeriod: 3,
+      DPeriod: 3
     },
     output: {
       fastK: [],
@@ -75,18 +77,51 @@ export default class STOCHRSI extends Indicator {
   }
 
   calcIndicator (indicator, params={}, range=this.range) {
-    params.padding = params.fastK_Period + params.fastD_Period
-    return super.calcIndicator(indicator, params, range)
+    // params.padding = params.fastK_Period + params.fastD_Period
+    // return super.calcIndicator(indicator, params, range)
 
-//     const outOrig = {...this.definition.output}
-//     this.definition.output = { output: [] }
-//     const RSI = super.calcIndicator("RSI", params, range)
-//     this.definition.output = outOrig
-// console.log(RSI)
+    const stochRSI = []
+    const smooth = []
+    const KVals = []
+    const S = params.stochPeriod || this.definition.input.stochPeriod
+    const D = params.DPeriod || this.definition.input.DPeriod
+    const K = params.KPeriod || this.definition.input.KPeriod
+
+    // calculate RSI
+    const output = { output: [] }
+    const RSI = super.calcIndicator("RSI", params, range, output)
+    if (!RSI) return false
+
+    // Calculate Stochastic RSI
+    for (let i = K - 1; i < RSI.length; i++) {
+      let s = (i - S + 1 < 0) ? 0 : (i - S + 1)
+      let subset = RSI.slice(s, i + 1).map(a => a[1]);
+      let min = Math.min(...subset);
+      let max = Math.max(...subset);
+      let stoch = ((RSI[i][1] - min) / (max - min)) * 100;
+      stochRSI.push(stoch);
+    }
+
+    // Calculate Stochastic RSI K and D
+    for (let i = 0; i < stochRSI.length; i++) {
+      let k = stochRSI.slice(Math.max(0, i - K + 1), i + 1).reduce((a, b) => a + b, 0) / K;
+      KVals.push(k)
+      let d = KVals.slice(Math.max(0, i - D + 1), i + 1).reduce((a, b) => a + b, 0) / D;
+      let t = RSI[i][0]
+      smooth.push([ t, k, d ])
+    }
+
+    return smooth
   }
 
-  calcIndicatorHistory() {
-    super.calcIndicatorHistory()
+  calcIndicatorStream(indicator, params, range=this.range) {
+    // return false
+
+    // const RSI = super.calcIndicatorStream(indicator, params, range)
+    // if (!RSI) return false
+
+    const stoch = this.calcIndicator(indicator, params, range)
+    return (isArray(stoch)) ? stoch[stoch.length-1] : false
   }
 
   legendInputs(pos=this.chart.cursorPos) {

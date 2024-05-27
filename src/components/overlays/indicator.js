@@ -835,12 +835,13 @@ export default class Indicator extends Overlay {
       volume: []
     }
     do {
-      input.inReal.push(this.range.value(start)[OHLCV.c])
-      input.open.push(this.range.value(start)[OHLCV.o])
-      input.high.push(this.range.value(start)[OHLCV.h])
-      input.low.push(this.range.value(start)[OHLCV.l])
-      input.close.push(this.range.value(start)[OHLCV.c])
-      input.volume.push(this.range.value(start)[OHLCV.v])
+      let val = this.range.value(start)
+      input.inReal.push(val[OHLCV.c])
+      input.open.push(val[OHLCV.o])
+      input.high.push(val[OHLCV.h])
+      input.low.push(val[OHLCV.l])
+      input.close.push(val[OHLCV.c])
+      input.volume.push(val[OHLCV.v])
     }
     while (start++ < end)
     return input
@@ -867,93 +868,96 @@ export default class Indicator extends Overlay {
     else return { timePeriod: step, ...input }
   }
 
+  noCalc(indicator, range) {
+    return this.chart.status == 'destroyed' ||
+    !this.core.TALibReady ||
+    !isString(indicator) ||
+    !(indicator in this.TALib) ||
+    !isObject(range) ||
+    range.dataLength < this.definition.input.timePeriod 
+  }
+
   /**
  * Calculate indicator values for chart history - partial or entire
  * @param {string} indicator - the TALib function to call
  * @param {object} params - parameters for the TALib function
  * @param {object} range - range instance or definition
  * @param {object} output - output definition
- * @returns {boolean} - success or failure
+ * @returns {array|boolean} - success or failure
  */
-  calcIndicator (indicator, params={}, range, output) {
-    if (this.chart.status == 'destroyed' ||
-        !isString(indicator) ||
-        !(indicator in this.TALib) ||
-        !isObject(range) ||
-        !this.core.TALibReady
-        ) return false
+  calcIndicator (indicator, params={}, range, output=this.definition.output) {
 
-        range = range || this.range
-        output = output || this.definition.output
-        params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
-        let start, end;
-        let p = params.timePeriod
-        let t = p + (params?.padding * 2 || 0)
-        let od = this.overlay.data
-    
-        // is it a Range instance?
-        if (range instanceof Range) {
-          start = 0
-          end = range.dataLength - t + 1
-        }
-        else if ( "indexStart" in range || "indexEnd" in range ||
-                  "tsStart" in range ||  "tsEnd" in range ) {
-          start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0
-          end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1
-          end - t
-        }
-        else return false
-    
-        // check if a full or only partial calculation is required
-        // full calculation required
-        if (od.length == 0) { }
-        // partial calculation required
-        else if (od.length + t !== range.dataLength) {
-          // new data in the past?
-          if (od[0][0] > range.value(t)[0]) {
-            start = 0
-            end = range.getTimeIndex(od[0][0]) - t
-            end = limit(end, t, range.dataLength - 1)
-          }
-          // new data in the future ?
-          else if (od[ od.length - 1 ][0] < range.value( range.dataLength - 1 )[0]) {
-            start = od.length - 1 + t
-            start = limit(start, 0, range.dataLength)
-            end = range.dataLength - 1
-          }
-          // something is wrong
-          else return false
-        }
-        // up to date, no need to calculate
-        else return false
+    if (this.noCalc(indicator, range)) return false
 
-        // if not enough data for calculation fail
-        if ( end - start < t ) return false
-  
-        let data = [];
-        let i, v, entry, input;
-    
-        while (start < end) {
-          // fetch the data required to calculate the indicator
-          input = this.indicatorInput(start, start + t)
-          params = {...params, ...input}
-          // let hasNull = params.inReal.find(element => element === null)
-          // if (hasNull) return false
-    
-          entry = this.TALib[indicator](params)
-    
-          v = []
-          i = 0
-          for (let o in output) {
-            v[i++] = entry[o][0]
-          }
-          // store entry with timestamp
-          data.push([range.value(start + p - 1)[0], ...v])
-          // data.push([range.value(start - 1)[0], ...v])
+    params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
+    let start, end;
+    let p = params.timePeriod
+    let t = p + (params?.padding * 2 || 0)
+    let od = this.overlay.data
 
-          start++
-        }
-        return data
+    // is it a Range instance?
+    if (range instanceof Range) {
+      start = 0
+      end = range.dataLength - t + 1
+    }
+    else if ( isObject(range) ) {
+      start = range?.indexStart || this.Timeline.t2Index(range?.tsStart || 0) || 0
+      end = range?.indexEnd || this.Timeline.t2Index(range?.tsEnd) || range.dataLength - t + 1
+      end - t
+    }
+    else return false
+
+    // check if a full or only partial calculation is required
+    // full calculation required
+    if (od.length == 0) { }
+    // partial calculation required
+    else if (od.length + t !== range.dataLength) {
+      // new data in the past?
+      if (od[0][0] > range.value(t)[0]) {
+        start = 0
+        end = range.getTimeIndex(od[0][0]) - t
+        end = limit(end, t, range.dataLength - 1)
+      }
+      // new data in the future ?
+      else if (od[ od.length - 1 ][0] < range.value( range.dataLength - 1 )[0]) {
+        start = od.length - 1 + t
+        start = limit(start, 0, range.dataLength)
+        end = range.dataLength - 1
+      }
+      // something is wrong
+      else return false
+    }
+    // up to date, no need to calculate
+    else return false
+
+    // if not enough data for calculation fail
+    if ( end < t ) return false
+    if ( end - start < t ) return false
+
+    let data = [];
+    let i, v, entry, input;
+
+    while (start < end) {
+      // fetch the data required to calculate the indicator
+      input = this.indicatorInput(start, start + t)
+      params = {...params, ...input}
+      // let hasNull = params.inReal.find(element => element === null)
+      // if (hasNull) return false
+
+      entry = this.TALib[indicator](params)
+
+      v = []
+      i = 0
+      for (let o in output) {
+        v[i++] = entry[o][0]
+      }
+      // store entry with timestamp
+      data.push([range.value(start + p - 1)[0], ...v])
+      // data.push([range.value(start - 1)[0], ...v])
+
+      start++
+    }
+    return data
   }
 
   /**
@@ -1008,15 +1012,11 @@ export default class Indicator extends Overlay {
    * @param {string} indicator - the TALib function to call
    * @param {Object} params - parameters for the TALib function
    * @param {Object} range - Range instance
-   * @returns {array} - indicator data entry
+   * @returns {array|boolean} - indicator data entry
    */
   calcIndicatorStream (indicator, params, range=this.range) {
-    if (this.chart.status == 'destroyed' ||
-        !this.core.TALibReady ||
-        !isString(indicator) ||
-        !(indicator in this.TALib) ||
-        !(range instanceof Range) ||
-        range.dataLength < this.definition.input.timePeriod 
+    if (this.noCalc(indicator, range) ||
+        !(range instanceof Range)
         ) return false
 
     let entry = this.TALib[indicator](params)
