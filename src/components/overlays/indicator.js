@@ -245,7 +245,8 @@ export default class Indicator extends Overlay {
     this.chartPane.graph.removeOverlay(this.id)
 
     // remove widgets
-    this.core.WidgetsG.delete(this.#ColourPicker.id)
+    if (isObject(this.#ColourPicker))
+      this.core.WidgetsG.delete(this.#ColourPicker.id)
 
     // execute parent class
     // delete data
@@ -892,7 +893,7 @@ export default class Indicator extends Overlay {
     params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
     let start, end;
     let p = params.timePeriod
-    let t = p + (params?.padding * 2 || 0)
+    let t = p + (params?.padding || 0)
     let od = this.overlay.data
 
     // is it a Range instance?
@@ -932,7 +933,9 @@ export default class Indicator extends Overlay {
 
     // if not enough data for calculation fail
     if ( end < t ) return false
-    if ( end - start < t ) return false
+    if ( end - start < t ) {
+      start -= (t + p) - (end - start)
+    }
 
     let data = [];
     let i, v, entry, input;

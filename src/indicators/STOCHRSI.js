@@ -120,8 +120,9 @@ export default class STOCHRSI extends Indicator {
     // const RSI = super.calcIndicatorStream(indicator, params, range)
     // if (!RSI) return false
 
+    params.padding = this.definition.input.KPeriod
     const stoch = this.calcIndicator(indicator, params, range)
-    return (isArray(stoch)) ? stoch[stoch.length-1] : false
+    return (isArray(stoch)) ? stoch[this.definition.input.stochPeriod + params.padding] : false
   }
 
   legendInputs(pos=this.chart.cursorPos) {
