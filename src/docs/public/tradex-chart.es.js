@@ -1516,11 +1516,6 @@ class Sh extends ji {
         srcEvent: n,
         key: n.key,
         target: n.target
-      }), this.enableUpEvent && n.type === "keyup" && this.callback({
-        type: or,
-        srcEvent: n,
-        key: n.key,
-        target: n.target
       }));
     }, this.enableDownEvent = this.options.enable, this.enableUpEvent = this.options.enable, this.events = (this.options.events || []).concat(Th), e.tabIndex = this.options.tabIndex || 0, e.style.outline = "none", this.events.forEach((n) => e.addEventListener(n, this.handleEvent));
   }
@@ -4436,9 +4431,6 @@ class ce extends Map {
   lastValue() {
     return na(this);
   }
-  lastValue() {
-    return jo(this);
-  }
   prevCurrNext(e) {
     let i = curr = next = null;
     for (let s of this)
@@ -6517,7 +6509,7 @@ class le extends W {
         this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "indicator.remove()" or "chart.removeIndicator()" instead.`);
         return;
       }
-      this.core.hub.expunge(this), this.chart.legend.remove(this.#x), this.clear(), this.core.MainPane.draw(void 0, !0), this.chartPane.graph.removeOverlay(this.id), this.core.WidgetsG.delete(this.#S.id), super.destroy(), this.core.state.removeIndicator(this.id), this.#P = "destroyed";
+      this.core.hub.expunge(this), this.chart.legend.remove(this.#x), this.clear(), this.core.MainPane.draw(void 0, !0), this.chartPane.graph.removeOverlay(this.id), w(this.#S) && this.core.WidgetsG.delete(this.#S.id), super.destroy(), this.core.state.removeIndicator(this.id), this.#P = "destroyed";
     }
   }
   remove() {
@@ -12099,7 +12091,7 @@ const Bp = {
   SMA: { id: "SMA", name: "Simple Moving Average", event: "addIndicator", ind: ts },
   STOCH: { id: "STOCH", name: "Stochastic Oscillator", event: "addIndicator", ind: Pa },
   VOL: { id: "VOL", name: "Volume", event: "addIndicator", ind: is }
-}, Ln = "0.148.0";
+}, Ln = "0.148.1";
 class Up {
   #e;
   #t;

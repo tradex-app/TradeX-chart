@@ -245,7 +245,8 @@ export default class Indicator extends Overlay {
     this.chartPane.graph.removeOverlay(this.id)
 
     // remove widgets
-    this.core.WidgetsG.delete(this.#ColourPicker.id)
+    if (isObject(this.#ColourPicker))
+      this.core.WidgetsG.delete(this.#ColourPicker.id)
 
     // execute parent class
     // delete data
