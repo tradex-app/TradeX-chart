@@ -221,6 +221,7 @@ export default class Overlay {
         case "renderImage": canvas[type]( ctx, params.src, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7] )
         case "renderText": canvas[type]( ctx, p[0], p[1], params ); break;
         case "renderTextBG": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
+        case "histogram": break;
       }
   
       ctx.restore();

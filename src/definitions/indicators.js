@@ -10,6 +10,7 @@ import BB from "../indicators/BB"
 import EMA from "../indicators/EMA"
 import MA from "../indicators/MA"
 import MA_Multi from "../indicators/MA_Multi"
+import MACD from "../indicators/MACD";
 import RSI from "../indicators/RSI";
 import SMA from "../indicators/SMA"
 import STOCH from "../indicators/STOCH";
@@ -22,6 +23,7 @@ export const IndicatorClasses = {
   EMA,
   MA,
   MA_Multi,
+  MACD,
   RSI,
   SMA,
   STOCH,

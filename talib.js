@@ -12,19 +12,28 @@ async function main(talib, wasm, data) {
   try {
     await talib.init(wasm);
     const inReal = []
-    const period = 13
-    const fastD_Period = 3
-    const fastK_Period = 5
+    const period = 12
+    const fastD_Period = 20
+    const fastK_Period = 20
 
     let i = 0
     for (let v of data.ohlcv) {
-      if (i++ < period+((fastD_Period+fastK_Period)*2))
+      // if (i++ < period+((fastD_Period+fastK_Period)*2))
+      if (i++ < 52) // data.ohlcv.length)
        inReal.push(v[4])
     }
     console.time()
     // const result = talib.BBANDS({inReal: inReal, timePeriod: 20, startIdx: 0, endIndex: 29})
     // const p = {inReal: inReal, timePeriod: 20, startIdx: 0, endIndex: 29}
-    const p = {inReal, timePeriod: period, fastK_Period: 5}
+    // const p = {inReal, timePeriod: period, fastK_Period: 5}
+    const p = {
+      inReal,       
+      fastPeriod: 12,
+      slowPeriod: 26,
+      signalPeriod: 9,
+      startIdx:10
+    }
+
     const params = talibParams
 
     console.log(p.inReal)
@@ -34,7 +43,7 @@ async function main(talib, wasm, data) {
     // talibParams.inReal = p.inReal
 
 
-    const result = talib.STOCHRSI(p)
+    const result = talib.MACD(p)
     // const result = talib.RSI(p)
 
 

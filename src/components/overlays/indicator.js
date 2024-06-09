@@ -11,6 +11,7 @@ import { STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
 import { WinState } from "../widgets/window"
 import { onClickOutside } from "../../utils/DOM"
+import { talibAPI } from "../../definitions/talib-api"
 
 // const plotTypes = {
 //   area,
@@ -704,11 +705,16 @@ export default class Indicator extends Overlay {
    * @memberof indicator
    */
   defineIndicator(s, api) {
+
+    s = (isObject(s)) ? s : {}
+    api = (isObject(api)) ? api : {outputs: [], options: []}
+
     const definition = {
       input: {},
       output: {},
       meta: {
         input: {},
+        output: [],
         style: {}
       }
     }
@@ -721,12 +727,9 @@ export default class Indicator extends Overlay {
       d.output = (!isObject(d.output)) ? {} : d.output
       d.meta = (!isObject(d.meta)) ? definition.meta : d.meta
       d.meta.input = (!isObject(d.meta.input)) ? {} : d.meta.input
+      d.meta.output = (!isObject(d.meta.output)) ? talibAPI[this.shortName].outputs : d.meta.output
       d.meta.style = (!isObject(d.meta.style)) ? {} : d.meta.style
     }
-
-
-    s = (isObject(s)) ? s : {}
-    api = (isObject(api)) ? api : {outputs: [], options: []}
 
     // style
     if (Object.keys(d?.meta.style).length == 0 &&
@@ -890,9 +893,23 @@ export default class Indicator extends Overlay {
 
     if (this.noCalc(indicator, range)) return false
 
-    params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
+    // get the period 
+    let d = 0;
+    let def = this.definition.input
+
+    if ("timePeriod" in def)
+      d = def.timePeriod
+    else {
+      for (let i in def) {
+        if (isInteger(def[i]) && def[i] > d)
+        d = def[i]
+      }
+      d *=2
+    }
+
+    // params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
     let start, end;
-    let p = params.timePeriod
+    let p = d
     let t = p + (params?.padding || 0)
     let od = this.overlay.data
 
@@ -1086,7 +1103,75 @@ export default class Indicator extends Overlay {
     super.plot(plots, type, opts )
   }
 
-  draw() {
+  /**
+   * 
+   * @param {number} j - range length
+   * @param {number} k - range index start
+   * @param {number} p - plot index, the output to plot
+   * @param {string} r - render action
+   * @param {object} s - plot styling
+   */
+  plotIt(j, k, p, r, s) {
+    const data = this.overlay.data
+    const width = this.xAxis.candleW
+    const plot = { w: width, }
+
+    let plots = []
+
+    while(j) {
+      if (k < 0 || k >= this.overlay.data.length) {
+        plots.push({x: null, y: null})
+      }
+      else {
+        plot.x = this.xAxis.xPos(data[k][0])
+        plot.y = this.yAxis.yPos(data[k][p])
+        plots.push({...plot})
+      }
+      k++
+      j--
+    }
+
+    this.plot(plots, r, this.style)
+  }
+
+  draw(range=this.range) {
+
+    // no update required
+    if (this.overlay.data.length < 2) return
+
+    if (!super.mustUpdate()) return
+
+    this.scene.clear()
+
+    const offset = this.xAxis.smoothScrollOffset || 0
+    const out = this.definition.meta.output
+
+    // account for "missing" entries because of indicator calculation
+    let o = this.Timeline.rangeScrollOffset
+    let d = range.data.length - this.overlay.data.length
+    let c = range.indexStart - d - 2
+    let i = range.Length + (o * 2) + 2
+    let x = 1
+
+    for (let p of out) {
+      let r;
+      switch(p.plot) {
+        case "line": 
+        case "line_dash":
+        case "limit_lower":
+        case "limit_upper":
+          r = "renderLine"
+          break;
+        case "historgram":
+          r = "historgram"
+          break
+      }
+      this.plotIt(i, c, x++, r, this.style)
+    }
+
+    this.target.viewport.render();
+
+    super.updated()
   }
 
   updated() {
