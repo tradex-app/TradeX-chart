@@ -821,6 +821,7 @@ export default class MainPane extends Component {
         ...params
       }
         instance = this.#Chart.addIndicator(indicator);
+        this.core.state.addIndicator(instance, "primary")
     }
     // add secondary chart indicator
     else {       
@@ -838,6 +839,7 @@ export default class MainPane extends Component {
 
       instance = this.addChartPane(params)
       instance.start()
+      this.core.state.addIndicator(instance, "secondary")
     }
     const id = ("instance" in instance) ? instance.instance.id : instance.id
     this.refresh()

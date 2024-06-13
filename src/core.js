@@ -1420,20 +1420,11 @@ export default class TradeXchart extends Tradex_chart {
         indicators.push(ind.instance.calcIndicatorHistory.bind(ind.instance, recalc))
       }
     }
-    // (async () => {
-      await Promise.all( indicators.map( async i => { 
-        executeInd(i) }))
-        this.refresh()
-    // })();
+    await Promise.all( indicators.map( async i => { 
+      executeInd(i) }))
+      this.refresh()
   }
 
-  // calcAllIndicators() {
-  //   for (const [key, value] of Object.entries(this.Indicators)) {
-  //     for (const [k, ind] of Object.entries(value)) {
-  //       ind.instance.calcIndicatorHistory()
-  //     }
-  //   }
-  // }
 
   /*============================*/
   /*---------- TRADES ----------*/

@@ -987,7 +987,11 @@ export default class Indicator extends Overlay {
   calcIndicatorHistory () {
     const calc = () => {
       let od = this.overlay.data
+
       if (isArray(od) && od.length > 0) return
+      // insert into Range and State
+      // let pane = (this.isPrimary) ? "primary" : "secondary"
+      // this.range.allData[`${pane}Pane`].push()
 
       const data = this.calcIndicator(this.libName, this.definition.input, this.range);
       if (data) {

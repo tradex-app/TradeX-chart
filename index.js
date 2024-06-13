@@ -1210,7 +1210,7 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
-// addChart()
+addChart()
 // addChart()
 // addChart()
 // addChart()

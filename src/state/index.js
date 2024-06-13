@@ -15,6 +15,7 @@ import Indicator from '../components/overlays/indicator'
 import Stream from '../helpers/stream'
 import MainPane from '../components/main'
 import { OHLCV } from '../definitions/chart'
+import Chart from '../components/chart'
 
 const DEFAULTSTATEID = "defaultState"
 const DEFAULT_STATE = {
@@ -92,6 +93,7 @@ export default class State {
     if (!isObject(state)) {
       state = {}
     }
+    // set up main (primary) chart state (handles price history (candles OHLCV))
     if (!isObject(state.chart)) {
       state.chart = defaultState.chart
       state.chart.isEmpty = true
@@ -176,7 +178,7 @@ export default class State {
       if (!isArray(o[c]) || o[c].length == 0)
         o.splice(c, 1)
       else {
-        // check each overlay / indicator entry
+        // validate each overlay / indicator entry
         let i = state.views[c][1]
         let x = i.length
         while (x--) {
@@ -725,6 +727,16 @@ export default class State {
     }
 
     return merged
+  }
+
+  addIndicator(i, p) {
+    if (isObject(i) && p == "primary") {
+      this.#data.primary.push(i.params.overlay)
+    }
+    else if (i instanceof Chart && p == "secondary") {
+      this.#data.secondary.push(...i.options.view)
+    }
+    else return false
   }
 
   removeIndicator(i) {

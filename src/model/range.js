@@ -289,29 +289,29 @@ export class Range {
    * return value by timestamp
    * @param {number} ts
    * @param {string} id
-   * @returns {*}  
+   * @returns {array}  
    * @memberof Range
    */
   valueByTS ( ts, id="" ) {
     if (!isInteger(ts) || !isString(id)) return false
 
     const idx = this.getTimeIndex(ts)
+      let value;
 
     switch (id) {
-      case "chart": 
-
-        break;
+      case "chart": break;
       case "primary": break;
       case "secondary": break;
       case "dataset": break;
       case "all": break;
       default: 
-        if (id.length === 0) return this.value(idx)
+        if (id.length === 0) value = this.value(idx)
         else {
           const idParts = id.split('_')
         }
         break;
     }
+    return value
   }
 
   /**
