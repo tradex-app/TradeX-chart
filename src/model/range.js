@@ -289,29 +289,29 @@ export class Range {
    * return value by timestamp
    * @param {number} ts
    * @param {string} id
-   * @returns {*}  
+   * @returns {array}  
    * @memberof Range
    */
   valueByTS ( ts, id="" ) {
     if (!isInteger(ts) || !isString(id)) return false
 
     const idx = this.getTimeIndex(ts)
+      let value;
 
     switch (id) {
-      case "chart": 
-
-        break;
+      case "chart": break;
       case "primary": break;
       case "secondary": break;
       case "dataset": break;
       case "all": break;
       default: 
-        if (id.length === 0) return this.value(idx)
+        if (id.length === 0) value = this.value(idx)
         else {
           const idParts = id.split('_')
         }
         break;
     }
+    return value
   }
 
   /**
@@ -410,14 +410,14 @@ export class Range {
    maxMinPriceVol ( input ) {
     let {data, start, end, that} = {...input}
     let buffer = bRound(this.#core.bufferPx / this.#core.candleW)
+    let l = data?.length-1
 
     buffer = (isInteger(buffer)) ? buffer : 0
     start = (isInteger(start)) ? start - buffer : 0
     start = (start > 0) ? start : 0
+    end = (isInteger(end)) ? end : l
 
-    end = (typeof end === "number") ? end : data?.length-1
-
-    if (data.length == 0) {
+    if (l < 0) {
       return {
         valueLo: 0,
         valueHi: 1,
@@ -431,7 +431,6 @@ export class Range {
         volumeMaxIdx: 0,
       }
     }
-    let l = data.length - 1
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
 
@@ -445,7 +444,7 @@ export class Range {
     let volumeMinIdx = i
     let volumeMaxIdx = i
 
-    while(i++ < c) {
+    while (i++ < c) {
       if (data[i][3] < valueMin) {
         valueMin = data[i][3]
         valueMinIdx = i
@@ -491,6 +490,63 @@ export class Range {
     function limit(val, min, max) {
       return Math.min(max, Math.max(min, val));
     }
+  }
+
+  /**
+   * Find data maximum and minimum for indicators or datasets
+   * expects [timestamp, value0, ...]
+   * @param {object} input
+   * @returns {Object}  
+   */
+  maxMinData (input) {
+    let {data, start, end, that} = {...input}
+    let buffer = bRound(this.#core.bufferPx / this.#core.candleW)
+    let l = data?.length-1
+    const r = {
+      data0: {
+        min: 0,
+        max: 1,
+        minIdx: 0,
+        maxIdx: 0,
+        diff: 1
+      }
+    }
+
+
+    buffer = (isInteger(buffer)) ? buffer : 0
+    start = (isInteger(start)) ? start - buffer : 0
+    start = (start > 0) ? start : 0
+    end = (isInteger(end)) ? end : l
+
+    if (l < 0 || data[0].length == 0) {
+      return r
+    }
+
+    let f = data[0].length
+    let i = limit(start, 0, l)
+    let c = limit(end, 0, l)
+    let j, k, min, max, minIdx, maxIdx;
+
+    while (--f > -1) {
+      let d = `data${f}`
+      max = data[i][f]
+      min = data[i][f]
+      j = i
+
+      while (j++ < c) {
+        if (data[j][f] < min) {
+          r[d].min = data[j][f]
+          r[d].minIdx = j
+        }
+        if (data[j][f] > max) {
+          r[d].max = data[j][f]
+          r[d].maxIdx = j
+        }
+      }
+
+      r[d].diff = r[d].max - r[d].min
+    }
+    return r
   }
 
   snapshot(start, end) {

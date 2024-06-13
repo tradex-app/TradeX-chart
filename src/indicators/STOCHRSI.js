@@ -1,53 +1,53 @@
-// STOCH.js
-// Stochastic Oscillator
-// https://hackape.github.io/talib.js/modules/_index_.html#rsi
-// https://www.investopedia.com/terms/r/rsi.asp
+// STOCHRSI.js
+// Stochastic RSI
+// https://hackape.github.io/talib.js/modules/_index_.html#stochrsi
+// https://www.investopedia.com/terms/s/stochrsi.asp
 
 import Indicator from "../components/overlays/indicator"
-import {STOCH as talibAPI } from "../definitions/talib-api";
+import {STOCHRSI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
+import { isArray } from "../utils/typeChecks";
 
 
 /**
- * Indicator - Stochastic Oscillator
+ * Indicator - Stochastic RSI
  * @export
- * @class STOCH
+ * @class STOCHRSI
  * @extends {indicator}
  */
-export default class STOCH extends Indicator {
+export default class STOCHRSI extends Indicator {
 
-  get name() { return 'Stochastic Oscillator' }
-  shortName = 'STOCH'
-  libName = 'STOCH'
+  get name() { return 'Stochastic RSI' }
+  shortName = 'STOCHRSI'
+  libName = 'STOCHRSI'
   definition = {
     input: {
-      high: [],
-      low: [],
-      close: [],
-      fastK_Period: 5,
-      slowK_Period: 3,
-      slowD_Period: 3
+      inReal: [],
+      timePeriod: 14,
+      stochPeriod: 14,
+      KPeriod: 3,
+      DPeriod: 3
     },
     output: {
-      slowK: [],
-      slowD: []
+      fastK: [],
+      fastD: []
     },
   }
   checkParamCount = false
   plots = [
-    { key: 'STOCH_1', title: ' ', type: 'line' },
+    { key: 'STOCHRSI_1', title: ' ', type: 'line' },
   ]
 
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
   static defaultStyle = {
-    slowKStroke: "#8C0",
-    slowKLineWidth: '1',
-    slowKLineDash: undefined,
-    slowDStroke: "#00C",
-    slowDLineWidth: '1',
-    slowDLineDash: undefined,
+    fastKStroke: "#8C0",
+    fastKLineWidth: '1',
+    fastKLineDash: undefined,
+    fastDStroke: "#00C",
+    fastDLineWidth: '1',
+    fastDLineDash: undefined,
     defaultHigh: 75,
     defaultLow: 25,
     highLowLineWidth: 1,
@@ -59,20 +59,70 @@ export default class STOCH extends Indicator {
 
 
   /**
-   * Creates an instance of STOCH.
+   * Creates an instance of STOCHRSI.
    * @param {Object} target - canvas scene
    * @param {Object} xAxis - timeline axis instance
    * @param {Object} yAxis - scale axis instance
    * @param {Object} config - theme / styling
    * @param {Object} parent - chart pane instance that hosts the indicator
    * @param {Object} params - contains minimum of overlay instance
-   * @memberof STOCH
+   * @memberof STOCHRSI
    */
   constructor (target, xAxis=false, yAxis=false, config, parent, params)  {
+
 
     super (target, xAxis, yAxis, config, parent, params)
 
     this.init(talibAPI)
+  }
+
+  calcIndicator (indicator, params={}, range=this.range) {
+    // params.padding = params.fastK_Period + params.fastD_Period
+    // return super.calcIndicator(indicator, params, range)
+
+    const stochRSI = []
+    const smooth = []
+    const KVals = []
+    const S = params.stochPeriod || this.definition.input.stochPeriod
+    const D = params.DPeriod || this.definition.input.DPeriod
+    const K = params.KPeriod || this.definition.input.KPeriod
+
+    // calculate RSI
+    const output = { output: [] }
+    const RSI = super.calcIndicator("RSI", params, range, output)
+    if (!RSI) return false
+
+    // Calculate Stochastic RSI
+    for (let i = K - 1; i < RSI.length; i++) {
+      let s = (i - S + 1 < 0) ? 0 : (i - S + 1)
+      let subset = RSI.slice(s, i + 1).map(a => a[1]);
+      let min = Math.min(...subset);
+      let max = Math.max(...subset);
+      let stoch = ((RSI[i][1] - min) / (max - min)) * 100;
+      stochRSI.push(stoch);
+    }
+
+    // Calculate Stochastic RSI K and D
+    for (let i = 0; i < stochRSI.length; i++) {
+      let k = stochRSI.slice(Math.max(0, i - K + 1), i + 1).reduce((a, b) => a + b, 0) / K;
+      KVals.push(k)
+      let d = KVals.slice(Math.max(0, i - D + 1), i + 1).reduce((a, b) => a + b, 0) / D;
+      let t = RSI[i][0]
+      smooth.push([ t, k, d ])
+    }
+
+    return smooth
+  }
+
+  calcIndicatorStream(indicator, params, range=this.range) {
+    // return false
+
+    // const RSI = super.calcIndicatorStream(indicator, params, range)
+    // if (!RSI) return false
+
+    params.padding = this.definition.input.KPeriod
+    const stoch = this.calcIndicator(indicator, params, range)
+    return (isArray(stoch)) ? stoch[this.definition.input.stochPeriod + params.padding] : false
   }
 
   legendInputs(pos=this.chart.cursorPos) {
@@ -81,11 +131,11 @@ export default class STOCH extends Indicator {
     const inputs = {}
     let labels = [false, false, false]
     let {c, colours} = super.legendInputs(pos)
-    inputs.SlowK = this.scale.nicePrice(this.overlay.data[c][1])
-    inputs.SlowD = this.scale.nicePrice(this.overlay.data[c][1])
+    inputs.fastK = this.scale.nicePrice(this.overlay.data[c][1])
+    inputs.fastD = this.scale.nicePrice(this.overlay.data[c][1])
     colours = [
-      this.style.slowD,
-      this.style.slowK
+      this.style.fastD,
+      this.style.fastK
     ]
 
     return {inputs, colours, labels}
@@ -111,7 +161,7 @@ export default class STOCH extends Indicator {
     let style = {fill: this.style.highLowRangeStyle}
     this.plot(plots, "renderRect", style)
 
-    // High STOCH Range marker
+    // High STOCHRSI Range marker
     plots.length = 0
     plots[0] = {x: 0, y: y1}
     plots[1] = {x: x2, y: y1}
@@ -122,7 +172,7 @@ export default class STOCH extends Indicator {
     }
     this.plot(plots, "renderLine", style)
 
-    // Low STOCH Range marker
+    // Low STOCHRSI Range marker
     plots.length = 0
     plots[0] = {x: 0, y: y2}
     plots[1] = {x: x2, y: y2}
@@ -140,8 +190,8 @@ export default class STOCH extends Indicator {
     }
 
     // we have data, draw something
-    // STOCH plot
-    plots = { slowD: [], slowK: [] }
+    // STOCHRSI plot
+    plots = { fastD: [], fastK: [] }
     const data = this.overlay.data
     const width = this.xAxis.candleW
     const plot = {
@@ -157,34 +207,34 @@ export default class STOCH extends Indicator {
 
     while(i) {
       if (c < 0 || c >= this.overlay.data.length) {
-        plots.slowD.push({x: null, y: null})
-        plots.slowK.push({x: null, y: null})
+        plots.fastD.push({x: null, y: null})
+        plots.fastK.push({x: null, y: null})
       }
       else {
         plot.x = this.xAxis.xPos(data[c][0])
         plot.y = this.yAxis.yPos(data[c][1])
-        plots.slowK.push({...plot})
+        plots.fastK.push({...plot})
 
         plot.x = this.xAxis.xPos(data[c][0])
         plot.y = this.yAxis.yPos(data[c][2])
-        plots.slowD.push({...plot})
+        plots.fastD.push({...plot})
       }
       c++
       i--
     }
 
     style = {
-      width: this.style.slowKLineWidth, 
-      stroke: this.style.slowKStroke, 
-      dash: this.style.slowKLineDash
+      width: this.style.fastKLineWidth, 
+      stroke: this.style.fastKStroke, 
+      dash: this.style.fastKLineDash
     }
-    this.plot(plots.slowK, "renderLine", style)
+    this.plot(plots.fastK, "renderLine", style)
     style = {
-      width: this.style.slowDLineWidth, 
-      stroke: this.style.slowDStroke, 
-      dash: this.style.slowDLineDash
+      width: this.style.fastDLineWidth, 
+      stroke: this.style.fastDStroke, 
+      dash: this.style.fastDLineDash
     }
-    this.plot(plots.slowD, "renderLine", style)
+    this.plot(plots.fastD, "renderLine", style)
 
     this.target.viewport.render();
 

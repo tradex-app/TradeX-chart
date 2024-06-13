@@ -1210,7 +1210,7 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
-// addChart()
+addChart()
 // addChart()
 // addChart()
 // addChart()
@@ -1230,7 +1230,7 @@ chart0.setIndicators({
 chart0.addIndicator("VOL")
 chart0.addIndicator("MA")
 chart0.addIndicator("TEST", "Test1", {data: [], settings: {test: true}})
-chart0.addIndicator("DBLMA", "DblMA", {data: [], settings: {}})
+// chart0.addIndicator("DBLMA", "DblMA", {data: [], settings: {}})
 
 // chart0.addIndicator("DMI", "DMI1", {data: []})
 chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
@@ -1258,7 +1258,7 @@ if (typeof chart1 === "object") {
   chart1.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 }
 
-chart2.addIndicator("VOL", "VOL", {settings:{isPrimary: false}})
+// chart2.addIndicator("VOL", "VOL", {settings:{isPrimary: false}})
 
 // test merging indicator data
 if (typeof chart5 === "object")

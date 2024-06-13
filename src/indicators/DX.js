@@ -10,7 +10,7 @@ import { YAXIS_TYPES } from "../definitions/chart";
 
 export default class DX extends Indicator {
 
-  name = 'Directional Movement Index'
+  get name() { return 'Directional Movement Index' }
   shortName = 'DX'
   libName = null
   definition = {

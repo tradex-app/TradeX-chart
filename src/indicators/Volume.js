@@ -16,7 +16,7 @@ import { isBoolean } from "../utils/typeChecks";
  */
 export default class Volume extends Indicator {
 
-  name = 'Volume'
+  get name() { return 'Volume' }
   shortName = 'VOL'
   checkParamCount = false
   scaleOverlay = true

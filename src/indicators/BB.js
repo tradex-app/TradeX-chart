@@ -9,7 +9,7 @@ import { BBANDS as talibAPI } from "../definitions/talib-api";
 
 export default class BB extends Indicator {
 
-  name = 'Bollinger Bands'
+  get name() { return 'Bollinger Bands' }
   shortName = 'BB'
   libName = 'BBANDS'
   definition = {

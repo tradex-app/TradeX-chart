@@ -37,7 +37,7 @@ import { colours2 } from "../components/views/colourPicker";
     width5: '1',
   }
 
-  name = 'Moving Average Multi'
+  get name() { return 'Moving Average Multi' }
   shortName = 'MA'
   libName = 'MA'
   definition = {

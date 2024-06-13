@@ -17,7 +17,7 @@ import Colour from "../utils/colour"
  */
 export default class RSI extends Indicator {
 
-  name = 'Relative Strength Index'
+  get name() { return 'Relative Strength Index' }
   shortName = 'RSI'
   libName = 'RSI'
   definition = {

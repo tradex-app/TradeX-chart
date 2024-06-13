@@ -14,6 +14,8 @@ import TradeXchart from '../core'
 import Indicator from '../components/overlays/indicator'
 import Stream from '../helpers/stream'
 import MainPane from '../components/main'
+import { OHLCV } from '../definitions/chart'
+import Chart from '../components/chart'
 
 const DEFAULTSTATEID = "defaultState"
 const DEFAULT_STATE = {
@@ -91,6 +93,7 @@ export default class State {
     if (!isObject(state)) {
       state = {}
     }
+    // set up main (primary) chart state (handles price history (candles OHLCV))
     if (!isObject(state.chart)) {
       state.chart = defaultState.chart
       state.chart.isEmpty = true
@@ -175,7 +178,7 @@ export default class State {
       if (!isArray(o[c]) || o[c].length == 0)
         o.splice(c, 1)
       else {
-        // check each overlay / indicator entry
+        // validate each overlay / indicator entry
         let i = state.views[c][1]
         let x = i.length
         while (x--) {
@@ -224,6 +227,39 @@ export default class State {
 
   static get(key) {
     return State.#stateList.get(key)
+  }
+
+  /**
+   * split price data into OHLCV
+   * @static
+   * @param {array} data
+   * @return {object}  
+   * @memberof State
+   */
+  static ohlcv(data) {
+    if (!isArray(data)) return false
+
+    let ohlcv = {
+      time: [],
+      open: [],
+      high: [],
+      low: [],
+      close: [],
+      volume: []
+    }
+    let start = 0, end = data.length;
+    while (end != 0 && start < end) {
+      let val = data[start]
+      ohlcv.time.push(val[OHLCV.t])
+      ohlcv.open.push(val[OHLCV.o])
+      ohlcv.high.push(val[OHLCV.h])
+      ohlcv.low.push(val[OHLCV.l])
+      ohlcv.close.push(val[OHLCV.c])
+      ohlcv.volume.push(val[OHLCV.v])
+      start++
+    }
+
+    return ohlcv
   }
 
   /**
@@ -281,8 +317,9 @@ export default class State {
       this.#status = "default"
       this.#isEmpty = true
     }
-    this.#id = state?.id || ""
+    this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
     this.#key = uid(`${SHORTNAME}_state`)
+    this.#id = state?.id || this.#key
   }
 
   get id() { return this.#id }
@@ -292,6 +329,7 @@ export default class State {
   get allData() {
     return {
       data: this.#data.chart.data,
+      ohlcv: this.#data.chart.ohlcv,
       primaryPane: this.#data.primary,
       secondaryPane: this.#data.secondary,
       datasets: this.#data.datasets
@@ -508,7 +546,9 @@ export default class State {
       
       // chart is empty so simply add the new data
       if (data.length == 0) {
+        let ohlcv = State.ohlcv(mData)
         this.allData.data.push(...mData)
+        this.allData.ohlcv = {...ohlcv}
       }
       // chart has data, check for gaps and overlap and then merge
       else {
@@ -687,6 +727,17 @@ export default class State {
     }
 
     return merged
+  }
+
+  addIndicator(i, p) {
+    if (isObject(i) && p == "primary") {
+      i.params.overlay.id = i.instance.id
+      this.#data.primary.push(i.params.overlay)
+    }
+    else if (i instanceof Chart && p == "secondary") {
+      this.#data.secondary.push(...i.options.view)
+    }
+    else return false
   }
 
   removeIndicator(i) {
