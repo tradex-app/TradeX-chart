@@ -731,6 +731,7 @@ export default class State {
 
   addIndicator(i, p) {
     if (isObject(i) && p == "primary") {
+      i.params.overlay.id = i.instance.id
       this.#data.primary.push(i.params.overlay)
     }
     else if (i instanceof Chart && p == "secondary") {
