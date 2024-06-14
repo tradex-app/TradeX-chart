@@ -347,7 +347,7 @@ export default class TradeXchart extends Tradex_chart {
   get allData() {
     return {
       data: this.state.data.chart.data,
-      primaryPane: this.state.data.secondary,
+      primaryPane: this.state.data.primary,
       secondaryPane: this.state.data.secondary,
       datasets: this.state.data.datasets
     }
