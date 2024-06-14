@@ -1,11 +1,11 @@
 // range.js
 
 import TradeXchart from "../core"
-import { ms2Interval } from "../utils/time"
+import { ms2Interval, TimeData } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS, INTITIALCNT, DEFAULT_TIMEFRAME } from "../definitions/chart"
 import { isInteger, isNumber, isObject, isString } from "../utils/typeChecks"
 import { bRound, limit } from "../utils/number"
-import { TimeData } from "../utils/time"
+import { diff } from "../utils/utilities"
 // import WebWorker from "./webWorkers"
 // import WebWorker from "./webWorkers4"
 
@@ -29,6 +29,7 @@ export class Range {
   valueMaxIdx = 0
   volumeMinIdx = 0
   volumeMaxIdx = 0
+  secondaryMaxMin = {}
   old = {}
   #initialCnt = INTITIALCNT
   #limitFuture = LIMITFUTURE
@@ -194,9 +195,9 @@ export class Range {
     inOut -= this.Length
 
     let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this})
-    
     this.setMaxMin(maxMin)
     this.setConfig({maxCandles: max})
+    this.maxMinDatasets()
 
     // if (this.#init || this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
     //   this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
@@ -492,6 +493,30 @@ export class Range {
     }
   }
 
+  maxMinDatasets() {
+    if (this.allData.secondaryPane.length == 0) return
+
+    let old = Object.keys(this.secondaryMaxMin)
+
+    for (let p of this.allData.secondaryPane) {
+      let input = {
+        data: p.data,
+        start: this.indexStart,
+        end: this.indexEnd,
+        that: this
+      }
+      this.secondaryMaxMin[p.id] = this.maxMinData(input)
+      let index = old.indexOf(p.id);
+      if (index !== -1) {
+        old.splice(index, 1);
+      }
+    }
+    // clean up old entries
+    for (let del of old) {
+      delete this.secondaryMaxMin[del]
+    }
+  }
+
   /**
    * Find data maximum and minimum for indicators or datasets
    * expects [timestamp, value0, ...]
@@ -501,8 +526,17 @@ export class Range {
   maxMinData (input) {
     let {data, start, end, that} = {...input}
     let buffer = bRound(this.#core.bufferPx / this.#core.candleW)
-    let l = data?.length-1
-    const r = {
+    let l = data.length-1
+    let x = this.dataLength - data.length
+    const r = {}
+
+    buffer = (isInteger(buffer)) ? buffer : 0
+    start = (isInteger(start)) ? start - buffer : 0
+    start = (start > 0) ? start - x : 0
+    end = (isInteger(end)) ? end - x : l
+
+    if (l < 0 || data[0].length == 0) {
+      return {
       data0: {
         min: 0,
         max: 1,
@@ -511,24 +545,16 @@ export class Range {
         diff: 1
       }
     }
-
-
-    buffer = (isInteger(buffer)) ? buffer : 0
-    start = (isInteger(start)) ? start - buffer : 0
-    start = (start > 0) ? start : 0
-    end = (isInteger(end)) ? end : l
-
-    if (l < 0 || data[0].length == 0) {
-      return r
     }
 
-    let f = data[0].length
+    let f = data[0].length - 1
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
-    let j, k, min, max, minIdx, maxIdx;
+    let j, k, min, max, minIdx, maxIdx, diff;
 
-    while (--f > -1) {
+    while (f > 0) {
       let d = `data${f}`
+      r[d] = {}
       max = data[i][f]
       min = data[i][f]
       j = i
@@ -544,7 +570,9 @@ export class Range {
         }
       }
 
-      r[d].diff = r[d].max - r[d].min
+      diff = r[d].max - r[d].min
+      if (diff !== NaN) r[d].diff = diff
+      --f
     }
     return r
   }
