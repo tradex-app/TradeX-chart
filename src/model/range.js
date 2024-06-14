@@ -111,7 +111,7 @@ export class Range {
     this.set(start, end)
   }
 
-  get allData () { return this.#core?.allData }
+  get allData () { return this.#core?.state.allData }
   get data () { return this.allData?.data || [] }
   get dataLength () { return (!!this.allData?.data.length) ? this.allData.data.length - 1 : 0 }
   get Length () { return this.indexEnd - this.indexStart }

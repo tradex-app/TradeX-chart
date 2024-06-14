@@ -2158,7 +2158,7 @@ class zi {
     i == 0 && this.data.length >= this.rangeLimit ? i = this.rangeLimit : i == 0 && (i = this.data.length), this.set(e, i);
   }
   get allData() {
-    return this.#e?.allData;
+    return this.#e?.state.allData;
   }
   get data() {
     return this.allData?.data || [];
@@ -12329,7 +12329,7 @@ const Ma = {
       ind: o[e]
     };
 })(Ma);
-const On = "0.148.2";
+const On = "0.148.3";
 class F0 {
   #e;
   #t;
@@ -19377,7 +19377,7 @@ class R extends Jm {
   get allData() {
     return {
       data: this.state.data.chart.data,
-      primaryPane: this.state.data.secondary,
+      primaryPane: this.state.data.primary,
       secondaryPane: this.state.data.secondary,
       datasets: this.state.data.datasets
     };
