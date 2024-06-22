@@ -528,16 +528,12 @@ export class Range {
     let buffer = bRound(this.#core.bufferPx / this.#core.candleW)
     let l = data.length-1
     let x = this.dataLength - data.length
+    let f = data[0]?.length - 1 || 0
     const r = {}
 
-    buffer = (isInteger(buffer)) ? buffer : 0
-    start = (isInteger(start)) ? start - buffer : 0
-    start = (start > 0) ? start - x : 0
-    end = (isInteger(end)) ? end - x : l
-
-    if (l < 0 || data[0].length == 0) {
-      return {
-      data0: {
+    // create default max min for indicator outputs
+    for (let g = f; g > 0; g--) {
+      r[`data${g}`] = {
         min: 0,
         max: 1,
         minIdx: 0,
@@ -545,33 +541,39 @@ export class Range {
         diff: 1
       }
     }
-    }
 
-    let f = data[0].length - 1
+    buffer = (isInteger(buffer)) ? buffer : 0
+    start = (isInteger(start)) ? start - buffer : 0
+    start = (start > 0) ? start - x : 0
+    end = (isInteger(end)) ? end - x : l
+
+    if (l < 0 || data[0].length == 0) 
+      return r
+
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
     let j, k, min, max, minIdx, maxIdx, diff;
 
-    while (f > 0) {
-      let d = `data${f}`
-      r[d] = {}
+    // iterate over indicator outputs
+    for (let d in r) {
       max = data[i][f]
       min = data[i][f]
       j = i
 
+      // iterate over range for indicator output
       while (j++ < c) {
-        if (data[j][f] < min) {
+        if (data[j][f] <= min) {
           r[d].min = data[j][f]
           r[d].minIdx = j
         }
-        if (data[j][f] > max) {
+        if (data[j][f] >= max) {
           r[d].max = data[j][f]
           r[d].maxIdx = j
         }
       }
 
       diff = r[d].max - r[d].min
-      if (diff !== NaN) r[d].diff = diff
+      r[d].diff = (!isNaN(diff)) ? diff : 0
       --f
     }
     return r

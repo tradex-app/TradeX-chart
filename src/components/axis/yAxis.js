@@ -6,6 +6,7 @@ import { isNumber } from "../../utils/typeChecks";
 import { 
   PRICEDIGITS, 
   YAXIS_STEP,
+  YAXIS_TYPE,
   YAXIS_TYPES
 } from "../../definitions/chart";
 import { YAxisFontSizeFactor } from "../../definitions/style";
@@ -56,7 +57,10 @@ export default class yAxis extends Axis {
     this.yAxisType = yAxisType
 
     // use either chart.localRange or core.range
-    range = (range) ? range : this.core.range
+    if (yAxisType == "relative")
+      range = this.core.range
+    else 
+      range = (range) ? range : this.core.range
     this.setRange(range)
   }
 
@@ -117,11 +121,14 @@ export default class yAxis extends Axis {
    * @memberof yAxis
    */
   yPos(y) {
+    let val;
     switch(this.yAxisType) {
-      case "percent" : return bRound(this.p100toPixel(y))
-      case "log" : return bRound(this.$2Pixel(log10(y)))
-      default : return bRound(this.$2Pixel(y))
+      case "relative" : val = this.val2Pixel(y)
+      case "percent" : val = this.p100toPixel(y)
+      case "log" : val = this.$2Pixel(log10(y))
+      default : val = this.$2Pixel(y)
     }
+    return bRound(val)
   }
 
   /**
@@ -133,6 +140,30 @@ export default class yAxis extends Axis {
    */
   yPos2Price(y) {
     return this.pixel2$(y)
+  }
+
+  /**
+   * convert indicator value to y pixel position relative top left (0,0)
+   * @param {number} y
+   * @return {number}  
+   * @memberof yAxis
+   */
+  val2Pixel(y) {
+    let h, p;
+    let chart = this.parent.parent
+        let id = chart.view[0].id
+        let mm = this.range.secondaryMaxMin
+        // secondary pane returns pixel value for indicator range
+        if (!chart.isPrimary &&
+            id in mm) {
+              h = y - mm[id].data1.min
+              p = this.height - (h * (this.height / mm[id].data1.diff))
+        }
+        // primary pane always returns pixel values for price range
+        else {
+          p = this.$2Pixel(y)
+        }
+    return p
   }
 
   /**
@@ -281,20 +312,29 @@ export default class yAxis extends Axis {
 
   calcGradations() {
     let max, min, off;
+    max = (this.#range.max > 0) ? this.#range.max : 1;
+    min = (this.#range.min > 0) ? this.#range.min : 0;
+
     switch (this.yAxisType) {
       case "percent":
         max = (this.#range.max > -10) ? this.#range.max : 110
         min = (this.#range.min > -10) ? this.#range.min : -10
-        off = this.#range.offset
-        this.#yAxisGrads = this.gradations(max + off, min + off)
+        break;
+      case "relative":
+        let chart = this.parent.parent
+        let id = chart.view[0].id
+        let mm = this.range.secondaryMaxMin
+        if (!chart.isPrimary &&
+            id in mm) {
+              max = mm[id].data1.max
+              min = mm[id].data1.min
+        }
         break;
       default:
-        max = (this.#range.max > 0) ? this.#range.max : 1
-        min = (this.#range.min > 0) ? this.#range.min : 0
-        off = this.#range.offset
-        this.#yAxisGrads = this.gradations(max + off, min + off)
         break;
     }
+    off = this.#range.offset
+    this.#yAxisGrads = this.gradations(max + off, min + off)
     return this.#yAxisGrads
   }
 

@@ -862,14 +862,39 @@ export default class Indicator extends Overlay {
     })
   }
 
+  getTimePeriod() {
+    let d = 0;
+    let def = this.definition.input
+
+    if ("timePeriod" in def)
+      d = def.timePeriod
+    else {
+      for (let i in def) {
+        if (isInteger(def[i]) && def[i] > d)
+        d = def[i]
+      }
+      d *=2
+    }
+    return d
+  }
+
   TALibParams() {
     let end = this.range.dataLength
-    let step = this.definition.input.timePeriod
+    let step = this.getTimePeriod()
     let start = end - step //+ 1
     let input = this.indicatorInput(start, end)
     let hasNull = input.inReal.find(element => element === null)
     if (hasNull) return false
     else return { timePeriod: step, ...input }
+  }
+
+  formatValue(entry) {
+    let v = []
+    let i = 0
+    for (let o in this.definition.output) {
+      v[i++] = entry[o][0]
+    }
+    return v
   }
 
   noCalc(indicator, range) {
@@ -894,19 +919,7 @@ export default class Indicator extends Overlay {
     if (this.noCalc(indicator, range)) return false
 
     // get the period 
-    let d = 0;
-    let def = this.definition.input
-
-    if ("timePeriod" in def)
-      d = def.timePeriod
-    else {
-      for (let i in def) {
-        if (isInteger(def[i]) && def[i] > d)
-        d = def[i]
-      }
-      d *=2
-    }
-
+    let d = this.getTimePeriod()
     // params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
     let start, end;
     let p = d
@@ -955,7 +968,7 @@ export default class Indicator extends Overlay {
     }
 
     let data = [];
-    let i, v, entry, input;
+    let entry, input, value;
 
     while (start < end) {
       // fetch the data required to calculate the indicator
@@ -965,14 +978,10 @@ export default class Indicator extends Overlay {
       // if (hasNull) return false
 
       entry = this.TALib[indicator](params)
+      value = this.formatValue(entry)
 
-      v = []
-      i = 0
-      for (let o in output) {
-        v[i++] = entry[o][0]
-      }
       // store entry with timestamp
-      data.push([range.value(start + p - 1)[0], ...v])
+      data.push([range.value(start + p - 1)[0], ...value])
       // data.push([range.value(start - 1)[0], ...v])
 
       start++
@@ -994,6 +1003,9 @@ export default class Indicator extends Overlay {
       // this.range.allData[`${pane}Pane`].push()
 
       const data = this.calcIndicator(this.libName, this.definition.input, this.range);
+      if (this.libName == "MACD") {
+        console.log(typeof data)
+      }
       if (data) {
         const d = new Set(data)
         const o = new Set(od)
@@ -1046,14 +1058,9 @@ export default class Indicator extends Overlay {
     let entry = this.TALib[indicator](params)
     let end = range.dataLength
     let time = range.value(end)[0]
-    let v = []
-    let i = 0
+    let value = this.formatValue(entry)
 
-    for (let o in this.definition.output) {
-      v[i++] = entry[o][0]
-    }
-
-    return [time, ...v]
+    return [time, ...value]
   }
 
   /**
