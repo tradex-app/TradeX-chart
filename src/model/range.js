@@ -496,17 +496,22 @@ export class Range {
   maxMinDatasets() {
     if (this.allData.secondaryPane.length == 0) return
 
-    let old = Object.keys(this.secondaryMaxMin)
+    let old = Object.keys(this.secondaryMaxMin) || []
 
+    // iterate over secondary panes
     for (let p of this.allData.secondaryPane) {
+      let index = old.indexOf(p.id);
       let input = {
         data: p.data,
         start: this.indexStart,
         end: this.indexEnd,
         that: this
       }
-      this.secondaryMaxMin[p.id] = this.maxMinData(input)
-      let index = old.indexOf(p.id);
+      // new entry?
+      if (!(p.id in this.secondaryMaxMin))
+        this.secondaryMaxMin[p.id] = this.maxMinData(input)
+
+      // old entry to remove?
       if (index !== -1) {
         old.splice(index, 1);
       }

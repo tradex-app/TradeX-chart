@@ -36,7 +36,7 @@ import { YAXIS_TYPES } from "../definitions/chart";
   
   static inCnt = 0
   static primaryPane = false
-  static scale = YAXIS_TYPES[2] // YAXIS_TYPES - percent
+  static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative
   static colours = [
     "#9C27B0",
     "#9C27B0",
@@ -84,6 +84,10 @@ import { YAXIS_TYPES } from "../definitions/chart";
     // debugger
     super.calcIndicatorHistory()
     // console.trace()
+  }
+
+  draw(range=this.range) {
+    super.draw(range)
   }
 
 }

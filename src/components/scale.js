@@ -332,7 +332,7 @@ export default class ScaleBar extends Component {
   draw(range=this.range, update=true) {
     this.graph.draw(range, update)
     this.parent.drawGrid(update)
-    this.parent.draw(this.range, true)
+    this.parent.draw(range, true)
   }
 
   resize(width=this.width, height=this.height) {

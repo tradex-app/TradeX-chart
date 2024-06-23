@@ -92,6 +92,21 @@ export default class yAxis extends Axis {
     return this.height / this.#range.diff
   }
 
+  getSecondaryMaxMinDiff() {
+    // default max min
+    let max = (this.#range.max > 0) ? this.#range.max : 1;
+    let min = (this.#range.min > 0) ? this.#range.min : 0;
+    let chart = this.parent.parent
+    let id = chart.view[0].id
+    let mm = this.range.secondaryMaxMin || {}
+    if (!chart.isPrimary &&
+        id in mm) {
+          max = mm[id].data1.max
+          min = mm[id].data1.min
+    }
+    return {max, min, diff: max - min}
+  }
+
   yAxisRangeBounds() {
 
   }
@@ -123,10 +138,10 @@ export default class yAxis extends Axis {
   yPos(y) {
     let val;
     switch(this.yAxisType) {
-      case "relative" : val = this.val2Pixel(y)
-      case "percent" : val = this.p100toPixel(y)
-      case "log" : val = this.$2Pixel(log10(y))
-      default : val = this.$2Pixel(y)
+      case "relative" : val = this.val2Pixel(y); break;
+      case "percent" : val = this.p100toPixel(y); break;
+      case "log" : val = this.$2Pixel(log10(y)); break;
+      default : val = this.$2Pixel(y); break;
     }
     return bRound(val)
   }
@@ -149,20 +164,20 @@ export default class yAxis extends Axis {
    * @memberof yAxis
    */
   val2Pixel(y) {
-    let h, p;
+    let p;
     let chart = this.parent.parent
-        let id = chart.view[0].id
-        let mm = this.range.secondaryMaxMin
-        // secondary pane returns pixel value for indicator range
-        if (!chart.isPrimary &&
-            id in mm) {
-              h = y - mm[id].data1.min
-              p = this.height - (h * (this.height / mm[id].data1.diff))
-        }
-        // primary pane always returns pixel values for price range
-        else {
-          p = this.$2Pixel(y)
-        }
+    let id = chart.view[0].id
+    let mm = this.range.secondaryMaxMin
+    // secondary pane returns pixel value for indicator range
+    if (!chart.isPrimary &&
+        id in mm) {
+          p = this.height * ((y - mm[id].data1.min) / mm[id].data1.diff)
+    }
+    // primary pane always returns pixel values for price range
+    else {
+      p = this.$2Pixel(y)
+    }
+    // console.log("val2Pixel()", p)
     return p
   }
 
@@ -311,7 +326,8 @@ export default class yAxis extends Axis {
   }
 
   calcGradations() {
-    let max, min, off;
+    let mm, max, min, off;
+    // default max min
     max = (this.#range.max > 0) ? this.#range.max : 1;
     min = (this.#range.min > 0) ? this.#range.min : 0;
 
@@ -321,38 +337,31 @@ export default class yAxis extends Axis {
         min = (this.#range.min > -10) ? this.#range.min : -10
         break;
       case "relative":
-        let chart = this.parent.parent
-        let id = chart.view[0].id
-        let mm = this.range.secondaryMaxMin
-        if (!chart.isPrimary &&
-            id in mm) {
-              max = mm[id].data1.max
-              min = mm[id].data1.min
-        }
+        mm = this.getSecondaryMaxMinDiff()
+        max = mm.max
+        min = mm.min
         break;
       default:
         break;
     }
+    // account for manual user positioning
     off = this.#range.offset
     this.#yAxisGrads = this.gradations(max + off, min + off)
     return this.#yAxisGrads
   }
 
   gradations(max, min, decimals=true) {
-      let digits,
-          rangeH,
-          yGridSize;
-    const scaleGrads = [];
-
-    let niceNumber = this.niceNumber()
-    // find next largest nice number above yStart
-    var yStartRoundNumber = Math.ceil( min/niceNumber ) * niceNumber;
-    // find next lowest nice number below yEnd
-    var yEndRoundNumber = Math.floor( max/niceNumber ) * niceNumber;
-
-    let pos = this.height,
-        step$ = (yEndRoundNumber - yStartRoundNumber) / niceNumber,
-        stepP = this.height / step$,
+    let digits,
+        scaleGrads = [],
+        rangeH = max - min,
+        niceNumber = this.niceNumber(rangeH),
+        // find next largest nice number above yStart
+        yStartRoundNumber = Math.ceil( min/niceNumber ) * niceNumber,
+        // find next lowest nice number below yEnd
+        yEndRoundNumber = Math.floor( max/niceNumber ) * niceNumber,
+        pos = this.height,
+        // step$ = (yEndRoundNumber - yStartRoundNumber) / niceNumber,
+        // stepP = this.height / step$,
         step = countDigits(niceNumber),
         nice;
     this.#step = step

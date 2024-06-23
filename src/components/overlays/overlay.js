@@ -141,6 +141,7 @@ export default class Overlay {
 
   getYAxis() {
     if (this.#yAxis instanceof yAxis) return this.#yAxis
+    else if (this.#yAxis.yAxis instanceof yAxis) return this.#yAxis.yAxis
     else if (this.chart.yAxis instanceof yAxis) return this.chart.yAxis
     else if ("scale" in this.#parent) return this.#parent.scale.yAxis
     else return false
@@ -148,8 +149,8 @@ export default class Overlay {
 
   contextIs() {
     if (!this.#xAxis && !this.#yAxis) return "chart"
-    else if (this.#xAxis instanceof xAxis) return "timeline"
-    else if (this.#yAxis instanceof yAxis) return "scale"
+    else if (this.getXAxis() instanceof xAxis) return "timeline"
+    else if (this.getYAxis() instanceof yAxis) return "scale"
     else return false
   }
 

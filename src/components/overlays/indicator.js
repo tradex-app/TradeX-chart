@@ -1130,7 +1130,7 @@ export default class Indicator extends Overlay {
     let plots = []
 
     while(j) {
-      if (k < 0 || k >= this.overlay.data.length) {
+      if (k < 0 || k >= data.length) {
         plots.push({x: null, y: null})
       }
       else {
@@ -1147,8 +1147,9 @@ export default class Indicator extends Overlay {
 
   draw(range=this.range) {
 
+    const data = this.overlay.data
     // no update required
-    if (this.overlay.data.length < 2) return
+    if (data.length < 2) return
 
     if (!super.mustUpdate()) return
 
@@ -1159,7 +1160,7 @@ export default class Indicator extends Overlay {
 
     // account for "missing" entries because of indicator calculation
     let o = this.Timeline.rangeScrollOffset
-    let d = range.data.length - this.overlay.data.length
+    let d = range.data.length - data.length
     let c = range.indexStart - d - 2
     let i = range.Length + (o * 2) + 2
     let x = 1

@@ -736,6 +736,7 @@ export default class State {
     }
     else if (i instanceof Chart && p == "secondary") {
       this.#data.secondary.push(...i.options.view)
+      this.range.maxMinDatasets()
     }
     else return false
   }
@@ -748,6 +749,7 @@ export default class State {
       for (let d=0; d<a.length; d++) {
         if (a[d].id == i) {
           a.splice(d, 1)
+          this.range.maxMinDatasets()
           return true
         }
       }
