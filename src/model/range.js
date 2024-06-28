@@ -557,7 +557,9 @@ export class Range {
 
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
-    let j, k, min, max, minIdx, maxIdx, diff;
+    let j, v, min, max, diff;
+    let tMax = -Infinity;
+    let tMin = Infinity;
 
     // iterate over indicator outputs
     for (let d in r) {
@@ -567,19 +569,29 @@ export class Range {
 
       // iterate over range for indicator output
       while (j++ < c) {
-        if (data[j][f] <= min) {
-          r[d].min = data[j][f]
+        v = data[j][f]
+        if (v <= min) {
+          r[d].min = v
           r[d].minIdx = j
         }
-        if (data[j][f] >= max) {
-          r[d].max = data[j][f]
+        if (v >= max) {
+          r[d].max = v
           r[d].maxIdx = j
         }
       }
 
+      if (v < tMin) tMin = v
+      if (v > tMax) tMax = v
+
       diff = r[d].max - r[d].min
       r[d].diff = (!isNaN(diff)) ? diff : 0
       --f
+    }
+    // max min totals for all outputs
+    r.data = {
+      min: tMin,
+      max: tMax,
+      diff: tMax - tMin
     }
     return r
   }

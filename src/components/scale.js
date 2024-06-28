@@ -150,7 +150,7 @@ export default class ScaleBar extends Component {
 
     this.on(`${this.parent.id}_pointermove`, this.onMouseMove, this)
     this.on(`${this.parent.id}_pointerout`, this.#layerCursor.erase, this.#layerCursor)
-    this.on(STREAM_UPDATE, this.#layerPriceLine.draw, this.#layerPriceLine)
+    this.on(STREAM_UPDATE, this.onStreamUpdate, this)
     this.on(`setRange`, this.draw, this)
   }
 
@@ -181,7 +181,7 @@ export default class ScaleBar extends Component {
   }
 
   onStreamUpdate(e) {
-
+    this.#layerPriceLine.draw()
   }
 
   onChartDrag(e) {

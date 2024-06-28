@@ -100,17 +100,13 @@ export default class yAxis extends Axis {
     let max = (this.#range.max > 0) ? this.#range.max : 1,
         min = (this.#range.min > 0) ? this.#range.min : 0,
         chart = this.parent.parent,
-        id = chart.view[0].id,
+        id = chart.view[0]?.id,
         mm = this.range.secondaryMaxMin || {},
         pane = this.#range;
     if (!chart.isPrimary &&
         id in mm) {
-          max = mm[id].data1.max
-          min = mm[id].data1.min
-          for (let d in mm[id]) {
-            max = (mm[id][d].max > max) ? mm[id][d].max : max
-            min = (mm[id][d].min < min) ? mm[id][d].min : min
-          }
+          max = mm[id].data.max
+          min = mm[id].data.min
     }
     return {max, min, diff: max - min}
   }
@@ -162,14 +158,18 @@ export default class yAxis extends Axis {
    */
   val2Pixel(y) {
     let p,
-        h = this.height,
-        chart = this.parent.parent,
-        id = chart.view[0].id,
-        mm = this.range.secondaryMaxMin;
+        chart = this.parent.parent;
     // secondary pane returns pixel value for indicator range
-    if (!chart.isPrimary &&
-        id in mm) {
-          p = h - (h * ((y - mm[id].data1.min) / mm[id].data1.diff))
+    if (!chart.isPrimary) {
+      let h = this.height,
+          {min, diff} = this.getMaxMinDiff();
+          p = h - (h * ((y - min) / diff))
+
+
+          // console.log(p)
+          if (p < 0 || p > h) {
+            let P = p
+          }
     }
     // primary pane always returns pixel values for price range
     else {
@@ -390,7 +390,7 @@ export default class yAxis extends Axis {
     for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
     {
       digits = countDigits(y)
-      nice = limitPrecision(y, step.decimals)
+      nice = limitPrecision(y, step.decimals) * 1
       pos = this.yPos(nice)
       scaleGrads.push([nice, pos, digits])
     }
