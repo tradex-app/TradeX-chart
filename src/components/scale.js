@@ -144,7 +144,6 @@ export default class ScaleBar extends Component {
     this.#input.setCursor("ns-resize")
     // this.#input.on("pointerdrag", throttle(this.onDrag, 100, this, true));
     this.#input.on("pointerdrag", this.onDrag.bind(this));
-
     this.#input.on("pointerdragend", this.onDragDone.bind(this))
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("dblclick", this.resetScaleRange.bind(this))

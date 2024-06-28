@@ -508,18 +508,25 @@ export class Range {
         that: this
       }
       // new entry?
-      if (!(p.id in this.secondaryMaxMin))
-        this.secondaryMaxMin[p.id] = this.maxMinData(input)
+      // if (!(p.id in this.secondaryMaxMin)) {
 
-      // old entry to remove?
+
+      // }
+
+      // current or new entry
+      this.secondaryMaxMin[p.id] = this.maxMinData(input)
+      console.log("set max min")
+
       if (index !== -1) {
         old.splice(index, 1);
       }
+
     }
     // clean up old entries
     for (let del of old) {
       delete this.secondaryMaxMin[del]
     }
+    
   }
 
   /**

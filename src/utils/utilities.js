@@ -87,7 +87,7 @@ export function getPrototypeAt(level, obj) {
  * @returns {Object}  
  */
 export function copyDeep(obj, clone=true) {
-  // if ("structuredClone" in navigator && clone) return _structuredClone(obj)
+  // if ("structuredClone" in navigator && clone) return doStructuredClone(obj)
 
   if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
   return obj;
@@ -108,7 +108,7 @@ export function copyDeep(obj, clone=true) {
   return temp;
 }
 
-function _structuredClone(obj) {
+export function doStructuredClone(obj) {
   try {
     return structuredClone(obj)
   }
