@@ -507,16 +507,9 @@ export class Range {
         end: this.indexEnd,
         that: this
       }
-      // new entry?
-      // if (!(p.id in this.secondaryMaxMin)) {
-
-
-      // }
-
       // current or new entry
       this.secondaryMaxMin[p.id] = this.maxMinData(input)
-      console.log("set max min")
-
+      // leave only old entries to remove
       if (index !== -1) {
         old.splice(index, 1);
       }

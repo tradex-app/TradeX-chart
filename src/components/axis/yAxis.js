@@ -107,6 +107,10 @@ export default class yAxis extends Axis {
         id in mm) {
           max = mm[id].data1.max
           min = mm[id].data1.min
+          for (let d in mm[id]) {
+            max = (mm[id][d].max > max) ? mm[id][d].max : max
+            min = (mm[id][d].min < min) ? mm[id][d].min : min
+          }
     }
     return {max, min, diff: max - min}
   }
@@ -235,9 +239,10 @@ export default class yAxis extends Axis {
    * @memberof yAxis
    */
   pixel2$(y) {
+    let {min, diff} = this.getMaxMinDiff()
     let ratio = (this.height - y) / this.height
-    let adjust = this.#range.diff * ratio
-    return this.#range.min + adjust
+    let adjust = diff * ratio
+    return min + adjust
   }
 
   yAxisTransform() {
@@ -299,8 +304,6 @@ export default class yAxis extends Axis {
   setZoom(z) {
     if (!isNumber(z) || this.#mode !== "manual") return false
 
-    // let t = this.transformPrimarySecondary()
-
     let t = this.#transform.manual;
     let {max, min, diff} = this. getMaxMinDiff()
     const diff10P = diff * 0.01;
@@ -316,8 +319,6 @@ export default class yAxis extends Axis {
     t.mid = (diff) / 2
     t.diff = diff
     t.zoom = change
-
-    this.calcGradations()
   }
 
   /**

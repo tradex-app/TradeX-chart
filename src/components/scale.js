@@ -329,6 +329,7 @@ export default class ScaleBar extends Component {
   }
 
   draw(range=this.range, update=true) {
+    this.#yAxis.calcGradations()
     this.graph.draw(range, update)
     this.parent.drawGrid(update)
     this.parent.draw(range, true)
