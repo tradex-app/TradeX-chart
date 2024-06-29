@@ -181,7 +181,27 @@ export default class ScaleBar extends Component {
   }
 
   onStreamUpdate(e) {
-    this.#layerPriceLine.draw()
+    let draw = false
+
+    if (this.parent.isPrimary) {
+      if (e[4] > this.range.max) {
+        this.range.max = e[4]
+        draw = true
+      }
+      if (e[4] < this.range.min) {
+        this.range.max = e[4]
+        draw = true
+      }
+    }
+    else {
+      let chart = this.parent
+      let id = chart.view[0].id
+      let mm = this.core.range.secondaryMaxMin[id].data
+      
+    }
+
+    if (draw) this.draw()
+    else this.#layerPriceLine.draw()
   }
 
   onChartDrag(e) {

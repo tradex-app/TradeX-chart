@@ -139,6 +139,7 @@ export class Range {
   get maxCandles () { return this.#maxCandles }
   get yAxisBounds () { return this.#yAxisBounds }
   get rangeLimit () { return this.#limitFuture }
+  get diff () { return this.max - this.min }
 
   end() {
     // WebWorker.destroy(this.#worker.id)
@@ -317,35 +318,28 @@ export class Range {
 
   /**
    * return data for id
-   * @param {string} id
-   * @returns {Array}  
+   * @param {string} [id="chart"]
+   * @returns {array|boolean}  
    * @memberof Range
    */
-  getDataById(id) {
+  getDataById(id="chart") {
     if (!isString(id)) return false
 
-    const idParts = id.split('_')
+    if (id == "chart") return this.data
 
-    switch (idParts[1]) {
-      case "chart": 
-        return this.data;
-      case "primary":
-        for (let o of this.allData.primaryPane) {
-          if (idParts[2] in o) return o[idParts[2]]
-        }
-        return false;
-      case "secondary":
-        for (let o of this.allData.secondaryPane) {
-          if (idParts[2] in o) return o[idParts[2]]
-        }
-        return false;
-      case "datasets":
-        for (let o of this.allData.datasets) {
-          if (idParts[2] in o) return o[idParts[2]]
-        }
-      return false;
-      default: return false
+    const datas = [
+      this.allData.primaryPane,
+      this.allData.secondaryPane,
+      this.allData.datasets
+    ]
+
+    for (let data of datas) {
+      for (let entry of data) {
+        if (id == entry?.id) return entry.data
+      }
     }
+
+    return false
   }
 
   /**
