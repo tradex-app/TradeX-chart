@@ -193,11 +193,21 @@ export default class ScaleBar extends Component {
         draw = true
       }
     }
+    // secondary pane
     else {
       let chart = this.parent
+      let range = this.core.range
       let id = chart.view[0].id
       let mm = this.core.range.secondaryMaxMin[id].data
-      
+      if (!!mm) {
+        let stream = range.value(undefined, id)
+        stream.forEach((value, index, array) => {
+          if (index == 0) return
+          if (value > mm.max) mm.max = value
+          else if (value < mm.min) mm.min = value
+        });
+        draw = true
+      }
     }
 
     if (draw) this.draw()

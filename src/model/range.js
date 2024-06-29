@@ -250,7 +250,7 @@ export class Range {
    * return value at index
    * @param {number} index - price history index, out of bounds will return null filled entry
    * @param {string} id - defaults to returning chart price history 
-   * @returns {array}
+   * @returns {array|null}
    */
   value ( index, id="chart" ) {
 
@@ -551,9 +551,7 @@ export class Range {
 
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
-    let j, v, min, max, diff;
-    let tMax = -Infinity;
-    let tMin = Infinity;
+    let j, v, min, max, diff, tMin, tMax;
 
     // iterate over indicator outputs
     for (let d in r) {
@@ -567,15 +565,17 @@ export class Range {
         if (v <= min) {
           r[d].min = v
           r[d].minIdx = j
+          min = v
         }
         if (v >= max) {
           r[d].max = v
           r[d].maxIdx = j
+          max = v
         }
       }
 
-      if (v < tMin) tMin = v
-      if (v > tMax) tMax = v
+      if (tMin === undefined || min < tMin) tMin = min
+      if (tMax === undefined || max > tMax) tMax = max
 
       diff = r[d].max - r[d].min
       r[d].diff = (!isNaN(diff)) ? diff : 0
