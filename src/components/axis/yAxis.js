@@ -277,8 +277,11 @@ export default class yAxis extends Axis {
 
   transformPrimarySecondary() {
     let t = this.#transform.manual;
-    if (!this.parent.parent.isPrimary) 
-      t = t.secondaryMaxMin
+    if (this.#yAxisType != "percent" &&
+        !this.parent.parent.isPrimary) {
+      let {pane} = this.getMaxMinDiff()
+      t = pane
+    }
     return t
   }
 
@@ -286,10 +289,7 @@ export default class yAxis extends Axis {
   setOffset(o) {
     if (!isNumber(o) || o == 0 || this.#mode !== "manual") return false
 
-    // let t = this.transformPrimarySecondary()
-
-    // TODO: pixel2Val
-    let t = this.#transform.manual;
+    let t = this.transformPrimarySecondary()
     let max = this.pixel2Val(o * -1)
     let min = this.pixel2Val(this.height - o)
     let diff = max - min;
@@ -298,6 +298,8 @@ export default class yAxis extends Axis {
     t.mid = (diff) / 2
     t.diff = diff
     t.zoom = 0
+
+
   }
 
   setZoom(z) {
