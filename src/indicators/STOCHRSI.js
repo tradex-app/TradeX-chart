@@ -40,7 +40,7 @@ export default class STOCHRSI extends Indicator {
 
   static inCnt = 0
   static primaryPane = false
-  static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
+  static scale = YAXIS_TYPES[2] // YAXIS_TYPES - percent
   static defaultStyle = {
     fastKStroke: "#8C0",
     fastKLineWidth: '1',

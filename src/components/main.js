@@ -1011,16 +1011,17 @@ export default class MainPane extends Component {
   }
 
   draw(range=this.range, update=false) {
-    this.time.xAxis.doCalcXAxisGrads(range)
+    range = (isObject(range)) ? range : this.range
     const graphs = [
       this.graph,
       this.#Time,
     ]
+    this.time.xAxis.doCalcXAxisGrads(range)
     this.#ChartPanes.forEach((chartPane, key) => {
       if (chartPane.status !== "destroyed")
         graphs.push(chartPane)
       else
-        this.log("error destroyed pane")
+        this.error(`ERROR: attempted to draw destroyed pane: ${chartPane.id}`)
     })
 
     this.renderLoop.queueFrame(
