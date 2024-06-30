@@ -105,10 +105,11 @@ export default class yAxis extends Axis {
         pane = this.#range;
     if (!chart.isPrimary &&
         id in mm) {
-          max = mm[id].data.max
-          min = mm[id].data.min
+          max = mm[id].data.max //* 1.2
+          min = mm[id].data.min //- (mm[id].data.min * 0.2)
+          pane = mm[id].data
     }
-    return {max, min, diff: max - min}
+    return {max, min, diff: max - min, pane}
   }
 
   yAxisRangeBounds() {
@@ -165,8 +166,6 @@ export default class yAxis extends Axis {
           {min, diff} = this.getMaxMinDiff();
           p = h - (h * ((y - min) / diff))
 
-
-          // console.log(p)
           if (p < 0 || p > h) {
             let P = p
           }
@@ -305,15 +304,17 @@ export default class yAxis extends Axis {
     if (!isNumber(z) || this.#mode !== "manual") return false
 
     let t = this.#transform.manual;
-    let {max, min, diff} = this. getMaxMinDiff()
+    let {max, min, diff, pane} = this. getMaxMinDiff()
     const diff10P = diff * 0.01;
     const change = z * diff10P;
           min -= change;
           max += change;
-    
+
     // if (max < min || min <= diff)  return
     if (max < min || min <= Infinity * -1 || max >= Infinity)  return
 
+    pane.min -= change;
+    pane.max += change;
     t.max =  max
     t.min = min 
     t.mid = (diff) / 2
@@ -340,6 +341,7 @@ export default class yAxis extends Axis {
           case "diff": return t[m].max - t[m].min
           case "zoom": return t[m][prop]
           case "offset": return t[m][prop]
+          case "secondaryMaxMin": return t[m][prop]
           default: return obj[prop]
         }
       }
