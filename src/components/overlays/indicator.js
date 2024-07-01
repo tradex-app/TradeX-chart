@@ -1125,7 +1125,8 @@ export default class Indicator extends Overlay {
   plotIt(j, k, p, r, s) {
     const data = this.overlay.data
     const width = this.xAxis.candleW
-    const plot = { w: width, }
+    const zero = this.yAxis.yPos(0)
+    const plot = { w: width, zero }
 
     let plots = []
 
@@ -1174,8 +1175,8 @@ export default class Indicator extends Overlay {
         case "limit_upper":
           r = "renderLine"
           break;
-        case "historgram":
-          r = "historgram"
+        case "histogram":
+          r = "histogram"
           break
       }
       this.plotIt(i, c, x++, r, this.style)
