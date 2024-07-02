@@ -54,9 +54,6 @@ export default class RSI extends Indicator {
   }
 
   checkParamCount = false
-  plots = [
-    { key: 'RSI_1', title: ' ', type: 'line' },
-  ]
 
   static inCnt = 0
   static primaryPane = false

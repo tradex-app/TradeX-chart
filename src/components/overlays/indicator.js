@@ -6,7 +6,7 @@ import { Range } from "../../model/range"
 import { limit } from "../../utils/number"
 import Colour from "../../utils/colour"
 import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from "../../utils/typeChecks"
-import { idSanitize, uid } from "../../utils/utilities"
+import { diff, idSanitize, mergeDeep, uid } from "../../utils/utilities"
 import { STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
 import { WinState } from "../widgets/window"
@@ -93,10 +93,12 @@ export default class Indicator extends Overlay {
     output: {},
     meta: {
       input: {},
-      output: {}
+      output: [],
+      outputOrder: [],
+      outputLegend: {},
+      style: {}
     }
   }
-
 
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
 
@@ -715,26 +717,34 @@ export default class Indicator extends Overlay {
       meta: {
         input: {},
         output: [],
+        outputOrder: [],
+        outputLegend: {},
         style: {}
       }
     }
-    let d;
     if (!isObject(this.definition)) 
-      d = this.definition = definition
-    else {
-      d = this.definition
-      d.input = (!isObject(d.input)) ? {} : d.input
-      d.output = (!isObject(d.output)) ? {} : d.output
-      d.meta = (!isObject(d.meta)) ? definition.meta : d.meta
-      d.meta.input = (!isObject(d.meta.input)) ? {} : d.meta.input
-      d.meta.output = (!isObject(d.meta.output)) ? talibAPI[this.shortName].outputs : d.meta.output
-      d.meta.style = (!isObject(d.meta.style)) ? {} : d.meta.style
-    }
+      this.definition = definition
+
+    this.definition = mergeDeep(this.definition, definition)
+
+    // indicator definition sanity check 
+    let d = this.definition;
+    let dm = d.meta;
+    let oo = [];
+    let out = talibAPI?.[this.libName]?.outputs || [];
+    d.input = (!isObject(d.input)) ? {} : d.input
+    d.output = (!isObject(d.output)) ? {} : d.output
+    dm = (!isObject(dm)) ? definition.meta : dm
+    dm.input = (!isObject(dm.input)) ? {} : dm.input
+    dm.output = (!isArray(dm.output) || !dm.output.length) ? out : dm.output;
+    dm.outputOrder = (!isArray(dm.outputOrder)) ? [] : dm.outputOrder
+    dm.outputLegend = (!isObject(dm.outputLegend)) ? {} : dm.outputLegend
+    dm.style = (!isObject(dm.style)) ? {} : dm.style
 
     // style
     if (Object.keys(d?.meta.style).length == 0 &&
         Object.keys(this.style).length > 0)
-        d.meta.style = this.buildConfigStyleTab()
+        dm.style = this.buildConfigStyleTab()
 
     // output
     if (Object.keys(d.output).length == 0) {
@@ -745,6 +755,7 @@ export default class Indicator extends Overlay {
     for (let o in d.output) {
       if (!isArray(d.output[o])) 
         d.output[o] = []
+        oo.push(o)
     }
 
     // input
@@ -771,18 +782,19 @@ export default class Indicator extends Overlay {
           "data-default": f?.defaultValue,
           max: f?.range?.max,
           min: f?.range?.min,
-          title: f?.hint
+          title: f?.hint,
+          display: true
         }
 
-        d.meta.input[f.name] = {...n, ...d.meta.input[f.name]}
+        dm.input[f.name] = {...n, ...dm.input[f.name]}
 
         if (f.name in d.input)
-          d.meta.input[f.name].value = d.input[f.name]
+          dm.input[f.name].value = d.input[f.name]
       }
     }
 
     // process options
-    d.meta.input = this.buildConfigInputTab() || {}
+    dm.input = this.buildConfigInputTab() || {}
 
     for (let def of api.options) {
       if (def.name in input)
@@ -792,12 +804,38 @@ export default class Indicator extends Overlay {
         validate(input.definition.input, api.options)
     }
 
-    for (let i in d.meta) {
-      if (Object.keys(d.meta[i]).length == 0)
-        delete d.meta[i]
+    // for (let i in dm) {
+    //   if (Object.keys(dm[i]).length == 0)
+    //     delete dm[i]
+    // }
+
+    // meta output order
+    // merge output keys with output order
+    // remove redundant keys and preserve order
+    let u = [...new Set([...dm.outputOrder, ...oo])]
+    let del = diff(u, oo)
+    for (let x of del) {
+      let idx = u.indexOf(x)
+      u.splice(idx, 1)
+    }
+    dm.outputOrder = u
+
+    // meta output legend
+    let k = Object.keys(d.output)
+    for (let [k,v] of Object.entries(dm.outputLegend)) {
+      if (!isObject(v)) {
+        dm.outputLegend[k] = {}
+      }
+      if (!isString(dm.outputLegend[k].labelStr)) {
+        dm.outputLegend[k].label = false
+        dm.outputLegend[k].labelStr = ""
+      }
+      if (!isBoolean(dm.outputLegend[k].label))
+        dm.outputLegend[k].label = false
+      if (!isBoolean(dm.outputLegend[k].value))
+        dm.outputLegend[k].value = false
     }
   }
-
 
   addLegend() {
     let legend = {
@@ -819,12 +857,21 @@ export default class Indicator extends Overlay {
    */
   legendInputs(pos=this.chart.cursorPos) {
     const colours = [this.style.stroke]
+    const inputs = {}
+    const index = this.Timeline.xPos2Index(pos[0])
+    const len = this.overlay.data.length
+    const order = this.definition.meta.outputOrder
+    const labels = this.definition.meta.outputLabels
 
-    let index = this.Timeline.xPos2Index(pos[0])
-
-    let c = index  - (this.range.data.length - this.overlay.data.length)
-    let l = limit(this.overlay.data.length - 1, 0, Infinity)
+    let c = index  - (this.range.data.length - len)
+    let l = limit(len - 1, 0, Infinity)
         c = limit(c, 0, l)
+
+        for (let o of order) {
+
+        }
+
+        inputs.val = this.scale.nicePrice(this.overlay.data[c][1])
 
     return {c, colours}
   }
@@ -1166,6 +1213,9 @@ export default class Indicator extends Overlay {
     let c = range.indexStart - d - 2
     let i = range.Length + (o * 2) + 2
     let x = 1
+
+    if (!meta.output.length) 
+      return super.updated()
 
     for (let p of meta.output) {
       let r;

@@ -28,15 +28,17 @@ import { YAXIS_TYPES } from "../definitions/chart";
     meta: {
       outputOrder: [
        "MACD", "MACDSignal", "MACDHist",
-      ]
+      ],
+      outputLegend: {
+        MACD: {labelStr: "MACD", label: false, value: true},
+        MACDSignal: {labelStr: "Signal", label: false, value: true},
+        MACDHist: {labelStr: "Hist", label: false, value: true}
+      }
     }
   }
 
   #precision = 2
   scaleOverlay = false
-  plots = [
-    { key: 'MACD_1', title: 'MACD: ', type: 'line' },
-  ]
 
   
   static inCnt = 0
