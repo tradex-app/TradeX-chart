@@ -1157,7 +1157,8 @@ export default class Indicator extends Overlay {
     this.scene.clear()
 
     const offset = this.xAxis.smoothScrollOffset || 0
-    const out = this.definition.meta.output
+    const meta = this.definition.meta
+    const plots = {}
 
     // account for "missing" entries because of indicator calculation
     let o = this.Timeline.rangeScrollOffset
@@ -1166,7 +1167,7 @@ export default class Indicator extends Overlay {
     let i = range.Length + (o * 2) + 2
     let x = 1
 
-    for (let p of out) {
+    for (let p of meta.output) {
       let r;
       switch(p.plot) {
         case "line": 
@@ -1179,7 +1180,14 @@ export default class Indicator extends Overlay {
           r = "histogram"
           break
       }
-      this.plotIt(i, c, x++, r, this.style)
+      plots[p?.name] = {x: x++, r}
+    }
+
+    // plot order
+    // drawn in reverse order, bottom to top
+    let q = (meta?.outputOrder || Object.keys(plots)).toReversed()
+    for (let p of q) {
+      this.plotIt(i, c, plots[p].x, plots[p].r, this.style)
     }
 
     this.target.viewport.render();

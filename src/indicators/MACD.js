@@ -23,8 +23,13 @@ import { YAXIS_TYPES } from "../definitions/chart";
     output: {
       MACD: [],
       MACDSignal: [],
-      MACDHist: []
+      MACDHist: [],
     },
+    meta: {
+      outputOrder: [
+       "MACD", "MACDSignal", "MACDHist",
+      ]
+    }
   }
 
   #precision = 2
@@ -69,7 +74,7 @@ import { YAXIS_TYPES } from "../definitions/chart";
   
   legendInputs(pos=this.chart.cursorPos) {
 
-    return false
+    // return false
 
     if (this.overlay.data.length == 0) return false
 
