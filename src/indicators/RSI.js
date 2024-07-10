@@ -49,7 +49,11 @@ export default class RSI extends Indicator {
             }]
           )
         }
-      }
+      },
+      outputOrder: [
+        "output",
+        "highLow"
+      ]
     }
   }
 
@@ -67,7 +71,18 @@ export default class RSI extends Indicator {
     highLowStyle: "dashed",
     highStroke: "#848",
     lowStroke: "#848",
-    highLowRangeStyle: "#22002220"
+    highLowRangeStyle: "#22002220",
+
+    output: {
+      stroke: "#C80",
+      width: 1,
+    },
+    highLow: {
+      stroke: "#848",
+      width: 1,
+      style: "dashed",
+      fill: "#22002220",
+    }
   }
 
 

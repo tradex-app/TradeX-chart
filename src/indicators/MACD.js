@@ -33,7 +33,10 @@ import { YAXIS_TYPES } from "../definitions/chart";
         MACD: {labelStr: "MACD", label: false, value: true},
         MACDSignal: {labelStr: "Signal", label: false, value: true},
         MACDHist: {labelStr: "Hist", label: false, value: true}
-      }
+      },
+      render: [
+        {output: {}}
+      ]
     }
   }
 
@@ -52,7 +55,23 @@ import { YAXIS_TYPES } from "../definitions/chart";
   ]
   static defaultStyle = {
     stroke: "#C80",
-    width: '1'
+    width: '1',
+    MACD: {
+      stroke: "#C80",
+      width: '1',
+    },
+    MACDSignal: {
+      stroke: "#C80",
+      width: '1',
+    },
+    MACDHist: {
+      upStroke: "#0f0",
+      upFill: "#0c0",
+      upWidth: '1',
+      dnStroke: "#fß0",
+      dnFill: "#c00",
+      dnWidth: '1',
+    },
   }
 
   /**

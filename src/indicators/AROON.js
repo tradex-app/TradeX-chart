@@ -27,9 +27,7 @@ export default class AROON extends Indicator {
   }
   precision = 2
   scaleOverlay = true
-  plots = [
-    { key: 'AROON_1', title: 'AROON', type: 'line' },
-  ]
+
 
   static inCnt = 0
   static primaryPane = false
@@ -78,7 +76,7 @@ export default class AROON extends Indicator {
     ]
     return {inputs, colours, labels}
   }
-
+/*
   draw(range=this.range) {
     // no update required
     if (this.overlay.data.length < 2) return
@@ -136,4 +134,5 @@ export default class AROON extends Indicator {
 
     super.updated()
   }
+  */
 }

@@ -21,6 +21,15 @@ import { talibAPI } from "../../definitions/talib-api"
 // }
 
 const DEFAULT_PERIOD = 5
+const OUTPUTEXTRAS = [
+  "highlow"
+]
+const HIGHLOWOUTPUT = {
+  name: "highLow",
+  type: null,
+  plot: "highLow",
+  hit: false
+}
 
 // Context enum
 class Context {
@@ -296,9 +305,9 @@ export default class Indicator extends Overlay {
   settings(s) {
     if (isObject(s)) {
       if (isObject(s?.config)) this.params.overlay.settings = 
-       {...this.params.overlay.settings, ...s.config}
+        mergeDeep(this.params.overlay.settings, s.config)
       if (isObject(s?.style)) this.style =
-        {...this.style, ...s.style}
+        mergeDeep(this.style, s.style)
       this.draw()
     }
     return {
@@ -559,10 +568,10 @@ export default class Indicator extends Overlay {
       let type = typeOf(v)
       switch(type) {
         case "number":
-          this.configInputNumber(define, input, i)
+          this.configInputNumber(input, i, v) 
           break;
         case "object":
-          this.configInputObject(define, input, i)
+          this.configInputObject(input, i, v)
           break;
       }
     }
@@ -572,19 +581,70 @@ export default class Indicator extends Overlay {
     return input
   }
 
-  buildConfigStyleTab() {
-    const style = {}
-    const change = {
+   buildConfigOutputTab(style) {
+    const entry = {}
+
+    for (let i in style) {
+      let d = ""
+      let min = ""
+      let fn, listeners;
+      let v = this.style[i]
+      let change = this.fieldEventChange()
+      let colour = this.fieldEventClick()
+      let type = typeOf(v)
+      switch (type) {
+
+        case "object": 
+          this.buildConfigOutputTab(v)
+          break;
+
+        case "number":
+          min = `0`
+          d = v
+          listeners = [change]
+          fn = (el) => {
+            this.configDialogue.provideEventListeners(`#${i}`, listeners)(el)
+          }
+          break;
+
+        case "string":
+          let c = new Colour(v);
+          type = (c.isValid)? "text" : ""
+          v = (c.isValid)? c.hexa : v
+          d = v
+          listeners = [change, colour, over, out]
+          fn = (el) => {
+            this.configDialogue.provideInputColor(el, `#${i}`)
+            this.configDialogue.provideEventListeners(`#${i}`, listeners)(el)
+          }
+          break;
+
+        default:
+          listeners = false
+          break;
+
+      }
+      if (!listeners) continue
+
+      entry[i] = this.configField(i, type, v, d, min, fn)
+    }
+
+    return entry
+  }
+
+  fieldEventChange() {
+    return {
       event: "change", 
       fn: (e)=>{
-        // console.log(`${e.target.id} = ${e.target.value}`)
-
         this.style[e.target.id] = e.target.value
         this.setRefresh()
         this.draw()
       }
     }
-    const colour = {
+  }
+
+  fieldEventClick() {
+    return {
       event: "click", 
       fn: (e)=>{
         e.preventDefault()
@@ -599,89 +659,45 @@ export default class Indicator extends Overlay {
         let y = this.#ColourPicker.offsetTop - e.target.top // offsetTop
         this.#ColourPicker.position(x, y, this.core)
         // hide colour picker when pointer gives focus elsewhere
-
       }
     }
-    const over = {
-      event: "pointerover",
-      fn: (e) => {
-        e.target.style.border = "1px solid #f00;"
-      }
-    }
-    const out = {
-      event: "pointerout",
-      fn: (e) => {
-        e.target.style.border = "none;"
-      }
-    }
-    let listeners;
-    for (let i in this?.style) {
-      let d = ""
-      let v = this.style[i]
-      let min = ""
-      let type = typeOf(v)
-      switch (type) {
-        case "number": 
-          min = `0`
-          d = v
-          listeners = [change]
-          break;
-        case "string":
-          let c = new Colour(v);
-          type = (c.isValid)? "text" : ""
-          v = (c.isValid)? c.hexa : v
-          d = v
-          listeners = [change, colour, over, out]
-          break;
-      }
-      // element modifier function
-      const fn = (el) => {
-        this.configDialogue.provideInputColor(el, `#${i}`)
-        this.configDialogue.provideEventListeners(`#${i}`, listeners)(el)
-      }
-
-      style[i] = {
-        entry: i, 
-        label: i, 
-        type, 
-        value: v, 
-        "data-oldval": v, 
-        "data-default": 
-        d, default: 
-        d, min, 
-        $function: fn }
-    }
-    return style
   }
 
-  configInputNumber(define, input, i) {
-    input[i] = {
+  configField(i, type, value, defaultValue, min="0", fn) {
+    return {
       entry: i,
       label: i,
-      type: 'number',
-      value: define[i],
-      default: define[i],
-      "data-default": define[i],
-      "data-oldval": define[i],
-      $function:
-        this.configDialogue.provideEventListeners(`#${i}`, 
-        [{
-          event: "change", 
-          fn: (e)=>{
-            // console.log(`#${i} = ${e.target.value}`)
-          }
-        }]
-      )
+      type,
+      value,
+      default: defaultValue,
+      "data-oldval": value, 
+      "data-default": defaultValue, 
+      min,
+      $function: fn
     }
   }
 
-  configInputObject(define, input, i) {
+  configInputNumber(input, i, v) {
+    input[i] = this.configField(i, "number", v, v)
+    input[i].$function = this.configDialogue.provideEventListeners(`#${i}`, 
+    [{
+      event: "change", 
+      fn: (e)=>{
+        // console.log(`#${i} = ${e.target.value}`)
+      }
+    }]
+  )
+  }
+
+  configInputObject(input, i, v) {
     if (i instanceof InputPeriodEnable) {
-      this.configInputNumber(define, input, i.period)
+
+      input[i.period] = this.configField(i.period, "number", v, v)
+
       input.$function = function (el) {
-        const elm = el.querySelector(`#${i}`)
+        const elm = el.querySelector(`#${i.period}`)
         const checkBox = document.createElement("input")
-              checkBox.id = `"enable${i}`
+              checkBox.id = `"enable${i.period}`
               checkBox.checked = i.enable
               checkBox.addEventListener("change", (e) => {
                 if (e.currentTarget.checked) {
@@ -741,11 +757,11 @@ export default class Indicator extends Overlay {
     dm.outputLegend = (!isObject(dm.outputLegend)) ? {} : dm.outputLegend
     dm.style = (!isObject(dm.style)) ? {} : dm.style
 
-    // style
-    if (Object.keys(d?.meta.style).length == 0 &&
-        Object.keys(this.style).length > 0)
-        dm.style = this.buildConfigStyleTab()
-
+    // input
+    const input = {...d.input, ...s}
+    delete input.style
+    d.input = input
+    
     // output
     if (Object.keys(d.output).length == 0) {
       for (let o of api.outputs) {
@@ -758,56 +774,21 @@ export default class Indicator extends Overlay {
         oo.push(o)
     }
 
-    // input
-    const input = {...d.input, ...s}
-    delete input.style
-    d.input = input
+    // define.meta validation
 
-    const validate = (src, def) => {
-      for (let f of def) {
-        // if input value is type is incorrect, use the default
-        if (typeof src[f.name] !== f.type)
-          src[f.name] = f.defaultValue
+    // Inputs Tab
 
-        if ("range" in def)
-          src[f.name] = limit(src[f.name], f.range.min, f.range.max)
-
-        const n = {
-          entry: f?.name,
-          label: f?.displayName,
-          type: f?.type,
-          value: src[f.name],
-          default: f?.defaultValue,
-          "data-oldval": src[f.name],
-          "data-default": f?.defaultValue,
-          max: f?.range?.max,
-          min: f?.range?.min,
-          title: f?.hint,
-          display: true
-        }
-
-        dm.input[f.name] = {...n, ...dm.input[f.name]}
-
-        if (f.name in d.input)
-          dm.input[f.name].value = d.input[f.name]
-      }
-    }
-
-    // process options
     dm.input = this.buildConfigInputTab() || {}
 
     for (let def of api.options) {
       if (def.name in input)
-        validate(input, api.options)
+        validate(input, api.options, d)
       else if (isObject(input?.definition?.input) && 
                 def.name in input.definition.input)
-        validate(input.definition.input, api.options)
+        validate(input.definition.input, api.options, d)
     }
 
-    // for (let i in dm) {
-    //   if (Object.keys(dm[i]).length == 0)
-    //     delete dm[i]
-    // }
+    // validate 
 
     // meta output order
     // merge output keys with output order
@@ -815,6 +796,7 @@ export default class Indicator extends Overlay {
     let u = [...new Set([...dm.outputOrder, ...oo])]
     let del = diff(u, oo)
     for (let x of del) {
+      if (OUTPUTEXTRAS.includes(x)) continue
       let idx = u.indexOf(x)
       u.splice(idx, 1)
     }
@@ -835,6 +817,12 @@ export default class Indicator extends Overlay {
       if (!isBoolean(dm.outputLegend[k].value))
         dm.outputLegend[k].value = false
     }
+
+    // Outputs Tab
+
+    if (Object.keys(d?.meta.style).length == 0 &&
+    Object.keys(this.style).length > 0)
+    dm.style = this.buildConfigOutputTab()
   }
 
   addLegend() {
@@ -861,7 +849,7 @@ export default class Indicator extends Overlay {
     const index = this.Timeline.xPos2Index(pos[0])
     const len = this.overlay.data.length
     const order = this.definition.meta.outputOrder
-    const labels = this.definition.meta.outputLabels
+    const legend = this.definition.meta.outputLegend
 
     let c = index  - (this.range.data.length - len)
     let l = limit(len - 1, 0, Infinity)
@@ -1218,19 +1206,9 @@ export default class Indicator extends Overlay {
       return super.updated()
 
     for (let p of meta.output) {
-      let r;
-      switch(p.plot) {
-        case "line": 
-        case "line_dash":
-        case "limit_lower":
-        case "limit_upper":
-          r = "renderLine"
-          break;
-        case "histogram":
-          r = "histogram"
-          break
-      }
-      plots[p?.name] = {x: x++, r}
+      let r = plotFunction(p.plot)
+      // valid plot function
+      if (r) plots[p?.name] = {x: x++, r}
     }
 
     // plot order
@@ -1250,3 +1228,62 @@ export default class Indicator extends Overlay {
     super.updated()
   }
 }
+
+function validate(src, def, d) {
+  let dm = d.meta
+  for (let f of def) {
+    // if input value is type is incorrect, use the default
+    if (typeof src[f.name] !== f.type)
+      src[f.name] = f.defaultValue
+
+    if ("range" in def)
+      src[f.name] = limit(src[f.name], f.range.min, f.range.max)
+
+    const n = {
+      entry: f?.name,
+      label: f?.displayName,
+      type: f?.type,
+      value: src[f.name],
+      default: f?.defaultValue,
+      "data-oldval": src[f.name],
+      "data-default": f?.defaultValue,
+      max: f?.range?.max,
+      min: f?.range?.min,
+      title: f?.hint,
+      display: true
+    }
+
+    dm.input[f.name] = {...n, ...dm.input[f.name]}
+
+    if (f.name in d.input)
+      dm.input[f.name].value = d.input[f.name]
+  }
+}
+
+
+function plotFunction(t) {
+  switch(t) {
+    case "line": 
+    case "line_dash":
+    case "limit_lower":
+    case "limit_upper":
+      return "renderLine"
+    case "histogram": return "histogram"
+    case "highLow": return "highLow"
+    default: return false
+  }
+}
+
+const over = {
+  event: "pointerover",
+  fn: (e) => {
+    e.target.style.border = "1px solid #f00;"
+  }
+}
+const out = {
+  event: "pointerout",
+  fn: (e) => {
+    e.target.style.border = "none;"
+  }
+}
+

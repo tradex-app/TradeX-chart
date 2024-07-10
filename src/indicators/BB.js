@@ -31,9 +31,6 @@ export default class BB extends Indicator {
 
   precision = 2
   scaleOverlay = false
-  plots = [
-    { key: 'BB_1', title: ' ', type: 'line' },
-  ]
 
   static inCnt = 0
   static primaryPane = true
