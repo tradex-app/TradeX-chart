@@ -4,14 +4,15 @@
 import Overlay from "./overlay"
 import { Range } from "../../model/range"
 import { limit } from "../../utils/number"
-import Colour from "../../utils/colour"
+import Colour, { Palette } from "../../utils/colour"
 import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from "../../utils/typeChecks"
-import { diff, idSanitize, mergeDeep, uid } from "../../utils/utilities"
+import { copyDeep, diff, idSanitize, mergeDeep, uid } from "../../utils/utilities"
 import { STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
 import { WinState } from "../widgets/window"
 import { onClickOutside } from "../../utils/DOM"
-import { talibAPI } from "../../definitions/talib-api"
+import { talibAPI, outputPlot } from "../../definitions/talib-api"
+import { error } from "../../helpers/messages"
 
 // const plotTypes = {
 //   area,
@@ -30,7 +31,9 @@ const HIGHLOWOUTPUT = {
   plot: "highLow",
   hit: false
 }
+const IGNORE_DEFINITIONS = ["outputLegend", "outputOrder", "render","style"]
 
+const palette = new Palette()
 // Context enum
 class Context {
   static standard = new Context("standard")
@@ -96,6 +99,7 @@ export default class Indicator extends Overlay {
   #status
   #ConfigDialogue
   #ColourPicker
+  #palette
 
   definition = {
     input: {},
@@ -109,23 +113,35 @@ export default class Indicator extends Overlay {
     }
   }
 
+  colours = [
+    palette.colours[8],
+    palette.colours[18],
+    palette.colours[28],
+    palette.colours[38],
+    palette.colours[48],
+  ]
+
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
 
     super(target, xAxis, yAxis, undefined, parent, params)
 
-    const overlay = params.overlay
+    if (!isObject(this.definition)) 
+      error(`Indicator: ${this.shortName}`, `does not provide a valid definition`)
 
+    const overlay = params.overlay
     this.#cnt_ = Indicator.cnt
-    this.#params = params
     this.#overlay = overlay
+    this.id = overlay?.id || uid(this.shortName)
+    this.#params = params
     this.#TALib = this.core.TALib
     this.#range = this.xAxis.range
-    this.id = overlay?.id || uid(this.shortName)
     this.legendName = overlay?.legendName
     this.#legendVisibility = (isBoolean(overlay?.legendVisibility)) ? overlay.legendVisibility : true
+    this.#palette = palette
     this.style = (overlay?.settings?.style) ? 
     {...this.constructor.defaultStyle, ...overlay.settings.style} : 
     {...this.constructor.defaultStyle, ...config.style};
+    this.meta
     const cfg = { title: `${this.legendName} Config`, content: "", params: overlay, parent: this }
     this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
     switch(overlay.settings?.context) {
@@ -533,8 +549,16 @@ export default class Indicator extends Overlay {
 
     // process other tabs
     for (let tab in meta) {
+      if (IGNORE_DEFINITIONS.includes(tab)) continue
+
       tabs[tab] = meta[tab]
     }
+
+    if (!isObject(meta?.style) ||
+        Object.keys(meta.style).length == 0)
+        meta.style = copyDeep(this.style)
+
+    console.log(tabs?.output)
 
     // if there are no tabs return no config message
     if (Object.keys(tabs).length == 0)
@@ -542,21 +566,36 @@ export default class Indicator extends Overlay {
     // ensure all tab fields provide data-oldval, data-default
     else {
       for (let tab in tabs) {
-        for (let field in tabs[tab]) {
-          let f = tabs[tab][field]
-          let keys = Object.keys(f)
-          if (!keys.includes("data-oldval"))
-            f["data-oldval"] = f.value
-          if (!keys.includes("data-default")) {
-            f["data-default"] = (!!f.default) ? 
-              f.default :
-              f.value
-          }
-        }
+        this.dataOldDefault(tabs[tab])
       }
     }
 
     return tabs
+  }
+
+  dataOldDefault(entries) {
+
+    if (isArray(entries)) {
+      for (let entry of entries) {
+        this.dataOldDefault(entry)
+      }
+    }
+
+    else if (isObject(entries)) {
+      for (let field in entries) {
+
+        let f = (isObject(entries[field])) ? entries[field] : entries
+        let keys = Object.keys(f)
+
+        if (!keys.includes("data-oldval"))
+          f["data-oldval"] = f?.value
+        if (!keys.includes("data-default")) {
+          f["data-default"] = (!!f?.default) ? 
+            f?.default :
+            f?.value
+        }
+      }
+    }
   }
 
   buildConfigInputTab() {
@@ -755,7 +794,9 @@ export default class Indicator extends Overlay {
     dm.output = (!isArray(dm.output) || !dm.output.length) ? out : dm.output;
     dm.outputOrder = (!isArray(dm.outputOrder)) ? [] : dm.outputOrder
     dm.outputLegend = (!isObject(dm.outputLegend)) ? {} : dm.outputLegend
-    dm.style = (!isObject(dm.style)) ? {} : dm.style
+    dm.style = (!isObject(dm.style)) ? 
+    (!isObject(this.style)) ? {} : this.style
+    : dm.style
 
     // input
     const input = {...d.input, ...s}
@@ -821,8 +862,35 @@ export default class Indicator extends Overlay {
     // Outputs Tab
 
     if (Object.keys(d?.meta.style).length == 0 &&
-    Object.keys(this.style).length > 0)
-    dm.style = this.buildConfigOutputTab()
+        Object.keys(this.style).length > 0)
+          dm.style = this.buildConfigOutputTab(this.style)
+
+
+    // meta output
+
+    for (let x = 0; x < dm.output.length; x++) {
+      let o = dm.output[x]
+      let t = plotFunction(o?.plot)
+      switch(t) {
+        case "renderLine": 
+          o.style = (!dm.style?.[o?.name]) ? this.defaultMetaStyleLine(o, x, dm.style) : this.style[o.name];
+          break;
+        case "histogram": return "histogram"
+        case "highLow": return "highLow"
+        default: break;
+      }
+    }
+  }
+
+  defaultMetaStyleLine(o, x, style) {
+    o.name = (!o?.name) ? "output" : o.name
+    style[o.name] = {}
+    
+    let k = this.colours.length
+    let v = (x <= k) ? this.colours[x] : this.colours[k%x]
+    style[o.name].colour = defaultConfigField("colour", v, "text")
+    style[o.name].width = defaultConfigField("width", "1", "number")
+    return style
   }
 
   addLegend() {
@@ -1257,6 +1325,20 @@ function validate(src, def, d) {
 
     if (f.name in d.input)
       dm.input[f.name].value = d.input[f.name]
+  }
+}
+
+function defaultConfigField(name, value, type) {
+  return {
+    entry: name,
+    label: name,
+    type: type,
+    value: value,
+    default: value,
+    "data-oldval": value,
+    "data-default": value,
+    title: name,
+    display: true
   }
 }
 

@@ -4,11 +4,15 @@
 // Docs - https://newproplus.github.io/talib-web/modules/_index_.html
 //        https://hackape.github.io/talib.js/modules/_index_.html
 
-// output.plot types = line, line_dash, limit_lower, limit_upper, histogram
-// output.name = ['upperBand', 'middleBand', 'lowerBand', 'output', 'aroonDown', 'aroonUp', 'inPhase', 'quadrature', 'sine', 'leadSine', 'MACD', 'MACDSignal', 'MACDHist', 'MAMA', 'FAMA', 'min', 'max', 'minIdx', 'maxIdx', 'slowK', 'slowD', 'fastK', 'fastD']
+// output.plot
+export const outputPlot = ["line", "line_dash", "limit_lower", "limit_upper", "histogram"]
+// output.name
+export const outputName = ['upperBand', 'middleBand', 'lowerBand', 'output', 'aroonDown', 'aroonUp', 'inPhase', 'quadrature', 'sine', 'leadSine', 'MACD', 'MACDSignal', 'MACDHist', 'MAMA', 'FAMA', 'min', 'max', 'minIdx', 'maxIdx', 'slowK', 'slowD', 'fastK', 'fastD']
 // type = number
-// inputs.name = "high", "low", "close", "inReal", "volume", "inReal0", "inReal1", "open", "inPeriods"
-// options types = timePeriod, MAType, fastK_Period, slowK_Period, slowK_MAType, fastD_period, slowD_period, slowD_MAType, fastPeriod, slowPeriod, nbDevUp, nbDevDn, penetration
+// inputs.name 
+export const inputsName = ["high", "low", "close", "inReal", "volume", "inReal0", "inReal1", "open", "inPeriods"]
+// options types 
+export const optionsTypes = ["timePeriod", "MAType", "fastK_Period", "slowK_Period", "slowK_MAType", "fastD_period", "slowD_period", "slowD_MAType", "fastPeriod", "slowPeriod", "nbDevUp", "nbDevDn", "penetration"]
 
 export const ACCBANDS = {
   name: "ACCBANDS",

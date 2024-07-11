@@ -362,14 +362,10 @@ export class Palette {
   #colours = colours2
   #entries = []
 
-  constructor (matrix=[10,5], colours=[]) {
-    if (
-        this.validateMatrix(matrix) &&
-        this.validateColours(colours)
-      ) {
-        this.#matrix = matrix
-        this.#colours = colours
-      }
+  constructor (matrix=[10,5], colours=colours2) {
+    
+    this.#matrix = (this.validateMatrix(matrix)) ? matrix : this.#matrix
+    this.#colours = (this.validateColours(colours)) ? colours : this.#colours
   }
 
   get matrix() { return this.#matrix }

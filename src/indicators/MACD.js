@@ -34,9 +34,6 @@ import { YAXIS_TYPES } from "../definitions/chart";
         MACDSignal: {labelStr: "Signal", label: false, value: true},
         MACDHist: {labelStr: "Hist", label: false, value: true}
       },
-      render: [
-        {output: {}}
-      ]
     }
   }
 
