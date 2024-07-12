@@ -888,9 +888,9 @@ export default class Indicator extends Overlay {
     
     let k = this.colours.length
     let v = (x <= k) ? this.colours[x] : this.colours[k%x]
-    style[o.name].colour = defaultConfigField("colour", v, "text")
-    style[o.name].width = defaultConfigField("width", "1", "number")
-    return style
+    style[o.name].colour = defaultConfigField("colour", `${o.name} Colour`, v, "text")
+    style[o.name].width = defaultConfigField("width", `${o.name} Width`, "1", "number", 0)
+    return style[o.name]
   }
 
   addLegend() {
@@ -1328,18 +1328,21 @@ function validate(src, def, d) {
   }
 }
 
-function defaultConfigField(name, value, type) {
-  return {
+function defaultConfigField(name, label, value, type, min, max) {
+  let f = {
     entry: name,
-    label: name,
-    type: type,
-    value: value,
+    label,
+    type,
+    value,
     default: value,
     "data-oldval": value,
     "data-default": value,
     title: name,
     display: true
   }
+  if (isNumber(min)) f.min = `${min}`
+  if (isNumber(max)) f.max = `${max}`
+  return f
 }
 
 

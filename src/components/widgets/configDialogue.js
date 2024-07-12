@@ -152,6 +152,37 @@ export default class ConfigDialogue extends Dialogue {
     return {content, modifiers: modifierList}
   }
 
+  configEntries(input, content, modifierList) {
+
+    content[i] = ``
+    // iterate over content rows
+    for (let row in input[i]) {
+      // standard input types
+      let r = input[i][row]
+      if (inputTypes.includes(r?.type)) {
+        let id = (isString(r?.entry)) ? r?.entry : ""
+        r.label = (isString(r?.label)) ? r?.label : id || ""
+        content[i] += htmlInput(i, r)
+      }
+      // other form element types
+      // if...
+
+      const modifiers = [ "$function" ]
+      
+      for (let modifier in r) {
+        if (modifiers.includes(modifier)) {
+
+          switch (modifier) {
+            case "$function":
+              if (isFunction(r[modifier]))
+                modifierList[row] = r[modifier]
+              break;
+          }
+        }
+      }
+    }
+  }
+
   /**
    * update config dialogue elements
    * @param {object} update - config dialogue elements to update
