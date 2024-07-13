@@ -120,7 +120,8 @@ export default class ConfigDialogue extends Dialogue {
         console.log(`${i} is Array`)
 
         for (let j of input[i]) {
-          
+          let obj = { output: j.style }
+          this.configEntries(j.name, obj, content, modifierList)
         }
       }
       else if (isObject(input[i])) {
