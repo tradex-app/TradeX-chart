@@ -2,7 +2,7 @@
 // Config Dialogue
 
 import Dialogue from "./dialogue";
-import { isBoolean, isString, isObject, isFunction } from "../../utils/typeChecks";
+import { isBoolean, isString, isObject, isFunction, isArray } from "../../utils/typeChecks";
 import { uid } from "../../utils/utilities";
 import { htmlInput, inputTypes } from "../../utils/DOM";
 import { tabsBuild, tabStyles } from "../views/tabs";
@@ -116,40 +116,53 @@ export default class ConfigDialogue extends Dialogue {
 
     // iterate over tabs
     for (let i in input) {
-      if (!isObject(input[i])) {
+      if (isArray(input[i])) {
+        console.log(`${i} is Array`)
+
+        for (let j of input[i]) {
+          
+        }
+      }
+      else if (isObject(input[i])) {
+        this.configEntries(i, input, content, modifierList)
+      }
+      else {
         this.core.error(`ERROR: Building Config Dialogue : Input malformed`)
         continue;
       }
-      content[i] = ``
-      // iterate over content rows
-      for (let row in input[i]) {
-        // standard input types
-        let r = input[i][row]
-        if (inputTypes.includes(r?.type)) {
-          let id = (isString(r?.entry)) ? r?.entry : ""
-          r.label = (isString(r?.label)) ? r?.label : id || ""
-          content[i] += htmlInput(i, r)
-        }
-        // other form element types
-        // if...
+    }
+    return {content, modifiers: modifierList}
+  }
 
-        const modifiers = [ "$function" ]
-        
-        for (let modifier in r) {
-          if (modifiers.includes(modifier)) {
+  configEntries(i, input, content, modifierList) {
 
-            switch (modifier) {
-              case "$function":
-                if (isFunction(r[modifier]))
-                  modifierList[row] = r[modifier]
-                break;
-            }
+    content[i] = ``
+    // iterate over content rows
+    for (let row in input[i]) {
+      // standard input types
+      let r = input[i][row]
+      if (inputTypes.includes(r?.type)) {
+        let id = (isString(r?.entry)) ? r?.entry : ""
+        r.label = (isString(r?.label)) ? r?.label : id || ""
+        content[i] += htmlInput(i, r)
+      }
+      // other form element types
+      // if...
+
+      const modifiers = [ "$function" ]
+      
+      for (let modifier in r) {
+        if (modifiers.includes(modifier)) {
+
+          switch (modifier) {
+            case "$function":
+              if (isFunction(r[modifier]))
+                modifierList[row] = r[modifier]
+              break;
           }
         }
       }
-
     }
-    return {content, modifiers: modifierList}
   }
 
   /**
