@@ -6,7 +6,7 @@
 
 import AROON from "../indicators/AROON";
 import BB from "../indicators/BB"
-// import DX from "../indicators/DX"
+import DX from "../indicators/DX"
 import EMA from "../indicators/EMA"
 import MA from "../indicators/MA"
 import MA_Multi from "../indicators/MA_Multi"
@@ -20,6 +20,7 @@ import Volume from "../indicators/Volume"
 export const IndicatorClasses = {
   AROON,
   BB,
+  DX,
   EMA,
   MA,
   MA_Multi,

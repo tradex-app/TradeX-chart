@@ -25,9 +25,7 @@ import { MA as talibAPI } from "../definitions/talib-api";
   #precision = 2
   primaryPane = true
   scaleOverlay = false
-  plots = [
-    { key: 'MA_1', title: 'MA: ', type: 'line' },
-  ]
+
 
   
   static inCnt = 0
@@ -73,6 +71,7 @@ import { MA as talibAPI } from "../definitions/talib-api";
     return {inputs, colours}
   }
 
+  /*
   draw(range=this.range) {
     // no update required
     if (this.overlay.data.length < 2) return
@@ -114,6 +113,6 @@ import { MA as talibAPI } from "../definitions/talib-api";
 
     super.updated()
   }
-
+  */
 }
 

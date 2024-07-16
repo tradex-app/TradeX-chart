@@ -675,7 +675,7 @@ export default class Indicator extends Overlay {
     return {
       event: "change", 
       fn: (e)=>{
-        this.style[e.target.id] = e.target.value
+        this.style.output[e.target.id] = e.target.value
         this.setRefresh()
         this.draw()
       }
@@ -718,14 +718,15 @@ export default class Indicator extends Overlay {
 
   configInputNumber(input, i, v) {
     input[i] = this.configField(i, "number", v, v)
-    input[i].$function = this.configDialogue.provideEventListeners(`#${i}`, 
-    [{
-      event: "change", 
-      fn: (e)=>{
-        // console.log(`#${i} = ${e.target.value}`)
-      }
-    }]
-  )
+    input[i].$function = this.configDialogue.provideEventListeners(
+      `#${i}`, 
+      [{
+        event: "change", 
+        fn: (e)=>{
+          // console.log(`#${i} = ${e.target.value}`)
+        }
+      }]
+    )
   }
 
   configInputObject(input, i, v) {
@@ -888,9 +889,51 @@ export default class Indicator extends Overlay {
     
     let k = this.colours.length
     let v = (x <= k) ? this.colours[x] : this.colours[k%x]
-    style[o.name].colour = defaultConfigField("colour", `${o.name} Colour`, v, "text")
-    style[o.name].width = defaultConfigField("width", `${o.name} Width`, "1", "number", 0)
+    style[o.name].colour = this.defaultConfigField(`${o.name}Colour`, "colour", `${o.name} Colour`, v, "text")
+    style[o.name].width = this.defaultConfigField(`${o.name}Width`, "width", `${o.name} Width`, "1", "number", 0)
     return style[o.name]
+  }
+
+  defaultConfigField(id, name, label, value, type, min, max) {
+
+    let c, fn, listeners;
+    let change = this.fieldEventChange()
+    let colour = this.fieldEventClick()
+
+    switch(type) {
+      case "number":
+        listeners = [change]
+        fn = (el) => {
+          this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
+        }
+        break;
+      case "text":
+        c = new Colour(value);
+        value = (c.isValid)? c.hexa : value
+        listeners = [change, colour, over, out]
+        fn = (el) => {
+          this.configDialogue.provideInputColor(el, `#${id}`)
+          this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
+        }
+        break;
+    }
+
+    let f = {
+      entry: id,
+      label,
+      type,
+      value,
+      default: value,
+      "data-oldval": value,
+      "data-default": value,
+      title: name,
+      display: true,
+      $function: fn
+    }
+    if (isNumber(min)) f.min = `${min}`
+    if (isNumber(max)) f.max = `${max}`
+
+    return f
   }
 
   addLegend() {
@@ -1246,7 +1289,7 @@ export default class Indicator extends Overlay {
       j--
     }
 
-    this.plot(plots, r, this.style)
+    this.plot(plots, r, s)
   }
 
   draw(range=this.range) {
@@ -1281,9 +1324,10 @@ export default class Indicator extends Overlay {
 
     // plot order
     // drawn in reverse order, bottom to top
-    let q = (meta?.outputOrder || Object.keys(plots)).toReversed()
+    let q = (meta?.outputOrder || Object.keys(plots)).reverse()
     for (let p of q) {
-      this.plotIt(i, c, plots[p].x, plots[p].r, this.style)
+      let style = (!this.style[p]) ? this. style : this.formatStyle(this.style[p], p)
+      this.plotIt(i, c, plots[p].x, plots[p].r, style)
     }
 
     this.target.viewport.render();
@@ -1291,11 +1335,28 @@ export default class Indicator extends Overlay {
     super.updated()
   }
 
+  formatStyle(style, plot) {
+    let e, s = {};
+    for (let entry in style) {
+      e = entry.replace(plot, "").toLowerCase()
+
+      switch(e) {
+        case "colour": e = "stroke"; break;
+      }
+      
+      s[e] = style[entry]
+    }
+    return s
+  }
+
   updated() {
     this.setRefresh()
     super.updated()
   }
 }
+// end of class Indicator
+
+
 
 function validate(src, def, d) {
   let dm = d.meta
@@ -1327,24 +1388,6 @@ function validate(src, def, d) {
       dm.input[f.name].value = d.input[f.name]
   }
 }
-
-function defaultConfigField(name, label, value, type, min, max) {
-  let f = {
-    entry: name,
-    label,
-    type,
-    value,
-    default: value,
-    "data-oldval": value,
-    "data-default": value,
-    title: name,
-    display: true
-  }
-  if (isNumber(min)) f.min = `${min}`
-  if (isNumber(max)) f.max = `${max}`
-  return f
-}
-
 
 function plotFunction(t) {
   switch(t) {

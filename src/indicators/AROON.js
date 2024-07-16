@@ -33,13 +33,24 @@ export default class AROON extends Indicator {
   static primaryPane = false
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
   static defaultStyle = {
-    downStroke: "#c80",
-    downLineWidth: '1',
-    downLineDash: undefined,
-    upStroke: "#08c",
-    upLineWidth: '1',
-    upLineDash: undefined,
-    fillStyle: "#0080c044"
+    // downStroke: "#c80",
+    // downLineWidth: '1',
+    // downLineDash: undefined,
+    // upStroke: "#08c",
+    // upLineWidth: '1',
+    // upLineDash: undefined,
+    fillStyle: "#0080c044",
+
+    aroonDown: {
+      stroke: "#c80",
+      width: 1,
+      dash: undefined,
+    },
+    aroonUp: {
+      stroke: "#08c",
+      width: 1,
+      dash: undefined,
+    },
   }
 
   /**
