@@ -74,14 +74,16 @@ export default class RSI extends Indicator {
     highLowRangeStyle: "#22002220",
 
     output: {
-      stroke: "#C80",
-      width: 1,
+      outputColour: "#C80",
+      outputWidth: 1,
     },
     highLow: {
       stroke: "#848",
       width: 1,
       style: "dashed",
       fill: "#22002220",
+      high: 75,
+      low: 25
     }
   }
 
@@ -118,6 +120,7 @@ export default class RSI extends Indicator {
    * Draw the current indicator range on its canvas layer and render it.
    * @param {Object} range 
    */
+  /*
   draw(range=this.range) {
 
     if (this.overlay.data.length < 2 ) return false
@@ -204,5 +207,7 @@ export default class RSI extends Indicator {
 
     super.updated()
   }
+*/
+
 }
 

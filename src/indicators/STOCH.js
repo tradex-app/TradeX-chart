@@ -34,13 +34,11 @@ export default class STOCH extends Indicator {
     },
   }
   checkParamCount = false
-  plots = [
-    { key: 'STOCH_1', title: ' ', type: 'line' },
-  ]
+
 
   static inCnt = 0
   static primaryPane = false
-  static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
+  static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative
   static defaultStyle = {
     slowKStroke: "#8C0",
     slowKLineWidth: '1',
@@ -95,6 +93,7 @@ export default class STOCH extends Indicator {
    * Draw the current indicator range on its canvas layer and render it.
    * @param {Object} range 
    */
+  /*
   draw(range=this.range) {
     if (this.overlay.data.length < 2 ) return false
 
@@ -190,5 +189,6 @@ export default class STOCH extends Indicator {
 
     super.updated()
   }
+    */
 }
 

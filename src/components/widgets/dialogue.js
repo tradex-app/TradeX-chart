@@ -117,6 +117,19 @@ export default class Dialogue extends Window {
   }
 
   /**
+   * return a function which attaches a listeners to an element
+   * @param {string} selector - valid DOM selector
+   * @param {string} event
+   * @param {function} fn
+   * @return {function} 
+   * @memberof Dialogue
+   */ 
+  provideEventListener(selector, event, fn) {
+    const listeners = [{event, fn}]
+    return this.provideEventListeners(selector, listeners)
+  }
+
+  /**
    * return a function which attaches an array of listeners to an element
    * @param {string} selector
    * @param {array} listeners - [{event, function}]

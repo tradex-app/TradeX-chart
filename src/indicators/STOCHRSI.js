@@ -34,13 +34,11 @@ export default class STOCHRSI extends Indicator {
     },
   }
   checkParamCount = false
-  plots = [
-    { key: 'STOCHRSI_1', title: ' ', type: 'line' },
-  ]
+
 
   static inCnt = 0
   static primaryPane = false
-  static scale = YAXIS_TYPES[2] // YAXIS_TYPES - percent
+  static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative
   static defaultStyle = {
     fastKStroke: "#8C0",
     fastKLineWidth: '1',
@@ -75,7 +73,7 @@ export default class STOCHRSI extends Indicator {
 
     this.init(talibAPI)
   }
-
+/*
   calcIndicator (indicator, params={}, range=this.range) {
     // params.padding = params.fastK_Period + params.fastD_Period
     // return super.calcIndicator(indicator, params, range)
@@ -124,7 +122,7 @@ export default class STOCHRSI extends Indicator {
     const stoch = this.calcIndicator(indicator, params, range)
     return (isArray(stoch)) ? stoch[this.definition.input.stochPeriod + params.padding] : false
   }
-
+*/
   legendInputs(pos=this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return false
 
@@ -145,6 +143,7 @@ export default class STOCHRSI extends Indicator {
    * Draw the current indicator range on its canvas layer and render it.
    * @param {Object} range 
    */
+  /*
   draw(range=this.range) {
     if (this.overlay.data.length < 2 ) return false
 
@@ -240,5 +239,6 @@ export default class STOCHRSI extends Indicator {
 
     super.updated()
   }
+    */
 }
 

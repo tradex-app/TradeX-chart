@@ -109,9 +109,10 @@ import { YAXIS_TYPES } from "../definitions/chart";
     // console.trace()
   }
 
+  /*
   draw(range=this.range) {
     super.draw(range)
   }
-
+  */
 }
 

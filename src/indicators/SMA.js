@@ -25,9 +25,6 @@ import { SMA as talibAPI } from "../definitions/talib-api";
   #precision = 2
   primaryPane = true
   scaleOverlay = false
-  plots = [
-    { key: 'SMA_1', title: 'SMA: ', type: 'line' },
-  ]
 
   
   static inCnt = 0
@@ -41,7 +38,11 @@ import { SMA as talibAPI } from "../definitions/talib-api";
   ]
   static defaultStyle = {
     stroke: "#C80",
-    width: '1'
+    width: '1',
+    output: {
+      outputColour: "#C80",
+      outputWidth: 1,
+    },
   }
 
   /**
@@ -73,6 +74,7 @@ import { SMA as talibAPI } from "../definitions/talib-api";
     return {inputs, colours}
   }
 
+  /*
   draw(range=this.range) {
     // no update required
     if (this.overlay.data.length < 2) return
@@ -114,6 +116,6 @@ import { SMA as talibAPI } from "../definitions/talib-api";
 
     super.updated()
   }
-
+  */
 }
 

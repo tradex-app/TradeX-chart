@@ -48,9 +48,6 @@ import { EMA as talibAPI } from "../definitions/talib-api";
   precision = 2
   checkParamCount = false
   scaleOverlay = false
-  plots = [
-    { key: 'EMA_1', title: 'EMA: ', type: 'line' },
-  ]
 
 
   static inCnt = 0
@@ -102,6 +99,7 @@ import { EMA as talibAPI } from "../definitions/talib-api";
    * Draw the current indicator range on its canvas layer and render it.
    * @param {Object} range 
    */
+  /*
   draw(range=this.range) {
 
     // no update required
@@ -144,5 +142,9 @@ import { EMA as talibAPI } from "../definitions/talib-api";
 
     super.updated()
   }
+  */
+ calcIndicator() {
+  throw new Error("test")
+ }
 }
 

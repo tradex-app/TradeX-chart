@@ -2,7 +2,7 @@
 // Config Dialogue
 
 import Dialogue from "./dialogue";
-import { isBoolean, isString, isObject, isFunction } from "../../utils/typeChecks";
+import { isBoolean, isString, isObject, isFunction, isArray } from "../../utils/typeChecks";
 import { uid } from "../../utils/utilities";
 import { htmlInput, inputTypes } from "../../utils/DOM";
 import { tabsBuild, tabStyles } from "../views/tabs";
@@ -116,54 +116,48 @@ export default class ConfigDialogue extends Dialogue {
 
     // iterate over tabs
     for (let i in input) {
-      if (!isObject(input[i])) {
+      if (isArray(input[i])) {
+        console.log(`${i} is Array`)
+
+        for (let j of input[i]) {
+          let obj = { output: j.style }
+          this.configEntries(j.name, obj, content, modifierList)
+        }
+      }
+      else if (isObject(input[i])) {
+        this.configEntries(i, input, content, modifierList)
+      }
+      else {
         this.core.error(`ERROR: Building Config Dialogue : Input malformed`)
         continue;
       }
-      content[i] = ``
-      // iterate over content rows
-      for (let row in input[i]) {
-        // standard input types
-        let r = input[i][row]
-        if (inputTypes.includes(r?.type)) {
-          let id = (isString(r?.entry)) ? r?.entry : ""
-          r.label = (isString(r?.label)) ? r?.label : id || ""
-          content[i] += htmlInput(i, r)
-        }
-        // other form element types
-        // if...
-
-        const modifiers = [ "$function" ]
-        
-        for (let modifier in r) {
-          if (modifiers.includes(modifier)) {
-
-            switch (modifier) {
-              case "$function":
-                if (isFunction(r[modifier]))
-                  modifierList[row] = r[modifier]
-                break;
-            }
-          }
-        }
-      }
-
     }
     return {content, modifiers: modifierList}
   }
 
-  configEntries(input, content, modifierList) {
+  /**
+   *
+   * @param {string} i - tab
+   * @param {object} input - object to convert to tabbed content
+   * @param {object} content ~ object to fill with processed tabbed content
+   * @param {object} modifierList - object to fill with functions that will be attached to content
+   * @memberof ConfigDialogue
+   */
+  configEntries(i, input, content, modifierList) {
 
-    content[i] = ``
     // iterate over content rows
     for (let row in input[i]) {
-      // standard input types
+
+      let id;
       let r = input[i][row]
+      // standard input types
+      // only process entries that match input types
       if (inputTypes.includes(r?.type)) {
-        let id = (isString(r?.entry)) ? r?.entry : ""
+        id = (isString(r?.entry)) ? r?.entry : ""
         r.label = (isString(r?.label)) ? r?.label : id || ""
-        content[i] += htmlInput(i, r)
+        content[i] += htmlInput(r.label, r)
       }
+      else continue
       // other form element types
       // if...
 
@@ -198,18 +192,13 @@ export default class ConfigDialogue extends Dialogue {
     return this.#update
   }
 
-  provideEventListener(selector, event, fn) {
-    const func = (el) => {
-      const elm = el.querySelector(selector)
-      if (!!elm)
-        elm.addEventListener(event, 
-        (e) => {
-          fn(e)
-        })
-    }
-    return func
-  }
-
+  /**
+   * Replaces input (selector) with tradex-colourinput
+   * interdependent colour picker and text field
+   * @param {HTMLElement} el
+   * @param {string} selector
+   * @memberof ConfigDialogue
+   */
   provideInputColor(el, selector) {
     const input = el.querySelector(selector)
     const colourInput = document.createElement("tradex-colourinput")

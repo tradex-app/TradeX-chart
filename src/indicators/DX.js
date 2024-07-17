@@ -12,7 +12,7 @@ export default class DX extends Indicator {
 
   get name() { return 'Directional Movement Index' }
   shortName = 'DX'
-  libName = null
+  libName = 'DX'
   definition = {
     input: {
 
@@ -23,9 +23,7 @@ export default class DX extends Indicator {
   }
   precision = 2
   scaleOverlay = true
-  plots = [
-    { key: 'DX_1', title: ' ', type: 'line' },
-  ]
+
 
   static inCnt = 0
   static primaryPane = false
@@ -73,6 +71,7 @@ export default class DX extends Indicator {
    * Draw the current indicator range on its canvas layer and render it.
    * @param {Object} range 
    */
+  /*
   draw(range=this.range) {
     // no update required
     if (this.overlay.data.length < 2) return
@@ -147,5 +146,6 @@ export default class DX extends Indicator {
 
     super.updated()
   }
+    */
 }
 

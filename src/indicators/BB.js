@@ -44,7 +44,23 @@ export default class BB extends Indicator {
     upperStroke: "#08c",
     upperLineWidth: 1,
     upperLineDash: undefined,
-    fillStyle: "#0080c044"
+    fillStyle: "#0080c044",
+
+    lowerBand: {
+      stroke: "#08c",
+      width: 1,
+      dash: undefined,
+    },
+    middleBand: {
+      stroke: "#0080c088",
+      width: 1,
+      dash: undefined,
+    },
+    upperBand: {
+      stroke: "#08c",
+      width: 1,
+      dash: undefined,
+    },
   }
 
   /**
@@ -86,6 +102,7 @@ export default class BB extends Indicator {
     return {inputs, colours, labels}
   }
 
+  /*
   draw(range=this.range) {
     // no update required
     if (this.overlay.data.length < 2) return
@@ -154,4 +171,5 @@ export default class BB extends Indicator {
 
     super.updated()
   }
+    */
 }
