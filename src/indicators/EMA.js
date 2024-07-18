@@ -143,8 +143,5 @@ import { EMA as talibAPI } from "../definitions/talib-api";
     super.updated()
   }
   */
- calcIndicator() {
-  throw new Error("test")
- }
 }
 

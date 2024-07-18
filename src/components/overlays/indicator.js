@@ -691,6 +691,7 @@ export default class Indicator extends Overlay {
       event: "change", 
       fn: (e)=>{
         this.style.output[e.target.id] = e.target.value
+        this.style.output[e.target.id] = e.target.value
         this.setRefresh()
         this.draw()
       }
@@ -1371,7 +1372,7 @@ export default class Indicator extends Overlay {
     super.updated()
   }
 }
-
+// end of class Indicator
 
 
 
