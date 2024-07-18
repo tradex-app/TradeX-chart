@@ -86,9 +86,16 @@ export default class ConfigDialogue extends Dialogue {
   set update(u) { this.#update = !!u }
   get update() { return this.#update }
 
-  configBuild(c={}) {
+  /**
+   * Transform (tabbed) content object into HTML 
+   * and provide any functions required for form elements
+   * @param {object} [contObj={}] - content
+   * @return {object} - {html, modifiers}
+   * @memberof ConfigDialogue
+   */
+  configBuild(contObj={}) {
 
-    let {content, modifiers={}} = this.configContent(c)
+    let {content, modifiers={}} = this.configContent(contObj)
 
     const tabsHTML = `
     <div class="tabbedContent">
@@ -157,9 +164,9 @@ export default class ConfigDialogue extends Dialogue {
         r.label = (isString(r?.label)) ? r?.label : id || ""
         content[i] += htmlInput(r.label, r)
       }
-      else continue
       // other form element types
       // if...
+      else continue
 
       const modifiers = [ "$function" ]
       
@@ -206,3 +213,4 @@ export default class ConfigDialogue extends Dialogue {
     colourInput.style.display = "inline-block"
   }
 }
+// end of class ConfigDialogue 

@@ -653,24 +653,26 @@ export default class Indicator extends Overlay {
           break;
 
         case "number":
-          min = `0`
-          d = v
-          listeners = [change]
-          fn = (el) => {
-            this.configDialogue.provideEventListeners(`#${i}`, listeners)(el)
-          }
+          ;({type, min, d, listeners, fn} = this.outputValueNumber(i, v, change))
           break;
 
         case "string":
           let c = new Colour(v);
-          type = (c.isValid)? "text" : ""
-          v = (c.isValid)? c.hexa : v
-          d = v
-          listeners = [change, colour, over, out]
-          fn = (el) => {
-            this.configDialogue.provideInputColor(el, `#${i}`)
-            this.configDialogue.provideEventListeners(`#${i}`, listeners)(el)
+          
+          if (c.isValid) {
+            type = "color"
+            v = c.hexa
+            d = v
+            listeners = [change, colour, over, out]
+            fn = (el) => {
+              this.configDialogue.provideInputColor(el, `#${i}`)
+              this.configDialogue.provideEventListeners(`#${i}`, listeners)(el)
+            }
           }
+          else if (isNumber(v*1)) {
+          ;({type, min, d, listeners, fn} = this.outputValueNumber(i, v, change))
+          }
+          else listeners = false
           break;
 
         default:
@@ -684,6 +686,19 @@ export default class Indicator extends Overlay {
     }
 
     return entry
+  }
+  
+  outputValueNumber(i, v, change) {
+    let listeners = [change]
+    return {
+      type: "number",
+      min: `0`,
+      d: v,
+      listeners,
+      fn: (el) => {
+        this.configDialogue.provideEventListeners(`#${i}`, listeners)(el)
+      }
+    }
   }
 
   fieldEventChange() {
