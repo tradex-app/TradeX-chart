@@ -361,6 +361,30 @@ export const union = (a, b) => diff(a, b).concat(b);
 
 
 /**
+ * test if is object and empty
+ * @export
+ * @param {object} obj
+ * @return {boolean}
+ */
+export function isObjectAndEmpty(obj) {
+  if (!isObject(obj)) return false
+  if (Object.keys.length) return false
+  return true
+}
+
+/**
+ * test if is object and not empty
+ * @export
+ * @param {object} obj
+ * @return {boolean}
+ */
+export function isObjectNotEmpty(obj) {
+  if (!isObject(obj)) return false
+  if (!Object.keys(obj).length) return false
+  else return true
+}
+
+/**
  * object comparison
  * @param {Object} obj1
  * @param {Object} obj2

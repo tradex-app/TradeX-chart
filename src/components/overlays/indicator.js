@@ -6,7 +6,7 @@ import { Range } from "../../model/range"
 import { limit } from "../../utils/number"
 import Colour, { Palette } from "../../utils/colour"
 import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from "../../utils/typeChecks"
-import { copyDeep, diff, idSanitize, mergeDeep, uid } from "../../utils/utilities"
+import { copyDeep, diff, idSanitize, isObjectNotEmpty, mergeDeep, uid } from "../../utils/utilities"
 import { STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
 import { WinState } from "../widgets/window"
@@ -636,23 +636,28 @@ export default class Indicator extends Overlay {
   }
 
    buildConfigOutputTab(style) {
-    const entry = {}
+    let entry = {}
 
     for (let i in style) {
       let d = ""
       let min = ""
       let fn, listeners;
-      let v = this.style[i]
+      let v = style[i]
       let change = this.fieldEventChange()
       let colour = this.fieldEventClick()
       let type = typeOf(v)
       switch (type) {
 
         case "object": 
-          this.buildConfigOutputTab(v)
+          let e = this.buildConfigOutputTab(v)
+          // entry[i] = e
+          entry = {...entry, ...e}
+          // delete style[i]
+          listeners = false
           break;
 
         case "number":
+        case "integer":
           ;({type, min, d, listeners, fn} = this.outputValueNumber(i, v, change))
           break;
 
@@ -826,9 +831,10 @@ export default class Indicator extends Overlay {
     dm.output = (!isArray(dm.output) || !dm.output.length) ? out : dm.output;
     dm.outputOrder = (!isArray(dm.outputOrder)) ? [] : dm.outputOrder
     dm.outputLegend = (!isObject(dm.outputLegend)) ? {} : dm.outputLegend
-    dm.style = (!isObject(dm.style)) ? 
-    (!isObject(this.style)) ? {} : this.style
-    : dm.style
+
+    // style
+    if (!isObjectNotEmpty(dm.style))
+        dm.style = this.style || {}
 
     // input
     const input = {...d.input, ...s}
@@ -891,15 +897,10 @@ export default class Indicator extends Overlay {
         dm.outputLegend[k].value = false
     }
 
-    // Outputs Tab
+    // Outputs Tab add any missing requirements
+    dm.style = this.buildConfigOutputTab(dm.style)
 
-    if (Object.keys(d?.meta.style).length == 0 &&
-        Object.keys(this.style).length > 0)
-          dm.style = this.buildConfigOutputTab(this.style)
-
-
-    // meta output
-
+    // meta output - add required data for relevant form fileds
     for (let x = 0; x < dm.output.length; x++) {
       let o = dm.output[x]
       let t = plotFunction(o?.plot)
@@ -916,12 +917,25 @@ export default class Indicator extends Overlay {
 
   defaultMetaStyleLine(o, x, style) {
     o.name = (!o?.name) ? "output" : o.name
-    style[o.name] = {}
+
+    if (!isObject(style?.[o.name]))
+      style[o.name] = {}
     
-    let k = this.colours.length
-    let v = (x <= k) ? this.colours[x] : this.colours[k%x]
-    style[o.name].colour = this.defaultConfigField(`${o.name}Colour`, "colour", `${o.name} Colour`, v, "text")
-    style[o.name].width = this.defaultConfigField(`${o.name}Width`, "width", `${o.name} Width`, "1", "number", 0)
+    // is colour valid?
+    let c = new Colour(style[o.name]?.colour)
+    if (!c.isValid) {
+      let k = this.colours.length
+      let v = (x <= k) ? this.colours[x] : this.colours[k%x]
+      style[o.name].colour = this.defaultConfigField(`${o.name}Colour`, "colour", `${o.name} Colour`, v, "text")
+    }
+
+    // is width valid?
+    if (!isNumber(style[o.name]?.width))
+      style[o.name].width = this.defaultConfigField(`${o.name}Width`, "width", `${o.name} Width`, "1", "number", 0)
+
+    // style[o.name].fillS = string
+    // style[o.name].fillStyle = #RBBA
+    // style[o.name].dash = string - 2, 10 
     return style[o.name]
   }
 
@@ -1359,7 +1373,7 @@ export default class Indicator extends Overlay {
     // drawn in reverse order, bottom to top
     let q = (meta?.outputOrder || Object.keys(plots)).reverse()
     for (let p of q) {
-      let style = (!this.style[p]) ? this. style : this.formatStyle(this.style[p], p)
+      let style = (!this.style[p]) ? this.style : this.formatStyle(this.style[p], p)
       this.plotIt(i, c, plots[p].x, plots[p].r, style)
     }
 
