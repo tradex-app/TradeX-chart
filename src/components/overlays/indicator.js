@@ -706,12 +706,16 @@ export default class Indicator extends Overlay {
     }
   }
 
+  /**
+   * Updates indicator meta output value with dialogue value
+   * @returns {object}
+   */
   fieldEventChange() {
     return {
       event: "change", 
       fn: (e)=>{
-        this.style.output[e.target.id] = e.target.value
-        this.style.output[e.target.id] = e.target.value
+        // this.definition.meta.output[e.target.id] = e.target.value
+        this.fieldTargetUpdate(e.target.id, e.target.value)
         this.setRefresh()
         this.draw()
       }
@@ -736,6 +740,33 @@ export default class Indicator extends Overlay {
         // hide colour picker when pointer gives focus elsewhere
       }
     }
+  }
+
+  fieldTargetUpdate(target, value) {
+    // let t = this.definition.meta.style[target]
+    //     t["data-oldval"] = t.value
+    //     t.value = value
+
+
+    let s = this.definition.meta.style
+    for (let e in s ) {
+      for (let o in s[e]) {
+        if (isObject(s[e][o]) && s[e][o].entry == target) {
+          s[e][o]["data-oldval"] = s[e][o].value
+          s[e][o].value = value
+        }
+      }
+    }
+
+
+    // for (let o of this.definition.meta.output) {
+    //   for (let k in o.style) {
+    //     if (o[k].entry == target) {
+    //       o[k]["data-oldval"] = o[k].value
+    //       o[k].value = value
+    //     }
+    //   }
+    // }
   }
 
   configField(i, type, value, defaultValue, min="0", fn) {
@@ -1320,6 +1351,7 @@ export default class Indicator extends Overlay {
     const width = this.xAxis.candleW
     const zero = this.yAxis.yPos(0)
     const plot = { w: width, zero }
+    const opts = {}
 
     let plots = []
 
@@ -1336,7 +1368,12 @@ export default class Indicator extends Overlay {
       j--
     }
 
-    this.plot(plots, r, s)
+    for (let key in s) {
+      if (!!s[key]?.value)
+        opts[key] = s[key].value
+    }
+
+    this.plot(plots, r, opts)
   }
 
   draw(range=this.range) {
@@ -1373,7 +1410,7 @@ export default class Indicator extends Overlay {
     // drawn in reverse order, bottom to top
     let q = (meta?.outputOrder || Object.keys(plots)).reverse()
     for (let p of q) {
-      let style = (!this.style[p]) ? this.style : this.formatStyle(this.style[p], p)
+      let style = this.formatStyle(this.definition.meta.style[p], p)
       this.plotIt(i, c, plots[p].x, plots[p].r, style)
     }
 
