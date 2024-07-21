@@ -31,6 +31,10 @@ export default class Volume extends Indicator {
   static primaryPane = "both"
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
+  static defaultStyle = {
+    up: {upColour: "#388E3C"},
+    dn: {dnColour: "#D32F2F"}
+  }
 
   /**
    * Creates an instance of Volume.
@@ -62,7 +66,7 @@ export default class Volume extends Indicator {
       this.style.Height = 100;
       this.#primaryPane = false
     }
-    this.#volumeBar = new VolumeBar(target.scene, this.style)
+    this.#volumeBar = new VolumeBar(target.scene, this.definition.meta.style)
 
     this.init()
   }
@@ -83,8 +87,8 @@ export default class Volume extends Indicator {
     const ohlcv = this.range.data[index]
     const theme = this.chart.theme.candle
     const colours = (ohlcv[4] >= ohlcv[1]) ?
-    [this.style.UpColour.slice(0,7)] :
-    [this.style.DnColour.slice(0,7)];
+    [this.definition.meta.style.UpColour.slice(0,7)] :
+    [this.definition.meta.style.DnColour.slice(0,7)];
     const inputs = {"V": this.scale.nicePrice(ohlcv[5])}
     return {inputs, colours}
   }

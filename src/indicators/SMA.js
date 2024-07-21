@@ -37,8 +37,8 @@ import { SMA as talibAPI } from "../definitions/talib-api";
     "#66BB6A"
   ]
   static defaultStyle = {
-    stroke: "#C80",
-    width: '1',
+    // stroke: "#C80",
+    // width: '1',
     output: {
       outputColour: "#C80",
       outputWidth: 1,
@@ -73,6 +73,14 @@ import { SMA as talibAPI } from "../definitions/talib-api";
 
     return {inputs, colours}
   }
+
+  // invokeSettings(c) {
+  //   return super.invokeSettings(c)
+  // }
+
+  // buildConfigOutputTab(style) {
+  //   return super.buildConfigOutputTab(style)
+  // }
 
   /*
   draw(range=this.range) {

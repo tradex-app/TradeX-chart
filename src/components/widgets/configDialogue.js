@@ -112,27 +112,26 @@ export default class ConfigDialogue extends Dialogue {
 
   /**
    * build tabbed content object
-   * @param {object} input - tabs {row: {attribute, attribute, ...}}
+   * @param {object} cfgObj - tabs {row: {attribute, attribute, ...}}
    * @returns {object} - {content: string, modifiers: object}
    */
-  configContent(input) {
-    if (!isObject(input)) return `<p>Input missing!</p>`
+  configContent(cfgObj) {
+    if (!isObject(cfgObj)) return `<p>Config content missing!</p>`
 
     let content = {}
     let modifierList = {}
 
     // iterate over tabs
-    for (let i in input) {
-      if (isArray(input[i])) {
-        console.log(`${i} is Array`)
+    for (let i in cfgObj) {
+      if (isArray(cfgObj[i])) {
 
-        for (let j of input[i]) {
-          let obj = { output: j.style }
+        for (let j of cfgObj[i]) {
+          let obj = { output: j }
           this.configEntries(j.name, obj, content, modifierList)
         }
       }
-      else if (isObject(input[i])) {
-        this.configEntries(i, input, content, modifierList)
+      else if (isObject(cfgObj[i])) {
+        this.configEntries(i, cfgObj, content, modifierList)
       }
       else {
         this.core.error(`ERROR: Building Config Dialogue : Input malformed`)
@@ -151,6 +150,7 @@ export default class ConfigDialogue extends Dialogue {
    * @memberof ConfigDialogue
    */
   configEntries(i, input, content, modifierList) {
+    content[i] = ""
 
     // iterate over content rows
     for (let row in input[i]) {

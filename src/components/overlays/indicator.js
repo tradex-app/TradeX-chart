@@ -504,7 +504,7 @@ export default class Indicator extends Overlay {
   /**
    * invoke indicator settings callback, user defined or default
    * @param {Object} c - {fn: function, own: boolean}, own flag will bypass default action
-   * @returns 
+   * @returns {boolean} - success or failuer
    */
   invokeSettings(c={}) {
     let r;
@@ -532,7 +532,8 @@ export default class Indicator extends Overlay {
         return false
       }
       // build the config dialogue
-      const {html, modifiers} = cd.configBuild(this.configInputs())
+      const configInputs = this.configInputs()
+      const {html, modifiers} = cd.configBuild(configInputs)
       const title = `${this.shortName} Config`
       cd.setTitle(title)
       cd.setContent(html, modifiers)
@@ -548,7 +549,7 @@ export default class Indicator extends Overlay {
   // entry, id, label, type, value, default, placeholder, class, max, min, step, onchange, disabled, visible, description
 
   configInputs() {
-    const name = this.name || this.shortName || this.#ID
+    const name = this.name || this.shortName || this.id
     const noConfig = `Indicator ${name} is not configurable.`
     const noTabs = { "No Config": {tab1: noConfig} }
       let tabs = {};
@@ -559,22 +560,12 @@ export default class Indicator extends Overlay {
         !isObject(this?.definition?.input)) 
       return noTabs
 
-    // inputs built in defineIndicator()
-    // style built in defineIndicator()
-
     // process other tabs
     for (let tab in meta) {
       if (IGNORE_DEFINITIONS.includes(tab)) continue
 
       tabs[tab] = meta[tab]
     }
-
-    if (!isObject(meta?.style) ||
-        Object.keys(meta.style).length == 0)
-        meta.style = copyDeep(this.style)
-
-    console.log(tabs?.output)
-
     // if there are no tabs return no config message
     if (Object.keys(tabs).length == 0)
       tabs = noTabs
@@ -635,64 +626,6 @@ export default class Indicator extends Overlay {
     return input
   }
 
-   buildConfigOutputTab(style) {
-    let entry = {}
-
-    for (let i in style) {
-      let d = ""
-      let min = ""
-      let fn, listeners;
-      let v = style[i]
-      let change = this.fieldEventChange()
-      let colour = this.fieldEventClick()
-      let type = typeOf(v)
-      switch (type) {
-
-        case "object": 
-          let e = this.buildConfigOutputTab(v)
-          // entry[i] = e
-          entry = {...entry, ...e}
-          // delete style[i]
-          listeners = false
-          break;
-
-        case "number":
-        case "integer":
-          ;({type, min, d, listeners, fn} = this.outputValueNumber(i, v, change))
-          break;
-
-        case "string":
-          let c = new Colour(v);
-          
-          if (c.isValid) {
-            type = "color"
-            v = c.hexa
-            d = v
-            listeners = [change, colour, over, out]
-            fn = (el) => {
-              this.configDialogue.provideInputColor(el, `#${i}`)
-              this.configDialogue.provideEventListeners(`#${i}`, listeners)(el)
-            }
-          }
-          else if (isNumber(v*1)) {
-          ;({type, min, d, listeners, fn} = this.outputValueNumber(i, v, change))
-          }
-          else listeners = false
-          break;
-
-        default:
-          listeners = false
-          break;
-
-      }
-      if (!listeners) continue
-
-      entry[i] = this.configField(i, type, v, d, min, fn)
-    }
-
-    return entry
-  }
-  
   outputValueNumber(i, v, change) {
     let listeners = [change]
     return {
@@ -743,11 +676,6 @@ export default class Indicator extends Overlay {
   }
 
   fieldTargetUpdate(target, value) {
-    // let t = this.definition.meta.style[target]
-    //     t["data-oldval"] = t.value
-    //     t.value = value
-
-
     let s = this.definition.meta.style
     for (let e in s ) {
       for (let o in s[e]) {
@@ -757,34 +685,11 @@ export default class Indicator extends Overlay {
         }
       }
     }
-
-
-    // for (let o of this.definition.meta.output) {
-    //   for (let k in o.style) {
-    //     if (o[k].entry == target) {
-    //       o[k]["data-oldval"] = o[k].value
-    //       o[k].value = value
-    //     }
-    //   }
-    // }
   }
 
-  configField(i, type, value, defaultValue, min="0", fn) {
-    return {
-      entry: i,
-      label: i,
-      type,
-      value,
-      default: defaultValue,
-      "data-oldval": value, 
-      "data-default": defaultValue, 
-      min,
-      $function: fn
-    }
-  }
 
   configInputNumber(input, i, v) {
-    input[i] = this.configField(i, "number", v, v)
+    input[i] = this.configField(i, i, "number", v, v)
     input[i].$function = this.configDialogue.provideEventListeners(
       `#${i}`, 
     [{
@@ -799,7 +704,7 @@ export default class Indicator extends Overlay {
   configInputObject(input, i, v) {
     if (i instanceof InputPeriodEnable) {
 
-      input[i.period] = this.configField(i.period, "number", v, v)
+      input[i.period] = this.configField(i.period, i.period, "number", v, v)
 
       input.$function = function (el) {
         const elm = el.querySelector(`#${i.period}`)
@@ -873,18 +778,20 @@ export default class Indicator extends Overlay {
     d.input = input
     
     // output
+    // if definition output is empty build it from api
     if (Object.keys(d.output).length == 0) {
       for (let o of api.outputs) {
         d.output[o.name] = []
       }
     }
+    // ensure all definition outputs are arrays
     for (let o in d.output) {
       if (!isArray(d.output[o])) 
         d.output[o] = []
-        oo.push(o)
+      oo.push(o)
     }
 
-    // define.meta validation
+    // define.meta validation ------------------
 
     // Inputs Tab
 
@@ -893,16 +800,25 @@ export default class Indicator extends Overlay {
     for (let def of api.options) {
       if (def.name in input)
         validate(input, api.options, d)
-      else if (isObject(input?.definition?.input) && 
-                def.name in input.definition.input)
-        validate(input.definition.input, api.options, d)
+      // else if (isObject(input?.definition?.input) && 
+      //           def.name in input.definition.input)
+      //   validate(input.definition.input, api.options, d)
     }
 
-    // validate 
 
-    // meta output order
-    // merge output keys with output order
-    // remove redundant keys and preserve order
+    this.buildOutputOrder(dm, oo)
+    this.buildOutputLegends(d)
+    this.buildConfigOutputTab(dm)
+  } // end of define indicator
+
+  /**
+   * meta output render order
+   * merge output keys with output order
+   * remove redundant keys and preserve order
+   * @param {object} dm - this.definition.meta
+   * @param {array} oo - output order derived from API output definition
+   */
+  buildOutputOrder(dm, oo) {
     let u = [...new Set([...dm.outputOrder, ...oo])]
     let del = diff(u, oo)
     for (let x of del) {
@@ -911,8 +827,10 @@ export default class Indicator extends Overlay {
       u.splice(idx, 1)
     }
     dm.outputOrder = u
+  }
 
-    // meta output legend
+  buildOutputLegends(d) {
+    let dm = d.meta
     let k = Object.keys(d.output)
     for (let [k,v] of Object.entries(dm.outputLegend)) {
       if (!isObject(v)) {
@@ -927,9 +845,19 @@ export default class Indicator extends Overlay {
       if (!isBoolean(dm.outputLegend[k].value))
         dm.outputLegend[k].value = false
     }
+  }
 
-    // Outputs Tab add any missing requirements
-    dm.style = this.buildConfigOutputTab(dm.style)
+  /**
+   * Outputs Tab add any missing requirements
+   * @param {object} dm - this.definition.meta
+   * @returns 
+   */
+  buildConfigOutputTab(dm) {
+    // cleam up style
+    for (let i in dm.style) {
+      if (typeof dm.style[i] !== "object")
+        delete dm.style[i]
+    }
 
     // meta output - add required data for relevant form fileds
     for (let x = 0; x < dm.output.length; x++) {
@@ -937,7 +865,9 @@ export default class Indicator extends Overlay {
       let t = plotFunction(o?.plot)
       switch(t) {
         case "renderLine": 
-          o.style = (!dm.style?.[o?.name]) ? this.defaultMetaStyleLine(o, x, dm.style) : this.style[o.name];
+          // o.style = (!dm.style?.[o?.name]) ? this.defaultMetaStyleLine(o, x, dm.style) : dm.style[o.name];
+          o.style = this.defaultMetaStyleLine(o, x, dm.style)
+
           break;
         case "histogram": return "histogram"
         case "highLow": return "highLow"
@@ -946,6 +876,14 @@ export default class Indicator extends Overlay {
     }
   }
 
+
+  /**
+   * 
+   * @param {object} o - style object
+   * @param {number} x - style entry (field) number
+   * @param {object} style - style entry object
+   * @returns 
+   */
   defaultMetaStyleLine(o, x, style) {
     o.name = (!o?.name) ? "output" : o.name
 
@@ -957,12 +895,12 @@ export default class Indicator extends Overlay {
     if (!c.isValid) {
       let k = this.colours.length
       let v = (x <= k) ? this.colours[x] : this.colours[k%x]
-      style[o.name].colour = this.defaultConfigField(`${o.name}Colour`, "colour", `${o.name} Colour`, v, "text")
+      style[o.name].colour = this.defaultOutputField(`${o.name}Colour`, `${o.name} Colour`, v, "color")
     }
 
     // is width valid?
     if (!isNumber(style[o.name]?.width))
-      style[o.name].width = this.defaultConfigField(`${o.name}Width`, "width", `${o.name} Width`, "1", "number", 0)
+      style[o.name].width = this.defaultOutputField(`${o.name}Width`, `${o.name} Width`, "1", "number", 0)
 
     // style[o.name].fillS = string
     // style[o.name].fillStyle = #RBBA
@@ -970,7 +908,7 @@ export default class Indicator extends Overlay {
     return style[o.name]
   }
 
-  defaultConfigField(id, name, label, value, type, min, max) {
+  defaultOutputField(id, label, value, type, min, max) {
 
     let c, fn, listeners;
     let change = this.fieldEventChange()
@@ -983,9 +921,9 @@ export default class Indicator extends Overlay {
           this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
         }
         break;
-      case "text":
+      case "color":
         c = new Colour(value);
-        value = (c.isValid)? c.hexa : value
+        value = (c.isValid)? c.hexa : this.defaultColour()
         listeners = [change, colour, over, out]
         fn = (el) => {
           this.configDialogue.provideInputColor(el, `#${id}`)
@@ -994,22 +932,26 @@ export default class Indicator extends Overlay {
         break;
     }
 
-    let f = {
-      entry: id,
+    return this.configField(id, label, type, value, value, min, max, fn)
+  }
+
+  configField(i, label, type, value, defaultValue, min, max, fn) {
+    return {
+      entry: i,
       label,
       type,
       value,
-      default: value,
-      "data-oldval": value,
-      "data-default": value,
-      title: name,
-      display: true,
+      default: defaultValue,
+      "data-oldval": value, 
+      "data-default": defaultValue, 
+      min,
+      max,
       $function: fn
     }
-    if (isNumber(min)) f.min = `${min}`
-    if (isNumber(max)) f.max = `${max}`
+  }
 
-    return f
+  defaultColour() {
+    return "#fff"
   }
 
   addLegend() {

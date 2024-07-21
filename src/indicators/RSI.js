@@ -63,16 +63,6 @@ export default class RSI extends Indicator {
   static primaryPane = false
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
   static defaultStyle = {
-    stroke: "#C80",
-    width: 1,
-    defaultHigh: 75,
-    defaultLow: 25,
-    highLowLineWidth: 1,
-    highLowStyle: "dashed",
-    highStroke: "#848",
-    lowStroke: "#848",
-    highLowRangeStyle: "#22002220",
-
     output: {
       outputColour: "#C80",
       outputWidth: 1,
