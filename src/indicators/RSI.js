@@ -53,7 +53,8 @@ export default class RSI extends Indicator {
       outputOrder: [
         "output",
         "highLow"
-      ]
+      ],
+      style: RSI.defaultStyle
     }
   }
 
@@ -64,17 +65,17 @@ export default class RSI extends Indicator {
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
   static defaultStyle = {
     output: {
-      outputColour: "#C80",
-      outputWidth: 1,
+      colour: {value: "#E91E63"},
+      width: {value: 1},
     },
-    highLow: {
-      stroke: "#848",
-      width: 1,
-      style: "dashed",
-      fill: "#22002220",
-      high: 75,
-      low: 25
-    }
+    // highLow: {
+    //   stroke: "#848",
+    //   width: 1,
+    //   style: "dashed",
+    //   fill: "#22002220",
+    //   high: 75,
+    //   low: 25
+    // }
   }
 
 
@@ -105,6 +106,9 @@ export default class RSI extends Indicator {
     return {inputs, colours}
   }
 
+  defineIndicator(s, api) {
+    super.defineIndicator(s, api)
+  }
 
   /**
    * Draw the current indicator range on its canvas layer and render it.

@@ -103,16 +103,5 @@ import { YAXIS_TYPES } from "../definitions/chart";
     return {inputs, colours}
   }
 
-  calcIndicatorHistory() {
-    // debugger
-    super.calcIndicatorHistory()
-    // console.trace()
-  }
-
-  /*
-  draw(range=this.range) {
-    super.draw(range)
-  }
-  */
 }
 

@@ -6,6 +6,7 @@ import { isBoolean, isString, isObject, isFunction, isArray } from "../../utils/
 import { uid } from "../../utils/utilities";
 import { htmlInput, inputTypes } from "../../utils/DOM";
 import { tabsBuild, tabStyles } from "../views/tabs";
+import { RGBAHex } from "../../utils/colour";
 
 export default class ConfigDialogue extends Dialogue {
 
@@ -118,20 +119,28 @@ export default class ConfigDialogue extends Dialogue {
   configContent(cfgObj) {
     if (!isObject(cfgObj)) return `<p>Config content missing!</p>`
 
+    let obj;
     let content = {}
     let modifierList = {}
 
     // iterate over tabs
     for (let i in cfgObj) {
+      content[i] = ""
       if (isArray(cfgObj[i])) {
-
         for (let j of cfgObj[i]) {
-          let obj = { output: j }
-          this.configEntries(j.name, obj, content, modifierList)
+          for (let k in j.style) {
+            obj = j.style[k]
+            if (!isObject(obj)) continue
+            this.configEntryFields(i, obj, content, modifierList)
+          }
         }
       }
       else if (isObject(cfgObj[i])) {
-        this.configEntries(i, cfgObj, content, modifierList)
+        content[i] = ""
+        for (let j in cfgObj[i]) {
+          obj = cfgObj[i][j]
+          this.configEntryFields(i, obj, content, modifierList)
+        }
       }
       else {
         this.core.error(`ERROR: Building Config Dialogue : Input malformed`)
@@ -149,6 +158,16 @@ export default class ConfigDialogue extends Dialogue {
    * @param {object} modifierList - object to fill with functions that will be attached to content
    * @memberof ConfigDialogue
    */
+
+  configEntryFields(i, input, content, modifierList) {
+    let id = (isString(input.entry)) ? input.entry : ""
+    let label = (isString(input.label)) ? input.label : id
+    content[i] += htmlInput(label, input)
+    modifierList[id] = input[ "$function" ]
+  }
+
+
+
   configEntries(i, input, content, modifierList) {
     content[i] = ""
 
@@ -209,6 +228,8 @@ export default class ConfigDialogue extends Dialogue {
   provideInputColor(el, selector) {
     const input = el.querySelector(selector)
     const colourInput = document.createElement("tradex-colourinput")
+    input.type = "text"
+    input.pattern = RGBAHex
     colourInput.setTarget(input)
     colourInput.style.display = "inline-block"
   }

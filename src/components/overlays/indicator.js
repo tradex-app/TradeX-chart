@@ -532,8 +532,8 @@ export default class Indicator extends Overlay {
         return false
       }
       // build the config dialogue
-      const configInputs = this.configInputs()
-      const {html, modifiers} = cd.configBuild(configInputs)
+      const configTabs = this.configInputs()
+      const {html, modifiers} = cd.configBuild(configTabs)
       const title = `${this.shortName} Config`
       cd.setTitle(title)
       cd.setContent(html, modifiers)
@@ -603,7 +603,7 @@ export default class Indicator extends Overlay {
       }
     }
   }
-
+/*
   buildConfigInputTab() {
     const define = this.definition.input
       let input = {}
@@ -625,7 +625,7 @@ export default class Indicator extends Overlay {
 
     return input
   }
-
+*/
   outputValueNumber(i, v, change) {
     let listeners = [change]
     return {
@@ -687,7 +687,7 @@ export default class Indicator extends Overlay {
     }
   }
 
-
+/*
   configInputNumber(input, i, v) {
     input[i] = this.configField(i, i, "number", v, v)
     input[i].$function = this.configDialogue.provideEventListeners(
@@ -700,7 +700,7 @@ export default class Indicator extends Overlay {
     }]
   )
   }
-
+*/
   configInputObject(input, i, v) {
     if (i instanceof InputPeriodEnable) {
 
@@ -768,17 +768,50 @@ export default class Indicator extends Overlay {
     dm.outputOrder = (!isArray(dm.outputOrder)) ? [] : dm.outputOrder
     dm.outputLegend = (!isObject(dm.outputLegend)) ? {} : dm.outputLegend
 
-    // style
+    // style ---------------
     if (!isObjectNotEmpty(dm.style))
         dm.style = this.style || {}
 
-    // input
+    // input ---------------
+
+    // validate all input fields
+    this.validateInputs(d, s, api)
+
+    // output ------------------
+
+    // validate all output arrays
+    this.validateOutputs(d, api, oo)
+
+    // meta validation ------------------
+    // Inputs Tab
+    // dm.input = this.buildConfigInputTab() || {}
+    this.buildOutputOrder(dm, oo)
+    this.buildOutputLegends(d)
+    this.buildConfigOutputTab(dm)
+
+  } // end of define indicator
+
+
+  validateInputs(d, s, api) {
     const input = {...d.input, ...s}
     delete input.style
     d.input = input
-    
-    // output
-    // if definition output is empty build it from api
+    for (let def of api.options) {
+      if (!(def.name in d.input))
+        d.input[def.name] = api.options[def.name]
+    }
+    this.validate(d.input, api.options, d)
+  }
+
+  /**
+   * if definition output is empty build it from api
+   * ensure all output are arrays
+   * @param {object} d 
+   * @param {object} api 
+   * @param {array} oo 
+   */
+  validateOutputs(d, api, oo) {
+    // set up all defaults to be arrays
     if (Object.keys(d.output).length == 0) {
       for (let o of api.outputs) {
         d.output[o.name] = []
@@ -790,26 +823,7 @@ export default class Indicator extends Overlay {
         d.output[o] = []
       oo.push(o)
     }
-
-    // define.meta validation ------------------
-
-    // Inputs Tab
-
-    dm.input = this.buildConfigInputTab() || {}
-
-    for (let def of api.options) {
-      if (def.name in input)
-        validate(input, api.options, d)
-      // else if (isObject(input?.definition?.input) && 
-      //           def.name in input.definition.input)
-      //   validate(input.definition.input, api.options, d)
-    }
-
-
-    this.buildOutputOrder(dm, oo)
-    this.buildOutputLegends(d)
-    this.buildConfigOutputTab(dm)
-  } // end of define indicator
+  }
 
   /**
    * meta output render order
@@ -929,14 +943,24 @@ export default class Indicator extends Overlay {
           this.configDialogue.provideInputColor(el, `#${id}`)
           this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
         }
+        type = "text"
         break;
     }
 
     return this.configField(id, label, type, value, value, min, max, fn)
   }
 
-  configField(i, label, type, value, defaultValue, min, max, fn) {
-    return {
+  configField(i, label, type, value, defaultValue, min, max, fn, title) {
+    defaultValue = defaultValue || value
+    title = title || label
+    if (isNumber(min) && isNumber(max) && min > max) {
+      [max, min] = [min, max]
+    }
+    else if (isNumber(min) && isNumber(max)) {
+      value = limit(value, min, max)
+    }
+
+    let f = {
       entry: i,
       label,
       type,
@@ -944,10 +968,13 @@ export default class Indicator extends Overlay {
       default: defaultValue,
       "data-oldval": value, 
       "data-default": defaultValue, 
-      min,
-      max,
-      $function: fn
+      $function: fn,
+      title
     }
+
+    if (isNumber(min)) f.min = min
+    if (isNumber(max)) f.max = max
+    return f
   }
 
   defaultColour() {
@@ -1379,41 +1406,39 @@ export default class Indicator extends Overlay {
     this.setRefresh()
     super.updated()
   }
+
+  validate(src, def, d) {
+    let dm = d.meta
+    for (let f of def) {
+      // if input value is type is incorrect, use the default
+      if (typeof src[f.name] !== f.type)
+        src[f.name] = f.defaultValue
+  
+      if ("range" in def)
+        src[f.name] = limit(src[f.name], f.range.min, f.range.max)
+  
+      const n = this.configField(
+        f?.name,
+        f?.displayName,
+        f?.type,
+        src[f.name],
+        f?.defaultValue,
+        f?.range?.min,
+        f?.range?.max,
+        undefined,
+        f?.hint,
+      )
+  
+      dm.input[f.name] = {...n, ...dm.input[f.name]}
+  
+      // if (f.name in d.input)
+      //   dm.input[f.name].value = d.input[f.name]
+    }
+  }
 }
 // end of class Indicator
 
 
-
-function validate(src, def, d) {
-  let dm = d.meta
-  for (let f of def) {
-    // if input value is type is incorrect, use the default
-    if (typeof src[f.name] !== f.type)
-      src[f.name] = f.defaultValue
-
-    if ("range" in def)
-      src[f.name] = limit(src[f.name], f.range.min, f.range.max)
-
-    const n = {
-      entry: f?.name,
-      label: f?.displayName,
-      type: f?.type,
-      value: src[f.name],
-      default: f?.defaultValue,
-      "data-oldval": src[f.name],
-      "data-default": f?.defaultValue,
-      max: f?.range?.max,
-      min: f?.range?.min,
-      title: f?.hint,
-      display: true
-    }
-
-    dm.input[f.name] = {...n, ...dm.input[f.name]}
-
-    if (f.name in d.input)
-      dm.input[f.name].value = d.input[f.name]
-  }
-}
 
 function plotFunction(t) {
   switch(t) {

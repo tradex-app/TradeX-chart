@@ -74,56 +74,5 @@ import { SMA as talibAPI } from "../definitions/talib-api";
     return {inputs, colours}
   }
 
-  // invokeSettings(c) {
-  //   return super.invokeSettings(c)
-  // }
-
-  // buildConfigOutputTab(style) {
-  //   return super.buildConfigOutputTab(style)
-  // }
-
-  /*
-  draw(range=this.range) {
-    // no update required
-    if (this.overlay.data.length < 2) return
-
-    if (!super.mustUpdate()) return
-
-    this.scene.clear()
-
-    const data = this.overlay.data
-    const width = this.xAxis.candleW
-    const plots = []
-    const offset = this.xAxis.smoothScrollOffset || 0
-    const plot = {
-      w: width,
-    }
-
-    // account for "missing" entries because of indicator calculation
-    let o = this.Timeline.rangeScrollOffset
-    let d = range.data.length - this.overlay.data.length
-    let c = range.indexStart - d - 2
-    let i = range.Length + (o * 2) + 2
-
-    while(i) {
-      if (c < 0 || c >= this.overlay.data.length) {
-        plots.push({x: null, y: null})
-      }
-      else {
-        plot.x = this.xAxis.xPos(data[c][0])
-        plot.y = this.yAxis.yPos(data[c][1])
-        plots.push({...plot})
-      }
-      c++
-      i--
-    }
-
-    this.plot(plots, "renderLine", this.style)
-
-    this.target.viewport.render();
-
-    super.updated()
-  }
-  */
 }
 
