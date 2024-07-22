@@ -4,7 +4,7 @@
 import Dialogue from "./dialogue";
 import { isBoolean, isString, isObject, isFunction, isArray } from "../../utils/typeChecks";
 import { uid } from "../../utils/utilities";
-import { htmlInput, inputTypes } from "../../utils/DOM";
+import { htmlInput, htmlSelect, inputTypes } from "../../utils/DOM";
 import { tabsBuild, tabStyles } from "../views/tabs";
 import { RGBAHex } from "../../utils/colour";
 
@@ -162,45 +162,12 @@ export default class ConfigDialogue extends Dialogue {
   configEntryFields(i, input, content, modifierList) {
     let id = (isString(input.entry)) ? input.entry : ""
     let label = (isString(input.label)) ? input.label : id
-    content[i] += htmlInput(label, input)
-    modifierList[id] = input[ "$function" ]
-  }
 
-
-
-  configEntries(i, input, content, modifierList) {
-    content[i] = ""
-
-    // iterate over content rows
-    for (let row in input[i]) {
-
-      let id;
-      let r = input[i][row]
-      // standard input types
-      // only process entries that match input types
-      if (inputTypes.includes(r?.type)) {
-        id = (isString(r?.entry)) ? r?.entry : ""
-        r.label = (isString(r?.label)) ? r?.label : id || ""
-        content[i] += htmlInput(r.label, r)
-      }
-      // other form element types
-      // if...
-      else continue
-
-      const modifiers = [ "$function" ]
-      
-      for (let modifier in r) {
-        if (modifiers.includes(modifier)) {
-
-          switch (modifier) {
-            case "$function":
-              if (isFunction(r[modifier]))
-                modifierList[row] = r[modifier]
-              break;
-          }
-        }
-      }
+    switch(input.type) {
+      case "select": content[i] += htmlSelect(label, input); break;
+      default: content[i] += htmlInput(label, input); break;
     }
+    modifierList[id] = input[ "$function" ]
   }
 
   /**

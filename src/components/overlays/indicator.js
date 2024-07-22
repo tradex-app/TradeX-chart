@@ -13,6 +13,7 @@ import { WinState } from "../widgets/window"
 import { onClickOutside } from "../../utils/DOM"
 import { talibAPI, outputPlot } from "../../definitions/talib-api"
 import { error } from "../../helpers/messages"
+import { dashedPatterns } from "../../definitions/style"
 
 // const plotTypes = {
 //   area,
@@ -925,15 +926,21 @@ export default class Indicator extends Overlay {
 
     style[o.name].width = this.defaultOutputField(`${o.name}Width`, `${o.name} Width`, v, "number", 0)
 
+    if ("dash" in style[o.name] && (!!style[o.name].dash)) {
+      v = style[o.name]?.dash.value
+      style[o.name].dash = this.defaultOutputField(`${o.name}dash`, `${o.name} Dash`, v, "dash", undefined, undefined, )
+    }
+
+
     // style[o.name].fillS = string
     // style[o.name].fillStyle = #RBBA
     // style[o.name].dash = string - 2, 10 
     return style[o.name]
   }
 
-  defaultOutputField(id, label, value, type, min, max) {
+  defaultOutputField(id, label, value, type, min, max, defaultValue) {
 
-    let c, fn, listeners;
+    let c, fn, listeners, options;
     let change = this.fieldEventChange()
     let colour = this.fieldEventClick()
 
@@ -944,6 +951,7 @@ export default class Indicator extends Overlay {
           this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
         }
         break;
+
       case "color":
         c = new Colour(value);
         value = (c.isValid)? c.hexa : this.defaultColour()
@@ -954,12 +962,26 @@ export default class Indicator extends Overlay {
         }
         type = "text"
         break;
+
+      case "dash":
+        listeners = [change]
+        fn = (el) => {
+          this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
+        }
+        type = "select"
+        let patterns = {}
+        for (let d in dashedPatterns) {
+          patterns[d] = dashedPatterns[d].toString()
+        }
+        options = patterns
+        break;
     }
 
-    return this.configField(id, label, type, value, value, min, max, fn)
+
+    return this.configField(id, label, type, value, value, min, max, fn, label, options)
   }
 
-  configField(i, label, type, value, defaultValue, min, max, fn, title) {
+  configField(i, label, type, value, defaultValue, min, max, fn, title, options) {
     defaultValue = defaultValue || value
     title = title || label
     if (isNumber(min) && isNumber(max) && min > max) {
@@ -983,6 +1005,7 @@ export default class Indicator extends Overlay {
 
     if (isNumber(min)) f.min = min
     if (isNumber(max)) f.max = max
+    if (isObject(options) && Object.keys(options).length) f.options = options
     return f
   }
 

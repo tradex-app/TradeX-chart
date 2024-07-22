@@ -434,7 +434,7 @@ export function findTargetParentWithClass(el, selector) {
 
 export function htmlInput(i, o) {
   let id = (isString(o?.entry)) ? o?.entry : ""
-  let label = (isString(o?.label)) ? `<label for="${id}">${o.label}</label>` : ``
+  let label = (isString(i)) ? `<label for="${id}">${i}</label>` : ``
   let input = `${label}<input id="${id}" class="subject" `
 
   for (let p in o) {
@@ -449,10 +449,20 @@ export function htmlInput(i, o) {
     else {
 
     }
-
   }
-
   return input += `>\n`
+}
+
+export function htmlSelect(i, o) {
+  let id = (isString(o?.entry)) ? o?.entry : ""
+  let label = (isString(i)) ? `<label for="${id}">${i}</label>` : ``
+  let options = ""
+
+  for (let opt in o?.options) {
+    options += `<option value="${o.options[opt]}">${opt}</option>`
+  }
+  let input = `${label}<select id="${id}" class="subject">${options}</select>\n`
+  return input
 }
 
 export default {

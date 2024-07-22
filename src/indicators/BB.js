@@ -94,4 +94,8 @@ export default class BB extends Indicator {
     return {inputs, colours, labels}
   }
 
+  draw() {
+    super.draw()
+  }
+
 }

@@ -106,9 +106,9 @@ export default class RSI extends Indicator {
     return {inputs, colours}
   }
 
-  defineIndicator(s, api) {
-    super.defineIndicator(s, api)
-  }
+  // defineIndicator(s, api) {
+  //   super.defineIndicator(s, api)
+  // }
 
   /**
    * Draw the current indicator range on its canvas layer and render it.
