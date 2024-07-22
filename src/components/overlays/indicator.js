@@ -899,6 +899,7 @@ export default class Indicator extends Overlay {
    * @returns 
    */
   defaultMetaStyleLine(o, x, style) {
+    let v;
     o.name = (!o?.name) ? "output" : o.name
 
     if (!isObject(style?.[o.name]))
@@ -908,13 +909,21 @@ export default class Indicator extends Overlay {
     let c = new Colour(style[o.name]?.colour.value)
     if (!c.isValid) {
       let k = this.colours.length
-      let v = (x <= k) ? this.colours[x] : this.colours[k%x]
-      style[o.name].colour.value = this.defaultOutputField(`${o.name}Colour`, `${o.name} Colour`, v, "color")
+          v = (x <= k) ? this.colours[x] : this.colours[k%x]
     }
+    else {
+      v = c.value.hexa
+    }
+    style[o.name].colour = this.defaultOutputField(`${o.name}Colour`, `${o.name} Colour`, v, "color")
+
 
     // is width valid?
     if (!isNumber(style[o.name]?.width.value))
-      style[o.name].width.value = this.defaultOutputField(`${o.name}Width`, `${o.name} Width`, "1", "number", 0)
+      v = 1
+    else
+      v = style[o.name]?.width.value
+
+    style[o.name].width = this.defaultOutputField(`${o.name}Width`, `${o.name} Width`, v, "number", 0)
 
     // style[o.name].fillS = string
     // style[o.name].fillStyle = #RBBA
