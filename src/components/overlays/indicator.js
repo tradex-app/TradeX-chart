@@ -905,16 +905,16 @@ export default class Indicator extends Overlay {
       style[o.name] = {}
     
     // is colour valid?
-    let c = new Colour(style[o.name]?.colour)
+    let c = new Colour(style[o.name]?.colour.value)
     if (!c.isValid) {
       let k = this.colours.length
       let v = (x <= k) ? this.colours[x] : this.colours[k%x]
-      style[o.name].colour = this.defaultOutputField(`${o.name}Colour`, `${o.name} Colour`, v, "color")
+      style[o.name].colour.value = this.defaultOutputField(`${o.name}Colour`, `${o.name} Colour`, v, "color")
     }
 
     // is width valid?
-    if (!isNumber(style[o.name]?.width))
-      style[o.name].width = this.defaultOutputField(`${o.name}Width`, `${o.name} Width`, "1", "number", 0)
+    if (!isNumber(style[o.name]?.width.value))
+      style[o.name].width.value = this.defaultOutputField(`${o.name}Width`, `${o.name} Width`, "1", "number", 0)
 
     // style[o.name].fillS = string
     // style[o.name].fillStyle = #RBBA

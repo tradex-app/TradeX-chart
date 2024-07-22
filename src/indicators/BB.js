@@ -35,32 +35,24 @@ export default class BB extends Indicator {
   static inCnt = 0
   static primaryPane = true
   static defaultStyle = {
-    lowerStroke: "#08c",
-    lowerLineWidth: 1,
-    lowerLineDash: undefined,
-    middleStroke: "#0080c088",
-    middleLineWidth: 1,
-    middleLineDash: undefined,
-    upperStroke: "#08c",
-    upperLineWidth: 1,
-    upperLineDash: undefined,
-    fillStyle: "#0080c044",
-
     lowerBand: {
-      stroke: "#08c",
-      width: 1,
-      dash: undefined,
+      colour: {value: "#08c"},
+      width: {value: 1},
+      dash: {value: ""},
     },
     middleBand: {
-      stroke: "#0080c088",
-      width: 1,
-      dash: undefined,
+      colour: {value: "#0080c088"},
+      width: {value: 1},
+      dash: {value: ""},
     },
     upperBand: {
-      stroke: "#08c",
-      width: 1,
-      dash: undefined,
+      colour: {value: "#08c"},
+      width: {value: 1},
+      dash: {value: ""}, 
     },
+    fill: {
+      colour: {value: "#0080c044"},
+    }
   }
 
   /**

@@ -51,15 +51,15 @@ import { YAXIS_TYPES } from "../definitions/chart";
     "#66BB6A"
   ]
   static defaultStyle = {
-    stroke: "#C80",
-    width: '1',
     MACD: {
-      stroke: "#C80",
-      width: '1',
+      colour: {value: "#08c"},
+      width: {value: 1},
+      dash: {value: ""}, 
     },
     MACDSignal: {
-      stroke: "#C80",
-      width: '1',
+      colour: {value: "#08c"},
+      width: {value: 1},
+      dash: {value: ""}, 
     },
     MACDHist: {
       upStroke: "#0f0",

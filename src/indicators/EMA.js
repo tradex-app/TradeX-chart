@@ -59,8 +59,10 @@ import { EMA as talibAPI } from "../definitions/talib-api";
     "#66BB6A"
   ]
   static defaultStyle = {
-    stroke: "#C80",
-    width: '1'
+    output: {
+      colour: {value: "#C80"},
+      width: {value: 1},
+    },
   }
 
 

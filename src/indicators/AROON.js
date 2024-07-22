@@ -42,14 +42,14 @@ export default class AROON extends Indicator {
     fillStyle: "#0080c044",
 
     aroonDown: {
-      stroke: "#c80",
-      width: 1,
-      dash: undefined,
+      colour: {value: "#c89"},
+      width: {value: 1},
+      dash: {value: ""}, 
     },
     aroonUp: {
-      stroke: "#08c",
-      width: 1,
-      dash: undefined,
+      colour: {value: "#08c"},
+      width: {value: 1},
+      dash: {value: ""}, 
     },
   }
 

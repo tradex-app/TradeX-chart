@@ -38,8 +38,10 @@ import { MA as talibAPI } from "../definitions/talib-api";
     "#66BB6A"
   ]
   static defaultStyle = {
-    stroke: "#C80",
-    width: '1'
+    output: {
+      colour: {value: "#9C27B0"},
+      width: {value: 1},
+    },
   }
 
   /**

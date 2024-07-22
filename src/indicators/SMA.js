@@ -37,11 +37,9 @@ import { SMA as talibAPI } from "../definitions/talib-api";
     "#66BB6A"
   ]
   static defaultStyle = {
-    // stroke: "#C80",
-    // width: '1',
     output: {
-      outputColour: "#C80",
-      outputWidth: 1,
+      colour: {value: "#0097A7"},
+      width: {value: 1},
     },
   }
 
