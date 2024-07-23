@@ -71,27 +71,4 @@ export default class BB extends Indicator {
     this.init(talibAPI)
   }
 
-  /**
-   * return inputs required to display indicator legend on chart pane
-   * @param {Array} [pos=this.chart.cursorPos] - optional
-   * @returns {Object} - {inputs, colours, labels}
-   * @memberof BB
-   */
-  legendInputs(pos=this.chart.cursorPos) {
-    if (this.overlay.data.length == 0) return false
-
-    const inputs = {}
-      let labels = [false, false, false]
-      let {c, colours} = super.legendInputs(pos)
-    inputs.Hi = this.scale.nicePrice(this.overlay.data[c][1])
-    inputs.Mid = this.scale.nicePrice(this.overlay.data[c][2])
-    inputs.Lo = this.scale.nicePrice(this.overlay.data[c][3])
-    colours = [
-      this.style.upperStroke,
-      this.style.middleStroke,
-      this.style.lowerStroke
-    ]
-    return {inputs, colours, labels}
-  }
-
 }

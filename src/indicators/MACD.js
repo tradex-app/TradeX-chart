@@ -89,19 +89,6 @@ import { YAXIS_TYPES } from "../definitions/chart";
 
     this.init(talibAPI)
   }
-  
-  legendInputs(pos=this.chart.cursorPos) {
-
-    // return false
-
-    if (this.overlay.data.length == 0) return false
-
-    const inputs = {}
-    const {c, colours} = super.legendInputs(pos)
-    inputs.MA_1 = this.scale.nicePrice(this.overlay.data[c][1])
-
-    return {inputs, colours}
-  }
 
 }
 

@@ -6,7 +6,6 @@ import { bRound, limit } from "../utils/number";
 import { uid } from "../utils/utilities";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { defaultTheme } from "../definitions/style";
-import { isBoolean } from "../utils/typeChecks";
 
 /**
  * Volume

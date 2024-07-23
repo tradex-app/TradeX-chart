@@ -61,16 +61,6 @@ import { SMA as talibAPI } from "../definitions/talib-api";
 
     this.init(talibAPI)
   }
-  
-  legendInputs(pos=this.chart.cursorPos) {
-    if (this.overlay.data.length == 0) return false
-
-    const inputs = {}
-    const {c, colours} = super.legendInputs(pos)
-    inputs.SMA_1 = this.scale.nicePrice(this.overlay.data[c][1])
-
-    return {inputs, colours}
-  }
 
 }
 

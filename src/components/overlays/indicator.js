@@ -1032,7 +1032,10 @@ export default class Indicator extends Overlay {
    * @memberof indicator
    */
   legendInputs(pos=this.chart.cursorPos) {
-    const colours = [this.style.stroke]
+    if (this.overlay.data.length == 0) return false
+
+    const labels = []
+    const colours = []
     const inputs = {}
     const index = this.Timeline.xPos2Index(pos[0])
     const len = this.overlay.data.length
@@ -1043,13 +1046,17 @@ export default class Indicator extends Overlay {
     let l = limit(len - 1, 0, Infinity)
         c = limit(c, 0, l)
 
-        for (let o of order) {
+    let i = 0
+    for (let o of this.definition.meta.output) {
+      if (o.type == "overlay") continue
 
-        }
+      labels[i] = false
+      inputs[o.name] = this.scale.nicePrice(this.overlay.data[c][i+1])
+      colours[i] = this.definition.meta.output[i].style.colour.value
+      i++
+    }
 
-        inputs.val = this.scale.nicePrice(this.overlay.data[c][1])
-
-    return {c, colours}
+    return {inputs, colours, labels}
   }
 
   indicatorInput(start, end) {

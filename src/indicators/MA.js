@@ -62,16 +62,6 @@ import { MA as talibAPI } from "../definitions/talib-api";
 
     this.init(talibAPI)
   }
-  
-  legendInputs(pos=this.chart.cursorPos) {
-    if (this.overlay.data.length == 0) return false
-
-    const inputs = {}
-    const {c, colours} = super.legendInputs(pos)
-    inputs.MA_1 = this.scale.nicePrice(this.overlay.data[c][1])
-
-    return {inputs, colours}
-  }
 
 }
 
