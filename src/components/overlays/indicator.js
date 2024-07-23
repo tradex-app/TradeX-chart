@@ -24,11 +24,11 @@ import { dashedPatterns } from "../../definitions/style"
 
 const DEFAULT_PERIOD = 5
 const OUTPUTEXTRAS = [
-  "highlow"
+  "highLowRange"
 ]
 const HIGHLOWOUTPUT = {
   name: "highLow",
-  type: null,
+  type: "overlay",
   plot: "highLow",
   hit: false
 }
@@ -754,7 +754,7 @@ export default class Indicator extends Overlay {
     if (!isObject(this.definition)) 
       this.definition = definition
 
-    this.definition = mergeDeep(this.definition, definition)
+    this.definition = mergeDeep(definition, this.definition)
 
     // indicator definition sanity check 
     let d = this.definition;
@@ -765,7 +765,7 @@ export default class Indicator extends Overlay {
     d.output = (!isObject(d.output)) ? {} : d.output
     dm = (!isObject(dm)) ? definition.meta : dm
     dm.input = (!isObject(dm.input)) ? {} : dm.input
-    dm.output = (!isArray(dm.output) || !dm.output.length) ? out : dm.output;
+    dm.output = (!isArray(dm.output) || !dm.output.length) ? out : [...out, ...dm.output];
     dm.outputOrder = (!isArray(dm.outputOrder)) ? [] : dm.outputOrder
     dm.outputLegend = (!isObject(dm.outputLegend)) ? {} : dm.outputLegend
 
@@ -1480,7 +1480,7 @@ function plotFunction(t) {
     case "limit_upper":
       return "renderLine"
     case "histogram": return "histogram"
-    case "highLow": return "highLow"
+    case "highLowRange": return "highLowRange"
     default: return false
   }
 }

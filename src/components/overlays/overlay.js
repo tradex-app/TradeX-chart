@@ -225,7 +225,7 @@ export default class Overlay {
         case "renderText": canvas[type]( ctx, p[0], p[1], params ); break;
         case "renderTextBG": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
         case "histogram": this.histogram( p, params ); break;
-        case "highLow": renderHighLowRange( ctx, p[0], p[1], p[2], p[3], params ); break;
+        case "highLowRange": renderHighLowRange( ctx, p[0], p[1], p[2], p[3], params ); break;
         default: break;
       }
   

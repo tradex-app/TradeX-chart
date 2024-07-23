@@ -43,7 +43,7 @@ export default class BB extends Indicator {
     middleBand: {
       colour: {value: "#0080c088"},
       width: {value: 1},
-      dash: {value: ""},
+      dash: {value: [20, 5]},
     },
     upperBand: {
       colour: {value: "#08c"},
@@ -92,10 +92,6 @@ export default class BB extends Indicator {
       this.style.lowerStroke
     ]
     return {inputs, colours, labels}
-  }
-
-  draw() {
-    super.draw()
   }
 
 }

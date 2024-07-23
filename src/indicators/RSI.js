@@ -29,30 +29,12 @@ export default class RSI extends Indicator {
       output: [],
     },
     meta: {
-      input : {
-        timePeriod: {
-          entry: 'timePeriod',
-          label: 'Period',
-          type: 'number',
-          value: 5,
-          // "data-oldval": 5,
-          default: 5,
-          min: '3',
-          title: `Number of time units to use in calculation`,
-          $function:
-            this.configDialogue.provideEventListeners("#Period", 
-            [{
-              event: "change", 
-              fn: (e)=>{
-              console.log(`#Period = ${e.target.value}`)
-              }
-            }]
-          )
-        }
-      },
       outputOrder: [
         "output",
-        "highLow"
+        "highLowRange"
+      ],
+      output: [
+        {name: "highLowRange", type: "overlay", plot: "highLowRange", style: RSI.defaultStyle.highLow}
       ],
       style: RSI.defaultStyle
     }
@@ -68,14 +50,14 @@ export default class RSI extends Indicator {
       colour: {value: "#E91E63"},
       width: {value: 1},
     },
-    // highLow: {
-    //   stroke: "#848",
-    //   width: 1,
-    //   style: "dashed",
-    //   fill: "#22002220",
-    //   high: 75,
-    //   low: 25
-    // }
+    highLowRange: {
+      colour: {value: "#880E4F"},
+      width: {value: 1},
+      dash: {value: [2,2]},
+      fill: {value: "#880E4F08"},
+      high: {value: 75},
+      low: {value: 25}
+    }
   }
 
 
@@ -106,9 +88,13 @@ export default class RSI extends Indicator {
     return {inputs, colours}
   }
 
-  // defineIndicator(s, api) {
-  //   super.defineIndicator(s, api)
-  // }
+  defineIndicator(s, api) {
+    super.defineIndicator(s, api)
+  }
+
+  draw() {
+    super.draw()
+  }
 
   /**
    * Draw the current indicator range on its canvas layer and render it.
