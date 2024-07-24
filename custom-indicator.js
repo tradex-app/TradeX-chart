@@ -3,6 +3,7 @@
 
 // import { Indicator } from "tradex-chart"
 import { Indicator, Range, uid } from "./src"
+import { isArray, isObject } from "./src/utils/typeChecks"
 
 /**
  * custom indicator class
@@ -15,14 +16,27 @@ export default class Test extends Indicator {
   // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
   static colours = []
   static defaultStyle = {
-    stroke: "#0088cc",
-    lineWidth: 1,
-    dash: undefined,
+    output: {
+      colour: "#0088cc",
+      width: 1,
+      dash: [],
+    }
   }
 
-  name = "Test Custom Inicator"
+  get name() {return "Test Custom Inicator" }
   shortName = "Test"
   timePeriod = 20
+
+  definition = {
+    output: {
+      output: []
+    },
+    meta: {
+      output: [
+        {name: "output", type: "custom", plot: "line"}
+      ]
+    }
+  }
 
   /**
    * Creates an instance of Test.
@@ -45,27 +59,112 @@ export default class Test extends Indicator {
    * @param {Object} range - instance of Range
    * @returns {boolean|array}
    */
-  calcIndicator(range=this.range) {
+/*
+  calcIndicator (indicator, params={}, range, output=this.definition.output) {
+
+    // if (this.noCalc(indicator, range)) return false
+
+    // get the period 
+    let d = this.getTimePeriod()
+    // params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
     let start, end;
+    let p = d
+    let t = p + (params?.padding || 0)
+    let od = this.overlay.data
+
+    // is it a Range instance?
+    if (range instanceof Range) {
+      start = 0
+      end = range.dataLength - t + 1
+    }
+    else if ( isObject(range) ) {
+      start = range?.indexStart || this.Timeline.t2Index(range?.tsStart || 0) || 0
+      end = range?.indexEnd || this.Timeline.t2Index(range?.tsEnd) || range.dataLength - t + 1
+      end - t
+    }
+    else return false
+
+    // check if a full or only partial calculation is required
+    if (!isArray(od)) return false
+    // full calculation required
+    // full calculation required
+    else if (od.length == 0) { }
+    // partial calculation required
+    else if (od.length + t !== range.dataLength) {
+      // new data in the past?
+      if (od[0][0] > range.value(t)[0]) {
+        start = 0
+        end = range.getTimeIndex(od[0][0]) - t
+        end = limit(end, t, range.dataLength - 1)
+      }
+      // new data in the future ?
+      else if (od[ od.length - 1 ][0] < range.value( range.dataLength - 1 )[0]) {
+        start = od.length - 1 + t
+        start = limit(start, 0, range.dataLength)
+        end = range.dataLength - 1
+      }
+      // something is wrong
+      else return false
+    }
+    // up to date, no need to calculate
+    else return false
+
+    // if not enough data for calculation fail
+    if ( end < t ) return false
+    if ( end - start < t ) {
+      start -= (t + p) - (end - start)
+    }
+
+    let data = [];
+    let entry, input, value;
+
+    while (start < end) {
+      // fetch the data required to calculate the indicator
+      input = this.indicatorInput(start, start + t)
+      // params = {...params, ...input}
+      // // let hasNull = params.inReal.find(element => element === null)
+      // // if (hasNull) return false
+
+      // entry = this.TALib[indicator](params)
+      entry = [input.close[0]]
+      value = this.formatValue(entry)
+
+      // store entry with timestamp
+      data.push([range.value(start + p - 1)[0], ...value])
+      // data.push([range.value(start - 1)[0], ...v])
+
+      start++
+    }
+    return data
+  }
+
+*/
+
+  
+  calcIndicator (indicator, params={}, range, output) {
     // number of values to use in indicator calculation
-    let p = this.timePeriod
+    let p = this.getTimePeriod()
+    let start, end;
+    let t = p + (params?.padding || 0)
 
     // is it a Range instance?
     if(range instanceof Range) {
       // if not calculate entire history
       start = 0
-      end = range.dataLength - p + 1
+      end = range.dataLength - t + 1
     }
-    else if ( "indexStart" in range || "indexEnd" in range ||
-              "tsStart" in range ||  "tsEnd" in range ) {
-      start = range.indexStart || this.Timeline.t2Index(range.tsStart || 0) || 0
-      end = range.indexEnd || this.Timeline.t2Index(range.tsEnd) || this.range.Length - 1
-      end - p
+    else if ( isObject(range) ) {
+      start = range?.indexStart || this.Timeline.t2Index(range?.tsStart || 0) || 0
+      end = range?.indexEnd || this.Timeline.t2Index(range?.tsEnd) || range.dataLength - t + 1
+      end - t
     }
     else return false
 
     // if not enough data for calculation fail
-    if ( end - start < p ) return false
+    if ( end < t ) return false
+    if ( end - start < t ) {
+      start -= (t + p) - (end - start)
+    }
 
     let data = [];
     let i, v, entry;
@@ -82,18 +181,32 @@ export default class Test extends Indicator {
     return data
   }
 
-  calcIndicatorHistory() {
-    // if overlay history is missing, calculate it
-    if (this.overlay.data.length < this.timePeriod) {
-      const data = this.calcIndicator()
-      if (data) this.overlay.data = data
-    }
+  calcIndicatorStream (indicator, params, range=this.range) {
+    // if (this.noCalc(indicator, range) ||
+    //     !(range instanceof Range)
+    //     ) return false
+
+    if (!(range instanceof Range)) return false
+
+    // let entry = this.TALib[indicator](params)
+    // let entry = {output: [params.close[0]]}
+    let end = range.dataLength
+    let time = range.value(end)[0]
+    // let value = this.formatValue(entry)
+    let value = [params.close[0]]
+
+    return [time, ...value]
   }
   
   /**
    * draw the indicator
    * @param {Object} range - current displayed range of candles
    */
+  draw() {
+    super.draw()
+  }
+
+  /*
   draw(range=this.range) {
     // minimum of two candles are required for this indicator
     if (this.overlay.data.length < 2 ) return false
@@ -141,4 +254,5 @@ export default class Test extends Indicator {
 
     super.updated()
   }
+  */
 }

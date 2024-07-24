@@ -1052,7 +1052,15 @@ export default class Indicator extends Overlay {
 
       labels[i] = false
       inputs[o.name] = this.scale.nicePrice(this.overlay.data[c][i+1])
-      colours[i] = this.definition.meta.style?.[o.name]?.colour?.value || "#ccc"
+
+      if (o.plot == "histogram") {
+        if (this.overlay.data[c][i+1] < 0)
+          colours[i] = this.definition.meta.style?.[o.name].dnStroke
+        else
+          colours[i] = this.definition.meta.style?.[o.name].upStroke
+      }
+      else 
+        colours[i] = this.definition.meta.style?.[o.name]?.colour?.value || "#ccc"
       i++
     }
 
@@ -1235,9 +1243,7 @@ export default class Indicator extends Overlay {
       // this.range.allData[`${pane}Pane`].push()
 
       const data = this.calcIndicator(this.libName, this.definition.input, this.range);
-      if (this.libName == "MACD") {
-        console.log(typeof data)
-      }
+
       if (data) {
         const d = new Set(data)
         const o = new Set(od)
@@ -1416,7 +1422,10 @@ export default class Indicator extends Overlay {
 
     // plot order
     // drawn in reverse order, bottom to top
-    let q = (meta?.outputOrder || Object.keys(plots)).reverse()
+    let oo = (meta?.outputOrder.length > 0) ? 
+      meta.outputOrder : 
+      Object.keys(plots)
+    let q = oo.reverse()
     for (let p of q) {
       let style = this.formatStyle(this.definition.meta.style[p], p)
       this.plotIt(i, c, plots[p].x, plots[p].r, style)

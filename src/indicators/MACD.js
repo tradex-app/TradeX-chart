@@ -65,7 +65,7 @@ import { YAXIS_TYPES } from "../definitions/chart";
       upStroke: "#0f0",
       upFill: "#0c0",
       upWidth: '1',
-      dnStroke: "#fß0",
+      dnStroke: "#f00",
       dnFill: "#c00",
       dnWidth: '1',
     },
