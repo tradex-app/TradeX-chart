@@ -81,19 +81,16 @@ export default class Volume extends Indicator {
 
     this.#volumeBar = new VolumeBar(target.scene, this.mStyle)
 
-    this.init()
+    // indicator legend
+    this.addLegend()
+    // config dialogue
+    this.configDialogue.start()
   }
 
   get primaryPane() { return this.#primaryPane }
   get defaultStyle() { return this.#defaultStyle }
   get mStyle() { return this.definition.meta.style }
 
-  init() {
-    // indicator legend
-    this.addLegend()
-    // config dialogue
-    this.configDialogue.start()
-  }
 
   /**
  * return inputs required to display indicator legend on chart pane

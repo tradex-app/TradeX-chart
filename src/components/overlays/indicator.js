@@ -1052,7 +1052,7 @@ export default class Indicator extends Overlay {
 
       labels[i] = false
       inputs[o.name] = this.scale.nicePrice(this.overlay.data[c][i+1])
-      colours[i] = this.definition.meta.output[i].style.colour.value
+      colours[i] = this.definition.meta.style?.[o.name]?.colour?.value || "#ccc"
       i++
     }
 
