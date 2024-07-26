@@ -64,6 +64,14 @@ export const CanvasStyle = {
   fill: "#888888"
 }
 
+export const dashedPatterns = {
+  "─────────": [],
+  "┈┈┈┈┈┈┈┈┈": [1, 1],
+  "- - - - -": [10, 10],
+  "─ ─ ─ ─ ─": [20, 5],
+  "─ ▪ ─ ▪ ─": [15, 3, 3, 3],
+}
+
 export const ToolsStyle = {
   COLOUR_ICON: COLOUR_ICON,
   COLOUR_ICONHOVER: COLOUR_ICONHOVER,

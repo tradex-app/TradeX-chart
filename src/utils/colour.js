@@ -6,6 +6,7 @@ import { isArray, isBoolean, isInteger, isNumber, isObject, isString } from './t
 import { isBrowser, isNode } from './browser-or-node'
 import { colours2 } from '../components/views/colourPicker';
 
+export const RGBAHex = `#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})`
 export const isHex  = /^#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i; 
 export const isHSL  = /^hsla?((\d{1,3}?),\s*(\d{1,3}%),\s*(\d{1,3}%)(,\s*[01]?\.?\d*)?)$/; 
 export const isHSLA = /^hsla[(]\s*0*(?:[12]?\d{1,2}|3(?:[0-5]\d|60))\s*(?:\s*,\s*0*(?:\d\d?(?:\.\d+)?\s*%|\.\d+\s*%|100(?:\.0*)?\s*%)){2}\s*,\s*0*(?:\.\d+|1(?:\.0*)?)\s*[)]$/
@@ -362,14 +363,10 @@ export class Palette {
   #colours = colours2
   #entries = []
 
-  constructor (matrix=[10,5], colours=[]) {
-    if (
-        this.validateMatrix(matrix) &&
-        this.validateColours(colours)
-      ) {
-        this.#matrix = matrix
-        this.#colours = colours
-      }
+  constructor (matrix=[10,5], colours=colours2) {
+    
+    this.#matrix = (this.validateMatrix(matrix)) ? matrix : this.#matrix
+    this.#colours = (this.validateColours(colours)) ? colours : this.#colours
   }
 
   get matrix() { return this.#matrix }

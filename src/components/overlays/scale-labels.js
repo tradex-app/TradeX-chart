@@ -24,7 +24,7 @@ export default class ScaleLabels extends Overlay {
 
     const ctx = this.scene.context
     const yAxis = this.yAxis
-    const grads = this.yAxis.calcGradations() || []
+    const grads = yAxis.yAxisGrads || []
     const theme = this.theme.yAxis
     const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true
       let tickPos = []
@@ -42,7 +42,7 @@ export default class ScaleLabels extends Overlay {
     ctx.fillStyle = theme.colourTick
     ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
     for (let tick of grads) {
-      y = yAxis.$2Pixel(tick[0])
+      y = yAxis.yPos(tick[0])
       ctx.fillText(tick[0], yAxis.yAxisTicks + 5, y + (theme.fontSize * 0.3))
 
       if (tickMarker) {

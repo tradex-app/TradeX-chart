@@ -780,7 +780,7 @@ export default class MainPane extends Component {
    * @param {string} i - indicator type eg. EMA, DMI, RSI
    * @param {string} name - identifier
    * @param {Object} params - {settings, data}
-   * @returns 
+   * @returns {Chart|Indicator|false}
    */
   addIndicator(i, name=i, params={})  {
     let instance;
@@ -821,6 +821,8 @@ export default class MainPane extends Component {
         ...params
       }
         instance = this.#Chart.addIndicator(indicator);
+        if (!instance) return false
+
         this.core.state.addIndicator(instance, "primary")
     }
     // add secondary chart indicator
@@ -838,9 +840,12 @@ export default class MainPane extends Component {
       params.elements = { ...this.elements }
 
       instance = this.addChartPane(params)
+      if (!instance) return false
+
       instance.start()
       this.core.state.addIndicator(instance, "secondary")
     }
+
     const id = ("instance" in instance) ? instance.instance.id : instance.id
     this.refresh()
     this.emit("addIndicatorDone", instance)
@@ -1011,16 +1016,17 @@ export default class MainPane extends Component {
   }
 
   draw(range=this.range, update=false) {
-    this.time.xAxis.doCalcXAxisGrads(range)
+    range = (isObject(range)) ? range : this.range
     const graphs = [
       this.graph,
       this.#Time,
     ]
+    this.time.xAxis.doCalcXAxisGrads(range)
     this.#ChartPanes.forEach((chartPane, key) => {
       if (chartPane.status !== "destroyed")
         graphs.push(chartPane)
       else
-        this.log("error destroyed pane")
+        this.error(`ERROR: attempted to draw destroyed pane: ${chartPane.id}`)
     })
 
     this.renderLoop.queueFrame(

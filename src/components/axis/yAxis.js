@@ -6,9 +6,11 @@ import { isNumber } from "../../utils/typeChecks";
 import { 
   PRICEDIGITS, 
   YAXIS_STEP,
+  YAXIS_TYPE,
   YAXIS_TYPES
 } from "../../definitions/chart";
 import { YAxisFontSizeFactor } from "../../definitions/style";
+import { doStructuredClone } from "../../utils/utilities";
 
 const p100Padding = 1.2
 
@@ -28,6 +30,7 @@ export default class yAxis extends Axis {
       get diff() { return this.range?.valueDiff },
       get zoom() { return 1 },
       get offset() { return 0 },
+      get secondaryMaxMin() { return this.range?.secondaryMaxMin },
       range: null
     },
     manual: {
@@ -36,7 +39,8 @@ export default class yAxis extends Axis {
       mid: 0.5,
       diff: 1,
       zoom: 1,
-      offset: 0
+      offset: 0,
+      secondaryMaxMin: {}
     }
   }
   #yAxisPadding = 1.04
@@ -56,7 +60,10 @@ export default class yAxis extends Axis {
     this.yAxisType = yAxisType
 
     // use either chart.localRange or core.range
-    range = (range) ? range : this.core.range
+    if (yAxisType == "relative")
+      range = this.core.range
+    else 
+      range = (range) ? range : this.core.range
     this.setRange(range)
   }
 
@@ -88,6 +95,23 @@ export default class yAxis extends Axis {
     return this.height / this.#range.diff
   }
 
+  getMaxMinDiff() {
+    // default max min
+    let max = (this.#range.max > 0) ? this.#range.max : 1,
+        min = (this.#range.min > 0) ? this.#range.min : 0,
+        chart = this.parent.parent,
+        id = chart.view[0]?.id,
+        mm = this.range.secondaryMaxMin || {},
+        pane = this.#range;
+    if (!chart.isPrimary &&
+        id in mm) {
+          max = mm[id].data.max //* 1.2
+          min = mm[id].data.min //- (mm[id].data.min * 0.2)
+          pane = mm[id].data
+    }
+    return {max, min, diff: max - min, pane}
+  }
+
   yAxisRangeBounds() {
 
   }
@@ -117,22 +141,41 @@ export default class yAxis extends Axis {
    * @memberof yAxis
    */
   yPos(y) {
+    let val;
     switch(this.yAxisType) {
-      case "percent" : return bRound(this.p100toPixel(y))
-      case "log" : return bRound(this.$2Pixel(log10(y)))
-      default : return bRound(this.$2Pixel(y))
+      case "relative" : val = this.val2Pixel(y); break;
+      case "percent" : val = this.p100toPixel(y); break;
+      case "log" : val = this.$2Pixel(log10(y)); break;
+      default : val = this.$2Pixel(y); break;
     }
+    return bRound(val)
   }
 
   /**
-   * return chart price
-   * handles Y Axis modes: default, log, percentage
+   * convert indicator value to y pixel position relative top left (0,0)
    * @param {number} y
-   * @returns {number}
+   * @return {number}  
    * @memberof yAxis
    */
-  yPos2Price(y) {
-    return this.pixel2$(y)
+  val2Pixel(y) {
+    let p,
+        chart = this.parent.parent;
+    // secondary pane returns pixel value for indicator range
+    if (!chart.isPrimary) {
+      let h = this.height,
+          {min, diff} = this.getMaxMinDiff();
+          p = h - (h * ((y - min) / diff))
+
+          if (p < 0 || p > h) {
+            let P = p
+          }
+    }
+    // primary pane always returns pixel values for price range
+    else {
+      p = this.$2Pixel(y)
+    }
+    // console.log("val2Pixel()", p)
+    return p
   }
 
   /**
@@ -160,18 +203,6 @@ export default class yAxis extends Axis {
   }
 
   /**
-   * convert pixel position to price (YAxis value)
-   * @param {number} y - pixel position relative top left (0,0)
-   * @returns {number} - price (YAxis value)
-   * @memberof yAxis
-   */
-  pixel2$(y) {
-    let ratio = (this.height - y) / this.height
-    let adjust = this.#range.diff * ratio
-    return this.#range.min + adjust
-  }
-
-  /**
    * convert percentage scale to y pixel position relative top left (0,0)
    * @param {number} y - percentage
    * @returns {number} - y pixel position
@@ -182,6 +213,35 @@ export default class yAxis extends Axis {
       let ratio = this.height / (max - this.#range.min)
       let padding = Math.floor((max - this.#range.max) ) //* 0.5 )
       return ((y - max) * -1 * ratio) // - padding
+  }
+
+
+  /**
+   * return chart price
+   * handles Y Axis modes: default, log, percentage
+   * @param {number} y
+   * @returns {number}
+   * @memberof yAxis
+   */
+  yPos2Price(y) {
+    return this.pixel2$(y)
+  }
+
+  pixel2Val(y) {
+    return this.pixel2$(y)
+  }
+
+  /**
+   * convert pixel position to price (YAxis value)
+   * @param {number} y - pixel position relative top left (0,0)
+   * @returns {number} - price (YAxis value)
+   * @memberof yAxis
+   */
+  pixel2$(y) {
+    let {min, diff} = this.getMaxMinDiff()
+    let ratio = (this.height - y) / this.height
+    let adjust = diff * ratio
+    return min + adjust
   }
 
   yAxisTransform() {
@@ -197,61 +257,71 @@ export default class yAxis extends Axis {
   setMode(m) {
     if (!["automatic","manual"].includes(m)) return false
 
-    const t = this.#transform
+    let t = this.#transform.manual
     if (this.mode == "automatic" && m == "manual") {
-      t.manual.zoom = 0
-      t.manual.max = this.#range.valueMax
-      t.manual.min = this.#range.valueMin
+      t.max = this.#range.valueMax
+      t.min = this.#range.valueMin
+      t.diff = t.max - t.min
+      t.zoom = 0
+      t.secondaryMaxMin = doStructuredClone(this.#range.secondaryMaxMin)
       this.#mode = m
       this.core.emit("yaxis_setmode", {mode: m, axis: this})
     }
     else if (this.mode == "manual" && m == "automatic") {
-      t.manual.zoom = 0
+      t.zoom = 0
       this.#mode = m
       this.core.emit("yaxis_setmode", {mode: m, axis: this})
     }
     return true
   }
 
+  transformPrimarySecondary() {
+    let t = this.#transform.manual;
+    if (this.#yAxisType != "percent" &&
+        !this.parent.parent.isPrimary) {
+      let {pane} = this.getMaxMinDiff()
+      t = pane
+    }
+    return t
+  }
+
   // manual Y axis positioning
   setOffset(o) {
     if (!isNumber(o) || o == 0 || this.#mode !== "manual") return false
 
-    const t = this.#transform
-    let max = this.pixel2$(o * -1)
-    let min = this.pixel2$(this.height - o)
-    let delta = max - min;
-    t.manual.min = min
-    t.manual.max = max
-    t.manual.mid = (delta) / 2
-    t.manual.diff = delta
-    t.manual.zoom = 0
+    let t = this.transformPrimarySecondary()
+    let max = this.pixel2Val(o * -1)
+    let min = this.pixel2Val(this.height - o)
+    let diff = max - min;
+    t.min = min
+    t.max = max
+    t.mid = (diff) / 2
+    t.diff = diff
+    t.zoom = 0
+
+
   }
 
   setZoom(z) {
     if (!isNumber(z) || this.#mode !== "manual") return false
 
-    const t = this.#transform
-    // const r = (z == 0) ? 0 : z / this.height
-
-      let min = t.manual.min
-      let max = t.manual.max
-    const delta = max - min;
-    const delta10P = delta * 0.01;
-    const change = z * delta10P;
+    let t = this.#transform.manual;
+    let {max, min, diff, pane} = this. getMaxMinDiff()
+    const diff10P = diff * 0.01;
+    const change = z * diff10P;
           min -= change;
           max += change;
-    
-    // if (max < min || min <= delta)  return
+
+    // if (max < min || min <= diff)  return
     if (max < min || min <= Infinity * -1 || max >= Infinity)  return
 
-    t.manual.max =  max
-    t.manual.min = min // (min >= 0.001)? min : 0.001
-    t.manual.mid = (delta) / 2
-    t.manual.diff = delta
-    t.manual.zoom = change
-
-    this.calcGradations()
+    pane.min -= change;
+    pane.max += change;
+    t.max =  max
+    t.min = min 
+    t.mid = (diff) / 2
+    t.diff = diff
+    t.zoom = change
   }
 
   /**
@@ -269,10 +339,11 @@ export default class yAxis extends Axis {
         switch (prop) {
           case "max": return t[m][prop] // "valueMax"
           case "min":  return t[m][prop] // "valueMin"
-          case "mid": return t[m][prop] // "priceMid"
-          case "diff": return t[m][prop] // "valueDiff"
+          case "mid": return t[m].min + (t[m].max - t[m].min) // "priceMid"
+          case "diff": return t[m].max - t[m].min
           case "zoom": return t[m][prop]
           case "offset": return t[m][prop]
+          case "secondaryMaxMin": return t[m][prop]
           default: return obj[prop]
         }
       }
@@ -280,39 +351,42 @@ export default class yAxis extends Axis {
   }
 
   calcGradations() {
-    let max, min, off;
+    let mm, max, min, off;
+    // default max min
+    max = (this.#range.max > 0) ? this.#range.max : 1;
+    min = (this.#range.min > 0) ? this.#range.min : 0;
+
     switch (this.yAxisType) {
       case "percent":
         max = (this.#range.max > -10) ? this.#range.max : 110
         min = (this.#range.min > -10) ? this.#range.min : -10
-        off = this.#range.offset
-        this.#yAxisGrads = this.gradations(max + off, min + off)
+        break;
+      case "relative":
+        mm = this.getMaxMinDiff()
+        max = mm.max
+        min = mm.min
         break;
       default:
-        max = (this.#range.max > 0) ? this.#range.max : 1
-        min = (this.#range.min > 0) ? this.#range.min : 0
-        off = this.#range.offset
-        this.#yAxisGrads = this.gradations(max + off, min + off)
         break;
     }
+    // account for manual user positioning
+    off = this.#range.offset
+    this.#yAxisGrads = this.gradations(max + off, min + off)
     return this.#yAxisGrads
   }
 
   gradations(max, min, decimals=true) {
-      let digits,
-          rangeH,
-          yGridSize;
-    const scaleGrads = [];
-
-    let niceNumber = this.niceNumber()
-    // find next largest nice number above yStart
-    var yStartRoundNumber = Math.ceil( min/niceNumber ) * niceNumber;
-    // find next lowest nice number below yEnd
-    var yEndRoundNumber = Math.floor( max/niceNumber ) * niceNumber;
-
-    let pos = this.height,
-        step$ = (yEndRoundNumber - yStartRoundNumber) / niceNumber,
-        stepP = this.height / step$,
+    let digits,
+        scaleGrads = [],
+        rangeH = max - min,
+        niceNumber = this.niceNumber(rangeH),
+        // find next largest nice number above yStart
+        yStartRoundNumber = Math.ceil( min/niceNumber ) * niceNumber,
+        // find next lowest nice number below yEnd
+        yEndRoundNumber = Math.floor( max/niceNumber ) * niceNumber,
+        pos = this.height,
+        // step$ = (yEndRoundNumber - yStartRoundNumber) / niceNumber,
+        // stepP = this.height / step$,
         step = countDigits(niceNumber),
         nice;
     this.#step = step
@@ -320,7 +394,7 @@ export default class yAxis extends Axis {
     for ( var y = yStartRoundNumber ; y <= yEndRoundNumber ; y += niceNumber )
     {
       digits = countDigits(y)
-      nice = limitPrecision(y, step.decimals)
+      nice = limitPrecision(y, step.decimals) * 1
       pos = this.yPos(nice)
       scaleGrads.push([nice, pos, digits])
     }

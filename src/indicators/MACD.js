@@ -23,20 +23,27 @@ import { YAXIS_TYPES } from "../definitions/chart";
     output: {
       MACD: [],
       MACDSignal: [],
-      MACDHist: []
+      MACDHist: [],
     },
+    meta: {
+      outputOrder: [
+       "MACD", "MACDSignal", "MACDHist",
+      ],
+      outputLegend: {
+        MACD: {labelStr: "MACD", label: false, value: true},
+        MACDSignal: {labelStr: "Signal", label: false, value: true},
+        MACDHist: {labelStr: "Hist", label: false, value: true}
+      },
+    }
   }
 
   #precision = 2
   scaleOverlay = false
-  plots = [
-    { key: 'MACD_1', title: 'MACD: ', type: 'line' },
-  ]
 
   
   static inCnt = 0
   static primaryPane = false
-  static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
+  static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative
   static colours = [
     "#9C27B0",
     "#9C27B0",
@@ -44,8 +51,24 @@ import { YAXIS_TYPES } from "../definitions/chart";
     "#66BB6A"
   ]
   static defaultStyle = {
-    stroke: "#C80",
-    width: '1'
+    MACD: {
+      colour: {value: "#08c"},
+      width: {value: 1},
+      dash: {value: ""}, 
+    },
+    MACDSignal: {
+      colour: {value: "#08c"},
+      width: {value: 1},
+      dash: {value: ""}, 
+    },
+    MACDHist: {
+      upStroke: "#0f0",
+      upFill: "#0c0",
+      upWidth: '1',
+      dnStroke: "#f00",
+      dnFill: "#c00",
+      dnWidth: '1',
+    },
   }
 
   /**
@@ -65,19 +88,6 @@ import { YAXIS_TYPES } from "../definitions/chart";
     MACD.inCnt++
 
     this.init(talibAPI)
-  }
-  
-  legendInputs(pos=this.chart.cursorPos) {
-
-    return false
-
-    if (this.overlay.data.length == 0) return false
-
-    const inputs = {}
-    const {c, colours} = super.legendInputs(pos)
-    inputs.MA_1 = this.scale.nicePrice(this.overlay.data[c][1])
-
-    return {inputs, colours}
   }
 
 }

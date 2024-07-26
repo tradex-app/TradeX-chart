@@ -87,7 +87,7 @@ export function getPrototypeAt(level, obj) {
  * @returns {Object}  
  */
 export function copyDeep(obj, clone=true) {
-  // if ("structuredClone" in navigator && clone) return _structuredClone(obj)
+  // if ("structuredClone" in navigator && clone) return doStructuredClone(obj)
 
   if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
   return obj;
@@ -108,7 +108,7 @@ export function copyDeep(obj, clone=true) {
   return temp;
 }
 
-function _structuredClone(obj) {
+export function doStructuredClone(obj) {
   try {
     return structuredClone(obj)
   }
@@ -359,6 +359,30 @@ export const diff = (a, b) => a.filter((v) => !b.includes(v));
 export const symDiff = (a, b) => diff(a, b).concat(diff(b, a));
 export const union = (a, b) => diff(a, b).concat(b);
 
+
+/**
+ * test if is object and empty
+ * @export
+ * @param {object} obj
+ * @return {boolean}
+ */
+export function isObjectAndEmpty(obj) {
+  if (!isObject(obj)) return false
+  if (Object.keys.length) return false
+  return true
+}
+
+/**
+ * test if is object and not empty
+ * @export
+ * @param {object} obj
+ * @return {boolean}
+ */
+export function isObjectNotEmpty(obj) {
+  if (!isObject(obj)) return false
+  if (!Object.keys(obj).length) return false
+  else return true
+}
 
 /**
  * object comparison

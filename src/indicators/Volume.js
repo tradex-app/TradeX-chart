@@ -6,7 +6,6 @@ import { bRound, limit } from "../utils/number";
 import { uid } from "../utils/utilities";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { defaultTheme } from "../definitions/style";
-import { isBoolean } from "../utils/typeChecks";
 
 /**
  * Volume
@@ -20,9 +19,16 @@ export default class Volume extends Indicator {
   shortName = 'VOL'
   checkParamCount = false
   scaleOverlay = true
-  plots = [
-    { key: 'VOL_1', title: ' ', type: 'bar' },
-  ]
+  definition = {
+    meta: {
+      style: {
+        up: {colour: {value: "#388E3C"}},
+        dn: {colour: {value: "#D32F2F"}},
+        height: {percent: {value: 15}}
+      }
+    }
+  }
+
   #defaultStyle = defaultTheme.volume
   #volumeBar
   #primaryPane = "both"
@@ -31,6 +37,11 @@ export default class Volume extends Indicator {
   static primaryPane = "both"
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
 
+  static defaultStyle = {
+    up: {colour: {value: "#388E3C"}},
+    dn: {colour: {value: "#D32F2F"}},
+    height: {percent: {value: 15}}
+  }
 
   /**
    * Creates an instance of Volume.
@@ -54,6 +65,7 @@ export default class Volume extends Indicator {
     this.id = params.overlay?.id || uid(this.shortName)
     this.#defaultStyle = {...this.defaultStyle, ...this.theme.volume}
     this.style = (overlay?.settings?.style) ? {...this.#defaultStyle, ...overlay.settings.style} : {...this.#defaultStyle, ...config.style}
+
     if (this.chart.type === "primaryPane") {
       this.style.Height = limit(this.style.Height, 0, 100) || 100;
       this.#primaryPane = true
@@ -62,13 +74,23 @@ export default class Volume extends Indicator {
       this.style.Height = 100;
       this.#primaryPane = false
     }
-    this.#volumeBar = new VolumeBar(target.scene, this.style)
 
-    this.init()
+    this.mStyle.up.colour.value = this.style.UpColour
+    this.mStyle.dn.colour.value = this.style.DnColour
+    this.mStyle.height.percent.value = this.style.Height
+
+    this.#volumeBar = new VolumeBar(target.scene, this.mStyle)
+
+    // indicator legend
+    this.addLegend()
+    // config dialogue
+    this.configDialogue.start()
   }
 
   get primaryPane() { return this.#primaryPane }
   get defaultStyle() { return this.#defaultStyle }
+  get mStyle() { return this.definition.meta.style }
+
 
   /**
  * return inputs required to display indicator legend on chart pane
@@ -83,8 +105,8 @@ export default class Volume extends Indicator {
     const ohlcv = this.range.data[index]
     const theme = this.chart.theme.candle
     const colours = (ohlcv[4] >= ohlcv[1]) ?
-    [this.style.UpColour.slice(0,7)] :
-    [this.style.DnColour.slice(0,7)];
+    [this.mStyle.up.colour.value.slice(0,7)] :
+    [this.mStyle.dn.colour.value.slice(0,7)];
     const inputs = {"V": this.scale.nicePrice(ohlcv[5])}
     return {inputs, colours}
   }
@@ -116,7 +138,7 @@ export default class Volume extends Indicator {
       w: w,
       z: zeroPos
     }
-    const volH = Math.floor(zeroPos * this.style.Height / 100)
+    const volH = Math.floor(zeroPos * this.mStyle.height.percent.value / 100)
 
     let o = this.core.rangeScrollOffset
     let v = range.indexStart - o

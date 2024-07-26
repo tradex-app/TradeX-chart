@@ -1,4 +1,5 @@
 // scale-priceLine.js
+// display current (stream) price on Y-Axis / Scale
 
 import Overlay from "./overlay"
 import Stream from "../../helpers/stream";
@@ -23,7 +24,9 @@ export default class ScalePriceLine extends Overlay {
 
   draw(candle) {
 
-    if (candle === undefined) return
+    if (candle === undefined ||
+        !this.parent.parent.isPrimary) 
+        return
 
     const ctx = this.scene.context
     const streaming = this.core.stream instanceof Stream &&

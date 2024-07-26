@@ -1,6 +1,6 @@
 // path.js
 
-import { isArray, isFunction } from "../utils/typeChecks"
+import { isArray, isFunction, isString } from "../utils/typeChecks"
 import { fillStroke } from "./fill";
 
 
@@ -20,8 +20,12 @@ export function renderPath (ctx, coords, style, strokeFill=()=>{}) {
   }
   ctx.strokeStyle = style.stroke
 
-  if (isArray(style.dash)) 
-    ctx.setLineDash(style.dash)
+  let dash = style?.dash
+  if (isString(dash)) {
+    dash = dash.split(",")
+  }
+  if (isArray(dash)) 
+    ctx.setLineDash(dash)
   
   ctx.beginPath()
   let move = true

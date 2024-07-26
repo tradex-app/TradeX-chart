@@ -4,6 +4,7 @@
 
 import { uid } from "../utils/utilities";
 import { isFunction, isInteger, isObject, isString } from '../utils/typeChecks'
+import { error, typeError } from "./messages";
 // import { timestampDiff } from "../utils/time";
 
 
@@ -243,11 +244,11 @@ class TaskProcessor {
   }
 
   static typeError(fn, t, e) {
-    throw new TypeError(`TaskProcessor.${fn} received ${t}, expected type ${e}`)
+    typeError(`TaskProcessor.${fn}`,t, e)
   }
 
   static error(fn, e, o) {
-    throw new Error(`TaskProcessor.${fn} ${e}`, o)
+    error(`TaskProcessor.${fn}`, e, o)
   }
 
 }

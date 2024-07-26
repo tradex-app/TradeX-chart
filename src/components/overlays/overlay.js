@@ -5,6 +5,8 @@ import { isBoolean } from "../../utils/typeChecks"
 import xAxis from "../axis/xAxis"
 import yAxis from "../axis/yAxis"
 import canvas from "../../renderer/canvas"
+import Histogram from "../primitives/histogram"
+import { renderHighLowRange } from "../primitives/range"
 
 
 export default class Overlay {
@@ -31,7 +33,7 @@ export default class Overlay {
     refresh: false,
     resize: false
   }
-
+  #histogram
 
   id
 
@@ -141,6 +143,7 @@ export default class Overlay {
 
   getYAxis() {
     if (this.#yAxis instanceof yAxis) return this.#yAxis
+    else if (this.#yAxis.yAxis instanceof yAxis) return this.#yAxis.yAxis
     else if (this.chart.yAxis instanceof yAxis) return this.chart.yAxis
     else if ("scale" in this.#parent) return this.#parent.scale.yAxis
     else return false
@@ -148,8 +151,8 @@ export default class Overlay {
 
   contextIs() {
     if (!this.#xAxis && !this.#yAxis) return "chart"
-    else if (this.#xAxis instanceof xAxis) return "timeline"
-    else if (this.#yAxis instanceof yAxis) return "scale"
+    else if (this.getXAxis() instanceof xAxis) return "timeline"
+    else if (this.getYAxis() instanceof yAxis) return "scale"
     else return false
   }
 
@@ -218,10 +221,12 @@ export default class Overlay {
         case "renderTriangle": canvas[type]( ctx, p[0], p[1], p[2], params); break;
         case "renderDiamond": canvas[type]( ctx, p[0], p[1], p[2], p[3], params); break;
         case "renderCircle": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
-        case "renderImage": canvas[type]( ctx, params.src, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7] )
+        case "renderImage": canvas[type]( ctx, params.src, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7] ); break;
         case "renderText": canvas[type]( ctx, p[0], p[1], params ); break;
         case "renderTextBG": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
-        case "histogram": break;
+        case "histogram": this.histogram( p, params ); break;
+        case "highLowRange": renderHighLowRange( ctx, p[0], p[1], p[2], p[3], params ); break;
+        default: break;
       }
   
       ctx.restore();
@@ -232,5 +237,12 @@ export default class Overlay {
      */
     clear() {
       this.scene.clear()
+    }
+
+    histogram( p, params ) {
+      if (!(this.#histogram instanceof Histogram))
+        this.#histogram = new Histogram(this.scene, this.theme)
+
+      this.#histogram.draw(p, params)
     }
 }

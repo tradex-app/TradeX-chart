@@ -4,14 +4,16 @@
 import Overlay from "./overlay"
 import { Range } from "../../model/range"
 import { limit } from "../../utils/number"
-import Colour from "../../utils/colour"
+import Colour, { Palette } from "../../utils/colour"
 import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from "../../utils/typeChecks"
-import { idSanitize, uid } from "../../utils/utilities"
+import { copyDeep, diff, idSanitize, isObjectNotEmpty, mergeDeep, uid } from "../../utils/utilities"
 import { STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
 import { WinState } from "../widgets/window"
 import { onClickOutside } from "../../utils/DOM"
-import { talibAPI } from "../../definitions/talib-api"
+import { talibAPI, outputPlot } from "../../definitions/talib-api"
+import { error } from "../../helpers/messages"
+import { dashedPatterns } from "../../definitions/style"
 
 // const plotTypes = {
 //   area,
@@ -21,7 +23,18 @@ import { talibAPI } from "../../definitions/talib-api"
 // }
 
 const DEFAULT_PERIOD = 5
+const OUTPUTEXTRAS = [
+  "highLowRange"
+]
+const HIGHLOWOUTPUT = {
+  name: "highLow",
+  type: "overlay",
+  plot: "highLow",
+  hit: false
+}
+const IGNORE_DEFINITIONS = ["outputLegend", "outputOrder", "render","style"]
 
+const palette = new Palette()
 // Context enum
 class Context {
   static standard = new Context("standard")
@@ -87,34 +100,49 @@ export default class Indicator extends Overlay {
   #status
   #ConfigDialogue
   #ColourPicker
+  #palette
 
   definition = {
     input: {},
     output: {},
     meta: {
       input: {},
-      output: {}
+      output: [],
+      outputOrder: [],
+      outputLegend: {},
+      style: {}
     }
   }
 
+  colours = [
+    palette.colours[8],
+    palette.colours[18],
+    palette.colours[28],
+    palette.colours[38],
+    palette.colours[48],
+  ]
 
   constructor (target, xAxis=false, yAxis=false, config, parent, params) {
 
     super(target, xAxis, yAxis, undefined, parent, params)
 
-    const overlay = params.overlay
+    if (!isObject(this.definition)) 
+      error(`Indicator: ${this.shortName}`, `does not provide a valid definition`)
 
+    const overlay = params.overlay
     this.#cnt_ = Indicator.cnt
-    this.#params = params
     this.#overlay = overlay
+    this.id = overlay?.id || uid(this.shortName)
+    this.#params = params
     this.#TALib = this.core.TALib
     this.#range = this.xAxis.range
-    this.id = overlay?.id || uid(this.shortName)
     this.legendName = overlay?.legendName
     this.#legendVisibility = (isBoolean(overlay?.legendVisibility)) ? overlay.legendVisibility : true
+    this.#palette = palette
     this.style = (overlay?.settings?.style) ? 
     {...this.constructor.defaultStyle, ...overlay.settings.style} : 
     {...this.constructor.defaultStyle, ...config.style};
+    this.meta
     const cfg = { title: `${this.legendName} Config`, content: "", params: overlay, parent: this }
     this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
     switch(overlay.settings?.context) {
@@ -122,6 +150,21 @@ export default class Indicator extends Overlay {
       case "standard":
       default: this.#context = Context.standard;
     }
+
+    // return new Proxy(this, {
+    //   get (target, key) {
+    //     const value = Reflect.get(target, key)
+    //     if (typeof value === "function") {
+    //       try {
+    //         return value.bind(target)
+    //       }
+    //       catch (e) {
+    //         target.core.error(`Error: ${target.name} ${key}()`)
+    //       }
+    //     }
+    //     return target[key]
+    //   }
+    // })
   }
 
   get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
@@ -294,9 +337,9 @@ export default class Indicator extends Overlay {
   settings(s) {
     if (isObject(s)) {
       if (isObject(s?.config)) this.params.overlay.settings = 
-       {...this.params.overlay.settings, ...s.config}
+        mergeDeep(this.params.overlay.settings, s.config)
       if (isObject(s?.style)) this.style =
-        {...this.style, ...s.style}
+        mergeDeep(this.style, s.style)
       this.draw()
     }
     return {
@@ -462,7 +505,7 @@ export default class Indicator extends Overlay {
   /**
    * invoke indicator settings callback, user defined or default
    * @param {Object} c - {fn: function, own: boolean}, own flag will bypass default action
-   * @returns 
+   * @returns {boolean} - success or failuer
    */
   invokeSettings(c={}) {
     let r;
@@ -490,7 +533,8 @@ export default class Indicator extends Overlay {
         return false
       }
       // build the config dialogue
-      const {html, modifiers} = cd.configBuild(this.configInputs())
+      const configTabs = this.configInputs()
+      const {html, modifiers} = cd.configBuild(configTabs)
       const title = `${this.shortName} Config`
       cd.setTitle(title)
       cd.setContent(html, modifiers)
@@ -506,7 +550,7 @@ export default class Indicator extends Overlay {
   // entry, id, label, type, value, default, placeholder, class, max, min, step, onchange, disabled, visible, description
 
   configInputs() {
-    const name = this.name || this.shortName || this.#ID
+    const name = this.name || this.shortName || this.id
     const noConfig = `Indicator ${name} is not configurable.`
     const noTabs = { "No Config": {tab1: noConfig} }
       let tabs = {};
@@ -517,37 +561,50 @@ export default class Indicator extends Overlay {
         !isObject(this?.definition?.input)) 
       return noTabs
 
-    // inputs built in defineIndicator()
-    // style built in defineIndicator()
-
     // process other tabs
     for (let tab in meta) {
+      if (IGNORE_DEFINITIONS.includes(tab)) continue
+
       tabs[tab] = meta[tab]
     }
-
     // if there are no tabs return no config message
     if (Object.keys(tabs).length == 0)
       tabs = noTabs
     // ensure all tab fields provide data-oldval, data-default
     else {
       for (let tab in tabs) {
-        for (let field in tabs[tab]) {
-          let f = tabs[tab][field]
-          let keys = Object.keys(f)
-          if (!keys.includes("data-oldval"))
-            f["data-oldval"] = f.value
-          if (!keys.includes("data-default")) {
-            f["data-default"] = (!!f.default) ? 
-              f.default :
-              f.value
-          }
-        }
+        this.dataOldDefault(tabs[tab])
       }
     }
 
     return tabs
   }
 
+  dataOldDefault(entries) {
+
+    if (isArray(entries)) {
+      for (let entry of entries) {
+        this.dataOldDefault(entry)
+      }
+    }
+
+    else if (isObject(entries)) {
+      for (let field in entries) {
+
+        let f = (isObject(entries[field])) ? entries[field] : entries
+        let keys = Object.keys(f)
+
+        if (!keys.includes("data-oldval"))
+          f["data-oldval"] = f?.value
+        if (!keys.includes("data-default")) {
+          f["data-default"] = (!!f?.default) ? 
+            f?.default :
+            f?.value
+        }
+      }
+    }
+  }
+/*
   buildConfigInputTab() {
     const define = this.definition.input
       let input = {}
@@ -557,10 +614,10 @@ export default class Indicator extends Overlay {
       let type = typeOf(v)
       switch(type) {
         case "number":
-          this.configInputNumber(define, input, i)
+          this.configInputNumber(input, i, v) 
           break;
         case "object":
-          this.configInputObject(define, input, i)
+          this.configInputObject(input, i, v)
           break;
       }
     }
@@ -569,20 +626,38 @@ export default class Indicator extends Overlay {
 
     return input
   }
+*/
+  outputValueNumber(i, v, change) {
+    let listeners = [change]
+    return {
+      type: "number",
+      min: `0`,
+      d: v,
+      listeners,
+      fn: (el) => {
+        this.configDialogue.provideEventListeners(`#${i}`, listeners)(el)
+      }
+    }
+  }
 
-  buildConfigStyleTab() {
-    const style = {}
-    const change = {
+  /**
+   * Updates indicator meta output value with dialogue value
+   * @returns {object}
+   */
+  fieldEventChange() {
+    return {
       event: "change", 
       fn: (e)=>{
-        // console.log(`${e.target.id} = ${e.target.value}`)
-
-        this.style[e.target.id] = e.target.value
+        // this.definition.meta.output[e.target.id] = e.target.value
+        this.fieldTargetUpdate(e.target.id, e.target.value)
         this.setRefresh()
         this.draw()
       }
     }
-    const colour = {
+  }
+
+  fieldEventClick() {
+    return {
       event: "click", 
       fn: (e)=>{
         e.preventDefault()
@@ -597,89 +672,45 @@ export default class Indicator extends Overlay {
         let y = this.#ColourPicker.offsetTop - e.target.top // offsetTop
         this.#ColourPicker.position(x, y, this.core)
         // hide colour picker when pointer gives focus elsewhere
-
       }
-    }
-    const over = {
-      event: "pointerover",
-      fn: (e) => {
-        e.target.style.border = "1px solid #f00;"
-      }
-    }
-    const out = {
-      event: "pointerout",
-      fn: (e) => {
-        e.target.style.border = "none;"
-      }
-    }
-    let listeners;
-    for (let i in this?.style) {
-      let d = ""
-      let v = this.style[i]
-      let min = ""
-      let type = typeOf(v)
-      switch (type) {
-        case "number": 
-          min = `0`
-          d = v
-          listeners = [change]
-          break;
-        case "string":
-          let c = new Colour(v);
-          type = (c.isValid)? "text" : ""
-          v = (c.isValid)? c.hexa : v
-          d = v
-          listeners = [change, colour, over, out]
-          break;
-      }
-      // element modifier function
-      const fn = (el) => {
-        this.configDialogue.provideInputColor(el, `#${i}`)
-        this.configDialogue.provideEventListeners(`#${i}`, listeners)(el)
-      }
-
-      style[i] = {
-        entry: i, 
-        label: i, 
-        type, 
-        value: v, 
-        "data-oldval": v, 
-        "data-default": 
-        d, default: 
-        d, min, 
-        $function: fn }
-    }
-    return style
-  }
-
-  configInputNumber(define, input, i) {
-    input[i] = {
-      entry: i,
-      label: i,
-      type: 'number',
-      value: define[i],
-      default: define[i],
-      "data-default": define[i],
-      "data-oldval": define[i],
-      $function:
-        this.configDialogue.provideEventListeners(`#${i}`, 
-        [{
-          event: "change", 
-          fn: (e)=>{
-            // console.log(`#${i} = ${e.target.value}`)
-          }
-        }]
-      )
     }
   }
 
-  configInputObject(define, input, i) {
+  fieldTargetUpdate(target, value) {
+    let s = this.definition.meta.style
+    for (let e in s ) {
+      for (let o in s[e]) {
+        if (isObject(s[e][o]) && s[e][o].entry == target) {
+          s[e][o]["data-oldval"] = s[e][o].value
+          s[e][o].value = value
+        }
+      }
+    }
+  }
+
+/*
+  configInputNumber(input, i, v) {
+    input[i] = this.configField(i, i, "number", v, v)
+    input[i].$function = this.configDialogue.provideEventListeners(
+      `#${i}`, 
+    [{
+      event: "change", 
+      fn: (e)=>{
+        // console.log(`#${i} = ${e.target.value}`)
+      }
+    }]
+  )
+  }
+*/
+  configInputObject(input, i, v) {
     if (i instanceof InputPeriodEnable) {
-      this.configInputNumber(define, input, i.period)
+
+      input[i.period] = this.configField(i.period, i.period, "number", v, v)
+
       input.$function = function (el) {
-        const elm = el.querySelector(`#${i}`)
+        const elm = el.querySelector(`#${i.period}`)
         const checkBox = document.createElement("input")
-              checkBox.id = `"enable${i}`
+              checkBox.id = `"enable${i.period}`
               checkBox.checked = i.enable
               checkBox.addEventListener("change", (e) => {
                 if (e.currentTarget.checked) {
@@ -715,89 +746,272 @@ export default class Indicator extends Overlay {
       meta: {
         input: {},
         output: [],
+        outputOrder: [],
+        outputLegend: {},
         style: {}
       }
     }
-    let d;
     if (!isObject(this.definition)) 
-      d = this.definition = definition
-    else {
-      d = this.definition
-      d.input = (!isObject(d.input)) ? {} : d.input
-      d.output = (!isObject(d.output)) ? {} : d.output
-      d.meta = (!isObject(d.meta)) ? definition.meta : d.meta
-      d.meta.input = (!isObject(d.meta.input)) ? {} : d.meta.input
-      d.meta.output = (!isObject(d.meta.output)) ? talibAPI[this.shortName].outputs : d.meta.output
-      d.meta.style = (!isObject(d.meta.style)) ? {} : d.meta.style
+      this.definition = definition
+
+    this.definition = mergeDeep(definition, this.definition)
+
+    // indicator definition sanity check 
+    let d = this.definition;
+    let dm = d.meta;
+    let oo = [];
+    let out = talibAPI?.[this.libName]?.outputs || [];
+    d.input = (!isObject(d.input)) ? {} : d.input
+    d.output = (!isObject(d.output)) ? {} : d.output
+    dm = (!isObject(dm)) ? definition.meta : dm
+    dm.input = (!isObject(dm.input)) ? {} : dm.input
+    dm.output = (!isArray(dm.output) || !dm.output.length) ? out : [...out, ...dm.output];
+    dm.outputOrder = (!isArray(dm.outputOrder)) ? [] : dm.outputOrder
+    dm.outputLegend = (!isObject(dm.outputLegend)) ? {} : dm.outputLegend
+
+    // style ---------------
+    if (!isObjectNotEmpty(dm.style))
+        dm.style = this.style || {}
+
+    // input ---------------
+
+    // validate all input fields
+    this.validateInputs(d, s, api)
+
+    // output ------------------
+
+    // validate all output arrays
+    this.validateOutputs(d, api, oo)
+
+    // meta validation ------------------
+    // Inputs Tab
+    // dm.input = this.buildConfigInputTab() || {}
+    this.buildOutputOrder(dm, oo)
+    this.buildOutputLegends(d)
+    this.buildConfigOutputTab(dm)
+
+  } // end of define indicator
+
+
+  validateInputs(d, s, api) {
+    const input = {...d.input, ...s}
+    delete input.style
+    d.input = input
+    for (let def of api.options) {
+      if (!(def.name in d.input))
+        d.input[def.name] = api.options[def.name]
     }
+    this.validate(d.input, api.options, d)
+  }
 
-    // style
-    if (Object.keys(d?.meta.style).length == 0 &&
-        Object.keys(this.style).length > 0)
-        d.meta.style = this.buildConfigStyleTab()
-
-    // output
+  /**
+   * if definition output is empty build it from api
+   * ensure all output are arrays
+   * @param {object} d 
+   * @param {object} api 
+   * @param {array} oo 
+   */
+  validateOutputs(d, api, oo) {
+    // set up all defaults to be arrays
     if (Object.keys(d.output).length == 0) {
       for (let o of api.outputs) {
         d.output[o.name] = []
       }
     }
+    // ensure all definition outputs are arrays
     for (let o in d.output) {
       if (!isArray(d.output[o])) 
         d.output[o] = []
-    }
-
-    // input
-    const input = {...d.input, ...s}
-    delete input.style
-    d.input = input
-
-    const validate = (src, def) => {
-      for (let f of def) {
-        // if input value is type is incorrect, use the default
-        if (typeof src[f.name] !== f.type)
-          src[f.name] = f.defaultValue
-
-        if ("range" in def)
-          src[f.name] = limit(src[f.name], f.range.min, f.range.max)
-
-        const n = {
-          entry: f?.name,
-          label: f?.displayName,
-          type: f?.type,
-          value: src[f.name],
-          default: f?.defaultValue,
-          "data-oldval": src[f.name],
-          "data-default": f?.defaultValue,
-          max: f?.range?.max,
-          min: f?.range?.min,
-          title: f?.hint
-        }
-
-        d.meta.input[f.name] = {...n, ...d.meta.input[f.name]}
-
-        if (f.name in d.input)
-          d.meta.input[f.name].value = d.input[f.name]
-      }
-    }
-
-    // process options
-    d.meta.input = this.buildConfigInputTab() || {}
-
-    for (let def of api.options) {
-      if (def.name in input)
-        validate(input, api.options)
-      else if (isObject(input?.definition?.input) && 
-                def.name in input.definition.input)
-        validate(input.definition.input, api.options)
-    }
-
-    for (let i in d.meta) {
-      if (Object.keys(d.meta[i]).length == 0)
-        delete d.meta[i]
+      oo.push(o)
     }
   }
 
+  /**
+   * meta output render order
+   * merge output keys with output order
+   * remove redundant keys and preserve order
+   * @param {object} dm - this.definition.meta
+   * @param {array} oo - output order derived from API output definition
+   */
+  buildOutputOrder(dm, oo) {
+    let u = [...new Set([...dm.outputOrder, ...oo])]
+    let del = diff(u, oo)
+    for (let x of del) {
+      if (OUTPUTEXTRAS.includes(x)) continue
+      let idx = u.indexOf(x)
+      u.splice(idx, 1)
+    }
+    dm.outputOrder = u
+  }
+
+  buildOutputLegends(d) {
+    let dm = d.meta
+    let k = Object.keys(d.output)
+    for (let [k,v] of Object.entries(dm.outputLegend)) {
+      if (!isObject(v)) {
+        dm.outputLegend[k] = {}
+      }
+      if (!isString(dm.outputLegend[k].labelStr)) {
+        dm.outputLegend[k].label = false
+        dm.outputLegend[k].labelStr = ""
+      }
+      if (!isBoolean(dm.outputLegend[k].label))
+        dm.outputLegend[k].label = false
+      if (!isBoolean(dm.outputLegend[k].value))
+        dm.outputLegend[k].value = false
+    }
+  }
+
+  /**
+   * Outputs Tab add any missing requirements
+   * @param {object} dm - this.definition.meta
+   * @returns 
+   */
+  buildConfigOutputTab(dm) {
+    // cleam up style
+    for (let i in dm.style) {
+      if (typeof dm.style[i] !== "object")
+        delete dm.style[i]
+    }
+
+    // meta output - add required data for relevant form fileds
+    for (let x = 0; x < dm.output.length; x++) {
+      let o = dm.output[x]
+      let t = plotFunction(o?.plot)
+      switch(t) {
+        case "renderLine": 
+          // o.style = (!dm.style?.[o?.name]) ? this.defaultMetaStyleLine(o, x, dm.style) : dm.style[o.name];
+          o.style = this.defaultMetaStyleLine(o, x, dm.style)
+
+          break;
+        case "histogram": return "histogram"
+        case "highLow": return "highLow"
+        default: break;
+      }
+    }
+  }
+
+
+  /**
+   * 
+   * @param {object} o - style object
+   * @param {number} x - style entry (field) number
+   * @param {object} style - style entry object
+   * @returns 
+   */
+  defaultMetaStyleLine(o, x, style) {
+    let v;
+    o.name = (!o?.name) ? "output" : o.name
+
+    if (!isObject(style?.[o.name]))
+      style[o.name] = {}
+    
+    // is colour valid?
+    let c = new Colour(style[o.name]?.colour.value)
+    if (!c.isValid) {
+      let k = this.colours.length
+          v = (x <= k) ? this.colours[x] : this.colours[k%x]
+    }
+    else {
+      v = c.value.hexa
+    }
+    style[o.name].colour = this.defaultOutputField(`${o.name}Colour`, `${o.name} Colour`, v, "color")
+
+
+    // is width valid?
+    if (!isNumber(style[o.name]?.width.value))
+      v = 1
+    else
+      v = style[o.name]?.width.value
+
+    style[o.name].width = this.defaultOutputField(`${o.name}Width`, `${o.name} Width`, v, "number", 0)
+
+    if ("dash" in style[o.name] && (!!style[o.name].dash)) {
+      v = style[o.name]?.dash.value
+      style[o.name].dash = this.defaultOutputField(`${o.name}dash`, `${o.name} Dash`, v, "dash", undefined, undefined, )
+    }
+
+
+    // style[o.name].fillS = string
+    // style[o.name].fillStyle = #RBBA
+    // style[o.name].dash = string - 2, 10 
+    return style[o.name]
+  }
+
+  defaultOutputField(id, label, value, type, min, max, defaultValue) {
+
+    let c, fn, listeners, options;
+    let change = this.fieldEventChange()
+    let colour = this.fieldEventClick()
+
+    switch(type) {
+      case "number":
+        listeners = [change]
+        fn = (el) => {
+          this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
+        }
+        break;
+
+      case "color":
+        c = new Colour(value);
+        value = (c.isValid)? c.hexa : this.defaultColour()
+        listeners = [change, colour, over, out]
+        fn = (el) => {
+          this.configDialogue.provideInputColor(el, `#${id}`)
+          this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
+        }
+        type = "text"
+        break;
+
+      case "dash":
+        listeners = [change]
+        fn = (el) => {
+          this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
+        }
+        type = "select"
+        let patterns = {}
+        for (let d in dashedPatterns) {
+          patterns[d] = dashedPatterns[d].toString()
+        }
+        options = patterns
+        break;
+    }
+
+
+    return this.configField(id, label, type, value, value, min, max, fn, label, options)
+  }
+
+  configField(i, label, type, value, defaultValue, min, max, fn, title, options) {
+    defaultValue = defaultValue || value
+    title = title || label
+    if (isNumber(min) && isNumber(max) && min > max) {
+      [max, min] = [min, max]
+    }
+    else if (isNumber(min) && isNumber(max)) {
+      value = limit(value, min, max)
+    }
+
+    let f = {
+      entry: i,
+      label,
+      type,
+      value,
+      default: defaultValue,
+      "data-oldval": value, 
+      "data-default": defaultValue, 
+      $function: fn,
+      title
+    }
+
+    if (isNumber(min)) f.min = min
+    if (isNumber(max)) f.max = max
+    if (isObject(options) && Object.keys(options).length) f.options = options
+    return f
+  }
+
+  defaultColour() {
+    return "#fff"
+  }
 
   addLegend() {
     let legend = {
@@ -818,15 +1032,39 @@ export default class Indicator extends Overlay {
    * @memberof indicator
    */
   legendInputs(pos=this.chart.cursorPos) {
-    const colours = [this.style.stroke]
+    if (this.overlay.data.length == 0) return false
 
-    let index = this.Timeline.xPos2Index(pos[0])
+    const labels = []
+    const colours = []
+    const inputs = {}
+    const index = this.Timeline.xPos2Index(pos[0])
+    const len = this.overlay.data.length
+    const order = this.definition.meta.outputOrder
+    const legend = this.definition.meta.outputLegend
 
-    let c = index  - (this.range.data.length - this.overlay.data.length)
-    let l = limit(this.overlay.data.length - 1, 0, Infinity)
+    let c = index  - (this.range.data.length - len)
+    let l = limit(len - 1, 0, Infinity)
         c = limit(c, 0, l)
 
-    return {c, colours}
+    let i = 0
+    for (let o of this.definition.meta.output) {
+      if (o.type == "overlay") continue
+
+      labels[i] = false
+      inputs[o.name] = this.scale.nicePrice(this.overlay.data[c][i+1])
+
+      if (o.plot == "histogram") {
+        if (this.overlay.data[c][i+1] < 0)
+          colours[i] = this.definition.meta.style?.[o.name].dnStroke
+        else
+          colours[i] = this.definition.meta.style?.[o.name].upStroke
+      }
+      else 
+        colours[i] = this.definition.meta.style?.[o.name]?.colour?.value || "#ccc"
+      i++
+    }
+
+    return {inputs, colours, labels}
   }
 
   indicatorInput(start, end) {
@@ -862,38 +1100,7 @@ export default class Indicator extends Overlay {
     })
   }
 
-  TALibParams() {
-    let end = this.range.dataLength
-    let step = this.definition.input.timePeriod
-    let start = end - step //+ 1
-    let input = this.indicatorInput(start, end)
-    let hasNull = input.inReal.find(element => element === null)
-    if (hasNull) return false
-    else return { timePeriod: step, ...input }
-  }
-
-  noCalc(indicator, range) {
-    return this.chart.status == 'destroyed' ||
-    !this.core.TALibReady ||
-    !isString(indicator) ||
-    !(indicator in this.TALib) ||
-    !isObject(range) ||
-    range.dataLength < this.definition.input.timePeriod 
-  }
-
-  /**
- * Calculate indicator values for chart history - partial or entire
- * @param {string} indicator - the TALib function to call
- * @param {object} params - parameters for the TALib function
- * @param {object} range - range instance or definition
- * @param {object} output - output definition
- * @returns {array|boolean} - success or failure
- */
-  calcIndicator (indicator, params={}, range, output=this.definition.output) {
-
-    if (this.noCalc(indicator, range)) return false
-
-    // get the period 
+  getTimePeriod() {
     let d = 0;
     let def = this.definition.input
 
@@ -906,7 +1113,64 @@ export default class Indicator extends Overlay {
       }
       d *=2
     }
+    return d
+  }
 
+  TALibParams() {
+    let end = this.range.dataLength
+    let step = this.getTimePeriod()
+    let start = end - step //+ 1
+    let input = this.indicatorInput(start, end)
+    let hasNull = input.inReal.find(element => element === null)
+    if (hasNull) return false
+    else return { timePeriod: step, ...input }
+  }
+
+  formatValue(entry) {
+    let v = []
+    let i = 0
+    for (let o in this.definition.output) {
+      v[i++] = entry[o][0]
+    }
+    return v
+  }
+
+  noCalc(indicator, range=this.range) {
+    return this.chart.status == 'destroyed' ||
+          !this.core.TALibReady ||
+          !isString(indicator) ||
+          !(indicator in this.TALib) ||
+          !isObject(range) ||
+          range.dataLength < this.definition.input.timePeriod 
+  }
+
+  noCalcCustom (indicator, range=this.range) {
+    return this.chart.status == 'destroyed' ||
+          !this.core.TALibReady ||
+          !isFunction(indicator) ||
+          !isObject(range) ||
+          range.dataLength < this.definition.input.timePeriod 
+  }
+
+  /**
+ * Calculate indicator values for chart history - partial or entire
+ * @param {string|function} indicator - the TALib function to call
+ * @param {object} params - parameters for the TALib function
+ * @param {object} range - range instance or definition
+ * @param {object} output - output definition
+ * @returns {array|boolean} - success or failure
+ */
+  calcIndicator (indicator, params={}, range, output=this.definition.output) {
+
+    let indicatorFn;
+    if (!this.noCalcCustom(indicator))
+      indicatorFn = indicator
+    else if (!this.noCalc(indicator, range))
+      indicatorFn = this.TALib[indicator]
+    else return false
+
+    // get the period 
+    let d = this.getTimePeriod()
     // params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
     let start, end;
     let p = d
@@ -926,8 +1190,10 @@ export default class Indicator extends Overlay {
     else return false
 
     // check if a full or only partial calculation is required
+    if (!isArray(od)) return false
     // full calculation required
-    if (od.length == 0) { }
+    // full calculation required
+    else if (od.length == 0) { }
     // partial calculation required
     else if (od.length + t !== range.dataLength) {
       // new data in the past?
@@ -955,7 +1221,7 @@ export default class Indicator extends Overlay {
     }
 
     let data = [];
-    let i, v, entry, input;
+    let entry, input, value;
 
     while (start < end) {
       // fetch the data required to calculate the indicator
@@ -964,15 +1230,11 @@ export default class Indicator extends Overlay {
       // let hasNull = params.inReal.find(element => element === null)
       // if (hasNull) return false
 
-      entry = this.TALib[indicator](params)
+      entry = indicatorFn(params)
+      value = this.formatValue(entry)
 
-      v = []
-      i = 0
-      for (let o in output) {
-        v[i++] = entry[o][0]
-      }
       // store entry with timestamp
-      data.push([range.value(start + p - 1)[0], ...v])
+      data.push([range.value(start + p - 1)[0], ...value])
       // data.push([range.value(start - 1)[0], ...v])
 
       start++
@@ -988,30 +1250,38 @@ export default class Indicator extends Overlay {
     const calc = () => {
       let od = this.overlay.data
 
-      if (isArray(od) && od.length > 0) return
+      // if (isArray(od) && od.length > 0) return
+      // if (!isArray(od) || od.length < 2) return
+
       // insert into Range and State
       // let pane = (this.isPrimary) ? "primary" : "secondary"
       // this.range.allData[`${pane}Pane`].push()
 
       const data = this.calcIndicator(this.libName, this.definition.input, this.range);
+
       if (data) {
         const d = new Set(data)
         const o = new Set(od)
-        let a, p, r = {};
+        let a, p, r = {}, s;
         if (!isArray(od) ||
             od.length == 0 ) {
             this.overlay.data = data
             return
         }
         else if (data[0][0] < od[0][0]) {
-          // let s = new Set([...d, ...o])
+          // s = new Set([...d, ...o])
           // this.overlay.data = Array.from(s)
           a = data
           p = od
         }
         else if (data[data.length-1][0] > od[od.length-1][0]) {
-          // let s = new Set([...o, ...d])
+          // s = new Set([...o, ...d])
           // this.overlay.data = Array.from(s)
+          a = od
+          p = data
+        }
+        else{
+          // s = new Set([...o, ...d])
           a = od
           p = data
         }
@@ -1033,27 +1303,30 @@ export default class Indicator extends Overlay {
 
   /**
    * Calculate indicator value for current stream candle
-   * @param {string} indicator - the TALib function to call
+   * @param {string|function} indicator - the TALib function to call
    * @param {Object} params - parameters for the TALib function
    * @param {Object} range - Range instance
    * @returns {array|boolean} - indicator data entry
    */
   calcIndicatorStream (indicator, params, range=this.range) {
-    if (this.noCalc(indicator, range) ||
-        !(range instanceof Range)
-        ) return false
+    // if (this.noCalc(indicator, range) ||
+    //     !(range instanceof Range)
+    //     ) return false
+    if (!(range instanceof Range)) return false
 
-    let entry = this.TALib[indicator](params)
+    let indicatorFn;
+    if (!this.noCalcCustom(indicator))
+      indicatorFn = indicator
+    else if (!this.noCalc(indicator, range))
+      indicatorFn = this.TALib[indicator]
+    else return false
+
+    let entry = indicatorFn(params)
     let end = range.dataLength
     let time = range.value(end)[0]
-    let v = []
-    let i = 0
+    let value = this.formatValue(entry)
 
-    for (let o in this.definition.output) {
-      v[i++] = entry[o][0]
-    }
-
-    return [time, ...v]
+    return [time, ...value]
   }
 
   /**
@@ -1118,12 +1391,14 @@ export default class Indicator extends Overlay {
   plotIt(j, k, p, r, s) {
     const data = this.overlay.data
     const width = this.xAxis.candleW
-    const plot = { w: width, }
+    const zero = this.yAxis.yPos(0)
+    const plot = { w: width, zero }
+    const opts = {}
 
     let plots = []
 
     while(j) {
-      if (k < 0 || k >= this.overlay.data.length) {
+      if (k < 0 || k >= data.length) {
         plots.push({x: null, y: null})
       }
       else {
@@ -1135,42 +1410,53 @@ export default class Indicator extends Overlay {
       j--
     }
 
-    this.plot(plots, r, this.style)
+    for (let key in s) {
+      if (!!s[key]?.value)
+        opts[key] = s[key].value
+    }
+
+    this.plot(plots, r, opts)
   }
 
   draw(range=this.range) {
 
+    const data = this.overlay.data
     // no update required
-    if (this.overlay.data.length < 2) return
+    if (data.length < 2) return
 
     if (!super.mustUpdate()) return
 
     this.scene.clear()
 
     const offset = this.xAxis.smoothScrollOffset || 0
-    const out = this.definition.meta.output
+    const meta = this.definition.meta
+    const plots = {}
 
     // account for "missing" entries because of indicator calculation
     let o = this.Timeline.rangeScrollOffset
-    let d = range.data.length - this.overlay.data.length
+    let d = range.data.length - data.length
     let c = range.indexStart - d - 2
     let i = range.Length + (o * 2) + 2
     let x = 1
 
-    for (let p of out) {
-      let r;
-      switch(p.plot) {
-        case "line": 
-        case "line_dash":
-        case "limit_lower":
-        case "limit_upper":
-          r = "renderLine"
-          break;
-        case "historgram":
-          r = "historgram"
-          break
-      }
-      this.plotIt(i, c, x++, r, this.style)
+    if (!meta.output.length) 
+      return super.updated()
+
+    for (let p of meta.output) {
+      let r = plotFunction(p.plot)
+      // valid plot function
+      if (r) plots[p?.name] = {x: x++, r}
+    }
+
+    // plot order
+    // drawn in reverse order, bottom to top
+    let oo = (meta?.outputOrder.length > 0) ? 
+      meta.outputOrder : 
+      Object.keys(plots)
+    let q = oo.reverse()
+    for (let p of q) {
+      let style = this.formatStyle(this.definition.meta.style[p], p)
+      this.plotIt(i, c, plots[p].x, plots[p].r, style)
     }
 
     this.target.viewport.render();
@@ -1178,8 +1464,81 @@ export default class Indicator extends Overlay {
     super.updated()
   }
 
+  formatStyle(style, plot) {
+    let e, s = {};
+    for (let entry in style) {
+      e = entry.replace(plot, "").toLowerCase()
+
+      switch(e) {
+        case "colour": e = "stroke"; break;
+      }
+      
+      s[e] = style[entry]
+    }
+    return s
+  }
+
   updated() {
     this.setRefresh()
     super.updated()
   }
+
+  validate(src, def, d) {
+    let dm = d.meta
+    for (let f of def) {
+      // if input value is type is incorrect, use the default
+      if (typeof src[f.name] !== f.type)
+        src[f.name] = f.defaultValue
+  
+      if ("range" in def)
+        src[f.name] = limit(src[f.name], f.range.min, f.range.max)
+  
+      const n = this.configField(
+        f?.name,
+        f?.displayName,
+        f?.type,
+        src[f.name],
+        f?.defaultValue,
+        f?.range?.min,
+        f?.range?.max,
+        undefined,
+        f?.hint,
+      )
+  
+      dm.input[f.name] = {...n, ...dm.input[f.name]}
+  
+      // if (f.name in d.input)
+      //   dm.input[f.name].value = d.input[f.name]
+    }
+  }
 }
+// end of class Indicator
+
+
+
+function plotFunction(t) {
+  switch(t) {
+    case "line": 
+    case "line_dash":
+    case "limit_lower":
+    case "limit_upper":
+      return "renderLine"
+    case "histogram": return "histogram"
+    case "highLowRange": return "highLowRange"
+    default: return false
+  }
+}
+
+const over = {
+  event: "pointerover",
+  fn: (e) => {
+    e.target.style.border = "1px solid #f00;"
+  }
+}
+const out = {
+  event: "pointerout",
+  fn: (e) => {
+    e.target.style.border = "none;"
+  }
+}
+

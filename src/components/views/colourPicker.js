@@ -14,7 +14,6 @@ import { EventHandlers } from "../../utils/utilities"
 import { GlobalStyle, WindowStyle } from "../../definitions/style"
 
 
-let template = document.createElement('template')
 
 const MIXERSIZE = 128
 const sliderW = 20
@@ -33,6 +32,8 @@ export const colours2 = [
   "#90A4AE","#E57373","#FF8A65","#FFD54F","#DCE775","#81C784","#4DD0E1","#64B5F6","#9575CD","#F06292",
   "#CFD8DC","#FFCDD2","#FFCCBC","#FFECB3","#F0F4C3","#C8E6C9","#B2EBF2","#BBDEFB","#D1C4E9","#F8BBD0"
 ]
+
+const template = document.createElement('template')
 
 template.innerHTML = `
 <style>

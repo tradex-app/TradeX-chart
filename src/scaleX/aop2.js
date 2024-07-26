@@ -1,4 +1,4 @@
-/ Aspect Oriented Programming Library
+// Aspect Oriented Programming Library
 
 // Pointcuts
 const pointcuts = {

@@ -144,14 +144,13 @@ export default class ScaleBar extends Component {
     this.#input.setCursor("ns-resize")
     // this.#input.on("pointerdrag", throttle(this.onDrag, 100, this, true));
     this.#input.on("pointerdrag", this.onDrag.bind(this));
-
     this.#input.on("pointerdragend", this.onDragDone.bind(this))
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("dblclick", this.resetScaleRange.bind(this))
 
     this.on(`${this.parent.id}_pointermove`, this.onMouseMove, this)
     this.on(`${this.parent.id}_pointerout`, this.#layerCursor.erase, this.#layerCursor)
-    this.on(STREAM_UPDATE, this.#layerPriceLine.draw, this.#layerPriceLine)
+    this.on(STREAM_UPDATE, this.onStreamUpdate, this)
     this.on(`setRange`, this.draw, this)
   }
 
@@ -182,7 +181,39 @@ export default class ScaleBar extends Component {
   }
 
   onStreamUpdate(e) {
+    let draw = false
 
+    if (this.#yAxis.mode == "manual") {
+      if (this.parent.isPrimary) {
+        if (e[4] > this.range.max) {
+          this.range.max = e[4]
+          draw = true
+        }
+        if (e[4] < this.range.min) {
+          this.range.max = e[4]
+          draw = true
+        }
+      }
+      // secondary pane
+      else {
+        let chart = this.parent
+        let range = this.core.range
+        let id = chart.view[0].id
+        let mm = this.core.range.secondaryMaxMin[id].data
+        if (!!mm) {
+          let stream = range.value(undefined, id)
+          stream.forEach((value, index, array) => {
+            if (index == 0) return
+            if (value > mm.max) mm.max = value
+            else if (value < mm.min) mm.min = value
+          });
+          draw = true
+        }
+      }
+    }
+
+    if (draw) this.draw()
+    else this.#layerPriceLine.draw()
   }
 
   onChartDrag(e) {
@@ -330,9 +361,10 @@ export default class ScaleBar extends Component {
   }
 
   draw(range=this.range, update=true) {
+    this.#yAxis.calcGradations()
     this.graph.draw(range, update)
     this.parent.drawGrid(update)
-    this.parent.draw(this.range, true)
+    this.parent.draw(range, true)
   }
 
   resize(width=this.width, height=this.height) {

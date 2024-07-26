@@ -139,6 +139,7 @@ export class Range {
   get maxCandles () { return this.#maxCandles }
   get yAxisBounds () { return this.#yAxisBounds }
   get rangeLimit () { return this.#limitFuture }
+  get diff () { return this.max - this.min }
 
   end() {
     // WebWorker.destroy(this.#worker.id)
@@ -249,7 +250,7 @@ export class Range {
    * return value at index
    * @param {number} index - price history index, out of bounds will return null filled entry
    * @param {string} id - defaults to returning chart price history 
-   * @returns {array}
+   * @returns {array|null}
    */
   value ( index, id="chart" ) {
 
@@ -317,35 +318,28 @@ export class Range {
 
   /**
    * return data for id
-   * @param {string} id
-   * @returns {Array}  
+   * @param {string} [id="chart"]
+   * @returns {array|boolean}  
    * @memberof Range
    */
-  getDataById(id) {
+  getDataById(id="chart") {
     if (!isString(id)) return false
 
-    const idParts = id.split('_')
+    if (id == "chart") return this.data
 
-    switch (idParts[1]) {
-      case "chart": 
-        return this.data;
-      case "primary":
-        for (let o of this.allData.primaryPane) {
-          if (idParts[2] in o) return o[idParts[2]]
-        }
-        return false;
-      case "secondary":
-        for (let o of this.allData.secondaryPane) {
-          if (idParts[2] in o) return o[idParts[2]]
-        }
-        return false;
-      case "datasets":
-        for (let o of this.allData.datasets) {
-          if (idParts[2] in o) return o[idParts[2]]
-        }
-      return false;
-      default: return false
+    const datas = [
+      this.allData.primaryPane,
+      this.allData.secondaryPane,
+      this.allData.datasets
+    ]
+
+    for (let data of datas) {
+      for (let entry of data) {
+        if (id == entry?.id) return entry.data
+      }
     }
+
+    return false
   }
 
   /**
@@ -496,25 +490,30 @@ export class Range {
   maxMinDatasets() {
     if (this.allData.secondaryPane.length == 0) return
 
-    let old = Object.keys(this.secondaryMaxMin)
+    let old = Object.keys(this.secondaryMaxMin) || []
 
+    // iterate over secondary panes
     for (let p of this.allData.secondaryPane) {
+      let index = old.indexOf(p.id);
       let input = {
         data: p.data,
         start: this.indexStart,
         end: this.indexEnd,
         that: this
       }
+      // current or new entry
       this.secondaryMaxMin[p.id] = this.maxMinData(input)
-      let index = old.indexOf(p.id);
+      // leave only old entries to remove
       if (index !== -1) {
         old.splice(index, 1);
       }
+
     }
     // clean up old entries
     for (let del of old) {
       delete this.secondaryMaxMin[del]
     }
+    
   }
 
   /**
@@ -528,16 +527,12 @@ export class Range {
     let buffer = bRound(this.#core.bufferPx / this.#core.candleW)
     let l = data.length-1
     let x = this.dataLength - data.length
+    let f = data[0]?.length - 1 || 0
     const r = {}
 
-    buffer = (isInteger(buffer)) ? buffer : 0
-    start = (isInteger(start)) ? start - buffer : 0
-    start = (start > 0) ? start - x : 0
-    end = (isInteger(end)) ? end - x : l
-
-    if (l < 0 || data[0].length == 0) {
-      return {
-      data0: {
+    // create default max min for indicator outputs
+    for (let g = f; g > 0; g--) {
+      r[`data${g}`] = {
         min: 0,
         max: 1,
         minIdx: 0,
@@ -545,34 +540,52 @@ export class Range {
         diff: 1
       }
     }
-    }
 
-    let f = data[0].length - 1
+    buffer = (isInteger(buffer)) ? buffer : 0
+    start = (isInteger(start)) ? start - buffer : 0
+    start = (start > 0) ? start - x : 0
+    end = (isInteger(end)) ? end - x : l
+
+    if (l < 0 || data[0].length == 0) 
+      return r
+
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
-    let j, k, min, max, minIdx, maxIdx, diff;
+    let j, v, min, max, diff, tMin, tMax;
 
-    while (f > 0) {
-      let d = `data${f}`
-      r[d] = {}
+    // iterate over indicator outputs
+    for (let d in r) {
       max = data[i][f]
       min = data[i][f]
       j = i
 
+      // iterate over range for indicator output
       while (j++ < c) {
-        if (data[j][f] < min) {
-          r[d].min = data[j][f]
+        v = data[j][f]
+        if (v <= min) {
+          r[d].min = v
           r[d].minIdx = j
+          min = v
         }
-        if (data[j][f] > max) {
-          r[d].max = data[j][f]
+        if (v >= max) {
+          r[d].max = v
           r[d].maxIdx = j
+          max = v
         }
       }
 
+      if (tMin === undefined || min < tMin) tMin = min
+      if (tMax === undefined || max > tMax) tMax = max
+
       diff = r[d].max - r[d].min
-      if (diff !== NaN) r[d].diff = diff
+      r[d].diff = (!isNaN(diff)) ? diff : 0
       --f
+    }
+    // max min totals for all outputs
+    r.data = {
+      min: tMin,
+      max: tMax,
+      diff: tMax - tMin
     }
     return r
   }

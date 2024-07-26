@@ -350,9 +350,6 @@ export default class Chart extends Component{
 
   onChartDrag(e) {
     this.cursor = "grab"
-    // if (this.scale.yAxis.mode == "manual") {
-    //   this.graph.drawAll()
-    // }
     this.core.MainPane.onChartDrag(e)
     this.scale.onChartDrag(e)
   }
@@ -521,7 +518,8 @@ export default class Chart extends Component{
       !isString(t) ||
       !YAXIS_TYPES.includes(t)  ||
       (this.type == "primaryPane" && t == "percent")
-    ) return false
+    ) 
+    return false
     this.#yAxisType = t
     return true
   }
@@ -588,7 +586,13 @@ export default class Chart extends Component{
         class: indClass,
         params: {overlay: i}
       }
-      return this.graph.addOverlay(i.name, config)
+      try {
+        return this.graph.addOverlay(i.name, config)
+      }
+      catch (e) {
+        this.core.error(`ERROR: Primary Pane: ${this.id} cannot add Indicator: ${i?.name} Error: ${e.message}`)
+        return false
+      }
     }
     else return false
   }

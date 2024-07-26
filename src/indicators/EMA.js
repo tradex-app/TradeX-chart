@@ -48,9 +48,6 @@ import { EMA as talibAPI } from "../definitions/talib-api";
   precision = 2
   checkParamCount = false
   scaleOverlay = false
-  plots = [
-    { key: 'EMA_1', title: 'EMA: ', type: 'line' },
-  ]
 
 
   static inCnt = 0
@@ -62,8 +59,10 @@ import { EMA as talibAPI } from "../definitions/talib-api";
     "#66BB6A"
   ]
   static defaultStyle = {
-    stroke: "#C80",
-    width: '1'
+    output: {
+      colour: {value: "#C80"},
+      width: {value: 1},
+    },
   }
 
 
@@ -85,64 +84,6 @@ import { EMA as talibAPI } from "../definitions/talib-api";
 
     this.init(talibAPI)
   }
-
   
-  legendInputs(pos=this.chart.cursorPos) {
-    if (this.overlay.data.length == 0) return false
-
-    const inputs = {}
-    const {c, colours} = super.legendInputs(pos)
-    inputs.EMA_1 = this.scale.nicePrice(this.overlay.data[c][1])
-
-    return {inputs, colours}
-  }
-
-
-  /**
-   * Draw the current indicator range on its canvas layer and render it.
-   * @param {Object} range 
-   */
-  draw(range=this.range) {
-
-    // no update required
-    if (this.overlay.data.length < 2) return
-
-    if (!super.mustUpdate()) return false
-
-    this.scene.clear()
-
-    const data = this.overlay.data
-    const width = this.xAxis.candleW
-    const plots = []
-    const offset = this.xAxis.smoothScrollOffset || 0
-    const plot = {
-      w: width,
-    }
-
-    // account for "missing" entries because of indicator calculation
-    let o = this.Timeline.rangeScrollOffset
-    let d = range.data.length - this.overlay.data.length
-    let c = range.indexStart - d - 2
-    let i = range.Length + (o * 2) + 2
-
-    while(i) {
-      if (c < 0 || c >= this.overlay.data.length) {
-        plots.push({x: null, y: null})
-      }
-      else {
-        plot.x = this.xAxis.xPos(data[c][0])
-        plot.y = this.yAxis.yPos(data[c][1])
-        plots.push({...plot})
-      }
-      c++
-      i--
-    }
-
-    this.plot(plots, "renderLine", this.style)
-
-    this.target.viewport.render();
-
-    super.updated()
-  }
 }
 
