@@ -1135,18 +1135,26 @@ export default class Indicator extends Overlay {
     return v
   }
 
-  noCalc(indicator, range) {
+  noCalc(indicator, range=this.range) {
     return this.chart.status == 'destroyed' ||
-    !this.core.TALibReady ||
-    !isString(indicator) ||
-    !(indicator in this.TALib) ||
-    !isObject(range) ||
-    range.dataLength < this.definition.input.timePeriod 
+          !this.core.TALibReady ||
+          !isString(indicator) ||
+          !(indicator in this.TALib) ||
+          !isObject(range) ||
+          range.dataLength < this.definition.input.timePeriod 
+  }
+
+  noCalcCustom (indicator, range=this.range) {
+    return this.chart.status == 'destroyed' ||
+          !this.core.TALibReady ||
+          !isFunction(indicator) ||
+          !isObject(range) ||
+          range.dataLength < this.definition.input.timePeriod 
   }
 
   /**
  * Calculate indicator values for chart history - partial or entire
- * @param {string} indicator - the TALib function to call
+ * @param {string|function} indicator - the TALib function to call
  * @param {object} params - parameters for the TALib function
  * @param {object} range - range instance or definition
  * @param {object} output - output definition
@@ -1154,7 +1162,12 @@ export default class Indicator extends Overlay {
  */
   calcIndicator (indicator, params={}, range, output=this.definition.output) {
 
-    if (this.noCalc(indicator, range)) return false
+    let indicatorFn;
+    if (!this.noCalcCustom(indicator))
+      indicatorFn = indicator
+    else if (!this.noCalc(indicator, range))
+      indicatorFn = this.TALib[indicator]
+    else return false
 
     // get the period 
     let d = this.getTimePeriod()
@@ -1217,7 +1230,7 @@ export default class Indicator extends Overlay {
       // let hasNull = params.inReal.find(element => element === null)
       // if (hasNull) return false
 
-      entry = this.TALib[indicator](params)
+      entry = indicatorFn(params)
       value = this.formatValue(entry)
 
       // store entry with timestamp
@@ -1237,7 +1250,9 @@ export default class Indicator extends Overlay {
     const calc = () => {
       let od = this.overlay.data
 
-      if (isArray(od) && od.length > 0) return
+      // if (isArray(od) && od.length > 0) return
+      // if (!isArray(od) || od.length < 2) return
+
       // insert into Range and State
       // let pane = (this.isPrimary) ? "primary" : "secondary"
       // this.range.allData[`${pane}Pane`].push()
@@ -1247,21 +1262,26 @@ export default class Indicator extends Overlay {
       if (data) {
         const d = new Set(data)
         const o = new Set(od)
-        let a, p, r = {};
+        let a, p, r = {}, s;
         if (!isArray(od) ||
             od.length == 0 ) {
             this.overlay.data = data
             return
         }
         else if (data[0][0] < od[0][0]) {
-          // let s = new Set([...d, ...o])
+          // s = new Set([...d, ...o])
           // this.overlay.data = Array.from(s)
           a = data
           p = od
         }
         else if (data[data.length-1][0] > od[od.length-1][0]) {
-          // let s = new Set([...o, ...d])
+          // s = new Set([...o, ...d])
           // this.overlay.data = Array.from(s)
+          a = od
+          p = data
+        }
+        else{
+          // s = new Set([...o, ...d])
           a = od
           p = data
         }
@@ -1283,17 +1303,25 @@ export default class Indicator extends Overlay {
 
   /**
    * Calculate indicator value for current stream candle
-   * @param {string} indicator - the TALib function to call
+   * @param {string|function} indicator - the TALib function to call
    * @param {Object} params - parameters for the TALib function
    * @param {Object} range - Range instance
    * @returns {array|boolean} - indicator data entry
    */
   calcIndicatorStream (indicator, params, range=this.range) {
-    if (this.noCalc(indicator, range) ||
-        !(range instanceof Range)
-        ) return false
+    // if (this.noCalc(indicator, range) ||
+    //     !(range instanceof Range)
+    //     ) return false
+    if (!(range instanceof Range)) return false
 
-    let entry = this.TALib[indicator](params)
+    let indicatorFn;
+    if (!this.noCalcCustom(indicator))
+      indicatorFn = indicator
+    else if (!this.noCalc(indicator, range))
+      indicatorFn = this.TALib[indicator]
+    else return false
+
+    let entry = indicatorFn(params)
     let end = range.dataLength
     let time = range.value(end)[0]
     let value = this.formatValue(entry)
