@@ -77,14 +77,13 @@ export default class Test extends Indicator {
   }
 
 
+  calcIndicatorStream (indicator, params={}, range=this.range) {
 
-  calcIndicatorStream (indicator, params, range=this.range) {
-    if (!(range instanceof Range)) return false
+    const indicatorFn = (params) => {
+      return {open: [params.open[0]], close: [params.close[0]]}
+    }
 
-    let end = range.dataLength
-    let time = range.value(end)[0]
-    let value = [params.open[0], params.close[0]]
-
-    return [time, ...value]
+    return super.calcIndicatorStream(indicatorFn, params, range) 
   }
-  }
+
+}

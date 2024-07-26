@@ -11603,8 +11603,6 @@ class se extends X {
   calcIndicatorHistory() {
     const e = () => {
       let i = this.overlay.data;
-      if (L(i) && i.length > 0)
-        return;
       const s = this.calcIndicator(this.libName, this.definition.input, this.range);
       if (s) {
         new Set(s), new Set(i);
@@ -11613,7 +11611,7 @@ class se extends X {
           this.overlay.data = s;
           return;
         } else
-          s[0][0] < i[0][0] ? (n = s, r = i) : s[s.length - 1][0] > i[i.length - 1][0] && (n = i, r = s);
+          s[0][0] < i[0][0] ? (n = s, r = i) : (s[s.length - 1][0] > i[i.length - 1][0], n = i, r = s);
         for (let l of n)
           a[l[0]] = l;
         for (let l of r)
@@ -11624,10 +11622,17 @@ class se extends X {
     this.core.TALibReady ? e() : this.core.talibAwait.push(e.bind(this));
   }
   calcIndicatorStream(e, i, s = this.range) {
-    if (this.noCalc(e, s) || !(s instanceof qi))
+    if (!(s instanceof qi))
       return !1;
-    let n = this.TALib[e](i), r = s.dataLength, a = s.value(r)[0], l = this.formatValue(n);
-    return [a, ...l];
+    let n;
+    if (!this.noCalcCustom(e))
+      n = e;
+    else if (!this.noCalc(e, s))
+      n = this.TALib[e];
+    else
+      return !1;
+    let r = n(i), a = s.dataLength, l = s.value(a)[0], c = this.formatValue(r);
+    return [l, ...c];
   }
   newValue(e) {
     let i = this.TALibParams();
@@ -12144,12 +12149,6 @@ class ji extends se {
   };
   constructor(e, i = !1, s = !1, n, r, a) {
     super(e, i, s, n, r, a), this.init(Na);
-  }
-  calcIndicatorHistory() {
-    super.calcIndicatorHistory();
-  }
-  calcIndicator(e, i = {}, s, n = this.definition.output) {
-    return super.calcIndicator(e, i, s, n);
   }
 }
 class Nn extends se {
