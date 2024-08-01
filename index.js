@@ -10,12 +10,15 @@ import decimals from './data/ohlcv_1d_IMPT'
 import btcusdt_15min from './data/btcusdt_15min'
 // import state4 from './data/seconds.js'
 // import state from './data/seconds-indicator'
+import tradesTestState from './data/trades-test-state.js'
+
 import TEST from './custom-indicator'
 import DblMA from './custom-dbl-ma.js'
 import DblMA2 from './custom-dbl-ma2.js'
 import DMI from './DMI'
 import CustomOverlay from './custom-overlay'
 import chartDCA from './chart-dca'
+import TradeFlow from './trade-flow.js'
 
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
@@ -967,7 +970,8 @@ const dre =   {
   };
 
 const configs = [
-  // {config: config1, stream: null},
+  {config: tradesTestState, stream: null},
+  {config: config1, stream: null},
   // {config: config2, stream: null},
 
   // {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
@@ -1226,10 +1230,13 @@ chart0.setIndicators({
   DMI: {id: "DMI", name: "Directional Movement Indicator", event: "addIndicator", ind: DMI },
   DBLMA: {id: "DBLMA", name: "Double Moving Average", event: "addIndicator", ind: DblMA },
   // DBLMA2: {id: "DBLMA2", name: "Double Moving Average", event: "addIndicator", ind: DblMA2 },
+  TRDFLO: {id: "TRDFLO", name: "Trade Flow", event: "addIndicator", ind: TradeFlow },
 })
 chart0.addIndicator("VOL")
 chart0.addIndicator("MA")
 chart0.addIndicator("TEST", "Test1", {data: [], settings: {test: true}})
+chart0.addIndicator("TRDFLO", "TradeFlow1", {data: [], settings: {test: true}})
+
 // chart0.addIndicator("DBLMA", "DblMA", {data: [], settings: {}})
 
 // chart0.addIndicator("DMI", "DMI1", {data: []})

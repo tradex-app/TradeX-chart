@@ -136,9 +136,9 @@ export function buildSubGrads() {
 }
 
 
-export function isValidTimestamp( _timestamp ) {
-  const newTimestamp = new Date(_timestamp).getTime();
-  return isNumber(newTimestamp);
+export function isValidTimestamp( ts ) {
+  const date = new Date(ts)
+  return (date instanceof Date && !isNaN(date.valueOf())  && isFinite(date.valueOf()));
 }
 
 export function isValidTimeInRange( time, start=BTCGENESIS,end=Date.now() ) {

@@ -7,7 +7,7 @@ import Dataset from '../model/dataset'
 import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
 import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual } from '../utils/utilities'
 import { calcTimeIndex, detectInterval } from '../model/range'
-import { ms2Interval, interval2MS, SECOND_MS } from '../utils/time'
+import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp } from '../utils/time'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT } from '../definitions/chart'
 import { SHORTNAME } from '../definitions/core'
 import TradeXchart from '../core'
@@ -37,13 +37,33 @@ const DEFAULT_STATE = {
   primary: [],
   secondary: [],
   datasets: [],
-  tools: {},
+  tools: {
+    display: true,
+    data: {
+      ts: {}
+    }
+  },
   trades: {
     display: true,
-    displayInfo: true
+    displayInfo: true,
+    data: {
+      ts: {}
+    }
   },
-  events: {},
-  annotations: {},
+  events: {
+    display: true,
+    displayInfo: true,
+    data: {
+      ts: {}
+    }
+  },
+  annotations: {
+    display: true,
+    displayInfo: true,
+    data: {
+      ts: {}
+    }
+  },
   range: {
     timeFrame: DEFAULT_TIMEFRAME,
     timeFrameMS: DEFAULT_TIMEFRAMEMS,
@@ -160,6 +180,13 @@ export default class State {
         state.datasets = []
     }
 
+// TODO: trades
+// TODO: events
+// TODO: annotations
+// tools
+
+
+
     // Build chart order
     if (state.views.length == 0) {
       // add primary chart
@@ -219,6 +246,7 @@ export default class State {
         !State.has(key)
       ) return false
     State.#stateList.delete(key)
+    return true
   }
 
   static has(key) {
@@ -266,7 +294,7 @@ export default class State {
  * export state - default json
  * @param {string} key - state unique identifier
  * @param {Object} [config={}] - default {type:"json"}
- * @returns {*}  
+ * @returns {object|false}  
  * @memberof State
  */
   static export(key, config={}) {
@@ -299,10 +327,10 @@ export default class State {
   #id = ""
   #key = ""
   #data = {}
-  #core
   #status = false
   #isEmpty = true
   #mergeList = []
+  #core
 
   constructor(state, deepValidate=false, isCrypto=false) {
     // validate state
@@ -332,7 +360,11 @@ export default class State {
       ohlcv: this.#data.chart.ohlcv,
       primaryPane: this.#data.primary,
       secondaryPane: this.#data.secondary,
-      datasets: this.#data.datasets
+      datasets: this.#data.datasets,
+      trades: this.#data.trades.data,
+      events: this.#data.events.data,
+      annotations: this.#data.annotations.data,
+      tools: this.#data.tools.data
     }
   }
   get data() { return this.#data }
@@ -635,7 +667,7 @@ export default class State {
       // Do we have trades?
       if (isObject(mTrades)) {
         for (let d in mTrades) {
-          
+          // TODO:
         }
       }
 
@@ -763,21 +795,44 @@ export default class State {
 
   addTrade(t) {
     // validate trade entry
-    const k1 = Object.keys(t)
-    const k2 = Object.keys(TRADE)
-    if (!isObject(t) ||
-        !isArrayEqual(k1, k2)) return false
-    for (let k of k2) {
-      if (typeof t[k] !== TRADE[k]) return false
-    }
+    if (!State.isValidEntry(t, TRADE)) return false
 
     // insert the trade
     const ts = t.timestamp - (t.timestamp % this.time.timeFrameMS)
     const d = new Date(ts)
-          t.dateStr =`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
-    if (!isArray(this.allData.trades[ts]))
-      this.allData.trades[ts] = []
-    this.allData.trades[ts].push(t)
+
+    t.dateStr =`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+
+    this.allData.trades.data.ts[t.timestamp] = t
+    this.allData.trades.data[this.time.timeFrame][ts] = t
+
+    this.#core.emit("state_tradeAdded", t)
+    this.#core.emit("trade_added", t)
+    return true
+  }
+
+  importTrades(data) {
+    if (!isObject(data)) return false
+    for (let ts in data) {
+      if ( 
+          isValidTimestamp(ts*1) &&
+          isArray(data[ts])
+          ) {
+            for (let t of data[ts]) {
+              if (t?.id) t.id = `${t.id}` 
+              if (State.isValidEntry(t, TRADE)) {
+                if (!isObject(this.allData.trades[this.core.time.timeFrame]))
+                this.allData.trades[this.core.time.timeFrame] = {}
+                if (!isArray(this.allData.trades[this.core.time.timeFrame][ts]))
+                this.allData.trades[this.core.time.timeFrame][ts] = []
+                this.allData.trades[this.core.time.timeFrame][ts].push(t)
+              }
+            }
+      }
+      else {
+        this.allData.trades[ts] = data[ts]
+      }
+    }
     return true
   }
 
@@ -792,21 +847,19 @@ export default class State {
 
   addEvent(e) {
     // validate event entry
-    const k1 = Object.keys(e)
-    const k2 = Object.keys(EVENT)
-    if (!isObject(e) ||
-        !isArrayEqual(k1, k2)) return false
-    for (let k of k2) {
-      if (typeof t[k] !== EVENT[k]) return false
-    }
+    if (!State.isValidEntry(e, EVENT)) return false
 
     // insert the event
-    const ts = t.timestamp - (t.timestamp % this.time.timeFrameMS)
+    const ts = t.timestamp - (e.timestamp % this.time.timeFrameMS)
     const d = new Date(ts)
-          e.dateStr =`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
-    if (!isArray(this.allData.events[ts]))
-      this.allData.events[ts] = []
-    this.allData.events[ts].push(e)
+
+    e.dateStr =`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+
+    this.allData.events.data.ts[e.timestamp] = e
+    this.allData.events.data[this.time.timeFrame][ts] = e
+
+    this.#core.emit("state_eventAdded", e)
+    this.#core.emit("event_added", e)
     return true
   }
 
@@ -817,6 +870,17 @@ export default class State {
    */
   removeEvent(e) {
     console.log("TODO: state.removeEvent()")
+  }
+
+  static isValidEntry(e, type) {
+    const k1 = Object.keys(e)
+    const k2 = Object.keys(type)
+    if (!isObject(e) ||
+        !isArrayEqual(k1, k2)) return false
+    for (let k of k2) {
+      if (typeof e[k] !== type[k]) return false
+    }
+    return true
   }
 }
 

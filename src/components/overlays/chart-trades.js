@@ -3,10 +3,12 @@
 
 import Overlay from "./overlay"
 import Trade from "../primitives/trade"
+import State from "../../state"
 import { limit } from "../../utils/number"
 import { debounce } from "../../utils/utilities"
 import { isObject } from "../../utils/typeChecks"
 import { HIT_DEBOUNCE } from "../../definitions/core"
+import { isValidTimestamp } from "../../utils/time"
 
 
 const tradeDialogue = {
@@ -40,6 +42,7 @@ export default class chartTrades extends Overlay {
     super(target, xAxis, yAxis, theme, parent, params)
 
     this.settings = params.settings
+    this.state.importTrades(this.data)
     this.#trade = new Trade(target, theme)
     this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this)
     tradeDialogue.parent = this

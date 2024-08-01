@@ -13,10 +13,13 @@ import { isPromise } from './utils/typeChecks'
 import { talibAPI } from './definitions/talib-api'
 import * as utils from './utils/utilities'
 import Aspect from './scaleX/aspect'
+import { candleW } from './components/primitives/candle'
+import { YAXIS_TYPES } from './definitions/chart'
 
 // export default Chart
 export { 
   Chart, 
+  candleW,
   canvas,
   copyDeep, 
   DOM, 
@@ -32,5 +35,6 @@ export {
   Overlay, 
   Range,
   utils,
-  uid 
+  uid,
+  YAXIS_TYPES,
 }

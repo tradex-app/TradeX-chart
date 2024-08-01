@@ -27,6 +27,7 @@ import { SMA as talibAPI } from "../definitions/talib-api";
   scaleOverlay = false
 
   
+  static version = "1.0"
   static inCnt = 0
   static primaryPane = true
   // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default

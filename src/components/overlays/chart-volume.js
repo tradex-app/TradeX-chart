@@ -3,6 +3,7 @@
 import Overlay from "./overlay"
 import VolumeBar from "../primitives/volume";
 import { bRound, limit } from "../../utils/number";
+import { candleW } from "../primitives/candle";
 
 
 export default class chartVolume extends Overlay {
@@ -31,10 +32,7 @@ export default class chartVolume extends Overlay {
     const offset = this.xAxis.smoothScrollOffset || 0
 
     let w = Math.max(this.xAxis.candleW -1, 1)
-    
-    if (w < 3) w = 1
-    else if (w < 5) w = 3
-    else if (w > 5) w = Math.ceil(w * 0.8)
+        w = candleW(w)
 
     const volume = {
       x: 0 + offset - this.xAxis.candleW,

@@ -3,6 +3,7 @@
 
 import { chartBar } from "../../renderer/chart";
 import { renderRect } from "../../renderer/rect";
+import { candleW } from "./candle";
 
 export default class Histogram {
 
@@ -26,6 +27,7 @@ export default class Histogram {
     for (let d of data) {
       let {w, x, y, zero: z} = d
 
+      w = candleW(w)
       x = x - (w / 2)
 
       if (y < z) {

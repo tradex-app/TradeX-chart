@@ -196,8 +196,6 @@ export default class MainPane extends Component {
     this.#viewDefaultH = isNumber(this.config.secondaryPaneDefaultH)? this.config.secondaryPaneDefaultH : SECONDARYDEFAULTHEIGHT
 
     this.rowsOldH = this.rowsH
-
-    this.log(`${this.#name} instantiated`)
   }
 
   start() {
@@ -240,6 +238,8 @@ export default class MainPane extends Component {
     stateMachineConfig.context = this;
     this.stateMachine = stateMachineConfig
     this.stateMachine.start()
+
+    this.log(`Main Pane ${this.#name} instantiated and running`)
   }
 
   destroy() {
@@ -326,7 +326,7 @@ export default class MainPane extends Component {
     this.on("setRange", this.onSetRange, this);
     this.on("scrollUpdate", this.draw, this)
     this.on("chart_render", this.draw, this)
-    this.on("destroyChartView", this.removeChartPane, this)
+    this.on("chart_paneDestroy", this.removeChartPane, this)
   }
 
   onSetRange() {
@@ -539,15 +539,22 @@ export default class MainPane extends Component {
   setDimensions() {
     this.#elRows.previousDimensions()
 
+    let siblings = this.core.elBody.shadowRoot.children
+    let width = this.core.elBody.offsetWidth
+    for (let s of siblings) {
+      if (s.tagName != "TRADEX-MAIN") width -= s?.offsetWidth || 0
+    }
+    this.element.style.width = `${width}px`
+
     let resizeH = this.#elRows.heightDeltaR
     let chartH = Math.round(this.chartH * resizeH)
-    let width = this.rowsW
+    // let width = this.rowsW
     let height = this.rowsH
     let layerWidth = Math.round(width * ((100 + this.#buffer) * 0.01))
     let dimensions = {
       resizeH: resizeH,
       mainH: this.element.height,
-      mainW: this.element.width,
+      mainW: width,
       rowsH: this.rowsH,
       rowsW: this.rowsW,
     }
@@ -870,6 +877,28 @@ export default class MainPane extends Component {
   }
 
   /**
+   * retrieve indicators by type
+   * @param {string} t - indicator type
+   * @returns {array} - array of indicators of type
+   */
+  getIndicatorsByType(t) {
+    const r = []
+
+    if (!isString(t)) return r
+    for (let p of this.#ChartPanes.values()) {
+      for (let i in p.indicators) {
+        let inst = p.indicators[i].instance
+        if (
+          inst.shortName == t ||
+          inst.libName == t
+        )
+        r.push(inst)
+      }
+    }
+    return r
+  }
+
+  /**
    * retrieve active indicator by ID
    * @param {string} i - indicator ID
    * @returns {Indicator|boolean} - Indicator instance
@@ -881,6 +910,7 @@ export default class MainPane extends Component {
         return p.indicators[i].instance
       }
     }
+    return false
   }
 
   /**

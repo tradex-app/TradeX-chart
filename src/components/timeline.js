@@ -189,6 +189,8 @@ export default class Timeline extends Component {
     stateMachineConfig.context = this
     this.stateMachine = stateMachineConfig
     this.stateMachine.start()
+
+    this.log(`Timeline ${this.#name} instantiated and running`)
   }
 
   destroy() {

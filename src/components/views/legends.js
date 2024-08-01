@@ -98,8 +98,8 @@ template.innerHTML = `
 }
 
 
-.legends.hide .legend.indicator {
-  display:none;
+.hide .indicator {
+  display: none !important;
 }
 
 

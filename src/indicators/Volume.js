@@ -6,6 +6,7 @@ import { bRound, limit } from "../utils/number";
 import { uid } from "../utils/utilities";
 import { YAXIS_TYPES } from "../definitions/chart";
 import { defaultTheme } from "../definitions/style";
+import { candleW } from "../components/primitives/candle";
 
 /**
  * Volume
@@ -33,6 +34,8 @@ export default class Volume extends Indicator {
   #volumeBar
   #primaryPane = "both"
 
+  
+  static version = "1.0"
   static inCnt = 0
   static primaryPane = "both"
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
@@ -128,10 +131,7 @@ export default class Volume extends Indicator {
     const offset = this.xAxis.smoothScrollOffset || 0
 
     let w = Math.max(this.xAxis.candleW -1, 1)
-    
-    if (w < 3) w = 1
-    else if (w < 5) w = 3
-    else if (w > 5) w = Math.ceil(w * 0.8)
+        w = candleW(w)
 
     const volume = {
       x: 0 + offset - this.xAxis.candleW,

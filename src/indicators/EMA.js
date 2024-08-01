@@ -50,6 +50,7 @@ import { EMA as talibAPI } from "../definitions/talib-api";
   scaleOverlay = false
 
 
+  static version = "1.0"
   static inCnt = 0
   static primaryPane = true
   static colours = [

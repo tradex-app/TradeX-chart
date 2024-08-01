@@ -16,6 +16,8 @@ export default class DX extends Indicator {
   precision = 2
   scaleOverlay = true
 
+  
+  static version = "1.0"
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent

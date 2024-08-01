@@ -109,7 +109,19 @@ export default class yAxis extends Axis {
           min = mm[id].data.min //- (mm[id].data.min * 0.2)
           pane = mm[id].data
     }
-    return {max, min, diff: max - min, pane}
+    // account for flat line or zero
+    if (max == min) {
+      if (max == 0) {
+        max = 0.05
+        min = -0.05
+      }
+      else {
+        max = max + (max * 0.05)
+        min = min + (min * 0.05)
+      }
+    }
+    let diff = max - min
+    return {max, min, diff, pane}
   }
 
   yAxisRangeBounds() {
