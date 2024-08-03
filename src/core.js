@@ -887,17 +887,23 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {boolean}
    */
   deleteState(key) {
-    return this.state.delete(key)
+    let r = this.state.delete(key)
+    if (!r) return false
+    this.emit("state_deleted", key)
+    return true
   }
 
   /**
    * export state as an object
    * @param {string} key - state id
    * @param {Object} config 
-   * @returns {Object}
+   * @returns {Object|false}
    */
   exportState(key=this.#state.key, config={}) {
-    return this.state.export(key, config)
+    let r = this.state.export(key, config)
+    if (!r) return false
+    this.emit("state_exported", key)
+    return r
   }
 
   /*============================*/
@@ -1351,6 +1357,15 @@ export default class TradeXchart extends Tradex_chart {
    */
   getIndicator(i) {
     return this.#MainPane.getIndicator(i)
+  }
+
+  /**
+   * retrieve indicators by type
+   * @param {string} t - indicator type
+   * @returns {array} - array of indicators of type
+   */
+  getIndicatorsByType(t) {
+    return this.#MainPane.getIndicatorsByType(t)
   }
 
   /**

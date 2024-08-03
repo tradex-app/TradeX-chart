@@ -26,7 +26,7 @@ export default class Menu {
   static menuList = {}
   static menuCnt = 0
   static class = CLASS_MENUS
-  static name = "Menus"
+  static Name = "Menus"
   static type = "menu"
   static currentActive
 

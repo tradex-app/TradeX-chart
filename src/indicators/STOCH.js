@@ -36,6 +36,7 @@ export default class STOCH extends Indicator {
   checkParamCount = false
 
 
+  static version = "1.0"
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative

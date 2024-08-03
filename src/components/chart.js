@@ -178,7 +178,6 @@ export default class Chart extends Component{
     this.scale = new ScaleBar(this.core, opts)
 
     this.#status = "init"
-    this.log(`${this.name} instantiated`)
   }
 
   set id(id) { this.#id = idSanitize(id) }
@@ -283,6 +282,7 @@ export default class Chart extends Component{
     this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg2)
     this.#ConfigDialogue.start()
     this.#status = "running"
+    this.log(`Chart Pane ${this.name} instantiated and running`)
   }
 
   /**
@@ -323,7 +323,7 @@ export default class Chart extends Component{
   }
 
   remove() {
-    this.emit("destroyChartView", this.id)
+    this.emit("chart_paneDestroy", this.id)
   }
 
   eventsListen() {
@@ -617,7 +617,7 @@ export default class Chart extends Component{
     this.#indicatorDeleteList[id] = true
 
     if (Object.keys(this.indicators).length === 0 && !this.isPrimary)
-      this.emit("destroyChartView", this.id)
+      this.emit("chart_paneDestroy", this.id)
     else {
       this.indicators[id].instance.destroy()
       this.graph.removeOverlay(id)

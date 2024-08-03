@@ -6,7 +6,7 @@ import { uid } from "../../utils/utilities";
 
 export default class Dialogue extends Window {
 
-  static name = "Dialogues"
+  static Name = "Dialogues"
   static type = "dialogue"
   static class = "tradeXdialogue"
 

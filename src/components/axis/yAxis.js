@@ -43,7 +43,7 @@ export default class yAxis extends Axis {
       secondaryMaxMin: {}
     }
   }
-  #yAxisPadding = 1.04
+  #yAxisPadding = 1 //1.04
   #yAxisStep = YAXIS_STEP
   #yAxisDigits = PRICEDIGITS
   #yAxisTicks = 3
@@ -73,7 +73,7 @@ export default class yAxis extends Axis {
   get rangeH() { return this.#range.diff * this.yAxisPadding }
   get yAxisRatio() { return this.getYAxisRatio() }
   get yAxisPrecision() { return this.yAxisCalcPrecision }
-  set yAxisPadding(p) { this.#yAxisPadding = p }
+  set yAxisPadding(p) { if (isNumber(p) || p != 0) this.#yAxisPadding = p }
   get yAxisPadding() { return this.#yAxisPadding }
   set yAxisType(t) { this.#yAxisType = YAXIS_TYPES.includes(t) ? t : YAXIS_TYPES[0] }
   get yAxisType() { return this.#yAxisType }
@@ -109,7 +109,25 @@ export default class yAxis extends Axis {
           min = mm[id].data.min //- (mm[id].data.min * 0.2)
           pane = mm[id].data
     }
-    return {max, min, diff: max - min, pane}
+    // account for flat line or zero
+    if (max == min) {
+      if (max == 0) {
+        max = 0.05
+        min = -0.05
+      }
+      else {
+        max = max + (max * 0.05)
+        min = min + (min * 0.05)
+      }
+    }
+    // add padding
+    if (this.mode != "manual") {
+      max *= this.#yAxisPadding || 1
+      min *= 1 - (this.#yAxisPadding - 1) || 1
+    }
+
+    let diff = max - min
+    return {max, min, diff, pane}
   }
 
   yAxisRangeBounds() {

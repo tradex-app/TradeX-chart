@@ -48,10 +48,7 @@ export default class Candle {
     }
 
     let w = Math.max(data.w -1, 1)
-    
-    if (w < 3) w = 1
-    else if (w < 5) w = 3
-    else if (w > 5) w = Math.ceil(w * 0.8)
+        w = candleW(w)
 
     let hw = Math.max(Math.floor(w * 0.5), 1)
     let h = Math.abs(data.o - data.c)
@@ -217,4 +214,16 @@ export default class Candle {
     coords.length = 0
   }
 }
-  
+
+/**
+ * Scale candle width to create gaps at larger sizes
+ * @export
+ * @param {number} w - candle width in pixels
+ * @return {number}  
+ */
+export function candleW (w) {
+  if (w < 3) w = 1
+  else if (w < 5) w = 3
+  else if (w > 5) w = Math.ceil(w * 0.8)
+  return w
+}

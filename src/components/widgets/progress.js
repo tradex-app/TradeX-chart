@@ -12,7 +12,7 @@ export default class Progress {
   static progressCnt = 0
   static class = CLASS_PROGRESS
   static type = "progress"
-  static name = "Progress"
+  static Name = "Progress"
   static icons = {
     loadingBars,
     loadingSpin

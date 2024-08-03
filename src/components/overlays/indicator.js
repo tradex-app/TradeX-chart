@@ -169,6 +169,7 @@ export default class Indicator extends Overlay {
 
   get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
   set id(id) { this.#ID = idSanitize(new String(id)) }
+  get version() { return `${this.constructor?.version}` }
   get context() { return this.#context }
   get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
   get chartPaneID() { return this.#params.overlay.paneID }
@@ -314,6 +315,34 @@ export default class Indicator extends Overlay {
     // Yes!
     else
       this.chart.remove()
+  }
+
+  /**
+   * build synthetic indicator data from sources other than TALib
+   * @param {function} fn - function to fill target with data
+   * @param {array} target 
+   */
+  dataProxy(fn, target=[]) {
+    const range = this.range
+    const state = this.state
+    const output = this.definition.meta.output
+    const data = []
+    const dummy = new Array(output.length + 1)
+          dummy.fill(0)
+      let length = range.dataLength
+    for (let i=0; i <= length; i++) {
+      dummy[0] = range.data[i][0]
+      data[i] = Array.from(dummy)
+    }
+
+    if (isFunction(fn)) fn(data, state, range)
+
+    // this.core.on("state_tradeAdded")
+
+    this.data.length = 0
+    for (let d of data) {
+      this.data.push(d)
+    }
   }
 
   /**

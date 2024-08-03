@@ -41,6 +41,7 @@ import { YAXIS_TYPES } from "../definitions/chart";
   scaleOverlay = false
 
   
+  static version = "1.0"
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative

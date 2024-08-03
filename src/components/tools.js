@@ -49,8 +49,6 @@ export default class ToolsBar extends Component {
 
   init() {
     this.mount(this.#elTools)
-
-    this.log(`${this.#name} instantiated`)
   }
 
 
@@ -67,6 +65,8 @@ export default class ToolsBar extends Component {
     stateMachineConfig.context = this
     this.stateMachine = stateMachineConfig
     this.stateMachine.start()
+
+    this.log(`Tool Bar ${this.#name} instantiated and running`)
   }
 
   destroy() {

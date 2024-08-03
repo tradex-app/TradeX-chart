@@ -290,6 +290,8 @@ export function getPrecision (value) {
  */
 export function limitPrecision (value, precision) {
 
+  if (value == 0) return "0"
+
   const digits = countDigits(value)
 
   if (isInteger(precision))

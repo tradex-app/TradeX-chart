@@ -45,8 +45,6 @@ export default class UtilsBar extends Component {
     }
     // mount the default or custom utils bar definition
     this.#elUtils.innerHTML = this.#elUtils.defaultNode(this.#utils)
-
-    this.log(`${this.#name} instantiated`)
   }
 
   get name() {return this.#name}
@@ -62,6 +60,7 @@ export default class UtilsBar extends Component {
     this.eventsListen()
     // start state machine
     // this.#stateMachine = new StateMachine(stateMachineConfig, this)
+    this.log(`Utils Bar ${this.#name} instantiated and running`)
   }
 
   destroy() {

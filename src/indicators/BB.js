@@ -32,6 +32,8 @@ export default class BB extends Indicator {
   precision = 2
   scaleOverlay = false
 
+  
+  static version = "1.0"
   static inCnt = 0
   static primaryPane = true
   static defaultStyle = {

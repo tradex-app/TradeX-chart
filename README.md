@@ -93,6 +93,10 @@ chart.start(config)
 </script>
 ```
 
+## TypeScript
+
+Types provided
+
 ## Documentation
 
 Documentation can be found here:
