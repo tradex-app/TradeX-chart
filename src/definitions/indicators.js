@@ -4,13 +4,21 @@
 // Docs - https://hackape.github.io/talib.js/modules/_index_.html
 
 
+import ADX from "../indicators/ADX"
+import ATR from "../indicators/ATR";
 import AROON from "../indicators/AROON";
 import BB from "../indicators/BB"
+import CCI from "../indicators/CCI";
+import CMO from "../indicators/CMO"
 import DX from "../indicators/DX"
 import EMA from "../indicators/EMA"
 import MA from "../indicators/MA"
 import MA_Multi from "../indicators/MA_Multi"
 import MACD from "../indicators/MACD";
+import MFI from "../indicators/MFI";
+import OBV from "../indicators/OBV";
+import PPO from "../indicators/PPO";
+import ROC from "../indicators/ROC";
 import RSI from "../indicators/RSI";
 import SMA from "../indicators/SMA"
 import STOCH from "../indicators/STOCH";
@@ -18,17 +26,25 @@ import STOCHRSI from "../indicators/STOCHRSI";
 import Volume from "../indicators/Volume"
 
 export const IndicatorClasses = {
+  // ADX,
+  ATR,
   AROON,
   BB,
+  CCI,
+  CMO,
   DX,
   EMA,
   MA,
-  MA_Multi,
+  // MA_Multi,
   MACD,
+  MFI,
+  // OBV,
+  PPO,
+  ROC,
   RSI,
   SMA,
-  STOCH,
-  STOCHRSI,
+  // STOCH,
+  // STOCHRSI,
   VOL: Volume,
 };
 
