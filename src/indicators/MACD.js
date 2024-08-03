@@ -5,7 +5,7 @@
 
 import Indicator from "../components/overlays/indicator"
 import { MACD as talibAPI } from "../definitions/talib-api";
-import { YAXIS_TYPES } from "../definitions/chart";
+import { YAXIS_PADDING, YAXIS_TYPES } from "../definitions/chart";
 
  
  export default class MACD extends Indicator {
@@ -45,6 +45,7 @@ import { YAXIS_TYPES } from "../definitions/chart";
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative
+  static yAxisPadding = YAXIS_PADDING
   static colours = [
     "#9C27B0",
     "#9C27B0",
@@ -89,6 +90,10 @@ import { YAXIS_TYPES } from "../definitions/chart";
     MACD.inCnt++
 
     this.init(talibAPI)
+  }
+
+  draw() {
+    return super.draw()
   }
 
 }
