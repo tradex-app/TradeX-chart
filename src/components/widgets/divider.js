@@ -27,7 +27,7 @@ export default class Divider {
   static dividerList = {}
   static divideCnt = 0
   static class = CLASS_DIVIDERS
-  static name = "Dividers"
+  static Name = "Dividers"
   static type = "divider"
 
   static create(widgets, config) {

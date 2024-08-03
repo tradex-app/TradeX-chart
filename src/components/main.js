@@ -845,6 +845,7 @@ export default class MainPane extends Component {
       params.parent = this
       params.title = name
       params.elements = { ...this.elements }
+      params.yAxisPadding = this.core.indicatorClasses[i]?.yAxisPadding || 1
 
       instance = this.addChartPane(params)
       if (!instance) return false

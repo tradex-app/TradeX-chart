@@ -57,7 +57,7 @@ export default class Window {
   static windowList = {}
   static windowCnt = 0
   static class = CLASS_WINDOWS
-  static name = "Windows"
+  static Name = "Windows"
   static type = "window"
   static currentActive = null
   static stylesInstalled = false

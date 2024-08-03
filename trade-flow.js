@@ -5,6 +5,7 @@
 import { Indicator } from "./src"
 import { candleW } from "./src"
 import { YAXIS_TYPES } from "./src";
+import { YAXIS_PADDING } from "./src/definitions/chart";
 
 /**
  * custom indicator class
@@ -15,6 +16,7 @@ export default class TradeFlow extends Indicator {
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative
+  static yAxisPadding = YAXIS_PADDING
   static colours = []
   static defaultStyle = {
     buy: {

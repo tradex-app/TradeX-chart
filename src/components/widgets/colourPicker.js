@@ -7,7 +7,7 @@ import { uid } from "../../utils/utilities";
 
 export default class ColourPicker extends Dialogue {
 
-  static name = "ColourPicker"
+  static Name = "ColourPicker"
   static type = "colourPicker"
   static class = "tradeXcolourPicker"
 

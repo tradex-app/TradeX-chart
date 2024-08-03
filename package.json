@@ -9,14 +9,16 @@
   ],
   "main": "./dist/tradex-chart.umd.js",
   "module": "./dist/tradex-chart.es.js",
+  "types": "./dist/tradex-chart.d.ts",
   "exports": {
     ".": {
       "import": "./dist/tradex-chart.es.js",
-      "require": "./dist/tradex-chart.umd.js"
+      "require": "./dist/tradex-chart.umd.js",
+      "types": "./dist/tradex-chart.d.ts"
     }
   },
   "private": false,
-  "version": "0.149.3",
+  "version": "0.150.0",
   "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",

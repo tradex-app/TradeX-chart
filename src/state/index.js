@@ -821,9 +821,9 @@ export default class State {
             for (let t of data[ts]) {
               if (t?.id) t.id = `${t.id}` 
               if (State.isValidEntry(t, TRADE)) {
-                if (!isObject(this.allData.trades[this.core.time.timeFrame]))
+                if (!isObject(this.allData.trades?.[this.core.time.timeFrame]))
                 this.allData.trades[this.core.time.timeFrame] = {}
-                if (!isArray(this.allData.trades[this.core.time.timeFrame][ts]))
+                if (!isArray(this.allData.trades[this.core.time.timeFrame]?.[ts]))
                 this.allData.trades[this.core.time.timeFrame][ts] = []
                 this.allData.trades[this.core.time.timeFrame][ts].push(t)
               }

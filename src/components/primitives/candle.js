@@ -215,7 +215,12 @@ export default class Candle {
   }
 }
 
-
+/**
+ * Scale candle width to create gaps at larger sizes
+ * @export
+ * @param {number} w - candle width in pixels
+ * @return {number}  
+ */
 export function candleW (w) {
   if (w < 3) w = 1
   else if (w < 5) w = 3

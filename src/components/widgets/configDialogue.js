@@ -10,7 +10,7 @@ import { RGBAHex } from "../../utils/colour";
 
 export default class ConfigDialogue extends Dialogue {
 
-  static name = "ConfigDialogues"
+  static Name = "ConfigDialogues"
   static type = "configDialogue"
   static class = "tradeXconfig"
 

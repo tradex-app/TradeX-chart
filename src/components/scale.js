@@ -3,7 +3,7 @@
 
 import Component from "./component"
 import { YAXIS_TYPE, YAXIS_TYPES } from '../definitions/chart'
-import { isArray, isObject } from '../utils/typeChecks'
+import { isArray, isNumber, isObject } from '../utils/typeChecks'
 import { elementDimPos } from "../utils/DOM"
 import yAxis from "./axis/yAxis"
 import stateMachineConfig from "../state/state-scale"
@@ -105,6 +105,11 @@ export default class ScaleBar extends Component {
       undefined : this.parent.localRange
     
     this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
+
+    this.#yAxis.yAxisPadding = 
+        (isNumber(this.options?.yAxisPadding) &&
+        this.options.yAxisPadding >= 1) ?
+        this.options.yAxisPadding : 1
 
     this.createGraph()
     this.#yAxis.calcGradations()

@@ -16,6 +16,7 @@ export const XAXIS_STEP = 100
 export const YAXIS_STEP = 100
 export const YAXIS_GRID = 16
 export const YAXIS_BOUNDS = 0.3
+export const YAXIS_PADDING = 1.04
 // YAxis type enum
 export class YAXIS_TYPE {
   static default = new YAXIS_TYPE("default")
