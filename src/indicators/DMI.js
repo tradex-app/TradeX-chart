@@ -1,18 +1,18 @@
-// ADX.js
-// Average Directional Movement Indicator
+// PLUS_DI.js
+// Directional Movement Indicator
 // https://hackape.github.io/talib.js/modules/_index_.html#dx
 // 
 
 import Indicator from "../components/overlays/indicator"
-import { ADX as talibAPI } from "../definitions/talib-api";
+import { PLUS_DI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPES } from "../definitions/chart";
 
 
-export default class ADX extends Indicator {
+export default class PLUS_DI extends Indicator {
 
-  get name() { return 'Average Directional Movement Index' }
-  shortName = 'ADX'
-  libName = 'ADX'
+  get name() { return '+Directional Movement Index' }
+  shortName = 'PLUS_DI'
+  libName = 'PLUS_DI'
   precision = 2
   scaleOverlay = true
 
@@ -37,14 +37,14 @@ export default class ADX extends Indicator {
   }
 
   /**
- * Creates an instance of DX.
+ * Creates an instance of PLUS_DI.
    * @param {Object} target - canvas scene
    * @param {Object} xAxis - timeline axis instance
    * @param {Object} yAxis - scale axis instance
    * @param {Object} config - theme / styling
    * @param {Object} parent - chart pane instance that hosts the indicator
    * @param {Object} params - contains minimum of overlay instance
- * @memberof DX
+ * @memberof PLUS_DI
  */
   constructor(target, xAxis=false, yAxis=false, config, parent, params)  {
 
@@ -53,8 +53,5 @@ export default class ADX extends Indicator {
     this.init(talibAPI)
   }
 
-  calcIndicator (indicator, params={}, range, output=this.definition.output) {
-    return super.calcIndicator (indicator, params, range, output) 
-  }
 }
 

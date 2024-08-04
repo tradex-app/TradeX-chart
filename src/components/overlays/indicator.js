@@ -948,7 +948,7 @@ export default class Indicator extends Overlay {
 
 
     // is width valid?
-    if (!isNumber(style[o.name]?.width.value))
+    if (!isNumber(style[o.name]?.width?.value))
       v = 1
     else
       v = style[o.name]?.width.value
@@ -1129,9 +1129,9 @@ export default class Indicator extends Overlay {
     })
   }
 
-  getTimePeriod() {
+  getTimePeriod(definition) {
     let d = 0;
-    let def = this.definition.input
+    let def = definition.input
 
     if ("timePeriod" in def)
       d = def.timePeriod
@@ -1155,10 +1155,10 @@ export default class Indicator extends Overlay {
     else return { timePeriod: step, ...input }
   }
 
-  formatValue(entry) {
+  formatValue(entry, definition) {
     let v = []
     let i = 0
-    for (let o in this.definition.output) {
+    for (let o in definition.output) {
       v[i++] = entry[o][0]
     }
     return v
@@ -1189,7 +1189,7 @@ export default class Indicator extends Overlay {
  * @param {object} output - output definition
  * @returns {array|boolean} - success or failure
  */
-  calcIndicator (indicator, params={}, range, output=this.definition.output) {
+  calcIndicator (indicator, params={}, range, definition=this.definition) {
 
     let indicatorFn;
     if (!this.noCalcCustom(indicator))
@@ -1198,8 +1198,9 @@ export default class Indicator extends Overlay {
       indicatorFn = this.TALib[indicator]
     else return false
 
-    // get the period 
-    let d = this.getTimePeriod()
+    definition = definition || this.definition
+
+    let d = this.getTimePeriod(definition)
     // params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
     let start, end;
     let p = d
@@ -1260,7 +1261,7 @@ export default class Indicator extends Overlay {
       // if (hasNull) return false
 
       entry = indicatorFn(params)
-      value = this.formatValue(entry)
+      value = this.formatValue(entry, definition)
 
       // store entry with timestamp
       data.push([range.value(start + p - 1)[0], ...value])
@@ -1275,7 +1276,7 @@ export default class Indicator extends Overlay {
    * calculate back history if missing
    * @memberof indicator
    */
-  calcIndicatorHistory () {
+  calcIndicatorHistory (calcFn) {
     const calc = () => {
       let od = this.overlay.data
 
@@ -1286,7 +1287,9 @@ export default class Indicator extends Overlay {
       // let pane = (this.isPrimary) ? "primary" : "secondary"
       // this.range.allData[`${pane}Pane`].push()
 
-      const data = this.calcIndicator(this.libName, this.definition.input, this.range);
+      if (!isFunction(calcFn)) calcFn = this.calcIndicator.bind(this)
+
+      const data = calcFn(this.libName, this.definition.input, this.range);
 
       if (data) {
         const d = new Set(data)
