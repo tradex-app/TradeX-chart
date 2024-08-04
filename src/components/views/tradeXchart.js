@@ -5,6 +5,7 @@ import { debounce, idSanitize } from "../../utils/utilities"
 import { isNumber, isObject, isString } from "../../utils/typeChecks"
 import { CSSUNITS } from "../../definitions/core"
 import { UTILSLOCATIONS } from "../../definitions/chart"
+import { defaultConfig } from "../../definitions/config"
 
 import element from "./classes/element"
 import MainPane from "../main"
@@ -103,7 +104,9 @@ export default class tradeXChart extends element {
       this.setDimensions(width, height)
 
       this.resizeObserver = new ResizeObserver(debounce(this.onResized, 100, this))
-      this.resizeObserver.observe(this)      
+      this.resizeObserver.observe(this)
+      
+      this.start(defaultConfig)
     }
   }
 
@@ -269,8 +272,8 @@ export default class tradeXChart extends element {
     switch(pos) {
       case "top":
       case true:
-        this.theme.setProperty("utils.location", "top")
-        this.theme.setProperty("utils.height", UTILSH)
+        this.#theme.setProperty("utils.location", "top")
+        this.#theme.setProperty("utils.height", UTILSH)
         this.#theme.utils.location = "top"
         this.#theme.utils.height = UTILSH
         this.elUtils.style.display = "block"
@@ -281,8 +284,8 @@ export default class tradeXChart extends element {
       case "none":
       case false:
       default:
-        this.theme.setProperty("utils.location", "none")
-        this.theme.setProperty("utils.height", 0)
+        this.#theme.setProperty("utils.location", "none")
+        this.#theme.setProperty("utils.height", 0)
         this.#theme.utils.location = "none"
         this.#theme.utils.height = 0
         this.elUtils.style.display = "none"

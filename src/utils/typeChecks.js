@@ -37,6 +37,14 @@ export function isNumber (v) {
  * @param {*} v
  * @returns {boolean}
  */
+export function isInteger (v) {
+  return (typeof v === 'number') && (Math.abs(v % 1) === 0);
+}
+
+/**
+ * @param {*} v
+ * @returns {boolean}
+ */
 export function isValid (v) {
   return v !== null && v !== undefined
 }
@@ -91,8 +99,20 @@ export function isError (v) {
  */
 export function isClass(v){
   // Class constructor is also a function
-  if(!(v && v.constructor === Function) || v.prototype === undefined)
+  if (!(v && v.constructor === Function) || v.prototype === undefined)
     return false;
+
+  // We have a function and not a class if arguments is a property name
+  if (Object.getOwnPropertyNames(v).includes('arguments'))
+    return false
+  
+  // This is a class that extends other class
+  if (Object.getOwnPropertyNames(v).includes('arguments'))
+    return false
+  
+  // This is a class that extends other class
+  if (Object.getOwnPropertyNames(v).includes('arguments'))
+    return false
   
   // This is a class that extends other class
   if(Function.prototype !== Object.getPrototypeOf(v))
@@ -112,13 +132,28 @@ export function checkType(type, value) {
     case 'array': return isArray(value);
     case 'function': return isFunction(value);
     case 'object': return isObject(value);
+    case 'integer': return isInteger(value);
     case 'number': return isNumber(value);
     case 'valid': return isValid(value);
     case 'boolean': return isBoolean(value);
     case 'string': return isString(value);
+    case 'map': return isMap(value);
     case 'promise': return isPromise(value);
-    case 'Error': return isError(value);
+    case 'error': return isError(value);
     case 'class': return isClass(value);
     default: throw new Error(`No known test for type: ${type}`)
   }
 };
+
+export function typeOf(value) {
+  const types = ["array", "error", "class", "function", "map", "promise", 
+                  "object", "integer", "number", "boolean", "string"]
+  for (let type of types) {
+    try {
+      if (checkType(type, value)) return type
+    }
+    catch (e) {
+      return typeof value
+    }
+  }
+}

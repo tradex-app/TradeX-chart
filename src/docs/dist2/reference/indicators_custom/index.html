@@ -123,7 +123,7 @@ In the Bollinger Band example, if you wanted to silence all labels, use an array
 <span class="line"><span style="color:#6B737C">// proof of concept for user defined indicators</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6B737C">// importing talibAPI is only required if you intend to use the talib functions provided by the chart to calculate your indicator</span></span>
-<span class="line"><span style="color:#F97583">import</span><span style="color:#B392F0"> { Indicator</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> Range</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> talibAPI</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> uid } </span><span style="color:#F97583">from</span><span style="color:#FFAB70"> "tradex-chart"</span><span style="color:#B392F0">;</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#B392F0"> { Indicator</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> Range</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> talibAPI } </span><span style="color:#F97583">from</span><span style="color:#FFAB70"> "tradex-chart"</span><span style="color:#B392F0">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6B737C">/**</span></span>
 <span class="line"><span style="color:#6B737C"> * Indicator - Relative Strength Index</span></span>
@@ -150,11 +150,20 @@ In the Bollinger Band example, if you wanted to silence all labels, use an array
 <span class="line"><span style="color:#B392F0">  };</span></span>
 <span class="line"><span style="color:#6B737C">/* end of TALib properties */</span></span>
 <span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#B392F0">  checkParamCount </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span><span style="color:#B392F0">;</span></span>
+<span class="line"><span style="color:#B392F0">  plots </span><span style="color:#F97583">=</span><span style="color:#B392F0"> [{ key</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> "RSI_1"</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> title</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> " "</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> type</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> "line"</span><span style="color:#B392F0"> }];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">  static</span><span style="color:#B392F0"> inCnt </span><span style="color:#F97583">=</span><span style="color:#F8F8F8"> 0</span><span style="color:#B392F0">;</span></span>
+<span class="line"><span style="color:#6B737C">  // is the indicator displayed on the primary pane with the price history (candles)?</span></span>
+<span class="line"><span style="color:#F97583">  static</span><span style="color:#B392F0"> primaryPane </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span><span style="color:#B392F0">;</span></span>
+<span class="line"><span style="color:#6B737C">  // ["default", "percent", "log"]</span></span>
+<span class="line"><span style="color:#F97583">  static</span><span style="color:#B392F0"> scale </span><span style="color:#F97583">=</span><span style="color:#FFAB70"> "percent"</span><span style="color:#B392F0">;</span></span>
 <span class="line"><span style="color:#6B737C">// default canvas drawing styles</span></span>
 <span class="line"><span style="color:#6B737C">// these can and will be overwritten by any </span></span>
 <span class="line"><span style="color:#6B737C">// matching values passed into constructor via </span></span>
 <span class="line"><span style="color:#6B737C">// params.overlay.settings.style</span></span>
-<span class="line"><span style="color:#B392F0">  #defaultStyle </span><span style="color:#F97583">=</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#F97583">  static</span><span style="color:#B392F0"> defaultStyle </span><span style="color:#F97583">=</span><span style="color:#B392F0"> {</span></span>
 <span class="line"><span style="color:#B392F0">    stroke</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> "#C80"</span><span style="color:#BBBBBB">,</span></span>
 <span class="line"><span style="color:#B392F0">    width</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> "1"</span><span style="color:#BBBBBB">,</span></span>
 <span class="line"><span style="color:#B392F0">    defaultHigh</span><span style="color:#F97583">:</span><span style="color:#F8F8F8"> 75</span><span style="color:#BBBBBB">,</span></span>
@@ -165,13 +174,6 @@ In the Bollinger Band example, if you wanted to silence all labels, use an array
 <span class="line"><span style="color:#B392F0">    lowStroke</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> "#848"</span><span style="color:#BBBBBB">,</span></span>
 <span class="line"><span style="color:#B392F0">    highLowRangeStyle</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> "#22002220"</span><span style="color:#BBBBBB">,</span></span>
 <span class="line"><span style="color:#B392F0">  };</span></span>
-<span class="line"><span style="color:#B392F0">  checkParamCount </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span><span style="color:#B392F0">;</span></span>
-<span class="line"><span style="color:#B392F0">  plots </span><span style="color:#F97583">=</span><span style="color:#B392F0"> [{ key</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> "RSI_1"</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> title</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> " "</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> type</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> "line"</span><span style="color:#B392F0"> }];</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#F97583">  static</span><span style="color:#B392F0"> inCnt </span><span style="color:#F97583">=</span><span style="color:#F8F8F8"> 0</span><span style="color:#B392F0">;</span></span>
-<span class="line"><span style="color:#F97583">  static</span><span style="color:#B392F0"> primaryPane </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span><span style="color:#B392F0">;</span></span>
-<span class="line"><span style="color:#F97583">  static</span><span style="color:#B392F0"> scale </span><span style="color:#F97583">=</span><span style="color:#FFAB70"> "percent"</span><span style="color:#B392F0">;</span></span>
-<span class="line"></span>
 <span class="line"><span style="color:#6B737C">  /**</span></span>
 <span class="line"><span style="color:#6B737C">   * Creates an instance of RSI.</span></span>
 <span class="line"><span style="color:#6B737C">   * </span><span style="color:#F97583">@param</span><span style="color:#B392F0"> {Object}</span><span style="color:#6B737C"> target - canvas scene</span></span>
@@ -185,13 +187,7 @@ In the Bollinger Band example, if you wanted to silence all labels, use an array
 <span class="line"><span style="color:#F97583">  constructor</span><span style="color:#B392F0">(target</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> xAxis </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> yAxis </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> config</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> parent</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> params) {</span></span>
 <span class="line"><span style="color:#B392F0">    super(target</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> xAxis</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> yAxis</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> config</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> parent</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> params);</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> overlay</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> params</span><span style="color:#B392F0">.overlay;</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.id </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> params</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">overlay</span><span style="color:#B392F0">?.id </span><span style="color:#F97583">||</span><span style="color:#B392F0"> uid(</span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.shortName);</span></span>
-<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.defineIndicator(</span><span style="color:#79B8FF">overlay</span><span style="color:#B392F0">?.settings</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> talibAPI[</span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.libName]);</span></span>
-<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.style </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> overlay</span><span style="color:#B392F0">?.</span><span style="color:#79B8FF">settings</span><span style="color:#B392F0">?.style</span></span>
-<span class="line"><span style="color:#F97583">      ?</span><span style="color:#B392F0"> { </span><span style="color:#F97583">...</span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.#defaultStyle</span><span style="color:#BBBBBB">,</span><span style="color:#F97583"> ...</span><span style="color:#79B8FF">overlay</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">settings</span><span style="color:#B392F0">.style }</span></span>
-<span class="line"><span style="color:#F97583">      :</span><span style="color:#B392F0"> { </span><span style="color:#F97583">...</span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.#defaultStyle</span><span style="color:#BBBBBB">,</span><span style="color:#F97583"> ...</span><span style="color:#79B8FF">config</span><span style="color:#B392F0">.style };</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.defineIndicator(</span><span style="color:#79B8FF">params</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">overlay</span><span style="color:#B392F0">?.settings</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> talibAPI[</span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.libName]);</span></span>
 <span class="line"><span style="color:#6B737C">    // calculate back history if missing</span></span>
 <span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.calcIndicatorHistory();</span></span>
 <span class="line"><span style="color:#6B737C">    // enable processing of price stream</span></span>
@@ -207,27 +203,6 @@ In the Bollinger Band example, if you wanted to silence all labels, use an array
 <span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.addLegend();</span></span>
 <span class="line"><span style="color:#6B737C">    // set the max min Y-Axis values if required</span></span>
 <span class="line"><span style="color:#6B737C">    // this.chart.setLocalRange(0, 150)</span></span>
-<span class="line"><span style="color:#B392F0">  }</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6B737C">  /** </span></span>
-<span class="line"><span style="color:#6B737C">   * Where can this indicator be displayed?</span></span>
-<span class="line"><span style="color:#6B737C">   * true - on the primary pane that displays the price history (candles) (eg. EMA)</span></span>
-<span class="line"><span style="color:#6B737C">   * false - on secondary panes as a stand alone indicator (eg. RSI)</span></span>
-<span class="line"><span style="color:#6B737C">   * "both" - on any chart pane</span></span>
-<span class="line"><span style="color:#6B737C">   * </span><span style="color:#F97583">@readonly</span></span>
-<span class="line"><span style="color:#6B737C">   * </span><span style="color:#F97583">@returns</span><span style="color:#B392F0"> {boolean|string}</span><span style="color:#6B737C"> - true, false, "both"</span></span>
-<span class="line"><span style="color:#6B737C">  */</span></span>
-<span class="line"><span style="color:#F97583">  get</span><span style="color:#B392F0"> primaryPane() {</span></span>
-<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> RSI14</span><span style="color:#B392F0">.primaryPane;</span></span>
-<span class="line"><span style="color:#B392F0">  }</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6B737C">  /**</span></span>
-<span class="line"><span style="color:#6B737C">   * return default drawing styling for indicator's canvas</span></span>
-<span class="line"><span style="color:#6B737C">   * </span><span style="color:#F97583">@readonly</span></span>
-<span class="line"><span style="color:#6B737C">   * </span><span style="color:#F97583">@returns</span><span style="color:#B392F0"> {object}</span></span>
-<span class="line"><span style="color:#6B737C">   */</span></span>
-<span class="line"><span style="color:#F97583">  get</span><span style="color:#B392F0"> defaultStyle() {</span></span>
-<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.#defaultStyle;</span></span>
 <span class="line"><span style="color:#B392F0">  }</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6B737C">  /**</span></span>

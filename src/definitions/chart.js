@@ -15,14 +15,26 @@ export const XAXIS_STEP = 100
 
 export const YAXIS_STEP = 100
 export const YAXIS_GRID = 16
-export const YAXIS_TYPES = ["default", "percent", "log"]
 export const YAXIS_BOUNDS = 0.3
+export const YAXIS_PADDING = 1.04
+// YAxis type enum
+export class YAXIS_TYPE {
+  static default = new YAXIS_TYPE("default")
+  static percent = new YAXIS_TYPE("percent")
+  static relative = new YAXIS_TYPE("relative")
+  static log = new YAXIS_TYPE("log")
+
+  constructor(name) {
+    this.name = name
+  }
+}
+export const YAXIS_TYPES = Object.keys(YAXIS_TYPE)
 
 export const INTITIALCNT = 30
 export const LIMITFUTURE = 200
 export const LIMITPAST = 200
 export const MINCANDLES = 20
-export const MAXCANDLES = 4096
+export const MAXCANDLES = 1920
 export const MAXGRADSPER = 75
 export const BUFFERSIZE = 5  // %
 

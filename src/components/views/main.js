@@ -30,14 +30,14 @@ template.innerHTML = `
   tradex-rows {
     position:relative;
     overflow: hidden;
-    width: calc(100% - ${SCALEW}px);
+    width: 100%;
     height: calc(100% - ${TIMEH}px);
     border: 1px solid;
     border-color: var(--txc-border-color, ${GlobalStyle.COLOUR_BORDER}); 
   }
   tradex-time {
     position: relative;
-    width: calc(100% - ${SCALEW}px);
+    width: 100%;
     height: ${TIMEH}px;
     overflow: hidden;
     margin-left: 1px;
@@ -105,11 +105,11 @@ export default class tradeXMain extends element {
 
   setMain() {
     let timeH = (isNumber(this.#theme?.time?.height)) ? this.#theme.time.height : TIMEH
-    let offset = (this.#theme.tools.location == "none") ? 60 : 0
+    // let offset = (this.#theme.tools.location == "none") ? 60 : 0
     this.rows.style.height = `calc(100% - ${timeH}px)`
-    this.rows.style.left = `${offset}px`
-    this.time.style.left = `${offset}px`
-    this.viewport.style.left = `${offset}px`
+    // this.rows.style.left = `${offset}px`
+    // this.time.style.left = `${offset}px`
+    // this.viewport.style.left = `${offset}px`
   }
 
 }

@@ -3,13 +3,16 @@
 
 import { defaultTheme, TX_MAXH, TX_MAXW } from "./style"
 import { MAX_CRYPTO_PRECISION } from "./core"
+// import * as talib from "talib-web/lib/index.esm"
+// // import talib from '../wasm/index.esm'
+// import wasm from '../wasm/talib.wasm.dataURI'
 
-const title = "Empty"
+export const defaultTitle = "Empty"
 
 export const defaultConfig = {
   id: undefined,
-  title: title,
-  symbol: title,
+  title: defaultTitle,
+  symbol: defaultTitle,
   width: TX_MAXW,
   height: TX_MAXH,
   utils: {},
@@ -21,7 +24,7 @@ export const defaultConfig = {
   theme: defaultTheme,
   watermark: {
     display: false,
-    text: title
+    text: defaultTitle
   },
   trades: { 
     display: true,

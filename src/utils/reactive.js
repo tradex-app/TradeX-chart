@@ -41,7 +41,8 @@ export function ref(v) {
 }
 
 export function watch(v, cb) {
-  if (isObject(v) && "__observer__" in v && typeof v.__observer__ === "function") {
+  if (isObject(v) && "__observer__" in v && 
+      typeof v.__observer__ === "function") {
     v.__observer__(cb)
   }
   else

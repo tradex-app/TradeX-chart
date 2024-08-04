@@ -49,9 +49,9 @@ export default class graph {
   get parent() { return this.#parent }
   get core() { return this.#core }
   get config() { return this.#config }
-  set width(w) { this.setWidth(w) }
+  // set width(w) { this.setWidth(w) }
   get width() { return this.#elParent.width }
-  set height(h) { this.setHeight(h) }
+  // set height(h) { this.setHeight(h) }
   get height() { return this.#elParent.height }
   get dimensions() { return this.#elParent.dimensions }
   set layerWidth(w) { this.#layerWidth = w || this.#elParent.width }
@@ -62,10 +62,10 @@ export default class graph {
   get data() { return this.#core.chartData }
   get range() { return this.#core.range }
   get stream() { return this.#core.stream }
-  get TimeLine() { return this.#core.TimeLine }
-  get xAxis() { return this.#core.TimeLine.xAxis }
-  get Scale() { return this.#parent.Scale }
-  get yAxis() { return this.#parent.Scale.yAxis }
+  get Timeline() { return this.#core.Timeline }
+  get xAxis() { return this.#core.Timeline.xAxis }
+  get Scale() { return this.#parent.scale }
+  get yAxis() { return this.#parent.scale.yAxis }
   get viewport() { return this.#viewport }
   get overlays() { return this.#overlays }
 
@@ -76,7 +76,7 @@ export default class graph {
 
   /**
    * set dimensions
-   * @param {nunber} w - viewport width
+   * @param {number} w - viewport width
    * @param {number} h - viewport height
    * @param {number} lw - layer width, independent width to allow for scroll buffer
    * @memberof graph

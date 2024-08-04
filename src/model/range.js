@@ -1,22 +1,27 @@
 // range.js
 
 import TradeXchart from "../core"
-import { ms2Interval } from "../utils/time"
-import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS, INTITIALCNT } from "../definitions/chart"
-import { isNumber, isObject, isString } from "../utils/typeChecks"
+import { ms2Interval, TimeData } from "../utils/time"
+import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS, INTITIALCNT, DEFAULT_TIMEFRAME } from "../definitions/chart"
+import { isInteger, isNumber, isObject, isString } from "../utils/typeChecks"
 import { bRound, limit } from "../utils/number"
+import { diff } from "../utils/utilities"
 // import WebWorker from "./webWorkers"
 // import WebWorker from "./webWorkers4"
 
 export class Range {
 
+  #core
+  #worker
+  #init = true
+  #indexed = false
   #interval = DEFAULT_TIMEFRAMEMS
-  #intervalStr = "1s"
+  #intervalStr = DEFAULT_TIMEFRAME
   indexStart = 0
   indexEnd = LIMITFUTURE
   valueMin = 0
-  valueMax = 0
-  valueDiff = 0
+  valueMax = 1
+  valueDiff = 1
   volumeMin = 0
   volumeMax = 0
   volumeDiff = 0
@@ -24,18 +29,19 @@ export class Range {
   valueMaxIdx = 0
   volumeMinIdx = 0
   volumeMaxIdx = 0
+  secondaryMaxMin = {}
   old = {}
-  initialCnt = INTITIALCNT
-  limitFuture = LIMITFUTURE
-  limitPast = LIMITPAST
-  minCandles = MINCANDLES
-  maxCandles = MAXCANDLES
-  yAxisBounds = YAXIS_BOUNDS
-  rangeLimit = LIMITFUTURE
+  #initialCnt = INTITIALCNT
+  #limitFuture = LIMITFUTURE
+  #limitPast = LIMITPAST
+  #minCandles = MINCANDLES
+  #maxCandles = 
+      this.#core?.MainPane?.graph?.width || 
+      this.#core?.parentElement.clientWidth || 
+      MAXCANDLES;
+  #yAxisBounds = YAXIS_BOUNDS
   anchor
-  #core
-  #worker
-  #init = true
+
 
   /**
    * Creates an instance of Range.
@@ -51,8 +57,22 @@ export class Range {
     this.#init = true;
     this.setConfig(config)
     this.#core = config.core;
-    start = (isNumber(start)) ? start : 0
-    end = (isNumber(end)) ? end : this.data.length-1
+
+    // initial range length
+    this.#initialCnt = 
+      this.#core.config?.range?.initialCnt || 
+      config.data?.initialCnt ||
+      this.#initialCnt;
+
+    // start sanity check
+    if (!isInteger(start) || this.isPastLimit(start))
+      start = this.data.length - this.#initialCnt
+    // end sanity check
+    if (!isInteger(end) || this.isFutureLimit(end))
+      end = this.data.length
+    // range length sanity check
+    if (end - start > this.#maxCandles)
+      end = end - ((end - start) - this.#maxCandles)
 
     const MaxMinPriceVolStr = `
     (input) => {
@@ -66,9 +86,9 @@ export class Range {
 
     // no data - use provided time frame / interval
     if (this.data.length == 0) {
-      let ts = Date.now()
-      start = 0
-      end = this.rangeLimit
+      let ts = Date.now();
+      start = this.rangeLimit * -2
+      end = this.rangeLimit * 2
       this.#interval = tf
       this.#intervalStr = ms2Interval(this.interval)
       this.anchor = ts - (ts % tf) // - (this.limitPast * this.#interval)
@@ -92,9 +112,9 @@ export class Range {
     this.set(start, end)
   }
 
-  get allData () { return this.#core.allData }
+  get allData () { return this.#core?.state.allData }
   get data () { return this.allData?.data || [] }
-  get dataLength () { return (this.allData?.data.length == 0) ? 0 : this.allData.data.length - 1 }
+  get dataLength () { return (!!this.allData?.data.length) ? this.allData.data.length - 1 : 0 }
   get Length () { return this.indexEnd - this.indexStart }
   get timeDuration () { return this.timeFinish - this.timeStart }
   get timeMin () { return this.value(this.indexStart)[0] }
@@ -106,9 +126,33 @@ export class Range {
   get interval () { return this.#interval }
   set intervalStr (i) { this.#intervalStr = i }
   get intervalStr () { return this.#intervalStr }
+  get timeFrame () { return this.#intervalStr }
+  get timeFrameMS () { return this.#interval }
+  get indexed () { return this.#indexed }
+  get pastLimitIndex () { return this.limitPast * -1 }
+  get futureLimitIndex () { return this.dataLength + this.limitFuture - 1 }
+  set initialCnt (c) { if (isInteger(c)) this.#initialCnt = c }
+  get initialCnt () { return this.#initialCnt }
+  get limitFuture () { return this.#limitFuture }
+  get limitPast () { return this.#limitPast }
+  get minCandles () { return this.#minCandles }
+  get maxCandles () { return this.#maxCandles }
+  get yAxisBounds () { return this.#yAxisBounds }
+  get rangeLimit () { return this.#limitFuture }
+  get diff () { return this.max - this.min }
 
   end() {
     // WebWorker.destroy(this.#worker.id)
+  }
+
+  isFutureLimit(idx=this.indexEnd) {
+    if (!isInteger(idx)) return
+    return (idx > this.futureLimitIndex)
+  }
+
+  isPastLimit(idx=this.indexStart) {
+    if (!isInteger(idx)) return
+    return (idx < this.pastLimitIndex)
   }
 
   /**
@@ -119,15 +163,15 @@ export class Range {
    * @returns {boolean} - success or failure
    * @memberof Range
    */
-  set (start=0, end=this.dataLength, max=this.maxCandles, config) {
-    if (!isNumber(start) || 
-        !isNumber(end) ||
-        !isNumber(max)) return false
+  set (start=0, end=this.dataLength, max=this.maxCandles) {
+    if (!isInteger(start) || 
+        !isInteger(end) ||
+        !isInteger(max)) return false
     // integer guard, prevent decimals
     start = start | 0
     end = end | 0
     max = max | 0
-    max = limit(max, this.minCandles, this.maxCandles)
+    max = limit( max, this.minCandles, this.maxCandles )
 
     // check and correct start and end argument order
     if (start > end) [start, end] = [end, start]
@@ -152,9 +196,9 @@ export class Range {
     inOut -= this.Length
 
     let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this})
-    
     this.setMaxMin(maxMin)
-    this.setConfig(config)
+    this.setConfig({maxCandles: max})
+    this.maxMinDatasets()
 
     // if (this.#init || this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
     //   this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
@@ -186,12 +230,12 @@ export class Range {
   setConfig(config) {
     if (!isObject(config)) return false
 
-    this.initialCnt = (isNumber(config?.initialCnt)) ? config.initialCnt : INTITIALCNT;
-    this.limitFuture = (isNumber(config?.limitFuture)) ? config.limitFuture : LIMITFUTURE;
-    this.limitPast = (isNumber(config?.limitPast)) ? config.limitPast : LIMITPAST;
-    this.minCandles = (isNumber(config?.minCandles)) ? config.minCandles : MINCANDLES;
-    this.maxCandles = (isNumber(config?.maxCandles)) ? config.maxCandles : MAXCANDLES;
-    this.yAxisBounds = (isNumber(config?.yAxisBounds)) ? config.yAxisBounds : YAXIS_BOUNDS;
+    this.#initialCnt = (isInteger(config?.initialCnt)) ? config.initialCnt : INTITIALCNT;
+    this.#limitFuture = (isInteger(config?.limitFuture)) ? config.limitFuture : LIMITFUTURE;
+    this.#limitPast = (isInteger(config?.limitPast)) ? config.limitPast : LIMITPAST;
+    this.#minCandles = (isInteger(config?.minCandles)) ? config.minCandles : MINCANDLES;
+    this.#maxCandles = (isInteger(config?.maxCandles)) ? config.maxCandles : MAXCANDLES;
+    this.#yAxisBounds = (isNumber(config?.yAxisBounds)) ? config.yAxisBounds : YAXIS_BOUNDS;
   }
 
   setMaxMin ( maxMin ) {
@@ -206,7 +250,7 @@ export class Range {
    * return value at index
    * @param {number} index - price history index, out of bounds will return null filled entry
    * @param {string} id - defaults to returning chart price history 
-   * @returns {array}
+   * @returns {array|null}
    */
   value ( index, id="chart" ) {
 
@@ -218,7 +262,7 @@ export class Range {
       if (!data) return null
     }
     // return last value as default
-    if (!isNumber(index)) index = data.length - 1
+    if (!isInteger(index)) index = data.length - 1
   
     let v = data[index]
     if (v !== undefined) return v
@@ -247,62 +291,55 @@ export class Range {
    * return value by timestamp
    * @param {number} ts
    * @param {string} id
-   * @returns {*}  
+   * @returns {array}  
    * @memberof Range
    */
   valueByTS ( ts, id="" ) {
-    if (!isNumber(ts) || !isString(id)) return false
+    if (!isInteger(ts) || !isString(id)) return false
 
     const idx = this.getTimeIndex(ts)
+      let value;
 
     switch (id) {
-      case "chart": 
-
-        break;
+      case "chart": break;
       case "primary": break;
       case "secondary": break;
       case "dataset": break;
       case "all": break;
       default: 
-        if (id.length === 0) return this.value(idx)
+        if (id.length === 0) value = this.value(idx)
         else {
           const idParts = id.split('_')
         }
         break;
     }
+    return value
   }
 
   /**
    * return data for id
-   * @param {string} id
-   * @returns {Array}  
+   * @param {string} [id="chart"]
+   * @returns {array|boolean}  
    * @memberof Range
    */
-  getDataById(id) {
+  getDataById(id="chart") {
     if (!isString(id)) return false
 
-    const idParts = id.split('_')
+    if (id == "chart") return this.data
 
-    switch (idParts[1]) {
-      case "chart": 
-        return this.data;
-      case "primary":
-        for (let o of this.allData.primaryPane) {
-          if (idParts[2] in o) return o[idParts[2]]
-        }
-        return false;
-      case "secondary":
-        for (let o of this.allData.secondaryPane) {
-          if (idParts[2] in o) return o[idParts[2]]
-        }
-        return false;
-      case "datasets":
-        for (let o of this.allData.datasets) {
-          if (idParts[2] in o) return o[idParts[2]]
-        }
-      return false;
-      default: return false
+    const datas = [
+      this.allData.primaryPane,
+      this.allData.secondaryPane,
+      this.allData.datasets
+    ]
+
+    for (let data of datas) {
+      for (let entry of data) {
+        if (id == entry?.id) return entry.data
+      }
     }
+
+    return false
   }
 
   /**
@@ -311,7 +348,7 @@ export class Range {
    * @returns {number}
    */
    getTimeIndex (ts) {
-    if (!isNumber(ts)) return false
+    if (!isInteger(ts)) return false
     ts = ts - (ts % this.interval)
   
     let x = (this.data.length > 0) ? this.data[0][0] : this.anchor
@@ -362,22 +399,20 @@ export class Range {
 
   /**
    * Find price maximum and minimum, volume maximum and minimum
-   * @param {Array} data
-   * @param {number} [start=0]
-   * @param {number} [end=data.length-1]
+   * @param {object} input
    * @returns {Object}  
    */
    maxMinPriceVol ( input ) {
     let {data, start, end, that} = {...input}
     let buffer = bRound(this.#core.bufferPx / this.#core.candleW)
+    let l = data?.length-1
 
-    buffer = (isNumber(buffer)) ? buffer : 0
-    start = (isNumber(start)) ? start - buffer : 0
+    buffer = (isInteger(buffer)) ? buffer : 0
+    start = (isInteger(start)) ? start - buffer : 0
     start = (start > 0) ? start : 0
+    end = (isInteger(end)) ? end : l
 
-    end = (typeof end === "number") ? end : data?.length-1
-
-    if (data.length == 0) {
+    if (l < 0) {
       return {
         valueLo: 0,
         valueHi: 1,
@@ -391,7 +426,6 @@ export class Range {
         volumeMaxIdx: 0,
       }
     }
-    let l = data.length - 1
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
 
@@ -405,7 +439,7 @@ export class Range {
     let volumeMinIdx = i
     let volumeMaxIdx = i
 
-    while(i++ < c) {
+    while (i++ < c) {
       if (data[i][3] < valueMin) {
         valueMin = data[i][3]
         valueMinIdx = i
@@ -453,6 +487,109 @@ export class Range {
     }
   }
 
+  maxMinDatasets() {
+    if (this.allData.secondaryPane.length == 0) return
+
+    let old = Object.keys(this.secondaryMaxMin) || []
+
+    // iterate over secondary panes
+    for (let p of this.allData.secondaryPane) {
+      let index = old.indexOf(p.id);
+      let input = {
+        data: p.data,
+        start: this.indexStart,
+        end: this.indexEnd,
+        that: this
+      }
+      // current or new entry
+      this.secondaryMaxMin[p.id] = this.maxMinData(input)
+      // leave only old entries to remove
+      if (index !== -1) {
+        old.splice(index, 1);
+      }
+
+    }
+    // clean up old entries
+    for (let del of old) {
+      delete this.secondaryMaxMin[del]
+    }
+    
+  }
+
+  /**
+   * Find data maximum and minimum for indicators or datasets
+   * expects [timestamp, value0, ...]
+   * @param {object} input
+   * @returns {Object}  
+   */
+  maxMinData (input) {
+    let {data, start, end, that} = {...input}
+    let buffer = bRound(this.#core.bufferPx / this.#core.candleW)
+    let l = data.length-1
+    let x = this.dataLength - data.length
+    let f = data[0]?.length - 1 || 0
+    const r = {}
+
+    // create default max min for indicator outputs
+    for (let g = f; g > 0; g--) {
+      r[`data${g}`] = {
+        min: 0,
+        max: 1,
+        minIdx: 0,
+        maxIdx: 0,
+        diff: 1
+      }
+    }
+
+    buffer = (isInteger(buffer)) ? buffer : 0
+    start = (isInteger(start)) ? start - buffer : 0
+    start = (start > 0) ? start - x : 0
+    end = (isInteger(end)) ? end - x : l
+
+    if (l < 0 || data[0].length == 0) 
+      return r
+
+    let i = limit(start, 0, l)
+    let c = limit(end, 0, l)
+    let j, v, min, max, diff, tMin, tMax;
+
+    // iterate over indicator outputs
+    for (let d in r) {
+      max = data[i][f]
+      min = data[i][f]
+      j = i
+
+      // iterate over range for indicator output
+      while (j++ < c) {
+        v = data[j][f]
+        if (v <= min) {
+          r[d].min = v
+          r[d].minIdx = j
+          min = v
+        }
+        if (v >= max) {
+          r[d].max = v
+          r[d].maxIdx = j
+          max = v
+        }
+      }
+
+      if (tMin === undefined || min < tMin) tMin = min
+      if (tMax === undefined || max > tMax) tMax = max
+
+      diff = r[d].max - r[d].min
+      r[d].diff = (!isNaN(diff)) ? diff : 0
+      --f
+    }
+    // max min totals for all outputs
+    r.data = {
+      min: tMin,
+      max: tMax,
+      diff: tMax - tMin
+    }
+    return r
+  }
+
   snapshot(start, end) {
     return {
       snapshot: true,
@@ -472,18 +609,6 @@ export class Range {
     }
   }
 } // end class
-
-
-export function rangeOnchartValue( range, indicator, index ) {
-  const len = range.primary[indicator].length - 1
-  const value = null
-}
-
-export function rangeOffchartValue( range, indicator, index ) {
-}
-
-export function rangeDatasetValue( range, indicator, index ) {
-}
 
 /**
  * Detects candles interval
@@ -507,23 +632,35 @@ export function detectInterval(ohlcv) {
 
 /**
  * Calculate the index for a given time stamp
- * @param {Object} time - time object provided by core
- * @param {number} timeStamp 
- * @returns {number}
+ * @param {TimeData} time - TimeData instance provided by core
+ * @param {number} timeStamp
+ * @returns {number|boolean}
  */
 export function calcTimeIndex(time, timeStamp) {
-  if (!isNumber(timeStamp)) return false
+  if (!(time instanceof TimeData)) return false
+
+  const data = time.range.data || []
+  const len = data.length
+
+  if (!isInteger(timeStamp)) {
+    if (!isInteger(data[len-1][0]))
+      timeStamp = Date.now()
+    else
+      timeStamp = data[len-1][0]
+  }
 
   let index
   let timeFrameMS = time.timeFrameMS
   timeStamp = timeStamp - (timeStamp % timeFrameMS)
 
-  if (timeStamp === time.range.data[0][0])
+  if (data.length === 0)
+    index = false
+  else if (timeStamp === data[0][0])
     index = 0
-  else if (timeStamp < time.range.data[0][0]) 
-    index = ((time.range.data[0][0] - timeStamp) / timeFrameMS) * -1
+  else if (timeStamp < data[0][0]) 
+    index = Math.floor((data[0][0] - timeStamp) / timeFrameMS) * -1
   else 
-    index = (timeStamp - time.range.data[0][0]) / timeFrameMS
+    index = Math.floor((timeStamp - data[0][0]) / timeFrameMS)
 
   return index
 }

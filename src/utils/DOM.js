@@ -348,11 +348,14 @@ export function getStyle(el, styleProp) {
   if (isString(el)) x = document.getElementById(el);
   else if (isElement(el)) x = el;
   else return false;
+  const defaultView = (x.ownerDocument || document).defaultView;
   if (!isString(styleProp)) return false;
-  if ("getComputedStyle" in navigator)
+  if (defaultView && defaultView.getComputedStyle) {
+    styleProp = styleProp.replace(/([A-Z])/g, "-$1").toLowerCase(); 
     y = document.defaultView
       .getComputedStyle(x, null)
       .getPropertyValue(styleProp);
+  }
   else if (x.currentStyle) y = x.currentStyle[styleProp];
   return y;
 }
@@ -431,9 +434,8 @@ export function findTargetParentWithClass(el, selector) {
 
 export function htmlInput(i, o) {
   let id = (isString(o?.entry)) ? o?.entry : ""
-  let label = (isString(o?.label)) ? o?.label : id || ""
-
-  let input = `<label for="${id}">${label}</label><input id="${id}" class="subject" `
+  let label = (isString(i)) ? `<label for="${id}">${i}</label>` : ``
+  let input = `${label}<input id="${id}" class="subject" `
 
   for (let p in o) {
     // add valid HTML element attributes
@@ -447,10 +449,20 @@ export function htmlInput(i, o) {
     else {
 
     }
-
   }
-
   return input += `>\n`
+}
+
+export function htmlSelect(i, o) {
+  let id = (isString(o?.entry)) ? o?.entry : ""
+  let label = (isString(i)) ? `<label for="${id}">${i}</label>` : ``
+  let options = ""
+
+  for (let opt in o?.options) {
+    options += `<option value="${o.options[opt]}">${opt}</option>`
+  }
+  let input = `${label}<select id="${id}" class="subject">${options}</select>\n`
+  return input
 }
 
 export default {

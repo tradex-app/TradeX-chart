@@ -9,14 +9,16 @@
   ],
   "main": "./dist/tradex-chart.umd.js",
   "module": "./dist/tradex-chart.es.js",
+  "types": "./dist/tradex-chart.d.ts",
   "exports": {
     ".": {
       "import": "./dist/tradex-chart.es.js",
-      "require": "./dist/tradex-chart.umd.js"
+      "require": "./dist/tradex-chart.umd.js",
+      "types": "./dist/tradex-chart.d.ts"
     }
   },
   "private": false,
-  "version": "0.142.7",
+  "version": "0.151.0",
   "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",
@@ -26,9 +28,9 @@
     "demo": "vite build && vite serve --open /demo.html"
   },
   "devDependencies": {
-    "jsdoc-to-markdown": "^8.0.0",
+    "jsdoc-to-markdown": "latest",
     "rollup-plugin-cleanup": "^3.2.1",
-    "vite": "^5.0.10"
+    "vite": "latest"
   },
   "dependencies": {
     "mjolnir.js": "^2.7.1",

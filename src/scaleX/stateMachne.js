@@ -59,13 +59,15 @@ export default class StateMachine {
 
   notify(event, data) {
 
+    if (!isObject(this.#config)) return false
+
     this.#event = event
     this.#eventData = data
     const currStateConfig = this.#config.states[this.#state]
       let destTransition = currStateConfig.on[event]
     if ( !destTransition 
       || !isFunction(destTransition.action)
-      || this.#status !== "running") {
+      || (this.#status !== "running" && this.#status !== "await")) {
       return false
     }
     let cond = destTransition?.condition?.type || destTransition?.condition || false
@@ -159,7 +161,11 @@ export default class StateMachine {
   }
 
   #unsubscribe() {
-    this.#core.hub.expunge(this.context)
+
+    const events = this.#events.values()
+    for (let e of events) {
+      this.#core.off(e.topic, e.cb, this.context)
+    }
     this.#events.clear()
   }
 

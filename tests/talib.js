@@ -1,11 +1,11 @@
-import * as talib from 'talib-web/lib/index.esm'
-import data from '../../data/1minute.js'
+import * as talib from '../node_modules/talib-web/lib/index.esm'
+import data from '../data/1minute.js'
 
-const wasm = "../node_modules/talib-web/lib/talib.wasm"
+const wasm = "node_modules/talib-web/lib/talib.wasm"
 
 (async () => {
   try {
-    await talib.init(txCfg.wasm);
+    await talib.init(wasm);
   } catch (e) {
     console.error(e)
   }

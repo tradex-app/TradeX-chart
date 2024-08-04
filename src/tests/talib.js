@@ -1,7 +1,7 @@
-import * as talib from '../node_modules/talib-web/lib/index.esm'
-import data from '../data/1minute.js'
+import * as talib from '../../node_modules/talib-web/lib/index.esm'
+import data from '../../data/1minute.js'
 
-const wasm = "../node_modules/talib-web/lib/talib.wasm"
+const wasm = "../../node_modules/talib-web/lib/talib.wasm"
 
 (async () => {
   try {

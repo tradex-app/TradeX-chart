@@ -10,10 +10,15 @@ import decimals from './data/ohlcv_1d_IMPT'
 import btcusdt_15min from './data/btcusdt_15min'
 // import state4 from './data/seconds.js'
 // import state from './data/seconds-indicator'
+import tradesTestState from './data/trades-test-state.js'
+
 import TEST from './custom-indicator'
+import DblMA from './custom-dbl-ma.js'
+import DblMA2 from './custom-dbl-ma2.js'
 import DMI from './DMI'
 import CustomOverlay from './custom-overlay'
 import chartDCA from './chart-dca'
+import TradeFlow from './trade-flow.js'
 
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
@@ -129,6 +134,27 @@ let state5 = {
     }
   ]
 }
+let state9 = {
+  "ohlcv": [
+
+  ],
+primary: [
+  {
+    "name": "SMA, 5",
+    "type": "SMA",
+    "data": [],
+    "settings": {timePeriod: 5}
+  }
+],
+"secondary": [
+  {
+    "name": "RSI, 20",
+    "type": "RSI",
+    "data": [],
+    "settings": {timePeriod: 20}
+  },
+]
+}
 
 // let rangeStartTS = 1558429200000 // 21/05/2019, 11:00:00 - 1 hour price
 // let rangeStartTS = 1663059600000 // seconds price
@@ -224,6 +250,7 @@ const config1 = {
     indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
   }
 }
+window.config1 = config1
 const config2 = {
   id: "TradeX_test",
   title: "TEST/USDT",
@@ -275,6 +302,8 @@ const config2 = {
   state: state2,
   progress: {loading:{}}
 }
+window.config2 = config2
+
 const config3 = {
   id: "TradeX_Blue",
   title: "BTC/USDT",
@@ -286,6 +315,7 @@ const config3 = {
   timeFrame: "1m",
   range: {
     startTS: rangeStartTS,
+    limitFuture: 10,
   },
   theme: {
     candle: {
@@ -368,6 +398,8 @@ const config3 = {
 
   }
 }
+window.config3 = config3
+
 const config4 = {
   id: "TradeX_test",
   title: "FUN/USDT",
@@ -431,6 +463,8 @@ const config4 = {
   wasm: wasm,
   state: state4
 }
+window.config4 = config4
+
 const config5 = {
   id: "Midnight",
   title: "ETH/USDT",
@@ -439,7 +473,7 @@ const config5 = {
   // height: 800,
   utils: {},
   tools: {},
-  timeFrame: "5m",
+  timeFrame: "1m",
   range: {
     startTS: rangeStartTS,
   },
@@ -531,6 +565,8 @@ const config5 = {
   talib: talib,
   wasm: wasm,
 }
+window.config5 = config5
+
 const config6 = {
   id: "Midnight",
   title: "BTC/USDT",
@@ -629,6 +665,8 @@ const config6 = {
   wasm: wasm,
   state: state1_5b
 }
+window.config6 = config6
+
 const config7 = {
   // id: "TradeX_test",
   title: "BTC/USDT",
@@ -707,6 +745,8 @@ const config7 = {
     indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
   }
 }
+window.config7 = config7
+
 const config8 = {
   // id: "TradeX_test",
   title: "IMPT/USDT",
@@ -785,6 +825,8 @@ const config8 = {
     indicatorSettings: {fn: (c)=>{ alert(c.id) }, own: true}
   }
 }
+window.config8 = config8
+
 const dre =   {
   id: "Midnight",
   title: "BTC/USDT",
@@ -928,14 +970,20 @@ const dre =   {
   };
 
 const configs = [
+  {config: tradesTestState, stream: null},
   {config: config1, stream: null},
-  {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
-  {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
-  {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  // {config: config2, stream: null},
+
+  // {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
+  // {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
+  {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
   {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
   {config: config6, stream: null},
   {config: config8, stream: null},
   // {config: config7, stream: null},
+  // {config: config9, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
+  // {config: config9, stream: (chart) => {livePrice_Binance(chart, "linkusdt", config9.timeFrame)}},
+  
   // {config: dre, stream: null},
 ]
 
@@ -1167,10 +1215,10 @@ function alertTest ($, p, c) {
 
 addChart()
 addChart()
-addChart()
-addChart()
-addChart()
-addChart()
+// addChart()
+// addChart()
+// addChart()
+// addChart()
 
 document.getElementById("fullscreen").addEventListener("click", (e) => {
   chart0.requestFullscreen()
@@ -1180,9 +1228,17 @@ document.getElementById("fullscreen").addEventListener("click", (e) => {
 chart0.setIndicators({
   TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST},
   DMI: {id: "DMI", name: "Directional Movement Indicator", event: "addIndicator", ind: DMI },
+  DBLMA: {id: "DBLMA", name: "Double Moving Average", event: "addIndicator", ind: DblMA },
+  // DBLMA2: {id: "DBLMA2", name: "Double Moving Average", event: "addIndicator", ind: DblMA2 },
+  TRDFLO: {id: "TRDFLO", name: "Trade Flow", event: "addIndicator", ind: TradeFlow },
 })
 chart0.addIndicator("VOL")
-chart0.addIndicator("TEST", "Test1", {data: [], settings: {}})
+chart0.addIndicator("MA")
+chart0.addIndicator("TEST", "Test1", {data: [], settings: {test: true}})
+chart0.addIndicator("TRDFLO", "TradeFlow1", {data: [], settings: {test: true}})
+
+// chart0.addIndicator("DBLMA", "DblMA", {data: [], settings: {}})
+
 // chart0.addIndicator("DMI", "DMI1", {data: []})
 chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
 chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
@@ -1209,7 +1265,7 @@ if (typeof chart1 === "object") {
   chart1.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 }
 
-chart2.addIndicator("VOL", "VOL", {settings:{isPrimary: false}})
+// chart2.addIndicator("VOL", "VOL", {settings:{isPrimary: false}})
 
 // test merging indicator data
 if (typeof chart5 === "object")

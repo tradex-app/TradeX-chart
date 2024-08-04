@@ -32,8 +32,10 @@ import TEST from "testIndicator"
  * @returns boolean
  */
 chart.setIndicators({
-  TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST}, false
+  TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST, public: true}, false
 })
+
+// The "public" property in the indicator object, determines if the indicator is available to the end user in the Utils / Indicator drop down menu.
 ```
 
 The list of registered indicators, both default and custom can be accessed via the chart API.

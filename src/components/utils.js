@@ -2,24 +2,22 @@
 // Utils bar that lives at the top of the chart
 // Providing: timeframes, indicators, config, refresh, save, load
 
+import Component from "./component"
 import { elementDimPos, findBySelectorAll, findTargetParentWithClass } from "../utils/DOM"
 import { UtilsStyle } from "../definitions/style"
 import { CLASS_UTILS } from "../definitions/core"
 import { UTILSLOCATIONS } from "../definitions/chart"
 import utilsList from "../definitions/utils"
-import Indicators from "../definitions/indicators"
+import IndicatorsPublic from "../definitions/indicators"
 import { debounce } from "../utils/utilities"
 import { isObject } from "../utils/typeChecks"
-import StateMachine from "../scaleX/stateMachne"
 import stateMachineConfig from "../state/state-utils"
 
 
-export default class UtilsBar {
+export default class UtilsBar extends Component {
 
   #name = "Utilities"
   #shortName = "utils"
-  #core
-  #options
   #elUtils
   #utils
   #location
@@ -27,17 +25,16 @@ export default class UtilsBar {
   #indicators
   #menus = {}
   #utilsEvents = {}
-  #stateMachine
   #timers = {}
 
   constructor (core, options) {
 
-    this.#core = core
-    this.#options = options
+    super(core, options)
+
     this.#elUtils = core.elUtils
     this.#utils = core.config?.utilsBar || utilsList
     this.#widgets = core.WidgetsG
-    this.#indicators = core.indicatorClasses || Indicators
+    this.#indicators = core.indicatorsPublic || IndicatorsPublic
     this.#location = core.config.theme?.utils?.location || "none"
     if (!!this.#location ||
           this.#location == "none" ||
@@ -48,22 +45,12 @@ export default class UtilsBar {
     }
     // mount the default or custom utils bar definition
     this.#elUtils.innerHTML = this.#elUtils.defaultNode(this.#utils)
-
-    this.log(`${this.#name} instantiated`)
   }
-
-  log(l) { this.#core.log(l) }
-  info(i) { this.#core.info(i) }
-  warn(w) { this.#core.warn(w) }
-  error(e) { this.#core.error(e) }
 
   get name() {return this.#name}
   get shortName() {return this.#shortName}
-  get core() {return this.#core}
-  get options() {return this.#options}
   get pos() { return this.dimensions }
   get dimensions() { return elementDimPos(this.#elUtils) }
-  get stateMachine() { return this.#stateMachine }
   get location() { return this.#location }
 
   start() {
@@ -73,12 +60,13 @@ export default class UtilsBar {
     this.eventsListen()
     // start state machine
     // this.#stateMachine = new StateMachine(stateMachineConfig, this)
+    this.log(`Utils Bar ${this.#name} instantiated and running`)
   }
 
   destroy() {
     // this.stateMachine.destroy()
     // remove event listeners
-    const api = this.#core
+    const api = this.core
     const utils = findBySelectorAll(`#${api.id} .${CLASS_UTILS} .icon-wrapper`)
 
     for (let util of utils) {
@@ -91,7 +79,7 @@ export default class UtilsBar {
       }
     }
 
-    this.#core.hub.expunge(this)
+    this.core.hub.expunge(this)
   }
 
   eventsListen() {
@@ -102,18 +90,6 @@ export default class UtilsBar {
     // this.on("global_resize", this.onResize, this)
   }
   
-  on(topic, handler, context=this) {
-    this.#core.on(topic, handler, context)
-  }
-
-  off(topic, handler, context=this) {
-    this.#core.off(topic, handler, context)
-  }
-
-  emit(topic, data) {
-    this.#core.emit(topic, data)
-  }
-
   onIconClick(e) {
     // if (!isObject(e.originalTarget)) return false
 
@@ -140,7 +116,7 @@ export default class UtilsBar {
       this.emit("util_selected", data)
     }
 
-    if (action) action(data, this.#core)
+    if (action) action(data, this.core)
   }
 
   onIconOver(e) {
@@ -198,16 +174,16 @@ export default class UtilsBar {
 
   onTimezone(data) {
     // console.log(`Timezone:`,data)
-    this.#core.notImplemented()
+    this.core.notImplemented()
   }
 
   onSettings(data) {
     // console.log(`Settings:`,data)
-    this.#core.notImplemented()
+    this.core.notImplemented()
   }
 
   onScreenshot(data) {
-    this.#core.downloadImage()
+    this.core.downloadImage()
   }
 
 

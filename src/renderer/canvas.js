@@ -43,6 +43,9 @@ import {
   fillStroke,
   linearGradient
 } from "./fill"
+import { 
+  chartBar 
+} from "./chart"
 
 
 /**
@@ -174,4 +177,5 @@ export default {
   renderDiamond,
   renderTriangle,
   renderCheckerBoard,
+  chartBar,
 }

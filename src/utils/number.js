@@ -1,5 +1,8 @@
 // number.js
 
+import { MAX_CRYPTO_PRECISION } from "../definitions/core";
+import { isInteger } from "./typeChecks";
+
 /**
  * Getting a random number between 0 (inclusive) and 1 (exclusive)
  * @export
@@ -87,7 +90,7 @@ export function getRandomIntInclusive(min, max) {
  * @export
  * @param {Array} list
  * @param {number} item
- * @returns {number} - array index
+ * @returns {number|null} - array index
  */
 export function binarySearch(list, item) {
   let low = 0
@@ -107,8 +110,8 @@ export function binarySearch(list, item) {
       low = mid + 1
     }
   }
-
-  return null //if not found
+  //if not found
+  return null 
 }
 
 /**
@@ -145,7 +148,7 @@ export function nice (value) {
  * return sign, number of integers, decimals
  * @export
  * @param {number} value
- * @returns {number}  
+ * @returns {object}  
  */
 export function countDigits(value) {
   const digits = {}
@@ -281,14 +284,23 @@ export function getPrecision (value) {
 
 /**
  * truncate price to fit on Scale
- * @param {object} digits - {sign: s, integers: i, decimals: d, value: v}
- * @return {number}  
+ * @param {number} value - typically a price
+ * @param {number} precision - integer number of decimal places
+ * @return {string}  
  */
-export function limitPrecision (digits, precision=18) {
+export function limitPrecision (value, precision) {
+
+  if (value == 0) return "0"
+
+  const digits = countDigits(value)
+
+  if (isInteger(precision))
+    return `${ new Number(digits.value).toFixed(precision) }`
+
   let {sign: s, integers: i, decimals: d, value: v} = digits
 
-  precision = (isNaN(precision)) ? 18 : precision
-  d = (d > precision) ? precision : d
+  precision = (isNaN(precision)) ? MAX_CRYPTO_PRECISION : precision
+  d = limit(d, 0, precision )
   v = new Number(v).toFixed(d)
   // let n = this.yAxisDigits - 1,
   let x = `${v}`,
@@ -325,7 +337,7 @@ export function limitPrecision (digits, precision=18) {
       f = 2
     }
     else if (i >= 2) {
-      f = 4
+      f = 3
     }
   }
   r = Number.parseFloat(r).toFixed(f)

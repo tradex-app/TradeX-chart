@@ -24,11 +24,12 @@ export default class Candle {
 
   draw(data) {
     const ctx = this.ctx
+    const cfg = this.cfg
     const hilo = data.raw[4] >= data.raw[1]
-    const bodyColour = hilo ? this.cfg.candle.UpBodyColour : this.cfg.candle.DnBodyColour
-    const wickColour = hilo ? this.cfg.candle.UpWickColour : this.cfg.candle.DnWickColour
+    const bodyColour = hilo ? cfg.candle.UpBodyColour : cfg.candle.DnBodyColour
+    const wickColour = hilo ? cfg.candle.UpWickColour : cfg.candle.DnWickColour
 
-    switch(this.cfg.candle.Type) {
+    switch(cfg.candle.Type) {
       case CandleType.CANDLE_SOLID :
       this.fill = true
       break;
@@ -47,10 +48,7 @@ export default class Candle {
     }
 
     let w = Math.max(data.w -1, 1)
-    
-    if (w < 3) w = 1
-    else if (w < 5) w = 3
-    else if (w > 5) w = Math.ceil(w * 0.8)
+        w = candleW(w)
 
     let hw = Math.max(Math.floor(w * 0.5), 1)
     let h = Math.abs(data.o - data.c)
@@ -65,7 +63,7 @@ export default class Candle {
     ctx.moveTo(x05, Math.floor(data.h))
 
     // Wicks
-    if (this.cfg.candle.Type === CandleType.OHLC) {
+    if (cfg.candle.Type === CandleType.OHLC) {
       ctx.lineTo(x05, Math.floor(data.l))
     }
     else {
@@ -94,7 +92,7 @@ export default class Candle {
         Math.floor(hw * 2),
         s * Math.max(h, max_h),
       )
-      // if (!this.fill && this.cfg.candle.Type !== CandleType.OHLC) 
+      // if (!this.fill && cfg.candle.Type !== CandleType.OHLC) 
         ctx.fill()
       ctx.stroke()
     }
@@ -111,7 +109,7 @@ export default class Candle {
       ctx.fill()
       ctx.stroke()
     } 
-    else if (w > 3 && !this.fill && this.cfg.candle.Type !== CandleType.OHLC) {
+    else if (w > 3 && !this.fill && cfg.candle.Type !== CandleType.OHLC) {
       let s = hilo ? 1 : -1
       ctx.rect(
         Math.floor(x - hw),
@@ -121,7 +119,7 @@ export default class Candle {
       )
       ctx.stroke()
     } 
-    else if (this.cfg.candle.Type === CandleType.OHLC) {
+    else if (cfg.candle.Type === CandleType.OHLC) {
       // ctx.strokeStyle = wickColour
       ctx.beginPath()
       ctx.moveTo(x05 - hw, data.o)
@@ -216,4 +214,16 @@ export default class Candle {
     coords.length = 0
   }
 }
-  
+
+/**
+ * Scale candle width to create gaps at larger sizes
+ * @export
+ * @param {number} w - candle width in pixels
+ * @return {number}  
+ */
+export function candleW (w) {
+  if (w < 3) w = 1
+  else if (w < 5) w = 3
+  else if (w > 5) w = Math.ceil(w * 0.8)
+  return w
+}

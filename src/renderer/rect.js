@@ -27,7 +27,7 @@ export function renderRectStroke (ctx, x, y, w, h, opts) {
  * @param {number} y - canvas pixel position
  * @param {number} w - width pixel distance
  * @param {number} h - height pixel distance
- * @param {string} opts - CSS colour format
+ * @param {object} opts - CSS colour format
  */
 export function renderRectFill (ctx, x, y, w, h, opts) {
   ctx.fillStyle = opts?.fill || CanvasStyle.fill

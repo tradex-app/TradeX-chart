@@ -17,8 +17,8 @@ The configuration object is passed to the chart after an instance of it has been
 import { Chart } from 'tradex-chart'
 
 // After the chart has mounted on the DOM,
-// Start it with a configuration object
-chart.start(config)
+// Provide it with a configuration object
+chart.use(config)
 ```
 
 ## Minimal Config

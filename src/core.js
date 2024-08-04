@@ -3,11 +3,11 @@
 
 import { NAME, SHORTNAME, ID, RANGELIMIT, PRICE_PRECISION, VOLUME_PRECISION, STREAM_UPDATE } from './definitions/core'
 import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH, watermark } from './definitions/style'
-import { OVERLAYPANES } from './definitions/chart'
-import { defaultConfig } from './definitions/config'
-import Indicators from './definitions/indicators'
+import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, OVERLAYPANES } from './definitions/chart'
+import { defaultConfig, defaultTitle } from './definitions/config'
+import IndicatorsPublic, { IndicatorClasses } from './definitions/indicators'
 import * as packageJSON from '../package.json'
-import { isArray, isBoolean, isFunction, isNumber, isObject, isString, isError, isPromise, isClass } from './utils/typeChecks'
+import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, isError, isPromise, isClass } from './utils/typeChecks'
 import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { isTimeFrame, SECOND_MS } from "./utils/time"
@@ -66,22 +66,13 @@ export default class TradeXchart extends Tradex_chart {
   #core
   #config
   #options
-  #el
-  #elUtils
-  #elBody
-  #elTools
-  #elMain
-  #elRows
-  #elTime
-  #elYAxis
-  #elWidgetsG
-
   #ready = false
-  #inCnt = null
+  #inCnt
   #State = State
   #state
   #range
-  #indicators = Indicators
+  #indicators = IndicatorClasses
+  #indicatorsPublic = IndicatorsPublic
   #standardOverlays = {...OVERLAYPANES}
   #optionalOverlays = {...OVERLAYPANES}
   #customOverlays = {...OVERLAYPANES}
@@ -112,20 +103,16 @@ export default class TradeXchart extends Tradex_chart {
     main: this.#MainPane,
   }
 
-  #time = {
-    range: {},
-    timeFrameMS: 0,
-    timeFrame: `undefined`,
-    timeZone: '',
-    indexed: false
-  }
+  #timeData = new Time.TimeData()
+
+  destruction = false
 
   // console outputs
   logs = false
   infos = false
   warnings = false
   errors = false
-  timer = false
+  timers = false
   
   #scrollPos = 0
   #smoothScrollOffset = 0
@@ -145,15 +132,15 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * Create a new TradeXchart instance
    * @static
-   * @param {DOM_element} container - HTML element to mount the chart on
-   * @param {Object} [txCfg={}] - chart config
-   * @param {Object} state - chart state
-   * @returns {instance} TradeXchart
+   * @param {Object} [cfg={}] - chart config
+   * @returns {TradeXchart} TradeXchart
    * @memberof TradeXchart
    */
   static create(cfg) {
 
     let txCfg = copyDeep(defaultConfig)
+        // txCfg.talib = talib
+        // txCfg.wasm = wasm
 
     if (isObject(cfg) && Object.keys(cfg).length > 0) {
       // clear default watermark if none is specified
@@ -175,12 +162,12 @@ export default class TradeXchart extends Tradex_chart {
         }
       }
 
-      if ((typeof txCfg.talib !== "object") || 
-          // (txCfg.talib[Symbol.toStringTag] !== "Module") ||
-          (typeof txCfg.talib.init !== "function")) {
-            TradeXchart.#talibReady = false
-            TradeXchart.#talibError = new Error(`${TradeXchart.#initErrMsg}`)
-          }
+      // if ((!isObject(txCfg.talib)) || 
+      //     // (txCfg.talib[Symbol.toStringTag] !== "Module") ||
+      //     (!isFunction(txCfg.talib.init))) {
+      //       TradeXchart.#talibReady = false
+      //       TradeXchart.#talibError = new Error(`${TradeXchart.#initErrMsg}`)
+      //     }
 /*
       // init TALib
       if (!TradeXchart.#TALibWorkerReady) {
@@ -233,7 +220,9 @@ export default class TradeXchart extends Tradex_chart {
       }
 */
 
-      if (!TradeXchart.#talibReady && TradeXchart.#talibError === null) {
+      if (!TradeXchart.#talibReady && 
+          TradeXchart.#talibError === null &&
+          isFunction(txCfg?.talib?.init)) {
         TradeXchart.#talibPromise = txCfg.talib.init(txCfg.wasm)
         TradeXchart.#talibPromise.then(
           () => { 
@@ -281,17 +270,16 @@ export default class TradeXchart extends Tradex_chart {
    */
   constructor () {
     super()
-    this.#el = this
     this.#core = this
     this.#inCnt = TradeXchart.cnt()
     this.logs = false
     this.infos = false
     this.warnings = false
     this.errors = false
-    this.timer = false
+    this.timers = false
     // this.#config = copyDeep(defaultConfig)
     this.setID(null)
-    this.#state = this.#State.create({}, false, false)
+    this.#state = this.#State.create({core: this}, false, false)
 
     console.warn(`!WARNING!: ${NAME} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`)
     this.log(`${SHORTNAME} instance count: ${this.inCnt}`)
@@ -308,9 +296,9 @@ export default class TradeXchart extends Tradex_chart {
   info(...i) { if (this.infos) console.info(...i) }
   warn(...w) { if (this.warnings) console.warn(...w) }
   error(e) { if (this.errors) console.error(e) }
-  time(n) { if (this.timer) console.time(n) }
-  timeLog(n) { if (this.timer) console.timeLog(n) }
-  timeEnd(n) { if (this.timer) console.timeEnd(n) }
+  timer(n) { if (this.timers) console.time(n) }
+  timeLog(n) { if (this.timers) console.timeLog(n) }
+  timeEnd(n) { if (this.timers) console.timeEnd(n) }
 
   get version() { return TradeXchart.version }
   /** @returns {string} - user defined chart name */
@@ -359,19 +347,21 @@ export default class TradeXchart extends Tradex_chart {
   get allData() {
     return {
       data: this.state.data.chart.data,
-      primaryPane: this.state.data.secondary,
+      primaryPane: this.state.data.primary,
       secondaryPane: this.state.data.secondary,
       datasets: this.state.data.datasets
     }
   }
   get rangeLimit() { return (isNumber(this.#range.initialCnt)) ? this.#range.initialCnt : RANGELIMIT }
   get range() { return this.#range }
-  get time() { return this.#time }
+  get time() { return this.#timeData }
+  get timeData() { return this.#timeData }
   get TimeUtils() { return Time }
 
   get theme() { return this.#theme }
   get settings() { return this.state.data.chart.settings }
   get indicatorClasses() { return this.#indicators }
+  get indicatorsPublic() { return this.#indicatorsPublic }
   get TALib() { return this.#TALib }
   get TALibReady() { return TradeXchart.talibReady }
   get TALibError() { return TradeXchart.talibError }
@@ -389,6 +379,7 @@ export default class TradeXchart extends Tradex_chart {
   get mousePos() { return this.#pointerPos }
   get pointerButtons() { return this.#pointerButtons }
 
+  set pricePrecision(p) { this.setPricePrecision(p) }
   get pricePrecision() { return this.#pricePrecision }
   get volumePrecision() { return this.#volumePrecision }
 
@@ -402,21 +393,24 @@ export default class TradeXchart extends Tradex_chart {
   get customOverlays() { return this.#customOverlays }
   get optionalOverlays() { return mergeDeep({...this.#optionalOverlays}, this.#customOverlays) } 
 
+
   /**
    * let's start building the chart
+   * merges the provided config with a default 
+   * to fill in missing or required values
    * @param {Object} cfg - chart configuration
    */
   start(cfg) {
     this.log(`${NAME} configuring...`)
 
-    TradeXchart.create(cfg)
+    if (this.#ready) this.#MainPane.destroy()
 
     const txCfg = TradeXchart.create(cfg)
     this.logs = (txCfg?.logs) ? txCfg.logs : false
     this.infos = (txCfg?.infos) ? txCfg.infos : false
     this.warnings = (txCfg?.warnings) ? txCfg.warnings : false
     this.errors = (txCfg?.errors) ? txCfg.errors : false
-    this.timer = (txCfg?.timer) ? txCfg.timer : false
+    this.timers = (txCfg?.timer) ? txCfg.timer : false
     this.#config = txCfg
     this.#inCnt = txCfg.cnt || this.#inCnt
     this.#TALib = txCfg.talib
@@ -425,6 +419,16 @@ export default class TradeXchart extends Tradex_chart {
     if (!("theme" in txCfg) || !isObject(txCfg.theme)) 
       txCfg.theme = defaultTheme
 
+    // process config
+    if (isObject(txCfg)) {
+      for (const option in txCfg) {
+        if (option in this.props()) {
+          this.props()[option](txCfg[option])
+        }
+      }
+    }
+
+    const oldID = this.id
     const id = (isString(txCfg?.id)) ? txCfg.id : null
     this.setID(id)
     this.classList.add(this.id)
@@ -438,100 +442,125 @@ export default class TradeXchart extends Tradex_chart {
     let deepValidate = txCfg?.deepValidate || false
     let isCrypto = txCfg?.isCrypto || false
 
-    // create state
-    this.#state = this.#State.create(state, deepValidate, isCrypto)
-    delete txCfg.state
-    this.log(`${this.name} id: ${this.id} : created with a ${this.state.status} state`)
-
     // time frame
-    let tf = "1s"
-    let ms = SECOND_MS
+    let {tf, ms} = (!!Time.interval2MS(txCfg?.timeFrame)) ?
+      isTimeFrame(txCfg.timeFrame) :
+      { tf: DEFAULT_TIMEFRAME,
+        ms: DEFAULT_TIMEFRAMEMS
+      };
+
+    let ts = Date.now();
+    ts = ts - (ts % ms)
+
+    // range
+    if (!isObject(txCfg?.range)) {
+
+      txCfg.range = {
+        startTS: ts,
+        timeFrame: tf,
+        timeFrameMS: ms
+      }
+    }
+    else {
+      let r = txCfg?.range;
+      if (!isInteger(r.startTS)) r.startTS = ts
+      if (!isInteger(r.timeFrameMS)) r.timeFrameMS = ms
+      if (Time.interval2MS(r.timeFrame) != r.timeFrameMS) r.timeFrame = Time.ms2Interval(ms)
+    }
+
+    state.range = {...state.range, ...txCfg.range}
+
+    // state
+    // If chart is already instantiated with a State, merge the enw one.
+    if (this.#ready) {
+
+      const newState = this.#State.create(state, deepValidate, isCrypto)
+      this.#state.use( newState.key )
+      delete txCfg.state
+
+      this.#MainPane = new MainPane(this, txCfg)
+      this.MainPane.start()
+
+      document.querySelector(`style[title="${oldID}_style"]`)?.remove()
+      this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`)
+
+      this.setTheme(this.#themeTemp.id)
+      this.setUtilsLocation(this.theme?.utils?.location)
+      this.elBody.setToolsLocation(this.theme?.tools?.location)
+
+      this.log(`${this.name} id: ${this.id} : loaded a new ${this.state.status} state`)
+    }
+    // Chart has no State, so instantiate one
+    else {
+      txCfg.watermark.display = true
+
+      this.#state = this.#State.create(state, deepValidate, isCrypto)
+      delete txCfg.state
+
+      this.log(`${this.name} id: ${this.id} : created with a ${this.state.status} state`)  
+
+      // set default range
+      let start = 0
+      let end = this.#state.data.range.initialCnt
+      let rangeConfig = (isObject(txCfg?.range)) ? txCfg.range : {}
+            rangeConfig.interval = ms
+            rangeConfig.core = this
+      this.getRange(null, null, rangeConfig)
+      this.setRange(start, end)
+
+      // setup main chart features
+      this.#WidgetsG = new WidgetsG(this, {widgets: txCfg?.widgets})
+      this.#UtilsBar = new UtilsBar(this, txCfg)
+      this.#ToolsBar = new ToolsBar(this, txCfg)
+      this.#MainPane = new MainPane(this, txCfg)
+
+      this.eventsListen()
+
+      this.elStart(this.theme)
+      this.elBody.start(this.theme)
+      this.UtilsBar.start()
+      this.ToolsBar.start()
+      this.MainPane.start()
+      this.WidgetsG.start()
+  
+      this.#progress = this.WidgetsG.insert("Progress", {})
+    }
+
+    // inject chart style rules
+    this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`)
+    this.setTheme(this.#themeTemp.id)
+
+    this.#scrollPos = this.bufferPx * -1
+    this.stream = this.#config.stream
 
     // is the chart empty - no data or stream
     if (!isObject(txCfg?.stream) && this.state.data.chart.data.length < 2) {
       this.warn(`${NAME} has no chart data or streaming provided.`)
-      // has a time frame been provided?
-      ;({tf, ms} = isTimeFrame(txCfg?.timeFrame))
     }
     // is the chart streaming with an empty chart?
     else if (isObject(txCfg?.stream) && this.state.data.chart.data.length < 2) {
-      // has a time frame been provided?
-      ;({tf, ms} = isTimeFrame(txCfg?.timeFrame))
-
       this.#delayedSetRange = true
     }
-    // chart has back history and optionally streaming
-    else {
-      tf = this.state.data.chart.tf 
-      ms = this.state.data.chart.tfms
-    }
-    this.log(`tf: ${tf} ms: ${ms}`)
 
-    this.#config.callbacks = this.#config.callbacks || {}
-
-    // process config
-    if (isObject(txCfg)) {
-      for (const option in txCfg) {
-        if (option in this.props()) {
-          this.props()[option](txCfg[option])
-        }
-      }
-    }
-
-    // set default range
-    const rangeConfig = (isObject(txCfg?.range)) ? txCfg.range : {}
-          rangeConfig.interval = ms
-          rangeConfig.core = this
-    this.getRange(null, null, rangeConfig)
-
-    // now set user defined (if any) range
-    if (this.#range.Length > 1) {
-      const rangeStart = calcTimeIndex(this.#time, this.#config?.range?.startTS)
-      const end = (isNumber(rangeStart)) ? 
-        rangeStart + this.#range.initialCnt :
-        this.allData.data.length
-      const start = (isNumber(rangeStart)) ? rangeStart : end - this.#range.initialCnt
-      this.#range.initialCnt = end - start
-      this.setRange(start, end)
-
-      if (txCfg.range?.center)
-        this.jumpToIndex(start, true, true)
-    }
-
-    // inject chart style rules
-    if (!!this.parentElement)
-      this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`)
-
-    // setup main chart features
-    this.#WidgetsG = new WidgetsG(this, {widgets: txCfg?.widgets})
-    this.#UtilsBar = new UtilsBar(this, txCfg)
-    this.#ToolsBar = new ToolsBar(this, txCfg)
-    this.#MainPane = new MainPane(this, txCfg)
-
-    this.setTheme(this.#themeTemp.id)
-
-    this.log(`${this.#name} V${TradeXchart.version} configured and running...`)
-
-    this.#scrollPos = this.bufferPx * -1
-
-    this.eventsListen()
-
-    this.elStart(this.theme)
-    this.elBody.start(this.theme)
-    this.UtilsBar.start()
-    this.ToolsBar.start()
-    this.MainPane.start()
-    this.WidgetsG.start()
-
-    this.#progress = this.WidgetsG.insert("Progress", {})
-
-    this.stream = this.#config.stream
+    this.log(`Time Frame: ${this.#range.timeFrame} Milliseconds: ${this.#range.timeFrameMS}`)
 
     if (this.#delayedSetRange) 
       this.on(STREAM_UPDATE, this.delayedSetRange, this)
 
+    this.#config.callbacks = this.#config.callbacks || {}
+
     this.#ready = true
     this.refresh()
+
+    this.log(`${this.#name} V${TradeXchart.version} configured and running...`)
+  }
+
+  /**
+   * alias of start()
+   * @param {Object} cfg - chart configuration
+   */
+  use(cfg) {
+    this.start(cfg)
   }
 
   /**
@@ -612,7 +641,7 @@ export default class TradeXchart extends Tradex_chart {
       indicators: (indicators) => this.setIndicators(indicators),
       theme: (theme) => { this.#themeTemp = this.addTheme(theme) },
       stream: (stream) => this.#stream = (isObject(stream)) ? stream : {},
-      pricePrecision: (precision) => this.setPricePrecision(precision),
+      pricePrecision: (pricePrecision) => this.setPricePrecision(pricePrecision),
       volumePrecision: (precision) => this.setVolumePrecision(precision),
     }
   }
@@ -689,7 +718,7 @@ export default class TradeXchart extends Tradex_chart {
    * Add a theme to the chart,
    * if no current theme is set, make this the current one.
    * @param {Object} theme - Volume accuracy
-   * @returns {instance} - theme instance
+   * @returns {Theme} - theme instance
    * @memberof TradeXchart
    */
   addTheme(theme) {
@@ -700,7 +729,7 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
  * Set the chart theme
- * @param {string} theme - theme identifier
+ * @param {string} ID - theme identifier
  * @returns {boolean}
  * @memberof TradeXchart
  */
@@ -729,11 +758,11 @@ export default class TradeXchart extends Tradex_chart {
     // Rows
     if (theme.chart.BorderThickness > 0) {
       this.elMain.rows.style.border = `1px solid ${borderColour}`
-      this.elMain.rows.style.height = `calc(100% - 4px)`
+      // this.elMain.rows.style.height = `calc(100% - 4px)`
     }
     else {
       this.elMain.rows.style.border = `none`
-      this.elMain.rows.style.height = `100%`
+      // this.elMain.rows.style.height = `100%`
     }
 
     // Timeline
@@ -804,7 +833,7 @@ export default class TradeXchart extends Tradex_chart {
     }
 
     // same as current state, nothing to do
-    if (key === this.key) return true
+    if (key === this.#state.key) return true
     
     // stop any streams
     this.stream.stop()
@@ -817,17 +846,22 @@ export default class TradeXchart extends Tradex_chart {
       interval: this.#state.data.chart.tfms,
       core: this
     }
-    this.getRange(null, null, rangeConfig)
+    this.getRange(undefined, undefined, rangeConfig)
 
     // set Range
     if (this.range.Length > 1) {
-      const rangeStart = calcTimeIndex(this.time, undefined)
-      const end = (rangeStart) ? 
+      const rangeStart = calcTimeIndex(this.time)
+      const end = (isInteger(rangeStart)) ? 
         rangeStart + this.range.initialCnt :
         this.#state.data.chart.data.length - 1
-      const start = (rangeStart) ? rangeStart : end - this.range.initialCnt
+      const start = (isInteger(rangeStart)) ? 
+        rangeStart : 
+        end - this.range.initialCnt
       this.range.initialCnt = end - start
       this.setRange(start, end)
+
+      if (this.config.range?.center)
+      this.jumpToIndex(start, true, true)
     }
 
     // rebuild chart
@@ -853,17 +887,23 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {boolean}
    */
   deleteState(key) {
-    return this.state.delete(key)
+    let r = this.state.delete(key)
+    if (!r) return false
+    this.emit("state_deleted", key)
+    return true
   }
 
   /**
    * export state as an object
    * @param {string} key - state id
    * @param {Object} config 
-   * @returns {Object}
+   * @returns {Object|false}
    */
-  exportState(key=this.key, config={}) {
-    return this.state.export(key=this.key, config={})
+  exportState(key=this.#state.key, config={}) {
+    let r = this.state.export(key, config)
+    if (!r) return false
+    this.emit("state_exported", key)
+    return r
   }
 
   /*============================*/
@@ -874,7 +914,7 @@ export default class TradeXchart extends Tradex_chart {
    * specify a chart stream
    * @memberof TradeXchart
    * @param {Object} stream 
-   * @returns {instance}
+   * @returns {Stream|false}
    */
   setStream(stream) {
     if (this.stream instanceof Stream) {
@@ -883,11 +923,10 @@ export default class TradeXchart extends Tradex_chart {
     }
     else if (isObject(stream)) {
       if (this.allData.data.length == 0 && isString(stream.timeFrame)) {
-        ;({tf, ms} = isTimeFrame(stream?.timeFrame))
+        const { tf, ms } = isTimeFrame(stream?.timeFrame)
         this.range.interval = ms
         this.range.intervalStr = tf
-        this.#time.timeFrameMS = ms
-        this.#time.timeFrame = tf
+        this.#timeData = new Time.TimeData(this.range)
       }
 
       this.#stream = new Stream(this)
@@ -917,9 +956,8 @@ export default class TradeXchart extends Tradex_chart {
    */
   delayedSetRange() {
     while (this.#delayedSetRange) {
-      let l = this.range.Length * 0.5
+      let l = Math.floor(this.range.initialCnt * 0.5)
       this.setRange(l * -1, l)
-      // this.jumpToTS(this.range.value)
       this.off(STREAM_UPDATE, this.delayedSetRange, this)
       this.#delayedSetRange = false
     }
@@ -933,20 +971,26 @@ export default class TradeXchart extends Tradex_chart {
    */
   updateRange(pos) {
     if (!isArray(pos) || !isNumber(pos[4]) || pos[4] == 0) return
+    if (pos[4] < 0 && this.range.isPastLimit()) return
+    if (pos[4] > 0 && this.range.isFutureLimit()) return
 
-    let dist, offset, scrollPos, r;
+    let dist, scrollPos, r;
 
     dist = pos[4]
     scrollPos = this.#scrollPos + dist
     r = scrollPos % this.candleW
 
-    if (scrollPos < this.bufferPx * -1) {
+    if (scrollPos < this.bufferPx * -1 ) {
+      let r = this.offsetRange(this.rangeScrollOffset * -1)
+      if (!r) return
+
       scrollPos = 0
-      this.offsetRange(this.rangeScrollOffset * -1)
     }
     else if (scrollPos > 0) {
+      let r = this.offsetRange(this.rangeScrollOffset)
+      if (!r) return
+
       scrollPos = this.bufferPx * -1
-      this.offsetRange(this.rangeScrollOffset)
     }
 
     this.#scrollPos = scrollPos
@@ -957,7 +1001,12 @@ export default class TradeXchart extends Tradex_chart {
     let start = this.range.indexStart - offset,
         end = this.range.indexEnd - offset;
 
+    if (this.range.isPastLimit(start) ||
+        this.range.isFutureLimit(end))
+        return false
+
     this.setRange(start, end)
+    return true
   }
 
   /**
@@ -966,11 +1015,9 @@ export default class TradeXchart extends Tradex_chart {
    * @param {number} end - index
    * @memberof TradeXchart
    */
-  getRange(start=0, end=0, config={}) {
+  getRange(start, end, config={}) {
     this.#range = new Range(start, end, config)
-    this.#time.range = this.#range
-    this.#time.timeFrameMS = this.#range.interval
-    this.#time.timeFrame = this.#range.intervalStr
+    this.#timeData = new Time.TimeData(this.#range)
   }
 
   /**
@@ -982,6 +1029,7 @@ export default class TradeXchart extends Tradex_chart {
   setRange(start=0, end=this.rangeLimit) {
     const max = (this.config?.maxCandles)? this.config.maxCandles : 
       (this.Chart?.layerWidth) ? this.Chart.layerWidth : this.Chart.width
+
     this.#range.set(start, end, max)
 
     if (start < 0 && !this.#mergingData) 
@@ -1034,7 +1082,7 @@ export default class TradeXchart extends Tradex_chart {
    */
   jumpToEnd(center=true) {
     let end = this.range.dataLength - this.range.Length
-    if (center) end += this.range.Length / 2
+    if (center) end += Math.round(this.range.Length / 2)
     this.jumpToIndex(end, true, false)
   }
 
@@ -1275,7 +1323,9 @@ export default class TradeXchart extends Tradex_chart {
         isString(v?.event) && 
         this.isIndicator(v?.ind)
       ) {
-        this.#indicators[k] = v
+        if (!!v?.public)
+        this.#indicatorsPublic[k] = v
+        this.#indicators[k] = v.ind
         result[k] = true
         this.log(`Custom Indicator: ${k} - Registered`)
       }
@@ -1307,6 +1357,15 @@ export default class TradeXchart extends Tradex_chart {
    */
   getIndicator(i) {
     return this.#MainPane.getIndicator(i)
+  }
+
+  /**
+   * retrieve indicators by type
+   * @param {string} t - indicator type
+   * @returns {array} - array of indicators of type
+   */
+  getIndicatorsByType(t) {
+    return this.#MainPane.getIndicatorsByType(t)
   }
 
   /**
@@ -1376,20 +1435,11 @@ export default class TradeXchart extends Tradex_chart {
         indicators.push(ind.instance.calcIndicatorHistory.bind(ind.instance, recalc))
       }
     }
-    // (async () => {
-      await Promise.all( indicators.map( async i => { 
-        executeInd(i) }))
-        this.refresh()
-    // })();
+    await Promise.all( indicators.map( async i => { 
+      executeInd(i) }))
+      this.refresh()
   }
 
-  // calcAllIndicators() {
-  //   for (const [key, value] of Object.entries(this.Indicators)) {
-  //     for (const [k, ind] of Object.entries(value)) {
-  //       ind.instance.calcIndicatorHistory()
-  //     }
-  //   }
-  // }
 
   /*============================*/
   /*---------- TRADES ----------*/

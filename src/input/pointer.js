@@ -54,7 +54,7 @@ export default class PointerAgent {
     switch (event) {
       case "pointerdown":
           cb = function (e) {
-            this.logit(e)
+            // this.logit(e)
             if (e.leftButton) this.#input.pad.left = true
             this.#input.onPointerDown(e)
             handler(this.#input.pointerEventData(e))
@@ -62,7 +62,7 @@ export default class PointerAgent {
           break;
       case "pointerup":
         cb = function (e) {
-          this.logit(e)
+          // this.logit(e)
           this.#input.onPointerUp(e)
           handler(this.#input.pointerEventData(e))
         }
@@ -81,14 +81,14 @@ export default class PointerAgent {
       case "pointerover":
       case "contextmenu":
         cb = function (e) {
-          this.logit(e)
+          // this.logit(e)
           this.#input.location(e)
           handler(this.#input.pointerEventData(e))
         }
         break;
       case "wheel":
         cb = function (e) {
-          this.logit(e)
+          // this.logit(e)
           this.#input.wheeldelta = e;
           handler(this.#input.pointerEventData(e))
         }
@@ -102,7 +102,7 @@ export default class PointerAgent {
         break;
       case "pointerdrag":
         cb = function (e) {
-          this.logit(e)
+          // this.logit(e)
           this.#input.motion(e)
           handler(this.#input.pointerEventData(e))
         }
@@ -111,7 +111,7 @@ export default class PointerAgent {
         break;
       case "pointerdragend":
         cb = function (e) {
-          this.logit(e)
+          // this.logit(e)
           this.#input.motion(e)
           this.#input.endPointerDrag(e)
           handler(this.#input.pointerEventData(e))
@@ -128,22 +128,22 @@ export default class PointerAgent {
     this.#input.agent.off(event, handler, options)
   }
 
-  logit(e) {
-    return
-    /*
-    let o = `pointer: ${e.pointerType}, event: ${e.type}, `
-    if ("deltaX" in e) o += `deltaX: ${e.deltaX}, `
-    if ("deltaY" in e) o += `deltaY: ${e.deltaY}, `
-    if ("delta" in e) o += `delta: ${e.delta}, `
-    if ("velocityX" in e) o += `veloX: ${e.velocityX}, `
-    if ("velocityY" in e) o += `veloY: ${e.velocityY}, `
-    if ("leftButton" in e && e.leftButton === true) o += `leftButton `
-    if ("rightButton" in e && e.rightButton === true) o += `rightButton`
-    o += `srcEvent.button: ${e.srcEvent.button}`
+  // logit(e) {
+  //   return
+  //   /*
+  //   let o = `pointer: ${e.pointerType}, event: ${e.type}, `
+  //   if ("deltaX" in e) o += `deltaX: ${e.deltaX}, `
+  //   if ("deltaY" in e) o += `deltaY: ${e.deltaY}, `
+  //   if ("delta" in e) o += `delta: ${e.delta}, `
+  //   if ("velocityX" in e) o += `veloX: ${e.velocityX}, `
+  //   if ("velocityY" in e) o += `veloY: ${e.velocityY}, `
+  //   if ("leftButton" in e && e.leftButton === true) o += `leftButton `
+  //   if ("rightButton" in e && e.rightButton === true) o += `rightButton`
+  //   o += `srcEvent.button: ${e.srcEvent.button}`
 
-    window.console.log(o)
-    */
-  }
+  //   window.console.log(o)
+  //   */
+  // }
 }
 
 

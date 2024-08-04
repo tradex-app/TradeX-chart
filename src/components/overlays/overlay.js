@@ -1,10 +1,12 @@
 // overlay.js
 // parent class for overlays to build upon
 
-import { isBoolean } from "../../utils/typeChecks"
+import { isArray, isBoolean } from "../../utils/typeChecks"
 import xAxis from "../axis/xAxis"
 import yAxis from "../axis/yAxis"
 import canvas from "../../renderer/canvas"
+import Histogram from "../primitives/histogram"
+import { renderHighLowRange } from "../primitives/range"
 
 
 export default class Overlay {
@@ -21,6 +23,7 @@ export default class Overlay {
   #scene
   #hit
   #params
+  #data = []
   #mustUpdate = {
     valueMax: null,
     valueMin: null,
@@ -31,6 +34,7 @@ export default class Overlay {
     refresh: false,
     resize: false
   }
+  #histogram
 
 
   id
@@ -47,11 +51,7 @@ export default class Overlay {
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#params = params
-
-    // this.on("setRange", this.drawUpdate, this)
-    // this.on("rowsResize", this.drawUpdate, this)
-    // this.on("divider_pointerdrag", this.drawUpdate, this)
-    // this.on("divider_pointerdragend", this.drawUpdate, this)
+    this.#data = this.#params.overlay?.data || []
     this.on("global_resize", this.onResize, this)
   }
 
@@ -70,8 +70,8 @@ export default class Overlay {
   get xAxis() { return this.getXAxis() }
   get yAxis() { return this.getYAxis() }
   get overlay() { return this.#params.overlay }
-  get overlayData() { return this.#params.overlay.data }
-  get data() { return this.#params.overlay.data }
+  get overlayData() { return this.#data }
+  get data() { return this.#data }
   get stateMachine() { return this.#core.stateMachine }
   get context() { return this.contextIs() }
   set position(p) { this.#target.setPosition(p[0], p[1]) }
@@ -146,6 +146,7 @@ export default class Overlay {
 
   getYAxis() {
     if (this.#yAxis instanceof yAxis) return this.#yAxis
+    else if (this.#yAxis.yAxis instanceof yAxis) return this.#yAxis.yAxis
     else if (this.chart.yAxis instanceof yAxis) return this.chart.yAxis
     else if ("scale" in this.#parent) return this.#parent.scale.yAxis
     else return false
@@ -153,8 +154,8 @@ export default class Overlay {
 
   contextIs() {
     if (!this.#xAxis && !this.#yAxis) return "chart"
-    else if (this.#xAxis instanceof xAxis) return "timeline"
-    else if (this.#yAxis instanceof yAxis) return "scale"
+    else if (this.getXAxis() instanceof xAxis) return "timeline"
+    else if (this.getYAxis() instanceof yAxis) return "scale"
     else return false
   }
 
@@ -223,9 +224,12 @@ export default class Overlay {
         case "renderTriangle": canvas[type]( ctx, p[0], p[1], p[2], params); break;
         case "renderDiamond": canvas[type]( ctx, p[0], p[1], p[2], p[3], params); break;
         case "renderCircle": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
-        case "renderImage": canvas[type]( ctx, params.src, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7] )
+        case "renderImage": canvas[type]( ctx, params.src, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7] ); break;
         case "renderText": canvas[type]( ctx, p[0], p[1], params ); break;
         case "renderTextBG": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
+        case "histogram": this.histogram( p, params ); break;
+        case "highLowRange": renderHighLowRange( ctx, p[0], p[1], p[2], p[3], params ); break;
+        default: break;
       }
   
       ctx.restore();
@@ -236,5 +240,12 @@ export default class Overlay {
      */
     clear() {
       this.scene.clear()
+    }
+
+    histogram( p, params ) {
+      if (!(this.#histogram instanceof Histogram))
+        this.#histogram = new Histogram(this.scene, this.theme)
+
+      this.#histogram.draw(p, params)
     }
 }

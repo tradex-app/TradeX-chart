@@ -2,27 +2,29 @@
 // Config Dialogue
 
 import Dialogue from "./dialogue";
-import { isBoolean, isString, isObject, isFunction } from "../../utils/typeChecks";
+import { isBoolean, isString, isObject, isFunction, isArray } from "../../utils/typeChecks";
 import { uid } from "../../utils/utilities";
-import { htmlInput, inputTypes } from "../../utils/DOM";
+import { htmlInput, htmlSelect, inputTypes } from "../../utils/DOM";
 import { tabsBuild, tabStyles } from "../views/tabs";
+import { RGBAHex } from "../../utils/colour";
 
 export default class ConfigDialogue extends Dialogue {
 
-  static name = "ConfigDialogues"
-  static type = "ConfigDialogue"
+  static Name = "ConfigDialogues"
+  static type = "configDialogue"
   static class = "tradeXconfig"
 
   static defaultStyles = `
   /** default Config Dialogue widget styles */
   
   .tradeXwindow.config {
-    overflow: hidden;
+    /* overflow: hidden; */
     background: none;
   }
 
   .tradeXwindow.config .content {
     padding: 0;
+    position: relative;
   }
 
   .tradeXwindow.config .buttons {
@@ -30,13 +32,25 @@ export default class ConfigDialogue extends Dialogue {
     display: flex;
     justify-content: flex-end;
     padding: 3px 1em;
+    border-radius: 0 0 5px 5px;
   }
 
   .tradeXwindow.config .buttons input {
     margin-left: 5px;
+    font-size: 1em;
+    padding: 1px .5em;
   }
 
   ${tabStyles} 
+
+  .tradeXwindow.config .content tradex-colourpicker {
+    position: absolute;
+    display: none !important;
+  }
+
+  .tradeXwindow.config .content tradex-colourpicker.active {
+    display: block !important;
+  }
   `
 
   static create(widgets, config) {
@@ -67,14 +81,22 @@ export default class ConfigDialogue extends Dialogue {
 
   destroy() {
     super.destroy()
+    this.elColourPicker.destroy()
   }
 
   set update(u) { this.#update = !!u }
   get update() { return this.#update }
 
-  configBuild(c={}) {
+  /**
+   * Transform (tabbed) content object into HTML 
+   * and provide any functions required for form elements
+   * @param {object} [contObj={}] - content
+   * @return {object} - {html, modifiers}
+   * @memberof ConfigDialogue
+   */
+  configBuild(contObj={}) {
 
-    let {content, modifiers={}} = this.configContent(c)
+    let {content, modifiers={}} = this.configContent(contObj)
 
     const tabsHTML = `
     <div class="tabbedContent">
@@ -82,6 +104,7 @@ export default class ConfigDialogue extends Dialogue {
         ${tabsBuild(content)}
       </form>
     </div>
+    <tradex-colourpicker></tradex-colourpicker>
     `
     const {html, modifiers: mods} = super.dialogueBuild(tabsHTML)
     modifiers = {...modifiers, ...mods}
@@ -90,48 +113,61 @@ export default class ConfigDialogue extends Dialogue {
 
   /**
    * build tabbed content object
-   * @param {object} input - tabs {row: {attribute, attribute, ...}}
+   * @param {object} cfgObj - tabs {row: {attribute, attribute, ...}}
    * @returns {object} - {content: string, modifiers: object}
    */
-  configContent(input) {
-    if (!isObject(input)) return `<p>Input missing!</p>`
+  configContent(cfgObj) {
+    if (!isObject(cfgObj)) return `<p>Config content missing!</p>`
 
+    let obj;
     let content = {}
     let modifierList = {}
 
     // iterate over tabs
-    for (let i in input) {
-      if (!isObject(input[i])) {
-        this.core.error(`ERROR: Building Config Dialogue : Input malformed`)
-        continue;
-      }
-      content[i] = ``
-      // iterate over content rows
-      for (let row in input[i]) {
-        // standard input types
-        if (inputTypes.includes(input[i][row]?.type)) {
-          content[i] += htmlInput(i, input[i][row])
-        }
-        // other form element types
-        // if...
-
-        const modifiers = [ "$function" ]
-        
-        for (let modifier in input[i][row]) {
-          if (modifiers.includes(modifier)) {
-
-            switch (modifier) {
-              case "$function":
-                if (isFunction(input[i][row][modifier]))
-                  modifierList[row] = input[i][row][modifier]
-                break;
-            }
+    for (let i in cfgObj) {
+      content[i] = ""
+      if (isArray(cfgObj[i])) {
+        for (let j of cfgObj[i]) {
+          for (let k in j.style) {
+            obj = j.style[k]
+            if (!isObject(obj)) continue
+            this.configEntryFields(i, obj, content, modifierList)
           }
         }
       }
-
+      else if (isObject(cfgObj[i])) {
+        content[i] = ""
+        for (let j in cfgObj[i]) {
+          obj = cfgObj[i][j]
+          this.configEntryFields(i, obj, content, modifierList)
+        }
+      }
+      else {
+        this.core.error(`ERROR: Building Config Dialogue : Input malformed`)
+        continue;
+      }
     }
     return {content, modifiers: modifierList}
+  }
+
+  /**
+   *
+   * @param {string} i - tab
+   * @param {object} input - object to convert to tabbed content
+   * @param {object} content ~ object to fill with processed tabbed content
+   * @param {object} modifierList - object to fill with functions that will be attached to content
+   * @memberof ConfigDialogue
+   */
+
+  configEntryFields(i, input, content, modifierList) {
+    let id = (isString(input.entry)) ? input.entry : ""
+    let label = (isString(input.label)) ? input.label : id
+
+    switch(input.type) {
+      case "select": content[i] += htmlSelect(label, input); break;
+      default: content[i] += htmlInput(label, input); break;
+    }
+    modifierList[id] = input[ "$function" ]
   }
 
   /**
@@ -149,15 +185,20 @@ export default class ConfigDialogue extends Dialogue {
     return this.#update
   }
 
-  provideEventListener(selector, event, fn) {
-    const func = (el) => {
-      const elm = el.querySelector(selector)
-      if (!!elm)
-        elm.addEventListener(event, 
-        (e) => {
-          fn(e)
-        })
-    }
-    return func
+  /**
+   * Replaces input (selector) with tradex-colourinput
+   * interdependent colour picker and text field
+   * @param {HTMLElement} el
+   * @param {string} selector
+   * @memberof ConfigDialogue
+   */
+  provideInputColor(el, selector) {
+    const input = el.querySelector(selector)
+    const colourInput = document.createElement("tradex-colourinput")
+    input.type = "text"
+    input.pattern = RGBAHex
+    colourInput.setTarget(input)
+    colourInput.style.display = "inline-block"
   }
 }
+// end of class ConfigDialogue 
