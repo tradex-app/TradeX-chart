@@ -89,7 +89,7 @@ const TokenChart: React.FC<IConfig> = (props) => {
         ind.value === newIndicator.value ? { ...ind, selected: true } : ind
       );
 
-      setIndicators(updatedIndicators as any);
+      setIndicators(updatedIndicators);
 
       // Prepare the indicator to add with additional settings
       const indicatorToAdd = {
@@ -132,9 +132,6 @@ const TokenChart: React.FC<IConfig> = (props) => {
       } else {
         setData(newData);
       }
-
-      // update onchart
-      setIndicators([...indicators.filter((indicator) => !indicator.isCustom)]);
 
       handleMergeData(newData);
     } catch (error) {
@@ -183,6 +180,14 @@ const TokenChart: React.FC<IConfig> = (props) => {
     setData([]);
     setFirstLoad(true);
     setIsEnd(false);
+    const indicatorsArray = Object.values(mergedConfig.availableIndicators);
+    const mappedIndicators = indicatorsArray.map((indicator: any) => ({
+      label: indicator.name,
+      value: indicator.id,
+      selected: false
+    }));
+
+    setIndicators(mappedIndicators);
     setSelectedInterval(mergedConfig?.defaults?.timeframe || '5m');
     setEndDate(new Date());
   }, [symbol]);

@@ -1,20 +1,20 @@
-"use client";
-import { Button } from "@/components/ui/button";
+'use client';
+import { Button } from '@/components/ui/button';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
+  CommandItem
+} from '@/components/ui/command';
 import {
   Popover,
   PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { useState } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+  PopoverTrigger
+} from '@/components/ui/popover';
+import { useState } from 'react';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Indicator {
   value: string;
@@ -28,7 +28,7 @@ interface IndDropdownProps {
 
 const IndicatorDropdown: React.FC<IndDropdownProps> = ({
   indicators = [],
-  setValue,
+  setValue
 }) => {
   const [open, setOpen] = useState(false);
 
@@ -65,8 +65,8 @@ const IndicatorDropdown: React.FC<IndDropdownProps> = ({
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
-                      ind.selected ? "opacity-100" : "opacity-0"
+                      'mr-2 h-4 w-4',
+                      ind.selected ? 'opacity-100' : 'opacity-0'
                     )}
                   />
                   {ind.label}
