@@ -53,7 +53,7 @@ export default class ADX extends Indicator {
     this.init(talibAPI)
   }
 
-  calcIndicator (indicator, params={}, range, output=this.definition.output) {
+  calcIndicator (indicator, params={}, range, output=this.definition) {
     return super.calcIndicator (indicator, params, range, output) 
   }
 }
