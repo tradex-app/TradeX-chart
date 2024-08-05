@@ -49,3 +49,6 @@ dist-ssr
 # macOS-specific files
 ./src/docs/.DS_Store
 nextjs/bun.lockb
+
+# nextjs
+./nextjs-tradex/.next/
