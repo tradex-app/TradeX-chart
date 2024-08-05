@@ -12744,7 +12744,7 @@ const Xa = {
       ind: o[e]
     };
 })(Xa);
-const Hn = "0.151.0";
+const Hn = "0.151.1";
 class fp {
   #e;
   #t;
@@ -15239,7 +15239,7 @@ class st extends yt {
     valueMin: -10,
     valueDiff: 120
   };
-  #A = {};
+  #L = {};
   constructor(e, i = {}) {
     if (super(e, i), this.#r = st.cnt, !C(i))
       throw new Error("Chart (pane) constructor failed: Expected options typeof object");
@@ -15409,7 +15409,7 @@ class st extends yt {
     return this.getIndicators();
   }
   get indicatorDeleteList() {
-    return this.#A;
+    return this.#L;
   }
   get Divider() {
     return this.#d;
@@ -15933,7 +15933,7 @@ class Qs extends yt {
   #w;
   #E;
   #M;
-  #A = 0;
+  #L = 0;
   #O = 0;
   constructor(e, i) {
     i.parent = e, super(e, i), this.#s = this.core.elMain, this.#n = this.core.elYAxis, this.init(i);
@@ -16100,8 +16100,8 @@ class Qs extends yt {
     this.#M = new Ve(this.#r, { disableContextMenu: !1 }), this.#M.on("keydown", this.onChartKeyDown.bind(this)), this.#M.on("keyup", this.onChartKeyUp.bind(this)), this.#M.on("wheel", this.onMouseWheel.bind(this)), this.#M.on("pointerenter", this.onMouseEnter.bind(this)), this.#M.on("pointerout", this.onMouseOut.bind(this)), this.#M.on("pointerup", this.onChartDragDone.bind(this)), this.#M.on("pointermove", this.onMouseMove.bind(this)), this.on(sn, this.onFirstStreamValue, this), this.on(nn, this.onNewStreamValue, this), this.on("setRange", this.onSetRange, this), this.on("scrollUpdate", this.draw, this), this.on("chart_render", this.draw, this), this.on("chart_paneDestroy", this.removeChartPane, this);
   }
   onSetRange() {
-    if (this.#O = this.#A, this.#A = this.chart.scale.calcScaleWidth(), this.#O < this.#A) {
-      const e = `${this.#A}px`;
+    if (this.#O = this.#L, this.#L = this.chart.scale.calcScaleWidth(), this.#O < this.#L) {
+      const e = `${this.#L}px`;
       this.core.elBody.scale.style.width = e, this.setDimensions();
     } else
       this.draw();
@@ -19603,7 +19603,7 @@ class _ extends Mf {
   #w = { ...$i };
   #E = { ...$i };
   #M;
-  #A;
+  #L;
   #O;
   chartWMin = ni;
   chartHMin = Ye;
@@ -19741,26 +19741,23 @@ class _ extends Mf {
   get ToolsBar() {
     return this.#_;
   }
-  get ToolsBar() {
-    return this.#_;
-  }
   get MainPane() {
-    return this.#L;
+    return this.#A;
   }
   get Timeline() {
-    return this.#L.time;
+    return this.#A.time;
   }
   get WidgetsG() {
     return this.#H;
   }
   get Chart() {
-    return this.#L.chart;
+    return this.#A.chart;
   }
   get ChartPanes() {
-    return this.#L.chartPanes;
+    return this.#A.chartPanes;
   }
   get Indicators() {
-    return this.#L.indicators;
+    return this.#A.indicators;
   }
   get CustomOverlays() {
     return this.#E;
@@ -19795,7 +19792,7 @@ class _ extends Mf {
     return Qc;
   }
   get theme() {
-    return this.#A;
+    return this.#L;
   }
   get settings() {
     return this.state.data.chart.settings;
@@ -19876,7 +19873,7 @@ class _ extends Mf {
     C(e) && (this.#V = e);
   }
   get candles() {
-    return this.#z;
+    return this.#V;
   }
   get progress() {
     return this.#F;
@@ -19998,8 +19995,8 @@ class _ extends Mf {
   setTheme(e) {
     if (!this.theme.list.has(e))
       return !1;
-    this.#A.setTheme(e, this);
-    const i = this.#A, s = document.querySelector(`style[title=${this.id}_style]`), n = `var(--txc-border-color, ${i.chart.BorderColour}`;
+    this.#L.setTheme(e, this);
+    const i = this.#L, s = document.querySelector(`style[title=${this.id}_style]`), n = `var(--txc-border-color, ${i.chart.BorderColour}`;
     let r = `.${this.id} { `;
     r += `--txc-background: ${i.chart.Background}; `, this.style.background = `var(--txc-background, ${i.chart.Background})`, this.style.border = `${i.chart.BorderThickness || 0}px solid`, this.style.borderColor = n, r += `--txc-border-color:  ${i.chart.BorderColour}; `, i.chart.BorderThickness > 0 ? this.elMain.rows.style.border = `1px solid ${n}` : this.elMain.rows.style.border = "none", r += `--txc-time-scrollbar-color: ${i.chart.BorderColour}; `, r += `--txc-time-handle-color: ${i.xAxis.handle}; `, r += `--txc-time-slider-color: ${i.xAxis.slider}; `, r += `--txc-time-cursor-fore: ${i.xAxis.colourCursor}; `, r += `--txc-time-cursor-back: ${i.xAxis.colourCursorBG}; `, r += `--txc-time-icon-color: ${i.icon.colour}; `, r += `--txc-time-icon-hover-color: ${i.icon.hover}; `, this.elTime.overview.scrollBar.style.borderColor = n, this.elTime.overview.handle.style.backgroundColor = `var(--txc-time-handle-color, ${i.xAxis.handle})`, this.elTime.overview.style.setProperty("--txc-time-slider-color", i.xAxis.slider), this.elTime.overview.style.setProperty("--txc-time-icon-color", i.icon.colour), this.elTime.overview.style.setProperty("--txc-time-icon-hover-color", i.icon.hover);
     for (let [a, l] of Object.entries(this.Chart.legend.list))
@@ -20197,22 +20194,19 @@ class _ extends Mf {
     return s;
   }
   addIndicator(e, i = e, s = {}) {
-    return this.#L.addIndicator(e, i, s) || this.error(`Indicator: ${e} - Error failed to add indicator`), e;
+    return this.#A.addIndicator(e, i, s) || this.error(`Indicator: ${e} - Error failed to add indicator`), e;
   }
   getIndicator(e) {
-    return this.#L.getIndicator(e);
-  }
-  getIndicatorsByType(e) {
-    return this.#L.getIndicatorsByType(e);
+    return this.#A.getIndicator(e);
   }
   getIndicatorsByType(e) {
     return this.#A.getIndicatorsByType(e);
   }
   removeIndicator(e) {
-    return this.#L.removeIndicator(e) || this.error(`Indicator: ${e} - Error failed to remove indicator`), e;
+    return this.#A.removeIndicator(e) || this.error(`Indicator: ${e} - Error failed to remove indicator`), e;
   }
   indicatorSettings(e, i) {
-    return this.#L.indicatorSettings(e, i);
+    return this.#A.indicatorSettings(e, i);
   }
   hasStateIndicator(e, i = "searchAll") {
     if (!T(e) || !T(i))
@@ -20256,7 +20250,7 @@ class _ extends Mf {
     return !P(e) && !P(i) ? !1 : (this.setDimensions(e, i), !0);
   }
   refresh() {
-    this.ready && this.#L.refresh();
+    this.ready && this.#A.refresh();
   }
   toImageURL(e, i, s, n) {
     return ro(this, e, i, s, "url", n);

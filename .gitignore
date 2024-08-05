@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
+nextjs-tradex/.next/*
 
 # Editor directories and files
 .vscode/*
@@ -50,5 +51,5 @@ dist-ssr
 ./src/docs/.DS_Store
 nextjs/bun.lockb
 
-# nextjs
-./nextjs-tradex/.next/
+
+
