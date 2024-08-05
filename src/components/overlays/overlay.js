@@ -36,7 +36,6 @@ export default class Overlay {
   }
   #histogram
 
-
   id
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params={}) {

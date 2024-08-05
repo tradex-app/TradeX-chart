@@ -866,9 +866,6 @@ export default class Chart extends Component{
     // height is undefined
     else {
       yDelta = this.core.MainPane.cursorPos[5]
-      if (activeHeight - yDelta < rowMinH)
-        yDelta = rowMinH - (activeHeight - yDelta)
-
       activeH = activeHeight - yDelta
       activeH = limit(activeH, rowMinH, total - rowMinH)
       prevH  = total - activeH

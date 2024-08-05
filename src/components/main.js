@@ -243,10 +243,6 @@ export default class MainPane extends Component {
   }
 
   destroy() {
-    // remove all listeners
-    this.core.hub.expunge(this)
-    this.renderLoop.stop()
-
     this.#destruction = true
     this.renderLoop.stop()
     this.stateMachine.destroy()
@@ -344,25 +340,6 @@ export default class MainPane extends Component {
       // this.#elViewport.style.width = `calc(100% - ${this.#scaleW}px)`
       // this.#elRows.style.width = `calc(100% - ${this.#scaleW}px)`
       // this.#elTime.style.width = `calc(100% - ${this.#scaleW}px)`
-
-      this.setDimensions()
-    }
-    else this.draw()
-
-    // this.draw()
-  }
-
-  onSetRange() {
-    this.#scaleWOld = this.#scaleW
-    this.#scaleW = this.chart.scale.calcScaleWidth()
-
-    // // does the scale width have to adjusted?
-    if (this.#scaleWOld < this.#scaleW) {
-      const width = `${this.#scaleW}px`
-      this.core.elBody.scale.style.width = width
-      this.#elViewport.style.width = `calc(100% - ${this.#scaleW}px)`
-      this.#elRows.style.width = `calc(100% - ${this.#scaleW}px)`
-      this.#elTime.style.width = `calc(100% - ${this.#scaleW}px)`
 
       this.setDimensions()
     }

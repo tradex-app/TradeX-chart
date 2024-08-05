@@ -108,7 +108,6 @@ export default class element extends HTMLElement {
   get dimensions() { return this.DOM }
   set cursor(c) { this.style.cursor = c }
   get cursor() { return this.style.cursor }
-  get hub() { return this.#hub }
 
   setDim(v, d) {
     if (!["width", "height", "top", "bottom", "left", "right"].includes(d) || !isString(v)) return
