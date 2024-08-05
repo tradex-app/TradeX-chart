@@ -1,0 +1,60 @@
+html,
+body {
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    Fira Sans,
+    Droid Sans,
+    Helvetica Neue,
+    sans-serif;
+}
+
+body > div {
+  height: 80%;
+  padding: 0 1rem;
+}
+
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.toolbar {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.light div:fullscreen {
+  background-color: white;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.full-size {
+  height: 100%;
+  width: 100%;
+}
