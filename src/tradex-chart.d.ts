@@ -80,6 +80,7 @@ declare module 'tradex-chart' {
     type?: string;
     data?: number[];
     settings?: object;
+  }
 
   export interface IIndicator {
     id: string;
@@ -133,9 +134,12 @@ declare module 'tradex-chart' {
     removeIndicator: (indicatorId: string) => void;
   }
 
+  export interface canvas {
+    [key: string]: function;
+  }
+
   export type ChartType = "area" | "candle_solid";
 
- 
   export const YAXIS_TYPES: {
     LINEAR: string;
     LOG: string;

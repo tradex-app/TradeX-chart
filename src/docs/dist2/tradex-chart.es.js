@@ -437,7 +437,7 @@ var to = { exports: {} };
     }
     function D(c, u) {
       return function() {
-        return u.apply(m, arguments);
+        return c.apply(u, arguments);
       };
     }
     function L(c, u) {
@@ -1546,16 +1546,6 @@ function Ch(o, e) {
   let o = !1, l = !1, h = !1;
   return i === ds || i === Ei && !Number.isFinite(s) ? (o = r === Ja, l = r === el, h = r === tl) : i === Ei ? (o = !!(s & rl), l = !!(s & al), h = !!(s & ol)) : i === us && (o = n === il, l = n === sl, h = n === nl), { leftButton: o, middleButton: l, rightButton: h };
 }
-function hl(a, i) {
-  const s = a.center;
-  if (!s)
-    return null;
-  const n = i.getBoundingClientRect(), r = n.width / i.offsetWidth || 1, o = n.height / i.offsetHeight || 1, l = {
-    x: (s.x - n.left - i.clientLeft) / r,
-    y: (s.y - n.top - i.clientTop) / o
-  };
-  return { center: s, offsetCenter: l };
-}
 const as = {
   srcElement: "root",
   priority: 0
@@ -1857,8 +1847,8 @@ class lr {
     }
     return r ? this.#t.agent.once(i, o.bind(this), n) : this.#t.agent.on(i, o.bind(this), n), o;
   }
-  off(i, s, n) {
-    this.#t.agent.off(i, s, n);
+  off(e, i, s) {
+    this.#t.agent.off(e, i, s);
   }
 }
 class hr {
@@ -12120,6 +12110,18 @@ class zm extends dt {
   get height() {
     return this.#n.height;
   }
+  set width(e) {
+    this.setWidth(e);
+  }
+  get width() {
+    return this.#n.width;
+  }
+  get xAxis() {
+    return this.#r;
+  }
+  get height() {
+    return this.#n.height;
+  }
   set width(i) {
     this.setWidth(i);
   }
@@ -12330,6 +12332,9 @@ const Vm = {
   expungeFrames() {
     this.renderQ.clear();
   },
+  expungeFrames() {
+    this.renderQ.clear();
+  },
   getFrame: function(o = 0) {
     return this.renderQ.has(o) ? this.renderQ.get(o) : this.renderQ.firstValue();
   },
@@ -12387,6 +12392,19 @@ class Fm {
   }
   get list() {
     return this.#l;
+  }
+  set collapse(e) {
+    this.setCollapse(e);
+  }
+  get collapse() {
+    return this.#o;
+  }
+  get visible() {
+    return this.getVisible();
+  }
+  getVisible() {
+    const e = getComputedStyle(this.#e);
+    return e.display && e.visibility;
   }
   set collapse(i) {
     this.setCollapse(i);
@@ -12766,8 +12784,8 @@ class jm extends dt {
   get shortName() {
     return this.#t;
   }
-  set height(i) {
-    this.setHeight(i);
+  set height(e) {
+    this.setHeight(e);
   }
   get height() {
     return this.#n.getBoundingClientRect().height;
@@ -12832,6 +12850,9 @@ class jm extends dt {
   get range() {
     return this.#s.range;
   }
+  get range() {
+    return this.#s.range;
+  }
   set rangeMode(e) {
     this.#s.mode = e;
   }
@@ -12869,8 +12890,8 @@ class jm extends dt {
     let e = this.graph.viewport.scene.canvas;
     this.#d = new Be(e, { disableContextMenu: !1 }), this.#d.setCursor("ns-resize"), this.#d.on("pointerdrag", this.onDrag.bind(this)), this.#d.on("pointerdragend", this.onDragDone.bind(this)), this.#d.on("wheel", this.onMouseWheel.bind(this)), this.#d.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.parent.id}_pointermove`, this.onMouseMove, this), this.on(`${this.parent.id}_pointerout`, this.#h.erase, this.#h), this.on(Je, this.#l.draw, this.#l), this.on("setRange", this.draw, this);
   }
-  onResize(i) {
-    this.setDimensions(i);
+  onResize(e) {
+    this.setDimensions(e);
   }
   onMouseMove(e) {
     this.#b = P(e) ? e : [Math.floor(e.position.x), Math.floor(e.position.y)], this.#h.draw(this.#b);
@@ -13975,7 +13996,7 @@ class at extends dt {
     let { layerConfig: i } = this.layerConfig(), s = new U.Layer(i);
     this.#f.set(e.id, s), this.#g.addLayer(s), e.layerTool = s, this.#x.set(e.id, e);
   }
-  addTools(i) {
+  addTools(e) {
   }
   overlayToolAdd(e) {
     this.#x.set(e.id, e);
@@ -14405,8 +14426,8 @@ class Bs extends dt {
   get dimensions() {
     return ae(this.#s);
   }
-  set cursor(i) {
-    this.element.style.cursor = i;
+  set cursor(e) {
+    this.element.style.cursor = e;
   }
   get cursor() {
     return this.element.style.cursor;
@@ -17647,6 +17668,9 @@ class Hp extends W {
   get resizeEntries() {
     return this.#m;
   }
+  get resizeEntries() {
+    return this.#m;
+  }
   elStart(i) {
     this.#h = i, this.setUtilsLocation();
   }
@@ -18766,7 +18790,7 @@ class N extends Hp {
     return this.#y;
   }
   get options() {
-    return this.#C;
+    return this.#b;
   }
   get config() {
     return this.#p;
@@ -18827,9 +18851,6 @@ class N extends Hp {
   }
   get ready() {
     return this.#E;
-  }
-  get ready() {
-    return this.#O;
   }
   get state() {
     return this.#f;
@@ -18907,6 +18928,42 @@ class N extends Hp {
   }
   get mousePos() {
     return this.#H;
+  }
+  get pointerButtons() {
+    return this.#W;
+  }
+  set pricePrecision(e) {
+    this.setPricePrecision(e);
+  }
+  get pricePrecision() {
+    return this.#V;
+  }
+  get volumePrecision() {
+    return this.#F;
+  }
+  set stream(e) {
+    return this.setStream(e);
+  }
+  get stream() {
+    return this.#D;
+  }
+  get worker() {
+    return this.#U;
+  }
+  get isEmpty() {
+    return this.#f.IsEmpty;
+  }
+  set candles(e) {
+    w(e) && (this.#z = e);
+  }
+  get candles() {
+    return this.#z;
+  }
+  get progress() {
+    return this.#B;
+  }
+  get customOverlays() {
+    return this.#T;
   }
   get pointerButtons() {
     return this.#W;
