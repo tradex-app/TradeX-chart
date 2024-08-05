@@ -244,7 +244,7 @@ export default class MainPane extends Component {
 
   destroy() {
     // remove all listeners
-    this.#core.hub.expunge(this)
+    this.core.hub.expunge(this)
     this.renderLoop.stop()
 
     this.#destruction = true
