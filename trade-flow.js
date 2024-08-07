@@ -6,6 +6,7 @@ import { Indicator } from "./src"
 import { candleW } from "./src"
 import { YAXIS_TYPES } from "./src";
 import { YAXIS_PADDING } from "./src/definitions/chart";
+import { isObject } from "./src/utils/typeChecks";
 
 /**
  * custom indicator class
@@ -75,8 +76,10 @@ export default class TradeFlow extends Indicator {
    */
   calcIndicatorHistory() {
 
+    if (!isObject(this.state.trades.data[this.state.time.timeFrame]))
+      return false
     // create a time series array from State trades entries
-    this.dataProxy(this.dataProxyFn, this.state.allData.trades[this.state.time.timeFrame])   
+    this.dataProxy(this.dataProxyFn, this.state.trades.data[this.state.time.timeFrame])   
 
     return false
   }

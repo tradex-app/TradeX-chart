@@ -42,7 +42,7 @@ export default class chartTrades extends Overlay {
     super(target, xAxis, yAxis, theme, parent, params)
 
     this.settings = params.settings
-    this.state.importTrades(this.data)
+    State.importData("trades", this.data, this.state, this.state.time.timeFrame)
     this.#trade = new Trade(target, theme)
     this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this)
     tradeDialogue.parent = this

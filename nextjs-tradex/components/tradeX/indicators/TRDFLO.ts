@@ -1,15 +1,19 @@
 import { Indicator } from "tradex-chart"
 import { candleW } from "tradex-chart"
 import { YAXIS_TYPES } from "tradex-chart";
+import { YAXIS_PADDING } from "tradex-chart";
+import { isObject } from "tradex-chart";
 
 /**
  * custom indicator class
  */
 export default class TradeFlow extends Indicator {
 
+  static version = "1.0"
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative
+  static yAxisPadding = YAXIS_PADDING
   static colours = []
   static defaultStyle = {
     buy: {
@@ -68,8 +72,10 @@ export default class TradeFlow extends Indicator {
    */
   calcIndicatorHistory() {
 
+    if (!isObject(this.state.trades.data[this.state.time.timeFrame]))
+      return false
     // create a time series array from State trades entries
-    this.dataProxy(this.dataProxyFn, this.state.allData.trades[this.state.time.timeFrame])   
+    this.dataProxy(this.dataProxyFn, this.state.trades.data[this.state.time.timeFrame])   
 
     return false
   }

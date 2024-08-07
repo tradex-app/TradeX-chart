@@ -27,7 +27,7 @@
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "talib-web": "^0.1.3",
-    "tradex-chart": "^0.151.0"
+    "tradex-chart": "file:./local_modules/tradex-chart/dist"
   },
   "devDependencies": {
     "@types/node": "^20",
