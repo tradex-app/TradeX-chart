@@ -9,16 +9,14 @@
   ],
   "main": "./dist/tradex-chart.umd.js",
   "module": "./dist/tradex-chart.es.js",
-  "types": "./dist/tradex-chart.d.ts",
   "exports": {
     ".": {
       "import": "./dist/tradex-chart.es.js",
-      "require": "./dist/tradex-chart.umd.js",
-      "types": "./dist/tradex-chart.d.ts"
+      "require": "./dist/tradex-chart.umd.js"
     }
   },
   "private": false,
-  "version": "0.151.2",
+  "version": "0.148.3",
   "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",
@@ -65,5 +63,6 @@
   },
   "documentation": {
     "url": "https://tradex-app.github.io/TradeX-chart/"
-  }
+  },
+  "types": "./dist/tradex-chart.d.ts"
 }

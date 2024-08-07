@@ -24,6 +24,7 @@ const DEFAULT_STATE = {
   key: "",
   status: "default",
   isEmpty: true,
+  allData: {},
   chart: {
     name: "Primary",
     type: "candles",
@@ -90,6 +91,26 @@ const EVENT = {
   url: "string",
 }
 
+const ANNOTATIONS = {
+  timestamp: "number",
+  id: "string",
+  title: "string",
+  content: "string",
+}
+
+const TOOLS = {
+  timestamp: "number",
+  id: "string",
+  type: "string",
+  nodes: "array",
+}
+
+const validator = {
+  trades: TRADE,
+  events: EVENT,
+  annotations: ANNOTATIONS,
+  tools: TOOLS
+}
 
 export default class State {
 
@@ -111,8 +132,9 @@ export default class State {
     const defaultState = State.default
 
     if (!isObject(state)) {
-      state = {}
+      state = defaultState
     }
+
     // set up main (primary) chart state (handles price history (candles OHLCV))
     if (!isObject(state.chart)) {
       state.chart = defaultState.chart
@@ -129,6 +151,7 @@ export default class State {
     else 
       state.chart.data = validateShallow(state.chart.data, isCrypto) ? state.chart.data : []
 
+    state.allData.data = state.chart.data
     state.chart.isEmpty = (state.chart.data.length == 0) ? true : false
 
     // validate range
@@ -159,6 +182,9 @@ export default class State {
 
     state.range.timeFrame = ms2Interval(state.range.timeFrameMS)
 
+    if (!isObject(state.chart.settings)) {
+      state.chart.settings = defaultState.chart.settings
+    }
 
     if (!isArray(state.views)) {
       state.views = defaultState.views
@@ -167,18 +193,17 @@ export default class State {
     if (!isArray(state.primary)) {
         state.primary = defaultState.primary
     }
+    state.allData.primaryPane = state.primary
 
     if (!isArray(state.secondary)) {
         state.secondary = defaultState.secondary
     }
-
-    if (!isObject(state.chart.settings)) {
-        state.chart.settings = defaultState.chart.settings
-    }
+    state.allData.secondaryPane = state.secondaryPane
 
     if (!isArray(state.datasets)) {
         state.datasets = []
     }
+    state.allData.datasets = state.datasets
 
 // TODO: trades
 // TODO: events
@@ -231,6 +256,27 @@ export default class State {
     if (!state.views.has("primary")) 
       state.views.insert("primary", defaultState.primary, 0)
     state.views.get("primary").push(state.chart)
+
+    // trades
+
+    State.validateData("trades", state)
+    state.trades = state.allData.trades
+
+    // events
+
+    State.validateData("events", state)
+    state.events = state.allData.events
+
+    // annotations
+
+    State.validateData("annotations", state)
+    state.annotations = state.allData.annotations
+
+    // tools
+
+    State.validateData("tools", state)
+    state.tools = state.allData.tools
+
 
     // Init dataset proxies
     for (var ds of state.datasets) {
@@ -323,6 +369,69 @@ export default class State {
     }
     return stateExport
   }
+
+  static validateData(type, state) {
+    if (!isString(type) || 
+        !(type in validator) ||
+        !isObject(state)) throw new Error(`ERROR: State: validateData: ${type} unexpected data`)
+
+    if (!isObject(state[type])) state[type] = copyDeep(DEFAULT_STATE[type])
+    state[type].display = !!state[type]?.display
+    state[type].displayInfo = !!state[type]?.displayInfo
+    if (!isObject(state[type].data)) state[type].data = copyDeep(DEFAULT_STATE[type].data)
+    else {
+      let tradeData = state[type].data
+      let allData = state?.data?.allData || state.allData
+      let tf = state.range.timeFrame
+      State.importData(type, tradeData, allData, tf)
+    }
+  }
+
+  /**
+   * import data (trades, events, annotations, tools) 
+   * validate and store in state
+   * @static
+   * @param {string} type - type of data to import
+   * @param {object} data - trade data to import
+   * @param {object} state - State allData
+   * @param {object} tf - time frame
+   * @memberof State
+   */
+  static importData(type, data, state, tf) {
+
+    if (!(type in validator)) return false
+
+    if (!isObject(state?.[type])) state[type] = copyDeep(DEFAULT_STATE[type])
+
+    let d = state[type].data
+    if (!isObject(d?.[tf]))
+      d[tf] = {}
+
+    if (!isObject(data)) return false
+    for (let ts in data) {
+      if ( 
+          isValidTimestamp(ts*1) &&
+          isArray(data[ts])
+          ) {
+            for (let t of data[ts]) {
+              if (t?.id) t.id = `${t.id}` 
+              if (State.isValidEntry(t, validator[type])) {
+                if (!isObject(d?.[tf]))
+                d[tf] = {}
+                if (!isArray(d[tf]?.[ts]))
+                d[tf][ts] = []
+                d[tf][ts].push(t)
+              }
+            }
+      }
+      else {
+        d[ts] = data[ts]
+      }
+    }
+    return true
+  }
+
+
   
   #id = ""
   #key = ""
@@ -367,6 +476,10 @@ export default class State {
       tools: this.#data.tools.data
     }
   }
+  get trades() { return this.#data.trades }
+  get events() { return this.#data.events }
+  get annotations() { return this.#data.annotations }
+  get tools() { return this.#data.tools }
   get data() { return this.#data }
   get core() { return (this.#core !== undefined) ? this.#core : false }
   get time() { return this.#core.timeData }
@@ -492,7 +605,7 @@ export default class State {
     let end = (isArray(merge?.ohlcv)) ? merge.ohlcv.length -1 : 0
     // time frames don't match
     if (end > 1 &&
-        this.time.timeFrameMS !== detectInterval(merge?.ohlcv)) {
+        tfMS !== detectInterval(merge?.ohlcv)) {
       this.error(`ERROR: ${this.core.id}: merge data time frame does not match existing time frame!`)
       return false
     }
@@ -504,7 +617,7 @@ export default class State {
     // }
 
     // if the chart empty is empty set the range to the merge data
-    if (this.#isEmpty || !isNumber(this.time.timeFrameMS)) {
+    if (this.#isEmpty || !isNumber(tfMS)) {
       if (!isObject(newRange) ||
           !isNumber(newRange.start) ||
           !isNumber(newRange.end) ) {
@@ -585,7 +698,7 @@ export default class State {
       // chart has data, check for gaps and overlap and then merge
       else {
         // are there gaps in the merge data?
-        let tfMS = this.time.timeFrameMS
+        let tfMS = tfMS
         let mStart = mData[0][0]
         let mEnd = mData[mData.length - 1][0]
         let mDataMS = (mData.length - 1) * tfMS
@@ -664,11 +777,10 @@ export default class State {
         }
       }
 
+      // Trades
       // Do we have trades?
       if (isObject(mTrades)) {
-        for (let d in mTrades) {
-          // TODO:
-        }
+        State.importTrades(mTrades, this.allData, this.time.timeFrame)
       }
 
       // set new Range if required
@@ -798,41 +910,16 @@ export default class State {
     if (!State.isValidEntry(t, TRADE)) return false
 
     // insert the trade
-    const ts = t.timestamp - (t.timestamp % this.time.timeFrameMS)
+    const ts = t.timestamp - (t.timestamp % tfMS)
     const d = new Date(ts)
 
     t.dateStr =`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
 
     this.allData.trades.data.ts[t.timestamp] = t
-    this.allData.trades.data[this.time.timeFrame][ts] = t
+    this.allData.trades.data[tf][ts] = t
 
     this.#core.emit("state_tradeAdded", t)
     this.#core.emit("trade_added", t)
-    return true
-  }
-
-  importTrades(data) {
-    if (!isObject(data)) return false
-    for (let ts in data) {
-      if ( 
-          isValidTimestamp(ts*1) &&
-          isArray(data[ts])
-          ) {
-            for (let t of data[ts]) {
-              if (t?.id) t.id = `${t.id}` 
-              if (State.isValidEntry(t, TRADE)) {
-                if (!isObject(this.allData.trades?.[this.core.time.timeFrame]))
-                this.allData.trades[this.core.time.timeFrame] = {}
-                if (!isArray(this.allData.trades[this.core.time.timeFrame]?.[ts]))
-                this.allData.trades[this.core.time.timeFrame][ts] = []
-                this.allData.trades[this.core.time.timeFrame][ts].push(t)
-              }
-            }
-      }
-      else {
-        this.allData.trades[ts] = data[ts]
-      }
-    }
     return true
   }
 
@@ -850,13 +937,13 @@ export default class State {
     if (!State.isValidEntry(e, EVENT)) return false
 
     // insert the event
-    const ts = t.timestamp - (e.timestamp % this.time.timeFrameMS)
+    const ts = t.timestamp - (e.timestamp % tfMS)
     const d = new Date(ts)
 
     e.dateStr =`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
 
     this.allData.events.data.ts[e.timestamp] = e
-    this.allData.events.data[this.time.timeFrame][ts] = e
+    this.allData.events.data[tf][ts] = e
 
     this.#core.emit("state_eventAdded", e)
     this.#core.emit("event_added", e)
