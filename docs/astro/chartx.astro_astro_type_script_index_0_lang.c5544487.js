@@ -594,8 +594,8 @@ function A8(o,e){for(var i=0;i<e.length;i++){const s=e[i];if(typeof s!="string"&
         margin: 0 auto;
       }
     </style>
-    `;for(const s of e)i+=this.iconNode(s);return i}iconNode(e){const i="sub"in e?'data-menu="true"':"";return`
-      <div id="${e.id}" data-event="${e.event}" ${i} class="icon-wrapper">${e.icon}</div>
+    `;for(const n of i)s+=this.iconNode(n);return s}iconNode(i){const s="sub"in i?'data-menu="true"':"";return`
+      <div id="${i.id}" data-event="${i.event}" ${s} class="icon-wrapper">${i.icon}</div>
 
     `}}customElements.get("tradex-tools")||window.customElements.define("tradex-tools",Fe);const F2=document.createElement("template");F2.innerHTML=`
 <style>

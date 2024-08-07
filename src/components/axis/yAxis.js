@@ -105,9 +105,9 @@ export default class yAxis extends Axis {
         pane = this.#range;
     if (!chart.isPrimary &&
         id in mm) {
-          max = mm[id]?.data?.max || max //* 1.2
-          min = mm[id]?.data?.min || min //- (mm[id].data.min * 0.2)
-          pane = mm[id]?.data || {}
+          max = mm[id].data.max //* 1.2
+          min = mm[id].data.min //- (mm[id].data.min * 0.2)
+          pane = mm[id].data
     }
     // account for flat line or zero
     if (max == min) {

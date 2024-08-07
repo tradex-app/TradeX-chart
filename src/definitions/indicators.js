@@ -28,7 +28,7 @@ import Volume from "../indicators/Volume"
 import PLUS_DI from "../indicators/DMI";
 
 export const IndicatorClasses = {
-  ADX,
+  // ADX,
   ATR,
   AROON,
   BB,
@@ -48,9 +48,6 @@ export const IndicatorClasses = {
   // STOCH,
   // STOCHRSI,
   VOL: Volume,
-
-
-  PLUS_DI
 };
 
 const indicators = {};
