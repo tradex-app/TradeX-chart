@@ -19,6 +19,7 @@ import MACD from "../indicators/MACD";
 import MFI from "../indicators/MFI";
 import OBV from "../indicators/OBV";
 import PPO from "../indicators/PPO";
+import PSAR from "../indicators/PSAR";
 import ROC from "../indicators/ROC";
 import RSI from "../indicators/RSI";
 import SMA from "../indicators/SMA"
@@ -44,6 +45,7 @@ export const IndicatorClasses = {
   MFI,
   OBV,  // fix scale
   PPO,
+  PSAR,
   ROC,
   RSI,
   SMA,

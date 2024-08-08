@@ -195,10 +195,8 @@ export class Range {
 
     inOut -= this.Length
 
-    let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this})
-    this.setMaxMin(maxMin)
     this.setConfig({maxCandles: max})
-    this.maxMinDatasets()
+    this.setAllMaxMin()
 
     // if (this.#init || this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
     //   this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
@@ -396,6 +394,13 @@ export class Range {
    * @returns {number}
    */
   rangeIndex (ts) { return this.getTimeIndex(ts) - this.indexStart }
+
+
+  setAllMaxMin() {
+    let maxMin = this.maxMinPriceVol({data: this.data, start: this.indexStart, end: this.indexEnd, that: this})
+    this.setMaxMin(maxMin)
+    this.maxMinDatasets()
+  }
 
   /**
    * Find price maximum and minimum, volume maximum and minimum

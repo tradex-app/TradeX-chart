@@ -852,6 +852,8 @@ export default class MainPane extends Component {
 
       instance.start()
       this.core.state.addIndicator(instance, "secondary")
+      instance.scale.draw(this.range, true)
+      this.draw()
     }
 
     const id = ("instance" in instance) ? instance.instance.id : instance.id

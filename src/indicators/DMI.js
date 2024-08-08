@@ -16,11 +16,11 @@ export default class DMI extends Indicator {
   static yAxisPadding = YAXIS_PADDING
   static colours = []
   static defaultStyle = {
-    "DMI+": {
+    "DI+": {
       colour: {value: "#0f0"},
       width: {value: 1},
     },
-    "DMI-": {
+    "DI-": {
       colour: {value: "#f00"},
       width: {value: 1},
     },
@@ -46,14 +46,14 @@ export default class DMI extends Indicator {
     },
     meta: {
       output: [
-        {name: "DMI+", type: "custom", plot: "line"},
-        {name: "DMI-", type: "custom", plot: "line"},
+        {name: "DI+", type: "custom", plot: "line"},
+        {name: "DI-", type: "custom", plot: "line"},
         {name: "ADX", type: "custom", plot: "line"},
       ],
       outputOrder: ["DMI+", "DMI-", "ADX"],
       outputLegend: {
-        "DMI+": {labelStr: "DMI+", label: true, value: true},
-        "DMI-": {labelStr: "DMI-", label: true, value: true},
+        "DI+": {labelStr: "DI+", label: true, value: true},
+        "DI-": {labelStr: "DI-", label: true, value: true},
         "ADX": {labelStr: "ADX", label: true, value: true},
       }
     },
@@ -80,10 +80,6 @@ export default class DMI extends Indicator {
 
   get data() { return this.overlay.data }
   get overlayData() { return this.overlay.data }
-
-  calcIndicatorHistory (calcFn) {
-    super.calcIndicatorHistory ()
-  }
 
   calcIndicator(indicator, params={}, range=this.range) {
     let DIPlusDef= {input: { timePeriod: 14}, output: {output: []}}
