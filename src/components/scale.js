@@ -99,11 +99,9 @@ export default class ScaleBar extends Component {
 
 
   start() {
-    // const range = (this.parent.name == "Chart" ) ? 
-      // undefined : this.parent.localRange
     const range = (this.options.yAxisType === "default") ? 
       undefined : this.parent.localRange
-    
+
     this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
 
     this.#yAxis.yAxisPadding = 

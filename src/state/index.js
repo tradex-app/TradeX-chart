@@ -212,6 +212,13 @@ export default class State {
 
 
 
+// TODO: trades
+// TODO: events
+// TODO: annotations
+// tools
+
+
+
     // Build chart order
     if (state.views.length == 0) {
       // add primary chart

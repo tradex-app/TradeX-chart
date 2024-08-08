@@ -847,11 +847,22 @@ export default class Indicator extends Overlay {
         d.output[o.name] = []
       }
     }
+    // default output order
+    let doo = true
+    if (Object.keys(d.meta.output).length > 0) {
+      doo = false
+      for (let o of d.meta.output) {
+        if (isObject(o))
+          oo.push(o.name)
+      }
+    }
+
     // ensure all definition outputs are arrays
     for (let o in d.output) {
       if (!isArray(d.output[o])) 
         d.output[o] = []
-      oo.push(o)
+      if (doo)
+        oo.push(o)
     }
   }
 
@@ -1134,7 +1145,7 @@ export default class Indicator extends Overlay {
     let def = this.definition.input
 
     if ("timePeriod" in def)
-      d = def.timePeriod
+      d = def.timePeriod * 2
     else {
       for (let i in def) {
         if (isInteger(def[i]) && def[i] > d)
@@ -1275,7 +1286,7 @@ export default class Indicator extends Overlay {
    * calculate back history if missing
    * @memberof indicator
    */
-  calcIndicatorHistory () {
+  calcIndicatorHistory (calcFn) {
     const calc = () => {
       let od = this.overlay.data
 
