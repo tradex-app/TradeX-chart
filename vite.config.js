@@ -45,6 +45,9 @@ export default defineConfig(({ command, mode }) => {
       // server: {
       //   open: '/demo.html'
       // }
+      server: {
+        host:true
+      }
     }
   }
   else {
