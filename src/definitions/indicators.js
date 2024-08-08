@@ -10,6 +10,7 @@ import AROON from "../indicators/AROON";
 import BB from "../indicators/BB"
 import CCI from "../indicators/CCI";
 import CMO from "../indicators/CMO"
+import DMI from "../indicators/DMI";
 import DX from "../indicators/DX"
 import EMA from "../indicators/EMA"
 import MA from "../indicators/MA"
@@ -28,25 +29,26 @@ import Volume from "../indicators/Volume"
 import PLUS_DI from "../indicators/DMI";
 
 export const IndicatorClasses = {
-  // ADX,
+  ADX,
   ATR,
   AROON,
   BB,
   CCI,
   CMO,
+  DMI,
   DX,
   EMA,
   MA,
   // MA_Multi,
   MACD,
   MFI,
-  // OBV,
+  OBV,  // fix scale
   PPO,
   ROC,
   RSI,
   SMA,
-  // STOCH,
-  // STOCHRSI,
+  // STOCH, BROKEN
+  STOCHRSI,  // FIX SCALE
   VOL: Volume,
 };
 

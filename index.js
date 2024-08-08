@@ -15,7 +15,6 @@ import tradesTestState from './data/trades-test-state.js'
 import TEST from './custom-indicator'
 import DblMA from './custom-dbl-ma.js'
 import DblMA2 from './custom-dbl-ma2.js'
-import DMI from './DMI'
 import CustomOverlay from './custom-overlay'
 import chartDCA from './chart-dca'
 import TradeFlow from './trade-flow.js'
@@ -1227,7 +1226,6 @@ document.getElementById("fullscreen").addEventListener("click", (e) => {
 // add custom indicator definition
 chart0.setIndicators({
   TEST: {id: "TEST", name: "Custom Indicator", event: "addIndicator", ind: TEST},
-  DMI: {id: "DMI", name: "Directional Movement Indicator", event: "addIndicator", ind: DMI },
   DBLMA: {id: "DBLMA", name: "Double Moving Average", event: "addIndicator", ind: DblMA },
   // DBLMA2: {id: "DBLMA2", name: "Double Moving Average", event: "addIndicator", ind: DblMA2 },
   TRDFLO: {id: "TRDFLO", name: "Trade Flow", event: "addIndicator", ind: TradeFlow },
