@@ -2,7 +2,7 @@
 // <tradex-chart></tradex-chart>
 
 import { debounce, idSanitize } from "../../utils/utilities"
-import { isNumber, isObject, isString } from "../../utils/typeChecks"
+import { isInteger, isNumber, isObject, isString } from "../../utils/typeChecks"
 import { CSSUNITS } from "../../definitions/core"
 import { UTILSLOCATIONS } from "../../definitions/chart"
 import { defaultConfig } from "../../definitions/config"
@@ -29,18 +29,20 @@ const HTML = `
     :host {
       position: relative;
       z-index: 0;
+      display: grid;
+      grid-row-gap: 0;
+      grid-template-rows: ${UTILSH}px 1fr 0;
     }
     tradex-utils {
-      height: ${UTILSH}px; 
+      grid-row: 1/2;
       width: 100%; 
     }
     tradex-body {
-      position: relative;
-      height: calc(100% - ${UTILSH}px); 
-      min-height: ${CHART_MINH - UTILSH}px;
+      grid-row: 2/3;
       width: 100%;
     }
     tradex-widgets {
+      grid-row: 3/4;
       position: relative;
     }
   </style>
@@ -89,7 +91,7 @@ export default class tradeXChart extends element {
     if (this.doInit) {
       this.doInit = false
       this.shadowRoot.appendChild(this.#template.content.cloneNode(true))
-      this.style.display = "block"
+      this.style.display = "grid"
       this.style.minHeight = TX_MINH
       this.#elWidgets = this.shadowRoot.querySelector('tradex-widgets')
       this.#elUtils = this.shadowRoot.querySelector('tradex-utils')
@@ -169,17 +171,14 @@ export default class tradeXChart extends element {
   onResized(entries) {
       super.onResize(entries)
 
-      const utilsH = (UTILSLOCATIONS.includes(this.theme?.utils?.location)) ? UTILSH : 0
       const {width, height} = entries[0].contentRect
       this.#chartW = width
       this.#chartH = height
       this.#resizeEntries = entries[0]
 
-      this.elBody.style.height = `calc(100% - ${utilsH}px)`
-
-      if (this.MainPane instanceof MainPane) {
-        // this.previousDimensions()
-      }
+      // if (this.MainPane instanceof MainPane) {
+      //   // this.previousDimensions()
+      // }
       if (this.ToolsBar instanceof ToolsBar) {
         this.ToolsBar.onResized()
       }
@@ -268,29 +267,26 @@ export default class tradeXChart extends element {
   }
 
   setUtilsLocation(pos=this.#theme?.utils?.location) {
-    this.#theme.utils = this.#theme.utils || {}
+    this.#theme.utils = this.#theme?.utils || {}
+    const utilsH = (isNumber(this.#theme.uitils?.height) && 
+                    this.#theme.utils.height > 0) ? 
+                    this.#theme.uitils.height :
+                    UTILSH;
     switch(pos) {
       case "top":
       case true:
-        this.#theme.setProperty("utils.location", "top")
-        this.#theme.setProperty("utils.height", UTILSH)
         this.#theme.utils.location = "top"
-        this.#theme.utils.height = UTILSH
-        this.elUtils.style.display = "block"
-        this.elUtils.style.height =`${UTILSH}px`;
-        this.elBody.style.height = `calc(100% - ${UTILSH}px)`
-        this.elBody.style.minHeight = `${CHART_MINH - UTILSH}px`
+        this.#theme.utils.height = utilsH
+        this.style.gridTemplateRows = `${utilsH}px 1fr`
+        this.elBody.style.minHeight = `${CHART_MINH - utilsH}px`
         break;
       case "none":
       case false:
       default:
-        this.#theme.setProperty("utils.location", "none")
-        this.#theme.setProperty("utils.height", 0)
         this.#theme.utils.location = "none"
         this.#theme.utils.height = 0
         this.elUtils.style.display = "none"
-        this.elUtils.style.height =`0px`;
-        this.elBody.style.height = `100%`
+        this.style.gridTemplateRows = `0 1fr`
         this.elBody.style.minHeight = `${CHART_MINH}px`
         break;
     }

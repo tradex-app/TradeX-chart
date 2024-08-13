@@ -368,7 +368,7 @@ const style = `
 <style id="txc_globalCSS">
   tradex-chart {
     content-visibility: auto;
-    display: flex;
+    display: grid;
     width: var(--txc-width, 100%);
     height: var(--txc-height, 100%);
     min-width: var(--txc-min-width, ${TX_MINW});

@@ -16,6 +16,11 @@ import { isNumber } from "../../utils/typeChecks"
 const template = document.createElement('template')
 template.innerHTML = `
 <style>
+  :host {
+    display: grid;
+    grid-row-gap: 0;
+    grid-template-rows: 1fr ${TIMESCALEH}px;
+  }
   #viewport {
     position: absolute;
     width: 100%;
@@ -28,20 +33,18 @@ template.innerHTML = `
     // top: 1px;
   }
   tradex-rows {
-    position:relative;
+    grid-row: 1/2;
     overflow: hidden;
     width: 100%;
-    height: calc(100% - ${TIMEH}px);
     border: 1px solid;
     border-color: var(--txc-border-color, ${GlobalStyle.COLOUR_BORDER}); 
   }
   tradex-time {
-    position: relative;
+    grid-row: 2/3;
     width: 100%;
-    height: ${TIMEH}px;
     overflow: hidden;
-    margin-left: 1px;
-    z-index: 1;
+    // margin-left: 1px;
+    // z-index: 1;
   }
 </style>
 <div id="viewport"></div>
@@ -105,11 +108,7 @@ export default class tradeXMain extends element {
 
   setMain() {
     let timeH = (isNumber(this.#theme?.time?.height)) ? this.#theme.time.height : TIMEH
-    // let offset = (this.#theme.tools.location == "none") ? 60 : 0
-    this.rows.style.height = `calc(100% - ${timeH}px)`
-    // this.rows.style.left = `${offset}px`
-    // this.time.style.left = `${offset}px`
-    // this.viewport.style.left = `${offset}px`
+    this.style.gridTemplateRows = `1fr ${timeH}px`
   }
 
 }

@@ -3,6 +3,7 @@
 import { isBoolean, isObject, isString } from "../../utils/typeChecks"
 import { debounce, uid } from "../../utils/utilities"
 import Input from "../../input"
+import { HIT_DEBOUNCE } from "../../definitions/core"
 
 
 const userSelect = [
@@ -256,7 +257,8 @@ export default class Legends {
         this.#collapseList.push({el, click})
       else
         this.#list[options.id].click.push({el, click})
-      el.addEventListener('click', click)
+      
+      el.addEventListener('click', debounce(click, 1000, this, true))
     }
   }
 }

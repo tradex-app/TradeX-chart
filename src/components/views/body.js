@@ -7,51 +7,45 @@ import tradeXTools from "./tools"
 import tradeXScale from "./scale"
 
 import {
-  UTILSH,
   TOOLSW,
-  TIMEH,
   SCALEW,
-  CHART_MINH,
-} from "../../definitions/style"
-import {
-  GlobalStyle
 } from "../../definitions/style"
 import { isNumber } from "../../utils/typeChecks"
 
-const right = `
+
+const template = document.createElement('template')
+const content = `
 <style>
+  :host {
+    display: grid;
+    grid-column-gap: 0;
+    grid-template-columns: 0 0 1fr ${SCALEW}px 0;
+    grid-template-rows: 1fr;
+  }
+  tradex-main, tradex-scale, tradex-tools {
+    max-height: 100%;
+    min-height: 100%;
+    overflow: hidden;
+  }
   tradex-tools {
-    position: absolute; 
-    top: 0; left: 0;
-    width: ${TOOLSW}px;
-    height: 100%; 
-    min-height: 100%; 
+    grid-column: 1/2;
+  }
+  tradex-scale:first-of-type {
+    grid-column: 2/3;
   }
   tradex-main {
-    position: absolute; 
-    top: 0;
-    right: ${SCALEW}px;
-    width: calc(100% - ${TOOLSW}px);
-    height: 100%;
-    min-height: 100%; 
+    grid-column: 3/4;
   }
-  tradex-scale {
-    position: absolute; 
-    top: 1px;
-    right: 0; 
-    width: ${SCALEW}px; 
-    height: 100%;
-    min-height: 100%; 
+  tradex-scale:last-of-type {
+    grid-column: 4/5;
   }
 </style>
 <tradex-tools></tradex-tools>
+<tradex-scale></tradex-scale>
 <tradex-main></tradex-main>
 <tradex-scale></tradex-scale>
 `
-
-const template = document.createElement('template')
-// const locations = { left, right, both }
-template.innerHTML = right
+template.innerHTML = content
 
 export default class tradeXBody extends element {
 
@@ -59,6 +53,14 @@ export default class tradeXBody extends element {
   #elTools
   #elMain
   #elScale
+  #elScale2
+  #gridTemplateColumns = {
+    toolsLeft: `${TOOLSW}px`,
+    scaleLeft: `0`,
+    main: `1fr`,
+    scaleRight: `${TOOLSW}px`,
+    toolsRight: `0`
+  }
 
   constructor () {
     super(template)
@@ -71,9 +73,11 @@ export default class tradeXBody extends element {
   connectedCallback() {
     super.connectedCallback (
       () => {
+        this.style.display = "grid"
         this.#elTools = this.shadowRoot.querySelector('tradex-tools')
         this.#elMain = this.shadowRoot.querySelector('tradex-main')
-        this.#elScale = this.shadowRoot.querySelector('tradex-scale')
+        this.#elScale = this.shadowRoot.querySelectorAll('tradex-scale')[1]
+        this.#elScale2 = this.shadowRoot.querySelectorAll('tradex-scale')[0]
       }
     )
   }
@@ -82,6 +86,7 @@ export default class tradeXBody extends element {
   get main() { return this.#elMain }
   get scale() { return this.#elScale }
   get scaleW() { return this.#elScale.width || this.#theme?.scale?.width || SCALEW }
+  get scale2W() { return this.#elScale.width || this.#theme?.scale?.width || SCALEW }
   get toolsW() { return this.#elTools.width || this.#theme?.tools?.width || TOOLSW }
 
 
@@ -90,60 +95,71 @@ export default class tradeXBody extends element {
     this.setToolsLocation()
   }
 
-  setYAxisLocation(side=this.#theme?.yAxis?.location) {
-    let scaleW = this.scaleW
-    let toolsW = (this.#theme?.tools?.location == "none") ? 0 : this.toolsW
+  setYAxisWidth(width=this.scaleW) {
+    width = (isNumber(width)) ? width : this.scaleW
+    this.setYAxisLocation(undefined, width)
+  }
 
+  setYAxisLocation(side=this.#theme?.yAxis?.location, width=this.scaleW) {
     switch (side) {
       case "left":
-        this.scale.style.left = `${toolsW}px`
-        this.scale.style.right = undefined
-        this.main.style.left = `${scaleW + toolsW}px`
-        this.main.style.right = undefined
-        this.main.style.width = `calc(100% - ${scaleW + toolsW}px)`
+        this.#gridTemplateColumns.scaleLeft = `${this.scaleW}px`
+        this.#gridTemplateColumns.scaleRight = `0`
+        this.#elScale.style.gridColumn = "2/3"
+        this.#elScale2.style.gridColumn = "4/5"
+        this.#elScale.style.display = "block"
+        this.#elScale2.style.display = "none"
         break;
       case "both":
+        this.#gridTemplateColumns.scaleLeft = `${this.scaleW}px`
+        this.#gridTemplateColumns.scaleRight = `${this.scaleW}px`
+        this.#elScale.style.gridColumn = "4/5"
+        this.#elScale2.style.gridColumn = "2/3"
+        this.#elScale.style.display = "block"
+        this.#elScale2.style.display = "block"
+
+        break;
       case "right":
       default:
-        this.scale.style.left = undefined
-        this.scale.style.right = 0
-        this.main.style.left = `${toolsW}px`
-        this.main.style.right = undefined
-        this.main.style.width = `calc(100% - ${scaleW + toolsW}px)`
+        this.#gridTemplateColumns.scaleLeft = `0`
+        this.#gridTemplateColumns.scaleRight = `${this.scaleW}px`
+        this.#elScale.style.gridColumn = "4/5"
+        this.#elScale2.style.gridColumn = "2/3"
+        this.#elScale.style.display = "block"
+        this.#elScale2.style.display = "none"
         break;
     }
+    this.setGridColumns()
   }
 
   setToolsLocation(side=this.#theme?.tools?.location) {
-    let toolsW = this.toolsW
-    this.#theme.tools = this.#theme.tools || {}
+    let toolsW = (this.#theme?.tools?.location == "none") ? 0 : this.toolsW
     switch(side) {
       case "none":
       case false:
-        this.#theme.tools.location = "none"
-        this.#theme.tools.width = 0
-        this.tools.style.display = "none"
-        this.tools.style.width =`0px`;
+        this.#gridTemplateColumns.toolsLeft = `0`
+        this.#gridTemplateColumns.toolsRight = `0`
+        this.#elTools.style.display = "none"
         break;
       case "right":
-        this.#theme.tools.location = "right"
-        this.#theme.tools.width = toolsW
-        this.tools.style.display = "block"
-        this.tools.style.left = undefined;
-        this.tools.style.right = 0;
-        this.tools.style.width =`${toolsW}px`;
+        this.#gridTemplateColumns.toolsLeft = `0`
+        this.#gridTemplateColumns.toolsRight = `${toolsW}px`
+        this.#elTools.style.gridColumn = "1/2"
+        this.#elTools.style.display = "block"
         break;
       case "left":
       default:
-        this.#theme.tools.location = "left"
-        this.#theme.tools.width = toolsW
-        this.tools.style.display = "block"
-        this.tools.style.left = 0;
-        this.tools.style.right = undefined;
-        this.tools.style.width =`${toolsW}px`;
+        this.#gridTemplateColumns.toolsLeft = `${toolsW}px`
+        this.#gridTemplateColumns.toolsRight = `0`
+        this.#elTools.style.gridColumn = "5/6"
+        this.#elTools.style.display = "block"
         break;
     }
-    this.setYAxisLocation()
+    this.setGridColumns()
+  }
+
+  setGridColumns() {
+    this.style.gridTemplateColumns = Object.values(this.#gridTemplateColumns).join(" ")
   }
 }
 

@@ -572,7 +572,7 @@ export default class Window {
 
         // }, 250)
       }
-    }, 250)
+    }, 1000)
 
     return true
   }

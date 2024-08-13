@@ -52,7 +52,7 @@ export default class element extends HTMLElement {
     if (this.doInit) {
       this.doInit = false
       this.shadowRoot.appendChild(this.template.content.cloneNode(true))
-      this.style.display = "block"
+      // this.style.display = "block"
 
       this.DOM.width = this.clientWidth
       this.DOM.height = this.clientHeight

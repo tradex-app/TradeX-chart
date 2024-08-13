@@ -40,8 +40,7 @@ export default class UtilsBar extends Component {
           this.#location == "none" ||
           !UTILSLOCATIONS.includes(this.#location)
       ) {
-      this.#elUtils.style.height = 0
-      this.core.elBody.style.height = "100%"
+      this.core.style.gridTemplateRows = `0 1fr`
     }
     // mount the default or custom utils bar definition
     this.#elUtils.innerHTML = this.#elUtils.defaultNode(this.#utils)

@@ -208,8 +208,9 @@ export default class MainPane extends Component {
     
     // set scale width
     const scaleW = this.chart.scale.calcScaleWidth()
-    this.core.elBody.scale.style.width = `${scaleW}px`
-    this.#elViewport.style.width = `${this.#elRows.width}px`
+    this.core.elBody.setYAxisWidth(scaleW)
+    // this.core.elBody.scale.style.width = `${scaleW}px`
+    // this.#elViewport.style.width = `${this.#elRows.width}px`
 
     // start each view / chart pane 
     this.#ChartPanes.forEach((view, key) => {
@@ -544,7 +545,6 @@ export default class MainPane extends Component {
     for (let s of siblings) {
       if (s.tagName != "TRADEX-MAIN") width -= s?.offsetWidth || 0
     }
-    this.element.style.width = `${width}px`
 
     let resizeH = this.#elRows.heightDeltaR
     let chartH = Math.round(this.chartH * resizeH)

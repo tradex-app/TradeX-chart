@@ -101,7 +101,7 @@ export default class TradeFlow extends Indicator {
     if (this.data.length == 0 ||
       range.secondaryMaxMin[this.id] == undefined) return
 
-    if (!super.mustUpdate()) return
+    if (!this.mustUpdate()) return
 
     this.scene.clear()
 
@@ -139,9 +139,8 @@ export default class TradeFlow extends Indicator {
       j--
     }
 
-    super.updated()
+    this.updated()
   }
-
 
   /**
    * populate indicator with trade data from state trades entries

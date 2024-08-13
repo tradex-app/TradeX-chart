@@ -122,7 +122,7 @@ export default class Volume extends Indicator {
   draw(range=this.range) {
     // no update required
     if (range.dataLength < 2 ) return false
-    if (!super.mustUpdate()) return false
+    if (!this.mustUpdate()) return false
 
     this.scene.clear()
 

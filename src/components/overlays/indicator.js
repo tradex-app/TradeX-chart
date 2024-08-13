@@ -251,6 +251,14 @@ export default class Indicator extends Overlay {
     }
   }
 
+  setRefresh() {
+    super.setRefresh()
+  }
+
+  mustUpdate() {
+    return super.mustUpdate()
+  }
+
   init(api) {
     const overlay = this.#params.overlay
 
@@ -442,6 +450,7 @@ export default class Indicator extends Overlay {
    * @param {Object} action - 
    */
   onVisibility(action) {
+    this.setRefresh()
     this.visible(!this.visible())
     action.parent.classList.toggle("visible")
     action.parent.classList.toggle("notvisible")
