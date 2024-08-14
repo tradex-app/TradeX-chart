@@ -2,13 +2,14 @@
 
 import Overlay from "./overlay"
 import { bRound } from "../../utils/number"
-import { isBoolean } from "../../utils/typeChecks"
+import { isBoolean, isNumber } from "../../utils/typeChecks"
 
 
 export default class TimeLabels extends Overlay {
 
   #cursorPos = [0,0]
   #xAxisGrads
+  #charW
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
@@ -30,6 +31,7 @@ export default class TimeLabels extends Overlay {
     const offset = 0
     const theme = this.theme.xAxis
     const tickMarker = (isBoolean(theme.tickMarker)) ? theme.tickMarker : true
+    this.#charW = this.#charW || ctx.measureText(`M`).width
 
     ctx.save();
     ctx.strokeStyle = theme.colourTick
@@ -37,8 +39,7 @@ export default class TimeLabels extends Overlay {
     ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
     for (let tick of grads) { 
       let x = bRound(tick[1])
-      // ctx.font = (tick[3] == "major") ? XAxisStyle.FONT_LABEL_BOLD : XAxisStyle.FONT_LABEL
-      let w = Math.floor(ctx.measureText(`${tick[0]}`).width * 0.5)
+      let w = Math.floor(tick[0].length * this.#charW * 0.5)
       ctx.fillText(tick[0], x - w + offset, this.xAxis.xAxisTicks + 12)
 
       if (tickMarker) {

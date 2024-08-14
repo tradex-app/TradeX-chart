@@ -206,12 +206,6 @@ export default class MainPane extends Component {
     this.#Time.start()
     this.createGraph()
     
-    // set scale width
-    const scaleW = this.chart.scale.calcScaleWidth()
-    this.core.elBody.setYAxisWidth(scaleW)
-    // this.core.elBody.scale.style.width = `${scaleW}px`
-    // this.#elViewport.style.width = `${this.#elRows.width}px`
-
     // start each view / chart pane 
     this.#ChartPanes.forEach((view, key) => {
       view.start(i++)
@@ -220,6 +214,10 @@ export default class MainPane extends Component {
     })
 
     this.rowsOldH = this.rowsH
+
+    // set scale width
+    const scaleW = this.chart.scale.calcScaleWidth()
+    this.core.elBody.setYAxisWidth(scaleW)    
 
     // create and start overlays
     this.draw(this.range, true)
@@ -336,12 +334,7 @@ export default class MainPane extends Component {
 
     // // does the scale width have to adjusted?
     if (this.#scaleWOld < this.#scaleW) {
-      const width = `${this.#scaleW}px`
-      this.core.elBody.scale.style.width = width
-      // this.#elViewport.style.width = `calc(100% - ${this.#scaleW}px)`
-      // this.#elRows.style.width = `calc(100% - ${this.#scaleW}px)`
-      // this.#elTime.style.width = `calc(100% - ${this.#scaleW}px)`
-
+      this.core.elBody.setYAxisWidth(this.#scaleW)
       this.setDimensions()
     }
     else this.draw()
@@ -653,11 +646,12 @@ export default class MainPane extends Component {
 
     // insert a row for the new indicator
     let row
-    this.#elRows.insertAdjacentHTML("beforeend", 
-      this.#elMain.rowNode(params.type, this.core))
+    let style = `` //
+    let node = this.#elMain.rowNode(params.type, style, this.core)
+    this.#elRows.insertAdjacentHTML("beforeend", node)
     row = this.#elRows.chartPaneSlot.assignedElements().slice(-1)[0]
     row.style.height = `${n}px`
-    row.style.width = `100%`
+    // row.style.width = `100%`
 
     // insert a YAxis for the new indicator
     let axis
@@ -790,7 +784,7 @@ export default class MainPane extends Component {
    * @returns {Chart|Indicator|false}
    */
   addIndicator(i, name=i, params={})  {
-    let instance;
+    let instance, pane;
     let isPrimary = this.indicatorClasses[i]?.primaryPane;
 
     if (
@@ -830,7 +824,7 @@ export default class MainPane extends Component {
         instance = this.#Chart.addIndicator(indicator);
         if (!instance) return false
 
-        this.core.state.addIndicator(instance, "primary")
+        pane = "primary"
     }
     // add secondary chart indicator
     else {       
@@ -851,15 +845,14 @@ export default class MainPane extends Component {
       if (!instance) return false
 
       instance.start()
-      this.core.state.addIndicator(instance, "secondary")
-      instance.scale.draw(this.range, true)
-      this.draw()
+      pane = "secondary"
     }
 
     const id = ("instance" in instance) ? instance.instance.id : instance.id
     this.refresh()
-    this.emit("addIndicatorDone", instance)
+    this.core.state.addIndicator(instance, pane)
     this.core.log(`Added indicator:`, id)
+    this.emit("addIndicatorDone", instance)
 
     return instance
   }

@@ -103,7 +103,7 @@ export default class tradeXBody extends element {
   setYAxisLocation(side=this.#theme?.yAxis?.location, width=this.scaleW) {
     switch (side) {
       case "left":
-        this.#gridTemplateColumns.scaleLeft = `${this.scaleW}px`
+        this.#gridTemplateColumns.scaleLeft = `${width}px`
         this.#gridTemplateColumns.scaleRight = `0`
         this.#elScale.style.gridColumn = "2/3"
         this.#elScale2.style.gridColumn = "4/5"
@@ -111,8 +111,8 @@ export default class tradeXBody extends element {
         this.#elScale2.style.display = "none"
         break;
       case "both":
-        this.#gridTemplateColumns.scaleLeft = `${this.scaleW}px`
-        this.#gridTemplateColumns.scaleRight = `${this.scaleW}px`
+        this.#gridTemplateColumns.scaleLeft = `${width}px`
+        this.#gridTemplateColumns.scaleRight = `${width}px`
         this.#elScale.style.gridColumn = "4/5"
         this.#elScale2.style.gridColumn = "2/3"
         this.#elScale.style.display = "block"
@@ -122,7 +122,7 @@ export default class tradeXBody extends element {
       case "right":
       default:
         this.#gridTemplateColumns.scaleLeft = `0`
-        this.#gridTemplateColumns.scaleRight = `${this.scaleW}px`
+        this.#gridTemplateColumns.scaleRight = `${width}px`
         this.#elScale.style.gridColumn = "4/5"
         this.#elScale2.style.gridColumn = "2/3"
         this.#elScale.style.display = "block"

@@ -9,6 +9,8 @@ import { renderTextBG, getTextRectHeight } from "../../renderer/text"
 
 export default class ScalePriceLine extends Overlay {
 
+  #opts
+  #txtH
 
   constructor(target, xAxis, yAxis, theme, parent, params) {
 
@@ -18,6 +20,19 @@ export default class ScalePriceLine extends Overlay {
     super(target, xAxis, yAxis, theme, parent, params)
 
     this.viewport = target.viewport
+    this.#opts = {
+      fontSize: YAxisStyle.FONTSIZE * 1.05,
+      fontWeight: YAxisStyle.FONTWEIGHT,
+      fontFamily: YAxisStyle.FONTFAMILY,
+      txtCol: "#FFFFFF", //YAxisStyle.COLOUR_CURSOR,
+      bakCol: YAxisStyle.COLOUR_CURSOR_BG,
+      paddingTop: 2,
+      paddingBottom: 2,
+      paddingLeft: 5,
+      paddingRight: 3,
+      width: this.viewport.width
+    }
+    this.#txtH = getTextRectHeight(this.#opts)
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
@@ -34,20 +49,9 @@ export default class ScalePriceLine extends Overlay {
 
     let price = candle[4],
         nice = this.parent.nicePrice(price),
-        options = {
-          fontSize: YAxisStyle.FONTSIZE * 1.05,
-          fontWeight: YAxisStyle.FONTWEIGHT,
-          fontFamily: YAxisStyle.FONTFAMILY,
-          txtCol: "#FFFFFF", //YAxisStyle.COLOUR_CURSOR,
-          bakCol: YAxisStyle.COLOUR_CURSOR_BG,
-          paddingTop: 2,
-          paddingBottom: 2,
-          paddingLeft: 5,
-          paddingRight: 3,
-          width: this.viewport.width
-        },
+        options = {...this.#opts},
         x = 0,
-        h = getTextRectHeight(options),
+        h = this.#txtH,
         y = this.parent.yPos(price) - (h * 0.5);
 
     this.scene.clear()

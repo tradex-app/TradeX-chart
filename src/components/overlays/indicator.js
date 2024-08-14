@@ -276,6 +276,8 @@ export default class Indicator extends Overlay {
       this.#ConfigDialogue.start()
 
       this.eventsListen()
+      this.setRefresh()
+      // this.draw()
     }
   }
 
@@ -642,29 +644,7 @@ export default class Indicator extends Overlay {
       }
     }
   }
-/*
-  buildConfigInputTab() {
-    const define = this.definition.input
-      let input = {}
 
-    for (let i in define) {
-      let v = define[i]
-      let type = typeOf(v)
-      switch(type) {
-        case "number":
-          this.configInputNumber(input, i, v) 
-          break;
-        case "object":
-          this.configInputObject(input, i, v)
-          break;
-      }
-    }
-    if (Object.keys(input).length == 0)
-      input = false
-
-    return input
-  }
-*/
   outputValueNumber(i, v, change) {
     let listeners = [change]
     return {

@@ -49,6 +49,7 @@ export default class ScaleBar extends Component {
   #scaleOverlays = new xMap()
   #additionalOverlays = []
   #digitCnt
+  #digitW = 12
 
   #input
   #priceLine
@@ -101,6 +102,10 @@ export default class ScaleBar extends Component {
   start() {
     const range = (this.options.yAxisType === "default") ? 
       undefined : this.parent.localRange
+    const ctx = this.core.MainPane.graph.viewport.scene.context
+    const t = this.theme.yAxis
+    ctx.font = createFont(t.fontSize, t.fontWeight, t.fontFamily)
+    this.#digitW = calcTextWidth(ctx, "0")
 
     this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
 
@@ -326,11 +331,7 @@ export default class ScaleBar extends Component {
 
   calcScaleWidth() {
     const max = this.calcPriceDigits()
-    const ctx = this.core.MainPane.graph.viewport.scene.context
-    const t = this.theme.yAxis
-    ctx.font = createFont(t.fontSize, t.fontWeight, t.fontFamily)
-    const w = calcTextWidth(ctx, "0")
-    return max * w
+    return max * this.#digitW
   }
 
   /**

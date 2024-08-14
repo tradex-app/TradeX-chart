@@ -31,8 +31,8 @@ export default class Overlay {
     Length: null,
     rowsW: null,
     rowsH: null,
-    refresh: false,
-    resize: false
+    refresh: true,
+    resize: true
   }
   #histogram
 

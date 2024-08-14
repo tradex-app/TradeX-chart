@@ -30,6 +30,7 @@ export default class DMI extends Indicator {
     },
   }
   
+  #precision = 2
 
   get name() {return "Directional Movement Index" }
   shortName = "DMI"

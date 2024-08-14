@@ -30,9 +30,9 @@ template.innerHTML = `
   }
   #viewport canvas {
     position: absolute;
-    // top: 1px;
   }
   tradex-rows {
+    display: grid;
     grid-row: 1/2;
     overflow: hidden;
     width: 100%;
@@ -43,8 +43,6 @@ template.innerHTML = `
     grid-row: 2/3;
     width: 100%;
     overflow: hidden;
-    // margin-left: 1px;
-    // z-index: 1;
   }
 </style>
 <div id="viewport"></div>
@@ -88,10 +86,9 @@ export default class tradeXMain extends element {
     this.setMain()
   }
 
-  rowNode(type, api) {
-    const styleRow = `` //` border-top: 1px solid ${api.theme.secondaryPane.separator};`
+  rowNode(type, style="", api) {
     const node = `
-      <tradex-chartpane slot="chartpane" class="${type}" style="${styleRow}">
+      <tradex-chartpane slot="chartpane" class="${type}" style="${style}">
       </tradex-chartpane>
     `
     return node
