@@ -165,11 +165,10 @@ class Node {
         const ctx = scene.context
 
         if (composition.includes(layer?.composition))
-        scene.context.globalCompositeOperation = layer.composition
-
-        scene.context.globalAlpha = layer.alpha
-
-        scene.context.drawImage(
+        ctx.globalCompositeOperation = layer.composition
+        ctx.globalAlpha = layer.alpha
+        ctx.scale(1,1)
+        ctx.drawImage(
           layer.scene.canvas,
           layer.x,
           layer.y,
@@ -602,7 +601,7 @@ class Hit extends Foundation {
    * @returns {Integer} layer index - returns -1 if no pixel is there
    */
   getIntersection(x, y) {
-    let context = this.context,
+    let ctx = this.context,
         data;
 
     x = Math.round(x - this.layer.x);
@@ -615,7 +614,7 @@ class Hit extends Foundation {
 
     // 2d
     if (this.contextType === "2d") {
-      data = context.getImageData(x, y, 1, 1).data;
+      data = ctx.getImageData(x, y, 1, 1).data;
 
       if (data[3] < 255) {
         return -1;
@@ -624,13 +623,13 @@ class Hit extends Foundation {
     // webgl
     else {
       data = new Uint8Array(4);
-      context.readPixels(
+      ctx.readPixels(
         x * CEL.pixelRatio,
         (this.height - y - 1) * CEL.pixelRatio,
         1,
         1,
-        context.RGBA,
-        context.UNSIGNED_BYTE,
+        ctx.RGBA,
+        ctx.UNSIGNED_BYTE,
         data
       );
 
@@ -708,6 +707,10 @@ function setSize(width, height, that, ratio=true) {
   if (!that.offscreen) {
     that.canvas.style.width = `${w}px`
     that.canvas.style.height = `${h}px`
+  }
+  else {
+    that.canvas.width = w
+    that.canvas.height = h
   }
 
   if (that.contextType !== "2d" &&

@@ -5241,13 +5241,16 @@ let Co = class {
     let { scene: i, layers: s } = this, n;
     i.clear();
     for (n of s)
-      e && A(n.layers) && n.layers.length > 0 && n.render(e), n.visible && n.width > 0 && n.height > 0 && (i.context, xo.includes(n?.composition) && (i.context.globalCompositeOperation = n.composition), i.context.globalAlpha = n.alpha, i.context.drawImage(
-        n.scene.canvas,
-        n.x,
-        n.y,
-        n.width,
-        n.height
-      ));
+      if (e && A(n.layers) && n.layers.length > 0 && n.render(e), n.visible && n.width > 0 && n.height > 0) {
+        const r = i.context;
+        xo.includes(n?.composition) && (r.globalCompositeOperation = n.composition), r.globalAlpha = n.alpha, r.scale(1, 1), r.drawImage(
+          n.scene.canvas,
+          n.x,
+          n.y,
+          n.width,
+          n.height
+        );
+      }
   }
 };
 class pd extends Co {
@@ -5511,7 +5514,7 @@ function qi(a, e) {
 }
 function Eo(a, e, i, s = !0) {
   let { width: n, height: r } = qi(a, e);
-  return i.width = n, i.height = r, i.canvas.width = n * W.pixelRatio, i.canvas.height = r * W.pixelRatio, i.offscreen || (i.canvas.style.width = `${n}px`, i.canvas.style.height = `${r}px`), i.contextType !== "2d" && i.contextType !== "bitmaprenderer" && i.context.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight), s && i.contextType === "2d" && W.pixelRatio !== 1 && !i.offscreen && i.context.scale(W.pixelRatio, W.pixelRatio), i;
+  return i.width = n, i.height = r, i.canvas.width = n * W.pixelRatio, i.canvas.height = r * W.pixelRatio, i.offscreen ? (i.canvas.width = n, i.canvas.height = r) : (i.canvas.style.width = `${n}px`, i.canvas.style.height = `${r}px`), i.contextType !== "2d" && i.contextType !== "bitmaprenderer" && i.context.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight), s && i.contextType === "2d" && W.pixelRatio !== 1 && !i.offscreen && i.context.scale(W.pixelRatio, W.pixelRatio), i;
 }
 const W = {
   idCnt: 0,
@@ -12854,7 +12857,7 @@ const Xo = {
       ind: a[e]
     };
 })(Xo);
-const _n = "0.15.1";
+const _n = "0.152.2";
 class Tp {
   #e;
   #t;
