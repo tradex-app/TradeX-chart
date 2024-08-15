@@ -676,11 +676,12 @@ class Hit extends Foundation {
 function clear(that) {
   let context = that.context;
   if (that.contextType === "2d") {
+    context.scale(1,1)
     context.clearRect(
       0,
       0,
-      that.width * CEL.pixelRatio,
-      that.height * CEL.pixelRatio
+      that.width,
+      that.height
     );
   }
   // webgl or webgl2

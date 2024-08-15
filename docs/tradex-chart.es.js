@@ -33,7 +33,7 @@ function R(a) {
 function aa(a) {
   return a != null;
 }
-function q(a) {
+function G(a) {
   return typeof a == "boolean";
 }
 function T(a) {
@@ -66,7 +66,7 @@ function ca(a, e) {
     case "valid":
       return aa(e);
     case "boolean":
-      return q(e);
+      return G(e);
     case "string":
       return T(e);
     case "map":
@@ -107,7 +107,7 @@ const Wf = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   checkType: ca,
   isArray: A,
-  isBoolean: q,
+  isBoolean: G,
   isClass: ri,
   isError: ha,
   isFunction: k,
@@ -1820,7 +1820,7 @@ class Er {
     "pancancel"
   ];
   #t;
-  #s = {
+  #i = {
     left: !1
   };
   constructor(e) {
@@ -1960,9 +1960,9 @@ const cc = {
 class Ve {
   #e;
   #t;
-  #s;
+  #i;
   #n;
-  #i = [];
+  #s = [];
   #r = null;
   #a = null;
   #o = null;
@@ -1983,7 +1983,7 @@ class Ve {
     this.#i = new hc(this.#t, n), this.pointerInit();
   }
   get agent() {
-    return this.#s;
+    return this.#i;
   }
   get pointer() {
     return this.#r instanceof Er ? this.#r : (this.#r = new Er(this), this.#r);
@@ -2013,7 +2013,7 @@ class Ve {
     return this.#c;
   }
   destroy() {
-    for (let e of this.#i)
+    for (let e of this.#s)
       this.off(e.event, e.handler, e.options);
     this.#i.destroy(), this.#r = void 0, this.#a = void 0, this.#o = void 0;
   }
@@ -2021,7 +2021,7 @@ class Ve {
     return !!(T(e) || k(i));
   }
   validOptions(e) {
-    return C(e) && q(e) ? e : void 0;
+    return C(e) && G(e) ? e : void 0;
   }
   on(e, i, s, n = !1) {
     if (!this.isValid(e, i))
@@ -2032,8 +2032,8 @@ class Ve {
     this.#r?.has(e) ? this.#r.off(e, i, s) : this.#o?.has(e) ? this.#o.off(e, i, s) : this.#a?.has(e) ? this.#a.off(e, i, s) : this.#t.removeEventListener(e, i, this.validOptions(s));
     for (let n of this.#s)
       if (n.event === e && n.handler === i && n.options === s) {
-        let r = this.#i.indexOf(n);
-        this.#i.splice(r, 1);
+        let r = this.#s.indexOf(n);
+        this.#s.splice(r, 1);
       }
   }
   once(e, i, s) {
@@ -2628,7 +2628,7 @@ const Xf = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
 class Gi {
   #e;
   #t;
-  #s = !0;
+  #i = !0;
   #n = !1;
   #s = ci;
   #r = En;
@@ -2696,10 +2696,10 @@ class Gi {
     return this.value(this.dataLength)[0];
   }
   set interval(e) {
-    this.#i = e;
+    this.#s = e;
   }
   get interval() {
-    return this.#i;
+    return this.#s;
   }
   set intervalStr(e) {
     this.#r = e;
@@ -2711,7 +2711,7 @@ class Gi {
     return this.#r;
   }
   get timeFrameMS() {
-    return this.#i;
+    return this.#s;
   }
   get indexed() {
     return this.#n;
@@ -2967,16 +2967,16 @@ function Rc(a, e) {
   let n, r = a.timeFrameMS;
   return e = e - e % r, i.length === 0 ? n = !1 : e === i[0][0] ? n = 0 : e < i[0][0] ? n = Math.floor((i[0][0] - e) / r) * -1 : n = Math.floor((e - i[0][0]) / r), n;
 }
-const kc = ["y", "M", "d", "h", "m", "s", "ms"], $c = ["years", "months", "days", "hours", "minutes", "seconds", "milliseconds"], _c = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334], Hc = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335], Fa = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], Bc = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], Ua = 1231006505e3, Qe = 1, te = 1e3, ie = te * 60, me = ie * 60, G = me * 24, It = G * 7, Te = G * 30;
+const kc = ["y", "M", "d", "h", "m", "s", "ms"], $c = ["years", "months", "days", "hours", "minutes", "seconds", "milliseconds"], _c = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334], Hc = [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335], Fa = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], Bc = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], Ua = 1231006505e3, Qe = 1, te = 1e3, ie = te * 60, me = ie * 60, W = me * 24, It = W * 7, Te = W * 30;
 function Va(a = 3, e = !1) {
-  let i = Fa[a % 12] * G;
-  return e && a > 0 && (i += G), i;
+  let i = Fa[a % 12] * W;
+  return e && a > 0 && (i += W), i;
 }
-const De = G * 365, oi = {
+const De = W * 365, oi = {
   y: De,
   M: Te,
   w: It,
-  d: G,
+  d: W,
   h: me,
   m: ie,
   s: te,
@@ -2985,7 +2985,7 @@ const De = G * 365, oi = {
   years: De,
   months: Te,
   weeks: It,
-  days: G,
+  days: W,
   hours: me,
   minutes: ie,
   seconds: te,
@@ -3001,13 +3001,13 @@ const De = G * 365, oi = {
   MONTH3: [Te * 3, "months"],
   MONTH2: [Te * 2, "months"],
   MONTH: [Te, "months"],
-  DAY15: [G * 15, "years"],
-  DAY10: [G * 10, "days"],
-  DAY7: [G * 7, "days"],
-  DAY5: [G * 5, "days"],
-  DAY3: [G * 3, "days"],
-  DAY2: [G * 2, "days"],
-  DAY: [G, "days"],
+  DAY15: [W * 15, "years"],
+  DAY10: [W * 10, "days"],
+  DAY7: [W * 7, "days"],
+  DAY5: [W * 5, "days"],
+  DAY3: [W * 3, "days"],
+  DAY2: [W * 2, "days"],
+  DAY: [W, "days"],
   HOUR12: [me * 12, "hours"],
   HOUR6: [me * 6, "hours"],
   HOUR4: [me * 4, "hours"],
@@ -3084,7 +3084,7 @@ const Ke = {
     return Xt(a, e, me);
   },
   inDays: function(a, e) {
-    return Xt(a, e, G);
+    return Xt(a, e, W);
   },
   inWeeks: function(a, e) {
     return Xt(a, e, It);
@@ -3218,7 +3218,7 @@ function Cn(a) {
   return Date.UTC(new Date(a).getUTCFullYear());
 }
 function Za(a) {
-  return a = a + De + G, es(a), a;
+  return a = a + De + W, es(a), a;
 }
 function es(a) {
   let i = new Date(a).getUTCFullYear();
@@ -3249,10 +3249,10 @@ function Zc(a, e) {
       i = xn(a), s = ja(a);
       break;
     case "weeks":
-      i = hi(a), s = i + G;
+      i = hi(a), s = i + W;
       break;
     case "days":
-      i = hi(a), s = i + G;
+      i = hi(a), s = i + W;
       break;
     case "hours":
       i = vn(a), s = i + me;
@@ -3309,7 +3309,7 @@ class ti {
     this.setTimeZone(e);
   }
   get timeZone() {
-    return this.#s;
+    return this.#i;
   }
   set timeZoneOffset(e) {
     this.#t = P(e) ? e : (/* @__PURE__ */ new Date()).getTimezoneOffset();
@@ -3344,7 +3344,7 @@ function ii(a = Intl.DateTimeFormat().resolvedOptions().timeZone, e = "en-US") {
 const eu = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   BTCGENESIS: Ua,
-  DAY_MS: G,
+  DAY_MS: W,
   HM: Gs,
   HMS: Qc,
   HOUR_MS: me,
@@ -3434,9 +3434,9 @@ Array.from(Object.keys($i));
 class xe {
   #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a;
   #o;
@@ -3910,15 +3910,15 @@ const au = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
 class lo {
   #e;
   #t;
-  #s;
+  #i;
   constructor(e) {
-    this.#t = e, this.#e = this.#t.core, this.#s = this.#e.Chart;
+    this.#t = e, this.#e = this.#t.core, this.#i = this.#e.Chart;
   }
   get core() {
     return this.#e;
   }
   get chart() {
-    return this.#s;
+    return this.#i;
   }
   get parent() {
     return this.#t;
@@ -3927,25 +3927,25 @@ class lo {
     return this.#e.theme;
   }
   get width() {
-    return this.#s.width;
+    return this.#i.width;
   }
   get height() {
-    return this.#s.height;
+    return this.#i.height;
   }
   get data() {
-    return this.#s.data;
+    return this.#i.data;
   }
   get range() {
-    return this.#s.range;
+    return this.#i.range;
   }
   get yDigits() {
-    return this.#s.yAxisDigits;
+    return this.#i.yAxisDigits;
   }
 }
 class Fi extends lo {
   #e = 4;
   #t;
-  #s = !0;
+  #i = !0;
   constructor(e) {
     super(e);
   }
@@ -4078,7 +4078,7 @@ class Fi extends lo {
     return n = Kt[l], o = zs[l], { xStep: n, rank: o };
   }
   dateTimeValue(e, i, s) {
-    if (e / G % 1 === 0) {
+    if (e / W % 1 === 0) {
       const n = bn(e);
       return n === 1 ? wn(e) === 0 ? Ka(e) : Ya(e) : n;
     } else
@@ -4097,9 +4097,9 @@ class Fi extends lo {
 class Et extends lo {
   #e;
   #t;
-  #s;
+  #i;
   #n = X[0];
-  #i = "automatic";
+  #s = "automatic";
   #r = {
     automatic: {
       get max() {
@@ -4143,10 +4143,10 @@ class Et extends lo {
   #d;
   #u;
   constructor(e, i, s = X[0], n) {
-    super(e), this.#s = i, this.#t = e, this.#e = e.parent, this.yAxisType = s, s == "relative" ? n = this.core.range : n = n || this.core.range, this.setRange(n);
+    super(e), this.#i = i, this.#t = e, this.#e = e.parent, this.yAxisType = s, s == "relative" ? n = this.core.range : n = n || this.core.range, this.setRange(n);
   }
   get chart() {
-    return this.#s;
+    return this.#i;
   }
   get range() {
     return this.#u;
@@ -4200,7 +4200,7 @@ class Et extends lo {
     this.setMode(e);
   }
   get mode() {
-    return this.#i;
+    return this.#s;
   }
   set offset(e) {
     this.setOffset(e);
@@ -4303,13 +4303,13 @@ class Et extends lo {
     return e;
   }
   setOffset(e) {
-    if (!P(e) || e == 0 || this.#i !== "manual")
+    if (!P(e) || e == 0 || this.#s !== "manual")
       return !1;
     let i = this.transformPrimarySecondary(), s = this.pixel2Val(e * -1), n = this.pixel2Val(this.height - e), r = s - n;
     i.min = n, i.max = s, i.mid = r / 2, i.diff = r, i.zoom = 0;
   }
   setZoom(e) {
-    if (!P(e) || this.#i !== "manual")
+    if (!P(e) || this.#s !== "manual")
       return !1;
     let i = this.#r.manual, { max: s, min: n, diff: r, pane: o } = this.getMaxMinDiff();
     const l = r * 0.01, c = e * l;
@@ -4318,7 +4318,7 @@ class Et extends lo {
   setRange(e) {
     this.#r.automatic.range = e, this.#u = new Proxy(e, {
       get: (i, s) => {
-        const n = this.#i, r = this.#r;
+        const n = this.#s, r = this.#r;
         switch (s) {
           case "max":
             return r[n][s];
@@ -4688,9 +4688,9 @@ class j {
   static isOverlay = !0;
   #e;
   #t;
-  #s = {};
+  #i = {};
   #n;
-  #i;
+  #s;
   #r;
   #a;
   #o;
@@ -4722,7 +4722,7 @@ class j {
     return this.#a;
   }
   get config() {
-    return this.#s;
+    return this.#i;
   }
   get params() {
     return this.#h;
@@ -4746,7 +4746,7 @@ class j {
     return this.#e.parent.parent;
   }
   get chartData() {
-    return this.#s.state.allData.data;
+    return this.#i.state.allData.data;
   }
   get xAxis() {
     return this.getXAxis();
@@ -4956,7 +4956,7 @@ class K extends HTMLElement {
     return K.#e;
   }
   #t;
-  #s;
+  #i;
   #n;
   id = pe(Jt);
   doInit = !0;
@@ -4989,7 +4989,7 @@ class K extends HTMLElement {
     return this.#t;
   }
   get template() {
-    return this.#s;
+    return this.#i;
   }
   get hub() {
     return this.#n;
@@ -5105,9 +5105,9 @@ const ud = ["min", "max", "value", "step", "orient", "width", "height"];
 class dd extends K {
   #e;
   #t;
-  #s;
-  #n = 1;
   #i;
+  #n = 1;
+  #s;
   #r = {};
   constructor() {
     super(wo);
@@ -5176,13 +5176,13 @@ const xo = ["source-over", "source-atop", "source-in", "source-out", "destinatio
 let Co = class {
   #e = 0;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   constructor(e = {}) {
     if (!z(e?.container))
       throw new Error("Viewport container is not a valid HTML element.");
-    this.#s = e.container, this.#n = [], this.#t = W.idCnt++, this.#i = new W.Scene(e);
+    this.#s = e.container, this.#n = [], this.#t = q.idCnt++, this.#i = new q.Scene(e);
     let { width: i, height: s } = qi(e?.width || 0, e?.height || 0);
     this.setSize(i, s);
   }
@@ -5190,13 +5190,13 @@ let Co = class {
     return this.#t;
   }
   get scene() {
-    return this.#s;
+    return this.#i;
   }
   get layers() {
     return this.#n;
   }
   get container() {
-    return this.#i;
+    return this.#s;
   }
   get OffscreenCanvas() {
     return Dn;
@@ -5225,7 +5225,7 @@ let Co = class {
     return -1;
   }
   get index() {
-    let e = W.viewports, i, s = 0;
+    let e = q.viewports, i, s = 0;
     for (i of e) {
       if (this.id === i.id)
         return s;
@@ -5258,25 +5258,25 @@ class pd extends Co {
     const i = { ...e };
     i.offscreen = !1, super(i);
     const s = this.scene.canvas, n = e.container;
-    n?.hasCanvasSlot && (s.slot = "viewportCanvas"), n.innerHTML = "", n.appendChild(s), W.viewports.push(this);
+    n?.hasCanvasSlot && (s.slot = "viewportCanvas"), n.innerHTML = "", n.appendChild(s), q.viewports.push(this);
   }
   destroy() {
-    super.destroy(), this.container.innerHTML = "", W.viewports.splice(this.index, 1);
+    super.destroy(), this.container.innerHTML = "", q.viewports.splice(this.index, 1);
   }
 }
 class Ks {
   #e = 0;
   #t = 0;
-  #s = 0;
+  #i = 0;
   #n = 0;
-  #i = 1;
+  #s = 1;
   #r = !0;
   #a = null;
   #o = Dn;
   viewport;
   constructor(e = {}) {
     const i = { ...e };
-    this.id = W.idCnt++, this.#o = q(e?.offscreen) ? e.offscreen : this.#o, i.layer = this, i.offscreen = this.#o, this.hit = new W.Hit(i), this.scene = new W.Scene(i), e?.x && e?.y && this.setPosition(e.x, e.y), e?.width && e?.height && this.setSize(e.width, e.height), e?.composition && (this.setComposition = e.composition), e?.alpha && (this.alpha = e.alpha), e?.visible && (this.visible = e.visible);
+    this.id = q.idCnt++, this.#o = G(e?.offscreen) ? e.offscreen : this.#o, i.layer = this, i.offscreen = this.#o, this.hit = new q.Hit(i), this.scene = new q.Scene(i), e?.x && e?.y && this.setPosition(e.x, e.y), e?.width && e?.height && this.setSize(e.width, e.height), e?.composition && (this.setComposition = e.composition), e?.alpha && (this.alpha = e.alpha), e?.visible && (this.visible = e.visible);
   }
   set x(e) {
     P(e) && (this.#e = e);
@@ -5291,10 +5291,10 @@ class Ks {
     return this.#t;
   }
   set width(e) {
-    P(e) && (this.#s = e);
+    P(e) && (this.#i = e);
   }
   get width() {
-    return this.#s;
+    return this.#i;
   }
   set height(e) {
     P(e) && (this.#n = e);
@@ -5303,10 +5303,10 @@ class Ks {
     return this.#n;
   }
   set alpha(e) {
-    this.#i = P(e) ? B(e, 0, 1) : 1;
+    this.#s = P(e) ? B(e, 0, 1) : 1;
   }
   get alpha() {
-    return this.#i;
+    return this.#s;
   }
   set composition(e) {
     xo.includes(e) && (this.#a = e);
@@ -5315,7 +5315,7 @@ class Ks {
     return this.#a;
   }
   set visible(e) {
-    q(e) && (this.#r = e);
+    G(e) && (this.#r = e);
   }
   get visible() {
     return this.#r;
@@ -5382,16 +5382,16 @@ class Ks {
 class To {
   #e;
   #t = 0;
-  #s = 0;
+  #i = 0;
   #n;
-  #i = !0;
+  #s = !0;
   #r;
   #a;
   #o;
   constructor(e = { offscreen: !0 }) {
-    this.#e = W.idCnt++, this.#o = e?.layer, this.#a = md.includes(e?.contextType) ? e.contextType : "2d";
+    this.#e = q.idCnt++, this.#o = e?.layer, this.#a = md.includes(e?.contextType) ? e.contextType : "2d";
     const i = document.createElement("canvas");
-    i.className = "scene-canvas", i.style.display = "block", e.offscreen = q(e?.offscreen) ? e.offscreen : !0, Dn && e.offscreen ? (this.#n = i.transferControlToOffscreen(), this.#s = !0) : (this.#n = i, this.#s = !1), this.#a == "webgl2d" ? this.#r = this.getContext("2d") : this.#r = this.getContext(this.contextType), e?.width && e?.height && this.setSize(e.width, e.height);
+    i.className = "scene-canvas", i.style.display = "block", e.offscreen = G(e?.offscreen) ? e.offscreen : !0, Dn && e.offscreen ? (this.#n = i.transferControlToOffscreen(), this.#s = !0) : (this.#n = i, this.#s = !1), this.#a == "webgl2d" ? this.#r = this.getContext("2d") : this.#r = this.getContext(this.contextType), e?.width && e?.height && this.setSize(e.width, e.height);
   }
   get id() {
     return this.#e;
@@ -5403,16 +5403,16 @@ class To {
     return this.#t;
   }
   set height(e) {
-    P(e) && (this.#s = e);
+    P(e) && (this.#i = e);
   }
   get height() {
-    return this.#s;
+    return this.#i;
   }
   get canvas() {
     return this.#n;
   }
   get offscreen() {
-    return this.#i;
+    return this.#s;
   }
   get contextType() {
     return this.#a;
@@ -5476,8 +5476,8 @@ class gd extends To {
       if (n = s.getImageData(e, i, 1, 1).data, n[3] < 255)
         return -1;
     } else if (n = new Uint8Array(4), s.readPixels(
-      e * W.pixelRatio,
-      (this.height - i - 1) * W.pixelRatio,
+      e * q.pixelRatio,
+      (this.height - i - 1) * q.pixelRatio,
       1,
       1,
       s.RGBA,
@@ -5502,21 +5502,21 @@ class gd extends To {
 }
 function yd(a) {
   let e = a.context;
-  return a.contextType === "2d" ? e.clearRect(
+  return a.contextType === "2d" ? (e.scale(1, 1), e.clearRect(
     0,
     0,
-    a.width * W.pixelRatio,
-    a.height * W.pixelRatio
-  ) : e.clear(e.COLOR_BUFFER_BIT | e.DEPTH_BUFFER_BIT), a;
+    a.width,
+    a.height
+  )) : e.clear(e.COLOR_BUFFER_BIT | e.DEPTH_BUFFER_BIT), a;
 }
 function qi(a, e) {
   return a < 0 && (a = 0), e < 0 && (e = 0), { width: a, height: e };
 }
 function Eo(a, e, i, s = !0) {
   let { width: n, height: r } = qi(a, e);
-  return i.width = n, i.height = r, i.canvas.width = n * W.pixelRatio, i.canvas.height = r * W.pixelRatio, i.offscreen ? (i.canvas.width = n, i.canvas.height = r) : (i.canvas.style.width = `${n}px`, i.canvas.style.height = `${r}px`), i.contextType !== "2d" && i.contextType !== "bitmaprenderer" && i.context.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight), s && i.contextType === "2d" && W.pixelRatio !== 1 && !i.offscreen && i.context.scale(W.pixelRatio, W.pixelRatio), i;
+  return i.width = n, i.height = r, i.canvas.width = n * q.pixelRatio, i.canvas.height = r * q.pixelRatio, i.offscreen ? (i.canvas.width = n, i.canvas.height = r) : (i.canvas.style.width = `${n}px`, i.canvas.style.height = `${r}px`), i.contextType !== "2d" && i.contextType !== "bitmaprenderer" && i.context.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight), s && i.contextType === "2d" && q.pixelRatio !== 1 && !i.offscreen && i.context.scale(q.pixelRatio, q.pixelRatio), i;
 }
-const W = {
+const q = {
   idCnt: 0,
   viewports: [],
   pixelRatio: window && window.devicePixelRatio || 1,
@@ -5697,9 +5697,9 @@ class ee {
 class vd extends K {
   #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a;
   #o;
@@ -5743,13 +5743,13 @@ class vd extends K {
     return this.#t;
   }
   get elPalette() {
-    return this.#s;
+    return this.#i;
   }
   get elColVal() {
     return this.#u;
   }
   get elModel() {
-    return this.#i;
+    return this.#s;
   }
   get elRGB() {
     return this.#r;
@@ -5845,14 +5845,14 @@ class vd extends K {
     const n = this.viewportNode("rgbv");
     i.appendChild(n.container), s.container.style.cursor = "url(), 0, 0, copy";
     const r = s.viewport, o = n.viewport, l = {}, c = this.#x.size, p = { x: 0, y: 0, width: c, height: c };
-    this.#x.layers = l, this.#x.view = r, l.grid = new W.Layer(p), r.addLayer(l.grid), l.rgbv = new W.Layer(p), o.addLayer(l.rgbv), this.#x[e] = { element: i, viewport: s, layers: l };
+    this.#x.layers = l, this.#x.view = r, l.grid = new q.Layer(p), r.addLayer(l.grid), l.rgbv = new q.Layer(p), o.addLayer(l.rgbv), this.#x[e] = { element: i, viewport: s, layers: l };
     let f = l.rgbv.scene.context, b = [0, 0, c, 0];
     return Ui(f, b, ["#f00f", "#ff0f", "#0f0f", "#0fff", "#00ff", "#f0ff", "#f00f"]), f.fillRect(0, 0, c, c), f = l.rgbv.scene.context, b = [0, 0, 0, c], Ui(f, b, ["#fff", "#0000", "#000"]), f.fillRect(0, 0, c, c), f = l.grid.scene.context, On(f, 8, 16, 16, "#fff", "#ccc"), r.render(), o.render(), i;
   }
   viewportNode(e) {
     const i = document.createElement("div");
     i.classList.add("viewport"), i.classList.add(e);
-    const s = new W.Viewport({
+    const s = new q.Viewport({
       width: this.#x.size,
       height: this.#x.size,
       container: i
@@ -5949,9 +5949,9 @@ Po.innerHTML = `
 class bd extends K {
   #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   constructor() {
     super(Po);
@@ -5990,7 +5990,7 @@ class bd extends K {
             `;
       i.insertAdjacentElement("afterend", this), i.insertAdjacentHTML("beforebegin", o), i.id = "";
       const l = n.querySelector(`#${s}`);
-      return l.addEventListener("change", this.onTargetChange.bind(this)), this.#i.value = r, this.#n.style.background = r, this.#r.setColour(r), this.#e.remove(), this.#e = l, !0;
+      return l.addEventListener("change", this.onTargetChange.bind(this)), this.#s.value = r, this.#n.style.background = r, this.#r.setColour(r), this.#e.remove(), this.#e = l, !0;
     }
     return !1;
   }
@@ -6002,7 +6002,7 @@ class bd extends K {
   }
   onTargetChange(e) {
     const i = new String(e.target.value);
-    i !== this.#r.colour.value.rgba && (this.#r.setColour(i), this.#i.value = i, this.#n.style.background = i);
+    i !== this.#r.colour.value.rgba && (this.#r.setColour(i), this.#s.value = i, this.#n.style.background = i);
   }
   openPicker() {
     this.#r.open(this.#e.value, this.#e);
@@ -6088,7 +6088,7 @@ class dt {
       i.a
     ] = e, i.hsl = `hsl(${e[0]},${e[1]}%,${e[2]}%)`, i.hsla = `hsl(${e[0]},${e[1]}%,${e[2]}%,${e[3]})`;
   }
-  #s(e) {
+  #i(e) {
     let i = e.length, s;
     switch (i) {
       case 4:
@@ -6106,7 +6106,7 @@ class dt {
   #n(e) {
     this.#e.hsl = e;
   }
-  #i(e) {
+  #s(e) {
     this.#e.hsla = e;
   }
   #r(e) {
@@ -6199,7 +6199,7 @@ class xd {
     return this.#t;
   }
   get entries() {
-    return this.#s;
+    return this.#i;
   }
   validateMatrix(e) {
     return A(e) && e.length == 2 && R(e[0]) && R(e[1]);
@@ -6214,7 +6214,7 @@ class xd {
         return !1;
       i.push(n);
     }
-    return this.#s = i, !0;
+    return this.#i = i, !0;
   }
 }
 class Xe {
@@ -6227,7 +6227,7 @@ class Xe {
 class ue {
   #e;
   #t;
-  #s;
+  #i;
   #n;
   #s = Xe.closed;
   #r;
@@ -6302,7 +6302,7 @@ class ue {
     this.mount(s);
   }
   destroy() {
-    this.#s.hub.expunge(), this.el.remove();
+    this.#i.hub.expunge(), this.el.remove();
   }
   get id() {
     return this.#e;
@@ -6311,7 +6311,7 @@ class ue {
     return this.dimensions;
   }
   get core() {
-    return this.#s;
+    return this.#i;
   }
   get parent() {
     return this.#r;
@@ -6323,10 +6323,10 @@ class ue {
     this.#n = e;
   }
   get theme() {
-    return this.#s.theme;
+    return this.#i.theme;
   }
   get state() {
-    return this.#i;
+    return this.#s;
   }
   get dimensions() {
     return ve(this.#l);
@@ -6394,13 +6394,13 @@ class ue {
     this.on(`window_close_${this.parent.id}`, this.onCloseWindow, this), this.on("global_resize", this.onGlobalResize, this);
   }
   on(e, i, s = this) {
-    this.#s.on(e, i, s);
+    this.#i.on(e, i, s);
   }
   off(e, i, s = this) {
-    this.#s.off(e, i, s);
+    this.#i.off(e, i, s);
   }
   emit(e, i) {
-    this.#s.emit(e, i);
+    this.#i.emit(e, i);
   }
   onGlobalResize(e) {
     const i = this.dimensions, s = {
@@ -6493,7 +6493,7 @@ class ue {
     return e.input = i.querySelectorAll("input"), e.select = i.querySelectorAll("select"), e.textarea = i.querySelectorAll("textarea"), e.button = i.querySelectorAll("button"), e;
   }
   position(e) {
-    let i = 0.1, s = this.dimensions, n = this.#s.dimensions;
+    let i = 0.1, s = this.dimensions, n = this.#i.dimensions;
     Math.round(n.left - s.left), Math.round(n.bottom - s.top);
     let r = this.#m?.iPos?.width !== n.width || this.#m.x100 ? s.width * this.#m.x100 : Math.round((n.width - s.width) / 2), o = this.#m?.iPos?.height !== n.height || this.#m.y100 ? s.height * this.#m.y100 : Math.round((n.height + s.height) / -2), l = ga(this.#l, "z-index");
     if (C(e)) {
@@ -11071,7 +11071,7 @@ class wt {
     this.enable = e, this.period = R(i) ? i : 5;
   }
   set enable(e) {
-    this.#e = q(e) ? e : !0;
+    this.#e = G(e) ? e : !0;
   }
   get enable() {
     return this.#e;
@@ -11092,9 +11092,9 @@ class U extends j {
     return !0;
   }
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a;
   #o;
@@ -11139,7 +11139,7 @@ class U extends j {
   constructor(e, i = !1, s = !1, n, r, o) {
     super(e, i, s, void 0, r, o), C(this.definition) || sp(`Indicator: ${this.shortName}`, "does not provide a valid definition");
     const l = o.overlay;
-    this.#i = U.cnt, this.#y = l, this.id = l?.id || pe(this.shortName), this.#u = o, this.#x = this.core.TALib, this.#E = this.xAxis.range, this.legendName = l?.legendName, this.#o = q(l?.legendVisibility) ? l.legendVisibility : !0, this.#M = bt, this.style = l?.settings?.style ? { ...this.constructor.defaultStyle, ...l.settings.style } : { ...this.constructor.defaultStyle, ...n.style }, this.meta;
+    this.#i = U.cnt, this.#y = l, this.id = l?.id || pe(this.shortName), this.#u = o, this.#x = this.core.TALib, this.#E = this.xAxis.range, this.legendName = l?.legendName, this.#o = G(l?.legendVisibility) ? l.legendVisibility : !0, this.#M = bt, this.style = l?.settings?.style ? { ...this.constructor.defaultStyle, ...l.settings.style } : { ...this.constructor.defaultStyle, ...n.style }, this.meta;
     const c = { title: `${this.legendName} Config`, content: "", params: l, parent: this };
     switch (this.#b = this.core.WidgetsG.insert("ConfigDialogue", c), l.settings?.context) {
       case "subcomponent":
@@ -11150,7 +11150,7 @@ class U extends j {
     }
   }
   get id() {
-    return this.#t || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#s}`;
+    return this.#t || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#i}`;
   }
   set id(e) {
     this.#t = ze(new String(e));
@@ -11315,7 +11315,7 @@ class U extends j {
       this.data.push(p);
   }
   visible(e) {
-    return q(e) && (this.emit(`${this.chartPaneID}_visibleIndicator`, { id: this.id, paneID: this.chartPaneID, visible: e }), this.chartPane.indicators[this.id].layer.visible = e, this.draw()), this.chartPane.indicators[this.id].layer.visible;
+    return G(e) && (this.emit(`${this.chartPaneID}_visibleIndicator`, { id: this.id, paneID: this.chartPaneID, visible: e }), this.chartPane.indicators[this.id].layer.visible = e, this.draw()), this.chartPane.indicators[this.id].layer.visible;
   }
   settings(e) {
     return C(e) && (C(e?.config) && (this.params.overlay.settings = _e(this.params.overlay.settings, e.config)), C(e?.style) && (this.style = _e(this.style, e.style)), this.draw()), {
@@ -11542,7 +11542,7 @@ class U extends j {
     let i = e.meta;
     Object.keys(e.output);
     for (let [s, n] of Object.entries(i.outputLegend))
-      C(n) || (i.outputLegend[s] = {}), T(i.outputLegend[s].labelStr) || (i.outputLegend[s].label = !1, i.outputLegend[s].labelStr = ""), q(i.outputLegend[s].label) || (i.outputLegend[s].label = !1), q(i.outputLegend[s].value) || (i.outputLegend[s].value = !1);
+      C(n) || (i.outputLegend[s] = {}), T(i.outputLegend[s].labelStr) || (i.outputLegend[s].label = !1, i.outputLegend[s].labelStr = ""), G(i.outputLegend[s].label) || (i.outputLegend[s].label = !1), G(i.outputLegend[s].value) || (i.outputLegend[s].value = !1);
   }
   buildConfigOutputTab(e) {
     for (let i in e.style)
@@ -12327,7 +12327,7 @@ class xt extends U {
     { key: "MA_1", title: "MA: ", type: "line" }
   ];
   #t = 3;
-  #s = 5;
+  #i = 5;
   MA = {
     MA1: { enabled: !1, ma: null },
     MA2: { enabled: !1, ma: null },
@@ -12773,7 +12773,7 @@ class kn extends U {
   };
   #e = ns.volume;
   #t;
-  #s = "both";
+  #i = "both";
   static version = "1.0";
   static inCnt = 0;
   static primaryPane = "both";
@@ -12789,7 +12789,7 @@ class kn extends U {
     this.id = o.overlay?.id || pe(this.shortName), this.#e = { ...this.defaultStyle, ...this.theme.volume }, this.style = l?.settings?.style ? { ...this.#e, ...l.settings.style } : { ...this.#e, ...n.style }, this.chart.type === "primaryPane" ? (this.style.Height = B(this.style.Height, 0, 100) || 100, this.#i = !0) : (this.style.Height = 100, this.#i = !1), this.mStyle.up.colour.value = this.style.UpColour, this.mStyle.dn.colour.value = this.style.DnColour, this.mStyle.height.percent.value = this.style.Height, this.#t = new qo(e.scene, this.mStyle), this.addLegend(), this.configDialogue.start();
   }
   get primaryPane() {
-    return this.#s;
+    return this.#i;
   }
   get defaultStyle() {
     return this.#e;
@@ -12858,14 +12858,14 @@ const Xo = {
       ind: a[e]
     };
 })(Xo);
-const _n = "0.152.3";
+const _n = "0.152.4";
 class Tp {
   #e;
   #t;
-  #s;
+  #i;
   #n = [];
   constructor(e, i) {
-    this.#e = e, this.#t = T(i.id) ? i.id : pe, this.#s = T(i.type) ? i.type : "default", this.#n = A(i.data) ? i.data : [];
+    this.#e = e, this.#t = T(i.id) ? i.id : pe, this.#i = T(i.type) ? i.type : "default", this.#n = A(i.data) ? i.data : [];
   }
 }
 function Ep(a, e = !1) {
@@ -12987,9 +12987,9 @@ const Lp = 0, Op = 1, Dp = 2, Np = 3, Ip = 4, Rp = 5, Li = [null, null, null, nu
 class ct {
   #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r = 0;
   #a;
   #o = Li;
@@ -13004,7 +13004,7 @@ class ct {
   static validateConfig(e) {
     if (C(e)) {
       let i = se(Oi);
-      e = _e(i, e), e.tfCountDown = q(e.tfCountDown) ? e.tfCountDown : Oi.tfCountDown, e.alerts = A(e.alerts) ? e.alerts : Oi.alerts;
+      e = _e(i, e), e.tfCountDown = G(e.tfCountDown) ? e.tfCountDown : Oi.tfCountDown, e.alerts = A(e.alerts) ? e.alerts : Oi.alerts;
     } else
       return Oi;
     return e;
@@ -13025,10 +13025,10 @@ class ct {
     return this.#e.range;
   }
   get status() {
-    return this.#s;
+    return this.#i;
   }
   set status({ status: e, data: i }) {
-    this.#s = e, this.emit(e, i);
+    this.#i = e, this.emit(e, i);
   }
   set dataReceived(e) {
     this.#d || (this.#d = !0, this.status = { status: nn, data: e });
@@ -13105,7 +13105,7 @@ class ct {
     let e, i, s, n, r, o, l;
     this.#n.timeFrameMS;
     let c = this.#n.timeFrameMS - (Date.now() - this.#l);
-    return c < 0 && (c = 0), this.#h = c, c > De ? (e = String(Math.floor(c / De)), i = String(Math.floor(c % De / Te)).padStart(2, "0"), this.#c = `${e}Y ${i}M`) : c > Te ? (i = String(Math.floor(c / Te)).padStart(2, "0"), n = String(Math.floor(c % Te / G)).padStart(2, "0"), this.#c = `${i}M ${n}D`) : c > It ? (s = String(Math.floor(c / It)).padStart(2, "0"), n = String(Math.floor(c % Te / G)).padStart(2, "0"), this.#c = `${s}W ${n}D`) : c > G ? (n = String(Math.floor(c / G)).padStart(2, "0"), r = String(Math.floor(c % G / me)).padStart(2, "0"), o = String(Math.floor(c % me / ie)).padStart(2, "0"), this.#c = `${n}D ${r}:${o}`) : c > me ? (r = String(Math.floor(c / me)).padStart(2, "0"), o = String(Math.floor(c % me / ie)).padStart(2, "0"), l = String(Math.floor(c % ie / te)).padStart(2, "0"), this.#c = `${r}:${o}:${l}`) : c > ie ? (o = String(Math.floor(c / ie)).padStart(2, "0"), l = String(Math.floor(c % ie / te)).padStart(2, "0"), this.#c = `00:${o}:${l}`) : (l = String(Math.floor(c / te)).padStart(2, "0"), String(c % te).padStart(4, "0"), this.#c = `00:00:${l}`), this.#c;
+    return c < 0 && (c = 0), this.#h = c, c > De ? (e = String(Math.floor(c / De)), i = String(Math.floor(c % De / Te)).padStart(2, "0"), this.#c = `${e}Y ${i}M`) : c > Te ? (i = String(Math.floor(c / Te)).padStart(2, "0"), n = String(Math.floor(c % Te / W)).padStart(2, "0"), this.#c = `${i}M ${n}D`) : c > It ? (s = String(Math.floor(c / It)).padStart(2, "0"), n = String(Math.floor(c % Te / W)).padStart(2, "0"), this.#c = `${s}W ${n}D`) : c > W ? (n = String(Math.floor(c / W)).padStart(2, "0"), r = String(Math.floor(c % W / me)).padStart(2, "0"), o = String(Math.floor(c % me / ie)).padStart(2, "0"), this.#c = `${n}D ${r}:${o}`) : c > me ? (r = String(Math.floor(c / me)).padStart(2, "0"), o = String(Math.floor(c % me / ie)).padStart(2, "0"), l = String(Math.floor(c % ie / te)).padStart(2, "0"), this.#c = `${r}:${o}:${l}`) : c > ie ? (o = String(Math.floor(c / ie)).padStart(2, "0"), l = String(Math.floor(c % ie / te)).padStart(2, "0"), this.#c = `00:${o}:${l}`) : (l = String(Math.floor(c / te)).padStart(2, "0"), String(c % te).padStart(4, "0"), this.#c = `00:00:${l}`), this.#c;
   }
   roundTime(e) {
     return e - e % this.#e.timeData.timeFrameMS;
@@ -13114,9 +13114,9 @@ class ct {
 class hs {
   #e;
   #t;
-  #s;
-  #n = {};
   #i;
+  #n = {};
+  #s;
   #r;
   #a = "stopped";
   #o;
@@ -13128,7 +13128,7 @@ class hs {
     if (!hs.validateConfig(e))
       return !1;
     const s = { ...e };
-    this.id = s.id, this.#i = s, this.#t = s.initial, this.#n.origin = i, this.#c = s.actions, this.#r = i.core, this.#u();
+    this.id = s.id, this.#s = s, this.#t = s.initial, this.#n.origin = i, this.#c = s.actions, this.#r = i.core, this.#u();
   }
   set id(e) {
     this.#e = ze(e);
@@ -13140,7 +13140,7 @@ class hs {
     return this.#t;
   }
   get previousSate() {
-    return this.#s;
+    return this.#i;
   }
   get context() {
     return this.#n;
@@ -13164,10 +13164,10 @@ class hs {
     return this.#c;
   }
   notify(e, i) {
-    if (!C(this.#i))
+    if (!C(this.#s))
       return !1;
     this.#l = e, this.#h = i;
-    const s = this.#i.states[this.#t];
+    const s = this.#s.states[this.#t];
     let n = s.on[e];
     if (!n || !k(n.action) || this.#a !== "running" && this.#a !== "await")
       return !1;
@@ -13180,20 +13180,20 @@ class hs {
       if (A(c))
         for (let p of c) {
           let f = p?.condition?.type || p?.condition || !1;
-          this.condition.call(this, f, p.condition) && T(p.target) && (p?.action.call(this, i), this.#s = this.#t, this.#t = p?.target, this.notify(null, null));
+          this.condition.call(this, f, p.condition) && T(p.target) && (p?.action.call(this, i), this.#i = this.#t, this.#t = p?.target, this.notify(null, null));
         }
       else if (C(c) && T(c.target)) {
         let p = c?.condition?.type || c?.condition || !1;
-        this.condition.call(this, p, c.condition) && T(c.target) && (c?.action.call(this, i), this.#s = this.#t, this.#t = c.target, this.notify(null, null));
+        this.condition.call(this, p, c.condition) && T(c.target) && (c?.action.call(this, i), this.#i = this.#t, this.#t = c.target, this.notify(null, null));
       }
     }
     return this.#t;
   }
   condition(e, i = null, s = {}) {
-    return e ? this.#i.guards[e].call(this, this.#n, i, s) : !1;
+    return e ? this.#s.guards[e].call(this, this.#n, i, s) : !1;
   }
   canTransition(e) {
-    const i = this.#i.states[this.#t];
+    const i = this.#s.states[this.#t];
     return e in i.on;
   }
   start() {
@@ -13242,11 +13242,11 @@ class hs {
 class kp {
   #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   constructor(e, i = []) {
-    this.#s = e, this.#e = e.core, this.#n = new be([...i]);
+    this.#i = e, this.#e = e.core, this.#n = new be([...i]);
     for (const [s, n] of this.#n)
       this.addOverlay(s, n);
   }
@@ -13266,19 +13266,19 @@ class kp {
     return this.#e;
   }
   get parent() {
-    return this.#s;
+    return this.#i;
   }
   get layerConfig() {
-    return this.#s.layerConfig().layerConfig;
+    return this.#i.layerConfig().layerConfig;
   }
   get list() {
     return this.#n;
   }
   get scale() {
-    return this.#s.parent.scale;
+    return this.#i.parent.scale;
   }
   get time() {
-    return this.#s.parent.time;
+    return this.#i.parent.time;
   }
   start() {
     this.eventsListen();
@@ -13309,12 +13309,12 @@ class kp {
     return i;
   }
   addOverlay(e, i) {
-    const s = new W.Layer(this.layerConfig);
+    const s = new q.Layer(this.layerConfig);
     try {
       return this.parent.viewport.addLayer(s), i.layer = s, i.instance = new i.class(
         s,
-        this.#s.Timeline,
-        this.#s.Scale,
+        this.#i.Timeline,
+        this.#i.Scale,
         this.#e.theme,
         this,
         i.params
@@ -13433,9 +13433,9 @@ const $p = [
 class mt {
   #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a;
   #o;
@@ -13499,13 +13499,13 @@ class mt {
     return this.#n.scale.yAxis;
   }
   get viewport() {
-    return this.#i;
+    return this.#s;
   }
   get overlays() {
     return this.#r;
   }
   destroy() {
-    this.#r.destroy(), this.#i.destroy();
+    this.#r.destroy(), this.#s.destroy();
   }
   setSize(e, i, s) {
     const n = this.#r.list;
@@ -13517,8 +13517,8 @@ class mt {
   createViewport(e = [], i = !1) {
     e = e.length == 0 ? se($p) : e;
     const { width: s, height: n } = this.layerConfig();
-    let r = i ? W.Node : W.Viewport;
-    this.#i = new r({
+    let r = i ? q.Node : q.Viewport;
+    this.#s = new r({
       width: s,
       height: n,
       container: this.#l
@@ -13573,7 +13573,7 @@ class mt {
     return s;
   }
   render() {
-    this.#i.render();
+    this.#s.render();
   }
   refresh() {
     this.draw(this.range, !0), this.render();
@@ -13582,12 +13582,12 @@ class mt {
 class gt {
   #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   constructor(e, i = {}) {
-    this.#t = e, this.#s = { ...i }, this.#n = this.#s.parent;
+    this.#t = e, this.#i = { ...i }, this.#n = this.#i.parent;
   }
   log(e) {
     this.#t.log(e);
@@ -13611,7 +13611,7 @@ class gt {
     return this.#t;
   }
   get options() {
-    return this.#s;
+    return this.#i;
   }
   get config() {
     return this.#t.config;
@@ -13626,10 +13626,10 @@ class gt {
     return this.#n;
   }
   set stateMachine(e) {
-    this.#i = new hs(e, this);
+    this.#s = new hs(e, this);
   }
   get stateMachine() {
-    return this.#i;
+    return this.#s;
   }
   set graph(e) {
     e instanceof mt && (this.#r = e);
@@ -13730,9 +13730,9 @@ const Os = {
 class Hn {
   static #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r = { w: 0, h: 0 };
   #a = { w: 0, h: 0, x: 0, y: 0 };
   #o = { x: !1, y: !0 };
@@ -13744,29 +13744,29 @@ class Hn {
     this.#t = Hn.#e++, this.#i = e.core, this.#n = z(e.elContainer) ? e.elContainer : !1, this.#s = z(e.elHandle) ? e.elHandle : !1, this.#d = k(e.callback) ? e.callback : !1, z(this.#n) && z(this.#s) && (this.mount(), this.eventsListen());
   }
   set cursor(e) {
-    this.#i.style.cursor = e;
+    this.#s.style.cursor = e;
   }
   get cursor() {
-    return this.#i.style.cursor;
+    return this.#s.style.cursor;
   }
   eventsListen() {
     this.#c = new Ve(this.#s, { disableContextMenu: !1 }), this.#c.on("mouseenter", Ee(this.onMouseEnter, 1, this, !0)), this.#c.on("mouseout", Ee(this.onMouseOut, 1, this, !0)), this.#c.on("drag", _a(this.onHandleDrag, 100, this)), this.#c.on("enddrag", this.onHandleDragDone.bind(this)), this.#c.on("mousedown", Ee(this.onMouseDown, 100, this, !0)), this.#c.on("mouseup", this.onMouseUp.bind(this));
   }
   on(e, i, s = this) {
-    this.#s.on(e, i, s);
+    this.#i.on(e, i, s);
   }
   off(e, i, s = this) {
-    this.#s.off(e, i, s);
+    this.#i.off(e, i, s);
   }
   emit(e, i) {
-    this.#s.emit(e, i);
+    this.#i.emit(e, i);
   }
   onMouseEnter() {
     const e = getComputedStyle(this.#s).backgroundColor;
     e && (this.colour = new dt(e), this.#s.style.backgroundColor = this.colour.hex);
   }
   onMouseOut() {
-    this.#i.style.backgroundColor = this.colour.hexa;
+    this.#s.style.backgroundColor = this.colour.hexa;
   }
   onMouseDown() {
   }
@@ -13788,7 +13788,7 @@ class Hn {
   }
   setHandleDims(e, i) {
     let s = this.#n.getBoundingClientRect().width;
-    i = i || this.#i.getBoundingClientRect().width, e = e / s * 100, this.#i.style.marginLeft = `${e}%`, i = i / s * 100, this.#i.style.width = `${i}%`;
+    i = i || this.#s.getBoundingClientRect().width, e = e / s * 100, this.#s.style.marginLeft = `${e}%`, i = i / s * 100, this.#s.style.width = `${i}%`;
   }
 }
 class _p extends j {
@@ -13805,7 +13805,7 @@ class _p extends j {
     if (!super.mustUpdate())
       return;
     this.scene.clear();
-    const i = this.scene.context, s = this.xAxis.xAxisGrads.values, n = 0, r = this.theme.xAxis, o = q(r.tickMarker) ? r.tickMarker : !0;
+    const i = this.scene.context, s = this.xAxis.xAxisGrads.values, n = 0, r = this.theme.xAxis, o = G(r.tickMarker) ? r.tickMarker : !0;
     this.#i = this.#i || i.measureText("M").width, i.save(), i.strokeStyle = r.colourTick, i.fillStyle = r.colourTick, i.font = `${r.fontWeight} ${r.fontSize}px ${r.fontFamily}`;
     for (let l of s) {
       let c = Oe(l[1]), p = Math.floor(l[0].length * this.#i * 0.5);
@@ -13870,9 +13870,9 @@ const Fp = [
 class Up extends gt {
   #e = "Timeline";
   #t = "time";
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a;
   #o;
@@ -14165,9 +14165,9 @@ const Vp = {
 class zp {
   #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a;
   #o = [];
@@ -14177,7 +14177,7 @@ class zp {
   #d;
   #u = null;
   constructor(e, i) {
-    this.#e = e, this.#t = i, this.#s = i.core, this.#n = i.core.theme.legend, this.init(), this.eventsListen();
+    this.#e = e, this.#t = i, this.#i = i.core, this.#n = i.core.theme.legend, this.init(), this.eventsListen();
   }
   get elTarget() {
     return this.#e;
@@ -14199,13 +14199,13 @@ class zp {
     return e.display && e.visibility;
   }
   destroy() {
-    this.#s.hub.expunge(this);
+    this.#i.hub.expunge(this);
     for (let e in this.#h)
       e !== "collapse" && this.remove(e);
     this.#e.remove();
   }
   eventsListen() {
-    this.#s.on("chart_pan", this.primaryPanePan, this), this.#s.on("chart_panDone", this.primaryPanePanDone, this);
+    this.#i.on("chart_pan", this.primaryPanePan, this), this.#i.on("chart_panDone", this.primaryPanePanDone, this);
   }
   init() {
     const e = this.#e.legends;
@@ -14236,10 +14236,10 @@ class zp {
     if (!C(e))
       return !1;
     const i = () => {
-      this.#s.error("ERROR: Legend parent missing!");
+      this.#i.error("ERROR: Legend parent missing!");
     };
-    e.id = e?.id || pe("legend"), e.type = e?.type || "overlay", e.title = e?.title || e?.parent.legendName, e.parent = e?.parent || i, e.visible = q(e?.visible) ? e.visible : !0;
-    const s = this.elTarget.buildLegend(e, this.#s.theme);
+    e.id = e?.id || pe("legend"), e.type = e?.type || "overlay", e.title = e?.title || e?.parent.legendName, e.parent = e?.parent || i, e.visible = G(e?.visible) ? e.visible : !0;
+    const s = this.elTarget.buildLegend(e, this.#i.theme);
     this.#e.legends.insertAdjacentHTML("beforeend", s);
     const n = this.#e.legends.querySelector(`#legend_${e.id}`);
     return this.#l = n.querySelectorAll(".control"), this.#h[e.id] = {
@@ -14258,7 +14258,7 @@ class zp {
     return delete this.#h[e], Object.keys(this.#h).length < 2 && (this.#r.style.display = "none"), !0;
   }
   update(e, i) {
-    if (!C(i) || !(e in this.#h) || this.#s.range.data.length == 0)
+    if (!C(i) || !(e in this.#h) || this.#i.range.data.length == 0)
       return !1;
     let s = this.#h[e].source(i.pos);
     const n = this.#e.buildInputs(s);
@@ -14474,7 +14474,7 @@ class Gp extends j {
   draw() {
     if (!super.mustUpdate())
       return;
-    const e = this.scene.context, i = this.yAxis, s = i.yAxisGrads || [], n = this.theme.yAxis, r = q(n.tickMarker) ? n.tickMarker : !0;
+    const e = this.scene.context, i = this.yAxis, s = i.yAxisGrads || [], n = this.theme.yAxis, r = G(n.tickMarker) ? n.tickMarker : !0;
     let o = [], l;
     switch (n?.location) {
       case "left":
@@ -14540,9 +14540,9 @@ const Yp = [
 class jp extends gt {
   #e = "Y Scale Axis";
   #t = "scale";
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a;
   #o;
@@ -14600,22 +14600,22 @@ class jp extends gt {
     return Object.fromEntries([...this.graph.overlays.list]);
   }
   get yAxis() {
-    return this.#i;
+    return this.#s;
   }
   set yAxisType(e) {
-    this.#i.yAxisType = X.includes(e) ? e : X[0];
+    this.#s.yAxisType = X.includes(e) ? e : X[0];
   }
   get yAxisType() {
-    return this.#i.yAxisType;
+    return this.#s.yAxisType;
   }
   get yAxisHeight() {
-    return this.#i.height;
+    return this.#s.height;
   }
   get yAxisRatio() {
-    return this.#i.yAxisRatio;
+    return this.#s.yAxisRatio;
   }
   get yAxisGrads() {
-    return this.#i.yAxisGrads;
+    return this.#s.yAxisGrads;
   }
   get pos() {
     return this.dimensions;
@@ -14630,22 +14630,22 @@ class jp extends gt {
     this.setScaleRange(e);
   }
   get range() {
-    return this.#i.range;
+    return this.#s.range;
   }
   set rangeMode(e) {
-    this.#i.mode = e;
+    this.#s.mode = e;
   }
   get rangeMode() {
-    return this.#i.mode;
+    return this.#s.mode;
   }
   set rangeYFactor(e) {
     this.core.range.yFactor(e);
   }
   set yOffset(e) {
-    this.#i.offset = e;
+    this.#s.offset = e;
   }
   get yOffset() {
-    return this.#i.offset;
+    return this.#s.offset;
   }
   get scale() {
     return this;
@@ -14660,7 +14660,7 @@ class jp extends gt {
     n.id = this.id, n.context = this, this.stateMachine = n, this.stateMachine.start();
   }
   restart() {
-    this.#i.setRange(this.core.range), this.draw();
+    this.#s.setRange(this.core.range), this.draw();
   }
   destroy() {
     this.core.hub.expunge(this), this.off(`${this.parent.id}_pointerout`, this.#c.erase, this.#c), this.off(st, this.onStreamUpdate, this.#h), this.stateMachine.destroy(), this.graph.destroy(), this.#p.destroy(), this.element.remove();
@@ -14692,7 +14692,7 @@ class jp extends gt {
   }
   onStreamUpdate(e) {
     let i = !1;
-    if (this.#i.mode == "manual")
+    if (this.#s.mode == "manual")
       if (this.parent.isPrimary)
         e[4] > this.range.max && (this.range.max = e[4], i = !0), e[4] < this.range.min && (this.range.max = e[4], i = !0);
       else {
@@ -14704,7 +14704,7 @@ class jp extends gt {
     i ? this.draw() : this.#h.draw();
   }
   onChartDrag(e) {
-    this.#i.mode === "manual" && (this.#i.offset = e.domEvent.srcEvent.movementY, this.draw());
+    this.#s.mode === "manual" && (this.#s.offset = e.domEvent.srcEvent.movementY, this.draw());
   }
   setHeight(e) {
     this.#r.style.height = `${e}px`;
@@ -14714,19 +14714,19 @@ class jp extends gt {
     this.setHeight(e.h), this.graph instanceof mt && (this.graph.setSize(i, e.h, i), this.draw()), this.#c instanceof Yo && this.calcPriceDigits();
   }
   setScaleRange(e = 0) {
-    this.#i.mode == "automatic" && (this.#i.mode = "manual"), this.#i.zoom = e, this.draw(this.range, !0), this.core.MainPane.draw();
+    this.#s.mode == "automatic" && (this.#s.mode = "manual"), this.#s.zoom = e, this.draw(this.range, !0), this.core.MainPane.draw();
   }
   resetScaleRange() {
-    this.#i.mode = "automatic", this.draw(this.range, !0), this.core.MainPane.draw();
+    this.#s.mode = "automatic", this.draw(this.range, !0), this.core.MainPane.draw();
   }
   yPos(e) {
-    return this.#i.yPos(e);
+    return this.#s.yPos(e);
   }
   yPosStream(e) {
-    return this.#i.lastYData2Pixel(y);
+    return this.#s.lastYData2Pixel(y);
   }
   yPos2Price(e) {
-    return this.#i.yPos2Price(e);
+    return this.#s.yPos2Price(e);
   }
   nicePrice(e, i) {
     return Fs(e, i);
@@ -14765,7 +14765,7 @@ class jp extends gt {
     this.graph.render();
   }
   draw(e = this.range, i = !0) {
-    this.#i.calcGradations(), this.graph.draw(e, i), this.parent.drawGrid(i), this.parent.draw(e, !0);
+    this.#s.calcGradations(), this.graph.draw(e, i), this.parent.drawGrid(i), this.parent.draw(e, !0);
   }
   resize(e = this.width, i = this.height) {
     this.setDimensions({ w: e, h: i });
@@ -15058,7 +15058,7 @@ class nf extends j {
       content: M,
       offFocus: ni + 1
     };
-    this.core.emit("event_selected", f), this.#s.open(O);
+    this.core.emit("event_selected", f), this.#i.open(O);
   }
   buildNewsEventHTML(e) {
     let i = e?.title, s = `<style>
@@ -15117,7 +15117,7 @@ const Qr = {
 class af extends j {
   #e;
   #t = [];
-  #s;
+  #i;
   #n;
   constructor(e, i = !1, s = !1, n, r, o) {
     super(e, i, s, n, r, o), this.settings = o.settings, I.importData("trades", this.data, this.state, this.state.time.timeFrame), this.#e = new rf(e, n), this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this), Qr.parent = this, this.#n = this.core.WidgetsG.insert("Dialogue", Qr), this.#n.start();
@@ -15226,9 +15226,9 @@ class ye extends j {
   static destroy(e) {
     e instanceof ye && delete ye.#t[e.inCnt];
   }
-  #s;
+  #i;
   #n;
-  #i = "Chart Tools";
+  #s = "Chart Tools";
   #r = "TX_Tool";
   #a;
   #o;
@@ -15240,16 +15240,16 @@ class ye extends j {
     super(e, i, s, n, r, o), this.#n = ye.inCnt, this.config.ID && (this.#i = ze(this.config.ID)), this.settings = o?.settings || {}, Jr.parent = this, this.#a = this.core.WidgetsG.insert("ConfigDialogue", Jr), this.#a.start(), this.eventsListen();
   }
   set id(e) {
-    this.#s = ze(e);
+    this.#i = ze(e);
   }
   get id() {
-    return this.#s || `${this.core.id}-${pe(this.#r)}_${this.#n}`;
+    return this.#i || `${this.core.id}-${pe(this.#r)}_${this.#n}`;
   }
   get inCnt() {
     return this.#n;
   }
   get name() {
-    return this.#i;
+    return this.#s;
   }
   get shortName() {
     return this.#r;
@@ -15328,9 +15328,9 @@ class it extends gt {
     return it.#e++;
   }
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a;
   #o = "idle";
@@ -15380,10 +15380,10 @@ class it extends gt {
     this.#t = ze(e);
   }
   get id() {
-    return this.#t || ze(`${this.core.id}-${this.#s}_${this.#r}`);
+    return this.#t || ze(`${this.core.id}-${this.#i}_${this.#r}`);
   }
   get name() {
-    return this.#s;
+    return this.#i;
   }
   get shortName() {
     return this.#n;
@@ -15392,7 +15392,7 @@ class it extends gt {
     this.setTitle(e);
   }
   get title() {
-    return this.#i;
+    return this.#s;
   }
   get type() {
     return this.#a;
@@ -15610,7 +15610,7 @@ class it extends gt {
   setTitle(e) {
     if (!T(e))
       return !1;
-    this.#i = e, Re.title = e;
+    this.#s = e, Re.title = e;
     const i = this.legend.list.chart.el.querySelectorAll(".title");
     for (let s of i)
       s.innerHTML = e;
@@ -15698,7 +15698,7 @@ class it extends gt {
     return !T(e) || !(e in this.indicators) ? !1 : this.indicators[e].instance.settings(i);
   }
   addTool(e) {
-    let { layerConfig: i } = this.layerConfig(), s = new W.Layer(i);
+    let { layerConfig: i } = this.layerConfig(), s = new q.Layer(i);
     this.#f.set(e.id, s), this.#v.addLayer(s), e.layerTool = s, this.#C.set(e.id, e);
   }
   addTools(e) {
@@ -16022,9 +16022,9 @@ const Ns = {
 class ea extends gt {
   #e = "MainPane";
   #t = "Main";
-  #s = !1;
+  #i = !1;
   #n;
-  #i;
+  #s;
   #r;
   #a;
   #o;
@@ -16060,7 +16060,7 @@ class ea extends gt {
   #L = 0;
   #O = 0;
   constructor(e, i) {
-    i.parent = e, super(e, i), this.#i = this.core.elMain, this.#n = this.core.elYAxis, this.init(i);
+    i.parent = e, super(e, i), this.#s = this.core.elMain, this.#n = this.core.elYAxis, this.init(i);
   }
   get name() {
     return this.#e;
@@ -16084,28 +16084,28 @@ class ea extends gt {
     return this.#x;
   }
   get element() {
-    return this.#i;
+    return this.#s;
   }
   get elRows() {
-    return this.#i.rows;
+    return this.#s.rows;
   }
   get elPrimary() {
-    return this.#i.rows.primary;
+    return this.#s.rows.primary;
   }
   get elSecondary() {
-    return this.#i.rows.secondary;
+    return this.#s.rows.secondary;
   }
   get elPanes() {
-    return this.#i.rows.chartPanes;
+    return this.#s.rows.chartPanes;
   }
   get elPaneSlot() {
-    return this.#i.rows.chartPaneSlot;
+    return this.#s.rows.chartPaneSlot;
   }
   get width() {
-    return this.#i.getBoundingClientRect().width;
+    return this.#s.getBoundingClientRect().width;
   }
   get height() {
-    return this.#i.getBoundingClientRect().height;
+    return this.#s.getBoundingClientRect().height;
   }
   get chartW() {
     return this.elPrimary.getBoundingClientRect().width;
@@ -16129,7 +16129,7 @@ class ea extends gt {
     return this.dimensions;
   }
   get dimensions() {
-    return ve(this.#i);
+    return ve(this.#s);
   }
   set cursor(e) {
     this.element.style.cursor = e;
@@ -16424,7 +16424,7 @@ class ea extends gt {
         break;
       case void 0:
       case "both":
-        o = q(s.settings?.isPrimary) ? s.settings.isPrimary : !0;
+        o = G(s.settings?.isPrimary) ? s.settings.isPrimary : !0;
     }
     if (s.settings.isPrimary = o, o) {
       const c = {
@@ -16795,9 +16795,9 @@ class I {
         r[o] = i[o];
     return !0;
   }
-  #s = "";
+  #i = "";
   #n = "";
-  #i = {};
+  #s = {};
   #r = !1;
   #a = !0;
   #o = [];
@@ -16806,7 +16806,7 @@ class I {
     C(e) ? (this.#s = I.validate(e, i, s), this.#r = "valid", this.#a = !!this.#s.chart?.isEmpty, this.#l = e?.core instanceof H ? e.core : void 0) : (this.#s = I.default, this.#r = "default", this.#a = !0), this.#s.chart.ohlcv = I.ohlcv(this.#s.chart.data), this.#n = pe(`${Jt}_state`), this.#i = e?.id || this.#n;
   }
   get id() {
-    return this.#s;
+    return this.#i;
   }
   get key() {
     return this.#n;
@@ -16819,31 +16819,31 @@ class I {
   }
   get allData() {
     return {
-      data: this.#i.chart.data,
-      ohlcv: this.#i.chart.ohlcv,
-      primaryPane: this.#i.primary,
-      secondaryPane: this.#i.secondary,
-      datasets: this.#i.datasets,
-      trades: this.#i.trades.data,
-      events: this.#i.events.data,
-      annotations: this.#i.annotations.data,
-      tools: this.#i.tools.data
+      data: this.#s.chart.data,
+      ohlcv: this.#s.chart.ohlcv,
+      primaryPane: this.#s.primary,
+      secondaryPane: this.#s.secondary,
+      datasets: this.#s.datasets,
+      trades: this.#s.trades.data,
+      events: this.#s.events.data,
+      annotations: this.#s.annotations.data,
+      tools: this.#s.tools.data
     };
   }
   get trades() {
-    return this.#i.trades;
+    return this.#s.trades;
   }
   get events() {
-    return this.#i.events;
+    return this.#s.events;
   }
   get annotations() {
-    return this.#i.annotations;
+    return this.#s.annotations;
   }
   get tools() {
-    return this.#i.tools;
+    return this.#s.tools;
   }
   get data() {
-    return this.#i;
+    return this.#s;
   }
   get core() {
     return this.#l !== void 0 ? this.#l : !1;
@@ -16912,7 +16912,7 @@ class I {
     this.allData?.events, e?.events;
     const Z = A(l) && this.range.inRange(l[0][0]) ? 1 : 0, he = {};
     if (A(l) && l.length > 0) {
-      if (r = l.length - 1, c.length - 1, he.mData = this.range.inRange(l[0][0]) && this.range.inRange(l[0][r]), !q(l[r][7]) && l[r].length !== 8 && l[r][6] !== null && l[r][7] !== !0 ? l = Mp(l) : i.end >= this.range.timeFinish && i.start <= this.range.timeFinish && (i.start += this.range.interval, i.end += this.range.interval), c.length == 0) {
+      if (r = l.length - 1, c.length - 1, he.mData = this.range.inRange(l[0][0]) && this.range.inRange(l[0][r]), !G(l[r][7]) && l[r].length !== 8 && l[r][6] !== null && l[r][7] !== !0 ? l = Mp(l) : i.end >= this.range.timeFinish && i.start <= this.range.timeFinish && (i.start += this.range.interval, i.end += this.range.interval), c.length == 0) {
         let D = I.ohlcv(l);
         this.allData.data.push(...l), this.allData.ohlcv = { ...D };
       } else {
@@ -17109,13 +17109,13 @@ class df {
 class mf {
   #e;
   #t;
-  #s;
+  #i;
   #n = 0;
-  #i = {};
+  #s = {};
   #r;
   #a = !0;
   constructor(e, i, s, n) {
-    this.#e = e, this.#t = s, this.#s = n;
+    this.#e = e, this.#t = s, this.#i = n;
     const r = `
       ${en.ThreadWorker.toString()};
       const fn = ${i}
@@ -17224,10 +17224,10 @@ class Ni extends ye {
     return this.#t;
   }
   set stateMachine(e) {
-    this.#s = new hs(e, this);
+    this.#i = new hs(e, this);
   }
   get stateMachine() {
-    return this.#s;
+    return this.#i;
   }
   start() {
     this.eventsListen();
@@ -17451,9 +17451,9 @@ const vf = [
 class Jo extends gt {
   #e = "Toolbar";
   #t = "tools";
-  #s;
+  #i;
   #n;
-  #i = ye;
+  #s = ye;
   #r;
   #a = {};
   #o = void 0;
@@ -17461,7 +17461,7 @@ class Jo extends gt {
   #h = { click: [], pointerover: [] };
   #c = [];
   constructor(e, i) {
-    super(e, i), this.#s = e.elTools, this.#r = vf || e.config.tools, this.#n = e.WidgetsG, this.init();
+    super(e, i), this.#i = e.elTools, this.#r = vf || e.config.tools, this.#n = e.WidgetsG, this.init();
   }
   get name() {
     return this.#e;
@@ -17473,17 +17473,17 @@ class Jo extends gt {
     return this.dimensions;
   }
   get dimensions() {
-    return ve(this.#s);
+    return ve(this.#i);
   }
   init() {
-    this.mount(this.#s);
+    this.mount(this.#i);
   }
   start() {
     this.initAllTools(), this.addAllTools(), this.eventsListen(), Rs.id = this.id, Rs.context = this, this.stateMachine = Rs, this.stateMachine.start(), this.log(`Tool Bar ${this.#e} instantiated and running`);
   }
   destroy() {
     this.core.hub.expunge(this);
-    const e = this.id, i = this.#s.querySelectorAll(".icon-wrapper");
+    const e = this.id, i = this.#i.querySelectorAll(".icon-wrapper");
     for (let s of i)
       for (let n of this.#r)
         n.id === e && s.removeEventListener("click", this.#h[e].click), s.removeEventListener("pointerover", this.#h[e].pointerover), s.removeEventListener("pointerout", this.#h[e].pointerout);
@@ -17527,10 +17527,10 @@ class Jo extends gt {
     console.log("Tool deselected:", e);
   }
   mount(e) {
-    e.innerHTML = this.#s.defaultNode(this.#r);
+    e.innerHTML = this.#i.defaultNode(this.#r);
   }
   initAllTools() {
-    const e = this.#s.querySelectorAll(".icon-wrapper");
+    const e = this.#i.querySelectorAll(".icon-wrapper");
     for (let i of e) {
       let s = i.id, n = i.querySelector("svg");
       n.style.fill = et.COLOUR_ICON, n.style.width = "90%";
@@ -17553,7 +17553,7 @@ class Jo extends gt {
       name: e,
       tool: this.#a[e],
       pos: i.cursorClick
-    }, n = this.#i.create(i, s);
+    }, n = this.#s.create(i, s);
     return n.start(), console.log(n), n;
   }
   addNewTool(e, i) {
@@ -17736,9 +17736,9 @@ tn.innerHTML = `
 class xf extends K {
   #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a;
   #o;
@@ -17762,13 +17762,13 @@ class xf extends K {
     return this.#t;
   }
   get rwdStart() {
-    return this.#s;
+    return this.#i;
   }
   get fwdEnd() {
     return this.#n;
   }
   get scrollBar() {
-    return this.#i;
+    return this.#s;
   }
   get viewport() {
     return this.#r;
@@ -17846,7 +17846,7 @@ tl.innerHTML = `
 class Tf extends K {
   #e;
   #t;
-  #s = this.onSlotChange.bind(this);
+  #i = this.onSlotChange.bind(this);
   constructor() {
     super(tl);
   }
@@ -17855,12 +17855,12 @@ class Tf extends K {
   connectedCallback() {
     super.connectedCallback(
       () => {
-        this.#e = this.shadowRoot.querySelector('slot[name="viewportCanvas"]'), this.#e.addEventListener("slotchange", this.#s);
+        this.#e = this.shadowRoot.querySelector('slot[name="viewportCanvas"]'), this.#e.addEventListener("slotchange", this.#i);
       }
     );
   }
   disconnectedCallback() {
-    super.disconnectedCallback(), this.#e.removeEventListener("slotchange", this.#s);
+    super.disconnectedCallback(), this.#e.removeEventListener("slotchange", this.#i);
   }
   get hasCanvasSlot() {
     return !0;
@@ -18067,9 +18067,9 @@ sl.innerHTML = `
 class Sf extends K {
   #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a = [];
   #o;
@@ -18095,13 +18095,13 @@ class Sf extends K {
     return this.#t;
   }
   get elTitle() {
-    return this.#s;
+    return this.#i;
   }
   get elInputs() {
     return this.#n;
   }
   get elControls() {
-    return this.#i;
+    return this.#s;
   }
   get title() {
     return this.#e;
@@ -18239,7 +18239,7 @@ rl.innerHTML = `
 class Mf extends K {
   #e;
   #t;
-  #s;
+  #i;
   #n;
   constructor() {
     super(rl);
@@ -18267,7 +18267,7 @@ class Mf extends K {
     return this.shadowRoot.querySelector('slot[name="chartpane"]');
   }
   get width() {
-    return this.#s;
+    return this.#i;
   }
   get height() {
     return this.#n;
@@ -18279,13 +18279,13 @@ class Mf extends K {
     return this.#t;
   }
   get widthDeltaR() {
-    return this.#s / this.#e;
+    return this.#i / this.#e;
   }
   get heightDeltaR() {
     return this.#n / this.#t;
   }
   previousDimensions() {
-    this.#e = this.#s ? this.#s : this.clientWidth, this.#t = this.#n ? this.#n : this.clientHeight, this.#s = this.clientWidth, this.#n = this.clientHeight;
+    this.#e = this.#i ? this.#i : this.clientWidth, this.#t = this.#n ? this.#n : this.clientHeight, this.#i = this.clientWidth, this.#n = this.clientHeight;
   }
 }
 customElements.get("tradex-rows") || window.customElements.define("tradex-rows", Mf);
@@ -18328,7 +18328,7 @@ al.innerHTML = `
 class Af extends K {
   #e;
   #t;
-  #s;
+  #i;
   #n;
   constructor() {
     super(al);
@@ -18338,14 +18338,14 @@ class Af extends K {
   connectedCallback() {
     super.connectedCallback(
       () => {
-        this.#s = this.shadowRoot.querySelector("#viewport"), this.#e = this.shadowRoot.querySelector("tradex-rows"), this.#t = this.shadowRoot.querySelector("tradex-time");
+        this.#i = this.shadowRoot.querySelector("#viewport"), this.#e = this.shadowRoot.querySelector("tradex-rows"), this.#t = this.shadowRoot.querySelector("tradex-time");
       }
     );
   }
   disconnectedCallback() {
   }
   get viewport() {
-    return this.#s;
+    return this.#i;
   }
   get rows() {
     return this.#e;
@@ -18439,7 +18439,7 @@ ll.innerHTML = `
 class Of extends K {
   #e;
   #t;
-  #s;
+  #i;
   constructor() {
     super(ll);
   }
@@ -18448,7 +18448,7 @@ class Of extends K {
   connectedCallback() {
     super.connectedCallback(
       () => {
-        this.#e = this.shadowRoot.querySelector("tradex-viewport"), this.#s = this.shadowRoot.querySelector('slot[name="chartpane"]'), this.#t = this.chartPaneSlot.assignedElements();
+        this.#e = this.shadowRoot.querySelector("tradex-viewport"), this.#i = this.shadowRoot.querySelector('slot[name="chartpane"]'), this.#t = this.chartPaneSlot.assignedElements();
       }
     );
   }
@@ -18459,7 +18459,7 @@ class Of extends K {
     return this.#t;
   }
   get chartPaneSlot() {
-    return this.#s;
+    return this.#i;
   }
 }
 customElements.get("tradex-scale") || window.customElements.define("tradex-scale", Of);
@@ -18498,7 +18498,7 @@ hl.innerHTML = Df;
 class Nf extends K {
   #e;
   #t;
-  #s;
+  #i;
   #n;
   #s;
   #r = {
@@ -18524,7 +18524,7 @@ class Nf extends K {
     return this.#t;
   }
   get main() {
-    return this.#s;
+    return this.#i;
   }
   get scale() {
     return this.#n;
@@ -18668,7 +18668,7 @@ const kf = `
 class $f extends K {
   #e;
   #t;
-  #s;
+  #i;
   #n;
   #s = si;
   #r = Je;
@@ -18736,10 +18736,10 @@ class $f extends K {
     return this.#t;
   }
   get elWidgets() {
-    return this.#s;
+    return this.#i;
   }
   get elWidgetsG() {
-    return this.#s;
+    return this.#i;
   }
   get elMain() {
     return this.#e.main;
@@ -18754,7 +18754,7 @@ class $f extends K {
     return this.#e.scale;
   }
   get width() {
-    return this.#i;
+    return this.#s;
   }
   get height() {
     return this.#r;
@@ -18850,9 +18850,9 @@ const _f = [
 class Hf extends gt {
   #e = "Utilities";
   #t = "utils";
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a;
   #o = {};
@@ -18871,10 +18871,10 @@ class Hf extends gt {
     return this.dimensions;
   }
   get dimensions() {
-    return ve(this.#s);
+    return ve(this.#i);
   }
   get location() {
-    return this.#i;
+    return this.#s;
   }
   start() {
     this.initAllUtils(), this.eventsListen(), this.log(`Utils Bar ${this.#e} instantiated and running`);
@@ -18915,7 +18915,7 @@ class Hf extends gt {
     i.style.fill = Ot.COLOUR_ICON;
   }
   initAllUtils() {
-    const e = this.#s.querySelectorAll(".icon-wrapper");
+    const e = this.#i.querySelectorAll(".icon-wrapper");
     for (let i of e) {
       this.#h[i.id] = 0;
       let s = i.id.replace("TX_", ""), n = i.querySelector("svg");
@@ -18946,9 +18946,9 @@ const Bf = 150;
 class Ce {
   #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a;
   #o;
@@ -18968,7 +18968,7 @@ class Ce {
     Ce.menuList[e].end(), delete Ce.menuList[e];
   }
   constructor(e, i) {
-    this.#t = e, this.#s = i.core, this.#n = i, this.#e = i.id, this.#r = e.elements[Ce.type], this.#i = this.#s.elWidgetsG, this.mount(this.#r);
+    this.#t = e, this.#i = i.core, this.#n = i, this.#e = i.id, this.#r = e.elements[Ce.type], this.#s = this.#i.elWidgetsG, this.mount(this.#r);
   }
   get el() {
     return this.#a;
@@ -19000,13 +19000,13 @@ class Ce {
     }), this.on("global_resize", this.onResize, this);
   }
   on(e, i, s = this) {
-    this.#s.on(e, i, s);
+    this.#i.on(e, i, s);
   }
   off(e, i, s = this) {
-    this.#s.off(e, i, s);
+    this.#i.off(e, i, s);
   }
   emit(e, i) {
-    this.#s.emit(e, i);
+    this.#i.emit(e, i);
   }
   onMenuSelect(e) {
     let i = e.currentTarget.dataset.event, s = {
@@ -19014,7 +19014,7 @@ class Ce {
       menu: this.#e,
       evt: i
     };
-    this.emit("menuItem_selected", s), this.emit("menu_close", s), this.#s.log(`menu_close: ${this.#e}`);
+    this.emit("menuItem_selected", s), this.emit("menu_close", s), this.#i.log(`menu_close: ${this.#e}`);
   }
   onOutsideClickListener(e) {
     if (!this.#a.contains(e.target) && !this.#n.primary.contains(e.target) && pt(this.#a)) {
@@ -19062,7 +19062,7 @@ class Ce {
       let l = Math.floor(this.#s.offsetWidth - r.width);
       l = B(l, 0, this.#s.offsetWidth), this.#a.style.left = `${l}px`;
     }
-    if (this.#s.MainPane.rowsH + n + r.height > this.#s.MainPane.rowsH) {
+    if (this.#i.MainPane.rowsH + n + r.height > this.#i.MainPane.rowsH) {
       let l = Math.floor(r.height * -1);
       l = B(l, this.#i.MainPane.rowsH * -1, 0), this.#a.style.top = `${l}px`;
     }
@@ -19088,7 +19088,7 @@ class di extends ue {
   /** default Dialogue widget styles */
   `;
   static create(e, i) {
-    return i.dragBar = q(i?.dragBar) ? i.dragBar : !0, i.close = q(i?.close) ? i.close : !0, i.type = i?.type || di.type, i.class = i?.class || "dialogue", i.id = i?.id || pe("dialogue"), super.create(e, i);
+    return i.dragBar = G(i?.dragBar) ? i.dragBar : !0, i.close = G(i?.close) ? i.close : !0, i.type = i?.type || di.type, i.class = i?.class || "dialogue", i.id = i?.id || pe("dialogue"), super.create(e, i);
   }
   static defaultNode() {
     return `
@@ -19267,9 +19267,9 @@ ml.innerHTML = `
 class Ff extends K {
   #e;
   #t;
-  #s;
+  #i;
   #n;
-  #i = this.onSlotChange.bind(this);
+  #s = this.onSlotChange.bind(this);
   constructor() {
     super(ml);
   }
@@ -19278,18 +19278,18 @@ class Ff extends K {
   connectedCallback() {
     super.connectedCallback(
       () => {
-        this.#t = this.shadowRoot.querySelector(".tabbedContent"), this.#s = this.shadowRoot.querySelector('slot[name="viewporttabs"]'), this.#s.addEventListener("slotchange", this.#i);
+        this.#t = this.shadowRoot.querySelector(".tabbedContent"), this.#i = this.shadowRoot.querySelector('slot[name="viewporttabs"]'), this.#i.addEventListener("slotchange", this.#s);
       }
     );
   }
   disconnectedCallback() {
-    super.disconnectedCallback(), this.#s.removeEventListener("slotchange", this.#i);
+    super.disconnectedCallback(), this.#i.removeEventListener("slotchange", this.#s);
   }
   get hastabsSlot() {
     return !0;
   }
   get tabsSlot() {
-    return this.#s;
+    return this.#i;
   }
   get tabs() {
     return this.#n;
@@ -19484,9 +19484,9 @@ class Le {
   }
   #e;
   #t;
-  #s;
-  #n;
   #i;
+  #n;
+  #s;
   #r;
   #a;
   #o;
@@ -19503,7 +19503,7 @@ class Le {
     this.mount(this.#r);
   }
   start() {
-    if (!C(this.#s.config?.progress) || !C(this.#s.config.progress?.loading))
+    if (!C(this.#i.config?.progress) || !C(this.#i.config.progress?.loading))
       return !1;
     this.#a.style.display = "block";
     const e = this.#i.elBody.width / 2 - this.#a.clientWidth / 2, i = this.#i.elBody.height / -2 - this.#a.clientHeight / 2;
@@ -19607,29 +19607,29 @@ class Vf extends gt {
     return this.#r;
   }
   get instances() {
-    return this.#i;
+    return this.#s;
   }
   get types() {
-    return this.#s;
+    return this.#i;
   }
   start() {
     this.eventsListen(), ks.id = this.id, ks.context = this, this.stateMachine = ks, this.stateMachine.start();
   }
   destroy() {
     this.core.hub.expunge(this), this.stateMachine.destroy();
-    for (let e in this.#i)
-      this.delete(e);
     for (let e in this.#s)
-      this.#s[e].destroy();
+      this.delete(e);
+    for (let e in this.#i)
+      this.#i[e].destroy();
   }
   eventsListen() {
     this.on("resize", this.onResize, this), this.on("menu_open", this.onOpenMenu, this), this.on("menu_close", this.onCloseMenu, this), this.on("menu_off", this.onCloseMenu, this), this.on("menuItem_selected", this.onMenuItemSelected, this), this.on("global_resize", this.onResize, this);
   }
   onOpenMenu(e) {
-    this.#i[e.menu].open();
+    this.#s[e.menu].open();
   }
   onCloseMenu(e) {
-    this.#i[e.menu].close();
+    this.#s[e.menu].close();
   }
   onMenuItemSelected(e) {
     this.emit(e.evt, e.target);
@@ -19651,28 +19651,28 @@ class Vf extends gt {
   }
   defaultNode() {
     let e = "", i = [];
-    for (let s in this.#s) {
-      let n = this.#s[s];
+    for (let s in this.#i) {
+      let n = this.#i[s];
       i.indexOf(n.type) === -1 && (e += n.defaultNode(), i.push(n.type));
     }
     return e;
   }
   insert(e, i) {
-    if (!(e in this.#s) || !C(i))
+    if (!(e in this.#i) || !C(i))
       return !1;
     i.core = this.core;
-    const s = this.#s[e].create(this, i);
-    return this.#i[s.id] = s, s;
+    const s = this.#i[e].create(this, i);
+    return this.#s[s.id] = s, s;
   }
   delete(e) {
-    if (!T(e) || !(e in this.#i))
+    if (!T(e) || !(e in this.#s))
       return !1;
-    const i = this.#i[e].type;
-    return this.#s[i].destroy(e), !0;
+    const i = this.#s[e].type;
+    return this.#i[i].destroy(e), !0;
   }
 }
 function na(a, e, i, s, n, r) {
-  const o = a.theme, l = document.createElement("template"), c = a.Timeline.graph.viewport.scene, p = a.MainPane, f = p.graph.viewport.scene, b = p.width, S = p.height, M = new W.Viewport({
+  const o = a.theme, l = document.createElement("template"), c = a.Timeline.graph.viewport.scene, p = a.MainPane, f = p.graph.viewport.scene, b = p.width, S = p.height, M = new q.Viewport({
     width: b,
     height: S,
     container: l
@@ -19730,9 +19730,9 @@ function na(a, e, i, s, n, r) {
 class H extends $f {
   static #e = _n;
   static #t = 0;
-  static #s = {};
+  static #i = {};
   static #n = {};
-  static #i = null;
+  static #s = null;
   static #r = !1;
   static #a = [];
   static #o = null;
@@ -19742,7 +19742,7 @@ class H extends $f {
     return H.#e;
   }
   static get talibPromise() {
-    return H.#i;
+    return H.#s;
   }
   static get talibReady() {
     return H.#r;
@@ -20101,7 +20101,7 @@ class H extends $f {
       let b = 0, S = this.#f.data.range.initialCnt, M = C(i?.range) ? i.range : {};
       M.interval = p, M.core = this, this.getRange(null, null, M), this.setRange(b, S), this.#H = new Vf(this, { widgets: i?.widgets }), this.#$ = new Hf(this, i), this.#_ = new Jo(this, i), this.#A = new ea(this, i), this.eventsListen(), this.elStart(this.theme), this.elBody.start(this.theme), this.UtilsBar.start(), this.ToolsBar.start(), this.MainPane.start(), this.WidgetsG.start(), this.#F = this.WidgetsG.insert("Progress", {});
     }
-    this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.setTheme(this.#O.id), this.#D = this.bufferPx * -1, this.stream = this.#p.stream, !C(i?.stream) && this.state.data.chart.data.length < 2 ? this.warn(`${qt} has no chart data or streaming provided.`) : C(i?.stream) && this.state.data.chart.data.length < 2 && (this.#R = !0), this.log(`Time Frame: ${this.#C.timeFrame} Milliseconds: ${this.#C.timeFrameMS}`), this.#R && this.on(st, this.delayedSetRange, this), this.#p.callbacks = this.#p.callbacks || {}, this.#E = !0, this.refresh(), this.log(`${this.#u} V${H.version} configured and running...`);
+    this.insertAdjacentHTML("beforebegin", `<style title="${this.id}_style"></style>`), this.setTheme(this.#O.id), this.#D = this.bufferPx * -1, this.stream = this.#p.stream, !C(i?.stream) && this.state.data.chart.data.length < 2 ? this.warn(`${qt} has no chart data or streaming provided.`) : C(i?.stream) && this.state.data.chart.data.length < 2 && (this.#R = !0), this.log(`Time Frame: ${this.#C.timeFrame} Milliseconds: ${this.#C.timeFrameMS}`), this.#R && this.on(st, this.delayedSetRange, this), this.#p.callbacks = this.#p.callbacks || {}, this.#E = !0, setTimeout(this.refresh.bind(this), 1e3), this.log(`${this.#u} V${H.version} configured and running...`);
   }
   use(e) {
     this.start(e);
@@ -20132,10 +20132,10 @@ class H extends $f {
       heightMin: (e) => this.setHeightMin(e),
       widthMax: (e) => this.setWidthMax(e),
       heightMax: (e) => this.setHeightMax(e),
-      logs: (e) => this.logs = q(e) ? e : !1,
-      infos: (e) => this.infos = q(e) ? e : !1,
-      warnings: (e) => this.warnings = q(e) ? e : !1,
-      errors: (e) => this.errors = q(e) ? e : !1,
+      logs: (e) => this.logs = G(e) ? e : !1,
+      infos: (e) => this.infos = G(e) ? e : !1,
+      warnings: (e) => this.warnings = G(e) ? e : !1,
+      errors: (e) => this.errors = G(e) ? e : !1,
       indicators: (e) => this.setIndicators(e),
       theme: (e) => {
         this.#O = this.addTheme(e);
@@ -20286,7 +20286,7 @@ class H extends $f {
   mergeData(e, i = !1, s = !1) {
     this.#k = !0;
     let n = this.state.mergeData(e, i, s);
-    return q(n) && (this.#k = !1), n;
+    return G(n) && (this.#k = !1), n;
   }
   isOverlay(e) {
     return ri(e) && k(e.prototype?.draw) && !this.isIndicator(e) && Object.getPrototypeOf(e.prototype).constructor.isOverlay;

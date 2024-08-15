@@ -550,7 +550,7 @@ export default class TradeXchart extends Tradex_chart {
     this.#config.callbacks = this.#config.callbacks || {}
 
     this.#ready = true
-    this.refresh()
+    setTimeout(this.refresh.bind(this), 1000)
 
     this.log(`${this.#name} V${TradeXchart.version} configured and running...`)
   }

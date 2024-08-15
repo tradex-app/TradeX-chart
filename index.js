@@ -999,6 +999,7 @@ function addChart() {
 
   let {config, stream} = configs[(chart.inCnt) % configs.length]
       chart.start(config)
+      chart.refresh()
       window["chart"+chart.inCnt] = chart
 
   if (typeof chart?.stream?.start === "function") {
