@@ -727,6 +727,19 @@ export default class MainPane extends Component {
 
     this.#ChartPanes.delete(paneID)
 
+    // resize Scale width for remaining chart panes
+    let scaleW = 0;
+    if (this.#ChartPanes.size === 1) {
+      scaleW = this.#ChartPanes.values().next().value.scale.calcScaleWidth()
+    }
+    else {
+      for (let o of exp) {
+        let w = o.scale.calcScaleWidth()
+        scaleW = (w > scaleW) ? w : scaleW
+      }
+    }
+    this.core.elBody.setYAxisWidth(scaleW)
+
     // is there only one chart pane remaining?
     if (this.#ChartPanes.size === 1) {
       let o = this.#ChartPanes.values().next().value

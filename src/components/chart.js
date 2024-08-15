@@ -357,7 +357,6 @@ export default class Chart extends Component{
   onChartDragDone(e) {
     this.cursor = "crosshair"
     this.core.MainPane.onChartDragDone(e)
-    // this.scale.onChartDragDone(e)
   }
 
   onPointerMove(e) {
