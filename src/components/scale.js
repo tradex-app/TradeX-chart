@@ -343,7 +343,7 @@ export default class ScaleBar extends Component {
   niceValue(v) {
     const step = this.#yAxis.niceNumber(v)
     let nice = limitPrecision(step, this.core.pricePrecision)
-        nice = nice.replace(/0+$/, "");
+        nice = nice.match(/^0*(\d+(?:\.(?:(?!0+$)\d)+)?)/)[1];
     return nice
   }
 
