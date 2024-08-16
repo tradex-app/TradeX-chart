@@ -1,6 +1,7 @@
 // trade.js
 // draw a single trade marker
 
+import { fillMask } from "../../renderer/canvas"
 import { svgToImage } from "../../utils/DOM"
 import { limit } from "../../utils/number"
 
@@ -10,6 +11,8 @@ export default class Trade {
   data
   buy
   sell
+  mask
+  dims = {w: 0, h: 0}
 
   constructor(target, theme) {
     this.scene = target.scene
@@ -23,13 +26,20 @@ export default class Trade {
     this.sell = svgToImage(this.cfg.iconSell, this.cfg.sellColour, this.dims)
   }
 
+  /**
+   * draw buy or sell icon using cached images generated from SVG
+   * draw hit mask - generated on the fly
+   * @param {*} data
+   * @return {*}  
+   * @memberof Trade
+   */
   draw(data) {
     this.data = data
     const c = this.cfg
     const i = (data.side === "buy") ? this.buy : this.sell
     const j = (data.side === "buy") ? c.iconBuy : c.iconSell
     const k = this.hit.getIndexValue(data.key)
-    const hit = svgToImage(j, k, this.dims)
+    const hit = fillMask(k, i)
     const h = limit(data.w, c.iconMinDim, c.iconHeight)
     const w = limit(data.w, c.iconMinDim, c.iconWidth)
     const x = this.data.x
@@ -47,4 +57,5 @@ export default class Trade {
 
     return {x,y,w,h,k}
   }
+
 }

@@ -46,6 +46,7 @@ import {
 import { 
   chartBar 
 } from "./chart"
+import Colour from "../utils/colour"
 
 
 /**
@@ -100,10 +101,19 @@ const channels = {
   alpa: "#000000FF"
 };
 
-export function getChannel(channelName, image) {
+export function fillMask(colour, image) {
   const copy = imageToCanvas(image);
   const ctx = copy.ctx;
-  ctx.fillStyle = channels[channelName];
+    let fill;
+
+  if (Object.keys(channels).includes(colour))
+    fill = channels[colour];
+  else {
+    let c = new Colour(colour)
+    fill = (c.isValid) ? c.hexa : channels.alpa
+
+  }
+  ctx.fillStyle = fill
   ctx.globalCompositeOperation = "multiply";
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.globalCompositeOperation = "destination-in";
@@ -120,10 +130,10 @@ export function getChannel(channelName, image) {
  */
 export function separateRGB(image) {
   return {
-    red: getChannel("red", image),
-    green: getChannel("green", image),
-    blue: getChannel("blue", image),
-    alpha: getChannel("alpha", image)
+    red: fillMask("red", image),
+    green: fillMask("green", image),
+    blue: fillMask("blue", image),
+    alpha: fillMask("alpha", image)
   };
 }
 
@@ -132,22 +142,23 @@ export function separateRGB(image) {
  *
  * @param {number} w - width in pixels
  * @param {number} h - height in pixels
- * @return {canvas}  - HTML canvas element
+ * @return {Canvas}  - HTML canvas element
  */
 export function createCanvas(w, h) {
-  const can = document.createElement("canvas");
-  can.ctx = can.getContext("2d", {willReadFrequently: true});
-  can.width = w || can.ctx.canvas.width;
-  can.height = h || can.ctx.canvas.height;
-  return can;
+  const c = document.createElement("canvas");
+  c.ctx = c.getContext("2d", {willReadFrequently: true});
+  c.width = w || c.ctx.canvas.width;
+  c.height = h || c.ctx.canvas.height;
+  return c;
 }
 
 
 export default {
+  Colour,
   createCanvas,
   imageToCanvas,
   separateRGB,
-  getChannel,
+  fillMask,
   getPixelRatio,
   fillStroke,
   linearGradient,

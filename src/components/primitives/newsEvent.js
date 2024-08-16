@@ -1,6 +1,7 @@
 // newsEvent.js
 // draw a single news event marker
 
+import { fillMask } from "../../renderer/canvas"
 import { svgToImage } from "../../utils/DOM"
 import { limit } from "../../utils/number"
 
@@ -26,7 +27,7 @@ export default class NewsEvent {
     const i = this.icon
     const c = this.cfg
     const k = this.hit.getIndexValue(data.key)
-    const hit = svgToImage(c.iconEvent, k, this.dims)
+    const hit = fillMask(k, i)
     const h = limit(data.w, c.iconMinDim, c.iconHeight)
     const w = limit(data.w, c.iconMinDim, c.iconWidth)
     const x = this.data.x
