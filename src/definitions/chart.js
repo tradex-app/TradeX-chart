@@ -8,8 +8,6 @@ export const DEFAULT_TIMEFRAME = "1m"
 export const DEFAULT_TIMEFRAMEMS = DEFAULT_TIMEINTERVAL
 export const DEFAULT_RANGELENGTH = 100
 
-export const PRICEDIGITS = 6
-
 export const XAXIS_ZOOM = 0.05
 export const XAXIS_STEP = 100
 
@@ -17,6 +15,8 @@ export const YAXIS_STEP = 100
 export const YAXIS_GRID = 16
 export const YAXIS_BOUNDS = 0.3
 export const YAXIS_PADDING = 1.04
+export const YAXIS_MINDIGITS = 8
+
 // YAxis type enum
 export class YAXIS_TYPE {
   static default = new YAXIS_TYPE("default")

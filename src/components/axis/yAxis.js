@@ -4,9 +4,7 @@ import Axis from "./axis";
 import { bRound, countDigits, log10, limitPrecision, numDigits } from "../../utils/number";
 import { isNumber } from "../../utils/typeChecks";
 import { 
-  PRICEDIGITS, 
   YAXIS_STEP,
-  YAXIS_TYPE,
   YAXIS_TYPES
 } from "../../definitions/chart";
 import { YAxisFontSizeFactor } from "../../definitions/style";
@@ -16,10 +14,9 @@ const p100Padding = 1.2
 
 export default class yAxis extends Axis {
 
-  #source
   #parent
+  #source
   #chart
-
   #yAxisType = YAXIS_TYPES[0]  // default, log, percent
   #mode = "automatic"
   #transform = {
@@ -45,7 +42,6 @@ export default class yAxis extends Axis {
   }
   #yAxisPadding = 1 //1.04
   #yAxisStep = YAXIS_STEP
-  #yAxisDigits = PRICEDIGITS
   #yAxisTicks = 3
   #yAxisGrads
   #step

@@ -2,7 +2,7 @@
 // Scale bar that lives on the side of the chart
 
 import Component from "./component"
-import { YAXIS_TYPE, YAXIS_TYPES } from '../definitions/chart'
+import { YAXIS_MINDIGITS, YAXIS_TYPES } from '../definitions/chart'
 import { isArray, isNumber, isObject } from '../utils/typeChecks'
 import { elementDimPos } from "../utils/DOM"
 import yAxis from "./axis/yAxis"
@@ -318,16 +318,33 @@ export default class ScaleBar extends Component {
   }
 
   calcPriceDigits() {
-    let count = 8;
+    let count = YAXIS_MINDIGITS,
+        nice = "0";
     if (this.core.range.dataLength > 0 &&
         this.#yAxis instanceof yAxis) {
-      const step = this.#yAxis.niceNumber(this.range.valueMax)
-        let nice = limitPrecision(step, this.core.pricePrecision)
-            nice = nice.replace(/0+$/, "");
-     count = `${nice}`.length + 2
+
+      if (this.#chart.isPrimary) {
+        nice = this.niceValue(this.range.valueMax)
+      }
+      else {
+        for (let i in this.#chart.indicators) {
+          let max = this.range.secondaryMaxMin?.[i]?.data?.max || YAXIS_MINDIGITS
+          let maxStr = this.niceValue(max)
+          if (maxStr.length > nice.length) nice = maxStr
+        }
+      }
+
+     count = `${nice}`.length + 2 || YAXIS_MINDIGITS
     }
-    this.#digitCnt = (count < 8) ? 8 : count
+    this.#digitCnt = (count < YAXIS_MINDIGITS) ? YAXIS_MINDIGITS : count
     return this.#digitCnt
+  }
+
+  niceValue(v) {
+    const step = this.#yAxis.niceNumber(v)
+    let nice = limitPrecision(step, this.core.pricePrecision)
+        nice = nice.replace(/0+$/, "");
+    return nice
   }
 
   calcScaleWidth() {

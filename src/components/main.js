@@ -24,7 +24,6 @@ import {
 } from '../definitions/core'
 
 import {
-  PRICEDIGITS,
   XAXIS_ZOOM,
   BUFFERSIZE,
   ROWMINHEIGHT,
