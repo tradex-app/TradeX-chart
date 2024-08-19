@@ -132,7 +132,7 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * Create a new TradeXchart instance
    * @static
-   * @param {Object} [cfg={}] - chart config
+   * @param {object} [cfg={}] - chart config
    * @returns {TradeXchart} TradeXchart
    * @memberof TradeXchart
    */
@@ -398,7 +398,7 @@ export default class TradeXchart extends Tradex_chart {
    * let's start building the chart
    * merges the provided config with a default 
    * to fill in missing or required values
-   * @param {Object} cfg - chart configuration
+   * @param {object} cfg - chart configuration
    */
   start(cfg) {
     this.log(`${NAME} configuring...`)
@@ -557,7 +557,7 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * alias of start()
-   * @param {Object} cfg - chart configuration
+   * @param {object} cfg - chart configuration
    */
   use(cfg) {
     this.start(cfg)
@@ -665,7 +665,7 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * set chart watermark
-   * @param {Object} w - {text, imgURL: URL | data:URL}
+   * @param {object} w - {text, imgURL: URL | data:URL}
    */
   setWatermark(w) {
     this.Chart.setWatermark(w)
@@ -717,7 +717,7 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * Add a theme to the chart,
    * if no current theme is set, make this the current one.
-   * @param {Object} theme - Volume accuracy
+   * @param {object} theme - Volume accuracy
    * @returns {Theme} - theme instance
    * @memberof TradeXchart
    */
@@ -823,7 +823,7 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * 
    * @param {string} key - state id
-   * @returns 
+   * @returns {boolean} - success / failure
    */
   setState(key) {
     // invalid state id
@@ -872,7 +872,7 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * validate and register a chart state
-   * @param {Object} state 
+   * @param {object} state 
    * @param {boolean} deepValidate - validate every entry rather than a sample
    * @param {boolean} isCrypto - validate time stamps against BTC genesis block
    * @returns {State} - State instance
@@ -896,7 +896,7 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * export state as an object
    * @param {string} key - state id
-   * @param {Object} config 
+   * @param {object} config 
    * @returns {Object|false}
    */
   exportState(key=this.#state.key, config={}) {
@@ -913,7 +913,7 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * specify a chart stream
    * @memberof TradeXchart
-   * @param {Object} stream 
+   * @param {object} stream 
    * @returns {Stream|false}
    */
   setStream(stream) {
@@ -1091,7 +1091,7 @@ export default class TradeXchart extends Tradex_chart {
    * Used for populating a chart with back history.
    * Merge data must be formatted to a Chart State.
    * Optionally set a new range upon merge.
-   * @param {Object} merge - merge data must be formatted to a Chart State
+   * @param {object} merge - merge data must be formatted to a Chart State
    * @param {boolean|object} newRange - false | {start: number, end: number}
    * @param {boolean} calc - automatically calculate indicator data (ignore any existing)
    */
@@ -1149,7 +1149,7 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * list of optional overlays, inclusive of custom overlays by key, value pair
-   * @returns {Object} - object of optional overlay key value pairs
+   * @returns {object} - object of optional overlay key value pairs
    */
   overlayEntries() {
     const c = this.optionalOverlays
@@ -1162,7 +1162,7 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * Register Custom Overlays
-   * @param {Object} o - overlays {myOverlay: {class: MyOverlayClass, location: "chartPane"}}
+   * @param {object} o - overlays {myOverlay: {class: MyOverlayClass, location: "chartPane"}}
    * @returns {object|boolean} - false failure, object of success or failures
    */
   setCustomOverlays(o) {
@@ -1305,7 +1305,7 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * import Indicators
-   * @param {Object} i - indicators {id, name, event, ind}
+   * @param {object} i - indicators {id, name, event, ind}
    * @param {boolean} flush - expunge default indicators
    * @returns {boolean|object} - false failure, object of success or failures
    */
@@ -1341,7 +1341,7 @@ export default class TradeXchart extends Tradex_chart {
    * add an indicator - default or registered user defined
    * @param {string} i - indicator
    * @param {string} name - identifier
-   * @param {Object} params - {settings, data}
+   * @param {object} params - {settings, data}
    * @returns {Indicator|false} - indicator instance or false
    */
   addIndicator(i, name=i, params={}) {
@@ -1382,8 +1382,8 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * set or get indicator settings
    * @param {string|Indicator} i - indicator id or Indicator instance
-   * @param {Object} s - settings
-   * @returns {Object} - settings
+   * @param {object} s - settings
+   * @returns {object} - settings
    */
   indicatorSettings(i, s) {
     return this.#MainPane.indicatorSettings(i, s)
@@ -1446,7 +1446,7 @@ export default class TradeXchart extends Tradex_chart {
   /*============================*/
   /**
    * Add a trade entry to the chat
-   * @param {Object} t - trade entry
+   * @param {object} t - trade entry
    * @returns {boolean}
    */
   addTrade(t) {
@@ -1467,7 +1467,7 @@ export default class TradeXchart extends Tradex_chart {
   /*============================*/
   /**
    * Add a event entry to the chat
-   * @param {Object} e - event entry
+   * @param {object} e - event entry
    * @returns {boolean}
    */
   addEvent(e) {
@@ -1517,7 +1517,7 @@ export default class TradeXchart extends Tradex_chart {
    * @param {function} cb - callback function to receive the generated data URL
    * @param {string} type - image type "img/png"|"img/jpg"|"img/webp"
    * @param {number} quality - image quality 0 - 1
-   * @param {Object} watermark - watermark definition {imgURL, x, y, width, height}
+   * @param {object} watermark - watermark definition {imgURL, x, y, width, height}
    * @returns {imageURL|Promise} - returns imageURL or Promise if no callback was specified
    */
   toImageURL(cb, type, quality, watermark) {
@@ -1529,7 +1529,7 @@ export default class TradeXchart extends Tradex_chart {
    * @param {string} fileName - name to save the image as
    * @param {string} type - image type "img/png"|"img/jpg"|"img/webp"
    * @param {number} quality - image quality 0 - 1
-   * @param {Object} watermark - watermark definition {imgURL, x, y, width, height}
+   * @param {object} watermark - watermark definition {imgURL, x, y, width, height}
    */
   downloadImage(fileName=`${this.id}.png`, type, quality, watermark) {
     exportImage(this, fileName, type, quality, "download", watermark)

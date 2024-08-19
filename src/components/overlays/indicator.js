@@ -207,8 +207,7 @@ export default class Indicator extends Overlay {
 
   /**
    * process candle value
-   * data - [timestamp, open, high, low, close, volume]
-   * @memberof indicator
+   * @type {Array<number>} data - [timestamp, open, high, low, close, volume]
    */
   set value(data) {
     // round time to nearest current time unit
@@ -224,15 +223,27 @@ export default class Indicator extends Overlay {
       this.#updateValueCB(data)
     }
   }
+  
+  /**
+   * @type {Array<number>}
+   */
   get value() {
     return this.#value
   }
 
+  /**
+   * specify Legend name
+   * @param {String} name 
+   */
   setLegendName(name) {
     this.#legendName = (isString(name)) ? name : this.shortName || this.#ID
     this.chart.legend.modify(this.#legendID, { legendName: name })
   }
 
+  /**
+   * set indicator visibility on chart
+   * @param {Boolean} v - true: visible, false: hidden
+   */
   setLegendVisibility(v) {
     this.#legendVisibility = !!v
     this.chart.legend.modify(this.#legendID, { legendVisibility: !!v })
@@ -420,7 +431,6 @@ export default class Indicator extends Overlay {
   /**
    * process new candle stream value
    * @param {Array} candle - [timestamp, open, high, low, close, volume]
-   * @memberof Indicator
    */
   onStreamUpdate(candle) {
     // console.log("onStreamUpdate(candle):", candle)
@@ -430,7 +440,6 @@ export default class Indicator extends Overlay {
   /**
    * execute legend action
    * @param {Object} e - event
-   * @memberof Chart
    */
   onLegendAction(e) {
 
@@ -894,7 +903,6 @@ export default class Indicator extends Overlay {
   /**
    * Outputs Tab add any missing requirements
    * @param {object} dm - this.definition.meta
-   * @returns 
    */
   buildConfigOutputTab(dm) {
     // cleam up style
@@ -926,7 +934,7 @@ export default class Indicator extends Overlay {
    * @param {object} o - style object
    * @param {number} x - style entry (field) number
    * @param {object} style - style entry object
-   * @returns 
+   * @returns {object}
    */
   defaultMetaStyleLine(o, x, style) {
     let v;
@@ -1403,7 +1411,6 @@ export default class Indicator extends Overlay {
    * @param {Array} plots - array of inputs, eg. x y coords [{x:x, y:y}, ...]
    * @param {string} type
    * @param {Object} opts
-   * @memberof Indicator
    */
   plot(plots, type, opts ) {
     super.plot(plots, type, opts )

@@ -30,6 +30,7 @@
   "devDependencies": {
     "jsdoc-to-markdown": "latest",
     "rollup-plugin-cleanup": "^3.2.1",
+    "tsd-jsdoc": "^2.5.0",
     "vite": "latest"
   },
   "dependencies": {
