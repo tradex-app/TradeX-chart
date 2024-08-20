@@ -54,7 +54,7 @@ export default class tradeXChartPane extends element {
       () => {
       this.#elViewport = this.shadowRoot.querySelector('.viewport')
       this.#elLegend = this.shadowRoot.querySelector('tradex-legends')
-    }
+      }
     )
   }
 
