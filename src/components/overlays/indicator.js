@@ -142,7 +142,7 @@ export default class Indicator extends Overlay {
     this.style = (overlay?.settings?.style) ? 
     {...this.constructor.defaultStyle, ...overlay.settings.style} : 
     {...this.constructor.defaultStyle, ...config.style};
-    this.meta
+    // this.meta
     const cfg = { title: `${this.legendName} Config`, content: "", params: overlay, parent: this }
     this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg)
     switch(overlay.settings?.context) {
@@ -266,6 +266,10 @@ export default class Indicator extends Overlay {
     super.setRefresh()
   }
 
+  /**
+   * Does the indicator need to redraw (update)?
+   * @returns {Boolean}
+   */
   mustUpdate() {
     return super.mustUpdate()
   }
@@ -324,6 +328,9 @@ export default class Indicator extends Overlay {
     this.#status = "destroyed"
   }
 
+  /**
+   * Remove indicator from chart pane
+   */
   remove() {
     this.core.log(`Deleting indicator: ${this.id} from: ${this.chartPaneID}`)
 
@@ -383,6 +390,7 @@ export default class Indicator extends Overlay {
   /**
    * set or get indicator settings
    * @param {Object} [s] - settings
+   * @returns {Object}
    */
   settings(s) {
     if (isObject(s)) {
@@ -554,7 +562,7 @@ export default class Indicator extends Overlay {
   /**
    * invoke indicator settings callback, user defined or default
    * @param {Object} c - {fn: function, own: boolean}, own flag will bypass default action
-   * @returns {boolean} - success or failuer
+   * @returns {boolean} - success or failure
    */
   invokeSettings(c={}) {
     let r;

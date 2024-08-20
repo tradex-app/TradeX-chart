@@ -22,12 +22,12 @@ export default class ConfigDialogue extends Dialogue {
     background: none;
   }
 
-  .tradeXwindow.config .content {
+  .tradeXwindow.config.active .content {
     padding: 0;
     position: relative;
   }
 
-  .tradeXwindow.config .buttons {
+  .tradeXwindow.config.active .buttons {
     background: #ffffffbb;
     display: flex;
     justify-content: flex-end;
@@ -35,22 +35,13 @@ export default class ConfigDialogue extends Dialogue {
     border-radius: 0 0 5px 5px;
   }
 
-  .tradeXwindow.config .buttons input {
+  .tradeXwindow.config.active .buttons input {
     margin-left: 5px;
     font-size: 1em;
     padding: 1px .5em;
   }
 
   ${tabStyles} 
-
-  .tradeXwindow.config .content tradex-colourpicker {
-    position: absolute;
-    display: none !important;
-  }
-
-  .tradeXwindow.config .content tradex-colourpicker.active {
-    display: block !important;
-  }
   `
 
   static create(widgets, config) {
@@ -104,7 +95,6 @@ export default class ConfigDialogue extends Dialogue {
         ${tabsBuild(content)}
       </form>
     </div>
-    <tradex-colourpicker></tradex-colourpicker>
     `
     const {html, modifiers: mods} = super.dialogueBuild(tabsHTML)
     modifiers = {...modifiers, ...mods}

@@ -57,7 +57,7 @@ export const tabStyles = `
   background: #ffffff88;
   order: 100;
 }
-.tabbedContent .input:checked + .label + .panel {
+.active .tabbedContent .input:checked + .label + .panel {
   display: grid;
   width: 100%;
   grid-template-columns: [label] 1fr [input] 10em [end];

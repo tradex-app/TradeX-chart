@@ -199,7 +199,7 @@ export default class Window {
     }
 
     this.#contentFields = this.allContentFields()
-    this.#elColourPicker = this.#elContent.querySelector("tradex-colourpicker")
+    // this.#elColourPicker = this.#elContent.querySelector("tradex-colourpicker")
 
     return this.#elContent
   }
@@ -322,7 +322,7 @@ export default class Window {
     this.#elCloseIcon = this.#elWindow.querySelector(".closeIcon")
     this.#elContent = this.#elWindow.querySelector(".content")
     this.#contentFields = this.allContentFields()
-    this.#elColourPicker = this.#elContent.querySelector("tradex-colourpicker")
+    // this.#elColourPicker = this.#elContent.querySelector("tradex-colourpicker")
 
     this.#elWindow.addEventListener("click", this.onWindow.bind(this))
     if (isElement(this.#elDragBar)) {

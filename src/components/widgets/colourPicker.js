@@ -61,8 +61,6 @@ export default class ColourPicker extends Dialogue {
   get elColourPicker() { return this.#elColourPicker }
 
   start() {
-    // this.elContent.innerHTML = `<tradex-colourpicker></tradex-colourpicker>`
-
     const element = document.createElement("tradex-colourpicker")
     // element.classList.add(type)
     this.elContent.appendChild(element)
