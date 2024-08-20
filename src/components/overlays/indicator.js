@@ -99,7 +99,6 @@ export default class Indicator extends Overlay {
   #legendID
   #status
   #ConfigDialogue
-  #ColourPicker
   #palette
 
   definition = {
@@ -313,10 +312,6 @@ export default class Indicator extends Overlay {
     this.clear()
     this.core.MainPane.draw(undefined, true)
     this.chartPane.graph.removeOverlay(this.id)
-
-    // remove widgets
-    if (isObject(this.#ColourPicker))
-      this.core.WidgetsG.delete(this.#ColourPicker.id)
 
     // execute parent class
     // delete data
@@ -596,8 +591,6 @@ export default class Indicator extends Overlay {
       cd.setTitle(title)
       cd.setContent(html, modifiers)
       cd.update = false
-      // set up colour picker
-      this.#ColourPicker = cd.elContent.querySelector("tradex-colourpicker")
     }
     if (cd.state.name === "closed" ) cd.open()
     else cd.setOpen()
@@ -687,26 +680,6 @@ export default class Indicator extends Overlay {
         this.fieldTargetUpdate(e.target.id, e.target.value)
         this.setRefresh()
         this.draw()
-      }
-    }
-  }
-
-  fieldEventClick() {
-    return {
-      event: "click", 
-      fn: (e)=>{
-        e.preventDefault()
-        // console.log(`Colour Picker: ${e.target.id} = ${e.target.value}`)
-        // if (this.core.MainPane.colourPicker.state === WinState.opened) return
-        // const picker = {params: {colour: e.target.value}}
-        // this.core.MainPane.colourPicker.open(picker)
-        // this.#ColourPicker.target = e.target
-        // this.#ColourPicker.colour = e.target.value
-        this.#ColourPicker.open(e.target.value, e.target) // .classList.toggle("active")
-        let x = e.target.offsetLeft - this.#ColourPicker.width // offsetWidth
-        let y = this.#ColourPicker.offsetTop - e.target.top // offsetTop
-        this.#ColourPicker.position(x, y, this.core)
-        // hide colour picker when pointer gives focus elsewhere
       }
     }
   }
@@ -987,7 +960,6 @@ export default class Indicator extends Overlay {
 
     let c, fn, listeners, options;
     let change = this.fieldEventChange()
-    let colour = this.fieldEventClick()
 
     switch(type) {
       case "number":
@@ -998,9 +970,7 @@ export default class Indicator extends Overlay {
         break;
 
       case "color":
-        c = new Colour(value);
-        value = (c.isValid)? c.hexa : this.defaultColour()
-        listeners = [change, colour, over, out]
+        listeners = [change, over, out]
         fn = (el) => {
           this.configDialogue.provideInputColor(el, `#${id}`)
           this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
