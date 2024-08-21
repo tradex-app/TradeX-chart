@@ -26,6 +26,7 @@ export default class PPO extends Indicator {
     output: {
       colour: {value: "#E91E63"},
       width: {value: 1},
+      dash: {value: []},
     },
     highLowRange: {
       colour: {value: "#880E4F"},

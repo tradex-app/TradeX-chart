@@ -41,6 +41,7 @@ import { MA as talibAPI } from "../definitions/talib-api";
     output: {
       colour: {value: "#9C27B0"},
       width: {value: 1},
+      dash: {value: []},
     },
   }
 

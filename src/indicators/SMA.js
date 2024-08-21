@@ -41,6 +41,7 @@ import { SMA as talibAPI } from "../definitions/talib-api";
     output: {
       colour: {value: "#0097A7"},
       width: {value: 1},
+      dash: {value: []},
     },
   }
 

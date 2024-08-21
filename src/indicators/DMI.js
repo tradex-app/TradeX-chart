@@ -19,14 +19,17 @@ export default class DMI extends Indicator {
     "DI+": {
       colour: {value: "#0f0"},
       width: {value: 1},
+      dash: {value: []},
     },
     "DI-": {
       colour: {value: "#f00"},
       width: {value: 1},
+      dash: {value: []},
     },
     "ADX": {
       colour: {value: "#00f"},
       width: {value: 1},
+      dash: {value: []},
     },
   }
   

@@ -63,6 +63,7 @@ import { EMA as talibAPI } from "../definitions/talib-api";
     output: {
       colour: {value: "#C80"},
       width: {value: 1},
+      dash: {value: []},
     },
   }
 

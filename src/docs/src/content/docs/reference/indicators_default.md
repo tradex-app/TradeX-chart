@@ -8,22 +8,27 @@ More indicators will be implemented. The plan is that the chart will ship with a
 
 Read the [indicators](../indicators/) to learn how to use them on your chart.
 
-```
- 
-    Momentum Indicators
-    -----------------------------------------
-    AROON - Aroon
-    RSI - Relative Strength Index
-    
-    Overlap Studies
-    -----------------------------------------
-    BBANDS - Bollinger Bands
-    EMA - Exponential Moving Average
-    MA - Moving Average
-    SMA - Simple Moving Average
-
-    
-```
+* ADX - Average Directional Movement Index
+* AROON
+* ATR - Average True Range
+* ATR - Average True Range
+* BB - Bollinger Bands
+* CCI - Community Channel Index
+* CMO - Change Momentum Oscillator
+* DMI - Directional Movement Indicator
+* DX - Directional Index
+* EMA - Exponential Moving Average
+* MA - Moving Average
+* MACD - Moving Average Convergence Divergence
+* MFI - Money Flow Index
+* OBV - On Balance Volume
+* PPO - Percentage Price Oscillator
+* PSAR - Parabolic Stop and Reverse
+* ROC - Rate of Change
+* RSI - Relative Strength Index
+* SMA -  Simple Moving Average
+* STOCHRSI - Stochastic RSI
+* Volume
 
 ## Indicator List API
 

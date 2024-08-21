@@ -255,6 +255,20 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
+"guides/known_bugs_issues.md": {
+	id: "guides/known_bugs_issues.md";
+  slug: "guides/known_bugs_issues";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/repurpose_indicators.md": {
+	id: "guides/repurpose_indicators.md";
+  slug: "guides/repurpose_indicators";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "guides/test.md": {
 	id: "guides/test.md";
   slug: "guides/test";
@@ -269,6 +283,13 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"reference/00_introduction.md": {
+	id: "reference/00_introduction.md";
+  slug: "reference/00_introduction";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "reference/01_getting_started.md": {
 	id: "reference/01_getting_started.md";
   slug: "reference/01_getting_started";

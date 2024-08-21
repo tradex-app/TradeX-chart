@@ -33,7 +33,6 @@ export default class AROON extends Indicator {
   static primaryPane = false
   static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
   static defaultStyle = {
-
     aroonDown: {
       colour: {value: "#c89"},
       width: {value: 1},
