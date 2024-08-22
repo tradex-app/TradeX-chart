@@ -44,7 +44,7 @@ export function isNode(o) {
 }
 
 // returns true if it is a DOM element
-export function isElement(o) {
+export function isHTMLElement(o) {
   return typeof HTMLElement === "object"
     ? o instanceof HTMLElement //DOM2
     : o &&
@@ -57,7 +57,7 @@ export function isElement(o) {
 // returns true if DOM element is visible
 // source (2018-03-11): https://github.com/jquery/jquery/blob/master/src/css/hiddenVisibleSelectors.js
 export function isVisible(o) {
-  if (!isElement(o)) return false;
+  if (!isHTMLElement(o)) return false;
 
   return (
     !!o && !!(o.offsetWidth || o.offsetHeight || o.getClientRects().length)
@@ -66,7 +66,7 @@ export function isVisible(o) {
 
 // https://www.javascripttutorial.net/dom/css/check-if-an-element-is-visible-in-the-viewport/
 export function isInViewport(el) {
-  if (!isElement(el)) return false;
+  if (!isHTMLElement(el)) return false;
 
   const rect = el.getBoundingClientRect();
   return (
@@ -80,7 +80,7 @@ export function isInViewport(el) {
 
 // https://stackoverflow.com/a/41698614/15109215
 export function isVisibleToUser(el) {
-  if (!isElement(el)) return false;
+  if (!isHTMLElement(el)) return false;
 
   const style = getComputedStyle(el);
   if (style.display === "none") return false;
@@ -192,7 +192,7 @@ export function waitForElm(selector) {
 }
 
 export function elementDimPos(el) {
-  if (!isElement(el)) return false;
+  if (!isHTMLElement(el)) return false;
 
   let _x = 0;
   let _y = 0;
@@ -226,7 +226,7 @@ export function elementDimPos(el) {
 
 export function elementsDistance(el1, el2) {
   // fail if either are not elements
-  if (!isElement(el1) || !isElement(el1)) return false;
+  if (!isHTMLElement(el1) || !isHTMLElement(el1)) return false;
 
   const el1Location = elementDimPos(el1);
   const el2Location = elementDimPos(el2);
@@ -300,7 +300,7 @@ export function svgToImage(html, fill, dims) {
 
 //  https://stackoverflow.com/a/3028037/15109215
 export function hideOnClickOutside(el) {
-  if (!isElement(el)) return false;
+  if (!isHTMLElement(el)) return false;
 
   const outsideClickListener = (event) => {
     if (!el.contains(event.target) && isVisible(el)) {
@@ -319,7 +319,7 @@ export function hideOnClickOutside(el) {
 }
 
 export function onClickOutside(el, cb) {
-  if (!isElement(el)) return false;
+  if (!isHTMLElement(el)) return false;
 
   const outsideClickListener = (event) => {
     if (!el.contains(event.target) && isVisible(el)) {
@@ -346,7 +346,7 @@ export function onClickOutside(el, cb) {
 export function getStyle(el, styleProp) {
   let x, y;
   if (isString(el)) x = document.getElementById(el);
-  else if (isElement(el)) x = el;
+  else if (isHTMLElement(el)) x = el;
   else return false;
   const defaultView = (x.ownerDocument || document).defaultView;
   if (!isString(styleProp)) return false;
@@ -426,7 +426,7 @@ export function addCSSRule(sheet, selector, rules, index) {
  * @returns {HTMLElement|null}
  */
 export function findTargetParentWithClass(el, selector) {
-  if (!isElement(el) || !isString(selector)) return null;
+  if (!isHTMLElement(el) || !isString(selector)) return null;
 
   if (el.classList.contains(selector)) return el;
   else return findTargetParentWithClass(el.parentElement, selector);
@@ -487,7 +487,7 @@ export default {
     htmlToElements,
     inputAttr,
     inputTypes,
-    isElement,
+    isHTMLElement,
     isImage,
     isInViewport,
     isNode,

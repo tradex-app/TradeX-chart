@@ -1,7 +1,7 @@
 // events.js
 
 import { isBoolean, isFunction, isObject } from "../utils/typeChecks";
-import { isElement } from "../utils/DOM";
+import { isHTMLElement } from "../utils/DOM";
 import { Point } from "./definitions";
 import { PointerAgent } from "./pointer";
 
@@ -87,7 +87,7 @@ export class EventAgent2 {
     return (
         this.has(event) || 
         isFunction(handler) || 
-        isElement(this.element) 
+        isHTMLElement(this.element) 
     ) ? true : false
   }
 
@@ -168,7 +168,7 @@ export class EventAgent2 {
   removerListener (event, handler, element, options) {
     if (!this.has(event) || 
         !isFunction(handler) || 
-        !isElement(element) 
+        !isHTMLElement(element) 
     ) return false
 
     if (!isObject(options) && !isBoolean(options)) options == undefined
@@ -229,7 +229,7 @@ export class EventsAgent {
 
     if (!this.has(event) || 
         !isFunction(handler) || 
-        !isElement(this.element) 
+        !isHTMLElement(this.element) 
     ) return false
 
     if (!isObject(options) && !isBoolean(options)) options == undefined
@@ -312,7 +312,7 @@ export class EventsAgent {
   removerListener (event, handler, element, options) {
     if (!this.has(event) || 
         !isFunction(handler) || 
-        !isElement(element) 
+        !isHTMLElement(element) 
     ) return false
 
     if (!isObject(options) && !isBoolean(options)) options == undefined

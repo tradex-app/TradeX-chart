@@ -1,4 +1,4 @@
-import { isElement } from './DOM';
+import { isHTMLElement } from './DOM';
 import { isArray, isBoolean, isFunction, isMap, isNumber, isObject, isString } from './typeChecks'
 
 let _hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -857,7 +857,7 @@ export class EventHandlers {
   static isValid(ctx, el, evt, fn) {
     return (
       !isObject(ctx) ||
-      !isElement(el) ||
+      !isHTMLElement(el) ||
       !isString(evt) ||
       !isFunction(fn)
     )
@@ -935,7 +935,7 @@ export class EventHandlers {
   static expungeEvent(ctx, el, evt) {
     if (
       !isObject(ctx) ||
-      !isElement(el) ||
+      !isHTMLElement(el) ||
       !isString(evt)
     )
     return false
@@ -955,7 +955,7 @@ export class EventHandlers {
   static expungeElement(ctx, el) {
     if (
       !isObject(ctx) ||
-      !isElement(el)
+      !isHTMLElement(el)
     )
     return false
     const entry = EventHandlers.#entries.get(ctx)

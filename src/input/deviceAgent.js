@@ -1,6 +1,6 @@
 // deviceAgent.js
 
-import { isElement } from "../utils/DOM";
+import { isHTMLElement } from "../utils/DOM";
 import { isBoolean, isFunction, isObject } from "../utils/typeChecks";
 
 
@@ -14,7 +14,7 @@ export default {
     return (
         this.has(event) || 
         isFunction(handler) || 
-        isElement(this.element) 
+        isHTMLElement(this.element) 
     ) ? true : false
   },
 
@@ -25,7 +25,7 @@ export default {
   removerListener: function (event, handler, element, options) {
     if (!this.has(event) || 
         !isFunction(handler) || 
-        !isElement(element) 
+        !isHTMLElement(element) 
     ) return false
 
     if (!isObject(options) && !isBoolean(options)) options == undefined

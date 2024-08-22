@@ -4,7 +4,7 @@
 
 // window.js
 
-import { elementDimPos, getStyle, isElement, isVisible,  } from "../../utils/DOM"
+import { elementDimPos, getStyle, isHTMLElement, isVisible,  } from "../../utils/DOM"
 import { CLASS_WINDOWS, CLASS_WINDOW } from "../../definitions/core"
 import { WindowStyle } from "../../definitions/style"
 import { isArray, isFunction, isNumber, isObject, isString } from "../../utils/typeChecks"
@@ -322,7 +322,7 @@ export default class Window {
     this.#elContent = this.#elWindow.querySelector(".content")
     this.#contentFields = this.allContentFields()
     this.#elWindow.addEventListener("click", this.onWindow.bind(this))
-    if (isElement(this.#elDragBar)) {
+    if (isHTMLElement(this.#elDragBar)) {
       this.#dragBar = new Input(this.#elDragBar, {disableContextMenu: false});
       this.#dragBar.on("pointerdrag", this.onDragBar.bind(this))
       this.#dragBar.on("pointerdragend", this.onDragBarEnd.bind(this))

@@ -2,7 +2,7 @@
 
 import { limit } from "../../utils/number";
 import { arrayMove } from "../../utils/utilities";
-import { isElement } from "../../utils/DOM";
+import { isHTMLElement } from "../../utils/DOM";
 import { isArray, isBoolean, isNumber } from "../../utils/typeChecks";
 // import WebGLCanvas from "../../renderer/Canvas2DtoWebGL/Canvas2DtoWebGL"
 
@@ -24,7 +24,7 @@ class Node {
    */
   constructor(cfg={}) {
 
-    if (!isElement(cfg?.container)) throw new Error("Viewport container is not a valid HTML element.")
+    if (!isHTMLElement(cfg?.container)) throw new Error("Viewport container is not a valid HTML element.")
 
     this.#container = cfg.container;
     this.#layers = [];

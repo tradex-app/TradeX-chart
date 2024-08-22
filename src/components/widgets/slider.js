@@ -1,7 +1,7 @@
 // slider.js
 //  GUI slider
 
-import { isElement } from "../../utils/DOM"
+import { isHTMLElement } from "../../utils/DOM"
 import Colour from "../../utils/colour"
 import { isFunction, isNumber } from "../../utils/typeChecks"
 import { debounce, throttle } from "../../utils/utilities"
@@ -33,11 +33,11 @@ export default class Slider {
 
     this.#id = Slider.#cnt++
     this.#core = config.core
-    this.#elContainer = (isElement(config.elContainer)) ? config.elContainer : false
-    this.#elHandle = (isElement(config.elHandle)) ? config.elHandle : false
+    this.#elContainer = (isHTMLElement(config.elContainer)) ? config.elContainer : false
+    this.#elHandle = (isHTMLElement(config.elHandle)) ? config.elHandle : false
     this.#callback = (isFunction(config.callback)) ? config.callback : false
 
-    if (isElement(this.#elContainer) && isElement(this.#elHandle)) {
+    if (isHTMLElement(this.#elContainer) && isHTMLElement(this.#elHandle)) {
 
       this.mount()
 

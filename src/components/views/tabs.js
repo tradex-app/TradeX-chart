@@ -4,7 +4,7 @@
 
 import element from "./classes/element"
 import { isFunction, isNumber, isObject, isString } from "../../utils/typeChecks"
-import { isElement } from "../../utils/DOM"
+import { isHTMLElement } from "../../utils/DOM"
 import { GlobalStyle } from "../../definitions/style"
 
 
@@ -28,8 +28,15 @@ export const tabStyles = `
 .tabbedContent .input {
   position: absolute;
   opacity: 0;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
 }
 .tabbedContent .label {
+  position: relative;
   width: auto;
   padding: .4em 1em;
   background: #e5e5e588;
@@ -44,10 +51,7 @@ export const tabStyles = `
 .tabbedContent .label:active {
   background: #ccc;
 }
-.tabbedContent .input:focus + .label {
-  z-index: 1;
-}
-.tabbedContent .input:checked + .label {
+.tabbedContent label:has(> input:checked) {
   background: #fff;
   color: #000;
 }
@@ -57,7 +61,7 @@ export const tabStyles = `
   background: #ffffff88;
   order: 100;
 }
-.active .tabbedContent .input:checked + .label + .panel {
+.tabbedContent label:has(> input:checked) + .panel {
   display: grid;
   width: 100%;
   grid-template-columns: [label] 1fr [input] 10em [end];
@@ -211,7 +215,7 @@ export class Tabs {
 
     this.#id = config.id
     this.#elementHtML = tabsElement(config.params)
-    if (isElement(config?.element)) {
+    if (isHTMLElement(config?.element)) {
       this.#element = config.element
       this.#element.innerHTML = this.#elementHtML
     }
@@ -255,7 +259,7 @@ export function tabsBuild(c={}, fn) {
       let content = (isFunction(fn)) ? fn(c[t[i]]) : c[t[i]]
       j.push(tabsPanel(i, t[i], content, f))
     }
-    tabs = j.reverse().join()
+    tabs = j.reverse().join("&nbsp;")
   }
   return tabs
 }
@@ -274,9 +278,11 @@ export function tabsPanel(id, label, content, checked=false) {
 
   const check = (!!checked) ? `checked="checked"` : ``
   const tab = `
-  <input class="input tab-${id}" name="tabs" type="radio" id="tab-${id}" ${check}/>
-  <label class="label tab-${id}" for="tab-${id}">${label}</label>
-  <div class="panel tab-${id}">
+  <label class="label tab_${id}" for="tab_${id}">
+    <span>${label}</span>
+    <input class="input tab_${id}" name="tabs" type="radio" id="tab_${id}" ${check}/>
+  </label>
+  <div class="panel tab_${id}">
     ${content}
   </div>
   `
