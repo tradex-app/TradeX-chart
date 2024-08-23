@@ -1,10 +1,34 @@
 # Contributing
 
-* Fork the Project
-* Create your Feature Branch (git checkout -b feature/AmazingFeature)
-* Commit your Changes (git commit -m 'Add some AmazingFeature)
-* Push to the Branch (git push origin feature/AmazingFeature)
-* Open a Pull Request
+Workflow Steps
+
+Fork the Repository:
+- Fork the original repository on GitHub.
+- Clone the forked repository to your local machine.
+
+Create a Feature Branch:
+- Checkout dev from your fork.
+- Pull the latest changes from the original repository's dev.
+- Create a new feature/* branch.
+
+Work on Feature:
+- Commit changes regularly.
+- Push to the feature/* branch in your fork.
+
+Make a Pull Request:
+- Go to the original repository on GitHub.
+- Create a PR from your feature/* branch to the original repository’s dev branch.
+
+Update your Fork (if needed):
+- If changes are made in the original dev branch while your PR is open, pull the latest changes from the original dev into your local dev.
+- Merge the updated dev into your feature/* branch, resolve conflicts, and push the changes to update your PR.
+
+Best Practices
+
+- Regularly update dev from the original repository before starting a new feature.
+- Keep feature branches focused on a single task.
+- Avoid direct commits to dev in your fork.
+- Use pull requests to propose changes and facilitate code reviews.
 
 We look forward to your new feature!
 
