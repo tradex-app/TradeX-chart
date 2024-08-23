@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "outDir": "./build",
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "declaration": false,
+    "declarationMap": false,
+    "moduleResolution": "node",
+    "allowJs": true,
+    "noEmitOnError": false,
+    "skipDefaultLibCheck": true,
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": ["ESNext", "DOM"],
+    "preserveSymlinks": true,
+    "strictPropertyInitialization": false,
+    "useDefineForClassFields": false 
+  },
+  "include": ["../../../src/**/*.js"],
+  "exclude": ["node_modules", "dist", "../../../src/docs", "../../../src/components/overlays/composite.js", "../../../src/utils/quadtree.js"]
+}

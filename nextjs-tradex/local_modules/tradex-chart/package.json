@@ -1,68 +1,31 @@
 {
   "name": "tradex-chart",
-  "files": [
-    "dist",
-    "LICENSE",
-    "README.md",
-    "CONTRIBUTING.md",
-    "CHANGELOG.md"
-  ],
-  "main": "./dist/tradex-chart.umd.js",
-  "module": "./dist/tradex-chart.es.js",
+  "type": "module",
+  "main": "./index.js",
+  "module": "./index.js",
+  "types": "./build/tradex-chart.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/tradex-chart.es.js",
-      "require": "./dist/tradex-chart.umd.js"
+      "import": "./index.js",
+      "require": "./index.js",
+      "types": "./build/tradex-chart.d.ts"
     }
   },
-  "private": false,
-  "version": "0.148.3",
-  "license": "GNU GPL3",
   "scripts": {
-    "dev": "vite",
-    "buildall": "./bin/buildall.sh",
-    "build": "./bin/build.sh",
-    "serve": "vite serve",
-    "demo": "vite build && vite serve --open /demo.html"
-  },
-  "devDependencies": {
-    "jsdoc-to-markdown": "latest",
-    "rollup-plugin-cleanup": "^3.2.1",
-    "vite": "latest"
+    "prebuild": "mkdir -p build && cp ../../../package.json ./build/",
+    "build": "tsc -p tsconfig.json && rollup -c rollup.config.mjs",
+    "postbuild": "cp ../../../types/tradex-chart.d.ts ./build/"
   },
   "dependencies": {
     "mjolnir.js": "^2.7.1",
-    "talib-web": "^0.1.3"
+    "talib-web": "^0.1.3",
+    "tslib": "^2.7.0"
   },
-  "keywords": [
-    "chart",
-    "crypto",
-    "canvas",
-    "trading",
-    "cryptocurrency",
-    "technical analysis",
-    "technical indicators",
-    "talib",
-    "stock chart",
-    "finance",
-    "stock",
-    "stockchart",
-    "exchange",
-    "candlestick",
-    "k-line",
-    "timeline",
-    "klinechart"
-  ],
-  "homepage": "https://tradex-app.github.io/TradeX-chart/",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tradex-app/TradeX-chart"
-  },
-  "bugs": {
-    "url": "https://github.com/tradex-app/TradeX-chart/issues"
-  },
-  "documentation": {
-    "url": "https://tradex-app.github.io/TradeX-chart/"
-  },
-  "types": "./dist/tradex-chart.d.ts"
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rollup": "^4.21.0"
+  }
 }

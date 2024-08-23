@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "build-tx": "cd local_modules/tradex-chart && npm run build",
+    "dev": "npm run build-tx && next dev",
+    "build": "npm run build-tx && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -18,27 +19,27 @@
     "clsx": "^2.1.1",
     "cmdk": "^0.2.1",
     "date-fns": "^3.6.0",
-    "lucide-react": "0.424.0",
-    "next": "14.2.5",
+    "lucide-react": "0.435.0",
+    "next": "14.2.6",
     "next-themes": "^0.3.0",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-full-screen": "^1.1.1",
-    "tailwind-merge": "^2.4.0",
+    "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "talib-web": "^0.1.3",
-    "tradex-chart": "file:./local_modules/tradex-chart/dist"
+    "tradex-chart": "file:./local_modules/tradex-chart/"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.5",
-    "postcss": "^8",
+    "@types/node": "^20.1.0",
+    "@types/react": "^18.3.4",
+    "@types/react-dom": "^18.3.0",
+    "eslint": "^8.37.0",
+    "eslint-config-next": "14.2.6",
+    "postcss": "^8.4.41",
     "prettier": "^3.3.3",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.5.4"
   },
   "browser": {
     "fs": false
