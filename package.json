@@ -28,10 +28,10 @@
     "demo": "vite build && vite serve --open /demo.html"
   },
   "devDependencies": {
-    "jsdoc-to-markdown": "latest",
+    "jsdoc-to-markdown": "^8.0.3",
     "rollup-plugin-cleanup": "^3.2.1",
     "tsd-jsdoc": "^2.5.0",
-    "vite": "latest"
+    "vite": "^5.4.2"
   },
   "dependencies": {
     "mjolnir.js": "^2.7.1",
