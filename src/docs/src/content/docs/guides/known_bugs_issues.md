@@ -6,7 +6,7 @@ description: Solutions when implementing TradeX in your project.
 
 This bug report addresses an issue encountered when running Trade-X charts in a Next.js environment (versions 13 and 14) using Turbopack. The problem arises due to the absence of the fs module on the client side and Turbopack's initial failure to respect the "browser": { "fs": false } flag in the package.json file. This report provides an updated solution to the problem by configuring Turbopack to ignore the fs module using a custom alias.
 
-![](assets/20240730_155540_TALib-NextJs-fs.webp)
+![](../../../assets/TALib-NextJs-fs.webp)
 
 **What is Turbopack?**
 Turbopack is a modern bundler designed to be a successor to Webpack, offering faster build times and improved performance, particularly for large projects. It aims to provide a more efficient development experience by leveraging Rust's performance and optimizations.
