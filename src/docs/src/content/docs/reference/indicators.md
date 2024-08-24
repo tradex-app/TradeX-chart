@@ -52,7 +52,7 @@ Each entry in the ``data`` array requires an array with minimum of [timestamp, v
 
 The ``settings`` object can contain an object ``style`` and or individual input settings specific to the indicator.
 
-The ``params.settings.style`` object is how indicator an indicator can have it's default style (theme) modified. 
+The ``params.settings.style`` object is how indicator an indicator can have it's default style (theme) modified.
 
 ### Adding Indicators Via the Data State
 
@@ -84,3 +84,58 @@ More will be implemented soon.
 ## Custom Indicators
 
 [Custom Idicators](../indicators_custom) are in important feature of TradeX-chart. They are an extension of the default indicator class and thus inherit all of their methods and properties. The documentation will show you how to [define](../indicators_custom#minimal-custom-indicator-definition), [register](../indicators_custom#registering-custom-indicators) and [how data is passed to them](../indicators_custom#how-the-indicator-updates).
+
+## Modifying Indicator Propterties
+
+Indicator input values (used in calculation) and output values (display: colour, line style) can be changed, whenever you want programmatically. First of all, you need the indicator instance of the indicator active on the chart.
+If you've added the chart programmatically
+
+```javascript
+const newRSI = myChart.addIndicator("RSI")
+```
+
+the instance will be returned.
+Otherwise, if the indicator has been added with the initial chart config / state, you will have to look up the instance.
+myChart.Indicators - provides a list of all chart panes and their hosted indicators. eg.
+
+```javascript
+myChart.Indicators["TradesTest-Chart_1"]["ID_m02xm36u_bwl"].instance
+```
+
+where:
+
+```javascript
+myChart.Indicators[chart pane ID][indicator ID].instance
+```
+
+Primary chart indicators (EMA, BB, ect.) can also be accessed like this:
+
+```javascript
+chart0.Chart.indicators["ID_m02zn8js_lhw"].instance
+```
+
+The intance will report it's name.
+
+```javascript
+chart0.Chart.indicators["ID_m02zn8js_lhw"].instance.name
+chart0.Chart.indicators["ID_m02zn8js_lhw"].instance.shortName
+```
+
+Indicator definition object is where the configurable values of the indicator are.
+
+```javascript
+chart0.Chart.indicators["ID_m02zn8js_lhw"].instance.definition.meta.output[0].style.colour.value = "#F00"
+chart0.Chart.indicators["ID_m02zn8js_lhw"].instance.definition.meta.output[0].style.width.value = 2
+```
+
+You then need to either scroll the chart or invoke `refresh()` to update the chart with the new changes.
+
+```javascript
+chart0.refresh()
+```
+
+The majority of indicators are drawn with lines and support the following configurable outputs:
+
+* colour - a string representing a valid CSS #RGB or #RGBA value
+* line width - number of pixels
+* line dash - a string of comma seperated number values. See: [MDM Web Docs](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash)
