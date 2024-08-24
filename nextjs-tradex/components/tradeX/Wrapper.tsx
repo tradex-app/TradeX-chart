@@ -7,9 +7,13 @@ import { fetchOHLCVData, fetchTXData } from './fetchers';
 import FullScreenWrapper from '../FullScreen/FullScreenWrapper';
 import FullScreenButton from '../FullScreen/FullScreenButton';
 import Toolbar from './Toolbar';
-import Chart from './Chart';
 import AVAILABLE_INDICATORS from './indicators/availbleIndicators';
 import { IConfig } from 'tradex-chart';
+import dynamic from 'next/dynamic';
+
+const Chart = dynamic(() => import('@/components/tradeX/Chart'), {
+  ssr: false
+});
 
 const defaultConfig = {
   toolbar: {
@@ -215,8 +219,8 @@ const TokenChart: React.FC<IConfig> = (props) => {
   return (
     <FullScreenWrapper>
       {({ handle, isIOS }: { handle: any; isIOS: boolean }) => (
-        <>
-          <div className="flex flex-grow">
+        <div className="flex flex-col h-full w-full min-h-[400px]">
+          <div className="flex flex-row">
             {mergedConfig.toolbar?.timeframe ||
             mergedConfig.toolbar?.indicators ||
             mergedConfig.toolbar?.typeSelector ? (
@@ -247,27 +251,25 @@ const TokenChart: React.FC<IConfig> = (props) => {
               </div>
             ) : null}
           </div>
-          <div className="relative" key={symbol}>
+          <div className="flex flex-grow w-full h-[600px]" key={symbol}>
             {data.length > 0 && (
-              <div className="h-[600px] w-full">
-                <Chart
-                  title={symbol}
-                  data={data}
-                  tradeData={tradeData}
-                  chartType={selectedChartType}
-                  onRangeChange={handleRangeChange}
-                  rangeLimit={DEFAULT_RANGE_LIMIT}
-                  // @ts-ignore
-                  chartX={chartX}
-                  // @ts-ignore
-                  setChart={setChart}
-                  onchart={indicators}
-                  customIndicators={AVAILABLE_INDICATORS}
-                />
-              </div>
+              <Chart
+                title={symbol}
+                data={data}
+                tradeData={tradeData}
+                chartType={selectedChartType}
+                onRangeChange={handleRangeChange}
+                rangeLimit={DEFAULT_RANGE_LIMIT}
+                // @ts-ignore
+                chartX={chartX}
+                // @ts-ignore
+                setChart={setChart}
+                onchart={indicators}
+                customIndicators={AVAILABLE_INDICATORS}
+              />
             )}
           </div>
-        </>
+        </div>
       )}
     </FullScreenWrapper>
   );

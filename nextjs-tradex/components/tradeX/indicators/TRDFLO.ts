@@ -1,34 +1,33 @@
-import { Indicator } from "tradex-chart"
-import { candleW } from "tradex-chart"
-import { YAXIS_TYPES } from "tradex-chart";
-import { YAXIS_PADDING } from "tradex-chart";
-import { isObject } from "tradex-chart";
+import { Indicator } from 'tradex-chart';
+import { candleW } from 'tradex-chart';
+import { YAXIS_TYPES } from 'tradex-chart';
+import { YAXIS_PADDING } from 'tradex-chart';
+import { isObject } from 'util';
 
 /**
  * custom indicator class
  */
 export default class TradeFlow extends Indicator {
-
-  static version = "1.0"
-  static inCnt = 0
-  static primaryPane = false
-  static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative
-  static yAxisPadding = YAXIS_PADDING
-  static colours = []
+  static version = '1.0';
+  static inCnt = 0;
+  static primaryPane = false;
+  static scale = YAXIS_TYPES[2]; // YAXIS_TYPES - relative
+  static yAxisPadding = YAXIS_PADDING;
+  static colours = [];
   static defaultStyle = {
     buy: {
-      colour: {value: "#0f0"},
+      colour: { value: '#0f0' }
     },
     sell: {
-      colour: {value: "#f00"},
-    },
+      colour: { value: '#f00' }
+    }
+  };
+
+  get name() {
+    return 'Trade Flow';
   }
-  
-
-  get name() {return "Trade Flow" }
-  shortName = "TRDFLO"
-  scaleOverlay = false
-
+  shortName = 'TRDFLO';
+  scaleOverlay = false;
 
   definition = {
     output: {
@@ -37,16 +36,15 @@ export default class TradeFlow extends Indicator {
     },
     meta: {
       output: [
-        {name: "buy", type: "custom", plot: "tradeBar"},
-        {name: "sell", type: "custom", plot: "tradeBar"}
+        { name: 'buy', type: 'custom', plot: 'tradeBar' },
+        { name: 'sell', type: 'custom', plot: 'tradeBar' }
       ],
       outputLegend: {
-        buy: {labelStr: "Buy", label: true, value: true},
-        sell: {labelStr: "Sell", label: true, value: true},
+        buy: { labelStr: 'Buy', label: true, value: true },
+        sell: { labelStr: 'Sell', label: true, value: true }
       }
-    },
-  }
-
+    }
+  };
 
   /**
    * Creates an instance of Test.
@@ -58,12 +56,12 @@ export default class TradeFlow extends Indicator {
    * @param {Object} params - contains minimum of overlay instance
    * @memberof Test
    */
-  constructor(target, xAxis=false, yAxis=false, config, parent, params) {
-    super(target, xAxis, yAxis, config, parent, params)
+  constructor(target, xAxis = false, yAxis = false, config, parent, params) {
+    super(target, xAxis, yAxis, config, parent, params);
 
-    this.init()
+    this.init();
 
-    this.on("trade_added", this.tradeAdded)
+    this.on('trade_added', this.tradeAdded);
   }
 
   /**
@@ -71,73 +69,73 @@ export default class TradeFlow extends Indicator {
    * @returns {boolean|array}
    */
   calcIndicatorHistory() {
-
     if (!isObject(this.state.trades.data[this.state.time.timeFrame]))
-      return false
+      return false;
     // create a time series array from State trades entries
-    this.dataProxy(this.dataProxyFn, this.state.trades.data[this.state.time.timeFrame])   
+    this.dataProxy(
+      this.dataProxyFn,
+      this.state.trades.data[this.state.time.timeFrame]
+    );
 
-    return false
+    return false;
   }
 
-  calcIndicatorStream (indicator, params={}, range=this.range) {
-
+  calcIndicatorStream(indicator, params = {}, range = this.range) {
     // fill new data entry with zeros
     // this.on("trade_added", this.tradeAdded)
     // will add new trade data when it becomes available.
-    let ts = range.value()[0]
-    let idx = range.getTimeIndex(ts)
-    this.data[idx] = [ts, 0, 0]
+    let ts = range.value()[0];
+    let idx = range.getTimeIndex(ts);
+    this.data[idx] = [ts, 0, 0];
 
-    return false
+    return false;
   }
 
-  draw(range=this.range) {
+  draw(range = this.range) {
     // no update required
-    if (this.data.length == 0 ||
-      range.secondaryMaxMin[this.id] == undefined) return
+    if (this.data.length == 0 || range.secondaryMaxMin[this.id] == undefined)
+      return;
 
-    if (!super.mustUpdate()) return
+    if (!this.mustUpdate()) return;
 
-    this.scene.clear()
+    this.scene.clear();
 
-    let w = candleW(this.xAxis.candleW )
+    let w = candleW(this.xAxis.candleW);
     let o = this.core.rangeScrollOffset;
-    let c = range.indexStart - o
-    let i = range.Length + (o * 2)
-    let j = i
+    let c = range.indexStart - o;
+    let i = range.Length + o * 2;
+    let j = i;
     let plots, opts;
 
     while (j) {
-      let d = this.data[c]
-      if (d === undefined) break
+      let d = this.data[c];
+      if (d === undefined) break;
 
-      let y0 = this.yAxis.yPos(0)
-      let y1 = this.yAxis.yPos(d[1])
-      let y2 = this.yAxis.yPos(d[2])
+      let y0 = this.yAxis.yPos(0);
+      let y1 = this.yAxis.yPos(d[1]);
+      let y2 = this.yAxis.yPos(d[2]);
 
-      let buyH = y0-y1
-      let sellH = y2-y0
+      let buyH = y0 - y1;
+      let sellH = y2 - y0;
 
       if (buyH != 0 || sellH != 0) {
-        let x = this.xAxis.xPos(d[0]) - (w / 2)
+        let x = this.xAxis.xPos(d[0]) - w / 2;
         // plot buy
-        plots = [x, y1, w, buyH]
-        opts = {fill: this.style.buy.colour.value}
-        super.plot(plots, "renderRectFill", opts)
-  
+        plots = [x, y1, w, buyH];
+        opts = { fill: this.style.buy.colour.value };
+        super.plot(plots, 'renderRectFill', opts);
+
         // plot sell
-        plots = [x, y0, w, sellH]
-        opts = {fill: this.style.sell.colour.value}
-        super.plot(plots, "renderRectFill", opts)
+        plots = [x, y0, w, sellH];
+        opts = { fill: this.style.sell.colour.value };
+        super.plot(plots, 'renderRectFill', opts);
       }
-      c++
-      j--
+      c++;
+      j--;
     }
 
-    super.updated()
+    this.updated();
   }
-
 
   /**
    * populate indicator with trade data from state trades entries
@@ -147,27 +145,25 @@ export default class TradeFlow extends Indicator {
    * @memberof TradeFlow
    */
   dataProxyFn(data, state, range) {
-    const trades = state.allData.trades[state.time.timeFrame]
+    const trades = state.allData.trades[state.time.timeFrame];
     for (let t in trades) {
-      let ts = t*1
-      if (ts < range.timeStart ||
-          ts > range.timeFinish) continue
+      let ts = t * 1;
+      if (ts < range.timeStart || ts > range.timeFinish) continue;
 
-      let idx = range.getTimeIndex(ts)
-      let buy = 0
-      let sell = 0
+      let idx = range.getTimeIndex(ts);
+      let buy = 0;
+      let sell = 0;
       for (let ts of trades[t]) {
-        if (ts.side == "buy") buy += ts.filled
-        if (ts.side == "sell") sell += ts.filled
+        if (ts.side == 'buy') buy += ts.filled;
+        if (ts.side == 'sell') sell += ts.filled;
       }
-      data[idx] = [ts, buy, sell * -1]
+      data[idx] = [ts, buy, sell * -1];
     }
   }
-  
+
   tradeAdded(t) {
     // TODO: add this trade to the indicator data
   }
-
 
   /*
   getTrades() {
