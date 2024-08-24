@@ -6,7 +6,7 @@ const AVAILABLE_INDICATORS: IIndicators = {
     id: 'TRDFLO',
     name: 'Trade Flow',
     event: 'addIndicator',
-    ind: undefined //TradeFlow
+    ind: TradeFlow
   }
   /// ADD NEW INDICATORS HERE
 };
