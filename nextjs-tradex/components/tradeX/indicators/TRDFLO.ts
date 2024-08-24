@@ -1,8 +1,11 @@
-import { Indicator } from 'tradex-chart';
-import { candleW } from 'tradex-chart';
-import { YAXIS_TYPES } from 'tradex-chart';
-import { YAXIS_PADDING } from 'tradex-chart';
-import { isObject } from 'util';
+import { Indicator } from "tradex-chart"
+import { candleW } from "tradex-chart"
+import { YAXIS_TYPES } from "tradex-chart";
+import { YAXIS_PADDING } from "tradex-chart";
+import { typeChecks } from "tradex-chart";
+
+const isObject = typeChecks.isObject
+
 
 /**
  * custom indicator class
