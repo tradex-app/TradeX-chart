@@ -151,6 +151,7 @@ const TradingChart = (props: ITokenChartProps) => {
         //const data = await response.json();
         await new Promise((resolve) => setTimeout(resolve, 2000));
         setTokensList(['PEPE', 'WBTC', 'ETH']);
+        handleTokenChange('PEPE');
       } catch (error) {
         console.error('Error fetching tokens:', error);
       }
