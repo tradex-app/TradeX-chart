@@ -1,10 +1,6 @@
 import { useState } from 'react';
-
-interface IIndicator {
-  name: string;
-  type: string;
-  data: number[];
-}
+import { IIndicator } from 'tradex-chart';
+import emptyChart from './emptyChart';
 
 type CreateStateType = (state: IState) => string;
 
@@ -20,9 +16,9 @@ interface IState {
 }
 
 const useChart = () => {
-  const [chartX, setChartX] = useState(null);
+  const [chartX, setChartX] = useState<any>(emptyChart);
 
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<number[][]>([]);
 
   const getIndicators = () => {
     if (!chartX) return;
@@ -31,15 +27,20 @@ const useChart = () => {
   };
 
   const getIndicatorId = (indicatorType: string) => {
-    const chartIndicators = getIndicators();
-    return chartIndicators.length > 0
-      ? Object.keys(chartIndicators[0]).find((key) =>
-          key.toLowerCase().includes(indicatorType.toLowerCase())
-        )
-      : undefined;
+    const chartIndicators = getIndicators() as Record<string, unknown>[];
+    if (chartIndicators && chartIndicators?.length > 0) {
+      Object.keys(chartIndicators[0]).find((key) =>
+        key.toLowerCase().includes(indicatorType.toLowerCase())
+      );
+    }
   };
 
-  const handleAddIndicator = (indicator) => {
+  const handleAddIndicator = (indicator: {
+    value: any;
+    name: any;
+    data: any;
+    customSettings: any;
+  }) => {
     if (!chartX) return;
 
     chartX.addIndicator(indicator.value, indicator.name, {
@@ -67,7 +68,7 @@ const useChart = () => {
     chartX.state.use(id);
   };
 
-  const handleMergeData = (data: number[]) => {
+  const handleMergeData = (data: number[][]) => {
     if (!chartX) return;
     chartX.mergeData({ ohlcv: data });
   };

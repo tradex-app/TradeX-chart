@@ -1,10 +1,29 @@
-declare module 'tradex-chart' {
+declare module "tradex-chart" {
+  export interface ITradeX extends HTMLElement {
+    Indicators?: { [key: string]: unknown }[];
+    theme?: { setProperty: (property: PropsEnum, value: any) => void };
+    start?: (config: object) => void;
+    setIndicators?: (indicators: IIndicators) => void;
+    mergeData?: (data: { ohlcv: number[] }) => void;
+    on?: (eventName: string, callback: (e: unknown) => void) => void;
+    expunge?: () => void;
+    refresh?: () => void;
+    state: {
+      create: (state: IState) => string;
+      use: (id: string) => void;
+    };
+    addIndicator: (
+      value: string,
+      name: string,
+      options: { data: number[]; settings: { custom: any } }
+    ) => void;
+    removeIndicator: (indicatorId: string) => void;
+  }
 
-  const ThemeProps = [
-    'chart.GridColour',
-    'candle.Type',
-  ] as const;
-  export type PropsEnum = typeof ThemeProps[number];
+  export enum ThemeProps {
+    ChartGridColour = "chart.GridColour",
+    CandleType = "candle.Type",
+  }
 
   export abstract class Indicator {
     static inCnt: number;
@@ -12,7 +31,7 @@ declare module 'tradex-chart' {
     static scale: string; // TODO: Ccheck
     static colours: string[];
     static defaultStyle: IndicatorStyle;
-    
+
     id: string;
     shortName: string;
     scaleOverlay: boolean;
@@ -38,7 +57,11 @@ declare module 'tradex-chart' {
 
     abstract init(): void;
     abstract calcIndicatorHistory(): boolean | any[];
-    abstract calcIndicatorStream(indicator: any, params?: any, range?: Range): boolean | any[];
+    abstract calcIndicatorStream(
+      indicator: any,
+      params?: any,
+      range?: Range
+    ): boolean | any[];
     abstract draw(range?: Range): void;
 
     protected plot(plots: any[], method: string, options: any): void;
@@ -75,23 +98,15 @@ declare module 'tradex-chart' {
   }
 
   export interface IIndicator {
-    value?: string;
-    name: string;
-    type?: string;
-    data?: number[];
-    settings?: object;
-  }
-
-  export interface IIndicator {
     id: string;
     name: string;
-    event: 'addIndicator';
+    event: "addIndicator";
     ind: unknown;
     offChart?: boolean;
     customSettings?: {
       selectLabel?: string;
       inputsBaseProps?: {
-        colours?: ColorsEnum[];
+        colours?: string[];
         labels?: boolean[];
       };
       legendInputs?: string[];
@@ -102,40 +117,72 @@ declare module 'tradex-chart' {
     [key: string]: IIndicator;
   }
 
+  export interface ITradeData {
+    name: string;
+    type: string;
+    settings: { "z-index": number; legend: boolean };
+    data: {
+      [key: string]: {
+        timestamp: number;
+        id: string;
+        side: string;
+        price: number;
+        amount: number;
+        filled: number;
+        average: number;
+        total: number;
+        tag: string;
+      }[];
+    };
+  }
+
   export interface IState {
-    chart?: {
-      type: string;
-      candleType: string;
-    };
-    candleType?: string;
-    type?: string;
-    data: number[][];
-    primary: IIndicator[];
+    version: string; // packageJSON.version
+    id: string;
+    key: string;
+    status: string;
+    isEmpty: boolean;
+    allData: Record<string, any>; // TODO
+    chart: Chart;
+    ohlcv: any[];
+    views: any[];
+    primary: any[];
+    secondary: any[];
+    datasets: any[];
+    tools: Tools;
+    trades: Trades;
+    events: Events;
+    annotations: Annotations;
+    range: Range;
   }
 
-  export interface ITradeX extends HTMLElement {
-    Indicators?: { [key: string]: unknown }[];
-    theme?: { setProperty: (property: PropsEnum, value: any) => void };
-    start?: (config: object) => void;
-    setIndicators?: (indicators: IIndicators) => void;
-    mergeData?: (data: { ohlcv: number[] }) => void;
-    on?: (eventName: string, callback: (e: unknown) => void) => void;
-    expunge?: () => void;
-    refresh?: () => void;
-    state: {
-      create: (state: IState) => string;
-      use: (id: string) => void;
+  interface Tools {
+    display: boolean;
+    data: {
+      ts: Record<string, any>; // TODO
     };
-    addIndicator: (
-      value: string,
-      name: string,
-      options: { data: number[]; settings: { custom: any } }
-    ) => void;
-    removeIndicator: (indicatorId: string) => void;
   }
 
-  export interface canvas {
-    [key: string]: function;
+  interface Trades extends Tools {
+    displayInfo: boolean;
+  }
+
+  interface Events extends Tools {
+    displayInfo: boolean;
+  }
+
+  interface Annotations extends Tools {
+    displayInfo: boolean;
+  }
+
+  interface Range {
+    timeFrame: string;
+    timeFrameMS: number;
+    initialCnt: number;
+  }
+
+  export interface Canvas {
+    [key: string]: (...args: any[]) => any;
   }
 
   export type ChartType = "area" | "candle_solid";
@@ -159,7 +206,6 @@ declare module 'tradex-chart' {
     Length: number;
     timeFrameMS: number;
     secondaryMaxMin?: { [key: string]: { [key: string]: number } };
-
   }
 
   export const talibAPI: {
@@ -170,36 +216,20 @@ declare module 'tradex-chart' {
     [key: string]: any; // TODO: Define utils types
   };
 
-  export function uid(tag?: string = "ID"): string;
-
-  export interface IProps {
-    title: string;
-    data: number[][];
-    tradeData?: any;
-    chartType?:  ChartType;
-    rangeLimit?: number;
-    onchart: { name: string; value: string; data?: number[] }[];
-    chartAccessor?: string;
-    customIndicators?: IIndicators;
-    chartX: ITradeX;
-    setChart: (chart: ITradeX) => void;
-    onRangeChange?: () => void;
-  }
+  export function uid(tag?: string): string;
 
   export function candleW(w: number): number;
-
 
   export interface RangeConfig {
     initialCnt: number;
     limitPast: number;
     limitFuture: number;
   }
-  
+
   export interface TradesConfig {
     display: boolean;
     displayInfo: boolean;
   }
-
 
   export interface IConfig {
     title: string;
@@ -216,13 +246,11 @@ declare module 'tradex-chart' {
     warnings: boolean;
     errors: boolean;
     maxCandleUpdate: number;
-    talib: typeof talib;
+    talib: any; // TODO
     wasm: string;
   }
 
-
-
-  ////// THEMES //////
+  // THEMES //
 
   export interface CandleTheme {
     AreaLineColour: string;
@@ -269,12 +297,12 @@ declare module 'tradex-chart' {
     colour: string;
     controls: boolean;
   }
-  
+
   export interface IconTheme {
     colour: string;
     hover: string;
   }
-  
+
   export interface Theme {
     candle: CandleTheme;
     volume: VolumeTheme;
@@ -293,5 +321,4 @@ declare module 'tradex-chart' {
       location: boolean;
     };
   }
-
 }

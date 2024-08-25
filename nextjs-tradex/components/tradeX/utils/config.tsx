@@ -1,5 +1,6 @@
 import * as talib from 'talib-web';
 import ColorsEnum from '../../theme/colors';
+import { ChartType, IConfig } from 'tradex-chart';
 
 export const CANDLE_THEME = {
   AreaLineColour: '#4c5fe7',
@@ -10,17 +11,24 @@ export const CANDLE_THEME = {
   DnBodyColour: ColorsEnum.Primary,
   DnWickColour: ColorsEnum.Primary
 };
+export interface IConfigExtended {
+  type?: ChartType;
+  defaultTitle?: string;
+  initialSymbol?: string;
+  rangeLimit?: number;
+  isLightTheme?: boolean;
+}
 
 const getConfig = ({
-  type = 'area',
-  title = '',
-  symbol = '',
+  type = 'candle_solid',
+  defaultTitle = ' ',
+  initialSymbol = '',
   rangeLimit = 96,
   isLightTheme = false
-}) => {
+}: IConfigExtended): IConfig => {
   return {
-    title,
-    symbol,
+    title: defaultTitle,
+    symbol: initialSymbol,
     utils: {},
     tools: {},
     range: {
@@ -53,7 +61,9 @@ const getConfig = ({
         colourCursor: '#2A2B3A',
         colourCursorBG: '#aac0f7',
         tickMarker: false,
-        location: 'right'
+        location: 'right',
+        slider: '#586ea6',
+        handle: '#586ea688'
       },
       chart: {
         Background: '#0f121300',

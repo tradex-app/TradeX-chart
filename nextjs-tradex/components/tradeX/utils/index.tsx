@@ -1,6 +1,6 @@
 import { differenceInCalendarDays } from 'date-fns';
-import { ChartResolutionEnum, ColumnAccessorEnumReversed } from './enums';
-import { IChartOption, IIndicatorOption } from './types';
+import { ChartResolutionEnum } from './enums';
+import { IChartOption } from './types';
 
 export const LIMIT = 250;
 export const DEFAULT_RANGE_LIMIT = 96;
@@ -40,46 +40,6 @@ export const FACTOR = {
   //
   '1w': LIMIT * TIME.week,
   '1M': LIMIT * TIME.month
-};
-
-export const getIndicatorsData = (
-  indicatorsData,
-  data: number[],
-  indicator: IIndicatorOption,
-  interval: string
-) => {
-  let name = indicatorsData[0].indicator;
-  let indType = 'RANGE';
-  let d = [];
-
-  switch (indicator.value) {
-    case 'RANGE':
-      name = indicatorsData[0].indicator;
-      indType = 'RANGE';
-      d = data.map((candle) => [
-        candle[0],
-        indicatorsData[0].values[ColumnAccessorEnumReversed[interval]] || 0,
-        indicatorsData[1].values[ColumnAccessorEnumReversed[interval]] || 0,
-        indicatorsData[2].values[ColumnAccessorEnumReversed[interval]] || 0
-      ]);
-      break;
-    case 'LEVEL':
-      name = 'Level';
-      indType = 'LEVEL';
-      d = data.map((candle) => [
-        candle[0],
-        indicatorsData[0].values[ColumnAccessorEnumReversed[interval]] || 0,
-        indicatorsData[1].values[ColumnAccessorEnumReversed[interval]] || 0
-      ]);
-
-      break;
-  }
-
-  return {
-    name,
-    value: indType,
-    data: d
-  };
 };
 
 // Intervals

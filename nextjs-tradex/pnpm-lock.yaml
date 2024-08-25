@@ -63,8 +63,8 @@ importers:
         specifier: ^0.1.3
         version: 0.1.3
       tradex-chart:
-        specifier: ^0.153.1
-        version: 0.153.1
+        specifier: file:../
+        version: file:..
     devDependencies:
       '@types/node':
         specifier: ^20.14.14
@@ -1968,8 +1968,8 @@ packages:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
 
-  tradex-chart@0.153.1:
-    resolution: {integrity: sha512-WAwgffA29YOYsvxiWRHMdwQl5auYfGrR8Ob1aQTmtMdoT43Fvx/4YBgMxGl2iQEGt44nk7VW1isEtZnChNGHTg==}
+  tradex-chart@file:..:
+    resolution: {directory: .., type: directory}
 
   ts-api-utils@1.3.0:
     resolution: {integrity: sha512-UQMIo7pb8WRomKR1/+MFVLTroIvDVtMX3K6OUir8ynLyzB8Jeriont2bTAtmNPa1ekAgN7YPDyf6V+ygrdU+eQ==}
@@ -4196,7 +4196,7 @@ snapshots:
     dependencies:
       is-number: 7.0.0
 
-  tradex-chart@0.153.1:
+  tradex-chart@file:..:
     dependencies:
       mjolnir.js: 2.7.3
       talib-web: 0.1.3

@@ -1,62 +1,46 @@
 'use client';
 
-import React, { useEffect, useState, memo } from 'react';
+import React, { useEffect, useState } from 'react';
 import useChart from './hooks/useChart';
 import { CHART_OPTIONS, DEFAULT_RANGE_LIMIT } from './utils';
 import { fetchOHLCVData, fetchTXData } from './fetchers';
 import FullScreenWrapper from '../FullScreen/FullScreenWrapper';
 import FullScreenButton from '../FullScreen/FullScreenButton';
 import Toolbar from './Toolbar';
-import AVAILABLE_INDICATORS from './indicators/availbleIndicators';
-import { IConfig } from 'tradex-chart';
 import dynamic from 'next/dynamic';
+import { IIndicatorToolbar, ITokenChartProps } from './utils/types';
+import { IIndicator, ITradeData } from 'tradex-chart';
 
 const Chart = dynamic(() => import('@/components/tradeX/Chart'), {
   ssr: false
 });
 
-const defaultConfig = {
-  toolbar: {
-    timeframe: true,
-    indicators: false,
-    typeSelector: false,
-    fullscreenButton: true
-  },
-  defaults: {
-    timeframe: '5m',
-    chartType: CHART_OPTIONS[0]
-  },
-  availableIndicators: AVAILABLE_INDICATORS
-};
-
 let end: number;
 
-const TokenChart: React.FC<IConfig> = (props) => {
-  const { config = defaultConfig, showTradeData } = props;
-  const [symbol, setSymbol] = useState('PEPE');
-  const [tokensList, setTokensList] = useState([]);
-
+const TradingChart = (props: ITokenChartProps) => {
+  const { loadIndicators, toolbar, defaults, ...config } = props;
+  const [symbol, setSymbol] = useState(config.title);
+  const [tokensList, setTokensList] = useState<string[]>([]);
   const [firstLoad, setFirstLoad] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
   const [endDate, setEndDate] = useState(new Date());
-  const [indicators, setIndicators] = useState([]);
-  const [selectedInterval, setSelectedInterval] = useState(
-    config?.defaults?.timeframe || '5m'
-  );
-  const [intervals, setIntervals] = useState([
-    '1m',
-    '5m',
-    '15m',
-    '30m',
-    '1h',
-    '12h',
-    '1d'
-  ]);
+  const [intervals, setIntervals] = useState(toolbar?.intervals || ['1h']);
   const [showPlaceHolder, setShowPlaceHolder] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [tradeData, setTradeData] = useState([]);
-
-  const mergedConfig = { ...defaultConfig, ...config };
+  const [tradeData, setTradeData] = useState<ITradeData[]>();
+  const [selectedInterval, setSelectedInterval] = useState(
+    defaults?.timeframe || '1h'
+  );
+  const [selectedChartType, setSelectedChartType] = useState(
+    defaults?.chartType || CHART_OPTIONS[0]
+  );
+  const [indicators, setIndicators] = useState<IIndicatorToolbar[]>([
+    {
+      value: '',
+      label: '',
+      selected: false
+    }
+  ]);
 
   const {
     chartX,
@@ -70,15 +54,8 @@ const TokenChart: React.FC<IConfig> = (props) => {
     resetData
   } = useChart();
 
-  const [selectedChartType, setSelectedChartType] = useState(
-    mergedConfig?.defaults?.chartType || CHART_OPTIONS[0]
-  );
-
   const handleSelectIndicator = (indicatorValue: string) => {
-    console.log('handleSelectIndicator', indicatorValue);
-    console.log('indicators', indicators);
-    // Find the indicator from AVAILABLE_INDICATORS
-    const indicator = AVAILABLE_INDICATORS[indicatorValue];
+    const indicator = loadIndicators[indicatorValue];
     console.log('indicator to add', indicator);
 
     if (indicator) {
@@ -100,7 +77,7 @@ const TokenChart: React.FC<IConfig> = (props) => {
         value: indicator.id,
         name: indicator.name,
         data: [],
-        settings: {}
+        customSettings: {}
       };
 
       handleAddIndicator(indicatorToAdd);
@@ -115,7 +92,7 @@ const TokenChart: React.FC<IConfig> = (props) => {
     if (isLoading || isEnd) return;
 
     try {
-      let newData = [];
+      let newData;
       setIsLoading(true);
       if (symbol) {
         const ticker = symbol + 'USDT';
@@ -124,20 +101,21 @@ const TokenChart: React.FC<IConfig> = (props) => {
           ticker: ticker
         });
       }
-      console.log('newData', newData);
-      end = newData[0][0];
-      console.log('end', end);
-      setFirstLoad(false);
+      if (newData) {
+        end = newData[0][0];
+        //console.log('end', end);
+        setFirstLoad(false);
 
-      setIsEnd(true); // TODO REMOVE LATER when merging logic is done
+        setIsEnd(true); // TODO REMOVE LATER when merging logic is done
 
-      if (data.length) {
-        setData([...newData, ...data]);
-      } else {
-        setData(newData);
+        if (data.length) {
+          setData([...newData, ...data]);
+        } else {
+          setData(newData);
+        }
+
+        handleMergeData(newData);
       }
-
-      handleMergeData(newData);
     } catch (error) {
       setIsEnd(true);
     } finally {
@@ -156,12 +134,12 @@ const TokenChart: React.FC<IConfig> = (props) => {
       token: symbol,
       to: 1000
     });
-    console.log('tx', tx);
     setTradeData(tx);
   };
 
   useEffect(() => {
-    if (!symbol || !selectedInterval || isEnd || !showTradeData) return;
+    if (!symbol || !selectedInterval || isEnd || !defaults?.showTradeData)
+      return;
     handleFetchTXData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [symbol, selectedInterval, endDate]);
@@ -169,7 +147,7 @@ const TokenChart: React.FC<IConfig> = (props) => {
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        //const response = await fetch('/api/tokens');
+        //const response = await fetch('/api/available-tokens');
         //const data = await response.json();
         await new Promise((resolve) => setTimeout(resolve, 2000));
         setTokensList(['PEPE', 'WBTC', 'ETH']);
@@ -184,15 +162,15 @@ const TokenChart: React.FC<IConfig> = (props) => {
     setData([]);
     setFirstLoad(true);
     setIsEnd(false);
-    const indicatorsArray = Object.values(mergedConfig.availableIndicators);
-    const mappedIndicators = indicatorsArray.map((indicator: any) => ({
+    const indicatorsArray = Object.values(loadIndicators);
+    const mappedIndicators = indicatorsArray.map((indicator: IIndicator) => ({
       label: indicator.name,
       value: indicator.id,
       selected: false
     }));
 
     setIndicators(mappedIndicators);
-    setSelectedInterval(mergedConfig?.defaults?.timeframe || '5m');
+    setSelectedInterval(defaults?.timeframe || '5m');
     setEndDate(new Date());
   }, [symbol]);
 
@@ -221,12 +199,20 @@ const TokenChart: React.FC<IConfig> = (props) => {
       {({ handle, isIOS }: { handle: any; isIOS: boolean }) => (
         <div className="flex flex-col h-full w-full min-h-[400px]">
           <div className="flex flex-row">
-            {mergedConfig.toolbar?.timeframe ||
-            mergedConfig.toolbar?.indicators ||
-            mergedConfig.toolbar?.typeSelector ? (
+            {(toolbar?.timeframe ||
+              toolbar?.indicators ||
+              toolbar?.typeSelector) && (
               <Toolbar
-                config={mergedConfig}
+                config={toolbar}
                 intervals={intervals}
+                selectedInterval={selectedInterval}
+                indicators={indicators}
+                tokensList={tokensList}
+                selectedToken={symbol}
+                selectedChart={selectedChartType}
+                onSelectIndicators={handleSelectIndicator}
+                onSelectChart={setSelectedChartType}
+                onSelectToken={handleTokenChange}
                 onSelectInterval={(value: React.SetStateAction<string>) => {
                   setFirstLoad(true);
                   setEndDate(new Date());
@@ -234,40 +220,28 @@ const TokenChart: React.FC<IConfig> = (props) => {
                   setSelectedInterval(value);
                   setIsEnd(false);
                 }}
-                selectedInterval={selectedInterval}
-                selectedChart={selectedChartType}
-                onSelectChart={setSelectedChartType}
-                hasChartTypeSelection
-                indicators={indicators}
-                onSelectIndicators={handleSelectIndicator}
-                tokensList={tokensList}
-                selectedToken={symbol}
-                onSelectToken={handleTokenChange}
               />
-            ) : null}
-            {mergedConfig.toolbar?.fullscreenButton ? (
+            )}
+            {toolbar?.fullscreenButton && (
               <div className="flex mr-4">
                 <FullScreenButton handle={handle} isIOS={isIOS} />
               </div>
-            ) : null}
+            )}
           </div>
           <div className="flex flex-grow w-full h-[600px]" key={symbol}>
-            {data.length > 0 && (
-              <Chart
-                title={symbol}
-                data={data}
-                tradeData={tradeData}
-                chartType={selectedChartType}
-                onRangeChange={handleRangeChange}
-                rangeLimit={DEFAULT_RANGE_LIMIT}
-                // @ts-ignore
-                chartX={chartX}
-                // @ts-ignore
-                setChart={setChart}
-                onchart={indicators}
-                customIndicators={AVAILABLE_INDICATORS}
-              />
-            )}
+            <Chart
+              config={config}
+              chartType={selectedChartType}
+              displayTitle={symbol}
+              rangeLimit={DEFAULT_RANGE_LIMIT}
+              data={data}
+              onchart={indicators}
+              tradeData={tradeData}
+              customIndicators={loadIndicators}
+              onRangeChange={handleRangeChange}
+              chartX={chartX}
+              setChart={setChart}
+            />
           </div>
         </div>
       )}
@@ -275,4 +249,4 @@ const TokenChart: React.FC<IConfig> = (props) => {
   );
 };
 
-export default memo(TokenChart);
+export default TradingChart;

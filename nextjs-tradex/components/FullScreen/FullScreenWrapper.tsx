@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import React, { useEffect, useState } from 'react';
+import { FullScreen, useFullScreenHandle } from 'react-full-screen';
 
 function iOS() {
   return (
     /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+    (navigator.userAgent.includes('Mac') && 'ontouchend' in document)
   );
 }
 
-const FullScreenWrapper = ({ children, ...props }) => {
+const FullScreenWrapper = ({ children, ...props }: any) => {
   const handle = useFullScreenHandle();
   const [isIOS, setIsIOS] = useState(false);
 
