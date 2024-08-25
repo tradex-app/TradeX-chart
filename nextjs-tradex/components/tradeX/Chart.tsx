@@ -1,15 +1,31 @@
 'use client';
 import { FC, useEffect } from 'react';
-import config from './utils/config';
 import { useTheme } from 'next-themes';
-import { IProps, ITradeX } from 'tradex-chart';
+import { IConfig, IIndicators, ITradeX } from 'tradex-chart';
 import ColorsEnum from '../theme/colors';
+import { IChartOption, IIndicatorToolbar } from './utils/types';
 import 'tradex-chart';
 
+export interface IProps {
+  config: IConfig;
+  displayTitle: string;
+  data: number[][];
+  tradeData?: any;
+  chartType?: IChartOption;
+  rangeLimit?: number;
+  onchart: IIndicatorToolbar[];
+  chartAccessor?: string;
+  customIndicators?: IIndicators;
+  chartX: ITradeX;
+  setChart: (chart: ITradeX) => void;
+  onRangeChange?: () => void;
+}
+
 const Chart: FC<IProps> = ({
+  config,
   // visual
-  title,
-  chartType = 'area',
+  displayTitle,
+  chartType,
   rangeLimit = 96,
   // data
   data,
@@ -45,11 +61,9 @@ const Chart: FC<IProps> = ({
       );
       return;
     }
-    chart.on('setRange', (e) => {
-      if (!e) return;
-
+    chart.on('setRange', (e: any) => {
+      if (!e || e.length === 0) return;
       console.log('Range change event detected:', e);
-
       if (e[0] <= 0 && onRangeChange) {
         onRangeChange();
       }
@@ -100,25 +114,13 @@ const Chart: FC<IProps> = ({
       const isLightTheme = theme === 'light';
 
       if (typeof chart.start === 'function') {
-        console.log('Starting the chart with configuration:', {
-          ...config({
-            title,
-            symbol: title,
-            type: chartType,
-            rangeLimit,
-            isLightTheme
-          }),
-          state
-        });
-
         chart.start({
-          ...config({
-            title,
-            symbol: title,
-            type: chartType,
-            rangeLimit,
-            isLightTheme
-          }),
+          ...config,
+          title: displayTitle,
+          symbol: displayTitle,
+          type: chartType,
+          rangeLimit,
+          isLightTheme,
           state
         });
       } else {
@@ -132,7 +134,7 @@ const Chart: FC<IProps> = ({
       setChart(chart);
       console.log('Chart rendering complete.');
     } catch (err) {
-      console.error(`Failed to render chart: ${title}`, err);
+      console.error(`Failed to render chart: ${displayTitle}`, err);
     }
   };
 

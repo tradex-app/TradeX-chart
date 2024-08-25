@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "preinstall": "npx -y only-allow pnpm",
-    "prebuild": "cd .. && npm install && npm run buildall",
+    "prebuild": "cd .. && npm install && npm run build",
     "dev": "next dev",
-    "build": "npm install && next build",
+    "build": "pnpm install && next build",
     "start": "next start",
     "lint": "next lint"
   },

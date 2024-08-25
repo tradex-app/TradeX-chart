@@ -92,6 +92,7 @@ const IntervalDropdown: React.FC<IProps> = ({
                   }) => (
                     <CommandItem
                       key={item.value}
+                      // @ts-ignore
                       value={item.value}
                       onSelect={(selectedValue) => {
                         setValue(selectedValue as ChartResolutionEnum);

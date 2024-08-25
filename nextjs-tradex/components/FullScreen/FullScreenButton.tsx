@@ -32,8 +32,8 @@ const FullScreenButton = ({
     <div className="flex flex-row justify-end items-center">
       {handle.active ? (
         <Button
-          variant="primary"
-          size="small"
+          variant="ghost"
+          size="sm"
           type="button"
           onClick={exitFullScreen}
         >
@@ -41,11 +41,11 @@ const FullScreenButton = ({
         </Button>
       ) : (
         <Button
-          variant="primary"
-          size="small"
+          variant="ghost"
+          size="sm"
           type="button"
           onClick={() => {
-            setInitialTheme(theme);
+            setInitialTheme(theme === 'dark' ? 'light' : 'dark');
             enterFullScreen();
           }}
         >
