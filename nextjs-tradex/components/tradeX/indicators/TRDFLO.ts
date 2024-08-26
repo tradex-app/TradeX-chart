@@ -72,12 +72,13 @@ export default class TradeFlow extends Indicator {
    * @returns {boolean|array}
    */
   calcIndicatorHistory() {
-    if (!isObject(this.state.trades.data[this.state.time.timeFrame]))
+    const state = this.core.state
+    if (!isObject(state.trades.data[state.time.timeFrame]))
       return false;
     // create a time series array from State trades entries
     this.dataProxy(
       this.dataProxyFn,
-      this.state.trades.data[this.state.time.timeFrame]
+      state.trades.data[state.time.timeFrame]
     );
 
     return false;
@@ -171,7 +172,7 @@ export default class TradeFlow extends Indicator {
   /*
   getTrades() {
     let t;
-    let p = this.state.data.primary
+    let p = state.data.primary
     for (let o of p) {
       if (o.type == "trades") return o.data
     }

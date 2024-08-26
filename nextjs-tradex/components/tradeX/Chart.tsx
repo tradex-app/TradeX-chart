@@ -114,14 +114,13 @@ const Chart: FC<IProps> = ({
       const isLightTheme = theme === 'light';
 
       if (typeof chart.start === 'function') {
-        console.log('Starting the chart with configuration:', {
-          ...config({
-            title,
-            symbol: title,
-            type: chartType,
-            rangeLimit,
-            isLightTheme
-          }),
+        chart.start({
+          ...config,
+          title: displayTitle,
+          symbol: displayTitle,
+          type: chartType,
+          rangeLimit,
+          isLightTheme,
           state
         });
 

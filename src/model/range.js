@@ -534,16 +534,19 @@ export class Range {
     let x = this.dataLength - data.length
     let f = data[0]?.length - 1 || 0
     const r = {}
+    const d = {
+      min: 0,
+      max: 1,
+      minIdx: 0,
+      maxIdx: 0,
+      diff: 1
+    }
+
+    if (l < 1) return { data: d }
 
     // create default max min for indicator outputs
     for (let g = f; g > 0; g--) {
-      r[`data${g}`] = {
-        min: 0,
-        max: 1,
-        minIdx: 0,
-        maxIdx: 0,
-        diff: 1
-      }
+      r[`data${g}`] = d
     }
 
     buffer = (isInteger(buffer)) ? buffer : 0
