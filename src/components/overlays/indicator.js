@@ -376,7 +376,7 @@ export default class Indicator extends Overlay {
    */
   dataProxy(fn, target=[]) {
     const range = this.range
-    const state = this.state
+    const state = this.core.state
     const output = this.definition.meta.output
     const data = []
     const dummy = new Array(output.length + 1)

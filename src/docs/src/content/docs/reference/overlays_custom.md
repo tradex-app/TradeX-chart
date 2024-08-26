@@ -47,25 +47,11 @@ class CustomOverlay extends Overlay {
 
 Please refer to the [default overlays in the repository](https://github.com/tradex-app/TradeX-chart/tree/master/src/components/overlays) as examples of what can be done with an overlay.
 
-### What the Parent Overlay Class Provides
+### What Overlay Class Provides
 
-The parent ``Overlay`` class provides everything needed to draw on the chart.
+The ``Overlay`` class provides everything needed to draw on or interact with the chart.
 
-
-| Name    | Description                                            |
-| --------- | -------------------------------------------------------- |
-| core    | [chart root API](../../api/core)                       |
-| parent  | pane that overlay is applied to                        |
-| config  | [chart config](../02_configuration)                    |
-| theme   | [chart theme](../themes)                               |
-| params  | parameters that the overlay was created with           |
-| target  | layer methods and properties                           |
-| scene   | layer canvas provided to the overlay                   |
-| chart   | chart pane                                             |
-| xAxis   | methods and properties for the timeline                |
-| yAxis   | methods and properties for the (price) scale           |
-| context | "chart", "xAxis", "yAxis" - where the overlay is added |
-| plots   | methods to draw on the overlay or any other canvas     |
+See: [Overlay Data and Properties](../overlays#builtinoverlays)
 
 ### Drawing on the Overlay
 

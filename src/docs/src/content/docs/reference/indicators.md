@@ -52,7 +52,7 @@ Each entry in the ``data`` array requires an array with minimum of [timestamp, v
 
 The ``settings`` object can contain an object ``style`` and or individual input settings specific to the indicator.
 
-The ``params.settings.style`` object is how indicator an indicator can have it's default style (theme) modified.
+The ``params.settings.style`` object modifies the indicator's default style (theme). 
 
 ### Adding Indicators Via the Data State
 
@@ -85,16 +85,18 @@ More will be implemented soon.
 
 [Custom Idicators](../indicators_custom) are in important feature of TradeX-chart. They are an extension of the default indicator class and thus inherit all of their methods and properties. The documentation will show you how to [define](../indicators_custom#minimal-custom-indicator-definition), [register](../indicators_custom#registering-custom-indicators) and [how data is passed to them](../indicators_custom#how-the-indicator-updates).
 
-## Modifying Indicator Propterties
+## Accessing Chart Methods, Data and Information 
 
-Indicator input values (used in calculation) and output values (display: colour, line style) can be changed, whenever you want programmatically. First of all, you need the indicator instance of the indicator active on the chart.
-If you've added the chart programmatically
+The base `Indicator` class extends the `Overlay` class. See [Overlay Data and Properties](../overlays#overlaydataandproperties)
+
+First of all, you need the indicator instance of the indicator active on the chart.
+
+If you've added the chart programmatically the instance will be returned.
 
 ```javascript
 const newRSI = myChart.addIndicator("RSI")
 ```
 
-the instance will be returned.
 Otherwise, if the indicator has been added with the initial chart config / state, you will have to look up the instance.
 myChart.Indicators - provides a list of all chart panes and their hosted indicators. eg.
 
@@ -120,8 +122,26 @@ The intance will report it's name.
 chart0.Chart.indicators["ID_m02zn8js_lhw"].instance.name
 chart0.Chart.indicators["ID_m02zn8js_lhw"].instance.shortName
 ```
+### Indicator Data and Settings
 
-Indicator definition object is where the configurable values of the indicator are.
+Indicator data and settings are also found grouped together under Primary Pane or Secondary Panes.
+
+```javascript
+chart0.allData.primaryPane
+chart0.allData.secondaryPane
+```
+or similarly via the chart state
+
+```javascript
+chart0.state.allData.primaryPane
+chart0.state.allData.secondaryPane
+```
+
+## Modifying Indicator Propterties
+
+Indicator input values (used in calculation) and output values (display: colour, line style) can be changed, whenever you want programmatically. 
+
+The Indicator definition object is where the configurable values of the indicator are.
 
 ```javascript
 chart0.Chart.indicators["ID_m02zn8js_lhw"].instance.definition.meta.output[0].style.colour.value = "#F00"

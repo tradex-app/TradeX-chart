@@ -33,8 +33,30 @@ Overlays (layers) have the following features:
 * boxes, circles, text, images...
 * automatically resize with the chart or pane displaying them.
 
+## Overlay Data and Properties
+
+The ``Overlay`` class provides everything needed to draw on or interact with the chart. The `core` property points to the root of the chart and thus gives you access to everything else contained therein.
+
+
+| Name    | Description                                            |
+| --------- | -------------------------------------------------------- |
+| core    | [chart root API](../../api/core)                       |
+| parent  | pane that overlay is applied to                        |
+| config  | [chart config](../02_configuration)                    |
+| theme   | [chart theme](../themes)                               |
+| params  | parameters that the overlay was created with           |
+| target  | layer methods and properties                           |
+| scene   | layer canvas provided to the overlay                   |
+| chart   | chart pane                                             |
+| xAxis   | methods and properties for the timeline                |
+| yAxis   | methods and properties for the (price) scale           |
+| data    | if the overlay is an indicator, data is found here    |
+| context | "chart", "xAxis", "yAxis" - where the overlay is added |
+| plots   | methods to draw on the overlay or any other canvas     |
+
 ## Built-in Overlays
 
+The chart is built by layering a number of default overlays. Any [custom overlays](../overlays_custom) or [Indicators](../indicators) are thus simply further layers atop these.
 
 | Name                                   | Key    | Default  |
 | ---------------------------------------- | -------- | ---------- |
@@ -55,7 +77,7 @@ Overlays (layers) have the following features:
 | Time Labels                            |        |          |
 
 :::note
-[Indicators](../indicators.md) are a special (child) class of overlays.
+[Indicators](../indicators) are a special (child) class of overlays.
 Both standard and custom indicators are extensions of the indicator class.
 Indicators draw a visual interpretation (calculation) of either the price history data (candles) or their own unique dataset.
 :::
@@ -83,6 +105,5 @@ The following ovelays are an exception and are added via the [initial chart stat
 ## Custom Overlays
 
 Please refer to the [Custom Overlays](../overlays_custom) documentation to find out how to [define](../overlays_custom/#definingacustomoverlay), [register](../overlays_custom#registeringanoverlay), [add](../overlays_custom#addinganoverlay) and [remove](../overlays_custom#removinganoverlay) overlays via the API.
-
 
 
