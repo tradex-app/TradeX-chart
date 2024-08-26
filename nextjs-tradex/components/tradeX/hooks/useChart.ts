@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IIndicator } from 'tradex-chart';
+import { IIndicator } from '../../../../types'; // import from 'tradex-chart';
 import emptyChart from './emptyChart';
 
 type CreateStateType = (state: IState) => string;

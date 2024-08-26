@@ -1,10 +1,10 @@
 'use client';
 import { FC, useEffect } from 'react';
 import { useTheme } from 'next-themes';
-import { IConfig, IIndicators, ITradeX } from 'tradex-chart';
+import { IConfig, IIndicators, ITradeX, ThemeProps } from '../../../types'; // import from 'tradex-chart';
 import ColorsEnum from '../theme/colors';
 import { IChartOption, IIndicatorToolbar } from './utils/types';
-import 'tradex-chart';
+import '../../../src'; // import 'tradex-chart';
 
 export interface IProps {
   config: IConfig;
@@ -144,11 +144,15 @@ const Chart: FC<IProps> = ({
     console.log('Applying theme settings based on current theme:', theme);
 
     if (theme === 'light') {
-      chartX.theme?.setProperty('chart.GridColour', ColorsEnum.SelectorLight);
+      chartX.theme?.setProperty(
+        ThemeProps.ChartGridColour,
+        ColorsEnum.SelectorLight
+      );
+
       return;
     }
 
-    chartX.theme?.setProperty('chart.GridColour', ColorsEnum.Selector);
+    chartX.theme?.setProperty(ThemeProps.ChartGridColour, ColorsEnum.Selector);
   }, [chartX, theme]);
 
   useEffect(() => {
@@ -161,7 +165,7 @@ const Chart: FC<IProps> = ({
 
     console.log('Chart type changed. Applying new type:', chartType);
 
-    chartX.theme?.setProperty('candle.Type', chartType?.value);
+    chartX.theme?.setProperty(ThemeProps.CandleType, chartType?.value);
   }, [chartType, chartX]);
 
   return (

@@ -1,6 +1,6 @@
 import * as talib from 'talib-web';
 import ColorsEnum from '../../theme/colors';
-import { ChartType, IConfig } from 'tradex-chart';
+import { ChartType, IConfig } from '../../../../types'; // import from 'tradex-chart';
 
 export const CANDLE_THEME = {
   AreaLineColour: '#4c5fe7',
