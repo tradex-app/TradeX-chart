@@ -72,6 +72,8 @@ import { YAXIS_PADDING, YAXIS_TYPES } from "../definitions/chart";
       dnWidth: '1',
     },
   }
+  static timePeriodMultiplier = true
+
 
   /**
    * Creates an instance of MACD.

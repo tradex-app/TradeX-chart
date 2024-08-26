@@ -36,6 +36,8 @@ export default class OBV extends Indicator {
       low: {value: -100}
     }
   }
+  static timePeriodMultiplier = true
+
 
   /**
  * Creates an instance of DX.

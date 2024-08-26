@@ -36,6 +36,7 @@ export default class ADX extends Indicator {
       low: {value: 25}
     }
   }
+  static timePeriodMultiplier = true
 
   /**
  * Creates an instance of DX.
