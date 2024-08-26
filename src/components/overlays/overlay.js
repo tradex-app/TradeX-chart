@@ -50,7 +50,7 @@ export default class Overlay {
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#params = params
-    this.#data = this.#params.overlay?.data || []
+    // this.#data = this.#params.overlay?.data || []
     this.on("global_resize", this.onResize, this)
   }
 
@@ -69,8 +69,8 @@ export default class Overlay {
   get xAxis() { return this.getXAxis() }
   get yAxis() { return this.getYAxis() }
   get overlay() { return this.#params.overlay }
-  get overlayData() { return this.#data }
-  get data() { return this.#data }
+  get overlayData() { return this.#params.overlay?.data || [] }
+  get data() { return this.#params.overlay?.data || [] }
   get stateMachine() { return this.#core.stateMachine }
   get context() { return this.contextIs() }
   set position(p) { this.#target.setPosition(p[0], p[1]) }

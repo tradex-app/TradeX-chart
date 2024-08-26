@@ -175,7 +175,7 @@ export default class TradeFlow extends Indicator {
   /*
   getTrades() {
     let t;
-    let p = state.data.primary
+    let p = this.core.state.data.primary
     for (let o of p) {
       if (o.type == "trades") return o.data
     }

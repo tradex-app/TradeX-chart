@@ -32,6 +32,7 @@ export default class DMI extends Indicator {
       dash: {value: []},
     },
   }
+  static timePeriodMultiplier = true
   
   #precision = 2
 

@@ -22,6 +22,8 @@ import TradeFlow from './trade-flow.js'
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
+import bearHawk from './data/bear-hawk.js'
+
 // build a split state to test all merge features
 const state1_5a = {primary:[], secondary:[]}
 const state1_5b = {primary:[], secondary:[]}
