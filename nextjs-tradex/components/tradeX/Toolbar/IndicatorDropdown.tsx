@@ -15,14 +15,10 @@ import {
 import { useState } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { IIndicatorToolbar } from '../utils/types';
 
-interface Indicator {
-  value: string;
-  label: string;
-  selected: boolean;
-}
 interface IndDropdownProps {
-  indicators?: Indicator[];
+  indicators?: IIndicatorToolbar[];
   setValue: (indicator: string) => void;
 }
 

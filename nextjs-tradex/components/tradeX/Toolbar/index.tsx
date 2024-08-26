@@ -1,24 +1,36 @@
 import IntervalDropdown from './IntervalDropdown';
 import { CHART_OPTIONS } from '../utils';
 import ChartTypeSwitch from './ChartTypeSwitch';
-import TokensDropdown from './TokensDrowpdown';
+import TokensDropdown from './TokensDropdown';
 import IndicatorDropdown from './IndicatorDropdown';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { IChartOption, IIndicatorToolbar } from '../utils/types';
 
 const Toolbar = ({
   config,
   intervals,
   selectedInterval,
-  onSelectInterval,
-  hasChartTypeSelection = false,
   selectedChart,
-  onSelectChart,
   indicators,
-  onSelectIndicators,
   tokensList,
   selectedToken,
-  onSelectToken
-}: any) => {
+  onSelectIndicators,
+  onSelectChart,
+  onSelectToken,
+  onSelectInterval
+}: {
+  config: any;
+  intervals: string[];
+  selectedInterval: string;
+  selectedChart: IChartOption;
+  indicators: IIndicatorToolbar[];
+  tokensList: any[];
+  selectedToken: string;
+  onSelectIndicators: (value: any) => void;
+  onSelectChart: (value: IChartOption) => void;
+  onSelectToken: (value: string) => void;
+  onSelectInterval: (value: string) => void;
+}) => {
   return (
     <div className="flex flex-row flex-grow mb-2">
       <div className="flex flex-row gap-2">
@@ -30,7 +42,7 @@ const Toolbar = ({
           />
         )}
 
-        {config.toolbar?.timeframe && (
+        {config?.timeframe && (
           <IntervalDropdown
             interval={selectedInterval}
             setValue={onSelectInterval}
@@ -39,7 +51,7 @@ const Toolbar = ({
           />
         )}
 
-        {config.toolbar?.indicators && (
+        {config?.indicators && (
           <IndicatorDropdown
             indicators={indicators}
             setValue={onSelectIndicators}
@@ -48,7 +60,7 @@ const Toolbar = ({
       </div>
 
       <div className="flex justify-end pl-2">
-        {config.toolbar?.typeSelector && hasChartTypeSelection && (
+        {config?.typeSelector && (
           <ChartTypeSwitch
             items={CHART_OPTIONS}
             value={selectedChart}
@@ -56,9 +68,11 @@ const Toolbar = ({
           />
         )}
       </div>
-      <div className="pr-2 mr-2">
-        <ThemeToggle />
-      </div>
+      {config?.themeSwitcher && (
+        <div className="pr-2 mr-2">
+          <ThemeToggle />
+        </div>
+      )}
     </div>
   );
 };

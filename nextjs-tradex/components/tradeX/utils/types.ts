@@ -1,29 +1,19 @@
-// @ts-nocheck
-import { Indicator } from 'tradex-chart';
-import { ReactNode } from 'react';
+import { ChartType, IConfig, IIndicators, Indicator } from 'tradex-chart';
 import { ChartResolutionEnum } from './enums';
-import { ColorsEnum } from '../../theme';
-
-export type ChartType = 'area' | 'candle_solid';
 
 export interface IChartOption {
   id: number;
   label: string;
   value: ChartType;
+  info?: string;
+  icon?: any;
 }
 
 export interface ITradeX extends HTMLElement {
   Indicators?: { [key: string]: unknown }[];
   theme?: { setProperty: (property: string, value: any) => void };
   start?: (config: object) => void;
-  setIndicators?: (indicators: {
-    [key: string]: {
-      id: string;
-      name: string;
-      event: string;
-      ind: typeof Indicator;
-    };
-  }) => void;
+  setIndicators?: (indicators: Indicator[]) => void;
   mergeData?: (data: { ohlcv: number[] }) => void;
   on?: (eventName: string, callback: (e: unknown) => void) => void;
 }
@@ -50,21 +40,27 @@ export interface ILevelIndicator extends ITechnicalIndicator {
   sup_or_res: 'S' | 'R';
 }
 
-export interface IIndicators {
-  [key: string]: {
-    id: string;
-    name: string;
-    event: 'addIndicator';
-    ind: unknown;
-    offChart?: boolean;
-    customSettings?: {
-      selectLabel?: string;
-      inputsBaseProps?: {
-        colours?: ColorsEnum[];
-        labels?: boolean[];
-      };
-      legendInputs?: string[];
-      values?: any;
-    };
+export interface ITokenChartProps extends IConfig {
+  loadIndicators: IIndicators;
+  toolbar?: ToolbarConfig;
+  defaults?: {
+    timeframe?: string;
+    chartType?: IChartOption;
+    showTradeData?: boolean;
   };
+}
+
+export interface IIndicatorToolbar {
+  label: string;
+  value: string;
+  selected: boolean;
+}
+
+export interface ToolbarConfig {
+  intervals: string[];
+  timeframe: boolean;
+  indicators: boolean;
+  typeSelector: boolean;
+  fullscreenButton: boolean;
+  themeSwitcher: boolean;
 }
