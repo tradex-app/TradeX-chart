@@ -1,7 +1,12 @@
 declare module "tradex-chart" {
+  export enum ThemeProps {
+    ChartGridColour = "chart.GridColour",
+    CandleType = "candle.Type",
+  }
+
   export interface ITradeX extends HTMLElement {
     Indicators?: { [key: string]: unknown }[];
-    theme?: { setProperty: (property: PropsEnum, value: any) => void };
+    theme?: { setProperty: (property: ThemeProps, value: any) => void };
     start?: (config: object) => void;
     setIndicators?: (indicators: IIndicators) => void;
     mergeData?: (data: { ohlcv: number[] }) => void;
@@ -18,11 +23,6 @@ declare module "tradex-chart" {
       options: { data: number[]; settings: { custom: any } }
     ) => void;
     removeIndicator: (indicatorId: string) => void;
-  }
-
-  export enum ThemeProps {
-    ChartGridColour = "chart.GridColour",
-    CandleType = "candle.Type",
   }
 
   export abstract class Indicator {
@@ -175,24 +175,19 @@ declare module "tradex-chart" {
     displayInfo: boolean;
   }
 
-  interface Range {
-    timeFrame: string;
-    timeFrameMS: number;
-    initialCnt: number;
-  }
-
   export interface Canvas {
     [key: string]: (...args: any[]) => any;
   }
 
   export type ChartType = "area" | "candle_solid";
 
-  export const YAXIS_TYPES: {
+  export type YAXIS_TYPES = {
     LINEAR: string;
     LOG: string;
+    RELATIVE: string;
   };
 
-  export const YAXIS_PADDING: number;
+  export type YAXIS_PADDING = number;
 
   export interface Range {
     start: number;
@@ -208,11 +203,11 @@ declare module "tradex-chart" {
     secondaryMaxMin?: { [key: string]: { [key: string]: number } };
   }
 
-  export const talibAPI: {
+  export type talibAPI = {
     [key: string]: any; // TODO: Define talib types
   };
 
-  export const utils: {
+  export type utils = {
     [key: string]: any; // TODO: Define utils types
   };
 

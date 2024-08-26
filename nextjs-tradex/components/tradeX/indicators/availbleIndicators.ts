@@ -1,4 +1,4 @@
-import { IIndicators } from 'tradex-chart';
+import { IIndicators } from '../../../../types'; // import from 'tradex-chart';
 import TradeFlow from './TRDFLO';
 
 const AVAILABLE_INDICATORS: IIndicators = {

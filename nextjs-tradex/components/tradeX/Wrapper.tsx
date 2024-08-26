@@ -8,8 +8,8 @@ import FullScreenWrapper from '../FullScreen/FullScreenWrapper';
 import FullScreenButton from '../FullScreen/FullScreenButton';
 import Toolbar from './Toolbar';
 import dynamic from 'next/dynamic';
-import { IIndicatorToolbar, ITokenChartProps } from './utils/types';
-import { IIndicator, ITradeData } from 'tradex-chart';
+import { IIndicatorToolbar, ITokenChartProps } from './utils/types'; // don't change this, these are from the wrapper not the module
+import { IIndicator, ITradeData } from '../../../types'; // import from 'tradex-chart';
 
 const Chart = dynamic(() => import('@/components/tradeX/Chart'), {
   ssr: false
