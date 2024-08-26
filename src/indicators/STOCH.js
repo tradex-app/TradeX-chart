@@ -52,6 +52,7 @@ export default class STOCH extends Indicator {
       dash: {value: ""}, 
     },
   }
+  static timePeriodMultiplier = true
 
 
   /**

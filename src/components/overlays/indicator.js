@@ -45,6 +45,18 @@ class Context {
   }
 }
 
+// enum for indicator state
+export class IndicatorState {
+  static noData = new IndicatorState("noData")
+  static hasData = new IndicatorState("hasData")
+  static error = new IndicatorState("error")
+  static destroyed = new IndicatorState("destroyed")
+
+  constructor(name) {
+    this.name = name
+  }
+}
+
 export class InputPeriodEnable {
 
   #enable = true
@@ -97,9 +109,10 @@ export default class Indicator extends Overlay {
   #precision = 2
   #style = {}
   #legendID
-  #status
+  #state = IndicatorState.noData
   #ConfigDialogue
   #palette
+  #error = {type: "", msg: "", style: ""}
 
   definition = {
     input: {},
@@ -200,7 +213,10 @@ export default class Indicator extends Overlay {
   set position(p) { this.target.setPosition(p[0], p[1]) }
   get isIndicator() { return Indicator.isIndicator }
   get isPrimary() { return this.chart.isPrimary }
-  get status() { return this.#status }
+  set state(s) { if (s instanceof IndicatorState) this.#state = s }
+  get state() { return this.#state }
+  set error(e) { this.setError(e) }
+  get error() { return this.#error }
   get configDialogue() { return this.#ConfigDialogue }
 
 
@@ -228,6 +244,19 @@ export default class Indicator extends Overlay {
    */
   get value() {
     return this.#value
+  }
+
+  setError(e) {
+    if (this.#state === IndicatorState.destroyed) return false
+    if (!isObject(e) &&
+        !isString(e?.type) &&
+        !isString(e?.msg)) return false
+    const err = {...e}
+    err.indicator = this
+    this.#error = e
+    this.state = IndicatorState.error
+    this.emit("indicator_error", err)
+    this.core.warn(`WARNING: Indicator: ${this.shortName} ID: ${this.id} ${err.msg}`)
   }
 
   /**
@@ -276,7 +305,7 @@ export default class Indicator extends Overlay {
   init(api) {
     const overlay = this.#params.overlay
 
-    this.defineIndicator(overlay?.settings, api)
+    this.defineIndicator(overlay, api)
     // calculate back history if missing
     this.calcIndicatorHistory()
     // enable processing of price stream
@@ -296,7 +325,7 @@ export default class Indicator extends Overlay {
   }
 
   destroy() {
-    if ( this.#status === "destroyed") return
+    if ( this.#state === IndicatorState.destroyed) return
     // has this been invoked from removeIndicator() ?
     // const chartPane = this.core.ChartPanes.get(this.chartPaneID)
     if ( !this.chartPane.indicatorDeleteList[this.id] ) {
@@ -320,7 +349,7 @@ export default class Indicator extends Overlay {
     // remove indicator state data
     this.core.state.removeIndicator(this.id)
 
-    this.#status = "destroyed"
+    this.#state = IndicatorState.destroyed
   }
 
   /**
@@ -510,11 +539,13 @@ export default class Indicator extends Overlay {
     }
     // clear indicator and recalculate
     if (calc) {
+      this.clear()
       this.overlay.data.length = 0
       this.calcIndicatorHistory()
     }
     this.setRefresh()
     this.draw()
+    this.core.refresh()
   }
 
   onConfigDialogueCancel(d) {
@@ -739,13 +770,13 @@ export default class Indicator extends Overlay {
 
   /**
    * validate indicator inputs and outputs against expected types and values
-   * @param {Object} s - indicator inputs
+   * @param {Object} settings - indicator inputs
    * @param {Object} api - predefined parameters
    * @memberof indicator
    */
-  defineIndicator(s, api) {
+  defineIndicator(settings, api) {
 
-    s = (isObject(s)) ? s : {}
+    let input = this.retrieveInput(settings)
     api = (isObject(api)) ? api : {outputs: [], options: []}
 
     const definition = {
@@ -769,7 +800,7 @@ export default class Indicator extends Overlay {
     let dm = d.meta;
     let oo = [];
     let out = talibAPI?.[this.libName]?.outputs || [];
-    d.input = (!isObject(d.input)) ? {} : d.input
+    d.input = (!isObject(d.input)) ? input : {...d.input, ...input}
     d.output = (!isObject(d.output)) ? {} : d.output
     dm = (!isObject(dm)) ? definition.meta : dm
     dm.input = (!isObject(dm.input)) ? {} : dm.input
@@ -784,7 +815,8 @@ export default class Indicator extends Overlay {
     // input ---------------
 
     // validate all input fields
-    this.validateInputs(d, s, api)
+    this.validateInputs(d, input, api)
+    this.populateMetaInputs(d)
 
     // output ------------------
 
@@ -800,6 +832,11 @@ export default class Indicator extends Overlay {
 
   } // end of define indicator
 
+  retrieveInput(settings) {
+    if (isObject(settings?.input)) return settings.input
+    else if (isObject(settings?.settings?.input)) return settings.settings.input
+    else return {}
+  }
 
   validateInputs(d, s, api) {
     const input = {...d.input, ...s}
@@ -842,6 +879,14 @@ export default class Indicator extends Overlay {
         d.output[o] = []
       if (doo)
         oo.push(o)
+    }
+  }
+
+  populateMetaInputs(def) {
+    let input = def.input
+    let metaIn = def.meta.input
+    for (let i in metaIn) {
+      metaIn[i].value = input[i]
     }
   }
 
@@ -1118,15 +1163,16 @@ export default class Indicator extends Overlay {
   getTimePeriod() {
     let d = 0;
     let def = this.definition.input
+    let m = (!!this.constructor?.timePeriodMultiplier) ? 2 : 1
 
     if ("timePeriod" in def)
-      d = def.timePeriod * 2
+      d = def.timePeriod * m
     else {
       for (let i in def) {
         if (isInteger(def[i]) && def[i] > d)
         d = def[i]
       }
-      d *=2
+      d *= m
     }
     return d
   }
@@ -1230,7 +1276,10 @@ export default class Indicator extends Overlay {
     else return false
 
     // if not enough data for calculation fail
-    if ( end < t ) return false
+    if ( end < t ) {
+      this.setError( {type: "noData", msg: "Insufficient input data"} )
+      return false
+    }
     if ( end - start < t ) {
       start -= (t + p) - (end - start)
     }
@@ -1308,7 +1357,7 @@ export default class Indicator extends Overlay {
           r[v[0]] = v
         }
         this.overlay.data = Object.values(r)
-
+        this.state = IndicatorState.hasData
         this.setRefresh()
       }
     }
@@ -1350,17 +1399,9 @@ export default class Indicator extends Overlay {
    * @memberof indicator
    */
   newValue (value) {
-    let p = this.TALibParams()
-    if (!p) return false
-
-    let v = this.calcIndicatorStream(this.libName, p)
-    if (!v) return false
-
-    this.overlay.data.push(v)
-
-    this.target.setPosition(this.core.scrollPos, 0)
-    this.doDraw = true
-    this.draw(this.range)
+    this.#setValue(
+      (v) => this.overlay.data.push(v)
+    )
   }
 
   /**
@@ -1369,15 +1410,24 @@ export default class Indicator extends Overlay {
    * @memberof indicator
    */
   updateValue (value) {
-    let l = this.overlay.data.length - 1
+    this.#setValue(
+      (v) => {
+        let l = this.overlay.data.length - 1;
+        this.overlay.data[l] = v 
+      }
+    )
+
+  }
+
+  #setValue(fn) {
     let p = this.TALibParams()
     if (!p) return false
 
     let v = this.calcIndicatorStream(this.libName, p)
     if (!v) return false
 
-    this.overlay.data[l] = v
-
+    fn(v)
+    this.state = IndicatorState.hasData
     this.target.setPosition(this.core.scrollPos, 0)
     this.doDraw = true
     this.draw(this.range)
@@ -1440,7 +1490,7 @@ export default class Indicator extends Overlay {
 
     if (!super.mustUpdate()) return
 
-    this.scene.clear()
+    this.clear()
 
     const offset = this.xAxis.smoothScrollOffset || 0
     const meta = this.definition.meta
@@ -1511,7 +1561,7 @@ export default class Indicator extends Overlay {
         f?.name,
         f?.displayName,
         f?.type,
-        src[f.name],
+        src[f.name],    // value
         f?.defaultValue,
         f?.range?.min,
         f?.range?.max,

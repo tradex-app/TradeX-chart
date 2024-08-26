@@ -22,6 +22,8 @@ import TradeFlow from './trade-flow.js'
 
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
+import bearHawk from './data/bear-hawk.js'
+
 // build a split state to test all merge features
 const state1_5a = {primary:[], secondary:[]}
 const state1_5b = {primary:[], secondary:[]}
@@ -969,6 +971,8 @@ const dre =   {
   };
 
 const configs = [
+
+  {config: bearHawk, stream: null},
   {config: tradesTestState, stream: null},
   {config: config1, stream: null},
   // {config: config2, stream: null},
@@ -1214,12 +1218,12 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
+addChart()
 // addChart()
 // addChart()
 // addChart()
 // addChart()
-// addChart()
-
+/*
 document.getElementById("fullscreen").addEventListener("click", (e) => {
   chart0.requestFullscreen()
 })
@@ -1269,3 +1273,4 @@ if (typeof chart1 === "object") {
 // test merging indicator data
 if (typeof chart5 === "object")
   chart5.mergeData(state1_5a, false)
+*/
