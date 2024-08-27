@@ -24,11 +24,24 @@ export class YAXIS_TYPE {
   static relative = new YAXIS_TYPE("relative")
   static log = new YAXIS_TYPE("log")
 
+  static valid (t) {
+    return (t instanceof YAXIS_TYPE) ? t : YAXIS_TYPE.default
+  }
+  static get types () {
+    let types = [];
+    for (let key in YAXIS_TYPE) {
+      if (YAXIS_TYPE[key] instanceof YAXIS_TYPE) types.push(key)
+    }
+    return types
+  }
+
   constructor(name) {
     this.name = name
   }
 }
-export const YAXIS_TYPES = Object.keys(YAXIS_TYPE)
+export const YAXIS_TYPES = YAXIS_TYPE.types
+
+
 
 export const INTITIALCNT = 30
 export const LIMITFUTURE = 200

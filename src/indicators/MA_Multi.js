@@ -15,7 +15,7 @@ import { colours2 } from "../components/views/colourPicker";
   static version = "1.0"
   static inCnt = 0
   static primaryPane = true
-  // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
+  // static scale = YAXIS_TYPE.default
 
   // colours2 10 x 5
   static colours = [

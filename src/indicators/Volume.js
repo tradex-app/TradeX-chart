@@ -4,7 +4,7 @@ import Indicator from "../components/overlays/indicator"
 import VolumeBar from "../components/primitives/volume";
 import { bRound, limit } from "../utils/number";
 import { uid } from "../utils/utilities";
-import { YAXIS_TYPES } from "../definitions/chart";
+import { YAXIS_TYPE } from "../definitions/chart";
 import { defaultTheme } from "../definitions/style";
 import { candleW } from "../components/primitives/candle";
 
@@ -38,7 +38,7 @@ export default class Volume extends Indicator {
   static version = "1.0"
   static inCnt = 0
   static primaryPane = "both"
-  static scale = YAXIS_TYPES[1] // YAXIS_TYPES - percent
+  static scale = YAXIS_TYPE.percent
 
   static defaultStyle = {
     up: {colour: {value: "#388E3C"}},

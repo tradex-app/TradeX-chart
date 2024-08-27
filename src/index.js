@@ -14,7 +14,7 @@ import { talibAPI } from './definitions/talib-api'
 import * as utils from './utils/utilities'
 import Aspect from './scaleX/aspect'
 import { candleW } from './components/primitives/candle'
-import { YAXIS_TYPES, YAXIS_PADDING } from './definitions/chart'
+import { YAXIS_TYPE, YAXIS_TYPES, YAXIS_PADDING } from './definitions/chart'
 
 // export default Chart
 export { 
@@ -36,6 +36,7 @@ export {
   Range,
   utils,
   uid,
+  YAXIS_TYPE,
   YAXIS_TYPES,
   YAXIS_PADDING
 }

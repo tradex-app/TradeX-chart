@@ -227,7 +227,7 @@ export default class Overlay {
         case "renderText": canvas[type]( ctx, p[0], p[1], params ); break;
         case "renderTextBG": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
         case "histogram": this.histogram( p, params ); break;
-        case "highLowRange": renderHighLowRange( ctx, p[0], p[1], p[2], p[3], params ); break;
+        case "highLowRange": this.highLowRange( ctx, params ); break;
         default: break;
       }
   
@@ -246,5 +246,13 @@ export default class Overlay {
         this.#histogram = new Histogram(this.scene, this.theme)
 
       this.#histogram.draw(p, params)
+    }
+
+    highLowRange( ctx, p ) {
+      let {high, low} = p
+      let y1 = this.yAxis.yPos(high)
+      let y2 = this.yAxis.yPos(low)
+      let {width, height} = this.scene
+      renderHighLowRange( ctx, y1, y2, width, height, p )
     }
 }
