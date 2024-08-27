@@ -36,7 +36,7 @@ import {
 } from "../definitions/core";
 import { 
   BUFFERSIZE, 
-  YAXIS_TYPES, 
+  YAXIS_TYPE, 
   COLLAPSEDHEIGHT 
 } from "../definitions/chart";
 import { VolumeStyle } from "../definitions/style"
@@ -157,7 +157,7 @@ export default class Chart extends Component{
       chartLegend.parent = this
       chartLegend.source = this.legendInputs.bind(this)
       this.legend.add(chartLegend)
-      this.yAxisType = "default"
+      this.yAxisType = YAXIS_TYPE.default
     }
     else {
       let type = this.core.indicatorClasses[options.view[0].type].scale
@@ -166,7 +166,7 @@ export default class Chart extends Component{
       chartLegend.parent = this
       chartLegend.source = () => { return {inputs:{}, colours:[], labels: []} }
       this.legend.add(chartLegend)
-      this.yAxisType = (YAXIS_TYPES.includes(type)) ? type : "default"
+      this.yAxisType = YAXIS_TYPE.valid(type)
     }
 
     // set up Scale (Y Axis)
@@ -513,13 +513,12 @@ export default class Chart extends Component{
    * @returns {boolean}
    */
   setYAxisType(t) {
+    let type = YAXIS_TYPE.valid(t)
     if (
-      !isString(t) ||
-      !YAXIS_TYPES.includes(t)  ||
-      (this.type == "primaryPane" && t == "percent")
+      (this.type == "primaryPane" && type == YAXIS_TYPE.percent)
     ) 
-    return false
-    this.#yAxisType = t
+      this.#yAxisType = YAXIS_TYPE.default
+    else this.#yAxisType = type
     return true
   }
 

@@ -2,7 +2,7 @@
 // Scale bar that lives on the side of the chart
 
 import Component from "./component"
-import { YAXIS_MINDIGITS, YAXIS_TYPES } from '../definitions/chart'
+import { YAXIS_MINDIGITS, YAXIS_TYPE } from '../definitions/chart'
 import { isArray, isNumber, isObject } from '../utils/typeChecks'
 import { elementDimPos } from "../utils/DOM"
 import yAxis from "./axis/yAxis"
@@ -80,7 +80,7 @@ export default class ScaleBar extends Component {
   get layerPriceLine() { return this.#layerPriceLine }
   get overlays() { return Object.fromEntries([...this.graph.overlays.list]) }
   get yAxis() { return this.#yAxis }
-  set yAxisType(t) { this.#yAxis.yAxisType = YAXIS_TYPES.includes(t) ? t : YAXIS_TYPES[0] }
+  set yAxisType(t) { this.#yAxis.yAxisType = YAXIS_TYPE.valid(t) }
   get yAxisType() { return this.#yAxis.yAxisType }
   get yAxisHeight() { return this.#yAxis.height }
   get yAxisRatio() { return this.#yAxis.yAxisRatio }
@@ -100,7 +100,7 @@ export default class ScaleBar extends Component {
 
 
   start() {
-    const range = (this.options.yAxisType === "default") ? 
+    const range = (this.options.yAxisType === YAXIS_TYPE.default) ? 
       undefined : this.parent.localRange
     const ctx = this.core.MainPane.graph.viewport.scene.context
     const t = this.theme.yAxis

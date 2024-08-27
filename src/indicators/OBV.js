@@ -5,7 +5,7 @@
 
 import Indicator from "../components/overlays/indicator"
 import { OBV as talibAPI } from "../definitions/talib-api";
-import { YAXIS_TYPES } from "../definitions/chart";
+import { YAXIS_TYPE } from "../definitions/chart";
 
 
 export default class OBV extends Indicator {
@@ -20,7 +20,7 @@ export default class OBV extends Indicator {
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false
-  static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
+  static scale = YAXIS_TYPE.default
   static defaultStyle = {
     output: {
       colour: {value: "#E91E63"},

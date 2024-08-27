@@ -3,7 +3,7 @@
 
 // import { Indicator } from "tradex-chart"
 // import { Indicator, Range, uid } from "./src"
-import { Indicator, IndicatorClasses, Range, uid } from "./src"
+import { Indicator, IndicatorClasses, Range, uid, YAXIS_TYPE } from "./src"
 
 
 /**
@@ -14,7 +14,7 @@ export default class DblMA extends Indicator {
   static inCnt = 0
   static primaryPane = false
   static compositePane = true
-  static scale = "default" // YAXIS_TYPES[0] // YAXIS_TYPES - default
+  static scale = YAXIS_TYPE.default
   static colours = []
   static defaultStyle = {
     stroke: "#0088cc",
