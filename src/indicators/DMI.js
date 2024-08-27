@@ -2,7 +2,7 @@
 // Directional Movement Index
 
 import Indicator from "../components/overlays/indicator"
-import { YAXIS_PADDING, YAXIS_TYPES } from "../definitions/chart";
+import { YAXIS_PADDING, YAXIS_TYPE } from "../definitions/chart";
 
 /**
  * custom indicator class
@@ -12,7 +12,7 @@ export default class DMI extends Indicator {
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false
-  static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative
+  static scale = YAXIS_TYPE.relative
   static yAxisPadding = YAXIS_PADDING
   static colours = []
   static defaultStyle = {

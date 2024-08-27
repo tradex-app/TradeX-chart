@@ -4,7 +4,7 @@
 // import { Indicator } from "tradex-chart"
 import { Indicator } from "./src"
 import { candleW } from "./src"
-import { YAXIS_TYPES } from "./src";
+import { YAXIS_TYPE } from "./src";
 import { YAXIS_PADDING } from "./src/definitions/chart";
 import { isObject } from "./src/utils/typeChecks";
 
@@ -16,7 +16,7 @@ export default class TradeFlow extends Indicator {
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false
-  static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative
+  static scale = YAXIS_TYPE.relative
   static yAxisPadding = YAXIS_PADDING
   static colours = []
   static defaultStyle = {

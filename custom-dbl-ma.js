@@ -14,7 +14,7 @@ export default class DblMA extends Indicator {
   static inCnt = 0
   static primaryPane = primaryPane
   // static scale is required for off chart indicators
-  // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
+  // static scale = YAXIS_TYPE.default
   static colours = []
   static defaultStyle = {
     stroke: "#0088cc",

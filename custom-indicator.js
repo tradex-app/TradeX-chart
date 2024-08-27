@@ -13,7 +13,7 @@ export default class Test extends Indicator {
   static inCnt = 0
   static primaryPane = true
   // static scale is required for secondary pane (off chart) indicators
-  // static scale = YAXIS_TYPES[0] // YAXIS_TYPES - default
+  // static scale = YAXIS_TYPE.default
   static colours = []
   static defaultStyle = {
     close: {
