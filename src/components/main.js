@@ -671,6 +671,7 @@ export default class MainPane extends Component {
       this.#Chart = o
     }
     else {
+      params.type = "secondary"
       params.name = params.view[0].name || "Secondary"
       params.shortName = params.view[0].type || "Secondary"
       o = new Chart(this.core, params);

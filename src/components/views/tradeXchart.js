@@ -157,6 +157,7 @@ export default class tradeXChart extends element {
   get elWidgetsG() { return this.#elWidgets }
   get elMain() { return this.#elBody.main }
   get elTime() { return this.#elBody.main.time }
+  get elRows() { return this.#elBody.main.rows }
   get elTools() { return this.#elBody.tools }
   get elYAxis() { return this.#elBody.scale }
   get width() { return this.#chartW }

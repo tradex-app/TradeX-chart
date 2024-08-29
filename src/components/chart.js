@@ -73,7 +73,9 @@ const chartLegend = {
   id: "chart",
   title: "",
   type: "chart",
-  source: () => {}
+  parent: undefined,
+  source: () => {},
+  visible: true
 }
 
 const chartTypes = [ "primary", "secondary" ]
@@ -470,11 +472,11 @@ export default class Chart extends Component{
    * Set chart dimensions
    * @param {Object} dim - dimensions {w:width, h: height}
    */
-  setDimensions(dim) {
+  setDimensions(dims={w: this.width, h: this.height}) {
+    if (!isObject(dims)) dims = {w: this.width, h: this.height}
     const buffer = this.config.buffer || BUFFERSIZE
-      let {w, h} = dim;
-               w = this.width
-               h = (h) ? h : this.height
+    let w = (isNumber(dims?.w)) ? dims.w : this.width
+    let h = (isNumber(dims?.h)) ? dims.h : this.height
     
     // element widths are automatically handled by CSS
     this.setHeight(h)
