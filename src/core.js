@@ -317,6 +317,7 @@ export default class TradeXchart extends Tradex_chart {
   get elTools() { return super.elTools }
   get elBody() { return super.elBody }
   get elMain() { return super.elMain }
+  get elRows() { return super.elRows }
   get elTime() { return super.elTime }
   get elYAxis() { return super.elYAxis }
   get elWidgetsG() { return super.elWidgets }
@@ -379,6 +380,9 @@ export default class TradeXchart extends Tradex_chart {
   get mousePos() { return this.#pointerPos }
   get pointerButtons() { return this.#pointerButtons }
 
+  get symbol() { return this.#config.symbol }
+  get timeFrame() { return this.range.interval }
+  get timeFrameStr() { return this.range.intervalStr }
   set pricePrecision(p) { this.setPricePrecision(p) }
   get pricePrecision() { return this.#pricePrecision }
   get volumePrecision() { return this.#volumePrecision }
@@ -656,18 +660,23 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   /**
-   * set chart title
-   * @param {string} t - title displayed top left before OHLCV
+   * set chart title and legend string
+   * @param {String} t - title
+   * @returns {Boolean} - success / failure
    */
   setTitle(t) {
+    if (!isString(t)) return false
     this.Chart.setTitle(t)
+    return true
   }
 
   /**
-   * set chart watermark
-   * @param {object} w - {text, imgURL: URL | data:URL}
+   * Set chart Watermark
+   * @param {{text: String, imgURL: string}|String} w - watermark
    */
   setWatermark(w) {
+    if (isString(w.text) || isString(w)) this.core.config.watermark.text = w
+    else if ("imgURL" in w) this.core.config.watermark.imgURL = w
     this.Chart.setWatermark(w)
   }
 
@@ -913,8 +922,8 @@ export default class TradeXchart extends Tradex_chart {
   /**
    * specify a chart stream
    * @memberof TradeXchart
-   * @param {object} stream 
-   * @returns {Stream|false}
+   * @param Object} stream - {tfCountDown, alerts}
+   * @returns {Stream|Boolean}
    */
   setStream(stream) {
     if (this.stream instanceof Stream) {
