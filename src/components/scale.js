@@ -235,10 +235,12 @@ export default class ScaleBar extends Component {
   }
 
   setDimensions(dim) {
-    const width = this.#element.getBoundingClientRect().width
-    this.setHeight(dim.h)
+    // const w = this.#element.getBoundingClientRect().width
+    const w = this.width
+    const h = this.parent.height
+    this.setHeight(h)
     if (this.graph instanceof Graph) {
-      this.graph.setSize(width, dim.h, width)
+      this.graph.setSize(w, h, w)
       this.draw()
     }
     if (this.#layerCursor instanceof ScaleCursor) 

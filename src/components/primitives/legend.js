@@ -142,6 +142,12 @@ export default class Legends {
   /**
    * add a legend to the chart pane
    * @param {object} options - {id, type, parent, source}
+   * @param {String} options.id
+   * @param {String} options.title
+   * @param {String} options.type
+   * @param {Object} options.parent
+   * @param {Function} options.source
+   * @param {Boolean} options.visible
    * @return {string} id 
    * @memberof Legends
    */
