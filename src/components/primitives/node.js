@@ -3,12 +3,46 @@
 
 import { renderCircle } from "../../renderer/circle"
 import { isNumber, isObject } from "../../utils/typeChecks";
-import { copyDeep, debounce, idSanitize, mergeDeep } from "../../utils/utilities";
+import { copyDeep, debounce, idSanitize, mergeDeep, uid } from "../../utils/utilities";
 import { drawingNode as defaultTheme } from "../../definitions/style";
 import { HIT_DEBOUNCE } from "../../definitions/core";
+import { svgToImage } from "../../utils/DOM";
+import { limit } from "../../utils/number";
+// import { NodeState } from "../overlays/chart-tools";
+
+export function nodeRender(target, theme, data) {
+
+  const ctx = target.scene.context
+  const ctxH = target.hit.context
+  const width = target.scene.width
+  const states = Object.keys(NodeState)
+  const state = (states.includes(data.state)) ? data.state : states[0]
+  const c = theme[state]
+  const k = target.hit.getIndexValue(data.key)
+  const x = data.x
+  const y = data.y
+  const r = data.r
+  const opts = {border: c.style , size: c.width, fill: c.fill}
+  const optsH = {border: "none" , size: 0, fill: k}
+
+  // const k = this.hit.getIndexValue(data.key)
+  // const hit = svgToImage(j, this.dims, k)
+
+  // draw node
+  ctx.save()
+  renderCircle(ctx, x, y, r, opts)
+  ctx.restore()
+
+  // draw hit mask
+  ctxH.save()
+  renderCircle(ctx, x, y, r + c.width, optsH)
+  ctxH.restore()
+
+  return {x,y,r,k}
+}
 
 // State enum
-class NodeState {
+export class NodeState {
   static passive = new NodeState("passive")
   static hover = new NodeState("hover")
   static active = new NodeState("active")
@@ -18,13 +52,13 @@ class NodeState {
   }
 }
 
-export default class Node {
+export default class ToolNode {
 
   static #cnt = 1
-  static get cnt() { return Node.#cnt++ }
+  static get cnt() { return ToolNode.#cnt++ }
 
   #id
-  #inCnt = Node.cnt
+  #inCnt = ToolNode.cnt
   #state = NodeState.passive
   #chart
   #layer
@@ -103,7 +137,7 @@ export default class Node {
 
   onPointerDown(pos) {
     if (this.#chart.stateMachine.state === "chart_pan") return
-      debounce(this.isNodeSelected, HIT_DEBOUNCE, this)(e)
+      debounce(this.isNodeSelected, HIT_DEBOUNCE, this)(pos)
   }
 
   onPointerUp(pos) {
@@ -131,6 +165,29 @@ export default class Node {
     if (!(c.x && c.y)) return false
     else return c
   }
+
+  isNodeSelected() {
+
+  }
+
+
+  // draw(data) {
+  //   this.data = data
+  //   const states = Object.keys(NodeState)
+  //   const state = (states.includes(data.state)) ? data.state : states[0]
+  //   const c = this.cfg[state]
+  //   const k = this.hit.getIndexValue(data.key)
+  //   const x = this.data.x
+  //   const y = this.data.y
+  //   const r = this.data.r
+  //   const ctx = this.ctx
+  //   const ctxH = this.ctxH
+  //   const opts = {border: c.style , size: c.width, fill: c.fill}
+  //   const optsH = {border: "none" , size: 0, fill: k}
+
+  //   // const k = this.hit.getIndexValue(data.key)
+  //   // const hit = svgToImage(j, this.dims, k)
+
 
   draw() {
     const t = this.themeState

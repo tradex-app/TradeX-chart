@@ -5,6 +5,7 @@ import Overlay from "./overlay"
 import { HIT_DEBOUNCE } from "../../definitions/core";
 import { isObject } from "../../utils/typeChecks";
 import { debounce, idSanitize, uid } from "../../utils/utilities"
+import ToolNode, { NodeState } from "../primitives/node";
 
 
 const toolsDialogue = {
