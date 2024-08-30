@@ -36,7 +36,7 @@ import {
 } from "../definitions/core";
 import { 
   BUFFERSIZE, 
-  YAXIS_TYPES, 
+  YAXIS_TYPE, 
   COLLAPSEDHEIGHT 
 } from "../definitions/chart";
 import { VolumeStyle } from "../definitions/style"
@@ -73,7 +73,9 @@ const chartLegend = {
   id: "chart",
   title: "",
   type: "chart",
-  source: () => {}
+  parent: undefined,
+  source: () => {},
+  visible: true
 }
 
 const chartTypes = [ "primary", "secondary" ]
@@ -157,7 +159,7 @@ export default class Chart extends Component{
       chartLegend.parent = this
       chartLegend.source = this.legendInputs.bind(this)
       this.legend.add(chartLegend)
-      this.yAxisType = "default"
+      this.yAxisType = YAXIS_TYPE.default
     }
     else {
       let type = this.core.indicatorClasses[options.view[0].type].scale
@@ -166,7 +168,7 @@ export default class Chart extends Component{
       chartLegend.parent = this
       chartLegend.source = () => { return {inputs:{}, colours:[], labels: []} }
       this.legend.add(chartLegend)
-      this.yAxisType = (YAXIS_TYPES.includes(type)) ? type : "default"
+      this.yAxisType = YAXIS_TYPE.valid(type)
     }
 
     // set up Scale (Y Axis)
@@ -470,11 +472,11 @@ export default class Chart extends Component{
    * Set chart dimensions
    * @param {Object} dim - dimensions {w:width, h: height}
    */
-  setDimensions(dim) {
+  setDimensions(dims={w: this.width, h: this.height}) {
+    if (!isObject(dims)) dims = {w: this.width, h: this.height}
     const buffer = this.config.buffer || BUFFERSIZE
-      let {w, h} = dim;
-               w = this.width
-               h = (h) ? h : this.height
+    let w = (isNumber(dims?.w)) ? dims.w : this.width
+    let h = (isNumber(dims?.h)) ? dims.h : this.height
     
     // element widths are automatically handled by CSS
     this.setHeight(h)
@@ -513,13 +515,12 @@ export default class Chart extends Component{
    * @returns {boolean}
    */
   setYAxisType(t) {
+    let type = YAXIS_TYPE.valid(t)
     if (
-      !isString(t) ||
-      !YAXIS_TYPES.includes(t)  ||
-      (this.type == "primaryPane" && t == "percent")
+      (this.type == "primaryPane" && type == YAXIS_TYPE.percent)
     ) 
-    return false
-    this.#yAxisType = t
+      this.#yAxisType = YAXIS_TYPE.default
+    else this.#yAxisType = type
     return true
   }
 

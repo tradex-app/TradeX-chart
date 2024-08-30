@@ -1222,7 +1222,6 @@ addChart()
 // addChart()
 // addChart()
 // addChart()
-// addChart()
 /*
 document.getElementById("fullscreen").addEventListener("click", (e) => {
   chart0.requestFullscreen()
@@ -1235,6 +1234,8 @@ chart0.setIndicators({
   // DBLMA2: {id: "DBLMA2", name: "Double Moving Average", event: "addIndicator", ind: DblMA2 },
   TRDFLO: {id: "TRDFLO", name: "Trade Flow", event: "addIndicator", ind: TradeFlow },
 })
+/*
+
 chart0.addIndicator("VOL")
 chart0.addIndicator("MA")
 chart0.addIndicator("TEST", "Test1", {data: [], settings: {test: true}})

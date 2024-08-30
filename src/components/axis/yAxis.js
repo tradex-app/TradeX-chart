@@ -5,7 +5,7 @@ import { bRound, countDigits, log10, limitPrecision, numDigits } from "../../uti
 import { isNumber } from "../../utils/typeChecks";
 import { 
   YAXIS_STEP,
-  YAXIS_TYPES
+  YAXIS_TYPE
 } from "../../definitions/chart";
 import { YAxisFontSizeFactor } from "../../definitions/style";
 import { doStructuredClone } from "../../utils/utilities";
@@ -17,7 +17,7 @@ export default class yAxis extends Axis {
   #parent
   #source
   #chart
-  #yAxisType = YAXIS_TYPES[0]  // default, log, percent
+  #yAxisType = YAXIS_TYPE.percent
   #mode = "automatic"
   #transform = {
     automatic: {
@@ -48,15 +48,15 @@ export default class yAxis extends Axis {
 
   #range
 
-  constructor(parent, chart, yAxisType=YAXIS_TYPES[0], range) {
+  constructor(parent, chart, yAxisType=YAXIS_TYPE.default, range) {
     super(parent)
     this.#chart = chart
     this.#parent = parent
     this.#source = parent.parent
-    this.yAxisType = yAxisType
+    this.yAxisType = YAXIS_TYPE.valid(yAxisType)
 
     // use either chart.localRange or core.range
-    if (yAxisType == "relative")
+    if (yAxisType == YAXIS_TYPE.relative)
       range = this.core.range
     else 
       range = (range) ? range : this.core.range
@@ -71,7 +71,7 @@ export default class yAxis extends Axis {
   get yAxisPrecision() { return this.yAxisCalcPrecision }
   set yAxisPadding(p) { if (isNumber(p) || p != 0) this.#yAxisPadding = p }
   get yAxisPadding() { return this.#yAxisPadding }
-  set yAxisType(t) { this.#yAxisType = YAXIS_TYPES.includes(t) ? t : YAXIS_TYPES[0] }
+  set yAxisType(t) { this.#yAxisType = YAXIS_TYPE.valid(t) }
   get yAxisType() { return this.#yAxisType }
   set yAxisStep(s) { this.#yAxisStep = isNumber(s) ? s : YAXIS_STEP }
   get yAxisStep() { return this.#yAxisStep }
@@ -157,9 +157,9 @@ export default class yAxis extends Axis {
   yPos(y) {
     let val;
     switch(this.yAxisType) {
-      case "relative" : val = this.val2Pixel(y); break;
-      case "percent" : val = this.p100toPixel(y); break;
-      case "log" : val = this.$2Pixel(log10(y)); break;
+      case YAXIS_TYPE.relative : val = this.val2Pixel(y); break;
+      case YAXIS_TYPE.percent : val = this.p100toPixel(y); break;
+      case YAXIS_TYPE.log : val = this.$2Pixel(log10(y)); break;
       default : val = this.$2Pixel(y); break;
     }
     return bRound(val)
@@ -223,10 +223,22 @@ export default class yAxis extends Axis {
    * @memberof yAxis
    */
   p100toPixel(y) {
-      let max = this.#range.max //* p100Padding
-      let ratio = this.height / (max - this.#range.min)
-      let padding = Math.floor((max - this.#range.max) ) //* 0.5 )
-      return ((y - max) * -1 * ratio) // - padding
+    // let max = this.#range.max //* p100Padding
+    // let ratio = this.height / (max - this.#range.min)
+    // // let padding = Math.floor((max - this.#range.max) ) //* 0.5 )
+    // return ((y - max) * -1 * ratio) // - padding
+
+    // if (this.mode == "automatic") {
+    //   return this.$2Pixel(y)
+    // }
+    // else {
+    //   let diff = this.#range.max - this.#range.min
+    //   let delta = this.#range.max - y
+    //   return this.val2Pixel(y)
+    // }
+
+    return this.$2Pixel(y)
+
   }
 
 
@@ -291,7 +303,7 @@ export default class yAxis extends Axis {
 
   transformPrimarySecondary() {
     let t = this.#transform.manual;
-    if (this.#yAxisType != "percent" &&
+    if (this.#yAxisType != YAXIS_TYPE.percent &&
         !this.parent.parent.isPrimary) {
       let {pane} = this.getMaxMinDiff()
       t = pane
@@ -312,8 +324,6 @@ export default class yAxis extends Axis {
     t.mid = (diff) / 2
     t.diff = diff
     t.zoom = 0
-
-
   }
 
   setZoom(z) {
@@ -349,15 +359,16 @@ export default class yAxis extends Axis {
     this.#range = new Proxy(range, {
       get: (obj, prop) => {
         const m = this.#mode
-        const t = this.#transform
+        const t = this.#transform[m]
+        const p = t[prop]
         switch (prop) {
-          case "max": return t[m][prop] // "valueMax"
-          case "min":  return t[m][prop] // "valueMin"
-          case "mid": return t[m].min + (t[m].max - t[m].min) // "priceMid"
-          case "diff": return t[m].max - t[m].min
-          case "zoom": return t[m][prop]
-          case "offset": return t[m][prop]
-          case "secondaryMaxMin": return t[m][prop]
+          case "max": return p // "valueMax"
+          case "min":  return p // "valueMin"
+          case "mid": return t.min + (t.max - t.min) // "priceMid"
+          case "diff": return t.max - t.min
+          case "zoom": return p
+          case "offset": return p
+          case "secondaryMaxMin": return p
           default: return obj[prop]
         }
       }
@@ -371,11 +382,11 @@ export default class yAxis extends Axis {
     min = (this.#range.min > 0) ? this.#range.min : 0;
 
     switch (this.yAxisType) {
-      case "percent":
+      case YAXIS_TYPE.percent:
         max = (this.#range.max > -10) ? this.#range.max : 110
         min = (this.#range.min > -10) ? this.#range.min : -10
         break;
-      case "relative":
+      case YAXIS_TYPE.relative:
         mm = this.getMaxMinDiff()
         max = mm.max
         min = mm.min

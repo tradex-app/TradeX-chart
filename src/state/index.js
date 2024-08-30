@@ -120,7 +120,7 @@ export default class State {
   static get default() { return copyDeep(DEFAULT_STATE) }
   static get list() { return State.#stateList }
 
-  static create(state, deepValidate=false, isCrypto=false) {
+  static create(state=State.default, deepValidate=false, isCrypto=false) {
     const instance = new State(state, deepValidate, isCrypto)
     const key = instance.key
     State.#stateList.set(key,instance)
@@ -204,20 +204,6 @@ export default class State {
         state.datasets = []
     }
     state.allData.datasets = state.datasets
-
-// TODO: trades
-// TODO: events
-// TODO: annotations
-// tools
-
-
-
-// TODO: trades
-// TODO: events
-// TODO: annotations
-// tools
-
-
 
     // Build chart order
     if (state.views.length == 0) {
@@ -446,9 +432,10 @@ export default class State {
   #status = false
   #isEmpty = true
   #mergeList = []
+  #dataSource
   #core
 
-  constructor(state, deepValidate=false, isCrypto=false) {
+  constructor(state=State.default, deepValidate=false, isCrypto=false) {
     // validate state
     if (isObject(state)) {
       this.#data = State.validate(state, deepValidate, isCrypto)
@@ -626,8 +613,8 @@ export default class State {
     // if the chart empty is empty set the range to the merge data
     if (this.#isEmpty || !isNumber(tfMS)) {
       if (!isObject(newRange) ||
-          !isNumber(newRange.start) ||
-          !isNumber(newRange.end) ) {
+          !isInteger(newRange.start) ||
+          !isInteger(newRange.end) ) {
         if (end > 1) {
           newRange = {start: end - this.range.initialCnt, end}
         }
@@ -635,14 +622,14 @@ export default class State {
     }
     // convert newRange values to timestamps
     if (isObject(newRange)) {
-      if (isNumber(newRange?.startTS))
+      if (isInteger(newRange?.startTS))
         newRange.start = newRange.startTS
       else
-        newRange.start = (isNumber(newRange.start)) ? this.range.value(newRange.start)[0] : this.range.timeMin
-      if (isNumber(newRange?.endTS))
+        newRange.start = (isInteger(newRange.start)) ? this.range.value(newRange.start)[0] : this.range.timeMin
+      if (isInteger(newRange?.endTS))
         newRange.end = newRange.endTS
       else
-        newRange.end = (isNumber(newRange.end)) ? this.range.value(newRange.end)[0] : this.range.timeMax
+        newRange.end = (isInteger(newRange.end)) ? this.range.value(newRange.end)[0] : this.range.timeMax
     }
     // ensure range remains temporally fixed
     else {
@@ -793,8 +780,8 @@ export default class State {
       // set new Range if required
       if (newRange) {
         if (isObject(newRange)) {
-          start = (isNumber(newRange.start)) ? this.range.getTimeIndex(newRange.start) : this.range.indexStart
-          end = (isNumber(newRange.end)) ? this.range.getTimeIndex(newRange.end) : this.range.indexEnd
+          start = (isInteger(newRange.start)) ? this.range.getTimeIndex(newRange.start) : this.range.indexStart
+          end = (isInteger(newRange.end)) ? this.range.getTimeIndex(newRange.end) : this.range.indexEnd
         }
         else {
           if (mData[0][0] )

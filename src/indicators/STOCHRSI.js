@@ -5,7 +5,7 @@
 
 import Indicator from "../components/overlays/indicator"
 import {STOCHRSI as talibAPI } from "../definitions/talib-api";
-import { YAXIS_TYPES } from "../definitions/chart";
+import { YAXIS_TYPE } from "../definitions/chart";
 
 
 /**
@@ -38,7 +38,7 @@ export default class STOCHRSI extends Indicator {
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false
-  static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative
+  static scale = YAXIS_TYPE.relative
   static defaultStyle = {
 
     fastK: {

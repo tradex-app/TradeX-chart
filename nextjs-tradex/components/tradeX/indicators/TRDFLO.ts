@@ -1,7 +1,14 @@
 // @ts-nocheck
+// import { Indicator } from '../../../../src';
+// import { candleW } from '../../../../src';
+// import { YAXIS_TYPE } from '../../../../src';
+// import { YAXIS_PADDING } from '../../../../src/definitions/chart';
+// import { isObject } from '../../../../src/utils/typeChecks';
+
+// to be used in production
 import { Indicator } from 'tradex-chart';
 import { candleW } from 'tradex-chart';
-import { YAXIS_TYPES } from 'tradex-chart';
+import { YAXIS_TYPE } from 'tradex-chart';
 import { YAXIS_PADDING } from 'tradex-chart';
 import { typeChecks } from 'tradex-chart';
 
@@ -14,7 +21,7 @@ export default class TradeFlow extends Indicator {
   static version = '1.0';
   static inCnt = 0;
   static primaryPane = false;
-  static scale = YAXIS_TYPES[2]; // YAXIS_TYPES - relative
+  static scale = YAXIS_TYPE.relative
   static yAxisPadding = YAXIS_PADDING;
   static colours = [];
   static defaultStyle = {
@@ -72,14 +79,10 @@ export default class TradeFlow extends Indicator {
    * @returns {boolean|array}
    */
   calcIndicatorHistory() {
-    const state = this.core.state
-    if (!isObject(state.trades.data[state.time.timeFrame]))
-      return false;
+    const state = this.core.state;
+    if (!isObject(state.trades.data[state.time.timeFrame])) return false;
     // create a time series array from State trades entries
-    this.dataProxy(
-      this.dataProxyFn,
-      state.trades.data[state.time.timeFrame]
-    );
+    this.dataProxy(this.dataProxyFn, state.trades.data[state.time.timeFrame]);
 
     return false;
   }

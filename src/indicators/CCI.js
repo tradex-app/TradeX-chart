@@ -5,7 +5,7 @@
 
 import Indicator from "../components/overlays/indicator"
 import { CCI as talibAPI } from "../definitions/talib-api";
-import { YAXIS_TYPES } from "../definitions/chart";
+import { YAXIS_TYPE } from "../definitions/chart";
 
 
 export default class CCI extends Indicator {
@@ -20,7 +20,7 @@ export default class CCI extends Indicator {
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false
-  static scale = YAXIS_TYPES[2] // YAXIS_TYPES - relative
+  static scale = YAXIS_TYPE.relative
   static defaultStyle = {
     output: {
       colour: {value: "#E91E63"},
