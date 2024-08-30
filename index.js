@@ -1221,7 +1221,6 @@ addChart()
 addChart()
 // addChart()
 // addChart()
-// addChart()
 /*
 document.getElementById("fullscreen").addEventListener("click", (e) => {
   chart0.requestFullscreen()

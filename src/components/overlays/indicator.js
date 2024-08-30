@@ -151,7 +151,7 @@ export default class Indicator extends Overlay {
     this.legendName = overlay?.legendName
     this.#legendVisibility = (isBoolean(overlay?.legendVisibility)) ? overlay.legendVisibility : true
     this.#palette = palette
-    this.style = (overlay?.settings?.style) ? 
+    this.style = (isObject(overlay?.settings?.style)) ? 
     {...this.constructor.defaultStyle, ...overlay.settings.style} : 
     {...this.constructor.defaultStyle, ...config.style};
     // this.meta
@@ -970,7 +970,7 @@ export default class Indicator extends Overlay {
       style[o.name] = {}
     
     // is colour valid?
-    let c = new Colour(style[o.name]?.colour.value)
+    let c = new Colour(style[o.name]?.colour?.value)
     if (!c.isValid) {
       let k = this.colours.length
           v = (x <= k) ? this.colours[x] : this.colours[k%x]
@@ -982,7 +982,7 @@ export default class Indicator extends Overlay {
 
 
     // is width valid?
-    if (!isNumber(style[o.name]?.width.value))
+    if (!isNumber(style[o.name]?.width?.value))
       v = 1
     else
       v = style[o.name]?.width.value
@@ -990,14 +990,13 @@ export default class Indicator extends Overlay {
     style[o.name].width = this.defaultOutputField(`${o.name}Width`, `${o.name} Width`, v, "number", 0)
 
     if ("dash" in style[o.name] && (!!style[o.name].dash)) {
-      v = style[o.name]?.dash.value
+      v = style[o.name]?.dash?.value
       style[o.name].dash = this.defaultOutputField(`${o.name}dash`, `${o.name} Dash`, v, "dash", undefined, undefined, )
     }
 
 
     // style[o.name].fillS = string
     // style[o.name].fillStyle = #RBBA
-    // style[o.name].dash = string - 2, 10 
     return style[o.name]
   }
 
