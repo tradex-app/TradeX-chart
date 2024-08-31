@@ -105,7 +105,6 @@ export default class tradeXChart extends element {
 
       this.resizeObserver = new ResizeObserver(debounce(this.onResized, 100, this))
       this.resizeObserver.observe(this)
-      
       this.start(defaultConfig)
     }
   }

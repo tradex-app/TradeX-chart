@@ -16,21 +16,26 @@ export const isNode =
   process.versions != null &&
   process.versions.node != null;
 
-/* eslint-disable no-undef */
 export const isJsDom = 
   (typeof window !== 'undefined' && window.name === 'nodejs') ||
-  navigator.userAgent.includes('Node.js') ||
-  navigator.userAgent.includes('jsdom');
+  (typeof navigator !== 'undefined' &&
+    (navigator.userAgent.includes('Node.js') ||
+    navigator.userAgent.includes('jsdom')));
+
 
 export const isTouchDevice = (w => 
-  'onorientationchange' in w ||
-  w.matchMedia("(any-pointer:coarse)").matches ||
-  (!!navigator.maxTouchPoints ||
-  !!navigator.msMaxTouchPoints ||
-  ('ontouchstart' in w ||
-  (w.DocumentTouch &&
-  document instanceof w.DocumentTouch))))
-  (typeof window !== 'undefined' ? window : {})
+  typeof w !== 'undefined' && (
+    'onorientationchange' in w ||
+    (typeof w.matchMedia === 'function' && w.matchMedia("(any-pointer:coarse)").matches) ||
+    (typeof navigator !== 'undefined' && (
+      navigator.maxTouchPoints > 0 ||
+      navigator.msMaxTouchPoints > 0 ||
+      'ontouchstart' in w ||
+      (w.DocumentTouch && document instanceof w.DocumentTouch)
+    ))
+  )
+)(typeof window !== 'undefined' ? window : {});
+
 
 export const getGlobalObject = () => {
   if (typeof globalThis !== 'undefined') { return globalThis; }
