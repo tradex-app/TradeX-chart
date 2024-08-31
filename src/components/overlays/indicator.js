@@ -179,7 +179,7 @@ export default class Indicator extends Overlay {
     // })
   }
 
-  get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
+  get id() { return this.#ID || `${this.core.ID}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
   set id(id) { this.#ID = idSanitize(new String(id)) }
   get version() { return `${this.constructor?.version}` }
   get context() { return this.#context }

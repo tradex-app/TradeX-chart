@@ -97,7 +97,7 @@ export default class Overlays {
         this.#parent.Scale,
         this.#core.theme,
         this,
-        overlay.params
+        overlay?.params
       )
       if (!isString(overlay.instance?.id)) 
         overlay.instance.id = key

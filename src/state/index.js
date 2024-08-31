@@ -600,13 +600,13 @@ export default class State {
     // time frames don't match
     if (end > 1 &&
         tfMS !== detectInterval(merge?.ohlcv)) {
-      this.error(`ERROR: ${this.core.id}: merge data time frame does not match existing time frame!`)
+      this.error(`ERROR: ${this.core.ID}: merge data time frame does not match existing time frame!`)
       return false
     }
 
     // // Not valid chart data
     // if (!isArray(merge?.ohlcv)) {
-    //   this.error(`ERROR: ${this.core.id}: merge chart data must be of type Array!`)
+    //   this.error(`ERROR: ${this.core.ID}: merge chart data must be of type Array!`)
     //   return false
     // }
 

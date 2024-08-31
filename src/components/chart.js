@@ -49,12 +49,12 @@ export const defaultOverlays = {
     ["candles", {class: chartCandles, fixed: false, required: true}],
     ["hiLo", {class: chartHighLow, fixed: true, required: false}],
     ["stream", {class: chartCandleStream, fixed: false, required: true}],
-    ["tools", {class: chartTools, fixed: false, required: true}],
+    // ["tools", {class: chartTools, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ],
   secondaryPane: [
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
-    ["tools", {class: chartTools, fixed: false, required: true}],
+    // ["tools", {class: chartTools, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ]
 }
@@ -183,7 +183,7 @@ export default class Chart extends Component{
   }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return this.#id || idSanitize(`${this.core.id}-${this.#name}_${this.#chartCnt}`) }
+  get id() { return this.#id || idSanitize(`${this.core.ID}-${this.#name}_${this.#chartCnt}`) }
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   set title(t) { this.setTitle(t) }
@@ -706,7 +706,7 @@ export default class Chart extends Component{
    * @param {Array|boolean} candle - OHLCV
    */
   updateLegends(pos = this.#cursorPos, candle = false) {
-    if (this.core.isEmpty || !isObject(this.#Legends)) return
+    if (this.core.IDEmpty || !isObject(this.#Legends)) return
 
     for (const legend in this.#Legends.list) {
       this.#Legends.update(legend, { pos, candle });

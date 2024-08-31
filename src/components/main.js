@@ -207,6 +207,7 @@ export default class MainPane extends Component {
     
     // start each view / chart pane 
     this.#ChartPanes.forEach((view, key) => {
+
       view.start(i++)
       // suppress divider of first chart pane as no preceding pane
       if (i === 1) view.Divider.hide()

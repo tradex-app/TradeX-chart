@@ -17,7 +17,6 @@ export default class element extends HTMLElement {
   #template
   #hub
 
-  id = uid( SHORTNAME )
   doInit = true
   intersectionObserver 
   mutationObserver 

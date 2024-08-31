@@ -1,18 +1,18 @@
 // @ts-nocheck
-// import { Indicator } from '../../../../src';
-// import { candleW } from '../../../../src';
-// import { YAXIS_TYPE } from '../../../../src';
-// import { YAXIS_PADDING } from '../../../../src/definitions/chart';
-// import { isObject } from '../../../../src/utils/typeChecks';
+import { Indicator } from '../../../../src';
+import { candleW } from '../../../../src';
+import { YAXIS_TYPE } from '../../../../src';
+import { YAXIS_PADDING } from '../../../../src/definitions/chart';
+import { isObject } from '../../../../src/utils/typeChecks';
 
 // to be used in production
-import { Indicator } from 'tradex-chart';
-import { candleW } from 'tradex-chart';
-import { YAXIS_TYPE } from 'tradex-chart';
-import { YAXIS_PADDING } from 'tradex-chart';
-import { typeChecks } from 'tradex-chart';
+// import { Indicator } from 'tradex-chart';
+// import { candleW } from 'tradex-chart';
+// import { YAXIS_TYPE } from 'tradex-chart';
+// import { YAXIS_PADDING } from 'tradex-chart';
+// import { typeChecks } from 'tradex-chart';
 
-const isObject = typeChecks.isObject;
+// const isObject = typeChecks.isObject;
 
 /**
  * custom indicator class
