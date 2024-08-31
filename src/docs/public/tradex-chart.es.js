@@ -24,10 +24,10 @@ function _(a) {
 function b(a) {
   return typeof a == "object" && !Array.isArray(a) && a !== null;
 }
-function P(a) {
+function M(a) {
   return typeof a == "number" && !isNaN(a);
 }
-function k(a) {
+function I(a) {
   return typeof a == "number" && Math.abs(a % 1) === 0;
 }
 function ca(a) {
@@ -48,7 +48,7 @@ function da(a) {
 function ma(a) {
   return a instanceof Error;
 }
-function ai(a) {
+function ri(a) {
   return !(a && a.constructor === Function) || a.prototype === void 0 || Object.getOwnPropertyNames(a).includes("arguments") || Object.getOwnPropertyNames(a).includes("arguments") || Object.getOwnPropertyNames(a).includes("arguments") ? !1 : Function.prototype !== Object.getPrototypeOf(a) ? !0 : Object.getOwnPropertyNames(a.prototype).length > 1;
 }
 function pa(a, e) {
@@ -60,9 +60,9 @@ function pa(a, e) {
     case "object":
       return b(e);
     case "integer":
-      return k(e);
+      return I(e);
     case "number":
-      return P(e);
+      return M(e);
     case "valid":
       return ca(e);
     case "boolean":
@@ -76,7 +76,7 @@ function pa(a, e) {
     case "error":
       return ma(e);
     case "class":
-      return ai(e);
+      return ri(e);
     default:
       throw new Error(`No known test for type: ${a}`);
   }
@@ -375,13 +375,13 @@ class ut {
     }
   }
   set x(e) {
-    P(e) && (this.#e = e);
+    M(e) && (this.#e = e);
   }
   get x() {
     return this.#e;
   }
   set y(e) {
-    P(e) && (this.#t = e);
+    M(e) && (this.#t = e);
   }
   get y() {
     return this.#t;
@@ -406,7 +406,7 @@ var Ea = { exports: {} };
       return setTimeout(re(u, g), m);
     }
     function S(u, m, g) {
-      return Array.isArray(u) ? (M(u, g[m], g), !0) : !1;
+      return Array.isArray(u) ? (P(u, g[m], g), !0) : !1;
     }
     function P(u, m, g) {
       var C;
@@ -487,7 +487,7 @@ var Ea = { exports: {} };
     function bt(u) {
       return u.trim().split(/\s+/g);
     }
-    function je(u, m, g) {
+    function Xe(u, m, g) {
       if (u.indexOf && !g)
         return u.indexOf(m);
       for (var C = 0; C < u.length; ) {
@@ -497,7 +497,7 @@ var Ea = { exports: {} };
       }
       return -1;
     }
-    function gi(u) {
+    function fi(u) {
       return Array.prototype.slice.call(u, 0);
     }
     function zn(u, m, g) {
@@ -841,7 +841,7 @@ var Ea = { exports: {} };
     function Ge(u) {
       this.options = $({}, this.defaults, u || {}), this.id = wl(), this.manager = null, this.options.enable = D(this.options.enable, !0), this.state = Ti, this.simultaneous = {}, this.requireFail = [];
     }
-    qe.prototype = {
+    Ge.prototype = {
       defaults: {},
       set: function(u) {
         return $(this.options, u), this.manager && this.manager.touchAction.update(), this;
@@ -850,22 +850,22 @@ var Ea = { exports: {} };
         if (S(u, "recognizeWith", this))
           return this;
         var m = this.simultaneous;
-        return u = Si(u, this), m[u.id] || (m[u.id] = u, u.recognizeWith(this)), this;
+        return u = Ei(u, this), m[u.id] || (m[u.id] = u, u.recognizeWith(this)), this;
       },
       dropRecognizeWith: function(u) {
-        return S(u, "dropRecognizeWith", this) ? this : (u = Si(u, this), delete this.simultaneous[u.id], this);
+        return S(u, "dropRecognizeWith", this) ? this : (u = Ei(u, this), delete this.simultaneous[u.id], this);
       },
       requireFailure: function(u) {
         if (S(u, "requireFailure", this))
           return this;
         var m = this.requireFail;
-        return u = Ei(u, this), je(m, u) === -1 && (m.push(u), u.requireFailure(this)), this;
+        return u = Ei(u, this), Xe(m, u) === -1 && (m.push(u), u.requireFailure(this)), this;
       },
       dropRequireFailure: function(u) {
         if (S(u, "dropRequireFailure", this))
           return this;
         u = Ei(u, this);
-        var m = je(this.requireFail, u);
+        var m = Xe(this.requireFail, u);
         return m > -1 && this.requireFail.splice(m, 1), this;
       },
       hasRequireFailures: function() {
@@ -915,10 +915,7 @@ var Ea = { exports: {} };
     function lr(u) {
       return u == Vt ? "down" : u == Ut ? "up" : u == Bt ? "left" : u == Ft ? "right" : "";
     }
-    function or(u) {
-      return u == zt ? "down" : u == Vt ? "up" : u == Ft ? "left" : u == Ut ? "right" : "";
-    }
-    function Si(u, m) {
+    function Ei(u, m) {
       var g = m.manager;
       return g ? g.get(u) : u;
     }
@@ -978,7 +975,7 @@ var Ea = { exports: {} };
         return [lt];
       },
       attrTest: function(u) {
-        return this._super.attrTest.call(this, u) && (Math.abs(u.scale - 1) > this.options.threshold || this.state & Le);
+        return this._super.attrTest.call(this, u) && (Math.abs(u.scale - 1) > this.options.threshold || this.state & Ae);
       },
       emit: function(u) {
         if (u.scale !== 1) {
@@ -1007,7 +1004,7 @@ var Ea = { exports: {} };
           this.reset();
         else if (u.eventType & fe)
           this.reset(), this._timer = v(function() {
-            this.state = Ge, this.tryEmit();
+            this.state = We, this.tryEmit();
           }, m.time, this);
         else if (u.eventType & Q)
           return We;
@@ -1017,7 +1014,7 @@ var Ea = { exports: {} };
         clearTimeout(this._timer);
       },
       emit: function(u) {
-        this.state === Ge && (u && u.eventType & Q ? this.manager.emit(this.options.event + "up", u) : (this._input.timeStamp = f(), this.manager.emit(this.options.event, this._input)));
+        this.state === We && (u && u.eventType & Q ? this.manager.emit(this.options.event + "up", u) : (this._input.timeStamp = f(), this.manager.emit(this.options.event, this._input)));
       }
     });
     function ws() {
@@ -1033,7 +1030,7 @@ var Ea = { exports: {} };
         return [lt];
       },
       attrTest: function(u) {
-        return this._super.attrTest.call(this, u) && (Math.abs(u.rotation) > this.options.threshold || this.state & Le);
+        return this._super.attrTest.call(this, u) && (Math.abs(u.rotation) > this.options.threshold || this.state & Ae);
       }
     });
     function xs() {
@@ -1048,7 +1045,7 @@ var Ea = { exports: {} };
         pointers: 1
       },
       getTouchAction: function() {
-        return Pi.prototype.getTouchAction.call(this);
+        return Si.prototype.getTouchAction.call(this);
       },
       attrTest: function(u) {
         var m = this.options.direction, g;
@@ -1060,7 +1057,7 @@ var Ea = { exports: {} };
       }
     });
     function Pi() {
-      qe.apply(this, arguments), this.pTime = !1, this.pCenter = !1, this._timer = null, this._input = null, this.count = 0;
+      Ge.apply(this, arguments), this.pTime = !1, this.pCenter = !1, this._timer = null, this._input = null, this.count = 0;
     }
     U(Pi, Ge, {
       defaults: {
@@ -1087,8 +1084,8 @@ var Ea = { exports: {} };
           var ae = this.count % m.taps;
           if (ae === 0)
             return this.hasRequireFailures() ? (this._timer = v(function() {
-              this.state = Ge, this.tryEmit();
-            }, m.interval, this), Le) : Ge;
+              this.state = We, this.tryEmit();
+            }, m.interval, this), Ae) : We;
         }
         return Fe;
       },
@@ -1101,7 +1098,7 @@ var Ea = { exports: {} };
         clearTimeout(this._timer);
       },
       emit: function() {
-        this.state == Ge && (this._input.tapCount = this.count, this.manager.emit(this.options.event, this._input));
+        this.state == We && (this._input.tapCount = this.count, this.manager.emit(this.options.event, this._input));
       }
     });
     function Ye(u, m) {
@@ -1156,7 +1153,7 @@ var Ea = { exports: {} };
         }
       },
       get: function(u) {
-        if (u instanceof qe)
+        if (u instanceof Ge)
           return u;
         for (var m = this.recognizers, g = 0; g < m.length; g++)
           if (m[g].options.event == u)
@@ -1173,7 +1170,7 @@ var Ea = { exports: {} };
         if (S(u, "remove", this))
           return this;
         if (u = this.get(u), u) {
-          var m = this.recognizers, g = je(m, u);
+          var m = this.recognizers, g = Xe(m, u);
           g !== -1 && (m.splice(g, 1), this.touchAction.update());
         }
         return this;
@@ -1504,11 +1501,6 @@ class Zh extends es {
         target: n.target
       }), this.enableUpEvent && n.type === "keyup" && this.callback({
         type: Pr,
-        srcEvent: n,
-        key: n.key,
-        target: n.target
-      }), this.enableUpEvent && n.type === "keyup" && this.callback({
-        type: Sr,
         srcEvent: n,
         key: n.key,
         target: n.target
@@ -2080,7 +2072,7 @@ class ze {
 function fc(a, e) {
   return a = Math.ceil(a) + 1, e = Math.floor(e), Math.floor(Math.random() * (e - a) + a);
 }
-function ki(a) {
+function Ri(a) {
   const e = {};
   return e.value = a, e.sign = !!a, e.integers = Ma(a), e.decimals = gc(a), e.total = e.integers + e.decimals, e;
 }
@@ -2099,8 +2091,8 @@ function gc(a) {
 }
 function zs(a, e) {
   if (a == 0) return "0";
-  const i = ki(a);
-  if (k(e))
+  const i = Ri(a);
+  if (I(e))
     return `${new Number(i.value).toFixed(e)}`;
   let { sign: s, integers: n, decimals: r, value: o } = i;
   e = isNaN(e) ? ha : e, r = F(r, 0, e), o = new Number(o).toFixed(r);
@@ -2387,17 +2379,17 @@ class ve extends Map {
     return L(e) ? (this.clear(), e.forEach(([i, s]) => this.set(i, s)), !0) : !1;
   }
   insertIndex(e, i, s) {
-    if (!P(e)) return !1;
+    if (!M(e)) return !1;
     const n = [...this];
     return n.splice(e, 0, [i, s]), this.populate(n), !0;
   }
   removeIndex(e) {
-    if (!P(e)) return !1;
+    if (!M(e)) return !1;
     const i = [...this];
     return i.splice(e, 1), this.populate(i), !0;
   }
   swapIndices(e, i) {
-    if (!P(e) || !P(i)) return !1;
+    if (!M(e) || !M(i)) return !1;
     const s = [...this];
     return Ia(s, e, i), this.populate(s), !0;
   }
@@ -2692,7 +2684,7 @@ class Xi {
     return this.dataLength + this.limitFuture - 1;
   }
   set initialCnt(e) {
-    k(e) && (this.#a = e);
+    I(e) && (this.#a = e);
   }
   get initialCnt() {
     return this.#a;
@@ -2721,11 +2713,11 @@ class Xi {
   end() {
   }
   isFutureLimit(e = this.indexEnd) {
-    if (k(e))
+    if (I(e))
       return e > this.futureLimitIndex;
   }
   isPastLimit(e = this.indexStart) {
-    if (k(e))
+    if (I(e))
       return e < this.pastLimitIndex;
   }
   set(e = 0, i = this.dataLength, s = this.maxCandles) {
@@ -2750,7 +2742,7 @@ class Xi {
     let s;
     if (i == "chart") s = this.data;
     else if (s = this.getDataById(i), !s) return null;
-    k(e) || (e = s.length - 1);
+    I(e) || (e = s.length - 1);
     let n = s[e];
     if (n !== void 0) return n;
     {
@@ -2759,7 +2751,7 @@ class Xi {
     }
   }
   valueByTS(e, i = "") {
-    if (!k(e) || !T(i)) return !1;
+    if (!I(e) || !T(i)) return !1;
     const s = this.getTimeIndex(e);
     let n;
     switch (i) {
@@ -2793,7 +2785,7 @@ class Xi {
     return !1;
   }
   getTimeIndex(e) {
-    if (!k(e)) return !1;
+    if (!I(e)) return !1;
     e = e - e % this.interval;
     let i = this.data.length > 0 ? this.data[0][0] : this.anchor;
     return e === i ? 0 : e < i ? (i - e) / this.interval * -1 : (e - i) / this.interval;
@@ -2921,7 +2913,7 @@ function Gs(a) {
 function Hc(a, e) {
   if (!(a instanceof ti)) return !1;
   const i = a.range.data || [], s = i.length;
-  k(e) || (k(i[s - 1][0]) ? e = i[s - 1][0] : e = Date.now());
+  I(e) || (I(i[s - 1][0]) ? e = i[s - 1][0] : e = Date.now());
   let n, r = a.timeFrameMS;
   return e = e - e % r, i.length === 0 ? n = !1 : e === i[0][0] ? n = 0 : e < i[0][0] ? n = Math.floor((i[0][0] - e) / r) * -1 : n = Math.floor((e - i[0][0]) / r), n;
 }
@@ -2998,7 +2990,7 @@ const Ne = G * 365, oi = {
   return e;
 }, qs = qc(), Xc = Object.keys(pi), jc = () => {
   const a = {};
-  for (const [e, i] of Object.entries(fi))
+  for (const [e, i] of Object.entries(pi))
     a[e] = i[0];
   return a;
 }, Yc = jc();
@@ -3008,11 +3000,11 @@ function Kc() {
 }
 function Zc() {
   const a = {};
-  for (let e in li) {
+  for (let e in oi) {
     let i = 0;
     a[e] = [];
     do
-      a[e].push(Math.round(li[e] * i)), i += 0.125;
+      a[e].push(Math.round(oi[e] * i)), i += 0.125;
     while (i < 1);
   }
   return a;
@@ -3024,17 +3016,17 @@ function vn(a) {
 function ja(a, e = Ga, i = Date.now()) {
   return vn(a) ? a > e && a < i : !1;
 }
-function Yt(a, e, i) {
+function Xt(a, e, i) {
   a = new Date(a), e = new Date(e);
   var s = e.getTime(), n = a.getTime();
   return parseInt((s - n) / i);
 }
-const Ze = {
+const Ke = {
   inSeconds: function(a, e) {
-    return Yt(a, e, te);
+    return Xt(a, e, te);
   },
   inMinutes: function(a, e) {
-    return Yt(a, e, ie);
+    return Xt(a, e, ie);
   },
   inHours: function(a, e) {
     return Xt(a, e, pe);
@@ -3043,7 +3035,7 @@ const Ze = {
     return Xt(a, e, G);
   },
   inWeeks: function(a, e) {
-    return Yt(a, e, Rt);
+    return Xt(a, e, It);
   },
   inMonths: function(a, e) {
     a = new Date(a), e = new Date(e);
@@ -3078,13 +3070,13 @@ function Qc(a, e) {
 }
 function Xs(a) {
   let e = te;
-  return T(a) ? (e = hi(a), e ? a = a : (e = te, a = "1s")) : a = "1s", { tf: a, ms: e };
+  return T(a) ? (e = li(a), e ? a = a : (e = te, a = "1s")) : a = "1s", { tf: a, ms: e };
 }
-function hi(a) {
+function li(a) {
   if (!T(a)) return !1;
   const e = /([0-9]{1,2})([s|m|h|d|w|M|y])/gm;
   let i;
-  return (i = e.exec(a)) !== null ? li[i[2]] * i[1] : !1;
+  return (i = e.exec(a)) !== null ? oi[i[2]] * i[1] : !1;
 }
 function bn(a) {
   let e = Math.floor(a / 1e3), i = Math.floor(e / 60);
@@ -3142,7 +3134,7 @@ function Tn(a) {
 function Jc(a, e = "en-GB", i = "short") {
   return new Date(a).toLocaleDateString(e, { weekday: i });
 }
-function ci(a) {
+function hi(a) {
   return new Date(a).setUTCHours(0, 0, 0, 0);
 }
 function En(a) {
@@ -3182,7 +3174,7 @@ function eu(a) {
   let e = new Date(a), i = e.getUTCMonth(), s = e.getUTCDate(), n = dayCount[i] + s;
   return i > 1 && is() && n++, n;
 }
-function $i(a, e) {
+function ki(a, e) {
   return {
     years: (s) => Pn(s),
     months: (s) => Sn(s),
@@ -3243,9 +3235,9 @@ function su(a, e) {
   }
   return [n, s];
 }
-class ii {
+class ti {
   #e = {};
-  #t = si();
+  #t = ii();
   #i = Intl.DateTimeFormat().resolvedOptions().timeZone;
   constructor(e) {
     e instanceof Xi && (this.#e = e), this.setTimeZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -3266,7 +3258,7 @@ class ii {
     return this.#i;
   }
   set timeZoneOffset(e) {
-    this.#t = P(e) ? e : (/* @__PURE__ */ new Date()).getTimezoneOffset();
+    this.#t = M(e) ? e : (/* @__PURE__ */ new Date()).getTimezoneOffset();
   }
   get timeZoneOffset() {
     return this.#t;
@@ -3275,10 +3267,10 @@ class ii {
     return this.#e.indexed;
   }
   setTimeZone(e) {
-    Intl.supportedValuesOf("timeZone").includes(e) && (this.#i = e, this.#t = si(e));
+    Intl.supportedValuesOf("timeZone").includes(e) && (this.#i = e, this.#t = ii(e));
   }
   getTimezoneOffset(e, i) {
-    si(e, i);
+    ii(e, i);
   }
   getIANATimeZones(e) {
     io(e);
@@ -3287,11 +3279,11 @@ class ii {
 function io(a = "en-US") {
   const e = {};
   return Intl.supportedValuesOf("timeZone").forEach((i) => {
-    let s = si(i, a);
+    let s = ii(i, a);
     e[i] = s;
   }), e;
 }
-function si(a = Intl.DateTimeFormat().resolvedOptions().timeZone, e = "en-US") {
+function ii(a = Intl.DateTimeFormat().resolvedOptions().timeZone, e = "en-US") {
   const i = /* @__PURE__ */ new Date(), s = i.toLocaleString(e, { timeZone: a }), n = i.toLocaleString(e);
   return -((Date.parse(n) - Date.parse(s)) / 36e5 + i.getTimezoneOffset() / 60);
 }
@@ -3386,7 +3378,7 @@ class oe {
   static c = 4;
   static v = 5;
 }
-const _i = {
+const $i = {
   mainPane: {},
   primaryPane: {},
   secondaryPane: {},
@@ -3571,7 +3563,7 @@ const hu = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   "- - - - -": [10, 10],
   "─ ─ ─ ─ ─": [20, 5],
   "─ ▪ ─ ▪ ─": [15, 3, 3, 3]
-}, tt = {
+}, et = {
   COLOUR_ICON: ui,
   COLOUR_ICONHOVER: Rt,
   ICONSIZE: ho
@@ -3600,12 +3592,12 @@ const hu = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   OHLC: "ohlc",
   AREA: "area",
   LINE: "line"
-}, Ai = {
+}, Mi = {
   COLOUR_CANDLE_UP: "#00F04088",
   COLOUR_CANDLE_DN: "#F0004088",
   COLOUR_WICK_UP: "#0F4",
   COLOUR_WICK_DN: "#F04"
-}, Hi = {
+}, _i = {
   COLOUR_VOLUME_UP: "#00F04044",
   COLOUR_VOLUME_DN: "#F0004044",
   ONCHART_VOLUME_HEIGHT: 15
@@ -3679,9 +3671,9 @@ const hu = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
     DnWickColour: Mi.COLOUR_WICK_DN
   },
   volume: {
-    Height: Hi.ONCHART_VOLUME_HEIGHT,
-    UpColour: Hi.COLOUR_VOLUME_UP,
-    DnColour: Hi.COLOUR_VOLUME_DN
+    Height: _i.ONCHART_VOLUME_HEIGHT,
+    UpColour: _i.COLOUR_VOLUME_UP,
+    DnColour: _i.COLOUR_VOLUME_DN
   },
   xAxis: {
     colourTick: ct.COLOUR_TICK,
@@ -3694,8 +3686,8 @@ const hu = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
     line: "#656565",
     slider: "#555555",
     handle: "#55555588",
-    icon: di,
-    iconHover: kt
+    icon: ui,
+    iconHover: Rt
   },
   yAxis: {
     colourTick: _e.COLOUR_TICK,
@@ -3748,8 +3740,8 @@ const hu = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
     controlsH: 18
   },
   icon: {
-    colour: di,
-    hover: kt
+    colour: ui,
+    hover: Rt
   },
   divider: {
     active: Li.ACTIVE,
@@ -3760,8 +3752,8 @@ const hu = '<svg width="46.08" height="46.08" viewBox="-51.2 -51.2 614.4 614.4" 
   window: Ze,
   watermark: Yu,
   trades: {
-    iconBuy: Ls.arrowUp,
-    iconSell: Ls.arrowDown,
+    iconBuy: As.arrowUp,
+    iconSell: As.arrowDown,
     iconHeight: 30,
     iconWidth: 30,
     iconMinDim: 10,
@@ -3969,7 +3961,7 @@ class Fi extends mo {
     return this.width / this.range.rangeDuration;
   }
   set xAxisTicks(e) {
-    this.#e = P(e) ? e : 0;
+    this.#e = M(e) ? e : 0;
   }
   get xAxisTicks() {
     return this.#e;
@@ -4040,7 +4032,7 @@ class Fi extends mo {
     const n = e.interval, { xStep: r, rank: o } = this.xStep(e), l = this.pixel2T(this.width) + r;
     let c = e.timeMin - e.timeMin % r - r, p = c;
     for (; c < l; ) {
-      let f = $i(c, "years"), v = $i(c, "months"), S = $i(c, "days");
+      let f = ki(c, "years"), v = ki(c, "months"), S = ki(c, "days");
       !(f in i.entries) && f >= p ? i.entries[f] = [this.dateTimeValue(f, n, o), this.t2Pixel(f), f, "major"] : !(v in i.entries) && v >= p ? i.entries[v] = [this.dateTimeValue(v, n, o), this.t2Pixel(v), v, "major"] : !(S in i.entries) && S >= p && (i.entries[S] = [this.dateTimeValue(S, n, o), this.t2Pixel(S), S, "major"]), i.entries[c] = [this.dateTimeValue(c, n, o), this.t2Pixel(c), c, "minor"], c += r;
     }
     return i.values = Object.values(i.entries), i;
@@ -4058,9 +4050,9 @@ class Fi extends mo {
     } else
       switch (s) {
         case "milliseconds":
-          return js(e);
+          return Ys(e);
         case "seconds":
-          return js(e);
+          return Ys(e);
         case "minutes":
           return js(e);
         case "hours":
@@ -4137,7 +4129,7 @@ class St extends mo {
     return this.yAxisCalcPrecision;
   }
   set yAxisPadding(e) {
-    (P(e) || e != 0) && (this.#a = e);
+    (M(e) || e != 0) && (this.#a = e);
   }
   get yAxisPadding() {
     return this.#a;
@@ -4201,7 +4193,7 @@ class St extends mo {
   yAxisLog() {
   }
   yAxisCntDigits(e) {
-    return ki(e);
+    return Ri(e);
   }
   yAxisCalcPrecision() {
     let e = Ma(this.#u.max);
@@ -4274,7 +4266,7 @@ class St extends mo {
     return e;
   }
   setOffset(e) {
-    if (!P(e) || e == 0 || this.#s !== "manual") return !1;
+    if (!M(e) || e == 0 || this.#s !== "manual") return !1;
     let i = this.transformPrimarySecondary(), s = this.pixel2Val(e * -1), n = this.pixel2Val(this.height - e), r = s - n;
     i.min = n, i.max = s, i.mid = r / 2, i.diff = r, i.zoom = 0;
   }
@@ -4322,7 +4314,7 @@ class St extends mo {
     return n = this.#u.offset, this.#o = this.gradations(i + n, s + n), this.#o;
   }
   gradations(e, i, s = !0) {
-    let n, r = [], o = e - i, l = this.niceNumber(o), c = Math.ceil(i / l) * l, p = Math.floor(e / l) * l, f = this.height, v = ki(l), S;
+    let n, r = [], o = e - i, l = this.niceNumber(o), c = Math.ceil(i / l) * l, p = Math.floor(e / l) * l, f = this.height, v = Ri(l), S;
     this.#c = v;
     for (var P = c; P <= p; P += l)
       n = Ri(P), S = zs(P, v.decimals) * 1, f = this.yPos(S), r.push([S, f, n]);
@@ -4378,7 +4370,7 @@ function vo(a, e, i, s, n, r) {
 function Ju(a, e, i, s, n, r, o) {
   T(o.fill) && yo(a, e, i, s, n, r, o?.fill), M(o.width) && o.width > 0 && go(a, e, i, s, n, r, o?.border, o?.width);
 }
-function Vi(a, e = [], i = []) {
+function Ui(a, e = [], i = []) {
   let [s, n, r, o] = e;
   const l = a.createLinearGradient(s, n, r, o);
   let c = 0, p = 1 / (i.length - 1);
@@ -4414,7 +4406,7 @@ function td(a, e, i, s, n) {
 function id(a, e, i, s, n, r) {
   a.beginPath(), a.moveTo(e - s / 2, i), a.lineTo(e, i - n / 2), a.lineTo(e + s / 2, i), a.lineTo(e, i + n / 2), a.closePath(), yt(a, r?.fill, r?.stroke, r?.width);
 }
-function Ht(a, e, i, s = () => {
+function _t(a, e, i, s = () => {
 }) {
   a.save();
   const n = i.width || 1;
@@ -4620,7 +4612,7 @@ class Y extends HTMLElement {
     return this.style.cursor;
   }
   setDim(e, i) {
-    !["width", "height", "top", "bottom", "left", "right"].includes(i) || !T(e) || (P(e) ? (this.DOM[i] = e, e += "px") : T(e) ? e.match(Zt) || (e = "100%") : (this.DOM[i] = this.parentElement.getBoundingClientRect()[i], e = this.DOM[i] + "px"), this.style[i] = e);
+    !["width", "height", "top", "bottom", "left", "right"].includes(i) || !T(e) || (M(e) ? (this.DOM[i] = e, e += "px") : T(e) ? e.match(Kt) || (e = "100%") : (this.DOM[i] = this.parentElement.getBoundingClientRect()[i], e = this.DOM[i] + "px"), this.style[i] = e);
   }
   setPos(e, i) {
     this.setDim(e, i);
@@ -4845,19 +4837,19 @@ class Js {
     this.id = X.idCnt++, this.#l = q(e?.offscreen) ? e.offscreen : this.#l, i.layer = this, i.offscreen = this.#l, this.hit = new X.Hit(i), this.scene = new X.Scene(i), e?.x && e?.y && this.setPosition(e.x, e.y), e?.width && e?.height && this.setSize(e.width, e.height), e?.composition && (this.setComposition = e.composition), e?.alpha && (this.alpha = e.alpha), e?.visible && (this.visible = e.visible);
   }
   set x(e) {
-    P(e) && (this.#e = e);
+    M(e) && (this.#e = e);
   }
   get x() {
     return this.#e;
   }
   set y(e) {
-    P(e) && (this.#t = e);
+    M(e) && (this.#t = e);
   }
   get y() {
     return this.#t;
   }
   set width(e) {
-    P(e) && (this.#i = e);
+    M(e) && (this.#i = e);
   }
   get width() {
     return this.#i;
@@ -4962,13 +4954,13 @@ class To {
     return this.#e;
   }
   set width(e) {
-    P(e) && (this.#t = e);
+    M(e) && (this.#t = e);
   }
   get width() {
     return this.#t;
   }
   set height(e) {
-    P(e) && (this.#i = e);
+    M(e) && (this.#i = e);
   }
   get height() {
     return this.#i;
@@ -5151,7 +5143,7 @@ So.innerHTML = `
     row-gap: 5px;
     border: 1px solid #aaa;
     border-radius: 5px;
-    box-shadow: ${Qe.SHADOW};
+    box-shadow: ${Ze.SHADOW};
     background: #ccc;
     color: #444;
     padding: 5px;
@@ -5243,7 +5235,7 @@ So.innerHTML = `
 
 </style>
 <div class="colourpicker default">
-  <tradex-slider max="255" min="0" step="1" value="255" orient="horizontal" width="${ji}" ></tradex-slider>
+  <tradex-slider max="255" min="0" step="1" value="255" orient="horizontal" width="${Yi}" ></tradex-slider>
   <span>A</span>
   <div class="fields">
     <input type="text" class="colval"/>
@@ -5277,7 +5269,7 @@ class yd extends Y {
   #d;
   #p;
   #x = {
-    size: ji
+    size: Yi
   };
   #E;
   #g;
@@ -5374,7 +5366,7 @@ class yd extends Y {
     this.top = i, this.left = e;
   }
   open(e, i, s) {
-    return this.state !== ee.closed ? !1 : (s?.cfg == "gradient" || (this.#C.cfg == "default", this.#p.setAttribute("orient", "horizontal"), this.#p.setAttribute("width", ji), this.#p.setAttribute("height", "")), this.setColour(e), this.target = i, this.state = ee.opened, this.classList.add("active"), setTimeout(() => {
+    return this.state !== ee.closed ? !1 : (s?.cfg == "gradient" || (this.#C.cfg == "default", this.#p.setAttribute("orient", "horizontal"), this.#p.setAttribute("width", Yi), this.#p.setAttribute("height", "")), this.setColour(e), this.target = i, this.state = ee.opened, this.classList.add("active"), setTimeout(() => {
       this.#y.click = this.onOutsideClickListener.bind(this), document.addEventListener("click", this.#y.click);
     }, 250), !0);
   }
@@ -5386,7 +5378,7 @@ class yd extends Y {
   }
   paletteNode() {
     let e = "";
-    for (let n of it)
+    for (let n of tt)
       e += `<button style="background: ${n};" data-colour="${n}"></button>`;
     const i = document.createElement("div");
     i.classList.add("palette"), i.style.display = "flex", i.innerHTML = e;
@@ -5439,7 +5431,7 @@ class yd extends Y {
     return "";
   }
   gradient(e, i, s, n) {
-    Vi(e, [0, 0, 0, 0], [i, s]);
+    Ui(e, [0, 0, 0, 0], [i, s]);
   }
   compositeLayers() {
     const e = this.#x.layers, i = ["rgb", "value"], s = e.rgbv.scene.context;
@@ -5746,9 +5738,9 @@ class rt {
 }
 class wd {
   #e = [10, 5];
-  #t = it;
+  #t = tt;
   #i = [];
-  constructor(e = [10, 5], i = it) {
+  constructor(e = [10, 5], i = tt) {
     this.#e = this.validateMatrix(e) ? e : this.#e, this.#t = this.validateColours(i) ? i : this.#t;
   }
   get matrix() {
@@ -5877,21 +5869,21 @@ class Oo {
     let c = Math.max(Math.floor(l * 0.5), 1), p = Math.abs(e.o - e.c), f = e.c === e.o ? 1 : 2, v = e.x, S = Math.floor(v) - 0.5;
     if (i.save(), i.strokeStyle = o, i.beginPath(), i.moveTo(S, Math.floor(e.h)), s.candle.Type === me.OHLC ? i.lineTo(S, Math.floor(e.l)) : n ? (i.lineTo(S, Math.floor(e.c)), i.moveTo(S, Math.floor(e.o))) : (i.lineTo(S, Math.floor(e.o)), i.moveTo(S, Math.floor(e.c))), i.lineTo(S, Math.floor(e.l)), i.stroke(), l == 3) {
       i.fillStyle = o;
-      let M = n ? 1 : -1;
+      let P = n ? 1 : -1;
       i.rect(
         Math.floor(v - c),
         e.c,
         Math.floor(c * 2),
-        M * Math.max(p, f)
+        P * Math.max(p, f)
       ), i.fill(), i.stroke();
     } else if (l > 3 && this.fill) {
       i.fillStyle = r;
-      let M = n ? 1 : -1;
+      let P = n ? 1 : -1;
       i.rect(
         Math.floor(v - c),
         e.c,
         Math.floor(c * 2),
-        M * Math.max(p, f)
+        P * Math.max(p, f)
       ), i.fill(), i.stroke();
     } else if (l > 3 && !this.fill && s.candle.Type !== me.OHLC) {
       let P = n ? 1 : -1;
@@ -5899,7 +5891,7 @@ class Oo {
         Math.floor(v - c),
         e.c,
         Math.floor(c * 2),
-        M * Math.max(p, f)
+        P * Math.max(p, f)
       ), i.stroke();
     } else s.candle.Type === me.OHLC ? (i.beginPath(), i.moveTo(S - c, e.o), i.lineTo(S, e.o), i.moveTo(S, e.c), i.lineTo(S + c, e.c), i.stroke()) : (i.strokeStyle = o, i.beginPath(), i.moveTo(
       S,
@@ -6075,7 +6067,7 @@ class K {
     this.#u.refresh = !0;
   }
   getXAxis() {
-    return this.#s instanceof Ui ? this.#s : this.core.Chart.time.xAxis instanceof Ui ? this.core.Chart.time.xAxis : "time" in this.#e ? this.#e.time.xAxis : !1;
+    return this.#s instanceof Fi ? this.#s : this.core.Chart.time.xAxis instanceof Fi ? this.core.Chart.time.xAxis : "time" in this.#e ? this.#e.time.xAxis : !1;
   }
   getYAxis() {
     return this.#n instanceof St ? this.#n : this.#n.yAxis instanceof St ? this.#n.yAxis : this.chart.yAxis instanceof St ? this.chart.yAxis : "scale" in this.#e ? this.#e.scale.yAxis : !1;
@@ -6183,9 +6175,9 @@ class K {
     Td(e, r, o, l, c, i);
   }
 }
-class Xe {
-  static opened = new Xe("opened");
-  static closed = new Xe("closed");
+class qe {
+  static opened = new qe("opened");
+  static closed = new qe("closed");
   constructor(e) {
     this.name = e;
   }
@@ -6227,11 +6219,11 @@ class de {
   /** default Window widget styles */
 
   .tradeXwindow {
-    border: 1px solid ${Qe.COLOUR_BORDER};
+    border: 1px solid ${Ze.COLOUR_BORDER};
     border-radius: 5px;
-    box-shadow: ${Qe.SHADOW};
-    background: ${Qe.COLOUR_BG};
-    color: ${Qe.COLOUR_TXT};
+    box-shadow: ${Ze.SHADOW};
+    background: ${Ze.COLOUR_BG};
+    color: ${Ze.COLOUR_TXT};
   }
 
   .tradeXwindow .dragBar {
@@ -6243,11 +6235,11 @@ class de {
   }
 
   .tradeXwindow .dragBar .title {
-    ${Qe.TITLE}
+    ${Ze.TITLE}
   }
 
   .tradeXwindow .content {
-    ${Qe.CONTENT}
+    ${Ze.CONTENT}
   }
  
   `;
@@ -6513,7 +6505,7 @@ class de {
     }, 1e3)), !0;
   }
   close() {
-    return this.#s !== Xe.closed && (this.setClose(), this.emit("window_closed", this.id), this.emit(`window_closed_${this.parent.id}`, this.id)), !0;
+    return this.#s !== qe.closed && (this.setClose(), this.emit("window_closed", this.id), this.emit(`window_closed_${this.parent.id}`, this.id)), !0;
   }
 }
 const Ed = {
@@ -11039,7 +11031,7 @@ class Ct {
   #e = !0;
   #t = a0;
   constructor(e = !0, i = 5) {
-    this.enable = e, this.period = k(i) ? i : 5;
+    this.enable = e, this.period = I(i) ? i : 5;
   }
   set enable(e) {
     this.#e = q(e) ? e : !0;
@@ -11048,7 +11040,7 @@ class Ct {
     return this.#e;
   }
   set period(e) {
-    this.#t = k(e) ? e : 5;
+    this.#t = I(e) ? e : 5;
   }
   get period() {
     return this.#t;
@@ -11313,7 +11305,7 @@ class V extends K {
     };
   }
   eventsListen() {
-    this.on(nt, this.onStreamUpdate, this), this.on(`window_opened_${this.id}`, this.onConfigDialogueOpen, this), this.on(`window_closed_${this.id}`, this.onConfigDialogueCancel, this), this.on(`window_submit_${this.id}`, this.onConfigDialogueSubmit, this), this.on(`window_cancel_${this.id}`, this.onConfigDialogueCancel, this), this.on(`window_default_${this.id}`, this.onConfigDialogueDefault, this);
+    this.on(st, this.onStreamUpdate, this), this.on(`window_opened_${this.id}`, this.onConfigDialogueOpen, this), this.on(`window_closed_${this.id}`, this.onConfigDialogueCancel, this), this.on(`window_submit_${this.id}`, this.onConfigDialogueSubmit, this), this.on(`window_cancel_${this.id}`, this.onConfigDialogueCancel, this), this.on(`window_default_${this.id}`, this.onConfigDialogueDefault, this);
   }
   on(e, i, s = this) {
     this.core.on(e, i, s);
@@ -11356,7 +11348,7 @@ class V extends K {
     this.setRefresh(), this.visible(!this.visible()), e.parent.classList.toggle("visible"), e.parent.classList.toggle("notvisible");
   }
   onConfigDialogueOpen(e) {
-    if (this.#b.state === Xe.opened) return;
+    if (this.#b.state === qe.opened) return;
     this.#b.setOpen();
     const i = this.#b.contentFields;
     for (let s in i)
@@ -11510,13 +11502,8 @@ class V extends K {
     for (let n in s)
       s[n].value = i[n];
   }
-  populateMetaInputs(e) {
-    let i = e.input, s = e.meta.input;
-    for (let n in s)
-      s[n].value = i[n];
-  }
   buildOutputOrder(e, i) {
-    let s = [.../* @__PURE__ */ new Set([...e.outputOrder, ...i])], n = oi(s, i);
+    let s = [.../* @__PURE__ */ new Set([...e.outputOrder, ...i])], n = ai(s, i);
     for (let r of n) {
       if (o0.includes(r)) continue;
       let o = s.indexOf(r);
@@ -11562,8 +11549,8 @@ class V extends K {
     let c, p, f, v = this.fieldEventChange();
     switch (n) {
       case "number":
-        p = [v], c = (M) => {
-          this.configDialogue.provideEventListeners(`#${e}`, p)(M);
+        p = [v], c = (P) => {
+          this.configDialogue.provideEventListeners(`#${e}`, p)(P);
         };
         break;
       case "color":
@@ -11572,8 +11559,8 @@ class V extends K {
         }, n = "text";
         break;
       case "dash":
-        p = [v], c = (M) => {
-          this.configDialogue.provideEventListeners(`#${e}`, p)(M);
+        p = [v], c = (P) => {
+          this.configDialogue.provideEventListeners(`#${e}`, p)(P);
         }, n = "select";
         let S = {};
         for (let P in Br)
@@ -11782,8 +11769,8 @@ class V extends K {
     }
     let v = (s?.outputOrder.length > 0 ? s.outputOrder : Object.keys(n)).reverse();
     for (let S of v) {
-      let M = this.formatStyle(this.definition.meta.style[S], S);
-      this.plotIt(c, l, n[S].x, n[S].r, M);
+      let P = this.formatStyle(this.definition.meta.style[S], S);
+      this.plotIt(c, l, n[S].x, n[S].r, P);
     }
     this.target.viewport.render(), super.updated();
   }
@@ -12268,11 +12255,11 @@ class Tt extends V {
   static inCnt = 0;
   static primaryPane = !0;
   static colours = [
-    it[8],
-    it[18],
-    it[28],
-    it[38],
-    it[48]
+    tt[8],
+    tt[18],
+    tt[28],
+    tt[38],
+    tt[48]
   ];
   static defaultStyle = {
     stroke1: Tt.colours[0],
@@ -12324,9 +12311,9 @@ class Tt extends V {
     MA5: { enabled: !1, ma: null }
   };
   constructor(e, i = !1, s = !1, n, r, o) {
-    super(e, i, s, n, r, o), It.inCnt++;
+    super(e, i, s, n, r, o), Nt.inCnt++;
     const l = o.overlay.settings?.MAChildren || this.MA;
-    this.#t = Object.keys(l).length, this.MA.ma1 = new It(e, i = !1, s = !1, n, r, o), this.MA.ma2 = new It(e, i = !1, s = !1, n, r, o);
+    this.#t = Object.keys(l).length, this.MA.ma1 = new Nt(e, i = !1, s = !1, n, r, o), this.MA.ma2 = new Nt(e, i = !1, s = !1, n, r, o);
   }
   legendInputs(e = this.chart.cursorPos) {
     if (this.overlay.data.length == 0) return !1;
@@ -12852,7 +12839,7 @@ const Zo = {
       ind: a[e]
     };
 })(Zo);
-const Un = "0.153.5";
+const Un = "0.153.6";
 class S0 {
   #e;
   #t;
@@ -12873,7 +12860,7 @@ function M0(a, e = !1) {
   if (!L(a)) return !1;
   let i = 0, s = 0;
   for (; i < a.length; ) {
-    if (!zi(a[i], e) || a[i][0] < s) return !1;
+    if (!Vi(a[i], e) || a[i][0] < s) return !1;
     s = a[i][0], i++;
   }
   return !0;
@@ -12991,7 +12978,7 @@ class mt {
       let i = se(Oi);
       e = He(i, e), e.tfCountDown = q(e.tfCountDown) ? e.tfCountDown : Oi.tfCountDown, e.alerts = L(e.alerts) ? e.alerts : Oi.alerts;
     } else
-      return Di;
+      return Oi;
     return e;
   }
   constructor(e) {
@@ -13025,13 +13012,13 @@ class mt {
     return this.#v;
   }
   set lastPriceMin(e) {
-    P(e) && (this.#v = e);
+    M(e) && (this.#v = e);
   }
   get lastPriceMax() {
     return this.#m;
   }
   set lastPriceMax(e) {
-    P(e) && (this.#m = e);
+    M(e) && (this.#m = e);
   }
   get lastTick() {
     return this.#d;
@@ -13397,7 +13384,7 @@ class Qo extends K {
       width: this.viewport.width
     }, o = r.fontSize + r.paddingTop + r.paddingBottom, l = i - o * 0.5;
     const c = this.scene.context;
-    this.scene.clear(), c.save(), c.fillStyle = r.bakCol, c.fillRect(1, l, this.width, o), $t(c, `${n}`, 1, l, r), c.restore();
+    this.scene.clear(), c.save(), c.fillStyle = r.bakCol, c.fillRect(1, l, this.width, o), kt(c, `${n}`, 1, l, r), c.restore();
   }
   erase() {
     this.scene.clear(), this.target.viewport.render();
@@ -13833,7 +13820,7 @@ class U0 extends K {
   draw() {
     const e = this.scene.context, i = this.target.viewport.container.getBoundingClientRect(), s = this.core.mousePos.x - i.left;
     let n = this.xAxis.xPos2Time(s), r = new Date(n), o = r.toUTCString(), l = this.dateUTCStringW(), c = s + this.core.bufferPx;
-    c = this.xAxis.xPosSnap2CandlePos(c), c = c - Math.round(l * 0.5) - this.core.scrollPos - this.core.bufferPx, this.scene.clear(), e.save(), $t(e, o, c, 1, this.#i), e.restore();
+    c = this.xAxis.xPosSnap2CandlePos(c), c = c - Math.round(l * 0.5) - this.core.scrollPos - this.core.bufferPx, this.scene.clear(), e.save(), kt(e, o, c, 1, this.#i), e.restore();
   }
 }
 const V0 = [
@@ -14493,7 +14480,7 @@ class Y0 extends K {
       return;
     const i = this.scene.context, s = this.core.stream instanceof mt && this.config.stream.tfCountDown;
     let n = e[4], r = this.parent.nicePrice(n), o = { ...this.#e }, l = 0, c = this.#t, p = this.parent.yPos(n) - c * 0.5;
-    this.scene.clear(), i.save(), e[4] >= e[1] ? o.bakCol = this.theme.candle.UpBodyColour : o.bakCol = this.theme.candle.DnBodyColour, $t(i, r, l, p, o), s && (r = this.core.stream.countDownUpdate(), o.fontSize = o?.fontSize / 1.1, $t(i, r, l, p + c, o)), i.restore(), this.viewport.render();
+    this.scene.clear(), i.save(), e[4] >= e[1] ? o.bakCol = this.theme.candle.UpBodyColour : o.bakCol = this.theme.candle.DnBodyColour, kt(i, r, l, p, o), s && (r = this.core.stream.countDownUpdate(), o.fontSize = o?.fontSize / 1.1, kt(i, r, l, p + c, o)), i.restore(), this.viewport.render();
   }
 }
 const K0 = [
@@ -14767,7 +14754,7 @@ class Q0 extends K {
     }
   }
   renderText(e) {
-    const i = Math.floor(this.core.height / et), s = this.core.config?.watermark?.fontSize, n = this.core.config?.watermark?.fontWeight, r = this.core.config?.watermark?.fontFamily, o = this.core.config?.watermark?.textColour, l = {
+    const i = Math.floor(this.core.height / Je), s = this.core.config?.watermark?.fontSize, n = this.core.config?.watermark?.fontWeight, r = this.core.config?.watermark?.fontFamily, o = this.core.config?.watermark?.textColour, l = {
       fontSize: (s || this.theme.watermark.FONTSIZE) * i,
       fontWeight: n || this.theme.watermark.FONTWEIGHT,
       fontFamily: r || this.theme.watermark.FONTFAMILY,
@@ -14911,7 +14898,7 @@ class ef extends K {
     r.restore();
   }
 }
-const Jt = {
+const Qt = {
   colour: "#4444cc88",
   wdith: 1,
   dash: [1, 0]
@@ -14963,7 +14950,7 @@ function Qi(a, e, i, s, n, r) {
     paddingRight: 3,
     width: n
   }, l = o.fontSize + o.paddingTop + o.paddingBottom, c = s - l * 0.5;
-  a.save(), a.fillStyle = o.bakCol, a.fillRect(i, c, n, l), $t(a, `${e}`, i, c, o), a.restore();
+  a.save(), a.fillStyle = o.bakCol, a.fillRect(i, c, n, l), kt(a, `${e}`, i, c, o), a.restore();
 }
 class rf {
   data;
@@ -14993,7 +14980,7 @@ const ta = {
     }
   }
 };
-class of extends K {
+class af extends K {
   #e;
   #t = [];
   #i;
@@ -15297,7 +15284,7 @@ const el = {
 class it extends vt {
   static #e = 0;
   static get cnt() {
-    return st.#e++;
+    return it.#e++;
   }
   #t;
   #i;
@@ -15335,7 +15322,7 @@ class it extends vt {
     valueMin: -10,
     valueDiff: 120
   };
-  #A = {};
+  #L = {};
   constructor(e, i = {}) {
     if (super(e, i), this.#n = it.cnt, !b(i)) throw new Error("Chart (pane) constructor failed: Expected options typeof object");
     if (this.#i = this.options.name, this.#r = this.options.shortName, this.#s = this.options.title, this.#a = this.options.type == "primary" ? "primaryPane" : "secondaryPane", this.#g = this.options.view, this.#c = this.options.elements.elScale, this.#o = this.options.elements.elTarget, this.#o.id = this.id, this.legend = new G0(this.elLegend, this), this.isPrimary)
@@ -15504,7 +15491,7 @@ class it extends vt {
     return this.getIndicators();
   }
   get indicatorDeleteList() {
-    return this.#A;
+    return this.#L;
   }
   get Divider() {
     return this.#d;
@@ -15599,7 +15586,7 @@ class it extends vt {
     this.setHeight(n), this.graph instanceof ft && (this.layerWidth = Math.round(s * ((100 + i) * 0.01)), this.graph.setSize(s, n, this.layerWidth), this.draw(void 0, !0), this.core.MainPane.draw(void 0, !1), this.Divider.setPos(), this.Divider.setWidth());
   }
   setLocalRange(e, i) {
-    if (!P(i) || !P(e))
+    if (!M(i) || !M(e))
       return !1;
     e > i && ([e, i] = [i, e]), this.#M = {
       valueMax: i,
@@ -15652,7 +15639,7 @@ class it extends vt {
     return i;
   }
   removeIndicator(e) {
-    return !T(e) || !(e in this.indicators) ? !1 : (this.#A[e] = !0, Object.keys(this.indicators).length === 0 && !this.isPrimary ? this.emit("chart_paneDestroy", this.id) : (this.indicators[e].instance.destroy(), this.graph.removeOverlay(e), this.draw(), delete this.#A[e]), !0);
+    return !T(e) || !(e in this.indicators) ? !1 : (this.#L[e] = !0, Object.keys(this.indicators).length === 0 && !this.isPrimary ? this.emit("chart_paneDestroy", this.id) : (this.indicators[e].instance.destroy(), this.graph.removeOverlay(e), this.draw(), delete this.#L[e]), !0);
   }
   removeAllIndicators() {
     const e = {}, i = this.getIndicators();
@@ -16025,7 +16012,7 @@ class na extends vt {
   #b;
   #P;
   #M;
-  #A = 0;
+  #L = 0;
   #O = 0;
   constructor(e, i) {
     i.parent = e, super(e, i), this.#s = this.core.elMain, this.#r = this.core.elYAxis, this.init(i);
@@ -16091,7 +16078,7 @@ class na extends vt {
     return this.#C;
   }
   set rowMinH(e) {
-    P(e) && (this.#C = Math.abs(e));
+    M(e) && (this.#C = Math.abs(e));
   }
   get pos() {
     return this.dimensions;
@@ -16192,7 +16179,7 @@ class na extends vt {
     this.#M = new ze(this.#n, { disableContextMenu: !1 }), this.#M.on("keydown", this.onChartKeyDown.bind(this)), this.#M.on("keyup", this.onChartKeyUp.bind(this)), this.#M.on("wheel", this.onMouseWheel.bind(this)), this.#M.on("pointerenter", this.onMouseEnter.bind(this)), this.#M.on("pointerout", this.onMouseOut.bind(this)), this.#M.on("pointerup", this.onChartDragDone.bind(this)), this.#M.on("pointermove", this.onMouseMove.bind(this)), this.on(ln, this.onFirstStreamValue, this), this.on(hn, this.onNewStreamValue, this), this.on("setRange", this.onSetRange, this), this.on("scrollUpdate", this.draw, this), this.on("chart_render", this.draw, this), this.on("chart_paneDestroy", this.removeChartPane, this);
   }
   onSetRange() {
-    this.#O = this.#A, this.#A = this.chart.scale.calcScaleWidth(), this.#O < this.#A ? (this.core.elBody.setYAxisWidth(this.#A), this.setDimensions()) : this.draw();
+    this.#O = this.#L, this.#L = this.chart.scale.calcScaleWidth(), this.#O < this.#L ? (this.core.elBody.setYAxisWidth(this.#L), this.setDimensions()) : this.draw();
   }
   onMouseWheel(e) {
     const i = Math.sign(e.wheeldelta) * -1;
@@ -16524,7 +16511,7 @@ class na extends vt {
     this.draw(this.range, !0);
   }
   paneMaximize(e) {
-    if (!(e instanceof st)) return !1;
+    if (!(e instanceof it)) return !1;
     const i = this.#y, s = e.legend.list.chart.el.querySelector(".controls");
     let n;
     if (s.classList.toggle("maximized"), s.classList.toggle("restored"), e === i.instance)
@@ -16545,7 +16532,7 @@ class na extends vt {
       n.element.style.display = "block", n.scale.element.style.display = "block", s in e.panes && i++ > 0 && n.Divider.show(), n.setDimensions({ w: void 0, h: e.panes[s] });
   }
   paneCollapse(e) {
-    if (!(e instanceof st)) return !1;
+    if (!(e instanceof it)) return !1;
     this.emit("pane_refresh", this);
     const i = e.legend.list.chart.el.querySelector(".controls"), s = e.collapsed;
     let n = e.element.clientHeight, r, o, l;
@@ -16664,7 +16651,7 @@ class k {
   static #e = new ve();
   static #t = {};
   static get default() {
-    return se(Ni);
+    return se(Di);
   }
   static get list() {
     return k.#e;
@@ -16935,7 +16922,7 @@ class k {
   addIndicator(e, i) {
     if (b(e) && i == "primary")
       e.params.overlay.id = e.instance.id, this.#s.primary.push(e.params.overlay);
-    else if (e instanceof st && i == "secondary")
+    else if (e instanceof it && i == "secondary")
       this.#s.secondary.push(...e.options.view), this.range.maxMinDatasets();
     else return !1;
   }
@@ -17167,7 +17154,7 @@ class Ni extends Te {
     return this.#e;
   }
   set lineWidth(e) {
-    this.#t = P(e) ? e : this.#t;
+    this.#t = M(e) ? e : this.#t;
   }
   get lineWidth() {
     return this.#t;
@@ -17218,28 +17205,28 @@ const wf = [
     name: "Line",
     icon: ht,
     event: "tool_activated",
-    class: Ii,
+    class: Ni,
     sub: [
       {
         id: "ray",
         name: "Ray",
         icon: ht,
         event: "tool_activated",
-        class: Ii
+        class: Ni
       },
       {
         id: "hRay",
         name: "Horizontal Ray",
         icon: ht,
         event: "tool_activated",
-        class: Ii
+        class: Ni
       },
       {
         id: "vRay",
         name: "Vertical Ray",
         icon: ht,
         event: "tool_activated",
-        class: Ii
+        class: Ni
       }
     ]
   },
@@ -17457,11 +17444,11 @@ class sl extends vt {
   }
   onIconOut(e) {
     const i = e.currentTarget.querySelector("svg");
-    i.style.fill = tt.COLOUR_ICON;
+    i.style.fill = et.COLOUR_ICON;
   }
   onIconOver(e) {
     const i = e.currentTarget.querySelector("svg");
-    i.style.fill = tt.COLOUR_ICONHOVER;
+    i.style.fill = et.COLOUR_ICONHOVER;
   }
   onToolTargetSelected(e) {
     console.log("tool_targetSelected:", e.target), this.#h = e.target;
@@ -18338,15 +18325,15 @@ class Df extends Y {
     let i = `
     <style>
       svg {
-        height: ${tt.ICONSIZE};
-        width: ${tt.ICONSIZE};
-        fill: ${tt.COLOUR_ICON};
+        height: ${et.ICONSIZE};
+        width: ${et.ICONSIZE};
+        fill: ${et.COLOUR_ICON};
       }
       svg:hover {
-        fill: ${tt.COLOUR_ICONHOVER};
+        fill: ${et.COLOUR_ICONHOVER};
       }
       .icon-wrapper {
-        width: ${tt.ICONSIZE};
+        width: ${et.ICONSIZE};
         margin: 0 auto;
       }
     </style>
@@ -18491,7 +18478,7 @@ class Rf extends Y {
     this.#e = e, this.setToolsLocation();
   }
   setYAxisWidth(e = this.scaleW) {
-    e = P(e) ? e : this.scaleW, this.setYAxisLocation(void 0, e);
+    e = M(e) ? e : this.scaleW, this.setYAxisLocation(void 0, e);
   }
   setYAxisLocation(e = this.#e?.yAxis?.location, i = this.scaleW) {
     switch (e) {
@@ -18555,8 +18542,8 @@ class kf extends Y {
     <div style="display: inline-block; float: right;">
     <style>
       svg {
-        height: ${Dt.ICONSIZE};
-        fill: ${Dt.COLOUR_ICON};
+        height: ${Ot.ICONSIZE};
+        fill: ${Ot.COLOUR_ICON};
       }
     </style>
     `;
@@ -18565,7 +18552,7 @@ class kf extends Y {
     return s + "</div>";
   }
   iconNode(e) {
-    const i = `display: inline-block; height: ${Dt.ICONSIZE}; padding-top: 2px`, s = "sub" in e ? 'data-menu="true"' : "";
+    const i = `display: inline-block; height: ${Ot.ICONSIZE}; padding-top: 2px`, s = "sub" in e ? 'data-menu="true"' : "";
     return `
       <div id="TX_${e.id}" data-event="${e.event}" ${s} class="icon-wrapper" style="${i}">${e.icon}</div>
 
@@ -18717,7 +18704,7 @@ class Hf extends Y {
     this.#s = i, this.#n = s, this.#u = e[0], this.ToolsBar instanceof sl && this.ToolsBar.onResized(), this.log(`onResize w: ${i}, h: ${s}`), this.emit("global_resize", { w: i, h: s });
   }
   setWidth(e) {
-    P(e) ? e += "px" : T(e) && e.match(Zt) || (e = "100%"), this.style.width = e, this.#s = Math.round(this.getBoundingClientRect().width);
+    M(e) ? e += "px" : T(e) && e.match(Kt) || (e = "100%"), this.style.width = e, this.#s = Math.round(this.getBoundingClientRect().width);
   }
   setHeight(e) {
     M(e) ? e += "px" : T(e) && e.match(Kt) || (this.#n = this.parentElement.getBoundingClientRect().height, e = this.#n + "px"), this.style.height = e, this.#n = Math.round(this.getBoundingClientRect().height);
@@ -18738,7 +18725,7 @@ class Hf extends Y {
     let s, n = this.width, r = this.height;
     if (!e || !i) {
       const o = this.getBoundingClientRect(), l = this.parentElement.getBoundingClientRect();
-      i = o.height ? o.height : l.height ? l.height : et, e = o.width ? o.width : l.width ? l.width : si;
+      i = o.height ? o.height : l.height ? l.height : Je, e = o.width ? o.width : l.width ? l.width : si;
     } else (!M(e) || !M(i)) && ((!T(e) || !e.match(Kt)) && (e = "100%"), (!T(i) || !i.match(Kt)) && (i = "100%"));
     return this.setWidth(e), this.setHeight(i), s = {
       width: this.width,
@@ -18755,12 +18742,12 @@ class Hf extends Y {
     switch (e) {
       case "top":
       case !0:
-        this.#c.utils.location = "top", this.#c.utils.height = i, this.style.gridTemplateRows = `${i}px 1fr`, this.elBody.style.minHeight = `${et - i}px`;
+        this.#c.utils.location = "top", this.#c.utils.height = i, this.style.gridTemplateRows = `${i}px 1fr`, this.elBody.style.minHeight = `${Je - i}px`;
         break;
       case "none":
       case !1:
       default:
-        this.#c.utils.location = "none", this.#c.utils.height = 0, this.elUtils.style.display = "none", this.style.gridTemplateRows = "0 1fr", this.elBody.style.minHeight = `${et}px`;
+        this.#c.utils.location = "none", this.#c.utils.height = 0, this.elUtils.style.display = "none", this.style.gridTemplateRows = "0 1fr", this.elBody.style.minHeight = `${Je}px`;
         break;
     }
   }
@@ -18851,11 +18838,11 @@ class Ff extends vt {
   }
   onIconOver(e) {
     const i = e.currentTarget.querySelector("svg");
-    i.style.fill = Dt.COLOUR_ICONHOVER;
+    i.style.fill = Ot.COLOUR_ICONHOVER;
   }
   onIconOut(e) {
     const i = e.currentTarget.querySelector("svg");
-    i.style.fill = Dt.COLOUR_ICON;
+    i.style.fill = Ot.COLOUR_ICON;
   }
   initAllUtils() {
     const e = this.#i.querySelectorAll(".icon-wrapper");
@@ -19045,7 +19032,7 @@ class di extends de {
     super.destroy();
   }
   get type() {
-    return mi.type;
+    return di.type;
   }
   dialogueBuild(e = "", i = []) {
     let s = { buttons: {} }, n = `
@@ -19693,7 +19680,7 @@ class B extends Hf {
   static get TALibWorker() {
     return B.#h;
   }
-  static #c = `${Xt} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`;
+  static #c = `${qt} requires "talib-web" to function properly. Without it, some features maybe missing or broken.`;
   static #u = [
     "TradeXchart",
     "Chart",
@@ -19706,8 +19693,8 @@ class B extends Hf {
     "UtilsBar",
     "Widgets"
   ];
-  #m = Xt;
-  #v = ei;
+  #m = qt;
+  #v = Jt;
   #d;
   #p;
   #x;
@@ -19722,10 +19709,10 @@ class B extends Hf {
   #b = { ...$i };
   #P = { ...$i };
   #M;
-  #A;
+  #L;
   #O;
   chartWMin = si;
-  chartHMin = et;
+  chartHMin = Je;
   chartW_Reactive = !0;
   chartH_Reactive = !0;
   chartBGColour = z.COLOUR_BG;
@@ -19733,7 +19720,7 @@ class B extends Hf {
   chartBorderColour = z.COLOUR_BORDER;
   #$;
   #_;
-  #L = {
+  #A = {
     chart: {},
     time: {}
   };
@@ -19741,9 +19728,9 @@ class B extends Hf {
   panes = {
     utils: this.#$,
     tools: this.#_,
-    main: this.#L
+    main: this.#A
   };
-  #I = new ii();
+  #I = new ti();
   destruction = !1;
   logs = !1;
   infos = !1;
@@ -19863,22 +19850,22 @@ class B extends Hf {
     return this.#_;
   }
   get MainPane() {
-    return this.#L;
+    return this.#A;
   }
   get Timeline() {
-    return this.#L.time;
+    return this.#A.time;
   }
   get WidgetsG() {
     return this.#H;
   }
   get Chart() {
-    return this.#L.chart;
+    return this.#A.chart;
   }
   get ChartPanes() {
-    return this.#L.chartPanes;
+    return this.#A.chartPanes;
   }
   get Indicators() {
-    return this.#L.indicators;
+    return this.#A.indicators;
   }
   get CustomOverlays() {
     return this.#P;
@@ -19913,7 +19900,7 @@ class B extends Hf {
     return nu;
   }
   get theme() {
-    return this.#A;
+    return this.#L;
   }
   get settings() {
     return this.state.data.chart.settings;
@@ -20036,7 +20023,7 @@ class B extends Hf {
       };
     else {
       let v = i?.range;
-      k(v.startTS) || (v.startTS = f), k(v.timeFrameMS) || (v.timeFrameMS = p), hi(v.timeFrame) != v.timeFrameMS && (v.timeFrame = Mt(p));
+      I(v.startTS) || (v.startTS = f), I(v.timeFrameMS) || (v.timeFrameMS = p), li(v.timeFrame) != v.timeFrameMS && (v.timeFrame = Pt(p));
     }
     if (r.range = { ...r.range, ...i.range }, this.#E) {
       const v = this.#y.create(r, o, l);
@@ -20057,7 +20044,7 @@ class B extends Hf {
     this.log("...cleanup the mess"), this.removeEventListener("mousemove", this.onMouseMove), this.hub.expunge(this), this.UtilsBar.destroy(), this.ToolsBar.destroy(), this.MainPane.destroy(), this.WidgetsG.destroy(), this.#U.end(), this.#y = null;
   }
   eventsListen() {
-    this.addEventListener("mousemove", this.onMouseMove.bind(this)), this.on(nt, this.onStreamUpdate, this), this.on("state_mergeComplete", () => this.#F.stop());
+    this.addEventListener("mousemove", this.onMouseMove.bind(this)), this.on(st, this.onStreamUpdate, this), this.on("state_mergeComplete", () => this.#F.stop());
   }
   onMouseMove(e) {
     this.#B.x = e.clientX, this.#B.y = e.clientY;
@@ -20137,7 +20124,7 @@ class B extends Hf {
     return r += " }", s.innerHTML = r, !0;
   }
   setScrollPos(e) {
-    e = Math.round(e), P(e) && e <= 0 && e >= this.bufferPx * -1 ? this.#D = e : this.emit("Error", "setScrollPos: not a valid value");
+    e = Math.round(e), M(e) && e <= 0 && e >= this.bufferPx * -1 ? this.#D = e : this.emit("Error", "setScrollPos: not a valid value");
   }
   setState(e) {
     if (!k.has(e))
@@ -20181,7 +20168,7 @@ class B extends Hf {
   delayedSetRange() {
     for (; this.#R; ) {
       let e = Math.floor(this.range.initialCnt * 0.5);
-      this.setRange(e * -1, e), this.off(nt, this.delayedSetRange, this), this.#R = !1;
+      this.setRange(e * -1, e), this.off(st, this.delayedSetRange, this), this.#R = !1;
     }
   }
   updateRange(e) {
@@ -20313,19 +20300,19 @@ class B extends Hf {
     return s;
   }
   addIndicator(e, i = e, s = {}) {
-    return this.#L.addIndicator(e, i, s) || this.error(`Indicator: ${e} - Error failed to add indicator`), e;
+    return this.#A.addIndicator(e, i, s) || this.error(`Indicator: ${e} - Error failed to add indicator`), e;
   }
   getIndicator(e) {
-    return this.#L.getIndicator(e);
+    return this.#A.getIndicator(e);
   }
   getIndicatorsByType(e) {
-    return this.#L.getIndicatorsByType(e);
+    return this.#A.getIndicatorsByType(e);
   }
   removeIndicator(e) {
-    return this.#L.removeIndicator(e) || this.error(`Indicator: ${e} - Error failed to remove indicator`), e;
+    return this.#A.removeIndicator(e) || this.error(`Indicator: ${e} - Error failed to remove indicator`), e;
   }
   indicatorSettings(e, i) {
-    return this.#L.indicatorSettings(e, i);
+    return this.#A.indicatorSettings(e, i);
   }
   hasStateIndicator(e, i = "searchAll") {
     if (!T(e) || !T(i)) return !1;
@@ -20364,10 +20351,10 @@ class B extends Hf {
     return this.#y.removeEvent(e);
   }
   resize(e, i) {
-    return !P(e) && !P(i) ? !1 : (this.setDimensions(e, i), !0);
+    return !M(e) && !M(i) ? !1 : (this.setDimensions(e, i), !0);
   }
   refresh() {
-    this.ready && this.#L.refresh();
+    this.ready && this.#A.refresh();
   }
   toImageURL(e, i, s, n) {
     return la(this, e, i, s, "url", n);
