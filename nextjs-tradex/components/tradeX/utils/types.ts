@@ -1,4 +1,4 @@
-import { ChartType, IConfig, IIndicators, Indicator } from 'tradex-chart';
+import { ChartType, IConfig, IIndicators, Indicator } from '../../../../types';
 import { ChartResolutionEnum } from './enums';
 
 export interface IChartOption {
