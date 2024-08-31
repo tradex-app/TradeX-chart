@@ -41,7 +41,6 @@ export interface ILevelIndicator extends ITechnicalIndicator {
 }
 
 export interface ITokenChartProps extends IConfig {
-  loadIndicators: IIndicators;
   toolbar?: ToolbarConfig;
   defaults?: {
     timeframe?: string;

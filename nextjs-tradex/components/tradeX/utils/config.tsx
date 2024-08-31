@@ -108,7 +108,7 @@ const getConfig = ({
     errors: true,
     maxCandleUpdate: 250,
     talib,
-    wasm: `${window.location.origin}/talib.wasm`
+    wasm: `${process.env.NEXT_PUBLIC_SITE_URL}/talib.wasm`
   };
 };
 
