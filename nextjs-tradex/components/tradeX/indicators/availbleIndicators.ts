@@ -1,7 +1,7 @@
 import { IIndicators } from '../../../../types'; // import from 'tradex-chart';
 import TradeFlow from './TRDFLO';
 
-const AVAILABLE_INDICATORS: IIndicators = {
+export const AVAILABLE_INDICATORS: IIndicators = {
   TRDFLO: {
     id: 'TRDFLO',
     name: 'Trade Flow',
@@ -23,5 +23,3 @@ export const SelectedIndicators = (
   });
   return filteredIndicators;
 };
-
-export default AVAILABLE_INDICATORS;

@@ -10,7 +10,7 @@ delete_folder() {
   fi
 }
 
-folders_to_delete=(".next" "node_modules")
+folders_to_delete=(".next" "node_modules/tradex-chart" "node_modules/tossr")
 
 for folder in "${folders_to_delete[@]}"; do
   delete_folder "$folder"
