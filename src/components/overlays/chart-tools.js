@@ -5,6 +5,7 @@ import Overlay from "./overlay"
 import { HIT_DEBOUNCE } from "../../definitions/core";
 import { isObject } from "../../utils/typeChecks";
 import { debounce, idSanitize, uid } from "../../utils/utilities"
+import ToolNode, { NodeState } from "../primitives/node";
 
 
 const toolsDialogue = {
@@ -70,10 +71,14 @@ export default class chartTools extends Overlay {
 
     super(target, xAxis, yAxis, theme, parent, params)
 
+    const overlay = params?.overlay
     this.#inCnt = chartTools.inCnt
+    this.id = overlay?.id || uid(this.shortName)
+
     // FIXME: why is there a this.id = undefined ???
     // delete this.id
-    if (!!this.config.ID) this.#id = idSanitize(this.config.ID)
+    // if (!!this.config.ID) this.#id = idSanitize(this.config.ID)
+
     // this.#name = config.name
     this.settings = params?.settings || {}
     // this.target.addTool(this)
@@ -85,7 +90,7 @@ export default class chartTools extends Overlay {
   }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return this.#id || `${this.core.id}-${uid(this.#shortName)}_${this.#inCnt}` }
+  get id() { return this.#id || `${this.core.ID}-${uid(this.#shortName)}_${this.#inCnt}` }
   get inCnt() { return this.#inCnt }
   get name() {return this.#name}
   get shortName() { return this.#shortName }

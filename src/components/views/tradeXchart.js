@@ -53,7 +53,8 @@ const HTML = `
   <tradex-body></tradex-body>
   <tradex-widgets></tradex-widgets>
 `
-
+const template = document.createElement('template')
+template.innerHTML = HTML
 
 export default class tradeXChart extends element {
 
@@ -71,10 +72,7 @@ export default class tradeXChart extends element {
   #resizeEntries
 
   constructor () {
-    const template = document.createElement('template')
-          template.innerHTML = HTML
     super(template, "closed")
-    this.#template = template
   }
 
   destroy() {
@@ -90,7 +88,7 @@ export default class tradeXChart extends element {
     // https://stackoverflow.com/a/43837330/15109215
     if (this.doInit) {
       this.doInit = false
-      this.shadowRoot.appendChild(this.#template.content.cloneNode(true))
+      this.shadowRoot.appendChild(template.content.cloneNode(true))
       this.style.display = "grid"
       this.style.minHeight = TX_MINH
       this.#elWidgets = this.shadowRoot.querySelector('tradex-widgets')
@@ -136,8 +134,8 @@ export default class tradeXChart extends element {
     }
   }
 
-  get id() { return this.getAttribute('id'); }
-  set id(id) { this.setAttribute('id', idSanitize(id)); }
+  // get id() { return this.getAttribute('id'); }
+  // set id(id) { this.setAttribute('id', idSanitize(id)); }
 
   get disabled() { return this.hasAttribute('disabled'); }
   set disabled(d) {

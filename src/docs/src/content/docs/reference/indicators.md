@@ -52,7 +52,39 @@ Each entry in the ``data`` array requires an array with minimum of [timestamp, v
 
 The ``settings`` object can contain an object ``style`` and or individual input settings specific to the indicator.
 
-The ``params.settings.style`` object modifies the indicator's default style (theme). 
+The ``params`` object permits modification of many of the [indicator's default configuration](#indicator-parameters).
+
+#### Indicator Parameters
+
+All indicator parameters are optional. if no
+
+| Property | Type | Descripttion |
+|----------|------|--------------|
+| id | String | indicator id - if undefined, one will be automatically generated and assigned. id can be used for restoring a chart State. |
+| legendName | String | name or title prefixed to indicator data (if any) displayed on the chart |
+| data | Array | any initial indicator data - if provided ``calcIndicator()`` will **not** be triggered. See [Indicator Data Format](#indicator-data-format) |
+| settings | will modify the default indicator [definition](#indicator-settings) |
+
+#### Indicator Settings
+
+The settings object modifies the indicator's default definition object.
+
+```javascript
+myChart.addIndicator(
+  "EMA", 
+  "EMA_30", 
+  { legendName: "Foo Baz", 
+    data: [], 
+    settings: { 
+      style: {output: {colour: {value: "#00f"}, width: {value: 3}, dash: {value: "4,4"}}}, 
+      input: {timePeriod: {value: 20}} 
+    } 
+  });
+````
+
+The the above example adds an EMA indicator to the chart, with a blue line, three pixels wide, [dashed styling](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/setLineDash) and an input time period calculation of 20 candles.
+
+Refer to the documentation for the settings of each individual [indicator](../indicators_default).
 
 ### Adding Indicators Via the Data State
 
@@ -136,8 +168,13 @@ or similarly via the chart state
 chart0.state.allData.primaryPane
 chart0.state.allData.secondaryPane
 ```
+### Indicator Data Format
 
-## Modifying Indicator Propterties
+Indicator data is stored as an Array of arrays. If the indicator data array is empty, the first event that triggers the ``calcIndicator()`` method, will fill the array.
+
+An Indicator Data array entry must contain a minimum of ``[ timestamp : integer, value : number ]``. Some indicators of course have more than one value, and are simply stored sequentially in the array. Theoretically, a custom indicator could store values of other data types.
+
+## Modifying the Indicator Definition
 
 Indicator input values (used in calculation) and output values (display: colour, line style) can be changed, whenever you want programmatically. 
 
