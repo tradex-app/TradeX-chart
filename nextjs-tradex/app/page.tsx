@@ -1,13 +1,12 @@
 'use client';
 import { CHART_OPTIONS } from '@/components/tradeX/utils';
-import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { Info } from './Info';
 import { Button } from '@/components/ui/button';
 import Icons from './Icons';
-import AVAILABLE_INDICATORS from '@/components/tradeX/indicators/availbleIndicators';
 import getConfig from '@/components/tradeX/utils/config';
 import { ToolbarConfig } from '@/components/tradeX/utils/types';
+import dynamic from 'next/dynamic';
 
 const TradingChart = dynamic(() => import('@/components/tradeX/Wrapper'), {
   ssr: false
@@ -55,7 +54,6 @@ export default function Home() {
         {showChart && (
           <TradingChart
             {...config}
-            loadIndicators={AVAILABLE_INDICATORS}
             toolbar={toolBarConfig}
             defaults={{
               timeframe: '1h',

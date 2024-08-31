@@ -432,16 +432,16 @@ export default class TradeXchart extends Tradex_chart {
       }
     }
 
-    const oldID = this.id
+    const oldID = this.ID
     const id = (isString(txCfg?.id)) ? txCfg.id : null
     this.setID(id)
-    this.classList.add(this.id)
+    this.classList.add(this.ID)
 
     this.log("processing state...")
 
     // if no state, default to empty
     let state = copyDeep(txCfg?.state) || {}
-        state.id = this.id
+        state.id = this.ID
         state.core = this
     let deepValidate = txCfg?.deepValidate || false
     let isCrypto = txCfg?.isCrypto || false
@@ -486,13 +486,13 @@ export default class TradeXchart extends Tradex_chart {
       this.MainPane.start()
 
       document.querySelector(`style[title="${oldID}_style"]`)?.remove()
-      this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`)
+      this.insertAdjacentHTML('beforebegin', `<style title="${this.ID}_style"></style>`)
 
       this.setTheme(this.#themeTemp.id)
       this.setUtilsLocation(this.theme?.utils?.location)
       this.elBody.setToolsLocation(this.theme?.tools?.location)
 
-      this.log(`${this.name} id: ${this.id} : loaded a new ${this.state.status} state`)
+      this.log(`${this.name} id: ${this.ID} : loaded a new ${this.state.status} state`)
     }
     // Chart has no State, so instantiate one
     else {
@@ -501,7 +501,7 @@ export default class TradeXchart extends Tradex_chart {
       this.#state = this.#State.create(state, deepValidate, isCrypto)
       delete txCfg.state
 
-      this.log(`${this.name} id: ${this.id} : created with a ${this.state.status} state`)  
+      this.log(`${this.name} id: ${this.ID} : created with a ${this.state.status} state`)  
 
       // set default range
       let start = 0
@@ -531,7 +531,7 @@ export default class TradeXchart extends Tradex_chart {
     }
 
     // inject chart style rules
-    this.insertAdjacentHTML('beforebegin', `<style title="${this.id}_style"></style>`)
+    this.insertAdjacentHTML('beforebegin', `<style title="${this.ID}_style"></style>`)
     this.setTheme(this.#themeTemp.id)
 
     this.#scrollPos = this.bufferPx * -1
@@ -592,7 +592,7 @@ export default class TradeXchart extends Tradex_chart {
     this.#workers.end()
     this.#State = null
 
-    // DOM.findByID(this.id).remove
+    // DOM.findByID(this.ID).remove
   }
 
   /**
@@ -654,9 +654,9 @@ export default class TradeXchart extends Tradex_chart {
 
   setID(id) {
     if (isString(id)) 
-      this.id = id
+      this.ID = id
     else 
-      this.id = `${uid( SHORTNAME )}_${this.#inCnt}`
+      this.ID = `${uid( SHORTNAME )}_${this.#inCnt}`
   }
 
   /**
@@ -748,10 +748,10 @@ export default class TradeXchart extends Tradex_chart {
 
     this.#theme.setTheme(ID, this)
     const theme = this.#theme
-    const style = document.querySelector(`style[title=${this.id}_style]`)
+    const style = document.querySelector(`style[title=${this.ID}_style]`)
     const borderColour = `var(--txc-border-color, ${theme.chart.BorderColour}`
 
-    let innerHTML = `.${this.id} { `
+    let innerHTML = `.${this.ID} { `
 
     // modify core style sheet custom CSS variables
     innerHTML +=`--txc-background: ${theme.chart.Background}; `
@@ -837,7 +837,7 @@ export default class TradeXchart extends Tradex_chart {
   setState(key) {
     // invalid state id
     if (!State.has(key)) {
-      this.warn(`${this.name} id: ${this.id} : Specified state does not exist`)
+      this.warn(`${this.name} id: ${this.ID} : Specified state does not exist`)
       return false
     }
 
@@ -1540,7 +1540,7 @@ export default class TradeXchart extends Tradex_chart {
    * @param {number} quality - image quality 0 - 1
    * @param {object} watermark - watermark definition {imgURL, x, y, width, height}
    */
-  downloadImage(fileName=`${this.id}.png`, type, quality, watermark) {
+  downloadImage(fileName=`${this.ID}.png`, type, quality, watermark) {
     exportImage(this, fileName, type, quality, "download", watermark)
   }
 

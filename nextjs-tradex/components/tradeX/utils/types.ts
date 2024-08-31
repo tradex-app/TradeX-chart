@@ -1,4 +1,4 @@
-import { ChartType, IConfig, IIndicators, Indicator } from 'tradex-chart';
+import { ChartType, IConfig, IIndicators, Indicator } from '../../../../types';
 import { ChartResolutionEnum } from './enums';
 
 export interface IChartOption {
@@ -41,7 +41,6 @@ export interface ILevelIndicator extends ITechnicalIndicator {
 }
 
 export interface ITokenChartProps extends IConfig {
-  loadIndicators: IIndicators;
   toolbar?: ToolbarConfig;
   defaults?: {
     timeframe?: string;

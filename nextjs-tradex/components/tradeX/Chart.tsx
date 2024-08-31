@@ -4,7 +4,7 @@ import { useTheme } from 'next-themes';
 import { IConfig, IIndicators, ITradeX, ThemeProps } from '../../../types'; // import from 'tradex-chart';
 import ColorsEnum from '../theme/colors';
 import { IChartOption, IIndicatorToolbar } from './utils/types';
-import '../../../src'; // import 'tradex-chart';
+import { Chart } from '../../../src'; // import 'tradex-chart';
 
 export interface IProps {
   config: IConfig;
@@ -21,7 +21,7 @@ export interface IProps {
   onRangeChange?: () => void;
 }
 
-const Chart: FC<IProps> = ({
+const TXChart: FC<IProps> = ({
   config,
   // visual
   displayTitle,
@@ -175,4 +175,4 @@ const Chart: FC<IProps> = ({
   );
 };
 
-export default Chart;
+export default TXChart;

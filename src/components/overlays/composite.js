@@ -66,7 +66,7 @@ export class Composite extends Overlay {
     
   }
 
-  get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
+  get id() { return this.#ID || `${this.core.ID}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
   set id(id) { this.#ID = idSanitize(new String(id)) }
   get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
   get chartPaneID() { return this.#params.overlay.paneID }
@@ -121,11 +121,11 @@ export class Composite extends Overlay {
 
   addComponentClass(c, params) {
     // is indicator?
-    if (this.core.isIndicator(c)) {
+    if (this.core.IDIndicator(c)) {
 
     }
     // is overlay?
-    else if (this.core.isOverlay(c)) {
+    else if (this.core.IDOverlay(c)) {
 
     }
   }

@@ -7,18 +7,15 @@ import { fetchOHLCVData, fetchTXData } from './fetchers';
 import FullScreenWrapper from '../FullScreen/FullScreenWrapper';
 import FullScreenButton from '../FullScreen/FullScreenButton';
 import Toolbar from './Toolbar';
-import dynamic from 'next/dynamic';
 import { IIndicatorToolbar, ITokenChartProps } from './utils/types'; // don't change this, these are from the wrapper not the module
 import { IIndicator, ITradeData } from '../../../types'; // import from 'tradex-chart';
-
-const Chart = dynamic(() => import('@/components/tradeX/Chart'), {
-  ssr: false
-});
+import Chart from '@/components/tradeX/Chart';
+import { AVAILABLE_INDICATORS as loadIndicators } from '@/components/tradeX/indicators/availbleIndicators';
 
 let end: number;
 
 const TradingChart = (props: ITokenChartProps) => {
-  const { loadIndicators, toolbar, defaults, ...config } = props;
+  const { toolbar, defaults, ...config } = props;
   const [symbol, setSymbol] = useState(config.title);
   const [tokensList, setTokensList] = useState<string[]>([]);
   const [firstLoad, setFirstLoad] = useState(true);
@@ -163,6 +160,7 @@ const TradingChart = (props: ITokenChartProps) => {
     setData([]);
     setFirstLoad(true);
     setIsEnd(false);
+
     const indicatorsArray = Object.values(loadIndicators);
     const mappedIndicators = indicatorsArray.map((indicator: IIndicator) => ({
       label: indicator.name,

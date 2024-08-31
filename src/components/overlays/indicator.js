@@ -144,11 +144,11 @@ export default class Indicator extends Overlay {
     const overlay = params.overlay
     this.#cnt_ = Indicator.cnt
     this.#overlay = overlay
-    this.id = overlay?.id || uid(this.shortName)
+    this.id = overlay?.id || uid(this?.shortName || overlay?.name)
     this.#params = params
     this.#TALib = this.core.TALib
     this.#range = this.xAxis.range
-    this.legendName = overlay?.legendName
+    this.legendName = overlay?.legendName || overlay?.name || this?.shortName
     this.#legendVisibility = (isBoolean(overlay?.legendVisibility)) ? overlay.legendVisibility : true
     this.#palette = palette
     this.style = (isObject(overlay?.settings?.style)) ? 
@@ -179,7 +179,7 @@ export default class Indicator extends Overlay {
     // })
   }
 
-  get id() { return this.#ID || `${this.core.id}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
+  get id() { return this.#ID || `${this.core.ID}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
   set id(id) { this.#ID = idSanitize(new String(id)) }
   get version() { return `${this.constructor?.version}` }
   get context() { return this.#context }
@@ -198,7 +198,7 @@ export default class Indicator extends Overlay {
   get overlay() { return this.#overlay }
   get legend() { return this.chart.legend.list[this.#legendID] }
   get legendID() { return this.#legendID }
-  get legendName() { return this.#legendName || this.shortName || this.#ID }
+  get legendName() { return this.#legendName || this.overlay?.name || this?.shortName || this.#ID }
   set legendName(n) { this.setLegendName(n) }
   set legendVisibility(v) { this.setLegendVisibility(v) }
   get indicator() { return this.#indicator }
@@ -264,8 +264,8 @@ export default class Indicator extends Overlay {
    * @param {String} name 
    */
   setLegendName(name) {
-    this.#legendName = (isString(name)) ? name : this.shortName || this.#ID
-    this.chart.legend.modify(this.#legendID, { legendName: name })
+    this.#legendName = (isString(name)) ? name : this.overlay?.name || this.shortName || this.#ID
+    this.chart.legend.modify(this.#legendID, { legendName: this.#legendName })
   }
 
   /**
