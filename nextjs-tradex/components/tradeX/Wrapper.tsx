@@ -8,19 +8,17 @@ import FullScreenWrapper from '../FullScreen/FullScreenWrapper';
 import FullScreenButton from '../FullScreen/FullScreenButton';
 import Toolbar from './Toolbar';
 import { IIndicatorToolbar, ITokenChartProps } from './utils/types'; // don't change this, these are from the wrapper not the module
-import { IIndicator, ITradeData } from '../../../types'; // import from 'tradex-chart';
+import { IIndicator, ITradeData, ITradeX } from '../../../types'; // import from 'tradex-chart';
 import Chart from '@/components/tradeX/Chart';
 import { AVAILABLE_INDICATORS as loadIndicators } from '@/components/tradeX/indicators/availbleIndicators';
-
-let end: number;
 
 const TradingChart = (props: ITokenChartProps) => {
   const { toolbar, defaults, ...config } = props;
   const [symbol, setSymbol] = useState(config.title);
   const [tokensList, setTokensList] = useState<string[]>([]);
   const [firstLoad, setFirstLoad] = useState(true);
-  const [isEnd, setIsEnd] = useState(false);
-  const [endDate, setEndDate] = useState(new Date());
+  /*   const [isEnd, setIsEnd] = useState(false);
+   */ /*const [endDate, setEndDate] = useState(new Date()); */
   const [intervals, setIntervals] = useState(toolbar?.intervals || ['1h']);
   const [showPlaceHolder, setShowPlaceHolder] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,45 +46,61 @@ const TradingChart = (props: ITokenChartProps) => {
     handleRemoveIndicator,
     handleAddIndicator,
     getIndicatorId,
-    resetData
+    resetData,
+    handleCreateState,
+    handleUseState,
+    stateKeys
   } = useChart();
 
   const handleSelectIndicator = (indicatorValue: string) => {
     const indicator = loadIndicators[indicatorValue];
-    console.log('indicator to add', indicator);
+    console.log('indicator to add/remove', indicator);
 
     if (indicator) {
-      const newIndicator = {
-        value: indicator.id,
-        label: indicator.name,
-        selected: true
-      };
-
-      // Update the indicators array
-      const updatedIndicators = indicators.map((ind) =>
-        ind.value === newIndicator.value ? { ...ind, selected: true } : ind
+      const existingIndicator = indicators.find(
+        (ind) => ind.value === indicator.id
       );
 
-      setIndicators(updatedIndicators);
+      if (existingIndicator?.selected) {
+        // If the indicator is already selected, remove it
+        setIndicators(
+          indicators.map((ind) =>
+            ind.value === indicator.id ? { ...ind, selected: false } : ind
+          )
+        );
+        handleRemoveIndicator(indicator.id);
+      } else {
+        // If the indicator is not selected, add it
+        const newIndicator = {
+          value: indicator.id,
+          label: indicator.name,
+          selected: true
+        };
 
-      // Prepare the indicator to add with additional settings
-      const indicatorToAdd = {
-        value: indicator.id,
-        name: indicator.name,
-        data: [],
-        customSettings: {}
-      };
+        setIndicators(
+          indicators.map((ind) =>
+            ind.value === newIndicator.value ? { ...ind, selected: true } : ind
+          )
+        );
 
-      handleAddIndicator(indicatorToAdd);
+        const indicatorToAdd = {
+          value: indicator.id,
+          name: indicator.name,
+          data: [],
+          customSettings: {}
+        };
+
+        handleAddIndicator(indicatorToAdd);
+      }
     }
   };
 
-  const handleRangeChange = () => {
+  /*   const handleRangeChange = () => {
     setEndDate(new Date(end - 1));
   };
-
-  const requestData = async () => {
-    if (isLoading || isEnd) return;
+ */
+  /*   const requestData = async () => {
+    if (isLoading) return;
 
     try {
       let newData;
@@ -94,8 +108,10 @@ const TradingChart = (props: ITokenChartProps) => {
       if (symbol) {
         const ticker = symbol + 'USDT';
         newData = await fetchOHLCVData({
+          end,
           selectedInterval,
-          ticker: ticker
+          ticker: ticker,
+          first: firstLoad
         });
       }
       if (newData) {
@@ -103,8 +119,8 @@ const TradingChart = (props: ITokenChartProps) => {
         //console.log('end', end);
         setFirstLoad(false);
 
-        setIsEnd(true); // TODO REMOVE LATER when merging logic is done
-
+         setIsEnd(true); // TODO REMOVE LATER when merging logic is done
+         
         if (data.length) {
           setData([...newData, ...data]);
         } else {
@@ -114,11 +130,12 @@ const TradingChart = (props: ITokenChartProps) => {
         handleMergeData(newData);
       }
     } catch (error) {
-      setIsEnd(true);
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
-  };
+  }; */
+
   const handleTokenChange = (value: React.SetStateAction<string>) => {
     const upperCaseValue = (value as string).toUpperCase();
     setSymbol(upperCaseValue);
@@ -134,12 +151,12 @@ const TradingChart = (props: ITokenChartProps) => {
     setTradeData(tx);
   };
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!symbol || !selectedInterval || isEnd || !defaults?.showTradeData)
       return;
     handleFetchTXData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [symbol, selectedInterval, endDate]);
+  }, [symbol, selectedInterval, endDate]); */
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -147,8 +164,8 @@ const TradingChart = (props: ITokenChartProps) => {
         //const response = await fetch('/api/available-tokens');
         //const data = await response.json();
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        setTokensList(['PEPE', 'WBTC', 'ETH']);
-        handleTokenChange('PEPE');
+        setTokensList(['BTCUSDT', 'ETHUSDT', 'LINKUSDT']);
+        handleTokenChange('BTCUSDT');
       } catch (error) {
         console.error('Error fetching tokens:', error);
       }
@@ -156,11 +173,10 @@ const TradingChart = (props: ITokenChartProps) => {
     fetchTokens();
   }, []);
 
-  useEffect(() => {
+  /*   useEffect(() => {
     setData([]);
     setFirstLoad(true);
     setIsEnd(false);
-
     const indicatorsArray = Object.values(loadIndicators);
     const mappedIndicators = indicatorsArray.map((indicator: IIndicator) => ({
       label: indicator.name,
@@ -171,9 +187,9 @@ const TradingChart = (props: ITokenChartProps) => {
     setIndicators(mappedIndicators);
     setSelectedInterval(defaults?.timeframe || '5m');
     setEndDate(new Date());
-  }, [symbol]);
+  }, [symbol]); */
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (!endDate || !selectedInterval || isLoading) {
       return;
     }
@@ -181,7 +197,7 @@ const TradingChart = (props: ITokenChartProps) => {
     requestData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [endDate, selectedInterval]);
-
+ */
   useEffect(() => {
     if (!data.length && !isLoading) {
       const timeoutId = setTimeout(() => {
@@ -192,6 +208,63 @@ const TradingChart = (props: ITokenChartProps) => {
     }
     setShowPlaceHolder(false);
   }, [data.length, isLoading]);
+
+  useEffect(() => {
+    if (!chartX) return;
+    function kline_Binance(
+      chart: {
+        mergeData: (arg0: { ohlcv: any }, arg1: boolean, arg2: boolean) => void;
+      },
+      start: number,
+      limit = 100
+    ) {
+      const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${selectedInterval}&startTime=${start}&limit=${limit}`;
+      console.log(url);
+      if (!isLoading) {
+        try {
+          fetch(url)
+            .then((r) => r.json())
+            .then((d) => {
+              console.log(d);
+              chart.mergeData({ ohlcv: d }, false, true);
+              setIsLoading(false);
+            });
+        } catch (e) {
+          console.error(e);
+          setIsLoading(false);
+        }
+      }
+    }
+
+    const registerRangeLimt = (chart: ITradeX) => {
+      console.log('registering range limit');
+      const list = chart.state.list();
+      console.log(list);
+      function onRangeLimit(e: any, x: string) {
+        const range = e.chart.range;
+        const limit = 100;
+        const start = range.timeStart - range.interval * limit;
+        const end = range.timeEnd;
+        const interval = range.intervalStr;
+        if (x == 'past') {
+          console.log('past triggered');
+          e.chart.progress.start();
+          kline_Binance(e.chart, start, limit);
+        }
+        if (x == 'future') {
+          console.log('future triggered');
+        }
+      }
+
+      if (chart.on) {
+        console.log('EVENTS REGISTERED');
+        chart.on('range_limitPast', (e) => onRangeLimit(e, 'past'));
+        chart.on('range_limitFuture', (e) => onRangeLimit(e, 'future'));
+      }
+    };
+
+    registerRangeLimt(chartX);
+  }, [chartX, selectedInterval]);
 
   return (
     <FullScreenWrapper>
@@ -214,10 +287,10 @@ const TradingChart = (props: ITokenChartProps) => {
                 onSelectToken={handleTokenChange}
                 onSelectInterval={(value: React.SetStateAction<string>) => {
                   setFirstLoad(true);
-                  setEndDate(new Date());
+                  /* setEndDate(new Date()); */
                   setData([]);
                   setSelectedInterval(value);
-                  setIsEnd(false);
+                  /* setIsEnd(false); */
                 }}
               />
             )}
@@ -237,7 +310,6 @@ const TradingChart = (props: ITokenChartProps) => {
               onchart={indicators}
               tradeData={tradeData}
               customIndicators={loadIndicators}
-              onRangeChange={handleRangeChange}
               chartX={chartX}
               setChart={setChart}
             />

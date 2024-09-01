@@ -5,6 +5,7 @@
   "scripts": {
     "cleanup": "./cleanup.sh && pnpm install",
     "prebuild": "cd .. && npm install && npm run build",
+    "preinstall": "cd .. && npm install",
     "dev": "pnpm cleanup && next dev",
     "build": "next build",
     "start": "next start",

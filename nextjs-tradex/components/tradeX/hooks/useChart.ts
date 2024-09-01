@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { IIndicator } from '../../../../types'; // import from 'tradex-chart';
-import emptyChart from './emptyChart';
 
 type CreateStateType = (state: IState) => string;
 
@@ -16,9 +15,9 @@ interface IState {
 }
 
 const useChart = () => {
-  const [chartX, setChartX] = useState<any>(emptyChart);
-
+  const [chartX, setChartX] = useState<any>();
   const [data, setData] = useState<number[][]>([]);
+  const [stateKeys, setStateKeys] = useState<string[]>([]);
 
   const getIndicators = () => {
     if (!chartX) return;
@@ -60,7 +59,9 @@ const useChart = () => {
 
   const handleCreateState: CreateStateType = (state) => {
     if (!chartX) return;
-    return chartX.state.create(state);
+    const key = chartX.state.create(state);
+    setStateKeys([...stateKeys, key]);
+    return key;
   };
 
   const handleUseState = (id: string) => {
@@ -94,7 +95,13 @@ const useChart = () => {
     handleRemoveIndicator,
     // state
     handleCreateState,
-    handleUseState
+    handleUseState,
+    handleDeleteState: (key: string) => {
+      if (!chartX) return;
+      chartX.state.delete(key);
+      setStateKeys(stateKeys.filter((k) => k !== key));
+    },
+    stateKeys
   };
 };
 

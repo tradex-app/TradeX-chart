@@ -4,6 +4,7 @@ export enum ThemeProps {
 }
 
 export interface ITradeX extends HTMLElement {
+  destroy(): unknown;
   Indicators?: { [key: string]: unknown }[];
   theme?: { setProperty: (property: ThemeProps, value: any) => void };
   start?: (config: object) => void;
@@ -13,6 +14,7 @@ export interface ITradeX extends HTMLElement {
   expunge?: () => void;
   refresh?: () => void;
   state: {
+    list(): unknown;
     create: (state: IState) => string;
     use: (id: string) => void;
   };
