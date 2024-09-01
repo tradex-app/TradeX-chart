@@ -681,7 +681,7 @@ export default class MainPane extends Component {
 
     // check for sizing error
     const tally = this.tallyChartHeights()
-    if (tally.height > this.#elMain.height) {
+    if (tally.total > this.#elMain.height) {
       
     }
 
@@ -978,10 +978,10 @@ export default class MainPane extends Component {
 
   tallyChartHeights() {
     const panes = this.#ChartPanes.entries()
-    const heights = { panes: {}, tally: 0 }
+    const heights = { panes: {}, total: 0 }
     for (let [key, value] of panes) {
       heights.panes[key] = value
-      heights.tally += value.height
+      heights.total += value.height
     }
     return heights
   }

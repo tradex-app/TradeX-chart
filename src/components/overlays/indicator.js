@@ -1548,10 +1548,14 @@ export default class Indicator extends Overlay {
 
   validate(src, def, d) {
     let dm = d.meta
+    let val;
     for (let f of def) {
+      val =  (typeof src[f.name] == "object") ? 
+        src[f.name]?.value :
+        src[f.name]
       // if input value is type is incorrect, use the default
-      if (typeof src[f.name] !== f.type)
-        src[f.name] = f.defaultValue
+      src[f.name] = (typeof val !== f.type) ?
+        f.defaultValue : val
   
       if ("range" in def)
         src[f.name] = limit(src[f.name], f.range.min, f.range.max)
