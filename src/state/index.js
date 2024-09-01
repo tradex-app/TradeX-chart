@@ -592,6 +592,9 @@ export default class State {
   // TODO: merge indicator data?
   // TODO: merge dataset?
   mergeData(merge, newRange=false, calc=false) {
+
+    let tfMS = this.range.timeFrameMS
+
     if (!isObject(merge)) {
       this.error(`ERROR: ${this.id}: merge data must be type Object!`)
       return false
@@ -692,7 +695,6 @@ export default class State {
       // chart has data, check for gaps and overlap and then merge
       else {
         // are there gaps in the merge data?
-        let tfMS = tfMS
         let mStart = mData[0][0]
         let mEnd = mData[mData.length - 1][0]
         let mDataMS = (mData.length - 1) * tfMS

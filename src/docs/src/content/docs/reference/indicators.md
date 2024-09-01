@@ -63,7 +63,7 @@ All indicator parameters are optional. if no
 | id | String | indicator id - if undefined, one will be automatically generated and assigned. id can be used for restoring a chart State. |
 | legendName | String | name or title prefixed to indicator data (if any) displayed on the chart |
 | data | Array | any initial indicator data - if provided ``calcIndicator()`` will **not** be triggered. See [Indicator Data Format](#indicator-data-format) |
-| settings | will modify the default indicator [definition](#indicator-settings) |
+| settings | Object | will modify the default indicator [definition](#indicator-settings) |
 
 #### Indicator Settings
 

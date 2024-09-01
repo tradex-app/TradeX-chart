@@ -384,7 +384,7 @@ export default class TradeXchart extends Tradex_chart {
   get timeFrame() { return this.range.interval }
   get timeFrameStr() { return this.range.intervalStr }
   set pricePrecision(p) { this.setPricePrecision(p) }
-  get pricePrecision() { return this.#pricePrecision }
+  get pricePrecision() { return this.#pricePrecision || PRICE_PRECISION }
   get volumePrecision() { return this.#volumePrecision }
 
   set stream(stream) { return this.setStream(stream) }

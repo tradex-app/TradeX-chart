@@ -972,17 +972,17 @@ const dre =   {
 
 const configs = [
 
-  {config: bearHawk, stream: null},
-  {config: tradesTestState, stream: null},
-  {config: config1, stream: null},
+  // {config: bearHawk, stream: null},
+  // {config: tradesTestState, stream: null},
+  // {config: config1, stream: null},
   // {config: config2, stream: null},
 
-  // {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
+  {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
   // {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
-  {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
-  {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
-  {config: config6, stream: null},
-  {config: config8, stream: null},
+  // {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
+  // {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
+  // {config: config6, stream: null},
+  // {config: config8, stream: null},
   // {config: config7, stream: null},
   // {config: config9, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
   // {config: config9, stream: (chart) => {livePrice_Binance(chart, "linkusdt", config9.timeFrame)}},
@@ -1242,9 +1242,10 @@ chart0.addIndicator("TRDFLO", "TradeFlow1", {data: [], settings: {test: true}})
 // chart0.addIndicator("DBLMA", "DblMA", {data: [], settings: {}})
 
 // chart0.addIndicator("DMI", "DMI1", {data: []})
+*/
 chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
 chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
-
+/*
 // register custom overlay
 chart0.setCustomOverlays({
   // custom: {
