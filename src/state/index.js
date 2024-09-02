@@ -66,6 +66,8 @@ const DEFAULT_STATE = {
     }
   },
   range: {
+    intervalStr: DEFAULT_TIMEFRAME,
+    interval: DEFAULT_TIMEFRAMEMS,
     timeFrame: DEFAULT_TIMEFRAME,
     timeFrameMS: DEFAULT_TIMEFRAMEMS,
     initialCnt: INTITIALCNT
@@ -317,6 +319,15 @@ export default class State {
         key = undefined
     }
     return key
+  }
+
+  static setTimeFrame(key, ohlcv) {
+    let state = State.get(key)
+    if (!state || state.isEmpty || !isArray(ohlcv) || ohlcv.length < 2) return false
+
+    let timeFrame = detectInterval(ohlcv)
+    state.range.timeFrameMS = timeFrame
+    state.range.timeFrame = ms2Interval(timeFrame)
   }
 
   /**
@@ -632,6 +643,8 @@ export default class State {
   // TODO: merge indicator data?
   // TODO: merge dataset?
   mergeData(merge, newRange=false, calc=false) {
+
+    if (this.isEmpty) State.setTimeFrame(this.key, merge?.ohlcv)
 
     let tfMS = this.range.timeFrameMS
 

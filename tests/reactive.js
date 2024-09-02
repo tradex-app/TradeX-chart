@@ -17,10 +17,6 @@ function makeRef(v, k) {
   v.__subs__ = {}
   v.__observer__ = function (cb) { v.__subs__[k](cb) }
 
-
-
-
-
   v = {
     __last__: v,
     __subs__: [],
@@ -44,12 +40,10 @@ function reactive(v) {
     if ("__observer__" in v) return new Error ("ref() target is already reactive")
     else {
       // iterate over properties to add getters and setters
-      for (k in v) {
+      for (let k in v) {
         if (isObject(v[k])) {
           makeRef(v, k)
         }
-
-
 
         v[k] = makeRef(v,k)
         watch(v[k], (newVal, oldVal) => {
