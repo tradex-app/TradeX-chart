@@ -4,7 +4,7 @@
 import { NAME, SHORTNAME, ID, RANGELIMIT, PRICE_PRECISION, VOLUME_PRECISION, STREAM_UPDATE } from './definitions/core'
 import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH, watermark } from './definitions/style'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, OVERLAYPANES } from './definitions/chart'
-import { defaultConfig, defaultTitle } from './definitions/config'
+import { defaultConfig, defaultTitle, initialEmptyState } from './definitions/config'
 import IndicatorsPublic, { IndicatorClasses } from './definitions/indicators'
 import * as packageJSON from '../package.json'
 import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, isError, isPromise, isClass } from './utils/typeChecks'
@@ -279,9 +279,9 @@ export default class TradeXchart extends Tradex_chart {
     this.timers = false
     // this.#config = copyDeep(defaultConfig)
     this.setID(null)
-    this.#state = this.#State.create({core: this}, false, false)
+    // this.#state = this.#State.create({id: initialEmptyState, core: this}, false, false)
 
-    console.warn(`!WARNING!: ${NAME} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`)
+    this.warn(`!WARNING!: ${NAME} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`)
     this.log(`${SHORTNAME} instance count: ${this.inCnt}`)
 
     this.oncontextmenu = window.oncontextmenu
@@ -480,6 +480,8 @@ export default class TradeXchart extends Tradex_chart {
 
       const newState = this.#State.create(state, deepValidate, isCrypto)
       this.#state.use( newState.key )
+      this.#State.delete({id: initialEmptyState})
+
       delete txCfg.state
 
       this.#MainPane = new MainPane(this, txCfg)
@@ -497,6 +499,7 @@ export default class TradeXchart extends Tradex_chart {
     // Chart has no State, so instantiate one
     else {
       txCfg.watermark.display = true
+      state.id = initialEmptyState
 
       this.#state = this.#State.create(state, deepValidate, isCrypto)
       delete txCfg.state

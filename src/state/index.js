@@ -127,6 +127,13 @@ export default class State {
     return instance
   }
 
+  static findStateById(id) {
+    for (let s of State.#stateList) {
+      if (s[1].id == id) return s[1].key
+    }
+    return undefined
+  }
+
   static validate(state, deepValidate=false, isCrypto=false) {
 
     const defaultState = State.default
@@ -280,7 +287,8 @@ export default class State {
     return state
   }
 
-  static delete(key) {
+  static delete(state) {
+    let key = State.getKey(state)
     if (!isString(key) ||
         !State.has(key)
       ) return false
@@ -294,6 +302,21 @@ export default class State {
 
   static get(key) {
     return State.#stateList.get(key)
+  }
+
+  static getKey(target) {
+    let key;
+
+    if (isObject(target) && Object.keys(target).length < 3) {
+      if (isString(target?.id)) {
+        key = State.findStateById(target.id) || target?.key
+      }
+      else if (isString(target?.key))
+        key = target?.key
+      else
+        key = undefined
+    }
+    return key
   }
 
   /**
@@ -494,11 +517,17 @@ export default class State {
 
   /**
    * delete a current or stored chart state
-   * @param {string} key - state id
+   * @param {String|Object} target - state key or {id: "someID"} or {key: "stateKey"}
    * @returns {boolean}
    */
-  delete(key) {
-    if (!isString(key)) return false
+  delete(state) {
+    let key = this.#key
+
+    if (!state) key = State.getKey(state)
+    if (!isString(key)) {
+      core.error(`${core.name} : State.use() : State not found`)
+      return false
+    }
     // delete any state but this instance
     if (key !== this.key) {
       State.delete(key)
@@ -510,6 +539,10 @@ export default class State {
         const empty = State.create()
         this.use(empty.key)
         State.delete(key)
+      }
+      else {
+        core.error(`${core.name} : State.use() : State not found`)
+        return false
       }
     }
     return true
@@ -527,8 +560,14 @@ export default class State {
     return State.get(key)
   }
 
-  use(key) {
+  /**
+   * Use a chart State 
+   * @param {String|Object} target - state key or {id: "someID"} or {key: "stateKey"}
+   * @returns {Boolean} - success / failure
+   */
+  use(state) {
     const core = this.core
+    const key = State.getKey(state)
 
     // invalid state id
     if (!State.has(key)) {
@@ -568,6 +607,7 @@ export default class State {
     //   core.MainPane.restart()
 
     core.refresh()
+    return true
   }
 
   /**
