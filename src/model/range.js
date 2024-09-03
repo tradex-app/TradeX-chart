@@ -12,6 +12,7 @@ import { diff } from "../utils/utilities"
 export class Range {
 
   #core
+  #state
   #worker
   #init = true
   #indexed = false
@@ -35,10 +36,7 @@ export class Range {
   #limitFuture = LIMITFUTURE
   #limitPast = LIMITPAST
   #minCandles = MINCANDLES
-  #maxCandles = 
-      this.#core?.MainPane?.graph?.width || 
-      this.#core?.parentElement.clientWidth || 
-      MAXCANDLES;
+  #maxCandles = MAXCANDLES;
   #yAxisBounds = YAXIS_BOUNDS
   anchor
 
@@ -47,22 +45,25 @@ export class Range {
    * Creates an instance of Range.
    * @param {number} start - initial index start
    * @param {number} end - initial index end
-   * @param {Object} [config={}] - range config
+   * @param {Object} config - range config
+   * @param {TradeXchart} config.core
+   * @param {State} config.state
+   * @param {Number} config.interval
+   * @param {Number} config.initialCnt
+   * @param {Number} config.limitFuture
+   * @param {Number} config.limitPast
+   * @param {Number} config.minCandles
+   * @param {Number} config.maxCandles
+   * @param {Number} config.yAxisBounds
    * @memberof Range
    */
-  constructor( start, end, config={}) {
-    if (!isObject(config)) return false
-    if (!(config?.core instanceof TradeXchart)) return false
+  constructor( start, end, config) {
+    if (!isObject(config) ||
+        !(config?.core instanceof TradeXchart))
+        throw new Error(`Range requires a config`)
 
     this.#init = true;
     this.setConfig(config)
-    this.#core = config.core;
-
-    // initial range length
-    this.#initialCnt = 
-      this.#core.config?.range?.initialCnt || 
-      config.data?.initialCnt ||
-      this.#initialCnt;
 
     // start sanity check
     if (!isInteger(start) || this.isPastLimit(start))
@@ -90,7 +91,7 @@ export class Range {
       start = this.rangeLimit * -2
       end = this.rangeLimit * 2
       this.#interval = tf
-      this.#intervalStr = ms2Interval(this.interval)
+      this.#intervalStr = ms2Interval(this.#interval)
       this.anchor = ts - (ts % tf) // - (this.limitPast * this.#interval)
     } 
     // nimimum of two entries to calculate time frame / interval
@@ -112,7 +113,7 @@ export class Range {
     this.set(start, end)
   }
 
-  get allData () { return this.#core?.state.allData }
+  get allData () { return this.#state.allData }
   get data () { return this.allData?.data || [] }
   get dataLength () { return (!!this.allData?.data.length) ? this.allData.data.length - 1 : 0 }
   get Length () { return this.indexEnd - this.indexStart }
@@ -139,7 +140,7 @@ export class Range {
   get maxCandles () { return this.#maxCandles }
   get yAxisBounds () { return this.#yAxisBounds }
   get rangeLimit () { return this.#limitFuture }
-  get diff () { return this.max - this.min }
+  get diff () { return this?.valueDiff }
 
   end() {
     // WebWorker.destroy(this.#worker.id)
@@ -195,7 +196,7 @@ export class Range {
 
     inOut -= this.Length
 
-    this.setConfig({maxCandles: max})
+    this.setMaxCandles(max)
     this.setAllMaxMin()
 
     // if (this.#init || this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
@@ -225,15 +226,41 @@ export class Range {
     // return true
   }
 
+  /**
+   * Configure Range
+   * @param {Object} config 
+   * @param {TradeXchart} config.core
+   * @param {State}  config.state
+   * @param {Number} config.initialCnt
+   * @param {Number} config.limitFuture
+   * @param {Number} config.limitPast
+   * @param {Number} config.minCandles
+   * @param {Number} config.maxCandles
+   * @param {Number} config.yAxisBounds
+   * @returns 
+   */
   setConfig(config) {
-    if (!isObject(config)) return false
-
-    this.#initialCnt = (isInteger(config?.initialCnt)) ? config.initialCnt : INTITIALCNT;
+    let state = config?.state
+    if ((state?.constructor?.name != `State`)) throw new Error(`Range requires a valid State`)
+    this.#state = state
+    let core = config?.core
+    if (!(core instanceof TradeXchart)) throw new Error(`Range requires a valid TradeXchart instance`)
+    this.#core = core
+    let initialCnt = (isInteger(config?.initialCnt)) ? config.initialCnt : INTITIALCNT;
+    this.#initialCnt = this.#core.config?.range?.initialCnt || initialCnt
     this.#limitFuture = (isInteger(config?.limitFuture)) ? config.limitFuture : LIMITFUTURE;
     this.#limitPast = (isInteger(config?.limitPast)) ? config.limitPast : LIMITPAST;
-    this.#minCandles = (isInteger(config?.minCandles)) ? config.minCandles : MINCANDLES;
-    this.#maxCandles = (isInteger(config?.maxCandles)) ? config.maxCandles : MAXCANDLES;
     this.#yAxisBounds = (isNumber(config?.yAxisBounds)) ? config.yAxisBounds : YAXIS_BOUNDS;
+    this.#minCandles = (isInteger(config?.minCandles)) ? config.minCandles : MINCANDLES;
+    this.setMaxCandles(config?.maxCandles)
+  }
+
+  setMaxCandles ( max ) {
+    let maxCandles = 
+      this.#core?.MainPane?.graph?.width || 
+      this.#core?.parentElement?.clientWidth || 
+      MAXCANDLES;
+    this.#maxCandles = (isInteger(max)) ? max : maxCandles;
   }
 
   setMaxMin ( maxMin ) {

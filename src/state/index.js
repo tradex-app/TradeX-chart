@@ -3,16 +3,17 @@
 
 import * as packageJSON from '../../package.json'
 import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString } from '../utils/typeChecks'
-import Dataset from '../model/dataset'
 import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
 import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual } from '../utils/utilities'
 import { calcTimeIndex, detectInterval } from '../model/range'
-import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp } from '../utils/time'
+import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame } from '../utils/time'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT } from '../definitions/chart'
 import { SHORTNAME } from '../definitions/core'
-import TradeXchart from '../core'
+import TradeXchart, { isChart } from '../core'
+import { Range } from '../model/range'
 import Indicator from '../components/overlays/indicator'
 import Stream from '../helpers/stream'
+import Dataset from '../model/dataset'
 import MainPane from '../components/main'
 import { OHLCV } from '../definitions/chart'
 import Chart from '../components/chart'
@@ -467,9 +468,13 @@ export default class State {
   #isEmpty = true
   #mergeList = []
   #dataSource
+  #range
   #core
 
   constructor(state=State.default, deepValidate=false, isCrypto=false) {
+    if (!(state?.core instanceof TradeXchart)) throw new Error(`State : invalid TradeXchart instance`)
+    this.#core = state.core
+
     // validate state
     if (isObject(state)) {
       this.#data = State.validate(state, deepValidate, isCrypto)
@@ -485,6 +490,22 @@ export default class State {
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
     this.#key = uid(`${SHORTNAME}_state`)
     this.#id = state?.id || this.#key
+
+    let cfg = this.#core.config.range
+    let config = {
+      core: this.#core,
+      state: this,
+      interval: cfg?.timeFrameMS,
+      initialCnt: cfg?.initialCnt,
+      limitFuture: cfg?.limitFuture,
+      limitPast: cfg?.limitPast,
+      minCandles: cfg?.minCandles,
+      maxCandles: cfg?.maxCandles,
+      yAxisBounds: cfg?.yAxisBounds,
+    }
+    let start = cfg?.startTS || 0;
+    let end  = cfg?.startTS || 0;
+    this.#range = new Range(start, end, config)
   }
 
   get id() { return this.#id }
@@ -511,7 +532,7 @@ export default class State {
   get data() { return this.#data }
   get core() { return (this.#core !== undefined) ? this.#core : false }
   get time() { return this.#core.timeData }
-  get range() { return this.#core.range }
+  get range() { return this.#range }
   
   error(e) { this.#core.error(e) }
 
@@ -603,6 +624,7 @@ export default class State {
     this.#isEmpty = source.isEmpty
     this.#data = source.data
 
+// TODO: remove ???
     // create new Range
     const chart = source.data.chart
     const rangeConfig = {

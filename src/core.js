@@ -353,8 +353,8 @@ export default class TradeXchart extends Tradex_chart {
       datasets: this.state.data.datasets
     }
   }
-  get rangeLimit() { return (isNumber(this.#range.initialCnt)) ? this.#range.initialCnt : RANGELIMIT }
-  get range() { return this.#range }
+  get rangeLimit() { return (isNumber(this.range.initialCnt)) ? this.range.initialCnt : RANGELIMIT }
+  get range() { return this.#state.range }
   get time() { return this.#timeData }
   get timeData() { return this.#timeData }
   get TimeUtils() { return Time }
@@ -507,13 +507,13 @@ export default class TradeXchart extends Tradex_chart {
       this.log(`${this.name} id: ${this.ID} : created with a ${this.state.status} state`)  
 
       // set default range
-      let start = 0
-      let end = this.#state.data.range.initialCnt
-      let rangeConfig = (isObject(txCfg?.range)) ? txCfg.range : {}
-            rangeConfig.interval = ms
-            rangeConfig.core = this
-      this.getRange(null, null, rangeConfig)
-      this.setRange(start, end)
+      // let start = 0
+      // let end = this.#state.data.range.initialCnt
+      // let rangeConfig = (isObject(txCfg?.range)) ? txCfg.range : {}
+      //       rangeConfig.interval = ms
+      //       rangeConfig.core = this
+      // this.getRange(null, null, rangeConfig)
+      // this.setRange(start, end)
 
       // setup main chart features
       this.#WidgetsG = new WidgetsG(this, {widgets: txCfg?.widgets})
@@ -549,7 +549,7 @@ export default class TradeXchart extends Tradex_chart {
       this.#delayedSetRange = true
     }
 
-    this.log(`Time Frame: ${this.#range.timeFrame} Milliseconds: ${this.#range.timeFrameMS}`)
+    this.log(`Time Frame: ${this.range.timeFrame} Milliseconds: ${this.range.timeFrameMS}`)
 
     if (this.#delayedSetRange) 
       this.on(STREAM_UPDATE, this.delayedSetRange, this)
@@ -1028,8 +1028,8 @@ export default class TradeXchart extends Tradex_chart {
    * @memberof TradeXchart
    */
   getRange(start, end, config={}) {
-    this.#range = new Range(start, end, config)
-    this.#timeData = new Time.TimeData(this.#range)
+    let range = new Range(start, end, config)
+    this.#timeData = new Time.TimeData(range)
   }
 
   /**
@@ -1042,7 +1042,7 @@ export default class TradeXchart extends Tradex_chart {
     const max = (this.config?.maxCandles)? this.config.maxCandles : 
       (this.Chart?.layerWidth) ? this.Chart.layerWidth : this.Chart.width
 
-    this.#range.set(start, end, max)
+    this.range.set(start, end, max)
 
     if (start < 0 && !this.#mergingData) 
       this.emit("range_limitPast", {chart: this, start, end})
@@ -1575,4 +1575,8 @@ if (!window.customElements.get('tradex-chart')) {
 // else {
   // define <tradex-chart></tradex-chart>
   customElements.get('tradex-chart') || customElements.define('tradex-chart', TradeXchart)
+}
+
+export function isChart(chart) {
+  return chart instanceof TradeXchart
 }
