@@ -1322,7 +1322,7 @@ export default class Indicator extends Overlay {
 
       const data = this.calcIndicator(this.libName, this.definition.input, this.range);
 
-      if (data) {
+      if (isArray(data)) {
         const d = new Set(data)
         const o = new Set(od)
         let a, p, r = {}, s;
@@ -1331,6 +1331,7 @@ export default class Indicator extends Overlay {
             this.overlay.data = data
             return
         }
+        else if (!data.length) return
         else if (data[0][0] < od[0][0]) {
           // s = new Set([...d, ...o])
           // this.overlay.data = Array.from(s)

@@ -117,21 +117,142 @@ const validator = {
 
 export default class State {
 
-  static #stateList = new xMap()
+  static #chartList = new xMap()
   static #dss = {}
   
   static get default() { return copyDeep(DEFAULT_STATE) }
-  static get list() { return State.#stateList }
 
-  static create(state=State.default, deepValidate=false, isCrypto=false) {
+  static server(chart) {
+
+    if (!isChart( chart )) return undefined
+
+    let states = new xMap()
+
+    if (!State.#chartList.has(chart.key)) {
+      State.#chartList.set(chart.key, {chart, states, active: undefined})
+    }
+
+    // const id = chart.key
+
+    // return new Proxy( State, {
+    //   get: (obj, prop) => {
+    //     switch (prop) {
+    //       case "list": return State.list(id)
+    //       case "active": return State.active(id)
+    //       default: return obj[prop]
+    //     }
+    //   }
+    // })
+  }
+
+  static chartList(chart) {
+    if (!isChart(chart)) return undefined
+    else if (State.#chartList.has(chart.key))
+      return State.#chartList.get(chart.key)
+    else return undefined
+  }
+
+  static create(chart, state=State.default, deepValidate=false, isCrypto=false) {
+    if (!isChart( chart )) return undefined
+
     const instance = new State(state, deepValidate, isCrypto)
     const key = instance.key
-    State.#stateList.set(key,instance)
+    let server = State.#chartList.get(chart.key)
+
+    if (!server) {
+      State.server(chart)
+      server = State.#chartList.get(chart.key)
+    }
+
+    server.states.set(key, instance)
     return instance
   }
 
-  static findStateById(id) {
-    for (let s of State.#stateList) {
+  static active(chart) {
+    return State.chartList(chart)?.active
+  }
+
+  static list (chart) {
+    let states = State.chartList(chart)?.states
+    if (!states) return undefined
+    
+    return Array.from( states, 
+      ([key, value]) => ({key, value}))
+  }
+
+  /**
+   * Use a chart State - set it to active
+   * @param {TradeXchart} chart - target
+   * @param {String|Object} state - state key or {id: "someID"} or {key: "stateKey"}
+   * @returns {State|undefined} - chart state
+   */
+  static use(chart, state) {
+    const key = State.getKey(state, chart)
+    const states = State.#chartList.get(chart.key)
+    let active = states.active
+    let target = states.states.get(key)
+    // invalid state id
+    if (!target) {
+      chart.warn(`${chart.name} id: ${chart.key} : State ${key} does not exist`)
+      return undefined
+    }
+    // same as current state, nothing to do
+    if (key != active?.key)
+      active = target
+    
+    states.active = active
+    
+    const source = new Proxy( target, {
+      get: (obj, prop) => {
+        return active[prop]
+      }
+    })
+
+    // stop any streams
+    if (chart.stream instanceof Stream)
+      chart.stream.stop()
+    // clean up panes - remove indicators
+    if (isFunction(chart.MainPane?.reset))
+      chart.MainPane.reset()
+    // set chart to use state
+    // chart.state = source
+
+    // this.#id = source.id
+    // // this.#key = source.key
+    // this.#status = source.status
+    // this.#isEmpty = source.isEmpty
+    // this.#data = source.data
+// --------------
+
+    // create new Range
+    // const chart = source.data.chart
+    // const rangeConfig = {
+    //   interval: chart?.tfms,
+    //   core
+    // }
+    // const start = chart?.startTS
+    // const end = chart?.endTS
+    // chart.getRange(start, end, rangeConfig)
+
+// ----------------
+
+    // // rebuild chart - add any indicators found in the new state
+    // if (isFunction(chart.MainPane.restart))
+    //   chart.MainPane.restart()
+
+// update Range from previous
+
+
+    chart.refresh()
+    return source
+  }
+  
+
+  static findStateById(id, chart) {
+    let states = State.chartList(chart)?.states
+    if (!states) return undefined
+
+    for (let s of states) {
       if (s[1].id == id) return s[1].key
     }
     return undefined
@@ -290,29 +411,32 @@ export default class State {
     return state
   }
 
-  static delete(state) {
-    let key = State.getKey(state)
+  static delete(chart, state) {
+    let states = State.chartList(chart)?.states
+    if (states) return undefined
+
+    let key = states.getKey(state)
     if (!isString(key) ||
-        !State.has(key)
+        !states.has(key)
       ) return false
-    State.#stateList.delete(key)
+    states.delete(key)
     return true
   }
 
-  static has(key) {
-    return State.#stateList.has(key)
+  static has(key, chart) {
+    return State.chartList(chart)?.states?.has(key)
   }
 
-  static get(key) {
-    return State.#stateList.get(key)
+  static get(key, chart) {
+    return State.chartList(chart)?.states?.get(key)
   }
 
-  static getKey(target) {
-    let key;
+  static getKey(target, chart) {
+    let key = target
 
     if (isObject(target) && Object.keys(target).length < 3) {
       if (isString(target?.id)) {
-        key = State.findStateById(target.id) || target?.key
+        key = State.findStateById(target.id, chart) || target?.key
       }
       else if (isString(target?.key))
         key = target?.key
@@ -324,11 +448,16 @@ export default class State {
 
   static setTimeFrame(key, ohlcv) {
     let state = State.get(key)
-    if (!state || state.isEmpty || !isArray(ohlcv) || ohlcv.length < 2) return false
+    let timeFrame = undefined
 
-    let timeFrame = detectInterval(ohlcv)
+    if (!state) return false
+
+    if (state.isEmpty && isArray(ohlcv) && ohlcv.length > 1) {
+      timeFrame = detectInterval(ohlcv)
     state.range.timeFrameMS = timeFrame
     state.range.timeFrame = ms2Interval(timeFrame)
+    }
+    return timeFrame
   }
 
   /**
@@ -503,8 +632,8 @@ export default class State {
       maxCandles: cfg?.maxCandles,
       yAxisBounds: cfg?.yAxisBounds,
     }
-    let start = cfg?.startTS || 0;
-    let end  = cfg?.startTS || 0;
+    let start = undefined
+    let end  = undefined
     this.#range = new Range(start, end, config)
   }
 
@@ -557,7 +686,7 @@ export default class State {
 
     if (!state) key = State.getKey(state)
     if (!isString(key)) {
-      core.error(`${core.name} : State.use() : State not found`)
+      core.error(`${core.name} : State.delete() : State not found`)
       return false
     }
     // delete any state but this instance
@@ -590,57 +719,6 @@ export default class State {
 
   get(key) {
     return State.get(key)
-  }
-
-  /**
-   * Use a chart State 
-   * @param {String|Object} target - state key or {id: "someID"} or {key: "stateKey"}
-   * @returns {Boolean} - success / failure
-   */
-  use(state) {
-    const core = this.core
-    const key = State.getKey(state)
-
-    // invalid state id
-    if (!State.has(key)) {
-      core.warn(`${core.name} id: ${core.id} : Specified state does not exist`)
-      return false
-    }
-
-    // same as current state, nothing to do
-    if (key === this.key) return true
-    
-    // stop any streams
-    if (core.stream instanceof Stream)
-      core.stream.stop()
-    // clean up panes - remove indicators
-    // if (isFunction(core.MainPane.reset))
-      core.MainPane.reset()
-    // set chart to use state
-    let source = State.get(key)
-    this.#id = source.id
-    // this.#key = source.key
-    this.#status = source.status
-    this.#isEmpty = source.isEmpty
-    this.#data = source.data
-
-// TODO: remove ???
-    // create new Range
-    const chart = source.data.chart
-    const rangeConfig = {
-      interval: chart?.tfms,
-      core
-    }
-    const start = chart?.startTS
-    const end = chart?.endTS
-    core.getRange(start, end, rangeConfig)
-
-    // // rebuild chart - add any indicators found in the new state
-    // if (isFunction(core.MainPane.restart))
-    //   core.MainPane.restart()
-
-    core.refresh()
-    return true
   }
 
   /**

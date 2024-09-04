@@ -258,7 +258,7 @@ export class Range {
   setMaxCandles ( max ) {
     let maxCandles = 
       this.#core?.MainPane?.graph?.width || 
-      this.#core?.parentElement?.clientWidth || 
+      Math.floor(this.#core?.parentElement?.clientWidth) || 
       MAXCANDLES;
     this.#maxCandles = (isInteger(max)) ? max : maxCandles;
   }
