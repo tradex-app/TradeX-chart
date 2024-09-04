@@ -258,32 +258,34 @@ export default class State {
     return undefined
   }
 
-  static validate(state, deepValidate=false, isCrypto=false) {
+  static validate(source=State.default, deepValidate=false, isCrypto=false) {
 
     const defaultState = State.default
+    let state
 
-    if (!isObject(state)) {
-      state = defaultState
-    }
+    if (!isObject(source)) source = defaultState
 
     // set up main (primary) chart state (handles price history (candles OHLCV))
-    if (!isObject(state.chart)) {
-      state.chart = defaultState.chart
-      state.chart.isEmpty = true
-      state.chart.data = (isArray(state.ohlcv)) ? state.ohlcv : []
+    if (!isObject(source.chart)) {
+      source.chart = defaultState.chart
+      source.chart.isEmpty = true
+      source.chart.data = (isArray(source.ohlcv)) ? source.ohlcv : []
       // Remove ohlcv we have Data
-      delete state.ohlcv
+      delete source.ohlcv
     }
 
-    state = mergeDeep(defaultState, state)
+    state = mergeDeep(defaultState, source)
 
     if (deepValidate) 
       state.chart.data = validateDeep(state.chart.data, isCrypto) ? state.chart.data : []
     else 
       state.chart.data = validateShallow(state.chart.data, isCrypto) ? state.chart.data : []
 
-    state.allData.data = state.chart.data
     state.chart.isEmpty = (state.chart.data.length == 0) ? true : false
+    Object.defineProperty( state.allData, "data", {
+        get: function() { return state.chart.data }
+      }
+    )
 
     // validate range
     if (!isObject(state.range)) state.range = {}
@@ -595,7 +597,6 @@ export default class State {
   #data = {}
   #status = false
   #isEmpty = true
-  #mergeList = []
   #dataSource
   #range
   #core
