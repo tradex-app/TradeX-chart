@@ -57,7 +57,6 @@ export default class graph {
   set layerWidth(w) { this.#layerWidth = w || this.#elParent.width }
   get layerWidth() { return this.#layerWidth }
   get stateMachine() { return this.#parent.stateMachine }
-  set state(s) { this.#core.setState(s) }
   get state() { return this.#core.getState() }
   get data() { return this.#core.chartData }
   get range() { return this.#core.range }

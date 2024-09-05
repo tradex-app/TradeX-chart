@@ -3,7 +3,7 @@
 import TradeXchart from "../core"
 import { ms2Interval, TimeData } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS, INTITIALCNT, DEFAULT_TIMEFRAME } from "../definitions/chart"
-import { isInteger, isNumber, isObject, isString } from "../utils/typeChecks"
+import { isArray, isInteger, isNumber, isObject, isString } from "../utils/typeChecks"
 import { bRound, limit } from "../utils/number"
 import { diff } from "../utils/utilities"
 // import WebWorker from "./webWorkers"
@@ -241,7 +241,7 @@ export class Range {
    */
   setConfig(config) {
     let state = config?.state
-    if ((state?.constructor?.name != `State`)) throw new Error(`Range requires a valid State`)
+    // if ((state?.constructor?.name != `State`)) throw new Error(`Range requires a valid State`)
     this.#state = state
     let core = config?.core
     if (!(core instanceof TradeXchart)) throw new Error(`Range requires a valid TradeXchart instance`)
@@ -520,7 +520,7 @@ export class Range {
   }
 
   maxMinDatasets() {
-    if (this.allData.secondaryPane.length == 0) return
+    if (!this.allData?.secondaryPane?.length) return
 
     let old = Object.keys(this.secondaryMaxMin) || []
 
@@ -651,6 +651,9 @@ export class Range {
  * @returns {number} - milliseconds
  */
 export function detectInterval(ohlcv) {
+
+  if (!isArray(ohlcv) ||
+      ohlcv.length < 2) return Infinity
 
   let len = Math.min(ohlcv.length - 1, 99)
   let min = Infinity

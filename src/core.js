@@ -103,7 +103,7 @@ export default class TradeXchart extends Tradex_chart {
     main: this.#MainPane,
   }
 
-  #timeData = new Time.TimeData()
+  // #timeData = new Time.TimeData()
 
   destruction = false
 
@@ -358,8 +358,8 @@ export default class TradeXchart extends Tradex_chart {
   }
   get rangeLimit() { return (isNumber(this.range.initialCnt)) ? this.range.initialCnt : RANGELIMIT }
   get range() { return this.state.range }
-  get time() { return this.#timeData }
-  get timeData() { return this.#timeData }
+  get time() { return this.state.time }
+  get timeData() { return this.state.time }
   get TimeUtils() { return Time }
 
   get theme() { return this.#theme }
@@ -842,50 +842,50 @@ export default class TradeXchart extends Tradex_chart {
    * @param {string} key - state id
    * @returns {boolean} - success / failure
    */
-  setState(key) {
-    // invalid state id
-    if (!this.#stateClass.has(this, key)) {
-      this.warn(`${this.name} id: ${this.ID} : Specified state does not exist`)
-      return false
-    }
+  // setState(key) {
+  //   // invalid state id
+  //   if (!this.#stateClass.has(this, key)) {
+  //     this.warn(`${this.name} id: ${this.ID} : Specified state does not exist`)
+  //     return false
+  //   }
 
-    // same as current state, nothing to do
-    if (key === this.state.key) return true
+  //   // same as current state, nothing to do
+  //   if (key === this.state.key) return true
     
-    // stop any streams
-    this.stream.stop()
-    // clean up panes
-    this.MainPane.reset()
-    // set chart to use state
-    this.#state = this.#stateClass.get(this, key)
-    // create new Range
-    const rangeConfig = {
-      interval: this.state.data.chart.tfms,
-      core: this
-    }
-    this.getRange(undefined, undefined, rangeConfig)
+  //   // stop any streams
+  //   this.stream.stop()
+  //   // clean up panes
+  //   this.MainPane.reset()
+  //   // set chart to use state
+  //   this.#state = this.#stateClass.get(this, key)
+  //   // create new Range
+  //   const rangeConfig = {
+  //     interval: this.state.data.chart.tfms,
+  //     core: this
+  //   }
+  //   this.getRange(undefined, undefined, rangeConfig)
 
-    // set Range
-    if (this.range.Length > 1) {
-      const rangeStart = calcTimeIndex(this.time)
-      const end = (isInteger(rangeStart)) ? 
-        rangeStart + this.range.initialCnt :
-        this.state.data.chart.data.length - 1
-      const start = (isInteger(rangeStart)) ? 
-        rangeStart : 
-        end - this.range.initialCnt
-      this.range.initialCnt = end - start
-      this.setRange(start, end)
+  //   // set Range
+  //   if (this.range.Length > 1) {
+  //     const rangeStart = calcTimeIndex(this.time)
+  //     const end = (isInteger(rangeStart)) ? 
+  //       rangeStart + this.range.initialCnt :
+  //       this.state.data.chart.data.length - 1
+  //     const start = (isInteger(rangeStart)) ? 
+  //       rangeStart : 
+  //       end - this.range.initialCnt
+  //     this.range.initialCnt = end - start
+  //     this.setRange(start, end)
 
-      if (this.config.range?.center)
-      this.jumpToIndex(start, true, true)
-    }
+  //     if (this.config.range?.center)
+  //     this.jumpToIndex(start, true, true)
+  //   }
 
-    // rebuild chart
-    this.MainPane.restart()
+  //   // rebuild chart
+  //   this.MainPane.restart()
 
-    this.refresh()
-  }
+  //   this.refresh()
+  // }
 
   /**
    * validate and register a chart state
@@ -941,9 +941,13 @@ export default class TradeXchart extends Tradex_chart {
     else if (isObject(stream)) {
       if (this.allData.data.length == 0 && isString(stream.timeFrame)) {
         const { tf, ms } = isTimeFrame(stream?.timeFrame)
-        this.range.interval = ms
-        this.range.intervalStr = tf
-        this.#timeData = new Time.TimeData(this.range)
+
+// TODO: set State timeframe / interval - TimeData and Range
+                                       
+        // this.range.interval = ms
+        // this.range.intervalStr = tf
+        // this.#timeData = new Time.TimeData(this.range)
+      // }
       }
 
       this.#stream = new Stream(this)
@@ -1033,10 +1037,10 @@ export default class TradeXchart extends Tradex_chart {
    * @param {Object} config 
    * @memberof TradeXchart
    */
-  getRange(start, end, config={}) {
-    let range = new Range(start, end, config)
-    this.#timeData = new Time.TimeData(range)
-  }
+  // getRange(start, end, config={}) {
+  //   let range = new Range(start, end, config)
+  //   this.#timeData = new Time.TimeData(range)
+  // }
 
   /**
    * set start and end of range

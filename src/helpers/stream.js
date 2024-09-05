@@ -11,7 +11,7 @@
   }
 */
 
-import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
+import { isArray, isBoolean, isInteger, isNumber, isObject, isString } from '../utils/typeChecks'
 import { YEAR_MS, MONTHR_MS, WEEK_MS, DAY_MS, HOUR_MS, MINUTE_MS, SECOND_MS, MILLISECOND } from '../utils/time';
 import { copyDeep, mergeDeep } from '../utils/utilities';
 import Alerts from './alerts';
@@ -166,10 +166,18 @@ export default class Stream {
   }
 
   onTick(tick) {
-    if (this.#status == STREAM_STARTED || this.#status == STREAM_LISTENING) {
-      if (isObject(tick)) {
+    if ((this.#status == STREAM_STARTED || this.#status == STREAM_LISTENING) && 
+        isObject(tick) ) 
+    {
+        if (!isInteger(tick.t)) tick.t = Date.now()
+        let keys = Object.keys(tick) 
+        let v;
+        for (let key of keys) {
+          v = tick[key] * 1
+          if (!isNumber(v)) return
+          tick[key] = v
+        }
         this.candle = tick
-      }
     }
   }
 

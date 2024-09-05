@@ -6,7 +6,7 @@ import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString
 import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
 import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual } from '../utils/utilities'
 import { calcTimeIndex, detectInterval } from '../model/range'
-import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame } from '../utils/time'
+import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT } from '../definitions/chart'
 import { SHORTNAME } from '../definitions/core'
 import TradeXchart, { isChart } from '../core'
@@ -214,34 +214,6 @@ export default class State {
     // clean up panes - remove indicators
     if (isFunction(chart.MainPane?.reset))
       chart.MainPane.reset()
-    // set chart to use state
-    // chart.state = source
-
-    // this.#id = source.id
-    // // this.#key = source.key
-    // this.#status = source.status
-    // this.#isEmpty = source.isEmpty
-    // this.#data = source.data
-// --------------
-
-    // create new Range
-    // const chart = source.data.chart
-    // const rangeConfig = {
-    //   interval: chart?.tfms,
-    //   core
-    // }
-    // const start = chart?.startTS
-    // const end = chart?.endTS
-    // chart.getRange(start, end, rangeConfig)
-
-// ----------------
-
-    // // rebuild chart - add any indicators found in the new state
-    // if (isFunction(chart.MainPane.restart))
-    //   chart.MainPane.restart()
-
-// update Range from previous
-
 
     chart.refresh()
     return source
@@ -258,6 +230,8 @@ export default class State {
     return undefined
   }
 
+
+
   static validate(source=State.default, deepValidate=false, isCrypto=false) {
 
     const defaultState = State.default
@@ -265,13 +239,16 @@ export default class State {
 
     if (!isObject(source)) source = defaultState
 
+    if (!(source.core instanceof TradeXchart)) throw new Error(`State : invalid TradeXchart instance`)
+
     // set up main (primary) chart state (handles price history (candles OHLCV))
     if (!isObject(source.chart)) {
       source.chart = defaultState.chart
-      source.chart.isEmpty = true
-      source.chart.data = (isArray(source.ohlcv)) ? source.ohlcv : []
+      source.chart.data = (isArray(source?.ohlcv)) ? source.ohlcv : []
+      source.isEmpty = true
+      source.status = "default"
       // Remove ohlcv we have Data
-      delete source.ohlcv
+      delete source?.ohlcv
     }
 
     state = mergeDeep(defaultState, source)
@@ -287,34 +264,39 @@ export default class State {
       }
     )
 
-    // validate range
-    if (!isObject(state.range)) state.range = {}
-
+    /*--- Time Frame ---*/
+    let cfg = state.core.config.range
+    let range = state.range
     let tfms = detectInterval(state.chart.data)
+    
+    if (tfms === Infinity) tfms = range.timeFrameMS || DEFAULT_TIMEFRAMEMS
 
-    if (tfms < SECOND_MS || tfms === Infinity) tfms = DEFAULT_TIMEFRAMEMS
-
-    if ((state.chart.isEmpty ||
-        state.chart.data.length == 1) && 
-        !isInteger(state.range?.timeFrameMS) &&
-        !isString(state.range?.timeFrame))
-      state.range.timeFrameMS = tfms
-
-    else 
-    if ((state.chart.isEmpty ||
-        state.chart.data.length == 1) && 
-        !isInteger(state.range?.timeFrameMS) &&
-        isString(state.range?.timeFrame))
-      state.range.timeFrameMS = interval2MS(state.range.timeFrame)
-
-    else
     if (!state.chart.isEmpty && 
         state.chart.data.length > 1 &&
-        state.range?.timeFrameMS !== tfms)
-      state.range.timeFrameMS = tfms
+        range.timeFrameMS !== tfms)
+      range.timeFrameMS = tfms
 
-    state.range.timeFrame = ms2Interval(state.range.timeFrameMS)
+    if (!isTimeFrameMS(range.timeFrameMS)) range.timeFrameMS = DEFAULT_TIMEFRAMEMS
 
+    range.timeFrame = ms2Interval(range.timeFrameMS)
+
+    /*--- Range ---*/
+    let config = {
+      core: source.core,
+      state,
+      interval: range.timeFrame || cfg?.timeFrameMS,
+      initialCnt: range?.initialCnt || cfg?.initialCnt,
+      limitFuture: range?.limitFuture || cfg?.limitFuture,
+      limitPast: range?.limitPast || cfg?.limitPast,
+      minCandles: range?.minCandles || cfg?.minCandles,
+      maxCandles: range?.maxCandles || cfg?.maxCandles,
+      yAxisBounds: range?.yAxisBounds || cfg?.yAxisBounds,
+    }
+    
+    state.range = new Range(range?.start, range?.end, config)
+    state.timeData = new TimeData(state.range)
+
+    
     if (!isObject(state.chart.settings)) {
       state.chart.settings = defaultState.chart.settings
     }
@@ -597,6 +579,7 @@ export default class State {
   #data = {}
   #status = false
   #isEmpty = true
+  #timeData
   #dataSource
   #range
   #core
@@ -604,44 +587,20 @@ export default class State {
   constructor(state=State.default, deepValidate=false, isCrypto=false) {
     if (!(state?.core instanceof TradeXchart)) throw new Error(`State : invalid TradeXchart instance`)
     this.#core = state.core
-
-    // validate state
-    if (isObject(state)) {
-      this.#data = State.validate(state, deepValidate, isCrypto)
-      this.#status = "valid"
-      this.#isEmpty = (this.#data.chart?.isEmpty) ? true : false
-      this.#core = (state?.core instanceof TradeXchart) ? state.core : undefined
-    }
-    else {
-      this.#data = State.default
-      this.#status = "default"
-      this.#isEmpty = true
-    }
+    this.#data = State.validate(state, deepValidate, isCrypto)
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
     this.#key = uid(`${SHORTNAME}_state`)
-    this.#id = state?.id || this.#key
-
-    let cfg = this.#core.config.range
-    let config = {
-      core: this.#core,
-      state: this,
-      interval: cfg?.timeFrameMS,
-      initialCnt: cfg?.initialCnt,
-      limitFuture: cfg?.limitFuture,
-      limitPast: cfg?.limitPast,
-      minCandles: cfg?.minCandles,
-      maxCandles: cfg?.maxCandles,
-      yAxisBounds: cfg?.yAxisBounds,
-    }
-    let start = undefined
-    let end  = undefined
-    this.#range = new Range(start, end, config)
+    this.#id = state?.id
   }
 
   get id() { return this.#id }
   get key() { return this.#key }
-  get status() { return this.#status }
-  get isEmpty() { return this.#isEmpty }
+  get status() { return this.#data.status }
+  get isEmpty() { return this.#data.isEmpty }
+  get core() { return (this.#core !== undefined) ? this.#core : false }
+  get data() { return this.#data }
+  get time() { return this.#data.timeData }
+  get range() { return this.#data.range }
   get allData() {
     return {
       data: this.#data.chart.data,
@@ -659,10 +618,7 @@ export default class State {
   get events() { return this.#data.events }
   get annotations() { return this.#data.annotations }
   get tools() { return this.#data.tools }
-  get data() { return this.#data }
-  get core() { return (this.#core !== undefined) ? this.#core : false }
-  get time() { return this.#core.timeData }
-  get range() { return this.#range }
+  
   
   error(e) { this.#core.error(e) }
 
@@ -768,7 +724,7 @@ export default class State {
     // }
 
     // if the chart empty is empty set the range to the merge data
-    if (this.#isEmpty || !isNumber(tfMS)) {
+    if (this.isEmpty || !isNumber(tfMS)) {
       if (!isObject(newRange) ||
           !isInteger(newRange.start) ||
           !isInteger(newRange.end) ) {
@@ -955,7 +911,7 @@ export default class State {
       if (merge.ohlcv.length > 1) this.#core.emit("state_mergeComplete")
 
       if (u) this.#core.refresh()
-      this.#isEmpty = false
+      this.#data.isEmpty = false
       return true
     }
   }

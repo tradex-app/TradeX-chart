@@ -1,4 +1,7 @@
 export default {
+    range: {
+      timeFrameMS: 3600000, // 1hr
+    },
     "ohlcv": [
         [
             1543572000000,

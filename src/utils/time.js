@@ -227,6 +227,15 @@ export function timestampDifference(date1,date2) {
   }
 }
 
+  export function isTimeFrameMS(ms) {
+    return (
+        isInteger(ms) &&
+        !(ms < SECOND_MS) &&
+        !(ms === Infinity)
+    )
+  }
+
+
 /**
  *
  * @export
