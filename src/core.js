@@ -895,7 +895,7 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {State} - State instance
    */
   createState(state, deepValidate, isCrypto) {
-    return this.state.create(state, deepValidate, isCrypto)
+    return this.stateClass.create(this, state, deepValidate, isCrypto)
   }
 
   /**
@@ -904,7 +904,7 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {boolean}
    */
   deleteState(key) {
-    let r = this.state.delete(key)
+    let r = this.stateClass.delete(this, key)
     if (!r) return false
     this.emit("state_deleted", key)
     return true
@@ -917,7 +917,7 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {Object|false}
    */
   exportState(key=this.state.key, config={}) {
-    let r = this.state.export(key, config)
+    let r = this.stateClass.export(this, key, config)
     if (!r) return false
     this.emit("state_exported", key)
     return r

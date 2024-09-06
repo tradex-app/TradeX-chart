@@ -152,6 +152,14 @@ export default class State {
     else return undefined
   }
 
+  /**
+   * Instantiate new state and add it to list
+   * @param {TradeXchart} chart 
+   * @param {Object} state 
+   * @param {boolean} deepValidate 
+   * @param {boolean} isCrypto 
+   * @returns {State}
+   */
   static create(chart, state=State.default, deepValidate=false, isCrypto=false) {
     if (!isChart( chart )) return undefined
 
@@ -187,7 +195,7 @@ export default class State {
    * @returns {State|undefined} - chart state
    */
   static use(chart, state) {
-    const key = State.getKey(state, chart)
+    const key = State.getKey(chart, state)
     const states = State.#chartList.get(chart.key)
     let active = states.active
     let target = states.states.get(key)
@@ -220,7 +228,7 @@ export default class State {
   }
   
 
-  static findStateById(id, chart) {
+  static findStateById(chart, id) {
     let states = State.chartList(chart)?.states
     if (!states) return undefined
 
@@ -399,7 +407,7 @@ export default class State {
     let states = State.chartList(chart)?.states
     if (states) return undefined
 
-    let key = states.getKey(state)
+    let key = states.getKey(chart, state)
     if (!isString(key) ||
         !states.has(key)
       ) return false
@@ -407,20 +415,20 @@ export default class State {
     return true
   }
 
-  static has(key, chart) {
+  static has(chart, key) {
     return State.chartList(chart)?.states?.has(key)
   }
 
-  static get(key, chart) {
+  static get(chart, key) {
     return State.chartList(chart)?.states?.get(key)
   }
 
-  static getKey(target, chart) {
+  static getKey(chart, target) {
     let key = target
 
     if (isObject(target) && Object.keys(target).length < 3) {
       if (isString(target?.id)) {
-        key = State.findStateById(target.id, chart) || target?.key
+        key = State.findStateById(chart, target.id) || target?.key
       }
       else if (isString(target?.key))
         key = target?.key
@@ -430,8 +438,8 @@ export default class State {
     return key
   }
 
-  static setTimeFrame(key, ohlcv) {
-    let state = State.get(key)
+  static setTimeFrame(chart, key, ohlcv) {
+    let state = State.get(chart, key)
     let timeFrame = undefined
 
     if (!state) return false
@@ -484,10 +492,10 @@ export default class State {
  * @returns {object|false}  
  * @memberof State
  */
-  static export(key, config={}) {
-    if (!State.has(key)) return false
+  static export(chart, key, config={}) {
+    if (!State.has(chart, key)) return false
     if (!isObject(config)) config = {}
-    const state = State.get(key)
+    const state = State.get(chart, key)
     const type = config?.type
     const data = copyDeep(state.data)
     const vals = data.chart.data
@@ -530,7 +538,7 @@ export default class State {
 
   /**
    * import data (trades, events, annotations, tools) 
-   * validate and store in state
+   * validate and store in a state
    * @static
    * @param {string} type - type of data to import
    * @param {object} data - trade data to import
@@ -641,19 +649,19 @@ export default class State {
   delete(state) {
     let key = this.#key
 
-    if (!state) key = State.getKey(state)
+    if (!state) key = State.getKey(this.#core, state)
     if (!isString(key)) {
       core.error(`${core.name} : State.delete() : State not found`)
       return false
     }
     // delete any state but this instance
     if (key !== this.key) {
-      State.delete(key)
+      State.delete(this.#core, key)
     }
     // if delete this instance
     // create an empty default state to replace it
     else {
-      if (State.has(key)) {
+      if (State.has(this.#core, key)) {
         const empty = State.create()
         this.use(empty.key)
         State.delete(key)
@@ -667,15 +675,19 @@ export default class State {
   }
 
   list() {
-    return State.list
+    return State.list(this.#core)
   }
 
   has(key) {
-    return State.has(key)
+    return State.has(this.#core, key)
   }
 
   get(key) {
-    return State.get(key)
+    return State.get(this.#core, key)
+  }
+
+  use(key) {
+    return State.use(this.#core, key)
   }
 
   /**
@@ -685,7 +697,7 @@ export default class State {
    * @returns {Object}
    */
   export(key=this.key, config={}) {
-    return State.export(key, config={})
+    return State.export(this.#core, key, config={})
   }
 
   /**
