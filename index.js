@@ -23,6 +23,7 @@ import TradeFlow from './trade-flow.js'
 const wasm = "node_modules/talib-web/lib/talib.wasm"
 
 import bearHawk from './data/bear-hawk.js'
+import { text } from './src/definitions/icons.js'
 
 // build a split state to test all merge features
 const state1_5a = {primary:[], secondary:[]}
@@ -1277,3 +1278,20 @@ if (typeof chart1 === "object") {
 if (typeof chart5 === "object")
   chart5.mergeData(state1_5a, false)
 */
+
+const nav = document.querySelector("nav")
+if (!!nav) {
+  let links = {
+    "state1": () => chart0.state.use(state1),
+    "state2": () => chart0.state.use(state2),
+    "state3":  () => chart0.state.use(state3),
+    "config1": "",
+    "config2": "",
+  }
+  for (let [key, value] of Object.entries(links)) {
+    let elm = document.createElement("button")
+        elm.innerHTML = key
+        elm.addEventListener("click", value)
+        nav.appendChild(elm)
+  }
+}

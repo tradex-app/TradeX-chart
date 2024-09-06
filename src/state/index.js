@@ -4,7 +4,7 @@
 import * as packageJSON from '../../package.json'
 import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString } from '../utils/typeChecks'
 import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
-import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual } from '../utils/utilities'
+import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53 } from '../utils/utilities'
 import { calcTimeIndex, detectInterval } from '../model/range'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT } from '../definitions/chart'
@@ -18,6 +18,7 @@ import MainPane from '../components/main'
 import { OHLCV } from '../definitions/chart'
 import Chart from '../components/chart'
 
+const HASHKEY = "state"
 const DEFAULTSTATEID = "defaultState"
 const DEFAULT_STATE = {
   version: packageJSON.version,
@@ -161,8 +162,9 @@ export default class State {
    * @returns {State}
    */
   static create(chart, state=State.default, deepValidate=false, isCrypto=false) {
-    if (!isChart( chart )) return undefined
-
+    if (!isChart( chart )) return 
+    
+    state.core = chart
     const instance = new State(state, deepValidate, isCrypto)
     const key = instance.key
     let server = State.#chartList.get(chart.key)
@@ -191,11 +193,22 @@ export default class State {
   /**
    * Use a chart State - set it to active
    * @param {TradeXchart} chart - target
-   * @param {String|Object} state - state key or {id: "someID"} or {key: "stateKey"}
+   * @param {String|Object} state - state key or {id: "someID"} or {key: "stateKey"} or a state object
    * @returns {State|undefined} - chart state
    */
   static use(chart, state) {
-    const key = State.getKey(chart, state)
+    let key = State.getKey(chart, state)
+
+    if (!isString(key) && isObject(state) && Object.keys(state).length > 2) {
+      let hash = State.hash(state)
+          key = `${SHORTNAME}_${HASHKEY}_${hash}`
+
+      if (!State.has(chart, key)) {
+        key = State.create(chart, state).key
+      }
+    }
+    else if (!isString(key) && !isObject(state)) return undefined
+
     const states = State.#chartList.get(chart.key)
     let active = states.active
     let target = states.states.get(key)
@@ -238,6 +251,10 @@ export default class State {
     return undefined
   }
 
+  static hash(input) {
+    let str = JSON.stringify(input)
+    return cyrb53(str)
+  }
 
 
   static validate(source=State.default, deepValidate=false, isCrypto=false) {
@@ -435,6 +452,8 @@ export default class State {
       else
         key = undefined
     }
+    else if (!isString(target))
+      key = undefined
     return key
   }
 
@@ -597,8 +616,8 @@ export default class State {
     this.#core = state.core
     this.#data = State.validate(state, deepValidate, isCrypto)
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
-    this.#key = uid(`${SHORTNAME}_state`)
-    this.#id = state?.id
+    let hash = State.hash(state)
+    this.#key = `${SHORTNAME}_${HASHKEY}_${hash}`
   }
 
   get id() { return this.#id }
