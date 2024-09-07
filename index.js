@@ -1285,8 +1285,8 @@ if (!!nav) {
     "state1": () => chart0.state.use(state1),
     "state2": () => chart0.state.use(state2),
     "state3":  () => chart0.state.use(state3),
-    "config1": "",
-    "config2": "",
+    // "config1": "",
+    // "config2": "",
   }
   for (let [key, value] of Object.entries(links)) {
     let elm = document.createElement("button")

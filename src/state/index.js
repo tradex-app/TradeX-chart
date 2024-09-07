@@ -232,11 +232,12 @@ export default class State {
     // stop any streams
     if (chart.stream instanceof Stream)
       chart.stream.stop()
-    // clean up panes - remove indicators
-    if (isFunction(chart.MainPane?.reset))
+    // clean up panes - remove 
+    if (isFunction(chart.MainPane?.reset)) {
       chart.MainPane.reset()
-
-    chart.refresh()
+      chart.MainPane.restart()
+      chart.MainPane.refresh()
+    }
     return source
   }
   
@@ -610,6 +611,12 @@ export default class State {
   #dataSource
   #range
   #core
+  #chartPanes = new xMap()
+  #chartPaneMaximized = {
+    instance: null, 
+    rowsH: 0,
+    panes: {}
+  }
 
   constructor(state=State.default, deepValidate=false, isCrypto=false) {
     if (!(state?.core instanceof TradeXchart)) throw new Error(`State : invalid TradeXchart instance`)
@@ -628,6 +635,8 @@ export default class State {
   get data() { return this.#data }
   get time() { return this.#data.timeData }
   get range() { return this.#data.range }
+  get chartPanes() { return this.#chartPanes }
+  get chartPaneMaximized() { return this.#chartPaneMaximized }
   get allData() {
     return {
       data: this.#data.chart.data,
