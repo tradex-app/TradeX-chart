@@ -1285,6 +1285,9 @@ if (!!nav) {
     "state1": () => chart0.state.use(state1),
     "state2": () => chart0.state.use(state2),
     "state3":  () => chart0.state.use(state3),
+    "config1": () => chart0.start(config1),
+    "config2": () => chart0.start(config2),
+    "config3":  () => chart0.start(config3),
     // "config1": "",
     // "config2": "",
   }

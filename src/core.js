@@ -65,7 +65,7 @@ export default class TradeXchart extends Tradex_chart {
   #name = NAME
   #shortName = SHORTNAME
   #core
-  #initialCfg
+  // #initialCfg
   #config
   #options
   #ready = false
@@ -313,7 +313,7 @@ export default class TradeXchart extends Tradex_chart {
   get config() { return this.#config }
   get core() { return this.#core }
   get inCnt() { return this.#inCnt }
-  get initialCfg() { return this.#initialCfg }
+  // get initialCfg() { return this.#initialCfg }
 
   get elUtils() { return super.elUtils }
   get elTools() { return super.elTools }
@@ -414,7 +414,7 @@ export default class TradeXchart extends Tradex_chart {
 
     if (this.#ready) this.#MainPane.destroy()
 
-    this.#initialCfg = cfg
+    // this.#initialCfg = cfg
     const txCfg = TradeXchart.create(cfg)
     this.logs = (txCfg?.logs) ? txCfg.logs : null
     this.infos = (txCfg?.infos) ? txCfg.infos : null
@@ -455,9 +455,11 @@ export default class TradeXchart extends Tradex_chart {
     // If chart is already instantiated with a State, merge the enw one.
     if (this.#ready) {
 
-      const newState = this.#stateClass.create(this, state, deepValidate, isCrypto)
-      this.#stateClass.use( this, newState.key )
-      this.#stateClass.delete(this, {id: initialEmptyState})
+      if (!(state instanceof State)) {
+        const newState = this.#stateClass.create(this, state, deepValidate, isCrypto)
+        this.#stateClass.use( this, newState.key )
+        this.#stateClass.delete(this, {id: initialEmptyState})
+      }
 
       delete txCfg.state
 
@@ -465,7 +467,6 @@ export default class TradeXchart extends Tradex_chart {
       this.MainPane.start()
 
       document.querySelector(`style[title="${oldID}_style"]`)?.remove()
-      // this.setTheme(this.#themeTemp.id)
       this.setUtilsLocation(this.theme?.utils?.location)
       this.elBody.setToolsLocation(this.theme?.tools?.location)
 

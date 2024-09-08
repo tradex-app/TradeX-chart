@@ -227,25 +227,8 @@ export default class State {
     //   }
     // })
 
-    // chart.initialCfg.state = active
-    // chart.start(chart.initialCfg)
     states.active = active
     return active
-    
-    // clean up panes - remove 
-    if (isFunction(chart.MainPane?.reset)) {
-      if (chart.stream instanceof Stream)
-        chart.stream.stop()
-      chart.MainPane.reset()
-      states.active = active
-      chart.MainPane.restart()
-      chart.MainPane.refresh()
-      return active
-    }
-    else {
-      states.active = active
-      return active
-    }
   }
   
 
@@ -722,7 +705,16 @@ export default class State {
   }
 
   use(key) {
-    return State.use(this.#core, key)
+    let state = State.use(this.#core, key)
+    // clean up panes - remove 
+    if (isFunction(this.#core.MainPane?.reset)) {
+      if (this.#core.stream instanceof Stream)
+      this.#core.stream.stop()
+      this.#core.MainPane.reset()
+      this.#core.MainPane.restart()
+      this.#core.MainPane.refresh()
+    }
+    return state
   }
 
   /**

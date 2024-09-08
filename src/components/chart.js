@@ -568,10 +568,10 @@ export default class Chart extends Component{
       o.id = config.id
       o.paneID = this.id
       o.key = indicatorHashKey(o)
-      if (this.isDuplicate(o.key)) {
-        this.core.error(`ERROR: Chart Pane: ${this.id} cannot add duplicate Indicator: ${i?.name} with same config`)
-        continue
-      }
+      // if (this.isDuplicate(o.key)) {
+      //   this.core.error(`ERROR: Chart Pane: ${this.id} cannot add duplicate Indicator: ${i?.name} with same config`)
+      //   continue
+      // }
 
       overlayList.push([o.id, config])
     }
@@ -595,10 +595,10 @@ export default class Chart extends Component{
       ) {
       i.paneID = this.id
       i.key = indicatorHashKey(i)
-      if (this.isDuplicate(i.key)) {
-        this.core.error(`ERROR: Chart Pane: ${this.id} cannot add duplicate Indicator: ${i?.name} with same config`)
-        return undefined
-      }
+      // if (this.isDuplicate(i.key)) {
+      //   this.core.error(`ERROR: Chart Pane: ${this.id} cannot add duplicate Indicator: ${i?.name} with same config`)
+      //   return undefined
+      // }
 
       const config = {
         class: indClass,
