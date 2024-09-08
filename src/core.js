@@ -11,7 +11,7 @@ import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString
 import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { isTimeFrame, SECOND_MS } from "./utils/time"
-import { copyDeep, mergeDeep, objToString, uid } from './utils/utilities'
+import { copyDeep, doStructuredClone, mergeDeep, objToString, uid } from './utils/utilities'
 import State from './state'
 import { Range, calcTimeIndex } from "./model/range"
 import { defaultTheme } from './definitions/style'
@@ -65,6 +65,7 @@ export default class TradeXchart extends Tradex_chart {
   #name = NAME
   #shortName = SHORTNAME
   #core
+  #initialCfg
   #config
   #options
   #ready = false
@@ -312,6 +313,7 @@ export default class TradeXchart extends Tradex_chart {
   get config() { return this.#config }
   get core() { return this.#core }
   get inCnt() { return this.#inCnt }
+  get initialCfg() { return this.#initialCfg }
 
   get elUtils() { return super.elUtils }
   get elTools() { return super.elTools }
@@ -407,17 +409,18 @@ export default class TradeXchart extends Tradex_chart {
    * to fill in missing or required values
    * @param {object} cfg - chart configuration
    */
-  start(cfg) {
+  start(cfg={}) {
     this.log(`${NAME} configuring...`)
 
     if (this.#ready) this.#MainPane.destroy()
 
+    this.#initialCfg = cfg
     const txCfg = TradeXchart.create(cfg)
-    this.logs = (txCfg?.logs) ? txCfg.logs : false
-    this.infos = (txCfg?.infos) ? txCfg.infos : false
-    this.warnings = (txCfg?.warnings) ? txCfg.warnings : false
-    this.errors = (txCfg?.errors) ? txCfg.errors : false
-    this.timers = (txCfg?.timer) ? txCfg.timer : false
+    this.logs = (txCfg?.logs) ? txCfg.logs : null
+    this.infos = (txCfg?.infos) ? txCfg.infos : null
+    this.warnings = (txCfg?.warnings) ? txCfg.warnings : null
+    this.errors = (txCfg?.errors) ? txCfg.errors : null
+    this.timers = (txCfg?.timer) ? txCfg.timer : null
     this.#config = txCfg
     this.#inCnt = txCfg.cnt || this.#inCnt
     this.#TALib = txCfg.talib
@@ -442,42 +445,13 @@ export default class TradeXchart extends Tradex_chart {
 
     this.log("processing state...")
 
-    // if no state, default to empty
-    let state = copyDeep(txCfg?.state) || {}
-        state.id = this.ID
-        state.core = this
     let deepValidate = txCfg?.deepValidate || false
     let isCrypto = txCfg?.isCrypto || false
 
-    // time frame
-    let {tf, ms} = (!!Time.interval2MS(txCfg?.timeFrame)) ?
-      isTimeFrame(txCfg.timeFrame) :
-      { tf: DEFAULT_TIMEFRAME,
-        ms: DEFAULT_TIMEFRAMEMS
-      };
+    let state = txCfg.state
+    if (!(txCfg.state instanceof State))
+      state = this.configureState(txCfg)
 
-    let ts = Date.now();
-    ts = ts - (ts % ms)
-
-    // range
-    if (!isObject(txCfg?.range)) {
-
-      txCfg.range = {
-        startTS: ts,
-        timeFrame: tf,
-        timeFrameMS: ms
-      }
-    }
-    else {
-      let r = txCfg?.range;
-      if (!isInteger(r.startTS)) r.startTS = ts
-      if (!isInteger(r.timeFrameMS)) r.timeFrameMS = ms
-      if (Time.interval2MS(r.timeFrame) != r.timeFrameMS) r.timeFrame = Time.ms2Interval(ms)
-    }
-
-    state.range = {...state.range, ...txCfg.range}
-
-    // state
     // If chart is already instantiated with a State, merge the enw one.
     if (this.#ready) {
 
@@ -491,9 +465,7 @@ export default class TradeXchart extends Tradex_chart {
       this.MainPane.start()
 
       document.querySelector(`style[title="${oldID}_style"]`)?.remove()
-      this.insertAdjacentHTML('beforebegin', `<style title="${this.ID}_style"></style>`)
-
-      this.setTheme(this.#themeTemp.id)
+      // this.setTheme(this.#themeTemp.id)
       this.setUtilsLocation(this.theme?.utils?.location)
       this.elBody.setToolsLocation(this.theme?.tools?.location)
 
@@ -509,15 +481,6 @@ export default class TradeXchart extends Tradex_chart {
       delete txCfg.state
 
       this.log(`${this.name} id: ${this.ID} : created with a ${this.state.status} state`)  
-
-      // set default range
-      // let start = 0
-      // let end = this.state.data.range.initialCnt
-      // let rangeConfig = (isObject(txCfg?.range)) ? txCfg.range : {}
-      //       rangeConfig.interval = ms
-      //       rangeConfig.core = this
-      // this.getRange(null, null, rangeConfig)
-      // this.setRange(start, end)
 
       // setup main chart features
       this.#WidgetsG = new WidgetsG(this, {widgets: txCfg?.widgets})
@@ -601,6 +564,42 @@ export default class TradeXchart extends Tradex_chart {
     this.#stateClass = null
 
     // DOM.findByID(this.ID).remove
+  }
+
+  configureState(txCfg) {
+    // if no state, default to empty
+    let state = copyDeep(txCfg?.state) || {}
+        state.id = this.ID
+        state.core = this
+
+    // time frame
+    let {tf, ms} = (!!Time.interval2MS(txCfg?.timeFrame)) ?
+      isTimeFrame(txCfg.timeFrame) :
+      { tf: DEFAULT_TIMEFRAME,
+        ms: DEFAULT_TIMEFRAMEMS
+      };
+
+    let ts = Date.now();
+    ts = ts - (ts % ms)
+
+    // range
+    if (!isObject(txCfg?.range)) {
+
+      txCfg.range = {
+        startTS: ts,
+        timeFrame: tf,
+        timeFrameMS: ms
+      }
+    }
+    else {
+      let r = txCfg?.range;
+      if (!isInteger(r.startTS)) r.startTS = ts
+      if (!isInteger(r.timeFrameMS)) r.timeFrameMS = ms
+      if (Time.interval2MS(r.timeFrame) != r.timeFrameMS) r.timeFrame = Time.ms2Interval(ms)
+    }
+
+    state.range = {...state.range, ...txCfg.range}
+    return state
   }
 
   /**
@@ -957,9 +956,16 @@ export default class TradeXchart extends Tradex_chart {
     }
   }
 
+  startStream() {
+    if (this.stream instanceof Stream) {
+      this.stream.start()
+    }
+  }
+
   /**
    * stop a chart stream
    * will halt any updates to price or indicators
+   * TODO: halt DataSource
    */
   stopStream() {
     if (this.stream instanceof Stream) {

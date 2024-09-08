@@ -6,8 +6,8 @@ import { Range } from "../../model/range"
 import { limit } from "../../utils/number"
 import Colour, { Palette } from "../../utils/colour"
 import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from "../../utils/typeChecks"
-import { copyDeep, diff, idSanitize, isObjectNotEmpty, mergeDeep, uid } from "../../utils/utilities"
-import { STREAM_UPDATE } from "../../definitions/core"
+import { copyDeep, cyrb53, diff, idSanitize, isObjectNotEmpty, mergeDeep, uid } from "../../utils/utilities"
+import { SHORTNAME, STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
 import { WinState } from "../widgets/window"
 import { onClickOutside } from "../../utils/DOM"
@@ -88,6 +88,7 @@ export default class Indicator extends Overlay {
 
   #ID
   #cnt_
+  #key
   #name
   #shortName
   #context
@@ -145,6 +146,7 @@ export default class Indicator extends Overlay {
     this.#cnt_ = Indicator.cnt
     this.#overlay = overlay
     this.id = overlay?.id || uid(this?.shortName || overlay?.name)
+    this.#key = overlay?.key || indicatorHashKey(overlay)
     this.#params = params
     this.#TALib = this.core.TALib
     this.#range = this.xAxis.range
@@ -181,6 +183,7 @@ export default class Indicator extends Overlay {
 
   get id() { return this.#ID || `${this.core.ID}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
   set id(id) { this.#ID = idSanitize(new String(id)) }
+  get key() { return this.#key }
   get version() { return `${this.constructor?.version}` }
   get context() { return this.#context }
   get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
@@ -1610,3 +1613,8 @@ const out = {
   }
 }
 
+export function indicatorHashKey(params) {
+  const objStr = JSON.stringify(params)
+  const hash = cyrb53(objStr)
+  return `${SHORTNAME}_Indicator_${hash}`
+}

@@ -7,7 +7,7 @@ import Component from "./component"
 import { elementDimPos } from "../utils/DOM";
 import { limit } from "../utils/number"
 import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks";
-import { copyDeep, idSanitize, xMap } from "../utils/utilities";
+import { copyDeep, cyrb53, idSanitize, xMap } from "../utils/utilities";
 import CEL from "./primitives/canvas";
 import Legends from "./primitives/legend"
 import Graph from "./views/classes/graph"
@@ -33,6 +33,7 @@ import {
   STREAM_FIRSTVALUE,
   STREAM_NEWVALUE,
   STREAM_UPDATE,
+  SHORTNAME,
 } from "../definitions/core";
 import { 
   BUFFERSIZE, 
@@ -40,6 +41,7 @@ import {
   COLLAPSEDHEIGHT 
 } from "../definitions/chart";
 import { VolumeStyle } from "../definitions/style"
+import Indicator, { indicatorHashKey } from "./overlays/indicator";
 
 
 export const defaultOverlays = {
@@ -544,24 +546,33 @@ export default class Chart extends Component{
         config.cnt = this.core.indicatorClasses[o.type].cnt
         config.id = `${this.id}-${o.type}_${config.cnt}`
         config.class = this.core.indicatorClasses[o.type]
+        config.oType = "indicator"
       }
       // other overlay types
       else if (o.type in optionalOverlays[this.type]) {
         config.cnt = 1
         config.id = `${this.id}-${o.type}`
         config.class = optionalOverlays[this.type][o.type].class
+        config.oType = "overlayOptional"
       }
       // custom overlay types
       else if (o.type in this.core.customOverlays[this.type]) {
         config.cnt = 1
         config.id = `${this.id}-${o.type}`
         config.class = this.core.customOverlays[this.type][o.type].class
+        config.oType = "overlayCustom"
       }
       else continue
 
       config.params = { overlay: o, }
       o.id = config.id
       o.paneID = this.id
+      o.key = indicatorHashKey(o)
+      if (this.isDuplicate(o.key)) {
+        this.core.error(`ERROR: Chart Pane: ${this.id} cannot add duplicate Indicator: ${i?.name} with same config`)
+        continue
+      }
+
       overlayList.push([o.id, config])
     }
     this.graph.addOverlays(overlayList)
@@ -572,6 +583,7 @@ export default class Chart extends Component{
   /**
    * add an indicator
    * @param {Object} i - {type, name, ...params}
+   * @returns {Indicator|undefined}
    */
   addIndicator(i) {
     const primaryPane = this.type === "primaryPane"
@@ -582,19 +594,47 @@ export default class Chart extends Component{
         primaryPane === isPrimary
       ) {
       i.paneID = this.id
+      i.key = indicatorHashKey(i)
+      if (this.isDuplicate(i.key)) {
+        this.core.error(`ERROR: Chart Pane: ${this.id} cannot add duplicate Indicator: ${i?.name} with same config`)
+        return undefined
+      }
+
       const config = {
         class: indClass,
-        params: {overlay: i}
+        params: {
+          overlay: i,
+        }
       }
       try {
         return this.graph.addOverlay(i.name, config)
       }
       catch (e) {
-        this.core.error(`ERROR: Primary Pane: ${this.id} cannot add Indicator: ${i?.name} Error: ${e.message}`)
-        return false
+        this.core.error(`ERROR: Chart Pane: ${this.id} cannot add Indicator: ${i?.name} Error: ${e.message}`)
+        return undefined
       }
     }
-    else return false
+    else return undefined
+  }
+
+  isDuplicate(key) {
+    let ind = this.findIndicatorByKey(key)
+    if (!ind) return false
+    else return ind.id
+  }
+
+
+  /**
+   * Find indicator by hash key
+   * @param {String} key 
+   * @returns {Indicator|undefined}
+   */
+  findIndicatorByKey(key) {
+    let iList = Object.values(this.getIndicators())
+    for (let i of iList) {
+      if (i.key = key) return i
+    }
+    return undefined
   }
 
   getIndicators() {

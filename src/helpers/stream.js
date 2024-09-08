@@ -147,7 +147,8 @@ export default class Stream {
   }
 
   start() {
-    this.#alerts = new Alerts(this.#config.alerts)
+    if (!(this.#alerts instanceof Alerts))
+      this.#alerts = new Alerts(this.#config.alerts)
     this.status = {status: STREAM_STARTED}
   }
 

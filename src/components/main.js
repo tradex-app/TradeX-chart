@@ -133,7 +133,7 @@ export default class MainPane extends Component {
   get bufferPx() { return this.getBufferPx() }
   get scrollPos() { return this.core.scrollPos }
   get renderLoop() { return renderLoop }
-  get views() { return this.core.state.data.views }
+  get inventory() { return this.core.state.data.inventory }
   get indicators() { return this.getIndicators() }
   get indicatorClasses() { return this.core.indicatorClasses }
   get elements() {
@@ -181,7 +181,7 @@ export default class MainPane extends Component {
     // register timeline - xAxis
     this.#Time = new Timeline(this.core, options)
 
-    // register chart views
+    // register chart panes
     this.registerChartPanes(options)
 
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE
@@ -256,8 +256,6 @@ export default class MainPane extends Component {
    * Remove any indicators
    */
   reset() {
-    // let panes = this.getIndicators(),
-    //     indicator;
     this.chartPanes.forEach(
       (chartPane, key) => {
         if (chartPane.isPrimary) 
@@ -265,16 +263,7 @@ export default class MainPane extends Component {
         else 
           this.removeChartPane(chartPane.id)
       }
-    )      
-
-
-    // for (let p in panes) {
-    //   indicator = panes[p]
-    //   for (let i in indicator) {
-    //     indicator[i].instance.remove()
-    //   }
-    // }
-    // this.setDimensions()
+    )
   }
 
   /**
@@ -291,7 +280,7 @@ export default class MainPane extends Component {
       }
       if (cnt == 0) {
         this.validateIndicators()
-        for (let [k,v] of this.views) {
+        for (let [k,v] of this.inventory) {
           let V = [...v]
           for (let i of V) {
             if (Object.keys(this.core.indicatorClasses).includes(i.type)) {
@@ -606,7 +595,7 @@ export default class MainPane extends Component {
     primary.primary = true
     options.rowY = 0
     // add chart views
-    for (let [k,v] of this.views) {
+    for (let [k,v] of this.inventory) {
       options.type = k
       options.view = v
       this.addChartPane(options)
@@ -778,12 +767,12 @@ export default class MainPane extends Component {
   validateIndicators() {
     const primaryPane = []
     // iterate over chart panes and remove invalid indicators
-    for (let [k,oc] of this.views) {
+    for (let [k,oc] of this.inventory) {
 
       if (k === "primary") primaryPane.push(oc)
       // validate entry - are there any indicators to add?
       if (oc.length === 0 && k !== "primary") {
-        this.views.delete(k)
+        this.inventory.delete(k)
         continue
       }
 
@@ -847,10 +836,10 @@ export default class MainPane extends Component {
         name: name,
         ...params
       }
-        instance = this.#Chart.addIndicator(indicator);
-        if (!instance) return undefined
+      instance = this.#Chart.addIndicator(indicator);
+      if (!instance) return undefined
 
-        pane = "primary"
+      pane = "primary"
     }
     // add secondary chart indicator
     else {       

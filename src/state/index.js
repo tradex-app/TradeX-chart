@@ -4,7 +4,7 @@
 import * as packageJSON from '../../package.json'
 import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString } from '../utils/typeChecks'
 import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
-import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53 } from '../utils/utilities'
+import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, doStructuredClone } from '../utils/utilities'
 import { calcTimeIndex, detectInterval } from '../model/range'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT } from '../definitions/chart'
@@ -36,7 +36,7 @@ const DEFAULT_STATE = {
     settings: {},
   },
   ohlcv: [],
-  views: [],
+  inventory: [],
   primary: [],
   secondary: [],
   datasets: [],
@@ -220,25 +220,32 @@ export default class State {
     // same as current state, nothing to do
     if (key != active?.key)
       active = target
-    
-    states.active = active
-    
-    const source = new Proxy( target, {
-      get: (obj, prop) => {
-        return active[prop]
-      }
-    })
+        
+    // const source = new Proxy( target, {
+    //   get: (obj, prop) => {
+    //     return active[prop]
+    //   }
+    // })
 
-    // stop any streams
-    if (chart.stream instanceof Stream)
-      chart.stream.stop()
+    // chart.initialCfg.state = active
+    // chart.start(chart.initialCfg)
+    states.active = active
+    return active
+    
     // clean up panes - remove 
     if (isFunction(chart.MainPane?.reset)) {
+      if (chart.stream instanceof Stream)
+        chart.stream.stop()
       chart.MainPane.reset()
+      states.active = active
       chart.MainPane.restart()
       chart.MainPane.refresh()
+      return active
     }
-    return source
+    else {
+      states.active = active
+      return active
+    }
   }
   
 
@@ -260,7 +267,7 @@ export default class State {
 
   static validate(source=State.default, deepValidate=false, isCrypto=false) {
 
-    const defaultState = State.default
+    const defaultState = doStructuredClone(State.default)
     let state
 
     if (!isObject(source)) source = defaultState
@@ -327,8 +334,8 @@ export default class State {
       state.chart.settings = defaultState.chart.settings
     }
 
-    if (!isArray(state.views)) {
-      state.views = defaultState.views
+    if (!isArray(state.inventory)) {
+      state.inventory = defaultState.inventory
     }
 
     if (!isArray(state.primary)) {
@@ -347,25 +354,25 @@ export default class State {
     state.allData.datasets = state.datasets
 
     // Build chart order
-    if (state.views.length == 0) {
+    if (state.inventory.length == 0) {
       // add primary chart
-      state.views.push(["primary", state.primary])
+      state.inventory.push(["primary", state.primary])
       // add secondary charts if they exist
       for (let o in state) {
         if (o.indexOf("secondary") == 0) {
-          state.views.push([o, state[o]])
+          state.inventory.push([o, state[o]])
         }
       }
     }
     // Process chart order
-    let o = state.views
+    let o = state.inventory
     let c = o.length
     while (c--) {
       if (!isArray(o[c]) || o[c].length == 0)
         o.splice(c, 1)
       else {
         // validate each overlay / indicator entry
-        let i = state.views[c][1]
+        let i = state.inventory[c][1]
         let x = i.length
         while (x--) {
           // remove if invalid
@@ -384,12 +391,12 @@ export default class State {
       }
     }
     // ensure state has the mandatory primary entry
-    if (state.views.length == 0)
-      state.views[0] = ["primary", defaultState.primary]
-    state.views = new xMap(state.views)
-    if (!state.views.has("primary")) 
-      state.views.insert("primary", defaultState.primary, 0)
-    state.views.get("primary").push(state.chart)
+    if (state.inventory.length == 0)
+      state.inventory[0] = ["primary", defaultState.primary]
+    state.inventory = new xMap(state.inventory)
+    if (!state.inventory.has("primary")) 
+      state.inventory.insert("primary", defaultState.primary, 0)
+    state.inventory.get("primary").push(state.chart)
 
     // trades
 
@@ -525,9 +532,9 @@ export default class State {
     if (vals.length > 0 &&
         vals[vals.length - 1].length > 6)
         vals.length = vals.length - 1
-    data.views.get("primary").pop()
+    data.inventory.get("primary").pop()
     // convert Map/() to array
-    data.views = Array.from(data.views)
+    data.inventory = Array.from(data.inventory)
     data.version = packageJSON.version
 
     switch(type) {

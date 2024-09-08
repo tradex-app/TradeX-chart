@@ -201,7 +201,7 @@ export const DividerStyle = {
   ACTIVE: "#888888C0",
   IDLE: "#FFFFFF00",
   LINE: GlobalStyle.COLOUR_BORDER,
-  STYLE: "1px solid"
+  STYLE: "2px solid"
 }
 
 export const watermark = {

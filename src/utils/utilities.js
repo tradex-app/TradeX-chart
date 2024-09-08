@@ -108,6 +108,12 @@ export function copyDeep(obj, clone=true) {
   return temp;
 }
 
+/**
+ * Deep object copy
+ * @export
+ * @param {Object} obj
+ * @return {Object}  
+ */
 export function doStructuredClone(obj) {
   try {
     return structuredClone(obj)
