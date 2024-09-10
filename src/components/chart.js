@@ -318,10 +318,6 @@ export default class Chart extends Component{
     this.#Scale = undefined
     this.graph = undefined
     this.#input = undefined
-
-    // TODO: remove state entry
-    this.core.warn(`Deleting chart pane ${this.id} destroys all of its data!`)
-
     this.element.remove()
     this.#status = "destroyed"
   }

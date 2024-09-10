@@ -5,12 +5,14 @@ import { ms2Interval, TimeData } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS, INTITIALCNT, DEFAULT_TIMEFRAME } from "../definitions/chart"
 import { isArray, isInteger, isNumber, isObject, isString } from "../utils/typeChecks"
 import { bRound, limit } from "../utils/number"
-import { diff } from "../utils/utilities"
+import { diff, uid } from "../utils/utilities"
+import { SHORTNAME } from "../definitions/core"
 // import WebWorker from "./webWorkers"
 // import WebWorker from "./webWorkers4"
 
 export class Range {
 
+  #id
   #core
   #state
   #worker
@@ -62,6 +64,7 @@ export class Range {
         !(config?.core instanceof TradeXchart))
         throw new Error(`Range requires a config`)
 
+    this.#id = uid(`${SHORTNAME}_Range`)
     this.#init = true;
     this.setConfig(config)
 
@@ -113,6 +116,7 @@ export class Range {
     this.set(start, end)
   }
 
+  get id () { return this.#id }
   get allData () { return this.#state.allData }
   get data () { return this.allData?.data || [] }
   get dataLength () { return (!!this.allData?.data.length) ? this.allData.data.length - 1 : 0 }

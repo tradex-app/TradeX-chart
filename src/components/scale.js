@@ -100,20 +100,12 @@ export default class ScaleBar extends Component {
 
 
   start() {
-    const range = (this.options.yAxisType === YAXIS_TYPE.default) ? 
-      undefined : this.parent.localRange
+
     const ctx = this.core.MainPane.graph.viewport.scene.context
     const t = this.theme.yAxis
     ctx.font = createFont(t.fontSize, t.fontWeight, t.fontFamily)
     this.#digitW = calcTextWidth(ctx, "0")
-
-    this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
-
-    this.#yAxis.yAxisPadding = 
-        (isNumber(this.options?.yAxisPadding) &&
-        this.options.yAxisPadding >= 1) ?
-        this.options.yAxisPadding : 1
-
+    this.setYAxis()
     this.createGraph()
     this.#yAxis.calcGradations()
     this.draw()
@@ -130,8 +122,9 @@ export default class ScaleBar extends Component {
   restart() {
     // TODO: remove old overlays
     // create and use new YAxis
-    this.#yAxis.setRange(this.core.range)
-    this.draw()
+    // this.#yAxis.setRange(this.core.range)
+    this.setYAxis()
+    this.draw(this.range, true)
   }
 
   destroy() {
@@ -245,6 +238,20 @@ export default class ScaleBar extends Component {
     }
     if (this.#layerCursor instanceof ScaleCursor) 
       this.calcPriceDigits()
+  }
+
+  setYAxis() {
+    const range = (this.options.yAxisType === YAXIS_TYPE.default) ? 
+      undefined : this.parent.localRange
+  
+    this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
+    this.#yAxis.yAxisPadding = 
+        (isNumber(this.options?.yAxisPadding) &&
+        this.options.yAxisPadding >= 1) ?
+        this.options.yAxisPadding : 1
+
+        console.log(this.#yAxis.range?.id)
+    
   }
 
   /**

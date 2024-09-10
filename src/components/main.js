@@ -253,7 +253,8 @@ export default class MainPane extends Component {
   }
 
   /**
-   * Remove any indicators
+   * Reset Chart to price history (candles) only
+   * Remove any primary or secondary indicators
    */
   reset() {
     this.chartPanes.forEach(

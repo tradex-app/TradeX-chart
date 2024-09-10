@@ -210,6 +210,7 @@ export default class State {
     else if (!isString(key) && !isObject(state)) return undefined
 
     const states = State.#chartList.get(chart.key)
+    let previous = states.active
     let active = states.active
     let target = states.states.get(key)
     // invalid state id
@@ -217,18 +218,23 @@ export default class State {
       chart.warn(`${chart.name} id: ${chart.key} : State ${key} does not exist`)
       return undefined
     }
-    // same as current state, nothing to do
-    if (key != active?.key)
+    // set active to target state
+    if (key != active?.key) {
+      states.previous = { state: active, node: "" }
       active = target
-        
+    }
+
+    console.log(active.key)
+    console.log(active.range.id)
+
+    states.active = active
+    return active
+
     // const source = new Proxy( target, {
     //   get: (obj, prop) => {
     //     return active[prop]
     //   }
     // })
-
-    states.active = active
-    return active
   }
   
 
@@ -705,12 +711,15 @@ export default class State {
   }
 
   use(key) {
-    let state = State.use(this.#core, key)
     // clean up panes - remove 
-    if (isFunction(this.#core.MainPane?.reset)) {
+    if (isFunction(this.#core.MainPane?.init)) {
       if (this.#core.stream instanceof Stream)
-      this.#core.stream.stop()
+        this.#core.stream.stop()
       this.#core.MainPane.reset()
+    }
+    let state = State.use(this.#core, key)
+
+    if (isFunction(this.#core.MainPane?.reset)) {
       this.#core.MainPane.restart()
       this.#core.MainPane.refresh()
     }
