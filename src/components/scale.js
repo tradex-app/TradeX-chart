@@ -123,20 +123,29 @@ export default class ScaleBar extends Component {
     // TODO: remove old overlays
     // create and use new YAxis
     // this.#yAxis.setRange(this.core.range)
+
+    this.destroy(false)
+
     this.setYAxis()
+    this.createGraph()
+    this.#yAxis.calcGradations()
     this.draw(this.range, true)
+    this.eventsListen()
+
   }
 
-  destroy() {
+  destroy(all=true) {
     this.core.hub.expunge(this)
     this.off(`${this.parent.id}_pointerout`, this.#layerCursor.erase, this.#layerCursor)
     this.off(STREAM_UPDATE, this.onStreamUpdate, this.#layerPriceLine)
 
-    this.stateMachine.destroy()
     this.graph.destroy()
     this.#input.destroy()
 
-    this.element.remove()
+    if (!!all) {
+      this.stateMachine.destroy()
+      this.element.remove()
+    }
   }
 
   eventsListen() {

@@ -159,10 +159,10 @@ export default class State {
    * @param {Object} state 
    * @param {boolean} deepValidate 
    * @param {boolean} isCrypto 
-   * @returns {State}
+   * @returns {State|undefined}
    */
   static create(chart, state=State.default, deepValidate=false, isCrypto=false) {
-    if (!isChart( chart )) return 
+    if (!isChart( chart )) return undefined
     
     state.core = chart
     const instance = new State(state, deepValidate, isCrypto)
@@ -172,6 +172,7 @@ export default class State {
     if (!server) {
       State.server(chart)
       server = State.#chartList.get(chart.key)
+      server.active = instance
     }
 
     server.states.set(key, instance)
@@ -224,8 +225,8 @@ export default class State {
       active = target
     }
 
-    console.log(active.key)
-    console.log(active.range.id)
+    console.log(target?.key || active?.key)
+    console.log(target?.range?.id || active?.range.id)
 
     states.active = active
     return active
@@ -715,12 +716,16 @@ export default class State {
     if (isFunction(this.#core.MainPane?.init)) {
       if (this.#core.stream instanceof Stream)
         this.#core.stream.stop()
-      this.#core.MainPane.reset()
+      this.#core.MainPane.reset(false)
+      this.#core.MainPane.destroy()
     }
     let state = State.use(this.#core, key)
 
     if (isFunction(this.#core.MainPane?.reset)) {
-      this.#core.MainPane.restart()
+      this.#core.MainPane.init(this.#core.MainPane.options)
+      this.#core.MainPane.start()
+
+      // this.#core.MainPane.restart()
       this.#core.MainPane.refresh()
     }
     return state

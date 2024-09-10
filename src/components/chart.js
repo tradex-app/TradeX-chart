@@ -172,15 +172,7 @@ export default class Chart extends Component{
       this.legend.add(chartLegend)
       this.yAxisType = YAXIS_TYPE.valid(type)
     }
-
-    // set up Scale (Y Axis)
-    const opts = {...options}
-          opts.parent = this
-          opts.chart = this
-          opts.elScale = this.elScale
-          opts.yAxisType = this.yAxisType
-    this.scale = new ScaleBar(this.core, opts)
-
+    this.setScaleBar()
     this.#status = "init"
   }
 
@@ -429,6 +421,16 @@ export default class Chart extends Component{
     this.removeIndicator(i.id)
   }
 
+  // set up Scale (Y Axis)
+  setScaleBar() {
+    const opts = {...this.options}
+          opts.parent = this
+          opts.chart = this
+          opts.elScale = this.elScale
+          opts.yAxisType = this.yAxisType
+    this.scale = new ScaleBar(this.core, opts)
+  }
+
   setTitle(t) {
     if (!isString(t)) return false
 
@@ -646,7 +648,14 @@ export default class Chart extends Component{
     return ind
   }
 
-  removeIndicator(id) {
+  /**
+   * Remove chart pane indicator
+   * remove entire secondary pane if indicator count = 0
+   * @param {String} id 
+   * @param {Boolean} state - leave chart pane state intact?
+   * @returns 
+   */
+  removeIndicator(id, state) {
     if (!isString(id) || !(id in this.indicators)) return false
 
     // enable deletion
@@ -655,7 +664,7 @@ export default class Chart extends Component{
     if (Object.keys(this.indicators).length === 0 && !this.isPrimary)
       this.emit("chart_paneDestroy", this.id)
     else {
-      this.indicators[id].instance.destroy()
+      this.indicators[id].instance.destroy(state)
       this.graph.removeOverlay(id)
       this.draw()
       delete this.#indicatorDeleteList[id]
@@ -663,11 +672,11 @@ export default class Chart extends Component{
     return true
   }
 
-  removeAllIndicators() {
+  removeAllIndicators(state) {
     const result = {}
     const all = this.getIndicators()
     for (let id in all) {
-      result[id] = this.removeIndicator(id)
+      result[id] = this.removeIndicator(id, state)
     }
     return result
   }

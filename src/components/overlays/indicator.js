@@ -327,7 +327,7 @@ export default class Indicator extends Overlay {
     }
   }
 
-  destroy() {
+  destroy(state=true) {
     if ( this.#state === IndicatorState.destroyed) return
     // has this been invoked from removeIndicator() ?
     // const chartPane = this.core.ChartPanes.get(this.chartPaneID)
@@ -350,7 +350,8 @@ export default class Indicator extends Overlay {
     // remove listeners
     super.destroy()
     // remove indicator state data
-    this.core.state.removeIndicator(this.id)
+    if (!!state)
+      this.core.state.removeIndicator(this.id)
 
     this.#state = IndicatorState.destroyed
   }

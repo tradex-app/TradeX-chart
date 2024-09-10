@@ -65,7 +65,7 @@ export default class TradeXchart extends Tradex_chart {
   #name = NAME
   #shortName = SHORTNAME
   #core
-  // #initialCfg
+  #txCfg
   #config
   #options
   #ready = false
@@ -313,7 +313,7 @@ export default class TradeXchart extends Tradex_chart {
   get config() { return this.#config }
   get core() { return this.#core }
   get inCnt() { return this.#inCnt }
-  // get initialCfg() { return this.#initialCfg }
+  get txCfg() { return this.#txCfg }
 
   get elUtils() { return super.elUtils }
   get elTools() { return super.elTools }
@@ -414,8 +414,10 @@ export default class TradeXchart extends Tradex_chart {
 
     if (this.#ready) this.#MainPane.destroy()
 
-    // this.#initialCfg = cfg
+    const oldID = this.ID
     const txCfg = TradeXchart.create(cfg)
+    // this.#txCfg = cfg // copyDeep(cfg)
+    this.#txCfg = txCfg
     this.logs = (txCfg?.logs) ? txCfg.logs : null
     this.infos = (txCfg?.infos) ? txCfg.infos : null
     this.warnings = (txCfg?.warnings) ? txCfg.warnings : null
@@ -426,28 +428,12 @@ export default class TradeXchart extends Tradex_chart {
     this.#TALib = txCfg.talib
 
     // if no theme use the default
-    if (!("theme" in txCfg) || !isObject(txCfg.theme)) 
-      txCfg.theme = defaultTheme
-
-    // process config
-    if (isObject(txCfg)) {
-      for (const option in txCfg) {
-        if (option in this.props()) {
-          this.props()[option](txCfg[option])
-        }
-      }
-    }
-
-    const oldID = this.ID
-    const id = (isString(txCfg?.id)) ? txCfg.id : null
-    this.setID(id)
-    this.classList.add(this.ID)
+    this.props(txCfg)
 
     this.log("processing state...")
 
     let deepValidate = txCfg?.deepValidate || false
     let isCrypto = txCfg?.isCrypto || false
-
     let state = txCfg.state
     if (!(txCfg.state instanceof State))
       state = this.configureState(txCfg)
@@ -532,10 +518,10 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * alias of start()
-   * @param {object} cfg - chart configuration
+   * @param {object} state - chart configuration
    */
-  use(cfg) {
-    this.start(cfg)
+  use(state) {
+    this.#stateClass.use(this, state, true)
   }
 
   /**
@@ -637,9 +623,9 @@ export default class TradeXchart extends Tradex_chart {
     }
   }
 
-  props() {
-    return {
+  props(txCfg) {
       // id: (id) => this.setID(id),
+    let entries = {
       width: (width) => this.setWidth(width),
       height: (height) => this.setHeight(height),
       widthMin: (width) => this.setWidthMin(width),
@@ -656,9 +642,26 @@ export default class TradeXchart extends Tradex_chart {
       pricePrecision: (pricePrecision) => this.setPricePrecision(pricePrecision),
       volumePrecision: (precision) => this.setVolumePrecision(precision),
     }
+    if (isObject(txCfg)) {
+      for (const option in txCfg) {
+        if (option in entries) {
+          entries[option](txCfg[option])
+        }
+      }
+    }
+    this.validateID(txCfg)
+    // if no theme use the default
+    if (!("theme" in txCfg) || !isObject(txCfg.theme)) 
+    txCfg.theme = defaultTheme
   }
 
   getInCnt() { return this.#inCnt }
+
+  validateID(txCfg) {
+    const id = (isString(txCfg?.id)) ? txCfg.id : null
+    this.setID(id)
+    this.classList.add(this.ID)
+  }
 
   setID(id) {
     if (isString(id)) 

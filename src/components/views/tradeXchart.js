@@ -24,7 +24,7 @@ import {
   GlobalStyle, GridStyle, XAxisStyle, YAxisStyle
 } from "../../definitions/style"
 
-const HTML = `
+export const HTML = `
   <style title="core">
     :host {
       position: relative;
@@ -89,11 +89,7 @@ export default class tradeXChart extends element {
     if (this.doInit) {
       this.doInit = false
       this.shadowRoot.appendChild(template.content.cloneNode(true))
-      this.style.display = "grid"
-      this.style.minHeight = TX_MINH
-      this.#elWidgets = this.shadowRoot.querySelector('tradex-widgets')
-      this.#elUtils = this.shadowRoot.querySelector('tradex-utils')
-      this.#elBody = this.shadowRoot.querySelector('tradex-body')
+      this.init()
       // set the "old" values from parent element
       this.#chartH = this.parentElement.clientHeight || CHART_MINH
       this.#chartW = this.parentElement.clientWidth || CHART_MINW
@@ -131,6 +127,14 @@ export default class tradeXChart extends element {
       default:
         break;
     }
+  }
+
+  init() {
+    this.style.display = "grid"
+    this.style.minHeight = TX_MINH
+    this.#elWidgets = this.shadowRoot.querySelector('tradex-widgets')
+    this.#elUtils = this.shadowRoot.querySelector('tradex-utils')
+    this.#elBody = this.shadowRoot.querySelector('tradex-body')
   }
 
   // get id() { return this.getAttribute('id'); }

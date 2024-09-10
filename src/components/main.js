@@ -162,26 +162,16 @@ export default class MainPane extends Component {
     options.chartData = this.core.chartData
     options.primaryPane = this.core.primaryPane
     options.secondaryPane = this.core.secondaryPane
-
     options.rangeLimit = this.core.rangeLimit
     options.settings = this.core.settings
-
-    // api - functions / methods, calculated properties provided by this module
-    options.elements = 
-      {...options.elements, 
-        ...this.elements
-      }
+    options.elements = {...options.elements, ...this.elements}
 
     if ( this.core.theme?.time?.navigation === false ) {
       const timeHeight = { height: TIMESCALEH }
       this.core.theme.time = {...this.core.theme?.time, ...timeHeight}
-      // this.#elRows.style.height = `calc(100% - ${TIMESCALEH}px)`
     }
 
-    // register timeline - xAxis
     this.#Time = new Timeline(this.core, options)
-
-    // register chart panes
     this.registerChartPanes(options)
 
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE
@@ -243,7 +233,8 @@ export default class MainPane extends Component {
       chartPane.remove()
       delete this.#chartDeleteList[key]
     })
-    this.graph.destroy();
+    this.graph.destroy()
+    this.time.destroy()
     // remove all listeners
     this.core.hub.expunge(this)
     this.#input.destroy()
@@ -257,14 +248,13 @@ export default class MainPane extends Component {
    * Remove any primary or secondary indicators
    */
   reset() {
-    this.chartPanes.forEach(
-      (chartPane, key) => {
-        if (chartPane.isPrimary) 
-          chartPane.removeAllIndicators()
-        else 
-          this.removeChartPane(chartPane.id)
+    let indicators = this.core.Indicators
+    for (let p in indicators) {
+      for (let i in indicators[p]) {
+        this.core.removeIndicator(i)
       }
-    )
+    }
+    return
   }
 
   /**
@@ -273,6 +263,9 @@ export default class MainPane extends Component {
   restart() {
     if (isFunction(this.chart.scale?.restart)) {
       // check if indicators need to be added
+      // this.chart.setScaleBar()
+      this.chart.scale.restart()
+
       const ind = this.getIndicators()
         let cnt = 0
       for (let r in ind) {
@@ -291,9 +284,9 @@ export default class MainPane extends Component {
         }
       }
       // this.chart.scale.restart()
-      for (let p of this.chartPanes) {
-        p[1].scale.restart()
-      }
+      // for (let p of this.chartPanes) {
+      //   p[1].scale.restart()
+      // }
     }
     // this.setDimensions()
   }

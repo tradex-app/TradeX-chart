@@ -162,7 +162,9 @@ export default class StateMachine {
 
   #unsubscribe() {
 
-    const events = this.#events.values()
+    const events = this.#events?.values()
+    if (!events) return
+
     for (let e of events) {
       this.#core.off(e.topic, e.cb, this.context)
     }
