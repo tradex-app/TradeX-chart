@@ -2,11 +2,12 @@
 // Data state management for the entire chart component library thingy
 
 import * as packageJSON from '../../package.json'
+import * as compression from '../utils/compression'
 import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString } from '../utils/typeChecks'
-import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
-import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, doStructuredClone } from '../utils/utilities'
-import { calcTimeIndex, detectInterval } from '../model/range'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
+import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, doStructuredClone } from '../utils/utilities'
+import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
+import { calcTimeIndex, detectInterval } from '../model/range'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT } from '../definitions/chart'
 import { SHORTNAME } from '../definitions/core'
 import TradeXchart, { isChart } from '../core'
@@ -238,6 +239,10 @@ export default class State {
     // })
   }
   
+  static archive(chart, id) {
+    let state = State.findStateById(chart, id)
+    if (!state) return false
+  }
 
   static findStateById(chart, id) {
     let states = State.chartList(chart)?.states
@@ -506,26 +511,44 @@ export default class State {
  * export state - default json
  * @param {string} key - state unique identifier
  * @param {Object} [config={}] - default {type:"json"}
- * @returns {object|false}  
+ * @returns {object|undefined}  
  * @memberof State
  */
   static export(chart, key, config={}) {
-    if (!State.has(chart, key)) return false
+    if (!State.has(chart, key)) return undefined
     if (!isObject(config)) config = {}
     const state = State.get(chart, key)
     const type = config?.type
-    const data = copyDeep(state.data)
-    const vals = data.chart.data
     let stateExport;
+    let data = {}
+    let exclude = [
+      "core", "inventory", "range", "timeData"
+    ]
+
+    for (let d in state.data) {
+      if (exclude.includes(d)) continue
+
+      data[d] = copyDeep(state.data[d])
+    }
 
     // trim streaming candle because it is not complete
+    let vals = data.chart.data
     if (vals.length > 0 &&
         vals[vals.length - 1].length > 6)
         vals.length = vals.length - 1
-    data.inventory.get("primary").pop()
-    // convert Map/() to array
-    data.inventory = Array.from(data.inventory)
+
+    // Inventory
+    // data.inventory.get("primary").pop()
+    data.inventory = (isArray(data.inventory)) ? Array.from(data.inventory) : []
     data.version = packageJSON.version
+    data.key = state.key
+
+    // Range
+    data.range = state.range.export()
+
+    // Time Data
+    let {indexed, timeFrame, TimeFrameMS, timeZone, timeZoneOffset} = {...state.data.timeData}
+    data.timeData = {indexed, timeFrame, TimeFrameMS, timeZone, timeZoneOffset}
 
     switch(type) {
       case "json":
@@ -712,10 +735,32 @@ export default class State {
   }
 
   use(key) {
+
+    // clean up panes - remove 
+    // if (isFunction(this.#core.MainPane?.init)) {
+    //   if (this.#core.stream instanceof Stream)
+    //     this.#core.stream.stop()
+    //   this.mainElements = this.#core.MainPane.children
+    //   this.mainElementa.parent
+    // }
+    // let state = State.use(this.#core, key)
+
+    // if (isFunction(this.#core.MainPane?.reset)) {
+    //   this.#core.MainPane.init(this.#core.MainPane.options)
+    //   this.#core.MainPane.start()
+
+    //   // this.#core.MainPane.restart()
+    //   this.#core.MainPane.refresh()
+    // }
+    // return state
+
+
+
     // clean up panes - remove 
     if (isFunction(this.#core.MainPane?.init)) {
       if (this.#core.stream instanceof Stream)
         this.#core.stream.stop()
+      this.archive = this.export(this.key)//.compress()
       this.#core.MainPane.reset(false)
       this.#core.MainPane.destroy()
     }

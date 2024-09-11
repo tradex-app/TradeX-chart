@@ -637,15 +637,23 @@ export class Range {
       data: this.data,
       dataLength: this.dataLength,
       Length: this.Length,
+      rangeDuration: this.rangeDuration,
       timeDuration: this.timeDuration,
       timeMin: this.timeMin,
       timeMax: this.timeMax,
-      rangeDuration: this.rangeDuration,
       timeStart: this.timeStart,
       timeFinish: this.timeFinish,
       interval: this.interval,
-      intervalStr: this.intervalStr 
+      intervalStr: this.intervalStr,
     }
+  }
+
+  export() {
+    let data = {}
+    for (let c of copy) {
+      data[c] = this[c]
+    }
+    return data
   }
 } // end class
 
@@ -706,3 +714,45 @@ export function calcTimeIndex(time, timeStamp) {
 
   return index
 }
+
+const copy = [
+  "indexEnd",
+  "indexStart",
+  "scale",
+  "secondaryMaxMin",
+  "valueDiff",
+  "valueHi",
+  "valueLo",
+  "valueMax",
+  "valueMaxIdx",
+  "valueMin",
+  "valueMinIdx",
+  "volumeDiff",
+  "volumeMax",
+  "volumeMaxIdx",
+  "volumeMin",
+  "volumeMinIdx",
+
+  "diff",
+  "futureLimitIndex",
+  "id",
+  "indexed",
+  "initialCnt",
+  "interval",
+  "intervalStr",
+  "limitFuture",
+  "limitPast",
+  "maxCandles",
+  "minCandles",
+  "pastLimitIndex",
+  "rangeDuration",
+  "rangeLimit",
+  "timeDuration",
+  "timeFinish",
+  "timeFrame",
+  "timeFrameMS",
+  "timeMax",
+  "timeMin",
+  "timeStart",
+  "yAxisBounds",
+]

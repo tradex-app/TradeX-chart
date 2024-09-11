@@ -5,7 +5,7 @@ import Overlay from "./overlay"
 import NewsEvent from "../primitives/newsEvent"
 import { limit } from "../../utils/number"
 import { debounce } from "../../utils/utilities"
-import { isString } from "../../utils/typeChecks"
+import { isObject, isString } from "../../utils/typeChecks"
 import { HIT_DEBOUNCE } from "../../definitions/core"
 
 const newsConfig = {
@@ -98,9 +98,11 @@ export default class chartNewsEvents extends Overlay {
   }
 
   draw(range=this.core.range) {
-    if (this.core.config?.events?.display === false) return
-
-    if (!super.mustUpdate()) return
+    if (this.core.config?.events?.display === false ||
+        !isObject(this.data) ||
+        Object.keys(this.data).length == 0 ||
+        !super.mustUpdate()
+      ) return
 
     this.hit.clear()
     this.scene.clear()

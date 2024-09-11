@@ -137,9 +137,11 @@ export default class chartTrades extends Overlay {
   }
 
   draw(range=this.core.range) {
-    if (!super.mustUpdate()) return
-
-    if (this.core.config?.trades?.display === false) return
+    if (this.core.config?.events?.display === false ||
+      !isObject(this.data) ||
+      Object.keys(this.data).length == 0 ||
+      !super.mustUpdate()
+    ) return
 
     this.hit.clear()
     this.scene.clear()
