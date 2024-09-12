@@ -313,8 +313,8 @@ export default class MainPane extends Component {
     // listen/subscribe/watch for notifications
     this.on(STREAM_FIRSTVALUE, this.onFirstStreamValue, this)
     this.on(STREAM_NEWVALUE, this.onNewStreamValue, this)
-    this.on("setRange", this.onSetRange, this);
-    this.on("scrollUpdate", this.draw, this)
+    this.on("range_set", this.onSetRange, this);
+    this.on("chart_scrollUpdate", this.draw, this)
     this.on("chart_render", this.draw, this)
     this.on("chart_paneDestroy", this.removeChartPane, this)
   }
@@ -385,7 +385,7 @@ export default class MainPane extends Component {
       secondaryPane.graph.overlays.list.get("cursor").layer.visible = true
     }
 
-    this.emit("main_mousemove", this.#cursorPos)
+    this.emit("main_mouseMove", this.#cursorPos)
   }
 
   onMouseEnter(e) {
@@ -561,7 +561,7 @@ export default class MainPane extends Component {
     }
 
     this.rowsOldH = this.rowsH
-    this.emit("rowsResize", dimensions)
+    this.emit("chart_rowsResize", dimensions)
     this.draw(undefined, true)
   }
 
@@ -677,7 +677,7 @@ export default class MainPane extends Component {
     }
 
     this.setPaneDividers()
-    this.emit("addChartView", o)
+    this.emit("chart_paneAdd", o)
 
     return o
   }
@@ -855,13 +855,14 @@ export default class MainPane extends Component {
 
       instance.start()
       pane = "secondary"
+      this.emit("chart_secondaryAdd", instance)
     }
 
     const id = ("instance" in instance) ? instance.instance.id : instance.id
     this.refresh()
     this.core.state.addIndicator(instance, pane)
     this.core.log(`Added indicator:`, id)
-    this.emit("addIndicatorDone", instance)
+    this.emit("chart_IndicatorAdd", instance)
 
     return instance
   }
@@ -941,7 +942,7 @@ export default class MainPane extends Component {
         Object.keys(i.chart.indicators).length > 1)
     {
         i.remove()
-        this.emit("pane_refresh", this)
+        this.emit("chart_paneRefresh", this)
     }
     // Yes!
     else i.chart.remove()
@@ -1141,7 +1142,7 @@ export default class MainPane extends Component {
     this.hidePaneDividers()
     }
 
-    this.emit("pane_refresh", this)
+    this.emit("chart_paneRefresh", this)
 
     return true
   }
@@ -1154,7 +1155,7 @@ export default class MainPane extends Component {
     const maxMin = this.chartPaneMaximized
     let style, i = 0;
 
-    this.emit("pane_refresh", this)
+    this.emit("chart_paneRefresh", this)
 
     // are Chart Pane dimensions the same?
     if (this.dimensions.height == maxMin.height) {}
@@ -1177,7 +1178,7 @@ export default class MainPane extends Component {
   paneCollapse(p) {
     if (!(p instanceof Chart)) return false
 
-    this.emit("pane_refresh", this)
+    this.emit("chart_paneRefresh", this)
 
     const controls = p.legend.list.chart.el.querySelector(".controls")
     const pc = p.collapsed

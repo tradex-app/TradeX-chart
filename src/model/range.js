@@ -207,7 +207,7 @@ export class Range {
     //   this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
     // }
 
-    this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
+    this.#core.emit("range_set", [newStart, newEnd, oldStart, oldEnd])
 
     // if (this.#init) this.#init = false
 
@@ -222,7 +222,7 @@ export class Range {
     //     this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
     //   }
 
-    //   this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
+    //   this.#core.emit("range_set", [newStart, newEnd, oldStart, oldEnd])
     //   this.#core.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
     //   this.#core.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
     // })
@@ -630,28 +630,21 @@ export class Range {
   }
 
   snapshot(start, end) {
-    return {
-      snapshot: true,
-      ts: Date.now(),
-
-      data: this.data,
-      dataLength: this.dataLength,
-      Length: this.Length,
-      rangeDuration: this.rangeDuration,
-      timeDuration: this.timeDuration,
-      timeMin: this.timeMin,
-      timeMax: this.timeMax,
-      timeStart: this.timeStart,
-      timeFinish: this.timeFinish,
-      interval: this.interval,
-      intervalStr: this.intervalStr,
-    }
+    let data = this.export()
+        data.snapshot = true
+        data.ts = Date.now()
+        data.data = this.data
+        data.dataLength = this.dataLength
+        data.Length = this.Length
+    return data
   }
 
-  export() {
+  export(exclude) {
     let data = {}
+    exclude = (isArray(exclude)) ? exclude : []
     for (let c of copy) {
-      data[c] = this[c]
+      if (!exclude.includes(c))
+        data[c] = this[c]
     }
     return data
   }

@@ -37,7 +37,7 @@ export default class chartNewsEvents extends Overlay {
     super(target, xAxis, yAxis, theme, parent, params)
 
     this.#event = new NewsEvent(target, theme)
-    this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this)
+    this.core.on("chart_primaryPointerDown", this.onPrimaryPointerDown, this)
     newsConfig.parent = this
     this.#dialogue = this.core.WidgetsG.insert("Dialogue", newsConfig)
     this.#dialogue.start()

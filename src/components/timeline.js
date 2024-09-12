@@ -200,7 +200,7 @@ export default class Timeline extends Component {
     this.#input3.destroy()
 
     this.core.hub.expunge(this)
-    this.off("main_mousemove", this.#layerCursor.draw, this.#layerCursor)
+    this.off("main_mouseMove", this.#layerCursor.draw, this.#layerCursor)
     
     this.#elFwdEnd.removeEventListener('click', debounce)
     this.#elRwdStart.removeEventListener('click', debounce)
@@ -229,8 +229,8 @@ export default class Timeline extends Component {
     this.#input3.on("pointerleave", () => this.hideJump(this.#jump.start))
     // this.#input3.on('click', () => debounce(this.onPointerClick, 1000, this, true))
 
-    this.on("main_mousemove", this.#layerCursor.draw, this.#layerCursor)
-    this.on("setRange", this.onSetRange, this)
+    this.on("main_mouseMove", this.#layerCursor.draw, this.#layerCursor)
+    this.on("range_set", this.onSetRange, this)
 
     this.#elFwdEnd.addEventListener('click', debounce(this.onPointerClick, 1000, this, true))
     this.#elRwdStart.addEventListener('click', debounce(this.onPointerClick, 1000, this, true))

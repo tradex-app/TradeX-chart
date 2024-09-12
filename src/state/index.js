@@ -760,13 +760,19 @@ export default class State {
     if (isFunction(this.#core.MainPane?.init)) {
       if (this.#core.stream instanceof Stream)
         this.#core.stream.stop()
-      this.archive = this.export(this.key)//.compress()
+      this.archive = this.export(this.key).compress()
       this.#core.MainPane.reset(false)
       this.#core.MainPane.destroy()
     }
     let state = State.use(this.#core, key)
 
-    if (isFunction(this.#core.MainPane?.reset)) {
+    if (isObject(state?.archive)) {
+      let archive = state.decompress()
+      JSON.parse(archive)
+
+    }
+
+    if (isFunction(this.#core.MainPane?.init)) {
       this.#core.MainPane.init(this.#core.MainPane.options)
       this.#core.MainPane.start()
 

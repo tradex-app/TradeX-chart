@@ -35,7 +35,7 @@ export default
         setRange: {
           target: 'setRange',
           action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "setRange"`)
+            // console.log(`${this.id}: transition from "${this.state}" to  "range_set"`)
           },
         },
         addIndicator: {
@@ -44,10 +44,10 @@ export default
             // console.log('secondaryPane: transition from "idle" to "addIndicator" state')
           },
         },
-        divider_pointerdrag: {
-          target: 'divider_pointerdrag',
+        divider_pointerDrag: {
+          target: 'divider_pointerDrag',
           action (data) {
-            // console.log('secondaryPane: transition from "idle" to "divider_pointerdrag" state')
+            // console.log('secondaryPane: transition from "idle" to "divider_pointerDrag" state')
             this.context.currCursor = this.context.origin.cursor
             this.context.origin.cursor = "row-resize"
           },
@@ -155,7 +155,7 @@ export default
         }
       }
     },
-    divider_pointerdrag: {
+    divider_pointerDrag: {
       onEnter(data) {
 
       },
@@ -163,13 +163,13 @@ export default
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
-        divider_pointerdrag: {
-          target: "divider_pointerdrag",
+        divider_pointerDrag: {
+          target: "divider_pointerDrag",
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         },
-        divider_pointerdragend: {
+        divider_pointerDragEnd: {
           target: "idle",
           action (data) {
             // this.actions.removeProperty.call(this)

@@ -525,9 +525,9 @@ const infoBox = {}
         infoBox.el.innerHTML = inf
       }
 
-chart.on("setRange", (e) => { infoBox.out(demo.internals()) })
+chart.on("range_set", (e) => { infoBox.out(demo.internals()) })
 chart.on("chart_pan", (e) => { infoBox.out(demo.internals()) })
-chart.on("main_mousemove", (e) => { infoBox.out(demo.internals()) })
+chart.on("main_mouseMove", (e) => { infoBox.out(demo.internals()) })
 infoBox.out(demo.internals())
 // test()
 

@@ -1025,7 +1025,7 @@ export default class TradeXchart extends Tradex_chart {
     }
 
     this.#scrollPos = scrollPos
-    this.emit("scrollUpdate", scrollPos)
+    this.emit("chart_scrollUpdate", scrollPos)
   }
 
   offsetRange(offset) {

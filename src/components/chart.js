@@ -329,7 +329,7 @@ export default class Chart extends Component{
     this.#input.on("pointerup", this.onPointerUp.bind(this));
 
     // listen/subscribe/watch for parent notifications
-    this.on("main_mousemove", this.updateLegends, this);
+    this.on("main_mouseMove", this.updateLegends, this);
     this.on(STREAM_LISTENING, this.onStreamListening, this);
     this.on(STREAM_NEWVALUE, this.onStreamNewValue, this);
     this.on(STREAM_UPDATE, this.onStreamUpdate, this);
@@ -383,7 +383,7 @@ export default class Chart extends Component{
     if (this.stateMachine.state === "tool_activated")
       this.emit("tool_targetSelected", { target: this, position: e });
     else if (this.isPrimary)
-      this.emit("primary_pointerdown", this.#cursorClick)
+      this.emit("chart_primaryPointerDown", this.#cursorClick)
   }
 
   onPointerUp(e) {
@@ -732,7 +732,7 @@ export default class Chart extends Component{
    * Refresh secondaryPane - overlays, grid, scale, indicators
    */
   refresh() {
-    this.emit("pane_refresh", this)
+    this.emit("chart_paneRefresh", this)
     this.scale.draw()
     this.draw(undefined, this.isPrimary)
   }
@@ -962,7 +962,7 @@ export default class Chart extends Component{
   zoomRange() {
     // draw the chart - grid, candles, volume
     this.draw(this.range, true)
-    this.emit("zoomDone", true)
+    this.emit("chart_zoomDone", true)
   }
 
 
