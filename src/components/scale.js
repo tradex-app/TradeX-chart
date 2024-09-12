@@ -119,6 +119,7 @@ export default class ScaleBar extends Component {
     this.stateMachine.start()
   }
 
+  // TODO: remove - obsolete ????
   restart() {
     this.destroy(false)
     this.setYAxis()

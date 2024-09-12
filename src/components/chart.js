@@ -157,7 +157,7 @@ export default class Chart extends Component{
 
     if (this.isPrimary) {
       chartLegend.type = "chart"
-      chartLegend.title = this.title
+      chartLegend.title = `${this.title} : ${this.range.timeFrame} : `
       chartLegend.parent = this
       chartLegend.source = this.legendInputs.bind(this)
       this.legend.add(chartLegend)
@@ -655,7 +655,7 @@ export default class Chart extends Component{
    * @param {Boolean} state - leave chart pane state intact?
    * @returns 
    */
-  removeIndicator(id, state) {
+  removeIndicator(id, state=true) {
     if (!isString(id) || !(id in this.indicators)) return false
 
     // enable deletion
@@ -769,16 +769,17 @@ export default class Chart extends Component{
     const index = limit(idx, 0, this.range.data.length - 1)
     const ohlcv = this.range.data[index]
     const theme = this.theme.candle
-    const colours = (ohlcv[4] >= ohlcv[1]) ?
-      new Array(5).fill(theme.UpWickColour) :
-      new Array(5).fill(theme.DnWickColour);
     const inputs = {}
     const keys = ["T","O","H","L","C","V"]
-
+    let colours = []
+    if (isArray(ohlcv)) {
+      colours = (ohlcv[4] >= ohlcv[1]) ?
+      new Array(5).fill(theme.UpWickColour) :
+      new Array(5).fill(theme.DnWickColour);
     for (let i=1; i<6; i++ ) {
       inputs[keys[i]] = this.scale.nicePrice(ohlcv[i])
     }
-
+    }
     return {inputs, colours, labels}
   }
 
