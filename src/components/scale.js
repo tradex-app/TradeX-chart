@@ -120,12 +120,7 @@ export default class ScaleBar extends Component {
   }
 
   restart() {
-    // TODO: remove old overlays
-    // create and use new YAxis
-    // this.#yAxis.setRange(this.core.range)
-
     this.destroy(false)
-
     this.setYAxis()
     this.createGraph()
     this.#yAxis.calcGradations()

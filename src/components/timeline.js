@@ -206,7 +206,7 @@ export default class Timeline extends Component {
     this.#elRwdStart.removeEventListener('click', debounce)
 
     this.graph.destroy()
-    this.element.remove()
+    // this.element.remove()
   }
 
   eventsListen() {

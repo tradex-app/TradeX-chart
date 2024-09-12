@@ -621,7 +621,7 @@ export default class MainPane extends Component {
   addChartPane(params) {
     // list of expanded panes
     const { expanded: exp } = this.chartPanesState()
-    // insert a row to mount the indicator on
+    // insert a row to mount the chart pane on
     const heights = this.calcChartPaneHeights()
     const n = heights.new
     let h
@@ -635,7 +635,7 @@ export default class MainPane extends Component {
       }
     }
 
-    // insert a row for the new indicator
+    // insert a row for the new chart pane
     let row
     let style = `` //
     let node = this.#elMain.rowNode(params.type, style, this.core)
@@ -644,13 +644,15 @@ export default class MainPane extends Component {
     row.style.height = `${n}px`
     // row.style.width = `100%`
 
-    // insert a YAxis for the new indicator
-    let axis
-    this.#elYAxis.insertAdjacentHTML("beforeend", 
-      this.scaleNode(params.type))
+    // insert a YAxis for the new chart pane
+    let axis;
+        node = this.scaleNode(params.type)
+    this.#elYAxis.insertAdjacentHTML("beforeend", node)
     axis = this.#elYAxis.chartPaneSlot.assignedElements().slice(-1)[0]
     axis.style.height = `${n}px`
     axis.style.width = `100%`
+    axis.height = n
+    axis.width = this.#elScale.width
 
     params.elements.elTarget = row
     params.elements.elScale = axis
