@@ -188,7 +188,12 @@ export default class MainPane extends Component {
     this.#elMain.start(this.theme)
     this.#Time.start()
     this.createGraph()
-    
+    this.rowsOldH = this.rowsH
+
+    // set scale width
+    const scaleW = this.chart.scale.calcScaleWidth()
+    this.core.elBody.setYAxisWidth(scaleW)    
+
     // start each view / chart pane 
     this.chartPanes.forEach((view, key) => {
 
@@ -196,13 +201,7 @@ export default class MainPane extends Component {
       // suppress divider of first chart pane as no preceding pane
       if (i === 1) view.Divider.hide()
     })
-
-    this.rowsOldH = this.rowsH
-
-    // set scale width
-    const scaleW = this.chart.scale.calcScaleWidth()
-    this.core.elBody.setYAxisWidth(scaleW)    
-
+  
     // create and start overlays
     this.draw(this.range, true)
 
@@ -259,6 +258,7 @@ export default class MainPane extends Component {
 
   /**
    * restart chart with current State
+   * TODO: remove - obsolete ?????
    */
   restart() {
     if (isFunction(this.chart.scale?.restart)) {
@@ -323,14 +323,12 @@ export default class MainPane extends Component {
     this.#scaleWOld = this.#scaleW
     this.#scaleW = this.chart.scale.calcScaleWidth()
 
-    // // does the scale width have to adjusted?
-    if (this.#scaleWOld < this.#scaleW) {
+    // does the scale width have to adjusted?
+    if (this.#scaleWOld != this.#scaleW) {
       this.core.elBody.setYAxisWidth(this.#scaleW)
       this.setDimensions()
+      this.draw()
     }
-    else this.draw()
-
-    // this.draw()
   }
 
   onMouseWheel(e) {
@@ -532,7 +530,6 @@ export default class MainPane extends Component {
 
     let resizeH = this.#elRows.heightDeltaR
     let chartH = Math.round(this.chartH * resizeH)
-    // let width = this.rowsW
     let height = this.rowsH
     let layerWidth = Math.round(width * ((100 + this.#buffer) * 0.01))
     let dimensions = {
@@ -544,7 +541,8 @@ export default class MainPane extends Component {
     }
 
     this.core.scrollPos = -1
-
+    this.#elViewport.style.width =`${width}px`
+    this.#elViewport.style.height =`${height}px`
     this.#Time.setDimensions({w: width})
     this.graph.setSize(width, height, layerWidth)
     this.#elViewport.style.width =`${width}px`
@@ -563,6 +561,27 @@ export default class MainPane extends Component {
     this.rowsOldH = this.rowsH
     this.emit("chart_rowsResize", dimensions)
     this.draw(undefined, true)
+  }
+
+  /**
+   * Set scale width for all chart panes
+   * @param {Boolean} draw - should this.draw() be invoked?
+   * @returns 
+   */
+  setScaleWidth(draw=false) {
+    const { expanded: exp } = this.chartPanesState()
+    let scaleW = 0;
+    
+    if (this.chartPanes.size === 1) {
+      scaleW = this.chartPanes.values().next().value.scale.calcScaleWidth()
+    }
+    else {
+      for (let o of exp) {
+        let w = o.scale.calcScaleWidth()
+        scaleW = (w > scaleW) ? w : scaleW
+      }
+    }
+    this.core.elBody.setYAxisWidth(scaleW)
   }
 
   getBufferPx() { 
