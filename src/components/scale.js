@@ -120,6 +120,7 @@ export default class ScaleBar extends Component {
   }
 
   // TODO: remove - obsolete ????
+  /*
   restart() {
     this.destroy(false)
     this.setYAxis()
@@ -127,9 +128,8 @@ export default class ScaleBar extends Component {
     this.#yAxis.calcGradations()
     this.draw(this.range, true)
     this.eventsListen()
-
   }
-
+*/
   destroy(all=true) {
     this.core.hub.expunge(this)
     this.off(`${this.parent.id}_pointerout`, this.#layerCursor.erase, this.#layerCursor)

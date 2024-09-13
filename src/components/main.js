@@ -189,11 +189,7 @@ export default class MainPane extends Component {
     this.#Time.start()
     this.createGraph()
     this.rowsOldH = this.rowsH
-
-    // set scale width
-    const scaleW = this.chart.scale.calcScaleWidth()
-    this.core.elBody.setYAxisWidth(scaleW)    
-
+    this.setScaleWidth()
     // start each view / chart pane 
     this.chartPanes.forEach((view, key) => {
 
@@ -259,7 +255,6 @@ export default class MainPane extends Component {
   /**
    * restart chart with current State
    * TODO: remove - obsolete ?????
-   */
   restart() {
     if (isFunction(this.chart.scale?.restart)) {
       // check if indicators need to be added
@@ -290,6 +285,7 @@ export default class MainPane extends Component {
     }
     // this.setDimensions()
   }
+   */
 
   eventsListen() {
     // Give Main focus so it can receive keyboard input
@@ -739,19 +735,7 @@ export default class MainPane extends Component {
     }
 
     this.chartPanes.delete(paneID)
-
-    // resize Scale width for remaining chart panes
-    let scaleW = 0;
-    if (this.chartPanes.size === 1) {
-      scaleW = this.chartPanes.values().next().value.scale.calcScaleWidth()
-    }
-    else {
-      for (let o of exp) {
-        let w = o.scale.calcScaleWidth()
-        scaleW = (w > scaleW) ? w : scaleW
-      }
-    }
-    this.core.elBody.setYAxisWidth(scaleW)
+    this.setScaleWidth()
 
     // is there only one chart pane remaining?
     if (this.chartPanes.size === 1) {
@@ -772,6 +756,7 @@ export default class MainPane extends Component {
 
     this.setPaneDividers()
     this.draw(this.range, true)
+
     return true
   }
 
