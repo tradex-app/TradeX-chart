@@ -140,7 +140,7 @@ export default
       onEnter(data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
-        this.context.origin.chart_IndicatorAdd(data) 
+        this.context.origin.addIndicator(data) 
       },
       onExit(data) {
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)

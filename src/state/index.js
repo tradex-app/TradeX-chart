@@ -199,7 +199,8 @@ export default class State {
    * @returns {State|undefined} - chart state
    */
   static use(chart, state) {
-    let key = State.getKey(chart, state)
+    let key = (State.has(chart, state)) ? state : 
+      (State.has(chart, state?.key)) ? state.key : state
 
     if (!isString(key) && isObject(state) && Object.keys(state).length > 2) {
       let hash = State.hash(state)
@@ -224,6 +225,17 @@ export default class State {
     if (key != active?.key) {
       states.previous = { state: active, node: "" }
       active = target
+
+      // rehydrate state
+      if (isObject(active?.archive)) {
+        let archive = (isString(active?.archive?.data)) ?
+          active?.archive.data :
+          "";
+        let data = (!!active.archive?.compress) ?
+          archive.decompress() :
+          archive;
+        let oldState = JSON.parse(data)
+      }
     }
 
     console.log(target?.key || active?.key)
@@ -511,7 +523,9 @@ export default class State {
    * export state - default json
    * @param {TradeXchart} chart
    * @param {string} key - state unique identifier
-   * @param {Object} [config={}] - default {type:"json"}
+   * @param {Object} [config={}]
+   * @param {String} config.type - default output: "json"
+   * @param {Boolean} config.compress - compression flag
    * @returns {object|undefined}  
    * @memberof State
    */
@@ -556,6 +570,8 @@ export default class State {
       default :
         const {replacer, space} = {...config};
         stateExport = JSON.stringify(data, replacer, space);
+        if (!!config?.compress)
+          stateExport = stateExport.compress()
     }
     return stateExport
   }
@@ -571,7 +587,7 @@ export default class State {
   static asyncExport(chart, key, config={}) {
     return new Promise((resolve, reject) => {
         try {
-          resolve (State.export(chart, key, config={}))
+          resolve (State.export(chart, key, config))
         }
         catch (e) {
           chart.error(e)
@@ -757,27 +773,6 @@ export default class State {
   }
 
   use(key) {
-
-    // clean up panes - remove 
-    // if (isFunction(this.#core.MainPane?.init)) {
-    //   if (this.#core.stream instanceof Stream)
-    //     this.#core.stream.stop()
-    //   this.mainElements = this.#core.MainPane.children
-    //   this.mainElementa.parent
-    // }
-    // let state = State.use(this.#core, key)
-
-    // if (isFunction(this.#core.MainPane?.reset)) {
-    //   this.#core.MainPane.init(this.#core.MainPane.options)
-    //   this.#core.MainPane.start()
-
-    //   // this.#core.MainPane.restart()
-    //   this.#core.MainPane.refresh()
-    // }
-    // return state
-
-
-
     // clean up panes - remove 
     if (isFunction(this.#core.MainPane?.init)) {
       if (this.#core.stream instanceof Stream)
@@ -786,18 +781,18 @@ export default class State {
       this.#core.progress.start()
       // this.archive = this.export(this.key).compress()
       // TODO: refactor this off onto WebWorker
-      State.asyncExport(this.#core, this.key).then(
-        (r) => { this.archive = r.compress() }
+      let compress = false
+      State.asyncExport(this.#core, this.key, {compress})
+      .then(
+        (r) => { this.archive = {data: r, compress} }
       )
       this.#core.MainPane.reset(false)
       this.#core.MainPane.destroy()
     }
     let state = State.use(this.#core, key)
 
-    if (isObject(state?.archive)) {
-      let archive = state.decompress()
-      JSON.parse(archive)
-    }
+    if (isObject(key))
+      key.key = state.key
 
     if (isFunction(this.#core.MainPane?.init)) {
       this.#core.MainPane.init(this.#core.MainPane.options)

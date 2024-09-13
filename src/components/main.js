@@ -868,7 +868,7 @@ export default class MainPane extends Component {
     this.refresh()
     this.core.state.addIndicator(instance, pane)
     this.core.log(`Added indicator:`, id)
-    this.emit("chart_IndicatorAdd", instance)
+    this.emit("chart_IndicatorAddDone", instance)
 
     return instance
   }

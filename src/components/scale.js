@@ -208,7 +208,7 @@ export default class ScaleBar extends Component {
         let chart = this.parent
         let range = this.core.range
         let id = chart.view[0].id
-        let mm = this.core.range.secondaryMaxMin[id].data
+        let mm = this.core.range.secondaryMaxMin?.[id]?.data
         if (!!mm) {
           let stream = range.value(undefined, id)
           stream.forEach((value, index, array) => {

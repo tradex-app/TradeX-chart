@@ -1111,7 +1111,11 @@ export default class Indicator extends Overlay {
 
     let i = 0
     for (let o of this.definition.meta.output) {
-      if (o.type == "overlay") continue
+      let entry = this.overlay.data[c]
+      if (o.type == "overlay" ||
+          !isArray(entry) ||
+          entry.length == 0
+          ) continue
 
       labels[i] = false
       inputs[o.name] = this.scale.nicePrice(this.overlay.data[c][i+1])
@@ -1466,7 +1470,10 @@ export default class Indicator extends Overlay {
     let plots = []
 
     while(j) {
-      if (k < 0 || k >= data.length) {
+      if (k < 0 || 
+          k >= data.length ||
+          !isArray(data[k])
+          ) {
         plots.push({x: null, y: null})
       }
       else {
