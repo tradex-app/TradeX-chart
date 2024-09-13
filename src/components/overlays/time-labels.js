@@ -38,7 +38,7 @@ export default class TimeLabels extends Overlay {
     ctx.fillStyle = theme.colourTick
     ctx.font = `${theme.fontWeight} ${theme.fontSize}px ${theme.fontFamily}`
     for (let tick of grads) { 
-      let x = bRound(tick[1])
+      let x = tick[1] // bRound(tick[1])
       let w = Math.floor(tick[0].length * this.#charW * 0.5)
       ctx.fillText(tick[0], x - w + offset, this.xAxis.xAxisTicks + 12)
 
