@@ -17,6 +17,7 @@ import { ScaleCursor } from './overlays/chart-cursor'
 import ScaleLabels from './overlays/scale-labels'
 import ScaleOverly from './overlays/scale-overlays'
 import ScalePriceLine from './overlays/scale-priceLine'
+import { YAxisStyle } from "../definitions/style"
 
 
 const defaultOverlays = [
@@ -68,7 +69,7 @@ export default class ScaleBar extends Component {
 
   get name() { return this.#name }
   get shortName() { return this.#shortName }
-  set height(h) { this.setHeight(h) }
+  // set height(h) { this.setHeight(h) }
   get height() { return this.#element.getBoundingClientRect().height }
   get width() { return this.#element.getBoundingClientRect().width }
   get element() { return this.#element }
@@ -103,9 +104,11 @@ export default class ScaleBar extends Component {
 
     const ctx = this.core.MainPane.graph.viewport.scene.context
     const t = this.theme.yAxis
+    this.setYAxis()
     ctx.font = createFont(t.fontSize, t.fontWeight, t.fontFamily)
     this.#digitW = calcTextWidth(ctx, "0")
-    this.setYAxis()
+    this.calcPriceDigits()
+    this.setDimensions({w: this.#digitW * this.#digitCnt})
     this.createGraph()
     this.#yAxis.calcGradations()
     this.draw()
@@ -228,15 +231,21 @@ export default class ScaleBar extends Component {
     this.draw()
   }
 
-  setHeight(h) {
+  #setHeight(h) {
     this.#element.style.height = `${h}px`
   }
 
-  setDimensions(dim) {
+  #setWidth(w) {
+    this.#element.style.width = `${w}px`
+  }
+
+  setDimensions(dim={}) {
     // const w = this.#element.getBoundingClientRect().width
-    const w = this.width
-    const h = this.parent.height
-    this.setHeight(h)
+    dim = (isObject(dim)) ? dim : {}
+    const w = dim?.w || this.width || YAXIS_MINDIGITS * YAxisStyle.FONTSIZE
+    const h = dim?.h || this.parent.height
+    this.#setWidth(w)
+    this.#setHeight(h)
     if (this.graph instanceof Graph) {
       this.graph.setSize(w, h, w)
       this.draw()

@@ -508,12 +508,13 @@ export default class State {
   }
 
   /**
- * export state - default json
- * @param {string} key - state unique identifier
- * @param {Object} [config={}] - default {type:"json"}
- * @returns {object|undefined}  
- * @memberof State
- */
+   * export state - default json
+   * @param {TradeXchart} chart
+   * @param {string} key - state unique identifier
+   * @param {Object} [config={}] - default {type:"json"}
+   * @returns {object|undefined}  
+   * @memberof State
+   */
   static export(chart, key, config={}) {
     if (!State.has(chart, key)) return undefined
     if (!isObject(config)) config = {}
@@ -557,6 +558,27 @@ export default class State {
         stateExport = JSON.stringify(data, replacer, space);
     }
     return stateExport
+  }
+
+  /**
+   * export state - default json
+   * @param {TradeXchart} chart
+   * @param {string} key - state unique identifier
+   * @param {Object} [config={}] - default {type:"json"}
+   * @returns {Promise}  
+   * @memberof State
+   */
+  static asyncExport(chart, key, config={}) {
+    return new Promise((resolve, reject) => {
+        try {
+          resolve (State.export(chart, key, config={}))
+        }
+        catch (e) {
+          chart.error(e)
+          reject ()
+        }
+      }
+    )
   }
 
   static validateData(type, state) {
@@ -760,7 +782,13 @@ export default class State {
     if (isFunction(this.#core.MainPane?.init)) {
       if (this.#core.stream instanceof Stream)
         this.#core.stream.stop()
-      this.archive = this.export(this.key).compress()
+      console.log("progress start")
+      this.#core.progress.start()
+      // this.archive = this.export(this.key).compress()
+      // TODO: refactor this off onto WebWorker
+      State.asyncExport(this.#core, this.key).then(
+        (r) => { this.archive = r.compress() }
+      )
       this.#core.MainPane.reset(false)
       this.#core.MainPane.destroy()
     }
@@ -769,7 +797,6 @@ export default class State {
     if (isObject(state?.archive)) {
       let archive = state.decompress()
       JSON.parse(archive)
-
     }
 
     if (isFunction(this.#core.MainPane?.init)) {
@@ -778,6 +805,8 @@ export default class State {
 
       // this.#core.MainPane.restart()
       this.#core.MainPane.refresh()
+      this.#core.progress.stop()
+      console.log("progress stop")
     }
     return state
   }

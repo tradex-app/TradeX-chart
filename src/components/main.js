@@ -189,7 +189,6 @@ export default class MainPane extends Component {
     this.#Time.start()
     this.createGraph()
     this.rowsOldH = this.rowsH
-    this.setScaleWidth()
     // start each view / chart pane 
     this.chartPanes.forEach((view, key) => {
 
@@ -197,6 +196,7 @@ export default class MainPane extends Component {
       // suppress divider of first chart pane as no preceding pane
       if (i === 1) view.Divider.hide()
     })
+    this.setScaleWidth()
   
     // create and start overlays
     this.draw(this.range, true)
