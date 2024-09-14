@@ -55,7 +55,6 @@ export default class MainPane extends Component {
   #shortName = "Main"
   #destruction = false
 
-  #elYAxis
   #elMain
   #elRows
   #elTime
@@ -97,8 +96,6 @@ export default class MainPane extends Component {
     options.parent = core
     super(core, options)
 
-    this.#elMain = this.core.elMain
-    this.#elYAxis = this.core.elYAxis
     this.init(options)
   }
 
@@ -150,6 +147,7 @@ export default class MainPane extends Component {
   init(options) {
     const core = this.core
 
+    this.#elMain = this.core.elMain
     this.#elRows = this.#elMain.rows
     this.#elTime = this.#elMain.time
     this.#elGrid = this.#elMain.rows.grid
@@ -227,10 +225,8 @@ export default class MainPane extends Component {
     })
     this.graph.destroy()
     this.time.destroy()
-    // remove all listeners
     this.core.hub.expunge(this)
     this.#input.destroy()
-
     this.stateMachine = null
     this.graph = null
   }
@@ -614,16 +610,8 @@ export default class MainPane extends Component {
 
     // insert a row for the new chart pane
     let row = this.#elMain.addRow(params.type, "", this.core, n)
-
-    let axis;
-    let node = this.#elMain.scaleNode(params.type)
-    this.#elYAxis.insertAdjacentHTML("beforeend", node)
-    axis = this.#elYAxis.chartPaneSlot.assignedElements().slice(-1)[0]
-    axis.style.height = `${n}px`
-    axis.style.width = `100%`
-    axis.height = n
-    axis.width = this.#elScale.width
-
+    let axis = this.#elMain.addScaleRow(params.type, n, this.#elScale)
+    
     params.elements.elTarget = row
     params.elements.elScale = axis
 

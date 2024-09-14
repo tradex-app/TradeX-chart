@@ -121,6 +121,18 @@ export default class tradeXMain extends element {
     else return false
   }
 
+  addScaleRow(type, height, elScale) {
+    let axis;
+    let node = this.scaleNode(type)
+    elScale.insertAdjacentHTML("beforeend", node)
+    axis = elScale.chartPaneSlot.assignedElements().slice(-1)[0]
+    axis.style.height = `${height}px`
+    axis.style.width = `100%`
+    axis.height = height
+    axis.width = elScale.width
+    return axis
+  }
+
   setMain() {
     let timeH = (isNumber(this.#theme?.time?.height)) ? this.#theme.time.height : TIMEH
     this.style.gridTemplateRows = `1fr ${timeH}px`
