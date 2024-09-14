@@ -159,9 +159,6 @@ export default class MainPane extends Component {
     options.name = "Chart"
     options.shortName = "Chart"
     options.parent = this
-    // options.chartData = this.core.chartData
-    // options.primaryPane = this.core.primaryPane
-    // options.secondaryPane = this.core.secondaryPane
     options.rangeLimit = this.core.rangeLimit
     options.settings = this.core.settings
     options.elements = {...options.elements, ...this.elements}
@@ -616,17 +613,10 @@ export default class MainPane extends Component {
     }
 
     // insert a row for the new chart pane
-    let row
-    let style = `` //
-    let node = this.#elMain.rowNode(params.type, style, this.core)
-    this.#elRows.insertAdjacentHTML("beforeend", node)
-    row = this.#elRows.chartPaneSlot.assignedElements().slice(-1)[0]
-    row.style.height = `${n}px`
-    // row.style.width = `100%`
+    let row = this.#elMain.addRow(params.type, "", this.core, n)
 
-    // insert a YAxis for the new chart pane
     let axis;
-        node = this.scaleNode(params.type)
+    let node = this.scaleNode(params.type)
     this.#elYAxis.insertAdjacentHTML("beforeend", node)
     axis = this.#elYAxis.chartPaneSlot.assignedElements().slice(-1)[0]
     axis.style.height = `${n}px`
@@ -723,6 +713,10 @@ export default class MainPane extends Component {
     this.draw(this.range, true)
 
     return true
+  }
+
+  removeChartPaneRows() {
+    // this.#elRows
   }
 
   /**

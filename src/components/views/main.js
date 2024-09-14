@@ -94,6 +94,15 @@ export default class tradeXMain extends element {
     return node
   }
 
+  addRow(type, style="", api, height) {
+    let row
+    let node = this.rowNode(type, style, api)
+    this.#elRows.insertAdjacentHTML("beforeend", node)
+    row = this.#elRows.chartPaneSlot.assignedElements().slice(-1)[0]
+    row.style.height = `${height}px`
+    return row
+  }
+
   removeRow(id) {
     const row = this.shadowRoot.querySelector(`#${id}`)
     if (!!row) {
