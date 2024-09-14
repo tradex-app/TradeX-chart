@@ -245,6 +245,11 @@ export default class MainPane extends Component {
     return
   }
 
+  removeAllRowElements() {
+    this.#elMain.rows.shadowRoot = ""
+    this.#elScale.shadowRoot = ""
+  }
+
   eventsListen() {
     // Give Main focus so it can receive keyboard input
     // this.#elRows.tabIndex = 0
@@ -254,7 +259,6 @@ export default class MainPane extends Component {
 
     this.#input.on("keydown", this.onChartKeyDown.bind(this))
     this.#input.on("keyup", this.onChartKeyUp.bind(this))
-
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("pointerenter", this.onMouseEnter.bind(this));
     this.#input.on("pointerout", this.onMouseOut.bind(this));

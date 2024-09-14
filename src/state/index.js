@@ -798,7 +798,7 @@ export default class State {
       .then(
         (r) => { this.archive = {data: r, compress} }
       )
-      this.#core.MainPane.reset(false)
+
       this.#core.MainPane.destroy()
     }
     let state = State.use(this.#core, key)
