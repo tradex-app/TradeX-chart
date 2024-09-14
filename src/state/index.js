@@ -235,6 +235,14 @@ export default class State {
           archive.decompress() :
           archive;
         let oldState = JSON.parse(data)
+        delete active.archive
+
+        const defaultState = doStructuredClone(State.default)
+        State.buildInventory(oldState, defaultState)
+    // TODO: set allData to primary[].data
+        active.allData.primaryPane = oldState.primary
+        active.allData.secondaryPane = oldState.secondary
+        active.data.inventory = oldState.inventory
       }
     }
 
@@ -360,51 +368,8 @@ export default class State {
     }
     state.allData.datasets = state.datasets
 
-    // Build chart order
-    if (state.inventory.length == 0) {
-      // add primary chart
-      state.inventory.push(["primary", state.primary])
-      // add secondary charts if they exist
-      for (let o in state) {
-        if (o.indexOf("secondary") == 0) {
-          state.inventory.push([o, state[o]])
-        }
-      }
-    }
-    // Process chart order
-    let o = state.inventory
-    let c = o.length
-    while (c--) {
-      if (!isArray(o[c]) || o[c].length == 0)
-        o.splice(c, 1)
-      else {
-        // validate each overlay / indicator entry
-        let i = state.inventory[c][1]
-        let x = i.length
-        while (x--) {
-          // remove if invalid
-          if (!isObject(i[x]) ||
-              !isString(i[x].name) ||
-              !isString(i[x].type)
-              // !isArray(i[x].data)
-              )
-                i.splice(x, 1)
-          // default settings if necessary
-          else if (!isObject(i[x].settings))
-            i[x].settings = {}
-        }
-        // if after check, no valid indicators, delete entry
-        if (o[c].length == 0) o.splice(c, 1)
-      }
-    }
-    // ensure state has the mandatory primary entry
-    if (state.inventory.length == 0)
-      state.inventory[0] = ["primary", defaultState.primary]
-    state.inventory = new xMap(state.inventory)
-    if (!state.inventory.has("primary")) 
-      state.inventory.insert("primary", defaultState.primary, 0)
-    state.inventory.get("primary").push(state.chart)
-
+    State.buildInventory(state, defaultState)
+    
     // trades
 
     State.validateData("trades", state)
@@ -612,6 +577,53 @@ export default class State {
       let tf = state.range.timeFrame
       State.importData(type, tradeData, allData, tf)
     }
+  }
+
+  static buildInventory(state, defaultState) {
+    // Build chart order
+    if (state.inventory.length == 0) {
+      // add primary chart
+      state.inventory.push(["primary", state.primary])
+      // add secondary charts if they exist
+      for (let o in state) {
+        if (o.indexOf("secondary") == 0) {
+          state.inventory.push([o, state[o]])
+        }
+      }
+    }
+    // Process chart order
+    let o = state.inventory
+    let c = o.length
+    while (c--) {
+      if (!isArray(o[c]) || o[c].length == 0)
+        o.splice(c, 1)
+      else {
+        // validate each overlay / indicator entry
+        let i = state.inventory[c][1]
+        let x = i.length
+        while (x--) {
+          // remove if invalid
+          if (!isObject(i[x]) ||
+              !isString(i[x].name) ||
+              !isString(i[x].type)
+              // !isArray(i[x].data)
+              )
+                i.splice(x, 1)
+          // default settings if necessary
+          else if (!isObject(i[x].settings))
+            i[x].settings = {}
+        }
+        // if after check, no valid indicators, delete entry
+        if (o[c].length == 0) o.splice(c, 1)
+      }
+    }
+    // ensure state has the mandatory primary entry
+    if (state.inventory.length == 0)
+      state.inventory[0] = ["primary", defaultState.primary]
+    state.inventory = new xMap(state.inventory)
+    if (!state.inventory.has("primary")) 
+      state.inventory.insert("primary", defaultState.primary, 0)
+    state.inventory.get("primary").push(state.chart)    
   }
 
   /**

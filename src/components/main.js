@@ -159,9 +159,9 @@ export default class MainPane extends Component {
     options.name = "Chart"
     options.shortName = "Chart"
     options.parent = this
-    options.chartData = this.core.chartData
-    options.primaryPane = this.core.primaryPane
-    options.secondaryPane = this.core.secondaryPane
+    // options.chartData = this.core.chartData
+    // options.primaryPane = this.core.primaryPane
+    // options.secondaryPane = this.core.secondaryPane
     options.rangeLimit = this.core.rangeLimit
     options.settings = this.core.settings
     options.elements = {...options.elements, ...this.elements}
@@ -251,41 +251,6 @@ export default class MainPane extends Component {
     }
     return
   }
-
-  /**
-   * restart chart with current State
-   * TODO: remove - obsolete ?????
-  restart() {
-    if (isFunction(this.chart.scale?.restart)) {
-      // check if indicators need to be added
-      // this.chart.setScaleBar()
-      this.chart.scale.restart()
-
-      const ind = this.getIndicators()
-        let cnt = 0
-      for (let r in ind) {
-        if (isObject(ind[r]) && Object.keys(ind[r]).length > 0)
-        cnt += Object.keys(ind[r]).length
-      }
-      if (cnt == 0) {
-        this.validateIndicators()
-        for (let [k,v] of this.inventory) {
-          let V = [...v]
-          for (let i of V) {
-            if (Object.keys(this.core.indicatorClasses).includes(i.type)) {
-              this.addIndicator(i.type, i.name, {data: i.data, settings: i.settings})
-            }
-          }
-        }
-      }
-      // this.chart.scale.restart()
-      // for (let p of this.chartPanes) {
-      //   p[1].scale.restart()
-      // }
-    }
-    // this.setDimensions()
-  }
-   */
 
   eventsListen() {
     // Give Main focus so it can receive keyboard input
