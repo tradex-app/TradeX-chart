@@ -146,7 +146,7 @@ export default class MainPane extends Component {
 
   init(options) {
     const core = this.core
-
+    
     this.#elMain = this.core.elMain
     this.#elRows = this.#elMain.rows
     this.#elTime = this.#elMain.time
@@ -167,6 +167,7 @@ export default class MainPane extends Component {
     }
 
     this.#Time = new Timeline(this.core, options)
+    this.chartPanes.clear()
     this.registerChartPanes(options)
 
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE
@@ -215,12 +216,15 @@ export default class MainPane extends Component {
     this.log(`Main Pane ${this.#name} instantiated and running`)
   }
 
-  destroy() {
+  destroy(indicators=true) {
     this.#destruction = true
     this.renderLoop.stop()
     this.stateMachine.destroy()
     this.chartPanes.forEach((chartPane, key) => {
-      chartPane.remove()
+      if (!!indicators) 
+        chartPane.remove()
+      else 
+        chartPane.deactivate()
       delete this.#chartDeleteList[key]
     })
     this.graph.destroy()

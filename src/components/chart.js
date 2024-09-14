@@ -293,17 +293,28 @@ export default class Chart extends Component{
     }
     this.core.log(`Deleting chart pane: ${this.id}`)
 
+    this.deactivate(true)
+    this.#status = "destroyed"
+  }
 
+  /**
+   * Remove this chart pane - invokes destroy()
+   * is the correct way to remove a chart pane
+   */
+  remove() {
+    this.emit("chart_paneDestroy", this.id)
+  }
+
+  deactivate(indicators=false) {
     this.core.hub.expunge(this)
-    
-    this.removeAllIndicators()
+    if (!!indicators)
+      this.removeAllIndicators()
     this.stateMachine.destroy()
     this.#Divider.destroy()
     this.#Scale.destroy()
     this.graph.destroy()
     this.#input.destroy()
     this.legend.destroy()
-
     this.stateMachine = undefined
     this.#Divider = undefined
     this.#Legends = undefined
@@ -311,11 +322,6 @@ export default class Chart extends Component{
     this.graph = undefined
     this.#input = undefined
     this.element.remove()
-    this.#status = "destroyed"
-  }
-
-  remove() {
-    this.emit("chart_paneDestroy", this.id)
   }
 
   eventsListen() {

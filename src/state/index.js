@@ -3,7 +3,7 @@
 
 import * as packageJSON from '../../package.json'
 import * as compression from '../utils/compression'
-import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString } from '../utils/typeChecks'
+import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from '../utils/typeChecks'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
 import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, doStructuredClone } from '../utils/utilities'
 import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
@@ -21,7 +21,7 @@ import Chart from '../components/chart'
 
 const HASHKEY = "state"
 const DEFAULTSTATEID = "defaultState"
-const DEFAULT_STATE = {
+export const DEFAULT_STATE = {
   version: packageJSON.version,
   id: DEFAULTSTATEID,
   key: "",
@@ -75,6 +75,11 @@ const DEFAULT_STATE = {
     timeFrameMS: DEFAULT_TIMEFRAMEMS,
     initialCnt: INTITIALCNT
   }
+}
+const CONFIGENTRIES = {
+  chart: "object",
+  ohlcv: "array",
+  range: "object"
 }
 const TRADE = {
   timestamp: "number",
@@ -218,7 +223,7 @@ export default class State {
     let target = states.states.get(key)
     // invalid state id
     if (!target) {
-      chart.warn(`${chart.name} id: ${chart.key} : State ${key} does not exist`)
+      chart.log(`${chart.name} id: ${chart.key} : State ${key} does not exist`)
       return undefined
     }
     // set active to target state
@@ -246,17 +251,8 @@ export default class State {
       }
     }
 
-    console.log(target?.key || active?.key)
-    console.log(target?.range?.id || active?.range.id)
-
     states.active = active
     return active
-
-    // const source = new Proxy( target, {
-    //   get: (obj, prop) => {
-    //     return active[prop]
-    //   }
-    // })
   }
   
   static archive(chart, id) {
@@ -279,6 +275,23 @@ export default class State {
     return cyrb53(str)
   }
 
+  /**
+   * Check if valid state config
+   * @param {Object} config - state config
+   * @returns {Boolean}
+   */
+  static isValidConfig(config) {
+    if (!isObject(config) || 
+        !Object.keys(config).length) 
+        return false
+    else {
+      for (let [key, type] of Object.entries(CONFIGENTRIES)) {
+        if (typeOf ( config?.[key] ) === type)
+          return true
+      }
+    }
+    return false
+  }
 
   static validate(source=State.default, deepValidate=false, isCrypto=false) {
 
@@ -670,7 +683,16 @@ export default class State {
     return true
   }
 
-
+  static isValidEntry(e, type) {
+    const k1 = Object.keys(e)
+    const k2 = Object.keys(type)
+    if (!isObject(e) ||
+        !isArrayEqual(k1, k2)) return false
+    for (let k of k2) {
+      if (typeof e[k] !== type[k]) return false
+    }
+    return true
+  }
   
   #id = ""
   #key = ""
@@ -784,27 +806,31 @@ export default class State {
     return State.get(this.#core, key)
   }
 
+  /**
+   * Set the chart state
+   * @param {Object|String} key - state object to register or key string
+   * @returns {State|undefined}
+   */
   use(key) {
+    const errMsg = `TradeX-Chart id: ${this.#core.id} : cannot use supplied key or state`
+    if (isString(key) && !State.has(key))
+      return undefined
+    else if (!State.isValidConfig(key)) {
+      this.#core.log(errMsg)
+      return undefined
+    }
+
     // clean up panes - remove 
     if (isFunction(this.#core.MainPane?.init)) {
       if (this.#core.stream instanceof Stream)
         this.#core.stream.stop()
-      console.log("progress start")
       this.#core.progress.start()
-      // this.archive = this.export(this.key).compress()
-      // TODO: refactor this off onto WebWorker
-      let compress = false
-      State.asyncExport(this.#core, this.key, {compress})
-      .then(
-        (r) => { this.archive = {data: r, compress} }
-      )
-
-      this.#core.MainPane.destroy()
+      this.#core.MainPane.destroy(false)
     }
     let state = State.use(this.#core, key)
 
     if (isObject(key))
-      key.key = state.key
+      key.key = state?.key
 
     if (isFunction(this.#core.MainPane?.init)) {
       this.#core.MainPane.init(this.#core.MainPane.options)
@@ -813,8 +839,10 @@ export default class State {
       // this.#core.MainPane.restart()
       this.#core.MainPane.refresh()
       this.#core.progress.stop()
-      console.log("progress stop")
     }
+    if (!state)
+      this.#core.log(errMsg)
+
     return state
   }
 
@@ -1205,15 +1233,5 @@ export default class State {
     console.log("TODO: state.removeEvent()")
   }
 
-  static isValidEntry(e, type) {
-    const k1 = Object.keys(e)
-    const k2 = Object.keys(type)
-    if (!isObject(e) ||
-        !isArrayEqual(k1, k2)) return false
-    for (let k of k2) {
-      if (typeof e[k] !== type[k]) return false
-    }
-    return true
-  }
 }
 
