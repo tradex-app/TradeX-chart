@@ -9,7 +9,8 @@ import {
   TIMESCALEH,
   TIMEH,
   SCALEW,
-  GlobalStyle
+  GlobalStyle,
+  STYLE_ROW
 } from "../../definitions/style"
 import { isNumber } from "../../utils/typeChecks"
 
@@ -91,6 +92,14 @@ export default class tradeXMain extends element {
       <tradex-chartpane slot="chartpane" class="${type}" style="${style}">
       </tradex-chartpane>
     `
+    return node
+  }
+
+  scaleNode(type) {
+    const styleRow = STYLE_ROW + ` width: 100%;`
+    const node = `
+    <div slot="chartpane" class="viewport scale ${type}" style="$${styleRow}"></div>
+  `
     return node
   }
 

@@ -616,7 +616,7 @@ export default class MainPane extends Component {
     let row = this.#elMain.addRow(params.type, "", this.core, n)
 
     let axis;
-    let node = this.scaleNode(params.type)
+    let node = this.#elMain.scaleNode(params.type)
     this.#elYAxis.insertAdjacentHTML("beforeend", node)
     axis = this.#elYAxis.chartPaneSlot.assignedElements().slice(-1)[0]
     axis.style.height = `${n}px`
@@ -1000,14 +1000,6 @@ export default class MainPane extends Component {
       sizes.new += height - total
     }
     return sizes
-  }
-
-  scaleNode(type) {
-    const styleRow = STYLE_ROW + ` width: 100%;`
-    const node = `
-    <div slot="chartpane" class="viewport scale ${type}" style="$${styleRow}"></div>
-  `
-    return node
   }
 
   createGraph() {
