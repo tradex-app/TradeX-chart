@@ -518,10 +518,10 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * alias of start()
-   * @param {object} state - chart configuration
+   * @param {object} cfg - chart configuration
    */
-  use(state) {
-    this.#stateClass.use(this, state, true)
+  use(cfg) {
+    this.start(cfg)
   }
 
   /**
@@ -547,8 +547,8 @@ export default class TradeXchart extends Tradex_chart {
     this.WidgetsG.destroy()
 
     this.#workers.end()
-    this.#state = null
-    this.#stateClass = null
+    this.#state = undefined
+    this.#stateClass = undefined
 
     // DOM.findByID(this.ID).remove
   }
@@ -841,56 +841,6 @@ export default class TradeXchart extends Tradex_chart {
   /*============================*/
 
   /**
-   * 
-   * @param {string} key - state id
-   * @returns {boolean} - success / failure
-   */
-  // setState(key) {
-  //   // invalid state id
-  //   if (!this.#stateClass.has(this, key)) {
-  //     this.warn(`${this.name} id: ${this.ID} : Specified state does not exist`)
-  //     return false
-  //   }
-
-  //   // same as current state, nothing to do
-  //   if (key === this.state.key) return true
-    
-  //   // stop any streams
-  //   this.stream.stop()
-  //   // clean up panes
-  //   this.MainPane.reset()
-  //   // set chart to use state
-  //   this.#state = this.#stateClass.get(this, key)
-  //   // create new Range
-  //   const rangeConfig = {
-  //     interval: this.state.data.chart.tfms,
-  //     core: this
-  //   }
-  //   this.getRange(undefined, undefined, rangeConfig)
-
-  //   // set Range
-  //   if (this.range.Length > 1) {
-  //     const rangeStart = calcTimeIndex(this.time)
-  //     const end = (isInteger(rangeStart)) ? 
-  //       rangeStart + this.range.initialCnt :
-  //       this.state.data.chart.data.length - 1
-  //     const start = (isInteger(rangeStart)) ? 
-  //       rangeStart : 
-  //       end - this.range.initialCnt
-  //     this.range.initialCnt = end - start
-  //     this.setRange(start, end)
-
-  //     if (this.config.range?.center)
-  //     this.jumpToIndex(start, true, true)
-  //   }
-
-  //   // rebuild chart
-  //   this.MainPane.restart()
-
-  //   this.refresh()
-  // }
-
-  /**
    * validate and register a chart state
    * @param {object} state 
    * @param {boolean} deepValidate - validate every entry rather than a sample
@@ -1039,18 +989,6 @@ export default class TradeXchart extends Tradex_chart {
     this.setRange(start, end)
     return true
   }
-
-  /**
-   * initialize range
-   * @param {number} start - index
-   * @param {number} end - index
-   * @param {Object} config 
-   * @memberof TradeXchart
-   */
-  // getRange(start, end, config={}) {
-  //   let range = new Range(start, end, config)
-  //   this.#timeData = new Time.TimeData(range)
-  // }
 
   /**
    * set start and end of range

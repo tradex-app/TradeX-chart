@@ -185,10 +185,20 @@ export default class State {
     return instance
   }
 
+  /**
+   * State currently in use
+   * @param {TradeXchart} chart - target
+   * @returns {State} - State instance
+   */
   static active(chart) {
     return State.chartList(chart)?.active
   }
 
+  /**
+   * List registered states
+   * @param {TradeXchart} chart - target
+   * @returns {Array.<State>|undefined} - array of state instances
+   */
   static list (chart) {
     let states = State.chartList(chart)?.states
     if (!states) return undefined
@@ -201,7 +211,7 @@ export default class State {
    * Use a chart State - set it to active
    * @param {TradeXchart} chart - target
    * @param {String|Object} state - state key or {id: "someID"} or {key: "stateKey"} or a state object
-   * @returns {State|undefined} - chart state
+   * @returns {State|undefined} - chart state instance
    */
   static use(chart, state) {
     let key = (State.has(chart, state)) ? state : 
@@ -540,8 +550,8 @@ export default class State {
     data.range = state.range.export()
 
     // Time Data
-    let {indexed, timeFrame, TimeFrameMS, timeZone, timeZoneOffset} = {...state.data.timeData}
-    data.timeData = {indexed, timeFrame, TimeFrameMS, timeZone, timeZoneOffset}
+    let {indexed, timeFrame, timeFrameMS, timeZone, timeZoneOffset} = {...state.data.timeData}
+    data.timeData = {indexed, timeFrame, timeFrameMS, timeZone, timeZoneOffset}
 
     switch(type) {
       case "json":
@@ -763,7 +773,7 @@ export default class State {
 
   /**
    * delete a current or stored chart state
-   * @param {String|Object} target - state key or {id: "someID"} or {key: "stateKey"}
+   * @param {String|Object} state - state key or {id: "someID"} or {key: "stateKey"}
    * @returns {boolean}
    */
   delete(state) {
@@ -794,14 +804,28 @@ export default class State {
     return true
   }
 
+  /**
+   * List registered states
+   * @returns {Array.<State>|undefined} - array of state instances
+   */
   list() {
     return State.list(this.#core)
   }
 
+  /**
+   * Query if state instance specified by key (string) exists
+   * @param {String} key - state idendifier
+   * @returns {Boolean}
+   */
   has(key) {
     return State.has(this.#core, key)
   }
 
+  /**
+   * Return state instance specified by key (string)
+   * @param {String} key - state idendifier
+   * @returns {State|undefined}
+   */
   get(key) {
     return State.get(this.#core, key)
   }

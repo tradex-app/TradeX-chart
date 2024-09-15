@@ -252,9 +252,6 @@ export default class ScaleBar extends Component {
         (isNumber(this.options?.yAxisPadding) &&
         this.options.yAxisPadding >= 1) ?
         this.options.yAxisPadding : 1
-
-        console.log(this.#yAxis.range?.id)
-    
   }
 
   /**
