@@ -553,23 +553,13 @@ export default class MainPane extends Component {
   }
 
   /**
-   * 
+   * Add panes to chart from inventory
    * @param {object} options 
    */
   registerChartPanes(options) {
     this.#elRows.previousDimensions()
-
-    const primaryPane = this.validateIndicators()
-
-    // set the primary chart
-    let primary = primaryPane[0]
-    for (let o of primaryPane) {
-      if (o?.primary === true) primary = o
-      else o.primary = false
-    }
-    primary.primary = true
+    this.validateIndicators()
     options.rowY = 0
-    // add chart views
     for (let [k,v] of this.inventory) {
       options.type = k
       options.view = v
