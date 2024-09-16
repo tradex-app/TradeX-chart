@@ -1065,19 +1065,10 @@ export default class TradeXchart extends Tradex_chart {
    * @param {boolean|object} newRange - false | {start: number, end: number}
    * @param {boolean} calc - automatically calculate indicator data (ignore any existing)
    */
-  
   mergeData(merge, newRange=false, calc=false) {
     this.#mergingData = true
     let m = this.state.mergeData(merge, newRange, calc)
     if (isBoolean(m)) this.#mergingData = false
-
-    // for (let a=0; a<220; a++) {
-    //   let b = this.range.data[a][0]
-    //   let c = this.range.data[a+1][0]
-    //   //consoole.log(c-b)
-    //   if (c-b > 3600000) console.log(`b: ${a} ${b} - c: ${a+1} ${c} = ${c-b}`)
-    // }
-
     return m
   }
 
@@ -1086,7 +1077,7 @@ export default class TradeXchart extends Tradex_chart {
   /*============================*/
   /**
    * validate Overlay
-   * @param {class} o- overlay class
+   * @param {Class} o - overlay class
    * @returns {boolean}
    */
   isOverlay(o) {

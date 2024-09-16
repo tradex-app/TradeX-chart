@@ -303,7 +303,7 @@ export default class State {
     return false
   }
 
-  static validate(source=State.default, deepValidate=false, isCrypto=false) {
+  static validate(instance, source=State.default, deepValidate=false, isCrypto=false) {
 
     const defaultState = doStructuredClone(State.default)
     let state
@@ -334,39 +334,6 @@ export default class State {
         get: function() { return state.chart.data }
       }
     )
-
-    /*--- Time Frame ---*/
-    let cfg = state.core.config.range
-    let range = state.range
-    let tfms = detectInterval(state.chart.data)
-    
-    if (tfms === Infinity) tfms = range.timeFrameMS || DEFAULT_TIMEFRAMEMS
-
-    if (!state.chart.isEmpty && 
-        state.chart.data.length > 1 &&
-        range.timeFrameMS !== tfms)
-      range.timeFrameMS = tfms
-
-    if (!isTimeFrameMS(range.timeFrameMS)) range.timeFrameMS = DEFAULT_TIMEFRAMEMS
-
-    range.timeFrame = ms2Interval(range.timeFrameMS)
-
-    /*--- Range ---*/
-    let config = {
-      core: source.core,
-      state,
-      interval: range.timeFrame || cfg?.timeFrameMS,
-      initialCnt: range?.initialCnt || cfg?.initialCnt,
-      limitFuture: range?.limitFuture || cfg?.limitFuture,
-      limitPast: range?.limitPast || cfg?.limitPast,
-      minCandles: range?.minCandles || cfg?.minCandles,
-      maxCandles: range?.maxCandles || cfg?.maxCandles,
-      yAxisBounds: range?.yAxisBounds || cfg?.yAxisBounds,
-    }
-    
-    state.range = new Range(range?.start, range?.end, config)
-    state.timeData = new TimeData(state.range)
-
     
     if (!isObject(state.chart.settings)) {
       state.chart.settings = defaultState.chart.settings
@@ -412,7 +379,6 @@ export default class State {
 
     State.validateData("tools", state)
     state.tools = state.allData.tools
-
 
     // Init dataset proxies
     for (var ds of state.datasets) {
@@ -703,6 +669,41 @@ export default class State {
     }
     return true
   }
+
+  static buildRange(instance, state, core) {
+
+    /*--- Time Frame ---*/
+    let cfg = state.core.config.range
+    let range = state.range
+    let tfms = detectInterval(state.chart.data)
+    
+    if (tfms === Infinity) tfms = range.timeFrameMS || DEFAULT_TIMEFRAMEMS
+
+    if (!state.chart.isEmpty && 
+        state.chart.data.length > 1 &&
+        range.timeFrameMS !== tfms)
+      range.timeFrameMS = tfms
+
+    if (!isTimeFrameMS(range.timeFrameMS)) range.timeFrameMS = DEFAULT_TIMEFRAMEMS
+
+    range.timeFrame = ms2Interval(range.timeFrameMS)
+
+    /*--- Range ---*/
+    let config = {
+      core,
+      state: instance, // state,
+      interval: range.timeFrame || cfg?.timeFrameMS,
+      initialCnt: range?.initialCnt || cfg?.initialCnt,
+      limitFuture: range?.limitFuture || cfg?.limitFuture,
+      limitPast: range?.limitPast || cfg?.limitPast,
+      minCandles: range?.minCandles || cfg?.minCandles,
+      maxCandles: range?.maxCandles || cfg?.maxCandles,
+      yAxisBounds: range?.yAxisBounds || cfg?.yAxisBounds,
+    }
+    
+    return new Range(range?.start, range?.end, config)
+  }
+
   
   #id = ""
   #key = ""
@@ -723,7 +724,9 @@ export default class State {
   constructor(state=State.default, deepValidate=false, isCrypto=false) {
     if (!(state?.core instanceof TradeXchart)) throw new Error(`State : invalid TradeXchart instance`)
     this.#core = state.core
-    this.#data = State.validate(state, deepValidate, isCrypto)
+    this.#data = State.validate(this, state, deepValidate, isCrypto)
+    this.#data.range = State.buildRange(this, this.#data, state.core)
+    this.#data.timeData = new TimeData(this.#data.range)
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
     let hash = State.hash(state)
     this.#key = `${SHORTNAME}_${HASHKEY}_${hash}`
