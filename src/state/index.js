@@ -5,7 +5,7 @@ import * as packageJSON from '../../package.json'
 import * as compression from '../utils/compression'
 import { isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from '../utils/typeChecks'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
-import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, doStructuredClone } from '../utils/utilities'
+import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, doStructuredClone, idSanitize } from '../utils/utilities'
 import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
 import { calcTimeIndex, detectInterval } from '../model/range'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT } from '../definitions/chart'
@@ -235,6 +235,10 @@ export default class State {
     if (!target) {
       chart.log(`${chart.name} id: ${chart.key} : State ${key} does not exist`)
       return undefined
+    }
+    // archive the current panes to inventory
+    if (previous instanceof State) {
+      State.archiveInventory(previous)
     }
     // set active to target state
     if (key != active?.key) {
@@ -568,7 +572,23 @@ export default class State {
     }
   }
 
-  static buildInventory(state, defaultState) {
+  static archiveInventory (state) {
+    state.data.inventory.length = 0
+    if (!(state.core.ChartPanes instanceof xMap)) return
+    for (let [key, pane] of state.core.ChartPanes) {
+      let ind = [],
+          entry = [];
+          entry[0] = (pane.isPrimary) ? "primary" : "secondary"
+          for (let i of Object.values(pane.indicators)) {
+            let {id, key, name, paneID, settings, type, data} = {...i}
+            ind.push({id, key, name, paneID, settings, type, data})
+          }
+      entry[1] = ind
+      state.data.inventory.push(entry)
+    }
+  }
+
+  static buildInventory (state, defaultState) {
     // Build chart order
     if (state.inventory.length == 0) {
       // add primary chart

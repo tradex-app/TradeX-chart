@@ -17,7 +17,7 @@ const defaultOverlays = [
 
 import { BUFFERSIZE } from "../../../definitions/chart"
 
-export default class graph {
+export default class Graph {
 
   #core
   #config

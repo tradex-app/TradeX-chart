@@ -35,6 +35,7 @@ import {
   STYLE_ROW,
   TIMESCALEH
 } from "../definitions/style"
+import graph from "./views/classes/graph"
 
 const defaultOverlays = [
   // ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
@@ -621,8 +622,8 @@ export default class MainPane extends Component {
     }
     else {
       params.type = "secondary"
-      params.name = params.view[0].name || "Secondary"
-      params.shortName = params.view[0].type || "Secondary"
+      params.name = params.view?.[0].name || "Secondary"
+      params.shortName = params.view?.[0].type || "Secondary"
       o = new Chart(this.core, params);
     }
     this.chartPanes.set(o.id, o)
@@ -1016,6 +1017,8 @@ export default class MainPane extends Component {
   }
 
   refresh() {
+    if (!(this.core.Chart?.graph instanceof Graph)) return
+
     this.renderLoop.expungeFrames()
     this.core.Chart.graph.refresh()
 

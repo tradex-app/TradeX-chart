@@ -25,7 +25,7 @@ import ToolsBar from './components/tools'
 import MainPane from './components/main'
 import WidgetsG from './components/widgets'
 import Indicator from './components/overlays/indicator'
-import { defaultOverlays, optionalOverlays } from './components/chart'
+import Chart, { defaultOverlays, optionalOverlays } from './components/chart'
 import exportImage from './utils/exportImage'
 import talib from './wasm/index.esm.str.js'
 import wasm from './wasm/talib.wasm.dataURI'
@@ -489,7 +489,7 @@ export default class TradeXchart extends Tradex_chart {
 
     // inject chart style rules
     this.insertAdjacentHTML('beforebegin', `<style title="${this.ID}_style"></style>`)
-    this.setTheme(this.#themeTemp.id)
+    this.setTheme(this.#theme.id)
 
     this.#scrollPos = this.bufferPx * -1
     this.stream = this.#config.stream
@@ -802,10 +802,12 @@ export default class TradeXchart extends Tradex_chart {
     this.elTime.overview.style.setProperty("--txc-time-icon-hover-color", theme.icon.hover);
 
     // Legends
-    for (let [key, legend] of Object.entries(this.Chart.legend.list)) {
-      legend.el.style.color = `var(--txc-legend-color, ${theme.legend.colour})`
-      legend.el.style.font = `var(--txc-legend-font, ${theme.legend.font})`
-      // TODO: control icons
+    if (this.Chart instanceof Chart) {
+      for (let [key, legend] of Object.entries(this.Chart.legend.list)) {
+        legend.el.style.color = `var(--txc-legend-color, ${theme.legend.colour})`
+        legend.el.style.font = `var(--txc-legend-font, ${theme.legend.font})`
+        // TODO: control icons
+      }
     }
 
     // Utils
