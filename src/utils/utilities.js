@@ -66,7 +66,7 @@ export function getPrototypeAt(level, obj) {
     const targetValue = target[key];
     const sourceValue = source[key];
 
-    if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
+    if (isArray(targetValue) && isArray(sourceValue)) {
       target[key] = mergeDeep(targetValue.concat([]), (sourceValue));
     } else if (isObject(targetValue) && isObject(sourceValue)) {
       target[key] = mergeDeep(Object.assign({}, targetValue), sourceValue);
@@ -96,7 +96,7 @@ export function copyDeep(obj, clone=true) {
   if (obj instanceof Date)
       temp = new obj.constructor(); //or new Date(obj);
   else
-      temp = Array.isArray(obj) ? [] : {}  // obj.constructor();
+      temp = isArray(obj) ? [] : {}  // obj.constructor();
 
   for (let key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {

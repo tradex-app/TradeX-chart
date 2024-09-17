@@ -3,7 +3,7 @@
 
 import * as packageJSON from '../../package.json'
 import * as compression from '../utils/compression'
-import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from '../utils/typeChecks'
+import { isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from '../utils/typeChecks'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
 import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, doStructuredClone } from '../utils/utilities'
 import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
@@ -574,16 +574,19 @@ export default class State {
       // add primary chart
       state.inventory.push(["primary", state.primary])
       // add secondary charts if they exist
-      for (let o in state) {
-        if (o.indexOf("secondary") == 0) {
-          state.inventory.push([o, state[o]])
+      let secondary = (isArray(state?.secondary)) ? state.secondary : []
+      for (let s of secondary) {
+        if (isObject(s) || isArrayOfType(s, "object")) {
+          state.inventory.push(["secondary", s])
         }
       }
     }
+
     // Process chart order
     let o = state.inventory
     let c = o.length
     while (c--) {
+      // if no valid indicators, delete entry
       if (!isArray(o[c]) || o[c].length == 0)
         o.splice(c, 1)
       else {
@@ -602,17 +605,27 @@ export default class State {
           else if (!isObject(i[x].settings))
             i[x].settings = {}
         }
-        // if after check, no valid indicators, delete entry
+        // if no valid indicators remain, delete entry
         if (o[c].length == 0) o.splice(c, 1)
       }
     }
+
     // ensure state has the mandatory primary entry
     if (state.inventory.length == 0)
       state.inventory[0] = ["primary", defaultState.primary]
-    state.inventory = new xMap(state.inventory)
-    if (!state.inventory.has("primary")) 
-      state.inventory.insert("primary", defaultState.primary, 0)
-    state.inventory.get("primary").push(state.chart)    
+
+    // remove duplicate primaries
+    let cnt = 0
+    state.inventory.forEach((v, i) => {
+      if (v[0] == "primary") {
+        if (++cnt > 1) 
+          state.inventory.splice(i, 1)
+      }
+    })
+
+    // if no primary, add one
+    if (!cnt) 
+      state.inventory.push(["primary", defaultState.primary])
   }
 
   /**

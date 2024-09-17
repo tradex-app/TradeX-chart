@@ -15,7 +15,7 @@ import watermark from "./overlays/chart-watermark"
 import Divider from "./widgets/divider"
 import stateMachineConfig from "../state/state-main"
 import Input from "../input"
-import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks"
+import { isArray, isArrayOfType, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks"
 import { copyDeep, valuesInArray, xMap } from "../utils/utilities"
 
 import {
@@ -559,10 +559,10 @@ export default class MainPane extends Component {
   registerChartPanes(options) {
     this.#elRows.previousDimensions()
     this.validateIndicators()
-    options.rowY = 0
-    for (let [k,v] of this.inventory) {
-      options.type = k
-      options.view = v
+    
+    for (let p of this.inventory) {
+      options.type = (p[0] == "primary") ? p[0] : "secondary"
+      options.view = (isArray(p[1])) ? p[1] : [p[1]]
       this.addChartPane(options)
     }
   }
@@ -616,7 +616,6 @@ export default class MainPane extends Component {
     // instantiate the chart pane
     let o
     if (params.type == "primary") {
-      // params.id
       o = new Chart(this.core, params)
       this.#Chart = o
     }
@@ -707,33 +706,35 @@ export default class MainPane extends Component {
 
   /**
    * iterate over chart panes and remove invalid indicators
-   * @returns {Array} 
    */
   validateIndicators() {
-    const primaryPane = []
-    // iterate over chart panes and remove invalid indicators
-    for (let [k,oc] of this.inventory) {
-
-      if (k === "primary") primaryPane.push(oc)
-      // validate entry - are there any indicators to add?
-      if (oc.length === 0 && k !== "primary") {
-        this.inventory.delete(k)
-        continue
-      }
-
-      // remove any indicators that are not supported
-      for (const [i, o] of oc.entries()) {
-        // is valid?
-        if (isObject(o) &&
-            ( o.type in this.core.indicatorClasses ||
-              nonIndicators.includes(o.type))) 
-            continue
-        // remove invalid
-        this.core.log(`indicator ${oc.type} not added: not supported.`)
-        oc.splice(i, 1)
-      }
+    const isValidObj = (o) => {
+      return isObject(o) &&
+      ( o.type in this.core.indicatorClasses ||
+        nonIndicators.includes(o.type))
     }
-    return primaryPane
+
+    const isValidArr = (o) => {
+      if (!isArray(o)) return false
+      o.forEach((v, i) => {
+        if (!isValidObj(v))
+          o.splice(i, 1)
+      })
+      return !o.length
+    }
+
+    this.inventory.forEach((v, i) => {
+      if (v[0] == "primary") {
+        isValidArr(v[1])
+      }
+      else {
+        if (!isValidArr(v[1]) &&
+            !isValidObj(v[1])) {
+              this.core.log(`TradeX-Chart : ${this.core.id} : indicator ${v?.type} not added: not supported.`)
+              this.inventory.splice(i,1)
+          }
+      }
+    });
   }
 
   /**
@@ -1019,7 +1020,7 @@ export default class MainPane extends Component {
     this.core.Chart.graph.refresh()
 
     for (let [key, secondaryPane] of this.chartPanes) {
-      secondaryPane.graph.refresh()
+      secondaryPane?.graph?.refresh()
     }
     this.draw(this.range, true)
   }

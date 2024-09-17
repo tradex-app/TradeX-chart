@@ -7,6 +7,16 @@
 }
 
 /**
+ * @param {*} v - value to test
+ * @param {String} t - type
+ * @returns {Boolean}
+ */
+export function isArrayOfType (v, t) {
+  if (!isArray(v)) return false
+  return v.every((n) => checkType(t, n))
+}
+
+/**
  * @param {*} v
  * @returns {boolean}
  */
@@ -128,6 +138,9 @@ export function isClass(v){
  * @returns {boolean}
  */
 export function checkType(type, value) {
+  if (value === undefined ||
+      value === null)
+      return false
   switch(type) {
     case 'array': return isArray(value);
     case 'function': return isFunction(value);
