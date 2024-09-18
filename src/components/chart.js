@@ -288,7 +288,7 @@ export default class Chart extends Component{
     if ( this.#status === "destroyed") return
     // has this been invoked from removeChartView() ?
     if ( !this.core.MainPane.chartDeleteList[this.id] ) {
-      this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartPane()" instead.`)
+      this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "chartPaneRemove()" instead.`)
       return
     }
     this.core.log(`Deleting chart pane: ${this.id}`)
@@ -495,7 +495,9 @@ export default class Chart extends Component{
 
   /**
    * Set chart dimensions
-   * @param {Object} dim - dimensions {w:width, h: height}
+   * @param {Object} dims - dimensions {w:width, h: height}
+   * @param {Number} dims.w - width in pixels
+   * @param {Number} dims.h- height in pixels
    */
   setDimensions(dims={w: this.width, h: this.height}) {
     if (!isObject(dims)) dims = {w: this.width, h: this.height}

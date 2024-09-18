@@ -169,50 +169,30 @@ export default class MainPane extends Component {
 
     this.#Time = new Timeline(this.core, options)
     this.chartPanes.clear()
-    this.registerChartPanes(options)
+    this.chartPanesRegister(options)
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE
     this.#rowMinH = isNumber(this.config.rowMinH)? this.config.rowMinH : ROWMINHEIGHT
     this.#viewDefaultH = isNumber(this.config.secondaryPaneDefaultH)? this.config.secondaryPaneDefaultH : SECONDARYDEFAULTHEIGHT
     this.rowsOldH = this.rowsH
   }
 
+  /**
+   * start timeline, primary and secondary chart panes
+   */
   start() {
-    let i = 0
-
-    // start timeline, chart, secondaryPane
     this.#elMain.start(this.theme)
     this.#Time.start()
     this.createGraph()
     this.rowsOldH = this.rowsH
-    // start each view / chart pane 
-    this.chartPanes.forEach((view, key) => {
-
-      view.start(i++)
-      // suppress divider of first chart pane as no preceding pane
-      if (i === 1) {
-        view.Divider.hide()
-      }
-      // check if new pane is maximized or collapsed and apply
-      if (!!view.options?.state?.collapsed?.state) {
-        this.paneCollapse(view)
-      }
-      if (!!view.options?.state?.maximized) {
-        this.paneMaximize(view)
-      }
-    })
+    this.chartPanesStart()
     this.setScaleWidth()
-  
-    // create and start overlays
     this.draw(this.range, true)
-
     this.renderLoop.init({
       graphs: [this.graph],
       range: this.range
     })
     this.renderLoop.start()
     this.renderLoop.queueFrame(this.range, [this.graph], false)
-
-    // set up event listeners
     this.eventsListen()
 
     // start State Machine 
@@ -286,7 +266,7 @@ export default class MainPane extends Component {
     this.on("range_set", this.onSetRange, this);
     this.on("chart_scrollUpdate", this.draw, this)
     this.on("chart_render", this.draw, this)
-    this.on("chart_paneDestroy", this.removeChartPane, this)
+    this.on("chart_paneDestroy", this.chartPaneRemove, this)
   }
 
   onSetRange() {
@@ -564,7 +544,7 @@ export default class MainPane extends Component {
    * Add panes to chart from inventory
    * @param {object} options 
    */
-  registerChartPanes(options) {
+  chartPanesRegister(options) {
     this.#elRows.previousDimensions()
     this.validateIndicators()
     
@@ -573,9 +553,30 @@ export default class MainPane extends Component {
         options.type = (p[0] == "primary") ? p[0] : "secondary"
         options.view = (isArrayOfType(p[1], "object")) ? p[1] : [p[1]]
         options.state = p[2]
-        this.addChartPane(options)
+        this.chartPaneAdd(options)
       }
     }
+  }
+
+  /** 
+   * Start each chart pane 
+   */
+  chartPanesStart() {
+    let i = 0
+    this.chartPanes.forEach((pane, key) => {
+      pane.start(i++)
+      // suppress divider of first chart pane as no preceding pane
+      if (i === 1) {
+        pane.Divider.hide()
+      }
+      // check if new pane is maximized or collapsed and apply
+      if (!!pane.options?.state?.collapsed?.state) {
+        this.paneCollapse(pane)
+      }
+      if (!!pane.options?.state?.maximized) {
+        this.paneMaximize(pane)
+      }
+    })
   }
 
   /** 
@@ -607,7 +608,7 @@ export default class MainPane extends Component {
    * add chart pane - provides primaryPane and secondaryPane indicators
    * @param {object} params 
    */
-  addChartPane(params) {
+  chartPaneAdd(params) {
     // list of expanded panes
     const { expanded: exp } = this.chartPanesState()
     // insert a row to mount the chart pane on
@@ -661,7 +662,7 @@ export default class MainPane extends Component {
    * @param {string} paneID 
    * @returns 
    */
-  removeChartPane(paneID) {
+  chartPaneRemove(paneID) {
     if (!isString(paneID) ||
         !this.chartPanes.has(paneID) ||
         paneID in this.#chartDeleteList
@@ -717,7 +718,7 @@ export default class MainPane extends Component {
     return true
   }
 
-  removeChartPaneRows() {
+  chartPaneRemoveRows() {
     // this.#elRows
   }
 
@@ -812,7 +813,7 @@ export default class MainPane extends Component {
       params.elements = { ...this.elements }
       params.yAxisPadding = this.core.indicatorClasses[i]?.yAxisPadding || 1
 
-      instance = this.addChartPane(params)
+      instance = this.chartPaneAdd(params)
       if (!instance) return undefined
 
       instance.start()
