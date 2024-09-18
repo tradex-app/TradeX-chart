@@ -147,7 +147,7 @@ export default class Indicator extends Overlay {
     this.id = overlay?.id || uid(this?.shortName || overlay?.name)
     this.#key = overlay?.key || indicatorHashKey(overlay)
     this.#TALib = this.core.TALib
-    this.#range = this.xAxis.range
+    this.#range = this.core.range
     this.legendName = overlay?.legendName || overlay?.name || this?.shortName
     this.#legendVisibility = (isBoolean(overlay?.legendVisibility)) ? overlay.legendVisibility : true
     this.#palette = palette

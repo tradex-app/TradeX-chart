@@ -170,11 +170,9 @@ export default class MainPane extends Component {
     this.#Time = new Timeline(this.core, options)
     this.chartPanes.clear()
     this.registerChartPanes(options)
-
     this.#buffer = isNumber(this.config.buffer)? this.config.buffer : BUFFERSIZE
     this.#rowMinH = isNumber(this.config.rowMinH)? this.config.rowMinH : ROWMINHEIGHT
     this.#viewDefaultH = isNumber(this.config.secondaryPaneDefaultH)? this.config.secondaryPaneDefaultH : SECONDARYDEFAULTHEIGHT
-
     this.rowsOldH = this.rowsH
   }
 
@@ -191,8 +189,9 @@ export default class MainPane extends Component {
 
       view.start(i++)
       // suppress divider of first chart pane as no preceding pane
-      if (i === 1) view.Divider.hide()
-
+      if (i === 1) {
+        view.Divider.hide()
+      }
       // check if new pane is maximized or collapsed and apply
       if (!!view.options?.state?.collapsed?.state) {
         this.paneCollapse(view)

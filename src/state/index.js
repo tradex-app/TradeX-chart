@@ -893,8 +893,6 @@ export default class State {
     if (isFunction(this.#core.MainPane?.init)) {
       this.#core.MainPane.init(this.#core.MainPane.options)
       this.#core.MainPane.start()
-
-      // this.#core.MainPane.restart()
       this.#core.MainPane.refresh()
       this.#core.progress.stop()
     }
