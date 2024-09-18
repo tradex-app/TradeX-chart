@@ -138,15 +138,14 @@ export default class Overlay {
 
   getXAxis() {
     if (this.#xAxis instanceof xAxis) return this.#xAxis
-    else if (this.core.Chart.time.xAxis instanceof xAxis) return this.core.Chart.time.xAxis
+    else if (this.core.Chart.time?.xAxis instanceof xAxis) return this.core.Chart.time.xAxis
     else if ("time" in this.#parent) return this.#parent.time.xAxis
     else return false
   }
 
   getYAxis() {
     if (this.#yAxis instanceof yAxis) return this.#yAxis
-    else if (this.#yAxis.yAxis instanceof yAxis) return this.#yAxis.yAxis
-    else if (this.chart.yAxis instanceof yAxis) return this.chart.yAxis
+    else if (this.chart?.yAxis instanceof yAxis) return this.chart.yAxis
     else if ("scale" in this.#parent) return this.#parent.scale.yAxis
     else return false
   }

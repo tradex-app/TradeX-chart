@@ -184,6 +184,7 @@ export default class MainPane extends Component {
     this.#Time.start()
     this.createGraph()
     this.rowsOldH = this.rowsH
+    this.chartPanesSizeToInventory()
     this.chartPanesStart()
     this.setScaleWidth()
     this.draw(this.range, true)
@@ -542,6 +543,7 @@ export default class MainPane extends Component {
 
   /**
    * Add panes to chart from inventory
+   * @private
    * @param {object} options 
    */
   chartPanesRegister(options) {
@@ -560,6 +562,32 @@ export default class MainPane extends Component {
 
   /** 
    * Start each chart pane 
+   * @private
+   */
+  chartPanesSizeToInventory() {
+    if (!this.chartPanes.size ||
+        !isObject(this.#Chart.options?.state)) 
+        return
+
+    const heights = {}
+    let total = 0;
+    let h;
+    this.chartPanes.forEach((pane, key) => {
+      h = pane.options.state.height
+      heights[key] = h
+      total += h
+    })
+    if (total != this.rowsH) {
+
+    }
+    this.chartPanes.forEach((pane, key) => {
+      pane.setHeight(heights[key])
+    })
+  }
+
+  /** 
+   * Start each chart pane 
+   * @private
    */
   chartPanesStart() {
     let i = 0
