@@ -98,7 +98,6 @@ export default class Indicator extends Overlay {
   #chartPane
   #scaleOverlay
   #plots
-  #params
   #overlay
   #indicator
   #type = "indicator"
@@ -147,7 +146,6 @@ export default class Indicator extends Overlay {
     this.#overlay = overlay
     this.id = overlay?.id || uid(this?.shortName || overlay?.name)
     this.#key = overlay?.key || indicatorHashKey(overlay)
-    this.#params = params
     this.#TALib = this.core.TALib
     this.#range = this.xAxis.range
     this.legendName = overlay?.legendName || overlay?.name || this?.shortName
@@ -187,14 +185,13 @@ export default class Indicator extends Overlay {
   get version() { return `${this.constructor?.version}` }
   get context() { return this.#context }
   get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
-  get chartPaneID() { return this.#params.overlay.paneID }
+  get chartPaneID() { return this.params.overlay.paneID }
   get primaryPane() { return this.#primaryPane || this.constructor.primaryPane }
   set primaryPane(c) { this.#primaryPane = c }
   get scaleOverlay() { return this.#scaleOverlay }
   set scaleOverlay(o) { this.#scaleOverlay = o }
   get plots() { return this.#plots }
   set plots(p) { this.#plots = p }
-  get params() { return this.#params }
   get Timeline() { return this.core.Timeline }
   get scale() { return this.parent.scale }
   get type() { return this.#type }
@@ -306,7 +303,7 @@ export default class Indicator extends Overlay {
   }
 
   init(api) {
-    const overlay = this.#params.overlay
+    const overlay = this.params.overlay
 
     this.defineIndicator(overlay, api)
     // calculate back history if missing
@@ -371,6 +368,21 @@ export default class Indicator extends Overlay {
     // Yes!
     else
       this.chart.remove()
+  }
+
+  /**
+   * Return a snapshot of values
+   * @returns {Object}
+   */
+  snapshot() {
+    return {
+      id: this.id,
+      key: this.key,
+      name: this.params.overlay.name,
+      type: this.shortName,
+      data: this.data,
+      settings: this.definition
+    }
   }
 
   /**

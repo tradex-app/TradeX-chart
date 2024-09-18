@@ -562,9 +562,11 @@ export default class MainPane extends Component {
     this.validateIndicators()
     
     for (let p of this.inventory) {
-      options.type = (p[0] == "primary") ? p[0] : "secondary"
-      options.view = (isArray(p[1])) ? p[1] : [p[1]]
-      this.addChartPane(options)
+      if (isArray(p) && p.length > 1) {
+        options.type = (p[0] == "primary") ? p[0] : "secondary"
+        options.view = (isArrayOfType(p[1], "object")) ? p[1] : [p[1]]
+        this.addChartPane(options)
+      }
     }
   }
 
@@ -718,23 +720,16 @@ export default class MainPane extends Component {
     const isValidArr = (o) => {
       if (!isArray(o)) return false
       o.forEach((v, i) => {
-        if (!isValidObj(v))
+        if (!isValidObj(v)) {
+          this.core.log(`TradeX-Chart : ${this.core.id} : indicator ${v?.type} not added: not supported.`)
           o.splice(i, 1)
+        }
       })
       return !o.length
     }
 
     this.inventory.forEach((v, i) => {
-      if (v[0] == "primary") {
         isValidArr(v[1])
-      }
-      else {
-        if (!isValidArr(v[1]) &&
-            !isValidObj(v[1])) {
-              this.core.log(`TradeX-Chart : ${this.core.id} : indicator ${v?.type} not added: not supported.`)
-              this.inventory.splice(i,1)
-          }
-      }
     });
   }
 

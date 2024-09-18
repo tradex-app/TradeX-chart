@@ -236,10 +236,6 @@ export default class State {
       chart.log(`${chart.name} id: ${chart.key} : State ${key} does not exist`)
       return undefined
     }
-    // archive the current panes to inventory
-    if (previous instanceof State) {
-      State.archiveInventory(previous)
-    }
     // set active to target state
     if (key != active?.key) {
       states.previous = { state: active, node: "" }
@@ -580,8 +576,7 @@ export default class State {
           entry = [];
           entry[0] = (pane.isPrimary) ? "primary" : "secondary"
           for (let i of Object.values(pane.indicators)) {
-            let {id, key, name, paneID, settings, type, data} = {...i}
-            ind.push({id, key, name, paneID, settings, type, data})
+            ind.push(i.instance.snapshot())
           }
       entry[1] = ind
       state.data.inventory.push(entry)
@@ -885,6 +880,7 @@ export default class State {
       if (this.#core.stream instanceof Stream)
         this.#core.stream.stop()
       this.#core.progress.start()
+      State.archiveInventory(this)
       this.#core.MainPane.destroy(false)
     }
     let state = State.use(this.#core, key)
