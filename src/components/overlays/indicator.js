@@ -371,24 +371,26 @@ export default class Indicator extends Overlay {
   }
 
   /**
+   * @typedef snapshot
+   * @property {String} id 
+   * @property {String} key - hashed key
+   * @property {String} name - display name
+   * @property {String} type - indicator type (short name)
+   * @property {Array} data - indicator data
+   * @property {Object} settings - indicator definition, input, output, style
+   */
+  /**
    * Return a snapshot of values
-   * @returns {Object}
+   * @returns {snapshot}
    */
   snapshot() {
-    let maxed = this.core.MainPane.chartPaneMaximized?.instance
-    let state = {
-      maximized: ( maxed?.key == this.key ),
-      collapsed: !!this.collapsed,
-      height: this.scene.height
-    }
     return {
       id: this.id,
       key: this.key,
       name: this.params.overlay.name,
       type: this.shortName,
       data: this.data,
-      settings: this.definition,
-      state
+      settings: this.definition
     }
   }
 

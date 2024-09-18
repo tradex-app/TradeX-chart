@@ -324,6 +324,25 @@ export default class Chart extends Component{
     this.element.remove()
   }
 
+  /**
+   * @typedef snapshot
+   * @property {Boolean} maximized 
+   * @property {Object} collapsed
+   * @property {Number} height
+   */
+  /**
+   * Return a snapshot of values
+   * @returns {snapshot}
+   */
+  snapshot() {
+    let maxed = this.core.MainPane.chartPaneMaximized?.instance
+    return {
+      maximized: ( maxed?.id == this.id ),
+      collapsed: {...this.collapsed},
+      height: this.height
+    }
+  }
+
   eventsListen() {
     this.#input = new Input(this.#elTarget, {disableContextMenu: false});
     this.#input.on("pointerdrag", this.onChartDrag.bind(this))

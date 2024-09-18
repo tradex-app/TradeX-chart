@@ -580,6 +580,7 @@ export default class State {
             ind.push(i.instance.snapshot())
           }
       entry[1] = ind
+      entry[2] = pane.snapshot()
       state.data.inventory.push(entry)
     }
   }
