@@ -570,16 +570,23 @@ export default class MainPane extends Component {
     }
   }
 
+  /** 
+   * @typedef {Object} chartPanesState
+   * @property {Array} list - list of chart panes
+   * @property {Array} collapsed - list of collapsed chart panes
+   * @property {Array} expanded - list of expanded chart panes
+   * @property {Chart|null} maximized - maximized chart pane
+  */
   /**
    * list of expanded, collapsed, maximized panes excluding
-   * @returns {Object}
+   * @returns {chartPanesState} chartPanesState
    */
   chartPanesState() {
     const state = {
       list: [...this.chartPanes.values()],
       collapsed: [],
       expanded: [],
-      maximized: this.chartPaneMaximized.instance
+      maximized: this.chartPaneMaximized?.instance
     }
     for (let o of state.list) {
       if (o.collapsed.state) state.collapsed.push(o)
@@ -596,7 +603,7 @@ export default class MainPane extends Component {
     // list of expanded panes
     const { expanded: exp } = this.chartPanesState()
     // insert a row to mount the chart pane on
-    const heights = this.calcChartPaneHeights()
+    const heights = this.chartPaneHeightsCalc()
     const n = heights.new
     let h
     // resize charts panes to accommodate the new addition   
@@ -631,7 +638,7 @@ export default class MainPane extends Component {
     this.chartPanes.set(o.id, o)
 
     // check for sizing error
-    const tally = this.tallyChartHeights()
+    const tally = this.chartPaneHeightsTally()
     if (tally.total > this.#elMain.height) {
       
     }
@@ -920,7 +927,7 @@ export default class MainPane extends Component {
     else return false
   }
 
-  tallyChartHeights() {
+  chartPaneHeightsTally() {
     const panes = this.chartPanes.entries()
     const heights = { panes: {}, total: 0 }
     for (let [key, value] of panes) {
@@ -930,7 +937,7 @@ export default class MainPane extends Component {
     return heights
   }
 
-  calcChartPaneHeights() {
+  chartPaneHeightsCalc() {
     // list of expanded panes excluding current
     const { collapsed: col, expanded: exp } = this.chartPanesState()
     const cnt = this.chartPanes.size + 1

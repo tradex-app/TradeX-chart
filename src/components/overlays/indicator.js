@@ -375,13 +375,20 @@ export default class Indicator extends Overlay {
    * @returns {Object}
    */
   snapshot() {
+    let maxed = this.core.MainPane.chartPaneMaximized?.instance
+    let state = {
+      maximized: ( maxed?.key == this.key ),
+      collapsed: !!this.collapsed,
+      height: this.scene.height
+    }
     return {
       id: this.id,
       key: this.key,
       name: this.params.overlay.name,
       type: this.shortName,
       data: this.data,
-      settings: this.definition
+      settings: this.definition,
+      state
     }
   }
 

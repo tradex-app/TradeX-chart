@@ -573,7 +573,8 @@ export default class State {
     if (!(state.core.ChartPanes instanceof xMap)) return
     for (let [key, pane] of state.core.ChartPanes) {
       let ind = [],
-          entry = [];
+          entry = [],
+          snapshot;
           entry[0] = (pane.isPrimary) ? "primary" : "secondary"
           for (let i of Object.values(pane.indicators)) {
             ind.push(i.instance.snapshot())
