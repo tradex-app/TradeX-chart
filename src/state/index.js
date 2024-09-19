@@ -434,8 +434,8 @@ export default class State {
 
     if (state.isEmpty && isArray(ohlcv) && ohlcv.length > 1) {
       timeFrame = detectInterval(ohlcv)
-    state.range.timeFrameMS = timeFrame
-    state.range.timeFrame = ms2Interval(timeFrame)
+      state.range.interval = timeFrame
+      state.range.intervalStr = ms2Interval(timeFrame)
     }
     return timeFrame
   }
@@ -925,7 +925,7 @@ export default class State {
   // TODO: merge dataset?
   mergeData(merge, newRange=false, calc=false) {
 
-    if (this.isEmpty) State.setTimeFrame(this.key, merge?.ohlcv)
+    if (this.isEmpty) State.setTimeFrame(this.#core, this.key, merge?.ohlcv)
 
     let tfMS = this.range.timeFrameMS
 
