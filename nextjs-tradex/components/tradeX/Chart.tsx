@@ -9,6 +9,7 @@ import { Chart } from '../../../src'; // import 'tradex-chart';
 export interface IProps {
   config: IConfig;
   displayTitle: string;
+  interval: string;
   data: number[][];
   tradeData?: any;
   chartType?: IChartOption;
@@ -26,7 +27,6 @@ const TXChart: FC<IProps> = ({
   // visual
   displayTitle,
   chartType,
-  rangeLimit = 96,
   // data
   data,
   onchart = [],
@@ -118,8 +118,9 @@ const TXChart: FC<IProps> = ({
           ...config,
           title: displayTitle,
           symbol: displayTitle,
+          timeFrame: '1m',
+          //timeFrame: config.timeFrame,
           type: chartType,
-          rangeLimit,
           isLightTheme,
           state
         });

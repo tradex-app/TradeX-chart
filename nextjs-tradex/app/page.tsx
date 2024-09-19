@@ -56,10 +56,10 @@ export default function Home() {
             {...config}
             toolbar={toolBarConfig}
             defaults={{
-              timeframe: '1h',
               chartType: CHART_OPTIONS[0],
               showTradeData: true
             }}
+            timeFrame="1m"
             // override config props here
           />
         )}

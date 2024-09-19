@@ -4,6 +4,7 @@ export enum ThemeProps {
 }
 
 export interface ITradeX extends HTMLElement {
+  stream: any;
   Indicators?: { [key: string]: unknown }[];
   theme?: { setProperty: (property: ThemeProps, value: any) => void };
   start?: (config: object) => void;
@@ -211,27 +212,91 @@ export type utils = {
 };
 
 export interface RangeConfig {
+  intervalStr: string;
+  timeFrame: string;
+  interval: number;
+  timeFrameMS: number;
+  startTS: number;
   initialCnt: number;
   limitPast: number;
   limitFuture: number;
+  minCandles: number;
+  maxCandles: number;
+  yAxisBounds: number;
+  center: boolean;
 }
 
 export interface TradesConfig {
   display: boolean;
   displayInfo: boolean;
+  data: {
+    ts: {};
+  };
 }
 
+export type IndicatorSettingsCallback = {
+  fn: (c: { id: any }) => void;
+  own: boolean;
+};
+
 export interface IConfig {
+  id: string;
   title: string;
+  timeFrame: string;
   symbol: string;
   utils: object;
-  tools: object;
   range: RangeConfig;
   theme: Theme;
+  watermark: {
+    display: boolean;
+    text: string;
+  };
   trades: TradesConfig;
   deepValidate: boolean;
+  status: string;
+  isEmpty: boolean;
+  allData: object;
   isCrypto: boolean;
   logs: boolean;
+  dca: boolean;
+  highLow: boolean;
+  stream: {
+    tfCountDown: boolean;
+    alerts: any[];
+  };
+  state: IState | {};
+  chart: {
+    name: "Primary" | "Secondary";
+    type: "candles";
+    candleType: ChartType;
+    indexed: boolean;
+    data: [];
+    settings: {};
+  };
+  ohlcv: any[];
+  inventory: any[];
+  events: {
+    display: boolean;
+    displayInfo: boolean;
+    data: {
+      ts: {};
+    };
+  };
+  annotations: {
+    display: boolean;
+    displayInfo: boolean;
+    data: {
+      ts: {};
+    };
+  };
+  primary: any[];
+  secondary: any[];
+  datasets: any[];
+  tools: Tools;
+  progress: { loading: {} };
+  callbacks: {
+    indicatorSettings: IndicatorSettingsCallback;
+  };
   infos: boolean;
   warnings: boolean;
   errors: boolean;

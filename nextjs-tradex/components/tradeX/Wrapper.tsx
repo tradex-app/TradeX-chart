@@ -7,22 +7,19 @@ import { fetchOHLCVData, fetchTXData } from './fetchers';
 import FullScreenWrapper from '../FullScreen/FullScreenWrapper';
 import FullScreenButton from '../FullScreen/FullScreenButton';
 import Toolbar from './Toolbar';
-import { IIndicatorToolbar, ITokenChartProps } from './utils/types'; // don't change this, these are from the wrapper not the module
+import { IIndicatorToolbar, ITokenChartProps } from './utils/types';
 import Chart from '@/components/tradeX/Chart';
 import { AVAILABLE_INDICATORS as loadIndicators } from '@/components/tradeX/indicators/availbleIndicators';
-import {ITradeX, IIndicator, ITradeData } from '../../../types';
+import { ITradeX, IIndicator, ITradeData } from '../../../types';
 
 const TradingChart = (props: ITokenChartProps) => {
   const { toolbar, defaults, ...config } = props;
-  const [symbol, setSymbol] = useState();
+  const [symbol, setSymbol] = useState(config?.symbol);
   const [tokensList, setTokensList] = useState<string[]>([]);
   const [intervals, setIntervals] = useState(toolbar?.intervals || ['1m']);
-  const [showPlaceHolder, setShowPlaceHolder] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [tradeData, setTradeData] = useState<ITradeData[]>();
-  const [selectedInterval, setSelectedInterval] = useState(
-    defaults?.timeframe || '1m'
-  );
+  const [selectedInterval, setSelectedInterval] = useState(config?.timeFrame);
   const [selectedChartType, setSelectedChartType] = useState(
     defaults?.chartType || CHART_OPTIONS[0]
   );
@@ -34,6 +31,7 @@ const TradingChart = (props: ITokenChartProps) => {
     }
   ]);
   const [hasInitialFetch, setHasInitialFetch] = useState(false);
+  const [ws, setWs] = useState<WebSocket | null>(null); // Store WebSocket instance
 
   const {
     chartX,
@@ -49,7 +47,6 @@ const TradingChart = (props: ITokenChartProps) => {
 
   const handleSelectIndicator = (indicatorValue: string) => {
     const indicator = loadIndicators[indicatorValue];
-    console.log('indicator to add/remove', indicator);
 
     if (indicator) {
       const existingIndicator = indicators.find(
@@ -57,7 +54,6 @@ const TradingChart = (props: ITokenChartProps) => {
       );
 
       if (existingIndicator?.selected) {
-        // If the indicator is already selected, remove it
         setIndicators(
           indicators.map((ind) =>
             ind.value === indicator.id ? { ...ind, selected: false } : ind
@@ -65,7 +61,6 @@ const TradingChart = (props: ITokenChartProps) => {
         );
         handleRemoveIndicator(indicator.id);
       } else {
-        // If the indicator is not selected, add it
         const newIndicator = {
           value: indicator.id,
           label: indicator.name,
@@ -113,49 +108,27 @@ const TradingChart = (props: ITokenChartProps) => {
   const fetchInitialBinanceData = useCallback(async () => {
     if (!chartX || !symbol || !selectedInterval || hasInitialFetch) return;
     setIsLoading(true);
+
     try {
-      const LIMIT = 100;
-      const TIME = {
-        sec: 1000,
-        min: 60 * 1000,
-        hour: 60 * 60 * 1000,
-        day: 24 * 60 * 60 * 1000,
-        week: 7 * 24 * 60 * 60 * 1000,
-        month: 30 * 24 * 60 * 60 * 1000
-      };
-      const FACTOR = {
-        '1m': LIMIT * TIME.min,
-        '5m': (LIMIT * TIME.hour) / 12,
-        '10m': (LIMIT * TIME.hour) / 6,
-        '15m': (LIMIT * TIME.hour) / 4,
-        '30m': (LIMIT * TIME.hour) / 2,
-        '1h': LIMIT * TIME.hour,
-        '4h': (LIMIT * TIME.day) / 6,
-        '12h': (LIMIT * TIME.day) / 2,
-        '1d': LIMIT * TIME.day,
-        '1w': LIMIT * TIME.week,
-        '1M': LIMIT * TIME.month
-      };
-      const start = Math.trunc(Date.now() / 1000) * 1000 -
-        // @ts-ignore
-        (FACTOR[selectedInterval] || FACTOR['1m']);
-      const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${selectedInterval}&startTime=${start}&limit=${LIMIT}`;
-      const response = await fetch(url);
-      const data = await response.json();
-      chartX.mergeData({ ohlcv: data }, false, true);
+      fetchOHLCVData(
+        chartX,
+        config?.range.startTS,
+        config?.range.limitPast,
+        symbol,
+        selectedInterval,
+        isLoading
+      );
       setHasInitialFetch(true);
     } catch (error) {
       console.error('Error fetching initial Binance data:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [chartX, symbol, selectedInterval, hasInitialFetch]);
+  }, [chartX, hasInitialFetch]);
 
   useEffect(() => {
     const fetchTokens = async () => {
       try {
-        //const response = await fetch('/api/available-tokens');
-        //const data = await response.json();
         await new Promise((resolve) => setTimeout(resolve, 2000));
         setTokensList(['BTCUSDT', 'ETHUSDT', 'LTCUSDT']);
         handleTokenChange('BTCUSDT');
@@ -175,24 +148,8 @@ const TradingChart = (props: ITokenChartProps) => {
     }));
 
     setIndicators(mappedIndicators);
-    setSelectedInterval(defaults?.timeframe || '5m');
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    setSelectedInterval(config?.timeFrame);
   }, [chartX]);
-
-  useEffect(() => {
-    if (!data.length && !isLoading) {
-      const timeoutId = setTimeout(() => {
-        setShowPlaceHolder(true);
-      }, 200);
-
-      return () => clearTimeout(timeoutId);
-    }
-    setShowPlaceHolder(false);
-  }, [data.length, isLoading]);
-
-  useEffect(() => {
-    fetchInitialBinanceData();
-  }, [fetchInitialBinanceData]);
 
   useEffect(() => {
     handleFetchTXData();
@@ -201,37 +158,89 @@ const TradingChart = (props: ITokenChartProps) => {
   useEffect(() => {
     if (!chartX) return;
 
-    const registerRangeLimt = (chart: ITradeX) => {
-      console.log('registering range limit');
-      // @ts-ignore
-      const list = chart?.state?.list();
-      console.log(list);
+    const registerRangeLimit = (chart: ITradeX) => {
       function onRangeLimit(e: any, x: string) {
         const range = e.chart.range;
         const limit = 100;
         const start = range.timeStart - range.interval * limit;
         const end = range.timeEnd;
         const interval = range.intervalStr;
-        if (x == 'past') {
-          console.log('past triggered');
+
+        if (x === 'past') {
           e.chart.progress.start();
-          fetchInitialBinanceData();
-        }
-        if (x == 'future') {
-          console.log('future triggered');
+          fetchOHLCVData(
+            e.chart,
+            start,
+            limit,
+            symbol,
+            selectedInterval,
+            isLoading
+          );
         }
       }
 
       if (chart.on) {
-        console.log('EVENTS REGISTERED');
+        fetchInitialBinanceData();
         chart.on('range_limitPast', (e) => onRangeLimit(e, 'past'));
-        chart.on('range_limitFuture', (e) => onRangeLimit(e, 'future'));
       }
     };
 
-    registerRangeLimt(chartX);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    registerRangeLimit(chartX);
   }, [chartX, selectedInterval]);
+
+  const livePrice_Binance = (
+    chart: ITradeX,
+    symbol: string,
+    interval: string
+  ) => {
+    const newWs = new WebSocket(
+      `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`
+    );
+
+    newWs.onmessage = (evt) => {
+      const msg = evt.data;
+      const obj = JSON.parse(msg);
+
+      if (obj && obj.k) {
+        const filteredData = {
+          t: obj.k.t, // timestamp
+          o: obj.k.o, // open price
+          h: obj.k.h, // high price
+          l: obj.k.l, // low price
+          c: obj.k.c, // close price
+          v: obj.k.v // volume
+        };
+        chart?.stream?.onTick(filteredData);
+      }
+    };
+
+    newWs.onopen = () => {
+      console.log('WebSocket connection opened');
+      chart?.stream?.start();
+    };
+
+    newWs.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    newWs.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    setWs(newWs);
+  };
+
+  useEffect(() => {
+    if (symbol && selectedInterval && chartX) {
+      livePrice_Binance(chartX, symbol, selectedInterval);
+    }
+
+    return () => {
+      if (ws) {
+        ws.close();
+      }
+    };
+  }, [symbol, selectedInterval, chartX]);
 
   return (
     <FullScreenWrapper>
@@ -268,14 +277,14 @@ const TradingChart = (props: ITokenChartProps) => {
           <div className="flex flex-grow w-full h-[600px]" key={symbol}>
             <Chart
               config={config}
-              chartType={selectedChartType}
               displayTitle={symbol}
+              interval={selectedInterval}
+              chartType={selectedChartType}
               rangeLimit={DEFAULT_RANGE_LIMIT}
               data={data}
               onchart={indicators}
               tradeData={tradeData}
               customIndicators={loadIndicators}
-              // @ts-ignore
               chartX={chartX}
               setChart={setChart}
             />
