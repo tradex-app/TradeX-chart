@@ -837,20 +837,9 @@ export default class Indicator extends Overlay {
     if (!isObjectNotEmpty(dm.style))
         dm.style = this.style || {}
 
-    // input ---------------
-
-    // validate all input fields
     this.validateInputs(d, input, api)
     this.populateMetaInputs(d)
-
-    // output ------------------
-
-    // validate all output arrays
     this.validateOutputs(d, api, oo)
-
-    // meta validation ------------------
-    // Inputs Tab
-    // dm.input = this.buildConfigInputTab() || {}
     this.buildOutputOrder(dm, oo)
     this.buildOutputLegends(d)
     this.buildConfigOutputTab(dm)

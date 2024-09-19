@@ -574,15 +574,32 @@ export default class MainPane extends Component {
         return
 
     const heights = {}
+    const heightsC = {}
+    let collapsed = false
     let total = 0;
-    let h;
+    let totalC = 0
+    let h, hc, colRowsH, colRowsCnt;
     this.chartPanes.forEach((pane, key) => {
-      h = pane.options.state.height
+      let state = pane.options.state
+      h = state.height
+      hc = state.collapsed.height
       heights[key] = h
+      heightsC[key] = hc
       total += h
+      totalC += hc
+      collapsed = collapsed || state.collapsed.height
+      if (isNumber(state.collapsed.rowsHeight)) {
+        colRowsH = state.collapsed.rowsHeight
+        colRowsCnt = state.collapsed.rowsCnt
+      }
     })
-    if (total != this.rowsH) {
+    // no collapsed panes
+    if (!collapsed) return
+
+    if (colRowsH != this.rowsH) {
 console.log("total does not match Row Height")
+
+      let delta = this.rowsH - total
     }
     this.chartPanes.forEach((pane, key) => {
       pane.setDimensions( {h: heights[key]} )

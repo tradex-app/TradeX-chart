@@ -336,11 +336,10 @@ export default class Chart extends Component{
    */
   snapshot() {
     let maxed = this.core.MainPane.chartPaneMaximized?.instance
-    let height =  (this.collapsed.state) ? this.collapsed.height : this.height
     return {
       maximized: ( maxed?.id == this.id ),
       collapsed: {...this.collapsed},
-      height
+      height: this.height
     }
   }
 
