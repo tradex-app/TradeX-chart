@@ -336,10 +336,11 @@ export default class Chart extends Component{
    */
   snapshot() {
     let maxed = this.core.MainPane.chartPaneMaximized?.instance
+    let height =  (this.collapsed.state) ? this.collapsed.height : this.height
     return {
       maximized: ( maxed?.id == this.id ),
       collapsed: {...this.collapsed},
-      height: this.height
+      height
     }
   }
 
@@ -823,10 +824,10 @@ export default class Chart extends Component{
     switch(action.icon) {
       case "up": this.reorderUp(); return;
       case "down": this.reorderDown(); return;
-      case "maximize": this.core.MainPane.paneMaximize(this); return;
-      case "restore": this.core.MainPane.paneMaximize(this); return;
-      case "collapse": this.core.MainPane.paneCollapse(this); return;
-      case "expand": this.core.MainPane.paneCollapse(this); return;
+      case "maximize": this.core.MainPane.chartPaneMaximize(this); return;
+      case "restore": this.core.MainPane.chartPaneMaximize(this); return;
+      case "collapse": this.core.MainPane.chartPaneCollapse(this); return;
+      case "expand": this.core.MainPane.chartPaneCollapse(this); return;
       case "remove": this.remove(); return;
       case "config": this.configDialogue(); return;
       default: return;

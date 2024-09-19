@@ -184,8 +184,8 @@ export default class MainPane extends Component {
     this.#Time.start()
     this.createGraph()
     this.rowsOldH = this.rowsH
-    this.chartPanesSizeToInventory()
     this.chartPanesStart()
+    this.chartPanesSizeToInventory()
     this.setScaleWidth()
     this.draw(this.range, true)
     this.renderLoop.init({
@@ -541,6 +541,10 @@ export default class MainPane extends Component {
     return w - r
   }
 
+//------------------------
+// Chart Panes
+//------------------------
+
   /**
    * Add panes to chart from inventory
    * @private
@@ -578,10 +582,19 @@ export default class MainPane extends Component {
       total += h
     })
     if (total != this.rowsH) {
-
+console.log("total does not match Row Height")
     }
     this.chartPanes.forEach((pane, key) => {
-      pane.setHeight(heights[key])
+      pane.setDimensions( {h: heights[key]} )
+    })
+    // check if pane is maximized or collapsed and apply
+    this.chartPanes.forEach((pane, key) => {
+      if (!!pane.options?.state?.collapsed?.state) {
+        this.chartPaneCollapse(pane)
+      }
+      if (!!pane.options?.state?.maximized) {
+        this.chartPaneMaximize(pane)
+      }
     })
   }
 
@@ -597,13 +610,13 @@ export default class MainPane extends Component {
       if (i === 1) {
         pane.Divider.hide()
       }
-      // check if new pane is maximized or collapsed and apply
-      if (!!pane.options?.state?.collapsed?.state) {
-        this.paneCollapse(pane)
-      }
-      if (!!pane.options?.state?.maximized) {
-        this.paneMaximize(pane)
-      }
+      // // check if new pane is maximized or collapsed and apply
+      // if (!!pane.options?.state?.collapsed?.state) {
+      //   this.chartPaneCollapse(pane)
+      // }
+      // if (!!pane.options?.state?.maximized) {
+      //   this.chartPaneMaximize(pane)
+      // }
     })
   }
 
@@ -679,7 +692,7 @@ export default class MainPane extends Component {
     if (tally.total > this.#elMain.height) {
     }
 
-    this.setPaneDividers()
+    this.chartPaneDividersSet()
     this.emit("chart_paneAdd", o)
 
     return o
@@ -740,7 +753,7 @@ export default class MainPane extends Component {
       }
     }
 
-    this.setPaneDividers()
+    this.chartPaneDividersSet()
     this.draw(this.range, true)
 
     return true
@@ -749,6 +762,257 @@ export default class MainPane extends Component {
   chartPaneRemoveRows() {
     // this.#elRows
   }
+
+
+  chartPaneHeightsTally() {
+    const panes = this.chartPanes.entries()
+    const heights = { panes: {}, total: 0 }
+    for (let [key, value] of panes) {
+      heights.panes[key] = value
+      heights.total += value.height
+    }
+    return heights
+  }
+
+  /**
+   * Re-calculate chart pane heights to accommodate new pane
+   * @param {Object} newPane - state of new chart pane
+   * @param {Boolean} newPane.maximized - whether pane is maximized
+   * @param {Boolean} newPane.collapsed - whether pane is collapsed
+   * @param {Number} newPane.height - new pane height
+   * @returns 
+   */
+  chartPaneHeightsCalc(newPane) {
+    // list of expanded panes excluding current
+    const { collapsed: col, expanded: exp } = this.chartPanesState()
+    const cnt = this.chartPanes.size + 1
+    const a = this.#viewDefaultH * (cnt - 1),
+          ratio = ( a / Math.log10( a * 2 ) ) / 100,
+          rowsH = Math.round(this.rowsH * ratio),
+          sizes = {};
+
+    if (cnt === 1) {
+      // only adding the primary (price) chart
+      sizes.new = this.rowsH
+    }
+    else if (cnt === 2 || exp.length === 1) {
+      // adjust chart size for first secondary chart pane
+      let height =  this.rowsH
+      const newPane = Math.round(height * this.#viewDefaultH / 100)
+      sizes[exp[0].id] = height - newPane
+      sizes.new = newPane
+    }
+    else if (exp.length === 2) {
+      const first = exp[0].viewport.height
+      const second = exp[1].viewport.height
+      const height = first + second
+      const newPane = Math.round(height * this.#viewDefaultH / 100)
+      const ratio = height / (height + newPane)
+      // adjust all to fit
+      sizes[exp[0].id] = Math.floor(first * ratio)
+      sizes[exp[1].id] = Math.floor(second * ratio)
+      sizes.new = Math.floor(newPane * ratio)
+      // account for remainder
+      sizes.new += height - (sizes[exp[0].id] + sizes[exp[1].id] + sizes.new)
+    }
+    else if (exp.length >= 3) {
+      // tally the heights of any collapsed panes
+      let height = this.rowsH;
+      let total = 0;
+      let diff, ratio;
+      for (let o of col) {
+        height -= o.viewport.height
+      }
+      sizes.new = Math.floor(height / (exp.length + 1))
+      ratio = height / (height + sizes.new)
+      diff = (height - sizes.new) // exp.length
+      for (let o of exp) {
+        // sizes[o.id] = o.viewport.height - diff
+        sizes[o.id] = diff * (o.viewport.height / height)
+        total += sizes[o.id]
+      }
+      // account for remainder
+      sizes.new += height - total
+    }
+    return sizes
+  }
+
+  /**
+   * Toggles chart pane maximization
+   * needs to account for possible chart resizing
+   * @param {Chart} p - Chart pane instance
+   * @returns {boolean}
+   */
+  chartPaneMaximize (p) {
+
+    if (!(p instanceof Chart)) return false
+
+    const maxMin = this.chartPaneMaximized
+    const controls = p.legend.list.chart.el.querySelector(".controls")
+    let style;
+    
+    controls.classList.toggle("maximized")
+    controls.classList.toggle("restored")
+    // chart pane is already maximized and so restore all
+    if (p === maxMin.instance) {
+      this.chartPanesRestore()
+      maxMin.instance = null
+      maxMin.panes = {}
+      if (p.collapsed.state) {
+        p.graph.viewport.scene.canvas.style.display = "none"
+        p.scale.graph.viewport.scene.canvas.style.visibility = "hidden"
+      }
+    }
+    // maximize pane, minimize the rest
+    else {
+      // set all panes to default state
+      this.chartPanesRestore()
+      // store maximized pane
+      maxMin.instance = p
+      // store MainPane dimensions in case chart is resized
+      maxMin.rowsH = this.rowsH
+      for (let [k, v] of this.chartPanes.entries()) {
+        // store height for restore
+        maxMin.panes[k] = v.element.clientHeight
+        style = v.element.style
+        if (p === v) {
+          style.display = "block"
+          v.setDimensions({w: undefined, h: this.rowsH})
+          v.graph.viewport.scene.canvas.style.display = "block"
+          v.scale.graph.viewport.scene.canvas.style.visibility = "visible"
+        }
+        else {
+          style.display = "none"
+          v.scale.element.style.display = "none"
+        }
+      }
+    this.chartPaneDividersHide()
+    }
+
+    this.emit("chart_paneRefresh", this)
+
+    return true
+  }
+
+  /**
+   * Iterate over chart panes and restore them to default state
+   * needs to account for possible chart resizing
+   */
+  chartPanesRestore() {
+    const maxMin = this.chartPaneMaximized
+    let style, i = 0;
+
+    this.emit("chart_paneRefresh", this)
+
+    // are Chart Pane dimensions the same?
+    if (this.dimensions.height == maxMin.height) {}
+
+    for (let [k, v] of this.chartPanes.entries()) {
+      v.element.style.display = "block"
+      v.scale.element.style.display = "block"
+      if (k in maxMin.panes)
+        if (i++ > 0) v.Divider.show()
+        v.setDimensions({w: undefined, h: maxMin.panes[k]})
+    }
+  }
+
+  /**
+   * Toggles chart pane collapsed state
+   * needs to account for possible chart resizing
+   * @param {Chart} p - Chart pane instance
+   * @returns {boolean}
+   */
+  chartPaneCollapse(p) {
+    if (!(p instanceof Chart)) return false
+
+    this.emit("chart_paneRefresh", this)
+
+    const controls = p.legend.list.chart.el.querySelector(".controls")
+    const pc = p.collapsed
+      let h = p.element.clientHeight
+      let i, j, n;
+    // list of expanded and collapsed panes excluding current
+    const {list: v, collapsed: col, expanded: exp} = this.chartPanesState()
+    i = col.indexOf(p)
+    if (i > -1) col.splice(i, 1)
+    i = exp.indexOf(p)
+    if (i > -1) exp.splice(i, 1)
+
+    // chart pane is already collapsed, so restore it
+    if (p.collapsed.state) {
+      controls.classList.remove("collapsed")
+      controls.classList.add("expanded")
+
+      // check if Rows count has changed
+      if (pc.rowsCnt !== v.length) {
+        h = pc.height * (pc.rowsCnt / v.length)
+      }
+      // check if Rows height has changed
+      else if (pc.rowsHeight !== this.rowsH) {
+        h = pc.height * (pc.rowsHeight / this.rowsH)
+      }
+      // no changes
+      else {
+        h = pc.height
+      }
+      // subtract height from all expanded panes
+      j = (h - COLLAPSEDHEIGHT ) / exp.length
+      for (let o of exp) {
+        n = o.element.clientHeight - j
+        o.setDimensions({w: undefined, h: n})
+      }
+      // set collapsed pane height
+      p.collapse(h)
+    }
+    // collapse the chart pane
+    else {
+      controls.classList.add("collapsed")
+      controls.classList.remove("expanded")
+
+      // minimum of two panes required
+      if (v.length < 2) return false
+      // minimum of one expanded pane required
+      if (exp.length < 1) return false
+      // add height to all expanded panes
+      h = (p.element.clientHeight - COLLAPSEDHEIGHT) / exp.length
+      for (let o of exp) {
+        n = o.element.clientHeight + h
+        o.setDimensions({w: undefined, h: n})
+      }
+      // collapse current pane
+      p.collapse()
+    }
+    // set the divider positions
+    this.chartPaneDividersSet()
+
+    return true
+  }
+
+  chartPaneDividersSet() {
+    const {list: v} = this.chartPanesState()
+    let i = 0
+    for (let o of v) {
+      if (o.Divider instanceof Divider &&
+          i++ > 0) {
+        o.Divider.setWidth()
+        o.Divider.setPos()
+        o.Divider.show()
+      }
+    }
+  }
+
+  chartPaneDividersHide() {
+    const {list: v} = this.chartPanesState()
+    for (let o of v) {
+      if (o.Divider instanceof Divider) {
+        o.Divider.hide()
+      }
+    }
+  }
+
+//------------------------
+// Indicators
+//------------------------
 
   /**
    * iterate over chart panes and remove invalid indicators
@@ -963,79 +1227,6 @@ export default class MainPane extends Component {
     else return false
   }
 
-  chartPaneHeightsTally() {
-    const panes = this.chartPanes.entries()
-    const heights = { panes: {}, total: 0 }
-    for (let [key, value] of panes) {
-      heights.panes[key] = value
-      heights.total += value.height
-    }
-    return heights
-  }
-
-  /**
-   * Re-calculate chart pane heights to accommodate new pane
-   * @param {Object} newPane - state of new chart pane
-   * @param {Boolean} newPane.maximized - whether pane is maximized
-   * @param {Boolean} newPane.collapsed - whether pane is collapsed
-   * @param {Number} newPane.height - new pane height
-   * @returns 
-   */
-  chartPaneHeightsCalc(newPane) {
-    // list of expanded panes excluding current
-    const { collapsed: col, expanded: exp } = this.chartPanesState()
-    const cnt = this.chartPanes.size + 1
-    const a = this.#viewDefaultH * (cnt - 1),
-          ratio = ( a / Math.log10( a * 2 ) ) / 100,
-          rowsH = Math.round(this.rowsH * ratio),
-          sizes = {};
-
-    if (cnt === 1) {
-      // only adding the primary (price) chart
-      sizes.new = this.rowsH
-    }
-    else if (cnt === 2 || exp.length === 1) {
-      // adjust chart size for first secondary chart pane
-      let height =  this.rowsH
-      const newPane = Math.round(height * this.#viewDefaultH / 100)
-      sizes[exp[0].id] = height - newPane
-      sizes.new = newPane
-    }
-    else if (exp.length === 2) {
-      const first = exp[0].viewport.height
-      const second = exp[1].viewport.height
-      const height = first + second
-      const newPane = Math.round(height * this.#viewDefaultH / 100)
-      const ratio = height / (height + newPane)
-      // adjust all to fit
-      sizes[exp[0].id] = Math.floor(first * ratio)
-      sizes[exp[1].id] = Math.floor(second * ratio)
-      sizes.new = Math.floor(newPane * ratio)
-      // account for remainder
-      sizes.new += height - (sizes[exp[0].id] + sizes[exp[1].id] + sizes.new)
-    }
-    else if (exp.length >= 3) {
-      // tally the heights of any collapsed panes
-      let height = this.rowsH;
-      let total = 0;
-      let diff, ratio;
-      for (let o of col) {
-        height -= o.viewport.height
-      }
-      sizes.new = Math.floor(height / (exp.length + 1))
-      ratio = height / (height + sizes.new)
-      diff = (height - sizes.new) // exp.length
-      for (let o of exp) {
-        // sizes[o.id] = o.viewport.height - diff
-        sizes[o.id] = diff * (o.viewport.height / height)
-        total += sizes[o.id]
-      }
-      // account for remainder
-      sizes.new += height - total
-    }
-    return sizes
-  }
-
   createGraph() {
     let overlays = copyDeep(defaultOverlays)
 
@@ -1081,179 +1272,6 @@ export default class MainPane extends Component {
 
   zoomRange() {
     this.draw(this.range, true)
-  }
-
-  /**
-   * Toggles chart pane maximization
-   * needs to account for possible chart resizing
-   * @param {Chart} p - Chart pane instance
-   * @returns {boolean}
-   */
-  paneMaximize (p) {
-
-    if (!(p instanceof Chart)) return false
-
-    const maxMin = this.chartPaneMaximized
-    const controls = p.legend.list.chart.el.querySelector(".controls")
-    let style;
-    
-    controls.classList.toggle("maximized")
-    controls.classList.toggle("restored")
-    // chart pane is already maximized and so restore all
-    if (p === maxMin.instance) {
-      this.panesRestore()
-      maxMin.instance = null
-      maxMin.panes = {}
-      if (p.collapsed.state) {
-        p.graph.viewport.scene.canvas.style.display = "none"
-        p.scale.graph.viewport.scene.canvas.style.visibility = "hidden"
-      }
-    }
-    // maximize pane, minimize the rest
-    else {
-      // set all panes to default state
-      this.panesRestore()
-      // store maximized pane
-      maxMin.instance = p
-      // store MainPane dimensions in case chart is resized
-      maxMin.rowsH = this.rowsH
-      for (let [k, v] of this.chartPanes.entries()) {
-        // store height for restore
-        maxMin.panes[k] = v.element.clientHeight
-        style = v.element.style
-        if (p === v) {
-          style.display = "block"
-          v.setDimensions({w: undefined, h: this.rowsH})
-          v.graph.viewport.scene.canvas.style.display = "block"
-          v.scale.graph.viewport.scene.canvas.style.visibility = "visible"
-        }
-        else {
-          style.display = "none"
-          v.scale.element.style.display = "none"
-        }
-      }
-    this.hidePaneDividers()
-    }
-
-    this.emit("chart_paneRefresh", this)
-
-    return true
-  }
-
-  /**
-   * Iterate over chart panes and restore them to default state
-   * needs to account for possible chart resizing
-   */
-  panesRestore() {
-    const maxMin = this.chartPaneMaximized
-    let style, i = 0;
-
-    this.emit("chart_paneRefresh", this)
-
-    // are Chart Pane dimensions the same?
-    if (this.dimensions.height == maxMin.height) {}
-
-    for (let [k, v] of this.chartPanes.entries()) {
-      v.element.style.display = "block"
-      v.scale.element.style.display = "block"
-      if (k in maxMin.panes)
-        if (i++ > 0) v.Divider.show()
-        v.setDimensions({w: undefined, h: maxMin.panes[k]})
-    }
-  }
-
-  /**
-   * Toggles chart pane collapsed state
-   * needs to account for possible chart resizing
-   * @param {Chart} p - Chart pane instance
-   * @returns {boolean}
-   */
-  paneCollapse(p) {
-    if (!(p instanceof Chart)) return false
-
-    this.emit("chart_paneRefresh", this)
-
-    const controls = p.legend.list.chart.el.querySelector(".controls")
-    const pc = p.collapsed
-      let h = p.element.clientHeight
-      let i, j, n;
-    // list of expanded and collapsed panes excluding current
-    const {list: v, collapsed: col, expanded: exp} = this.chartPanesState()
-    i = col.indexOf(p)
-    if (i > -1) col.splice(i, 1)
-    i = exp.indexOf(p)
-    if (i > -1) exp.splice(i, 1)
-
-    // chart pane is already collapsed, so restore it
-    if (p.collapsed.state) {
-      controls.classList.remove("collapsed")
-      controls.classList.add("expanded")
-
-      // check if Rows count has changed
-      if (pc.rowsCnt !== v.length) {
-        h = pc.height * (pc.rowsCnt / v.length)
-      }
-      // check if Rows height has changed
-      else if (pc.rowsHeight !== this.rowsH) {
-        h = pc.height * (pc.rowsHeight / this.rowsH)
-      }
-      // no changes
-      else {
-        h = pc.height
-      }
-      // subtract height from all expanded panes
-      j = (h - COLLAPSEDHEIGHT ) / exp.length
-      for (let o of exp) {
-        n = o.element.clientHeight - j
-        o.setDimensions({w: undefined, h: n})
-      }
-      // set collapsed pane height
-      p.collapse(h)
-    }
-    // collapse the chart pane
-    else {
-      controls.classList.add("collapsed")
-      controls.classList.remove("expanded")
-
-      // minimum of two panes required
-      if (v.length < 2) return false
-      // minimum of one expanded pane required
-      if (exp.length < 1) return false
-      // add height to all expanded panes
-      h = (p.element.clientHeight - COLLAPSEDHEIGHT) / exp.length
-      for (let o of exp) {
-        n = o.element.clientHeight + h
-        o.setDimensions({w: undefined, h: n})
-      }
-      // collapse current pane
-      p.collapse()
-    }
-    // set the divider positions
-    this.setPaneDividers()
-
-    return true
-  }
-
-  setPaneDividers() {
-    const {list: v} = this.chartPanesState()
-    let i = 0
-    for (let o of v) {
-      if (o.Divider instanceof Divider &&
-          i++ > 0) {
-        o.Divider.setWidth()
-        o.Divider.setPos()
-        o.Divider.show()
-      }
-    }
-  }
-
-  hidePaneDividers() {
-    const {list: v} = this.chartPanesState()
-    for (let o of v) {
-      if (o.Divider instanceof Divider) {
-        o.Divider.hide()
-      }
-    }
   }
 
 }
