@@ -58,6 +58,9 @@ dependencies:
   talib-web:
     specifier: ^0.1.3
     version: 0.1.3
+  tradex-chart:
+    specifier: ^0.153.7
+    version: 0.153.7
 
 devDependencies:
   '@types/node':
@@ -1002,6 +1005,10 @@ packages:
     dependencies:
       '@swc/counter': 0.1.3
       tslib: 2.7.0
+    dev: false
+
+  /@types/hammerjs@2.0.45:
+    resolution: {integrity: sha512-qkcUlZmX6c4J8q45taBKTL3p+LbITgyx7qhlPYOdOHZB7B31K0mXbP5YA7i7SgDeEGuI9MnumiKPEMrxg8j3KQ==}
     dev: false
 
   /@types/json5@0.0.29:
@@ -2238,6 +2245,11 @@ packages:
     resolution: {integrity: sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ==}
     dev: true
 
+  /hammerjs@2.0.8:
+    resolution: {integrity: sha512-tSQXBXS/MWQOn/RKckawJ61vvsDpCom87JgxiYdGwHdOa0ht0vzUWDlfioofFCRU0L+6NGDt6XzbgoJvZkMeRQ==}
+    engines: {node: '>=0.8.0'}
+    dev: false
+
   /has-bigints@1.0.2:
     resolution: {integrity: sha512-tSvCKtBr9lkF0Ex0aQiP9N+OpV4zi2r/Nee5VkRDbaqv35RLYMzbwQfFSZZH0kR+Rd6302UJZ2p/bJCEoR3VoQ==}
     dev: true
@@ -2689,6 +2701,14 @@ packages:
   /minipass@7.1.2:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
+
+  /mjolnir.js@2.7.3:
+    resolution: {integrity: sha512-Z5z/+FzZqOSO3juSVKV3zcm4R2eAlWwlKMcqHmyFEJAaLILNcDKnIbnb4/kbcGyIuhtdWrzu8WOIR7uM6I34aw==}
+    engines: {node: '>= 4', npm: '>= 3'}
+    dependencies:
+      '@types/hammerjs': 2.0.45
+      hammerjs: 2.0.8
+    dev: false
 
   /ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
@@ -3533,6 +3553,13 @@ packages:
     engines: {node: '>=8.0'}
     dependencies:
       is-number: 7.0.0
+
+  /tradex-chart@0.153.7:
+    resolution: {integrity: sha512-R/l2l/9BZ0KhcHaAFTcxZ4CzR60DX8ytaSCsCsSxn7M3iaoLM7faL+NG/4XcqOG3b2YN2BhB1WBN7PN9rnzk7Q==}
+    dependencies:
+      mjolnir.js: 2.7.3
+      talib-web: 0.1.3
+    dev: false
 
   /ts-api-utils@1.3.0(typescript@5.5.4):
     resolution: {integrity: sha512-UQMIo7pb8WRomKR1/+MFVLTroIvDVtMX3K6OUir8ynLyzB8Jeriont2bTAtmNPa1ekAgN7YPDyf6V+ygrdU+eQ==}

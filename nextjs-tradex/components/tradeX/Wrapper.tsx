@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import useChart from './hooks/useChart';
 import { CHART_OPTIONS, DEFAULT_RANGE_LIMIT } from './utils';
 import { fetchOHLCVData, fetchTXData } from './fetchers';
@@ -8,25 +8,20 @@ import FullScreenWrapper from '../FullScreen/FullScreenWrapper';
 import FullScreenButton from '../FullScreen/FullScreenButton';
 import Toolbar from './Toolbar';
 import { IIndicatorToolbar, ITokenChartProps } from './utils/types'; // don't change this, these are from the wrapper not the module
-import { IIndicator, ITradeData } from '../../../types'; // import from 'tradex-chart';
 import Chart from '@/components/tradeX/Chart';
 import { AVAILABLE_INDICATORS as loadIndicators } from '@/components/tradeX/indicators/availbleIndicators';
-
-let end: number;
+import {ITradeX, IIndicator, ITradeData } from '../../../types';
 
 const TradingChart = (props: ITokenChartProps) => {
   const { toolbar, defaults, ...config } = props;
-  const [symbol, setSymbol] = useState(config.title);
+  const [symbol, setSymbol] = useState();
   const [tokensList, setTokensList] = useState<string[]>([]);
-  const [firstLoad, setFirstLoad] = useState(true);
-  const [isEnd, setIsEnd] = useState(false);
-  const [endDate, setEndDate] = useState(new Date());
-  const [intervals, setIntervals] = useState(toolbar?.intervals || ['1h']);
+  const [intervals, setIntervals] = useState(toolbar?.intervals || ['1m']);
   const [showPlaceHolder, setShowPlaceHolder] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [tradeData, setTradeData] = useState<ITradeData[]>();
   const [selectedInterval, setSelectedInterval] = useState(
-    defaults?.timeframe || '1h'
+    defaults?.timeframe || '1m'
   );
   const [selectedChartType, setSelectedChartType] = useState(
     defaults?.chartType || CHART_OPTIONS[0]
@@ -38,6 +33,7 @@ const TradingChart = (props: ITokenChartProps) => {
       selected: false
     }
   ]);
+  const [hasInitialFetch, setHasInitialFetch] = useState(false);
 
   const {
     chartX,
@@ -53,93 +49,107 @@ const TradingChart = (props: ITokenChartProps) => {
 
   const handleSelectIndicator = (indicatorValue: string) => {
     const indicator = loadIndicators[indicatorValue];
-    console.log('indicator to add', indicator);
+    console.log('indicator to add/remove', indicator);
 
     if (indicator) {
-      const newIndicator = {
-        value: indicator.id,
-        label: indicator.name,
-        selected: true
-      };
-
-      // Update the indicators array
-      const updatedIndicators = indicators.map((ind) =>
-        ind.value === newIndicator.value ? { ...ind, selected: true } : ind
+      const existingIndicator = indicators.find(
+        (ind) => ind.value === indicator.id
       );
 
-      setIndicators(updatedIndicators);
+      if (existingIndicator?.selected) {
+        // If the indicator is already selected, remove it
+        setIndicators(
+          indicators.map((ind) =>
+            ind.value === indicator.id ? { ...ind, selected: false } : ind
+          )
+        );
+        handleRemoveIndicator(indicator.id);
+      } else {
+        // If the indicator is not selected, add it
+        const newIndicator = {
+          value: indicator.id,
+          label: indicator.name,
+          selected: true
+        };
 
-      // Prepare the indicator to add with additional settings
-      const indicatorToAdd = {
-        value: indicator.id,
-        name: indicator.name,
-        data: [],
-        customSettings: {}
-      };
+        setIndicators(
+          indicators.map((ind) =>
+            ind.value === newIndicator.value ? { ...ind, selected: true } : ind
+          )
+        );
 
-      handleAddIndicator(indicatorToAdd);
+        const indicatorToAdd = {
+          value: indicator.id,
+          name: indicator.name,
+          data: [],
+          customSettings: {}
+        };
+
+        handleAddIndicator(indicatorToAdd);
+      }
     }
   };
 
-  const handleRangeChange = () => {
-    setEndDate(new Date(end - 1));
-  };
-
-  const requestData = async () => {
-    if (isLoading || isEnd) return;
-
-    try {
-      let newData;
-      setIsLoading(true);
-      if (symbol) {
-        const ticker = symbol + 'USDT';
-        newData = await fetchOHLCVData({
-          selectedInterval,
-          ticker: ticker
-        });
-      }
-      if (newData) {
-        end = newData[0][0];
-        //console.log('end', end);
-        setFirstLoad(false);
-
-        setIsEnd(true); // TODO REMOVE LATER when merging logic is done
-
-        if (data.length) {
-          setData([...newData, ...data]);
-        } else {
-          setData(newData);
-        }
-
-        handleMergeData(newData);
-      }
-    } catch (error) {
-      setIsEnd(true);
-    } finally {
-      setIsLoading(false);
-    }
-  };
   const handleTokenChange = (value: React.SetStateAction<string>) => {
     const upperCaseValue = (value as string).toUpperCase();
     setSymbol(upperCaseValue);
+    setHasInitialFetch(false);
   };
 
-  const handleFetchTXData = async () => {
-    if (!symbol) return;
-    const tx = await fetchTXData({
-      tf: selectedInterval,
-      token: symbol,
-      to: 1000
-    });
-    setTradeData(tx);
-  };
+  const handleFetchTXData = useCallback(async () => {
+    if (!symbol || !selectedInterval) return;
+    try {
+      const tx = await fetchTXData({
+        tf: selectedInterval,
+        token: symbol,
+        to: 1000
+      });
+      setTradeData(tx);
+    } catch (error) {
+      console.error('Error fetching TX data:', error);
+    }
+  }, [symbol, selectedInterval]);
 
-  useEffect(() => {
-    if (!symbol || !selectedInterval || isEnd || !defaults?.showTradeData)
-      return;
-    handleFetchTXData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [symbol, selectedInterval, endDate]);
+  const fetchInitialBinanceData = useCallback(async () => {
+    if (!chartX || !symbol || !selectedInterval || hasInitialFetch) return;
+    setIsLoading(true);
+    try {
+      const LIMIT = 100;
+      const TIME = {
+        sec: 1000,
+        min: 60 * 1000,
+        hour: 60 * 60 * 1000,
+        day: 24 * 60 * 60 * 1000,
+        week: 7 * 24 * 60 * 60 * 1000,
+        month: 30 * 24 * 60 * 60 * 1000
+      };
+      const FACTOR = {
+        '1m': LIMIT * TIME.min,
+        '5m': (LIMIT * TIME.hour) / 12,
+        '10m': (LIMIT * TIME.hour) / 6,
+        '15m': (LIMIT * TIME.hour) / 4,
+        '30m': (LIMIT * TIME.hour) / 2,
+        '1h': LIMIT * TIME.hour,
+        '4h': (LIMIT * TIME.day) / 6,
+        '12h': (LIMIT * TIME.day) / 2,
+        '1d': LIMIT * TIME.day,
+        '1w': LIMIT * TIME.week,
+        '1M': LIMIT * TIME.month
+      };
+      const start = Math.trunc(Date.now() / 1000) * 1000 -
+        // @ts-ignore
+        (FACTOR[selectedInterval] || FACTOR['1m']);
+      const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${selectedInterval}&startTime=${start}&limit=${LIMIT}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      chartX.mergeData({ ohlcv: data }, false, true);
+      setHasInitialFetch(true);
+    } catch (error) {
+      console.error('Error fetching initial Binance data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [chartX, symbol, selectedInterval, hasInitialFetch]);
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -147,8 +157,8 @@ const TradingChart = (props: ITokenChartProps) => {
         //const response = await fetch('/api/available-tokens');
         //const data = await response.json();
         await new Promise((resolve) => setTimeout(resolve, 2000));
-        setTokensList(['PEPE', 'WBTC', 'ETH']);
-        handleTokenChange('PEPE');
+        setTokensList(['BTCUSDT', 'ETHUSDT', 'LTCUSDT']);
+        handleTokenChange('BTCUSDT');
       } catch (error) {
         console.error('Error fetching tokens:', error);
       }
@@ -157,10 +167,6 @@ const TradingChart = (props: ITokenChartProps) => {
   }, []);
 
   useEffect(() => {
-    setData([]);
-    setFirstLoad(true);
-    setIsEnd(false);
-
     const indicatorsArray = Object.values(loadIndicators);
     const mappedIndicators = indicatorsArray.map((indicator: IIndicator) => ({
       label: indicator.name,
@@ -170,17 +176,8 @@ const TradingChart = (props: ITokenChartProps) => {
 
     setIndicators(mappedIndicators);
     setSelectedInterval(defaults?.timeframe || '5m');
-    setEndDate(new Date());
-  }, [symbol]);
-
-  useEffect(() => {
-    if (!endDate || !selectedInterval || isLoading) {
-      return;
-    }
-
-    requestData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [endDate, selectedInterval]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chartX]);
 
   useEffect(() => {
     if (!data.length && !isLoading) {
@@ -192,6 +189,49 @@ const TradingChart = (props: ITokenChartProps) => {
     }
     setShowPlaceHolder(false);
   }, [data.length, isLoading]);
+
+  useEffect(() => {
+    fetchInitialBinanceData();
+  }, [fetchInitialBinanceData]);
+
+  useEffect(() => {
+    handleFetchTXData();
+  }, [handleFetchTXData]);
+
+  useEffect(() => {
+    if (!chartX) return;
+
+    const registerRangeLimt = (chart: ITradeX) => {
+      console.log('registering range limit');
+      // @ts-ignore
+      const list = chart?.state?.list();
+      console.log(list);
+      function onRangeLimit(e: any, x: string) {
+        const range = e.chart.range;
+        const limit = 100;
+        const start = range.timeStart - range.interval * limit;
+        const end = range.timeEnd;
+        const interval = range.intervalStr;
+        if (x == 'past') {
+          console.log('past triggered');
+          e.chart.progress.start();
+          fetchInitialBinanceData();
+        }
+        if (x == 'future') {
+          console.log('future triggered');
+        }
+      }
+
+      if (chart.on) {
+        console.log('EVENTS REGISTERED');
+        chart.on('range_limitPast', (e) => onRangeLimit(e, 'past'));
+        chart.on('range_limitFuture', (e) => onRangeLimit(e, 'future'));
+      }
+    };
+
+    registerRangeLimt(chartX);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chartX, selectedInterval]);
 
   return (
     <FullScreenWrapper>
@@ -213,11 +253,9 @@ const TradingChart = (props: ITokenChartProps) => {
                 onSelectChart={setSelectedChartType}
                 onSelectToken={handleTokenChange}
                 onSelectInterval={(value: React.SetStateAction<string>) => {
-                  setFirstLoad(true);
-                  setEndDate(new Date());
                   setData([]);
                   setSelectedInterval(value);
-                  setIsEnd(false);
+                  setHasInitialFetch(false);
                 }}
               />
             )}
@@ -237,7 +275,7 @@ const TradingChart = (props: ITokenChartProps) => {
               onchart={indicators}
               tradeData={tradeData}
               customIndicators={loadIndicators}
-              onRangeChange={handleRangeChange}
+              // @ts-ignore
               chartX={chartX}
               setChart={setChart}
             />

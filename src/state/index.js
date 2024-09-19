@@ -434,8 +434,8 @@ export default class State {
 
     if (state.isEmpty && isArray(ohlcv) && ohlcv.length > 1) {
       timeFrame = detectInterval(ohlcv)
-      state.range.interval = timeFrame
-      state.range.intervalStr = ms2Interval(timeFrame)
+    state.range.interval = timeFrame
+    state.range.intervalStr = ms2Interval(timeFrame)
     }
     return timeFrame
   }
