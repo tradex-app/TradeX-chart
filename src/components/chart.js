@@ -359,6 +359,7 @@ export default class Chart extends Component{
     this.on(STREAM_NEWVALUE, this.onStreamNewValue, this);
     this.on(STREAM_UPDATE, this.onStreamUpdate, this);
     this.on(STREAM_FIRSTVALUE, this.onStreamNewValue, this)
+    this.on("range_timeframeSet", this.onTimeframeSet, this)
     this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this)
 
     if (this.isPrimary) 
@@ -444,6 +445,12 @@ export default class Chart extends Component{
 
   onDeleteIndicator(i) {
     this.removeIndicator(i.id)
+  }
+
+  onTimeframeSet() {
+    let title = `${this.title} : ${this.range.timeFrame} : `
+    chartLegend.title = title
+    this.setTitle(title)
   }
 
   // set up Scale (Y Axis)
