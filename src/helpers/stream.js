@@ -12,7 +12,7 @@
 */
 
 import { isArray, isBoolean, isInteger, isNumber, isObject, isString } from '../utils/typeChecks'
-import { YEAR_MS, MONTHR_MS, WEEK_MS, DAY_MS, HOUR_MS, MINUTE_MS, SECOND_MS, MILLISECOND } from '../utils/time';
+import { YEAR_MS, MONTHR_MS, WEEK_MS, DAY_MS, HOUR_MS, MINUTE_MS, SECOND_MS, MILLISECOND, isValidTimestamp } from '../utils/time';
 import { copyDeep, mergeDeep } from '../utils/utilities';
 import Alerts from './alerts';
 
@@ -120,6 +120,7 @@ export default class Stream {
     // store last tick for alerts
     const lastTick = [...this.#candle]
     // round time to nearest current time unit
+    if (!isValidTimestamp(data.t)) return
     data.t = this.roundTime(new Date(data.t))
     // ensure values are numbers
     data.o = data.o * 1
@@ -170,7 +171,7 @@ export default class Stream {
     if ((this.#status == STREAM_STARTED || this.#status == STREAM_LISTENING) && 
         isObject(tick) ) 
     {
-        if (!isInteger(tick.t)) tick.t = Date.now()
+        if (!isInteger(tick.t * 1)) return // tick.t = Date.now()
         let keys = Object.keys(tick) 
         let v;
         for (let key of keys) {

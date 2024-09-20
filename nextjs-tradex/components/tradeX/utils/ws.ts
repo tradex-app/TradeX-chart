@@ -23,6 +23,7 @@ export const livePrice_Binance = (
           c: obj.k.c, // close price
           v: obj.k.v // volume
         };
+        // console.log(filteredData)
         chart?.stream?.onTick(filteredData);
       }
     };

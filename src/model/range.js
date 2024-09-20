@@ -465,31 +465,35 @@ export class Range {
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
 
-    let valueMin  = data[i][3]
-    let valueMax  = data[i][2]
-    let volumeMin = data[i][5]
-    let volumeMax = data[i][5]
+    let valueMin  = data[i][3] || Infinity
+    let valueMax  = data[i][2] || -Infinity
+    let volumeMin = data[i][5] || Infinity
+    let volumeMax = data[i][5] || -Infinity
 
     let valueMinIdx  = i
     let valueMaxIdx  = i
     let volumeMinIdx = i
     let volumeMaxIdx = i
+    let val;
 
     while (i++ < c) {
-      if (data[i][3] < valueMin) {
-        valueMin = data[i][3]
+      val = data[i][3]
+      if (isNumber(val) && val < valueMin) {
+        valueMin = val
         valueMinIdx = i
       }
-      if (data[i][2] > valueMax) {
-        valueMax = data[i][2]
+      val = data[i][2]
+      if (isNumber(val) && val > valueMax) {
+        valueMax = val
         valueMaxIdx = i
       }
-      if (data[i][5] < volumeMin) {
-        volumeMin = data[i][5]
+      val = data[i][5]
+      if (isNumber(val) && val < volumeMin) {
+        volumeMin = val
         volumeMinIdx = i
       }
-      if (data[i][5] > volumeMax) {
-        volumeMax = data[i][5]
+      if (isNumber(val) && val > volumeMax) {
+        volumeMax = val
         volumeMaxIdx = i
       }
     }
@@ -594,13 +598,14 @@ export class Range {
 
     // iterate over indicator outputs
     for (let d in r) {
-      max = data[i][f]
-      min = data[i][f]
+      max = data[i][f] || -Infinity
+      min = data[i][f] || Infinity
       j = i
 
       // iterate over range for indicator output
       while (j++ < c) {
         v = data[j][f]
+        if (!isNumber) continue
         if (v <= min) {
           r[d].min = v
           r[d].minIdx = j

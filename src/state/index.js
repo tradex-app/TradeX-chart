@@ -18,6 +18,7 @@ import Dataset from '../model/dataset'
 import MainPane from '../components/main'
 import { OHLCV } from '../definitions/chart'
 import Chart from '../components/chart'
+import internal from 'stream'
 
 const HASHKEY = "state"
 const DEFAULTSTATEID = "defaultState"
@@ -1187,13 +1188,13 @@ export default class State {
       merged = older
       let fill = older[older.length-1][0]
       let gap = Math.floor((newer[0][0] - fill) / this.range.interval)
-      for(gap; gap > 0; gap--) {
+      for(gap; gap > 1; gap--) {
         let arr = Array(newer[0].length).fill(null)
+            fill += this.range.interval
             arr[0] = fill
-            fill =+ this.range.interval
-        merged.push(arr)
-        merged = merged.concat(newer)
+            merged.push(arr)
       }
+      merged = merged.concat(newer)
     }
 
     // no overlap, insert the new data
