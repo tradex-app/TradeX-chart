@@ -9,8 +9,14 @@ import FullScreenButton from '../FullScreen/FullScreenButton';
 import Toolbar from './Toolbar';
 import { IIndicatorToolbar, ITokenChartProps } from './utils/types';
 import Chart from '@/components/tradeX/Chart';
-import { AVAILABLE_INDICATORS as loadIndicators } from '@/components/tradeX/indicators/availbleIndicators';
-import { ITradeX, IIndicator, ITradeData } from '../../../types';
+import { CUSTOM_INDICATORS } from '@/components/tradeX/indicators/availbleIndicators';
+import { ITradeX, ITradeData } from '../../../types';
+import { Chart as TXChart } from '../../../src'; // import 'tradex-chart';
+import { livePrice_Binance } from './utils/ws';
+
+
+// INSTANTIATE CHART MODULE
+TXChart // DO NOT REMOVE THIS
 
 const TradingChart = (props: ITokenChartProps) => {
   const { toolbar, defaults, ...config } = props;
@@ -27,11 +33,11 @@ const TradingChart = (props: ITokenChartProps) => {
     {
       value: '',
       label: '',
-      selected: false
+      tooltip: ''
     }
   ]);
   const [hasInitialFetch, setHasInitialFetch] = useState(false);
-  const [ws, setWs] = useState<WebSocket | null>(null); // Store WebSocket instance
+  const [ws, setWs] = useState<WebSocket | null>(null);
 
   const {
     chartX,
@@ -46,43 +52,25 @@ const TradingChart = (props: ITokenChartProps) => {
   } = useChart();
 
   const handleSelectIndicator = (indicatorValue: string) => {
-    const indicator = loadIndicators[indicatorValue];
 
-    if (indicator) {
-      const existingIndicator = indicators.find(
-        (ind) => ind.value === indicator.id
-      );
-
-      if (existingIndicator?.selected) {
-        setIndicators(
-          indicators.map((ind) =>
-            ind.value === indicator.id ? { ...ind, selected: false } : ind
-          )
-        );
-        handleRemoveIndicator(indicator.id);
-      } else {
-        const newIndicator = {
-          value: indicator.id,
-          label: indicator.name,
-          selected: true
-        };
-
-        setIndicators(
-          indicators.map((ind) =>
-            ind.value === newIndicator.value ? { ...ind, selected: true } : ind
-          )
-        );
-
-        const indicatorToAdd = {
-          value: indicator.id,
-          name: indicator.name,
-          data: [],
-          customSettings: {}
-        };
-
-        handleAddIndicator(indicatorToAdd);
-      }
-    }
+      const indicatorClass = indicatorValue;
+      const indicatorName = indicatorValue;
+        const indicatorProps = 
+        { 
+          //id: "string", // user defined or automatic
+          legendName: indicatorValue, // legend title
+          // data: [], 
+          // settings: { 
+          //   style: {
+          //     output: {
+          //       colour: {value: "#0f0"}, 
+          //       width: {value: 3}, dash: "4,4"}
+          //     }, 
+          //     input: {timePeriod: {value: 15}
+          //    } 
+          //  } 
+         }
+        handleAddIndicator(indicatorClass, indicatorName, indicatorProps); 
   };
 
   const handleTokenChange = (value: React.SetStateAction<string>) => {
@@ -105,7 +93,7 @@ const TradingChart = (props: ITokenChartProps) => {
     }
   }, [symbol, selectedInterval]);
 
-  const fetchInitialBinanceData = useCallback(async () => {
+  const fetchInitialHistory = useCallback(async () => {
     if (!chartX || !symbol || !selectedInterval || hasInitialFetch) return;
     setIsLoading(true);
 
@@ -124,8 +112,10 @@ const TradingChart = (props: ITokenChartProps) => {
     } finally {
       setIsLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chartX, hasInitialFetch]);
 
+  // TOKEN LIST
   useEffect(() => {
     const fetchTokens = async () => {
       try {
@@ -139,22 +129,12 @@ const TradingChart = (props: ITokenChartProps) => {
     fetchTokens();
   }, []);
 
-  useEffect(() => {
-    const indicatorsArray = Object.values(loadIndicators);
-    const mappedIndicators = indicatorsArray.map((indicator: IIndicator) => ({
-      label: indicator.name,
-      value: indicator.id,
-      selected: false
-    }));
-
-    setIndicators(mappedIndicators);
-    setSelectedInterval(config?.timeFrame);
-  }, [chartX]);
-
+  // Transactions
   useEffect(() => {
     handleFetchTXData();
   }, [handleFetchTXData]);
 
+  // Range History
   useEffect(() => {
     if (!chartX) return;
 
@@ -180,59 +160,19 @@ const TradingChart = (props: ITokenChartProps) => {
       }
 
       if (chart.on) {
-        fetchInitialBinanceData();
+        fetchInitialHistory();
         chart.on('range_limitPast', (e) => onRangeLimit(e, 'past'));
       }
     };
 
     registerRangeLimit(chartX);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chartX, selectedInterval]);
 
-  const livePrice_Binance = (
-    chart: ITradeX,
-    symbol: string,
-    interval: string
-  ) => {
-    const newWs = new WebSocket(
-      `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`
-    );
-
-    newWs.onmessage = (evt) => {
-      const msg = evt.data;
-      const obj = JSON.parse(msg);
-
-      if (obj && obj.k) {
-        const filteredData = {
-          t: obj.k.t, // timestamp
-          o: obj.k.o, // open price
-          h: obj.k.h, // high price
-          l: obj.k.l, // low price
-          c: obj.k.c, // close price
-          v: obj.k.v // volume
-        };
-        chart?.stream?.onTick(filteredData);
-      }
-    };
-
-    newWs.onopen = () => {
-      console.log('WebSocket connection opened');
-      chart?.stream?.start();
-    };
-
-    newWs.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    newWs.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
-
-    setWs(newWs);
-  };
-
+  // WS
   useEffect(() => {
     if (symbol && selectedInterval && chartX) {
-      livePrice_Binance(chartX, symbol, selectedInterval);
+      livePrice_Binance(chartX, symbol, selectedInterval, setWs);
     }
 
     return () => {
@@ -240,7 +180,25 @@ const TradingChart = (props: ITokenChartProps) => {
         ws.close();
       }
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [symbol, selectedInterval, chartX]);
+
+  // Indicators
+  useEffect(() => {
+    if (!chartX || !chartX?.indicatorClasses) return;
+    
+    const registeredIndicators = chartX.indicatorClasses;
+    // console.log("registeredIndicators", registeredIndicators);
+
+    const mappedRegisteredIndicators = Object.entries(registeredIndicators).map(([key, IndClass]) => ({
+      label: (IndClass as any).nameShort || key,
+      value: key,
+      tooltip: (IndClass as any).nameLong || key,
+      selected: false
+    }));
+    // console.log("Mapped Registered Indicators:", mappedRegisteredIndicators);
+    setIndicators(mappedRegisteredIndicators);
+  }, [chartX]);
 
   return (
     <FullScreenWrapper>
@@ -284,7 +242,7 @@ const TradingChart = (props: ITokenChartProps) => {
               data={data}
               onchart={indicators}
               tradeData={tradeData}
-              customIndicators={loadIndicators}
+              customIndicators={CUSTOM_INDICATORS}
               chartX={chartX}
               setChart={setChart}
             />

@@ -52,7 +52,7 @@ export interface ITokenChartProps extends IConfig {
 export interface IIndicatorToolbar {
   label: string;
   value: string;
-  selected: boolean;
+  tooltip: string;
 }
 
 export interface ToolbarConfig {

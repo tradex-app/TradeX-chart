@@ -33,7 +33,7 @@ const IndicatorDropdown: React.FC<IndDropdownProps> = ({
 
   return (
     <div className="flex items-center space-x-4">
-      <Popover open={open} onOpenChange={setOpen}>
+     {indicators[0].label !== '' &&( <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
@@ -59,19 +59,19 @@ const IndicatorDropdown: React.FC<IndDropdownProps> = ({
                     setOpen(false);
                   }}
                 >
-                  <Check
+                  {/* <Check
                     className={cn(
                       'mr-2 h-4 w-4',
                       ind.selected ? 'opacity-100' : 'opacity-0'
                     )}
-                  />
+                  /> */}
                   {ind.label}
                 </CommandItem>
               ))}
             </CommandGroup>
           </Command>
         </PopoverContent>
-      </Popover>
+      </Popover>)}
     </div>
   );
 };

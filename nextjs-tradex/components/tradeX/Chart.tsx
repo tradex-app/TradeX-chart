@@ -4,7 +4,6 @@ import { useTheme } from 'next-themes';
 import { IConfig, IIndicators, ITradeX, ThemeProps } from '../../../types'; // import from 'tradex-chart';
 import ColorsEnum from '../theme/colors';
 import { IChartOption, IIndicatorToolbar } from './utils/types';
-import { Chart } from '../../../src'; // import 'tradex-chart';
 
 export interface IProps {
   config: IConfig;
@@ -43,7 +42,7 @@ const TXChart: FC<IProps> = ({
 
   // Register custom indicators to the chart
   const registerIndicators = (chart: ITradeX) => {
-    if (chart.setIndicators && customIndicators) {
+    if (chart?.setIndicators && customIndicators) {
       chart.setIndicators(customIndicators);
       console.log('Custom indicators registered:', customIndicators);
     } else {
@@ -53,7 +52,7 @@ const TXChart: FC<IProps> = ({
     }
   };
 
-  // Register event listener for range change
+  // Register event listener for range change, not being used, can lead to slowness
   const registerRangeChangeEvent = (chart: ITradeX) => {
     if (!chart || typeof chart.on !== 'function') {
       console.warn(
@@ -63,7 +62,6 @@ const TXChart: FC<IProps> = ({
     }
     chart.on('setRange', (e: any) => {
       if (!e || e.length === 0) return;
-      console.log('Range change event detected:', e);
       if (e[0] <= 0 && onRangeChange) {
         onRangeChange();
       }
@@ -72,8 +70,6 @@ const TXChart: FC<IProps> = ({
 
   const renderChart = () => {
     try {
-      console.log('Rendering chart...');
-
       const existingChart = document.querySelector(
         `#${chartAccessor} tradex-chart`
       ) as ITradeX;
@@ -94,8 +90,6 @@ const TXChart: FC<IProps> = ({
         return;
       }
       mount.appendChild(chart);
-      console.log('Chart element appended to DOM.');
-
       const state: {
         ohlcv: number[][];
         trades: any;
@@ -128,12 +122,11 @@ const TXChart: FC<IProps> = ({
         console.error('chart.start is undefined');
       }
 
-      if (customIndicators) {
+      if ((Object.keys(customIndicators || {}).length !== 0)) {
         registerIndicators(chart);
       }
 
       setChart(chart);
-      console.log('Chart rendering complete.');
     } catch (err) {
       console.error(`Failed to render chart: ${displayTitle}`, err);
     }
@@ -141,8 +134,6 @@ const TXChart: FC<IProps> = ({
 
   useEffect(() => {
     if (!chartX) return;
-
-    console.log('Applying theme settings based on current theme:', theme);
 
     if (theme === 'light') {
       chartX.theme?.setProperty(
@@ -157,14 +148,11 @@ const TXChart: FC<IProps> = ({
   }, [chartX, theme]);
 
   useEffect(() => {
-    console.log('Initial chart rendering...');
     renderChart();
   }, []);
 
   useEffect(() => {
     if (!chartX) return;
-
-    console.log('Chart type changed. Applying new type:', chartType);
 
     chartX.theme?.setProperty(ThemeProps.CandleType, chartType?.value);
   }, [chartType, chartX]);

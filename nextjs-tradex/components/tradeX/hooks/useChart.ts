@@ -22,6 +22,7 @@ const useChart = () => {
 
   const getIndicators = () => {
     if (!chartX) return;
+    console.log(chartX.Indicators)
 
     return Object.values(chartX.Indicators);
   };
@@ -35,20 +36,10 @@ const useChart = () => {
     }
   };
 
-  const handleAddIndicator = (indicator: {
-    value: any;
-    name: any;
-    data: any;
-    customSettings: any;
-  }) => {
+  const handleAddIndicator = (indicatorClass: any, indicatorName: any, indicatorProps: any): any => {
     if (!chartX) return;
 
-    chartX.addIndicator(indicator.value, indicator.name, {
-      data: indicator.data || [],
-      settings: {
-        custom: indicator.customSettings
-      }
-    });
+    chartX.addIndicator(indicatorClass, indicatorName, indicatorProps);
 
     chartX.refresh();
   };
