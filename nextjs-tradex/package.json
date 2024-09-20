@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build-tx": "cd local_modules/tradex-chart && npm run build",
     "cleanup": "./cleanup.sh && pnpm install",
     "prebuild": "cd .. && npm install && npm run build",
     "dev": "pnpm cleanup && next dev",
