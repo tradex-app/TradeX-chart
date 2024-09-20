@@ -1061,8 +1061,11 @@ console.log("total does not match Row Height")
    * add an indicator after the chart has started
    * @param {string} i - indicator type eg. EMA, DMI, RSI
    * @param {string} name - identifier
-   * @param {Object} params - {settings, data}
-   * @returns {Chart|Indicator|undefined}
+   * @param {object} params - {data, settings}
+   * @param {Array} params.data - [ [ts, data, ...], ... ]
+   * @param {Object} params.settings - {input, output, style}
+   * 
+   * @returns {Chart|Indicator|undefined} - indicator instance or false
    */
   addIndicator(i, name=i, params={})  {
     let instance, pane;

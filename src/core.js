@@ -1302,10 +1302,13 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * add an indicator - default or registered user defined
-   * @param {string} i - indicator
+   * @param {string} i - indicator registered with the chart
    * @param {string} name - identifier
-   * @param {object} params - {settings, data}
-   * @returns {Indicator|false} - indicator instance or false
+   * @param {object} params - {data, settings}
+   * @param {Array} params.data - [ [ts, data, ...], ... ]
+   * @param {Object} params.settings - {input, output, style}
+   * 
+   * @returns {Chart|Indicator|undefined} - indicator instance or false
    */
   addIndicator(i, name=i, params={}) {
     const r = this.#MainPane.addIndicator(i, name, params)
