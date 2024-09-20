@@ -3642,6 +3642,11 @@ class TimeData {
     #range = {};
     #timeZoneOffset = getTimezoneOffset();
     #timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    static { this.timeUnits = TIMEUNITS; }
+    static { this.timeUnitsLong = TIMEUNITSLONG; }
+    static { this.timeUnitsValues = TIMESCALESVALUES; }
+    static { this.timeScaleValues = TIMESCALESVALUES; }
+    static { this.BTCGenesis = BTCGENESIS; }
     constructor(range) {
         if (range instanceof Range)
             this.#range = range;
@@ -3654,6 +3659,7 @@ class TimeData {
     get timeZone() { return this.#timeZone; }
     set timeZoneOffset(z) { this.#timeZoneOffset = (isNumber(z)) ? z : new Date().getTimezoneOffset(); }
     get timeZoneOffset() { return this.#timeZoneOffset; }
+    get timeZoneLocal() { return getTimezone(); }
     get indexed() { return this.#range.indexed; }
     setTimeZone(z) {
         if (Intl.supportedValuesOf('timeZone').includes(z)) {
@@ -3661,11 +3667,26 @@ class TimeData {
             this.#timeZoneOffset = getTimezoneOffset(z);
         }
     }
-    getTimezoneOffset(timeZone, locale) {
-        getTimezoneOffset(timeZone, locale);
+    static timezoneLocal() {
+        return getTimezone();
     }
-    getIANATimeZones(locale) {
-        IANATimeZones(locale);
+    static timezoneOffset(timeZone, locale) {
+        return getTimezoneOffset(timeZone, locale);
+    }
+    static IANATimeZone(locale) {
+        return IANATimeZones(locale);
+    }
+    static isValidTimestamp(ts) {
+        return isValidTimestamp(ts);
+    }
+    static isValidTimeInRange(time, start = BTCGENESIS, end = Date.now()) {
+        return isValidTimeInRange(time, start, end);
+    }
+    static interval2MS(tf) {
+        return interval2MS(tf);
+    }
+    static ms2Interval(ms) {
+        return ms2Interval(ms);
     }
 }
 function IANATimeZones(locale = 'en-US') {
@@ -18108,6 +18129,7 @@ class Chart extends Component {
         this.on(STREAM_NEWVALUE, this.onStreamNewValue, this);
         this.on(STREAM_UPDATE, this.onStreamUpdate, this);
         this.on(STREAM_FIRSTVALUE, this.onStreamNewValue, this);
+        this.on("range_timeframeSet", this.onTimeframeSet, this);
         this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this);
         if (this.isPrimary)
             this.on("chart_yAxisRedraw", this.onYAxisRedraw, this);
@@ -18178,6 +18200,11 @@ class Chart extends Component {
     }
     onDeleteIndicator(i) {
         this.removeIndicator(i.id);
+    }
+    onTimeframeSet() {
+        let title = `${this.title} : ${this.range.timeFrame} : `;
+        chartLegend.title = title;
+        this.setTitle(title);
     }
     setScaleBar() {
         const opts = { ...this.options };
@@ -20010,6 +20037,7 @@ class State {
             timeFrame = detectInterval(ohlcv);
             state.range.interval = timeFrame;
             state.range.intervalStr = ms2Interval(timeFrame);
+            chart.emit("range_timeframeSet", state.range.intervalStr);
         }
         return timeFrame;
     }
@@ -24818,4 +24846,4 @@ class Aspect {
     }
 }
 
-export { Aspect, TradeXchart as Chart, DEFAULT_STATE, DOM, EventHub, Indicator, IndicatorClasses, Overlay, Range, StateMachine, YAXIS_PADDING, YAXIS_TYPE, YAXIS_TYPES, candleW, canvas, copyDeep, isPromise, mergeDeep, talibAPI, typeChecks, uid, utilities as utils };
+export { Aspect, TradeXchart as Chart, DEFAULT_STATE, DOM, EventHub, Indicator, IndicatorClasses, Overlay, Range, StateMachine, TimeData, YAXIS_PADDING, YAXIS_TYPE, YAXIS_TYPES, candleW, canvas, copyDeep, isPromise, mergeDeep, talibAPI, typeChecks, uid, utilities as utils };
