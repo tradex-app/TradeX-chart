@@ -7,16 +7,20 @@ import Indicator from "../components/overlays/indicator"
 import { MFI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "MFI"
+let nameLong = 'Money Flow Index'
+
 
 export default class MFI extends Indicator {
 
-  get name() { return 'Money Flow Index' }
-  shortName = 'MFI'
-  libName = 'MFI'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   precision = 2
   scaleOverlay = true
 
-  
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false

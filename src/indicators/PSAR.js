@@ -6,16 +6,20 @@
 import Indicator from "../components/overlays/indicator"
 import { SAR as talibAPI } from "../definitions/talib-api";
 
+let nameShort = "PSAR"
+let nameLong = 'Parabolic Stop and Reverse'
+
 
 export default class PSAR extends Indicator {
 
-  get name() { return 'Parabolic Stop and Reverse' }
-  shortName = 'PSAR'
-  libName = 'SAR'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   precision = 2
   scaleOverlay = false
 
-  
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = true

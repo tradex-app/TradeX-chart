@@ -4,11 +4,17 @@
 import Indicator from "../components/overlays/indicator"
 import { YAXIS_PADDING, YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "DMI"
+let nameLong = 'Average Directional Movement Index'
+
+
 /**
  * custom indicator class
  */
 export default class DMI extends Indicator {
 
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false
@@ -36,8 +42,9 @@ export default class DMI extends Indicator {
   
   #precision = 2
 
-  get name() {return "Directional Movement Index" }
-  shortName = "DMI"
+  get name() { return nameLong }
+  shortName = nameShort
+  // libName = nameShort
   scaleOverlay = false
 
 

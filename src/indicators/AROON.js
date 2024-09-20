@@ -7,12 +7,15 @@ import Indicator from "../components/overlays/indicator"
 import { AROON as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "AROON"
+let nameLong = 'AROON'
+
 
 export default class AROON extends Indicator {
 
-  get name() { return 'Aroon' }
-  shortName = 'AROON'
-  libName = 'AROON'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   definition = {
     input: {
       high: [],
@@ -28,6 +31,8 @@ export default class AROON extends Indicator {
   scaleOverlay = true
 
   
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false

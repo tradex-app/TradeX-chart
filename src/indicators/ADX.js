@@ -7,16 +7,19 @@ import Indicator from "../components/overlays/indicator"
 import { ADX as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "ADX"
+let nameLong = 'Average Directional Movement Index'
 
 export default class ADX extends Indicator {
 
-  get name() { return 'Average Directional Movement Index' }
-  shortName = 'ADX'
-  libName = 'ADX'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   precision = 2
   scaleOverlay = true
 
-  
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false

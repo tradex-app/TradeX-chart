@@ -7,16 +7,20 @@ import Indicator from "../components/overlays/indicator"
 import { PPO as talibAPI } from "../definitions/talib-api";
 import { YAXIS_PADDING, YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "PPO"
+let nameLong = 'Percentage Price Oscillator'
+
 
 export default class PPO extends Indicator {
 
   get name() { return 'Percentage Price Oscillator' }
-  shortName = 'PPO'
-  libName = 'PPO'
+  shortName = nameShort
+  libName = nameShort
   precision = 2
   scaleOverlay = true
 
-  
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false

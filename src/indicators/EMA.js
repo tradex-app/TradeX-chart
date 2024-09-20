@@ -6,12 +6,14 @@
 import Indicator from "../components/overlays/indicator"
 import { EMA as talibAPI } from "../definitions/talib-api";
 
+let nameShort = "EMA"
+let nameLong = 'Exponential Moving Average'
  
  export default class EMA extends Indicator {
 
-  get name() { return 'Exponential Moving Average' }
-  shortName = 'EMA'
-  libName = 'EMA'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   definition = {
     input: {
       inReal: [], 
@@ -49,7 +51,8 @@ import { EMA as talibAPI } from "../definitions/talib-api";
   checkParamCount = false
   scaleOverlay = false
 
-
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = true
