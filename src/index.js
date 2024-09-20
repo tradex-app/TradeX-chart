@@ -16,6 +16,7 @@ import Aspect from './scaleX/aspect'
 import { candleW } from './components/primitives/candle'
 import { YAXIS_TYPE, YAXIS_TYPES, YAXIS_PADDING } from './definitions/chart'
 import { DEFAULT_STATE } from './state'
+import { TimeData } from './utils/time'
 
 // export default Chart
 export { 
@@ -35,6 +36,7 @@ export {
   mergeDeep, 
   Overlay, 
   Range,
+  TimeData,
   utils,
   uid,
   YAXIS_TYPE,

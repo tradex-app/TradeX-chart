@@ -74,6 +74,7 @@ The following list of events is not exhaustive as the chart is still under heavy
 * range_limitFuture
 * range_limitPast
 * range_set
+* range_timeframeSet
 * state_eventAdded
 * state_exported
 * state_deleted

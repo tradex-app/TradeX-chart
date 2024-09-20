@@ -136,11 +136,25 @@ export function buildSubGrads() {
 }
 
 
+/**
+ * Test if valid timestamp or date/time string
+ * @export
+ * @param {Number|String} ts - unix timestamp or date/time string
+ * @return {Boolean}
+ */
 export function isValidTimestamp( ts ) {
   const date = new Date(ts)
-  return (date instanceof Date && !isNaN(date.valueOf())  && isFinite(date.valueOf()));
+  return (date instanceof Date && !isNaN(date.valueOf()) && isFinite(date.valueOf()));
 }
 
+/**
+ * Test if timestamp or date/time string is in the range of BTC genesis and not greater than end
+ * @export
+ * @param {Number|String} time - unix timestamp or date/time string
+ * @param {Number|String} [start=BTCGENESIS] - unix timestamp or date/time string
+ * @param {Number|String} [end=Date.now()] - unix timestamp or date/time string
+ * @return {Boolean}
+ */
 export function isValidTimeInRange( time, start=BTCGENESIS,end=Date.now() ) {
   if (!isValidTimestamp(time)) return false
   return (time > start && time < end) ? true : false
@@ -561,6 +575,12 @@ export class TimeData {
   #range = {}
   #timeZoneOffset = getTimezoneOffset()
   #timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  
+  static timeUnits = TIMEUNITS
+  static timeUnitsLong = TIMEUNITSLONG
+  static timeUnitsValues = TIMESCALESVALUES
+  static timeScaleValues = TIMESCALESVALUES
+  static BTCGenesis = BTCGENESIS
 
   constructor(range) {
     if (range instanceof Range) this.#range = range
@@ -574,6 +594,7 @@ export class TimeData {
   get timeZone() { return this.#timeZone }
   set timeZoneOffset(z) { this.#timeZoneOffset = (isNumber(z)) ? z : new Date().getTimezoneOffset() }
   get timeZoneOffset() { return this.#timeZoneOffset }
+  get timeZoneLocal() { return getTimezone() }
   get indexed() { return this.#range.indexed }
 
   setTimeZone(z) {
@@ -583,12 +604,32 @@ export class TimeData {
     }
   }
 
-  getTimezoneOffset(timeZone, locale) {
-    getTimezoneOffset(timeZone, locale)
+  static timezoneLocal () {
+    return getTimezone()
   }
 
-  getIANATimeZones(locale) {
-    IANATimeZones(locale)
+  static timezoneOffset (timeZone, locale) {
+    return getTimezoneOffset(timeZone, locale)
+  }
+
+  static IANATimeZone (locale) {
+    return IANATimeZones(locale)
+  }
+
+  static isValidTimestamp (ts) {
+    return isValidTimestamp(ts)
+  }
+
+  static isValidTimeInRange ( time, start=BTCGENESIS,end=Date.now() ) {
+    return isValidTimeInRange(time, start, end)
+  }
+
+  static interval2MS (tf) {
+    return interval2MS(tf)
+  }
+
+  static ms2Interval (ms) {
+    return ms2Interval(ms)
   }
 }
 

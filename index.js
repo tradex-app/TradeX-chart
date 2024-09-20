@@ -1143,8 +1143,9 @@ let waiting = false
 function kline_Binance(chart, symbol="BTCUSDT", start, limit=100, interval="1m") {
   if (!waiting) {
     waiting = true
+    const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${selectedInterval}&startTime=${start}&limit=${limit}`;
     try {
-      fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${start}&limit=${limit}`)
+      fetch(url)
       .then(r => r.json())
       .then(d => {
         console.log(d)
