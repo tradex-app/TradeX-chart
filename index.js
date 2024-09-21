@@ -266,6 +266,9 @@ const config2 = {
     startTS: state2.ohlcv.slice(-15)[0][0], // rangeStartTS,
   },
   theme: {
+    title: {
+      display: false,
+    },
     candle: {
       Type: "candle_solid",
       UpBodyColour: "#00F04088",

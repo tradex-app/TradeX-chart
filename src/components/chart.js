@@ -160,8 +160,10 @@ export default class Chart extends Component{
       chartLegend.title = `${this.title} : ${this.range.timeFrame} : `
       chartLegend.parent = this
       chartLegend.source = this.legendInputs.bind(this)
+      // chartLegend.visible = this.theme.title.display
       this.legend.add(chartLegend)
       this.yAxisType = YAXIS_TYPE.default
+      this.setTitle(this.theme?.title)
     }
     else {
       let type = this.core.indicatorClasses[options.view[0].type].scale
@@ -325,7 +327,7 @@ export default class Chart extends Component{
   }
 
   /**
-   * @typedef snapshot
+   * @typedef {Object} snapshot
    * @property {Boolean} maximized 
    * @property {Object} collapsed
    * @property {Number} height
@@ -463,14 +465,34 @@ export default class Chart extends Component{
     this.scale = new ScaleBar(this.core, opts)
   }
 
+  /** 
+   * @typedef {Object} Title
+   * @property {Boolean} display
+   * @property {String} text
+   */
+  /**
+   * Set the chart title
+   * @param {Title|String} t - title text or title definition object
+   * @returns {Boolean}
+   */
   setTitle(t) {
-    if (!isString(t)) return false
+    let txt = this.#title
+    let vis;
+    if (isObject(t)) {
+      if (isString(t?.text)) txt = t.text
+      vis = (!!t?.display) ? "display" : "none"
+    }
+    else if (isString(t)) {
+      txt = t
+    }
+    else return false
 
-    this.#title = t
-    chartLegend.title = t
+    this.#title = txt
+    chartLegend.title = txt
     const title = this.legend.list.chart.el.querySelectorAll(".title")
     for (let n of title) {
-      n.innerHTML = t
+      n.innerHTML = txt
+      n.style.display = vis || n.style.display
     }
     return true
   }

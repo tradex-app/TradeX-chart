@@ -239,6 +239,9 @@ const tradeIcons = { arrowDown, arrowUp, arrowDownRound, arrowUpRound, arrowDown
 const eventIcons = { noteSolid, lightning }
 
 export const defaultTheme = {
+  title: {
+    display: true,
+  },
   candle: {
     Type: CandleType.CANDLE_SOLID,
     UpBodyColour: CandleStyle.COLOUR_CANDLE_UP,

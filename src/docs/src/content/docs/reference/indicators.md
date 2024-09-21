@@ -35,8 +35,21 @@ However, indicators can also be added with data and or with custom settings.
 ```javascript
 const data = [ [1543572000000, 4079.63478779] ]
 const settings = {style:{}}
-const params = {data, settings}
-const myInd = chart0.addIndicator("EMA", "EMA_1", params)
+const params = { 
+  id: "string" // user defined or automatic
+  legendName: "EMA 15" // legend title
+  data: data, 
+  settings: { 
+    style: {
+      output: {
+        colour: {value: "#0f0"}, 
+        width: {value: 3}, dash: "4,4"}
+      }, 
+      input: {timePeriod: {value: 15}
+     } 
+   } 
+ }
+)const myInd = chart0.addIndicator("EMA", "EMA_1", params)
 ```
 
 
@@ -64,7 +77,7 @@ All indicator parameters are optional. if no
 | id         | String | indicator id - if undefined, one will be automatically generated and assigned. id can be used for restoring a chart State.                 |
 | legendName | String | name or title prefixed to indicator data (if any) displayed on the chart                                                                   |
 | data       | Array  | any initial indicator data - if provided``calcIndicator()`` will **not** be triggered. See [Indicator Data Format](#indicator-data-format) |
-| settings   | Object | will modify the default indicator [definition](#indicator-settings)                                                                        |
+| settings   | Object | will modify the default indicator[definition](#indicator-settings)                                                                         |
 
 #### Indicator Settings
 
