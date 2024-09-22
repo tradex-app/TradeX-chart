@@ -77,10 +77,8 @@ export default class TradeXchart extends Tradex_chart {
   #standardOverlays = {...OVERLAYPANES}
   #optionalOverlays = {...OVERLAYPANES}
   #customOverlays = {...OVERLAYPANES}
-
   #TALib
   #theme
-  #themeTemp
 
   chartWMin = CHART_MINW
   chartHMin = CHART_MINH
@@ -416,7 +414,6 @@ export default class TradeXchart extends Tradex_chart {
 
     const oldID = this.ID
     const txCfg = TradeXchart.create(cfg)
-    // this.#txCfg = cfg // copyDeep(cfg)
     this.#txCfg = txCfg
     this.logs = (txCfg?.logs) ? txCfg.logs : null
     this.infos = (txCfg?.infos) ? txCfg.infos : null
@@ -426,10 +423,7 @@ export default class TradeXchart extends Tradex_chart {
     this.#config = txCfg
     this.#inCnt = txCfg.cnt || this.#inCnt
     this.#TALib = txCfg.talib
-
-    // if no theme use the default
     this.props(txCfg)
-
     this.log("processing state...")
 
     let deepValidate = txCfg?.deepValidate || false
@@ -637,7 +631,7 @@ export default class TradeXchart extends Tradex_chart {
       warnings: (warnings) => this.warnings = (isBoolean(warnings)) ? warnings : false,
       errors: (errors) => this.errors = (isBoolean(errors)) ? errors : false,
       indicators: (indicators) => this.setIndicators(indicators),
-      theme: (theme) => { this.#themeTemp = this.addTheme(theme) },
+      theme: (theme) => { this.#theme = this.addTheme(theme); },
       stream: (stream) => this.#stream = (isObject(stream)) ? stream : {},
       pricePrecision: (pricePrecision) => this.setPricePrecision(pricePrecision),
       volumePrecision: (precision) => this.setVolumePrecision(precision),

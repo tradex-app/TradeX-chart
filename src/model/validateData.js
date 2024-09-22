@@ -63,11 +63,11 @@ export function validateDeep(data, isCrypto=false) {
  * @param {number} timeFrameMS - time frame increment in milliseconds
  * @return {Array} - array of candles [timestamp, open, high, low, close, volume] 
  */
-export function fillGaps(data, timeFrameMS) {
+export function fillGaps(data, timeFrameMS, gaps) {
   if (!isArray(data) ||
       data.length == 1) return false
 
-  let a, b, c, e,
+  let a, b, c, e, tf, fill, last,
       r = [],
       i = 0,
       l = (data[data.length - 1][0] - data[i][0]) / timeFrameMS;
@@ -77,10 +77,15 @@ export function fillGaps(data, timeFrameMS) {
     c = b - a
     if ( c == timeFrameMS ) {
       r.push(data[i])
+      last = data[i]
     }
     else if ( c > timeFrameMS) {
-      e = [a + timeFrameMS, null, null, null, null, null]
+      tf = a + timeFrameMS
+      e = [tf, null, null, null, null, null]
       r.push(e)
+      fill = [...last]
+      fill[0] = tf
+      gaps[`${tf}`] = fill
       data.splice(i + 1, 0, e)
     }
     i++

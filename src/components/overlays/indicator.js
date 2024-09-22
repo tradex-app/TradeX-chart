@@ -113,6 +113,7 @@ export default class Indicator extends Overlay {
   #ConfigDialogue
   #palette
   #error = {type: "", msg: "", style: ""}
+  #gapFill = true
 
   definition = {
     input: {},
@@ -217,6 +218,8 @@ export default class Indicator extends Overlay {
   get state() { return this.#state }
   set error(e) { this.setError(e) }
   get error() { return this.#error }
+  get gapFill() { return this.#gapFill }
+  set gapFill(g) { this.#gapFill = !!g }
   get configDialogue() { return this.#ConfigDialogue }
 
 
@@ -371,7 +374,7 @@ export default class Indicator extends Overlay {
   }
 
   /**
-   * @typedef snapshot
+   * @typedef {Object} snapshot
    * @property {String} id 
    * @property {String} key - hashed key
    * @property {String} name - display name
@@ -1145,6 +1148,8 @@ export default class Indicator extends Overlay {
   }
 
   indicatorInput(start, end) {
+    let gaps = this.core.state.gaps
+    let raw, val;
     let input = {
       inReal: [],
       open: [],
@@ -1153,8 +1158,11 @@ export default class Indicator extends Overlay {
       close: [],
       volume: []
     }
+
     do {
-      let val = this.range.value(start)
+      raw = this.range.value(start)
+      val = (this.#gapFill && `${raw[0]}` in gaps) ? gaps[`${raw[0]}`] : raw
+
       input.inReal.push(val[OHLCV.c])
       input.open.push(val[OHLCV.o])
       input.high.push(val[OHLCV.h])

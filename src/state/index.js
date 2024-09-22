@@ -740,6 +740,7 @@ export default class State {
   #id = ""
   #key = ""
   #data = {}
+  #gaps = {}
   #status = false
   #isEmpty = true
   #timeData
@@ -770,6 +771,7 @@ export default class State {
   get isEmpty() { return this.#data.isEmpty }
   get core() { return (this.#core !== undefined) ? this.#core : false }
   get data() { return this.#data }
+  get gaps() { return this.#gaps }
   get time() { return this.#data.timeData }
   get range() { return this.#data.range }
   get chartPanes() { return this.#chartPanes }
@@ -1186,12 +1188,16 @@ export default class State {
     // no overlap, but a gap exists
     else if (newer[0][0] - older[older.length-1][0] > this.range.interval) {
       merged = older
-      let fill = older[older.length-1][0]
-      let gap = Math.floor((newer[0][0] - fill) / this.range.interval)
+      let len = older.length
+      let gaps = this.gaps
+      let ts = older[len-1][0]
+      let gap = Math.floor((newer[0][0] - ts) / this.range.interval)
       for(gap; gap > 1; gap--) {
+        ts += this.range.interval
+        gaps[`${ts}`] = [ ...older[len-1] ]
+        gaps[`${ts}`][0] = ts
         let arr = Array(newer[0].length).fill(null)
-            fill += this.range.interval
-            arr[0] = fill
+            arr[0] = ts
             merged.push(arr)
       }
       merged = merged.concat(newer)

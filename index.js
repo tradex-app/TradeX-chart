@@ -267,7 +267,7 @@ const config2 = {
   },
   theme: {
     title: {
-      display: false,
+      display: true,
     },
     candle: {
       Type: "candle_solid",

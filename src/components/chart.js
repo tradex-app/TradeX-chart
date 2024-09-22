@@ -90,7 +90,7 @@ export default class Chart extends Component{
   #id;
   #name
   #shortName
-  #title;
+  #titleStr
   #chartCnt
   #type               // primary, secondary
   #status = "idle"
@@ -145,7 +145,7 @@ export default class Chart extends Component{
 
     this.#name = this.options.name
     this.#shortName = this.options.shortName
-    this.#title = this.options.title
+    this.#titleStr = this.options.title
     this.#type = (this.options.type == "primary") ? "primaryPane" : "secondaryPane"
     this.#view = this.options.view
     this.#elScale = this.options.elements.elScale;
@@ -157,13 +157,12 @@ export default class Chart extends Component{
 
     if (this.isPrimary) {
       chartLegend.type = "chart"
-      chartLegend.title = `${this.title} : ${this.range.timeFrame} : `
+      chartLegend.title = this.title
       chartLegend.parent = this
       chartLegend.source = this.legendInputs.bind(this)
       // chartLegend.visible = this.theme.title.display
       this.legend.add(chartLegend)
       this.yAxisType = YAXIS_TYPE.default
-      this.setTitle(this.theme?.title)
     }
     else {
       let type = this.core.indicatorClasses[options.view[0].type].scale
@@ -183,7 +182,7 @@ export default class Chart extends Component{
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   set title(t) { this.setTitle(t) }
-  get title() { return this.#title }
+  get title() { return `${this.#titleStr} : ${this.range.timeFrame} : ` }
   get type() { return this.#type }
   get status() { return this.#status }
   get collapsed() { return this.#collapsed }
@@ -265,11 +264,13 @@ export default class Chart extends Component{
     // set up event listeners
     this.eventsListen()
 
+    if (this.isPrimary)
+      this.setTitle(this.theme?.title)
+
     // add divider to allow manual resize of the chart pane
     let cfg = { chartPane: this }
     this.#Divider = this.core.WidgetsG.insert("Divider", cfg)
     this.#Divider.start()
-    // cfg = {dragBar, closeIcon, title, content, position, styles}
     const content = `Configure chart ${this.id}`
     let cfg2 = { 
       title: "Chart Config", 
@@ -476,7 +477,7 @@ export default class Chart extends Component{
    * @returns {Boolean}
    */
   setTitle(t) {
-    let txt = this.#title
+    let txt = this.#titleStr
     let vis;
     if (isObject(t)) {
       if (isString(t?.text)) txt = t.text
@@ -487,11 +488,11 @@ export default class Chart extends Component{
     }
     else return false
 
-    this.#title = txt
-    chartLegend.title = txt
+    this.#titleStr = txt
+    chartLegend.title = this.title
     const title = this.legend.list.chart.el.querySelectorAll(".title")
     for (let n of title) {
-      n.innerHTML = txt
+      n.innerHTML = this.title
       n.style.display = vis || n.style.display
     }
     return true
