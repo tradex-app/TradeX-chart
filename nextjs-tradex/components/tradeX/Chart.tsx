@@ -32,11 +32,11 @@ const TXChart: FC<IProps> = ({
   // config
   chartAccessor = 'tradexChartContainer',
   customIndicators,
-  onRangeChange,
+  onRangeChange
 }) => {
   const { theme } = useTheme();
   const isChartLoadedRef = useRef(false);
-  const {chartX, setChartX} = useChartContext();
+  const { chartX, setChartX } = useChartContext();
 
   // Register custom indicators to the chart
   const registerIndicators = (chart: ITradeX) => {
@@ -74,8 +74,8 @@ const TXChart: FC<IProps> = ({
         `#${chartAccessor} tradex-chart`
       ) as ITradeX;
 
-      if(existingChart) return;
-      
+      if (existingChart) return;
+
       const combinedPrimary = tradeData ? [...onchart, ...tradeData] : onchart;
 
       const mount = document.querySelector(`#${chartAccessor}`);
@@ -114,11 +114,10 @@ const TXChart: FC<IProps> = ({
         console.error('chart.start is undefined');
       }
 
-      if ((Object.keys(customIndicators || {}).length !== 0)) {
+      if (Object.keys(customIndicators || {}).length !== 0) {
         registerIndicators(chart);
       }
       isChartLoadedRef.current = true;
-      console.log("CHART", chart)
       setChartX(chart);
     } catch (err) {
       console.error(`Failed to render chart: ${displayTitle}`, err);
@@ -142,7 +141,7 @@ const TXChart: FC<IProps> = ({
 
   useEffect(() => {
     renderChart();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

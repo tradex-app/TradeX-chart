@@ -11,9 +11,5 @@ export default {
     chunkFileNames: '[name]-[hash].mjs',
     assetFileNames: 'assets/[name]-[hash].[ext]'
   },
-  plugins: [
-    resolve(),
-    commonjs(),
-    json(),
-  ]
+  plugins: [resolve(), commonjs(), json()]
 };

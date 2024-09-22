@@ -2,9 +2,7 @@ import { useState } from 'react';
 import { IIndicator, ITradeX } from '../../../../types'; // import from 'tradex-chart';
 import { IStatesToolbar } from '../utils/types';
 
-
 /// DEPRECATED IN FAVOR OF CONTEXT
-
 
 type CreateStateType = (state: IState) => string;
 
@@ -20,7 +18,7 @@ interface IState {
 
 const useChart = () => {
   const [chartX, setChartX] = useState<ITradeX>();
-  const [states, setStates] = useState<IStatesToolbar[]>()
+  const [states, setStates] = useState<IStatesToolbar[]>();
 
   const getIndicators = () => {
     if (!chartX) return;
@@ -38,12 +36,16 @@ const useChart = () => {
     }
   };
 
-  const handleAddIndicator = (indicatorClass: any, indicatorName: any, indicatorProps: any): any => {
+  const handleAddIndicator = (
+    indicatorClass: any,
+    indicatorName: any,
+    indicatorProps: any
+  ): any => {
     if (!chartX) return;
 
     chartX.addIndicator(indicatorClass, indicatorName, indicatorProps);
     chartX?.refresh?.();
-    };
+  };
 
   const handleRemoveIndicator = (indicatorId: string) => {
     if (!chartX) return;
@@ -74,7 +76,7 @@ const useChart = () => {
   const listStates = () => {
     if (!chartX) return false;
     return chartX.state.list();
-  }
+  };
 
   return {
     chartX,

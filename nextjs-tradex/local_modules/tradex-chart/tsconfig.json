@@ -17,8 +17,14 @@
     "lib": ["ESNext", "DOM"],
     "preserveSymlinks": true,
     "strictPropertyInitialization": false,
-    "useDefineForClassFields": false 
+    "useDefineForClassFields": false
   },
   "include": ["../../../src/**/*.js"],
-  "exclude": ["node_modules", "dist", "../../../src/docs", "../../../src/components/overlays/composite.js", "../../../src/utils/quadtree.js"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "../../../src/docs",
+    "../../../src/components/overlays/composite.js",
+    "../../../src/utils/quadtree.js"
+  ]
 }

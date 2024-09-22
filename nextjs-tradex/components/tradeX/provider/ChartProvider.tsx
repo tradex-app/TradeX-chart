@@ -22,7 +22,11 @@ interface ChartContextProps {
   handleMergeData: (newData: number[]) => void;
   getIndicatorId: (indicatorType: string) => string | undefined;
   getIndicators: () => any[];
-  handleAddIndicator: (indicatorClass: any, indicatorName: any, indicatorProps: any) => void;
+  handleAddIndicator: (
+    indicatorClass: any,
+    indicatorName: any,
+    indicatorProps: any
+  ) => void;
   handleRemoveIndicator: (indicatorId: string) => void;
   handleSwitchIndicator: (indicatorId: string) => void;
   handleCreateState: CreateStateType;
@@ -50,7 +54,11 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
     return undefined;
   };
 
-  const handleAddIndicator = (indicatorClass: any, indicatorName: any, indicatorProps: any): any => {
+  const handleAddIndicator = (
+    indicatorClass: any,
+    indicatorName: any,
+    indicatorProps: any
+  ): any => {
     if (!chartX) return;
     chartX.addIndicator(indicatorClass, indicatorName, indicatorProps);
     chartX?.refresh?.();
@@ -70,7 +78,7 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
       const indicatorProps = {};
       handleAddIndicator(indicatorClass, indicatorType, indicatorProps);
     }
-  }
+  };
 
   const handleCreateState: CreateStateType = (state: IState) => {
     if (!chartX) return '';
@@ -87,7 +95,6 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
     chartX.mergeData?.({ ohlcv: newData });
   };
 
-
   return (
     <ChartContext.Provider
       value={{
@@ -102,7 +109,7 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
         handleRemoveIndicator,
         handleSwitchIndicator,
         handleCreateState,
-        handleUseState,
+        handleUseState
       }}
     >
       {children}
