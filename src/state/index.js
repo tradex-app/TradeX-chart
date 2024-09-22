@@ -214,7 +214,7 @@ export default class State {
    * @param {String|Object} state - state key or {id: "someID"} or {key: "stateKey"} or a state object
    * @returns {State|undefined} - chart state instance
    */
-  static use(chart, state) {
+  static use(chart, state=State.default) {
     let key = (State.has(chart, state)) ? state : 
       (State.has(chart, state?.key)) ? state.key : state
 
@@ -802,9 +802,9 @@ export default class State {
    * @param {Object} state 
    * @param {boolean} deepValidate - validate every entry rather than a sample
    * @param {boolean} isCrypto - validate time stamps against BTC genesis block
-   * @returns {State} - State instance
+   * @returns {State|undefined} - State instance
    */
-  create(state, deepValidate, isCrypto) {
+  create(state=State.default, deepValidate, isCrypto) {
     return State.create(state, deepValidate, isCrypto)
   }
 
@@ -876,6 +876,9 @@ export default class State {
     const errMsg = `TradeX-Chart id: ${this.#core.id} : cannot use supplied key or state`
     if (isString(key) && !State.has(key))
       return undefined
+    else if (key === undefined) {
+      key = State.default
+    }
     else if (!State.isValidConfig(key)) {
       this.#core.log(errMsg)
       return undefined

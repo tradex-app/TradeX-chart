@@ -50,6 +50,7 @@ export default class TradeXchart extends Tradex_chart {
   static #TALibWorkerReady = false
   /** @returns {string} - return TradeX Chart version number */
   static get version() { return TradeXchart.#version }
+  static get default() { return copyDeep(defaultConfig) }
   static get talibPromise() { return TradeXchart.#talibPromise }
   static get talibReady() { return TradeXchart.#talibReady }
   static get talibAwait() { return TradeXchart.#talibAwait }
@@ -135,9 +136,9 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {TradeXchart} TradeXchart
    * @memberof TradeXchart
    */
-  static create(cfg) {
+  static create(cfg=TradeXchart.default) {
 
-    let txCfg = copyDeep(defaultConfig)
+    let txCfg = TradeXchart.default
         // txCfg.talib = talib
         // txCfg.wasm = wasm
 
@@ -407,7 +408,7 @@ export default class TradeXchart extends Tradex_chart {
    * to fill in missing or required values
    * @param {object} cfg - chart configuration
    */
-  start(cfg={}) {
+  start(cfg=TradeXchart.default) {
     this.log(`${NAME} configuring...`)
 
     if (this.#ready) this.#MainPane.destroy()
