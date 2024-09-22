@@ -1,23 +1,22 @@
 'use client';
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
 import { IConfig, IIndicators, ITradeX, ThemeProps } from '../../../types'; // import from 'tradex-chart';
 import ColorsEnum from '../theme/colors';
 import { IChartOption, IIndicatorToolbar } from './utils/types';
+import { useChartContext } from './provider/ChartProvider';
 
 export interface IProps {
   config: IConfig;
   displayTitle: string;
   interval: string;
-  data: number[][];
+  initialData?: number[][];
   tradeData?: any;
   chartType?: IChartOption;
   rangeLimit?: number;
-  onchart: IIndicatorToolbar[];
+  onchart?: IIndicatorToolbar[];
   chartAccessor?: string;
   customIndicators?: IIndicators;
-  chartX: ITradeX;
-  setChart: (chart: ITradeX) => void;
   onRangeChange?: () => void;
 }
 
@@ -27,18 +26,17 @@ const TXChart: FC<IProps> = ({
   displayTitle,
   chartType,
   // data
-  data,
+  initialData = [],
   onchart = [],
   tradeData,
   // config
   chartAccessor = 'tradexChartContainer',
   customIndicators,
   onRangeChange,
-  // chart instantiation
-  chartX,
-  setChart
 }) => {
   const { theme } = useTheme();
+  const isChartLoadedRef = useRef(false);
+  const {chartX, setChartX} = useChartContext();
 
   // Register custom indicators to the chart
   const registerIndicators = (chart: ITradeX) => {
@@ -69,18 +67,15 @@ const TXChart: FC<IProps> = ({
   };
 
   const renderChart = () => {
+    if (isChartLoadedRef.current) return;
+
     try {
       const existingChart = document.querySelector(
         `#${chartAccessor} tradex-chart`
       ) as ITradeX;
 
-      if (existingChart) {
-        console.log('Existing chart found. Setting reference.');
-        // existingChart.remove();
-        setChart(existingChart);
-        return;
-      }
-
+      if(existingChart) return;
+      
       const combinedPrimary = tradeData ? [...onchart, ...tradeData] : onchart;
 
       const mount = document.querySelector(`#${chartAccessor}`);
@@ -95,12 +90,10 @@ const TXChart: FC<IProps> = ({
         trades: any;
         primary?: { name: string; type: string; data: number[] }[];
       } = {
-        ohlcv: data,
+        ohlcv: initialData,
         primary: combinedPrimary,
         trades: tradeData
       };
-
-      console.log('State prepared:', state);
 
       if (onRangeChange) {
         registerRangeChangeEvent(chart);
@@ -113,7 +106,6 @@ const TXChart: FC<IProps> = ({
           title: displayTitle,
           symbol: displayTitle,
           timeFrame: '1m',
-          //timeFrame: config.timeFrame,
           type: chartType,
           isLightTheme,
           state
@@ -125,8 +117,9 @@ const TXChart: FC<IProps> = ({
       if ((Object.keys(customIndicators || {}).length !== 0)) {
         registerIndicators(chart);
       }
-
-      setChart(chart);
+      isChartLoadedRef.current = true;
+      console.log("CHART", chart)
+      setChartX(chart);
     } catch (err) {
       console.error(`Failed to render chart: ${displayTitle}`, err);
     }
@@ -149,6 +142,7 @@ const TXChart: FC<IProps> = ({
 
   useEffect(() => {
     renderChart();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

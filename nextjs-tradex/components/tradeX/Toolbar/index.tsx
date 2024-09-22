@@ -4,7 +4,10 @@ import ChartTypeSwitch from './ChartTypeSwitch';
 import TokensDropdown from './TokensDropdown';
 import IndicatorDropdown from './IndicatorDropdown';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { IChartOption, IIndicatorToolbar } from '../utils/types';
+import { IChartOption, IIndicatorToolbar, IStatesToolbar } from '../utils/types';
+import StateDropdown from './StateDropdown';
+import { CreateState, PrintState } from './Buttons';
+import { ITradeX } from 'tradex-chart';
 
 const Toolbar = ({
   config,
@@ -14,6 +17,8 @@ const Toolbar = ({
   indicators,
   tokensList,
   selectedToken,
+  states,
+  onSelectState,
   onSelectIndicators,
   onSelectChart,
   onSelectToken,
@@ -23,17 +28,19 @@ const Toolbar = ({
   intervals: string[];
   selectedInterval: string;
   selectedChart: IChartOption;
-  indicators: IIndicatorToolbar[];
+  indicators?: IIndicatorToolbar[];
   tokensList: any[];
   selectedToken: string;
+  states?: IStatesToolbar[];
+  onSelectState: (value: any) => void;
   onSelectIndicators: (value: any) => void;
   onSelectChart: (value: IChartOption) => void;
   onSelectToken: (value: string) => void;
   onSelectInterval: (value: string) => void;
 }) => {
   return (
-    <div className="flex flex-row flex-grow mb-2">
-      <div className="flex flex-row gap-2">
+    <div className="flex flex-row flex-grow mb-2 items-center">
+      <div className="flex flex-row gap-2 items-center">
         {tokensList.length > 0 && (
           <TokensDropdown
             tokensList={tokensList}
@@ -57,9 +64,20 @@ const Toolbar = ({
             setValue={onSelectIndicators}
           />
         )}
-      </div>
 
-      <div className="flex justify-end pl-2">
+        {config?.indicators && (
+          <StateDropdown
+            states={states}
+            setValue={onSelectState}
+          />
+        )}
+       
+      </div>
+      <div className='pr-2'>
+      <CreateState key='createState'/>
+      </div>
+      <PrintState key='printState'/>
+      <div className="flex justify-end pl-2 items-center">
         {config?.typeSelector && (
           <ChartTypeSwitch
             items={CHART_OPTIONS}

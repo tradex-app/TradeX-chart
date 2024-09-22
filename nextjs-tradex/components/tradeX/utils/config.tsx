@@ -202,8 +202,8 @@ const getConfig = ({
       initialCnt: rangeLimit,
       limitFuture: rangeLimit,
       limitPast: rangeLimit,
-      minCandles: rangeLimit,
-      maxCandles: rangeLimit,
+      minCandles: rangeLimit/8,
+      maxCandles: rangeLimit*8,
       yAxisBounds: 0.3,
       center: false
     },

@@ -16,7 +16,12 @@ export const fetchOHLCVData = async (
   try {
     if (isLoading || !chart) return;
     const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${selectedInterval}&startTime=${start}&limit=${limit}`;
-    console.log(url);
+    
+    const date = new Date(start).toLocaleString()
+    console.log("Symbol", symbol);
+    console.log("Selected Interval", selectedInterval);
+    console.log("Start", date);
+    console.log("Limit", limit);
 
     try {
       fetch(url)
@@ -24,6 +29,7 @@ export const fetchOHLCVData = async (
         .then((d) => {
           // @ts-ignore
           chart.mergeData({ ohlcv: d });
+          console.log("End", new Date(d[d.length - 1][0]).toLocaleString());
         });
     } catch (e) {
       console.error(e);

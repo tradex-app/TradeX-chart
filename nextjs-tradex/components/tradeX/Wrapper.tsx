@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
-import useChart from './hooks/useChart';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { CHART_OPTIONS, DEFAULT_RANGE_LIMIT } from './utils';
 import { fetchOHLCVData, fetchTXData } from './fetchers';
 import FullScreenWrapper from '../FullScreen/FullScreenWrapper';
@@ -10,9 +9,10 @@ import Toolbar from './Toolbar';
 import { IIndicatorToolbar, ITokenChartProps } from './utils/types';
 import Chart from '@/components/tradeX/Chart';
 import { CUSTOM_INDICATORS } from '@/components/tradeX/indicators/availbleIndicators';
-import { ITradeX, ITradeData } from '../../../types';
-import { Chart as TXChart } from '../../../src'; // import 'tradex-chart';
+import { ITradeData } from '../../../types';
+import { Chart as TXChart } from '../../../src'; // import { Chart as TXChart } from 'tradex-chart';
 import { livePrice_Binance } from './utils/ws';
+import { useChartContext } from './provider/ChartProvider';
 
 
 // INSTANTIATE CHART MODULE
@@ -26,30 +26,43 @@ const TradingChart = (props: ITokenChartProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [tradeData, setTradeData] = useState<ITradeData[]>();
   const [selectedInterval, setSelectedInterval] = useState(config?.timeFrame);
+  const [indicators, setIndicators] = useState<IIndicatorToolbar[]>();
+  const [hasInitialFetch, setHasInitialFetch] = useState(false);
+  const wsRef = useRef<WebSocket>();
   const [selectedChartType, setSelectedChartType] = useState(
     defaults?.chartType || CHART_OPTIONS[0]
   );
-  const [indicators, setIndicators] = useState<IIndicatorToolbar[]>([
-    {
-      value: '',
-      label: '',
-      tooltip: ''
-    }
-  ]);
-  const [hasInitialFetch, setHasInitialFetch] = useState(false);
-  const [ws, setWs] = useState<WebSocket | null>(null);
-
   const {
     chartX,
-    setChartX: setChart,
-    data,
-    setData,
-    handleMergeData,
-    handleRemoveIndicator,
+    states,
+    setChartX,
+    setStates,
     handleAddIndicator,
+    handleCreateState,
     getIndicatorId,
-    resetData
-  } = useChart();
+  } = useChartContext();
+
+  const indicatorsEffectTriggered = useRef(false);
+
+  const handleSelectState = (stateID: string) => {
+    console.log('StateID', stateID);
+
+    if (stateID && states) {
+      const existingID = states.find(
+        (st) => st.value === stateID
+      );
+
+      if (existingID?.selected) {
+        console.log("CLOSE DROPDOWN")
+      } else {
+        setStates(
+          states.map((st) =>
+            st.value === stateID ? { ...st, selected: true } : { ...st, selected: false }
+          )
+        );
+      }
+    }
+  }
 
   const handleSelectIndicator = (indicatorValue: string) => {
 
@@ -115,6 +128,7 @@ const TradingChart = (props: ITokenChartProps) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chartX, hasInitialFetch]);
 
+
   // TOKEN LIST
   useEffect(() => {
     const fetchTokens = async () => {
@@ -127,68 +141,20 @@ const TradingChart = (props: ITokenChartProps) => {
       }
     };
     fetchTokens();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Transactions
-  useEffect(() => {
-    handleFetchTXData();
-  }, [handleFetchTXData]);
 
-  // Range History
-  useEffect(() => {
-    if (!chartX) return;
+  const initializeChart = useCallback(async () => {
+    if (!chartX || !symbol || !selectedInterval) return;
+    console.log("chartX", chartX)
+    console.log("Symbol:", symbol);
+    console.log("Selected Interval:", selectedInterval);
 
-    const registerRangeLimit = (chart: ITradeX) => {
-      function onRangeLimit(e: any, x: string) {
-        const range = e.chart.range;
-        const limit = 100;
-        const start = range.timeStart - range.interval * limit;
-        const end = range.timeEnd;
-        const interval = range.intervalStr;
-
-        if (x === 'past') {
-          e.chart.progress.start();
-          fetchOHLCVData(
-            e.chart,
-            start,
-            limit,
-            symbol,
-            selectedInterval,
-            isLoading
-          );
-        }
-      }
-
-      if (chart.on) {
-        fetchInitialHistory();
-        chart.on('range_limitPast', (e) => onRangeLimit(e, 'past'));
-      }
-    };
-
-    registerRangeLimit(chartX);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartX, selectedInterval]);
-
-  // WS
-  useEffect(() => {
-    if (symbol && selectedInterval && chartX) {
-      livePrice_Binance(chartX, symbol, selectedInterval, setWs);
-    }
-
-    return () => {
-      if (ws) {
-        ws.close();
-      }
-    };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [symbol, selectedInterval, chartX]);
-
-  // Indicators
-  useEffect(() => {
-    if (!chartX || !chartX?.indicatorClasses) return;
+    if (indicatorsEffectTriggered.current || !chartX || !chartX?.indicatorClasses) return;
+    indicatorsEffectTriggered.current = true;
     
     const registeredIndicators = chartX.indicatorClasses;
-    // console.log("registeredIndicators", registeredIndicators);
 
     const mappedRegisteredIndicators = Object.entries(registeredIndicators).map(([key, IndClass]) => ({
       label: (IndClass as any).nameShort || key,
@@ -196,9 +162,66 @@ const TradingChart = (props: ITokenChartProps) => {
       tooltip: (IndClass as any).nameLong || key,
       selected: false
     }));
-    // console.log("Mapped Registered Indicators:", mappedRegisteredIndicators);
     setIndicators(mappedRegisteredIndicators);
-  }, [chartX]);
+
+    setIsLoading(true);
+    try {
+      // Fetch transactions
+      const tx = await fetchTXData({
+        tf: selectedInterval,
+        token: symbol,
+        to: 1000
+      });
+      setTradeData(tx);
+
+      // Fetch initial history
+      await fetchOHLCVData(
+        chartX,
+        config?.range.startTS,
+        config?.range.limitPast,
+        symbol,
+        selectedInterval,
+        isLoading
+      );
+      // Register range limit
+      chartX?.on?.('range_limitPast', (e: any) => {
+        const range = e.chart.range;
+        const limit = 100;
+        const start = range.timeStart - range.interval * limit;
+        fetchOHLCVData(
+          e.chart,
+          start,
+          limit,
+          symbol,
+          selectedInterval,
+          isLoading
+        );
+      })
+
+      // Initialize WebSocket
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+      wsRef.current = livePrice_Binance(chartX, symbol, selectedInterval);
+
+      setHasInitialFetch(true);
+    } catch (error) {
+      console.error('Error initializing chart:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chartX, symbol, selectedInterval]);
+
+
+  useEffect(() => {
+    if (chartX && symbol && selectedInterval && !hasInitialFetch) {
+      initializeChart();
+    }
+  }, [chartX, symbol, selectedInterval, hasInitialFetch, initializeChart]);
+
+
+
 
   return (
     <FullScreenWrapper>
@@ -216,11 +239,12 @@ const TradingChart = (props: ITokenChartProps) => {
                 tokensList={tokensList}
                 selectedToken={symbol}
                 selectedChart={selectedChartType}
+                states={states}
+                onSelectState={handleSelectState}
                 onSelectIndicators={handleSelectIndicator}
                 onSelectChart={setSelectedChartType}
                 onSelectToken={handleTokenChange}
                 onSelectInterval={(value: React.SetStateAction<string>) => {
-                  setData([]);
                   setSelectedInterval(value);
                   setHasInitialFetch(false);
                 }}
@@ -232,19 +256,16 @@ const TradingChart = (props: ITokenChartProps) => {
               </div>
             )}
           </div>
-          <div className="flex flex-grow w-full h-[600px]" key={symbol}>
+          <div className="flex flex-grow w-full h-[600px]">
             <Chart
               config={config}
               displayTitle={symbol}
               interval={selectedInterval}
               chartType={selectedChartType}
               rangeLimit={DEFAULT_RANGE_LIMIT}
-              data={data}
               onchart={indicators}
               tradeData={tradeData}
               customIndicators={CUSTOM_INDICATORS}
-              chartX={chartX}
-              setChart={setChart}
             />
           </div>
         </div>

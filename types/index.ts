@@ -4,6 +4,8 @@ export enum ThemeProps {
 }
 
 export interface ITradeX extends HTMLElement {
+  range: any;
+  indicatorClasses: ()=> string[];
   stream: any;
   Indicators?: { [key: string]: unknown }[];
   theme?: { setProperty: (property: ThemeProps, value: any) => void };
@@ -14,7 +16,8 @@ export interface ITradeX extends HTMLElement {
   expunge?: () => void;
   refresh?: () => void;
   state: {
-    create: (state: IState) => string;
+    list:()=> IState[];
+    create: (state: IState | undefined) => string;
     use: (id: string) => void;
   };
   addIndicator: (

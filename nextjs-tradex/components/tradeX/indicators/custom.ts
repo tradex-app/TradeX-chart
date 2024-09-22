@@ -1,4 +1,4 @@
-// custom-indicator.js
+// @ts-nocheck
 // proof of concept for user defined indicators
 
 // import { Indicator } from "tradex-chart"

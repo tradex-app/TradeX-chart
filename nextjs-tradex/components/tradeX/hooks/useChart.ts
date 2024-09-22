@@ -1,6 +1,10 @@
 import { useState } from 'react';
-import { IIndicator } from '../../../../types'; // import from 'tradex-chart';
-import emptyChart from './emptyChart';
+import { IIndicator, ITradeX } from '../../../../types'; // import from 'tradex-chart';
+import { IStatesToolbar } from '../utils/types';
+
+
+/// DEPRECATED IN FAVOR OF CONTEXT
+
 
 type CreateStateType = (state: IState) => string;
 
@@ -11,24 +15,22 @@ interface IState {
   };
   candleType?: string;
   type?: string;
-  data: number[];
   primary: IIndicator[];
 }
 
 const useChart = () => {
-  const [chartX, setChartX] = useState<any>(emptyChart);
-
-  const [data, setData] = useState<number[][]>([]);
+  const [chartX, setChartX] = useState<ITradeX>();
+  const [states, setStates] = useState<IStatesToolbar[]>()
 
   const getIndicators = () => {
     if (!chartX) return;
-    console.log(chartX.Indicators)
+    console.log(chartX.Indicators);
 
-    return Object.values(chartX.Indicators);
+    return chartX.Indicators ? Object.values(chartX.Indicators) : [];
   };
 
   const getIndicatorId = (indicatorType: string) => {
-    const chartIndicators = getIndicators() as Record<string, unknown>[];
+    const chartIndicators = getIndicators();
     if (chartIndicators && chartIndicators?.length > 0) {
       Object.keys(chartIndicators[0]).find((key) =>
         key.toLowerCase().includes(indicatorType.toLowerCase())
@@ -40,18 +42,17 @@ const useChart = () => {
     if (!chartX) return;
 
     chartX.addIndicator(indicatorClass, indicatorName, indicatorProps);
-
-    chartX.refresh();
-  };
+    chartX?.refresh?.();
+    };
 
   const handleRemoveIndicator = (indicatorId: string) => {
     if (!chartX) return;
     chartX.removeIndicator(indicatorId);
   };
 
-  const handleCreateState: CreateStateType = (state) => {
-    if (!chartX) return;
-    return chartX.state.create(state);
+  const handleCreateState: CreateStateType = (state: IState) => {
+    if (!chartX) return '';
+    return chartX.state.create(undefined);
   };
 
   const handleUseState = (id: string) => {
@@ -59,31 +60,36 @@ const useChart = () => {
     chartX.state.use(id);
   };
 
-  const handleMergeData = (data: number[][]) => {
+  const handleMergeData = (newData: number[]) => {
     if (!chartX) return;
-    chartX.mergeData({ ohlcv: data });
+    chartX.mergeData?.({ ohlcv: newData });
   };
 
-  const resetData = () => {
+  // const resetData = () => {
+  //   if (!chartX) return false;
+  //   chartX?.expunge();
+  //   return true;
+  // };
+
+  const listStates = () => {
     if (!chartX) return false;
-    chartX.expunge();
-    return true;
-  };
+    return chartX.state.list();
+  }
 
   return {
     chartX,
     setChartX,
-    // data
-    data,
-    setData,
     handleMergeData,
-    resetData,
+    // resetData,
     // indicators
     getIndicatorId,
     getIndicators,
     handleAddIndicator,
     handleRemoveIndicator,
     // state
+    states,
+    setStates,
+    listStates,
     handleCreateState,
     handleUseState
   };

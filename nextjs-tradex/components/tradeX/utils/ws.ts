@@ -4,7 +4,6 @@ export const livePrice_Binance = (
     chart: ITradeX,
     symbol: string,
     interval: string,
-    setWs: any
   ) => {
     const newWs = new WebSocket(
       `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`
@@ -41,5 +40,5 @@ export const livePrice_Binance = (
       console.log('WebSocket connection closed');
     };
 
-    setWs(newWs);
+    return newWs;
   };
