@@ -6,8 +6,7 @@ import IndicatorDropdown from './IndicatorDropdown';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { IChartOption, IIndicatorToolbar, IStatesToolbar } from '../utils/types';
 import StateDropdown from './StateDropdown';
-import { CreateState, PrintState } from './Buttons';
-import { ITradeX } from 'tradex-chart';
+import { PrintState } from './Buttons';
 
 const Toolbar = ({
   config,
@@ -72,9 +71,6 @@ const Toolbar = ({
           />
         )}
        
-      </div>
-      <div className='pr-2'>
-      <CreateState key='createState'/>
       </div>
       <PrintState key='printState'/>
       <div className="flex justify-end pl-2 items-center">

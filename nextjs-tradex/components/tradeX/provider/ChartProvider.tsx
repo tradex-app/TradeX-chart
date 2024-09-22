@@ -24,6 +24,7 @@ interface ChartContextProps {
   getIndicators: () => any[];
   handleAddIndicator: (indicatorClass: any, indicatorName: any, indicatorProps: any) => void;
   handleRemoveIndicator: (indicatorId: string) => void;
+  handleSwitchIndicator: (indicatorId: string) => void;
   handleCreateState: CreateStateType;
   handleUseState: (id: string) => void;
 }
@@ -60,6 +61,17 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
     chartX.removeIndicator(indicatorId);
   };
 
+  const handleSwitchIndicator = (indicatorType: string) => {
+    const id = getIndicatorId(indicatorType);
+    if (id) {
+      handleRemoveIndicator(id);
+    } else {
+      const indicatorClass = indicatorType;
+      const indicatorProps = {};
+      handleAddIndicator(indicatorClass, indicatorType, indicatorProps);
+    }
+  }
+
   const handleCreateState: CreateStateType = (state: IState) => {
     if (!chartX) return '';
     return chartX.state.create(undefined);
@@ -88,6 +100,7 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
         getIndicators,
         handleAddIndicator,
         handleRemoveIndicator,
+        handleSwitchIndicator,
         handleCreateState,
         handleUseState,
       }}

@@ -15,6 +15,9 @@ import {
 import { useState } from 'react';
 import { ChevronsUpDown } from 'lucide-react';
 import { IIndicatorToolbar } from '../utils/types';
+import { useChartContext } from '../provider/ChartProvider';
+import { faChartSimple } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface IndDropdownProps {
   indicators?: IIndicatorToolbar[];
@@ -26,9 +29,15 @@ const IndicatorDropdown: React.FC<IndDropdownProps> = ({
   setValue
 }) => {
   const [open, setOpen] = useState(false);
+  const{handleSwitchIndicator} =  useChartContext();
 
-  // Safeguard to ensure indicators is an array
-  const safeIndicators = Array.isArray(indicators) ? indicators : [];
+  // List of indicators to be filtered out
+  const filterOutIndicators = ['VOL']; // Add or remove indicators as needed
+
+  // Safeguard to ensure indicators is an array and filter out unwanted indicators
+  const safeIndicators = Array.isArray(indicators) 
+    ? indicators.filter(ind => !filterOutIndicators.includes(ind.value))
+    : [];
 
   return (
     <div className="flex items-center space-x-4">
@@ -66,6 +75,15 @@ const IndicatorDropdown: React.FC<IndDropdownProps> = ({
           </Command>
         </PopoverContent>
       </Popover>)}
+      <Button 
+      variant='secondary' 
+      size='toolbar' 
+      onClick={() => {
+        handleSwitchIndicator('VOL')
+      }}
+    >
+      <FontAwesomeIcon icon={faChartSimple} className="mr-2" /> Volume
+    </Button>
     </div>
   );
 };
