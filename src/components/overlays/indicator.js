@@ -151,6 +151,7 @@ export default class Indicator extends Overlay {
     this.#range = this.core.range
     this.legendName = overlay?.legendName || overlay?.name || this?.shortName
     this.#legendVisibility = (isBoolean(overlay?.legendVisibility)) ? overlay.legendVisibility : true
+    this.#gapFill = (isBoolean(overlay?.gapFill)) ? overlay.gapFill : true
     this.#palette = palette
     this.style = (isObject(overlay?.settings?.style)) ? 
     {...this.constructor.defaultStyle, ...overlay.settings.style} : 

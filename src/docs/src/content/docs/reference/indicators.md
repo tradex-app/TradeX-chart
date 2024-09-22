@@ -92,7 +92,8 @@ myChart.addIndicator(
     settings: { 
       style: {output: {colour: {value: "#00f"}, width: {value: 3}, dash: {value: "4,4"}}}, 
       input: {timePeriod: {value: 20}} 
-    } 
+    },
+    gapFill: true // default, optional
   });
 ````
 
