@@ -5,9 +5,10 @@
 
 import { SHORTNAME } from "../definitions/core";
 import State from "../state"
-import { isFunction, isObject } from "../utils/typeChecks";
+import { isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isString } from "../utils/typeChecks";
 import { uid, xMap } from "../utils/utilities";
 import TradeXchart from "../core";
+import { limit } from "../utils/number";
 
 export default class DataSource {
 
@@ -88,7 +89,7 @@ export default class DataSource {
   #ticker
   #core
   #timeFrames = {}
-  #timeFrameActive
+  #timeFrameCurr
 
   #waiting = false
 
@@ -109,13 +110,12 @@ export default class DataSource {
   constructor( cfg ) {
 
     this.#cnt = ++DataSource.#sourceCnt
-    this.#symbol = cfg.symbol
-    this.#id = uid(`${SHORTNAME}_dataSource_${cfg.symbol}`)
-    // convert time frames list into object {1m: 60000}
-    this.#timeFrames = cfg.timeFrames
-    this.#timeFrameActive = cfg.timeFrameInit
-    this.#history = cfg.history
-    this.#ticker = cfg.ticker
+    this.symbolSet(cfg.symbol)
+    this.#id = uid(`${SHORTNAME}_dataSource_${this.#symbol}`)
+    this.timeFramesAdd(cfg.timeFrames)
+    this.timeFrameUse(cfg.timeFrameInit)
+    this.historyAdd(cfg.history)
+    this.tickerAdd(cfg.ticker)
     this.#state = cfg.state
     this.#core = cfg.core
 
@@ -130,8 +130,29 @@ export default class DataSource {
   get timeFrameStr() { return }
   get timeFrames() { return this.#timeFrames }
 
-  useTimeFrame(tf) {
+  symbolSet(s) {
+    if (!isString(s)) 
+      throw new Error(`TODO: DataSource : symbol invalid`)
+    this.#symbol = s
+  }
 
+  timeFramesAdd(t) {
+    if (!isArrayOfType(t, "number")) 
+      throw new Error(`TODO: DataSource : time frames invalid`)
+
+    // convert time frames list into object {1m: 60000}
+    
+    this.#timeFrames = [...t]
+  }
+
+  timeFrameUse(tf) {
+    // TODO: check if time frame string and look up number
+    tf *= 1
+    if (!isInteger(tf))
+      throw new Error(`TODO: DataSource : time frames invalid`)
+
+    tf = limit(tf, 1000, TIMESCALES.YEARS10)
+    this.#timeFrameCurr = tf
   }
 
   tickerAdd(t) {
