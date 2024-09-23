@@ -31,37 +31,9 @@ const TradingChart = (props: ITokenChartProps) => {
   const [selectedChartType, setSelectedChartType] = useState(
     defaults?.chartType || CHART_OPTIONS[0]
   );
-  const {
-    chartX,
-    states,
-    setChartX,
-    setStates,
-    handleAddIndicator,
-    handleCreateState,
-    getIndicatorId
-  } = useChartContext();
+  const { chartX, handleAddIndicator } = useChartContext();
 
   const indicatorsEffectTriggered = useRef(false);
-
-  const handleSelectState = (stateID: string) => {
-    console.log('StateID', stateID);
-
-    if (stateID && states) {
-      const existingID = states.find((st) => st.value === stateID);
-
-      if (existingID?.selected) {
-        console.log('CLOSE DROPDOWN');
-      } else {
-        setStates(
-          states.map((st) =>
-            st.value === stateID
-              ? { ...st, selected: true }
-              : { ...st, selected: false }
-          )
-        );
-      }
-    }
-  };
 
   const handleSelectIndicator = (indicatorValue: string) => {
     const indicatorClass = indicatorValue;
@@ -237,8 +209,6 @@ const TradingChart = (props: ITokenChartProps) => {
                 tokensList={tokensList}
                 selectedToken={symbol}
                 selectedChart={selectedChartType}
-                states={states}
-                onSelectState={handleSelectState}
                 onSelectIndicators={handleSelectIndicator}
                 onSelectChart={setSelectedChartType}
                 onSelectToken={handleTokenChange}

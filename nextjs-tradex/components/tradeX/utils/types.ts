@@ -49,7 +49,6 @@ export interface IIndicatorToolbar {
 export interface IStatesToolbar {
   label: string;
   value: string;
-  tooltip: string;
   selected: boolean;
 }
 

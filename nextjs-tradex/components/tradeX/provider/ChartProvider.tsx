@@ -1,24 +1,17 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { IIndicator, ITradeX } from '../../../../types';
-import { IStatesToolbar } from '../utils/types';
-
-type CreateStateType = (state: IState) => string;
-
-interface IState {
-  chart?: {
-    type: string;
-    candleType: string;
-  };
-  candleType?: string;
-  type?: string;
-  primary: IIndicator[];
-}
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect
+} from 'react';
+import { IState, ITradeX } from '../../../../types';
 
 interface ChartContextProps {
   chartX: ITradeX | undefined;
   setChartX: React.Dispatch<React.SetStateAction<ITradeX | undefined>>;
-  states: IStatesToolbar[] | undefined;
-  setStates: React.Dispatch<React.SetStateAction<IStatesToolbar[] | undefined>>;
+  states: IState[] | undefined;
+  setStates: React.Dispatch<React.SetStateAction<IState[] | undefined>>;
   handleMergeData: (newData: number[]) => void;
   getIndicatorId: (indicatorType: string) => string | undefined;
   getIndicators: () => any[];
@@ -29,15 +22,13 @@ interface ChartContextProps {
   ) => void;
   handleRemoveIndicator: (indicatorId: string) => void;
   handleSwitchIndicator: (indicatorId: string) => void;
-  handleCreateState: CreateStateType;
-  handleUseState: (id: string) => void;
 }
 
 const ChartContext = createContext<ChartContextProps | undefined>(undefined);
 
 export const ChartProvider = ({ children }: { children: ReactNode }) => {
   const [chartX, setChartX] = useState<ITradeX>();
-  const [states, setStates] = useState<IStatesToolbar[]>();
+  const [states, setStates] = useState<IState[]>();
 
   const getIndicators = () => {
     if (!chartX) return [];
@@ -80,16 +71,6 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const handleCreateState: CreateStateType = (state: IState) => {
-    if (!chartX) return '';
-    return chartX.state.create(undefined);
-  };
-
-  const handleUseState = (id: string) => {
-    if (!chartX) return;
-    chartX.state.use(id);
-  };
-
   const handleMergeData = (newData: number[]) => {
     if (!chartX) return;
     chartX.mergeData?.({ ohlcv: newData });
@@ -107,9 +88,7 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
         getIndicators,
         handleAddIndicator,
         handleRemoveIndicator,
-        handleSwitchIndicator,
-        handleCreateState,
-        handleUseState
+        handleSwitchIndicator
       }}
     >
       {children}
@@ -117,7 +96,6 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Custom hook for consuming the context
 export const useChartContext = () => {
   const context = useContext(ChartContext);
   if (!context) {

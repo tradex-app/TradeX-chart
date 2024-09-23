@@ -20,8 +20,6 @@ const Toolbar = ({
   indicators,
   tokensList,
   selectedToken,
-  states,
-  onSelectState,
   onSelectIndicators,
   onSelectChart,
   onSelectToken,
@@ -34,8 +32,6 @@ const Toolbar = ({
   indicators?: IIndicatorToolbar[];
   tokensList: any[];
   selectedToken: string;
-  states?: IStatesToolbar[];
-  onSelectState: (value: any) => void;
   onSelectIndicators: (value: any) => void;
   onSelectChart: (value: IChartOption) => void;
   onSelectToken: (value: string) => void;
@@ -68,9 +64,7 @@ const Toolbar = ({
           />
         )}
 
-        {config?.indicators && (
-          <StateDropdown states={states} setValue={onSelectState} />
-        )}
+        {config?.states && <StateDropdown />}
       </div>
       <PrintState key="printState" />
       <div className="flex justify-end pl-2 items-center">

@@ -1,11 +1,11 @@
 export enum ThemeProps {
-  ChartGridColour = "chart.GridColour",
-  CandleType = "candle.Type",
+  ChartGridColour = 'chart.GridColour',
+  CandleType = 'candle.Type',
 }
 
 export interface ITradeX extends HTMLElement {
   range: any;
-  indicatorClasses: ()=> string[];
+  indicatorClasses: () => string[];
   stream: any;
   Indicators?: { [key: string]: unknown }[];
   theme?: { setProperty: (property: ThemeProps, value: any) => void };
@@ -16,9 +16,9 @@ export interface ITradeX extends HTMLElement {
   expunge?: () => void;
   refresh?: () => void;
   state: {
-    list:()=> IState[];
-    create: (state: IState | undefined) => string;
-    use: (id: string) => void;
+    list: () => IState[];
+    create: (state: IState | string | undefined) => IState;
+    use: (state: IState | string | undefined) => IState;
   };
   addIndicator: (
     value: string,
@@ -103,7 +103,7 @@ export interface IndicatorDefinition {
 export interface IIndicator {
   id: string;
   name: string;
-  event: "addIndicator";
+  event: 'addIndicator';
   ind: unknown;
   offChart?: boolean;
   customSettings?: {
@@ -123,7 +123,7 @@ export interface IIndicators {
 export interface ITradeData {
   name: string;
   type: string;
-  settings: { "z-index": number; legend: boolean };
+  settings: { 'z-index': number; legend: boolean };
   data: {
     [key: string]: {
       timestamp: number;
@@ -182,7 +182,7 @@ export interface Canvas {
   [key: string]: (...args: any[]) => any;
 }
 
-export type ChartType = "area" | "candle_solid";
+export type ChartType = 'area' | 'candle_solid';
 
 export type YAXIS_TYPES = {
   LINEAR: string;
@@ -269,8 +269,8 @@ export interface IConfig {
   };
   state: IState | {};
   chart: {
-    name: "Primary" | "Secondary";
-    type: "candles";
+    name: 'Primary' | 'Secondary';
+    type: 'candles';
     candleType: ChartType;
     indexed: boolean;
     data: [];

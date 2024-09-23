@@ -12,68 +12,91 @@ import {
   PopoverContent,
   PopoverTrigger
 } from '@/components/ui/popover';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { IStatesToolbar } from '../utils/types';
+import { useChartContext } from '../provider/ChartProvider';
 
-interface StateDropdownProps {
-  states?: IStatesToolbar[];
-  setValue: (indicator: string) => void;
-}
-
-const StateDropdown: React.FC<StateDropdownProps> = ({
-  states = [],
-  setValue
-}) => {
+const StateDropdown = () => {
   const [open, setOpen] = useState(false);
+  const { states, setStates, chartX } = useChartContext();
+  const [toolbarStates, setToolbarStates] = useState<IStatesToolbar[]>([]);
 
-  const safeStates = Array.isArray(states) ? states : [];
+  useEffect(() => {
+    if (states) {
+      const mappedStates = states.map((state, index) => ({
+        label: index.toString(),
+        value: state.key,
+        selected: false
+      }));
+      setToolbarStates(mappedStates);
+    }
+  }, [states]);
+
+  const handleSelectState = (stateKey: string) => {
+    if (chartX) {
+      chartX.state.use(stateKey);
+      console.log(stateKey);
+      const updatedStates = toolbarStates.map((state) =>
+        state.value === stateKey
+          ? { ...state, selected: !state.selected }
+          : state
+      );
+      setToolbarStates(updatedStates);
+    }
+  };
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (newOpen && chartX) {
+      const st = chartX.state.list();
+      setStates(st);
+    }
+    setOpen(newOpen);
+  };
 
   return (
-    <div className="flex items-center space-x-4">
-      {safeStates.length > 0 && (
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              size={'toolbar'}
-              role="combobox"
-              aria-expanded={open}
-              className="w-[200px] justify-between"
-            >
-              Select indicator...
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0">
-            <Command>
-              <CommandInput placeholder="Search indicator..." />
-              <CommandEmpty>No ind found.</CommandEmpty>
-              <CommandGroup>
-                {states.map((state) => (
-                  <CommandItem
-                    key={state.value}
-                    value={state.value}
-                    onSelect={() => {
-                      setValue(state.value);
-                      setOpen(false);
-                    }}
-                  >
-                    <Check
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        state.selected ? 'opacity-100' : 'opacity-0'
-                      )}
-                    />
-                    {state.label}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
-          </PopoverContent>
-        </Popover>
-      )}
+    <div className="flex items-center mr-2">
+      <Popover open={open} onOpenChange={handleOpenChange}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            size={'toolbar'}
+            role="combobox"
+            aria-expanded={open}
+            className="w-[150px] justify-between"
+          >
+            Select state...
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command>
+            <CommandInput placeholder="Search state..." />
+            <CommandEmpty>No state found.</CommandEmpty>
+            <CommandGroup>
+              {toolbarStates.map((st) => (
+                <CommandItem
+                  key={st.value}
+                  value={st.value}
+                  onSelect={() => {
+                    handleSelectState(st.value);
+                    setOpen(false);
+                  }}
+                >
+                  <Check
+                    className={cn(
+                      'mr-2 h-4 w-4',
+                      st.selected ? 'opacity-100' : 'opacity-0'
+                    )}
+                  />
+                  {st.label}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };
