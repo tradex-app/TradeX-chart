@@ -13,6 +13,7 @@ import { ITradeData } from '../../../types';
 import { Chart as TXChart } from '../../../src'; // import { Chart as TXChart } from 'tradex-chart';
 import { livePrice_Binance } from './utils/ws';
 import { useChartContext } from './provider/ChartProvider';
+import { useTheme } from 'next-themes';
 
 // INSTANTIATE CHART MODULE
 TXChart; // DO NOT REMOVE THIS
@@ -27,11 +28,14 @@ const TradingChart = (props: ITokenChartProps) => {
   const [selectedInterval, setSelectedInterval] = useState(config?.timeFrame);
   const [indicators, setIndicators] = useState<IIndicatorToolbar[]>();
   const [hasInitialFetch, setHasInitialFetch] = useState(false);
+  const [multipleAsset, setMultipleAsset] = useState(false);
   const wsRef = useRef<WebSocket>();
   const [selectedChartType, setSelectedChartType] = useState(
     defaults?.chartType || CHART_OPTIONS[0]
   );
   const { chartX, handleAddIndicator } = useChartContext();
+  const { theme } = useTheme();
+  const isLightTheme = theme === 'light';
 
   const indicatorsEffectTriggered = useRef(false);
 
@@ -57,6 +61,10 @@ const TradingChart = (props: ITokenChartProps) => {
 
   const handleTokenChange = (value: React.SetStateAction<string>) => {
     const upperCaseValue = (value as string).toUpperCase();
+    if (hasInitialFetch && !multipleAsset) {
+      setMultipleAsset(true);
+      initializeAsset();
+    }
     setSymbol(upperCaseValue);
     setHasInitialFetch(false);
   };
@@ -112,8 +120,76 @@ const TradingChart = (props: ITokenChartProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const initializeAsset = useCallback(async () => {
+    console.log('initializeAsset function called');
+    if (!chartX || !symbol || !selectedInterval || !multipleAsset) return;
+    console.log('initializeAsset');
+    console.log('chartX', chartX);
+    console.log('Symbol:', symbol);
+    console.log('Selected Interval:', selectedInterval);
+
+    const newState = {
+      ...config,
+      title: symbol,
+      symbol: symbol,
+      timeFrame: selectedInterval,
+      type: selectedChartType,
+      isLightTheme,
+      state: []
+    };
+    chartX.state.use(newState);
+
+    setIsLoading(true);
+    try {
+      // Fetch transactions
+      const tx = await fetchTXData({
+        tf: selectedInterval,
+        token: symbol,
+        to: 1000
+      });
+      setTradeData(tx);
+
+      // Fetch initial history
+      await fetchOHLCVData(
+        chartX,
+        config?.range.startTS,
+        config?.range.limitPast,
+        symbol,
+        selectedInterval,
+        isLoading
+      );
+      // Register range limit
+      chartX?.on?.('range_limitPast', (e: any) => {
+        const range = e.chart.range;
+        const limit = 100;
+        const start = range.timeStart - range.interval * limit;
+        fetchOHLCVData(
+          e.chart,
+          start,
+          limit,
+          symbol,
+          selectedInterval,
+          isLoading
+        );
+      });
+
+      // Initialize WebSocket
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+      wsRef.current = livePrice_Binance(chartX, symbol, selectedInterval);
+
+      setHasInitialFetch(true);
+    } catch (error) {
+      console.error('Error initializing chart:', error);
+    } finally {
+      setIsLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chartX, symbol, selectedInterval]);
+
   const initializeChart = useCallback(async () => {
-    if (!chartX || !symbol || !selectedInterval) return;
+    if (!chartX || !symbol || !selectedInterval || multipleAsset) return;
     console.log('chartX', chartX);
     console.log('Symbol:', symbol);
     console.log('Selected Interval:', selectedInterval);
@@ -188,10 +264,30 @@ const TradingChart = (props: ITokenChartProps) => {
   }, [chartX, symbol, selectedInterval]);
 
   useEffect(() => {
-    if (chartX && symbol && selectedInterval && !hasInitialFetch) {
+    if (
+      chartX &&
+      symbol &&
+      selectedInterval &&
+      !hasInitialFetch &&
+      !multipleAsset
+    ) {
       initializeChart();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chartX, symbol, selectedInterval, hasInitialFetch, initializeChart]);
+
+  useEffect(() => {
+    if (
+      chartX &&
+      symbol &&
+      selectedInterval &&
+      !hasInitialFetch &&
+      multipleAsset
+    ) {
+      initializeAsset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chartX, symbol, selectedInterval, hasInitialFetch, initializeAsset]);
 
   return (
     <FullScreenWrapper>
