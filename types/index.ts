@@ -16,6 +16,7 @@ export interface ITradeX extends HTMLElement {
   expunge?: () => void;
   refresh?: () => void;
   state: {
+    key: string;
     list: () => IState[];
     create: (state: IState | string | undefined) => IState;
     use: (state: IState | string | undefined) => IState;

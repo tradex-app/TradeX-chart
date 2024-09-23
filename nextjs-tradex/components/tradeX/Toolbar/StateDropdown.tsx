@@ -28,11 +28,11 @@ const StateDropdown = () => {
       const mappedStates = states.map((state, index) => ({
         label: index.toString(),
         value: state.key,
-        selected: false
+        selected: state.key === chartX?.state.key
       }));
       setToolbarStates(mappedStates);
     }
-  }, [states]);
+  }, [chartX?.state.key, states]);
 
   const handleSelectState = (stateKey: string) => {
     if (chartX) {
