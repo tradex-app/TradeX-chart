@@ -182,7 +182,7 @@ export default class Chart extends Component{
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   set title(t) { this.setTitle(t) }
-  get title() { return `${this.#titleStr} : ${this.range.timeFrame} : ` }
+  get title() { return `${this.#titleStr} : ${this.range.timeFrame} :` }
   get type() { return this.#type }
   get status() { return this.#status }
   get collapsed() { return this.#collapsed }
@@ -451,7 +451,7 @@ export default class Chart extends Component{
   }
 
   onTimeframeSet() {
-    let title = `${this.title} : ${this.range.timeFrame} : `
+    let title = `${this.#titleStr}`
     chartLegend.title = title
     this.setTitle(title)
   }

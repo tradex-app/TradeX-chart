@@ -60,7 +60,7 @@ template.innerHTML = `
 }
 .legend dl {
   display: inline; 
-  margin: 0 0 0 -1em;
+  margin: 0;
   overflow: hidden;
 }
 .legend dl:first-child,
