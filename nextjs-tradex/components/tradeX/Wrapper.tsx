@@ -63,47 +63,32 @@ const TradingChart = (props: ITokenChartProps) => {
     const upperCaseValue = (value as string).toUpperCase();
     if (hasInitialFetch && !multipleAsset) {
       setMultipleAsset(true);
+      setSymbol(upperCaseValue);
       initializeAsset();
     }
-    setSymbol(upperCaseValue);
-    setHasInitialFetch(false);
   };
 
-  const handleFetchTXData = useCallback(async () => {
-    if (!symbol || !selectedInterval) return;
-    try {
-      const tx = await fetchTXData({
-        tf: selectedInterval,
-        token: symbol,
-        to: 1000
-      });
-      setTradeData(tx);
-    } catch (error) {
-      console.error('Error fetching TX data:', error);
+  const handlechangeTimeframe = (value: React.SetStateAction<string>) => {
+    if (hasInitialFetch && !multipleAsset) {
+      setMultipleAsset(true);
+      setSelectedInterval(value);
+      initializeAsset();
     }
-  }, [symbol, selectedInterval]);
+  };
 
-  const fetchInitialHistory = useCallback(async () => {
-    if (!chartX || !symbol || !selectedInterval || hasInitialFetch) return;
-    setIsLoading(true);
-
-    try {
-      fetchOHLCVData(
-        chartX,
-        config?.range.startTS,
-        config?.range.limitPast,
-        symbol,
-        selectedInterval,
-        isLoading
-      );
-      setHasInitialFetch(true);
-    } catch (error) {
-      console.error('Error fetching initial Binance data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartX, hasInitialFetch]);
+  // const handleFetchTXData = useCallback(async () => {
+  //   if (!symbol || !selectedInterval) return;
+  //   try {
+  //     const tx = await fetchTXData({
+  //       tf: selectedInterval,
+  //       token: symbol,
+  //       to: 1000
+  //     });
+  //     setTradeData(tx);
+  //   } catch (error) {
+  //     console.error('Error fetching TX data:', error);
+  //   }
+  // }, [symbol, selectedInterval]);
 
   // TOKEN LIST
   useEffect(() => {
@@ -121,108 +106,63 @@ const TradingChart = (props: ITokenChartProps) => {
   }, []);
 
   const initializeAsset = useCallback(async () => {
-    console.log('initializeAsset function called');
-    if (!chartX || !symbol || !selectedInterval || !multipleAsset) return;
-    console.log('initializeAsset');
+    if (!chartX || !symbol || !selectedInterval) return;
+    console.log('initializeChartOrAsset');
     console.log('chartX', chartX);
     console.log('Symbol:', symbol);
     console.log('Selected Interval:', selectedInterval);
 
-    const newState = {
-      ...config,
-      title: symbol,
-      symbol: symbol,
-      timeFrame: selectedInterval,
-      type: selectedChartType,
-      isLightTheme,
-      state: []
-    };
-    chartX.state.use(newState);
+    if (!multipleAsset) {
+      // first time loading
+      if (
+        indicatorsEffectTriggered.current ||
+        !chartX ||
+        !chartX?.indicatorClasses
+      )
+        return;
+      indicatorsEffectTriggered.current = true;
 
-    setIsLoading(true);
-    try {
-      // Fetch transactions
-      const tx = await fetchTXData({
-        tf: selectedInterval,
-        token: symbol,
-        to: 1000
-      });
-      setTradeData(tx);
+      const registeredIndicators = chartX.indicatorClasses;
 
-      // Fetch initial history
-      await fetchOHLCVData(
-        chartX,
-        config?.range.startTS,
-        config?.range.limitPast,
-        symbol,
-        selectedInterval,
-        isLoading
-      );
-      // Register range limit
-      chartX?.on?.('range_limitPast', (e: any) => {
-        const range = e.chart.range;
-        const limit = 100;
-        const start = range.timeStart - range.interval * limit;
-        fetchOHLCVData(
-          e.chart,
-          start,
-          limit,
-          symbol,
-          selectedInterval,
-          isLoading
-        );
-      });
-
-      // Initialize WebSocket
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-      wsRef.current = livePrice_Binance(chartX, symbol, selectedInterval);
-
-      setHasInitialFetch(true);
-    } catch (error) {
-      console.error('Error initializing chart:', error);
-    } finally {
-      setIsLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartX, symbol, selectedInterval]);
-
-  const initializeChart = useCallback(async () => {
-    if (!chartX || !symbol || !selectedInterval || multipleAsset) return;
-    console.log('chartX', chartX);
-    console.log('Symbol:', symbol);
-    console.log('Selected Interval:', selectedInterval);
-
-    if (
-      indicatorsEffectTriggered.current ||
-      !chartX ||
-      !chartX?.indicatorClasses
-    )
-      return;
-    indicatorsEffectTriggered.current = true;
-
-    const registeredIndicators = chartX.indicatorClasses;
-
-    const mappedRegisteredIndicators = Object.entries(registeredIndicators).map(
-      ([key, IndClass]) => ({
+      const mappedRegisteredIndicators = Object.entries(
+        registeredIndicators
+      ).map(([key, IndClass]) => ({
         label: (IndClass as any).nameShort || key,
         value: key,
         tooltip: (IndClass as any).nameLong || key,
         selected: false
-      })
-    );
-    setIndicators(mappedRegisteredIndicators);
+      }));
+      setIndicators(mappedRegisteredIndicators);
+    } else {
+      // already initialized
+      const newState = {
+        ...config,
+        title: symbol,
+        symbol: symbol,
+        timeFrame: selectedInterval,
+        type: selectedChartType,
+        isLightTheme,
+        state: []
+      };
+      // @ts-ignore
+      chartX.state.use(newState);
+    }
 
     setIsLoading(true);
     try {
       // Fetch transactions
-      const tx = await fetchTXData({
-        tf: selectedInterval,
-        token: symbol,
-        to: 1000
-      });
-      setTradeData(tx);
+      // const tx = await fetchTXData({
+      //   tf: selectedInterval,
+      //   token: symbol,
+      //   to: 1000
+      // });
+      // setTradeData(tx);
+
+      // Initialize WebSocket
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+      wsRef.current = livePrice_Binance(chartX, symbol, selectedInterval);
 
       // Fetch initial history
       await fetchOHLCVData(
@@ -233,6 +173,7 @@ const TradingChart = (props: ITokenChartProps) => {
         selectedInterval,
         isLoading
       );
+
       // Register range limit
       chartX?.on?.('range_limitPast', (e: any) => {
         const range = e.chart.range;
@@ -248,12 +189,6 @@ const TradingChart = (props: ITokenChartProps) => {
         );
       });
 
-      // Initialize WebSocket
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-      wsRef.current = livePrice_Binance(chartX, symbol, selectedInterval);
-
       setHasInitialFetch(true);
     } catch (error) {
       console.error('Error initializing chart:', error);
@@ -264,30 +199,11 @@ const TradingChart = (props: ITokenChartProps) => {
   }, [chartX, symbol, selectedInterval]);
 
   useEffect(() => {
-    if (
-      chartX &&
-      symbol &&
-      selectedInterval &&
-      !hasInitialFetch &&
-      !multipleAsset
-    ) {
-      initializeChart();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartX, symbol, selectedInterval, hasInitialFetch, initializeChart]);
-
-  useEffect(() => {
-    if (
-      chartX &&
-      symbol &&
-      selectedInterval &&
-      !hasInitialFetch &&
-      multipleAsset
-    ) {
+    if (chartX && symbol && selectedInterval) {
       initializeAsset();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartX, symbol, selectedInterval, hasInitialFetch, initializeAsset]);
+  }, [chartX, symbol, selectedInterval]);
 
   return (
     <FullScreenWrapper>
@@ -309,8 +225,7 @@ const TradingChart = (props: ITokenChartProps) => {
                 onSelectChart={setSelectedChartType}
                 onSelectToken={handleTokenChange}
                 onSelectInterval={(value: React.SetStateAction<string>) => {
-                  setSelectedInterval(value);
-                  setHasInitialFetch(false);
+                  handlechangeTimeframe(value);
                 }}
               />
             )}
