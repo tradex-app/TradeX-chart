@@ -3,15 +3,12 @@ import React, {
   useContext,
   useState,
   ReactNode,
-  useEffect
 } from 'react';
 import { IState, ITradeX } from '../../../../types';
 
 interface ChartContextProps {
   chartX: ITradeX | undefined;
   setChartX: React.Dispatch<React.SetStateAction<ITradeX | undefined>>;
-  states: IState[] | undefined;
-  setStates: React.Dispatch<React.SetStateAction<IState[] | undefined>>;
   handleMergeData: (newData: number[]) => void;
   getIndicatorId: (indicatorType: string) => string | undefined;
   getIndicators: () => any[];
@@ -28,7 +25,6 @@ const ChartContext = createContext<ChartContextProps | undefined>(undefined);
 
 export const ChartProvider = ({ children }: { children: ReactNode }) => {
   const [chartX, setChartX] = useState<ITradeX>();
-  const [states, setStates] = useState<IState[]>();
 
   const getIndicators = () => {
     if (!chartX) return [];
@@ -81,8 +77,6 @@ export const ChartProvider = ({ children }: { children: ReactNode }) => {
       value={{
         chartX,
         setChartX,
-        states,
-        setStates,
         handleMergeData,
         getIndicatorId,
         getIndicators,

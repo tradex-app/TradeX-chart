@@ -12,7 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger
 } from '@/components/ui/popover';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { IStatesToolbar } from '../utils/types';
@@ -20,19 +20,8 @@ import { useChartContext } from '../provider/ChartProvider';
 
 const StateDropdown = () => {
   const [open, setOpen] = useState(false);
-  const { states, setStates, chartX } = useChartContext();
+  const { chartX } = useChartContext();
   const [toolbarStates, setToolbarStates] = useState<IStatesToolbar[]>([]);
-
-  useEffect(() => {
-    if (states) {
-      const mappedStates = states.map((state, index) => ({
-        label: 'State: ' + (index + 1).toString(),
-        value: state.key,
-        selected: state.key === chartX?.state.key
-      }));
-      setToolbarStates(mappedStates);
-    }
-  }, [chartX?.state.key, states]);
 
   const handleSelectState = (stateKey: string) => {
     if (chartX) {
@@ -50,7 +39,12 @@ const StateDropdown = () => {
   const handleOpenChange = (newOpen: boolean) => {
     if (newOpen && chartX) {
       const st = chartX.state.list();
-      setStates(st);
+      const mappedStates = st.map((state, index) => ({
+        label: 'State: ' + state.value.data.id,
+        value: state.key,
+        selected: state.key === chartX?.state.key
+      }));
+      setToolbarStates(mappedStates);
     }
     setOpen(newOpen);
   };
@@ -60,11 +54,11 @@ const StateDropdown = () => {
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
+            className="w-[150px] justify-between"
             size={'toolbar'}
+            variant={'toolbar'}
             role="combobox"
             aria-expanded={open}
-            className="w-[150px] justify-between"
           >
             Select state...
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
