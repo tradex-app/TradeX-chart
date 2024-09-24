@@ -799,12 +799,12 @@ export default class State {
 
   /**
    * validate and register a chart state
-   * @param {Object} state 
-   * @param {boolean} deepValidate - validate every entry rather than a sample
-   * @param {boolean} isCrypto - validate time stamps against BTC genesis block
+   * @param {Object} [state=State.default] 
+   * @param {boolean} [deepValidate=true] - validate every entry rather than a sample
+   * @param {boolean} [isCrypto=false] - validate time stamps against BTC genesis block
    * @returns {State|undefined} - State instance
    */
-  create(state=State.default, deepValidate, isCrypto) {
+  create(state=State.default, deepValidate=true, isCrypto=false) {
     return State.create(state, deepValidate, isCrypto)
   }
 
@@ -815,8 +815,9 @@ export default class State {
    */
   delete(state) {
     let key = this.#key
+    let core = this.#core
 
-    if (!state) key = State.getKey(this.#core, state)
+    if (!state) key = State.getKey(core, state)
     if (!isString(key)) {
       core.error(`${core.name} : State.delete() : State not found`)
       return false
@@ -829,7 +830,7 @@ export default class State {
     // create an empty default state to replace it
     else {
       if (State.has(this.#core, key)) {
-        const empty = State.create()
+        const empty = this.create()
         this.use(empty.key)
         State.delete(key)
       }

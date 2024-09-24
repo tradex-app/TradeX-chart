@@ -119,7 +119,7 @@ export default class DataSource {
     this.#state = cfg.state
     this.#core = cfg.core
 
-    core.on("range_limitPast", this.onRangeLimit, this)
+    this.#core.on("range_limitPast", this.onRangeLimit, this)
     // core.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
   }
 
