@@ -392,9 +392,9 @@ export default class State {
 
   static delete(chart, state) {
     let states = State.chartList(chart)?.states
-    if (states) return undefined
-
-    let key = states.getKey(chart, state)
+    if (!states) return undefined
+    let key = state;
+    if (state instanceof State) key = state.#key
     if (!isString(key) ||
         !states.has(key)
       ) return false
@@ -810,29 +810,32 @@ export default class State {
 
   /**
    * delete a current or stored chart state
-   * @param {String|Object} state - state key or {id: "someID"} or {key: "stateKey"}
+   * @param {String|Object|State} state - state key or {id: "someID"} or {key: "stateKey"}
    * @returns {boolean}
    */
   delete(state) {
-    let key = this.#key
     let core = this.#core
-
-    if (!state) key = State.getKey(core, state)
-    if (!isString(key)) {
-      core.error(`${core.name} : State.delete() : State not found`)
-      return false
+    let key;
+    if (state instanceof State) key = state.key
+    else if (isString(state)) key = state
+    else if (isObject(state) && isString(state.key)) key = state.key
+    else if (isObject(state) && isString(state.id) && !!this.getByID(state.id)) {
+      key = this.getByID(state.id)?.key
     }
+    else core.error(`${core.name} : State.delete() : State not found`)
+
     // delete any state but this instance
     if (key !== this.key) {
-      State.delete(this.#core, key)
+      if (this.has(key))
+        State.delete(core, key)
     }
     // if delete this instance
     // create an empty default state to replace it
     else {
-      if (State.has(this.#core, key)) {
+      if (this.has(key)) {
         const empty = this.create()
-        this.use(empty.key)
-        State.delete(key)
+        this.use(empty?.key)
+        State.delete(core, key)
       }
       else {
         core.error(`${core.name} : State.use() : State not found`)
@@ -866,6 +869,20 @@ export default class State {
    */
   get(key) {
     return State.get(this.#core, key)
+  }
+
+  /**
+   * Get state by user defined id
+   * @param {String} id
+   * @return {State|undefined}  
+   * @memberof State
+   */
+  getByID(id) {
+    let list = State.list(this.#core)
+    if (!list || !isString(id)) return undefined
+    for (let s of list) {
+      if (s.id ==id) return s
+    }
   }
 
   /**
