@@ -18,13 +18,6 @@ import { useTheme } from 'next-themes';
 // INSTANTIATE CHART MODULE
 TXChart; // DO NOT REMOVE THIS
 
-interface IMappedState {
-  key: string;
-  current: boolean;
-  symbol: string;
-  timeFrame: string;
-}
-
 const TradingChart = (props: ITokenChartProps) => {
   const { toolbar, defaults, ...config } = props;
   const [symbol, setSymbol] = useState(config?.symbol);
@@ -35,9 +28,6 @@ const TradingChart = (props: ITokenChartProps) => {
   const [selectedInterval, setSelectedInterval] = useState(config?.timeFrame);
   const [indicators, setIndicators] = useState<IIndicatorToolbar[]>();
   const [hasInitialFetch, setHasInitialFetch] = useState(false);
-  const [mappedStates, setMappedStates] = useState<Map<string, IMappedState>>(
-    new Map()
-  );
   const wsRef = useRef<WebSocket>();
   const [selectedChartType, setSelectedChartType] = useState(
     defaults?.chartType || CHART_OPTIONS[0]
@@ -150,38 +140,23 @@ const TradingChart = (props: ITokenChartProps) => {
     // because state is set in instantiation
     if (!fisrtStateSet.current) {
       registerIndicators();
-      const statesList = chartX.state.list();
-      const currStateKey = chartX.state.key;
-      const newMappedStates = new Map();
-      statesList.forEach((state) => {
-        const key = `${state.key === currStateKey ? symbol : ''}-${state.key === currStateKey ? selectedInterval : ''}`;
-        newMappedStates.set(key, {
-          key: state.key,
-          current: state.key === currStateKey,
-          symbol: state.key === currStateKey ? symbol : '',
-          timeFrame: state.key === currStateKey ? selectedInterval : ''
-        });
-      });
-      setMappedStates(newMappedStates);
     }
-
     if (fisrtStateSet.current) {
-      // Check if the state already exists
-      if (mappedStates.has(stateKey)) {
-        const existingState = mappedStates.get(stateKey);
-        if (existingState) {
-          console.log('EXISTING STATE, SWITCHING TO IT');
-          chartX.state.use(existingState.key);
-          setMappedStates(
-            new Map(
-              mappedStates.set(stateKey, { ...existingState, current: true })
-            )
-          );
-        }
+      const existingState = chartX.state
+        .list()
+        .find(
+          (state: { value: { data: { id: string } } }) =>
+            state.value.data.id === stateKey
+        );
+
+      if (existingState) {
+        console.log('EXISTING STATE, SWITCHING TO IT', existingState);
+        chartX.state.use(existingState.key);
       } else {
         console.log('NEW STATE');
         const newState = {
           ...config,
+          id: symbol + '-' + selectedInterval,
           title: symbol,
           symbol: symbol,
           timeFrame: selectedInterval,
@@ -190,14 +165,7 @@ const TradingChart = (props: ITokenChartProps) => {
           state: []
         };
         // @ts-ignore
-        const newStateKey = chartX.state.use(newState).key;
-        const newMappedState = {
-          key: newStateKey,
-          current: true,
-          symbol: symbol,
-          timeFrame: selectedInterval
-        };
-        setMappedStates(new Map(mappedStates.set(stateKey, newMappedState)));
+        chartX.state.use(newState);
       }
     }
 

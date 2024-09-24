@@ -26,6 +26,7 @@ const TXChart: FC<IProps> = ({
   displayTitle,
   chartType,
   // data
+  interval,
   initialData = [],
   onchart = [],
   tradeData,
@@ -103,9 +104,10 @@ const TXChart: FC<IProps> = ({
       if (typeof chart.start === 'function') {
         chart.start({
           ...config,
+          id: displayTitle + '-' + interval,
           title: displayTitle,
           symbol: displayTitle,
-          timeFrame: '1m',
+          timeFrame: interval,
           type: chartType,
           isLightTheme,
           state

@@ -16,6 +16,7 @@ export interface ITradeX extends HTMLElement {
   expunge?: () => void;
   refresh?: () => void;
   state: {
+    value: any;
     delete: (key: string) => boolean;
     key: string;
     list: () => IState[];
@@ -142,6 +143,7 @@ export interface ITradeData {
 }
 
 export interface IState {
+  value: any;
   version: string; // packageJSON.version
   id: string;
   key: string;
