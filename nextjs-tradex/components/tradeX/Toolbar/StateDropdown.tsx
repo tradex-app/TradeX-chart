@@ -40,7 +40,7 @@ const StateDropdown = () => {
     if (newOpen && chartX) {
       const st = chartX.state.list();
       const mappedStates = st.map((state, index) => ({
-        label: 'State: ' + state.value.data.id,
+        label: String(state.value.data.id),
         value: state.key,
         selected: state.key === chartX?.state.key
       }));
