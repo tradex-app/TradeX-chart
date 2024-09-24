@@ -4,11 +4,7 @@ import ChartTypeSwitch from './ChartTypeSwitch';
 import TokensDropdown from './TokensDropdown';
 import IndicatorDropdown from './IndicatorDropdown';
 import { ThemeToggle } from '@/components/theme-toggle';
-import {
-  IChartOption,
-  IIndicatorToolbar,
-  IStatesToolbar
-} from '../utils/types';
+import { IChartOption, IIndicatorToolbar } from '../utils/types';
 import StateDropdown from './StateDropdown';
 import { PrintState } from './Buttons';
 
