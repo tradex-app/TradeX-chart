@@ -26,7 +26,7 @@ const StateDropdown = () => {
   useEffect(() => {
     if (states) {
       const mappedStates = states.map((state, index) => ({
-        label: index.toString(),
+        label: 'State: ' + (index + 1).toString(),
         value: state.key,
         selected: state.key === chartX?.state.key
       }));

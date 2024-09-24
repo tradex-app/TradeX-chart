@@ -18,6 +18,13 @@ import { useTheme } from 'next-themes';
 // INSTANTIATE CHART MODULE
 TXChart; // DO NOT REMOVE THIS
 
+interface IMappedState {
+  key: string;
+  current: boolean;
+  symbol: string;
+  timeFrame: string;
+}
+
 const TradingChart = (props: ITokenChartProps) => {
   const { toolbar, defaults, ...config } = props;
   const [symbol, setSymbol] = useState(config?.symbol);
@@ -28,7 +35,9 @@ const TradingChart = (props: ITokenChartProps) => {
   const [selectedInterval, setSelectedInterval] = useState(config?.timeFrame);
   const [indicators, setIndicators] = useState<IIndicatorToolbar[]>();
   const [hasInitialFetch, setHasInitialFetch] = useState(false);
-  const [multipleAsset, setMultipleAsset] = useState(false);
+  const [mappedStates, setMappedStates] = useState<Map<string, IMappedState>>(
+    new Map()
+  );
   const wsRef = useRef<WebSocket>();
   const [selectedChartType, setSelectedChartType] = useState(
     defaults?.chartType || CHART_OPTIONS[0]
@@ -37,7 +46,8 @@ const TradingChart = (props: ITokenChartProps) => {
   const { theme } = useTheme();
   const isLightTheme = theme === 'light';
 
-  const indicatorsEffectTriggered = useRef(false);
+  const fisrtStateSet = useRef(false);
+  const lastInitializedAsset = useRef({ symbol: '', interval: '' });
 
   const handleSelectIndicator = (indicatorValue: string) => {
     const indicatorClass = indicatorValue;
@@ -61,18 +71,14 @@ const TradingChart = (props: ITokenChartProps) => {
 
   const handleTokenChange = (value: React.SetStateAction<string>) => {
     const upperCaseValue = (value as string).toUpperCase();
-    if (hasInitialFetch && !multipleAsset) {
-      setMultipleAsset(true);
+    if (hasInitialFetch) {
       setSymbol(upperCaseValue);
-      initializeAsset();
     }
   };
 
   const handlechangeTimeframe = (value: React.SetStateAction<string>) => {
-    if (hasInitialFetch && !multipleAsset) {
-      setMultipleAsset(true);
+    if (hasInitialFetch) {
       setSelectedInterval(value);
-      initializeAsset();
     }
   };
 
@@ -105,47 +111,94 @@ const TradingChart = (props: ITokenChartProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const initializeAsset = useCallback(async () => {
-    if (!chartX || !symbol || !selectedInterval) return;
-    console.log('initializeChartOrAsset');
-    console.log('chartX', chartX);
-    console.log('Symbol:', symbol);
-    console.log('Selected Interval:', selectedInterval);
+  const registerIndicators = useCallback(() => {
+    if (fisrtStateSet.current || !chartX || !chartX?.indicatorClasses) return;
 
-    if (!multipleAsset) {
-      // first time loading
-      if (
-        indicatorsEffectTriggered.current ||
-        !chartX ||
-        !chartX?.indicatorClasses
-      )
-        return;
-      indicatorsEffectTriggered.current = true;
+    const registeredIndicators = chartX.indicatorClasses;
 
-      const registeredIndicators = chartX.indicatorClasses;
-
-      const mappedRegisteredIndicators = Object.entries(
-        registeredIndicators
-      ).map(([key, IndClass]) => ({
+    const mappedRegisteredIndicators = Object.entries(registeredIndicators).map(
+      ([key, IndClass]) => ({
         label: (IndClass as any).nameShort || key,
         value: key,
         tooltip: (IndClass as any).nameLong || key,
         selected: false
-      }));
-      setIndicators(mappedRegisteredIndicators);
-    } else {
-      // already initialized
-      const newState = {
-        ...config,
-        title: symbol,
-        symbol: symbol,
-        timeFrame: selectedInterval,
-        type: selectedChartType,
-        isLightTheme,
-        state: []
-      };
-      // @ts-ignore
-      chartX.state.use(newState);
+      })
+    );
+    setIndicators(mappedRegisteredIndicators);
+  }, [chartX]);
+
+  const initializeAsset = useCallback(async () => {
+    if (!chartX || !symbol || !selectedInterval) return;
+
+    const stateKey = `${symbol}-${selectedInterval}`;
+
+    // Check if the asset has already been initialized
+    if (
+      lastInitializedAsset.current.symbol === symbol &&
+      lastInitializedAsset.current.interval === selectedInterval
+    ) {
+      console.log('Asset already initialized, skipping...');
+      return;
+    }
+
+    console.log('initializeAsset');
+    console.log('chartX', chartX);
+    console.log('Symbol:', symbol);
+    console.log('Selected Interval:', selectedInterval);
+
+    // first time loading just register indicators
+    // because state is set in instantiation
+    if (!fisrtStateSet.current) {
+      registerIndicators();
+      const statesList = chartX.state.list();
+      const currStateKey = chartX.state.key;
+      const newMappedStates = new Map();
+      statesList.forEach((state) => {
+        const key = `${state.key === currStateKey ? symbol : ''}-${state.key === currStateKey ? selectedInterval : ''}`;
+        newMappedStates.set(key, {
+          key: state.key,
+          current: state.key === currStateKey,
+          symbol: state.key === currStateKey ? symbol : '',
+          timeFrame: state.key === currStateKey ? selectedInterval : ''
+        });
+      });
+      setMappedStates(newMappedStates);
+    }
+
+    if (fisrtStateSet.current) {
+      // Check if the state already exists
+      if (mappedStates.has(stateKey)) {
+        const existingState = mappedStates.get(stateKey);
+        if (existingState) {
+          console.log('EXISTING STATE, SWITCHING TO IT');
+          chartX.state.use(existingState.key);
+          setMappedStates(
+            new Map(
+              mappedStates.set(stateKey, { ...existingState, current: true })
+            )
+          );
+        }
+      } else {
+        console.log('NEW STATE');
+        const newState = {
+          ...config,
+          title: symbol,
+          symbol: symbol,
+          timeFrame: selectedInterval,
+          type: selectedChartType,
+          isLightTheme,
+          state: []
+        };
+        // @ts-ignore
+        const newStateKey = chartX.state.use(newState).key;
+        const newMappedState = {
+          key: newStateKey,
+          current: true,
+          symbol: symbol,
+          timeFrame: selectedInterval
+        };
+        setMappedStates(new Map(mappedStates.set(stateKey, newMappedState)));
+      }
     }
 
     setIsLoading(true);
@@ -190,10 +243,14 @@ const TradingChart = (props: ITokenChartProps) => {
       });
 
       setHasInitialFetch(true);
+
+      // Update the last initialized asset
+      lastInitializedAsset.current = { symbol, interval: selectedInterval };
     } catch (error) {
       console.error('Error initializing chart:', error);
     } finally {
       setIsLoading(false);
+      fisrtStateSet.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chartX, symbol, selectedInterval]);
@@ -202,8 +259,7 @@ const TradingChart = (props: ITokenChartProps) => {
     if (chartX && symbol && selectedInterval) {
       initializeAsset();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartX, symbol, selectedInterval]);
+  }, [chartX, symbol, selectedInterval, initializeAsset]);
 
   return (
     <FullScreenWrapper>
