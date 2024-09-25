@@ -1,14 +1,14 @@
-export enum ThemeProps {
-  ChartGridColour = 'chart.GridColour',
-  CandleType = 'candle.Type',
-}
-
 export interface ITradeX extends HTMLElement {
   range: any;
   indicatorClasses: () => string[];
   stream: any;
   Indicators?: { [key: string]: unknown }[];
-  theme?: { setProperty: (property: ThemeProps, value: any) => void };
+  theme?: {
+    setProperty: (
+      property: 'chart.GridColour' | 'candle.Type',
+      value: any
+    ) => void;
+  };
   start?: (config: object) => void;
   setIndicators?: (indicators: IIndicators) => void;
   mergeData?: (data: { ohlcv: number[] }) => void;

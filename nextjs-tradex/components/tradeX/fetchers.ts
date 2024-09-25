@@ -1,4 +1,5 @@
-import { ITradeData, ITradeX } from '../../../types'; // import from 'tradex-chart';
+import { ITradeData, ITradeX } from '../../../types'; // 'tradex-chart';
+
 import { sampleOHLCV, tradeData } from './PEPEUSDT';
 
 const hasEnvVar = process.env.NEXT_PUBLIC_TX_BASE_URL

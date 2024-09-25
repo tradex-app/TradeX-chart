@@ -7,16 +7,15 @@ import FullScreenWrapper from '../FullScreen/FullScreenWrapper';
 import FullScreenButton from '../FullScreen/FullScreenButton';
 import Toolbar from './Toolbar';
 import { IIndicatorToolbar, ITokenChartProps } from './utils/types';
-import Chart from '@/components/tradeX/Chart';
+import TradeXChart from '@/components/tradeX/Chart';
 import { CUSTOM_INDICATORS } from '@/components/tradeX/indicators/availbleIndicators';
-import { ITradeData } from '../../../types';
-import { Chart as TXChart } from '../../../src'; // import { Chart as TXChart } from 'tradex-chart';
 import { livePrice_Binance } from './utils/ws';
 import { useChartContext } from './provider/ChartProvider';
 import { useTheme } from 'next-themes';
+import { Chart } from '../../../src'; // 'tradex-chart';
+import { IConfig, ITradeData } from '../../../types'; // 'tradex-chart';
 
-// INSTANTIATE CHART MODULE
-TXChart; // DO NOT REMOVE THIS
+Chart; // DO NOT REMOVE THIS
 
 const TradingChart = (props: ITokenChartProps) => {
   const { toolbar, defaults, ...config } = props;
@@ -260,8 +259,8 @@ const TradingChart = (props: ITokenChartProps) => {
             )}
           </div>
           <div className="flex flex-grow w-full h-[600px]">
-            <Chart
-              config={config}
+            <TradeXChart
+              config={config as IConfig}
               displayTitle={symbol}
               interval={selectedInterval}
               chartType={selectedChartType}

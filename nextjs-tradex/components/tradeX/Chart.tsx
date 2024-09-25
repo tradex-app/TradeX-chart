@@ -1,7 +1,7 @@
 'use client';
 import { FC, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
-import { IConfig, IIndicators, ITradeX, ThemeProps } from '../../../types'; // import from 'tradex-chart';
+import { IConfig, IIndicators, ITradeX } from '../../../types'; // 'tradex-chart';
 import ColorsEnum from '../theme/colors';
 import { IChartOption, IIndicatorToolbar } from './utils/types';
 import { useChartContext } from './provider/ChartProvider';
@@ -20,7 +20,7 @@ export interface IProps {
   onRangeChange?: () => void;
 }
 
-const TXChart: FC<IProps> = ({
+const TradeXChart: FC<IProps> = ({
   config,
   // visual
   displayTitle,
@@ -130,15 +130,12 @@ const TXChart: FC<IProps> = ({
     if (!chartX) return;
 
     if (theme === 'light') {
-      chartX.theme?.setProperty(
-        ThemeProps.ChartGridColour,
-        ColorsEnum.SelectorLight
-      );
+      chartX.theme?.setProperty('chart.GridColour', ColorsEnum.SelectorLight);
 
       return;
     }
 
-    chartX.theme?.setProperty(ThemeProps.ChartGridColour, ColorsEnum.Selector);
+    chartX.theme?.setProperty('chart.GridColour', ColorsEnum.Selector);
   }, [chartX, theme]);
 
   useEffect(() => {
@@ -149,14 +146,14 @@ const TXChart: FC<IProps> = ({
   useEffect(() => {
     if (!chartX) return;
 
-    chartX.theme?.setProperty(ThemeProps.CandleType, chartType?.value);
+    chartX.theme?.setProperty('candle.Type', chartType?.value);
   }, [chartType, chartX]);
 
   return (
     <div className="w-full h-full">
-      <div id={chartAccessor} className="h-full" />
+      <div id={chartAccessor} className="w-full h-full" />
     </div>
   );
 };
 
-export default TXChart;
+export default TradeXChart;

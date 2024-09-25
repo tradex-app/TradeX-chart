@@ -6,7 +6,7 @@
 // import Overlay from "./overlay";
 // import { renderLineHorizontal } from "../../renderer/line";
 // import { renderTextBG } from "../../renderer/text";
-import { Overlay, renderLineHorizontal, renderTextBG } from 'tradex-chart';
+import { Overlay, renderLineHorizontal, renderTextBG } from '../../../../src'; //'tradex-chart';
 
 const defaults = {
   colour: '#4444cc88',
@@ -16,17 +16,17 @@ const defaults = {
 
 function drawText(ctx, txt, x, y, w, theme) {
   let options = {
-      fontSize: theme.fontSize * 1.05,
-      fontWeight: theme.fontWeight,
-      fontFamily: theme.fontFamily,
-      txtCol: theme.colourCursor,
-      bakCol: theme.colourCursorBG,
-      paddingTop: 2,
-      paddingBottom: 2,
-      paddingLeft: 3,
-      paddingRight: 3,
-      width: w
-    },
+    fontSize: theme.fontSize * 1.05,
+    fontWeight: theme.fontWeight,
+    fontFamily: theme.fontFamily,
+    txtCol: theme.colourCursor,
+    bakCol: theme.colourCursorBG,
+    paddingTop: 2,
+    paddingBottom: 2,
+    paddingLeft: 3,
+    paddingRight: 3,
+    width: w
+  },
     height = options.fontSize + options.paddingTop + options.paddingBottom,
     yPos = y - height * 0.5;
 
@@ -53,7 +53,7 @@ class scaleHighLow extends Overlay {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  draw() {}
+  draw() { }
 
   scaleDraw(range = this.core.range) {
     if (!super.mustUpdate()) return;
