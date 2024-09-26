@@ -1,10 +1,5 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-} from 'react';
-import { IState, ITradeX } from '../../../../types';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { ITradeX } from '../../../../types';
 
 interface ChartContextProps {
   chartX: ITradeX | undefined;

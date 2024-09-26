@@ -19,23 +19,23 @@ class ThreadWorker {
    * @param {function} fn
    * @memberof ThreadWorker
    */
-  constructor (fn) {
+  constructor(fn) {
     this.#fn = fn
     self.onmessage = m => this._onmessage(m.data)
   }
 
- /**
-  * passes data to worker function and returns the result
-  * @param {object} m - message object {r, data}
-  */
-  _onmessage (m) {
-    const {r, data} = m
-    try{
+  /**
+   * passes data to worker function and returns the result
+   * @param {object} m - message object {r, data}
+   */
+  _onmessage(m) {
+    const { r, data } = m
+    try {
       const result = this.#fn(data, r)
-      self.postMessage({r, status: true, result})
+      self.postMessage({ r, status: true, result })
     }
     catch (e) {
-      self.postMessage({r, status: false, result: e})
+      self.postMessage({ r, status: false, result: e })
     }
   }
 
@@ -78,11 +78,10 @@ class Thread {
     this.#worker = new Worker(blobURL);
     // FireFox throws error when revokeObjectURL() is executed
     // so add timeout
-    setTimeout(function(blobURL)
-    {	
+    setTimeout(function (blobURL) {
       try { URL.revokeObjectURL(blobURL); }
-      catch (e) {}
-    },500,blobURL);
+      catch (e) { }
+    }, 500, blobURL);
   }
 
   get id() { return this.#id }
@@ -97,7 +96,7 @@ class Thread {
    */
   onmessage(m) {
     this.#idle = true
-    return (isFunction(this.#cb))? this.#cb(m) : m
+    return (isFunction(this.#cb)) ? this.#cb(m) : m
   }
 
   /**
@@ -107,7 +106,7 @@ class Thread {
   */
   onerror(e) {
     this.#idle = true
-    return (isFunction(this.#err))? this.#err(e) : e
+    return (isFunction(this.#err)) ? this.#err(e) : e
   }
 
   /**
@@ -119,21 +118,21 @@ class Thread {
     return new Promise((resolve, reject) => {
       try {
         let r = this.req
-        this.#reqList[r] = {resolve, reject}
+        this.#reqList[r] = { resolve, reject }
         this.#idle = false
 
-        this.#worker.postMessage({r, data: m})
+        this.#worker.postMessage({ r, data: m })
 
         this.#worker.onmessage = m => {
-          const {r, status, result} = m.data
+          const { r, status, result } = m.data
           if (r in this.#reqList) {
-            const {resolve, reject} = this.#reqList[r]
+            const { resolve, reject } = this.#reqList[r]
             delete this.#reqList[r]
             if (status) {
               resolve(this.onmessage(result))
             }
             else {
-              reject(this.onerror({r, result}))
+              reject(this.onerror({ r, result }))
             }
           }
           else if (status == "resolved")
@@ -146,12 +145,12 @@ class Thread {
           reject(this.onerror(e))
         }
 
-      } catch (error) { 
+      } catch (error) {
         this.#idle = true
-        reject(error) 
+        reject(error)
       }
     })
-    
+
   }
 
   terminate() {
@@ -173,7 +172,7 @@ export default class WebWorker {
 
   static Thread = Thread
 
-  static create(worker, ID="worker", cb, err) {
+  static create(worker, ID = "worker", cb, err) {
     if (typeof window.Worker === "undefined") return false
     if (isFunction(worker)) {
       worker = worker.toString()
@@ -184,13 +183,13 @@ export default class WebWorker {
         /^function\s*\w*\s*\([\w\s,]*\)\s*{([\w\W]*?)}$/
       )[1];
       if (!!fnStr) {
-      // is URL path?
+        // is URL path?
       }
       worker = fnStr
     }
     else { return false }
 
-    ID = (isString(ID))? uid(ID) : uid("worker")
+    ID = (isString(ID)) ? uid(ID) : uid("worker")
     this.#threads.set(ID, new this.Thread(ID, worker, cb, err))
     return this.#threads.get(ID)
   }
@@ -206,7 +205,7 @@ export default class WebWorker {
    * destroy all web workers
    */
   static end() {
-    this.#threads.forEach( (value, key, map) => {
+    this.#threads.forEach((value, key, map) => {
       this.destroy(key)
     });
   }
@@ -220,7 +219,11 @@ class TaskProcessor {
     if (!isObject(t)) { this.typeError("add()", t, "object") }
     if (!isString(t?.id)) { this.typeError("add(t.id)", t, "string") }
     if (!isString(t?.fn)) { this.typeError("add(t.fn)", t, "string") }
-    this.taskList[t.id] = eval(t.fn)
+    try {
+      this.taskList[t.id] = new Function(`return ${t.fn}`)();
+    } catch (error) {
+      this.error("add()", `Failed to create function from string`, { cause: error });
+    }
   }
 
   static remove(t) {
@@ -236,7 +239,7 @@ class TaskProcessor {
     if (!(t.id in this.taskList)) { this.error("exec()", `task ${t.id} not found!`) }
 
     try {
-      this.taskList[t.id](...t.params) 
+      this.taskList[t.id](...t.params)
     }
     catch (e) {
       this.error("exec()", `task ${t.id} error!`, { cause: e })
@@ -244,7 +247,7 @@ class TaskProcessor {
   }
 
   static typeError(fn, t, e) {
-    typeError(`TaskProcessor.${fn}`,t, e)
+    typeError(`TaskProcessor.${fn}`, t, e)
   }
 
   static error(fn, e, o) {
@@ -254,7 +257,7 @@ class TaskProcessor {
 }
 
 
-const STRATEGIES = new Set([ 'roundrobin', 'random', 'leastbusy' ]);
+const STRATEGIES = new Set(['roundrobin', 'random', 'leastbusy']);
 /**
  * RPC Worker Pool provides each worker a command list
  * Commands can be persistent or transient (disposable)
@@ -273,10 +276,10 @@ export class RPCWorkerPool {
   #taskList = {}
   #taskID = 0
 
-  constructor( cores=1, size=0, strategy="roundrobin" ) {
+  constructor(cores = 1, size = 0, strategy = "roundrobin") {
 
     this.#CPUCores = (isInteger(cores) && cores > 1) ? cores : 1
-    if ( !isInteger(size) || size === 0) this.#size = this.#CPUCores;
+    if (!isInteger(size) || size === 0) this.#size = this.#CPUCores;
     else if (size < 0) this.#size = Math.max(this.#CPUCores + size, 1);
     else this.#size = size;
 
@@ -284,17 +287,18 @@ export class RPCWorkerPool {
 
     this.#strategy = strategy;
 
-    for (let i = 0; i < this.#size; i++) {   
-      const worker = WebWorker.create( TaskProcessor );
+    for (let i = 0; i < this.#size; i++) {
+      const worker = WebWorker.create(TaskProcessor);
       this.workers.push(
-        { worker, 
-          taskList: {}, 
-          taskQueue: [] 
+        {
+          worker,
+          taskList: {},
+          taskQueue: []
         });
     }
   }
 
-  get cores () { return this.#CPUCores }
+  get cores() { return this.#CPUCores }
   get size() { return this.#size }
   get strategy() { return this.#strategy }
   get workers() { return this.#workers }
@@ -304,12 +308,12 @@ export class RPCWorkerPool {
     let id;
     if (this.#strategy === "random") {
       id = Math.floor(Math.random() * this.#size);
-    } 
+    }
     else if (this.strategy === "roundrobin") {
       this.#rr_index++;
       if (this.#rr_index >= this.#size) this.#rr_index = 0;
       id = this.#rr_index;
-    } 
+    }
     else if (this.#strategy === "leastbusy") {
       let min = Infinity;
       for (let i = 0; i < this.#size; i++) {
@@ -321,10 +325,10 @@ export class RPCWorkerPool {
       }
     }
     console.log("Selected Worker:", id);
-    return this.workers[id];s
+    return this.workers[id]; s
   }
 
-  addTask(name, task ) {
+  addTask(name, task) {
     if (!isString(name || !isString(task))) return false
 
     let id = `${name}_${this.taskID}`
@@ -332,7 +336,7 @@ export class RPCWorkerPool {
     this.#taskList[id] = entry
 
     for (let worker of this.#workers) {
-      worker.postMessage({task: "addTask", args: entry})
+      worker.postMessage({ task: "addTask", args: entry })
     }
 
     return id
@@ -340,9 +344,9 @@ export class RPCWorkerPool {
 
   exec(task, args) {
     if (!isString(task) ||
-        !(task in this.#taskList)) return false
+      !(task in this.#taskList)) return false
 
-    this.getWorker().postMessage({task, args}).then(
+    this.getWorker().postMessage({ task, args }).then(
       r => { return r }
     )
   }
@@ -352,7 +356,7 @@ export class RPCWorkerPool {
 }
 
 
-  
+
 
 
 /*
@@ -379,7 +383,7 @@ export class RpcWorkerPool {
   workers = [];
 
   constructor(path, size = 0, strategy = "roundrobin") {
-    
+
     if ( !isInteger(size) || size === 0) this.size = CORES;
     else if (size < 0) this.size = Math.max(CORES + size, 1);
     else this.size = size;
@@ -424,12 +428,12 @@ export class RpcWorkerPool {
     let id;
     if (this.strategy === "random") {
       id = Math.floor(Math.random() * this.size);
-    } 
+    }
     else if (this.strategy === "roundrobin") {
       this.rr_index++;
       if (this.rr_index >= this.size) this.rr_index = 0;
       id = this.rr_index;
-    } 
+    }
     else if (this.strategy === "leastbusy") {
       let min = Infinity;
       for (let i = 0; i < this.size; i++) {

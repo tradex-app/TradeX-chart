@@ -1,4 +1,4 @@
-import { ITradeX } from '../../../../types';
+import { ITradeX } from '../../../../types'; // 'tradex-chart';
 
 export const livePrice_Binance = (
   chart: ITradeX,

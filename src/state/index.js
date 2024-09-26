@@ -18,7 +18,6 @@ import Dataset from '../model/dataset'
 import MainPane from '../components/main'
 import { OHLCV } from '../definitions/chart'
 import Chart from '../components/chart'
-import internal from 'stream'
 
 const HASHKEY = "state"
 const DEFAULTSTATEID = "defaultState"
@@ -127,17 +126,17 @@ export default class State {
 
   static #chartList = new xMap()
   static #dss = {}
-  
+
   static get default() { return copyDeep(DEFAULT_STATE) }
 
   static server(chart) {
 
-    if (!isChart( chart )) return undefined
+    if (!isChart(chart)) return undefined
 
     let states = new xMap()
 
     if (!State.#chartList.has(chart.key)) {
-      State.#chartList.set(chart.key, {chart, states, active: undefined})
+      State.#chartList.set(chart.key, { chart, states, active: undefined })
     }
 
     // const id = chart.key
@@ -168,9 +167,9 @@ export default class State {
    * @param {boolean} isCrypto 
    * @returns {State|undefined}
    */
-  static create(chart, state=State.default, deepValidate=false, isCrypto=false) {
-    if (!isChart( chart )) return undefined
-    
+  static create(chart, state = State.default, deepValidate = false, isCrypto = false) {
+    if (!isChart(chart)) return undefined
+
     state.core = chart
     const instance = new State(state, deepValidate, isCrypto)
     const key = instance.key
@@ -200,12 +199,12 @@ export default class State {
    * @param {TradeXchart} chart - target
    * @returns {Array.<State>|undefined} - array of state instances
    */
-  static list (chart) {
+  static list(chart) {
     let states = State.chartList(chart)?.states
     if (!states) return undefined
-    
-    return Array.from( states, 
-      ([key, value]) => ({key, value}))
+
+    return Array.from(states,
+      ([key, value]) => ({ key, value }))
   }
 
   /**
@@ -214,13 +213,13 @@ export default class State {
    * @param {String|Object} state - state key or {id: "someID"} or {key: "stateKey"} or a state object
    * @returns {State|undefined} - chart state instance
    */
-  static use(chart, state=State.default) {
-    let key = (State.has(chart, state)) ? state : 
+  static use(chart, state = State.default) {
+    let key = (State.has(chart, state)) ? state :
       (State.has(chart, state?.key)) ? state.key : state
 
     if (!isString(key) && isObject(state) && Object.keys(state).length > 2) {
       let hash = State.hash(state)
-          key = `${SHORTNAME}_${HASHKEY}_${hash}`
+      key = `${SHORTNAME}_${HASHKEY}_${hash}`
 
       if (!State.has(chart, key)) {
         key = State.create(chart, state).key
@@ -255,7 +254,7 @@ export default class State {
 
         const defaultState = doStructuredClone(State.default)
         State.buildInventory(oldState, defaultState)
-    // TODO: set allData to primary[].data
+        // TODO: set allData to primary[].data
         active.allData.primaryPane = oldState.primary
         active.allData.secondaryPane = oldState.secondary
         active.data.inventory = oldState.inventory
@@ -265,7 +264,7 @@ export default class State {
     states.active = active
     return active
   }
-  
+
   static archive(chart, id) {
     let state = State.findStateById(chart, id)
     if (!state) return false
@@ -292,19 +291,19 @@ export default class State {
    * @returns {Boolean}
    */
   static isValidConfig(config) {
-    if (!isObject(config) || 
-        !Object.keys(config).length) 
-        return false
+    if (!isObject(config) ||
+      !Object.keys(config).length)
+      return false
     else {
       for (let [key, type] of Object.entries(CONFIGENTRIES)) {
-        if (typeOf ( config?.[key] ) === type)
+        if (typeOf(config?.[key]) === type)
           return true
       }
     }
     return false
   }
 
-  static validate(instance, source=State.default, deepValidate=false, isCrypto=false) {
+  static validate(instance, source = State.default, deepValidate = false, isCrypto = false) {
 
     const defaultState = doStructuredClone(State.default)
     let state
@@ -325,17 +324,17 @@ export default class State {
 
     state = mergeDeep(defaultState, source)
 
-    if (deepValidate) 
+    if (deepValidate)
       state.chart.data = validateDeep(state.chart.data, isCrypto) ? state.chart.data : []
-    else 
+    else
       state.chart.data = validateShallow(state.chart.data, isCrypto) ? state.chart.data : []
 
     state.chart.isEmpty = (state.chart.data.length == 0) ? true : false
-    Object.defineProperty( state.allData, "data", {
-        get: function() { return state.chart.data }
-      }
+    Object.defineProperty(state.allData, "data", {
+      get: function () { return state.chart.data }
+    }
     )
-    
+
     if (!isObject(state.chart.settings)) {
       state.chart.settings = defaultState.chart.settings
     }
@@ -345,22 +344,22 @@ export default class State {
     }
 
     if (!isArray(state.primary)) {
-        state.primary = defaultState.primary
+      state.primary = defaultState.primary
     }
     state.allData.primaryPane = state.primary
 
     if (!isArray(state.secondary)) {
-        state.secondary = defaultState.secondary
+      state.secondary = defaultState.secondary
     }
     state.allData.secondaryPane = state.secondaryPane
 
     if (!isArray(state.datasets)) {
-        state.datasets = []
+      state.datasets = []
     }
     state.allData.datasets = state.datasets
 
     State.buildInventory(state, defaultState)
-    
+
     // trades
 
     State.validateData("trades", state)
@@ -396,8 +395,8 @@ export default class State {
     let key = state;
     if (state instanceof State) key = state.#key
     if (!isString(key) ||
-        !states.has(key)
-      ) return false
+      !states.has(key)
+    ) return false
     states.delete(key)
     return true
   }
@@ -485,7 +484,7 @@ export default class State {
    * @returns {object|undefined}  
    * @memberof State
    */
-  static export(chart, key, config={}) {
+  static export(chart, key, config = {}) {
     if (!State.has(chart, key)) return undefined
     if (!isObject(config)) config = {}
     const state = State.get(chart, key)
@@ -505,8 +504,8 @@ export default class State {
     // trim streaming candle because it is not complete
     let vals = data.chart.data
     if (vals.length > 0 &&
-        vals[vals.length - 1].length > 6)
-        vals.length = vals.length - 1
+      vals[vals.length - 1].length > 6)
+      vals.length = vals.length - 1
 
     // Inventory
     // data.inventory.get("primary").pop()
@@ -518,13 +517,13 @@ export default class State {
     data.range = state.range.export()
 
     // Time Data
-    let {indexed, timeFrame, timeFrameMS, timeZone, timeZoneOffset} = {...state.data.timeData}
-    data.timeData = {indexed, timeFrame, timeFrameMS, timeZone, timeZoneOffset}
+    let { indexed, timeFrame, timeFrameMS, timeZone, timeZoneOffset } = { ...state.data.timeData }
+    data.timeData = { indexed, timeFrame, timeFrameMS, timeZone, timeZoneOffset }
 
-    switch(type) {
+    switch (type) {
       case "json":
-      default :
-        const {replacer, space} = {...config};
+      default:
+        const { replacer, space } = { ...config };
         stateExport = JSON.stringify(data, replacer, space);
         if (!!config?.compress)
           stateExport = stateExport.compress()
@@ -540,23 +539,23 @@ export default class State {
    * @returns {Promise}  
    * @memberof State
    */
-  static asyncExport(chart, key, config={}) {
+  static asyncExport(chart, key, config = {}) {
     return new Promise((resolve, reject) => {
-        try {
-          resolve (State.export(chart, key, config))
-        }
-        catch (e) {
-          chart.error(e)
-          reject ()
-        }
+      try {
+        resolve(State.export(chart, key, config))
       }
+      catch (e) {
+        chart.error(e)
+        reject()
+      }
+    }
     )
   }
 
   static validateData(type, state) {
-    if (!isString(type) || 
-        !(type in validator) ||
-        !isObject(state)) throw new Error(`ERROR: State: validateData: ${type} unexpected data`)
+    if (!isString(type) ||
+      !(type in validator) ||
+      !isObject(state)) throw new Error(`ERROR: State: validateData: ${type} unexpected data`)
 
     if (!isObject(state[type])) state[type] = copyDeep(DEFAULT_STATE[type])
     state[type].display = !!state[type]?.display
@@ -570,24 +569,24 @@ export default class State {
     }
   }
 
-  static archiveInventory (state) {
+  static archiveInventory(state) {
     state.data.inventory.length = 0
     if (!(state.core.ChartPanes instanceof xMap)) return
     for (let [key, pane] of state.core.ChartPanes) {
       let ind = [],
-          entry = [],
-          snapshot;
-          entry[0] = (pane.isPrimary) ? "primary" : "secondary"
-          for (let i of Object.values(pane.indicators)) {
-            ind.push(i.instance.snapshot())
-          }
+        entry = [],
+        snapshot;
+      entry[0] = (pane.isPrimary) ? "primary" : "secondary"
+      for (let i of Object.values(pane.indicators)) {
+        ind.push(i.instance.snapshot())
+      }
       entry[1] = ind
       entry[2] = pane.snapshot()
       state.data.inventory.push(entry)
     }
   }
 
-  static buildInventory (state, defaultState) {
+  static buildInventory(state, defaultState) {
     // Build chart order
     if (state.inventory.length == 0) {
       // add primary chart
@@ -615,11 +614,11 @@ export default class State {
         while (x--) {
           // remove if invalid
           if (!isObject(i[x]) ||
-              !isString(i[x].name) ||
-              !isString(i[x].type)
-              // !isArray(i[x].data)
-              )
-                i.splice(x, 1)
+            !isString(i[x].name) ||
+            !isString(i[x].type)
+            // !isArray(i[x].data)
+          )
+            i.splice(x, 1)
           // default settings if necessary
           else if (!isObject(i[x].settings))
             i[x].settings = {}
@@ -637,13 +636,13 @@ export default class State {
     let cnt = 0
     state.inventory.forEach((v, i) => {
       if (v[0] == "primary") {
-        if (++cnt > 1) 
+        if (++cnt > 1)
           state.inventory.splice(i, 1)
       }
     })
 
     // if no primary, add one
-    if (!cnt) 
+    if (!cnt)
       state.inventory.push(["primary", defaultState.primary])
   }
 
@@ -669,20 +668,20 @@ export default class State {
 
     if (!isObject(data)) return false
     for (let ts in data) {
-      if ( 
-          isValidTimestamp(ts*1) &&
-          isArray(data[ts])
-          ) {
-            for (let t of data[ts]) {
-              if (t?.id) t.id = `${t.id}` 
-              if (State.isValidEntry(t, validator[type])) {
-                if (!isObject(d?.[tf]))
-                d[tf] = {}
-                if (!isArray(d[tf]?.[ts]))
-                d[tf][ts] = []
-                d[tf][ts].push(t)
-              }
-            }
+      if (
+        isValidTimestamp(ts * 1) &&
+        isArray(data[ts])
+      ) {
+        for (let t of data[ts]) {
+          if (t?.id) t.id = `${t.id}`
+          if (State.isValidEntry(t, validator[type])) {
+            if (!isObject(d?.[tf]))
+              d[tf] = {}
+            if (!isArray(d[tf]?.[ts]))
+              d[tf][ts] = []
+            d[tf][ts].push(t)
+          }
+        }
       }
       else {
         d[ts] = data[ts]
@@ -695,7 +694,7 @@ export default class State {
     const k1 = Object.keys(e)
     const k2 = Object.keys(type)
     if (!isObject(e) ||
-        !isArrayEqual(k1, k2)) return false
+      !isArrayEqual(k1, k2)) return false
     for (let k of k2) {
       if (typeof e[k] !== type[k]) return false
     }
@@ -708,12 +707,12 @@ export default class State {
     let cfg = state.core.config.range
     let range = state.range
     let tfms = detectInterval(state.chart.data)
-    
+
     if (tfms === Infinity) tfms = range.timeFrameMS || DEFAULT_TIMEFRAMEMS
 
-    if (!state.chart.isEmpty && 
-        state.chart.data.length > 1 &&
-        range.timeFrameMS !== tfms)
+    if (!state.chart.isEmpty &&
+      state.chart.data.length > 1 &&
+      range.timeFrameMS !== tfms)
       range.timeFrameMS = tfms
 
     if (!isTimeFrameMS(range.timeFrameMS)) range.timeFrameMS = DEFAULT_TIMEFRAMEMS
@@ -732,11 +731,11 @@ export default class State {
       maxCandles: range?.maxCandles || cfg?.maxCandles,
       yAxisBounds: range?.yAxisBounds || cfg?.yAxisBounds,
     }
-    
+
     return new Range(range?.start, range?.end, config)
   }
 
-  
+
   #id = ""
   #key = ""
   #data = {}
@@ -749,12 +748,12 @@ export default class State {
   #core
   #chartPanes = new xMap()
   #chartPaneMaximized = {
-    instance: null, 
+    instance: null,
     rowsH: 0,
     panes: {}
   }
 
-  constructor(state=State.default, deepValidate=false, isCrypto=false) {
+  constructor(state = State.default, deepValidate = false, isCrypto = false) {
     if (!(state?.core instanceof TradeXchart)) throw new Error(`State : invalid TradeXchart instance`)
     this.#core = state.core
     this.#data = State.validate(this, state, deepValidate, isCrypto)
@@ -793,8 +792,8 @@ export default class State {
   get events() { return this.#data.events }
   get annotations() { return this.#data.annotations }
   get tools() { return this.#data.tools }
-  
-  
+
+
   error(e) { this.#core.error(e) }
 
   /**
@@ -804,7 +803,7 @@ export default class State {
    * @param {boolean} [isCrypto=false] - validate time stamps against BTC genesis block
    * @returns {State|undefined} - State instance
    */
-  create(state=State.default, deepValidate=true, isCrypto=false) {
+  create(state = State.default, deepValidate = true, isCrypto = false) {
     return State.create(state, deepValidate, isCrypto)
   }
 
@@ -881,7 +880,7 @@ export default class State {
     let list = State.list(this.#core)
     if (!list || !isString(id)) return undefined
     for (let s of list) {
-      if (s.id ==id) return s
+      if (s.id == id) return s
     }
   }
 
@@ -933,8 +932,8 @@ export default class State {
    * @param {Object} config 
    * @returns {Object}
    */
-  export(key=this.key, config={}) {
-    return State.export(this.#core, key, config={})
+  export(key = this.key, config = {}) {
+    return State.export(this.#core, key, config = {})
   }
 
   /**
@@ -948,7 +947,7 @@ export default class State {
    */
   // TODO: merge indicator data?
   // TODO: merge dataset?
-  mergeData(merge, newRange=false, calc=false) {
+  mergeData(merge, newRange = false, calc = false) {
 
     if (this.isEmpty) State.setTimeFrame(this.#core, this.key, merge?.ohlcv)
 
@@ -958,10 +957,10 @@ export default class State {
       this.error(`ERROR: ${this.id}: merge data must be type Object!`)
       return false
     }
-    let end = (isArray(merge?.ohlcv)) ? merge.ohlcv.length -1 : 0
+    let end = (isArray(merge?.ohlcv)) ? merge.ohlcv.length - 1 : 0
     // time frames don't match
     if (end > 1 &&
-        tfMS !== detectInterval(merge?.ohlcv)) {
+      tfMS !== detectInterval(merge?.ohlcv)) {
       this.error(`ERROR: ${this.core.ID}: merge data time frame does not match existing time frame!`)
       return false
     }
@@ -975,10 +974,10 @@ export default class State {
     // if the chart empty is empty set the range to the merge data
     if (this.isEmpty || !isNumber(tfMS)) {
       if (!isObject(newRange) ||
-          !isInteger(newRange.start) ||
-          !isInteger(newRange.end) ) {
+        !isInteger(newRange.start) ||
+        !isInteger(newRange.end)) {
         if (end > 1) {
-          newRange = {start: end - this.range.initialCnt, end}
+          newRange = { start: end - this.range.initialCnt, end }
         }
       }
     }
@@ -1012,7 +1011,7 @@ export default class State {
     const trades = this.allData?.trades
     const mTrades = merge?.trades || false
     const events = this.allData?.events
-    const mEvents = merge?.events || false    
+    const mEvents = merge?.events || false
     const inc = (!isArray(mData)) ? 0 : (this.range.inRange(mData[0][0])) ? 1 : 0
     const refresh = {}
 
@@ -1021,16 +1020,16 @@ export default class State {
       i = mData.length - 1
       j = data.length - 1
 
-      refresh.mData = 
-      this.range.inRange(mData[0][0]) &&
-      this.range.inRange(mData[0][i])
+      refresh.mData =
+        this.range.inRange(mData[0][0]) &&
+        this.range.inRange(mData[0][i])
 
       // if not a candle stream
       if (!isBoolean(mData[i][7]) &&
-          mData[i].length !== 8 &&
-          mData[i][6] !== null &&
-          mData[i][7] !== true
-          ) {
+        mData[i].length !== 8 &&
+        mData[i][6] !== null &&
+        mData[i][7] !== true
+      ) {
         // sanitize data, must be numbers
         // entries must be: [ts,o,h,l,c,v]
         mData = sanitizeCandles(mData)
@@ -1039,17 +1038,17 @@ export default class State {
       else {
         // should range auto increment?
         if (newRange.end >= this.range.timeFinish &&
-            newRange.start <= this.range.timeFinish) {
-              newRange.start += this.range.interval
-              newRange.end += this.range.interval
-            }
+          newRange.start <= this.range.timeFinish) {
+          newRange.start += this.range.interval
+          newRange.end += this.range.interval
+        }
       }
-      
+
       // chart is empty so simply add the new data
       if (data.length == 0) {
         let ohlcv = State.ohlcv(mData)
         this.allData.data.push(...mData)
-        this.allData.ohlcv = {...ohlcv}
+        this.allData.ohlcv = { ...ohlcv }
       }
       // chart has data, check for gaps and overlap and then merge
       else {
@@ -1078,11 +1077,11 @@ export default class State {
             if (isArray(o?.data) && o?.data.length > 0) {
               for (let p of primaryPane) {
                 if (isObject(p) &&
-                    p.name === o.name &&
-                    p.type === o.type &&
-                    isObjectEqual(p.settings, o.settings)) {
-                      p.data = this.merge(p.data, o.data)
-                      this.#core.getIndicator(p.id).drawOnUpdate = true
+                  p.name === o.name &&
+                  p.type === o.type &&
+                  isObjectEqual(p.settings, o.settings)) {
+                  p.data = this.merge(p.data, o.data)
+                  this.#core.getIndicator(p.id).drawOnUpdate = true
                 }
               }
             }
@@ -1095,11 +1094,11 @@ export default class State {
             if (isArray(o?.data) && o?.data.length > 0) {
               for (let p of secondaryPane) {
                 if (isObject(p) &&
-                    p.name === o.name &&
-                    p.type === o.type &&
-                    isObjectEqual(p.settings, o.settings)) {
-                      p.data = this.merge(p.data, o.data)
-                      this.#core.getIndicator(p.id).drawOnUpdate = true
+                  p.name === o.name &&
+                  p.type === o.type &&
+                  isObjectEqual(p.settings, o.settings)) {
+                  p.data = this.merge(p.data, o.data)
+                  this.#core.getIndicator(p.id).drawOnUpdate = true
                 }
               }
             }
@@ -1116,9 +1115,9 @@ export default class State {
           if (isArray(o?.data) && o?.data.length > 0) {
             for (let p of dataset) {
               if (p.name === o.name &&
-                  p.type === o.type &&
-                  isObjectEqual(p.settings, o.settings)) {
-                    p.data = this.merge(p.data, o.data)
+                p.type === o.type &&
+                isObjectEqual(p.settings, o.settings)) {
+                p.data = this.merge(p.data, o.data)
               }
             }
           }
@@ -1128,7 +1127,7 @@ export default class State {
       // Do we have events?
       if (isObject(mEvents)) {
         for (let e in mEvents) {
-          
+
         }
       }
 
@@ -1145,8 +1144,8 @@ export default class State {
           end = (isInteger(newRange.end)) ? this.range.getTimeIndex(newRange.end) : this.range.indexEnd
         }
         else {
-          if (mData[0][0] )
-          start = this.range.indexStart + inc
+          if (mData[0][0])
+            start = this.range.indexStart + inc
           end = this.range.indexEnd + inc
         }
         this.#core.setRange(start, end)
@@ -1180,17 +1179,17 @@ export default class State {
 
     // handle price stream
     if (newer.length == 1 &&
-        newer[0][0] == older[older.length-1][0]) {
-        older[older.length-1] = newer[0]
-        merged = older
+      newer[0][0] == older[older.length - 1][0]) {
+      older[older.length - 1] = newer[0]
+      merged = older
     }
     else if (newer.length == 1 &&
-        newer[0][0] == older[older.length-1][0] + this.range.interval) {
-        merged = older.concat(newer)
+      newer[0][0] == older[older.length - 1][0] + this.range.interval) {
+      merged = older.concat(newer)
     }
 
     // overlap between existing data and merge data
-    else if (older[older.length-1][0] >= newer[0][0]) {
+    else if (older[older.length - 1][0] >= newer[0][0]) {
       let o = 0
       while (older[o][0] < newer[0][0]) {
         merged.push(older[o])
@@ -1207,19 +1206,19 @@ export default class State {
     }
 
     // no overlap, but a gap exists
-    else if (newer[0][0] - older[older.length-1][0] > this.range.interval) {
+    else if (newer[0][0] - older[older.length - 1][0] > this.range.interval) {
       merged = older
       let len = older.length
       let gaps = this.gaps
-      let ts = older[len-1][0]
+      let ts = older[len - 1][0]
       let gap = Math.floor((newer[0][0] - ts) / this.range.interval)
-      for(gap; gap > 1; gap--) {
+      for (gap; gap > 1; gap--) {
         ts += this.range.interval
-        gaps[`${ts}`] = [ ...older[len-1] ]
+        gaps[`${ts}`] = [...older[len - 1]]
         gaps[`${ts}`][0] = ts
         let arr = Array(newer[0].length).fill(null)
-            arr[0] = ts
-            merged.push(arr)
+        arr[0] = ts
+        merged.push(arr)
       }
       merged = merged.concat(newer)
     }
@@ -1249,7 +1248,7 @@ export default class State {
 
     const seekAndDestroy = (p, i) => {
       const a = this.data[p]
-      for (let d=0; d<a.length; d++) {
+      for (let d = 0; d < a.length; d++) {
         if (a[d].id == i) {
           a.splice(d, 1)
           this.range.maxMinDatasets()
@@ -1272,7 +1271,7 @@ export default class State {
     const ts = t.timestamp - (t.timestamp % tfMS)
     const d = new Date(ts)
 
-    t.dateStr =`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+    t.dateStr = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
 
     this.allData.trades.data.ts[t.timestamp] = t
     this.allData.trades.data[tf][ts] = t
@@ -1299,7 +1298,7 @@ export default class State {
     const ts = t.timestamp - (e.timestamp % tfMS)
     const d = new Date(ts)
 
-    e.dateStr =`${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+    e.dateStr = `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
 
     this.allData.events.data.ts[e.timestamp] = e
     this.allData.events.data[tf][ts] = e

@@ -1,5 +1,4 @@
-import { IIndicators } from 'tradex-chart';
-
+import { IIndicators } from '../../../../types'; // 'tradex-chart';
 import custom from './custom';
 
 export const CUSTOM_INDICATORS: IIndicators = {
