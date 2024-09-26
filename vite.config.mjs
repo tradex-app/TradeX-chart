@@ -1,3 +1,5 @@
+// vite.config.js
+
 import path from 'path';
 import { defineConfig } from 'vite';
 import cleanup from 'rollup-plugin-cleanup';
@@ -8,6 +10,7 @@ const id = "tradex-chart";
 export default defineConfig(({ command, mode }) => {
   if (command === 'build') {
     return {
+      // build specific config
       build: {
         lib: {
           entry: path.resolve(__dirname, 'src/index.js'),
@@ -18,6 +21,7 @@ export default defineConfig(({ command, mode }) => {
         target: "esnext",
         minify: "esbuild",
         rollupOptions: {
+          // make sure to externalize deps that shouldn't be bundled into your library
           external: [
             'talib-web',
           ],
@@ -33,7 +37,11 @@ export default defineConfig(({ command, mode }) => {
       },
     };
   } else if (command === 'serve') {
+    // demo specific config
     return {
+      // server: {
+      //   open: '/demo.html'
+      // }
       server: {
         host: true
       }
