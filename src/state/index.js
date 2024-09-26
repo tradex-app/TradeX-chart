@@ -18,7 +18,6 @@ import Dataset from '../model/dataset'
 import MainPane from '../components/main'
 import { OHLCV } from '../definitions/chart'
 import Chart from '../components/chart'
-//import internal from 'stream'
 
 const HASHKEY = "state"
 const DEFAULTSTATEID = "defaultState"
