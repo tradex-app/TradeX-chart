@@ -4,11 +4,21 @@
 // the chart can request (pull) data when needed
 
 import { SHORTNAME } from "../definitions/core";
+import TradeXchart from "../core";
 import State from "../state"
 import { isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isString } from "../utils/typeChecks";
 import { uid, xMap } from "../utils/utilities";
-import TradeXchart from "../core";
 import { limit } from "../utils/number";
+import { TIMESCALESVALUES, ms2Interval } from "../utils/time";
+
+const defaultTimeFrames = {}
+for (let t of Object.values(TIMESCALESVALUES)) {
+  let ms = t[0]
+  let key = ms2Interval(ms)
+  if (ms < 60000) continue
+  defaultTimeFrames[`${key}`] = ms
+}
+Object.freeze(defaultTimeFrames)
 
 export default class DataSource {
 
@@ -16,41 +26,34 @@ export default class DataSource {
   static #sourceList= new xMap()
   static #sourceCnt = 0
 
+  static get defaultTimeFrames() { return defaultTimeFrames }
 
   /**
    *
    * @static
+   * @param {Object} cfg - configuration object
+   * @param {String} cfg.symbol - eg. BTC/USDT 
+   * @param {Array.<Number>} cfg.timeFrames - object of time frames in milliseconds
+   * @param {Number} cfg.timeFrameInit - initial time frame
+   * @param {Ticker} cfg.ticker
+   * @param {History} cfg.history
    * @param {State} state
-   * @param {object} source - { history: function, stream: function }
-   * @param {object} data - 
-   * @return {State|boolean} state with data source
+   * @return {DataSource|boolean} state with data source
    * @memberof DataSource
    */
-  static create( state, source, data, core ) {
+  static create( cfg, state ) {
 
     if (
-      (
-        !isObject(source) &&
-        !isFunction(source?.history) &&
-        !isFunction(source?.stream) &&
-        !isObject(data)
-      ) ||
-      !( core instanceof TradeXchart )
+      !isObject(cfg) ||
+      !( state.core instanceof TradeXchart ) ||
+      !( state instanceof State )
     )
     // can't build a data source
     return false
 
-    if (!(state instanceof State)) {
-      state = State.validate(state)
-    }
-    // create new empty default state
-    else {
-      state = State.create()
-    }
-
-    state.dataSource = new DataSource( state, source, data )
-    DataSource.#sourceList.set( state.dataSource, state )
-    return state
+    let dataSource = new DataSource( cfg, state )
+    DataSource.#sourceList.set( dataSource, state )
+    return dataSource
   }
 
   static delete(key) {
@@ -74,11 +77,15 @@ export default class DataSource {
    * @returns {Array.<DataSource>|undefined} - array of state instances
    */
   static list (chart) {
-    let sources = DataSource.chartList(chart)?.sources
+    let sources = DataSource.sourceList(chart)?.sources
     if (!sources) return undefined
     
     return Array.from( sources, 
       ([key, value]) => ({key, value}))
+  }
+
+  static sourceList(chart) {
+    
   }
 
   #cnt
@@ -88,10 +95,11 @@ export default class DataSource {
   #history
   #ticker
   #core
-  #timeFrames = {}
+  #timeFrames = []
   #timeFrameCurr
 
   #waiting = false
+  #fetching = false
 
 
   /**
@@ -99,25 +107,24 @@ export default class DataSource {
    * One DataSource per symbol and thus state
    * @param {Object} cfg - configuration object
    * @param {String} cfg.symbol - eg. BTC/USDT 
-   * @param {Array.<Number>} cfg.timeFrames - array of time frames in milliseconds
+   * @param {Array.<Number>} cfg.timeFrames - object of time frames in milliseconds
    * @param {Number} cfg.timeFrameInit - initial time frame
    * @param {Ticker} cfg.ticker
    * @param {History} cfg.history
-   * @param {State} cfg.state
-   * @param {TradeXchart} cfg.core
+   * @param {State} state
    * @memberof DataSource
    */
-  constructor( cfg ) {
+  constructor( cfg, state ) {
 
     this.#cnt = ++DataSource.#sourceCnt
-    this.symbolSet(cfg.symbol)
+    this.symbolSet(cfg?.symbol)
     this.#id = uid(`${SHORTNAME}_dataSource_${this.#symbol}`)
-    this.timeFramesAdd(cfg.timeFrames)
-    this.timeFrameUse(cfg.timeFrameInit)
-    this.historyAdd(cfg.history)
-    this.tickerAdd(cfg.ticker)
-    this.#state = cfg.state
-    this.#core = cfg.core
+    this.timeFramesAdd(cfg?.timeFrames)
+    this.timeFrameUse(cfg?.timeFrameInit)
+    this.historyAdd(cfg?.history)
+    this.tickerAdd(cfg?.ticker)
+    this.#state = state
+    this.#core = state.core
 
     this.#core.on("range_limitPast", this.onRangeLimit, this)
     // core.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
@@ -125,9 +132,9 @@ export default class DataSource {
 
   get id() { return this.#id }
   get symbol() { return this.#symbol }
-  get timeFrame() { return this.#timeFrameActive }
-  get timeFrameMS() { return this.#timeFrameActive }
-  get timeFrameStr() { return }
+  get timeFrame() { return this.#timeFrameCurr }
+  get timeFrameMS() { return this.#timeFrameCurr }
+  get timeFrameStr() { return ms2Interval(this.#timeFrameCurr) }
   get timeFrames() { return this.#timeFrames }
 
   symbolSet(s) {
@@ -137,12 +144,13 @@ export default class DataSource {
   }
 
   timeFramesAdd(t) {
-    if (!isArrayOfType(t, "number")) 
+    // if (!isArrayOfType(t, "array")) 
+    if (!isObject(t))
       throw new Error(`TODO: DataSource : time frames invalid`)
 
     // convert time frames list into object {1m: 60000}
-    
-    this.#timeFrames = [...t]
+    if (!Object.keys(t).length) t = DataSource.defaultTimeFrames
+    this.#timeFrames = {...t}
   }
 
   timeFrameUse(tf) {
@@ -151,7 +159,7 @@ export default class DataSource {
     if (!isInteger(tf))
       throw new Error(`TODO: DataSource : time frames invalid`)
 
-    tf = limit(tf, 1000, TIMESCALES.YEARS10)
+    tf = limit(tf, 1000, TIMESCALESVALUES.YEARS10[0])
     this.#timeFrameCurr = tf
   }
 
@@ -188,14 +196,26 @@ export default class DataSource {
   }
 
   onFetch(f) {
+    // if (this.#fetching) 
+    this.#fetching = true
+    try {
 
+    }
+    catch (e) {
+      this.#core.error(e)
+      this.#waiting = false
+    }
   }
 
   onRangeLimit(e) {
-    if (this.#waiting) return
+    // if (this.#waiting) return
     this.#waiting = true
     try {
       // history call must handle time outs
+      if (!isFunction(this.#history)) {
+        this.#waiting = false
+        return
+      }
       this.#history( this.#symbol, this.#core.timeFrame, this.#core.range.timeStart )
       .then(d => {
         this.#core.mergeData(d, false, true)

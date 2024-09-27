@@ -18,6 +18,8 @@ import Dataset from '../model/dataset'
 import MainPane from '../components/main'
 import { OHLCV } from '../definitions/chart'
 import Chart from '../components/chart'
+import DataSource from '../model/dataSource'
+//import internal from 'stream'
 
 const HASHKEY = "state"
 const DEFAULTSTATEID = "defaultState"
@@ -27,6 +29,13 @@ export const DEFAULT_STATE = {
   key: "",
   status: "default",
   isEmpty: true,
+  dataSource: {
+    symbol: "Empty Chart",
+    timeFrames: {},
+    timeFrameInit:DEFAULT_TIMEFRAMEMS,
+    ticker: null,
+    history: null,
+  },
   allData: {},
   chart: {
     name: "Primary",
@@ -73,7 +82,8 @@ export const DEFAULT_STATE = {
     interval: DEFAULT_TIMEFRAMEMS,
     timeFrame: DEFAULT_TIMEFRAME,
     timeFrameMS: DEFAULT_TIMEFRAMEMS,
-    initialCnt: INTITIALCNT
+    initialCnt: INTITIALCNT,
+    // start
   }
 }
 const CONFIGENTRIES = {
@@ -757,9 +767,10 @@ export default class State {
     if (!(state?.core instanceof TradeXchart)) throw new Error(`State : invalid TradeXchart instance`)
     this.#core = state.core
     this.#data = State.validate(this, state, deepValidate, isCrypto)
-    this.#data.range = State.buildRange(this, this.#data, state.core)
+    this.#data.range = State.buildRange(this, this.#data, this.#core)
     this.#data.timeData = new TimeData(this.#data.range)
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
+    this.#dataSource = DataSource.create(this.#data.dataSource, this)
     let hash = State.hash(state)
     this.#key = `${SHORTNAME}_${HASHKEY}_${hash}`
   }
@@ -775,6 +786,7 @@ export default class State {
   get range() { return this.#data.range }
   get chartPanes() { return this.#chartPanes }
   get chartPaneMaximized() { return this.#chartPaneMaximized }
+  get dataSource() { return this.#dataSource }
   get allData() {
     return {
       data: this.#data.chart.data,
