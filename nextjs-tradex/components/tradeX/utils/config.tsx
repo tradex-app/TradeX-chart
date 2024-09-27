@@ -1,4 +1,4 @@
-import * as talib from './';
+import * as talib from 'talib-web';
 import ColorsEnum from '../../theme/colors';
 import { ChartType, IConfig } from '../../../../types'; // 'tradex-chart';
 

@@ -25,7 +25,8 @@
     "buildall": "./bin/buildall.sh",
     "build": "./bin/build.sh",
     "serve": "vite serve",
-    "demo": "vite build && vite serve --open /demo.html"
+    "demo": "vite build && vite serve --open /demo.html",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "jsdoc-to-markdown": "^8.0.3",
