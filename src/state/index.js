@@ -767,10 +767,10 @@ export default class State {
     if (!(state?.core instanceof TradeXchart)) throw new Error(`State : invalid TradeXchart instance`)
     this.#core = state.core
     this.#data = State.validate(this, state, deepValidate, isCrypto)
+    this.#dataSource = DataSource.create(this.#data.dataSource, this)
     this.#data.range = State.buildRange(this, this.#data, this.#core)
     this.#data.timeData = new TimeData(this.#data.range)
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
-    this.#dataSource = DataSource.create(this.#data.dataSource, this)
     let hash = State.hash(state)
     this.#key = `${SHORTNAME}_${HASHKEY}_${hash}`
   }
@@ -804,6 +804,7 @@ export default class State {
   get events() { return this.#data.events }
   get annotations() { return this.#data.annotations }
   get tools() { return this.#data.tools }
+  get symbol() { return this.#dataSource.symbol }
 
 
   error(e) { this.#core.error(e) }

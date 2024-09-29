@@ -116,6 +116,8 @@ export default class DataSource {
    */
   constructor( cfg, state ) {
 
+    this.#state = state
+    this.#core = state.core
     this.#cnt = ++DataSource.#sourceCnt
     this.symbolSet(cfg?.symbol)
     this.#id = uid(`${SHORTNAME}_dataSource_${this.#symbol}`)
@@ -123,8 +125,6 @@ export default class DataSource {
     this.timeFrameUse(cfg?.timeFrameInit)
     this.historyAdd(cfg?.history)
     this.tickerAdd(cfg?.ticker)
-    this.#state = state
-    this.#core = state.core
 
     this.#core.on("range_limitPast", this.onRangeLimit, this)
     // core.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
@@ -138,15 +138,22 @@ export default class DataSource {
   get timeFrames() { return this.#timeFrames }
 
   symbolSet(s) {
-    if (!isString(s)) 
-      throw new Error(`TODO: DataSource : symbol invalid`)
-    this.#symbol = s
+    let symbol = this.#core.config.symbol
+    if ((!isString(s) || (isString(s) && !s.length)) && 
+         !symbol.length)
+      throwError(this.#core.id, `symbol invalid`)
+    else 
+    if ((!isString(s) || (isString(s) && !s.length)) && 
+          symbol.length > 0)
+      this.#symbol = symbol
+    else
+      this.#symbol = s
   }
 
   timeFramesAdd(t) {
     // if (!isArrayOfType(t, "array")) 
     if (!isObject(t))
-      throw new Error(`TODO: DataSource : time frames invalid`)
+      throwError(this.#core.id, `time frames invalid`)
 
     // convert time frames list into object {1m: 60000}
     if (!Object.keys(t).length) t = DataSource.defaultTimeFrames
@@ -157,7 +164,7 @@ export default class DataSource {
     // TODO: check if time frame string and look up number
     tf *= 1
     if (!isInteger(tf))
-      throw new Error(`TODO: DataSource : time frames invalid`)
+      throwError(this.#core.id, `time frame invalid`)
 
     tf = limit(tf, 1000, TIMESCALESVALUES.YEARS10[0])
     this.#timeFrameCurr = tf
@@ -227,4 +234,9 @@ export default class DataSource {
       this.#waiting = false
     }
   }
+
+}
+
+function throwError(id, e) {
+  throw new Error(`TradeX-chart id: ${id} : DataSource : ${e}`)
 }
