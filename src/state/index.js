@@ -23,6 +23,7 @@ import DataSource from '../model/dataSource'
 
 const HASHKEY = "state"
 const DEFAULTSTATEID = "defaultState"
+const EMPTYCHART = "Empty Chart"
 export const DEFAULT_STATE = {
   version: packageJSON.version,
   id: DEFAULTSTATEID,
@@ -30,7 +31,7 @@ export const DEFAULT_STATE = {
   status: "default",
   isEmpty: true,
   dataSource: {
-    symbol: "Empty Chart",
+    symbol: EMPTYCHART,
     timeFrames: {},
     timeFrameInit:DEFAULT_TIMEFRAMEMS,
     ticker: null,
@@ -85,11 +86,6 @@ export const DEFAULT_STATE = {
     initialCnt: INTITIALCNT,
     // start
   }
-}
-const CONFIGENTRIES = {
-  chart: "object",
-  ohlcv: "array",
-  range: "object"
 }
 const TRADE = {
   timestamp: "number",
@@ -227,7 +223,7 @@ export default class State {
     let key = (State.has(chart, state)) ? state :
       (State.has(chart, state?.key)) ? state.key : state
 
-    if (!isString(key) && isObject(state) && Object.keys(state).length > 2) {
+    if (!isString(key) && isObject(state) && !Object.keys(state).length) {
       let hash = State.hash(state)
       key = `${SHORTNAME}_${HASHKEY}_${hash}`
 
@@ -305,12 +301,13 @@ export default class State {
       !Object.keys(config).length)
       return false
     else {
-      for (let [key, type] of Object.entries(CONFIGENTRIES)) {
-        if (typeOf(config?.[key]) === type)
-          return true
+      for (let [key, type] of Object.entries(config)) {
+        if (key in DEFAULT_STATE && 
+            typeof config[key] !== typeof DEFAULT_STATE[key])
+          return false
       }
+      return true
     }
-    return false
   }
 
   static validate(instance, source = State.default, deepValidate = false, isCrypto = false) {
@@ -321,6 +318,18 @@ export default class State {
     if (!isObject(source)) source = defaultState
 
     if (!(source.core instanceof TradeXchart)) throw new Error(`State : invalid TradeXchart instance`)
+
+    // process DataState config
+    if (!isObject(source.dataSource)) {
+      source.dataSource = defaultState.dataSource
+      source.dataSource.symbol = source.core.config?.symbol || `undefined`
+    }
+    if (!isString(source.dataSource.symbol) ||
+        !source.dataSource.symbol.length ||
+        source.dataSource.symbol == EMPTYCHART) {
+      source.dataSource.symbol = source.core.config?.symbol || `undefined`
+    }
+
 
     // set up main (primary) chart state (handles price history (candles OHLCV))
     if (!isObject(source.chart)) {
@@ -784,6 +793,7 @@ export default class State {
   get gaps() { return this.#gaps }
   get time() { return this.#data.timeData }
   get range() { return this.#data.range }
+  get symbol() { return this.#dataSource.symbol }
   get chartPanes() { return this.#chartPanes }
   get chartPaneMaximized() { return this.#chartPaneMaximized }
   get dataSource() { return this.#dataSource }
@@ -804,7 +814,6 @@ export default class State {
   get events() { return this.#data.events }
   get annotations() { return this.#data.annotations }
   get tools() { return this.#data.tools }
-  get symbol() { return this.#dataSource.symbol }
 
 
   error(e) { this.#core.error(e) }

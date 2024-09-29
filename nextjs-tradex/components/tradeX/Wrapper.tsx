@@ -153,6 +153,7 @@ const TradingChart = (props: ITokenChartProps) => {
         chartX.state.use(existingState.key);
       } else {
         console.log('NEW STATE');
+        /*
         const newState = {
           ...config,
           id: symbol + '-' + selectedInterval,
@@ -163,6 +164,14 @@ const TradingChart = (props: ITokenChartProps) => {
           isLightTheme,
           state: []
         };
+        */
+        const newState = {
+          id: symbol + '-' + selectedInterval,
+          dataSource: {
+            symbol,
+            timeFrameInit: selectedInterval
+          }
+        }
         // @ts-ignore
         chartX.state.use(newState);
       }

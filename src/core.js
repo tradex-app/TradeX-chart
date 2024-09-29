@@ -384,7 +384,7 @@ export default class TradeXchart extends Tradex_chart {
   get mousePos() { return this.#pointerPos }
   get pointerButtons() { return this.#pointerButtons }
 
-  get symbol() { return this.state.symbol }
+  get symbol() { return this.state?.symbol }
   get timeFrame() { return this.range.interval }
   get timeFrameStr() { return this.range.intervalStr }
   set pricePrecision(p) { this.setPricePrecision(p) }

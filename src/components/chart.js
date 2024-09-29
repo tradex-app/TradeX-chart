@@ -265,7 +265,7 @@ export default class Chart extends Component{
     this.eventsListen()
 
     if (this.isPrimary)
-      this.setTitle(this.theme?.title)
+      this.setTitle(this.core.state.symbol)  // (this.theme?.title)
 
     // add divider to allow manual resize of the chart pane
     let cfg = { chartPane: this }
