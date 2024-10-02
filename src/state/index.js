@@ -36,6 +36,10 @@ export const DEFAULT_STATE = {
     timeFrameInit:DEFAULT_TIMEFRAMEMS,
     ticker: null,
     history: null,
+    intialRange: {
+      initialCnt: INTITIALCNT,
+      startTS: undefined
+    }
   },
   allData: {},
   chart: {
@@ -78,14 +82,6 @@ export const DEFAULT_STATE = {
       ts: {}
     }
   },
-  range: {
-    intervalStr: DEFAULT_TIMEFRAME,
-    interval: DEFAULT_TIMEFRAMEMS,
-    timeFrame: DEFAULT_TIMEFRAME,
-    timeFrameMS: DEFAULT_TIMEFRAMEMS,
-    initialCnt: INTITIALCNT,
-    // start
-  }
 }
 const TRADE = {
   timestamp: "number",
@@ -714,39 +710,6 @@ export default class State {
     return true
   }
 
-  static buildRange(instance, state, core) {
-
-    /*--- Time Frame ---*/
-    let cfg = state.core.config.range
-    let range = state.range
-    let tfms = detectInterval(state.chart.data)
-
-    if (tfms === Infinity) tfms = range.timeFrameMS || DEFAULT_TIMEFRAMEMS
-
-    if (!state.chart.isEmpty &&
-      state.chart.data.length > 1 &&
-      range.timeFrameMS !== tfms)
-      range.timeFrameMS = tfms
-
-    if (!isTimeFrameMS(range.timeFrameMS)) range.timeFrameMS = DEFAULT_TIMEFRAMEMS
-
-    range.timeFrame = ms2Interval(range.timeFrameMS)
-
-    /*--- Range ---*/
-    let config = {
-      core,
-      state: instance, // state,
-      interval: range.timeFrame || cfg?.timeFrameMS,
-      initialCnt: range?.initialCnt || cfg?.initialCnt,
-      limitFuture: range?.limitFuture || cfg?.limitFuture,
-      limitPast: range?.limitPast || cfg?.limitPast,
-      minCandles: range?.minCandles || cfg?.minCandles,
-      maxCandles: range?.maxCandles || cfg?.maxCandles,
-      yAxisBounds: range?.yAxisBounds || cfg?.yAxisBounds,
-    }
-
-    return new Range(range?.start, range?.end, config)
-  }
 
 
   #id = ""
@@ -771,8 +734,8 @@ export default class State {
     this.#core = state.core
     this.#data = State.validate(this, state, deepValidate, isCrypto)
     this.#dataSource = DataSource.create(this.#data.dataSource, this)
-    this.#data.range = State.buildRange(this, this.#data, this.#core)
-    this.#data.timeData = new TimeData(this.#data.range)
+    // this.#data.range = State.buildRange(this, this.#data, this.#core)
+    this.#data.timeData = new TimeData(this.#dataSource.range)
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
     this.#key = hashKey(state)
   }
@@ -785,8 +748,12 @@ export default class State {
   get data() { return this.#data }
   get gaps() { return this.#gaps }
   get time() { return this.#data.timeData }
-  get range() { return this.#data.range }
+  get range() { return this.#dataSource.range } // { return this.#data.range }
   get symbol() { return this.#dataSource.symbol }
+  set timeFrame(t) { this.#dataSource.timeFrame(t) }
+  get timeFrame() { return this.#dataSource.timeFrame }
+  get timeFrameStr() { return this.#dataSource.timeFrameStr }
+  get timeFrames() { return this.#dataSource.timeFrames }
   get chartPanes() { return this.#chartPanes }
   get chartPaneMaximized() { return this.#chartPaneMaximized }
   get dataSource() { return this.#dataSource }
@@ -939,6 +906,15 @@ export default class State {
       this.#core.log(errMsg)
 
     return state
+  }
+
+  /**
+   * Does this state DataSource provide this time frame?
+   * @param {Number|String} tf - time frame, milliseconds (integer ) or string, eg. 1m, 2h, 1d, 1w, 1M, 1y
+   * @returns {Boolean}
+   */
+  hasTimeFrame(tf) {
+    return this.#dataSource.timeFrameExists(tf)
   }
 
   /**

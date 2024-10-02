@@ -5,6 +5,7 @@
 
 import { SHORTNAME } from "../definitions/core";
 import TradeXchart from "../core";
+import { Range, detectInterval } from "./range";
 import State from "../state"
 import { isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isString } from "../utils/typeChecks";
 import { uid, xMap } from "../utils/utilities";
@@ -109,6 +110,7 @@ export default class DataSource {
     
   }
 
+
   #cnt
   #id
   #symbol
@@ -116,6 +118,7 @@ export default class DataSource {
   #history
   #ticker
   #core
+  #range
   #timeFrames = {}
   #timeFrameCurr
 
@@ -142,8 +145,9 @@ export default class DataSource {
     this.#cnt = ++DataSource.#sourceCnt
     this.symbolSet(cfg?.symbol)
     this.#id = uid(`${SHORTNAME}_dataSource_${this.#symbol}`)
-    this.timeFramesAdd(cfg?.timeFrames)
+    this.timeFramesAdd(cfg?.timeFrames, cfg?.initialRange)
     this.timeFrameUse(cfg?.timeFrameInit)
+    this.#range = buildRange(state, state.data, state.core)
     this.historyAdd(cfg?.history)
     this.tickerAdd(cfg?.ticker)
 
@@ -153,10 +157,12 @@ export default class DataSource {
 
   get id() { return this.#id }
   get symbol() { return this.#symbol }
+  set timeFrame(t) { this.timeFrameUse(t) }
   get timeFrame() { return this.#timeFrameCurr }
   get timeFrameMS() { return this.#timeFrameCurr }
   get timeFrameStr() { return ms2Interval(this.#timeFrameCurr) }
   get timeFrames() { return this.#timeFrames }
+  get range() { return this.#range }
 
   symbolSet(s) {
     let symbol = this.#core.config.symbol
@@ -169,13 +175,13 @@ export default class DataSource {
       this.#symbol = symbol
   }
 
-  timeFramesAdd(t) {
+  timeFramesAdd(t, r) {
     let tf;
     if (isArrayOfType(t, "integer")) {
       tf = buildTimeFrames(t)
     }
     else if (!isObject(t) || !Object.keys(t).length) {
-      tf = DataSource.defaultTimeFrames
+      tf = r?.DataSource.defaultTimeFrames
     }
     else {
       tf = buildTimeFrames( Object.values(t) )
@@ -190,11 +196,34 @@ export default class DataSource {
     if (!isInteger(tf))
       throwError(this.#core.id, `time frame invalid`)
 
+    let valid = this.timeFrameExists(tf)
+
+    if (!isInteger(this.#timeFrameCurr))
+      this.#timeFrameCurr = detectInterval(this.#state.data.chart.data)
+
+    if (!!valid) {
+      if (valid == this.#timeFrameCurr ) return
+      // switch to new or existing time frame
+      this.#timeFrameCurr = valid
+    }
+    else if (!Object.keys(this.#timeFrames).length) {
+      if (tf == this.#timeFrameCurr ) return
+
     let str = ms2Interval(tf)
-    if (str in this.#timeFrames)
+      this.#timeFrames[str] = tf
       this.#timeFrameCurr = tf
+    }
     else 
       throwError(this.#core.id, `time frame invalid`)
+  }
+
+  timeFrameExists(tf) {
+    if (tf in this.#timeFrames) return this.#timeFrames[tf]
+    if (isInteger(tf)) {
+      let str = ms2Interval(tf)
+      if (str in this.#timeFrames) return tf
+    }
+    return undefined
   }
 
   tickerAdd(t) {
@@ -277,4 +306,39 @@ function buildTimeFrames (t) {
     tf[str] = [ms, str]
   }
   return tf
+}
+
+function buildRange(instance, state) {
+
+  /*--- Time Frame ---*/
+  let core = state.core
+  let cfg = core.config.range
+  let range = state.range
+  let tfms = detectInterval(state.chart.data)
+
+  if (tfms === Infinity) tfms = range.timeFrameMS || DEFAULT_TIMEFRAMEMS
+
+  if (!state.chart.isEmpty &&
+    state.chart.data.length > 1 &&
+    range.timeFrameMS !== tfms)
+    range.timeFrameMS = tfms
+
+  if (!isTimeFrameMS(range.timeFrameMS)) range.timeFrameMS = DEFAULT_TIMEFRAMEMS
+
+  range.timeFrame = ms2Interval(range.timeFrameMS)
+
+  /*--- Range ---*/
+  let config = {
+    core,
+    state: instance, // state,
+    interval: range.timeFrame || cfg?.timeFrameMS,
+    initialCnt: range?.initialCnt || cfg?.initialCnt,
+    limitFuture: range?.limitFuture || cfg?.limitFuture,
+    limitPast: range?.limitPast || cfg?.limitPast,
+    minCandles: range?.minCandles || cfg?.minCandles,
+    maxCandles: range?.maxCandles || cfg?.maxCandles,
+    yAxisBounds: range?.yAxisBounds || cfg?.yAxisBounds,
+  }
+
+  return new Range(range?.start, range?.end, config)
 }
