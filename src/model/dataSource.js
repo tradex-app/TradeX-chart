@@ -9,10 +9,11 @@ import State from "../state"
 import { isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isString } from "../utils/typeChecks";
 import { uid, xMap } from "../utils/utilities";
 import { limit } from "../utils/number";
-import { TIMESCALESVALUES, ms2Interval } from "../utils/time";
+import { TIMEFRAMEMAX, TIMEFRAMEMIN, TIMESCALESVALUES, interval2MS, isTimeFrameMS, ms2Interval } from "../utils/time";
 
+const TSV =   TIMESCALESVALUES
 const defaultTimeFrames = {}
-for (let t of Object.values(TIMESCALESVALUES)) {
+for (let t of Object.values(TSV)) {
   let ms = t[0]
   let key = ms2Interval(ms)
   if (ms < 60000) continue
@@ -20,13 +21,33 @@ for (let t of Object.values(TIMESCALESVALUES)) {
 }
 Object.freeze(defaultTimeFrames)
 
+const defaultTimeFramesShort = {
+  "1m": TSV.MINUTE[0],
+  "2m": TSV.MINUTE2[0],
+  "3m": TSV.MINUTE3[0],
+  "5m": TSV.MINUTE5[0],
+  "10m": TSV.MINUTE10[0],
+  "15m": TSV.MINUTE15[0],
+  "30m": TSV.MINUTE30[0],
+  "1h": TSV.HOUR[0],
+  "2h": TSV.HOUR2[0],
+  "3h": TSV.HOUR3[0],
+  "4h": TSV.HOUR4[0],
+  "1d": TSV.DAY[0],
+  "1w": TSV.DAY7[0],
+  "1M": TSV.MONTH[0],
+  "3M": TSV.MONTH3[0],
+  "6M": TSV.MONTH6[0],
+  "1y": TSV.YEARS[0]
+}
+
 export default class DataSource {
 
   static #chartList = new xMap()
   static #sourceList= new xMap()
   static #sourceCnt = 0
 
-  static get defaultTimeFrames() { return defaultTimeFrames }
+  static get defaultTimeFrames() { return defaultTimeFramesShort }
 
   /**
    *
@@ -95,7 +116,7 @@ export default class DataSource {
   #history
   #ticker
   #core
-  #timeFrames = []
+  #timeFrames = {}
   #timeFrameCurr
 
   #waiting = false
@@ -142,32 +163,38 @@ export default class DataSource {
     if ((!isString(s) || (isString(s) && !s.length)) && 
          !symbol.length)
       throwError(this.#core.id, `symbol invalid`)
-    else 
-    if ((!isString(s) || (isString(s) && !s.length)) && 
-          symbol.length > 0)
-      this.#symbol = symbol
-    else
+    else if (isString(s) && s.length > 0)
       this.#symbol = s
+    else
+      this.#symbol = symbol
   }
 
   timeFramesAdd(t) {
-    // if (!isArrayOfType(t, "array")) 
-    if (!isObject(t))
-      throwError(this.#core.id, `time frames invalid`)
-
-    // convert time frames list into object {1m: 60000}
-    if (!Object.keys(t).length) t = DataSource.defaultTimeFrames
-    this.#timeFrames = {...t}
+    let tf;
+    if (isArrayOfType(t, "integer")) {
+      tf = buildTimeFrames(t)
+    }
+    else if (!isObject(t) || !Object.keys(t).length) {
+      tf = DataSource.defaultTimeFrames
+    }
+    else {
+      tf = buildTimeFrames( Object.values(t) )
+    }
+    this.#timeFrames = {...tf}
   }
 
   timeFrameUse(tf) {
-    // TODO: check if time frame string and look up number
-    tf *= 1
+    if (isString(tf)) {
+      tf = interval2MS(tf)
+    }
     if (!isInteger(tf))
       throwError(this.#core.id, `time frame invalid`)
 
-    tf = limit(tf, 1000, TIMESCALESVALUES.YEARS10[0])
-    this.#timeFrameCurr = tf
+    let str = ms2Interval(tf)
+    if (str in this.#timeFrames)
+      this.#timeFrameCurr = tf
+    else 
+      throwError(this.#core.id, `time frame invalid`)
   }
 
   tickerAdd(t) {
@@ -239,4 +266,15 @@ export default class DataSource {
 
 function throwError(id, e) {
   throw new Error(`TradeX-chart id: ${id} : DataSource : ${e}`)
+}
+
+function buildTimeFrames (t) {
+  let tf = {}
+  let str;
+  for (let ms of t) {
+    if (!isTimeFrameMS(ms)) continue
+    str = ms2Interval(ms)
+    tf[str] = [ms, str]
+  }
+  return tf
 }

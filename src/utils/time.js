@@ -65,12 +65,14 @@ export const TIMESCALESVALUES = {
   HOUR12: [ HOUR_MS * 12, "hours", 12 ],
   HOUR6: [ HOUR_MS * 6, "hours", 6 ],
   HOUR4: [ HOUR_MS * 4, "hours", 4 ],
+  HOUR3: [ HOUR_MS * 3, "hours", 3 ],
   HOUR2: [ HOUR_MS * 2, "hours", 2 ],
   HOUR: [ HOUR_MS, "hours", 1 ],
   MINUTE30: [ MINUTE_MS * 30, "minutes", 30 ],
   MINUTE15: [ MINUTE_MS * 15, "minutes", 15 ],
   MINUTE10: [ MINUTE_MS * 10, "minutes", 10 ],
   MINUTE5: [ MINUTE_MS * 5, "minutes", 5 ],
+  MINUTE3: [ MINUTE_MS * 3, "minutes", 3 ],
   MINUTE2: [ MINUTE_MS * 2, "minutes", 2 ],
   MINUTE: [ MINUTE_MS, "minutes", 1 ],
   SECOND30: [ SECOND_MS * 30, "seconds", 30 ],
@@ -85,6 +87,10 @@ export const TIMESCALESVALUES = {
   MILLISECOND50: [ MILLISECOND * 50, "milliseconds", 50 ],
   MILLISECOND: [ MILLISECOND, "milliseconds", 1 ],
 }
+export const TIMEFRAMEMIN = MINUTE_MS
+export const INTERVALMIN = TIMEFRAMEMIN
+export const TIMEFRAMEMAX = TIMESCALESVALUES.YEARS10[0]
+export const INTERVALMAX = TIMEFRAMEMAX
 const timeScales = () => {
   const values = Object.values(TIMESCALESVALUES)
   const vals = []

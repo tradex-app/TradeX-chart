@@ -223,9 +223,8 @@ export default class State {
     let key = (State.has(chart, state)) ? state :
       (State.has(chart, state?.key)) ? state.key : state
 
-    if (!isString(key) && isObject(state) && !Object.keys(state).length) {
-      let hash = State.hash(state)
-      key = `${SHORTNAME}_${HASHKEY}_${hash}`
+    if (!isString(key) && isObject(state) && !!Object.keys(state).length) {
+      key = hashKey(state)
 
       if (!State.has(chart, key)) {
         key = State.create(chart, state).key
@@ -284,11 +283,6 @@ export default class State {
       if (s[1].id == id) return s[1].key
     }
     return undefined
-  }
-
-  static hash(input) {
-    let str = JSON.stringify(input)
-    return cyrb53(str)
   }
 
   /**
@@ -780,8 +774,7 @@ export default class State {
     this.#data.range = State.buildRange(this, this.#data, this.#core)
     this.#data.timeData = new TimeData(this.#data.range)
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
-    let hash = State.hash(state)
-    this.#key = `${SHORTNAME}_${HASHKEY}_${hash}`
+    this.#key = hashKey(state)
   }
 
   get id() { return this.#id }
@@ -1341,3 +1334,8 @@ export default class State {
 
 }
 
+function hashKey(state) {
+  let str = JSON.stringify(state)
+  let hash = cyrb53(str)
+  return `${SHORTNAME}_${HASHKEY}_${hash}`
+}
