@@ -8,7 +8,7 @@ import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, Tim
 import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, doStructuredClone, idSanitize } from '../utils/utilities'
 import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
 import { calcTimeIndex, detectInterval } from '../model/range'
-import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT } from '../definitions/chart'
+import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT, LIMITFUTURE, LIMITPAST, MAXCANDLES, MINCANDLES, YAXIS_BOUNDS } from '../definitions/chart'
 import { SHORTNAME } from '../definitions/core'
 import TradeXchart, { isChart } from '../core'
 import { Range } from '../model/range'
@@ -32,13 +32,19 @@ export const DEFAULT_STATE = {
   isEmpty: true,
   dataSource: {
     symbol: EMPTYCHART,
-    timeFrames: {},
     timeFrameInit:DEFAULT_TIMEFRAMEMS,
+    timeFrames: {},
+    timeFramesData: {},
     ticker: null,
     history: null,
-    intialRange: {
+    initialRange: {
+      startTS: undefined,
       initialCnt: INTITIALCNT,
-      startTS: undefined
+      limitFuture: LIMITFUTURE,
+      limitPast: LIMITPAST,
+      minCandles: MINCANDLES,
+      maxCandles: MAXCANDLES,
+      yAxisBounds: YAXIS_BOUNDS
     }
   },
   allData: {},
@@ -734,7 +740,6 @@ export default class State {
     this.#core = state.core
     this.#data = State.validate(this, state, deepValidate, isCrypto)
     this.#dataSource = DataSource.create(this.#data.dataSource, this)
-    // this.#data.range = State.buildRange(this, this.#data, this.#core)
     this.#data.timeData = new TimeData(this.#dataSource.range)
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
     this.#key = hashKey(state)

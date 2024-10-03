@@ -145,7 +145,7 @@ export default class DataSource {
     this.#cnt = ++DataSource.#sourceCnt
     this.symbolSet(cfg?.symbol)
     this.#id = uid(`${SHORTNAME}_dataSource_${this.#symbol}`)
-    this.timeFramesAdd(cfg?.timeFrames, cfg?.initialRange)
+    this.timeFramesAdd(cfg?.timeFrames, DataSource)
     this.timeFrameUse(cfg?.timeFrameInit)
     this.#range = buildRange(state, state.data, state.core)
     this.historyAdd(cfg?.history)
@@ -175,13 +175,13 @@ export default class DataSource {
       this.#symbol = symbol
   }
 
-  timeFramesAdd(t, r) {
+  timeFramesAdd(t, d) {
     let tf;
     if (isArrayOfType(t, "integer")) {
       tf = buildTimeFrames(t)
     }
     else if (!isObject(t) || !Object.keys(t).length) {
-      tf = r?.DataSource.defaultTimeFrames
+      tf = d.defaultTimeFrames
     }
     else {
       tf = buildTimeFrames( Object.values(t) )
