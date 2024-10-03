@@ -579,7 +579,7 @@ export default class State {
     else {
       let tradeData = state[type].data
       let allData = state?.data?.allData || state.allData
-      let tf = state.range.timeFrame
+      let {tf} = isTimeFrame(state.dataSource.timeFrameInit)
       State.importData(type, tradeData, allData, tf)
     }
   }
@@ -737,6 +737,7 @@ export default class State {
 
   constructor(state = State.default, deepValidate = false, isCrypto = false) {
     if (!(state?.core instanceof TradeXchart)) throw new Error(`State : invalid TradeXchart instance`)
+    this.legacy(state)
     this.#core = state.core
     this.#data = State.validate(this, state, deepValidate, isCrypto)
     this.#dataSource = DataSource.create(this.#data.dataSource, this)
@@ -782,6 +783,18 @@ export default class State {
 
 
   error(e) { this.#core.error(e) }
+
+  legacy(state) {
+    if (!isObject(state?.data?.dataSource) && isObject(state?.data?.range)) {
+      let ms = state.data.range.timeFrameMS || interval2MS(state.data.range.timeFrame)
+      let tf = ms2Interval(ms)
+      state.data.dataSource = {
+        initialRange: {...state.data.range},
+        timeFrameInit: ms,
+        timeFrames: {[`${tf}`]: ms }
+      }
+    }
+  }
 
   /**
    * validate and register a chart state
@@ -947,7 +960,7 @@ export default class State {
 
     if (this.isEmpty) State.setTimeFrame(this.#core, this.key, merge?.ohlcv)
 
-    let tfMS = this.range.timeFrameMS
+    let tfMS = this.#dataSource.timeFrame
 
     if (!isObject(merge)) {
       this.error(`ERROR: ${this.id}: merge data must be type Object!`)

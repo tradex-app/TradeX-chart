@@ -10,7 +10,7 @@ import State from "../state"
 import { isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isString } from "../utils/typeChecks";
 import { uid, xMap } from "../utils/utilities";
 import { limit } from "../utils/number";
-import { TIMEFRAMEMAX, TIMEFRAMEMIN, TIMESCALESVALUES, interval2MS, isTimeFrameMS, ms2Interval } from "../utils/time";
+import { TIMEFRAMEMAX, TIMEFRAMEMIN, TIMESCALESVALUES, interval2MS, isTimeFrame, isTimeFrameMS, ms2Interval } from "../utils/time";
 
 const TSV =   TIMESCALESVALUES
 const defaultTimeFrames = {}
@@ -147,7 +147,7 @@ export default class DataSource {
     this.#id = uid(`${SHORTNAME}_dataSource_${this.#symbol}`)
     this.timeFramesAdd(cfg?.timeFrames, DataSource)
     this.timeFrameUse(cfg?.timeFrameInit)
-    this.#range = buildRange(state, state.data)
+    this.#range = this.buildRange(state)
     this.historyAdd(cfg?.history)
     this.tickerAdd(cfg?.ticker)
 
@@ -291,6 +291,45 @@ export default class DataSource {
     }
   }
 
+  buildRange(instance) {
+
+    /*--- Time Frame ---*/
+    let core = instance.core
+    let cfg = core.config.range
+    let state = instance.data
+    let range = state.dataSource.initialRange
+    let tfms = detectInterval(state.chart.data)
+  
+    if (tfms === Infinity) {
+      let {ms} = isTimeFrame(state.dataSource.timeFrameInit)
+      tfms = ms || DEFAULT_TIMEFRAMEMS
+    } 
+  
+    if (!state.chart.isEmpty &&
+      state.chart.data.length > 1 &&
+      this.#timeFrameCurr !== tfms)
+      this.#timeFrameCurr = tfms
+  
+    if (!isTimeFrameMS(this.#timeFrameCurr)) this.#timeFrameCurr = DEFAULT_TIMEFRAMEMS
+  
+    // range.timeFrame = ms2Interval(range.timeFrameMS)
+  
+    /*--- Range ---*/
+    let config = {
+      core,
+      state: instance, // state,
+      interval: this.#timeFrameCurr || cfg?.timeFrameMS,
+      initialCnt: range?.initialCnt || cfg?.initialCnt,
+      limitFuture: range?.limitFuture || cfg?.limitFuture,
+      limitPast: range?.limitPast || cfg?.limitPast,
+      minCandles: range?.minCandles || cfg?.minCandles,
+      maxCandles: range?.maxCandles || cfg?.maxCandles,
+      yAxisBounds: range?.yAxisBounds || cfg?.yAxisBounds,
+    }
+  
+    return new Range(range?.start, range?.end, config)
+  }
+
 }
 
 function throwError(id, e) {
@@ -308,37 +347,4 @@ function buildTimeFrames (t) {
   return tf
 }
 
-function buildRange(instance, state) {
 
-  /*--- Time Frame ---*/
-  let core = state.core
-  let cfg = core.config.range
-  let range = state.range
-  let tfms = detectInterval(state.chart.data)
-
-  if (tfms === Infinity) tfms = range.timeFrameMS || DEFAULT_TIMEFRAMEMS
-
-  if (!state.chart.isEmpty &&
-    state.chart.data.length > 1 &&
-    range.timeFrameMS !== tfms)
-    range.timeFrameMS = tfms
-
-  if (!isTimeFrameMS(range.timeFrameMS)) range.timeFrameMS = DEFAULT_TIMEFRAMEMS
-
-  range.timeFrame = ms2Interval(range.timeFrameMS)
-
-  /*--- Range ---*/
-  let config = {
-    core,
-    state: instance, // state,
-    interval: range.timeFrame || cfg?.timeFrameMS,
-    initialCnt: range?.initialCnt || cfg?.initialCnt,
-    limitFuture: range?.limitFuture || cfg?.limitFuture,
-    limitPast: range?.limitPast || cfg?.limitPast,
-    minCandles: range?.minCandles || cfg?.minCandles,
-    maxCandles: range?.maxCandles || cfg?.maxCandles,
-    yAxisBounds: range?.yAxisBounds || cfg?.yAxisBounds,
-  }
-
-  return new Range(range?.start, range?.end, config)
-}
