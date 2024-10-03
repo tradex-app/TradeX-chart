@@ -960,7 +960,7 @@ export default class State {
 
     if (this.isEmpty) State.setTimeFrame(this.#core, this.key, merge?.ohlcv)
 
-    let tfMS = this.#dataSource.timeFrame
+    let tfMS = this.#dataSource.timeFrameMS
 
     if (!isObject(merge)) {
       this.error(`ERROR: ${this.id}: merge data must be type Object!`)
@@ -970,6 +970,7 @@ export default class State {
     // time frames don't match
     if (end > 1 &&
       tfMS !== detectInterval(merge?.ohlcv)) {
+        console.log(tfMS, detectInterval(merge?.ohlcv))
       this.error(`ERROR: ${this.core.ID}: merge data time frame does not match existing time frame!`)
       return false
     }

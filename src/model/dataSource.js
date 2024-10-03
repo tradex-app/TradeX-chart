@@ -113,11 +113,12 @@ export default class DataSource {
 
   #cnt
   #id
+  #core
+  #source = {name: ""}
   #symbol
   #state
   #history
-  #ticker
-  #core
+  #ticker  
   #range
   #timeFrames = {}
   #timeFrameCurr
@@ -130,11 +131,14 @@ export default class DataSource {
    * Creates an instance of DataSource.
    * One DataSource per symbol and thus state
    * @param {Object} cfg - configuration object
+   * @param {Object} cfg.source - Exchange or data provider
    * @param {String} cfg.symbol - eg. BTC/USDT 
+   * @param {Object} cfg.symbols - list of symbols and their data
    * @param {Array.<Number>} cfg.timeFrames - object of time frames in milliseconds
    * @param {Number} cfg.timeFrameInit - initial time frame
    * @param {Ticker} cfg.ticker
    * @param {History} cfg.history
+   * @param {Object} cfg.initialRange
    * @param {State} state
    * @memberof DataSource
    */
@@ -143,6 +147,8 @@ export default class DataSource {
     this.#state = state
     this.#core = state.core
     this.#cnt = ++DataSource.#sourceCnt
+    this.symbolsAdd(cfg?.symbols)
+    this.sourceSet(cfg?.source)
     this.symbolSet(cfg?.symbol)
     this.#id = uid(`${SHORTNAME}_dataSource_${this.#symbol}`)
     this.timeFramesAdd(cfg?.timeFrames, DataSource)
@@ -163,6 +169,16 @@ export default class DataSource {
   get timeFrameStr() { return ms2Interval(this.#timeFrameCurr) }
   get timeFrames() { return this.#timeFrames }
   get range() { return this.#range }
+
+  sourceSet(s) {
+    if (isString(s)) this.#source.name = s
+    else if (isObject(s)) this.#source = {...this.#source, ...s}
+    else return
+  }
+
+  symbolsAdd(s) {
+
+  }
 
   symbolSet(s) {
     let symbol = this.#core.config.symbol
