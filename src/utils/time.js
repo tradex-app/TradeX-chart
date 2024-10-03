@@ -272,6 +272,10 @@ export function isTimeFrame(tf) {
       tf = "1s"
     }
   }
+  else if (isInteger(tf)) {
+    ms = tf
+    tf = ms2Interval(tf)
+  }
   else tf = "1s"
   return {tf, ms}
 }

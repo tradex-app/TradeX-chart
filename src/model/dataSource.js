@@ -147,7 +147,7 @@ export default class DataSource {
     this.#id = uid(`${SHORTNAME}_dataSource_${this.#symbol}`)
     this.timeFramesAdd(cfg?.timeFrames, DataSource)
     this.timeFrameUse(cfg?.timeFrameInit)
-    this.#range = buildRange(state, state.data, state.core)
+    this.#range = buildRange(state, state.data)
     this.historyAdd(cfg?.history)
     this.tickerAdd(cfg?.ticker)
 
