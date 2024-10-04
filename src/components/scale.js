@@ -211,7 +211,7 @@ export default class ScaleBar extends Component {
     }
 
     if (draw) this.draw()
-    else this.#layerPriceLine.draw()
+    else this.#layerPriceLine.draw(e)
   }
 
   onChartDrag(e) {

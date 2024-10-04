@@ -31,10 +31,11 @@ export const DEFAULT_STATE = {
   status: "default",
   isEmpty: true,
   dataSource: {
+    source: {name: ""},
     symbol: EMPTYCHART,
+    symbols: {},
     timeFrameInit:DEFAULT_TIMEFRAMEMS,
     timeFrames: {},
-    timeFramesData: {},
     ticker: null,
     history: null,
     initialRange: {
@@ -903,8 +904,10 @@ export default class State {
 
     // clean up panes - remove 
     if (isFunction(this.#core.MainPane?.init)) {
-      if (this.#core.stream instanceof Stream)
+      if (this.#core.stream instanceof Stream) {
         this.#core.stream.stop()
+        this.#core.stream = null
+      }
       this.#core.progress.start()
       State.archiveInventory(this)
       this.#core.MainPane.destroy(false)
