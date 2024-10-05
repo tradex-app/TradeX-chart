@@ -47,6 +47,7 @@ export default class Stream {
   #maxUpdate
   #updateTimer = 0
   #precision
+  #data
   #candle = empty
   #countDownStart = 0
   #countDownMS = 0
@@ -121,13 +122,19 @@ export default class Stream {
     const lastTick = [...this.#candle]
     // round time to nearest current time unit
     if (!isValidTimestamp(data.t)) return
+    console.log(data.t)
+    data.ts = Date.now()
     data.t = this.roundTime(new Date(data.t))
+    console.log(data.t)
+
     // ensure values are numbers
     data.o = data.o * 1
     data.h = data.h * 1
     data.l = data.l * 1
     data.c = data.c * 1
     data.v = data.v * 1
+
+    this.#data = data
 
     if (this.#candle[T] !== data.t) {
       this.newCandle(data)
@@ -210,7 +217,9 @@ export default class Stream {
     this.#core.state.mergeData({ohlcv: [this.#candle]}, true, false)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
     this.#countDownMS = this.#time.timeFrameMS
-    this.#countDownStart = this.roundTime(Date.now())
+    this.#countDownStart = this.roundTime(data.ts) // this.roundTime(Date.now())
+
+    console.log(data.t)
   }
 
   prevCandle() {
@@ -247,7 +256,10 @@ export default class Stream {
   countDownUpdate() {
     let y,M,w,d,h,m,s,u;
     let tf = this.#time.timeFrameMS
-    let cntDn = this.#time.timeFrameMS - (Date.now() - this.#countDownStart)
+    let now = this.#data.ts
+    let cntDn = tf - (now - this.#countDownStart)
+
+    console.log(cntDn,tf, now, this.#countDownStart)
 
     if (cntDn < 0) {
       // is the stream closed or in error?
@@ -296,10 +308,12 @@ export default class Stream {
     }
     // else this.#countDown  = `00 : ${cntDn}`
 
+    console.log(this.#countDown)
+
     return this.#countDown
   }
 
   roundTime(ts) {
-    return ts - (ts % this.#core.timeData.timeFrameMS)
+    return ts - (ts % this.#time.timeFrameMS)
   }
 }

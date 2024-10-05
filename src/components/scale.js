@@ -16,7 +16,7 @@ import Graph from "./views/classes/graph"
 import { ScaleCursor } from './overlays/chart-cursor'
 import ScaleLabels from './overlays/scale-labels'
 import ScaleOverly from './overlays/scale-overlays'
-import ScalePriceLine from './overlays/scale-priceLine'
+import ScalePriceLine, { priceLineTxtScaling } from './overlays/scale-priceLine'
 import { YAxisStyle } from "../definitions/style"
 
 
@@ -107,8 +107,8 @@ export default class ScaleBar extends Component {
     this.setYAxis()
     ctx.font = createFont(t.fontSize, t.fontWeight, t.fontFamily)
     this.#digitW = calcTextWidth(ctx, "0")
-    this.calcPriceDigits()
-    this.setDimensions({w: this.#digitW * this.#digitCnt})
+    let w = this.calcScaleWidth()
+    this.setDimensions({w})
     this.createGraph()
     this.#yAxis.calcGradations()
     this.draw()
@@ -231,7 +231,7 @@ export default class ScaleBar extends Component {
   setDimensions(dim={}) {
     // const w = this.#element.getBoundingClientRect().width
     dim = (isObject(dim)) ? dim : {}
-    const w = dim?.w || this.width || YAXIS_MINDIGITS * YAxisStyle.FONTSIZE
+    const w = dim?.w || this.width || YAXIS_MINDIGITS * YAxisStyle.FONTSIZE * priceLineTxtScaling
     const h = dim?.h || this.parent.height
     this.#setWidth(w)
     this.#setHeight(h)
@@ -358,7 +358,7 @@ export default class ScaleBar extends Component {
 
   calcScaleWidth() {
     const max = this.calcPriceDigits()
-    return max * this.#digitW
+    return (max + 2) * this.#digitW * priceLineTxtScaling
   }
 
   /**
