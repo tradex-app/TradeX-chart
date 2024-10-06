@@ -117,11 +117,12 @@ export default class DataSource {
   #source = {name: ""}
   #symbol
   #state
-  #history
-  #ticker  
   #range
   #timeFrames = {}
   #timeFrameCurr
+  #tickerStream  
+  #rangeLimitPast
+  #rangeLimitFuture
 
   #waiting = false
   #fetching = false
@@ -154,11 +155,8 @@ export default class DataSource {
     this.timeFramesAdd(cfg?.timeFrames, DataSource)
     this.timeFrameUse(cfg?.timeFrameInit)
     this.#range = this.buildRange(state)
-    this.historyAdd(cfg?.history)
-    this.tickerAdd(cfg?.ticker)
-
-    this.#core.on("range_limitPast", this.onRangeLimit, this)
-    // core.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
+    this.historyAdd(cfg?.source)
+    this.tickerAdd(cfg?.source?.tickerStream)
   }
 
   get id() { return this.#id }
@@ -258,8 +256,34 @@ export default class DataSource {
 
   }
 
-  historyAdd(h) {
+  tickerRemove() {
 
+  }
+
+  /**
+   * Add price history fetching functions
+   * @param {Object} s - source
+   * @param {Function} s.rangeLimitPast - fetch function to execute when chart range hits current limit of past price data
+   * @param {Function} s.rangeLimitFuture  - fetch funtion to execute when chart rante hits current end of price history
+   */
+  historyAdd(s) {
+    this.historyRemove()
+    if (isFunction(s?.rangeLimitPast)) {
+      if (s.rangeLimitPast.constructor.length !== 3)
+        consoleError(this.#core, "range_limitPast function requires three parameters")
+      else {
+        this.#rangeLimitPast = (e) => this.onRangeLimit(e, s.rangeLimitPast, this.#core.range.timeStart)
+        this.#core.on("range_limitPast", this.#rangeLimitPast, this)
+      }
+    }
+    if (isFunction(s?.rangeLimitFuture)) {
+      if (s.rangeLimitFuture.constructor.length !== 3)
+        consoleError(this.#core, "range_limitFuture function requires three parameters")
+      else {
+        this.#rangeLimitFuture = (e) => this.onRangeLimit(e, s.rangeLimitFuture, this.#core.range.timeFinish)
+        this.#core.on("range_limitFuture", this.#rangeLimitFuture, this)
+      }
+    }
   }
 
   historyFetch() {
@@ -268,6 +292,17 @@ export default class DataSource {
 
   historyError() {
 
+  }
+
+  historyRemove() {
+    if (isFunction(this.#rangeLimitPast)) {
+      this.#core.off("range_limitPast", this.#rangeLimitPast, this)
+      this.#rangeLimitPast = null
+    }
+    if (isFunction(this.#rangeLimitFuture)) {
+      this.#core.off("range_limitFuture", this.#rangeLimitFuture, this)
+      this.#rangeLimitFuture = null
+    }
   }
 
   onTick(t) {
@@ -286,16 +321,22 @@ export default class DataSource {
     }
   }
 
-  onRangeLimit(e) {
+  /**
+   * Execute function on range limit
+   * @param {*} e -
+   * @param {Function} fn - function to execute
+   * @param {Number} ts - unix time stamp milliseconds
+   */
+  onRangeLimit(e, fn, ts) {
     // if (this.#waiting) return
     this.#waiting = true
     try {
       // history call must handle time outs
-      if (!isFunction(this.#history)) {
+      if (!isFunction(fn)) {
         this.#waiting = false
         return
       }
-      this.#history( this.#symbol, this.#core.timeFrame, this.#core.range.timeStart )
+      fn( this.#symbol, this.#core.timeFrame, ts )
       .then(d => {
         this.#core.mergeData(d, false, true)
         this.#waiting = false
@@ -346,6 +387,10 @@ export default class DataSource {
     return new Range(range?.start, range?.end, config)
   }
 
+}
+
+function consoleError(c, e) {
+  c(`TradeX-chart id: ${c.id} : DataSource : ${e}`)
 }
 
 function throwError(id, e) {

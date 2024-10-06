@@ -31,13 +31,16 @@ export const DEFAULT_STATE = {
   status: "default",
   isEmpty: true,
   dataSource: {
-    source: {name: ""},
+    source: {
+      name: "",
+      rangeLimitPast: null,
+      rangeLimitFuture: null,
+      tickerStream: null
+    },
     symbol: EMPTYCHART,
     symbols: {},
     timeFrameInit:DEFAULT_TIMEFRAMEMS,
     timeFrames: {},
-    ticker: null,
-    history: null,
     initialRange: {
       startTS: undefined,
       initialCnt: INTITIALCNT,
@@ -907,6 +910,7 @@ export default class State {
       if (this.#core.stream instanceof Stream) {
         this.#core.stream.stop()
         this.#core.stream = null
+        this.#dataSource.historyRemove()
       }
       this.#core.progress.start()
       State.archiveInventory(this)

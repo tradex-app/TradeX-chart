@@ -122,10 +122,8 @@ export default class Stream {
     const lastTick = [...this.#candle]
     // round time to nearest current time unit
     if (!isValidTimestamp(data.t)) return
-    console.log(data.t)
     data.ts = Date.now()
     data.t = this.roundTime(new Date(data.t))
-    console.log(data.t)
 
     // ensure values are numbers
     data.o = data.o * 1
@@ -218,8 +216,6 @@ export default class Stream {
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
     this.#countDownMS = this.#time.timeFrameMS
     this.#countDownStart = this.roundTime(data.ts) // this.roundTime(Date.now())
-
-    console.log(data.t)
   }
 
   prevCandle() {
@@ -258,8 +254,6 @@ export default class Stream {
     let tf = this.#time.timeFrameMS
     let now = this.#data.ts
     let cntDn = tf - (now - this.#countDownStart)
-
-    console.log(cntDn,tf, now, this.#countDownStart)
 
     if (cntDn < 0) {
       // is the stream closed or in error?
@@ -307,8 +301,6 @@ export default class Stream {
       this.#countDown = `00:00:${s}`
     }
     // else this.#countDown  = `00 : ${cntDn}`
-
-    console.log(this.#countDown)
 
     return this.#countDown
   }
