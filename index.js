@@ -1228,7 +1228,7 @@ function onRangeLimit2(e, sym, tf, ts) {
   let x = "past"
   if (x == "past") {
     e.chart.progress.start()
-    return kline_Binance2(e.chart, sym, ts, limit, tf)
+    return kline_Binance2(e.chart, sym, start, limit, tf)
   }
   if (x == "future") {
 
