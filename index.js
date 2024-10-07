@@ -253,6 +253,7 @@ const config1 = {
   }
 }
 window.config1 = config1
+
 const config2 = {
   id: "TradeX_test",
   title: "TEST/USDT",
@@ -1163,6 +1164,27 @@ function kline_Binance(chart, symbol="BTCUSDT", start, limit=100, interval="1m")
   }
 }
 
+function kline_Binance2(chart, symbol="BTCUSDT", start, limit=100, interval="1m") {
+  if (symbol == "testusdt") symbol = "BTCUSDT"
+  if (typeof interval == "number") interval = chart.timeData.ms2Interval(interval)
+  const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${start}&limit=${limit}`;
+  return new Promise((resolve, reject) => {
+    try {
+      fetch(url)
+      .then(r => r.json())
+      .then(d => {
+        console.log(d)
+        resolve({ohlcv: d})
+      })
+    }
+    catch(e) {
+      console.error(e)
+      reject(e)
+      // waiting = false
+    }
+  })
+}
+
 function onWSMessage (evt, chart) { 
   var msg = evt.data;
   var obj = JSON.parse(msg);
@@ -1190,8 +1212,23 @@ function onRangeLimit(e, x) {
   const end = range.timeEnd
   const interval = range.intervalStr
   if (x == "past") {
-    e.chart.progress.start()
     kline_Binance(e.chart, undefined, start, limit, interval)
+  }
+  if (x == "future") {
+
+  }
+}
+
+function onRangeLimit2(e, sym, tf, ts) {
+  const range = e.chart.range
+  const limit = 100
+  const start = ts - (tf * limit)
+  // const end = range.timeEnd
+  const interval = range.intervalStr
+  let x = "past"
+  if (x == "past") {
+    e.chart.progress.start()
+    return kline_Binance2(e.chart, sym, ts, limit, tf)
   }
   if (x == "future") {
 
@@ -1251,8 +1288,14 @@ chart0.addIndicator("TRDFLO", "TradeFlow1", {data: [], settings: {test: true}})
 
 // chart0.addIndicator("DMI", "DMI1", {data: []})
 */
-chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
-chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
+// chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
+// chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
+
+chart0.state.dataSource.historyAdd({
+  rangeLimitPast: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts) },
+  // rangeLimitFuture: (e) => onRangeLimit2(e, sym, tf, ts)
+})
+
 /*
 // register custom overlay
 chart0.setCustomOverlays({

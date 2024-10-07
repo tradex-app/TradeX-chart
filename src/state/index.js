@@ -567,8 +567,7 @@ export default class State {
         chart.error(e)
         reject()
       }
-    }
-    )
+    })
   }
 
   static validateData(type, state) {

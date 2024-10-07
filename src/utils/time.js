@@ -614,6 +614,23 @@ export class TimeData {
     }
   }
 
+  isValidTimestamp(ts) {
+    return isValidTimestamp(ts)
+  }
+
+  isValidTimeInRange ( time, start=BTCGENESIS,end=Date.now() ) {
+    return isValidTimeInRange(time, start, end)
+  }
+
+  interval2MS (tf) {
+    return interval2MS(tf)
+  }
+
+  ms2Interval (ms) {
+    return ms2Interval(ms)
+  }
+
+
   static timezoneLocal () {
     return getTimezone()
   }

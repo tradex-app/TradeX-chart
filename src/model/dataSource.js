@@ -7,7 +7,7 @@ import { SHORTNAME } from "../definitions/core";
 import TradeXchart from "../core";
 import { Range, detectInterval } from "./range";
 import State from "../state"
-import { isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isString } from "../utils/typeChecks";
+import { isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isPromise, isString } from "../utils/typeChecks";
 import { uid, xMap } from "../utils/utilities";
 import { limit } from "../utils/number";
 import { TIMEFRAMEMAX, TIMEFRAMEMIN, TIMESCALESVALUES, interval2MS, isTimeFrame, isTimeFrameMS, ms2Interval } from "../utils/time";
@@ -269,18 +269,18 @@ export default class DataSource {
   historyAdd(s) {
     this.historyRemove()
     if (isFunction(s?.rangeLimitPast)) {
-      if (s.rangeLimitPast.constructor.length !== 3)
+      if (s.rangeLimitPast.length !== 4)
         consoleError(this.#core, "range_limitPast function requires three parameters")
       else {
-        this.#rangeLimitPast = (e) => this.onRangeLimit(e, s.rangeLimitPast, this.#core.range.timeStart)
+        this.#rangeLimitPast = (e) => { return this.onRangeLimit(e, s.rangeLimitPast, this.#core.range.timeStart) }
         this.#core.on("range_limitPast", this.#rangeLimitPast, this)
       }
     }
     if (isFunction(s?.rangeLimitFuture)) {
-      if (s.rangeLimitFuture.constructor.length !== 3)
+      if (s.rangeLimitFuture.length !== 3)
         consoleError(this.#core, "range_limitFuture function requires three parameters")
       else {
-        this.#rangeLimitFuture = (e) => this.onRangeLimit(e, s.rangeLimitFuture, this.#core.range.timeFinish)
+        this.#rangeLimitFuture = (e) => { return this.onRangeLimit(e, s.rangeLimitFuture, this.#core.range.timeFinish) }
         this.#core.on("range_limitFuture", this.#rangeLimitFuture, this)
       }
     }
@@ -328,19 +328,27 @@ export default class DataSource {
    * @param {Number} ts - unix time stamp milliseconds
    */
   onRangeLimit(e, fn, ts) {
-    // if (this.#waiting) return
+    if (!isFunction(fn)) {
+      this.#waiting = false
+      return
+    }
+    if (this.#waiting == true)
+      return
     this.#waiting = true
     try {
       // history call must handle time outs
-      if (!isFunction(fn)) {
-        this.#waiting = false
-        return
+    this.#core.progress.start()
+
+      // let d = fn( e, this.#symbol, this.#core.timeFrame, ts )
+      let p = fn( e, this.#symbol, this.#core.timeFrame, ts )
+      if (isPromise(p)) {
+        p.then( d => {
+          if (!isObject(d)) throwError(this.#core.id, "Price history fetch did not return a Promise that resolved to an Object. Nothing to merge.")
+          this.#core.mergeData(d, false, true)
+          this.#waiting = false
+        })
       }
-      fn( this.#symbol, this.#core.timeFrame, ts )
-      .then(d => {
-        this.#core.mergeData(d, false, true)
-        this.#waiting = false
-      })
+      else throwError(this.#core.id, "Price history fetch did not return a Promise")
     }
     catch(e) {
       this.#core.error(e)

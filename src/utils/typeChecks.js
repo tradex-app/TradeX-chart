@@ -90,7 +90,7 @@ export function isMap(v) {
  * @return {boolean}
  */
 export function isPromise (v) {
-  return !!v && (isObject(v) || isFunction(v)) && isFunction(v.then);
+  return !!v && (isObject(v) || isFunction(v)) && isFunction(v.then) && v[Symbol.toStringTag] === 'Promise';
 }
 
 /**
