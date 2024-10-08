@@ -35,7 +35,12 @@ export const DEFAULT_STATE = {
       name: "",
       rangeLimitPast: null,
       rangeLimitFuture: null,
-      tickerStream: null
+      tickerStream: {
+        start: null,
+        stop: null,
+        tfCountDown: true,
+        alerts: [] 
+      }
     },
     symbol: EMPTYCHART,
     symbols: {},

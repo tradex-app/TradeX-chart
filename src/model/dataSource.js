@@ -118,9 +118,12 @@ export default class DataSource {
   #symbol
   #state
   #range
+  #stream
   #timeFrames = {}
   #timeFrameCurr
-  #tickerStream  
+  #tickerStream
+  #tickerStart
+  #tickerStop
   #rangeLimitPast
   #rangeLimitFuture
 
@@ -240,16 +243,36 @@ export default class DataSource {
     return undefined
   }
 
-  tickerAdd(t) {
-
+  tickerAdd(t, start) {
+    if (isFunction(t?.start)) {
+      let n = 3
+      if (t.start.length !== n)
+        consoleError(`this.#core, range_limitPast function requires n parameters`)
+      else {
+        this.#tickerStart = t.start
+        if (isObject(start)) {
+          let {symbol, tf} = {...start}
+          this.tickerStart(symbol, tf)
+        }
+      }
+    }
+    if (isFunction(t?.stop)) {
+      this.#tickerStop = t.stop
+    }
   }
 
-  tickerStart() {
-
+  tickerStart(symbol, tf) {
+    if (isString(symbol) && 
+        symbol.length &&
+        isInteger(tf) ) {
+          this.#stream.start()
+          this.#tickerStart(symbol, tf, this.#tickerStream.onTick, this.#core)
+        }
   }
 
   tickerStop() {
-
+    this.#tickerStop()
+    this.#stream.stop()
   }
 
   tickerError() {
@@ -257,41 +280,34 @@ export default class DataSource {
   }
 
   tickerRemove() {
-
+    this.tickerStop()
   }
 
   /**
    * Add price history fetching functions
-   * @param {Object} s - source
-   * @param {Function} s.rangeLimitPast - fetch function to execute when chart range hits current limit of past price data
-   * @param {Function} s.rangeLimitFuture  - fetch funtion to execute when chart rante hits current end of price history
+   * @param {Object} h - source
+   * @param {Function} h.rangeLimitPast - fetch function to execute when chart range hits current limit of past price data
+   * @param {Function} h.rangeLimitFuture  - fetch funtion to execute when chart rante hits current end of price history
    */
-  historyAdd(s) {
+  historyAdd(h) {
     this.historyRemove()
-    if (isFunction(s?.rangeLimitPast)) {
-      if (s.rangeLimitPast.length !== 4)
-        consoleError(this.#core, "range_limitPast function requires three parameters")
+    let n = 4
+    if (isFunction(h?.rangeLimitPast)) {
+      if (h.rangeLimitPast.length !== n)
+        consoleError(`this.#core, range_limitPast function requires ${n} parameters`)
       else {
-        this.#rangeLimitPast = (e) => { return this.onRangeLimit(e, s.rangeLimitPast, this.#core.range.timeStart) }
+        this.#rangeLimitPast = (e) => { return this.onRangeLimit(e, h.rangeLimitPast, this.#core.range.timeStart) }
         this.#core.on("range_limitPast", this.#rangeLimitPast, this)
       }
     }
-    if (isFunction(s?.rangeLimitFuture)) {
-      if (s.rangeLimitFuture.length !== 3)
-        consoleError(this.#core, "range_limitFuture function requires three parameters")
+    if (isFunction(h?.rangeLimitFuture)) {
+      if (h.rangeLimitFuture.length !== n)
+        consoleError(this.#core, `range_limitFuture function requires n parameters`)
       else {
-        this.#rangeLimitFuture = (e) => { return this.onRangeLimit(e, s.rangeLimitFuture, this.#core.range.timeFinish) }
+        this.#rangeLimitFuture = (e) => { return this.onRangeLimit(e, h.rangeLimitFuture, this.#core.range.timeFinish) }
         this.#core.on("range_limitFuture", this.#rangeLimitFuture, this)
       }
     }
-  }
-
-  historyFetch() {
-
-  }
-
-  historyError() {
-
   }
 
   historyRemove() {
@@ -302,22 +318,6 @@ export default class DataSource {
     if (isFunction(this.#rangeLimitFuture)) {
       this.#core.off("range_limitFuture", this.#rangeLimitFuture, this)
       this.#rangeLimitFuture = null
-    }
-  }
-
-  onTick(t) {
-
-  }
-
-  onFetch(f) {
-    // if (this.#fetching) 
-    this.#fetching = true
-    try {
-
-    }
-    catch (e) {
-      this.#core.error(e)
-      this.#waiting = false
     }
   }
 
