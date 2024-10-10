@@ -391,10 +391,9 @@ export default class TradeXchart extends Tradex_chart {
   get pricePrecision() { return this.#pricePrecision || PRICE_PRECISION }
   get volumePrecision() { return this.#volumePrecision }
 
-  set stream(stream) { return this.setStream(stream) }
-  get stream() { return this.#stream }
+  get stream() { return this.state.dataSource.stream }
   get worker() { return this.#workers }
-  get isEmpty() { return this.state.IsEmpty }
+  get isEmpty() { return this.state.isEmpty }
   set candles(c) { if (isObject(c)) this.#candles = c }
   get candles() { return this.#candles }
   get progress() { return this.#progress }
@@ -487,7 +486,6 @@ export default class TradeXchart extends Tradex_chart {
     this.setTheme(this.#theme.id)
 
     this.#scrollPos = this.bufferPx * -1
-    this.stream = this.#config.stream
 
     // is the chart empty - no data or stream
     if (!isObject(txCfg?.stream) && this.state.data.chart.data.length < 2) {
@@ -876,36 +874,6 @@ export default class TradeXchart extends Tradex_chart {
   /*============================*/
   /*---------- STREAM ----------*/
   /*============================*/
-
-  /**
-   * specify a chart stream
-   * @memberof TradeXchart
-   * @param Object} stream - {tfCountDown, alerts}
-   * @returns {Stream|Boolean}
-   */
-  setStream(stream) {
-    if (this.stream instanceof Stream) {
-      this.error("ERROR: Invoke stopStream() before starting a new one.")
-      return false
-    }
-    else if (isObject(stream)) {
-      if (this.allData.data.length == 0 && isString(stream.timeFrame)) {
-        const { tf, ms } = isTimeFrame(stream?.timeFrame)
-
-// TODO: set State timeframe / interval - TimeData and Range
-                                       
-        // this.range.interval = ms
-        // this.range.intervalStr = tf
-        // this.#timeData = new Time.TimeData(this.range)
-      // }
-      }
-
-      this.#stream = new Stream(this)
-      this.#config.stream = this.#stream.config
-      
-      return this.#stream
-    }
-  }
 
   startStream() {
     if (this.stream instanceof Stream) {

@@ -13,7 +13,7 @@
 
 import { isArray, isBoolean, isInteger, isNumber, isObject, isString } from '../utils/typeChecks'
 import { YEAR_MS, MONTHR_MS, WEEK_MS, DAY_MS, HOUR_MS, MINUTE_MS, SECOND_MS, MILLISECOND, isValidTimestamp } from '../utils/time';
-import { copyDeep, mergeDeep } from '../utils/utilities';
+import { copyDeep, mergeDeep, valuesInArray } from '../utils/utilities';
 import Alerts from './alerts';
 
 import {
@@ -29,8 +29,8 @@ import {
   STREAM_PRECISION
 } from "../definitions/core"
 
-import { YAXIS_BOUNDS } from '../definitions/chart';
-
+const statusAllowStart = [STREAM_NONE, STREAM_STOPPED]
+const keys = ["t","o","h","l","c","v"]
 const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
 const empty = [null, null, null, null, null]
 const defaultStreamConfig = {
@@ -43,7 +43,6 @@ export default class Stream {
   #core
   #config
   #status
-  #time
   #maxUpdate
   #updateTimer = 0
   #precision
@@ -59,24 +58,10 @@ export default class Stream {
   #alerts
 
 
-  static validateConfig(c) {
-    if (!isObject(c)) return defaultStreamConfig
-
-    else {
-      let d = copyDeep(defaultStreamConfig)
-      c = mergeDeep(d, c)
-
-      c.tfCountDown = (isBoolean(c.tfCountDown)) ? c.tfCountDown : defaultStreamConfig.tfCountDown
-      c.alerts = (isArray(c.alerts)) ? c.alerts : defaultStreamConfig.alerts
-    }
-    return c
-  }
-
   constructor(core) {
     this.#core = core
-    this.#time = core.time
     this.status = {status: STREAM_NONE}
-    this.#config = Stream.validateConfig(core.config?.stream)
+    this.#config = validateConfig(core.config?.stream)
     this.#maxUpdate = (isNumber(core.config?.maxCandleUpdate)) ? core.config.maxCandleUpdate : STREAM_MAXUPDATE
     this.#precision = (isNumber(core.config?.streamPrecision)) ? core.config.streamPrecision : STREAM_PRECISION
   }
@@ -86,10 +71,14 @@ export default class Stream {
   get countDown() { return this.#countDown }
   get range() { return this.#core.range }
   get status() { return this.#status }
-  set status({status, data}) {
-    this.#status = status
-    this.emit(status, data)
+  set status(s) {
+    if (!isObject(s) && !isString(s?.status)) return
+    this.#status = s.status
+    this.emit(s.status, s?.data)
   }
+  get symbol() { return this.#core.symbol }
+  get timeFrame() { return this.#core.interval }
+  get timeFrameStr() { return this.#core.intervalStr }
   set dataReceived(data) {
     if (this.#dataReceived) return
 
@@ -120,6 +109,8 @@ export default class Stream {
     const now = Date.now()
     // store last tick for alerts
     const lastTick = [...this.#candle]
+    // ensure candle data provides t,o,h,l,c,v
+    if (!valuesInArray(keys, Object.keys(data))) return
     // round time to nearest current time unit
     if (!isValidTimestamp(data.t)) return
     data.ts = Date.now()
@@ -133,6 +124,7 @@ export default class Stream {
     data.v = data.v * 1
 
     this.#data = data
+    this.dataReceived = data
 
     if (this.#candle[T] !== data.t) {
       this.newCandle(data)
@@ -153,8 +145,13 @@ export default class Stream {
   }
 
   start() {
+    if (!statusAllowStart.includes(this.status)) {
+      this.#core.error("ERROR: Invoke stopStream() before starting a new one.")
+      return 
+    }
     if (!(this.#alerts instanceof Alerts))
       this.#alerts = new Alerts(this.#config.alerts)
+
     this.status = {status: STREAM_STARTED}
   }
 
@@ -178,13 +175,13 @@ export default class Stream {
     {
         if (!isInteger(tick.t * 1)) return // tick.t = Date.now()
         let keys = Object.keys(tick) 
-        let v;
+        let t = {}, v;
         for (let key of keys) {
           v = tick[key] * 1
-          if (!isNumber(v)) return
-          tick[key] = v
+          if (!isNumber(v)) continue
+          t[key] = v
         }
-        this.candle = tick
+        this.candle = t
     }
   }
 
@@ -212,9 +209,11 @@ export default class Stream {
       data.c, 
       data.v, 
       null, true]
+
+      console.log(`new candle:`, this.#candle)
     this.#core.state.mergeData({ohlcv: [this.#candle]}, true, false)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
-    this.#countDownMS = this.#time.timeFrameMS
+    this.#countDownMS = this.#core.time.timeFrameMS
     this.#countDownStart = this.roundTime(data.ts) // this.roundTime(Date.now())
   }
 
@@ -241,6 +240,7 @@ export default class Stream {
 
     // update the last candle in the state data
     this.#candle = candle
+    console.log(`candle update:`,candle)
 
     const d = this.#core.allData.data
     const l = (d.length > 0) ? d.length -1 : 0
@@ -251,7 +251,7 @@ export default class Stream {
 
   countDownUpdate() {
     let y,M,w,d,h,m,s,u;
-    let tf = this.#time.timeFrameMS
+    let tf = this.#core.time.timeFrameMS
     let now = this.#data.ts
     let cntDn = tf - (now - this.#countDownStart)
 
@@ -306,6 +306,19 @@ export default class Stream {
   }
 
   roundTime(ts) {
-    return ts - (ts % this.#time.timeFrameMS)
+    return ts - (ts % this.#core.time.timeFrameMS)
   }
+}
+
+function validateConfig(c) {
+  if (!isObject(c)) return defaultStreamConfig
+
+  else {
+    let d = copyDeep(defaultStreamConfig)
+    c = mergeDeep(d, c)
+
+    c.tfCountDown = (isBoolean(c.tfCountDown)) ? c.tfCountDown : defaultStreamConfig.tfCountDown
+    c.alerts = (isArray(c.alerts)) ? c.alerts : defaultStreamConfig.alerts
+  }
+  return c
 }

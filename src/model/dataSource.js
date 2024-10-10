@@ -11,6 +11,7 @@ import { isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isPr
 import { uid, xMap } from "../utils/utilities";
 import { limit } from "../utils/number";
 import { TIMEFRAMEMAX, TIMEFRAMEMIN, TIMESCALESVALUES, interval2MS, isTimeFrame, isTimeFrameMS, ms2Interval } from "../utils/time";
+import Stream from "../helpers/stream";
 
 const TSV =   TIMESCALESVALUES
 const defaultTimeFrames = {}
@@ -121,7 +122,6 @@ export default class DataSource {
   #stream
   #timeFrames = {}
   #timeFrameCurr
-  #tickerStream
   #tickerStart
   #tickerStop
   #rangeLimitPast
@@ -158,11 +158,13 @@ export default class DataSource {
     this.timeFramesAdd(cfg?.timeFrames, DataSource)
     this.timeFrameUse(cfg?.timeFrameInit)
     this.#range = this.buildRange(state)
+    this.#stream = new Stream(state.core)
     this.historyAdd(cfg?.source)
     this.tickerAdd(cfg?.source?.tickerStream)
   }
 
   get id() { return this.#id }
+  get stream() { return this.#stream }
   get symbol() { return this.#symbol }
   set timeFrame(t) { this.timeFrameUse(t) }
   get timeFrame() { return this.#timeFrameCurr }
@@ -206,6 +208,11 @@ export default class DataSource {
     this.#timeFrames = {...tf}
   }
 
+  /**
+   * Set the chart time frame
+   * @param {Number|String} tf - time frame milliseconds or "1h"
+   * @returns 
+   */
   timeFrameUse(tf) {
     if (isString(tf)) {
       tf = interval2MS(tf)
@@ -226,7 +233,7 @@ export default class DataSource {
     else if (!Object.keys(this.#timeFrames).length) {
       if (tf == this.#timeFrameCurr ) return
 
-    let str = ms2Interval(tf)
+      let str = ms2Interval(tf)
       this.#timeFrames[str] = tf
       this.#timeFrameCurr = tf
     }
@@ -243,15 +250,24 @@ export default class DataSource {
     return undefined
   }
 
-  tickerAdd(t, start) {
+  /**
+   * Add a ticker stream to the chart
+   * @param {Object} t - ticker stream definition
+   * @param {Function} t.start - function to start stream
+   * @param {Function} t.stop - function to stop stream
+   * @param {Object} begin - start ticker immediately upon add
+   * @param {String} begin.symbol - ticker symbol
+   * @param {Number} begin.tf - ticker time frame / interval in milliseconds
+   */
+  tickerAdd(t, begin) {
     if (isFunction(t?.start)) {
       let n = 3
       if (t.start.length !== n)
-        consoleError(`this.#core, range_limitPast function requires n parameters`)
+        consoleError(this.#core, `range_limitPast function requires n parameters`)
       else {
         this.#tickerStart = t.start
-        if (isObject(start)) {
-          let {symbol, tf} = {...start}
+        if (isObject(begin)) {
+          let {symbol, tf} = {...begin}
           this.tickerStart(symbol, tf)
         }
       }
@@ -261,12 +277,36 @@ export default class DataSource {
     }
   }
 
+  /**
+   * 
+   * @param {String} symbol - ticker symbol eg. BTCUSDT
+   * @param {Number} tf - ticker time frame in millisconds
+   * @returns {Boolean}
+   */
   tickerStart(symbol, tf) {
     if (isString(symbol) && 
         symbol.length &&
         isInteger(tf) ) {
+          if (!this.#symbol || this.#symbol === "empty")
+            this.symbolSet(symbol)
+
+          else if (this.#symbol !== "empty" && this.#symbol !== symbol) {
+            consoleError(this.#core, `ticker symbol does not match chart symbol`)
+            return false
+          }
+
+          if (this.#state.isEmpty) {
+            this.timeFrameUse(tf)
+          }
+          else if (this.#timeFrameCurr !== tf) {
+            consoleError(this.#core, `ticker time frame does not match chart time frame`)
+            return false
+          }
+
+          let onTick = (t) => { this.#stream.onTick.call(this.#stream, t) }
           this.#stream.start()
-          this.#tickerStart(symbol, tf, this.#tickerStream.onTick, this.#core)
+          this.#tickerStart(symbol, tf, onTick)
+          return true
         }
   }
 
@@ -294,7 +334,7 @@ export default class DataSource {
     let n = 4
     if (isFunction(h?.rangeLimitPast)) {
       if (h.rangeLimitPast.length !== n)
-        consoleError(`this.#core, range_limitPast function requires ${n} parameters`)
+        consoleError(this.#core, `range_limitPast function requires ${n} parameters`)
       else {
         this.#rangeLimitPast = (e) => { return this.onRangeLimit(e, h.rangeLimitPast, this.#core.range.timeStart) }
         this.#core.on("range_limitPast", this.#rangeLimitPast, this)
@@ -337,7 +377,7 @@ export default class DataSource {
     this.#waiting = true
     try {
       // history call must handle time outs
-    this.#core.progress.start()
+      this.#core.progress.start()
 
       // let d = fn( e, this.#symbol, this.#core.timeFrame, ts )
       let p = fn( e, this.#symbol, this.#core.timeFrame, ts )
@@ -347,12 +387,18 @@ export default class DataSource {
           this.#core.mergeData(d, false, true)
           this.#waiting = false
         })
+        .catch(e => {
+          this.#waiting = false
+          this.#core.progress.stop()
+          this.#core.error(e)
+        })
       }
       else throwError(this.#core.id, "Price history fetch did not return a Promise")
     }
     catch(e) {
-      this.#core.error(e)
       this.#waiting = false
+      this.#core.progress.stop()
+      this.#core.error(e)
     }
   }
 
@@ -398,7 +444,7 @@ export default class DataSource {
 }
 
 function consoleError(c, e) {
-  c(`TradeX-chart id: ${c.id} : DataSource : ${e}`)
+  c.error(`TradeX-chart id: ${c.id} : DataSource : ${e}`)
 }
 
 function throwError(id, e) {

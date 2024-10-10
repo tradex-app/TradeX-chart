@@ -731,7 +731,6 @@ export default class State {
   #data = {}
   #gaps = {}
   #status = false
-  #isEmpty = true
   #timeData
   #dataSource
   #range
@@ -757,7 +756,7 @@ export default class State {
   get id() { return this.#id }
   get key() { return this.#key }
   get status() { return this.#data.status }
-  get isEmpty() { return this.#data.isEmpty }
+  get isEmpty() { return !this.#data.chart.data.length }
   get core() { return (this.#core !== undefined) ? this.#core : false }
   get data() { return this.#data }
   get gaps() { return this.#gaps }

@@ -256,16 +256,16 @@ window.config1 = config1
 
 const config2 = {
   id: "TradeX_test",
-  title: "TEST/USDT",
-  symbol: "testusdt",
+  title: "BTC/USDT",
+  symbol: "btcusdt",
   // width: 1000,
   // height: 800,
   utils: {},
   tools: {},
   timeFrame: "1m",
-  range: {
-    startTS: state2.ohlcv.slice(-15)[0][0], // rangeStartTS,
-  },
+  // range: {
+  //   startTS: state2.ohlcv.slice(-15)[0][0], // rangeStartTS,
+  // },
   theme: {
     title: {
       display: true,
@@ -982,7 +982,7 @@ const configs = [
   // {config: config1, stream: null},
   // {config: config2, stream: null},
 
-  {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
+  {config: config2, stream: null}, //stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
   // {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
   // {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
   // {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
@@ -1011,11 +1011,11 @@ function addChart() {
       chart.refresh()
       window["chart"+chart.inCnt] = chart
 
-  if (typeof chart?.stream?.start === "function") {
-    // chart is ready and waiting for a websocket stream
-    chart.stream.start()
-    if (typeof stream === "function") stream(chart)
-  }
+  // if (typeof chart?.stream?.start === "function") {
+  //   // chart is ready and waiting for a websocket stream
+  //   chart.stream.start()
+  //   if (typeof stream === "function") stream(chart)
+  // }
 }
 
 
@@ -1135,12 +1135,36 @@ class Stream {
   }
 }
 
-function livePrice_Binance(chart, symbol="btcusdt", interval="1m") {
+function livePrice_Binance(chart, symbol="btcusdt", interval="1m", onTick) {
+  if (typeof interval === "number") {
+    interval = chart.timeData.ms2Interval(interval)
+  }
   // var ws = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@aggTrade");
   var ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@kline_${interval}`);
 
-  ws.onmessage = (evt) => onWSMessage.call(this, evt, chart)
+  ws.onmessage = (evt) => onWSMessage.call(this, evt, chart, onTick)
 }
+
+function onWSMessage (evt, chart, onTick) { 
+  let msg = evt.data;
+  let obj = JSON.parse(msg);
+  if (typeof obj === "object" && obj.k) { 
+
+    /* KLine data passed to the chart
+      {
+        t: timeStamp // timestamp of current candle in milliseconds
+        o: open  // open price
+        h: high  // high price
+        l. low // low price
+        c: close  // close price
+        v: volume // volume
+      }
+    */
+    // console.log(obj.k)
+    if (!!onTick) onTick(obj.k)
+    else chart.stream.onTick(obj.k)   
+  }
+};
 
 let waiting = false
 
@@ -1155,6 +1179,12 @@ function kline_Binance(chart, symbol="BTCUSDT", start, limit=100, interval="1m")
         console.log(d)
         chart.mergeData({ohlcv: d}, false, true)
         waiting = false
+      })
+      .catch(e => {
+        e.text().then( eMsg => {
+          console.error(eMsg)
+          waiting = false
+        })
       })
     }
     catch(e) {
@@ -1176,34 +1206,17 @@ function kline_Binance2(chart, symbol="BTCUSDT", start, limit=100, interval="1m"
         console.log(d)
         resolve({ohlcv: d})
       })
+      .catch(e => {
+        console.error(e)
+        reject(e)
+      })
     }
     catch(e) {
       console.error(e)
       reject(e)
-      // waiting = false
     }
   })
 }
-
-function onWSMessage (evt, chart) { 
-  var msg = evt.data;
-  var obj = JSON.parse(msg);
-  if (typeof obj === "object" && obj.k) { 
-
-    /* KLine data passed to the chart
-      {
-        t: timeStamp // timestamp of current candle in milliseconds
-        o: open  // open price
-        h: high  // high price
-        l. low // low price
-        c: close  // close price
-        v: volume // volume
-      }
-    */
-    // console.log(obj.k)
-    chart.stream.onTick(obj.k)   
-  }
-};
 
 function onRangeLimit(e, x) {
   const range = e.chart.range
@@ -1291,10 +1304,26 @@ chart0.addIndicator("TRDFLO", "TradeFlow1", {data: [], settings: {test: true}})
 // chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
 // chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 
-chart0.state.dataSource.historyAdd({
-  rangeLimitPast: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts) },
-  // rangeLimitFuture: (e) => onRangeLimit2(e, sym, tf, ts)
+
+chart0.on("stream_candleFirst", () => {
+  chart0.state.dataSource.historyAdd({
+    rangeLimitPast: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts) },
+    // rangeLimitFuture: (e) => onRangeLimit2(e, sym, tf, ts)
+  })
 })
+chart0.state.dataSource.tickerAdd(
+  {
+    start: (symbol, tf, onTick) => { livePrice_Binance(chart0, symbol, tf, onTick) },
+    end: () => {}
+  },
+  {
+    symbol: "btcusdt",
+    tf: 60000
+  }
+)
+
+
+
 
 /*
 // register custom overlay

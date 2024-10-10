@@ -442,8 +442,8 @@ export default class MainPane extends Component {
   }
 
   onFirstStreamValue(value) {
-    this.chart.scale.xAxis.calcXAxisGrads(this.range,)
-    this.draw(this.range, true)
+    // this.chart.scale.xAxis.calcXAxisGrads(this.range,)
+    // this.draw(this.range, true)
   }
 
   onNewStreamValue(value) {
