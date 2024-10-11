@@ -43,12 +43,22 @@ export default defineConfig(({ command, mode }) => {
       //   open: '/demo.html'
       // }
       server: {
-        host: true
+        host: true,
+        // cors: false,
       }
     };
   } else {
     return {
       // dev / serve specific config
+      server: {
+        // host: true,
+        // cors: false,
+        proxy: {
+          '/api': {
+            target: 'https://api.binance.com'
+          }
+        }
+      }
     };
   }
 });

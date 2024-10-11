@@ -1198,6 +1198,7 @@ function kline_Binance2(chart, symbol="BTCUSDT", start, limit=100, interval="1m"
   if (symbol == "testusdt") symbol = "BTCUSDT"
   if (typeof interval == "number") interval = chart.timeData.ms2Interval(interval)
   const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${start}&limit=${limit}`;
+  // const url = `/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${start}&limit=${limit}`;
   return new Promise((resolve, reject) => {
     try {
       fetch(url)
