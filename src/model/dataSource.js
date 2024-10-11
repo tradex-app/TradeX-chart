@@ -331,7 +331,7 @@ export default class DataSource {
    */
   historyAdd(h) {
     this.historyRemove()
-    let n = 4
+    let n = 5
     if (isFunction(h?.rangeLimitPast)) {
       if (h.rangeLimitPast.length !== n)
         consoleError(this.#core, `range_limitPast function requires ${n} parameters`)
@@ -380,20 +380,22 @@ export default class DataSource {
       this.#core.progress.start()
 
       // let d = fn( e, this.#symbol, this.#core.timeFrame, ts )
-      let p = fn( e, this.#symbol, this.#core.timeFrame, ts )
-      if (isPromise(p)) {
-        p.then( d => {
+      let p = new Deferred()
+      fn( e, p, this.#symbol, this.#core.timeFrame, ts)
+      // if (isPromise(p)) {
+        p.promise.then( d => {
           if (!isObject(d)) throwError(this.#core.id, "Price history fetch did not return a Promise that resolved to an Object. Nothing to merge.")
           this.#core.mergeData(d, false, true)
           this.#waiting = false
+          this.#core.progress.stop()
         })
         .catch(e => {
           this.#waiting = false
           this.#core.progress.stop()
           this.#core.error(e)
         })
-      }
-      else throwError(this.#core.id, "Price history fetch did not return a Promise")
+      // }
+      // else throwError(this.#core.id, "Price history fetch did not return a Promise")
     }
     catch(e) {
       this.#waiting = false
@@ -462,4 +464,11 @@ function buildTimeFrames (t) {
   return tf
 }
 
-
+class Deferred {
+  constructor() {
+    this.promise = new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
+  }
+}

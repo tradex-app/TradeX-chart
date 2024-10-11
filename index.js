@@ -1194,29 +1194,31 @@ function kline_Binance(chart, symbol="BTCUSDT", start, limit=100, interval="1m")
   }
 }
 
-function kline_Binance2(chart, symbol="BTCUSDT", start, limit=100, interval="1m") {
+function kline_Binance2(chart, result, symbol="BTCUSDT", start, limit=100, interval="1m") {
   if (symbol == "testusdt") symbol = "BTCUSDT"
   if (typeof interval == "number") interval = chart.timeData.ms2Interval(interval)
   const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${start}&limit=${limit}`;
   // const url = `/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${start}&limit=${limit}`;
-  return new Promise((resolve, reject) => {
+  // return new Promise((resolve, reject) => {
     try {
       fetch(url)
       .then(r => r.json())
       .then(d => {
         console.log(d)
-        resolve({ohlcv: d})
+        result.resolve({ohlcv: d})
+        // return {ohlcv: d}
+
       })
       .catch(e => {
         console.error(e)
-        reject(e)
+        result.reject(e)
       })
     }
     catch(e) {
       console.error(e)
-      reject(e)
+      result.reject(e)
     }
-  })
+  // })
 }
 
 function onRangeLimit(e, x) {
@@ -1233,7 +1235,7 @@ function onRangeLimit(e, x) {
   }
 }
 
-function onRangeLimit2(e, sym, tf, ts) {
+function onRangeLimit2(e, r, sym, tf, ts) {
   const range = e.chart.range
   const limit = 100
   const start = ts - (tf * limit)
@@ -1241,8 +1243,8 @@ function onRangeLimit2(e, sym, tf, ts) {
   const interval = range.intervalStr
   let x = "past"
   if (x == "past") {
-    e.chart.progress.start()
-    return kline_Binance2(e.chart, sym, start, limit, tf)
+    // e.chart.progress.start()
+    kline_Binance2(e.chart, r, sym, start, limit, tf)
   }
   if (x == "future") {
 
@@ -1302,16 +1304,16 @@ chart0.addIndicator("TRDFLO", "TradeFlow1", {data: [], settings: {test: true}})
 
 // chart0.addIndicator("DMI", "DMI1", {data: []})
 */
-// chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
+chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
 // chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 
 
-chart0.on("stream_candleFirst", () => {
-  chart0.state.dataSource.historyAdd({
-    rangeLimitPast: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts) },
-    // rangeLimitFuture: (e) => onRangeLimit2(e, sym, tf, ts)
-  })
-})
+// chart0.on("stream_candleFirst", () => {
+//   chart0.state.dataSource.historyAdd({
+//     rangeLimitPast: (e, r, sym, tf, ts) => { return onRangeLimit2(e, r, sym, tf, ts) },
+//     // rangeLimitFuture: (e) => onRangeLimit2(e, sym, tf, ts)
+//   })
+// })
 chart0.state.dataSource.tickerAdd(
   {
     start: (symbol, tf, onTick) => { livePrice_Binance(chart0, symbol, tf, onTick) },
