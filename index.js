@@ -1169,6 +1169,7 @@ function onWSMessage (evt, chart, onTick) {
 let waiting = false
 
 function kline_Binance(chart, symbol="BTCUSDT", start, limit=100, interval="1m") {
+  symbol = symbol.toUpperCase()
   if (!waiting) {
     waiting = true
     const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${start}&limit=${limit}`;
@@ -1195,6 +1196,7 @@ function kline_Binance(chart, symbol="BTCUSDT", start, limit=100, interval="1m")
 }
 
 function kline_Binance2(chart, result, symbol="BTCUSDT", start, limit=100, interval="1m") {
+  symbol = symbol.toUpperCase()
   if (symbol == "testusdt") symbol = "BTCUSDT"
   if (typeof interval == "number") interval = chart.timeData.ms2Interval(interval)
   const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${start}&limit=${limit}`;
@@ -1221,7 +1223,7 @@ function kline_Binance2(chart, result, symbol="BTCUSDT", start, limit=100, inter
   // })
 }
 
-function onRangeLimit(e, x) {
+function onRangeLimit(e, x="past") {
   const range = e.chart.range
   const limit = 100
   const start = range.timeStart - (range.interval * limit)
@@ -1304,16 +1306,16 @@ chart0.addIndicator("TRDFLO", "TradeFlow1", {data: [], settings: {test: true}})
 
 // chart0.addIndicator("DMI", "DMI1", {data: []})
 */
-chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
+// chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
 // chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 
 
-// chart0.on("stream_candleFirst", () => {
-//   chart0.state.dataSource.historyAdd({
-//     rangeLimitPast: (e, r, sym, tf, ts) => { return onRangeLimit2(e, r, sym, tf, ts) },
-//     // rangeLimitFuture: (e) => onRangeLimit2(e, sym, tf, ts)
-//   })
-// })
+chart0.on("stream_candleFirst", () => {
+  chart0.state.dataSource.historyAdd({
+    rangeLimitPast: (e, r, sym, tf, ts) => { return onRangeLimit2(e, r, sym, tf, ts) },
+    // rangeLimitFuture: (e) => onRangeLimit2(e, sym, tf, ts)
+  })
+})
 chart0.state.dataSource.tickerAdd(
   {
     start: (symbol, tf, onTick) => { livePrice_Binance(chart0, symbol, tf, onTick) },
@@ -1325,7 +1327,7 @@ chart0.state.dataSource.tickerAdd(
   }
 )
 
-
+// onRangeLimit({chart: chart0})
 
 
 /*
