@@ -1,5 +1,5 @@
 import { isHTMLElement } from './DOM';
-import { isArray, isBoolean, isFunction, isMap, isNumber, isObject, isString } from './typeChecks'
+import { checkType, isArray, isBoolean, isFunction, isMap, isNumber, isObject, isString } from './typeChecks'
 
 let _hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -199,6 +199,16 @@ export function getProperty(obj, path) {
   return keys.reduce((o, key) =>
       (o && o[key] !== 'undefined') ? o[key] : undefined, obj);
 }
+
+export function objectValidate(o, v) {
+  for (let key of Object.keys(v)) {
+    if (checkType(v[key], o?.[key])) {
+      return false
+    }
+  }
+  return true
+}
+
 
 // https://www.30secondsofcode.org/js/s/data-structures-doubly-linked-list/
 export class DoubleLinkedList {

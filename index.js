@@ -1309,22 +1309,30 @@ chart0.addIndicator("TRDFLO", "TradeFlow1", {data: [], settings: {test: true}})
 // chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 
 
-chart0.on("stream_candleFirst", () => {
-  chart0.state.dataSource.historyAdd({
-    rangeLimitPast: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts) },
-    // rangeLimitFuture: (e) => onRangeLimit2(e, sym, tf, ts)
-  })
+// chart0.on("stream_candleFirst", () => {
+//   chart0.state.dataSource.historyAdd({
+//     rangeLimitPast: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts) },
+//     // rangeLimitFuture: (e) => onRangeLimit2(e, sym, tf, ts)
+//   })
+// })
+// chart0.state.dataSource.tickerAdd(
+//   {
+//     start: (symbol, tf, onTick) => { livePrice_Binance(chart0, symbol, tf, onTick) },
+//     stop: () => {}
+//   },
+//   {
+//     symbol: "btcusdt",
+//     tf: 60000
+//   }
+// )
+
+chart0.state.dataSource.startTickerHistory({
+  rangeLimitPast: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts) },
+  start: (symbol, tf, onTick) => { livePrice_Binance(chart0, symbol, tf, onTick) },
+  stop: () => {},
+  symbol: "btcusdt",
+  tf: 60000
 })
-chart0.state.dataSource.tickerAdd(
-  {
-    start: (symbol, tf, onTick) => { livePrice_Binance(chart0, symbol, tf, onTick) },
-    end: () => {}
-  },
-  {
-    symbol: "btcusdt",
-    tf: 60000
-  }
-)
 
 // onRangeLimit({chart: chart0})
 

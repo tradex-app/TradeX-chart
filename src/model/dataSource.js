@@ -7,7 +7,7 @@ import { SHORTNAME } from "../definitions/core";
 import TradeXchart from "../core";
 import { Range, detectInterval } from "./range";
 import State from "../state"
-import { isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isPromise, isString } from "../utils/typeChecks";
+import { checkType, isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isPromise, isString } from "../utils/typeChecks";
 import { uid, xMap } from "../utils/utilities";
 import { limit } from "../utils/number";
 import { TIMEFRAMEMAX, TIMEFRAMEMIN, TIMESCALESVALUES, interval2MS, isTimeFrame, isTimeFrameMS, ms2Interval } from "../utils/time";
@@ -359,6 +359,37 @@ export default class DataSource {
       this.#core.off("range_limitFuture", this.#rangeLimitFuture, this)
       this.#rangeLimitFuture = null
     }
+  }
+
+  startTickerHistory(s) {
+    const v = {
+      rangeLimitPast: "function",
+      start: "function",
+      stop: "function",
+      symbol: "string",
+      tf: "integer"
+    }
+    for (let key of Object.keys(v)) {
+      if (!checkType(v[key], s?.[key])) {
+        consoleError(this.#core, `startTickerHistory() ${key} is not of the required type ${v[key]}`)
+        return false
+      }
+    }
+    this.#core.on("stream_candleFirst", () => {
+      this.historyAdd({
+        rangeLimitPast: s.rangeLimitPast
+      })
+    })
+    this.tickerAdd(
+      {
+        start: s.start,
+        stop: s.end
+      },
+      {
+        symbol: s.symbol,
+        tf: s.tf
+      }
+    )
   }
 
   /**
