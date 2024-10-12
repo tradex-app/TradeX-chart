@@ -773,6 +773,18 @@ export function promiseState(p) {
 }
 
 /**
+ * Deferred Promise - resolve and reject can be invoked externally
+ */
+export class Deferred {
+  constructor() {
+    this.promise = new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
+  }
+}
+
+/**
  * array buffer to string (UTF-16)
  * @param {ArrayBuffer} buf - TypedArray
  * @return {string} 
