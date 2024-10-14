@@ -275,6 +275,7 @@ export default class DataSource {
     if (isFunction(t?.stop)) {
       this.#tickerStop = t.stop
     }
+    else this.#tickerStop = () => { consoleError(this.#core, `tickerStop() function is undefined`) }
   }
 
   /**
@@ -342,7 +343,7 @@ export default class DataSource {
     }
     if (isFunction(h?.rangeLimitFuture)) {
       if (h.rangeLimitFuture.length !== n)
-        consoleError(this.#core, `range_limitFuture function requires n parameters`)
+        consoleError(this.#core, `range_limitFuture function requires ${n} parameters`)
       else {
         this.#rangeLimitFuture = (e) => { return this.onRangeLimit(e, h.rangeLimitFuture, this.#core.range.timeFinish) }
         this.#core.on("range_limitFuture", this.#rangeLimitFuture, this)
@@ -361,7 +362,21 @@ export default class DataSource {
     }
   }
 
+  /**
+   * Start ticker stream, and load the immediate chunk of back history
+   * @param {Object} s 
+   * @param {Function} s.rangeLimitPastetch - function to execute when chart range hits current limit of past price data
+   * @param {Function} s.start - function to start ticker stream
+   * @param {Function} s.stop - function to start ticker stream
+   * @param {String} s.symbol - eg. btcusdt
+   * @param {Number} s.tf - time frame in milliseconds
+   * @returns 
+   */
   startTickerHistory(s) {
+    if (!this.#state.isEmpty) {
+      consoleError(this.#core, `startTickerHistory() cannot execute because chart is not empty`)
+    }
+
     const v = {
       rangeLimitPast: "function",
       start: "function",
@@ -383,7 +398,7 @@ export default class DataSource {
     this.tickerAdd(
       {
         start: s.start,
-        stop: s.end
+        stop: s.stop
       },
       {
         symbol: s.symbol,

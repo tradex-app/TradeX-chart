@@ -1207,8 +1207,6 @@ function kline_Binance2(chart, symbol="BTCUSDT", start, limit=100, interval="1m"
       .then(d => {
         console.log(d)
         resolve({ohlcv: d})
-        // return {ohlcv: d}
-
       })
       .catch(e => {
         console.error(e)
@@ -1223,33 +1221,32 @@ function kline_Binance2(chart, symbol="BTCUSDT", start, limit=100, interval="1m"
 }
 
 function onRangeLimit(e, x="past") {
+  let start;
   const range = e.chart.range
   const limit = 100
-  const start = range.timeStart - (range.interval * limit)
-  const end = range.timeEnd
   const interval = range.intervalStr
   if (x == "past") {
-    kline_Binance(e.chart, undefined, start, limit, interval)
+    start = range.timeStart - (range.interval * limit)
   }
   if (x == "future") {
-
+    start = range.timeEnd
   }
+  kline_Binance(e.chart, undefined, start, limit, interval)
 }
 
-function onRangeLimit2(e, sym, tf, ts) {
+function onRangeLimit2(e, sym, tf, ts, x="past") {
+  let start;
   const range = e.chart.range
   const limit = 100
-  const start = ts - (tf * limit)
-  // const end = range.timeEnd
   const interval = range.intervalStr
-  let x = "past"
-  if (x == "past") {
-    // e.chart.progress.start()
-    return kline_Binance2(e.chart, sym, start, limit, tf)
-  }
   if (x == "future") {
-
+    start = ts 
   }
+  else {
+    start = ts - (tf * limit)
+  }
+  
+  return kline_Binance2(e.chart, sym, start, limit, tf)
 }
 
 function once (chart) {
@@ -1326,13 +1323,17 @@ chart0.addIndicator("TRDFLO", "TradeFlow1", {data: [], settings: {test: true}})
 //   }
 // )
 
+state1.dataSource.source.rangeLimitFuture = (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts, "future") }
+
 chart0.state.dataSource.startTickerHistory({
-  rangeLimitPast: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts) },
+  rangeLimitPast: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts, "past") },
   start: (symbol, tf, onTick) => { livePrice_Binance(chart0, symbol, tf, onTick) },
   stop: () => {},
   symbol: "btcusdt",
   tf: 60000
 })
+
+chart0.on("range_limitFuture", () => console.log("range_limitFuture"))
 
 // onRangeLimit({chart: chart0})
 
