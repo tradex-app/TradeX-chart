@@ -13,7 +13,7 @@ const ChartTypeSwitch = ({ onChange, items, value }: IProps) => {
   return (
     <Tabs
       defaultValue={value.label.toUpperCase()}
-      className="w-[400px] rounded-none"
+      className="pr-2 rounded-none"
     >
       <TabsList className="h-7 rounded-none">
         <TabsTrigger

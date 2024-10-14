@@ -36,13 +36,13 @@ const Toolbar = ({
   return (
     <div className="flex flex-row flex-grow mb-2 items-center">
       <div className="flex flex-row gap-2 items-center">
-        {tokensList.length > 0 && (
+        {
           <TokensDropdown
             tokensList={tokensList}
             value={selectedToken}
             setValue={onSelectToken}
           />
-        )}
+        }
 
         {config?.timeframe && (
           <IntervalDropdown
@@ -73,7 +73,7 @@ const Toolbar = ({
         )}
       </div>
       {config?.themeSwitcher && (
-        <div className="pr-2 mr-2">
+        <div className="flex justify-end items-center pr-2 mr-2">
           <ThemeToggle />
         </div>
       )}

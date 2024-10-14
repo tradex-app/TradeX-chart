@@ -1,5 +1,6 @@
 export interface ITradeX extends HTMLElement {
-  range: any;
+  timeData: any;
+  range: { timeData: { ms2Interval: (arg0: never) => string } };
   indicatorClasses: () => string[];
   stream: any;
   Indicators?: { [key: string]: unknown }[];
@@ -16,6 +17,7 @@ export interface ITradeX extends HTMLElement {
   expunge?: () => void;
   refresh?: () => void;
   state: {
+    dataSource: any;
     value: any;
     delete: (key: string) => boolean;
     key: string;

@@ -2,18 +2,19 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { CHART_OPTIONS, DEFAULT_RANGE_LIMIT } from './utils';
-import { fetchOHLCVData, fetchTXData } from './fetchers';
 import FullScreenWrapper from '../FullScreen/FullScreenWrapper';
 import FullScreenButton from '../FullScreen/FullScreenButton';
 import Toolbar from './Toolbar';
 import { IIndicatorToolbar, ITokenChartProps } from './utils/types';
 import TradeXChart from '@/components/tradeX/Chart';
 import { CUSTOM_INDICATORS } from '@/components/tradeX/indicators/availbleIndicators';
-import { livePrice_Binance } from './utils/ws';
+// import { livePrice_Binance } from './utils/ws';
 import { useChartContext } from './provider/ChartProvider';
 import { useTheme } from 'next-themes';
 import { Chart } from '../../../src'; // 'tradex-chart';
 import { IConfig, ITradeData } from '../../../types'; // 'tradex-chart';
+import { onRangeLimit } from './utils/dataFetching';
+import { livePrice_Binance } from './utils/dataFetching';
 
 Chart; // DO NOT REMOVE THIS
 
@@ -171,7 +172,7 @@ const TradingChart = (props: ITokenChartProps) => {
             symbol,
             timeFrameInit: selectedInterval
           }
-        }
+        };
         // @ts-ignore
         chartX.state.use(newState);
       }
@@ -188,34 +189,23 @@ const TradingChart = (props: ITokenChartProps) => {
       // setTradeData(tx);
 
       // Initialize WebSocket
-      if (wsRef.current) {
-        wsRef.current.close();
-      }
-      wsRef.current = livePrice_Binance(chartX, symbol, selectedInterval);
+      // if (wsRef.current) {
+      //   wsRef.current.close();
+      // }
+      // wsRef.current = livePrice_Binance(chartX, symbol, selectedInterval);
 
-      // Fetch initial history
-      await fetchOHLCVData(
-        chartX,
-        config?.range.startTS,
-        config?.range.limitPast,
-        symbol,
-        selectedInterval,
-        isLoading
-      );
+      // REGISTER DATA HANDLERS
 
-      // Register range limit
-      chartX?.on?.('range_limitPast', (e: any) => {
-        const range = e.chart.range;
-        const limit = 100;
-        const start = range.timeStart - range.interval * limit;
-        fetchOHLCVData(
-          e.chart,
-          start,
-          limit,
-          symbol,
-          selectedInterval,
-          isLoading
-        );
+      chartX?.state.dataSource.startTickerHistory({
+        rangeLimitPast: (e: any, sym: any, tf: any, ts: any) => {
+          return onRangeLimit(e, sym, tf, ts);
+        },
+        start: (symbol: string, tf: string, onTick: any) => {
+          livePrice_Binance(chartX, symbol, tf, onTick);
+        },
+        stop: () => {},
+        symbol: symbol,
+        tf: 60000
       });
 
       setHasInitialFetch(true);

@@ -1140,7 +1140,7 @@ function livePrice_Binance(chart, symbol="btcusdt", interval="1m", onTick) {
     interval = chart.timeData.ms2Interval(interval)
   }
   // var ws = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@aggTrade");
-  var ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@kline_${interval}`);
+  var ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`);
 
   ws.onmessage = (evt) => onWSMessage.call(this, evt, chart, onTick)
 }
