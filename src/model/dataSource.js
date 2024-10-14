@@ -214,9 +214,10 @@ export default class DataSource {
    * @returns 
    */
   timeFrameUse(tf) {
-    if (isString(tf)) {
+    if (isString(tf) && !isInteger(tf*1)) {
       tf = interval2MS(tf)
     }
+    tf *= 1
     if (!isInteger(tf))
       throwError(this.#core.id, `time frame invalid`)
 
