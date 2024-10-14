@@ -911,8 +911,7 @@ export default class State {
     // clean up panes - remove 
     if (isFunction(this.#core.MainPane?.init)) {
       if (this.#core.stream instanceof Stream) {
-        this.#core.stream.stop()
-        this.#core.stream = null
+        this.#dataSource.tickerStop()
         this.#dataSource.historyRemove()
       }
       this.#core.progress.start()
