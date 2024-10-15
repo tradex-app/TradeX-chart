@@ -164,6 +164,8 @@ export default class DataSource {
   }
 
   get id() { return this.#id }
+  get state() { return this.#state }
+  get source() { return this.#source }
   get stream() { return this.#stream }
   get symbol() { return this.#symbol }
   set timeFrame(t) { this.timeFrameUse(t) }
@@ -415,7 +417,7 @@ export default class DataSource {
    * @param {Number} ts - unix time stamp milliseconds
    */
   onRangeLimit(e, fn, ts) {
-    if (!isFunction(fn)) {
+    if (!isFunction(fn) && this.#state.isActive) {
       this.#waiting = false
       return
     }

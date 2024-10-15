@@ -757,6 +757,7 @@ export default class State {
   get key() { return this.#key }
   get status() { return this.#data.status }
   get isEmpty() { return !this.#data.chart.data.length }
+  get isActive() { return this.#key === State.active(this.#core).key }
   get core() { return (this.#core !== undefined) ? this.#core : false }
   get data() { return this.#data }
   get gaps() { return this.#gaps }
@@ -911,8 +912,19 @@ export default class State {
     // clean up panes - remove 
     if (isFunction(this.#core.MainPane?.init)) {
       if (this.#core.stream instanceof Stream) {
-        this.#dataSource.tickerStop()
-        this.#dataSource.historyRemove()
+        // new source - exchange, api
+        if (this.source.name !== key?.source?.name) {
+          // this.#dataSource.tickerStop()
+          // this.#dataSource.historyRemove()
+        }
+        // check if ticker or history fetch has changed
+        else {
+          // if (isObject(key?.source?.tickerStream)) 
+          //   this.#dataSource.tickerStop()
+          // if (isFunction(key?.source?.rangeLimitPast) ||
+          //     isFunction(key?.source?.rangeLimitFuture))
+          //   this.#dataSource.historyRemove()
+        }
       }
       this.#core.progress.start()
       State.archiveInventory(this)
