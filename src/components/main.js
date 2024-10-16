@@ -1045,7 +1045,7 @@ console.log("total does not match Row Height")
       if (!isArray(o)) return false
       o.forEach((v, i) => {
         if (!isValidObj(v)) {
-          this.core.log(`TradeX-Chart : ${this.core.id} : indicator ${v?.type} not added: not supported.`)
+          this.core.log(`TradeX-Chart : ${this.core.ID} : indicator ${v?.type} not added: not supported.`)
           o.splice(i, 1)
         }
       })

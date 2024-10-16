@@ -27,7 +27,7 @@ export default class Theme {
   static create(theme, core) {
     if (!(isObject(theme))) return false
 
-    theme.id = (isString(theme.name))? uid(theme.name) : uid(`${core.id}_theme`)
+    theme.id = (isString(theme.name))? uid(theme.name) : uid(`${core.ID}_theme`)
 
     const instance = new Theme(theme, core)
 

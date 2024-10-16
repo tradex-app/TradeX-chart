@@ -898,7 +898,7 @@ export default class State {
    * @returns {State|undefined}
    */
   use(key) {
-    const errMsg = `TradeX-Chart id: ${this.#core.id} : cannot use supplied key or state`
+    const errMsg = `TradeX-Chart id: ${this.#core.ID} : cannot use supplied key or state`
     if (isString(key) && !State.has(key))
       return undefined
     else if (key === undefined) {
@@ -911,21 +911,6 @@ export default class State {
 
     // clean up panes - remove 
     if (isFunction(this.#core.MainPane?.init)) {
-      if (this.#core.stream instanceof Stream) {
-        // new source - exchange, api
-        if (this.source.name !== key?.source?.name) {
-          // this.#dataSource.tickerStop()
-          // this.#dataSource.historyRemove()
-        }
-        // check if ticker or history fetch has changed
-        else {
-          // if (isObject(key?.source?.tickerStream)) 
-          //   this.#dataSource.tickerStop()
-          // if (isFunction(key?.source?.rangeLimitPast) ||
-          //     isFunction(key?.source?.rangeLimitFuture))
-          //   this.#dataSource.historyRemove()
-        }
-      }
       this.#core.progress.start()
       State.archiveInventory(this)
       this.#core.MainPane.destroy(false)
@@ -941,7 +926,12 @@ export default class State {
       this.#core.MainPane.refresh()
       this.#core.progress.stop()
     }
-    if (!state)
+
+    if (state instanceof State) {
+      applyHistoryFetch(state, this)
+      applyTickerStream(state, this)
+    }
+    else
       this.#core.log(errMsg)
 
     return state
@@ -984,21 +974,20 @@ export default class State {
     let tfMS = this.#dataSource.timeFrameMS
 
     if (!isObject(merge)) {
-      this.error(`ERROR: ${this.id}: merge data must be type Object!`)
+      this.error(`ERROR: ${this.core.ID}: state: ${this.key} ${this.symbol} merge data must be type Object!`)
       return false
     }
     let end = (isArray(merge?.ohlcv)) ? merge.ohlcv.length - 1 : 0
+    let mergeTF = detectInterval(merge?.ohlcv)
     // time frames don't match
-    if (end > 1 &&
-      tfMS !== detectInterval(merge?.ohlcv)) {
-        console.log(tfMS, detectInterval(merge?.ohlcv))
-      this.error(`ERROR: ${this.core.ID}: merge data time frame does not match existing time frame!`)
+    if (end > 1 && tfMS !== mergeTF) {
+      this.error(`ERROR: ${this.core.ID}: state: ${this.key} ${this.symbol} merge data time frame ${mergeTF} does not match existing time frame ${tfMS}!`)
       return false
     }
 
     // // Not valid chart data
     // if (!isArray(merge?.ohlcv)) {
-    //   this.error(`ERROR: ${this.core.ID}: merge chart data must be of type Array!`)
+    //   this.error(`ERROR: ${this.core.ID}: state: ${this.key} ${this.symbol} merge chart data must be of type Array!`)
     //   return false
     // }
 
@@ -1354,4 +1343,39 @@ function hashKey(state) {
   let str = JSON.stringify(state)
   let hash = cyrb53(str)
   return `${SHORTNAME}_${HASHKEY}_${hash}`
+}
+
+function applyHistoryFetch(curr, old) {
+  let c = curr.dataSource.source;
+  let o = old.dataSource.source;
+  if (c.name !== o.name) return false
+
+  if (!isFunction(c.rangeLimitPast) &&
+      isFunction(o.rangeLimitPast))
+      c.rangeLimitPast = o.rangeLimitPast
+
+  if (!isFunction(c.rangeLimitFuture) &&
+      isFunction(o.rangeLimitFuture))
+      c.rangeLimitFuture = o.rangeLimitFuture
+
+  return true
+}
+
+function applyTickerStream(curr, old) {
+  let c = curr.dataSource.source.tickerStream;
+  let o = old.dataSource.source.tickerStream;
+  if (c.name !== o.name) return false
+
+  if (curr.dataSource.symbol == old.dataSource.symbol) {
+    if (!isFunction(c.start) &&
+        isFunction(o.start))
+        c.start = o.start
+
+    if (!isFunction(c.stop) &&
+        isFunction(o.stop))
+        c.stop = o.stop
+
+    return true
+  }
+  return false
 }

@@ -141,7 +141,7 @@ export default class Chart extends Component{
 
     this.#chartCnt = Chart.cnt
 
-    if (!isObject(options)) throw new Error(`TradeX-Chart : id: ${core.id} : Chart (pane) constructor failed: Expected options typeof object`)
+    if (!isObject(options)) throw new Error(`TradeX-Chart : ${core.ID} : Chart (pane) constructor failed: Expected options typeof object`)
 
     this.#name = this.options.name
     this.#shortName = this.options.shortName
@@ -281,7 +281,7 @@ export default class Chart extends Component{
     this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg2)
     this.#ConfigDialogue.start()
     this.#status = "running"
-    this.log(`TradeX-Chart : id: ${this.core.id} : Chart Pane ${this.name} instantiated and running`)
+    this.log(`TradeX-Chart : ${this.core.ID} : Chart Pane : ${this.name} : instantiated and running`)
   }
 
   /**

@@ -200,6 +200,7 @@ const TradingChart = (props: ITokenChartProps) => {
         rangeLimitPast: (e: any, sym: any, tf: any, ts: any) => {
           return onRangeLimit(e, sym, tf, ts);
         },
+        rangeLimitFuture: (e: any, sym: any, tf: any, ts: any) => {},
         start: (symbol: string, tf: string, onTick: any) => {
           livePrice_Binance(chartX, symbol, tf, onTick);
         },

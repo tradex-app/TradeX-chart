@@ -98,6 +98,19 @@ export default class Stream {
     this.#lastTick = t
     this.alerts.check(t, this.#candle)
   }
+  get isActive() {
+    let active = [
+      STREAM_LISTENING,
+      STREAM_STARTED,
+      STREAM_FIRSTVALUE,
+      STREAM_NEWVALUE,
+      STREAM_UPDATE
+    ]
+    if (active.includes(this.#status))
+      return true
+    else
+      return false
+  }
 
   /**
    * process price tick
