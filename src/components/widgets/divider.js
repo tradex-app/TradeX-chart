@@ -32,7 +32,7 @@ export default class Divider {
 
   static create(widgets, config) {
 
-    const id = `${config.core.id}_divider_${++Divider.divideCnt}`
+    const id = `${config.core.ID}_divider_${++Divider.divideCnt}`
     config.id = id
 
     // add entry

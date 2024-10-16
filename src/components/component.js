@@ -28,7 +28,7 @@ export default class Component {
   error(e) { this.#core.error(e) }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return this.#id || `${this.#core.id}-${this.name}` }
+  get id() { return this.#id || `${this.#core.ID}-${this.name}` }
   get core() { return this.#core }
   get options() { return this.#options }
   get config() { return this.#core.config }
