@@ -115,6 +115,7 @@ export default class DataSource {
   #cnt
   #id
   #core
+  #cfg
   #source = doStructuredClone(DEFAULT_STATE.dataSource.source)
   #symbol
   #state
@@ -142,7 +143,7 @@ export default class DataSource {
    * @memberof DataSource
    */
   constructor( cfg, state ) {
-
+    this.#cfg = cfg
     this.#state = state
     this.#core = state.core
     this.#cnt = ++DataSource.#sourceCnt
@@ -160,6 +161,7 @@ export default class DataSource {
   }
 
   get id() { return this.#id }
+  get cfg() { return this.#cfg }
   get state() { return this.#state }
   get source() { return this.#source }
   get stream() { return this.#stream }
@@ -212,10 +214,7 @@ export default class DataSource {
    * @returns 
    */
   timeFrameUse(tf) {
-    if (isString(tf) && !isInteger(tf*1)) {
-      tf = interval2MS(tf)
-    }
-    tf *= 1
+    tf = timeFrame2MS(tf)
     if (!isInteger(tf))
       throwError(this.#core.ID, this.#state.key, `time frame invalid`)
 
@@ -240,6 +239,11 @@ export default class DataSource {
       throwError(this.#core.ID, this.#state.key, `time frame invalid`)
   }
 
+  /**
+   * Report if time frame exists
+   * @param {Number|String} tf 
+   * @returns {Number|undefined}
+   */
   timeFrameExists(tf) {
     if (tf in this.#timeFrames) return this.#timeFrames[tf]
     if (isInteger(tf)) {
@@ -284,6 +288,7 @@ export default class DataSource {
    * @returns {Boolean}
    */
   tickerStart(symbol, tf) {
+    tf = timeFrame2MS(tf)
     if (isString(symbol) && 
         symbol.length &&
         isInteger(tf) ) {
@@ -388,7 +393,14 @@ export default class DataSource {
       tf: "integer"
     }
     for (let key of Object.keys(v)) {
-      if (!checkType(v[key], s?.[key])) {
+      if (key == "tf") {
+        s.tf = timeFrame2MS(s.tf)
+        if (isInteger(s.tf)) continue
+      }
+      else if (checkType(v[key], s?.[key])) {
+        continue
+      }
+      else {
         consoleError(this.#core, this.#state.key, `startTickerHistory() ${key} is not of the required type ${v[key]}`)
         return false
       }
@@ -434,7 +446,7 @@ export default class DataSource {
         p.then( d => {
           if (!isObject(d)) throwError(this.#core.ID, this.#state.key, "Price history fetch did not return a Promise that resolved to an Object. Nothing to merge.")
           this.identifyState()
-          this.#core.mergeData(d, false, true)
+          this.#state.mergeData(d, false, true)
           this.#waiting = false
           this.#core.progress.stop()
         })
@@ -516,3 +528,9 @@ function buildTimeFrames (t) {
   return tf
 }
 
+function timeFrame2MS(tf) {
+  if (isString(tf) && !isInteger(tf*1)) {
+    tf = interval2MS(tf)
+  }
+  return tf * 1
+}
