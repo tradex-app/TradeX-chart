@@ -206,7 +206,7 @@ const TradingChart = (props: ITokenChartProps) => {
         },
         stop: () => {},
         symbol: symbol,
-        tf: 60000
+        tf: selectedInterval
       });
 
       setHasInitialFetch(true);
