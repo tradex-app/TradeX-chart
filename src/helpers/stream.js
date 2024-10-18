@@ -15,6 +15,8 @@ import { isArray, isBoolean, isInteger, isNumber, isObject, isString } from '../
 import { YEAR_MS, MONTHR_MS, WEEK_MS, DAY_MS, HOUR_MS, MINUTE_MS, SECOND_MS, MILLISECOND, isValidTimestamp } from '../utils/time';
 import { copyDeep, mergeDeep, valuesInArray } from '../utils/utilities';
 import Alerts from './alerts';
+import TradeXchart from '../core';
+import State from '../state';
 
 import {
   STREAM_ERROR,
@@ -42,6 +44,7 @@ export default class Stream {
 
   #core
   #config
+  #state
   #status
   #maxUpdate
   #updateTimer = 0
@@ -58,14 +61,18 @@ export default class Stream {
   #alerts
 
 
-  constructor(core) {
-    this.#core = core
+  constructor(core, state) {
+    if (!(core instanceof TradeXchart)) throwError({id: "invalid"}, `not a valid chart instance`)
+    else this.#core = core
+    if (!(state instanceof State)) throwError(core, `state not a valid State instance`)
+    else this.#state = state
     this.status = {status: STREAM_NONE}
     this.#config = validateConfig(core.config?.stream)
     this.#maxUpdate = (isNumber(core.config?.maxCandleUpdate)) ? core.config.maxCandleUpdate : STREAM_MAXUPDATE
     this.#precision = (isNumber(core.config?.streamPrecision)) ? core.config.streamPrecision : STREAM_PRECISION
   }
 
+  get state() { return this.#state }
   get config() { return this.#config }
   get countDownMS() { return this.#countDownMS }
   get countDown() { return this.#countDown }
@@ -223,7 +230,7 @@ export default class Stream {
       data.v, 
       null, true]
 
-      console.log(`new candle:`, this.#candle)
+console.log(`State: ${this.#state.key} new candle:`, this.#candle)
     this.#core.state.mergeData({ohlcv: [this.#candle]}, true, false)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
     this.#countDownMS = this.#core.time.timeFrameMS
@@ -253,7 +260,7 @@ export default class Stream {
 
     // update the last candle in the state data
     this.#candle = candle
-    console.log(`candle update:`,candle)
+console.log(`State: ${this.#state.key} candle update:`,candle)
 
     const d = this.#core.allData.data
     const l = (d.length > 0) ? d.length -1 : 0
@@ -334,4 +341,12 @@ function validateConfig(c) {
     c.alerts = (isArray(c.alerts)) ? c.alerts : defaultStreamConfig.alerts
   }
   return c
+}
+
+function consoleError(c, e) {
+  c.error(`TradeX-chart id: ${c.id}: Ticker Stream : ${e}`)
+}
+
+function throwError(id, e) {
+  throw new Error(`TradeX-chart id: ${id} : Ticker Stream : ${e}`)
 }

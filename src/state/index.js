@@ -928,8 +928,8 @@ export default class State {
     }
 
     if (state instanceof State) {
-      applyHistoryFetch(state, this)
-      applyTickerStream(state, this)
+      // applyHistoryFetch(state, this)
+      // applyTickerStream(state, this)
     }
     else
       this.#core.log(errMsg)
@@ -968,20 +968,21 @@ export default class State {
   // TODO: merge indicator data?
   // TODO: merge dataset?
   mergeData(merge, newRange = false, calc = false) {
+console.log(`TradeX-chart id: ${this.#core.id}: State ${this.#key} : mergeData()`)
 
     if (this.isEmpty) State.setTimeFrame(this.#core, this.key, merge?.ohlcv)
 
     let tfMS = this.#dataSource.timeFrameMS
 
     if (!isObject(merge)) {
-      this.error(`ERROR: ${this.core.ID}: state: ${this.key} ${this.symbol} merge data must be type Object!`)
+      consoleError(this.#core, this.#key, `${this.symbol} merge data must be type Object!`)
       return false
     }
     let end = (isArray(merge?.ohlcv)) ? merge.ohlcv.length - 1 : 0
     let mergeTF = detectInterval(merge?.ohlcv)
     // time frames don't match
     if (end > 1 && tfMS !== mergeTF) {
-      this.error(`ERROR: ${this.core.ID}: state: ${this.key} ${this.symbol} merge data time frame ${mergeTF} does not match existing time frame ${tfMS}!`)
+      consoleError(this.#core, this.#key, `${this.symbol} merge data time frame ${mergeTF} does not match existing time frame ${tfMS}!`)
       return false
     }
 
@@ -1378,4 +1379,12 @@ function applyTickerStream(curr, old) {
     return true
   }
   return false
+}
+
+function consoleError(c, k, e) {
+  c.error(`TradeX-chart id: ${c.id}: State ${k} : ${e}`)
+}
+
+function throwError(id, k, e) {
+  throw new Error(`TradeX-chart id: ${id} : State ${k} : ${e}`)
 }

@@ -154,7 +154,7 @@ export default class DataSource {
     this.timeFramesAdd(cfg?.timeFrames, DataSource)
     this.timeFrameUse(cfg?.timeFrameInit)
     this.#range = this.buildRange(state)
-    this.#stream = new Stream(state.core)
+    this.#stream = new Stream(state.core, state)
     this.historyAdd(cfg?.source)
     let begin = {symbol: this.symbol, tf: this.timeFrameMS}
     this.tickerAdd(cfg?.source?.tickerStream, begin)
@@ -430,7 +430,7 @@ export default class DataSource {
    * @param {Number} ts - unix time stamp milliseconds
    */
   onRangeLimit(e, fn, ts) {
-    if (!isFunction(fn) && this.#state.isActive) {
+    if (!isFunction(fn) || !this.#state.isActive) {
       this.#waiting = false
       return
     }
