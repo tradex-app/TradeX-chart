@@ -1329,7 +1329,7 @@ state1.dataSource.source.rangeLimitFuture = (e, sym, tf, ts) => { return onRange
 
 chart0.state.dataSource.startTickerHistory({
   rangeLimitPast: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts, "past") },
-  rangeLimitFuture: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts, "future") },
+  // rangeLimitFuture: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts, "future") },
   start: (symbol, tf, onTick) => { livePrice_Binance(chart0, symbol, tf, onTick) },
   stop: () => {},
   symbol: "btcusdt",

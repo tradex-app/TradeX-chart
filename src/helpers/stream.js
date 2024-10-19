@@ -206,12 +206,12 @@ export default class Stream {
   }
 
   onUpdate() {
+    if (!this.#state?.isActive) return
     if (this.#candle !== empty) {
       this.status = {status: STREAM_UPDATE, data: this.candle}
       this.status = {status: STREAM_LISTENING, data: this.#candle}
     }
   }
-
 
   /**
    * add new candle to state data
@@ -262,11 +262,12 @@ console.log(`State: ${this.#state.key} new candle:`, this.#candle)
     this.#candle = candle
 console.log(`State: ${this.#state.key} candle update:`,candle)
 
-    const d = this.#core.allData.data
+    const d = this.#state.data.chart.data
     const l = (d.length > 0) ? d.length -1 : 0
     d[l] = this.#candle
 
-    this.countDownUpdate()
+    if (this.#state?.isActive)
+      this.countDownUpdate()
   }
 
   countDownUpdate() {
@@ -344,9 +345,9 @@ function validateConfig(c) {
 }
 
 function consoleError(c, e) {
-  c.error(`TradeX-chart id: ${c.id}: Ticker Stream : ${e}`)
+  c.error(`TradeX-chart: ${c.id}: Ticker Stream : ${e}`)
 }
 
 function throwError(id, e) {
-  throw new Error(`TradeX-chart id: ${id} : Ticker Stream : ${e}`)
+  throw new Error(`TradeX-chart: ${id} : Ticker Stream : ${e}`)
 }

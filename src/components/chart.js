@@ -141,7 +141,7 @@ export default class Chart extends Component{
 
     this.#chartCnt = Chart.cnt
 
-    if (!isObject(options)) throw new Error(`TradeX-Chart : ${core.ID} : Chart (pane) constructor failed: Expected options typeof object`)
+    if (!isObject(options)) throw new Error(`TradeX-Chart: ${core.ID} : Chart (pane) constructor failed: Expected options typeof object`)
 
     this.#name = this.options.name
     this.#shortName = this.options.shortName
@@ -281,7 +281,7 @@ export default class Chart extends Component{
     this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg2)
     this.#ConfigDialogue.start()
     this.#status = "running"
-    this.log(`TradeX-Chart : ${this.core.ID} : Chart Pane : ${this.name} : instantiated and running`)
+    this.log(`TradeX-Chart: ${this.core.ID} : Chart Pane : ${this.name} : instantiated and running`)
   }
 
   /**
@@ -362,6 +362,7 @@ export default class Chart extends Component{
     this.on(STREAM_NEWVALUE, this.onStreamNewValue, this);
     this.on(STREAM_UPDATE, this.onStreamUpdate, this);
     this.on(STREAM_FIRSTVALUE, this.onStreamNewValue, this)
+    this.on("range_valueMaxMin", this.onValueMaxMin, this)
     this.on("range_timeframeSet", this.onTimeframeSet, this)
     this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this)
 
@@ -454,6 +455,10 @@ export default class Chart extends Component{
     let title = `${this.#titleStr}`
     chartLegend.title = title
     this.setTitle(title)
+  }
+
+  onValueMaxMin(m) {
+    console.log(`TradeX-chart: ${this.core.ID} : Chart Pane ${this.id} : Range Value Max: ${m.max}, Min: ${m.min}`)
   }
 
   // set up Scale (Y Axis)

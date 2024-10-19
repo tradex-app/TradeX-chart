@@ -2890,10 +2890,10 @@ class Range {
   get indexed() {
     return this.#indexed;
   }
-  get pastLimitIndex() {
+  get indexPastLimit() {
     return this.limitPast * -1;
   }
-  get futureLimitIndex() {
+  get indexFutureLimit() {
     return this.dataLength + this.limitFuture - 1;
   }
   set initialCnt(c) {
@@ -2926,11 +2926,11 @@ class Range {
   end() {}
   isFutureLimit(idx = this.indexEnd) {
     if (!isInteger(idx)) return;
-    return idx > this.futureLimitIndex;
+    return idx > this.indexFutureLimit;
   }
   isPastLimit(idx = this.indexStart) {
     if (!isInteger(idx)) return;
-    return idx < this.pastLimitIndex;
+    return idx < this.indexPastLimit;
   }
   set(start = 0, end = this.dataLength, max = this.maxCandles) {
     if (!isInteger(start) || !isInteger(end) || !isInteger(max)) return false;
@@ -3297,7 +3297,7 @@ const copy = [
   'volumeMin',
   'volumeMinIdx',
   'diff',
-  'futureLimitIndex',
+  'indexFutureLimit',
   'id',
   'indexed',
   'initialCnt',
@@ -3307,7 +3307,7 @@ const copy = [
   'limitPast',
   'maxCandles',
   'minCandles',
-  'pastLimitIndex',
+  'indexPastLimit',
   'rangeDuration',
   'rangeLimit',
   'timeDuration',
@@ -21772,8 +21772,8 @@ class MainPane extends Component {
       range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length);
     let newEnd =
       range.indexEnd + Math.ceil(direction * XAXIS_ZOOM * range.Length);
-    if (range.isPastLimit(newStart)) newStart = range.pastLimitIndex + 1;
-    if (range.isFutureLimit(newEnd)) newEnd = range.futureLimitIndex - 1;
+    if (range.isPastLimit(newStart)) newStart = range.indexPastLimit + 1;
+    if (range.isFutureLimit(newEnd)) newEnd = range.indexFutureLimit - 1;
     if (
       newEnd - newStart > range.maxCandles ||
       newEnd - newStart < range.minCandles

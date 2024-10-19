@@ -758,6 +758,7 @@ export default class State {
   get status() { return this.#data.status }
   get isEmpty() { return !this.#data.chart.data.length }
   get isActive() { return this.#key === State.active(this.#core).key }
+  get hasGaps() { return Object.keys(this.#gaps).length }
   get core() { return (this.#core !== undefined) ? this.#core : false }
   get data() { return this.#data }
   get gaps() { return this.#gaps }
@@ -898,7 +899,7 @@ export default class State {
    * @returns {State|undefined}
    */
   use(key) {
-    const errMsg = `TradeX-Chart id: ${this.#core.ID} : cannot use supplied key or state`
+    const errMsg = `TradeX-Chart: ${this.#core.id} : cannot use supplied key or state`
     if (isString(key) && !State.has(key))
       return undefined
     else if (key === undefined) {
@@ -911,6 +912,10 @@ export default class State {
 
     // clean up panes - remove 
     if (isFunction(this.#core.MainPane?.init)) {
+      if (this.#core.stream instanceof Stream) {
+        // this.#dataSource.tickerStop()
+        this.#dataSource?.historyPause()
+      }
       this.#core.progress.start()
       State.archiveInventory(this)
       this.#core.MainPane.destroy(false)
@@ -926,10 +931,8 @@ export default class State {
       this.#core.MainPane.refresh()
       this.#core.progress.stop()
     }
-
     if (state instanceof State) {
-      // applyHistoryFetch(state, this)
-      // applyTickerStream(state, this)
+      state.dataSource?.historyRestart()
     }
     else
       this.#core.log(errMsg)
@@ -968,7 +971,7 @@ export default class State {
   // TODO: merge indicator data?
   // TODO: merge dataset?
   mergeData(merge, newRange = false, calc = false) {
-console.log(`TradeX-chart id: ${this.#core.id}: State ${this.#key} : mergeData()`)
+console.log(`TradeX-chart: ${this.#core.id}: State ${this.#key} : mergeData()`)
 
     if (this.isEmpty) State.setTimeFrame(this.#core, this.key, merge?.ohlcv)
 
