@@ -3,15 +3,16 @@
 // so rather than pushing data to the chart
 // the chart can request (pull) data when needed
 
-import { SHORTNAME } from "../definitions/core";
+import { RANGELIMIT, SHORTNAME } from "../definitions/core";
 import TradeXchart from "../core";
 import { Range, detectInterval } from "./range";
 import State, { DEFAULT_STATE } from "../state"
+import Stream from "../helpers/stream";
 import { checkType, isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isPromise, isString } from "../utils/typeChecks";
 import { doStructuredClone, uid, xMap } from "../utils/utilities";
 import { limit } from "../utils/number";
 import { TIMEFRAMEMAX, TIMEFRAMEMIN, TIMESCALESVALUES, interval2MS, isTimeFrame, isTimeFrameMS, ms2Interval } from "../utils/time";
-import Stream from "../helpers/stream";
+import { DEFAULT_TIMEFRAME, INTITIALCNT } from "../definitions/chart";
 
 const TSV =   TIMESCALESVALUES
 const defaultTimeFrames = {}
@@ -58,10 +59,10 @@ export default class DataSource {
    * @param {String} cfg.symbol - eg. BTC/USDT 
    * @param {Array.<Number>} cfg.timeFrames - object of time frames in milliseconds
    * @param {Number} cfg.timeFrameInit - initial time frame
-   * @param {Ticker} cfg.ticker
-   * @param {History} cfg.history
+   * @param {Object} cfg.ticker
+   * @param {Object} cfg.history
    * @param {State} state
-   * @return {DataSource|boolean} state with data source
+   * @return {DataSource|undefined} state with data source
    * @memberof DataSource
    */
   static create( cfg, state ) {
@@ -72,7 +73,7 @@ export default class DataSource {
       !( state instanceof State )
     )
     // can't build a data source
-    return false
+    return undefined
 
     let dataSource = new DataSource( cfg, state )
     DataSource.#sourceList.set( dataSource, state )
@@ -278,13 +279,13 @@ export default class DataSource {
     if (isFunction(t?.stop)) {
       this.#source.tickerStream.stop = t.stop
     }
-    else this.#source.tickerStream.stop = () => { consoleError(this.#core, this.#state.key, `tickerStop() function is undefined`) }
+    else this.#source.tickerStream.stop = () => { this.#core.log(`TradeX-chart: ${this.#core.id} : DataSource : tickerStop() function is undefined`) }
   }
 
   /**
    * 
    * @param {String} symbol - ticker symbol eg. BTCUSDT
-   * @param {Number} tf - ticker time frame in millisconds
+   * @param {Number|String} tf - ticker time frame in millisconds
    * @returns {Boolean}
    */
   tickerStart(symbol, tf) {
@@ -341,7 +342,7 @@ export default class DataSource {
       if (h.rangeLimitPast.length !== n)
         consoleError(this.#core, this.#state.key, `range_limitPast function requires ${n} parameters`)
       else {
-        this.#source.rangeLimitPast = (e) => { return this.onRangeLimit(e, h.rangeLimitPast, this.#core.range.timeStart) }
+        this.#source.rangeLimitPast = (e) => { return this.onRangeLimit(e, h.rangeLimitPast, this.#state.range.timeStart) }
         this.#core.on("range_limitPast", this.#source.rangeLimitPast, this)
       }
     }
@@ -350,8 +351,9 @@ export default class DataSource {
         consoleError(this.#core, this.#state.key, `range_limitFuture function requires ${n} parameters`)
       else {
         this.#source.rangeLimitFuture = (e) => {
-          if (this.#stream.isActive) return Promise.resolve({})
-          else return this.onRangeLimit(e, h.rangeLimitFuture, this.#core.range.timeFinish) 
+          // if (this.#stream.isActive) return Promise.resolve({})
+          // else return this.onRangeLimit(e, h.rangeLimitFuture, this.#state.range.timeFinish) 
+          return this.onRangeLimit(e, h.rangeLimitFuture, this.#state.range.timeFinish) 
         }
         this.#core.on("range_limitFuture", this.#source.rangeLimitFuture, this)
       }
@@ -369,6 +371,18 @@ export default class DataSource {
     }
   }
 
+  historyPause() {
+    this.#core.off("range_limitPast", this.#source.rangeLimitPast, this)
+    this.#core.off("range_limitFuture", this.#source.rangeLimitFuture, this)
+  }
+
+  historyRestart() {
+    if (isFunction(this.#source.rangeLimitPast))
+      this.#core.on("range_limitPast", this.#source.rangeLimitPast, this)
+    if (isFunction(this.#source.rangeLimitFuture))
+      this.#core.on("range_limitFuture", this.#source.rangeLimitFuture, this)
+  }
+
   /**
    * Start ticker stream, and load the immediate chunk of back history
    * @param {Object} s 
@@ -384,9 +398,12 @@ export default class DataSource {
       consoleError(this.#core, this.#state.key, `startTickerHistory() cannot execute because chart is not empty`)
     }
 
+    if (!isFunction(s?.rangeLimitFuture))
+        s.rangeLimitFuture = (e, sym, tf, ts) => { return Promise.resolve({}) }
+
     const v = {
       rangeLimitPast: "function",
-      rangeLimitFuture: "function",
+      // rangeLimitFuture: "function",
       start: "function",
       stop: "function",
       symbol: "string",
@@ -476,7 +493,7 @@ export default class DataSource {
   
     if (tfms === Infinity) {
       let {ms} = isTimeFrame(state.dataSource.timeFrameInit)
-      tfms = ms || DEFAULT_TIMEFRAMEMS
+      tfms = ms || core.timeFrameMS || DEFAULT_TIMEFRAME
     } 
   
     if (!state.chart.isEmpty &&
@@ -484,9 +501,7 @@ export default class DataSource {
       this.#timeFrameCurr !== tfms)
       this.#timeFrameCurr = tfms
   
-    if (!isTimeFrameMS(this.#timeFrameCurr)) this.#timeFrameCurr = DEFAULT_TIMEFRAMEMS
-  
-    // range.timeFrame = ms2Interval(range.timeFrameMS)
+    if (!isTimeFrameMS(this.#timeFrameCurr)) this.#timeFrameCurr = core.timeFrameMS || DEFAULT_TIMEFRAME
   
     /*--- Range ---*/
     let config = {
@@ -510,11 +525,11 @@ export default class DataSource {
 }
 
 function consoleError(c, k, e) {
-  c.error(`TradeX-chart id: ${c.id}: State ${k} : DataSource : ${e}`)
+  c.error(`TradeX-chart: ${c.id}: State ${k} : DataSource : ${e}`)
 }
 
 function throwError(id, k, e) {
-  throw new Error(`TradeX-chart id: ${id} : State ${k} : DataSource : ${e}`)
+  throw new Error(`TradeX-chart: ${id} : State ${k} : DataSource : ${e}`)
 }
 
 function buildTimeFrames (t) {

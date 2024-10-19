@@ -300,8 +300,8 @@ export default class MainPane extends Component {
       let newStart = range.indexStart - Math.floor(direction * XAXIS_ZOOM * range.Length)
       let newEnd = range.indexEnd + Math.ceil(direction * XAXIS_ZOOM * range.Length)
 
-    if (range.isPastLimit(newStart)) newStart = range.pastLimitIndex + 1
-    if (range.isFutureLimit(newEnd)) newEnd = range.futureLimitIndex - 1
+    if (range.isPastLimit(newStart)) newStart = range.indexPastLimit + 1
+    if (range.isFutureLimit(newEnd)) newEnd = range.indexFutureLimit - 1
     if (newEnd - newStart > range.maxCandles ||
         newEnd - newStart < range.minCandles) return
 
@@ -1045,7 +1045,7 @@ console.log("total does not match Row Height")
       if (!isArray(o)) return false
       o.forEach((v, i) => {
         if (!isValidObj(v)) {
-          this.core.log(`TradeX-Chart : ${this.core.ID} : indicator ${v?.type} not added: not supported.`)
+          this.core.log(`TradeX-Chart: ${this.core.ID} : indicator ${v?.type} not added: not supported.`)
           o.splice(i, 1)
         }
       })
