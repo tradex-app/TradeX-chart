@@ -6,8 +6,8 @@
 import Component from "./component"
 import { elementDimPos } from "../utils/DOM";
 import { limit } from "../utils/number"
-import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks";
-import { copyDeep, cyrb53, idSanitize, xMap } from "../utils/utilities";
+import { isArray, isNumber, isObject, isString } from "../utils/typeChecks";
+import { doStructuredClone, cyrb53, idSanitize, xMap } from "../utils/utilities";
 import CEL from "./primitives/canvas";
 import Legends from "./primitives/legend"
 import Graph from "./views/classes/graph"
@@ -923,7 +923,7 @@ export default class Chart extends Component{
   }
 
   createGraph() {
-    let overlays = copyDeep(this.overlaysDefault)
+    let overlays = doStructuredClone(this.overlaysDefault)
     this.graph = new Graph(this, this.elViewport, overlays, false)
 
     if (this.isPrimary) {

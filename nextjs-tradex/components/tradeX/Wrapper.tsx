@@ -170,7 +170,19 @@ const TradingChart = (props: ITokenChartProps) => {
           id: symbol + '-' + selectedInterval,
           dataSource: {
             symbol,
-            timeFrameInit: selectedInterval
+            timeFrameInit: selectedInterval,
+            // source: {
+            //   rangeLimitPast: (e: any, sym: any, tf: any, ts: any) => {
+            //     return onRangeLimit(e, sym, tf, ts);
+            //   },
+            //   rangeLimitFuture: (e: any, sym: any, tf: any, ts: any) => {},
+            //   tickerStream: {
+            //     start: (symbol: string, tf: string, onTick: any) => {
+            //       livePrice_Binance(chartX, symbol, tf, onTick);
+            //     },
+            //     stop: () => {},
+            //   }
+            // }
           }
         };
         // @ts-ignore
@@ -198,9 +210,13 @@ const TradingChart = (props: ITokenChartProps) => {
 
       chartX?.state.dataSource.startTickerHistory({
         rangeLimitPast: (e: any, sym: any, tf: any, ts: any) => {
-          return onRangeLimit(e, sym, tf, ts);
+          return onRangeLimit(e, sym, tf, ts, "past");
         },
-        rangeLimitFuture: (e: any, sym: any, tf: any, ts: any) => {},
+        rangeLimitFuture: (e: any, sym: any, tf: any, ts: any) => {
+          if (!chartX.stream.isActive)
+            return onRangeLimit(e, sym, tf, ts, "future");
+          else return Promise.resolve({})
+        },
         start: (symbol: string, tf: string, onTick: any) => {
           livePrice_Binance(chartX, symbol, tf, onTick);
         },

@@ -79,6 +79,7 @@ The following list of events is not exhaustive as the chart is still under heavy
 * state_eventAdded
 * state_exported
 * state_deleted
+* state_usingState
 * state_mergeComplete
 * state_tradeAdded
 * stream_candleFirst

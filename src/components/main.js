@@ -16,7 +16,7 @@ import Divider from "./widgets/divider"
 import stateMachineConfig from "../state/state-main"
 import Input from "../input"
 import { isArray, isArrayOfType, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks"
-import { copyDeep, valuesInArray, xMap } from "../utils/utilities"
+import { doStructuredClone, valuesInArray, xMap } from "../utils/utilities"
 
 import {
   STREAM_FIRSTVALUE,
@@ -1248,7 +1248,7 @@ console.log("total does not match Row Height")
   }
 
   createGraph() {
-    let overlays = copyDeep(defaultOverlays)
+    let overlays = doStructuredClone(defaultOverlays)
 
     this.graph = new Graph(this, this.#elViewport, overlays)
   }

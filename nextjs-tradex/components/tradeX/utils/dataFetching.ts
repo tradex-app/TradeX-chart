@@ -58,20 +58,21 @@ export function onRangeLimit(
   e: { chart: { range: any } },
   sym: string,
   tf: number,
-  ts: number
+  ts: number,
+  x: string
 ) {
+  let start;
   const range = e.chart.range;
   const limit = 100;
-  const start = ts - tf * limit;
   // const end = range.timeEnd
   const interval = range.intervalStr;
-  let x = 'past';
-  if (x == 'past') {
-    // e.chart.progress.start()
-    return kline_Binance(e.chart, sym, start, limit, tf);
+  if (x == "future") {
+    start = ts 
   }
-  if (x == 'future') {
+  else {
+    start = ts - (tf * limit)
   }
+  return kline_Binance(e.chart, sym, start, limit, tf);
 }
 
 export function livePrice_Binance(

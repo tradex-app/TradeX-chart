@@ -13,7 +13,7 @@
 
 import { isArray, isBoolean, isInteger, isNumber, isObject, isString } from '../utils/typeChecks'
 import { YEAR_MS, MONTHR_MS, WEEK_MS, DAY_MS, HOUR_MS, MINUTE_MS, SECOND_MS, MILLISECOND, isValidTimestamp } from '../utils/time';
-import { copyDeep, mergeDeep, valuesInArray } from '../utils/utilities';
+import { doStructuredClone, mergeDeep, valuesInArray } from '../utils/utilities';
 import Alerts from './alerts';
 import TradeXchart from '../core';
 import State from '../state';
@@ -58,6 +58,9 @@ export default class Stream {
   #lastPriceMax
   #lastPriceMin
   #lastTick = empty
+  #lastScrollPos
+  #lastXPos
+  #lastYPos
   #alerts
 
 
@@ -76,16 +79,16 @@ export default class Stream {
   get config() { return this.#config }
   get countDownMS() { return this.#countDownMS }
   get countDown() { return this.#countDown }
-  get range() { return this.#core.range }
+  get range() { return this.#state.range }
   get status() { return this.#status }
   set status(s) {
     if (!isObject(s) && !isString(s?.status)) return
     this.#status = s.status
     this.emit(s.status, s?.data)
   }
-  get symbol() { return this.#core.symbol }
-  get timeFrame() { return this.#core.interval }
-  get timeFrameStr() { return this.#core.intervalStr }
+  get symbol() { return this.#state.symbol }
+  get timeFrame() { return this.#state.timeFrame }
+  get timeFrameStr() { return this.#state.timeFrameStr }
   set dataReceived(data) {
     if (this.#dataReceived) return
 
@@ -97,6 +100,12 @@ export default class Stream {
   set lastPriceMin(p) { if (isNumber(p)) this.#lastPriceMin = p }
   get lastPriceMax() { return this.#lastPriceMax }
   set lastPriceMax(p) { if (isNumber(p)) this.#lastPriceMax = p }
+  get lastScrollPos() { return this.#lastScrollPos }
+  set lastScrollPos(p) { this.setLastScrollPos(p) }
+  get lastXPos() { return this.#lastXPos }
+  set lastXPos(p) { if (isNumber(p)) this.#lastXPos = p }
+  get lastYPos() { return this.#lastYPos }
+  set lastYPos(p) { if (isObject(p)) this.#lastYPos = p }
   get lastTick() { return this.#lastTick }
   set lastTick(t) { 
     if (!isArray(t)) return
@@ -164,6 +173,16 @@ export default class Stream {
     return (this.#candle !== empty) ? this.#candle : null
   }
 
+  setLastScrollPos(p) {
+    if (isNumber(p)) this.#lastScrollPos = p
+  }
+
+  resetLastPos() {
+    this.#lastXPos = undefined
+    this.#lastYPos = undefined
+    this.#lastScrollPos = undefined
+  }
+
   start() {
     if (!statusAllowStart.includes(this.status)) {
       this.#core.error("ERROR: Invoke stopStream() before starting a new one.")
@@ -179,6 +198,7 @@ export default class Stream {
     if (this.#alerts instanceof Alerts)
       this.#alerts.destroy()
     this.status = {status: STREAM_STOPPED}
+    this.resetLastPos()
   }
   
   emit(topic, data) {
@@ -231,14 +251,14 @@ export default class Stream {
       null, true]
 
 console.log(`State: ${this.#state.key} new candle:`, this.#candle)
-    this.#core.state.mergeData({ohlcv: [this.#candle]}, true, false)
+    this.#state.mergeData({ohlcv: [this.#candle]}, true, false)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
-    this.#countDownMS = this.#core.time.timeFrameMS
+    this.#countDownMS = this.#state.timeFrame
     this.#countDownStart = this.roundTime(data.ts) // this.roundTime(Date.now())
   }
 
   prevCandle() {
-    const d = this.#core.allData.data
+    const d = this.#state.data.chart.data
     if (d.length > 0 && d[d.length - 1][7]) 
           d[d.length - 1].length = 6
   }
@@ -272,7 +292,7 @@ console.log(`State: ${this.#state.key} candle update:`,candle)
 
   countDownUpdate() {
     let y,M,w,d,h,m,s,u;
-    let tf = this.#core.time.timeFrameMS
+    let tf = this.#state.timeFrame
     let now = this.#data.ts
     let cntDn = tf - (now - this.#countDownStart)
 
@@ -327,15 +347,16 @@ console.log(`State: ${this.#state.key} candle update:`,candle)
   }
 
   roundTime(ts) {
-    return ts - (ts % this.#core.time.timeFrameMS)
+    return ts - (ts % this.#state.dataSource.timeFrame)
   }
+
 }
 
 function validateConfig(c) {
   if (!isObject(c)) return defaultStreamConfig
 
   else {
-    let d = copyDeep(defaultStreamConfig)
+    let d = doStructuredClone(defaultStreamConfig)
     c = mergeDeep(d, c)
 
     c.tfCountDown = (isBoolean(c.tfCountDown)) ? c.tfCountDown : defaultStreamConfig.tfCountDown

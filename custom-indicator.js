@@ -73,7 +73,7 @@ export default class Test extends Indicator {
       return {open: [params.open[0]], close: [params.close[0]]}
     }
 
-    return super.calcIndicator(indicatorFn, params={}, range, output) 
+    return super.calcIndicator(indicatorFn, params={}, range) //, output) 
   }
 
 

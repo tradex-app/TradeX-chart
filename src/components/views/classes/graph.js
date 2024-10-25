@@ -2,7 +2,7 @@
 // class
 
 import DOM from "../../../utils/DOM"
-import { copyDeep, xMap } from '../../../utils/utilities'
+import { doStructuredClone, xMap } from '../../../utils/utilities'
 import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from '../../../utils/typeChecks'
 import CEL from "../../primitives/canvas"
 import Overlays from "../../overlays"
@@ -95,7 +95,7 @@ export default class Graph {
 
   createViewport(overlays=[], node=false) {
 
-    overlays = (overlays.length == 0) ? copyDeep(defaultOverlays) : overlays
+    overlays = (overlays.length == 0) ? doStructuredClone(defaultOverlays) : overlays
 
     const {width, height} = this.layerConfig()
 

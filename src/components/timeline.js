@@ -6,7 +6,7 @@ import xAxis from "./axis/xAxis"
 import Input from "../input"
 import stateMachineConfig from "../state/state-time"
 import { elementDimPos } from "../utils/DOM"
-import { copyDeep, debounce, xMap } from "../utils/utilities"
+import { doStructuredClone, debounce, xMap } from "../utils/utilities"
 import { isArray, isObject } from "../utils/typeChecks"
 import Slider from "./widgets/slider"
 import { BUFFERSIZE } from "../definitions/chart"
@@ -313,7 +313,7 @@ export default class Timeline extends Component {
   xPosOHLCV(x) { return this.#xAxis.xPosOHLCV(x) }
 
   createGraph() {
-    let overlays = copyDeep(defaultOverlays)
+    let overlays = doStructuredClone(defaultOverlays)
 
     this.graph = new Graph(this, this.#elViewport, overlays, false)
     this.#layerCursor = this.graph.overlays.get("cursor").instance

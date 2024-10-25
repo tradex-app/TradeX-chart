@@ -7,7 +7,7 @@ import Overlay from './components/overlays/overlay'
 import Indicator from './components/overlays/indicator'
 import { IndicatorClasses } from './definitions/indicators'
 import { Range, detectInterval } from './model/range'
-import { copyDeep, mergeDeep, uid } from './utils/utilities'
+import { copyDeep, doStructuredClone, mergeDeep, uid } from './utils/utilities'
 import * as typeChecks from './utils/typeChecks'
 import { isPromise } from './utils/typeChecks'
 import { talibAPI } from './definitions/talib-api'
@@ -23,7 +23,8 @@ export {
   Chart, 
   candleW,
   canvas,
-  copyDeep, 
+  copyDeep,
+  doStructuredClone,
   DOM, 
   Aspect,
   EventHub,

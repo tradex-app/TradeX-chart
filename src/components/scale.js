@@ -9,7 +9,7 @@ import yAxis from "./axis/yAxis"
 import stateMachineConfig from "../state/state-scale"
 import Input from "../input"
 import {limitPrecision } from '../utils/number'
-import { copyDeep, xMap } from '../utils/utilities'
+import { doStructuredClone, xMap } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
 import { calcTextWidth, createFont } from '../renderer/text'
 import Graph from "./views/classes/graph"
@@ -115,7 +115,7 @@ export default class ScaleBar extends Component {
     this.eventsListen()
 
     // start State Machine 
-    const newConfig = copyDeep(stateMachineConfig)
+    const newConfig = doStructuredClone(stateMachineConfig)
     newConfig.id = this.id
     newConfig.context = this
     this.stateMachine = newConfig
@@ -312,7 +312,7 @@ export default class ScaleBar extends Component {
 
 
   createGraph() {
-    let overlays = copyDeep(defaultOverlays)
+    let overlays = doStructuredClone(defaultOverlays)
 
     this.graph = new Graph(this, this.#elViewport, overlays, false)
     this.#layerCursor = this.graph.overlays.get("cursor").instance

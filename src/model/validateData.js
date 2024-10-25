@@ -1,6 +1,9 @@
-import { isArray, isBoolean, isNumber, isObject, isString, checkType } from '../utils/typeChecks'
+import { isArray, isBoolean, isNumber, isObject, isString, checkType, isFunction, isInteger } from '../utils/typeChecks'
 import { getRandomIntBetween } from '../utils/number'
-import { isValidTimeInRange } from '../utils/time'
+import { isValidTimeInRange, isValidTimestamp, TimeData } from '../utils/time'
+import State from '../state'
+import { intersection, nearestArrayValue } from '../utils/utilities'
+import { isInViewport } from '../utils/DOM'
 
 
 /**
@@ -56,46 +59,6 @@ export function validateDeep(data, isCrypto=false) {
 }
 
 /**
- * Fill any gaps in a price history array
- *
- * @export
- * @param {Array} data - array of candles [timestamp, open, high, low, close, volume]
- * @param {number} timeFrameMS - time frame increment in milliseconds
- * @return {Array} - array of candles [timestamp, open, high, low, close, volume] 
- */
-export function fillGaps(data, timeFrameMS, gaps) {
-  if (!isArray(data) ||
-      data.length == 1) return false
-
-  let a, b, c, e, tf, fill, last,
-      r = [],
-      i = 0,
-      l = (data[data.length - 1][0] - data[i][0]) / timeFrameMS;
-  while (i < l) {
-    a = data[i][0]
-    b = data[i+1][0]
-    c = b - a
-    if ( c == timeFrameMS ) {
-      r.push(data[i])
-      last = data[i]
-    }
-    else if ( c > timeFrameMS) {
-      tf = a + timeFrameMS
-      e = [tf, null, null, null, null, null]
-      r.push(e)
-      fill = [...last]
-      fill[0] = tf
-      gaps[`${tf}`] = fill
-      data.splice(i + 1, 0, e)
-    }
-    i++
-  }
-  // r.push(data[i])
-  // return r
-  return data
-}
-
-/**
  * Validate Candle
  *
  * @export
@@ -138,4 +101,171 @@ export function sanitizeCandles(c) {
     }
   }
   return c
+}
+
+export class Gaps {
+
+  #core
+  #state
+  #range
+  #list = {}
+
+  constructor(state) {
+    if (!(state instanceof State)) throw new Error(`Class Gaps requires a valid State`)
+
+    this.#core = state.core
+    this.#state = state
+    this.#range = state.range
+  }
+
+  get list () { return this.#list }
+  get hasGaps () { return Object.keys(this.#list).length }
+  get dataSource () { return this.#state.dataSource }
+  get source () { return this.#state.dataSource.source }
+
+  /**
+   * Find and fill any gaps in a price history array.
+   * Invoked from State initiation.
+   * @param {Array} data - array of candles [timestamp, open, high, low, close, volume]
+   * @return {Array} - array of candles [timestamp, open, high, low, close, volume] 
+   */
+  findFillGaps(data) {
+    let timeFrameMS = this.#state.timeFrame
+    if (!isArray(data) ||
+        data.length == 1) return false
+
+    let a, b, c, e, ts, fill, last,
+        r = [],
+        i = 0,
+        l = (data[data.length - 1][0] - data[i][0]) / timeFrameMS;
+    while (i < l) {
+      a = data[i][0]
+      b = data[i+1][0]
+      c = b - a
+      if ( c == timeFrameMS ) {
+        // r.push(data[i])
+        // last = data[i]
+      }
+      // gap
+      else if ( c > timeFrameMS) {
+        ts = a + timeFrameMS
+        e = [ts, null, null, null, null, null]
+        // r.push(e)
+        // fill = [...last]
+        // fill[0] = tf
+        this.list[`${ts}`] = e
+        data.splice(i + 1, 0, e)
+      }
+      else if ( c < timeFrameMS ) {
+
+      }
+      i++
+    }
+    // r.push(data[i])
+    // return r
+    return data
+  }
+
+
+  /**
+   * Remove any gaps filled on merge
+   *
+   * @param {Number} start - timestamp
+   * @param {Number} end - timestamp
+   * @return {Array.<Number>} - array of filled gap timestamps
+   * @memberof Gaps
+   */
+  removeFilledGaps(start, end) {
+    if (!this.hasGaps) return
+
+    let tf = this.#state.timeFrame
+    let range = this.#range
+    let filled = []
+    let value;
+
+    const invalid = (start) => {
+      value = this.#list[`${start}`]
+      if (value !== range.valueByTS(start)) {
+        delete this.#list[start]
+        filled.push(start)
+      }
+    }
+
+    if (!isInteger(start) || !isInteger(end)) {
+      let gapTFs = Object.keys(this.#list)
+      for (let start of gapTFs) {
+        invalid(start)
+      }
+    }
+    else {
+      while (start <= end) {
+        invalid(start)
+        start += tf
+      }
+    }    
+    return filled
+  }
+
+  nullFillGapsOnMerge(newer, older) {
+    let merged = older
+    let len = older.length
+    let ts = older[len - 1][0]
+    let gap = Math.floor((newer[0][0] - ts) / this.#state.timeFrame)
+    let arr;
+    for (gap; gap > 1; gap--) {
+      ts += this.#state.timeFrame
+      // this.#list[`${ts}`] = [...older[len - 1]]
+      // this.#list[`${ts}`][0] = ts
+      arr = Array(newer[0].length).fill(null)
+      arr[0] = ts
+      merged.push(arr)
+      this.#list[`${ts}`] = arr
+    }
+    return merged
+  }
+
+  fillRangeGaps() {
+    let range = this.#range
+    let gaps = Object.keys(this.#list)
+    let start = range.indexStart
+    let end = range.indexEnd
+    let startTS = range.indexStartTS
+    let endTS = range.indexEndTS
+    let e = {chart: this.#core, start, end, startTS, endTS}
+
+    if (start >= gaps[0] && start <= gaps[gaps.length-1]) {
+      // fill gap with DataSource history fetch past
+      if (isFunction(this.source?.rangeLimitPast))
+        this.source?.rangeLimitPast(e)
+    }
+    if (end >= gaps[0] && end <= gaps[gaps.length-1]) {
+      // fill gap with DataSource history fetch Future
+      if (isFunction(this.source?.rangeLimitFuture))
+        this.source?.rangeLimitFuture(e)
+    }
+  }
+
+  /**
+   * Find gaps in price history time span
+   * @param {Number} [startTS=this.#range.indexStartTS]
+   * @param {Number} [endTS=this.#range.indexEndTS]
+   * @return {Array}  
+   * @memberof Gaps
+   */
+  findGapsInTimeSpan(startTS=this.#range.indexStartTS, endTS=this.#range.indexEndTS) {
+    if (!isValidTimestamp(startTS) || !isValidTimestamp(endTS) || !this.hasGaps) return []
+
+    // let gaps = Object.keys(this.#list)
+    let range = this.#range
+    let start = range.getTimeIndex(startTS)
+    let end = range.getTimeIndex(endTS)
+    let TFs = []
+    let value;
+    for (let i=start; i<end+1; i++) {
+      value = range.value(i)
+      if (value[1] === null) TFs.push(value[0])
+      else continue
+    }
+    return TFs
+  }
 }
