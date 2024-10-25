@@ -98,9 +98,9 @@ export default class DMI extends Indicator {
     let DIMinusDef = {input: { timePeriod: 14}, output: {output: []}}
     let ADXDef = {input: { timePeriod: 14}, output: {output: []}}
 
-    let result1 = super.calcIndicator("PLUS_DI", params, range, DIPlusDef)
-    let result2 = super.calcIndicator("MINUS_DI", params, range, DIMinusDef)
-    let result3 = super.calcIndicator("ADX", params, range, ADXDef)
+    let result1 = super.calcIndicator("PLUS_DI", params, range) // , DIPlusDef)
+    let result2 = super.calcIndicator("MINUS_DI", params, range) //, DIMinusDef)
+    let result3 = super.calcIndicator("ADX", params, range) //, ADXDef)
 
     if (!result1 && !result2 && !result3) return false
 

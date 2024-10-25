@@ -11,7 +11,7 @@ import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString
 import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { isTimeFrame, SECOND_MS } from "./utils/time"
-import { copyDeep, doStructuredClone, mergeDeep, objToString, uid } from './utils/utilities'
+import { doStructuredClone, mergeDeep, objToString, uid } from './utils/utilities'
 import State from './state'
 import { Range, calcTimeIndex } from "./model/range"
 import { defaultTheme } from './definitions/style'
@@ -50,7 +50,7 @@ export default class TradeXchart extends Tradex_chart {
   static #TALibWorkerReady = false
   /** @returns {string} - return TradeX Chart version number */
   static get version() { return TradeXchart.#version }
-  static get default() { return copyDeep(defaultConfig) }
+  static get default() { return doStructuredClone(defaultConfig) }
   static get talibPromise() { return TradeXchart.#talibPromise }
   static get talibReady() { return TradeXchart.#talibReady }
   static get talibAwait() { return TradeXchart.#talibAwait }
@@ -387,6 +387,8 @@ export default class TradeXchart extends Tradex_chart {
   get symbol() { return this.state?.symbol }
   get timeFrame() { return this.range.interval }
   get timeFrameStr() { return this.range.intervalStr }
+  get interval() { return this.range.interval }
+  get intervalStr() { return this.range.intervalStr }
   set pricePrecision(p) { this.setPricePrecision(p) }
   get pricePrecision() { return this.#pricePrecision || PRICE_PRECISION }
   get volumePrecision() { return this.#volumePrecision }
@@ -548,7 +550,7 @@ export default class TradeXchart extends Tradex_chart {
 
   configureState(txCfg) {
     // if no state, default to empty
-    let state = copyDeep(txCfg?.state) || {}
+    let state = doStructuredClone(txCfg?.state) || {}
         state.id = this.ID
         state.core = this
 
@@ -966,11 +968,39 @@ export default class TradeXchart extends Tradex_chart {
       (this.Chart?.layerWidth) ? this.Chart.layerWidth : this.Chart.width
 
     this.range.set(start, end, max)
+    this.state.gaps.fillRangeGaps()
+    let startTS = (this.range.indexStartTS < this.range.timeStart) ? 
+      this.range.timeStart :
+      this.range.indexStartTS;
+    let endTS = (this.range.indexEndTS > this.range.timeFinish) ?
+      this.range.timeFinish :
+      this.range.indexEndTS;
+    let e = {chart: this, start, end, startTS, endTS}
 
     if (start < 0 && !this.#mergingData) 
-      this.emit("range_limitPast", {chart: this, start, end})
+      this.emit("range_limitPast", e)
     else if (end > this.range.dataLength && !this.#mergingData) 
-      this.emit("range_limitFuture", {chart: this, start, end})
+      this.emit("range_limitFuture", e)
+    
+    // fetch price history to fill gaps
+    let gaps = this.state.gaps.findGapsInTimeSpan()
+    if (!gaps.length) return
+    else {
+      let fn;
+      e.startTS = gaps[0]
+      e.endTS = gaps[gaps.length-1]
+      e.start = this.range.getTimeIndex(gaps[0])
+      e.end = this.range.getTimeIndex(gaps[gaps.length-1])
+      if (isFunction(this.state.dataSource.source.rangeLimitPast)) 
+        // fn = (e) => this.state.dataSource.source.rangeLimitPast(e)
+        this.emit("range_limitPast", e)
+      else
+      if (isFunction(this.state.dataSource.source.rangeLimitFuture)) 
+        // fn = (e) => this.state.dataSource.source.rangeLimitFuture(e)
+        this.emit("range_limitFuture", e)
+      else return
+      // fn(e)
+    }
   }
 
   /**
@@ -1350,9 +1380,9 @@ export default class TradeXchart extends Tradex_chart {
 
   /**
    * calculate all indicators currently in use
-   * @param {boolean} recalc - overwrite all existing data
+   * @param {array} update - overwrite all existing data
    */
-  async calcAllIndicators(recalc) {
+  async calcAllIndicators(update) {
     const indicators = []
     const executeInd = (i) => {
       return new Promise(resolve => setTimeout(() => {
@@ -1361,7 +1391,7 @@ export default class TradeXchart extends Tradex_chart {
     }
     for (const [key, value] of Object.entries(this.Indicators)) {
       for (const [k, ind] of Object.entries(value)) {
-        indicators.push(ind.instance.calcIndicatorHistory.bind(ind.instance, recalc))
+        indicators.push(ind.instance.calcIndicatorHistory.bind(ind.instance, update))
       }
     }
     await Promise.all( indicators.map( async i => { 

@@ -5,8 +5,8 @@ import * as packageJSON from '../../package.json'
 import * as compression from '../utils/compression'
 import { isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from '../utils/typeChecks'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
-import { copyDeep, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, doStructuredClone, idSanitize } from '../utils/utilities'
-import { validateDeep, validateShallow, fillGaps, sanitizeCandles } from '../model/validateData'
+import { doStructuredClone, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, } from '../utils/utilities'
+import { validateDeep, validateShallow, sanitizeCandles, Gaps } from '../model/validateData'
 import { calcTimeIndex, detectInterval } from '../model/range'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT, LIMITFUTURE, LIMITPAST, MAXCANDLES, MINCANDLES, YAXIS_BOUNDS } from '../definitions/chart'
 import { SHORTNAME } from '../definitions/core'
@@ -144,7 +144,7 @@ export default class State {
   static #chartList = new xMap()
   static #dss = {}
 
-  static get default() { return copyDeep(DEFAULT_STATE) }
+  static get default() { return doStructuredClone(DEFAULT_STATE) }
 
   static server(chart) {
 
@@ -460,6 +460,8 @@ export default class State {
       timeFrame = detectInterval(ohlcv)
       state.range.interval = timeFrame
       state.range.intervalStr = ms2Interval(timeFrame)
+      if (chart?.stream instanceof Stream)
+        chart.stream.resetLastPos()
       chart.emit("range_timeframeSet", state.range.intervalStr)
     }
     return timeFrame
@@ -522,7 +524,7 @@ export default class State {
     for (let d in state.data) {
       if (exclude.includes(d)) continue
 
-      data[d] = copyDeep(state.data[d])
+      data[d] = doStructuredClone(state.data[d])
     }
 
     // trim streaming candle because it is not complete
@@ -580,10 +582,10 @@ export default class State {
       !(type in validator) ||
       !isObject(state)) throw new Error(`ERROR: State: validateData: ${type} unexpected data`)
 
-    if (!isObject(state[type])) state[type] = copyDeep(DEFAULT_STATE[type])
+    if (!isObject(state[type])) state[type] = doStructuredClone(DEFAULT_STATE[type])
     state[type].display = !!state[type]?.display
     state[type].displayInfo = !!state[type]?.displayInfo
-    if (!isObject(state[type].data)) state[type].data = copyDeep(DEFAULT_STATE[type].data)
+    if (!isObject(state[type].data)) state[type].data = doStructuredClone(DEFAULT_STATE[type].data)
     else {
       let tradeData = state[type].data
       let allData = state?.data?.allData || state.allData
@@ -683,7 +685,7 @@ export default class State {
 
     if (!(type in validator)) return false
 
-    if (!isObject(state?.[type])) state[type] = copyDeep(DEFAULT_STATE[type])
+    if (!isObject(state?.[type])) state[type] = doStructuredClone(DEFAULT_STATE[type])
 
     let d = state[type].data
     if (!isObject(d?.[tf]))
@@ -729,7 +731,7 @@ export default class State {
   #id = ""
   #key = ""
   #data = {}
-  #gaps = {}
+  #gaps
   #status = false
   #timeData
   #dataSource
@@ -750,6 +752,7 @@ export default class State {
     this.#dataSource = DataSource.create(this.#data.dataSource, this)
     this.#data.timeData = new TimeData(this.#dataSource.range)
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
+    this.#gaps = new Gaps(this)
     this.#key = hashKey(state)
   }
 
@@ -758,7 +761,7 @@ export default class State {
   get status() { return this.#data.status }
   get isEmpty() { return !this.#data.chart.data.length }
   get isActive() { return this.#key === State.active(this.#core).key }
-  get hasGaps() { return Object.keys(this.#gaps).length }
+  get hasGaps() { return this.#gaps.hasGaps }
   get core() { return (this.#core !== undefined) ? this.#core : false }
   get data() { return this.#data }
   get gaps() { return this.#gaps }
@@ -899,13 +902,13 @@ export default class State {
    * @returns {State|undefined}
    */
   use(key) {
-    const errMsg = `TradeX-Chart: ${this.#core.id} : cannot use supplied key or state`
-    if (isString(key) && !State.has(key))
+    const errMsg = `TradeX-Chart: ${this.#core.ID} : cannot use supplied key or state`
+    if (isString(key) && !State.has(this.#core, key))
       return undefined
     else if (key === undefined) {
       key = State.default
     }
-    else if (!State.isValidConfig(key)) {
+    else if (isObject(key) && !State.isValidConfig(key)) {
       this.#core.log(errMsg)
       return undefined
     }
@@ -920,12 +923,27 @@ export default class State {
       State.archiveInventory(this)
       this.#core.MainPane.destroy(false)
     }
+
+    // is there a matching source, symbol, timeFrame State?
+    if ( State.isValidConfig(key) ) {
+      let source = key?.dataSource?.source?.name
+      let symbol = key?.dataSource?.symbol
+      let timeFrame = key?.dataSource?.timeFrameInit
+      let matching = this.dataSource.findMatching(source, symbol, timeFrame)
+      
+      // use matching State
+      if (matching instanceof State) 
+        key = matching.key 
+    }
+
     let state = State.use(this.#core, key)
 
     if (isObject(key))
       key.key = state?.key
 
     if (isFunction(this.#core.MainPane?.init)) {
+      if (this.#core?.stream instanceof Stream)
+        this.#core.stream.resetLastPos()
       this.#core.MainPane.init(this.#core.MainPane.options)
       this.#core.MainPane.start()
       this.#core.MainPane.refresh()
@@ -937,6 +955,7 @@ export default class State {
     else
       this.#core.log(errMsg)
 
+    this.#core.emit(`state_usingState`, state)
     return state
   }
 
@@ -971,7 +990,7 @@ export default class State {
   // TODO: merge indicator data?
   // TODO: merge dataset?
   mergeData(merge, newRange = false, calc = false) {
-console.log(`TradeX-chart: ${this.#core.id}: State ${this.#key} : mergeData()`)
+console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
 
     if (this.isEmpty) State.setTimeFrame(this.#core, this.key, merge?.ohlcv)
 
@@ -1083,18 +1102,14 @@ console.log(`TradeX-chart: ${this.#core.id}: State ${this.#key} : mergeData()`)
 
         // fill the gaps
         if (mEnd > mStart + mDataMS)
-          mData = fillGaps(mData, tfMS)
+          mData = this.#gaps.findFillGaps(mData)
 
         // merge the new data
         this.data.chart.data = this.merge(data, mData)
       }
 
-      // calculate all indicators if required
-      // and update existing data
-      if (calc) this.#core.calcAllIndicators(calc)
-
-      // otherwise merge the new indicator data
-      else {
+      // merge the new indicator data
+      if (!calc) {
         // Do we have primaryPane indicators?
         if (isArray(mPrimary) && mPrimary.length > 0) {
           for (let o of mPrimary) {
@@ -1128,10 +1143,12 @@ console.log(`TradeX-chart: ${this.#core.id}: State ${this.#key} : mergeData()`)
             }
           }
         }
-
-        // calculate any missing indicator data if required
-        this.#core.calcAllIndicators()
       }
+      // calculate any missing indicator data if required
+      let mStart = mData[0][0]
+      let mEnd = mData[mData.length-1][0]
+      let filled = this.#gaps.removeFilledGaps(mStart, mEnd)
+      this.#core.calcAllIndicators(filled)
 
       // Do we have datasets?
       if (isArray(mDataset) && mDataset.length > 0) {
@@ -1231,19 +1248,7 @@ console.log(`TradeX-chart: ${this.#core.id}: State ${this.#key} : mergeData()`)
 
     // no overlap, but a gap exists
     else if (newer[0][0] - older[older.length - 1][0] > this.range.interval) {
-      merged = older
-      let len = older.length
-      let gaps = this.gaps
-      let ts = older[len - 1][0]
-      let gap = Math.floor((newer[0][0] - ts) / this.range.interval)
-      for (gap; gap > 1; gap--) {
-        ts += this.range.interval
-        gaps[`${ts}`] = [...older[len - 1]]
-        gaps[`${ts}`][0] = ts
-        let arr = Array(newer[0].length).fill(null)
-        arr[0] = ts
-        merged.push(arr)
-      }
+      merged = this.#gaps.nullFillGapsOnMerge(newer, older)
       merged = merged.concat(newer)
     }
 

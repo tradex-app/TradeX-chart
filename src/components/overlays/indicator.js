@@ -5,8 +5,8 @@ import Overlay from "./overlay"
 import { Range } from "../../model/range"
 import { limit } from "../../utils/number"
 import Colour, { Palette } from "../../utils/colour"
-import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from "../../utils/typeChecks"
-import { copyDeep, cyrb53, diff, idSanitize, isObjectNotEmpty, mergeDeep, uid } from "../../utils/utilities"
+import { isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from "../../utils/typeChecks"
+import { doStructuredClone, cyrb53, diff, idSanitize, isObjectNotEmpty, mergeDeep, uid } from "../../utils/utilities"
 import { SHORTNAME, STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
 import { WinState } from "../widgets/window"
@@ -114,6 +114,7 @@ export default class Indicator extends Overlay {
   #palette
   #error = {type: "", msg: "", style: ""}
   #gapFill = true
+  // #gaps = new Set()
 
   definition = {
     input: {},
@@ -1149,7 +1150,7 @@ export default class Indicator extends Overlay {
   }
 
   indicatorInput(start, end) {
-    let gaps = this.core.state.gaps
+    let gaps = this.core.state.gaps.list
     let raw, val;
     let input = {
       inReal: [],
@@ -1162,7 +1163,12 @@ export default class Indicator extends Overlay {
 
     do {
       raw = this.range.value(start)
-      val = (this.#gapFill && `${raw[0]}` in gaps) ? gaps[`${raw[0]}`] : raw
+      if (this.#gapFill && `${raw[0]}` in gaps) {
+        // gap entry null values
+        val = gaps[`${raw[0]}`]
+        // this.#gaps.add(raw[0])
+      }
+      else val = raw
 
       input.inReal.push(val[OHLCV.c])
       input.open.push(val[OHLCV.o])
@@ -1243,11 +1249,11 @@ export default class Indicator extends Overlay {
  * Calculate indicator values for chart history - partial or entire
  * @param {string|function} indicator - the TALib function to call
  * @param {object} params - parameters for the TALib function
- * @param {object} range - range instance or definition
- * @param {object} output - output definition
+ * @param {Range} range - range instance or definition
+ * @param {Array.<Number>} [update] - timestamps of updated price history
  * @returns {array|boolean} - success or failure
  */
-  calcIndicator (indicator, params={}, range, output=this.definition.output) {
+  calcIndicator (indicator, params={}, range, update) {
 
     let indicatorFn;
     if (!this.noCalcCustom(indicator))
@@ -1279,7 +1285,6 @@ export default class Indicator extends Overlay {
     // check if a full or only partial calculation is required
     if (!isArray(od)) return false
     // full calculation required
-    // full calculation required
     else if (od.length == 0) { }
     // partial calculation required
     else if (od.length + t !== range.dataLength) {
@@ -1297,6 +1302,14 @@ export default class Indicator extends Overlay {
       }
       // something is wrong
       else return false
+    }
+    // updated span of price history?
+    else if (isArrayOfType(update, "integer")) {
+console.log("updating a chunk of indicator history", update)
+      start = this.Timeline.t2Index(update[0])
+      end = this.Timeline.t2Index(update[update.length-1]) - t
+      if (end - start < t)
+        start = (start - t < 0) ? 0 : start - t
     }
     // up to date, no need to calculate
     else return false
@@ -1318,7 +1331,7 @@ export default class Indicator extends Overlay {
       input = this.indicatorInput(start, start + t)
       params = {...params, ...input}
       // let hasNull = params.inReal.find(element => element === null)
-      // if (hasNull) return false
+      // if (hasNull) return
 
       entry = indicatorFn(params)
       value = this.formatValue(entry)
@@ -1329,14 +1342,15 @@ export default class Indicator extends Overlay {
 
       start++
     }
+    // this.#gaps = new Set([...this.#gaps].sort())
     return data
   }
 
   /**
    * calculate back history if missing
-   * @memberof indicator
+   * @param {Array.<Number>} update - timestamps of updated price history
    */
-  calcIndicatorHistory (calcFn) {
+  calcIndicatorHistory (update) {
     const calc = () => {
       let od = this.overlay.data
 
@@ -1347,7 +1361,7 @@ export default class Indicator extends Overlay {
       // let pane = (this.isPrimary) ? "primary" : "secondary"
       // this.range.allData[`${pane}Pane`].push()
 
-      const data = this.calcIndicator(this.libName, this.definition.input, this.range);
+      const data = this.calcIndicator(this.libName, this.definition.input, this.range, update);
 
       if (isArray(data)) {
         const d = new Set(data)

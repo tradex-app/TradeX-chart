@@ -3,7 +3,7 @@
 
 import { renderCircle } from "../../renderer/circle"
 import { isNumber, isObject } from "../../utils/typeChecks";
-import { copyDeep, debounce, idSanitize, mergeDeep, uid } from "../../utils/utilities";
+import { doStructuredClone, debounce, idSanitize, mergeDeep, uid } from "../../utils/utilities";
 import { drawingNode as defaultTheme } from "../../definitions/style";
 import { HIT_DEBOUNCE } from "../../definitions/core";
 import { svgToImage } from "../../utils/DOM";
@@ -68,7 +68,7 @@ export default class ToolNode {
   #ctxH
   #hitV
   #theme
-  #themeDefault = copyDeep(defaultTheme)
+  #themeDefault = doStructuredClone(defaultTheme)
   #constraint = {x: false, y: false}
   #x
   #y
@@ -85,7 +85,7 @@ export default class ToolNode {
     this.#ctxH = this.layer.hit.canvas
     this.#hitV = this.#inCnt
 
-    const themed = (isObject(theme)) ? copyDeep(theme) : defaultTheme
+    const themed = (isObject(theme)) ? doStructuredClone(theme) : defaultTheme
     this.#theme = mergeDeep(this.#themeDefault, themed)
 
     this.eventsListen()

@@ -1,3 +1,5 @@
+// import { isValidTimestamp } from "./time"
+
 /**
  * @param {*} v
  * @returns {boolean}
@@ -154,13 +156,14 @@ export function checkType(type, value) {
     case 'promise': return isPromise(value);
     case 'error': return isError(value);
     case 'class': return isClass(value);
+    // case 'timestamp': return isValidTimestamp(value);
     default: throw new Error(`No known test for type: ${type}`)
   }
 };
 
 export function typeOf(value) {
   const types = ["array", "error", "class", "function", "map", "promise", 
-                  "object", "integer", "number", "boolean", "string"]
+                  "object", "integer", "number", "boolean", "string"] //, "timestamp"]
   for (let type of types) {
     try {
       if (checkType(type, value)) return type

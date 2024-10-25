@@ -62,7 +62,7 @@ export default class DataSource {
    * @param {Object} cfg.ticker
    * @param {Object} cfg.history
    * @param {State} state
-   * @return {DataSource|undefined} state with data source
+   * @return {DataSource} state with data source
    * @memberof DataSource
    */
   static create( cfg, state ) {
@@ -222,22 +222,36 @@ export default class DataSource {
     let valid = this.timeFrameExists(tf)
 
     if (!isInteger(this.#timeFrameCurr))
-      this.#timeFrameCurr = detectInterval(this.#state.data.chart.data)
+      tf = detectInterval(this.#state.data.chart.data)
 
     if (!!valid) {
       if (valid == this.#timeFrameCurr ) return
-      // switch to new or existing time frame
-      this.#timeFrameCurr = valid
+      tf = valid
     }
     else if (!Object.keys(this.#timeFrames).length) {
       if (tf == this.#timeFrameCurr ) return
 
       let str = ms2Interval(tf)
       this.#timeFrames[str] = tf
-      this.#timeFrameCurr = tf
     }
     else 
       throwError(this.#core.ID, this.#state.key, `time frame invalid`)
+
+    //TODO: pause / stop fetch
+    this.historyPause()
+    this.#timeFrameCurr = tf
+    // check if a matching symbol time frame State exists
+    let matching = this.findMatching()
+    // if so, switch to it
+    if (matching instanceof State) this.#state.use(matching.key)
+    // if no exact match, create a new State from an existing with the new time frame
+    else {
+      let newStateDef = {}
+      newStateDef.dataSource = doStructuredClone(this.#state.dataSource)
+      this.#state.use(newStateDef)
+    }
+    // apply ticker stream to new State
+    // apply fetch
   }
 
   /**
@@ -342,7 +356,7 @@ export default class DataSource {
       if (h.rangeLimitPast.length !== n)
         consoleError(this.#core, this.#state.key, `range_limitPast function requires ${n} parameters`)
       else {
-        this.#source.rangeLimitPast = (e) => { return this.onRangeLimit(e, h.rangeLimitPast, this.#state.range.timeStart) }
+        this.#source.rangeLimitPast = (e) => { return this.onRangeLimit(e, h.rangeLimitPast, e.startTS) }
         this.#core.on("range_limitPast", this.#source.rangeLimitPast, this)
       }
     }
@@ -353,7 +367,7 @@ export default class DataSource {
         this.#source.rangeLimitFuture = (e) => {
           // if (this.#stream.isActive) return Promise.resolve({})
           // else return this.onRangeLimit(e, h.rangeLimitFuture, this.#state.range.timeFinish) 
-          return this.onRangeLimit(e, h.rangeLimitFuture, this.#state.range.timeFinish) 
+          return this.onRangeLimit(e, h.rangeLimitFuture, e.endTS) 
         }
         this.#core.on("range_limitFuture", this.#source.rangeLimitFuture, this)
       }
@@ -461,7 +475,7 @@ export default class DataSource {
       let p = fn( e, this.#symbol, this.#timeFrameCurr, ts)
       if (isPromise(p)) {
         p.then( d => {
-          if (!isObject(d)) throwError(this.#core.ID, this.#state.key, "Price history fetch did not return a Promise that resolved to an Object. Nothing to merge.")
+          if (!isObject(d)) consoleError(this.#core, this.#state.key, "Price history fetch did not return a Promise that resolved to an Object. Nothing to merge.")
           this.identifyState()
           this.#state.mergeData(d, false, true)
           this.#waiting = false
@@ -473,7 +487,7 @@ export default class DataSource {
           this.#core.error(e)
         })
       }
-      else throwError(this.#core.ID, this.#state.key, "Price history fetch did not return a Promise")
+      else consoleError(this.#core, this.#state.key, "Price history fetch did not return a Promise")
     }
     catch(e) {
       this.#waiting = false
@@ -521,6 +535,31 @@ export default class DataSource {
 
   identifyState() {
     console.log(`${this.state.key} ${this.symbol} ${this.timeFrameStr}`)
+  }
+
+  /**
+   * 
+   * @param {String} source - exchange or api name
+   * @param {String} symbol - asset symbol eg. btcusdt
+   * @param {Number} timeFrame - time frame in milliseconds
+   * @returns {State|Object|undefined} - matching state, or Object of closest matching States
+   */
+  findMatching(source=this.#source.name, symbol=this.#symbol, timeFrame=this.#timeFrameCurr) {
+    let tf = timeFrame2MS(timeFrame)
+    let matching = {symbol: [], timeFrame: []}
+    if (!isString(source) || !isString(symbol) || !isInteger(tf)) return undefined
+
+    let list = this.#state.list() || []
+    let ds;
+    for (let s of list) {
+      ds = s.value.dataSource.source
+      if (ds.source !== this.source) continue
+      if (ds.symbol !== this.symbol) continue
+      matching.symbol.push(s)
+      if (ds.timeFrame === this.timeFrame) return s
+      else matching.timeFrame.push(s)
+    }
+    return matching
   }
 }
 
