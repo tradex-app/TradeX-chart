@@ -19,6 +19,7 @@ import MainPane from '../components/main'
 import { OHLCV } from '../definitions/chart'
 import Chart from '../components/chart'
 import DataSource from '../model/dataSource'
+import { OverlaySet } from './overlaySet'
 //import internal from 'stream'
 
 const HASHKEY = "state"
@@ -732,10 +733,8 @@ export default class State {
   #key = ""
   #data = {}
   #gaps
-  #status = false
-  #timeData
   #dataSource
-  #range
+  #overlaySet
   #core
   #chartPanes = new xMap()
   #chartPaneMaximized = {
@@ -752,6 +751,7 @@ export default class State {
     this.#dataSource = DataSource.create(this.#data.dataSource, this)
     this.#data.timeData = new TimeData(this.#dataSource.range)
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
+    this.#overlaySet = new OverlaySet(state.core, this)
     this.#gaps = new Gaps(this)
     this.#key = hashKey(state)
   }
