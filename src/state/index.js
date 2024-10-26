@@ -215,7 +215,7 @@ export default class State {
   /**
    * List registered states
    * @param {TradeXchart} chart - target
-   * @returns {Array.<State>|undefined} - array of state instances
+   * @returns {Array.<Object>|undefined} - array of state instances
    */
   static list(chart) {
     let states = State.chartList(chart)?.states
@@ -1348,7 +1348,7 @@ console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
 
 }
 
-function hashKey(state) {
+export function hashKey(state) {
   let str = JSON.stringify(state)
   let hash = cyrb53(str)
   return `${SHORTNAME}_${HASHKEY}_${hash}`
