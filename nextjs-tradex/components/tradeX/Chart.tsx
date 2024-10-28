@@ -71,8 +71,6 @@ const TradeXChart: FC<IProps> = ({
     if (isChartLoadedRef.current) return;
 
     try {
-      console.log('Rendering chart...');
-
       const existingChart = document.querySelector(
         `#${chartAccessor} tradex-chart`
       ) as ITradeX;
@@ -88,8 +86,6 @@ const TradeXChart: FC<IProps> = ({
         return;
       }
       mount.appendChild(chart);
-      console.log('Chart element appended to DOM.');
-
       const state: {
         ohlcv: number[][];
         trades: any;
@@ -99,8 +95,6 @@ const TradeXChart: FC<IProps> = ({
         primary: combinedPrimary,
         trades: tradeData
       };
-
-      console.log('State prepared:', state);
 
       if (onRangeChange) {
         registerRangeChangeEvent(chart);
@@ -135,19 +129,16 @@ const TradeXChart: FC<IProps> = ({
   useEffect(() => {
     if (!chartX) return;
 
-    console.log('Applying theme settings based on current theme:', theme);
-
     if (theme === 'light') {
       chartX.theme?.setProperty('chart.GridColour', ColorsEnum.SelectorLight);
 
       return;
     }
 
-    chartX.theme?.setProperty(ThemeProps.ChartGridColour, ColorsEnum.Selector);
+    chartX.theme?.setProperty('chart.GridColour', ColorsEnum.Selector);
   }, [chartX, theme]);
 
   useEffect(() => {
-    console.log('Initial chart rendering...');
     renderChart();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -155,9 +146,7 @@ const TradeXChart: FC<IProps> = ({
   useEffect(() => {
     if (!chartX) return;
 
-    console.log('Chart type changed. Applying new type:', chartType);
-
-    chartX.theme?.setProperty(ThemeProps.CandleType, chartType?.value);
+    chartX.theme?.setProperty('candle.Type', chartType?.value);
   }, [chartType, chartX]);
 
   return (

@@ -1277,9 +1277,12 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
-addChart()
 // addChart()
-/*
+// addChart()
+// addChart()
+// addChart()
+// addChart()
+
 document.getElementById("fullscreen").addEventListener("click", (e) => {
   chart0.requestFullscreen()
 })
