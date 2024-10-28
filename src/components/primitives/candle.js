@@ -49,14 +49,13 @@ export default class Candle {
         break;
     }
 
-    let w = Math.max(data.w - 1, 1)
-    w = candleW(w, this.dpr)
-
-    let hw = this.alignToPixel(w * 0.5)
+   let w = candleW(data.w, this.dpr)
+   const gap = Math.floor(data.w * 0.1)
+   w = this.alignToPixel(w, gap)
     
-    // Center the candle
-    let x = this.alignToPixel(data.x)
-    let bodyX = this.alignToPixel(x - hw)
+    // Calculate center x position and adjust bar position
+    const x = this.alignToPixel(data.x)
+    const bodyX = x - (w / 2)
     
     // Ensure heights are pixel aligned
     let h = Math.abs(data.o - data.c)
@@ -86,7 +85,7 @@ export default class Candle {
     ctx.stroke()
 
     // Body
-    if (w === 3 * this.dpr) {
+    if (w <= 3 * this.dpr) {
       ctx.fillStyle = wickColour
       let s = hilo ? 1 : -1
 
@@ -97,7 +96,7 @@ export default class Candle {
         s * Math.max(bodyHeight, max_h)
       )
     }
-    else if (w > 3 * this.dpr && this.fill) {
+    else if (this.fill) {
       ctx.fillStyle = bodyColour
       let s = hilo ? 1 : -1
 
@@ -108,7 +107,7 @@ export default class Candle {
         s * Math.max(bodyHeight, max_h)
       )
     }
-    else if (w > 3 * this.dpr && !this.fill && cfg.candle.Type !== CandleType.OHLC) {
+    else if (!this.fill && cfg.candle.Type !== CandleType.OHLC) {
       let s = hilo ? 1 : -1
       ctx.strokeRect(
         bodyX,
@@ -122,7 +121,7 @@ export default class Candle {
       ctx.moveTo(bodyX, this.alignToPixel(data.o))
       ctx.lineTo(x, this.alignToPixel(data.o))
       ctx.moveTo(x, this.alignToPixel(data.c))
-      ctx.lineTo(this.alignToPixel(x + hw), this.alignToPixel(data.c))
+      ctx.lineTo(x + w/2, this.alignToPixel(data.c))
       ctx.stroke()
     }
     else {
@@ -211,14 +210,20 @@ export default class Candle {
  * @export
  * @param {number} w - candle width in pixels
  * @param {number} dpr - device pixel ratio
+ * @param {number} gapPercentage - gap percentage
  * @return {number}  
  */
-export function candleW(w, dpr = 1) {
+export function candleW(w, dpr = 1) { 
   // Base width calculations
   if (w < 3) w = 1
-  else if (w < 5) w = 3
-  else if (w > 5) w = Math.ceil(w * 0.8)
+  else if (w < 10) w = 3 * dpr
+  else if (w >= 10) w = Math.ceil(w * 0.8) // define the candle width here
+  
+  const gapPercentage = 0.1 //define the candle gap here
+  const gap = Math.floor(w * gapPercentage) 
   
   // Apply DPI scaling
-  return Math.round(w * dpr)
+  const scaledWidth = Math.round((w - gap) * dpr)
+  
+  return scaledWidth
 }
