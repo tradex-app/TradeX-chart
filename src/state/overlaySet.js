@@ -15,7 +15,7 @@ const DEFAULT_SET = {
   key: "",
   overlays: {},
   indicators: {},
-  drawingTools: {},
+  tools: {},
   markers:{}
 }
 
@@ -47,9 +47,10 @@ export class OverlaySet {
    * Instantiate new overlay set and add it to list
    * @param {TradeXchart} chart 
    * @param {Object} state 
+   * @param {Object} set
    * @returns {OverlaySet|undefined}
    */
-  static create(chart, state) {
+  static create(chart, state, set) {
     const instance = new OverlaySet(chart, state)
     const key = instance.key
     let server = OverlaySet.#setList.get(chart.key)
@@ -93,7 +94,7 @@ export class OverlaySet {
    * @param {String|Object} set - set key or {id: "someID"} or {key: "setKey"} or a set object
    * @returns {OverlaySet|undefined} - chart set instance
    */
-  static use(chart, set = OverlaySet.default) {
+  static use(chart, set=OverlaySet.default) {
     let key = (OverlaySet.has(chart, set)) ? set :
       (OverlaySet.has(chart, set?.key)) ? set.key : set
 
@@ -112,7 +113,7 @@ export class OverlaySet {
     let sets = OverlaySet.setList(chart)?.sets
     if (!sets) return undefined
     let key = set;
-    if (set instanceof OverlaySet) key = set.#key
+    if (set instanceof OverlaySet) key = set.key
     if (!isString(key) ||
       !sets.has(key)
     ) return false
@@ -180,23 +181,32 @@ export class OverlaySet {
 
   }
 
+  static chartOverlaySet(chart) {
+    if (!isChart(chart)) return {}
+
+    const set = {}
+    for (let [key, value] of chart.ChartPanes) {
+
+    }
+  }
+
   #core
   #state
-  #key
+  #data = OverlaySet.default
 
-  constructor(core, state) {
+  constructor(core, state, set) {
 
     if (!(core instanceof TradeXchart)) throwError(`requires a valid chart instance`)
     if (!(state instanceof State)) throwError(`requires a valid State instance`)
     
     this.#core = core
     this.#state = state
-
+    this.#data.indicators = core.Indicators
   }
 
   get core() { return this.#core }
   get state() { return this.#state }
-  get key() { return this.#key }
+  get key() { return this.#data.key }
 
 }
 

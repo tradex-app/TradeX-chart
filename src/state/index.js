@@ -270,7 +270,7 @@ export default class State {
         delete active.archive
 
         const defaultState = doStructuredClone(State.default)
-        State.buildInventory(oldState, defaultState)
+        State.buildInventory(oldState)
         // TODO: set allData to primary[].data
         active.allData.primaryPane = oldState.primary
         active.allData.secondaryPane = oldState.secondary
@@ -383,7 +383,7 @@ export default class State {
     }
     state.allData.datasets = state.datasets
 
-    State.buildInventory(state, defaultState)
+    State.buildInventory(state)
 
     // trades
 
@@ -612,7 +612,7 @@ export default class State {
     }
   }
 
-  static buildInventory(state, defaultState) {
+  static buildInventory(state) {
     // Build chart order
     if (state.inventory.length == 0) {
       // add primary chart
@@ -626,6 +626,9 @@ export default class State {
       }
     }
 
+   let defaultState = doStructuredClone(State.default)
+
+
     // Process chart order
     let o = state.inventory
     let c = o.length
@@ -635,7 +638,7 @@ export default class State {
         o.splice(c, 1)
       else {
         // validate each overlay / indicator entry
-        let i = state.inventory[c][1]
+        let i = state.inventory[c]?.[1] || []
         let x = i.length
         while (x--) {
           // remove if invalid
@@ -735,6 +738,7 @@ export default class State {
   #gaps
   #dataSource
   #overlaySet
+  #inventory = []
   #core
   #chartPanes = new xMap()
   #chartPaneMaximized = {
@@ -792,7 +796,7 @@ export default class State {
   get events() { return this.#data.events }
   get annotations() { return this.#data.annotations }
   get tools() { return this.#data.tools }
-
+  get inventory() { return this.#inventory }
 
   error(e) { this.#core.error(e) }
 
@@ -1346,6 +1350,9 @@ console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
     console.log("TODO: state.removeEvent()")
   }
 
+  buildInventory() {
+    return State.buildInventory(this)
+  }
 }
 
 export function hashKey(state) {
