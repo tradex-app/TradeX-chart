@@ -253,7 +253,7 @@ export default class Chart extends Component{
     this.draw(this.range);
 
     // set mouse pointer
-    this.cursor = "crosshair"
+    //this.cursor = "crosshair" causing issues with candles drawing
 
     // start State Machine
     stateMachineConfig.id = this.id
@@ -377,8 +377,8 @@ export default class Chart extends Component{
   }
 
   onChartDragDone(e) {
-    this.cursor = "crosshair"
     this.core.MainPane.onChartDragDone(e)
+    this.cursor = "crosshair"
   }
 
   onPointerMove(e) {
