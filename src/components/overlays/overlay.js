@@ -4,7 +4,7 @@
 import { isArray, isBoolean } from "../../utils/typeChecks"
 import xAxis from "../axis/xAxis"
 import yAxis from "../axis/yAxis"
-import canvas from "../../renderer/canvas"
+import canvas from "../../renderer/canvas-lib"
 import Histogram from "../primitives/histogram"
 import { renderHighLowRange } from "../primitives/range"
 
