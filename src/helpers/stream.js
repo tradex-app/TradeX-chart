@@ -11,10 +11,12 @@
   }
 */
 
-import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
-import { YEAR_MS, MONTHR_MS, WEEK_MS, DAY_MS, HOUR_MS, MINUTE_MS, SECOND_MS, MILLISECOND } from '../utils/time';
-import { copyDeep, mergeDeep } from '../utils/utilities';
+import { isArray, isBoolean, isInteger, isNumber, isObject, isString } from '../utils/typeChecks'
+import { YEAR_MS, MONTHR_MS, WEEK_MS, DAY_MS, HOUR_MS, MINUTE_MS, SECOND_MS, MILLISECOND, isValidTimestamp } from '../utils/time';
+import { doStructuredClone, mergeDeep, valuesInArray } from '../utils/utilities';
 import Alerts from './alerts';
+import TradeXchart from '../core';
+import State from '../state';
 
 import {
   STREAM_ERROR,
@@ -29,8 +31,8 @@ import {
   STREAM_PRECISION
 } from "../definitions/core"
 
-import { YAXIS_BOUNDS } from '../definitions/chart';
-
+const statusAllowStart = [STREAM_NONE, STREAM_STOPPED]
+const keys = ["t","o","h","l","c","v"]
 const T = 0, O = 1, H = 2, L = 3, C = 4, V = 5;
 const empty = [null, null, null, null, null]
 const defaultStreamConfig = {
@@ -42,11 +44,12 @@ export default class Stream {
 
   #core
   #config
+  #state
   #status
-  #time
   #maxUpdate
   #updateTimer = 0
   #precision
+  #data
   #candle = empty
   #countDownStart = 0
   #countDownMS = 0
@@ -55,40 +58,37 @@ export default class Stream {
   #lastPriceMax
   #lastPriceMin
   #lastTick = empty
+  #lastScrollPos
+  #lastXPos
+  #lastYPos
   #alerts
 
 
-  static validateConfig(c) {
-    if (!isObject(c)) return defaultStreamConfig
-
-    else {
-      let d = copyDeep(defaultStreamConfig)
-      c = mergeDeep(d, c)
-
-      c.tfCountDown = (isBoolean(c.tfCountDown)) ? c.tfCountDown : defaultStreamConfig.tfCountDown
-      c.alerts = (isArray(c.alerts)) ? c.alerts : defaultStreamConfig.alerts
-    }
-    return c
-  }
-
-  constructor(core) {
-    this.#core = core
-    this.#time = core.time
+  constructor(core, state) {
+    if (!(core instanceof TradeXchart)) throwError({id: "invalid"}, `not a valid chart instance`)
+    else this.#core = core
+    if (!(state instanceof State)) throwError(core, `state not a valid State instance`)
+    else this.#state = state
     this.status = {status: STREAM_NONE}
-    this.#config = Stream.validateConfig(core.config?.stream)
+    this.#config = validateConfig(core.config?.stream)
     this.#maxUpdate = (isNumber(core.config?.maxCandleUpdate)) ? core.config.maxCandleUpdate : STREAM_MAXUPDATE
     this.#precision = (isNumber(core.config?.streamPrecision)) ? core.config.streamPrecision : STREAM_PRECISION
   }
 
+  get state() { return this.#state }
   get config() { return this.#config }
   get countDownMS() { return this.#countDownMS }
   get countDown() { return this.#countDown }
-  get range() { return this.#core.range }
+  get range() { return this.#state.range }
   get status() { return this.#status }
-  set status({status, data}) {
-    this.#status = status
-    this.emit(status, data)
+  set status(s) {
+    if (!isObject(s) && !isString(s?.status)) return
+    this.#status = s.status
+    this.emit(s.status, s?.data)
   }
+  get symbol() { return this.#state.symbol }
+  get timeFrame() { return this.#state.timeFrame }
+  get timeFrameStr() { return this.#state.timeFrameStr }
   set dataReceived(data) {
     if (this.#dataReceived) return
 
@@ -100,6 +100,12 @@ export default class Stream {
   set lastPriceMin(p) { if (isNumber(p)) this.#lastPriceMin = p }
   get lastPriceMax() { return this.#lastPriceMax }
   set lastPriceMax(p) { if (isNumber(p)) this.#lastPriceMax = p }
+  get lastScrollPos() { return this.#lastScrollPos }
+  set lastScrollPos(p) { this.setLastScrollPos(p) }
+  get lastXPos() { return this.#lastXPos }
+  set lastXPos(p) { if (isNumber(p)) this.#lastXPos = p }
+  get lastYPos() { return this.#lastYPos }
+  set lastYPos(p) { if (isObject(p)) this.#lastYPos = p }
   get lastTick() { return this.#lastTick }
   set lastTick(t) { 
     if (!isArray(t)) return
@@ -107,6 +113,19 @@ export default class Stream {
     const prevLastTick = this.#lastTick
     this.#lastTick = t
     this.alerts.check(t, this.#candle)
+  }
+  get isActive() {
+    let active = [
+      STREAM_LISTENING,
+      STREAM_STARTED,
+      STREAM_FIRSTVALUE,
+      STREAM_NEWVALUE,
+      STREAM_UPDATE
+    ]
+    if (active.includes(this.#status))
+      return true
+    else
+      return false
   }
 
   /**
@@ -119,14 +138,22 @@ export default class Stream {
     const now = Date.now()
     // store last tick for alerts
     const lastTick = [...this.#candle]
+    // ensure candle data provides t,o,h,l,c,v
+    if (!valuesInArray(keys, Object.keys(data))) return
     // round time to nearest current time unit
+    if (!isValidTimestamp(data.t)) return
+    data.ts = Date.now()
     data.t = this.roundTime(new Date(data.t))
+
     // ensure values are numbers
     data.o = data.o * 1
     data.h = data.h * 1
     data.l = data.l * 1
     data.c = data.c * 1
     data.v = data.v * 1
+
+    this.#data = data
+    this.dataReceived = data
 
     if (this.#candle[T] !== data.t) {
       this.newCandle(data)
@@ -146,8 +173,24 @@ export default class Stream {
     return (this.#candle !== empty) ? this.#candle : null
   }
 
+  setLastScrollPos(p) {
+    if (isNumber(p)) this.#lastScrollPos = p
+  }
+
+  resetLastPos() {
+    this.#lastXPos = undefined
+    this.#lastYPos = undefined
+    this.#lastScrollPos = undefined
+  }
+
   start() {
-    this.#alerts = new Alerts(this.#config.alerts)
+    if (!statusAllowStart.includes(this.status)) {
+      this.#core.error("ERROR: Invoke stopStream() before starting a new one.")
+      return 
+    }
+    if (!(this.#alerts instanceof Alerts))
+      this.#alerts = new Alerts(this.#config.alerts)
+
     this.status = {status: STREAM_STARTED}
   }
 
@@ -155,6 +198,7 @@ export default class Stream {
     if (this.#alerts instanceof Alerts)
       this.#alerts.destroy()
     this.status = {status: STREAM_STOPPED}
+    this.resetLastPos()
   }
   
   emit(topic, data) {
@@ -166,20 +210,28 @@ export default class Stream {
   }
 
   onTick(tick) {
-    if (this.#status == STREAM_STARTED || this.#status == STREAM_LISTENING) {
-      if (isObject(tick)) {
-        this.candle = tick
-      }
+    if ((this.#status == STREAM_STARTED || this.#status == STREAM_LISTENING) && 
+        isObject(tick) ) 
+    {
+        if (!isInteger(tick.t * 1)) return // tick.t = Date.now()
+        let keys = Object.keys(tick) 
+        let t = {}, v;
+        for (let key of keys) {
+          v = tick[key] * 1
+          if (!isNumber(v)) continue
+          t[key] = v
+        }
+        this.candle = t
     }
   }
 
   onUpdate() {
+    if (!this.#state?.isActive) return
     if (this.#candle !== empty) {
       this.status = {status: STREAM_UPDATE, data: this.candle}
       this.status = {status: STREAM_LISTENING, data: this.#candle}
     }
   }
-
 
   /**
    * add new candle to state data
@@ -197,14 +249,16 @@ export default class Stream {
       data.c, 
       data.v, 
       null, true]
-    this.#core.state.mergeData({ohlcv: [this.#candle]}, true, false)
+
+console.log(`State: ${this.#state.key} new candle:`, this.#candle)
+    this.#state.mergeData({ohlcv: [this.#candle]}, true, false)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
-    this.#countDownMS = this.#time.timeFrameMS
-    this.#countDownStart = this.roundTime(Date.now())
+    this.#countDownMS = this.#state.timeFrame
+    this.#countDownStart = this.roundTime(data.ts) // this.roundTime(Date.now())
   }
 
   prevCandle() {
-    const d = this.#core.allData.data
+    const d = this.#state.data.chart.data
     if (d.length > 0 && d[d.length - 1][7]) 
           d[d.length - 1].length = 6
   }
@@ -226,18 +280,21 @@ export default class Stream {
 
     // update the last candle in the state data
     this.#candle = candle
+console.log(`State: ${this.#state.key} candle update:`,candle)
 
-    const d = this.#core.allData.data
+    const d = this.#state.data.chart.data
     const l = (d.length > 0) ? d.length -1 : 0
     d[l] = this.#candle
 
-    this.countDownUpdate()
+    if (this.#state?.isActive)
+      this.countDownUpdate()
   }
 
   countDownUpdate() {
     let y,M,w,d,h,m,s,u;
-    let tf = this.#time.timeFrameMS
-    let cntDn = this.#time.timeFrameMS - (Date.now() - this.#countDownStart)
+    let tf = this.#state.timeFrame
+    let now = this.#data.ts
+    let cntDn = tf - (now - this.#countDownStart)
 
     if (cntDn < 0) {
       // is the stream closed or in error?
@@ -290,6 +347,28 @@ export default class Stream {
   }
 
   roundTime(ts) {
-    return ts - (ts % this.#core.timeData.timeFrameMS)
+    return ts - (ts % this.#state.dataSource.timeFrame)
   }
+
+}
+
+function validateConfig(c) {
+  if (!isObject(c)) return defaultStreamConfig
+
+  else {
+    let d = doStructuredClone(defaultStreamConfig)
+    c = mergeDeep(d, c)
+
+    c.tfCountDown = (isBoolean(c.tfCountDown)) ? c.tfCountDown : defaultStreamConfig.tfCountDown
+    c.alerts = (isArray(c.alerts)) ? c.alerts : defaultStreamConfig.alerts
+  }
+  return c
+}
+
+function consoleError(c, e) {
+  c.error(`TradeX-chart: ${c.id}: Ticker Stream : ${e}`)
+}
+
+function throwError(id, e) {
+  throw new Error(`TradeX-chart: ${id} : Ticker Stream : ${e}`)
 }

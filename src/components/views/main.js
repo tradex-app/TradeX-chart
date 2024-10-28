@@ -9,7 +9,8 @@ import {
   TIMESCALEH,
   TIMEH,
   SCALEW,
-  GlobalStyle
+  GlobalStyle,
+  STYLE_ROW
 } from "../../definitions/style"
 import { isNumber } from "../../utils/typeChecks"
 
@@ -94,6 +95,23 @@ export default class tradeXMain extends element {
     return node
   }
 
+  scaleNode(type) {
+    const styleRow = STYLE_ROW + ` width: 100%;`
+    const node = `
+    <div slot="chartpane" class="viewport scale ${type}" style="$${styleRow}"></div>
+  `
+    return node
+  }
+
+  addRow(type, style="", api, height) {
+    let row
+    let node = this.rowNode(type, style, api)
+    this.#elRows.insertAdjacentHTML("beforeend", node)
+    row = this.#elRows.chartPaneSlot.assignedElements().slice(-1)[0]
+    row.style.height = `${height}px`
+    return row
+  }
+
   removeRow(id) {
     const row = this.shadowRoot.querySelector(`#${id}`)
     if (!!row) {
@@ -101,6 +119,18 @@ export default class tradeXMain extends element {
       return true
     }
     else return false
+  }
+
+  addScaleRow(type, height, elScale) {
+    let axis;
+    let node = this.scaleNode(type)
+    elScale.insertAdjacentHTML("beforeend", node)
+    axis = elScale.chartPaneSlot.assignedElements().slice(-1)[0]
+    axis.style.height = `${height}px`
+    axis.style.width = `100%`
+    axis.height = height
+    axis.width = elScale.width
+    return axis
   }
 
   setMain() {

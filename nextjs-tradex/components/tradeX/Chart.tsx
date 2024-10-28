@@ -1,49 +1,47 @@
 'use client';
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
-import { IConfig, IIndicators, ITradeX, ThemeProps } from '../../../types'; // import from 'tradex-chart';
+import { IConfig, IIndicators, ITradeX } from '../../../types'; // 'tradex-chart';
 import ColorsEnum from '../theme/colors';
 import { IChartOption, IIndicatorToolbar } from './utils/types';
-import { Chart } from '../../../src'; // import 'tradex-chart';
+import { useChartContext } from './provider/ChartProvider';
 
 export interface IProps {
   config: IConfig;
   displayTitle: string;
-  data: number[][];
+  interval: string;
+  initialData?: number[][];
   tradeData?: any;
   chartType?: IChartOption;
   rangeLimit?: number;
-  onchart: IIndicatorToolbar[];
+  onchart?: IIndicatorToolbar[];
   chartAccessor?: string;
   customIndicators?: IIndicators;
-  chartX: ITradeX;
-  setChart: (chart: ITradeX) => void;
   onRangeChange?: () => void;
 }
 
-const TXChart: FC<IProps> = ({
+const TradeXChart: FC<IProps> = ({
   config,
   // visual
   displayTitle,
   chartType,
-  rangeLimit = 96,
   // data
-  data,
+  interval,
+  initialData = [],
   onchart = [],
   tradeData,
   // config
   chartAccessor = 'tradexChartContainer',
   customIndicators,
-  onRangeChange,
-  // chart instantiation
-  chartX,
-  setChart
+  onRangeChange
 }) => {
   const { theme } = useTheme();
+  const isChartLoadedRef = useRef(false);
+  const { chartX, setChartX } = useChartContext();
 
   // Register custom indicators to the chart
   const registerIndicators = (chart: ITradeX) => {
-    if (chart.setIndicators && customIndicators) {
+    if (chart?.setIndicators && customIndicators) {
       chart.setIndicators(customIndicators);
       console.log('Custom indicators registered:', customIndicators);
     } else {
@@ -53,7 +51,7 @@ const TXChart: FC<IProps> = ({
     }
   };
 
-  // Register event listener for range change
+  // Register event listener for range change, not being used, can lead to slowness
   const registerRangeChangeEvent = (chart: ITradeX) => {
     if (!chart || typeof chart.on !== 'function') {
       console.warn(
@@ -63,7 +61,6 @@ const TXChart: FC<IProps> = ({
     }
     chart.on('setRange', (e: any) => {
       if (!e || e.length === 0) return;
-      console.log('Range change event detected:', e);
       if (e[0] <= 0 && onRangeChange) {
         onRangeChange();
       }
@@ -71,6 +68,8 @@ const TXChart: FC<IProps> = ({
   };
 
   const renderChart = () => {
+    if (isChartLoadedRef.current) return;
+
     try {
       console.log('Rendering chart...');
 
@@ -78,12 +77,7 @@ const TXChart: FC<IProps> = ({
         `#${chartAccessor} tradex-chart`
       ) as ITradeX;
 
-      if (existingChart) {
-        console.log('Existing chart found. Setting reference.');
-        // existingChart.remove();
-        setChart(existingChart);
-        return;
-      }
+      if (existingChart) return;
 
       const combinedPrimary = tradeData ? [...onchart, ...tradeData] : onchart;
 
@@ -101,7 +95,7 @@ const TXChart: FC<IProps> = ({
         trades: any;
         primary?: { name: string; type: string; data: number[] }[];
       } = {
-        ohlcv: data,
+        ohlcv: initialData,
         primary: combinedPrimary,
         trades: tradeData
       };
@@ -116,10 +110,11 @@ const TXChart: FC<IProps> = ({
       if (typeof chart.start === 'function') {
         chart.start({
           ...config,
+          id: displayTitle + '-' + interval,
           title: displayTitle,
           symbol: displayTitle,
+          timeFrame: interval,
           type: chartType,
-          rangeLimit,
           isLightTheme,
           state
         });
@@ -127,12 +122,11 @@ const TXChart: FC<IProps> = ({
         console.error('chart.start is undefined');
       }
 
-      if (customIndicators) {
+      if (Object.keys(customIndicators || {}).length !== 0) {
         registerIndicators(chart);
       }
-
-      setChart(chart);
-      console.log('Chart rendering complete.');
+      isChartLoadedRef.current = true;
+      setChartX(chart);
     } catch (err) {
       console.error(`Failed to render chart: ${displayTitle}`, err);
     }
@@ -144,10 +138,7 @@ const TXChart: FC<IProps> = ({
     console.log('Applying theme settings based on current theme:', theme);
 
     if (theme === 'light') {
-      chartX.theme?.setProperty(
-        ThemeProps.ChartGridColour,
-        ColorsEnum.SelectorLight
-      );
+      chartX.theme?.setProperty('chart.GridColour', ColorsEnum.SelectorLight);
 
       return;
     }
@@ -158,6 +149,7 @@ const TXChart: FC<IProps> = ({
   useEffect(() => {
     console.log('Initial chart rendering...');
     renderChart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -170,9 +162,9 @@ const TXChart: FC<IProps> = ({
 
   return (
     <div className="w-full h-full">
-      <div id={chartAccessor} className="h-full" />
+      <div id={chartAccessor} className="w-full h-full cursor-crosshair" />
     </div>
   );
 };
 
-export default TXChart;
+export default TradeXChart;

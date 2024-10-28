@@ -7,6 +7,8 @@ import Indicator from "../components/overlays/indicator"
 import {STOCH as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "STOCH"
+let nameLong = 'Stochastic Oscillator'
 
 /**
  * Indicator - Stochastic Oscillator
@@ -16,9 +18,9 @@ import { YAXIS_TYPE } from "../definitions/chart";
  */
 export default class STOCH extends Indicator {
 
-  get name() { return 'Stochastic Oscillator' }
-  shortName = 'STOCH'
-  libName = 'STOCH'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   definition = {
     input: {
       high: [],
@@ -35,7 +37,8 @@ export default class STOCH extends Indicator {
   }
   checkParamCount = false
 
-
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false

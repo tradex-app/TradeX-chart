@@ -3,14 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "build-tx": "cd local_modules/tradex-chart && pnpm i && npm run build",
     "cleanup": "./cleanup.sh && pnpm install",
     "prebuild": "cd .. && npm install && npm run build",
-    "dev": "pnpm cleanup && next dev",
+    "dev": "pnpm cleanup && next dev -p 4000",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write ."
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.6.0",
+    "@fortawesome/free-solid-svg-icons": "^6.6.0",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@radix-ui/react-dialog": "1.1.1",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-popover": "1.1.1",

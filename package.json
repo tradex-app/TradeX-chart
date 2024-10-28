@@ -18,14 +18,15 @@
     }
   },
   "private": false,
-  "version": "0.153.7",
+  "version": "0.155.0",
   "license": "GNU GPL3",
   "scripts": {
     "dev": "vite",
     "buildall": "./bin/buildall.sh",
     "build": "./bin/build.sh",
     "serve": "vite serve",
-    "demo": "vite build && vite serve --open /demo.html"
+    "demo": "vite build && vite serve --open /demo.html",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "jsdoc-to-markdown": "^8.0.3",

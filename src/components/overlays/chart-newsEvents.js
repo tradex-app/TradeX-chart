@@ -5,7 +5,7 @@ import Overlay from "./overlay"
 import NewsEvent from "../primitives/newsEvent"
 import { limit } from "../../utils/number"
 import { debounce } from "../../utils/utilities"
-import { isString } from "../../utils/typeChecks"
+import { isObject, isString } from "../../utils/typeChecks"
 import { HIT_DEBOUNCE } from "../../definitions/core"
 
 const newsConfig = {
@@ -37,7 +37,7 @@ export default class chartNewsEvents extends Overlay {
     super(target, xAxis, yAxis, theme, parent, params)
 
     this.#event = new NewsEvent(target, theme)
-    this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this)
+    this.core.on("chart_primaryPointerDown", this.onPrimaryPointerDown, this)
     newsConfig.parent = this
     this.#dialogue = this.core.WidgetsG.insert("Dialogue", newsConfig)
     this.#dialogue.start()
@@ -98,9 +98,11 @@ export default class chartNewsEvents extends Overlay {
   }
 
   draw(range=this.core.range) {
-    if (this.core.config?.events?.display === false) return
-
-    if (!super.mustUpdate()) return
+    if (this.core.config?.events?.display === false ||
+        !isObject(this.data) ||
+        Object.keys(this.data).length == 0 ||
+        !super.mustUpdate()
+      ) return
 
     this.hit.clear()
     this.scene.clear()

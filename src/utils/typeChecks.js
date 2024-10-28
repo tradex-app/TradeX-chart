@@ -1,9 +1,21 @@
+// import { isValidTimestamp } from "./time"
+
 /**
  * @param {*} v
  * @returns {boolean}
  */
  export function isArray (v) {
   return Array.isArray(v)
+}
+
+/**
+ * @param {*} v - value to test
+ * @param {String} t - type
+ * @returns {Boolean}
+ */
+export function isArrayOfType (v, t) {
+  if (!isArray(v)) return false
+  return v.every((n) => checkType(t, n))
 }
 
 /**
@@ -80,7 +92,7 @@ export function isMap(v) {
  * @return {boolean}
  */
 export function isPromise (v) {
-  return !!v && (isObject(v) || isFunction(v)) && isFunction(v.then);
+  return !!v && (isObject(v) || isFunction(v)) && isFunction(v.then) && v[Symbol.toStringTag] === 'Promise';
 }
 
 /**
@@ -128,6 +140,9 @@ export function isClass(v){
  * @returns {boolean}
  */
 export function checkType(type, value) {
+  if (value === undefined ||
+      value === null)
+      return false
   switch(type) {
     case 'array': return isArray(value);
     case 'function': return isFunction(value);
@@ -141,13 +156,14 @@ export function checkType(type, value) {
     case 'promise': return isPromise(value);
     case 'error': return isError(value);
     case 'class': return isClass(value);
+    // case 'timestamp': return isValidTimestamp(value);
     default: throw new Error(`No known test for type: ${type}`)
   }
 };
 
 export function typeOf(value) {
   const types = ["array", "error", "class", "function", "map", "promise", 
-                  "object", "integer", "number", "boolean", "string"]
+                  "object", "integer", "number", "boolean", "string"] //, "timestamp"]
   for (let type of types) {
     try {
       if (checkType(type, value)) return type

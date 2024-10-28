@@ -44,14 +44,14 @@ export default class chartTrades extends Overlay {
     this.settings = params.settings
     State.importData("trades", this.data, this.state, this.state.time.timeFrame)
     this.#trade = new Trade(target, theme)
-    this.core.on("primary_pointerdown", this.onPrimaryPointerDown, this)
+    this.core.on("chart_primaryPointerDown", this.onPrimaryPointerDown, this)
     tradeDialogue.parent = this
     this.#dialogue = this.core.WidgetsG.insert("Dialogue", tradeDialogue)
     this.#dialogue.start()
   }
 
   destroy() {
-    this.core.off("primary_pointerdown", this.onPrimaryPointerDown, this)
+    this.core.off("chart_primaryPointerDown", this.onPrimaryPointerDown, this)
   }
 
   set position(p) { this.target.setPosition(p[0], p[1]) }
@@ -137,9 +137,11 @@ export default class chartTrades extends Overlay {
   }
 
   draw(range=this.core.range) {
-    if (!super.mustUpdate()) return
-
-    if (this.core.config?.trades?.display === false) return
+    if (this.core.config?.events?.display === false ||
+      !isObject(this.data) ||
+      Object.keys(this.data).length == 0 ||
+      !super.mustUpdate()
+    ) return
 
     this.hit.clear()
     this.scene.clear()

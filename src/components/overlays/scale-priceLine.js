@@ -6,6 +6,7 @@ import Stream from "../../helpers/stream";
 import { YAxisStyle } from "../../definitions/style";
 import { renderTextBG, getTextRectHeight } from "../../renderer/text"
 
+export const priceLineTxtScaling = 1.05
 
 export default class ScalePriceLine extends Overlay {
 
@@ -21,7 +22,7 @@ export default class ScalePriceLine extends Overlay {
 
     this.viewport = target.viewport
     this.#opts = {
-      fontSize: YAxisStyle.FONTSIZE * 1.05,
+      fontSize: YAxisStyle.FONTSIZE * priceLineTxtScaling,
       fontWeight: YAxisStyle.FONTWEIGHT,
       fontFamily: YAxisStyle.FONTFAMILY,
       txtCol: "#FFFFFF", //YAxisStyle.COLOUR_CURSOR,

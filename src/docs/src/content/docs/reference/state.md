@@ -11,7 +11,14 @@ The chart data state defines what information the chart displays.
 * events
 * annotations
 
-Data states can be provided to the chart either via the config object at ``chart.start(config)``, or by creating a state separately and telling the chart to use it.
+Data states can be provided to the chart either via the initializing config object past to the chart via:
+```javascript
+chart.start(config)
+```
+or after initilization by telling the chart to use a new state object or the key (string) of a previously registered state object.
+```javascript
+chart.state.use(state)
+```
 
 If no state is provided through the config at ``chart.start(config)`` then the chart will automatically use a default empty state.
 
@@ -23,7 +30,7 @@ The chart config object has a state property ``config.state``. It requires a val
 
 ## Create and Use a State
 
-A [data state (object)](#state-config-object) must be first validated by the chart. If valid, will register it for later use and return the id key assigned to it. This means the chart can hold multiple states in memory to be used as desired allowing for easy swapping.
+A state object can be registered for later use. The [state (object)](#state-config-object) will validated by the chart. If valid, it will return the id key (string) assigned to it. This means the chart can hold multiple states in memory to be used as desired, allowing for easy swapping.
 
 ```javascript
 const key = chart.state.create(state)
@@ -34,7 +41,7 @@ For more information parameters see: TODO: State API documentation
 To have the chart use a state:
 
 ```javascript
-chart.useState(key)
+chart.state.use(key)
 ```
 
 * will remove any indicators the chart was previously using
@@ -98,7 +105,7 @@ const xport = chart.exportState(key)
 
 ## List
 
-Return a ``Map()`` of all [chart data states](#internal-chart-data-state) currently in memory. This includes states in use by other charts.
+Return an array of all [chart data states](#internal-chart-data-state) currently in memory. This includes states in use by other charts.
 
 ```javascript
 const list = chart.state.list()
@@ -184,7 +191,19 @@ The following data state config object example demonstrates the possible options
   // user defined data
   datasets: [],
 
+  // specifies what range of the price history (candles) to display
+  range: {
+    indexStart:  0,   // initial index 
+    indexEnd:    30,  // initial index end
+  }
 
+  // Time definition
+  timeData: {
+    timeFrameMS: 360000,   // milliseconds
+    timeFrame: "1h",
+    timeZone: "Europe/Berlin",
+    timeZoneOffset: 2,
+  }
 }
 ```
 

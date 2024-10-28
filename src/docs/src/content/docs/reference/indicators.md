@@ -35,8 +35,21 @@ However, indicators can also be added with data and or with custom settings.
 ```javascript
 const data = [ [1543572000000, 4079.63478779] ]
 const settings = {style:{}}
-const params = {data, settings}
-const myInd = chart0.addIndicator("EMA", "EMA_1", params)
+const params = { 
+  id: "string" // user defined or automatic
+  legendName: "EMA 15" // legend title
+  data: data, 
+  settings: { 
+    style: {
+      output: {
+        colour: {value: "#0f0"}, 
+        width: {value: 3}, dash: "4,4"}
+      }, 
+      input: {timePeriod: {value: 15}
+     } 
+   } 
+ }
+)const myInd = chart0.addIndicator("EMA", "EMA_1", params)
 ```
 
 
@@ -58,12 +71,13 @@ The ``params`` object permits modification of many of the [indicator's default c
 
 All indicator parameters are optional. if no
 
-| Property | Type | Descripttion |
-|----------|------|--------------|
-| id | String | indicator id - if undefined, one will be automatically generated and assigned. id can be used for restoring a chart State. |
-| legendName | String | name or title prefixed to indicator data (if any) displayed on the chart |
-| data | Array | any initial indicator data - if provided ``calcIndicator()`` will **not** be triggered. See [Indicator Data Format](#indicator-data-format) |
-| settings | Object | will modify the default indicator [definition](#indicator-settings) |
+
+| Property   | Type   | Descripttion                                                                                                                               |
+| ------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| id         | String | indicator id - if undefined, one will be automatically generated and assigned. id can be used for restoring a chart State.                 |
+| legendName | String | name or title prefixed to indicator data (if any) displayed on the chart                                                                   |
+| data       | Array  | any initial indicator data - if provided``calcIndicator()`` will **not** be triggered. See [Indicator Data Format](#indicator-data-format) |
+| settings   | Object | will modify the default indicator[definition](#indicator-settings)                                                                         |
 
 #### Indicator Settings
 
@@ -78,7 +92,8 @@ myChart.addIndicator(
     settings: { 
       style: {output: {colour: {value: "#00f"}, width: {value: 3}, dash: {value: "4,4"}}}, 
       input: {timePeriod: {value: 20}} 
-    } 
+    },
+    gapFill: true // default, optional
   });
 ````
 
@@ -117,7 +132,7 @@ More will be implemented soon.
 
 [Custom Idicators](../indicators_custom) are in important feature of TradeX-chart. They are an extension of the default indicator class and thus inherit all of their methods and properties. The documentation will show you how to [define](../indicators_custom#minimal-custom-indicator-definition), [register](../indicators_custom#registering-custom-indicators) and [how data is passed to them](../indicators_custom#how-the-indicator-updates).
 
-## Accessing Chart Methods, Data and Information 
+## Accessing Chart Methods, Data and Information
 
 The base `Indicator` class extends the `Overlay` class. See [Overlay Data and Properties](../overlays#overlaydataandproperties)
 
@@ -154,6 +169,7 @@ The intance will report it's name.
 chart0.Chart.indicators["ID_m02zn8js_lhw"].instance.name
 chart0.Chart.indicators["ID_m02zn8js_lhw"].instance.shortName
 ```
+
 ### Indicator Data and Settings
 
 Indicator data and settings are also found grouped together under Primary Pane or Secondary Panes.
@@ -162,12 +178,14 @@ Indicator data and settings are also found grouped together under Primary Pane o
 chart0.allData.primaryPane
 chart0.allData.secondaryPane
 ```
+
 or similarly via the chart state
 
 ```javascript
 chart0.state.allData.primaryPane
 chart0.state.allData.secondaryPane
 ```
+
 ### Indicator Data Format
 
 Indicator data is stored as an Array of arrays. If the indicator data array is empty, the first event that triggers the ``calcIndicator()`` method, will fill the array.
@@ -176,7 +194,7 @@ An Indicator Data array entry must contain a minimum of ``[ timestamp : integer,
 
 ## Modifying the Indicator Definition
 
-Indicator input values (used in calculation) and output values (display: colour, line style) can be changed, whenever you want programmatically. 
+Indicator input values (used in calculation) and output values (display: colour, line style) can be changed, whenever you want programmatically.
 
 The Indicator definition object is where the configurable values of the indicator are.
 

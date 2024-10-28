@@ -6,8 +6,8 @@
 import Component from "./component"
 import { elementDimPos } from "../utils/DOM";
 import { limit } from "../utils/number"
-import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks";
-import { copyDeep, idSanitize, xMap } from "../utils/utilities";
+import { isArray, isNumber, isObject, isString } from "../utils/typeChecks";
+import { doStructuredClone, cyrb53, idSanitize, xMap } from "../utils/utilities";
 import CEL from "./primitives/canvas";
 import Legends from "./primitives/legend"
 import Graph from "./views/classes/graph"
@@ -33,6 +33,7 @@ import {
   STREAM_FIRSTVALUE,
   STREAM_NEWVALUE,
   STREAM_UPDATE,
+  SHORTNAME,
 } from "../definitions/core";
 import { 
   BUFFERSIZE, 
@@ -40,6 +41,7 @@ import {
   COLLAPSEDHEIGHT 
 } from "../definitions/chart";
 import { VolumeStyle } from "../definitions/style"
+import Indicator, { indicatorHashKey } from "./overlays/indicator";
 
 
 export const defaultOverlays = {
@@ -88,7 +90,7 @@ export default class Chart extends Component{
   #id;
   #name
   #shortName
-  #title;
+  #titleStr
   #chartCnt
   #type               // primary, secondary
   #status = "idle"
@@ -139,11 +141,11 @@ export default class Chart extends Component{
 
     this.#chartCnt = Chart.cnt
 
-    if (!isObject(options)) throw new Error(`Chart (pane) constructor failed: Expected options typeof object`)
+    if (!isObject(options)) throw new Error(`TradeX-Chart: ${core.ID} : Chart (pane) constructor failed: Expected options typeof object`)
 
     this.#name = this.options.name
     this.#shortName = this.options.shortName
-    this.#title = this.options.title
+    this.#titleStr = this.options.title
     this.#type = (this.options.type == "primary") ? "primaryPane" : "secondaryPane"
     this.#view = this.options.view
     this.#elScale = this.options.elements.elScale;
@@ -158,6 +160,7 @@ export default class Chart extends Component{
       chartLegend.title = this.title
       chartLegend.parent = this
       chartLegend.source = this.legendInputs.bind(this)
+      // chartLegend.visible = this.theme.title.display
       this.legend.add(chartLegend)
       this.yAxisType = YAXIS_TYPE.default
     }
@@ -170,15 +173,7 @@ export default class Chart extends Component{
       this.legend.add(chartLegend)
       this.yAxisType = YAXIS_TYPE.valid(type)
     }
-
-    // set up Scale (Y Axis)
-    const opts = {...options}
-          opts.parent = this
-          opts.chart = this
-          opts.elScale = this.elScale
-          opts.yAxisType = this.yAxisType
-    this.scale = new ScaleBar(this.core, opts)
-
+    this.setScaleBar()
     this.#status = "init"
   }
 
@@ -187,11 +182,11 @@ export default class Chart extends Component{
   get name() { return this.#name }
   get shortName() { return this.#shortName }
   set title(t) { this.setTitle(t) }
-  get title() { return this.#title }
+  get title() { return `${this.#titleStr} : ${this.range.timeFrame} :` }
   get type() { return this.#type }
   get status() { return this.#status }
   get collapsed() { return this.#collapsed }
-  get isPrimary() { return this.options.view.primary || (this.#type === "primaryPane") || false }
+  get isPrimary() { return this.options?.view?.primary || (this.#type === "primaryPane") || false }
   get element() { return this.#elTarget }
   get pos() { return this.dimensions }
   get dimensions() { return elementDimPos(this.#elTarget) }
@@ -258,7 +253,7 @@ export default class Chart extends Component{
     this.draw(this.range);
 
     // set mouse pointer
-    this.cursor = "crosshair"
+    //this.cursor = "crosshair" causing issues with candles drawing
 
     // start State Machine
     stateMachineConfig.id = this.id
@@ -269,11 +264,13 @@ export default class Chart extends Component{
     // set up event listeners
     this.eventsListen()
 
+    if (this.isPrimary)
+      this.setTitle(this.core.state.symbol)  // (this.theme?.title)
+
     // add divider to allow manual resize of the chart pane
     let cfg = { chartPane: this }
     this.#Divider = this.core.WidgetsG.insert("Divider", cfg)
     this.#Divider.start()
-    // cfg = {dragBar, closeIcon, title, content, position, styles}
     const content = `Configure chart ${this.id}`
     let cfg2 = { 
       title: "Chart Config", 
@@ -284,7 +281,7 @@ export default class Chart extends Component{
     this.#ConfigDialogue = this.core.WidgetsG.insert("ConfigDialogue", cfg2)
     this.#ConfigDialogue.start()
     this.#status = "running"
-    this.log(`Chart Pane ${this.name} instantiated and running`)
+    this.log(`TradeX-Chart: ${this.core.ID} : Chart Pane : ${this.name} : instantiated and running`)
   }
 
   /**
@@ -294,38 +291,59 @@ export default class Chart extends Component{
     if ( this.#status === "destroyed") return
     // has this been invoked from removeChartView() ?
     if ( !this.core.MainPane.chartDeleteList[this.id] ) {
-      this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "removeChartPane()" instead.`)
+      this.core.warn(`Cannot "destroy()": ${this.id} !!! Use "remove()" or "chartPaneRemove()" instead.`)
       return
     }
     this.core.log(`Deleting chart pane: ${this.id}`)
 
+    this.deactivate(true)
+    this.#status = "destroyed"
+  }
 
+  /**
+   * Remove this chart pane - invokes destroy()
+   * is the correct way to remove a chart pane
+   */
+  remove() {
+    this.emit("chart_paneDestroy", this.id)
+  }
+
+  deactivate(indicators=false) {
     this.core.hub.expunge(this)
-    
-    this.removeAllIndicators()
+    if (!!indicators)
+      this.removeAllIndicators()
     this.stateMachine.destroy()
     this.#Divider.destroy()
     this.#Scale.destroy()
     this.graph.destroy()
     this.#input.destroy()
     this.legend.destroy()
-
     this.stateMachine = undefined
     this.#Divider = undefined
     this.#Legends = undefined
     this.#Scale = undefined
     this.graph = undefined
     this.#input = undefined
-
-    // TODO: remove state entry
-    this.core.warn(`Deleting chart pane ${this.id} destroys all of its data!`)
-
     this.element.remove()
-    this.#status = "destroyed"
   }
 
-  remove() {
-    this.emit("chart_paneDestroy", this.id)
+  /**
+   * @typedef {Object} snapshot
+   * @property {Boolean} maximized 
+   * @property {Object} collapsed
+   * @property {Number} height
+   */
+  /**
+   * Return a snapshot of values
+   * @returns {snapshot}
+   */
+  snapshot() {
+    let maxed = this.core.MainPane.chartPaneMaximized?.instance
+    return {
+      maximized: ( maxed?.id == this.id ),
+      collapsed: {...this.collapsed},
+      height: this.height
+    }
   }
 
   eventsListen() {
@@ -339,11 +357,13 @@ export default class Chart extends Component{
     this.#input.on("pointerup", this.onPointerUp.bind(this));
 
     // listen/subscribe/watch for parent notifications
-    this.on("main_mousemove", this.updateLegends, this);
+    this.on("main_mouseMove", this.updateLegends, this);
     this.on(STREAM_LISTENING, this.onStreamListening, this);
     this.on(STREAM_NEWVALUE, this.onStreamNewValue, this);
     this.on(STREAM_UPDATE, this.onStreamUpdate, this);
     this.on(STREAM_FIRSTVALUE, this.onStreamNewValue, this)
+    this.on("range_valueMaxMin", this.onValueMaxMin, this)
+    this.on("range_timeframeSet", this.onTimeframeSet, this)
     this.on(`${this.id}_removeIndicator`, this.onDeleteIndicator, this)
 
     if (this.isPrimary) 
@@ -357,8 +377,8 @@ export default class Chart extends Component{
   }
 
   onChartDragDone(e) {
-    this.cursor = "crosshair"
     this.core.MainPane.onChartDragDone(e)
+    this.cursor = "crosshair"
   }
 
   onPointerMove(e) {
@@ -393,7 +413,7 @@ export default class Chart extends Component{
     if (this.stateMachine.state === "tool_activated")
       this.emit("tool_targetSelected", { target: this, position: e });
     else if (this.isPrimary)
-      this.emit("primary_pointerdown", this.#cursorClick)
+      this.emit("chart_primaryPointerDown", this.#cursorClick)
   }
 
   onPointerUp(e) {
@@ -431,14 +451,54 @@ export default class Chart extends Component{
     this.removeIndicator(i.id)
   }
 
-  setTitle(t) {
-    if (!isString(t)) return false
+  onTimeframeSet() {
+    let title = `${this.#titleStr}`
+    chartLegend.title = title
+    this.setTitle(title)
+  }
 
-    this.#title = t
-    chartLegend.title = t
+  onValueMaxMin(m) {
+    console.log(`TradeX-chart: ${this.core.ID} : Chart Pane ${this.id} : Range Value Max: ${m.max}, Min: ${m.min}`)
+  }
+
+  // set up Scale (Y Axis)
+  setScaleBar() {
+    const opts = {...this.options}
+          opts.parent = this
+          opts.chart = this
+          opts.elScale = this.elScale
+          opts.yAxisType = this.yAxisType
+    this.scale = new ScaleBar(this.core, opts)
+  }
+
+  /** 
+   * @typedef {Object} Title
+   * @property {Boolean} display
+   * @property {String} text
+   */
+  /**
+   * Set the chart title
+   * @param {Title|String} t - title text or title definition object
+   * @returns {Boolean}
+   */
+  setTitle(t) {
+    let txt = this.#titleStr
+    let vis;
+    if (isObject(t)) {
+      if (isString(t?.text)) txt = t.text
+      vis = (!!t?.display) ? "display" : "none"
+    }
+    else if (isString(t)) {
+      txt = t
+    }
+    else return false
+
+    this.#titleStr = txt
+    chartLegend.title = this.title
     const title = this.legend.list.chart.el.querySelectorAll(".title")
     for (let n of title) {
-      n.innerHTML = t
+      n.innerHTML = this.title
+      n.style.display = vis || n.style.display
     }
     return true
   }
@@ -470,7 +530,9 @@ export default class Chart extends Component{
 
   /**
    * Set chart dimensions
-   * @param {Object} dim - dimensions {w:width, h: height}
+   * @param {Object} dims - dimensions {w:width, h: height}
+   * @param {Number} dims.w - width in pixels
+   * @param {Number} dims.h- height in pixels
    */
   setDimensions(dims={w: this.width, h: this.height}) {
     if (!isObject(dims)) dims = {w: this.width, h: this.height}
@@ -544,24 +606,33 @@ export default class Chart extends Component{
         config.cnt = this.core.indicatorClasses[o.type].cnt
         config.id = `${this.id}-${o.type}_${config.cnt}`
         config.class = this.core.indicatorClasses[o.type]
+        config.oType = "indicator"
       }
       // other overlay types
       else if (o.type in optionalOverlays[this.type]) {
         config.cnt = 1
         config.id = `${this.id}-${o.type}`
         config.class = optionalOverlays[this.type][o.type].class
+        config.oType = "overlayOptional"
       }
       // custom overlay types
       else if (o.type in this.core.customOverlays[this.type]) {
         config.cnt = 1
         config.id = `${this.id}-${o.type}`
         config.class = this.core.customOverlays[this.type][o.type].class
+        config.oType = "overlayCustom"
       }
       else continue
 
       config.params = { overlay: o, }
       o.id = config.id
       o.paneID = this.id
+      o.key = indicatorHashKey(o)
+      // if (this.isDuplicate(o.key)) {
+      //   this.core.error(`ERROR: Chart Pane: ${this.id} cannot add duplicate Indicator: ${i?.name} with same config`)
+      //   continue
+      // }
+
       overlayList.push([o.id, config])
     }
     this.graph.addOverlays(overlayList)
@@ -572,6 +643,7 @@ export default class Chart extends Component{
   /**
    * add an indicator
    * @param {Object} i - {type, name, ...params}
+   * @returns {Indicator|undefined}
    */
   addIndicator(i) {
     const primaryPane = this.type === "primaryPane"
@@ -582,19 +654,47 @@ export default class Chart extends Component{
         primaryPane === isPrimary
       ) {
       i.paneID = this.id
+      i.key = indicatorHashKey(i)
+      // if (this.isDuplicate(i.key)) {
+      //   this.core.error(`ERROR: Chart Pane: ${this.id} cannot add duplicate Indicator: ${i?.name} with same config`)
+      //   return undefined
+      // }
+
       const config = {
         class: indClass,
-        params: {overlay: i}
+        params: {
+          overlay: i,
+        }
       }
       try {
         return this.graph.addOverlay(i.name, config)
       }
       catch (e) {
-        this.core.error(`ERROR: Primary Pane: ${this.id} cannot add Indicator: ${i?.name} Error: ${e.message}`)
-        return false
+        this.core.error(`ERROR: Chart Pane: ${this.id} cannot add Indicator: ${i?.name} Error: ${e.message}`)
+        return undefined
       }
     }
-    else return false
+    else return undefined
+  }
+
+  isDuplicate(key) {
+    let ind = this.findIndicatorByKey(key)
+    if (!ind) return false
+    else return ind.id
+  }
+
+
+  /**
+   * Find indicator by hash key
+   * @param {String} key 
+   * @returns {Indicator|undefined}
+   */
+  findIndicatorByKey(key) {
+    let iList = Object.values(this.getIndicators())
+    for (let i of iList) {
+      if (i.key = key) return i
+    }
+    return undefined
   }
 
   getIndicators() {
@@ -610,7 +710,14 @@ export default class Chart extends Component{
     return ind
   }
 
-  removeIndicator(id) {
+  /**
+   * Remove chart pane indicator
+   * remove entire secondary pane if indicator count = 0
+   * @param {String} id 
+   * @param {Boolean} state - leave chart pane state intact?
+   * @returns 
+   */
+  removeIndicator(id, state=true) {
     if (!isString(id) || !(id in this.indicators)) return false
 
     // enable deletion
@@ -619,7 +726,7 @@ export default class Chart extends Component{
     if (Object.keys(this.indicators).length === 0 && !this.isPrimary)
       this.emit("chart_paneDestroy", this.id)
     else {
-      this.indicators[id].instance.destroy()
+      this.indicators[id].instance.destroy(state)
       this.graph.removeOverlay(id)
       this.draw()
       delete this.#indicatorDeleteList[id]
@@ -627,11 +734,11 @@ export default class Chart extends Component{
     return true
   }
 
-  removeAllIndicators() {
+  removeAllIndicators(state) {
     const result = {}
     const all = this.getIndicators()
     for (let id in all) {
-      result[id] = this.removeIndicator(id)
+      result[id] = this.removeIndicator(id, state)
     }
     return result
   }
@@ -687,7 +794,7 @@ export default class Chart extends Component{
    * Refresh secondaryPane - overlays, grid, scale, indicators
    */
   refresh() {
-    this.emit("pane_refresh", this)
+    this.emit("chart_paneRefresh", this)
     this.scale.draw()
     this.draw(undefined, this.isPrimary)
   }
@@ -724,16 +831,17 @@ export default class Chart extends Component{
     const index = limit(idx, 0, this.range.data.length - 1)
     const ohlcv = this.range.data[index]
     const theme = this.theme.candle
-    const colours = (ohlcv[4] >= ohlcv[1]) ?
-      new Array(5).fill(theme.UpWickColour) :
-      new Array(5).fill(theme.DnWickColour);
     const inputs = {}
     const keys = ["T","O","H","L","C","V"]
-
+    let colours = []
+    if (isArray(ohlcv)) {
+      colours = (ohlcv[4] >= ohlcv[1]) ?
+      new Array(5).fill(theme.UpWickColour) :
+      new Array(5).fill(theme.DnWickColour);
     for (let i=1; i<6; i++ ) {
       inputs[keys[i]] = this.scale.nicePrice(ohlcv[i])
     }
-
+    }
     return {inputs, colours, labels}
   }
 
@@ -750,10 +858,10 @@ export default class Chart extends Component{
     switch(action.icon) {
       case "up": this.reorderUp(); return;
       case "down": this.reorderDown(); return;
-      case "maximize": this.core.MainPane.paneMaximize(this); return;
-      case "restore": this.core.MainPane.paneMaximize(this); return;
-      case "collapse": this.core.MainPane.paneCollapse(this); return;
-      case "expand": this.core.MainPane.paneCollapse(this); return;
+      case "maximize": this.core.MainPane.chartPaneMaximize(this); return;
+      case "restore": this.core.MainPane.chartPaneMaximize(this); return;
+      case "collapse": this.core.MainPane.chartPaneCollapse(this); return;
+      case "expand": this.core.MainPane.chartPaneCollapse(this); return;
       case "remove": this.remove(); return;
       case "config": this.configDialogue(); return;
       default: return;
@@ -815,7 +923,7 @@ export default class Chart extends Component{
   }
 
   createGraph() {
-    let overlays = copyDeep(this.overlaysDefault)
+    let overlays = doStructuredClone(this.overlaysDefault)
     this.graph = new Graph(this, this.elViewport, overlays, false)
 
     if (this.isPrimary) {
@@ -917,7 +1025,7 @@ export default class Chart extends Component{
   zoomRange() {
     // draw the chart - grid, candles, volume
     this.draw(this.range, true)
-    this.emit("zoomDone", true)
+    this.emit("chart_zoomDone", true)
   }
 
 

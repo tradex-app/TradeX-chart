@@ -5,9 +5,9 @@ import Overlay from "./overlay"
 import { Range } from "../../model/range"
 import { limit } from "../../utils/number"
 import Colour, { Palette } from "../../utils/colour"
-import { isArray, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from "../../utils/typeChecks"
-import { copyDeep, diff, idSanitize, isObjectNotEmpty, mergeDeep, uid } from "../../utils/utilities"
-import { STREAM_UPDATE } from "../../definitions/core"
+import { isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from "../../utils/typeChecks"
+import { doStructuredClone, cyrb53, diff, idSanitize, isObjectNotEmpty, mergeDeep, uid } from "../../utils/utilities"
+import { SHORTNAME, STREAM_UPDATE } from "../../definitions/core"
 import { OHLCV } from "../../definitions/chart"
 import { WinState } from "../widgets/window"
 import { onClickOutside } from "../../utils/DOM"
@@ -88,6 +88,7 @@ export default class Indicator extends Overlay {
 
   #ID
   #cnt_
+  #key
   #name
   #shortName
   #context
@@ -97,7 +98,6 @@ export default class Indicator extends Overlay {
   #chartPane
   #scaleOverlay
   #plots
-  #params
   #overlay
   #indicator
   #type = "indicator"
@@ -113,6 +113,8 @@ export default class Indicator extends Overlay {
   #ConfigDialogue
   #palette
   #error = {type: "", msg: "", style: ""}
+  #gapFill = true
+  // #gaps = new Set()
 
   definition = {
     input: {},
@@ -145,11 +147,12 @@ export default class Indicator extends Overlay {
     this.#cnt_ = Indicator.cnt
     this.#overlay = overlay
     this.id = overlay?.id || uid(this?.shortName || overlay?.name)
-    this.#params = params
+    this.#key = overlay?.key || indicatorHashKey(overlay)
     this.#TALib = this.core.TALib
-    this.#range = this.xAxis.range
+    this.#range = this.core.range
     this.legendName = overlay?.legendName || overlay?.name || this?.shortName
     this.#legendVisibility = (isBoolean(overlay?.legendVisibility)) ? overlay.legendVisibility : true
+    this.#gapFill = (isBoolean(overlay?.gapFill)) ? overlay.gapFill : true
     this.#palette = palette
     this.style = (isObject(overlay?.settings?.style)) ? 
     {...this.constructor.defaultStyle, ...overlay.settings.style} : 
@@ -181,17 +184,17 @@ export default class Indicator extends Overlay {
 
   get id() { return this.#ID || `${this.core.ID}-${this.chartPaneID}-${this.shortName}-${this.#cnt_}`}
   set id(id) { this.#ID = idSanitize(new String(id)) }
+  get key() { return this.#key }
   get version() { return `${this.constructor?.version}` }
   get context() { return this.#context }
   get chartPane() { return this.core.ChartPanes.get(this.chartPaneID) }
-  get chartPaneID() { return this.#params.overlay.paneID }
+  get chartPaneID() { return this.params.overlay.paneID }
   get primaryPane() { return this.#primaryPane || this.constructor.primaryPane }
   set primaryPane(c) { this.#primaryPane = c }
   get scaleOverlay() { return this.#scaleOverlay }
   set scaleOverlay(o) { this.#scaleOverlay = o }
   get plots() { return this.#plots }
   set plots(p) { this.#plots = p }
-  get params() { return this.#params }
   get Timeline() { return this.core.Timeline }
   get scale() { return this.parent.scale }
   get type() { return this.#type }
@@ -217,6 +220,8 @@ export default class Indicator extends Overlay {
   get state() { return this.#state }
   set error(e) { this.setError(e) }
   get error() { return this.#error }
+  get gapFill() { return this.#gapFill }
+  set gapFill(g) { this.#gapFill = !!g }
   get configDialogue() { return this.#ConfigDialogue }
 
 
@@ -303,7 +308,7 @@ export default class Indicator extends Overlay {
   }
 
   init(api) {
-    const overlay = this.#params.overlay
+    const overlay = this.params.overlay
 
     this.defineIndicator(overlay, api)
     // calculate back history if missing
@@ -324,7 +329,7 @@ export default class Indicator extends Overlay {
     }
   }
 
-  destroy() {
+  destroy(state=true) {
     if ( this.#state === IndicatorState.destroyed) return
     // has this been invoked from removeIndicator() ?
     // const chartPane = this.core.ChartPanes.get(this.chartPaneID)
@@ -347,7 +352,8 @@ export default class Indicator extends Overlay {
     // remove listeners
     super.destroy()
     // remove indicator state data
-    this.core.state.removeIndicator(this.id)
+    if (!!state)
+      this.core.state.removeIndicator(this.id)
 
     this.#state = IndicatorState.destroyed
   }
@@ -367,6 +373,30 @@ export default class Indicator extends Overlay {
     // Yes!
     else
       this.chart.remove()
+  }
+
+  /**
+   * @typedef {Object} snapshot
+   * @property {String} id 
+   * @property {String} key - hashed key
+   * @property {String} name - display name
+   * @property {String} type - indicator type (short name)
+   * @property {Array} data - indicator data
+   * @property {Object} settings - indicator definition, input, output, style
+   */
+  /**
+   * Return a snapshot of values
+   * @returns {snapshot}
+   */
+  snapshot() {
+    return {
+      id: this.id,
+      key: this.key,
+      name: this.params.overlay.name,
+      type: this.shortName,
+      data: this.data,
+      settings: this.definition
+    }
   }
 
   /**
@@ -812,20 +842,9 @@ export default class Indicator extends Overlay {
     if (!isObjectNotEmpty(dm.style))
         dm.style = this.style || {}
 
-    // input ---------------
-
-    // validate all input fields
     this.validateInputs(d, input, api)
     this.populateMetaInputs(d)
-
-    // output ------------------
-
-    // validate all output arrays
     this.validateOutputs(d, api, oo)
-
-    // meta validation ------------------
-    // Inputs Tab
-    // dm.input = this.buildConfigInputTab() || {}
     this.buildOutputOrder(dm, oo)
     this.buildOutputLegends(d)
     this.buildConfigOutputTab(dm)
@@ -1107,7 +1126,11 @@ export default class Indicator extends Overlay {
 
     let i = 0
     for (let o of this.definition.meta.output) {
-      if (o.type == "overlay") continue
+      let entry = this.overlay.data[c]
+      if (o.type == "overlay" ||
+          !isArray(entry) ||
+          entry.length == 0
+          ) continue
 
       labels[i] = false
       inputs[o.name] = this.scale.nicePrice(this.overlay.data[c][i+1])
@@ -1127,6 +1150,8 @@ export default class Indicator extends Overlay {
   }
 
   indicatorInput(start, end) {
+    let gaps = this.core.state.gaps.list
+    let raw, val;
     let input = {
       inReal: [],
       open: [],
@@ -1135,8 +1160,16 @@ export default class Indicator extends Overlay {
       close: [],
       volume: []
     }
+
     do {
-      let val = this.range.value(start)
+      raw = this.range.value(start)
+      if (this.#gapFill && `${raw[0]}` in gaps) {
+        // gap entry null values
+        val = gaps[`${raw[0]}`]
+        // this.#gaps.add(raw[0])
+      }
+      else val = raw
+
       input.inReal.push(val[OHLCV.c])
       input.open.push(val[OHLCV.o])
       input.high.push(val[OHLCV.h])
@@ -1216,11 +1249,11 @@ export default class Indicator extends Overlay {
  * Calculate indicator values for chart history - partial or entire
  * @param {string|function} indicator - the TALib function to call
  * @param {object} params - parameters for the TALib function
- * @param {object} range - range instance or definition
- * @param {object} output - output definition
+ * @param {Range} range - range instance or definition
+ * @param {Array.<Number>} [update] - timestamps of updated price history
  * @returns {array|boolean} - success or failure
  */
-  calcIndicator (indicator, params={}, range, output=this.definition.output) {
+  calcIndicator (indicator, params={}, range, update) {
 
     let indicatorFn;
     if (!this.noCalcCustom(indicator))
@@ -1252,7 +1285,6 @@ export default class Indicator extends Overlay {
     // check if a full or only partial calculation is required
     if (!isArray(od)) return false
     // full calculation required
-    // full calculation required
     else if (od.length == 0) { }
     // partial calculation required
     else if (od.length + t !== range.dataLength) {
@@ -1270,6 +1302,14 @@ export default class Indicator extends Overlay {
       }
       // something is wrong
       else return false
+    }
+    // updated span of price history?
+    else if (isArrayOfType(update, "integer")) {
+console.log("updating a chunk of indicator history", update)
+      start = this.Timeline.t2Index(update[0])
+      end = this.Timeline.t2Index(update[update.length-1]) - t
+      if (end - start < t)
+        start = (start - t < 0) ? 0 : start - t
     }
     // up to date, no need to calculate
     else return false
@@ -1291,7 +1331,7 @@ export default class Indicator extends Overlay {
       input = this.indicatorInput(start, start + t)
       params = {...params, ...input}
       // let hasNull = params.inReal.find(element => element === null)
-      // if (hasNull) return false
+      // if (hasNull) return
 
       entry = indicatorFn(params)
       value = this.formatValue(entry)
@@ -1302,14 +1342,15 @@ export default class Indicator extends Overlay {
 
       start++
     }
+    // this.#gaps = new Set([...this.#gaps].sort())
     return data
   }
 
   /**
    * calculate back history if missing
-   * @memberof indicator
+   * @param {Array.<Number>} update - timestamps of updated price history
    */
-  calcIndicatorHistory (calcFn) {
+  calcIndicatorHistory (update) {
     const calc = () => {
       let od = this.overlay.data
 
@@ -1320,9 +1361,9 @@ export default class Indicator extends Overlay {
       // let pane = (this.isPrimary) ? "primary" : "secondary"
       // this.range.allData[`${pane}Pane`].push()
 
-      const data = this.calcIndicator(this.libName, this.definition.input, this.range);
+      const data = this.calcIndicator(this.libName, this.definition.input, this.range, update);
 
-      if (data) {
+      if (isArray(data)) {
         const d = new Set(data)
         const o = new Set(od)
         let a, p, r = {}, s;
@@ -1331,6 +1372,7 @@ export default class Indicator extends Overlay {
             this.overlay.data = data
             return
         }
+        else if (!data.length) return
         else if (data[0][0] < od[0][0]) {
           // s = new Set([...d, ...o])
           // this.overlay.data = Array.from(s)
@@ -1461,7 +1503,10 @@ export default class Indicator extends Overlay {
     let plots = []
 
     while(j) {
-      if (k < 0 || k >= data.length) {
+      if (k < 0 || 
+          k >= data.length ||
+          !isArray(data[k])
+          ) {
         plots.push({x: null, y: null})
       }
       else {
@@ -1609,3 +1654,8 @@ const out = {
   }
 }
 
+export function indicatorHashKey(params) {
+  const objStr = JSON.stringify(params)
+  const hash = cyrb53(objStr)
+  return `${SHORTNAME}_Indicator_${hash}`
+}

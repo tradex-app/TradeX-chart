@@ -32,7 +32,7 @@ export default class Divider {
 
   static create(widgets, config) {
 
-    const id = `${config.core.id}_divider_${++Divider.divideCnt}`
+    const id = `${config.core.ID}_divider_${++Divider.divideCnt}`
     config.id = id
 
     // add entry
@@ -141,7 +141,7 @@ export default class Divider {
     this.#cursorPos = this.#core.MainPane.cursorPos // [e.position.x, e.position.y]
     this.#elDivider.style.background = this.#theme.divider.active
     this.emit(`${this.id}_pointerdrag`, this.#cursorPos)
-    this.emit(`divider_pointerdrag`, {
+    this.emit(`divider_pointerDrag`, {
       id: this.id,
       e: e,
       pos: this.#cursorPos,
@@ -155,7 +155,7 @@ export default class Divider {
     this.#elDivider.style.background = this.#theme.divider.idle
     this.#cursorPos = this.#core.MainPane.cursorPos // [e.position.x, e.position.y]
     this.emit(`${this.id}_pointerdragend`, this.#cursorPos)
-    this.emit(`divider_pointerdragend`, {
+    this.emit("divider_pointerDragEnd", {
       id: this.id,
       e: e,
       pos: this.#cursorPos,

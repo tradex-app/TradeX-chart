@@ -6,12 +6,15 @@
 import Indicator from "../components/overlays/indicator"
 import { SMA as talibAPI } from "../definitions/talib-api";
 
+let nameShort = "SMA"
+let nameLong =  'Simple Moving Average'
+
  
  export default class SMA extends Indicator {
 
-  get name() { return 'Simple Moving Average' }
-  shortName = 'SMA'
-  libName = 'SMA'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   definition = {
     input: {
       inReal: [], 
@@ -26,7 +29,8 @@ import { SMA as talibAPI } from "../definitions/talib-api";
   primaryPane = true
   scaleOverlay = false
 
-  
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = true

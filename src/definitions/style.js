@@ -22,6 +22,7 @@ const FONTWEIGHT = "normal"
 const FONTSIZE = 12
 const FONTSTYLE = "normal"
 const FONTFAMILY = "Avenir, Helvetica, Arial, sans-serif"
+const FONTFAMILYMONO = "Andalé, Lucida, Monaco, Courier"
 const COLOUR_BG = "#141414"
 const COLOUR_BORDER = "#333"
 const COLOUR_TXT = "#cccccc"
@@ -149,9 +150,9 @@ export const YAxisType = {
 
 export const YAxisFontSizeFactor = 1.75
 
-const YAxisStyle_FONTWEIGHT = FONTWEIGHT
-const YAxisStyle_FONTSIZE = FONTSIZE
-const YAxisStyle_FONTFAMILY = FONTFAMILY
+const YAxisStyle_FONTWEIGHT = 500 // FONTWEIGHT
+const YAxisStyle_FONTSIZE = FONTSIZE+2
+const YAxisStyle_FONTFAMILY = FONTFAMILYMONO
 
 export const YAxisStyle = {
   COLOUR_TICK: "#888",
@@ -165,9 +166,9 @@ export const YAxisStyle = {
   FONT_LABEL_BOLD: `bold ${YAxisStyle_FONTSIZE}px ${YAxisStyle_FONTFAMILY}`
 }
 
-const XAxisStyle_FONTWEIGHT = FONTWEIGHT
-const XAxisStyle_FONTSIZE = FONTSIZE
-const XAxisStyle_FONTFAMILY = FONTFAMILY
+const XAxisStyle_FONTWEIGHT = 500 // FONTWEIGHT
+const XAxisStyle_FONTSIZE = FONTSIZE+2
+const XAxisStyle_FONTFAMILY = FONTFAMILYMONO
 
 export const XAxisStyle = {
   COLOUR_TICK: "#888",
@@ -201,7 +202,7 @@ export const DividerStyle = {
   ACTIVE: "#888888C0",
   IDLE: "#FFFFFF00",
   LINE: GlobalStyle.COLOUR_BORDER,
-  STYLE: "1px solid"
+  STYLE: "2px solid"
 }
 
 export const watermark = {
@@ -238,6 +239,9 @@ const tradeIcons = { arrowDown, arrowUp, arrowDownRound, arrowUpRound, arrowDown
 const eventIcons = { noteSolid, lightning }
 
 export const defaultTheme = {
+  title: {
+    display: true,
+  },
   candle: {
     Type: CandleType.CANDLE_SOLID,
     UpBodyColour: CandleStyle.COLOUR_CANDLE_UP,
@@ -301,7 +305,7 @@ export const defaultTheme = {
   },
   time: {
     navigation: false,
-    font: LegendStyle.font,
+    font: FONTFAMILYMONO,
     colour: "#96a9db",
     handleColour: "#586ea6",
   },

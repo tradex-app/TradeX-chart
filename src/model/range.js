@@ -1,24 +1,27 @@
 // range.js
 
 import TradeXchart from "../core"
-import { ms2Interval, TimeData } from "../utils/time"
+import { interval2MS, isValidTimestamp, ms2Interval, TimeData } from "../utils/time"
 import { DEFAULT_TIMEFRAMEMS, LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS, INTITIALCNT, DEFAULT_TIMEFRAME } from "../definitions/chart"
-import { isInteger, isNumber, isObject, isString } from "../utils/typeChecks"
+import { isArray, isInteger, isNumber, isObject, isString } from "../utils/typeChecks"
 import { bRound, limit } from "../utils/number"
-import { diff } from "../utils/utilities"
+import { diff, uid } from "../utils/utilities"
+import { SHORTNAME } from "../definitions/core"
 // import WebWorker from "./webWorkers"
 // import WebWorker from "./webWorkers4"
 
 export class Range {
 
+  #id
   #core
+  #state
   #worker
   #init = true
   #indexed = false
   #interval = DEFAULT_TIMEFRAMEMS
   #intervalStr = DEFAULT_TIMEFRAME
-  indexStart = 0
-  indexEnd = LIMITFUTURE
+  #indexStart = 0
+  #indexEnd = LIMITFUTURE
   valueMin = 0
   valueMax = 1
   valueDiff = 1
@@ -29,16 +32,13 @@ export class Range {
   valueMaxIdx = 0
   volumeMinIdx = 0
   volumeMaxIdx = 0
-  secondaryMaxMin = {}
-  old = {}
+  #secondaryMaxMin = {}
+  #old = {}
   #initialCnt = INTITIALCNT
   #limitFuture = LIMITFUTURE
   #limitPast = LIMITPAST
   #minCandles = MINCANDLES
-  #maxCandles = 
-      this.#core?.MainPane?.graph?.width || 
-      this.#core?.parentElement.clientWidth || 
-      MAXCANDLES;
+  #maxCandles = MAXCANDLES;
   #yAxisBounds = YAXIS_BOUNDS
   anchor
 
@@ -47,42 +47,32 @@ export class Range {
    * Creates an instance of Range.
    * @param {number} start - initial index start
    * @param {number} end - initial index end
-   * @param {Object} [config={}] - range config
+   * @param {Object} config - range config
+   * @param {TradeXchart} config.core
+   * @param {State} config.state
+   * @param {Number} config.startTS
+   * @param {Number} config.interval
+   * @param {Number} config.initialCnt
+   * @param {Number} config.limitFuture
+   * @param {Number} config.limitPast
+   * @param {Number} config.minCandles
+   * @param {Number} config.maxCandles
+   * @param {Number} config.yAxisBounds
    * @memberof Range
    */
-  constructor( start, end, config={}) {
-    if (!isObject(config)) return false
-    if (!(config?.core instanceof TradeXchart)) return false
+  constructor( start, end, config) {
+    if (!isObject(config) ||
+        !(config?.core instanceof TradeXchart))
+        throw new Error(`Range requires a config`)
 
+    this.#id = uid(`${SHORTNAME}_Range`)
     this.#init = true;
     this.setConfig(config)
-    this.#core = config.core;
 
-    // initial range length
-    this.#initialCnt = 
-      this.#core.config?.range?.initialCnt || 
-      config.data?.initialCnt ||
-      this.#initialCnt;
-
-    // start sanity check
-    if (!isInteger(start) || this.isPastLimit(start))
-      start = this.data.length - this.#initialCnt
-    // end sanity check
-    if (!isInteger(end) || this.isFutureLimit(end))
-      end = this.data.length
-    // range length sanity check
-    if (end - start > this.#maxCandles)
-      end = end - ((end - start) - this.#maxCandles)
-
-    const MaxMinPriceVolStr = `
-    (input) => {
-      return maxMinPriceVol(input)
-    }
-    function ${this.maxMinPriceVol.toString()}
-  `
-    // this.#worker = this.#core.worker.create(MaxMinPriceVolStr, "range")
-
-    const tf = config?.interval || DEFAULT_TIMEFRAMEMS
+    let tf;
+    if (isInteger(config?.interval)) tf = config.interval
+    else if (isString(config?.interval)) tf = interval2MS(config?.interval)
+    else tf = DEFAULT_TIMEFRAMEMS
 
     // no data - use provided time frame / interval
     if (this.data.length == 0) {
@@ -90,7 +80,7 @@ export class Range {
       start = this.rangeLimit * -2
       end = this.rangeLimit * 2
       this.#interval = tf
-      this.#intervalStr = ms2Interval(this.interval)
+      this.#intervalStr = ms2Interval(this.#interval)
       this.anchor = ts - (ts % tf) // - (this.limitPast * this.#interval)
     } 
     // nimimum of two entries to calculate time frame / interval
@@ -103,6 +93,23 @@ export class Range {
       this.#interval = detectInterval(this.data)
       this.#intervalStr = ms2Interval(this.interval)
     }
+    
+    // use timestamp start if available
+/*    if (isValidTimestamp(config?.startTS)) {
+      let time = new TimeData(this)
+      start = calcTimeIndex(time, config.startTS) || start
+    }
+*/
+    // start sanity check
+    if (!isInteger(start) || this.isPastLimit(start))
+      start = this.data.length - this.#initialCnt
+    // end sanity check
+    if (!isInteger(end) || this.isFutureLimit(end))
+      end = this.data.length
+    // range length sanity check
+    if (end - start > this.#maxCandles)
+      end = end - ((end - start) - this.#maxCandles)
+
     // adjust range end if out of bounds
     if (end == 0 && this.data.length >= this.rangeLimit)
       end = this.rangeLimit
@@ -110,9 +117,19 @@ export class Range {
       end = this.data.length
 
     this.set(start, end)
+
+    const MaxMinPriceVolStr = `
+    (input) => {
+      return maxMinPriceVol(input)
+    }
+    function ${this.maxMinPriceVol.toString()}
+  `
+    // this.#worker = this.#core.worker.create(MaxMinPriceVolStr, "range")
+
   }
 
-  get allData () { return this.#core?.state.allData }
+  get id () { return this.#id }
+  get allData () { return this.#state.allData }
   get data () { return this.allData?.data || [] }
   get dataLength () { return (!!this.allData?.data.length) ? this.allData.data.length - 1 : 0 }
   get Length () { return this.indexEnd - this.indexStart }
@@ -128,9 +145,13 @@ export class Range {
   get intervalStr () { return this.#intervalStr }
   get timeFrame () { return this.#intervalStr }
   get timeFrameMS () { return this.#interval }
+  get indexStart () { return this.#indexStart }
+  get indexEnd () { return this.#indexEnd }
   get indexed () { return this.#indexed }
-  get pastLimitIndex () { return this.limitPast * -1 }
-  get futureLimitIndex () { return this.dataLength + this.limitFuture - 1 }
+  get indexEndTS() { return this.value(this.indexEnd)[0] }
+  get indexStartTS() { return this.value(this.indexStart)[0] }
+  get indexPastLimit () { return this.limitPast * -1 }
+  get indexFutureLimit () { return this.dataLength + this.limitFuture - 1 }
   set initialCnt (c) { if (isInteger(c)) this.#initialCnt = c }
   get initialCnt () { return this.#initialCnt }
   get limitFuture () { return this.#limitFuture }
@@ -139,7 +160,8 @@ export class Range {
   get maxCandles () { return this.#maxCandles }
   get yAxisBounds () { return this.#yAxisBounds }
   get rangeLimit () { return this.#limitFuture }
-  get diff () { return this.max - this.min }
+  get secondaryMaxMin () { return this.#secondaryMaxMin }
+  get diff () { return this?.valueDiff }
 
   end() {
     // WebWorker.destroy(this.#worker.id)
@@ -147,12 +169,12 @@ export class Range {
 
   isFutureLimit(idx=this.indexEnd) {
     if (!isInteger(idx)) return
-    return (idx > this.futureLimitIndex)
+    return (idx > this.indexFutureLimit)
   }
 
   isPastLimit(idx=this.indexStart) {
     if (!isInteger(idx)) return
-    return (idx < this.pastLimitIndex)
+    return (idx < this.indexPastLimit)
   }
 
   /**
@@ -190,19 +212,19 @@ export class Range {
     const oldEnd = this.indexEnd
       let inOut = this.Length
 
-    this.indexStart = start
-    this.indexEnd = end
+    this.#indexStart = start
+    this.#indexEnd = end
 
     inOut -= this.Length
 
-    this.setConfig({maxCandles: max})
+    this.setMaxCandles(max)
     this.setAllMaxMin()
 
-    // if (this.#init || this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
-    //   this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
-    // }
+    if (this.#init || this.#old.valueMax != this.valueMax || this.#old.valueMin != this.valueMin) {
+      this.#core.emit("range_valueMaxMin", {max: this.valueMax, min: this.valueMin})
+    }
 
-    this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
+    this.#core.emit("range_set", [newStart, newEnd, oldStart, oldEnd])
 
     // if (this.#init) this.#init = false
 
@@ -213,11 +235,11 @@ export class Range {
     // .then(maxMin => {
     //   this.setMaxMin(maxMin)
 
-    //   if (this.old.priceMax != this.priceMax || this.old.priceMin != this.priceMin) {
+    //   if (this.#old.priceMax != this.priceMax || this.#old.priceMin != this.priceMin) {
     //     this.#core.emit("range_priceMaxMin", [this.priceMax, this.priceMin])
     //   }
 
-    //   this.#core.emit("setRange", [newStart, newEnd, oldStart, oldEnd])
+    //   this.#core.emit("range_set", [newStart, newEnd, oldStart, oldEnd])
     //   this.#core.emit("chart_zoom", [newStart, newEnd, oldStart, oldEnd, inOut])
     //   this.#core.emit(`chart_zoom_${inOut}`, [newStart, newEnd, oldStart, oldEnd])
     // })
@@ -225,20 +247,46 @@ export class Range {
     // return true
   }
 
+  /**
+   * Configure Range
+   * @param {Object} config 
+   * @param {TradeXchart} config.core
+   * @param {State}  config.state
+   * @param {Number} config.initialCnt
+   * @param {Number} config.limitFuture
+   * @param {Number} config.limitPast
+   * @param {Number} config.minCandles
+   * @param {Number} config.maxCandles
+   * @param {Number} config.yAxisBounds
+   * @returns 
+   */
   setConfig(config) {
-    if (!isObject(config)) return false
-
-    this.#initialCnt = (isInteger(config?.initialCnt)) ? config.initialCnt : INTITIALCNT;
+    let state = config?.state
+    // if ((state?.constructor?.name != `State`)) throw new Error(`Range requires a valid State`)
+    this.#state = state
+    let core = config?.core
+    if (!(core instanceof TradeXchart)) throw new Error(`Range requires a valid TradeXchart instance`)
+    this.#core = core
+    let initialCnt = (isInteger(config?.initialCnt)) ? config.initialCnt : INTITIALCNT;
+    this.#initialCnt = this.#core.config?.range?.initialCnt || initialCnt
     this.#limitFuture = (isInteger(config?.limitFuture)) ? config.limitFuture : LIMITFUTURE;
     this.#limitPast = (isInteger(config?.limitPast)) ? config.limitPast : LIMITPAST;
-    this.#minCandles = (isInteger(config?.minCandles)) ? config.minCandles : MINCANDLES;
-    this.#maxCandles = (isInteger(config?.maxCandles)) ? config.maxCandles : MAXCANDLES;
     this.#yAxisBounds = (isNumber(config?.yAxisBounds)) ? config.yAxisBounds : YAXIS_BOUNDS;
+    this.#minCandles = (isInteger(config?.minCandles)) ? config.minCandles : MINCANDLES;
+    this.setMaxCandles(config?.maxCandles)
+  }
+
+  setMaxCandles ( max ) {
+    let maxCandles = 
+      this.#core?.MainPane?.graph?.width || 
+      Math.floor(this.#core?.parentElement?.clientWidth) || 
+      MAXCANDLES;
+    this.#maxCandles = (isInteger(max)) ? max : maxCandles;
   }
 
   setMaxMin ( maxMin ) {
     for (let m in maxMin) {
-      this.old[m] = this[m]
+      this.#old[m] = this[m]
       this[m] = maxMin[m]
     }
     this.scale = (this.dataLength != 0) ? this.Length / this.dataLength : 1
@@ -434,31 +482,35 @@ export class Range {
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
 
-    let valueMin  = data[i][3]
-    let valueMax  = data[i][2]
-    let volumeMin = data[i][5]
-    let volumeMax = data[i][5]
+    let valueMin  = data[i][3] || Infinity
+    let valueMax  = data[i][2] || -Infinity
+    let volumeMin = data[i][5] || Infinity
+    let volumeMax = data[i][5] || -Infinity
 
     let valueMinIdx  = i
     let valueMaxIdx  = i
     let volumeMinIdx = i
     let volumeMaxIdx = i
+    let val;
 
     while (i++ < c) {
-      if (data[i][3] < valueMin) {
-        valueMin = data[i][3]
+      val = data[i][3]
+      if (isNumber(val) && val < valueMin) {
+        valueMin = val
         valueMinIdx = i
       }
-      if (data[i][2] > valueMax) {
-        valueMax = data[i][2]
+      val = data[i][2]
+      if (isNumber(val) && val > valueMax) {
+        valueMax = val
         valueMaxIdx = i
       }
-      if (data[i][5] < volumeMin) {
-        volumeMin = data[i][5]
+      val = data[i][5]
+      if (isNumber(val) && val < volumeMin) {
+        volumeMin = val
         volumeMinIdx = i
       }
-      if (data[i][5] > volumeMax) {
-        volumeMax = data[i][5]
+      if (isNumber(val) && val > volumeMax) {
+        volumeMax = val
         volumeMaxIdx = i
       }
     }
@@ -493,9 +545,9 @@ export class Range {
   }
 
   maxMinDatasets() {
-    if (this.allData.secondaryPane.length == 0) return
+    if (!this.allData?.secondaryPane?.length) return
 
-    let old = Object.keys(this.secondaryMaxMin) || []
+    let old = Object.keys(this.#secondaryMaxMin) || []
 
     // iterate over secondary panes
     for (let p of this.allData.secondaryPane) {
@@ -507,7 +559,7 @@ export class Range {
         that: this
       }
       // current or new entry
-      this.secondaryMaxMin[p.id] = this.maxMinData(input)
+      this.#secondaryMaxMin[p.id] = this.maxMinData(input)
       // leave only old entries to remove
       if (index !== -1) {
         old.splice(index, 1);
@@ -516,7 +568,7 @@ export class Range {
     }
     // clean up old entries
     for (let del of old) {
-      delete this.secondaryMaxMin[del]
+      delete this.#secondaryMaxMin[del]
     }
     
   }
@@ -563,13 +615,14 @@ export class Range {
 
     // iterate over indicator outputs
     for (let d in r) {
-      max = data[i][f]
-      min = data[i][f]
+      max = data[i][f] || -Infinity
+      min = data[i][f] || Infinity
       j = i
 
       // iterate over range for indicator output
       while (j++ < c) {
         v = data[j][f]
+        if (!isNumber) continue
         if (v <= min) {
           r[d].min = v
           r[d].minIdx = j
@@ -599,22 +652,23 @@ export class Range {
   }
 
   snapshot(start, end) {
-    return {
-      snapshot: true,
-      ts: Date.now(),
+    let data = this.export()
+        data.snapshot = true
+        data.ts = Date.now()
+        data.data = this.data
+        data.dataLength = this.dataLength
+        data.Length = this.Length
+    return data
+  }
 
-      data: this.data,
-      dataLength: this.dataLength,
-      Length: this.Length,
-      timeDuration: this.timeDuration,
-      timeMin: this.timeMin,
-      timeMax: this.timeMax,
-      rangeDuration: this.rangeDuration,
-      timeStart: this.timeStart,
-      timeFinish: this.timeFinish,
-      interval: this.interval,
-      intervalStr: this.intervalStr 
+  export(exclude) {
+    let data = {}
+    exclude = (isArray(exclude)) ? exclude : []
+    for (let c of copy) {
+      if (!exclude.includes(c))
+        data[c] = this[c]
     }
+    return data
   }
 } // end class
 
@@ -624,6 +678,9 @@ export class Range {
  * @returns {number} - milliseconds
  */
 export function detectInterval(ohlcv) {
+
+  if (!isArray(ohlcv) ||
+      ohlcv.length < 2) return Infinity
 
   let len = Math.min(ohlcv.length - 1, 99)
   let min = Infinity
@@ -642,15 +699,15 @@ export function detectInterval(ohlcv) {
  * Calculate the index for a given time stamp
  * @param {TimeData} time - TimeData instance provided by core
  * @param {number} timeStamp
- * @returns {number|boolean}
+ * @returns {number|undefined}
  */
 export function calcTimeIndex(time, timeStamp) {
-  if (!(time instanceof TimeData)) return false
+  if (!(time instanceof TimeData)) return undefined
 
   const data = time.range.data || []
   const len = data.length
 
-  if (!isInteger(timeStamp)) {
+  if (!isValidTimestamp(timeStamp)) {
     if (!isInteger(data[len-1][0]))
       timeStamp = Date.now()
     else
@@ -662,7 +719,7 @@ export function calcTimeIndex(time, timeStamp) {
   timeStamp = timeStamp - (timeStamp % timeFrameMS)
 
   if (data.length === 0)
-    index = false
+    index = undefined
   else if (timeStamp === data[0][0])
     index = 0
   else if (timeStamp < data[0][0]) 
@@ -672,3 +729,45 @@ export function calcTimeIndex(time, timeStamp) {
 
   return index
 }
+
+const copy = [
+  "indexEnd",
+  "indexStart",
+  "scale",
+  "secondaryMaxMin",
+  "valueDiff",
+  "valueHi",
+  "valueLo",
+  "valueMax",
+  "valueMaxIdx",
+  "valueMin",
+  "valueMinIdx",
+  "volumeDiff",
+  "volumeMax",
+  "volumeMaxIdx",
+  "volumeMin",
+  "volumeMinIdx",
+
+  "diff",
+  "indexFutureLimit",
+  "id",
+  "indexed",
+  "initialCnt",
+  "interval",
+  "intervalStr",
+  "limitFuture",
+  "limitPast",
+  "maxCandles",
+  "minCandles",
+  "indexPastLimit",
+  "rangeDuration",
+  "rangeLimit",
+  "timeDuration",
+  "timeFinish",
+  "timeFrame",
+  "timeFrameMS",
+  "timeMax",
+  "timeMin",
+  "timeStart",
+  "yAxisBounds",
+]

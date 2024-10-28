@@ -45,46 +45,52 @@ export const TIMEUNITSVALUESLONG = {
 }
 export const TIMEUNITSVALUES = { ...TIMEUNITSVALUESSHORT, ...TIMEUNITSVALUESLONG }
 export const TIMESCALESVALUES = {
-  YEARS10: [ YEAR_MS * 10, "years" ],
-  YEARS5: [ YEAR_MS * 5, "years" ],
-  YEARS3: [ YEAR_MS * 3, "years" ],
-  YEARS2: [ YEAR_MS * 2, "years" ],
-  YEARS: [ YEAR_MS, "years" ],
-  MONTH6: [ MONTHR_MS * 6, "months" ],
-  MONTH4: [ MONTHR_MS * 4, "months" ],
-  MONTH3: [ MONTHR_MS * 3, "months" ],
-  MONTH2: [ MONTHR_MS * 2, "months" ],
-  MONTH: [ MONTHR_MS, "months" ],
-  DAY15: [ DAY_MS * 15, "years" ],
-  DAY10: [ DAY_MS * 10, "days" ],
-  DAY7: [ DAY_MS * 7, "days" ],
-  DAY5: [ DAY_MS * 5, "days" ],
-  DAY3: [ DAY_MS * 3, "days" ],
-  DAY2: [ DAY_MS * 2, "days" ],
-  DAY: [ DAY_MS, "days" ],
-  HOUR12: [ HOUR_MS * 12, "hours" ],
-  HOUR6: [ HOUR_MS * 6, "hours" ],
-  HOUR4: [ HOUR_MS * 4, "hours" ],
-  HOUR2: [ HOUR_MS * 2, "hours" ],
-  HOUR: [ HOUR_MS, "hours" ],
-  MINUTE30: [ MINUTE_MS * 30, "minutes" ],
-  MINUTE15: [ MINUTE_MS * 15, "minutes" ],
-  MINUTE10: [ MINUTE_MS * 10, "minutes" ],
-  MINUTE5: [ MINUTE_MS * 5, "minutes" ],
-  MINUTE2: [ MINUTE_MS * 2, "minutes" ],
-  MINUTE: [ MINUTE_MS, "minutes" ],
-  SECOND30: [ SECOND_MS * 30, "seconds" ],
-  SECOND15: [ SECOND_MS * 15, "seconds" ],
-  SECOND10: [ SECOND_MS * 10, "seconds" ],
-  SECOND5: [ SECOND_MS * 5, "seconds" ],
-  SECOND2: [ SECOND_MS * 2, "seconds" ],
-  SECOND: [ SECOND_MS, "seconds" ],
-  MILLISECOND500: [ MILLISECOND * 500, "milliseconds" ],
-  MILLISECOND250: [ MILLISECOND * 250, "milliseconds" ],
-  MILLISECOND100: [ MILLISECOND * 100, "milliseconds" ],
-  MILLISECOND50: [ MILLISECOND * 50, "milliseconds" ],
-  MILLISECOND: [ MILLISECOND, "milliseconds" ],
+  YEARS10: [ YEAR_MS * 10, "years", 10 ],
+  YEARS5: [ YEAR_MS * 5, "years", 5 ],
+  YEARS3: [ YEAR_MS * 3, "years", 3 ],
+  YEARS2: [ YEAR_MS * 2, "years", 2 ],
+  YEARS: [ YEAR_MS, "years", 1 ],
+  MONTH6: [ MONTHR_MS * 6, "months", 6 ],
+  MONTH4: [ MONTHR_MS * 4, "months", 4 ],
+  MONTH3: [ MONTHR_MS * 3, "months", 3 ],
+  MONTH2: [ MONTHR_MS * 2, "months", 2 ],
+  MONTH: [ MONTHR_MS, "months", 1 ],
+  DAY15: [ DAY_MS * 15, "years", 15 ],
+  DAY10: [ DAY_MS * 10, "days", 10 ],
+  DAY7: [ DAY_MS * 7, "days", 7 ],
+  DAY5: [ DAY_MS * 5, "days", 5 ],
+  DAY3: [ DAY_MS * 3, "days", 3 ],
+  DAY2: [ DAY_MS * 2, "days", 2 ],
+  DAY: [ DAY_MS, "days", 1 ],
+  HOUR12: [ HOUR_MS * 12, "hours", 12 ],
+  HOUR6: [ HOUR_MS * 6, "hours", 6 ],
+  HOUR4: [ HOUR_MS * 4, "hours", 4 ],
+  HOUR3: [ HOUR_MS * 3, "hours", 3 ],
+  HOUR2: [ HOUR_MS * 2, "hours", 2 ],
+  HOUR: [ HOUR_MS, "hours", 1 ],
+  MINUTE30: [ MINUTE_MS * 30, "minutes", 30 ],
+  MINUTE15: [ MINUTE_MS * 15, "minutes", 15 ],
+  MINUTE10: [ MINUTE_MS * 10, "minutes", 10 ],
+  MINUTE5: [ MINUTE_MS * 5, "minutes", 5 ],
+  MINUTE3: [ MINUTE_MS * 3, "minutes", 3 ],
+  MINUTE2: [ MINUTE_MS * 2, "minutes", 2 ],
+  MINUTE: [ MINUTE_MS, "minutes", 1 ],
+  SECOND30: [ SECOND_MS * 30, "seconds", 30 ],
+  SECOND15: [ SECOND_MS * 15, "seconds", 15 ],
+  SECOND10: [ SECOND_MS * 10, "seconds", 10 ],
+  SECOND5: [ SECOND_MS * 5, "seconds", 5 ],
+  SECOND2: [ SECOND_MS * 2, "seconds", 2 ],
+  SECOND: [ SECOND_MS, "seconds", 1 ],
+  MILLISECOND500: [ MILLISECOND * 500, "milliseconds", 500 ],
+  MILLISECOND250: [ MILLISECOND * 250, "milliseconds", 250 ],
+  MILLISECOND100: [ MILLISECOND * 100, "milliseconds", 100 ],
+  MILLISECOND50: [ MILLISECOND * 50, "milliseconds", 50 ],
+  MILLISECOND: [ MILLISECOND, "milliseconds", 1 ],
 }
+export const TIMEFRAMEMIN = MINUTE_MS
+export const INTERVALMIN = TIMEFRAMEMIN
+export const TIMEFRAMEMAX = TIMESCALESVALUES.YEARS10[0]
+export const INTERVALMAX = TIMEFRAMEMAX
 const timeScales = () => {
   const values = Object.values(TIMESCALESVALUES)
   const vals = []
@@ -136,11 +142,25 @@ export function buildSubGrads() {
 }
 
 
+/**
+ * Test if valid timestamp or date/time string
+ * @export
+ * @param {Number|String} ts - unix timestamp or date/time string
+ * @return {Boolean}
+ */
 export function isValidTimestamp( ts ) {
   const date = new Date(ts)
-  return (date instanceof Date && !isNaN(date.valueOf())  && isFinite(date.valueOf()));
+  return (date instanceof Date && !isNaN(date.valueOf()) && isFinite(date.valueOf()));
 }
 
+/**
+ * Test if timestamp or date/time string is in the range of BTC genesis and not greater than end
+ * @export
+ * @param {Number|String} time - unix timestamp or date/time string
+ * @param {Number|String} [start=BTCGENESIS] - unix timestamp or date/time string
+ * @param {Number|String} [end=Date.now()] - unix timestamp or date/time string
+ * @return {Boolean}
+ */
 export function isValidTimeInRange( time, start=BTCGENESIS,end=Date.now() ) {
   if (!isValidTimestamp(time)) return false
   return (time > start && time < end) ? true : false
@@ -227,6 +247,15 @@ export function timestampDifference(date1,date2) {
   }
 }
 
+  export function isTimeFrameMS(ms) {
+    return (
+        isInteger(ms) &&
+        !(ms < SECOND_MS) &&
+        !(ms === Infinity)
+    )
+  }
+
+
 /**
  *
  * @export
@@ -242,6 +271,10 @@ export function isTimeFrame(tf) {
       ms = SECOND_MS
       tf = "1s"
     }
+  }
+  else if (isInteger(tf)) {
+    ms = tf
+    tf = ms2Interval(tf)
   }
   else tf = "1s"
   return {tf, ms}
@@ -552,6 +585,12 @@ export class TimeData {
   #range = {}
   #timeZoneOffset = getTimezoneOffset()
   #timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  
+  static timeUnits = TIMEUNITS
+  static timeUnitsLong = TIMEUNITSLONG
+  static timeUnitsValues = TIMESCALESVALUES
+  static timeScaleValues = TIMESCALESVALUES
+  static BTCGenesis = BTCGENESIS
 
   constructor(range) {
     if (range instanceof Range) this.#range = range
@@ -565,6 +604,7 @@ export class TimeData {
   get timeZone() { return this.#timeZone }
   set timeZoneOffset(z) { this.#timeZoneOffset = (isNumber(z)) ? z : new Date().getTimezoneOffset() }
   get timeZoneOffset() { return this.#timeZoneOffset }
+  get timeZoneLocal() { return getTimezone() }
   get indexed() { return this.#range.indexed }
 
   setTimeZone(z) {
@@ -574,12 +614,49 @@ export class TimeData {
     }
   }
 
-  getTimezoneOffset(timeZone, locale) {
-    getTimezoneOffset(timeZone, locale)
+  isValidTimestamp(ts) {
+    return isValidTimestamp(ts)
   }
 
-  getIANATimeZones(locale) {
-    IANATimeZones(locale)
+  isValidTimeInRange ( time, start=BTCGENESIS,end=Date.now() ) {
+    return isValidTimeInRange(time, start, end)
+  }
+
+  interval2MS (tf) {
+    return interval2MS(tf)
+  }
+
+  ms2Interval (ms) {
+    return ms2Interval(ms)
+  }
+
+
+  static timezoneLocal () {
+    return getTimezone()
+  }
+
+  static timezoneOffset (timeZone, locale) {
+    return getTimezoneOffset(timeZone, locale)
+  }
+
+  static IANATimeZone (locale) {
+    return IANATimeZones(locale)
+  }
+
+  static isValidTimestamp (ts) {
+    return isValidTimestamp(ts)
+  }
+
+  static isValidTimeInRange ( time, start=BTCGENESIS,end=Date.now() ) {
+    return isValidTimeInRange(time, start, end)
+  }
+
+  static interval2MS (tf) {
+    return interval2MS(tf)
+  }
+
+  static ms2Interval (ms) {
+    return ms2Interval(ms)
   }
 }
 

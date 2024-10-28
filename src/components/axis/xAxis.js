@@ -13,7 +13,7 @@ import {
   time_start,
   HM, MS,
   TIMESCALES, TIMESCALESRANK,
-  MINUTE_MS, HOUR_MS, DAY_MS,
+  MINUTE_MS, HOUR_MS, DAY_MS, get_dayName,
  } from "../../utils/time";
 
 export default class xAxis extends Axis {
@@ -161,11 +161,10 @@ export default class xAxis extends Axis {
         grads.entries[d] = [this.dateTimeValue(d, tf, rank), this.t2Pixel(d), d, "major"]
         prev = d
       }
-
-      // else if (!(t1 in grads.entries)) {
+      else {
         grads.entries[t1] = [this.dateTimeValue(t1, tf, rank), this.t2Pixel(t1), t1, "minor"]
         prev = t1
-      // }      
+      }      
 
       t1 += xStep
     }
@@ -198,6 +197,7 @@ export default class xAxis extends Axis {
 
   dateTimeValue(ts, tf, r) {
     let value
+    let locale
     if ((ts / DAY_MS) % 1 === 0) {
       const date = get_day(ts)
       if (date === 1) {
@@ -205,7 +205,10 @@ export default class xAxis extends Axis {
         if (month === 0) return get_year(ts)
         else return get_monthName(ts)
       }
-      else return date
+      else {
+        let day = get_dayName(ts, locale)
+        return `${day} ${date}`
+      }
     }
     else {
       switch (r) {

@@ -7,16 +7,19 @@ import Indicator from "../components/overlays/indicator"
 import { CMO as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "CMO"
+let nameLong = 'Chande Momentum Oscillator'
 
 export default class CMO extends Indicator {
 
-  get name() { return 'Chande Momentum Oscillator' }
-  shortName = 'CMO'
-  libName = 'CMO'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   precision = 2
   scaleOverlay = true
 
-  
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false

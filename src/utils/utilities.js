@@ -1,5 +1,5 @@
 import { isHTMLElement } from './DOM';
-import { isArray, isBoolean, isFunction, isMap, isNumber, isObject, isString } from './typeChecks'
+import { checkType, isArray, isBoolean, isFunction, isMap, isNumber, isObject, isString } from './typeChecks'
 
 let _hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -66,7 +66,7 @@ export function getPrototypeAt(level, obj) {
     const targetValue = target[key];
     const sourceValue = source[key];
 
-    if (Array.isArray(targetValue) && Array.isArray(sourceValue)) {
+    if (isArray(targetValue) && isArray(sourceValue)) {
       target[key] = mergeDeep(targetValue.concat([]), (sourceValue));
     } else if (isObject(targetValue) && isObject(sourceValue)) {
       target[key] = mergeDeep(Object.assign({}, targetValue), sourceValue);
@@ -96,7 +96,7 @@ export function copyDeep(obj, clone=true) {
   if (obj instanceof Date)
       temp = new obj.constructor(); //or new Date(obj);
   else
-      temp = Array.isArray(obj) ? [] : {}  // obj.constructor();
+      temp = isArray(obj) ? [] : {}  // obj.constructor();
 
   for (let key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
@@ -108,6 +108,12 @@ export function copyDeep(obj, clone=true) {
   return temp;
 }
 
+/**
+ * Deep object copy
+ * @export
+ * @param {Object} obj
+ * @return {Object}  
+ */
 export function doStructuredClone(obj) {
   try {
     return structuredClone(obj)
@@ -193,6 +199,16 @@ export function getProperty(obj, path) {
   return keys.reduce((o, key) =>
       (o && o[key] !== 'undefined') ? o[key] : undefined, obj);
 }
+
+export function objectValidate(o, v) {
+  for (let key of Object.keys(v)) {
+    if (checkType(v[key], o?.[key])) {
+      return false
+    }
+  }
+  return true
+}
+
 
 // https://www.30secondsofcode.org/js/s/data-structures-doubly-linked-list/
 export class DoubleLinkedList {
@@ -767,6 +783,18 @@ export function promiseState(p) {
 }
 
 /**
+ * Deferred Promise - resolve and reject can be invoked externally
+ */
+export class Deferred {
+  constructor() {
+    this.promise = new Promise((resolve, reject) => {
+      this.resolve = resolve;
+      this.reject = reject;
+    });
+  }
+}
+
+/**
  * array buffer to string (UTF-16)
  * @param {ArrayBuffer} buf - TypedArray
  * @return {string} 
@@ -998,3 +1026,59 @@ export class EventHandlers {
 
 }
 
+/**
+ * Generate a hash key with HMAC sha256
+ * https://stackoverflow.com/a/56416039/15109215
+ * @param {String} key 
+ * @param {String} message 
+ * @returns {Promise} - resolves to String
+ */
+export async function HMAC(key, message){
+  const g = str => new Uint8Array([...decodeURIComponent(encodeURIComponent(str))].map(c => c.charCodeAt(0))),
+  k = g(key),
+  m = g(message),
+  c = await crypto.subtle.importKey('raw', k, { name: 'HMAC', hash: 'SHA-256' },true, ['sign']),
+  s = await crypto.subtle.sign('HMAC', c, m);
+  return btoa(String.fromCharCode(...new Uint8Array(s)))
+}
+
+/**
+ * Strong SHA hash
+ * @param {String} m 
+ * @returns {Promise} - resolves to String
+ */
+export async function H(m) {
+  const msgUint8 = new TextEncoder().encode(m)                       
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8)          
+  const hashArray = Array.from(new Uint8Array(hashBuffer))                    
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+  return hashHex
+}
+
+/**
+ * A simple, *insecure* 32-bit hash that's short, fast, and has no dependencies.
+ * Output is always 7 characters.
+ * https://gist.github.com/jlevy/c246006675becc446360a798e2b2d781
+ * @param {String} str 
+ * @param {Number} seed 
+ * @returns {String} - hex hash
+ */
+export function cyrb53 (str, seed = 0) {
+  let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+  for(let i = 0, ch; i < str.length; i++) {
+      ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1  = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+  h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2  = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+  h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+
+  //return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+  //return [h2>>>0, h1>>>0];
+  // or
+  return (h2>>>0).toString(16).padStart(8,0)+(h1>>>0).toString(16).padStart(8,0);
+  // or 
+  //return 4294967296n * BigInt(h2) + BigInt(h1);
+};

@@ -9,14 +9,15 @@ import yAxis from "./axis/yAxis"
 import stateMachineConfig from "../state/state-scale"
 import Input from "../input"
 import {limitPrecision } from '../utils/number'
-import { copyDeep, xMap } from '../utils/utilities'
+import { doStructuredClone, xMap } from '../utils/utilities'
 import { STREAM_UPDATE } from "../definitions/core"
 import { calcTextWidth, createFont } from '../renderer/text'
 import Graph from "./views/classes/graph"
 import { ScaleCursor } from './overlays/chart-cursor'
 import ScaleLabels from './overlays/scale-labels'
 import ScaleOverly from './overlays/scale-overlays'
-import ScalePriceLine from './overlays/scale-priceLine'
+import ScalePriceLine, { priceLineTxtScaling } from './overlays/scale-priceLine'
+import { YAxisStyle } from "../definitions/style"
 
 
 const defaultOverlays = [
@@ -68,7 +69,7 @@ export default class ScaleBar extends Component {
 
   get name() { return this.#name }
   get shortName() { return this.#shortName }
-  set height(h) { this.setHeight(h) }
+  // set height(h) { this.setHeight(h) }
   get height() { return this.#element.getBoundingClientRect().height }
   get width() { return this.#element.getBoundingClientRect().width }
   get element() { return this.#element }
@@ -100,50 +101,39 @@ export default class ScaleBar extends Component {
 
 
   start() {
-    const range = (this.options.yAxisType === YAXIS_TYPE.default) ? 
-      undefined : this.parent.localRange
+
     const ctx = this.core.MainPane.graph.viewport.scene.context
     const t = this.theme.yAxis
+    this.setYAxis()
     ctx.font = createFont(t.fontSize, t.fontWeight, t.fontFamily)
     this.#digitW = calcTextWidth(ctx, "0")
-
-    this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
-
-    this.#yAxis.yAxisPadding = 
-        (isNumber(this.options?.yAxisPadding) &&
-        this.options.yAxisPadding >= 1) ?
-        this.options.yAxisPadding : 1
-
+    let w = this.calcScaleWidth()
+    this.setDimensions({w})
     this.createGraph()
     this.#yAxis.calcGradations()
     this.draw()
     this.eventsListen()
 
     // start State Machine 
-    const newConfig = copyDeep(stateMachineConfig)
+    const newConfig = doStructuredClone(stateMachineConfig)
     newConfig.id = this.id
     newConfig.context = this
     this.stateMachine = newConfig
     this.stateMachine.start()
   }
 
-  restart() {
-    // TODO: remove old overlays
-    // create and use new YAxis
-    this.#yAxis.setRange(this.core.range)
-    this.draw()
-  }
-
-  destroy() {
+  destroy(all=true) {
     this.core.hub.expunge(this)
     this.off(`${this.parent.id}_pointerout`, this.#layerCursor.erase, this.#layerCursor)
     this.off(STREAM_UPDATE, this.onStreamUpdate, this.#layerPriceLine)
 
-    this.stateMachine.destroy()
     this.graph.destroy()
     this.#input.destroy()
 
-    this.element.remove()
+    if (!!all) {
+      this.stateMachine.destroy()
+      this.element.remove()
+    }
   }
 
   eventsListen() {
@@ -159,7 +149,7 @@ export default class ScaleBar extends Component {
     this.on(`${this.parent.id}_pointermove`, this.onMouseMove, this)
     this.on(`${this.parent.id}_pointerout`, this.#layerCursor.erase, this.#layerCursor)
     this.on(STREAM_UPDATE, this.onStreamUpdate, this)
-    this.on(`setRange`, this.draw, this)
+    this.on(`range_set`, this.draw, this)
   }
 
   onResize(dimensions) {
@@ -207,7 +197,7 @@ export default class ScaleBar extends Component {
         let chart = this.parent
         let range = this.core.range
         let id = chart.view[0].id
-        let mm = this.core.range.secondaryMaxMin[id].data
+        let mm = this.core.range.secondaryMaxMin?.[id]?.data
         if (!!mm) {
           let stream = range.value(undefined, id)
           stream.forEach((value, index, array) => {
@@ -221,7 +211,7 @@ export default class ScaleBar extends Component {
     }
 
     if (draw) this.draw()
-    else this.#layerPriceLine.draw()
+    else this.#layerPriceLine.draw(e)
   }
 
   onChartDrag(e) {
@@ -230,21 +220,38 @@ export default class ScaleBar extends Component {
     this.draw()
   }
 
-  setHeight(h) {
+  #setHeight(h) {
     this.#element.style.height = `${h}px`
   }
 
-  setDimensions(dim) {
+  #setWidth(w) {
+    this.#element.style.width = `${w}px`
+  }
+
+  setDimensions(dim={}) {
     // const w = this.#element.getBoundingClientRect().width
-    const w = this.width
-    const h = this.parent.height
-    this.setHeight(h)
+    dim = (isObject(dim)) ? dim : {}
+    const w = dim?.w || this.width || YAXIS_MINDIGITS * YAxisStyle.FONTSIZE * priceLineTxtScaling
+    const h = dim?.h || this.parent.height
+    this.#setWidth(w)
+    this.#setHeight(h)
     if (this.graph instanceof Graph) {
       this.graph.setSize(w, h, w)
       this.draw()
     }
     if (this.#layerCursor instanceof ScaleCursor) 
       this.calcPriceDigits()
+  }
+
+  setYAxis() {
+    const range = (this.options.yAxisType === YAXIS_TYPE.default) ? 
+      undefined : this.parent.localRange
+  
+    this.#yAxis = new yAxis(this, this, this.options.yAxisType, range)
+    this.#yAxis.yAxisPadding = 
+        (isNumber(this.options?.yAxisPadding) &&
+        this.options.yAxisPadding >= 1) ?
+        this.options.yAxisPadding : 1
   }
 
   /**
@@ -305,7 +312,7 @@ export default class ScaleBar extends Component {
 
 
   createGraph() {
-    let overlays = copyDeep(defaultOverlays)
+    let overlays = doStructuredClone(defaultOverlays)
 
     this.graph = new Graph(this, this.#elViewport, overlays, false)
     this.#layerCursor = this.graph.overlays.get("cursor").instance
@@ -351,7 +358,7 @@ export default class ScaleBar extends Component {
 
   calcScaleWidth() {
     const max = this.calcPriceDigits()
-    return max * this.#digitW
+    return (max + 2) * this.#digitW * priceLineTxtScaling
   }
 
   /**

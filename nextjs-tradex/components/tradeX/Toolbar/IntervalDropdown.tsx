@@ -56,7 +56,7 @@ const IntervalDropdown: React.FC<IProps> = ({
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              size={'sm'}
+              size={'toolbar'}
               role="combobox"
               aria-expanded={open}
               className="w-[85px] justify-between"

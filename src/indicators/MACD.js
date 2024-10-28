@@ -7,12 +7,15 @@ import Indicator from "../components/overlays/indicator"
 import { MACD as talibAPI } from "../definitions/talib-api";
 import { YAXIS_PADDING, YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "MACD"
+let nameLong = 'Moving Average Convergence/Divergence'
+
  
  export default class MACD extends Indicator {
 
   get name() { return 'Moving Average Convergence/Divergence' }
-  shortName = 'MACD'
-  libName = 'MACD'
+  shortName = nameShort
+  libName = nameShort
   definition = {
     input: {
       inReal: [], 
@@ -40,7 +43,8 @@ import { YAXIS_PADDING, YAXIS_TYPE } from "../definitions/chart";
   #precision = 2
   scaleOverlay = false
 
-  
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false

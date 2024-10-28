@@ -6,7 +6,7 @@ import xAxis from "./axis/xAxis"
 import Input from "../input"
 import stateMachineConfig from "../state/state-time"
 import { elementDimPos } from "../utils/DOM"
-import { copyDeep, debounce, xMap } from "../utils/utilities"
+import { doStructuredClone, debounce, xMap } from "../utils/utilities"
 import { isArray, isObject } from "../utils/typeChecks"
 import Slider from "./widgets/slider"
 import { BUFFERSIZE } from "../definitions/chart"
@@ -200,13 +200,13 @@ export default class Timeline extends Component {
     this.#input3.destroy()
 
     this.core.hub.expunge(this)
-    this.off("main_mousemove", this.#layerCursor.draw, this.#layerCursor)
+    this.off("main_mouseMove", this.#layerCursor.draw, this.#layerCursor)
     
     this.#elFwdEnd.removeEventListener('click', debounce)
     this.#elRwdStart.removeEventListener('click', debounce)
 
     this.graph.destroy()
-    this.element.remove()
+    // this.element.remove()
   }
 
   eventsListen() {
@@ -229,8 +229,8 @@ export default class Timeline extends Component {
     this.#input3.on("pointerleave", () => this.hideJump(this.#jump.start))
     // this.#input3.on('click', () => debounce(this.onPointerClick, 1000, this, true))
 
-    this.on("main_mousemove", this.#layerCursor.draw, this.#layerCursor)
-    this.on("setRange", this.onSetRange, this)
+    this.on("main_mouseMove", this.#layerCursor.draw, this.#layerCursor)
+    this.on("range_set", this.onSetRange, this)
 
     this.#elFwdEnd.addEventListener('click', debounce(this.onPointerClick, 1000, this, true))
     this.#elRwdStart.addEventListener('click', debounce(this.onPointerClick, 1000, this, true))
@@ -313,7 +313,7 @@ export default class Timeline extends Component {
   xPosOHLCV(x) { return this.#xAxis.xPosOHLCV(x) }
 
   createGraph() {
-    let overlays = copyDeep(defaultOverlays)
+    let overlays = doStructuredClone(defaultOverlays)
 
     this.graph = new Graph(this, this.#elViewport, overlays, false)
     this.#layerCursor = this.graph.overlays.get("cursor").instance

@@ -7,6 +7,7 @@ import { MAX_CRYPTO_PRECISION } from "./core"
 // // import talib from '../wasm/index.esm'
 // import wasm from '../wasm/talib.wasm.dataURI'
 
+export const initialEmptyState = "initialEmptyState"
 export const defaultTitle = "Empty"
 
 export const defaultConfig = {

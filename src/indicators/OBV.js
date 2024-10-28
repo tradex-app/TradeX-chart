@@ -7,16 +7,19 @@ import Indicator from "../components/overlays/indicator"
 import { OBV as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "OBV"
+let nameLong =  'On Balance Volume'
 
 export default class OBV extends Indicator {
 
-  get name() { return 'On Balance Volume' }
-  shortName = 'OBV'
-  libName = 'OBV'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   precision = 2
   scaleOverlay = true
 
-  
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false

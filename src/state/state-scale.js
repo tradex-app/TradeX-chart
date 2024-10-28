@@ -49,7 +49,7 @@ export default
         setRange: {
           target: 'setRange',
           action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "setRange"`)
+            // console.log(`${this.id}: transition from "${this.state}" to  "range_set"`)
           },
         },
       }

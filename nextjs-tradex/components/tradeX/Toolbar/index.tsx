@@ -5,6 +5,8 @@ import TokensDropdown from './TokensDropdown';
 import IndicatorDropdown from './IndicatorDropdown';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { IChartOption, IIndicatorToolbar } from '../utils/types';
+import StateDropdown from './StateDropdown';
+import { PrintState } from './Buttons';
 
 const Toolbar = ({
   config,
@@ -23,7 +25,7 @@ const Toolbar = ({
   intervals: string[];
   selectedInterval: string;
   selectedChart: IChartOption;
-  indicators: IIndicatorToolbar[];
+  indicators?: IIndicatorToolbar[];
   tokensList: any[];
   selectedToken: string;
   onSelectIndicators: (value: any) => void;
@@ -32,15 +34,15 @@ const Toolbar = ({
   onSelectInterval: (value: string) => void;
 }) => {
   return (
-    <div className="flex flex-row flex-grow mb-2">
-      <div className="flex flex-row gap-2">
-        {tokensList.length > 0 && (
+    <div className="flex flex-row flex-grow mb-2 items-center">
+      <div className="flex flex-row gap-2 items-center">
+        {
           <TokensDropdown
             tokensList={tokensList}
             value={selectedToken}
             setValue={onSelectToken}
           />
-        )}
+        }
 
         {config?.timeframe && (
           <IntervalDropdown
@@ -57,9 +59,11 @@ const Toolbar = ({
             setValue={onSelectIndicators}
           />
         )}
-      </div>
 
-      <div className="flex justify-end pl-2">
+        {config?.states && <StateDropdown />}
+      </div>
+      <PrintState key="printState" />
+      <div className="flex justify-end pl-2 items-center">
         {config?.typeSelector && (
           <ChartTypeSwitch
             items={CHART_OPTIONS}
@@ -69,7 +73,7 @@ const Toolbar = ({
         )}
       </div>
       {config?.themeSwitcher && (
-        <div className="pr-2 mr-2">
+        <div className="flex justify-end items-center pr-2 mr-2">
           <ThemeToggle />
         </div>
       )}

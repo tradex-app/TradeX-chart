@@ -1,4 +1,4 @@
-import { ChartType, IConfig, IIndicators, Indicator } from '../../../../types';
+import { ChartType, IConfig } from '../../../../types';
 import { ChartResolutionEnum } from './enums';
 
 export interface IChartOption {
@@ -7,15 +7,6 @@ export interface IChartOption {
   value: ChartType;
   info?: string;
   icon?: any;
-}
-
-export interface ITradeX extends HTMLElement {
-  Indicators?: { [key: string]: unknown }[];
-  theme?: { setProperty: (property: string, value: any) => void };
-  start?: (config: object) => void;
-  setIndicators?: (indicators: Indicator[]) => void;
-  mergeData?: (data: { ohlcv: number[] }) => void;
-  on?: (eventName: string, callback: (e: unknown) => void) => void;
 }
 
 export interface IIndicatorOption {
@@ -52,6 +43,12 @@ export interface ITokenChartProps extends IConfig {
 export interface IIndicatorToolbar {
   label: string;
   value: string;
+  tooltip: string;
+}
+
+export interface IStatesToolbar {
+  label: string;
+  value: string;
   selected: boolean;
 }
 
@@ -59,6 +56,7 @@ export interface ToolbarConfig {
   intervals: string[];
   timeframe: boolean;
   indicators: boolean;
+  states: boolean;
   typeSelector: boolean;
   fullscreenButton: boolean;
   themeSwitcher: boolean;

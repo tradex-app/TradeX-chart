@@ -2,7 +2,7 @@
 // class
 
 import DOM from "../../../utils/DOM"
-import { copyDeep, xMap } from '../../../utils/utilities'
+import { doStructuredClone, xMap } from '../../../utils/utilities'
 import { isArray, isBoolean, isFunction, isNumber, isObject, isString } from '../../../utils/typeChecks'
 import CEL from "../../primitives/canvas"
 import Overlays from "../../overlays"
@@ -17,7 +17,7 @@ const defaultOverlays = [
 
 import { BUFFERSIZE } from "../../../definitions/chart"
 
-export default class graph {
+export default class Graph {
 
   #core
   #config
@@ -57,7 +57,6 @@ export default class graph {
   set layerWidth(w) { this.#layerWidth = w || this.#elParent.width }
   get layerWidth() { return this.#layerWidth }
   get stateMachine() { return this.#parent.stateMachine }
-  set state(s) { this.#core.setState(s) }
   get state() { return this.#core.getState() }
   get data() { return this.#core.chartData }
   get range() { return this.#core.range }
@@ -96,7 +95,7 @@ export default class graph {
 
   createViewport(overlays=[], node=false) {
 
-    overlays = (overlays.length == 0) ? copyDeep(defaultOverlays) : overlays
+    overlays = (overlays.length == 0) ? doStructuredClone(defaultOverlays) : overlays
 
     const {width, height} = this.layerConfig()
 

@@ -15,7 +15,7 @@ export default class chartCursor extends Overlay{
 
     super(target, xAxis, yAxis, theme, parent, params)
 
-    this.core.on("main_mousemove", this.onMouseMoveX, this)
+    this.core.on("main_mouseMove", this.onMouseMoveX, this)
 
     this.#input = new Input(this.target.viewport.container, {disableContextMenu: false});
     this.#input.on("pointermove", this.onMouseMove.bind(this))

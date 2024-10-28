@@ -29,11 +29,11 @@ const FullScreenButton = ({
   };
 
   return (
-    <div className="flex flex-row justify-end items-center">
+    <div className="">
       {handle.active ? (
         <Button
           variant="ghost"
-          size="sm"
+          size="toolbarIcon"
           type="button"
           onClick={exitFullScreen}
         >
