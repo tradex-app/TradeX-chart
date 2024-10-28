@@ -1,5 +1,5 @@
 import Chart from './core'
-import canvas from './renderer/canvas'
+import canvas from './renderer/canvas-lib'
 import DOM from './utils/DOM'
 import EventHub from './utils/eventHub'
 import StateMachine from './scaleX/stateMachne'

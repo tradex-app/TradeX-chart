@@ -1,7 +1,7 @@
 // newsEvent.js
 // draw a single news event marker
 
-import { fillMask } from "../../renderer/canvas"
+import { fillMask } from "../../renderer/canvas-lib"
 import { svgToImage } from "../../utils/DOM"
 import { limit } from "../../utils/number"
 

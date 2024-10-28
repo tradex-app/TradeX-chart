@@ -31,8 +31,9 @@ class Node {
     this.#id = CEL.idCnt++;
     this.#scene = new CEL.Scene(cfg);
 
-    let {width: w, height: h} = sizeSanitize(cfg?.width || 0, cfg?.height || 0)
-    this.setSize(w, h);
+    // Initialize with parent container size instead of config
+    const rect = this.#container.getBoundingClientRect();
+    this.setSize(rect.width, rect.height);
   }
 
   get id() { return this.#id }
@@ -672,17 +673,18 @@ class Hit extends Foundation {
     return [r, g, b];
   }
 }
-
 function clear(that) {
   let context = that.context;
+  const dpr = window.devicePixelRatio || 1;
+
   if (that.contextType === "2d") {
-    context.scale(1,1)
-    context.clearRect(
-      0,
-      0,
-      that.width,
-      that.height
-    );
+    // Save the current transform
+    context.save();
+    // Reset the transform to clear the entire canvas
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, that.canvas.width, that.canvas.height);
+    // Restore the transform
+    context.restore();
   }
   // webgl or webgl2
   else {
@@ -690,41 +692,47 @@ function clear(that) {
   }
   return that;
 }
-
 function sizeSanitize(width, height) {
   if (width < 0) width = 0
   if (height < 0) height = 0
   return {width, height}
 }
 
-function setSize(width, height, that, ratio=true) {
+function setSize(width, height, that) {
   let {width: w, height: h} = sizeSanitize(width, height)
+  const dpr = window.devicePixelRatio || 1;
 
   that.width = w;
   that.height = h;
-  that.canvas.width =  w * CEL.pixelRatio;
-  that.canvas.height = h * CEL.pixelRatio;
 
   if (!that.offscreen) {
-    that.canvas.style.width = `${w}px`
-    that.canvas.style.height = `${h}px`
-  }
-  else {
-    that.canvas.width = w
-    that.canvas.height = h
+    // Set the display size (css pixels)
+    that.canvas.style.width = `${w}px`;
+    that.canvas.style.height = `${h}px`;
+    
+    // Set the buffer size (actual pixels)
+    that.canvas.width = Math.round(w * dpr);
+    that.canvas.height = Math.round(h * dpr);
+    
+    // Scale all drawing operations by the dpr
+    if (that.contextType === "2d") {
+      that.context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+  } else {
+    // For offscreen canvas, we still need to handle high DPI
+    that.canvas.width = Math.round(w * dpr);
+    that.canvas.height = Math.round(h * dpr);
+    
+    if (that.contextType === "2d") {
+      that.context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
   }
 
   if (that.contextType !== "2d" &&
       that.contextType !== "bitmaprenderer") {
-        that.context.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-      }
-
-  if (ratio && 
-    that.contextType === "2d" && 
-    CEL.pixelRatio !== 1 &&
-    !that.offscreen) {
-    that.context.scale(CEL.pixelRatio, CEL.pixelRatio);
+    that.context.viewport(0, 0, that.canvas.width, that.canvas.height);
   }
+
   return that;
 }
 

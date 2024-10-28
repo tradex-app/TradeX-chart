@@ -1,7 +1,7 @@
 // chart-watermark.js
 
 import { createFont, getTextRectHeight, getTextRectWidth } from "../../renderer/text"
-import { renderImage } from "../../renderer/canvas"
+import { renderImage } from "../../renderer/canvas-lib"
 import { isObject, isString } from "../../utils/typeChecks"
 import { isImage } from "../../utils/DOM"
 import Overlay from "./overlay"
