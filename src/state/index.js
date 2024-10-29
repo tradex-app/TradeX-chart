@@ -736,6 +736,8 @@ export default class State {
   #key = ""
   #data = {}
   #gaps
+  #status = false
+  #timeData
   #dataSource
   #overlaySet
   #inventory = []
@@ -755,7 +757,6 @@ export default class State {
     this.#dataSource = DataSource.create(this.#data.dataSource, this)
     this.#data.timeData = new TimeData(this.#dataSource.range)
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
-    this.#overlaySet = new OverlaySet(state.core, this)
     this.#gaps = new Gaps(this)
     this.#key = hashKey(state)
   }

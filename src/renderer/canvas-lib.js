@@ -1,4 +1,4 @@
-// canvas.js
+// canvas-lib.js
 
 import {
   calcTextWidth,
@@ -47,16 +47,6 @@ import {
   chartBar 
 } from "./chart"
 import Colour from "../utils/colour"
-
-
-/**
- * Get screen ratio
- * @param canvas
- * @returns {number}
- */
-export function getPixelRatio (canvas) {
-  return (canvas.ownerDocument && canvas.ownerDocument.defaultView && canvas.ownerDocument.defaultView.devicePixelRatio) || 2
-}
 
 
 
@@ -159,7 +149,6 @@ export default {
   imageToCanvas,
   separateRGB,
   fillMask,
-  getPixelRatio,
   fillStroke,
   linearGradient,
   calcTextWidth,

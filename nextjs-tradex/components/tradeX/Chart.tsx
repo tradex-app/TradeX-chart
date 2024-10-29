@@ -151,7 +151,7 @@ const TradeXChart: FC<IProps> = ({
 
   return (
     <div className="w-full h-full">
-      <div id={chartAccessor} className="w-full h-full" />
+      <div id={chartAccessor} className="w-full h-full cursor-crosshair" />
     </div>
   );
 };

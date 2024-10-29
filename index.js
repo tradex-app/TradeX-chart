@@ -1005,6 +1005,7 @@ const add = document.querySelector("#add")
 function addChart() {
   let chart = document.createElement("tradex-chart")
   let section = document.createElement("section")
+      section.setAttribute('style', 'cursor: crosshair'); // added default cursor as crosshair here to avoid messing with candle rendering
       section.appendChild(chart)
       main.appendChild(section)
 
