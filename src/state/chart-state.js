@@ -3,7 +3,7 @@
 
 import * as packageJSON from '../../package.json'
 import * as compression from '../utils/compression'
-import { isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from '../utils/typeChecks'
+import { checkType, isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from '../utils/typeChecks'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
 import { doStructuredClone, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, } from '../utils/utilities'
 import { validateDeep, validateShallow, sanitizeCandles, Gaps } from '../model/validateData'
@@ -101,7 +101,7 @@ export const DEFAULT_STATE = {
 }
 
 const TRADE = {
-  timestamp: "number",
+  timestamp: "timestamp",
   id: "string",
   side: "string",
   price: "number",
@@ -113,7 +113,7 @@ const TRADE = {
 }
 
 const EVENT = {
-  timestamp: "number",
+  timestamp: "timestamp",
   id: "string",
   title: "string",
   content: "string",
@@ -121,14 +121,14 @@ const EVENT = {
 }
 
 const ANNOTATIONS = {
-  timestamp: "number",
+  timestamp: "timestamp",
   id: "string",
   title: "string",
   content: "string",
 }
 
 const TOOLS = {
-  timestamp: "number",
+  timestamp: "timestamp",
   id: "string",
   type: "string",
   nodes: "array",
@@ -743,7 +743,7 @@ export default class State {
     if (!isObject(e) ||
       !isArrayEqual(k1, k2)) return false
     for (let k of k2) {
-      if (typeof e[k] !== type[k]) return false
+      if (!checkType(type[k], e[k])) return false
     }
     return true
   }
