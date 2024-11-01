@@ -29,8 +29,13 @@ export default class Trade {
   /**
    * draw buy or sell icon using cached images generated from SVG
    * draw hit mask - generated on the fly
-   * @param {*} data
-   * @return {*}  
+   * @param {Object} data
+   * @param {String} data.side - "buy", "sell"
+   * @param {Number} data.key - hit detection key
+   * @param {Number} data.w - candle width
+   * @param {Number} data.x - canvas coordinate
+   * @param {Number} data.y - canvas coordinate
+   * @return {Object}  
    * @memberof Trade
    */
   draw(data) {

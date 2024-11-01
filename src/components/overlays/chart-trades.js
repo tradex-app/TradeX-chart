@@ -3,7 +3,7 @@
 
 import Overlay from "./overlay"
 import Trade from "../primitives/trade"
-import State from "../../state"
+import State from "../../state/chart-state"
 import { limit } from "../../utils/number"
 import { debounce } from "../../utils/utilities"
 import { isObject } from "../../utils/typeChecks"

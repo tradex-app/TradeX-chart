@@ -99,6 +99,7 @@ export const DEFAULT_STATE = {
     }
   },
 }
+
 const TRADE = {
   timestamp: "number",
   id: "string",
@@ -675,14 +676,31 @@ export default class State {
       state.inventory.push(["primary", defaultState.primary])
   }
 
+  static importAnnotations(data, state, tf) {
+    State.importData("annotations", data, state, tf)
+  }
+
+  static importEvents(data, state, tf) {
+    State.importData("events", data, state, tf)
+  }
+
+  static importTrades(data, state, tf) {
+    State.importData("trades", data, state, tf)
+  }
+
+  static importTools(data, state, tf) {
+    State.importData("tools", data, state, tf)
+  }
+
+
   /**
    * import data (trades, events, annotations, tools) 
    * validate and store in a state
    * @static
    * @param {string} type - type of data to import
-   * @param {object} data - trade data to import
+   * @param {object} data - data to import
    * @param {object} state - State allData
-   * @param {object} tf - time frame
+   * @param {string} tf - time frame
    * @memberof State
    */
   static importData(type, data, state, tf) {
@@ -1060,6 +1078,10 @@ console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
     const mTrades = merge?.trades || false
     const events = this.allData?.events
     const mEvents = merge?.events || false
+    const annotations = this.allData?.annotations
+    const mAnnotations = merge?.annotations || false
+    const tools = this.allData?.tools
+    const mTools = merge?.tools || false
     const inc = (!isArray(mData)) ? 0 : (this.range.inRange(mData[0][0])) ? 1 : 0
     const refresh = {}
 
@@ -1170,17 +1192,24 @@ console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
         }
       }
 
-      // Do we have events?
-      if (isObject(mEvents)) {
-        for (let e in mEvents) {
-
-        }
+      // Do we have annotations?
+      if (isObject(mAnnotations)) {
+        State.importEvents(mAnnotations, this.allData, this.time.timeFrame)
       }
 
-      // Trades
+      // Do we have events?
+      if (isObject(mEvents)) {
+        State.importEvents(mEvents, this.allData, this.time.timeFrame)
+      }
+
       // Do we have trades?
       if (isObject(mTrades)) {
         State.importTrades(mTrades, this.allData, this.time.timeFrame)
+      }
+
+      // Do we have tools?
+      if (isObject(mTools)) {
+        State.importTools(mTools, this.allData, this.time.timeFrame)
       }
 
       // set new Range if required
@@ -1297,6 +1326,14 @@ console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
     return false
   }
 
+  /**
+   * 
+   * @param {Object} t 
+   * @param {Number} t.timestamp - unix timestamp in milliseconds
+   * @param {String} t.id 
+   * @param {String} t.side - "buy", "sell"
+   * @returns {Boolean}
+   */
   addTrade(t) {
     // validate trade entry
     if (!State.isValidEntry(t, TRADE)) return false

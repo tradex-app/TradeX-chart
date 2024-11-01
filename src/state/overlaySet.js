@@ -3,7 +3,7 @@
 // overlays, indicators, drawing tools, markers
 
 import * as packageJSON from '../../package.json'
-import State, { hashKey } from ".";
+import State, { hashKey } from "./chart-state";
 import TradeXchart, { isChart } from "../core";
 import { isObject, isString } from "../utils/typeChecks";
 import { doStructuredClone, xMap } from "../utils/utilities";

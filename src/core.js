@@ -12,7 +12,7 @@ import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { isTimeFrame, SECOND_MS } from "./utils/time"
 import { doStructuredClone, mergeDeep, objToString, uid } from './utils/utilities'
-import State from './state'
+import State from './state/chart-state.js'
 import { Range, calcTimeIndex } from "./model/range"
 import { defaultTheme } from './definitions/style'
 import StateMachine from './scaleX/stateMachne'
