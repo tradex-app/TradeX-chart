@@ -9,6 +9,7 @@ import { debounce } from "../../utils/utilities"
 import { isObject } from "../../utils/typeChecks"
 import { HIT_DEBOUNCE } from "../../definitions/core"
 import { isValidTimestamp } from "../../utils/time"
+import { WinState } from "../widgets/window"
 
 
 const tradeDialogue = {
@@ -35,6 +36,8 @@ export default class chartTrades extends Overlay {
   #trades = []
   #data
   #dialogue
+  #currentSelected
+  #lastSelected
 
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
@@ -89,9 +92,12 @@ export default class chartTrades extends Overlay {
     // do not display if...
     if (this.core.config?.trades?.display === false ||
         this.core.config?.trades?.displayInfo === false ||
-        k == -1)  return
+        k == -1) {
+          this.#dialogue.close()
+          return
+        }
 
-    console.log("isTradeSelected()")
+    console.log("isTradeSelected()", k)
 
     const d = this.theme.trades
     const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconWidth)
@@ -116,8 +122,18 @@ export default class chartTrades extends Overlay {
       content: content,
       offFocus: HIT_DEBOUNCE + 1
     }
+    this.#lastSelected = this.#currentSelected
+    this.#currentSelected = tr
     this.core.emit("trade_selected", tr)
-    this.#dialogue.open(config)
+
+    if (this.#lastSelected === this.#currentSelected &&
+        this.#dialogue.state === WinState.closed)
+      this.#dialogue.open(config)
+    else
+    if (this.#lastSelected !== this.#currentSelected) {
+      this.#dialogue.close()
+      this.#dialogue.open(config)
+    }
   }
 
   buildTradeHTML(h) {
@@ -166,11 +182,20 @@ export default class chartTrades extends Overlay {
       // fetch trades (if any) for timestamp
       if (k >= 0) {
         for (let tr of this.data[t]) {
+          // loop over trade entries for timestamp
+          // for (let e of tr) {
+
+          // }
+
           trade.x = this.xAxis.xPos(x[0]) - (this.xAxis.candleW / 2)
           trade.y = this.yAxis.yPos(x[2]) - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
           trade.side = tr.side
           trade.key = k
-          this.#trades.push(this.#trade.draw(trade))
+          this.#trades.push({
+            key: k,
+            trade,
+            hit: this.#trade.draw(trade)
+          })
         }
       }
       c++

@@ -42,7 +42,6 @@ export default class Trade {
     this.data = data
     const c = this.cfg
     const i = (data.side === "buy") ? this.buy : this.sell
-    const j = (data.side === "buy") ? c.iconBuy : c.iconSell
     const k = this.hit.getIndexValue(data.key)
     const hit = fillMask(k, i)
     const h = limit(data.w, c.iconMinDim, c.iconHeight)

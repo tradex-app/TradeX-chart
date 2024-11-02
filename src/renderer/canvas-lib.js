@@ -101,14 +101,11 @@ export function fillMask(colour, image) {
   else {
     let c = new Colour(colour)
     fill = (c.isValid) ? c.hexa : channels.alpa
-
   }
   ctx.fillStyle = fill
-  ctx.globalCompositeOperation = "multiply";
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.globalCompositeOperation = "destination-in";
   ctx.drawImage(image, 0, 0);
-  ctx.globalCompositeOperation = "source-over";
   return copy;
 }
 
