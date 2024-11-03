@@ -33,7 +33,7 @@ const tradeDialogue = {
 export default class chartTrades extends Overlay {
 
   #trade
-  #trades = []
+  #trades
   #data
   #dialogue
   #currentSelected
@@ -97,8 +97,6 @@ export default class chartTrades extends Overlay {
           return
         }
 
-    console.log("isTradeSelected()", k)
-
     const d = this.theme.trades
     const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconWidth)
     const ts = this.xAxis.pixel2T(x)
@@ -107,15 +105,12 @@ export default class chartTrades extends Overlay {
     const iPos = this.core.dimensions
 
     // retrieve trade
-    let tr = Object.keys(this.data)[k] * 1
+    let tr = this.#trades[k].trade.entry
     // adjust position to scroll position
     let tx = this.xAxis.xPos(ts) + o
     // negative values required as widgets start positioned below chart content
     let ty = (y - (w * 1.5)) - iPos.height
-    let content = ``
-    for (let t of this.data[tr]) {
-      content += this.buildTradeHTML(t)
-    }
+    let content = this.buildTradeHTML(tr)
     const config = {
       dimensions: {h: undefined, w: 150},
       position: {x: tx + (w / 2) + 1, y: ty},
@@ -161,10 +156,10 @@ export default class chartTrades extends Overlay {
 
     this.hit.clear()
     this.scene.clear()
-    this.#trades.length = 0
+    this.#trades = []
 
     const offset = this.xAxis.smoothScrollOffset || 0
-    const trade = {
+    const tradeObj = {
       x: offset - this.xAxis.candleW,
       w: this.xAxis.candleW
     }
@@ -173,7 +168,9 @@ export default class chartTrades extends Overlay {
     let o = this.core.rangeScrollOffset;
     let c = range.indexStart - o
     let i = range.Length + (o * 2)
-    let x, t, k;
+    let j = 0
+    let x, t, k, h;
+    let trade;
 
     while(i) {
       x = range.value( c )
@@ -181,21 +178,21 @@ export default class chartTrades extends Overlay {
       k = Object.keys(this.data).indexOf(t)
       // fetch trades (if any) for timestamp
       if (k >= 0) {
+        // loop over trade entries for timestamp (candle)
         for (let tr of this.data[t]) {
-          // loop over trade entries for timestamp
-          // for (let e of tr) {
-
-          // }
-
+          trade = {...tradeObj}
           trade.x = this.xAxis.xPos(x[0]) - (this.xAxis.candleW / 2)
           trade.y = this.yAxis.yPos(x[2]) - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
+          trade.entry = tr
           trade.side = tr.side
-          trade.key = k
-          this.#trades.push({
-            key: k,
+          trade.key = j  // k
+          h = this.#trade.draw(trade)
+          this.#trades[j] = {
+            key: j,
             trade,
-            hit: this.#trade.draw(trade)
-          })
+            hit: h
+          }
+          j++
         }
       }
       c++
