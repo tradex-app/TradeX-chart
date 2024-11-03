@@ -1,6 +1,6 @@
 // canvas.js
 
-import { limit } from "../../utils/number";
+import { decimalToHex, limit } from "../../utils/number";
 import { arrayMove } from "../../utils/utilities";
 import { isHTMLElement } from "../../utils/DOM";
 import { isArray, isBoolean, isNumber } from "../../utils/typeChecks";
@@ -647,8 +647,7 @@ class Hit extends Foundation {
    * @returns {String}
    */
   getIndexValue(index) {
-    let rgb = this.intToRGB(index);
-    return "rgb(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ")";
+    return `#${decimalToHex(index).padStart(6, '0')}`
   }
   /**
    * converts rgb array to integer value

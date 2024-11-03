@@ -6,7 +6,7 @@
 import { RANGELIMIT, SHORTNAME } from "../definitions/core";
 import TradeXchart from "../core";
 import { Range, detectInterval } from "./range";
-import State, { DEFAULT_STATE } from "../state"
+import State, { DEFAULT_STATE } from "../state/chart-state"
 import Stream from "../helpers/stream";
 import { checkType, isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isPromise, isString } from "../utils/typeChecks";
 import { doStructuredClone, uid, xMap } from "../utils/utilities";

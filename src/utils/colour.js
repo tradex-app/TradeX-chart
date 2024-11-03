@@ -5,13 +5,14 @@
 import { isArray, isBoolean, isInteger, isNumber, isObject, isString } from './typeChecks'
 import { isBrowser, isNode } from './browser-or-node'
 import { colours2 } from '../components/views/colourPicker';
+import { decimalToHex } from './number';
 
 export const RGBAHex = `#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})`
 export const isHex  = /^#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i; 
-export const isHSL  = /^hsla?((\d{1,3}?),\s*(\d{1,3}%),\s*(\d{1,3}%)(,\s*[01]?\.?\d*)?)$/; 
-export const isHSLA = /^hsla[(]\s*0*(?:[12]?\d{1,2}|3(?:[0-5]\d|60))\s*(?:\s*,\s*0*(?:\d\d?(?:\.\d+)?\s*%|\.\d+\s*%|100(?:\.0*)?\s*%)){2}\s*,\s*0*(?:\.\d+|1(?:\.0*)?)\s*[)]$/
-export const isRGB  = /^rgba?((\d{1,3}%?),\s*(\d{1,3}%?),\s*(\d{1,3}%?)(,\s*[01]?\.?\d*)?)$/;
-export const isRGBA = /^^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1(?:\.0*)?)\s*[)]$/
+export const isHSL  = /^hsl\(\s*(\d+),\s*([0-9.]+)%,\s*([0-9.]+)%\s*\)$/; 
+export const isHSLA = /^hsla?\s*\(\s*(\d+),\s*([0-9.]+)%,\s*([0-9.]+)%,\s*(0?\.\d+|0|1)?\s*\)$/i
+export const isRGB  = /^rgb[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*(?:,(?![)])|(?=[)]))){3}[)]$/i;
+export const isRGBA = /^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|0|1(?:\.0*)?)\s*[)]$/i;
 
 /**
  * Colour utility class
@@ -177,32 +178,66 @@ export default class Colour {
   }
   #valueIsRGB(rgb) {
     this.#value.rgb = rgb
-    this.#RGBAToHex(rgba)
+    this.#RGBAToHex(rgb)
   }
   #valueIsRGBA(rgba) {
     this.#value.rgba = rgba
     this.#RGBAToHex(rgba)
   }
-
+/*
   #RGBToHex (rgb) {
     let {r,g,b,a} = this.#getRGB(rgb)
   
-    if (r.length == 1)
-      r = "0" + r;
-    if (g.length == 1)
-      g = "0" + g;
-    if (b.length == 1)
-      b = "0" + b;
-    if (a.length == 1)
-      a = "0" + a;
-
     this.value.r = r
     this.value.g = g
     this.value.b = b
     this.value.a = a
 
-    this.setHex([r,g,b,a])
+    let hex = [
+      decimalToHex(r),
+      decimalToHex(g),
+      decimalToHex(b),
+      decimalToHex(a),
+    ]
+
+    this.setHex(hex)
     return this
+  }
+*/
+  /**
+   * 
+   * @param {string} rgba 
+   */
+  #RGBAToHex (rgba) {
+    let x, isPercent,
+      i = 0,
+      y = [],
+      z = [],
+      m = rgba.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i),
+      a = isString(m[4]) ? m[4] : `1`,
+      mRGBA = [ m[1], m[2], m[3], a ];
+
+      for (let v of mRGBA) {
+        isPercent = v.indexOf("%") > -1;
+        x = parseFloat(v)
+        if (i < 3 && isPercent) {
+          x = Math.round(255 * x / 100)
+        }
+        else if (i == 3) {
+          if (!isPercent && x >= 0 && x <= 1) {
+            x = Math.round(255 * x);
+          } else if (isPercent && x >= 0 && x <= 100) {
+            x = Math.round(255 * x / 100)
+          } else {
+            x = "";
+          }
+        }
+        y[i] = (x | 1 << 8).toString(16).slice(1)
+        z[i++] = x
+      }
+      this.setHex(y)
+      this.setRGBA(z)
+      this.#hexToHSL(this.#value.hexa)
   }
 
   #RGBToHSL (rgb) {
@@ -295,7 +330,6 @@ export default class Colour {
   #getRGB (rgb) {
     let r,g,b,a;
     let v = this.#value
-    if (v.r && v.g && v.b && v.a) return {r, g, b, a} = {...v}
 
     if (isString(rgb)) {
       // Choose correct separator
@@ -316,43 +350,15 @@ export default class Colour {
       b = rgb.b
       a = ("a" in rgb) ? rgb.a : ""
     }
+    else if (v.r && v.g && v.b && v.a) return {r, g, b, a} = {...v}
+
     else return false
+
+    r = `${r * 1}`
+    g = `${g * 1}`
+    b = `${b * 1}`
+    a = `${a * 1}`
     return {r, g, b, a}
-  }
-
-  /**
-   * 
-   * @param {string} rgba 
-   */
-  #RGBAToHex (rgba) {
-    let x, isPercent,
-      i = 0,
-      y = [],
-      z = [],
-      rgb = rgba.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i);
-      rgb.shift()
-
-      for (let v of rgb) {
-        isPercent = v.indexOf("%") > -1;
-        x = parseFloat(v)
-        if (i < 3 && isPercent) {
-          x = Math.round(255 * x / 100)
-        }
-        else if (i == 3) {
-          if (!isPercent && x >= 0 && x <= 1) {
-            x = Math.round(255 * x);
-          } else if (isPercent && x >= 0 && x <= 100) {
-            x = Math.round(255 * x / 100)
-          } else {
-            x = "";
-          }
-        }
-        y[i] = (x | 1 << 8).toString(16).slice(1)
-        z[i++] = x
-      }
-      this.setHex(y)
-      this.setRGBA(z)
-      this.#hexToHSL(this.#value.hexa)
   }
   
 }

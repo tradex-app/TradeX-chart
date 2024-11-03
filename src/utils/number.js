@@ -402,3 +402,9 @@ export function mean(arr) {
 export function limit(val, min, max) {
   return Math.min(max, Math.max(min, val));
 }
+
+export function decimalToHex(decimal) {
+  const unsigned = Math.abs(decimal);
+  const hex = unsigned.toString(16);
+  return hex.length % 2 === 0 ? hex : "0" + hex;
+}

@@ -3,7 +3,7 @@
 
 import * as packageJSON from '../../package.json'
 import * as compression from '../utils/compression'
-import { isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from '../utils/typeChecks'
+import { checkType, isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from '../utils/typeChecks'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
 import { doStructuredClone, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, } from '../utils/utilities'
 import { validateDeep, validateShallow, sanitizeCandles, Gaps } from '../model/validateData'
@@ -19,6 +19,7 @@ import MainPane from '../components/main'
 import { OHLCV } from '../definitions/chart'
 import Chart from '../components/chart'
 import DataSource from '../model/dataSource'
+import { OverlaySet } from './overlaySet'
 //import internal from 'stream'
 
 const HASHKEY = "state"
@@ -98,8 +99,9 @@ export const DEFAULT_STATE = {
     }
   },
 }
+
 const TRADE = {
-  timestamp: "number",
+  timestamp: "timestamp",
   id: "string",
   side: "string",
   price: "number",
@@ -111,7 +113,7 @@ const TRADE = {
 }
 
 const EVENT = {
-  timestamp: "number",
+  timestamp: "timestamp",
   id: "string",
   title: "string",
   content: "string",
@@ -119,14 +121,14 @@ const EVENT = {
 }
 
 const ANNOTATIONS = {
-  timestamp: "number",
+  timestamp: "timestamp",
   id: "string",
   title: "string",
   content: "string",
 }
 
 const TOOLS = {
-  timestamp: "number",
+  timestamp: "timestamp",
   id: "string",
   type: "string",
   nodes: "array",
@@ -214,7 +216,7 @@ export default class State {
   /**
    * List registered states
    * @param {TradeXchart} chart - target
-   * @returns {Array.<State>|undefined} - array of state instances
+   * @returns {Array.<Object>|undefined} - array of state instances
    */
   static list(chart) {
     let states = State.chartList(chart)?.states
@@ -269,7 +271,7 @@ export default class State {
         delete active.archive
 
         const defaultState = doStructuredClone(State.default)
-        State.buildInventory(oldState, defaultState)
+        State.buildInventory(oldState)
         // TODO: set allData to primary[].data
         active.allData.primaryPane = oldState.primary
         active.allData.secondaryPane = oldState.secondary
@@ -382,7 +384,7 @@ export default class State {
     }
     state.allData.datasets = state.datasets
 
-    State.buildInventory(state, defaultState)
+    State.buildInventory(state)
 
     // trades
 
@@ -611,7 +613,7 @@ export default class State {
     }
   }
 
-  static buildInventory(state, defaultState) {
+  static buildInventory(state) {
     // Build chart order
     if (state.inventory.length == 0) {
       // add primary chart
@@ -625,6 +627,9 @@ export default class State {
       }
     }
 
+   let defaultState = doStructuredClone(State.default)
+
+
     // Process chart order
     let o = state.inventory
     let c = o.length
@@ -634,7 +639,7 @@ export default class State {
         o.splice(c, 1)
       else {
         // validate each overlay / indicator entry
-        let i = state.inventory[c][1]
+        let i = state.inventory[c]?.[1] || []
         let x = i.length
         while (x--) {
           // remove if invalid
@@ -671,14 +676,31 @@ export default class State {
       state.inventory.push(["primary", defaultState.primary])
   }
 
+  static importAnnotations(data, state, tf) {
+    State.importData("annotations", data, state, tf)
+  }
+
+  static importEvents(data, state, tf) {
+    State.importData("events", data, state, tf)
+  }
+
+  static importTrades(data, state, tf) {
+    State.importData("trades", data, state, tf)
+  }
+
+  static importTools(data, state, tf) {
+    State.importData("tools", data, state, tf)
+  }
+
+
   /**
    * import data (trades, events, annotations, tools) 
    * validate and store in a state
    * @static
    * @param {string} type - type of data to import
-   * @param {object} data - trade data to import
+   * @param {object} data - data to import
    * @param {object} state - State allData
-   * @param {object} tf - time frame
+   * @param {string} tf - time frame
    * @memberof State
    */
   static importData(type, data, state, tf) {
@@ -721,7 +743,7 @@ export default class State {
     if (!isObject(e) ||
       !isArrayEqual(k1, k2)) return false
     for (let k of k2) {
-      if (typeof e[k] !== type[k]) return false
+      if (!checkType(type[k], e[k])) return false
     }
     return true
   }
@@ -735,7 +757,8 @@ export default class State {
   #status = false
   #timeData
   #dataSource
-  #range
+  #overlaySet
+  #inventory = []
   #core
   #chartPanes = new xMap()
   #chartPaneMaximized = {
@@ -792,7 +815,7 @@ export default class State {
   get events() { return this.#data.events }
   get annotations() { return this.#data.annotations }
   get tools() { return this.#data.tools }
-
+  get inventory() { return this.#inventory }
 
   error(e) { this.#core.error(e) }
 
@@ -1055,6 +1078,10 @@ console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
     const mTrades = merge?.trades || false
     const events = this.allData?.events
     const mEvents = merge?.events || false
+    const annotations = this.allData?.annotations
+    const mAnnotations = merge?.annotations || false
+    const tools = this.allData?.tools
+    const mTools = merge?.tools || false
     const inc = (!isArray(mData)) ? 0 : (this.range.inRange(mData[0][0])) ? 1 : 0
     const refresh = {}
 
@@ -1165,17 +1192,24 @@ console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
         }
       }
 
-      // Do we have events?
-      if (isObject(mEvents)) {
-        for (let e in mEvents) {
-
-        }
+      // Do we have annotations?
+      if (isObject(mAnnotations)) {
+        State.importEvents(mAnnotations, this.allData, this.time.timeFrame)
       }
 
-      // Trades
+      // Do we have events?
+      if (isObject(mEvents)) {
+        State.importEvents(mEvents, this.allData, this.time.timeFrame)
+      }
+
       // Do we have trades?
       if (isObject(mTrades)) {
         State.importTrades(mTrades, this.allData, this.time.timeFrame)
+      }
+
+      // Do we have tools?
+      if (isObject(mTools)) {
+        State.importTools(mTools, this.allData, this.time.timeFrame)
       }
 
       // set new Range if required
@@ -1292,6 +1326,14 @@ console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
     return false
   }
 
+  /**
+   * 
+   * @param {Object} t 
+   * @param {Number} t.timestamp - unix timestamp in milliseconds
+   * @param {String} t.id 
+   * @param {String} t.side - "buy", "sell"
+   * @returns {Boolean}
+   */
   addTrade(t) {
     // validate trade entry
     if (!State.isValidEntry(t, TRADE)) return false
@@ -1346,9 +1388,12 @@ console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
     console.log("TODO: state.removeEvent()")
   }
 
+  buildInventory() {
+    return State.buildInventory(this)
+  }
 }
 
-function hashKey(state) {
+export function hashKey(state) {
   let str = JSON.stringify(state)
   let hash = cyrb53(str)
   return `${SHORTNAME}_${HASHKEY}_${hash}`

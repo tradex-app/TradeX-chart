@@ -1,4 +1,4 @@
-// import { isValidTimestamp } from "./time"
+import { isValidTimestamp } from "./time"
 
 /**
  * @param {*} v
@@ -134,14 +134,20 @@ export function isClass(v){
   return Object.getOwnPropertyNames(v.prototype).length > 1;
 }
 
+
+const types = ["array", "error", "class", "function", "map", "promise", 
+  "object", "integer", "number", "boolean", "string"]
+
 /**
  * @param {string} type
  * @param {*} value
  * @returns {boolean}
  */
 export function checkType(type, value) {
+  const t = [...types, 'timestamp', 'valid']
   if (value === undefined ||
-      value === null)
+      value === null ||
+      !t.includes(type))
       return false
   switch(type) {
     case 'array': return isArray(value);
@@ -156,14 +162,12 @@ export function checkType(type, value) {
     case 'promise': return isPromise(value);
     case 'error': return isError(value);
     case 'class': return isClass(value);
-    // case 'timestamp': return isValidTimestamp(value);
+    case 'timestamp': return isValidTimestamp(value);
     default: throw new Error(`No known test for type: ${type}`)
   }
 };
 
 export function typeOf(value) {
-  const types = ["array", "error", "class", "function", "map", "promise", 
-                  "object", "integer", "number", "boolean", "string"] //, "timestamp"]
   for (let type of types) {
     try {
       if (checkType(type, value)) return type
