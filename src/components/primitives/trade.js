@@ -40,16 +40,16 @@ export default class Trade {
    */
   draw(data) {
     this.data = data
-    const c = this.cfg
-    const i = (data.side === "buy") ? this.buy : this.sell
-    const k = this.hit.getIndexValue(data.key)
-    const hit = fillMask(k, i)
-    const h = limit(data.w, c.iconMinDim, c.iconHeight)
-    const w = limit(data.w, c.iconMinDim, c.iconWidth)
-    const x = this.data.x
-    const y = this.data.y
-    const ctx = this.ctx
-    const ctxH = this.ctxH
+    let c = this.cfg
+    let i = (data.side === "buy") ? this.buy : this.sell
+    let k = this.hit.getIndexValue(data.key)
+    let hit = fillMask(k, i)
+    let h = limit(data.w, c.iconMinDim, c.iconHeight)
+    let w = limit(data.w, c.iconMinDim, c.iconWidth)
+    let x = this.data.x
+    let y = this.data.y
+    let ctx = this.ctx
+    let ctxH = this.ctxH
     // draw icon
     ctx.save();
     ctx.drawImage(i, x, y, w, h);

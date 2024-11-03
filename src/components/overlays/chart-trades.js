@@ -111,6 +111,7 @@ export default class chartTrades extends Overlay {
     // negative values required as widgets start positioned below chart content
     let ty = (y - (w * 1.5)) - iPos.height
     let content = this.buildTradeHTML(tr)
+console.log(`trade selected`, tr.side, k)
     const config = {
       dimensions: {h: undefined, w: 150},
       position: {x: tx + (w / 2) + 1, y: ty},
@@ -158,19 +159,22 @@ export default class chartTrades extends Overlay {
     this.scene.clear()
     this.#trades = []
 
+    const w = this.xAxis.candleW
     const offset = this.xAxis.smoothScrollOffset || 0
     const tradeObj = {
-      x: offset - this.xAxis.candleW,
-      w: this.xAxis.candleW
+      x: offset - w,
+      w: w
     }
 
     let d = this.theme.trades
+    let h = limit(w, d.iconMinDim, d.iconHeight)
     let o = this.core.rangeScrollOffset;
     let c = range.indexStart - o
     let i = range.Length + (o * 2)
     let j = 0
-    let x, t, k, h;
-    let trade;
+    let x, t, k;
+    let yb, ys;
+    let hit, trade;
 
     while(i) {
       x = range.value( c )
@@ -178,21 +182,25 @@ export default class chartTrades extends Overlay {
       k = Object.keys(this.data).indexOf(t)
       // fetch trades (if any) for timestamp
       if (k >= 0) {
+        yb = this.yAxis.yPos(x[3]) + (limit(w, d.iconMinDim, d.iconHeight) * 0.5)
+        ys = this.yAxis.yPos(x[2]) - (limit(w, d.iconMinDim, d.iconHeight) * 1.5)
         // loop over trade entries for timestamp (candle)
         for (let tr of this.data[t]) {
           trade = {...tradeObj}
-          trade.x = this.xAxis.xPos(x[0]) - (this.xAxis.candleW / 2)
-          trade.y = this.yAxis.yPos(x[2]) - (limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight) * 1.5)
+          trade.x = this.xAxis.xPos(x[0]) - (w / 2)
           trade.entry = tr
           trade.side = tr.side
-          trade.key = j  // k
-          h = this.#trade.draw(trade)
+          trade.key = j
+          trade.y = (tr.side === "buy") ? yb : ys
+          hit = this.#trade.draw(trade)
           this.#trades[j] = {
             key: j,
             trade,
-            hit: h
+            hit
           }
           j++
+          if (tr.side === "buy") yb += h
+          else ys -= h
         }
       }
       c++
