@@ -1526,16 +1526,19 @@ console.log("updating a chunk of indicator history", update)
     this.plot(plots, r, opts)
   }
 
+  canIndicatorDraw() {
+    if (this.overlay.data.length < 2 ||
+        !super.mustUpdate() ||
+        !this.yAxis)
+        return false
+    else return true
+  }
+
   draw(range=this.range) {
-
-    const data = this.overlay.data
-    // no update required
-    if (data.length < 2) return
-
-    if (!super.mustUpdate()) return
+    if (!this.canIndicatorDraw()) return
 
     this.clear()
-
+    const data = this.overlay.data
     const offset = this.xAxis.smoothScrollOffset || 0
     const meta = this.definition.meta
     const plots = {}
