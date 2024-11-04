@@ -952,7 +952,7 @@ export default class State {
       let source = key?.dataSource?.source?.name
       let symbol = key?.dataSource?.symbol
       let timeFrame = key?.dataSource?.timeFrameInit
-      let matching = this.dataSource.findMatching(source, symbol, timeFrame)
+      let matching = this.dataSource.findMatchingState(source, symbol, timeFrame)
       
       // use matching State
       if (matching instanceof State) 
