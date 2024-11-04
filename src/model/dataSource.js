@@ -214,6 +214,31 @@ export default class DataSource {
    * @returns 
    */
   timeFrameUse(tf) {
+    let TF = this.timeFrameValidate(tf)
+    if (!TF) return
+
+    this.historyPause()
+    this.#timeFrameCurr = TF
+    // check if a matching symbol time frame State exists
+    let matching = this.findMatchingState()
+    // if so, switch to it
+    if (matching instanceof State) this.#state.use(matching.key)
+    // if no exact match, create a new State from an existing with the new time frame
+    else {
+      let newStateDef = {}
+      newStateDef.dataSource = doStructuredClone(this.#state.dataSource)
+      this.#state.use(newStateDef)
+    }
+    // apply ticker stream to new State
+    // apply fetch
+  }
+
+  /**
+   * Validate time frame 
+   * @param {Number|String} tf - time frame milliseconds or "1h"
+   * @returns {Number|undefined} - time frame milliseconds
+   */
+  timeFrameValidate(tf) {
     tf = timeFrame2MS(tf)
     if (!isInteger(tf))
       throwError(this.#core.ID, this.#state.key, `time frame invalid`)
@@ -236,20 +261,7 @@ export default class DataSource {
     else 
       throwError(this.#core.ID, this.#state.key, `time frame invalid`)
 
-    this.historyPause()
-    this.#timeFrameCurr = tf
-    // check if a matching symbol time frame State exists
-    let matching = this.findMatching()
-    // if so, switch to it
-    if (matching instanceof State) this.#state.use(matching.key)
-    // if no exact match, create a new State from an existing with the new time frame
-    else {
-      let newStateDef = {}
-      newStateDef.dataSource = doStructuredClone(this.#state.dataSource)
-      this.#state.use(newStateDef)
-    }
-    // apply ticker stream to new State
-    // apply fetch
+    return tf
   }
 
   /**
@@ -543,7 +555,7 @@ export default class DataSource {
    * @param {Number} timeFrame - time frame in milliseconds
    * @returns {State|Object|undefined} - matching state, or Object of closest matching States
    */
-  findMatching(source=this.#source.name, symbol=this.#symbol, timeFrame=this.#timeFrameCurr) {
+  findMatchingState(source=this.#source.name, symbol=this.#symbol, timeFrame=this.#timeFrameCurr) {
     let tf = timeFrame2MS(timeFrame)
     let matching = {symbol: [], timeFrame: []}
     if (!isString(source) || !isString(symbol) || !isInteger(tf)) return undefined
