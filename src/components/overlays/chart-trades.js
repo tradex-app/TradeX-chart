@@ -111,7 +111,6 @@ export default class chartTrades extends Overlay {
     // negative values required as widgets start positioned below chart content
     let ty = (y - (w * 1.5)) - iPos.height
     let content = this.buildTradeHTML(tr)
-console.log(`trade selected`, tr.side, k)
     const config = {
       dimensions: {h: undefined, w: 150},
       position: {x: tx + (w / 2) + 1, y: ty},

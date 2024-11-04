@@ -184,26 +184,7 @@ export default class Colour {
     this.#value.rgba = rgba
     this.#RGBAToHex(rgba)
   }
-/*
-  #RGBToHex (rgb) {
-    let {r,g,b,a} = this.#getRGB(rgb)
-  
-    this.value.r = r
-    this.value.g = g
-    this.value.b = b
-    this.value.a = a
 
-    let hex = [
-      decimalToHex(r),
-      decimalToHex(g),
-      decimalToHex(b),
-      decimalToHex(a),
-    ]
-
-    this.setHex(hex)
-    return this
-  }
-*/
   /**
    * 
    * @param {string} rgba 

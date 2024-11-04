@@ -2,8 +2,6 @@ import { isArray, isBoolean, isNumber, isObject, isString, checkType, isFunction
 import { getRandomIntBetween } from '../utils/number'
 import { isValidTimeInRange, isValidTimestamp, TimeData } from '../utils/time'
 import State from '../state/chart-state'
-import { intersection, nearestArrayValue } from '../utils/utilities'
-import { isInViewport } from '../utils/DOM'
 
 
 /**

@@ -10,7 +10,6 @@ import State, { DEFAULT_STATE } from "../state/chart-state"
 import Stream from "../helpers/stream";
 import { checkType, isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isPromise, isString } from "../utils/typeChecks";
 import { doStructuredClone, uid, xMap } from "../utils/utilities";
-import { limit } from "../utils/number";
 import { TIMEFRAMEMAX, TIMEFRAMEMIN, TIMESCALESVALUES, interval2MS, isTimeFrame, isTimeFrameMS, ms2Interval } from "../utils/time";
 import { DEFAULT_TIMEFRAME, INTITIALCNT } from "../definitions/chart";
 
@@ -237,7 +236,6 @@ export default class DataSource {
     else 
       throwError(this.#core.ID, this.#state.key, `time frame invalid`)
 
-    //TODO: pause / stop fetch
     this.historyPause()
     this.#timeFrameCurr = tf
     // check if a matching symbol time frame State exists
@@ -304,30 +302,31 @@ export default class DataSource {
    */
   tickerStart(symbol, tf) {
     tf = timeFrame2MS(tf)
-    if (isString(symbol) && 
-        symbol.length &&
-        isInteger(tf) ) {
-          if (!this.#symbol || this.#symbol === "empty")
-            this.symbolSet(symbol)
+    if (!isString(symbol) ||
+        !symbol.length ||
+        !isInteger(tf) ) 
+        return false
 
-          else if (this.#symbol !== "empty" && this.#symbol !== symbol) {
-            consoleError(this.#core, this.#state.key, `ticker symbol does not match chart symbol`)
-            return false
-          }
+    if (!this.#symbol || this.#symbol === "empty")
+      this.symbolSet(symbol)
 
-          if (this.#state.isEmpty) {
-            this.timeFrameUse(tf)
-          }
-          else if (this.#timeFrameCurr !== tf) {
-            consoleError(this.#core, this.#state.key, `ticker time frame does not match chart time frame`)
-            return false
-          }
+    else if (this.#symbol !== "empty" && this.#symbol !== symbol) {
+      consoleError(this.#core, this.#state.key, `ticker symbol does not match chart symbol`)
+      return false
+    }
 
-          let onTick = (t) => { this.#stream.onTick.call(this.#stream, t) }
-          this.#stream.start()
-          this.#source.tickerStream.start(symbol, tf, onTick)
-          return true
-        }
+    if (this.#state.isEmpty) {
+      this.timeFrameUse(tf)
+    }
+    else if (this.#timeFrameCurr !== tf) {
+      consoleError(this.#core, this.#state.key, `ticker time frame does not match chart time frame`)
+      return false
+    }
+
+    let onTick = (t) => { this.#stream.onTick.call(this.#stream, t) }
+    this.#stream.start()
+    this.#source.tickerStream.start(symbol, tf, onTick)
+    return true
   }
 
   tickerStop() {
@@ -551,13 +550,13 @@ export default class DataSource {
 
     let list = this.#state.list() || []
     let ds;
-    for (let s of list) {
-      ds = s.value.dataSource.source
+    for (let state of list) {
+      ds = state.value.dataSource.source
       if (ds.source !== this.source) continue
       if (ds.symbol !== this.symbol) continue
-      matching.symbol.push(s)
-      if (ds.timeFrame === this.timeFrame) return s
-      else matching.timeFrame.push(s)
+      matching.symbol.push(state)
+      if (ds.timeFrame === this.timeFrame) return state
+      else matching.timeFrame.push(state)
     }
     return matching
   }
@@ -571,7 +570,7 @@ function throwError(id, k, e) {
   throw new Error(`TradeX-chart: ${id} : State ${k} : DataSource : ${e}`)
 }
 
-function buildTimeFrames (t) {
+function buildTimeFrames(t) {
   let tf = {}
   let str;
   for (let ms of t) {

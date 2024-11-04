@@ -1384,7 +1384,7 @@ export default class TradeXchart extends Tradex_chart {
    */
   async calcAllIndicators(update) {
     const indicators = []
-    const executeInd = (i) => {
+    const executeIndicator = (i) => {
       return new Promise(resolve => setTimeout(() => {
         resolve( i() )
       }, 0))
@@ -1395,7 +1395,7 @@ export default class TradeXchart extends Tradex_chart {
       }
     }
     await Promise.all( indicators.map( async i => { 
-      executeInd(i) }))
+      executeIndicator(i) }))
       this.refresh()
   }
 
