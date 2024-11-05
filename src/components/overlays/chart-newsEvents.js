@@ -58,7 +58,10 @@ export default class chartNewsEvents extends Overlay {
 
     if (this.core.config?.events?.display === false ||
         this.core.config?.events?.displayInfo === false ||
-        k == -1)  return
+        k == -1) {
+          this.#dialogue.close()
+          return
+        }
 
     const d = this.theme.events
     const w = limit(this.xAxis.candleW, d.iconMinDim, d.iconHeight)
