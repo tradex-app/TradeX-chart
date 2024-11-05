@@ -233,22 +233,8 @@ export default class State {
    * @returns {State|undefined} - chart state instance
    */
   static use(chart, state = State.default) {
-    let key = (State.has(chart, state)) ? state :
-      (State.has(chart, state?.key)) ? state.key : state
-
-    if (!isString(key) && 
-        isObject(state) && 
-        !!Object.keys(state).length) 
-    {
-      key = hashKey(state)
-
-      if (!State.has(chart, key))
-        key = State.create(chart, state).key
-    }
-    else 
-    if (!isString(key) && 
-        !isObject(state)) 
-        return undefined
+    let key = State.determineKey(chart, state)
+    if (!key) return
 
     const states = State.#chartList.get(chart.key)
     let previous = states.active
@@ -271,6 +257,27 @@ export default class State {
 
     states.active = active
     return active
+  }
+
+  static determineKey(chart, state) {
+    let key = (State.has(chart, state)) ? state :
+      (State.has(chart, state?.key)) ? state.key : state
+
+    if (!isString(key) && 
+        isObject(state) && 
+        !!Object.keys(state).length) 
+    {
+      key = hashKey(state)
+
+      if (!State.has(chart, key))
+        key = State.create(chart, state).key
+    }
+    else 
+    if (!isString(key) && 
+        !isObject(state)) 
+        return undefined
+
+    return key
   }
 
   static archive(chart, id) {
