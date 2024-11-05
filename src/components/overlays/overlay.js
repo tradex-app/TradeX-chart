@@ -160,6 +160,10 @@ export default class Overlay {
     else return false
   }
 
+  /**
+   * Does the indicator need to redraw (update)?
+   * @returns {Boolean}
+   */
   mustUpdate() {
     const r = this.#core.range
     const l = this.#mustUpdate
