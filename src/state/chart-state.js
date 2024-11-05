@@ -236,14 +236,19 @@ export default class State {
     let key = (State.has(chart, state)) ? state :
       (State.has(chart, state?.key)) ? state.key : state
 
-    if (!isString(key) && isObject(state) && !!Object.keys(state).length) {
+    if (!isString(key) && 
+        isObject(state) && 
+        !!Object.keys(state).length) 
+    {
       key = hashKey(state)
 
-      if (!State.has(chart, key)) {
+      if (!State.has(chart, key))
         key = State.create(chart, state).key
-      }
     }
-    else if (!isString(key) && !isObject(state)) return undefined
+    else 
+    if (!isString(key) && 
+        !isObject(state)) 
+        return undefined
 
     const states = State.#chartList.get(chart.key)
     let previous = states.active
@@ -260,23 +265,8 @@ export default class State {
       active = target
 
       // rehydrate state
-      if (isObject(active?.archive)) {
-        let archive = (isString(active?.archive?.data)) ?
-          active?.archive.data :
-          "";
-        let data = (!!active.archive?.compress) ?
-          archive.decompress() :
-          archive;
-        let oldState = JSON.parse(data)
-        delete active.archive
-
-        const defaultState = doStructuredClone(State.default)
-        State.buildInventory(oldState)
-        // TODO: set allData to primary[].data
-        active.allData.primaryPane = oldState.primary
-        active.allData.secondaryPane = oldState.secondary
-        active.data.inventory = oldState.inventory
-      }
+      if (isObject(active?.archive))
+        State.unarchive(active)
     }
 
     states.active = active
@@ -286,6 +276,24 @@ export default class State {
   static archive(chart, id) {
     let state = State.findStateById(chart, id)
     if (!state) return false
+  }
+
+  static unarchive(active) {
+    let archive = (isString(active?.archive?.data)) ?
+    active?.archive.data :
+    "";
+    let data = (!!active.archive?.compress) ?
+      archive.decompress() :
+      archive;
+    let oldState = JSON.parse(data)
+    delete active.archive
+
+    // const defaultState = doStructuredClone(State.default)
+    State.buildInventory(oldState)
+    // TODO: set allData to primary[].data
+    active.allData.primaryPane = oldState.primary
+    active.allData.secondaryPane = oldState.secondary
+    active.data.inventory = oldState.inventory
   }
 
   static findStateById(chart, id) {
