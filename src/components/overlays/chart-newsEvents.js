@@ -100,12 +100,17 @@ export default class chartNewsEvents extends Overlay {
     return c
   }
 
-  draw(range=this.core.range) {
-    if (this.core.config?.events?.display === false ||
+  canNewsEventsDraw() {
+    if (!super.mustUpdate() ||
         !isObject(this.data) ||
         Object.keys(this.data).length == 0 ||
-        !super.mustUpdate()
-      ) return
+        this.core.config?.events?.display === false
+      ) return false
+    else return true
+  }
+
+  draw(range=this.core.range) {
+    if (!this.canNewsEventsDraw()) return
 
     this.hit.clear()
     this.scene.clear()
