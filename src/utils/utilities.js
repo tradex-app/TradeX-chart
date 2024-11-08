@@ -200,15 +200,6 @@ export function getProperty(obj, path) {
       (o && o[key] !== 'undefined') ? o[key] : undefined, obj);
 }
 
-export function objectValidate(o, v) {
-  for (let key of Object.keys(v)) {
-    if (checkType(v[key], o?.[key])) {
-      return false
-    }
-  }
-  return true
-}
-
 
 // https://www.30secondsofcode.org/js/s/data-structures-doubly-linked-list/
 export class DoubleLinkedList {
@@ -295,8 +286,7 @@ export function isArrayEqual(a1, a2) {
       continue
     }
     if (isObject(a1[i]) || isObject(a1[i])) {
-      // FIXME
-      if (!isObject(a1[i], a2[i])) return false
+      if (!isObjectEqual(a1[i], a2[i])) return false
       continue
     }
     if (a1[i] !== a2[i]) return false;

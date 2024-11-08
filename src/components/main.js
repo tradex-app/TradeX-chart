@@ -1035,7 +1035,7 @@ console.log("total does not match Row Height")
    * iterate over chart panes and remove invalid indicators
    */
   validateIndicators() {
-    const isValidObj = (o) => {
+    const isValidIndicatorObj = (o) => {
       return isObject(o) &&
       ( o.type in this.core.indicatorClasses ||
         nonIndicators.includes(o.type))
@@ -1043,10 +1043,10 @@ console.log("total does not match Row Height")
 
     const isValidArr = (o) => {
       if (!isArray(o)) return false
-      o.forEach((v, i) => {
-        if (!isValidObj(v)) {
-          this.core.log(`TradeX-Chart: ${this.core.ID} : indicator ${v?.type} not added: not supported.`)
-          o.splice(i, 1)
+      o.forEach((value, index) => {
+        if (!isValidIndicatorObj(value)) {
+          this.core.log(`TradeX-Chart: ${this.core.ID} : indicator ${value?.type} not added: not supported.`)
+          o.splice(index, 1)
         }
       })
       return !o.length

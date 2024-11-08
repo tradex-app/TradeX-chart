@@ -3,7 +3,7 @@
 
 import * as packageJSON from '../../package.json'
 import * as compression from '../utils/compression'
-import { checkType, isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from '../utils/typeChecks'
+import { checkType, isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isObjectOfTypes, isString, typeOf } from '../utils/typeChecks'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
 import { doStructuredClone, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, } from '../utils/utilities'
 import { validateDeep, validateShallow, sanitizeCandles, Gaps } from '../model/validateData'
@@ -20,6 +20,7 @@ import { OHLCV } from '../definitions/chart'
 import Chart from '../components/chart'
 import DataSource from '../model/dataSource'
 import { OverlaySet } from './overlaySet'
+import { isOverlayObject } from '../components/overlays/overlay'
 //import internal from 'stream'
 
 const HASHKEY = "state"
@@ -616,8 +617,7 @@ export default class State {
     if (!(state.core.ChartPanes instanceof xMap)) return
     for (let [key, pane] of state.core.ChartPanes) {
       let ind = [],
-        entry = [],
-        snapshot;
+        entry = [];
       entry[0] = (pane.isPrimary) ? "primary" : "secondary"
       for (let i of Object.values(pane.indicators)) {
         ind.push(i.instance.snapshot())
@@ -642,9 +642,6 @@ export default class State {
       }
     }
 
-   let defaultState = doStructuredClone(State.default)
-
-
     // Process chart order
     let o = state.inventory
     let c = o.length
@@ -658,11 +655,7 @@ export default class State {
         let x = i.length
         while (x--) {
           // remove if invalid
-          if (!isObject(i[x]) ||
-            !isString(i[x].name) ||
-            !isString(i[x].type)
-            // !isArray(i[x].data)
-          )
+          if (!isOverlayObject(i[x]))
             i.splice(x, 1)
           // default settings if necessary
           else if (!isObject(i[x].settings))
@@ -672,6 +665,8 @@ export default class State {
         if (o[c].length == 0) o.splice(c, 1)
       }
     }
+
+    let defaultState = doStructuredClone(State.default)
 
     // ensure state has the mandatory primary entry
     if (state.inventory.length == 0)
@@ -752,15 +747,8 @@ export default class State {
     return true
   }
 
-  static isValidEntry(e, type) {
-    const k1 = Object.keys(e)
-    const k2 = Object.keys(type)
-    if (!isObject(e) ||
-      !isArrayEqual(k1, k2)) return false
-    for (let k of k2) {
-      if (!checkType(type[k], e[k])) return false
-    }
-    return true
+  static isValidEntry(target, types) {
+    return isObjectOfTypes(target, types)
   }
 
 

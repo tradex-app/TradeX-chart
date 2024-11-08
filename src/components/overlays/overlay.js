@@ -1,7 +1,7 @@
 // overlay.js
 // parent class for overlays to build upon
 
-import { isArray, isBoolean } from "../../utils/typeChecks"
+import { isArray, isBoolean, isObjectOfTypes } from "../../utils/typeChecks"
 import xAxis from "../axis/xAxis"
 import yAxis from "../axis/yAxis"
 import canvas from "../../renderer/canvas-lib"
@@ -261,4 +261,13 @@ export default class Overlay {
       let {width, height} = this.scene
       renderHighLowRange( ctx, y1, y2, width, height, p )
     }
+}
+
+const overlayObjectDef = {
+  name: "string",
+  type: "string"
+}
+
+export function isOverlayObject(o) {
+  return isObjectOfTypes(o, overlayObjectDef)
 }
