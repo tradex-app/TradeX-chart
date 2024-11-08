@@ -296,7 +296,7 @@ export default class State {
     delete active.archive
 
     // const defaultState = doStructuredClone(State.default)
-    State.buildInventory(oldState)
+    State.parseChartPanesInventory(oldState)
     // TODO: set allData to primary[].data
     active.allData.primaryPane = oldState.primary
     active.allData.secondaryPane = oldState.secondary
@@ -399,7 +399,7 @@ export default class State {
     }
     state.allData.datasets = state.datasets
 
-    State.buildInventory(state)
+    State.parseChartPanesInventory(state)
 
     // trades
 
@@ -611,7 +611,7 @@ export default class State {
     }
   }
 
-  static archiveInventory(state) {
+  static archiveChartPanesInventory(state) {
     state.data.inventory.length = 0
     if (!(state.core.ChartPanes instanceof xMap)) return
     for (let [key, pane] of state.core.ChartPanes) {
@@ -627,7 +627,7 @@ export default class State {
     }
   }
 
-  static buildInventory(state) {
+  static parseChartPanesInventory(state) {
     validateInventory(state)
     validateInventoryChartPanes(state)
     validateInventoryPrimaryPane(state)
@@ -893,7 +893,7 @@ export default class State {
         this.#dataSource?.historyPause()
       }
       this.#core.progress.start()
-      State.archiveInventory(this)
+      State.archiveChartPanesInventory(this)
       this.#core.MainPane.destroy(false)
     }
 
@@ -1338,9 +1338,6 @@ console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
     console.log("TODO: state.removeEvent()")
   }
 
-  buildInventory() {
-    return State.buildInventory(this)
-  }
 }
 
 export function hashKey(state) {
