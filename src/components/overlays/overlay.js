@@ -263,11 +263,3 @@ export default class Overlay {
     }
 }
 
-const overlayObjectDef = {
-  name: "string",
-  type: "string"
-}
-
-export function isOverlayObject(o) {
-  return isObjectOfTypes(o, overlayObjectDef)
-}

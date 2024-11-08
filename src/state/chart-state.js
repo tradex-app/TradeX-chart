@@ -20,7 +20,6 @@ import { OHLCV } from '../definitions/chart'
 import Chart from '../components/chart'
 import DataSource from '../model/dataSource'
 import { OverlaySet } from './overlaySet'
-import { isOverlayObject } from '../components/overlays/overlay'
 //import internal from 'stream'
 
 const HASHKEY = "state"
@@ -629,61 +628,9 @@ export default class State {
   }
 
   static buildInventory(state) {
-    // Build chart order
-    if (state.inventory.length == 0) {
-      // add primary chart
-      state.inventory.push(["primary", state.primary])
-      // add secondary charts if they exist
-      let secondary = (isArray(state?.secondary)) ? state.secondary : []
-      for (let s of secondary) {
-        if (isObject(s) || isArrayOfType(s, "object")) {
-          state.inventory.push(["secondary", s])
-        }
-      }
-    }
-
-    // Process chart order
-    let o = state.inventory
-    let c = o.length
-    while (c--) {
-      // if no valid indicators, delete entry
-      if (!isArray(o[c]) || o[c].length == 0)
-        o.splice(c, 1)
-      else {
-        // validate each overlay / indicator entry
-        let i = state.inventory[c]?.[1] || []
-        let x = i.length
-        while (x--) {
-          // remove if invalid
-          if (!isOverlayObject(i[x]))
-            i.splice(x, 1)
-          // default settings if necessary
-          else if (!isObject(i[x].settings))
-            i[x].settings = {}
-        }
-        // if no valid indicators remain, delete entry
-        if (o[c].length == 0) o.splice(c, 1)
-      }
-    }
-
-    let defaultState = doStructuredClone(State.default)
-
-    // ensure state has the mandatory primary entry
-    if (state.inventory.length == 0)
-      state.inventory[0] = ["primary", defaultState.primary]
-
-    // remove duplicate primaries
-    let cnt = 0
-    state.inventory.forEach((v, i) => {
-      if (v[0] == "primary") {
-        if (++cnt > 1)
-          state.inventory.splice(i, 1)
-      }
-    })
-
-    // if no primary, add one
-    if (!cnt)
-      state.inventory.push(["primary", defaultState.primary])
+    validateInventory(state)
+    validateInventoryChartPanes(state)
+    validateInventoryPrimaryPane(state)
   }
 
   static importAnnotations(data, state, tf) {
@@ -1435,6 +1382,78 @@ function applyTickerStream(curr, old) {
     return true
   }
   return false
+}
+
+function validateInventoryChartPanes(state) {
+  let o = state.inventory
+  let c = o.length
+  while (c--) {
+    // if no valid indicators, delete chart pane
+    if (!isArray(o[c]) || o[c].length == 0)
+      o.splice(c, 1)
+    else 
+      validateInventoryOverlays(state, c)
+  }
+}
+
+function validateInventoryPrimaryPane(state) {
+  let cnt = 0
+  state.inventory.forEach((v, i) => {
+    if (v[0] == "primary") {
+      // remove duplicate primaries
+      if (++cnt > 1)
+        state.inventory.splice(i, 1)
+    }
+  })
+
+  // if no primary, add one
+  if (!cnt) {
+    let defaultState = doStructuredClone(State.default)
+    state.inventory.push(["primary", defaultState.primary])
+  }
+}
+
+function validateInventoryOverlays(state, c) {
+  let o = state.inventory
+  let i = state.inventory[c]?.[1] || []
+  let x = i.length
+  while (x--) {
+    // remove if invalid
+    if (!isInventoryOverlayValid(i[x], state.core))
+      i.splice(x, 1)
+    // default settings if necessary
+    else if (!isObject(i[x].settings))
+      i[x].settings = {}
+  }
+  // if no valid indicators remain, delete chart pane
+  if (o[c].length == 0) o.splice(c, 1)
+}
+
+function isInventoryOverlayValid(o, core) {
+  const overlayObjectDef = {
+    name: "string",
+    type: "string"
+  }
+
+  return (
+    isObjectOfTypes(o, overlayObjectDef) &&
+    (o.type in core.indicatorClasses ||
+     o.type in core.overlayEntries())
+  )
+}
+
+function validateInventory(state) {
+  if (!isArray(state.inventory) || state.inventory.length == 0) {
+    // add primary chart
+    state.inventory.push(["primary", state.primary])
+    // add secondary charts if they exist
+    let secondary = (isArray(state?.secondary)) ? state.secondary : []
+    for (let s of secondary) {
+      if (isObject(s) || isArrayOfType(s, "object")) {
+        state.inventory.push(["secondary", s])
+      }
+    }
+  }
 }
 
 function consoleError(c, k, e) {
