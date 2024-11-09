@@ -230,9 +230,10 @@ export default class State {
    * Use a chart State - set it to active
    * @param {TradeXchart} chart - target
    * @param {String|Object} state - state key or {id: "someID"} or {key: "stateKey"} or a state object
+   * @param {State} [inherit] - State instance to inherit indicators from
    * @returns {State|undefined} - chart state instance
    */
-  static use(chart, state = State.default) {
+  static use(chart, state = State.default, inherit) {
     let key = State.determineKey(chart, state)
     if (!key) return
 
@@ -249,11 +250,12 @@ export default class State {
     if (key != active?.key) {
       states.previous = { state: active, node: "" }
       active = target
-
-      // rehydrate state
-      if (isObject(active?.archive))
-        State.unarchive(active)
     }
+    if (inherit) 
+      State.inheritChartPanesInventory(active, previous)
+    // rehydrate state
+    if (isObject(active?.archive))
+      State.unarchiveInventory(active)
 
     states.active = active
     return active
@@ -285,19 +287,17 @@ export default class State {
     if (!state) return false
   }
 
-  static unarchive(active) {
+  static unarchiveInventory(active) {
     let archive = (isString(active?.archive?.data)) ?
     active?.archive.data :
     "";
-    let data = (!!active.archive?.compress) ?
+    let archiveData = (!!active.archive?.compress) ?
       archive.decompress() :
       archive;
-    let oldState = JSON.parse(data)
+    let oldState = JSON.parse(archiveData)
     delete active.archive
 
-    // const defaultState = doStructuredClone(State.default)
     State.parseChartPanesInventory(oldState)
-    // TODO: set allData to primary[].data
     active.allData.primaryPane = oldState.primary
     active.allData.secondaryPane = oldState.secondary
     active.data.inventory = oldState.inventory
@@ -627,6 +627,23 @@ export default class State {
     }
   }
 
+  static inheritChartPanesInventory(active, previous) {
+    if (!isArray(previous.data?.inventory) ||
+        !previous.data.length) return
+
+    let activeInventory = new xMap(active.data?.inventory || [])
+    let previousInventory = new xMap(previous.data.inventory)
+    let targetInventory = new xMap()
+    active.data.inventory = []
+
+    previousInventory.forEach((value, key, map) => {
+      let val = activeInventory.get(key)
+      let v = (!!val) ? val : value
+      targetInventory.set(key, v)
+    })
+    active.data.inventory = Array.from(targetInventory)
+  }
+
   static parseChartPanesInventory(state) {
     validateInventory(state)
     validateInventoryChartPanes(state)
@@ -708,7 +725,6 @@ export default class State {
   #timeData
   #dataSource
   #overlaySet
-  #inventory = []
   #core
   #chartPanes = new xMap()
   #chartPaneMaximized = {
@@ -765,7 +781,7 @@ export default class State {
   get events() { return this.#data.events }
   get annotations() { return this.#data.annotations }
   get tools() { return this.#data.tools }
-  get inventory() { return this.#inventory }
+  get inventory() { return this.#data.inventory }
 
   error(e) { this.#core.error(e) }
 
@@ -909,7 +925,8 @@ export default class State {
         key = matching.key 
     }
 
-    let state = State.use(this.#core, key)
+    let inherit = (!!key?.override) ? undefined : this
+    let state = State.use(this.#core, key, inherit)
 
     if (isObject(key))
       key.key = state?.key
