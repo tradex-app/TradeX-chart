@@ -7,7 +7,7 @@ import { elementDimPos } from "../utils/DOM"
 import Timeline from './timeline'
 import Graph from "./views/classes/graph"
 import renderLoop from "./views/classes/renderLoop"
-import Chart from "./chart"
+import Chart, { ChartPaneSnapshot } from "./chart"
 import chartGrid from "./overlays/chart-grid"
 import Indicator from "./overlays/indicator"
 import watermark from "./overlays/chart-watermark"
@@ -15,7 +15,7 @@ import watermark from "./overlays/chart-watermark"
 import Divider from "./widgets/divider"
 import stateMachineConfig from "../state/state-main"
 import Input from "../input"
-import { isArray, isArrayOfType, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks"
+import { isArray, isArrayOfType, isBoolean, isFunction, isNumber, isObject, isObjectOfTypes, isString } from "../utils/typeChecks"
 import { doStructuredClone, valuesInArray, xMap } from "../utils/utilities"
 
 import {
@@ -555,12 +555,19 @@ export default class MainPane extends Component {
     this.validateIndicators()
     
     for (let p of this.inventory) {
+      if (isObjectOfTypes(p, ChartPaneSnapshot.types)) {
+        options.type = (p.isPrimary) ? "primary" : "secondary"
+        options.view = p.indicators
+        options.state = p
+      }
+      // legacy support
+      else
       if (isArray(p) && p.length > 1) {
         options.type = (p[0] == "primary") ? p[0] : "secondary"
         options.view = (isArrayOfType(p[1], "object")) ? p[1] : [p[1]]
         options.state = p[2]
-        this.chartPaneAdd(options)
       }
+      this.chartPaneAdd(options)
     }
   }
 

@@ -615,33 +615,42 @@ export default class State {
     state.data.inventory.length = 0
     if (!(state.core.ChartPanes instanceof xMap)) return
     for (let [key, pane] of state.core.ChartPanes) {
-      let ind = [],
-        entry = [];
-      entry[0] = (pane.isPrimary) ? "primary" : "secondary"
-      for (let i of Object.values(pane.indicators)) {
-        ind.push(i.instance.snapshot())
-      }
-      entry[1] = ind
-      entry[2] = pane.snapshot()
+      let entry = [
+        key,
+        pane.snapshot()
+      ]
+      // let entry = pane.snapshot()
       state.data.inventory.push(entry)
     }
   }
 
   static inheritChartPanesInventory(active, previous) {
-    if (!isArray(previous.data?.inventory) ||
-        !previous.data.length) return
+    let previousInventory = previous.inventory
+    if (!isArray(previousInventory) ||
+        !previousInventory.length)
+        return
 
-    let activeInventory = new xMap(active.data?.inventory || [])
-    let previousInventory = new xMap(previous.data.inventory)
-    let targetInventory = new xMap()
-    active.data.inventory = []
+    let activeInventory = []
+    let targetInventory = []
+    let entry, search, isPrimary;
 
-    previousInventory.forEach((value, key, map) => {
-      let val = activeInventory.get(key)
-      let v = (!!val) ? val : value
-      targetInventory.set(key, v)
+    if (isArray(active.inventory)) {
+      activeInventory = active.inventory
+    }
+
+    const findMatch = (match, inventory) => {
+      for (let i of inventory) {
+        if (i[0] === match) return i
+      }
+    }
+
+    previousInventory.forEach( (i, j) => {
+      search = findMatch(i[0], activeInventory)
+      entry = (!!search) ? search : previousInventory[j];
+      isPrimary = (!!entry[1]?.isPrimary) ? "primary" : "secondary"
+      targetInventory.push([isPrimary, entry])
     })
-    active.data.inventory = Array.from(targetInventory)
+    active.data.inventory = targetInventory
   }
 
   static parseChartPanesInventory(state) {

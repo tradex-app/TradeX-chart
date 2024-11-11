@@ -24,7 +24,7 @@ const wasm = "node_modules/talib-web/lib/talib.wasm"
 
 import bearHawk from './data/bear-hawk.js'
 import { text } from './src/definitions/icons.js'
-import { loadStates } from './demo/js/loadStates.js'
+import { loadStates, statesDropDown } from './demo/js/loadStates.js'
 import { loadTimeFrame } from './demo/js/loadTimeFrame.js'
 
 // build a split state to test all merge features
@@ -1379,3 +1379,4 @@ const cfgs = { config1, config2, config3 }
 
 loadTimeFrame(chart0)
 loadStates(chart0, states, cfgs)
+statesDropDown(chart0, states)
