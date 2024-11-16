@@ -5,7 +5,7 @@ import * as packageJSON from '../../package.json'
 import * as compression from '../utils/compression'
 import { checkType, isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isObjectOfTypes, isString, typeOf } from '../utils/typeChecks'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
-import { doStructuredClone, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, } from '../utils/utilities'
+import { doStructuredClone, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, intersection, } from '../utils/utilities'
 import { validateDeep, validateShallow, sanitizeCandles, Gaps } from '../model/validateData'
 import { calcTimeIndex, detectInterval } from '../model/range'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT, LIMITFUTURE, LIMITPAST, MAXCANDLES, MINCANDLES, YAXIS_BOUNDS } from '../definitions/chart'
@@ -615,9 +615,15 @@ export default class State {
     state.data.inventory.length = 0
     if (!(state.core.ChartPanes instanceof xMap)) return
     for (let [key, pane] of state.core.ChartPanes) {
+      // let entry = [
+      //   key,
+      //   pane.snapshot()
+      // ]
+      let snapshot = pane.snapshot()
       let entry = [
-        key,
-        pane.snapshot()
+        (snapshot.isPrimary) ? "primary" : "secondary",
+        Object.values(snapshot.indicators),
+        snapshot
       ]
       // let entry = pane.snapshot()
       state.data.inventory.push(entry)
@@ -625,6 +631,7 @@ export default class State {
   }
 
   static inheritChartPanesInventory(active, previous) {
+    let isMatchingAssetTF = isMatchingSymbolTF(active, previous)
     let previousInventory = previous.inventory
     if (!isArray(previousInventory) ||
         !previousInventory.length)
@@ -632,23 +639,29 @@ export default class State {
 
     let activeInventory = []
     let targetInventory = []
-    let entry, search, isPrimary;
+    let entry, result, search, snapshot, isPrimary;
 
     if (isArray(active.inventory)) {
       activeInventory = active.inventory
     }
 
-    const findMatch = (match, inventory) => {
-      for (let i of inventory) {
-        if (i[0] === match) return i
-      }
-    }
-
     previousInventory.forEach( (i, j) => {
-      search = findMatch(i[0], activeInventory)
-      entry = (!!search) ? search : previousInventory[j];
-      isPrimary = (!!entry[1]?.isPrimary) ? "primary" : "secondary"
-      targetInventory.push([isPrimary, entry])
+      search = findMatchingChartPane(i[1], activeInventory)
+      result = (!!search) ? search : i;
+      result[2] = i[2]
+      if (isMatchingAssetTF) entry = result
+      else {
+        entry = doStructuredClone(result)
+        entry[1] = (isObject(entry[1])) ? [entry[1]] : entry[1]
+        for (let indicator of entry[1]) {
+          indicator.data = []
+          delete indicator.id 
+          delete indicator.key
+        }
+      }
+      targetInventory.push(entry)
+
+      // targetInventory.push([isPrimary, entry, snapshot])
     })
     active.data.inventory = targetInventory
   }
@@ -1372,6 +1385,11 @@ export function hashKey(state) {
   return `${SHORTNAME}_${HASHKEY}_${hash}`
 }
 
+function isMatchingSymbolTF(active, previous) {
+  return (active.timeFrame === previous.timeFrame &&
+          active.symbol === previous.symbol)
+}
+
 function applyHistoryFetch(curr, old) {
   let c = curr.dataSource.source;
   let o = old.dataSource.source;
@@ -1477,6 +1495,46 @@ function validateInventory(state) {
       }
     }
   }
+}
+
+function findMatchingChartPane(source, target, isPrimary, assetMatch) {
+  let pane, search;
+  for (pane of target) {
+    search =  matchedInventoryIndicators(source, pane)
+    if (search.matched.length) return pane
+  }
+}
+/*
+function types(arr) {
+  return arr.forEach((ind) => { return ind.type }, [])
+}
+
+function matchedTypes(sourceTypes, target) {
+  return target.forEach((pane) => {
+    let paneTypes = types(pane)
+    let intersect = intersection(sourceTypes, paneTypes)
+    if (!intersect.length) return intersect
+  }, [])
+} 
+*/
+function matchedInventoryIndicators(source, target) {
+  let matched = []
+  let noMatch = []
+  for (let s of source) {
+    for (let t of target) {
+      if (matchInventoryIndicator(s, t))
+        matched.push(s)
+      else
+        noMatch.push(t)
+    }
+  }
+  return {matched, noMatch}
+}
+
+function matchInventoryIndicator(source, target) {
+  let type = source.type == target.type
+  let settings = isObjectEqual(source.settings, target?.settings)
+  return type || settings
 }
 
 function consoleError(c, k, e) {

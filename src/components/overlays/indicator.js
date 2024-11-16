@@ -84,6 +84,17 @@ export default class Indicator extends Overlay {
   static #cnt = 0
   static get cnt() { return ++Indicator.#cnt }
   static get isIndicator() { return true }
+  static definition = {
+    input: {},
+    output: {},
+    meta: {
+      input: {},
+      output: [],
+      outputOrder: [],
+      outputLegend: {},
+      style: {}
+    }
+  }
 
 
   #ID
@@ -116,17 +127,7 @@ export default class Indicator extends Overlay {
   #gapFill = true
   // #gaps = new Set()
 
-  definition = {
-    input: {},
-    output: {},
-    meta: {
-      input: {},
-      output: [],
-      outputOrder: [],
-      outputLegend: {},
-      style: {}
-    }
-  }
+  definition = doStructuredClone(Indicator.definition)
 
   colours = [
     palette.colours[8],
@@ -797,17 +798,7 @@ export default class Indicator extends Overlay {
     let input = this.retrieveInput(settings)
     api = (isObject(api)) ? api : {outputs: [], options: []}
 
-    const definition = {
-      input: {},
-      output: {},
-      meta: {
-        input: {},
-        output: [],
-        outputOrder: [],
-        outputLegend: {},
-        style: {}
-      }
-    }
+    const definition = doStructuredClone(Indicator.definition)
     if (!isObject(this.definition)) 
       this.definition = definition
 

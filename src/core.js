@@ -1260,7 +1260,7 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   /**
-   * import Indicators
+   * import Indicators available to users
    * @param {object} i - indicators {id, name, event, ind}
    * @param {boolean} flush - expunge default indicators
    * @returns {boolean|object} - false failure, object of success or failures
@@ -1279,6 +1279,7 @@ export default class TradeXchart extends Tradex_chart {
         isString(v?.event) && 
         this.isIndicator(v?.ind)
       ) {
+        this.indicatorDefinitionDefaults(v)
         if (!!v?.public)
         this.#indicatorsPublic[k] = v
         this.#indicators[k] = v.ind
@@ -1346,6 +1347,14 @@ export default class TradeXchart extends Tradex_chart {
    */
   indicatorSettings(i, s) {
     return this.#MainPane.indicatorSettings(i, s)
+  }
+
+  /**
+   * expose indicator definition defaults
+   * @param {Indicator} i 
+   */
+  indicatorDefinitionDefaults(i) {
+console.log(i)
   }
 
   /**

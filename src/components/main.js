@@ -555,7 +555,7 @@ export default class MainPane extends Component {
     this.validateIndicators()
     
     for (let p of this.inventory) {
-      if (isObjectOfTypes(p, ChartPaneSnapshot.types)) {
+      if (p instanceof ChartPaneSnapshot) {
         options.type = (p.isPrimary) ? "primary" : "secondary"
         options.view = p.indicators
         options.state = p
@@ -705,8 +705,8 @@ console.log("total does not match Row Height")
     }
     else {
       params.type = "secondary"
-      params.name = params.view?.[0].name || "Secondary"
-      params.shortName = params.view?.[0].type || "Secondary"
+      params.name = params.view?.[0]?.name || "Secondary"
+      params.shortName = params.view?.[0]?.type || "Secondary"
       o = new Chart(this.core, params);
     }
     this.chartPanes.set(o.id, o)
@@ -813,7 +813,8 @@ console.log("total does not match Row Height")
     const a = this.#viewDefaultH * (cnt - 1),
           ratio = ( a / Math.log10( a * 2 ) ) / 100,
           rowsH = Math.round(this.rowsH * ratio),
-          sizes = {};
+          sizes = {},
+          paneH = (o) => {return o.height} // { return o?.viewport?.height || o.height };
 
     if (cnt === 1) {
       // only adding the primary (price) chart
@@ -827,8 +828,8 @@ console.log("total does not match Row Height")
       sizes.new = newPane
     }
     else if (exp.length === 2) {
-      const first = exp[0].viewport.height
-      const second = exp[1].viewport.height
+      const first = paneH(exp[0])
+      const second = paneH(exp[1])
       const height = first + second
       const newPane = Math.round(height * this.#viewDefaultH / 100)
       const ratio = height / (height + newPane)
@@ -845,14 +846,14 @@ console.log("total does not match Row Height")
       let total = 0;
       let diff, ratio;
       for (let o of col) {
-        height -= o.viewport.height
+        height -= paneH(o)
       }
       sizes.new = Math.floor(height / (exp.length + 1))
       ratio = height / (height + sizes.new)
       diff = (height - sizes.new) // exp.length
       for (let o of exp) {
         // sizes[o.id] = o.viewport.height - diff
-        sizes[o.id] = diff * (o.viewport.height / height)
+        sizes[o.id] = diff * (paneH(o) / height)
         total += sizes[o.id]
       }
       // account for remainder
