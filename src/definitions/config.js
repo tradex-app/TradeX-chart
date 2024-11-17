@@ -43,5 +43,6 @@ export const defaultConfig = {
   talib: undefined,
   wasm: undefined,
   state: {},
+  stateInheritPrevious: true,
   callbacks: {}
 }

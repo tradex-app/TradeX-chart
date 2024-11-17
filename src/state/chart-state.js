@@ -947,7 +947,7 @@ export default class State {
         key = matching.key 
     }
 
-    let inherit = (!!key?.override) ? undefined : this
+    let inherit = (!!this.#core.config.stateInheritPrevious) ? this : undefined
     let state = State.use(this.#core, key, inherit)
 
     if (isObject(key))
@@ -1002,7 +1002,7 @@ export default class State {
   // TODO: merge indicator data?
   // TODO: merge dataset?
   mergeData(merge, newRange = false, calc = false) {
-console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
+// console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
 
     if (this.isEmpty) State.setTimeFrame(this.#core, this.key, merge?.ohlcv)
 

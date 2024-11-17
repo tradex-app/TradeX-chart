@@ -280,7 +280,7 @@ console.log(`State: ${this.#state.key} new candle:`, this.#candle)
 
     // update the last candle in the state data
     this.#candle = candle
-console.log(`State: ${this.#state.key} candle update:`,candle)
+// console.log(`State: ${this.#state.key} candle update:`,candle)
 
     const d = this.#state.data.chart.data
     const l = (d.length > 0) ? d.length -1 : 0

@@ -455,7 +455,7 @@ export default class Chart extends Component{
   }
 
   onValueMaxMin(m) {
-    console.log(`TradeX-chart: ${this.core.ID} : Chart Pane ${this.id} : Range Value Max: ${m.max}, Min: ${m.min}`)
+    // console.log(`TradeX-chart: ${this.core.ID} : Chart Pane ${this.id} : Range Value Max: ${m.max}, Min: ${m.min}`)
   }
 
   // set up Scale (Y Axis)
