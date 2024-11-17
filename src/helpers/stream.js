@@ -16,7 +16,7 @@ import { YEAR_MS, MONTHR_MS, WEEK_MS, DAY_MS, HOUR_MS, MINUTE_MS, SECOND_MS, MIL
 import { doStructuredClone, mergeDeep, valuesInArray } from '../utils/utilities';
 import Alerts from './alerts';
 import TradeXchart from '../core';
-import State from '../state';
+import State from '../state/chart-state';
 
 import {
   STREAM_ERROR,
@@ -280,7 +280,7 @@ console.log(`State: ${this.#state.key} new candle:`, this.#candle)
 
     // update the last candle in the state data
     this.#candle = candle
-console.log(`State: ${this.#state.key} candle update:`,candle)
+// console.log(`State: ${this.#state.key} candle update:`,candle)
 
     const d = this.#state.data.chart.data
     const l = (d.length > 0) ? d.length -1 : 0

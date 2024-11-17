@@ -3,7 +3,6 @@ import { binanceTF } from "./binanceTF";
 
 export function loadTimeFrame(chart) {
   const nav = document.querySelector("nav")
-
   const select = document.createElement("select", )
   let options = ""
   for (let [key, value] of Object.entries(binanceTF)) {

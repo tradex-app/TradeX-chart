@@ -7,7 +7,7 @@ import { elementDimPos } from "../utils/DOM"
 import Timeline from './timeline'
 import Graph from "./views/classes/graph"
 import renderLoop from "./views/classes/renderLoop"
-import Chart from "./chart"
+import Chart, { ChartPaneSnapshot } from "./chart"
 import chartGrid from "./overlays/chart-grid"
 import Indicator from "./overlays/indicator"
 import watermark from "./overlays/chart-watermark"
@@ -15,7 +15,7 @@ import watermark from "./overlays/chart-watermark"
 import Divider from "./widgets/divider"
 import stateMachineConfig from "../state/state-main"
 import Input from "../input"
-import { isArray, isArrayOfType, isBoolean, isFunction, isNumber, isObject, isString } from "../utils/typeChecks"
+import { isArray, isArrayOfType, isBoolean, isFunction, isNumber, isObject, isObjectOfTypes, isString } from "../utils/typeChecks"
 import { doStructuredClone, valuesInArray, xMap } from "../utils/utilities"
 
 import {
@@ -555,12 +555,19 @@ export default class MainPane extends Component {
     this.validateIndicators()
     
     for (let p of this.inventory) {
+      if (p instanceof ChartPaneSnapshot) {
+        options.type = (p.isPrimary) ? "primary" : "secondary"
+        options.view = p.indicators
+        options.state = p
+      }
+      // legacy support
+      else
       if (isArray(p) && p.length > 1) {
         options.type = (p[0] == "primary") ? p[0] : "secondary"
         options.view = (isArrayOfType(p[1], "object")) ? p[1] : [p[1]]
         options.state = p[2]
-        this.chartPaneAdd(options)
       }
+      this.chartPaneAdd(options)
     }
   }
 
@@ -698,8 +705,8 @@ console.log("total does not match Row Height")
     }
     else {
       params.type = "secondary"
-      params.name = params.view?.[0].name || "Secondary"
-      params.shortName = params.view?.[0].type || "Secondary"
+      params.name = params.view?.[0]?.name || "Secondary"
+      params.shortName = params.view?.[0]?.type || "Secondary"
       o = new Chart(this.core, params);
     }
     this.chartPanes.set(o.id, o)
@@ -806,7 +813,8 @@ console.log("total does not match Row Height")
     const a = this.#viewDefaultH * (cnt - 1),
           ratio = ( a / Math.log10( a * 2 ) ) / 100,
           rowsH = Math.round(this.rowsH * ratio),
-          sizes = {};
+          sizes = {},
+          paneH = (o) => {return o.height} // { return o?.viewport?.height || o.height };
 
     if (cnt === 1) {
       // only adding the primary (price) chart
@@ -820,8 +828,8 @@ console.log("total does not match Row Height")
       sizes.new = newPane
     }
     else if (exp.length === 2) {
-      const first = exp[0].viewport.height
-      const second = exp[1].viewport.height
+      const first = paneH(exp[0])
+      const second = paneH(exp[1])
       const height = first + second
       const newPane = Math.round(height * this.#viewDefaultH / 100)
       const ratio = height / (height + newPane)
@@ -838,14 +846,14 @@ console.log("total does not match Row Height")
       let total = 0;
       let diff, ratio;
       for (let o of col) {
-        height -= o.viewport.height
+        height -= paneH(o)
       }
       sizes.new = Math.floor(height / (exp.length + 1))
       ratio = height / (height + sizes.new)
       diff = (height - sizes.new) // exp.length
       for (let o of exp) {
         // sizes[o.id] = o.viewport.height - diff
-        sizes[o.id] = diff * (o.viewport.height / height)
+        sizes[o.id] = diff * (paneH(o) / height)
         total += sizes[o.id]
       }
       // account for remainder
@@ -1035,7 +1043,7 @@ console.log("total does not match Row Height")
    * iterate over chart panes and remove invalid indicators
    */
   validateIndicators() {
-    const isValidObj = (o) => {
+    const isValidIndicatorObj = (o) => {
       return isObject(o) &&
       ( o.type in this.core.indicatorClasses ||
         nonIndicators.includes(o.type))
@@ -1043,10 +1051,10 @@ console.log("total does not match Row Height")
 
     const isValidArr = (o) => {
       if (!isArray(o)) return false
-      o.forEach((v, i) => {
-        if (!isValidObj(v)) {
-          this.core.log(`TradeX-Chart: ${this.core.ID} : indicator ${v?.type} not added: not supported.`)
-          o.splice(i, 1)
+      o.forEach((value, index) => {
+        if (!isValidIndicatorObj(value)) {
+          this.core.log(`TradeX-Chart: ${this.core.ID} : indicator ${value?.type} not added: not supported.`)
+          o.splice(index, 1)
         }
       })
       return !o.length

@@ -39,20 +39,17 @@
 <li>events</li>
 <li>annotations</li>
 </ul>
-<p>Data states can be provided to the chart either via the initializing config object past to the chart via:</p>
-<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.start(config)</span></span></code></pre>
-<p>or after initilization by telling the chart to use a new state object or the key (string) of a previously registered state object.</p>
-<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">state</span><span style="color:#B392F0">.use(state)</span></span></code></pre>
+<p>Data states can be provided to the chart either via the config object at <code dir="auto">chart.start(config)</code>, or by creating a state separately and telling the chart to use it.</p>
 <p>If no state is provided through the config at <code dir="auto">chart.start(config)</code> then the chart will automatically use a default empty state.</p>
 <p>Data can be then later added via a price stream (typically provided by an exchange websocket) or by merging a block of back history.</p>
 <h2 id="config">Config</h2>
 <p>The chart config object has a state property <code dir="auto">config.state</code>. It requires a valid <a href="#state-config-object">state config object</a>.</p>
 <h2 id="create-and-use-a-state">Create and Use a State</h2>
-<p>A state object can be registered for later use. The <a href="#state-config-object">state (object)</a> will validated by the chart. If valid, it will return the id key (string) assigned to it. This means the chart can hold multiple states in memory to be used as desired, allowing for easy swapping.</p>
+<p>A <a href="#state-config-object">data state (object)</a> must be first validated by the chart. If valid, will register it for later use and return the id key assigned to it. This means the chart can hold multiple states in memory to be used as desired allowing for easy swapping.</p>
 <pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> key</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> chart</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">state</span><span style="color:#B392F0">.create(state)</span></span></code></pre>
 <p>For more information parameters see: TODO: State API documentation</p>
 <p>To have the chart use a state:</p>
-<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">state</span><span style="color:#B392F0">.use(key)</span></span></code></pre>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.useState(key)</span></span></code></pre>
 <ul>
 <li>will remove any indicators the chart was previously using</li>
 <li>stop listening for and displaying the price stream, if any</li>
@@ -119,7 +116,7 @@
 <p>The chart can export any data state contained in memory to a JSoN object. The export will be formatted as a <a href="#state-config-object">state config object</a>.</p>
 <pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> xport</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> chart</span><span style="color:#B392F0">.exportState(key)</span></span></code></pre>
 <h2 id="list">List</h2>
-<p>Return an array of all <a href="#internal-chart-data-state">chart data states</a> currently in memory. This includes states in use by other charts.</p>
+<p>Return a <code dir="auto">Map()</code> of all <a href="#internal-chart-data-state">chart data states</a> currently in memory. This includes states in use by other charts.</p>
 <pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> list</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> chart</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">state</span><span style="color:#B392F0">.list()</span></span></code></pre>
 <h2 id="has">Has</h2>
 <p>Return <code dir="auto">true</code> or <code dir="auto">false</code> if the specified state exists.</p>
@@ -188,19 +185,7 @@
 <span class="line"><span style="color:#6B737C">  // user defined data</span></span>
 <span class="line"><span style="color:#B392F0">  datasets</span><span style="color:#BBBBBB">:</span><span style="color:#B392F0"> []</span><span style="color:#BBBBBB">,</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6B737C">  // specifies what range of the price history (candles) to display</span></span>
-<span class="line"><span style="color:#B392F0">  range</span><span style="color:#BBBBBB">:</span><span style="color:#B392F0"> {</span></span>
-<span class="line"><span style="color:#B392F0">    indexStart</span><span style="color:#BBBBBB">:</span><span style="color:#F8F8F8">  0</span><span style="color:#BBBBBB">,</span><span style="color:#6B737C">   // initial index </span></span>
-<span class="line"><span style="color:#B392F0">    indexEnd</span><span style="color:#BBBBBB">:</span><span style="color:#F8F8F8">    30</span><span style="color:#BBBBBB">,</span><span style="color:#6B737C">  // initial index end</span></span>
-<span class="line"><span style="color:#B392F0">  }</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6B737C">  // Time definition</span></span>
-<span class="line"><span style="color:#B392F0">  timeData</span><span style="color:#BBBBBB">:</span><span style="color:#B392F0"> {</span></span>
-<span class="line"><span style="color:#B392F0">    timeFrameMS</span><span style="color:#BBBBBB">:</span><span style="color:#F8F8F8"> 360000</span><span style="color:#BBBBBB">,</span><span style="color:#6B737C">   // milliseconds</span></span>
-<span class="line"><span style="color:#B392F0">    timeFrame</span><span style="color:#BBBBBB">:</span><span style="color:#FFAB70"> "1h"</span><span style="color:#BBBBBB">,</span></span>
-<span class="line"><span style="color:#B392F0">    timeZone</span><span style="color:#BBBBBB">:</span><span style="color:#FFAB70"> "Europe/Berlin"</span><span style="color:#BBBBBB">,</span></span>
-<span class="line"><span style="color:#B392F0">    timeZoneOffset</span><span style="color:#BBBBBB">:</span><span style="color:#F8F8F8"> 2</span><span style="color:#BBBBBB">,</span></span>
-<span class="line"><span style="color:#B392F0">  }</span></span>
 <span class="line"><span style="color:#B392F0">}</span></span></code></pre>
 <aside aria-label="Note" class="starlight-aside starlight-aside--note"><p class="starlight-aside__title" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="starlight-aside__icon"><path d="M12 11C11.7348 11 11.4804 11.1054 11.2929 11.2929C11.1054 11.4804 11 11.7348 11 12V16C11 16.2652 11.1054 16.5196 11.2929 16.7071C11.4804 16.8946 11.7348 17 12 17C12.2652 17 12.5196 16.8946 12.7071 16.7071C12.8946 16.5196 13 16.2652 13 16V12C13 11.7348 12.8946 11.4804 12.7071 11.2929C12.5196 11.1054 12.2652 11 12 11ZM12.38 7.08C12.1365 6.97998 11.8635 6.97998 11.62 7.08C11.4973 7.12759 11.3851 7.19896 11.29 7.29C11.2017 7.3872 11.1306 7.49882 11.08 7.62C11.024 7.73868 10.9966 7.86882 11 8C10.9992 8.13161 11.0245 8.26207 11.0742 8.38391C11.124 8.50574 11.1973 8.61656 11.29 8.71C11.3872 8.79833 11.4988 8.86936 11.62 8.92C11.7715 8.98224 11.936 9.00632 12.099 8.99011C12.2619 8.97391 12.4184 8.91792 12.5547 8.82707C12.691 8.73622 12.8029 8.61328 12.8805 8.46907C12.9582 8.32486 12.9992 8.16378 13 8C12.9963 7.73523 12.8927 7.48163 12.71 7.29C12.6149 7.19896 12.5028 7.12759 12.38 7.08ZM12 2C10.0222 2 8.08879 2.58649 6.4443 3.6853C4.79981 4.78412 3.51809 6.3459 2.76121 8.17317C2.00433 10.0004 1.8063 12.0111 2.19215 13.9509C2.578 15.8907 3.53041 17.6725 4.92894 19.0711C6.32746 20.4696 8.10929 21.422 10.0491 21.8079C11.9889 22.1937 13.9996 21.9957 15.8268 21.2388C17.6541 20.4819 19.2159 19.2002 20.3147 17.5557C21.4135 15.9112 22 13.9778 22 12C22 10.6868 21.7413 9.38642 21.2388 8.17317C20.7363 6.95991 19.9997 5.85752 19.0711 4.92893C18.1425 4.00035 17.0401 3.26375 15.8268 2.7612C14.6136 2.25866 13.3132 2 12 2ZM12 20C10.4178 20 8.87104 19.5308 7.55544 18.6518C6.23985 17.7727 5.21447 16.5233 4.60897 15.0615C4.00347 13.5997 3.84504 11.9911 4.15372 10.4393C4.4624 8.88743 5.22433 7.46197 6.34315 6.34315C7.46197 5.22433 8.88743 4.4624 10.4393 4.15372C11.9911 3.84504 13.5997 4.00346 15.0615 4.60896C16.5233 5.21447 17.7727 6.23984 18.6518 7.55544C19.5308 8.87103 20 10.4177 20 12C20 14.1217 19.1572 16.1566 17.6569 17.6569C16.1566 19.1571 14.1217 20 12 20Z"></path></svg>Note</p><section class="starlight-aside__content"><p>State Config properties are optional, you do not have to include all of them for the state to be valid.</p></section></aside>
 <h3 id="time-series-datasets---candles-and-indicators">Time Series Datasets - Candles and Indicators</h3>

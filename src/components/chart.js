@@ -329,21 +329,18 @@ export default class Chart extends Component{
 
   /**
    * @typedef {Object} snapshot
+   * @property {Boolean} isPrimary
    * @property {Boolean} maximized 
    * @property {Object} collapsed
    * @property {Number} height
+   * @property {Object} indicators
    */
   /**
    * Return a snapshot of values
    * @returns {snapshot}
    */
   snapshot() {
-    let maxed = this.core.MainPane.chartPaneMaximized?.instance
-    return {
-      maximized: ( maxed?.id == this.id ),
-      collapsed: {...this.collapsed},
-      height: this.height
-    }
+    return new ChartPaneSnapshot(this)
   }
 
   eventsListen() {
@@ -458,7 +455,7 @@ export default class Chart extends Component{
   }
 
   onValueMaxMin(m) {
-    console.log(`TradeX-chart: ${this.core.ID} : Chart Pane ${this.id} : Range Value Max: ${m.max}, Min: ${m.min}`)
+    // console.log(`TradeX-chart: ${this.core.ID} : Chart Pane ${this.id} : Range Value Max: ${m.max}, Min: ${m.min}`)
   }
 
   // set up Scale (Y Axis)
@@ -1095,4 +1092,31 @@ export default class Chart extends Component{
     if (cd.state.name === "closed" ) cd.open()
   }
   
+}
+
+export class ChartPaneSnapshot {
+  static isPrimary = "boolean"
+  static maximized = "boolean"
+  static collapsed = "object"
+  static height = "number"
+  static indicators = "object"
+
+  static get types() {
+    let {...types} = ChartPaneSnapshot
+    return types
+   }
+
+  constructor(that) {
+    let maxed = that.core.MainPane.chartPaneMaximized?.instance
+    this.isPrimary = that.isPrimary
+    this.maximized = ( maxed?.id == that.id )
+    this.collapsed = {...that.collapsed}
+    this.height = that.height
+    this.indicators = Object.keys(that.indicators).reduce(
+      (ind, key) => {
+        ind[key] = that.indicators[key].instance.snapshot()
+        return ind
+      }, {}
+    )
+  }
 }

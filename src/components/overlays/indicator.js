@@ -84,6 +84,17 @@ export default class Indicator extends Overlay {
   static #cnt = 0
   static get cnt() { return ++Indicator.#cnt }
   static get isIndicator() { return true }
+  static definition = {
+    input: {},
+    output: {},
+    meta: {
+      input: {},
+      output: [],
+      outputOrder: [],
+      outputLegend: {},
+      style: {}
+    }
+  }
 
 
   #ID
@@ -109,24 +120,14 @@ export default class Indicator extends Overlay {
   #precision = 2
   #style = {}
   #legendID
-  #state = IndicatorState.noData
+  #status = IndicatorState.noData
   #ConfigDialogue
   #palette
   #error = {type: "", msg: "", style: ""}
   #gapFill = true
   // #gaps = new Set()
 
-  definition = {
-    input: {},
-    output: {},
-    meta: {
-      input: {},
-      output: [],
-      outputOrder: [],
-      outputLegend: {},
-      style: {}
-    }
-  }
+  definition = doStructuredClone(Indicator.definition)
 
   colours = [
     palette.colours[8],
@@ -216,8 +217,8 @@ export default class Indicator extends Overlay {
   set position(p) { this.target.setPosition(p[0], p[1]) }
   get isIndicator() { return Indicator.isIndicator }
   get isPrimary() { return this.chart.isPrimary }
-  set state(s) { if (s instanceof IndicatorState) this.#state = s }
-  get state() { return this.#state }
+  set status(s) { if (s instanceof IndicatorState) this.#status = s }
+  get status() { return this.#status }
   set error(e) { this.setError(e) }
   get error() { return this.#error }
   get gapFill() { return this.#gapFill }
@@ -252,14 +253,14 @@ export default class Indicator extends Overlay {
   }
 
   setError(e) {
-    if (this.#state === IndicatorState.destroyed) return false
+    if (this.#status === IndicatorState.destroyed) return false
     if (!isObject(e) &&
         !isString(e?.type) &&
         !isString(e?.msg)) return false
     const err = {...e}
     err.indicator = this
     this.#error = e
-    this.state = IndicatorState.error
+    this.#status = IndicatorState.error
     this.emit("indicator_error", err)
     this.core.warn(`WARNING: Indicator: ${this.shortName} ID: ${this.id} ${err.msg}`)
   }
@@ -295,18 +296,6 @@ export default class Indicator extends Overlay {
     }
   }
 
-  setRefresh() {
-    super.setRefresh()
-  }
-
-  /**
-   * Does the indicator need to redraw (update)?
-   * @returns {Boolean}
-   */
-  mustUpdate() {
-    return super.mustUpdate()
-  }
-
   init(api) {
     const overlay = this.params.overlay
 
@@ -330,7 +319,7 @@ export default class Indicator extends Overlay {
   }
 
   destroy(state=true) {
-    if ( this.#state === IndicatorState.destroyed) return
+    if ( this.#status === IndicatorState.destroyed) return
     // has this been invoked from removeIndicator() ?
     // const chartPane = this.core.ChartPanes.get(this.chartPaneID)
     if ( !this.chartPane.indicatorDeleteList[this.id] ) {
@@ -355,7 +344,7 @@ export default class Indicator extends Overlay {
     if (!!state)
       this.core.state.removeIndicator(this.id)
 
-    this.#state = IndicatorState.destroyed
+    this.#status = IndicatorState.destroyed
   }
 
   /**
@@ -809,17 +798,7 @@ export default class Indicator extends Overlay {
     let input = this.retrieveInput(settings)
     api = (isObject(api)) ? api : {outputs: [], options: []}
 
-    const definition = {
-      input: {},
-      output: {},
-      meta: {
-        input: {},
-        output: [],
-        outputOrder: [],
-        outputLegend: {},
-        style: {}
-      }
-    }
+    const definition = doStructuredClone(Indicator.definition)
     if (!isObject(this.definition)) 
       this.definition = definition
 
@@ -1012,7 +991,6 @@ export default class Indicator extends Overlay {
       v = style[o.name]?.dash?.value
       style[o.name].dash = this.defaultOutputField(`${o.name}dash`, `${o.name} Dash`, v, "dash", undefined, undefined, )
     }
-
 
     // style[o.name].fillS = string
     // style[o.name].fillStyle = #RBBA
@@ -1305,7 +1283,6 @@ export default class Indicator extends Overlay {
     }
     // updated span of price history?
     else if (isArrayOfType(update, "integer")) {
-console.log("updating a chunk of indicator history", update)
       start = this.Timeline.t2Index(update[0])
       end = this.Timeline.t2Index(update[update.length-1]) - t
       if (end - start < t)
@@ -1335,11 +1312,8 @@ console.log("updating a chunk of indicator history", update)
 
       entry = indicatorFn(params)
       value = this.formatValue(entry)
-
       // store entry with timestamp
       data.push([range.value(start + p - 1)[0], ...value])
-      // data.push([range.value(start - 1)[0], ...v])
-
       start++
     }
     // this.#gaps = new Set([...this.#gaps].sort())
@@ -1353,14 +1327,6 @@ console.log("updating a chunk of indicator history", update)
   calcIndicatorHistory (update) {
     const calc = () => {
       let od = this.overlay.data
-
-      // if (isArray(od) && od.length > 0) return
-      // if (!isArray(od) || od.length < 2) return
-
-      // insert into Range and State
-      // let pane = (this.isPrimary) ? "primary" : "secondary"
-      // this.range.allData[`${pane}Pane`].push()
-
       const data = this.calcIndicator(this.libName, this.definition.input, this.range, update);
 
       if (isArray(data)) {
@@ -1398,7 +1364,7 @@ console.log("updating a chunk of indicator history", update)
           r[v[0]] = v
         }
         this.overlay.data = Object.values(r)
-        this.state = IndicatorState.hasData
+        this.#status = IndicatorState.hasData
         this.setRefresh()
       }
     }
@@ -1468,21 +1434,10 @@ console.log("updating a chunk of indicator history", update)
     if (!v) return false
 
     fn(v)
-    this.state = IndicatorState.hasData
+    this.#status = IndicatorState.hasData
     this.target.setPosition(this.core.scrollPos, 0)
     this.doDraw = true
     this.draw(this.range)
-  }
-
-  /**
-   * plot 
-   *
-   * @param {Array} plots - array of inputs, eg. x y coords [{x:x, y:y}, ...]
-   * @param {string} type
-   * @param {Object} opts
-   */
-  plot(plots, type, opts ) {
-    super.plot(plots, type, opts )
   }
 
   /**
@@ -1526,16 +1481,20 @@ console.log("updating a chunk of indicator history", update)
     this.plot(plots, r, opts)
   }
 
+  canIndicatorDraw() {
+    if (this.overlay.data.length < 2 ||
+        !this.mustUpdate() ||
+        !this.yAxis ||
+        !this.state.isActive)
+        return false
+    else return true
+  }
+
   draw(range=this.range) {
-
-    const data = this.overlay.data
-    // no update required
-    if (data.length < 2) return
-
-    if (!super.mustUpdate()) return
+    if (!this.canIndicatorDraw()) return
 
     this.clear()
-
+    const data = this.overlay.data
     const offset = this.xAxis.smoothScrollOffset || 0
     const meta = this.definition.meta
     const plots = {}

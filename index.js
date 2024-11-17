@@ -24,7 +24,7 @@ const wasm = "node_modules/talib-web/lib/talib.wasm"
 
 import bearHawk from './data/bear-hawk.js'
 import { text } from './src/definitions/icons.js'
-import { loadStates } from './demo/js/loadStates.js'
+import { loadStates, statesDropDown } from './demo/js/loadStates.js'
 import { loadTimeFrame } from './demo/js/loadTimeFrame.js'
 
 // build a split state to test all merge features
@@ -985,6 +985,8 @@ const configs = [
   // {config: config2, stream: null},
 
   {config: config2, stream: null}, //stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
+  {config: tradesTestState, stream: null},
+
   // {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
   // {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
   // {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
@@ -1277,7 +1279,7 @@ function alertTest ($, p, c) {
 // Add some charts
 
 addChart()
-// addChart()
+addChart()
 // addChart()
 // addChart()
 // addChart()
@@ -1377,3 +1379,4 @@ const cfgs = { config1, config2, config3 }
 
 loadTimeFrame(chart0)
 loadStates(chart0, states, cfgs)
+statesDropDown(chart0, states)

@@ -1,7 +1,7 @@
 // overlay.js
 // parent class for overlays to build upon
 
-import { isArray, isBoolean } from "../../utils/typeChecks"
+import { isArray, isBoolean, isObjectOfTypes } from "../../utils/typeChecks"
 import xAxis from "../axis/xAxis"
 import yAxis from "../axis/yAxis"
 import canvas from "../../renderer/canvas-lib"
@@ -16,6 +16,8 @@ export default class Overlay {
   #parent
   #core
   #config = {}
+  #state
+  #range
   #theme
   #xAxis
   #yAxis
@@ -43,6 +45,8 @@ export default class Overlay {
     this.#core = parent.core
     this.#parent = parent
     this.#config = parent.core.config
+    this.#state = parent.core.state
+    this.#range = parent.core.range
     this.#target = target
     this.#scene = target.scene
     this.#hit = target.hit
@@ -50,7 +54,6 @@ export default class Overlay {
     this.#xAxis = xAxis
     this.#yAxis = yAxis
     this.#params = params
-    // this.#data = this.#params.overlay?.data || []
     this.on("global_resize", this.onResize, this)
   }
 
@@ -59,8 +62,8 @@ export default class Overlay {
   get target() { return this.#target }
   get config() { return this.#config }
   get params() { return this.#params }
-  get range() { return this.#core.range }
-  get state() { return this.#core.state }
+  get range() { return this.#range }
+  get state() { return this.#state }
   get scene() { return this.#scene }
   get hit() { return this.#hit }
   get theme() { return this.#core.theme }
@@ -139,14 +142,14 @@ export default class Overlay {
   getXAxis() {
     if (this.#xAxis instanceof xAxis) return this.#xAxis
     else if (this.core.Chart.time?.xAxis instanceof xAxis) return this.core.Chart.time.xAxis
-    else if ("time" in this.#parent) return this.#parent.time.xAxis
+    else if (this.#parent?.time?.xAxis instanceof xAxis) return this.#parent.time.xAxis
     else return false
   }
 
   getYAxis() {
     if (this.#yAxis instanceof yAxis) return this.#yAxis
     else if (this.chart?.yAxis instanceof yAxis) return this.chart.yAxis
-    else if ("scale" in this.#parent) return this.#parent.scale.yAxis
+    else if (this.#parent?.scale?.yAxis instanceof yAxis) return this.#parent.scale.yAxis
     else return false
   }
 
@@ -157,6 +160,10 @@ export default class Overlay {
     else return false
   }
 
+  /**
+   * Does the indicator need to redraw (update)?
+   * @returns {Boolean}
+   */
   mustUpdate() {
     const r = this.#core.range
     const l = this.#mustUpdate
@@ -255,3 +262,4 @@ export default class Overlay {
       renderHighLowRange( ctx, y1, y2, width, height, p )
     }
 }
+

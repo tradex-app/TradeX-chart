@@ -1,9 +1,7 @@
 import { isArray, isBoolean, isNumber, isObject, isString, checkType, isFunction, isInteger } from '../utils/typeChecks'
 import { getRandomIntBetween } from '../utils/number'
 import { isValidTimeInRange, isValidTimestamp, TimeData } from '../utils/time'
-import State from '../state'
-import { intersection, nearestArrayValue } from '../utils/utilities'
-import { isInViewport } from '../utils/DOM'
+import State from '../state/chart-state'
 
 
 /**

@@ -12,7 +12,7 @@ import * as Time from './utils/time'
 import { limit } from './utils/number'
 import { isTimeFrame, SECOND_MS } from "./utils/time"
 import { doStructuredClone, mergeDeep, objToString, uid } from './utils/utilities'
-import State from './state'
+import State from './state/chart-state.js'
 import { Range, calcTimeIndex } from "./model/range"
 import { defaultTheme } from './definitions/style'
 import StateMachine from './scaleX/stateMachne'
@@ -1260,7 +1260,7 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   /**
-   * import Indicators
+   * import Indicators available to users
    * @param {object} i - indicators {id, name, event, ind}
    * @param {boolean} flush - expunge default indicators
    * @returns {boolean|object} - false failure, object of success or failures
@@ -1279,6 +1279,7 @@ export default class TradeXchart extends Tradex_chart {
         isString(v?.event) && 
         this.isIndicator(v?.ind)
       ) {
+        this.indicatorDefinitionDefaults(v)
         if (!!v?.public)
         this.#indicatorsPublic[k] = v
         this.#indicators[k] = v.ind
@@ -1349,6 +1350,14 @@ export default class TradeXchart extends Tradex_chart {
   }
 
   /**
+   * expose indicator definition defaults
+   * @param {Indicator} i 
+   */
+  indicatorDefinitionDefaults(i) {
+console.log(i)
+  }
+
+  /**
    * Does current chart state have indicator
    * @param {string} i - indicator id or name
    * @param {string} dataset -
@@ -1384,7 +1393,7 @@ export default class TradeXchart extends Tradex_chart {
    */
   async calcAllIndicators(update) {
     const indicators = []
-    const executeInd = (i) => {
+    const executeIndicator = (i) => {
       return new Promise(resolve => setTimeout(() => {
         resolve( i() )
       }, 0))
@@ -1395,7 +1404,7 @@ export default class TradeXchart extends Tradex_chart {
       }
     }
     await Promise.all( indicators.map( async i => { 
-      executeInd(i) }))
+      executeIndicator(i) }))
       this.refresh()
   }
 
