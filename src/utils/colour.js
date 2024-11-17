@@ -184,24 +184,41 @@ export default class Colour {
     this.#value.rgba = rgba
     this.#RGBAToHex(rgba)
   }
-/*
-  #RGBToHex (rgb) {
-    let {r,g,b,a} = this.#getRGB(rgb)
-  
-    this.value.r = r
-    this.value.g = g
-    this.value.b = b
-    this.value.a = a
 
-    let hex = [
-      decimalToHex(r),
-      decimalToHex(g),
-      decimalToHex(b),
-      decimalToHex(a),
-    ]
+  /**
+   * 
+   * @param {string} rgba 
+   */
+  #RGBAToHex (rgba) {
+    let x, isPercent,
+      i = 0,
+      y = [],
+      z = [],
+      m = rgba.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i),
+      a = isString(m[4]) ? m[4] : `1`,
+      mRGBA = [ m[1], m[2], m[3], a ];
 
-    this.setHex(hex)
-    return this
+      for (let v of mRGBA) {
+        isPercent = v.indexOf("%") > -1;
+        x = parseFloat(v)
+        if (i < 3 && isPercent) {
+          x = Math.round(255 * x / 100)
+        }
+        else if (i == 3) {
+          if (!isPercent && x >= 0 && x <= 1) {
+            x = Math.round(255 * x);
+          } else if (isPercent && x >= 0 && x <= 100) {
+            x = Math.round(255 * x / 100)
+          } else {
+            x = "";
+          }
+        }
+        y[i] = (x | 1 << 8).toString(16).slice(1)
+        z[i++] = x
+      }
+      this.setHex(y)
+      this.setRGBA(z)
+      this.#hexToHSL(this.#value.hexa)
   }
 */
   /**

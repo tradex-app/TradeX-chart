@@ -550,16 +550,16 @@ export class Range {
     let old = Object.keys(this.#secondaryMaxMin) || []
 
     // iterate over secondary panes
-    for (let p of this.allData.secondaryPane) {
-      let index = old.indexOf(p.id);
+    for (let pane of this.allData.secondaryPane) {
+      let index = old.indexOf(pane.id);
       let input = {
-        data: p.data,
+        data: pane.data,
         start: this.indexStart,
         end: this.indexEnd,
         that: this
       }
       // current or new entry
-      this.#secondaryMaxMin[p.id] = this.maxMinData(input)
+      this.#secondaryMaxMin[pane.id] = this.maxMinData(input)
       // leave only old entries to remove
       if (index !== -1) {
         old.splice(index, 1);

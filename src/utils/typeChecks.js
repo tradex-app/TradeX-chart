@@ -1,4 +1,5 @@
 import { isValidTimestamp } from "./time"
+import { isArrayEqual } from "./utilities"
 
 /**
  * @param {*} v
@@ -35,6 +36,20 @@ export function isObject (v) {
   typeof v === 'object' &&
   !Array.isArray(v) &&
   v !== null)
+}
+
+export function isObjectOfTypes (target, types, equal) {
+  if (!isObject(target) ||
+      !isObject(types))
+      return false
+  const k1 = Object.keys(target)
+  const k2 = Object.keys(types)
+  if (!!equal && !isArrayEqual(k1, k2))
+      return false
+  for (let k of k2) {
+    if (!checkType(types[k], target[k])) return false
+  }
+  return true
 }
 
 /**

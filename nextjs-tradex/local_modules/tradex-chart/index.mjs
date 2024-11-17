@@ -22609,7 +22609,7 @@ class State {
         let oldState = JSON.parse(data);
         delete active.archive;
         const defaultState = doStructuredClone(State.default);
-        State.buildInventory(oldState, defaultState);
+        State.parseChartPanesInventory(oldState, defaultState);
         active.allData.primaryPane = oldState.primary;
         active.allData.secondaryPane = oldState.secondary;
         active.data.inventory = oldState.inventory;
@@ -22694,7 +22694,7 @@ class State {
       state.datasets = [];
     }
     state.allData.datasets = state.datasets;
-    State.buildInventory(state, defaultState);
+    State.parseChartPanesInventory(state, defaultState);
     State.validateData('trades', state);
     state.trades = state.allData.trades;
     State.validateData('events', state);
@@ -22832,7 +22832,7 @@ class State {
       State.importData(type, tradeData, allData, tf);
     }
   }
-  static archiveInventory(state) {
+  static archiveChartPanesInventory(state) {
     state.data.inventory.length = 0;
     if (!(state.core.ChartPanes instanceof xMap)) return;
     for (let [key, pane] of state.core.ChartPanes) {
@@ -22847,7 +22847,7 @@ class State {
       state.data.inventory.push(entry);
     }
   }
-  static buildInventory(state, defaultState) {
+  static parseChartPanesInventory(state, defaultState) {
     if (state.inventory.length == 0) {
       state.inventory.push(['primary', state.primary]);
       let secondary = isArray(state?.secondary) ? state.secondary : [];
@@ -23067,7 +23067,7 @@ class State {
     if (isFunction(this.#core.MainPane?.init)) {
       if (this.#core.stream instanceof Stream) this.#core.stream.stop();
       this.#core.progress.start();
-      State.archiveInventory(this);
+      State.archiveChartPanesInventory(this);
       this.#core.MainPane.destroy(false);
     }
     let state = State.use(this.#core, key);

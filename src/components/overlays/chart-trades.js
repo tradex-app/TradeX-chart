@@ -111,7 +111,6 @@ export default class chartTrades extends Overlay {
     // negative values required as widgets start positioned below chart content
     let ty = (y - (w * 1.5)) - iPos.height
     let content = this.buildTradeHTML(tr)
-console.log(`trade selected`, tr.side, k)
     const config = {
       dimensions: {h: undefined, w: 150},
       position: {x: tx + (w / 2) + 1, y: ty},
@@ -148,12 +147,17 @@ console.log(`trade selected`, tr.side, k)
     return c
   }
 
+  canTradesDraw() {
+    if (!super.mustUpdate() ||
+        !isObject(this.data) ||
+        Object.keys(this.data).length == 0 ||
+        this.core.config?.events?.display === false
+        ) return false
+    else return true
+  }
+
   draw(range=this.core.range) {
-    if (this.core.config?.events?.display === false ||
-      !isObject(this.data) ||
-      Object.keys(this.data).length == 0 ||
-      !super.mustUpdate()
-    ) return
+    if (!this.canTradesDraw()) return
 
     this.hit.clear()
     this.scene.clear()

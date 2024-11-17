@@ -21,3 +21,19 @@ export function loadStates (chart, states, configs) {
     }
   }
 }
+
+export function statesDropDown(chart, states) {
+  const nav = document.querySelector("nav")
+  if (!nav) return
+
+  const select = document.createElement("select", )
+  let options = ""
+  for (let [key, value] of Object.entries(states)) {
+    options += `<option value="${value}">${key}</option>\n`
+  }
+  select.innerHTML = options
+  select.addEventListener("change", (e) => {
+    chart.state.use(states[e.target.value])
+  })
+  nav?.appendChild(select)
+}

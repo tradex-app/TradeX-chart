@@ -3,9 +3,9 @@
 
 import * as packageJSON from '../../package.json'
 import * as compression from '../utils/compression'
-import { checkType, isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isString, typeOf } from '../utils/typeChecks'
+import { checkType, isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isObjectOfTypes, isString, typeOf } from '../utils/typeChecks'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
-import { doStructuredClone, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, } from '../utils/utilities'
+import { doStructuredClone, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, intersection, } from '../utils/utilities'
 import { validateDeep, validateShallow, sanitizeCandles, Gaps } from '../model/validateData'
 import { calcTimeIndex, detectInterval } from '../model/range'
 import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, INTITIALCNT, LIMITFUTURE, LIMITPAST, MAXCANDLES, MINCANDLES, YAXIS_BOUNDS } from '../definitions/chart'
@@ -230,20 +230,12 @@ export default class State {
    * Use a chart State - set it to active
    * @param {TradeXchart} chart - target
    * @param {String|Object} state - state key or {id: "someID"} or {key: "stateKey"} or a state object
+   * @param {State} [inherit] - State instance to inherit indicators from
    * @returns {State|undefined} - chart state instance
    */
-  static use(chart, state = State.default) {
-    let key = (State.has(chart, state)) ? state :
-      (State.has(chart, state?.key)) ? state.key : state
-
-    if (!isString(key) && isObject(state) && !!Object.keys(state).length) {
-      key = hashKey(state)
-
-      if (!State.has(chart, key)) {
-        key = State.create(chart, state).key
-      }
-    }
-    else if (!isString(key) && !isObject(state)) return undefined
+  static use(chart, state = State.default, inherit) {
+    let key = State.determineKey(chart, state)
+    if (!key) return
 
     const states = State.#chartList.get(chart.key)
     let previous = states.active
@@ -258,34 +250,57 @@ export default class State {
     if (key != active?.key) {
       states.previous = { state: active, node: "" }
       active = target
-
-      // rehydrate state
-      if (isObject(active?.archive)) {
-        let archive = (isString(active?.archive?.data)) ?
-          active?.archive.data :
-          "";
-        let data = (!!active.archive?.compress) ?
-          archive.decompress() :
-          archive;
-        let oldState = JSON.parse(data)
-        delete active.archive
-
-        const defaultState = doStructuredClone(State.default)
-        State.buildInventory(oldState)
-        // TODO: set allData to primary[].data
-        active.allData.primaryPane = oldState.primary
-        active.allData.secondaryPane = oldState.secondary
-        active.data.inventory = oldState.inventory
-      }
     }
+    if (inherit) 
+      State.inheritChartPanesInventory(active, previous)
+    // rehydrate state
+    if (isObject(active?.archive))
+      State.unarchiveInventory(active)
 
     states.active = active
     return active
   }
 
+  static determineKey(chart, state) {
+    let key = (State.has(chart, state)) ? state :
+      (State.has(chart, state?.key)) ? state.key : state
+
+    if (!isString(key) && 
+        isObject(state) && 
+        !!Object.keys(state).length) 
+    {
+      key = hashKey(state)
+
+      if (!State.has(chart, key))
+        key = State.create(chart, state).key
+    }
+    else 
+    if (!isString(key) && 
+        !isObject(state)) 
+        return undefined
+
+    return key
+  }
+
   static archive(chart, id) {
     let state = State.findStateById(chart, id)
     if (!state) return false
+  }
+
+  static unarchiveInventory(active) {
+    let archive = (isString(active?.archive?.data)) ?
+    active?.archive.data :
+    "";
+    let archiveData = (!!active.archive?.compress) ?
+      archive.decompress() :
+      archive;
+    let oldState = JSON.parse(archiveData)
+    delete active.archive
+
+    State.parseChartPanesInventory(oldState)
+    active.allData.primaryPane = oldState.primary
+    active.allData.secondaryPane = oldState.secondary
+    active.data.inventory = oldState.inventory
   }
 
   static findStateById(chart, id) {
@@ -384,7 +399,7 @@ export default class State {
     }
     state.allData.datasets = state.datasets
 
-    State.buildInventory(state)
+    State.parseChartPanesInventory(state)
 
     // trades
 
@@ -596,84 +611,65 @@ export default class State {
     }
   }
 
-  static archiveInventory(state) {
+  static archiveChartPanesInventory(state) {
     state.data.inventory.length = 0
     if (!(state.core.ChartPanes instanceof xMap)) return
     for (let [key, pane] of state.core.ChartPanes) {
-      let ind = [],
-        entry = [],
-        snapshot;
-      entry[0] = (pane.isPrimary) ? "primary" : "secondary"
-      for (let i of Object.values(pane.indicators)) {
-        ind.push(i.instance.snapshot())
-      }
-      entry[1] = ind
-      entry[2] = pane.snapshot()
+      // let entry = [
+      //   key,
+      //   pane.snapshot()
+      // ]
+      let snapshot = pane.snapshot()
+      let entry = [
+        (snapshot.isPrimary) ? "primary" : "secondary",
+        Object.values(snapshot.indicators),
+        snapshot
+      ]
+      // let entry = pane.snapshot()
       state.data.inventory.push(entry)
     }
   }
 
-  static buildInventory(state) {
-    // Build chart order
-    if (state.inventory.length == 0) {
-      // add primary chart
-      state.inventory.push(["primary", state.primary])
-      // add secondary charts if they exist
-      let secondary = (isArray(state?.secondary)) ? state.secondary : []
-      for (let s of secondary) {
-        if (isObject(s) || isArrayOfType(s, "object")) {
-          state.inventory.push(["secondary", s])
-        }
-      }
+  static inheritChartPanesInventory(active, previous) {
+    let isMatchingAssetTF = isMatchingSymbolTF(active, previous)
+    let previousInventory = previous.inventory
+    if (!isArray(previousInventory) ||
+        !previousInventory.length)
+        return
+
+    let activeInventory = []
+    let targetInventory = []
+    let entry, result, search, snapshot, isPrimary;
+
+    if (isArray(active.inventory)) {
+      activeInventory = active.inventory
     }
 
-   let defaultState = doStructuredClone(State.default)
-
-
-    // Process chart order
-    let o = state.inventory
-    let c = o.length
-    while (c--) {
-      // if no valid indicators, delete entry
-      if (!isArray(o[c]) || o[c].length == 0)
-        o.splice(c, 1)
+    previousInventory.forEach( (i, j) => {
+      search = findMatchingChartPane(i[1], activeInventory)
+      result = (!!search) ? search : i;
+      result[2] = i[2]
+      if (isMatchingAssetTF) entry = result
       else {
-        // validate each overlay / indicator entry
-        let i = state.inventory[c]?.[1] || []
-        let x = i.length
-        while (x--) {
-          // remove if invalid
-          if (!isObject(i[x]) ||
-            !isString(i[x].name) ||
-            !isString(i[x].type)
-            // !isArray(i[x].data)
-          )
-            i.splice(x, 1)
-          // default settings if necessary
-          else if (!isObject(i[x].settings))
-            i[x].settings = {}
+        entry = doStructuredClone(result)
+        entry[1] = (isObject(entry[1])) ? [entry[1]] : entry[1]
+        for (let indicator of entry[1]) {
+          indicator.data = []
+          delete indicator.id 
+          delete indicator.key
         }
-        // if no valid indicators remain, delete entry
-        if (o[c].length == 0) o.splice(c, 1)
       }
-    }
+      targetInventory.push(entry)
 
-    // ensure state has the mandatory primary entry
-    if (state.inventory.length == 0)
-      state.inventory[0] = ["primary", defaultState.primary]
-
-    // remove duplicate primaries
-    let cnt = 0
-    state.inventory.forEach((v, i) => {
-      if (v[0] == "primary") {
-        if (++cnt > 1)
-          state.inventory.splice(i, 1)
-      }
+      // targetInventory.push([isPrimary, entry, snapshot])
     })
+    active.data.inventory = targetInventory
+  }
 
-    // if no primary, add one
-    if (!cnt)
-      state.inventory.push(["primary", defaultState.primary])
+  static parseChartPanesInventory(state) {
+    validateInventory(state)
+    validateInventoryChartPanes(state)
+    validateInventoryPrimaryPane(state)
   }
 
   static importAnnotations(data, state, tf) {
@@ -737,15 +733,8 @@ export default class State {
     return true
   }
 
-  static isValidEntry(e, type) {
-    const k1 = Object.keys(e)
-    const k2 = Object.keys(type)
-    if (!isObject(e) ||
-      !isArrayEqual(k1, k2)) return false
-    for (let k of k2) {
-      if (!checkType(type[k], e[k])) return false
-    }
-    return true
+  static isValidEntry(target, types) {
+    return isObjectOfTypes(target, types)
   }
 
 
@@ -758,7 +747,6 @@ export default class State {
   #timeData
   #dataSource
   #overlaySet
-  #inventory = []
   #core
   #chartPanes = new xMap()
   #chartPaneMaximized = {
@@ -815,7 +803,7 @@ export default class State {
   get events() { return this.#data.events }
   get annotations() { return this.#data.annotations }
   get tools() { return this.#data.tools }
-  get inventory() { return this.#inventory }
+  get inventory() { return this.#data.inventory }
 
   error(e) { this.#core.error(e) }
 
@@ -943,7 +931,7 @@ export default class State {
         this.#dataSource?.historyPause()
       }
       this.#core.progress.start()
-      State.archiveInventory(this)
+      State.archiveChartPanesInventory(this)
       this.#core.MainPane.destroy(false)
     }
 
@@ -952,14 +940,15 @@ export default class State {
       let source = key?.dataSource?.source?.name
       let symbol = key?.dataSource?.symbol
       let timeFrame = key?.dataSource?.timeFrameInit
-      let matching = this.dataSource.findMatching(source, symbol, timeFrame)
+      let matching = this.dataSource.findMatchingState(source, symbol, timeFrame)
       
       // use matching State
       if (matching instanceof State) 
         key = matching.key 
     }
 
-    let state = State.use(this.#core, key)
+    let inherit = (!!this.#core.config.stateInheritPrevious) ? this : undefined
+    let state = State.use(this.#core, key, inherit)
 
     if (isObject(key))
       key.key = state?.key
@@ -1013,7 +1002,7 @@ export default class State {
   // TODO: merge indicator data?
   // TODO: merge dataset?
   mergeData(merge, newRange = false, calc = false) {
-console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
+// console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
 
     if (this.isEmpty) State.setTimeFrame(this.#core, this.key, merge?.ohlcv)
 
@@ -1399,6 +1388,11 @@ export function hashKey(state) {
   return `${SHORTNAME}_${HASHKEY}_${hash}`
 }
 
+function isMatchingSymbolTF(active, previous) {
+  return (active.timeFrame === previous.timeFrame &&
+          active.symbol === previous.symbol)
+}
+
 function applyHistoryFetch(curr, old) {
   let c = curr.dataSource.source;
   let o = old.dataSource.source;
@@ -1432,6 +1426,118 @@ function applyTickerStream(curr, old) {
     return true
   }
   return false
+}
+
+function validateInventoryChartPanes(state) {
+  let o = state.inventory
+  let c = o.length
+  while (c--) {
+    // if no valid indicators, delete chart pane
+    if (!isArray(o[c]) || o[c].length == 0)
+      o.splice(c, 1)
+    else 
+      validateInventoryOverlays(state, c)
+  }
+}
+
+function validateInventoryPrimaryPane(state) {
+  let cnt = 0
+  state.inventory.forEach((v, i) => {
+    if (v[0] == "primary") {
+      // remove duplicate primaries
+      if (++cnt > 1)
+        state.inventory.splice(i, 1)
+    }
+  })
+
+  // if no primary, add one
+  if (!cnt) {
+    let defaultState = doStructuredClone(State.default)
+    state.inventory.push(["primary", defaultState.primary])
+  }
+}
+
+function validateInventoryOverlays(state, c) {
+  let o = state.inventory
+  let i = state.inventory[c]?.[1] || []
+  let x = i.length
+  while (x--) {
+    // remove if invalid
+    if (!isInventoryOverlayValid(i[x], state.core))
+      i.splice(x, 1)
+    // default settings if necessary
+    else if (!isObject(i[x].settings))
+      i[x].settings = {}
+  }
+  // if no valid indicators remain, delete chart pane
+  if (o[c].length == 0) o.splice(c, 1)
+}
+
+function isInventoryOverlayValid(o, core) {
+  const overlayObjectDef = {
+    name: "string",
+    type: "string"
+  }
+
+  return (
+    isObjectOfTypes(o, overlayObjectDef) &&
+    (o.type in core.indicatorClasses ||
+     o.type in core.overlayEntries())
+  )
+}
+
+function validateInventory(state) {
+  if (!isArray(state.inventory) || state.inventory.length == 0) {
+    // add primary chart
+    state.inventory.push(["primary", state.primary])
+    // add secondary charts if they exist
+    let secondary = (isArray(state?.secondary)) ? state.secondary : []
+    for (let s of secondary) {
+      if (isObject(s) || isArrayOfType(s, "object")) {
+        state.inventory.push(["secondary", s])
+      }
+    }
+  }
+}
+
+function findMatchingChartPane(source, target, isPrimary, assetMatch) {
+  let pane, search;
+  for (pane of target) {
+    search =  matchedInventoryIndicators(source, pane)
+    if (search.matched.length) return pane
+  }
+}
+/*
+function types(arr) {
+  return arr.forEach((ind) => { return ind.type }, [])
+}
+
+function matchedTypes(sourceTypes, target) {
+  return target.forEach((pane) => {
+    let paneTypes = types(pane)
+    let intersect = intersection(sourceTypes, paneTypes)
+    if (!intersect.length) return intersect
+  }, [])
+} 
+*/
+function matchedInventoryIndicators(source, target) {
+  let matched = []
+  let noMatch = []
+  for (let s of source) {
+    for (let t of target) {
+      if (matchInventoryIndicator(s, t))
+        matched.push(s)
+      else
+        noMatch.push(t)
+    }
+  }
+  return {matched, noMatch}
+}
+
+function matchInventoryIndicator(source, target) {
+  let type = source.type == target.type
+  let settings = isObjectEqual(source.settings, target?.settings)
+  return type || settings
 }
 
 function consoleError(c, k, e) {
