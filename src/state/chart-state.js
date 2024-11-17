@@ -1377,6 +1377,9 @@ export default class State {
     console.log("TODO: state.removeEvent()")
   }
 
+  buildInventory() {
+    return State.buildInventory(this)
+  }
 }
 
 export function hashKey(state) {
