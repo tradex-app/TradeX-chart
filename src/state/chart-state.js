@@ -251,8 +251,10 @@ export default class State {
       states.previous = { state: active, node: "" }
       active = target
     }
-    if (inherit) 
+    if (inherit) {
       State.inheritChartPanesInventory(active, previous)
+      // State.inheritChartPanesZoom(active, previous)
+    }
     // rehydrate state
     if (isObject(active?.archive))
       State.unarchiveInventory(active)
@@ -615,55 +617,31 @@ export default class State {
     state.data.inventory.length = 0
     if (!(state.core.ChartPanes instanceof xMap)) return
     for (let [key, pane] of state.core.ChartPanes) {
-      // let entry = [
-      //   key,
-      //   pane.snapshot()
-      // ]
       let snapshot = pane.snapshot()
       let entry = [
         (snapshot.isPrimary) ? "primary" : "secondary",
         Object.values(snapshot.indicators),
         snapshot
       ]
-      // let entry = pane.snapshot()
       state.data.inventory.push(entry)
     }
   }
 
   static inheritChartPanesInventory(active, previous) {
-    let isMatchingAssetTF = isMatchingSymbolTF(active, previous)
-    let previousInventory = previous.inventory
-    if (!isArray(previousInventory) ||
-        !previousInventory.length)
-        return
+    let matchedTF = isMatchingSymbolTF(active, previous)
+    let {
+      activeInventory,
+      previousInventory,
+      matchedInventory
+    } = chartPanesActivePreviousMatched(active, previous, matchedTF)
 
-    let activeInventory = []
-    let targetInventory = []
-    let entry, result, search, snapshot, isPrimary;
+    if (!matchedInventory?.length) return
+    active.data.inventory = matchedInventory
 
-    if (isArray(active.inventory)) {
-      activeInventory = active.inventory
-    }
-
-    previousInventory.forEach( (i, j) => {
-      search = findMatchingChartPane(i[1], activeInventory)
-      result = (!!search) ? search : i;
-      result[2] = i[2]
-      if (isMatchingAssetTF) entry = result
-      else {
-        entry = doStructuredClone(result)
-        entry[1] = (isObject(entry[1])) ? [entry[1]] : entry[1]
-        for (let indicator of entry[1]) {
-          indicator.data = []
-          delete indicator.id 
-          delete indicator.key
-        }
-      }
-      targetInventory.push(entry)
-
-      // targetInventory.push([isPrimary, entry, snapshot])
-    })
-    active.data.inventory = targetInventory
+    let start = active.range.indexStart
+    let end = start + previous.range.Length
+    let max = previous.range.maxCandles
+    active.range.set(start, end, max)
   }
 
   static parseChartPanesInventory(state) {
@@ -1507,6 +1485,45 @@ function findMatchingChartPane(source, target, isPrimary, assetMatch) {
     if (search.matched.length) return pane
   }
 }
+
+function chartPanesActivePreviousMatched(active, previous, matchedTF) {
+  let previousInventory = previous.inventory
+  if (!isArray(previousInventory) ||
+      !previousInventory.length)
+      return {}
+
+  let activeInventory = []
+  let matchedInventory = []
+  let entry, result, search;
+
+  if (isArray(active.inventory)) {
+    activeInventory = active.inventory
+  }
+
+  previousInventory.forEach( (i, j) => {
+    search = findMatchingChartPane(i[1], activeInventory)
+    result = (!!search) ? search : i;
+    result[2] = i[2]
+    if (matchedTF) entry = result
+    else {
+      entry = doStructuredClone(result)
+      entry[1] = (isObject(entry[1])) ? [entry[1]] : entry[1]
+      for (let indicator of entry[1]) {
+        indicator.data = []
+        delete indicator.id 
+        delete indicator.key
+      }
+    }
+    matchedInventory.push(entry)
+  })
+  return {
+    activeInventory,
+    previousInventory,
+    matchedInventory
+  }
+}
+
+
 /*
 function types(arr) {
   return arr.forEach((ind) => { return ind.type }, [])
