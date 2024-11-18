@@ -180,13 +180,13 @@ export class Range {
 
   /**
    * set Range index start and end
-   * @param {number} [start=0]
-   * @param {number} [end=this.dataLength]
+   * @param {number} [start=this.indexStart]
+   * @param {number} [end=this.indexEnd]
    * @param {number} [max=this.maxCandles]
    * @returns {boolean} - success or failure
    * @memberof Range
    */
-  set (start=0, end=this.dataLength, max=this.maxCandles) {
+  set (start=this.indexStart, end=this.indexEnd, max=this.maxCandles) {
     if (!isInteger(start) || 
         !isInteger(end) ||
         !isInteger(max)) return false

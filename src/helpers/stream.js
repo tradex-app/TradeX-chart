@@ -55,8 +55,6 @@ export default class Stream {
   #countDownMS = 0
   #countDown = ""
   #dataReceived = false
-  #lastPriceMax
-  #lastPriceMin
   #lastTick = empty
   #lastScrollPos
   #lastXPos
@@ -159,6 +157,7 @@ export default class Stream {
     else {
       this.updateCandle(data)
     }
+    this.newBounds(data)
     this.status = {status: STREAM_LISTENING, data: this.#candle}
     this.lastTick = lastTick
 
@@ -228,6 +227,24 @@ export default class Stream {
     if (this.#candle !== empty) {
       this.status = {status: STREAM_UPDATE, data: this.candle}
       this.status = {status: STREAM_LISTENING, data: this.#candle}
+    }
+  }
+
+  newBounds(data) {
+    console.log("Price bounds", this.lastPriceMax, this.range.valueHi)
+
+    if (this.lastPriceMax > this.range.valueHi) {
+      console.log("Price MAX exceeded", this.lastPriceMax, this.range.valueHi)
+      // this.#core.Chart.draw(undefined, true)
+      // this.#core.Chart.render()
+      this.range.set()
+    }
+    else
+    if (this.lastPriceMin < this.range.valueLo) {
+      console.log("Price MIN exceeded", this.lastPriceMin, this.range.valueLo)
+      // this.#core.Chart.draw(undefined, true)
+      // this.#core.Chart.render()
+      this.range.set()
     }
   }
 
