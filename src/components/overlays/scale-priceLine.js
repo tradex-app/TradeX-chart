@@ -2,7 +2,6 @@
 // display current (stream) price on Y-Axis / Scale
 
 import Overlay from "./overlay"
-import Stream from "../../helpers/stream";
 import { YAxisStyle } from "../../definitions/style";
 import { renderTextBG, getTextRectHeight } from "../../renderer/text"
 
@@ -45,9 +44,6 @@ export default class ScalePriceLine extends Overlay {
         return
 
     const ctx = this.scene.context
-    const streaming = this.core.stream instanceof Stream &&
-                      this.config.stream.tfCountDown
-
     let price = candle[4],
         nice = this.parent.nicePrice(price),
         options = {...this.#opts},
@@ -63,7 +59,7 @@ export default class ScalePriceLine extends Overlay {
 
     renderTextBG(ctx, nice, x, y, options)
 
-    if (streaming) {
+    if (this.core.isStreaming) {
       nice = this.core.stream.countDownUpdate()
       options.fontSize = options?.fontSize / 1.1
       renderTextBG(ctx, nice, x, y+h, options)
