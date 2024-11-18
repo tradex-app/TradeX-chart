@@ -53,11 +53,6 @@ export default class chartCandles extends Overlay {
     let i = range.Length + (o * 2)
     let x
 
-    if (this.core.stream) {
-      this.core.stream.lastPriceMax = range.valueMax
-      this.core.stream.lastPriceMin = range.valueMin
-    }
-
     while(i) {
       if (c >= 0) {
         x = range.value( c )

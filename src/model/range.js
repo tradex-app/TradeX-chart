@@ -129,6 +129,7 @@ export class Range {
   }
 
   get id () { return this.#id }
+  get core() { return this.#core }
   get allData () { return this.#state.allData }
   get data () { return this.allData?.data || [] }
   get dataLength () { return (!!this.allData?.data.length) ? this.allData.data.length - 1 : 0 }
@@ -457,7 +458,7 @@ export class Range {
    */
    maxMinPriceVol ( input ) {
     let {data, start, end, that} = {...input}
-    let buffer = bRound(this.#core.bufferPx / this.#core.candleW)
+    let buffer = bRound(that.core.bufferPx / that.core.candleW)
     let l = data?.length-1
 
     buffer = (isInteger(buffer)) ? buffer : 0
@@ -471,8 +472,14 @@ export class Range {
         valueHi: 1,
         valueMin: 0,
         valueMax: 1,
+        valueDiff: 1,
+        valueLast: undefined,
+        valueLive: undefined,
+        valueLiveMin: undefined,
+        valueLiveMax: undefined,
         volumeMin: 0,
         volumeMax: 0,
+        volumeDiff: 0,
         valueMinIdx: 0,
         valueMaxIdx: 0,
         volumeMinIdx: 0,
@@ -518,6 +525,10 @@ export class Range {
     let diff = valueMax - valueMin
     let valueLo = valueMin
     let valueHi = valueMax
+    let valueLast = data[data.length - 1][4] || null
+    let valueLive = that.core.stream?.lastTick[4] || null
+    let valueLiveMin = that.core.stream?.lastPriceMin || null
+    let valueLiveMax = that.core.stream?.lastPriceMax || null
     valueMin -= diff * that.yAxisBounds
     valueMin = (valueMin > 0) ? valueMin : 0
     valueMax += diff * that.yAxisBounds
@@ -529,6 +540,10 @@ export class Range {
       valueMin,
       valueMax,
       valueDiff: valueMax - valueMin,
+      valueLast,
+      valueLive,
+      valueLiveMin,
+      valueLiveMax,
       volumeMin,
       volumeMax,
       volumeDiff: volumeMax - volumeMin,
@@ -581,7 +596,7 @@ export class Range {
    */
   maxMinData (input) {
     let {data, start, end, that} = {...input}
-    let buffer = bRound(this.#core.bufferPx / this.#core.candleW)
+    let buffer = bRound(that.#core.bufferPx / that.#core.candleW)
     let l = data.length-1
     let x = this.dataLength - data.length
     let f = data[0]?.length - 1 || 0
@@ -591,7 +606,8 @@ export class Range {
       max: 1,
       minIdx: 0,
       maxIdx: 0,
-      diff: 1
+      diff: 1,
+      last: undefined
     }
 
     if (l < 1) return { data: d }

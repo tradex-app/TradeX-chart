@@ -96,10 +96,8 @@ export default class Stream {
     this.status = {status: STREAM_FIRSTVALUE, data}
   }
   get alerts() { return this.#alerts }
-  get lastPriceMin() { return this.#lastPriceMin }
-  set lastPriceMin(p) { if (isNumber(p)) this.#lastPriceMin = p }
-  get lastPriceMax() { return this.#lastPriceMax }
-  set lastPriceMax(p) { if (isNumber(p)) this.#lastPriceMax = p }
+  get lastPriceMin() { return this.#candle[3] }
+  get lastPriceMax() { return this.#candle[2] }
   get lastScrollPos() { return this.#lastScrollPos }
   set lastScrollPos(p) { this.setLastScrollPos(p) }
   get lastXPos() { return this.#lastXPos }
