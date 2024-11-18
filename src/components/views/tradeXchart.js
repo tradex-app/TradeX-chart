@@ -80,7 +80,7 @@ export default class tradeXChart extends element {
   }
 
   static get observedAttributes() {
-    return ['config', 'disabled', 'height', 'stream', 'width']
+    return ['config', 'disabled', 'height', 'width'] // , 'stream', 'width']
   }
 
   connectedCallback() {
@@ -117,13 +117,13 @@ export default class tradeXChart extends element {
       case "disabled":
         break;
       case "height":
-        this.height(newVal)
+        this.setDimensions(undefined, newVal)
         break;
       case "width":
-        this.width(newVal)
+        this.setDimensions(newVal, undefined)
         break;
-        case "stream":
-          break;
+        // case "stream":
+        //   break;
       default:
         break;
     }
@@ -149,8 +149,8 @@ export default class tradeXChart extends element {
     }
   }
   
-  get stream() { return true }
-  set stream(s) {  }
+  // get stream() { return true }
+  // set stream(s) {  }
 
   get elBody() { return this.#elBody }
   get elUtils() { return this.#elUtils }
@@ -225,8 +225,8 @@ export default class tradeXChart extends element {
 
   /**
    * Set chart width and height
-   * @param {number} w - width in pixels
-   * @param {number} h - height in pixels
+   * @param {number|undefined} w - width in pixels
+   * @param {number|undefined} h - height in pixels
    * @memberof TradeXchart
    */
   setDimensions(w, h) {
