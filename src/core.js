@@ -396,6 +396,7 @@ export default class TradeXchart extends Tradex_chart {
   get stream() { return this.state.dataSource.stream }
   get worker() { return this.#workers }
   get isEmpty() { return this.state.isEmpty }
+  get isStreaming() { return this.state.dataSource.stream.isActive }
   set candles(c) { if (isObject(c)) this.#candles = c }
   get candles() { return this.#candles }
   get progress() { return this.#progress }

@@ -36,8 +36,9 @@ export default class chartHighLow extends Overlay {
     let r = this.scene.width
     let w = 35
     let opts = {}
-    const hi = range.valueHi
-    const lo = range.valueLo
+    const hi = Math.max(range.valueHi, range.valueLiveMax)
+    const lo = Math.min(range.valueLo, range.valueLiveMin)
+    const price = range.valueLive
     const theme = {...this.theme.yAxis}
     const ctx = this.scene.context
 
@@ -95,8 +96,8 @@ class scaleHighLow extends Overlay {
     this.scene.clear()
 
     let txt, x, y, w;
-    const hi = range.valueHi
-    const lo = range.valueLo
+    const hi = Math.max(range.valueHi, range.valueLiveMax)
+    const lo = Math.min(range.valueLo, range.valueLiveMin)
     const theme = {...this.theme.yAxis}
     const ctx = this.scene.context
 
