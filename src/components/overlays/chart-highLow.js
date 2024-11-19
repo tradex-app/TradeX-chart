@@ -3,6 +3,7 @@
 import Overlay from "./overlay"
 import { renderLineHorizontal } from "../../renderer/line";
 import { renderTextBG } from "../../renderer/text";
+import { STREAM_UPDATE } from "../../definitions/core";
 
 const defaults = {
   colour: "#4444cc88",
@@ -83,10 +84,18 @@ class scaleHighLow extends Overlay {
     super(target, xAxis, yAxis, theme, parent, params)
 
     this.viewport = target.viewport
+    this.on(STREAM_UPDATE, this.onStreamUpdate, this)
   }
 
   // Overlay position is fixed and won't pan / scroll with the chart
   set position(p) { this.target.setPosition(0, 0) }
+
+  onStreamUpdate() {
+    if ("hiLo" in this.chart.scale.overlays) {
+      this.setRefresh()
+      this.scaleDraw()
+    }
+  }
 
   draw() {}
 
@@ -115,8 +124,9 @@ class scaleHighLow extends Overlay {
     yLo = this.yAxis.yPos(lo) + 1
     drawText(ctx, txt, x, yLo, w, theme)
 
-    if (this.core.isStreaming) {
-      let livePrice = this.core.stream.lastTick[4]
+    let livePrice = this.core.stream.lastTick[4]
+
+    if (this.core.isStreaming && !!livePrice) {
       let diff = hi - lo
       let hiPercent = (hi - livePrice) / diff * 100
       let loPercent = (livePrice - lo) / diff * 100
