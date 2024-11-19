@@ -234,16 +234,10 @@ export default class Stream {
     console.log("Price bounds", this.lastPriceMax, this.range.valueHi)
 
     if (this.lastPriceMax > this.range.valueHi) {
-      console.log("Price MAX exceeded", this.lastPriceMax, this.range.valueHi)
-      // this.#core.Chart.draw(undefined, true)
-      // this.#core.Chart.render()
       this.range.set()
     }
     else
     if (this.lastPriceMin < this.range.valueLo) {
-      console.log("Price MIN exceeded", this.lastPriceMin, this.range.valueLo)
-      // this.#core.Chart.draw(undefined, true)
-      // this.#core.Chart.render()
       this.range.set()
     }
   }

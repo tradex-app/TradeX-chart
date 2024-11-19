@@ -3,6 +3,7 @@
 import Overlay from "./overlay"
 import { renderLineHorizontal } from "../../renderer/line";
 import { renderTextBG } from "../../renderer/text";
+import { STREAM_UPDATE } from "../../definitions/core";
 
 const defaults = {
   colour: "#4444cc88",
@@ -83,10 +84,18 @@ class scaleHighLow extends Overlay {
     super(target, xAxis, yAxis, theme, parent, params)
 
     this.viewport = target.viewport
+    this.on(STREAM_UPDATE, this.onStreamUpdate, this)
   }
 
   // Overlay position is fixed and won't pan / scroll with the chart
   set position(p) { this.target.setPosition(0, 0) }
+
+  onStreamUpdate() {
+    if ("hiLo" in this.chart.scale.overlays) {
+      this.setRefresh()
+      this.scaleDraw()
+    }
+  }
 
   draw() {}
 
@@ -95,7 +104,8 @@ class scaleHighLow extends Overlay {
 
     this.scene.clear()
 
-    let txt, x, y, w;
+    let txt, x, yHi, yLo, w;
+    let options
     const hi = Math.max(range.valueHi, range.valueLiveMax)
     const lo = Math.min(range.valueLo, range.valueLiveMin)
     const theme = {...this.theme.yAxis}
@@ -104,15 +114,28 @@ class scaleHighLow extends Overlay {
     theme.colourCursorBG = this.theme?.hilo?.colour || defaults.colour
     // Highest Price
     txt = this.chart.Scale.nicePrice(hi)
-    x = 1
-    y = this.yAxis.yPos(hi) + 1
-    w = this.viewport.width
-    drawText(ctx, txt, x, y, w, theme)
+      x = 1
+    yHi = this.yAxis.yPos(hi) + 1
+      w = this.viewport.width
+    options = drawText(ctx, txt, x, yHi, w, theme)
 
     // Lowest Price
     txt = this.chart.Scale.nicePrice(lo)
-    y = this.yAxis.yPos(lo) + 1
-    drawText(ctx, txt, x, y, w, theme)
+    yLo = this.yAxis.yPos(lo) + 1
+    drawText(ctx, txt, x, yLo, w, theme)
+
+    let livePrice = this.core.stream.lastTick[4]
+
+    if (this.core.isStreaming && !!livePrice) {
+      let diff = hi - lo
+      let hiPercent = (hi - livePrice) / diff * 100
+      let loPercent = (livePrice - lo) / diff * 100
+      let hiP100Txt = this.chart.Scale.nicePrice(hiPercent)
+      let loP100Txt = this.chart.Scale.nicePrice(loPercent)
+      let offset = options.fontSize + options.paddingTop + options.paddingBottom
+      drawText(ctx, `+${hiP100Txt}%`, x, yHi + offset, w, theme)
+      drawText(ctx, `-${loP100Txt}%`, x, yLo + offset, w, theme)
+    }
 
     super.updated()
   }
@@ -144,4 +167,6 @@ function drawText(ctx, txt, x, y, w, theme) {
   renderTextBG(ctx, `${txt}`, x, yPos , options)
 
   ctx.restore()
+
+  return options
 }

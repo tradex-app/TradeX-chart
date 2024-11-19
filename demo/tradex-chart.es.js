@@ -3559,8 +3559,6 @@ class Le {
   #n;
   #r;
   #a;
-  #l;
-  #h;
   #o;
   #l;
   #h;
@@ -5426,8 +5424,6 @@ class Hm extends ee {
   #n;
   #r;
   #a;
-  #l;
-  #h;
   #o;
   #l;
   #h;
@@ -6359,8 +6355,6 @@ class be {
   #n = Ze.closed;
   #r;
   #a;
-  #l;
-  #h;
   #o;
   #l;
   #h;
@@ -13487,8 +13481,6 @@ class As {
   #n;
   #r;
   #a = "stopped";
-  #l;
-  #h;
   #o;
   #l;
   #h;
@@ -13528,9 +13520,6 @@ class As {
   }
   get eventData() {
     return this.#h;
-  }
-  get eventData() {
-    return this.#o;
   }
   get actions() {
     return this.#c;
@@ -13581,7 +13570,7 @@ class As {
     for (let e in this.#n.states)
       for (let i in this.#n.states[e].on) {
         let s = this.notify.bind(this, i);
-        this.#l.add({ topic: i, cb: s }), this.#r.on(i, s, this.context);
+        this.#o.add({ topic: i, cb: s }), this.#r.on(i, s, this.context);
       }
   }
   #d() {
@@ -14236,8 +14225,6 @@ class yg extends It {
   #n;
   #r;
   #a;
-  #l;
-  #h;
   #o;
   #l;
   #h;
@@ -14900,8 +14887,6 @@ class Pg extends It {
   #n;
   #r;
   #a;
-  #l;
-  #h;
   #o;
   #l;
   #h;
@@ -14949,12 +14934,6 @@ class Pg extends It {
   }
   get layerPriceLine() {
     return this.#h;
-  }
-  get layerOverlays() {
-    return this.#h;
-  }
-  get layerPriceLine() {
-    return this.#o;
   }
   get overlays() {
     return Object.fromEntries([...this.graph.overlays.list]);
@@ -16469,8 +16448,6 @@ class vo extends It {
   #n;
   #r;
   #a;
-  #l;
-  #h;
   #o;
   #l;
   #h;
@@ -17848,6 +17825,9 @@ class M {
   get dataSource() {
     return this.#l;
   }
+  get dataSource() {
+    return this.#l;
+  }
   get allData() {
     return {
       data: this.#n.chart.data,
@@ -18846,8 +18826,6 @@ class o1 extends ee {
   #n;
   #r;
   #a;
-  #l;
-  #h;
   #o;
   #l;
   #h;
@@ -19795,8 +19773,6 @@ class C1 extends ee {
   #n = fi;
   #r = dt;
   #a;
-  #l;
-  #h;
   #o;
   #l;
   #h;
