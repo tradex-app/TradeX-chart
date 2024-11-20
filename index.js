@@ -24,8 +24,9 @@ const wasm = "node_modules/talib-web/lib/talib.wasm"
 
 import bearHawk from './data/bear-hawk.js'
 import { text } from './src/definitions/icons.js'
-import { loadStates, statesDropDown } from './demo/js/loadStates.js'
-import { loadTimeFrame } from './demo/js/loadTimeFrame.js'
+import { loadStates, statesDropDown } from './demos/js/loadStates.js'
+import { loadTimeFrame } from './demos/js/loadTimeFrame.js'
+import { addIndicatorDropdown } from './demos/js/addIndicator.js'
 
 // build a split state to test all merge features
 const state1_5a = {primary:[], secondary:[]}
@@ -1377,6 +1378,7 @@ if (typeof chart5 === "object")
 const states = { state1, state2, state3 }
 const cfgs = { config1, config2, config3 }
 
-loadTimeFrame(chart0)
+// loadTimeFrame(chart0)
 loadStates(chart0, states, cfgs)
 statesDropDown(chart0, states)
+addIndicatorDropdown(chart0)

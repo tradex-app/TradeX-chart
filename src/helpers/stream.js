@@ -157,7 +157,7 @@ export default class Stream {
     else {
       this.updateCandle(data)
     }
-    this.newBounds(data)
+    this.newBounds()
     this.status = {status: STREAM_LISTENING, data: this.#candle}
     this.lastTick = lastTick
 
@@ -230,15 +230,10 @@ export default class Stream {
     }
   }
 
-  newBounds(data) {
-    console.log("Price bounds", this.lastPriceMax, this.range.valueHi)
-
-    if (this.lastPriceMax > this.range.valueHi) {
-      this.range.set()
-    }
-    else
-    if (this.lastPriceMin < this.range.valueLo) {
-      this.range.set()
+  newBounds() {
+    if (this.lastPriceMax > this.range.valueHi ||
+        this.lastPriceMin < this.range.valueLo) {
+        this.range.set()
     }
   }
 
@@ -259,7 +254,7 @@ export default class Stream {
       data.v, 
       null, true]
 
-console.log(`State: ${this.#state.key} new candle:`, this.#candle)
+// console.log(`State: ${this.#state.key} new candle:`, this.#candle)
     this.#state.mergeData({ohlcv: [this.#candle]}, true, false)
     this.status = {status: STREAM_NEWVALUE, data: {data: data, candle: this.#candle}}
     this.#countDownMS = this.#state.timeFrame

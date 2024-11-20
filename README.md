@@ -170,3 +170,8 @@ if (youEnjoyed) {
     starThisRepository();
 }
 ```
+                        
+## Stargazers over time
+[![Stargazers over time](https://starchart.cc/tradex-app/TradeX-chart.svg?variant=adaptive)](https://starchart.cc/tradex-app/TradeX-chart)
+
+                    
