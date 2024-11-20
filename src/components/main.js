@@ -850,14 +850,11 @@ console.log("total does not match Row Height")
       }
       sizes.new = Math.floor(height / (exp.length + 1))
       ratio = height / (height + sizes.new)
-      diff = (height - sizes.new) // exp.length
+      sizes.new *= ratio
       for (let o of exp) {
-        // sizes[o.id] = o.viewport.height - diff
-        sizes[o.id] = diff * (paneH(o) / height)
+        sizes[o.id] = paneH(o) * ratio
         total += sizes[o.id]
       }
-      // account for remainder
-      sizes.new += height - total
     }
     return sizes
   }
