@@ -211,7 +211,9 @@ export default class ScaleBar extends Component {
     }
 
     if (draw) this.draw()
-    else this.#layerPriceLine.draw(e)
+    else {
+      this.#layerPriceLine.draw(e)
+    }
   }
 
   onChartDrag(e) {
@@ -318,7 +320,7 @@ export default class ScaleBar extends Component {
     this.#layerCursor = this.graph.overlays.get("cursor").instance
     this.#layerLabels = this.graph.overlays.get("labels").instance
     this.#layerOverlays = this.graph.overlays.get("overlay").instance
-    this.#layerPriceLine = this.graph.overlays.get("price").instance
+    this.#layerPriceLine = this.graph.overlays.get("price")?.instance
 
     this.graph.addOverlays(this.#additionalOverlays)
     this.#layerPriceLine.target.moveTop()
