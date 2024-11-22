@@ -14,6 +14,7 @@ import { onClickOutside } from "../../utils/DOM"
 import { talibAPI, outputPlot } from "../../definitions/talib-api"
 import { error } from "../../helpers/messages"
 import { dashedPatterns } from "../../definitions/style"
+import { provideEventListeners } from "../widgets/components/listeners"
 
 // const plotTypes = {
 //   area,
@@ -713,7 +714,7 @@ export default class Indicator extends Overlay {
       d: v,
       listeners,
       fn: (el) => {
-        this.configDialogue.provideEventListeners(`#${i}`, listeners)(el)
+        provideEventListeners(`#${i}`, listeners)(el)
       }
     }
   }
@@ -749,7 +750,7 @@ export default class Indicator extends Overlay {
 /*
   configInputNumber(input, i, v) {
     input[i] = this.configField(i, i, "number", v, v)
-    input[i].$function = this.configDialogue.provideEventListeners(
+    input[i].$function = provideEventListeners(
       `#${i}`, 
     [{
       event: "change", 
@@ -941,11 +942,11 @@ export default class Indicator extends Overlay {
       let t = plotFunction(o?.plot)
       switch(t) {
         case "renderLine": 
-          // o.style = (!dm.style?.[o?.name]) ? this.defaultMetaStyleLine(o, x, dm.style) : dm.style[o.name];
           o.style = this.defaultMetaStyleLine(o, x, dm.style)
-
           break;
-        case "histogram": return "histogram"
+        case "histogram": 
+          o.style = this.defaultMetaStyleHistogram(o, x, dm.style)
+          return "histogram"
         case "highLow": return "highLow"
         default: break;
       }
@@ -997,6 +998,16 @@ export default class Indicator extends Overlay {
     return style[o.name]
   }
 
+  defaultMetaStyleHistogram(o, x, style) {
+    let v;
+    o.name = (!o?.name) ? "output" : o.name
+
+    if (!isObject(style?.[o.name]))
+      style[o.name] = {}
+    
+    return "histogram"
+  }
+
   defaultOutputField(id, label, value, type, min, max, defaultValue) {
 
     let c, fn, listeners, options;
@@ -1006,15 +1017,15 @@ export default class Indicator extends Overlay {
       case "number":
         listeners = [change]
         fn = (el) => {
-          this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
+          provideEventListeners(`#${id}`, listeners)(el)
         }
         break;
 
       case "color":
         listeners = [change, over, out]
         fn = (el) => {
-          this.configDialogue.provideInputColor(el, `#${id}`)
-          this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
+          this.#ConfigDialogue.provideInputColor(el, `#${id}`)
+          provideEventListeners(`#${id}`, listeners)(el)
         }
         type = "text"
         break;
@@ -1022,7 +1033,7 @@ export default class Indicator extends Overlay {
       case "dash":
         listeners = [change]
         fn = (el) => {
-          this.configDialogue.provideEventListeners(`#${id}`, listeners)(el)
+          provideEventListeners(`#${id}`, listeners)(el)
         }
         type = "select"
         let patterns = {}

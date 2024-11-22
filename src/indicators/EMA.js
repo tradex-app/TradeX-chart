@@ -5,6 +5,7 @@
 
 import Indicator from "../components/overlays/indicator"
 import { EMA as talibAPI } from "../definitions/talib-api";
+import { provideEventListeners } from "../components/widgets/components/listeners";
 
 let nameShort = "EMA"
 let nameLong = 'Exponential Moving Average'
@@ -34,7 +35,7 @@ let nameLong = 'Exponential Moving Average'
           min: '3',
           title: `Number of time units to use in calculation`,
           $function:
-            this.configDialogue.provideEventListeners("#Period", 
+            provideEventListeners("#Period", 
             [{
               event: "change", 
               fn: (e)=>{
