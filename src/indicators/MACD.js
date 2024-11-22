@@ -63,17 +63,17 @@ let nameLong = 'Moving Average Convergence/Divergence'
       dash: {value: ""}, 
     },
     MACDSignal: {
-      colour: {value: "#08c"},
+      colour: {value: "#0c8"},
       width: {value: 1},
       dash: {value: ""}, 
     },
     MACDHist: {
-      upStroke: "#0f0",
-      upFill: "#0c0",
-      upWidth: '1',
-      dnStroke: "#f00",
-      dnFill: "#c00",
-      dnWidth: '1',
+      upStroke: {value: "#0f0"},
+      upFill: {value: "#0c0"},
+      upWidth: {value: '1'},
+      dnStroke: {value: "#f00"},
+      dnFill: {value: "#c00"},
+      dnWidth: {value: '1'},
     },
   }
   static timePeriodMultiplier = true
