@@ -15,6 +15,7 @@ import { talibAPI, outputPlot } from "../../definitions/talib-api"
 import { error } from "../../helpers/messages"
 import { dashedPatterns } from "../../definitions/style"
 import { provideEventListeners } from "../widgets/components/listeners"
+import { configField, populateMetaInputs } from "../widgets/components/form-elements"
 
 // const plotTypes = {
 //   area,
@@ -749,7 +750,7 @@ export default class Indicator extends Overlay {
 
 /*
   configInputNumber(input, i, v) {
-    input[i] = this.configField(i, i, "number", v, v)
+    input[i] = configField(i, i, "number", v, v)
     input[i].$function = provideEventListeners(
       `#${i}`, 
     [{
@@ -764,7 +765,7 @@ export default class Indicator extends Overlay {
   configInputObject(input, i, v) {
     if (i instanceof InputPeriodEnable) {
 
-      input[i.period] = this.configField(i.period, i.period, "number", v, v)
+      input[i.period] = configField(i.period, i.period, "number", v, v)
 
       input.$function = function (el) {
         const elm = el.querySelector(`#${i.period}`)
@@ -823,7 +824,7 @@ export default class Indicator extends Overlay {
         dm.style = this.style || {}
 
     this.validateInputs(d, input, api)
-    this.populateMetaInputs(d)
+    populateMetaInputs(d)
     this.validateOutputs(d, api, oo)
     this.buildOutputOrder(dm, oo)
     this.buildOutputLegends(d)
@@ -878,14 +879,6 @@ export default class Indicator extends Overlay {
         d.output[o] = []
       if (doo)
         oo.push(o)
-    }
-  }
-
-  populateMetaInputs(def) {
-    let input = def.input
-    let metaIn = def.meta.input
-    for (let i in metaIn) {
-      metaIn[i].value = input[i]
     }
   }
 
@@ -1045,35 +1038,7 @@ export default class Indicator extends Overlay {
     }
 
 
-    return this.configField(id, label, type, value, value, min, max, fn, label, options)
-  }
-
-  configField(i, label, type, value, defaultValue, min, max, fn, title, options) {
-    defaultValue = defaultValue || value
-    title = title || label
-    if (isNumber(min) && isNumber(max) && min > max) {
-      [max, min] = [min, max]
-    }
-    else if (isNumber(min) && isNumber(max)) {
-      value = limit(value, min, max)
-    }
-
-    let f = {
-      entry: i,
-      label,
-      type,
-      value,
-      default: defaultValue,
-      "data-oldval": value, 
-      "data-default": defaultValue, 
-      $function: fn,
-      title
-    }
-
-    if (isNumber(min)) f.min = min
-    if (isNumber(max)) f.max = max
-    if (isObject(options) && Object.keys(options).length) f.options = options
-    return f
+    return configField(id, label, type, value, value, min, max, fn, label, options)
   }
 
   defaultColour() {
@@ -1575,7 +1540,7 @@ export default class Indicator extends Overlay {
       if ("range" in def)
         src[f.name] = limit(src[f.name], f.range.min, f.range.max)
   
-      const n = this.configField(
+      const n = configField(
         f?.name,
         f?.displayName,
         f?.type,
