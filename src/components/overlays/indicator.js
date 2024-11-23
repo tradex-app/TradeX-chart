@@ -15,7 +15,7 @@ import { talibAPI, outputPlot } from "../../definitions/talib-api"
 import { error } from "../../helpers/messages"
 import { dashedPatterns } from "../../definitions/style"
 import { provideEventListeners } from "../widgets/components/listeners"
-import { configField, dataOldDefault, fieldTargetUpdate, populateMetaInputs, validate, validateInputs, validateOutputs } from "../widgets/components/form-elements"
+import { configField, dataOldDefault, defaultOutputField, fieldTargetUpdate, populateMetaInputs, validate, validateInputs, validateOutputs } from "../widgets/components/form-elements"
 
 // const plotTypes = {
 //   area,
@@ -739,7 +739,7 @@ export default class Indicator extends Overlay {
     validateInputs(d, input, api)
     populateMetaInputs(d)
     validateOutputs(d, api, oo)
-    this.buildOutputOrder(dm, oo)
+    this.buildOutputOrder(dm, oo, OUTPUTEXTRAS)
     this.buildOutputLegends(d)
     this.buildConfigOutputTab(dm)
 
@@ -757,12 +757,13 @@ export default class Indicator extends Overlay {
    * remove redundant keys and preserve order
    * @param {object} dm - this.definition.meta
    * @param {array} oo - output order derived from API output definition
+   * @param {Array} extras
    */
-  buildOutputOrder(dm, oo) {
+  buildOutputOrder(dm, oo, extras) {
     let u = [...new Set([...dm.outputOrder, ...oo])]
     let del = diff(u, oo)
     for (let x of del) {
-      if (OUTPUTEXTRAS.includes(x)) continue
+      if (extras.includes(x)) continue
       let idx = u.indexOf(x)
       u.splice(idx, 1)
     }
@@ -824,7 +825,11 @@ export default class Indicator extends Overlay {
    * @returns {object}
    */
   defaultMetaStyleLine(o, x, style) {
-    let v;
+    let value, params;
+    let fns = {
+      change: this.fieldEventChange(),
+      provideInputColour: this.#ConfigDialogue.provideInputColor
+    }
     o.name = (!o?.name) ? "output" : o.name
 
     if (!isObject(style?.[o.name]))
@@ -834,25 +839,24 @@ export default class Indicator extends Overlay {
     let c = new Colour(style[o.name]?.colour?.value)
     if (!c.isValid) {
       let k = this.colours.length
-          v = (x <= k) ? this.colours[x] : this.colours[k%x]
+          value = (x <= k) ? this.colours[x] : this.colours[k%x]
     }
     else {
-      v = c.value.hexa
+      value = c.value.hexa
     }
-    style[o.name].colour = this.defaultOutputField(`${o.name}Colour`, `${o.name} Colour`, v, "color")
-
+    style[o.name].colour = this.defaultOutputField(`${o.name}Colour`, `${o.name} Colour`, value, "color", fns)
 
     // is width valid?
     if (!isNumber(style[o.name]?.width?.value))
-      v = 1
+      value = 1
     else
-      v = style[o.name]?.width.value
+      value = style[o.name]?.width.value
 
-    style[o.name].width = this.defaultOutputField(`${o.name}Width`, `${o.name} Width`, v, "number", 0)
+    style[o.name].width = this.defaultOutputField(`${o.name}Width`, `${o.name} Width`, value, "number", 0)
 
     if ("dash" in style[o.name] && (!!style[o.name].dash)) {
-      v = style[o.name]?.dash?.value
-      style[o.name].dash = this.defaultOutputField(`${o.name}dash`, `${o.name} Dash`, v, "dash", undefined, undefined, )
+      value = style[o.name]?.dash?.value
+      style[o.name].dash = this.defaultOutputField(`${o.name}dash`, `${o.name} Dash`, value, "dash", undefined, undefined, )
     }
 
     // style[o.name].fillS = string

@@ -2,9 +2,10 @@
 
 import { dashedPatterns } from "../../../definitions/style"
 import { limit } from "../../../utils/number"
-import { isArray, isNumber, isObject } from "../../../utils/typeChecks"
+import { isArray, isBoolean, isNumber, isObject, isString } from "../../../utils/typeChecks"
 import { provideEventListeners } from "./listeners"
 import { InputPeriodEnable } from "../../overlays/indicator"
+import { diff } from "../../../utils/utilities"
 
 
 export function populateMetaInputs(def) {
