@@ -15,7 +15,7 @@ import { talibAPI, outputPlot } from "../../definitions/talib-api"
 import { error } from "../../helpers/messages"
 import { dashedPatterns } from "../../definitions/style"
 import { provideEventListeners } from "../widgets/components/listeners"
-import { configField, dataOldDefault, fieldTargetUpdate, populateMetaInputs } from "../widgets/components/form-elements"
+import { configField, dataOldDefault, fieldTargetUpdate, populateMetaInputs, validate, validateInputs } from "../widgets/components/form-elements"
 
 // const plotTypes = {
 //   area,
@@ -736,7 +736,7 @@ export default class Indicator extends Overlay {
     if (!isObjectNotEmpty(dm.style))
         dm.style = this.style || {}
 
-    this.validateInputs(d, input, api)
+    validateInputs(d, input, api)
     populateMetaInputs(d)
     this.validateOutputs(d, api, oo)
     this.buildOutputOrder(dm, oo)
@@ -749,17 +749,6 @@ export default class Indicator extends Overlay {
     if (isObject(settings?.input)) return settings.input
     else if (isObject(settings?.settings?.input)) return settings.settings.input
     else return {}
-  }
-
-  validateInputs(d, s, api) {
-    const input = {...d.input, ...s}
-    delete input.style
-    d.input = input
-    for (let def of api.options) {
-      if (!(def.name in d.input))
-        d.input[def.name] = api.options[def.name]
-    }
-    this.validate(d.input, api.options, d)
   }
 
   /**
@@ -1439,38 +1428,6 @@ export default class Indicator extends Overlay {
     super.updated()
   }
 
-  validate(src, def, d) {
-    let dm = d.meta
-    let val;
-    for (let f of def) {
-      val =  (typeof src[f.name] == "object") ? 
-        src[f.name]?.value :
-        src[f.name]
-      // if input value is type is incorrect, use the default
-      src[f.name] = (typeof val !== f.type) ?
-        f.defaultValue : val
-  
-      if ("range" in def)
-        src[f.name] = limit(src[f.name], f.range.min, f.range.max)
-  
-      const n = configField(
-        f?.name,
-        f?.displayName,
-        f?.type,
-        src[f.name],    // value
-        f?.defaultValue,
-        f?.range?.min,
-        f?.range?.max,
-        undefined,
-        f?.hint,
-      )
-  
-      dm.input[f.name] = {...n, ...dm.input[f.name]}
-  
-      // if (f.name in d.input)
-      //   dm.input[f.name].value = d.input[f.name]
-    }
-  }
 }
 // end of class Indicator
 
