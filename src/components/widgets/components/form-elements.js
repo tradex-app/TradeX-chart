@@ -218,6 +218,39 @@ export function validate(src, def, d) {
   }
 }
 
+/**
+* if definition output is empty build it from api
+* ensure all output are arrays
+* @param {object} d 
+* @param {object} api 
+* @param {array} oo 
+*/
+export function validateOutputs(d, api, oo) {
+ // set up all defaults to be arrays
+ if (Object.keys(d.output).length == 0) {
+   for (let o of api.outputs) {
+     d.output[o.name] = []
+   }
+ }
+ // default output order
+ let doo = true
+ if (Object.keys(d.meta.output).length > 0) {
+   doo = false
+   for (let o of d.meta.output) {
+     if (isObject(o))
+       oo.push(o.name)
+   }
+ }
+
+ // ensure all definition outputs are arrays
+ for (let o in d.output) {
+   if (!isArray(d.output[o])) 
+     d.output[o] = []
+   if (doo)
+     oo.push(o)
+ }
+}
+
 const over = {
   event: "pointerover",
   fn: (e) => {
