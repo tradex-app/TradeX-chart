@@ -99,12 +99,26 @@ export function configInputNumber(input, i, v) {
 )
 }
 
-export function fieldTargetUpdate(target, value, style) {
-  for (let e in style ) {
-    for (let o in style[e]) {
-      if (isObject(style[e][o]) && style[e][o].entry == target) {
-        style[e][o]["data-oldval"] = style[e][o].value
-        style[e][o].value = value
+export function configInputObject(input, i, v) {
+  if (i instanceof InputPeriodEnable) {
+
+    input[i.period] = configField(i.period, i.period, "number", v, v)
+
+    input.$function = function (el) {
+      const elm = el.querySelector(`#${i.period}`)
+      const checkBox = document.createElement("input")
+            checkBox.id = `"enable${i.period}`
+            checkBox.checked = i.enable
+            checkBox.addEventListener("change", (e) => {
+              if (e.currentTarget.checked) {
+                console.log(`enable ${e.currentTarget.id}`)
+              }
+              else {
+                console.log(`disable ${e.currentTarget.id}`)
+              }
+            })
+      if (!!elm) {
+        elm.insertAdjacentElement("beforebegin", checkBox)
       }
     }
   }
@@ -146,6 +160,17 @@ export function defaultOutputField({id, label, value, type, min, max, defaultVal
       break;
   }
   return configField(id, label, type, value, value, min, max, fn, label, options)
+}
+
+export function fieldTargetUpdate(target, value, style) {
+  for (let e in style ) {
+    for (let o in style[e]) {
+      if (isObject(style[e][o]) && style[e][o].entry == target) {
+        style[e][o]["data-oldval"] = style[e][o].value
+        style[e][o].value = value
+      }
+    }
+  }
 }
 
 const over = {

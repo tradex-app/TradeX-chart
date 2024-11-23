@@ -15,7 +15,7 @@ import { talibAPI, outputPlot } from "../../definitions/talib-api"
 import { error } from "../../helpers/messages"
 import { dashedPatterns } from "../../definitions/style"
 import { provideEventListeners } from "../widgets/components/listeners"
-import { configField, populateMetaInputs } from "../widgets/components/form-elements"
+import { configField, dataOldDefault, fieldTargetUpdate, populateMetaInputs } from "../widgets/components/form-elements"
 
 // const plotTypes = {
 //   area,
@@ -675,49 +675,11 @@ export default class Indicator extends Overlay {
     // ensure all tab fields provide data-oldval, data-default
     else {
       for (let tab in tabs) {
-        this.dataOldDefault(tabs[tab])
+        dataOldDefault(tabs[tab])
       }
     }
 
     return tabs
-  }
-
-  dataOldDefault(entries) {
-
-    if (isArray(entries)) {
-      for (let entry of entries) {
-        this.dataOldDefault(entry)
-      }
-    }
-
-    else if (isObject(entries)) {
-      for (let field in entries) {
-
-        let f = (isObject(entries[field])) ? entries[field] : entries
-        let keys = Object.keys(f)
-
-        if (!keys.includes("data-oldval"))
-          f["data-oldval"] = f?.value
-        if (!keys.includes("data-default")) {
-          f["data-default"] = (!!f?.default) ? 
-            f?.default :
-            f?.value
-        }
-      }
-    }
-  }
-
-  outputValueNumber(i, v, change) {
-    let listeners = [change]
-    return {
-      type: "number",
-      min: `0`,
-      d: v,
-      listeners,
-      fn: (el) => {
-        provideEventListeners(`#${i}`, listeners)(el)
-      }
-    }
   }
 
   /**
@@ -725,67 +687,18 @@ export default class Indicator extends Overlay {
    * @returns {object}
    */
   fieldEventChange() {
+    let style = this.definition.meta.style
     return {
       event: "change", 
       fn: (e)=>{
         // this.definition.meta.output[e.target.id] = e.target.value
-        this.fieldTargetUpdate(e.target.id, e.target.value)
+        fieldTargetUpdate(e.target.id, e.target.value, style)
         this.setRefresh()
         this.draw()
       }
     }
   }
 
-  fieldTargetUpdate(target, value) {
-    let s = this.definition.meta.style
-    for (let e in s ) {
-      for (let o in s[e]) {
-        if (isObject(s[e][o]) && s[e][o].entry == target) {
-          s[e][o]["data-oldval"] = s[e][o].value
-          s[e][o].value = value
-        }
-      }
-    }
-  }
-
-/*
-  configInputNumber(input, i, v) {
-    input[i] = configField(i, i, "number", v, v)
-    input[i].$function = provideEventListeners(
-      `#${i}`, 
-    [{
-      event: "change", 
-      fn: (e)=>{
-        // console.log(`#${i} = ${e.target.value}`)
-      }
-    }]
-  )
-  }
-*/
-  configInputObject(input, i, v) {
-    if (i instanceof InputPeriodEnable) {
-
-      input[i.period] = configField(i.period, i.period, "number", v, v)
-
-      input.$function = function (el) {
-        const elm = el.querySelector(`#${i.period}`)
-        const checkBox = document.createElement("input")
-              checkBox.id = `"enable${i.period}`
-              checkBox.checked = i.enable
-              checkBox.addEventListener("change", (e) => {
-                if (e.currentTarget.checked) {
-                  console.log(`enable ${e.currentTarget.id}`)
-                }
-                else {
-                  console.log(`disable ${e.currentTarget.id}`)
-                }
-              })
-        if (!!elm) {
-          elm.insertAdjacentElement("beforebegin", checkBox)
-        }
-      }
-    }
-  }
 
   //--- building the indicator
 
