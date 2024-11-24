@@ -32,18 +32,17 @@ export default class Histogram {
 
       if (y < z) {
         h = z - y
-        opts.fill = "#0f0"
+        opts.fill = cfg.upfill
+        opts.stroke = cfg.upstroke
+        opts.width = cfg.upwidth
       }
       else {
         h = y - z
         y = z
-        opts.fill = "#f00"
+        opts.fill = cfg.dnfill
+        opts.stroke = cfg.dnstroke
+        opts.width = cfg.dnwidth
       }
-
-
-      // h = (y < z) ? z - y : y - z
-
-
       renderRect(ctx, x, y, w, h, opts)
     }
   }
