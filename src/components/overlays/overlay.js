@@ -249,9 +249,17 @@ export default class Overlay {
 
     histogram( p, params ) {
       if (!(this.#histogram instanceof Histogram))
-        this.#histogram = new Histogram(this.scene, this.theme)
+        this.#histogram = new Histogram(this.scene, params)
 
-      this.#histogram.draw(p, params)
+      this.#histogram.draw(p)
+    }
+
+    highLowRange( ctx, p ) {
+      let {high, low} = p
+      let y1 = this.yAxis.yPos(high)
+      let y2 = this.yAxis.yPos(low)
+      let {width, height} = this.scene
+      renderHighLowRange( ctx, y1, y2, width, height, p )
     }
 
     highLowRange( ctx, p ) {
