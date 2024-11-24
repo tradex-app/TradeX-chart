@@ -809,7 +809,7 @@ export default class Indicator extends Overlay {
           break;
         case "histogram": 
           o.style = this.defaultMetaStyleHistogram(o, x, dm.style)
-          return "histogram"
+          break;
         case "highLow": return "highLow"
         default: break;
       }
@@ -865,13 +865,43 @@ export default class Indicator extends Overlay {
   }
 
   defaultMetaStyleHistogram(o, x, style) {
-    let v;
+    let value;
+    let fns = {
+      change: this.fieldEventChange(),
+      provideInputColour: this.#ConfigDialogue.provideInputColor
+    }
     o.name = (!o?.name) ? "output" : o.name
 
     if (!isObject(style?.[o.name]))
       style[o.name] = {}
-    
-    return "histogram"
+
+    // style[o.name]?.dnFill?.value
+    // style[o.name]?.dnStroke?.value
+
+    // is colour valid?
+    let c = new Colour(style[o.name]?.dnFill?.value)
+    if (!c.isValid) {
+      value = "#f00"
+    }
+    else {
+      value = c.value.hexa
+    }
+    style[o.name].dnFill = this.defaultOutputField(`${o.name}ColourDn`, `${o.name} Colour Dn`, value, "color", fns)
+    style[o.name].dnStroke = style[o.name].dnFill
+
+    // is colour valid?
+    c = new Colour(style[o.name]?.upFill?.value)
+    if (!c.isValid) {
+      value = "#0f0"
+    }
+    else {
+      value = c.value.hexa
+    }
+    style[o.name].upFill = this.defaultOutputField(`${o.name}ColourUp`, `${o.name} Colour Up`, value, "color", fns)
+    style[o.name].upStroke = style[o.name].upFill
+
+    return style[o.name]
+    // return "histogram"
   }
 
   defaultOutputField(id, label, value, type, min, max, defaultValue) {

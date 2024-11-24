@@ -49,7 +49,7 @@ let nameLong = 'Moving Average Convergence/Divergence'
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPE.relative
-  static yAxisPadding = YAXIS_PADDING
+  static yAxisPadding = 1.2 // YAXIS_PADDING
   static colours = [
     "#9C27B0",
     "#9C27B0",
