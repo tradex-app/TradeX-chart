@@ -1361,12 +1361,10 @@ export default class Indicator extends Overlay {
   }
 
   canIndicatorDraw() {
-    if (this.overlay.data.length < 2 ||
-        !this.mustUpdate() ||
-        !this.yAxis ||
-        !this.state.isActive)
-        return false
-    else return true
+    return !(this.overlay.data.length < 2 ||
+            !this.mustUpdate() ||
+            !this.yAxis ||
+            !this.state.isActive)
   }
 
   draw(range=this.range) {

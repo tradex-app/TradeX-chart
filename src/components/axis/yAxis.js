@@ -119,7 +119,7 @@ export default class yAxis extends Axis {
     // add padding
     if (this.mode != "manual") {
       max *= this.#yAxisPadding || 1
-      min *= 1 - (this.#yAxisPadding - 1) || 1
+      min *= this.#yAxisPadding || 1
     }
 
     let diff = max - min
