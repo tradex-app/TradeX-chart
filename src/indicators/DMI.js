@@ -94,7 +94,7 @@ export default class DMI extends Indicator {
   get overlayData() { return this.overlay.data }
 
   calcIndicator(indicator, params={}, range=this.range) {
-    let DIPlusDef= {input: { timePeriod: 14}, output: {output: []}}
+    let DIPlusDef = {input: { timePeriod: 14}, output: {output: []}}
     let DIMinusDef = {input: { timePeriod: 14}, output: {output: []}}
     let ADXDef = {input: { timePeriod: 14}, output: {output: []}}
 
@@ -123,4 +123,7 @@ export default class DMI extends Indicator {
     return false
   }
 
+  draw(range=this.range) {
+    super.draw(range)
+  }
 }

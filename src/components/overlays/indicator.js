@@ -751,14 +751,6 @@ export default class Indicator extends Overlay {
     else return {}
   }
 
-  populateMetaInputs(def) {
-    let input = def.input
-    let metaIn = def.meta.input
-    for (let i in metaIn) {
-      metaIn[i].value = input[i]
-    }
-  }
-
   /**
    * meta output render order
    * merge output keys with output order
@@ -1369,12 +1361,10 @@ export default class Indicator extends Overlay {
   }
 
   canIndicatorDraw() {
-    if (this.overlay.data.length < 2 ||
-        !this.mustUpdate() ||
-        !this.yAxis ||
-        !this.state.isActive)
-        return false
-    else return true
+    return !(this.overlay.data.length < 2 ||
+            !this.mustUpdate() ||
+            !this.yAxis ||
+            !this.state.isActive)
   }
 
   draw(range=this.range) {
