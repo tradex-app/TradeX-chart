@@ -4354,7 +4354,7 @@ class _t extends Rl {
   }
   getMaxMinDiff() {
     let e = this.#u.max > 0 ? this.#u.max : 1, i = this.#u.min > 0 ? this.#u.min : 0, s = this.parent.parent, n = s.view[0]?.id, r = this.range.secondaryMaxMin || {}, o = this.#u;
-    !s.isPrimary && n in r && (e = r[n]?.data?.max || 0, i = r[n]?.data?.min || 0, o = r[n]?.data || []), e == i && (e == 0 ? (e = 0.05, i = -0.05) : (e = e + e * 0.05, i = i + i * 0.05)), this.mode != "manual" && (e *= this.#a || 1, i *= 1 - (this.#a - 1) || 1);
+    !s.isPrimary && n in r && (e = r[n]?.data?.max || 0, i = r[n]?.data?.min || 0, o = r[n]?.data || []), e == i && (e == 0 ? (e = 0.05, i = -0.05) : (e = e + e * 0.05, i = i + i * 0.05)), this.mode != "manual" && (e *= this.#a || 1, i *= this.#a || 1);
     let l = e - i;
     return { max: e, min: i, diff: l, pane: o };
   }
@@ -12323,6 +12323,9 @@ class qf extends U {
     let n = s.value()[0], r = s.getTimeIndex(n);
     return this.data[r] = [n, 0, 0], !1;
   }
+  draw(e = this.range) {
+    super.draw(e);
+  }
 }
 let sn = "DX", Ja = "Directional Movement Index";
 class jf extends U {
@@ -13093,7 +13096,7 @@ const wh = {
       ind: a[e]
     };
 })(wh);
-const Ls = "0.157.5";
+const Ls = "0.157.6";
 function ig(a) {
   a = a === !0;
   var e, i = {}, s = this, n, r, o = "", l = [], c = "", m = 256;
