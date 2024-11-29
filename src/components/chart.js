@@ -575,11 +575,14 @@ export default class Chart extends Component{
    */
   setYAxisType(t) {
     let type = YAXIS_TYPE.valid(t)
+    
     if (
       (this.type == "primaryPane" && type == YAXIS_TYPE.percent)
     ) 
       this.#yAxisType = YAXIS_TYPE.default
-    else this.#yAxisType = type
+    else 
+      this.#yAxisType = type
+
     return true
   }
 

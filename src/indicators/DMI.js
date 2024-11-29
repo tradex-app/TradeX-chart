@@ -19,7 +19,7 @@ export default class DMI extends Indicator {
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPE.relative
-  static yAxisPadding = YAXIS_PADDING
+  static yAxisPadding = 1.3 // YAXIS_PADDING
   static colours = []
   static defaultStyle = {
     "DI+": {

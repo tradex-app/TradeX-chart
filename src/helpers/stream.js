@@ -212,13 +212,13 @@ export default class Stream {
     {
         if (!isInteger(tick.t * 1)) return // tick.t = Date.now()
         let keys = Object.keys(tick) 
-        let t = {}, v;
+        let _tick = {}, value;
         for (let key of keys) {
-          v = tick[key] * 1
-          if (!isNumber(v)) continue
-          t[key] = v
+          value = tick[key] * 1
+          if (isNumber(value))
+            _tick[key] = value
         }
-        this.candle = t
+        this.candle = _tick
     }
   }
 
