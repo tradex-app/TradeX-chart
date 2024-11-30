@@ -1245,6 +1245,7 @@ export default class Indicator extends Overlay {
         this.overlay.data = Object.values(r)
         this.#status = IndicatorState.hasData
         this.setRefresh()
+        this.scale.draw(this.range, true)
       }
     }
     if (this.core.TALibReady) calc()

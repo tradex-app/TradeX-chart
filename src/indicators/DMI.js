@@ -19,7 +19,6 @@ export default class DMI extends Indicator {
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPE.relative
-  static yAxisPadding = 1.3 // YAXIS_PADDING
   static colours = []
   static defaultStyle = {
     "DI+": {
@@ -86,8 +85,6 @@ export default class DMI extends Indicator {
     super(target, xAxis, yAxis, config, parent, params)
 
     this.init()
-
-    this.on("trade_added", this.tradeAdded)
   }
 
   get data() { return this.overlay.data }
@@ -112,10 +109,6 @@ export default class DMI extends Indicator {
   }
 
   calcIndicatorStream (indicator, params={}, range=this.range) {
-
-    // fill new data entry with zeros
-    // this.on("trade_added", this.tradeAdded)
-    // will add new trade data when it becomes available.
     let ts = range.value()[0]
     let idx = range.getTimeIndex(ts)
     this.data[idx] = [ts, 0, 0]

@@ -162,7 +162,7 @@ export default class Chart extends Component{
       chartLegend.source = this.legendInputs.bind(this)
       // chartLegend.visible = this.theme.title.display
       this.legend.add(chartLegend)
-      this.yAxisType = YAXIS_TYPE.default
+      this.yAxisType = YAXIS_TYPE.relative
     }
     else {
       let type = this.core.indicatorClasses[options.view[0].type].scale
