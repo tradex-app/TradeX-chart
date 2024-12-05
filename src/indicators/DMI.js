@@ -3,6 +3,7 @@
 
 import Indicator from "../components/overlays/indicator"
 import { YAXIS_PADDING, YAXIS_TYPE } from "../definitions/chart";
+import { limit } from "../utils/number";
 
 let nameShort = "DMI"
 let nameLong = 'Average Directional Movement Index'
@@ -109,11 +110,19 @@ export default class DMI extends Indicator {
   }
 
   calcIndicatorStream (indicator, params={}, range=this.range) {
-    let ts = range.value()[0]
-    let idx = range.getTimeIndex(ts)
-    this.data[idx] = [ts, 0, 0]
 
-    return false
+    let result1 = (!this.noCalc("PLUS_DI", range)) ? this.TALib["PLUS_DI"](params).output : false
+    let result2 = (!this.noCalc("MINUS_DI", range)) ? this.TALib["MINUS_DI"](params).output : false
+    let result3 = (!this.noCalc("ADX", range)) ? this.TALib["ADX"](params).output : false
+
+console.log("ADX", params)
+
+    if (!result1 && !result2 && !result3) return false
+
+    let time = range.value()[0]
+    // let value = this.formatValue(entry)
+
+    return [time, result1[0], result2[0], result3[0]]
   }
 
   draw(range=this.range) {

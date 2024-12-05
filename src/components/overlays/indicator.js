@@ -1260,9 +1260,7 @@ export default class Indicator extends Overlay {
    * @returns {array|boolean} - indicator data entry
    */
   calcIndicatorStream (indicator, params, range=this.range) {
-    // if (this.noCalc(indicator, range) ||
-    //     !(range instanceof Range)
-    //     ) return false
+
     if (!(range instanceof Range)) return false
 
     let indicatorFn;
@@ -1273,8 +1271,7 @@ export default class Indicator extends Overlay {
     else return false
 
     let entry = indicatorFn(params)
-    let end = range.dataLength
-    let time = range.value(end)[0]
+    let time = range.value()[0]
     let value = this.formatValue(entry)
 
     return [time, ...value]
@@ -1309,10 +1306,10 @@ export default class Indicator extends Overlay {
   #setValue(fn) {
     let p = this.TALibParams()
     if (!p) return false
-
+console.log(p)
     let v = this.calcIndicatorStream(this.libName, p)
     if (!v) return false
-
+console.log(v)
     fn(v)
     this.#status = IndicatorState.hasData
     this.target.setPosition(this.core.scrollPos, 0)
