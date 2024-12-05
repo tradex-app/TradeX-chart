@@ -1108,95 +1108,96 @@ export default class Indicator extends Overlay {
  * @param {object} params - parameters for the TALib function
  * @param {Range} range - range instance or definition
  * @param {Array.<Number>} [update] - timestamps of updated price history
- * @returns {array|boolean} - success or failure
+ * @returns {Promise} - success or failure - array|boolean
  */
   calcIndicator (indicator, params={}, range, update) {
-
-    let indicatorFn;
-    if (!this.noCalcCustom(indicator))
-      indicatorFn = indicator
-    else if (!this.noCalc(indicator, range))
-      indicatorFn = this.TALib[indicator]
-    else return false
-
-    // get the period 
-    let d = this.getTimePeriod()
-    // params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
-    let start, end;
-    let p = d
-    let t = p + (params?.padding || 0)
-    let od = this.overlay.data
-
-    // is it a Range instance?
-    if (range instanceof Range) {
-      start = 0
-      end = range.dataLength - t + 1
-    }
-    else if ( isObject(range) ) {
-      start = range?.indexStart || this.Timeline.t2Index(range?.tsStart || 0) || 0
-      end = range?.indexEnd || this.Timeline.t2Index(range?.tsEnd) || range.dataLength - t + 1
-      end - t
-    }
-    else return false
-
-    // check if a full or only partial calculation is required
-    if (!isArray(od)) return false
-    // full calculation required
-    else if (od.length == 0) { }
-    // partial calculation required
-    else if (od.length + t !== range.dataLength) {
-      // new data in the past?
-      if (od[0][0] > range.value(t)[0]) {
+    return new Promise( (resolve, reject) => {
+      let indicatorFn;
+      if (!this.noCalcCustom(indicator))
+        indicatorFn = indicator
+      else if (!this.noCalc(indicator, range))
+        indicatorFn = this.TALib[indicator]
+      else reject(false)
+  
+      // get the period 
+      let d = this.getTimePeriod()
+      // params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD
+      let start, end;
+      let p = d
+      let t = p + (params?.padding || 0)
+      let od = this.overlay.data
+  
+      // is it a Range instance?
+      if (range instanceof Range) {
         start = 0
-        end = range.getTimeIndex(od[0][0]) - t
-        end = limit(end, t, range.dataLength - 1)
+        end = range.dataLength - t + 1
       }
-      // new data in the future ?
-      else if (od[ od.length - 1 ][0] < range.value( range.dataLength - 1 )[0]) {
-        start = od.length - 1 + t
-        start = limit(start, 0, range.dataLength)
-        end = range.dataLength - 1
+      else if ( isObject(range) ) {
+        start = range?.indexStart || this.Timeline.t2Index(range?.tsStart || 0) || 0
+        end = range?.indexEnd || this.Timeline.t2Index(range?.tsEnd) || range.dataLength - t + 1
+        end - t
       }
-      // something is wrong
-      else return false
-    }
-    // updated span of price history?
-    else if (isArrayOfType(update, "integer")) {
-      start = this.Timeline.t2Index(update[0])
-      end = this.Timeline.t2Index(update[update.length-1]) - t
-      if (end - start < t)
-        start = (start - t < 0) ? 0 : start - t
-    }
-    // up to date, no need to calculate
-    else return false
-
-    // if not enough data for calculation fail
-    if ( end < t ) {
-      this.setError( {type: "noData", msg: "Insufficient input data"} )
-      return false
-    }
-    if ( end - start < t ) {
-      start -= (t + p) - (end - start)
-    }
-
-    let data = [];
-    let entry, input, value;
-
-    while (start < end) {
-      // fetch the data required to calculate the indicator
-      input = this.indicatorInput(start, start + t)
-      params = {...params, ...input}
-      // let hasNull = params.inReal.find(element => element === null)
-      // if (hasNull) return
-
-      entry = indicatorFn(params)
-      value = this.formatValue(entry)
-      // store entry with timestamp
-      data.push([range.value(start + p - 1)[0], ...value])
-      start++
-    }
-    // this.#gaps = new Set([...this.#gaps].sort())
-    return data
+      else reject(false)
+  
+      // check if a full or only partial calculation is required
+      if (!isArray(od)) reject(false)
+      // full calculation required
+      else if (od.length == 0) { }
+      // partial calculation required
+      else if (od.length + t !== range.dataLength) {
+        // new data in the past?
+        if (od[0][0] > range.value(t)[0]) {
+          start = 0
+          end = range.getTimeIndex(od[0][0]) - t
+          end = limit(end, t, range.dataLength - 1)
+        }
+        // new data in the future ?
+        else if (od[ od.length - 1 ][0] < range.value( range.dataLength - 1 )[0]) {
+          start = od.length - 1 + t
+          start = limit(start, 0, range.dataLength)
+          end = range.dataLength - 1
+        }
+        // something is wrong
+        else reject(false)
+      }
+      // updated span of price history?
+      else if (isArrayOfType(update, "integer")) {
+        start = this.Timeline.t2Index(update[0])
+        end = this.Timeline.t2Index(update[update.length-1]) - t
+        if (end - start < t)
+          start = (start - t < 0) ? 0 : start - t
+      }
+      // up to date, no need to calculate
+      else reject(false)
+  
+      // if not enough data for calculation fail
+      if ( end < t ) {
+        this.setError( {type: "noData", msg: "Insufficient input data"} )
+        reject(false)
+      }
+      if ( end - start < t ) {
+        start -= (t + p) - (end - start)
+      }
+  
+      let data = [];
+      let entry, input, value;
+  
+      while (start < end) {
+        // fetch the data required to calculate the indicator
+        input = this.indicatorInput(start, start + t)
+        params = {...params, ...input}
+        // let hasNull = params.inReal.find(element => element === null)
+        // if (hasNull) return
+  
+        entry = indicatorFn(params)
+        value = this.formatValue(entry)
+        // store entry with timestamp
+        data.push([range.value(start + p - 1)[0], ...value])
+        start++
+      }
+      // this.#gaps = new Set([...this.#gaps].sort())
+      resolve(data)
+    })
   }
 
   /**
@@ -1206,47 +1207,48 @@ export default class Indicator extends Overlay {
   calcIndicatorHistory (update) {
     const calc = () => {
       let od = this.overlay.data
-      const data = this.calcIndicator(this.libName, this.definition.input, this.range, update);
-
-      if (isArray(data)) {
-        const d = new Set(data)
-        const o = new Set(od)
-        let a, p, r = {}, s;
-        if (!isArray(od) ||
-            od.length == 0 ) {
-            this.overlay.data = data
-            return
+      this.calcIndicator(this.libName, this.definition.input, this.range, update)
+      .then( (data) => {
+        if (isArray(data)) {
+          const d = new Set(data)
+          const o = new Set(od)
+          let a, p, r = {}, s;
+          if (!isArray(od) ||
+              od.length == 0 ) {
+              this.overlay.data = data
+              return
+          }
+          else if (!data.length) return
+          else if (data[0][0] < od[0][0]) {
+            // s = new Set([...d, ...o])
+            // this.overlay.data = Array.from(s)
+            a = data
+            p = od
+          }
+          else if (data[data.length-1][0] > od[od.length-1][0]) {
+            // s = new Set([...o, ...d])
+            // this.overlay.data = Array.from(s)
+            a = od
+            p = data
+          }
+          else{
+            // s = new Set([...o, ...d])
+            a = od
+            p = data
+          }
+          
+          for (let v of a) {
+            r[v[0]] = v
+          }
+          for (let v of p) {
+            r[v[0]] = v
+          }
+          this.overlay.data = Object.values(r)
+          this.#status = IndicatorState.hasData
+          this.setRefresh()
+          this.scale.draw(this.range, true)
         }
-        else if (!data.length) return
-        else if (data[0][0] < od[0][0]) {
-          // s = new Set([...d, ...o])
-          // this.overlay.data = Array.from(s)
-          a = data
-          p = od
-        }
-        else if (data[data.length-1][0] > od[od.length-1][0]) {
-          // s = new Set([...o, ...d])
-          // this.overlay.data = Array.from(s)
-          a = od
-          p = data
-        }
-        else{
-          // s = new Set([...o, ...d])
-          a = od
-          p = data
-        }
-        
-        for (let v of a) {
-          r[v[0]] = v
-        }
-        for (let v of p) {
-          r[v[0]] = v
-        }
-        this.overlay.data = Object.values(r)
-        this.#status = IndicatorState.hasData
-        this.setRefresh()
-        this.scale.draw(this.range, true)
-      }
+      })
     }
     if (this.core.TALibReady) calc()
     else  this.core.talibAwait.push(calc.bind(this))

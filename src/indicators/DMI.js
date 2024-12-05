@@ -96,33 +96,44 @@ export default class DMI extends Indicator {
     let DIMinusDef = {input: { timePeriod: 14}, output: {output: []}}
     let ADXDef = {input: { timePeriod: 14}, output: {output: []}}
 
-    let result1 = super.calcIndicator("PLUS_DI", params, range) // , DIPlusDef)
-    let result2 = super.calcIndicator("MINUS_DI", params, range) //, DIMinusDef)
-    let result3 = super.calcIndicator("ADX", params, range) //, ADXDef)
-
-    if (!result1 && !result2 && !result3) return false
-
-    for (let i=0; i<result1.length; i++) {
-      result1[i][2] = result2[i][1]
-      result1[i][3] = result3[i][1]
-    }
-    return result1
+    return new Promise( (resolve, reject) => {
+      let promises = [
+        super.calcIndicator("PLUS_DI", params, range), // , DIPlusDef)
+        super.calcIndicator("MINUS_DI", params, range), //, DIMinusDef)
+        super.calcIndicator("ADX", params, range) //, ADXDef)
+      ]
+      Promise.all(promises).then( (result) => {
+        let [result1, result2, result3] = [...result]
+  
+        if (!result1 && !result2 && !result3) reject(false)
+    
+        for (let i=0; i<result1.length; i++) {
+          result1[i][2] = result2[i][1]
+          result1[i][3] = result3[i][1]
+        }
+        resolve(result1)      
+      })
+    })
   }
 
   calcIndicatorStream (indicator, params={}, range=this.range) {
+    console.log("ADX", params)
 
-    let result1 = (!this.noCalc("PLUS_DI", range)) ? this.TALib["PLUS_DI"](params).output : false
-    let result2 = (!this.noCalc("MINUS_DI", range)) ? this.TALib["MINUS_DI"](params).output : false
-    let result3 = (!this.noCalc("ADX", range)) ? this.TALib["ADX"](params).output : false
+    let promises = [
+      (!this.noCalc("PLUS_DI", range)) ? this.TALib["PLUS_DI"](params).output : false,
+      (!this.noCalc("MINUS_DI", range)) ? this.TALib["MINUS_DI"](params).output : false,
+      (!this.noCalc("ADX", range)) ? this.TALib["ADX"](params).output : false
+    ]
+    Promise.all(promises).then(  (result) => {
+      let [result1, result2, result3] = [...result]
 
-console.log("ADX", params)
-
-    if (!result1 && !result2 && !result3) return false
-
-    let time = range.value()[0]
-    // let value = this.formatValue(entry)
-
-    return [time, result1[0], result2[0], result3[0]]
+      if (!result1 && !result2 && !result3) return false
+  
+      let time = range.value()[0]
+      // let value = this.formatValue(entry)
+  
+      return [time, result1[0], result2[0], result3[0]]
+    })
   }
 
   draw(range=this.range) {
