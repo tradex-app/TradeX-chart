@@ -16,7 +16,7 @@ import TEST from './custom-indicator'
 import DblMA from './custom-dbl-ma.js'
 import DblMA2 from './custom-dbl-ma2.js'
 import CustomOverlay from './custom-overlay'
-import chartDCA from './chart-dca'
+// import chartDCA from './chart-dca'
 import TradeFlow from './trade-flow.js'
 
 
