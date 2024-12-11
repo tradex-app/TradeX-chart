@@ -105,7 +105,7 @@ export default class DMI extends Indicator {
       Promise.all(promises).then( (result) => {
         let [result1, result2, result3] = [...result]
   
-        if (!result1 && !result2 && !result3) reject(false)
+        if (!result1 && !result2 && !result3) resolve(false)
     
         for (let i=0; i<result1.length; i++) {
           result1[i][2] = result2[i][1]

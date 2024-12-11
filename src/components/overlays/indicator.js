@@ -1117,7 +1117,7 @@ export default class Indicator extends Overlay {
         indicatorFn = indicator
       else if (!this.noCalc(indicator, range))
         indicatorFn = this.TALib[indicator]
-      else reject(false)
+      else resolve(false)
   
       // get the period 
       let d = this.getTimePeriod()
@@ -1137,10 +1137,10 @@ export default class Indicator extends Overlay {
         end = range?.indexEnd || this.Timeline.t2Index(range?.tsEnd) || range.dataLength - t + 1
         end - t
       }
-      else reject(false)
+      else resolve(false)
   
       // check if a full or only partial calculation is required
-      if (!isArray(od)) reject(false)
+      if (!isArray(od)) resolve(false)
       // full calculation required
       else if (od.length == 0) { }
       // partial calculation required
@@ -1158,7 +1158,7 @@ export default class Indicator extends Overlay {
           end = range.dataLength - 1
         }
         // something is wrong
-        else reject(false)
+        else resolve(false)
       }
       // updated span of price history?
       else if (isArrayOfType(update, "integer")) {
@@ -1168,12 +1168,12 @@ export default class Indicator extends Overlay {
           start = (start - t < 0) ? 0 : start - t
       }
       // up to date, no need to calculate
-      else reject(false)
+      else resolve(false)
   
       // if not enough data for calculation fail
       if ( end < t ) {
         this.setError( {type: "noData", msg: "Insufficient input data"} )
-        reject(false)
+        resolve(false)
       }
       if ( end - start < t ) {
         start -= (t + p) - (end - start)
