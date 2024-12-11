@@ -2,8 +2,8 @@
 // proof of concept for user defined indicators
 
 // import { Indicator } from "tradex-chart"
-import { Indicator, Range, uid } from "./src"
-import { isArray, isObject } from "./src/utils/typeChecks"
+import { Indicator, Range, uid } from "../../src"
+import { isArray, isObject } from "../../src/utils/typeChecks"
 
 /**
  * custom indicator class

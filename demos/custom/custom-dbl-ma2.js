@@ -3,7 +3,7 @@
 
 // import { Indicator } from "tradex-chart"
 // import { Indicator, Range, uid } from "./src"
-import { Indicator, IndicatorClasses, Range, uid, YAXIS_TYPE } from "./src"
+import { Indicator, IndicatorClasses, Range, uid, YAXIS_TYPE } from "../../src"
 
 
 /**

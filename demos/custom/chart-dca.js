@@ -3,7 +3,7 @@
 // import { renderLineHorizontal } from "../../renderer/line";
 // import { renderTextBG } from "../../renderer/text";
 
-import { Overlay, canvas } from "./dist/tradex-chart.es";
+import { Overlay, canvas } from "../../dist/tradex-chart.es";
 
 // renderLineHorizontal, renderTextBG - available from canvas
 const renderLineHorizontal = canvas.renderLineHorizontal
