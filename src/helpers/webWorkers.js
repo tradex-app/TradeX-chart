@@ -325,7 +325,7 @@ export class RPCWorkerPool {
       }
     }
     console.log("Selected Worker:", id);
-    return this.workers[id]; s
+    return this.workers[id];
   }
 
   addTask(name, task) {

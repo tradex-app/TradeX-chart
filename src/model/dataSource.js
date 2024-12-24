@@ -3,44 +3,42 @@
 // so rather than pushing data to the chart
 // the chart can request (pull) data when needed
 
-import { RANGELIMIT, SHORTNAME } from "../definitions/core";
+import { interval2MS, isTimeFrame, isTimeFrameMS, ms2Interval } from "../utils/time";
+import { DEFAULT_TIMEFRAME } from "../definitions/chart";
+import { SHORTNAME } from "../definitions/core";
 import TradeXchart from "../core";
 import { Range, detectInterval } from "./range";
 import State, { DEFAULT_STATE } from "../state/chart-state"
 import Stream from "../helpers/stream";
 import { checkType, isArray, isArrayOfType, isFunction, isInteger, isNumber, isObject, isPromise, isString } from "../utils/typeChecks";
 import { doStructuredClone, uid, xMap } from "../utils/utilities";
-import { TIMEFRAMEMAX, TIMEFRAMEMIN, TIMESCALESVALUES, interval2MS, isTimeFrame, isTimeFrameMS, ms2Interval } from "../utils/time";
-import { DEFAULT_TIMEFRAME, INTITIALCNT } from "../definitions/chart";
 
-const TSV =   TIMESCALESVALUES
-const defaultTimeFrames = {}
-for (let t of Object.values(TSV)) {
-  let ms = t[0]
-  let key = ms2Interval(ms)
-  if (ms < 60000) continue
-  defaultTimeFrames[`${key}`] = ms
-}
-Object.freeze(defaultTimeFrames)
+export const SECOND_MS = 1000
+export const MINUTE_MS = SECOND_MS*60
+export const HOUR_MS = MINUTE_MS*60
+export const DAY_MS = HOUR_MS*24
+export const WEEK_MS = DAY_MS*7
+export const MONTHR_MS = DAY_MS*30
+export const YEAR_MS = DAY_MS*365
 
 const defaultTimeFramesShort = {
-  "1m": TSV.MINUTE[0],
-  "2m": TSV.MINUTE2[0],
-  "3m": TSV.MINUTE3[0],
-  "5m": TSV.MINUTE5[0],
-  "10m": TSV.MINUTE10[0],
-  "15m": TSV.MINUTE15[0],
-  "30m": TSV.MINUTE30[0],
-  "1h": TSV.HOUR[0],
-  "2h": TSV.HOUR2[0],
-  "3h": TSV.HOUR3[0],
-  "4h": TSV.HOUR4[0],
-  "1d": TSV.DAY[0],
-  "1w": TSV.DAY7[0],
-  "1M": TSV.MONTH[0],
-  "3M": TSV.MONTH3[0],
-  "6M": TSV.MONTH6[0],
-  "1y": TSV.YEARS[0]
+  "1m": MINUTE_MS,
+  "2m": MINUTE_MS * 2,
+  "3m": MINUTE_MS * 3,
+  "5m": MINUTE_MS * 5,
+  "10m": MINUTE_MS * 10,
+  "15m": MINUTE_MS * 15,
+  "30m": MINUTE_MS * 30,
+  "1h": HOUR_MS,
+  "2h": HOUR_MS * 2,
+  "3h": HOUR_MS * 3,
+  "4h": HOUR_MS * 4,
+  "1d": DAY_MS,
+  "1w": DAY_MS * 7,
+  "1M": MONTHR_MS,
+  "3M": MONTHR_MS * 3,
+  "6M": MONTHR_MS * 6,
+  "1y": YEAR_MS
 }
 
 export default class DataSource {

@@ -18,12 +18,14 @@ import { isImage } from "./DOM"
  */
 export default function exportImage(core, dest, type, quality, output, watermark) {
   const theme = core.theme
-  const container = document.createElement("template")
-  const time = core.Timeline.graph.viewport.scene
+    const time = core.Timeline.graph.viewport.scene
   const main = core.MainPane
   const mainScene = main.graph.viewport.scene
   const width = main.width
   const height = main.height
+  const container = document.createElement("div")
+        container.setAttribute("width", width)
+        container.setAttribute("height", height)
   const imgViewport = new CEL.Viewport({
     width: width,
     height: height,

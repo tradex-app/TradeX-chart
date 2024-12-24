@@ -1,10 +1,10 @@
 // chart-watermark.js
 
-import { createFont, getTextRectHeight, getTextRectWidth } from "./src/renderer/text"
-import { renderImage } from "./src/renderer/canvas-lib"
-import { isObject, isString } from "./src/utils/typeChecks"
-import DOM from "./src/utils/DOM"
-import Overlay from "./src/components/overlays/overlay"
+import { createFont, getTextRectHeight, getTextRectWidth } from "../../src/renderer/text"
+import { renderImage } from "../../src/renderer/canvas-lib"
+import { isObject, isString } from "../../src/utils/typeChecks"
+import DOM from "../../src/utils/DOM"
+import Overlay from "../../src/components/overlays/overlay"
 
 
 export default class CustomOverlay extends Overlay {

@@ -908,9 +908,13 @@ export default class State {
         // this.#dataSource.tickerStop()
         this.#dataSource?.historyPause()
       }
-      this.#core.progress.start()
-      State.archiveChartPanesInventory(this)
-      this.#core.MainPane.destroy(false)
+      const reqID = requestAnimationFrame((ts) => {
+        this.#core.progress.start()
+        requestAnimationFrame(() => {
+          State.archiveChartPanesInventory(this)
+          this.#core.MainPane.destroy(false)
+        })
+      })
     }
 
     // is there a matching source, symbol, timeFrame State?

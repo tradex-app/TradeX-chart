@@ -2,11 +2,11 @@
 // visualize trade flow
 
 // import { Indicator } from "tradex-chart"
-import { Indicator } from "./src"
-import { candleW } from "./src"
-import { YAXIS_TYPE } from "./src";
-import { YAXIS_PADDING } from "./src/definitions/chart";
-import { isObject } from "./src/utils/typeChecks";
+import { Indicator } from "../../src"
+import { candleW } from "../../src"
+import { YAXIS_TYPE } from "../../src";
+import { YAXIS_PADDING } from "../../src/definitions/chart";
+import { isObject } from "../../src/utils/typeChecks";
 
 /**
  * custom indicator class

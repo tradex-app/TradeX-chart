@@ -2,7 +2,7 @@
 // Double Moving Average - Secondary Chart Pane
 
 // import { Indicator } from "tradex-chart"
-import { Indicator, IndicatorClasses, Range, uid } from "./src"
+import { Indicator, IndicatorClasses, Range, uid } from "../../src"
 
 const primaryPane = false
 
