@@ -117,7 +117,7 @@ Editable sandbox examples can found on [CodeSandbox.io](https://codesandbox.io/u
 ## Framework Integration Examples
 
 * [React / NextJS](nextjs)
-* Vue (TODO:)
+* [Vue](https://github.com/tradex-app/TradeX-Chart-Vue-JS)
 * Svelte (TODO:)
 
 ## Features
