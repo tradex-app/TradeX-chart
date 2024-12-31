@@ -140,7 +140,7 @@ Editable sandbox examples can found on [CodeSandbox.io](https://codesandbox.io/u
 
 For the latest news on TradeX-chart, feedback, feature requests, and community, join us over on Discord or GitHub.
 
-* [TradeX Discord](https://discord.gg/dMegsSQDe)
+* [TradeX Discord](https://discord.gg/6XS9tDrcdq)
 * [Issue Tracker](https://github.com/tradex-app/TradeX-chart/issues)
 * [GitHub](https://github.com/tradex-app/TradeX-chart/discussions)
 

@@ -52,7 +52,7 @@ export const Info = () => {
         <p>
           For the latest news on TradeX-chart, feedback, feature requests, and
           community, join us over on{' '}
-          <Link href="https://discord.com/">Discord</Link> or
+          <Link href="https://discord.gg/6XS9tDrcdq">Discord</Link> or
           <Link href="https://github.com/tradex-app/TradeX-chart">GitHub</Link>.
         </p>
       </section>
