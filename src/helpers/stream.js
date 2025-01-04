@@ -212,13 +212,13 @@ export default class Stream {
     {
         if (!isInteger(tick.t * 1)) return // tick.t = Date.now()
         let keys = Object.keys(tick) 
-        let t = {}, v;
+        let _tick = {}, value;
         for (let key of keys) {
-          v = tick[key] * 1
-          if (!isNumber(v)) continue
-          t[key] = v
+          value = tick[key] * 1
+          if (isNumber(value))
+            _tick[key] = value
         }
-        this.candle = t
+        this.candle = _tick
     }
   }
 
@@ -253,6 +253,7 @@ export default class Stream {
       data.c, 
       data.v, 
       null, true]
+      console.log("candle", this.#candle)
 
 // console.log(`State: ${this.#state.key} new candle:`, this.#candle)
     this.#state.mergeData({ohlcv: [this.#candle]}, true, false)
@@ -285,6 +286,8 @@ export default class Stream {
     // update the last candle in the state data
     this.#candle = candle
 // console.log(`State: ${this.#state.key} candle update:`,candle)
+console.log(this.#candle)
+
 
     const d = this.#state.data.chart.data
     const l = (d.length > 0) ? d.length -1 : 0

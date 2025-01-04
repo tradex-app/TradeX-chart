@@ -87,6 +87,15 @@ export const TIMESCALESVALUES = {
   MILLISECOND50: [ MILLISECOND * 50, "milliseconds", 50 ],
   MILLISECOND: [ MILLISECOND, "milliseconds", 1 ],
 }
+const defaultTF = {}
+for (let t of Object.values(TIMESCALESVALUES)) {
+  let ms = t[0]
+  let key = ms2Interval(ms)
+  if (ms < 60000) continue
+  defaultTF[`${key}`] = ms
+}
+Object.freeze(defaultTF)
+export const defaultTimeFrames = defaultTF
 export const TIMEFRAMEMIN = MINUTE_MS
 export const INTERVALMIN = TIMEFRAMEMIN
 export const TIMEFRAMEMAX = TIMESCALESVALUES.YEARS10[0]

@@ -36,7 +36,7 @@ const Icons = () => {
           />
         </a>
         <a
-          href="https://discord.com/channels/1039287962510311434/1039288750913634405"
+          href="https://discord.gg/6XS9tDrcdq"
           title="Discord"
         >
           <img

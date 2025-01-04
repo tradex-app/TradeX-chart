@@ -908,7 +908,7 @@ export default class State {
         // this.#dataSource.tickerStop()
         this.#dataSource?.historyPause()
       }
-      this.#core.progress.start()
+      // this.#core.progress.start()
       State.archiveChartPanesInventory(this)
       this.#core.MainPane.destroy(false)
     }

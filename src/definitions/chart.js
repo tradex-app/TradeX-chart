@@ -13,8 +13,8 @@ export const XAXIS_STEP = 100
 
 export const YAXIS_STEP = 100
 export const YAXIS_GRID = 16
-export const YAXIS_BOUNDS = 0.3
-export const YAXIS_PADDING = 1.04
+export const YAXIS_BOUNDS = 0.2
+export const YAXIS_PADDING = 1.2
 export const YAXIS_MINDIGITS = 8 // candle count down plus 00:00:00
 
 // YAxis type enum

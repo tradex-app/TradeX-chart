@@ -1,6 +1,10 @@
 import { Chart, DOM } from './src'
 import { LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS } from "./src/definitions/chart"
 import * as talib from './node_modules/talib-web/lib/index.esm'
+// const wasm = "node_modules/talib-web/lib/talib.wasm"
+import wasm from './src/wasm/talib.wasm.dataURI.js'
+// const talib = null
+// const wasm = null
 
 // let state = undefined
 import state1 from './data/1hour.js'
@@ -20,7 +24,15 @@ import CustomOverlay from './demos/custom/custom-overlay.js'
 import TradeFlow from './demos/custom/trade-flow.js'
 
 
-const wasm = "node_modules/talib-web/lib/talib.wasm"
+
+
+import bearHawk from './data/bear-hawk.js'
+import { text } from './src/definitions/icons.js'
+import { loadStates, statesDropDown } from './demos/js/loadStates.js'
+import { loadTimeFrame } from './demos/js/loadTimeFrame.js'
+import { addIndicatorDropdown } from './demos/js/addIndicator.js'
+
+import { livePrice_Binance, onRangeLimit2 } from './demos/dataSource/binance.js'
 
 import bearHawk from './data/bear-hawk.js'
 import { text } from './src/definitions/icons.js'

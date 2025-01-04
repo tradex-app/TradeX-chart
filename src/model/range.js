@@ -627,7 +627,7 @@ export class Range {
 
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
-    let j, v, min, max, diff, tMin, tMax;
+    let j, v, min, max, diff, tMin, tMax, tDiff;
 
     // iterate over indicator outputs
     for (let d in r) {
@@ -659,6 +659,11 @@ export class Range {
       --f
     }
     // max min totals for all outputs
+    tDiff = tMax - tMin
+    tMin -= tDiff * this.yAxisBounds
+    tMax += tDiff * this.yAxisBounds
+    tDiff = tMax - tMin
+
     r.data = {
       min: tMin,
       max: tMax,

@@ -27,8 +27,10 @@ import WidgetsG from './components/widgets'
 import Indicator from './components/overlays/indicator'
 import Chart, { defaultOverlays, optionalOverlays } from './components/chart'
 import exportImage from './utils/exportImage'
-import talib from './wasm/index.esm.str.js'
+// import talib from './wasm/index.esm.str.js'
+import * as talib from './wasm/index.esm'
 import wasm from './wasm/talib.wasm.dataURI'
+import { talibAPI } from './definitions/talib-api'
 
 
 /**
@@ -42,6 +44,7 @@ export default class TradeXchart extends Tradex_chart {
   static #cnt = 0
   static #cfg = {}
   static #instances = {}
+  static #talib = null
   static #talibPromise = null
   static #talibReady = false
   static #talibAwait = []
@@ -51,6 +54,7 @@ export default class TradeXchart extends Tradex_chart {
   /** @returns {string} - return TradeX Chart version number */
   static get version() { return TradeXchart.#version }
   static get default() { return doStructuredClone(defaultConfig) }
+  static get talib() { return TradeXchart.#talibPromise }
   static get talibPromise() { return TradeXchart.#talibPromise }
   static get talibReady() { return TradeXchart.#talibReady }
   static get talibAwait() { return TradeXchart.#talibAwait }
@@ -220,13 +224,27 @@ export default class TradeXchart extends Tradex_chart {
       }
 */
 
-      if (!TradeXchart.#talibReady && 
-          TradeXchart.#talibError === null &&
-          isFunction(txCfg?.talib?.init)) {
-        TradeXchart.#talibPromise = txCfg.talib.init(txCfg.wasm)
+    if ( isObject(txCfg?.talib) &&
+      TradeXchart.isTalibInstantiated(txCfg.talib)) {
+      TradeXchart.#talibReady = true;
+    }
+    else
+    if (!TradeXchart.#talibReady && 
+        TradeXchart.#talibError === null) {
+
+        if (isPromise(txCfg?.talib))
+          TradeXchart.#talibPromise = txCfg.talib
+        else
+        if (isFunction(txCfg?.talib?.init))
+          TradeXchart.#talibPromise = txCfg.talib.init(txCfg.wasm)
+
+        else
+          return txCfg
+
         TradeXchart.#talibPromise.then(
-          () => { 
+          (r) => { 
             TradeXchart.#talibReady = true;
+            TradeXchart.#talib = r
             // process functions waiting for talibReady
             for (let c of TradeXchart.#talibAwait) {
               if (isFunction(c)) c()
@@ -234,7 +252,8 @@ export default class TradeXchart extends Tradex_chart {
           },
           () => { TradeXchart.#talibReady = false }
         )
-      }
+    } 
+
     return txCfg
     }
   
@@ -260,6 +279,14 @@ export default class TradeXchart extends Tradex_chart {
      */
     static cnt() {
       return TradeXchart.#cnt++
+    }
+
+    static isTalibInstantiated(talib) {
+      let result = false
+      for (let key in talibAPI) {
+        result == result && (key in talib)
+      }
+      return result
     }
 
   /**
@@ -367,7 +394,7 @@ export default class TradeXchart extends Tradex_chart {
   get settings() { return this.state.data.chart.settings }
   get indicatorClasses() { return this.#indicators }
   get indicatorsPublic() { return this.#indicatorsPublic }
-  get TALib() { return this.#TALib }
+  get TALib() { return this.#TALib } // { TradeXchart.talib }
   get TALibReady() { return TradeXchart.talibReady }
   get TALibError() { return TradeXchart.talibError }
   get talibAwait() { return TradeXchart.talibAwait }
