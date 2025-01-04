@@ -23,17 +23,6 @@ import CustomOverlay from './demos/custom/custom-overlay.js'
 // import chartDCA from './chart-dca'
 import TradeFlow from './demos/custom/trade-flow.js'
 
-
-
-
-import bearHawk from './data/bear-hawk.js'
-import { text } from './src/definitions/icons.js'
-import { loadStates, statesDropDown } from './demos/js/loadStates.js'
-import { loadTimeFrame } from './demos/js/loadTimeFrame.js'
-import { addIndicatorDropdown } from './demos/js/addIndicator.js'
-
-import { livePrice_Binance, onRangeLimit2 } from './demos/dataSource/binance.js'
-
 import bearHawk from './data/bear-hawk.js'
 import { text } from './src/definitions/icons.js'
 import { loadStates, statesDropDown } from './demos/js/loadStates.js'
