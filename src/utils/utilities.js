@@ -86,11 +86,10 @@ export function getPrototypeAt(level, obj) {
  * @param {Object} obj
  * @returns {Object}  
  */
-export function copyDeep(obj, clone=true) {
-  // if ("structuredClone" in navigator && clone) return doStructuredClone(obj)
+export function copyDeep(obj, clone) {
 
-  if (obj === null || typeof obj !== 'object' || 'isActiveClone' in obj)
-  return obj;
+  if (obj === null || typeof obj !== 'object')
+    return obj;
 
   let temp;
   if (obj instanceof Date)
@@ -100,9 +99,11 @@ export function copyDeep(obj, clone=true) {
 
   for (let key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-          obj['isActiveClone'] = null;
-          temp[key] = copyDeep(obj[key], false);
-          delete obj['isActiveClone'];
+          if (typeof obj[key] !== "object" || obj[key] === obj)
+            temp[key] = obj[key]
+          else {
+            temp[key] = copyDeep(obj[key], false);
+          }
       }
   }
   return temp;

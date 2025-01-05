@@ -118,20 +118,20 @@ function ce(n, A) {
     k(i) && k(s) ? n[e] = ce(i.concat([]), s) : Q(i) && Q(s) ? n[e] = ce(Object.assign({}, i), s) : n[e] = s;
   }), n);
 }
-function lo(n, A = !0) {
-  if (n === null || typeof n != "object" || "isActiveClone" in n)
+function lo(n, A) {
+  if (n === null || typeof n != "object")
     return n;
   let e;
   n instanceof Date ? e = new n.constructor() : e = k(n) ? [] : {};
   for (let i in n)
-    Object.prototype.hasOwnProperty.call(n, i) && (n.isActiveClone = null, e[i] = lo(n[i], !1), delete n.isActiveClone);
+    Object.prototype.hasOwnProperty.call(n, i) && (typeof n[i] != "object" || n[i] === n ? e[i] = n[i] : e[i] = lo(n[i]));
   return e;
 }
 function gA(n) {
   try {
     return structuredClone(n);
   } catch {
-    return lo(n, !1);
+    return lo(n);
   }
 }
 function wl(n, A) {
@@ -15605,7 +15605,7 @@ const hh = {
       ind: n[A]
     };
 })(hh);
-const ks = "0.157.7";
+const ks = "0.157.8";
 function Qf(n) {
   n = n === !0;
   var A, e = {}, i = this, s, o, a = "", r = [], I = "", l = 256;
