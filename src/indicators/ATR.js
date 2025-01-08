@@ -1,4 +1,4 @@
-// ADX.js
+// ATR.js
 // Average True Range
 // https://hackape.github.io/talib.js/modules/_index_.html#dx
 // 
