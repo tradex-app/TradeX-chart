@@ -1076,7 +1076,7 @@ export default class TradeXchart extends Tradex_chart {
   jumpToEnd(center=true) {
     let end = this.range.dataLength - this.range.Length
     if (center) end += Math.round(this.range.Length / 2)
-    this.jumpToIndex(end, true, false)
+    this.jumpToIndex(end + 1, true, false)
   }
 
   /**
@@ -1382,7 +1382,7 @@ export default class TradeXchart extends Tradex_chart {
    * @param {Indicator} i 
    */
   indicatorDefinitionDefaults(i) {
-console.log(i)
+// console.log(i)
   }
 
   /**

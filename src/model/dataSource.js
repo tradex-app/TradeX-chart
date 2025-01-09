@@ -543,7 +543,7 @@ export default class DataSource {
   }
 
   identifyState() {
-    console.log(`${this.state.key} ${this.symbol} ${this.timeFrameStr}`)
+    this.#core.log(`${this.state.key} ${this.symbol} ${this.timeFrameStr}`)
   }
 
   /**
