@@ -234,6 +234,13 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"examples/features.mdx": {
+	id: "examples/features.mdx";
+  slug: "examples/features";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
 "examples/static_chart.mdx": {
 	id: "examples/static_chart.mdx";
   slug: "examples/static_chart";
