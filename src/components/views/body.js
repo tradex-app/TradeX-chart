@@ -29,6 +29,7 @@ const content = `
   }
   tradex-tools {
     grid-column: 1/2;
+    grid-row: 1/2;
   }
   tradex-scale:first-of-type {
     grid-column: 2/3;

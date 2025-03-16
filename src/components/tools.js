@@ -148,7 +148,8 @@ export default class ToolsBar extends Component {
     el.innerHTML = this.#elTools.defaultNode(this.#tools)
   }
 
-  show(pos) {
+  show(pos=this.core.theme.tools.location) {
+    pos = (pos === "left" || pos === "right") ? pos : "left";
     this.core.elBody.setToolsLocation(pos)
     this.core.MainPane.setDimensions()
     this.core.refresh()
