@@ -148,6 +148,18 @@ export default class ToolsBar extends Component {
     el.innerHTML = this.#elTools.defaultNode(this.#tools)
   }
 
+  show(pos) {
+    this.core.elBody.setToolsLocation(pos)
+    this.core.MainPane.setDimensions()
+    this.core.refresh()
+  }
+
+  hide() {
+    this.core.elBody.setToolsLocation("none")
+    this.core.MainPane.setDimensions()
+    this.core.refresh()
+  }
+
   initAllTools() {
     const tools = this.#elTools.querySelectorAll(`.icon-wrapper`)
     for (let tool of tools) {

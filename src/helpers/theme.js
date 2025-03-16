@@ -108,7 +108,13 @@ export default class Theme {
     }
     else {
       let k = keys.shift()
-      this[k] = setProperty(this[k], keys.join('.'), value)
+
+      switch (k) {
+        case "tools": console.log("theme set tools");
+        case "utils": console.log("theme set utils");
+        default:
+          this[k] = setProperty(this[k], keys.join('.'), value);
+      }
     }
 
     this.#core.refresh()

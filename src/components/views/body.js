@@ -144,14 +144,14 @@ export default class tradeXBody extends element {
       case "right":
         this.#gridTemplateColumns.toolsLeft = `0`
         this.#gridTemplateColumns.toolsRight = `${toolsW}px`
-        this.#elTools.style.gridColumn = "1/2"
+        this.#elTools.style.gridColumn = "5/6"
         this.#elTools.style.display = "block"
         break;
       case "left":
       default:
         this.#gridTemplateColumns.toolsLeft = `${toolsW}px`
         this.#gridTemplateColumns.toolsRight = `0`
-        this.#elTools.style.gridColumn = "5/6"
+        this.#elTools.style.gridColumn = "1/2"
         this.#elTools.style.display = "block"
         break;
     }

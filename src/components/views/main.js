@@ -76,8 +76,6 @@ export default class tradeXMain extends element {
       })
   }
 
-  disconnectedCallback() {
-  }
   get viewport() { return this.#elViewPort }
   get rows() { return this.#elRows }
   get time() { return this.#elTime }
