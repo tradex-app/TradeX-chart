@@ -134,7 +134,8 @@ export default class tradeXBody extends element {
   }
 
   setToolsLocation(side=this.#theme?.tools?.location) {
-    let toolsW = (this.#theme?.tools?.location == "none") ? 0 : this.toolsW
+    let toolsW = (side == "left" || side == "right") ? this.#theme.tools.width || TOOLSW : 0
+    this.#elTools.style.width = `${toolsW}px`
     switch(side) {
       case "none":
       case false:

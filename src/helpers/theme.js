@@ -21,7 +21,7 @@ export default class Theme {
    * @static
    * @param {Object} theme
    * @param {Object} core
-   * @returns {instance}  
+   * @returns {instance|boolean}  
    * @memberof Theme
    */
   static create(theme, core) {
@@ -64,7 +64,6 @@ export default class Theme {
 
     const defaultT = doStructuredClone(defaultTheme)
     const newTheme = doStructuredClone(theme)
-
     const setTheme = mergeDeep(defaultT, newTheme)
 
     for (let t in setTheme) {
@@ -106,7 +105,8 @@ export default class Theme {
     if (keys.length == 1) {
       this[keys[0]] = value
     }
-    else {
+    else 
+    if (keys.length > 1) {
       let k = keys.shift()
 
       switch (k) {

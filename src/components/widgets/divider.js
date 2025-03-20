@@ -6,6 +6,7 @@ import { isNumber, isString } from "../../utils/typeChecks"
 import Input from "../../input"
 import { CLASS_DIVIDERS } from "../../definitions/core"
 import { DIVIDERHEIGHT } from "../../definitions/chart"
+import { TOOLSW } from "../../definitions/style"
 
 
 export default class Divider {
@@ -203,12 +204,13 @@ export default class Divider {
     let top = this.#chartPane.pos.top - elementDimPos(this.#elDividers).top;
         top = top - (this.height / 2) + 1
     this.#elDivider.style.top = `${top}px`
-    this.#elDivider.style.left = `${this.#core.elBody.tools.width}px`
   }
 
   setWidth() {
-    this.#elDivider.style.width = `${this.#core.elMain.width + this.#core.elBody.scale.width}px`
-    this.#elDivider.style.left = `${this.#core.elBody.tools.width}px`
+    let pos = this.#core.theme.tools.location
+    let toolsW = (pos == "left" || pos == "right") ? this.#theme.tools.width || TOOLSW : 0
+    this.#core.WidgetsG.elements.divider.style.width = `${this.#core.elBody.width - toolsW}px`
+    this.#core.WidgetsG.elements.divider.style.right = (pos === "left") ? `0px` : `${toolsW}px`
   }
 
   setCursorStyle(c) {

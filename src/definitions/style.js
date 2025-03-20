@@ -298,7 +298,8 @@ export const defaultTheme = {
     separator: "#666"
   },
   tools: {
-    location: false
+    location: false,
+    width: TOOLSW
   },
   utils: {
     location: false
