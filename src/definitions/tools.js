@@ -14,12 +14,16 @@ export default [
     name: "Cursor",
     icon: cursor,
     event: "tool_activated",
+    active: false,
+    diplay: true
   },
   {
     id: "line",
     name: "Line",
     icon: line,
     event: "tool_activated",
+    active: false,
+    diplay: true,
     class: Line,
     sub: [
       {
@@ -50,6 +54,8 @@ export default [
     name: "Fibonacci",
     icon: fibonacci,
     event: "tool_activated",
+    active: false,
+    diplay: true,
     class: Fibonacci,
     sub: [
       {
@@ -64,6 +70,8 @@ export default [
     name: "Range",
     icon: range,
     event: "tool_activated",
+    active: false,
+    diplay: true,
     class: Range,
     sub: [
       {
@@ -78,6 +86,8 @@ export default [
     name: "Text",
     icon: text,
     event: "tool_activated",
+    active: false,
+    diplay: true,
     class: Text,
     sub: [
       {
@@ -92,6 +102,8 @@ export default [
     name: "Measure",
     icon: measure,
     event: "tool_activated",
+    active: false,
+    diplay: true,
     class: Measure,
   },
   {
@@ -99,6 +111,8 @@ export default [
     name: "Delete",
     icon: del,
     event: "tool_activated",
+    active: false,
+    diplay: true,
     class: undefined,
   }
 ]

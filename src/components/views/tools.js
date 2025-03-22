@@ -30,7 +30,7 @@ export default class tradeXTools extends element {
         fill: ${ToolsStyle.COLOUR_ICON};
       }
       svg:hover {
-        fill: ${ToolsStyle.COLOUR_ICONHOVER};
+        fill: ${ToolsStyle.COLOUR_ICONHOVER} !important;
       }
       .icon-wrapper {
         width: ${ToolsStyle.ICONSIZE};

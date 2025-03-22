@@ -47,6 +47,7 @@ export default class ToolsBar extends Component {
   get pos() { return this.dimensions }
   get dimensions() { return elementDimPos(this.#elTools) }
 
+  // iterate over tools list and add tool bar nodes
   init() {
     this.mount(this.#elTools)
   }
@@ -55,8 +56,8 @@ export default class ToolsBar extends Component {
   start() {
     // build toolbar
     this.initAllTools()
-    // add all on and off chart tools
-    this.addAllTools()
+    // draw tools in Range
+    this.drawRangeTools()
     // set up event listeners
     this.eventsListen()
 
@@ -79,8 +80,8 @@ export default class ToolsBar extends Component {
       for (let t of this.#tools) {
         if (t.id === id)
           tool.removeEventListener("click", this.#toolEvents[id].click)
-          tool.removeEventListener("pointerover", this.#toolEvents[id].pointerover)
-          tool.removeEventListener("pointerout", this.#toolEvents[id].pointerout)
+          // tool.removeEventListener("pointerover", this.#toolEvents[id].pointerover)
+          // tool.removeEventListener("pointerout", this.#toolEvents[id].pointerout)
       }
     }
 
@@ -116,15 +117,15 @@ export default class ToolsBar extends Component {
     }
   }
 
-  onIconOut(e) {
-    const svg = e.currentTarget.querySelector('svg');
-          svg.style.fill = ToolsStyle.COLOUR_ICON
-  }
+  // onIconOut(e) {
+  //   const svg = e.currentTarget.querySelector('svg');
+  //         svg.style.fill = ToolsStyle.COLOUR_ICON
+  // }
 
-  onIconOver(e) {
-    const svg = e.currentTarget.querySelector('svg');
-          svg.style.fill = ToolsStyle.COLOUR_ICONHOVER
-  }
+  // onIconOver(e) {
+  //   const svg = e.currentTarget.querySelector('svg');
+  //         svg.style.fill = ToolsStyle.COLOUR_ICONHOVER
+  // }
 
   onToolTargetSelected(tool) {
     console.log("tool_targetSelected:", tool.target)
@@ -144,6 +145,7 @@ export default class ToolsBar extends Component {
     console.log("Tool deselected:", e)
   }
 
+  // iterate over tools list and add tool bar nodes
   mount(el) {
     el.innerHTML = this.#elTools.defaultNode(this.#tools)
   }
@@ -195,11 +197,13 @@ export default class ToolsBar extends Component {
         if (t.id === id) {
           this.#toolEvents[id] = {}
           this.#toolEvents[id].click = this.onIconClick.bind(this) // debounce(this.onIconClick, 500, this) // this.onIconClick.bind(this)
-          this.#toolEvents[id].pointerover = this.onIconOver.bind(this)
-          this.#toolEvents[id].pointerout = this.onIconOut.bind(this)
-          tool.addEventListener("click", this.#toolEvents[id].click)
-          tool.addEventListener("pointerover", this.#toolEvents[id].pointerover)
-          tool.addEventListener("pointerout", this.#toolEvents[id].pointerout)
+          // this.#toolEvents[id].pointerover = this.onIconOver.bind(this)
+          // this.#toolEvents[id].pointerout = this.onIconOut.bind(this)
+          if (t.active !== false) {
+            tool.addEventListener("click", this.#toolEvents[id].click)
+          }
+          // tool.addEventListener("pointerover", this.#toolEvents[id].pointerover)
+          // tool.addEventListener("pointerout", this.#toolEvents[id].pointerout)
 
           if (t?.sub) {
             let config = {
@@ -253,8 +257,8 @@ export default class ToolsBar extends Component {
     // add tool entry to Data State
   }
 
-  // add all tools to the chart panes
-  addAllTools() {
+  // draw all tools in (visible) Range to the chart panes
+  drawRangeTools() {
     // iterate over Data State to add all tools
   }
 

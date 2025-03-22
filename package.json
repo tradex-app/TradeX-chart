@@ -12,9 +12,9 @@
   "types": "./dist/tradex-chart.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/tradex-chart.d.ts",
       "import": "./dist/tradex-chart.es.js",
-      "require": "./dist/tradex-chart.umd.js",
-      "types": "./dist/tradex-chart.d.ts"
+      "require": "./dist/tradex-chart.umd.js"
     }
   },
   "private": false,
