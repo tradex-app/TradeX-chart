@@ -8,7 +8,7 @@ TradeX-chart is a highly customizable stock trade chart with **one** dependency 
 [![Size](https://badgen.net/bundlephobia/minzip/tradex-chart)](https://bundlephobia.com/result?p=tradex-chart)
 [![LICENSE](https://badgen.net/github/license/tradex-app/tradex-chart)](LICENSE)
 [![GitHub](https://badgen.net/badge/icon/github?icon=github&label)](https://github.com/tradex-app/TradeX-chart)
-[![NPM](https://badgen.net/badge/icon/npm?icon=npm&label)](https://www.npmjs.com/package/tradex-chart)
+[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/6XS9tDrcdq)
 
 </div>
 
@@ -117,7 +117,7 @@ Editable sandbox examples can found on [CodeSandbox.io](https://codesandbox.io/u
 ## Framework Integration Examples
 
 * [React / NextJS](nextjs)
-* Vue (TODO:)
+* [Vue](https://github.com/tradex-app/TradeX-Chart-Vue-JS)
 * Svelte (TODO:)
 
 ## Features
@@ -140,19 +140,20 @@ Editable sandbox examples can found on [CodeSandbox.io](https://codesandbox.io/u
 
 For the latest news on TradeX-chart, feedback, feature requests, and community, join us over on Discord or GitHub.
 
-* [TradeX Discord](https://discord.gg/dMegsSQDe)
+* [TradeX Discord](https://discord.gg/6XS9tDrcdq)
 * [Issue Tracker](https://github.com/tradex-app/TradeX-chart/issues)
 * [GitHub](https://github.com/tradex-app/TradeX-chart/discussions)
+* [Discord](https://discord.gg/6XS9tDrcdq)
 
 ## Contributing
 
 Testing, [bug reports and feature requests](https://github.com/tradex-app/TradeX-chart/issues) welcome
 
-If anybody you have any bugs/issues/feature requests, please, before making a submission, first:
-* check the GitHub issue tracker: https://github.com/tradex-app/TradeX-chart/issues
-* documentation: https://tradex-app.github.io/TradeX-chart/
-* live examples: https://tradex-chart.guildmedia.net/examples/static_chart/
-* development roadmap: https://github.com/tradex-app/TradeX-chart/blob/master/docs/TradeX-chart-Development-Roadmap.pdf
+If you have any bugs, issues, or feature requests, please, before making a submission, first:
+* [check the GitHub issue tracker](https://github.com/tradex-app/TradeX-chart/issues)
+* [documentation](https://tradex-app.github.io/TradeX-chart/)
+* [live examples](https://tradex-chart.guildmedia.net/examples/static_chart/)
+* [development roadmap](https://github.com/tradex-app/TradeX-chart/blob/master/docs/TradeX-chart-Development-Roadmap.pdf)
 
 To submit an issue:
 * [Fork the chart repostitory](https://github.com/tradex-app/TradeX-chart/fork)
@@ -170,3 +171,8 @@ if (youEnjoyed) {
     starThisRepository();
 }
 ```
+                        
+## Stargazers over time
+[![Stargazers over time](https://starchart.cc/tradex-app/TradeX-chart.svg?variant=adaptive)](https://starchart.cc/tradex-app/TradeX-chart)
+
+                    

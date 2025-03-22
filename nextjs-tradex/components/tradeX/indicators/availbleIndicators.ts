@@ -1,14 +1,13 @@
-import { IIndicators } from '../../../../types'; // import from 'tradex-chart';
-import TradeFlow from './TRDFLO';
+import { IIndicators } from '../../../../types'; // 'tradex-chart';
+import custom from './custom';
 
-const AVAILABLE_INDICATORS: IIndicators = {
-  TRDFLO: {
-    id: 'TRDFLO',
-    name: 'Trade Flow',
+export const CUSTOM_INDICATORS: IIndicators = {
+  custom: {
+    id: 'custom',
+    name: 'Custom',
     event: 'addIndicator',
-    ind: TradeFlow
+    ind: custom
   }
-  /// ADD NEW INDICATORS HERE
 };
 
 export const SelectedIndicators = (
@@ -17,11 +16,9 @@ export const SelectedIndicators = (
   const filteredIndicators: IIndicators = {};
 
   selectedIndicators.forEach((indicator) => {
-    if (AVAILABLE_INDICATORS[indicator]) {
-      filteredIndicators[indicator] = AVAILABLE_INDICATORS[indicator];
+    if (CUSTOM_INDICATORS[indicator]) {
+      filteredIndicators[indicator] = CUSTOM_INDICATORS[indicator];
     }
   });
   return filteredIndicators;
 };
-
-export default AVAILABLE_INDICATORS;

@@ -6,11 +6,14 @@
 import Indicator from "../components/overlays/indicator"
 import { BBANDS as talibAPI } from "../definitions/talib-api";
 
+let nameShort = "BB"
+let nameLong = 'Bollinger Bands'
+
 
 export default class BB extends Indicator {
 
-  get name() { return 'Bollinger Bands' }
-  shortName = 'BB'
+  get name() { return nameLong }
+  shortName = nameShort
   libName = 'BBANDS'
   definition = {
     input: {
@@ -32,7 +35,8 @@ export default class BB extends Indicator {
   precision = 2
   scaleOverlay = false
 
-  
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = true

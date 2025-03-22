@@ -7,16 +7,20 @@ import Indicator from "../components/overlays/indicator"
 import { DX as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "DX"
+let nameLong = 'Directional Movement Index'
+
 
 export default class DX extends Indicator {
 
-  get name() { return 'Directional Movement Index' }
-  shortName = 'DX'
-  libName = 'DX'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   precision = 2
   scaleOverlay = true
 
-  
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false

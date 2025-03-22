@@ -7,6 +7,9 @@ import Indicator from "../components/overlays/indicator"
 import {RSI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "RSI"
+let nameLong = 'Average Directional Movement Index'
+
 
 /**
  * Indicator - Relative Strength Index
@@ -16,9 +19,9 @@ import { YAXIS_TYPE } from "../definitions/chart";
  */
 export default class RSI extends Indicator {
 
-  get name() { return 'Relative Strength Index' }
-  shortName = 'RSI'
-  libName = 'RSI'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   definition = {
     input: {
       inReal: [], 
@@ -41,6 +44,8 @@ export default class RSI extends Indicator {
 
   checkParamCount = false
 
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false

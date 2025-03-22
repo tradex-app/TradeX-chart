@@ -1,6 +1,10 @@
 import { Chart, DOM } from './src'
 import { LIMITFUTURE, LIMITPAST, MINCANDLES, MAXCANDLES, YAXIS_BOUNDS } from "./src/definitions/chart"
 import * as talib from './node_modules/talib-web/lib/index.esm'
+// const wasm = "node_modules/talib-web/lib/talib.wasm"
+import wasm from './src/wasm/talib.wasm.dataURI.js'
+// const talib = null
+// const wasm = null
 
 // let state = undefined
 import state1 from './data/1hour.js'
@@ -12,17 +16,20 @@ import btcusdt_15min from './data/btcusdt_15min'
 // import state from './data/seconds-indicator'
 import tradesTestState from './data/trades-test-state.js'
 
-import TEST from './custom-indicator'
-import DblMA from './custom-dbl-ma.js'
-import DblMA2 from './custom-dbl-ma2.js'
-import CustomOverlay from './custom-overlay'
-import chartDCA from './chart-dca'
-import TradeFlow from './trade-flow.js'
-
-
-const wasm = "node_modules/talib-web/lib/talib.wasm"
+import TEST from './demos/custom/custom-indicator.js'
+import DblMA from './demos/custom/custom-dbl-ma.js'
+import DblMA2 from './demos/custom/custom-dbl-ma2.js'
+import CustomOverlay from './demos/custom/custom-overlay.js'
+// import chartDCA from './chart-dca'
+import TradeFlow from './demos/custom/trade-flow.js'
 
 import bearHawk from './data/bear-hawk.js'
+import { text } from './src/definitions/icons.js'
+import { loadStates, statesDropDown } from './demos/js/loadStates.js'
+import { loadTimeFrame } from './demos/js/loadTimeFrame.js'
+import { addIndicatorDropdown } from './demos/js/addIndicator.js'
+
+import { livePrice_Binance, onRangeLimit2 } from './demos/dataSource/binance.js'
 
 // build a split state to test all merge features
 const state1_5a = {primary:[], secondary:[]}
@@ -252,19 +259,23 @@ const config1 = {
   }
 }
 window.config1 = config1
+
 const config2 = {
   id: "TradeX_test",
-  title: "TEST/USDT",
-  symbol: "testusdt",
+  title: "BTC/USDT",
+  symbol: "btcusdt",
   // width: 1000,
   // height: 800,
   utils: {},
   tools: {},
   timeFrame: "1m",
-  range: {
-    startTS: state2.ohlcv.slice(-15)[0][0], // rangeStartTS,
-  },
+  // range: {
+  //   startTS: state2.ohlcv.slice(-15)[0][0], // rangeStartTS,
+  // },
   theme: {
+    title: {
+      display: true,
+    },
     candle: {
       Type: "candle_solid",
       UpBodyColour: "#00F04088",
@@ -910,61 +921,61 @@ const dre =   {
   logs: false,
   infos: true,
   warnings: true,
-    errors: true,
-    maxCandleUpdate: 250,
-    talib,
-    wasm: wasm,
-    state: {
-      ohlcv: btcusdt_15min,
-      primary: [
-        {
-          "name": "Trades",
-          "type": "trades",
-          "settings": {
-              "z-index": 5,
-              "legend": false
-          },
-          data: {
-            1695906000000: [
-                {
-                  timestamp: 1695906000000,
-                  id: "012336352",
-                  side: "buy",
-                  price: 27032,
-                  amount: 0.25,
-                  filled: 0.25,
-                  average: 27032,
-                  total: 27032,
-                  tag: "Bot ABC - BTC/USDT"
-                }
-              ],
-              1695945600000: [
-                {
-                  timestamp: 1695945600000,
-                  id: "012335353",
-                  side: "sell",
-                  price: 27032,
-                  amount: 0.25,
-                  filled: 0.25,
-                  average: 27032,
-                  total: 27032,
-                  tag: "Bot ABC - BTC/USDT"
-                }
-              ],
-              1696327200000: [
-                {
-                  timestamp: 1696327200000,
-                  id: "012335354",
-                  side: "sell",
-                  price: 27550.6,
-                  amount: 0.25,
-                  filled: 0.25,
-                  average: 27550.6,
-                  total: 27550.6,
-                  tag: "Bot ABC - BTC/USDT"
-                }
-              ]
-            }
+  errors: true,
+  maxCandleUpdate: 250,
+  talib,
+  wasm: wasm,
+  state: {
+    ohlcv: btcusdt_15min,
+    primary: [
+      {
+        "name": "Trades",
+        "type": "trades",
+        "settings": {
+            "z-index": 5,
+            "legend": false
+        },
+        data: {
+          1695906000000: [
+              {
+                timestamp: 1695906000000,
+                id: "012336352",
+                side: "buy",
+                price: 27032,
+                amount: 0.25,
+                filled: 0.25,
+                average: 27032,
+                total: 27032,
+                tag: "Bot ABC - BTC/USDT"
+              }
+            ],
+            1695945600000: [
+              {
+                timestamp: 1695945600000,
+                id: "012335353",
+                side: "sell",
+                price: 27032,
+                amount: 0.25,
+                filled: 0.25,
+                average: 27032,
+                total: 27032,
+                tag: "Bot ABC - BTC/USDT"
+              }
+            ],
+            1696327200000: [
+              {
+                timestamp: 1696327200000,
+                id: "012335354",
+                side: "sell",
+                price: 27550.6,
+                amount: 0.25,
+                filled: 0.25,
+                average: 27550.6,
+                total: 27550.6,
+                tag: "Bot ABC - BTC/USDT"
+              }
+            ]
+          }
         }
       ]
     }
@@ -972,17 +983,19 @@ const dre =   {
 
 const configs = [
 
-  {config: bearHawk, stream: null},
-  {config: tradesTestState, stream: null},
-  {config: config1, stream: null},
+  // {config: bearHawk, stream: null},
+  // {config: tradesTestState, stream: null},
+  // {config: config1, stream: null},
   // {config: config2, stream: null},
 
-  // {config: config2, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
+  {config: config2, stream: null}, //stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
+  {config: tradesTestState, stream: null},
+
   // {config: config3, stream: (chart) => {livePrice_Binance(chart, "btcusdt", config3.timeFrame)}},
-  {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
-  {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
-  {config: config6, stream: null},
-  {config: config8, stream: null},
+  // {config: config4, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}},
+  // {config: config5, stream: (chart) => {livePrice_Binance(chart, "ethusdt", config5.timeFrame)}},
+  // {config: config6, stream: null},
+  // {config: config8, stream: null},
   // {config: config7, stream: null},
   // {config: config9, stream: (chart) => {new Stream(chart, interval, null, chart.stream.onTick.bind(chart.stream))}}, // {setInterval(stream.bind(chart), interval)}},
   // {config: config9, stream: (chart) => {livePrice_Binance(chart, "linkusdt", config9.timeFrame)}},
@@ -998,6 +1011,7 @@ const add = document.querySelector("#add")
 function addChart() {
   let chart = document.createElement("tradex-chart")
   let section = document.createElement("section")
+      section.setAttribute('style', 'cursor: crosshair'); // added default cursor as crosshair here to avoid messing with candle rendering
       section.appendChild(chart)
       main.appendChild(section)
 
@@ -1006,11 +1020,11 @@ function addChart() {
       chart.refresh()
       window["chart"+chart.inCnt] = chart
 
-  if (typeof chart?.stream?.start === "function") {
-    // chart is ready and waiting for a websocket stream
-    chart.stream.start()
-    if (typeof stream === "function") stream(chart)
-  }
+  // if (typeof chart?.stream?.start === "function") {
+  //   // chart is ready and waiting for a websocket stream
+  //   chart.stream.start()
+  //   if (typeof stream === "function") stream(chart)
+  // }
 }
 
 
@@ -1041,9 +1055,9 @@ const infoBox = {}
         infoBox.el.innerHTML = inf
       }
 
-chart.on("setRange", (e) => { infoBox.out(demo.internals()) })
+chart.on("range_set", (e) => { infoBox.out(demo.internals()) })
 chart.on("chart_pan", (e) => { infoBox.out(demo.internals()) })
-chart.on("main_mousemove", (e) => { infoBox.out(demo.internals()) })
+chart.on("main_mouseMove", (e) => { infoBox.out(demo.internals()) })
 infoBox.out(demo.internals())
 // test()
 
@@ -1130,68 +1144,6 @@ class Stream {
   }
 }
 
-function livePrice_Binance(chart, symbol="btcusdt", interval="1m") {
-  // var ws = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@aggTrade");
-  var ws = new WebSocket(`wss://stream.binance.com:9443/ws/${symbol}@kline_${interval}`);
-
-  ws.onmessage = (evt) => onWSMessage.call(this, evt, chart)
-}
-
-let waiting = false
-
-function kline_Binance(chart, symbol="BTCUSDT", start, limit=100, interval="1m") {
-  if (!waiting) {
-    waiting = true
-    try {
-      fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&startTime=${start}&limit=${limit}`)
-      .then(r => r.json())
-      .then(d => {
-        console.log(d)
-        chart.mergeData({ohlcv: d}, false, true)
-        waiting = false
-      })
-    }
-    catch(e) {
-      console.error(e)
-      waiting = false
-    }
-  }
-}
-
-function onWSMessage (evt, chart) { 
-  var msg = evt.data;
-  var obj = JSON.parse(msg);
-  if (typeof obj === "object" && obj.k) { 
-
-    /* KLine data passed to the chart
-      {
-        t: timeStamp // timestamp of current candle in milliseconds
-        o: open  // open price
-        h: high  // high price
-        l. low // low price
-        c: close  // close price
-        v: volume // volume
-      }
-    */
-    // console.log(obj.k)
-    chart.stream.onTick(obj.k)   
-  }
-};
-
-function onRangeLimit(e, x) {
-  const range = e.chart.range
-  const limit = 100
-  const start = range.timeStart - (range.interval * limit)
-  const end = range.timeEnd
-  const interval = range.intervalStr
-  if (x == "past") {
-    e.chart.progress.start()
-    kline_Binance(e.chart, undefined, start, limit, interval)
-  }
-  if (x == "future") {
-
-  }
-}
 
 function once (chart) {
   const tick = {
@@ -1245,9 +1197,45 @@ chart0.addIndicator("TRDFLO", "TradeFlow1", {data: [], settings: {test: true}})
 // chart0.addIndicator("DBLMA", "DblMA", {data: [], settings: {}})
 
 // chart0.addIndicator("DMI", "DMI1", {data: []})
-chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
-chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
+*/
+// chart0.on("range_limitPast", (e) => onRangeLimit(e, "past"))
+// chart0.on("range_limitFuture", (e) => onRangeLimit(e, "future"))
 
+
+// chart0.on("stream_candleFirst", () => {
+//   chart0.state.dataSource.historyAdd({
+//     rangeLimitPast: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts) },
+//     // rangeLimitFuture: (e) => onRangeLimit2(e, sym, tf, ts)
+//   })
+// })
+// chart0.state.dataSource.tickerAdd(
+//   {
+//     start: (symbol, tf, onTick) => { livePrice_Binance(chart0, symbol, tf, onTick) },
+//     stop: () => {}
+//   },
+//   {
+//     symbol: "btcusdt",
+//     tf: 60000
+//   }
+// )
+
+state1.dataSource.source.rangeLimitFuture = (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts, "future") }
+
+chart0.state.dataSource.startTickerHistory({
+  rangeLimitPast: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts, "past") },
+  // rangeLimitFuture: (e, sym, tf, ts) => { return onRangeLimit2(e, sym, tf, ts, "future") },
+  start: (symbol, tf, onTick) => { livePrice_Binance(chart0, symbol, tf, onTick) },
+  stop: () => {},
+  symbol: "btcusdt",
+  tf: 60000
+})
+
+chart0.on("range_limitFuture", () => console.log("range_limitFuture"))
+
+// onRangeLimit({chart: chart0})
+
+
+/*
 // register custom overlay
 chart0.setCustomOverlays({
   // custom: {
@@ -1276,3 +1264,11 @@ if (typeof chart1 === "object") {
 if (typeof chart5 === "object")
   chart5.mergeData(state1_5a, false)
 */
+
+const states = { state1, state2, state3 }
+const cfgs = { config1, config2, config3 }
+
+// loadTimeFrame(chart0)
+loadStates(chart0, states, cfgs)
+statesDropDown(chart0, states)
+addIndicatorDropdown(chart0)

@@ -7,16 +7,20 @@ import Indicator from "../components/overlays/indicator"
 import { CCI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "CCI"
+let nameLong = 'Commodity Channel Index'
+
 
 export default class CCI extends Indicator {
 
-  get name() { return 'Commodity Channel Index' }
-  shortName = 'CCI'
-  libName = 'CCI'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   precision = 2
   scaleOverlay = true
 
-  
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false

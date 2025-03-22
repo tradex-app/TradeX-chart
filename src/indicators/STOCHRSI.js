@@ -7,6 +7,9 @@ import Indicator from "../components/overlays/indicator"
 import {STOCHRSI as talibAPI } from "../definitions/talib-api";
 import { YAXIS_TYPE } from "../definitions/chart";
 
+let nameShort = "STOCHRSI"
+let nameLong = 'Stochastic RSI'
+
 
 /**
  * Indicator - Stochastic RSI
@@ -16,9 +19,9 @@ import { YAXIS_TYPE } from "../definitions/chart";
  */
 export default class STOCHRSI extends Indicator {
 
-  get name() { return 'Stochastic RSI' }
-  shortName = 'STOCHRSI'
-  libName = 'STOCHRSI'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   definition = {
     input: {
       inReal: [],
@@ -34,7 +37,8 @@ export default class STOCHRSI extends Indicator {
   }
   checkParamCount = false
 
-
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false

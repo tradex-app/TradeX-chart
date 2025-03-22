@@ -4,7 +4,7 @@
 // Theme list available globally to all charts
 
 import { isObject, isString } from "../utils/typeChecks"
-import { copyDeep, mergeDeep, getProperty, setProperty, uid, xMap } from "../utils/utilities"
+import { doStructuredClone, mergeDeep, getProperty, setProperty, uid, xMap } from "../utils/utilities"
 import { defaultTheme } from "../definitions/style"
 
 const reserved = ["constructor","list","setCurrent","setTheme","setValue"]
@@ -21,13 +21,13 @@ export default class Theme {
    * @static
    * @param {Object} theme
    * @param {Object} core
-   * @returns {instance}  
+   * @returns {instance|boolean}  
    * @memberof Theme
    */
   static create(theme, core) {
     if (!(isObject(theme))) return false
 
-    theme.id = (isString(theme.name))? uid(theme.name) : `${core.id}.theme`
+    theme.id = (isString(theme.name))? uid(theme.name) : uid(`${core.ID}_theme`)
 
     const instance = new Theme(theme, core)
 
@@ -62,9 +62,8 @@ export default class Theme {
   setCurrent(theme={}) {
     theme = (isObject(theme))? theme : {}
 
-    const defaultT = copyDeep(defaultTheme)
-    const newTheme = copyDeep(theme)
-
+    const defaultT = doStructuredClone(defaultTheme)
+    const newTheme = doStructuredClone(theme)
     const setTheme = mergeDeep(defaultT, newTheme)
 
     for (let t in setTheme) {
@@ -106,9 +105,16 @@ export default class Theme {
     if (keys.length == 1) {
       this[keys[0]] = value
     }
-    else {
+    else 
+    if (keys.length > 1) {
       let k = keys.shift()
-      this[k] = setProperty(this[k], keys.join('.'), value)
+
+      switch (k) {
+        case "tools": console.log("theme set tools");
+        case "utils": console.log("theme set utils");
+        default:
+          this[k] = setProperty(this[k], keys.join('.'), value);
+      }
     }
 
     this.#core.refresh()

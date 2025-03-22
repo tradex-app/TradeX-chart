@@ -8,6 +8,10 @@ import { YAXIS_TYPE } from "../definitions/chart";
 import { defaultTheme } from "../definitions/style";
 import { candleW } from "../components/primitives/candle";
 
+let nameShort = "VOL"
+let nameLong = 'Volume'
+
+
 /**
  * Volume
  * @export
@@ -16,8 +20,9 @@ import { candleW } from "../components/primitives/candle";
  */
 export default class Volume extends Indicator {
 
-  get name() { return 'Volume' }
-  shortName = 'VOL'
+  get name() { return nameLong }
+  shortName = nameShort
+  // libName = nameShort
   checkParamCount = false
   scaleOverlay = true
   definition = {
@@ -34,7 +39,8 @@ export default class Volume extends Indicator {
   #volumeBar
   #primaryPane = "both"
 
-  
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = "both"

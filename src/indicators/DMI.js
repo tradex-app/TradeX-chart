@@ -3,17 +3,23 @@
 
 import Indicator from "../components/overlays/indicator"
 import { YAXIS_PADDING, YAXIS_TYPE } from "../definitions/chart";
+import { limit } from "../utils/number";
+
+let nameShort = "DMI"
+let nameLong = 'Average Directional Movement Index'
+
 
 /**
  * custom indicator class
  */
 export default class DMI extends Indicator {
 
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = false
   static scale = YAXIS_TYPE.relative
-  static yAxisPadding = YAXIS_PADDING
   static colours = []
   static defaultStyle = {
     "DI+": {
@@ -36,8 +42,9 @@ export default class DMI extends Indicator {
   
   #precision = 2
 
-  get name() {return "Directional Movement Index" }
-  shortName = "DMI"
+  get name() { return nameLong }
+  shortName = nameShort
+  // libName = nameShort
   scaleOverlay = false
 
 
@@ -79,41 +86,57 @@ export default class DMI extends Indicator {
     super(target, xAxis, yAxis, config, parent, params)
 
     this.init()
-
-    this.on("trade_added", this.tradeAdded)
   }
 
   get data() { return this.overlay.data }
   get overlayData() { return this.overlay.data }
 
   calcIndicator(indicator, params={}, range=this.range) {
-    let DIPlusDef= {input: { timePeriod: 14}, output: {output: []}}
+    let DIPlusDef = {input: { timePeriod: 14}, output: {output: []}}
     let DIMinusDef = {input: { timePeriod: 14}, output: {output: []}}
     let ADXDef = {input: { timePeriod: 14}, output: {output: []}}
 
-    let result1 = super.calcIndicator("PLUS_DI", params, range, DIPlusDef)
-    let result2 = super.calcIndicator("MINUS_DI", params, range, DIMinusDef)
-    let result3 = super.calcIndicator("ADX", params, range, ADXDef)
-
-    if (!result1 && !result2 && !result3) return false
-
-    for (let i=0; i<result1.length; i++) {
-      result1[i][2] = result2[i][1]
-      result1[i][3] = result3[i][1]
-    }
-    return result1
+    return new Promise( (resolve, reject) => {
+      let promises = [
+        super.calcIndicator("PLUS_DI", params, range), // , DIPlusDef)
+        super.calcIndicator("MINUS_DI", params, range), //, DIMinusDef)
+        super.calcIndicator("ADX", params, range) //, ADXDef)
+      ]
+      Promise.all(promises).then( (result) => {
+        let [result1, result2, result3] = [...result]
+  
+        if (!result1 && !result2 && !result3) resolve(false)
+    
+        for (let i=0; i<result1.length; i++) {
+          result1[i][2] = result2[i][1]
+          result1[i][3] = result3[i][1]
+        }
+        resolve(result1)      
+      })
+    })
   }
 
   calcIndicatorStream (indicator, params={}, range=this.range) {
+    console.log("ADX", params)
 
-    // fill new data entry with zeros
-    // this.on("trade_added", this.tradeAdded)
-    // will add new trade data when it becomes available.
-    let ts = range.value()[0]
-    let idx = range.getTimeIndex(ts)
-    this.data[idx] = [ts, 0, 0]
+    let promises = [
+      (!this.noCalc("PLUS_DI", range)) ? this.TALib["PLUS_DI"](params).output : false,
+      (!this.noCalc("MINUS_DI", range)) ? this.TALib["MINUS_DI"](params).output : false,
+      (!this.noCalc("ADX", range)) ? this.TALib["ADX"](params).output : false
+    ]
+    Promise.all(promises).then(  (result) => {
+      let [result1, result2, result3] = [...result]
 
-    return false
+      if (!result1 && !result2 && !result3) return false
+  
+      let time = range.value()[0]
+      // let value = this.formatValue(entry)
+  
+      return [time, result1[0], result2[0], result3[0]]
+    })
   }
 
+  draw(range=this.range) {
+    super.draw(range)
+  }
 }

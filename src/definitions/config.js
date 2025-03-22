@@ -4,9 +4,10 @@
 import { defaultTheme, TX_MAXH, TX_MAXW } from "./style"
 import { MAX_CRYPTO_PRECISION } from "./core"
 // import * as talib from "talib-web/lib/index.esm"
-// // import talib from '../wasm/index.esm'
-// import wasm from '../wasm/talib.wasm.dataURI'
+import * as talib from '../wasm/index.esm'
+import wasm from '../wasm/talib.wasm.dataURI'
 
+export const initialEmptyState = "initialEmptyState"
 export const defaultTitle = "Empty"
 
 export const defaultConfig = {
@@ -39,8 +40,9 @@ export const defaultConfig = {
   errors: true,
   stream: {},
   maxCandleUpdate: 250,
-  talib: undefined,
-  wasm: undefined,
+  talib,
+  wasm,
   state: {},
+  stateInheritPrevious: true,
   callbacks: {}
 }

@@ -6,28 +6,27 @@
 // import Overlay from "./overlay";
 // import { renderLineHorizontal } from "../../renderer/line";
 // import { renderTextBG } from "../../renderer/text";
-import { Overlay, renderLineHorizontal, renderTextBG } from "tradex-chart";
-
+import { Overlay, renderLineHorizontal, renderTextBG } from '../../../../src'; //'tradex-chart';
 
 const defaults = {
-  colour: "#4444cc88",
+  colour: '#4444cc88',
   wdith: 1,
-  dash: [1, 0],
+  dash: [1, 0]
 };
 
 function drawText(ctx, txt, x, y, w, theme) {
   let options = {
-      fontSize: theme.fontSize * 1.05,
-      fontWeight: theme.fontWeight,
-      fontFamily: theme.fontFamily,
-      txtCol: theme.colourCursor,
-      bakCol: theme.colourCursorBG,
-      paddingTop: 2,
-      paddingBottom: 2,
-      paddingLeft: 3,
-      paddingRight: 3,
-      width: w,
-    },
+    fontSize: theme.fontSize * 1.05,
+    fontWeight: theme.fontWeight,
+    fontFamily: theme.fontFamily,
+    txtCol: theme.colourCursor,
+    bakCol: theme.colourCursorBG,
+    paddingTop: 2,
+    paddingBottom: 2,
+    paddingLeft: 3,
+    paddingRight: 3,
+    width: w
+  },
     height = options.fontSize + options.paddingTop + options.paddingBottom,
     yPos = y - height * 0.5;
 
@@ -54,7 +53,7 @@ class scaleHighLow extends Overlay {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  draw() {}
+  draw() { }
 
   scaleDraw(range = this.core.range) {
     if (!super.mustUpdate()) return;
@@ -91,7 +90,7 @@ export default class chartHighLow extends Overlay {
     // add the overlay to the Scale (yAxis)
     const hiLo = { class: scaleHighLow, fixed: true, required: false };
     if (this.core.config?.highLow === true)
-      this.scaleOverly = this.chart.scale.addOverlay("hiLo", hiLo);
+      this.scaleOverly = this.chart.scale.addOverlay('hiLo', hiLo);
   }
 
   // Overlay position is fixed and won't pan / scroll with the chart
@@ -126,22 +125,22 @@ export default class chartHighLow extends Overlay {
     y = this.yAxis.yPos(hi);
     renderLineHorizontal(ctx, y, 0, r, opts);
 
-    txt = "High";
-    x = this.theme.yAxis.location == "left" ? 0 : r - (w + 25);
+    txt = 'High';
+    x = this.theme.yAxis.location == 'left' ? 0 : r - (w + 25);
     drawText(ctx, txt, x, y, w, theme);
 
     // Lowest Price
     y = this.yAxis.yPos(lo);
     renderLineHorizontal(ctx, y, 0, r, opts);
 
-    txt = "Low";
+    txt = 'Low';
     drawText(ctx, txt, x, y, w, theme);
 
     ctx.restore();
 
     super.updated();
 
-    if ("hiLo" in this.chart.scale.overlays) {
+    if ('hiLo' in this.chart.scale.overlays) {
       this.chart.scale.overlays.hiLo.instance.setRefresh();
       this.chart.scale.overlays.hiLo.instance.scaleDraw();
     }

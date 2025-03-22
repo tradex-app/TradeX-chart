@@ -24,7 +24,7 @@ import {
   GlobalStyle, GridStyle, XAxisStyle, YAxisStyle
 } from "../../definitions/style"
 
-const HTML = `
+export const HTML = `
   <style title="core">
     :host {
       position: relative;
@@ -80,7 +80,7 @@ export default class tradeXChart extends element {
   }
 
   static get observedAttributes() {
-    return ['config', 'disabled', 'height', 'stream', 'width']
+    return ['config', 'disabled', 'height', 'width'] // , 'stream', 'width']
   }
 
   connectedCallback() {
@@ -89,11 +89,7 @@ export default class tradeXChart extends element {
     if (this.doInit) {
       this.doInit = false
       this.shadowRoot.appendChild(template.content.cloneNode(true))
-      this.style.display = "grid"
-      this.style.minHeight = TX_MINH
-      this.#elWidgets = this.shadowRoot.querySelector('tradex-widgets')
-      this.#elUtils = this.shadowRoot.querySelector('tradex-utils')
-      this.#elBody = this.shadowRoot.querySelector('tradex-body')
+      this.init()
       // set the "old" values from parent element
       this.#chartH = this.parentElement.clientHeight || CHART_MINH
       this.#chartW = this.parentElement.clientWidth || CHART_MINW
@@ -105,7 +101,6 @@ export default class tradeXChart extends element {
 
       this.resizeObserver = new ResizeObserver(debounce(this.onResized, 100, this))
       this.resizeObserver.observe(this)
-      
       this.start(defaultConfig)
     }
   }
@@ -122,16 +117,24 @@ export default class tradeXChart extends element {
       case "disabled":
         break;
       case "height":
-        this.height(newVal)
+        this.setDimensions(undefined, newVal)
         break;
       case "width":
-        this.width(newVal)
+        this.setDimensions(newVal, undefined)
         break;
-        case "stream":
-          break;
+        // case "stream":
+        //   break;
       default:
         break;
     }
+  }
+
+  init() {
+    this.style.display = "grid"
+    this.style.minHeight = TX_MINH
+    this.#elWidgets = this.shadowRoot.querySelector('tradex-widgets')
+    this.#elUtils = this.shadowRoot.querySelector('tradex-utils')
+    this.#elBody = this.shadowRoot.querySelector('tradex-body')
   }
 
   // get id() { return this.getAttribute('id'); }
@@ -146,8 +149,8 @@ export default class tradeXChart extends element {
     }
   }
   
-  get stream() { return true }
-  set stream(s) {  }
+  // get stream() { return true }
+  // set stream(s) {  }
 
   get elBody() { return this.#elBody }
   get elUtils() { return this.#elUtils }
@@ -222,8 +225,8 @@ export default class tradeXChart extends element {
 
   /**
    * Set chart width and height
-   * @param {number} w - width in pixels
-   * @param {number} h - height in pixels
+   * @param {number|undefined} w - width in pixels
+   * @param {number|undefined} h - height in pixels
    * @memberof TradeXchart
    */
   setDimensions(w, h) {

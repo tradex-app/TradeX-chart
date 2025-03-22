@@ -32,22 +32,22 @@ export default
             // console.log(`${this.id}: transition from "${this.state}" to  "chart_scrollTo"`)
           },
         },
-        setRange: {
-          target: 'setRange',
+        range_set: {
+          target: 'range_set',
           action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "setRange"`)
+            // console.log(`${this.id}: transition from "${this.state}" to  "range_set"`)
           },
         },
-        addIndicator: {
-          target: 'addIndicator',
+        chart_IndicatorAdd: {
+          target: 'chart_IndicatorAdd',
           action (data) {
-            // console.log('secondaryPane: transition from "idle" to "addIndicator" state')
+            // console.log('secondaryPane: transition from "idle" to "chart_IndicatorAdd" state')
           },
         },
-        divider_pointerdrag: {
-          target: 'divider_pointerdrag',
+        divider_pointerDrag: {
+          target: 'divider_pointerDrag',
           action (data) {
-            // console.log('secondaryPane: transition from "idle" to "divider_pointerdrag" state')
+            // console.log('secondaryPane: transition from "idle" to "divider_pointerDrag" state')
             this.context.currCursor = this.context.origin.cursor
             this.context.origin.cursor = "row-resize"
           },
@@ -55,7 +55,7 @@ export default
         global_resize: {
           target: 'global_resize',
           action (data) {
-            // console.log('secondaryPane: transition from "idle" to "addIndicator" state')
+            // console.log('secondaryPane: transition from "idle" to "chart_IndicatorAdd" state')
           },
         },
       }
@@ -101,7 +101,7 @@ export default
         },
       }
     },
-    setRange: {
+    range_set: {
       onEnter (data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
       },
@@ -136,7 +136,7 @@ export default
         },
       }
     },
-    addIndicator: {
+    chart_IndicatorAdd: {
       onEnter(data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
 
@@ -146,16 +146,16 @@ export default
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
-        addIndicatorDone: {
+        chart_IndicatorAddDone: {
           target: "idle",
           action (data) {
-            // console.log('transition action for "onIdle" in "addIndicator" state')
+            // console.log('transition action for "onIdle" in "chart_IndicatorAdd" state')
 
           },
         }
       }
     },
-    divider_pointerdrag: {
+    divider_pointerDrag: {
       onEnter(data) {
 
       },
@@ -163,13 +163,13 @@ export default
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
-        divider_pointerdrag: {
-          target: "divider_pointerdrag",
+        divider_pointerDrag: {
+          target: "divider_pointerDrag",
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to "ilde"`)
           },
         },
-        divider_pointerdragend: {
+        divider_pointerDragEnd: {
           target: "idle",
           action (data) {
             // this.actions.removeProperty.call(this)

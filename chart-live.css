@@ -20,6 +20,13 @@ button {
   margin-left: 1em;
 }
 
+nav {
+  margin-left: 1em;
+}
+nav a {
+  margin-right: 1em;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

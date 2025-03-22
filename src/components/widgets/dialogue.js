@@ -3,6 +3,7 @@
 import { isArray, isBoolean, isFunction, isObject } from "../../utils/typeChecks";
 import Window from "./window";
 import { uid } from "../../utils/utilities";
+import { provideEventListeners } from "./components/listeners";
 
 export default class Dialogue extends Window {
 
@@ -75,7 +76,7 @@ export default class Dialogue extends Window {
     {
       // define callbacks for button click
       modifiers.submit =
-        this.provideEventListeners(`input.submit`, 
+        provideEventListeners(`input.submit`, 
         [{
           event: "click", 
           fn: (e) => {
@@ -85,7 +86,7 @@ export default class Dialogue extends Window {
         }]
         )
       modifiers.cancel =
-        this.provideEventListeners(`input.cancel`, 
+        provideEventListeners(`input.cancel`, 
         [{
           event: "click", 
           fn: (e) => {
@@ -96,7 +97,7 @@ export default class Dialogue extends Window {
         )
 
       modifiers.default =
-        this.provideEventListeners(`input.default`, 
+        provideEventListeners(`input.default`, 
         [{
           event: "click", 
           fn: (e) => {
@@ -114,55 +115,6 @@ export default class Dialogue extends Window {
     </div>
     `
     return {html, modifiers}
-  }
-
-   /**
-   * return a function which attaches a listeners to an element
-   * @param {string} selector - valid DOM selector
-   * @param {string} event
-   * @param {function} fn
-   * @return {function} 
-   * @memberof Dialogue
-   */ 
-  provideEventListener(selector, event, fn) {
-    const listeners = [{event, fn}]
-    return this.provideEventListeners(selector, listeners)
-  }
-
-  /**
-   * return a function which attaches a listeners to an element
-   * @param {string} selector - valid DOM selector
-   * @param {string} event
-   * @param {function} fn
-   * @return {function} 
-   * @memberof Dialogue
-   */ 
-  provideEventListener(selector, event, fn) {
-    const listeners = [{event, fn}]
-    return this.provideEventListeners(selector, listeners)
-  }
-
-  /**
-   * return a function which attaches an array of listeners to an element
-   * @param {string} selector
-   * @param {array} listeners - [{event, function}]
-   * @return {function}  
-   * @memberof Dialogue
-   */
-  provideEventListeners(selector, listeners) {
-    // el - host root element for dialogue content
-    const func = (el) => {
-      const elm = el.querySelector(selector)
-      if (!!elm) {
-        for (let l of listeners) {
-          elm.addEventListener(l.event, 
-            (e) => {
-              l.fn(e)
-            })
-        }
-      }
-    }
-    return func
   }
 
 }

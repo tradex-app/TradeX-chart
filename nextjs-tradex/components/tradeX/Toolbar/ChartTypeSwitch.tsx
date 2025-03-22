@@ -11,12 +11,23 @@ interface IProps {
 
 const ChartTypeSwitch = ({ onChange, items, value }: IProps) => {
   return (
-    <Tabs defaultValue={value.label.toUpperCase()} className="w-[400px]">
-      <TabsList>
-        <TabsTrigger onClick={() => onChange(items[0])} value="CANDLE">
+    <Tabs
+      defaultValue={value.label.toUpperCase()}
+      className="pr-2 rounded-none"
+    >
+      <TabsList className="h-7 rounded-none">
+        <TabsTrigger
+          className="h-5 rounded-none"
+          onClick={() => onChange(items[0])}
+          value="CANDLE"
+        >
           Candles
         </TabsTrigger>
-        <TabsTrigger onClick={() => onChange(items[1])} value="LINE">
+        <TabsTrigger
+          className="h-5 rounded-none"
+          onClick={() => onChange(items[1])}
+          value="LINE"
+        >
           Lines
         </TabsTrigger>
       </TabsList>

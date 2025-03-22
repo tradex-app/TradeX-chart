@@ -30,7 +30,7 @@ const TokensDropdown = ({ tokensList, value, setValue }: any) => {
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            size={'sm'}
+            size={'toolbar'}
             role="combobox"
             aria-expanded={open}
             className="w-[100px] justify-between"

@@ -1,11 +1,15 @@
-export enum ThemeProps {
-  ChartGridColour = "chart.GridColour",
-  CandleType = "candle.Type",
-}
-
 export interface ITradeX extends HTMLElement {
+  timeData: any;
+  range: { timeData: { ms2Interval: (arg0: never) => string } };
+  indicatorClasses: () => string[];
+  stream: any;
   Indicators?: { [key: string]: unknown }[];
-  theme?: { setProperty: (property: ThemeProps, value: any) => void };
+  theme?: {
+    setProperty: (
+      property: 'chart.GridColour' | 'candle.Type',
+      value: any
+    ) => void;
+  };
   start?: (config: object) => void;
   setIndicators?: (indicators: IIndicators) => void;
   mergeData?: (data: { ohlcv: number[] }) => void;
@@ -13,8 +17,13 @@ export interface ITradeX extends HTMLElement {
   expunge?: () => void;
   refresh?: () => void;
   state: {
-    create: (state: IState) => string;
-    use: (id: string) => void;
+    dataSource: any;
+    value: any;
+    delete: (key: string) => boolean;
+    key: string;
+    list: () => IState[];
+    create: (state: IState | string | undefined) => IState;
+    use: (state: IState | string | undefined) => IState;
   };
   addIndicator: (
     value: string,
@@ -31,28 +40,28 @@ export abstract class Indicator {
   static colours: string[];
   static defaultStyle: IndicatorStyle;
 
-  id: string;
-  shortName: string;
-  scaleOverlay: boolean;
-  definition: IndicatorDefinition;
+  // id: string;
+  // shortName: string;
+  // scaleOverlay: boolean;
+  // definition: IndicatorDefinition;
 
-  protected data: any[]; // TODO
+  protected data: any[] | undefined; // TODO
   protected scene: any; // TODO
   protected xAxis: any; // TODO
   protected yAxis: any; // TODO
-  protected style: IndicatorStyle;
+  protected style: IndicatorStyle | undefined;
   protected core: any;
   protected state: any; // TODO
-  protected range: Range;
+  protected range: Range | undefined;
 
-  constructor(
-    target: any, // TODO
-    xAxis?: any, // TODO
-    yAxis?: any, // TODO
-    config?: any, // TODO
-    parent?: any, // TODO
-    params?: any // TODO
-  );
+  // constructor(
+  //   target: any, // TODO
+  //   xAxis?: any, // TODO
+  //   yAxis?: any, // TODO
+  //   config?: any, // TODO
+  //   parent?: any, // TODO
+  //   params?: any // TODO
+  // );
 
   abstract init(): void;
   abstract calcIndicatorHistory(): boolean | any[];
@@ -63,11 +72,11 @@ export abstract class Indicator {
   ): boolean | any[];
   abstract draw(range?: Range): void;
 
-  protected plot(plots: any[], method: string, options: any): void;
-  protected dataProxy(callback: Function, data: any): void;
-  on(event: string, handler: Function): void;
-  mustUpdate(): boolean;
-  updated(): void;
+  // protected plot(plots: any[], method: string, options: any): void;
+  // protected dataProxy(callback: Function, data: any): void;
+  // on(event: string, handler: Function): void;
+  // mustUpdate(): boolean;
+  // updated(): void;
 }
 
 export interface IndicatorStyle {
@@ -99,7 +108,7 @@ export interface IndicatorDefinition {
 export interface IIndicator {
   id: string;
   name: string;
-  event: "addIndicator";
+  event: 'addIndicator';
   ind: unknown;
   offChart?: boolean;
   customSettings?: {
@@ -119,7 +128,7 @@ export interface IIndicators {
 export interface ITradeData {
   name: string;
   type: string;
-  settings: { "z-index": number; legend: boolean };
+  settings: { 'z-index': number; legend: boolean };
   data: {
     [key: string]: {
       timestamp: number;
@@ -136,13 +145,14 @@ export interface ITradeData {
 }
 
 export interface IState {
+  value: any;
   version: string; // packageJSON.version
   id: string;
   key: string;
   status: string;
   isEmpty: boolean;
   allData: Record<string, any>; // TODO
-  chart: Chart;
+  chart: any; // TODO
   ohlcv: any[];
   views: any[];
   primary: any[];
@@ -178,7 +188,7 @@ export interface Canvas {
   [key: string]: (...args: any[]) => any;
 }
 
-export type ChartType = "area" | "candle_solid";
+export type ChartType = 'area' | 'candle_solid';
 
 export type YAXIS_TYPES = {
   LINEAR: string;
@@ -210,32 +220,92 @@ export type utils = {
   [key: string]: any; // TODO: Define utils types
 };
 
-export function uid(tag?: string): string;
-
-export function candleW(w: number): number;
-
 export interface RangeConfig {
+  intervalStr: string;
+  timeFrame: string;
+  interval: number;
+  timeFrameMS: number;
+  startTS: number;
   initialCnt: number;
   limitPast: number;
   limitFuture: number;
+  minCandles: number;
+  maxCandles: number;
+  yAxisBounds: number;
+  center: boolean;
 }
 
 export interface TradesConfig {
   display: boolean;
   displayInfo: boolean;
+  data: {
+    ts: {};
+  };
 }
 
+export type IndicatorSettingsCallback = {
+  fn: (c: { id: any }) => void;
+  own: boolean;
+};
+
 export interface IConfig {
+  id: string;
   title: string;
+  timeFrame: string;
   symbol: string;
   utils: object;
-  tools: object;
   range: RangeConfig;
   theme: Theme;
+  watermark: {
+    display: boolean;
+    text: string;
+  };
   trades: TradesConfig;
   deepValidate: boolean;
+  status: string;
+  isEmpty: boolean;
+  allData: object;
   isCrypto: boolean;
   logs: boolean;
+  dca: boolean;
+  highLow: boolean;
+  stream: {
+    tfCountDown: boolean;
+    alerts: any[];
+  };
+  state: IState | {};
+  chart: {
+    name: 'Primary' | 'Secondary';
+    type: 'candles';
+    candleType: ChartType;
+    indexed: boolean;
+    data: [];
+    settings: {};
+  };
+  ohlcv: any[];
+  inventory: any[];
+  events: {
+    display: boolean;
+    displayInfo: boolean;
+    data: {
+      ts: {};
+    };
+  };
+  annotations: {
+    display: boolean;
+    displayInfo: boolean;
+    data: {
+      ts: {};
+    };
+  };
+  primary: any[];
+  secondary: any[];
+  datasets: any[];
+  tools: Tools;
+  progress: { loading: {} };
+  callbacks: {
+    indicatorSettings: IndicatorSettingsCallback;
+  };
   infos: boolean;
   warnings: boolean;
   errors: boolean;

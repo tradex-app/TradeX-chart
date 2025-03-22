@@ -6,6 +6,7 @@ import { isNumber, isString } from "../../utils/typeChecks"
 import Input from "../../input"
 import { CLASS_DIVIDERS } from "../../definitions/core"
 import { DIVIDERHEIGHT } from "../../definitions/chart"
+import { TOOLSW } from "../../definitions/style"
 
 
 export default class Divider {
@@ -32,7 +33,7 @@ export default class Divider {
 
   static create(widgets, config) {
 
-    const id = `${config.core.id}_divider_${++Divider.divideCnt}`
+    const id = `${config.core.ID}_divider_${++Divider.divideCnt}`
     config.id = id
 
     // add entry
@@ -141,7 +142,7 @@ export default class Divider {
     this.#cursorPos = this.#core.MainPane.cursorPos // [e.position.x, e.position.y]
     this.#elDivider.style.background = this.#theme.divider.active
     this.emit(`${this.id}_pointerdrag`, this.#cursorPos)
-    this.emit(`divider_pointerdrag`, {
+    this.emit(`divider_pointerDrag`, {
       id: this.id,
       e: e,
       pos: this.#cursorPos,
@@ -155,7 +156,7 @@ export default class Divider {
     this.#elDivider.style.background = this.#theme.divider.idle
     this.#cursorPos = this.#core.MainPane.cursorPos // [e.position.x, e.position.y]
     this.emit(`${this.id}_pointerdragend`, this.#cursorPos)
-    this.emit(`divider_pointerdragend`, {
+    this.emit("divider_pointerDragEnd", {
       id: this.id,
       e: e,
       pos: this.#cursorPos,
@@ -203,12 +204,13 @@ export default class Divider {
     let top = this.#chartPane.pos.top - elementDimPos(this.#elDividers).top;
         top = top - (this.height / 2) + 1
     this.#elDivider.style.top = `${top}px`
-    this.#elDivider.style.left = `${this.#core.elBody.tools.width}px`
   }
 
   setWidth() {
-    this.#elDivider.style.width = `${this.#core.elMain.width + this.#core.elBody.scale.width}px`
-    this.#elDivider.style.left = `${this.#core.elBody.tools.width}px`
+    let pos = this.#core.theme.tools.location
+    let toolsW = (pos == "left" || pos == "right") ? this.#theme.tools.width || TOOLSW : 0
+    this.#core.WidgetsG.elements.divider.style.width = `${this.#core.elBody.width - toolsW}px`
+    this.#core.WidgetsG.elements.divider.style.right = (pos === "left") ? `0px` : `${toolsW}px`
   }
 
   setCursorStyle(c) {

@@ -52,30 +52,34 @@ chart.emit("some_event", {value: "foo"})
 
 The following list of events is not exhaustive as the chart is still under heavy development and subject to change until the release of version 1.0.
 
-* addChartView
-* addIndicatorDone
-* addSecondary
+* chart_IndicatorAdd
 * chart_pan
 * chart_panDone
+* chart_paneAdd
 * chart_paneDestroy
+* chart_paneRefresh
+* chart_primaryPointerDown
 * chart_render
+* chart_rowsResize
+* chart_secondaryAdd
+* chart_scrollUpdate
 * chart_yAxisRedraw
-* divider_pointerdrag
-* divider_pointerdragend
+* chart_zoomDone
+* divider_pointerDrag
+* divider_pointerDragEnd
 * Error
 * event_selected
 * global_resize
-* main_mousemove
-* pane_refresh
-* primary_pointerdown
+* main_mouseMove
 * range_limitFuture
 * range_limitPast
-* rowsResize
-* scrollUpdate
-* setRange
+* range_set
+* range_timeframeSet
+* range_valueMaxMin
 * state_eventAdded
 * state_exported
 * state_deleted
+* state_usingState
 * state_mergeComplete
 * state_tradeAdded
 * stream_candleFirst
@@ -88,4 +92,3 @@ The following list of events is not exhaustive as the chart is still under heavy
 * stream_Stopped
 * trade_selected
 * trade_added
-* zoomDone

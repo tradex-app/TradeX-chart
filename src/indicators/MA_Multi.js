@@ -9,9 +9,14 @@ import Indicator, { InputPeriodEnable } from "../components/overlays/indicator"
 import MA from "../indicators/MA"
 import { colours2 } from "../components/views/colourPicker";
 
+let nameShort = "MMA"
+let nameLong = 'Moving Average Multi'
+
  
  export default class MA_Multi extends Indicator {
 
+  static nameShort = nameShort
+  static nameLong = nameLong
   static version = "1.0"
   static inCnt = 0
   static primaryPane = true
@@ -38,9 +43,9 @@ import { colours2 } from "../components/views/colourPicker";
     width5: '1',
   }
 
-  get name() { return 'Moving Average Multi' }
-  shortName = 'MA'
-  libName = 'MA'
+  get name() { return nameLong }
+  shortName = nameShort
+  libName = nameShort
   definition = {
     input: {
       inReal: [], 

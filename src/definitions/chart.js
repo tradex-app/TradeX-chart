@@ -1,9 +1,9 @@
 // definitions/chart.js
 
-import { MINUTE_MS } from "../utils/time"
+// import { MINUTE_MS } from "../utils/time"
 
 export const DEFAULT_TIMEVALUE = 1
-export const DEFAULT_TIMEINTERVAL = MINUTE_MS
+export const DEFAULT_TIMEINTERVAL = 60000 // MINUTE_MS
 export const DEFAULT_TIMEFRAME = "1m"
 export const DEFAULT_TIMEFRAMEMS = DEFAULT_TIMEINTERVAL
 export const DEFAULT_RANGELENGTH = 100
@@ -13,9 +13,9 @@ export const XAXIS_STEP = 100
 
 export const YAXIS_STEP = 100
 export const YAXIS_GRID = 16
-export const YAXIS_BOUNDS = 0.3
-export const YAXIS_PADDING = 1.04
-export const YAXIS_MINDIGITS = 8
+export const YAXIS_BOUNDS = 0.2
+export const YAXIS_PADDING = 1.2
+export const YAXIS_MINDIGITS = 8 // candle count down plus 00:00:00
 
 // YAxis type enum
 export class YAXIS_TYPE {

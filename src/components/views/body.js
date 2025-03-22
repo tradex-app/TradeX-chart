@@ -29,6 +29,7 @@ const content = `
   }
   tradex-tools {
     grid-column: 1/2;
+    grid-row: 1/2;
   }
   tradex-scale:first-of-type {
     grid-column: 2/3;
@@ -133,7 +134,8 @@ export default class tradeXBody extends element {
   }
 
   setToolsLocation(side=this.#theme?.tools?.location) {
-    let toolsW = (this.#theme?.tools?.location == "none") ? 0 : this.toolsW
+    let toolsW = (side == "left" || side == "right") ? this.#theme.tools.width || TOOLSW : 0
+    this.#elTools.style.width = `${toolsW}px`
     switch(side) {
       case "none":
       case false:
@@ -144,14 +146,14 @@ export default class tradeXBody extends element {
       case "right":
         this.#gridTemplateColumns.toolsLeft = `0`
         this.#gridTemplateColumns.toolsRight = `${toolsW}px`
-        this.#elTools.style.gridColumn = "1/2"
+        this.#elTools.style.gridColumn = "5/6"
         this.#elTools.style.display = "block"
         break;
       case "left":
       default:
         this.#gridTemplateColumns.toolsLeft = `${toolsW}px`
         this.#gridTemplateColumns.toolsRight = `0`
-        this.#elTools.style.gridColumn = "5/6"
+        this.#elTools.style.gridColumn = "1/2"
         this.#elTools.style.display = "block"
         break;
     }

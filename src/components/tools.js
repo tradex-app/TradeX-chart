@@ -7,7 +7,7 @@ import { elementDimPos } from "../utils/DOM"
 import tools from "../definitions/tools"
 import Tool from "./overlays/chart-tools"
 import stateMachineConfig from "../state/state-tools"
-import { ToolsStyle } from "../definitions/style"
+import { ToolsStyle, TOOLSW } from "../definitions/style"
 
 
 /**
@@ -146,6 +146,40 @@ export default class ToolsBar extends Component {
 
   mount(el) {
     el.innerHTML = this.#elTools.defaultNode(this.#tools)
+  }
+
+  show(pos=this.core.theme.tools.location) {
+    let toolBarW = this.core.theme.tools.width || TOOLSW
+    let dividerPos = "0px"
+
+    switch (pos) {
+      case "none":
+        toolBarW = 0;
+        break;
+      case "right":
+        dividerPos = `${toolBarW}px`
+        break;
+      case "left":
+      default:
+        pos = "left";
+        break;
+    }
+
+    let divider = this.core.elBody.clientWidth - toolBarW
+    this.core.theme.tools.location = pos
+    this.core.WidgetsG.elements.divider.style.right = dividerPos
+    this.core.WidgetsG.elements.divider.style.width = `${divider}px`
+    this.core.elBody.setToolsLocation(pos)
+    this.core.MainPane.setDimensions()
+    this.core.refresh()
+  }
+
+  hide() {
+    this.core.WidgetsG.elements.divider.style.right = `0px`
+
+    this.core.elBody.setToolsLocation("none")
+    this.core.MainPane.setDimensions()
+    this.core.refresh()
   }
 
   initAllTools() {
