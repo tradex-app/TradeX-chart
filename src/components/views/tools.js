@@ -28,8 +28,16 @@ export default class tradeXTools extends element {
         height: ${ToolsStyle.ICONSIZE};
         width: ${ToolsStyle.ICONSIZE};
         fill: ${ToolsStyle.COLOUR_ICON};
+        opacity: 0.5;
+        display: none;
       }
-      svg:hover {
+      .display svg {
+        display: block;
+      }
+      .enable svg {
+        opacity: 1;
+      }
+      .enable svg:hover {
         fill: ${ToolsStyle.COLOUR_ICONHOVER} !important;
       }
       .icon-wrapper {
