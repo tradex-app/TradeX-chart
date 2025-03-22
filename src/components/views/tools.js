@@ -47,8 +47,11 @@ export default class tradeXTools extends element {
 
   iconNode(tool) {
     const menu = ("sub" in tool) ? `data-menu="true"` : ""
+    const active = (tool?.active !== false) ? `active` : ``
+    const enable = (tool?.enable !== false) ? `enable` : ``
+    const display = (tool?.display !== false) ? `display` : ``
     return  `
-      <div id="${tool.id}" data-event="${tool.event}" ${menu} class="icon-wrapper">${tool.icon}</div>\n
+      <div id="${tool.id}" data-event="${tool.event}" ${menu} class="icon-wrapper ${active} ${enable} ${display}">${tool.icon}</div>\n
     `
   }
 }
