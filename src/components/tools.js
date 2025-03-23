@@ -26,7 +26,7 @@ export default class ToolsBar extends Component {
   #Tool = Tool
   #tools
   #toolClasses = {}
-  #activeTool = undefined
+  #activeTool = ""
   #toolTarget
   #toolEvents = {click:[], pointerover:[]}
 
@@ -100,20 +100,27 @@ export default class ToolsBar extends Component {
   }
 
   onIconClick(e) {
-    let evt = e.currentTarget.dataset.event,
-        menu = e.currentTarget.dataset.menu || false,
+    let t = e.currentTarget
+    if (!t.classList.contains("enable")) return
+
+    let d = t.dataset,
+        evt = d.event,
+        menu = d.menu || false,
+        tool = t.id,
         data = {
-          target: e.currentTarget.id,
-          menu: menu,
-          evt: e.currentTarget.dataset.event,
-          tool: e.currentTarget.dataset.tool
+          target: t,
+          menu,
+          evt,
+          tool
         };
         
     // this.emit(evt, data)
+    console.log (data)
 
     if (menu) this.emit("menu_open", data)
     else {
       this.emit("menuItem_selected", data)
+      // this.addNewTool(tool, t)
     }
   }
 
@@ -232,7 +239,7 @@ export default class ToolsBar extends Component {
   /**
    * add tool to chart row from data state
    * or add as new tool from toolbar
-   * @param {class} tool 
+   * @param {string} tool 
    * @param {Object} target
    */
   addTool(tool=this.#activeTool, target=this.#toolTarget) {

@@ -90,7 +90,7 @@ export default [
     event: "tool_activated",
     enable: true,
     diplay: true,
-    class: TradePosition ,
+    class: TradePosition,
   },
   {
     id: "text",

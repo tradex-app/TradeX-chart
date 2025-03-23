@@ -42,7 +42,7 @@ export default class chartTools extends Overlay {
 
     const tool = new config.tool(config)
 
-    chartTools.#instances[cnt] = tool
+    chartTools.#instances[config.toolID] = tool
     target.chartToolAdd(tool)
 
     return tool
