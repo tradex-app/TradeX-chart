@@ -1,12 +1,13 @@
 // tools.js
 
-import { cursor, line, fibonacci, range, text, measure, del } from "./icons"
+import { cursor, line, fibonacci, range, tradePosition, text, measure, del } from "./icons"
 
 import Fibonacci from "../tools/fibonacci"
 import Line from "../tools/line"
 import Measure from "../tools/measure"
 import Range from "../tools/range"
 import Text from "../tools/text"
+import TradePosition from "../tools/trade-positiion"
 
 export default [
   {
@@ -81,6 +82,15 @@ export default [
         icon: line,
       }
     ]
+  },
+  {
+    id: "trade",
+    name: "Trade Position",
+    icon: tradePosition,
+    event: "tool_activated",
+    enable: true,
+    diplay: true,
+    class: TradePosition ,
   },
   {
     id: "text",
