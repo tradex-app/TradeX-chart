@@ -9,6 +9,9 @@ import StateMachine from '../scaleX/stateMachne';
 
 export default class Line extends Tool {
 
+  static isOverlay = true
+
+
   #colour = lineConfig.colour
   #lineWidth = lineConfig.width
   #stateMachine
@@ -17,10 +20,10 @@ export default class Line extends Tool {
     super(config)
   }
 
-  set colour(colour=this.#colour) {
+  set colour(colour) {
     // const c = tinycolor(colour)
     // this.#colour = (c.isValid()) ? colour : this.#colour
-    this.#colour = colour
+    this.#colour = colour || this.#colour
   }
   get colour() { return this.#colour }
   set lineWidth(width) { this.#lineWidth = (isNumber(width)) ? width : this.#lineWidth }

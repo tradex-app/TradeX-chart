@@ -3,7 +3,7 @@
 
 import { NAME, SHORTNAME, ID, RANGELIMIT, PRICE_PRECISION, VOLUME_PRECISION, STREAM_UPDATE } from './definitions/core'
 import style, { GlobalStyle, CHART_MINH, CHART_MINW, cssVars, SCALEW, TIMEH, TOOLSW, UTILSH, watermark } from './definitions/style'
-import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, OVERLAYPANES } from './definitions/chart'
+import { DEFAULT_TIMEFRAME, DEFAULT_TIMEFRAMEMS, LIMITPAST, OVERLAYPANES } from './definitions/chart'
 import { defaultConfig, defaultTitle, initialEmptyState } from './definitions/config'
 import IndicatorsPublic, { IndicatorClasses } from './definitions/indicators'
 import * as packageJSON from '../package.json'
@@ -25,7 +25,7 @@ import ToolsBar from './components/tools'
 import MainPane from './components/main'
 import WidgetsG from './components/widgets'
 import Indicator from './components/overlays/indicator'
-import Chart, { defaultOverlays, optionalOverlays } from './components/chart'
+import Chart, { standardOverlays, optionalOverlays } from './components/chart'
 import exportImage from './utils/exportImage'
 // import talib from './wasm/index.esm.str.js'
 import * as talib from './wasm/index.esm'
@@ -79,9 +79,9 @@ export default class TradeXchart extends Tradex_chart {
   #stateClass
   #indicators = IndicatorClasses
   #indicatorsPublic = IndicatorsPublic
-  #standardOverlays = {...OVERLAYPANES}
-  #optionalOverlays = {...OVERLAYPANES}
-  #customOverlays = {...OVERLAYPANES}
+  #overlaysDefault = {...OVERLAYPANES}
+  #overlaysOptional = {...OVERLAYPANES}
+  #overlaysCustom = {...OVERLAYPANES}
   #TALib
   #theme
 
@@ -313,9 +313,9 @@ export default class TradeXchart extends Tradex_chart {
     this.oncontextmenu = window.oncontextmenu
     this.#workers = WebWorker
 
-    const so = this.#standardOverlays
-    so.primaryPane = {...so.primaryPane, ...defaultOverlays.primaryPane}
-    this.#optionalOverlays = {...optionalOverlays}
+    const so = this.#overlaysDefault
+    so.primaryPane = {...so.primaryPane, ...standardOverlays.primaryPane}
+    this.#overlaysOptional = {...optionalOverlays}
   }
 
   log(...l) { if (this.logs) console.log(...l) }
@@ -364,8 +364,6 @@ export default class TradeXchart extends Tradex_chart {
 
   /** @returns {object} - all chart indicators in use, grouped by chart panes */
   get Indicators() { return this.#MainPane.indicators }
-
-  get CustomOverlays() { return this.#customOverlays }
 
   get ready() { return this.#ready }
 
@@ -427,8 +425,10 @@ export default class TradeXchart extends Tradex_chart {
   set candles(c) { if (isObject(c)) this.#candles = c }
   get candles() { return this.#candles }
   get progress() { return this.#progress }
-  get customOverlays() { return this.#customOverlays }
-  get optionalOverlays() { return mergeDeep({...this.#optionalOverlays}, this.#customOverlays) } 
+  get overlays() { return this.overlaysList() }
+  get overlaysDefault() { return this.#overlaysDefault }
+  get overlaysOptional() { return this.#overlaysOptional }
+  get overlaysCustom() { return this.#overlaysCustom } 
 
 
   /**
@@ -1123,6 +1123,25 @@ export default class TradeXchart extends Tradex_chart {
     return e[o]
   }
 
+  overlaysList(by) {
+    let list = {}
+    switch(by) {
+      case "all":
+        return {
+          ...this.overlayEntries(),
+          ...this.indicatorClasses,
+          ...this.ToolsBar.overlays
+        };
+      case "type":
+      default:
+        return {
+          standard: {...this.overlayEntries()},
+          indicators: {...this.indicatorClasses},
+          tools: {...this.ToolsBar.overlays}
+        }
+    }
+  }
+
   /**
    * list of optional overlays, inclusive of custom overlays by ID
    * @returns {Array} - array of optional overlay keys
@@ -1136,11 +1155,15 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {object} - object of optional overlay key value pairs
    */
   overlayEntries() {
-    const c = this.optionalOverlays
-      let e = {}
-    for (let p in c) {
-      e = {...e, ...c[p]}
+    let e = {}
+    function merge (c) {
+      for (let p in c) {
+        e = {...e, ...c[p]}
+      }
     }
+    merge(this.#overlaysDefault)
+    merge(this.#overlaysOptional)
+    merge(this.#overlaysCustom)
     return e
   }
 
@@ -1156,9 +1179,9 @@ export default class TradeXchart extends Tradex_chart {
       if (
         isObject(v) &&
         this.isOverlay(v?.class) &&
-        Object.keys(this.#customOverlays).includes(v?.location)
+        Object.keys(this.#overlaysCustom).includes(v?.location)
       ) {
-        this.#customOverlays[v.location][k] = v
+        this.#overlaysCustom[v.location][k] = v
         result[k] = true
         this.log(`Custom Overlay: ${k} - Registered`)
       }

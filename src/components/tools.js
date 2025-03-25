@@ -8,6 +8,7 @@ import tools from "../definitions/tools"
 import Tool from "./overlays/chart-tools"
 import stateMachineConfig from "../state/state-tools"
 import { ToolsStyle, TOOLSW } from "../definitions/style"
+import { isArray } from "../utils/typeChecks"
 
 
 /**
@@ -46,6 +47,9 @@ export default class ToolsBar extends Component {
   get shortName() {return this.#shortName}
   get pos() { return this.dimensions }
   get dimensions() { return elementDimPos(this.#elTools) }
+  get tools() { return this.#tools }
+  get list() { return this.listTools() }
+  get overlays() { return this.listToolOverlays() }
 
   // iterate over tools list and add tool bar nodes
   init() {
@@ -120,7 +124,7 @@ export default class ToolsBar extends Component {
     if (menu) this.emit("menu_open", data)
     else {
       this.emit("menuItem_selected", data)
-      // this.addNewTool(tool, t)
+      this.addNewTool(tool, t)
     }
   }
 
@@ -246,7 +250,9 @@ export default class ToolsBar extends Component {
     let config = {
       name: tool,
       tool: this.#toolClasses[tool],
-      pos: target.cursorClick
+      pos: target.cursorClick,
+      theme: this.core.theme,
+      parent: this
     }
     let toolInstance = this.#Tool.create(target, config)
     toolInstance.start()
@@ -269,4 +275,27 @@ export default class ToolsBar extends Component {
     // iterate over Data State to add all tools
   }
 
+  listTools() {
+    const list = {}
+    function iterate(tools) {
+      for (let t of tools) {
+        list[t.id] = t
+
+        if (isArray(t?.sub))
+          iterate(t.sub)
+      }
+    }
+    iterate(this.#tools)
+    return list
+  }
+
+  listToolOverlays() {
+    const list = {}
+    const tools = this.listTools()
+    for (let t of Object.keys(tools)) {
+      if (!!tools[t]?.class?.isOverlay)
+        list[t] = tools[t]
+    }
+    return list
+  }
 }

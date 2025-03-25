@@ -51,7 +51,7 @@ export const defaultOverlays = {
     ["candles", {class: chartCandles, fixed: false, required: true}],
     ["hiLo", {class: chartHighLow, fixed: true, required: false}],
     ["stream", {class: chartCandleStream, fixed: false, required: true}],
-    // ["tools", {class: chartTools, fixed: false, required: true}],
+    ["tools", {class: chartTools, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ],
   secondaryPane: [
@@ -59,6 +59,22 @@ export const defaultOverlays = {
     // ["tools", {class: chartTools, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ]
+}
+export const standardOverlays = {
+  primaryPane: {
+    "watermark": {class: watermark, fixed: true, required: true, params: {content: null}},
+    "grid": {class: chartGrid, fixed: true, required: true, params: {axes: "y"}},
+    "candles": {class: chartCandles, fixed: false, required: true},
+    "hiLo": {class: chartHighLow, fixed: true, required: false},
+    "stream": {class: chartCandleStream, fixed: false, required: true},
+    "tools": {class: chartTools, fixed: false, required: true},
+    "cursor": {class: chartCursor, fixed: true, required: true}
+  },
+  secondaryPane: {
+    "grid": {class: chartGrid, fixed: true, required: true, params: {axes: "y"}},
+    // "tools": {class: chartTools, fixed: false, required: true},
+    "cursor": {class: chartCursor, fixed: true, required: true}
+  }
 }
 export const optionalOverlays = {
   primaryPane: {

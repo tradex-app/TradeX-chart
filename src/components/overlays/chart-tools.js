@@ -36,7 +36,7 @@ export default class chartTools extends Overlay {
     const cnt = ++chartTools.#cnt
     
     config.cnt = cnt
-    config.modID = `${config.toolID}_${cnt}`
+    config.modID = `${config.name}_${cnt}`
     config.toolID = config.modID
     config.target = target
 
@@ -72,14 +72,8 @@ export default class chartTools extends Overlay {
     super(target, xAxis, yAxis, theme, parent, params)
 
     const overlay = params?.overlay
-    this.#inCnt = chartTools.inCnt
-    this.id = overlay?.id || uid(this.shortName)
+    // this.#inCnt = chartTools.inCnt
 
-    // FIXME: why is there a this.id = undefined ???
-    // delete this.id
-    // if (!!this.config.ID) this.#id = idSanitize(this.config.ID)
-
-    // this.#name = config.name
     this.settings = params?.settings || {}
     // this.target.addTool(this)
     toolsDialogue.parent = this
