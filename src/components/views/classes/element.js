@@ -200,7 +200,7 @@ export default class element extends HTMLElement {
   /**
   * Publish a topic
   * @param {string} topic - The topic name
-  * @param {Object}  data - The data to publish
+  * @param {*} [data] - The data to publish
   * @returns {boolean}
   */
   emit(topic, data) {

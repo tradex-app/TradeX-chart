@@ -465,9 +465,18 @@ export function htmlSelect(i, o) {
   return input
 }
 
+export function blobToDataURL(blob) {
+  return new Promise((resolve) => {
+    let reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.readAsDataURL(blob);
+  });
+}
+
 export default {
     addCSSRule,
     addStyleRule,
+    blobToDataURL,
     deleteStyleRule,
     elementDimPos,
     elementsDistance,

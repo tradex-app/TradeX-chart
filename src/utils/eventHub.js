@@ -79,10 +79,11 @@ export default class EventHub {
     /**
     * Publish a topic
     * @param {string} topic - The topic name
-    * @param {Object}  data - The data to publish
+    * @param {*} [data] - The data to publish
+    * @returns {boolean}
     */
     emit(topic, data) {
-      if (!isString(topic)) return
+      if (!isString(topic)) return false;
       
       (this.#hub[topic] || []).forEach(
         cb => {
@@ -91,9 +92,11 @@ export default class EventHub {
           }
           catch (e) {
             console.error(e)
+            return false
           }
         }
       );
+      return true
     }
   
     /**

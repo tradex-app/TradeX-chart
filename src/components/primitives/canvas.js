@@ -2,7 +2,7 @@
 
 import { decimalToHex, limit } from "../../utils/number";
 import { arrayMove } from "../../utils/utilities";
-import { isHTMLElement } from "../../utils/DOM";
+import { blobToDataURL, isHTMLElement } from "../../utils/DOM";
 import { isArray, isBoolean, isNumber } from "../../utils/typeChecks";
 // import WebGLCanvas from "../../renderer/Canvas2DtoWebGL/Canvas2DtoWebGL"
 
@@ -484,10 +484,12 @@ class Foundation {
     else {
       canvas.convertToBlob()
       .then(blob => {
-        const reader = new FileReaderSync();
-        const dataURL = reader.readAsDataURL(blob);
-        return dataURL
+        blobToDataURL(blob)
+        .then(dataURL => {
+          return dataURL
+        })
       });
+    }
   }
 
  /**

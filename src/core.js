@@ -537,6 +537,8 @@ export default class TradeXchart extends Tradex_chart {
     setTimeout(this.refresh.bind(this), 1000)
 
     this.log(`${this.#name} V${TradeXchart.version} configured and running...`)
+
+    this.emit("chart_started")
   }
 
   /**
@@ -570,8 +572,8 @@ export default class TradeXchart extends Tradex_chart {
     this.WidgetsG.destroy()
 
     this.#workers.end()
-    this.#state = undefined
-    this.#stateClass = undefined
+    this.#state
+    this.#stateClass
 
     // DOM.findByID(this.ID).remove
   }
