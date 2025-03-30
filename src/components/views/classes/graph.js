@@ -167,7 +167,8 @@ export default class Graph {
       if (update)
         overlay.instance.setRefresh()
       
-      overlay.instance.draw()
+      if (isFunction(overlay.instance.draw))
+        overlay.instance.draw()
 
       if (!overlay.fixed)
         overlay.instance.position = [this.#core.scrollPos, 0]

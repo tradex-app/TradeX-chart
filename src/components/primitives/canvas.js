@@ -335,7 +335,7 @@ class Layer {
         layers = viewport.layers,
         order;
 
-    if (typeof pos === "number") {
+    if (isNumber(pos)) {
       order = limit(Math.floor(pos), (layers.length - 1) * -1, layers.length - 1)
       pos = "order"
     }
@@ -472,6 +472,24 @@ class Foundation {
   get context() { return this.#context }
   get layer() { return this.#layer }
 
+  getContext(type, cfg) {
+    return this.canvas.getContext(type, cfg);
+  }
+
+  getDataURL(type, quality, canvas=this.canvas) {
+    if (!this.offscreen) {
+      const dataURL = canvas.toDataURL(type, quality);
+      return dataURL
+    }
+    else {
+      canvas.convertToBlob()
+      .then(blob => {
+        const reader = new FileReaderSync();
+        const dataURL = reader.readAsDataURL(blob);
+        return dataURL
+      });
+  }
+
  /**
    * set scene size
    * @param {number} width
@@ -502,10 +520,6 @@ class Scene extends Foundation {
     super(cfg)
   }
 
-  getContext(type) {
-    return this.canvas.getContext(type);
-  }
-
   /**
    * convert scene into an HTML image source
    * @param {String} type - image format "img/png"|"img/jpg"|"img/webp"
@@ -515,7 +529,7 @@ class Scene extends Foundation {
   toImage(type = "image/png", quality, cb) {
     let that = this,
       imageObj = new Image(),
-      dataURL = this.canvas.toDataURL(type, quality);
+      dataURL = this.getDataURL(type, quality);
 
     imageObj.onload = function () {
       imageObj.width = that.width;
@@ -532,8 +546,16 @@ class Scene extends Foundation {
    * @param {number} quality - image quality 0 - 1
    */
   export(cfg, type = "image/png", quality) {
-    const dataURL = this.canvas.toDataURL(type, quality);
-    this.invokeImageDownload(dataURL, cfg.fileName)
+    if (!this.offscreen) {
+      const dataURL = this.getDataURL(type, quality);
+      this.invokeImageDownload(dataURL, cfg.fileName)
+    }
+    else {
+      this.getDataURL()
+      .then(dataURL => {
+        this.invokeImageDownload(dataURL, cfg.fileName)
+      });
+    }
   }
 
   /**
@@ -543,7 +565,7 @@ class Scene extends Foundation {
    * @param {number} quality - image quality 0 - 1
    */
   exportHit(cfg, type = "image/png", quality) {
-    const dataURL = this.layer.hit.canvas.toDataURL(type, quality);
+    const dataURL = this.getDataURL(type, quality, this.layer.hit.canvas);
     this.invokeImageDownload(dataURL, cfg.fileName)
   }
 
@@ -581,7 +603,7 @@ class Hit extends Foundation {
   }
 
   getContext(type) {
-    return this.canvas.getContext(type, {
+    return super.getContext(type, {
       // add preserveDrawingBuffer to pick colours with readPixels for hit detection
       preserveDrawingBuffer: true,
       // fix webgl antialiasing picking issue
@@ -593,7 +615,7 @@ class Hit extends Foundation {
    * Test if a hit for coordinates. This can be used for pointer interactivity.
    * @param {number} x
    * @param {number} y
-   * @returns {Integer} layer index - returns -1 if no pixel is there
+   * @returns {number} layer index (integer) - returns -1 if no pixel is there
    */
   getIntersection(x, y) {
     let ctx = this.context,

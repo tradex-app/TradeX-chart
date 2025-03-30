@@ -1,10 +1,9 @@
 // trade-position.js
 
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
-import { debounce } from '../utils/utilities';
-import Tool from "../components/overlays/chart-tools"
+import { debounce, idSanitize, uid } from '../utils/utilities';
+import { ChartTool } from "../components/overlays/chart-tools"
 import State from '../state/chart-state';
-import StateMachine from '../scaleX/stateMachne';
 import  ToolNode, { nodeRender, NodeState, } from '../components/primitives/node';
 import { HIT_DEBOUNCE } from '../definitions/core';
 
@@ -19,25 +18,33 @@ const tradePositionDef = {
 }
 
 
-export default class TradePosition extends Tool {
+export default class TradePosition extends ChartTool {
 
+  static #cnt = 0
   static isOverlay = true
+  static get inCnt() { return TradePosition.#cnt++ }
 
 
-  #stateMachine
+  #id
+  #inCnt
+  #name = "Trade Posiition"
+  #shortName = "Tool_TradePos"
 
-  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
-    super(target, xAxis=false, yAxis=false, theme, parent, params)
+
+  constructor(cfg) {
+
+    const { target, xAxis=false, yAxis=false, theme, parent, params } = cfg
+    super(target, xAxis, yAxis, theme, parent, params)
     this.settings = params.settings
     State.importData("tradesPositions", this.data, this.state, this.state.time.timeFrame)
   }
 
-    set position(p) { this.target.setPosition(p[0], p[1]) }
-    get data() { return this.overlay.data }
-    get settings() { return this.params.settings }
-    set settings(s) { this.doSettings(s) }
-    set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
-    get stateMachine() { return this.#stateMachine }
+    set id(id) { this.#id = idSanitize(id) }
+    get id() { return this.#id || `${this.core.ID}-${uid(this.#shortName)}_${this.#inCnt}` }
+    get inCnt() { return this.#inCnt }
+    get name() {return this.#name}
+    get shortName() { return this.#shortName }
+
 
     start() {
       this.eventsListen()

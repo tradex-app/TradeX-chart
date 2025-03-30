@@ -2,10 +2,12 @@
 // display drawings and tools on the chart
 
 import Overlay from "./overlay"
+import CEL from "../primitives/canvas";
 import { HIT_DEBOUNCE } from "../../definitions/core";
 import { isObject } from "../../utils/typeChecks";
 import { debounce, idSanitize, uid } from "../../utils/utilities"
 import ToolNode, { NodeState } from "../primitives/node";
+import StateMachine from "../../scaleX/stateMachne";
 
 
 const toolsDialogue = {
@@ -25,58 +27,98 @@ const toolsDialogue = {
   }
 }
 
-export default class chartTools extends Overlay {
+export default class ChartTools extends Overlay {
 
   static #cnt = 0
   static #instances = {}
   
-  static get inCnt() { return chartTools.#cnt++ }
-
-  static create(target, config) {
-    const cnt = ++chartTools.#cnt
-    
-    config.cnt = cnt
-    config.modID = `${config.name}_${cnt}`
-    config.toolID = config.modID
-    config.target = target
-
-    const tool = new config.tool(config)
-
-    chartTools.#instances[config.toolID] = tool
-    target.chartToolAdd(tool)
-
-    return tool
-  }
-
-  static destroy(tool) {
-    if (tool instanceof chartTools) {
-      delete chartTools.#instances[tool.inCnt]
-    }
-  }
+  static get inCnt() { return ChartTools.#cnt++ }
 
   #id
   #inCnt
   #name = "Chart Tools"
-  #shortName = "TX_Tool"
-  #configDialogue
-  #chart
+  #shortName = "TX_Tools"
 
+
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
+
+    // Tools cannot be constructed immediately
+    // they must be constructed as needed
+
+    super(target, xAxis, yAxis, theme, parent, params)
+
+    const overlay = params?.overlay
+    // this.#inCnt = ChartTools.inCnt
+
+    this.settings = params?.settings || {}
+    // this.target.addTool(this)
+    toolsDialogue.parent = this
+
+  }
+
+  set id(id) { this.#id = idSanitize(id) }
+  get id() { return this.#id || `${this.core.ID}-${uid(this.#shortName)}_${this.#inCnt}` }
+  get inCnt() { return this.#inCnt }
+  get name() {return this.#name}
+  get shortName() { return this.#shortName }
+
+  create(config) {
+    const cnt = ++ChartTools.#cnt
+
+    // find Tools overlay add new sub layer to it and pass it to constructor
+    // if (!(config?.target instanceof CEL.Viewport)) {
+      const toolsOverlay = config.core.Chart.graph.overlays.list.get("tools").layer.viewport
+      //  cfg - {x, y, width, height, contextType, offscreen}
+      const {x, y, width, height, contextType, isOffScreen: offScreen} = config.target
+      const cfg = { x, y, width, height, contextType, offscreen }
+      const layer = new CEL.Layer(cfg)
+      config.target = toolsOverlay.addLayer(layer)
+    // }
+    
+    config.cnt = cnt
+    config.modID = `${config.name}_${cnt}`
+    config.toolID = config.modID
+    // config.target = target
+
+    const tool = new config.tool(config)
+
+    ChartTools.#instances[config.toolID] = tool
+    // target.chartToolAdd(tool)
+
+    return tool
+  }
+
+  destroy(tool) {
+    if (tool instanceof ChartTool) {
+      delete ChartTools.#instances[tool.ID]
+    }
+  }
+}
+
+
+export class ChartTool extends Overlay {
+
+
+  static #cnt = 0
+  static #instances = {}
+  
+  static get inCnt() { return ChartTool.#cnt++ }
+
+  #id
+  #inCnt
+  #name = "Chart Tool"
+  #shortName = "TX_Tool"
+  #stateMachine
+  #configDialogue
   #cursorPos = [0, 0]
   #cursorActive = false
   #cursorClick
-
   #boundingBox = {TL: [0,0], BR: [0,0]}
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
     super(target, xAxis, yAxis, theme, parent, params)
 
-    const overlay = params?.overlay
-    // this.#inCnt = chartTools.inCnt
-
-    this.settings = params?.settings || {}
-    // this.target.addTool(this)
-    toolsDialogue.parent = this
     this.#configDialogue = this.core.WidgetsG.insert("ConfigDialogue", toolsDialogue)
     this.#configDialogue.start()
 
@@ -90,6 +132,10 @@ export default class chartTools extends Overlay {
   get shortName() { return this.#shortName }
   get settings() { return this.params.settings }
   set settings(s) { this.doSettings(s) }
+  set position(p) { this.target.setPosition(p[0], p[1]) }
+  get data() { return this.overlay.data }
+  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
+  get stateMachine() { return this.#stateMachine }
 
   eventsListen() {
     const chart = this.chart
@@ -149,5 +195,4 @@ export default class chartTools extends Overlay {
     
     super.updated()
   }
-
 }
