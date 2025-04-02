@@ -29,6 +29,7 @@ export default class ToolsBar extends Component {
   #toolClasses = {}
   #activeTool = ""
   #toolTarget
+  #toolsOverlay
   #toolEvents = {click:[], pointerover:[]}
 
   #menus = []
@@ -93,8 +94,13 @@ export default class ToolsBar extends Component {
   }
 
   eventsListen() {
+    this.on("chart_started", this.onChartStarted, this)
     this.on("tool_selected", this.onToolSelect, this)
     this.on("tool_deselected", this.onToolDeselect, this)
+  }
+
+  onChartStarted() {
+    this.#toolsOverlay = this.core.Chart.graph.overlays.list.get("tools").layer.viewport
   }
 
   onResized() {

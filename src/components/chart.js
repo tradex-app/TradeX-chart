@@ -13,6 +13,7 @@ import Legends from "./primitives/legend"
 import Graph from "./views/classes/graph"
 import StateMachine from "../scaleX/stateMachne";
 import stateMachineConfig from "../state/state-chartPane"
+import Tools from "../tools";
 import Input from "../input"
 import ScaleBar from "./scale"
 import watermark from "./overlays/chart-watermark"
@@ -56,7 +57,7 @@ export const defaultOverlays = {
   ],
   secondaryPane: [
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
-    // ["tools", {class: chartTools, fixed: false, required: true}],
+    ["tools", {class: chartTools, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
   ]
 }
@@ -72,7 +73,7 @@ export const standardOverlays = {
   },
   secondaryPane: {
     "grid": {class: chartGrid, fixed: true, required: true, params: {axes: "y"}},
-    // "tools": {class: chartTools, fixed: false, required: true},
+    "tools": {class: chartTools, fixed: false, required: true},
     "cursor": {class: chartCursor, fixed: true, required: true}
   }
 }
@@ -125,12 +126,12 @@ export default class Chart extends Component{
   #Legends;
   #Divider;
   #Stream;
+  #Tools
   #ConfigDialogue;
 
   #streamCandle
 
   #view
-  #viewport;
   #layersTools = new xMap();
   #overlayTools = new xMap();
 
@@ -264,6 +265,8 @@ export default class Chart extends Component{
 
     // Y Axis - Price Scale
     this.#Scale.start();
+
+    this.#Tools = new Tools(this)
 
     // draw the chart - grid, candles, volume
     this.draw(this.range);
@@ -774,7 +777,7 @@ export default class Chart extends Component{
     let { layerConfig } = this.layerConfig();
     let layer = new CEL.Layer(layerConfig);
     this.#layersTools.set(tool.id, layer);
-    this.#viewport.addLayer(layer);
+    this.viewport.addLayer(layer);
 
     tool.layerTool = layer;
     this.#overlayTools.set(tool.id, tool);

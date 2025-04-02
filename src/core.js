@@ -13,9 +13,9 @@ import { limit } from './utils/number'
 import { isTimeFrame, SECOND_MS } from "./utils/time"
 import { doStructuredClone, mergeDeep, objToString, uid } from './utils/utilities'
 import State from './state/chart-state.js'
-import { Range, calcTimeIndex } from "./model/range"
 import { defaultTheme } from './definitions/style'
 import StateMachine from './scaleX/stateMachne'
+import Tools from './tools/index.js'
 import Stream from './helpers/stream'
 import Theme from "./helpers/theme"
 import WebWorker from "./helpers/webWorkers"
@@ -132,6 +132,8 @@ export default class TradeXchart extends Tradex_chart {
 
   #delayedSetRange = false
   #mergingData = false
+
+  #tools
 
   /**
    * Create a new TradeXchart instance
@@ -306,6 +308,7 @@ export default class TradeXchart extends Tradex_chart {
     this.timers = false
     this.setID(null)
     this.#stateClass = State
+    this.#tools = Tools
 
     this.warn(`!WARNING!: ${NAME} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`)
     this.log(`${SHORTNAME} instance count: ${this.inCnt}`)
@@ -364,6 +367,8 @@ export default class TradeXchart extends Tradex_chart {
 
   /** @returns {object} - all chart indicators in use, grouped by chart panes */
   get Indicators() { return this.#MainPane.indicators }
+
+  get Tools() { return this.#tools }
 
   get ready() { return this.#ready }
 
@@ -514,6 +519,7 @@ export default class TradeXchart extends Tradex_chart {
     // inject chart style rules
     this.insertAdjacentHTML('beforebegin', `<style title="${this.ID}_style"></style>`)
     this.setTheme(this.#theme.id)
+    this.Tools.init({core: this})
 
     this.#scrollPos = this.bufferPx * -1
 

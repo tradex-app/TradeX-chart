@@ -47,12 +47,11 @@ export default class ChartTools extends Overlay {
 
     super(target, xAxis, yAxis, theme, parent, params)
 
-    const overlay = params?.overlay
-    // this.#inCnt = ChartTools.inCnt
-
     this.settings = params?.settings || {}
     // this.target.addTool(this)
     toolsDialogue.parent = this
+
+    this.eventsListen()
 
   }
 
@@ -62,15 +61,15 @@ export default class ChartTools extends Overlay {
   get name() {return this.#name}
   get shortName() { return this.#shortName }
 
-  create(config) {
+  add(config) {
     const cnt = ++ChartTools.#cnt
 
     // find Tools overlay add new sub layer to it and pass it to constructor
     // if (!(config?.target instanceof CEL.Viewport)) {
-      const toolsOverlay = config.core.Chart.graph.overlays.list.get("tools").layer.viewport
+      // const toolsOverlay = config.core.Chart.graph.overlays.list.get("tools").layer.viewport
       //  cfg - {x, y, width, height, contextType, offscreen}
-      const {x, y, width, height, contextType, isOffScreen: offScreen} = config.target
-      const cfg = { x, y, width, height, contextType, offscreen }
+      const {width, height, contextType, offscreen} = this.scene
+      const cfg = { x: 0, y: 0, width, height, contextType, offscreen }
       const layer = new CEL.Layer(cfg)
       config.target = toolsOverlay.addLayer(layer)
     // }
@@ -88,10 +87,14 @@ export default class ChartTools extends Overlay {
     return tool
   }
 
-  destroy(tool) {
+  remove(tool) {
     if (tool instanceof ChartTool) {
       delete ChartTools.#instances[tool.ID]
     }
+  }
+
+  eventsListen() {
+    // this.on("chart_started", this.)
   }
 }
 
@@ -136,6 +139,7 @@ export class ChartTool extends Overlay {
   get data() { return this.overlay.data }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
+  get isTool() { return true }
 
   eventsListen() {
     const chart = this.chart
