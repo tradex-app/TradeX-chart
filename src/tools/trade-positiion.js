@@ -22,6 +22,7 @@ export default class TradePosition extends ChartTool {
 
   static #cnt = 0
   static isOverlay = true
+  static isTool = true
   static get inCnt() { return TradePosition.#cnt++ }
 
 

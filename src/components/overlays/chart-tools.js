@@ -31,6 +31,7 @@ export default class ChartTools extends Overlay {
 
   static #cnt = 0
   static #instances = {}
+  static isTool = true
   
   static get inCnt() { return ChartTools.#cnt++ }
 
@@ -104,6 +105,8 @@ export class ChartTool extends Overlay {
 
   static #cnt = 0
   static #instances = {}
+  static isOverlay = true
+  static isTool = true
   
   static get inCnt() { return ChartTool.#cnt++ }
 

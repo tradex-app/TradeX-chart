@@ -3,7 +3,8 @@
 
 import Chart from "../components/chart"
 import defaultTools from "../definitions/tools"
-import { isClass, isFunction } from "../utils/typeChecks"
+import { isArray, isArrayOfType, isClass, isFunction, isObject } from "../utils/typeChecks"
+import { getPrototypeAt, prototypeHas, valuesInArray } from "../utils/utilities"
 
 export default class Tools {
 
@@ -19,22 +20,30 @@ export default class Tools {
   static init(cfg) {
 
     Tools.#cfg = cfg
-
-    // provide tools
-    // const list = cfg?.
-    // Tools.register(cfg)
   }
 
-  static register(tools, merge=true) {
-    this.#list = tools || defaultTools
-
-    for (let t of this.#list) {
-
-
-      if (t?.sub) {
-
-      }
+  static register(tools=defaultTools, merge=true) {
+    let keys = ["id", "name", "icon", "event", "class"]
+    let sub = []
+    let test = (t) => {
+      let k = Object.keys(t)
+      return valuesInArray(keys, k) && Tools.isTool(t.class)
     }
+    let loop = (entries, arr) => {
+      for (let t of entries) {
+
+        if (isArray(t?.sub)) {
+          if (isArrayOfType(t.sub, "object"))
+            sub = loop(t.sub, [])
+            if (sub.length > 0)
+              t.sub = sub
+        }
+        
+        if (test(t)) arr.push(t)
+      }
+      return arr
+    }
+    this.#list = (!isArrayOfType(tools, "object")) ? defaultTools : loop(tools, [])
   }
 
   static overlays() {
@@ -45,7 +54,7 @@ export default class Tools {
     return (
       isClass(tool) &&
       isFunction(tool.prototype?.draw) &&
-      !!tool?.isTool
+      prototypeHas("isTool", tool)
     )
   }
 

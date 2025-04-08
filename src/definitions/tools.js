@@ -2,6 +2,7 @@
 
 import { cursor, line, fibonacci, range, tradePosition, text, measure, del } from "./icons"
 
+import Cursor from "../tools/cursor"
 import Fibonacci from "../tools/fibonacci"
 import Line from "../tools/line"
 import Measure from "../tools/measure"
@@ -17,7 +18,8 @@ export default [
     event: "tool_activated",
     enable: false,
     diplay: true,
-    active: true
+    active: true,
+    class: Cursor
   },
   {
     id: "line",

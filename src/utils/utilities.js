@@ -49,6 +49,16 @@ export function getPrototypeAt(level, obj) {
   return proto;
 }
 
+export function prototypeHas(prop, obj, level=3) {
+  if ((!isNumber(level)) || level < 1) level = 3
+  // if (!isObject(obj)) return false
+  for (let i = level; i >= 0; i--)  {
+    let proto = getPrototypeAt(i, obj)
+    if (!!proto[prop]) return true
+  }
+  return false
+}
+
 /**
  * Deep merge two objects.
  * https://gist.github.com/ahtcx/0cd94e62691f539160b32ecda18af3d6?permalink_comment_id=2930530#gistcomment-2930530
@@ -142,15 +152,15 @@ export function objToString(obj, ndeep) {
  * recursively execute a function on object properties
  * @export
  * @param {Object} obj
- * @param {function} propExec
+ * @param {function} fn
  */
-export function objRecurse (obj, propExec) {
+export function objRecurse (obj, fn) {
   if (!isObject(obj)) return
   for (let k in obj) {
     if (typeof obj[k] === 'object' && obj[k] !== null) {
-      objRecurse(obj[k], propExec)
+      objRecurse(obj[k], fn)
     } else if (obj.hasOwnProperty(k)) {
-      propExec(k, obj[k])
+      fn(k, obj[k])
     }
   }
 }

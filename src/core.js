@@ -520,7 +520,7 @@ export default class TradeXchart extends Tradex_chart {
     this.insertAdjacentHTML('beforebegin', `<style title="${this.ID}_style"></style>`)
     this.setTheme(this.#theme.id)
     this.Tools.init({core: this})
-
+    this.Tools.register()
     this.#scrollPos = this.bufferPx * -1
 
     // is the chart empty - no data or stream
