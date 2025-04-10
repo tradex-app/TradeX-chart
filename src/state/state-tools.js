@@ -28,6 +28,20 @@ export default
             this.context.origin.onToolSelected(data)
           },
         },
+        tool_editBegin: {
+          target: 'tool_editBegin',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+            this.context.origin.onToolEditBegin(data)
+          },
+        },
+        tool_editEnd: {
+          target: 'tool_editEnd',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+            this.context.origin.onToolEditEnd(data)
+          },
+        },
         tool_deselected: {
           target: 'tool_deselected',
           action (data) {
@@ -59,6 +73,12 @@ export default
             this.context.origin.onToolTargetSelected(data)
           },
         },
+        tool_deactivated: {
+          target: 'idle',
+          action (data) {
+
+          }
+        }
       }
     },
     tool_selected: {

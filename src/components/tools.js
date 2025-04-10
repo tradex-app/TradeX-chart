@@ -129,7 +129,7 @@ export default class ToolsBar extends Component {
 
     if (menu) this.emit("menu_open", data)
     else {
-      this.emit("menuItem_selected", data)
+      this.emit("tool_activated", data)
       this.addNewTool(tool, t)
     }
   }

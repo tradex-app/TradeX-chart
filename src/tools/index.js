@@ -9,7 +9,8 @@ import { getPrototypeAt, prototypeHas, valuesInArray } from "../utils/utilities"
 export default class Tools {
 
   static #cfg
-  static #list
+  static #listByGroup = []
+  static #list = []
 
   /**
    * initialize Tools static class
@@ -39,11 +40,25 @@ export default class Tools {
               t.sub = sub
         }
         
-        if (test(t)) arr.push(t)
+        if (test(t)) {
+          arr.push(t)
+          Tools.#list.push(t)
+        }
       }
       return arr
     }
-    this.#list = (!isArrayOfType(tools, "object")) ? defaultTools : loop(tools, [])
+    
+    let result = []
+    if (isArray(tools) && tools.length == 0)
+      result = []
+    else
+    if (isArrayOfType(tools, "object") && tools.length > 0) {
+      result = loop(tools, [])
+    }
+    else
+      result = loop(defaultTools, [])
+
+    this.#listByGroup = result
   }
 
   static overlays() {
@@ -60,6 +75,10 @@ export default class Tools {
 
   static get list() {
     return Tools.#list
+  }
+
+  static get listByGroup() {
+    return Tools.#listByGroup
   }
 
   #chart
@@ -80,6 +99,13 @@ export default class Tools {
   get stateMachine() { return this.#stateMachine }
   get mainStateMachine() { return this.core.MainPane.stateMachne }
 
+  onToolBegin() {
+    
+  }
+
+  onToolEnd() {
+    
+  }
 
   add(tool) {
 

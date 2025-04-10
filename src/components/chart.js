@@ -247,6 +247,7 @@ export default class Chart extends Component{
   get overlaysDefault() { return defaultOverlays[this.type] }
   get indicators() { return this.getIndicators() }
   get indicatorDeleteList() { return this.#indicatorDeleteList }
+  get tools() { return this.#Tools }
   get Divider() { return this.#Divider }
   get siblingPrev() { return this.sibling("prev") }
   get siblingNext() { return this.sibling("next") }
