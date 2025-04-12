@@ -2,20 +2,32 @@
 // ray, horizontal ray, vertical ray
 
 import { isArray, isBoolean, isNumber, isObject, isString } from '../utils/typeChecks'
-import Tool from "../components/overlays/chart-tools"
-import { lineConfig } from "../definitions/tools";
-import StateMachine from '../scaleX/stateMachne';
+import { debounce, idSanitize, uid } from '../utils/utilities';
+import { ChartTool } from "../components/overlays/chart-tools"
+import State from '../state/chart-state';
+import { HIT_DEBOUNCE } from '../definitions/core';
 
 
-export default class Line extends Tool {
+export default class Line extends ChartTool {
+
+  static #cnt = 0
+  static isOverlay = true
+  static isTool = true
+  static get inCnt() { return Line.#cnt++ }
 
   #colour = lineConfig.colour
   #lineWidth = lineConfig.width
   #stateMachine
 
-  constructor(config) {
-    super(config)
+  constructor(cfg) {
+
+    const { target, xAxis=false, yAxis=false, theme, parent, params } = cfg
+    super(target, xAxis, yAxis, theme, parent, params)
+    this.settings = params.settings
+    State.importData("tradesPositions", this.data, this.state, this.state.time.timeFrame)
   }
+
+  get inCnt() { return Line.#cnt }
 
   set colour(colour) {
     // const c = tinycolor(colour)

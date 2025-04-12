@@ -1,5 +1,5 @@
 // chart-drawingTools.js
-// display drawings and tools on the chart
+// display drawings and tools on the chart for your confirmtin bias over the price
 
 import Overlay from "./overlay"
 import CEL from "../primitives/canvas";
@@ -7,6 +7,7 @@ import { HIT_DEBOUNCE } from "../../definitions/core";
 import { isObject } from "../../utils/typeChecks";
 import { debounce, idSanitize, uid } from "../../utils/utilities"
 import ToolNode, { NodeState } from "../primitives/node";
+
 import StateMachine from "../../scaleX/stateMachne";
 
 
@@ -27,13 +28,15 @@ const toolsDialogue = {
   }
 }
 
-export default class ChartTools extends Overlay {
+// Provides host overlay for ChartPane tools
+
+export default class ChartToolsHost extends Overlay {
 
   static #cnt = 0
   static #instances = {}
   static isTool = true
   
-  static get inCnt() { return ChartTools.#cnt++ }
+  static get inCnt() { return ChartToolsHost.#cnt++ }
 
   #id
   #inCnt
@@ -43,17 +46,15 @@ export default class ChartTools extends Overlay {
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    // Tools cannot be constructed immediately
-    // they must be constructed as needed
-
     super(target, xAxis, yAxis, theme, parent, params)
 
     this.settings = params?.settings || {}
-    // this.target.addTool(this)
+
     toolsDialogue.parent = this
 
     this.eventsListen()
 
+    ChartToolsHost.#instances[this.id] = this
   }
 
   set id(id) { this.#id = idSanitize(id) }
@@ -63,7 +64,7 @@ export default class ChartTools extends Overlay {
   get shortName() { return this.#shortName }
 
   add(config) {
-    const cnt = ++ChartTools.#cnt
+    const cnt = ++ChartToolsHost.#cnt
 
     // find Tools overlay add new sub layer to it and pass it to constructor
     // if (!(config?.target instanceof CEL.Viewport)) {
@@ -72,7 +73,7 @@ export default class ChartTools extends Overlay {
       const {width, height, contextType, offscreen} = this.scene
       const cfg = { x: 0, y: 0, width, height, contextType, offscreen }
       const layer = new CEL.Layer(cfg)
-      config.target = toolsOverlay.addLayer(layer)
+      config.target = this.overlay.addLayer(layer)
     // }
     
     config.cnt = cnt
@@ -82,15 +83,14 @@ export default class ChartTools extends Overlay {
 
     const tool = new config.tool(config)
 
-    ChartTools.#instances[config.toolID] = tool
-    // target.chartToolAdd(tool)
+
 
     return tool
   }
 
   remove(tool) {
     if (tool instanceof ChartTool) {
-      delete ChartTools.#instances[tool.ID]
+      delete ChartToolsHost.#instances[tool.ID]
     }
   }
 
@@ -99,6 +99,8 @@ export default class ChartTools extends Overlay {
   }
 }
 
+
+// provides parent class for Tool Classes
 
 export class ChartTool extends Overlay {
 

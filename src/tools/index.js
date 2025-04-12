@@ -1,5 +1,6 @@
 // index.js
-// Tools for drawing your confirmtin bias over the price
+// Controls adding Tools to the Chart Pane Tools Overlay
+// exposed in core API
 
 import Chart from "../components/chart"
 import defaultTools from "../definitions/tools"
@@ -9,8 +10,8 @@ import { getPrototypeAt, prototypeHas, valuesInArray } from "../utils/utilities"
 export default class Tools {
 
   static #cfg
-  static #listByGroup = []
   static #list = []
+  static #listByGroup = []
 
   /**
    * initialize Tools static class
@@ -81,9 +82,51 @@ export default class Tools {
     return Tools.#listByGroup
   }
 
+  static get chartToolHosts() {
+    let toolHosts = {}
+    let panes = Tools.#cfg.core.ChartPanes.entries()
+    // iterate over panes, retrieve tool instances
+    for (let pane of panes) {
+      toolHosts[pane.id] = pane.tools
+    }
+    return toolHosts
+  }
+
+  static get instances() {
+    let instances = {}
+    let hosts = Object.values(Tools.chartToolHosts)
+    for (let host of hosts) {
+      instances = {...instances, ...host.instances}
+    }
+    return instances
+  }
+
+  static get instancesByType() {
+    let byType = {}
+    let hosts = Object.values(Tools.chartToolHosts)
+    for (let host of hosts) {
+      let tools = host.tools.instances
+      for (let id in tools) {
+        let type = tools[id].shortName
+        byType[type] = [...byType[type], tools[id]]
+      }
+    }
+    return byType
+   }
+
+  static get instancesByChartPane() {
+    let instances = {}
+    let hosts = Tools.chartToolHosts
+    for (let host in hosts) {
+      instances[host] = hosts[host].tools.instances 
+    }
+    return instances
+  }
+
   #chart
   #viewport
   #stateMachine
+  #instances = {}
 
   constructor(chart) {
     if (!(chart instanceof Chart))
@@ -98,6 +141,7 @@ export default class Tools {
   get viewport() { return this.#viewport }
   get stateMachine() { return this.#stateMachine }
   get mainStateMachine() { return this.core.MainPane.stateMachne }
+  get instances() { return this.#instances }
 
   onToolBegin() {
     
@@ -107,12 +151,47 @@ export default class Tools {
     
   }
 
-  add(tool) {
+  hasType(type) {
+    for (let tool of this.core.Tools.list) {
+      if (tool.id === type)
+        return tool
+    }
+  }
 
+  add(tool, pane, params) {
+    let type = this.hasType(tool)
+    if (!type) return undefined
+    
+    let cfg = {
+      //  target, 
+      xAxis: false, 
+      yAxis: false, 
+      // theme, parent, params
+    }
+    const instance = new type.class(cfg)
+    this.#instances[instance.id] = instance
+    return instance
   }
 
   remove(tool) {
+    if (!this.getInstanceByID(tool)) return false
 
+    // remove tool overlay from chart
+    // remove tool from instance list
+  }
+
+  getInstanceByID (ID) {
+    for (let instance in this.#instances) {
+      if (instance === ID) return instance
+    }
+    return undefined
+  }
+
+  getInstanceByType (type) {
+    for (let instance of Object.values(this.#instances)) {
+      if (instance.shortName === type) return instance
+    }
+    return undefined
   }
 
 }
