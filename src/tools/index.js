@@ -7,29 +7,17 @@ import defaultTools from "../definitions/tools"
 import { isArray, isArrayOfType, isClass, isFunction, isObject } from "../utils/typeChecks"
 import { getPrototypeAt, prototypeHas, valuesInArray } from "../utils/utilities"
 
-export default class Tools {
+export default class Toolbox {
 
-  static #cfg
   static #list = []
   static #listByGroup = []
-
-  /**
-   * initialize Tools static class
-   *
-   * @static
-   * @param {object} cfg
-   */
-  static init(cfg) {
-
-    Tools.#cfg = cfg
-  }
 
   static register(tools=defaultTools, merge=true) {
     let keys = ["id", "name", "icon", "event", "class"]
     let sub = []
     let test = (t) => {
       let k = Object.keys(t)
-      return valuesInArray(keys, k) && Tools.isTool(t.class)
+      return valuesInArray(keys, k) && Toolbox.isTool(t.class)
     }
     let loop = (entries, arr) => {
       for (let t of entries) {
@@ -43,7 +31,7 @@ export default class Tools {
         
         if (test(t)) {
           arr.push(t)
-          Tools.#list.push(t)
+          Toolbox.#list.push(t)
         }
       }
       return arr
@@ -62,10 +50,6 @@ export default class Tools {
     this.#listByGroup = result
   }
 
-  static overlays() {
-
-  }
-
   static isTool(tool) {
     return (
       isClass(tool) &&
@@ -75,16 +59,25 @@ export default class Tools {
   }
 
   static get list() {
-    return Tools.#list
+    return Toolbox.#list
   }
 
   static get listByGroup() {
-    return Tools.#listByGroup
+    return Toolbox.#listByGroup
   }
 
-  static get chartToolHosts() {
+
+  core
+
+  constructor(core) {
+    this.core = core
+  }
+
+  get static () { return Toolbox }
+
+  get chartToolHosts() {
     let toolHosts = {}
-    let panes = Tools.#cfg.core.ChartPanes.entries()
+    let panes = this.core.ChartPanes.entries()
     // iterate over panes, retrieve tool instances
     for (let pane of panes) {
       toolHosts[pane.id] = pane.tools
@@ -92,18 +85,18 @@ export default class Tools {
     return toolHosts
   }
 
-  static get instances() {
+  get instances() {
     let instances = {}
-    let hosts = Object.values(Tools.chartToolHosts)
+    let hosts = Object.values(this.chartToolHosts)
     for (let host of hosts) {
       instances = {...instances, ...host.instances}
     }
     return instances
   }
 
-  static get instancesByType() {
+  get instancesByType() {
     let byType = {}
-    let hosts = Object.values(Tools.chartToolHosts)
+    let hosts = Object.values(this.chartToolHosts)
     for (let host of hosts) {
       let tools = host.tools.instances
       for (let id in tools) {
@@ -114,19 +107,33 @@ export default class Tools {
     return byType
    }
 
-  static get instancesByChartPane() {
+  get instancesByChartPane() {
     let instances = {}
-    let hosts = Tools.chartToolHosts
+    let hosts = this.chartToolHosts
     for (let host in hosts) {
       instances[host] = hosts[host].tools.instances 
     }
     return instances
   }
 
+  add(tool, paneID, params) {
+    let pane = this.core.ChartPanes.has(paneID)
+    if (!pane) return undefined
+    
+    params.chartPane = pane
+    return pane.tools.add(tool, params)
+  }
+  
+}
+
+export class Tools {
+
   #chart
   #viewport
   #stateMachine
   #instances = {}
+
+  get Toolbox() { return Toolbox }
 
   constructor(chart) {
     if (!(chart instanceof Chart))
@@ -136,7 +143,7 @@ export default class Tools {
     this.#viewport = chart.graph.overlays.list.get("tools").layer.viewport
   }
 
-  get core() { return Tools.#cfg.core }
+  get core() { return this.#chart.core }
   get chart() { return this.#chart }
   get viewport() { return this.#viewport }
   get stateMachine() { return this.#stateMachine }
@@ -158,19 +165,9 @@ export default class Tools {
     }
   }
 
-  add(tool, pane, params) {
-    let type = this.hasType(tool)
-    if (!type) return undefined
-    
-    let cfg = {
-      //  target, 
-      xAxis: false, 
-      yAxis: false, 
-      // theme, parent, params
-    }
-    const instance = new type.class(cfg)
-    this.#instances[instance.id] = instance
-    return instance
+  add(tool, params) {
+    params.chartPane = this.chart
+    return this.chart.tools.add(tool, params)
   }
 
   remove(tool) {
@@ -193,5 +190,6 @@ export default class Tools {
     }
     return undefined
   }
+
 
 }

@@ -15,7 +15,7 @@ import { doStructuredClone, mergeDeep, objToString, uid } from './utils/utilitie
 import State from './state/chart-state.js'
 import { defaultTheme } from './definitions/style'
 import StateMachine from './scaleX/stateMachne'
-import Tools from './tools/index.js'
+import Toolbox from './tools/index.js'
 import Stream from './helpers/stream'
 import Theme from "./helpers/theme"
 import WebWorker from "./helpers/webWorkers"
@@ -269,7 +269,7 @@ export default class TradeXchart extends Tradex_chart {
       if (!(chart instanceof TradeXchart)) return false
 
       const inCnt = chart.inCnt;
-      chart.destuction = true
+      chart.destruction = true
       chart.destroy()
       delete TradeXchart.#instances[inCnt];
       return true
@@ -308,7 +308,7 @@ export default class TradeXchart extends Tradex_chart {
     this.timers = false
     this.setID(null)
     this.#stateClass = State
-    this.#tools = Tools
+    this.#tools = new Toolbox(this)
 
     this.warn(`!WARNING!: ${NAME} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`)
     this.log(`${SHORTNAME} instance count: ${this.inCnt}`)
@@ -519,8 +519,7 @@ export default class TradeXchart extends Tradex_chart {
     // inject chart style rules
     this.insertAdjacentHTML('beforebegin', `<style title="${this.ID}_style"></style>`)
     this.setTheme(this.#theme.id)
-    this.Tools.init({core: this})
-    this.Tools.register()
+    this.Tools.static.register()
     this.#scrollPos = this.bufferPx * -1
 
     // is the chart empty - no data or stream

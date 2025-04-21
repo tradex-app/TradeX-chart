@@ -134,14 +134,6 @@ export function isClass(v){
     return false
   
   // This is a class that extends other class
-  if (Object.getOwnPropertyNames(v).includes('arguments'))
-    return false
-  
-  // This is a class that extends other class
-  if (Object.getOwnPropertyNames(v).includes('arguments'))
-    return false
-  
-  // This is a class that extends other class
   if(Function.prototype !== Object.getPrototypeOf(v))
     return true;
   

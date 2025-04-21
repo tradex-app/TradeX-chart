@@ -44,9 +44,21 @@ export default class ChartToolsHost extends Overlay {
   #shortName = "TX_Tools"
 
 
+  /**
+   * Creates an instance of ChartToolsHost.
+   * @param {object} target - CEl Layer instance
+   * @param {boolean} [xAxis=false]
+   * @param {boolean} [yAxis=false]
+   * @param {object} theme - 
+   * @param {object} parent - overlay host / parent
+   * @param {object} params - data to configure overlay
+   * @memberof ChartToolsHost
+   */
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
     super(target, xAxis, yAxis, theme, parent, params)
+
+    this.#inCnt = ChartToolsHost.inCnt
 
     this.settings = params?.settings || {}
 
@@ -62,30 +74,39 @@ export default class ChartToolsHost extends Overlay {
   get inCnt() { return this.#inCnt }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
+  get Tools() { return this.core.Tools }
 
-  add(config) {
+  /**
+   * add Tool to Chart Pane
+   * @param {string} tool - identifier
+   * @param {*} params 
+   * @returns 
+   */
+  add(tool, params) {
+
+    let type = this.Tools.hasType(tool)
+    if (!type) return undefined
+
     const cnt = ++ChartToolsHost.#cnt
-
-    // find Tools overlay add new sub layer to it and pass it to constructor
-    // if (!(config?.target instanceof CEL.Viewport)) {
-      // const toolsOverlay = config.core.Chart.graph.overlays.list.get("tools").layer.viewport
-      //  cfg - {x, y, width, height, contextType, offscreen}
-      const {width, height, contextType, offscreen} = this.scene
-      const cfg = { x: 0, y: 0, width, height, contextType, offscreen }
-      const layer = new CEL.Layer(cfg)
-      config.target = this.overlay.addLayer(layer)
+    const {width, height, contextType, offscreen} = this.scene
+    const cfg = { x: 0, y: 0, width, height, contextType, offscreen }
+    const layer = new CEL.Layer(cfg)
+    params.target = this.overlay.addLayer(layer)
+    params.xAxis = false
+    params.xAxis = false
+    params.yAxis = false
+    params.theme = {}
+    params.parent = this
+    // params.params = {
+    //   // cnt: cnt,
+    //   // modID: `${params.name}_${cnt}`,
+    //   toolID: params.modID
     // }
-    
-    config.cnt = cnt
-    config.modID = `${config.name}_${cnt}`
-    config.toolID = config.modID
-    // config.target = target
 
-    const tool = new config.tool(config)
+    const instance = new type.class(cfg)
+    this.Tools.instances[instance.id] = instance
 
-
-
-    return tool
+    return instance
   }
 
   remove(tool) {
@@ -118,6 +139,7 @@ export class ChartTool extends Overlay {
   #shortName = "TX_Tool"
   #stateMachine
   #configDialogue
+  #chartPane
   #cursorPos = [0, 0]
   #cursorActive = false
   #cursorClick
@@ -129,6 +151,7 @@ export class ChartTool extends Overlay {
 
     this.#configDialogue = this.core.WidgetsG.insert("ConfigDialogue", toolsDialogue)
     this.#configDialogue.start()
+    this.#chartPane = params.chartPane
 
     this.eventsListen()
   }
@@ -145,6 +168,7 @@ export class ChartTool extends Overlay {
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
   get stateMachine() { return this.#stateMachine }
   get isTool() { return true }
+  get chartPane() { return this.#chartPane }
 
   eventsListen() {
     const chart = this.chart

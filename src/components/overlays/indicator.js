@@ -1112,13 +1112,13 @@ export default class Indicator extends Overlay {
  */
   calcIndicator (indicator, params={}, range, update) {
     return new Promise( (resolve, reject) => {
-      let indicatorFn;
+      let indicatorFn = this.TALib[String(indicator)]
       if (!this.noCalcCustom(indicator))
         indicatorFn = indicator
       else if (!this.noCalc(indicator, range))
         indicatorFn = this.TALib[indicator]
       else resolve(false)
-  
+
       // get the period 
       let d = this.getTimePeriod()
       // params.timePeriod = params.timePeriod || this.definition.input.timePeriod || DEFAULT_PERIOD

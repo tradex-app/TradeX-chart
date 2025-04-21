@@ -40,6 +40,16 @@ export default class Overlay {
 
   id
 
+  /**
+   * Creates an instance of Overlay.
+   * @param {object} target - CEl Layer instance
+   * @param {boolean} [xAxis=false]
+   * @param {boolean} [yAxis=false]
+   * @param {object} theme - 
+   * @param {object} parent - overlay host / parent
+   * @param {object} params - data to configure overlay
+   * @memberof Overlay
+   */
   constructor(target, xAxis=false, yAxis=false, theme, parent, params={}) {
 
     this.#core = parent.core

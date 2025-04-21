@@ -37,8 +37,6 @@ export default class Line extends ChartTool {
   get colour() { return this.#colour }
   set lineWidth(width) { this.#lineWidth = (isNumber(width)) ? width : this.#lineWidth }
   get lineWidth() { return this.#lineWidth }
-  set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
-  get stateMachine() { return this.#stateMachine }
 
   start() {
     this.eventsListen()
@@ -59,11 +57,11 @@ export default class Line extends ChartTool {
   }
 
   draw() {
-    let [x1, y1] = this.cursorClick
+    let [x1, y1] = this.chartPane.cursorClick
 
-    const scene = this.layerTool.scene
+    const scene = this.scene
     scene.clear()
-    const ctx = this.layerTool.scene.context
+    const ctx = this.scene.context
 
     ctx.save();
 
@@ -78,6 +76,10 @@ export default class Line extends ChartTool {
 
     ctx.restore()
 
-    this.elViewport.render()
+    this.target.viewport.render()
   }
+}
+
+const stateMachineConfig = {
+
 }
