@@ -14,8 +14,8 @@ let nameLong = 'Percentage Price Oscillator'
 export default class PPO extends Indicator {
 
   get name() { return 'Percentage Price Oscillator' }
-  shortName = nameShort
-  libName = nameShort
+  get shortName() { return nameShort }
+  get libName() { return nameShort }
   precision = 2
   scaleOverlay = true
 

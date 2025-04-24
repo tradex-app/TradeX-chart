@@ -4,7 +4,7 @@
 import Overlay from "./overlay"
 import CEL from "../primitives/canvas";
 import { HIT_DEBOUNCE } from "../../definitions/core";
-import { isObject } from "../../utils/typeChecks";
+import { isClass, isObject } from "../../utils/typeChecks";
 import { debounce, idSanitize, uid } from "../../utils/utilities"
 import ToolNode, { NodeState } from "../primitives/node";
 
@@ -33,15 +33,15 @@ const toolsDialogue = {
 export default class ChartToolsHost extends Overlay {
 
   static #cnt = 0
-  static #instances = {}
-  static isTool = true
   
   static get inCnt() { return ChartToolsHost.#cnt++ }
 
   #id
   #inCnt
-  #name = "Chart Tools"
-  #shortName = "TX_Tools"
+  #name = "Chart Tool Host"
+  #shortName = "TX_ChartToolsHost"
+  #type = "tool"
+  #tools= {}
 
 
   /**
@@ -65,54 +65,68 @@ export default class ChartToolsHost extends Overlay {
     toolsDialogue.parent = this
 
     this.eventsListen()
-
-    ChartToolsHost.#instances[this.id] = this
   }
 
   set id(id) { this.#id = idSanitize(id) }
   get id() { return this.#id || `${this.core.ID}-${uid(this.#shortName)}_${this.#inCnt}` }
+  get type() { return this.#type }
   get inCnt() { return this.#inCnt }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
-  get Tools() { return this.core.Tools }
+  get tools() { return this.#tools}
 
   /**
    * add Tool to Chart Pane
-   * @param {string} tool - identifier
-   * @param {*} params 
+   * @param {object} tool - class
+   * @param {object} cfg 
    * @returns 
    */
-  add(tool, params) {
+  add(tool, cfg={}) {
 
-    let type = this.Tools.hasType(tool)
-    if (!type) return undefined
+    if (!isClass(tool.class) || !tool.class.isTool ) return undefined
 
     const cnt = ++ChartToolsHost.#cnt
     const {width, height, contextType, offscreen} = this.scene
-    const cfg = { x: 0, y: 0, width, height, contextType, offscreen }
+    const params = { x: 0, y: 0, width, height, contextType, offscreen }
     const layer = new CEL.Layer(cfg)
-    params.target = this.overlay.addLayer(layer)
-    params.xAxis = false
-    params.xAxis = false
-    params.yAxis = false
-    params.theme = {}
-    params.parent = this
+    cfg.target = this.target.viewport.addLayer(layer)
+    cfg.xAxis = false
+    cfg.xAxis = false
+    cfg.yAxis = false
+    cfg.theme = {}
+    cfg.parent = this.parent
+    cfg.params = params
     // params.params = {
     //   // cnt: cnt,
     //   // modID: `${params.name}_${cnt}`,
     //   toolID: params.modID
     // }
 
-    const instance = new type.class(cfg)
-    this.Tools.instances[instance.id] = instance
+    const instance = new tool.class(cfg)
+    this.#tools[instance.id] = instance
 
     return instance
   }
 
   remove(tool) {
     if (tool instanceof ChartTool) {
-      delete ChartToolsHost.#instances[tool.ID]
+      delete this.#tools[tool.id]
+      return true
     }
+    return false
+  }
+
+  getAll () { 
+    return Object.values(this.#tools) 
+  }
+
+  getByID (ID) {
+    return this.getAll().find((tool) => tool.id === ID)
+  }
+
+  getByType (type) {
+    if (!!type) return this.getAll()
+    else return this.getAll().filter((tool) => tool.shortName === type)
   }
 
   eventsListen() {
@@ -149,6 +163,8 @@ export class ChartTool extends Overlay {
 
     super(target, xAxis, yAxis, theme, parent, params)
 
+    this.#inCnt = ChartTool.inCnt
+    this.id = params?.id || `${this.core.ID}-${uid(this.shortName)}_${this.inCnt}`
     this.#configDialogue = this.core.WidgetsG.insert("ConfigDialogue", toolsDialogue)
     this.#configDialogue.start()
     this.#chartPane = params.chartPane
@@ -157,12 +173,12 @@ export class ChartTool extends Overlay {
   }
 
   set id(id) { this.#id = idSanitize(id) }
-  get id() { return this.#id || `${this.core.ID}-${uid(this.#shortName)}_${this.#inCnt}` }
+  get id() { return this.#id || `${this.core.ID}-${uid(this.shortName)}_${this.inCnt}` }
   get inCnt() { return this.#inCnt }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
   get settings() { return this.params.settings }
-  set settings(s) { this.doSettings(s) }
+  set settings(s) { this.validateSettings(s) }
   set position(p) { this.target.setPosition(p[0], p[1]) }
   get data() { return this.overlay.data }
   set stateMachine(config) { this.#stateMachine = new StateMachine(config, this) }
@@ -197,7 +213,7 @@ export class ChartTool extends Overlay {
   }
 
 
-  doSettings(s) {
+  validateSettings(s) {
     if (!isObject(s)) return false
 
     let t = this.theme.trades

@@ -16,17 +16,16 @@ const tradePositionDef = {
   }
 }
 
+let nameLong = "Trade Posiition"
+let nameShort = "tradepos"
 
 export default class TradePosition extends ChartTool {
 
   static #cnt = 0
-  static isOverlay = true
-  static isTool = true
   static get inCnt() { return TradePosition.#cnt++ }
 
-
-  #name = "Trade Posiition"
-  #shortName = "Tool_TradePos"
+  get name() { return nameLong }
+  get shortName() { return nameShort }
 
 
   constructor(cfg) {

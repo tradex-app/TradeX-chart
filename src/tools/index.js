@@ -76,36 +76,27 @@ export default class Toolbox {
   get static () { return Toolbox }
 
   get chartToolHosts() {
-    let toolHosts = {}
-    let panes = this.core.ChartPanes.entries()
-    // iterate over panes, retrieve tool instances
-    for (let pane of panes) {
-      toolHosts[pane.id] = pane.tools
-    }
-    return toolHosts
+    return Object.fromEntries(this.core.ChartPanes)
   }
 
   get instances() {
-    let instances = {}
-    let hosts = Object.values(this.chartToolHosts)
-    for (let host of hosts) {
-      instances = {...instances, ...host.instances}
+    let instances = []
+    for (let host of this.core.ChartPanes.values()) {
+      instances = [...instances, ...host.tools.getAll()]
     }
     return instances
   }
 
   get instancesByType() {
     let byType = {}
-    let hosts = Object.values(this.chartToolHosts)
-    for (let host of hosts) {
-      let tools = host.tools.instances
-      for (let id in tools) {
-        let type = tools[id].shortName
-        byType[type] = [...byType[type], tools[id]]
-      }
+    
+    for (let instance of this.instances) {
+      let type = instance.shortName
+      if (!byType[type]) byType[type] = []
+      byType[type].push(instance)
     }
     return byType
-   }
+  }
 
   get instancesByChartPane() {
     let instances = {}
@@ -114,6 +105,10 @@ export default class Toolbox {
       instances[host] = hosts[host].tools.instances 
     }
     return instances
+  }
+
+  getByType(type) {
+    return this.instancesByType[type]
   }
 
   add(tool, paneID, params) {
@@ -126,12 +121,17 @@ export default class Toolbox {
   
 }
 
+
+/**
+ * Provides tool management for chart panes
+ *
+ * @export
+ * @class Tools
+ */
 export class Tools {
 
   #chart
-  #viewport
   #stateMachine
-  #instances = {}
 
   get Toolbox() { return Toolbox }
 
@@ -140,15 +140,15 @@ export class Tools {
       throw new Error("Class Tools requires a valid Chart instance.")
 
     this.#chart = chart
-    this.#viewport = chart.graph.overlays.list.get("tools").layer.viewport
   }
 
   get core() { return this.#chart.core }
   get chart() { return this.#chart }
-  get viewport() { return this.#viewport }
   get stateMachine() { return this.#stateMachine }
   get mainStateMachine() { return this.core.MainPane.stateMachne }
-  get instances() { return this.#instances }
+  get toolHostOverlay() { return this.#chart.graph.overlays.list.get("tools").instance }
+  get viewport() { return this.toolHostOverlay.layer.viewport }
+  get instances() { return this.toolHostOverlay.tools }
 
   onToolBegin() {
     
@@ -159,36 +159,38 @@ export class Tools {
   }
 
   hasType(type) {
-    for (let tool of this.core.Tools.list) {
-      if (tool.id === type)
-        return tool
-    }
+    return this.core.Tools.static.list.find((tool) => tool.id === type)
   }
 
-  add(tool, params) {
-    params.chartPane = this.chart
-    return this.chart.tools.add(tool, params)
+  /**
+   * add tool (overlay) to this chart pane
+   *
+   * @param {string} tool
+   * @param {object} [params={}]
+   * @return {object} 
+   * @memberof Tools
+   */
+  add(tool, params={}) {
+    const toolType = this.hasType(tool)
+    if (!toolType) return undefined
+
+    this.toolHostOverlay.add(toolType, params)
   }
 
   remove(tool) {
-    if (!this.getInstanceByID(tool)) return false
-
-    // remove tool overlay from chart
-    // remove tool from instance list
+    return this.toolHostOverlay.remove(tool)
   }
 
-  getInstanceByID (ID) {
-    for (let instance in this.#instances) {
-      if (instance === ID) return instance
-    }
-    return undefined
+  getAll () {
+    return this.toolHostOverlay.getAll()
   }
 
-  getInstanceByType (type) {
-    for (let instance of Object.values(this.#instances)) {
-      if (instance.shortName === type) return instance
-    }
-    return undefined
+  getByID (ID) {
+    return this.toolHostOverlay.getByID(ID)
+  }
+
+  getByType (type) {
+    return this.toolHostOverlay.getByType(type)
   }
 
 

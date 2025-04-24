@@ -14,8 +14,8 @@ let nameLong = 'Moving Average Convergence/Divergence'
  export default class MACD extends Indicator {
 
   get name() { return 'Moving Average Convergence/Divergence' }
-  shortName = nameShort
-  libName = nameShort
+  get shortName() { return nameShort }
+  get libName() { return nameShort }
   definition = {
     input: {
       inReal: [], 

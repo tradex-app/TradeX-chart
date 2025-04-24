@@ -13,8 +13,8 @@ let nameLong = 'Parabolic Stop and Reverse'
 export default class PSAR extends Indicator {
 
   get name() { return nameLong }
-  shortName = nameShort
-  libName = nameShort
+  get shortName() { return nameShort }
+  get libName() { return nameShort }
   precision = 2
   scaleOverlay = false
 

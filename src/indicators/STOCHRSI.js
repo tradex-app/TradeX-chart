@@ -20,8 +20,8 @@ let nameLong = 'Stochastic RSI'
 export default class STOCHRSI extends Indicator {
 
   get name() { return nameLong }
-  shortName = nameShort
-  libName = nameShort
+  get shortName() { return nameShort }
+  get libName() { return nameShort }
   definition = {
     input: {
       inReal: [],

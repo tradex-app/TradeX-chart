@@ -14,8 +14,8 @@ let nameLong = 'AROON'
 export default class AROON extends Indicator {
 
   get name() { return nameLong }
-  shortName = nameShort
-  libName = nameShort
+  get shortName() { return nameShort }
+  get libName() { return nameShort }
   definition = {
     input: {
       high: [],

@@ -7,12 +7,16 @@ import { ChartTool } from "../components/overlays/chart-tools"
 import State from '../state/chart-state';
 import { HIT_DEBOUNCE } from '../definitions/core';
 
+let nameShort = "Cursor"
+let nameLong = 'Cursor'
+
 export default class Cursor extends ChartTool {
 
   static #cnt = 0
-  static isOverlay = true
-  static isTool = true
   static get inCnt() { return Cursor.#cnt++ }
+
+  get name() { return nameLong }
+  get shortName() { return nameShort }
 
   constructor(cfg) {
 

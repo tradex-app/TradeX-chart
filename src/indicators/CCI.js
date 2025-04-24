@@ -14,8 +14,8 @@ let nameLong = 'Commodity Channel Index'
 export default class CCI extends Indicator {
 
   get name() { return nameLong }
-  shortName = nameShort
-  libName = nameShort
+  get shortName() { return nameShort }
+  get libName() { return nameShort }
   precision = 2
   scaleOverlay = true
 

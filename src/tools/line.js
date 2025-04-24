@@ -6,37 +6,54 @@ import { debounce, idSanitize, uid } from '../utils/utilities';
 import { ChartTool } from "../components/overlays/chart-tools"
 import State from '../state/chart-state';
 import { HIT_DEBOUNCE } from '../definitions/core';
+import Colour from '../utils/colour';
 
+const LINECONFIG = {
+  colour: "#0088FF",
+  width: 1.5
+}
+
+let nameShort = "line"
+let nameLong = 'Line'
 
 export default class Line extends ChartTool {
 
+  get name() { return nameLong }
+  get shortName() { return nameShort }
+
   static #cnt = 0
-  static isOverlay = true
-  static isTool = true
   static get inCnt() { return Line.#cnt++ }
 
-  #colour = lineConfig.colour
-  #lineWidth = lineConfig.width
+  #colour = LINECONFIG.colour
+  #lineWidth = LINECONFIG.width
   #stateMachine
 
   constructor(cfg) {
 
     const { target, xAxis=false, yAxis=false, theme, parent, params } = cfg
     super(target, xAxis, yAxis, theme, parent, params)
-    this.settings = params.settings
-    State.importData("tradesPositions", this.data, this.state, this.state.time.timeFrame)
+    this.validateSettings(params?.settings)
+    // State.importData("tradesPositions", this.data, this.state, this.state.time.timeFrame)
   }
 
   get inCnt() { return Line.#cnt }
-
   set colour(colour) {
-    // const c = tinycolor(colour)
-    // this.#colour = (c.isValid()) ? colour : this.#colour
-    this.#colour = colour || this.#colour
+    let c = new Colour(colour)
+    this.#colour = (c.isValid) ? colour : this.#colour
   }
   get colour() { return this.#colour }
   set lineWidth(width) { this.#lineWidth = (isNumber(width)) ? width : this.#lineWidth }
   get lineWidth() { return this.#lineWidth }
+
+  validateSettings(s) {
+    if (!isObject(s)) return false
+
+    this.colour = s?.colour
+    this.lineWidth = s?.width
+
+    // this.posStart = s?.postStart
+    // this.posEnd = s?.posEnd
+  }
 
   start() {
     this.eventsListen()

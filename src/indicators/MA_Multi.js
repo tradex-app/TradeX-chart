@@ -44,8 +44,8 @@ let nameLong = 'Moving Average Multi'
   }
 
   get name() { return nameLong }
-  shortName = nameShort
-  libName = nameShort
+  get shortName() { return nameShort }
+  get libName() { return nameShort }
   definition = {
     input: {
       inReal: [], 

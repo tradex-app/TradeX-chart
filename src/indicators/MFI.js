@@ -14,8 +14,8 @@ let nameLong = 'Money Flow Index'
 export default class MFI extends Indicator {
 
   get name() { return nameLong }
-  shortName = nameShort
-  libName = nameShort
+  get shortName() { return nameShort }
+  get libName() { return nameShort }
   precision = 2
   scaleOverlay = true
 

@@ -13,7 +13,7 @@ import Legends from "./primitives/legend"
 import Graph from "./views/classes/graph"
 import StateMachine from "../scaleX/stateMachne";
 import stateMachineConfig from "../state/state-chartPane"
-import Tools from "../tools";
+import { Tools } from "../tools";
 import Input from "../input"
 import ScaleBar from "./scale"
 import watermark from "./overlays/chart-watermark"
@@ -785,20 +785,6 @@ export default class Chart extends Component{
   }
 
   addTools(tools) {}
-
-  // duplicate get overlayTools()
-  // overlayTools() {
-  //   const tools = [];
-  //   // for (let i = 0; i < this.#layersTools.length; i++) {
-  //   // tools[i] =
-  //   // new indicator(
-  //   //   this.#layersPrimary[i],
-  //   //   this.#Time,
-  //   //   this.#Scale,
-  //   //   this.config)
-  //   // }
-  //   // return tools
-  // }
 
   overlayToolAdd(tool) {
     // create new tool layer

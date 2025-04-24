@@ -13,8 +13,8 @@ let nameLong = 'Chande Momentum Oscillator'
 export default class CMO extends Indicator {
 
   get name() { return nameLong }
-  shortName = nameShort
-  libName = nameShort
+  get shortName() { return nameShort }
+  get libName() { return nameShort }
   precision = 2
   scaleOverlay = true
 

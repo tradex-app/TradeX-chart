@@ -13,8 +13,8 @@ let nameLong = 'Average Directional Movement Index'
 export default class ADX extends Indicator {
 
   get name() { return nameLong }
-  shortName = nameShort
-  libName = nameShort
+  get shortName() { return nameShort }
+  get libName() { return nameShort }
   precision = 2
   scaleOverlay = true
 

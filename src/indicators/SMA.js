@@ -13,8 +13,8 @@ let nameLong =  'Simple Moving Average'
  export default class SMA extends Indicator {
 
   get name() { return nameLong }
-  shortName = nameShort
-  libName = nameShort
+  get shortName() { return nameShort }
+  get libName() { return nameShort }
   definition = {
     input: {
       inReal: [], 
