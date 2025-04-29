@@ -243,7 +243,7 @@ export default class Chart extends Component{
   get layerGrid() { return this.graph.overlays.get("grid").layer }
   get overlays() { return Object.fromEntries([...this.graph.overlays.list]) }
   get overlayGrid() { return this.graph.overlays.get("grid").instance }
-  get overlayTools() { return this.#overlayTools }
+  get overlayTools() { return this.graph.overlays.get("tools").instance }
   get overlaysDefault() { return defaultOverlays[this.type] }
   get indicators() { return this.getIndicators() }
   get indicatorDeleteList() { return this.#indicatorDeleteList }
@@ -522,7 +522,7 @@ export default class Chart extends Component{
 
   setWatermark(w) {
     if (isString(w.text) || isString(w)) this.core.config.watermark.text = w
-    else if ("imgURL" in w) this.core.config.watermark.imgURL = w
+    else if ("imgURL" in w) this.core.config.watermark.imgURL = w.imgURL
   }
 
   /**
@@ -548,8 +548,8 @@ export default class Chart extends Component{
   /**
    * Set chart dimensions
    * @param {Object} dims - dimensions {w:width, h: height}
-   * @param {Number} dims.w - width in pixels
-   * @param {Number} dims.h- height in pixels
+   * @param {Number|undefined} dims.w - width in pixels
+   * @param {Number|undefined} dims.h- height in pixels
    */
   setDimensions(dims={w: this.width, h: this.height}) {
     if (!isObject(dims)) dims = {w: this.width, h: this.height}
@@ -1021,7 +1021,7 @@ export default class Chart extends Component{
       col.height = this.element.clientHeight
       col.rowsHeight = this.core.MainPane.rowsH
       col.rowsCnt = this.core.ChartPanes.size
-      this.setDimensions({W: undefined, h: COLLAPSEDHEIGHT})
+      this.setDimensions({w: undefined, h: COLLAPSEDHEIGHT})
     }
   }
 

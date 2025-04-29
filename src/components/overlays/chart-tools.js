@@ -3,12 +3,14 @@
 
 import Overlay from "./overlay"
 import CEL from "../primitives/canvas";
+import Graph from "../views/classes/graph";
 import { HIT_DEBOUNCE } from "../../definitions/core";
 import { isClass, isObject } from "../../utils/typeChecks";
 import { debounce, idSanitize, uid } from "../../utils/utilities"
 import ToolNode, { NodeState } from "../primitives/node";
 
 import StateMachine from "../../scaleX/stateMachne";
+import renderLoop from "../views/classes/renderLoop";
 
 
 const toolsDialogue = {
@@ -42,6 +44,7 @@ export default class ChartToolsHost extends Overlay {
   #shortName = "TX_ChartToolsHost"
   #type = "tool"
   #tools= {}
+  #graph
 
 
   /**
@@ -62,6 +65,8 @@ export default class ChartToolsHost extends Overlay {
 
     this.settings = params?.settings || {}
 
+    this.#graph = new Graph(this, parent.parent.elViewport, [], true)
+
     toolsDialogue.parent = this
 
     this.eventsListen()
@@ -73,7 +78,12 @@ export default class ChartToolsHost extends Overlay {
   get inCnt() { return this.#inCnt }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
+  get graph() { return this.#graph }
+  get elCanvas() { return this.graph.viewport.scene.canvas }
   get tools() { return this.#tools}
+  get renderLoop() { return renderLoop }
+  get overlays() { return Object.fromEntries([...this.graph.overlays.list]) }
+
 
   /**
    * add Tool to Chart Pane
@@ -108,6 +118,8 @@ export default class ChartToolsHost extends Overlay {
     return instance
   }
 
+  
+
   remove(tool) {
     if (tool instanceof ChartTool) {
       delete this.#tools[tool.id]
@@ -132,7 +144,17 @@ export default class ChartToolsHost extends Overlay {
   eventsListen() {
     // this.on("chart_started", this.)
   }
+
+  render() {
+    this.graph.render();
+  }
+
+  draw(range=this.range, update=false) {
+      this.graph.draw(range, update)
+  }
 }
+
+
 
 
 // provides parent class for Tool Classes

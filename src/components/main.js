@@ -35,7 +35,7 @@ import {
   STYLE_ROW,
   TIMESCALEH
 } from "../definitions/style"
-import graph from "./views/classes/graph"
+
 
 const defaultOverlays = [
   // ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],

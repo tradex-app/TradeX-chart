@@ -27,12 +27,20 @@ export default class Graph {
   #overlays
 
   #elParent
-  #elCanvas
   #elViewport
+  #elCanvas
 
   #layerWidth
 
 
+  /**
+   * Creates an instance of Graph.
+   * @param {object} parent - class or function that instantiates Graph, provides application pointers
+   * @param {HTMLElement} elViewport - HTML element that will host the Graph canvas element
+   * @param {array} overlays - array of Overlay objects
+   * @param {boolean} [node=false]
+   * @memberof Graph
+   */
   constructor(parent, elViewport, overlays, node=false) {
 
     this.#parent = parent
@@ -49,9 +57,7 @@ export default class Graph {
   get parent() { return this.#parent }
   get core() { return this.#core }
   get config() { return this.#config }
-  // set width(w) { this.setWidth(w) }
   get width() { return this.#elParent.width }
-  // set height(h) { this.setHeight(h) }
   get height() { return this.#elParent.height }
   get dimensions() { return this.#elParent.dimensions }
   set layerWidth(w) { this.#layerWidth = w || this.#elParent.width }
@@ -66,7 +72,9 @@ export default class Graph {
   get Scale() { return this.#parent.scale }
   get yAxis() { return this.#parent.scale.yAxis }
   get viewport() { return this.#viewport }
+  get canvas() { return this.#elCanvas }
   get overlays() { return this.#overlays }
+  get elViewport() { return this.#elViewport }
 
   destroy() {
     this.#overlays.destroy()
@@ -93,9 +101,17 @@ export default class Graph {
     this.render()
   }
 
+  /**
+   * create canvas viewport and appends it to the container element
+   *
+   * @param {array} [overlays=[]]
+   * @param {boolean} [node=false]
+   * @memberof Graph
+   */
   createViewport(overlays=[], node=false) {
 
-    overlays = (overlays.length == 0) ? doStructuredClone(defaultOverlays) : overlays
+    // overlays = (overlays.length == 0) ? doStructuredClone(defaultOverlays) : overlays
+    if (!isArray(overlays)) overlays = []
 
     const {width, height} = this.layerConfig()
 
@@ -113,9 +129,19 @@ export default class Graph {
   }
 
   layerConfig() {
+    let viewportDims;
+
+    // normal canvas
+    if (isFunction(this.#elViewport?.getBoundingClientRect)) {
+      viewportDims = this.#elViewport.getBoundingClientRect()
+    }
+    // offscrren canvas
+    else 
+      viewportDims = this.#elViewport
+
     const buffer = this.config?.buffer || BUFFERSIZE
-    const width = this.#elViewport.getBoundingClientRect().width
-    const height = this.#elViewport.getBoundingClientRect().height // this.#parent.height || this.#parent.rowsH - 1
+    const width = viewportDims.width
+    const height = viewportDims.height 
     this.layerWidth = Math.round(width * ((100 + buffer) * 0.01))
     const layerConfig = { 
       width: this.layerWidth, 

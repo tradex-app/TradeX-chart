@@ -174,7 +174,7 @@ export class Tools {
     const toolType = this.hasType(tool)
     if (!toolType) return undefined
 
-    this.toolHostOverlay.add(toolType, params)
+    return this.toolHostOverlay.add(toolType, params)
   }
 
   remove(tool) {

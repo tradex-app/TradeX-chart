@@ -84,6 +84,14 @@ export default class Overlays {
     return r
   }
 
+  /**
+   * Add overlay to 
+   *
+   * @param {*} key
+   * @param {*} overlay
+   * @return {*} 
+   * @memberof Overlays
+   */
   addOverlay(key, overlay) {
     const layer = new CEL.Layer(this.layerConfig)
 
@@ -100,7 +108,7 @@ export default class Overlays {
         overlay?.params
       )
       if (!isString(overlay.instance?.id)) 
-        overlay.instance.id = key
+        overlay.instance.id = String(key)
 
       this.#list.set(overlay.instance.id, overlay)
       return overlay

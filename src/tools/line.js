@@ -74,7 +74,9 @@ export default class Line extends ChartTool {
   }
 
   draw() {
-    let [x1, y1] = this.chartPane.cursorClick
+    // let [x1, y1] = this.chartPane.cursorClick
+
+    let [x1, y1] = [0,0]
 
     const scene = this.scene
     scene.clear()

@@ -688,7 +688,7 @@ export default class TradeXchart extends Tradex_chart {
   getInCnt() { return this.#inCnt }
 
   validateID(txCfg) {
-    const id = (isString(txCfg?.id)) ? txCfg.id : null
+    const id = String(txCfg?.id)
     this.setID(id)
     this.classList.add(this.ID)
   }
@@ -706,8 +706,7 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {Boolean} - success / failure
    */
   setTitle(t) {
-    if (!isString(t)) return false
-    this.Chart.setTitle(t)
+    this.Chart.setTitle(String(t))
     return true
   }
 
@@ -1286,15 +1285,13 @@ export default class TradeXchart extends Tradex_chart {
    * @returns {Overlay|boolean}
    */
   findOverlayInGraph(key, targetID) {
-    if (!isString(key) ||
-    !isString(targetID)) return false
 
     // is overlay ID valid?
-    const overlay = this.hasOverlay(key)
+    const overlay = this.hasOverlay(String(key))
     if (!overlay) return false
 
     // is targetID valid?
-    const graph = this.findGraph(targetID)
+    const graph = this.findGraph(String(targetID))
     if (!graph) return false
 
     return {overlay, graph}
@@ -1419,15 +1416,13 @@ export default class TradeXchart extends Tradex_chart {
    * Does current chart state have indicator
    * @param {string} i - indicator id or name
    * @param {string} dataset -
-   * @returns {Indicator|false}
+   * @returns {Indicator|boolean}
    */
   hasStateIndicator(i, dataset="searchAll") {
-    if (!isString(i) || !isString(dataset)) return false
 
     const find = function(i, d) {
       for (let e of d) {
-        if (e?.id == i || e?.name == i) return true
-        else return false
+        return (e?.id === i || e?.name === i) ? true : false
       }
     }
     let r
@@ -1436,13 +1431,14 @@ export default class TradeXchart extends Tradex_chart {
       for (let d of this.allData) {
         if (find(i, d)) return true
       }
-      return false
+      r = false
     }
     else {
       if (dataset in this.allData) {
-        return find(i, d)
+        r = find(i, d)
       }
     }
+    return r
   }
 
   /**

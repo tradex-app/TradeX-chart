@@ -10,6 +10,10 @@ const composition = ["source-over","source-atop","source-in","source-out","desti
 const _OffscreenCanvas = (typeof OffscreenCanvas !== "undefined") ? true : false
 const contextTypes = ["2d", "webgl", "webgl2d", "webgl2", "webgpu", "bitmaprenderer"]
 
+
+/**
+ * Create a multi-layered canvas (not appended to container element)
+ */
 class Node {
 
   #key = 0
@@ -179,8 +183,9 @@ class Node {
   }
 }
 
+
 /**
- * Create multi-layered canvas
+ * Create multi-layered canvas and appends it to a containter element
  * @class Viewport
  */
 class Viewport extends Node {
@@ -414,6 +419,10 @@ class Layer {
   }
 }
 
+
+/**
+ * Creates a canvas
+ */
 class Foundation {
 
   #id
@@ -511,6 +520,9 @@ class Foundation {
   }
 }
 
+/**
+ * Extends canvas functionality
+ */
 class Scene extends Foundation {
 
   /**
@@ -593,6 +605,9 @@ class Scene extends Foundation {
   }
 }
 
+/**
+ * Provides canvas hit detection
+ */
 class Hit extends Foundation {
 
   /**
