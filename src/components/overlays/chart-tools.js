@@ -91,7 +91,7 @@ export default class ChartToolsHost extends Overlay {
    * @param {object} cfg 
    * @returns 
    */
-  add(tool, cfg={}) {
+  _add(tool, cfg={}) {
 
     if (!isClass(tool.class) || !tool.class.isTool ) return undefined
 
@@ -118,7 +118,29 @@ export default class ChartToolsHost extends Overlay {
     return instance
   }
 
-  
+
+  /**
+   * add Tool to Chart Pane
+   * @param {object} tool - class
+   * @param {object} [cfg={}] - configuration
+   * @returns 
+   */
+  add(tool, cfg={}) {
+
+    if (!isClass(tool.class) || !tool.class.isTool ) return undefined
+
+    let cnt = ++ChartToolsHost.#cnt
+    tool.chart = this.chart
+    tool.parent = this
+    tool.params = (isObject(tool.params)) ?
+      {...tool.params, ...cfg} :
+      cfg
+    let key = cfg?.id || tool?.params.id || `${tool.class.constructor.name}-${cnt}`
+
+    this.#graph.addOverlay(key, tool)
+  }
+
+
 
   remove(tool) {
     if (tool instanceof ChartTool) {

@@ -85,11 +85,11 @@ export default class Overlays {
   }
 
   /**
-   * Add overlay to 
+   * instantiate overlay
    *
-   * @param {*} key
-   * @param {*} overlay
-   * @return {*} 
+   * @param {string} key
+   * @param {object} overlay
+   * @return {object} 
    * @memberof Overlays
    */
   addOverlay(key, overlay) {
@@ -97,6 +97,9 @@ export default class Overlays {
 
     // try / catch in case user defined custom overlays (indicator) errors
     try {
+      if (!overlay.class.isOverlay) 
+        throw new Error(`${overlay} is not an Overlay or a derivative`)
+
       this.parent.viewport.addLayer(layer)
       overlay.layer = layer
       overlay.instance = new overlay.class(
@@ -104,7 +107,7 @@ export default class Overlays {
         this.#parent.Timeline,
         this.#parent.Scale,
         this.#core.theme,
-        this,
+        overlay?.parent || this,
         overlay?.params
       )
       if (!isString(overlay.instance?.id)) 
@@ -119,7 +122,7 @@ export default class Overlays {
       overlay.instance = undefined
       this.#list.delete(key)
       // report error
-      this.#core.error(`ERROR: Cannot instantiate ${key} overlay / indicator : It will not be added to the chart.`)
+      this.#core.error(`ERROR: Cannot instantiate ${key} overlay / indicator / tool : It will not be added to the chart.`)
       this.#core.error(e)
       return false
     }

@@ -28,9 +28,8 @@ export default class Line extends ChartTool {
   #lineWidth = LINECONFIG.width
   #stateMachine
 
-  constructor(cfg) {
+  constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
-    const { target, xAxis=false, yAxis=false, theme, parent, params } = cfg
     super(target, xAxis, yAxis, theme, parent, params)
     this.validateSettings(params?.settings)
     // State.importData("tradesPositions", this.data, this.state, this.state.time.timeFrame)
