@@ -264,6 +264,8 @@ export default class Graph {
   }
 
   render() {
+    if (this.overlays.list.has("tools"))
+      this.overlays.list.get("tools").instance.render()
     this.#viewport.render()
   }
 

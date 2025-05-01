@@ -9,7 +9,7 @@ import { HIT_DEBOUNCE } from '../definitions/core';
 import Colour from '../utils/colour';
 
 const LINECONFIG = {
-  colour: "#0088FF",
+  colour: "#ffffff",
   width: 1.5
 }
 

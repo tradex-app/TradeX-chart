@@ -172,6 +172,25 @@ export default class ChartToolsHost extends Overlay {
 
   render() {
     this.graph.render();
+
+    const scene = this.scene
+    scene.clear()
+    const ctx = this.scene.context
+
+    ctx.save();
+
+    ctx.scale(1,1)
+    ctx.drawImage(
+      this.graph.viewport.scene.canvas,
+      0,
+      0,
+      this.graph.viewport.width,
+      this.graph.viewport.height
+    );
+
+    ctx.restore()
+
+    this.target.viewport.render()
   }
 
   draw(range=this.range, update=false) {
