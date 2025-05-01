@@ -43,7 +43,7 @@ export default class ChartToolsHost extends Overlay {
   #name = "Chart Tool Host"
   #shortName = "TX_ChartToolsHost"
   #type = "tool"
-  #tools= {}
+  #chart
   #graph
 
 
@@ -65,6 +65,8 @@ export default class ChartToolsHost extends Overlay {
 
     this.settings = params?.settings || {}
 
+    this.#chart = params.chart
+
     this.#graph = new Graph(this, parent.parent.elViewport, [], true)
 
     toolsDialogue.parent = this
@@ -78,45 +80,46 @@ export default class ChartToolsHost extends Overlay {
   get inCnt() { return this.#inCnt }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
+  get chart() { return this.#chart }
   get graph() { return this.#graph }
   get elCanvas() { return this.graph.viewport.scene.canvas }
-  get tools() { return this.#tools}
+  get tools() { return this.overlays}
   get renderLoop() { return renderLoop }
   get overlays() { return Object.fromEntries([...this.graph.overlays.list]) }
 
 
-  /**
-   * add Tool to Chart Pane
-   * @param {object} tool - class
-   * @param {object} cfg 
-   * @returns 
-   */
-  _add(tool, cfg={}) {
+  // /**
+  //  * add Tool to Chart Pane
+  //  * @param {object} tool - class
+  //  * @param {object} cfg 
+  //  * @returns 
+  //  */
+  // _add(tool, cfg={}) {
 
-    if (!isClass(tool.class) || !tool.class.isTool ) return undefined
+  //   if (!isClass(tool.class) || !tool.class.isTool ) return undefined
 
-    const cnt = ++ChartToolsHost.#cnt
-    const {width, height, contextType, offscreen} = this.scene
-    const params = { x: 0, y: 0, width, height, contextType, offscreen }
-    const layer = new CEL.Layer(cfg)
-    cfg.target = this.target.viewport.addLayer(layer)
-    cfg.xAxis = false
-    cfg.xAxis = false
-    cfg.yAxis = false
-    cfg.theme = {}
-    cfg.parent = this.parent
-    cfg.params = params
-    // params.params = {
-    //   // cnt: cnt,
-    //   // modID: `${params.name}_${cnt}`,
-    //   toolID: params.modID
-    // }
+  //   const cnt = ++ChartToolsHost.#cnt
+  //   const {width, height, contextType, offscreen} = this.scene
+  //   const params = { x: 0, y: 0, width, height, contextType, offscreen }
+  //   const layer = new CEL.Layer(cfg)
+  //   cfg.target = this.target.viewport.addLayer(layer)
+  //   cfg.xAxis = false
+  //   cfg.xAxis = false
+  //   cfg.yAxis = false
+  //   cfg.theme = {}
+  //   cfg.parent = this.parent
+  //   cfg.params = params
+  //   // params.params = {
+  //   //   // cnt: cnt,
+  //   //   // modID: `${params.name}_${cnt}`,
+  //   //   toolID: params.modID
+  //   // }
 
-    const instance = new tool.class(cfg)
-    this.#tools[instance.id] = instance
+  //   const instance = new tool.class(cfg)
+  //   this.#tools[instance.id] = instance
 
-    return instance
-  }
+  //   return instance
+  // }
 
 
   /**
@@ -130,28 +133,28 @@ export default class ChartToolsHost extends Overlay {
     if (!isClass(tool.class) || !tool.class.isTool ) return undefined
 
     let cnt = ++ChartToolsHost.#cnt
-    tool.chart = this.chart
     tool.parent = this
     tool.params = (isObject(tool.params)) ?
       {...tool.params, ...cfg} :
       cfg
+    tool.params.chartPane = this.#chart
     let key = cfg?.id || tool?.params.id || `${tool.class.constructor.name}-${cnt}`
 
-    this.#graph.addOverlay(key, tool)
+    return this.#graph.addOverlay(key, tool)
   }
 
 
 
   remove(tool) {
     if (tool instanceof ChartTool) {
-      delete this.#tools[tool.id]
+      delete this.tools[tool.id]
       return true
     }
     return false
   }
 
   getAll () { 
-    return Object.values(this.#tools) 
+    return Object.values(this.tools) 
   }
 
   getByID (ID) {
@@ -231,7 +234,7 @@ export class ChartTool extends Overlay {
   get chartPane() { return this.#chartPane }
 
   eventsListen() {
-    const chart = this.chart
+    const chart = this.chartPane
     chart.on(`${chart.id}_pointermove`, this.onPointerMove, this)
     chart.on(`${chart.id}_pointerdown`, this.onPointerDown, this)
     chart.on(`${chart.id}_pointerup`, this.onPointerUp, this)

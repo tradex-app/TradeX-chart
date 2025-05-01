@@ -23,6 +23,7 @@ export default class Graph {
   #config
   #theme
   #parent
+  #chartPane
   #viewport
   #overlays
 
@@ -47,6 +48,7 @@ export default class Graph {
     this.#core = parent.core
     this.#config = this.core.config
     this.#theme = this.core.theme
+    this.#chartPane = this.getChartPane()
     this.#elParent = this.#parent.element
     this.#elViewport = elViewport
     
@@ -55,6 +57,7 @@ export default class Graph {
   }
 
   get parent() { return this.#parent }
+  get chart() { return (this.#chartPane) }
   get core() { return this.#core }
   get config() { return this.#config }
   get width() { return this.#elParent.width }
@@ -99,6 +102,20 @@ export default class Graph {
     // must redraw because resizing canvas clears it
     this.draw()
     this.render()
+  }
+
+  getChartPane() {
+    let chartPane = this.parent
+
+    while (!!chartPane) {
+      if (chartPane?.type !== "primaryPane" && chartPane?.type !== "secondaryPane")
+        chartPane = chartPane?.parent
+      else 
+        break
+      if (chartPane === undefined)
+        break
+    }
+    return chartPane
   }
 
   /**

@@ -2,7 +2,7 @@
 // A base class for overlays components to extend upon
 
 
-import { isString } from "../utils/typeChecks"
+import { isObject, isString } from "../utils/typeChecks"
 import { xMap } from "../utils/utilities"
 import CEL from "./primitives/canvas"
 
@@ -12,6 +12,7 @@ export default class Overlays {
   #core
   #config
   #parent
+  #chart
 
   #list
 
@@ -20,11 +21,13 @@ export default class Overlays {
   constructor (parent, list=[]) {
 
     this.#parent = parent
+    this.#chart = parent.chart
     this.#core = parent.core
     this.#list = new xMap([...list])
 
     // iterate over List, create and add overlays
     for (const [key, overlay] of this.#list) {
+      overlay.chart = this.#chart
       this.addOverlay(key, overlay)
     }
 
@@ -99,6 +102,11 @@ export default class Overlays {
     try {
       if (!overlay.class.isOverlay) 
         throw new Error(`${overlay} is not an Overlay or a derivative`)
+
+      if (isObject(overlay?.params)) 
+        overlay.params.chart = this.#chart
+      else
+        overlay.params = { chart: this.#chart }
 
       this.parent.viewport.addLayer(layer)
       overlay.layer = layer
