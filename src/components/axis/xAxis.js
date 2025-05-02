@@ -15,6 +15,7 @@ import {
   TIMESCALES, TIMESCALESRANK,
   MINUTE_MS, HOUR_MS, DAY_MS, get_dayName,
  } from "../../utils/time";
+import CEL from "../primitives/canvas";
 
 export default class xAxis extends Axis {
 
@@ -38,7 +39,7 @@ export default class xAxis extends Axis {
   get indexEnd() { return this.range.indexEnd }
   get timeMax() { return this.range.timeMax }
   get timeMin() { return this.range.timeMin }
-  get candleW() { return this.width / this.range.Length }
+  get candleW() { return (this.width / this.range.Length) }
   get candlesOnLayer() { return bRound(this.core.Chart.layerWidth / this.candleW )}
   get xAxisRatio() { return this.width / this.range.rangeDuration }
   set xAxisTicks(t) { this.#xAxisTicks = isNumber(t) ? t : 0 }

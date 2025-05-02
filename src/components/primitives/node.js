@@ -79,10 +79,10 @@ export default class ToolNode {
     this.y = y
     this.#chart = chart
     this.#layer = layer
-    this.#scene = this.layer.scene
-    this.#hit = this.layer.hit
-    this.#ctx = this.layer.scene.canvas.context
-    this.#ctxH = this.layer.hit.canvas
+    this.#scene = layer.scene
+    this.#hit = layer.hit
+    this.#ctx = layer.scene.context
+    this.#ctxH = layer.hit.context
     this.#hitV = this.#inCnt
 
     const themed = (isObject(theme)) ? doStructuredClone(theme) : defaultTheme
@@ -103,6 +103,7 @@ export default class ToolNode {
   get isHover() { return this.#state === NodeState.hover }
   get isPassive() { return this.#state === NodeState.passive }
   get isConstrained() { return this.isNodeConstrained() }
+  get core() { return this.#chart.core }
   get chart() { return this.#chart }
   get layer() { return this.#layer }
   get scene() { return this.#scene }
@@ -123,10 +124,11 @@ export default class ToolNode {
   }
 
   eventsListen() {
-    const chart = this.#chart
-    chart.on(`${chart.id}_pointermove`, this.onPointerMove, this)
-    chart.on(`${chart.id}_pointerdown`, this.onPointerDown, this)
-    chart.on(`${chart.id}_pointerup`, this.onPointerUp, this)
+    let core = this.core
+    let chart = this.#chart
+    core.on(`${chart.id}_pointerMove`, this.onPointerMove, this)
+    core.on(`${chart.id}_pointerDown`, this.onPointerDown, this)
+    core.on(`${chart.id}_pointerUp`, this.onPointerUp, this)
   }
 
   onPointerMove(pos) {

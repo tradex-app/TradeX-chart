@@ -43,8 +43,11 @@ export default class ChartToolsHost extends Overlay {
   #name = "Chart Tool Host"
   #shortName = "TX_ChartToolsHost"
   #type = "tool"
-  #chart
+  #chartPane
   #graph
+  #pointer = {
+    click: [0, 0]
+  }
 
 
   /**
@@ -65,7 +68,7 @@ export default class ChartToolsHost extends Overlay {
 
     this.settings = params?.settings || {}
 
-    this.#chart = params.chart
+    this.#chartPane = params.chart
 
     this.#graph = new Graph(this, parent.parent.elViewport, [], true)
 
@@ -80,7 +83,7 @@ export default class ChartToolsHost extends Overlay {
   get inCnt() { return this.#inCnt }
   get name() {return this.#name}
   get shortName() { return this.#shortName }
-  get chart() { return this.#chart }
+  get chartPane() { return this.#chartPane }
   get graph() { return this.#graph }
   get elCanvas() { return this.graph.viewport.scene.canvas }
   get tools() { return this.overlays}
@@ -137,7 +140,7 @@ export default class ChartToolsHost extends Overlay {
     tool.params = (isObject(tool.params)) ?
       {...tool.params, ...cfg} :
       cfg
-    tool.params.chartPane = this.#chart
+    tool.params.chartPane = this.#chartPane
     let key = cfg?.id || tool?.params.id || `${tool.class.constructor.name}-${cnt}`
 
     return this.#graph.addOverlay(key, tool)
@@ -167,8 +170,20 @@ export default class ChartToolsHost extends Overlay {
   }
 
   eventsListen() {
-    // this.on("chart_started", this.)
+    const core = this.core
+    const chart = this.chartPane
+    core.on(`${chart.id}_pointerMove`, this.onPointerMove, this)
+    core.on(`${chart.id}_pointerDown`, this.onPointerDown, this)
+    core.on(`${chart.id}_pointerUp`, this.onPointerUp, this)
   }
+
+  onPointerDown(e) {
+    console.log(`ChartToolsHost`, e)
+
+    this.#pointer.click = e
+    this.draw()
+  }
+
 
   render() {
     this.graph.render();
@@ -187,6 +202,8 @@ export default class ChartToolsHost extends Overlay {
       this.graph.viewport.width,
       this.graph.viewport.height
     );
+    let node = new ToolNode(undefined, this.#pointer.click[0], this.#pointer.click[1], this.scene.layer, this.chart)
+    node.draw()
 
     ctx.restore()
 
@@ -254,20 +271,22 @@ export class ChartTool extends Overlay {
 
   eventsListen() {
     const chart = this.chartPane
-    chart.on(`${chart.id}_pointermove`, this.onPointerMove, this)
-    chart.on(`${chart.id}_pointerdown`, this.onPointerDown, this)
-    chart.on(`${chart.id}_pointerup`, this.onPointerUp, this)
+    chart.on(`${chart.id}_pointerMove`, this.onPointerMove, this)
+    chart.on(`${chart.id}_pointerDown`, this.onPointerDown, this)
+    chart.on(`${chart.id}_pointerUp`, this.onPointerUp, this)
   }
 
   onPointerMove(pos) {
-    if (this.chart.stateMachine.state === "chart_pan") return
+    if (this.chartPane.stateMachine.state === "chart_pan") return
     
     
   }
 
   onPointerDown(pos) {
-    if (this.chart.stateMachine.state === "chart_pan") return
+    if (this.chartPane.stateMachine.state === "chart_pan") return
       debounce(this.isToolSelected, HIT_DEBOUNCE, this)(pos)
+
+    this.#cursorPos = pos
   }
 
   onPointerUp(pos) {
@@ -300,13 +319,16 @@ export class ChartTool extends Overlay {
 
     this.hit.clear()
     this.scene.clear()
+    const ctx = this.scene.context
 
+    ctx.save();
 
     let d = this.theme.tools
     let o = this.core.rangeScrollOffset;
     let c = range.indexStart - o
     let i = range.Length + (o * 2)
 
+    ctx.restore()
     
     super.updated()
   }

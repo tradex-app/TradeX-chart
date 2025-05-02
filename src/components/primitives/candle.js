@@ -10,6 +10,7 @@
 
 import { CandleType, defaultTheme } from "../../definitions/style"
 import { isArray, isString } from "../../utils/typeChecks"
+import CEL from "./canvas"
 
 export default class Candle {
   areaCoordinates = []
@@ -213,17 +214,16 @@ export default class Candle {
  * @param {number} gapPercentage - gap percentage
  * @return {number}  
  */
-export function candleW(w, dpr = 1) { 
+export function candleW(w, dpr = CEL.pixelRatio, gapPercentage=0.1) { 
   // Base width calculations
   if (w < 3) w = 1
   else if (w < 10) w = 3 * dpr
   else if (w >= 10) w = Math.ceil(w * 0.8) // define the candle width here
   
-  const gapPercentage = 0.1 //define the candle gap here
   const gap = Math.floor(w * gapPercentage) 
   
   // Apply DPI scaling
-  const scaledWidth = Math.round((w - gap) * dpr)
+  const scaledWidth = Math.round( (w - gap) )
   
   return scaledWidth
 }

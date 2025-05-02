@@ -124,7 +124,7 @@ export default class ScaleBar extends Component {
 
   destroy(all=true) {
     this.core.hub.expunge(this)
-    this.off(`${this.parent.id}_pointerout`, this.#layerCursor.erase, this.#layerCursor)
+    this.off(`${this.parent.id}_pointerOut`, this.#layerCursor.erase, this.#layerCursor)
     this.off(STREAM_UPDATE, this.onStreamUpdate, this.#layerPriceLine)
 
     this.graph.destroy()
@@ -146,8 +146,8 @@ export default class ScaleBar extends Component {
     this.#input.on("wheel", this.onMouseWheel.bind(this))
     this.#input.on("dblclick", this.resetScaleRange.bind(this))
 
-    this.on(`${this.parent.id}_pointermove`, this.onMouseMove, this)
-    this.on(`${this.parent.id}_pointerout`, this.#layerCursor.erase, this.#layerCursor)
+    this.on(`${this.parent.id}_pointerMove`, this.onMouseMove, this)
+    this.on(`${this.parent.id}_pointerOut`, this.#layerCursor.erase, this.#layerCursor)
     this.on(STREAM_UPDATE, this.onStreamUpdate, this)
     this.on(`range_set`, this.draw, this)
   }

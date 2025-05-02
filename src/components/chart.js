@@ -374,7 +374,6 @@ export default class Chart extends Component{
     this.#input.on("pointerup", this.onPointerUp.bind(this));
 
     // listen/subscribe/watch for parent notifications
-    this.on("main_mouseMove", this.updateLegends, this);
     this.on(STREAM_LISTENING, this.onStreamListening, this);
     this.on(STREAM_NEWVALUE, this.onStreamNewValue, this);
     this.on(STREAM_UPDATE, this.onStreamUpdate, this);
@@ -404,7 +403,7 @@ export default class Chart extends Component{
     this.graph.overlays.list.get("cursor").layer.visible = true
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)]
     this.#Scale.onMouseMove(this.#cursorPos)
-    this.emit(`${this.id}_pointermove`, this.#cursorPos)
+    this.emit(`${this.id}_pointerMove`, this.#cursorPos)
   }
 
   onPointerEnter(e) {
@@ -413,14 +412,14 @@ export default class Chart extends Component{
     this.core.MainPane.onMouseEnter()
     this.scale.layerCursor.visible = true
     this.graph.overlays.list.get("cursor").layer.visible = true
-    this.emit(`${this.id}_pointerenter`, this.#cursorPos);
+    this.emit(`${this.id}_pointerEnter`, this.#cursorPos);
   }
 
   onPointerOut(e) {
     this.#cursorActive = false;
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.scale.layerCursor.visible = false
-    this.emit(`${this.id}_pointerout`, this.#cursorPos);
+    this.emit(`${this.id}_pointerOut`, this.#cursorPos);
   }
 
   onPointerDown(e) {
@@ -431,6 +430,11 @@ export default class Chart extends Component{
       this.emit("tool_targetSelected", { target: this, position: e });
     else if (this.isPrimary)
       this.emit("chart_primaryPointerDown", this.#cursorClick)
+    else if (!this.isPrimary)
+      this.emit("chart_secondaryPointerDown", this.#cursorClick)
+
+    this.emit("chart_pointerDown", {charPane: this, pos: this.#cursorClick})
+    this.emit(`${this.id}_pointerDown`, this.#cursorPos);
   }
 
   onPointerUp(e) {

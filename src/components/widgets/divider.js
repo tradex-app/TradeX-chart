@@ -141,7 +141,7 @@ export default class Divider {
   onPointerDrag(e) {
     this.#cursorPos = this.#core.MainPane.cursorPos // [e.position.x, e.position.y]
     this.#elDivider.style.background = this.#theme.divider.active
-    this.emit(`${this.id}_pointerdrag`, this.#cursorPos)
+    this.emit(`${this.id}_pointerDrag`, this.#cursorPos)
     this.emit(`divider_pointerDrag`, {
       id: this.id,
       e: e,
@@ -155,7 +155,7 @@ export default class Divider {
     
     this.#elDivider.style.background = this.#theme.divider.idle
     this.#cursorPos = this.#core.MainPane.cursorPos // [e.position.x, e.position.y]
-    this.emit(`${this.id}_pointerdragend`, this.#cursorPos)
+    this.emit(`${this.id}_pointerDragend`, this.#cursorPos)
     this.emit("divider_pointerDragEnd", {
       id: this.id,
       e: e,

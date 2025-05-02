@@ -58,7 +58,9 @@ The following list of events is not exhaustive as the chart is still under heavy
 * chart_paneAdd
 * chart_paneDestroy
 * chart_paneRefresh
+* chart_pointerDown
 * chart_primaryPointerDown
+* chart_secondaryPointerDown
 * chart_render
 * chart_rowsResize
 * chart_secondaryAdd

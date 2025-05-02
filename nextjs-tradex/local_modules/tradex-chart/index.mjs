@@ -4122,7 +4122,7 @@ class Divider {
   onPointerDrag(e) {
     this.#cursorPos = this.#core.MainPane.cursorPos;
     this.#elDivider.style.background = this.#theme.divider.active;
-    this.emit(`${this.id}_pointerdrag`, this.#cursorPos);
+    this.emit(`${this.id}_pointerDrag`, this.#cursorPos);
     this.emit(`divider_pointerDrag`, {
       id: this.id,
       e: e,
@@ -4134,7 +4134,7 @@ class Divider {
   onPointerDragEnd(e) {
     this.#elDivider.style.background = this.#theme.divider.idle;
     this.#cursorPos = this.#core.MainPane.cursorPos;
-    this.emit(`${this.id}_pointerdragend`, this.#cursorPos);
+    this.emit(`${this.id}_pointerDragend`, this.#cursorPos);
     this.emit('divider_pointerDragEnd', {
       id: this.id,
       e: e,
@@ -19387,7 +19387,7 @@ class ScaleBar extends Component {
   destroy(all = true) {
     this.core.hub.expunge(this);
     this.off(
-      `${this.parent.id}_pointerout`,
+      `${this.parent.id}_pointerOut`,
       this.#layerCursor.erase,
       this.#layerCursor
     );
@@ -19407,9 +19407,9 @@ class ScaleBar extends Component {
     this.#input.on('pointerdragend', this.onDragDone.bind(this));
     this.#input.on('wheel', this.onMouseWheel.bind(this));
     this.#input.on('dblclick', this.resetScaleRange.bind(this));
-    this.on(`${this.parent.id}_pointermove`, this.onMouseMove, this);
+    this.on(`${this.parent.id}_pointerMove`, this.onMouseMove, this);
     this.on(
-      `${this.parent.id}_pointerout`,
+      `${this.parent.id}_pointerOut`,
       this.#layerCursor.erase,
       this.#layerCursor
     );
@@ -20433,9 +20433,9 @@ class chartTools extends Overlay {
   }
   eventsListen() {
     const chart = this.chart;
-    chart.on(`${chart.id}_pointermove`, this.onPointerMove, this);
-    chart.on(`${chart.id}_pointerdown`, this.onPointerDown, this);
-    chart.on(`${chart.id}_pointerup`, this.onPointerUp, this);
+    chart.on(`${chart.id}_pointerMove`, this.onPointerMove, this);
+    chart.on(`${chart.id}_pointerDown`, this.onPointerDown, this);
+    chart.on(`${chart.id}_pointerUp`, this.onPointerUp, this);
   }
   onPointerMove(pos) {
     if (this.chart.stateMachine.state === 'chart_pan') return;
@@ -20870,7 +20870,7 @@ class Chart extends Component {
     this.graph.overlays.list.get('cursor').layer.visible = true;
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.#Scale.onMouseMove(this.#cursorPos);
-    this.emit(`${this.id}_pointermove`, this.#cursorPos);
+    this.emit(`${this.id}_pointerMove`, this.#cursorPos);
   }
   onPointerEnter(e) {
     this.core.MainPane.onPointerActive(this);
@@ -20878,13 +20878,13 @@ class Chart extends Component {
     this.core.MainPane.onMouseEnter();
     this.scale.layerCursor.visible = true;
     this.graph.overlays.list.get('cursor').layer.visible = true;
-    this.emit(`${this.id}_pointerenter`, this.#cursorPos);
+    this.emit(`${this.id}_pointerEnter`, this.#cursorPos);
   }
   onPointerOut(e) {
     this.#cursorActive = false;
     this.#cursorPos = [Math.round(e.position.x), Math.round(e.position.y)];
     this.scale.layerCursor.visible = false;
-    this.emit(`${this.id}_pointerout`, this.#cursorPos);
+    this.emit(`${this.id}_pointerOut`, this.#cursorPos);
   }
   onPointerDown(e) {
     this.core.pointerButtons[e.domEvent.srcEvent.button] = true;

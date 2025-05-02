@@ -3651,7 +3651,7 @@ class XA {
     this.#a.style.background = this.#i.divider.idle, this.#e.MainPane.onMouseEnter();
   }
   onPointerDrag(A) {
-    this.#I = this.#e.MainPane.cursorPos, this.#a.style.background = this.#i.divider.active, this.emit(`${this.id}_pointerdrag`, this.#I), this.emit("divider_pointerDrag", {
+    this.#I = this.#e.MainPane.cursorPos, this.#a.style.background = this.#i.divider.active, this.emit(`${this.id}_pointerDrag`, this.#I), this.emit("divider_pointerDrag", {
       id: this.id,
       e: A,
       pos: this.#I,
@@ -3659,7 +3659,7 @@ class XA {
     }), this.chartPane.resize();
   }
   onPointerDragEnd(A) {
-    this.#a.style.background = this.#i.divider.idle, this.#I = this.#e.MainPane.cursorPos, this.emit(`${this.id}_pointerdragend`, this.#I), this.emit("divider_pointerDragEnd", {
+    this.#a.style.background = this.#i.divider.idle, this.#I = this.#e.MainPane.cursorPos, this.emit(`${this.id}_pointerDragend`, this.#I), this.emit("divider_pointerDragEnd", {
       id: this.id,
       e: A,
       pos: this.#I,
@@ -17496,11 +17496,11 @@ class Hf extends Qt {
     s.id = this.id, s.context = this, this.stateMachine = s, this.stateMachine.start();
   }
   destroy(A = !0) {
-    this.core.hub.expunge(this), this.off(`${this.parent.id}_pointerout`, this.#g.erase, this.#g), this.off(Se, this.onStreamUpdate, this.#r), this.graph.destroy(), this.#c.destroy(), A && (this.stateMachine.destroy(), this.element.remove());
+    this.core.hub.expunge(this), this.off(`${this.parent.id}_pointerOut`, this.#g.erase, this.#g), this.off(Se, this.onStreamUpdate, this.#r), this.graph.destroy(), this.#c.destroy(), A && (this.stateMachine.destroy(), this.element.remove());
   }
   eventsListen() {
     let A = this.graph.viewport.scene.canvas;
-    this.#c = new Re(A, { disableContextMenu: !1 }), this.#c.setCursor("ns-resize"), this.#c.on("pointerdrag", this.onDrag.bind(this)), this.#c.on("pointerdragend", this.onDragDone.bind(this)), this.#c.on("wheel", this.onMouseWheel.bind(this)), this.#c.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.parent.id}_pointermove`, this.onMouseMove, this), this.on(`${this.parent.id}_pointerout`, this.#g.erase, this.#g), this.on(Se, this.onStreamUpdate, this), this.on("range_set", this.draw, this);
+    this.#c = new Re(A, { disableContextMenu: !1 }), this.#c.setCursor("ns-resize"), this.#c.on("pointerdrag", this.onDrag.bind(this)), this.#c.on("pointerdragend", this.onDragDone.bind(this)), this.#c.on("wheel", this.onMouseWheel.bind(this)), this.#c.on("dblclick", this.resetScaleRange.bind(this)), this.on(`${this.parent.id}_pointerMove`, this.onMouseMove, this), this.on(`${this.parent.id}_pointerOut`, this.#g.erase, this.#g), this.on(Se, this.onStreamUpdate, this), this.on("range_set", this.draw, this);
   }
   onResize(A) {
     this.setDimensions(A);
@@ -18137,7 +18137,7 @@ class ee extends dA {
   }
   eventsListen() {
     const A = this.chart;
-    A.on(`${A.id}_pointermove`, this.onPointerMove, this), A.on(`${A.id}_pointerdown`, this.onPointerDown, this), A.on(`${A.id}_pointerup`, this.onPointerUp, this);
+    A.on(`${A.id}_pointerMove`, this.onPointerMove, this), A.on(`${A.id}_pointerDown`, this.onPointerDown, this), A.on(`${A.id}_pointerUp`, this.onPointerUp, this);
   }
   onPointerMove(A) {
     this.chart.stateMachine.state;
@@ -18455,13 +18455,13 @@ class Fe extends Qt {
     this.core.MainPane.onChartDragDone(A), this.cursor = "crosshair";
   }
   onPointerMove(A) {
-    this.core.MainPane.onPointerActive(this), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.#p = [Math.round(A.position.x), Math.round(A.position.y)], this.#C.onMouseMove(this.#p), this.emit(`${this.id}_pointermove`, this.#p);
+    this.core.MainPane.onPointerActive(this), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.#p = [Math.round(A.position.x), Math.round(A.position.y)], this.#C.onMouseMove(this.#p), this.emit(`${this.id}_pointerMove`, this.#p);
   }
   onPointerEnter(A) {
-    this.core.MainPane.onPointerActive(this), this.#p = [Math.round(A.position.x), Math.round(A.position.y)], this.core.MainPane.onMouseEnter(), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.emit(`${this.id}_pointerenter`, this.#p);
+    this.core.MainPane.onPointerActive(this), this.#p = [Math.round(A.position.x), Math.round(A.position.y)], this.core.MainPane.onMouseEnter(), this.scale.layerCursor.visible = !0, this.graph.overlays.list.get("cursor").layer.visible = !0, this.emit(`${this.id}_pointerEnter`, this.#p);
   }
   onPointerOut(A) {
-    this.#f = !1, this.#p = [Math.round(A.position.x), Math.round(A.position.y)], this.scale.layerCursor.visible = !1, this.emit(`${this.id}_pointerout`, this.#p);
+    this.#f = !1, this.#p = [Math.round(A.position.x), Math.round(A.position.y)], this.scale.layerCursor.visible = !1, this.emit(`${this.id}_pointerOut`, this.#p);
   }
   onPointerDown(A) {
     this.core.pointerButtons[A.domEvent.srcEvent.button] = !0, this.#m = [Math.floor(A.position.x), Math.floor(A.position.y), A], this.stateMachine.state === "tool_activated" ? this.emit("tool_targetSelected", { target: this, position: A }) : this.isPrimary && this.emit("chart_primaryPointerDown", this.#m);

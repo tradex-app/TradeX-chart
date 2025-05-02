@@ -28,7 +28,7 @@ class Node {
    */
   constructor(cfg={}) {
 
-    if (!isHTMLElement(cfg?.container)) throw new Error("Viewport container is not a valid HTML element.")
+    if (!cfg?.offscreen && !isHTMLElement(cfg?.container)) throw new Error("Viewport container is not a valid HTML element.")
 
     this.#container = cfg.container;
     this.#layers = [];
@@ -156,6 +156,8 @@ class Node {
         layer;
 
     scene.clear();
+    let ctx = scene.context
+        ctx.save();
 
     for (layer of layers) {
 
@@ -165,7 +167,6 @@ class Node {
           layer.render(all)
 
       if (layer.visible && layer.width > 0 && layer.height > 0) {
-        const ctx = scene.context
 
         if (composition.includes(layer?.composition))
         ctx.globalCompositeOperation = layer.composition
@@ -180,6 +181,7 @@ class Node {
         );
       }
     }
+    ctx.restore()
   }
 }
 
@@ -707,7 +709,7 @@ class Hit extends Foundation {
 }
 function clear(that) {
   let context = that.context;
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = windowDevicePixelRatio()
 
   if (that.contextType === "2d") {
     // Save the current transform
@@ -724,6 +726,11 @@ function clear(that) {
   }
   return that;
 }
+
+function windowDevicePixelRatio() {
+  return (window && window.devicePixelRatio) || 1;
+}
+
 function sizeSanitize(width, height) {
   if (width < 0) width = 0
   if (height < 0) height = 0
@@ -732,32 +739,25 @@ function sizeSanitize(width, height) {
 
 function setSize(width, height, that) {
   let {width: w, height: h} = sizeSanitize(width, height)
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = windowDevicePixelRatio()
 
   that.width = w;
   that.height = h;
+
+  // Set the buffer size (actual pixels)
+  that.canvas.width = Math.round(w * dpr);
+  that.canvas.height = Math.round(h * dpr);
+  
+  // Scale all drawing operations by the dpr
+  if (that.contextType === "2d") {
+    // that.context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    that.context.scale(dpr, dpr)
+  }
 
   if (!that.offscreen) {
     // Set the display size (css pixels)
     that.canvas.style.width = `${w}px`;
     that.canvas.style.height = `${h}px`;
-    
-    // Set the buffer size (actual pixels)
-    that.canvas.width = Math.round(w * dpr);
-    that.canvas.height = Math.round(h * dpr);
-    
-    // Scale all drawing operations by the dpr
-    if (that.contextType === "2d") {
-      that.context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-  } else {
-    // For offscreen canvas, we still need to handle high DPI
-    that.canvas.width = Math.round(w * dpr);
-    that.canvas.height = Math.round(h * dpr);
-    
-    if (that.contextType === "2d") {
-      that.context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
   }
 
   if (that.contextType !== "2d" &&
@@ -772,7 +772,7 @@ function setSize(width, height, that) {
 const CEL = {
   idCnt: 0,
   viewports: [],
-  pixelRatio: (window && window.devicePixelRatio) || 1,
+  get pixelRatio() { return windowDevicePixelRatio() },
 
   Node,
   Viewport,
