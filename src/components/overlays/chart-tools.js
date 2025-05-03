@@ -178,8 +178,6 @@ export default class ChartToolsHost extends Overlay {
   }
 
   onPointerDown(e) {
-    console.log(`ChartToolsHost`, e)
-
     this.#pointer.click = e
     this.draw()
   }
@@ -202,8 +200,8 @@ export default class ChartToolsHost extends Overlay {
       this.graph.viewport.width,
       this.graph.viewport.height
     );
-    let node = new ToolNode(undefined, this.#pointer.click[0], this.#pointer.click[1], this.scene.layer, this.chart)
-    node.draw()
+    // let node = new ToolNode(undefined, this.#pointer.click[0], this.#pointer.click[1], this.scene.layer, this.chart)
+    // node.draw()
 
     ctx.restore()
 

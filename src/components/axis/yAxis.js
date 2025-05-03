@@ -9,6 +9,7 @@ import {
 } from "../../definitions/chart";
 import { YAxisFontSizeFactor } from "../../definitions/style";
 import { doStructuredClone } from "../../utils/utilities";
+import CEL from "../primitives/canvas";
 
 const p100Padding = 1.2
 
@@ -451,8 +452,10 @@ export default class yAxis extends Axis {
 
     // try to find a nice number to round to
     let niceNumber = Math.pow( 10 , Math.ceil( Math.log10( yGridSize ) ) );
+
     if ( yGridSize < 0.25 * niceNumber ) niceNumber = 0.25 * niceNumber;
-    else if ( yGridSize < 0.5 * niceNumber ) niceNumber = 0.5 * niceNumber;
+    else 
+    if ( yGridSize < 0.5 * niceNumber ) niceNumber = 0.5 * niceNumber;
 
     return niceNumber
   }
