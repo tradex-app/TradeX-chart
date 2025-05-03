@@ -20,7 +20,7 @@ export default class Candle {
     this.ctx = this.scene.context
     this.width = this.scene.width
     this.cfg = theme
-    this.dpr = window.devicePixelRatio || 1
+    this.dpr = CEL.pixelRatio
   }
 
   alignToPixel(value) {

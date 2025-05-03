@@ -2,6 +2,7 @@
 // draws a single volume bar
 
 import { defaultTheme } from "../../definitions/style"
+import CEL from "./canvas"
 
 export default class VolumeBar {
 
@@ -11,7 +12,7 @@ export default class VolumeBar {
     this.width = this.scene.width
     this.theme = theme
     // this.cfg = ("volume" in theme) ? theme.volume : theme
-    this.dpr = window.devicePixelRatio || 1
+    this.dpr = CEL.pixelRatio
   }
 
   alignToPixel(value) {
