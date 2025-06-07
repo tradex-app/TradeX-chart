@@ -26,7 +26,7 @@ export default class NewsEvent {
     this.data = data
     const i = this.icon
     const c = this.cfg
-    const k = this.hit.getIndexValue(data.key)
+    const k = this.hit.getIndexToRGB(data.key)
     const hit = fillMask(k, i)
     const h = limit(data.w, c.iconMinDim, c.iconHeight)
     const w = limit(data.w, c.iconMinDim, c.iconWidth)

@@ -94,7 +94,7 @@ class Thread {
    * @param {*} m - result from worker thread
    * @returns {*} - either pure result or callback modified result. If callback returns nothing, no result is returned in the promise (undefined).
    */
-  onmessage(m) {
+  onMessage(m) {
     this.#idle = true
     return (isFunction(this.#cb)) ? this.#cb(m) : m
   }
@@ -104,7 +104,7 @@ class Thread {
   * @param {Error} e - error from worker thread
   * @returns {*} - either pure error or callback modified error. If callback returns nothing, no error is returned.
   */
-  onerror(e) {
+  onError(e) {
     this.#idle = true
     return (isFunction(this.#err)) ? this.#err(e) : e
   }
@@ -129,20 +129,20 @@ class Thread {
             const { resolve, reject } = this.#reqList[r]
             delete this.#reqList[r]
             if (status) {
-              resolve(this.onmessage(result))
+              resolve(this.onMessage(result))
             }
             else {
-              reject(this.onerror({ r, result }))
+              reject(this.onError({ r, result }))
             }
           }
           else if (status == "resolved")
-            this.onmessage(result)
+            this.onMessage(result)
           else
-            throw new Error("Orphaned thread request ${r}")
+            throw new Error(`Orphaned thread request ${r}`)
         }
 
         this.#worker.onerror = e => {
-          reject(this.onerror(e))
+          reject(this.onError(e))
         }
 
       } catch (error) {

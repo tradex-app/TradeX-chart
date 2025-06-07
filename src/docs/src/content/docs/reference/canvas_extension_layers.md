@@ -104,7 +104,7 @@ layer.scene.context.fillRect(0, 0, 100, 50);
 Draw a rectangle on the hit canvas for hit detection. This is not visible to the end user.
 
 ```javascript
-layer.hit.context.fillStyle = layer.hit.getIndexValue(0);
+layer.hit.context.fillStyle = layer.hit.getIndexToRGB(0);
 layer.hit.context.fillRect(0, 0, 100, 50);
 ```
 
@@ -358,7 +358,7 @@ Clear the hit detection layer.
 hit.clear();
 ```
 
-### getIndexValue()
+### getIndexToRGB()
 
 Get hit value (colour) from index. This value is used as the fill or stroke value for the hit mask which is used for [pointer detection](#getintersection-1).
 
@@ -371,7 +371,7 @@ function drawHitCircle(config) {
   context.save();
   context.beginPath();
   context.arc(config.x, config.y, 60, 0, Math.PI*2, false);
-  context.fillStyle = hit.getIndexValue(config.key);
+  context.fillStyle = hit.getIndexToRGB(config.key);
   context.fill();
   context.restore();
 }

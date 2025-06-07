@@ -3,7 +3,7 @@
 
 import Component from "./component"
 import { YAXIS_MINDIGITS, YAXIS_TYPE } from '../definitions/chart'
-import { isArray, isNumber, isObject } from '../utils/typeChecks'
+import { isArray, isClass, isNumber, isObject, isString } from '../utils/typeChecks'
 import { elementDimPos } from "../utils/DOM"
 import yAxis from "./axis/yAxis"
 import stateMachineConfig from "../state/state-scale"
@@ -29,8 +29,11 @@ const defaultOverlays = [
 
 /**
  * Provides the chart panes scale / yAxis
+ * Manages Y-axis scaling, price formatting, overlays, and user interactions
+ * 
  * @export
  * @class ScaleBar
+ * @extends {Component}
  */
 export default class ScaleBar extends Component {
 
@@ -65,6 +68,25 @@ export default class ScaleBar extends Component {
     this.#chart = this.options.chart
     this.id = `${this.parent.id}_scale`
     this.#elViewport = this.#element.viewport || this.#element
+  }
+
+  destroy(all=true) {
+    this.core.hub.expunge(this)
+    this.off(`${this.parent.id}_pointerOut`, this.#layerCursor.erase, this.#layerCursor)
+    this.off(STREAM_UPDATE, this.onStreamUpdate, this.#layerPriceLine)
+
+    this.graph.destroy()
+    this.#input.destroy()
+
+    if (!!all) {
+      this.stateMachine.destroy()
+      this.element.remove()
+    }
+
+    this.#layerCursor = null
+    this.#layerLabels = null
+    this.#layerOverlays = null
+    this.#layerPriceLine = null
   }
 
   get name() { return this.#name }
@@ -120,20 +142,6 @@ export default class ScaleBar extends Component {
     newConfig.context = this
     this.stateMachine = newConfig
     this.stateMachine.start()
-  }
-
-  destroy(all=true) {
-    this.core.hub.expunge(this)
-    this.off(`${this.parent.id}_pointerOut`, this.#layerCursor.erase, this.#layerCursor)
-    this.off(STREAM_UPDATE, this.onStreamUpdate, this.#layerPriceLine)
-
-    this.graph.destroy()
-    this.#input.destroy()
-
-    if (!!all) {
-      this.stateMachine.destroy()
-      this.element.remove()
-    }
   }
 
   eventsListen() {
@@ -287,11 +295,11 @@ export default class ScaleBar extends Component {
 
   /**
    * convert last stream value to y pixel position relative top left (0,0)
-   * @param {number} y - last stream value 
+   * @param {number} yData - last stream value 
    * @returns {number} - y pixel position
    * @memberof ScaleBar
    */
-  yPosStream(yData) { return this.#yAxis.lastYData2Pixel(y) }
+  yPosStream(yData) { return this.#yAxis.lastYData2Pixel(yData) }
 
   /**
    * convert pixel pos to chart price
@@ -377,14 +385,24 @@ export default class ScaleBar extends Component {
   }
 
   addOverlay(key, overlay) {
-    if (!isObject(overlay)) return false
+    if (!isString(key) || 
+        !isObject(overlay ||
+        !isClass(overlay)
+        )) return null
     if (this.graph === undefined)
       this.#additionalOverlays.push([key, overlay])
     else {
-      let o = this.graph.addOverlay(key, overlay)
-      this.#layerPriceLine.target.moveTop()
-      this.#layerCursor.target.moveTop()
-      return o
+      try {
+        let o = this.graph.addOverlay(key, overlay)
+        this.#layerPriceLine.target.moveTop()
+        this.#layerCursor.target.moveTop()
+        return o
+      } 
+      catch (error) {
+        this.error(`Scale: Error attempting to add overlay ${key}`)
+        this.error(error)
+        return null
+      }
     }
   }
 

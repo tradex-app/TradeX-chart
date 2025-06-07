@@ -11,16 +11,22 @@ const defaults = {
   dash: [1,0]
 }
 
-export default class chartHighLow extends Overlay {
+export default class ChartHighLow extends Overlay {
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
     super(target, xAxis, yAxis, theme, parent, params)
 
     // add the overlay to the Scale (yAxis)
-    const hiLo = {class: scaleHighLow, fixed: true, required: false}
-    if (this.core.config?.highLow === true)
-      this.scaleOverly = this.chart.scale.addOverlay("hiLo", hiLo)
+    const hiLo = {class: ScaleHighLow, fixed: true, required: false}
+    if (this.core.config?.highLow === true) {
+      try {
+        this.scaleOverly = this.chart.scale.addOverlay("hiLo", hiLo)
+      } catch (error) {
+        this.core.error(`Chart overlay ChartHighLow cannot add Scale overly ScaleHighLow`)
+        this.core.error(error)
+      }
+    }
   }
 
   // Overlay position is fixed and won't pan / scroll with the chart
@@ -37,8 +43,9 @@ export default class chartHighLow extends Overlay {
     let r = this.scene.width
     let w = 35
     let opts = {}
-    const hi = Math.max(range.valueHi, range.valueLiveMax)
-    const lo = Math.min(range.valueLo, range.valueLiveMin)
+    let inRange = this.core.stream.inRange
+    const hi = (!inRange) ? range.valueHi : Math.max(range.valueHi, range.valueLiveMax)
+    const lo = (!inRange) ? range.valueLo : Math.min(range.valueLo, range.valueLiveMin)
     const price = range.valueLive
     const theme = {...this.theme.yAxis}
     const ctx = this.scene.context
@@ -77,7 +84,7 @@ export default class chartHighLow extends Overlay {
   }
 }
 
-class scaleHighLow extends Overlay {
+class ScaleHighLow extends Overlay {
 
   constructor(target, xAxis=false, yAxis=false, theme, parent, params) {
 
@@ -106,8 +113,9 @@ class scaleHighLow extends Overlay {
 
     let txt, x, yHi, yLo, w;
     let options
-    const hi = Math.max(range.valueHi, range.valueLiveMax)
-    const lo = Math.min(range.valueLo, range.valueLiveMin)
+    let inRange = this.core.stream.inRange
+    const hi = (!inRange) ? range.valueHi : Math.max(range.valueHi, range.valueLiveMax)
+    const lo = (!inRange) ? range.valueLo : Math.min(range.valueLo, range.valueLiveMin)
     const theme = {...this.theme.yAxis}
     const ctx = this.scene.context
 

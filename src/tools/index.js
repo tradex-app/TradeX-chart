@@ -4,7 +4,7 @@
 
 import Chart from "../components/chart"
 import defaultTools from "../definitions/tools"
-import { isArray, isArrayOfType, isClass, isFunction, isObject } from "../utils/typeChecks"
+import { isArray, isArrayOfType, isClass, isFunction, isObject, isString } from "../utils/typeChecks"
 import { getPrototypeAt, prototypeHas, valuesInArray } from "../utils/utilities"
 
 export default class Toolbox {
@@ -15,23 +15,24 @@ export default class Toolbox {
   static register(tools=defaultTools, merge=true) {
     let keys = ["id", "name", "icon", "event", "class"]
     let sub = []
-    let test = (t) => {
+
+    let validateTool = (t) => {
       let k = Object.keys(t)
       return valuesInArray(keys, k) && Toolbox.isTool(t.class)
     }
-    let loop = (entries, arr) => {
-      for (let t of entries) {
 
-        if (isArray(t?.sub)) {
-          if (isArrayOfType(t.sub, "object"))
-            sub = loop(t.sub, [])
-            if (sub.length > 0)
-              t.sub = sub
+    let processTools = (entries, arr) => {
+      for (let tool of entries) {
+
+        if (isArrayOfType(tool?.sub, "object")) {
+          sub = processTools(tool.sub, [])
+          if (sub.length > 0)
+            tool.sub = sub
         }
         
-        if (test(t)) {
-          arr.push(t)
-          Toolbox.#list.push(t)
+        if (validateTool(tool)) {
+          arr.push(tool)
+          Toolbox.#list.push(tool)
         }
       }
       return arr
@@ -42,10 +43,10 @@ export default class Toolbox {
       result = []
     else
     if (isArrayOfType(tools, "object") && tools.length > 0) {
-      result = loop(tools, [])
+      result = processTools(tools, [])
     }
     else
-      result = loop(defaultTools, [])
+      result = processTools(defaultTools, [])
 
     this.#listByGroup = result
   }
@@ -58,6 +59,10 @@ export default class Toolbox {
     )
   }
 
+  static isToolInstance(tool) {
+    return Toolbox.instances.find((instance) => instance === tool)
+  }
+
   static get list() {
     return Toolbox.#list
   }
@@ -66,8 +71,6 @@ export default class Toolbox {
     return Toolbox.#listByGroup
   }
 
-
-  core
 
   constructor(core) {
     this.core = core
@@ -107,18 +110,66 @@ export default class Toolbox {
     return instances
   }
 
+  getInstance(tool) {
+    let instance
+    let instances = this.instances
+    if (isString(tool)) {
+      instance = instances.find((ins) => { ins.id === tool })
+    }
+    else
+    if (this.static.isToolInstance(tool)) 
+      instance = tool
+    else {
+      return false
+    }
+    return instance
+  }
+
   getByType(type) {
     return this.instancesByType[type]
   }
 
-  add(tool, paneID, params) {
-    let pane = this.core.ChartPanes.has(paneID)
-    if (!pane) return undefined
-    
-    params.chartPane = pane
-    return pane.tools.add(tool, params)
+  add(tool, paneID, params={}) {
+    let pane = this.core.ChartPanes.get(paneID)
+    if (!pane) throw new Error(`Class Toolbox add() requires a valid pane id`)
+    if (!isObject(params)) params = {}
+
+    const toolParams = { ...params, chartPane: pane } 
+    return pane.tools.add(tool, toolParams)
   }
   
+  remove(tool) {
+    const instance = this.getInstance(tool)
+
+    if (!instance) {
+      this.core.error(`Class Toolbox remove() cannot remove an invalid tool`)
+      return
+    }
+
+    return tool.chartPane.tools.remove(instance)
+  }
+
+  activate(tool) {
+    const instance = this.getInstance(tool)
+
+    if (!instance) {
+      this.core.error(`Class Toolbox activate() cannot activate an invalid tool`)
+      return
+    }
+
+    return tool.chartPane.tools.activateTool(instance)
+  }
+
+  deactivate(tool) {
+    const instance = this.getInstance(tool)
+
+    if (!instance) {
+      this.core.error(`Class Toolbox deactivate() cannot deactivate an invalid tool`)
+      return
+    }
+
+    return tool.chartPane.tools.deactivateTool(instance)
+  }
 }
 
 
@@ -145,7 +196,7 @@ export class Tools {
   get core() { return this.#chart.core }
   get chart() { return this.#chart }
   get stateMachine() { return this.#stateMachine }
-  get mainStateMachine() { return this.core.MainPane.stateMachne }
+  get mainStateMachine() { return this.core.MainPane.stateMachine }
   get toolHostOverlay() { return this.#chart.graph.overlays.list.get("tools").instance }
   get viewport() { return this.toolHostOverlay.layer.viewport }
   get instances() { return this.toolHostOverlay.tools }
@@ -167,18 +218,66 @@ export class Tools {
    *
    * @param {string} tool
    * @param {object} [params={}]
-   * @return {object} 
+   * @return {object|null} 
    * @memberof Tools
    */
   add(tool, params={}) {
     const toolType = this.hasType(tool)
-    if (!toolType) return undefined
+    if (!toolType) {
+      this.core.warn(`Class Tools requires a valid tool type. Type ${tool} not found.`)
+      return null
+    }
+    if (!isObject(params)) params = {}
 
-    return this.toolHostOverlay.add(toolType, params)
+    try {
+      return this.toolHostOverlay.add(toolType, params)
+    } 
+    catch (error) {
+      this.core.error(`Failed to add tool ${toolType} because ${error.message}`)
+      return null
+    }
   }
 
   remove(tool) {
     return this.toolHostOverlay.remove(tool)
+  }
+
+  activate(tool) {
+    const active = this.getTool(tool)
+
+    if (!active) {
+      this.core.warn(`Cannot activate invalid tool`)
+      return null
+    }
+
+    this.toolHostOverlay.activateTool(active)
+    return active
+  }
+
+  deactivate(tool) {
+    const active = this.getTool(tool)
+
+    if (!active) {
+      this.core.warn(`Cannot deactivate invalid tool`)
+      return null
+    }
+
+    this.toolHostOverlay.deactivateTool(active)
+    return active
+  }
+
+  edit(tool) {
+
+  }
+
+  getTool(tool) {
+    if (isString(tool)) 
+      return this.getByID(tool)
+    else
+    if (!!this.Toolbox.isToolInstance(tool)) 
+      return tool
+    else
+      return null
   }
 
   getAll () {

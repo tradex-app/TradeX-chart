@@ -1,7 +1,6 @@
 // overlay.js
 // parent class for overlays to build upon
 
-import { isArray, isBoolean, isObjectOfTypes } from "../../utils/typeChecks"
 import xAxis from "../axis/xAxis"
 import yAxis from "../axis/yAxis"
 import canvas from "../../renderer/canvas-lib"
@@ -19,13 +18,20 @@ export default class Overlay {
   #state
   #range
   #theme
+
+  // Axis and rendering
   #xAxis
   #yAxis
   #target
   #scene
   #hit
+
+  // Data and parameters
   #params
   #data = []
+  #histogram
+  
+  // Update tracking
   #mustUpdate = {
     valueMax: null,
     valueMin: null,
@@ -36,7 +42,6 @@ export default class Overlay {
     refresh: true,
     resize: true
   }
-  #histogram
 
   id
 
@@ -51,6 +56,13 @@ export default class Overlay {
    * @memberof Overlay
    */
   constructor(target, xAxis=false, yAxis=false, theme, parent, params={}) {
+    if (!target || !parent) {
+      throw new Error('Target and parent are required parameters')
+    }
+    
+    if (!parent.core) {
+      throw new Error('Parent must have a core property')
+    }
 
     this.#core = parent.core
     this.#parent = parent
@@ -65,6 +77,16 @@ export default class Overlay {
     this.#yAxis = yAxis
     this.#params = params
     this.on("global_resize", this.onResize, this)
+  }
+
+  destroy() {
+    this.#core.hub.expunge(this)
+
+    if ("overlay" in this.#params &&
+        "data" in this.#params.overlay) {
+          this.#params.overlay.data.length = 0
+          delete this.#params.overlay.data
+        }
   }
 
   get core() { return this.#core }
@@ -85,16 +107,9 @@ export default class Overlay {
   get overlayData() { return this.#params.overlay?.data || [] }
   get data() { return this.#params.overlay?.data || [] }
   get stateMachine() { return this.#core.stateMachine }
-  get context() { return this.contextIs() }
+  get context() { return this.getContextType() }
   set position(p) { this.#target.setPosition(p[0], p[1]) }
-
-  destroy() {
-    this.#core.hub.expunge(this)
-
-    if ("overlay" in this.#params &&
-        "data" in this.#params.overlay)
-      delete this.#params.overlay.data
-  }
+  get isOverlay() { return Overlay.isOverlay }
 
   /**
    * Set a custom event listener
@@ -122,9 +137,9 @@ export default class Overlay {
    * @param {*} context
    * @memberof Overlay
    */
-    expunge(context=this) {
-      this.#core.expunge(context);
-    }
+  expunge(context=this) {
+    this.#core.expunge(context);
+  }
 
   /**
    * Broadcast an event
@@ -163,7 +178,7 @@ export default class Overlay {
     else return false
   }
 
-  contextIs() {
+  getContextType() {
     if (!this.#xAxis && !this.#yAxis) return "chart"
     else if (this.getXAxis() instanceof xAxis) return "timeline"
     else if (this.getYAxis() instanceof yAxis) return "scale"
@@ -199,8 +214,6 @@ export default class Overlay {
     l.Length = r.Length
     l.rowsW = d.width
     l.rowsH = d.height
-    l.rowsW = d.width
-    l.rowsH = d.height
     l.refresh = false
     l.resize = false
   }
@@ -215,39 +228,55 @@ export default class Overlay {
     plot(plots, type, params ) {
 
       const ctx = this.scene.context
-      const p = plots
-      ctx.save();
-  
-      switch(type) {
-        case "createCanvas": canvas[type]( p[0], p[1] ); break;
-        case "fillStroke": canvas[type]( ctx, p[0], p[1], p[2] ); break;
-        case "renderLine": canvas[type]( ctx, p, params ); break;
-        case "renderLineHorizontal": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
-        case "renderLineVertical": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
-        case "renderPath": canvas[type]( ctx, p, params.style, params ); break;
-        case "renderPathStroke": canvas[type]( ctx, p, params.style ); break;
-        case "renderPathClosed": canvas[type]( ctx, p, params.style, params ); break;
-        case "renderSpline": canvas[type]( ctx, p, params ); break;
-        case "renderRect": canvas[type]( ctx, p[0], p[1], p[2], p[3], params ); break;
-        case "renderRectFill": canvas[type]( ctx, p[0], p[1], p[2], p[3], params ); break;
-        case "renderRectStroke": canvas[type]( ctx, p[0], p[1], p[2], p[3], params ); break;
-        case "renderRectRound": canvas[type]( ctx, p[0], p[1], p[2], p[3], p[4], params ); break;
-        case "renderRectRoundFill": canvas[type]( ctx, p[0], p[1], p[2], p[3], p[4], params ); break;
-        case "renderRectRoundStroke": canvas[type]( ctx, p[0], p[1], p[2], p[3], p[4], params ); break;
-        case "renderPolygonRegular": canvas[type]( ctx, p[0], p[1], p[2], p[3], p[4], params ); break;
-        case "renderPolygonIrregular": canvas[type]( ctx, p, params ); break;
-        case "renderTriangle": canvas[type]( ctx, p[0], p[1], p[2], params); break;
-        case "renderDiamond": canvas[type]( ctx, p[0], p[1], p[2], p[3], params); break;
-        case "renderCircle": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
-        case "renderImage": canvas[type]( ctx, params.src, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7] ); break;
-        case "renderText": canvas[type]( ctx, p[0], p[1], params ); break;
-        case "renderTextBG": canvas[type]( ctx, p[0], p[1], p[2], params ); break;
-        case "histogram": this.histogram( p, params ); break;
-        case "highLowRange": this.highLowRange( ctx, params ); break;
-        default: break;
+      const p = plots 
+      const plotTypeFn = this.plotTypeFn(canvas, type, ctx, p, params)
+    
+      if (!plotTypeFn[type]) {
+        this.core.warn(`Overlay: Unknown plot type: ${type}`)
+        return
+      }
+
+      try {
+        ctx.save();
+        plotTypeFn[type]();
+      } 
+      catch (error) {
+        this.core.error(`Overlay: Error plotting ${type}:`, error)
+      }
+      finally {
+        ctx.restore();
       }
   
-      ctx.restore();
+    }
+
+    plotTypeFn(canvas, type, ctx, p, params) {
+      return {
+        createCanvas: () => { canvas[type](p[0], p[1]); },
+        fillStroke: () => { canvas[type](ctx, p[0], p[1], p[2]); },
+        renderLine: () => { canvas[type](ctx, p, params); },
+        renderLineHorizontal: () => { canvas[type](ctx, p[0], p[1], p[2], params); },
+        renderLineVertical: () => { canvas[type](ctx, p[0], p[1], p[2], params); },
+        renderPath: () => { canvas[type](ctx, p, params.style, params); },
+        renderPathStroke: () => { canvas[type](ctx, p, params.style); },
+        renderPathClosed: () => { canvas[type](ctx, p, params.style, params); },
+        renderSpline: () => { canvas[type](ctx, p, params); },
+        renderRect: () => { canvas[type](ctx, p[0], p[1], p[2], p[3], params); },
+        renderRectFill: () => { canvas[type](ctx, p[0], p[1], p[2], p[3], params); },
+        renderRectStroke: () => { canvas[type](ctx, p[0], p[1], p[2], p[3], params); },
+        renderRectRound: () => { canvas[type](ctx, p[0], p[1], p[2], p[3], p[4], params); },
+        renderRectRoundFill: () => { canvas[type](ctx, p[0], p[1], p[2], p[3], p[4], params); },
+        renderRectRoundStroke: () => { canvas[type](ctx, p[0], p[1], p[2], p[3], p[4], params); },
+        renderPolygonRegular: () => { canvas[type](ctx, p[0], p[1], p[2], p[3], p[4], params); },
+        renderPolygonIrregular: () => { canvas[type](ctx, p, params); },
+        renderTriangle: () => { canvas[type](ctx, p[0], p[1], p[2], params); },
+        renderDiamond: () => { canvas[type](ctx, p[0], p[1], p[2], p[3], params); },
+        renderCircle: () => { canvas[type](ctx, p[0], p[1], p[2], params); },
+        renderImage: () => { canvas[type](ctx, params.src, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]); },
+        renderText: () => { canvas[type](ctx, p[0], p[1], params); },
+        renderTextBG: () => { canvas[type](ctx, p[0], p[1], p[2], params); },
+        histogram: () => { this.histogram(p, params); },
+        highLowRange: () => { this.highLowRange(ctx, params); },
+      };
     }
 
     /**

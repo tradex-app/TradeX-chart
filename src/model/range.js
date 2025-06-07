@@ -8,7 +8,6 @@ import { bRound, limit } from "../utils/number"
 import { diff, uid } from "../utils/utilities"
 import { SHORTNAME } from "../definitions/core"
 // import WebWorker from "./webWorkers"
-// import WebWorker from "./webWorkers4"
 
 export class Range {
 
@@ -61,9 +60,12 @@ export class Range {
    * @memberof Range
    */
   constructor( start, end, config) {
-    if (!isObject(config) ||
-        !(config?.core instanceof TradeXchart))
-        throw new Error(`Range requires a config`)
+    if (!isObject(config)) {
+      throw new Error('Range constructor requires a config object');
+    }
+    if (!(config?.core instanceof TradeXchart)) {
+      throw new Error('Range constructor requires a valid TradeXchart instance');
+    }
 
     this.#id = uid(`${SHORTNAME}_Range`)
     this.#init = true;
@@ -140,9 +142,7 @@ export class Range {
   get rangeDuration () { return this.timeMax - this.timeMin }
   get timeStart () { return this.value(0)[0] }
   get timeFinish () { return this.value(this.dataLength)[0] }
-  set interval (i) { this.#interval = i }
   get interval () { return this.#interval }
-  set intervalStr (i) { this.#intervalStr = i }
   get intervalStr () { return this.#intervalStr }
   get timeFrame () { return this.#intervalStr }
   get timeFrameMS () { return this.#interval }
@@ -176,6 +176,20 @@ export class Range {
   isPastLimit(idx=this.indexStart) {
     if (!isInteger(idx)) return
     return (idx < this.indexPastLimit)
+  }
+
+  isValidTimestamp(ts, msg) {
+    if (isValidTimestamp(ts)) return true
+    this.#core.warn(`Range.${msg}: invalid timestamp`);
+    return false
+  }
+
+  isValidDataset(id, msg) {
+    let isValid = !isString(id) || !this.hasDataByID(id)
+    if (isValid) {
+      this.#core.warn(`Range.${msg}: id ${id} is invalid, no dataset exists.`);
+    }
+    return !isValid
   }
 
   /**
@@ -300,13 +314,15 @@ export class Range {
    * @returns {array|null}
    */
   value ( index, id="chart" ) {
-
-    let data
+    if (!isString(id)) {
+      this.#core.warn(`Range.value: id must be a string. Instead received typeOf ${typeof id}`);
+      return null;
+    }
     
-    if (id == "chart") data = this.data
-    else {
-      data = this.getDataById(id)
-      if (!data) return null
+    const data = this.getDataById(id);
+    if (!data) {
+      this.#core.warn(`Range.value: no data exists for id: ${id}`);
+      return null;
     }
     // return last value as default
     if (!isInteger(index)) index = data.length - 1
@@ -334,45 +350,38 @@ export class Range {
   }
 
   /**
-   * TODO: Finish this!!!
-   * return value by timestamp
-   * @param {number} ts
-   * @param {string} id
-   * @returns {array}  
+   * Return value by timestamp
+   * @param {number} ts - Timestamp
+   * @param {string} id - dataset id
+   * @returns {array|null}  
    * @memberof Range
    */
-  valueByTS ( ts, id="" ) {
-    if (!isInteger(ts) || !isString(id)) return false
-
+  valueByTS ( ts, id="chart" ) {
     const idx = this.getTimeIndex(ts)
-      let value;
+    const data = this.getDataById(id)
 
-    switch (id) {
-      case "chart": break;
-      case "primary": break;
-      case "secondary": break;
-      case "dataset": break;
-      case "all": break;
-      default: 
-        if (id.length === 0) value = this.value(idx)
-        else {
-          const idParts = id.split('_')
-        }
-        break;
+    if (!data?.length) {
+      this.#core.warn(`Range.valueByTS: no data in dataset ${id}`);
+      return null
     }
-    return value
+    if (!idx || idx > data.length) {
+      this.#core.warn(`Range.valueByTS: no valid indesx for timestapm ${ts} in dataset ${id}`);
+      return null
+    }
+
+    return data[idx]
   }
 
   /**
-   * return data for id
-   * @param {string} [id="chart"]
-   * @returns {array|boolean}  
+   * Does data for id exist?
+   * @param {string} id
+   * @returns {boolean}  
    * @memberof Range
    */
-  getDataById(id="chart") {
+  hasDataByID(id) {
     if (!isString(id)) return false
 
-    if (id == "chart") return this.data
+    if (id === "chart") return true
 
     const datas = [
       this.allData.primaryPane,
@@ -382,7 +391,7 @@ export class Range {
 
     for (let data of datas) {
       for (let entry of data) {
-        if (id == entry?.id) return entry.data
+        if (id === entry?.id) return true
       }
     }
 
@@ -390,15 +399,44 @@ export class Range {
   }
 
   /**
+   * return data for id
+   * @param {string} [id="chart"]
+   * @returns {array|null}  
+   * @memberof Range
+   */
+  getDataById(id="chart") {
+    if (!this.isValidDataset(id, "getDataById")) return null
+
+    if (id === "chart") return this.data
+
+    const datas = [
+      this.allData.primaryPane,
+      this.allData.secondaryPane,
+      this.allData.datasets
+    ]
+
+    for (let data of datas) {
+      for (let entry of data) {
+        if (id === entry?.id) return entry.data
+      }
+    }
+
+    return null
+  }
+
+  /**
    * Return time index
    * @param {number} ts - timestamp
-   * @returns {number}
+   * @returns {number|null}
    */
-   getTimeIndex (ts) {
-    if (!isInteger(ts)) return false
+   getTimeIndex  (ts, id="chart" ) {
+    if (!this.isValidTimestamp(ts, "getTimeIndex")) return null
+    if (!this.isValidDataset(id, "getTimeIndex")) return null
+
     ts = ts - (ts % this.interval)
   
-    let x = (this.data.length > 0) ? this.data[0][0] : this.anchor
+    const data = this.getDataById(id)
+    const x = (data.length > 0) ? data[0][0] : this.anchor
     if (ts === x) 
       return 0
     else if (ts < x)
@@ -458,15 +496,9 @@ export class Range {
    */
    maxMinPriceVol ( input ) {
     let {data, start, end, that} = {...input}
-    let buffer = bRound(that.core.bufferPx / that.core.candleW)
-    let l = data?.length-1
 
-    buffer = (isInteger(buffer)) ? buffer : 0
-    start = (isInteger(start)) ? start - buffer : 0
-    start = (start > 0) ? start : 0
-    end = (isInteger(end)) ? end : l
-
-    if (l < 0) {
+    // Early return for empty data
+    if (!data || data.length === 0) {
       return {
         valueLo: 0,
         valueHi: 1,
@@ -486,6 +518,15 @@ export class Range {
         volumeMaxIdx: 0,
       }
     }
+
+    const l = data.length - 1;
+    const buffer = Math.round(that.core.bufferPx / that.core.candleW) || 0;
+
+    // Calculate start and end indices with proper bounds checking
+    start = Math.max(0, (isInteger(start) ? start - buffer : 0));
+    end = Math.min(l, isInteger(end) ? end : l);
+
+    // Initialize with first data point in range
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
 
@@ -522,24 +563,36 @@ export class Range {
       }
     }
 
-    let diff = valueMax - valueMin
-    let valueLo = valueMin
-    let valueHi = valueMax
-    let valueLast = data[data.length - 1][4] || null
-    let valueLive = that.core.stream?.lastTick[4] || null
-    let valueLiveMin = that.core.stream?.lastPriceMin || null
-    let valueLiveMax = that.core.stream?.lastPriceMax || null
-    valueMin -= diff * that.yAxisBounds
-    valueMin = (valueMin > 0) ? valueMin : 0
-    valueMax += diff * that.yAxisBounds
-    diff = valueMax - valueMin
+    // Handle edge case where no valid values were found
+    if (valueMin === Infinity) valueMin = 0;
+    if (valueMax === -Infinity) valueMax = 1;
+    if (volumeMin === Infinity) volumeMin = 0;
+    if (volumeMax === -Infinity) volumeMax = 0;
+    
+    // price range
+    const rawDiff = valueMax - valueMin;
+    const valueLo = valueMin;
+    const valueHi = valueMax;
+    
+    // Apply y-axis bounds padding
+    valueMin -= rawDiff * that.yAxisBounds;
+    valueMin = Math.max(0, valueMin);
+    valueMax += rawDiff * that.yAxisBounds;
+    
+    const valueDiff = valueMax - valueMin;
+    
+    // Get last values
+    const valueLast = data[l]?.[4] ?? null;
+    const valueLive = that.core.stream?.lastTick?.[4] ?? null;
+    const valueLiveMin = that.core.stream?.lastPriceMin ?? null;
+    const valueLiveMax = that.core.stream?.lastPriceMax ?? null;
 
     return {
       valueLo,
       valueHi,
       valueMin,
       valueMax,
-      valueDiff: valueMax - valueMin,
+      valueDiff,
       valueLast,
       valueLive,
       valueLiveMin,
@@ -547,12 +600,11 @@ export class Range {
       volumeMin,
       volumeMax,
       volumeDiff: volumeMax - volumeMin,
-
       valueMinIdx,
       valueMaxIdx,
       volumeMinIdx,
       volumeMaxIdx
-    }
+    };
 
     function limit(val, min, max) {
       return Math.min(max, Math.max(min, val));
@@ -590,16 +642,19 @@ export class Range {
 
   /**
    * Find data maximum and minimum for indicators or datasets
-   * expects [timestamp, value0, ...]
-   * @param {object} input
-   * @returns {Object}  
+   * @param {object} input - Object containing data, range, and context
+   * @param {Array<Array<number>>} input.data - Array of data points [timestamp, value0, ...]
+   * @param {number} input.start - Start index
+   * @param {number} input.end - End index
+   * @param {object} input.that - Reference to the parent object
+   * @returns {Object} - { min, max, diff } 
    */
   maxMinData (input) {
     let {data, start, end, that} = {...input}
     let buffer = bRound(that.#core.bufferPx / that.#core.candleW)
-    let l = data.length-1
-    let x = this.dataLength - data.length
-    let f = data[0]?.length - 1 || 0
+    let l = data?.length - 1 || 0
+    let x = this.dataLength - data?.length || 0
+    let f = data?.[0]?.length - 1 || 0
     const r = {}
     const d = {
       min: 0,
@@ -609,8 +664,9 @@ export class Range {
       diff: 1,
       last: undefined
     }
-
-    if (l < 1) return { data: d }
+    
+    // Early return for empty data
+    if (l < 1 || !data || !data[0]?.length) return { data: d }
 
     // create default max min for indicator outputs
     for (let g = f; g > 0; g--) {
@@ -622,23 +678,33 @@ export class Range {
     start = (start > 0) ? start - x : 0
     end = (isInteger(end)) ? end - x : l
 
-    if (l < 0 || data[0].length == 0) 
-      return r
+    // Return early if range is invalid
+    if (l < 0 || data[0].length == 0) return r
 
     let i = limit(start, 0, l)
     let c = limit(end, 0, l)
+
+    // Return early if range is empty
+    if (i >= c) return r
+
     let j, v, min, max, diff, tMin, tMax, tDiff;
 
     // iterate over indicator outputs
     for (let d in r) {
-      max = data[i][f] || -Infinity
-      min = data[i][f] || Infinity
+      // Initialize min/max on first valid data point
+      max = (isNumber(data[i][f])) ? data[i][f] : -Infinity
+      min = max
+      r[d].min = max
+      r[d].max = max
       j = i
 
       // iterate over range for indicator output
       while (j++ < c) {
+
+        // Skip invalid values
         v = data[j][f]
-        if (!isNumber) continue
+        if (!isNumber(v)) continue
+
         if (v <= min) {
           r[d].min = v
           r[d].minIdx = j
@@ -658,6 +724,11 @@ export class Range {
       r[d].diff = (!isNaN(diff)) ? diff : 0
       --f
     }
+
+    // Handle case where no valid values were found across all fields
+    if (tMin === undefined) tMin = 0
+    if (tMax === undefined) tMax = 1
+
     // max min totals for all outputs
     tDiff = tMax - tMin
     tMin -= tDiff * this.yAxisBounds
@@ -676,7 +747,7 @@ export class Range {
     let data = this.export()
         data.snapshot = true
         data.ts = Date.now()
-        data.data = this.data
+        JSON.parse(JSON.stringify(this.data)); // Deep copy
         data.dataLength = this.dataLength
         data.Length = this.Length
     return data
@@ -695,7 +766,7 @@ export class Range {
 
 /**
  * Detects candles interval
- * @param {Array} ohlcv - array of ohlcv values (price history)
+ * @param {Array<Array<number>>} ohlcv - Array of OHLCV candles where each candle is [timestamp, open, high, low, close, volume]
  * @returns {number} - milliseconds
  */
 export function detectInterval(ohlcv) {
@@ -703,11 +774,17 @@ export function detectInterval(ohlcv) {
   if (!isArray(ohlcv) ||
       ohlcv.length < 2) return Infinity
 
+  // Validate OHLCV structure
+  if (!ohlcv.every(candle => isArray(candle) && candle.length >= 1 && typeof candle[0] === 'number')) {
+    // Invalid OHLCV data structure
+    return Infinity;
+  }
+
   let len = Math.min(ohlcv.length - 1, 99)
   let min = Infinity
   ohlcv.slice(0, len).forEach((x, i) => {
       let d = ohlcv[i+1][0] - x[0]
-      if (d === d && d < min) min = d
+      if (!isNaN(d) && d < min) min = d
   })
   // This saves monthly chart from being awkward
   // if (min >= WEEK_MS * 4 && min <= DAY_MS * 30) {
@@ -717,10 +794,12 @@ export function detectInterval(ohlcv) {
 }
 
 /**
- * Calculate the index for a given time stamp
+ * Calculate the index for a given time stamp in a time series
  * @param {TimeData} time - TimeData instance provided by core
- * @param {number} timeStamp
- * @returns {number|undefined}
+ * @param {number} timeStamp - Unix timestamp in milliseconds
+ * @returns {number|undefined} - Index in the time series data array.
+ *                              Can be negative if timestamp is before the first data point.
+ *                              Returns undefined if data is empty.
  */
 export function calcTimeIndex(time, timeStamp) {
   if (!(time instanceof TimeData)) return undefined
@@ -728,24 +807,31 @@ export function calcTimeIndex(time, timeStamp) {
   const data = time.range.data || []
   const len = data.length
 
+  // Handle invalid timestamp
   if (!isValidTimestamp(timeStamp)) {
-    if (!isInteger(data[len-1][0]))
-      timeStamp = Date.now()
-    else
-      timeStamp = data[len-1][0]
+    if (len === 0) {
+      timeStamp = Date.now();
+    } else if (!isInteger(data[len-1][0])) {
+      timeStamp = Date.now();
+    } else {
+      timeStamp = data[len-1][0];
+    }
   }
 
-  let index
-  let timeFrameMS = time.timeFrameMS
+    let index
+  const timeFrameMS = time.timeFrameMS
+  // Normalize timestamp to the beginning of its timeframe period
   timeStamp = timeStamp - (timeStamp % timeFrameMS)
 
-  if (data.length === 0)
+  if (len === 0)
     index = undefined
   else if (timeStamp === data[0][0])
     index = 0
-  else if (timeStamp < data[0][0]) 
+  else if (timeStamp < data[0][0])
+    // Calculate negative index for timestamps before the first data point
     index = Math.floor((data[0][0] - timeStamp) / timeFrameMS) * -1
-  else 
+  else
+    // Calculate positive index for timestamps after the first data point
     index = Math.floor((timeStamp - data[0][0]) / timeFrameMS)
 
   return index

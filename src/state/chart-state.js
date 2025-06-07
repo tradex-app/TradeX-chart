@@ -2,7 +2,7 @@
 // Data state management for the entire chart component library thingy
 
 import * as packageJSON from '../../package.json'
-import * as compression from '../utils/compression'
+import LZW from '../utils/compression'
 import { checkType, isArray, isArrayOfType, isBoolean, isFunction, isInteger, isNumber, isObject, isObjectOfTypes, isString, typeOf } from '../utils/typeChecks'
 import { ms2Interval, interval2MS, SECOND_MS, isValidTimestamp, isTimeFrame, TimeData, isTimeFrameMS } from '../utils/time'
 import { doStructuredClone, mergeDeep, xMap, uid, isObjectEqual, isArrayEqual, cyrb53, intersection, } from '../utils/utilities'
@@ -294,7 +294,7 @@ export default class State {
     active?.archive.data :
     "";
     let archiveData = (!!active.archive?.compress) ?
-      archive.decompress() :
+      LZW.decompress(archive) :
       archive;
     let oldState = JSON.parse(archiveData)
     delete active.archive
@@ -523,15 +523,15 @@ export default class State {
    * export state - default json
    * @param {TradeXchart} chart
    * @param {string} key - state unique identifier
-   * @param {Object} [config={}]
+   * @param {Object} [config=defaultExportConfig]
    * @param {String} config.type - default output: "json"
    * @param {Boolean} config.compress - compression flag
    * @returns {object|undefined}  
    * @memberof State
    */
-  static export(chart, key, config = {}) {
+  static export(chart, key, config = defaultExportConfig) {
     if (!State.has(chart, key)) return undefined
-    if (!isObject(config)) config = {}
+    if (!isObject(config)) config = defaultExportConfig
     const state = State.get(chart, key)
     const type = config?.type
     let stateExport;
@@ -571,7 +571,7 @@ export default class State {
         const { replacer, space } = { ...config };
         stateExport = JSON.stringify(data, replacer, space);
         if (!!config?.compress)
-          stateExport = stateExport.compress()
+          stateExport = LZW.compress(stateExport)
     }
     return stateExport
   }
@@ -1563,4 +1563,9 @@ function consoleError(c, k, e) {
 
 function throwError(id, k, e) {
   throw new Error(`TradeX-chart id: ${id} : State ${k} : ${e}`)
+}
+
+const defaultExportConfig = {
+  type: "json",
+  compress: true
 }

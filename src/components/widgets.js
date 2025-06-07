@@ -9,7 +9,7 @@ import ColourPicker from "./widgets/colourPicker"
 import Divider from "./widgets/divider"
 import Progress from "./widgets/progress"
 import Window from "./widgets/window"
-import StateMachine from "../scaleX/stateMachne"
+import StateMachine from "../scaleX/stateMachine"
 import stateMachineConfig from "../state/state-widgets"
 import { isBoolean, isObject, isString } from "../utils/typeChecks"
 

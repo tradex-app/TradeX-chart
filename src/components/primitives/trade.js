@@ -42,7 +42,7 @@ export default class Trade {
     this.data = data
     let c = this.cfg
     let i = (data.side === "buy") ? this.buy : this.sell
-    let k = this.hit.getIndexValue(data.key)
+    let k = this.hit.getIndexToRGB(data.key)
     let hit = fillMask(k, i)
     let h = limit(data.w, c.iconMinDim, c.iconHeight)
     let w = limit(data.w, c.iconMinDim, c.iconWidth)

@@ -197,7 +197,6 @@ export default class xAxis extends Axis {
   }
 
   dateTimeValue(ts, tf, r) {
-    let value
     let locale
     if ((ts / DAY_MS) % 1 === 0) {
       const date = get_day(ts)

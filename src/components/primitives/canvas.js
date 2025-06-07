@@ -71,7 +71,7 @@ class Node {
 
   /**
    * add layer a layer to the viewport
-   * @param {CEL.Layer} layer
+   * @param {Layer} layer
    * @returns {Viewport|false}
    */
   addLayer(layer) {
@@ -85,11 +85,14 @@ class Node {
 
   /**
    * remove a layer from the viewport
-   * @param {CEL.layer} layer 
+   * @param {Layer} layer 
    * @returns {boolean}
    */
   removeLayer(layer) {
-    if (!(layer instanceof Layer)) return false
+    if (!(layer instanceof Layer) ||
+        !layer.index || 
+        this.layers[layer.index] !== layer
+    ) return false
 
     this.layers.splice(layer.index, 1)
     return true
@@ -157,7 +160,9 @@ class Node {
 
     scene.clear();
     let ctx = scene.context
-        ctx.save();
+    if (!ctx) return 
+
+    ctx.save();
 
     for (layer of layers) {
 
@@ -230,12 +235,12 @@ class Viewport extends Node {
 
 class Layer {
 
-  #x = 0;
-  #y = 0;
-  #width = 0;
-  #height = 0;
+  #x = 0
+  #y = 0
+  #width = 0
+  #height = 0
   #alpha = 1
-  #visible = true;
+  #visible = true
   #composition = null
   #offScreen = true && _OffscreenCanvas
 
@@ -262,7 +267,7 @@ class Layer {
       this.setSize(cfg.width, cfg.height);
     }
     if (cfg?.composition) {
-      this.setComposition = cfg.composition
+      this.composition = cfg.composition
     }
     if (cfg?.alpha) {
       this.alpha = cfg.alpha
@@ -415,7 +420,7 @@ class Layer {
     // setting size to 0x0 will not release all of the memory
     // however, 1x1 will ensure minimal amount of memory is consumed 
     // until the browser disposes of the canvas
-    setSize(1,1)
+    setSize(1, 1, this.scene)
     this.scene.clear()
     this.hit.clear()
   }
@@ -493,13 +498,18 @@ class Foundation {
       return dataURL
     }
     else {
-      canvas.convertToBlob()
-      .then(blob => {
-        blobToDataURL(blob)
-        .then(dataURL => {
-          return dataURL
-        })
-      });
+      try {
+        canvas.convertToBlob()
+        .then(blob => {
+          blobToDataURL(blob)
+          .then(dataURL => {
+            return dataURL
+          })
+        });
+      } catch (error) {
+        throw error
+      }
+
     }
   }
 
@@ -681,7 +691,7 @@ class Hit extends Foundation {
    * @param {number} index
    * @returns {String}
    */
-  getIndexValue(index) {
+  getIndexToRGB(index) {
     return `#${decimalToHex(index).padStart(6, '0')}`
   }
   /**
@@ -707,6 +717,8 @@ class Hit extends Foundation {
     return [r, g, b];
   }
 }
+// end of class Hit
+
 function clear(that) {
   let context = that.context;
   const dpr = windowDevicePixelRatio()
@@ -737,35 +749,34 @@ function sizeSanitize(width, height) {
   return {width, height}
 }
 
-function setSize(width, height, that) {
+function setSize(width, height, scene) {
   let {width: w, height: h} = sizeSanitize(width, height)
   const dpr = windowDevicePixelRatio()
 
-  that.width = w;
-  that.height = h;
+  scene.width = w;
+  scene.height = h;
 
   // Set the buffer size (actual pixels)
-  that.canvas.width = Math.round(w * dpr);
-  that.canvas.height = Math.round(h * dpr);
+  scene.canvas.width = Math.round(w * dpr);
+  scene.canvas.height = Math.round(h * dpr);
   
   // Scale all drawing operations by the dpr
-  if (that.contextType === "2d") {
-    // that.context.setTransform(dpr, 0, 0, dpr, 0, 0);
-    that.context.scale(dpr, dpr)
+  if (scene.contextType === "2d") {
+    scene.context.scale(dpr, dpr)
   }
 
-  if (!that.offscreen) {
+  if (!scene.offscreen) {
     // Set the display size (css pixels)
-    that.canvas.style.width = `${w}px`;
-    that.canvas.style.height = `${h}px`;
+    scene.canvas.style.width = `${w}px`;
+    scene.canvas.style.height = `${h}px`;
   }
 
-  if (that.contextType !== "2d" &&
-      that.contextType !== "bitmaprenderer") {
-    that.context.viewport(0, 0, that.canvas.width, that.canvas.height);
+  if (scene.contextType !== "2d" &&
+      scene.contextType !== "bitmaprenderer") {
+    scene.context.viewport(0, 0, scene.canvas.width, scene.canvas.height);
   }
 
-  return that;
+  return scene;
 }
 
 // Canvas Extension Layers

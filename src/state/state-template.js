@@ -15,7 +15,7 @@ export default
       },
       on: {
         someEvent: {
-          target: '',
+          target: 'xyz',
           action (data) {
             console.log('transition action for event in "idle" state')
           },

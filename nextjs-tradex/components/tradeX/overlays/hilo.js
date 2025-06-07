@@ -40,6 +40,7 @@ function drawText(ctx, txt, x, y, w, theme) {
   ctx.restore();
 }
 
+
 class scaleHighLow extends Overlay {
   constructor(target, xAxis = false, yAxis = false, theme, parent, params) {
     super(target, xAxis, yAxis, theme, parent, params);

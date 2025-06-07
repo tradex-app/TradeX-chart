@@ -125,6 +125,16 @@ export default class Stream {
   }
 
   /**
+   * Is the streaming canlde in range (visible)?
+   * @readonly
+   * @returns {boolean}
+   */
+  get inRange() {
+    if (!!this.#candle) return false
+    else return this.range.inRange(this.candle[0])
+  }
+
+  /**
    * process price tick
    *
    * @param {Object} data - t: timestamp, p: price, q: quantity

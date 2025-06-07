@@ -79,7 +79,7 @@ export default class chartTrades extends Overlay {
 
   /**
    * Display trade info if makrer selected
-   * @param {array} e - pointer event [x, y]
+   * @param {array} e - pointer event [x, y, e]
    */
   isTradeSelected(e) {
     const evt = e[2].domEvent.srcEvent

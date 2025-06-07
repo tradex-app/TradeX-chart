@@ -215,22 +215,28 @@ export const watermark = {
 }
 
 export const drawingNode = {
-  passive: {
+  idle: {
     stroke: "#000",
     fill: "#ccc",
-    width: 1,
+    width: 2,
     radius: 6,
   },
   hover: {
-    stroke: "#800",
-    fill: "#fff",
-    width: 1,
+    stroke: "#c00",
+    fill: "#ccc",
+    width: 2,
+    radius: 6,
+  },
+  selected: {
+    stroke: "#c00",
+    fill: "#ccc",
+    width: 2,
     radius: 6,
   },
   active: {
     stroke: "#800",
     fill: "#fff",
-    width: 1,
+    width: 2,
     radius: 6,
   },
 }

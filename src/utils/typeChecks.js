@@ -1,4 +1,4 @@
-import { isValidTimestamp } from "./time"
+// import { isValidTimestamp } from "./time"
 import { isArrayEqual } from "./utilities"
 
 /**
@@ -25,6 +25,14 @@ export function isArrayOfType (v, t) {
  */
 export function isFunction (v) {
   return v && typeof v === 'function'
+}
+
+/**
+ * @param {*} v
+ * @returns {boolean}
+ */
+export function isAsyncFunction (v) {
+  return isFunction(v) && Object.prototype.toString.call(v) === '[object AsyncFunction]';
 }
 
 /**
@@ -142,7 +150,7 @@ export function isClass(v){
 }
 
 
-const types = ["array", "error", "class", "function", "map", "promise", 
+const types = ["array", "error", "class", "function", "asyncfunction", "map", "promise", 
   "object", "integer", "number", "boolean", "string"]
 
 /**
@@ -151,13 +159,15 @@ const types = ["array", "error", "class", "function", "map", "promise",
  * @returns {boolean}
  */
 export function checkType(type, value) {
-  const t = [...types, 'timestamp', 'valid']
+  // const t = [...types, 'timestamp', 'valid']
+  const t = [...types, 'valid']
   if (value === undefined ||
       value === null ||
       !t.includes(type))
       return false
   switch(type) {
     case 'array': return isArray(value);
+    case 'asyncfunction': return isAsyncFunction(value);
     case 'function': return isFunction(value);
     case 'object': return isObject(value);
     case 'integer': return isInteger(value);
@@ -169,7 +179,7 @@ export function checkType(type, value) {
     case 'promise': return isPromise(value);
     case 'error': return isError(value);
     case 'class': return isClass(value);
-    case 'timestamp': return isValidTimestamp(value);
+    // case 'timestamp': return isValidTimestamp(value);
     default: throw new Error(`No known test for type: ${type}`)
   }
 };

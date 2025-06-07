@@ -12,30 +12,14 @@ import { isHTMLElement, isVisible } from "../../utils/DOM"
 import { isArray, isNumber, isObject, isString } from "../../utils/typeChecks"
 import { EventHandlers } from "../../utils/utilities"
 import { GlobalStyle, WindowStyle } from "../../definitions/style"
-
+import { colours2 } from "../../definitions/colour-palettes"
 
 
 const MIXERSIZE = 128
 const sliderW = 20
 const sliderH = MIXERSIZE
-
-const colours = [
-  "#f88", "#fc8", "#ff8", "#cf8", "#8f8", "#8ff", "#4cf", "#88f", "#c8f", "#f8f",
-  "#f00", "#fc0", "#ff0", "#8f0", "#0f0", "#0ff", "#08f", "#00f", "#80f", "#f0f",
-  "#800", "#840", "#880", "#480", "#080", "#088", "#048", "#008", "#408", "#808",
-  "#000", "#222", "#333", "#444", "#666", "#888", "#aaa", "#ccc", "#eee", "#fff"
-]
-export const colours2 = [
-  "#263238","#B71C1C","#BF360C","#FF6F00","#827717","#194D33","#006064","#0D47A1","#311B92","#880E4F",
-  "#455A64","#D32F2F","#E64A19","#FFA000","#AFB42B","#388E3C","#0097A7","#1976D2","#512DA8","#C2185B",
-  "#607D8B","#F44336","#FF5722","#FFC107","#CDDC39","#4CAF50","#00BCD4","#2196F3","#673AB7","#E91E63",
-  "#90A4AE","#E57373","#FF8A65","#FFD54F","#DCE775","#81C784","#4DD0E1","#64B5F6","#9575CD","#F06292",
-  "#CFD8DC","#FFCDD2","#FFCCBC","#FFECB3","#F0F4C3","#C8E6C9","#B2EBF2","#BBDEFB","#D1C4E9","#F8BBD0"
-]
-
-
-
 const template = document.createElement('template')
+
 
 template.innerHTML = `
 <style>
@@ -353,7 +337,7 @@ export default class tradeXColourPicker extends element {
     const x = e.clientX
     const y = e.clientY
     const i = this.#canvas.mixer.layers.rgbv.hit.getIntersection(x,y)
-    const c = this.#canvas.mixer.layers.rgbv.hit.getIndexValue(i)
+    const c = this.#canvas.mixer.layers.rgbv.hit.getIndexToRGB(i)
     console.log(c)
   }
 

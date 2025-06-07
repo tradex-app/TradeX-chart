@@ -28,12 +28,12 @@ export default
             // console.log('Scale: from "idle" to "chart_yAxisRedraw" state')
           },
         },
-        chart_tool: {
-          target: 'chart_tool',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to "chart_tool"`)
-          },
-        },
+        // chart_tool: {
+        //   target: 'chart_tool',
+        //   action (data) {
+        //     // console.log(`${this.id}: transition from "${this.state}" to "chart_tool"`)
+        //   },
+        // },
         tool_activated: {
           target: 'tool_activated',
           action (data) {

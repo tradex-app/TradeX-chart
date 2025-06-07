@@ -14,7 +14,7 @@ import { isTimeFrame, SECOND_MS } from "./utils/time"
 import { doStructuredClone, mergeDeep, objToString, uid } from './utils/utilities'
 import State from './state/chart-state.js'
 import { defaultTheme } from './definitions/style'
-import StateMachine from './scaleX/stateMachne'
+import StateMachine from './scaleX/stateMachine'
 import Toolbox from './tools/index.js'
 import Stream from './helpers/stream'
 import Theme from "./helpers/theme"
@@ -133,7 +133,7 @@ export default class TradeXchart extends Tradex_chart {
   #delayedSetRange = false
   #mergingData = false
 
-  #tools
+  #toolbox
 
   /**
    * Create a new TradeXchart instance
@@ -308,7 +308,7 @@ export default class TradeXchart extends Tradex_chart {
     this.timers = false
     this.setID(null)
     this.#stateClass = State
-    this.#tools = new Toolbox(this)
+    this.#toolbox = new Toolbox(this)
 
     this.warn(`!WARNING!: ${NAME} changes to config format, for details please refer to https://github.com/tradex-app/TradeX-chart/blob/master/docs/notices.md`)
     this.log(`${SHORTNAME} instance count: ${this.inCnt}`)
@@ -368,7 +368,7 @@ export default class TradeXchart extends Tradex_chart {
   /** @returns {object} - all chart indicators in use, grouped by chart panes */
   get Indicators() { return this.#MainPane.indicators }
 
-  get Tools() { return this.#tools }
+  get Tools() { return this.#toolbox }
 
   get ready() { return this.#ready }
 
@@ -1203,23 +1203,24 @@ export default class TradeXchart extends Tradex_chart {
    * Add an overlay from target graph (pane)
    * @param {string} key - overlay ID
    * @param {string} targetID - target pane ID - mainPane, chartPane, chartScale, timeline, ID
-   * @returns {boolean}
+   * @returns {boolean|null} - success or failure
    */
   addOverlay(key, targetID) {
     let result;
     const target = this.findOverlayInGraph(key, targetID)
     if (!target) result = target
     else {
-      const {overlay, graph} = {...target}
-      result = graph.addOverlay(key, overlay)
-    }
-    if (!result) {
-      this.error(`Overlay: ${key} - Error attempting to add overlay to ${targetID}`)
-      return false
-    }
-    else {
-      this.log(`Overlay: ${key} - Added to ${targetID}`)
-      return true
+      try {
+        const {overlay, graph} = {...target}
+        result = graph.addOverlay(key, overlay)
+        this.log(`Overlay: ${key} - Added to ${targetID}`)
+        return result
+      } 
+      catch (error) {
+        this.error(`Overlay: ${key} - Error attempting to add overlay to ${targetID}`)
+        this.error(error)
+        return null
+      }
     }
   }
 

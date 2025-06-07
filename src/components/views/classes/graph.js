@@ -180,7 +180,7 @@ export default class Graph {
    * add a single overlay to Graph
    * @param {string} key - identifier
    * @param {Object} overlay - {class, params}
-   * @returns boolean
+   * @returns {object|null}
    */
   addOverlay(key, overlay) {
     return this.#overlays.addOverlay(key, overlay)
@@ -189,7 +189,7 @@ export default class Graph {
   /**
    * remove overlay from Graph
    * @param {string} key - identifier
-   * @returns boolean
+   * @returns {boolean}
    */
   removeOverlay(key) {
     return this.#overlays.removeOverlay(key)

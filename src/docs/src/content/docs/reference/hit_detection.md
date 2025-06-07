@@ -21,16 +21,16 @@ Images drawn on the hit layer are of one single colour and that colour is provid
 
 ```javascript
 const hit = layer.hit
-const col = hit.getIndexValue(key)
+const col = hit.getIndexToRGB(key)
 ```
-The ``key`` or ``ID`` value provided to ``getIndexValue(key)`` is a unique user assigned ``number`` for each item on the layer that you wish to detect any pointer interaction with.
+The ``key`` or ``ID`` value provided to ``getIndexToRGB(key)`` is a unique user assigned ``number`` for each item on the layer that you wish to detect any pointer interaction with.
 
 The returned value is used as the fill or stroke on the Hit canvas.
 
 ```javascript
 const ctx = layer.scene.context
 const hit = layer.hit
-const col = hit.getIndexValue(key)
+const col = hit.getIndexToRGB(key)
 
 ctx.stroke = col
 ctx.fillStyle = col

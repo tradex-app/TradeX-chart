@@ -2,7 +2,7 @@
 // control point for drawing tools
 
 import { renderCircle } from "../../renderer/circle"
-import { isNumber, isObject } from "../../utils/typeChecks";
+import { isArray, isFunction, isNumber, isObject } from "../../utils/typeChecks";
 import { doStructuredClone, debounce, idSanitize, mergeDeep, uid } from "../../utils/utilities";
 import { drawingNode as defaultTheme } from "../../definitions/style";
 import { HIT_DEBOUNCE } from "../../definitions/core";
@@ -18,14 +18,14 @@ export function nodeRender(target, theme, data) {
   const states = Object.keys(NodeState)
   const state = (states.includes(data.state)) ? data.state : states[0]
   const c = theme[state]
-  const k = target.hit.getIndexValue(data.key)
+  const k = target.hit.getIndexToRGB(data.key)
   const x = data.x
   const y = data.y
   const r = data.r
-  const opts = {border: c.style , size: c.width, fill: c.fill}
-  const optsH = {border: "none" , size: 0, fill: k}
+  const opts = {stroke: c.style , width: c.width, fill: c.fill}
+  const optsH = {stroke: "none" , width: 0, fill: k}
 
-  // const k = this.hit.getIndexValue(data.key)
+  // const k = this.hit.getIndexToRGB(data.key)
   // const hit = svgToImage(j, this.dims, k)
 
   // draw node
@@ -35,7 +35,7 @@ export function nodeRender(target, theme, data) {
 
   // draw hit mask
   ctxH.save()
-  renderCircle(ctx, x, y, r + c.width, optsH)
+  renderCircle(ctxH, x, y, r + c.width, optsH)
   ctxH.restore()
 
   return {x,y,r,k}
@@ -43,8 +43,9 @@ export function nodeRender(target, theme, data) {
 
 // State enum
 export class NodeState {
-  static passive = new NodeState("passive")
+  static idle = new NodeState("idle")
   static hover = new NodeState("hover")
+  static selected = new NodeState("selected")
   static active = new NodeState("active")
 
   constructor(name) {
@@ -59,7 +60,7 @@ export default class ToolNode {
 
   #id
   #inCnt = ToolNode.cnt
-  #state = NodeState.passive
+  #state = NodeState.idle
   #chart
   #layer
   #scene
@@ -67,13 +68,15 @@ export default class ToolNode {
   #ctx
   #ctxH
   #hitV
+  #hitRGB
   #theme
   #themeDefault = doStructuredClone(defaultTheme)
-  #constraint = {x: false, y: false}
+  #constraint = {x: false, y: false, fn: undefined}
+  #tracking = []
   #x
   #y
 
-  constructor(id, x, y, layer, chart, theme=defaultTheme) {
+  constructor(id, x, y, constraint, tracking, layer, chart, theme=defaultTheme) {
     this.#id = idSanitize(id) || uid("TX_Node_") + `_${this.#inCnt}`
     this.x = x
     this.y = y
@@ -84,6 +87,9 @@ export default class ToolNode {
     this.#ctx = layer.scene.context
     this.#ctxH = layer.hit.context
     this.#hitV = this.#inCnt
+    this.#hitRGB = layer.hit.getIndexToRGB(this.#hitRGB)
+    this.constraint = constraint
+    this.#tracking = tracking
 
     const themed = (isObject(theme)) ? doStructuredClone(theme) : defaultTheme
     this.#theme = mergeDeep(this.#themeDefault, themed)
@@ -100,9 +106,12 @@ export default class ToolNode {
   set state(s) { this.setState(s); }
   get state() { return this.#state; }
   get isActive() { return this.#state === NodeState.active }
+  get isSelected() { return this.#state === NodeState.selected }
   get isHover() { return this.#state === NodeState.hover }
-  get isPassive() { return this.#state === NodeState.passive }
+  get isidle() { return this.#state === NodeState.idle }
   get isConstrained() { return this.isNodeConstrained() }
+  get isTracking() { return this.#tracking }
+  set isTracking(t) { if (this.isArrayOfNodes(t)) this.#tracking = t }
   get core() { return this.#chart.core }
   get chart() { return this.#chart }
   get layer() { return this.#layer }
@@ -111,16 +120,26 @@ export default class ToolNode {
   get ctx() { return this.#ctx }
   get ctxH() { return this.#ctxH }
   get hitV() { return this.#hitV }
+  get hitRGB() { return this.#hitRGB }
   get theme() { return this.#theme }
   get themeState() { return this.#theme[this.#state.name] }
   set x(x) { if (isNumber(x)) this.#x = x }
   get x() { return this.#x }
   set y(y) { if (isNumber(y)) this.#y = y}
   get y() { return this.#y }
+  set constraint(c) { this.setConstraint(c) }
+  get constraint() { return this.#constraint }
 
   setState(s) {
     if (!(s in NodeState)) return
     this.#state = NodeState[s]
+  }
+
+  setConstraint(c) {
+    if (!isObject(c)) return false
+    this.#constraint.x = (isNumber(c?.x)) ? c.x : false
+    this.#constraint.y = (isNumber(c?.y)) ? c.y : false
+    this.#constraint.fn = (isFunction(c?.fn)) ? c.fn : undefined
   }
 
   eventsListen() {
@@ -162,6 +181,11 @@ export default class ToolNode {
 
   }
 
+  isArrayOfNodes(a) {
+    if (!isArray(a)) return false
+    return a.every((i) => i instanceof ToolNode)
+  }
+
   isNodeConstrained() {
     const c = this.#constraint
     if (!(c.x && c.y)) return false
@@ -178,7 +202,7 @@ export default class ToolNode {
   //   const states = Object.keys(NodeState)
   //   const state = (states.includes(data.state)) ? data.state : states[0]
   //   const c = this.cfg[state]
-  //   const k = this.hit.getIndexValue(data.key)
+  //   const k = this.hit.getIndexToRGB(data.key)
   //   const x = this.data.x
   //   const y = this.data.y
   //   const r = this.data.r
@@ -187,7 +211,7 @@ export default class ToolNode {
   //   const opts = {border: c.style , size: c.width, fill: c.fill}
   //   const optsH = {border: "none" , size: 0, fill: k}
 
-  //   // const k = this.hit.getIndexValue(data.key)
+  //   // const k = this.hit.getIndexToRGB(data.key)
   //   // const hit = svgToImage(j, this.dims, k)
 
 
@@ -195,8 +219,9 @@ export default class ToolNode {
     const t = this.themeState
     const ctx = this.#ctx
     const ctxH = this.#ctxH
-    const opts = { border: t.stroke, size: t.width, fill: t.fill }
-    const optsH = { size: t.width, fill: this.#hitV }
+    const hitV = this.#hit.getIndexToRGB(this.#hitV)
+    const opts = { stroke: t.stroke, width: t.width, fill: t.fill }
+    const optsH = { width: t.width, fill: hitV }
 
     // draw node
     ctx.save()
@@ -205,7 +230,7 @@ export default class ToolNode {
 
     // draw hit mask
     ctxH.save()
-    renderCircle(ctx, this.#x, this.#y, t.radius + t.width, optsH)
+    renderCircle(ctxH, this.#x, this.#y, t.radius + t.width, optsH)
     ctxH.restore()
   }
 }

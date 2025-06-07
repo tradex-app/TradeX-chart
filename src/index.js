@@ -1,8 +1,8 @@
-import Chart from './core'
+import Chart, { isChart } from './core'
 import canvas from './renderer/canvas-lib'
 import DOM from './utils/DOM'
 import EventHub from './utils/eventHub'
-import StateMachine from './scaleX/stateMachne'
+import StateMachine from './scaleX/stateMachine'
 import Overlay from './components/overlays/overlay'
 import Indicator from './components/overlays/indicator'
 import { IndicatorClasses } from './definitions/indicators'
@@ -32,6 +32,7 @@ export {
   Indicator,
   IndicatorClasses,
   talibAPI,
+  isChart,
   isPromise,
   typeChecks,
   mergeDeep, 

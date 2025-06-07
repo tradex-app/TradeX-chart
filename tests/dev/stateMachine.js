@@ -49,7 +49,7 @@ class StateMachine {
   }
 
   get state() { return this.#state }
-  get previousSate() { return this.#statePrev }
+  get previousState() { return this.#statePrev }
   get context() { return this.#context }
   get status() { return this.#status }
 

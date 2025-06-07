@@ -341,8 +341,16 @@ export default class Timeline extends Component {
     if (!isObject(overlay)) return false
     if (this.graph === undefined)
       this.#additionalOverlays.push([key, overlay])
-    else
-      return this.graph.addOverlay(key, overlay)
+    else {
+      try {
+        return this.graph.addOverlay(key, overlay)
+      } 
+      catch (error) {
+        this.error(`Timeline: Error attempting to add overlay ${key}`)
+        this.error(error)
+        return null
+      }
+    }
   }
 
   render() {

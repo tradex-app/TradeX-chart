@@ -6329,7 +6329,7 @@ class Hit extends Foundation {
     }
     return this.rgbToInt(data);
   }
-  getIndexValue(index) {
+  getIndexToRGB(index) {
     let rgb = this.intToRGB(index);
     return 'rgb(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ')';
   }
@@ -6749,7 +6749,7 @@ class tradeXColourPicker extends element {
     const x = e.clientX;
     const y = e.clientY;
     const i = this.#canvas.mixer.layers.rgbv.hit.getIntersection(x, y);
-    const c = this.#canvas.mixer.layers.rgbv.hit.getIndexValue(i);
+    const c = this.#canvas.mixer.layers.rgbv.hit.getIndexToRGB(i);
     console.log(c);
   }
   position(x, y, container) {
@@ -17407,7 +17407,7 @@ class StateMachine {
   get state() {
     return this.#state;
   }
-  get previousSate() {
+  get previousState() {
     return this.#statePrev;
   }
   get context() {
@@ -19891,10 +19891,10 @@ const defaults = {
   wdith: 1,
   dash: [1, 0]
 };
-class chartHighLow extends Overlay {
+class ChartHighLow extends Overlay {
   constructor(target, xAxis = false, yAxis = false, theme, parent, params) {
     super(target, xAxis, yAxis, theme, parent, params);
-    const hiLo = { class: scaleHighLow, fixed: true, required: false };
+    const hiLo = { class: ScaleHighLow, fixed: true, required: false };
     if (this.core.config?.highLow === true)
       this.scaleOverly = this.chart.scale.addOverlay('hiLo', hiLo);
   }
@@ -19935,7 +19935,7 @@ class chartHighLow extends Overlay {
     }
   }
 }
-class scaleHighLow extends Overlay {
+class ScaleHighLow extends Overlay {
   constructor(target, xAxis = false, yAxis = false, theme, parent, params) {
     super(target, xAxis, yAxis, theme, parent, params);
     this.viewport = target.viewport;
@@ -20001,7 +20001,7 @@ class NewsEvent {
     this.data = data;
     const i = this.icon;
     const c = this.cfg;
-    const k = this.hit.getIndexValue(data.key);
+    const k = this.hit.getIndexToRGB(data.key);
     const hit = fillMask(k, i);
     const h = limit(data.w, c.iconMinDim, c.iconHeight);
     const w = limit(data.w, c.iconMinDim, c.iconWidth);
@@ -20160,7 +20160,7 @@ class Trade {
     const c = this.cfg;
     const i = data.side === 'buy' ? this.buy : this.sell;
     data.side === 'buy' ? c.iconBuy : c.iconSell;
-    const k = this.hit.getIndexValue(data.key);
+    const k = this.hit.getIndexToRGB(data.key);
     const hit = fillMask(k, i);
     const h = limit(data.w, c.iconMinDim, c.iconHeight);
     const w = limit(data.w, c.iconMinDim, c.iconWidth);
@@ -20484,7 +20484,7 @@ const defaultOverlays$1 = {
       { class: chartGrid, fixed: true, required: true, params: { axes: 'y' } }
     ],
     ['candles', { class: chartCandles, fixed: false, required: true }],
-    ['hiLo', { class: chartHighLow, fixed: true, required: false }],
+    ['hiLo', { class: ChartHighLow, fixed: true, required: false }],
     ['stream', { class: chartCandleStream, fixed: false, required: true }],
     ['cursor', { class: chartCursor, fixed: true, required: true }]
   ],

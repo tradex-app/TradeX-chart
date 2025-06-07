@@ -29,7 +29,7 @@ export default class Legends {
   #list = {}
   #show
   #hide
-  #toggle = null
+  #toggle = "hide"
 
 
   constructor(target, parent) {
@@ -96,7 +96,7 @@ export default class Legends {
       else if (s.parentElement.className !== "controls") 
         return which(s.parentElement)
       else
-        return false
+        return {icon: "none"}
     }
     return which(e)
   }
@@ -152,7 +152,7 @@ export default class Legends {
    * @memberof Legends
    */
   add(options) {
-    if (!isObject(options)) return false
+    if (!isObject(options)) return undefined
 
     const parentError = () => {this.#core.error("ERROR: Legend parent missing!")}
     options.id = options?.id || uid("legend")

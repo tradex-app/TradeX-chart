@@ -13,6 +13,15 @@ import CEL from "../primitives/canvas";
 
 const p100Padding = 1.2
 
+/**
+ * Y-Axis management for chart scaling, positioning, and coordinate transformations
+ * Handles multiple axis types: default, logarithmic, percentage, and relative scaling
+ * Supports both automatic and manual scaling modes
+ * 
+ * @export
+ * @class yAxis
+ * @extends {Axis}
+ */
 export default class yAxis extends Axis {
 
   #parent
@@ -128,7 +137,9 @@ export default class yAxis extends Axis {
   }
 
   yAxisRangeBounds() {
-
+    let max = this.range.valueMax
+    let min = this.range.valueMin
+    return {max, min}
   }
 
   yAxisLog() {

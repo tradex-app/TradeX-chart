@@ -21,6 +21,13 @@ export default
             this.context.origin.onToolActivated(data)
           },
         },
+        tool_deactivated: {
+          target: 'tool_deactivated',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+            this.context.origin.onTooldeActivated(data)
+          },
+        },
         tool_selected: {
           target: 'tool_selected',
           action (data) {
@@ -28,20 +35,20 @@ export default
             this.context.origin.onToolSelected(data)
           },
         },
-        tool_editBegin: {
-          target: 'tool_editBegin',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
-            this.context.origin.onToolEditBegin(data)
-          },
-        },
-        tool_editEnd: {
-          target: 'tool_editEnd',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
-            this.context.origin.onToolEditEnd(data)
-          },
-        },
+        // tool_editBegin: {
+        //   target: 'tool_editBegin',
+        //   action (data) {
+        //     // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+        //     this.context.origin.onToolEditBegin(data)
+        //   },
+        // },
+        // tool_editEnd: {
+        //   target: 'tool_editEnd',
+        //   action (data) {
+        //     // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+        //     this.context.origin.onToolEditEnd(data)
+        //   },
+        // },
         tool_deselected: {
           target: 'tool_deselected',
           action (data) {
@@ -67,7 +74,7 @@ export default
       },
       on: {
         tool_selected: {
-          target: 'tool_addToTarget',
+          target: 'tool_selected',
           action (data) {
             // console.log(`${this.id}: transition from "${this.state}" to "onIdle"`)
             this.context.origin.onToolTargetSelected(data)
@@ -81,6 +88,23 @@ export default
         }
       }
     },
+    tool_deactivated: {
+      onEnter (data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+      },
+      onExit (data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+      },
+      on: {
+        always: {
+          target: "idle",
+          action (data) {
+            // console.log('transition action for "onIdle" in "chart_IndicatorAdd" state')
+
+          },
+        }
+      }
+    },
     tool_selected: {
       onEnter (data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
@@ -89,14 +113,14 @@ export default
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
-        // always: {
-        //   target: 'idle',
-        //   condition: 'toolTarget',
-        //   action (data) {
-        //     // console.log(`${this.id}: transition from "${this.state}" to "onIdle"`)
-        //     this.context.origin.addNewTool()
-        //   },
-        // },
+        always: {
+          target: 'idle',
+          condition: 'toolTarget',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "onIdle"`)
+            this.context.origin.addNewTool()
+          },
+        },
       }
     },
     tool_deselected: {

@@ -1,7 +1,7 @@
 // mediator.js
 
 // import { core } from "./scaleX";
-import StateMachine from "./stateMachne"
+import StateMachine from "./stateMachine"
 
 export default class Mediator {
 

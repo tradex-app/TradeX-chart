@@ -1,4 +1,4 @@
-import { valuesInArray } from "../src/utils/utilities"
+import { valuesInArray } from "../../src/utils/utilities"
 
 
 function isFunction (value) {
@@ -26,7 +26,7 @@ class StateMachine {
   }
 
   get state() { return this.#state }
-  get previousSate() { return this.#statePrev }
+  get previousState() { return this.#statePrev }
   get context() { return this.#context }
   get status() { return this.#status }
   get event() { return this.#event }

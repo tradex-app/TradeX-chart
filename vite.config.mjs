@@ -47,6 +47,13 @@ export default defineConfig(({ command, mode }) => {
         // cors: false,
       }
     };
+  } else if (command === 'test') {
+    return {
+      test: {
+        environment: "jsdom", // or 'node'
+        globals: true,
+      },
+    };
   } else {
     return {
       // dev / serve specific config

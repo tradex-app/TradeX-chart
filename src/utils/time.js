@@ -89,7 +89,7 @@ export const TIMESCALESVALUES = {
 }
 const defaultTF = {}
 for (let t of Object.values(TIMESCALESVALUES)) {
-  let ms = t[0]
+  let ms = t[0] * 1
   let key = ms2Interval(ms)
   if (ms < 60000) continue
   defaultTF[`${key}`] = ms
@@ -178,8 +178,8 @@ export function isValidTimeInRange( time, start=BTCGENESIS,end=Date.now() ) {
 function parseTSDiff(d1, d2, unit) {
   d1 = new Date(d1)
   d2 = new Date(d2)
-  var t2 = d2.getTime();
-  var t1 = d1.getTime();
+  let t2 = d2.getTime();
+  let t1 = d1.getTime();
 
   return parseInt((t2-t1)/unit);
 }
@@ -293,17 +293,17 @@ export function isTimeFrame(tf) {
  * convert interval (timeframe) string to milliseconds
  * @export
  * @param {string} tf
- * @returns {number}
+ * @returns {number|undefined}
  */
 export function interval2MS(tf) {
-  if (!isString(tf)) return false
+  if (!isString(tf)) return undefined
 
   const regex = /([0-9]{1,2})([s|m|h|d|w|M|y])/gm;
   let m
   if ((m = regex.exec(tf)) !== null) {
     return TIMEUNITSVALUESSHORT[m[2]] * m[1]
   }
-  else return false
+  else return undefined
 }
 
 /**
@@ -389,10 +389,10 @@ export function hour_start(t) {
  * day number of the month
  *
  * @param {timestamp} t - timestamp ms
- * @returns {number} - day number of the month
+ * @returns {number|undefined} - day number of the month
  */
  export function get_day(t) {
-  return t ? new Date(t).getUTCDate() : null
+  return t ? new Date(t).getUTCDate() : undefined
 }
 
 export function get_dayName(t, locale="en-GB", len="short") {
@@ -413,7 +413,7 @@ export function get_dayName(t, locale="en-GB", len="short") {
  * month number of the year
  *
  * @param {timestamp} t - timestamp ms
- * @returns {number} - month number of the year
+ * @returns {number|undefined} - month number of the year
  */
  export function get_month(t) {
   if (!t) return undefined
@@ -448,7 +448,7 @@ export function nextMonth(t) {
  * the year
  *
  * @param {timestamp} t - timestamp ms
- * @returns {number} - the year
+ * @returns {number|undefined} - the year
  */
  export function get_year(t) {
   if (!t) return undefined
@@ -541,20 +541,20 @@ export function unitRange (ts, tf) {
 /* Time String Formatting */
 
 export function HM (t) {
-  let {h, m} = DHMS(t)
-  if (h == 0 && m == 0) return `${d}`
+  let {d, h, m} = DHMS(t)
+  if (h == "0" && m == "0") return `${d}`
   else return `${h}:${m}`
 }
 
 export function HMS (t) {
-  let {h, m, s} = DHMS(t)
-  if (h == 0 && m == 0 && s == 0) return `${d}`
+  let {d, h, m, s} = DHMS(t)
+  if (h == "0" && m == "0" && s == "0") return `${d}`
   return `${h}:${m}:${s}`
 }
 
 export function MS (t) {
-  let {h, m, s} = DHMS(t);
-  if (h == 0 && m == 0 && s == 0) return `${d}`
+  let {d, h, m, s} = DHMS(t);
+  if (h == "0" && m == "0" && s == "0") return `${d}`
   return `${m}:${s}`
 }
 

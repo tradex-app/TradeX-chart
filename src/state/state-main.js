@@ -16,9 +16,21 @@ export default
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
+        global_resize: {
+          target: 'global_resize',
+          action (data) {
+            // console.log('secondaryPane: transition from "idle" to "chart_IndicatorAdd" state')
+          },
+        },
         chart_paneMaximize: {
           target: 'chart_paneMaximize',
           action (data) {}
+        },
+        range_set: {
+          target: 'range_set',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to  "range_set"`)
+          },
         },
         chart_pan: {
           target: 'chart_pan',
@@ -32,18 +44,6 @@ export default
             // console.log(`${this.id}: transition from "${this.state}" to  "chart_scrollTo"`)
           },
         },
-        range_set: {
-          target: 'range_set',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "range_set"`)
-          },
-        },
-        chart_IndicatorAdd: {
-          target: 'chart_IndicatorAdd',
-          action (data) {
-            // console.log('secondaryPane: transition from "idle" to "chart_IndicatorAdd" state')
-          },
-        },
         divider_pointerDrag: {
           target: 'divider_pointerDrag',
           action (data) {
@@ -52,13 +52,43 @@ export default
             this.context.origin.cursor = "row-resize"
           },
         },
-        global_resize: {
-          target: 'global_resize',
+        chart_IndicatorAdd: {
+          target: 'chart_IndicatorAdd',
+          action (data) {
+            // console.log('secondaryPane: transition from "idle" to "chart_IndicatorAdd" state')
+          },
+        },
+        chart_ToolActive: {
+          target: 'chart_ToolActive',
+          action (data) {
+            // console.log('secondaryPane: transition from "idle" to "chart_IndicatorAdd" state')
+          },
+        },
+        chart_ToolInactive: {
+          target: 'chart_ToolInactive',
           action (data) {
             // console.log('secondaryPane: transition from "idle" to "chart_IndicatorAdd" state')
           },
         },
       }
+    },
+    global_resize: {
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+        this.context.origin.setDimensions()
+      },
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+      },
+      on: {
+        always: {
+          target: 'idle',
+          condition: 'resizeDone',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+          },
+        },
+      },
     },
     chart_paneMaximize: {
       onEnter (data) {},
@@ -70,6 +100,24 @@ export default
             // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
             this.context.maximize = "some pane pointer"
             // this.context.origin.updateRange(data) 
+          },
+        },
+      }
+    },
+    range_set: {
+      onEnter (data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+      },
+      onExit (data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+      },
+      on: {
+        always: {
+          target: 'idle',
+          condition: 'zoomDone',
+          action (data) {
+            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+            this.context.origin.zoomRange(data) 
           },
         },
       }
@@ -101,24 +149,6 @@ export default
         },
       }
     },
-    range_set: {
-      onEnter (data) {
-        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
-      },
-      onExit (data) {
-        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
-      },
-      on: {
-        always: {
-          target: 'idle',
-          condition: 'zoomDone',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
-            this.context.origin.zoomRange(data) 
-          },
-        },
-      }
-    },
     chart_scrollTo: {
       onEnter (data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
@@ -134,25 +164,6 @@ export default
             this.context.origin.updateRange(data) 
           },
         },
-      }
-    },
-    chart_IndicatorAdd: {
-      onEnter(data) {
-        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
-
-        this.context.origin.addIndicator(data) 
-      },
-      onExit(data) {
-        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
-      },
-      on: {
-        chart_IndicatorAddDone: {
-          target: "idle",
-          action (data) {
-            // console.log('transition action for "onIdle" in "chart_IndicatorAdd" state')
-
-          },
-        }
       }
     },
     divider_pointerDrag: {
@@ -180,24 +191,63 @@ export default
         },
       }
     },
-    global_resize: {
+    chart_IndicatorAdd: {
       onEnter(data) {
         // console.log(`${this.id}: state: "${this.state}" - onEnter`)
-        this.context.origin.setDimensions()
+
+        this.context.origin.addIndicator(data) 
+      },
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+      },
+      on: {
+        chart_IndicatorAddDone: {
+          target: "idle",
+          action (data) {
+            // console.log('transition action for "onIdle" in "chart_IndicatorAdd" state')
+
+          },
+        }
+      }
+    },
+    chart_ToolActive: {
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+
+        // this.context.origin.addIndicator(data) 
+      },
+      onExit(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
+      },
+      on: {
+        chart_ToolInactive: {
+          target: "chart_ToolInactive",
+          action (data) {
+            // console.log('transition action for "onIdle" in "chart_IndicatorAdd" state')
+
+          },
+        }
+      }
+    },
+    chart_ToolInactive: {
+      onEnter(data) {
+        // console.log(`${this.id}: state: "${this.state}" - onEnter`)
+
+        // this.context.origin.addIndicator(data) 
       },
       onExit(data) {
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
         always: {
-          target: 'idle',
-          condition: 'resizeDone',
+          target: "idle",
           action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to "idle"`)
+            // console.log('transition action for "onIdle" in "chart_IndicatorAdd" state')
+
           },
-        },
-      },
-    }
+        }
+      }
+    },
   },
   guards: {
     zoomDone () { return true },

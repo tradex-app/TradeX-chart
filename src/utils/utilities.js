@@ -96,7 +96,7 @@ export function prototypeHas(prop, obj, level=3) {
  * @param {Object} obj
  * @returns {Object}  
  */
-export function copyDeep(obj, clone) {
+export function copyDeep(obj) {
 
   if (obj === null || typeof obj !== 'object')
     return obj;
@@ -112,7 +112,7 @@ export function copyDeep(obj, clone) {
           if (typeof obj[key] !== "object" || obj[key] === obj)
             temp[key] = obj[key]
           else {
-            temp[key] = copyDeep(obj[key], false);
+            temp[key] = copyDeep(obj[key]);
           }
       }
   }
@@ -130,7 +130,7 @@ export function doStructuredClone(obj) {
     return structuredClone(obj)
   }
   catch (e) {
-    return copyDeep(obj, false)
+    return copyDeep(obj)
   }
 }
 

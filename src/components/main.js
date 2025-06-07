@@ -6,7 +6,7 @@ import Component from "./component"
 import { elementDimPos } from "../utils/DOM"
 import Timeline from './timeline'
 import Graph from "./views/classes/graph"
-import renderLoop from "./views/classes/renderLoop"
+import RenderLoop from "./views/classes/renderLoop"
 import Chart, { ChartPaneSnapshot } from "./chart"
 import chartGrid from "./overlays/chart-grid"
 import Indicator from "./overlays/indicator"
@@ -65,6 +65,7 @@ export default class MainPane extends Component {
   #elViewport
 
   #Graph
+  #RenderLoop
   #layerGrid
   #layerWatermark
   #Chart
@@ -130,7 +131,7 @@ export default class MainPane extends Component {
   get buffer() { return this.#buffer }
   get bufferPx() { return this.getBufferPx() }
   get scrollPos() { return this.core.scrollPos }
-  get renderLoop() { return renderLoop }
+  get renderLoop() { return this.#RenderLoop }
   get inventory() { return this.core.state.data.inventory }
   get indicators() { return this.getIndicators() }
   get indicatorClasses() { return this.core.indicatorClasses }
@@ -174,6 +175,13 @@ export default class MainPane extends Component {
     this.#rowMinH = isNumber(this.config.rowMinH)? this.config.rowMinH : ROWMINHEIGHT
     this.#viewDefaultH = isNumber(this.config.secondaryPaneDefaultH)? this.config.secondaryPaneDefaultH : SECONDARYDEFAULTHEIGHT
     this.rowsOldH = this.rowsH
+
+    const renderLoopConfig = {
+      graphs: [this.graph],
+      range: this.range,
+      core: this.core
+    }
+    this.#RenderLoop = new RenderLoop(renderLoopConfig)
   }
 
   /**
@@ -188,10 +196,6 @@ export default class MainPane extends Component {
     this.chartPanesSizeToInventory()
     this.setScaleWidth()
     this.draw(this.range, true)
-    this.renderLoop.init({
-      graphs: [this.graph],
-      range: this.range
-    })
     this.renderLoop.start()
     this.renderLoop.queueFrame(this.range, [this.graph], false)
     this.eventsListen()
@@ -220,7 +224,6 @@ export default class MainPane extends Component {
     this.time.destroy()
     this.core.hub.expunge(this)
     this.#input.destroy()
-    this.stateMachine = null
     this.graph = null
   }
 

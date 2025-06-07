@@ -7,7 +7,7 @@
 import Indicator, { InputPeriodEnable } from "../components/overlays/indicator"
 // import { MA as talibAPI } from "../definitions/talib-api";
 import MA from "../indicators/MA"
-import { colours2 } from "../components/views/colourPicker";
+import { colours2 } from "../definitions/colour-palettes"
 
 let nameShort = "MMA"
 let nameLong = 'Moving Average Multi'

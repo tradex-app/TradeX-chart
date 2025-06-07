@@ -1,0 +1,354 @@
+<!-- 
+This HTML file:
+
+    Sets up a test page with controls for interacting with the TradeX-Chart
+    Includes styling for the chart and UI elements
+    Loads the TradeX-Chart library
+    Initializes the chart with mock data
+    Implements event handlers for all the UI controls
+    Sets up a simulated data stream to test real-time updates
+    Handles window resizing
+    Provides a complete testing environment for the Playwright tests
+
+The page includes:
+
+    Chart type toggle (candle/line)
+    Theme toggle (light/dark)
+    Indicator selector
+    Time range buttons (1H, 1D, 1W, 1M)
+    Simulated real-time data updates
+
+This setup provides a comprehensive environment for testing all aspects of the TradeX-Chart library with Playwright. 
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeX-Chart Test</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    
+    button {
+      padding: 8px 12px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
+    button:hover {
+      background-color: #45a049;
+    }
+    
+    .time-range-buttons {
+      display: flex;
+      gap: 5px;
+    }
+    
+    .time-range-button {
+      background-color: #2196F3;
+    }
+    
+    .time-range-button:hover {
+      background-color: #0b7dda;
+    }
+    
+    .chart-type-toggle {
+      background-color: #ff9800;
+    }
+    
+    .chart-type-toggle:hover {
+      background-color: #e68a00;
+    }
+    
+    .theme-toggle-button {
+      background-color: #9c27b0;
+    }
+    
+    .theme-toggle-button:hover {
+      background-color: #7b1fa2;
+    }
+    
+    .indicator-button {
+      background-color: #f44336;
+    }
+    
+    .indicator-button:hover {
+      background-color: #d32f2f;
+    }
+    
+    .tradex-chart-container {
+      flex: 1;
+      min-height: 400px;
+      border: 1px solid #ddd;
+      background-color: white;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    
+    .indicator-menu {
+      position: absolute;
+      top: 60px;
+      left: 20px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      padding: 10px;
+    }
+    
+    .indicator-menu-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .indicator-menu-item:last-child {
+      border-bottom: none;
+    }
+    
+    .indicator-menu-item:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .tradex-chart-tooltip {
+      position: absolute;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      pointer-events: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="controls">
+      <button class="chart-type-toggle">Toggle Chart Type</button>
+      <button class="theme-toggle-button">Toggle Theme</button>
+      <button class="indicator-button">Add Indicator</button>
+      <div class="time-range-buttons">
+        <button class="time-range-button" data-range="1h">1H</button>
+        <button class="time-range-button" data-range="1d">1D</button>
+        <button class="time-range-button" data-range="1w">1W</button>
+        <button class="time-range-button" data-range="1m">1M</button>
+      </div>
+    </div>
+    
+    <div id="chart" class="tradex-chart-container"></div>
+    
+    <div class="indicator-menu" style="display: none;">
+      <div class="indicator-menu-item" data-indicator="ma">Moving Average</div>
+      <div class="indicator-menu-item" data-indicator="ema">Exponential MA</div>
+      <div class="indicator-menu-item" data-indicator="bollinger">Bollinger Bands</div>
+      <div class="indicator-menu-item" data-indicator="rsi">RSI</div>
+      <div class="indicator-menu-item" data-indicator="macd">MACD</div>
+      <div class="indicator-menu-item" data-indicator="volume">Volume</div>
+    </div>
+  </div>
+
+  <!-- Load TradeX-Chart library -->
+  <script src="./tradex-chart.min.js"></script>
+  
+  <script>
+    // Generate mock data for testing
+    function generateMockData(count = 100) {
+      const data = [];
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      let baseTimestamp = now.getTime();
+      let basePrice = 100 + Math.random() * 100;
+      
+      for (let i = 0; i < count; i++) {
+        const timestamp = baseTimestamp + i * 60000; // 1-minute candles
+        const open = basePrice;
+        const high = open * (1 + Math.random() * 0.02);
+        const low = open * (1 - Math.random() * 0.02);
+        const close = low + Math.random() * (high - low);
+        const volume = 1000 + Math.random() * 9000;
+        
+        data.push([
+          timestamp,
+          open,
+          high,
+          low,
+          close,
+          volume
+        ]);
+        
+        basePrice = close;
+      }
+      
+      return data;
+    }
+    
+    // Initialize chart when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // Generate mock data
+      const mockData = generateMockData(200);
+      
+      // Initialize TradeX-Chart
+      window.chart = new TradeXChart({
+        el: document.getElementById('chart'),
+        data: mockData,
+        width: 'auto',
+        height: 'auto',
+        theme: 'light',
+        chartType: 'candle',
+        timeframe: '1m',
+        crosshair: true,
+        grid: true,
+        timezone: 'UTC',
+        indicators: [
+          { name: 'MA', params: { period: 20 } }
+        ],
+        onReady: () => {
+          console.log('Chart is ready');
+          window.chart.isReady = true;
+        }
+      });
+      
+      // Event listeners for UI controls
+      document.querySelector('.chart-type-toggle').addEventListener('click', () => {
+        const currentType = window.chart.chartType;
+        const newType = currentType === 'candle' ? 'line' : 'candle';
+        window.chart.setChartType(newType);
+      });
+      
+      document.querySelector('.theme-toggle-button').addEventListener('click', () => {
+        const currentTheme = window.chart.options.theme;
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        window.chart.setTheme(newTheme);
+      });
+      
+      document.querySelector('.indicator-button').addEventListener('click', () => {
+        const menu = document.querySelector('.indicator-menu');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+      });
+      
+      document.querySelectorAll('.indicator-menu-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const indicator = item.getAttribute('data-indicator');
+          
+          // Add the selected indicator
+          switch(indicator) {
+            case 'ma':
+              window.chart.addIndicator({ name: 'MA', params: { period: 20 } });
+              break;
+            case 'ema':
+              window.chart.addIndicator({ name: 'EMA', params: { period: 14 } });
+              break;
+            case 'bollinger':
+              window.chart.addIndicator({ name: 'BB', params: { period: 20, stdDev: 2 } });
+              break;
+            case 'rsi':
+              window.chart.addIndicator({ name: 'RSI', params: { period: 14 } });
+              break;
+            case 'macd':
+              window.chart.addIndicator({ name: 'MACD', params: { fast: 12, slow: 26, signal: 9 } });
+              break;
+            case 'volume':
+              window.chart.addIndicator({ name: 'Volume' });
+              break;
+          }
+          
+          // Hide the menu
+          document.querySelector('.indicator-menu').style.display = 'none';
+        });
+      });
+      
+      document.querySelectorAll('.time-range-button').forEach(button => {
+        button.addEventListener('click', () => {
+          const range = button.getAttribute('data-range');
+          let timeframe, count;
+          
+          switch(range) {
+            case '1h':
+              timeframe = '1m';
+              count = 60;
+              break;
+            case '1d':
+              timeframe = '5m';
+              count = 288; // 24 hours * 12 (5-min candles per hour)
+              break;
+            case '1w':
+              timeframe = '30m';
+              count = 336; // 7 days * 48 (30-min candles per day)
+              break;
+            case '1m':
+              timeframe = '1h';
+              count = 720; // 30 days * 24 hours
+              break;
+          }
+          
+          // Update chart timeframe
+          window.chart.setTimeframe(timeframe);
+          
+          // Generate new data with appropriate granularity
+          const newData = generateMockData(count);
+          window.chart.setData(newData);
+        });
+      });
+      
+      // Handle window resize
+      window.addEventListener('resize', () => {
+        if (window.chart) {
+          window.chart.resize();
+        }
+      });
+      
+      // Simulate streaming updates
+      setInterval(() => {
+        if (window.chart && window.chart.data && window.chart.data.length > 0) {
+          const lastCandle = window.chart.data[window.chart.data.length - 1];
+          const newTimestamp = lastCandle[0] + 60000; // Add 1 minute
+          
+          const open = lastCandle[4]; // Last close becomes new open
+          const high = open * (1 + Math.random() * 0.01);
+          const low = open * (1 - Math.random() * 0.01);
+          const close = low + Math.random() * (high - low);
+          const volume = 1000 + Math.random() * 9000;
+          
+          const newCandle = [
+            newTimestamp,
+            open,
+            high,
+            low,
+            close,
+            volume
+          ];
+          
+          window.chart.update([newCandle]);
+        }
+      }, 5000); // Update every 5 seconds
+    });
+  </script>
+</body>
+</html>

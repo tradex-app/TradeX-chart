@@ -5,14 +5,13 @@
 import Component from "./component"
 import { elementDimPos } from "../utils/DOM"
 import tools from "../definitions/tools"
-import Tool from "./overlays/chart-tools"
 import stateMachineConfig from "../state/state-tools"
 import { ToolsStyle, TOOLSW } from "../definitions/style"
 import { isArray } from "../utils/typeChecks"
 
 
 /**
- * Provides the drawing tools for the chart.
+ * Provides the drawing tools GUI for the chart.
  * @export
  * @class ToolsBar
  */
@@ -23,8 +22,6 @@ export default class ToolsBar extends Component {
 
   #elTools
   #widgets
-
-  #Tool = Tool
   #tools
   #toolClasses = {}
   #activeTool = ""
@@ -48,7 +45,7 @@ export default class ToolsBar extends Component {
   get shortName() {return this.#shortName}
   get pos() { return this.dimensions }
   get dimensions() { return elementDimPos(this.#elTools) }
-  get tools() { return this.#tools }
+  get tools() { return this.core.Tools }
   get list() { return this.listTools() }
   get overlays() { return this.listToolOverlays() }
 
@@ -60,7 +57,7 @@ export default class ToolsBar extends Component {
 
   start() {
     // build toolbar
-    this.initAllTools()
+    this.initAllToolsGUI()
     // draw tools in Range
     this.drawRangeTools()
     // set up event listeners
@@ -201,7 +198,7 @@ export default class ToolsBar extends Component {
     this.core.refresh()
   }
 
-  initAllTools() {
+  initAllToolsGUI() {
     const tools = this.#elTools.querySelectorAll(`.icon-wrapper`)
     for (let tool of tools) {
 
@@ -250,30 +247,37 @@ export default class ToolsBar extends Component {
    * add tool to chart row from data state
    * or add as new tool from toolbar
    * @param {string} tool 
-   * @param {Object} target
+   * @param {string} chartPaneID
+   * @param {object} [config={}]
    */
-  addTool(tool=this.#activeTool, target=this.#toolTarget) {
-    let config = {
+  addTool(tool=this.#activeTool, chartPaneID, config={}) {
+
+    const cfg = {
+      ...config,
       name: tool,
-      tool: this.#toolClasses[tool],
-      pos: target.cursorClick,
       theme: this.core.theme,
-      parent: this
+      parent: this,
+      chartPaneID
     }
-    let toolInstance = this.#Tool.create(target, config)
-    toolInstance.start()
-    
-    console.log(toolInstance)
-    return toolInstance
+    return this.tools.add(this.#toolClasses[tool], cfg)
   }
 
-  addNewTool(tool, target) {
-    let t = this.addTool(tool, target)
-    this.activeTool = (t)
-    this.emit(`tool_active`, t)
-    this.emit(`tool_${t.id}_active`, t)
+  addNewTool(tool, chartPaneID) {
 
-    // add tool entry to Data State
+    const callback = (chartPane) => {
+      let t = this.addTool(tool, chartPaneID)
+      this.activeTool = (t)
+      this.emit(`tool_active`, t)
+      this.emit(`tool_${t.id}_active`, t)
+  
+      // add tool entry to Data State
+      // return instance
+    }
+
+    // set up callback for first click on chart pane
+
+    // trigger state machine/s - chart goes into tool mode
+
   }
 
   // draw all tools in (visible) Range to the chart panes

@@ -1,7 +1,7 @@
 // _template.js
 // A template file for Chart components
 
-import StateMachine from "../scaleX/stateMachne"
+import StateMachine from "../scaleX/stateMachine"
 import stateMachineConfig from "../state/state-chart"
 import { idSanitize } from "../utils/utilities"
 

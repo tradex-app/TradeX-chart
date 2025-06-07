@@ -2,7 +2,7 @@
 // parent class for major chart components
 
 import { idSanitize } from "../utils/utilities"
-import StateMachine from "../scaleX/stateMachne"
+import StateMachine from "../scaleX/stateMachine"
 import Graph from "./views/classes/graph"
 
 
@@ -19,7 +19,7 @@ export default class Component {
 
     this.#core = core
     this.#options = {...options}
-    this.#parent = this.#options.parent;
+    this.#parent = this.#options?.parent;
   }
 
   log(l) { this.#core.log(l) }

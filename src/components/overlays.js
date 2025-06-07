@@ -24,13 +24,7 @@ export default class Overlays {
     this.#chart = parent.chart
     this.#core = parent.core
     this.#list = new xMap([...list])
-
-    // iterate over List, create and add overlays
-    for (const [key, overlay] of this.#list) {
-      overlay.chart = this.#chart
-      this.addOverlay(key, overlay)
-    }
-
+    this.addOverlays(list)
   }
 
   log(l) { this.#core.log(l) }
@@ -77,14 +71,22 @@ export default class Overlays {
   }
 
   addOverlays(overlays) {
-    let r = [];
-    let k, s;
+    let result = [];
+    let failed = []
+    let key, obj;
     for (let o of overlays) {
-      s = this.addOverlay(o[0], o[1])
-      k = s.instance?.id || o[0]
-      r.push([k, s])
+      try {
+        obj = this.addOverlay(o[0], o[1])
+        key = obj.instance?.id || o[0]
+        result.push([key, obj])
+      } 
+      catch (error) {
+        failed.push({key, error})
+      }
     }
-    return r
+    if (failed.length) 
+      this.#core.error(`addOverlays() one or more overlays could not be added:`, failed)
+    return result
   }
 
   /**
@@ -100,7 +102,7 @@ export default class Overlays {
 
     // try / catch in case user defined custom overlays (indicator) errors
     try {
-      if (!overlay.class.isOverlay) 
+      if (!overlay?.class?.isOverlay) 
         throw new Error(`${overlay} is not an Overlay or a derivative`)
 
       if (isObject(overlay?.params)) 
@@ -126,13 +128,15 @@ export default class Overlays {
     }
     catch (e) {
       // clean up
-      layer.remove()
+      layer.destroy()
       overlay.instance = undefined
       this.#list.delete(key)
+      
       // report error
-      this.#core.error(`ERROR: Cannot instantiate ${key} overlay / indicator / tool : It will not be added to the chart.`)
+      let msg = `ERROR: Cannot instantiate ${key} overlay / indicator / tool : It will not be added to the chart.`
+      this.#core.error(msg)
       this.#core.error(e)
-      return false
+      throw new Error(msg, {cause: e})
     }
   }
 

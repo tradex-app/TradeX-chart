@@ -11,7 +11,7 @@ import { doStructuredClone, cyrb53, idSanitize, xMap } from "../utils/utilities"
 import CEL from "./primitives/canvas";
 import Legends from "./primitives/legend"
 import Graph from "./views/classes/graph"
-import StateMachine from "../scaleX/stateMachne";
+import StateMachine from "../scaleX/stateMachine";
 import stateMachineConfig from "../state/state-chartPane"
 import { Tools } from "../tools";
 import Input from "../input"
@@ -22,7 +22,7 @@ import chartCursor from "./overlays/chart-cursor"
 import chartVolume from "./overlays/chart-volume"
 import chartCandles from "./overlays/chart-candles"
 import chartCandleStream from "./overlays/chart-candleStream"
-import chartHighLow from "./overlays/chart-highLow";
+import ChartHighLow from "./overlays/chart-highLow";
 import chartNewsEvents from "./overlays/chart-newsEvents";
 import chartTrades from "./overlays/chart-trades"
 import chartTools from "./overlays/chart-tools";
@@ -50,7 +50,7 @@ export const defaultOverlays = {
     ["watermark", {class: watermark, fixed: true, required: true, params: {content: null}}],
     ["grid", {class: chartGrid, fixed: true, required: true, params: {axes: "y"}}],
     ["candles", {class: chartCandles, fixed: false, required: true}],
-    ["hiLo", {class: chartHighLow, fixed: true, required: false}],
+    ["hiLo", {class: ChartHighLow, fixed: true, required: false}],
     ["stream", {class: chartCandleStream, fixed: false, required: true}],
     ["tools", {class: chartTools, fixed: false, required: true}],
     ["cursor", {class: chartCursor, fixed: true, required: true}]
@@ -66,7 +66,7 @@ export const standardOverlays = {
     "watermark": {class: watermark, fixed: true, required: true, params: {content: null}},
     "grid": {class: chartGrid, fixed: true, required: true, params: {axes: "y"}},
     "candles": {class: chartCandles, fixed: false, required: true},
-    "hiLo": {class: chartHighLow, fixed: true, required: false},
+    "hiLo": {class: ChartHighLow, fixed: true, required: false},
     "stream": {class: chartCandleStream, fixed: false, required: true},
     "tools": {class: chartTools, fixed: false, required: true},
     "cursor": {class: chartCursor, fixed: true, required: true}
@@ -276,9 +276,10 @@ export default class Chart extends Component{
     //this.cursor = "crosshair" causing issues with candles drawing
 
     // start State Machine
-    stateMachineConfig.id = this.id
+    const stateMachineCfg = doStructuredClone(stateMachineConfig)
+    stateMachineCfg.id = this.id
     stateMachineConfig.context = this;
-    this.stateMachine = stateMachineConfig;
+    this.stateMachine = stateMachineCfg;
     this.stateMachine.start();
 
     // set up event listeners
@@ -338,7 +339,6 @@ export default class Chart extends Component{
     this.graph.destroy()
     this.#input.destroy()
     this.legend.destroy()
-    this.stateMachine = undefined
     this.#Divider = undefined
     this.#Legends = undefined
     this.#Scale = undefined
@@ -434,7 +434,7 @@ export default class Chart extends Component{
       this.emit("chart_secondaryPointerDown", this.#cursorClick)
 
     this.emit("chart_pointerDown", {charPane: this, pos: this.#cursorClick})
-    this.emit(`${this.id}_pointerDown`, this.#cursorPos);
+    this.emit(`${this.id}_pointerDown`, this.#cursorClick);
   }
 
   onPointerUp(e) {
@@ -691,7 +691,9 @@ export default class Chart extends Component{
         }
       }
       try {
-        return this.graph.addOverlay(i.name, config)
+        let indicator = this.graph.addOverlay(i.name, config)
+        this.core.log(`Chart Pane ${this.id} added indicator: ${i.name}`)
+        return indicator
       }
       catch (e) {
         this.core.error(`ERROR: Chart Pane: ${this.id} cannot add Indicator: ${i?.name} Error: ${e.message}`)

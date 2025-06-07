@@ -15,6 +15,10 @@ const LINECONFIG = {
 
 let nameShort = "line"
 let nameLong = 'Line'
+let nodeDefinitions = [
+  {id: "node1", tracking: [undefined]},
+  {id: "node2", tracking: ["node2"]},
+]
 
 export default class Line extends ChartTool {
 
@@ -33,6 +37,8 @@ export default class Line extends ChartTool {
     super(target, xAxis, yAxis, theme, parent, params)
     this.validateSettings(params?.settings)
     // State.importData("tradesPositions", this.data, this.state, this.state.time.timeFrame)
+
+    this.start()
   }
 
   get inCnt() { return Line.#cnt }
@@ -43,15 +49,13 @@ export default class Line extends ChartTool {
   get colour() { return this.#colour }
   set lineWidth(width) { this.#lineWidth = (isNumber(width)) ? width : this.#lineWidth }
   get lineWidth() { return this.#lineWidth }
+  get nodeDefinitions() { return nodeDefinitions }
 
   validateSettings(s) {
     if (!isObject(s)) return false
 
     this.colour = s?.colour
     this.lineWidth = s?.width
-
-    // this.posStart = s?.postStart
-    // this.posEnd = s?.posEnd
   }
 
   start() {
@@ -72,14 +76,16 @@ export default class Line extends ChartTool {
     this.stateMachine.destroy()
   }
 
-  draw() {
-    // let [x1, y1] = this.chartPane.cursorClick
+  render(ctx, scene) {
 
-    let [x1, y1] = [0,0]
+    let n = this.nodeList
 
-    const scene = this.scene
-    scene.clear()
-    const ctx = this.scene.context
+    if (n.done.length !== 2) return
+
+    let x1 = n.done[0].x
+    let y1 = n.done[0].y
+    let x2 = n.done[1].x
+    let y2 = n.done[1].y
 
     ctx.save();
 
@@ -88,13 +94,11 @@ export default class Line extends ChartTool {
 
     ctx.beginPath();
     ctx.moveTo(x1, y1);
-    ctx.lineTo(300, 150);
+    ctx.lineTo(x2, y2);
     ctx.stroke()
     ctx.closePath()
 
     ctx.restore()
-
-    this.target.viewport.render()
   }
 }
 

@@ -4,7 +4,7 @@
 
 import { isArray, isBoolean, isInteger, isNumber, isObject, isString } from './typeChecks'
 import { isBrowser, isNode } from './browser-or-node'
-import { colours2 } from '../components/views/colourPicker';
+import { colours2 } from '../definitions/colour-palettes';
 import { decimalToHex } from './number';
 
 export const RGBAHex = `#?([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})`
@@ -16,7 +16,7 @@ export const isRGBA = /^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100
 
 /**
  * Colour utility class
- * colour modle transformations
+ * colour model transformations
  * @export
  * @class Colour
  */
@@ -40,7 +40,8 @@ export default class Colour {
     hsla: null,  //'hsla(0,0%,0%,1)',
     rgb: null,  //'rgb(0,0,0)',
     rgba: null,  //'rgba(0,0,0,1)',
-    isValid: false
+    isValid: false,
+    error: ""
   }
 
   /**
@@ -58,7 +59,7 @@ export default class Colour {
 
   /** 
    * All information for colour
-   * @type {string} 
+   * @type {object} 
    */
   get value() { return this.#value }
   /** 
@@ -68,11 +69,11 @@ export default class Colour {
   get isValid() { return this.#value.isValid }
   /** 
    * CSS RGB value
-   * @type {string} */
+   * @type {string|null} */
   get hex() { return this.#value.hex }
   /** 
    * CSS RGBA value
-   * @type {string} 
+   * @type {string|null} 
    */
   get hexa() { return this.#value.hexa }
   
@@ -273,41 +274,52 @@ export default class Colour {
   #hexToRGB(hex) {
     if (isString(hex)) hex = /([a-f\d]{2})/ig.exec(hex);
 
-    var rgba = [
+    if (isArray(hex)) {
+      var rgba = [
         parseInt(hex[0], 16),
         parseInt(hex[1], 16),
         parseInt(hex[2], 16),
         parseInt(hex[3], 16) / 255
     ];
     this.setRGBA(rgba)
+    }
+    else this.#value.error = "hexToRGB() invalid input"
   }
 
   #hexToHSL(hex) {
     if (isString(hex)) hex = /([a-f\d]{2})/ig.exec(hex);
 
-    let r = parseInt(hex[0], 16);
-    let g = parseInt(hex[1], 16);
-    let b = parseInt(hex[2], 16);
-    let a = parseInt(hex[3], 16);
-    r /= 255, g /= 255, b /= 255, a /= 255;
-    var max = Math.max(r, g, b), min = Math.min(r, g, b);
-    var h, s, l = (max + min) / 2;
-
-    if(max == min){
-      h = s = 0; // achromatic
-    }else{
-      var d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch(max){
-        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-        case g: h = (b - r) / d + 2; break;
-        case b: h = (r - g) / d + 4; break;
+    if (isArray(hex)) {
+      let r = parseInt(hex[0], 16);
+      let g = parseInt(hex[1], 16);
+      let b = parseInt(hex[2], 16);
+      let a = parseInt(hex[3], 16);
+      r /= 255, g /= 255, b /= 255, a /= 255;
+      var max = Math.max(r, g, b), min = Math.min(r, g, b);
+      var h, s, l = (max + min) / 2;
+  
+      if(max == min){
+        h = s = 0; // achromatic
+      }else{
+        var d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch(max){
+          case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: h = (b - r) / d + 2; break;
+          case b: h = (r - g) / d + 4; break;
+        }
+        h /= 6;
       }
-      h /= 6;
+      this.setHSLA([r,g,b,a])
     }
-    this.setHSLA([r,g,b,a])
+    else this.#value.error = "hexToHSL() invalid input"
   }
 
+  /**
+   * 
+   * @param {string|array|object} rgb 
+   * @returns {object|false}
+   */
   #getRGB (rgb) {
     let r,g,b,a;
     let v = this.#value
@@ -333,7 +345,10 @@ export default class Colour {
     }
     else if (v.r && v.g && v.b && v.a) return {r, g, b, a} = {...v}
 
-    else return false
+    else {
+      this.#value.error = "getRGB() invalid input"
+      return false
+    }
 
     r = `${r * 1}`
     g = `${g * 1}`

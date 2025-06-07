@@ -14,36 +14,36 @@ export default
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
-        resize: {
-          target: 'resize',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "resize"`)
-          },
-        },
-        xAxis_scale: {
-          target: 'scale',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "scale"`)
-          },
-        },
-        xAxis_inc: {
-          target: 'incremental',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "incremental"`)
-          },
-        },
-        xAxis_log: {
-          target: 'logarithmic',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "logarithmic"`)
-          },
-        },
-        xAxis_100: {
-          target: 'percentual',
-          action (data) {
-            // console.log(`${this.id}: transition from "${this.state}" to  "percentual"`)
-          },
-        },
+        // resize: {
+        //   target: 'resize',
+        //   action (data) {
+        //     // console.log(`${this.id}: transition from "${this.state}" to  "resize"`)
+        //   },
+        // },
+        // xAxis_scale: {
+        //   target: 'scale',
+        //   action (data) {
+        //     // console.log(`${this.id}: transition from "${this.state}" to  "scale"`)
+        //   },
+        // },
+        // xAxis_inc: {
+        //   target: 'incremental',
+        //   action (data) {
+        //     // console.log(`${this.id}: transition from "${this.state}" to  "incremental"`)
+        //   },
+        // },
+        // xAxis_log: {
+        //   target: 'logarithmic',
+        //   action (data) {
+        //     // console.log(`${this.id}: transition from "${this.state}" to  "logarithmic"`)
+        //   },
+        // },
+        // xAxis_100: {
+        //   target: 'percentual',
+        //   action (data) {
+        //     // console.log(`${this.id}: transition from "${this.state}" to  "percentual"`)
+        //   },
+        // },
         chart_pan: {
           target: 'chart_pan',
           action (data) {
@@ -60,12 +60,12 @@ export default
         // console.log(`${this.id}: state: "${this.state}" - onExit (${this.event})`)
       },
       on: {
-        someEvent: {
-          target: '',
-          action (data) {
-            // console.log('Time: transition action for event in "idle" state')
-          },
-        },
+        // someEvent: {
+        //   target: '',
+        //   action (data) {
+        //     // console.log('Time: transition action for event in "idle" state')
+        //   },
+        // },
       }
     },
     chart_pan: {
