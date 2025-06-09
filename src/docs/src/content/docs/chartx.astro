@@ -1,6 +1,6 @@
 <script>
   import { Chart } from "../../../public/tradex-chart.es"
-  import state from "../../../public/1hour"
+  import state from "../../../public/1hour-no-indicators"
 
   const title = "BTC/USDT"
   const config = {
@@ -28,6 +28,9 @@
   const chartDiv = document.getElementById("chart")
         chartDiv?.appendChild(chart)
         chart.start(config)
+        chart.addIndicator("EMA")
+        chart.addIndicator("RSI")
+        window.chart0 = chart
 </script>
 <style>
   #chart {
