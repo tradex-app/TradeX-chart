@@ -80,12 +80,18 @@ export default class ToolsBar extends Component {
     const tools = this.#elTools.querySelectorAll(`.icon-wrapper`)
     for (let tool of tools) {
       for (let t of this.#tools) {
-        if (t.id === id)
+        if (t.id === id && this.#toolEvents[id]) {
           tool.removeEventListener("click", this.#toolEvents[id].click)
           // tool.removeEventListener("pointerover", this.#toolEvents[id].pointerover)
           // tool.removeEventListener("pointerout", this.#toolEvents[id].pointerout)
+        }
       }
     }
+
+    // Remove chart event listeners
+    this.off("chart_started", this.onChartStarted, this)
+    this.off("tool_selected", this.onToolSelect, this)
+    this.off("tool_deselected", this.onToolDeselect, this)
 
     this.stateMachine.destroy()
   }
@@ -122,7 +128,9 @@ export default class ToolsBar extends Component {
         };
         
     // this.emit(evt, data)
-    console.log (data)
+    // Debug log - keeping as comment for development
+    // console.log (data)
+    this.log(`Tool icon clicked: ${JSON.stringify(data)}`)
 
     if (menu) this.emit("menu_open", data)
     else {
@@ -142,21 +150,29 @@ export default class ToolsBar extends Component {
   // }
 
   onToolTargetSelected(tool) {
-    console.log("tool_targetSelected:", tool.target)
+    // Debug log - keeping as comment for development
+    // console.log("tool_targetSelected:", tool.target)
+    this.log(`Tool target selected: ${tool.target}`)
     this.#toolTarget = tool.target
   }
 
   onToolActivated(tool) {
-    console.log("Tool activated:", tool)
+    // Debug log - keeping as comment for development
+    // console.log("Tool activated:", tool)
+    this.log(`Tool activated: ${tool}`)
     this.#activeTool = tool
   }
 
   onToolSelect(e) {
-    console.log("Tool selected:", e)
+    // Debug log - keeping as comment for development
+    // console.log("Tool selected:", e)
+    this.log(`Tool selected: ${JSON.stringify(e)}`)
   }
 
   onToolDeselect(e) {
-    console.log("Tool deselected:", e)
+    // Debug log - keeping as comment for development
+    // console.log("Tool deselected:", e)
+    this.log(`Tool deselected: ${JSON.stringify(e)}`)
   }
 
   // iterate over tools list and add tool bar nodes

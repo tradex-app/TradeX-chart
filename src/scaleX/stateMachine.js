@@ -420,21 +420,22 @@ export default class StateMachine {
             for (let i = 0; i < event.length; i++) {
               const evt = event[i]
 
-              if (!StateMachine.#validateSingleTransition(evt, eventName, stateName, c, core))
+              if (! StateMachine.#validateSingleTransition(evt, eventName, stateName, c, core))
                 return false
             }
           }
 
           // validate single transition
           else {
-            if (!StateMachine.#validateSingleTransition(event, eventName, stateName, c, core))
+            if (! StateMachine.#validateSingleTransition(event, eventName, stateName, c, core))
               return false
           }
         }
       }
     }
-
-    return true 
+    
+    // State Machine config valid
+    return true
   }
 
   static #validateSingleTransition(event, eventName, stateName, cfg, core) {
@@ -463,7 +464,7 @@ export default class StateMachine {
   }
 
     /**
-   * Validate an Function property, action, condition (guard) - supports inline functions, string references, and arrays
+   * Validate a Function property, action, condition (guard) - supports inline functions, string references, and arrays
    * @param {Function|string|Array} func - The execution to validate
    * @param {"actions"|"guards"} type - action or condition (guard) property
    * @param {string} eventName - Event name for error reporting

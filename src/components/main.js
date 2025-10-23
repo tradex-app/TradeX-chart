@@ -607,7 +607,6 @@ export default class MainPane extends Component {
     if (!collapsed) return
 
     if (colRowsH != this.rowsH) {
-console.log("total does not match Row Height")
 
       let delta = this.rowsH - total
     }

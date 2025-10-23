@@ -141,6 +141,30 @@ const validator = {
   tools: TOOLS
 }
 
+
+// enum for Data State status
+export class DataStateStatus {
+  static default = new DataStateStatus("default")
+  static loading = new DataStateStatus("loading")
+  static ready = new DataStateStatus("ready")
+  static error = new DataStateStatus("error")
+
+  constructor(name) {
+    this.name = name
+  }
+}
+
+
+/**
+ * Data State management for the chart
+ * price history (candles OHLCV)
+ * indicators
+ * trades
+ * orders
+ * events
+ * annotations
+ * tools
+ */
 export default class State {
 
   static #chartList = new xMap()
@@ -721,7 +745,13 @@ export default class State {
   #key = ""
   #data = {}
   #gaps
-  #status = false
+  #status = {
+    value: DataStateStatus.default, 
+    msg: "Default empty state",
+    get isActive() {return this.isActive},
+    get isEmpty() {return this.isEmpty},
+    get hasGaps() {return this.hasGaps}
+  }
   #timeData
   #dataSource
   #overlaySet
@@ -734,7 +764,13 @@ export default class State {
   }
 
   constructor(state = State.default, deepValidate = false, isCrypto = false) {
-    if (!(state?.core instanceof TradeXchart)) throw new Error(`State : invalid TradeXchart instance`)
+    if (!(state?.core instanceof TradeXchart)) {
+      let msg = `Data State : invalid TradeXchart instance`
+      this.status = {value: DataStateStatus.error, msg}
+      throw new Error(msg)
+    }
+
+    this.status = {value: DataStateStatus.loading, msg: ""}
     this.legacy(state)
     this.#core = state.core
     this.#data = State.validate(this, state, deepValidate, isCrypto)
@@ -743,11 +779,13 @@ export default class State {
     this.#data.chart.ohlcv = State.ohlcv(this.#data.chart.data)
     this.#gaps = new Gaps(this)
     this.#key = hashKey(state)
+    this.status = DataStateStatus.ready
   }
 
   get id() { return this.#id }
   get key() { return this.#key }
-  get status() { return this.#data.status }
+  get status() { return this.#status }
+  set status(s) { this.setStatus(s) }
   get isEmpty() { return !this.#data.chart.data.length }
   get isActive() { return this.#key === State.active(this.#core).key }
   get hasGaps() { return this.#gaps.hasGaps }
@@ -782,6 +820,19 @@ export default class State {
   get annotations() { return this.#data.annotations }
   get tools() { return this.#data.tools }
   get inventory() { return this.#data.inventory }
+
+  setStatus(s) { 
+    if (isObject(s) && 
+        s?.value instanceof DataStateStatus) {
+          this.#status.value = s.value
+          this.#status.msg = String(s?.msg) || ""
+          return true
+        }
+      else {
+        this.#core.warn(`Cannot set DataState status: incorret format. Expects {value: DataStateStatus, msg: string}`)
+        return false
+      }
+    }
 
   error(e) { this.#core.error(e) }
 
@@ -976,9 +1027,8 @@ export default class State {
    * @param {Object} merge - merge data must be formatted to a Chart State
    * @param {boolean|object} newRange - false | {startTS: number, endTS: number} | {start: number, end: number}
    * @param {boolean} calc - automatically calculate indicator data (ignore any existing)
+   * @returns {boolean} - success failure
    */
-  // TODO: merge indicator data?
-  // TODO: merge dataset?
   mergeData(merge, newRange = false, calc = false) {
 // console.log(`TradeX-chart: ${this.#core.ID}: State ${this.#key} : mergeData()`)
 
@@ -1204,6 +1254,30 @@ export default class State {
       this.#data.isEmpty = false
       return true
     }
+
+    return false
+  }
+
+  /**
+   * Async version of mergeData()
+   * @param {Object} merge 
+   * @param {boolean|object} newRange 
+   * @param {boolean} calc 
+   * @returns {Promise} - resolves to boolean - success failuer
+   */
+  async mergeDataAsync (merge, newRange=false, calc=false) {
+    return new Promise((resolve, reject) => {
+      try {
+        if (this.mergeData(merge, newRange, calc))
+          resolve(true)
+        else
+          reject(false)
+      } 
+      catch (error) {
+        consoleError(error.message)
+        reject(false)
+      }
+    })
   }
 
   merge(data, mData) {
@@ -1265,10 +1339,12 @@ export default class State {
     if (isObject(i) && p == "primary") {
       i.params.overlay.id = i.instance.id
       this.#data.primary.push(i.params.overlay)
+      return true
     }
     else if (i instanceof Chart && p == "secondary") {
       this.#data.secondary.push(...i.options.view)
       this.range.maxMinDatasets()
+      return true
     }
     else return false
   }

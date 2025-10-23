@@ -286,7 +286,7 @@ export default class TradeXchart extends Tradex_chart {
     static isTalibInstantiated(talib) {
       let result = false
       for (let key in talibAPI) {
-        result == result && (key in talib)
+        result = result && (key in talib)
       }
       return result
     }
@@ -835,7 +835,7 @@ export default class TradeXchart extends Tradex_chart {
       for (let [key, legend] of Object.entries(this.Chart.legend.list)) {
         legend.el.style.color = `var(--txc-legend-color, ${theme.legend.colour})`
         legend.el.style.font = `var(--txc-legend-font, ${theme.legend.font})`
-        // TODO: control icons
+        // TODO: control icons (commented out for now)
       }
     }
 
@@ -1093,6 +1093,7 @@ export default class TradeXchart extends Tradex_chart {
    * @param {object} merge - merge data must be formatted to a Chart State
    * @param {boolean|object} newRange - false | {start: number, end: number}
    * @param {boolean} calc - automatically calculate indicator data (ignore any existing)
+   * @returns {boolean} - success failure
    */
   mergeData(merge, newRange=false, calc=false) {
     this.#mergingData = true
@@ -1100,6 +1101,19 @@ export default class TradeXchart extends Tradex_chart {
     if (isBoolean(m)) this.#mergingData = false
     return m
   }
+
+  /**
+   * Async version of mergeData()
+   * @param {Object} merge 
+   * @param {boolean|object} newRange 
+   * @param {boolean} calc 
+   * @returns {Promise} - resolves to boolean - success failuer
+   */
+  async mergeDataAsync (merge, newRange=false, calc=false) {
+    return await this.state.mergeDataAsync(merge, newRange, calc)
+  }
+
+
 
   /*============================*/
   /*--------- OVERLAYS ---------*/

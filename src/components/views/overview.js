@@ -206,6 +206,15 @@ export default class tradeXOverview extends element {
 
   }
 
+  /**
+   * Simple logging method for debug messages
+   * @param {string} msg - Message to log
+   */
+  log(msg) {
+    // In production, this could be controlled by a debug flag
+    // console.log(`[tradeXOverview] ${msg}`);
+  }
+
   connectedCallback() {
     super.connectedCallback(
       () => {
@@ -241,7 +250,13 @@ export default class tradeXOverview extends element {
   get overviewCSS() { return this.#overviewCSS }
 
   onChangeSliderHandler() {
-    console.log(`${this.input.value}, ${this.input.getAttribute('max')}`)
+    // Debug log - keeping as comment for development
+    // console.log(`${this['input'].value}, ${this['input'].getAttribute('max')}`)
+    // Using bound context from event listener
+    // Note: 'this' is bound to an object with 'self' and 'input' properties in the event listener
+    if (this.hasOwnProperty('self') && this.hasOwnProperty('input')) {
+      this['self'].log(`Slider changed: ${this['input'].value}, max: ${this['input'].getAttribute('max')}`);
+    }
   }
 
 }

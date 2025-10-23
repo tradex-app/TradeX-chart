@@ -113,10 +113,10 @@ export function configInputObject(input, i, v) {
             checkBox.checked = i.enable
             checkBox.addEventListener("change", (e) => {
               if (e.currentTarget.checked) {
-                console.log(`enable ${e.currentTarget.id}`)
+                // console.log(`enable ${e.currentTarget.id}`)
               }
               else {
-                console.log(`disable ${e.currentTarget.id}`)
+                // console.log(`disable ${e.currentTarget.id}`)
               }
             })
       if (!!elm) {

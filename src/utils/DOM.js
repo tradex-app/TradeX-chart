@@ -1,13 +1,13 @@
 // DOM.js
 // DOM utilities
 
-import { isFunction, isNumber, isObject, isString } from "./typeChecks"
+import { isArray, isFunction, isNumber, isObject, isString } from "./typeChecks"
 
-export const htmlAttr = [ "id", "class", "style", "alt", "width", "height", "title"  ]
+export const htmlAttr = ["id", "class", "style", "alt", "width", "height", "title"  ]
 export const inputAttr = [...htmlAttr, "name", "type", "value", "default", "placeholder", "max", "min", "maxlenght", "src", "checked", "disabled", "pattern", "readonly", "required", "size", "step", "multiple", "autofocus", "list", "autocomplete"]
 // inputTypes - excluding: "checkbox"
 export const inputTypes = ["button","color","date","datetime-local","email","file","hidden","image","month","number","password","radio","range","reset","search","submit","tel","text","time","url","week",]
- 
+
 
 export function findByID(id, base = document) {
   return base.getElementById(id);
@@ -34,7 +34,7 @@ export function findBySelectorAll(sel, base = document) {
 }
 
 // returns true if it is a DOM node
-export function isNode(o) {
+export function isHTMLNode(o) {
   return typeof Node === "object"
     ? o instanceof Node
     : o &&
@@ -43,7 +43,11 @@ export function isNode(o) {
         typeof o.nodeName === "string";
 }
 
-// returns true if it is a DOM element
+/**
+ * Check if element is an HTML element
+ * @param {*} element - Element to check
+ * @returns {boolean}
+ */
 export function isHTMLElement(o) {
   return typeof HTMLElement === "object"
     ? o instanceof HTMLElement //DOM2
@@ -167,6 +171,26 @@ export function isSVG(html) {
 }
 
 /**
+ * Check if element is in viewport
+ * @param {HTMLElement} element - Target element
+ * @param {number} threshold - Visibility threshold (0-1)
+ * @returns {boolean}
+ */
+export function isElementInViewport(element, threshold = 0) {
+  const rect = element.getBoundingClientRect();
+  const elementHeight = rect.bottom - rect.top;
+  const elementWidth = rect.right - rect.left;
+  
+  const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+  const visibleWidth = Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0);
+  
+  const visibleArea = visibleHeight * visibleWidth;
+  const totalArea = elementHeight * elementWidth;
+  
+  return (visibleArea / totalArea) >= threshold;
+}
+
+/**
  * wait for element to appear in DOM
  * @param {string} selector
  * @return {Promise}  
@@ -191,6 +215,24 @@ export function waitForElm(selector) {
   });
 }
 
+/**
+ * Get element's position relative to viewport
+ * @param {HTMLElement} element - Target element
+ * @returns {Object} Position object
+ */
+export function getElementPosition(element) {
+  const rect = element.getBoundingClientRect();
+  return {
+    top: rect.top + window.scrollY,
+    left: rect.left + window.scrollX,
+    width: rect.width,
+    height: rect.height,
+    bottom: rect.bottom + window.scrollY,
+    right: rect.right + window.scrollX
+  };
+}
+
+// Get element dimensions and position
 export function elementDimPos(el) {
   if (!isHTMLElement(el)) return false;
 
@@ -241,7 +283,7 @@ export function elementsDistance(el1, el2) {
 
 /**
  * Convert string into HTML element
- * @param {String} html representing a single element
+ * @param {String} html string
  * @returns {Element}
  */
 export function htmlToElement(html) {
@@ -260,42 +302,83 @@ export function htmlToElement(html) {
 export function htmlToElements(html) {
   if (!isString(html)) return false;
   const template = document.createElement("template");
-  template.innerHTML = html;
+  template.innerHTML = html.trim();
   return template.content.childNodes;
 }
 
-export function svgToImage(html, fill, dims) {
-  if (!isSVG(html) || !isNumber(dims?.w) || !isNumber(dims?.h))
-    return false;
+/**
+ * Create element with attributes and content
+ * @param {string} tag - HTML tag
+ * @param {Object} attributes - Element attributes
+ * @param {array|string|HTMLElement} content - Element content
+ * @returns {HTMLElement}
+ */
+export function createElement(tag, attributes = {}, content = '') {
+  const element = document.createElement(tag);
+  
+  // Set attributes
+  Object.entries(attributes).forEach(([key, value]) => {
+    if (key === 'className') {
+      element.className = value;
+    } else if (key === 'dataset') {
+      Object.entries(value).forEach(([dataKey, dataValue]) => {
+        element.dataset[dataKey] = dataValue;
+      });
+    } else {
+      element.setAttribute(key, value);
+    }
+  });
+  
+  const setContent = (content, element) => {
+    if (isString(content)) {
+      const elements = htmlToElements(content)
+      element.append(elements)
+    } else if (isHTMLElement(content)) {
+      element.appendChild(content);
+    }
+  }
 
-  let w = dims.w;
-  let h = dims.h;
-  let canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
-  let svg = htmlToElement(html);
-  svg.style.fill = fill;
-  svg.setAttribute("width", w);
-  svg.setAttribute("height", h);
-  svg.xmlns = "http://www.w3.org/2000/svg";
+  if (isArray(cotent)) {
+    content.forEach(child => {
+      setContent(child, element)
+    })
+  }
+  else setContent(content, element)
 
-  // get svg data
-  let xml = new XMLSerializer().serializeToString(svg);
+  return element;
+}
 
-  // make it base64
-  let svg64 = btoa(xml);
-  let b64Start = "data:image/svg+xml;base64,";
+export function htmlInput(i, o) {
+  let id = (isString(o?.entry)) ? o?.entry : ""
+  let label = (isString(i)) ? `<label for="${id}">${i}</label>` : ``
+  let input = `${label}<input id="${id}" class="subject" `
 
-  // prepend a "header"
-  let image64 = b64Start + svg64;
-  let img = new Image(); //document.createElement("img")
-  img.setAttribute("width", w);
-  img.setAttribute("height", h);
-  img.onload = () => {
-    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-  };
-  img.src = image64;
-  return img;
+  for (let p in o) {
+    // add valid HTML element attributes
+    // valid HTML attribute characters https://stackoverflow.com/a/926136/15109215
+    if (inputAttr.includes(p) ||
+        /^(data-[^\t\n\f \/>"'=]+)/g.test(p)) 
+    {
+      input += `${p}="${o[p]}" `
+    }
+    // process non-attributes
+    else {
+
+    }
+  }
+  return input += `>\n`
+}
+
+export function htmlSelect(i, o) {
+  let id = (isString(o?.entry)) ? o?.entry : ""
+  let label = (isString(i)) ? `<label for="${id}">${i}</label>` : ``
+  let options = ""
+
+  for (let opt in o?.options) {
+    options += `<option value="${o.options[opt]}">${opt}</option>`
+  }
+  let input = `${label}<select id="${id}" class="subject">${options}</select>\n`
+  return input
 }
 
 //  https://stackoverflow.com/a/3028037/15109215
@@ -432,38 +515,41 @@ export function findTargetParentWithClass(el, selector) {
   else return findTargetParentWithClass(el.parentElement, selector);
 }
 
-export function htmlInput(i, o) {
-  let id = (isString(o?.entry)) ? o?.entry : ""
-  let label = (isString(i)) ? `<label for="${id}">${i}</label>` : ``
-  let input = `${label}<input id="${id}" class="subject" `
-
-  for (let p in o) {
-    // add valid HTML element attributes
-    // valid HTML attribute characters https://stackoverflow.com/a/926136/15109215
-    if (inputAttr.includes(p) ||
-        /^(data-[^\t\n\f \/>"'=]+)/g.test(p)) 
-    {
-      input += `${p}="${o[p]}" `
-    }
-    // process non-attributes
-    else {
-
-    }
+/**
+ * Add CSS class with animation support
+ * @param {HTMLElement} element - Target element
+ * @param {string} className - CSS class name
+ * @param {number} duration - Animation duration
+ */
+export function addClassWithAnimation(element, className, duration = 300) {
+  element.classList.add(className);
+  
+  if (duration > 0) {
+    element.style.transition = `all ${duration}ms ease`;
+    setTimeout(() => {
+      element.style.transition = '';
+    }, duration);
   }
-  return input += `>\n`
 }
 
-export function htmlSelect(i, o) {
-  let id = (isString(o?.entry)) ? o?.entry : ""
-  let label = (isString(i)) ? `<label for="${id}">${i}</label>` : ``
-  let options = ""
-
-  for (let opt in o?.options) {
-    options += `<option value="${o.options[opt]}">${opt}</option>`
+/**
+ * Remove CSS class with animation support
+ * @param {HTMLElement} element - Target element
+ * @param {string} className - CSS class name
+ * @param {number} duration - Animation duration
+ */
+export function removeClassWithAnimation(element, className, duration = 300) {
+  if (duration > 0) {
+    element.style.transition = `all ${duration}ms ease`;
+    setTimeout(() => {
+      element.classList.remove(className);
+      element.style.transition = '';
+    }, duration);
+  } else {
+    element.classList.remove(className);
   }
-  let input = `${label}<select id="${id}" class="subject">${options}</select>\n`
-  return input
 }
+
 
 export function blobToDataURL(blob) {
   return new Promise((resolve) => {
@@ -472,6 +558,103 @@ export function blobToDataURL(blob) {
     reader.readAsDataURL(blob);
   });
 }
+
+export function svgToImage(html, fill, dims) {
+  if (!isSVG(html) || !isNumber(dims?.w) || !isNumber(dims?.h))
+    return false;
+
+  let w = dims.w;
+  let h = dims.h;
+  let canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  let svg = htmlToElement(html);
+  svg.style.fill = fill;
+  svg.setAttribute("width", w);
+  svg.setAttribute("height", h);
+  svg.xmlns = "http://www.w3.org/2000/svg";
+
+  // get svg data
+  let xml = new XMLSerializer().serializeToString(svg);
+
+  // make it base64
+  let svg64 = btoa(xml);
+  let b64Start = "data:image/svg+xml;base64,";
+
+  // prepend a "header"
+  let image64 = b64Start + svg64;
+  let img = new Image(); //document.createElement("img")
+  img.setAttribute("width", w);
+  img.setAttribute("height", h);
+  img.onload = () => {
+    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+  };
+  img.src = image64;
+  return img;
+}
+
+// Get scroll position
+export function getScrollPosition(element = window) {
+  if (element === window) {
+    return {
+      x: window.pageXOffset || document.documentElement.scrollLeft,
+      y: window.pageYOffset || document.documentElement.scrollTop
+    };
+  } else if (isHTMLElement(element)) {
+    return {
+      x: element.scrollLeft,
+      y: element.scrollTop
+    };
+  }
+  return { x: 0, y: 0 };
+}
+
+// Set scroll position
+export function setScrollPosition(element, x, y, behavior = 'auto') {
+  if (element === window) {
+    window.scrollTo({ left: x, top: y, behavior });
+  } else if (isHTMLElement(element)) {
+    element.scrollTo({ left: x, top: y, behavior });
+  }
+}
+
+/**
+ * Smooth scroll to element
+ * @param {HTMLElement} element - Target element
+ * @param {Object} options - Scroll options
+ */
+export function scrollToElement(element, options = {}) {
+  const {
+    behavior = 'smooth',
+    block = 'center',
+    inline = 'nearest',
+    offset = 0
+  } = options;
+
+  const elementRect = element.getBoundingClientRect();
+  const absoluteElementTop = elementRect.top + window.scrollY;
+  const middle = absoluteElementTop - (window.innerHeight / 2) + (elementRect.height / 2) + offset;
+
+  window.scrollTo({
+    top: middle,
+    behavior
+  });
+}
+
+// Add event listener with cleanup tracking
+export function addEventListenerWithCleanup(element, event, handler, options = {}) {
+  if (!isHTMLElement(element) || !isString(event) || !isFunction(handler)) {
+    return null;
+  }
+  
+  element.addEventListener(event, handler, options);
+  
+  // Return cleanup function
+  return () => {
+    element.removeEventListener(event, handler, options);
+  };
+}
+
 
 export default {
     addCSSRule,
@@ -499,7 +682,7 @@ export default {
     isHTMLElement,
     isImage,
     isInViewport,
-    isNode,
+    isHTMLNode,
     isSVG,
     isVisible,
     isVisibleToUser,

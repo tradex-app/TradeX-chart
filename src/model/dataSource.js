@@ -59,7 +59,7 @@ export default class DataSource {
    * @param {Object} cfg.ticker
    * @param {Object} cfg.history
    * @param {State} state
-   * @return {DataSource} state with data source
+   * @return {DataSource|undefined} state with data source
    * @memberof DataSource
    */
   static create( cfg, state ) {
@@ -75,6 +75,10 @@ export default class DataSource {
     let dataSource = new DataSource( cfg, state )
     DataSource.#sourceList.set( dataSource, state )
     return dataSource
+  }
+
+  static destroy() {
+    
   }
 
   static delete(key) {
@@ -141,7 +145,7 @@ export default class DataSource {
    * @memberof DataSource
    */
   constructor( cfg, state ) {
-    this.#cfg = cfg
+    this.#cfg = doStructuredClone(cfg)
     this.#state = state
     this.#core = state.core
     this.#cnt = ++DataSource.#sourceCnt
@@ -157,6 +161,12 @@ export default class DataSource {
     let begin = {symbol: this.symbol, tf: this.timeFrameMS}
     this.tickerAdd(cfg?.source?.tickerStream, begin)
   }
+
+  destroy() {
+    this.tickerStop()
+    this.historyRemove()
+    DataSource.#sourceList.delete(this)
+  }  
 
   get id() { return this.#id }
   get cfg() { return this.#cfg }
@@ -183,13 +193,12 @@ export default class DataSource {
 
   symbolSet(s) {
     let symbol = this.#core.config.symbol
-    if ((!isString(s) || (isString(s) && !s.length)) && 
-         !symbol.length)
+    if (!isString(s) || (isString(s) && !s.length))
       throwError(this.#core.ID, this.#state.key, `symbol invalid`)
-    else if (isString(s) && s.length > 0)
-      this.#symbol = s
+    if (s === symbol)
+      return
     else
-      this.#symbol = symbol
+      this.#symbol = s
   }
 
   timeFramesAdd(t, d) {
@@ -301,7 +310,7 @@ export default class DataSource {
     if (isFunction(t?.stop)) {
       this.#source.tickerStream.stop = t.stop
     }
-    else this.#source.tickerStream.stop = () => { this.#core.log(`TradeX-chart: ${this.#core.id} : DataSource : tickerStop() function is undefined`) }
+    else this.#source.tickerStream.stop = () => { this.#core.log(`TradeX-chart: ${this.#core.ID} : DataSource : tickerStop() function is undefined`) }
   }
 
   /**
@@ -580,6 +589,17 @@ function throwError(id, k, e) {
   throw new Error(`TradeX-chart: ${id} : State ${k} : DataSource : ${e}`)
 }
 
+/**
+ * Build an object of time frame labels mapped to their corresponding millisecond values.
+ *
+ * @param {Array.<Number>} t - An array of time frame durations in milliseconds.
+ * @returns {Object} An object where keys are string representations (e.g., "1m", "1h")
+ *                   and values are the corresponding durations in milliseconds.
+ *
+ * @example
+ * buildTimeFrames([60000, 300000])
+ * // Returns: { "1m": 60000, "5m": 300000 }
+ */
 function buildTimeFrames(t) {
   let tf = {}
   let str;

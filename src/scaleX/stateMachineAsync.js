@@ -7,7 +7,7 @@ import {
   isObject,
   isString
 } from "../utils/typeChecks"
-import {idSanitize, valuesInArray} from "../utils/utilities"
+import {doStructuredClone, idSanitize, valuesInArray} from "../utils/utilities"
 
 /**
  * Finite State Machine with async support
@@ -29,6 +29,12 @@ export default class StateMachine {
   #actions
   #guards
   #pendingTransitions = new Set()
+  
+  // Race condition protection
+  #transitionMutex = false
+  #eventQueue = []
+  #processing = false
+  #transitionCounter = 0
 
   #statuses = ["await", "idle", "running", "stopped", "paused"]
   #statusNoExecute = ["stopped", "paused"]
@@ -40,21 +46,20 @@ export default class StateMachine {
    */
   constructor(config, context) {
     this.#core = context.core
-    if (! StateMachine.validateConfig(config, this.#core)) {
+    if (!StateMachine.validateConfig(config, this.#core)) {
       const msg = `StateMachine config is invalid`
       this.#core?.error(msg)
       throw new Error(msg)
     }
 
-    const cfg = {
-      ...config
-    }
+    const cfg = doStructuredClone(config)
+
     this.id = cfg.id
     this.#config = cfg
     this.#state = cfg.initial
     this.#context.origin = context
-    this.#actions = cfg.actions
-    this.#guards = cfg.guards
+    this.#actions = cfg?.actions || {}
+    this.#guards = cfg?.guards || {}
 
     // Enter initial state
     this.#subscribe()
@@ -77,15 +82,47 @@ export default class StateMachine {
 
   getStateOverview() {
     return {
-      current: this.#state, 
-      previous: this.#statePrev, 
-      context: this.#context, 
-      status: this.#status,
+      current: this.#state,
+      previous: this.#statePrev,
+      context: this.#context,
+      status: this.#status
       pending: this.#pendingTransitions.size
     }
   }
 
   async notify(event, data) {
+    // Add event to queue for sequential processing
+    return new Promise((resolve, reject) => {
+      this.#eventQueue.push({ event, data, resolve, reject })
+      this.#processEventQueue()
+    })
+  }
+
+  async #processEventQueue() {
+    // Prevent concurrent queue processing
+    if (this.#processing) {
+      return
+    }
+
+    this.#processing = true
+
+    try {
+      while (this.#eventQueue.length > 0) {
+        const { event, data, resolve, reject } = this.#eventQueue.shift()
+        
+        try {
+          const result = await this.#executeTransition(event, data)
+          resolve(result)
+        } catch (error) {
+          reject(error)
+        }
+      }
+    } finally {
+      this.#processing = false
+    }
+  }
+
+  async #executeTransition(event, data) {
     // Status check
     if (this.#noExecute()) {
         this.#core?.warn(`StateMachine not running. Status: ${this.#status}`)
@@ -95,11 +132,14 @@ export default class StateMachine {
     if (!isObject(this.#config)) 
       return false
 
-    // Create transition ID for tracking
-    const transitionId = `${this.#state}-${event}-${Date.now()}`
+    // Create unique transition ID for tracking
+    const transitionId = `${this.#state}-${event}-${++this.#transitionCounter}-${Date.now()}`
     this.#pendingTransitions.add(transitionId)
 
     try {
+      // Capture initial state for validation
+      const initialState = this.#state
+      
       this.#event = event
       this.#eventData = data
 
@@ -108,6 +148,9 @@ export default class StateMachine {
       if (this.#status === "running") {
         this.#status = "await"
       }
+
+      // Validate state hasn't changed during async operations
+      this.#validateTransition(initialState, event)
 
       // Null checks
       const currentStateConfig = this.#config.states[this.#state]
@@ -145,6 +188,9 @@ export default class StateMachine {
         return false
       }
 
+      // Validate state hasn't changed before executing transition
+      this.#validateTransition(initialState, event)
+
       // Execute onExit (may be async)
       if (currentStateConfig?.onExit) {
         await this.#executeFunction(currentStateConfig.onExit, data)
@@ -153,8 +199,8 @@ export default class StateMachine {
       // Execute transition action (may be async)
       await this.#executeFunction(destinationTransition.action, data)
 
-      this.#statePrev = this.#state
-      this.#state = destinationState
+      // Atomic state update
+      this.#updateState(destinationState, event, data)
 
       // Execute onEnter (may be async)
       const destinationStateConfig = this.#config.states[destinationState]
@@ -167,21 +213,8 @@ export default class StateMachine {
         this.#status = "running"
       }
 
-      // null event - immediately transition (transient transition)
-      if (this.#config.states[destinationState]?.on && (this.#config.states[destinationState].on[''] || this.#config.states[destinationState].on?.always)) {
-        const transient = this.#config.states[destinationState].on[''] || this.#config.states[destinationState].on.always
-        
-        // Do we have an array of conditions to check?
-        if (isArray(transient)) {
-          for (let transition of transient) {
-            await this.transitionExecute(transition, data)
-          }
-        }
-        // otherwise if only one condition
-        else if (isObject(transient) && isString(transient.target)) {
-          await this.transitionExecute(transient, data)
-        }
-      }
+      // Handle transient transitions with recursion protection
+      await this.#handleTransientTransitions(destinationState, data, transitionId)
 
       return this.#state
     } catch (error) {
@@ -200,8 +233,10 @@ export default class StateMachine {
         
     let cond = transition?.condition?.type || transition?.condition || false
     if ((await this.#conditionGuard.call(this, cond, transition.condition)) && isString(transition.target)) {
-      await this.#conditionActionExecute(transition, data)
+      // Use the new queue-based system for consistency
+      return await this.notify('', data)
     }
+    return false
   }
 
   #noExecute() {
@@ -236,6 +271,100 @@ export default class StateMachine {
     }
   }
 
+  /**
+   * Validate that state hasn't changed during async operations
+   * @param {string} expectedState - The state we expect to be in
+   * @param {string} event - The event being processed
+   * @throws {Error} If state has changed unexpectedly
+   */
+  #validateTransition(expectedState, event) {
+    if (this.#state !== expectedState) {
+      const error = `State changed from ${expectedState} to ${this.#state} during ${event} transition`
+      this.#core?.error(error)
+      throw new Error(error)
+    }
+  }
+
+  /**
+   * Atomically update state variables
+   * @param {string} newState - New state to transition to
+   * @param {string} event - Event that triggered the transition
+   * @param {*} data - Event data
+   */
+  #updateState(newState, event, data) {
+    this.#statePrev = this.#state
+    this.#state = newState
+    this.#event = event
+    this.#eventData = data
+  }
+
+  /**
+   * Handle transient transitions with recursion protection
+   * @param {string} destinationState - State to check for transient transitions
+   * @param {*} data - Event data
+   * @param {string} parentTransitionId - ID of parent transition to prevent infinite recursion
+   */
+  async #handleTransientTransitions(destinationState, data, parentTransitionId) {
+    // Prevent infinite recursion by limiting depth
+    const maxRecursionDepth = 10
+    const currentDepth = this.#pendingTransitions.size
+    
+    if (currentDepth > maxRecursionDepth) {
+      this.#core?.warn(`Maximum transient transition depth (${maxRecursionDepth}) exceeded`)
+      return
+    }
+
+    // Check for transient transitions (null event or 'always')
+    const stateConfig = this.#config.states[destinationState]
+    if (!stateConfig?.on) return
+
+    const transient = stateConfig.on[''] || stateConfig.on?.always
+    if (!transient) return
+
+    // Process transient transitions
+    if (isArray(transient)) {
+      for (let transition of transient) {
+        await this.#executeTransientTransition(transition, data, parentTransitionId)
+      }
+    } else if (isObject(transient) && isString(transient.target)) {
+      await this.#executeTransientTransition(transient, data, parentTransitionId)
+    }
+  }
+
+  /**
+   * Execute a single transient transition
+   * @param {Object} transition - Transition configuration
+   * @param {*} data - Event data
+   * @param {string} parentTransitionId - Parent transition ID
+   */
+  async #executeTransientTransition(transition, data, parentTransitionId) {
+    const transitionId = `transient-${parentTransitionId}-${++this.#transitionCounter}`
+    this.#pendingTransitions.add(transitionId)
+
+    try {
+      // Check condition if present
+      const condition = transition?.condition?.type || transition?.condition || false
+      if (condition && !(await this.#conditionGuard.call(this, condition, transition.condition))) {
+        return false
+      }
+
+      // Execute transition action if present
+      if (transition.action) {
+        await this.#executeFunction(transition.action, data)
+      }
+
+      // Update state
+      this.#updateState(transition.target, '', data)
+
+      // Recursively handle any further transient transitions
+      await this.#handleTransientTransitions(transition.target, data, transitionId)
+      
+      return true
+    } finally {
+      this.#pendingTransitions.delete(transitionId)
+    }
+  }
+
   canTransition(event) {
     const currentStateConfig = this.#config.states[this.#state]
     return currentStateConfig && currentStateConfig.on && currentStateConfig.on[event] !== undefined
@@ -252,10 +381,11 @@ export default class StateMachine {
   /** commence state machine execution */
   start() {
     if (this.#status !== "stopped") {
-      this.#core.warn(`StateMachine can only start from a stopped status`)
-      return
+      this.#core?.warn(`StateMachine can only start from a stopped status`)
+      return false
     }
     this.#status = "running"
+    return true
   }
 
   /** stop state machine execution */
@@ -280,36 +410,49 @@ export default class StateMachine {
       return
     }
     this.#status = this.#statusOld
+    return true
   }
 
   /** Expunge state and event listeners, free memory */
   async destroy() {
     await this.stop()
+    
+    // Clear event queue and reject any pending promises
+    while (this.#eventQueue.length > 0) {
+      const { reject } = this.#eventQueue.shift()
+      reject(new Error('State machine destroyed'))
+    }
+    
+    // Reset processing state
+    this.#processing = false
+    this.#transitionMutex = false
+    
     this.#unsubscribe()
     this.#config = null
     this.#context = null
     this.#actions = null
+    this.#guards = null
     this.#pendingTransitions.clear()
   }
 
   #subscribe() {
     this.#events = new Set()
+
     for (let state in this.#config.states) {
       for (let event in this.#config.states[state].on) {
         let cb = async (data) => await this.notify(event, data)
         this.#events.add({topic: event, cb})
-        this.#core.on(event, cb, this.context)
+        this.#core?.on(event, cb, this.context)
       }
     }
   }
 
   #unsubscribe() {
     const events = this.#events?.values()
-    if (! events) 
-      return
+    if (!events) return
 
     for (let e of events) {
-      this.#core.off(e.topic, e.cb, this.context)
+      this.#core?.off(e.topic, e.cb, this.context)
     }
     this.#events.clear()
   }
@@ -322,7 +465,7 @@ export default class StateMachine {
    */
   static validateConfig(c, core) {
     if (!isObject(c)) {
-      core.error(`StateMachine config must be an object`)
+      core?.error(`StateMachine config must be an object`)
       return false
     }
 
@@ -330,14 +473,12 @@ export default class StateMachine {
     let keys = Object.keys(c)
     const missing = required.filter(r => ! keys.includes(r))
     if (missing.length > 0) {
-      core?.error(`StateMachine config is missing required properties: ${
-        missing.join(', ')
-      }`)
+      core?.error(`StateMachine config is missing required properties: ${missing.join(', ')}`)
       return false
     }
 
     if (!(c.initial in c.states)) {
-      core.error(`StateMachine config the initial state is not found`)
+      core?.error(`StateMachine config: the initial state '${c.initial}' is not found in states`)
       return false
     }
 
@@ -374,6 +515,7 @@ export default class StateMachine {
     // Validate states
     for (let stateName in c.states) {
       const state = c.states[stateName]
+
       if (!isObject(state)) {
         core?.error(`StateMachine config: state '${stateName}' must be an object`)
         return false
@@ -397,6 +539,7 @@ export default class StateMachine {
 
         for (let eventName in state.on) {
           const event = state.on[eventName]
+
           if (!isObject(event) && !isArray(event)) {
             core?.error(`StateMachine config: event '${eventName}' in state '${stateName}' must be object or array`)
             return false
@@ -406,10 +549,12 @@ export default class StateMachine {
           if (isArray(event)) {
             for (let i = 0; i < event.length; i++) {
               const evt = event[i]
+
               if (! StateMachine.#validateSingleTransition(evt, eventName, stateName, c, core))
                 return false
             }
           }
+
           // validate single transition
           else {
             if (! StateMachine.#validateSingleTransition(event, eventName, stateName, c, core))
@@ -431,7 +576,7 @@ export default class StateMachine {
       }
 
       if (!(event.target in cfg.states)) {
-        core?.error(`StateMachine config: target state '${event.target}' in state not found`)
+        core?.error(`StateMachine config: target state '${event.target}' not found in states`)
         return false
       }
 
@@ -448,4 +593,47 @@ export default class StateMachine {
     }
     return true
   }
+
+    /**
+   * Validate a Function property, action, condition (guard) - supports inline functions, string references, and arrays
+   * @param {Function|string|Array} func - The execution to validate
+   * @param {"actions"|"guards"} type - action or condition (guard) property
+   * @param {string} eventName - Event name for error reporting
+   * @param {string} stateName - State name for error reporting
+   * @param {Object} cfg - Configuration object
+   * @param {Object} core - Core object for logging
+   * @returns {boolean} - Whether the execution is valid
+   */
+    static #validateFunction(func, type, eventName, stateName, cfg, core) {
+      if (!func) return true
+      if (!["actions", "guards"].includes(type)) return false
+  
+      // Handle array of executions
+      if (isArray(func)) {
+        for (let i = 0; i < func.length; i++) {
+          if (!StateMachine.#validateFunction(func[i], type, eventName, stateName, cfg, core)) {
+            return false
+          }
+        }
+        return true
+      }
+  
+      // Handle string reference to an action or guards object
+      if (isString(func)) {
+        if (!cfg[type] || !isFunction(cfg[type][func])) {
+          core?.error(`StateMachine config: event '${eventName}'.${type} '${func}' in state '${stateName}' does not refer to a valid ${type} function`)
+          return false
+        }
+        return true
+      }
+  
+      // Handle inline function
+      if (isFunction(func)) {
+        return true
+      }
+  
+      // Invalid execution type
+      core?.error(`StateMachine config: event '${eventName}'.${type} in state '${stateName}' must be a function, string reference, or array`)
+      return false
+    }
 }

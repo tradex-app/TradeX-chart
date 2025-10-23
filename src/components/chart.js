@@ -450,7 +450,7 @@ export default class Chart extends Component{
   }
 
   onStreamUpdate(candle) {
-    if (this.isPrimary) {
+    if (this.isPrimary && this.chartStreamCandle) {
       this.#streamCandle = candle
       this.chartStreamCandle.draw()
       this.layerStream.setPosition(this.core.stream.lastScrollPos, 0)
@@ -718,7 +718,7 @@ export default class Chart extends Component{
   findIndicatorByKey(key) {
     let iList = Object.values(this.getIndicators())
     for (let i of iList) {
-      if (i.key = key) return i
+      if (i.key === key) return i
     }
     return undefined
   }
@@ -744,19 +744,19 @@ export default class Chart extends Component{
    * @returns 
    */
   removeIndicator(id, state=true) {
-    if (!isString(id) || !(id in this.indicators)) return false
+    if (!isString(id) || !(id in this.indicators))
+      return false
 
     // enable deletion
     this.#indicatorDeleteList[id] = true
+    this.indicators[id].instance.destroy(state)
+    this.graph.removeOverlay(id)
+    this.draw()
+    delete this.#indicatorDeleteList[id]
 
     if (Object.keys(this.indicators).length === 0 && !this.isPrimary)
       this.emit("chart_paneDestroy", this.id)
-    else {
-      this.indicators[id].instance.destroy(state)
-      this.graph.removeOverlay(id)
-      this.draw()
-      delete this.#indicatorDeleteList[id]
-    }
+
     return true
   }
 
@@ -780,9 +780,16 @@ export default class Chart extends Component{
   }
 
   addTool(tool) {
-    // FIXME: this.layerConfig - undefined
-    let { layerConfig } = this.layerConfig();
-    let layer = new CEL.Layer(layerConfig);
+    // Get layer configuration from the graph instance
+    const config = this.graph.layerConfig();
+    
+    // Add null check for safety
+    if (!config || !config.layerConfig) {
+      this.core.error(`Failed to get layer configuration for tool: ${tool.id}`);
+      return false;
+    }
+
+    let layer = new CEL.Layer(config.layerConfig);
     this.#layersTools.set(tool.id, layer);
     this.viewport.addLayer(layer);
 

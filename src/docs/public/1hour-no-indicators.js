@@ -1,3 +1,4 @@
+import { LIMITFUTURE } from "../src/definitions/chart";
 
 export default {
     // range: {

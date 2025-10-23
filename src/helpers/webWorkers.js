@@ -73,7 +73,7 @@ class Thread {
       const fn = ${fn}
       const worker = new ThreadWorker(fn)
     `
-    const blob = new Blob([`;(async () => {${workerFn}})().catch(e => {console.error(e)})`], { type: 'text/javascript' })
+    const blob = new Blob([`;(async () => {${workerFn}})().catch(e => {//console.error('Web Worker Error:', e)})`], { type: 'text/javascript' })
     const blobURL = URL.createObjectURL(blob)
     this.#worker = new Worker(blobURL);
     // FireFox throws error when revokeObjectURL() is executed
@@ -324,7 +324,7 @@ export class RPCWorkerPool {
         }
       }
     }
-    console.log("Selected Worker:", id);
+    // console.log("Selected Worker:", id); // Debug logging - uncomment for development
     return this.workers[id];
   }
 

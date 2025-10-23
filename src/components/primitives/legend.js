@@ -59,7 +59,16 @@ export default class Legends {
       if (l === "collapse") continue
       this.remove(l)
     }
-    // TODO: remove collapse listeners
+    
+    // Remove event listeners to prevent memory leaks
+    this.#core.off("chart_pan", this.primaryPanePan, this)
+    this.#core.off("chart_panDone", this.primaryPanePanDone, this)
+    
+    // Remove collapse listeners
+    for (let item of this.#collapseList) {
+      item.el.removeEventListener('click', item.click);
+    }
+    
     this.#elTarget.remove()
   }
 
@@ -154,11 +163,18 @@ export default class Legends {
   add(options) {
     if (!isObject(options)) return undefined
 
-    const parentError = () => {this.#core.error("ERROR: Legend parent missing!")}
+    const parentError = () => {
+      this.#core.error("ERROR: Legend parent missing!");
+      return null; // Return null to indicate error
+    }
     options.id = options?.id || uid("legend")
     options.type = options?.type || "overlay"
-    options.title = options?.title || options?.parent.legendName
-    options.parent = options?.parent || parentError
+    options.title = options?.title ? String(options.title) : ""
+    options.parent = options?.parent || parentError()
+    
+    // Check if parent is null (error case)
+    if (options.parent === null) return undefined;
+    
     options.visible = (isBoolean(options?.visible)) ? options.visible : true
 
     const html = this.elTarget.buildLegend(options, this.#core.theme)

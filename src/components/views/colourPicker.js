@@ -160,6 +160,7 @@ export default class tradeXColourPicker extends element {
   #elRGBV
   #elChecker
   #elASlider
+  #onColValChange
   #canvas = {
     size: MIXERSIZE // 256
   }
@@ -174,8 +175,38 @@ export default class tradeXColourPicker extends element {
   }
 
   destroy() {
-    // TODO: remove all event listeners
-    this.#picker.remove()
+    // Remove all event listeners to prevent memory leaks
+    if (this.#windowEvents.click) {
+      document.removeEventListener('click', this.#windowEvents.click)
+      delete this.#windowEvents.click
+    }
+    if (this.#windowEvents.keydown) {
+      document.removeEventListener('keydown', this.#windowEvents.keydown)
+      delete this.#windowEvents.keydown
+    }
+    
+    // Remove element event listeners
+    if (this.#elSubmit) {
+      this.#elSubmit.removeEventListener('click', this.close.bind(this))
+    }
+    if (this.#elColVal && this.#onColValChange) {
+      this.#elColVal.removeEventListener('change', this.#onColValChange)
+    }
+    if (this.#elASlider) {
+      this.#elASlider.removeEventListener('input', this.#onASliderChange.bind(this))
+      this.#elASlider.removeEventListener('pointerup', this.#onASliderChange.bind(this))
+    }
+    if (this.#elMixer) {
+      this.#elMixer.removeEventListener('click', this.onCanvasClick.bind(this))
+    }
+    if (this.#elPalette) {
+      this.#elPalette.removeEventListener('click', this.onCanvasClick.bind(this))
+    }
+    
+    // Remove the picker element
+    if (this.#picker) {
+      this.#picker.remove()
+    }
   }
 
   connectedCallback() {
@@ -204,11 +235,11 @@ export default class tradeXColourPicker extends element {
         this.#elASlider = this.shadowRoot.querySelector('tradex-slider')
 
         // add handler for manual editing of colour value
-        const onColValChange = (e) => {
+        this.#onColValChange = (e) => {
           this.setColour(e.target.value)
           this.#target.dispatchEvent(new Event('change'))
         }
-        this.#elColVal.addEventListener("change", onColValChange)
+        this.#elColVal.addEventListener("change", this.#onColValChange)
         this.#elSubmit.addEventListener('click', this.close.bind(this))
         this.#elASlider.addEventListener('input', this.#onASliderChange.bind(this))
         this.#elASlider.addEventListener('pointerup', this.#onASliderChange.bind(this))
@@ -628,7 +659,16 @@ export class tradeXColourInput extends element {
   }
 
   destroy() {
-    // TODO: remove all event listeners
+    // Remove all event listeners to prevent memory leaks
+    if (this.#swatch) {
+      this.#swatch.removeEventListener('click', this.onSwatchClick.bind(this))
+    }
+    if (this.#target) {
+      this.#target.removeEventListener('change', this.onTargetChange.bind(this))
+    }
+    if (this.#picker && this.#picker.destroy) {
+      this.#picker.destroy()
+    }
   }
 
   connectedCallback() {

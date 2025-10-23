@@ -10,13 +10,9 @@ import CEL from "./primitives/canvas"
 export default class Overlays {
 
   #core
-  #config
   #parent
   #chart
-
   #list
-
-  #elOverlays
 
   constructor (parent, list=[]) {
 
@@ -34,10 +30,10 @@ export default class Overlays {
 
   get core() { return this.#core }
   get parent() { return this.#parent }
-  get layerConfig() { return this.#parent.layerConfig().layerConfig }
+  get layerConfig() { return this.#parent?.layerConfig().layerConfig || {} }
   get list() { return this.#list }
-  get scale() { return this.#parent.parent.scale }
-  get time() { return this.#parent.parent.time }
+  get scale() { return this.#parent.parent?.scale }
+  get time() { return this.#parent.parent?.time }
 
   start() {
     // set up event listeners
@@ -46,8 +42,8 @@ export default class Overlays {
 
   destroy() {
     if (this.#list.size == 0) return
-    for (let k of this.#list.keys()) {
-      this.removeOverlay(k)
+    for (let key of this.#list.keys()) {
+      this.removeOverlay(key)
     }
   }
 
@@ -70,11 +66,33 @@ export default class Overlays {
     return this.#list.get(overlay)
   }
 
+  // Add helper methods
+  hasOverlay(key) {
+    return this.#list.has(key)
+  }
+
+  getOverlayCount() {
+    return this.#list.size
+  }
+
+  // Add validation
+  validateOverlayConfig(overlay) {
+    if (!overlay?.class) {
+      throw new Error('Overlay configuration must include a class')
+    }
+    if (!overlay.class.isOverlay) {
+      throw new Error('Overlay class must have isOverlay static property')
+    }
+    return true
+  }
+
   addOverlays(overlays) {
     let result = [];
     let failed = []
     let key, obj;
     for (let o of overlays) {
+      key = o[0]
+      this.validateOverlayConfig(o[1])
       try {
         obj = this.addOverlay(o[0], o[1])
         key = obj.instance?.id || o[0]
@@ -90,11 +108,13 @@ export default class Overlays {
   }
 
   /**
-   * instantiate overlay
-   *
-   * @param {string} key
-   * @param {object} overlay
-   * @return {object} 
+   * Instantiate overlay
+   * @param {string} key - Overlay identifier
+   * @param {object} overlay - Overlay configuration
+   * @param {class} overlay.class - Overlay class constructor
+   * @param {object} [overlay.params] - Parameters for overlay
+   * @returns {object} Overlay descriptor with instance, layer, class, params
+   * @throws {Error} If overlay is not valid or instantiation fails
    * @memberof Overlays
    */
   addOverlay(key, overlay) {

@@ -49,7 +49,19 @@ export default class Slider {
   set cursor(c) { this.#elHandle.style.cursor = c }
   get cursor() { return this.#elHandle.style.cursor }
 
-  // TODO: remove event listeners on destroy
+  destroy() {
+    // Remove all event listeners to prevent memory leaks
+    if (this.#input) {
+      this.#input.off("mouseenter")
+      this.#input.off("mouseout")
+      this.#input.off("drag")
+      this.#input.off("enddrag")
+      this.#input.off("mousedown")
+      this.#input.off("mouseup")
+      this.#input.destroy && this.#input.destroy()
+      this.#input = null
+    }
+  }
 
   eventsListen() {
   this.#input = new Input(this.#elHandle, {disableContextMenu: false});
